@@ -18,23 +18,23 @@ package controllers
 
 import base.SpecBase
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
-import views.html.UnauthorisedView
+import play.api.test.Helpers.*
+import views.html.PageNotFoundView
 
-class UnauthorisedControllerSpec extends SpecBase {
+class PageNotFoundControllerSpec extends SpecBase {
 
-  "Unauthorised Controller" - {
+  "PageNotFound Controller" - {
 
     "must return OK and the correct view for a GET" in {
 
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
       running(application) {
-        val request = FakeRequest(GET, routes.UnauthorisedController.onPageLoad().url)
+        val request = FakeRequest(GET, routes.PageNotFoundController.onPageLoad().url)
 
         val result = route(application, request).value
 
-        val view = application.injector.instanceOf[UnauthorisedView]
+        val view = application.injector.instanceOf[PageNotFoundView]
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view()(request, applicationConfig, messages(application)).toString

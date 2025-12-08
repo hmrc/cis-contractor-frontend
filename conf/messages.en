@@ -45,5 +45,31 @@ signedOut.title = For your security, we signed you out
 signedOut.heading = For your security, we signed you out
 signedOut.guidance = We did not save your answers.
 
+pageNotFound.title      = Page not found
+pageNotFound.heading    = Page not found
+pageNotFound.p1         = If you typed the web address, check it is correct.
+pageNotFound.p2         = If you pasted the web address, check you copied the entire address.
+pageNotFound.p3         = If the web address is correct or you selected a link or button, contact the
+pageNotFound.link       = HMRC Online Services Helpdesk
+pageNotFound.p4         = if you need to speak to someone.
+
+systemError.title       = Sorry, there is a problem with this service
+systemError.heading     = Sorry, there is a problem with this service
+systemError.p1          = Try again later.
+systemError.p2          = Contact the
+systemError.link        = HMRC Online Services Helpdesk
+systemError.p3          = if you need to speak to someone about Construction Industry Scheme and quote the reference number:
+
+accessDenied.title      = Sorry, there is a problem with the service
+accessDenied.heading    = Sorry, there is a problem with the service
+accessDenied.link       = Return to the Construction Industry Scheme start page.
+
 unauthorised.title = You can’t access this service with this account
 unauthorised.heading = You can’t access this service with this account
+unauthorised.guidance.org.p1.prefix = If you are a contractor or subcontractor, you will need to register with
+unauthorised.guidance.org.p1.link = Construction Industry Scheme
+unauthorised.guidance.org.p1.suffix = to access this service.
+unauthorised.guidance.agent.p2.prefix = If you are an agent, you will need to request access to
+unauthorised.guidance.agent.p2.link = PAYE for Agents
+unauthorised.guidance.agent.p2.suffix = to use this service.
+
