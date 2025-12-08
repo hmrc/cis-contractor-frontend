@@ -19,23 +19,24 @@ package controllers
 import base.SpecBase
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import views.html.UnauthorisedView
+import views.html.UnauthorisedOrgStandardView
 
-class UnauthorisedControllerSpec extends SpecBase {
-  
-  "Unauthorised Controller" - {
+class UnauthorisedWrongRoleControllerSpec extends SpecBase {
+
+  "UnauthorisedWrongRole Controller" - {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
+      val application = applicationBuilder(userAnswers = None)
         .build()
 
       running(application) {
-        val request = FakeRequest(GET, routes.UnauthorisedController.onPageLoad().url)
+        val request =
+          FakeRequest(GET, controllers.routes.UnauthorisedWrongRoleController.onPageLoad().url)
 
         val result = route(application, request).value
 
-        val view = application.injector.instanceOf[UnauthorisedView]
+        val view = application.injector.instanceOf[UnauthorisedOrgStandardView]
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view()(request, applicationConfig, messages(application)).toString

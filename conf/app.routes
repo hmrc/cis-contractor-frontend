@@ -19,6 +19,11 @@ GET         /account/sign-out                            controllers.auth.AuthCo
 GET         /account/signed-out                          controllers.auth.SignedOutController.onPageLoad()
 
 GET         /unauthorised                                controllers.UnauthorisedController.onPageLoad()
+GET         /unauthorised/standard-user                  controllers.UnauthorisedWrongRoleController.onPageLoad()
+GET         /unauthorised/organisation                   controllers.UnauthorisedOrganisationAffinityController.onPageLoad()
+GET         /unauthorised/individual                     controllers.UnauthorisedIndividualAffinityController.onPageLoad()
+GET         /unauthorised/agent                          controllers.UnauthorisedAgentAffinityController.onPageLoad()
+
 GET         /page-not-found                              controllers.PageNotFoundController.onPageLoad()
 GET         /access-denied                               controllers.AccessDeniedController.onPageLoad()
 GET         /system-error/there-is-a-problem             controllers.SystemErrorController.onPageLoad()

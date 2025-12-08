@@ -14,15 +14,12 @@
  * limitations under the License.
  */
 
-package models.requests
+package controllers.actions
 
-import models.EmployerReference
-import play.api.mvc.{Request, WrappedRequest}
+import uk.gov.hmrc.auth.core.retrieve.~
 
-case class IdentifierRequest[A](
-                                 request: Request[A],
-                                 userId: String,
-                                 employerReference: Option[EmployerReference],
-                                 agentReference: Option[String],
-                                 isAgent: Boolean = false
-                               ) extends WrappedRequest[A](request)
+object TestAuthRetrievals {
+  implicit class Ops[A](a: A) {
+    def ~[B](b: B): A ~ B = new ~(a, b)
+  }
+}
