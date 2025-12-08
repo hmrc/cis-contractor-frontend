@@ -18,7 +18,7 @@ package controllers.add
 
 import controllers.actions.*
 import forms.TypeOfSubcontractorFormProvider
-import models.{Mode, UserAnswers}
+import models.Mode
 import navigation.Navigator
 import pages.TypeOfSubcontractorPage
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -46,10 +46,9 @@ class TypeOfSubcontractorController @Inject() (
 
   val form = formProvider()
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData) { implicit request =>
+  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
 
-    val userAnswers  = request.userAnswers.getOrElse(UserAnswers(request.userId))
-    val preparedForm = userAnswers.get(TypeOfSubcontractorPage) match {
+    val preparedForm = request.userAnswers.get(TypeOfSubcontractorPage) match {
       case None        => form
       case Some(value) => form.fill(value)
     }
@@ -57,17 +56,15 @@ class TypeOfSubcontractorController @Inject() (
     Ok(view(preparedForm, mode))
   }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData).async {
+  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
       form
         .bindFromRequest()
         .fold(
           formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
           value =>
-            val userAnswers  = request.userAnswers.getOrElse(UserAnswers(request.userId))
-
             for {
-              updatedAnswers <- Future.fromTry(userAnswers.set(TypeOfSubcontractorPage, value))
+              updatedAnswers <- Future.fromTry(request.userAnswers.set(TypeOfSubcontractorPage, value))
               _              <- sessionRepository.set(updatedAnswers)
             } yield Redirect(navigator.nextPage(TypeOfSubcontractorPage, mode, updatedAnswers))
         )
