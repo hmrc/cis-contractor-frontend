@@ -16,16 +16,21 @@
 
 package controllers.actions
 
-import javax.inject.Inject
+import models.EmployerReference
 import models.requests.IdentifierRequest
-import play.api.mvc._
+import play.api.mvc.*
 
+import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class FakeIdentifierAction @Inject()(bodyParsers: PlayBodyParsers) extends IdentifierAction {
+class FakeIdentifierAction @Inject()(isAgent: Boolean)(bodyParsers: PlayBodyParsers) extends IdentifierAction {
 
   override def invokeBlock[A](request: Request[A], block: IdentifierRequest[A] => Future[Result]): Future[Result] =
-    block(IdentifierRequest(request, "id"))
+    if (isAgent) {
+      block(IdentifierRequest(request, "id", None, Some("agentReferenceNumber"), true))
+    } else {
+      block(IdentifierRequest(request, "id", Some(EmployerReference("taxOfficeNumber", "taxOfficeReference")), None))
+    }
 
   override def parser: BodyParser[AnyContent] =
     bodyParsers.default

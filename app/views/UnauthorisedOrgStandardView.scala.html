@@ -14,19 +14,23 @@
  * limitations under the License.
  *@
 
-@import utils.Utils.emptyString
+@import config.FrontendAppConfig
+@import views.html.components._
 
-@this()
+@this(
+    layout: templates.Layout,
+    heading: H1,
+    link: Link,
+)
 
-@(title: Html, content: Html)(implicit messages: Messages)
+@()(implicit request: Request[_], appConfig: FrontendAppConfig, messages: Messages)
 
-<div class="govuk-summary-card">
-    <div class="govuk-summary-card__title-wrapper">
-        <h2 class="govuk-summary-card__title">
-            @title
-        </h2>
-    </div>
-    <div class="govuk-summary-card__content">
-        @content
-    </div>
-</div>
+@layout(
+    pageTitle = titleNoForm(messages("unauthorised.org.standard.title")),
+    showSignOut = false,
+    showBackLink = false
+) {
+    @heading(messages("unauthorised.org.standard.heading"), classes = "govuk-heading-xl")
+    @link("unauthorised.org.standard.guidance.link", appConfig.govUkCISGuidanceUrl, prefixTextKey = "unauthorised.org.standard.paragraph")
+
+}
