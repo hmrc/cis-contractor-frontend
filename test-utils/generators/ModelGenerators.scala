@@ -17,12 +17,13 @@
 package generators
 
 import models.*
+import models.add.TypeOfSubcontractor
 import org.scalacheck.{Arbitrary, Gen}
 
 trait ModelGenerators {
 
-  implicit lazy val arbitrarySubcontractorTypes: Arbitrary[SubcontractorTypes] =
+  implicit lazy val arbitrarySubcontractorTypes: Arbitrary[TypeOfSubcontractor] =
     Arbitrary {
-      Gen.oneOf(SubcontractorTypes.values.toSeq)
+      Gen.oneOf(TypeOfSubcontractor.values.toSeq)
     }
 }

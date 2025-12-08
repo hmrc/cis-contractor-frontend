@@ -16,15 +16,14 @@
 
 package viewmodels.checkAnswers
 
-import controllers.routes
 import models.{CheckMode, UserAnswers}
 import pages.SubcontractorTypesPage
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
-import viewmodels.govuk.summarylist._
-import viewmodels.implicits._
+import viewmodels.govuk.summarylist.*
+import viewmodels.implicits.*
 
 object SubcontractorTypesSummary  {
 
@@ -34,16 +33,16 @@ object SubcontractorTypesSummary  {
 
         val value = ValueViewModel(
           HtmlContent(
-            HtmlFormat.escape(messages(s"subcontractorTypes.$answer"))
+            HtmlFormat.escape(messages(s"typeOfSubcontractor.$answer"))
           )
         )
 
         SummaryListRowViewModel(
-          key     = "subcontractorTypes.checkYourAnswersLabel",
+          key     = "typeOfSubcontractor.checkYourAnswersLabel",
           value   = value,
           actions = Seq(
-            ActionItemViewModel("site.change", routes.SubcontractorTypesController.onPageLoad(CheckMode).url)
-              .withVisuallyHiddenText(messages("subcontractorTypes.change.hidden"))
+            ActionItemViewModel("site.change", controllers.add.routes.TypeOfSubcontractorController.onPageLoad(CheckMode).url)
+              .withVisuallyHiddenText(messages("typeOfSubcontractor.change.hidden"))
           )
         )
     }

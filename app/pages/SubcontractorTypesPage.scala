@@ -16,10 +16,10 @@
 
 package pages
 
-import models.SubcontractorTypes
+import models.add.TypeOfSubcontractor
 import play.api.libs.json.JsPath
 
-case object SubcontractorTypesPage extends QuestionPage[SubcontractorTypes] {
+case object SubcontractorTypesPage extends QuestionPage[TypeOfSubcontractor] {
 
   override def path: JsPath = JsPath \ toString
 

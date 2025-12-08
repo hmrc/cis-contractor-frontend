@@ -17,22 +17,22 @@
 package forms
 
 import forms.behaviours.OptionFieldBehaviours
-import models.SubcontractorTypes
+import models.add.TypeOfSubcontractor
 import play.api.data.FormError
 
-class SubcontractorTypesFormProviderSpec extends OptionFieldBehaviours {
+class TypeOfSubcontractorFormProviderSpec extends OptionFieldBehaviours {
 
-  val form = new SubcontractorTypesFormProvider()()
+  val form = new TypeOfSubcontractorFormProvider()()
 
   ".value" - {
 
     val fieldName = "value"
-    val requiredKey = "subcontractorTypes.error.required"
+    val requiredKey = "typeOfSubcontractor.error.required"
 
-    behave like optionsField[SubcontractorTypes](
+    behave like optionsField[TypeOfSubcontractor](
       form,
       fieldName,
-      validValues  = SubcontractorTypes.values,
+      validValues  = TypeOfSubcontractor.values,
       invalidError = FormError(fieldName, "error.invalid")
     )
 

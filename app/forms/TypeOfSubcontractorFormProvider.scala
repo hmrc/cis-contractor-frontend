@@ -19,13 +19,13 @@ package forms
 import javax.inject.Inject
 
 import forms.mappings.Mappings
+import models.add.TypeOfSubcontractor
 import play.api.data.Form
-import models.SubcontractorTypes
 
-class SubcontractorTypesFormProvider @Inject() extends Mappings {
+class TypeOfSubcontractorFormProvider @Inject() extends Mappings {
 
-  def apply(): Form[SubcontractorTypes] =
+  def apply(): Form[TypeOfSubcontractor] =
     Form(
-      "value" -> enumerable[SubcontractorTypes]("subcontractorTypes.error.required")
+      "value" -> enumerable[TypeOfSubcontractor]("typeOfSubcontractor.error.required")
     )
 }

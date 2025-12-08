@@ -20,7 +20,7 @@ GET         /account/signed-out                          controllers.auth.Signed
 
 GET         /unauthorised                                controllers.UnauthorisedController.onPageLoad()
 
-GET        /add/type-of-subcontractor                    controllers.SubcontractorTypesController.onPageLoad(mode: Mode = NormalMode)
-POST       /add/type-of-subcontractor                    controllers.SubcontractorTypesController.onSubmit(mode: Mode = NormalMode)
-GET        /add/type-of-subcontractor                    controllers.SubcontractorTypesController.onPageLoad(mode: Mode = CheckMode)
-POST       /add/type-of-subcontractor                    controllers.SubcontractorTypesController.onSubmit(mode: Mode = CheckMode)
+GET        /add/type-of-subcontractor                    controllers.add.TypeOfSubcontractorController.onPageLoad(mode: Mode = NormalMode)
+POST       /add/type-of-subcontractor                    controllers.add.TypeOfSubcontractorController.onSubmit(mode: Mode = NormalMode)
+GET        /add/type-of-subcontractor                    controllers.add.TypeOfSubcontractorController.onPageLoad(mode: Mode = CheckMode)
+POST       /add/type-of-subcontractor                    controllers.add.TypeOfSubcontractorController.onSubmit(mode: Mode = CheckMode)

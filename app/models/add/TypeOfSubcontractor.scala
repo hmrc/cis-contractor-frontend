@@ -14,34 +14,35 @@
  * limitations under the License.
  */
 
-package models
+package models.add
 
+import models.{Enumerable, WithName}
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.Aliases.Text
 import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.RadioItem
 
-sealed trait SubcontractorTypes
+sealed trait TypeOfSubcontractor
 
-object SubcontractorTypes extends Enumerable.Implicits {
+object TypeOfSubcontractor extends Enumerable.Implicits {
 
-  case object Individualorsoletrader extends WithName("individualOrSoleTrader") with SubcontractorTypes
-  case object Limitedcompany extends WithName("limitedCompany") with SubcontractorTypes
-  case object Partnership  extends WithName("partnership") with SubcontractorTypes
-  case object Trust extends WithName("trust") with SubcontractorTypes
+  case object Individualorsoletrader extends WithName("individualOrSoleTrader") with TypeOfSubcontractor
+  case object Limitedcompany extends WithName("limitedCompany") with TypeOfSubcontractor
+  case object Partnership  extends WithName("partnership") with TypeOfSubcontractor
+  case object Trust extends WithName("trust") with TypeOfSubcontractor
 
-  val values: Seq[SubcontractorTypes] = Seq(
+  val values: Seq[TypeOfSubcontractor] = Seq(
     Individualorsoletrader, Limitedcompany, Partnership, Trust
   )
 
   def options(implicit messages: Messages): Seq[RadioItem] = values.zipWithIndex.map {
     case (value, index) =>
       RadioItem(
-        content = Text(messages(s"subcontractorTypes.${value.toString}")),
+        content = Text(messages(s"typeOfSubcontractor.${value.toString}")),
         value   = Some(value.toString),
         id      = Some(s"value_$index")
       )
   }
 
-  implicit val enumerable: Enumerable[SubcontractorTypes] =
+  implicit val enumerable: Enumerable[TypeOfSubcontractor] =
     Enumerable(values.map(v => v.toString -> v): _*)
 }

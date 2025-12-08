@@ -16,6 +16,7 @@
 
 package models
 
+import models.add.TypeOfSubcontractor
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Gen
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
@@ -26,33 +27,33 @@ import play.api.libs.json.{JsError, JsString, Json}
 
 class SubcontractorTypesSpec extends AnyFreeSpec with Matchers with ScalaCheckPropertyChecks with OptionValues {
 
-  "SubcontractorTypes" - {
+  "TypeOfSubcontractor" - {
 
     "must deserialise valid values" in {
 
-      val gen = Gen.oneOf(SubcontractorTypes.values.toSeq)
+      val gen = Gen.oneOf(TypeOfSubcontractor.values.toSeq)
 
       forAll(gen) {
         subcontractorTypes =>
 
-          JsString(subcontractorTypes.toString).validate[SubcontractorTypes].asOpt.value mustEqual subcontractorTypes
+          JsString(subcontractorTypes.toString).validate[TypeOfSubcontractor].asOpt.value mustEqual subcontractorTypes
       }
     }
 
     "must fail to deserialise invalid values" in {
 
-      val gen = arbitrary[String] suchThat (!SubcontractorTypes.values.map(_.toString).contains(_))
+      val gen = arbitrary[String] suchThat (!TypeOfSubcontractor.values.map(_.toString).contains(_))
 
       forAll(gen) {
         invalidValue =>
 
-          JsString(invalidValue).validate[SubcontractorTypes] mustEqual JsError("error.invalid")
+          JsString(invalidValue).validate[TypeOfSubcontractor] mustEqual JsError("error.invalid")
       }
     }
 
     "must serialise" in {
 
-      val gen = Gen.oneOf(SubcontractorTypes.values.toSeq)
+      val gen = Gen.oneOf(TypeOfSubcontractor.values.toSeq)
 
       forAll(gen) {
         subcontractorTypes =>

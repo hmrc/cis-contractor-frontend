@@ -14,6 +14,8 @@
  * limitations under the License.
  *@
 
+@import models.add.TypeOfSubcontractor
+
 @this(
     layout: templates.Layout,
     formHelper: FormWithCSRF,
@@ -24,9 +26,9 @@
 
 @(form: Form[_], mode: Mode)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = title(form, messages("subcontractorTypes.title"))) {
+@layout(pageTitle = title(form, messages("typeOfSubcontractor.title"))) {
 
-    @formHelper(action = routes.SubcontractorTypesController.onSubmit(mode), Symbol("autoComplete") -> "off") {
+    @formHelper(action = controllers.add.routes.TypeOfSubcontractorController.onSubmit(mode), Symbol("autoComplete") -> "off") {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form,  errorLinkOverrides = Map("value" -> "value_0")))
@@ -35,8 +37,8 @@
         @govukRadios(
             RadiosViewModel(
                 field  = form("value"),
-                legend = LegendViewModel(messages("subcontractorTypes.heading")).asPageHeading().withCssClass("govuk-fieldset__legend--l"),
-                items  = SubcontractorTypes.options
+                legend = LegendViewModel(messages("typeOfSubcontractor.heading")).asPageHeading().withCssClass("govuk-fieldset__legend--l"),
+                items  = TypeOfSubcontractor.options
             )
         )
 
