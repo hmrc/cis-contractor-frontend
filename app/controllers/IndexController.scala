@@ -36,8 +36,8 @@ class IndexController @Inject()(
   extends FrontendBaseController with I18nSupport {
 
   def onPageLoad(): Action[AnyContent] = identify.async { implicit request =>
-    val fresh = UserAnswers(request.userId)
-    sessionRepository.set(fresh).map { _ =>
+    val userAnswers = UserAnswers(request.userId)
+    sessionRepository.set(userAnswers).map { _ =>
       Redirect(controllers.add.routes.TypeOfSubcontractorController.onPageLoad(NormalMode))
     }
   }
