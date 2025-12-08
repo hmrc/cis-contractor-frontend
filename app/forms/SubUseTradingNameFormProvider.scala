@@ -19,8 +19,8 @@ package forms
 import javax.inject.Inject
 
 import forms.mappings.Mappings
+import models.add.SubUseTradingName
 import play.api.data.Form
-import models.SubUseTradingName
 
 class SubUseTradingNameFormProvider @Inject() extends Mappings {
 

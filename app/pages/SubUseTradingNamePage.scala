@@ -16,7 +16,7 @@
 
 package pages
 
-import models.SubUseTradingName
+import models.add.SubUseTradingName
 import play.api.libs.json.JsPath
 
 case object SubUseTradingNamePage extends QuestionPage[SubUseTradingName] {

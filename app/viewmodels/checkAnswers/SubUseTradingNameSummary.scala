@@ -42,7 +42,7 @@ object SubUseTradingNameSummary  {
           key     = "subUseTradingName.checkYourAnswersLabel",
           value   = value,
           actions = Seq(
-            ActionItemViewModel("site.change", routes.SubUseTradingNameController.onPageLoad(CheckMode).url)
+            ActionItemViewModel("site.change", controllers.add.routes.SubUseTradingNameController.onPageLoad(CheckMode).url)
               .withVisuallyHiddenText(messages("subUseTradingName.change.hidden"))
           )
         )

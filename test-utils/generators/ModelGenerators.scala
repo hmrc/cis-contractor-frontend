@@ -18,6 +18,7 @@ package generators
 
 import models.*
 import models.add.TypeOfSubcontractor
+import models.add.SubUseTradingName
 import org.scalacheck.{Arbitrary, Gen}
 
 trait ModelGenerators {
