@@ -27,3 +27,8 @@ GET         /unauthorised/agent                          controllers.Unauthorise
 GET         /page-not-found                              controllers.PageNotFoundController.onPageLoad()
 GET         /access-denied                               controllers.AccessDeniedController.onPageLoad()
 GET         /system-error/there-is-a-problem             controllers.SystemErrorController.onPageLoad()
+
+GET        /add/type-of-subcontractor                    controllers.add.TypeOfSubcontractorController.onPageLoad(mode: Mode = NormalMode)
+POST       /add/type-of-subcontractor                    controllers.add.TypeOfSubcontractorController.onSubmit(mode: Mode = NormalMode)
+GET        /add/type-of-subcontractor                    controllers.add.TypeOfSubcontractorController.onPageLoad(mode: Mode = CheckMode)
+POST       /add/type-of-subcontractor                    controllers.add.TypeOfSubcontractorController.onSubmit(mode: Mode = CheckMode)

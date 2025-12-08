@@ -14,16 +14,32 @@
  * limitations under the License.
  */
 
-package generators
+package forms
 
-import models.*
+import forms.behaviours.OptionFieldBehaviours
 import models.add.TypeOfSubcontractor
-import org.scalacheck.{Arbitrary, Gen}
+import play.api.data.FormError
 
-trait ModelGenerators {
+class TypeOfSubcontractorFormProviderSpec extends OptionFieldBehaviours {
 
-  implicit lazy val arbitrarySubcontractorTypes: Arbitrary[TypeOfSubcontractor] =
-    Arbitrary {
-      Gen.oneOf(TypeOfSubcontractor.values.toSeq)
-    }
+  val form = new TypeOfSubcontractorFormProvider()()
+
+  ".value" - {
+
+    val fieldName = "value"
+    val requiredKey = "typeOfSubcontractor.error.required"
+
+    behave like optionsField[TypeOfSubcontractor](
+      form,
+      fieldName,
+      validValues  = TypeOfSubcontractor.values,
+      invalidError = FormError(fieldName, "error.invalid")
+    )
+
+    behave like mandatoryField(
+      form,
+      fieldName,
+      requiredError = FormError(fieldName, requiredKey)
+    )
+  }
 }

@@ -17,8 +17,9 @@
 package controllers
 
 import base.SpecBase
+import models.NormalMode
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import views.html.IndexView
 
 class IndexControllerSpec extends SpecBase {
@@ -33,12 +34,9 @@ class IndexControllerSpec extends SpecBase {
         val request = FakeRequest(GET, routes.IndexController.onPageLoad().url)
 
         val result = route(application, request).value
-
-        val view = application.injector.instanceOf[IndexView]
-
-        status(result) mustEqual OK
-
-        contentAsString(result) mustEqual view()(request, messages(application)).toString
+        
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.add.routes.TypeOfSubcontractorController.onPageLoad(NormalMode).url
       }
     }
   }
