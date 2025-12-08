@@ -14,15 +14,18 @@
  * limitations under the License.
  */
 
-package generators
+package forms
 
-import models.*
-import org.scalacheck.{Arbitrary, Gen}
+import javax.inject.Inject
 
-trait ModelGenerators {
+import forms.mappings.Mappings
+import play.api.data.Form
+import models.SubcontractorTypes
 
-  implicit lazy val arbitrarySubcontractorTypes: Arbitrary[SubcontractorTypes] =
-    Arbitrary {
-      Gen.oneOf(SubcontractorTypes.values.toSeq)
-    }
+class SubcontractorTypesFormProvider @Inject() extends Mappings {
+
+  def apply(): Form[SubcontractorTypes] =
+    Form(
+      "value" -> enumerable[SubcontractorTypes]("subcontractorTypes.error.required")
+    )
 }
