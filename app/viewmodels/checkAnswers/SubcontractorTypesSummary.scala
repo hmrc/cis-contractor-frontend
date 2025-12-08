@@ -17,7 +17,7 @@
 package viewmodels.checkAnswers
 
 import models.{CheckMode, UserAnswers}
-import pages.SubcontractorTypesPage
+import pages.TypeOfSubcontractorPage
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
@@ -28,7 +28,7 @@ import viewmodels.implicits.*
 object SubcontractorTypesSummary  {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(SubcontractorTypesPage).map {
+    answers.get(TypeOfSubcontractorPage).map {
       answer =>
 
         val value = ValueViewModel(

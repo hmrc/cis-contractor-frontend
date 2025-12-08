@@ -25,7 +25,7 @@ import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.SubcontractorTypesPage
+import pages.TypeOfSubcontractorPage
 import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
@@ -42,7 +42,7 @@ class TypeOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
   lazy val subcontractorTypesRoute = controllers.add.routes.TypeOfSubcontractorController.onPageLoad(NormalMode).url
 
   val formProvider = new TypeOfSubcontractorFormProvider()
-  val form = formProvider()
+  val form         = formProvider()
 
   "TypeOfSubcontractor Controller" - {
 
@@ -64,7 +64,8 @@ class TypeOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = UserAnswers(userAnswersId).set(SubcontractorTypesPage, TypeOfSubcontractor.values.head).success.value
+      val userAnswers =
+        UserAnswers(userAnswersId).set(TypeOfSubcontractorPage, TypeOfSubcontractor.values.head).success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
@@ -76,7 +77,10 @@ class TypeOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(TypeOfSubcontractor.values.head), NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill(TypeOfSubcontractor.values.head), NormalMode)(
+          request,
+          messages(application)
+        ).toString
       }
     }
 
@@ -126,7 +130,6 @@ class TypeOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-
     "must return a Bad Request and errors when no value is submitted" in {
 
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
@@ -136,7 +139,7 @@ class TypeOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
           FakeRequest(POST, subcontractorTypesRoute)
             .withFormUrlEncodedBody()
 
-        val form = new TypeOfSubcontractorFormProvider()()
+        val form      = new TypeOfSubcontractorFormProvider()()
         val boundForm = form.bind(Map.empty)
 
         val view = application.injector.instanceOf[TypeOfSubcontractorView]
@@ -149,7 +152,6 @@ class TypeOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
         contentAsString(result) must include(messages(application)("typeOfSubcontractor.error.required"))
       }
     }
-
 
   }
 }

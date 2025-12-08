@@ -27,7 +27,7 @@ import models._
 class Navigator @Inject() () {
 
   private val normalRoutes: Page => UserAnswers => Call = {
-    case SubcontractorTypesPage => _ => controllers.add.routes.TypeOfSubcontractorController.onPageLoad(NormalMode)
+    case TypeOfSubcontractorPage => _ => controllers.add.routes.TypeOfSubcontractorController.onPageLoad(NormalMode)
     case _                      => _ => routes.IndexController.onPageLoad()
   }
 

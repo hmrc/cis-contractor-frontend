@@ -20,13 +20,13 @@ import controllers.actions.*
 import forms.TypeOfSubcontractorFormProvider
 import models.{Mode, UserAnswers}
 import navigation.Navigator
-import pages.SubcontractorTypesPage
+import pages.TypeOfSubcontractorPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-
 import views.html.add.TypeOfSubcontractorView
+
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -46,9 +46,10 @@ class TypeOfSubcontractorController @Inject() (
 
   val form = formProvider()
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
+  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData) { implicit request =>
 
-    val preparedForm = request.userAnswers.get(SubcontractorTypesPage) match {
+    val userAnswers  = request.userAnswers.getOrElse(UserAnswers(request.userId))
+    val preparedForm = userAnswers.get(TypeOfSubcontractorPage) match {
       case None        => form
       case Some(value) => form.fill(value)
     }
@@ -56,18 +57,19 @@ class TypeOfSubcontractorController @Inject() (
     Ok(view(preparedForm, mode))
   }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData).async { implicit request =>
-    form
-      .bindFromRequest()
-      .fold(
-        formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
-        value =>
-          val userAnswers = request.userAnswers.getOrElse(UserAnswers(request.userId))
+  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData).async {
+    implicit request =>
+      form
+        .bindFromRequest()
+        .fold(
+          formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
+          value =>
+            val userAnswers  = request.userAnswers.getOrElse(UserAnswers(request.userId))
 
-          for {
-            updatedAnswers <- Future.fromTry(userAnswers.set(SubcontractorTypesPage, value))
-            _              <- sessionRepository.set(updatedAnswers)
-          } yield Redirect(navigator.nextPage(SubcontractorTypesPage, mode, updatedAnswers))
-      )
+            for {
+              updatedAnswers <- Future.fromTry(userAnswers.set(TypeOfSubcontractorPage, value))
+              _              <- sessionRepository.set(updatedAnswers)
+            } yield Redirect(navigator.nextPage(TypeOfSubcontractorPage, mode, updatedAnswers))
+        )
   }
 }

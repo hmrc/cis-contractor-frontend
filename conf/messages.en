@@ -66,7 +66,6 @@ accessDenied.link       = Return to the Construction Industry Scheme start page.
 
 unauthorised.title = You can’t access this service with this account
 unauthorised.heading = You can’t access this service with this account
-<<<<<<< HEAD
 
 typeOfSubcontractor.title = What type of subcontractor are you adding?
 typeOfSubcontractor.heading = What type of subcontractor are you adding?
@@ -77,7 +76,7 @@ typeOfSubcontractor.trust = Trust
 typeOfSubcontractor.checkYourAnswersLabel = What type of subcontractor are you adding?
 typeOfSubcontractor.error.required = Select how the subcontractor is operating
 typeOfSubcontractor.change.hidden = SubcontractorTypes
-=======
+
 unauthorised.guidance.org.p1.prefix = If you are a contractor or subcontractor, you will need to register with
 unauthorised.guidance.org.p1.link = Construction Industry Scheme
 unauthorised.guidance.org.p1.suffix = to access this service.
@@ -85,4 +84,3 @@ unauthorised.guidance.agent.p2.prefix = If you are an agent, you will need to re
 unauthorised.guidance.agent.p2.link = PAYE for Agents
 unauthorised.guidance.agent.p2.suffix = to use this service.
 
->>>>>>> main
