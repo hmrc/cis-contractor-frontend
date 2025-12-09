@@ -28,7 +28,8 @@ class Navigator @Inject() () {
 
   private val normalRoutes: Page => UserAnswers => Call = {
     case TypeOfSubcontractorPage => _ => controllers.add.routes.TypeOfSubcontractorController.onPageLoad(NormalMode)
-    case _                      => _ => routes.IndexController.onPageLoad()
+    case SubcontractorNamePage   => _ => controllers.add.routes.SubcontractorNameController.onPageLoad(NormalMode)
+    case _                       => _ => routes.IndexController.onPageLoad()
   }
 
   private val checkRouteMap: Page => UserAnswers => Call = { case _ =>

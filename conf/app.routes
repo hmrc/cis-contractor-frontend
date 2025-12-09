@@ -32,3 +32,8 @@ GET        /add/type-of-subcontractor                    controllers.add.TypeOfS
 POST       /add/type-of-subcontractor                    controllers.add.TypeOfSubcontractorController.onSubmit(mode: Mode = NormalMode)
 GET        /add/type-of-subcontractor                    controllers.add.TypeOfSubcontractorController.onPageLoad(mode: Mode = CheckMode)
 POST       /add/type-of-subcontractor                    controllers.add.TypeOfSubcontractorController.onSubmit(mode: Mode = CheckMode)
+
+GET        /add/name                                    controllers.add.SubcontractorNameController.onPageLoad(mode: Mode = NormalMode)
+POST       /add/name                                    controllers.add.SubcontractorNameController.onSubmit(mode: Mode = NormalMode)
+GET        /add/name                                    controllers.add.SubcontractorNameController.onPageLoad(mode: Mode = CheckMode)
+POST       /add/name                                    controllers.add.SubcontractorNameController.onSubmit(mode: Mode = CheckMode)
