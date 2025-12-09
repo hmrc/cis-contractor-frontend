@@ -14,18 +14,17 @@
  * limitations under the License.
  */
 
-package pages
+package forms.add
 
-import pages.behaviours.PageBehaviours
+import forms.mappings.Mappings
+import play.api.data.Form
 
-class SubUseTradingNamePageSpec extends PageBehaviours {
+import javax.inject.Inject
 
-  "SubUseTradingNamePage" - {
+class SubUseTradingNameFormProvider @Inject() extends Mappings {
 
-    beRetrievable[Boolean](SubUseTradingNamePage)
-
-    beSettable[Boolean](SubUseTradingNamePage)
-
-    beRemovable[Boolean](SubUseTradingNamePage)
-  }
+  def apply(): Form[Boolean] =
+    Form(
+      "value" -> boolean("subUseTradingName.error.required")
+    )
 }

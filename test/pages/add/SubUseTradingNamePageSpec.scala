@@ -14,32 +14,19 @@
  * limitations under the License.
  */
 
-package forms
+package pages.add
 
-import forms.behaviours.BooleanFieldBehaviours
-import play.api.data.FormError
+import pages.add.SubUseTradingNamePage
+import pages.behaviours.PageBehaviours
 
-class SubUseTradingNameFormProviderSpec extends BooleanFieldBehaviours  {
+class SubUseTradingNamePageSpec extends PageBehaviours {
 
-  val requiredKey = "subUseTradingName.error.required"
-  val invalidKey = "error.boolean"
+  "SubUseTradingNamePage" - {
 
-  val form = new SubUseTradingNameFormProvider()()
+    beRetrievable[Boolean](SubUseTradingNamePage)
 
-  ".value" - {
+    beSettable[Boolean](SubUseTradingNamePage)
 
-    val fieldName = "value"
-
-    behave like booleanField(
-      form,
-      fieldName,
-      invalidError = FormError(fieldName, invalidKey)
-    )
-
-    behave like mandatoryField(
-      form,
-      fieldName,
-      requiredError = FormError(fieldName, requiredKey)
-    )
+    beRemovable[Boolean](SubUseTradingNamePage)
   }
 }

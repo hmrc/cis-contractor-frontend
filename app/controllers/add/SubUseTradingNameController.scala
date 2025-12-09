@@ -17,10 +17,10 @@
 package controllers.add
 
 import controllers.actions.*
-import forms.SubUseTradingNameFormProvider
+import forms.add.SubUseTradingNameFormProvider
 import models.Mode
 import navigation.Navigator
-import pages.SubUseTradingNamePage
+import pages.add.SubUseTradingNamePage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository

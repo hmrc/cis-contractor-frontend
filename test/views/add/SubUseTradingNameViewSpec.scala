@@ -16,7 +16,7 @@
 
 package views.add
 
-import forms.SubUseTradingNameFormProvider
+import forms.add.SubUseTradingNameFormProvider
 import models.NormalMode
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
