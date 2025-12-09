@@ -16,20 +16,19 @@
 
 package forms
 
+import forms.add.TradingNameOfSubcontractorFormProvider
 import forms.behaviours.StringFieldBehaviours
 import play.api.data.FormError
-
-
 import org.scalacheck.Gen
 
-class NameOfSubcontractorFormProviderSpec extends StringFieldBehaviours {
+class TradingNameOfSubcontractorFormProviderSpec extends StringFieldBehaviours {
 
-  val requiredKey = "nameOfSubcontractor.error.required"
-  val lengthKey   = "nameOfSubcontractor.error.length"
-  val invalidKey  = "nameOfSubcontractor.error.invalidCharacters"
+  val requiredKey = "tradingNameOfSubcontractor.error.required"
+  val lengthKey   = "tradingNameOfSubcontractor.error.length"
+  val invalidKey  = "tradingNameOfSubcontractor.error.invalidCharacters"
   val maxLength   = 56
 
-  private val form = new NameOfSubcontractorFormProvider()()
+  private val form = new TradingNameOfSubcontractorFormProvider()()
 
   ".value" - {
 

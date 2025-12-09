@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 
-package forms
+package forms.add
 
-import javax.inject.Inject
 import forms.mappings.Mappings
 import play.api.data.Form
 
-class NameOfSubcontractorFormProvider @Inject() extends Mappings {
+import javax.inject.Inject
+
+class TradingNameOfSubcontractorFormProvider @Inject() extends Mappings {
 
 
   private val allowedCharsRegex =
@@ -28,13 +29,12 @@ class NameOfSubcontractorFormProvider @Inject() extends Mappings {
 
   def apply(): Form[String] =
     Form(
-      "value" -> text("nameOfSubcontractor.error.required")
+      "value" -> text("tradingNameOfSubcontractor.error.required")
         .transform(_.trim, identity)
         .verifying(
           firstError(
-            maxLength(56, "nameOfSubcontractor.error.length"),
-            regexp(allowedCharsRegex, "nameOfSubcontractor.error.invalidCharacters"),
-            isNotEmpty("value", "nameOfSubcontractor.error.required")
+            maxLength(56, "tradingNameOfSubcontractor.error.length"),
+            regexp(allowedCharsRegex, "tradingNameOfSubcontractor.error.invalidCharacters")
           )
         )
     )

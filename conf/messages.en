@@ -109,10 +109,10 @@ unauthorised.agent.p2.suffix = to use this service.
 
 
 
-nameOfSubcontractor.title = What is the subcontractor’s trading name?
-nameOfSubcontractor.heading = What is the subcontractor’s trading name?
-nameOfSubcontractor.checkYourAnswersLabel = What is the subcontractor’s trading name?
-nameOfSubcontractor.error.required = Enter a trading name like ABC Construction LTD
-nameOfSubcontractor.error.length = Enter a trading name less or equal to 56 characters
-nameOfSubcontractor.change.hidden = What is the subcontractor’s trading name?
-nameOfSubcontractor.error.invalidCharacters = Enter a trading name like ABC Construction LTD
+tradingNameOfSubcontractor.title = What is the subcontractor’s trading name?
+tradingNameOfSubcontractor.heading = What is the subcontractor’s trading name?
+tradingNameOfSubcontractor.checkYourAnswersLabel = What is the subcontractor’s trading name?
+tradingNameOfSubcontractor.error.required = Enter a trading name like ABC Construction LTD
+tradingNameOfSubcontractor.error.length = Enter a trading name less or equal to 56 characters
+tradingNameOfSubcontractor.change.hidden = What is the subcontractor’s trading name?
+tradingNameOfSubcontractor.error.invalidCharacters = Enter a trading name like ABC Construction LTD

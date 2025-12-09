@@ -17,13 +17,13 @@
 package controllers.add
 
 import base.SpecBase
-import forms.TypeOfSubcontractorFormProvider
+import forms.add.TypeOfSubcontractorFormProvider
 import models.add.TypeOfSubcontractor
 import models.{NormalMode, UserAnswers}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.TypeOfSubcontractorPage
+import pages.add.TypeOfSubcontractorPage
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*

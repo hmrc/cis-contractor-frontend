@@ -16,7 +16,7 @@
 
 package views.add
 
-import forms.NameOfSubcontractorFormProvider
+import forms.add.TradingNameOfSubcontractorFormProvider
 import models.NormalMode
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
@@ -26,47 +26,49 @@ import play.api.i18n.Messages
 import play.api.mvc.Request
 import play.api.test.FakeRequest
 import play.twirl.api.HtmlFormat
-import views.html.add.NameOfSubcontractorView
+import views.html.add.TradingNameOfSubcontractorView
 
-class NameOfSubcontractorViewSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite {
+class TradingNameOfSubcontractorViewSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite {
 
-  "NameOfSubcontractorView" should {
+  "TradingNameOfSubcontractorView" should {
 
     "render the page with title, heading, input and submit button" in new Setup {
       val html: HtmlFormat.Appendable = view(form, NormalMode)
       val doc                         = org.jsoup.Jsoup.parse(html.toString())
-      
-      doc.select("title").text() must include(messages("nameOfSubcontractor.title"))
-      
+
+      doc.select("title").text() must include(messages("tradingNameOfSubcontractor.title"))
+
       val heading = doc.select("label.govuk-label")
-      heading.text() mustBe messages("nameOfSubcontractor.heading")
-      
-      doc.select("form").attr("action") mustBe controllers.add.routes.NameOfSubcontractorController.onSubmit(NormalMode).url
-      
+      heading.text() mustBe messages("tradingNameOfSubcontractor.heading")
+
+      doc.select("form").attr("action") mustBe controllers.add.routes.TradingNameOfSubcontractorController
+        .onSubmit(NormalMode)
+        .url
+
       doc.select("input[name=value]").size() mustBe 1
-      
+
       doc.select(".govuk-button").text() mustBe messages("site.continue")
     }
 
     "display error summary and inline error when no name is entered" in new Setup {
       val errorForm: Form[String] =
-        form.withError("value", "nameOfSubcontractor.error.required")
+        form.withError("value", "tradingNameOfSubcontractor.error.required")
 
       val html = view(errorForm, NormalMode)
       val doc  = org.jsoup.Jsoup.parse(html.toString())
-      
+
       val summary = doc.select(".govuk-error-summary")
-      summary.text() must include(messages("nameOfSubcontractor.error.required"))
+      summary.text() must include(messages("tradingNameOfSubcontractor.error.required"))
 
       val linkHref = summary.select("a").attr("href")
       linkHref mustBe "#value"
 
-      doc.select(".govuk-error-message").text() must include(messages("nameOfSubcontractor.error.required"))
+      doc.select(".govuk-error-message").text() must include(messages("tradingNameOfSubcontractor.error.required"))
     }
   }
 
   trait Setup {
-    val formProvider       = new NameOfSubcontractorFormProvider()
+    val formProvider       = new TradingNameOfSubcontractorFormProvider()
     val form: Form[String] = formProvider()
 
     implicit val request: Request[_] = FakeRequest()
@@ -76,6 +78,6 @@ class NameOfSubcontractorViewSpec extends AnyWordSpec with Matchers with GuiceOn
         app.injector.instanceOf[play.api.i18n.MessagesApi]
       )
 
-    val view: NameOfSubcontractorView = app.injector.instanceOf[NameOfSubcontractorView]
+    val view: TradingNameOfSubcontractorView = app.injector.instanceOf[TradingNameOfSubcontractorView]
   }
 }

@@ -18,8 +18,9 @@ package navigation
 
 import base.SpecBase
 import controllers.routes
-import pages._
-import models._
+import pages.*
+import models.*
+import pages.add.{TradingNameOfSubcontractorPage, TypeOfSubcontractorPage}
 
 class NavigatorSpec extends SpecBase {
 
@@ -36,7 +37,7 @@ class NavigatorSpec extends SpecBase {
       }
 
       "must go from a NameOfSubcontractorPage  to next page" in {
-        navigator.nextPage(NameOfSubcontractorPage, NormalMode, UserAnswers("id")) mustBe controllers.add.routes.NameOfSubcontractorController.onPageLoad(NormalMode)
+        navigator.nextPage(TradingNameOfSubcontractorPage, NormalMode, UserAnswers("id")) mustBe controllers.add.routes.TradingNameOfSubcontractorController.onPageLoad(NormalMode)
       }
 
       "must go from a TypeOfSubcontractorPage  to next page" in {

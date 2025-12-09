@@ -18,26 +18,27 @@ package controllers.add
 
 import base.SpecBase
 import controllers.routes
-import forms.NameOfSubcontractorFormProvider
+import forms.add.TradingNameOfSubcontractorFormProvider
 import models.{NormalMode, UserAnswers}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.NameOfSubcontractorPage
+import pages.add.TradingNameOfSubcontractorPage
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import repositories.SessionRepository
-import views.html.add.NameOfSubcontractorView
+import views.html.add.TradingNameOfSubcontractorView
 
 import scala.concurrent.Future
+import scala.util.Random
 
-class NameOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
+class TradingNameOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
 
-  val formProvider = new NameOfSubcontractorFormProvider()
+  val formProvider = new TradingNameOfSubcontractorFormProvider()
   val form         = formProvider()
 
-  lazy val nameOfSubcontractorRoute = controllers.add.routes.NameOfSubcontractorController.onPageLoad(NormalMode).url
+  lazy val nameOfSubcontractorRoute = controllers.add.routes.TradingNameOfSubcontractorController.onPageLoad(NormalMode).url
 
   "NameOfSubcontractor Controller" - {
 
@@ -50,7 +51,7 @@ class NameOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
 
         val result = route(application, request).value
 
-        val view = application.injector.instanceOf[NameOfSubcontractorView]
+        val view = application.injector.instanceOf[TradingNameOfSubcontractorView]
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
@@ -59,14 +60,14 @@ class NameOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = UserAnswers(userAnswersId).set(NameOfSubcontractorPage, "answer").success.value
+      val userAnswers = UserAnswers(userAnswersId).set(TradingNameOfSubcontractorPage, "answer").success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
       running(application) {
         val request = FakeRequest(GET, nameOfSubcontractorRoute)
 
-        val view = application.injector.instanceOf[NameOfSubcontractorView]
+        val view = application.injector.instanceOf[TradingNameOfSubcontractorView]
 
         val result = route(application, request).value
 
@@ -96,7 +97,7 @@ class NameOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.add.routes.NameOfSubcontractorController
+        redirectLocation(result).value mustEqual controllers.add.routes.TradingNameOfSubcontractorController
           .onPageLoad(NormalMode)
           .url
       }
@@ -113,7 +114,7 @@ class NameOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
 
         val boundForm = form.bind(Map("value" -> ""))
 
-        val view = application.injector.instanceOf[NameOfSubcontractorView]
+        val view = application.injector.instanceOf[TradingNameOfSubcontractorView]
 
         val result = route(application, request).value
 
@@ -125,8 +126,8 @@ class NameOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
     "must return a Bad Request and errors when invalid data is submitted with length is more than 56 character" in {
 
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
-      val longInput   =
-        "AbccddcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcAbccddcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcAbccddcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdc"
+      val longInput   = Random.alphanumeric.take(57).mkString
+
       running(application) {
         val request =
           FakeRequest(POST, nameOfSubcontractorRoute)
@@ -134,7 +135,7 @@ class NameOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
 
         val boundForm = form.bind(Map("value" -> longInput))
 
-        val view = application.injector.instanceOf[NameOfSubcontractorView]
+        val view = application.injector.instanceOf[TradingNameOfSubcontractorView]
 
         val result = route(application, request).value
 

@@ -14,13 +14,18 @@
  * limitations under the License.
  */
 
-package pages
+package forms.add
 
-import play.api.libs.json.JsPath
+import forms.mappings.Mappings
+import models.add.TypeOfSubcontractor
+import play.api.data.Form
 
-case object NameOfSubcontractorPage extends QuestionPage[String] {
+import javax.inject.Inject
 
-  override def path: JsPath = JsPath \ toString
+class TypeOfSubcontractorFormProvider @Inject() extends Mappings {
 
-  override def toString: String = "nameOfSubcontractor"
+  def apply(): Form[TypeOfSubcontractor] =
+    Form(
+      "value" -> enumerable[TypeOfSubcontractor]("typeOfSubcontractor.error.required")
+    )
 }

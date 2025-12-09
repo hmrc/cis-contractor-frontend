@@ -17,29 +17,29 @@
 package controllers.add
 
 import controllers.actions.*
-import forms.NameOfSubcontractorFormProvider
+import forms.add.TradingNameOfSubcontractorFormProvider
 import models.Mode
 import navigation.Navigator
-import pages.NameOfSubcontractorPage
+import pages.add.TradingNameOfSubcontractorPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.add.NameOfSubcontractorView
+import views.html.add.TradingNameOfSubcontractorView
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class NameOfSubcontractorController @Inject()(
-                                        override val messagesApi: MessagesApi,
-                                        sessionRepository: SessionRepository,
-                                        navigator: Navigator,
-                                        identify: IdentifierAction,
-                                        getData: DataRetrievalAction,
-                                        requireData: DataRequiredAction,
-                                        formProvider: NameOfSubcontractorFormProvider,
-                                        val controllerComponents: MessagesControllerComponents,
-                                        view: NameOfSubcontractorView
+class TradingNameOfSubcontractorController @Inject()(
+                                                      override val messagesApi: MessagesApi,
+                                                      sessionRepository: SessionRepository,
+                                                      navigator: Navigator,
+                                                      identify: IdentifierAction,
+                                                      getData: DataRetrievalAction,
+                                                      requireData: DataRequiredAction,
+                                                      formProvider: TradingNameOfSubcontractorFormProvider,
+                                                      val controllerComponents: MessagesControllerComponents,
+                                                      view: TradingNameOfSubcontractorView
                                     )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   val form = formProvider()
@@ -47,7 +47,7 @@ class NameOfSubcontractorController @Inject()(
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) {
     implicit request =>
 
-      val preparedForm = request.userAnswers.get(NameOfSubcontractorPage) match {
+      val preparedForm = request.userAnswers.get(TradingNameOfSubcontractorPage) match {
         case None => form
         case Some(value) => form.fill(value)
       }
@@ -64,9 +64,9 @@ class NameOfSubcontractorController @Inject()(
 
         value =>
           for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(NameOfSubcontractorPage, value))
+            updatedAnswers <- Future.fromTry(request.userAnswers.set(TradingNameOfSubcontractorPage, value))
             _              <- sessionRepository.set(updatedAnswers)
-          } yield Redirect(navigator.nextPage(NameOfSubcontractorPage, mode, updatedAnswers))
+          } yield Redirect(navigator.nextPage(TradingNameOfSubcontractorPage, mode, updatedAnswers))
       )
   }
 }

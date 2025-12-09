@@ -17,18 +17,18 @@
 package navigation
 
 import javax.inject.{Inject, Singleton}
-
 import play.api.mvc.Call
 import controllers.routes
-import pages._
-import models._
+import pages.*
+import models.*
+import pages.add.{TradingNameOfSubcontractorPage, TypeOfSubcontractorPage}
 
 @Singleton
 class Navigator @Inject() () {
 
   private val normalRoutes: Page => UserAnswers => Call = {
     case TypeOfSubcontractorPage => _ => controllers.add.routes.TypeOfSubcontractorController.onPageLoad(NormalMode)
-    case NameOfSubcontractorPage => _ => controllers.add.routes.NameOfSubcontractorController.onPageLoad(NormalMode)
+    case TradingNameOfSubcontractorPage => _ => controllers.add.routes.TradingNameOfSubcontractorController.onPageLoad(NormalMode)
     case _                      => _ => routes.IndexController.onPageLoad()
   }
 
