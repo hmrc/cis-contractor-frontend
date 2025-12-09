@@ -19,13 +19,12 @@ package forms
 import javax.inject.Inject
 
 import forms.mappings.Mappings
-import models.add.SubUseTradingName
 import play.api.data.Form
 
 class SubUseTradingNameFormProvider @Inject() extends Mappings {
 
-  def apply(): Form[SubUseTradingName] =
+  def apply(): Form[Boolean] =
     Form(
-      "value" -> enumerable[SubUseTradingName]("subUseTradingName.error.required")
+      "value" -> boolean("subUseTradingName.error.required")
     )
 }

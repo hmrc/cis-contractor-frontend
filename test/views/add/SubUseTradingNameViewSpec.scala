@@ -18,7 +18,6 @@ package views.add
 
 import forms.SubUseTradingNameFormProvider
 import models.NormalMode
-import models.add.SubUseTradingName
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
@@ -45,12 +44,10 @@ class SubUseTradingNameViewSpec extends AnyWordSpec with Matchers with GuiceOneA
       val hint = doc.select("fieldset .govuk-hint")
       hint.text() mustBe messages("subUseTradingName.hint")
 
-      val radios = doc.select(".govuk-radios__input")
-      radios.size() mustBe SubUseTradingName.options.size
-
-      val labels = doc.select(".govuk-radios__label").eachText()
-      labels must contain(messages("subUseTradingName.yes"))
-      labels must contain(messages("subUseTradingName.no"))
+      val radioButtons = doc.select(".govuk-radios__label")
+      radioButtons.size() mustBe 2
+      radioButtons.get(0).text mustBe "Yes"
+      radioButtons.get(1).text mustBe "No"
 
       doc.select("form").attr("action") mustBe controllers.add.routes.SubUseTradingNameController.onSubmit(NormalMode).url
 
@@ -60,7 +57,7 @@ class SubUseTradingNameViewSpec extends AnyWordSpec with Matchers with GuiceOneA
     }
 
     "display error summary and inline error when no option is selected" in new Setup {
-      val errorForm: Form[SubUseTradingName] =
+      val errorForm: Form[Boolean] =
         form.withError("value", "subUseTradingName.error.required")
 
       val html = view(errorForm, NormalMode)
@@ -78,7 +75,7 @@ class SubUseTradingNameViewSpec extends AnyWordSpec with Matchers with GuiceOneA
 
   trait Setup {
     val formProvider                   = new SubUseTradingNameFormProvider()
-    val form: Form[SubUseTradingName] = formProvider()
+    val form: Form[Boolean] = formProvider()
 
     implicit val request: Request[_] = FakeRequest()
     implicit val messages: Messages  =

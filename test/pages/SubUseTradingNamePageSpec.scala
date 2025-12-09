@@ -16,17 +16,16 @@
 
 package pages
 
-import models.add.SubUseTradingName
 import pages.behaviours.PageBehaviours
 
 class SubUseTradingNamePageSpec extends PageBehaviours {
 
   "SubUseTradingNamePage" - {
 
-    beRetrievable[SubUseTradingName](SubUseTradingNamePage)
+    beRetrievable[Boolean](SubUseTradingNamePage)
 
-    beSettable[SubUseTradingName](SubUseTradingNamePage)
+    beSettable[Boolean](SubUseTradingNamePage)
 
-    beRemovable[SubUseTradingName](SubUseTradingNamePage)
+    beRemovable[Boolean](SubUseTradingNamePage)
   }
 }

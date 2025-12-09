@@ -35,10 +35,9 @@
         }
 
         @govukRadios(
-            RadiosViewModel(
+            RadiosViewModel.yesNo(
                 field  = form("value"),
                 legend = LegendViewModel(messages("subUseTradingName.heading")).asPageHeading().withCssClass("govuk-fieldset__legend--l"),
-                items  = SubUseTradingName.options
             ).withHint(Hint(
                 content = Messages("subUseTradingName.hint"))
             )

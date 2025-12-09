@@ -16,24 +16,24 @@
 
 package forms
 
-import forms.behaviours.OptionFieldBehaviours
-import models.add.SubUseTradingName
+import forms.behaviours.BooleanFieldBehaviours
 import play.api.data.FormError
 
-class SubUseTradingNameFormProviderSpec extends OptionFieldBehaviours {
+class SubUseTradingNameFormProviderSpec extends BooleanFieldBehaviours  {
+
+  val requiredKey = "subUseTradingName.error.required"
+  val invalidKey = "error.boolean"
 
   val form = new SubUseTradingNameFormProvider()()
 
   ".value" - {
 
     val fieldName = "value"
-    val requiredKey = "subUseTradingName.error.required"
 
-    behave like optionsField[SubUseTradingName](
+    behave like booleanField(
       form,
       fieldName,
-      validValues  = SubUseTradingName.values,
-      invalidError = FormError(fieldName, "error.invalid")
+      invalidError = FormError(fieldName, invalidKey)
     )
 
     behave like mandatoryField(
