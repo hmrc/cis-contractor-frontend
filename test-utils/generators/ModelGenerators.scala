@@ -18,7 +18,6 @@ package generators
 
 import models.*
 import models.add.TypeOfSubcontractor
-import models.add.SubUseTradingName
 import org.scalacheck.{Arbitrary, Gen}
 
 trait ModelGenerators {
@@ -26,10 +25,5 @@ trait ModelGenerators {
   implicit lazy val arbitrarySubcontractorTypes: Arbitrary[TypeOfSubcontractor] =
     Arbitrary {
       Gen.oneOf(TypeOfSubcontractor.values.toSeq)
-    }
-
-  implicit lazy val arbitrarySubUseTradingName: Arbitrary[SubUseTradingName] =
-    Arbitrary {
-      Gen.oneOf(SubUseTradingName.values.toSeq)
     }
 }
