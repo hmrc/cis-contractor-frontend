@@ -113,6 +113,6 @@ nameOfSubcontractor.title = What is the subcontractor’s trading name?
 nameOfSubcontractor.heading = What is the subcontractor’s trading name?
 nameOfSubcontractor.checkYourAnswersLabel = What is the subcontractor’s trading name?
 nameOfSubcontractor.error.required = Enter a trading name like ABC Construction LTD
-nameOfSubcontractor.error.length = Trading name must be 56 characters or less
+nameOfSubcontractor.error.length = Enter a trading name less or equal to 56 characters
 nameOfSubcontractor.change.hidden = What is the subcontractor’s trading name?
 nameOfSubcontractor.error.invalidCharacters = Enter a trading name like ABC Construction LTD

@@ -35,7 +35,7 @@ import scala.concurrent.Future
 class NameOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
 
   val formProvider = new NameOfSubcontractorFormProvider()
-  val form = formProvider()
+  val form         = formProvider()
 
   lazy val nameOfSubcontractorRoute = controllers.add.routes.NameOfSubcontractorController.onPageLoad(NormalMode).url
 
@@ -96,7 +96,9 @@ class NameOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.add.routes.NameOfSubcontractorController.onPageLoad(NormalMode).url
+        redirectLocation(result).value mustEqual controllers.add.routes.NameOfSubcontractorController
+          .onPageLoad(NormalMode)
+          .url
       }
     }
 
@@ -110,6 +112,27 @@ class NameOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
             .withFormUrlEncodedBody(("value", ""))
 
         val boundForm = form.bind(Map("value" -> ""))
+
+        val view = application.injector.instanceOf[NameOfSubcontractorView]
+
+        val result = route(application, request).value
+
+        status(result) mustEqual BAD_REQUEST
+        contentAsString(result) mustEqual view(boundForm, NormalMode)(request, messages(application)).toString
+      }
+    }
+
+    "must return a Bad Request and errors when invalid data is submitted with length is more than 56 character" in {
+
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val longInput   =
+        "AbccddcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcAbccddcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcAbccddcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdc"
+      running(application) {
+        val request =
+          FakeRequest(POST, nameOfSubcontractorRoute)
+            .withFormUrlEncodedBody(("value", longInput))
+
+        val boundForm = form.bind(Map("value" -> longInput))
 
         val view = application.injector.instanceOf[NameOfSubcontractorView]
 
