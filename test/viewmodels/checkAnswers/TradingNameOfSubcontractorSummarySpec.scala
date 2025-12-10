@@ -31,7 +31,7 @@ class TradingNameOfSubcontractorSummarySpec extends AnyFreeSpec with Matchers {
 
   implicit val messages: Messages = stubMessages()
 
-  "NameOfSubcontractorSummary.row" - {
+  "TradingNNameOfSubcontractorSummary.row" - {
 
     "must return a SummaryListRow when the answer exists" in {
       val answers =
@@ -45,7 +45,7 @@ class TradingNameOfSubcontractorSummarySpec extends AnyFreeSpec with Matchers {
 
       val row = maybeRow.value
       
-      val expectedKeyText = messages("nameOfSubcontractor.checkYourAnswersLabel")
+      val expectedKeyText = messages("tradingNameOfSubcontractor.checkYourAnswersLabel")
       row.key.content.asHtml.toString should include(expectedKeyText)
       
       row.value.content.asHtml.toString should include("Acme Ltd")
@@ -57,7 +57,7 @@ class TradingNameOfSubcontractorSummarySpec extends AnyFreeSpec with Matchers {
       val changeAction = actions.head
       val expectedChangeText = messages("site.change")
       val expectedHref = routes.TradingNameOfSubcontractorController.onPageLoad(CheckMode).url
-      val expectedHiddenText = messages("nameOfSubcontractor.change.hidden")
+      val expectedHiddenText = messages("tradingNameOfSubcontractor.change.hidden")
 
       changeAction.content.asHtml.toString should include(expectedChangeText)
       changeAction.href shouldBe expectedHref

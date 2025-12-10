@@ -31,11 +31,11 @@ object TradingNameOfSubcontractorSummary  {
       answer =>
 
         SummaryListRowViewModel(
-          key     = "nameOfSubcontractor.checkYourAnswersLabel",
+          key     = "tradingNameOfSubcontractor.checkYourAnswersLabel",
           value   = ValueViewModel(HtmlFormat.escape(answer).toString),
           actions = Seq(
             ActionItemViewModel("site.change", controllers.add.routes.TradingNameOfSubcontractorController.onPageLoad(CheckMode).url)
-              .withVisuallyHiddenText(messages("nameOfSubcontractor.change.hidden"))
+              .withVisuallyHiddenText(messages("tradingNameOfSubcontractor.change.hidden"))
           )
         )
     }
