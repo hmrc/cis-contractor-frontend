@@ -19,8 +19,6 @@ package viewmodels.checkAnswers.add
 import models.{CheckMode, UserAnswers}
 import pages.add.SubUseTradingNamePage
 import play.api.i18n.Messages
-import play.twirl.api.HtmlFormat
-import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
@@ -31,15 +29,11 @@ object SubUseTradingNameSummary  {
     answers.get(SubUseTradingNamePage).map {
       answer =>
 
-        val value = ValueViewModel(
-          HtmlContent(
-            HtmlFormat.escape(messages(s"subUseTradingName.$answer"))
-          )
-        )
+        val value = if (answer) "site.yes" else "site.no"
 
         SummaryListRowViewModel(
           key     = "subUseTradingName.checkYourAnswersLabel",
-          value   = value,
+          value   = ValueViewModel(value),
           actions = Seq(
             ActionItemViewModel("site.change", controllers.add.routes.SubUseTradingNameController.onPageLoad(CheckMode).url)
               .withVisuallyHiddenText(messages("subUseTradingName.change.hidden"))
