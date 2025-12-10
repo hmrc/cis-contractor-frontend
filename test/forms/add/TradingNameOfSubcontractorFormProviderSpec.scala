@@ -16,7 +16,6 @@
 
 package forms.add
 
-import forms.add.TradingNameOfSubcontractorFormProvider
 import forms.behaviours.StringFieldBehaviours
 import org.scalacheck.Gen
 import play.api.data.FormError
