@@ -20,7 +20,7 @@ import base.SpecBase
 import controllers.routes
 import pages.*
 import models.*
-import pages.add.{TradingNameOfSubcontractorPage, TypeOfSubcontractorPage}
+import pages.add.*
 
 class NavigatorSpec extends SpecBase {
 
@@ -37,13 +37,28 @@ class NavigatorSpec extends SpecBase {
       }
 
       "must go from a NameOfSubcontractorPage  to next page" in {
-        navigator.nextPage(TradingNameOfSubcontractorPage, NormalMode, UserAnswers("id")) mustBe controllers.add.routes.TradingNameOfSubcontractorController.onPageLoad(NormalMode)
+        navigator.nextPage(
+          TradingNameOfSubcontractorPage,
+          NormalMode,
+          UserAnswers("id")
+        ) mustBe controllers.add.routes.TradingNameOfSubcontractorController.onPageLoad(NormalMode)
       }
 
       "must go from a TypeOfSubcontractorPage  to next page" in {
-        navigator.nextPage(TypeOfSubcontractorPage, NormalMode, UserAnswers("id")) mustBe controllers.add.routes.TypeOfSubcontractorController.onPageLoad(NormalMode)
+        navigator.nextPage(
+          TypeOfSubcontractorPage,
+          NormalMode,
+          UserAnswers("id")
+        ) mustBe controllers.add.routes.TypeOfSubcontractorController.onPageLoad(NormalMode)
       }
 
+      "must go from a SubAddAddressPage  to next page" in {
+        navigator.nextPage(
+          SubAddAddressPage,
+          NormalMode,
+          UserAnswers("id")
+        ) mustBe controllers.add.routes.SubAddAddressController.onPageLoad(NormalMode)
+      }
 
     }
 
@@ -52,7 +67,8 @@ class NavigatorSpec extends SpecBase {
       "must go from a page that doesn't exist in the edit route map to CheckYourAnswers" in {
 
         case object UnknownPage extends Page
-        navigator.nextPage(UnknownPage, CheckMode, UserAnswers("id")) mustBe routes.CheckYourAnswersController.onPageLoad()
+        navigator.nextPage(UnknownPage, CheckMode, UserAnswers("id")) mustBe routes.CheckYourAnswersController
+          .onPageLoad()
       }
     }
   }

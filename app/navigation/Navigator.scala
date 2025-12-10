@@ -21,7 +21,7 @@ import play.api.mvc.Call
 import controllers.routes
 import pages.*
 import models.*
-import pages.add.{TradingNameOfSubcontractorPage, TypeOfSubcontractorPage}
+import pages.add.*
 
 @Singleton
 class Navigator @Inject() () {
@@ -29,6 +29,7 @@ class Navigator @Inject() () {
   private val normalRoutes: Page => UserAnswers => Call = {
     case TypeOfSubcontractorPage => _ => controllers.add.routes.TypeOfSubcontractorController.onPageLoad(NormalMode)
     case TradingNameOfSubcontractorPage => _ => controllers.add.routes.TradingNameOfSubcontractorController.onPageLoad(NormalMode)
+    case SubAddAddressPage => _ => controllers.add.routes.SubAddAddressController.onPageLoad(NormalMode)
     case _                      => _ => routes.IndexController.onPageLoad()
   }
 
