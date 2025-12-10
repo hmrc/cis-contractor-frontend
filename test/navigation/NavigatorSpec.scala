@@ -34,6 +34,14 @@ class NavigatorSpec extends SpecBase {
         case object UnknownPage extends Page
         navigator.nextPage(UnknownPage, NormalMode, UserAnswers("id")) mustBe routes.IndexController.onPageLoad()
       }
+
+      "must go from a UniqueTaxpayerReferencePage  to next page" in {
+        navigator.nextPage(
+          UniqueTaxpayerReferencePage,
+          NormalMode,
+          UserAnswers("id")
+        ) mustBe controllers.add.routes.UniqueTaxpayerReferenceController.onPageLoad(NormalMode)
+      }
     }
 
     "in Check mode" - {
