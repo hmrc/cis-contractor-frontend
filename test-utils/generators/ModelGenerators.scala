@@ -19,11 +19,25 @@ package generators
 import models.*
 import models.add.TypeOfSubcontractor
 import org.scalacheck.{Arbitrary, Gen}
+import play.api.libs.json.Json
+
+import java.time.Instant
 
 trait ModelGenerators {
 
   implicit lazy val arbitrarySubcontractorTypes: Arbitrary[TypeOfSubcontractor] =
     Arbitrary {
       Gen.oneOf(TypeOfSubcontractor.values.toSeq)
+    }
+
+  implicit lazy val arbitraryUserAnswers: Arbitrary[UserAnswers] =
+    Arbitrary {
+      for {
+        id <- Gen.uuid.map(_.toString)
+      } yield UserAnswers(
+        id = id,
+        data = Json.obj(),
+        lastUpdated = Instant.now()
+      )
     }
 }

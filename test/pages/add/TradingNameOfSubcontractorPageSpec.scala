@@ -16,20 +16,16 @@
 
 package pages.add
 
-import org.scalatest.freespec.AnyFreeSpec
-import org.scalatest.matchers.should.Matchers
-import play.api.libs.json.JsPath
+import pages.behaviours.PageBehaviours
 
-class TradingNameOfSubcontractorPageSpec extends AnyFreeSpec with Matchers {
+class TradingNameOfSubcontractorPageSpec extends PageBehaviours {
 
   "TradingNameOfSubcontractorPage" - {
 
-    "must have the correct toString value" in {
-      TradingNameOfSubcontractorPage.toString shouldBe "tradingNameOfSubcontractor"
-    }
+    beRetrievable[String](TradingNameOfSubcontractorPage)
 
-    "must have the correct JsPath" in {
-      TradingNameOfSubcontractorPage.path shouldBe JsPath \ "tradingNameOfSubcontractor"
-    }
+    beSettable[String](TradingNameOfSubcontractorPage)
+
+    beRemovable[String](TradingNameOfSubcontractorPage)
   }
 }
