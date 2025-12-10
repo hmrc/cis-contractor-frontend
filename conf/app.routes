@@ -32,3 +32,8 @@ GET        /add/type-of-subcontractor                    controllers.add.TypeOfS
 POST       /add/type-of-subcontractor                    controllers.add.TypeOfSubcontractorController.onSubmit(mode: Mode = NormalMode)
 GET        /add/type-of-subcontractor                    controllers.add.TypeOfSubcontractorController.onPageLoad(mode: Mode = CheckMode)
 POST       /add/type-of-subcontractor                    controllers.add.TypeOfSubcontractorController.onSubmit(mode: Mode = CheckMode)
+
+GET        /add/check-national-insurance-number          controllers.add.NationalInsuranceNumberController.onPageLoad(mode: Mode = NormalMode)
+POST       /add/check-national-insurance-number          controllers.add.NationalInsuranceNumberController.onSubmit(mode: Mode = NormalMode)
+GET        /add/change-check-national-insurance-number   controllers.add.NationalInsuranceNumberController.onPageLoad(mode: Mode = CheckMode)
+POST       /add/change-check-national-insurance-number   controllers.add.NationalInsuranceNumberController.onSubmit(mode: Mode = CheckMode)

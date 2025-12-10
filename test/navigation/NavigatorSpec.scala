@@ -34,6 +34,14 @@ class NavigatorSpec extends SpecBase {
         case object UnknownPage extends Page
         navigator.nextPage(UnknownPage, NormalMode, UserAnswers("id")) mustBe routes.IndexController.onPageLoad()
       }
+
+      "must go from a NationalInsuranceNumberPage  to next page" in {
+        navigator.nextPage(
+          NationalInsuranceNumberPage,
+          NormalMode,
+          UserAnswers("id")
+        ) mustBe controllers.add.routes.NationalInsuranceNumberController.onPageLoad(NormalMode)
+      }
     }
 
     "in Check mode" - {
@@ -41,7 +49,8 @@ class NavigatorSpec extends SpecBase {
       "must go from a page that doesn't exist in the edit route map to CheckYourAnswers" in {
 
         case object UnknownPage extends Page
-        navigator.nextPage(UnknownPage, CheckMode, UserAnswers("id")) mustBe routes.CheckYourAnswersController.onPageLoad()
+        navigator.nextPage(UnknownPage, CheckMode, UserAnswers("id")) mustBe routes.CheckYourAnswersController
+          .onPageLoad()
       }
     }
   }
