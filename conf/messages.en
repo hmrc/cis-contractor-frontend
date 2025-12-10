@@ -113,3 +113,11 @@ subUseTradingName.hint = This is a business name, different from their own name.
 subUseTradingName.checkYourAnswersLabel = Does the subcontractor use a trading name?
 subUseTradingName.error.required = Select whether or not the subcontractor uses a trading name
 subUseTradingName.change.hidden = Subcontractor use a trading name
+
+tradingNameOfSubcontractor.title = What is the subcontractor’s trading name?
+tradingNameOfSubcontractor.heading = What is the subcontractor’s trading name?
+tradingNameOfSubcontractor.checkYourAnswersLabel = What is the subcontractor’s trading name?
+tradingNameOfSubcontractor.error.required = Enter a trading name like ABC Construction LTD
+tradingNameOfSubcontractor.error.length = Enter a trading name less or equal to 56 characters
+tradingNameOfSubcontractor.change.hidden = What is the subcontractor’s trading name?
+tradingNameOfSubcontractor.error.invalidCharacters = Enter a trading name like ABC Construction LTD

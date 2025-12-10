@@ -18,8 +18,9 @@ package navigation
 
 import base.SpecBase
 import controllers.routes
-import pages._
-import models._
+import pages.*
+import models.*
+import pages.add.{TradingNameOfSubcontractorPage, TypeOfSubcontractorPage}
 
 class NavigatorSpec extends SpecBase {
 
@@ -34,7 +35,11 @@ class NavigatorSpec extends SpecBase {
         case object UnknownPage extends Page
         navigator.nextPage(UnknownPage, NormalMode, UserAnswers("id")) mustBe routes.IndexController.onPageLoad()
       }
-      
+
+      "must go from a NameOfSubcontractorPage  to next page" in {
+        navigator.nextPage(TradingNameOfSubcontractorPage, NormalMode, UserAnswers("id")) mustBe controllers.add.routes.TradingNameOfSubcontractorController.onPageLoad(NormalMode)
+      }
+
       "must go from TypeOfSubcontractorPage to SubUseTradingNameController" in {
         navigator.nextPage(
           TypeOfSubcontractorPage,
@@ -42,7 +47,7 @@ class NavigatorSpec extends SpecBase {
           UserAnswers("id")
         ) mustBe controllers.add.routes.SubUseTradingNameController.onPageLoad(NormalMode)
       }
-      
+
     }
 
     "in Check mode" - {

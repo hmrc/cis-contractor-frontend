@@ -14,30 +14,18 @@
  * limitations under the License.
  */
 
-package generators
+package pages.add
 
-import models.*
-import models.add.TypeOfSubcontractor
-import org.scalacheck.{Arbitrary, Gen}
-import play.api.libs.json.Json
+import pages.behaviours.PageBehaviours
 
-import java.time.Instant
+class TradingNameOfSubcontractorPageSpec extends PageBehaviours {
 
-trait ModelGenerators {
+  "TradingNameOfSubcontractorPage" - {
 
-  implicit lazy val arbitrarySubcontractorTypes: Arbitrary[TypeOfSubcontractor] =
-    Arbitrary {
-      Gen.oneOf(TypeOfSubcontractor.values.toSeq)
-    }
+    beRetrievable[String](TradingNameOfSubcontractorPage)
 
-  implicit lazy val arbitraryUserAnswers: Arbitrary[UserAnswers] =
-    Arbitrary {
-      for {
-        id <- Gen.uuid.map(_.toString)
-      } yield UserAnswers(
-        id = id,
-        data = Json.obj(),
-        lastUpdated = Instant.now()
-      )
-    }
+    beSettable[String](TradingNameOfSubcontractorPage)
+
+    beRemovable[String](TradingNameOfSubcontractorPage)
+  }
 }
