@@ -107,6 +107,16 @@ unauthorised.agent.p2.prefix = You need to request access to
 unauthorised.agent.p2.link = PAYE for Agents
 unauthorised.agent.p2.suffix = to use this service.
 
+
+
+tradingNameOfSubcontractor.title = What is the subcontractor’s trading name?
+tradingNameOfSubcontractor.heading = What is the subcontractor’s trading name?
+tradingNameOfSubcontractor.checkYourAnswersLabel = What is the subcontractor’s trading name?
+tradingNameOfSubcontractor.error.required = Enter a trading name like ABC Construction LTD
+tradingNameOfSubcontractor.error.length = Enter a trading name less or equal to 56 characters
+tradingNameOfSubcontractor.change.hidden = What is the subcontractor’s trading name?
+tradingNameOfSubcontractor.error.invalidCharacters = Enter a trading name like ABC Construction LTD
+
 subcontractorName.title = What is the subcontractor''s name?
 subcontractorName.heading = What is the subcontractor''s name?
 subcontractorName.firstName = First name
