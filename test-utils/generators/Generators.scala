@@ -22,7 +22,7 @@ import org.scalacheck.Arbitrary._
 import org.scalacheck.Gen._
 import org.scalacheck.{Gen, Shrink}
 
-trait Generators extends UserAnswersGenerator with ModelGenerators with PageGenerators with UserAnswersEntryGenerators {
+trait Generators extends ModelGenerators {
 
   implicit val dontShrink: Shrink[String] = Shrink.shrinkAny
 
