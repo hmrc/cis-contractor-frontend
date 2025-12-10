@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package forms
+package forms.add
 
 import forms.add.TypeOfSubcontractorFormProvider
 import forms.behaviours.OptionFieldBehaviours

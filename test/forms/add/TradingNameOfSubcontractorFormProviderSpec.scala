@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package forms
+package forms.add
 
 import forms.add.TradingNameOfSubcontractorFormProvider
 import forms.behaviours.StringFieldBehaviours
-import play.api.data.FormError
 import org.scalacheck.Gen
+import play.api.data.FormError
 
 class TradingNameOfSubcontractorFormProviderSpec extends StringFieldBehaviours {
 
