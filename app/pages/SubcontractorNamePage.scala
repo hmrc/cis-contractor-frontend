@@ -17,15 +17,11 @@
 package pages
 
 import models.add.SubcontractorName
-import play.api.libs.json.{JsPath, Json, OFormat}
+import play.api.libs.json.JsPath
 
 case object SubcontractorNamePage extends QuestionPage[SubcontractorName] {
 
   override def path: JsPath = JsPath \ toString
 
   override def toString: String = "subcontractorName"
-}
-
-object SubcontractorName {
-  implicit val format: OFormat[SubcontractorName] = Json.format[SubcontractorName]
 }

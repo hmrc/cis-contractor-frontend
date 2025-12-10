@@ -16,8 +16,14 @@
 
 package models.add
 
+import play.api.libs.json.{Json, OFormat}
+
 case class SubcontractorName(
-                                firstName: String,
-                                middleName: Option[String],
-                                lastName: String
-                              )
+  firstName: String,
+  middleName: Option[String],
+  lastName: String
+)
+
+object SubcontractorName {
+  implicit val format: OFormat[SubcontractorName] = Json.format[SubcontractorName]
+}

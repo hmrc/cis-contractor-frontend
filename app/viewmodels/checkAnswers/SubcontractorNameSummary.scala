@@ -16,11 +16,11 @@
 
 package viewmodels.checkAnswers
 
+import models.add.SubcontractorName.format
 import models.{CheckMode, UserAnswers}
-import pages.SubcontractorName.format
 import pages.SubcontractorNamePage
 import play.api.i18n.Messages
-import play.twirl.api.HtmlFormat
+import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
@@ -30,11 +30,15 @@ object SubcontractorNameSummary {
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
     answers.get(SubcontractorNamePage).map { answer =>
 
-      val fullName = Seq(Some(answer.firstName), answer.middleName, Some(answer.lastName)).flatten.mkString(" ")
+      val fullName = Seq(
+        Some(answer.firstName),
+        answer.middleName,
+        Some(answer.lastName)
+      ).flatten.mkString(" ")
 
       SummaryListRowViewModel(
         key = "subcontractorName.checkYourAnswersLabel",
-        value = ValueViewModel(HtmlFormat.escape(fullName).toString),
+        value = ValueViewModel(Text(fullName)),
         actions = Seq(
           ActionItemViewModel(
             "site.change",
