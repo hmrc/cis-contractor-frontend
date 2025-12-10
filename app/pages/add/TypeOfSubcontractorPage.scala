@@ -14,30 +14,15 @@
  * limitations under the License.
  */
 
-package generators
+package pages.add
 
-import models.*
 import models.add.TypeOfSubcontractor
-import org.scalacheck.{Arbitrary, Gen}
-import play.api.libs.json.Json
+import pages.QuestionPage
+import play.api.libs.json.JsPath
 
-import java.time.Instant
+case object TypeOfSubcontractorPage extends QuestionPage[TypeOfSubcontractor] {
 
-trait ModelGenerators {
+  override def path: JsPath = JsPath \ toString
 
-  implicit lazy val arbitrarySubcontractorTypes: Arbitrary[TypeOfSubcontractor] =
-    Arbitrary {
-      Gen.oneOf(TypeOfSubcontractor.values.toSeq)
-    }
-
-  implicit lazy val arbitraryUserAnswers: Arbitrary[UserAnswers] =
-    Arbitrary {
-      for {
-        id <- Gen.uuid.map(_.toString)
-      } yield UserAnswers(
-        id = id,
-        data = Json.obj(),
-        lastUpdated = Instant.now()
-      )
-    }
+  override def toString: String = "typeOfSubcontractor"
 }

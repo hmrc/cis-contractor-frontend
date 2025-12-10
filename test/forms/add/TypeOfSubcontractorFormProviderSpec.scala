@@ -14,14 +14,32 @@
  * limitations under the License.
  */
 
-package pages
+package forms.add
 
+import forms.behaviours.OptionFieldBehaviours
 import models.add.TypeOfSubcontractor
-import play.api.libs.json.JsPath
+import play.api.data.FormError
 
-case object TypeOfSubcontractorPage extends QuestionPage[TypeOfSubcontractor] {
+class TypeOfSubcontractorFormProviderSpec extends OptionFieldBehaviours {
 
-  override def path: JsPath = JsPath \ toString
+  val form = new TypeOfSubcontractorFormProvider()()
 
-  override def toString: String = "typeOfSubcontractor"
+  ".value" - {
+
+    val fieldName = "value"
+    val requiredKey = "typeOfSubcontractor.error.required"
+
+    behave like optionsField[TypeOfSubcontractor](
+      form,
+      fieldName,
+      validValues  = TypeOfSubcontractor.values,
+      invalidError = FormError(fieldName, "error.invalid")
+    )
+
+    behave like mandatoryField(
+      form,
+      fieldName,
+      requiredError = FormError(fieldName, requiredKey)
+    )
+  }
 }

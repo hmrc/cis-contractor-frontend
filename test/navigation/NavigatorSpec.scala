@@ -18,8 +18,9 @@ package navigation
 
 import base.SpecBase
 import controllers.routes
-import pages._
-import models._
+import pages.*
+import models.*
+import pages.add.{TradingNameOfSubcontractorPage, TypeOfSubcontractorPage}
 
 class NavigatorSpec extends SpecBase {
 
@@ -33,6 +34,14 @@ class NavigatorSpec extends SpecBase {
 
         case object UnknownPage extends Page
         navigator.nextPage(UnknownPage, NormalMode, UserAnswers("id")) mustBe routes.IndexController.onPageLoad()
+      }
+
+      "must go from a TradingNameOfSubcontractorPage  to next page" in {
+        navigator.nextPage(TradingNameOfSubcontractorPage, NormalMode, UserAnswers("id")) mustBe controllers.add.routes.TradingNameOfSubcontractorController.onPageLoad(NormalMode)
+      }
+
+      "must go from a TypeOfSubcontractorPage  to next page" in {
+        navigator.nextPage(TypeOfSubcontractorPage, NormalMode, UserAnswers("id")) mustBe controllers.add.routes.TypeOfSubcontractorController.onPageLoad(NormalMode)
       }
 
       "must go from a NationalInsuranceNumberPage  to next page" in {
@@ -49,8 +58,7 @@ class NavigatorSpec extends SpecBase {
       "must go from a page that doesn't exist in the edit route map to CheckYourAnswers" in {
 
         case object UnknownPage extends Page
-        navigator.nextPage(UnknownPage, CheckMode, UserAnswers("id")) mustBe routes.CheckYourAnswersController
-          .onPageLoad()
+        navigator.nextPage(UnknownPage, CheckMode, UserAnswers("id")) mustBe routes.CheckYourAnswersController.onPageLoad()
       }
     }
   }

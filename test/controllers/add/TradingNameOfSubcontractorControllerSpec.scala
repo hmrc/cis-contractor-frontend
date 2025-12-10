@@ -17,41 +17,41 @@
 package controllers.add
 
 import base.SpecBase
-import forms.add.TypeOfSubcontractorFormProvider
-import models.add.TypeOfSubcontractor
+import controllers.routes
+import forms.add.TradingNameOfSubcontractorFormProvider
 import models.{NormalMode, UserAnswers}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.add.TypeOfSubcontractorPage
+import pages.add.TradingNameOfSubcontractorPage
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import repositories.SessionRepository
-import views.html.add.TypeOfSubcontractorView
+import views.html.add.TradingNameOfSubcontractorView
 
 import scala.concurrent.Future
+import scala.util.Random
 
-class TypeOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
+class TradingNameOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
 
-
-  lazy val subcontractorTypesRoute = controllers.add.routes.TypeOfSubcontractorController.onPageLoad(NormalMode).url
-
-  val formProvider = new TypeOfSubcontractorFormProvider()
+  val formProvider = new TradingNameOfSubcontractorFormProvider()
   val form         = formProvider()
 
-  "TypeOfSubcontractor Controller" - {
+  lazy val nameOfSubcontractorRoute = controllers.add.routes.TradingNameOfSubcontractorController.onPageLoad(NormalMode).url
+
+  "NameOfSubcontractor Controller" - {
 
     "must return OK and the correct view for a GET" in {
 
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
       running(application) {
-        val request = FakeRequest(GET, subcontractorTypesRoute)
+        val request = FakeRequest(GET, nameOfSubcontractorRoute)
 
         val result = route(application, request).value
 
-        val view = application.injector.instanceOf[TypeOfSubcontractorView]
+        val view = application.injector.instanceOf[TradingNameOfSubcontractorView]
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
@@ -60,23 +60,19 @@ class TypeOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers =
-        UserAnswers(userAnswersId).set(TypeOfSubcontractorPage, TypeOfSubcontractor.values.head).success.value
+      val userAnswers = UserAnswers(userAnswersId).set(TradingNameOfSubcontractorPage, "answer").success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
       running(application) {
-        val request = FakeRequest(GET, subcontractorTypesRoute)
+        val request = FakeRequest(GET, nameOfSubcontractorRoute)
 
-        val view = application.injector.instanceOf[TypeOfSubcontractorView]
+        val view = application.injector.instanceOf[TradingNameOfSubcontractorView]
 
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(TypeOfSubcontractor.values.head), NormalMode)(
-          request,
-          messages(application)
-        ).toString
+        contentAsString(result) mustEqual view(form.fill("answer"), NormalMode)(request, messages(application)).toString
       }
     }
 
@@ -95,13 +91,15 @@ class TypeOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, subcontractorTypesRoute)
-            .withFormUrlEncodedBody(("value", TypeOfSubcontractor.values.head.toString))
+          FakeRequest(POST, nameOfSubcontractorRoute)
+            .withFormUrlEncodedBody(("value", "answer"))
 
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.add.routes.TypeOfSubcontractorController.onPageLoad(NormalMode).url
+        redirectLocation(result).value mustEqual controllers.add.routes.TradingNameOfSubcontractorController
+          .onPageLoad(NormalMode)
+          .url
       }
     }
 
@@ -111,12 +109,12 @@ class TypeOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, subcontractorTypesRoute)
-            .withFormUrlEncodedBody(("value", "invalid value"))
+          FakeRequest(POST, nameOfSubcontractorRoute)
+            .withFormUrlEncodedBody(("value", ""))
 
-        val boundForm = form.bind(Map("value" -> "invalid value"))
+        val boundForm = form.bind(Map("value" -> ""))
 
-        val view = application.injector.instanceOf[TypeOfSubcontractorView]
+        val view = application.injector.instanceOf[TradingNameOfSubcontractorView]
 
         val result = route(application, request).value
 
@@ -125,28 +123,55 @@ class TypeOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must return a Bad Request and errors when no value is submitted" in {
+    "must return a Bad Request and errors when invalid data is submitted with length is more than 56 character" in {
 
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val longInput   = Random.alphanumeric.take(57).mkString
 
       running(application) {
         val request =
-          FakeRequest(POST, subcontractorTypesRoute)
-            .withFormUrlEncodedBody()
+          FakeRequest(POST, nameOfSubcontractorRoute)
+            .withFormUrlEncodedBody(("value", longInput))
 
-        val form      = new TypeOfSubcontractorFormProvider()()
-        val boundForm = form.bind(Map.empty)
+        val boundForm = form.bind(Map("value" -> longInput))
 
-        val view = application.injector.instanceOf[TypeOfSubcontractorView]
+        val view = application.injector.instanceOf[TradingNameOfSubcontractorView]
 
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
         contentAsString(result) mustEqual view(boundForm, NormalMode)(request, messages(application)).toString
-
-        contentAsString(result) must include(messages(application)("typeOfSubcontractor.error.required"))
       }
     }
 
+    "must redirect to Journey Recovery for a GET if no existing data is found" in {
+
+      val application = applicationBuilder(userAnswers = None).build()
+
+      running(application) {
+        val request = FakeRequest(GET, nameOfSubcontractorRoute)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must redirect to Journey Recovery for a POST if no existing data is found" in {
+
+      val application = applicationBuilder(userAnswers = None).build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, nameOfSubcontractorRoute)
+            .withFormUrlEncodedBody(("value", "answer"))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
   }
 }

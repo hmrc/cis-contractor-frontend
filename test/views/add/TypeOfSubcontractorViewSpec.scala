@@ -16,7 +16,7 @@
 
 package views.add
 
-import forms.TypeOfSubcontractorFormProvider
+import forms.add.TypeOfSubcontractorFormProvider
 import models.NormalMode
 import models.add.TypeOfSubcontractor
 import org.scalatest.matchers.must.Matchers
