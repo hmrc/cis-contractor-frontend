@@ -109,6 +109,14 @@ unauthorised.agent.p2.suffix = to use this service.
 
 
 
+tradingNameOfSubcontractor.title = What is the subcontractor’s trading name?
+tradingNameOfSubcontractor.heading = What is the subcontractor’s trading name?
+tradingNameOfSubcontractor.checkYourAnswersLabel = What is the subcontractor’s trading name?
+tradingNameOfSubcontractor.error.required = Enter a trading name like ABC Construction LTD
+tradingNameOfSubcontractor.error.length = Enter a trading name less or equal to 56 characters
+tradingNameOfSubcontractor.change.hidden = What is the subcontractor’s trading name?
+tradingNameOfSubcontractor.error.invalidCharacters = Enter a trading name like ABC Construction LTD
+
 uniqueTaxpayerReference.title = Do you have a Unique Taxpayer Reference (UTR)?
 uniqueTaxpayerReference.heading = Do you have a Unique Taxpayer Reference (UTR)?
 uniqueTaxpayerReference.hint = This is 10 numbers, like 1234567890. The UTR will be on tax returns and other letters about Self Assessment. It may also be called 'tax reference'.
