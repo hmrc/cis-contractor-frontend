@@ -16,7 +16,6 @@
 
 package forms.add
 
-import forms.add.SubUseTradingNameFormProvider
 import forms.behaviours.BooleanFieldBehaviours
 import play.api.data.FormError
 

@@ -16,7 +16,6 @@
 
 package pages.add
 
-import pages.add.SubUseTradingNamePage
 import pages.behaviours.PageBehaviours
 
 class SubUseTradingNamePageSpec extends PageBehaviours {
