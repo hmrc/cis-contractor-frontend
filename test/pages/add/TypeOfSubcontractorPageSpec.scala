@@ -14,32 +14,19 @@
  * limitations under the License.
  */
 
-package forms
+package pages.add
 
-import forms.behaviours.OptionFieldBehaviours
 import models.add.TypeOfSubcontractor
-import play.api.data.FormError
+import pages.behaviours.PageBehaviours
 
-class TypeOfSubcontractorFormProviderSpec extends OptionFieldBehaviours {
+class TypeOfSubcontractorPageSpec extends PageBehaviours {
 
-  val form = new TypeOfSubcontractorFormProvider()()
+  "TypeOfSubcontractorPage" - {
 
-  ".value" - {
+    beRetrievable[TypeOfSubcontractor](TypeOfSubcontractorPage)
 
-    val fieldName = "value"
-    val requiredKey = "typeOfSubcontractor.error.required"
+    beSettable[TypeOfSubcontractor](TypeOfSubcontractorPage)
 
-    behave like optionsField[TypeOfSubcontractor](
-      form,
-      fieldName,
-      validValues  = TypeOfSubcontractor.values,
-      invalidError = FormError(fieldName, "error.invalid")
-    )
-
-    behave like mandatoryField(
-      form,
-      fieldName,
-      requiredError = FormError(fieldName, requiredKey)
-    )
+    beRemovable[TypeOfSubcontractor](TypeOfSubcontractorPage)
   }
 }
