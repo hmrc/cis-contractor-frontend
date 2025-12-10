@@ -83,15 +83,15 @@ class SubcontractorNameFormProviderSpec extends StringFieldBehaviours {
       result.errors.map(_.message) must contain("subcontractorName.firstName.error.invalidCharacters")
     }
 
-//    "must not bind strings where first character is not a letter" in {
-//      val invalid = "1John"
-//      val result = form.bind(Map(
-//        "firstName" -> invalid,
-//        "middleName" -> "",
-//        "lastName" -> validLastName
-//      ))
-//      result.errors.map(_.message) must contain("nameOfSubcontractor.firstName.error.firstChar")
-//    }
+    "must not bind strings where first character is not a letter" in {
+      val invalid = "-John"
+      val result = form.bind(Map(
+        "firstName" -> invalid,
+        "middleName" -> "",
+        "lastName" -> validLastName
+      ))
+      result.errors.map(_.message) must contain("subcontractorName.firstName.error.firstChar")
+    }
   }
 
   "middleName" - {
@@ -223,16 +223,16 @@ class SubcontractorNameFormProviderSpec extends StringFieldBehaviours {
       result.errors.map(_.message) must contain("subcontractorName.lastName.error.invalidCharacters")
     }
 
-//    "must fail when first character is not a letter" in {
-//      val result = form.bind(
-//        Map(
-//          "firstName"  -> validFirstName,
-//          "middleName" -> validMiddleName.getOrElse(""),
-//          "lastName"   -> "-Smith"
-//        )
-//      )
-//      result.errors.map(_.message) must contain("nameOfSubcontractor.lastName.error.firstChar")
-//    }
+    "must fail when first character is not a letter" in {
+      val result = form.bind(
+        Map(
+          "firstName"  -> validFirstName,
+          "middleName" -> validMiddleName.getOrElse(""),
+          "lastName"   -> "-Smith"
+        )
+      )
+      result.errors.map(_.message) must contain("subcontractorName.lastName.error.firstChar")
+    }
   }
 
 }
