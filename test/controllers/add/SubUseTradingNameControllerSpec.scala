@@ -20,10 +20,11 @@ import base.SpecBase
 import controllers.routes
 import forms.add.SubUseTradingNameFormProvider
 import models.{NormalMode, UserAnswers}
+import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.when
+import org.mockito.Mockito.{verify, when}
 import org.scalatestplus.mockito.MockitoSugar
-import pages.add.SubUseTradingNamePage
+import pages.add.{SubUseTradingNamePage, TradingNameOfSubcontractorPage}
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
@@ -37,7 +38,7 @@ class SubUseTradingNameControllerSpec extends SpecBase with MockitoSugar {
   lazy val subUseTradingNameRoute = controllers.add.routes.SubUseTradingNameController.onPageLoad(NormalMode).url
 
   val formProvider = new SubUseTradingNameFormProvider()
-  val form = formProvider()
+  val form         = formProvider()
 
   "SubUseTradingName Controller" - {
 
@@ -96,7 +97,9 @@ class SubUseTradingNameControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.add.routes.TradingNameOfSubcontractorController.onPageLoad(NormalMode).url
+        redirectLocation(result).value mustEqual controllers.add.routes.TradingNameOfSubcontractorController
+          .onPageLoad(NormalMode)
+          .url
       }
     }
 
@@ -121,7 +124,9 @@ class SubUseTradingNameControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.add.routes.SubUseTradingNameController.onPageLoad(NormalMode).url
+        redirectLocation(result).value mustEqual controllers.add.routes.SubUseTradingNameController
+          .onPageLoad(NormalMode)
+          .url
       }
     }
 
@@ -184,7 +189,7 @@ class SubUseTradingNameControllerSpec extends SpecBase with MockitoSugar {
           FakeRequest(POST, subUseTradingNameRoute)
             .withFormUrlEncodedBody()
 
-        val form = new SubUseTradingNameFormProvider()()
+        val form      = new SubUseTradingNameFormProvider()()
         val boundForm = form.bind(Map.empty)
 
         val view = application.injector.instanceOf[SubUseTradingNameView]
@@ -197,5 +202,38 @@ class SubUseTradingNameControllerSpec extends SpecBase with MockitoSugar {
         contentAsString(result) must include(messages(application)("subUseTradingName.error.required"))
       }
     }
+
+    "must remove TradingNameOfSubcontractor answer when value No is submitted" in {
+
+      val mockSessionRepository = mock[SessionRepository]
+
+      val mockUserAnswers = emptyUserAnswers.set(TradingNameOfSubcontractorPage, "ABC").success.value
+
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+      val application =
+        applicationBuilder(userAnswers = Some(mockUserAnswers))
+          .overrides(
+            bind[SessionRepository].toInstance(mockSessionRepository)
+          )
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, subUseTradingNameRoute)
+            .withFormUrlEncodedBody(("value", "false"))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        val uaCaptor: ArgumentCaptor[UserAnswers] = ArgumentCaptor.forClass(classOf[UserAnswers])
+        verify(mockSessionRepository).set(uaCaptor.capture)
+
+        uaCaptor.getValue.get(SubUseTradingNamePage) mustBe Some(false)
+        uaCaptor.getValue.get(TradingNameOfSubcontractorPage) mustBe None
+      }
+    }
+
   }
 }
