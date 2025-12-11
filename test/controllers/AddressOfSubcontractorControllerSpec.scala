@@ -17,13 +17,14 @@
 package controllers
 
 import base.SpecBase
-import forms.AddressOfSubcontractorFormProvider
-import models.{NormalMode, AddressOfSubcontractor, UserAnswers}
+import forms.add.AddressOfSubcontractorFormProvider
+import models.add.AddressOfSubcontractor
+import models.{NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.AddressOfSubcontractorPage
+import pages.add.AddressOfSubcontractorPage
 import play.api.inject.bind
 import play.api.libs.json.Json
 import play.api.mvc.Call

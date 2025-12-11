@@ -14,20 +14,20 @@
  * limitations under the License.
  */
 
-package controllers
+package controllers.add
 
-import controllers.actions._
-import forms.AddressOfSubcontractorFormProvider
-import javax.inject.Inject
+import controllers.actions.*
+import forms.add.AddressOfSubcontractorFormProvider
 import models.Mode
 import navigation.Navigator
-import pages.AddressOfSubcontractorPage
+import pages.add.AddressOfSubcontractorPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.AddressOfSubcontractorView
 
+import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class AddressOfSubcontractorController @Inject()(

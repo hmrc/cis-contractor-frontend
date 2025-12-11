@@ -14,14 +14,19 @@
  * limitations under the License.
  */
 
-package pages
+package models.add
 
-import models.AddressOfSubcontractor
-import play.api.libs.json.JsPath
+import play.api.libs.json.*
 
-case object AddressOfSubcontractorPage extends QuestionPage[AddressOfSubcontractor] {
+case class AddressOfSubcontractor(
+  addressLine1: String,
+  addressLine2: String,
+  addressLine3: String,
+  addressLine4: Option[String],
+  postCode: String
+)
 
-  override def path: JsPath = JsPath \ toString
+object AddressOfSubcontractor {
 
-  override def toString: String = "addressOfSubcontractor"
+  implicit val format: OFormat[AddressOfSubcontractor] = Json.format
 }

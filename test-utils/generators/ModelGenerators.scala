@@ -17,7 +17,7 @@
 package generators
 
 import models.*
-import models.add.TypeOfSubcontractor
+import models.add.{AddressOfSubcontractor, TypeOfSubcontractor}
 import org.scalacheck.{Arbitrary, Gen}
 import play.api.libs.json.Json
 import org.scalacheck.Arbitrary.arbitrary

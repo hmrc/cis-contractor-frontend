@@ -133,3 +133,9 @@ addressOfSubcontractor.addressLine2.change.hidden = Address line 2 (optional)
 addressOfSubcontractor.addressLine3 =  Town or city
 addressOfSubcontractor.addressLine4 = County (optional)
 addressOfSubcontractor.postCode  = Postcode
+
+addressOfSubcontractor.error.addressLine1.invalidCharacters = Enter a first line of address like 10 Downing Street
+addressOfSubcontractor.error.addressLine2.invalidCharacters = Enter a second line of address like Flat 2A
+addressOfSubcontractor.error.addressLine3.invalidCharacters = Enter a town like London
+addressOfSubcontractor.error.addressLine4.invalidCharacters = Enter a country like United Kingdom
+addressOfSubcontractor.error.postCode.invalidCharacters = Enter a postcode like SW1A 2AA
