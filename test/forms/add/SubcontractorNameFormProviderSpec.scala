@@ -14,12 +14,9 @@
  * limitations under the License.
  */
 
-package forms
+package forms.add
 
 import forms.behaviours.StringFieldBehaviours
-import play.api.data.FormError
-import org.scalacheck.Gen
-import models.add.SubcontractorName
 
 class SubcontractorNameFormProviderSpec extends StringFieldBehaviours {
 
@@ -30,8 +27,6 @@ class SubcontractorNameFormProviderSpec extends StringFieldBehaviours {
   val validFirstName = "John"
 
   "firstName" - {
-
-    val fieldName = "firstName"
 
     "must bind valid data" in {
       val validValues = Seq("John", "Ben", "Joe")
@@ -85,18 +80,19 @@ class SubcontractorNameFormProviderSpec extends StringFieldBehaviours {
 
     "must not bind strings where first character is not a letter" in {
       val invalid = "-John"
-      val result = form.bind(Map(
-        "firstName" -> invalid,
-        "middleName" -> "",
-        "lastName" -> validLastName
-      ))
+      val result  = form.bind(
+        Map(
+          "firstName"  -> invalid,
+          "middleName" -> "",
+          "lastName"   -> validLastName
+        )
+      )
       result.errors.map(_.message) must contain("subcontractorName.firstName.error.firstChar")
     }
   }
 
   "middleName" - {
 
-    val fieldName   = "middleName"
     val maxLength   = 35
     val lengthError = "subcontractorName.middleName.error.length"
 
@@ -167,7 +163,6 @@ class SubcontractorNameFormProviderSpec extends StringFieldBehaviours {
 
   "lastName" - {
 
-    val fieldName   = "lastName"
     val maxLength   = 35
     val lengthError = "subcontractorName.lastName.error.length"
 

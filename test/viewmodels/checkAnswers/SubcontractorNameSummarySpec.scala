@@ -24,7 +24,7 @@ import org.scalatest.TryValues.convertTryToSuccessOrFailure
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.matchers.should.Matchers.{convertToStringShouldWrapperForVerb, should, shouldBe}
-import pages.SubcontractorNamePage
+import pages.add.SubcontractorNamePage
 import play.api.i18n.Messages
 import play.api.test.Helpers.stubMessages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow

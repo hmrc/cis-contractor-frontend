@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-package pages
+package pages.add
 
 import models.add.SubcontractorName
+import pages.QuestionPage
 import play.api.libs.json.JsPath
 
 case object SubcontractorNamePage extends QuestionPage[SubcontractorName] {

@@ -21,7 +21,7 @@ import play.api.mvc.Call
 import controllers.routes
 import pages.*
 import models.*
-import pages.add.{TradingNameOfSubcontractorPage, TypeOfSubcontractorPage}
+import pages.add.{SubcontractorNamePage, TradingNameOfSubcontractorPage, TypeOfSubcontractorPage}
 
 @Singleton
 class Navigator @Inject() () {

@@ -18,14 +18,14 @@ package controllers.add
 
 import base.SpecBase
 import controllers.routes
-import forms.SubcontractorNameFormProvider
+import forms.add.SubcontractorNameFormProvider
+import models.NormalMode
 import models.add.*
-import models.{NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.SubcontractorNamePage
+import pages.add.SubcontractorNamePage
 import play.api.inject.bind
 import play.api.libs.json.{Json, OFormat}
 import play.api.mvc.Call
@@ -44,8 +44,6 @@ class SubcontractorNameControllerSpec extends SpecBase with MockitoSugar {
   val form         = formProvider()
 
   lazy val subcontractorNameRoute = controllers.add.routes.SubcontractorNameController.onPageLoad(NormalMode).url
-
-  val validName = SubcontractorName("John", Some("Paul"), "Smith")
 
   "SubcontractorName Controller" - {
 
@@ -67,9 +65,8 @@ class SubcontractorNameControllerSpec extends SpecBase with MockitoSugar {
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      implicit val subcontractorNameFormat: OFormat[SubcontractorName] = {
+      implicit val subcontractorNameFormat: OFormat[SubcontractorName] =
         Json.format[SubcontractorName]
-      }
 
       val validName = SubcontractorName("John", Some("Paul"), "Smith")
 
@@ -79,8 +76,6 @@ class SubcontractorNameControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request = FakeRequest(GET, subcontractorNameRoute)
-
-        val view = application.injector.instanceOf[SubcontractorNameView]
 
         val result = route(application, request).value
 

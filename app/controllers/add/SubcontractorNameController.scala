@@ -17,11 +17,11 @@
 package controllers.add
 
 import controllers.actions.*
-import forms.SubcontractorNameFormProvider
+import forms.add.SubcontractorNameFormProvider
 import models.Mode
 import navigation.Navigator
 import models.add.SubcontractorName.format
-import pages.SubcontractorNamePage
+import pages.add.SubcontractorNamePage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository

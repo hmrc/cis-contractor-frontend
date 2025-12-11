@@ -20,7 +20,6 @@ import models.add.SubcontractorName
 import models.add.SubcontractorName.format
 import org.scalacheck.{Arbitrary, Gen}
 import org.scalatest.matchers.must.Matchers
-import pages.SubcontractorNamePage
 import pages.behaviours.PageBehaviours
 
 class SubcontractorNamePageSpec extends PageBehaviours with Matchers {

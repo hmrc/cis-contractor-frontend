@@ -20,7 +20,7 @@ import base.SpecBase
 import controllers.routes
 import pages.*
 import models.*
-import pages.add.{TradingNameOfSubcontractorPage, TypeOfSubcontractorPage}
+import pages.add.{SubcontractorNamePage, TradingNameOfSubcontractorPage, TypeOfSubcontractorPage}
 
 class NavigatorSpec extends SpecBase {
 
