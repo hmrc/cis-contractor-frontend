@@ -14,25 +14,32 @@
  * limitations under the License.
  */
 
-package pages.add
+package forms.add
 
-import models.UserAnswers
-import pages.QuestionPage
-import play.api.libs.json.JsPath
+import forms.behaviours.BooleanFieldBehaviours
+import play.api.data.FormError
 
-import scala.util.Try
+class SubTradingNameYesNoFormProviderSpec extends BooleanFieldBehaviours  {
 
-case object SubUseTradingNamePage extends QuestionPage[Boolean] {
+  val requiredKey = "subTradingNameYesNo.error.required"
+  val invalidKey = "error.boolean"
 
-  override def path: JsPath = JsPath \ toString
+  val form = new SubTradingNameYesNoFormProvider()()
 
-  override def toString: String = "subUseTradingName"
+  ".value" - {
 
-  override def cleanup(value: Option[Boolean], userAnswers: UserAnswers): Try[UserAnswers] =
-    if value.contains(false) then {
-      userAnswers
-        .remove(TradingNameOfSubcontractorPage)
-    } else {
-      super.cleanup(value, userAnswers)
-    }
+    val fieldName = "value"
+
+    behave like booleanField(
+      form,
+      fieldName,
+      invalidError = FormError(fieldName, invalidKey)
+    )
+
+    behave like mandatoryField(
+      form,
+      fieldName,
+      requiredError = FormError(fieldName, requiredKey)
+    )
+  }
 }

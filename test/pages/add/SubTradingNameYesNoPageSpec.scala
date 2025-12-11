@@ -18,20 +18,20 @@ package pages.add
 
 import pages.behaviours.PageBehaviours
 
-class SubUseTradingNamePageSpec extends PageBehaviours {
+class SubTradingNameYesNoPageSpec extends PageBehaviours {
 
-  "SubUseTradingNamePage" - {
+  "SubTradingNameYesNoPage" - {
 
-    beRetrievable[Boolean](SubUseTradingNamePage)
+    beRetrievable[Boolean](SubTradingNameYesNoPage)
 
-    beSettable[Boolean](SubUseTradingNamePage)
+    beSettable[Boolean](SubTradingNameYesNoPage)
 
-    beRemovable[Boolean](SubUseTradingNamePage)
+    beRemovable[Boolean](SubTradingNameYesNoPage)
 
     "cleanup: must remove TradingNameOfSubcontractor userAnswers when No is selected" in {
       val userAnswers = emptyUserAnswers.set(TradingNameOfSubcontractorPage, "ABC").success.value
 
-      val updatedUserAnswers = userAnswers.set(SubUseTradingNamePage, false).success.value
+      val updatedUserAnswers = userAnswers.set(SubTradingNameYesNoPage, false).success.value
 
       updatedUserAnswers.get(TradingNameOfSubcontractorPage) mustBe None
     }

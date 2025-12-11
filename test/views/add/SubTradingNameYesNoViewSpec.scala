@@ -16,7 +16,7 @@
 
 package views.add
 
-import forms.add.SubUseTradingNameFormProvider
+import forms.add.SubTradingNameYesNoFormProvider
 import models.NormalMode
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
@@ -26,30 +26,30 @@ import play.api.i18n.Messages
 import play.api.mvc.Request
 import play.api.test.FakeRequest
 import play.twirl.api.HtmlFormat
-import views.html.add.SubUseTradingNameView
+import views.html.add.SubTradingNameYesNoView
 
-class SubUseTradingNameViewSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite {
+class SubTradingNameYesNoViewSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite {
 
-  "SubUseTradingNameView" should {
+  "SubTradingNameYesNoView" should {
 
     "render the page with title, heading, radios and submit button" in new Setup {
       val html: HtmlFormat.Appendable = view(form, NormalMode)
       val doc                         = org.jsoup.Jsoup.parse(html.toString())
-      doc.select("title").text() must include(messages("subUseTradingName.title"))
+      doc.select("title").text() must include(messages("subTradingNameYesNo.title"))
 
       val legend = doc.select("fieldset legend")
-      legend.text() mustBe messages("subUseTradingName.heading")
+      legend.text() mustBe messages("subTradingNameYesNo.heading")
       legend.hasClass("govuk-fieldset__legend--l") mustBe true
 
       val hint = doc.select("fieldset .govuk-hint")
-      hint.text() mustBe messages("subUseTradingName.hint")
+      hint.text() mustBe messages("subTradingNameYesNo.hint")
 
       val radioButtons = doc.select(".govuk-radios__label")
       radioButtons.size() mustBe 2
       radioButtons.get(0).text mustBe "Yes"
       radioButtons.get(1).text mustBe "No"
 
-      doc.select("form").attr("action") mustBe controllers.add.routes.SubUseTradingNameController.onSubmit(NormalMode).url
+      doc.select("form").attr("action") mustBe controllers.add.routes.SubTradingNameYesNoController.onSubmit(NormalMode).url
 
       doc.select("form").attr("autocomplete") mustBe "off"
 
@@ -58,23 +58,23 @@ class SubUseTradingNameViewSpec extends AnyWordSpec with Matchers with GuiceOneA
 
     "display error summary and inline error when no option is selected" in new Setup {
       val errorForm: Form[Boolean] =
-        form.withError("value", "subUseTradingName.error.required")
+        form.withError("value", "subTradingNameYesNo.error.required")
 
       val html = view(errorForm, NormalMode)
       val doc  = org.jsoup.Jsoup.parse(html.toString())
 
       val summary = doc.select(".govuk-error-summary")
-      summary.text() must include(messages("subUseTradingName.error.required"))
+      summary.text() must include(messages("subTradingNameYesNo.error.required"))
 
       val linkHref = summary.select("a").attr("href")
       linkHref mustBe "#value"
 
-      doc.select(".govuk-error-message").text() must include(messages("subUseTradingName.error.required"))
+      doc.select(".govuk-error-message").text() must include(messages("subTradingNameYesNo.error.required"))
     }
   }
 
   trait Setup {
-    val formProvider                   = new SubUseTradingNameFormProvider()
+    val formProvider                   = new SubTradingNameYesNoFormProvider()
     val form: Form[Boolean] = formProvider()
 
     implicit val request: Request[_] = FakeRequest()
@@ -84,6 +84,6 @@ class SubUseTradingNameViewSpec extends AnyWordSpec with Matchers with GuiceOneA
         app.injector.instanceOf[play.api.i18n.MessagesApi]
       )
 
-    val view: SubUseTradingNameView = app.injector.instanceOf[SubUseTradingNameView]
+    val view: SubTradingNameYesNoView = app.injector.instanceOf[SubTradingNameYesNoView]
   }
 }

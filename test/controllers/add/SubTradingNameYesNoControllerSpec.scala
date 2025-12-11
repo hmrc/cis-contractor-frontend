@@ -18,39 +18,39 @@ package controllers.add
 
 import base.SpecBase
 import controllers.routes
-import forms.add.SubUseTradingNameFormProvider
+import forms.add.SubTradingNameYesNoFormProvider
 import models.{NormalMode, UserAnswers}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.add.SubUseTradingNamePage
+import pages.add.SubTradingNameYesNoPage
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import repositories.SessionRepository
-import views.html.add.SubUseTradingNameView
+import views.html.add. SubTradingNameYesNoView
 
 import scala.concurrent.Future
 
-class SubUseTradingNameControllerSpec extends SpecBase with MockitoSugar {
+class SubTradingNameYesNoControllerSpec extends SpecBase with MockitoSugar {
 
-  lazy val subUseTradingNameRoute = controllers.add.routes.SubUseTradingNameController.onPageLoad(NormalMode).url
+  lazy val subTradingNameYesNoRoute = controllers.add.routes.SubTradingNameYesNoController.onPageLoad(NormalMode).url
 
-  val formProvider = new SubUseTradingNameFormProvider()
+  val formProvider = new SubTradingNameYesNoFormProvider()
   val form         = formProvider()
 
-  "SubUseTradingName Controller" - {
+  "SubTradingNameYesNo Controller" - {
 
     "must return OK and the correct view for a GET" in {
 
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
       running(application) {
-        val request = FakeRequest(GET, subUseTradingNameRoute)
+        val request = FakeRequest(GET, subTradingNameYesNoRoute)
 
         val result = route(application, request).value
 
-        val view = application.injector.instanceOf[SubUseTradingNameView]
+        val view = application.injector.instanceOf[ SubTradingNameYesNoView]
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
@@ -59,14 +59,14 @@ class SubUseTradingNameControllerSpec extends SpecBase with MockitoSugar {
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = UserAnswers(userAnswersId).set(SubUseTradingNamePage, true).success.value
+      val userAnswers = UserAnswers(userAnswersId).set(SubTradingNameYesNoPage, true).success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
       running(application) {
-        val request = FakeRequest(GET, subUseTradingNameRoute)
+        val request = FakeRequest(GET, subTradingNameYesNoRoute)
 
-        val view = application.injector.instanceOf[SubUseTradingNameView]
+        val view = application.injector.instanceOf[ SubTradingNameYesNoView]
 
         val result = route(application, request).value
 
@@ -90,7 +90,7 @@ class SubUseTradingNameControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, subUseTradingNameRoute)
+          FakeRequest(POST, subTradingNameYesNoRoute)
             .withFormUrlEncodedBody(("value", "true"))
 
         val result = route(application, request).value
@@ -117,13 +117,13 @@ class SubUseTradingNameControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, subUseTradingNameRoute)
+          FakeRequest(POST, subTradingNameYesNoRoute)
             .withFormUrlEncodedBody(("value", "false"))
 
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.add.routes.SubUseTradingNameController
+        redirectLocation(result).value mustEqual controllers.add.routes.SubTradingNameYesNoController
           .onPageLoad(NormalMode)
           .url
       }
@@ -135,12 +135,12 @@ class SubUseTradingNameControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, subUseTradingNameRoute)
+          FakeRequest(POST, subTradingNameYesNoRoute)
             .withFormUrlEncodedBody(("value", ""))
 
         val boundForm = form.bind(Map("value" -> ""))
 
-        val view = application.injector.instanceOf[SubUseTradingNameView]
+        val view = application.injector.instanceOf[ SubTradingNameYesNoView]
 
         val result = route(application, request).value
 
@@ -154,7 +154,7 @@ class SubUseTradingNameControllerSpec extends SpecBase with MockitoSugar {
       val application = applicationBuilder(userAnswers = None).build()
 
       running(application) {
-        val request = FakeRequest(GET, subUseTradingNameRoute)
+        val request = FakeRequest(GET, subTradingNameYesNoRoute)
 
         val result = route(application, request).value
 
@@ -169,7 +169,7 @@ class SubUseTradingNameControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, subUseTradingNameRoute)
+          FakeRequest(POST, subTradingNameYesNoRoute)
             .withFormUrlEncodedBody(("value", "true"))
 
         val result = route(application, request).value
@@ -185,20 +185,20 @@ class SubUseTradingNameControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, subUseTradingNameRoute)
+          FakeRequest(POST, subTradingNameYesNoRoute)
             .withFormUrlEncodedBody()
 
-        val form      = new SubUseTradingNameFormProvider()()
+        val form      = new SubTradingNameYesNoFormProvider()()
         val boundForm = form.bind(Map.empty)
 
-        val view = application.injector.instanceOf[SubUseTradingNameView]
+        val view = application.injector.instanceOf[ SubTradingNameYesNoView]
 
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
         contentAsString(result) mustEqual view(boundForm, NormalMode)(request, messages(application)).toString
 
-        contentAsString(result) must include(messages(application)("subUseTradingName.error.required"))
+        contentAsString(result) must include(messages(application)("subTradingNameYesNo.error.required"))
       }
     }
 

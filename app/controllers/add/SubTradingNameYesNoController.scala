@@ -17,29 +17,29 @@
 package controllers.add
 
 import controllers.actions.*
-import forms.add.SubUseTradingNameFormProvider
+import forms.add.SubTradingNameYesNoFormProvider
 import models.Mode
 import navigation.Navigator
-import pages.add.SubUseTradingNamePage
+import pages.add.SubTradingNameYesNoPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.add.SubUseTradingNameView
+import views.html.add.SubTradingNameYesNoView
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class SubUseTradingNameController @Inject()(
-                                       override val messagesApi: MessagesApi,
-                                       sessionRepository: SessionRepository,
-                                       navigator: Navigator,
-                                       identify: IdentifierAction,
-                                       getData: DataRetrievalAction,
-                                       requireData: DataRequiredAction,
-                                       formProvider: SubUseTradingNameFormProvider,
-                                       val controllerComponents: MessagesControllerComponents,
-                                       view: SubUseTradingNameView
+class SubTradingNameYesNoController @Inject()(
+                                               override val messagesApi: MessagesApi,
+                                               sessionRepository: SessionRepository,
+                                               navigator: Navigator,
+                                               identify: IdentifierAction,
+                                               getData: DataRetrievalAction,
+                                               requireData: DataRequiredAction,
+                                               formProvider: SubTradingNameYesNoFormProvider,
+                                               val controllerComponents: MessagesControllerComponents,
+                                               view: SubTradingNameYesNoView
                                      )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   val form = formProvider()
@@ -47,7 +47,7 @@ class SubUseTradingNameController @Inject()(
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) {
     implicit request =>
 
-      val preparedForm = request.userAnswers.get(SubUseTradingNamePage) match {
+      val preparedForm = request.userAnswers.get(SubTradingNameYesNoPage) match {
         case None => form
         case Some(value) => form.fill(value)
       }
@@ -64,9 +64,9 @@ class SubUseTradingNameController @Inject()(
 
         value =>
           for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(SubUseTradingNamePage, value))
+            updatedAnswers <- Future.fromTry(request.userAnswers.set(SubTradingNameYesNoPage, value))
             _              <- sessionRepository.set(updatedAnswers)
-          } yield Redirect(navigator.nextPage(SubUseTradingNamePage, mode, updatedAnswers))
+          } yield Redirect(navigator.nextPage(SubTradingNameYesNoPage, mode, updatedAnswers))
       )
   }
 }

@@ -21,22 +21,22 @@ import play.api.mvc.Call
 import controllers.routes
 import pages.*
 import models.*
-import pages.add.{SubUseTradingNamePage, TradingNameOfSubcontractorPage, TypeOfSubcontractorPage}
+import pages.add.{SubTradingNameYesNoPage, TradingNameOfSubcontractorPage, TypeOfSubcontractorPage}
 
 @Singleton
 class Navigator @Inject() () {
 
   private val normalRoutes: Page => UserAnswers => Call = {
-    case TypeOfSubcontractorPage        => _ => controllers.add.routes.SubUseTradingNameController.onPageLoad(NormalMode)
-    case SubUseTradingNamePage          => userAnswers => navigatorFromSubUseTradingNamePage(NormalMode)(userAnswers)
+    case TypeOfSubcontractorPage        => _ => controllers.add.routes.SubTradingNameYesNoController.onPageLoad(NormalMode)
+    case SubTradingNameYesNoPage        => userAnswers => navigatorFromSubTradingNameYesNoPage(NormalMode)(userAnswers)
     case TradingNameOfSubcontractorPage =>
       _ => controllers.add.routes.TradingNameOfSubcontractorController.onPageLoad(NormalMode)
     case _                              => _ => routes.IndexController.onPageLoad()
   }
 
   private val checkRouteMap: Page => UserAnswers => Call = {
-    case SubUseTradingNamePage => userAnswers => navigatorFromSubUseTradingNamePage(CheckMode)(userAnswers)
-    case _                     => _ => routes.CheckYourAnswersController.onPageLoad()
+    case SubTradingNameYesNoPage => userAnswers => navigatorFromSubTradingNameYesNoPage(CheckMode)(userAnswers)
+    case _                       => _ => routes.CheckYourAnswersController.onPageLoad()
   }
 
   def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers): Call = mode match {
@@ -46,10 +46,10 @@ class Navigator @Inject() () {
       checkRouteMap(page)(userAnswers)
   }
 
-  private def navigatorFromSubUseTradingNamePage(mode: Mode)(userAnswers: UserAnswers): Call =
-    (userAnswers.get(SubUseTradingNamePage), mode) match {
+  private def navigatorFromSubTradingNameYesNoPage(mode: Mode)(userAnswers: UserAnswers): Call =
+    (userAnswers.get(SubTradingNameYesNoPage), mode) match {
       case (Some(true), _)           => controllers.add.routes.TradingNameOfSubcontractorController.onPageLoad(mode)
-      case (Some(false), NormalMode) => controllers.add.routes.SubUseTradingNameController.onPageLoad(NormalMode)
+      case (Some(false), NormalMode) => controllers.add.routes.SubTradingNameYesNoController.onPageLoad(NormalMode)
       case (Some(false), CheckMode)  => routes.CheckYourAnswersController.onPageLoad()
       case (None, _)                 => routes.JourneyRecoveryController.onPageLoad()
     }

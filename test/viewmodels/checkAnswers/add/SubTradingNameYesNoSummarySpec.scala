@@ -22,29 +22,29 @@ import org.scalatest.OptionValues.convertOptionToValuable
 import org.scalatest.TryValues.convertTryToSuccessOrFailure
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.should.Matchers
-import pages.add.SubUseTradingNamePage
+import pages.add.SubTradingNameYesNoPage
 import play.api.i18n.Messages
 import play.api.test.Helpers.stubMessages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.*
 
-class SubUseTradingNameSummarySpec extends AnyFreeSpec with Matchers {
+class SubTradingNameYesNoSummarySpec extends AnyFreeSpec with Matchers {
   implicit val messages: Messages = stubMessages()
 
-  "SubUseTradingNameSummary.row" - {
+  "SubTradingNameYesNoSummary.row" - {
 
     "must return a SummaryListRow with 'Yes' when the answer is true" in {
       val answers = UserAnswers("test-id")
-        .set(SubUseTradingNamePage, true)
+        .set(SubTradingNameYesNoPage, true)
         .success
         .value
 
-      val maybeRow: Option[SummaryListRow] = SubUseTradingNameSummary.row(answers)
+      val maybeRow: Option[SummaryListRow] = SubTradingNameYesNoSummary.row(answers)
       maybeRow shouldBe defined
 
       val row =
         maybeRow.value
 
-      val expectedKeyText = messages("subUseTradingName.checkYourAnswersLabel")
+      val expectedKeyText = messages("subTradingNameYesNo.checkYourAnswersLabel")
       row.key.content.asHtml.toString should include(expectedKeyText)
 
       val expectedValue = messages("site.yes")
@@ -56,8 +56,8 @@ class SubUseTradingNameSummarySpec extends AnyFreeSpec with Matchers {
 
       val changeAction       = actions.head
       val expectedChangeText = messages("site.change")
-      val expectedHref       = routes.SubUseTradingNameController.onPageLoad(CheckMode).url
-      val expectedHiddenText = messages("subUseTradingName.change.hidden")
+      val expectedHref       = routes.SubTradingNameYesNoController.onPageLoad(CheckMode).url
+      val expectedHiddenText = messages("subTradingNameYesNo.change.hidden")
 
       changeAction.content.asHtml.toString    should include(expectedChangeText)
       changeAction.href                     shouldBe expectedHref
@@ -66,11 +66,11 @@ class SubUseTradingNameSummarySpec extends AnyFreeSpec with Matchers {
 
     "must return a SummaryListRow with 'No' when the answer is false" in {
       val answers = UserAnswers("test-id")
-        .set(SubUseTradingNamePage, false)
+        .set(SubTradingNameYesNoPage, false)
         .success
         .value
 
-      val maybeRow: Option[SummaryListRow] = SubUseTradingNameSummary.row(answers)
+      val maybeRow: Option[SummaryListRow] = SubTradingNameYesNoSummary.row(answers)
       maybeRow shouldBe defined
 
       val row           = maybeRow.value
@@ -80,7 +80,7 @@ class SubUseTradingNameSummarySpec extends AnyFreeSpec with Matchers {
 
     "must return None when the answer does not exist" in {
       val answers = UserAnswers("test-id")
-      SubUseTradingNameSummary.row(answers) shouldBe None
+      SubTradingNameYesNoSummary.row(answers) shouldBe None
     }
   }
 }

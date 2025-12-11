@@ -24,9 +24,9 @@
 
 @(form: Form[_], mode: Mode)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = title(form, messages("subUseTradingName.title"))) {
+@layout(pageTitle = title(form, messages("subTradingNameYesNo.title"))) {
 
-    @formHelper(action = controllers.add.routes.SubUseTradingNameController.onSubmit(mode), Symbol("autoComplete") -> "off") {
+    @formHelper(action = controllers.add.routes.SubTradingNameYesNoController.onSubmit(mode), Symbol("autoComplete") -> "off") {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form))
@@ -35,9 +35,9 @@
         @govukRadios(
             RadiosViewModel.yesNo(
                 field  = form("value"),
-                legend = LegendViewModel(messages("subUseTradingName.heading")).asPageHeading().withCssClass("govuk-fieldset__legend--l"),
+                legend = LegendViewModel(messages("subTradingNameYesNo.heading")).asPageHeading().withCssClass("govuk-fieldset__legend--l"),
             ).withHint(Hint(
-                content = Messages("subUseTradingName.hint"))
+                content = Messages("subTradingNameYesNo.hint"))
             )
         )
 
