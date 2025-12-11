@@ -27,5 +27,13 @@ class SubUseTradingNamePageSpec extends PageBehaviours {
     beSettable[Boolean](SubUseTradingNamePage)
 
     beRemovable[Boolean](SubUseTradingNamePage)
+
+    "cleanup: must remove TradingNameOfSubcontractor userAnswers when No is selected" in {
+      val userAnswers = emptyUserAnswers.set(TradingNameOfSubcontractorPage, "ABC").success.value
+
+      val updatedUserAnswers = userAnswers.set(SubUseTradingNamePage, false).success.value
+
+      updatedUserAnswers.get(TradingNameOfSubcontractorPage) mustBe None
+    }
   }
 }

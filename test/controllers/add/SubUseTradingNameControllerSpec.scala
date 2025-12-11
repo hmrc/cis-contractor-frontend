@@ -20,11 +20,10 @@ import base.SpecBase
 import controllers.routes
 import forms.add.SubUseTradingNameFormProvider
 import models.{NormalMode, UserAnswers}
-import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.{verify, when}
+import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.add.{SubUseTradingNamePage, TradingNameOfSubcontractorPage}
+import pages.add.SubUseTradingNamePage
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
@@ -200,38 +199,6 @@ class SubUseTradingNameControllerSpec extends SpecBase with MockitoSugar {
         contentAsString(result) mustEqual view(boundForm, NormalMode)(request, messages(application)).toString
 
         contentAsString(result) must include(messages(application)("subUseTradingName.error.required"))
-      }
-    }
-
-    "must remove TradingNameOfSubcontractor answer when value No is submitted" in {
-
-      val mockSessionRepository = mock[SessionRepository]
-
-      val mockUserAnswers = emptyUserAnswers.set(TradingNameOfSubcontractorPage, "ABC").success.value
-
-      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
-
-      val application =
-        applicationBuilder(userAnswers = Some(mockUserAnswers))
-          .overrides(
-            bind[SessionRepository].toInstance(mockSessionRepository)
-          )
-          .build()
-
-      running(application) {
-        val request =
-          FakeRequest(POST, subUseTradingNameRoute)
-            .withFormUrlEncodedBody(("value", "false"))
-
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-
-        val uaCaptor: ArgumentCaptor[UserAnswers] = ArgumentCaptor.forClass(classOf[UserAnswers])
-        verify(mockSessionRepository).set(uaCaptor.capture)
-
-        uaCaptor.getValue.get(SubUseTradingNamePage) mustBe Some(false)
-        uaCaptor.getValue.get(TradingNameOfSubcontractorPage) mustBe None
       }
     }
 

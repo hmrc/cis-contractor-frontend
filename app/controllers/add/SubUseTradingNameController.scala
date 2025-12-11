@@ -20,7 +20,7 @@ import controllers.actions.*
 import forms.add.SubUseTradingNameFormProvider
 import models.Mode
 import navigation.Navigator
-import pages.add.{SubUseTradingNamePage, TradingNameOfSubcontractorPage}
+import pages.add.SubUseTradingNamePage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
@@ -65,11 +65,6 @@ class SubUseTradingNameController @Inject()(
         value =>
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(SubUseTradingNamePage, value))
-            updatedAnswers <- if (value) { // if value is No, then remove TradingNameOfSubcontractor from session and user answer
-              Future.successful(updatedAnswers)
-            } else {
-              Future.fromTry(updatedAnswers.remove(TradingNameOfSubcontractorPage))
-            }
             _              <- sessionRepository.set(updatedAnswers)
           } yield Redirect(navigator.nextPage(SubUseTradingNamePage, mode, updatedAnswers))
       )
