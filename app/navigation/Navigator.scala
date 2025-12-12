@@ -27,14 +27,17 @@ import pages.add.*
 class Navigator @Inject() () {
 
   private val normalRoutes: Page => UserAnswers => Call = {
-    case TypeOfSubcontractorPage => _ => controllers.add.routes.TypeOfSubcontractorController.onPageLoad(NormalMode)
-    case TradingNameOfSubcontractorPage => _ => controllers.add.routes.TradingNameOfSubcontractorController.onPageLoad(NormalMode)
+    case TypeOfSubcontractorPage        => _ => controllers.add.routes.SubTradingNameYesNoController.onPageLoad(NormalMode)
+    case SubTradingNameYesNoPage        => userAnswers => navigatorFromSubTradingNameYesNoPage(NormalMode)(userAnswers)
+    case TradingNameOfSubcontractorPage =>
+      _ => controllers.add.routes.TradingNameOfSubcontractorController.onPageLoad(NormalMode)
     case SubAddAddressPage => _ => controllers.add.routes.SubAddAddressController.onPageLoad(NormalMode)
-    case _                      => _ => routes.IndexController.onPageLoad()
+    case _                              => _ => routes.IndexController.onPageLoad()
   }
 
-  private val checkRouteMap: Page => UserAnswers => Call = { case _ =>
-    _ => routes.CheckYourAnswersController.onPageLoad()
+  private val checkRouteMap: Page => UserAnswers => Call = {
+    case SubTradingNameYesNoPage => userAnswers => navigatorFromSubTradingNameYesNoPage(CheckMode)(userAnswers)
+    case _                       => _ => routes.CheckYourAnswersController.onPageLoad()
   }
 
   def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers): Call = mode match {
@@ -43,4 +46,12 @@ class Navigator @Inject() () {
     case CheckMode  =>
       checkRouteMap(page)(userAnswers)
   }
+
+  private def navigatorFromSubTradingNameYesNoPage(mode: Mode)(userAnswers: UserAnswers): Call =
+    (userAnswers.get(SubTradingNameYesNoPage), mode) match {
+      case (Some(true), _)           => controllers.add.routes.TradingNameOfSubcontractorController.onPageLoad(mode)
+      case (Some(false), NormalMode) => controllers.add.routes.SubTradingNameYesNoController.onPageLoad(NormalMode)
+      case (Some(false), CheckMode)  => routes.CheckYourAnswersController.onPageLoad()
+      case (None, _)                 => routes.JourneyRecoveryController.onPageLoad()
+    }
 }

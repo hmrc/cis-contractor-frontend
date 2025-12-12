@@ -107,7 +107,12 @@ unauthorised.agent.p2.prefix = You need to request access to
 unauthorised.agent.p2.link = PAYE for Agents
 unauthorised.agent.p2.suffix = to use this service.
 
-
+subTradingNameYesNo.title = Does the subcontractor use a trading name?
+subTradingNameYesNo.heading = Does the subcontractor use a trading name?
+subTradingNameYesNo.hint = This is a business name, different from their own name.
+subTradingNameYesNo.checkYourAnswersLabel = Does the subcontractor use a trading name?
+subTradingNameYesNo.error.required = Select whether or not the subcontractor uses a trading name
+subTradingNameYesNo.change.hidden = Subcontractor use a trading name
 
 tradingNameOfSubcontractor.title = What is the subcontractor’s trading name?
 tradingNameOfSubcontractor.heading = What is the subcontractor’s trading name?
