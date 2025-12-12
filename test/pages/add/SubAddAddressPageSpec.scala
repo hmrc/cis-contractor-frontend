@@ -27,5 +27,15 @@ class SubAddAddressPageSpec extends PageBehaviours {
     beSettable[Boolean](SubAddAddressPage)
 
     beRemovable[Boolean](SubAddAddressPage)
+
+    //Need to update to correct page!
+    "cleanup: must remove TradingNameOfSubcontractor userAnswers when No is selected" in {
+      val userAnswers = emptyUserAnswers.set(TradingNameOfSubcontractorPage, "ABC").success.value
+
+      val updatedUserAnswers = userAnswers.set(SubTradingNameYesNoPage, false).success.value
+
+      updatedUserAnswers.get(TradingNameOfSubcontractorPage) mustBe None
+    }
+
   }
 }
