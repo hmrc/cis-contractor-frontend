@@ -24,9 +24,9 @@
 
 @(form: Form[_], mode: Mode)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = title(form, messages("subAddAddress.title"))) {
+@layout(pageTitle = title(form, messages("subAddressYesNo.title"))) {
 
-    @formHelper(action = controllers.add.routes.SubAddAddressController.onSubmit(mode), Symbol("autoComplete") -> "off") {
+    @formHelper(action = controllers.add.routes.SubAddressYesNoController.onSubmit(mode), Symbol("autoComplete") -> "off") {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form))
@@ -35,9 +35,9 @@
         @govukRadios(
             RadiosViewModel.yesNo(
                 field = form("value"),
-                legend = LegendViewModel(messages("subAddAddress.heading")).asPageHeading().withCssClass("govuk-fieldset__legend--l")
+                legend = LegendViewModel(messages("subAddressYesNo.heading")).asPageHeading().withCssClass("govuk-fieldset__legend--l")
             ).withHint(Hint(
-                content = Messages("subAddAddress.hint"))
+                content = Messages("subAddressYesNo.hint"))
             )
         )
 

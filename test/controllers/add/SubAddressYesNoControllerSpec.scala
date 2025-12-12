@@ -18,39 +18,39 @@ package controllers.add
 
 import base.SpecBase
 import controllers.routes
-import forms.add.SubAddAddressFormProvider
+import forms.add.SubAddressYesNoFormProvider
 import models.{NormalMode, UserAnswers}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.add.SubAddAddressPage
+import pages.add.SubAddressYesNoPage
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import repositories.SessionRepository
-import views.html.add.SubAddAddressView
+import views.html.add.SubAddressYesNoView
 
 import scala.concurrent.Future
 
-class SubAddAddressControllerSpec extends SpecBase with MockitoSugar {
+class SubAddressYesNoControllerSpec extends SpecBase with MockitoSugar {
 
-  val formProvider = new SubAddAddressFormProvider()
+  val formProvider = new SubAddressYesNoFormProvider()
   val form = formProvider()
 
-  lazy val subAddAddressRoute = controllers.add.routes.SubAddAddressController.onPageLoad(NormalMode).url
+  lazy val subAddressYesNoRoute = controllers.add.routes.SubAddressYesNoController.onPageLoad(NormalMode).url
 
-  "SubAddAddress Controller" - {
+  "SubAddressYesNo Controller" - {
 
     "must return OK and the correct view for a GET" in {
 
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
       running(application) {
-        val request = FakeRequest(GET, subAddAddressRoute)
+        val request = FakeRequest(GET, subAddressYesNoRoute)
 
         val result = route(application, request).value
 
-        val view = application.injector.instanceOf[SubAddAddressView]
+        val view = application.injector.instanceOf[SubAddressYesNoView]
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
@@ -59,14 +59,14 @@ class SubAddAddressControllerSpec extends SpecBase with MockitoSugar {
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = UserAnswers(userAnswersId).set(SubAddAddressPage, true).success.value
+      val userAnswers = UserAnswers(userAnswersId).set(SubAddressYesNoPage, true).success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
       running(application) {
-        val request = FakeRequest(GET, subAddAddressRoute)
+        val request = FakeRequest(GET, subAddressYesNoRoute)
 
-        val view = application.injector.instanceOf[SubAddAddressView]
+        val view = application.injector.instanceOf[SubAddressYesNoView]
 
         val result = route(application, request).value
 
@@ -90,7 +90,7 @@ class SubAddAddressControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, subAddAddressRoute)
+          FakeRequest(POST, subAddressYesNoRoute)
             .withFormUrlEncodedBody(("value", "true"))
 
         val result = route(application, request).value
@@ -115,13 +115,13 @@ class SubAddAddressControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, subAddAddressRoute)
+          FakeRequest(POST, subAddressYesNoRoute)
             .withFormUrlEncodedBody(("value", "false"))
 
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.add.routes.SubAddAddressController.onPageLoad(NormalMode).url
+        redirectLocation(result).value mustEqual controllers.add.routes.SubAddressYesNoController.onPageLoad(NormalMode).url
       }
     }
 
@@ -131,12 +131,12 @@ class SubAddAddressControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, subAddAddressRoute)
+          FakeRequest(POST, subAddressYesNoRoute)
             .withFormUrlEncodedBody(("value", ""))
 
         val boundForm = form.bind(Map("value" -> ""))
 
-        val view = application.injector.instanceOf[SubAddAddressView]
+        val view = application.injector.instanceOf[SubAddressYesNoView]
 
         val result = route(application, request).value
 
@@ -150,7 +150,7 @@ class SubAddAddressControllerSpec extends SpecBase with MockitoSugar {
       val application = applicationBuilder(userAnswers = None).build()
 
       running(application) {
-        val request = FakeRequest(GET, subAddAddressRoute)
+        val request = FakeRequest(GET, subAddressYesNoRoute)
 
         val result = route(application, request).value
 
@@ -165,7 +165,7 @@ class SubAddAddressControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, subAddAddressRoute)
+          FakeRequest(POST, subAddressYesNoRoute)
             .withFormUrlEncodedBody(("value", "true"))
 
         val result = route(application, request).value
@@ -181,20 +181,20 @@ class SubAddAddressControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, subAddAddressRoute)
+          FakeRequest(POST, subAddressYesNoRoute)
             .withFormUrlEncodedBody()
 
-        val form = new SubAddAddressFormProvider()()
+        val form = new SubAddressYesNoFormProvider()()
         val boundForm = form.bind(Map.empty)
 
-        val view = application.injector.instanceOf[SubAddAddressView]
+        val view = application.injector.instanceOf[SubAddressYesNoView]
 
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
         contentAsString(result) mustEqual view(boundForm, NormalMode)(request, messages(application)).toString
 
-        contentAsString(result) must include(messages(application)("subAddAddress.error.required"))
+        contentAsString(result) must include(messages(application)("subAddressYesNo.error.required"))
       }
     }
 

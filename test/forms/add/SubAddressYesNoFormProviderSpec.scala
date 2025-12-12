@@ -19,12 +19,12 @@ package forms.add
 import forms.behaviours.BooleanFieldBehaviours
 import play.api.data.FormError
 
-class SubAddAddressFormProviderSpec extends BooleanFieldBehaviours {
+class SubAddressYesNoFormProviderSpec extends BooleanFieldBehaviours {
 
-  val requiredKey = "subAddAddress.error.required"
+  val requiredKey = "subAddressYesNo.error.required"
   val invalidKey = "error.boolean"
 
-  val form = new SubAddAddressFormProvider()()
+  val form = new SubAddressYesNoFormProvider()()
 
   ".value" - {
 

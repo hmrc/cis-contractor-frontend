@@ -18,15 +18,15 @@ package pages.add
 
 import pages.behaviours.PageBehaviours
 
-class SubAddAddressPageSpec extends PageBehaviours {
+class SubAddressYesNoPageSpec extends PageBehaviours {
 
-  "SubAddAddressPage" - {
+  "SubAddressYesNoPage" - {
 
-    beRetrievable[Boolean](SubAddAddressPage)
+    beRetrievable[Boolean](SubAddressYesNoPage)
 
-    beSettable[Boolean](SubAddAddressPage)
+    beSettable[Boolean](SubAddressYesNoPage)
 
-    beRemovable[Boolean](SubAddAddressPage)
+    beRemovable[Boolean](SubAddressYesNoPage)
 
     //Need to update to correct page!
     "cleanup: must remove TradingNameOfSubcontractor userAnswers when No is selected" in {

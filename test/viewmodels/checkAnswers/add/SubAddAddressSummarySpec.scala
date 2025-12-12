@@ -22,30 +22,30 @@ import org.scalatest.OptionValues.convertOptionToValuable
 import org.scalatest.TryValues.convertTryToSuccessOrFailure
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.should.Matchers
-import pages.add.SubAddAddressPage
+import pages.add.SubAddressYesNoPage
 import play.api.i18n.Messages
 import play.api.test.Helpers.stubMessages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.*
 
-class SubAddAddressSummarySpec extends AnyFreeSpec with Matchers {
+class SubAddressYesNoSummarySpec extends AnyFreeSpec with Matchers {
 
   implicit val messages: Messages = stubMessages()
 
-  "SubAddAddressSummary.row" - {
+  "SubAddressYesNoSummary.row" - {
 
     "must return a SummaryListRow with 'Yes' when the answer is true" in {
       val answers = UserAnswers("test-id")
-        .set(SubAddAddressPage, true)
+        .set(SubAddressYesNoPage, true)
         .success
         .value
 
-      val maybeRow: Option[SummaryListRow] = SubAddAddressSummary.row(answers)
+      val maybeRow: Option[SummaryListRow] = SubAddressYesNoSummary.row(answers)
       maybeRow shouldBe defined
 
       val row =
         maybeRow.value
 
-      val expectedKeyText = messages("subAddAddress.checkYourAnswersLabel")
+      val expectedKeyText = messages("subAddressYesNo.checkYourAnswersLabel")
       row.key.content.asHtml.toString should include(expectedKeyText)
 
       val expectedValue = messages("site.yes")
@@ -57,8 +57,8 @@ class SubAddAddressSummarySpec extends AnyFreeSpec with Matchers {
 
       val changeAction = actions.head
       val expectedChangeText = messages("site.change")
-      val expectedHref = routes.SubAddAddressController.onPageLoad(CheckMode).url
-      val expectedHiddenText = messages("subAddAddress.change.hidden")
+      val expectedHref = routes.SubAddressYesNoController.onPageLoad(CheckMode).url
+      val expectedHiddenText = messages("subAddressYesNo.change.hidden")
 
       changeAction.content.asHtml.toString should include(expectedChangeText)
       changeAction.href shouldBe expectedHref
@@ -67,11 +67,11 @@ class SubAddAddressSummarySpec extends AnyFreeSpec with Matchers {
 
     "must return a SummaryListRow with 'No' when the answer is false" in {
       val answers = UserAnswers("test-id")
-        .set(SubAddAddressPage, false)
+        .set(SubAddressYesNoPage, false)
         .success
         .value
 
-      val maybeRow: Option[SummaryListRow] = SubAddAddressSummary.row(answers)
+      val maybeRow: Option[SummaryListRow] = SubAddressYesNoSummary.row(answers)
       maybeRow shouldBe defined
 
       val row = maybeRow.value
@@ -81,7 +81,7 @@ class SubAddAddressSummarySpec extends AnyFreeSpec with Matchers {
 
     "must return None when the answer does not exist" in {
       val answers = UserAnswers("test-id")
-      SubAddAddressSummary.row(answers) shouldBe None
+      SubAddressYesNoSummary.row(answers) shouldBe None
     }
   }
 }

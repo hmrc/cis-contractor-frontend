@@ -17,26 +17,26 @@
 package viewmodels.checkAnswers.add
 
 import models.{CheckMode, UserAnswers}
-import pages.add.SubAddAddressPage
+import pages.add.SubAddressYesNoPage
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
 
-object SubAddAddressSummary  {
+object SubAddressYesNoSummary  {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(SubAddAddressPage).map {
+    answers.get(SubAddressYesNoPage).map {
       answer =>
 
         val value = if (answer) "site.yes" else "site.no"
 
         SummaryListRowViewModel(
-          key     = "subAddAddress.checkYourAnswersLabel",
+          key     = "subAddressYesNo.checkYourAnswersLabel",
           value   = ValueViewModel(value),
           actions = Seq(
-            ActionItemViewModel("site.change", controllers.add.routes.SubAddAddressController.onPageLoad(CheckMode).url)
-              .withVisuallyHiddenText(messages("subAddAddress.change.hidden"))
+            ActionItemViewModel("site.change", controllers.add.routes.SubAddressYesNoController.onPageLoad(CheckMode).url)
+              .withVisuallyHiddenText(messages("subAddressYesNo.change.hidden"))
           )
         )
     }

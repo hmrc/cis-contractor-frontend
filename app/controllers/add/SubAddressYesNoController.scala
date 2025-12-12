@@ -17,29 +17,29 @@
 package controllers.add
 
 import controllers.actions.*
-import forms.add.SubAddAddressFormProvider
+import forms.add.SubAddressYesNoFormProvider
 import models.Mode
 import navigation.Navigator
-import pages.add.SubAddAddressPage
+import pages.add.SubAddressYesNoPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.add.SubAddAddressView
+import views.html.add.SubAddressYesNoView
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class SubAddAddressController @Inject()(
-                                         override val messagesApi: MessagesApi,
-                                         sessionRepository: SessionRepository,
-                                         navigator: Navigator,
-                                         identify: IdentifierAction,
-                                         getData: DataRetrievalAction,
-                                         requireData: DataRequiredAction,
-                                         formProvider: SubAddAddressFormProvider,
-                                         val controllerComponents: MessagesControllerComponents,
-                                         view: SubAddAddressView
+class SubAddressYesNoController @Inject()(
+                                           override val messagesApi: MessagesApi,
+                                           sessionRepository: SessionRepository,
+                                           navigator: Navigator,
+                                           identify: IdentifierAction,
+                                           getData: DataRetrievalAction,
+                                           requireData: DataRequiredAction,
+                                           formProvider: SubAddressYesNoFormProvider,
+                                           val controllerComponents: MessagesControllerComponents,
+                                           view: SubAddressYesNoView
                                  )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   val form = formProvider()
@@ -47,7 +47,7 @@ class SubAddAddressController @Inject()(
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) {
     implicit request =>
 
-      val preparedForm = request.userAnswers.get(SubAddAddressPage) match {
+      val preparedForm = request.userAnswers.get(SubAddressYesNoPage) match {
         case None => form
         case Some(value) => form.fill(value)
       }
@@ -64,9 +64,9 @@ class SubAddAddressController @Inject()(
 
         value =>
           for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(SubAddAddressPage, value))
+            updatedAnswers <- Future.fromTry(request.userAnswers.set(SubAddressYesNoPage, value))
             _              <- sessionRepository.set(updatedAnswers)
-          } yield Redirect(navigator.nextPage(SubAddAddressPage, mode, updatedAnswers))
+          } yield Redirect(navigator.nextPage(SubAddressYesNoPage, mode, updatedAnswers))
       )
   }
 }

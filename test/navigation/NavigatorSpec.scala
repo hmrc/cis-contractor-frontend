@@ -79,25 +79,25 @@ class NavigatorSpec extends SpecBase {
         ) mustBe controllers.add.routes.TradingNameOfSubcontractorController.onPageLoad(NormalMode)
       }
 
-      "must go from a SubAddAddressPage to next page when true" in {
+      "must go from a SubAddressYesNoPage to next page when true" in {
         navigator.nextPage(
-          SubAddAddressPage,
+          SubAddressYesNoPage,
           NormalMode,
-          emptyUserAnswers.setOrException(SubAddAddressPage, true)
+          emptyUserAnswers.setOrException(SubAddressYesNoPage, true)
         ) mustBe controllers.add.routes.TradingNameOfSubcontractorController.onPageLoad(NormalMode)
       }
 
-      "must go from a SubAddAddressPage to next page when false" in {
+      "must go from a SubAddressYesNoPage to next page when false" in {
         navigator.nextPage(
-          SubAddAddressPage,
+          SubAddressYesNoPage,
           NormalMode,
-          emptyUserAnswers.setOrException(SubAddAddressPage, false)
-        ) mustBe controllers.add.routes.SubAddAddressController.onPageLoad(NormalMode)
+          emptyUserAnswers.setOrException(SubAddressYesNoPage, false)
+        ) mustBe controllers.add.routes.SubAddressYesNoController.onPageLoad(NormalMode)
       }
 
-      "must go from a SubAddAddressPage to journey recovery when incomplete info provided" in {
+      "must go from a SubAddressYesNoPage to journey recovery when incomplete info provided" in {
         navigator.nextPage(
-          SubAddAddressPage,
+          SubAddressYesNoPage,
           NormalMode,
           emptyUserAnswers
         ) mustBe journeyRecovery
@@ -138,25 +138,25 @@ class NavigatorSpec extends SpecBase {
         ) mustBe journeyRecovery
       }
 
-      "must go from a SubAddAddressPage to next page when true" in {
+      "must go from a SubAddressYesNoPage to next page when true" in {
         navigator.nextPage(
-          SubAddAddressPage,
+          SubAddressYesNoPage,
           CheckMode,
-          emptyUserAnswers.setOrException(SubAddAddressPage, true)
+          emptyUserAnswers.setOrException(SubAddressYesNoPage, true)
         ) mustBe controllers.add.routes.TradingNameOfSubcontractorController.onPageLoad(CheckMode)
       }
 
-      "must go from a SubAddAddressPage to CYA page when false" in {
+      "must go from a SubAddressYesNoPage to CYA page when false" in {
         navigator.nextPage(
-          SubAddAddressPage,
+          SubAddressYesNoPage,
           CheckMode,
-          emptyUserAnswers.setOrException(SubAddAddressPage, false)
+          emptyUserAnswers.setOrException(SubAddressYesNoPage, false)
         ) mustBe CYA
       }
 
-      "must go from a SubAddAddressPage to journey recovery page when incomplete info provided" in {
+      "must go from a SubAddressYesNoPage to journey recovery page when incomplete info provided" in {
         navigator.nextPage(
-          SubAddAddressPage,
+          SubAddressYesNoPage,
           CheckMode,
           emptyUserAnswers
         ) mustBe journeyRecovery
