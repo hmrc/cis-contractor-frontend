@@ -27,7 +27,6 @@ import pages.add.SubAddAddressPage
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import play.twirl.api.HtmlFormat
 import repositories.SessionRepository
 import views.html.add.SubAddAddressView
 
@@ -170,7 +169,7 @@ class SubAddAddressControllerSpec extends SpecBase with MockitoSugar {
         status(result) mustEqual BAD_REQUEST
         contentAsString(result) mustEqual view(boundForm, NormalMode)(request, messages(application)).toString
 
-        contentAsString(result) must include(HtmlFormat.escape(messages(application)("subAddAddress.error.required")).toString)
+        contentAsString(result) must include(messages(application)("subAddAddress.error.required"))
       }
     }
 
