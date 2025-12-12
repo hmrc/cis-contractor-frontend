@@ -75,7 +75,7 @@ class SubAddAddressControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must redirect to the next page when valid data is submitted" in {
+    "must redirect to the next page when valid data with value Yes is submitted" in {
 
       val mockSessionRepository = mock[SessionRepository]
 
@@ -92,6 +92,31 @@ class SubAddAddressControllerSpec extends SpecBase with MockitoSugar {
         val request =
           FakeRequest(POST, subAddAddressRoute)
             .withFormUrlEncodedBody(("value", "true"))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.add.routes.TradingNameOfSubcontractorController.onPageLoad(NormalMode).url
+      }
+    }
+
+    "must redirect to the next page when valid data with value No is submitted" in {
+
+      val mockSessionRepository = mock[SessionRepository]
+
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+      val application =
+        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          .overrides(
+            bind[SessionRepository].toInstance(mockSessionRepository)
+          )
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, subAddAddressRoute)
+            .withFormUrlEncodedBody(("value", "false"))
 
         val result = route(application, request).value
 

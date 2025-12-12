@@ -31,12 +31,13 @@ class Navigator @Inject() () {
     case SubTradingNameYesNoPage        => userAnswers => navigatorFromSubTradingNameYesNoPage(NormalMode)(userAnswers)
     case TradingNameOfSubcontractorPage =>
       _ => controllers.add.routes.TradingNameOfSubcontractorController.onPageLoad(NormalMode)
-    case SubAddAddressPage => _ => controllers.add.routes.SubAddAddressController.onPageLoad(NormalMode)
+    case SubAddAddressPage              => userAnswers => navigatorFromSubAddAddressPage(NormalMode)(userAnswers)
     case _                              => _ => routes.IndexController.onPageLoad()
   }
 
   private val checkRouteMap: Page => UserAnswers => Call = {
     case SubTradingNameYesNoPage => userAnswers => navigatorFromSubTradingNameYesNoPage(CheckMode)(userAnswers)
+    case SubAddAddressPage => userAnswers => navigatorFromSubAddAddressPage(CheckMode)(userAnswers)
     case _                       => _ => routes.CheckYourAnswersController.onPageLoad()
   }
 
@@ -51,6 +52,14 @@ class Navigator @Inject() () {
     (userAnswers.get(SubTradingNameYesNoPage), mode) match {
       case (Some(true), _)           => controllers.add.routes.TradingNameOfSubcontractorController.onPageLoad(mode)
       case (Some(false), NormalMode) => controllers.add.routes.SubTradingNameYesNoController.onPageLoad(NormalMode)
+      case (Some(false), CheckMode)  => routes.CheckYourAnswersController.onPageLoad()
+      case (None, _)                 => routes.JourneyRecoveryController.onPageLoad()
+    }
+
+  private def navigatorFromSubAddAddressPage(mode: Mode)(userAnswers: UserAnswers): Call =
+    (userAnswers.get(SubAddAddressPage), mode) match {
+      case (Some(true), _)           => controllers.add.routes.TradingNameOfSubcontractorController.onPageLoad(mode)
+      case (Some(false), NormalMode) => controllers.add.routes.SubAddAddressController.onPageLoad(NormalMode)
       case (Some(false), CheckMode)  => routes.CheckYourAnswersController.onPageLoad()
       case (None, _)                 => routes.JourneyRecoveryController.onPageLoad()
     }
