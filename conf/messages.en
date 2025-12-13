@@ -112,7 +112,7 @@ subTradingNameYesNo.heading = Does the subcontractor use a trading name?
 subTradingNameYesNo.hint = This is a business name, different from their own name.
 subTradingNameYesNo.checkYourAnswersLabel = Does the subcontractor use a trading name?
 subTradingNameYesNo.error.required = Select whether or not the subcontractor uses a trading name
-subTradingNameYesNo.change.hidden = Subcontractor use a trading name
+subTradingNameYesNo.change.hidden = Does the subcontractor use a trading name?
 
 tradingNameOfSubcontractor.title = What is the subcontractor’s trading name?
 tradingNameOfSubcontractor.heading = What is the subcontractor’s trading name?
@@ -121,3 +121,11 @@ tradingNameOfSubcontractor.error.required = Enter a trading name like ABC Constr
 tradingNameOfSubcontractor.error.length = Enter a trading name less or equal to 56 characters
 tradingNameOfSubcontractor.change.hidden = What is the subcontractor’s trading name?
 tradingNameOfSubcontractor.error.invalidCharacters = Enter a trading name like ABC Construction LTD
+
+subNationalInsuranceNumber.title = What is the subcontractor’s National Insurance number?
+subNationalInsuranceNumber.heading = What is the subcontractor’s National Insurance number?
+subNationalInsuranceNumber.hint = The subcontractor’s National Insurance number will be on their National Insurance card, benefit letter, payslip or P60
+subNationalInsuranceNumber.checkYourAnswersLabel = What is the subcontractor’s National Insurance number?
+subNationalInsuranceNumber.error.required = Enter a National Insurance number like QQ 12 34 56 C
+subNationalInsuranceNumber.error.length = Enter a National Insurance number less or equal to 9 characters
+subNationalInsuranceNumber.change.hidden = What is the subcontractor’s National Insurance number?
