@@ -33,10 +33,20 @@ POST       /add/type-of-subcontractor                    controllers.add.TypeOfS
 GET        /add/type-of-subcontractor                    controllers.add.TypeOfSubcontractorController.onPageLoad(mode: Mode = CheckMode)
 POST       /add/type-of-subcontractor                    controllers.add.TypeOfSubcontractorController.onSubmit(mode: Mode = CheckMode)
 
+GET        /add/check-trading-name                       controllers.add.SubTradingNameYesNoController.onPageLoad(mode: Mode = NormalMode)
+POST       /add/check-trading-name                       controllers.add.SubTradingNameYesNoController.onSubmit(mode: Mode = NormalMode)
+GET        /add/change-check-trading-name                controllers.add.SubTradingNameYesNoController.onPageLoad(mode: Mode = CheckMode)
+POST       /add/change-check-trading-name                controllers.add.SubTradingNameYesNoController.onSubmit(mode: Mode = CheckMode)
+
 GET        /add/trading-name                             controllers.add.TradingNameOfSubcontractorController.onPageLoad(mode: Mode = NormalMode)
 POST       /add/trading-name                             controllers.add.TradingNameOfSubcontractorController.onSubmit(mode: Mode = NormalMode)
 GET        /add/change-trading-name                      controllers.add.TradingNameOfSubcontractorController.onPageLoad(mode: Mode = CheckMode)
 POST       /add/change-trading-name                      controllers.add.TradingNameOfSubcontractorController.onSubmit(mode: Mode = CheckMode)
+
+GET        /add/check-address                            controllers.add.SubAddressYesNoController.onPageLoad(mode: Mode = NormalMode)
+POST       /add/check-address                            controllers.add.SubAddressYesNoController.onSubmit(mode: Mode = NormalMode)
+GET        /add/change-check-address                     controllers.add.SubAddressYesNoController.onPageLoad(mode: Mode = CheckMode)
+POST       /add/change-check-address                     controllers.add.SubAddressYesNoController.onSubmit(mode: Mode = CheckMode)
 
 GET        /add/name                                     controllers.add.SubcontractorNameController.onPageLoad(mode: Mode = NormalMode)
 POST       /add/name                                     controllers.add.SubcontractorNameController.onSubmit(mode: Mode = NormalMode)

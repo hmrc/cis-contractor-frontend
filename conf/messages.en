@@ -107,7 +107,12 @@ unauthorised.agent.p2.prefix = You need to request access to
 unauthorised.agent.p2.link = PAYE for Agents
 unauthorised.agent.p2.suffix = to use this service.
 
-
+subTradingNameYesNo.title = Does the subcontractor use a trading name?
+subTradingNameYesNo.heading = Does the subcontractor use a trading name?
+subTradingNameYesNo.hint = This is a business name, different from their own name.
+subTradingNameYesNo.checkYourAnswersLabel = Does the subcontractor use a trading name?
+subTradingNameYesNo.error.required = Select whether or not the subcontractor uses a trading name
+subTradingNameYesNo.change.hidden = Subcontractor use a trading name
 
 tradingNameOfSubcontractor.title = What is the subcontractor’s trading name?
 tradingNameOfSubcontractor.heading = What is the subcontractor’s trading name?
@@ -116,6 +121,13 @@ tradingNameOfSubcontractor.error.required = Enter a trading name like ABC Constr
 tradingNameOfSubcontractor.error.length = Enter a trading name less or equal to 56 characters
 tradingNameOfSubcontractor.change.hidden = What is the subcontractor’s trading name?
 tradingNameOfSubcontractor.error.invalidCharacters = Enter a trading name like ABC Construction LTD
+
+subAddressYesNo.title = Do you want to add the subcontractor’s address?
+subAddressYesNo.heading = Do you want to add the subcontractor’s address?
+subAddressYesNo.hint = You can add this information now, or later.
+subAddressYesNo.checkYourAnswersLabel = Do you want to add the subcontractor’s address?
+subAddressYesNo.error.required = Select whether or not to add the subcontractor’s address
+subAddressYesNo.change.hidden = Do you want to add the subcontractor’s address?
 
 subcontractorName.title = What is the subcontractor’s name?
 subcontractorName.heading = What is the subcontractor’s name?
