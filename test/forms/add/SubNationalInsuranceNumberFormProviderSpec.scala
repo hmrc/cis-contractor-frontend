@@ -46,7 +46,7 @@ class SubNationalInsuranceNumberFormProviderSpec extends StringFieldBehaviours {
     behave like fieldThatBindsValidData(
       form,
       fieldName,
-      stringsWithMaxLength(maxLength)
+      validNino
     )
 
     behave like fieldWithMaxLength(
