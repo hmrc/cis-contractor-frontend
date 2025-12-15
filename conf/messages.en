@@ -128,4 +128,5 @@ subNationalInsuranceNumber.hint = The subcontractor’s National Insurance numbe
 subNationalInsuranceNumber.checkYourAnswersLabel = What is the subcontractor’s National Insurance number?
 subNationalInsuranceNumber.error.required = Enter a National Insurance number like QQ 12 34 56 C
 subNationalInsuranceNumber.error.length = Enter a National Insurance number less or equal to 9 characters
+subNationalInsuranceNumber.error.invalidCharacters = Enter a National Insurance number like QQ 12 34 56 C
 subNationalInsuranceNumber.change.hidden = What is the subcontractor’s National Insurance number?

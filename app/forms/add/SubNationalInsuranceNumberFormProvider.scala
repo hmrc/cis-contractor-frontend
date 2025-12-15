@@ -17,6 +17,7 @@
 package forms.add
 
 import forms.mappings.Mappings
+import forms.Validation
 import play.api.data.Form
 
 import javax.inject.Inject
@@ -25,7 +26,12 @@ class SubNationalInsuranceNumberFormProvider @Inject() extends Mappings {
 
   def apply(): Form[String] =
     Form(
-      "value" -> text("subNationalInsuranceNumber.error.required")
-        .verifying(maxLength(9, "subNationalInsuranceNumber.error.length"))
+      "value" -> nino("subNationalInsuranceNumber.error.required")
+        .verifying(
+          firstError(
+            maxLength(9, "subNationalInsuranceNumber.error.length"),
+            regexp(Validation.ninoRegex, "subNationalInsuranceNumber.error.invalidCharacters" )
+          )
+        )
     )
 }
