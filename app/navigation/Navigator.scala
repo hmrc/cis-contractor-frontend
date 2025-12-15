@@ -21,7 +21,7 @@ import play.api.mvc.Call
 import controllers.routes
 import pages.*
 import models.*
-import pages.add.{SubTradingNameYesNoPage, TradingNameOfSubcontractorPage, TypeOfSubcontractorPage}
+import pages.add.{SubNationalInsuranceNumberPage, SubTradingNameYesNoPage, TradingNameOfSubcontractorPage, TypeOfSubcontractorPage}
 
 @Singleton
 class Navigator @Inject() () {
@@ -31,6 +31,7 @@ class Navigator @Inject() () {
     case SubTradingNameYesNoPage        => userAnswers => navigatorFromSubTradingNameYesNoPage(NormalMode)(userAnswers)
     case TradingNameOfSubcontractorPage =>
       _ => controllers.add.routes.TradingNameOfSubcontractorController.onPageLoad(NormalMode)
+    case SubNationalInsuranceNumberPage => _ => controllers.add.routes.SubNationalInsuranceNumberController.onPageLoad(NormalMode)
     case _                              => _ => routes.IndexController.onPageLoad()
   }
 
