@@ -42,3 +42,8 @@ GET        /add/trading-name                             controllers.add.Trading
 POST       /add/trading-name                             controllers.add.TradingNameOfSubcontractorController.onSubmit(mode: Mode = NormalMode)
 GET        /add/change-trading-name                      controllers.add.TradingNameOfSubcontractorController.onPageLoad(mode: Mode = CheckMode)
 POST       /add/change-trading-name                      controllers.add.TradingNameOfSubcontractorController.onSubmit(mode: Mode = CheckMode)
+
+GET        /add/check-address                            controllers.add.SubAddressYesNoController.onPageLoad(mode: Mode = NormalMode)
+POST       /add/check-address                            controllers.add.SubAddressYesNoController.onSubmit(mode: Mode = NormalMode)
+GET        /add/change-check-address                     controllers.add.SubAddressYesNoController.onPageLoad(mode: Mode = CheckMode)
+POST       /add/change-check-address                     controllers.add.SubAddressYesNoController.onSubmit(mode: Mode = CheckMode)

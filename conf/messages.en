@@ -121,3 +121,10 @@ tradingNameOfSubcontractor.error.required = Enter a trading name like ABC Constr
 tradingNameOfSubcontractor.error.length = Enter a trading name less or equal to 56 characters
 tradingNameOfSubcontractor.change.hidden = What is the subcontractor’s trading name?
 tradingNameOfSubcontractor.error.invalidCharacters = Enter a trading name like ABC Construction LTD
+
+subAddressYesNo.title = Do you want to add the subcontractor’s address?
+subAddressYesNo.heading = Do you want to add the subcontractor’s address?
+subAddressYesNo.hint = You can add this information now, or later.
+subAddressYesNo.checkYourAnswersLabel = Do you want to add the subcontractor’s address?
+subAddressYesNo.error.required = Select whether or not to add the subcontractor’s address
+subAddressYesNo.change.hidden = Do you want to add the subcontractor’s address?
