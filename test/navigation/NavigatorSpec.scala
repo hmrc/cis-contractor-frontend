@@ -20,11 +20,14 @@ import base.SpecBase
 import controllers.routes
 import pages.*
 import models.*
-import pages.add.{TradingNameOfSubcontractorPage, TypeOfSubcontractorPage}
+import pages.add.*
 
 class NavigatorSpec extends SpecBase {
 
   val navigator = new Navigator
+
+  private lazy val journeyRecovery = routes.JourneyRecoveryController.onPageLoad()
+  private lazy val CYA             = routes.CheckYourAnswersController.onPageLoad()
 
   "Navigator" - {
 
@@ -36,12 +39,68 @@ class NavigatorSpec extends SpecBase {
         navigator.nextPage(UnknownPage, NormalMode, UserAnswers("id")) mustBe routes.IndexController.onPageLoad()
       }
 
-      "must go from a TradingNameOfSubcontractorPage  to next page" in {
-        navigator.nextPage(TradingNameOfSubcontractorPage, NormalMode, UserAnswers("id")) mustBe controllers.add.routes.TradingNameOfSubcontractorController.onPageLoad(NormalMode)
+      "must go from TypeOfSubcontractorPage to SubTradingNameYesNoController" in {
+        navigator.nextPage(
+          TypeOfSubcontractorPage,
+          NormalMode,
+          UserAnswers("id")
+        ) mustBe controllers.add.routes.SubTradingNameYesNoController.onPageLoad(NormalMode)
       }
 
-      "must go from a TypeOfSubcontractorPage  to next page" in {
-        navigator.nextPage(TypeOfSubcontractorPage, NormalMode, UserAnswers("id")) mustBe controllers.add.routes.TypeOfSubcontractorController.onPageLoad(NormalMode)
+      "must go from SubTradingNameYesNoPage to TradingNameOfSubcontractorController when true" in {
+        navigator.nextPage(
+          SubTradingNameYesNoPage,
+          NormalMode,
+          emptyUserAnswers.setOrException(SubTradingNameYesNoPage, true)
+        ) mustBe controllers.add.routes.TradingNameOfSubcontractorController.onPageLoad(NormalMode)
+      }
+
+      "must go from SubTradingNameYesNoPage to next page when false" in {
+        navigator.nextPage(
+          SubTradingNameYesNoPage,
+          NormalMode,
+          emptyUserAnswers.setOrException(SubTradingNameYesNoPage, false)
+        ) mustBe controllers.add.routes.SubTradingNameYesNoController.onPageLoad(NormalMode)
+      }
+
+      "must go from SubTradingNameYesNoPage to journey recovery page when incomplete info provided" in {
+        navigator.nextPage(
+          SubTradingNameYesNoPage,
+          NormalMode,
+          emptyUserAnswers
+        ) mustBe journeyRecovery
+      }
+
+      "must go from a TradingNameOfSubcontractorPage to next page" in {
+        navigator.nextPage(
+          TradingNameOfSubcontractorPage,
+          NormalMode,
+          UserAnswers("id")
+        ) mustBe controllers.add.routes.TradingNameOfSubcontractorController.onPageLoad(NormalMode)
+      }
+
+      "must go from a SubAddressYesNoPage to next page when true" in {
+        navigator.nextPage(
+          SubAddressYesNoPage,
+          NormalMode,
+          emptyUserAnswers.setOrException(SubAddressYesNoPage, true)
+        ) mustBe controllers.add.routes.TradingNameOfSubcontractorController.onPageLoad(NormalMode)
+      }
+
+      "must go from a SubAddressYesNoPage to next page when false" in {
+        navigator.nextPage(
+          SubAddressYesNoPage,
+          NormalMode,
+          emptyUserAnswers.setOrException(SubAddressYesNoPage, false)
+        ) mustBe controllers.add.routes.SubAddressYesNoController.onPageLoad(NormalMode)
+      }
+
+      "must go from a SubAddressYesNoPage to journey recovery when incomplete info provided" in {
+        navigator.nextPage(
+          SubAddressYesNoPage,
+          NormalMode,
+          emptyUserAnswers
+        ) mustBe journeyRecovery
       }
 
       "must go from a NationalInsuranceNumberPage  to next page" in {
@@ -58,8 +117,58 @@ class NavigatorSpec extends SpecBase {
       "must go from a page that doesn't exist in the edit route map to CheckYourAnswers" in {
 
         case object UnknownPage extends Page
-        navigator.nextPage(UnknownPage, CheckMode, UserAnswers("id")) mustBe routes.CheckYourAnswersController.onPageLoad()
+        navigator.nextPage(UnknownPage, CheckMode, UserAnswers("id")) mustBe routes.CheckYourAnswersController
+          .onPageLoad()
       }
+
+      "must go from SubTradingNameYesNoPage to TradingNameOfSubcontractorController when true" in {
+        navigator.nextPage(
+          SubTradingNameYesNoPage,
+          CheckMode,
+          emptyUserAnswers.setOrException(SubTradingNameYesNoPage, true)
+        ) mustBe controllers.add.routes.TradingNameOfSubcontractorController.onPageLoad(CheckMode)
+      }
+
+      "must go from SubTradingNameYesNoPage to CYA page when false" in {
+        navigator.nextPage(
+          SubTradingNameYesNoPage,
+          CheckMode,
+          emptyUserAnswers.setOrException(SubTradingNameYesNoPage, false)
+        ) mustBe CYA
+      }
+
+      "must go from SubTradingNameYesNoPage to journey recovery page when incomplete info provided" in {
+        navigator.nextPage(
+          SubTradingNameYesNoPage,
+          CheckMode,
+          emptyUserAnswers
+        ) mustBe journeyRecovery
+      }
+
+      "must go from a SubAddressYesNoPage to next page when true" in {
+        navigator.nextPage(
+          SubAddressYesNoPage,
+          CheckMode,
+          emptyUserAnswers.setOrException(SubAddressYesNoPage, true)
+        ) mustBe controllers.add.routes.TradingNameOfSubcontractorController.onPageLoad(CheckMode)
+      }
+
+      "must go from a SubAddressYesNoPage to CYA page when false" in {
+        navigator.nextPage(
+          SubAddressYesNoPage,
+          CheckMode,
+          emptyUserAnswers.setOrException(SubAddressYesNoPage, false)
+        ) mustBe CYA
+      }
+
+      "must go from a SubAddressYesNoPage to journey recovery page when incomplete info provided" in {
+        navigator.nextPage(
+          SubAddressYesNoPage,
+          CheckMode,
+          emptyUserAnswers
+        ) mustBe journeyRecovery
+      }
+
     }
   }
 }
