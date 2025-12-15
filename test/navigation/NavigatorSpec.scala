@@ -103,6 +103,9 @@ class NavigatorSpec extends SpecBase {
         ) mustBe journeyRecovery
       }
 
+      "must go from a SubcontractorNamePage  to next page" in {
+        navigator.nextPage(SubcontractorNamePage, NormalMode, UserAnswers("id")) mustBe controllers.add.routes.SubcontractorNameController.onPageLoad(NormalMode)
+      }
     }
 
     "in Check mode" - {
