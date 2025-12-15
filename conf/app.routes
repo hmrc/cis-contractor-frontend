@@ -55,5 +55,5 @@ POST       /add/change-name                              controllers.add.Subcont
 
 GET        /add/check-unique-taxpayer-reference          controllers.add.UniqueTaxpayerReferenceController.onPageLoad(mode: Mode = NormalMode)
 POST       /add/check-unique-taxpayer-reference          controllers.add.UniqueTaxpayerReferenceController.onSubmit(mode: Mode = NormalMode)
-GET        /add/change-unique-taxpayer-reference         controllers.add.UniqueTaxpayerReferenceController.onPageLoad(mode: Mode = CheckMode)
-POST       /add/change-unique-taxpayer-reference         controllers.add.UniqueTaxpayerReferenceController.onSubmit(mode: Mode = CheckMode)
+GET        /add/change-check-unique-taxpayer-reference   controllers.add.UniqueTaxpayerReferenceController.onPageLoad(mode: Mode = CheckMode)
+POST       /add/change-check-unique-taxpayer-reference   controllers.add.UniqueTaxpayerReferenceController.onSubmit(mode: Mode = CheckMode)
