@@ -79,6 +79,14 @@ class NavigatorSpec extends SpecBase {
         ) mustBe controllers.add.routes.TradingNameOfSubcontractorController.onPageLoad(NormalMode)
       }
 
+      "must go from SubNationalInsuranceNumberPage to next page" in {
+        navigator.nextPage(
+          SubNationalInsuranceNumberPage,
+          NormalMode,
+          UserAnswers("id")
+        ) mustBe controllers.add.routes.SubNationalInsuranceNumberController.onPageLoad(NormalMode)
+      }
+
     }
 
     "in Check mode" - {
