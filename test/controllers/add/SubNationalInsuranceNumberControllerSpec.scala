@@ -20,7 +20,6 @@ import base.SpecBase
 import controllers.routes
 import forms.add.SubNationalInsuranceNumberFormProvider
 import models.{NormalMode, UserAnswers}
-import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
