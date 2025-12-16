@@ -32,6 +32,9 @@ class AddressOfSubcontractorFormProvider @Inject() extends Mappings {
   private val allowedPostcodeCharsRegex =
     """^[A-Za-z0-9 ~!"@#\$%&'()*+,\-./:;<=>?\[\\\]^_\{\}£€]*$"""
 
+  private val ukPostcodeRegex =
+    """^(GIR\s?0AA|(?:(?:[A-Z]{1,2}\d[A-Z\d]?|\d[A-Z]{2})\s?\d[A-Z]{2}))$"""
+
   def apply(): Form[AddressOfSubcontractor] = Form(
     Forms.mapping(
       "addressLine1" ->
@@ -76,18 +79,18 @@ class AddressOfSubcontractorFormProvider @Inject() extends Mappings {
               )
             )
         ),
-      "postCode" ->
+      "postCode"     ->
         text("addressOfSubcontractor.error.postCode.required")
-          .transform(_.trim, identity)
+          .transform(_.trim.toUpperCase, identity)
           .verifying(
             firstError(
               maxLength(8, "addressOfSubcontractor.error.postCode.length"),
-              regexp(allowedPostcodeCharsRegex, "addressOfSubcontractor.error.postCode.invalidCharacters")
+              regexp(allowedPostcodeCharsRegex, "addressOfSubcontractor.error.postCode.invalidCharacters"),
+              regexp(ukPostcodeRegex, "addressOfSubcontractor.error.postCode.invalid")
             )
           )
-    )(
-      (a1: String, a2: String, a3: String, a4: Option[String], pc: String) =>
-        AddressOfSubcontractor(a1, a2, a3, a4, pc)
+    )((a1: String, a2: String, a3: String, a4: Option[String], pc: String) =>
+      AddressOfSubcontractor(a1, a2, a3, a4, pc)
     )(address =>
       Some(
         (
