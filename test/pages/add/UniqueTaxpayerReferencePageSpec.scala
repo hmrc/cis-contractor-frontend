@@ -20,7 +20,7 @@ import pages.behaviours.PageBehaviours
 
 class UniqueTaxpayerReferencePageSpec extends PageBehaviours {
 
-  "NationalInsuranceNumberPage" - {
+  "UniqueTaxpayerReferencePage" - {
 
     beRetrievable[Boolean](UniqueTaxpayerReferencePage)
 
