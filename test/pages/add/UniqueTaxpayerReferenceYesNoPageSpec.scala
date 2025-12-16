@@ -18,21 +18,21 @@ package pages.add
 
 import pages.behaviours.PageBehaviours
 
-class UniqueTaxpayerReferencePageSpec extends PageBehaviours {
+class UniqueTaxpayerReferenceYesNoPageSpec extends PageBehaviours {
 
-  "UniqueTaxpayerReferencePage" - {
+  "UniqueTaxpayerReferenceYesNoPage" - {
 
-    beRetrievable[Boolean](UniqueTaxpayerReferencePage)
+    beRetrievable[Boolean](UniqueTaxpayerReferenceYesNoPage)
 
-    beSettable[Boolean](UniqueTaxpayerReferencePage)
+    beSettable[Boolean](UniqueTaxpayerReferenceYesNoPage)
 
-    beRemovable[Boolean](UniqueTaxpayerReferencePage)
+    beRemovable[Boolean](UniqueTaxpayerReferenceYesNoPage)
 
     //Need to update to correct page!
     "cleanup: must remove TradingNameOfSubcontractor userAnswers when No is selected" in {
       val userAnswers = emptyUserAnswers.set(TradingNameOfSubcontractorPage, "ABC").success.value
 
-      val updatedUserAnswers = userAnswers.set(UniqueTaxpayerReferencePage, false).success.value
+      val updatedUserAnswers = userAnswers.set(UniqueTaxpayerReferenceYesNoPage, false).success.value
 
       updatedUserAnswers.get(TradingNameOfSubcontractorPage) mustBe None
     }

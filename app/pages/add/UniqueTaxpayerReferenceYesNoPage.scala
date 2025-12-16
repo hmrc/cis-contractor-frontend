@@ -22,11 +22,11 @@ import play.api.libs.json.JsPath
 
 import scala.util.Try
 
-case object UniqueTaxpayerReferencePage extends QuestionPage[Boolean] {
+case object UniqueTaxpayerReferenceYesNoPage extends QuestionPage[Boolean] {
 
   override def path: JsPath = JsPath \ toString
 
-  override def toString: String = "uniqueTaxpayerReference"
+  override def toString: String = "uniqueTaxpayerReferenceYesNo"
 
   override def cleanup(value: Option[Boolean], userAnswers: UserAnswers): Try[UserAnswers] =
     if value.contains(false) then {

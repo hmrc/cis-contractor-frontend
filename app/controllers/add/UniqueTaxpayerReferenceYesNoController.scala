@@ -17,29 +17,29 @@
 package controllers.add
 
 import controllers.actions.*
-import forms.add.UniqueTaxpayerReferenceFormProvider
+import forms.add.UniqueTaxpayerReferenceYesNoFormProvider
 import models.Mode
 import navigation.Navigator
-import pages.add.UniqueTaxpayerReferencePage
+import pages.add.UniqueTaxpayerReferenceYesNoPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.add.UniqueTaxpayerReferenceView
+import views.html.add.UniqueTaxpayerReferenceYesNoView
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class UniqueTaxpayerReferenceController @Inject() (
-  override val messagesApi: MessagesApi,
-  sessionRepository: SessionRepository,
-  navigator: Navigator,
-  identify: IdentifierAction,
-  getData: DataRetrievalAction,
-  requireData: DataRequiredAction,
-  formProvider: UniqueTaxpayerReferenceFormProvider,
-  val controllerComponents: MessagesControllerComponents,
-  view: UniqueTaxpayerReferenceView
+class UniqueTaxpayerReferenceYesNoController @Inject()(
+                                                        override val messagesApi: MessagesApi,
+                                                        sessionRepository: SessionRepository,
+                                                        navigator: Navigator,
+                                                        identify: IdentifierAction,
+                                                        getData: DataRetrievalAction,
+                                                        requireData: DataRequiredAction,
+                                                        formProvider: UniqueTaxpayerReferenceYesNoFormProvider,
+                                                        val controllerComponents: MessagesControllerComponents,
+                                                        view: UniqueTaxpayerReferenceYesNoView
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport {
@@ -48,7 +48,7 @@ class UniqueTaxpayerReferenceController @Inject() (
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
 
-    val preparedForm = request.userAnswers.get(UniqueTaxpayerReferencePage) match {
+    val preparedForm = request.userAnswers.get(UniqueTaxpayerReferenceYesNoPage) match {
       case None        => form
       case Some(value) => form.fill(value)
     }
@@ -64,9 +64,9 @@ class UniqueTaxpayerReferenceController @Inject() (
           formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
           value =>
             for {
-              updatedAnswers <- Future.fromTry(request.userAnswers.set(UniqueTaxpayerReferencePage, value))
+              updatedAnswers <- Future.fromTry(request.userAnswers.set(UniqueTaxpayerReferenceYesNoPage, value))
               _              <- sessionRepository.set(updatedAnswers)
-            } yield Redirect(navigator.nextPage(UniqueTaxpayerReferencePage, mode, updatedAnswers))
+            } yield Redirect(navigator.nextPage(UniqueTaxpayerReferenceYesNoPage, mode, updatedAnswers))
         )
   }
 }

@@ -21,10 +21,10 @@ import play.api.data.Form
 
 import javax.inject.Inject
 
-class UniqueTaxpayerReferenceFormProvider @Inject() extends Mappings {
+class UniqueTaxpayerReferenceYesNoFormProvider @Inject() extends Mappings {
 
   def apply(): Form[Boolean] =
     Form(
-      "value" -> boolean("uniqueTaxpayerReference.error.required")
+      "value" -> boolean("uniqueTaxpayerReferenceYesNo.error.required")
     )
 }

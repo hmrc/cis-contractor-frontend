@@ -16,7 +16,7 @@
 
 package views.add
 
-import forms.add.UniqueTaxpayerReferenceFormProvider
+import forms.add.UniqueTaxpayerReferenceYesNoFormProvider
 import models.NormalMode
 import org.jsoup.Jsoup
 import org.scalatest.matchers.must.Matchers
@@ -26,24 +26,24 @@ import play.api.data.Form
 import play.api.i18n.{Lang, Messages, MessagesApi, MessagesImpl}
 import play.api.mvc.Request
 import play.api.test.FakeRequest
-import views.html.add.UniqueTaxpayerReferenceView
+import views.html.add.UniqueTaxpayerReferenceYesNoView
 
-class UniqueTaxpayerReferenceViewSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite {
+class UniqueTaxpayerReferenceYesNoViewSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite {
 
-  "UniqueTaxpayerReferenceView" should {
+  "UniqueTaxpayerReferenceYesNoView" should {
 
     "render the page with title, heading, hint, yes/no radios and submit button" in new Setup {
 
       val html = view(form, NormalMode)
       val doc  = Jsoup.parse(html.toString())
 
-      doc.select("title").text() must include(messages("uniqueTaxpayerReference.title"))
+      doc.select("title").text() must include(messages("uniqueTaxpayerReferenceYesNo.title"))
 
       val legend = doc.select("fieldset legend")
-      legend.text() mustBe messages("uniqueTaxpayerReference.heading")
+      legend.text() mustBe messages("uniqueTaxpayerReferenceYesNo.heading")
       legend.hasClass("govuk-fieldset__legend--l") mustBe true
 
-      doc.select(".govuk-hint").text() mustBe messages("uniqueTaxpayerReference.hint")
+      doc.select(".govuk-hint").text() mustBe messages("uniqueTaxpayerReferenceYesNo.hint")
 
       val radios = doc.select(".govuk-radios__input")
       radios.size() mustBe 2
@@ -53,7 +53,7 @@ class UniqueTaxpayerReferenceViewSpec extends AnyWordSpec with Matchers with Gui
       labels must contain("No")
 
       doc.select("form").attr("action") mustBe
-        controllers.add.routes.UniqueTaxpayerReferenceController.onSubmit(NormalMode).url
+        controllers.add.routes.UniqueTaxpayerReferenceYesNoController.onSubmit(NormalMode).url
 
       doc.select("form").attr("autocomplete") mustBe "off"
 
@@ -77,7 +77,7 @@ class UniqueTaxpayerReferenceViewSpec extends AnyWordSpec with Matchers with Gui
   }
 
   trait Setup {
-    val formProvider        = new UniqueTaxpayerReferenceFormProvider()
+    val formProvider        = new UniqueTaxpayerReferenceYesNoFormProvider()
     val form: Form[Boolean] = formProvider()
 
     implicit val request: Request[_] = FakeRequest()
@@ -86,7 +86,7 @@ class UniqueTaxpayerReferenceViewSpec extends AnyWordSpec with Matchers with Gui
       app.injector.instanceOf[MessagesApi]
     )
 
-    val view: UniqueTaxpayerReferenceView =
-      app.injector.instanceOf[UniqueTaxpayerReferenceView]
+    val view: UniqueTaxpayerReferenceYesNoView =
+      app.injector.instanceOf[UniqueTaxpayerReferenceYesNoView]
   }
 }
