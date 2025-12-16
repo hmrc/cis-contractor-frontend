@@ -147,3 +147,12 @@ subcontractorName.lastName.error.firstChar = Enter a last name where the first c
 subcontractorName.lastName.error.length = Last name must be 35 characters or less
 subcontractorName.checkYourAnswersLabel = What is the subcontractor’s name?
 subcontractorName.change.hidden = What is the subcontractor’s name?
+
+subcontractorsUniqueTaxpayerReference.title = What is the subcontractor’s Unique Taxpayer Reference (UTR)?
+subcontractorsUniqueTaxpayerReference.heading = What is the subcontractor’s Unique Taxpayer Reference (UTR)?
+subcontractorsUniqueTaxpayerReference.hint = This is 10 numbers, like 1234567890. The UTR will be on tax returns and other letters about Self Assessment. It may also be called ‘tax reference’
+subcontractorsUniqueTaxpayerReference.checkYourAnswersLabel = Subcontractor’s Unique Taxpayer Reference
+subcontractorsUniqueTaxpayerReference.error.required = Enter a Unique Taxpayer Reference like 1234567890
+subcontractorsUniqueTaxpayerReference.error.invalid = Enter a Unique Taxpayer Reference like 1234567890
+subcontractorsUniqueTaxpayerReference.error.length = Enter a unique taxpayer reference less or equal to 10 characters
+subcontractorsUniqueTaxpayerReference.change.hidden = Subcontractor’s Unique Taxpayer Reference

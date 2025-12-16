@@ -52,3 +52,8 @@ GET        /add/name                                     controllers.add.Subcont
 POST       /add/name                                     controllers.add.SubcontractorNameController.onSubmit(mode: Mode = NormalMode)
 GET        /add/change-name                              controllers.add.SubcontractorNameController.onPageLoad(mode: Mode = CheckMode)
 POST       /add/change-name                              controllers.add.SubcontractorNameController.onSubmit(mode: Mode = CheckMode)
+
+GET        /add/unique-taxpayer-reference                controllers.add.SubcontractorsUniqueTaxpayerReferenceController.onPageLoad(mode: Mode = NormalMode)
+POST       /add/unique-taxpayer-reference                controllers.add.SubcontractorsUniqueTaxpayerReferenceController.onSubmit(mode: Mode = NormalMode)
+GET        /add/change-unique-taxpayer-reference         controllers.add.SubcontractorsUniqueTaxpayerReferenceController.onPageLoad(mode: Mode = CheckMode)
+POST       /add/change-unique-taxpayer-reference         controllers.add.SubcontractorsUniqueTaxpayerReferenceController.onSubmit(mode: Mode = CheckMode)
