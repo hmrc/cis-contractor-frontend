@@ -147,3 +147,10 @@ subcontractorName.lastName.error.firstChar = Enter a last name where the first c
 subcontractorName.lastName.error.length = Last name must be 35 characters or less
 subcontractorName.checkYourAnswersLabel = What is the subcontractor’s name?
 subcontractorName.change.hidden = What is the subcontractor’s name?
+
+worksReferenceNumberYesNo.title = Do you have a works reference number?
+worksReferenceNumberYesNo.heading = Do you have a works reference number?
+worksReferenceNumberYesNo.hint = This is your reference number used to identify the subcontractor's work or project. It can contain letters and numbers
+worksReferenceNumberYesNo.checkYourAnswersLabel = Works reference number
+worksReferenceNumberYesNo.error.required = Select whether you have the subcontractor’s work reference number or not
+worksReferenceNumberYesNo.change.hidden = Works reference number

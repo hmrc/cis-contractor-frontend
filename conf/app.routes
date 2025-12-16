@@ -52,3 +52,8 @@ GET        /add/name                                     controllers.add.Subcont
 POST       /add/name                                     controllers.add.SubcontractorNameController.onSubmit(mode: Mode = NormalMode)
 GET        /add/change-name                              controllers.add.SubcontractorNameController.onPageLoad(mode: Mode = CheckMode)
 POST       /add/change-name                              controllers.add.SubcontractorNameController.onSubmit(mode: Mode = CheckMode)
+
+GET        /add/check-works-reference-number             controllers.add.WorksReferenceNumberYesNoController.onPageLoad(mode: Mode = NormalMode)
+POST       /add/check-works-reference-number             controllers.add.WorksReferenceNumberYesNoController.onSubmit(mode: Mode = NormalMode)
+GET        /add/change-check-works-reference-number      controllers.add.WorksReferenceNumberYesNoController.onPageLoad(mode: Mode = CheckMode)
+POST       /add/change-check-works-reference-number      controllers.add.WorksReferenceNumberYesNoController.onSubmit(mode: Mode = CheckMode)

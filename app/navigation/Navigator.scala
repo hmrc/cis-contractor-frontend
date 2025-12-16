@@ -33,6 +33,7 @@ class Navigator @Inject() () {
       _ => controllers.add.routes.TradingNameOfSubcontractorController.onPageLoad(NormalMode)
     case SubcontractorNamePage   =>   _ => controllers.add.routes.SubcontractorNameController.onPageLoad(NormalMode)
     case SubAddressYesNoPage            => userAnswers => navigatorFromSubAddressYesNoPage(NormalMode)(userAnswers)
+    case WorksReferenceNumberYesNoPage  => userAnswers => navigatorFromWorksReferenceNumber(NormalMode)(userAnswers)
     case _                              => _ => routes.IndexController.onPageLoad()
   }
 
@@ -63,5 +64,13 @@ class Navigator @Inject() () {
       case (Some(false), NormalMode) => controllers.add.routes.SubAddressYesNoController.onPageLoad(NormalMode)
       case (Some(false), CheckMode)  => routes.CheckYourAnswersController.onPageLoad()
       case (None, _)                 => routes.JourneyRecoveryController.onPageLoad()
+    }
+
+  private def navigatorFromWorksReferenceNumber(mode: Mode)(userAnswers: UserAnswers): Call =
+    (userAnswers.get(SubAddressYesNoPage), mode) match {
+      case (Some(true), _) => controllers.add.routes.WorksReferenceNumberYesNoController.onPageLoad(mode) // Works Reference Number Page
+      case (Some(false), NormalMode) => controllers.add.routes.WorksReferenceNumberYesNoController.onPageLoad(NormalMode)//Subcontractor Contact Details Yes/No?
+      case (Some(false), CheckMode) => routes.CheckYourAnswersController.onPageLoad()
+      case (None, _) => routes.JourneyRecoveryController.onPageLoad()
     }
 }
