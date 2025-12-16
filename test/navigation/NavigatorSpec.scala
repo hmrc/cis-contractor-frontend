@@ -115,7 +115,7 @@ class NavigatorSpec extends SpecBase {
         navigator.nextPage(
           SubcontractorContactDetailsYesNoPage,
           NormalMode,
-          UserAnswers("id")
+          emptyUserAnswers.setOrException(SubcontractorContactDetailsYesNoPage, true)
         ) mustBe controllers.add.routes.SubcontractorContactDetailsYesNoController.onPageLoad(NormalMode)
       }
 

@@ -69,7 +69,7 @@ class Navigator @Inject() () {
 
   private def navigatorFromSubcontractorContactDetailsYesNoPage(mode: Mode)(userAnswers: UserAnswers): Call =
     (userAnswers.get(SubcontractorContactDetailsYesNoPage), mode) match {
-      case (Some(true), _)           => controllers.add.routes.TradingNameOfSubcontractorController.onPageLoad(mode)
+      case (Some(true), _)           => controllers.add.routes.SubcontractorContactDetailsYesNoController.onPageLoad(mode)
       case (Some(false), NormalMode) =>
         controllers.add.routes.SubcontractorContactDetailsYesNoController.onPageLoad(NormalMode)
       case (Some(false), CheckMode)  => routes.CheckYourAnswersController.onPageLoad()
