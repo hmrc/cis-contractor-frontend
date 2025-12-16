@@ -150,7 +150,7 @@ subcontractorName.change.hidden = What is the subcontractor’s name?
 
 uniqueTaxpayerReference.title = Do you have a Unique Taxpayer Reference (UTR)?
 uniqueTaxpayerReference.heading = Do you have a Unique Taxpayer Reference (UTR)?
-uniqueTaxpayerReference.hint = This is 10 numbers, like 1234567890. The UTR will be on tax returns and other letters about Self Assessment. It may also be called 'tax reference'.
+uniqueTaxpayerReference.hint = This is 10 numbers, like 1234567890. The UTR will be on tax returns and other letters about Self Assessment. It may also be called ‘tax reference’.
 uniqueTaxpayerReference.checkYourAnswersLabel = Unique Taxpayer Reference (UTR)
-uniqueTaxpayerReference.error.required = Select whether or not you have the subcontractor''s Unique Tax Reference
+uniqueTaxpayerReference.error.required = Select whether or not you have the subcontractor’s Unique Tax Reference
 uniqueTaxpayerReference.change.hidden = Unique Taxpayer Reference (UTR)
