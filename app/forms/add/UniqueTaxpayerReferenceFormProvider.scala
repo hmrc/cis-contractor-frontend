@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package forms
-
-import javax.inject.Inject
+package forms.add
 
 import forms.mappings.Mappings
 import play.api.data.Form
+
+import javax.inject.Inject
 
 class UniqueTaxpayerReferenceFormProvider @Inject() extends Mappings {
 

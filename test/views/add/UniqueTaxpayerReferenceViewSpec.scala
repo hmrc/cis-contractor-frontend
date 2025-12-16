@@ -16,7 +16,7 @@
 
 package views.add
 
-import forms.UniqueTaxpayerReferenceFormProvider
+import forms.add.UniqueTaxpayerReferenceFormProvider
 import models.NormalMode
 import org.jsoup.Jsoup
 import org.scalatest.matchers.must.Matchers

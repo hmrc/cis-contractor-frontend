@@ -17,10 +17,10 @@
 package controllers.add
 
 import controllers.actions.*
-import forms.UniqueTaxpayerReferenceFormProvider
+import forms.add.UniqueTaxpayerReferenceFormProvider
 import models.Mode
 import navigation.Navigator
-import pages.UniqueTaxpayerReferencePage
+import pages.add.UniqueTaxpayerReferencePage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository

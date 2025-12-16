@@ -16,7 +16,6 @@
 
 package pages.add
 
-import pages.UniqueTaxpayerReferencePage
 import pages.behaviours.PageBehaviours
 
 class UniqueTaxpayerReferencePageSpec extends PageBehaviours {
