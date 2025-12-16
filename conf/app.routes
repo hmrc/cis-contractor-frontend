@@ -48,6 +48,11 @@ POST       /add/check-address                            controllers.add.SubAddr
 GET        /add/change-check-address                     controllers.add.SubAddressYesNoController.onPageLoad(mode: Mode = CheckMode)
 POST       /add/change-check-address                     controllers.add.SubAddressYesNoController.onSubmit(mode: Mode = CheckMode)
 
+GET        /add/name                                     controllers.add.SubcontractorNameController.onPageLoad(mode: Mode = NormalMode)
+POST       /add/name                                     controllers.add.SubcontractorNameController.onSubmit(mode: Mode = NormalMode)
+GET        /add/change-name                              controllers.add.SubcontractorNameController.onPageLoad(mode: Mode = CheckMode)
+POST       /add/change-name                              controllers.add.SubcontractorNameController.onSubmit(mode: Mode = CheckMode)
+
 GET        /add/check-national-insurance-number          controllers.add.NationalInsuranceNumberYesNoController.onPageLoad(mode: Mode = NormalMode)
 POST       /add/check-national-insurance-number          controllers.add.NationalInsuranceNumberYesNoController.onSubmit(mode: Mode = NormalMode)
 GET        /add/change-check-national-insurance-number   controllers.add.NationalInsuranceNumberYesNoController.onPageLoad(mode: Mode = CheckMode)
