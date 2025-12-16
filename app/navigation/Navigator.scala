@@ -31,16 +31,17 @@ class Navigator @Inject() () {
     case SubTradingNameYesNoPage        => userAnswers => navigatorFromSubTradingNameYesNoPage(NormalMode)(userAnswers)
     case TradingNameOfSubcontractorPage =>
       _ => controllers.add.routes.TradingNameOfSubcontractorController.onPageLoad(NormalMode)
-    case NationalInsuranceNumberPage    =>
-      _ => controllers.add.routes.NationalInsuranceNumberController.onPageLoad(NormalMode)
+    case NationalInsuranceNumberYesNoPage    =>
+      _ => controllers.add.routes.NationalInsuranceNumberYesNoController.onPageLoad(NormalMode)
     case SubAddressYesNoPage            => userAnswers => navigatorFromSubAddressYesNoPage(NormalMode)(userAnswers)
     case _                              => _ => routes.IndexController.onPageLoad()
   }
 
   private val checkRouteMap: Page => UserAnswers => Call = {
-    case SubTradingNameYesNoPage => userAnswers => navigatorFromSubTradingNameYesNoPage(CheckMode)(userAnswers)
-    case SubAddressYesNoPage     => userAnswers => navigatorFromSubAddressYesNoPage(CheckMode)(userAnswers)
-    case _                       => _ => routes.CheckYourAnswersController.onPageLoad()
+    case SubTradingNameYesNoPage          => userAnswers => navigatorFromSubTradingNameYesNoPage(CheckMode)(userAnswers)
+    case SubAddressYesNoPage              => userAnswers => navigatorFromSubAddressYesNoPage(CheckMode)(userAnswers)
+    case NationalInsuranceNumberYesNoPage => userAnswers => navigatorFromNationalInsuranceNumberYesNoPage(CheckMode)(userAnswers)
+    case _                                => _ => routes.CheckYourAnswersController.onPageLoad()
   }
 
   def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers): Call = mode match {
@@ -62,6 +63,14 @@ class Navigator @Inject() () {
     (userAnswers.get(SubAddressYesNoPage), mode) match {
       case (Some(true), _)           => controllers.add.routes.TradingNameOfSubcontractorController.onPageLoad(mode)
       case (Some(false), NormalMode) => controllers.add.routes.SubAddressYesNoController.onPageLoad(NormalMode)
+      case (Some(false), CheckMode)  => routes.CheckYourAnswersController.onPageLoad()
+      case (None, _)                 => routes.JourneyRecoveryController.onPageLoad()
+    }
+
+  private def navigatorFromNationalInsuranceNumberYesNoPage(mode: Mode)(userAnswers: UserAnswers): Call =
+    (userAnswers.get(NationalInsuranceNumberYesNoPage), mode) match {
+      case (Some(true), _)           => controllers.add.routes.NationalInsuranceNumberYesNoController.onPageLoad(mode) // NI PAGE
+      case (Some(false), NormalMode) => controllers.add.routes.NationalInsuranceNumberYesNoController.onPageLoad(NormalMode) // UTR YES NO PAGE
       case (Some(false), CheckMode)  => routes.CheckYourAnswersController.onPageLoad()
       case (None, _)                 => routes.JourneyRecoveryController.onPageLoad()
     }

@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package forms
-
-import javax.inject.Inject
+package forms.add
 
 import forms.mappings.Mappings
 import play.api.data.Form
 
-class NationalInsuranceNumberFormProvider @Inject() extends Mappings {
+import javax.inject.Inject
+
+class NationalInsuranceNumberYesNoFormProvider @Inject() extends Mappings {
 
   def apply(): Form[Boolean] =
     Form(

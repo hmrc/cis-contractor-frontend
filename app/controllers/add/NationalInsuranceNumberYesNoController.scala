@@ -17,29 +17,29 @@
 package controllers.add
 
 import controllers.actions.*
-import forms.NationalInsuranceNumberFormProvider
+import forms.add.NationalInsuranceNumberYesNoFormProvider
 import models.Mode
 import navigation.Navigator
-import pages.NationalInsuranceNumberPage
+import pages.add.NationalInsuranceNumberYesNoPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.add.NationalInsuranceNumberView
+import views.html.add.NationalInsuranceNumberYesNoView
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class NationalInsuranceNumberController @Inject()(
-                                         override val messagesApi: MessagesApi,
-                                         sessionRepository: SessionRepository,
-                                         navigator: Navigator,
-                                         identify: IdentifierAction,
-                                         getData: DataRetrievalAction,
-                                         requireData: DataRequiredAction,
-                                         formProvider: NationalInsuranceNumberFormProvider,
-                                         val controllerComponents: MessagesControllerComponents,
-                                         view: NationalInsuranceNumberView
+class NationalInsuranceNumberYesNoController @Inject()(
+                                                        override val messagesApi: MessagesApi,
+                                                        sessionRepository: SessionRepository,
+                                                        navigator: Navigator,
+                                                        identify: IdentifierAction,
+                                                        getData: DataRetrievalAction,
+                                                        requireData: DataRequiredAction,
+                                                        formProvider: NationalInsuranceNumberYesNoFormProvider,
+                                                        val controllerComponents: MessagesControllerComponents,
+                                                        view: NationalInsuranceNumberYesNoView
                                  )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   val form = formProvider()
@@ -47,7 +47,7 @@ class NationalInsuranceNumberController @Inject()(
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) {
     implicit request =>
 
-      val preparedForm = request.userAnswers.get(NationalInsuranceNumberPage) match {
+      val preparedForm = request.userAnswers.get(NationalInsuranceNumberYesNoPage) match {
         case None => form
         case Some(value) => form.fill(value)
       }
@@ -64,9 +64,9 @@ class NationalInsuranceNumberController @Inject()(
 
         value =>
           for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(NationalInsuranceNumberPage, value))
+            updatedAnswers <- Future.fromTry(request.userAnswers.set(NationalInsuranceNumberYesNoPage, value))
             _              <- sessionRepository.set(updatedAnswers)
-          } yield Redirect(navigator.nextPage(NationalInsuranceNumberPage, mode, updatedAnswers))
+          } yield Redirect(navigator.nextPage(NationalInsuranceNumberYesNoPage, mode, updatedAnswers))
       )
   }
 }

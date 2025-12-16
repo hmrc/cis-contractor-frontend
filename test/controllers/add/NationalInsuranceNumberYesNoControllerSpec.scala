@@ -14,33 +14,34 @@
  * limitations under the License.
  */
 
-package controllers
+package controllers.add
 
 import base.SpecBase
-import forms.NationalInsuranceNumberFormProvider
+import controllers.routes
+import forms.add.NationalInsuranceNumberYesNoFormProvider
 import models.{NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.NationalInsuranceNumberPage
+import pages.add.NationalInsuranceNumberYesNoPage
 import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import repositories.SessionRepository
-import views.html.add.NationalInsuranceNumberView
+import views.html.add.NationalInsuranceNumberYesNoView
 
 import scala.concurrent.Future
 
-class NationalInsuranceNumberControllerSpec extends SpecBase with MockitoSugar {
+class NationalInsuranceNumberYesNoControllerSpec extends SpecBase with MockitoSugar {
 
   def onwardRoute = Call("GET", "/foo")
 
-  val formProvider = new NationalInsuranceNumberFormProvider()
+  val formProvider = new NationalInsuranceNumberYesNoFormProvider()
   val form = formProvider()
 
-  lazy val nationalInsuranceNumberRoute = controllers.add.routes.NationalInsuranceNumberController.onPageLoad(NormalMode).url
+  lazy val nationalInsuranceNumberRoute: String = controllers.add.routes.NationalInsuranceNumberYesNoController.onPageLoad(NormalMode).url
 
   "NationalInsuranceNumber Controller" - {
 
@@ -53,7 +54,7 @@ class NationalInsuranceNumberControllerSpec extends SpecBase with MockitoSugar {
 
         val result = route(application, request).value
 
-        val view = application.injector.instanceOf[NationalInsuranceNumberView]
+        val view = application.injector.instanceOf[NationalInsuranceNumberYesNoView]
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
@@ -62,14 +63,14 @@ class NationalInsuranceNumberControllerSpec extends SpecBase with MockitoSugar {
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = UserAnswers(userAnswersId).set(NationalInsuranceNumberPage, true).success.value
+      val userAnswers = UserAnswers(userAnswersId).set(NationalInsuranceNumberYesNoPage, true).success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
       running(application) {
         val request = FakeRequest(GET, nationalInsuranceNumberRoute)
 
-        val view = application.injector.instanceOf[NationalInsuranceNumberView]
+        val view = application.injector.instanceOf[NationalInsuranceNumberYesNoView]
 
         val result = route(application, request).value
 
@@ -115,7 +116,7 @@ class NationalInsuranceNumberControllerSpec extends SpecBase with MockitoSugar {
 
         val boundForm = form.bind(Map("value" -> ""))
 
-        val view = application.injector.instanceOf[NationalInsuranceNumberView]
+        val view = application.injector.instanceOf[NationalInsuranceNumberYesNoView]
 
         val result = route(application, request).value
 

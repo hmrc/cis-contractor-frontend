@@ -16,7 +16,7 @@
 
 package views.add
 
-import forms.NationalInsuranceNumberFormProvider
+import forms.add.NationalInsuranceNumberYesNoFormProvider
 import models.NormalMode
 import org.jsoup.Jsoup
 import org.scalatest.matchers.must.Matchers
@@ -26,9 +26,9 @@ import play.api.data.Form
 import play.api.i18n.{Lang, Messages, MessagesApi, MessagesImpl}
 import play.api.mvc.Request
 import play.api.test.FakeRequest
-import views.html.add.NationalInsuranceNumberView
+import views.html.add.NationalInsuranceNumberYesNoView
 
-class NationalInsuranceNumberViewSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite {
+class NationalInsuranceNumberYesNoViewSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite {
 
   "NationalInsuranceNumberView" should {
 
@@ -37,13 +37,13 @@ class NationalInsuranceNumberViewSpec extends AnyWordSpec with Matchers with Gui
       val html = view(form, NormalMode)
       val doc  = Jsoup.parse(html.toString())
 
-      doc.select("title").text() must include(messages("nationalInsuranceNumber.title"))
+      doc.select("title").text() must include(messages("nationalInsuranceNumberYesNo.title"))
 
       val legend = doc.select("fieldset legend")
-      legend.text() mustBe messages("nationalInsuranceNumber.heading")
+      legend.text() mustBe messages("nationalInsuranceNumberYesNo.heading")
       legend.hasClass("govuk-fieldset__legend--l") mustBe true
 
-      doc.select(".govuk-hint").text() mustBe messages("nationalInsuranceNumber.hint")
+      doc.select(".govuk-hint").text() mustBe messages("nationalInsuranceNumberYesNo.hint")
 
       val radios = doc.select(".govuk-radios__input")
       radios.size() mustBe 2
@@ -53,7 +53,7 @@ class NationalInsuranceNumberViewSpec extends AnyWordSpec with Matchers with Gui
       labels must contain("No")
 
       doc.select("form").attr("action") mustBe
-        controllers.add.routes.NationalInsuranceNumberController.onSubmit(NormalMode).url
+        controllers.add.routes.NationalInsuranceNumberYesNoController.onSubmit(NormalMode).url
 
       doc.select("form").attr("autocomplete") mustBe "off"
 
@@ -77,7 +77,7 @@ class NationalInsuranceNumberViewSpec extends AnyWordSpec with Matchers with Gui
   }
 
   trait Setup {
-    val formProvider        = new NationalInsuranceNumberFormProvider()
+    val formProvider        = new NationalInsuranceNumberYesNoFormProvider()
     val form: Form[Boolean] = formProvider()
 
     implicit val request: Request[_] = FakeRequest()
@@ -86,7 +86,7 @@ class NationalInsuranceNumberViewSpec extends AnyWordSpec with Matchers with Gui
       app.injector.instanceOf[MessagesApi]
     )
 
-    val view: NationalInsuranceNumberView =
-      app.injector.instanceOf[NationalInsuranceNumberView]
+    val view: NationalInsuranceNumberYesNoView =
+      app.injector.instanceOf[NationalInsuranceNumberYesNoView]
   }
 }

@@ -16,17 +16,12 @@
 
 package pages.add
 
-import pages.NationalInsuranceNumberPage
-import pages.behaviours.PageBehaviours
+import pages.QuestionPage
+import play.api.libs.json.JsPath
 
-class NationalInsuranceNumberPageSpec extends PageBehaviours {
+case object NationalInsuranceNumberYesNoPage extends QuestionPage[Boolean] {
 
-  "NationalInsuranceNumberPage" - {
+  override def path: JsPath = JsPath \ toString
 
-    beRetrievable[Boolean](NationalInsuranceNumberPage)
-
-    beSettable[Boolean](NationalInsuranceNumberPage)
-
-    beRemovable[Boolean](NationalInsuranceNumberPage)
-  }
+  override def toString: String = "nationalInsuranceNumber"
 }

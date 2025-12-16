@@ -23,12 +23,12 @@ import org.scalatest.TryValues.convertTryToSuccessOrFailure
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.matchers.should.Matchers.{should, shouldBe}
-import pages.NationalInsuranceNumberPage
+import pages.add.NationalInsuranceNumberYesNoPage
 import play.api.i18n.Messages
 import play.api.test.Helpers.stubMessages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 
-class NationalInsuranceNumberSummarySpec extends AnyFreeSpec with Matchers {
+class NationalInsuranceNumberYesNoSummarySpec extends AnyFreeSpec with Matchers {
 
   implicit val messages: Messages = stubMessages()
 
@@ -36,11 +36,11 @@ class NationalInsuranceNumberSummarySpec extends AnyFreeSpec with Matchers {
 
     "must return a SummaryListRow with 'Yes' when the answer is true" in {
       val answers = UserAnswers("test-id")
-        .set(NationalInsuranceNumberPage, true)
+        .set(NationalInsuranceNumberYesNoPage, true)
         .success
         .value
 
-      val maybeRow: Option[SummaryListRow] = NationalInsuranceNumberSummary.row(answers)
+      val maybeRow: Option[SummaryListRow] = NationalInsuranceNumberYesNoSummary.row(answers)
       maybeRow shouldBe defined
 
       val row =
@@ -58,7 +58,7 @@ class NationalInsuranceNumberSummarySpec extends AnyFreeSpec with Matchers {
 
       val changeAction       = actions.head
       val expectedChangeText = messages("site.change")
-      val expectedHref       = routes.NationalInsuranceNumberController.onPageLoad(CheckMode).url
+      val expectedHref       = routes.NationalInsuranceNumberYesNoController.onPageLoad(CheckMode).url
       val expectedHiddenText = messages("nationalInsuranceNumber.change.hidden")
 
       changeAction.content.asHtml.toString    should include(expectedChangeText)
@@ -68,11 +68,11 @@ class NationalInsuranceNumberSummarySpec extends AnyFreeSpec with Matchers {
 
     "must return a SummaryListRow with 'No' when the answer is false" in {
       val answers = UserAnswers("test-id")
-        .set(NationalInsuranceNumberPage, false)
+        .set(NationalInsuranceNumberYesNoPage, false)
         .success
         .value
 
-      val maybeRow: Option[SummaryListRow] = NationalInsuranceNumberSummary.row(answers)
+      val maybeRow: Option[SummaryListRow] = NationalInsuranceNumberYesNoSummary.row(answers)
       maybeRow shouldBe defined
 
       val row           = maybeRow.value
@@ -82,7 +82,7 @@ class NationalInsuranceNumberSummarySpec extends AnyFreeSpec with Matchers {
 
     "must return None when the answer does not exist" in {
       val answers = UserAnswers("test-id")
-      NationalInsuranceNumberSummary.row(answers) shouldBe None
+      NationalInsuranceNumberYesNoSummary.row(answers) shouldBe None
     }
   }
 }

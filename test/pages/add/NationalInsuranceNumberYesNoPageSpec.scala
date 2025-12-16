@@ -14,13 +14,18 @@
  * limitations under the License.
  */
 
-package pages
+package pages.add
 
-import play.api.libs.json.JsPath
+import pages.behaviours.PageBehaviours
 
-case object NationalInsuranceNumberPage extends QuestionPage[Boolean] {
+class NationalInsuranceNumberYesNoPageSpec extends PageBehaviours {
 
-  override def path: JsPath = JsPath \ toString
+  "NationalInsuranceNumberPage" - {
 
-  override def toString: String = "nationalInsuranceNumber"
+    beRetrievable[Boolean](NationalInsuranceNumberYesNoPage)
+
+    beSettable[Boolean](NationalInsuranceNumberYesNoPage)
+
+    beRemovable[Boolean](NationalInsuranceNumberYesNoPage)
+  }
 }
