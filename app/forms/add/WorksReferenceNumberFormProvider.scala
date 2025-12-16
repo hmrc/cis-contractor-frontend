@@ -29,14 +29,13 @@ class WorksReferenceNumberFormProvider @Inject() extends Mappings {
       "value" -> text("worksReferenceNumber.error.required")
         .verifying(
           pattern(
-            """^[0-9]+$""".r,
+            """^[A-Za-z0-9~!@#$%*+:;=?\s,.\[\]{}_()/&'-£€]+$""".r,
             error = "worksReferenceNumber.error.invalid"
           ),
           maxLength(
-            10,
+            20,
             "worksReferenceNumber.error.length"
           )
         )
     )
-
 }

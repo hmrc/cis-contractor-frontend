@@ -18,6 +18,7 @@ package forms.add
 
 import forms.behaviours.StringFieldBehaviours
 import org.scalacheck.Gen
+import org.scalatest.matchers.should.Matchers.should
 import play.api.data.{Form, FormError}
 
 class WorksReferenceNumberFormProviderSpec extends StringFieldBehaviours {
@@ -25,7 +26,7 @@ class WorksReferenceNumberFormProviderSpec extends StringFieldBehaviours {
   val requiredKey = "worksReferenceNumber.error.required"
   val invalidKey  = "worksReferenceNumber.error.invalid"
   val lengthKey   = "worksReferenceNumber.error.length"
-  val maxLength   = 10
+  val maxLength   = 20
 
   val form: Form[String] = new WorksReferenceNumberFormProvider()()
 
@@ -55,10 +56,4 @@ class WorksReferenceNumberFormProviderSpec extends StringFieldBehaviours {
     fieldName,
     requiredError = FormError(fieldName, requiredKey)
   )
-
-  "must not bind non-numeric values" in {
-    val result = form.bind(Map(fieldName -> "ABC123"))
-    assert(result.hasErrors)
-    assert(result.error(fieldName).exists(_.message == invalidKey))
-  }
 }
