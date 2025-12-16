@@ -147,3 +147,10 @@ subcontractorName.lastName.error.firstChar = Enter a last name where the first c
 subcontractorName.lastName.error.length = Last name must be 35 characters or less
 subcontractorName.checkYourAnswersLabel = What is the subcontractor’s name?
 subcontractorName.change.hidden = What is the subcontractor’s name?
+
+subcontractorContactDetailsYesNo.title = Do you want to add the subcontractor’s contact details?
+subcontractorContactDetailsYesNo.heading = Do you want to add the subcontractor’s contact details?
+subcontractorContactDetailsYesNo.hint = You can add the subcontractor’s email address and telephone number now or add them later.
+subcontractorContactDetailsYesNo.checkYourAnswersLabel = Contact Details
+subcontractorContactDetailsYesNo.error.required = Select whether or not you have the contact details
+subcontractorContactDetailsYesNo.change.hidden = Contact Details

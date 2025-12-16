@@ -27,13 +27,15 @@ import pages.add.*
 class Navigator @Inject() () {
 
   private val normalRoutes: Page => UserAnswers => Call = {
-    case TypeOfSubcontractorPage        => _ => controllers.add.routes.SubTradingNameYesNoController.onPageLoad(NormalMode)
-    case SubTradingNameYesNoPage        => userAnswers => navigatorFromSubTradingNameYesNoPage(NormalMode)(userAnswers)
-    case TradingNameOfSubcontractorPage =>
+    case TypeOfSubcontractorPage              => _ => controllers.add.routes.SubTradingNameYesNoController.onPageLoad(NormalMode)
+    case SubTradingNameYesNoPage              => userAnswers => navigatorFromSubTradingNameYesNoPage(NormalMode)(userAnswers)
+    case TradingNameOfSubcontractorPage       =>
       _ => controllers.add.routes.TradingNameOfSubcontractorController.onPageLoad(NormalMode)
-    case SubcontractorNamePage   =>   _ => controllers.add.routes.SubcontractorNameController.onPageLoad(NormalMode)
-    case SubAddressYesNoPage            => userAnswers => navigatorFromSubAddressYesNoPage(NormalMode)(userAnswers)
-    case _                              => _ => routes.IndexController.onPageLoad()
+    case SubcontractorNamePage                => _ => controllers.add.routes.SubcontractorNameController.onPageLoad(NormalMode)
+    case SubAddressYesNoPage                  => userAnswers => navigatorFromSubAddressYesNoPage(NormalMode)(userAnswers)
+    case SubcontractorContactDetailsYesNoPage =>
+      userAnswers => navigatorFromSubcontractorContactDetailsYesNoPage(NormalMode)(userAnswers)
+    case _                                    => _ => routes.IndexController.onPageLoad()
   }
 
   private val checkRouteMap: Page => UserAnswers => Call = {
@@ -61,6 +63,15 @@ class Navigator @Inject() () {
     (userAnswers.get(SubAddressYesNoPage), mode) match {
       case (Some(true), _)           => controllers.add.routes.TradingNameOfSubcontractorController.onPageLoad(mode)
       case (Some(false), NormalMode) => controllers.add.routes.SubAddressYesNoController.onPageLoad(NormalMode)
+      case (Some(false), CheckMode)  => routes.CheckYourAnswersController.onPageLoad()
+      case (None, _)                 => routes.JourneyRecoveryController.onPageLoad()
+    }
+
+  private def navigatorFromSubcontractorContactDetailsYesNoPage(mode: Mode)(userAnswers: UserAnswers): Call =
+    (userAnswers.get(SubcontractorContactDetailsYesNoPage), mode) match {
+      case (Some(true), _)           => controllers.add.routes.TradingNameOfSubcontractorController.onPageLoad(mode)
+      case (Some(false), NormalMode) =>
+        controllers.add.routes.SubcontractorContactDetailsYesNoController.onPageLoad(NormalMode)
       case (Some(false), CheckMode)  => routes.CheckYourAnswersController.onPageLoad()
       case (None, _)                 => routes.JourneyRecoveryController.onPageLoad()
     }

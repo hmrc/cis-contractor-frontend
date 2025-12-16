@@ -1,0 +1,75 @@
+package viewmodels.checkAnswers.add
+
+class SubcontractorContactDetailsYesNoSummarySpec {
+
+}
+import controllers.add.routes
+import models.{CheckMode, UserAnswers}
+import org.scalatest.OptionValues.convertOptionToValuable
+import org.scalatest.TryValues.convertTryToSuccessOrFailure
+import org.scalatest.freespec.AnyFreeSpec
+import org.scalatest.matchers.must.Matchers
+import org.scalatest.matchers.should.Matchers.{should, shouldBe}
+import pages.add.SubcontractorContactDetailsYesNoPage
+import play.api.i18n.Messages
+import play.api.test.Helpers.stubMessages
+import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
+
+class NationalInsuranceNumberYesNoSummarySpec extends AnyFreeSpec with Matchers {
+
+  implicit val messages: Messages = stubMessages()
+
+  "NationalInsuranceNumberSummary.row" - {
+
+    "must return a SummaryListRow with 'Yes' when the answer is true" in {
+      val answers = UserAnswers("test-id")
+        .set(SubcontractorContactDetailsYesNoPage, true)
+        .success
+        .value
+
+      val maybeRow: Option[SummaryListRow] = SubcontractorContactDetailsYesNoSummary.row(answers)
+      maybeRow shouldBe defined
+
+      val row =
+        maybeRow.value
+
+      val expectedKeyText = messages("subcontractorContactDetailsYesNo.checkYourAnswersLabel")
+      row.key.content.asHtml.toString should include(expectedKeyText)
+
+      val expectedValue = messages("site.yes")
+      row.value.content.asHtml.toString should include(expectedValue)
+
+      row.actions shouldBe defined
+      val actions = row.actions.value.items
+      actions should have size 1
+
+      val changeAction       = actions.head
+      val expectedChangeText = messages("site.change")
+      val expectedHref       = routes.SubcontractorContactDetailsYesNoController.onPageLoad(CheckMode).url
+      val expectedHiddenText = messages("subcontractorContactDetailsYesNo.change.hidden")
+
+      changeAction.content.asHtml.toString    should include(expectedChangeText)
+      changeAction.href                     shouldBe expectedHref
+      changeAction.visuallyHiddenText.value shouldBe expectedHiddenText
+    }
+
+    "must return a SummaryListRow with 'No' when the answer is false" in {
+      val answers = UserAnswers("test-id")
+        .set(SubcontractorContactDetailsYesNoPage, false)
+        .success
+        .value
+
+      val maybeRow: Option[SummaryListRow] = SubcontractorContactDetailsYesNoSummary.row(answers)
+      maybeRow shouldBe defined
+
+      val row           = maybeRow.value
+      val expectedValue = messages("site.no")
+      row.value.content.asHtml.toString should include(expectedValue)
+    }
+
+    "must return None when the answer does not exist" in {
+      val answers = UserAnswers("test-id")
+      SubcontractorContactDetailsYesNoSummary.row(answers) shouldBe None
+    }
+  }
+}
