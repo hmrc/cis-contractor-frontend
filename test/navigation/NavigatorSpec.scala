@@ -107,12 +107,28 @@ class NavigatorSpec extends SpecBase {
         navigator.nextPage(SubcontractorNamePage, NormalMode, UserAnswers("id")) mustBe controllers.add.routes.SubcontractorNameController.onPageLoad(NormalMode)
       }
 
-      "must go from a UniqueTaxpayerReferencePage  to next page" in {
+      "must go from a UniqueTaxpayerReferencePage to next page when true" in {
         navigator.nextPage(
           UniqueTaxpayerReferencePage,
           NormalMode,
-          UserAnswers("id")
+          emptyUserAnswers.setOrException(UniqueTaxpayerReferencePage, true)
+        ) mustBe controllers.add.routes.TradingNameOfSubcontractorController.onPageLoad(NormalMode)
+      }
+
+      "must go from a UniqueTaxpayerReferencePage to next page when false" in {
+        navigator.nextPage(
+          UniqueTaxpayerReferencePage,
+          NormalMode,
+          emptyUserAnswers.setOrException(UniqueTaxpayerReferencePage, false)
         ) mustBe controllers.add.routes.UniqueTaxpayerReferenceController.onPageLoad(NormalMode)
+      }
+
+      "must go from a UniqueTaxpayerReferencePage to journey recovery when incomplete info provided" in {
+        navigator.nextPage(
+          UniqueTaxpayerReferencePage,
+          NormalMode,
+          emptyUserAnswers
+        ) mustBe journeyRecovery
       }
     }
 
@@ -168,6 +184,30 @@ class NavigatorSpec extends SpecBase {
       "must go from a SubAddressYesNoPage to journey recovery page when incomplete info provided" in {
         navigator.nextPage(
           SubAddressYesNoPage,
+          CheckMode,
+          emptyUserAnswers
+        ) mustBe journeyRecovery
+      }
+
+      "must go from a UniqueTaxpayerReferencePage to next page when true" in {
+        navigator.nextPage(
+          UniqueTaxpayerReferencePage,
+          CheckMode,
+          emptyUserAnswers.setOrException(UniqueTaxpayerReferencePage, true)
+        ) mustBe controllers.add.routes.TradingNameOfSubcontractorController.onPageLoad(CheckMode)
+      }
+
+      "must go from a UniqueTaxpayerReferencePage to CYA page when false" in {
+        navigator.nextPage(
+          UniqueTaxpayerReferencePage,
+          CheckMode,
+          emptyUserAnswers.setOrException(UniqueTaxpayerReferencePage, false)
+        ) mustBe CYA
+      }
+
+      "must go from a UniqueTaxpayerReferencePage to journey recovery when incomplete info provided" in {
+        navigator.nextPage(
+          UniqueTaxpayerReferencePage,
           CheckMode,
           emptyUserAnswers
         ) mustBe journeyRecovery
