@@ -14,19 +14,19 @@
  * limitations under the License.
  */
 
-package models.add
+package pages.add
 
-import play.api.libs.json.*
+import models.add.UKAddress
+import pages.behaviours.PageBehaviours
 
-case class AddressOfSubcontractor(
-  addressLine1: String,
-  addressLine2: String,
-  addressLine3: String,
-  addressLine4: Option[String],
-  postCode: String
-)
+class AddressOfSubcontractorPageSpec extends PageBehaviours {
 
-object AddressOfSubcontractor {
+  "AddressOfSubcontractorPage" - {
 
-  implicit val format: OFormat[AddressOfSubcontractor] = Json.format
+    beRetrievable[UKAddress](AddressOfSubcontractorPage)
+
+    beSettable[UKAddress](AddressOfSubcontractorPage)
+
+    beRemovable[UKAddress](AddressOfSubcontractorPage)
+  }
 }

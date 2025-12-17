@@ -16,7 +16,7 @@
 
 package forms.add
 import forms.mappings.Mappings
-import models.add.AddressOfSubcontractor
+import models.add.UKAddress
 import play.api.data.{Form, Forms}
 
 import javax.inject.Inject
@@ -29,13 +29,10 @@ class AddressOfSubcontractorFormProvider @Inject() extends Mappings {
   private val firstCharLetterRegex =
     """^[A-Za-z].*"""
 
-  private val allowedPostcodeCharsRegex =
-    """^[A-Za-z0-9 ~!"@#\$%&'()*+,\-./:;<=>?\[\\\]^_\{\}£€]*$"""
-
   private val ukPostcodeRegex =
-    """^(GIR\s?0AA|(?:(?:[A-Z]{1,2}\d[A-Z\d]?|\d[A-Z]{2})\s?\d[A-Z]{2}))$"""
-
-  def apply(): Form[AddressOfSubcontractor] = Form(
+    """^[A-Za-z0-9 ~!"@#\$%&'()*+,\-./:;<=>?\[\\\]^_\{\}£€]*$"""
+  
+  def apply(): Form[UKAddress] = Form(
     Forms.mapping(
       "addressLine1" ->
         text("addressOfSubcontractor.error.addressLine1.required")
@@ -85,12 +82,11 @@ class AddressOfSubcontractorFormProvider @Inject() extends Mappings {
           .verifying(
             firstError(
               maxLength(8, "addressOfSubcontractor.error.postCode.length"),
-              regexp(allowedPostcodeCharsRegex, "addressOfSubcontractor.error.postCode.invalidCharacters"),
               regexp(ukPostcodeRegex, "addressOfSubcontractor.error.postCode.invalid")
             )
           )
     )((a1: String, a2: String, a3: String, a4: Option[String], pc: String) =>
-      AddressOfSubcontractor(a1, a2, a3, a4, pc)
+      UKAddress(a1, a2, a3, a4, pc)
     )(address =>
       Some(
         (
