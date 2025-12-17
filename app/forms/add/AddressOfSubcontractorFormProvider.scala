@@ -40,8 +40,7 @@ class AddressOfSubcontractorFormProvider @Inject() extends Mappings {
           .verifying(
             firstError(
               maxLength(35, "addressOfSubcontractor.error.addressLine1.length"),
-              regexp(allowedAddressCharsRegex, "addressOfSubcontractor.error.addressLine1.invalidCharacters"),
-              regexp(firstCharLetterRegex, "addressOfSubcontractor.error.addressLine1.firstCharMustBeLetter")
+              regexp(allowedAddressCharsRegex, "addressOfSubcontractor.error.addressLine1.invalidCharacters")
             )
           ),
       "addressLine2" ->
