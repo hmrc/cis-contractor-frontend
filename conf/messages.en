@@ -157,7 +157,7 @@ uniqueTaxpayerReferenceYesNo.change.hidden = do you have a Unique Taxpayer Refer
 
 subcontractorContactDetailsYesNo.title = Do you want to add the subcontractor’s contact details?
 subcontractorContactDetailsYesNo.heading = Do you want to add the subcontractor’s contact details?
-subcontractorContactDetailsYesNo.hint = You can add the subcontractor’s email address and telephone number now or add them later.
-subcontractorContactDetailsYesNo.checkYourAnswersLabel = Contact Details
+subcontractorContactDetailsYesNo.hint = You can add the subcontractor’s email address and telephone number now or add them later
+subcontractorContactDetailsYesNo.checkYourAnswersLabel = Do you want to add the subcontractor’s contact details?
 subcontractorContactDetailsYesNo.error.required = Select whether or not you have the contact details
-subcontractorContactDetailsYesNo.change.hidden = Contact Details
+subcontractorContactDetailsYesNo.change.hidden = do you want to add the subcontractor’s contact details?

@@ -58,7 +58,7 @@ POST       /add/check-unique-taxpayer-reference          controllers.add.UniqueT
 GET        /add/change-check-unique-taxpayer-reference   controllers.add.UniqueTaxpayerReferenceYesNoController.onPageLoad(mode: Mode = CheckMode)
 POST       /add/change-check-unique-taxpayer-reference   controllers.add.UniqueTaxpayerReferenceYesNoController.onSubmit(mode: Mode = CheckMode)
 
-GET        /add/contact-details                          controllers.add.SubcontractorContactDetailsYesNoController.onPageLoad(mode: Mode = NormalMode)
-POST       /add/contact-details                          controllers.add.SubcontractorContactDetailsYesNoController.onSubmit(mode: Mode = NormalMode)
-GET        /add/change-contact-details                   controllers.add.SubcontractorContactDetailsYesNoController.onPageLoad(mode: Mode = CheckMode)
-POST       /add/change-contact-details                   controllers.add.SubcontractorContactDetailsYesNoController.onSubmit(mode: Mode = CheckMode)
+GET        /add/check-contact-details                    controllers.add.SubcontractorContactDetailsYesNoController.onPageLoad(mode: Mode = NormalMode)
+POST       /add/check-contact-details                    controllers.add.SubcontractorContactDetailsYesNoController.onSubmit(mode: Mode = NormalMode)
+GET        /add/change-check-contact-details             controllers.add.SubcontractorContactDetailsYesNoController.onPageLoad(mode: Mode = CheckMode)
+POST       /add/change-check-contact-details             controllers.add.SubcontractorContactDetailsYesNoController.onSubmit(mode: Mode = CheckMode)
