@@ -25,21 +25,27 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
 
-object AddressOfSubcontractorSummary  {
+object AddressOfSubcontractorSummary {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(AddressOfSubcontractorPage).map {
-      answer =>
+    answers.get(AddressOfSubcontractorPage).map { answer =>
 
-      val value = HtmlFormat.escape(answer.addressLine1).toString + "<br/>" + HtmlFormat.escape(answer.addressLine2).toString
+      val value = HtmlFormat.escape(answer.addressLine1).toString + "<br/>" + HtmlFormat
+        .escape(answer.addressLine2)
+        .toString + "<br/>" + HtmlFormat.escape(answer.addressLine3).toString + "<br/>" + HtmlFormat
+        .escape(answer.addressLine4.getOrElse(""))
+        .toString + "<br/>" + HtmlFormat.escape(answer.postCode).toString
 
-        SummaryListRowViewModel(
-          key     = "addressOfSubcontractor.checkYourAnswersLabel",
-          value   = ValueViewModel(HtmlContent(value)),
-          actions = Seq(
-            ActionItemViewModel("site.change", controllers.add.routes.AddressOfSubcontractorController.onPageLoad(CheckMode).url)
-              .withVisuallyHiddenText(messages("addressOfSubcontractor.change.hidden"))
+      SummaryListRowViewModel(
+        key = "addressOfSubcontractor.checkYourAnswersLabel",
+        value = ValueViewModel(HtmlContent(value)),
+        actions = Seq(
+          ActionItemViewModel(
+            "site.change",
+            controllers.add.routes.AddressOfSubcontractorController.onPageLoad(CheckMode).url
           )
+            .withVisuallyHiddenText(messages("addressOfSubcontractor.change.hidden"))
         )
+      )
     }
 }
