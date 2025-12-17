@@ -58,4 +58,8 @@ trait Mappings extends Formatters with Constraints {
                          nonNumericKey: String = "error.nonNumeric",
                          args: Seq[String] = Seq.empty): FieldMapping[BigDecimal] =
     of(currencyFormatter(requiredKey, invalidNumeric, nonNumericKey, args))
+
+  protected def nino(errorKey: String = "error.required"): FieldMapping[String] =
+    of(ninoFormatter(errorKey))
+  
 }
