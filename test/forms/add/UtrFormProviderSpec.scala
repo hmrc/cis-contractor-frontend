@@ -43,6 +43,13 @@ class UtrFormProviderSpec extends AnyFreeSpec with Matchers with StringFieldBeha
       validDataGenerator = validUtrGenerator
     )
 
+    behave like fieldWithMinLength(
+      form = form,
+      fieldName = fieldName,
+      minLength = utrLength,
+      lengthError = FormError(fieldName, lengthKey, Seq(utrLength))
+    )
+
     behave like fieldWithMaxLength(
       form = form,
       fieldName = fieldName,
