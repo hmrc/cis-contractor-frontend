@@ -33,14 +33,15 @@ class Navigator @Inject() () {
       _ => controllers.add.routes.TradingNameOfSubcontractorController.onPageLoad(NormalMode)
     case SubcontractorNamePage   =>   _ => controllers.add.routes.SubcontractorNameController.onPageLoad(NormalMode)
     case SubAddressYesNoPage            => userAnswers => navigatorFromSubAddressYesNoPage(NormalMode)(userAnswers)
-    case WorksReferenceNumberYesNoPage  => userAnswers => navigatorFromWorksReferenceNumber(NormalMode)(userAnswers)
+    case WorksReferenceNumberYesNoPage  => userAnswers => navigatorFromWorksReferenceNumberYesNoPage(NormalMode)(userAnswers)
     case _                              => _ => routes.IndexController.onPageLoad()
   }
 
   private val checkRouteMap: Page => UserAnswers => Call = {
-    case SubTradingNameYesNoPage => userAnswers => navigatorFromSubTradingNameYesNoPage(CheckMode)(userAnswers)
-    case SubAddressYesNoPage     => userAnswers => navigatorFromSubAddressYesNoPage(CheckMode)(userAnswers)
-    case _                       => _ => routes.CheckYourAnswersController.onPageLoad()
+    case SubTradingNameYesNoPage           => userAnswers => navigatorFromSubTradingNameYesNoPage(CheckMode)(userAnswers)
+    case SubAddressYesNoPage               => userAnswers => navigatorFromSubAddressYesNoPage(CheckMode)(userAnswers)
+    case WorksReferenceNumberYesNoPage     => userAnswers => navigatorFromWorksReferenceNumberYesNoPage(CheckMode)(userAnswers)
+    case _                                 => _ => routes.CheckYourAnswersController.onPageLoad()
   }
 
   def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers): Call = mode match {
@@ -66,7 +67,7 @@ class Navigator @Inject() () {
       case (None, _)                 => routes.JourneyRecoveryController.onPageLoad()
     }
 
-  private def navigatorFromWorksReferenceNumber(mode: Mode)(userAnswers: UserAnswers): Call =
+  private def navigatorFromWorksReferenceNumberYesNoPage(mode: Mode)(userAnswers: UserAnswers): Call =
     (userAnswers.get(SubAddressYesNoPage), mode) match {
       case (Some(true), _) => controllers.add.routes.WorksReferenceNumberYesNoController.onPageLoad(mode) // Works Reference Number Page
       case (Some(false), NormalMode) => controllers.add.routes.WorksReferenceNumberYesNoController.onPageLoad(NormalMode)//Subcontractor Contact Details Yes/No?
