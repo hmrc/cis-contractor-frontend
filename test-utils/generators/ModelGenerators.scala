@@ -17,13 +17,22 @@
 package generators
 
 import models.*
-import models.add.TypeOfSubcontractor
+import models.add.{SubContactDetails, TypeOfSubcontractor}
 import org.scalacheck.{Arbitrary, Gen}
 import play.api.libs.json.Json
+import org.scalacheck.Arbitrary.arbitrary
 
 import java.time.Instant
 
 trait ModelGenerators {
+
+  implicit lazy val arbitrarySubContactDetails: Arbitrary[SubContactDetails] =
+    Arbitrary {
+      for {
+        email <- arbitrary[String]
+        telephone <- arbitrary[String]
+      } yield SubContactDetails(email, telephone)
+    }
 
   implicit lazy val arbitrarySubcontractorTypes: Arbitrary[TypeOfSubcontractor] =
     Arbitrary {

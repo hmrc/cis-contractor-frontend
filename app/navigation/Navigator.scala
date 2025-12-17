@@ -33,6 +33,7 @@ class Navigator @Inject() () {
       _ => controllers.add.routes.TradingNameOfSubcontractorController.onPageLoad(NormalMode)
     case SubcontractorNamePage   =>   _ => controllers.add.routes.SubcontractorNameController.onPageLoad(NormalMode)
     case SubAddressYesNoPage            => userAnswers => navigatorFromSubAddressYesNoPage(NormalMode)(userAnswers)
+    case SubContactDetailsPage          => _ => controllers.add.routes.SubContactDetailsController.onPageLoad(NormalMode)
     case _                              => _ => routes.IndexController.onPageLoad()
   }
 
