@@ -148,6 +148,13 @@ subcontractorName.lastName.error.length = Last name must be 35 characters or les
 subcontractorName.checkYourAnswersLabel = What is the subcontractor’s name?
 subcontractorName.change.hidden = What is the subcontractor’s name?
 
+uniqueTaxpayerReferenceYesNo.title = Do you have a Unique Taxpayer Reference (UTR)?
+uniqueTaxpayerReferenceYesNo.heading = Do you have a Unique Taxpayer Reference (UTR)?
+uniqueTaxpayerReferenceYesNo.hint = This is 10 numbers, like 1234567890. The UTR will be on tax returns and other letters about Self Assessment. It may also be called ‘tax reference’
+uniqueTaxpayerReferenceYesNo.checkYourAnswersLabel = Do you have a Unique Taxpayer Reference (UTR)?
+uniqueTaxpayerReferenceYesNo.error.required = Select whether or not you have the subcontractor’s Unique Tax Reference
+uniqueTaxpayerReferenceYesNo.change.hidden = do you have a Unique Taxpayer Reference (UTR)?
+
 subNationalInsuranceNumber.title = What is the subcontractor’s National Insurance number?
 subNationalInsuranceNumber.heading = What is the subcontractor’s National Insurance number?
 subNationalInsuranceNumber.hint = The subcontractor’s National Insurance number will be on their National Insurance card, benefit letter, payslip or P60
