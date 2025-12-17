@@ -57,3 +57,8 @@ GET        /add/check-national-insurance-number          controllers.add.Nationa
 POST       /add/check-national-insurance-number          controllers.add.NationalInsuranceNumberYesNoController.onSubmit(mode: Mode = NormalMode)
 GET        /add/change-check-national-insurance-number   controllers.add.NationalInsuranceNumberYesNoController.onPageLoad(mode: Mode = CheckMode)
 POST       /add/change-check-national-insurance-number   controllers.add.NationalInsuranceNumberYesNoController.onSubmit(mode: Mode = CheckMode)
+
+GET        /add/check-unique-taxpayer-reference          controllers.add.UniqueTaxpayerReferenceYesNoController.onPageLoad(mode: Mode = NormalMode)
+POST       /add/check-unique-taxpayer-reference          controllers.add.UniqueTaxpayerReferenceYesNoController.onSubmit(mode: Mode = NormalMode)
+GET        /add/change-check-unique-taxpayer-reference   controllers.add.UniqueTaxpayerReferenceYesNoController.onPageLoad(mode: Mode = CheckMode)
+POST       /add/change-check-unique-taxpayer-reference   controllers.add.UniqueTaxpayerReferenceYesNoController.onSubmit(mode: Mode = CheckMode)
