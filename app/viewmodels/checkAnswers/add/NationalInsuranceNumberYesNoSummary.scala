@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package viewmodels.checkAnswers
+package viewmodels.checkAnswers.add
 
 import models.{CheckMode, UserAnswers}
 import pages.add.NationalInsuranceNumberYesNoPage
@@ -31,14 +31,14 @@ object NationalInsuranceNumberYesNoSummary {
       val value = if (answer) "site.yes" else "site.no"
 
       SummaryListRowViewModel(
-        key = "nationalInsuranceNumber.checkYourAnswersLabel",
+        key = "nationalInsuranceNumberYesNo.checkYourAnswersLabel",
         value = ValueViewModel(value),
         actions = Seq(
           ActionItemViewModel(
             "site.change",
             controllers.add.routes.NationalInsuranceNumberYesNoController.onPageLoad(CheckMode).url
           )
-            .withVisuallyHiddenText(messages("nationalInsuranceNumber.change.hidden"))
+            .withVisuallyHiddenText(messages("nationalInsuranceNumberYesNo.change.hidden"))
         )
       )
     }

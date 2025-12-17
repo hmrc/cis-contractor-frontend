@@ -27,15 +27,14 @@ import pages.add.*
 class Navigator @Inject() () {
 
   private val normalRoutes: Page => UserAnswers => Call = {
-    case TypeOfSubcontractorPage        => _ => controllers.add.routes.SubTradingNameYesNoController.onPageLoad(NormalMode)
-    case SubTradingNameYesNoPage        => userAnswers => navigatorFromSubTradingNameYesNoPage(NormalMode)(userAnswers)
-    case TradingNameOfSubcontractorPage =>
+    case TypeOfSubcontractorPage           => _ => controllers.add.routes.SubTradingNameYesNoController.onPageLoad(NormalMode)
+    case SubTradingNameYesNoPage           => userAnswers => navigatorFromSubTradingNameYesNoPage(NormalMode)(userAnswers)
+    case TradingNameOfSubcontractorPage    =>
       _ => controllers.add.routes.TradingNameOfSubcontractorController.onPageLoad(NormalMode)
-    case SubcontractorNamePage   =>   _ => controllers.add.routes.SubcontractorNameController.onPageLoad(NormalMode)
-    case NationalInsuranceNumberYesNoPage    =>
-      _ => controllers.add.routes.NationalInsuranceNumberYesNoController.onPageLoad(NormalMode)
-    case SubAddressYesNoPage            => userAnswers => navigatorFromSubAddressYesNoPage(NormalMode)(userAnswers)
-    case _                              => _ => routes.IndexController.onPageLoad()
+    case SubcontractorNamePage             =>   _ => controllers.add.routes.SubcontractorNameController.onPageLoad(NormalMode)
+    case NationalInsuranceNumberYesNoPage  => userAnswers => navigatorFromNationalInsuranceNumberYesNoPage(NormalMode)(userAnswers)
+    case SubAddressYesNoPage               => userAnswers => navigatorFromSubAddressYesNoPage(NormalMode)(userAnswers)
+    case _                                 => _ => routes.IndexController.onPageLoad()
   }
 
   private val checkRouteMap: Page => UserAnswers => Call = {

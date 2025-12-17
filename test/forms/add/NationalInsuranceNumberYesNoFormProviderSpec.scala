@@ -16,13 +16,12 @@
 
 package forms.add
 
-import forms.add.NationalInsuranceNumberYesNoFormProvider
 import forms.behaviours.BooleanFieldBehaviours
 import play.api.data.FormError
 
 class NationalInsuranceNumberYesNoFormProviderSpec extends BooleanFieldBehaviours {
 
-  val requiredKey = "nationalInsuranceNumber.error.required"
+  val requiredKey = "nationalInsuranceNumberYesNo.error.required"
   val invalidKey = "error.boolean"
 
   val form = new NationalInsuranceNumberYesNoFormProvider()()

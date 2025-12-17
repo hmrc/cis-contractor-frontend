@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package viewmodels.checkAnswers
+package viewmodels.checkAnswers.add
 
 import controllers.add.routes
 import models.{CheckMode, UserAnswers}
@@ -46,7 +46,7 @@ class NationalInsuranceNumberYesNoSummarySpec extends AnyFreeSpec with Matchers 
       val row =
         maybeRow.value
 
-      val expectedKeyText = messages("nationalInsuranceNumber.checkYourAnswersLabel")
+      val expectedKeyText = messages("nationalInsuranceNumberYesNo.checkYourAnswersLabel")
       row.key.content.asHtml.toString should include(expectedKeyText)
 
       val expectedValue = messages("site.yes")
@@ -59,7 +59,7 @@ class NationalInsuranceNumberYesNoSummarySpec extends AnyFreeSpec with Matchers 
       val changeAction       = actions.head
       val expectedChangeText = messages("site.change")
       val expectedHref       = routes.NationalInsuranceNumberYesNoController.onPageLoad(CheckMode).url
-      val expectedHiddenText = messages("nationalInsuranceNumber.change.hidden")
+      val expectedHiddenText = messages("nationalInsuranceNumberYesNo.change.hidden")
 
       changeAction.content.asHtml.toString    should include(expectedChangeText)
       changeAction.href                     shouldBe expectedHref
