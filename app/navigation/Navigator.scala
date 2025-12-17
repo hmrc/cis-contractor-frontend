@@ -33,12 +33,14 @@ class Navigator @Inject() () {
       _ => controllers.add.routes.TradingNameOfSubcontractorController.onPageLoad(NormalMode)
     case SubcontractorNamePage   =>   _ => controllers.add.routes.SubcontractorNameController.onPageLoad(NormalMode)
     case SubAddressYesNoPage            => userAnswers => navigatorFromSubAddressYesNoPage(NormalMode)(userAnswers)
+    case UniqueTaxpayerReferenceYesNoPage => userAnswers => navigatorFromUniqueTaxpayerReferenceYesNoPage(NormalMode)(userAnswers)
     case _                              => _ => routes.IndexController.onPageLoad()
   }
 
   private val checkRouteMap: Page => UserAnswers => Call = {
     case SubTradingNameYesNoPage => userAnswers => navigatorFromSubTradingNameYesNoPage(CheckMode)(userAnswers)
     case SubAddressYesNoPage     => userAnswers => navigatorFromSubAddressYesNoPage(CheckMode)(userAnswers)
+    case UniqueTaxpayerReferenceYesNoPage => userAnswers => navigatorFromUniqueTaxpayerReferenceYesNoPage(CheckMode)(userAnswers)
     case _                       => _ => routes.CheckYourAnswersController.onPageLoad()
   }
 
@@ -63,5 +65,13 @@ class Navigator @Inject() () {
       case (Some(false), NormalMode) => controllers.add.routes.SubAddressYesNoController.onPageLoad(NormalMode)
       case (Some(false), CheckMode)  => routes.CheckYourAnswersController.onPageLoad()
       case (None, _)                 => routes.JourneyRecoveryController.onPageLoad()
+    }
+
+  private def navigatorFromUniqueTaxpayerReferenceYesNoPage(mode: Mode)(userAnswers: UserAnswers): Call =
+    (userAnswers.get(UniqueTaxpayerReferenceYesNoPage), mode) match {
+      case (Some(true), _) => controllers.add.routes.TradingNameOfSubcontractorController.onPageLoad(mode)
+      case (Some(false), NormalMode) => controllers.add.routes.UniqueTaxpayerReferenceYesNoController.onPageLoad(NormalMode)
+      case (Some(false), CheckMode) => routes.CheckYourAnswersController.onPageLoad()
+      case (None, _) => routes.JourneyRecoveryController.onPageLoad()
     }
 }
