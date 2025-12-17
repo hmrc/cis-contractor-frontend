@@ -112,7 +112,7 @@ subTradingNameYesNo.heading = Does the subcontractor use a trading name?
 subTradingNameYesNo.hint = This is a business name, different from their own name.
 subTradingNameYesNo.checkYourAnswersLabel = Does the subcontractor use a trading name?
 subTradingNameYesNo.error.required = Select whether or not the subcontractor uses a trading name
-subTradingNameYesNo.change.hidden = Subcontractor use a trading name
+subTradingNameYesNo.change.hidden = Does the subcontractor use a trading name?
 
 tradingNameOfSubcontractor.title = What is the subcontractor’s trading name?
 tradingNameOfSubcontractor.heading = What is the subcontractor’s trading name?
@@ -161,3 +161,12 @@ worksReferenceNumberYesNo.hint = This is your reference number used to identify 
 worksReferenceNumberYesNo.checkYourAnswersLabel = Do you have a works reference number?
 worksReferenceNumberYesNo.error.required = Select whether you have the subcontractor’s work reference number or not
 worksReferenceNumberYesNo.change.hidden = Do you have a works reference number?
+
+subNationalInsuranceNumber.title = What is the subcontractor’s National Insurance number?
+subNationalInsuranceNumber.heading = What is the subcontractor’s National Insurance number?
+subNationalInsuranceNumber.hint = The subcontractor’s National Insurance number will be on their National Insurance card, benefit letter, payslip or P60
+subNationalInsuranceNumber.checkYourAnswersLabel = What is the subcontractor’s National Insurance number?
+subNationalInsuranceNumber.error.required = Enter a National Insurance number like ‘QQ 12 34 56 C’
+subNationalInsuranceNumber.error.length = Enter a National Insurance number less or equal to 9 characters
+subNationalInsuranceNumber.error.invalidCharacters = Enter a National Insurance number like ‘QQ 12 34 56 C’
+subNationalInsuranceNumber.change.hidden = what is the subcontractor’s National Insurance number?
