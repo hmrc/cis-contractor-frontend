@@ -58,6 +58,11 @@ POST       /add/check-unique-taxpayer-reference          controllers.add.UniqueT
 GET        /add/change-check-unique-taxpayer-reference   controllers.add.UniqueTaxpayerReferenceYesNoController.onPageLoad(mode: Mode = CheckMode)
 POST       /add/change-check-unique-taxpayer-reference   controllers.add.UniqueTaxpayerReferenceYesNoController.onSubmit(mode: Mode = CheckMode)
 
+GET        /add/national-insurance-number                controllers.add.SubNationalInsuranceNumberController.onPageLoad(mode: Mode = NormalMode)
+POST       /add/national-insurance-number                controllers.add.SubNationalInsuranceNumberController.onSubmit(mode: Mode = NormalMode)
+GET        /add/change-national-insurance-number         controllers.add.SubNationalInsuranceNumberController.onPageLoad(mode: Mode = CheckMode)
+POST       /add/change-national-insurance-number         controllers.add.SubNationalInsuranceNumberController.onSubmit(mode: Mode = CheckMode)
+
 GET        /add/unique-taxpayer-reference                controllers.add.SubcontractorsUniqueTaxpayerReferenceController.onPageLoad(mode: Mode = NormalMode)
 POST       /add/unique-taxpayer-reference                controllers.add.SubcontractorsUniqueTaxpayerReferenceController.onSubmit(mode: Mode = NormalMode)
 GET        /add/change-unique-taxpayer-reference         controllers.add.SubcontractorsUniqueTaxpayerReferenceController.onPageLoad(mode: Mode = CheckMode)

@@ -131,6 +131,14 @@ class NavigatorSpec extends SpecBase {
         ) mustBe journeyRecovery
       }
 
+      "must go from SubNationalInsuranceNumberPage to next page" in {
+        navigator.nextPage(
+          SubNationalInsuranceNumberPage,
+          NormalMode,
+          UserAnswers("id")
+        ) mustBe controllers.add.routes.SubNationalInsuranceNumberController.onPageLoad(NormalMode)
+      }
+
       "must go from SubcontractorsUniqueTaxpayerReferencePage to SubcontractorsUniqueTaxpayerReferenceController" in {
         navigator.nextPage(
           SubcontractorsUniqueTaxpayerReferencePage,
