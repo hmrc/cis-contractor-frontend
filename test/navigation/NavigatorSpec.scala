@@ -173,6 +173,14 @@ class NavigatorSpec extends SpecBase {
         ) mustBe journeyRecovery
       }
 
+      "must go from SubcontractorsUniqueTaxpayerReferencePage to SubcontractorsUniqueTaxpayerReferenceController with userAnswers in checkMode" in {
+        navigator.nextPage(
+          SubcontractorsUniqueTaxpayerReferencePage,
+          CheckMode,
+          UserAnswers("id")
+        ) mustBe controllers.add.routes.SubcontractorsUniqueTaxpayerReferenceController.onPageLoad(CheckMode)
+      }
+
     }
   }
 }

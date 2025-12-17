@@ -18,25 +18,17 @@ package forms.add
 
 import forms.mappings.Mappings
 import play.api.data.Form
-import play.api.data.validation.Constraints._
 
 import javax.inject.Inject
 
-class SubcontractorsUniqueTaxpayerReferenceFormProvider @Inject() extends Mappings {
+class UtrFormProvider @Inject() extends Mappings {
 
   def apply(): Form[String] =
     Form(
-      "value" -> text("subcontractorsUniqueTaxpayerReference.error.required")
-        .verifying(
-          pattern(
-            """^[0-9]+$""".r,
-            error = "subcontractorsUniqueTaxpayerReference.error.invalid"
-          ),
-          maxLength(
-            10,
-            "subcontractorsUniqueTaxpayerReference.error.length"
-          )
-        )
+      "value" -> utr(
+        requiredKey = "subcontractorsUniqueTaxpayerReference.error.required",
+        invalidKey = "subcontractorsUniqueTaxpayerReference.error.invalid",
+        lengthKey = "subcontractorsUniqueTaxpayerReference.error.length"
+      )
     )
-
 }

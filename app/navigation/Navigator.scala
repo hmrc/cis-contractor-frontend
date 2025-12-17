@@ -33,15 +33,17 @@ class Navigator @Inject() () {
       _ => controllers.add.routes.TradingNameOfSubcontractorController.onPageLoad(NormalMode)
     case SubcontractorNamePage                     => _ => controllers.add.routes.SubcontractorNameController.onPageLoad(NormalMode)
     case SubAddressYesNoPage                       => userAnswers => navigatorFromSubAddressYesNoPage(NormalMode)(userAnswers)
-    case SubcontractorsUniqueTaxpayerReferencePage => _ =>
-      controllers.add.routes.SubcontractorsUniqueTaxpayerReferenceController.onPageLoad(NormalMode)
+    case SubcontractorsUniqueTaxpayerReferencePage =>
+      _ => controllers.add.routes.SubcontractorsUniqueTaxpayerReferenceController.onPageLoad(NormalMode)
     case _                                         => _ => routes.IndexController.onPageLoad()
   }
 
   private val checkRouteMap: Page => UserAnswers => Call = {
-    case SubTradingNameYesNoPage => userAnswers => navigatorFromSubTradingNameYesNoPage(CheckMode)(userAnswers)
-    case SubAddressYesNoPage     => userAnswers => navigatorFromSubAddressYesNoPage(CheckMode)(userAnswers)
-    case _                       => _ => routes.CheckYourAnswersController.onPageLoad()
+    case SubTradingNameYesNoPage                   => userAnswers => navigatorFromSubTradingNameYesNoPage(CheckMode)(userAnswers)
+    case SubAddressYesNoPage                       => userAnswers => navigatorFromSubAddressYesNoPage(CheckMode)(userAnswers)
+    case SubcontractorsUniqueTaxpayerReferencePage =>
+      userAnswers => controllers.add.routes.SubcontractorsUniqueTaxpayerReferenceController.onPageLoad(CheckMode)
+    case _                                         => _ => routes.CheckYourAnswersController.onPageLoad()
   }
 
   def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers): Call = mode match {

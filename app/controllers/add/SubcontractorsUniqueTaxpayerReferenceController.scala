@@ -17,7 +17,7 @@
 package controllers.add
 
 import controllers.actions.*
-import forms.add.SubcontractorsUniqueTaxpayerReferenceFormProvider
+import forms.add.UtrFormProvider
 import models.Mode
 import navigation.Navigator
 import pages.add.SubcontractorsUniqueTaxpayerReferencePage
@@ -31,15 +31,15 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class SubcontractorsUniqueTaxpayerReferenceController @Inject()(
-                                        override val messagesApi: MessagesApi,
-                                        sessionRepository: SessionRepository,
-                                        navigator: Navigator,
-                                        identify: IdentifierAction,
-                                        getData: DataRetrievalAction,
-                                        requireData: DataRequiredAction,
-                                        formProvider: SubcontractorsUniqueTaxpayerReferenceFormProvider,
-                                        val controllerComponents: MessagesControllerComponents,
-                                        view: SubcontractorsUniqueTaxpayerReferenceView
+                                                                 override val messagesApi: MessagesApi,
+                                                                 sessionRepository: SessionRepository,
+                                                                 navigator: Navigator,
+                                                                 identify: IdentifierAction,
+                                                                 getData: DataRetrievalAction,
+                                                                 requireData: DataRequiredAction,
+                                                                 formProvider: UtrFormProvider,
+                                                                 val controllerComponents: MessagesControllerComponents,
+                                                                 view: SubcontractorsUniqueTaxpayerReferenceView
                                     )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   val form = formProvider()

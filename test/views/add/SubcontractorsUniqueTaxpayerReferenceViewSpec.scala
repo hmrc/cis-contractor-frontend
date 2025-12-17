@@ -16,7 +16,7 @@
 
 package views.add
 
-import forms.add.SubcontractorsUniqueTaxpayerReferenceFormProvider
+import forms.add.UtrFormProvider
 import models.NormalMode
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
@@ -70,7 +70,7 @@ class SubcontractorsUniqueTaxpayerReferenceViewSpec extends AnyWordSpec with Mat
   }
 
   trait Setup {
-    val formProvider       = new SubcontractorsUniqueTaxpayerReferenceFormProvider()
+    val formProvider       = new UtrFormProvider()
     val form: Form[String] = formProvider()
 
     implicit val request: Request[_] = FakeRequest()

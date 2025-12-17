@@ -154,5 +154,5 @@ subcontractorsUniqueTaxpayerReference.hint = This is 10 numbers, like 1234567890
 subcontractorsUniqueTaxpayerReference.checkYourAnswersLabel = Subcontractor’s Unique Taxpayer Reference
 subcontractorsUniqueTaxpayerReference.error.required = Enter a Unique Taxpayer Reference like 1234567890
 subcontractorsUniqueTaxpayerReference.error.invalid = Enter a Unique Taxpayer Reference like 1234567890
-subcontractorsUniqueTaxpayerReference.error.length = Enter a unique taxpayer reference less or equal to 10 characters
-subcontractorsUniqueTaxpayerReference.change.hidden = Subcontractor’s Unique Taxpayer Reference
+subcontractorsUniqueTaxpayerReference.error.length = Unique Taxpayer Reference must be a 10 digit number
+subcontractorsUniqueTaxpayerReference.change.hidden = subcontractor’s Unique Taxpayer Reference

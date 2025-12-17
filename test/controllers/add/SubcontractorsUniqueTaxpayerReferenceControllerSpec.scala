@@ -18,7 +18,7 @@ package controllers.add
 
 import base.SpecBase
 import controllers.routes
-import forms.add.SubcontractorsUniqueTaxpayerReferenceFormProvider
+import forms.add.UtrFormProvider
 import models.{NormalMode, UserAnswers}
 import org.scalatestplus.mockito.MockitoSugar
 import pages.add.SubcontractorsUniqueTaxpayerReferencePage
@@ -31,7 +31,7 @@ class SubcontractorsUniqueTaxpayerReferenceControllerSpec extends SpecBase with 
 
   def onwardRoute = Call("GET", "/foo")
 
-  val formProvider = new SubcontractorsUniqueTaxpayerReferenceFormProvider()
+  val formProvider = new UtrFormProvider()
   val form         = formProvider()
 
   lazy val subcontractorsUniqueTaxpayerReferenceRoute =
@@ -71,6 +71,28 @@ class SubcontractorsUniqueTaxpayerReferenceControllerSpec extends SpecBase with 
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(form.fill("answer"), NormalMode)(request, messages(application)).toString
+      }
+    }
+
+    "must bind the form and redirect on POST when valid data is submitted" in {
+
+      val validValue = "1234567890"
+
+      val application =
+        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, subcontractorsUniqueTaxpayerReferenceRoute)
+            .withFormUrlEncodedBody(("value", validValue))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(result).value mustEqual
+          subcontractorsUniqueTaxpayerReferenceRoute
       }
     }
 
