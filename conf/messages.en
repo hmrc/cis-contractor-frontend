@@ -132,9 +132,9 @@ subAddressYesNo.change.hidden = Do you want to add the subcontractor’s address
 nationalInsuranceNumberYesNo.title = Do you have a National Insurance Number?
 nationalInsuranceNumberYesNo.heading = Do you have a National Insurance Number?
 nationalInsuranceNumberYesNo.hint = A National Insurance Number is made up of letters and numbers, like ‘QQ 12 34 56 A’
-nationalInsuranceNumberYesNo.checkYourAnswersLabel = National Insurance Number
+nationalInsuranceNumberYesNo.checkYourAnswersLabel = Do you have a National Insurance Number?
 nationalInsuranceNumberYesNo.error.required = Select whether you have the subcontractor’s National Insurance Number or not
-nationalInsuranceNumberYesNo.change.hidden = do you have a National Insurance Number?
+nationalInsuranceNumberYesNo.change.hidden = Do you have a National Insurance Number?
 
 subcontractorName.title = What is the subcontractor’s name?
 subcontractorName.heading = What is the subcontractor’s name?

@@ -114,6 +114,22 @@ class NavigatorSpec extends SpecBase {
           emptyUserAnswers.setOrException(NationalInsuranceNumberYesNoPage, false)
         ) mustBe controllers.add.routes.NationalInsuranceNumberYesNoController.onPageLoad(NormalMode)
       }
+
+      "must go from a NationalInsuranceNumberYesNoPage to next page when true" in {
+        navigator.nextPage(
+          NationalInsuranceNumberYesNoPage,
+          NormalMode,
+          emptyUserAnswers.setOrException(NationalInsuranceNumberYesNoPage, true)
+        ) mustBe controllers.add.routes.NationalInsuranceNumberYesNoController.onPageLoad(NormalMode)
+      }
+
+      "must go from NationalInsuranceNumberYesNoPage to journey recovery when incomplete info provided" in {
+        navigator.nextPage(
+          NationalInsuranceNumberYesNoPage,
+          NormalMode,
+          emptyUserAnswers
+        ) mustBe journeyRecovery
+      }
     }
 
     "in Check mode" - {
@@ -173,6 +189,29 @@ class NavigatorSpec extends SpecBase {
         ) mustBe journeyRecovery
       }
 
+      "must go from a NationalInsuranceNumberYesNoPage to next page when true" in {
+        navigator.nextPage(
+          NationalInsuranceNumberYesNoPage,
+          CheckMode,
+          emptyUserAnswers.setOrException(NationalInsuranceNumberYesNoPage, true)
+        ) mustBe controllers.add.routes.NationalInsuranceNumberYesNoController.onPageLoad(CheckMode)
+      }
+
+      "must go from a NationalInsuranceNumberYesNoPage to CYA page when false" in {
+        navigator.nextPage(
+          NationalInsuranceNumberYesNoPage,
+          CheckMode,
+          emptyUserAnswers.setOrException(NationalInsuranceNumberYesNoPage, false)
+        ) mustBe CYA
+      }
+
+      "must go from a NationalInsuranceNumberYesNoPage to journey recovery page when incomplete info provided" in {
+        navigator.nextPage(
+          NationalInsuranceNumberYesNoPage,
+          CheckMode,
+          emptyUserAnswers
+        ) mustBe journeyRecovery
+      }
     }
   }
 }
