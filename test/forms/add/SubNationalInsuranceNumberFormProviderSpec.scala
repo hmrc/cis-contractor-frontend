@@ -68,7 +68,7 @@ class SubNationalInsuranceNumberFormProviderSpec extends StringFieldBehaviours {
     }
 
     "reject invalid National Insurance number" in {
-      val invalidNino = Seq("AB000000Z", "!A000000A", "AA`00000A")
+      val invalidNino = Seq("AB000000Z", "!A000000A", "AA`00000A" , "QQ000000", "AD000000")
       invalidNino.foreach { nino =>
         val result = form.bind(Map(fieldName -> nino))
         result.errors.map(_.message) must contain(invalidKey)

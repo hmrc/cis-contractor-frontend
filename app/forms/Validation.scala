@@ -18,7 +18,7 @@ package forms
 
 object Validation {
 
-  final val ninoRegex = """(?i)^[ \t]*[A-Z]{1}[ \t]*[A-Z][ \t]*[0-9][ \t]*[0-9][ \t]*""" +
+  final val ninoRegex = """(?i)^[ \t]*[[A-Z]&&[^DFIQUV]][ \t]*[[A-Z]&&[^DFIQUV]][ \t]*[0-9][ \t]*[0-9][ \t]*""" +
     """[0-9][ \t]*[0-9][ \t]*[0-9][ \t]*[0-9][ \t]*[A-D]?[ \t]*$"""
 
 }
