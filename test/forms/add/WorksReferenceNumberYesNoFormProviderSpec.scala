@@ -1,6 +1,5 @@
 package forms.add
 
-import forms.add.WorksReferenceNumberYesNoFormProvider
 import forms.behaviours.BooleanFieldBehaviours
 import play.api.data.FormError
 

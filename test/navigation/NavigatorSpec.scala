@@ -107,6 +107,22 @@ class NavigatorSpec extends SpecBase {
         navigator.nextPage(SubcontractorNamePage, NormalMode, UserAnswers("id")) mustBe controllers.add.routes.SubcontractorNameController.onPageLoad(NormalMode)
       }
 
+      "must go from a WorksReferenceNumberYesNoPage to next page when true" in {
+        navigator.nextPage(
+          WorksReferenceNumberYesNoPage,
+          NormalMode,
+          emptyUserAnswers.setOrException(WorksReferenceNumberYesNoPage, true)
+        ) mustBe controllers.add.routes.WorksReferenceNumberYesNoController.onPageLoad(NormalMode)
+      }
+
+      "must go from a WorksReferenceNumberYesNoPage to next page when false" in {
+        navigator.nextPage(
+          WorksReferenceNumberYesNoPage,
+          NormalMode,
+          emptyUserAnswers.setOrException(WorksReferenceNumberYesNoPage, false)
+        ) mustBe controllers.add.routes.WorksReferenceNumberYesNoController.onPageLoad(NormalMode)
+      }
+
       "must go from WorksReferenceNumberYesNoPage to journey recovery when incomplete info provided" in {
         navigator.nextPage(
           WorksReferenceNumberYesNoPage,
@@ -174,6 +190,29 @@ class NavigatorSpec extends SpecBase {
         ) mustBe journeyRecovery
       }
 
+      "must go from a WorksReferenceNumberYesNoPage to next page when true" in {
+        navigator.nextPage(
+          WorksReferenceNumberYesNoPage,
+          CheckMode,
+          emptyUserAnswers.setOrException(WorksReferenceNumberYesNoPage, true)
+        ) mustBe controllers.add.routes.WorksReferenceNumberYesNoController.onPageLoad(CheckMode)
+      }
+
+      "must go from a WorksReferenceNumberYesNoPage to CYA page when false" in {
+        navigator.nextPage(
+          WorksReferenceNumberYesNoPage,
+          CheckMode,
+          emptyUserAnswers.setOrException(WorksReferenceNumberYesNoPage, false)
+        ) mustBe CYA
+      }
+
+      "must go from a WorksReferenceNumberYesNoPage to journey recovery page when incomplete info provided" in {
+        navigator.nextPage(
+          WorksReferenceNumberYesNoPage,
+          CheckMode,
+          emptyUserAnswers
+        ) mustBe journeyRecovery
+      }
     }
   }
 }

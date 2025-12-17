@@ -68,7 +68,7 @@ class Navigator @Inject() () {
     }
 
   private def navigatorFromWorksReferenceNumberYesNoPage(mode: Mode)(userAnswers: UserAnswers): Call =
-    (userAnswers.get(SubAddressYesNoPage), mode) match {
+    (userAnswers.get(WorksReferenceNumberYesNoPage), mode) match {
       case (Some(true), _) => controllers.add.routes.WorksReferenceNumberYesNoController.onPageLoad(mode) // Works Reference Number Page
       case (Some(false), NormalMode) => controllers.add.routes.WorksReferenceNumberYesNoController.onPageLoad(NormalMode)//Subcontractor Contact Details Yes/No?
       case (Some(false), CheckMode) => routes.CheckYourAnswersController.onPageLoad()
