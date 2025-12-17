@@ -177,6 +177,14 @@ class NavigatorSpec extends SpecBase {
         ) mustBe journeyRecovery
       }
 
+      "must go from a WorksReferenceNumberPage  to next page in check mode" in {
+        navigator.nextPage(
+          WorksReferenceNumberPage,
+          CheckMode,
+          UserAnswers("id")
+        ) mustBe controllers.add.routes.WorksReferenceNumberController.onPageLoad(CheckMode)
+      }
+
     }
   }
 }

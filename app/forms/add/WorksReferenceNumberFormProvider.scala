@@ -18,24 +18,24 @@ package forms.add
 
 import forms.mappings.Mappings
 import play.api.data.Form
-import play.api.data.validation.Constraints._
 
 import javax.inject.Inject
 
 class WorksReferenceNumberFormProvider @Inject() extends Mappings {
 
+  private val worksRefRegex = """^[A-Za-z0-9~!@#$%*+:;=?\s,.{}()/_&'-£€]+$""".r
+
   def apply(): Form[String] =
     Form(
       "value" -> text("worksReferenceNumber.error.required")
         .verifying(
-          pattern(
-            """^[A-Za-z0-9~!@#$%*+:;=?\s,.\[\]{}_()/&'-£€]+$""".r,
-            error = "worksReferenceNumber.error.invalid"
-          ),
-          maxLength(
-            20,
-            "worksReferenceNumber.error.length"
+          regexp(
+            worksRefRegex.toString(),
+            "worksReferenceNumber.error.invalid"
           )
+        )
+        .verifying(
+          maxLength(20, "worksReferenceNumber.error.length")
         )
     )
 }

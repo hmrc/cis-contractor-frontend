@@ -40,6 +40,7 @@ class Navigator @Inject() () {
   private val checkRouteMap: Page => UserAnswers => Call = {
     case SubTradingNameYesNoPage => userAnswers => navigatorFromSubTradingNameYesNoPage(CheckMode)(userAnswers)
     case SubAddressYesNoPage     => userAnswers => navigatorFromSubAddressYesNoPage(CheckMode)(userAnswers)
+    case WorksReferenceNumberPage => userAnswers => controllers.add.routes.WorksReferenceNumberController.onPageLoad(CheckMode)
     case _                       => _ => routes.CheckYourAnswersController.onPageLoad()
   }
 
