@@ -155,4 +155,4 @@ worksReferenceNumber.checkYourAnswersLabel = What is the works reference number?
 worksReferenceNumber.error.required = Enter a works reference number
 worksReferenceNumber.error.invalid = Enter a valid works reference number
 worksReferenceNumber.error.length = Enter a works reference number less or equal to 20 characters
-worksReferenceNumber.change.hidden = What is the works reference number?
+worksReferenceNumber.change.hidden = what is the works reference number?
