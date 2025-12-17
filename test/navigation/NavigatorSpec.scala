@@ -79,6 +79,15 @@ class NavigatorSpec extends SpecBase {
         ) mustBe controllers.add.routes.TradingNameOfSubcontractorController.onPageLoad(NormalMode)
       }
 
+      "must go from a AddressOfSubcontractorPage to next page" in {
+        navigator.nextPage(
+          AddressOfSubcontractorPage,
+          NormalMode,
+          UserAnswers("id")
+        ) mustBe controllers.add.routes.AddressOfSubcontractorController.onPageLoad(NormalMode)
+      }
+
+
       "must go from a SubAddressYesNoPage to next page when true" in {
         navigator.nextPage(
           SubAddressYesNoPage,

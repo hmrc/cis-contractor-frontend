@@ -20,7 +20,7 @@ import play.api.libs.json.*
 
 case class UKAddress(
   addressLine1: String,
-  addressLine2: String,
+  addressLine2: Option[String],
   addressLine3: String,
   addressLine4: Option[String],
   postCode: String

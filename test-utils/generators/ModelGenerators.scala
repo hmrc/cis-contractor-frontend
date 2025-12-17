@@ -34,7 +34,7 @@ trait ModelGenerators {
         addressLine3 <- arbitrary[String]
         addressLine4 <- arbitrary[String]
         postCode     <- arbitrary[String]
-      } yield UKAddress(addressLine1, addressLine2, addressLine3, Some(addressLine4), postCode)
+      } yield UKAddress(addressLine1, Some(addressLine2), addressLine3, Some(addressLine4), postCode)
     }
 
   implicit lazy val arbitrarySubcontractorTypes: Arbitrary[TypeOfSubcontractor] =

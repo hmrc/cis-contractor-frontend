@@ -31,7 +31,7 @@ class AddressOfSubcontractorFormProvider @Inject() extends Mappings {
 
   private val ukPostcodeRegex =
     """^[A-Za-z0-9 ~!"@#\$%&'()*+,\-./:;<=>?\[\\\]^_\{\}£€]*$"""
-  
+
   def apply(): Form[UKAddress] = Form(
     Forms.mapping(
       "addressLine1" ->
@@ -44,15 +44,23 @@ class AddressOfSubcontractorFormProvider @Inject() extends Mappings {
             )
           ),
       "addressLine2" ->
-        text("addressOfSubcontractor.error.addressLine2.required")
-          .transform(_.trim, identity)
-          .verifying(
-            firstError(
-              maxLength(35, "addressOfSubcontractor.error.addressLine2.length"),
-              regexp(allowedAddressCharsRegex, "addressOfSubcontractor.error.addressLine2.invalidCharacters"),
-              regexp(firstCharLetterRegex, "addressOfSubcontractor.error.addressLine2.firstCharMustBeLetter")
+        Forms.optional(
+          Forms.text
+            .transform(_.trim, identity)
+            .verifying(
+              firstError(
+                maxLength(35, "addressOfSubcontractor.error.addressLine2.length"),
+                regexp(
+                  allowedAddressCharsRegex,
+                  "addressOfSubcontractor.error.addressLine2.invalidCharacters"
+                ),
+                regexp(
+                  firstCharLetterRegex,
+                  "addressOfSubcontractor.error.addressLine2.firstCharMustBeLetter"
+                )
+              )
             )
-          ),
+        ),
       "addressLine3" ->
         text("addressOfSubcontractor.error.addressLine3.required")
           .transform(_.trim, identity)
@@ -84,18 +92,17 @@ class AddressOfSubcontractorFormProvider @Inject() extends Mappings {
               regexp(ukPostcodeRegex, "addressOfSubcontractor.error.postCode.invalid")
             )
           )
-    )((a1: String, a2: String, a3: String, a4: Option[String], pc: String) =>
-      UKAddress(a1, a2, a3, a4, pc)
-    )(address =>
-      Some(
-        (
-          address.addressLine1,
-          address.addressLine2,
-          address.addressLine3,
-          address.addressLine4,
-          address.postCode
+    )((a1: String, a2: Option[String], a3: String, a4: Option[String], pc: String) => UKAddress(a1, a2, a3, a4, pc))(
+      address =>
+        Some(
+          (
+            address.addressLine1,
+            address.addressLine2,
+            address.addressLine3,
+            address.addressLine4,
+            address.postCode
+          )
         )
-      )
     )
   )
 }

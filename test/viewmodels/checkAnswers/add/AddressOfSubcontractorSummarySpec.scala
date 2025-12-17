@@ -26,7 +26,6 @@ import pages.add.AddressOfSubcontractorPage
 import play.api.i18n.Messages
 import play.api.test.Helpers.stubMessages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
-import viewmodels.checkAnswers.AddressOfSubcontractorSummary
 
 class AddressOfSubcontractorSummarySpec extends AnyWordSpec with Matchers {
 
@@ -38,7 +37,7 @@ class AddressOfSubcontractorSummarySpec extends AnyWordSpec with Matchers {
 
       val address = UKAddress(
         addressLine1 = "10 Downing Street",
-        addressLine2 = "Westminster",
+        addressLine2 = Some("Westminster"),
         addressLine3 = "London",
         addressLine4 = Some("Greater London"),
         postCode = "SW1A 2AA"

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package viewmodels.checkAnswers
+package viewmodels.checkAnswers.add
 
 import models.{CheckMode, UserAnswers}
 import pages.add.AddressOfSubcontractorPage
@@ -31,7 +31,7 @@ object AddressOfSubcontractorSummary {
     answers.get(AddressOfSubcontractorPage).map { answer =>
 
       val value = HtmlFormat.escape(answer.addressLine1).toString + "<br/>" + HtmlFormat
-        .escape(answer.addressLine2)
+        .escape(answer.addressLine2.getOrElse(""))
         .toString + "<br/>" + HtmlFormat.escape(answer.addressLine3).toString + "<br/>" + HtmlFormat
         .escape(answer.addressLine4.getOrElse(""))
         .toString + "<br/>" + HtmlFormat.escape(answer.postCode).toString

@@ -49,7 +49,7 @@ import views.html.add.AddressOfSubcontractorView
 
 import scala.concurrent.Future
 
-class UKAddressControllerSpec extends SpecBase with MockitoSugar {
+class AddressOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
 
 
   private val formProvider = new AddressOfSubcontractorFormProvider()
@@ -100,7 +100,7 @@ class UKAddressControllerSpec extends SpecBase with MockitoSugar {
 
         val expected = UKAddress(
           addressLine1 = "value 1",
-          addressLine2 = "value 2",
+          addressLine2 = Some("value 2"),
           addressLine3 = "value 3",
           addressLine4 = Some("value 4"),
           postCode = "NX1 1AA"

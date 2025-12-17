@@ -27,7 +27,7 @@ class UKAddressSpec extends AnyWordSpec with Matchers {
     "serialize UKAddress to JSON" in {
       val address = UKAddress(
         addressLine1 = "10 Downing Street",
-        addressLine2 = "Westminster",
+        addressLine2 = Some("Westminster"),
         addressLine3 = "London",
         addressLine4 = Some("Greater London"),
         postCode = "SW1A 2AA"
@@ -58,7 +58,7 @@ class UKAddressSpec extends AnyWordSpec with Matchers {
       result shouldBe JsSuccess(
         UKAddress(
           "10 Downing Street",
-          "Westminster",
+          Some("Westminster"),
           "London",
           Some("Greater London"),
           "SW1A 2AA"
@@ -79,7 +79,7 @@ class UKAddressSpec extends AnyWordSpec with Matchers {
       result shouldBe JsSuccess(
         UKAddress(
           "221B Baker Street",
-          "Marylebone",
+          Some("Marylebone"),
           "London",
           None,
           "NW1 6XE"
