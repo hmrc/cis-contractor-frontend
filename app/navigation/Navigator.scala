@@ -35,6 +35,7 @@ class Navigator @Inject() () {
     case SubAddressYesNoPage            => userAnswers => navigatorFromSubAddressYesNoPage(NormalMode)(userAnswers)
     case NationalInsuranceNumberYesNoPage  => userAnswers => navigatorFromNationalInsuranceNumberYesNoPage(NormalMode)(userAnswers)
     case UniqueTaxpayerReferenceYesNoPage => userAnswers => navigatorFromUniqueTaxpayerReferenceYesNoPage(NormalMode)(userAnswers)
+    case SubNationalInsuranceNumberPage => _ => controllers.add.routes.SubNationalInsuranceNumberController.onPageLoad(NormalMode)
     case _                              => _ => routes.IndexController.onPageLoad()
   }
 
