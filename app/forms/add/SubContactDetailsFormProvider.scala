@@ -33,7 +33,7 @@ class SubContactDetailsFormProvider @Inject() extends Mappings {
    def apply(): Form[SubContactDetails] = Form(
      mapping(
       "email" -> text("subContactDetails.error.email.required")
-
+        .transform(_.trim, identity)
         .verifying(
           firstError(
             maxLength(maxEmailLength, "subContactDetails.error.email.length"),
@@ -41,6 +41,7 @@ class SubContactDetailsFormProvider @Inject() extends Mappings {
           )
         ),
       "telephone" -> text("subContactDetails.error.telephone.required")
+        .transform(_.trim, identity)
         .verifying(
           firstError(
             maxLength(maxTelephoneLength, "subContactDetails.error.telephone.length"),
