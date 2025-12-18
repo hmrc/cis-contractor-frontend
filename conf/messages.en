@@ -155,6 +155,13 @@ uniqueTaxpayerReferenceYesNo.checkYourAnswersLabel = Do you have a Unique Taxpay
 uniqueTaxpayerReferenceYesNo.error.required = Select whether or not you have the subcontractor’s Unique Tax Reference
 uniqueTaxpayerReferenceYesNo.change.hidden = do you have a Unique Taxpayer Reference (UTR)?
 
+worksReferenceNumberYesNo.title = Do you have a works reference number?
+worksReferenceNumberYesNo.heading = Do you have a works reference number?
+worksReferenceNumberYesNo.hint = This is your reference number used to identify the subcontractor’s work or project. It can contain letters and numbers
+worksReferenceNumberYesNo.checkYourAnswersLabel = Do you have a works reference number?
+worksReferenceNumberYesNo.error.required = Select whether you have the subcontractor’s work reference number or not
+worksReferenceNumberYesNo.change.hidden = Do you have a works reference number?
+
 subNationalInsuranceNumber.title = What is the subcontractor’s National Insurance number?
 subNationalInsuranceNumber.heading = What is the subcontractor’s National Insurance number?
 subNationalInsuranceNumber.hint = The subcontractor’s National Insurance number will be on their National Insurance card, benefit letter, payslip or P60
