@@ -43,6 +43,7 @@ class Navigator @Inject() () {
     case SubTradingNameYesNoPage => userAnswers => navigatorFromSubTradingNameYesNoPage(CheckMode)(userAnswers)
     case SubAddressYesNoPage     => userAnswers => navigatorFromSubAddressYesNoPage(CheckMode)(userAnswers)
     case UniqueTaxpayerReferenceYesNoPage => userAnswers => navigatorFromUniqueTaxpayerReferenceYesNoPage(CheckMode)(userAnswers)
+    case SubContactDetailsPage          => _ => routes.CheckYourAnswersController.onPageLoad()
     case _                       => _ => routes.CheckYourAnswersController.onPageLoad()
   }
 

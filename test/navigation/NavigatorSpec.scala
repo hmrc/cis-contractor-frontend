@@ -225,6 +225,14 @@ class NavigatorSpec extends SpecBase {
         ) mustBe journeyRecovery
       }
 
+      "must go from a SubContactDetailsPage to CYA" in {
+        navigator.nextPage(
+          SubContactDetailsPage,
+          CheckMode,
+          UserAnswers("id")
+        ) mustBe CYA
+      }
+
     }
   }
 }
