@@ -26,7 +26,7 @@ import javax.inject.Inject
 class SubContactDetailsFormProvider @Inject() extends Mappings {
 
   private val emailRegex = "^[A-Za-z0-9!#$%&*+-/=?^_`{|}~.]+@[A-Za-z0-9!#$%&*+-/=?^_`{|}~.]+$"
-  private val phoneRegex = "^[0-9() \\-]{1,35}$"
+  private val phoneRegex = """^[0-9 )/(\-]+$"""
   private val maxEmailLength = 254
   private val maxTelephoneLength = 35
 

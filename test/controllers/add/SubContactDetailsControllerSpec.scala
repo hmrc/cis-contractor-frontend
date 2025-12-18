@@ -21,14 +21,12 @@ import controllers.routes
 import forms.add.SubContactDetailsFormProvider
 import models.add.SubContactDetails
 import models.{NormalMode, UserAnswers}
-import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
 import pages.add.SubContactDetailsPage
 import play.api.inject.bind
 import play.api.libs.json.Json
-import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import repositories.SessionRepository
@@ -103,7 +101,7 @@ class SubContactDetailsControllerSpec extends SpecBase with MockitoSugar {
       running(application) {
         val request =
           FakeRequest(POST, subContactDetailsRoute)
-            .withFormUrlEncodedBody(("email", "value 1"), ("telephone", "value 2"))
+            .withFormUrlEncodedBody(("email", "user@domain.com"), ("telephone", "07777777777"))
 
         val result = route(application, request).value
 

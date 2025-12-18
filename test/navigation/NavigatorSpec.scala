@@ -106,6 +106,10 @@ class NavigatorSpec extends SpecBase {
       "must go from a SubcontractorNamePage  to next page" in {
         navigator.nextPage(SubcontractorNamePage, NormalMode, UserAnswers("id")) mustBe controllers.add.routes.SubcontractorNameController.onPageLoad(NormalMode)
       }
+
+      "must go from a SubContactDetailsPage  to next page" in {
+        navigator.nextPage(SubContactDetailsPage, NormalMode, UserAnswers("id")) mustBe controllers.add.routes.SubContactDetailsController.onPageLoad(NormalMode)
+      }
     }
 
     "in Check mode" - {

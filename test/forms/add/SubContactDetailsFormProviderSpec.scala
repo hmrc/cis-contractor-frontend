@@ -16,7 +16,6 @@
 
 package forms.add
 
-import forms.add.SubContactDetailsFormProvider
 import forms.behaviours.StringFieldBehaviours
 import play.api.data.FormError
 
@@ -24,58 +23,129 @@ class SubContactDetailsFormProviderSpec extends StringFieldBehaviours {
 
   val form = new SubContactDetailsFormProvider()()
 
+  val validEmails = Seq(
+    "user@domain.com",
+    "user.name@domain.com",
+    "user+tag@domain.com",
+    "user@domain.co.uk",
+    "user123@domain123.com",
+    "user!#$%&*+-/=?^_`{|}~@domain.com",
+    "user@domain!#$%&*+-/=?^_`{|}~.com"
+  )
+
+  val invalidEmails = Seq(
+    "invalid-email",
+    "@domain.com",
+    "user@",
+    "user name@domain.com",
+    "user@domain com"
+  )
+
+  val validTelephones = Seq(
+    "07777777777",
+    "447777777777",
+    "07777777777  ",
+    "(44)77777777777",
+    "44-777-777"
+  )
+
+  val invalidTelephones = Seq(
+    "+1 (800) 12-1 ext 9",
+    "+91-9876543210 ext.42",
+    "11021113751 ext 111",
+    "+61.2.9876.5432 x99",
+    "+44 20 7946.0958",
+    "abc123",
+    "!!"
+  )
+
+  val emailFieldName = "email"
+  val emailRequiredKey = "subContactDetails.error.email.required"
+  val emailLengthKey = "subContactDetails.error.email.length"
+  val emailInvalidKey  = "subContactDetails.error.email.invalid"
+  val emailMaxLength = 254
+
+  val telephoneFieldName = "telephone"
+  val telephoneRequiredKey = "subContactDetails.error.telephone.required"
+  val telephoneLengthKey = "subContactDetails.error.telephone.length"
+  val telephoneInvalidKey  = "subContactDetails.error.telephone.invalid"
+  val telephoneMaxLength = 35
+
   ".email" - {
-
-    val fieldName = "email"
-    val requiredKey = "subContactDetails.error.email.required"
-    val lengthKey = "subContactDetails.error.email.length"
-    val invalidKey  = "subContactDetails.error.email.invalid"
-    val maxLength = 254
-
-    behave like fieldThatBindsValidData(
-      form,
-      fieldName,
-      stringsWithMaxLength(maxLength)
-    )
 
     behave like fieldWithMaxLength(
       form,
-      fieldName,
-      maxLength = maxLength,
-      lengthError = FormError(fieldName, lengthKey, Seq(maxLength))
+      emailFieldName,
+      maxLength = emailMaxLength,
+      lengthError = FormError(emailFieldName, emailLengthKey, Seq(emailMaxLength))
     )
 
     behave like mandatoryField(
       form,
-      fieldName,
-      requiredError = FormError(fieldName, requiredKey)
+      emailFieldName,
+      requiredError = FormError(emailFieldName, emailRequiredKey)
     )
+
+    "must bind valid email data" in {
+      validEmails.foreach { validEmail =>
+        val result = form.bind(Map(emailFieldName -> validEmail, telephoneFieldName -> validTelephones.head))
+        result.errors must be(empty)
+      }
+    }
+
+    "must reject invalid email formats" in {
+      invalidEmails.foreach { invalidEmail =>
+        val result = form.bind(Map(emailFieldName -> invalidEmail, telephoneFieldName -> validTelephones.head))
+        result.errors must contain(
+          FormError(emailFieldName, emailInvalidKey, Seq("^[A-Za-z0-9!#$%&*+-/=?^_`{|}~.]+@[A-Za-z0-9!#$%&*+-/=?^_`{|}~.]+$"))
+        )
+      }
+    }
+
+    "must accept valid email formats" in {
+      validEmails.foreach { validEmail =>
+        val result = form.bind(Map(emailFieldName -> validEmail, telephoneFieldName -> validTelephones.head))
+        result.errors must not contain FormError(emailFieldName, emailInvalidKey)
+      }
+    }
   }
 
   ".telephone" - {
 
-    val fieldName = "telephone"
-    val requiredKey = "subContactDetails.error.telephone.required"
-    val lengthKey = "subContactDetails.error.telephone.length"
-    val maxLength = 35
-
-    behave like fieldThatBindsValidData(
-      form,
-      fieldName,
-      stringsWithMaxLength(maxLength)
-    )
-
     behave like fieldWithMaxLength(
       form,
-      fieldName,
-      maxLength = maxLength,
-      lengthError = FormError(fieldName, lengthKey, Seq(maxLength))
+      telephoneFieldName,
+      maxLength = telephoneMaxLength,
+      lengthError = FormError(telephoneFieldName, telephoneLengthKey, Seq(telephoneMaxLength))
     )
 
     behave like mandatoryField(
       form,
-      fieldName,
-      requiredError = FormError(fieldName, requiredKey)
+      telephoneFieldName,
+      requiredError = FormError(telephoneFieldName, telephoneRequiredKey)
     )
+
+    "must bind valid telephone data" in {
+      validTelephones.foreach { validTelephone =>
+        val result = form.bind(Map(emailFieldName -> validEmails.head, telephoneFieldName -> validTelephone))
+        result.errors must be(empty)
+      }
+    }
+
+    "must reject invalid telephone formats" in {
+      invalidTelephones.foreach { invalidTelephone =>
+        val result = form.bind(Map(emailFieldName -> validEmails.head, telephoneFieldName -> invalidTelephone))
+        result.errors must contain(
+          FormError(telephoneFieldName, telephoneInvalidKey, Seq("^[0-9 )/(\\-]+$"))
+        )
+      }
+    }
+
+    "must accept valid telephone formats" in {
+      validTelephones.foreach { validTelephone =>
+        val result = form.bind(Map(emailFieldName -> validEmails.head, telephoneFieldName -> validTelephone))
+        result.errors must not contain FormError(telephoneFieldName, telephoneInvalidKey)
+      }
+    }
   }
 }
