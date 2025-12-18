@@ -42,7 +42,7 @@ class Navigator @Inject() () {
   private val checkRouteMap: Page => UserAnswers => Call = {
     case SubTradingNameYesNoPage => userAnswers => navigatorFromSubTradingNameYesNoPage(CheckMode)(userAnswers)
     case SubAddressYesNoPage     => userAnswers => navigatorFromSubAddressYesNoPage(CheckMode)(userAnswers)
-    case AddressOfSubcontractorPage => _ => controllers.add.routes.AddressOfSubcontractorController.onPageLoad(NormalMode)
+    case AddressOfSubcontractorPage => _ => routes.CheckYourAnswersController.onPageLoad()
     case UniqueTaxpayerReferenceYesNoPage => userAnswers => navigatorFromUniqueTaxpayerReferenceYesNoPage(CheckMode)(userAnswers)
     case _                       => _ => routes.CheckYourAnswersController.onPageLoad()
   }

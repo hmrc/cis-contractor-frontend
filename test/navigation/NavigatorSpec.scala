@@ -223,6 +223,14 @@ class NavigatorSpec extends SpecBase {
         ) mustBe CYA
       }
 
+      "must go from a AddressOfSubcontractorPage to CYA" in {
+        navigator.nextPage(
+          AddressOfSubcontractorPage,
+          CheckMode,
+          UserAnswers("id")
+        ) mustBe CYA
+      }
+
       "must go from a UniqueTaxpayerReferenceYesNoPage to journey recovery when incomplete info provided" in {
         navigator.nextPage(
           UniqueTaxpayerReferenceYesNoPage,
