@@ -207,5 +207,5 @@ subcontractorsUniqueTaxpayerReference.hint = This is 10 numbers, like 1234567890
 subcontractorsUniqueTaxpayerReference.checkYourAnswersLabel = What is the subcontractor’s Unique Taxpayer Reference (UTR)?
 subcontractorsUniqueTaxpayerReference.error.required = Enter a Unique Taxpayer Reference like 1234567890
 subcontractorsUniqueTaxpayerReference.error.invalid = Enter a Unique Taxpayer Reference like 1234567890
-subcontractorsUniqueTaxpayerReference.error.length = Enter a unique taxpayer reference equal to 10 characters
+subcontractorsUniqueTaxpayerReference.error.length = Enter a Unique Taxpayer Reference as a 10 digit number
 subcontractorsUniqueTaxpayerReference.change.hidden = what is the subcontractor’s Unique Taxpayer Reference (UTR)?

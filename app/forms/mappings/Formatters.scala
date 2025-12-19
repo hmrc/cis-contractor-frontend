@@ -142,7 +142,7 @@ trait Formatters {
 
   private[mappings] def utrFormatter(requiredKey: String, invalidKey: String, lengthKey: String): Formatter[String] =
     new Formatter[String] {
-      private val utrRegex = "^(?!0{10})\\d{10}$"
+      private val utrRegex = "^[0-9]{10}$"
       private val fixedLength = 10
 
       override def bind(key: String, data: Map[String, String]): Either[Seq[FormError], String] = {
