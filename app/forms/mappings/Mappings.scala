@@ -61,5 +61,7 @@ trait Mappings extends Formatters with Constraints {
 
   protected def nino(errorKey: String = "error.required"): FieldMapping[String] =
     of(ninoFormatter(errorKey))
-  
+
+  protected def utr(requiredKey: String, invalidKey: String, lengthKey: String): FieldMapping[String] =
+    of(utrFormatter(requiredKey, invalidKey, lengthKey))
 }

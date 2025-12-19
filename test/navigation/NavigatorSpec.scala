@@ -176,6 +176,13 @@ class NavigatorSpec extends SpecBase {
       "must go from a SubContactDetailsPage  to next page" in {
         navigator.nextPage(SubContactDetailsPage, NormalMode, UserAnswers("id")) mustBe controllers.add.routes.SubContactDetailsController.onPageLoad(NormalMode)
       }
+      "must go from SubcontractorsUniqueTaxpayerReferencePage to SubcontractorsUniqueTaxpayerReferenceController" in {
+        navigator.nextPage(
+          SubcontractorsUniqueTaxpayerReferencePage,
+          NormalMode,
+          UserAnswers("id")
+        ) mustBe controllers.add.routes.SubcontractorsUniqueTaxpayerReferenceController.onPageLoad(NormalMode)
+      }
     }
 
     "in Check mode" - {
@@ -297,6 +304,14 @@ class NavigatorSpec extends SpecBase {
           CheckMode,
           UserAnswers("id")
         ) mustBe CYA
+      }
+
+      "must go from SubcontractorsUniqueTaxpayerReferencePage to SubcontractorsUniqueTaxpayerReferenceController with userAnswers in checkMode" in {
+        navigator.nextPage(
+          SubcontractorsUniqueTaxpayerReferencePage,
+          CheckMode,
+          UserAnswers("id")
+        ) mustBe controllers.add.routes.SubcontractorsUniqueTaxpayerReferenceController.onPageLoad(CheckMode)
       }
 
     }

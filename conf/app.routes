@@ -77,3 +77,8 @@ GET        /add/contact-details                          controllers.add.SubCont
 POST       /add/contact-details                          controllers.add.SubContactDetailsController.onSubmit(mode: Mode = NormalMode)
 GET        /add/change-contact-details                   controllers.add.SubContactDetailsController.onPageLoad(mode: Mode = CheckMode)
 POST       /add/change-contact-details                   controllers.add.SubContactDetailsController.onSubmit(mode: Mode = CheckMode)
+
+GET        /add/unique-taxpayer-reference                controllers.add.SubcontractorsUniqueTaxpayerReferenceController.onPageLoad(mode: Mode = NormalMode)
+POST       /add/unique-taxpayer-reference                controllers.add.SubcontractorsUniqueTaxpayerReferenceController.onSubmit(mode: Mode = NormalMode)
+GET        /add/change-unique-taxpayer-reference         controllers.add.SubcontractorsUniqueTaxpayerReferenceController.onPageLoad(mode: Mode = CheckMode)
+POST       /add/change-unique-taxpayer-reference         controllers.add.SubcontractorsUniqueTaxpayerReferenceController.onSubmit(mode: Mode = CheckMode)
