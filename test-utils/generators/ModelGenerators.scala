@@ -17,7 +17,7 @@
 package generators
 
 import models.*
-import models.add.{SubContactDetails, TypeOfSubcontractor}
+import models.add.{SubContactDetails, UKAddress, TypeOfSubcontractor}
 import org.scalacheck.{Arbitrary, Gen}
 import play.api.libs.json.Json
 import org.scalacheck.Arbitrary.arbitrary
@@ -32,6 +32,17 @@ trait ModelGenerators {
         email <- arbitrary[String]
         telephone <- arbitrary[String]
       } yield SubContactDetails(email, telephone)
+    }
+
+  implicit lazy val arbitraryAddressOfSubcontractor: Arbitrary[UKAddress] =
+    Arbitrary {
+      for {
+        addressLine1 <- arbitrary[String]
+        addressLine2 <- arbitrary[String]
+        addressLine3 <- arbitrary[String]
+        addressLine4 <- arbitrary[String]
+        postCode     <- arbitrary[String]
+      } yield UKAddress(addressLine1, Some(addressLine2), addressLine3, Some(addressLine4), postCode)
     }
 
   implicit lazy val arbitrarySubcontractorTypes: Arbitrary[TypeOfSubcontractor] =

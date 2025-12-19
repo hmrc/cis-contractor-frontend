@@ -171,6 +171,36 @@ subNationalInsuranceNumber.error.length = Enter a National Insurance number less
 subNationalInsuranceNumber.error.invalidCharacters = Enter a National Insurance number like ‘QQ 12 34 56 C’
 subNationalInsuranceNumber.change.hidden = what is the subcontractor’s National Insurance number?
 
+addressOfSubcontractor.title = What is the subcontractor’s address?
+addressOfSubcontractor.heading = What is the subcontractor’s address?
+addressOfSubcontractor.addressLine1 = Address line 1
+addressOfSubcontractor.addressLine2 = Address line 2 (optional)
+addressOfSubcontractor.checkYourAnswersLabel = What is the subcontractor’s address?
+addressOfSubcontractor.change.hidden= address of subcontractor
+addressOfSubcontractor.error.addressLine1.required = Enter address line 1, typically the building and street
+addressOfSubcontractor.error.addressLine3.required = Enter the town or city
+addressOfSubcontractor.error.postCode.required = Enter postcode
+addressOfSubcontractor.error.addressLine1.length = The first line of the address must be 35 characters or less
+addressOfSubcontractor.error.addressLine2.length = The second line of the address must be 35 characters or less
+addressOfSubcontractor.addressLine1.change.hidden = address Line 1
+addressOfSubcontractor.addressLine2.change.hidden = address line 2 (optional)
+addressOfSubcontractor.addressLine3 =  Town or city
+addressOfSubcontractor.addressLine4 = Country (optional)
+addressOfSubcontractor.postCode  = Postcode
+
+addressOfSubcontractor.error.addressLine1.invalidCharacters = The first line of the address contains invalid characters
+addressOfSubcontractor.error.addressLine2.invalidCharacters = The second line of the address contains invalid characters
+addressOfSubcontractor.error.addressLine3.invalidCharacters = Town or city of the address contains invalid characters
+addressOfSubcontractor.error.addressLine4.invalidCharacters = Country contains invalid characters
+addressOfSubcontractor.error.addressLine4.firstCharMustBeLetter = Enter a country where the first character is a letter
+addressOfSubcontractor.error.addressLine1.firstCharMustBeLetterOrNumber = Enter an address where the first character is a letter or a number
+addressOfSubcontractor.error.postCode.length = Postcode must be 8 characters or less
+addressOfSubcontractor.error.postCode.invalid = Enter a full UK postcode
+addressOfSubcontractor.error.addressLine3.length = Town or city must be 35 characters or less
+addressOfSubcontractor.error.addressLine4.length = Country must be 35 characters or less
+addressOfSubcontractor.error.addressLine2.firstCharMustBeLetter = Enter an address where the first character is a letter
+addressOfSubcontractor.error.addressLine3.firstCharMustBeLetter = Enter a town or city where the first character is a letter
+
 subContactDetails.title = Subcontractor’s contact details
 subContactDetails.heading = Subcontractor’s contact details
 subContactDetails.email = Email address

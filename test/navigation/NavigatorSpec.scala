@@ -79,6 +79,15 @@ class NavigatorSpec extends SpecBase {
         ) mustBe controllers.add.routes.TradingNameOfSubcontractorController.onPageLoad(NormalMode)
       }
 
+      "must go from a AddressOfSubcontractorPage to next page" in {
+        navigator.nextPage(
+          AddressOfSubcontractorPage,
+          NormalMode,
+          UserAnswers("id")
+        ) mustBe controllers.add.routes.AddressOfSubcontractorController.onPageLoad(NormalMode)
+      }
+
+
       "must go from a SubAddressYesNoPage to next page when true" in {
         navigator.nextPage(
           SubAddressYesNoPage,
@@ -239,6 +248,14 @@ class NavigatorSpec extends SpecBase {
           UniqueTaxpayerReferenceYesNoPage,
           CheckMode,
           emptyUserAnswers.setOrException(UniqueTaxpayerReferenceYesNoPage, false)
+        ) mustBe CYA
+      }
+
+      "must go from a AddressOfSubcontractorPage to CYA" in {
+        navigator.nextPage(
+          AddressOfSubcontractorPage,
+          CheckMode,
+          UserAnswers("id")
         ) mustBe CYA
       }
 
