@@ -14,21 +14,19 @@
  * limitations under the License.
  */
 
-package forms.add
+package pages.add
 
-import forms.Validation
-import forms.mappings.Mappings
-import play.api.data.Form
+import models.add.UKAddress
+import pages.behaviours.PageBehaviours
 
-import javax.inject.Inject
+class AddressOfSubcontractorPageSpec extends PageBehaviours {
 
-class WorksReferenceNumberFormProvider @Inject() extends Mappings {
+  "AddressOfSubcontractorPage" - {
 
-  def apply(): Form[String] =
-    Form(
-      "value" -> text("worksReferenceNumber.error.required")
-        .transform(_.trim, identity)
-        .verifying(regexp(Validation.worksRefRegex, "worksReferenceNumber.error.invalid"))
-        .verifying(maxLength(20, "worksReferenceNumber.error.length"))
-    )
+    beRetrievable[UKAddress](AddressOfSubcontractorPage)
+
+    beSettable[UKAddress](AddressOfSubcontractorPage)
+
+    beRemovable[UKAddress](AddressOfSubcontractorPage)
+  }
 }

@@ -14,21 +14,17 @@
  * limitations under the License.
  */
 
-package forms.add
+package pages.add
 
-import forms.Validation
-import forms.mappings.Mappings
-import play.api.data.Form
+import pages.behaviours.PageBehaviours
 
-import javax.inject.Inject
+class WorksReferenceNumberYesNoPageSpec extends PageBehaviours {
 
-class WorksReferenceNumberFormProvider @Inject() extends Mappings {
+  "WorksReferenceNumberYesNoPage" - {
+    beRetrievable[Boolean](WorksReferenceNumberYesNoPage)
 
-  def apply(): Form[String] =
-    Form(
-      "value" -> text("worksReferenceNumber.error.required")
-        .transform(_.trim, identity)
-        .verifying(regexp(Validation.worksRefRegex, "worksReferenceNumber.error.invalid"))
-        .verifying(maxLength(20, "worksReferenceNumber.error.length"))
-    )
+    beSettable[Boolean](WorksReferenceNumberYesNoPage)
+
+    beRemovable[Boolean](WorksReferenceNumberYesNoPage)
+  }
 }

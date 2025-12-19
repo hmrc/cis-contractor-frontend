@@ -16,19 +16,30 @@
 
 package forms.add
 
-import forms.Validation
-import forms.mappings.Mappings
-import play.api.data.Form
+import forms.behaviours.BooleanFieldBehaviours
+import play.api.data.FormError
 
-import javax.inject.Inject
+class WorksReferenceNumberYesNoFormProviderSpec extends BooleanFieldBehaviours {
 
-class WorksReferenceNumberFormProvider @Inject() extends Mappings {
+  val requiredKey = "worksReferenceNumberYesNo.error.required"
+  val invalidKey = "error.boolean"
 
-  def apply(): Form[String] =
-    Form(
-      "value" -> text("worksReferenceNumber.error.required")
-        .transform(_.trim, identity)
-        .verifying(regexp(Validation.worksRefRegex, "worksReferenceNumber.error.invalid"))
-        .verifying(maxLength(20, "worksReferenceNumber.error.length"))
+  val form = new WorksReferenceNumberYesNoFormProvider()()
+
+  ".value" - {
+
+    val fieldName = "value"
+
+    behave like booleanField(
+      form,
+      fieldName,
+      invalidError = FormError(fieldName, invalidKey)
     )
+
+    behave like mandatoryField(
+      form,
+      fieldName,
+      requiredError = FormError(fieldName, requiredKey)
+    )
+  }
 }

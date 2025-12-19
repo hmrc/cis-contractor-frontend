@@ -18,37 +18,44 @@ package controllers.add
 
 import base.SpecBase
 import controllers.routes
-import forms.add.WorksReferenceNumberFormProvider
+import forms.add.WorksReferenceNumberYesNoFormProvider
 import models.{NormalMode, UserAnswers}
+import navigation.{FakeNavigator, Navigator}
+import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.add.WorksReferenceNumberPage
+import pages.add.WorksReferenceNumberYesNoPage
 import play.api.data.Form
+import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import views.html.add.WorksReferenceNumberView
+import repositories.SessionRepository
+import views.html.add.WorksReferenceNumberYesNoView
 
-class WorksReferenceNumberControllerSpec extends SpecBase with MockitoSugar {
+import scala.concurrent.Future
 
-  def onwardRoute: Call = Call("GET", "/foo")
+class WorksReferenceNumberYesNoControllerSpec extends SpecBase with MockitoSugar {
 
-  val formProvider = new WorksReferenceNumberFormProvider()
-  val form: Form[String] = formProvider()
+  def onwardRoute = Call("GET", "/foo")
 
-  lazy val worksReferenceNumberRoute: String = controllers.add.routes.WorksReferenceNumberController.onPageLoad(NormalMode).url
+  val formProvider = new WorksReferenceNumberYesNoFormProvider()
+  val form: Form[Boolean] = formProvider()
 
-  "WorksReferenceNumber Controller" - {
+  lazy val worksReferenceNumberYesNoRoute: String = controllers.add.routes.WorksReferenceNumberYesNoController.onPageLoad(NormalMode).url
+
+  "WorksReferenceNumberYesNo Controller" - {
 
     "must return OK and the correct view for a GET" in {
 
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
       running(application) {
-        val request = FakeRequest(GET, worksReferenceNumberRoute)
+        val request = FakeRequest(GET, worksReferenceNumberYesNoRoute)
 
         val result = route(application, request).value
 
-        val view = application.injector.instanceOf[WorksReferenceNumberView]
+        val view = application.injector.instanceOf[WorksReferenceNumberYesNoView]
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
@@ -57,41 +64,45 @@ class WorksReferenceNumberControllerSpec extends SpecBase with MockitoSugar {
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = UserAnswers(userAnswersId).set(WorksReferenceNumberPage, "answer").success.value
+      val userAnswers = UserAnswers(userAnswersId).set(WorksReferenceNumberYesNoPage, true).success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
       running(application) {
-        val request = FakeRequest(GET, worksReferenceNumberRoute)
+        val request = FakeRequest(GET, worksReferenceNumberYesNoRoute)
 
-        val view = application.injector.instanceOf[WorksReferenceNumberView]
+        val view = application.injector.instanceOf[WorksReferenceNumberYesNoView]
 
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill("answer"), NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill(true), NormalMode)(request, messages(application)).toString
       }
     }
 
-    "must bind the form and redirect on POST when valid data is submitted" in {
+    "must redirect to the next page when valid data is submitted" in {
 
-      val validValue = "1234567-AB"
+      val mockSessionRepository = mock[SessionRepository]
+
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
       val application =
         applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          .overrides(
+            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
+            bind[SessionRepository].toInstance(mockSessionRepository)
+          )
           .build()
 
       running(application) {
         val request =
-          FakeRequest(POST, worksReferenceNumberRoute)
-            .withFormUrlEncodedBody(("value", validValue))
+          FakeRequest(POST, worksReferenceNumberYesNoRoute)
+            .withFormUrlEncodedBody(("value", "true"))
 
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-
-        redirectLocation(result).value mustEqual
-          worksReferenceNumberRoute
+        redirectLocation(result).value mustEqual onwardRoute.url
       }
     }
 
@@ -101,12 +112,12 @@ class WorksReferenceNumberControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, worksReferenceNumberRoute)
+          FakeRequest(POST, worksReferenceNumberYesNoRoute)
             .withFormUrlEncodedBody(("value", ""))
 
         val boundForm = form.bind(Map("value" -> ""))
 
-        val view = application.injector.instanceOf[WorksReferenceNumberView]
+        val view = application.injector.instanceOf[WorksReferenceNumberYesNoView]
 
         val result = route(application, request).value
 
@@ -120,7 +131,7 @@ class WorksReferenceNumberControllerSpec extends SpecBase with MockitoSugar {
       val application = applicationBuilder(userAnswers = None).build()
 
       running(application) {
-        val request = FakeRequest(GET, worksReferenceNumberRoute)
+        val request = FakeRequest(GET, worksReferenceNumberYesNoRoute)
 
         val result = route(application, request).value
 
@@ -135,8 +146,8 @@ class WorksReferenceNumberControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, worksReferenceNumberRoute)
-            .withFormUrlEncodedBody(("value", "answer"))
+          FakeRequest(POST, worksReferenceNumberYesNoRoute)
+            .withFormUrlEncodedBody(("value", "true"))
 
         val result = route(application, request).value
 

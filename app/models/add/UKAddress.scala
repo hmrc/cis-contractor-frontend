@@ -14,21 +14,19 @@
  * limitations under the License.
  */
 
-package forms.add
+package models.add
 
-import forms.Validation
-import forms.mappings.Mappings
-import play.api.data.Form
+import play.api.libs.json.*
 
-import javax.inject.Inject
+case class UKAddress(
+  addressLine1: String,
+  addressLine2: Option[String],
+  addressLine3: String,
+  addressLine4: Option[String],
+  postCode: String
+)
 
-class WorksReferenceNumberFormProvider @Inject() extends Mappings {
+object UKAddress {
 
-  def apply(): Form[String] =
-    Form(
-      "value" -> text("worksReferenceNumber.error.required")
-        .transform(_.trim, identity)
-        .verifying(regexp(Validation.worksRefRegex, "worksReferenceNumber.error.invalid"))
-        .verifying(maxLength(20, "worksReferenceNumber.error.length"))
-    )
+  implicit val format: OFormat[UKAddress] = Json.format
 }

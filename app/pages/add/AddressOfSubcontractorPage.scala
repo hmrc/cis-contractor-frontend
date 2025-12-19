@@ -14,21 +14,15 @@
  * limitations under the License.
  */
 
-package forms.add
+package pages.add
 
-import forms.Validation
-import forms.mappings.Mappings
-import play.api.data.Form
+import models.add.UKAddress
+import pages.QuestionPage
+import play.api.libs.json.JsPath
 
-import javax.inject.Inject
+case object AddressOfSubcontractorPage extends QuestionPage[UKAddress] {
 
-class WorksReferenceNumberFormProvider @Inject() extends Mappings {
+  override def path: JsPath = JsPath \ toString
 
-  def apply(): Form[String] =
-    Form(
-      "value" -> text("worksReferenceNumber.error.required")
-        .transform(_.trim, identity)
-        .verifying(regexp(Validation.worksRefRegex, "worksReferenceNumber.error.invalid"))
-        .verifying(maxLength(20, "worksReferenceNumber.error.length"))
-    )
+  override def toString: String = "addressOfSubcontractor"
 }

@@ -16,19 +16,15 @@
 
 package forms.add
 
-import forms.Validation
 import forms.mappings.Mappings
 import play.api.data.Form
 
 import javax.inject.Inject
 
-class WorksReferenceNumberFormProvider @Inject() extends Mappings {
+class WorksReferenceNumberYesNoFormProvider @Inject() extends Mappings {
 
-  def apply(): Form[String] =
+  def apply(): Form[Boolean] =
     Form(
-      "value" -> text("worksReferenceNumber.error.required")
-        .transform(_.trim, identity)
-        .verifying(regexp(Validation.worksRefRegex, "worksReferenceNumber.error.invalid"))
-        .verifying(maxLength(20, "worksReferenceNumber.error.length"))
+      "value" -> boolean("worksReferenceNumberYesNo.error.required")
     )
 }

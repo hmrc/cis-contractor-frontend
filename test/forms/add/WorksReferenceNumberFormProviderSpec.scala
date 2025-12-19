@@ -32,17 +32,24 @@ class WorksReferenceNumberFormProviderSpec extends StringFieldBehaviours {
 
   val fieldName = "value"
 
+  val validWorkRefsGen: Gen[String] = Gen.oneOf(
+    "ABC Construction LTD",
+    "A&B Contractors Ltd",
+    "North-East (UK)",
+    "Symbols ~!@#$%&'()*+",
+    "Symbols ,-./:;=?_{}£",
+    "Symbol €",
+    "Contains £ and €",
+    "Dollar $ sign"
+  )
+
   override def stringsLongerThan(n: Int): Gen[String] =
     Gen.listOfN(n + 1, Gen.numChar).map(_.mkString)
 
   override def stringsWithMaxLength(n: Int): Gen[String] =
     Gen.listOfN(n, Gen.numChar).map(_.mkString)
 
-  behave like fieldThatBindsValidData(
-    form,
-    fieldName,
-    stringsWithMaxLength(maxLength)
-  )
+  behave like fieldThatBindsValidData(form, fieldName, validWorkRefsGen)
 
   behave like fieldWithMaxLength(
     form,
@@ -56,4 +63,18 @@ class WorksReferenceNumberFormProviderSpec extends StringFieldBehaviours {
     fieldName,
     requiredError = FormError(fieldName, requiredKey)
   )
+
+  "trim leading and trailing spaces" in {
+    val result = form.bind(Map(fieldName -> "   ABC Ltd   "))
+    result.value.value mustBe "ABC Ltd"
+  }
+
+  "reject invalid characters (backtick, pipe)" in {
+    val invalidNames = Seq("Backtick ` here", "Pipe | symbol")
+    invalidNames.foreach { name =>
+      val result = form.bind(Map(fieldName -> name))
+      result.errors.map(_.message) must contain(invalidKey)
+    }
+  }
+
 }
