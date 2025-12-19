@@ -29,8 +29,10 @@ class AddressOfSubcontractorFormProvider @Inject() extends Mappings {
   private val firstCharLetterRegex =
     """^[A-Za-z].*"""
 
+  private val firstCharLetterOrDigitRegex = """^[A-Za-z0-9].*"""
+
   private val ukPostcodeRegex =
-    """^[A-Za-z0-9 ~!"@#\$%&'()*+,\-./:;<=>?\[\\\]^_\{\}£€]*$"""
+    """^(GIR\s?0AA|(?:(?:[A-Z]{1,2}\d[A-Z\d]?|\d[A-Z]{2})\s?\d[A-Z]{2}))$"""
 
   def apply(): Form[UKAddress] = Form(
     Forms.mapping(
@@ -40,7 +42,11 @@ class AddressOfSubcontractorFormProvider @Inject() extends Mappings {
           .verifying(
             firstError(
               maxLength(35, "addressOfSubcontractor.error.addressLine1.length"),
-              regexp(allowedAddressCharsRegex, "addressOfSubcontractor.error.addressLine1.invalidCharacters")
+              regexp(allowedAddressCharsRegex, "addressOfSubcontractor.error.addressLine1.invalidCharacters"),
+              regexp(
+                firstCharLetterOrDigitRegex,
+                "addressOfSubcontractor.error.addressLine1.firstCharMustBeLetterOrNumber"
+              )
             )
           ),
       "addressLine2" ->
@@ -85,7 +91,10 @@ class AddressOfSubcontractorFormProvider @Inject() extends Mappings {
         ),
       "postCode"     ->
         text("addressOfSubcontractor.error.postCode.required")
-          .transform(_.trim.toUpperCase, identity)
+          .transform(
+            _.trim.toUpperCase.replaceAll("\\s+", " "),
+            identity
+          )
           .verifying(
             firstError(
               maxLength(8, "addressOfSubcontractor.error.postCode.length"),

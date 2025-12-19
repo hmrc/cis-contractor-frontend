@@ -24,27 +24,39 @@ class AddressOfSubcontractorFormProviderSpec extends StringFieldBehaviours {
 
   private val form = new AddressOfSubcontractorFormProvider()()
 
-  private val maxLength            = 35
-  private val postcodeMaxLength    = 8
+  private val maxLength         = 35
+  private val postcodeMaxLength = 8
 
   private val allowedChars: Seq[Char] =
     (('A' to 'Z') ++ ('a' to 'z') ++ ('0' to '9')) ++
-      Seq(' ', ',', '.', '\'', '(', ')', '-', '/', '&', '£', '€', '_', '[', ']', '{', '}', ':', ';', '?', '!', '~', '@', '#', '$', '%', '*', '+', '^', '\\', '"')
+      Seq(' ', ',', '.', '\'', '(', ')', '-', '/', '&', '£', '€', '_', '[', ']', '{', '}', ':', ';', '?', '!', '~', '@',
+        '#', '$', '%', '*', '+', '^', '\\', '"')
 
-  private val letterChars: Seq[Char] = (('A' to 'Z') ++ ('a' to 'z'))
+  private val letterChars: Seq[Char] = ('A' to 'Z') ++ ('a' to 'z')
 
   private def validAddressLineGen(max: Int): Gen[String] = for {
-    first <- Gen.oneOf(letterChars)
+    first   <- Gen.oneOf(letterChars)
     restLen <- Gen.choose(0, math.max(0, max - 1))
-    rest <- Gen.listOfN(restLen, Gen.oneOf(allowedChars)).map(_.mkString)
+    rest    <- Gen.listOfN(restLen, Gen.oneOf(allowedChars)).map(_.mkString)
   } yield s"$first$rest"
 
   private val validPostcodes = Gen.oneOf(
-    "SW1A 1AA", "EC1A 1BB", "W1A 0AX", "M1 1AE", "B33 8TH", "CR2 6XH", "DN55 1PT", "GIR 0AA"
+    "SW1A 1AA",
+    "EC1A 1BB",
+    "W1A 0AX",
+    "M1 1AE",
+    "B33 8TH",
+    "CR2 6XH",
+    "DN55 1PT",
+    "GIR 0AA"
   )
 
   private val invalidPostcodes = Gen.oneOf(
-    "SW1A|1AA", "🙂", "ABCD💥", "NE1\t1AA"
+    "SW1A|1AA",
+    "$$",
+    "ABCD£",
+    "123456",
+    "AAAA AA"
   )
 
   ".addressLine1" - {
@@ -74,26 +86,28 @@ class AddressOfSubcontractorFormProviderSpec extends StringFieldBehaviours {
     )
 
     "must fail when invalid characters are used (while first char is a letter)" in {
-      val input = "A|Street"
-      val result = form.bind(Map(fieldName -> input, "addressLine2" -> "B Street", "addressLine3" -> "C Town", "postCode" -> "SW1A 1AA"))
+      val input  = "A|Street"
+      val result = form.bind(
+        Map(fieldName -> input, "addressLine2" -> "B Street", "addressLine3" -> "C Town", "postCode" -> "SW1A 1AA")
+      )
       result.errors.exists(_.message == invalidKey) mustBe true
     }
   }
 
   ".addressLine2 (optional)" - {
 
-    val fieldName = "addressLine2"
-    val lengthKey = "addressOfSubcontractor.error.addressLine2.length"
-    val invalidKey = "addressOfSubcontractor.error.addressLine2.invalidCharacters"
+    val fieldName    = "addressLine2"
+    val lengthKey    = "addressOfSubcontractor.error.addressLine2.length"
+    val invalidKey   = "addressOfSubcontractor.error.addressLine2.invalidCharacters"
     val firstCharKey = "addressOfSubcontractor.error.addressLine2.firstCharMustBeLetter"
 
     "must bind valid data when provided" in {
       val result = form.bind(
         Map(
           "addressLine1" -> "A Street",
-          fieldName -> "B Street",
+          fieldName      -> "B Street",
           "addressLine3" -> "C Town",
-          "postCode" -> "EC1A 1BB"
+          "postCode"     -> "EC1A 1BB"
         )
       )
 
@@ -104,9 +118,9 @@ class AddressOfSubcontractorFormProviderSpec extends StringFieldBehaviours {
       val result = form.bind(
         Map(
           "addressLine1" -> "A Street",
-          fieldName -> "",
+          fieldName      -> "",
           "addressLine3" -> "C Town",
-          "postCode" -> "EC1A 1BB"
+          "postCode"     -> "EC1A 1BB"
         )
       )
 
@@ -118,7 +132,7 @@ class AddressOfSubcontractorFormProviderSpec extends StringFieldBehaviours {
         Map(
           "addressLine1" -> "A Street",
           "addressLine3" -> "C Town",
-          "postCode" -> "EC1A 1BB"
+          "postCode"     -> "EC1A 1BB"
         )
       )
 
@@ -136,9 +150,9 @@ class AddressOfSubcontractorFormProviderSpec extends StringFieldBehaviours {
       val result = form.bind(
         Map(
           "addressLine1" -> "A Street",
-          fieldName -> "B|Street",
+          fieldName      -> "B|Street",
           "addressLine3" -> "C Town",
-          "postCode" -> "EC1A 1BB"
+          "postCode"     -> "EC1A 1BB"
         )
       )
 
@@ -149,9 +163,9 @@ class AddressOfSubcontractorFormProviderSpec extends StringFieldBehaviours {
       val result = form.bind(
         Map(
           "addressLine1" -> "A Street",
-          fieldName -> "1B Street",
+          fieldName      -> "1B Street",
           "addressLine3" -> "C Town",
-          "postCode" -> "EC1A 1BB"
+          "postCode"     -> "EC1A 1BB"
         )
       )
 
@@ -159,14 +173,13 @@ class AddressOfSubcontractorFormProviderSpec extends StringFieldBehaviours {
     }
   }
 
-
   ".addressLine3" - {
 
-    val fieldName   = "addressLine3"
-    val requiredKey = "addressOfSubcontractor.error.addressLine3.required"
-    val lengthKey   = "addressOfSubcontractor.error.addressLine3.length"
-    val invalidKey  = "addressOfSubcontractor.error.addressLine3.invalidCharacters"
-    val firstCharKey= "addressOfSubcontractor.error.addressLine3.firstCharMustBeLetter"
+    val fieldName    = "addressLine3"
+    val requiredKey  = "addressOfSubcontractor.error.addressLine3.required"
+    val lengthKey    = "addressOfSubcontractor.error.addressLine3.length"
+    val invalidKey   = "addressOfSubcontractor.error.addressLine3.invalidCharacters"
+    val firstCharKey = "addressOfSubcontractor.error.addressLine3.firstCharMustBeLetter"
 
     behave like fieldThatBindsValidData(
       form,
@@ -188,12 +201,16 @@ class AddressOfSubcontractorFormProviderSpec extends StringFieldBehaviours {
     )
 
     "must fail when invalid characters are used (while first char is a letter)" in {
-      val result = form.bind(Map("addressLine1" -> "A Street", "addressLine2" -> "B Street", fieldName -> "C|Town", "postCode" -> "W1A 0AX"))
+      val result = form.bind(
+        Map("addressLine1" -> "A Street", "addressLine2" -> "B Street", fieldName -> "C|Town", "postCode" -> "W1A 0AX")
+      )
       result.errors.exists(_.message == invalidKey) mustBe true
     }
 
     "must fail when first character is not a letter" in {
-      val result = form.bind(Map("addressLine1" -> "A Street", "addressLine2" -> "B Street", fieldName -> "1C Town", "postCode" -> "W1A 0AX"))
+      val result = form.bind(
+        Map("addressLine1" -> "A Street", "addressLine2" -> "B Street", fieldName -> "1C Town", "postCode" -> "W1A 0AX")
+      )
       result.errors.exists(_.message == firstCharKey) mustBe true
     }
   }
@@ -267,11 +284,11 @@ class AddressOfSubcontractorFormProviderSpec extends StringFieldBehaviours {
         val result = form.bind(
           Map(
             "addressLine1" -> "A Street",
-            "addressLine2" -> "B Street",
             "addressLine3" -> "C Town",
-            fieldName      -> bad
+            "postCode"     -> bad
           )
         )
+
         result.errors.exists(_.message == invalidKey) mustBe true
       }
     }
