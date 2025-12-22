@@ -129,6 +129,13 @@ subAddressYesNo.checkYourAnswersLabel = Do you want to add the subcontractor’s
 subAddressYesNo.error.required = Select whether or not to add the subcontractor’s address
 subAddressYesNo.change.hidden = Do you want to add the subcontractor’s address?
 
+nationalInsuranceNumberYesNo.title = Do you have a National Insurance number?
+nationalInsuranceNumberYesNo.heading = Do you have a National Insurance number?
+nationalInsuranceNumberYesNo.hint = A National Insurance number is made up of letters and numbers, like ‘QQ 12 34 56 A’
+nationalInsuranceNumberYesNo.checkYourAnswersLabel = Do you have a National Insurance number?
+nationalInsuranceNumberYesNo.error.required = Select whether you have the subcontractor’s National Insurance number or not
+nationalInsuranceNumberYesNo.change.hidden = Do you have a National Insurance number?
+
 subcontractorName.title = What is the subcontractor’s name?
 subcontractorName.heading = What is the subcontractor’s name?
 subcontractorName.firstName = First name
@@ -175,7 +182,7 @@ subcontractorContactDetailsYesNo.title = Do you want to add the subcontractor’
 subcontractorContactDetailsYesNo.heading = Do you want to add the subcontractor’s contact details?
 subcontractorContactDetailsYesNo.hint = You can add the subcontractor’s email address and telephone number now or add them later
 subcontractorContactDetailsYesNo.checkYourAnswersLabel = Do you want to add the subcontractor’s contact details?
-subcontractorContactDetailsYesNo.error.required = Select whether or not you have the contact details
+subcontractorContactDetailsYesNo.error.required = Select whether you have the subcontractor’s contact details
 subcontractorContactDetailsYesNo.change.hidden = do you want to add the subcontractor’s contact details?
 
 addressOfSubcontractor.title = What is the subcontractor’s address?
@@ -207,3 +214,27 @@ addressOfSubcontractor.error.addressLine3.length = Town or city must be 35 chara
 addressOfSubcontractor.error.addressLine4.length = Country must be 35 characters or less
 addressOfSubcontractor.error.addressLine2.firstCharMustBeLetter = Enter an address where the first character is a letter
 addressOfSubcontractor.error.addressLine3.firstCharMustBeLetter = Enter a town or city where the first character is a letter
+
+subContactDetails.title = Subcontractor’s contact details
+subContactDetails.heading = Subcontractor’s contact details
+subContactDetails.email = Email address
+subContactDetails.telephone = Telephone number
+subContactDetails.telephone.hint = For international numbers, include the country code, like +33 for a French number
+subContactDetails.checkYourAnswersLabel = Subcontractor’s contact details
+subContactDetails.error.email.required = Enter an email address
+subContactDetails.error.telephone.required = Enter a telephone number
+subContactDetails.error.email.length = Enter an email address less or equal to 254 characters
+subContactDetails.error.telephone.length = Enter a phone number less or equal to 35 characters
+subContactDetails.error.email.invalid = Enter a valid email address
+subContactDetails.error.telephone.invalid = Enter a valid phone number
+subContactDetails.email.change.hidden = email address
+subContactDetails.telephone.change.hidden = telephone number
+
+subcontractorsUniqueTaxpayerReference.title = What is the subcontractor’s Unique Taxpayer Reference (UTR)?
+subcontractorsUniqueTaxpayerReference.heading = What is the subcontractor’s Unique Taxpayer Reference (UTR)?
+subcontractorsUniqueTaxpayerReference.hint = This is 10 numbers, like 1234567890. The UTR will be on tax returns and other letters about Self Assessment. It may also be called ‘tax reference’
+subcontractorsUniqueTaxpayerReference.checkYourAnswersLabel = What is the subcontractor’s Unique Taxpayer Reference (UTR)?
+subcontractorsUniqueTaxpayerReference.error.required = Enter a Unique Taxpayer Reference like 1234567890
+subcontractorsUniqueTaxpayerReference.error.invalid = Enter a Unique Taxpayer Reference like 1234567890
+subcontractorsUniqueTaxpayerReference.error.length = Enter a Unique Taxpayer Reference as a 10 digit number
+subcontractorsUniqueTaxpayerReference.change.hidden = what is the subcontractor’s Unique Taxpayer Reference (UTR)?

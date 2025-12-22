@@ -23,30 +23,30 @@ import org.scalatest.TryValues.convertTryToSuccessOrFailure
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.matchers.should.Matchers.{should, shouldBe}
-import pages.add.SubcontractorContactDetailsYesNoPage
+import pages.add.NationalInsuranceNumberYesNoPage
 import play.api.i18n.Messages
 import play.api.test.Helpers.stubMessages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 
-class SubcontractorContactDetailsYesNoSummarySpec extends AnyFreeSpec with Matchers {
+class NationalInsuranceNumberYesNoSummarySpec extends AnyFreeSpec with Matchers {
 
   implicit val messages: Messages = stubMessages()
 
-  "SubcontractorContactDetailsYesNoSummary.row" - {
+  "NationalInsuranceNumberSummary.row" - {
 
     "must return a SummaryListRow with 'Yes' when the answer is true" in {
       val answers = UserAnswers("test-id")
-        .set(SubcontractorContactDetailsYesNoPage, true)
+        .set(NationalInsuranceNumberYesNoPage, true)
         .success
         .value
 
-      val maybeRow: Option[SummaryListRow] = SubcontractorContactDetailsYesNoSummary.row(answers)
+      val maybeRow: Option[SummaryListRow] = NationalInsuranceNumberYesNoSummary.row(answers)
       maybeRow shouldBe defined
 
       val row =
         maybeRow.value
 
-      val expectedKeyText = messages("subcontractorContactDetailsYesNo.checkYourAnswersLabel")
+      val expectedKeyText = messages("nationalInsuranceNumberYesNo.checkYourAnswersLabel")
       row.key.content.asHtml.toString should include(expectedKeyText)
 
       val expectedValue = messages("site.yes")
@@ -58,8 +58,8 @@ class SubcontractorContactDetailsYesNoSummarySpec extends AnyFreeSpec with Match
 
       val changeAction       = actions.head
       val expectedChangeText = messages("site.change")
-      val expectedHref       = routes.SubcontractorContactDetailsYesNoController.onPageLoad(CheckMode).url
-      val expectedHiddenText = messages("subcontractorContactDetailsYesNo.change.hidden")
+      val expectedHref       = routes.NationalInsuranceNumberYesNoController.onPageLoad(CheckMode).url
+      val expectedHiddenText = messages("nationalInsuranceNumberYesNo.change.hidden")
 
       changeAction.content.asHtml.toString    should include(expectedChangeText)
       changeAction.href                     shouldBe expectedHref
@@ -68,11 +68,11 @@ class SubcontractorContactDetailsYesNoSummarySpec extends AnyFreeSpec with Match
 
     "must return a SummaryListRow with 'No' when the answer is false" in {
       val answers = UserAnswers("test-id")
-        .set(SubcontractorContactDetailsYesNoPage, false)
+        .set(NationalInsuranceNumberYesNoPage, false)
         .success
         .value
 
-      val maybeRow: Option[SummaryListRow] = SubcontractorContactDetailsYesNoSummary.row(answers)
+      val maybeRow: Option[SummaryListRow] = NationalInsuranceNumberYesNoSummary.row(answers)
       maybeRow shouldBe defined
 
       val row           = maybeRow.value
@@ -82,7 +82,7 @@ class SubcontractorContactDetailsYesNoSummarySpec extends AnyFreeSpec with Match
 
     "must return None when the answer does not exist" in {
       val answers = UserAnswers("test-id")
-      SubcontractorContactDetailsYesNoSummary.row(answers) shouldBe None
+      NationalInsuranceNumberYesNoSummary.row(answers) shouldBe None
     }
   }
 }
