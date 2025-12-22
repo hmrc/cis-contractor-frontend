@@ -79,6 +79,15 @@ class NavigatorSpec extends SpecBase {
         ) mustBe controllers.add.routes.TradingNameOfSubcontractorController.onPageLoad(NormalMode)
       }
 
+      "must go from a AddressOfSubcontractorPage to next page" in {
+        navigator.nextPage(
+          AddressOfSubcontractorPage,
+          NormalMode,
+          UserAnswers("id")
+        ) mustBe controllers.add.routes.AddressOfSubcontractorController.onPageLoad(NormalMode)
+      }
+
+
       "must go from a SubAddressYesNoPage to next page when true" in {
         navigator.nextPage(
           SubAddressYesNoPage,
@@ -188,6 +197,13 @@ class NavigatorSpec extends SpecBase {
         ) mustBe controllers.add.routes.SubNationalInsuranceNumberController.onPageLoad(NormalMode)
       }
 
+      "must go from SubcontractorsUniqueTaxpayerReferencePage to SubcontractorsUniqueTaxpayerReferenceController" in {
+        navigator.nextPage(
+          SubcontractorsUniqueTaxpayerReferencePage,
+          NormalMode,
+          UserAnswers("id")
+        ) mustBe controllers.add.routes.SubcontractorsUniqueTaxpayerReferenceController.onPageLoad(NormalMode)
+      }
     }
 
     "in Check mode" - {
@@ -263,6 +279,14 @@ class NavigatorSpec extends SpecBase {
         ) mustBe CYA
       }
 
+      "must go from a AddressOfSubcontractorPage to CYA" in {
+        navigator.nextPage(
+          AddressOfSubcontractorPage,
+          CheckMode,
+          UserAnswers("id")
+        ) mustBe CYA
+      }
+
       "must go from a UniqueTaxpayerReferenceYesNoPage to journey recovery when incomplete info provided" in {
         navigator.nextPage(
           UniqueTaxpayerReferenceYesNoPage,
@@ -317,6 +341,14 @@ class NavigatorSpec extends SpecBase {
           emptyUserAnswers
         ) mustBe journeyRecovery
       }
+      "must go from SubcontractorsUniqueTaxpayerReferencePage to SubcontractorsUniqueTaxpayerReferenceController with userAnswers in checkMode" in {
+        navigator.nextPage(
+          SubcontractorsUniqueTaxpayerReferencePage,
+          CheckMode,
+          UserAnswers("id")
+        ) mustBe controllers.add.routes.SubcontractorsUniqueTaxpayerReferenceController.onPageLoad(CheckMode)
+      }
+
     }
   }
 }

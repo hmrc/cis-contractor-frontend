@@ -34,18 +34,24 @@ class Navigator @Inject() () {
     case SubcontractorNamePage   =>   _ => controllers.add.routes.SubcontractorNameController.onPageLoad(NormalMode)
     case SubAddressYesNoPage            => userAnswers => navigatorFromSubAddressYesNoPage(NormalMode)(userAnswers)
     case NationalInsuranceNumberYesNoPage  => userAnswers => navigatorFromNationalInsuranceNumberYesNoPage(NormalMode)(userAnswers)
+    case AddressOfSubcontractorPage => _ => controllers.add.routes.AddressOfSubcontractorController.onPageLoad(NormalMode)
     case UniqueTaxpayerReferenceYesNoPage => userAnswers => navigatorFromUniqueTaxpayerReferenceYesNoPage(NormalMode)(userAnswers)
     case WorksReferenceNumberYesNoPage  => userAnswers => navigatorFromWorksReferenceNumberYesNoPage(NormalMode)(userAnswers)
     case SubNationalInsuranceNumberPage => _ => controllers.add.routes.SubNationalInsuranceNumberController.onPageLoad(NormalMode)
+    case SubcontractorsUniqueTaxpayerReferencePage =>
+      _ => controllers.add.routes.SubcontractorsUniqueTaxpayerReferenceController.onPageLoad(NormalMode)
     case _                              => _ => routes.IndexController.onPageLoad()
   }
 
   private val checkRouteMap: Page => UserAnswers => Call = {
-    case SubTradingNameYesNoPage          => userAnswers => navigatorFromSubTradingNameYesNoPage(CheckMode)(userAnswers)
-    case SubAddressYesNoPage              => userAnswers => navigatorFromSubAddressYesNoPage(CheckMode)(userAnswers)
+    case SubTradingNameYesNoPage => userAnswers => navigatorFromSubTradingNameYesNoPage(CheckMode)(userAnswers)
+    case SubAddressYesNoPage     => userAnswers => navigatorFromSubAddressYesNoPage(CheckMode)(userAnswers)
+    case AddressOfSubcontractorPage => _ => routes.CheckYourAnswersController.onPageLoad()
     case NationalInsuranceNumberYesNoPage => userAnswers => navigatorFromNationalInsuranceNumberYesNoPage(CheckMode)(userAnswers)
     case UniqueTaxpayerReferenceYesNoPage => userAnswers => navigatorFromUniqueTaxpayerReferenceYesNoPage(CheckMode)(userAnswers)
     case WorksReferenceNumberYesNoPage     => userAnswers => navigatorFromWorksReferenceNumberYesNoPage(CheckMode)(userAnswers)
+    case SubcontractorsUniqueTaxpayerReferencePage =>
+      userAnswers => controllers.add.routes.SubcontractorsUniqueTaxpayerReferenceController.onPageLoad(CheckMode)
     case _                       => _ => routes.CheckYourAnswersController.onPageLoad()
   }
 
