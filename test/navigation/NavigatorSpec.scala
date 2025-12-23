@@ -113,11 +113,7 @@ class NavigatorSpec extends SpecBase {
       }
 
       "must go from a SubcontractorNamePage  to next page" in {
-        navigator.nextPage(
-          SubcontractorNamePage,
-          NormalMode,
-          UserAnswers("id")
-        ) mustBe controllers.add.routes.SubcontractorNameController.onPageLoad(NormalMode)
+        navigator.nextPage(SubcontractorNamePage, NormalMode, UserAnswers("id")) mustBe controllers.add.routes.SubcontractorNameController.onPageLoad(NormalMode)
       }
 
       "must go from a WorksReferenceNumberPage  to next page" in {
@@ -126,6 +122,30 @@ class NavigatorSpec extends SpecBase {
           NormalMode,
           UserAnswers("id")
         ) mustBe controllers.add.routes.WorksReferenceNumberController.onPageLoad(NormalMode)
+      }
+
+      "must go from a NationalInsuranceNumberYesNoPage to next page when false" in {
+        navigator.nextPage(
+          NationalInsuranceNumberYesNoPage,
+          NormalMode,
+          emptyUserAnswers.setOrException(NationalInsuranceNumberYesNoPage, false)
+        ) mustBe controllers.add.routes.NationalInsuranceNumberYesNoController.onPageLoad(NormalMode)
+      }
+
+      "must go from a NationalInsuranceNumberYesNoPage to next page when true" in {
+        navigator.nextPage(
+          NationalInsuranceNumberYesNoPage,
+          NormalMode,
+          emptyUserAnswers.setOrException(NationalInsuranceNumberYesNoPage, true)
+        ) mustBe controllers.add.routes.NationalInsuranceNumberYesNoController.onPageLoad(NormalMode)
+      }
+
+      "must go from NationalInsuranceNumberYesNoPage to journey recovery when incomplete info provided" in {
+        navigator.nextPage(
+          NationalInsuranceNumberYesNoPage,
+          NormalMode,
+          emptyUserAnswers
+        ) mustBe journeyRecovery
       }
 
       "must go from a UniqueTaxpayerReferenceYesNoPage to next page when true" in {
@@ -185,6 +205,16 @@ class NavigatorSpec extends SpecBase {
         ) mustBe controllers.add.routes.SubNationalInsuranceNumberController.onPageLoad(NormalMode)
       }
 
+      "must go from a SubContactDetailsPage  to next page" in {
+        navigator.nextPage(SubContactDetailsPage, NormalMode, UserAnswers("id")) mustBe controllers.add.routes.SubContactDetailsController.onPageLoad(NormalMode)
+      }
+      "must go from SubcontractorsUniqueTaxpayerReferencePage to SubcontractorsUniqueTaxpayerReferenceController" in {
+        navigator.nextPage(
+          SubcontractorsUniqueTaxpayerReferencePage,
+          NormalMode,
+          UserAnswers("id")
+        ) mustBe controllers.add.routes.SubcontractorsUniqueTaxpayerReferenceController.onPageLoad(NormalMode)
+      }
     }
 
     "in Check mode" - {
@@ -276,6 +306,29 @@ class NavigatorSpec extends SpecBase {
         ) mustBe journeyRecovery
       }
 
+      "must go from a NationalInsuranceNumberYesNoPage to next page when true" in {
+        navigator.nextPage(
+          NationalInsuranceNumberYesNoPage,
+          CheckMode,
+          emptyUserAnswers.setOrException(NationalInsuranceNumberYesNoPage, true)
+        ) mustBe controllers.add.routes.NationalInsuranceNumberYesNoController.onPageLoad(CheckMode)
+      }
+
+      "must go from a NationalInsuranceNumberYesNoPage to CYA page when false" in {
+        navigator.nextPage(
+          NationalInsuranceNumberYesNoPage,
+          CheckMode,
+          emptyUserAnswers.setOrException(NationalInsuranceNumberYesNoPage, false)
+        ) mustBe CYA
+      }
+
+      "must go from a NationalInsuranceNumberYesNoPage to journey recovery page when incomplete info provided" in {
+        navigator.nextPage(
+          NationalInsuranceNumberYesNoPage,
+          CheckMode,
+          emptyUserAnswers
+        ) mustBe journeyRecovery
+      }
       "must go from a WorksReferenceNumberPage  to next page in check mode" in {
         navigator.nextPage(
           WorksReferenceNumberPage,
@@ -307,6 +360,23 @@ class NavigatorSpec extends SpecBase {
           emptyUserAnswers
         ) mustBe journeyRecovery
       }
+
+      "must go from a SubContactDetailsPage to CYA" in {
+        navigator.nextPage(
+          SubContactDetailsPage,
+          CheckMode,
+          UserAnswers("id")
+        ) mustBe CYA
+      }
+
+      "must go from SubcontractorsUniqueTaxpayerReferencePage to SubcontractorsUniqueTaxpayerReferenceController with userAnswers in checkMode" in {
+        navigator.nextPage(
+          SubcontractorsUniqueTaxpayerReferencePage,
+          CheckMode,
+          UserAnswers("id")
+        ) mustBe controllers.add.routes.SubcontractorsUniqueTaxpayerReferenceController.onPageLoad(CheckMode)
+      }
+
     }
   }
 }
