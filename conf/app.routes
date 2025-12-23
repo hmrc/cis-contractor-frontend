@@ -87,3 +87,8 @@ GET        /add/unique-taxpayer-reference                controllers.add.Subcont
 POST       /add/unique-taxpayer-reference                controllers.add.SubcontractorsUniqueTaxpayerReferenceController.onSubmit(mode: Mode = NormalMode)
 GET        /add/change-unique-taxpayer-reference         controllers.add.SubcontractorsUniqueTaxpayerReferenceController.onPageLoad(mode: Mode = CheckMode)
 POST       /add/change-unique-taxpayer-reference         controllers.add.SubcontractorsUniqueTaxpayerReferenceController.onSubmit(mode: Mode = CheckMode)
+
+GET        /add/check-contact-details                    controllers.add.SubcontractorContactDetailsYesNoController.onPageLoad(mode: Mode = NormalMode)
+POST       /add/check-contact-details                    controllers.add.SubcontractorContactDetailsYesNoController.onSubmit(mode: Mode = NormalMode)
+GET        /add/change-check-contact-details             controllers.add.SubcontractorContactDetailsYesNoController.onPageLoad(mode: Mode = CheckMode)
+POST       /add/change-check-contact-details             controllers.add.SubcontractorContactDetailsYesNoController.onSubmit(mode: Mode = CheckMode)

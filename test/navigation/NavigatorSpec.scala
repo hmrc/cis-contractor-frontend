@@ -207,6 +207,14 @@ class NavigatorSpec extends SpecBase {
           UserAnswers("id")
         ) mustBe controllers.add.routes.SubcontractorsUniqueTaxpayerReferenceController.onPageLoad(NormalMode)
       }
+      "must go from a SubcontractorContactDetailsYesNoPage  to next page" in {
+        navigator.nextPage(
+          SubcontractorContactDetailsYesNoPage,
+          NormalMode,
+          emptyUserAnswers.setOrException(SubcontractorContactDetailsYesNoPage, true)
+        ) mustBe controllers.add.routes.TradingNameOfSubcontractorController.onPageLoad(NormalMode)
+      }
+
     }
 
     "in Check mode" - {
@@ -293,6 +301,30 @@ class NavigatorSpec extends SpecBase {
       "must go from a UniqueTaxpayerReferenceYesNoPage to journey recovery when incomplete info provided" in {
         navigator.nextPage(
           UniqueTaxpayerReferenceYesNoPage,
+          CheckMode,
+          emptyUserAnswers
+        ) mustBe journeyRecovery
+      }
+
+      "must go from a SubcontractorContactDetailsYesNoPage to next page when true" in {
+        navigator.nextPage(
+          SubcontractorContactDetailsYesNoPage,
+          CheckMode,
+          emptyUserAnswers.setOrException(SubcontractorContactDetailsYesNoPage, true)
+        ) mustBe controllers.add.routes.TradingNameOfSubcontractorController.onPageLoad(CheckMode)
+      }
+
+      "must go from a SubcontractorContactDetailsYesNoPage to CYA page when false" in {
+        navigator.nextPage(
+          SubcontractorContactDetailsYesNoPage,
+          CheckMode,
+          emptyUserAnswers.setOrException(SubcontractorContactDetailsYesNoPage, false)
+        ) mustBe CYA
+      }
+
+      "must go from a SubcontractorContactDetailsYesNoPage to journey recovery when incomplete info provided" in {
+        navigator.nextPage(
+          SubcontractorContactDetailsYesNoPage,
           CheckMode,
           emptyUserAnswers
         ) mustBe journeyRecovery

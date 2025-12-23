@@ -178,6 +178,13 @@ subNationalInsuranceNumber.error.length = Enter a National Insurance number less
 subNationalInsuranceNumber.error.invalidCharacters = Enter a National Insurance number like ‘QQ 12 34 56 C’
 subNationalInsuranceNumber.change.hidden = what is the subcontractor’s National Insurance number?
 
+subcontractorContactDetailsYesNo.title = Do you want to add the subcontractor’s contact details?
+subcontractorContactDetailsYesNo.heading = Do you want to add the subcontractor’s contact details?
+subcontractorContactDetailsYesNo.hint = You can add the subcontractor’s email address and telephone number now or add them later
+subcontractorContactDetailsYesNo.checkYourAnswersLabel = Do you want to add the subcontractor’s contact details?
+subcontractorContactDetailsYesNo.error.required = Select whether you have the subcontractor’s contact details
+subcontractorContactDetailsYesNo.change.hidden = do you want to add the subcontractor’s contact details?
+
 addressOfSubcontractor.title = What is the subcontractor’s address?
 addressOfSubcontractor.heading = What is the subcontractor’s address?
 addressOfSubcontractor.addressLine1 = Address line 1
