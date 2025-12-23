@@ -41,6 +41,8 @@ class Navigator @Inject() () {
     case SubContactDetailsPage          => _ => controllers.add.routes.SubContactDetailsController.onPageLoad(NormalMode)
     case SubcontractorsUniqueTaxpayerReferencePage =>
       _ => controllers.add.routes.SubcontractorsUniqueTaxpayerReferenceController.onPageLoad(NormalMode)
+    case SubcontractorContactDetailsYesNoPage =>
+      userAnswers => navigatorFromSubcontractorContactDetailsYesNoPage(NormalMode)(userAnswers)
     case WorksReferenceNumberPage       => _ => controllers.add.routes.WorksReferenceNumberController.onPageLoad(NormalMode)
     case _                              => _ => routes.IndexController.onPageLoad()
   }
@@ -56,6 +58,7 @@ class Navigator @Inject() () {
     case SubContactDetailsPage          => _ => routes.CheckYourAnswersController.onPageLoad()
     case SubcontractorsUniqueTaxpayerReferencePage =>
       userAnswers => controllers.add.routes.SubcontractorsUniqueTaxpayerReferenceController.onPageLoad(CheckMode)
+    case SubcontractorContactDetailsYesNoPage => userAnswers => navigatorFromSubcontractorContactDetailsYesNoPage(CheckMode)(userAnswers)
     case _                       => _ => routes.CheckYourAnswersController.onPageLoad()
   }
 
@@ -104,5 +107,14 @@ class Navigator @Inject() () {
       case (Some(false), NormalMode) => controllers.add.routes.WorksReferenceNumberYesNoController.onPageLoad(NormalMode)//Subcontractor Contact Details Yes/No?
       case (Some(false), CheckMode) => routes.CheckYourAnswersController.onPageLoad()
       case (None, _) => routes.JourneyRecoveryController.onPageLoad()
+    }
+
+  private def navigatorFromSubcontractorContactDetailsYesNoPage(mode: Mode)(userAnswers: UserAnswers): Call =
+    (userAnswers.get(SubcontractorContactDetailsYesNoPage), mode) match {
+      case (Some(true), _)           => controllers.add.routes.TradingNameOfSubcontractorController.onPageLoad(mode)
+      case (Some(false), NormalMode) =>
+        controllers.add.routes.SubcontractorContactDetailsYesNoController.onPageLoad(NormalMode)
+      case (Some(false), CheckMode)  => routes.CheckYourAnswersController.onPageLoad()
+      case (None, _)                 => routes.JourneyRecoveryController.onPageLoad()
     }
 }

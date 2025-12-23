@@ -75,7 +75,7 @@ typeOfSubcontractor.partnership = Partnership
 typeOfSubcontractor.trust = Trust
 typeOfSubcontractor.checkYourAnswersLabel = What type of subcontractor are you adding?
 typeOfSubcontractor.error.required = Select how the subcontractor is operating
-typeOfSubcontractor.change.hidden = what type of subcontractor are you adding?
+typeOfSubcontractor.change.hidden = SubcontractorTypes
 
 unauthorised.guidance.org.p1.prefix = If you are a contractor or subcontractor, you will need to register with
 unauthorised.guidance.org.p1.link = Construction Industry Scheme
@@ -112,14 +112,14 @@ subTradingNameYesNo.heading = Does the subcontractor use a trading name?
 subTradingNameYesNo.hint = This is a business name, different from their own name.
 subTradingNameYesNo.checkYourAnswersLabel = Does the subcontractor use a trading name?
 subTradingNameYesNo.error.required = Select whether or not the subcontractor uses a trading name
-subTradingNameYesNo.change.hidden = does the subcontractor use a trading name?
+subTradingNameYesNo.change.hidden = Does the subcontractor use a trading name?
 
 tradingNameOfSubcontractor.title = What is the subcontractor’s trading name?
 tradingNameOfSubcontractor.heading = What is the subcontractor’s trading name?
 tradingNameOfSubcontractor.checkYourAnswersLabel = What is the subcontractor’s trading name?
 tradingNameOfSubcontractor.error.required = Enter a trading name like ABC Construction LTD
 tradingNameOfSubcontractor.error.length = Enter a trading name less or equal to 56 characters
-tradingNameOfSubcontractor.change.hidden = what is the subcontractor’s trading name?
+tradingNameOfSubcontractor.change.hidden = What is the subcontractor’s trading name?
 tradingNameOfSubcontractor.error.invalidCharacters = Enter a trading name like ABC Construction LTD
 
 subAddressYesNo.title = Do you want to add the subcontractor’s address?
@@ -127,7 +127,7 @@ subAddressYesNo.heading = Do you want to add the subcontractor’s address?
 subAddressYesNo.hint = You can add this information now, or later.
 subAddressYesNo.checkYourAnswersLabel = Do you want to add the subcontractor’s address?
 subAddressYesNo.error.required = Select whether or not to add the subcontractor’s address
-subAddressYesNo.change.hidden = do you want to add the subcontractor’s address?
+subAddressYesNo.change.hidden = Do you want to add the subcontractor’s address?
 
 nationalInsuranceNumberYesNo.title = Do you have a National Insurance number?
 nationalInsuranceNumberYesNo.heading = Do you have a National Insurance number?
@@ -153,7 +153,7 @@ subcontractorName.lastName.error.invalidCharacters = Last name must only include
 subcontractorName.lastName.error.firstChar = Enter a last name where the first character is a letter
 subcontractorName.lastName.error.length = Last name must be 35 characters or less
 subcontractorName.checkYourAnswersLabel = What is the subcontractor’s name?
-subcontractorName.change.hidden = what is the subcontractor’s name?
+subcontractorName.change.hidden = What is the subcontractor’s name?
 
 uniqueTaxpayerReferenceYesNo.title = Do you have a Unique Taxpayer Reference (UTR)?
 uniqueTaxpayerReferenceYesNo.heading = Do you have a Unique Taxpayer Reference (UTR)?
@@ -167,7 +167,7 @@ worksReferenceNumberYesNo.heading = Do you have a works reference number?
 worksReferenceNumberYesNo.hint = This is your reference number used to identify the subcontractor’s work or project. It can contain letters and numbers
 worksReferenceNumberYesNo.checkYourAnswersLabel = Do you have a works reference number?
 worksReferenceNumberYesNo.error.required = Select whether you have the subcontractor’s work reference number or not
-worksReferenceNumberYesNo.change.hidden = do you have a works reference number?
+worksReferenceNumberYesNo.change.hidden = Do you have a works reference number?
 
 subNationalInsuranceNumber.title = What is the subcontractor’s National Insurance number?
 subNationalInsuranceNumber.heading = What is the subcontractor’s National Insurance number?
@@ -177,6 +177,13 @@ subNationalInsuranceNumber.error.required = Enter a National Insurance number li
 subNationalInsuranceNumber.error.length = Enter a National Insurance number less or equal to 9 characters
 subNationalInsuranceNumber.error.invalidCharacters = Enter a National Insurance number like ‘QQ 12 34 56 C’
 subNationalInsuranceNumber.change.hidden = what is the subcontractor’s National Insurance number?
+
+subcontractorContactDetailsYesNo.title = Do you want to add the subcontractor’s contact details?
+subcontractorContactDetailsYesNo.heading = Do you want to add the subcontractor’s contact details?
+subcontractorContactDetailsYesNo.hint = You can add the subcontractor’s email address and telephone number now or add them later
+subcontractorContactDetailsYesNo.checkYourAnswersLabel = Do you want to add the subcontractor’s contact details?
+subcontractorContactDetailsYesNo.error.required = Select whether you have the subcontractor’s contact details
+subcontractorContactDetailsYesNo.change.hidden = do you want to add the subcontractor’s contact details?
 
 worksReferenceNumber.title = What is the works reference number?
 worksReferenceNumber.heading = What is the works reference number?
@@ -202,7 +209,7 @@ addressOfSubcontractor.addressLine1.change.hidden = address Line 1
 addressOfSubcontractor.addressLine2.change.hidden = address line 2 (optional)
 addressOfSubcontractor.addressLine3 =  Town or city
 addressOfSubcontractor.addressLine4 = Country (optional)
-addressOfSubcontractor.postCode = Postcode
+addressOfSubcontractor.postCode  = Postcode
 
 addressOfSubcontractor.error.addressLine1.invalidCharacters = The first line of the address contains invalid characters
 addressOfSubcontractor.error.addressLine2.invalidCharacters = The second line of the address contains invalid characters
