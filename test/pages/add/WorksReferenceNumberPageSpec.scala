@@ -14,12 +14,18 @@
  * limitations under the License.
  */
 
-package forms
+package pages.add
 
-object Validation {
+import pages.behaviours.PageBehaviours
 
-  final val ninoRegex = """(?i)^[ \t]*[[A-Z]&&[^DFIQUV]][ \t]*[[A-Z]&&[^DFIQUV]][ \t]*[0-9][ \t]*[0-9][ \t]*""" +
-    """[0-9][ \t]*[0-9][ \t]*[0-9][ \t]*[0-9][ \t]*[A-D]?[ \t]*$"""
-  final val worksRefRegex = """^[A-Za-z0-9 ~!@#$%&'()*+,-./:;=?_{}£€]+$"""
-  
+class WorksReferenceNumberPageSpec extends PageBehaviours {
+
+  "worksReferenceNumber" - {
+
+    beRetrievable[String](WorksReferenceNumberPage)
+
+    beSettable[String](WorksReferenceNumberPage)
+
+    beRemovable[String](WorksReferenceNumberPage)
+  }
 }

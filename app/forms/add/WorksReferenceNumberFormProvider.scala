@@ -14,12 +14,21 @@
  * limitations under the License.
  */
 
-package forms
+package forms.add
 
-object Validation {
+import forms.Validation
+import forms.mappings.Mappings
+import play.api.data.Form
 
-  final val ninoRegex = """(?i)^[ \t]*[[A-Z]&&[^DFIQUV]][ \t]*[[A-Z]&&[^DFIQUV]][ \t]*[0-9][ \t]*[0-9][ \t]*""" +
-    """[0-9][ \t]*[0-9][ \t]*[0-9][ \t]*[0-9][ \t]*[A-D]?[ \t]*$"""
-  final val worksRefRegex = """^[A-Za-z0-9 ~!@#$%&'()*+,-./:;=?_{}£€]+$"""
-  
+import javax.inject.Inject
+
+class WorksReferenceNumberFormProvider @Inject() extends Mappings {
+
+  def apply(): Form[String] =
+    Form(
+      "value" -> text("worksReferenceNumber.error.required")
+        .transform(_.trim, identity)
+        .verifying(regexp(Validation.worksRefRegex, "worksReferenceNumber.error.invalid"))
+        .verifying(maxLength(20, "worksReferenceNumber.error.length"))
+    )
 }

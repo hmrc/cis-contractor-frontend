@@ -73,6 +73,11 @@ POST       /add/national-insurance-number                controllers.add.SubNati
 GET        /add/change-national-insurance-number         controllers.add.SubNationalInsuranceNumberController.onPageLoad(mode: Mode = CheckMode)
 POST       /add/change-national-insurance-number         controllers.add.SubNationalInsuranceNumberController.onSubmit(mode: Mode = CheckMode)
 
+GET        /add/works-reference-number                   controllers.add.WorksReferenceNumberController.onPageLoad(mode: Mode = NormalMode)
+POST       /add/works-reference-number                   controllers.add.WorksReferenceNumberController.onSubmit(mode: Mode = NormalMode)
+GET        /add/change-works-reference-number            controllers.add.WorksReferenceNumberController.onPageLoad(mode: Mode = CheckMode)
+POST       /add/change-works-reference-number            controllers.add.WorksReferenceNumberController.onSubmit(mode: Mode = CheckMode)
+
 GET        /add/address                        controllers.add.AddressOfSubcontractorController.onPageLoad(mode: Mode = NormalMode)
 POST       /add/address                        controllers.add.AddressOfSubcontractorController.onSubmit(mode: Mode = NormalMode)
 GET        /add/change-address                  controllers.add.AddressOfSubcontractorController.onPageLoad(mode: Mode = CheckMode)

@@ -43,6 +43,7 @@ class Navigator @Inject() () {
       _ => controllers.add.routes.SubcontractorsUniqueTaxpayerReferenceController.onPageLoad(NormalMode)
     case SubcontractorContactDetailsYesNoPage =>
       userAnswers => navigatorFromSubcontractorContactDetailsYesNoPage(NormalMode)(userAnswers)
+    case WorksReferenceNumberPage       => _ => controllers.add.routes.WorksReferenceNumberController.onPageLoad(NormalMode)
     case _                              => _ => routes.IndexController.onPageLoad()
   }
 
@@ -52,6 +53,7 @@ class Navigator @Inject() () {
     case AddressOfSubcontractorPage => _ => routes.CheckYourAnswersController.onPageLoad()
     case NationalInsuranceNumberYesNoPage => userAnswers => navigatorFromNationalInsuranceNumberYesNoPage(CheckMode)(userAnswers)
     case UniqueTaxpayerReferenceYesNoPage => userAnswers => navigatorFromUniqueTaxpayerReferenceYesNoPage(CheckMode)(userAnswers)
+    case WorksReferenceNumberPage => userAnswers => controllers.add.routes.WorksReferenceNumberController.onPageLoad(CheckMode)
     case WorksReferenceNumberYesNoPage     => userAnswers => navigatorFromWorksReferenceNumberYesNoPage(CheckMode)(userAnswers)
     case SubContactDetailsPage          => _ => routes.CheckYourAnswersController.onPageLoad()
     case SubcontractorsUniqueTaxpayerReferencePage =>

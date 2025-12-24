@@ -116,6 +116,14 @@ class NavigatorSpec extends SpecBase {
         navigator.nextPage(SubcontractorNamePage, NormalMode, UserAnswers("id")) mustBe controllers.add.routes.SubcontractorNameController.onPageLoad(NormalMode)
       }
 
+      "must go from a WorksReferenceNumberPage  to next page" in {
+        navigator.nextPage(
+          WorksReferenceNumberPage,
+          NormalMode,
+          UserAnswers("id")
+        ) mustBe controllers.add.routes.WorksReferenceNumberController.onPageLoad(NormalMode)
+      }
+
       "must go from a NationalInsuranceNumberYesNoPage to next page when false" in {
         navigator.nextPage(
           NationalInsuranceNumberYesNoPage,
@@ -353,6 +361,14 @@ class NavigatorSpec extends SpecBase {
           emptyUserAnswers
         ) mustBe journeyRecovery
       }
+      "must go from a WorksReferenceNumberPage  to next page in check mode" in {
+        navigator.nextPage(
+          WorksReferenceNumberPage,
+          CheckMode,
+          UserAnswers("id")
+        ) mustBe controllers.add.routes.WorksReferenceNumberController.onPageLoad(CheckMode)
+      }
+
       "must go from a WorksReferenceNumberYesNoPage to next page when true" in {
         navigator.nextPage(
           WorksReferenceNumberYesNoPage,
