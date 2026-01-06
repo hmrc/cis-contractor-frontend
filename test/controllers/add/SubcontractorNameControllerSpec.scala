@@ -21,14 +21,12 @@ import controllers.routes
 import forms.add.SubcontractorNameFormProvider
 import models.NormalMode
 import models.add.*
-import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
 import pages.add.SubcontractorNamePage
 import play.api.inject.bind
 import play.api.libs.json.{Json, OFormat}
-import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import repositories.SessionRepository
@@ -37,8 +35,6 @@ import views.html.add.SubcontractorNameView
 import scala.concurrent.Future
 
 class SubcontractorNameControllerSpec extends SpecBase with MockitoSugar {
-
-  def onwardRoute = Call("GET", "/foo")
 
   val formProvider = new SubcontractorNameFormProvider()
   val form         = formProvider()
@@ -86,7 +82,7 @@ class SubcontractorNameControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must redirect to the next page when valid data is submitted" in {
+    "must redirect to the SubTradingNameYesNo page when valid data is submitted" in {
 
       val mockSessionRepository = mock[SessionRepository]
 
@@ -95,7 +91,6 @@ class SubcontractorNameControllerSpec extends SpecBase with MockitoSugar {
       val application =
         applicationBuilder(userAnswers = Some(emptyUserAnswers))
           .overrides(
-            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
             bind[SessionRepository].toInstance(mockSessionRepository)
           )
           .build()
@@ -112,7 +107,7 @@ class SubcontractorNameControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual onwardRoute.url
+        redirectLocation(result).value mustEqual controllers.add.routes.SubTradingNameYesNoController.onPageLoad(NormalMode).url
       }
     }
 
