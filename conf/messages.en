@@ -112,7 +112,7 @@ subTradingNameYesNo.heading = Does the subcontractor use a trading name?
 subTradingNameYesNo.hint = This is a business name, different from their own name.
 subTradingNameYesNo.checkYourAnswersLabel = Trading name
 subTradingNameYesNo.error.required = Select whether or not the subcontractor uses a trading name
-subTradingNameYesNo.change.hidden =  Trading name
+subTradingNameYesNo.change.hidden =  trading name
 
 tradingNameOfSubcontractor.title = What is the subcontractor’s trading name?
 tradingNameOfSubcontractor.heading = What is the subcontractor’s trading name?
