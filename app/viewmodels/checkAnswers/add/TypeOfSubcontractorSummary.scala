@@ -14,37 +14,36 @@
  * limitations under the License.
  */
 
-package viewmodels.checkAnswers
+package viewmodels.checkAnswers.add
 
-import models.add.SubcontractorName.format
 import models.{CheckMode, UserAnswers}
-import pages.add.SubcontractorNamePage
+import pages.add.TypeOfSubcontractorPage
 import play.api.i18n.Messages
-import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
+import play.twirl.api.HtmlFormat
+import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
 
-object SubcontractorNameSummary {
+object TypeOfSubcontractorSummary  {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(SubcontractorNamePage).map { answer =>
+    answers.get(TypeOfSubcontractorPage).map {
+      answer =>
 
-      val fullName = Seq(
-        Some(answer.firstName),
-        answer.middleName,
-        Some(answer.lastName)
-      ).flatten.mkString(" ")
-
-      SummaryListRowViewModel(
-        key = "subcontractorName.checkYourAnswersLabel",
-        value = ValueViewModel(Text(fullName)),
-        actions = Seq(
-          ActionItemViewModel(
-            "site.change",
-            controllers.add.routes.SubcontractorNameController.onPageLoad(CheckMode).url
-          ).withVisuallyHiddenText(messages("subcontractorName.change.hidden"))
+        val value = ValueViewModel(
+          HtmlContent(
+            HtmlFormat.escape(messages(s"typeOfSubcontractor.$answer"))
+          )
         )
-      )
+
+        SummaryListRowViewModel(
+          key     = "typeOfSubcontractor.checkYourAnswersLabel",
+          value   = value,
+          actions = Seq(
+            ActionItemViewModel("site.change", controllers.add.routes.TypeOfSubcontractorController.onPageLoad(CheckMode).url)
+              .withVisuallyHiddenText(messages("typeOfSubcontractor.change.hidden"))
+          )
+        )
     }
 }

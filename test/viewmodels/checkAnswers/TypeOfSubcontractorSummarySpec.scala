@@ -27,6 +27,7 @@ import pages.add.TypeOfSubcontractorPage
 import play.api.i18n.Messages
 import play.api.test.Helpers.stubMessages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.*
+import viewmodels.checkAnswers.add.TypeOfSubcontractorSummary
 
 class TypeOfSubcontractorSummarySpec extends AnyFreeSpec with Matchers {
 
