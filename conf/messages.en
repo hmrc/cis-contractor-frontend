@@ -119,7 +119,7 @@ tradingNameOfSubcontractor.heading = What is the subcontractor’s trading name?
 tradingNameOfSubcontractor.checkYourAnswersLabel = Trading name
 tradingNameOfSubcontractor.error.required = Enter a trading name like ABC Construction LTD
 tradingNameOfSubcontractor.error.length = Enter a trading name less or equal to 56 characters
-tradingNameOfSubcontractor.change.hidden = Trading name
+tradingNameOfSubcontractor.change.hidden = trading name
 tradingNameOfSubcontractor.error.invalidCharacters = Enter a trading name like ABC Construction LTD
 
 subAddressYesNo.title = Do you want to add the subcontractor’s address?
@@ -192,7 +192,7 @@ worksReferenceNumber.checkYourAnswersLabel = Works reference number
 worksReferenceNumber.error.required = Enter a works reference number
 worksReferenceNumber.error.invalid = Enter a valid works reference number
 worksReferenceNumber.error.length = Enter a works reference number less or equal to 20 characters
-worksReferenceNumber.change.hidden = Works reference number
+worksReferenceNumber.change.hidden = works reference number
 
 addressOfSubcontractor.title = What is the subcontractor’s address?
 addressOfSubcontractor.heading = What is the subcontractor’s address?
@@ -248,6 +248,7 @@ subcontractorsUniqueTaxpayerReference.error.required = Enter a Unique Taxpayer R
 subcontractorsUniqueTaxpayerReference.error.invalid = Enter a Unique Taxpayer Reference as a 10 digit number
 subcontractorsUniqueTaxpayerReference.error.length = Enter a Unique Taxpayer Reference as a 10 digit number
 subcontractorsUniqueTaxpayerReference.change.hidden = Unique Taxpayer Reference
+
 checkYourAnswers.heading.sub.h2 = Subcontractor details
 checkYourAnswers.heading.h2 = Now add the subcontractor
 checkYourAnswers.warning = You must verify this subcontractor with HMRC before making any payments to them.
