@@ -57,7 +57,7 @@ class SubcontractorsUniqueTaxpayerReferenceSummarySpec extends AnyFreeSpec with 
       val changeAction       = actions.head
       val expectedChangeText = messages("site.change")
       val expectedHref       =
-        routes.SubcontractorsUniqueTaxpayerReferenceController.onPageLoad(CheckMode).url
+        routes.UniqueTaxpayerReferenceYesNoController.onPageLoad(CheckMode).url
       val expectedHiddenText = messages("subcontractorsUniqueTaxpayerReference.change.hidden")
 
       changeAction.content.asHtml.toString should include(expectedChangeText)

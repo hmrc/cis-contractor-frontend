@@ -177,7 +177,7 @@ class NavigatorSpec extends SpecBase {
           WorksReferenceNumberYesNoPage,
           NormalMode,
           emptyUserAnswers.setOrException(WorksReferenceNumberYesNoPage, true)
-        ) mustBe controllers.add.routes.WorksReferenceNumberYesNoController.onPageLoad(NormalMode)
+        ) mustBe controllers.add.routes.WorksReferenceNumberController.onPageLoad(NormalMode)
       }
 
       "must go from a WorksReferenceNumberYesNoPage to next page when false" in {
@@ -374,7 +374,7 @@ class NavigatorSpec extends SpecBase {
           WorksReferenceNumberYesNoPage,
           CheckMode,
           emptyUserAnswers.setOrException(WorksReferenceNumberYesNoPage, true)
-        ) mustBe controllers.add.routes.WorksReferenceNumberYesNoController.onPageLoad(CheckMode)
+        ) mustBe controllers.add.routes.WorksReferenceNumberController.onPageLoad(CheckMode)
       }
 
       "must go from a WorksReferenceNumberYesNoPage to CYA page when false" in {
