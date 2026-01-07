@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package viewmodels.checkAnswers
+package viewmodels.checkAnswers.add
 
 import controllers.add.routes
 import models.add.SubcontractorName
@@ -28,7 +28,6 @@ import pages.add.SubcontractorNamePage
 import play.api.i18n.Messages
 import play.api.test.Helpers.stubMessages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
-import viewmodels.checkAnswers.add.SubcontractorNameSummary
 
 class SubcontractorNameSummarySpec extends AnyFreeSpec with Matchers {
 

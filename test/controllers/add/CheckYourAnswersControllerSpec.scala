@@ -14,17 +14,18 @@
  * limitations under the License.
  */
 
-package controllers
+package controllers.add
 
 import base.SpecBase
-import pages.add._
+import controllers.routes
+import pages.add.*
 import play.api.i18n.{Messages, MessagesApi}
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
+import viewmodels.checkAnswers.add.*
 import viewmodels.govuk.SummaryListFluency
-import viewmodels.govuk.summarylist._
-import viewmodels.checkAnswers.add._
-import views.html.CheckYourAnswersView
+import viewmodels.govuk.summarylist.*
+import views.html.add.CheckYourAnswersView
 
 class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency {
 
@@ -34,7 +35,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency {
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
       running(application) {
-        val request = FakeRequest(GET, routes.CheckYourAnswersController.onPageLoad().url)
+        val request = FakeRequest(GET, controllers.add.routes.CheckYourAnswersController.onPageLoad().url)
         val result  = route(application, request).value
 
         implicit val messages: Messages =
@@ -52,7 +53,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency {
       val application = applicationBuilder(userAnswers = None).build()
 
       running(application) {
-        val request = FakeRequest(GET, routes.CheckYourAnswersController.onPageLoad().url)
+        val request = FakeRequest(GET, controllers.add.routes.CheckYourAnswersController.onPageLoad().url)
         val result  = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
@@ -73,7 +74,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency {
       val application = applicationBuilder(userAnswers = Some(uaWithNoAnswers)).build()
 
       running(application) {
-        val request = FakeRequest(GET, routes.CheckYourAnswersController.onPageLoad().url)
+        val request = FakeRequest(GET, controllers.add.routes.CheckYourAnswersController.onPageLoad().url)
         val result  = route(application, request).value
 
         implicit val messages: Messages =
@@ -131,7 +132,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency {
       val application = applicationBuilder(userAnswers = Some(uaWithYesAnswers)).build()
 
       running(application) {
-        val request = FakeRequest(GET, routes.CheckYourAnswersController.onPageLoad().url)
+        val request = FakeRequest(GET, controllers.add.routes.CheckYourAnswersController.onPageLoad().url)
         val result  = route(application, request).value
 
         implicit val messages: Messages =
@@ -160,11 +161,11 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency {
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
       // update this test later when submit will be implemented
       running(application) {
-        val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit().url)
+        val request = FakeRequest(POST, controllers.add.routes.CheckYourAnswersController.onSubmit().url)
         val result  = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.CheckYourAnswersController.onPageLoad().url
+        redirectLocation(result).value mustEqual controllers.add.routes.CheckYourAnswersController.onPageLoad().url
       }
     }
 
@@ -172,7 +173,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency {
       val application = applicationBuilder(userAnswers = None).build()
 
       running(application) {
-        val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit().url)
+        val request = FakeRequest(POST, controllers.add.routes.CheckYourAnswersController.onSubmit().url)
         val result  = route(application, request).value
 
         status(result) mustEqual SEE_OTHER

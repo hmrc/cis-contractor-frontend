@@ -30,7 +30,7 @@
  * limitations under the License.
  */
 
-package controllers
+package controllers.add
 
 import com.google.inject.Inject
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
@@ -41,7 +41,7 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.checkAnswers.add.*
 import viewmodels.govuk.summarylist.*
-import views.html.CheckYourAnswersView
+import views.html.add.CheckYourAnswersView
 
 import scala.concurrent.Future
 
@@ -99,7 +99,7 @@ class CheckYourAnswersController @Inject() (
 
   def onSubmit(): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
-      Future.successful(Redirect(routes.CheckYourAnswersController.onPageLoad()))
+      Future.successful(Redirect(controllers.add.routes.CheckYourAnswersController.onPageLoad()))
     }
 
   private def showOnlyIfNo(

@@ -31,7 +31,7 @@
 
 @layout(pageTitle = titleNoForm(messages("checkYourAnswers.title"))) {
 
-    @formHelper(action = routes.CheckYourAnswersController.onSubmit(), Symbol("autoComplete") -> "off") {
+    @formHelper(action = controllers.add.routes.CheckYourAnswersController.onSubmit(), Symbol("autoComplete") -> "off") {
 
         @h1("checkYourAnswers.heading")
         @h2("checkYourAnswers.heading.sub.h2")

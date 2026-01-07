@@ -27,7 +27,7 @@ class NavigatorSpec extends SpecBase {
   val navigator = new Navigator
 
   private lazy val journeyRecovery = routes.JourneyRecoveryController.onPageLoad()
-  private lazy val CYA             = routes.CheckYourAnswersController.onPageLoad()
+  private lazy val CYA             = controllers.add.routes.CheckYourAnswersController.onPageLoad()
 
   "Navigator" - {
 
@@ -230,7 +230,7 @@ class NavigatorSpec extends SpecBase {
       "must go from a page that doesn't exist in the edit route map to CheckYourAnswers" in {
 
         case object UnknownPage extends Page
-        navigator.nextPage(UnknownPage, CheckMode, UserAnswers("id")) mustBe routes.CheckYourAnswersController
+        navigator.nextPage(UnknownPage, CheckMode, UserAnswers("id")) mustBe controllers.add.routes.CheckYourAnswersController
           .onPageLoad()
       }
 
