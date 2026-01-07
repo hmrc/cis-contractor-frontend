@@ -20,6 +20,7 @@ import base.SpecBase
 import controllers.routes
 import pages.*
 import models.*
+import models.add.TypeOfSubcontractor
 import pages.add.*
 
 class NavigatorSpec extends SpecBase {
@@ -39,20 +40,20 @@ class NavigatorSpec extends SpecBase {
         navigator.nextPage(UnknownPage, NormalMode, UserAnswers("id")) mustBe routes.IndexController.onPageLoad()
       }
 
-      "must go from a TypeOfSubcontractorPage to SubcontractorNamePage" in {
+      "must go from a TypeOfSubcontractorPage to SubTradingNameYesNo when Individualorsoletrader is selected" in {
         navigator.nextPage(
             TypeOfSubcontractorPage,
             NormalMode,
-            UserAnswers("id")
-        ) mustBe controllers.add.routes.SubcontractorNameController.onPageLoad(NormalMode)
+            emptyUserAnswers.setOrException(TypeOfSubcontractorPage, TypeOfSubcontractor.Individualorsoletrader)
+        ) mustBe controllers.add.routes.SubTradingNameYesNoController.onPageLoad(NormalMode)
       }
 
-      "must go from a SubcontractorNamePage to SubTradingNameYesNoPage" in {
+      "must go from a SubcontractorNamePage to SubAddressYesNoPage" in {
         navigator.nextPage(
           SubcontractorNamePage,
           NormalMode,
           UserAnswers("id")
-        ) mustBe controllers.add.routes.SubTradingNameYesNoController.onPageLoad(NormalMode)
+        ) mustBe controllers.add.routes.SubAddressYesNoController.onPageLoad(NormalMode)
       }
 
       "must go from a SubTradingNameYesNoPage to TradingNameOfSubcontractorPage when true" in {
@@ -63,12 +64,12 @@ class NavigatorSpec extends SpecBase {
         ) mustBe controllers.add.routes.TradingNameOfSubcontractorController.onPageLoad(NormalMode)
       }
 
-      "must go from a SubTradingNameYesNoPage to SubAddressYesNoPage when false" in {
+      "must go from a SubTradingNameYesNoPage to SubcontractorNamePage when false" in {
         navigator.nextPage(
             SubTradingNameYesNoPage,
             NormalMode,
             emptyUserAnswers.setOrException(SubTradingNameYesNoPage, false)
-        ) mustBe controllers.add.routes.SubAddressYesNoController.onPageLoad(NormalMode)
+        ) mustBe controllers.add.routes.SubcontractorNameController.onPageLoad(NormalMode)
       }
 
       "must go from a SubTradingNameYesNoPage to journey recovery page when incomplete info provided" in {

@@ -82,7 +82,7 @@ class SubcontractorNameControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must redirect to the SubTradingNameYesNo page when valid data is submitted" in {
+    "must redirect to the SubAddressYesNo page when valid data is submitted" in {
 
       val mockSessionRepository = mock[SessionRepository]
 
@@ -107,7 +107,7 @@ class SubcontractorNameControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.add.routes.SubTradingNameYesNoController.onPageLoad(NormalMode).url
+        redirectLocation(result).value mustEqual controllers.add.routes.SubAddressYesNoController.onPageLoad(NormalMode).url
       }
     }
 
