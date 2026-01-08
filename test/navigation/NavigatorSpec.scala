@@ -48,6 +48,38 @@ class NavigatorSpec extends SpecBase {
         ) mustBe controllers.add.routes.SubTradingNameYesNoController.onPageLoad(NormalMode)
       }
 
+      "must go from a TypeOfSubcontractorPage to SubTradingNameYesNo when Limitedcompany is selected" in {
+        navigator.nextPage(
+          TypeOfSubcontractorPage,
+          NormalMode,
+          emptyUserAnswers.setOrException(TypeOfSubcontractorPage, TypeOfSubcontractor.Limitedcompany)
+        ) mustBe routes.JourneyRecoveryController.onPageLoad()
+      }
+
+      "must go from a TypeOfSubcontractorPage to SubTradingNameYesNo when Partnership is selected" in {
+        navigator.nextPage(
+          TypeOfSubcontractorPage,
+          NormalMode,
+          emptyUserAnswers.setOrException(TypeOfSubcontractorPage, TypeOfSubcontractor.Partnership)
+        ) mustBe routes.JourneyRecoveryController.onPageLoad()
+      }
+
+      "must go from a TypeOfSubcontractorPage to SubTradingNameYesNo when Trust is selected" in {
+        navigator.nextPage(
+          TypeOfSubcontractorPage,
+          NormalMode,
+          emptyUserAnswers.setOrException(TypeOfSubcontractorPage, TypeOfSubcontractor.Trust)
+        ) mustBe routes.JourneyRecoveryController.onPageLoad()
+      }
+
+      "must go from a TypeOfSubcontractorPage to journey recovery page when incomplete info provided" in {
+        navigator.nextPage(
+          TypeOfSubcontractorPage,
+          NormalMode,
+          emptyUserAnswers
+        ) mustBe journeyRecovery
+      }
+
       "must go from a SubcontractorNamePage to SubAddressYesNoPage" in {
         navigator.nextPage(
           SubcontractorNamePage,
@@ -255,6 +287,22 @@ class NavigatorSpec extends SpecBase {
         case object UnknownPage extends Page
         navigator.nextPage(UnknownPage, CheckMode, UserAnswers("id")) mustBe routes.CheckYourAnswersController
           .onPageLoad()
+      }
+
+      "must go from TypeOfSubcontractorPage to CYA when valid data is submitted" in {
+        navigator.nextPage(
+          TypeOfSubcontractorPage,
+          CheckMode,
+          emptyUserAnswers.setOrException(TypeOfSubcontractorPage, TypeOfSubcontractor.values.head)
+        ) mustBe CYA
+      }
+
+      "must go from a TypeOfSubcontractorPage to journey recovery page when incomplete info provided" in {
+        navigator.nextPage(
+          TypeOfSubcontractorPage,
+          CheckMode,
+          emptyUserAnswers
+        ) mustBe journeyRecovery
       }
 
       "must go from SubTradingNameYesNoPage to TradingNameOfSubcontractorController when true" in {
