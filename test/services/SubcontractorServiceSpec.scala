@@ -36,7 +36,7 @@ class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
 
   "SubcontractorService" - {
     "createSubcontractor" - {
-      "should create a subcontractor if a trading name is provided" in {
+      "should create a subcontractor when a subcontractor type is provided" in {
         val mockConnector: ConstructionIndustrySchemeConnector = mock[ConstructionIndustrySchemeConnector]
         val service                                            = new SubcontractorService(mockConnector)
 
@@ -58,7 +58,7 @@ class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
         verifyNoMoreInteractions(mockConnector)
       }
 
-      "should fail when Subcontractor Type not found in session data" in {
+      "should fail when subcontractor type not found in session data" in {
         val mockConnector: ConstructionIndustrySchemeConnector = mock[ConstructionIndustrySchemeConnector]
         val service                                            = new SubcontractorService(mockConnector)
 
