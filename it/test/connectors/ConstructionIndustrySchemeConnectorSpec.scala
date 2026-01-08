@@ -23,6 +23,7 @@ import models.subcontractor.SubcontractorCreateRequest
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
+import play.api.http.Status.{CREATED, INTERNAL_SERVER_ERROR}
 import uk.gov.hmrc.http.HeaderCarrier
 
 class ConstructionIndustrySchemeConnectorSpec
@@ -50,7 +51,7 @@ class ConstructionIndustrySchemeConnectorSpec
         post(urlPathEqualTo("/cis/subcontractor/create"))
           .willReturn(
             aResponse()
-              .withStatus(200)
+              .withStatus(CREATED)
               .withBody(responseJson)
           )
       )
@@ -71,7 +72,7 @@ class ConstructionIndustrySchemeConnectorSpec
     "propagate upstream error on non-2xx" in {
       stubFor(
         post(urlPathEqualTo("/cis/subcontractor/create"))
-          .willReturn(aResponse().withStatus(500).withBody("boom"))
+          .willReturn(aResponse().withStatus(INTERNAL_SERVER_ERROR).withBody("boom"))
       )
 
       val ex = intercept[Exception] {
