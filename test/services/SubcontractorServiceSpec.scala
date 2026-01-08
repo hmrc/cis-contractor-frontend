@@ -19,7 +19,7 @@ package services
 import base.SpecBase
 import connectors.ConstructionIndustrySchemeConnector
 import models.add.TypeOfSubcontractor
-import models.subcontractor.{SubcontractorCreateRequest, SubcontractorCreateResponse}
+import models.subcontractor.{CreateSubcontractorRequest, CreateSubcontractorResponse}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{verify, verifyNoMoreInteractions, when}
 import org.scalatestplus.mockito.MockitoSugar
@@ -42,8 +42,8 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
 
         val mockSubContractorResourceRef = 10
 
-        when(mockConnector.createSubcontractor(any[SubcontractorCreateRequest])(any[HeaderCarrier]))
-          .thenReturn(Future.successful(SubcontractorCreateResponse(subbieResourceRef = mockSubContractorResourceRef)))
+        when(mockConnector.createSubcontractor(any[CreateSubcontractorRequest])(any[HeaderCarrier]))
+          .thenReturn(Future.successful(CreateSubcontractorResponse(subbieResourceRef = mockSubContractorResourceRef)))
 
         val expectedUserAnswers = emptyUserAnswers
           .set(TypeOfSubcontractorPage, TypeOfSubcontractor.Trust)
@@ -52,9 +52,9 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
 
         val result = service.createSubcontractor(1, expectedUserAnswers)
 
-        result.futureValue mustBe SubcontractorCreateResponse(mockSubContractorResourceRef)
+        result.futureValue mustBe CreateSubcontractorResponse(mockSubContractorResourceRef)
 
-        verify(mockConnector).createSubcontractor(any[SubcontractorCreateRequest])(any[HeaderCarrier])
+        verify(mockConnector).createSubcontractor(any[CreateSubcontractorRequest])(any[HeaderCarrier])
         verifyNoMoreInteractions(mockConnector)
       }
 
@@ -62,7 +62,7 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
         val mockConnector: ConstructionIndustrySchemeConnector = mock[ConstructionIndustrySchemeConnector]
         val service                                            = new SubcontractorService(mockConnector)
 
-        when(mockConnector.createSubcontractor(any[SubcontractorCreateRequest])(any[HeaderCarrier]))
+        when(mockConnector.createSubcontractor(any[CreateSubcontractorRequest])(any[HeaderCarrier]))
           .thenReturn(Future.failed(new Exception("bang")))
 
         val exception =
@@ -75,7 +75,7 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
         val mockConnector: ConstructionIndustrySchemeConnector = mock[ConstructionIndustrySchemeConnector]
         val service                                            = new SubcontractorService(mockConnector)
 
-        when(mockConnector.createSubcontractor(any[SubcontractorCreateRequest])(any[HeaderCarrier]))
+        when(mockConnector.createSubcontractor(any[CreateSubcontractorRequest])(any[HeaderCarrier]))
           .thenReturn(Future.failed(new Exception("bang")))
 
         val expectedUserAnswers = emptyUserAnswers
@@ -88,7 +88,7 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
 
         exception.getMessage must include("bang")
 
-        verify(mockConnector).createSubcontractor(any[SubcontractorCreateRequest])(any[HeaderCarrier])
+        verify(mockConnector).createSubcontractor(any[CreateSubcontractorRequest])(any[HeaderCarrier])
         verifyNoMoreInteractions(mockConnector)
       }
     }

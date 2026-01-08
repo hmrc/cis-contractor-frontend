@@ -19,7 +19,7 @@ package controllers.add
 import base.SpecBase
 import forms.add.TypeOfSubcontractorFormProvider
 import models.add.TypeOfSubcontractor
-import models.subcontractor.SubcontractorCreateResponse
+import models.subcontractor.CreateSubcontractorResponse
 import models.{NormalMode, UserAnswers}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{verify, verifyNoMoreInteractions, when}
@@ -90,7 +90,7 @@ class TypeOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
       when(mockSubcontractorService.createSubcontractor(any[Int], any[UserAnswers])(any[HeaderCarrier])).thenReturn(
         Future
-          .successful(SubcontractorCreateResponse(subbieResourceRef = 2))
+          .successful(CreateSubcontractorResponse(subbieResourceRef = 2))
       )
 
       val application =
