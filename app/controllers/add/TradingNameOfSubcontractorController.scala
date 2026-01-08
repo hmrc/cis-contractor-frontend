@@ -1,5 +1,5 @@
 /*
- * Copyright 2026 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,6 @@ import pages.add.TradingNameOfSubcontractorPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
-import services.SubcontractorService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.add.TradingNameOfSubcontractorView
 
@@ -40,8 +39,7 @@ class TradingNameOfSubcontractorController @Inject() (
   requireData: DataRequiredAction,
   formProvider: TradingNameOfSubcontractorFormProvider,
   val controllerComponents: MessagesControllerComponents,
-  view: TradingNameOfSubcontractorView,
-  subcontractorService: SubcontractorService
+  view: TradingNameOfSubcontractorView
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport {
@@ -67,8 +65,6 @@ class TradingNameOfSubcontractorController @Inject() (
           value =>
             for {
               updatedAnswers <- Future.fromTry(request.userAnswers.set(TradingNameOfSubcontractorPage, value))
-              // TODO
-              // _              <- subcontractorService.createSubcontractor(0, updatedAnswers)
               _              <- sessionRepository.set(updatedAnswers)
             } yield Redirect(navigator.nextPage(TradingNameOfSubcontractorPage, mode, updatedAnswers))
         )
