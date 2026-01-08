@@ -12,8 +12,8 @@ GET         /refresh-session                             controllers.KeepAliveCo
 
 GET         /there-is-a-problem                          controllers.JourneyRecoveryController.onPageLoad(continueUrl: Option[RedirectUrl] ?= None)
 
-GET         /check-your-answers                          controllers.add.CheckYourAnswersController.onPageLoad()
-POST        /check-your-answers                          controllers.add.CheckYourAnswersController.onSubmit()
+GET         /individual/check-answers                    controllers.add.CheckYourAnswersController.onPageLoad()
+POST        /individual/check-answers                    controllers.add.CheckYourAnswersController.onSubmit()
 
 GET         /account/sign-out-survey                     controllers.auth.AuthController.signOut()
 GET         /account/sign-out                            controllers.auth.AuthController.signOutNoSurvey()
@@ -31,8 +31,8 @@ GET         /system-error/there-is-a-problem             controllers.SystemError
 
 GET        /add/type-of-subcontractor                    controllers.add.TypeOfSubcontractorController.onPageLoad(mode: Mode = NormalMode)
 POST       /add/type-of-subcontractor                    controllers.add.TypeOfSubcontractorController.onSubmit(mode: Mode = NormalMode)
-GET        /add/type-of-subcontractor                    controllers.add.TypeOfSubcontractorController.onPageLoad(mode: Mode = CheckMode)
-POST       /add/type-of-subcontractor                    controllers.add.TypeOfSubcontractorController.onSubmit(mode: Mode = CheckMode)
+GET        /add/change-type-of-subcontractor             controllers.add.TypeOfSubcontractorController.onPageLoad(mode: Mode = CheckMode)
+POST       /add/change-type-of-subcontractor             controllers.add.TypeOfSubcontractorController.onSubmit(mode: Mode = CheckMode)
 
 GET        /add/check-trading-name                       controllers.add.SubTradingNameYesNoController.onPageLoad(mode: Mode = NormalMode)
 POST       /add/check-trading-name                       controllers.add.SubTradingNameYesNoController.onSubmit(mode: Mode = NormalMode)

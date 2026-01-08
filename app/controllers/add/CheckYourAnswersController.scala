@@ -34,7 +34,6 @@ package controllers.add
 
 import com.google.inject.Inject
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
-import pages.add.*
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
@@ -56,40 +55,23 @@ class CheckYourAnswersController @Inject() (
     with I18nSupport {
 
   def onPageLoad(): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
-    val ua                                             = request.userAnswers
-    val subTradingNameYesNoRow: Option[SummaryListRow] =
-      showOnlyIfNo(ua.get(SubTradingNameYesNoPage), SubTradingNameYesNoSummary.row(ua))
-
-    val subAddressYesNoRow: Option[SummaryListRow] =
-      showOnlyIfNo(ua.get(SubAddressYesNoPage), SubAddressYesNoSummary.row(ua))
-
-    val ninoYesNoRow: Option[SummaryListRow] =
-      showOnlyIfNo(ua.get(NationalInsuranceNumberYesNoPage), NationalInsuranceNumberYesNoSummary.row(ua))
-
-    val utrYesNoRow: Option[SummaryListRow] =
-      showOnlyIfNo(ua.get(UniqueTaxpayerReferenceYesNoPage), UniqueTaxpayerReferenceYesNoSummary.row(ua))
-
-    val wrnYesNoRow: Option[SummaryListRow] =
-      showOnlyIfNo(ua.get(WorksReferenceNumberYesNoPage), WorksReferenceNumberYesNoSummary.row(ua))
-
-    val subContactDetailsYesNoRow: Option[SummaryListRow] =
-      showOnlyIfNo(ua.get(SubcontractorContactDetailsYesNoPage), SubcontractorContactDetailsYesNoSummary.row(ua))
+    val ua = request.userAnswers
 
     val list = SummaryListViewModel(
       rows = Seq(
         TypeOfSubcontractorSummary.row(ua),
+        SubTradingNameYesNoSummary.row(ua),
         SubcontractorNameSummary.row(ua),
-        subTradingNameYesNoRow,
         TradingNameOfSubcontractorSummary.row(ua),
-        subAddressYesNoRow,
+        SubAddressYesNoSummary.row(ua),
         AddressOfSubcontractorSummary.row(ua),
-        ninoYesNoRow,
+        NationalInsuranceNumberYesNoSummary.row(ua),
         SubNationalInsuranceNumberSummary.row(ua),
-        utrYesNoRow,
+        UniqueTaxpayerReferenceYesNoSummary.row(ua),
         SubcontractorsUniqueTaxpayerReferenceSummary.row(ua),
-        wrnYesNoRow,
+        WorksReferenceNumberYesNoSummary.row(ua),
         WorksReferenceNumberSummary.row(ua),
-        subContactDetailsYesNoRow,
+        SubcontractorContactDetailsYesNoSummary.row(ua),
         SubContactDetailsSummary.row(ua)
       ).flatten
     )
@@ -102,9 +84,4 @@ class CheckYourAnswersController @Inject() (
       Future.successful(Redirect(controllers.add.routes.CheckYourAnswersController.onPageLoad()))
     }
 
-  private def showOnlyIfNo(
-    boolOpt: Option[Boolean],
-    buildRow: => Option[SummaryListRow]
-  ): Option[SummaryListRow] =
-    boolOpt.filter(_ == false).flatMap(_ => buildRow)
 }

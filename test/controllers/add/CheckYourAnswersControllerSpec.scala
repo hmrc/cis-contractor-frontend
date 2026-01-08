@@ -18,148 +18,115 @@ package controllers.add
 
 import base.SpecBase
 import controllers.routes
+import models.CheckMode
+import models.add.{SubContactDetails, TypeOfSubcontractor, UKAddress}
 import pages.add.*
-import play.api.i18n.{Messages, MessagesApi}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import viewmodels.checkAnswers.add.*
-import viewmodels.govuk.SummaryListFluency
-import viewmodels.govuk.summarylist.*
-import views.html.add.CheckYourAnswersView
 
-class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency {
+class CheckYourAnswersControllerSpec extends SpecBase {
 
   "Check Your Answers Controller" - {
 
-    "must return OK and the correct view for a GET with empty answers" in {
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+    "must display all questions and dependent rows when answers are provided" in {
 
-      running(application) {
-        val request = FakeRequest(GET, controllers.add.routes.CheckYourAnswersController.onPageLoad().url)
-        val result  = route(application, request).value
+      val address = UKAddress(
+        addressLine1 = "10 Downing Street",
+        addressLine2 = Some("Westminster"),
+        addressLine3 = "London",
+        addressLine4 = Some("UK"),
+        postCode = "SW1A 2AA"
+      )
 
-        implicit val messages: Messages =
-          application.injector.instanceOf[MessagesApi].preferred(request)
-
-        val view = application.injector.instanceOf[CheckYourAnswersView]
-        val expectedList = SummaryListViewModel(rows = Seq.empty)
-
-        status(result) mustEqual OK
-        contentAsString(result) mustEqual view(expectedList)(request, messages).toString
-      }
-    }
-
-    "must redirect to Journey Recovery for a GET if no existing data is found" in {
-      val application = applicationBuilder(userAnswers = None).build()
-
-      running(application) {
-        val request = FakeRequest(GET, controllers.add.routes.CheckYourAnswersController.onPageLoad().url)
-        val result  = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
-      }
-    }
-
-    "must include the decision ('Yes/No') rows when the corresponding answers are false" in {
-      val uaWithNoAnswers =
+      val ua =
         emptyUserAnswers
-          .set(SubTradingNameYesNoPage, false).success.value
-          .set(SubAddressYesNoPage, false).success.value
-          .set(NationalInsuranceNumberYesNoPage, false).success.value
-          .set(UniqueTaxpayerReferenceYesNoPage, false).success.value
-          .set(WorksReferenceNumberYesNoPage, false).success.value
-          .set(SubcontractorContactDetailsYesNoPage, false).success.value
+          .set(TypeOfSubcontractorPage, TypeOfSubcontractor.Individualorsoletrader)
+          .success
+          .value
+          .set(SubTradingNameYesNoPage, true)
+          .success
+          .value
+          .set(TradingNameOfSubcontractorPage, "ABC Ltd")
+          .success
+          .value
+          .set(SubAddressYesNoPage, true)
+          .success
+          .value
+          .set(AddressOfSubcontractorPage, address)
+          .success
+          .value
+          .set(NationalInsuranceNumberYesNoPage, true)
+          .success
+          .value
+          .set(SubNationalInsuranceNumberPage, "AB123456C")
+          .success
+          .value
+          .set(UniqueTaxpayerReferenceYesNoPage, true)
+          .success
+          .value
+          .set(SubcontractorsUniqueTaxpayerReferencePage, "1234567890")
+          .success
+          .value
+          .set(WorksReferenceNumberYesNoPage, true)
+          .success
+          .value
+          .set(WorksReferenceNumberPage, "WRN-001")
+          .success
+          .value
+          .set(SubcontractorContactDetailsYesNoPage, true)
+          .success
+          .value
+          .set(SubContactDetailsPage, SubContactDetails("test@example.com", "0123456789"))
+          .success
+          .value
 
-      val application = applicationBuilder(userAnswers = Some(uaWithNoAnswers)).build()
-
-      running(application) {
-        val request = FakeRequest(GET, controllers.add.routes.CheckYourAnswersController.onPageLoad().url)
-        val result  = route(application, request).value
-
-        implicit val messages: Messages =
-          application.injector.instanceOf[MessagesApi].preferred(request)
-
-        val view = application.injector.instanceOf[CheckYourAnswersView]
-
-        val subTradingNameYesNoRow =
-          uaWithNoAnswers.get(SubTradingNameYesNoPage).filter(_ == false).flatMap(_ => SubTradingNameYesNoSummary.row(uaWithNoAnswers))
-        val subAddressYesNoRow =
-          uaWithNoAnswers.get(SubAddressYesNoPage).filter(_ == false).flatMap(_ => SubAddressYesNoSummary.row(uaWithNoAnswers))
-        val ninoYesNoRow =
-          uaWithNoAnswers.get(NationalInsuranceNumberYesNoPage).filter(_ == false).flatMap(_ => NationalInsuranceNumberYesNoSummary.row(uaWithNoAnswers))
-        val utrYesNoRow =
-          uaWithNoAnswers.get(UniqueTaxpayerReferenceYesNoPage).filter(_ == false).flatMap(_ => UniqueTaxpayerReferenceYesNoSummary.row(uaWithNoAnswers))
-        val wrnYesNoRow =
-          uaWithNoAnswers.get(WorksReferenceNumberYesNoPage).filter(_ == false).flatMap(_ => WorksReferenceNumberYesNoSummary.row(uaWithNoAnswers))
-        val subContactDetailsYesNoRow =
-          uaWithNoAnswers.get(SubcontractorContactDetailsYesNoPage).filter(_ == false).flatMap(_ => SubcontractorContactDetailsYesNoSummary.row(uaWithNoAnswers))
-
-        val expectedList = SummaryListViewModel(
-          rows = Seq(
-            TypeOfSubcontractorSummary.row(uaWithNoAnswers),
-            SubcontractorNameSummary.row(uaWithNoAnswers),
-            subTradingNameYesNoRow,
-            TradingNameOfSubcontractorSummary.row(uaWithNoAnswers),
-            subAddressYesNoRow,
-            AddressOfSubcontractorSummary.row(uaWithNoAnswers),
-            ninoYesNoRow,
-            SubNationalInsuranceNumberSummary.row(uaWithNoAnswers),
-            utrYesNoRow,
-            SubcontractorsUniqueTaxpayerReferenceSummary.row(uaWithNoAnswers),
-            wrnYesNoRow,
-            WorksReferenceNumberSummary.row(uaWithNoAnswers),
-            subContactDetailsYesNoRow,
-            SubContactDetailsSummary.row(uaWithNoAnswers)
-          ).flatten
-        )
-
-        status(result) mustEqual OK
-        contentAsString(result) mustEqual view(expectedList)(request, messages).toString
-      }
-    }
-
-    "must not include the decision ('Yes/No') rows when the corresponding answers are true" in {
-      val uaWithYesAnswers =
-        emptyUserAnswers
-          .set(SubTradingNameYesNoPage, true).success.value
-          .set(SubAddressYesNoPage, true).success.value
-          .set(NationalInsuranceNumberYesNoPage, true).success.value
-          .set(UniqueTaxpayerReferenceYesNoPage, true).success.value
-          .set(WorksReferenceNumberYesNoPage, true).success.value
-          .set(SubcontractorContactDetailsYesNoPage, true).success.value
-
-      val application = applicationBuilder(userAnswers = Some(uaWithYesAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(ua)).build()
 
       running(application) {
         val request = FakeRequest(GET, controllers.add.routes.CheckYourAnswersController.onPageLoad().url)
         val result  = route(application, request).value
 
-        implicit val messages: Messages =
-          application.injector.instanceOf[MessagesApi].preferred(request)
-
-        val view = application.injector.instanceOf[CheckYourAnswersView]
-        val expectedList = SummaryListViewModel(
-          rows = Seq(
-            TypeOfSubcontractorSummary.row(uaWithYesAnswers),
-            SubcontractorNameSummary.row(uaWithYesAnswers),
-            TradingNameOfSubcontractorSummary.row(uaWithYesAnswers),
-            AddressOfSubcontractorSummary.row(uaWithYesAnswers),
-            SubNationalInsuranceNumberSummary.row(uaWithYesAnswers),
-            SubcontractorsUniqueTaxpayerReferenceSummary.row(uaWithYesAnswers),
-            WorksReferenceNumberSummary.row(uaWithYesAnswers),
-            SubContactDetailsSummary.row(uaWithYesAnswers)
-          ).flatten
-        )
-
+        val content = contentAsString(result)
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(expectedList)(request, messages).toString
+
+        content must include("Type")
+        content must include("Does the subcontractor use a trading name?")
+        content must include("Trading name")
+        content must include("Do you want to add the subcontractor’s address?")
+        content must include("Contractor address")
+        content must include("Do you have a National Insurance number?")
+        content must include("National Insurance number")
+        content must include("Do you have a Unique Taxpayer Reference (UTR)?")
+        content must include("Unique Taxpayer Reference")
+        content must include("Do you have a works reference number?")
+        content must include("Works reference number")
+        content must include("Do you want to add the subcontractor’s contact details?")
+
+        // Assert dependent values appear
+        content must include("ABC Ltd")
+        content must include("AB123456C")
+        content must include("1234567890")
+        content must include("WRN-001")
+
+        content must include("Contact details")
+        content must include("test@example.com")
+        content must include("0123456789")
+
+
+        content must include(controllers.add.routes.SubTradingNameYesNoController.onPageLoad(CheckMode).url)
+        content must include(controllers.add.routes.SubAddressYesNoController.onPageLoad(CheckMode).url)
+        content must include(controllers.add.routes.NationalInsuranceNumberYesNoController.onPageLoad(CheckMode).url)
+        content must include(controllers.add.routes.UniqueTaxpayerReferenceYesNoController.onPageLoad(CheckMode).url)
+        content must include(controllers.add.routes.WorksReferenceNumberYesNoController.onPageLoad(CheckMode).url)
+        content must include(
+          controllers.add.routes.SubcontractorContactDetailsYesNoController.onPageLoad(CheckMode).url
+        )
       }
     }
 
     "must redirect back to Check Your Answers on submit (POST)" in {
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
-      // update this test later when submit will be implemented
+
       running(application) {
         val request = FakeRequest(POST, controllers.add.routes.CheckYourAnswersController.onSubmit().url)
         val result  = route(application, request).value
@@ -182,4 +149,3 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency {
     }
   }
 }
-

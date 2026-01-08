@@ -110,9 +110,9 @@ unauthorised.agent.p2.suffix = to use this service.
 subTradingNameYesNo.title = Does the subcontractor use a trading name?
 subTradingNameYesNo.heading = Does the subcontractor use a trading name?
 subTradingNameYesNo.hint = This is a business name, different from their own name.
-subTradingNameYesNo.checkYourAnswersLabel = Trading name
+subTradingNameYesNo.checkYourAnswersLabel = Does the subcontractor use a trading name?
 subTradingNameYesNo.error.required = Select whether or not the subcontractor uses a trading name
-subTradingNameYesNo.change.hidden =  trading name
+subTradingNameYesNo.change.hidden = does the subcontractor use a trading name?
 
 tradingNameOfSubcontractor.title = What is the subcontractor’s trading name?
 tradingNameOfSubcontractor.heading = What is the subcontractor’s trading name?
@@ -125,16 +125,16 @@ tradingNameOfSubcontractor.error.invalidCharacters = Enter a trading name like A
 subAddressYesNo.title = Do you want to add the subcontractor’s address?
 subAddressYesNo.heading = Do you want to add the subcontractor’s address?
 subAddressYesNo.hint = You can add this information now, or later.
-subAddressYesNo.checkYourAnswersLabel = Contractor address
+subAddressYesNo.checkYourAnswersLabel = Do you want to add the subcontractor’s address?
 subAddressYesNo.error.required = Select whether or not to add the subcontractor’s address
-subAddressYesNo.change.hidden = contractor address
+subAddressYesNo.change.hidden = do you want to add the subcontractor’s address?
 
 nationalInsuranceNumberYesNo.title = Do you have a National Insurance number?
 nationalInsuranceNumberYesNo.heading = Do you have a National Insurance number?
 nationalInsuranceNumberYesNo.hint = A National Insurance number is made up of letters and numbers, like ‘QQ 12 34 56 A’
-nationalInsuranceNumberYesNo.checkYourAnswersLabel = National Insurance number
+nationalInsuranceNumberYesNo.checkYourAnswersLabel = Do you have a National Insurance number?
 nationalInsuranceNumberYesNo.error.required = Select whether you have the subcontractor’s National Insurance number or not
-nationalInsuranceNumberYesNo.change.hidden = national Insurance number
+nationalInsuranceNumberYesNo.change.hidden = do you have a National Insurance number?
 
 subcontractorName.title = What is the subcontractor’s name?
 subcontractorName.heading = What is the subcontractor’s name?
@@ -158,16 +158,16 @@ subcontractorName.change.hidden = name
 uniqueTaxpayerReferenceYesNo.title = Do you have a Unique Taxpayer Reference (UTR)?
 uniqueTaxpayerReferenceYesNo.heading = Do you have a Unique Taxpayer Reference (UTR)?
 uniqueTaxpayerReferenceYesNo.hint = This is 10 numbers, like 1234567890. The UTR will be on tax returns and other letters about Self Assessment. It may also be called ‘tax reference’
-uniqueTaxpayerReferenceYesNo.checkYourAnswersLabel = Add Unique Taxpayer Reference
+uniqueTaxpayerReferenceYesNo.checkYourAnswersLabel = Do you have a Unique Taxpayer Reference (UTR)?
 uniqueTaxpayerReferenceYesNo.error.required = Select whether or not you have the subcontractor’s Unique Tax Reference
-uniqueTaxpayerReferenceYesNo.change.hidden = add Unique Taxpayer Reference
+uniqueTaxpayerReferenceYesNo.change.hidden = do you have a Unique Taxpayer Reference (UTR)?
 
 worksReferenceNumberYesNo.title = Do you have a works reference number?
 worksReferenceNumberYesNo.heading = Do you have a works reference number?
 worksReferenceNumberYesNo.hint = This is your reference number used to identify the subcontractor’s work or project. It can contain letters and numbers
-worksReferenceNumberYesNo.checkYourAnswersLabel = Works reference number
+worksReferenceNumberYesNo.checkYourAnswersLabel = Do you have a works reference number?
 worksReferenceNumberYesNo.error.required = Select whether you have the subcontractor’s work reference number or not
-worksReferenceNumberYesNo.change.hidden = works reference number
+worksReferenceNumberYesNo.change.hidden = do you have a works reference number?
 
 subNationalInsuranceNumber.title = What is the subcontractor’s National Insurance number?
 subNationalInsuranceNumber.heading = What is the subcontractor’s National Insurance number?
@@ -181,9 +181,9 @@ subNationalInsuranceNumber.change.hidden = national Insurance number
 subcontractorContactDetailsYesNo.title = Do you want to add the subcontractor’s contact details?
 subcontractorContactDetailsYesNo.heading = Do you want to add the subcontractor’s contact details?
 subcontractorContactDetailsYesNo.hint = You can add the subcontractor’s email address and telephone number now or add them later
-subcontractorContactDetailsYesNo.checkYourAnswersLabel = Contact details
+subcontractorContactDetailsYesNo.checkYourAnswersLabel = Do you want to add the subcontractor’s contact details?
 subcontractorContactDetailsYesNo.error.required = Select whether you have the subcontractor’s contact details
-subcontractorContactDetailsYesNo.change.hidden = contact details
+subcontractorContactDetailsYesNo.change.hidden = do you want to add the subcontractor’s contact details?
 
 worksReferenceNumber.title = What is the works reference number?
 worksReferenceNumber.heading = What is the works reference number?
