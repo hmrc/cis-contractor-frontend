@@ -18,6 +18,7 @@ package connectors
 
 import com.github.tomakehurst.wiremock.client.WireMock.{aResponse, post, stubFor, urlPathEqualTo}
 import itutil.ApplicationWithWiremock
+import models.add.TypeOfSubcontractor
 import models.subContractor.SubContractorCreateRequest
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.matchers.must.Matchers
@@ -56,7 +57,11 @@ class ConstructionIndustrySchemeConnectorSpec
 
       val result = connector
         .createSubContractor(
-          SubContractorCreateRequest(schemeId = 10, subcontractorType = "trader", currentVersion = 0)
+          SubContractorCreateRequest(
+            schemeId = 10,
+            subcontractorType = TypeOfSubcontractor.Trust.toString,
+            currentVersion = 0
+          )
         )
         .futureValue
 
@@ -72,7 +77,11 @@ class ConstructionIndustrySchemeConnectorSpec
       val ex = intercept[Exception] {
         connector
           .createSubContractor(
-            SubContractorCreateRequest(schemeId = 10, subcontractorType = "trader", currentVersion = 0)
+            SubContractorCreateRequest(
+              schemeId = 10,
+              subcontractorType = TypeOfSubcontractor.Trust.toString,
+              currentVersion = 0
+            )
           )
           .futureValue
       }
