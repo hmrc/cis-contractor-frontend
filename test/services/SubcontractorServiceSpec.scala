@@ -29,7 +29,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
+final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
 
   implicit val hc: HeaderCarrier    = HeaderCarrier()
   implicit val ec: ExecutionContext = scala.concurrent.ExecutionContext.global
