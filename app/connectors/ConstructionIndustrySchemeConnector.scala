@@ -16,7 +16,7 @@
 
 package connectors
 
-import models.subContractor.{SubContractorCreateRequest, SubContractorCreateResponse}
+import models.subcontractor.{SubcontractorCreateRequest, SubcontractorCreateResponse}
 import play.api.Logging
 import play.api.libs.json.Json
 import play.api.libs.ws.JsonBodyWritables.writeableOf_JsValue
@@ -35,11 +35,11 @@ class ConstructionIndustrySchemeConnector @Inject() (config: ServicesConfig, htt
 
   private val cisBaseUrl: String = config.baseUrl("construction-industry-scheme") + "/cis"
 
-  def createSubContractor(
-    payload: SubContractorCreateRequest
-  )(implicit hc: HeaderCarrier): Future[SubContractorCreateResponse] =
+  def createSubcontractor(
+    payload: SubcontractorCreateRequest
+  )(implicit hc: HeaderCarrier): Future[SubcontractorCreateResponse] =
     http
       .post(url"$cisBaseUrl/subcontractor/create")
       .withBody(Json.toJson(payload))
-      .execute[SubContractorCreateResponse]
+      .execute[SubcontractorCreateResponse]
 }

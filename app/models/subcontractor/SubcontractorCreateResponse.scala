@@ -14,16 +14,14 @@
  * limitations under the License.
  */
 
-package models.subContractor
+package models.subcontractor
 
 import play.api.libs.json.{Json, OFormat}
 
-final case class SubContractorCreateRequest(
-  schemeId: Int,
-  subcontractorType: String,
-  currentVersion: Int
+final case class SubcontractorCreateResponse(
+  subbieResourceRef: Int
 )
 
-object SubContractorCreateRequest {
-  implicit val format: OFormat[SubContractorCreateRequest] = Json.format[SubContractorCreateRequest]
+object SubcontractorCreateResponse {
+  implicit val format: OFormat[SubcontractorCreateResponse] = Json.format[SubcontractorCreateResponse]
 }

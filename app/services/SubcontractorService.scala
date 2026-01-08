@@ -18,7 +18,7 @@ package services
 
 import connectors.ConstructionIndustrySchemeConnector
 import models.UserAnswers
-import models.subContractor.{SubContractorCreateRequest, SubContractorCreateResponse}
+import models.subcontractor.{SubcontractorCreateRequest, SubcontractorCreateResponse}
 import pages.add.TypeOfSubcontractorPage
 import play.api.Logging
 import uk.gov.hmrc.http.HeaderCarrier
@@ -35,15 +35,15 @@ class SubcontractorService @Inject() (
   def createSubcontractor(
     schemeId: Int,
     userAnswers: UserAnswers
-  )(implicit hc: HeaderCarrier): Future[SubContractorCreateResponse] =
+  )(implicit hc: HeaderCarrier): Future[SubcontractorCreateResponse] =
     for {
       subcontractorType <- getSubcontractorType(userAnswers)
-      payload            = SubContractorCreateRequest(
+      payload            = SubcontractorCreateRequest(
                              schemeId = schemeId,
                              subcontractorType = subcontractorType,
                              currentVersion = 0
                            )
-      response          <- cisConnector.createSubContractor(payload)
+      response          <- cisConnector.createSubcontractor(payload)
     } yield response
 
   private def getSubcontractorType(userAnswers: UserAnswers): Future[String] =
