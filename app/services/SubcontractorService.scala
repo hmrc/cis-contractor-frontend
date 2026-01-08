@@ -17,7 +17,9 @@
 package services
 
 import connectors.ConstructionIndustrySchemeConnector
+import models.UserAnswers
 import models.subContractor.{SubContractorCreateRequest, SubContractorCreateResponse}
+import pages.add.TypeOfSubcontractorPage
 import play.api.Logging
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -26,27 +28,27 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
 @Singleton
-class SubContractorService @Inject() (
+class SubcontractorService @Inject() (
   cisConnector: ConstructionIndustrySchemeConnector
 )(implicit ec: ExecutionContext)
     extends Logging {
-  def createSubContractor(
+  def createSubcontractor(
     schemeId: Int,
-    subcontractorType: String,
-    currentVersion: Int
-  )(implicit hc: HeaderCarrier): Future[SubContractorCreateResponse] = {
-    val payload = SubContractorCreateRequest(
-      schemeId = schemeId,
-      subcontractorType = subcontractorType,
-      currentVersion = 0
-    )
-    logger.info(
-      s"[SubContractorService] Calling BE  to create FormP sub contractor for $schemeId $subcontractorType $currentVersion"
-    )
-    cisConnector.createSubContractor(payload).andThen {
-      case Success(response) =>
-        logger.info(s"[SubContractorService] FormP sub contractor creation completed successfully")
-      case Failure(error)    => logger.error("[SubContractorService] BE call failed", error)
+    userAnswers: UserAnswers
+  )(implicit hc: HeaderCarrier): Future[SubContractorCreateResponse] =
+    for {
+      subcontractorType <- getSubcontractorType(userAnswers)
+      payload            = SubContractorCreateRequest(
+                             schemeId = schemeId,
+                             subcontractorType = subcontractorType,
+                             currentVersion = 0
+                           )
+      response          <- cisConnector.createSubContractor(payload)
+    } yield response
+
+  private def getSubcontractorType(userAnswers: UserAnswers): Future[String] =
+    userAnswers.get(TypeOfSubcontractorPage) match {
+      case Some(subcontractorType) => Future.successful(subcontractorType.toString)
+      case None                    => Future.failed(new RuntimeException("Subcontractor Type not found in session data"))
     }
-  }
 }

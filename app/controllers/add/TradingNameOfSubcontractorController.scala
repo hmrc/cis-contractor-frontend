@@ -24,7 +24,7 @@ import pages.add.TradingNameOfSubcontractorPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
-import services.SubContractorService
+import services.SubcontractorService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.add.TradingNameOfSubcontractorView
 
@@ -41,7 +41,7 @@ class TradingNameOfSubcontractorController @Inject() (
   formProvider: TradingNameOfSubcontractorFormProvider,
   val controllerComponents: MessagesControllerComponents,
   view: TradingNameOfSubcontractorView,
-  subContractorService: SubContractorService
+  subcontractorService: SubcontractorService
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport {
@@ -68,7 +68,7 @@ class TradingNameOfSubcontractorController @Inject() (
             for {
               updatedAnswers <- Future.fromTry(request.userAnswers.set(TradingNameOfSubcontractorPage, value))
               // TODO
-              // _              <- subContractorService.createSubContractor(0, value, 0)
+              // _              <- subcontractorService.createSubcontractor(0, updatedAnswers)
               _              <- sessionRepository.set(updatedAnswers)
             } yield Redirect(navigator.nextPage(TradingNameOfSubcontractorPage, mode, updatedAnswers))
         )

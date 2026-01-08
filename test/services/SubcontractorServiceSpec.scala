@@ -18,16 +18,18 @@ package services
 
 import base.SpecBase
 import connectors.ConstructionIndustrySchemeConnector
+import models.add.TypeOfSubcontractor
 import models.subContractor.{SubContractorCreateRequest, SubContractorCreateResponse}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{verify, verifyNoMoreInteractions, when}
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.mockito.MockitoSugar.mock
+import pages.add.TypeOfSubcontractorPage
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class SubContractorServiceSpec extends SpecBase with MockitoSugar {
+class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
 
   implicit val hc: HeaderCarrier    = HeaderCarrier()
   implicit val ec: ExecutionContext = scala.concurrent.ExecutionContext.global
@@ -36,14 +38,19 @@ class SubContractorServiceSpec extends SpecBase with MockitoSugar {
     "createSubContractor" - {
       "should create a subcontractor if a trading name is provided" in {
         val mockConnector: ConstructionIndustrySchemeConnector = mock[ConstructionIndustrySchemeConnector]
-        val service                                            = new SubContractorService(mockConnector)
+        val service                                            = new SubcontractorService(mockConnector)
 
         val mockSubContractorResourceRef = 10
 
         when(mockConnector.createSubContractor(any[SubContractorCreateRequest])(any[HeaderCarrier]))
           .thenReturn(Future.successful(SubContractorCreateResponse(subbieResourceRef = mockSubContractorResourceRef)))
 
-        val result = service.createSubContractor(1, "trader", 0)
+        val expectedUserAnswers = emptyUserAnswers
+          .set(TypeOfSubcontractorPage, TypeOfSubcontractor.Trust)
+          .success
+          .value
+
+        val result = service.createSubcontractor(1, expectedUserAnswers)
 
         result.futureValue mustBe SubContractorCreateResponse(mockSubContractorResourceRef)
 
@@ -51,15 +58,33 @@ class SubContractorServiceSpec extends SpecBase with MockitoSugar {
         verifyNoMoreInteractions(mockConnector)
       }
 
-      "fail when the connector call fails" in {
+      "should fail when Subcontractor Type not found in session data" in {
         val mockConnector: ConstructionIndustrySchemeConnector = mock[ConstructionIndustrySchemeConnector]
-        val service                                            = new SubContractorService(mockConnector)
+        val service                                            = new SubcontractorService(mockConnector)
 
         when(mockConnector.createSubContractor(any[SubContractorCreateRequest])(any[HeaderCarrier]))
           .thenReturn(Future.failed(new Exception("bang")))
 
         val exception =
-          service.createSubContractor(1, "trader", 0).failed.futureValue
+          service.createSubcontractor(1, emptyUserAnswers).failed.futureValue
+
+        exception.getMessage must include("Subcontractor Type not found in session data")
+      }
+
+      "should fail when the connector call fails" in {
+        val mockConnector: ConstructionIndustrySchemeConnector = mock[ConstructionIndustrySchemeConnector]
+        val service                                            = new SubcontractorService(mockConnector)
+
+        when(mockConnector.createSubContractor(any[SubContractorCreateRequest])(any[HeaderCarrier]))
+          .thenReturn(Future.failed(new Exception("bang")))
+
+        val expectedUserAnswers = emptyUserAnswers
+          .set(TypeOfSubcontractorPage, TypeOfSubcontractor.Trust)
+          .success
+          .value
+
+        val exception =
+          service.createSubcontractor(1, expectedUserAnswers).failed.futureValue
 
         exception.getMessage must include("bang")
 
