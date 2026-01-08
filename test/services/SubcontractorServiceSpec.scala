@@ -34,8 +34,8 @@ class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
   implicit val hc: HeaderCarrier    = HeaderCarrier()
   implicit val ec: ExecutionContext = scala.concurrent.ExecutionContext.global
 
-  "SubContractorService" - {
-    "createSubContractor" - {
+  "SubcontractorService" - {
+    "createSubcontractor" - {
       "should create a subcontractor if a trading name is provided" in {
         val mockConnector: ConstructionIndustrySchemeConnector = mock[ConstructionIndustrySchemeConnector]
         val service                                            = new SubcontractorService(mockConnector)

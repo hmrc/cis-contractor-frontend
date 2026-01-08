@@ -35,8 +35,8 @@ class ConstructionIndustrySchemeConnectorSpec
 
   val connector: ConstructionIndustrySchemeConnector = app.injector.instanceOf[ConstructionIndustrySchemeConnector]
 
-  "createSubContractor" should {
-    "successfully create a sub contractor" in {
+  "createSubcontractor" should {
+    "successfully create a subcontractor" in {
 
       val responseJson =
         """
