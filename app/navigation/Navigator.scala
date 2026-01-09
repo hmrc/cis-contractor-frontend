@@ -71,9 +71,9 @@ class Navigator @Inject() () {
   private def navigatorFromTypeOfSubcontractorPage(mode: Mode)(userAnswers: UserAnswers): Call =
     (userAnswers.get(TypeOfSubcontractorPage), mode) match {
       case (Some(Individualorsoletrader), NormalMode) => controllers.add.routes.SubTradingNameYesNoController.onPageLoad(NormalMode)
-      case (None, _) => routes.JourneyRecoveryController.onPageLoad()
-      case (_, NormalMode) => routes.JourneyRecoveryController.onPageLoad()
-      case (_, CheckMode) => routes.CheckYourAnswersController.onPageLoad()
+      case (None, _)                                  => routes.JourneyRecoveryController.onPageLoad()
+      case (_, NormalMode)                            => routes.JourneyRecoveryController.onPageLoad()
+      case (_, CheckMode)                             => routes.CheckYourAnswersController.onPageLoad()
     }
 
   private def navigatorFromSubTradingNameYesNoPage(mode: Mode)(userAnswers: UserAnswers): Call =
@@ -102,18 +102,18 @@ class Navigator @Inject() () {
 
   private def navigatorFromUniqueTaxpayerReferenceYesNoPage(mode: Mode)(userAnswers: UserAnswers): Call =
     (userAnswers.get(UniqueTaxpayerReferenceYesNoPage), mode) match {
-      case (Some(true), _) => controllers.add.routes.SubcontractorsUniqueTaxpayerReferenceController.onPageLoad(mode)
-      case (Some(false), NormalMode) => controllers.add.routes.WorksReferenceNumberYesNoController.onPageLoad(NormalMode)
-      case (Some(false), CheckMode) => routes.CheckYourAnswersController.onPageLoad()
-      case (None, _) => routes.JourneyRecoveryController.onPageLoad()
+      case (Some(true), _)            => controllers.add.routes.SubcontractorsUniqueTaxpayerReferenceController.onPageLoad(mode)
+      case (Some(false), NormalMode)  => controllers.add.routes.WorksReferenceNumberYesNoController.onPageLoad(NormalMode)
+      case (Some(false), CheckMode)   => routes.CheckYourAnswersController.onPageLoad()
+      case (None, _)                  => routes.JourneyRecoveryController.onPageLoad()
     }
 
   private def navigatorFromWorksReferenceNumberYesNoPage(mode: Mode)(userAnswers: UserAnswers): Call =
     (userAnswers.get(WorksReferenceNumberYesNoPage), mode) match {
-      case (Some(true), _) => controllers.add.routes.WorksReferenceNumberController.onPageLoad(mode)
-      case (Some(false), NormalMode) => controllers.add.routes.SubcontractorContactDetailsYesNoController.onPageLoad(NormalMode)
-      case (Some(false), CheckMode) => routes.CheckYourAnswersController.onPageLoad()
-      case (None, _) => routes.JourneyRecoveryController.onPageLoad()
+      case (Some(true), _)            => controllers.add.routes.WorksReferenceNumberController.onPageLoad(mode)
+      case (Some(false), NormalMode)  => controllers.add.routes.SubcontractorContactDetailsYesNoController.onPageLoad(NormalMode)
+      case (Some(false), CheckMode)   => routes.CheckYourAnswersController.onPageLoad()
+      case (None, _)                  => routes.JourneyRecoveryController.onPageLoad()
     }
 
   private def navigatorFromSubcontractorContactDetailsYesNoPage(mode: Mode)(userAnswers: UserAnswers): Call =
