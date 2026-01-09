@@ -30,22 +30,32 @@ object AddressOfSubcontractorSummary {
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
     answers.get(AddressOfSubcontractorPage).map { answer =>
 
-      val value = HtmlFormat.escape(answer.addressLine1).toString + "<br/>" + HtmlFormat
-        .escape(answer.addressLine2.getOrElse(""))
-        .toString + "<br/>" + HtmlFormat.escape(answer.addressLine3).toString + "<br/>" + HtmlFormat
-        .escape(answer.addressLine4.getOrElse(""))
-        .toString + "<br/>" + HtmlFormat.escape(answer.postCode).toString
+      val lines: Seq[String] = Seq(
+        answer.addressLine1,
+        answer.addressLine2.getOrElse(""),
+        answer.addressLine3,
+        answer.addressLine4.getOrElse(""),
+        answer.postCode
+      )
+
+
+      val escapedWithBreaks: String =
+        lines
+          .filter(_.trim.nonEmpty) // remove empty or whitespace-only lines
+          .map(HtmlFormat.escape(_).toString)
+          .mkString("<br/>")
+
 
       SummaryListRowViewModel(
         key = "addressOfSubcontractor.checkYourAnswersLabel",
-        value = ValueViewModel(HtmlContent(value)),
+        value = ValueViewModel(HtmlContent(escapedWithBreaks)),
         actions = Seq(
           ActionItemViewModel(
             "site.change",
             controllers.add.routes.AddressOfSubcontractorController.onPageLoad(CheckMode).url
-          )
-            .withVisuallyHiddenText(messages("addressOfSubcontractor.change.hidden"))
+          ).withVisuallyHiddenText(messages("addressOfSubcontractor.change.hidden"))
         )
       )
     }
+
 }

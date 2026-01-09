@@ -96,7 +96,7 @@ class SubAddressYesNoControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.add.routes.TradingNameOfSubcontractorController.onPageLoad(NormalMode).url
+        redirectLocation(result).value mustEqual controllers.add.routes.AddressOfSubcontractorController.onPageLoad(NormalMode).url
       }
     }
 
@@ -121,7 +121,7 @@ class SubAddressYesNoControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.add.routes.SubAddressYesNoController.onPageLoad(NormalMode).url
+        redirectLocation(result).value mustEqual controllers.add.routes.NationalInsuranceNumberYesNoController.onPageLoad(NormalMode).url
       }
     }
 
