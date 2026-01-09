@@ -57,7 +57,7 @@ class SubNationalInsuranceNumberSummarySpec extends AnyFreeSpec with Matchers{
 
       val changeAction = actions.head
       val expectedChangeText = messages("site.change")
-      val expectedHref = routes.NationalInsuranceNumberYesNoController.onPageLoad(CheckMode).url
+      val expectedHref = routes.SubNationalInsuranceNumberController.onPageLoad(CheckMode).url
       val expectedHiddenText = messages("subNationalInsuranceNumber.change.hidden")
 
       changeAction.content.asHtml.toString should include(expectedChangeText)

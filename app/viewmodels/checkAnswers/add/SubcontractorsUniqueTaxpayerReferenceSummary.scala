@@ -34,7 +34,7 @@ object SubcontractorsUniqueTaxpayerReferenceSummary  {
           key     = "subcontractorsUniqueTaxpayerReference.checkYourAnswersLabel",
           value   = ValueViewModel(HtmlFormat.escape(answer).toString),
           actions = Seq(
-            ActionItemViewModel("site.change", controllers.add.routes.UniqueTaxpayerReferenceYesNoController.onPageLoad(CheckMode).url)
+            ActionItemViewModel("site.change", controllers.add.routes.SubcontractorsUniqueTaxpayerReferenceController.onPageLoad(CheckMode).url)
               .withVisuallyHiddenText(messages("subcontractorsUniqueTaxpayerReference.change.hidden"))
           )
         )

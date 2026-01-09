@@ -67,7 +67,7 @@ class AddressOfSubcontractorSummarySpec extends AnyWordSpec with Matchers {
       val action = row.actions.value.items.head
 
       action.href mustBe
-        controllers.add.routes.SubAddressYesNoController
+        controllers.add.routes.AddressOfSubcontractorController
           .onPageLoad(CheckMode)
           .url
 

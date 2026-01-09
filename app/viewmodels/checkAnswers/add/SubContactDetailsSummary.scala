@@ -37,7 +37,7 @@ object SubContactDetailsSummary  {
           key     = "subContactDetails.checkYourAnswersLabel",
           value   = ValueViewModel(HtmlContent(value)),
           actions = Seq(
-            ActionItemViewModel("site.change", controllers.add.routes.SubcontractorContactDetailsYesNoController.onPageLoad(CheckMode).url)
+            ActionItemViewModel("site.change", controllers.add.routes.SubContactDetailsController.onPageLoad(CheckMode).url)
               .withVisuallyHiddenText(messages("subContactDetails.change.hidden"))
           )
         )

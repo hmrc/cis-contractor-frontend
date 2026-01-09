@@ -65,7 +65,7 @@ class SubContactDetailsSummarySpec extends AnyFreeSpec with Matchers {
 
       val changeAction = actions.head
       val expectedChangeText = messages("site.change")
-      val expectedHref = routes.SubcontractorContactDetailsYesNoController.onPageLoad(CheckMode).url
+      val expectedHref = routes.SubContactDetailsController.onPageLoad(CheckMode).url
       val expectedHiddenText = messages("subContactDetails.change.hidden")
 
       changeAction.content.asHtml.toString should include(expectedChangeText)

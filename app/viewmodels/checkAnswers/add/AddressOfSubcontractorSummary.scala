@@ -52,7 +52,7 @@ object AddressOfSubcontractorSummary {
         actions = Seq(
           ActionItemViewModel(
             "site.change",
-            controllers.add.routes.SubAddressYesNoController.onPageLoad(CheckMode).url
+            controllers.add.routes.AddressOfSubcontractorController.onPageLoad(CheckMode).url
           ).withVisuallyHiddenText(messages("addressOfSubcontractor.change.hidden"))
         )
       )

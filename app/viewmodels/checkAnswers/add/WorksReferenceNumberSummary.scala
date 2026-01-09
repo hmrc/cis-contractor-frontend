@@ -34,7 +34,7 @@ object WorksReferenceNumberSummary  {
           key     = "worksReferenceNumber.checkYourAnswersLabel",
           value   = ValueViewModel(HtmlFormat.escape(answer).toString),
           actions = Seq(
-            ActionItemViewModel("site.change", controllers.add.routes.WorksReferenceNumberYesNoController.onPageLoad(CheckMode).url)
+            ActionItemViewModel("site.change", controllers.add.routes.WorksReferenceNumberController.onPageLoad(CheckMode).url)
               .withVisuallyHiddenText(messages("worksReferenceNumber.change.hidden"))
           )
         )

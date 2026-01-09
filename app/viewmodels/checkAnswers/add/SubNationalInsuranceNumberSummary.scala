@@ -34,7 +34,7 @@ object SubNationalInsuranceNumberSummary  {
           key     = "subNationalInsuranceNumber.checkYourAnswersLabel",
           value   = ValueViewModel(HtmlFormat.escape(answer).toString),
           actions = Seq(
-            ActionItemViewModel("site.change", controllers.add.routes.NationalInsuranceNumberYesNoController.onPageLoad(CheckMode).url)
+            ActionItemViewModel("site.change", controllers.add.routes.SubNationalInsuranceNumberController.onPageLoad(CheckMode).url)
               .withVisuallyHiddenText(messages("subNationalInsuranceNumber.change.hidden"))
           )
         )

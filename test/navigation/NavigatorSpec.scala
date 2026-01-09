@@ -230,7 +230,21 @@ class NavigatorSpec extends SpecBase {
         ) mustBe controllers.add.routes.SubContactDetailsController.onPageLoad(NormalMode)
       }
 
-    }
+
+      "must go from SubcontractorContactDetailsYesNoPage to CYA when false" in {
+        val ua =
+          emptyUserAnswers
+            .setOrException(SubcontractorContactDetailsYesNoPage, false)
+
+        val navigator = new Navigator
+        navigator.nextPage(
+          SubcontractorContactDetailsYesNoPage,
+          NormalMode,
+          ua
+        ) mustBe controllers.add.routes.CheckYourAnswersController.onPageLoad()
+      }
+
+  }
 
     "in Check mode" - {
 

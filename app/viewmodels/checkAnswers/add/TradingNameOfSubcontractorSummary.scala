@@ -34,7 +34,7 @@ object TradingNameOfSubcontractorSummary  {
           key     = "tradingNameOfSubcontractor.checkYourAnswersLabel",
           value   = ValueViewModel(HtmlFormat.escape(answer).toString),
           actions = Seq(
-            ActionItemViewModel("site.change", controllers.add.routes.SubTradingNameYesNoController.onPageLoad(CheckMode).url)
+            ActionItemViewModel("site.change", controllers.add.routes.TradingNameOfSubcontractorController.onPageLoad(CheckMode).url)
               .withVisuallyHiddenText(messages("tradingNameOfSubcontractor.change.hidden"))
           )
         )
