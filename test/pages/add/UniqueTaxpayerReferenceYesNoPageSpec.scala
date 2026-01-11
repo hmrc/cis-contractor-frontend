@@ -29,8 +29,8 @@ class UniqueTaxpayerReferenceYesNoPageSpec extends PageBehaviours {
     beRemovable[Boolean](UniqueTaxpayerReferenceYesNoPage)
 
     //Need to update to correct page!
-    "cleanup: must remove TradingNameOfSubcontractor userAnswers when No is selected" in {
-      val userAnswers = emptyUserAnswers.set(TradingNameOfSubcontractorPage, "ABC").success.value
+    "cleanup: must remove SubcontractorsUniqueTaxpayerReferencePage userAnswers when No is selected" in {
+      val userAnswers = emptyUserAnswers.set(SubcontractorsUniqueTaxpayerReferencePage, "1234567891").success.value
 
       val updatedUserAnswers = userAnswers.set(UniqueTaxpayerReferenceYesNoPage, false).success.value
 

@@ -14,37 +14,29 @@
  * limitations under the License.
  */
 
-package viewmodels.checkAnswers
+package viewmodels.checkAnswers.add
 
-import models.add.SubcontractorName.format
 import models.{CheckMode, UserAnswers}
-import pages.add.SubcontractorNamePage
+import pages.add.TradingNameOfSubcontractorPage
 import play.api.i18n.Messages
-import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
+import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
 
-object SubcontractorNameSummary {
+object TradingNameOfSubcontractorSummary  {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(SubcontractorNamePage).map { answer =>
+    answers.get(TradingNameOfSubcontractorPage).map {
+      answer =>
 
-      val fullName = Seq(
-        Some(answer.firstName),
-        answer.middleName,
-        Some(answer.lastName)
-      ).flatten.mkString(" ")
-
-      SummaryListRowViewModel(
-        key = "subcontractorName.checkYourAnswersLabel",
-        value = ValueViewModel(Text(fullName)),
-        actions = Seq(
-          ActionItemViewModel(
-            "site.change",
-            controllers.add.routes.SubcontractorNameController.onPageLoad(CheckMode).url
-          ).withVisuallyHiddenText(messages("subcontractorName.change.hidden"))
+        SummaryListRowViewModel(
+          key     = "tradingNameOfSubcontractor.checkYourAnswersLabel",
+          value   = ValueViewModel(HtmlFormat.escape(answer).toString),
+          actions = Seq(
+            ActionItemViewModel("site.change", controllers.add.routes.TradingNameOfSubcontractorController.onPageLoad(CheckMode).url)
+              .withVisuallyHiddenText(messages("tradingNameOfSubcontractor.change.hidden"))
+          )
         )
-      )
     }
 }

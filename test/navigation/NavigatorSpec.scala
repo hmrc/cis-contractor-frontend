@@ -20,7 +20,7 @@ import base.SpecBase
 import controllers.routes
 import pages.*
 import models.*
-import models.add.TypeOfSubcontractor
+import models.add.{TypeOfSubcontractor,SubcontractorName, UKAddress}
 import pages.add.*
 
 class NavigatorSpec extends SpecBase {
@@ -28,7 +28,7 @@ class NavigatorSpec extends SpecBase {
   val navigator = new Navigator
 
   private lazy val journeyRecovery = routes.JourneyRecoveryController.onPageLoad()
-  private lazy val CYA             = routes.CheckYourAnswersController.onPageLoad()
+  private lazy val CYA             = controllers.add.routes.CheckYourAnswersController.onPageLoad()
 
   "Navigator" - {
 
@@ -260,8 +260,22 @@ class NavigatorSpec extends SpecBase {
         navigator.nextPage(
           SubcontractorContactDetailsYesNoPage,
           NormalMode,
-          emptyUserAnswers.setOrException(SubcontractorContactDetailsYesNoPage, false)
-        ) mustBe routes.CheckYourAnswersController.onPageLoad()
+          emptyUserAnswers.setOrException(SubcontractorContactDetailsYesNoPage, true)
+        ) mustBe controllers.add.routes.SubContactDetailsController.onPageLoad(NormalMode)
+      }
+
+
+      "must go from SubcontractorContactDetailsYesNoPage to CYA when false" in {
+        val ua =
+          emptyUserAnswers
+            .setOrException(SubcontractorContactDetailsYesNoPage, false)
+
+        val navigator = new Navigator
+        navigator.nextPage(
+          SubcontractorContactDetailsYesNoPage,
+          NormalMode,
+          ua
+        ) mustBe controllers.add.routes.CheckYourAnswersController.onPageLoad()
       }
 
       "must go from a SubcontractorContactDetailsYesNoPage to journey recovery when incomplete info provided" in {
@@ -276,7 +290,7 @@ class NavigatorSpec extends SpecBase {
         navigator.nextPage(
           SubContactDetailsPage,
           NormalMode, UserAnswers("id")
-        ) mustBe routes.CheckYourAnswersController.onPageLoad()
+        ) mustBe controllers.add.routes.CheckYourAnswersController.onPageLoad()
       }
     }
 
@@ -285,7 +299,11 @@ class NavigatorSpec extends SpecBase {
       "must go from a page that doesn't exist in the edit route map to CheckYourAnswers" in {
 
         case object UnknownPage extends Page
-        navigator.nextPage(UnknownPage, CheckMode, UserAnswers("id")) mustBe routes.CheckYourAnswersController
+        navigator.nextPage(
+          UnknownPage,
+          CheckMode,
+          UserAnswers("id")
+        ) mustBe controllers.add.routes.CheckYourAnswersController
           .onPageLoad()
       }
 
@@ -318,7 +336,7 @@ class NavigatorSpec extends SpecBase {
           SubTradingNameYesNoPage,
           CheckMode,
           emptyUserAnswers.setOrException(SubTradingNameYesNoPage, false)
-        ) mustBe CYA
+        ) mustBe controllers.add.routes.SubcontractorNameController.onPageLoad(CheckMode)
       }
 
       "must go from SubTradingNameYesNoPage to journey recovery page when incomplete info provided" in {
@@ -437,7 +455,7 @@ class NavigatorSpec extends SpecBase {
           WorksReferenceNumberPage,
           CheckMode,
           UserAnswers("id")
-        ) mustBe controllers.add.routes.WorksReferenceNumberController.onPageLoad(CheckMode)
+        ) mustBe controllers.add.routes.CheckYourAnswersController.onPageLoad()
       }
 
       "must go from a WorksReferenceNumberYesNoPage to next page when true" in {
@@ -464,20 +482,160 @@ class NavigatorSpec extends SpecBase {
         ) mustBe journeyRecovery
       }
 
+      "must go to SubcontractorNameController when answer is No and name is missing" in {
+        val ua =
+          emptyUserAnswers
+            .set(SubTradingNameYesNoPage, false)
+            .success
+            .value
+
+        val navigator = new Navigator()
+        navigator.nextPage(SubTradingNameYesNoPage, CheckMode, ua) mustBe
+          controllers.add.routes.SubcontractorNameController.onPageLoad(CheckMode)
+      }
+
+      "must go to CYA when answer is No and subcontractor name already exists (Some(_))" in {
+        val ua =
+          emptyUserAnswers
+            .set(SubTradingNameYesNoPage, false)
+            .success
+            .value
+            .set(SubcontractorNamePage, SubcontractorName(firstName = "Jane", middleName = None, lastName = "Doe"))
+            .success
+            .value
+
+        val navigator = new Navigator()
+        navigator.nextPage(SubTradingNameYesNoPage, CheckMode, ua) mustBe
+          controllers.add.routes.CheckYourAnswersController.onPageLoad()
+      }
+
+      "must go to TradingNameOfSubcontractorController when answer is Yes and trading name is missing" in {
+        val ua =
+          emptyUserAnswers
+            .set(SubTradingNameYesNoPage, true)
+            .success
+            .value
+
+        val navigator = new Navigator()
+        navigator.nextPage(SubTradingNameYesNoPage, CheckMode, ua) mustBe
+          controllers.add.routes.TradingNameOfSubcontractorController.onPageLoad(CheckMode)
+      }
+
+      "must go to CYA when answer is Yes and trading name already exists (Some(_))" in {
+        val ua =
+          emptyUserAnswers
+            .set(SubTradingNameYesNoPage, true)
+            .success
+            .value
+            .set(TradingNameOfSubcontractorPage, "ACME Construction")
+            .success
+            .value
+
+        val navigator = new Navigator()
+        navigator.nextPage(SubTradingNameYesNoPage, CheckMode, ua) mustBe
+          controllers.add.routes.CheckYourAnswersController.onPageLoad()
+      }
+
+      "must route to JourneyRecovery when SubTradingNameYesNoPage answer is missing" in {
+        val navigator = new Navigator()
+        navigator.nextPage(SubTradingNameYesNoPage, CheckMode, emptyUserAnswers) mustBe
+          routes.JourneyRecoveryController.onPageLoad()
+      }
+    }
+
+    "navigatorFromSubTradingNameYesNoPage in NormalMode" - {
+      "must go to TradingNameOfSubcontractorController when answer is Yes" in {
+        val ua        = emptyUserAnswers.set(SubTradingNameYesNoPage, true).success.value
+        val navigator = new Navigator()
+        navigator.nextPage(SubTradingNameYesNoPage, NormalMode, ua) mustBe
+          controllers.add.routes.TradingNameOfSubcontractorController.onPageLoad(NormalMode)
+      }
+
+      "must go to SubcontractorNameController when answer is No" in {
+        val ua        = emptyUserAnswers.set(SubTradingNameYesNoPage, false).success.value
+        val navigator = new Navigator()
+        navigator.nextPage(SubTradingNameYesNoPage, NormalMode, ua) mustBe
+          controllers.add.routes.SubcontractorNameController.onPageLoad(NormalMode)
+      }
+
+      "must route to JourneyRecovery when SubTradingNameYesNoPage answer is missing" in {
+        val navigator = new Navigator()
+        navigator.nextPage(SubTradingNameYesNoPage, NormalMode, emptyUserAnswers) mustBe
+          routes.JourneyRecoveryController.onPageLoad()
+      }
+
+      "must go from SubAddressYesNoPage to CYA when true and AddressOfSubcontractorPage is already answered" in {
+        val addressSample = models.add.UKAddress(
+          addressLine1 = "10 Example Street",
+          addressLine2 = Some("Suite 2"),
+          addressLine3 = "Newcastle",
+          addressLine4 = Some("Tyne & Wear"),
+          postCode = "NE1 1AA"
+        )
+
+        val ua     =
+          emptyUserAnswers
+            .set(SubAddressYesNoPage, true)
+            .success
+            .value
+            .set(AddressOfSubcontractorPage, addressSample)
+            .success
+            .value
+        val result = navigator.nextPage(SubAddressYesNoPage, CheckMode, ua)
+        result mustBe CYA
+      }
+
+
+      "must go from NationalInsuranceNumberYesNoPage to CYA when true and SubNationalInsuranceNumberPage is already answered" in {
+        val ua =
+          emptyUserAnswers
+            .set(NationalInsuranceNumberYesNoPage, true).success.value
+            .set(SubNationalInsuranceNumberPage, "AB123456C").success.value // sample valid NINO
+
+        val result = navigator.nextPage(NationalInsuranceNumberYesNoPage, CheckMode, ua)
+        result mustBe CYA
+      }
+
+      "must go from UniqueTaxpayerReferenceYesNoPage to CYA when true and SubcontractorsUniqueTaxpayerReferencePage is already answered" in {
+        val ua =
+          emptyUserAnswers
+            .set(UniqueTaxpayerReferenceYesNoPage, true).success.value
+            .set(SubcontractorsUniqueTaxpayerReferencePage, "1234567890").success.value
+
+        val result = navigator.nextPage(UniqueTaxpayerReferenceYesNoPage, CheckMode, ua)
+        result mustBe CYA
+      }
+
+      "must go from WorksReferenceNumberYesNoPage to CYA when true and WorksReferenceNumberPage is already answered" in {
+        val ua =
+          emptyUserAnswers
+            .set(WorksReferenceNumberYesNoPage, true).success.value
+            .set(WorksReferenceNumberPage, "WRN-001").success.value // sample WRN
+
+        val result = navigator.nextPage(WorksReferenceNumberYesNoPage, CheckMode, ua)
+        result mustBe CYA
+      }
+
+
+      "must go from SubcontractorContactDetailsYesNoPage to CYA in CheckMode when true and SubContactDetailsPage is already answered" in {
+        val contactDetailsSample = models.add.SubContactDetails("test@test.com","11222121221")
+
+        val ua =
+          emptyUserAnswers
+            .set(SubcontractorContactDetailsYesNoPage, true).success.value
+            .set(SubContactDetailsPage, contactDetailsSample).success.value
+
+        val result = navigator.nextPage(SubcontractorContactDetailsYesNoPage, CheckMode, ua)
+        result mustBe CYA
+      }
+
+
       "must go from a SubContactDetailsPage to CYA" in {
         navigator.nextPage(
           SubContactDetailsPage,
           CheckMode,
           UserAnswers("id")
         ) mustBe CYA
-      }
-
-      "must go from SubcontractorsUniqueTaxpayerReferencePage to SubcontractorsUniqueTaxpayerReferenceController with userAnswers in checkMode" in {
-        navigator.nextPage(
-          SubcontractorsUniqueTaxpayerReferencePage,
-          CheckMode,
-          UserAnswers("id")
-        ) mustBe controllers.add.routes.SubcontractorsUniqueTaxpayerReferenceController.onPageLoad(CheckMode)
       }
 
     }

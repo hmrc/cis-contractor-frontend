@@ -14,60 +14,67 @@
  * limitations under the License.
  */
 
-package viewmodels.checkAnswers
+package viewmodels.checkAnswers.add
 
 import controllers.add.routes
+import models.add.SubcontractorName
 import models.{CheckMode, UserAnswers}
 import org.scalatest.OptionValues.convertOptionToValuable
 import org.scalatest.TryValues.convertTryToSuccessOrFailure
 import org.scalatest.freespec.AnyFreeSpec
-import org.scalatest.matchers.should.Matchers
-import pages.add.TradingNameOfSubcontractorPage
+import org.scalatest.matchers.must.Matchers
+import org.scalatest.matchers.should.Matchers.{convertToStringShouldWrapperForVerb, should, shouldBe}
+import pages.add.SubcontractorNamePage
 import play.api.i18n.Messages
 import play.api.test.Helpers.stubMessages
-import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.*
+import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 
-class TradingNameOfSubcontractorSummarySpec extends AnyFreeSpec with Matchers {
+class SubcontractorNameSummarySpec extends AnyFreeSpec with Matchers {
 
   implicit val messages: Messages = stubMessages()
 
-  "TradingNNameOfSubcontractorSummary.row" - {
+  "SubcontractorNameSummary.row" - {
 
     "must return a SummaryListRow when the answer exists" in {
-      val answers =
-        UserAnswers("test-id")
-          .set(TradingNameOfSubcontractorPage, "Acme Ltd")
-          .success
-          .value
+      val subcontractorName = SubcontractorName(
+        firstName = "John",
+        middleName = Some("F."),
+        lastName = "Doe"
+      )
 
-      val maybeRow = TradingNameOfSubcontractorSummary.row(answers)
+      val answers = UserAnswers("test-id")
+        .set(SubcontractorNamePage, subcontractorName)
+        .success
+        .value
+
+      val maybeRow: Option[SummaryListRow] = SubcontractorNameSummary.row(answers)
       maybeRow shouldBe defined
 
       val row = maybeRow.value
-      
-      val expectedKeyText = messages("tradingNameOfSubcontractor.checkYourAnswersLabel")
+
+      val expectedKeyText = messages("subcontractorName.checkYourAnswersLabel")
       row.key.content.asHtml.toString should include(expectedKeyText)
-      
-      row.value.content.asHtml.toString should include("Acme Ltd")
-      
+
+      val expectedFullName = Seq(Some("John"), Some("F."), Some("Doe")).flatten.mkString(" ")
+      row.value.content.asHtml.toString should include(expectedFullName)
+
       row.actions shouldBe defined
       val actions = row.actions.value.items
       actions should have size 1
 
-      val changeAction = actions.head
+      val changeAction       = actions.head
       val expectedChangeText = messages("site.change")
-      val expectedHref = routes.TradingNameOfSubcontractorController.onPageLoad(CheckMode).url
-      val expectedHiddenText = messages("tradingNameOfSubcontractor.change.hidden")
+      val expectedHref       = routes.SubcontractorNameController.onPageLoad(CheckMode).url
+      val expectedHiddenText = messages("subcontractorName.change.hidden")
 
-      changeAction.content.asHtml.toString should include(expectedChangeText)
-      changeAction.href shouldBe expectedHref
-      
+      changeAction.content.asHtml.toString    should include(expectedChangeText)
+      changeAction.href                     shouldBe expectedHref
       changeAction.visuallyHiddenText.value shouldBe expectedHiddenText
     }
 
     "must return None when the answer does not exist" in {
       val answers = UserAnswers("test-id")
-      TradingNameOfSubcontractorSummary.row(answers) shouldBe None
+      SubcontractorNameSummary.row(answers) shouldBe None
     }
   }
 }
