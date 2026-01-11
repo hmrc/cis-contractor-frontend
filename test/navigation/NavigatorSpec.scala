@@ -331,7 +331,7 @@ class NavigatorSpec extends SpecBase {
         ) mustBe controllers.add.routes.TradingNameOfSubcontractorController.onPageLoad(CheckMode)
       }
 
-      "must go from SubTradingNameYesNoPage to CYA page when false" in {
+      "must go from SubTradingNameYesNoPage to SubcontractorNamePage when false" in {
         navigator.nextPage(
           SubTradingNameYesNoPage,
           CheckMode,
