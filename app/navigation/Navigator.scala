@@ -46,7 +46,7 @@ class Navigator @Inject() () {
   }
 
   private val checkRouteMap: Page => UserAnswers => Call = {
-    case TypeOfSubcontractorPage => userAnswers => navigatorFromTypeOfSubcontractorPage(CheckMode)(userAnswers)
+    case TypeOfSubcontractorPage                   => userAnswers => navigatorFromTypeOfSubcontractorPage(CheckMode)(userAnswers)
     case SubTradingNameYesNoPage                   => userAnswers => navigatorFromSubTradingNameYesNoPage(CheckMode)(userAnswers)
     case SubAddressYesNoPage                       => userAnswers => navigatorFromSubAddressYesNoPage(CheckMode)(userAnswers)
     case AddressOfSubcontractorPage                => _ => controllers.add.routes.CheckYourAnswersController.onPageLoad()
@@ -72,9 +72,9 @@ class Navigator @Inject() () {
   private def navigatorFromTypeOfSubcontractorPage(mode: Mode)(userAnswers: UserAnswers): Call =
     (userAnswers.get(TypeOfSubcontractorPage), mode) match {
       case (Some(Individualorsoletrader), NormalMode) => controllers.add.routes.SubTradingNameYesNoController.onPageLoad(NormalMode)
-      case (None, _) => routes.JourneyRecoveryController.onPageLoad()
-      case (_, NormalMode) => routes.JourneyRecoveryController.onPageLoad()
-      case (_, CheckMode) => controllers.add.routes.CheckYourAnswersController.onPageLoad()
+      case (None, _)                                  => routes.JourneyRecoveryController.onPageLoad()
+      case (_, NormalMode)                            => routes.JourneyRecoveryController.onPageLoad()
+      case (_, CheckMode)                             => controllers.add.routes.CheckYourAnswersController.onPageLoad()
     }
 
   private def navigatorFromSubTradingNameYesNoPage(mode: Mode)(ua: UserAnswers): Call =

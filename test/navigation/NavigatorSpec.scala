@@ -20,7 +20,7 @@ import base.SpecBase
 import controllers.routes
 import pages.*
 import models.*
-import models.add.{TypeOfSubcontractor,SubcontractorName, UKAddress}
+import models.add.{TypeOfSubcontractor, SubcontractorName, UKAddress}
 import pages.add.*
 
 class NavigatorSpec extends SpecBase {
@@ -80,14 +80,6 @@ class NavigatorSpec extends SpecBase {
         ) mustBe journeyRecovery
       }
 
-      "must go from a SubcontractorNamePage to SubAddressYesNoPage" in {
-        navigator.nextPage(
-          SubcontractorNamePage,
-          NormalMode,
-          UserAnswers("id")
-        ) mustBe controllers.add.routes.SubAddressYesNoController.onPageLoad(NormalMode)
-      }
-
       "must go from a SubTradingNameYesNoPage to TradingNameOfSubcontractorPage when true" in {
         navigator.nextPage(
             SubTradingNameYesNoPage,
@@ -117,6 +109,14 @@ class NavigatorSpec extends SpecBase {
             TradingNameOfSubcontractorPage,
             NormalMode,
             UserAnswers("id")
+        ) mustBe controllers.add.routes.SubAddressYesNoController.onPageLoad(NormalMode)
+      }
+
+      "must go from a SubcontractorNamePage to SubAddressYesNoPage" in {
+        navigator.nextPage(
+          SubcontractorNamePage,
+          NormalMode,
+          UserAnswers("id")
         ) mustBe controllers.add.routes.SubAddressYesNoController.onPageLoad(NormalMode)
       }
 
