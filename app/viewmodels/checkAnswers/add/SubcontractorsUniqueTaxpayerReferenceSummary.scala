@@ -24,19 +24,21 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
 
-object SubcontractorsUniqueTaxpayerReferenceSummary  {
+object SubcontractorsUniqueTaxpayerReferenceSummary {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(SubcontractorsUniqueTaxpayerReferencePage).map {
-      answer =>
-
-        SummaryListRowViewModel(
-          key     = "subcontractorsUniqueTaxpayerReference.checkYourAnswersLabel",
-          value   = ValueViewModel(HtmlFormat.escape(answer).toString),
-          actions = Seq(
-            ActionItemViewModel("site.change", controllers.add.routes.SubcontractorsUniqueTaxpayerReferenceController.onPageLoad(CheckMode).url)
-              .withVisuallyHiddenText(messages("subcontractorsUniqueTaxpayerReference.change.hidden"))
+    answers.get(SubcontractorsUniqueTaxpayerReferencePage).map { answer =>
+      SummaryListRowViewModel(
+        key = "subcontractorsUniqueTaxpayerReference.checkYourAnswersLabel",
+        value = ValueViewModel(HtmlFormat.escape(answer).toString),
+        actions = Seq(
+          ActionItemViewModel(
+            "site.change",
+            controllers.add.routes.SubcontractorsUniqueTaxpayerReferenceController.onPageLoad(CheckMode).url
           )
+            .withVisuallyHiddenText(messages("subcontractorsUniqueTaxpayerReference.change.hidden"))
+            .withAttribute("id" -> "subcontractors-unique-taxpayer-reference")
         )
+      )
     }
 }

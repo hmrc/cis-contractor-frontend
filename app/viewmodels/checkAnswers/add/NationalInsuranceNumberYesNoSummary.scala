@@ -39,6 +39,7 @@ object NationalInsuranceNumberYesNoSummary {
             controllers.add.routes.NationalInsuranceNumberYesNoController.onPageLoad(CheckMode).url
           )
             .withVisuallyHiddenText(messages("nationalInsuranceNumberYesNo.change.hidden"))
+            .withAttribute("id" -> "national-insurance-number-yes-no")
         )
       )
     }

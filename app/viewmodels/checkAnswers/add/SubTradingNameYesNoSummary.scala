@@ -37,6 +37,7 @@ object SubTradingNameYesNoSummary  {
           actions = Seq(
             ActionItemViewModel("site.change", controllers.add.routes.SubTradingNameYesNoController.onPageLoad(CheckMode).url)
               .withVisuallyHiddenText(messages("subTradingNameYesNo.change.hidden"))
+              .withAttribute("id" -> "sub-trading-name-yes-no")
           )
         )
     }

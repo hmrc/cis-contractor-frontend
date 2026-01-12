@@ -24,19 +24,21 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
 
-object WorksReferenceNumberSummary  {
+object WorksReferenceNumberSummary {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(WorksReferenceNumberPage).map {
-      answer =>
-
-        SummaryListRowViewModel(
-          key     = "worksReferenceNumber.checkYourAnswersLabel",
-          value   = ValueViewModel(HtmlFormat.escape(answer).toString),
-          actions = Seq(
-            ActionItemViewModel("site.change", controllers.add.routes.WorksReferenceNumberController.onPageLoad(CheckMode).url)
-              .withVisuallyHiddenText(messages("worksReferenceNumber.change.hidden"))
+    answers.get(WorksReferenceNumberPage).map { answer =>
+      SummaryListRowViewModel(
+        key = "worksReferenceNumber.checkYourAnswersLabel",
+        value = ValueViewModel(HtmlFormat.escape(answer).toString),
+        actions = Seq(
+          ActionItemViewModel(
+            "site.change",
+            controllers.add.routes.WorksReferenceNumberController.onPageLoad(CheckMode).url
           )
+            .withVisuallyHiddenText(messages("worksReferenceNumber.change.hidden"))
+            .withAttribute("id" -> "works-reference-number")
         )
+      )
     }
 }

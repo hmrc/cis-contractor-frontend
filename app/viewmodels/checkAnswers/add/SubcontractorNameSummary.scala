@@ -44,6 +44,7 @@ object SubcontractorNameSummary {
             "site.change",
             controllers.add.routes.SubcontractorNameController.onPageLoad(CheckMode).url
           ).withVisuallyHiddenText(messages("subcontractorName.change.hidden"))
+            .withAttribute("id" -> "subcontractor-name")
         )
       )
     }
