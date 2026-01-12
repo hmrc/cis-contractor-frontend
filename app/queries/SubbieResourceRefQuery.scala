@@ -14,15 +14,10 @@
  * limitations under the License.
  */
 
-package models.subcontractor
+package queries
 
-import play.api.libs.json.{Json, OFormat}
+import play.api.libs.json.JsPath
 
-final case class CreateSubcontractorRequest(
-  schemeId: String,
-  subcontractorType: String
-)
-
-object CreateSubcontractorRequest {
-  implicit val format: OFormat[CreateSubcontractorRequest] = Json.format[CreateSubcontractorRequest]
+case object SubbieResourceRefQuery extends Gettable[Int] with Settable[Int] {
+  override def path: JsPath = JsPath \ "subbieResourceRef"
 }

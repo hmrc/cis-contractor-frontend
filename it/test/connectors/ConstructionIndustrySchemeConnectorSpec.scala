@@ -19,11 +19,11 @@ package connectors
 import com.github.tomakehurst.wiremock.client.WireMock.{aResponse, post, stubFor, urlPathEqualTo}
 import itutil.ApplicationWithWiremock
 import models.add.TypeOfSubcontractor
-import models.subcontractor.CreateSubcontractorRequest
+import models.subcontractor.{CreateSubcontractorRequest, UpdateSubcontractorRequest}
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-import play.api.http.Status.{CREATED, INTERNAL_SERVER_ERROR}
+import play.api.http.Status.{CREATED, INTERNAL_SERVER_ERROR, OK}
 import uk.gov.hmrc.http.HeaderCarrier
 
 class ConstructionIndustrySchemeConnectorSpec
@@ -59,9 +59,8 @@ class ConstructionIndustrySchemeConnectorSpec
       val result = connector
         .createSubcontractor(
           CreateSubcontractorRequest(
-            schemeId = 10,
-            subcontractorType = TypeOfSubcontractor.Trust.toString,
-            currentVersion = 0
+            schemeId = "10",
+            subcontractorType = TypeOfSubcontractor.Trust.toString
           )
         )
         .futureValue
@@ -79,9 +78,61 @@ class ConstructionIndustrySchemeConnectorSpec
         connector
           .createSubcontractor(
             CreateSubcontractorRequest(
-              schemeId = 10,
-              subcontractorType = TypeOfSubcontractor.Trust.toString,
-              currentVersion = 0
+              schemeId = "10",
+              subcontractorType = TypeOfSubcontractor.Trust.toString
+            )
+          )
+          .futureValue
+      }
+      ex.getMessage must include("returned 500")
+    }
+  }
+
+  "updateSubcontractor" should {
+    "successfully update subcontractor" in {
+
+      val responseJson =
+        """
+          |{
+          |  "newVersion": 20
+          |}
+                  """.stripMargin
+
+      stubFor(
+        post(urlPathEqualTo("/cis/subcontractor/update"))
+          .willReturn(
+            aResponse()
+              .withStatus(OK)
+              .withBody(responseJson)
+          )
+      )
+
+      val result = connector
+        .updateSubcontractor(
+          UpdateSubcontractorRequest(
+            schemeId = "10",
+            subbieResourceRef = 10,
+            tradingName = Some("trader name")
+          )
+        )
+        .futureValue
+
+      result.newVersion mustBe 20
+    }
+
+    "propagate upstream error on non-2xx" in {
+      stubFor(
+        post(urlPathEqualTo("/cis/subcontractor/update"))
+          .willReturn(aResponse().withStatus(INTERNAL_SERVER_ERROR).withBody("boom"))
+      )
+
+      val ex = intercept[Exception] {
+        connector
+          .updateSubcontractor(
+            UpdateSubcontractorRequest(
+              schemeId = "10",
+              subbieResourceRef = 10,
+              tradingName = Some("trader name")
             )
           )
           .futureValue

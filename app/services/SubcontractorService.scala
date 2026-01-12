@@ -18,37 +18,115 @@ package services
 
 import connectors.ConstructionIndustrySchemeConnector
 import models.UserAnswers
-import models.subcontractor.{CreateSubcontractorRequest, CreateSubcontractorResponse}
-import pages.add.TypeOfSubcontractorPage
+import models.add.SubcontractorName
+import models.subcontractor.{CreateSubcontractorRequest, UpdateSubcontractorRequest, UpdateSubcontractorResponse}
+import pages.add.{SubcontractorNamePage, TradingNameOfSubcontractorPage, TypeOfSubcontractorPage}
 import play.api.Logging
+import queries.{CisIdQuery, SubbieResourceRefQuery}
 import uk.gov.hmrc.http.HeaderCarrier
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
-import scala.util.{Failure, Success}
 
 @Singleton
 class SubcontractorService @Inject() (
   cisConnector: ConstructionIndustrySchemeConnector
 )(implicit ec: ExecutionContext)
     extends Logging {
+
+  def initializeCisId(userAnswers: UserAnswers)(implicit hc: HeaderCarrier): Future[UserAnswers] =
+    userAnswers.get(CisIdQuery) match {
+      case Some(cisId) => Future.successful(userAnswers)
+      case None        =>
+        cisConnector.getCisTaxpayer().flatMap { tp =>
+          val cisId = tp.uniqueId.trim
+          if (cisId.isEmpty) {
+            Future.failed(new RuntimeException("Empty cisId (uniqueId) returned from /cis/taxpayer"))
+          } else {
+            for {
+              updatedUserAnswers <- Future.fromTry(userAnswers.set(CisIdQuery, cisId))
+            } yield updatedUserAnswers
+          }
+        }
+    }
+
   def createSubcontractor(
-    schemeId: Int,
     userAnswers: UserAnswers
-  )(implicit hc: HeaderCarrier): Future[CreateSubcontractorResponse] =
+  )(implicit hc: HeaderCarrier): Future[UserAnswers] =
+    userAnswers.get(SubbieResourceRefQuery) match {
+      case Some(value) => Future.successful(userAnswers)
+      case None        =>
+        for {
+          cisId             <- getCisId(userAnswers)
+          subcontractorType <- getSubcontractorType(userAnswers)
+          payload            = CreateSubcontractorRequest(
+                                 schemeId = cisId,
+                                 subcontractorType = subcontractorType
+                               )
+          response          <- cisConnector.createSubcontractor(payload)
+          updatedAnswers    <- Future.fromTry(userAnswers.set(SubbieResourceRefQuery, response.subbieResourceRef))
+        } yield updatedAnswers
+    }
+
+  def updateSubcontractorTradingName(
+    userAnswers: UserAnswers
+  )(implicit hc: HeaderCarrier): Future[UpdateSubcontractorResponse] =
     for {
-      subcontractorType <- getSubcontractorType(userAnswers)
-      payload            = CreateSubcontractorRequest(
-                             schemeId = schemeId,
-                             subcontractorType = subcontractorType,
-                             currentVersion = 0
+      cisId             <- getCisId(userAnswers)
+      subbieResourceRef <- getSubbieResourceRef(userAnswers)
+      tradingName       <- getSubcontractorTradingName(userAnswers)
+      payload            = UpdateSubcontractorRequest(
+                             schemeId = cisId,
+                             subbieResourceRef = subbieResourceRef,
+                             tradingName = Some(tradingName)
                            )
-      response          <- cisConnector.createSubcontractor(payload)
+      response          <- cisConnector.updateSubcontractor(payload)
     } yield response
+
+  def updateSubcontractorName(
+    userAnswers: UserAnswers
+  )(implicit hc: HeaderCarrier): Future[UpdateSubcontractorResponse] =
+    for {
+      cisId             <- getCisId(userAnswers)
+      subbieResourceRef <- getSubbieResourceRef(userAnswers)
+      name              <- getSubcontractorName(userAnswers)
+      payload            = UpdateSubcontractorRequest(
+                             schemeId = cisId,
+                             subbieResourceRef = subbieResourceRef,
+                             firstName = Some(name.firstName),
+                             secondName = name.middleName,
+                             surname = Some(name.lastName)
+                           )
+      response          <- cisConnector.updateSubcontractor(payload)
+    } yield response
+
+  private def getCisId(userAnswers: UserAnswers): Future[String] =
+    userAnswers.get(CisIdQuery) match {
+      case Some(cisId) => Future.successful(cisId)
+      case None        => Future.failed(new RuntimeException("CisIdQuery not found in session data"))
+    }
+
+  private def getSubbieResourceRef(userAnswers: UserAnswers): Future[Int] =
+    userAnswers.get(SubbieResourceRefQuery) match {
+      case Some(subbieResourceRef) => Future.successful(subbieResourceRef)
+      case None                    => Future.failed(new RuntimeException("SubbieResourceRef not found in session data"))
+    }
 
   private def getSubcontractorType(userAnswers: UserAnswers): Future[String] =
     userAnswers.get(TypeOfSubcontractorPage) match {
       case Some(subcontractorType) => Future.successful(subcontractorType.toString)
-      case None                    => Future.failed(new RuntimeException("Subcontractor Type not found in session data"))
+      case None                    => Future.failed(new RuntimeException("TypeOfSubcontractorPage not found in session data"))
+    }
+
+  private def getSubcontractorTradingName(userAnswers: UserAnswers): Future[String] =
+    userAnswers.get(TradingNameOfSubcontractorPage) match {
+      case Some(name) => Future.successful(name)
+      case None       => Future.failed(new RuntimeException("TradingNameOfSubcontractorPage not found in session data"))
+    }
+
+  private def getSubcontractorName(userAnswers: UserAnswers): Future[SubcontractorName] =
+    userAnswers.get(SubcontractorNamePage) match {
+      case Some(name) => Future.successful(name)
+      case None       => Future.failed(new RuntimeException("SubcontractorNamePage not found in session data"))
     }
 }

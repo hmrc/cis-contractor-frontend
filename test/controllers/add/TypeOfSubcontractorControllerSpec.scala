@@ -19,18 +19,15 @@ package controllers.add
 import base.SpecBase
 import forms.add.TypeOfSubcontractorFormProvider
 import models.add.TypeOfSubcontractor
-import models.subcontractor.CreateSubcontractorResponse
 import models.{NormalMode, UserAnswers}
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.{verify, verifyNoMoreInteractions, when}
+import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
 import pages.add.TypeOfSubcontractorPage
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import repositories.SessionRepository
-import services.SubcontractorService
-import uk.gov.hmrc.http.HeaderCarrier
 import views.html.add.TypeOfSubcontractorView
 
 import scala.concurrent.Future
@@ -84,20 +81,14 @@ class TypeOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
 
     "must redirect to the next page when valid data is submitted" in {
 
-      val mockSessionRepository    = mock[SessionRepository]
-      val mockSubcontractorService = mock[SubcontractorService]
+      val mockSessionRepository = mock[SessionRepository]
 
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
-      when(mockSubcontractorService.createSubcontractor(any[Int], any[UserAnswers])(any[HeaderCarrier])).thenReturn(
-        Future
-          .successful(CreateSubcontractorResponse(subbieResourceRef = 2))
-      )
 
       val application =
         applicationBuilder(userAnswers = Some(emptyUserAnswers))
           .overrides(
-            bind[SessionRepository].toInstance(mockSessionRepository),
-            bind[SubcontractorService].toInstance(mockSubcontractorService)
+            bind[SessionRepository].toInstance(mockSessionRepository)
           )
           .build()
 
@@ -113,9 +104,6 @@ class TypeOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
           .onPageLoad(NormalMode)
           .url
       }
-
-      verify(mockSubcontractorService).createSubcontractor(any[Int], any[UserAnswers])(any[HeaderCarrier])
-      verifyNoMoreInteractions(mockSubcontractorService)
     }
 
     "must return a Bad Request and errors when invalid data is submitted" in {

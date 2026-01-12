@@ -17,9 +17,19 @@
 package controllers
 
 import base.SpecBase
-import models.NormalMode
+import models.{NormalMode, UserAnswers}
+import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito.{verify, verifyNoMoreInteractions, when}
+import org.scalatestplus.mockito.MockitoSugar.mock
+import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
+import queries.CisIdQuery
+import repositories.SessionRepository
+import services.SubcontractorService
+import uk.gov.hmrc.http.HeaderCarrier
+
+import scala.concurrent.Future
 
 class IndexControllerSpec extends SpecBase {
 
@@ -27,16 +37,41 @@ class IndexControllerSpec extends SpecBase {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = None).build()
+      val mockSessionRepository    = mock[SessionRepository]
+      val mockSubcontractorService = mock[SubcontractorService]
+
+      val mockUserAnswers = emptyUserAnswers
+        .set(CisIdQuery, "CisId")
+        .success
+        .value
+
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+      when(mockSubcontractorService.initializeCisId(any[UserAnswers])(any[HeaderCarrier])).thenReturn(
+        Future
+          .successful(mockUserAnswers)
+      )
+
+      val application = applicationBuilder(userAnswers = None)
+        .overrides(
+          bind[SessionRepository].toInstance(mockSessionRepository),
+          bind[SubcontractorService].toInstance(mockSubcontractorService)
+        )
+        .build()
 
       running(application) {
         val request = FakeRequest(GET, routes.IndexController.onPageLoad().url)
 
         val result = route(application, request).value
-        
+
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.add.routes.TypeOfSubcontractorController.onPageLoad(NormalMode).url
+        redirectLocation(result).value mustEqual controllers.add.routes.TypeOfSubcontractorController
+          .onPageLoad(NormalMode)
+          .url
       }
+
+      verify(mockSubcontractorService).initializeCisId(any[UserAnswers])(any[HeaderCarrier])
+      verifyNoMoreInteractions(mockSubcontractorService)
     }
   }
 }
