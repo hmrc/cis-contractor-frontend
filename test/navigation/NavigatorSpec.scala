@@ -48,7 +48,7 @@ class NavigatorSpec extends SpecBase {
         ) mustBe controllers.add.routes.SubTradingNameYesNoController.onPageLoad(NormalMode)
       }
 
-      "must go from a TypeOfSubcontractorPage to SubTradingNameYesNo when Limitedcompany is selected" in {
+      "must go from a TypeOfSubcontractorPage to JourneyRecovery when Limitedcompany is selected" in {
         navigator.nextPage(
           TypeOfSubcontractorPage,
           NormalMode,
@@ -56,7 +56,7 @@ class NavigatorSpec extends SpecBase {
         ) mustBe routes.JourneyRecoveryController.onPageLoad()
       }
 
-      "must go from a TypeOfSubcontractorPage to SubTradingNameYesNo when Partnership is selected" in {
+      "must go from a TypeOfSubcontractorPage to JourneyRecovery when Partnership is selected" in {
         navigator.nextPage(
           TypeOfSubcontractorPage,
           NormalMode,
@@ -64,7 +64,7 @@ class NavigatorSpec extends SpecBase {
         ) mustBe routes.JourneyRecoveryController.onPageLoad()
       }
 
-      "must go from a TypeOfSubcontractorPage to SubTradingNameYesNo when Trust is selected" in {
+      "must go from a TypeOfSubcontractorPage to JourneyRecovery when Trust is selected" in {
         navigator.nextPage(
           TypeOfSubcontractorPage,
           NormalMode,
@@ -256,7 +256,7 @@ class NavigatorSpec extends SpecBase {
         ) mustBe controllers.add.routes.SubContactDetailsController.onPageLoad(NormalMode)
       }
 
-      "must go from a SubcontractorContactDetailsYesNoPage to CYA when false" in {
+      "must go from a SubcontractorContactDetailsYesNoPage to SubContactDetailsPage when true" in {
         navigator.nextPage(
           SubcontractorContactDetailsYesNoPage,
           NormalMode,
