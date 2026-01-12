@@ -21,38 +21,32 @@ import play.api.mvc.Call
 import controllers.routes
 import pages.*
 import models.*
+import models.add.TypeOfSubcontractor.*
 import pages.add.*
 
 @Singleton
 class Navigator @Inject() () {
 
   private val normalRoutes: Page => UserAnswers => Call = {
-    case TypeOfSubcontractorPage                   => _ => controllers.add.routes.SubTradingNameYesNoController.onPageLoad(NormalMode)
-    case SubTradingNameYesNoPage                   => userAnswers => navigatorFromSubTradingNameYesNoPage(NormalMode)(userAnswers)
-    case TradingNameOfSubcontractorPage            =>
-      _ => controllers.add.routes.TradingNameOfSubcontractorController.onPageLoad(NormalMode)
-    case SubcontractorNamePage                     => _ => controllers.add.routes.SubcontractorNameController.onPageLoad(NormalMode)
-    case SubAddressYesNoPage                       => userAnswers => navigatorFromSubAddressYesNoPage(NormalMode)(userAnswers)
-    case NationalInsuranceNumberYesNoPage          =>
-      userAnswers => navigatorFromNationalInsuranceNumberYesNoPage(NormalMode)(userAnswers)
-    case AddressOfSubcontractorPage                =>
-      _ => controllers.add.routes.AddressOfSubcontractorController.onPageLoad(NormalMode)
-    case UniqueTaxpayerReferenceYesNoPage          =>
-      userAnswers => navigatorFromUniqueTaxpayerReferenceYesNoPage(NormalMode)(userAnswers)
-    case WorksReferenceNumberYesNoPage             =>
-      userAnswers => navigatorFromWorksReferenceNumberYesNoPage(NormalMode)(userAnswers)
-    case SubNationalInsuranceNumberPage            =>
-      _ => controllers.add.routes.SubNationalInsuranceNumberController.onPageLoad(NormalMode)
-    case SubContactDetailsPage                     => _ => controllers.add.routes.SubContactDetailsController.onPageLoad(NormalMode)
-    case SubcontractorsUniqueTaxpayerReferencePage =>
-      _ => controllers.add.routes.SubcontractorsUniqueTaxpayerReferenceController.onPageLoad(NormalMode)
-    case SubcontractorContactDetailsYesNoPage      =>
-      userAnswers => navigatorFromSubcontractorContactDetailsYesNoPage(NormalMode)(userAnswers)
-    case WorksReferenceNumberPage                  => _ => controllers.add.routes.WorksReferenceNumberController.onPageLoad(NormalMode)
-    case _                                         => _ => routes.IndexController.onPageLoad()
+    case TypeOfSubcontractorPage                      => userAnswers => navigatorFromTypeOfSubcontractorPage(NormalMode)(userAnswers)
+    case SubTradingNameYesNoPage                      => userAnswers => navigatorFromSubTradingNameYesNoPage(NormalMode)(userAnswers)
+    case TradingNameOfSubcontractorPage               => _ => controllers.add.routes.SubAddressYesNoController.onPageLoad(NormalMode)
+    case SubcontractorNamePage                        =>  _ => controllers.add.routes.SubAddressYesNoController.onPageLoad(NormalMode)
+    case SubAddressYesNoPage                          => userAnswers => navigatorFromSubAddressYesNoPage(NormalMode)(userAnswers)
+    case AddressOfSubcontractorPage                   => _ => controllers.add.routes.NationalInsuranceNumberYesNoController.onPageLoad(NormalMode)
+    case NationalInsuranceNumberYesNoPage             => userAnswers => navigatorFromNationalInsuranceNumberYesNoPage(NormalMode)(userAnswers)
+    case SubNationalInsuranceNumberPage               => _ => controllers.add.routes.UniqueTaxpayerReferenceYesNoController.onPageLoad(NormalMode)
+    case UniqueTaxpayerReferenceYesNoPage             => userAnswers => navigatorFromUniqueTaxpayerReferenceYesNoPage(NormalMode)(userAnswers)
+    case SubcontractorsUniqueTaxpayerReferencePage    => _ => controllers.add.routes.WorksReferenceNumberYesNoController.onPageLoad(NormalMode)
+    case WorksReferenceNumberYesNoPage                => userAnswers => navigatorFromWorksReferenceNumberYesNoPage(NormalMode)(userAnswers)
+    case WorksReferenceNumberPage                     => _ => controllers.add.routes.SubcontractorContactDetailsYesNoController.onPageLoad(NormalMode)
+    case SubcontractorContactDetailsYesNoPage         => userAnswers => navigatorFromSubcontractorContactDetailsYesNoPage(NormalMode)(userAnswers)
+    case SubContactDetailsPage                        => _ => controllers.add.routes.CheckYourAnswersController.onPageLoad()
+    case _                                            => _ => routes.IndexController.onPageLoad()
   }
 
   private val checkRouteMap: Page => UserAnswers => Call = {
+    case TypeOfSubcontractorPage                   => userAnswers => navigatorFromTypeOfSubcontractorPage(CheckMode)(userAnswers)
     case SubTradingNameYesNoPage                   => userAnswers => navigatorFromSubTradingNameYesNoPage(CheckMode)(userAnswers)
     case SubAddressYesNoPage                       => userAnswers => navigatorFromSubAddressYesNoPage(CheckMode)(userAnswers)
     case AddressOfSubcontractorPage                => _ => controllers.add.routes.CheckYourAnswersController.onPageLoad()
@@ -74,6 +68,14 @@ class Navigator @Inject() () {
     case CheckMode  =>
       checkRouteMap(page)(userAnswers)
   }
+
+  private def navigatorFromTypeOfSubcontractorPage(mode: Mode)(userAnswers: UserAnswers): Call =
+    (userAnswers.get(TypeOfSubcontractorPage), mode) match {
+      case (Some(Individualorsoletrader), NormalMode) => controllers.add.routes.SubTradingNameYesNoController.onPageLoad(NormalMode)
+      case (None, _)                                  => routes.JourneyRecoveryController.onPageLoad()
+      case (_, NormalMode)                            => routes.JourneyRecoveryController.onPageLoad()
+      case (_, CheckMode)                             => controllers.add.routes.CheckYourAnswersController.onPageLoad()
+    }
 
   private def navigatorFromSubTradingNameYesNoPage(mode: Mode)(ua: UserAnswers): Call =
     (ua.get(SubTradingNameYesNoPage), mode) match {

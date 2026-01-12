@@ -20,7 +20,7 @@ import base.SpecBase
 import controllers.routes
 import pages.*
 import models.*
-import models.add.{SubcontractorName, UKAddress}
+import models.add.{TypeOfSubcontractor, SubcontractorName, UKAddress}
 import pages.add.*
 
 class NavigatorSpec extends SpecBase {
@@ -40,55 +40,87 @@ class NavigatorSpec extends SpecBase {
         navigator.nextPage(UnknownPage, NormalMode, UserAnswers("id")) mustBe routes.IndexController.onPageLoad()
       }
 
-      "must go from TypeOfSubcontractorPage to SubTradingNameYesNoController" in {
+      "must go from a TypeOfSubcontractorPage to SubTradingNameYesNo when Individualorsoletrader is selected" in {
         navigator.nextPage(
-          TypeOfSubcontractorPage,
-          NormalMode,
-          UserAnswers("id")
+            TypeOfSubcontractorPage,
+            NormalMode,
+            emptyUserAnswers.setOrException(TypeOfSubcontractorPage, TypeOfSubcontractor.Individualorsoletrader)
         ) mustBe controllers.add.routes.SubTradingNameYesNoController.onPageLoad(NormalMode)
       }
 
-      "must go from SubTradingNameYesNoPage to TradingNameOfSubcontractorController when true" in {
+      "must go from a TypeOfSubcontractorPage to JourneyRecovery when Limitedcompany is selected" in {
         navigator.nextPage(
-          SubTradingNameYesNoPage,
+          TypeOfSubcontractorPage,
           NormalMode,
-          emptyUserAnswers.setOrException(SubTradingNameYesNoPage, true)
-        ) mustBe controllers.add.routes.TradingNameOfSubcontractorController.onPageLoad(NormalMode)
+          emptyUserAnswers.setOrException(TypeOfSubcontractorPage, TypeOfSubcontractor.Limitedcompany)
+        ) mustBe routes.JourneyRecoveryController.onPageLoad()
       }
 
-      "must go from SubTradingNameYesNoPage to next page when false" in {
+      "must go from a TypeOfSubcontractorPage to JourneyRecovery when Partnership is selected" in {
         navigator.nextPage(
-          SubTradingNameYesNoPage,
+          TypeOfSubcontractorPage,
           NormalMode,
-          emptyUserAnswers.setOrException(SubTradingNameYesNoPage, false)
-        ) mustBe controllers.add.routes.SubcontractorNameController.onPageLoad(NormalMode)
+          emptyUserAnswers.setOrException(TypeOfSubcontractorPage, TypeOfSubcontractor.Partnership)
+        ) mustBe routes.JourneyRecoveryController.onPageLoad()
       }
 
-      "must go from SubTradingNameYesNoPage to journey recovery page when incomplete info provided" in {
+      "must go from a TypeOfSubcontractorPage to JourneyRecovery when Trust is selected" in {
         navigator.nextPage(
-          SubTradingNameYesNoPage,
+          TypeOfSubcontractorPage,
+          NormalMode,
+          emptyUserAnswers.setOrException(TypeOfSubcontractorPage, TypeOfSubcontractor.Trust)
+        ) mustBe routes.JourneyRecoveryController.onPageLoad()
+      }
+
+      "must go from a TypeOfSubcontractorPage to journey recovery page when incomplete info provided" in {
+        navigator.nextPage(
+          TypeOfSubcontractorPage,
           NormalMode,
           emptyUserAnswers
         ) mustBe journeyRecovery
       }
 
-      "must go from a TradingNameOfSubcontractorPage to next page" in {
+      "must go from a SubTradingNameYesNoPage to TradingNameOfSubcontractorPage when true" in {
         navigator.nextPage(
-          TradingNameOfSubcontractorPage,
-          NormalMode,
-          UserAnswers("id")
+            SubTradingNameYesNoPage,
+            NormalMode,
+            emptyUserAnswers.setOrException(SubTradingNameYesNoPage, true)
         ) mustBe controllers.add.routes.TradingNameOfSubcontractorController.onPageLoad(NormalMode)
       }
 
-      "must go from a AddressOfSubcontractorPage to next page" in {
+      "must go from a SubTradingNameYesNoPage to SubcontractorNamePage when false" in {
         navigator.nextPage(
-          AddressOfSubcontractorPage,
-          NormalMode,
-          UserAnswers("id")
-        ) mustBe controllers.add.routes.AddressOfSubcontractorController.onPageLoad(NormalMode)
+            SubTradingNameYesNoPage,
+            NormalMode,
+            emptyUserAnswers.setOrException(SubTradingNameYesNoPage, false)
+        ) mustBe controllers.add.routes.SubcontractorNameController.onPageLoad(NormalMode)
       }
 
-      "must go from a SubAddressYesNoPage to next page when true" in {
+      "must go from a SubTradingNameYesNoPage to journey recovery page when incomplete info provided" in {
+        navigator.nextPage(
+            SubTradingNameYesNoPage,
+            NormalMode,
+            emptyUserAnswers
+        ) mustBe journeyRecovery
+      }
+
+      "must go from a TradingNameOfSubcontractorPage to SubAddressYesNoPage" in {
+        navigator.nextPage(
+            TradingNameOfSubcontractorPage,
+            NormalMode,
+            UserAnswers("id")
+        ) mustBe controllers.add.routes.SubAddressYesNoController.onPageLoad(NormalMode)
+      }
+
+      "must go from a SubcontractorNamePage to SubAddressYesNoPage" in {
+        navigator.nextPage(
+          SubcontractorNamePage,
+          NormalMode,
+          UserAnswers("id")
+        ) mustBe controllers.add.routes.SubAddressYesNoController.onPageLoad(NormalMode)
+      }
+
+      "must go from a SubAddressYesNoPage to AddressOfSubcontractorPage when true" in {
         navigator.nextPage(
           SubAddressYesNoPage,
           NormalMode,
@@ -96,7 +128,7 @@ class NavigatorSpec extends SpecBase {
         ) mustBe controllers.add.routes.AddressOfSubcontractorController.onPageLoad(NormalMode)
       }
 
-      "must go from a SubAddressYesNoPage to next page when false" in {
+      "must go from a SubAddressYesNoPage to NationalInsuranceNumberYesNoPage when false" in {
         navigator.nextPage(
           SubAddressYesNoPage,
           NormalMode,
@@ -112,31 +144,15 @@ class NavigatorSpec extends SpecBase {
         ) mustBe journeyRecovery
       }
 
-      "must go from a SubcontractorNamePage  to next page" in {
+      "must go from a AddressOfSubcontractorPage to NationalInsuranceNumberYesNoPage" in {
         navigator.nextPage(
-          SubcontractorNamePage,
-          NormalMode,
-          UserAnswers("id")
-        ) mustBe controllers.add.routes.SubcontractorNameController.onPageLoad(NormalMode)
+            AddressOfSubcontractorPage,
+            NormalMode,
+            UserAnswers("id")
+        ) mustBe controllers.add.routes.NationalInsuranceNumberYesNoController.onPageLoad(NormalMode)
       }
 
-      "must go from a WorksReferenceNumberPage  to next page" in {
-        navigator.nextPage(
-          WorksReferenceNumberPage,
-          NormalMode,
-          UserAnswers("id")
-        ) mustBe controllers.add.routes.WorksReferenceNumberController.onPageLoad(NormalMode)
-      }
-
-      "must go from a NationalInsuranceNumberYesNoPage to next page when false" in {
-        navigator.nextPage(
-          NationalInsuranceNumberYesNoPage,
-          NormalMode,
-          emptyUserAnswers.setOrException(NationalInsuranceNumberYesNoPage, false)
-        ) mustBe controllers.add.routes.UniqueTaxpayerReferenceYesNoController.onPageLoad(NormalMode)
-      }
-
-      "must go from a NationalInsuranceNumberYesNoPage to next page when true" in {
+      "must go from a NationalInsuranceNumberYesNoPage to SubNationalInsuranceNumberPage when true" in {
         navigator.nextPage(
           NationalInsuranceNumberYesNoPage,
           NormalMode,
@@ -144,7 +160,15 @@ class NavigatorSpec extends SpecBase {
         ) mustBe controllers.add.routes.SubNationalInsuranceNumberController.onPageLoad(NormalMode)
       }
 
-      "must go from NationalInsuranceNumberYesNoPage to journey recovery when incomplete info provided" in {
+      "must go from a NationalInsuranceNumberYesNoPage to UniqueTaxpayerReferenceYesNoPage when false" in {
+        navigator.nextPage(
+            NationalInsuranceNumberYesNoPage,
+            NormalMode,
+            emptyUserAnswers.setOrException(NationalInsuranceNumberYesNoPage, false)
+        ) mustBe controllers.add.routes.UniqueTaxpayerReferenceYesNoController.onPageLoad(NormalMode)
+      }
+
+      "must go from a NationalInsuranceNumberYesNoPage to journey recovery when incomplete info provided" in {
         navigator.nextPage(
           NationalInsuranceNumberYesNoPage,
           NormalMode,
@@ -152,84 +176,85 @@ class NavigatorSpec extends SpecBase {
         ) mustBe journeyRecovery
       }
 
-      "must go from a UniqueTaxpayerReferenceYesNoPage to next page when true" in {
+      "must go from a SubNationalInsuranceNumberPage to UniqueTaxpayerReferenceYesNoPage" in {
         navigator.nextPage(
-          UniqueTaxpayerReferenceYesNoPage,
+          SubNationalInsuranceNumberPage,
           NormalMode,
-          emptyUserAnswers.setOrException(UniqueTaxpayerReferenceYesNoPage, true)
+          UserAnswers("id")
+        ) mustBe controllers.add.routes.UniqueTaxpayerReferenceYesNoController.onPageLoad(NormalMode)
+      }
+
+      "must go from a UniqueTaxpayerReferenceYesNoPage to SubcontractorsUniqueTaxpayerReferencePage when true" in {
+        navigator.nextPage(
+            UniqueTaxpayerReferenceYesNoPage,
+            NormalMode,
+            emptyUserAnswers.setOrException(UniqueTaxpayerReferenceYesNoPage, true)
         ) mustBe controllers.add.routes.SubcontractorsUniqueTaxpayerReferenceController.onPageLoad(NormalMode)
       }
 
-      "must go from a UniqueTaxpayerReferenceYesNoPage to next page when false" in {
+      "must go from a UniqueTaxpayerReferenceYesNoPage to WorksReferenceNumberYesNoPage when false" in {
         navigator.nextPage(
-          UniqueTaxpayerReferenceYesNoPage,
-          NormalMode,
-          emptyUserAnswers.setOrException(UniqueTaxpayerReferenceYesNoPage, false)
+            UniqueTaxpayerReferenceYesNoPage,
+            NormalMode,
+            emptyUserAnswers.setOrException(UniqueTaxpayerReferenceYesNoPage, false)
         ) mustBe controllers.add.routes.WorksReferenceNumberYesNoController.onPageLoad(NormalMode)
       }
 
       "must go from a UniqueTaxpayerReferenceYesNoPage to journey recovery when incomplete info provided" in {
         navigator.nextPage(
-          UniqueTaxpayerReferenceYesNoPage,
-          NormalMode,
-          emptyUserAnswers
+            UniqueTaxpayerReferenceYesNoPage,
+            NormalMode,
+            emptyUserAnswers
         ) mustBe journeyRecovery
       }
 
-      "must go from a WorksReferenceNumberYesNoPage to next page when true" in {
-        navigator.nextPage(
-          WorksReferenceNumberYesNoPage,
-          NormalMode,
-          emptyUserAnswers.setOrException(WorksReferenceNumberYesNoPage, true)
-        ) mustBe controllers.add.routes.WorksReferenceNumberController.onPageLoad(NormalMode)
-      }
-
-      "must go from a WorksReferenceNumberYesNoPage to next page when false" in {
-        navigator.nextPage(
-          WorksReferenceNumberYesNoPage,
-          NormalMode,
-          emptyUserAnswers.setOrException(WorksReferenceNumberYesNoPage, false)
-        ) mustBe controllers.add.routes.SubcontractorContactDetailsYesNoController.onPageLoad(NormalMode)
-      }
-
-      "must go from WorksReferenceNumberYesNoPage to journey recovery when incomplete info provided" in {
-        navigator.nextPage(
-          WorksReferenceNumberYesNoPage,
-          NormalMode,
-          emptyUserAnswers
-        ) mustBe journeyRecovery
-      }
-
-      "must go from SubNationalInsuranceNumberPage to next page" in {
-        navigator.nextPage(
-          SubNationalInsuranceNumberPage,
-          NormalMode,
-          UserAnswers("id")
-        ) mustBe controllers.add.routes.SubNationalInsuranceNumberController.onPageLoad(NormalMode)
-      }
-
-      "must go from a SubContactDetailsPage  to next page" in {
-        navigator.nextPage(
-          SubContactDetailsPage,
-          NormalMode,
-          UserAnswers("id")
-        ) mustBe controllers.add.routes.SubContactDetailsController.onPageLoad(NormalMode)
-      }
-      "must go from SubcontractorsUniqueTaxpayerReferencePage to SubcontractorsUniqueTaxpayerReferenceController" in {
+      "must go from a SubcontractorsUniqueTaxpayerReferencePage to WorksReferenceNumberYesNoController" in {
         navigator.nextPage(
           SubcontractorsUniqueTaxpayerReferencePage,
           NormalMode,
           UserAnswers("id")
-        ) mustBe controllers.add.routes.SubcontractorsUniqueTaxpayerReferenceController.onPageLoad(NormalMode)
-      }
-      "must go from a SubcontractorContactDetailsYesNoPage  to next page" in {
-        navigator.nextPage(
-          SubcontractorContactDetailsYesNoPage,
-          NormalMode,
-          emptyUserAnswers.setOrException(SubcontractorContactDetailsYesNoPage, true)
-        ) mustBe controllers.add.routes.SubContactDetailsController.onPageLoad(NormalMode)
+        ) mustBe controllers.add.routes.WorksReferenceNumberYesNoController.onPageLoad(NormalMode)
       }
 
+      "must go from a WorksReferenceNumberYesNoPage to WorksReferenceNumberPage when true" in {
+        navigator.nextPage(
+            WorksReferenceNumberYesNoPage,
+            NormalMode,
+            emptyUserAnswers.setOrException(WorksReferenceNumberYesNoPage, true)
+        ) mustBe controllers.add.routes.WorksReferenceNumberController.onPageLoad(NormalMode)
+      }
+
+      "must go from a WorksReferenceNumberYesNoPage to SubcontractorContactDetailsYesNoPage when false" in {
+        navigator.nextPage(
+            WorksReferenceNumberYesNoPage,
+            NormalMode,
+            emptyUserAnswers.setOrException(WorksReferenceNumberYesNoPage, false)
+        ) mustBe controllers.add.routes.SubcontractorContactDetailsYesNoController.onPageLoad(NormalMode)
+      }
+
+      "must go from a WorksReferenceNumberYesNoPage to journey recovery when incomplete info provided" in {
+        navigator.nextPage(
+            WorksReferenceNumberYesNoPage,
+            NormalMode,
+            emptyUserAnswers
+        ) mustBe journeyRecovery
+      }
+
+      "must go from a WorksReferenceNumberPage to SubcontractorContactDetailsYesNoPage" in {
+        navigator.nextPage(
+            WorksReferenceNumberPage,
+            NormalMode,
+            UserAnswers("id")
+        ) mustBe controllers.add.routes.SubcontractorContactDetailsYesNoController.onPageLoad(NormalMode)
+      }
+
+      "must go from a SubcontractorContactDetailsYesNoPage to SubContactDetailsPage when true" in {
+        navigator.nextPage(
+            SubcontractorContactDetailsYesNoPage,
+            NormalMode,
+            emptyUserAnswers.setOrException(SubcontractorContactDetailsYesNoPage, true)
+        ) mustBe controllers.add.routes.SubContactDetailsController.onPageLoad(NormalMode)
+      }
 
       "must go from SubcontractorContactDetailsYesNoPage to CYA when false" in {
         val ua =
@@ -244,7 +269,21 @@ class NavigatorSpec extends SpecBase {
         ) mustBe controllers.add.routes.CheckYourAnswersController.onPageLoad()
       }
 
-  }
+      "must go from a SubcontractorContactDetailsYesNoPage to journey recovery when incomplete info provided" in {
+        navigator.nextPage(
+          SubcontractorContactDetailsYesNoPage,
+          NormalMode,
+          emptyUserAnswers
+        ) mustBe journeyRecovery
+      }
+
+      "must go from a SubContactDetailsPage to CYA" in {
+        navigator.nextPage(
+          SubContactDetailsPage,
+          NormalMode, UserAnswers("id")
+        ) mustBe controllers.add.routes.CheckYourAnswersController.onPageLoad()
+      }
+    }
 
     "in Check mode" - {
 
@@ -259,6 +298,22 @@ class NavigatorSpec extends SpecBase {
           .onPageLoad()
       }
 
+      "must go from TypeOfSubcontractorPage to CYA when valid data is submitted" in {
+        navigator.nextPage(
+          TypeOfSubcontractorPage,
+          CheckMode,
+          emptyUserAnswers.setOrException(TypeOfSubcontractorPage, TypeOfSubcontractor.values.head)
+        ) mustBe CYA
+      }
+
+      "must go from a TypeOfSubcontractorPage to journey recovery page when incomplete info provided" in {
+        navigator.nextPage(
+          TypeOfSubcontractorPage,
+          CheckMode,
+          emptyUserAnswers
+        ) mustBe journeyRecovery
+      }
+
       "must go from SubTradingNameYesNoPage to TradingNameOfSubcontractorController when true" in {
         navigator.nextPage(
           SubTradingNameYesNoPage,
@@ -267,7 +322,7 @@ class NavigatorSpec extends SpecBase {
         ) mustBe controllers.add.routes.TradingNameOfSubcontractorController.onPageLoad(CheckMode)
       }
 
-      "must go from SubTradingNameYesNoPage to CYA page when false" in {
+      "must go from SubTradingNameYesNoPage to SubcontractorNamePage when false" in {
         navigator.nextPage(
           SubTradingNameYesNoPage,
           CheckMode,

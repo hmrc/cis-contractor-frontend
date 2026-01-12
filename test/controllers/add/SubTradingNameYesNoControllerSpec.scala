@@ -102,7 +102,7 @@ class SubTradingNameYesNoControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must redirect to the next page when valid data with value No is submitted" in {
+    "must redirect to the SubcontractorName page when valid data with value No is submitted" in {
 
       val mockSessionRepository = mock[SessionRepository]
 

@@ -24,19 +24,21 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
 
-object SubNationalInsuranceNumberSummary  {
+object SubNationalInsuranceNumberSummary {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(SubNationalInsuranceNumberPage).map {
-      answer =>
-
-        SummaryListRowViewModel(
-          key     = "subNationalInsuranceNumber.checkYourAnswersLabel",
-          value   = ValueViewModel(HtmlFormat.escape(answer).toString),
-          actions = Seq(
-            ActionItemViewModel("site.change", controllers.add.routes.SubNationalInsuranceNumberController.onPageLoad(CheckMode).url)
-              .withVisuallyHiddenText(messages("subNationalInsuranceNumber.change.hidden"))
+    answers.get(SubNationalInsuranceNumberPage).map { answer =>
+      SummaryListRowViewModel(
+        key = "subNationalInsuranceNumber.checkYourAnswersLabel",
+        value = ValueViewModel(HtmlFormat.escape(answer).toString),
+        actions = Seq(
+          ActionItemViewModel(
+            "site.change",
+            controllers.add.routes.SubNationalInsuranceNumberController.onPageLoad(CheckMode).url
           )
+            .withVisuallyHiddenText(messages("subNationalInsuranceNumber.change.hidden"))
+            .withAttribute("id" -> "sub-national-insurance-number")
         )
+      )
     }
 }

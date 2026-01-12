@@ -20,13 +20,11 @@ import base.SpecBase
 import controllers.routes
 import forms.add.NationalInsuranceNumberYesNoFormProvider
 import models.{NormalMode, UserAnswers}
-import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
 import pages.add.NationalInsuranceNumberYesNoPage
 import play.api.inject.bind
-import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import repositories.SessionRepository
@@ -35,8 +33,6 @@ import views.html.add.NationalInsuranceNumberYesNoView
 import scala.concurrent.Future
 
 class NationalInsuranceNumberYesNoControllerSpec extends SpecBase with MockitoSugar {
-
-  def onwardRoute = Call("GET", "/foo")
 
   val formProvider = new NationalInsuranceNumberYesNoFormProvider()
   val form = formProvider()
@@ -79,7 +75,7 @@ class NationalInsuranceNumberYesNoControllerSpec extends SpecBase with MockitoSu
       }
     }
 
-    "must redirect to the next page when valid data is submitted" in {
+    "must redirect to the SubNationalInsuranceNumber page when valid data with value Yes is submitted" in {
 
       val mockSessionRepository = mock[SessionRepository]
 
@@ -88,7 +84,6 @@ class NationalInsuranceNumberYesNoControllerSpec extends SpecBase with MockitoSu
       val application =
         applicationBuilder(userAnswers = Some(emptyUserAnswers))
           .overrides(
-            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
             bind[SessionRepository].toInstance(mockSessionRepository)
           )
           .build()
@@ -101,7 +96,32 @@ class NationalInsuranceNumberYesNoControllerSpec extends SpecBase with MockitoSu
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual onwardRoute.url
+        redirectLocation(result).value mustEqual controllers.add.routes.SubNationalInsuranceNumberController.onPageLoad(NormalMode).url
+      }
+    }
+
+    "must redirect to the UniqueTaxpayerReferenceYesNo page when valid data with value No is submitted" in {
+
+      val mockSessionRepository = mock[SessionRepository]
+
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+      val application =
+        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          .overrides(
+            bind[SessionRepository].toInstance(mockSessionRepository)
+          )
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, nationalInsuranceNumberRoute)
+            .withFormUrlEncodedBody(("value", "false"))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.add.routes.UniqueTaxpayerReferenceYesNoController.onPageLoad(NormalMode).url
       }
     }
 

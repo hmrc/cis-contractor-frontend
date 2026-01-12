@@ -23,21 +23,24 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
 
-object WorksReferenceNumberYesNoSummary  {
+object WorksReferenceNumberYesNoSummary {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(WorksReferenceNumberYesNoPage).map {
-      answer =>
+    answers.get(WorksReferenceNumberYesNoPage).map { answer =>
 
-        val value = if (answer) "site.yes" else "site.no"
+      val value = if (answer) "site.yes" else "site.no"
 
-        SummaryListRowViewModel(
-          key     = "worksReferenceNumberYesNo.checkYourAnswersLabel",
-          value   = ValueViewModel(value),
-          actions = Seq(
-            ActionItemViewModel("site.change", controllers.add.routes.WorksReferenceNumberYesNoController.onPageLoad(CheckMode).url)
-              .withVisuallyHiddenText(messages("worksReferenceNumberYesNo.change.hidden"))
+      SummaryListRowViewModel(
+        key = "worksReferenceNumberYesNo.checkYourAnswersLabel",
+        value = ValueViewModel(value),
+        actions = Seq(
+          ActionItemViewModel(
+            "site.change",
+            controllers.add.routes.WorksReferenceNumberYesNoController.onPageLoad(CheckMode).url
           )
+            .withVisuallyHiddenText(messages("worksReferenceNumberYesNo.change.hidden"))
+            .withAttribute("id" -> "works-reference-number-yes-no")
         )
+      )
     }
 }

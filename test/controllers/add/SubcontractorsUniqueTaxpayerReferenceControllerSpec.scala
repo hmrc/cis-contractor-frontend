@@ -22,14 +22,11 @@ import forms.add.UtrFormProvider
 import models.{NormalMode, UserAnswers}
 import org.scalatestplus.mockito.MockitoSugar
 import pages.add.SubcontractorsUniqueTaxpayerReferencePage
-import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import views.html.add.SubcontractorsUniqueTaxpayerReferenceView
 
 class SubcontractorsUniqueTaxpayerReferenceControllerSpec extends SpecBase with MockitoSugar {
-
-  def onwardRoute = Call("GET", "/foo")
 
   val formProvider = new UtrFormProvider()
   val form         = formProvider()
@@ -74,7 +71,7 @@ class SubcontractorsUniqueTaxpayerReferenceControllerSpec extends SpecBase with 
       }
     }
 
-    "must bind the form and redirect on POST when valid data is submitted" in {
+    "must bind the form and redirect to WorksReferenceNumberYesNo Page on POST when valid data is submitted" in {
 
       val validValue = "1234567890"
 
@@ -91,8 +88,7 @@ class SubcontractorsUniqueTaxpayerReferenceControllerSpec extends SpecBase with 
 
         status(result) mustEqual SEE_OTHER
 
-        redirectLocation(result).value mustEqual
-          subcontractorsUniqueTaxpayerReferenceRoute
+        redirectLocation(result).value mustEqual controllers.add.routes.WorksReferenceNumberYesNoController.onPageLoad(NormalMode).url
       }
     }
 

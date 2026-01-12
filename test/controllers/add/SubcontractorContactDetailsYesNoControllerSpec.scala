@@ -20,13 +20,11 @@ import base.SpecBase
 import controllers.routes
 import forms.add.SubcontractorContactDetailsYesNoFormProvider
 import models.{NormalMode, UserAnswers}
-import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
 import pages.add.SubcontractorContactDetailsYesNoPage
 import play.api.inject.bind
-import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import repositories.SessionRepository
@@ -35,8 +33,6 @@ import views.html.add.SubcontractorContactDetailsYesNoView
 import scala.concurrent.Future
 
 class SubcontractorContactDetailsYesNoControllerSpec extends SpecBase with MockitoSugar {
-
-  def onwardRoute = Call("GET", "/foo")
 
   val formProvider = new SubcontractorContactDetailsYesNoFormProvider()
   val form = formProvider()
@@ -79,7 +75,7 @@ class SubcontractorContactDetailsYesNoControllerSpec extends SpecBase with Mocki
       }
     }
 
-    "must redirect to the next page when valid data is submitted" in {
+    "must redirect to the SubContactDetails page when valid data with value Yes is submitted" in {
 
       val mockSessionRepository = mock[SessionRepository]
 
@@ -88,7 +84,6 @@ class SubcontractorContactDetailsYesNoControllerSpec extends SpecBase with Mocki
       val application =
         applicationBuilder(userAnswers = Some(emptyUserAnswers))
           .overrides(
-            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
             bind[SessionRepository].toInstance(mockSessionRepository)
           )
           .build()
@@ -101,7 +96,32 @@ class SubcontractorContactDetailsYesNoControllerSpec extends SpecBase with Mocki
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual onwardRoute.url
+        redirectLocation(result).value mustEqual controllers.add.routes.SubContactDetailsController.onPageLoad(NormalMode).url
+      }
+    }
+
+    "must redirect to the CYA page when valid data with value No is submitted" in {
+
+      val mockSessionRepository = mock[SessionRepository]
+
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+      val application =
+        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          .overrides(
+            bind[SessionRepository].toInstance(mockSessionRepository)
+          )
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, subcontractorContactDetailsYesNoRoute)
+            .withFormUrlEncodedBody(("value", "false"))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.add.routes.CheckYourAnswersController.onPageLoad().url
       }
     }
 

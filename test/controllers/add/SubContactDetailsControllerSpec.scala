@@ -85,7 +85,7 @@ class SubContactDetailsControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must redirect to the next page when valid data is submitted" in {
+    "must redirect to the CYA page when valid data is submitted" in {
 
       val mockSessionRepository = mock[SessionRepository]
 
@@ -106,9 +106,7 @@ class SubContactDetailsControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.add.routes.SubContactDetailsController
-          .onPageLoad(NormalMode)
-          .url
+        redirectLocation(result).value mustEqual controllers.add.routes.CheckYourAnswersController.onPageLoad().url
       }
     }
 

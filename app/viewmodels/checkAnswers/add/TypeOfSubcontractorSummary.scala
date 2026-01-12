@@ -25,25 +25,28 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
 
-object TypeOfSubcontractorSummary  {
+object TypeOfSubcontractorSummary {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(TypeOfSubcontractorPage).map {
-      answer =>
+    answers.get(TypeOfSubcontractorPage).map { answer =>
 
-        val value = ValueViewModel(
-          HtmlContent(
-            HtmlFormat.escape(messages(s"typeOfSubcontractor.$answer"))
-          )
+      val value = ValueViewModel(
+        HtmlContent(
+          HtmlFormat.escape(messages(s"typeOfSubcontractor.$answer"))
         )
+      )
 
-        SummaryListRowViewModel(
-          key     = "typeOfSubcontractor.checkYourAnswersLabel",
-          value   = value,
-          actions = Seq(
-            ActionItemViewModel("site.change", controllers.add.routes.TypeOfSubcontractorController.onPageLoad(CheckMode).url)
-              .withVisuallyHiddenText(messages("typeOfSubcontractor.change.hidden"))
+      SummaryListRowViewModel(
+        key = "typeOfSubcontractor.checkYourAnswersLabel",
+        value = value,
+        actions = Seq(
+          ActionItemViewModel(
+            "site.change",
+            controllers.add.routes.TypeOfSubcontractorController.onPageLoad(CheckMode).url
           )
+            .withVisuallyHiddenText(messages("typeOfSubcontractor.change.hidden"))
+            .withAttribute("id" -> "type-of-subcontractor")
         )
+      )
     }
 }

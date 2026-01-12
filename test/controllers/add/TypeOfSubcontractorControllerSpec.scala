@@ -17,6 +17,7 @@
 package controllers.add
 
 import base.SpecBase
+import controllers.routes
 import forms.add.TypeOfSubcontractorFormProvider
 import models.add.TypeOfSubcontractor
 import models.{NormalMode, UserAnswers}
@@ -80,7 +81,7 @@ class TypeOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must redirect to the next page when valid data is submitted" in {
+    "must redirect to the SubTradingNameYesNo page when valid data Individualorsoletrader is submitted" in {
 
       val mockSessionRepository = mock[SessionRepository]
 
@@ -96,12 +97,87 @@ class TypeOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
       running(application) {
         val request =
           FakeRequest(POST, subcontractorTypesRoute)
-            .withFormUrlEncodedBody(("value", TypeOfSubcontractor.values.head.toString))
+            .withFormUrlEncodedBody(("value", TypeOfSubcontractor.Individualorsoletrader.toString))
 
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual controllers.add.routes.SubTradingNameYesNoController.onPageLoad(NormalMode).url
+      }
+    }
+
+    "must redirect to the JourneyRecovery page when valid data Limitedcompany is submitted" in {
+
+      val mockSessionRepository = mock[SessionRepository]
+
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+      val application =
+        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          .overrides(
+            bind[SessionRepository].toInstance(mockSessionRepository)
+          )
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, subcontractorTypesRoute)
+            .withFormUrlEncodedBody(("value", TypeOfSubcontractor.Limitedcompany.toString))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must redirect to the JourneyRecovery page when valid data Partnership is submitted" in {
+
+      val mockSessionRepository = mock[SessionRepository]
+
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+      val application =
+        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          .overrides(
+            bind[SessionRepository].toInstance(mockSessionRepository)
+          )
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, subcontractorTypesRoute)
+            .withFormUrlEncodedBody(("value", TypeOfSubcontractor.Partnership.toString))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must redirect to the JourneyRecovery page when valid data Trust is submitted" in {
+
+      val mockSessionRepository = mock[SessionRepository]
+
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+      val application =
+        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          .overrides(
+            bind[SessionRepository].toInstance(mockSessionRepository)
+          )
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, subcontractorTypesRoute)
+            .withFormUrlEncodedBody(("value", TypeOfSubcontractor.Trust.toString))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
       }
     }
 

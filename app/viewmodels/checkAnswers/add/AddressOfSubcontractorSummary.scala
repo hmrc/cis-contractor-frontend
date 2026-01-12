@@ -38,13 +38,11 @@ object AddressOfSubcontractorSummary {
         answer.postCode
       )
 
-
       val escapedWithBreaks: String =
         lines
           .filter(_.trim.nonEmpty) // remove empty or whitespace-only lines
           .map(HtmlFormat.escape(_).toString)
           .mkString("<br/>")
-
 
       SummaryListRowViewModel(
         key = "addressOfSubcontractor.checkYourAnswersLabel",
@@ -54,6 +52,7 @@ object AddressOfSubcontractorSummary {
             "site.change",
             controllers.add.routes.AddressOfSubcontractorController.onPageLoad(CheckMode).url
           ).withVisuallyHiddenText(messages("addressOfSubcontractor.change.hidden"))
+            .withAttribute("id" -> "address-of-subcontractor")
         )
       )
     }

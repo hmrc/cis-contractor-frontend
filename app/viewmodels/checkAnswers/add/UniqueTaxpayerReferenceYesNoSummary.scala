@@ -39,6 +39,7 @@ object UniqueTaxpayerReferenceYesNoSummary {
             controllers.add.routes.UniqueTaxpayerReferenceYesNoController.onPageLoad(CheckMode).url
           )
             .withVisuallyHiddenText(messages("uniqueTaxpayerReferenceYesNo.change.hidden"))
+            .withAttribute("id" -> "unique-taxpayer-reference-yes-no")
         )
       )
     }

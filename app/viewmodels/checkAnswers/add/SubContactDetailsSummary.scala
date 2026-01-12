@@ -39,6 +39,7 @@ object SubContactDetailsSummary  {
           actions = Seq(
             ActionItemViewModel("site.change", controllers.add.routes.SubContactDetailsController.onPageLoad(CheckMode).url)
               .withVisuallyHiddenText(messages("subContactDetails.change.hidden"))
+              .withAttribute("id" -> "sub-contact-details")
           )
         )
     }
