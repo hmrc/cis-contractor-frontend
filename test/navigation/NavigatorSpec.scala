@@ -256,15 +256,6 @@ class NavigatorSpec extends SpecBase {
         ) mustBe controllers.add.routes.SubContactDetailsController.onPageLoad(NormalMode)
       }
 
-      "must go from a SubcontractorContactDetailsYesNoPage to SubContactDetailsPage when true" in {
-        navigator.nextPage(
-          SubcontractorContactDetailsYesNoPage,
-          NormalMode,
-          emptyUserAnswers.setOrException(SubcontractorContactDetailsYesNoPage, true)
-        ) mustBe controllers.add.routes.SubContactDetailsController.onPageLoad(NormalMode)
-      }
-
-
       "must go from SubcontractorContactDetailsYesNoPage to CYA when false" in {
         val ua =
           emptyUserAnswers
