@@ -23,14 +23,11 @@ import models.{NormalMode, UserAnswers}
 import org.scalatestplus.mockito.MockitoSugar
 import pages.add.WorksReferenceNumberPage
 import play.api.data.Form
-import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import views.html.add.WorksReferenceNumberView
 
 class WorksReferenceNumberControllerSpec extends SpecBase with MockitoSugar {
-
-  def onwardRoute: Call = Call("GET", "/foo")
 
   val formProvider = new WorksReferenceNumberFormProvider()
   val form: Form[String] = formProvider()
@@ -73,7 +70,7 @@ class WorksReferenceNumberControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must bind the form and redirect on POST when valid data is submitted" in {
+    "must bind the form and redirect to SubcontractorContactDetailsYesNo page on POST when valid data is submitted" in {
 
       val validValue = "1234567-AB"
 
@@ -91,7 +88,7 @@ class WorksReferenceNumberControllerSpec extends SpecBase with MockitoSugar {
         status(result) mustEqual SEE_OTHER
 
         redirectLocation(result).value mustEqual
-          worksReferenceNumberRoute
+          controllers.add.routes.SubcontractorContactDetailsYesNoController.onPageLoad(NormalMode).url
       }
     }
 

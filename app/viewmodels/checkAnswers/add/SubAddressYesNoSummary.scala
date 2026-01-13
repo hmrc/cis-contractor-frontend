@@ -37,6 +37,7 @@ object SubAddressYesNoSummary  {
           actions = Seq(
             ActionItemViewModel("site.change", controllers.add.routes.SubAddressYesNoController.onPageLoad(CheckMode).url)
               .withVisuallyHiddenText(messages("subAddressYesNo.change.hidden"))
+              .withAttribute("id" -> "sub-address-yes-no")
           )
         )
     }

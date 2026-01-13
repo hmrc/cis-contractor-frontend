@@ -31,7 +31,7 @@ case object UniqueTaxpayerReferenceYesNoPage extends QuestionPage[Boolean] {
   override def cleanup(value: Option[Boolean], userAnswers: UserAnswers): Try[UserAnswers] =
     if value.contains(false) then {
       userAnswers
-        .remove(TradingNameOfSubcontractorPage) //Need to update to correct page!
+        .remove(SubcontractorsUniqueTaxpayerReferencePage)
     } else {
       super.cleanup(value, userAnswers)
     }

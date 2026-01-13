@@ -14,36 +14,38 @@
  * limitations under the License.
  */
 
-package viewmodels.checkAnswers
+package viewmodels.checkAnswers.add
 
+import models.add.SubcontractorName.format
 import models.{CheckMode, UserAnswers}
-import pages.add.TypeOfSubcontractorPage
+import pages.add.SubcontractorNamePage
 import play.api.i18n.Messages
-import play.twirl.api.HtmlFormat
-import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
+import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
 
-object TypeOfSubcontractorSummary  {
+object SubcontractorNameSummary {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(TypeOfSubcontractorPage).map {
-      answer =>
+    answers.get(SubcontractorNamePage).map { answer =>
 
-        val value = ValueViewModel(
-          HtmlContent(
-            HtmlFormat.escape(messages(s"typeOfSubcontractor.$answer"))
-          )
-        )
+      val fullName = Seq(
+        Some(answer.firstName),
+        answer.middleName,
+        Some(answer.lastName)
+      ).flatten.mkString(" ")
 
-        SummaryListRowViewModel(
-          key     = "typeOfSubcontractor.checkYourAnswersLabel",
-          value   = value,
-          actions = Seq(
-            ActionItemViewModel("site.change", controllers.add.routes.TypeOfSubcontractorController.onPageLoad(CheckMode).url)
-              .withVisuallyHiddenText(messages("typeOfSubcontractor.change.hidden"))
-          )
+      SummaryListRowViewModel(
+        key = "subcontractorName.checkYourAnswersLabel",
+        value = ValueViewModel(Text(fullName)),
+        actions = Seq(
+          ActionItemViewModel(
+            "site.change",
+            controllers.add.routes.SubcontractorNameController.onPageLoad(CheckMode).url
+          ).withVisuallyHiddenText(messages("subcontractorName.change.hidden"))
+            .withAttribute("id" -> "subcontractor-name")
         )
+      )
     }
 }

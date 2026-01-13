@@ -29,7 +29,6 @@ import org.scalatestplus.mockito.MockitoSugar
 import pages.add.SubcontractorNamePage
 import play.api.inject.bind
 import play.api.libs.json.{Json, OFormat}
-import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import queries.SubbieResourceRefQuery
@@ -41,8 +40,6 @@ import views.html.add.SubcontractorNameView
 import scala.concurrent.Future
 
 class SubcontractorNameControllerSpec extends SpecBase with MockitoSugar {
-
-  def onwardRoute = Call("GET", "/foo")
 
   val formProvider = new SubcontractorNameFormProvider()
   val form         = formProvider()
@@ -90,7 +87,7 @@ class SubcontractorNameControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must redirect to the next page when valid data is submitted" in {
+    "must redirect to the SubAddressYesNo page when valid data is submitted" in {
 
       val mockSessionRepository    = mock[SessionRepository]
       val mockSubcontractorService = mock[SubcontractorService]
@@ -114,7 +111,7 @@ class SubcontractorNameControllerSpec extends SpecBase with MockitoSugar {
       val application =
         applicationBuilder(userAnswers = Some(emptyUserAnswers))
           .overrides(
-            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
+            bind[SessionRepository].toInstance(mockSessionRepository),
             bind[SessionRepository].toInstance(mockSessionRepository),
             bind[SubcontractorService].toInstance(mockSubcontractorService)
           )
@@ -132,7 +129,7 @@ class SubcontractorNameControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual onwardRoute.url
+        redirectLocation(result).value mustEqual controllers.add.routes.SubAddressYesNoController.onPageLoad(NormalMode).url
       }
 
       verify(mockSubcontractorService).createSubcontractor(any[UserAnswers])(any[HeaderCarrier])

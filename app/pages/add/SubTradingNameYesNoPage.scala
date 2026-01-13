@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,8 +30,9 @@ case object SubTradingNameYesNoPage extends QuestionPage[Boolean] {
 
   override def cleanup(value: Option[Boolean], userAnswers: UserAnswers): Try[UserAnswers] =
     if value.contains(false) then {
-      userAnswers
-        .remove(TradingNameOfSubcontractorPage)
+      userAnswers.remove(TradingNameOfSubcontractorPage)
+    } else if value.contains(true) then {
+      userAnswers.remove(SubcontractorNamePage)
     } else {
       super.cleanup(value, userAnswers)
     }

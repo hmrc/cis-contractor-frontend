@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package viewmodels.checkAnswers
+package viewmodels.checkAnswers.add
 
 import models.{CheckMode, UserAnswers}
 import pages.add.TradingNameOfSubcontractorPage
@@ -24,19 +24,21 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
 
-object TradingNameOfSubcontractorSummary  {
+object TradingNameOfSubcontractorSummary {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(TradingNameOfSubcontractorPage).map {
-      answer =>
-
-        SummaryListRowViewModel(
-          key     = "tradingNameOfSubcontractor.checkYourAnswersLabel",
-          value   = ValueViewModel(HtmlFormat.escape(answer).toString),
-          actions = Seq(
-            ActionItemViewModel("site.change", controllers.add.routes.TradingNameOfSubcontractorController.onPageLoad(CheckMode).url)
-              .withVisuallyHiddenText(messages("tradingNameOfSubcontractor.change.hidden"))
+    answers.get(TradingNameOfSubcontractorPage).map { answer =>
+      SummaryListRowViewModel(
+        key = "tradingNameOfSubcontractor.checkYourAnswersLabel",
+        value = ValueViewModel(HtmlFormat.escape(answer).toString),
+        actions = Seq(
+          ActionItemViewModel(
+            "site.change",
+            controllers.add.routes.TradingNameOfSubcontractorController.onPageLoad(CheckMode).url
           )
+            .withVisuallyHiddenText(messages("tradingNameOfSubcontractor.change.hidden"))
+            .withAttribute("id" -> "trading-name-of-subcontractor")
         )
+      )
     }
 }
