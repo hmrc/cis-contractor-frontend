@@ -16,7 +16,7 @@
 
 package connectors
 
-import com.github.tomakehurst.wiremock.client.WireMock.{aResponse, post, stubFor, urlPathEqualTo}
+import com.github.tomakehurst.wiremock.client.WireMock.{aResponse, get, post, stubFor, urlPathEqualTo}
 import itutil.ApplicationWithWiremock
 import models.add.TypeOfSubcontractor
 import models.subcontractor.{CreateSubcontractorRequest, UpdateSubcontractorRequest}
@@ -36,6 +36,61 @@ class ConstructionIndustrySchemeConnectorSpec
   implicit val hc: HeaderCarrier = HeaderCarrier()
 
   val connector: ConstructionIndustrySchemeConnector = app.injector.instanceOf[ConstructionIndustrySchemeConnector]
+
+  "getCisTaxpayer" should {
+
+    "return CisTaxpayer when BE returns 200 with valid JSON" in {
+      stubFor(
+        get(urlPathEqualTo("/cis/taxpayer"))
+          .willReturn(
+            aResponse()
+              .withStatus(OK)
+              .withBody(
+                """{
+                  |  "uniqueId": "123",
+                  |  "taxOfficeNumber": "111",
+                  |  "taxOfficeRef": "test111",
+                  |  "employerName1": "TEST LTD"
+                  |}""".stripMargin
+              )
+          )
+      )
+
+      val result = connector.getCisTaxpayer().futureValue
+      result.uniqueId mustBe "123"
+      result.taxOfficeNumber mustBe "111"
+      result.taxOfficeRef mustBe "test111"
+      result.employerName1 mustBe Some("TEST LTD")
+    }
+
+    "fail when BE returns 200 with invalid JSON" in {
+      stubFor(
+        get(urlPathEqualTo("/cis/taxpayer"))
+          .willReturn(
+            aResponse()
+              .withStatus(OK)
+              .withBody("""{ "unexpectedField": true }""")
+          )
+      )
+
+      val ex = intercept[Exception] {
+        connector.getCisTaxpayer().futureValue
+      }
+      ex.getMessage.toLowerCase must include("uniqueid")
+    }
+
+    "propagate an upstream error when BE returns 500" in {
+      stubFor(
+        get(urlPathEqualTo("/cis/taxpayer"))
+          .willReturn(aResponse().withStatus(INTERNAL_SERVER_ERROR).withBody("boom"))
+      )
+
+      val ex = intercept[Exception] {
+        connector.getCisTaxpayer().futureValue
+      }
+      ex.getMessage must include("returned 500")
+    }
+  }
 
   "createSubcontractor" should {
     "successfully create a subcontractor" in {
