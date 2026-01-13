@@ -19,10 +19,9 @@ package controllers.add
 import base.SpecBase
 import controllers.routes
 import forms.add.SubcontractorNameFormProvider
-import models.{NormalMode, UserAnswers}
 import models.add.*
 import models.subcontractor.UpdateSubcontractorResponse
-import navigation.{FakeNavigator, Navigator}
+import models.{NormalMode, UserAnswers}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{verify, verifyNoMoreInteractions, when}
 import org.scalatestplus.mockito.MockitoSugar
@@ -42,9 +41,10 @@ import scala.concurrent.Future
 class SubcontractorNameControllerSpec extends SpecBase with MockitoSugar {
 
   val formProvider = new SubcontractorNameFormProvider()
-  val form         = formProvider()
+  private val form = formProvider()
 
-  lazy val subcontractorNameRoute = controllers.add.routes.SubcontractorNameController.onPageLoad(NormalMode).url
+  private lazy val subcontractorNameRoute =
+    controllers.add.routes.SubcontractorNameController.onPageLoad(NormalMode).url
 
   "SubcontractorName Controller" - {
 
@@ -112,7 +112,6 @@ class SubcontractorNameControllerSpec extends SpecBase with MockitoSugar {
         applicationBuilder(userAnswers = Some(emptyUserAnswers))
           .overrides(
             bind[SessionRepository].toInstance(mockSessionRepository),
-            bind[SessionRepository].toInstance(mockSessionRepository),
             bind[SubcontractorService].toInstance(mockSubcontractorService)
           )
           .build()
@@ -129,7 +128,9 @@ class SubcontractorNameControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.add.routes.SubAddressYesNoController.onPageLoad(NormalMode).url
+        redirectLocation(result).value mustEqual controllers.add.routes.SubAddressYesNoController
+          .onPageLoad(NormalMode)
+          .url
       }
 
       verify(mockSubcontractorService).createSubcontractor(any[UserAnswers])(any[HeaderCarrier])
