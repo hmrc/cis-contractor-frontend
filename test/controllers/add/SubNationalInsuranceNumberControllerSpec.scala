@@ -19,6 +19,7 @@ package controllers.add
 import base.SpecBase
 import controllers.routes
 import forms.add.SubNationalInsuranceNumberFormProvider
+import models.subcontractor.UpdateSubcontractorResponse
 import models.{NormalMode, UserAnswers}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
@@ -27,17 +28,21 @@ import pages.add.SubNationalInsuranceNumberPage
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
+import queries.SubbieResourceRefQuery
 import repositories.SessionRepository
+import services.SubcontractorService
+import uk.gov.hmrc.http.HeaderCarrier
 import views.html.add.SubNationalInsuranceNumberView
 
 import scala.concurrent.Future
 
 class SubNationalInsuranceNumberControllerSpec extends SpecBase with MockitoSugar {
 
-  val formProvider = new SubNationalInsuranceNumberFormProvider()
-  val form = formProvider()
-
-  lazy val subNationalInsuranceNumberRoute = controllers.add.routes.SubNationalInsuranceNumberController.onPageLoad(NormalMode).url
+  val formProvider                                   = new SubNationalInsuranceNumberFormProvider()
+  val form                                           = formProvider()
+  val mockSubcontractorService: SubcontractorService = mock[SubcontractorService]
+  lazy val subNationalInsuranceNumberRoute           =
+    controllers.add.routes.SubNationalInsuranceNumberController.onPageLoad(NormalMode).url
 
   "SubNationalInsuranceNumber Controller" - {
 
@@ -79,12 +84,22 @@ class SubNationalInsuranceNumberControllerSpec extends SpecBase with MockitoSuga
 
       val mockSessionRepository = mock[SessionRepository]
 
+      val newVersion      = 20
+      val mockUserAnswers = emptyUserAnswers
+        .set(SubbieResourceRefQuery, 2)
+        .success
+        .value
+
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
+      when(mockSubcontractorService.updateSubcontractor(any[UserAnswers])(any[HeaderCarrier]))
+        .thenReturn(Future.successful(UpdateSubcontractorResponse(newVersion = 1)))
+
       val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        applicationBuilder(userAnswers = Some(mockUserAnswers))
           .overrides(
-            bind[SessionRepository].toInstance(mockSessionRepository)
+            bind[SessionRepository].toInstance(mockSessionRepository),
+            bind[SubcontractorService].toInstance(mockSubcontractorService)
           )
           .build()
 
@@ -105,7 +120,7 @@ class SubNationalInsuranceNumberControllerSpec extends SpecBase with MockitoSuga
     "must return a Bad Request and errors when invalid data is submitted with length is more than 9 character" in {
 
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
-      val answer = "AA1234567A"
+      val answer      = "AA1234567A"
 
       running(application) {
         val request =
@@ -126,7 +141,6 @@ class SubNationalInsuranceNumberControllerSpec extends SpecBase with MockitoSuga
     "must return a Bad Request and errors when invalid data is submitted" in {
 
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
-
       running(application) {
         val request =
           FakeRequest(POST, subNationalInsuranceNumberRoute)
@@ -146,7 +160,6 @@ class SubNationalInsuranceNumberControllerSpec extends SpecBase with MockitoSuga
     "must redirect to Journey Recovery for a GET if no existing data is found" in {
 
       val application = applicationBuilder(userAnswers = None).build()
-
       running(application) {
         val request = FakeRequest(GET, subNationalInsuranceNumberRoute)
 
@@ -157,8 +170,30 @@ class SubNationalInsuranceNumberControllerSpec extends SpecBase with MockitoSuga
       }
     }
 
-    "must redirect to Journey Recovery for a POST if no existing data is found" in {
+    "must fail the request if updateSubcontractor throws an exception" in {
 
+      when(mockSubcontractorService.updateSubcontractor(any[UserAnswers])(any[HeaderCarrier]))
+        .thenReturn(Future.failed(new RuntimeException("boom")))
+
+      val application =
+        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          .overrides(
+            bind[SubcontractorService].toInstance(mockSubcontractorService)
+          )
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, subNationalInsuranceNumberRoute)
+            .withFormUrlEncodedBody("value" -> "AA123456A")
+
+        intercept[RuntimeException] {
+          await(route(application, request).value)
+        }
+      }
+    }
+
+    "must redirect to Journey Recovery for a POST if no existing data is found" in {
       val application = applicationBuilder(userAnswers = None).build()
 
       running(application) {
