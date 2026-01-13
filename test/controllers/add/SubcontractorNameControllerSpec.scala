@@ -103,7 +103,7 @@ class SubcontractorNameControllerSpec extends SpecBase with MockitoSugar {
         Future
           .successful(mockUserAnswers)
       )
-      when(mockSubcontractorService.updateSubcontractorName(any[UserAnswers])(any[HeaderCarrier])).thenReturn(
+      when(mockSubcontractorService.updateSubcontractor(any[UserAnswers])(any[HeaderCarrier])).thenReturn(
         Future
           .successful(UpdateSubcontractorResponse(newVersion = newVersion))
       )
@@ -134,7 +134,7 @@ class SubcontractorNameControllerSpec extends SpecBase with MockitoSugar {
       }
 
       verify(mockSubcontractorService).createSubcontractor(any[UserAnswers])(any[HeaderCarrier])
-      verify(mockSubcontractorService).updateSubcontractorName(any[UserAnswers])(any[HeaderCarrier])
+      verify(mockSubcontractorService).updateSubcontractor(any[UserAnswers])(any[HeaderCarrier])
       verifyNoMoreInteractions(mockSubcontractorService)
     }
 

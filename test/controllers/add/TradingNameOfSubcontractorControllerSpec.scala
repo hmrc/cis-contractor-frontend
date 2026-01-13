@@ -40,9 +40,9 @@ import scala.util.Random
 class TradingNameOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
 
   val formProvider = new TradingNameOfSubcontractorFormProvider()
-  val form         = formProvider()
+  private val form = formProvider()
 
-  lazy val nameOfSubcontractorRoute =
+  private lazy val nameOfSubcontractorRoute =
     controllers.add.routes.TradingNameOfSubcontractorController.onPageLoad(NormalMode).url
 
   "NameOfSubcontractor Controller" - {
@@ -97,7 +97,7 @@ class TradingNameOfSubcontractorControllerSpec extends SpecBase with MockitoSuga
         Future
           .successful(mockUserAnswers)
       )
-      when(mockSubcontractorService.updateSubcontractorTradingName(any[UserAnswers])(any[HeaderCarrier])).thenReturn(
+      when(mockSubcontractorService.updateSubcontractor(any[UserAnswers])(any[HeaderCarrier])).thenReturn(
         Future
           .successful(UpdateSubcontractorResponse(newVersion = newVersion))
       )
@@ -124,7 +124,7 @@ class TradingNameOfSubcontractorControllerSpec extends SpecBase with MockitoSuga
       }
 
       verify(mockSubcontractorService).createSubcontractor(any[UserAnswers])(any[HeaderCarrier])
-      verify(mockSubcontractorService).updateSubcontractorTradingName(any[UserAnswers])(any[HeaderCarrier])
+      verify(mockSubcontractorService).updateSubcontractor(any[UserAnswers])(any[HeaderCarrier])
       verifyNoMoreInteractions(mockSubcontractorService)
     }
 

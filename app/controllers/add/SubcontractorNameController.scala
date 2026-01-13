@@ -47,7 +47,7 @@ class SubcontractorNameController @Inject() (
     extends FrontendBaseController
     with I18nSupport {
 
-  val form = formProvider()
+  private val form = formProvider()
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
 
@@ -69,7 +69,7 @@ class SubcontractorNameController @Inject() (
             for {
               updatedAnswers <- Future.fromTry(request.userAnswers.set(SubcontractorNamePage, value))
               updatedAnswers <- subcontractorService.createSubcontractor(updatedAnswers)
-              _              <- subcontractorService.updateSubcontractorName(updatedAnswers)
+              _              <- subcontractorService.updateSubcontractor(updatedAnswers)
               _              <- sessionRepository.set(updatedAnswers)
             } yield Redirect(navigator.nextPage(SubcontractorNamePage, mode, updatedAnswers))
         )

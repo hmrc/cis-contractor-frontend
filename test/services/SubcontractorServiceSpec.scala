@@ -18,14 +18,14 @@ package services
 
 import base.SpecBase
 import connectors.ConstructionIndustrySchemeConnector
-import models.add.{SubcontractorName, TypeOfSubcontractor}
+import models.add.{SubContactDetails, SubcontractorName, TypeOfSubcontractor, UKAddress}
 import models.response.CisTaxpayerResponse
 import models.subcontractor.{CreateSubcontractorRequest, CreateSubcontractorResponse, UpdateSubcontractorRequest, UpdateSubcontractorResponse}
-import org.mockito.ArgumentMatchers.any
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{verify, verifyNoInteractions, verifyNoMoreInteractions, when}
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.mockito.MockitoSugar.mock
-import pages.add.{SubcontractorNamePage, TradingNameOfSubcontractorPage, TypeOfSubcontractorPage}
+import pages.add.{AddressOfSubcontractorPage, SubContactDetailsPage, SubNationalInsuranceNumberPage, SubcontractorNamePage, SubcontractorsUniqueTaxpayerReferencePage, TradingNameOfSubcontractorPage, TypeOfSubcontractorPage, WorksReferenceNumberPage}
 import queries.{CisIdQuery, SubbieResourceRefQuery}
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -128,7 +128,7 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
         val mockConnector: ConstructionIndustrySchemeConnector = mock[ConstructionIndustrySchemeConnector]
         val service                                            = new SubcontractorService(mockConnector)
 
-        val cisId       = ""
+        val cisId = ""
 
         when(mockConnector.getCisTaxpayer()(any[HeaderCarrier]))
           .thenReturn(
@@ -288,10 +288,9 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    val subContractorResourceRef = 10
-    "updateSubcontractorTradingName" - {
-
-      "should update subcontractor when trading name is provided" in {
+    "updateSubcontractor" - {
+      val subContractorResourceRef = 10
+      "should update subcontractor when session data is present with trading name" in {
         val mockConnector: ConstructionIndustrySchemeConnector = mock[ConstructionIndustrySchemeConnector]
         val service                                            = new SubcontractorService(mockConnector)
 
@@ -306,18 +305,137 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
           .set(TradingNameOfSubcontractorPage, "trading name")
           .success
           .value
+          .set(
+            AddressOfSubcontractorPage,
+            UKAddress("addressLine1", Some("addressLine2"), "addressLine3", Some("addressLine4"), "postCode")
+          )
+          .success
+          .value
+          .set(SubNationalInsuranceNumberPage, "nino")
+          .success
+          .value
+          .set(SubcontractorsUniqueTaxpayerReferencePage, "utr")
+          .success
+          .value
+          .set(WorksReferenceNumberPage, "workRef")
+          .success
+          .value
+          .set(SubContactDetailsPage, SubContactDetails("email", "phone"))
+          .success
+          .value
+
+        val expectedUpdateRequest = UpdateSubcontractorRequest(
+          schemeId = "cisId",
+          subbieResourceRef = subContractorResourceRef,
+          tradingName = Some("trading name"),
+          addressLine1 = Some("addressLine1"),
+          addressLine2 = Some("addressLine2"),
+          addressLine3 = Some("addressLine3"),
+          addressLine4 = Some("addressLine4"),
+          country = Some("addressLine4"),
+          postcode = Some("postCode"),
+          nino = Some("nino"),
+          utr = Some("utr"),
+          worksReferenceNumber = Some("workRef"),
+          emailAddress = Some("email"),
+          phoneNumber = Some("phone")
+        )
 
         val mockResponse = UpdateSubcontractorResponse(newVersion = newVersion)
 
         when(mockConnector.updateSubcontractor(any[UpdateSubcontractorRequest])(any[HeaderCarrier]))
           .thenReturn(Future.successful(mockResponse))
 
-        val result = service.updateSubcontractorTradingName(userAnswers)
+        val result = service.updateSubcontractor(userAnswers)
 
         result.futureValue mustBe mockResponse
 
-        verify(mockConnector).updateSubcontractor(any[UpdateSubcontractorRequest])(any[HeaderCarrier])
+        verify(mockConnector).updateSubcontractor(eqTo(expectedUpdateRequest))(any[HeaderCarrier])
         verifyNoMoreInteractions(mockConnector)
+      }
+
+      "should update subcontractor when session data is present with subcontractor name" in {
+        val mockConnector: ConstructionIndustrySchemeConnector = mock[ConstructionIndustrySchemeConnector]
+        val service                                            = new SubcontractorService(mockConnector)
+
+        val newVersion  = 20
+        val userAnswers = emptyUserAnswers
+          .set(CisIdQuery, "cisId")
+          .success
+          .value
+          .set(SubbieResourceRefQuery, subContractorResourceRef)
+          .success
+          .value
+          .set(SubcontractorNamePage, SubcontractorName("firstname", Some("middle name"), "lastname"))
+          .success
+          .value
+          .set(
+            AddressOfSubcontractorPage,
+            UKAddress("addressLine1", Some("addressLine2"), "addressLine3", Some("addressLine4"), "postCode")
+          )
+          .success
+          .value
+          .set(SubNationalInsuranceNumberPage, "nino")
+          .success
+          .value
+          .set(SubcontractorsUniqueTaxpayerReferencePage, "utr")
+          .success
+          .value
+          .set(WorksReferenceNumberPage, "workRef")
+          .success
+          .value
+          .set(SubContactDetailsPage, SubContactDetails("email", "phone"))
+          .success
+          .value
+
+        val expectedUpdateRequest = UpdateSubcontractorRequest(
+          schemeId = "cisId",
+          subbieResourceRef = subContractorResourceRef,
+          firstName = Some("firstname"),
+          secondName = Some("middle name"),
+          surname = Some("lastname"),
+          addressLine1 = Some("addressLine1"),
+          addressLine2 = Some("addressLine2"),
+          addressLine3 = Some("addressLine3"),
+          addressLine4 = Some("addressLine4"),
+          country = Some("addressLine4"),
+          postcode = Some("postCode"),
+          nino = Some("nino"),
+          utr = Some("utr"),
+          worksReferenceNumber = Some("workRef"),
+          emailAddress = Some("email"),
+          phoneNumber = Some("phone")
+        )
+
+        val mockResponse = UpdateSubcontractorResponse(newVersion = newVersion)
+
+        when(mockConnector.updateSubcontractor(any[UpdateSubcontractorRequest])(any[HeaderCarrier]))
+          .thenReturn(Future.successful(mockResponse))
+
+        val result = service.updateSubcontractor(userAnswers)
+
+        result.futureValue mustBe mockResponse
+
+        verify(mockConnector).updateSubcontractor(eqTo(expectedUpdateRequest))(any[HeaderCarrier])
+        verifyNoMoreInteractions(mockConnector)
+      }
+
+      "should fail when subbieResourceRef not found in session data" in {
+        val mockConnector: ConstructionIndustrySchemeConnector = mock[ConstructionIndustrySchemeConnector]
+        val service                                            = new SubcontractorService(mockConnector)
+
+        val userAnswers = emptyUserAnswers
+          .set(CisIdQuery, "cisId")
+          .success
+          .value
+
+        when(mockConnector.updateSubcontractor(any[UpdateSubcontractorRequest])(any[HeaderCarrier]))
+          .thenReturn(Future.failed(new Exception("bang")))
+
+        val exception =
+          service.updateSubcontractor(userAnswers).failed.futureValue
+
+        exception.getMessage must include("SubbieResourceRef not found in session data")
       }
 
       "should fail when cisId not found in session data" in {
@@ -328,30 +446,9 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
           .thenReturn(Future.failed(new Exception("bang")))
 
         val exception =
-          service.updateSubcontractorTradingName(emptyUserAnswers).failed.futureValue
+          service.updateSubcontractor(emptyUserAnswers).failed.futureValue
 
         exception.getMessage must include("CisIdQuery not found in session data")
-      }
-
-      "should fail when subcontractor trading name not found in session data" in {
-        val mockConnector: ConstructionIndustrySchemeConnector = mock[ConstructionIndustrySchemeConnector]
-        val service                                            = new SubcontractorService(mockConnector)
-
-        when(mockConnector.updateSubcontractor(any[UpdateSubcontractorRequest])(any[HeaderCarrier]))
-          .thenReturn(Future.failed(new Exception("bang")))
-
-        val userAnswers = emptyUserAnswers
-          .set(CisIdQuery, "cisId")
-          .success
-          .value
-          .set(SubbieResourceRefQuery, subContractorResourceRef)
-          .success
-          .value
-
-        val exception =
-          service.updateSubcontractorTradingName(userAnswers).failed.futureValue
-
-        exception.getMessage must include("TradingNameOfSubcontractorPage not found in session data")
       }
 
       "should fail when the connector call fails" in {
@@ -373,100 +470,7 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
           .value
 
         val exception =
-          service.updateSubcontractorTradingName(userAnswers).failed.futureValue
-
-        exception.getMessage must include("bang")
-
-        verify(mockConnector).updateSubcontractor(any[UpdateSubcontractorRequest])(any[HeaderCarrier])
-        verifyNoMoreInteractions(mockConnector)
-      }
-    }
-
-    "updateSubcontractorName" - {
-
-      "should update subcontractor when name is provided" in {
-        val mockConnector: ConstructionIndustrySchemeConnector = mock[ConstructionIndustrySchemeConnector]
-        val service                                            = new SubcontractorService(mockConnector)
-
-        val newVersion  = 20
-        val userAnswers = emptyUserAnswers
-          .set(CisIdQuery, "cisId")
-          .success
-          .value
-          .set(SubbieResourceRefQuery, subContractorResourceRef)
-          .success
-          .value
-          .set(SubcontractorNamePage, SubcontractorName("firstname", Some("middle name"), "lastname"))
-          .success
-          .value
-
-        val mockResponse = UpdateSubcontractorResponse(newVersion = newVersion)
-
-        when(mockConnector.updateSubcontractor(any[UpdateSubcontractorRequest])(any[HeaderCarrier]))
-          .thenReturn(Future.successful(mockResponse))
-
-        val result = service.updateSubcontractorName(userAnswers)
-
-        result.futureValue mustBe mockResponse
-
-        verify(mockConnector).updateSubcontractor(any[UpdateSubcontractorRequest])(any[HeaderCarrier])
-        verifyNoMoreInteractions(mockConnector)
-      }
-
-      "should fail when cisId not found in session data" in {
-        val mockConnector: ConstructionIndustrySchemeConnector = mock[ConstructionIndustrySchemeConnector]
-        val service                                            = new SubcontractorService(mockConnector)
-
-        when(mockConnector.updateSubcontractor(any[UpdateSubcontractorRequest])(any[HeaderCarrier]))
-          .thenReturn(Future.failed(new Exception("bang")))
-
-        val exception =
-          service.updateSubcontractorName(emptyUserAnswers).failed.futureValue
-
-        exception.getMessage must include("CisIdQuery not found in session data")
-      }
-
-      "should fail when subcontractor name not found in session data" in {
-        val mockConnector: ConstructionIndustrySchemeConnector = mock[ConstructionIndustrySchemeConnector]
-        val service                                            = new SubcontractorService(mockConnector)
-
-        when(mockConnector.updateSubcontractor(any[UpdateSubcontractorRequest])(any[HeaderCarrier]))
-          .thenReturn(Future.failed(new Exception("bang")))
-
-        val userAnswers = emptyUserAnswers
-          .set(CisIdQuery, "cisId")
-          .success
-          .value
-          .set(SubbieResourceRefQuery, subContractorResourceRef)
-          .success
-          .value
-
-        val exception =
-          service.updateSubcontractorName(userAnswers).failed.futureValue
-
-        exception.getMessage must include("SubcontractorNamePage not found in session data")
-      }
-
-      "should fail when the connector call fails" in {
-        val mockConnector: ConstructionIndustrySchemeConnector = mock[ConstructionIndustrySchemeConnector]
-        val service                                            = new SubcontractorService(mockConnector)
-
-        when(mockConnector.updateSubcontractor(any[UpdateSubcontractorRequest])(any[HeaderCarrier]))
-          .thenReturn(Future.failed(new Exception("bang")))
-
-        val userAnswers = emptyUserAnswers
-          .set(CisIdQuery, "cisId")
-          .success
-          .value
-          .set(SubbieResourceRefQuery, subContractorResourceRef)
-          .success
-          .value
-          .set(SubcontractorNamePage, SubcontractorName("firstname", Some("middle name"), "lastname"))
-          .success
-          .value
-
-        val exception =
-          service.updateSubcontractorName(userAnswers).failed.futureValue
+          service.updateSubcontractor(userAnswers).failed.futureValue
 
         exception.getMessage must include("bang")
 
