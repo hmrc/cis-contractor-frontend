@@ -59,20 +59,21 @@ class SubcontractorNameController @Inject() (
     Ok(view(preparedForm, mode))
   }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
-    implicit request =>
+  def onSubmit(mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData).async { implicit request =>
       form
         .bindFromRequest()
         .fold(
           formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
           value =>
             for {
-              updatedAnswers       <- Future.fromTry(request.userAnswers.set(SubcontractorNamePage, value))
-              _                    <- sessionRepository.set(updatedAnswers)
-              answersWithSubbieRef <- subcontractorService.createSubcontractor(updatedAnswers)
-              _                    <- sessionRepository.set(answersWithSubbieRef)
-              _                    <- subcontractorService.updateSubcontractor(updatedAnswers)
-            } yield Redirect(navigator.nextPage(SubcontractorNamePage, mode, updatedAnswers))
+              updatedAnswers           <- Future.fromTry(request.userAnswers.set(SubcontractorNamePage, value))
+              userAnswersWithSubbieRef <- subcontractorService.ensureSubcontractorInUserAnswers(updatedAnswers)
+              _                        <- sessionRepository.set(userAnswersWithSubbieRef)
+              _                        <- subcontractorService.updateSubcontractor(userAnswersWithSubbieRef)
+            } yield Redirect(
+              navigator.nextPage(SubcontractorNamePage, mode, userAnswersWithSubbieRef)
+            )
         )
-  }
+    }
 }

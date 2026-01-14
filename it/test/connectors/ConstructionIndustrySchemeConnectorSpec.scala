@@ -144,6 +144,9 @@ class ConstructionIndustrySchemeConnectorSpec
   }
 
   "updateSubcontractor" should {
+
+    val subbieResourceRef = 10
+
     "successfully update subcontractor" in {
 
       val responseJson =
@@ -166,7 +169,7 @@ class ConstructionIndustrySchemeConnectorSpec
         .updateSubcontractor(
           UpdateSubcontractorRequest(
             schemeId = "10",
-            subbieResourceRef = 10,
+            subbieResourceRef = subbieResourceRef,
             tradingName = Some("trader name")
           )
         )
@@ -186,7 +189,7 @@ class ConstructionIndustrySchemeConnectorSpec
           .updateSubcontractor(
             UpdateSubcontractorRequest(
               schemeId = "10",
-              subbieResourceRef = 10,
+              subbieResourceRef = subbieResourceRef,
               tradingName = Some("trader name")
             )
           )

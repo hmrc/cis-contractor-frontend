@@ -38,145 +38,6 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
 
   "SubcontractorService" - {
 
-    "initializeCisId" - {
-      "should initialize CisId if it is not in session data" in {
-        val mockConnector: ConstructionIndustrySchemeConnector = mock[ConstructionIndustrySchemeConnector]
-        val service                                            = new SubcontractorService(mockConnector)
-
-        val cisId       = "cisId"
-        val userAnswers = emptyUserAnswers
-
-        when(mockConnector.getCisTaxpayer()(any[HeaderCarrier]))
-          .thenReturn(
-            Future.successful(
-              CisTaxpayerResponse(
-                uniqueId = cisId,
-                taxOfficeNumber = "taxOfficeNumber",
-                taxOfficeRef = "taxOfficeRef",
-                aoDistrict = None,
-                aoPayType = None,
-                aoCheckCode = None,
-                aoReference = None,
-                validBusinessAddr = None,
-                correlation = None,
-                ggAgentId = None,
-                employerName1 = None,
-                employerName2 = None,
-                agentOwnRef = None,
-                schemeName = None,
-                utr = None,
-                enrolledSig = None
-              )
-            )
-          )
-
-        val result = service.initializeCisId(userAnswers)
-
-        val expectedUserAnswers = userAnswers
-          .set(CisIdQuery, cisId)
-          .success
-          .value
-
-        result.futureValue mustBe expectedUserAnswers
-
-        verify(mockConnector).getCisTaxpayer()(any[HeaderCarrier])
-        verifyNoMoreInteractions(mockConnector)
-      }
-
-      "should return user answers when CisIs is already in session data " in {
-        val mockConnector: ConstructionIndustrySchemeConnector = mock[ConstructionIndustrySchemeConnector]
-        val service                                            = new SubcontractorService(mockConnector)
-
-        val cisId               = "cisId"
-        val expectedUserAnswers = emptyUserAnswers
-          .set(CisIdQuery, cisId)
-          .success
-          .value
-
-        when(mockConnector.getCisTaxpayer()(any[HeaderCarrier]))
-          .thenReturn(
-            Future.successful(
-              CisTaxpayerResponse(
-                uniqueId = cisId,
-                taxOfficeNumber = "taxOfficeNumber",
-                taxOfficeRef = "taxOfficeRef",
-                aoDistrict = None,
-                aoPayType = None,
-                aoCheckCode = None,
-                aoReference = None,
-                validBusinessAddr = None,
-                correlation = None,
-                ggAgentId = None,
-                employerName1 = None,
-                employerName2 = None,
-                agentOwnRef = None,
-                schemeName = None,
-                utr = None,
-                enrolledSig = None
-              )
-            )
-          )
-
-        val result = service.initializeCisId(expectedUserAnswers)
-
-        result.futureValue mustBe expectedUserAnswers
-
-        verifyNoInteractions(mockConnector)
-      }
-
-      "should fail when connector returns empty CisId when CisId not in session data" in {
-        val mockConnector: ConstructionIndustrySchemeConnector = mock[ConstructionIndustrySchemeConnector]
-        val service                                            = new SubcontractorService(mockConnector)
-
-        val cisId = ""
-
-        when(mockConnector.getCisTaxpayer()(any[HeaderCarrier]))
-          .thenReturn(
-            Future.successful(
-              CisTaxpayerResponse(
-                uniqueId = cisId,
-                taxOfficeNumber = "taxOfficeNumber",
-                taxOfficeRef = "taxOfficeRef",
-                aoDistrict = None,
-                aoPayType = None,
-                aoCheckCode = None,
-                aoReference = None,
-                validBusinessAddr = None,
-                correlation = None,
-                ggAgentId = None,
-                employerName1 = None,
-                employerName2 = None,
-                agentOwnRef = None,
-                schemeName = None,
-                utr = None,
-                enrolledSig = None
-              )
-            )
-          )
-
-        val exception =
-          service.initializeCisId(emptyUserAnswers).failed.futureValue
-
-        exception.getMessage must include("Empty cisId (uniqueId) returned from /cis/taxpayer")
-      }
-
-      "should fail when the connector call fails" in {
-        val mockConnector: ConstructionIndustrySchemeConnector = mock[ConstructionIndustrySchemeConnector]
-        val service                                            = new SubcontractorService(mockConnector)
-
-        when(mockConnector.getCisTaxpayer()(any[HeaderCarrier]))
-          .thenReturn(Future.failed(new Exception("bang")))
-
-        val exception =
-          service.initializeCisId(emptyUserAnswers).failed.futureValue
-
-        exception.getMessage must include("bang")
-
-        verify(mockConnector).getCisTaxpayer()(any[HeaderCarrier])
-        verifyNoMoreInteractions(mockConnector)
-      }
-    }
-
     "createSubcontractor" - {
       "should create a subcontractor when a subcontractor type is provided" in {
         val mockConnector: ConstructionIndustrySchemeConnector = mock[ConstructionIndustrySchemeConnector]
@@ -195,7 +56,7 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
         when(mockConnector.createSubcontractor(any[CreateSubcontractorRequest])(any[HeaderCarrier]))
           .thenReturn(Future.successful(CreateSubcontractorResponse(subbieResourceRef = mockSubContractorResourceRef)))
 
-        val result = service.createSubcontractor(userAnswers)
+        val result = service.ensureSubcontractorInUserAnswers(userAnswers)
 
         val expectedUserAnswers = userAnswers
           .set(SubbieResourceRefQuery, mockSubContractorResourceRef)
@@ -225,7 +86,7 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
           .success
           .value
 
-        val result = service.createSubcontractor(userAnswers)
+        val result = service.ensureSubcontractorInUserAnswers(userAnswers)
 
         result.futureValue mustBe userAnswers
 
@@ -240,7 +101,7 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
           .thenReturn(Future.failed(new Exception("bang")))
 
         val exception =
-          service.createSubcontractor(emptyUserAnswers).failed.futureValue
+          service.ensureSubcontractorInUserAnswers(emptyUserAnswers).failed.futureValue
 
         exception.getMessage must include("CisIdQuery not found in session data")
       }
@@ -258,7 +119,7 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
           .value
 
         val exception =
-          service.createSubcontractor(userAnswers).failed.futureValue
+          service.ensureSubcontractorInUserAnswers(userAnswers).failed.futureValue
 
         exception.getMessage must include("TypeOfSubcontractorPage not found in session data")
       }
@@ -279,7 +140,7 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
           .value
 
         val exception =
-          service.createSubcontractor(userAnswers).failed.futureValue
+          service.ensureSubcontractorInUserAnswers(userAnswers).failed.futureValue
 
         exception.getMessage must include("bang")
 
@@ -332,7 +193,6 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
           addressLine2 = Some("addressLine2"),
           addressLine3 = Some("addressLine3"),
           addressLine4 = Some("addressLine4"),
-          country = Some("addressLine4"),
           postcode = Some("postCode"),
           nino = Some("nino"),
           utr = Some("utr"),
@@ -398,7 +258,6 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
           addressLine2 = Some("addressLine2"),
           addressLine3 = Some("addressLine3"),
           addressLine4 = Some("addressLine4"),
-          country = Some("addressLine4"),
           postcode = Some("postCode"),
           nino = Some("nino"),
           utr = Some("utr"),
