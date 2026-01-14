@@ -41,8 +41,8 @@ class IndexController @Inject() (
     val userAnswers = UserAnswers(request.userId)
 
     for {
-      updatedUserAnswers <- cisManagerService.ensureCisIdInUserAnswers(userAnswers)
-      _                  <- sessionRepository.set(updatedUserAnswers)
+      userAnswersWithCisId <- cisManagerService.ensureCisIdInUserAnswers(userAnswers)
+      _                    <- sessionRepository.set(userAnswersWithCisId)
     } yield Redirect(controllers.add.routes.TypeOfSubcontractorController.onPageLoad(NormalMode))
   }
 }
