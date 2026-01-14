@@ -398,7 +398,6 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
           addressLine2 = Some("addressLine2"),
           addressLine3 = Some("addressLine3"),
           addressLine4 = Some("addressLine4"),
-          country = Some("addressLine4"),
           postcode = Some("postCode"),
           nino = Some("nino"),
           utr = Some("utr"),

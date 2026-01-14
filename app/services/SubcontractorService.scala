@@ -92,7 +92,6 @@ class SubcontractorService @Inject() (
                                                                              addressLine2 = addressLine2,
                                                                              addressLine3 = addressLine3,
                                                                              addressLine4 = addressLine4,
-                                                                             country = addressLine4,
                                                                              postcode = postCode,
                                                                              nino = userAnswers.get(SubNationalInsuranceNumberPage),
                                                                              utr = userAnswers.get(SubcontractorsUniqueTaxpayerReferencePage),
