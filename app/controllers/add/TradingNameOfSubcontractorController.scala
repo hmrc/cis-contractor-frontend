@@ -70,7 +70,7 @@ class TradingNameOfSubcontractorController @Inject() (
               _                        <- sessionRepository.set(updatedAnswers)
               userAnswersWithSubbieRef <- subcontractorService.ensureSubcontractorInUserAnswers(updatedAnswers)
               _                        <- sessionRepository.set(userAnswersWithSubbieRef)
-              _                        <- subcontractorService.updateSubcontractor(updatedAnswers)
+              _                        <- subcontractorService.updateSubcontractor(userAnswersWithSubbieRef)
             } yield Redirect(navigator.nextPage(TradingNameOfSubcontractorPage, mode, updatedAnswers))
         )
   }
