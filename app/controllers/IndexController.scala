@@ -22,7 +22,7 @@ import play.api.i18n.I18nSupport
 import play.api.mvc.Results.Redirect
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
-import services.SubcontractorService
+import services.CisManageService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
 import javax.inject.Inject
@@ -32,7 +32,7 @@ class IndexController @Inject() (
   val controllerComponents: MessagesControllerComponents,
   identify: IdentifierAction,
   sessionRepository: SessionRepository,
-  subcontractorService: SubcontractorService
+  cisManagerService: CisManageService
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport {
@@ -41,7 +41,7 @@ class IndexController @Inject() (
     val userAnswers = UserAnswers(request.userId)
 
     for {
-      updatedUserAnswers <- subcontractorService.initializeCisId(userAnswers)
+      updatedUserAnswers <- cisManagerService.ensureCisIdInUserAnswers(userAnswers)
       _                  <- sessionRepository.set(updatedUserAnswers)
     } yield Redirect(controllers.add.routes.TypeOfSubcontractorController.onPageLoad(NormalMode))
   }

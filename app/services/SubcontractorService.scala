@@ -34,22 +34,6 @@ class SubcontractorService @Inject() (
 )(implicit ec: ExecutionContext)
     extends Logging {
 
-  def initializeCisId(userAnswers: UserAnswers)(implicit hc: HeaderCarrier): Future[UserAnswers] =
-    userAnswers.get(CisIdQuery) match {
-      case Some(cisId) => Future.successful(userAnswers)
-      case None        =>
-        cisConnector.getCisTaxpayer().flatMap { tp =>
-          val cisId = tp.uniqueId.trim
-          if (cisId.isEmpty) {
-            Future.failed(new RuntimeException("Empty cisId (uniqueId) returned from /cis/taxpayer"))
-          } else {
-            for {
-              updatedUserAnswers <- Future.fromTry(userAnswers.set(CisIdQuery, cisId))
-            } yield updatedUserAnswers
-          }
-        }
-    }
-
   def ensureSubcontractorInUserAnswers(
     userAnswers: UserAnswers
   )(implicit hc: HeaderCarrier): Future[UserAnswers] =
