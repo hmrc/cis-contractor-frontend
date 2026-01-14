@@ -54,6 +54,8 @@ class SubcontractorService @Inject() (
     userAnswers: UserAnswers
   )(implicit hc: HeaderCarrier): Future[UserAnswers] =
     userAnswers.get(SubbieResourceRefQuery) match {
+      // TODO: If the user changes the trading type, we need to create a new subcontractor.
+      // This will be handled in a future change.
       case Some(value) => Future.successful(userAnswers)
       case None        =>
         for {
