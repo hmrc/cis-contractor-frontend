@@ -68,7 +68,7 @@ class TradingNameOfSubcontractorController @Inject() (
             for {
               updatedAnswers       <- Future.fromTry(request.userAnswers.set(TradingNameOfSubcontractorPage, value))
               _                    <- sessionRepository.set(updatedAnswers)
-              answersWithSubbieRef <- subcontractorService.createSubcontractor(updatedAnswers)
+              answersWithSubbieRef <- subcontractorService.ensureSubcontractorInUserAnswers(updatedAnswers)
               _                    <- sessionRepository.set(answersWithSubbieRef)
               _                    <- subcontractorService.updateSubcontractor(updatedAnswers)
             } yield Redirect(navigator.nextPage(TradingNameOfSubcontractorPage, mode, updatedAnswers))

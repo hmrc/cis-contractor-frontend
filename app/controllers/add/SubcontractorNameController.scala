@@ -69,7 +69,7 @@ class SubcontractorNameController @Inject() (
             for {
               updatedAnswers       <- Future.fromTry(request.userAnswers.set(SubcontractorNamePage, value))
               _                    <- sessionRepository.set(updatedAnswers)
-              answersWithSubbieRef <- subcontractorService.createSubcontractor(updatedAnswers)
+              answersWithSubbieRef <- subcontractorService.ensureSubcontractorInUserAnswers(updatedAnswers)
               _                    <- sessionRepository.set(answersWithSubbieRef)
               _                    <- subcontractorService.updateSubcontractor(updatedAnswers)
             } yield Redirect(navigator.nextPage(SubcontractorNamePage, mode, updatedAnswers))

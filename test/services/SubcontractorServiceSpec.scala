@@ -195,7 +195,7 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
         when(mockConnector.createSubcontractor(any[CreateSubcontractorRequest])(any[HeaderCarrier]))
           .thenReturn(Future.successful(CreateSubcontractorResponse(subbieResourceRef = mockSubContractorResourceRef)))
 
-        val result = service.createSubcontractor(userAnswers)
+        val result = service.ensureSubcontractorInUserAnswers(userAnswers)
 
         val expectedUserAnswers = userAnswers
           .set(SubbieResourceRefQuery, mockSubContractorResourceRef)
@@ -225,7 +225,7 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
           .success
           .value
 
-        val result = service.createSubcontractor(userAnswers)
+        val result = service.ensureSubcontractorInUserAnswers(userAnswers)
 
         result.futureValue mustBe userAnswers
 
@@ -240,7 +240,7 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
           .thenReturn(Future.failed(new Exception("bang")))
 
         val exception =
-          service.createSubcontractor(emptyUserAnswers).failed.futureValue
+          service.ensureSubcontractorInUserAnswers(emptyUserAnswers).failed.futureValue
 
         exception.getMessage must include("CisIdQuery not found in session data")
       }
@@ -258,7 +258,7 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
           .value
 
         val exception =
-          service.createSubcontractor(userAnswers).failed.futureValue
+          service.ensureSubcontractorInUserAnswers(userAnswers).failed.futureValue
 
         exception.getMessage must include("TypeOfSubcontractorPage not found in session data")
       }
@@ -279,7 +279,7 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
           .value
 
         val exception =
-          service.createSubcontractor(userAnswers).failed.futureValue
+          service.ensureSubcontractorInUserAnswers(userAnswers).failed.futureValue
 
         exception.getMessage must include("bang")
 
