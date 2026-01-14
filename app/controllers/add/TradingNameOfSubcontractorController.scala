@@ -58,8 +58,8 @@ class TradingNameOfSubcontractorController @Inject() (
     Ok(view(preparedForm, mode))
   }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
-    implicit request =>
+  def onSubmit(mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData).async { implicit request =>
       form
         .bindFromRequest()
         .fold(
@@ -67,11 +67,13 @@ class TradingNameOfSubcontractorController @Inject() (
           value =>
             for {
               updatedAnswers           <- Future.fromTry(request.userAnswers.set(TradingNameOfSubcontractorPage, value))
-              _                        <- sessionRepository.set(updatedAnswers)
-              userAnswersWithSubbieRef <- subcontractorService.ensureSubcontractorInUserAnswers(updatedAnswers)
+              userAnswersWithSubbieRef <-
+                subcontractorService.ensureSubcontractorInUserAnswers(updatedAnswers)
               _                        <- sessionRepository.set(userAnswersWithSubbieRef)
               _                        <- subcontractorService.updateSubcontractor(userAnswersWithSubbieRef)
-            } yield Redirect(navigator.nextPage(TradingNameOfSubcontractorPage, mode, updatedAnswers))
+            } yield Redirect(
+              navigator.nextPage(TradingNameOfSubcontractorPage, mode, userAnswersWithSubbieRef)
+            )
         )
-  }
+    }
 }
