@@ -26,7 +26,7 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import queries.CisIdQuery
 import repositories.SessionRepository
-import services.SubcontractorService
+import services.CisManageService
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.Future
@@ -37,8 +37,8 @@ class IndexControllerSpec extends SpecBase {
 
     "must return OK and the correct view for a GET" in {
 
-      val mockSessionRepository    = mock[SessionRepository]
-      val mockSubcontractorService = mock[SubcontractorService]
+      val mockSessionRepository = mock[SessionRepository]
+      val mockCisManagerService = mock[CisManageService]
 
       val mockUserAnswers = emptyUserAnswers
         .set(CisIdQuery, "CisId")
@@ -47,7 +47,7 @@ class IndexControllerSpec extends SpecBase {
 
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
-      when(mockSubcontractorService.initializeCisId(any[UserAnswers])(any[HeaderCarrier])).thenReturn(
+      when(mockCisManagerService.ensureCisIdInUserAnswers(any[UserAnswers])(any[HeaderCarrier])).thenReturn(
         Future
           .successful(mockUserAnswers)
       )
@@ -55,7 +55,7 @@ class IndexControllerSpec extends SpecBase {
       val application = applicationBuilder(userAnswers = None)
         .overrides(
           bind[SessionRepository].toInstance(mockSessionRepository),
-          bind[SubcontractorService].toInstance(mockSubcontractorService)
+          bind[CisManageService].toInstance(mockCisManagerService)
         )
         .build()
 
@@ -70,8 +70,8 @@ class IndexControllerSpec extends SpecBase {
           .url
       }
 
-      verify(mockSubcontractorService).initializeCisId(any[UserAnswers])(any[HeaderCarrier])
-      verifyNoMoreInteractions(mockSubcontractorService)
+      verify(mockCisManagerService).ensureCisIdInUserAnswers(any[UserAnswers])(any[HeaderCarrier])
+      verifyNoMoreInteractions(mockCisManagerService)
     }
   }
 }

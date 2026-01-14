@@ -93,7 +93,7 @@ class TradingNameOfSubcontractorControllerSpec extends SpecBase with MockitoSuga
         .value
 
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
-      when(mockSubcontractorService.createSubcontractor(any[UserAnswers])(any[HeaderCarrier])).thenReturn(
+      when(mockSubcontractorService.ensureSubcontractorInUserAnswers(any[UserAnswers])(any[HeaderCarrier])).thenReturn(
         Future
           .successful(mockUserAnswers)
       )
@@ -123,7 +123,7 @@ class TradingNameOfSubcontractorControllerSpec extends SpecBase with MockitoSuga
           .url
       }
 
-      verify(mockSubcontractorService).createSubcontractor(any[UserAnswers])(any[HeaderCarrier])
+      verify(mockSubcontractorService).ensureSubcontractorInUserAnswers(any[UserAnswers])(any[HeaderCarrier])
       verify(mockSubcontractorService).updateSubcontractor(any[UserAnswers])(any[HeaderCarrier])
       verifyNoMoreInteractions(mockSubcontractorService)
     }

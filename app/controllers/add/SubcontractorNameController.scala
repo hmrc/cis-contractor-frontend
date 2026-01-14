@@ -67,11 +67,11 @@ class SubcontractorNameController @Inject() (
           formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
           value =>
             for {
-              updatedAnswers       <- Future.fromTry(request.userAnswers.set(SubcontractorNamePage, value))
-              _                    <- sessionRepository.set(updatedAnswers)
-              answersWithSubbieRef <- subcontractorService.createSubcontractor(updatedAnswers)
-              _                    <- sessionRepository.set(answersWithSubbieRef)
-              _                    <- subcontractorService.updateSubcontractor(updatedAnswers)
+              updatedAnswers           <- Future.fromTry(request.userAnswers.set(SubcontractorNamePage, value))
+              _                        <- sessionRepository.set(updatedAnswers)
+              userAnswersWithSubbieRef <- subcontractorService.ensureSubcontractorInUserAnswers(updatedAnswers)
+              _                        <- sessionRepository.set(userAnswersWithSubbieRef)
+              _                        <- subcontractorService.updateSubcontractor(userAnswersWithSubbieRef)
             } yield Redirect(navigator.nextPage(SubcontractorNamePage, mode, updatedAnswers))
         )
   }
