@@ -26,7 +26,7 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class CisManageService @Inject()(
+class CisManageService @Inject() (
   cisConnector: ConstructionIndustrySchemeConnector
 )(implicit ec: ExecutionContext)
     extends Logging {
@@ -36,11 +36,22 @@ class CisManageService @Inject()(
       case Some(cisId) => Future.successful(userAnswers)
       case None        =>
         cisConnector.getCisTaxpayer().flatMap { tp =>
-          val cisId = tp.uniqueId.trim
-          if (cisId.isEmpty) {
+          val cisIdString = tp.uniqueId.trim
+          if (cisIdString.isEmpty) {
             Future.failed(new RuntimeException("Empty cisId (uniqueId) returned from /cis/taxpayer"))
           } else {
+            val cisIdFuture: Future[Int] =
+              cisIdString.toIntOption match {
+                case Some(value) => Future.successful(value)
+                case None        =>
+                  Future.failed(
+                    new RuntimeException(
+                      "Invalid data format: cisId (uniqueId) returned from /cis/taxpayer"
+                    )
+                  )
+              }
             for {
+              cisId              <- cisIdFuture
               updatedUserAnswers <- Future.fromTry(userAnswers.set(CisIdQuery, cisId))
             } yield updatedUserAnswers
           }

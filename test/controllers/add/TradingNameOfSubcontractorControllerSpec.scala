@@ -19,7 +19,6 @@ package controllers.add
 import base.SpecBase
 import controllers.routes
 import forms.add.TradingNameOfSubcontractorFormProvider
-import models.subcontractor.UpdateSubcontractorResponse
 import models.{NormalMode, UserAnswers}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{verify, verifyNoMoreInteractions, when}
@@ -86,7 +85,6 @@ class TradingNameOfSubcontractorControllerSpec extends SpecBase with MockitoSuga
       val mockSessionRepository    = mock[SessionRepository]
       val mockSubcontractorService = mock[SubcontractorService]
 
-      val newVersion      = 20
       val mockUserAnswers = emptyUserAnswers
         .set(SubbieResourceRefQuery, 2)
         .success
@@ -99,7 +97,7 @@ class TradingNameOfSubcontractorControllerSpec extends SpecBase with MockitoSuga
       )
       when(mockSubcontractorService.updateSubcontractor(any[UserAnswers])(any[HeaderCarrier])).thenReturn(
         Future
-          .successful(UpdateSubcontractorResponse(newVersion = newVersion))
+          .successful(())
       )
 
       val application =

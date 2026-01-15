@@ -17,11 +17,12 @@
 package connectors
 
 import models.response.CisTaxpayerResponse
-import models.subcontractor.{CreateSubcontractorRequest, CreateSubcontractorResponse, UpdateSubcontractorRequest, UpdateSubcontractorResponse}
+import models.subcontractor.{CreateSubcontractorRequest, CreateSubcontractorResponse, UpdateSubcontractorRequest}
 import play.api.Logging
+import play.api.http.Status.NO_CONTENT
 import play.api.libs.json.Json
 import play.api.libs.ws.JsonBodyWritables.writeableOf_JsValue
-import uk.gov.hmrc.http.{HeaderCarrier, HttpReadsInstances, StringContextOps}
+import uk.gov.hmrc.http.{HeaderCarrier, HttpReadsInstances, HttpResponse, StringContextOps}
 import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
@@ -51,9 +52,20 @@ class ConstructionIndustrySchemeConnector @Inject() (config: ServicesConfig, htt
 
   def updateSubcontractor(
     payload: UpdateSubcontractorRequest
-  )(implicit hc: HeaderCarrier): Future[UpdateSubcontractorResponse] =
+  )(implicit hc: HeaderCarrier): Future[Unit] =
     http
       .post(url"$cisBaseUrl/subcontractor/update")
       .withBody(Json.toJson(payload))
-      .execute[UpdateSubcontractorResponse]
+      .execute[HttpResponse]
+      .flatMap { response =>
+        if (response.status == NO_CONTENT) {
+          Future.successful(())
+        } else {
+          Future.failed(
+            new RuntimeException(
+              s"Update subcontractor failed, returned ${response.status}"
+            )
+          )
+        }
+      }
 }

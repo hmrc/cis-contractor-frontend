@@ -23,21 +23,20 @@ import play.api.Application
 import play.api.inject.guice.GuiceApplicationBuilder
 
 trait ApplicationWithWiremock
-  extends AnyWordSpec
+    extends AnyWordSpec
     with GuiceOneServerPerSuite
     with BeforeAndAfterAll
     with BeforeAndAfterEach:
 
   lazy val wireMock = new WireMock
 
-  val extraConfig: Map[String, Any] = {
+  val extraConfig: Map[String, Any] =
     Map[String, Any](
-      "microservice.services.auth.host" -> WireMockConstants.stubHost,
-      "microservice.services.auth.port" -> WireMockConstants.stubPort,
+      "microservice.services.auth.host"                         -> WireMockConstants.stubHost,
+      "microservice.services.auth.port"                         -> WireMockConstants.stubPort,
       "microservice.services.construction-industry-scheme.host" -> WireMockConstants.stubHost,
       "microservice.services.construction-industry-scheme.port" -> WireMockConstants.stubPort
     )
-  }
 
   override lazy val app: Application = new GuiceApplicationBuilder()
     .configure(extraConfig)

@@ -25,22 +25,24 @@ sealed trait TypeOfSubcontractor
 
 object TypeOfSubcontractor extends Enumerable.Implicits {
 
-  case object Individualorsoletrader extends WithName("individualOrSoleTrader") with TypeOfSubcontractor
-  case object Limitedcompany extends WithName("limitedCompany") with TypeOfSubcontractor
-  case object Partnership  extends WithName("partnership") with TypeOfSubcontractor
+  case object Individualorsoletrader extends WithName("soletrader") with TypeOfSubcontractor
+  case object Limitedcompany extends WithName("company") with TypeOfSubcontractor
+  case object Partnership extends WithName("partnership") with TypeOfSubcontractor
   case object Trust extends WithName("trust") with TypeOfSubcontractor
 
   val values: Seq[TypeOfSubcontractor] = Seq(
-    Individualorsoletrader, Limitedcompany, Partnership, Trust
+    Individualorsoletrader,
+    Limitedcompany,
+    Partnership,
+    Trust
   )
 
-  def options(implicit messages: Messages): Seq[RadioItem] = values.zipWithIndex.map {
-    case (value, index) =>
-      RadioItem(
-        content = Text(messages(s"typeOfSubcontractor.${value.toString}")),
-        value   = Some(value.toString),
-        id      = Some(s"value_$index")
-      )
+  def options(implicit messages: Messages): Seq[RadioItem] = values.zipWithIndex.map { case (value, index) =>
+    RadioItem(
+      content = Text(messages(s"typeOfSubcontractor.${value.toString}")),
+      value = Some(value.toString),
+      id = Some(s"value_$index")
+    )
   }
 
   implicit val enumerable: Enumerable[TypeOfSubcontractor] =
