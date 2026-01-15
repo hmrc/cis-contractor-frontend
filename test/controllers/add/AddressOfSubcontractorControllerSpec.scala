@@ -37,8 +37,9 @@ import controllers.routes
 import forms.add.AddressOfSubcontractorFormProvider
 import models.add.UKAddress
 import models.{NormalMode, UserAnswers}
-import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.when
+import org.mockito.ArgumentCaptor
+import org.mockito.ArgumentMatchers.{any => anyArg}
+import org.mockito.Mockito.{times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import pages.add.AddressOfSubcontractorPage
 import play.api.inject.bind
@@ -46,15 +47,15 @@ import play.api.libs.json.Json
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import repositories.SessionRepository
+import services.SubcontractorService
 import views.html.add.AddressOfSubcontractorView
 
 import scala.concurrent.Future
 
 class AddressOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
 
-
   private val formProvider = new AddressOfSubcontractorFormProvider()
-  private val form = formProvider()
+  private val form         = formProvider()
 
   private lazy val addressOfSubcontractorRoute =
     controllers.add.routes.AddressOfSubcontractorController.onPageLoad(NormalMode).url
@@ -67,7 +68,7 @@ class AddressOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
         "addressLine2" -> "value 2",
         "addressLine3" -> "value 3",
         "addressLine4" -> "value 4",
-        "postCode" -> "NX1 1AA"
+        "postCode"     -> "NX1 1AA"
       )
     )
   )
@@ -79,7 +80,7 @@ class AddressOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request = FakeRequest(GET, addressOfSubcontractorRoute)
-        val view = application.injector.instanceOf[AddressOfSubcontractorView]
+        val view    = application.injector.instanceOf[AddressOfSubcontractorView]
 
         val result = route(application, request).value
 
@@ -93,7 +94,7 @@ class AddressOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request = FakeRequest(GET, addressOfSubcontractorRoute)
-        val view = application.injector.instanceOf[AddressOfSubcontractorView]
+        val view    = application.injector.instanceOf[AddressOfSubcontractorView]
 
         val result = route(application, request).value
 
@@ -111,14 +112,23 @@ class AddressOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must redirect to the NationalInsuranceNumberYesNo page when valid data is submitted" in {
-      val mockSessionRepository = mock[SessionRepository]
-      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+    "must redirect to the NationalInsuranceNumberYesNo page when valid data is submitted and call updateSubcontractor with the updated address" in {
+      val mockSessionRepository    = mock[SessionRepository]
+      val mockSubcontractorService = mock[SubcontractorService]
+
+      when(mockSessionRepository.set(anyArg())) thenReturn Future.successful(true)
+
+      when(mockSubcontractorService.ensureSubcontractorInUserAnswers(anyArg())(anyArg()))
+        .thenAnswer(inv => Future.successful(inv.getArgument(0, classOf[UserAnswers])))
+
+      when(mockSubcontractorService.updateSubcontractor(anyArg())(anyArg()))
+        .thenReturn(Future.successful(()))
 
       val application =
         applicationBuilder(userAnswers = Some(emptyUserAnswers))
           .overrides(
-            bind[SessionRepository].toInstance(mockSessionRepository)
+            bind[SessionRepository].toInstance(mockSessionRepository),
+            bind[SubcontractorService].toInstance(mockSubcontractorService)
           )
           .build()
 
@@ -130,13 +140,30 @@ class AddressOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
               "addressLine2" -> "value 2",
               "addressLine3" -> "value 3",
               "addressLine4" -> "value 4",
-              "postCode" -> "NX1 1AA"
+              "postCode"     -> "NX1 1AA"
             )
 
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.add.routes.NationalInsuranceNumberYesNoController.onPageLoad(NormalMode).url
+        redirectLocation(result).value mustEqual
+          controllers.add.routes.NationalInsuranceNumberYesNoController.onPageLoad(NormalMode).url
+
+        verify(mockSubcontractorService, times(1)).ensureSubcontractorInUserAnswers(anyArg())(anyArg())
+
+        val uaCaptor = ArgumentCaptor.forClass(classOf[UserAnswers])
+        verify(mockSubcontractorService, times(1)).updateSubcontractor(uaCaptor.capture())(anyArg())
+
+        val passedUa     = uaCaptor.getValue
+        val savedAddress = passedUa.get(AddressOfSubcontractorPage).value
+
+        savedAddress.addressLine1 mustBe "value 1"
+        savedAddress.addressLine2 mustBe Some("value 2")
+        savedAddress.addressLine3 mustBe "value 3"
+        savedAddress.addressLine4 mustBe Some("value 4")
+        savedAddress.postCode     mustBe "NX1 1AA"
+
+        verify(mockSessionRepository, times(1)).set(anyArg())
       }
     }
 
@@ -150,7 +177,7 @@ class AddressOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
               "addressLine1" -> "",
               "addressLine2" -> "value 2",
               "addressLine3" -> "value 3",
-              "postCode" -> "NX1 1AA"
+              "postCode"     -> "NX1 1AA"
             )
 
         val boundForm = form.bind(
@@ -158,11 +185,11 @@ class AddressOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
             "addressLine1" -> "",
             "addressLine2" -> "value 2",
             "addressLine3" -> "value 3",
-            "postCode" -> "NX1 1AA"
+            "postCode"     -> "NX1 1AA"
           )
         )
 
-        val view = application.injector.instanceOf[AddressOfSubcontractorView]
+        val view   = application.injector.instanceOf[AddressOfSubcontractorView]
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
@@ -175,7 +202,7 @@ class AddressOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request = FakeRequest(GET, addressOfSubcontractorRoute)
-        val result = route(application, request).value
+        val result  = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
@@ -192,7 +219,7 @@ class AddressOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
               "addressLine1" -> "value 1",
               "addressLine2" -> "value 2",
               "addressLine3" -> "value 3",
-              "postCode" -> "NX1 1AA"
+              "postCode"     -> "NX1 1AA"
             )
 
         val result = route(application, request).value

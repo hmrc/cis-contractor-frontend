@@ -26,9 +26,9 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.add.AddressOfSubcontractorView
-
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
+import services.SubcontractorService
 
 class AddressOfSubcontractorController @Inject()(
                                       override val messagesApi: MessagesApi,
@@ -38,6 +38,7 @@ class AddressOfSubcontractorController @Inject()(
                                       getData: DataRetrievalAction,
                                       requireData: DataRequiredAction,
                                       formProvider: AddressOfSubcontractorFormProvider,
+                                      subcontractorService: SubcontractorService,
                                       val controllerComponents: MessagesControllerComponents,
                                       view: AddressOfSubcontractorView
                                      )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
@@ -64,9 +65,11 @@ class AddressOfSubcontractorController @Inject()(
 
         value =>
           for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(AddressOfSubcontractorPage, value))
-            _              <- sessionRepository.set(updatedAnswers)
-          } yield Redirect(navigator.nextPage(AddressOfSubcontractorPage, mode, updatedAnswers))
+            updatedAnswers0  <- Future.fromTry(request.userAnswers.set(AddressOfSubcontractorPage, value))
+            updatedAnswers1 <- subcontractorService.ensureSubcontractorInUserAnswers(updatedAnswers0)
+            _               <- sessionRepository.set(updatedAnswers1)
+            _               <- subcontractorService.updateSubcontractor(updatedAnswers1)
+          } yield Redirect(navigator.nextPage(AddressOfSubcontractorPage, mode, updatedAnswers1))
       )
   }
 }
