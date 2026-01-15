@@ -18,6 +18,6 @@ package queries
 
 import play.api.libs.json.JsPath
 
-case object CisIdQuery extends Gettable[String] with Settable[String] {
+case object CisIdQuery extends Gettable[Int] with Settable[Int] {
   override def path: JsPath = JsPath \ "cisId"
 }
