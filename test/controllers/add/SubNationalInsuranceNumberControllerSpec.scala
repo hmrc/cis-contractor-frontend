@@ -19,7 +19,6 @@ package controllers.add
 import base.SpecBase
 import controllers.routes
 import forms.add.SubNationalInsuranceNumberFormProvider
-import models.subcontractor.UpdateSubcontractorResponse
 import models.{NormalMode, UserAnswers}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
@@ -93,7 +92,7 @@ class SubNationalInsuranceNumberControllerSpec extends SpecBase with MockitoSuga
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
       when(mockSubcontractorService.updateSubcontractor(any[UserAnswers])(any[HeaderCarrier]))
-        .thenReturn(Future.successful(UpdateSubcontractorResponse(newVersion = 1)))
+        .thenReturn(Future.successful(()))
 
       val application =
         applicationBuilder(userAnswers = Some(mockUserAnswers))
