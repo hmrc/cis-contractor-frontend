@@ -18,9 +18,9 @@ package services
 
 import connectors.ConstructionIndustrySchemeConnector
 import models.UserAnswers
-import models.add.SubcontractorName
-import models.subcontractor.{CreateSubcontractorRequest, UpdateSubcontractorRequest, UpdateSubcontractorResponse}
-import pages.add.{AddressOfSubcontractorPage, SubContactDetailsPage, SubNationalInsuranceNumberPage, SubcontractorNamePage, SubcontractorsUniqueTaxpayerReferencePage, TradingNameOfSubcontractorPage, TypeOfSubcontractorPage, WorksReferenceNumberPage}
+import models.add.{SubcontractorName, TypeOfSubcontractor}
+import models.subcontractor.{CreateSubcontractorRequest, UpdateSubcontractorRequest}
+import pages.add.*
 import play.api.Logging
 import queries.{CisIdQuery, SubbieResourceRefQuery}
 import uk.gov.hmrc.http.HeaderCarrier
@@ -47,7 +47,8 @@ class SubcontractorService @Inject() (
           subcontractorType <- getSubcontractorType(userAnswers)
           payload            = CreateSubcontractorRequest(
                                  schemeId = cisId,
-                                 subcontractorType = subcontractorType
+                                 subcontractorType = subcontractorType,
+                                 version = 0
                                )
           response          <- cisConnector.createSubcontractor(payload)
           updatedAnswers    <- Future.fromTry(userAnswers.set(SubbieResourceRefQuery, response.subbieResourceRef))
@@ -56,7 +57,7 @@ class SubcontractorService @Inject() (
 
   def updateSubcontractor(
     userAnswers: UserAnswers
-  )(implicit hc: HeaderCarrier): Future[UpdateSubcontractorResponse] =
+  )(implicit hc: HeaderCarrier): Future[Unit] =
     for {
       cisId             <- getCisId(userAnswers)
       subbieResourceRef <- getSubbieResourceRef(userAnswers)
@@ -78,10 +79,10 @@ class SubcontractorService @Inject() (
                              emailAddress = userAnswers.get(SubContactDetailsPage).map(_.email),
                              phoneNumber = userAnswers.get(SubContactDetailsPage).map(_.telephone)
                            )
-      response          <- cisConnector.updateSubcontractor(payload)
-    } yield response
+      _                 <- cisConnector.updateSubcontractor(payload)
+    } yield ()
 
-  private def getCisId(userAnswers: UserAnswers): Future[String] =
+  private def getCisId(userAnswers: UserAnswers): Future[Int] =
     userAnswers.get(CisIdQuery) match {
       case Some(cisId) => Future.successful(cisId)
       case None        => Future.failed(new RuntimeException("CisIdQuery not found in session data"))
@@ -93,9 +94,9 @@ class SubcontractorService @Inject() (
       case None                    => Future.failed(new RuntimeException("SubbieResourceRef not found in session data"))
     }
 
-  private def getSubcontractorType(userAnswers: UserAnswers): Future[String] =
+  private def getSubcontractorType(userAnswers: UserAnswers): Future[TypeOfSubcontractor] =
     userAnswers.get(TypeOfSubcontractorPage) match {
-      case Some(subcontractorType) => Future.successful(subcontractorType.toString)
+      case Some(subcontractorType) => Future.successful(subcontractorType)
       case None                    => Future.failed(new RuntimeException("TypeOfSubcontractorPage not found in session data"))
     }
 }

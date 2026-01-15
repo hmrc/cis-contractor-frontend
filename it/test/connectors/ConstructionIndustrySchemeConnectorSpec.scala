@@ -22,8 +22,9 @@ import models.add.TypeOfSubcontractor
 import models.subcontractor.{CreateSubcontractorRequest, UpdateSubcontractorRequest}
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.matchers.must.Matchers
+import org.scalatest.matchers.should.Matchers.shouldBe
 import org.scalatest.wordspec.AnyWordSpec
-import play.api.http.Status.{CREATED, INTERNAL_SERVER_ERROR, OK}
+import play.api.http.Status.{CREATED, INTERNAL_SERVER_ERROR, NO_CONTENT, OK}
 import uk.gov.hmrc.http.HeaderCarrier
 
 class ConstructionIndustrySchemeConnectorSpec
@@ -93,6 +94,9 @@ class ConstructionIndustrySchemeConnectorSpec
   }
 
   "createSubcontractor" should {
+
+    val cisId = 200
+
     "successfully create a subcontractor" in {
 
       val responseJson =
@@ -114,8 +118,9 @@ class ConstructionIndustrySchemeConnectorSpec
       val result = connector
         .createSubcontractor(
           CreateSubcontractorRequest(
-            schemeId = "10",
-            subcontractorType = TypeOfSubcontractor.Trust.toString
+            schemeId = cisId,
+            subcontractorType = TypeOfSubcontractor.Individualorsoletrader,
+            version = 0
           )
         )
         .futureValue
@@ -133,8 +138,9 @@ class ConstructionIndustrySchemeConnectorSpec
         connector
           .createSubcontractor(
             CreateSubcontractorRequest(
-              schemeId = "10",
-              subcontractorType = TypeOfSubcontractor.Trust.toString
+              schemeId = cisId,
+              subcontractorType = TypeOfSubcontractor.Individualorsoletrader,
+              version = 0
             )
           )
           .futureValue
@@ -146,36 +152,29 @@ class ConstructionIndustrySchemeConnectorSpec
   "updateSubcontractor" should {
 
     val subbieResourceRef = 10
+    val cisId             = 200
 
     "successfully update subcontractor" in {
-
-      val responseJson =
-        """
-          |{
-          |  "newVersion": 20
-          |}
-                  """.stripMargin
 
       stubFor(
         post(urlPathEqualTo("/cis/subcontractor/update"))
           .willReturn(
             aResponse()
-              .withStatus(OK)
-              .withBody(responseJson)
+              .withStatus(NO_CONTENT)
           )
       )
 
-      val result = connector
+      val result: Unit = connector
         .updateSubcontractor(
           UpdateSubcontractorRequest(
-            schemeId = "10",
+            schemeId = cisId,
             subbieResourceRef = subbieResourceRef,
             tradingName = Some("trader name")
           )
         )
         .futureValue
 
-      result.newVersion mustBe 20
+      result shouldBe ()
     }
 
     "propagate upstream error on non-2xx" in {
@@ -188,7 +187,7 @@ class ConstructionIndustrySchemeConnectorSpec
         connector
           .updateSubcontractor(
             UpdateSubcontractorRequest(
-              schemeId = "10",
+              schemeId = cisId,
               subbieResourceRef = subbieResourceRef,
               tradingName = Some("trader name")
             )

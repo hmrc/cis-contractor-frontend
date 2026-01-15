@@ -35,19 +35,19 @@ final class CisManageServiceSpec extends SpecBase with MockitoSugar {
 
   "SubcontractorService" - {
 
-    "initializeCisId" - {
+    "ensureCisIdInUserAnswers" - {
       "should initialize CisId if it is not in session data" in {
         val mockConnector: ConstructionIndustrySchemeConnector = mock[ConstructionIndustrySchemeConnector]
         val service                                            = new CisManageService(mockConnector)
 
-        val cisId       = "cisId"
+        val cisId       = 10
         val userAnswers = emptyUserAnswers
 
         when(mockConnector.getCisTaxpayer()(any[HeaderCarrier]))
           .thenReturn(
             Future.successful(
               CisTaxpayerResponse(
-                uniqueId = cisId,
+                uniqueId = "10",
                 taxOfficeNumber = "taxOfficeNumber",
                 taxOfficeRef = "taxOfficeRef",
                 aoDistrict = None,
@@ -84,7 +84,7 @@ final class CisManageServiceSpec extends SpecBase with MockitoSugar {
         val mockConnector: ConstructionIndustrySchemeConnector = mock[ConstructionIndustrySchemeConnector]
         val service                                            = new CisManageService(mockConnector)
 
-        val cisId               = "cisId"
+        val cisId               = 10
         val expectedUserAnswers = emptyUserAnswers
           .set(CisIdQuery, cisId)
           .success
@@ -94,7 +94,7 @@ final class CisManageServiceSpec extends SpecBase with MockitoSugar {
           .thenReturn(
             Future.successful(
               CisTaxpayerResponse(
-                uniqueId = cisId,
+                uniqueId = "10",
                 taxOfficeNumber = "taxOfficeNumber",
                 taxOfficeRef = "taxOfficeRef",
                 aoDistrict = None,
@@ -155,6 +155,42 @@ final class CisManageServiceSpec extends SpecBase with MockitoSugar {
           service.ensureCisIdInUserAnswers(emptyUserAnswers).failed.futureValue
 
         exception.getMessage must include("Empty cisId (uniqueId) returned from /cis/taxpayer")
+      }
+
+      "should fail when connector returns invalid CisId when CisId not in session data" in {
+        val mockConnector: ConstructionIndustrySchemeConnector = mock[ConstructionIndustrySchemeConnector]
+        val service                                            = new CisManageService(mockConnector)
+
+        val cisId = "value is not Int"
+
+        when(mockConnector.getCisTaxpayer()(any[HeaderCarrier]))
+          .thenReturn(
+            Future.successful(
+              CisTaxpayerResponse(
+                uniqueId = cisId,
+                taxOfficeNumber = "taxOfficeNumber",
+                taxOfficeRef = "taxOfficeRef",
+                aoDistrict = None,
+                aoPayType = None,
+                aoCheckCode = None,
+                aoReference = None,
+                validBusinessAddr = None,
+                correlation = None,
+                ggAgentId = None,
+                employerName1 = None,
+                employerName2 = None,
+                agentOwnRef = None,
+                schemeName = None,
+                utr = None,
+                enrolledSig = None
+              )
+            )
+          )
+
+        val exception =
+          service.ensureCisIdInUserAnswers(emptyUserAnswers).failed.futureValue
+
+        exception.getMessage must include("Invalid data format: cisId (uniqueId) returned from /cis/taxpayer")
       }
 
       "should fail when the connector call fails" in {

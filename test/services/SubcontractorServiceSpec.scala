@@ -19,7 +19,7 @@ package services
 import base.SpecBase
 import connectors.ConstructionIndustrySchemeConnector
 import models.add.{SubContactDetails, SubcontractorName, TypeOfSubcontractor, UKAddress}
-import models.subcontractor.{CreateSubcontractorRequest, CreateSubcontractorResponse, UpdateSubcontractorRequest, UpdateSubcontractorResponse}
+import models.subcontractor.{CreateSubcontractorRequest, CreateSubcontractorResponse, UpdateSubcontractorRequest}
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{verify, verifyNoInteractions, verifyNoMoreInteractions, when}
 import org.scalatestplus.mockito.MockitoSugar
@@ -37,15 +37,17 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
 
   "SubcontractorService" - {
 
+    val subbieResourceRef = 10
+    val cisId             = 200
+
     "createSubcontractor" - {
+
       "should create a subcontractor when a subcontractor type is provided" in {
         val mockConnector: ConstructionIndustrySchemeConnector = mock[ConstructionIndustrySchemeConnector]
         val service                                            = new SubcontractorService(mockConnector)
 
-        val mockSubContractorResourceRef = 10
-
         val userAnswers = emptyUserAnswers
-          .set(CisIdQuery, "cisId")
+          .set(CisIdQuery, cisId)
           .success
           .value
           .set(TypeOfSubcontractorPage, TypeOfSubcontractor.Trust)
@@ -53,12 +55,12 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
           .value
 
         when(mockConnector.createSubcontractor(any[CreateSubcontractorRequest])(any[HeaderCarrier]))
-          .thenReturn(Future.successful(CreateSubcontractorResponse(subbieResourceRef = mockSubContractorResourceRef)))
+          .thenReturn(Future.successful(CreateSubcontractorResponse(subbieResourceRef = subbieResourceRef)))
 
         val result = service.ensureSubcontractorInUserAnswers(userAnswers)
 
         val expectedUserAnswers = userAnswers
-          .set(SubbieResourceRefQuery, mockSubContractorResourceRef)
+          .set(SubbieResourceRefQuery, subbieResourceRef)
           .success
           .value
 
@@ -72,16 +74,14 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
         val mockConnector: ConstructionIndustrySchemeConnector = mock[ConstructionIndustrySchemeConnector]
         val service                                            = new SubcontractorService(mockConnector)
 
-        val mockSubContractorResourceRef = 10
-
         val userAnswers = emptyUserAnswers
-          .set(CisIdQuery, "cisId")
+          .set(CisIdQuery, cisId)
           .success
           .value
           .set(TypeOfSubcontractorPage, TypeOfSubcontractor.Trust)
           .success
           .value
-          .set(SubbieResourceRefQuery, mockSubContractorResourceRef)
+          .set(SubbieResourceRefQuery, subbieResourceRef)
           .success
           .value
 
@@ -113,7 +113,7 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
           .thenReturn(Future.failed(new Exception("bang")))
 
         val userAnswers = emptyUserAnswers
-          .set(CisIdQuery, "cisId")
+          .set(CisIdQuery, cisId)
           .success
           .value
 
@@ -131,7 +131,7 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
           .thenReturn(Future.failed(new Exception("bang")))
 
         val userAnswers = emptyUserAnswers
-          .set(CisIdQuery, "cisId")
+          .set(CisIdQuery, cisId)
           .success
           .value
           .set(TypeOfSubcontractorPage, TypeOfSubcontractor.Trust)
@@ -149,17 +149,16 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
     }
 
     "updateSubcontractor" - {
-      val subContractorResourceRef = 10
+
       "should update subcontractor when session data is present with trading name" in {
         val mockConnector: ConstructionIndustrySchemeConnector = mock[ConstructionIndustrySchemeConnector]
         val service                                            = new SubcontractorService(mockConnector)
 
-        val newVersion  = 20
         val userAnswers = emptyUserAnswers
-          .set(CisIdQuery, "cisId")
+          .set(CisIdQuery, cisId)
           .success
           .value
-          .set(SubbieResourceRefQuery, subContractorResourceRef)
+          .set(SubbieResourceRefQuery, subbieResourceRef)
           .success
           .value
           .set(TradingNameOfSubcontractorPage, "trading name")
@@ -185,8 +184,8 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
           .value
 
         val expectedUpdateRequest = UpdateSubcontractorRequest(
-          schemeId = "cisId",
-          subbieResourceRef = subContractorResourceRef,
+          schemeId = cisId,
+          subbieResourceRef = subbieResourceRef,
           tradingName = Some("trading name"),
           addressLine1 = Some("addressLine1"),
           addressLine2 = Some("addressLine2"),
@@ -200,14 +199,12 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
           phoneNumber = Some("phone")
         )
 
-        val mockResponse = UpdateSubcontractorResponse(newVersion = newVersion)
-
         when(mockConnector.updateSubcontractor(any[UpdateSubcontractorRequest])(any[HeaderCarrier]))
-          .thenReturn(Future.successful(mockResponse))
+          .thenReturn(Future.successful(()))
 
         val result = service.updateSubcontractor(userAnswers)
 
-        result.futureValue mustBe mockResponse
+        result.futureValue mustBe ()
 
         verify(mockConnector).updateSubcontractor(eqTo(expectedUpdateRequest))(any[HeaderCarrier])
         verifyNoMoreInteractions(mockConnector)
@@ -217,12 +214,11 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
         val mockConnector: ConstructionIndustrySchemeConnector = mock[ConstructionIndustrySchemeConnector]
         val service                                            = new SubcontractorService(mockConnector)
 
-        val newVersion  = 20
         val userAnswers = emptyUserAnswers
-          .set(CisIdQuery, "cisId")
+          .set(CisIdQuery, cisId)
           .success
           .value
-          .set(SubbieResourceRefQuery, subContractorResourceRef)
+          .set(SubbieResourceRefQuery, subbieResourceRef)
           .success
           .value
           .set(SubcontractorNamePage, SubcontractorName("firstname", Some("middle name"), "lastname"))
@@ -248,8 +244,8 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
           .value
 
         val expectedUpdateRequest = UpdateSubcontractorRequest(
-          schemeId = "cisId",
-          subbieResourceRef = subContractorResourceRef,
+          schemeId = cisId,
+          subbieResourceRef = subbieResourceRef,
           firstName = Some("firstname"),
           secondName = Some("middle name"),
           surname = Some("lastname"),
@@ -265,14 +261,12 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
           phoneNumber = Some("phone")
         )
 
-        val mockResponse = UpdateSubcontractorResponse(newVersion = newVersion)
-
         when(mockConnector.updateSubcontractor(any[UpdateSubcontractorRequest])(any[HeaderCarrier]))
-          .thenReturn(Future.successful(mockResponse))
+          .thenReturn(Future.successful(()))
 
         val result = service.updateSubcontractor(userAnswers)
 
-        result.futureValue mustBe mockResponse
+        result.futureValue mustBe ()
 
         verify(mockConnector).updateSubcontractor(eqTo(expectedUpdateRequest))(any[HeaderCarrier])
         verifyNoMoreInteractions(mockConnector)
@@ -283,7 +277,7 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
         val service                                            = new SubcontractorService(mockConnector)
 
         val userAnswers = emptyUserAnswers
-          .set(CisIdQuery, "cisId")
+          .set(CisIdQuery, cisId)
           .success
           .value
 
@@ -317,10 +311,10 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
           .thenReturn(Future.failed(new Exception("bang")))
 
         val userAnswers = emptyUserAnswers
-          .set(CisIdQuery, "cisId")
+          .set(CisIdQuery, cisId)
           .success
           .value
-          .set(SubbieResourceRefQuery, subContractorResourceRef)
+          .set(SubbieResourceRefQuery, subbieResourceRef)
           .success
           .value
           .set(TradingNameOfSubcontractorPage, "trading name")

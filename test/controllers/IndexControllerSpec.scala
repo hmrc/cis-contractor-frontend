@@ -40,8 +40,9 @@ class IndexControllerSpec extends SpecBase {
       val mockSessionRepository = mock[SessionRepository]
       val mockCisManagerService = mock[CisManageService]
 
+      val cisId           = 10
       val mockUserAnswers = emptyUserAnswers
-        .set(CisIdQuery, "CisId")
+        .set(CisIdQuery, cisId)
         .success
         .value
 
