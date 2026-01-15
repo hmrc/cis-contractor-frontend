@@ -20,7 +20,6 @@ import base.SpecBase
 import controllers.routes
 import forms.add.SubContactDetailsFormProvider
 import models.add.SubContactDetails
-import models.subcontractor.UpdateSubcontractorResponse
 import models.{NormalMode, UserAnswers}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
@@ -96,12 +95,10 @@ class SubContactDetailsControllerSpec extends SpecBase with MockitoSugar {
     "must call updateSubcontractor and save session on valid submission and redirect to CheckYourAnswersController" in {
 
       val mockSessionRepository = mock[SessionRepository]
-      when(mockSubcontractorService.updateSubcontractor(any[UserAnswers])(any[HeaderCarrier]))
-        .thenReturn(Future.successful(UpdateSubcontractorResponse(newVersion = 1)))
 
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
       when(mockSubcontractorService.updateSubcontractor(any[UserAnswers])(any[HeaderCarrier]))
-        .thenReturn(Future.successful(UpdateSubcontractorResponse(newVersion = 1)))
+        .thenReturn(Future.successful(()))
 
       val application =
         applicationBuilder(userAnswers = Some(emptyUserAnswers))
