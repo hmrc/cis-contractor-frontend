@@ -22,24 +22,27 @@ import play.api.i18n.I18nSupport
 import play.api.mvc.Results.Redirect
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
+import services.CisManageService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 
-
-class IndexController @Inject()(
-                                 val controllerComponents: MessagesControllerComponents,
-                                 identify: IdentifierAction,
-                                 sessionRepository: SessionRepository
-                               )(implicit ec: ExecutionContext)
-  extends FrontendBaseController with I18nSupport {
+class IndexController @Inject() (
+  val controllerComponents: MessagesControllerComponents,
+  identify: IdentifierAction,
+  sessionRepository: SessionRepository,
+  cisManagerService: CisManageService
+)(implicit ec: ExecutionContext)
+    extends FrontendBaseController
+    with I18nSupport {
 
   def onPageLoad(): Action[AnyContent] = identify.async { implicit request =>
     val userAnswers = UserAnswers(request.userId)
-    sessionRepository.set(userAnswers).map { _ =>
-      Redirect(controllers.add.routes.TypeOfSubcontractorController.onPageLoad(NormalMode))
-    }
+
+    for {
+      userAnswersWithCisId <- cisManagerService.ensureCisIdInUserAnswers(userAnswers)
+      _                    <- sessionRepository.set(userAnswersWithCisId)
+    } yield Redirect(controllers.add.routes.TypeOfSubcontractorController.onPageLoad(NormalMode))
   }
 }
-

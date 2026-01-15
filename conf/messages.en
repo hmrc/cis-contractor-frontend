@@ -69,8 +69,8 @@ unauthorised.heading = You can’t access this service with this account
 
 typeOfSubcontractor.title = What type of subcontractor are you adding?
 typeOfSubcontractor.heading = What type of subcontractor are you adding?
-typeOfSubcontractor.individualOrSoleTrader = Individual or sole trader
-typeOfSubcontractor.limitedCompany = Limited company
+typeOfSubcontractor.soletrader = Individual or sole trader
+typeOfSubcontractor.company = Limited company
 typeOfSubcontractor.partnership = Partnership
 typeOfSubcontractor.trust = Trust
 typeOfSubcontractor.checkYourAnswersLabel = Type
