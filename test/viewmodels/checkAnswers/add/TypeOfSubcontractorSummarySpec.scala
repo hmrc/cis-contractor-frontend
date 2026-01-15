@@ -48,7 +48,7 @@ class TypeOfSubcontractorSummarySpec extends AnyFreeSpec with Matchers {
 
       row.key.content.asHtml.toString should include(messages("typeOfSubcontractor.checkYourAnswersLabel"))
 
-      val expectedValue = messages("typeOfSubcontractor.limitedCompany")
+      val expectedValue = messages("typeOfSubcontractor.company")
       row.value.content.asHtml.toString should include(expectedValue)
 
       row.actions shouldBe defined

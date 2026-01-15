@@ -20,7 +20,6 @@ import base.SpecBase
 import controllers.routes
 import forms.add.SubcontractorNameFormProvider
 import models.add.*
-import models.subcontractor.UpdateSubcontractorResponse
 import models.{NormalMode, UserAnswers}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{verify, verifyNoMoreInteractions, when}
@@ -92,7 +91,6 @@ class SubcontractorNameControllerSpec extends SpecBase with MockitoSugar {
       val mockSessionRepository    = mock[SessionRepository]
       val mockSubcontractorService = mock[SubcontractorService]
 
-      val newVersion      = 20
       val mockUserAnswers = emptyUserAnswers
         .set(SubbieResourceRefQuery, 2)
         .success
@@ -103,10 +101,8 @@ class SubcontractorNameControllerSpec extends SpecBase with MockitoSugar {
         Future
           .successful(mockUserAnswers)
       )
-      when(mockSubcontractorService.updateSubcontractor(any[UserAnswers])(any[HeaderCarrier])).thenReturn(
-        Future
-          .successful(UpdateSubcontractorResponse(newVersion = newVersion))
-      )
+      when(mockSubcontractorService.updateSubcontractor(any[UserAnswers])(any[HeaderCarrier]))
+        .thenReturn(Future.successful(()))
 
       val application =
         applicationBuilder(userAnswers = Some(emptyUserAnswers))
