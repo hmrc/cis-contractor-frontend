@@ -17,9 +17,19 @@
 package controllers
 
 import base.SpecBase
-import models.NormalMode
+import models.{NormalMode, UserAnswers}
+import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito.{verify, verifyNoMoreInteractions, when}
+import org.scalatestplus.mockito.MockitoSugar.mock
+import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
+import queries.CisIdQuery
+import repositories.SessionRepository
+import services.CisManageService
+import uk.gov.hmrc.http.HeaderCarrier
+
+import scala.concurrent.Future
 
 class IndexControllerSpec extends SpecBase {
 
@@ -27,16 +37,42 @@ class IndexControllerSpec extends SpecBase {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = None).build()
+      val mockSessionRepository = mock[SessionRepository]
+      val mockCisManagerService = mock[CisManageService]
+
+      val cisId           = 10
+      val mockUserAnswers = emptyUserAnswers
+        .set(CisIdQuery, cisId)
+        .success
+        .value
+
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+      when(mockCisManagerService.ensureCisIdInUserAnswers(any[UserAnswers])(any[HeaderCarrier])).thenReturn(
+        Future
+          .successful(mockUserAnswers)
+      )
+
+      val application = applicationBuilder(userAnswers = None)
+        .overrides(
+          bind[SessionRepository].toInstance(mockSessionRepository),
+          bind[CisManageService].toInstance(mockCisManagerService)
+        )
+        .build()
 
       running(application) {
         val request = FakeRequest(GET, routes.IndexController.onPageLoad().url)
 
         val result = route(application, request).value
-        
+
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.add.routes.TypeOfSubcontractorController.onPageLoad(NormalMode).url
+        redirectLocation(result).value mustEqual controllers.add.routes.TypeOfSubcontractorController
+          .onPageLoad(NormalMode)
+          .url
       }
+
+      verify(mockCisManagerService).ensureCisIdInUserAnswers(any[UserAnswers])(any[HeaderCarrier])
+      verifyNoMoreInteractions(mockCisManagerService)
     }
   }
 }
