@@ -28,7 +28,6 @@ import play.api.data.Form
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import queries.SubbieResourceRefQuery
 import services.SubcontractorService
 import uk.gov.hmrc.http.HeaderCarrier
 import views.html.add.WorksReferenceNumberView
