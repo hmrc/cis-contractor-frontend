@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@ import pages.add.WorksReferenceNumberPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
+import services.SubcontractorService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.add.WorksReferenceNumberView
 
@@ -38,6 +39,7 @@ class WorksReferenceNumberController @Inject()(
                                         getData: DataRetrievalAction,
                                         requireData: DataRequiredAction,
                                         formProvider: WorksReferenceNumberFormProvider,
+                                        subcontractorService: SubcontractorService,
                                         val controllerComponents: MessagesControllerComponents,
                                         view: WorksReferenceNumberView
                                     )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
@@ -48,7 +50,7 @@ class WorksReferenceNumberController @Inject()(
     implicit request =>
 
       val preparedForm = request.userAnswers.get(WorksReferenceNumberPage) match {
-        case None => form
+        case None        => form
         case Some(value) => form.fill(value)
       }
 
@@ -58,15 +60,27 @@ class WorksReferenceNumberController @Inject()(
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
 
-      form.bindFromRequest().fold(
-        formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, mode))),
+//      form.bindFromRequest().fold(
+//        formWithErrors =>
+//          Future.successful(BadRequest(view(formWithErrors, mode))),
+//
+//        value =>
+//          for {
+//            updatedAnswers <- Future.fromTry(request.userAnswers.set(WorksReferenceNumberPage, value))
+//            _              <- sessionRepository.set(updatedAnswers)
+//          } yield Redirect(navigator.nextPage(WorksReferenceNumberPage, mode, updatedAnswers))
+//      )
 
-        value =>
-          for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(WorksReferenceNumberPage, value))
-            _              <- sessionRepository.set(updatedAnswers)
-          } yield Redirect(navigator.nextPage(WorksReferenceNumberPage, mode, updatedAnswers))
-      )
+      form
+        .bindFromRequest()
+        .fold(
+          formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
+          value =>
+            for {
+              updatedAnswers <- Future.fromTry(request.userAnswers.set(WorksReferenceNumberPage, value))
+              _ <- sessionRepository.set(updatedAnswers)
+              _ <- subcontractorService.updateSubcontractor(updatedAnswers)
+            } yield Redirect(navigator.nextPage(WorksReferenceNumberPage, mode, updatedAnswers))
+        )
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,17 +20,25 @@ import base.SpecBase
 import controllers.routes
 import forms.add.WorksReferenceNumberFormProvider
 import models.{NormalMode, UserAnswers}
+import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito.{verify, verifyNoMoreInteractions, when}
 import org.scalatestplus.mockito.MockitoSugar
 import pages.add.WorksReferenceNumberPage
 import play.api.data.Form
+import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
+import queries.SubbieResourceRefQuery
+import services.SubcontractorService
+import uk.gov.hmrc.http.HeaderCarrier
 import views.html.add.WorksReferenceNumberView
+
+import scala.concurrent.Future
 
 class WorksReferenceNumberControllerSpec extends SpecBase with MockitoSugar {
 
   val formProvider = new WorksReferenceNumberFormProvider()
-  val form: Form[String] = formProvider()
+  private val form: Form[String] = formProvider()
 
   lazy val worksReferenceNumberRoute: String = controllers.add.routes.WorksReferenceNumberController.onPageLoad(NormalMode).url
 
@@ -74,8 +82,16 @@ class WorksReferenceNumberControllerSpec extends SpecBase with MockitoSugar {
 
       val validValue = "1234567-AB"
 
+      val mockSubcontractorService = mock[SubcontractorService]
+
+      when(mockSubcontractorService.updateSubcontractor(any[UserAnswers])(any[HeaderCarrier]))
+        .thenReturn(Future.successful(()))
+
       val application =
         applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          .overrides(
+            bind[SubcontractorService].toInstance(mockSubcontractorService)
+          )
           .build()
 
       running(application) {
@@ -90,6 +106,9 @@ class WorksReferenceNumberControllerSpec extends SpecBase with MockitoSugar {
         redirectLocation(result).value mustEqual
           controllers.add.routes.SubcontractorContactDetailsYesNoController.onPageLoad(NormalMode).url
       }
+
+      verify(mockSubcontractorService).updateSubcontractor(any[UserAnswers])(any[HeaderCarrier])
+      verifyNoMoreInteractions(mockSubcontractorService)
     }
 
     "must return a Bad Request and errors when invalid data is submitted" in {
