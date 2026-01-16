@@ -118,9 +118,6 @@ class AddressOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
 
       when(mockSessionRepository.set(anyArg())) thenReturn Future.successful(true)
 
-      when(mockSubcontractorService.ensureSubcontractorInUserAnswers(anyArg())(anyArg()))
-        .thenAnswer(inv => Future.successful(inv.getArgument(0, classOf[UserAnswers])))
-
       when(mockSubcontractorService.updateSubcontractor(anyArg())(anyArg()))
         .thenReturn(Future.successful(()))
 
@@ -149,7 +146,6 @@ class AddressOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
         redirectLocation(result).value mustEqual
           controllers.add.routes.NationalInsuranceNumberYesNoController.onPageLoad(NormalMode).url
 
-        verify(mockSubcontractorService, times(1)).ensureSubcontractorInUserAnswers(anyArg())(anyArg())
 
         val uaCaptor = ArgumentCaptor.forClass(classOf[UserAnswers])
         verify(mockSubcontractorService, times(1)).updateSubcontractor(uaCaptor.capture())(anyArg())

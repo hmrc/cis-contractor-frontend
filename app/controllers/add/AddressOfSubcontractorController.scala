@@ -65,11 +65,10 @@ class AddressOfSubcontractorController @Inject()(
 
         value =>
           for {
-            updatedAnswers0  <- Future.fromTry(request.userAnswers.set(AddressOfSubcontractorPage, value))
-            updatedAnswers1 <- subcontractorService.ensureSubcontractorInUserAnswers(updatedAnswers0)
-            _               <- sessionRepository.set(updatedAnswers1)
-            _               <- subcontractorService.updateSubcontractor(updatedAnswers1)
-          } yield Redirect(navigator.nextPage(AddressOfSubcontractorPage, mode, updatedAnswers1))
+            updatedAnswers <- Future.fromTry(request.userAnswers.set(AddressOfSubcontractorPage, value))
+            _              <- sessionRepository.set(updatedAnswers)
+            _              <- subcontractorService.updateSubcontractor(updatedAnswers)
+          } yield Redirect(navigator.nextPage(AddressOfSubcontractorPage, mode, updatedAnswers))
       )
   }
 }
