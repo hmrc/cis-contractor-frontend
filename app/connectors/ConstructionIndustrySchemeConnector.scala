@@ -41,18 +41,32 @@ class ConstructionIndustrySchemeConnector @Inject() (config: ServicesConfig, htt
     http
       .get(url"$cisBaseUrl/taxpayer")
       .execute[CisTaxpayerResponse]
+      .map { response =>
+        logger.info(s"[ConstructionIndustrySchemeConnector][getCisTaxpayer] Response: $response")
+        response
+      }
 
   def createSubcontractor(
     payload: CreateSubcontractorRequest
   )(implicit hc: HeaderCarrier): Future[CreateSubcontractorResponse] =
+    logger.info(
+      s"[ConstructionIndustrySchemeConnector][createSubcontractor] Payload: ${Json.toJson(payload)}"
+    )
     http
       .post(url"$cisBaseUrl/subcontractor/create")
       .withBody(Json.toJson(payload))
       .execute[CreateSubcontractorResponse]
+      .map { response =>
+        logger.info(s"[ConstructionIndustrySchemeConnector][createSubcontractor] Response: $response")
+        response
+      }
 
   def updateSubcontractor(
     payload: UpdateSubcontractorRequest
   )(implicit hc: HeaderCarrier): Future[Unit] =
+    logger.info(
+      s"[ConstructionIndustrySchemeConnector][updateSubcontractor] Payload: ${Json.toJson(payload)}"
+    )
     http
       .post(url"$cisBaseUrl/subcontractor/update")
       .withBody(Json.toJson(payload))
