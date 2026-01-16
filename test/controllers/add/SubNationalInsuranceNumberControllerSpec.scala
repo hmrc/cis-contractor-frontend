@@ -82,8 +82,6 @@ class SubNationalInsuranceNumberControllerSpec extends SpecBase with MockitoSuga
     "must redirect to the UniqueTaxpayerReferenceYesNo page when valid data is submitted" in {
 
       val mockSessionRepository = mock[SessionRepository]
-
-      val newVersion      = 20
       val mockUserAnswers = emptyUserAnswers
         .set(SubbieResourceRefQuery, 2)
         .success
