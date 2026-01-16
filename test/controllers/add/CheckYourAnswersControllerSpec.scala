@@ -93,7 +93,7 @@ class CheckYourAnswersControllerSpec extends SpecBase {
         content must include("Does the subcontractor use a trading name?")
         content must include("Trading name")
         content must include("Do you want to add the subcontractor’s address?")
-        content must include("Contractor address")
+        content must include("Subcontractor address")
         content must include("Do you have a National Insurance number?")
         content must include("National Insurance number")
         content must include("Do you have a Unique Taxpayer Reference (UTR)?")
@@ -102,7 +102,6 @@ class CheckYourAnswersControllerSpec extends SpecBase {
         content must include("Works reference number")
         content must include("Do you want to add the subcontractor’s contact details?")
 
-        // Assert dependent values appear
         content must include("ABC Ltd")
         content must include("AB123456C")
         content must include("1234567890")
