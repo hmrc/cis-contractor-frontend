@@ -35,8 +35,8 @@ class SubcontractorNameFormProvider @Inject() extends Mappings {
         .transform[String](_.trim, identity)
         .verifying(
           firstError(
-            regexp(nameRegexLettersOnly, "subcontractorName.firstName.error.invalidCharacters"),
             regexp(firstCharLetterRegex, "subcontractorName.firstName.error.firstChar"),
+            regexp(nameRegexLettersOnly, "subcontractorName.firstName.error.invalidCharacters"),
             maxLength(35, "subcontractorName.firstName.error.length")
           )
         ),
@@ -45,8 +45,8 @@ class SubcontractorNameFormProvider @Inject() extends Mappings {
           .transform[String](_.trim, identity)
           .verifying(
             firstError(
-              regexp(nameRegexLettersOnly, "subcontractorName.middleName.error.invalidCharacters"),
               regexp(firstCharLetterRegex, "subcontractorName.middleName.error.firstChar"),
+              regexp(nameRegexLettersOnly, "subcontractorName.middleName.error.invalidCharacters"),
               maxLength(35, "subcontractorName.middleName.error.length")
             )
           )
@@ -55,8 +55,8 @@ class SubcontractorNameFormProvider @Inject() extends Mappings {
         .transform[String](_.trim, identity)
         .verifying(
           firstError(
-            regexp(lastNameRegex, "subcontractorName.lastName.error.invalidCharacters"),
             regexp(firstCharLetterRegex, "subcontractorName.lastName.error.firstChar"),
+            regexp(lastNameRegex, "subcontractorName.lastName.error.invalidCharacters"),
             maxLength(35, "subcontractorName.lastName.error.length")
           )
         )
