@@ -30,22 +30,26 @@ import play.api.libs.json.Json
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import repositories.SessionRepository
+import services.SubcontractorService
+import uk.gov.hmrc.http.HeaderCarrier
 import views.html.add.SubContactDetailsView
 
 import scala.concurrent.Future
 
 class SubContactDetailsControllerSpec extends SpecBase with MockitoSugar {
 
-  val formProvider = new SubContactDetailsFormProvider()
-  val form = formProvider()
+  val formProvider                                   = new SubContactDetailsFormProvider()
+  val form                                           = formProvider()
+  val mockSubcontractorService: SubcontractorService = mock[SubcontractorService]
 
   lazy val subContactDetailsRoute = controllers.add.routes.SubContactDetailsController.onPageLoad(NormalMode).url
+  lazy val subContactDetailsSubmitRoute = controllers.add.routes.SubContactDetailsController.onSubmit(NormalMode).url
 
   val userAnswers = UserAnswers(
     userAnswersId,
     Json.obj(
       SubContactDetailsPage.toString -> Json.obj(
-        "email" -> "value 1",
+        "email"     -> "value 1",
         "telephone" -> "value 2"
       )
     )
@@ -81,26 +85,32 @@ class SubContactDetailsControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(SubContactDetails("value 1", "value 2")), NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill(SubContactDetails("value 1", "value 2")), NormalMode)(
+          request,
+          messages(application)
+        ).toString
       }
     }
 
-    "must redirect to the CYA page when valid data is submitted" in {
+    "must call updateSubcontractor and save session on valid submission and redirect to CheckYourAnswersController" in {
 
       val mockSessionRepository = mock[SessionRepository]
 
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+      when(mockSubcontractorService.updateSubcontractor(any[UserAnswers])(any[HeaderCarrier]))
+        .thenReturn(Future.successful(()))
 
       val application =
         applicationBuilder(userAnswers = Some(emptyUserAnswers))
           .overrides(
-            bind[SessionRepository].toInstance(mockSessionRepository)
+            bind[SessionRepository].toInstance(mockSessionRepository),
+            bind[SubcontractorService].toInstance(mockSubcontractorService)
           )
           .build()
 
       running(application) {
         val request =
-          FakeRequest(POST, subContactDetailsRoute)
+          FakeRequest(POST, subContactDetailsSubmitRoute)
             .withFormUrlEncodedBody(("email", "user@domain.com"), ("telephone", "07777777777"))
 
         val result = route(application, request).value
@@ -109,6 +119,33 @@ class SubContactDetailsControllerSpec extends SpecBase with MockitoSugar {
         redirectLocation(result).value mustEqual controllers.add.routes.CheckYourAnswersController.onPageLoad().url
       }
     }
+
+    "must fail if updateSubcontractor throws an exception" in {
+
+      when(mockSubcontractorService.updateSubcontractor(any[UserAnswers])(any[HeaderCarrier]))
+        .thenReturn(Future.failed(new RuntimeException("boom")))
+
+      val application =
+        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          .overrides(
+            bind[SubcontractorService].toInstance(mockSubcontractorService)
+          )
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, subContactDetailsSubmitRoute)
+            .withFormUrlEncodedBody(
+              "email" -> "user@test.com",
+              "telephone" -> "07777777777"
+            )
+
+        intercept[RuntimeException] {
+          await(route(application, request).value)
+        }
+      }
+    }
+
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
@@ -129,7 +166,7 @@ class SubContactDetailsControllerSpec extends SpecBase with MockitoSugar {
         contentAsString(result) mustEqual view(boundForm, NormalMode)(request, messages(application)).toString
       }
     }
-    
+
     "must redirect to Journey Recovery for a GET if no existing data is found" in {
 
       val application = applicationBuilder(userAnswers = None).build()
