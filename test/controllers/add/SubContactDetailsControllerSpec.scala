@@ -42,7 +42,7 @@ class SubContactDetailsControllerSpec extends SpecBase with MockitoSugar {
   val form                                           = formProvider()
   val mockSubcontractorService: SubcontractorService = mock[SubcontractorService]
 
-  lazy val subContactDetailsRoute = controllers.add.routes.SubContactDetailsController.onPageLoad(NormalMode).url
+  lazy val subContactDetailsRoute       = controllers.add.routes.SubContactDetailsController.onPageLoad(NormalMode).url
   lazy val subContactDetailsSubmitRoute = controllers.add.routes.SubContactDetailsController.onSubmit(NormalMode).url
 
   val userAnswers = UserAnswers(
@@ -136,7 +136,7 @@ class SubContactDetailsControllerSpec extends SpecBase with MockitoSugar {
         val request =
           FakeRequest(POST, subContactDetailsSubmitRoute)
             .withFormUrlEncodedBody(
-              "email" -> "user@test.com",
+              "email"     -> "user@test.com",
               "telephone" -> "07777777777"
             )
 
@@ -145,7 +145,6 @@ class SubContactDetailsControllerSpec extends SpecBase with MockitoSugar {
         }
       }
     }
-
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 

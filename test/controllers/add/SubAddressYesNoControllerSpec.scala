@@ -35,7 +35,7 @@ import scala.concurrent.Future
 class SubAddressYesNoControllerSpec extends SpecBase with MockitoSugar {
 
   val formProvider = new SubAddressYesNoFormProvider()
-  val form = formProvider()
+  val form         = formProvider()
 
   lazy val subAddressYesNoRoute = controllers.add.routes.SubAddressYesNoController.onPageLoad(NormalMode).url
 
@@ -96,7 +96,9 @@ class SubAddressYesNoControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.add.routes.AddressOfSubcontractorController.onPageLoad(NormalMode).url
+        redirectLocation(result).value mustEqual controllers.add.routes.AddressOfSubcontractorController
+          .onPageLoad(NormalMode)
+          .url
       }
     }
 
@@ -121,7 +123,9 @@ class SubAddressYesNoControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.add.routes.NationalInsuranceNumberYesNoController.onPageLoad(NormalMode).url
+        redirectLocation(result).value mustEqual controllers.add.routes.NationalInsuranceNumberYesNoController
+          .onPageLoad(NormalMode)
+          .url
       }
     }
 
@@ -184,7 +188,7 @@ class SubAddressYesNoControllerSpec extends SpecBase with MockitoSugar {
           FakeRequest(POST, subAddressYesNoRoute)
             .withFormUrlEncodedBody()
 
-        val form = new SubAddressYesNoFormProvider()()
+        val form      = new SubAddressYesNoFormProvider()()
         val boundForm = form.bind(Map.empty)
 
         val view = application.injector.instanceOf[SubAddressYesNoView]

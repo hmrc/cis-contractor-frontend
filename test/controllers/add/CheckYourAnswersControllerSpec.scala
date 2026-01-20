@@ -111,7 +111,6 @@ class CheckYourAnswersControllerSpec extends SpecBase {
         content must include("test@example.com")
         content must include("0123456789")
 
-
         content must include(controllers.add.routes.SubTradingNameYesNoController.onPageLoad(CheckMode).url)
         content must include(controllers.add.routes.SubAddressYesNoController.onPageLoad(CheckMode).url)
         content must include(controllers.add.routes.NationalInsuranceNumberYesNoController.onPageLoad(CheckMode).url)

@@ -27,9 +27,8 @@ import play.api.i18n.Messages
 import play.api.test.Helpers.stubMessages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.*
 
+class SubNationalInsuranceNumberSummarySpec extends AnyFreeSpec with Matchers {
 
-class SubNationalInsuranceNumberSummarySpec extends AnyFreeSpec with Matchers{
-  
   implicit val messages: Messages = stubMessages()
 
   "SubNationalInsuranceNumberSummary.row" - {
@@ -55,13 +54,13 @@ class SubNationalInsuranceNumberSummarySpec extends AnyFreeSpec with Matchers{
       val actions = row.actions.value.items
       actions should have size 1
 
-      val changeAction = actions.head
+      val changeAction       = actions.head
       val expectedChangeText = messages("site.change")
-      val expectedHref = routes.SubNationalInsuranceNumberController.onPageLoad(CheckMode).url
+      val expectedHref       = routes.SubNationalInsuranceNumberController.onPageLoad(CheckMode).url
       val expectedHiddenText = messages("subNationalInsuranceNumber.change.hidden")
 
       changeAction.content.asHtml.toString should include(expectedChangeText)
-      changeAction.href shouldBe expectedHref
+      changeAction.href                  shouldBe expectedHref
 
       changeAction.visuallyHiddenText.value shouldBe expectedHiddenText
     }

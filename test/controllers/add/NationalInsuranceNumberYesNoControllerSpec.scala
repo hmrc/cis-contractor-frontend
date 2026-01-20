@@ -35,9 +35,10 @@ import scala.concurrent.Future
 class NationalInsuranceNumberYesNoControllerSpec extends SpecBase with MockitoSugar {
 
   val formProvider = new NationalInsuranceNumberYesNoFormProvider()
-  val form = formProvider()
+  val form         = formProvider()
 
-  lazy val nationalInsuranceNumberRoute: String = controllers.add.routes.NationalInsuranceNumberYesNoController.onPageLoad(NormalMode).url
+  lazy val nationalInsuranceNumberRoute: String =
+    controllers.add.routes.NationalInsuranceNumberYesNoController.onPageLoad(NormalMode).url
 
   "NationalInsuranceNumber Controller" - {
 
@@ -96,7 +97,9 @@ class NationalInsuranceNumberYesNoControllerSpec extends SpecBase with MockitoSu
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.add.routes.SubNationalInsuranceNumberController.onPageLoad(NormalMode).url
+        redirectLocation(result).value mustEqual controllers.add.routes.SubNationalInsuranceNumberController
+          .onPageLoad(NormalMode)
+          .url
       }
     }
 
@@ -121,7 +124,9 @@ class NationalInsuranceNumberYesNoControllerSpec extends SpecBase with MockitoSu
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.add.routes.UniqueTaxpayerReferenceYesNoController.onPageLoad(NormalMode).url
+        redirectLocation(result).value mustEqual controllers.add.routes.UniqueTaxpayerReferenceYesNoController
+          .onPageLoad(NormalMode)
+          .url
       }
     }
 

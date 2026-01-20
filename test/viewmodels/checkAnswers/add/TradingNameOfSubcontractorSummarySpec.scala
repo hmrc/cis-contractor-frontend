@@ -44,24 +44,24 @@ class TradingNameOfSubcontractorSummarySpec extends AnyFreeSpec with Matchers {
       maybeRow shouldBe defined
 
       val row = maybeRow.value
-      
+
       val expectedKeyText = messages("tradingNameOfSubcontractor.checkYourAnswersLabel")
       row.key.content.asHtml.toString should include(expectedKeyText)
-      
+
       row.value.content.asHtml.toString should include("Acme Ltd")
-      
+
       row.actions shouldBe defined
       val actions = row.actions.value.items
       actions should have size 1
 
-      val changeAction = actions.head
+      val changeAction       = actions.head
       val expectedChangeText = messages("site.change")
-      val expectedHref = routes.TradingNameOfSubcontractorController.onPageLoad(CheckMode).url
+      val expectedHref       = routes.TradingNameOfSubcontractorController.onPageLoad(CheckMode).url
       val expectedHiddenText = messages("tradingNameOfSubcontractor.change.hidden")
 
       changeAction.content.asHtml.toString should include(expectedChangeText)
-      changeAction.href shouldBe expectedHref
-      
+      changeAction.href                  shouldBe expectedHref
+
       changeAction.visuallyHiddenText.value shouldBe expectedHiddenText
     }
 

@@ -30,7 +30,7 @@ class SubNationalInsuranceNumberFormProvider @Inject() extends Mappings {
         .verifying(
           firstError(
             maxLength(9, "subNationalInsuranceNumber.error.length"),
-            regexp(Validation.ninoRegex, "subNationalInsuranceNumber.error.invalidCharacters" )
+            regexp(Validation.ninoRegex, "subNationalInsuranceNumber.error.invalidCharacters")
           )
         )
     )

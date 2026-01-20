@@ -25,14 +25,14 @@ import javax.inject.Inject
 
 class SubContactDetailsFormProvider @Inject() extends Mappings {
 
-  private val emailRegex = "^[A-Za-z0-9!#$%&*+-/=?^_`{|}~.]+@[A-Za-z0-9!#$%&*+-/=?^_`{|}~.]+$"
-  private val phoneRegex = """^[0-9 )/(\-]+$"""
-  private val maxEmailLength = 254
+  private val emailRegex         = "^[A-Za-z0-9!#$%&*+-/=?^_`{|}~.]+@[A-Za-z0-9!#$%&*+-/=?^_`{|}~.]+$"
+  private val phoneRegex         = """^[0-9 )/(\-]+$"""
+  private val maxEmailLength     = 254
   private val maxTelephoneLength = 35
 
-   def apply(): Form[SubContactDetails] = Form(
-     mapping(
-      "email" -> text("subContactDetails.error.email.required")
+  def apply(): Form[SubContactDetails] = Form(
+    mapping(
+      "email"     -> text("subContactDetails.error.email.required")
         .transform(_.trim, identity)
         .verifying(
           firstError(
@@ -49,5 +49,5 @@ class SubContactDetailsFormProvider @Inject() extends Mappings {
           )
         )
     )(SubContactDetails.apply)(x => Some((x.email, x.telephone)))
-   )
- }
+  )
+}
