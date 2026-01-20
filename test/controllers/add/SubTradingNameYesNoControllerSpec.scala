@@ -28,7 +28,7 @@ import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import repositories.SessionRepository
-import views.html.add. SubTradingNameYesNoView
+import views.html.add.SubTradingNameYesNoView
 
 import scala.concurrent.Future
 
@@ -50,7 +50,7 @@ class SubTradingNameYesNoControllerSpec extends SpecBase with MockitoSugar {
 
         val result = route(application, request).value
 
-        val view = application.injector.instanceOf[ SubTradingNameYesNoView]
+        val view = application.injector.instanceOf[SubTradingNameYesNoView]
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
@@ -66,7 +66,7 @@ class SubTradingNameYesNoControllerSpec extends SpecBase with MockitoSugar {
       running(application) {
         val request = FakeRequest(GET, subTradingNameYesNoRoute)
 
-        val view = application.injector.instanceOf[ SubTradingNameYesNoView]
+        val view = application.injector.instanceOf[SubTradingNameYesNoView]
 
         val result = route(application, request).value
 
@@ -140,7 +140,7 @@ class SubTradingNameYesNoControllerSpec extends SpecBase with MockitoSugar {
 
         val boundForm = form.bind(Map("value" -> ""))
 
-        val view = application.injector.instanceOf[ SubTradingNameYesNoView]
+        val view = application.injector.instanceOf[SubTradingNameYesNoView]
 
         val result = route(application, request).value
 
@@ -191,7 +191,7 @@ class SubTradingNameYesNoControllerSpec extends SpecBase with MockitoSugar {
         val form      = new SubTradingNameYesNoFormProvider()()
         val boundForm = form.bind(Map.empty)
 
-        val view = application.injector.instanceOf[ SubTradingNameYesNoView]
+        val view = application.injector.instanceOf[SubTradingNameYesNoView]
 
         val result = route(application, request).value
 

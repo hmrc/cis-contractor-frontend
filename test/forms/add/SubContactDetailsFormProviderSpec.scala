@@ -59,17 +59,17 @@ class SubContactDetailsFormProviderSpec extends StringFieldBehaviours {
     "!!"
   )
 
-  val emailFieldName = "email"
+  val emailFieldName   = "email"
   val emailRequiredKey = "subContactDetails.error.email.required"
-  val emailLengthKey = "subContactDetails.error.email.length"
+  val emailLengthKey   = "subContactDetails.error.email.length"
   val emailInvalidKey  = "subContactDetails.error.email.invalid"
-  val emailMaxLength = 254
+  val emailMaxLength   = 254
 
-  val telephoneFieldName = "telephone"
+  val telephoneFieldName   = "telephone"
   val telephoneRequiredKey = "subContactDetails.error.telephone.required"
-  val telephoneLengthKey = "subContactDetails.error.telephone.length"
+  val telephoneLengthKey   = "subContactDetails.error.telephone.length"
   val telephoneInvalidKey  = "subContactDetails.error.telephone.invalid"
-  val telephoneMaxLength = 35
+  val telephoneMaxLength   = 35
 
   ".email" - {
 
@@ -97,7 +97,11 @@ class SubContactDetailsFormProviderSpec extends StringFieldBehaviours {
       invalidEmails.foreach { invalidEmail =>
         val result = form.bind(Map(emailFieldName -> invalidEmail, telephoneFieldName -> validTelephones.head))
         result.errors must contain(
-          FormError(emailFieldName, emailInvalidKey, Seq("^[A-Za-z0-9!#$%&*+-/=?^_`{|}~.]+@[A-Za-z0-9!#$%&*+-/=?^_`{|}~.]+$"))
+          FormError(
+            emailFieldName,
+            emailInvalidKey,
+            Seq("^[A-Za-z0-9!#$%&*+-/=?^_`{|}~.]+@[A-Za-z0-9!#$%&*+-/=?^_`{|}~.]+$")
+          )
         )
       }
     }

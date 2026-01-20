@@ -88,7 +88,9 @@ class SubcontractorsUniqueTaxpayerReferenceControllerSpec extends SpecBase with 
 
         status(result) mustEqual SEE_OTHER
 
-        redirectLocation(result).value mustEqual controllers.add.routes.WorksReferenceNumberYesNoController.onPageLoad(NormalMode).url
+        redirectLocation(result).value mustEqual controllers.add.routes.WorksReferenceNumberYesNoController
+          .onPageLoad(NormalMode)
+          .url
       }
     }
 

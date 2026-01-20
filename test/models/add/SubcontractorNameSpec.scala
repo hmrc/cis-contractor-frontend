@@ -24,7 +24,7 @@ class SubcontractorNameSpec extends SpecBase {
   "SubcontractorName" - {
     "serialise to JSON correctly" in {
       val subcontractorName = SubcontractorName("Alice", Some("Chloe"), "Smith")
-      val json = Json.toJson(subcontractorName)
+      val json              = Json.toJson(subcontractorName)
 
       (json \ "firstName").as[String] mustBe "Alice"
       (json \ "middleName").as[String] mustBe "Chloe"
@@ -32,7 +32,7 @@ class SubcontractorNameSpec extends SpecBase {
     }
 
     "deserialize from JSON correctly" in {
-      val json = Json.parse(
+      val json   = Json.parse(
         """
           |{
           |  "firstName": "Alice",
@@ -49,8 +49,8 @@ class SubcontractorNameSpec extends SpecBase {
 
     "round-trip serialize and deserialize correctly" in {
       val subcontractorName = SubcontractorName("Alice", Some("Chloe"), "Smith")
-      val json = Json.toJson(subcontractorName)
-      val result = json.as[SubcontractorName]
+      val json              = Json.toJson(subcontractorName)
+      val result            = json.as[SubcontractorName]
       result mustBe subcontractorName
     }
   }

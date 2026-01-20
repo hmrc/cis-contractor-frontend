@@ -23,7 +23,7 @@ import play.api.mvc.*
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class FakeIdentifierAction @Inject()(isAgent: Boolean)(bodyParsers: PlayBodyParsers) extends IdentifierAction {
+class FakeIdentifierAction @Inject() (isAgent: Boolean)(bodyParsers: PlayBodyParsers) extends IdentifierAction {
 
   override def invokeBlock[A](request: Request[A], block: IdentifierRequest[A] => Future[Result]): Future[Result] =
     if (isAgent) {

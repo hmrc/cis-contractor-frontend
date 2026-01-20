@@ -31,19 +31,19 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class ErrorHandler @Inject() (
-   val messagesApi: MessagesApi,
-   view: ErrorTemplate,
-   notFoundView: PageNotFoundView,
-   systemErrorView: SystemErrorView,
-   accessDeniedView: AccessDeniedView,
-   referenceGenerator: ReferenceGenerator
+  val messagesApi: MessagesApi,
+  view: ErrorTemplate,
+  notFoundView: PageNotFoundView,
+  systemErrorView: SystemErrorView,
+  accessDeniedView: AccessDeniedView,
+  referenceGenerator: ReferenceGenerator
 )(implicit val ec: ExecutionContext, appConfig: FrontendAppConfig)
-  extends FrontendErrorHandler
+    extends FrontendErrorHandler
     with I18nSupport
     with Logging {
 
   override def standardErrorTemplate(pageTitle: String, heading: String, message: String)(implicit
-                                                                                          rh: RequestHeader
+    rh: RequestHeader
   ): Future[Html] =
     Future.successful(view(pageTitle, heading, message))
 
