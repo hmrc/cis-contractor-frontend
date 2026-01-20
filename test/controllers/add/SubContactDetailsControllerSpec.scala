@@ -30,19 +30,16 @@ import play.api.libs.json.Json
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import repositories.SessionRepository
-import services.SubcontractorService
-import uk.gov.hmrc.http.HeaderCarrier
 import views.html.add.SubContactDetailsView
 
 import scala.concurrent.Future
 
 class SubContactDetailsControllerSpec extends SpecBase with MockitoSugar {
 
-  val formProvider                                   = new SubContactDetailsFormProvider()
-  val form                                           = formProvider()
-  val mockSubcontractorService: SubcontractorService = mock[SubcontractorService]
+  val formProvider = new SubContactDetailsFormProvider()
+  val form         = formProvider()
 
-  lazy val subContactDetailsRoute = controllers.add.routes.SubContactDetailsController.onPageLoad(NormalMode).url
+  lazy val subContactDetailsRoute       = controllers.add.routes.SubContactDetailsController.onPageLoad(NormalMode).url
   lazy val subContactDetailsSubmitRoute = controllers.add.routes.SubContactDetailsController.onSubmit(NormalMode).url
 
   val userAnswers = UserAnswers(
@@ -92,19 +89,14 @@ class SubContactDetailsControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must call updateSubcontractor and save session on valid submission and redirect to CheckYourAnswersController" in {
+    "must redirect to CheckYourAnswersController" in {
 
       val mockSessionRepository = mock[SessionRepository]
-
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
-      when(mockSubcontractorService.updateSubcontractor(any[UserAnswers])(any[HeaderCarrier]))
-        .thenReturn(Future.successful(()))
-
-      val application =
+      val application           =
         applicationBuilder(userAnswers = Some(emptyUserAnswers))
           .overrides(
-            bind[SessionRepository].toInstance(mockSessionRepository),
-            bind[SubcontractorService].toInstance(mockSubcontractorService)
+            bind[SessionRepository].toInstance(mockSessionRepository)
           )
           .build()
 
@@ -119,33 +111,6 @@ class SubContactDetailsControllerSpec extends SpecBase with MockitoSugar {
         redirectLocation(result).value mustEqual controllers.add.routes.CheckYourAnswersController.onPageLoad().url
       }
     }
-
-    "must fail if updateSubcontractor throws an exception" in {
-
-      when(mockSubcontractorService.updateSubcontractor(any[UserAnswers])(any[HeaderCarrier]))
-        .thenReturn(Future.failed(new RuntimeException("boom")))
-
-      val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
-          .overrides(
-            bind[SubcontractorService].toInstance(mockSubcontractorService)
-          )
-          .build()
-
-      running(application) {
-        val request =
-          FakeRequest(POST, subContactDetailsSubmitRoute)
-            .withFormUrlEncodedBody(
-              "email" -> "user@test.com",
-              "telephone" -> "07777777777"
-            )
-
-        intercept[RuntimeException] {
-          await(route(application, request).value)
-        }
-      }
-    }
-
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 

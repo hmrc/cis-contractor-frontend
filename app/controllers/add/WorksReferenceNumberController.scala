@@ -24,7 +24,6 @@ import pages.add.WorksReferenceNumberPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
-import services.SubcontractorService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.add.WorksReferenceNumberView
 
@@ -39,7 +38,6 @@ class WorksReferenceNumberController @Inject()(
                                         getData: DataRetrievalAction,
                                         requireData: DataRequiredAction,
                                         formProvider: WorksReferenceNumberFormProvider,
-                                        subcontractorService: SubcontractorService,
                                         val controllerComponents: MessagesControllerComponents,
                                         view: WorksReferenceNumberView
                                     )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
@@ -67,7 +65,6 @@ class WorksReferenceNumberController @Inject()(
             for {
               updatedAnswers <- Future.fromTry(request.userAnswers.set(WorksReferenceNumberPage, value))
               _ <- sessionRepository.set(updatedAnswers)
-              _ <- subcontractorService.updateSubcontractor(updatedAnswers)
             } yield Redirect(navigator.nextPage(WorksReferenceNumberPage, mode, updatedAnswers))
         )
   }

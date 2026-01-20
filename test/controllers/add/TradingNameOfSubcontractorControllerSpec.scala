@@ -29,7 +29,6 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import queries.SubbieResourceRefQuery
 import repositories.SessionRepository
-import services.SubcontractorService
 import uk.gov.hmrc.http.HeaderCarrier
 import views.html.add.TradingNameOfSubcontractorView
 
@@ -83,28 +82,14 @@ class TradingNameOfSubcontractorControllerSpec extends SpecBase with MockitoSuga
     "must redirect to the SubAddressYesNo page when valid data is submitted" in {
 
       val mockSessionRepository    = mock[SessionRepository]
-      val mockSubcontractorService = mock[SubcontractorService]
-
-      val mockUserAnswers = emptyUserAnswers
-        .set(SubbieResourceRefQuery, 2)
-        .success
-        .value
 
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
-      when(mockSubcontractorService.ensureSubcontractorInUserAnswers(any[UserAnswers])(any[HeaderCarrier])).thenReturn(
-        Future
-          .successful(mockUserAnswers)
-      )
-      when(mockSubcontractorService.updateSubcontractor(any[UserAnswers])(any[HeaderCarrier])).thenReturn(
-        Future
-          .successful(())
-      )
+
 
       val application =
         applicationBuilder(userAnswers = Some(emptyUserAnswers))
           .overrides(
-            bind[SessionRepository].toInstance(mockSessionRepository),
-            bind[SubcontractorService].toInstance(mockSubcontractorService)
+            bind[SessionRepository].toInstance(mockSessionRepository)
           )
           .build()
 
@@ -120,10 +105,6 @@ class TradingNameOfSubcontractorControllerSpec extends SpecBase with MockitoSuga
           .onPageLoad(NormalMode)
           .url
       }
-
-      verify(mockSubcontractorService).ensureSubcontractorInUserAnswers(any[UserAnswers])(any[HeaderCarrier])
-      verify(mockSubcontractorService).updateSubcontractor(any[UserAnswers])(any[HeaderCarrier])
-      verifyNoMoreInteractions(mockSubcontractorService)
     }
 
     "must return a Bad Request and errors when invalid data is submitted" in {

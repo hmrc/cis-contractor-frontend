@@ -24,7 +24,6 @@ import pages.add.TradingNameOfSubcontractorPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
-import services.SubcontractorService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.add.TradingNameOfSubcontractorView
 
@@ -39,7 +38,6 @@ class TradingNameOfSubcontractorController @Inject() (
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   formProvider: TradingNameOfSubcontractorFormProvider,
-  subcontractorService: SubcontractorService,
   val controllerComponents: MessagesControllerComponents,
   view: TradingNameOfSubcontractorView
 )(implicit ec: ExecutionContext)
@@ -67,12 +65,9 @@ class TradingNameOfSubcontractorController @Inject() (
           value =>
             for {
               updatedAnswers           <- Future.fromTry(request.userAnswers.set(TradingNameOfSubcontractorPage, value))
-              userAnswersWithSubbieRef <-
-                subcontractorService.ensureSubcontractorInUserAnswers(updatedAnswers)
-              _                        <- sessionRepository.set(userAnswersWithSubbieRef)
-              _                        <- subcontractorService.updateSubcontractor(userAnswersWithSubbieRef)
+              _                        <- sessionRepository.set(updatedAnswers)
             } yield Redirect(
-              navigator.nextPage(TradingNameOfSubcontractorPage, mode, userAnswersWithSubbieRef)
+              navigator.nextPage(TradingNameOfSubcontractorPage, mode, updatedAnswers)
             )
         )
     }
