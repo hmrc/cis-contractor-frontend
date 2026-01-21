@@ -16,29 +16,24 @@
 
 package utils
 
-import jakarta.inject.Singleton
 import org.apache.commons.lang3.StringUtils
 
-trait UTRValidator:
-  def isValidUTR(utr: String): Boolean
-
-@Singleton
-class UTRValidatorImpl extends UTRValidator:
+object UTR:
   private val UTR_WEIGHTS = Array(6, 7, 8, 9, 10, 5, 4, 3, 2)
+  private val utrPattern  = "^[0-9]{10}$".r
 
   def isValidUTR(utr: String): Boolean = {
     if (utr == null || StringUtils.isBlank(utr)) return false
-    val utrPattern = "^[0-9]{10}$".r
     utr match {
       case utrPattern() =>
-        val digits      = utr.map(_.asDigit).toArray
-        val total       = (1 to 9).map(i => digits(i) * UTR_WEIGHTS(i - 1)).sum
-        val remainder   = total % 11
+        val leadDigit   = utr.head.asDigit
+        val sum         = (1 to 9).map(i => utr(i).asDigit * UTR_WEIGHTS(i - 1)).sum
+        val remainder   = sum % 11
         var checkNumber = 11 - remainder
         if (checkNumber > 9) checkNumber -= 9
-        checkNumber == digits(0)
+        leadDigit == checkNumber
       case _            => false
     }
   }
 
-end UTRValidatorImpl
+end UTR
