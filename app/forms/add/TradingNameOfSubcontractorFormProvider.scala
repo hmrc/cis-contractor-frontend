@@ -23,7 +23,6 @@ import javax.inject.Inject
 
 class TradingNameOfSubcontractorFormProvider @Inject() extends Mappings {
 
-
   private val allowedCharsRegex =
     """^[A-Za-z0-9"~!@#\$%*+:\;=\?\s,\.\[\]_\\\{\}\(\)/&'\-\^\u00A3\u20AC]+$"""
 
@@ -38,6 +37,5 @@ class TradingNameOfSubcontractorFormProvider @Inject() extends Mappings {
           )
         )
     )
-
 
 }

@@ -35,9 +35,9 @@ import scala.concurrent.Future
 
 class SubNationalInsuranceNumberControllerSpec extends SpecBase with MockitoSugar {
 
-  val formProvider                                   = new SubNationalInsuranceNumberFormProvider()
-  val form                                           = formProvider()
-  lazy val subNationalInsuranceNumberRoute           =
+  val formProvider                         = new SubNationalInsuranceNumberFormProvider()
+  val form                                 = formProvider()
+  lazy val subNationalInsuranceNumberRoute =
     controllers.add.routes.SubNationalInsuranceNumberController.onPageLoad(NormalMode).url
 
   "SubNationalInsuranceNumber Controller" - {
@@ -79,7 +79,7 @@ class SubNationalInsuranceNumberControllerSpec extends SpecBase with MockitoSuga
     "must redirect to the UniqueTaxpayerReferenceYesNo page when valid data is submitted" in {
 
       val mockSessionRepository = mock[SessionRepository]
-      val mockUserAnswers = emptyUserAnswers
+      val mockUserAnswers       = emptyUserAnswers
         .set(SubbieResourceRefQuery, 2)
         .success
         .value

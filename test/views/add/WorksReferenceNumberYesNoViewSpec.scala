@@ -30,56 +30,58 @@ import play.api.mvc.Request
 import play.api.test.FakeRequest
 import play.twirl.api.HtmlFormat
 
-class WorksReferenceNumberYesNoViewSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite{
+class WorksReferenceNumberYesNoViewSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite {
 
- "WorksReferenceNumberYesNoView" should {
-   "render the page with title, heading, radios and submit button" in new Setup {
-     val html: HtmlFormat.Appendable = view(form, NormalMode)
-     val doc: Document = org.jsoup.Jsoup.parse(html.body)
-     doc.select("title").text() must include(messages("worksReferenceNumberYesNo.title"))
+  "WorksReferenceNumberYesNoView" should {
+    "render the page with title, heading, radios and submit button" in new Setup {
+      val html: HtmlFormat.Appendable = view(form, NormalMode)
+      val doc: Document               = org.jsoup.Jsoup.parse(html.body)
+      doc.select("title").text() must include(messages("worksReferenceNumberYesNo.title"))
 
-     val legend: Elements = doc.select("fieldset legend")
-     legend.text() mustBe messages("worksReferenceNumberYesNo.heading")
-     legend.hasClass("govuk-fieldset__legend--l") mustBe true
+      val legend: Elements = doc.select("fieldset legend")
+      legend.text() mustBe messages("worksReferenceNumberYesNo.heading")
+      legend.hasClass("govuk-fieldset__legend--l") mustBe true
 
-     val hint: Elements = doc.select("fieldset .govuk-hint")
-     hint.text() mustBe messages("worksReferenceNumberYesNo.hint")
+      val hint: Elements = doc.select("fieldset .govuk-hint")
+      hint.text() mustBe messages("worksReferenceNumberYesNo.hint")
 
-     val radioButtons: Elements = doc.select(".govuk-radios__label")
-     radioButtons.size() mustBe 2
-     radioButtons.get(0).text mustBe "Yes"
-     radioButtons.get(1).text mustBe "No"
+      val radioButtons: Elements = doc.select(".govuk-radios__label")
+      radioButtons.size() mustBe 2
+      radioButtons.get(0).text mustBe "Yes"
+      radioButtons.get(1).text mustBe "No"
 
-     doc.select("form").attr("action") mustBe controllers.add.routes.WorksReferenceNumberYesNoController.onSubmit(NormalMode).url
+      doc.select("form").attr("action") mustBe controllers.add.routes.WorksReferenceNumberYesNoController
+        .onSubmit(NormalMode)
+        .url
 
-     doc.select("form").attr("autocomplete") mustBe "off"
+      doc.select("form").attr("autocomplete") mustBe "off"
 
-     doc.select(".govuk-button").text() mustBe messages("site.continue")
-   }
+      doc.select(".govuk-button").text() mustBe messages("site.continue")
+    }
 
-   "display error summary and inline error when no option is selected" in new Setup {
-     val errorForm: Form[Boolean] =
-       form.withError("value", "worksReferenceNumberYesNo.error.required")
+    "display error summary and inline error when no option is selected" in new Setup {
+      val errorForm: Form[Boolean] =
+        form.withError("value", "worksReferenceNumberYesNo.error.required")
 
-     val html: HtmlFormat.Appendable = view(errorForm, NormalMode)
-     val doc: Document = org.jsoup.Jsoup.parse(html.body)
+      val html: HtmlFormat.Appendable = view(errorForm, NormalMode)
+      val doc: Document               = org.jsoup.Jsoup.parse(html.body)
 
-     val summary: Elements = doc.select(".govuk-error-summary")
-     summary.text() must include(messages("worksReferenceNumberYesNo.error.required"))
+      val summary: Elements = doc.select(".govuk-error-summary")
+      summary.text() must include(messages("worksReferenceNumberYesNo.error.required"))
 
-     val linkHref: String = summary.select("a").attr("href")
-     linkHref mustBe "#value"
+      val linkHref: String = summary.select("a").attr("href")
+      linkHref mustBe "#value"
 
-     doc.select(".govuk-error-message").text() must include(messages("worksReferenceNumberYesNo.error.required"))
-   }
- }
+      doc.select(".govuk-error-message").text() must include(messages("worksReferenceNumberYesNo.error.required"))
+    }
+  }
 
   trait Setup {
-    val formProvider = new WorksReferenceNumberYesNoFormProvider()
+    val formProvider        = new WorksReferenceNumberYesNoFormProvider()
     val form: Form[Boolean] = formProvider()
 
     implicit val request: Request[_] = FakeRequest()
-    implicit val messages: Messages =
+    implicit val messages: Messages  =
       play.api.i18n.MessagesImpl(
         play.api.i18n.Lang.defaultLang,
         app.injector.instanceOf[play.api.i18n.MessagesApi]

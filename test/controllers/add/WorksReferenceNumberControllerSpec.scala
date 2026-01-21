@@ -29,10 +29,11 @@ import views.html.add.WorksReferenceNumberView
 
 class WorksReferenceNumberControllerSpec extends SpecBase with MockitoSugar {
 
-  val formProvider = new WorksReferenceNumberFormProvider()
+  val formProvider               = new WorksReferenceNumberFormProvider()
   private val form: Form[String] = formProvider()
 
-  lazy val worksReferenceNumberRoute: String = controllers.add.routes.WorksReferenceNumberController.onPageLoad(NormalMode).url
+  lazy val worksReferenceNumberRoute: String =
+    controllers.add.routes.WorksReferenceNumberController.onPageLoad(NormalMode).url
 
   "WorksReferenceNumber Controller" - {
 
@@ -73,7 +74,6 @@ class WorksReferenceNumberControllerSpec extends SpecBase with MockitoSugar {
     "must bind the form and redirect to SubcontractorContactDetailsYesNo page on POST when valid data is submitted" in {
 
       val validValue = "1234567-AB"
-
 
       val application =
         applicationBuilder(userAnswers = Some(emptyUserAnswers))

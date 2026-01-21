@@ -19,10 +19,10 @@ package forms.add
 import forms.behaviours.BooleanFieldBehaviours
 import play.api.data.FormError
 
-class SubTradingNameYesNoFormProviderSpec extends BooleanFieldBehaviours  {
+class SubTradingNameYesNoFormProviderSpec extends BooleanFieldBehaviours {
 
   val requiredKey = "subTradingNameYesNo.error.required"
-  val invalidKey = "error.boolean"
+  val invalidKey  = "error.boolean"
 
   val form = new SubTradingNameYesNoFormProvider()()
 

@@ -34,25 +34,32 @@ package controllers.add
 
 import com.google.inject.Inject
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
+import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import repositories.SessionRepository
+import services.SubcontractorService
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.checkAnswers.add.*
 import viewmodels.govuk.summarylist.*
 import views.html.add.CheckYourAnswersView
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 class CheckYourAnswersController @Inject() (
   override val messagesApi: MessagesApi,
+  sessionRepository: SessionRepository,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   val controllerComponents: MessagesControllerComponents,
+  subcontractorService: SubcontractorService,
   view: CheckYourAnswersView
-) extends FrontendBaseController
-    with I18nSupport {
+)(implicit ec: ExecutionContext)
+    extends FrontendBaseController
+    with I18nSupport
+    with Logging {
 
   def onPageLoad(): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
     val ua = request.userAnswers
@@ -81,7 +88,17 @@ class CheckYourAnswersController @Inject() (
 
   def onSubmit(): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
-      Future.successful(Redirect(controllers.add.routes.CheckYourAnswersController.onPageLoad()))
+      (for {
+        userAnswersWithSubbieRef <- subcontractorService.ensureSubcontractorInUserAnswers(request.userAnswers)
+        _                        <- sessionRepository.set(userAnswersWithSubbieRef)
+        _                        <- subcontractorService.updateSubcontractor(userAnswersWithSubbieRef)
+      } yield Redirect(controllers.add.routes.CheckYourAnswersController.onPageLoad())) // change to confirmation page
+        .recover { case t: Throwable =>
+          logger.error("[CheckYourAnswersController.onSubmit] failed", t)
+          Redirect(
+            controllers.routes.JourneyRecoveryController.onPageLoad()
+          ) // change if you need to specific error page
+        }
     }
 
 }

@@ -21,15 +21,13 @@ import controllers.routes
 import forms.add.TradingNameOfSubcontractorFormProvider
 import models.{NormalMode, UserAnswers}
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.{verify, verifyNoMoreInteractions, when}
+import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
 import pages.add.TradingNameOfSubcontractorPage
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import queries.SubbieResourceRefQuery
 import repositories.SessionRepository
-import uk.gov.hmrc.http.HeaderCarrier
 import views.html.add.TradingNameOfSubcontractorView
 
 import scala.concurrent.Future
@@ -81,10 +79,9 @@ class TradingNameOfSubcontractorControllerSpec extends SpecBase with MockitoSuga
 
     "must redirect to the SubAddressYesNo page when valid data is submitted" in {
 
-      val mockSessionRepository    = mock[SessionRepository]
+      val mockSessionRepository = mock[SessionRepository]
 
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
-
 
       val application =
         applicationBuilder(userAnswers = Some(emptyUserAnswers))

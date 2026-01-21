@@ -20,9 +20,9 @@ import models.EmployerReference
 import play.api.mvc.{Request, WrappedRequest}
 
 case class IdentifierRequest[A](
-                                 request: Request[A],
-                                 userId: String,
-                                 employerReference: Option[EmployerReference],
-                                 agentReference: Option[String],
-                                 isAgent: Boolean = false
-                               ) extends WrappedRequest[A](request)
+  request: Request[A],
+  userId: String,
+  employerReference: Option[EmployerReference],
+  agentReference: Option[String],
+  isAgent: Boolean = false
+) extends WrappedRequest[A](request)

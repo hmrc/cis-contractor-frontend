@@ -85,9 +85,8 @@ class SubcontractorNameControllerSpec extends SpecBase with MockitoSugar {
 
     "must redirect to the SubAddressYesNo page when valid data is submitted" in {
 
-      val mockSessionRepository    = mock[SessionRepository]
+      val mockSessionRepository = mock[SessionRepository]
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
-     
 
       val application =
         applicationBuilder(userAnswers = Some(emptyUserAnswers))

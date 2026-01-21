@@ -35,9 +35,10 @@ import scala.concurrent.Future
 class SubcontractorContactDetailsYesNoControllerSpec extends SpecBase with MockitoSugar {
 
   val formProvider = new SubcontractorContactDetailsYesNoFormProvider()
-  val form = formProvider()
+  val form         = formProvider()
 
-  lazy val subcontractorContactDetailsYesNoRoute = controllers.add.routes.SubcontractorContactDetailsYesNoController.onPageLoad(NormalMode).url
+  lazy val subcontractorContactDetailsYesNoRoute =
+    controllers.add.routes.SubcontractorContactDetailsYesNoController.onPageLoad(NormalMode).url
 
   "SubcontractorContactDetailsYesNo Controller" - {
 
@@ -96,7 +97,9 @@ class SubcontractorContactDetailsYesNoControllerSpec extends SpecBase with Mocki
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.add.routes.SubContactDetailsController.onPageLoad(NormalMode).url
+        redirectLocation(result).value mustEqual controllers.add.routes.SubContactDetailsController
+          .onPageLoad(NormalMode)
+          .url
       }
     }
 
