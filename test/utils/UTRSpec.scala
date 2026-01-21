@@ -56,7 +56,7 @@ class UTRSpec extends SpecBase:
     }
 
     "returns false for a UTR of expected length but the check digit is wrong" in {
-      val shortUtr = "123456789"
+      val shortUtr = "1234567890"
       isValidUTR(shortUtr) mustBe false
     }
 
