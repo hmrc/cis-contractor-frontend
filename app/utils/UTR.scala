@@ -26,10 +26,10 @@ object UTR:
     if (utr == null || StringUtils.isBlank(utr)) return false
     utr match {
       case utrPattern() =>
-        val leadDigit   = utr.head.asDigit
-        val sum         = (1 to 9).map(i => utr(i).asDigit * UTR_WEIGHTS(i - 1)).sum
-        val remainder   = sum % 11
-        var checkNumber = 11 - remainder
+        val (leadDigit, rest) = (utr.head.asDigit, utr.tail)
+        val sum               = rest.zipWithIndex.map((d, i) => d.asDigit * UTR_WEIGHTS(i)).sum
+        val remainder         = sum % 11
+        var checkNumber       = 11 - remainder
         if (checkNumber > 9) checkNumber -= 9
         leadDigit == checkNumber
       case _            => false
