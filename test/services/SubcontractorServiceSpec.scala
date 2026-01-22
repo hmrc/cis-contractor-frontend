@@ -19,7 +19,7 @@ package services
 import base.SpecBase
 import connectors.ConstructionIndustrySchemeConnector
 import models.add.{SubContactDetails, SubcontractorName, TypeOfSubcontractor, UKAddress}
-import models.subcontractor.{CreateSubcontractorRequest, CreateSubcontractorResponse, UpdateSubcontractorRequest}
+import models.subcontractor.{CreateAndUpdateSubcontractorRequest, CreateSubcontractorRequest, CreateSubcontractorResponse}
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{verify, verifyNoInteractions, verifyNoMoreInteractions, when}
 import org.scalatestplus.mockito.MockitoSugar
@@ -57,7 +57,7 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
         when(mockConnector.createSubcontractor(any[CreateSubcontractorRequest])(any[HeaderCarrier]))
           .thenReturn(Future.successful(CreateSubcontractorResponse(subbieResourceRef = subbieResourceRef)))
 
-        val result = service.ensureSubcontractorInUserAnswers(userAnswers)
+        val result = service.createSubContractor(userAnswers)
 
         val expectedUserAnswers = userAnswers
           .set(SubbieResourceRefQuery, subbieResourceRef)
@@ -85,7 +85,7 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
           .success
           .value
 
-        val result = service.ensureSubcontractorInUserAnswers(userAnswers)
+        val result = service.createSubContractor(userAnswers)
 
         result.futureValue mustBe userAnswers
 
@@ -100,7 +100,7 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
           .thenReturn(Future.failed(new Exception("bang")))
 
         val exception =
-          service.ensureSubcontractorInUserAnswers(emptyUserAnswers).failed.futureValue
+          service.createSubContractor(emptyUserAnswers).failed.futureValue
 
         exception.getMessage must include("CisIdQuery not found in session data")
       }
@@ -118,7 +118,7 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
           .value
 
         val exception =
-          service.ensureSubcontractorInUserAnswers(userAnswers).failed.futureValue
+          service.createSubContractor(userAnswers).failed.futureValue
 
         exception.getMessage must include("TypeOfSubcontractorPage not found in session data")
       }
@@ -139,7 +139,7 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
           .value
 
         val exception =
-          service.ensureSubcontractorInUserAnswers(userAnswers).failed.futureValue
+          service.createSubContractor(userAnswers).failed.futureValue
 
         exception.getMessage must include("bang")
 
@@ -158,10 +158,10 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
           .set(CisIdQuery, cisId)
           .success
           .value
-          .set(SubbieResourceRefQuery, subbieResourceRef)
+          .set(TradingNameOfSubcontractorPage, "trading name")
           .success
           .value
-          .set(TradingNameOfSubcontractorPage, "trading name")
+          .set(TypeOfSubcontractorPage, TypeOfSubcontractor.Individualorsoletrader)
           .success
           .value
           .set(
@@ -183,9 +183,9 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
           .success
           .value
 
-        val expectedUpdateRequest = UpdateSubcontractorRequest(
-          schemeId = cisId,
-          subbieResourceRef = subbieResourceRef,
+        val expectedUpdateRequest = CreateAndUpdateSubcontractorRequest(
+          instanceId = cisId,
+          subcontractorType = "soletrader",
           tradingName = Some("trading name"),
           addressLine1 = Some("addressLine1"),
           addressLine2 = Some("addressLine2"),
@@ -199,14 +199,14 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
           phoneNumber = Some("phone")
         )
 
-        when(mockConnector.updateSubcontractor(any[UpdateSubcontractorRequest])(any[HeaderCarrier]))
+        when(mockConnector.createAndUpdateSubcontractor(any[CreateAndUpdateSubcontractorRequest])(any[HeaderCarrier]))
           .thenReturn(Future.successful(()))
 
-        val result = service.updateSubcontractor(userAnswers)
+        val result = service.createAndUpdateSubcontractor(userAnswers)
 
         result.futureValue mustBe ()
 
-        verify(mockConnector).updateSubcontractor(eqTo(expectedUpdateRequest))(any[HeaderCarrier])
+        verify(mockConnector).createAndUpdateSubcontractor(eqTo(expectedUpdateRequest))(any[HeaderCarrier])
         verifyNoMoreInteractions(mockConnector)
       }
 
@@ -218,7 +218,7 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
           .set(CisIdQuery, cisId)
           .success
           .value
-          .set(SubbieResourceRefQuery, subbieResourceRef)
+          .set(TypeOfSubcontractorPage, TypeOfSubcontractor.Individualorsoletrader)
           .success
           .value
           .set(SubcontractorNamePage, SubcontractorName("firstname", Some("middle name"), "lastname"))
@@ -243,9 +243,9 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
           .success
           .value
 
-        val expectedUpdateRequest = UpdateSubcontractorRequest(
-          schemeId = cisId,
-          subbieResourceRef = subbieResourceRef,
+        val expectedUpdateRequest = CreateAndUpdateSubcontractorRequest(
+          instanceId = cisId,
+          subcontractorType = "soletrader",
           firstName = Some("firstname"),
           secondName = Some("middle name"),
           surname = Some("lastname"),
@@ -261,14 +261,14 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
           phoneNumber = Some("phone")
         )
 
-        when(mockConnector.updateSubcontractor(any[UpdateSubcontractorRequest])(any[HeaderCarrier]))
+        when(mockConnector.createAndUpdateSubcontractor(any[CreateAndUpdateSubcontractorRequest])(any[HeaderCarrier]))
           .thenReturn(Future.successful(()))
 
-        val result = service.updateSubcontractor(userAnswers)
+        val result = service.createAndUpdateSubcontractor(userAnswers)
 
         result.futureValue mustBe ()
 
-        verify(mockConnector).updateSubcontractor(eqTo(expectedUpdateRequest))(any[HeaderCarrier])
+        verify(mockConnector).createAndUpdateSubcontractor(eqTo(expectedUpdateRequest))(any[HeaderCarrier])
         verifyNoMoreInteractions(mockConnector)
       }
 
@@ -281,24 +281,24 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
           .success
           .value
 
-        when(mockConnector.updateSubcontractor(any[UpdateSubcontractorRequest])(any[HeaderCarrier]))
+        when(mockConnector.createAndUpdateSubcontractor(any[CreateAndUpdateSubcontractorRequest])(any[HeaderCarrier]))
           .thenReturn(Future.failed(new Exception("bang")))
 
         val exception =
-          service.updateSubcontractor(userAnswers).failed.futureValue
+          service.createAndUpdateSubcontractor(userAnswers).failed.futureValue
 
-        exception.getMessage must include("SubbieResourceRef not found in session data")
+        exception.getMessage must include("TypeOfSubcontractorPage missing")
       }
 
       "should fail when cisId not found in session data" in {
         val mockConnector: ConstructionIndustrySchemeConnector = mock[ConstructionIndustrySchemeConnector]
         val service                                            = new SubcontractorService(mockConnector)
 
-        when(mockConnector.updateSubcontractor(any[UpdateSubcontractorRequest])(any[HeaderCarrier]))
+        when(mockConnector.createAndUpdateSubcontractor(any[CreateAndUpdateSubcontractorRequest])(any[HeaderCarrier]))
           .thenReturn(Future.failed(new Exception("bang")))
 
         val exception =
-          service.updateSubcontractor(emptyUserAnswers).failed.futureValue
+          service.createAndUpdateSubcontractor(emptyUserAnswers).failed.futureValue
 
         exception.getMessage must include("CisIdQuery not found in session data")
       }
@@ -307,7 +307,7 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
         val mockConnector: ConstructionIndustrySchemeConnector = mock[ConstructionIndustrySchemeConnector]
         val service                                            = new SubcontractorService(mockConnector)
 
-        when(mockConnector.updateSubcontractor(any[UpdateSubcontractorRequest])(any[HeaderCarrier]))
+        when(mockConnector.createAndUpdateSubcontractor(any[CreateAndUpdateSubcontractorRequest])(any[HeaderCarrier]))
           .thenReturn(Future.failed(new Exception("bang")))
 
         val userAnswers = emptyUserAnswers
@@ -322,12 +322,10 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
           .value
 
         val exception =
-          service.updateSubcontractor(userAnswers).failed.futureValue
+          service.createAndUpdateSubcontractor(userAnswers).failed.futureValue
 
-        exception.getMessage must include("bang")
+        exception.getMessage must include("TypeOfSubcontractorPage missing")
 
-        verify(mockConnector).updateSubcontractor(any[UpdateSubcontractorRequest])(any[HeaderCarrier])
-        verifyNoMoreInteractions(mockConnector)
       }
     }
   }

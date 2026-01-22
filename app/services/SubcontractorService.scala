@@ -19,7 +19,7 @@ package services
 import connectors.ConstructionIndustrySchemeConnector
 import models.UserAnswers
 import models.add.{SubcontractorName, TypeOfSubcontractor}
-import models.subcontractor.{CreateSubcontractorRequest, UpdateSubcontractorRequest}
+import models.subcontractor.{CreateSubcontractorRequest, CreateAndUpdateSubcontractorRequest}
 import pages.add.*
 import play.api.Logging
 import queries.{CisIdQuery, SubbieResourceRefQuery}
@@ -34,7 +34,7 @@ class SubcontractorService @Inject() (
 )(implicit ec: ExecutionContext)
     extends Logging {
 
-  def ensureSubcontractorInUserAnswers(
+  def createSubContractor(
     userAnswers: UserAnswers
   )(implicit hc: HeaderCarrier): Future[UserAnswers] =
     userAnswers.get(SubbieResourceRefQuery) match {
@@ -46,7 +46,7 @@ class SubcontractorService @Inject() (
           cisId             <- getCisId(userAnswers)
           subcontractorType <- getSubcontractorType(userAnswers)
           payload            = CreateSubcontractorRequest(
-                                 schemeId = cisId,
+                                 instanceId = cisId,
                                  subcontractorType = subcontractorType,
                                  version = 0
                                )
@@ -55,31 +55,37 @@ class SubcontractorService @Inject() (
         } yield updatedAnswers
     }
 
-  def updateSubcontractor(
+  def createAndUpdateSubcontractor(
     userAnswers: UserAnswers
   )(implicit hc: HeaderCarrier): Future[Unit] =
     for {
       cisId             <- getCisId(userAnswers)
-      subbieResourceRef <- getSubbieResourceRef(userAnswers)
-      payload            = UpdateSubcontractorRequest(
-                             schemeId = cisId,
-                             subbieResourceRef = subbieResourceRef,
-                             firstName = userAnswers.get(SubcontractorNamePage).map(_.firstName),
-                             secondName = userAnswers.get(SubcontractorNamePage).flatMap(_.middleName),
-                             surname = userAnswers.get(SubcontractorNamePage).map(_.lastName),
-                             tradingName = userAnswers.get(TradingNameOfSubcontractorPage),
-                             addressLine1 = userAnswers.get(AddressOfSubcontractorPage).map(_.addressLine1),
-                             addressLine2 = userAnswers.get(AddressOfSubcontractorPage).flatMap(_.addressLine2),
-                             addressLine3 = userAnswers.get(AddressOfSubcontractorPage).map(_.addressLine3),
-                             addressLine4 = userAnswers.get(AddressOfSubcontractorPage).flatMap(_.addressLine4),
-                             postcode = userAnswers.get(AddressOfSubcontractorPage).map(_.postCode),
-                             nino = userAnswers.get(SubNationalInsuranceNumberPage),
-                             utr = userAnswers.get(SubcontractorsUniqueTaxpayerReferencePage),
-                             worksReferenceNumber = userAnswers.get(WorksReferenceNumberPage),
-                             emailAddress = userAnswers.get(SubContactDetailsPage).map(_.email),
-                             phoneNumber = userAnswers.get(SubContactDetailsPage).map(_.telephone)
+      subcontractorType <- Future.fromTry(
+                             userAnswers
+                               .get(TypeOfSubcontractorPage)
+                               .toRight(new IllegalStateException("TypeOfSubcontractorPage missing"))
+                               .toTry
                            )
-      _                 <- cisConnector.updateSubcontractor(payload)
+
+      payload = CreateAndUpdateSubcontractorRequest(
+                  instanceId = cisId,
+                  subcontractorType = subcontractorType.toString,
+                  firstName = userAnswers.get(SubcontractorNamePage).map(_.firstName),
+                  secondName = userAnswers.get(SubcontractorNamePage).flatMap(_.middleName),
+                  surname = userAnswers.get(SubcontractorNamePage).map(_.lastName),
+                  tradingName = userAnswers.get(TradingNameOfSubcontractorPage),
+                  addressLine1 = userAnswers.get(AddressOfSubcontractorPage).map(_.addressLine1),
+                  addressLine2 = userAnswers.get(AddressOfSubcontractorPage).flatMap(_.addressLine2),
+                  addressLine3 = userAnswers.get(AddressOfSubcontractorPage).map(_.addressLine3),
+                  addressLine4 = userAnswers.get(AddressOfSubcontractorPage).flatMap(_.addressLine4),
+                  postcode = userAnswers.get(AddressOfSubcontractorPage).map(_.postCode),
+                  nino = userAnswers.get(SubNationalInsuranceNumberPage),
+                  utr = userAnswers.get(SubcontractorsUniqueTaxpayerReferencePage),
+                  worksReferenceNumber = userAnswers.get(WorksReferenceNumberPage),
+                  emailAddress = userAnswers.get(SubContactDetailsPage).map(_.email),
+                  phoneNumber = userAnswers.get(SubContactDetailsPage).map(_.telephone)
+                )
+      _      <- cisConnector.createAndUpdateSubcontractor(payload)
     } yield ()
 
   private def getCisId(userAnswers: UserAnswers): Future[Int] =
@@ -87,12 +93,7 @@ class SubcontractorService @Inject() (
       case Some(cisId) => Future.successful(cisId)
       case None        => Future.failed(new RuntimeException("CisIdQuery not found in session data"))
     }
-
-  private def getSubbieResourceRef(userAnswers: UserAnswers): Future[Int] =
-    userAnswers.get(SubbieResourceRefQuery) match {
-      case Some(subbieResourceRef) => Future.successful(subbieResourceRef)
-      case None                    => Future.failed(new RuntimeException("SubbieResourceRef not found in session data"))
-    }
+  
 
   private def getSubcontractorType(userAnswers: UserAnswers): Future[TypeOfSubcontractor] =
     userAnswers.get(TypeOfSubcontractorPage) match {

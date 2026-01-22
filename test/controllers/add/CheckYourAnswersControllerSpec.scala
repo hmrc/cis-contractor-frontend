@@ -141,9 +141,9 @@ class CheckYourAnswersControllerSpec extends SpecBase {
         .value
 
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
-      when(mockSubcontractorService.ensureSubcontractorInUserAnswers(any[UserAnswers])(any[HeaderCarrier]))
+      when(mockSubcontractorService.createSubContractor(any[UserAnswers])(any[HeaderCarrier]))
         .thenReturn(Future.successful(mockUserAnswers))
-      when(mockSubcontractorService.updateSubcontractor(any[UserAnswers])(any[HeaderCarrier]))
+      when(mockSubcontractorService.createAndUpdateSubcontractor(any[UserAnswers])(any[HeaderCarrier]))
         .thenReturn(Future.successful(()))
 
       val application =
@@ -167,36 +167,7 @@ class CheckYourAnswersControllerSpec extends SpecBase {
           .url
       }
 
-      verify(mockSubcontractorService).ensureSubcontractorInUserAnswers(any[UserAnswers])(any[HeaderCarrier])
-      verify(mockSessionRepository).set(any[UserAnswers])
-      verify(mockSubcontractorService).updateSubcontractor(any[UserAnswers])(any[HeaderCarrier])
-      verifyNoMoreInteractions(mockSubcontractorService)
-    }
-
-    "must redirect to Technical Difficulties when ensureSubcontractorInUserAnswers fails" in {
-      val mockSessionRepository    = mock[SessionRepository]
-      val mockSubcontractorService = mock[SubcontractorService]
-
-      when(mockSubcontractorService.ensureSubcontractorInUserAnswers(any[UserAnswers])(any[HeaderCarrier]))
-        .thenReturn(Future.failed(new RuntimeException("ensure failed")))
-
-      val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
-          .overrides(
-            bind[SessionRepository].toInstance(mockSessionRepository),
-            bind[SubcontractorService].toInstance(mockSubcontractorService)
-          )
-          .build()
-
-      running(application) {
-        val request = FakeRequest(POST, controllers.add.routes.CheckYourAnswersController.onSubmit().url)
-        val result  = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
-      }
-
-      verify(mockSubcontractorService).ensureSubcontractorInUserAnswers(any[UserAnswers])(any[HeaderCarrier])
+      verify(mockSubcontractorService).createAndUpdateSubcontractor(any[UserAnswers])(any[HeaderCarrier])
       verifyNoMoreInteractions(mockSubcontractorService)
     }
 

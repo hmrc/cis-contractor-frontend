@@ -17,7 +17,7 @@
 package connectors
 
 import models.response.CisTaxpayerResponse
-import models.subcontractor.{CreateSubcontractorRequest, CreateSubcontractorResponse, UpdateSubcontractorRequest}
+import models.subcontractor.{CreateSubcontractorRequest, CreateSubcontractorResponse, CreateAndUpdateSubcontractorRequest}
 import play.api.Logging
 import play.api.http.Status.NO_CONTENT
 import play.api.libs.json.Json
@@ -61,11 +61,11 @@ class ConstructionIndustrySchemeConnector @Inject() (config: ServicesConfig, htt
         response
       }
 
-  def updateSubcontractor(
-    payload: UpdateSubcontractorRequest
+  def createAndUpdateSubcontractor(
+    payload: CreateAndUpdateSubcontractorRequest
   )(implicit hc: HeaderCarrier): Future[Unit] =
     logger.info(
-      s"[ConstructionIndustrySchemeConnector][updateSubcontractor] Payload: ${Json.toJson(payload)}"
+      s"[ConstructionIndustrySchemeConnector][createAndUpdateSubcontractor] Payload: ${Json.toJson(payload)}"
     )
     http
       .post(url"$cisBaseUrl/subcontractor/update")

@@ -27,7 +27,7 @@ class CreateSubcontractorRequestSpec extends AnyWordSpec with Matchers {
 
     "round-trip (writes -> reads) with all fields populated" in {
       val model = CreateSubcontractorRequest(
-        schemeId = 1,
+        instanceId = 1,
         subcontractorType = Individualorsoletrader,
         version = 0
       )
@@ -41,7 +41,7 @@ class CreateSubcontractorRequestSpec extends AnyWordSpec with Matchers {
         Json.parse(
           """
             |{
-            |  "schemeId": 1,
+            |  "instanceId": 1,
             |  "version": 0
             |}
             """.stripMargin

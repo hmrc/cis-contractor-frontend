@@ -45,7 +45,7 @@ import viewmodels.checkAnswers.add.*
 import viewmodels.govuk.summarylist.*
 import views.html.add.CheckYourAnswersView
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
 
 class CheckYourAnswersController @Inject() (
   override val messagesApi: MessagesApi,
@@ -89,9 +89,7 @@ class CheckYourAnswersController @Inject() (
   def onSubmit(): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
       (for {
-        userAnswersWithSubbieRef <- subcontractorService.ensureSubcontractorInUserAnswers(request.userAnswers)
-        _                        <- sessionRepository.set(userAnswersWithSubbieRef)
-        _                        <- subcontractorService.updateSubcontractor(userAnswersWithSubbieRef)
+        _ <- subcontractorService.createAndUpdateSubcontractor(request.userAnswers)
       } yield Redirect(controllers.add.routes.CheckYourAnswersController.onPageLoad())) // change to confirmation page
         .recover { case t: Throwable =>
           logger.error("[CheckYourAnswersController.onSubmit] failed", t)
