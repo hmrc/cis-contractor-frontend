@@ -78,7 +78,6 @@ object ValidatedSubcontractor {
   // To be Kept separate from generic helper for clarity.
   private def getOptionalNamePage(answers: UserAnswers): Either[ValidationError, Option[SubcontractorName]] =
     (answers.get(SubcontractorNamePage), answers.get(SubTradingNameYesNoPage)) match {
-      case (_, None)                  => Left(MissingAnswer(SubTradingNameYesNoPage))
       case (Some(value), Some(false)) => Right(Some(value))
       case (None, Some(true))         => Right(None)
       case _                          => Left(InvalidAnswer(SubcontractorNamePage))
