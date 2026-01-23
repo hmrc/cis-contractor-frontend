@@ -43,7 +43,7 @@ class SubcontractorService @Inject() (
 
       payload = CreateAndUpdateSubcontractorRequest(
                   instanceId = cisId,
-                  subcontractorType = subcontractorType.toString,
+                  subcontractorType = subcontractorType,
                   firstName = userAnswers.get(SubcontractorNamePage).map(_.firstName),
                   secondName = userAnswers.get(SubcontractorNamePage).flatMap(_.middleName),
                   surname = userAnswers.get(SubcontractorNamePage).map(_.lastName),

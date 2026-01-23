@@ -16,6 +16,7 @@
 
 package models.subcontractor
 
+import models.add.TypeOfSubcontractor
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import play.api.libs.json.Json
@@ -29,7 +30,7 @@ class CreateAndUpdateSubcontractorRequestSpec extends AnyWordSpec with Matchers 
     "round-trip (writes -> reads) with all fields populated" in {
       val model = CreateAndUpdateSubcontractorRequest(
         instanceId = instanceId,
-        subcontractorType = "soletrader",
+        subcontractorType = TypeOfSubcontractor.Individualorsoletrader,
         firstName = Some("firstName"),
         secondName = Some("secondName"),
         surname = Some("surname"),
@@ -63,7 +64,7 @@ class CreateAndUpdateSubcontractorRequestSpec extends AnyWordSpec with Matchers 
 
       val parsed = json.as[CreateAndUpdateSubcontractorRequest]
       parsed.instanceId mustBe instanceId
-      parsed.subcontractorType mustBe "soletrader"
+      parsed.subcontractorType mustBe TypeOfSubcontractor.Individualorsoletrader
     }
 
     "fail to parse when a required field is missing" in {

@@ -16,11 +16,12 @@
 
 package models.subcontractor
 
+import models.add.TypeOfSubcontractor
 import play.api.libs.json.{Json, OFormat}
 
 final case class CreateAndUpdateSubcontractorRequest(
   instanceId: Int,
-  subcontractorType: String,
+  subcontractorType: TypeOfSubcontractor,
   firstName: Option[String] = None,
   secondName: Option[String] = None,
   surname: Option[String] = None,
