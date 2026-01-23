@@ -122,8 +122,83 @@ class CheckYourAnswersControllerSpec extends SpecBase {
       }
     }
 
+    "must redirect to the Journey Recovery page on GET when user answers are incomplete" in {
+      val incompleteUserAnswers =
+        emptyUserAnswers
+          .set(TypeOfSubcontractorPage, TypeOfSubcontractor.Individualorsoletrader)
+          .success
+          .value
+          .set(SubTradingNameYesNoPage, true)
+          .success
+          .value
+          .set(TradingNameOfSubcontractorPage, "ABC Ltd")
+          .success
+          .value
+
+      val application = applicationBuilder(userAnswers = Some(incompleteUserAnswers)).build()
+
+      running(application) {
+        val request = FakeRequest(GET, controllers.add.routes.CheckYourAnswersController.onPageLoad().url)
+        val result  = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
     "must redirect back to Check Your Answers on submit (POST)" in {
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+
+      val address = UKAddress(
+        addressLine1 = "10 Downing Street",
+        addressLine2 = Some("Westminster"),
+        addressLine3 = "London",
+        addressLine4 = Some("UK"),
+        postCode = "SW1A 2AA"
+      )
+
+      val ua =
+        emptyUserAnswers
+          .set(TypeOfSubcontractorPage, TypeOfSubcontractor.Individualorsoletrader)
+          .success
+          .value
+          .set(SubTradingNameYesNoPage, true)
+          .success
+          .value
+          .set(TradingNameOfSubcontractorPage, "ABC Ltd")
+          .success
+          .value
+          .set(SubAddressYesNoPage, true)
+          .success
+          .value
+          .set(AddressOfSubcontractorPage, address)
+          .success
+          .value
+          .set(NationalInsuranceNumberYesNoPage, true)
+          .success
+          .value
+          .set(SubNationalInsuranceNumberPage, "AB123456C")
+          .success
+          .value
+          .set(UniqueTaxpayerReferenceYesNoPage, true)
+          .success
+          .value
+          .set(SubcontractorsUniqueTaxpayerReferencePage, "1234567890")
+          .success
+          .value
+          .set(WorksReferenceNumberYesNoPage, true)
+          .success
+          .value
+          .set(WorksReferenceNumberPage, "WRN-001")
+          .success
+          .value
+          .set(SubcontractorContactDetailsYesNoPage, true)
+          .success
+          .value
+          .set(SubContactDetailsPage, SubContactDetails("test@example.com", "0123456789"))
+          .success
+          .value
+
+      val application = applicationBuilder(userAnswers = Some(ua)).build()
 
       running(application) {
         val request = FakeRequest(POST, controllers.add.routes.CheckYourAnswersController.onSubmit().url)
@@ -136,6 +211,31 @@ class CheckYourAnswersControllerSpec extends SpecBase {
 
     "must redirect to Journey Recovery on submit (POST) if no existing data is found" in {
       val application = applicationBuilder(userAnswers = None).build()
+
+      running(application) {
+        val request = FakeRequest(POST, controllers.add.routes.CheckYourAnswersController.onSubmit().url)
+        val result  = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must redirect to Journey Recovery on submit when user answers are incomplete" in {
+
+      val incompleteUserAnswers =
+        emptyUserAnswers
+          .set(TypeOfSubcontractorPage, TypeOfSubcontractor.Individualorsoletrader)
+          .success
+          .value
+          .set(SubTradingNameYesNoPage, true)
+          .success
+          .value
+          .set(TradingNameOfSubcontractorPage, "ABC Ltd")
+          .success
+          .value
+
+      val application = applicationBuilder(userAnswers = Some(incompleteUserAnswers)).build()
 
       running(application) {
         val request = FakeRequest(POST, controllers.add.routes.CheckYourAnswersController.onSubmit().url)

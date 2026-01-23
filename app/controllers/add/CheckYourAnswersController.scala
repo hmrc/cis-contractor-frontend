@@ -41,6 +41,8 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.checkAnswers.add.*
 import viewmodels.govuk.summarylist.*
 import views.html.add.CheckYourAnswersView
+import models.add.ValidatedSubcontractor
+import play.api.Logging
 
 import scala.concurrent.Future
 
@@ -52,36 +54,47 @@ class CheckYourAnswersController @Inject() (
   val controllerComponents: MessagesControllerComponents,
   view: CheckYourAnswersView
 ) extends FrontendBaseController
-    with I18nSupport {
+    with I18nSupport
+    with Logging {
 
   def onPageLoad(): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
     val ua = request.userAnswers
+    ValidatedSubcontractor.build(ua) match {
+      case Right(_)    =>
+        val list = SummaryListViewModel(
+          rows = Seq(
+            TypeOfSubcontractorSummary.row(ua),
+            SubTradingNameYesNoSummary.row(ua),
+            SubcontractorNameSummary.row(ua),
+            TradingNameOfSubcontractorSummary.row(ua),
+            SubAddressYesNoSummary.row(ua),
+            AddressOfSubcontractorSummary.row(ua),
+            NationalInsuranceNumberYesNoSummary.row(ua),
+            SubNationalInsuranceNumberSummary.row(ua),
+            UniqueTaxpayerReferenceYesNoSummary.row(ua),
+            SubcontractorsUniqueTaxpayerReferenceSummary.row(ua),
+            WorksReferenceNumberYesNoSummary.row(ua),
+            WorksReferenceNumberSummary.row(ua),
+            SubcontractorContactDetailsYesNoSummary.row(ua),
+            SubContactDetailsSummary.row(ua)
+          ).flatten
+        )
 
-    val list = SummaryListViewModel(
-      rows = Seq(
-        TypeOfSubcontractorSummary.row(ua),
-        SubTradingNameYesNoSummary.row(ua),
-        SubcontractorNameSummary.row(ua),
-        TradingNameOfSubcontractorSummary.row(ua),
-        SubAddressYesNoSummary.row(ua),
-        AddressOfSubcontractorSummary.row(ua),
-        NationalInsuranceNumberYesNoSummary.row(ua),
-        SubNationalInsuranceNumberSummary.row(ua),
-        UniqueTaxpayerReferenceYesNoSummary.row(ua),
-        SubcontractorsUniqueTaxpayerReferenceSummary.row(ua),
-        WorksReferenceNumberYesNoSummary.row(ua),
-        WorksReferenceNumberSummary.row(ua),
-        SubcontractorContactDetailsYesNoSummary.row(ua),
-        SubContactDetailsSummary.row(ua)
-      ).flatten
-    )
-
-    Ok(view(list))
+        Ok(view(list))
+      case Left(error) =>
+        logger.error(s"[CheckYourAnswersController.onPageLoad] Failed to load the page: $error")
+        Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+    }
   }
 
   def onSubmit(): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
-      Future.successful(Redirect(controllers.add.routes.CheckYourAnswersController.onPageLoad()))
+      ValidatedSubcontractor.build(request.userAnswers) match {
+        case Right(_)    =>
+          Future.successful(Redirect(controllers.add.routes.CheckYourAnswersController.onPageLoad()))
+        case Left(error) =>
+          logger.error(s"[CheckYourAnswersController.onSubmit] Failed submit the page:$error")
+          Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+      }
     }
-
 }
