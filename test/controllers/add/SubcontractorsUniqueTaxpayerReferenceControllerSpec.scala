@@ -28,10 +28,10 @@ import views.html.add.SubcontractorsUniqueTaxpayerReferenceView
 
 class SubcontractorsUniqueTaxpayerReferenceControllerSpec extends SpecBase with MockitoSugar {
 
-  val formProvider = new UtrFormProvider()
-  val form         = formProvider()
+  private val formProvider = new UtrFormProvider()
+  private val form         = formProvider()
 
-  lazy val subcontractorsUniqueTaxpayerReferenceRoute =
+  lazy private val subcontractorsUniqueTaxpayerReferenceRoute =
     controllers.add.routes.SubcontractorsUniqueTaxpayerReferenceController.onPageLoad(NormalMode).url
 
   "SubcontractorsUniqueTaxpayerReference Controller" - {
@@ -71,9 +71,9 @@ class SubcontractorsUniqueTaxpayerReferenceControllerSpec extends SpecBase with 
       }
     }
 
-    "must bind the form and redirect to WorksReferenceNumberYesNo Page on POST when valid data is submitted" in {
+    "must bind the form and redirect to WorksReferenceNumberYesNo Page on POST when valid UTR is submitted" in {
 
-      val validValue = "1234567890"
+      val validValue = "5860920998"
 
       val application =
         applicationBuilder(userAnswers = Some(emptyUserAnswers))
@@ -91,6 +91,28 @@ class SubcontractorsUniqueTaxpayerReferenceControllerSpec extends SpecBase with 
         redirectLocation(result).value mustEqual controllers.add.routes.WorksReferenceNumberYesNoController
           .onPageLoad(NormalMode)
           .url
+      }
+    }
+
+    "must bind the form and redirect to WorksReferenceNumberYesNo Page on POST when invalid UTR is submitted" in {
+
+      val invalidValue = "1234567890"
+
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, subcontractorsUniqueTaxpayerReferenceRoute)
+            .withFormUrlEncodedBody(("value", invalidValue))
+
+        val boundForm = form.bind(Map("value" -> invalidValue))
+
+        val view = application.injector.instanceOf[SubcontractorsUniqueTaxpayerReferenceView]
+
+        val result = route(application, request).value
+
+        status(result) mustEqual BAD_REQUEST
+        contentAsString(result) mustEqual view(boundForm, NormalMode)(request, messages(application)).toString
       }
     }
 
