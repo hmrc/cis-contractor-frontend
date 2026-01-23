@@ -42,7 +42,7 @@ class SubcontractorService @Inject() (
       subcontractorType <- getSubcontractorType(userAnswers)
 
       payload = CreateAndUpdateSubcontractorRequest(
-                  instanceId = cisId,
+                  cisId = cisId,
                   subcontractorType = subcontractorType,
                   firstName = userAnswers.get(SubcontractorNamePage).map(_.firstName),
                   secondName = userAnswers.get(SubcontractorNamePage).flatMap(_.middleName),

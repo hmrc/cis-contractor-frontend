@@ -68,7 +68,7 @@ class ConstructionIndustrySchemeConnector @Inject() (config: ServicesConfig, htt
       s"[ConstructionIndustrySchemeConnector][createAndUpdateSubcontractor] Payload: ${Json.toJson(payload)}"
     )
     http
-      .post(url"$cisBaseUrl/subcontractor/update")
+      .post(url"$cisBaseUrl/subcontractor/create-and-update")
       .withBody(Json.toJson(payload))
       .execute[HttpResponse]
       .flatMap { response =>

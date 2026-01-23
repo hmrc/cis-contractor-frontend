@@ -37,7 +37,7 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
 
   "SubcontractorService" - {
 
-    val cisId             = 200
+    val cisId = 200
 
     "createAndUpdateSubcontractor" - {
 
@@ -75,7 +75,7 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
           .value
 
         val expectedUpdateRequest = CreateAndUpdateSubcontractorRequest(
-          instanceId = cisId,
+          cisId = cisId,
           subcontractorType = TypeOfSubcontractor.Individualorsoletrader,
           tradingName = Some("trading name"),
           addressLine1 = Some("addressLine1"),
@@ -135,7 +135,7 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
           .value
 
         val expectedUpdateRequest = CreateAndUpdateSubcontractorRequest(
-          instanceId = cisId,
+          cisId = cisId,
           subcontractorType = TypeOfSubcontractor.Individualorsoletrader,
           firstName = Some("firstname"),
           secondName = Some("middle name"),
