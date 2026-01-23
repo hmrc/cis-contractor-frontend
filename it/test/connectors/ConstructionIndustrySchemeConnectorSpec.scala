@@ -19,7 +19,8 @@ package connectors
 import com.github.tomakehurst.wiremock.client.WireMock.{aResponse, get, post, stubFor, urlPathEqualTo}
 import itutil.ApplicationWithWiremock
 import models.add.TypeOfSubcontractor
-import models.subcontractor.{CreateSubcontractorRequest, CreateAndUpdateSubcontractorRequest}
+import models.add.TypeOfSubcontractor.Individualorsoletrader
+import models.subcontractor.{CreateAndUpdateSubcontractorRequest, CreateSubcontractorRequest}
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.matchers.should.Matchers.shouldBe
@@ -118,7 +119,7 @@ class ConstructionIndustrySchemeConnectorSpec
       val result = connector
         .createSubcontractor(
           CreateSubcontractorRequest(
-            schemeId = cisId,
+            instanceId = cisId,
             subcontractorType = TypeOfSubcontractor.Individualorsoletrader,
             version = 0
           )
@@ -138,7 +139,7 @@ class ConstructionIndustrySchemeConnectorSpec
         connector
           .createSubcontractor(
             CreateSubcontractorRequest(
-              schemeId = cisId,
+              instanceId = cisId,
               subcontractorType = TypeOfSubcontractor.Individualorsoletrader,
               version = 0
             )
@@ -151,13 +152,12 @@ class ConstructionIndustrySchemeConnectorSpec
 
   "updateSubcontractor" should {
 
-    val subbieResourceRef = 10
-    val cisId             = 200
+    val cisId = "200"
 
     "successfully update subcontractor" in {
 
       stubFor(
-        post(urlPathEqualTo("/cis/subcontractor/update"))
+        post(urlPathEqualTo("/cis/subcontractor/create-and-update"))
           .willReturn(
             aResponse()
               .withStatus(NO_CONTENT)
@@ -167,9 +167,8 @@ class ConstructionIndustrySchemeConnectorSpec
       val result: Unit = connector
         .createAndUpdateSubcontractor(
           CreateAndUpdateSubcontractorRequest(
-            schemeId = cisId,
-            subbieResourceRef = subbieResourceRef,
-            tradingName = Some("trader name")
+            cisId = cisId,
+            subcontractorType = Individualorsoletrader
           )
         )
         .futureValue
@@ -179,7 +178,7 @@ class ConstructionIndustrySchemeConnectorSpec
 
     "propagate upstream error on non-2xx" in {
       stubFor(
-        post(urlPathEqualTo("/cis/subcontractor/update"))
+        post(urlPathEqualTo("/cis/subcontractor/create-and-update"))
           .willReturn(aResponse().withStatus(INTERNAL_SERVER_ERROR).withBody("boom"))
       )
 
@@ -187,9 +186,8 @@ class ConstructionIndustrySchemeConnectorSpec
         connector
           .createAndUpdateSubcontractor(
             CreateAndUpdateSubcontractorRequest(
-              schemeId = cisId,
-              subbieResourceRef = subbieResourceRef,
-              tradingName = Some("trader name")
+              cisId = cisId,
+              subcontractorType = Individualorsoletrader
             )
           )
           .futureValue
