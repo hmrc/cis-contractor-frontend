@@ -62,7 +62,7 @@ class SubcontractorService @Inject() (
       _      <- cisConnector.createAndUpdateSubcontractor(payload)
     } yield ()
 
-  private def getCisId(userAnswers: UserAnswers): Future[Int] =
+  private def getCisId(userAnswers: UserAnswers): Future[String] =
     userAnswers.get(CisIdQuery) match {
       case Some(cisId) => Future.successful(cisId)
       case None        => Future.failed(new RuntimeException("CisIdQuery not found in session data"))

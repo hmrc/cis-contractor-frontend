@@ -20,7 +20,7 @@ import models.add.TypeOfSubcontractor
 import play.api.libs.json.{Json, OFormat}
 
 final case class CreateAndUpdateSubcontractorRequest(
-  cisId: Int,
+  cisId: String,
   subcontractorType: TypeOfSubcontractor,
   firstName: Option[String] = None,
   secondName: Option[String] = None,
