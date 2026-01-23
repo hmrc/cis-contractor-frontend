@@ -25,7 +25,7 @@ class CreateAndUpdateSubcontractorRequestSpec extends AnyWordSpec with Matchers 
 
   "CisTaxpayerResponse JSON format" should {
 
-    val cisId = 10
+    val cisId = "10"
 
     "round-trip (writes -> reads) with all fields populated" in {
       val model = CreateAndUpdateSubcontractorRequest(
@@ -56,7 +56,7 @@ class CreateAndUpdateSubcontractorRequestSpec extends AnyWordSpec with Matchers 
         Json.parse(
           """
             |{
-            |  "cisId": 10,
+            |  "cisId": "10",
             |  "subcontractorType": "soletrader"
             |}
           """.stripMargin
@@ -72,7 +72,7 @@ class CreateAndUpdateSubcontractorRequestSpec extends AnyWordSpec with Matchers 
         Json.parse(
           """
             |{
-            |  "cisId": 10,
+            |  "cisId": "10",
             |  "nino": "123"
             |}
           """.stripMargin
