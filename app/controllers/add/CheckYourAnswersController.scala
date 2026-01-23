@@ -37,7 +37,6 @@ import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierA
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import repositories.SessionRepository
 import services.SubcontractorService
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -49,7 +48,6 @@ import scala.concurrent.ExecutionContext
 
 class CheckYourAnswersController @Inject() (
   override val messagesApi: MessagesApi,
-  sessionRepository: SessionRepository,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,

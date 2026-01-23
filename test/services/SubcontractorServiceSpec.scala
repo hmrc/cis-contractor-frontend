@@ -19,13 +19,13 @@ package services
 import base.SpecBase
 import connectors.ConstructionIndustrySchemeConnector
 import models.add.{SubContactDetails, SubcontractorName, TypeOfSubcontractor, UKAddress}
-import models.subcontractor.{CreateAndUpdateSubcontractorRequest, CreateSubcontractorRequest, CreateSubcontractorResponse}
+import models.subcontractor.CreateAndUpdateSubcontractorRequest
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
-import org.mockito.Mockito.{verify, verifyNoInteractions, verifyNoMoreInteractions, when}
+import org.mockito.Mockito.{verify, verifyNoMoreInteractions, when}
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.mockito.MockitoSugar.mock
-import pages.add.{AddressOfSubcontractorPage, SubContactDetailsPage, SubNationalInsuranceNumberPage, SubcontractorNamePage, SubcontractorsUniqueTaxpayerReferencePage, TradingNameOfSubcontractorPage, TypeOfSubcontractorPage, WorksReferenceNumberPage}
-import queries.{CisIdQuery, SubbieResourceRefQuery}
+import pages.add.*
+import queries.CisIdQuery
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -37,120 +37,11 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
 
   "SubcontractorService" - {
 
-    val subbieResourceRef = 10
     val cisId             = 200
 
-    "createSubcontractor" - {
+    "createAndUpdateSubcontractor" - {
 
-      "should create a subcontractor when a subcontractor type is provided" in {
-        val mockConnector: ConstructionIndustrySchemeConnector = mock[ConstructionIndustrySchemeConnector]
-        val service                                            = new SubcontractorService(mockConnector)
-
-        val userAnswers = emptyUserAnswers
-          .set(CisIdQuery, cisId)
-          .success
-          .value
-          .set(TypeOfSubcontractorPage, TypeOfSubcontractor.Trust)
-          .success
-          .value
-
-        when(mockConnector.createSubcontractor(any[CreateSubcontractorRequest])(any[HeaderCarrier]))
-          .thenReturn(Future.successful(CreateSubcontractorResponse(subbieResourceRef = subbieResourceRef)))
-
-        val result = service.createSubContractor(userAnswers)
-
-        val expectedUserAnswers = userAnswers
-          .set(SubbieResourceRefQuery, subbieResourceRef)
-          .success
-          .value
-
-        result.futureValue mustBe expectedUserAnswers
-
-        verify(mockConnector).createSubcontractor(any[CreateSubcontractorRequest])(any[HeaderCarrier])
-        verifyNoMoreInteractions(mockConnector)
-      }
-
-      "should return user answers when if subcontractor is already created " in {
-        val mockConnector: ConstructionIndustrySchemeConnector = mock[ConstructionIndustrySchemeConnector]
-        val service                                            = new SubcontractorService(mockConnector)
-
-        val userAnswers = emptyUserAnswers
-          .set(CisIdQuery, cisId)
-          .success
-          .value
-          .set(TypeOfSubcontractorPage, TypeOfSubcontractor.Trust)
-          .success
-          .value
-          .set(SubbieResourceRefQuery, subbieResourceRef)
-          .success
-          .value
-
-        val result = service.createSubContractor(userAnswers)
-
-        result.futureValue mustBe userAnswers
-
-        verifyNoInteractions(mockConnector)
-      }
-
-      "should fail when cisId not found in session data" in {
-        val mockConnector: ConstructionIndustrySchemeConnector = mock[ConstructionIndustrySchemeConnector]
-        val service                                            = new SubcontractorService(mockConnector)
-
-        when(mockConnector.createSubcontractor(any[CreateSubcontractorRequest])(any[HeaderCarrier]))
-          .thenReturn(Future.failed(new Exception("bang")))
-
-        val exception =
-          service.createSubContractor(emptyUserAnswers).failed.futureValue
-
-        exception.getMessage must include("CisIdQuery not found in session data")
-      }
-
-      "should fail when subcontractor type not found in session data" in {
-        val mockConnector: ConstructionIndustrySchemeConnector = mock[ConstructionIndustrySchemeConnector]
-        val service                                            = new SubcontractorService(mockConnector)
-
-        when(mockConnector.createSubcontractor(any[CreateSubcontractorRequest])(any[HeaderCarrier]))
-          .thenReturn(Future.failed(new Exception("bang")))
-
-        val userAnswers = emptyUserAnswers
-          .set(CisIdQuery, cisId)
-          .success
-          .value
-
-        val exception =
-          service.createSubContractor(userAnswers).failed.futureValue
-
-        exception.getMessage must include("TypeOfSubcontractorPage not found in session data")
-      }
-
-      "should fail when the connector call fails" in {
-        val mockConnector: ConstructionIndustrySchemeConnector = mock[ConstructionIndustrySchemeConnector]
-        val service                                            = new SubcontractorService(mockConnector)
-
-        when(mockConnector.createSubcontractor(any[CreateSubcontractorRequest])(any[HeaderCarrier]))
-          .thenReturn(Future.failed(new Exception("bang")))
-
-        val userAnswers = emptyUserAnswers
-          .set(CisIdQuery, cisId)
-          .success
-          .value
-          .set(TypeOfSubcontractorPage, TypeOfSubcontractor.Trust)
-          .success
-          .value
-
-        val exception =
-          service.createSubContractor(userAnswers).failed.futureValue
-
-        exception.getMessage must include("bang")
-
-        verify(mockConnector).createSubcontractor(any[CreateSubcontractorRequest])(any[HeaderCarrier])
-        verifyNoMoreInteractions(mockConnector)
-      }
-    }
-
-    "updateSubcontractor" - {
-
-      "should update subcontractor when session data is present with trading name" in {
+      "should create and update subcontractor when session data is present with trading name" in {
         val mockConnector: ConstructionIndustrySchemeConnector = mock[ConstructionIndustrySchemeConnector]
         val service                                            = new SubcontractorService(mockConnector)
 
@@ -272,24 +163,6 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
         verifyNoMoreInteractions(mockConnector)
       }
 
-      "should fail when subbieResourceRef not found in session data" in {
-        val mockConnector: ConstructionIndustrySchemeConnector = mock[ConstructionIndustrySchemeConnector]
-        val service                                            = new SubcontractorService(mockConnector)
-
-        val userAnswers = emptyUserAnswers
-          .set(CisIdQuery, cisId)
-          .success
-          .value
-
-        when(mockConnector.createAndUpdateSubcontractor(any[CreateAndUpdateSubcontractorRequest])(any[HeaderCarrier]))
-          .thenReturn(Future.failed(new Exception("bang")))
-
-        val exception =
-          service.createAndUpdateSubcontractor(userAnswers).failed.futureValue
-
-        exception.getMessage must include("TypeOfSubcontractorPage missing")
-      }
-
       "should fail when cisId not found in session data" in {
         val mockConnector: ConstructionIndustrySchemeConnector = mock[ConstructionIndustrySchemeConnector]
         val service                                            = new SubcontractorService(mockConnector)
@@ -314,7 +187,7 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
           .set(CisIdQuery, cisId)
           .success
           .value
-          .set(SubbieResourceRefQuery, subbieResourceRef)
+          .set(TypeOfSubcontractorPage, TypeOfSubcontractor.Individualorsoletrader)
           .success
           .value
           .set(TradingNameOfSubcontractorPage, "trading name")
@@ -324,7 +197,7 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
         val exception =
           service.createAndUpdateSubcontractor(userAnswers).failed.futureValue
 
-        exception.getMessage must include("TypeOfSubcontractorPage missing")
+        exception.getMessage must include("bang")
 
       }
     }

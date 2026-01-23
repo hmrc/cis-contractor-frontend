@@ -19,10 +19,10 @@ package services
 import connectors.ConstructionIndustrySchemeConnector
 import models.UserAnswers
 import models.add.{SubcontractorName, TypeOfSubcontractor}
-import models.subcontractor.{CreateSubcontractorRequest, CreateAndUpdateSubcontractorRequest}
+import models.subcontractor.CreateAndUpdateSubcontractorRequest
 import pages.add.*
 import play.api.Logging
-import queries.{CisIdQuery, SubbieResourceRefQuery}
+import queries.CisIdQuery
 import uk.gov.hmrc.http.HeaderCarrier
 
 import javax.inject.{Inject, Singleton}
@@ -34,38 +34,12 @@ class SubcontractorService @Inject() (
 )(implicit ec: ExecutionContext)
     extends Logging {
 
-  def createSubContractor(
-    userAnswers: UserAnswers
-  )(implicit hc: HeaderCarrier): Future[UserAnswers] =
-    userAnswers.get(SubbieResourceRefQuery) match {
-      // TODO: If the user changes the trading type, we need to create a new subcontractor.
-      // This will be handled in a future change.
-      case Some(value) => Future.successful(userAnswers)
-      case None        =>
-        for {
-          cisId             <- getCisId(userAnswers)
-          subcontractorType <- getSubcontractorType(userAnswers)
-          payload            = CreateSubcontractorRequest(
-                                 instanceId = cisId,
-                                 subcontractorType = subcontractorType,
-                                 version = 0
-                               )
-          response          <- cisConnector.createSubcontractor(payload)
-          updatedAnswers    <- Future.fromTry(userAnswers.set(SubbieResourceRefQuery, response.subbieResourceRef))
-        } yield updatedAnswers
-    }
-
   def createAndUpdateSubcontractor(
     userAnswers: UserAnswers
   )(implicit hc: HeaderCarrier): Future[Unit] =
     for {
       cisId             <- getCisId(userAnswers)
-      subcontractorType <- Future.fromTry(
-                             userAnswers
-                               .get(TypeOfSubcontractorPage)
-                               .toRight(new IllegalStateException("TypeOfSubcontractorPage missing"))
-                               .toTry
-                           )
+      subcontractorType <- getSubcontractorType(userAnswers)
 
       payload = CreateAndUpdateSubcontractorRequest(
                   instanceId = cisId,
@@ -93,7 +67,6 @@ class SubcontractorService @Inject() (
       case Some(cisId) => Future.successful(cisId)
       case None        => Future.failed(new RuntimeException("CisIdQuery not found in session data"))
     }
-  
 
   private def getSubcontractorType(userAnswers: UserAnswers): Future[TypeOfSubcontractor] =
     userAnswers.get(TypeOfSubcontractorPage) match {

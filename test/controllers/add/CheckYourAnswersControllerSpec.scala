@@ -36,58 +36,58 @@ import scala.concurrent.Future
 class CheckYourAnswersControllerSpec extends SpecBase {
 
   "Check Your Answers Controller" - {
+    val address = UKAddress(
+      addressLine1 = "10 Downing Street",
+      addressLine2 = Some("Westminster"),
+      addressLine3 = "London",
+      addressLine4 = Some("UK"),
+      postCode = "SW1A 2AA"
+    )
+    val ua =
+      emptyUserAnswers
+        .set(TypeOfSubcontractorPage, TypeOfSubcontractor.Individualorsoletrader)
+        .success
+        .value
+        .set(SubTradingNameYesNoPage, true)
+        .success
+        .value
+        .set(TradingNameOfSubcontractorPage, "ABC Ltd")
+        .success
+        .value
+        .set(SubAddressYesNoPage, true)
+        .success
+        .value
+        .set(AddressOfSubcontractorPage, address)
+        .success
+        .value
+        .set(NationalInsuranceNumberYesNoPage, true)
+        .success
+        .value
+        .set(SubNationalInsuranceNumberPage, "AB123456C")
+        .success
+        .value
+        .set(UniqueTaxpayerReferenceYesNoPage, true)
+        .success
+        .value
+        .set(SubcontractorsUniqueTaxpayerReferencePage, "1234567890")
+        .success
+        .value
+        .set(WorksReferenceNumberYesNoPage, true)
+        .success
+        .value
+        .set(WorksReferenceNumberPage, "WRN-001")
+        .success
+        .value
+        .set(SubcontractorContactDetailsYesNoPage, true)
+        .success
+        .value
+        .set(SubContactDetailsPage, SubContactDetails("test@example.com", "0123456789"))
+        .success
+        .value
 
     "must display all questions and dependent rows when answers are provided" in {
 
-      val address = UKAddress(
-        addressLine1 = "10 Downing Street",
-        addressLine2 = Some("Westminster"),
-        addressLine3 = "London",
-        addressLine4 = Some("UK"),
-        postCode = "SW1A 2AA"
-      )
 
-      val ua =
-        emptyUserAnswers
-          .set(TypeOfSubcontractorPage, TypeOfSubcontractor.Individualorsoletrader)
-          .success
-          .value
-          .set(SubTradingNameYesNoPage, true)
-          .success
-          .value
-          .set(TradingNameOfSubcontractorPage, "ABC Ltd")
-          .success
-          .value
-          .set(SubAddressYesNoPage, true)
-          .success
-          .value
-          .set(AddressOfSubcontractorPage, address)
-          .success
-          .value
-          .set(NationalInsuranceNumberYesNoPage, true)
-          .success
-          .value
-          .set(SubNationalInsuranceNumberPage, "AB123456C")
-          .success
-          .value
-          .set(UniqueTaxpayerReferenceYesNoPage, true)
-          .success
-          .value
-          .set(SubcontractorsUniqueTaxpayerReferencePage, "1234567890")
-          .success
-          .value
-          .set(WorksReferenceNumberYesNoPage, true)
-          .success
-          .value
-          .set(WorksReferenceNumberPage, "WRN-001")
-          .success
-          .value
-          .set(SubcontractorContactDetailsYesNoPage, true)
-          .success
-          .value
-          .set(SubContactDetailsPage, SubContactDetails("test@example.com", "0123456789"))
-          .success
-          .value
 
       val application = applicationBuilder(userAnswers = Some(ua)).build()
 
@@ -131,25 +131,16 @@ class CheckYourAnswersControllerSpec extends SpecBase {
       }
     }
 
-    "must redirect to Check Your Answers when valid data is submitted" in {
+    "must redirect to other (confirm page ) when valid data is submitted" in {
       val mockSessionRepository    = mock[SessionRepository]
       val mockSubcontractorService = mock[SubcontractorService]
 
-      val mockUserAnswers = emptyUserAnswers
-        .set(SubbieResourceRefQuery, 2)
-        .success
-        .value
-
-      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
-      when(mockSubcontractorService.createSubContractor(any[UserAnswers])(any[HeaderCarrier]))
-        .thenReturn(Future.successful(mockUserAnswers))
       when(mockSubcontractorService.createAndUpdateSubcontractor(any[UserAnswers])(any[HeaderCarrier]))
         .thenReturn(Future.successful(()))
 
       val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        applicationBuilder(userAnswers = Some(ua))
           .overrides(
-            bind[SessionRepository].toInstance(mockSessionRepository),
             bind[SubcontractorService].toInstance(mockSubcontractorService)
           )
           .build()
@@ -157,7 +148,6 @@ class CheckYourAnswersControllerSpec extends SpecBase {
       running(application) {
         val request =
           FakeRequest(POST, controllers.add.routes.CheckYourAnswersController.onSubmit().url)
-            .withFormUrlEncodedBody(("value", "answer"))
 
         val result = route(application, request).value
 
