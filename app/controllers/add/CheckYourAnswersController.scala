@@ -34,6 +34,7 @@ package controllers.add
 
 import com.google.inject.Inject
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
+import models.add.ValidatedSubcontractor
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -44,7 +45,7 @@ import viewmodels.checkAnswers.add.*
 import viewmodels.govuk.summarylist.*
 import views.html.add.CheckYourAnswersView
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 class CheckYourAnswersController @Inject() (
   override val messagesApi: MessagesApi,
@@ -61,40 +62,59 @@ class CheckYourAnswersController @Inject() (
 
   def onPageLoad(): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
     val ua = request.userAnswers
+    ValidatedSubcontractor.build(ua) match {
+      case Right(_)    =>
+        val list = SummaryListViewModel(
+          rows = Seq(
+            TypeOfSubcontractorSummary.row(ua),
+            SubTradingNameYesNoSummary.row(ua),
+            SubcontractorNameSummary.row(ua),
+            TradingNameOfSubcontractorSummary.row(ua),
+            SubAddressYesNoSummary.row(ua),
+            AddressOfSubcontractorSummary.row(ua),
+            NationalInsuranceNumberYesNoSummary.row(ua),
+            SubNationalInsuranceNumberSummary.row(ua),
+            UniqueTaxpayerReferenceYesNoSummary.row(ua),
+            SubcontractorsUniqueTaxpayerReferenceSummary.row(ua),
+            WorksReferenceNumberYesNoSummary.row(ua),
+            WorksReferenceNumberSummary.row(ua),
+            SubcontractorContactDetailsYesNoSummary.row(ua),
+            SubContactDetailsSummary.row(ua)
+          ).flatten
+        )
 
-    val list = SummaryListViewModel(
-      rows = Seq(
-        TypeOfSubcontractorSummary.row(ua),
-        SubTradingNameYesNoSummary.row(ua),
-        SubcontractorNameSummary.row(ua),
-        TradingNameOfSubcontractorSummary.row(ua),
-        SubAddressYesNoSummary.row(ua),
-        AddressOfSubcontractorSummary.row(ua),
-        NationalInsuranceNumberYesNoSummary.row(ua),
-        SubNationalInsuranceNumberSummary.row(ua),
-        UniqueTaxpayerReferenceYesNoSummary.row(ua),
-        SubcontractorsUniqueTaxpayerReferenceSummary.row(ua),
-        WorksReferenceNumberYesNoSummary.row(ua),
-        WorksReferenceNumberSummary.row(ua),
-        SubcontractorContactDetailsYesNoSummary.row(ua),
-        SubContactDetailsSummary.row(ua)
-      ).flatten
-    )
-
-    Ok(view(list))
+        Ok(view(list))
+      case Left(error) =>
+        logger.error(s"[CheckYourAnswersController.onPageLoad] Failed to load the page: $error")
+        Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+    }
   }
 
   def onSubmit(): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
-      (for {
-        _ <- subcontractorService.createAndUpdateSubcontractor(request.userAnswers)
-      } yield Redirect(controllers.add.routes.CheckYourAnswersController.onPageLoad())) // change to confirmation page
-        .recover { case t: Throwable =>
-          logger.error("[CheckYourAnswersController.onSubmit] failed", t)
-          Redirect(
-            controllers.routes.JourneyRecoveryController.onPageLoad()
-          ) // change if you need to specific error page
-        }
+      ValidatedSubcontractor.build(request.userAnswers) match {
+        case Right(_) =>
+          subcontractorService
+            .createAndUpdateSubcontractor(request.userAnswers)
+            .map { _ =>
+              Redirect(controllers.add.routes.CheckYourAnswersController.onPageLoad())
+            }
+            .recover { case t =>
+              logger.error(
+                "[CheckYourAnswersController.onSubmit] Failed to create/update subcontractor",
+                t
+              )
+              Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+            }
+
+        case Left(error) =>
+          logger.error(
+            s"[CheckYourAnswersController.onSubmit] Validation failed: $error"
+          )
+          Future.successful(
+            Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+          )
+      }
     }
 
 }

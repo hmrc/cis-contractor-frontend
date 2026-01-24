@@ -172,5 +172,30 @@ class CheckYourAnswersControllerSpec extends SpecBase {
         redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
       }
     }
+
+    "must redirect to Journey Recovery on submit when user answers are incomplete" in {
+
+      val incompleteUserAnswers =
+        emptyUserAnswers
+          .set(TypeOfSubcontractorPage, TypeOfSubcontractor.Individualorsoletrader)
+          .success
+          .value
+          .set(SubTradingNameYesNoPage, true)
+          .success
+          .value
+          .set(TradingNameOfSubcontractorPage, "ABC Ltd")
+          .success
+          .value
+
+      val application = applicationBuilder(userAnswers = Some(incompleteUserAnswers)).build()
+
+      running(application) {
+        val request = FakeRequest(POST, controllers.add.routes.CheckYourAnswersController.onSubmit().url)
+        val result  = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
   }
 }

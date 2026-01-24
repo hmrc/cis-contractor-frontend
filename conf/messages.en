@@ -245,7 +245,7 @@ subcontractorsUniqueTaxpayerReference.heading = What is the subcontractor’s Un
 subcontractorsUniqueTaxpayerReference.hint = This is 10 numbers, like 1234567890. The UTR will be on tax returns and other letters about Self Assessment. It may also be called ‘tax reference’
 subcontractorsUniqueTaxpayerReference.checkYourAnswersLabel = Unique Taxpayer Reference
 subcontractorsUniqueTaxpayerReference.error.required = Enter a Unique Taxpayer Reference (UTR), like 1234567890
-subcontractorsUniqueTaxpayerReference.error.invalid = Enter a Unique Taxpayer Reference (UTR) using 10 digits
+subcontractorsUniqueTaxpayerReference.error.invalid = Your entry for ‘Unique tax reference (UTR)’ is invalid. Please amend.
 subcontractorsUniqueTaxpayerReference.error.length = Enter a Unique Taxpayer Reference (UTR) using 10 digits
 subcontractorsUniqueTaxpayerReference.change.hidden = Unique Taxpayer Reference
 
