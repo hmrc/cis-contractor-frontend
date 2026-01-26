@@ -24,6 +24,7 @@ import pages.add.SubcontractorsUniqueTaxpayerReferencePage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
+import services.SubcontractorService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.add.SubcontractorsUniqueTaxpayerReferenceView
 
@@ -38,6 +39,7 @@ class SubcontractorsUniqueTaxpayerReferenceController @Inject()(
                                                                  getData: DataRetrievalAction,
                                                                  requireData: DataRequiredAction,
                                                                  formProvider: UtrFormProvider,
+                                                                 subcontractorService: SubcontractorService,
                                                                  val controllerComponents: MessagesControllerComponents,
                                                                  view: SubcontractorsUniqueTaxpayerReferenceView
                                     )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
@@ -62,11 +64,26 @@ class SubcontractorsUniqueTaxpayerReferenceController @Inject()(
         formWithErrors =>
           Future.successful(BadRequest(view(formWithErrors, mode))),
 
-        value =>
-          for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(SubcontractorsUniqueTaxpayerReferencePage, value))
-            _              <- sessionRepository.set(updatedAnswers)
-          } yield Redirect(navigator.nextPage(SubcontractorsUniqueTaxpayerReferencePage, mode, updatedAnswers))
+        value => {
+          subcontractorService.isDuplicateUTR(request.userAnswers, value).flatMap {
+            case true =>
+              val errorForm = form
+                .fill(value)
+                .withError(
+                  key = "value",
+                  message = "subcontractorsUniqueTaxpayerReference.error.duplicate"
+                )
+              Future.successful(
+                BadRequest(view(errorForm, mode))
+            )
+
+            case false =>
+              for {
+                updatedAnswers <- Future.fromTry(request.userAnswers.set(SubcontractorsUniqueTaxpayerReferencePage, value))
+                _ <- sessionRepository.set(updatedAnswers)
+              } yield Redirect(navigator.nextPage(SubcontractorsUniqueTaxpayerReferencePage, mode, updatedAnswers))
+          }
+        }
       )
   }
 }

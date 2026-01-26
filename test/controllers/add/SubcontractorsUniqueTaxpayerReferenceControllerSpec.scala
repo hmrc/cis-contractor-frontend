@@ -20,18 +20,25 @@ import base.SpecBase
 import controllers.routes
 import forms.add.UtrFormProvider
 import models.{NormalMode, UserAnswers}
+import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito.{verify, verifyNoMoreInteractions, when}
 import org.scalatestplus.mockito.MockitoSugar
 import pages.add.SubcontractorsUniqueTaxpayerReferencePage
+import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
+import services.SubcontractorService
+import uk.gov.hmrc.http.HeaderCarrier
 import views.html.add.SubcontractorsUniqueTaxpayerReferenceView
+
+import scala.concurrent.Future
 
 class SubcontractorsUniqueTaxpayerReferenceControllerSpec extends SpecBase with MockitoSugar {
 
   val formProvider = new UtrFormProvider()
   val form         = formProvider()
 
-  lazy val subcontractorsUniqueTaxpayerReferenceRoute =
+  private lazy val subcontractorsUniqueTaxpayerReferenceRoute =
     controllers.add.routes.SubcontractorsUniqueTaxpayerReferenceController.onPageLoad(NormalMode).url
 
   "SubcontractorsUniqueTaxpayerReference Controller" - {
@@ -71,12 +78,20 @@ class SubcontractorsUniqueTaxpayerReferenceControllerSpec extends SpecBase with 
       }
     }
 
-    "must bind the form and redirect to WorksReferenceNumberYesNo Page on POST when valid data is submitted" in {
+    "must bind the form and redirect to WorksReferenceNumberYesNo Page on POST when valid data (utr is not duplicated) is submitted" in {
 
       val validValue = "1234567890"
 
+      val mockSubcontractorService = mock[SubcontractorService]
+
+      when(mockSubcontractorService.isDuplicateUTR(any[UserAnswers], any[String])(any[HeaderCarrier]))
+        .thenReturn(Future.successful(false))
+
       val application =
         applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          .overrides(
+            bind[SubcontractorService].toInstance(mockSubcontractorService)
+          )
           .build()
 
       running(application) {
@@ -87,9 +102,48 @@ class SubcontractorsUniqueTaxpayerReferenceControllerSpec extends SpecBase with 
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-
         redirectLocation(result).value mustEqual controllers.add.routes.WorksReferenceNumberYesNoController.onPageLoad(NormalMode).url
       }
+
+      verify(mockSubcontractorService).isDuplicateUTR(any[UserAnswers], any[String])(any[HeaderCarrier])
+      verifyNoMoreInteractions(mockSubcontractorService)
+    }
+
+    "must return a Bad Request and show duplicate error when when utr already exists" in {
+
+      val duplicatedUTR = "1234567890"
+
+      val mockSubcontractorService = mock[SubcontractorService]
+
+      when(mockSubcontractorService.isDuplicateUTR(any[UserAnswers], any[String])(any[HeaderCarrier]))
+        .thenReturn(Future.successful(true))
+
+      val application =
+        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          .overrides(
+            bind[SubcontractorService].toInstance(mockSubcontractorService)
+          )
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, subcontractorsUniqueTaxpayerReferenceRoute)
+            .withFormUrlEncodedBody(("value", duplicatedUTR))
+
+        val boundForm = form.bind(Map("value" -> duplicatedUTR))
+
+        val formWithDuplicateError = boundForm.withError("value", "subcontractorsUniqueTaxpayerReference.error.duplicate")
+
+        val view = application.injector.instanceOf[SubcontractorsUniqueTaxpayerReferenceView]
+
+        val result = route(application, request).value
+
+        status(result) mustEqual BAD_REQUEST
+        contentAsString(result) mustEqual view(formWithDuplicateError, NormalMode)(request, messages(application)).toString
+      }
+
+      verify(mockSubcontractorService).isDuplicateUTR(any[UserAnswers], any[String])(any[HeaderCarrier])
+      verifyNoMoreInteractions(mockSubcontractorService)
     }
 
     "must return a Bad Request and errors when invalid data is submitted" in {
