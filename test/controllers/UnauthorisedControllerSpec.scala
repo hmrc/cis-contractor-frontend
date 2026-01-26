@@ -22,7 +22,7 @@ import play.api.test.Helpers.*
 import views.html.UnauthorisedView
 
 class UnauthorisedControllerSpec extends SpecBase {
-  
+
   "Unauthorised Controller" - {
 
     "must return OK and the correct view for a GET" in {

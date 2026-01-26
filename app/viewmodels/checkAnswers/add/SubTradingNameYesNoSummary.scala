@@ -23,22 +23,24 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
 
-object SubTradingNameYesNoSummary  {
+object SubTradingNameYesNoSummary {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(SubTradingNameYesNoPage).map {
-      answer =>
+    answers.get(SubTradingNameYesNoPage).map { answer =>
 
-        val value = if (answer) "site.yes" else "site.no"
+      val value = if (answer) "site.yes" else "site.no"
 
-        SummaryListRowViewModel(
-          key     = "subTradingNameYesNo.checkYourAnswersLabel",
-          value   = ValueViewModel(value),
-          actions = Seq(
-            ActionItemViewModel("site.change", controllers.add.routes.SubTradingNameYesNoController.onPageLoad(CheckMode).url)
-              .withVisuallyHiddenText(messages("subTradingNameYesNo.change.hidden"))
-              .withAttribute("id" -> "sub-trading-name-yes-no")
+      SummaryListRowViewModel(
+        key = "subTradingNameYesNo.checkYourAnswersLabel",
+        value = ValueViewModel(value),
+        actions = Seq(
+          ActionItemViewModel(
+            "site.change",
+            controllers.add.routes.SubTradingNameYesNoController.onPageLoad(CheckMode).url
           )
+            .withVisuallyHiddenText(messages("subTradingNameYesNo.change.hidden"))
+            .withAttribute("id" -> "sub-trading-name-yes-no")
         )
+      )
     }
 }

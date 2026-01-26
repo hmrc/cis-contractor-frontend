@@ -146,7 +146,6 @@ class AddressOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
         redirectLocation(result).value mustEqual
           controllers.add.routes.NationalInsuranceNumberYesNoController.onPageLoad(NormalMode).url
 
-
         val uaCaptor = ArgumentCaptor.forClass(classOf[UserAnswers])
         verify(mockSubcontractorService, times(1)).updateSubcontractor(uaCaptor.capture())(anyArg())
 
@@ -157,7 +156,7 @@ class AddressOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
         savedAddress.addressLine2 mustBe Some("value 2")
         savedAddress.addressLine3 mustBe "value 3"
         savedAddress.addressLine4 mustBe Some("value 4")
-        savedAddress.postCode     mustBe "NX1 1AA"
+        savedAddress.postCode mustBe "NX1 1AA"
 
         verify(mockSessionRepository, times(1)).set(anyArg())
       }

@@ -36,10 +36,11 @@ import scala.concurrent.Future
 
 class WorksReferenceNumberControllerSpec extends SpecBase with MockitoSugar {
 
-  val formProvider = new WorksReferenceNumberFormProvider()
+  val formProvider               = new WorksReferenceNumberFormProvider()
   private val form: Form[String] = formProvider()
 
-  lazy val worksReferenceNumberRoute: String = controllers.add.routes.WorksReferenceNumberController.onPageLoad(NormalMode).url
+  lazy val worksReferenceNumberRoute: String =
+    controllers.add.routes.WorksReferenceNumberController.onPageLoad(NormalMode).url
 
   "WorksReferenceNumber Controller" - {
 

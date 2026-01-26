@@ -26,13 +26,13 @@ class TypeOfSubcontractorFormProviderSpec extends OptionFieldBehaviours {
 
   ".value" - {
 
-    val fieldName = "value"
+    val fieldName   = "value"
     val requiredKey = "typeOfSubcontractor.error.required"
 
     behave like optionsField[TypeOfSubcontractor](
       form,
       fieldName,
-      validValues  = TypeOfSubcontractor.values,
+      validValues = TypeOfSubcontractor.values,
       invalidError = FormError(fieldName, "error.invalid")
     )
 

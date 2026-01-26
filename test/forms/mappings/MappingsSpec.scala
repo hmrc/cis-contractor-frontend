@@ -241,13 +241,13 @@ class MappingsSpec extends AnyFreeSpec with Matchers with OptionValues with Mapp
       )
 
     "bind a valid utr" in {
-      val result = testForm.bind(Map("value" -> "1234567890"))
-      result.get mustEqual "1234567890"
+      val result = testForm.bind(Map("value" -> "5860920998"))
+      result.get mustEqual "5860920998"
     }
 
     "bind an utr with spaces" in {
-      val result = testForm.bind(Map("value" -> " 123  4567  890 "))
-      result.get mustEqual "1234567890"
+      val result = testForm.bind(Map("value" -> " 586 092 0998 "))
+      result.get mustEqual "5860920998"
     }
 
     "not bind an empty string" in {

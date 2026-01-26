@@ -36,5 +36,4 @@ case object WorksReferenceNumberYesNoPage extends QuestionPage[Boolean] {
       super.cleanup(value, userAnswers)
     }
 
-
 }

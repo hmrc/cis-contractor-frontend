@@ -28,8 +28,14 @@ import pages.QuestionPage
 import play.api.libs.json.*
 import base.SpecBase
 
-
-trait PageBehaviours extends AnyFreeSpec with Matchers with ScalaCheckPropertyChecks with Generators with OptionValues with TryValues with SpecBase {
+trait PageBehaviours
+    extends AnyFreeSpec
+    with Matchers
+    with ScalaCheckPropertyChecks
+    with Generators
+    with OptionValues
+    with TryValues
+    with SpecBase {
 
   class BeRetrievable[A] {
     def apply[P <: QuestionPage[A]](genP: Gen[P])(using ev1: Arbitrary[A], ev2: Format[A]): Unit =

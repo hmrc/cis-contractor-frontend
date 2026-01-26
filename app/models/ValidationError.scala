@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,22 +14,18 @@
  * limitations under the License.
  */
 
-package viewmodels
+package models
 
-package object govuk {
+import pages.Page
 
-  object all
-      extends ImplicitConversions
-      with BackLinkFluency
-      with ButtonFluency
-      with CheckboxFluency
-      with DateFluency
-      with ErrorSummaryFluency
-      with FieldsetFluency
-      with HintFluency
-      with InputFluency
-      with LabelFluency
-      with RadiosFluency
-      with SummaryListFluency
-      with TagFluency
+sealed trait ValidationError {
+  def message: String
+}
+
+final case class MissingAnswer(page: Page) extends ValidationError {
+  override val message: String = s"Missing answer for page: $page"
+}
+
+final case class InvalidAnswer(page: Page) extends ValidationError {
+  override val message: String = s"Invalid answer for page: $page"
 }

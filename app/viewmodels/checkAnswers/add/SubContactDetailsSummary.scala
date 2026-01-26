@@ -25,22 +25,24 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
 
-object SubContactDetailsSummary  {
+object SubContactDetailsSummary {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(SubContactDetailsPage).map {
-      answer =>
+    answers.get(SubContactDetailsPage).map { answer =>
 
       val value = HtmlFormat.escape(answer.email).toString + "<br/>" + HtmlFormat.escape(answer.telephone).toString
 
-        SummaryListRowViewModel(
-          key     = "subContactDetails.checkYourAnswersLabel",
-          value   = ValueViewModel(HtmlContent(value)),
-          actions = Seq(
-            ActionItemViewModel("site.change", controllers.add.routes.SubContactDetailsController.onPageLoad(CheckMode).url)
-              .withVisuallyHiddenText(messages("subContactDetails.change.hidden"))
-              .withAttribute("id" -> "sub-contact-details")
+      SummaryListRowViewModel(
+        key = "subContactDetails.checkYourAnswersLabel",
+        value = ValueViewModel(HtmlContent(value)),
+        actions = Seq(
+          ActionItemViewModel(
+            "site.change",
+            controllers.add.routes.SubContactDetailsController.onPageLoad(CheckMode).url
           )
+            .withVisuallyHiddenText(messages("subContactDetails.change.hidden"))
+            .withAttribute("id" -> "sub-contact-details")
         )
+      )
     }
 }

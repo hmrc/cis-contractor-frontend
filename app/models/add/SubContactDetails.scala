@@ -18,7 +18,7 @@ package models.add
 
 import play.api.libs.json.*
 
-case class SubContactDetails (email: String, telephone: String)
+case class SubContactDetails(email: String, telephone: String)
 
 object SubContactDetails {
 

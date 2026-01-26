@@ -35,10 +35,11 @@ import scala.concurrent.Future
 
 class WorksReferenceNumberYesNoControllerSpec extends SpecBase with MockitoSugar {
 
-  val formProvider = new WorksReferenceNumberYesNoFormProvider()
+  val formProvider        = new WorksReferenceNumberYesNoFormProvider()
   val form: Form[Boolean] = formProvider()
 
-  lazy val worksReferenceNumberYesNoRoute: String = controllers.add.routes.WorksReferenceNumberYesNoController.onPageLoad(NormalMode).url
+  lazy val worksReferenceNumberYesNoRoute: String =
+    controllers.add.routes.WorksReferenceNumberYesNoController.onPageLoad(NormalMode).url
 
   "WorksReferenceNumberYesNo Controller" - {
 
@@ -97,7 +98,9 @@ class WorksReferenceNumberYesNoControllerSpec extends SpecBase with MockitoSugar
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.add.routes.WorksReferenceNumberController.onPageLoad(NormalMode).url
+        redirectLocation(result).value mustEqual controllers.add.routes.WorksReferenceNumberController
+          .onPageLoad(NormalMode)
+          .url
       }
     }
 
@@ -122,7 +125,9 @@ class WorksReferenceNumberYesNoControllerSpec extends SpecBase with MockitoSugar
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.add.routes.SubcontractorContactDetailsYesNoController.onPageLoad(NormalMode).url
+        redirectLocation(result).value mustEqual controllers.add.routes.SubcontractorContactDetailsYesNoController
+          .onPageLoad(NormalMode)
+          .url
       }
     }
 

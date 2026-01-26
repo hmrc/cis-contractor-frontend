@@ -33,7 +33,7 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers.stubControllerComponents
 
 trait SpecBase
-  extends AnyFreeSpec
+    extends AnyFreeSpec
     with Matchers
     with TryValues
     with OptionValues
@@ -43,18 +43,18 @@ trait SpecBase
 
   implicit lazy val applicationConfig: FrontendAppConfig = app.injector.instanceOf[FrontendAppConfig]
 
-  val userAnswersId: String = "id"
+  val userAnswersId: String    = "id"
   val parsers: PlayBodyParsers = stubControllerComponents().parsers
 
-  def emptyUserAnswers : UserAnswers = UserAnswers(userAnswersId)
+  def emptyUserAnswers: UserAnswers = UserAnswers(userAnswersId)
 
   def messages(app: Application): Messages = app.injector.instanceOf[MessagesApi].preferred(FakeRequest())
 
   protected def applicationBuilder(
-                                    userAnswers: Option[UserAnswers] = None,
-                                    additionalBindings: Seq[Binding[_]] = Nil,
-                                    isAgent: Boolean = false
-                                  ): GuiceApplicationBuilder =
+    userAnswers: Option[UserAnswers] = None,
+    additionalBindings: Seq[Binding[_]] = Nil,
+    isAgent: Boolean = false
+  ): GuiceApplicationBuilder =
     new GuiceApplicationBuilder()
       .configure("play.http.router" -> "app.Routes")
       .overrides(

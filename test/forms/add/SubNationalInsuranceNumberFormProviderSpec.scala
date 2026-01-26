@@ -23,9 +23,9 @@ import play.api.data.FormError
 class SubNationalInsuranceNumberFormProviderSpec extends StringFieldBehaviours {
 
   val requiredKey = "subNationalInsuranceNumber.error.required"
-  val lengthKey = "subNationalInsuranceNumber.error.length"
+  val lengthKey   = "subNationalInsuranceNumber.error.length"
   val invalidKey  = "subNationalInsuranceNumber.error.invalidCharacters"
-  val maxLength = 9
+  val maxLength   = 9
 
   val form = new SubNationalInsuranceNumberFormProvider()()
 
@@ -39,8 +39,7 @@ class SubNationalInsuranceNumberFormProviderSpec extends StringFieldBehaviours {
       "se005000c",
       "AA123456",
       "YZ555555",
-      "rj888888",
-
+      "rj888888"
     )
 
     behave like fieldThatBindsValidData(
@@ -68,7 +67,7 @@ class SubNationalInsuranceNumberFormProviderSpec extends StringFieldBehaviours {
     }
 
     "reject invalid National Insurance number" in {
-      val invalidNino = Seq("AB000000Z", "!A000000A", "AA`00000A" , "QQ000000", "AD000000")
+      val invalidNino = Seq("AB000000Z", "!A000000A", "AA`00000A", "QQ000000", "AD000000")
       invalidNino.foreach { nino =>
         val result = form.bind(Map(fieldName -> nino))
         result.errors.map(_.message) must contain(invalidKey)
