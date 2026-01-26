@@ -20,7 +20,7 @@ import com.github.tomakehurst.wiremock.client.WireMock.{aResponse, get, post, st
 import itutil.ApplicationWithWiremock
 import models.add.TypeOfSubcontractor
 import models.add.TypeOfSubcontractor.Individualorsoletrader
-import models.subcontractor.{CreateAndUpdateSubcontractorRequest, CreateSubcontractorRequest}
+import models.subcontractor.CreateAndUpdateSubcontractorRequest
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.matchers.should.Matchers.shouldBe
@@ -94,63 +94,7 @@ class ConstructionIndustrySchemeConnectorSpec
     }
   }
 
-  "createSubcontractor" should {
-
-    val cisId = 200
-
-    "successfully create a subcontractor" in {
-
-      val responseJson =
-        """
-          |{
-          |  "subbieResourceRef": 10
-          |}
-                """.stripMargin
-
-      stubFor(
-        post(urlPathEqualTo("/cis/subcontractor/create"))
-          .willReturn(
-            aResponse()
-              .withStatus(CREATED)
-              .withBody(responseJson)
-          )
-      )
-
-      val result = connector
-        .createSubcontractor(
-          CreateSubcontractorRequest(
-            instanceId = cisId,
-            subcontractorType = TypeOfSubcontractor.Individualorsoletrader,
-            version = 0
-          )
-        )
-        .futureValue
-
-      result.subbieResourceRef mustBe 10
-    }
-
-    "propagate upstream error on non-2xx" in {
-      stubFor(
-        post(urlPathEqualTo("/cis/subcontractor/create"))
-          .willReturn(aResponse().withStatus(INTERNAL_SERVER_ERROR).withBody("boom"))
-      )
-
-      val ex = intercept[Exception] {
-        connector
-          .createSubcontractor(
-            CreateSubcontractorRequest(
-              instanceId = cisId,
-              subcontractorType = TypeOfSubcontractor.Individualorsoletrader,
-              version = 0
-            )
-          )
-          .futureValue
-      }
-      ex.getMessage must include("returned 500")
-    }
-  }
-
-  "updateSubcontractor" should {
+  "createAndUpdateSubcontractor" should {
 
     val cisId = "200"
 

@@ -18,19 +18,18 @@ package controllers.add
 
 import base.SpecBase
 import controllers.routes
-import models.{CheckMode, UserAnswers}
 import models.add.{SubContactDetails, TypeOfSubcontractor, UKAddress}
-import org.scalatestplus.mockito.MockitoSugar.mock
-import pages.add.*
-import play.api.test.FakeRequest
-import play.api.test.Helpers.*
-import queries.SubbieResourceRefQuery
-import repositories.SessionRepository
-import services.SubcontractorService
+import models.{CheckMode, UserAnswers}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{verify, verifyNoMoreInteractions, when}
-import uk.gov.hmrc.http.HeaderCarrier
+import org.scalatestplus.mockito.MockitoSugar.mock
+import pages.add.*
 import play.api.inject.bind
+import play.api.test.FakeRequest
+import play.api.test.Helpers.*
+import services.SubcontractorService
+import uk.gov.hmrc.http.HeaderCarrier
+
 import scala.concurrent.Future
 
 class CheckYourAnswersControllerSpec extends SpecBase {
@@ -132,7 +131,6 @@ class CheckYourAnswersControllerSpec extends SpecBase {
     }
 
     "must redirect to other (confirm page ) when valid data is submitted" in {
-      val mockSessionRepository    = mock[SessionRepository]
       val mockSubcontractorService = mock[SubcontractorService]
 
       when(mockSubcontractorService.createAndUpdateSubcontractor(any[UserAnswers])(any[HeaderCarrier]))
@@ -171,6 +169,31 @@ class CheckYourAnswersControllerSpec extends SpecBase {
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
       }
+    }
+
+    "must redirect to Journey Recovery when service call fails (recover block)" in {
+      val mockSubcontractorService = mock[SubcontractorService]
+
+      when(mockSubcontractorService.createAndUpdateSubcontractor(any[UserAnswers])(any[HeaderCarrier]))
+        .thenReturn(Future.failed(new RuntimeException("boom")))
+
+      val application =
+        applicationBuilder(userAnswers = Some(ua))
+          .overrides(
+            bind[SubcontractorService].toInstance(mockSubcontractorService)
+          )
+          .build()
+
+      running(application) {
+        val request = FakeRequest(POST, controllers.add.routes.CheckYourAnswersController.onSubmit().url)
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+      }
+
+      verify(mockSubcontractorService).createAndUpdateSubcontractor(any[UserAnswers])(any[HeaderCarrier])
+      verifyNoMoreInteractions(mockSubcontractorService)
     }
 
     "must redirect to Journey Recovery on submit when user answers are incomplete" in {

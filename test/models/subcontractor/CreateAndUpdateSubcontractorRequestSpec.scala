@@ -23,7 +23,7 @@ import play.api.libs.json.Json
 
 class CreateAndUpdateSubcontractorRequestSpec extends AnyWordSpec with Matchers {
 
-  "CisTaxpayerResponse JSON format" should {
+  "CreateAndUpdateSubcontractorRequest JSON format" should {
 
     val cisId = "10"
 
