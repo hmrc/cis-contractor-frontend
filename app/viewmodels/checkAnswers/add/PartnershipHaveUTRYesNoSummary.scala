@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package viewmodels.checkAnswers
+package viewmodels.checkAnswers.add
 
 import models.{CheckMode, UserAnswers}
 import pages.add.PartnershipHaveUTRYesNoPage
