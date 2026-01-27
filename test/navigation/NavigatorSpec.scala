@@ -96,6 +96,22 @@ class NavigatorSpec extends SpecBase {
         ) mustBe controllers.add.routes.SubcontractorNameController.onPageLoad(NormalMode)
       }
 
+      "must go from a PartnershipHaveUTRYesNoController to other page when true" in {
+        navigator.nextPage(
+          PartnershipHaveUTRYesNoPage,
+          NormalMode,
+          emptyUserAnswers.setOrException(PartnershipHaveUTRYesNoPage, true)
+        ) mustBe controllers.add.routes.PartnershipHaveUTRYesNoController.onPageLoad(NormalMode)
+      }
+
+      "must go from a PartnershipHaveUTRYesNoController to other page when false" in {
+        navigator.nextPage(
+          PartnershipHaveUTRYesNoPage,
+          NormalMode,
+          emptyUserAnswers.setOrException(PartnershipHaveUTRYesNoPage, false)
+        ) mustBe controllers.add.routes.PartnershipHaveUTRYesNoController.onPageLoad(NormalMode)
+      }
+
       "must go from a SubTradingNameYesNoPage to journey recovery page when incomplete info provided" in {
         navigator.nextPage(
           SubTradingNameYesNoPage,
