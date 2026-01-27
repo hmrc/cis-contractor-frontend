@@ -61,6 +61,17 @@ class SubcontractorService @Inject() (
                 )
       _      <- cisConnector.createAndUpdateSubcontractor(payload)
     } yield ()
+  
+  def isDuplicateUTR(
+    userAnswers: UserAnswers,
+    utr: String
+  )(implicit hc: HeaderCarrier): Future[Boolean] =
+    for {
+      cisId     <- getCisId(userAnswers)
+      utrList   <- cisConnector.getSubcontractorUTRs(cisId.toString)
+    } yield {
+      utrList.subcontractorUTRs.contains(utr)
+    }
 
   private def getCisId(userAnswers: UserAnswers): Future[String] =
     userAnswers.get(CisIdQuery) match {

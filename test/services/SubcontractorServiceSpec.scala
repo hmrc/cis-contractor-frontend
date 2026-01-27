@@ -19,6 +19,7 @@ package services
 import base.SpecBase
 import connectors.ConstructionIndustrySchemeConnector
 import models.add.{SubContactDetails, SubcontractorName, TypeOfSubcontractor, UKAddress}
+import models.subcontractor.GetSubcontractorUTRsResponse
 import models.subcontractor.CreateAndUpdateSubcontractorRequest
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{verify, verifyNoMoreInteractions, when}
@@ -201,5 +202,107 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
 
       }
     }
+
+    "isDuplicateUTR(" - {
+
+      val cisId                          = "123"
+      val utr                            = "1111111111"
+      val subcontractorUTRs: Seq[String] = Seq("1111111111", "2222222222")
+
+      "should return true when a duplicate exists" in {
+        val mockConnector: ConstructionIndustrySchemeConnector = mock[ConstructionIndustrySchemeConnector]
+        val service                                            = new SubcontractorService(mockConnector)
+
+        val userAnswers = emptyUserAnswers
+          .set(CisIdQuery, cisId)
+          .success
+          .value
+
+        when(mockConnector.getSubcontractorUTRs(eqTo(cisId.toString))(any[HeaderCarrier]))
+          .thenReturn(Future.successful(GetSubcontractorUTRsResponse(subcontractorUTRs = subcontractorUTRs)))
+
+        val result = service.isDuplicateUTR(userAnswers, utr)
+
+        result.futureValue mustBe true
+
+        verify(mockConnector).getSubcontractorUTRs(eqTo(cisId.toString))(any[HeaderCarrier])
+        verifyNoMoreInteractions(mockConnector)
+      }
+
+      "should return false when no duplicate exists" in {
+        val mockConnector: ConstructionIndustrySchemeConnector = mock[ConstructionIndustrySchemeConnector]
+        val service                                            = new SubcontractorService(mockConnector)
+
+        val userAnswers = emptyUserAnswers
+          .set(CisIdQuery, cisId)
+          .success
+          .value
+
+        when(mockConnector.getSubcontractorUTRs(eqTo(cisId.toString))(any[HeaderCarrier]))
+          .thenReturn(Future.successful(GetSubcontractorUTRsResponse(subcontractorUTRs = subcontractorUTRs)))
+
+        val result = service.isDuplicateUTR(userAnswers, "88888888")
+
+        result.futureValue mustBe false
+
+        verify(mockConnector).getSubcontractorUTRs(eqTo(cisId.toString))(any[HeaderCarrier])
+        verifyNoMoreInteractions(mockConnector)
+      }
+
+      "should return false when getSubcontractorUTRs return empty list" in {
+        val mockConnector: ConstructionIndustrySchemeConnector = mock[ConstructionIndustrySchemeConnector]
+        val service                                            = new SubcontractorService(mockConnector)
+
+        val userAnswers = emptyUserAnswers
+          .set(CisIdQuery, cisId)
+          .success
+          .value
+
+        when(mockConnector.getSubcontractorUTRs(eqTo(cisId.toString))(any[HeaderCarrier]))
+          .thenReturn(Future.successful(GetSubcontractorUTRsResponse(subcontractorUTRs = Seq.empty)))
+
+        val result = service.isDuplicateUTR(userAnswers, utr)
+
+        result.futureValue mustBe false
+
+        verify(mockConnector).getSubcontractorUTRs(eqTo(cisId.toString))(any[HeaderCarrier])
+        verifyNoMoreInteractions(mockConnector)
+      }
+
+      "should fail when cisId not found in session data" in {
+        val mockConnector: ConstructionIndustrySchemeConnector = mock[ConstructionIndustrySchemeConnector]
+        val service                                            = new SubcontractorService(mockConnector)
+
+        when(mockConnector.getSubcontractorUTRs(eqTo(cisId.toString))(any[HeaderCarrier]))
+          .thenReturn(Future.failed(new Exception("bang")))
+
+        val exception =
+          service.isDuplicateUTR(emptyUserAnswers, utr).failed.futureValue
+
+        exception.getMessage must include("CisIdQuery not found in session data")
+      }
+
+      "should fail when the connector call fails" in {
+        val mockConnector: ConstructionIndustrySchemeConnector = mock[ConstructionIndustrySchemeConnector]
+        val service                                            = new SubcontractorService(mockConnector)
+
+        when(mockConnector.getSubcontractorUTRs(eqTo(cisId.toString))(any[HeaderCarrier]))
+          .thenReturn(Future.failed(new Exception("bang")))
+
+        val userAnswers = emptyUserAnswers
+          .set(CisIdQuery, cisId)
+          .success
+          .value
+
+        val exception =
+          service.isDuplicateUTR(userAnswers, utr).failed.futureValue
+
+        exception.getMessage must include("bang")
+
+        verify(mockConnector).getSubcontractorUTRs(eqTo(cisId.toString))(any[HeaderCarrier])
+        verifyNoMoreInteractions(mockConnector)
+      }
+    }
+
   }
 }

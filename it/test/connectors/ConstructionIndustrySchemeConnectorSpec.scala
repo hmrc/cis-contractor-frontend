@@ -139,4 +139,49 @@ class ConstructionIndustrySchemeConnectorSpec
       ex.getMessage must include("returned 500")
     }
   }
+
+  "getSubcontractorUTRs" should {
+
+    val cisId = "cis-123"
+
+    "successfully get a subcontractor utr list" in {
+
+      val responseJson =
+        """
+          |{
+          |  "subcontractorUTRs": ["1111111111", "2222222222"]
+          |}
+                  """.stripMargin
+
+      stubFor(
+        get(urlPathEqualTo(s"/cis/subcontractors/utr/$cisId"))
+          .willReturn(
+            aResponse()
+              .withStatus(OK)
+              .withBody(responseJson)
+          )
+      )
+
+      val result = connector
+        .getSubcontractorUTRs(cisId)
+        .futureValue
+
+      result.subcontractorUTRs mustBe Seq("1111111111", "2222222222")
+    }
+
+    "propagate upstream error on non-2xx" in {
+      stubFor(
+        get(urlPathEqualTo(s"/cis/subcontractors/utr/$cisId"))
+          .willReturn(aResponse().withStatus(INTERNAL_SERVER_ERROR).withBody("boom"))
+      )
+
+      val ex = intercept[Exception] {
+        connector
+          .getSubcontractorUTRs(cisId)
+          .futureValue
+      }
+      ex.getMessage must include("returned 500")
+    }
+  }
+
 }
