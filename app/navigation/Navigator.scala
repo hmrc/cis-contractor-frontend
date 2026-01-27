@@ -23,6 +23,7 @@ import pages.*
 import models.*
 import models.add.TypeOfSubcontractor.*
 import pages.add.*
+import pages.add.partnership.*
 
 @Singleton
 class Navigator @Inject() () {
@@ -50,6 +51,8 @@ class Navigator @Inject() () {
     case SubcontractorContactDetailsYesNoPage      =>
       userAnswers => navigatorFromSubcontractorContactDetailsYesNoPage(NormalMode)(userAnswers)
     case SubContactDetailsPage                     => _ => controllers.add.routes.CheckYourAnswersController.onPageLoad()
+    case PartnershipWorksRefYesNoPage              =>
+      userAnswers => navigatorFromPartnershipWorksRefYesNoPage(NormalMode)(userAnswers)
     case _                                         => _ => routes.IndexController.onPageLoad()
   }
 
@@ -67,6 +70,8 @@ class Navigator @Inject() () {
     case SubContactDetailsPage                => _ => controllers.add.routes.CheckYourAnswersController.onPageLoad()
     case SubcontractorContactDetailsYesNoPage =>
       userAnswers => navigatorFromSubcontractorContactDetailsYesNoPage(CheckMode)(userAnswers)
+    case PartnershipWorksRefYesNoPage         =>
+      userAnswers => navigatorFromPartnershipWorksRefYesNoPage(CheckMode)(userAnswers)
     case _                                    => _ => controllers.add.routes.CheckYourAnswersController.onPageLoad()
   }
 
@@ -207,6 +212,15 @@ class Navigator @Inject() () {
 
       case _ =>
         routes.JourneyRecoveryController.onPageLoad()
+    }
+
+  private def navigatorFromPartnershipWorksRefYesNoPage(mode: Mode)(userAnswers: UserAnswers): Call =
+    (userAnswers.get(PartnershipWorksRefYesNoPage), mode) match {
+      case (Some(true), _)           => controllers.add.partnership.routes.PartnershipWorksRefYesNoController.onPageLoad(mode)
+      case (Some(false), NormalMode) =>
+        controllers.add.partnership.routes.PartnershipWorksRefYesNoController.onPageLoad(NormalMode)
+      case (Some(false), CheckMode)  => controllers.add.routes.CheckYourAnswersController.onPageLoad()
+      case (None, _)                 => routes.JourneyRecoveryController.onPageLoad()
     }
 
 }

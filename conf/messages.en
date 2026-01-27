@@ -249,6 +249,13 @@ subcontractorsUniqueTaxpayerReference.error.invalid = Your entry for ‘Unique t
 subcontractorsUniqueTaxpayerReference.error.length = Enter a Unique Taxpayer Reference (UTR) using 10 digits
 subcontractorsUniqueTaxpayerReference.change.hidden = Unique Taxpayer Reference
 
+partnershipWorksRefYesNo.title = Does {0} have a works reference number?
+partnershipWorksRefYesNo.heading = Does {0} have a works reference number?
+partnershipWorksRefYesNo.hint = This is the reference number used to identify your subcontractor’s work or project. It can contain letters and numbers
+partnershipWorksRefYesNo.checkYourAnswersLabel = Do you have a works reference number?
+partnershipWorksRefYesNo.error.required = Select one option.
+partnershipWorksRefYesNo.change.hidden = do you have a works reference number?
+
 checkYourAnswers.heading.sub.h2 = Subcontractor details
 checkYourAnswers.heading.h2 = Now add the subcontractor
 checkYourAnswers.warning = You must verify this subcontractor with HMRC before making any payments to them.

@@ -22,6 +22,7 @@ import pages.*
 import models.*
 import models.add.{SubcontractorName, TypeOfSubcontractor, UKAddress}
 import pages.add.*
+import pages.add.partnership.*
 
 class NavigatorSpec extends SpecBase {
 
@@ -284,6 +285,30 @@ class NavigatorSpec extends SpecBase {
           UserAnswers("id")
         ) mustBe controllers.add.routes.CheckYourAnswersController.onPageLoad()
       }
+
+      "must go from a PartnershipWorksRefYesNoPage to next page when true" in {
+        navigator.nextPage(
+          PartnershipWorksRefYesNoPage,
+          NormalMode,
+          emptyUserAnswers.setOrException(PartnershipWorksRefYesNoPage, true)
+        ) mustBe controllers.add.partnership.routes.PartnershipWorksRefYesNoController.onPageLoad(NormalMode)
+      }
+
+      "must go from a PartnershipWorksRefYesNoPage to next page when false" in {
+        navigator.nextPage(
+          PartnershipWorksRefYesNoPage,
+          NormalMode,
+          emptyUserAnswers.setOrException(PartnershipWorksRefYesNoPage, false)
+        ) mustBe controllers.add.partnership.routes.PartnershipWorksRefYesNoController.onPageLoad(NormalMode)
+      }
+
+      "must go from a PartnershipWorksRefYesNoPage to journey recovery when incomplete info provided" in {
+        navigator.nextPage(
+          PartnershipWorksRefYesNoPage,
+          NormalMode,
+          emptyUserAnswers
+        ) mustBe journeyRecovery
+      }
     }
 
     "in Check mode" - {
@@ -469,6 +494,30 @@ class NavigatorSpec extends SpecBase {
       "must go from a WorksReferenceNumberYesNoPage to journey recovery page when incomplete info provided" in {
         navigator.nextPage(
           WorksReferenceNumberYesNoPage,
+          CheckMode,
+          emptyUserAnswers
+        ) mustBe journeyRecovery
+      }
+
+      "must go from a PartnershipWorksRefYesNoPage to next page when true" in {
+        navigator.nextPage(
+          PartnershipWorksRefYesNoPage,
+          CheckMode,
+          emptyUserAnswers.setOrException(PartnershipWorksRefYesNoPage, true)
+        ) mustBe controllers.add.partnership.routes.PartnershipWorksRefYesNoController.onPageLoad(CheckMode)
+      }
+
+      "must go from a PartnershipWorksRefYesNoPage to CYA page when false" in {
+        navigator.nextPage(
+          PartnershipWorksRefYesNoPage,
+          CheckMode,
+          emptyUserAnswers.setOrException(PartnershipWorksRefYesNoPage, false)
+        ) mustBe CYA
+      }
+
+      "must go from a PartnershipWorksRefYesNoPage to journey recovery page when incomplete info provided" in {
+        navigator.nextPage(
+          PartnershipWorksRefYesNoPage,
           CheckMode,
           emptyUserAnswers
         ) mustBe journeyRecovery
