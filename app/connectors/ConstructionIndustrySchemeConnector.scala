@@ -17,7 +17,7 @@
 package connectors
 
 import models.response.CisTaxpayerResponse
-import models.subcontractor.{CreateSubcontractorRequest, CreateSubcontractorResponse, UpdateSubcontractorRequest}
+import models.subcontractor.{CreateSubcontractorRequest, CreateSubcontractorResponse, GetSubcontractorUTRsResponse, UpdateSubcontractorRequest}
 import play.api.Logging
 import play.api.http.Status.NO_CONTENT
 import play.api.libs.json.Json
@@ -82,4 +82,19 @@ class ConstructionIndustrySchemeConnector @Inject() (config: ServicesConfig, htt
           )
         }
       }
+
+  def getSubcontractorUTRs(
+                           cisId: String
+                           )(implicit hc: HeaderCarrier): Future[GetSubcontractorUTRsResponse] =
+      logger.info(
+        s"[ConstructionIndustrySchemeConnector][getSubcontractorUTR] cisId: ${Json.toJson(cisId)}"
+      )
+      http
+        .get(url"$cisBaseUrl/subcontractors/utr/$cisId")
+        .execute[GetSubcontractorUTRsResponse]
+        .map { response =>
+          logger.info(s"[ConstructionIndustrySchemeConnector][getSubcontractorUTRs] Response: $response")
+          response
+        }
+
 }
