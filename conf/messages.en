@@ -247,6 +247,7 @@ subcontractorsUniqueTaxpayerReference.checkYourAnswersLabel = Unique Taxpayer Re
 subcontractorsUniqueTaxpayerReference.error.required = Enter a Unique Taxpayer Reference (UTR), like 1234567890
 subcontractorsUniqueTaxpayerReference.error.invalid = Your entry for ‘Unique tax reference (UTR)’ is invalid. Please amend.
 subcontractorsUniqueTaxpayerReference.error.length = Enter a Unique Taxpayer Reference (UTR) using 10 digits
+subcontractorsUniqueTaxpayerReference.error.duplicate = You have entered a Unique Tax Reference (UTR) of an existing subcontractor. Please amend your entry.
 subcontractorsUniqueTaxpayerReference.change.hidden = Unique Taxpayer Reference
 
 partnershipWorksRefYesNo.title = Does {0} have a works reference number?
