@@ -20,10 +20,10 @@ import base.SpecBase
 import models.{CheckMode, UserAnswers}
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import pages.add.PartnershipHaveUTRYesNoPage
-import play.api.i18n.{Lang, Messages, MessagesImpl, MessagesProvider}
+import play.api.i18n.{Lang, Messages, MessagesImpl}
 import play.api.test.Helpers.*
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
-import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.{ActionItem, Actions, Key, SummaryListRow, Value}
+import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.*
 
 class PartnershipHaveUTRYesNoSummarySpec extends SpecBase with GuiceOneAppPerSuite {
 
