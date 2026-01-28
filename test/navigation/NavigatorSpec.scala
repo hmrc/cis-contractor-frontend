@@ -22,6 +22,7 @@ import pages.*
 import models.*
 import models.add.{SubcontractorName, TypeOfSubcontractor, UKAddress}
 import pages.add.*
+import pages.add.partnership.PartnershipHasUtrYesNoPage
 
 class NavigatorSpec extends SpecBase {
 
@@ -94,6 +95,22 @@ class NavigatorSpec extends SpecBase {
           NormalMode,
           emptyUserAnswers.setOrException(SubTradingNameYesNoPage, false)
         ) mustBe controllers.add.routes.SubcontractorNameController.onPageLoad(NormalMode)
+      }
+
+      "must go from a partnershipHasUtrYesNo to other page when true" in {
+        navigator.nextPage(
+          PartnershipHasUtrYesNoPage,
+          NormalMode,
+          emptyUserAnswers.setOrException(PartnershipHasUtrYesNoPage, true)
+        ) mustBe controllers.add.partnership.routes.PartnershipHasUtrYesNoController.onPageLoad(NormalMode)
+      }
+
+      "must go from a partnershipHasUtrYesNo to other page when false" in {
+        navigator.nextPage(
+          PartnershipHasUtrYesNoPage,
+          NormalMode,
+          emptyUserAnswers.setOrException(PartnershipHasUtrYesNoPage, false)
+        ) mustBe controllers.add.partnership.routes.PartnershipHasUtrYesNoController.onPageLoad(NormalMode)
       }
 
       "must go from a SubTradingNameYesNoPage to journey recovery page when incomplete info provided" in {
