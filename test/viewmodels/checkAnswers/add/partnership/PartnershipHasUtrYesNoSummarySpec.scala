@@ -14,23 +14,24 @@
  * limitations under the License.
  */
 
-package viewmodels.checkAnswers.add
+package viewmodels.checkAnswers.add.partnership
 
 import base.SpecBase
 import models.{CheckMode, UserAnswers}
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
-import pages.add.PartnershipHasUtrYesNoPage
+import pages.add.partnership.PartnershipHasUtrYesNoPage
 import play.api.i18n.{Lang, Messages, MessagesImpl}
 import play.api.test.Helpers.*
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.*
+import viewmodels.checkAnswers.add.PartnershipHasUtrYesNoSummary
 
 class PartnershipHasUtrYesNoSummarySpec extends SpecBase with GuiceOneAppPerSuite {
 
   private val messagesApi                 = stubMessagesApi()
   private implicit val messages: Messages = MessagesImpl(Lang.defaultLang, messagesApi)
 
-  "PartnershipHaveUTRYesNoSummary.row" - {
+  "PartnershipHasUtrYesNoSummary.row" - {
 
     "return a row with key, value = yes, and change action when the answer is true" in {
       val ua: UserAnswers =
@@ -51,7 +52,7 @@ class PartnershipHasUtrYesNoSummarySpec extends SpecBase with GuiceOneAppPerSuit
       actions.items must have size 1
 
       val action: ActionItem = actions.items.head
-      action.href mustBe controllers.add.routes.PartnershipHasUtrYesNoController
+      action.href mustBe controllers.add.partnership.routes.PartnershipHasUtrYesNoController
         .onPageLoad(CheckMode)
         .url
       action.content mustBe Text("site.change")
@@ -80,7 +81,7 @@ class PartnershipHasUtrYesNoSummarySpec extends SpecBase with GuiceOneAppPerSuit
       actions.items must have size 1
 
       val action: ActionItem = actions.items.head
-      action.href mustBe controllers.add.routes.PartnershipHasUtrYesNoController
+      action.href mustBe controllers.add.partnership.routes.PartnershipHasUtrYesNoController
         .onPageLoad(CheckMode)
         .url
       action.content mustBe Text("site.change")

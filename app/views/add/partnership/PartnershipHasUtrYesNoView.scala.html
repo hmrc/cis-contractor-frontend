@@ -26,7 +26,7 @@
 
 @layout(pageTitle = title(form, messages("partnershipHasUtrYesNo.title", name))) {
 
-    @formHelper(action = controllers.add.routes.PartnershipHasUtrYesNoController.onSubmit(mode), Symbol("autoComplete") -> "off") {
+    @formHelper(action = controllers.add.partnership.routes.PartnershipHasUtrYesNoController.onSubmit(mode), Symbol("autoComplete") -> "off") {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form))

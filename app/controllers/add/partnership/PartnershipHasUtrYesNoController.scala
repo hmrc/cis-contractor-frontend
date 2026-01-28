@@ -14,18 +14,19 @@
  * limitations under the License.
  */
 
-package controllers.add
+package controllers.add.partnership
 
 import controllers.actions.*
-import forms.add.PartnershipHasUtrYesNoFormProvider
+import forms.add.partnership.PartnershipHasUtrYesNoFormProvider
 import models.Mode
 import navigation.Navigator
-import pages.add.{PartnershipHasUtrYesNoPage, SubPartnershipNamePage}
+import pages.add.SubPartnershipNamePage
+import pages.add.partnership.PartnershipHasUtrYesNoPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.add.PartnershipHasUtrYesNoView
+import views.html.add.partnership.PartnershipHasUtrYesNoView
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}

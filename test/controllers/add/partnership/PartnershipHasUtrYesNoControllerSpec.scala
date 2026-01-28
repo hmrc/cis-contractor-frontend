@@ -14,20 +14,22 @@
  * limitations under the License.
  */
 
-package controllers
+package controllers.add.partnership
 
 import base.SpecBase
-import forms.add.PartnershipHasUtrYesNoFormProvider
+import controllers.routes
+import forms.add.partnership.PartnershipHasUtrYesNoFormProvider
 import models.{NormalMode, UserAnswers}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.add.{PartnershipHasUtrYesNoPage, SubPartnershipNamePage}
+import pages.add.SubPartnershipNamePage
+import pages.add.partnership.PartnershipHasUtrYesNoPage
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import repositories.SessionRepository
-import views.html.add.PartnershipHasUtrYesNoView
+import views.html.add.partnership.PartnershipHasUtrYesNoView
 
 import scala.concurrent.Future
 
@@ -38,8 +40,10 @@ class PartnershipHasUtrYesNoControllerSpec extends SpecBase with MockitoSugar {
 
   private val partnershipName = "Test Partnership"
 
-  private lazy val routeLoad   = controllers.add.routes.PartnershipHasUtrYesNoController.onPageLoad(NormalMode).url
-  private lazy val routeSubmit = controllers.add.routes.PartnershipHasUtrYesNoController.onSubmit(NormalMode).url
+  private lazy val routeLoad   =
+    controllers.add.partnership.routes.PartnershipHasUtrYesNoController.onPageLoad(NormalMode).url
+  private lazy val routeSubmit =
+    controllers.add.partnership.routes.PartnershipHasUtrYesNoController.onSubmit(NormalMode).url
 
   private def uaWithName: UserAnswers =
     emptyUserAnswers.set(SubPartnershipNamePage, partnershipName).success.value
@@ -85,6 +89,18 @@ class PartnershipHasUtrYesNoControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
+    "must redirect to Journey Recovery for a GET when partnership name is missing (userAnswers present)" in {
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+
+      running(application) {
+        val request = FakeRequest(GET, routeLoad)
+        val result  = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
     "must redirect to the next page when valid data is submitted" in {
       val mockSessionRepository = mock[SessionRepository]
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
@@ -104,7 +120,7 @@ class PartnershipHasUtrYesNoControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.add.routes.PartnershipHasUtrYesNoController
+        redirectLocation(result).value mustEqual controllers.add.partnership.routes.PartnershipHasUtrYesNoController
           .onPageLoad(NormalMode)
           .url
       }
@@ -131,6 +147,26 @@ class PartnershipHasUtrYesNoControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
+    "must redirect to Journey Recovery for a POST when partnership name is missing (userAnswers present)" in {
+      val mockSessionRepository = mock[SessionRepository]
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+      val application =
+        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, routeSubmit)
+            .withFormUrlEncodedBody("value" -> "true")
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
     "must redirect to Journey Recovery for a GET if no existing data is found" in {
       val application = applicationBuilder(userAnswers = None).build()
 

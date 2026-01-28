@@ -23,6 +23,7 @@ import pages.*
 import models.*
 import models.add.TypeOfSubcontractor.*
 import pages.add.*
+import pages.add.partnership.PartnershipHasUtrYesNoPage
 
 @Singleton
 class Navigator @Inject() () {
@@ -32,7 +33,7 @@ class Navigator @Inject() () {
     case SubTradingNameYesNoPage                   => userAnswers => navigatorFromSubTradingNameYesNoPage(NormalMode)(userAnswers)
     case TradingNameOfSubcontractorPage            => _ => controllers.add.routes.SubAddressYesNoController.onPageLoad(NormalMode)
     case SubcontractorNamePage                     => _ => controllers.add.routes.SubAddressYesNoController.onPageLoad(NormalMode)
-    case PartnershipHasUtrYesNoPage               => _ => controllers.add.routes.PartnershipHasUtrYesNoController.onPageLoad(NormalMode)
+    case PartnershipHasUtrYesNoPage               => _ => controllers.add.partnership.routes.PartnershipHasUtrYesNoController.onPageLoad(NormalMode)
     case SubAddressYesNoPage                       => userAnswers => navigatorFromSubAddressYesNoPage(NormalMode)(userAnswers)
     case AddressOfSubcontractorPage                =>
       _ => controllers.add.routes.NationalInsuranceNumberYesNoController.onPageLoad(NormalMode)

@@ -17,7 +17,7 @@
 package viewmodels.checkAnswers.add
 
 import models.{CheckMode, UserAnswers}
-import pages.add.PartnershipHasUtrYesNoPage
+import pages.add.partnership.PartnershipHasUtrYesNoPage
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
@@ -35,7 +35,7 @@ object PartnershipHasUtrYesNoSummary  {
           key     = "partnershipHasUtrYesNo.checkYourAnswersLabel",
           value   = ValueViewModel(value),
           actions = Seq(
-            ActionItemViewModel("site.change", controllers.add.routes.PartnershipHasUtrYesNoController.onPageLoad(CheckMode).url)
+            ActionItemViewModel("site.change", controllers.add.partnership.routes.PartnershipHasUtrYesNoController.onPageLoad(CheckMode).url)
               .withVisuallyHiddenText(messages("partnershipHasUtrYesNo.change.hidden"))
           )
         )
