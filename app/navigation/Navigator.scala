@@ -32,7 +32,7 @@ class Navigator @Inject() () {
     case SubTradingNameYesNoPage                   => userAnswers => navigatorFromSubTradingNameYesNoPage(NormalMode)(userAnswers)
     case TradingNameOfSubcontractorPage            => _ => controllers.add.routes.SubAddressYesNoController.onPageLoad(NormalMode)
     case SubcontractorNamePage                     => _ => controllers.add.routes.SubAddressYesNoController.onPageLoad(NormalMode)
-    case PartnershipHaveUTRYesNoPage               => _ => controllers.add.routes.PartnershipHaveUTRYesNoController.onPageLoad(NormalMode)
+    case PartnershipHasUtrYesNoPage               => _ => controllers.add.routes.PartnershipHasUtrYesNoController.onPageLoad(NormalMode)
     case SubAddressYesNoPage                       => userAnswers => navigatorFromSubAddressYesNoPage(NormalMode)(userAnswers)
     case AddressOfSubcontractorPage                =>
       _ => controllers.add.routes.NationalInsuranceNumberYesNoController.onPageLoad(NormalMode)

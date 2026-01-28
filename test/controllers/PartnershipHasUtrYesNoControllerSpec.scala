@@ -17,35 +17,34 @@
 package controllers
 
 import base.SpecBase
-import forms.add.PartnershipHaveUTRYesNoFormProvider
+import forms.add.PartnershipHasUtrYesNoFormProvider
 import models.{NormalMode, UserAnswers}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.add.{PartnershipHaveUTRYesNoPage, SubPartnershipNamePage}
+import pages.add.{PartnershipHasUtrYesNoPage, SubPartnershipNamePage}
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import repositories.SessionRepository
-import views.html.add.PartnershipHaveUTRYesNoView
+import views.html.add.PartnershipHasUtrYesNoView
 
 import scala.concurrent.Future
 
-class PartnershipHaveUTRYesNoControllerSpec extends SpecBase with MockitoSugar {
+class PartnershipHasUtrYesNoControllerSpec extends SpecBase with MockitoSugar {
 
-  private val formProvider = new PartnershipHaveUTRYesNoFormProvider()
+  private val formProvider = new PartnershipHasUtrYesNoFormProvider()
   private val form         = formProvider()
 
   private val partnershipName = "Test Partnership"
 
+  private lazy val routeLoad   = controllers.add.routes.PartnershipHasUtrYesNoController.onPageLoad(NormalMode).url
+  private lazy val routeSubmit = controllers.add.routes.PartnershipHasUtrYesNoController.onSubmit(NormalMode).url
 
-  private lazy val routeLoad   = controllers.add.routes.PartnershipHaveUTRYesNoController.onPageLoad(NormalMode).url
-  private lazy val routeSubmit = controllers.add.routes.PartnershipHaveUTRYesNoController.onSubmit(NormalMode).url
-  
   private def uaWithName: UserAnswers =
     emptyUserAnswers.set(SubPartnershipNamePage, partnershipName).success.value
 
-  "PartnershipHaveUTRYesNo Controller" - {
+  "partnershipHasUtrYesNo Controller" - {
 
     "must return OK and the correct view for a GET when name is present" in {
       val application = applicationBuilder(userAnswers = Some(uaWithName)).build()
@@ -54,17 +53,20 @@ class PartnershipHaveUTRYesNoControllerSpec extends SpecBase with MockitoSugar {
         val request = FakeRequest(GET, routeLoad)
 
         val result = route(application, request).value
-        val view   = application.injector.instanceOf[PartnershipHaveUTRYesNoView]
+        val view   = application.injector.instanceOf[PartnershipHasUtrYesNoView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode, partnershipName)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode, partnershipName)(
+          request,
+          messages(application)
+        ).toString
       }
     }
 
     "must populate the view correctly on a GET when the question has previously been answered and name is present" in {
       val userAnswers =
         uaWithName
-          .set(PartnershipHaveUTRYesNoPage, true)
+          .set(PartnershipHasUtrYesNoPage, true)
           .success
           .value
 
@@ -72,11 +74,14 @@ class PartnershipHaveUTRYesNoControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request = FakeRequest(GET, routeLoad)
-        val view    = application.injector.instanceOf[PartnershipHaveUTRYesNoView]
+        val view    = application.injector.instanceOf[PartnershipHasUtrYesNoView]
         val result  = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(true), NormalMode, partnershipName)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill(true), NormalMode, partnershipName)(
+          request,
+          messages(application)
+        ).toString
       }
     }
 
@@ -99,7 +104,9 @@ class PartnershipHaveUTRYesNoControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.add.routes.PartnershipHaveUTRYesNoController.onPageLoad(NormalMode).url
+        redirectLocation(result).value mustEqual controllers.add.routes.PartnershipHasUtrYesNoController
+          .onPageLoad(NormalMode)
+          .url
       }
     }
 
@@ -113,11 +120,14 @@ class PartnershipHaveUTRYesNoControllerSpec extends SpecBase with MockitoSugar {
 
         val boundForm = form.bind(Map("value" -> ""))
 
-        val view   = application.injector.instanceOf[PartnershipHaveUTRYesNoView]
+        val view   = application.injector.instanceOf[PartnershipHasUtrYesNoView]
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode, partnershipName)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, NormalMode, partnershipName)(
+          request,
+          messages(application)
+        ).toString
       }
     }
 

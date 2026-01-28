@@ -19,13 +19,13 @@ package viewmodels.checkAnswers.add
 import base.SpecBase
 import models.{CheckMode, UserAnswers}
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
-import pages.add.PartnershipHaveUTRYesNoPage
+import pages.add.PartnershipHasUtrYesNoPage
 import play.api.i18n.{Lang, Messages, MessagesImpl}
 import play.api.test.Helpers.*
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.*
 
-class PartnershipHaveUTRYesNoSummarySpec extends SpecBase with GuiceOneAppPerSuite {
+class PartnershipHasUtrYesNoSummarySpec extends SpecBase with GuiceOneAppPerSuite {
 
   private val messagesApi                 = stubMessagesApi()
   private implicit val messages: Messages = MessagesImpl(Lang.defaultLang, messagesApi)
@@ -35,15 +35,15 @@ class PartnershipHaveUTRYesNoSummarySpec extends SpecBase with GuiceOneAppPerSui
     "return a row with key, value = yes, and change action when the answer is true" in {
       val ua: UserAnswers =
         emptyUserAnswers
-          .set(PartnershipHaveUTRYesNoPage, true)
+          .set(PartnershipHasUtrYesNoPage, true)
           .success
           .value
 
-      val maybeRow = PartnershipHaveUTRYesNoSummary.row(ua)
+      val maybeRow = PartnershipHasUtrYesNoSummary.row(ua)
       maybeRow must not be empty
 
       val row: SummaryListRow = maybeRow.value
-      row.key mustBe Key(content = Text("partnershipHaveUTRYesNo.checkYourAnswersLabel"))
+      row.key mustBe Key(content = Text("partnershipHasUtrYesNo.checkYourAnswersLabel"))
       row.value mustBe Value(content = Text("site.yes"))
       
       row.actions must not be empty
@@ -51,27 +51,27 @@ class PartnershipHaveUTRYesNoSummarySpec extends SpecBase with GuiceOneAppPerSui
       actions.items must have size 1
 
       val action: ActionItem = actions.items.head
-      action.href mustBe controllers.add.routes.PartnershipHaveUTRYesNoController
+      action.href mustBe controllers.add.routes.PartnershipHasUtrYesNoController
         .onPageLoad(CheckMode)
         .url
       action.content mustBe Text("site.change")
-      action.visuallyHiddenText mustBe Some(messages("partnershipHaveUTRYesNo.change.hidden"))
+      action.visuallyHiddenText mustBe Some(messages("partnershipHasUtrYesNo.change.hidden"))
     }
 
     "return a row with key, value = no, and change action when the answer is false" in {
       val ua: UserAnswers =
         emptyUserAnswers
-          .set(PartnershipHaveUTRYesNoPage, false)
+          .set(PartnershipHasUtrYesNoPage, false)
           .success
           .value
 
-      val maybeRow = PartnershipHaveUTRYesNoSummary.row(ua)
+      val maybeRow = PartnershipHasUtrYesNoSummary.row(ua)
       maybeRow must not be empty
 
       val row: SummaryListRow = maybeRow.value
 
 
-      row.key mustBe Key(content = Text("partnershipHaveUTRYesNo.checkYourAnswersLabel"))
+      row.key mustBe Key(content = Text("partnershipHasUtrYesNo.checkYourAnswersLabel"))
       
       row.value mustBe Value(content = Text("site.no"))
       
@@ -80,16 +80,16 @@ class PartnershipHaveUTRYesNoSummarySpec extends SpecBase with GuiceOneAppPerSui
       actions.items must have size 1
 
       val action: ActionItem = actions.items.head
-      action.href mustBe controllers.add.routes.PartnershipHaveUTRYesNoController
+      action.href mustBe controllers.add.routes.PartnershipHasUtrYesNoController
         .onPageLoad(CheckMode)
         .url
       action.content mustBe Text("site.change")
-      action.visuallyHiddenText mustBe Some(messages("partnershipHaveUTRYesNo.change.hidden"))
+      action.visuallyHiddenText mustBe Some(messages("partnershipHasUtrYesNo.change.hidden"))
     }
 
     "return None when the answer is missing" in {
       val ua: UserAnswers = emptyUserAnswers
-      PartnershipHaveUTRYesNoSummary.row(ua) mustBe None
+      PartnershipHasUtrYesNoSummary.row(ua) mustBe None
     }
   }
 }

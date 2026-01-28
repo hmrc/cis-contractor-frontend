@@ -17,29 +17,29 @@
 package controllers.add
 
 import controllers.actions.*
-import forms.add.PartnershipHaveUTRYesNoFormProvider
+import forms.add.PartnershipHasUtrYesNoFormProvider
 import models.Mode
 import navigation.Navigator
-import pages.add.{PartnershipHaveUTRYesNoPage, SubPartnershipNamePage}
+import pages.add.{PartnershipHasUtrYesNoPage, SubPartnershipNamePage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.add.PartnershipHaveUTRYesNoView
+import views.html.add.PartnershipHasUtrYesNoView
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class PartnershipHaveUTRYesNoController @Inject() (
-  override val messagesApi: MessagesApi,
-  sessionRepository: SessionRepository,
-  navigator: Navigator,
-  identify: IdentifierAction,
-  getData: DataRetrievalAction,
-  requireData: DataRequiredAction,
-  formProvider: PartnershipHaveUTRYesNoFormProvider,
-  val controllerComponents: MessagesControllerComponents,
-  view: PartnershipHaveUTRYesNoView
+class PartnershipHasUtrYesNoController @Inject()(
+                                                  override val messagesApi: MessagesApi,
+                                                  sessionRepository: SessionRepository,
+                                                  navigator: Navigator,
+                                                  identify: IdentifierAction,
+                                                  getData: DataRetrievalAction,
+                                                  requireData: DataRequiredAction,
+                                                  formProvider: PartnershipHasUtrYesNoFormProvider,
+                                                  val controllerComponents: MessagesControllerComponents,
+                                                  view: PartnershipHasUtrYesNoView
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport {
@@ -51,7 +51,7 @@ class PartnershipHaveUTRYesNoController @Inject() (
       request.userAnswers
         .get(SubPartnershipNamePage)
         .map { partnershipName =>
-          val preparedForm = request.userAnswers.get(PartnershipHaveUTRYesNoPage) match {
+          val preparedForm = request.userAnswers.get(PartnershipHasUtrYesNoPage) match {
             case None        => form
             case Some(value) => form.fill(value)
           }
@@ -71,9 +71,9 @@ class PartnershipHaveUTRYesNoController @Inject() (
               formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, name))),
               value =>
                 for {
-                  updatedAnswers <- Future.fromTry(request.userAnswers.set(PartnershipHaveUTRYesNoPage, value))
+                  updatedAnswers <- Future.fromTry(request.userAnswers.set(PartnershipHasUtrYesNoPage, value))
                   _              <- sessionRepository.set(updatedAnswers)
-                } yield Redirect(navigator.nextPage(PartnershipHaveUTRYesNoPage, mode, updatedAnswers))
+                } yield Redirect(navigator.nextPage(PartnershipHasUtrYesNoPage, mode, updatedAnswers))
             )
         }
         .getOrElse(Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())))

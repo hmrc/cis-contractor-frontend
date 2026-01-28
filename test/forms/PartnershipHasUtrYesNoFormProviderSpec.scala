@@ -16,16 +16,16 @@
 
 package forms
 
-import forms.add.PartnershipHaveUTRYesNoFormProvider
+import forms.add.PartnershipHasUtrYesNoFormProvider
 import forms.behaviours.BooleanFieldBehaviours
 import play.api.data.FormError
 
-class PartnershipHaveUTRYesNoFormProviderSpec extends BooleanFieldBehaviours {
+class PartnershipHasUtrYesNoFormProviderSpec extends BooleanFieldBehaviours {
 
   val requiredKey = "partnershipHaveUTRYesNo.error.required"
   val invalidKey = "error.boolean"
 
-  val form = new PartnershipHaveUTRYesNoFormProvider()()
+  val form = new PartnershipHasUtrYesNoFormProvider()()
 
   ".value" - {
 

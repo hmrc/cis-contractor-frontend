@@ -14,14 +14,17 @@
  * limitations under the License.
  */
 
-package pages.add
+package forms.add
 
-import pages.QuestionPage
-import play.api.libs.json.JsPath
+import forms.mappings.Mappings
+import play.api.data.Form
 
-case object PartnershipHaveUTRYesNoPage extends QuestionPage[Boolean] {
+import javax.inject.Inject
 
-  override def path: JsPath = JsPath \ toString
+class PartnershipHasUtrYesNoFormProvider @Inject() extends Mappings {
 
-  override def toString: String = "partnershipHaveUTRYesNo"
+  def apply(): Form[Boolean] =
+    Form(
+      "value" -> boolean("partnershipHasUtrYesNo.error.required")
+    )
 }

@@ -24,9 +24,9 @@
 
 @(form: Form[_], mode: Mode, name: String)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = title(form, messages("partnershipHaveUTRYesNo.title", name))) {
+@layout(pageTitle = title(form, messages("partnershipHasUtrYesNo.title", name))) {
 
-    @formHelper(action = controllers.add.routes.PartnershipHaveUTRYesNoController.onSubmit(mode), Symbol("autoComplete") -> "off") {
+    @formHelper(action = controllers.add.routes.PartnershipHasUtrYesNoController.onSubmit(mode), Symbol("autoComplete") -> "off") {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form))
@@ -35,8 +35,8 @@
         @govukRadios(
             RadiosViewModel.yesNo(
                 field = form("value"),
-                legend = LegendViewModel(messages("partnershipHaveUTRYesNo.heading", name)).asPageHeading().withCssClass("govuk-fieldset__legend--l"),
-            ).withHint(HintViewModel(messages("partnershipHaveUTRYesNo.hint")))
+                legend = LegendViewModel(messages("partnershipHasUtrYesNo.heading", name)).asPageHeading().withCssClass("govuk-fieldset__legend--l"),
+            ).withHint(HintViewModel(messages("partnershipHasUtrYesNo.hint")))
         )
 
         @govukButton(

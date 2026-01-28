@@ -14,17 +14,18 @@
  * limitations under the License.
  */
 
-package forms.add
+package pages.add
 
-import forms.mappings.Mappings
-import play.api.data.Form
+import pages.behaviours.PageBehaviours
 
-import javax.inject.Inject
+class PartnershipHasUtrYesNoPageSpec extends PageBehaviours {
 
-class PartnershipHaveUTRYesNoFormProvider @Inject() extends Mappings {
+  "PartnershipHasUtrYesNoPage" - {
 
-  def apply(): Form[Boolean] =
-    Form(
-      "value" -> boolean("partnershipHaveUTRYesNo.error.required")
-    )
+    beRetrievable[Boolean](PartnershipHasUtrYesNoPage)
+
+    beSettable[Boolean](PartnershipHasUtrYesNoPage)
+
+    beRemovable[Boolean](PartnershipHasUtrYesNoPage)
+  }
 }
