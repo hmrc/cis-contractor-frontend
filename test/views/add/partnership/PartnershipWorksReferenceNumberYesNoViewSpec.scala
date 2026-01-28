@@ -38,7 +38,7 @@ class PartnershipWorksReferenceNumberYesNoViewSpec extends AnyWordSpec with Matc
       private val partnershipName = "Test Partnership"
 
       val html: HtmlFormat.Appendable = view(form, NormalMode, partnershipName)
-      val doc: Document = org.jsoup.Jsoup.parse(html.toString())
+      val doc: Document               = org.jsoup.Jsoup.parse(html.toString())
       doc.select("title").text() must include(messages("partnershipWorksReferenceNumberYesNo.title", partnershipName))
 
       val legend: Elements = doc.select("fieldset legend")
@@ -53,7 +53,9 @@ class PartnershipWorksReferenceNumberYesNoViewSpec extends AnyWordSpec with Matc
       radioButtons.get(0).text mustBe "Yes"
       radioButtons.get(1).text mustBe "No"
 
-      doc.select("form").attr("action") mustBe controllers.add.partnership.routes.PartnershipWorksReferenceNumberYesNoController
+      doc
+        .select("form")
+        .attr("action") mustBe controllers.add.partnership.routes.PartnershipWorksReferenceNumberYesNoController
         .onSubmit(NormalMode)
         .url
 
@@ -69,7 +71,7 @@ class PartnershipWorksReferenceNumberYesNoViewSpec extends AnyWordSpec with Matc
       private val partnershipName = "Test Partnership"
 
       val html: HtmlFormat.Appendable = view(errorForm, NormalMode, partnershipName)
-      val doc: Document = org.jsoup.Jsoup.parse(html.toString())
+      val doc: Document               = org.jsoup.Jsoup.parse(html.toString())
 
       val summary: Elements = doc.select(".govuk-error-summary")
       summary.text() must include(messages("partnershipWorksReferenceNumberYesNo.error.required"))
@@ -77,21 +79,24 @@ class PartnershipWorksReferenceNumberYesNoViewSpec extends AnyWordSpec with Matc
       val linkHref: String = summary.select("a").attr("href")
       linkHref mustBe "#value"
 
-      doc.select(".govuk-error-message").text() must include(messages("partnershipWorksReferenceNumberYesNo.error.required"))
+      doc.select(".govuk-error-message").text() must include(
+        messages("partnershipWorksReferenceNumberYesNo.error.required")
+      )
     }
   }
 
   trait Setup {
-    val formProvider = new PartnershipWorksReferenceNumberYesNoFormProvider()
+    val formProvider        = new PartnershipWorksReferenceNumberYesNoFormProvider()
     val form: Form[Boolean] = formProvider()
 
     implicit val request: Request[_] = FakeRequest()
-    implicit val messages: Messages =
+    implicit val messages: Messages  =
       play.api.i18n.MessagesImpl(
         play.api.i18n.Lang.defaultLang,
         app.injector.instanceOf[play.api.i18n.MessagesApi]
       )
 
-    val view: PartnershipWorksReferenceNumberYesNoView = app.injector.instanceOf[PartnershipWorksReferenceNumberYesNoView]
+    val view: PartnershipWorksReferenceNumberYesNoView =
+      app.injector.instanceOf[PartnershipWorksReferenceNumberYesNoView]
   }
 }

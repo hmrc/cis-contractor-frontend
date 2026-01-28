@@ -23,7 +23,7 @@ import models.{NormalMode, UserAnswers}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.add.partnership.{PartnershipWorksReferenceNumberYesNoPage, PartnershipNamePage}
+import pages.add.partnership.{PartnershipNamePage, PartnershipWorksReferenceNumberYesNoPage}
 import play.api.data.Form
 import play.api.inject.bind
 import play.api.test.FakeRequest
@@ -35,7 +35,7 @@ import scala.concurrent.Future
 
 class PartnershipWorksReferenceNumberYesNoControllerSpec extends SpecBase with MockitoSugar {
 
-  val formProvider = new PartnershipWorksReferenceNumberYesNoFormProvider()
+  val formProvider        = new PartnershipWorksReferenceNumberYesNoFormProvider()
   val form: Form[Boolean] = formProvider()
 
   private val partnershipName = "Test Partnership"
@@ -57,7 +57,7 @@ class PartnershipWorksReferenceNumberYesNoControllerSpec extends SpecBase with M
 
       running(application) {
         val request = FakeRequest(GET, routeLoad)
-        val result = route(application, request).value
+        val result  = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController
@@ -98,11 +98,14 @@ class PartnershipWorksReferenceNumberYesNoControllerSpec extends SpecBase with M
 
       running(application) {
         val request = FakeRequest(GET, routeLoad)
-        val view = application.injector.instanceOf[PartnershipWorksReferenceNumberYesNoView]
-        val result = route(application, request).value
+        val view    = application.injector.instanceOf[PartnershipWorksReferenceNumberYesNoView]
+        val result  = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(true), NormalMode, partnershipName)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill(true), NormalMode, partnershipName)(
+          request,
+          messages(application)
+        ).toString
       }
     }
 
@@ -143,7 +146,9 @@ class PartnershipWorksReferenceNumberYesNoControllerSpec extends SpecBase with M
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.add.partnership.routes.PartnershipWorksReferenceNumberYesNoController
+        redirectLocation(
+          result
+        ).value mustEqual controllers.add.partnership.routes.PartnershipWorksReferenceNumberYesNoController
           .onPageLoad(NormalMode)
           .url
       }
@@ -168,7 +173,9 @@ class PartnershipWorksReferenceNumberYesNoControllerSpec extends SpecBase with M
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.add.partnership.routes.PartnershipWorksReferenceNumberYesNoController
+        redirectLocation(
+          result
+        ).value mustEqual controllers.add.partnership.routes.PartnershipWorksReferenceNumberYesNoController
           .onPageLoad(NormalMode)
           .url
       }
@@ -190,7 +197,10 @@ class PartnershipWorksReferenceNumberYesNoControllerSpec extends SpecBase with M
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode, partnershipName)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, NormalMode, partnershipName)(
+          request,
+          messages(application)
+        ).toString
       }
     }
 
@@ -200,7 +210,7 @@ class PartnershipWorksReferenceNumberYesNoControllerSpec extends SpecBase with M
 
       running(application) {
         val request = FakeRequest(GET, routeLoad)
-        val result = route(application, request).value
+        val result  = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
@@ -240,9 +250,14 @@ class PartnershipWorksReferenceNumberYesNoControllerSpec extends SpecBase with M
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode, partnershipName)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, NormalMode, partnershipName)(
+          request,
+          messages(application)
+        ).toString
 
-        contentAsString(result) must include(messages(application)("partnershipWorksReferenceNumberYesNo.error.required"))
+        contentAsString(result) must include(
+          messages(application)("partnershipWorksReferenceNumberYesNo.error.required")
+        )
       }
     }
   }

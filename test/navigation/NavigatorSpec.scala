@@ -291,7 +291,8 @@ class NavigatorSpec extends SpecBase {
           PartnershipWorksReferenceNumberYesNoPage,
           NormalMode,
           emptyUserAnswers.setOrException(PartnershipWorksReferenceNumberYesNoPage, true)
-        ) mustBe controllers.add.partnership.routes.PartnershipWorksReferenceNumberYesNoController.onPageLoad(NormalMode)
+        ) mustBe controllers.add.partnership.routes.PartnershipWorksReferenceNumberYesNoController
+          .onPageLoad(NormalMode)
       }
 
       "must go from a PartnershipWorksReferenceNumberYesNoPage to next page when false" in {
@@ -299,7 +300,8 @@ class NavigatorSpec extends SpecBase {
           PartnershipWorksReferenceNumberYesNoPage,
           NormalMode,
           emptyUserAnswers.setOrException(PartnershipWorksReferenceNumberYesNoPage, false)
-        ) mustBe controllers.add.partnership.routes.PartnershipWorksReferenceNumberYesNoController.onPageLoad(NormalMode)
+        ) mustBe controllers.add.partnership.routes.PartnershipWorksReferenceNumberYesNoController
+          .onPageLoad(NormalMode)
       }
 
       "must go from a PartnershipWorksReferenceNumberYesNoPage to journey recovery when incomplete info provided" in {

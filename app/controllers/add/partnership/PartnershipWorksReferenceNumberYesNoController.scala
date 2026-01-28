@@ -20,7 +20,7 @@ import controllers.actions.*
 import forms.add.partnership.PartnershipWorksReferenceNumberYesNoFormProvider
 import models.Mode
 import navigation.Navigator
-import pages.add.partnership.{PartnershipWorksReferenceNumberYesNoPage, PartnershipNamePage}
+import pages.add.partnership.{PartnershipNamePage, PartnershipWorksReferenceNumberYesNoPage}
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -31,16 +31,16 @@ import views.html.add.partnership.PartnershipWorksReferenceNumberYesNoView
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class PartnershipWorksReferenceNumberYesNoController @Inject()(
-                                                                override val messagesApi: MessagesApi,
-                                                                sessionRepository: SessionRepository,
-                                                                navigator: Navigator,
-                                                                identify: IdentifierAction,
-                                                                getData: DataRetrievalAction,
-                                                                requireData: DataRequiredAction,
-                                                                formProvider: PartnershipWorksReferenceNumberYesNoFormProvider,
-                                                                val controllerComponents: MessagesControllerComponents,
-                                                                view: PartnershipWorksReferenceNumberYesNoView
+class PartnershipWorksReferenceNumberYesNoController @Inject() (
+  override val messagesApi: MessagesApi,
+  sessionRepository: SessionRepository,
+  navigator: Navigator,
+  identify: IdentifierAction,
+  getData: DataRetrievalAction,
+  requireData: DataRequiredAction,
+  formProvider: PartnershipWorksReferenceNumberYesNoFormProvider,
+  val controllerComponents: MessagesControllerComponents,
+  view: PartnershipWorksReferenceNumberYesNoView
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport {
@@ -60,7 +60,7 @@ class PartnershipWorksReferenceNumberYesNoController @Inject()(
           Ok(view(preparedForm, mode, partnershipName))
         }
         .getOrElse(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
-  }
+    }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
@@ -73,7 +73,8 @@ class PartnershipWorksReferenceNumberYesNoController @Inject()(
               formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, partnershipName))),
               value =>
                 for {
-                  updatedAnswers <- Future.fromTry(request.userAnswers.set(PartnershipWorksReferenceNumberYesNoPage, value))
+                  updatedAnswers <-
+                    Future.fromTry(request.userAnswers.set(PartnershipWorksReferenceNumberYesNoPage, value))
                   _              <- sessionRepository.set(updatedAnswers)
                 } yield Redirect(navigator.nextPage(PartnershipWorksReferenceNumberYesNoPage, mode, updatedAnswers))
             )

@@ -29,7 +29,7 @@ class PartnershipWorksReferenceNumberYesNoPageSpec extends PageBehaviours {
 
     beRemovable[Boolean](PartnershipWorksReferenceNumberYesNoPage)
 
-    //Need to update to correct page!
+    // Need to update to correct page!
     "cleanup: must remove TradingNameOfSubcontractor userAnswers when No is selected" in {
       val userAnswers = emptyUserAnswers.set(TradingNameOfSubcontractorPage, "ABC").success.value
 
