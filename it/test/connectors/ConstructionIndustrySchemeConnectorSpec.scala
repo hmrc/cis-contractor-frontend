@@ -25,7 +25,7 @@ import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.matchers.should.Matchers.shouldBe
 import org.scalatest.wordspec.AnyWordSpec
-import play.api.http.Status.{CREATED, INTERNAL_SERVER_ERROR, NO_CONTENT, OK}
+import play.api.http.Status.{INTERNAL_SERVER_ERROR, NO_CONTENT, OK}
 import uk.gov.hmrc.http.HeaderCarrier
 
 class ConstructionIndustrySchemeConnectorSpec

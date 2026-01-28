@@ -130,6 +130,21 @@ class CheckYourAnswersControllerSpec extends SpecBase {
       }
     }
 
+    "must redirect to Journey Recovery on page load (GET) when validation fails (Left(error))" in {
+      val invalidUserAnswers = emptyUserAnswers
+
+      val application = applicationBuilder(userAnswers = Some(invalidUserAnswers)).build()
+
+      running(application) {
+
+        val request = FakeRequest(GET, controllers.add.routes.CheckYourAnswersController.onPageLoad().url)
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
     "must redirect to other (confirm page ) when valid data is submitted" in {
       val mockSubcontractorService = mock[SubcontractorService]
 
