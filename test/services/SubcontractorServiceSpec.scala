@@ -333,13 +333,13 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
 
     "isDuplicateUTR(" - {
 
-      val cisId = 123
-      val utr = "1111111111"
+      val cisId                          = 123
+      val utr                            = "1111111111"
       val subcontractorUTRs: Seq[String] = Seq("1111111111", "2222222222")
 
       "should return true when a duplicate exists" in {
         val mockConnector: ConstructionIndustrySchemeConnector = mock[ConstructionIndustrySchemeConnector]
-        val service = new SubcontractorService(mockConnector)
+        val service                                            = new SubcontractorService(mockConnector)
 
         val userAnswers = emptyUserAnswers
           .set(CisIdQuery, cisId)
@@ -359,7 +359,7 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
 
       "should return false when no duplicate exists" in {
         val mockConnector: ConstructionIndustrySchemeConnector = mock[ConstructionIndustrySchemeConnector]
-        val service = new SubcontractorService(mockConnector)
+        val service                                            = new SubcontractorService(mockConnector)
 
         val userAnswers = emptyUserAnswers
           .set(CisIdQuery, cisId)
@@ -379,7 +379,7 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
 
       "should return false when getSubcontractorUTRs return empty list" in {
         val mockConnector: ConstructionIndustrySchemeConnector = mock[ConstructionIndustrySchemeConnector]
-        val service = new SubcontractorService(mockConnector)
+        val service                                            = new SubcontractorService(mockConnector)
 
         val userAnswers = emptyUserAnswers
           .set(CisIdQuery, cisId)
@@ -399,7 +399,7 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
 
       "should fail when cisId not found in session data" in {
         val mockConnector: ConstructionIndustrySchemeConnector = mock[ConstructionIndustrySchemeConnector]
-        val service = new SubcontractorService(mockConnector)
+        val service                                            = new SubcontractorService(mockConnector)
 
         when(mockConnector.getSubcontractorUTRs(eqTo(cisId.toString))(any[HeaderCarrier]))
           .thenReturn(Future.failed(new Exception("bang")))
@@ -412,7 +412,7 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
 
       "should fail when the connector call fails" in {
         val mockConnector: ConstructionIndustrySchemeConnector = mock[ConstructionIndustrySchemeConnector]
-        val service = new SubcontractorService(mockConnector)
+        val service                                            = new SubcontractorService(mockConnector)
 
         when(mockConnector.getSubcontractorUTRs(eqTo(cisId.toString))(any[HeaderCarrier]))
           .thenReturn(Future.failed(new Exception("bang")))
@@ -431,6 +431,6 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
         verifyNoMoreInteractions(mockConnector)
       }
     }
-    
+
   }
 }

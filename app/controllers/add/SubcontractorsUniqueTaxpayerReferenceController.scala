@@ -64,8 +64,7 @@ class SubcontractorsUniqueTaxpayerReferenceController @Inject() (
         .bindFromRequest()
         .fold(
           formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
-
-          value => {
+          value =>
             subcontractorService.isDuplicateUTR(request.userAnswers, value).flatMap {
               case true =>
                 val errorForm = form
@@ -82,10 +81,9 @@ class SubcontractorsUniqueTaxpayerReferenceController @Inject() (
                 for {
                   updatedAnswers <-
                     Future.fromTry(request.userAnswers.set(SubcontractorsUniqueTaxpayerReferencePage, value))
-                  _ <- sessionRepository.set(updatedAnswers)
+                  _              <- sessionRepository.set(updatedAnswers)
                 } yield Redirect(navigator.nextPage(SubcontractorsUniqueTaxpayerReferencePage, mode, updatedAnswers))
             }
-          }
         )
   }
 }
