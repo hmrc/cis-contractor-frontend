@@ -24,9 +24,9 @@
 
 @(form: Form[_], mode: Mode, name: String)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = title(form, messages("partnershipWorksRefYesNo.title", name))) {
+@layout(pageTitle = title(form, messages("partnershipWorksReferenceNumberYesNo.title", name))) {
 
-    @formHelper(action = controllers.add.partnership.routes.PartnershipWorksRefYesNoController.onSubmit(mode), Symbol("autoComplete") -> "off") {
+    @formHelper(action = controllers.add.partnership.routes.PartnershipWorksReferenceNumberYesNoController.onSubmit(mode), Symbol("autoComplete") -> "off") {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form))
@@ -35,9 +35,9 @@
         @govukRadios(
             RadiosViewModel.yesNo(
                 field = form("value"),
-                legend = LegendViewModel(messages("partnershipWorksRefYesNo.heading", name)).asPageHeading().withCssClass("govuk-fieldset__legend--l")
+                legend = LegendViewModel(messages("partnershipWorksReferenceNumberYesNo.heading", name)).asPageHeading().withCssClass("govuk-fieldset__legend--l")
             ).withHint(Hint(
-                content = Messages("partnershipWorksRefYesNo.hint"))
+                content = Messages("partnershipWorksReferenceNumberYesNo.hint"))
             )
         )
 

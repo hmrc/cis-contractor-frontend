@@ -99,7 +99,7 @@ POST       /add/contact-details                          controllers.add.SubCont
 GET        /add/change-contact-details                   controllers.add.SubContactDetailsController.onPageLoad(mode: Mode = CheckMode)
 POST       /add/change-contact-details                   controllers.add.SubContactDetailsController.onSubmit(mode: Mode = CheckMode)
 
-GET        /add/partnership/partnership-has-works-reference                      controllers.add.partnership.PartnershipWorksRefYesNoController.onPageLoad(mode: Mode = NormalMode)
-POST       /add/partnership/partnership-has-works-reference                      controllers.add.partnership.PartnershipWorksRefYesNoController.onSubmit(mode: Mode = NormalMode)
-GET        /add/partnership/change-partnership-has-works-reference               controllers.add.partnership.PartnershipWorksRefYesNoController.onPageLoad(mode: Mode = CheckMode)
-POST       /add/partnership/change-partnership-has-works-reference               controllers.add.partnership.PartnershipWorksRefYesNoController.onSubmit(mode: Mode = CheckMode)
+GET        /add/partnership/partnership-has-works-reference                      controllers.add.partnership.PartnershipWorksReferenceNumberYesNoController.onPageLoad(mode: Mode = NormalMode)
+POST       /add/partnership/partnership-has-works-reference                      controllers.add.partnership.PartnershipWorksReferenceNumberYesNoController.onSubmit(mode: Mode = NormalMode)
+GET        /add/partnership/change-partnership-has-works-reference               controllers.add.partnership.PartnershipWorksReferenceNumberYesNoController.onPageLoad(mode: Mode = CheckMode)
+POST       /add/partnership/change-partnership-has-works-reference               controllers.add.partnership.PartnershipWorksReferenceNumberYesNoController.onSubmit(mode: Mode = CheckMode)

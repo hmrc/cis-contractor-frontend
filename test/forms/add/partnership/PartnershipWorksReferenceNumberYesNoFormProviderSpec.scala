@@ -16,15 +16,30 @@
 
 package forms.add.partnership
 
-import forms.mappings.Mappings
-import play.api.data.Form
+import forms.behaviours.BooleanFieldBehaviours
+import play.api.data.FormError
 
-import javax.inject.Inject
+class PartnershipWorksReferenceNumberYesNoFormProviderSpec extends BooleanFieldBehaviours {
 
-class PartnershipWorksRefYesNoFormProvider @Inject() extends Mappings {
+  val requiredKey = "partnershipWorksReferenceNumberYesNo.error.required"
+  val invalidKey = "error.boolean"
 
-  def apply(): Form[Boolean] =
-    Form(
-      "value" -> boolean("partnershipWorksRefYesNo.error.required")
+  val form = new PartnershipWorksReferenceNumberYesNoFormProvider()()
+
+  ".value" - {
+
+    val fieldName = "value"
+
+    behave like booleanField(
+      form,
+      fieldName,
+      invalidError = FormError(fieldName, invalidKey)
     )
+
+    behave like mandatoryField(
+      form,
+      fieldName,
+      requiredError = FormError(fieldName, requiredKey)
+    )
+  }
 }

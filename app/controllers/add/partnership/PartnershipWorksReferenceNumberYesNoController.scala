@@ -17,41 +17,42 @@
 package controllers.add.partnership
 
 import controllers.actions.*
-import forms.add.partnership.PartnershipWorksRefYesNoFormProvider
+import forms.add.partnership.PartnershipWorksReferenceNumberYesNoFormProvider
 import models.Mode
 import navigation.Navigator
-import pages.add.partnership.{PartnershipWorksRefYesNoPage, SubPartnershipNamePage}
+import pages.add.partnership.{PartnershipWorksReferenceNumberYesNoPage, PartnershipNamePage}
+import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.add.partnership.PartnershipWorksRefYesNoView
+import views.html.add.partnership.PartnershipWorksReferenceNumberYesNoView
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class PartnershipWorksRefYesNoController @Inject() (
-  override val messagesApi: MessagesApi,
-  sessionRepository: SessionRepository,
-  navigator: Navigator,
-  identify: IdentifierAction,
-  getData: DataRetrievalAction,
-  requireData: DataRequiredAction,
-  formProvider: PartnershipWorksRefYesNoFormProvider,
-  val controllerComponents: MessagesControllerComponents,
-  view: PartnershipWorksRefYesNoView
+class PartnershipWorksReferenceNumberYesNoController @Inject()(
+                                                                override val messagesApi: MessagesApi,
+                                                                sessionRepository: SessionRepository,
+                                                                navigator: Navigator,
+                                                                identify: IdentifierAction,
+                                                                getData: DataRetrievalAction,
+                                                                requireData: DataRequiredAction,
+                                                                formProvider: PartnershipWorksReferenceNumberYesNoFormProvider,
+                                                                val controllerComponents: MessagesControllerComponents,
+                                                                view: PartnershipWorksReferenceNumberYesNoView
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport {
 
-  val form = formProvider()
+  val form: Form[Boolean] = formProvider()
 
   def onPageLoad(mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData) { implicit request =>
       request.userAnswers
-        .get(SubPartnershipNamePage)
+        .get(PartnershipNamePage)
         .map { partnershipName =>
-          val preparedForm = request.userAnswers.get(PartnershipWorksRefYesNoPage) match {
+          val preparedForm = request.userAnswers.get(PartnershipWorksReferenceNumberYesNoPage) match {
             case None        => form
             case Some(value) => form.fill(value)
           }
@@ -64,7 +65,7 @@ class PartnershipWorksRefYesNoController @Inject() (
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
       request.userAnswers
-        .get(SubPartnershipNamePage)
+        .get(PartnershipNamePage)
         .map { partnershipName =>
           form
             .bindFromRequest()
@@ -72,9 +73,9 @@ class PartnershipWorksRefYesNoController @Inject() (
               formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, partnershipName))),
               value =>
                 for {
-                  updatedAnswers <- Future.fromTry(request.userAnswers.set(PartnershipWorksRefYesNoPage, value))
+                  updatedAnswers <- Future.fromTry(request.userAnswers.set(PartnershipWorksReferenceNumberYesNoPage, value))
                   _              <- sessionRepository.set(updatedAnswers)
-                } yield Redirect(navigator.nextPage(PartnershipWorksRefYesNoPage, mode, updatedAnswers))
+                } yield Redirect(navigator.nextPage(PartnershipWorksReferenceNumberYesNoPage, mode, updatedAnswers))
             )
         }
         .getOrElse(Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())))

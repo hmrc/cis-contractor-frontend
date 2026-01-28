@@ -17,26 +17,26 @@
 package viewmodels.checkAnswers.add.partnership
 
 import models.{CheckMode, UserAnswers}
-import pages.add.partnership.PartnershipWorksRefYesNoPage
+import pages.add.partnership.PartnershipWorksReferenceNumberYesNoPage
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
 
-object PartnershipWorksRefYesNoSummary  {
+object PartnershipWorksReferenceNumberYesNoSummary  {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(PartnershipWorksRefYesNoPage).map {
+    answers.get(PartnershipWorksReferenceNumberYesNoPage).map {
       answer =>
 
         val value = if (answer) "site.yes" else "site.no"
 
         SummaryListRowViewModel(
-          key     = "partnershipWorksRefYesNo.checkYourAnswersLabel",
+          key     = "partnershipWorksReferenceNumberYesNo.checkYourAnswersLabel",
           value   = ValueViewModel(value),
           actions = Seq(
-            ActionItemViewModel("site.change", controllers.add.partnership.routes.PartnershipWorksRefYesNoController.onPageLoad(CheckMode).url)
-              .withVisuallyHiddenText(messages("partnershipWorksRefYesNo.change.hidden"))
+            ActionItemViewModel("site.change", controllers.add.partnership.routes.PartnershipWorksReferenceNumberYesNoController.onPageLoad(CheckMode).url)
+              .withVisuallyHiddenText(messages("partnershipWorksReferenceNumberYesNo.change.hidden"))
           )
         )
     }

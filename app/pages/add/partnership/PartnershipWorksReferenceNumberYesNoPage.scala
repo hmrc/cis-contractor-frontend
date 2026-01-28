@@ -16,12 +16,24 @@
 
 package pages.add.partnership
 
+import models.UserAnswers
 import pages.QuestionPage
+import pages.add.TradingNameOfSubcontractorPage
 import play.api.libs.json.JsPath
 
-case object SubPartnershipNamePage extends QuestionPage[String] {
+import scala.util.Try
+
+case object PartnershipWorksReferenceNumberYesNoPage extends QuestionPage[Boolean] {
 
   override def path: JsPath = JsPath \ toString
 
-  override def toString: String = "subPartnershipNamePage"
+  override def toString: String = "partnershipWorksReferenceNumberYesNo"
+
+  override def cleanup(value: Option[Boolean], userAnswers: UserAnswers): Try[UserAnswers] =
+    if value.contains(false) then {
+      userAnswers
+        .remove(TradingNameOfSubcontractorPage) // Need to update to correct page!
+    } else {
+      super.cleanup(value, userAnswers)
+    }
 }

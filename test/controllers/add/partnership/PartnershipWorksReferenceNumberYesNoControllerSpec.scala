@@ -18,37 +18,54 @@ package controllers.add.partnership
 
 import base.SpecBase
 import controllers.routes
-import forms.add.partnership.PartnershipWorksRefYesNoFormProvider
+import forms.add.partnership.PartnershipWorksReferenceNumberYesNoFormProvider
 import models.{NormalMode, UserAnswers}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.add.partnership.{PartnershipWorksRefYesNoPage, SubPartnershipNamePage}
+import pages.add.partnership.{PartnershipWorksReferenceNumberYesNoPage, PartnershipNamePage}
+import play.api.data.Form
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import repositories.SessionRepository
-import views.html.add.partnership.PartnershipWorksRefYesNoView
+import views.html.add.partnership.PartnershipWorksReferenceNumberYesNoView
 
 import scala.concurrent.Future
 
-class PartnershipWorksRefYesNoControllerSpec extends SpecBase with MockitoSugar {
+class PartnershipWorksReferenceNumberYesNoControllerSpec extends SpecBase with MockitoSugar {
 
-  val formProvider = new PartnershipWorksRefYesNoFormProvider()
-  val form         = formProvider()
+  val formProvider = new PartnershipWorksReferenceNumberYesNoFormProvider()
+  val form: Form[Boolean] = formProvider()
 
   private val partnershipName = "Test Partnership"
 
   private lazy val routeLoad =
-    controllers.add.partnership.routes.PartnershipWorksRefYesNoController.onPageLoad(NormalMode).url
+    controllers.add.partnership.routes.PartnershipWorksReferenceNumberYesNoController.onPageLoad(NormalMode).url
 
   private lazy val routeSubmit =
-    controllers.add.partnership.routes.PartnershipWorksRefYesNoController.onSubmit(NormalMode).url
+    controllers.add.partnership.routes.PartnershipWorksReferenceNumberYesNoController.onSubmit(NormalMode).url
 
   private def uaWithName: UserAnswers =
-    emptyUserAnswers.set(SubPartnershipNamePage, partnershipName).success.value
+    emptyUserAnswers.set(PartnershipNamePage, partnershipName).success.value
 
-  "PartnershipWorksRefYesNo Controller" - {
+  "PartnershipWorksReferenceNumberYesNo Controller" - {
+
+    "must redirect to JourneyRecovery if PartnershipName is missing for a GET" in {
+
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+
+      running(application) {
+        val request = FakeRequest(GET, routeLoad)
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController
+          .onPageLoad()
+          .url
+      }
+
+    }
 
     "must return OK and the correct view for a GET" in {
 
@@ -59,7 +76,7 @@ class PartnershipWorksRefYesNoControllerSpec extends SpecBase with MockitoSugar 
 
         val result = route(application, request).value
 
-        val view = application.injector.instanceOf[PartnershipWorksRefYesNoView]
+        val view = application.injector.instanceOf[PartnershipWorksReferenceNumberYesNoView]
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(form, NormalMode, partnershipName)(
@@ -73,7 +90,7 @@ class PartnershipWorksRefYesNoControllerSpec extends SpecBase with MockitoSugar 
 
       val userAnswers =
         uaWithName
-          .set(PartnershipWorksRefYesNoPage, true)
+          .set(PartnershipWorksReferenceNumberYesNoPage, true)
           .success
           .value
 
@@ -81,12 +98,30 @@ class PartnershipWorksRefYesNoControllerSpec extends SpecBase with MockitoSugar 
 
       running(application) {
         val request = FakeRequest(GET, routeLoad)
-        val view = application.injector.instanceOf[PartnershipWorksRefYesNoView]
+        val view = application.injector.instanceOf[PartnershipWorksReferenceNumberYesNoView]
         val result = route(application, request).value
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(form.fill(true), NormalMode, partnershipName)(request, messages(application)).toString
       }
+    }
+
+    "must redirect to JourneyRecovery if PartnershipName is missing for a POST" in {
+
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+
+      running(application) {
+        val request = FakeRequest(POST, routeSubmit)
+          .withFormUrlEncodedBody(("value", "true"))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController
+          .onPageLoad()
+          .url
+      }
+
     }
 
     "must redirect to the next page when valid data with value Yes is submitted" in {
@@ -108,7 +143,7 @@ class PartnershipWorksRefYesNoControllerSpec extends SpecBase with MockitoSugar 
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.add.partnership.routes.PartnershipWorksRefYesNoController
+        redirectLocation(result).value mustEqual controllers.add.partnership.routes.PartnershipWorksReferenceNumberYesNoController
           .onPageLoad(NormalMode)
           .url
       }
@@ -133,7 +168,7 @@ class PartnershipWorksRefYesNoControllerSpec extends SpecBase with MockitoSugar 
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.add.partnership.routes.PartnershipWorksRefYesNoController
+        redirectLocation(result).value mustEqual controllers.add.partnership.routes.PartnershipWorksReferenceNumberYesNoController
           .onPageLoad(NormalMode)
           .url
       }
@@ -150,7 +185,7 @@ class PartnershipWorksRefYesNoControllerSpec extends SpecBase with MockitoSugar 
 
         val boundForm = form.bind(Map("value" -> ""))
 
-        val view = application.injector.instanceOf[PartnershipWorksRefYesNoView]
+        val view = application.injector.instanceOf[PartnershipWorksReferenceNumberYesNoView]
 
         val result = route(application, request).value
 
@@ -197,17 +232,17 @@ class PartnershipWorksRefYesNoControllerSpec extends SpecBase with MockitoSugar 
           FakeRequest(POST, routeSubmit)
             .withFormUrlEncodedBody()
 
-        val form      = new PartnershipWorksRefYesNoFormProvider()()
+        val form      = new PartnershipWorksReferenceNumberYesNoFormProvider()()
         val boundForm = form.bind(Map.empty)
 
-        val view = application.injector.instanceOf[PartnershipWorksRefYesNoView]
+        val view = application.injector.instanceOf[PartnershipWorksReferenceNumberYesNoView]
 
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
         contentAsString(result) mustEqual view(boundForm, NormalMode, partnershipName)(request, messages(application)).toString
 
-        contentAsString(result) must include(messages(application)("partnershipWorksRefYesNo.error.required"))
+        contentAsString(result) must include(messages(application)("partnershipWorksReferenceNumberYesNo.error.required"))
       }
     }
   }

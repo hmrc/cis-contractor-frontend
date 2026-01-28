@@ -286,25 +286,25 @@ class NavigatorSpec extends SpecBase {
         ) mustBe controllers.add.routes.CheckYourAnswersController.onPageLoad()
       }
 
-      "must go from a PartnershipWorksRefYesNoPage to next page when true" in {
+      "must go from a PartnershipWorksReferenceNumberYesNoPage to next page when true" in {
         navigator.nextPage(
-          PartnershipWorksRefYesNoPage,
+          PartnershipWorksReferenceNumberYesNoPage,
           NormalMode,
-          emptyUserAnswers.setOrException(PartnershipWorksRefYesNoPage, true)
-        ) mustBe controllers.add.partnership.routes.PartnershipWorksRefYesNoController.onPageLoad(NormalMode)
+          emptyUserAnswers.setOrException(PartnershipWorksReferenceNumberYesNoPage, true)
+        ) mustBe controllers.add.partnership.routes.PartnershipWorksReferenceNumberYesNoController.onPageLoad(NormalMode)
       }
 
-      "must go from a PartnershipWorksRefYesNoPage to next page when false" in {
+      "must go from a PartnershipWorksReferenceNumberYesNoPage to next page when false" in {
         navigator.nextPage(
-          PartnershipWorksRefYesNoPage,
+          PartnershipWorksReferenceNumberYesNoPage,
           NormalMode,
-          emptyUserAnswers.setOrException(PartnershipWorksRefYesNoPage, false)
-        ) mustBe controllers.add.partnership.routes.PartnershipWorksRefYesNoController.onPageLoad(NormalMode)
+          emptyUserAnswers.setOrException(PartnershipWorksReferenceNumberYesNoPage, false)
+        ) mustBe controllers.add.partnership.routes.PartnershipWorksReferenceNumberYesNoController.onPageLoad(NormalMode)
       }
 
-      "must go from a PartnershipWorksRefYesNoPage to journey recovery when incomplete info provided" in {
+      "must go from a PartnershipWorksReferenceNumberYesNoPage to journey recovery when incomplete info provided" in {
         navigator.nextPage(
-          PartnershipWorksRefYesNoPage,
+          PartnershipWorksReferenceNumberYesNoPage,
           NormalMode,
           emptyUserAnswers
         ) mustBe journeyRecovery
@@ -499,25 +499,25 @@ class NavigatorSpec extends SpecBase {
         ) mustBe journeyRecovery
       }
 
-      "must go from a PartnershipWorksRefYesNoPage to next page when true" in {
+      "must go from a PartnershipWorksReferenceNumberYesNoPage to next page when true" in {
         navigator.nextPage(
-          PartnershipWorksRefYesNoPage,
+          PartnershipWorksReferenceNumberYesNoPage,
           CheckMode,
-          emptyUserAnswers.setOrException(PartnershipWorksRefYesNoPage, true)
-        ) mustBe controllers.add.partnership.routes.PartnershipWorksRefYesNoController.onPageLoad(CheckMode)
+          emptyUserAnswers.setOrException(PartnershipWorksReferenceNumberYesNoPage, true)
+        ) mustBe controllers.add.partnership.routes.PartnershipWorksReferenceNumberYesNoController.onPageLoad(CheckMode)
       }
 
-      "must go from a PartnershipWorksRefYesNoPage to CYA page when false" in {
+      "must go from a PartnershipWorksReferenceNumberYesNoPage to CYA page when false" in {
         navigator.nextPage(
-          PartnershipWorksRefYesNoPage,
+          PartnershipWorksReferenceNumberYesNoPage,
           CheckMode,
-          emptyUserAnswers.setOrException(PartnershipWorksRefYesNoPage, false)
+          emptyUserAnswers.setOrException(PartnershipWorksReferenceNumberYesNoPage, false)
         ) mustBe CYA
       }
 
-      "must go from a PartnershipWorksRefYesNoPage to journey recovery page when incomplete info provided" in {
+      "must go from a PartnershipWorksReferenceNumberYesNoPage to journey recovery page when incomplete info provided" in {
         navigator.nextPage(
-          PartnershipWorksRefYesNoPage,
+          PartnershipWorksReferenceNumberYesNoPage,
           CheckMode,
           emptyUserAnswers
         ) mustBe journeyRecovery
