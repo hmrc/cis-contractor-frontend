@@ -17,7 +17,7 @@ date.year = Year
 date.error.day = day
 date.error.month = month
 date.error.year = year
-
+error.boolean = Please give an answer
 timeout.title = You’re about to be signed out
 timeout.message = For security reasons, you will be signed out of this service in
 timeout.keepAlive = Stay signed in
@@ -257,3 +257,10 @@ checkYourAnswers.p1 = By adding this subcontractor you are confirming that, to t
 checkYourAnswers.addSubcontractor = Add subcontractor
 
 
+
+partnershipHasUtrYesNo.title = Does this partnership have a Unique Taxpayer Reference (UTR)?
+partnershipHasUtrYesNo.heading = Does {0} have a Unique Taxpayer Reference (UTR)?
+partnershipHasUtrYesNo.hint = This is 10 numbers, like 1234567890. The UTR will be on tax returns and other letters about Self Assessment. It may also be called ‘tax reference’, or ‘UTR’
+partnershipHasUtrYesNo.checkYourAnswersLabel = Does {0} have a Unique Taxpayer Reference (UTR)?
+partnershipHasUtrYesNo.error.required = Select yes if the partnership has a Unique Taxpayer Reference (UTR)
+partnershipHasUtrYesNo.change.hidden = Unique Taxpayer Reference (UTR)
