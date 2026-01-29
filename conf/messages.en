@@ -258,7 +258,7 @@ checkYourAnswers.addSubcontractor = Add subcontractor
 
 
 
-partnershipHasUtrYesNo.title = What is the subcontractor’s Unique Taxpayer Reference?
+partnershipHasUtrYesNo.title = Does this partnership have a Unique Taxpayer Reference (UTR)?
 partnershipHasUtrYesNo.heading = Does {0} have a Unique Taxpayer Reference (UTR)?
 partnershipHasUtrYesNo.hint = This is 10 numbers, like 1234567890. The UTR will be on tax returns and other letters about Self Assessment. It may also be called ‘tax reference’, or ‘UTR’
 partnershipHasUtrYesNo.checkYourAnswersLabel = Does {0} have a Unique Taxpayer Reference (UTR)?
