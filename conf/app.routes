@@ -99,5 +99,10 @@ POST       /add/contact-details                          controllers.add.SubCont
 GET        /add/change-contact-details                   controllers.add.SubContactDetailsController.onPageLoad(mode: Mode = CheckMode)
 POST       /add/change-contact-details                   controllers.add.SubContactDetailsController.onSubmit(mode: Mode = CheckMode)
 
-GET        /add/partnership/partnership-utr             controllers.add.PartnershipUniqueTaxpayerReferenceController.onPageLoad(mode: Mode = NormalMode)
-POST       /add/partnership/partnership-utr             controllers.add.PartnershipUniqueTaxpayerReferenceController.onSubmit(mode: Mode = NormalMode)
+GET        /add/partnership/partnership-utr              controllers.add.PartnershipUniqueTaxpayerReferenceController.onPageLoad(mode: Mode = NormalMode)
+POST       /add/partnership/partnership-utr              controllers.add.PartnershipUniqueTaxpayerReferenceController.onSubmit(mode: Mode = NormalMode)
+GET        /add/partnership/partnership-has-utr          controllers.add.partnership.PartnershipHasUtrYesNoController.onPageLoad(mode: Mode = NormalMode)
+POST       /add/partnership/partnership-has-utr          controllers.add.partnership.PartnershipHasUtrYesNoController.onSubmit(mode: Mode = NormalMode)
+GET        /add/partnership/change-partnership-has-utr   controllers.add.partnership.PartnershipHasUtrYesNoController.onPageLoad(mode: Mode = CheckMode)
+POST       /add/partnership/change-partnership-has-utr   controllers.add.partnership.PartnershipHasUtrYesNoController.onSubmit(mode: Mode = CheckMode)
+
