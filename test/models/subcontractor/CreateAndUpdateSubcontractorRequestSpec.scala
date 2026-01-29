@@ -16,21 +16,21 @@
 
 package models.subcontractor
 
+import models.add.TypeOfSubcontractor
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import play.api.libs.json.Json
 
-class UpdateSubcontractorRequestSpec extends AnyWordSpec with Matchers {
+class CreateAndUpdateSubcontractorRequestSpec extends AnyWordSpec with Matchers {
 
-  "CisTaxpayerResponse JSON format" should {
+  "CreateAndUpdateSubcontractorRequest JSON format" should {
 
-    val schemeId          = 10
-    val subbieResourceRef = 20
+    val cisId = "10"
 
     "round-trip (writes -> reads) with all fields populated" in {
-      val model = UpdateSubcontractorRequest(
-        schemeId = schemeId,
-        subbieResourceRef = subbieResourceRef,
+      val model = CreateAndUpdateSubcontractorRequest(
+        cisId = cisId,
+        subcontractorType = TypeOfSubcontractor.Individualorsoletrader,
         firstName = Some("firstName"),
         secondName = Some("secondName"),
         surname = Some("surname"),
@@ -48,7 +48,7 @@ class UpdateSubcontractorRequestSpec extends AnyWordSpec with Matchers {
       )
 
       val js = Json.toJson(model)
-      js.as[UpdateSubcontractorRequest] mustBe model
+      js.as[CreateAndUpdateSubcontractorRequest] mustBe model
     }
 
     "parse minimal JSON with only required fields" in {
@@ -56,15 +56,15 @@ class UpdateSubcontractorRequestSpec extends AnyWordSpec with Matchers {
         Json.parse(
           """
             |{
-            |  "schemeId": 10,
-            |  "subbieResourceRef": 20
+            |  "cisId": "10",
+            |  "subcontractorType": "soletrader"
             |}
           """.stripMargin
         )
 
-      val parsed = json.as[UpdateSubcontractorRequest]
-      parsed.schemeId mustBe schemeId
-      parsed.subbieResourceRef mustBe subbieResourceRef
+      val parsed = json.as[CreateAndUpdateSubcontractorRequest]
+      parsed.cisId mustBe cisId
+      parsed.subcontractorType mustBe TypeOfSubcontractor.Individualorsoletrader
     }
 
     "fail to parse when a required field is missing" in {
@@ -72,13 +72,13 @@ class UpdateSubcontractorRequestSpec extends AnyWordSpec with Matchers {
         Json.parse(
           """
             |{
-            |  "schemeId": 10,
+            |  "cisId": "10",
             |  "nino": "123"
             |}
           """.stripMargin
         )
 
-      jsonMissing.validate[UpdateSubcontractorRequest].isError mustBe true
+      jsonMissing.validate[CreateAndUpdateSubcontractorRequest].isError mustBe true
     }
   }
 }

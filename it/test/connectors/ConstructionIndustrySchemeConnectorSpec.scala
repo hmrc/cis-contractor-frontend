@@ -19,12 +19,13 @@ package connectors
 import com.github.tomakehurst.wiremock.client.WireMock.{aResponse, get, post, stubFor, urlPathEqualTo}
 import itutil.ApplicationWithWiremock
 import models.add.TypeOfSubcontractor
-import models.subcontractor.{CreateSubcontractorRequest, UpdateSubcontractorRequest}
+import models.add.TypeOfSubcontractor.Individualorsoletrader
+import models.subcontractor.CreateAndUpdateSubcontractorRequest
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.matchers.should.Matchers.shouldBe
 import org.scalatest.wordspec.AnyWordSpec
-import play.api.http.Status.{CREATED, INTERNAL_SERVER_ERROR, NO_CONTENT, OK}
+import play.api.http.Status.{INTERNAL_SERVER_ERROR, NO_CONTENT, OK}
 import uk.gov.hmrc.http.HeaderCarrier
 
 class ConstructionIndustrySchemeConnectorSpec
@@ -93,71 +94,14 @@ class ConstructionIndustrySchemeConnectorSpec
     }
   }
 
-  "createSubcontractor" should {
+  "createAndUpdateSubcontractor" should {
 
-    val cisId = 200
-
-    "successfully create a subcontractor" in {
-
-      val responseJson =
-        """
-          |{
-          |  "subbieResourceRef": 10
-          |}
-                """.stripMargin
-
-      stubFor(
-        post(urlPathEqualTo("/cis/subcontractor/create"))
-          .willReturn(
-            aResponse()
-              .withStatus(CREATED)
-              .withBody(responseJson)
-          )
-      )
-
-      val result = connector
-        .createSubcontractor(
-          CreateSubcontractorRequest(
-            schemeId = cisId,
-            subcontractorType = TypeOfSubcontractor.Individualorsoletrader,
-            version = 0
-          )
-        )
-        .futureValue
-
-      result.subbieResourceRef mustBe 10
-    }
-
-    "propagate upstream error on non-2xx" in {
-      stubFor(
-        post(urlPathEqualTo("/cis/subcontractor/create"))
-          .willReturn(aResponse().withStatus(INTERNAL_SERVER_ERROR).withBody("boom"))
-      )
-
-      val ex = intercept[Exception] {
-        connector
-          .createSubcontractor(
-            CreateSubcontractorRequest(
-              schemeId = cisId,
-              subcontractorType = TypeOfSubcontractor.Individualorsoletrader,
-              version = 0
-            )
-          )
-          .futureValue
-      }
-      ex.getMessage must include("returned 500")
-    }
-  }
-
-  "updateSubcontractor" should {
-
-    val subbieResourceRef = 10
-    val cisId             = 200
+    val cisId = "200"
 
     "successfully update subcontractor" in {
 
       stubFor(
-        post(urlPathEqualTo("/cis/subcontractor/update"))
+        post(urlPathEqualTo("/cis/subcontractor/create-and-update"))
           .willReturn(
             aResponse()
               .withStatus(NO_CONTENT)
@@ -165,11 +109,10 @@ class ConstructionIndustrySchemeConnectorSpec
       )
 
       val result: Unit = connector
-        .updateSubcontractor(
-          UpdateSubcontractorRequest(
-            schemeId = cisId,
-            subbieResourceRef = subbieResourceRef,
-            tradingName = Some("trader name")
+        .createAndUpdateSubcontractor(
+          CreateAndUpdateSubcontractorRequest(
+            cisId = cisId,
+            subcontractorType = Individualorsoletrader
           )
         )
         .futureValue
@@ -179,17 +122,16 @@ class ConstructionIndustrySchemeConnectorSpec
 
     "propagate upstream error on non-2xx" in {
       stubFor(
-        post(urlPathEqualTo("/cis/subcontractor/update"))
+        post(urlPathEqualTo("/cis/subcontractor/create-and-update"))
           .willReturn(aResponse().withStatus(INTERNAL_SERVER_ERROR).withBody("boom"))
       )
 
       val ex = intercept[Exception] {
         connector
-          .updateSubcontractor(
-            UpdateSubcontractorRequest(
-              schemeId = cisId,
-              subbieResourceRef = subbieResourceRef,
-              tradingName = Some("trader name")
+          .createAndUpdateSubcontractor(
+            CreateAndUpdateSubcontractorRequest(
+              cisId = cisId,
+              subcontractorType = Individualorsoletrader
             )
           )
           .futureValue

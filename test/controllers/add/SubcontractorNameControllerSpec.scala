@@ -19,20 +19,17 @@ package controllers.add
 import base.SpecBase
 import controllers.routes
 import forms.add.SubcontractorNameFormProvider
+import models.NormalMode
 import models.add.*
-import models.{NormalMode, UserAnswers}
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.{verify, verifyNoMoreInteractions, when}
+import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
 import pages.add.SubcontractorNamePage
 import play.api.inject.bind
 import play.api.libs.json.{Json, OFormat}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import queries.SubbieResourceRefQuery
 import repositories.SessionRepository
-import services.SubcontractorService
-import uk.gov.hmrc.http.HeaderCarrier
 import views.html.add.SubcontractorNameView
 
 import scala.concurrent.Future
@@ -88,27 +85,13 @@ class SubcontractorNameControllerSpec extends SpecBase with MockitoSugar {
 
     "must redirect to the SubAddressYesNo page when valid data is submitted" in {
 
-      val mockSessionRepository    = mock[SessionRepository]
-      val mockSubcontractorService = mock[SubcontractorService]
-
-      val mockUserAnswers = emptyUserAnswers
-        .set(SubbieResourceRefQuery, 2)
-        .success
-        .value
-
+      val mockSessionRepository = mock[SessionRepository]
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
-      when(mockSubcontractorService.ensureSubcontractorInUserAnswers(any[UserAnswers])(any[HeaderCarrier])).thenReturn(
-        Future
-          .successful(mockUserAnswers)
-      )
-      when(mockSubcontractorService.updateSubcontractor(any[UserAnswers])(any[HeaderCarrier]))
-        .thenReturn(Future.successful(()))
 
       val application =
         applicationBuilder(userAnswers = Some(emptyUserAnswers))
           .overrides(
-            bind[SessionRepository].toInstance(mockSessionRepository),
-            bind[SubcontractorService].toInstance(mockSubcontractorService)
+            bind[SessionRepository].toInstance(mockSessionRepository)
           )
           .build()
 
@@ -128,10 +111,6 @@ class SubcontractorNameControllerSpec extends SpecBase with MockitoSugar {
           .onPageLoad(NormalMode)
           .url
       }
-
-      verify(mockSubcontractorService).ensureSubcontractorInUserAnswers(any[UserAnswers])(any[HeaderCarrier])
-      verify(mockSubcontractorService).updateSubcontractor(any[UserAnswers])(any[HeaderCarrier])
-      verifyNoMoreInteractions(mockSubcontractorService)
     }
 
     "must return a Bad Request and errors when invalid data is submitted" in {
