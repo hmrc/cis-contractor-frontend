@@ -23,8 +23,7 @@ import models.{NormalMode, UserAnswers}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.add.SubPartnershipNamePage
-import pages.add.partnership.PartnershipHasUtrYesNoPage
+import pages.add.partnership.{PartnershipHasUtrYesNoPage, PartnershipNamePage}
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
@@ -46,7 +45,7 @@ class PartnershipHasUtrYesNoControllerSpec extends SpecBase with MockitoSugar {
     controllers.add.partnership.routes.PartnershipHasUtrYesNoController.onSubmit(NormalMode).url
 
   private def uaWithName: UserAnswers =
-    emptyUserAnswers.set(SubPartnershipNamePage, partnershipName).success.value
+    emptyUserAnswers.set(PartnershipNamePage, partnershipName).success.value
 
   "partnershipHasUtrYesNo Controller" - {
 

@@ -20,8 +20,7 @@ import controllers.actions.*
 import forms.add.partnership.PartnershipHasUtrYesNoFormProvider
 import models.Mode
 import navigation.Navigator
-import pages.add.SubPartnershipNamePage
-import pages.add.partnership.PartnershipHasUtrYesNoPage
+import pages.add.partnership.{PartnershipHasUtrYesNoPage, PartnershipNamePage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
@@ -50,7 +49,7 @@ class PartnershipHasUtrYesNoController @Inject()(
   def onPageLoad(mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData) { implicit request =>
       request.userAnswers
-        .get(SubPartnershipNamePage)
+        .get(PartnershipNamePage)
         .map { partnershipName =>
           val preparedForm = request.userAnswers.get(PartnershipHasUtrYesNoPage) match {
             case None        => form
@@ -64,7 +63,7 @@ class PartnershipHasUtrYesNoController @Inject()(
   def onSubmit(mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
       request.userAnswers
-        .get(SubPartnershipNamePage)
+        .get(PartnershipNamePage)
         .map { name =>
           form
             .bindFromRequest()
