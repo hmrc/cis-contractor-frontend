@@ -97,7 +97,9 @@ class UniqueTaxpayerReferenceYesNoControllerSpec extends SpecBase with MockitoSu
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.add.routes.SubcontractorsUniqueTaxpayerReferenceController.onPageLoad(NormalMode).url
+        redirectLocation(result).value mustEqual controllers.add.routes.SubcontractorsUniqueTaxpayerReferenceController
+          .onPageLoad(NormalMode)
+          .url
       }
     }
 
@@ -122,7 +124,9 @@ class UniqueTaxpayerReferenceYesNoControllerSpec extends SpecBase with MockitoSu
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.add.routes.WorksReferenceNumberYesNoController.onPageLoad(NormalMode).url
+        redirectLocation(result).value mustEqual controllers.add.routes.WorksReferenceNumberYesNoController
+          .onPageLoad(NormalMode)
+          .url
       }
     }
 

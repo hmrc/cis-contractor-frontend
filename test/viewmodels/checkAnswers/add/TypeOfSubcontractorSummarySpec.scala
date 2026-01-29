@@ -48,7 +48,7 @@ class TypeOfSubcontractorSummarySpec extends AnyFreeSpec with Matchers {
 
       row.key.content.asHtml.toString should include(messages("typeOfSubcontractor.checkYourAnswersLabel"))
 
-      val expectedValue = messages("typeOfSubcontractor.limitedCompany")
+      val expectedValue = messages("typeOfSubcontractor.company")
       row.value.content.asHtml.toString should include(expectedValue)
 
       row.actions shouldBe defined
@@ -56,8 +56,8 @@ class TypeOfSubcontractorSummarySpec extends AnyFreeSpec with Matchers {
       actions should have size 1
 
       val changeAction = actions.head
-      changeAction.content.asHtml.toString should include(messages("site.change"))
-      changeAction.href shouldBe routes.TypeOfSubcontractorController.onPageLoad(CheckMode).url
+      changeAction.content.asHtml.toString    should include(messages("site.change"))
+      changeAction.href                     shouldBe routes.TypeOfSubcontractorController.onPageLoad(CheckMode).url
       changeAction.visuallyHiddenText.value shouldBe messages("typeOfSubcontractor.change.hidden")
     }
 

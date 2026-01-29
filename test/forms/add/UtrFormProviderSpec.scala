@@ -21,10 +21,11 @@ import org.scalacheck.Gen
 import play.api.data.{Form, FormError}
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.freespec.AnyFreeSpec
+import utils.UTRGenerator
 
 class UtrFormProviderSpec extends AnyFreeSpec with Matchers with StringFieldBehaviours {
 
-  def validUtrGenerator: Gen[String] = Gen.listOfN(10, Gen.choose(0, 9)).map(_.mkString)
+  def validUtrGenerator: Gen[String] = Gen.const(UTRGenerator.randomUTR())
 
   val requiredKey = "subcontractorsUniqueTaxpayerReference.error.required"
   val invalidKey  = "subcontractorsUniqueTaxpayerReference.error.invalid"

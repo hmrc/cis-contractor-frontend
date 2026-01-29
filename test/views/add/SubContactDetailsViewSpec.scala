@@ -35,7 +35,7 @@ class SubContactDetailsViewSpec extends AnyWordSpec with Matchers with GuiceOneA
 
     "render the page with title, heading, two input fields and submit button" in new Setup {
       val html: HtmlFormat.Appendable = view(form, NormalMode)
-      val doc = Jsoup.parse(html.toString())
+      val doc                         = Jsoup.parse(html.toString())
 
       doc.select("title").text() must include(messages("subContactDetails.title"))
 
@@ -61,7 +61,7 @@ class SubContactDetailsViewSpec extends AnyWordSpec with Matchers with GuiceOneA
         .withError("telephone", "subcontractorName.error.telephone.required")
 
       val html = view(errorForm, NormalMode)
-      val doc = Jsoup.parse(html.toString())
+      val doc  = Jsoup.parse(html.toString())
 
       val summary = doc.select(".govuk-error-summary")
       summary.text() must include(messages("subContactDetails.error.email.required"))
@@ -70,17 +70,17 @@ class SubContactDetailsViewSpec extends AnyWordSpec with Matchers with GuiceOneA
       summary.select("a[href=#email]").size() mustBe 1
       summary.select("a[href=#telephone]").size() mustBe 1
 
-      doc.select("#email-error").text() must include(messages("subContactDetails.error.email.required"))
+      doc.select("#email-error").text()     must include(messages("subContactDetails.error.email.required"))
       doc.select("#telephone-error").text() must include(messages("subcontractorName.error.telephone.required"))
     }
   }
 
   trait Setup {
     val formProvider: SubContactDetailsFormProvider = new SubContactDetailsFormProvider()
-    val form: Form[_] = formProvider()
+    val form: Form[_]                               = formProvider()
 
     implicit val request: Request[_] = FakeRequest()
-    implicit val messages: Messages =
+    implicit val messages: Messages  =
       play.api.i18n.MessagesImpl(
         play.api.i18n.Lang.defaultLang,
         app.injector.instanceOf[play.api.i18n.MessagesApi]

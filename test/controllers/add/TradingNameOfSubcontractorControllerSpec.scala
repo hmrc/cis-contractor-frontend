@@ -21,13 +21,16 @@ import controllers.routes
 import forms.add.TradingNameOfSubcontractorFormProvider
 import models.{NormalMode, UserAnswers}
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.when
+import org.mockito.Mockito.{verify, verifyNoMoreInteractions, when}
 import org.scalatestplus.mockito.MockitoSugar
 import pages.add.TradingNameOfSubcontractorPage
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
+import queries.SubbieResourceRefQuery
 import repositories.SessionRepository
+import services.SubcontractorService
+import uk.gov.hmrc.http.HeaderCarrier
 import views.html.add.TradingNameOfSubcontractorView
 
 import scala.concurrent.Future
@@ -36,9 +39,10 @@ import scala.util.Random
 class TradingNameOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
 
   val formProvider = new TradingNameOfSubcontractorFormProvider()
-  val form         = formProvider()
+  private val form = formProvider()
 
-  lazy val nameOfSubcontractorRoute = controllers.add.routes.TradingNameOfSubcontractorController.onPageLoad(NormalMode).url
+  private lazy val nameOfSubcontractorRoute =
+    controllers.add.routes.TradingNameOfSubcontractorController.onPageLoad(NormalMode).url
 
   "NameOfSubcontractor Controller" - {
 
@@ -78,14 +82,29 @@ class TradingNameOfSubcontractorControllerSpec extends SpecBase with MockitoSuga
 
     "must redirect to the SubAddressYesNo page when valid data is submitted" in {
 
-      val mockSessionRepository = mock[SessionRepository]
+      val mockSessionRepository    = mock[SessionRepository]
+      val mockSubcontractorService = mock[SubcontractorService]
+
+      val mockUserAnswers = emptyUserAnswers
+        .set(SubbieResourceRefQuery, 2)
+        .success
+        .value
 
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+      when(mockSubcontractorService.ensureSubcontractorInUserAnswers(any[UserAnswers])(any[HeaderCarrier])).thenReturn(
+        Future
+          .successful(mockUserAnswers)
+      )
+      when(mockSubcontractorService.updateSubcontractor(any[UserAnswers])(any[HeaderCarrier])).thenReturn(
+        Future
+          .successful(())
+      )
 
       val application =
         applicationBuilder(userAnswers = Some(emptyUserAnswers))
           .overrides(
-            bind[SessionRepository].toInstance(mockSessionRepository)
+            bind[SessionRepository].toInstance(mockSessionRepository),
+            bind[SubcontractorService].toInstance(mockSubcontractorService)
           )
           .build()
 
@@ -101,6 +120,10 @@ class TradingNameOfSubcontractorControllerSpec extends SpecBase with MockitoSuga
           .onPageLoad(NormalMode)
           .url
       }
+
+      verify(mockSubcontractorService).ensureSubcontractorInUserAnswers(any[UserAnswers])(any[HeaderCarrier])
+      verify(mockSubcontractorService).updateSubcontractor(any[UserAnswers])(any[HeaderCarrier])
+      verifyNoMoreInteractions(mockSubcontractorService)
     }
 
     "must return a Bad Request and errors when invalid data is submitted" in {

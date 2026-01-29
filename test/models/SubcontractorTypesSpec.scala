@@ -33,10 +33,8 @@ class SubcontractorTypesSpec extends AnyFreeSpec with Matchers with ScalaCheckPr
 
       val gen = Gen.oneOf(TypeOfSubcontractor.values.toSeq)
 
-      forAll(gen) {
-        subcontractorTypes =>
-
-          JsString(subcontractorTypes.toString).validate[TypeOfSubcontractor].asOpt.value mustEqual subcontractorTypes
+      forAll(gen) { subcontractorTypes =>
+        JsString(subcontractorTypes.toString).validate[TypeOfSubcontractor].asOpt.value mustEqual subcontractorTypes
       }
     }
 
@@ -44,10 +42,8 @@ class SubcontractorTypesSpec extends AnyFreeSpec with Matchers with ScalaCheckPr
 
       val gen = arbitrary[String] suchThat (!TypeOfSubcontractor.values.map(_.toString).contains(_))
 
-      forAll(gen) {
-        invalidValue =>
-
-          JsString(invalidValue).validate[TypeOfSubcontractor] mustEqual JsError("error.invalid")
+      forAll(gen) { invalidValue =>
+        JsString(invalidValue).validate[TypeOfSubcontractor] mustEqual JsError("error.invalid")
       }
     }
 
@@ -55,10 +51,8 @@ class SubcontractorTypesSpec extends AnyFreeSpec with Matchers with ScalaCheckPr
 
       val gen = Gen.oneOf(TypeOfSubcontractor.values.toSeq)
 
-      forAll(gen) {
-        subcontractorTypes =>
-
-          Json.toJson(subcontractorTypes) mustEqual JsString(subcontractorTypes.toString)
+      forAll(gen) { subcontractorTypes =>
+        Json.toJson(subcontractorTypes) mustEqual JsString(subcontractorTypes.toString)
       }
     }
   }

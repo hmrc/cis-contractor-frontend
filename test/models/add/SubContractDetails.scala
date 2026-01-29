@@ -24,14 +24,14 @@ class SubContractDetails extends SpecBase {
   "SubContractDetails" - {
     "serialise to JSON correctly" in {
       val subContactDetails = SubContactDetails("user@domain.com", "07777777777")
-      val json = Json.toJson(subContactDetails)
+      val json              = Json.toJson(subContactDetails)
 
       (json \ "email").as[String] mustBe "user@domain.com"
       (json \ "telephone").as[String] mustBe "07777777777"
     }
 
     "deserialize from JSON correctly" in {
-      val json = Json.parse(
+      val json   = Json.parse(
         """
           |{
           |  "email": "user@domain.com",
@@ -46,8 +46,8 @@ class SubContractDetails extends SpecBase {
 
     "round-trip serialize and deserialize correctly" in {
       val subContactDetails = SubContactDetails("user@domain.com", "07777777777")
-      val json = Json.toJson(subContactDetails)
-      val result = json.as[SubContactDetails]
+      val json              = Json.toJson(subContactDetails)
+      val result            = json.as[SubContactDetails]
       result mustBe subContactDetails
     }
   }

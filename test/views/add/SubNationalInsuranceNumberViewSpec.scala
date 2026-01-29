@@ -28,13 +28,13 @@ import play.api.test.FakeRequest
 import play.twirl.api.HtmlFormat
 import views.html.add.SubNationalInsuranceNumberView
 
-class SubNationalInsuranceNumberViewSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite  {
+class SubNationalInsuranceNumberViewSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite {
 
   "SubNationalInsuranceNumberView" should {
 
     "render the page with title, heading, input and submit button" in new Setup {
       val html: HtmlFormat.Appendable = view(form, NormalMode)
-      val doc = org.jsoup.Jsoup.parse(html.toString())
+      val doc                         = org.jsoup.Jsoup.parse(html.toString())
 
       doc.select("title").text() must include(messages("subNationalInsuranceNumber.title"))
 
@@ -55,7 +55,7 @@ class SubNationalInsuranceNumberViewSpec extends AnyWordSpec with Matchers with 
         form.withError("value", "subNationalInsuranceNumber.error.required")
 
       val html = view(errorForm, NormalMode)
-      val doc = org.jsoup.Jsoup.parse(html.toString())
+      val doc  = org.jsoup.Jsoup.parse(html.toString())
 
       val summary = doc.select(".govuk-error-summary")
       summary.text() must include(messages("subNationalInsuranceNumber.error.required"))
@@ -68,11 +68,11 @@ class SubNationalInsuranceNumberViewSpec extends AnyWordSpec with Matchers with 
   }
 
   trait Setup {
-    val formProvider = new SubNationalInsuranceNumberFormProvider()
+    val formProvider       = new SubNationalInsuranceNumberFormProvider()
     val form: Form[String] = formProvider()
 
     implicit val request: Request[_] = FakeRequest()
-    implicit val messages: Messages =
+    implicit val messages: Messages  =
       play.api.i18n.MessagesImpl(
         play.api.i18n.Lang.defaultLang,
         app.injector.instanceOf[play.api.i18n.MessagesApi]

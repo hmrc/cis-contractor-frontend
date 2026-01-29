@@ -27,7 +27,6 @@ import play.api.i18n.Messages
 import play.api.test.Helpers.stubMessages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.*
 
-
 class WorksReferenceNumberYesNoSummarySpec extends AnyFreeSpec with Matchers {
   implicit val messages: Messages = stubMessages()
 
@@ -55,13 +54,13 @@ class WorksReferenceNumberYesNoSummarySpec extends AnyFreeSpec with Matchers {
       val actions = row.actions.value.items
       actions should have size 1
 
-      val changeAction = actions.head
+      val changeAction       = actions.head
       val expectedChangeText = messages("site.change")
-      val expectedHref = routes.WorksReferenceNumberYesNoController.onPageLoad(CheckMode).url
+      val expectedHref       = routes.WorksReferenceNumberYesNoController.onPageLoad(CheckMode).url
       val expectedHiddenText = messages("worksReferenceNumberYesNo.change.hidden")
 
-      changeAction.content.asHtml.toString should include(expectedChangeText)
-      changeAction.href shouldBe expectedHref
+      changeAction.content.asHtml.toString    should include(expectedChangeText)
+      changeAction.href                     shouldBe expectedHref
       changeAction.visuallyHiddenText.value shouldBe expectedHiddenText
     }
 
@@ -74,7 +73,7 @@ class WorksReferenceNumberYesNoSummarySpec extends AnyFreeSpec with Matchers {
       val maybeRow: Option[SummaryListRow] = WorksReferenceNumberYesNoSummary.row(answers)
       maybeRow shouldBe defined
 
-      val row = maybeRow.value
+      val row           = maybeRow.value
       val expectedValue = messages("site.no")
       row.value.content.asHtml.toString should include(expectedValue)
     }

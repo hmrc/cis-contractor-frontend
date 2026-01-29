@@ -46,12 +46,14 @@ class TypeOfSubcontractorViewSpec extends AnyWordSpec with Matchers with GuiceOn
       radios.size() mustBe TypeOfSubcontractor.options.size
 
       val labels = doc.select(".govuk-radios__label").eachText()
-      labels must contain(messages("typeOfSubcontractor.individualOrSoleTrader"))
-      labels must contain(messages("typeOfSubcontractor.limitedCompany"))
+      labels must contain(messages("typeOfSubcontractor.soletrader"))
+      labels must contain(messages("typeOfSubcontractor.company"))
       labels must contain(messages("typeOfSubcontractor.partnership"))
       labels must contain(messages("typeOfSubcontractor.trust"))
 
-      doc.select("form").attr("action") mustBe controllers.add.routes.TypeOfSubcontractorController.onSubmit(NormalMode).url
+      doc.select("form").attr("action") mustBe controllers.add.routes.TypeOfSubcontractorController
+        .onSubmit(NormalMode)
+        .url
 
       doc.select("form").attr("autocomplete") mustBe "off"
 
@@ -76,7 +78,7 @@ class TypeOfSubcontractorViewSpec extends AnyWordSpec with Matchers with GuiceOn
   }
 
   trait Setup {
-    val formProvider                   = new TypeOfSubcontractorFormProvider()
+    val formProvider                    = new TypeOfSubcontractorFormProvider()
     val form: Form[TypeOfSubcontractor] = formProvider()
 
     implicit val request: Request[_] = FakeRequest()

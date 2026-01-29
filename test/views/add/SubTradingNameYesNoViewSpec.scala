@@ -49,7 +49,9 @@ class SubTradingNameYesNoViewSpec extends AnyWordSpec with Matchers with GuiceOn
       radioButtons.get(0).text mustBe "Yes"
       radioButtons.get(1).text mustBe "No"
 
-      doc.select("form").attr("action") mustBe controllers.add.routes.SubTradingNameYesNoController.onSubmit(NormalMode).url
+      doc.select("form").attr("action") mustBe controllers.add.routes.SubTradingNameYesNoController
+        .onSubmit(NormalMode)
+        .url
 
       doc.select("form").attr("autocomplete") mustBe "off"
 
@@ -74,7 +76,7 @@ class SubTradingNameYesNoViewSpec extends AnyWordSpec with Matchers with GuiceOn
   }
 
   trait Setup {
-    val formProvider                   = new SubTradingNameYesNoFormProvider()
+    val formProvider        = new SubTradingNameYesNoFormProvider()
     val form: Form[Boolean] = formProvider()
 
     implicit val request: Request[_] = FakeRequest()
