@@ -36,7 +36,7 @@ class TradingNameOfSubcontractorSummarySpec extends AnyFreeSpec with Matchers {
     "must return a SummaryListRow when the answer exists" in {
       val answers =
         UserAnswers("test-id")
-          .set(TradingNameOfSubcontractorPage, "Acme Ltd")
+          .set(TradingNameOfSubcontractorPage, "O'Reilly & Co <UK>")
           .success
           .value
 
@@ -48,7 +48,7 @@ class TradingNameOfSubcontractorSummarySpec extends AnyFreeSpec with Matchers {
       val expectedKeyText = messages("tradingNameOfSubcontractor.checkYourAnswersLabel")
       row.key.content.asHtml.toString should include(expectedKeyText)
 
-      row.value.content.asHtml.toString should include("Acme Ltd")
+      row.value.content.asHtml.toString should include("O&#x27;Reilly &amp; Co &lt;UK&gt;")
 
       row.actions shouldBe defined
       val actions = row.actions.value.items

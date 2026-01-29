@@ -156,14 +156,18 @@ class SubcontractorsUniqueTaxpayerReferenceControllerSpec extends SpecBase with 
 
         val boundForm = form.bind(Map("value" -> duplicatedUTR))
 
-        val formWithDuplicateError = boundForm.withError("value", "subcontractorsUniqueTaxpayerReference.error.duplicate")
+        val formWithDuplicateError =
+          boundForm.withError("value", "subcontractorsUniqueTaxpayerReference.error.duplicate")
 
         val view = application.injector.instanceOf[SubcontractorsUniqueTaxpayerReferenceView]
 
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(formWithDuplicateError, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(formWithDuplicateError, NormalMode)(
+          request,
+          messages(application)
+        ).toString
       }
 
       verify(mockSubcontractorService).isDuplicateUTR(any[UserAnswers], any[String])(any[HeaderCarrier])

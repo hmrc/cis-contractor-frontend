@@ -19,7 +19,7 @@ package models.subcontractor
 import play.api.libs.json.{Json, OFormat}
 
 final case class GetSubcontractorUTRsResponse(
-  subcontractorUTRs: Seq[String],
+  subcontractorUTRs: Seq[String]
 )
 
 object GetSubcontractorUTRsResponse {
