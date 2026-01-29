@@ -50,6 +50,10 @@ class Navigator @Inject() () {
     case SubcontractorContactDetailsYesNoPage      =>
       userAnswers => navigatorFromSubcontractorContactDetailsYesNoPage(NormalMode)(userAnswers)
     case SubContactDetailsPage                     => _ => controllers.add.routes.CheckYourAnswersController.onPageLoad()
+    case PartnershipUniqueTaxpayerReferencePage    =>
+      _ =>
+        routes.JourneyRecoveryController
+          .onPageLoad() // TODO: https://confluence.tools.tax.service.gov.uk/display/RBD/SL0205-H%28PTN%29+-+Works+Ref
     case _                                         => _ => routes.IndexController.onPageLoad()
   }
 
@@ -81,8 +85,8 @@ class Navigator @Inject() () {
     (userAnswers.get(TypeOfSubcontractorPage), mode) match {
       case (Some(Individualorsoletrader), NormalMode) =>
         controllers.add.routes.SubTradingNameYesNoController.onPageLoad(NormalMode)
-      case (Some(Partnership), NormalMode) =>
-        controllers.add.routes.SubcontractorsUniqueTaxpayerReferenceController.onPageLoad(NormalMode)
+      case (Some(Partnership), NormalMode)            =>
+        controllers.add.routes.PartnershipUniqueTaxpayerReferenceController.onPageLoad()
       case (None, _)                                  => routes.JourneyRecoveryController.onPageLoad()
       case (_, NormalMode)                            => routes.JourneyRecoveryController.onPageLoad()
       case (_, CheckMode)                             => controllers.add.routes.CheckYourAnswersController.onPageLoad()

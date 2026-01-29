@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,18 +20,18 @@ import controllers.actions.*
 import forms.add.UtrFormProvider
 import models.Mode
 import navigation.Navigator
-import pages.add.SubcontractorsUniqueTaxpayerReferencePage
+import pages.add.PartnershipUniqueTaxpayerReferencePage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
 import services.SubcontractorService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.add.SubcontractorsUniqueTaxpayerReferenceView
+import views.html.add.PartnershipUniqueTaxpayerReferenceView
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class SubcontractorsUniqueTaxpayerReferenceController @Inject() (
+class PartnershipUniqueTaxpayerReferenceController @Inject() (
   override val messagesApi: MessagesApi,
   sessionRepository: SessionRepository,
   navigator: Navigator,
@@ -41,7 +41,7 @@ class SubcontractorsUniqueTaxpayerReferenceController @Inject() (
   formProvider: UtrFormProvider,
   subcontractorService: SubcontractorService,
   val controllerComponents: MessagesControllerComponents,
-  view: SubcontractorsUniqueTaxpayerReferenceView
+  view: PartnershipUniqueTaxpayerReferenceView
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport {
@@ -50,7 +50,7 @@ class SubcontractorsUniqueTaxpayerReferenceController @Inject() (
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
 
-    val preparedForm = request.userAnswers.get(SubcontractorsUniqueTaxpayerReferencePage) match {
+    val preparedForm = request.userAnswers.get(PartnershipUniqueTaxpayerReferencePage) match {
       case None        => form
       case Some(value) => form.fill(value)
     }
@@ -71,7 +71,7 @@ class SubcontractorsUniqueTaxpayerReferenceController @Inject() (
                   .fill(value)
                   .withError(
                     key = "value",
-                    message = "subcontractorsUniqueTaxpayerReference.error.duplicate"
+                    message = "partnershipUniqueTaxpayerReference.error.duplicate"
                   )
                 Future.successful(
                   BadRequest(view(errorForm, mode))
@@ -80,9 +80,9 @@ class SubcontractorsUniqueTaxpayerReferenceController @Inject() (
               case false =>
                 for {
                   updatedAnswers <-
-                    Future.fromTry(request.userAnswers.set(SubcontractorsUniqueTaxpayerReferencePage, value))
+                    Future.fromTry(request.userAnswers.set(PartnershipUniqueTaxpayerReferencePage, value))
                   _              <- sessionRepository.set(updatedAnswers)
-                } yield Redirect(navigator.nextPage(SubcontractorsUniqueTaxpayerReferencePage, mode, updatedAnswers))
+                } yield Redirect(navigator.nextPage(PartnershipUniqueTaxpayerReferencePage, mode, updatedAnswers))
             }
         )
   }
