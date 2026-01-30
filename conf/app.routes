@@ -103,3 +103,8 @@ GET        /add/partnership-name                         controllers.add.partner
 POST       /add/partnership-name                         controllers.add.partnership.PartnershipNameController.onSubmit(mode: Mode = NormalMode)
 GET        /add/change-partnership-name                  controllers.add.partnership.PartnershipNameController.onPageLoad(mode: Mode = CheckMode)
 POST       /add/change-partnership-name                  controllers.add.partnership.PartnershipNameController.onSubmit(mode: Mode = CheckMode)
+
+GET        /add/partnership/partnership-has-utr                         controllers.add.partnership.PartnershipHasUtrYesNoController.onPageLoad(mode: Mode = NormalMode)
+POST       /add/partnership/partnership-has-utr                         controllers.add.partnership.PartnershipHasUtrYesNoController.onSubmit(mode: Mode = NormalMode)
+GET        /add/partnership/change-partnership-has-utr                  controllers.add.partnership.PartnershipHasUtrYesNoController.onPageLoad(mode: Mode = CheckMode)
+POST       /add/partnership/change-partnership-has-utr                  controllers.add.partnership.PartnershipHasUtrYesNoController.onSubmit(mode: Mode = CheckMode)

@@ -16,13 +16,16 @@
 
 package pages.add.partnership
 
-import pages.QuestionPage
-import play.api.libs.json.JsPath
+import pages.behaviours.PageBehaviours
 
-case object PartnershipNamePage extends QuestionPage[String] {
+class PartnershipHasUtrYesNoPageSpec extends PageBehaviours {
 
-  override def path: JsPath = JsPath \ toString
+  "PartnershipHasUtrYesNoPage" - {
 
-  override def toString: String = "partnershipName"
+    beRetrievable[Boolean](PartnershipHasUtrYesNoPage)
 
+    beSettable[Boolean](PartnershipHasUtrYesNoPage)
+
+    beRemovable[Boolean](PartnershipHasUtrYesNoPage)
+  }
 }
