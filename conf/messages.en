@@ -267,7 +267,7 @@ partnershipWorksReferenceNumber.change.hidden = partnership works reference
 
 partnershipUniqueTaxpayerReference.title = Partnership Unique Taxpayer Reference (UTR)
 partnershipUniqueTaxpayerReference.heading = Partnership Unique Taxpayer Reference (UTR)
-partnershipUniqueTaxpayerReference.paragraph = The UTR will be on tax returns and other documents from HMRC. It might be called 'reference', 'UTR', or 'official use'.
+partnershipUniqueTaxpayerReference.paragraph = The UTR will be on tax returns and other documents from HMRC. It might be called ‘reference’, ‘UTR’, or ‘official use’.
 partnershipUniqueTaxpayerReference.linkText = Get more help to find a UTR (opens in new tab)
 partnershipUniqueTaxpayerReference.heading2 = What is the UTR for {0}?
 partnershipUniqueTaxpayerReference.hint = A UTR is a 10 digit number
