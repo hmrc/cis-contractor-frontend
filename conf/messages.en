@@ -256,6 +256,14 @@ checkYourAnswers.warning = You must verify this subcontractor with HMRC before m
 checkYourAnswers.p1 = By adding this subcontractor you are confirming that, to the best of your knowledge, the details you are providing are correct.
 checkYourAnswers.addSubcontractor = Add subcontractor
 
+partnershipWorksReferenceNumber.title = What is the works reference number for this partnership
+partnershipWorksReferenceNumber.heading = What is the works reference number for {0}?
+partnershipWorksReferenceNumber.hint = This is unique to the construction work or project. You may have received it from the contractor
+partnershipWorksReferenceNumber.checkYourAnswersLabel = Partnership works reference
+partnershipWorksReferenceNumber.error.required = Enter a works reference number
+partnershipWorksReferenceNumber.error.invalid = Enter a valid works reference number
+partnershipWorksReferenceNumber.error.length = Enter a works reference number less or equal to 20 characters
+partnershipWorksReferenceNumber.change.hidden = partnership works reference
 
 
 partnershipHasUtrYesNo.title = Does this partnership have a Unique Taxpayer Reference (UTR)?
