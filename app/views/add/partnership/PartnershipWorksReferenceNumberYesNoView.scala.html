@@ -24,7 +24,7 @@
 
 @(form: Form[_], mode: Mode, name: String)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = title(form, messages("partnershipWorksReferenceNumberYesNo.title", name))) {
+@layout(pageTitle = title(form, messages("partnershipWorksReferenceNumberYesNo.title"))) {
 
     @formHelper(action = controllers.add.partnership.routes.PartnershipWorksReferenceNumberYesNoController.onSubmit(mode), Symbol("autoComplete") -> "off") {
 
