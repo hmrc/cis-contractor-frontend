@@ -256,29 +256,6 @@ checkYourAnswers.warning = You must verify this subcontractor with HMRC before m
 checkYourAnswers.p1 = By adding this subcontractor you are confirming that, to the best of your knowledge, the details you are providing are correct.
 checkYourAnswers.addSubcontractor = Add subcontractor
 
-
-
-sampleContract.title = sampleContract
-sampleContract.heading = sampleContract
-sampleContract.checkYourAnswersLabel = sampleContract
-sampleContract.error.required = Enter the contract name
-sampleContract.error.length = sampleContract must be 15 characters or less
-sampleContract.change.hidden = sampleContract
-
-sampleSubContract.title = sampleSubContract
-sampleSubContract.heading = sampleSubContract
-sampleSubContract.checkYourAnswersLabel = sampleSubContract
-sampleSubContract.error.required = Select yes if sampleSubContract
-sampleSubContract.change.hidden = sampleSubContract
-
-sampleContractRadioButtonPage.title = SampleRadioButton
-sampleContractRadioButtonPage.heading = SampleRadioButton
-sampleContractRadioButtonPage.uK = EU
-sampleContractRadioButtonPage.india = Option 2
-sampleContractRadioButtonPage.checkYourAnswersLabel = SampleRadioButton
-sampleContractRadioButtonPage.error.required = Select sampleContractRadioButtonPage
-sampleContractRadioButtonPage.change.hidden = SampleContractRadioButtonPage
-
 partnershipWorksReferenceNumber.title = What is the works reference number for this partnership - Construction Industry Scheme - GOV.UK
 partnershipWorksReferenceNumber.heading = What is the works reference number for {0}?
 partnershipWorksReferenceNumber.hint = This is unique to the construction work or project. You may have received it from the contractor
@@ -286,4 +263,4 @@ partnershipWorksReferenceNumber.checkYourAnswersLabel = Partnership works refere
 partnershipWorksReferenceNumber.error.required = Enter a works reference number
 partnershipWorksReferenceNumber.error.invalid = Enter a valid works reference number
 partnershipWorksReferenceNumber.error.length = Enter a works reference number less or equal to 20 characters
-partnershipWorksReferenceNumber.change.hidden = Partnership works reference
+partnershipWorksReferenceNumber.change.hidden = partnership works reference

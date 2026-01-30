@@ -20,7 +20,7 @@ import controllers.actions.*
 import forms.add.partnership.PartnershipWorksReferenceNumberFormProvider
 import models.Mode
 import navigation.Navigator
-import pages.add.partnership.{PartnershipWorksReferenceNumberPage, SubPartnershipNamePage}
+import pages.add.partnership.{PartnershipNamePage, PartnershipWorksReferenceNumberPage}
 import play.api.i18n.Lang.logger
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -31,53 +31,55 @@ import views.html.add.partnership.PartnershipWorksReferenceNumberView
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class PartnershipWorksReferenceNumberController @Inject()(
-                                                           override val messagesApi: MessagesApi,
-                                                           sessionRepository: SessionRepository,
-                                                           navigator: Navigator,
-                                                           identify: IdentifierAction,
-                                                           getData: DataRetrievalAction,
-                                                           requireData: DataRequiredAction,
-                                                           formProvider: PartnershipWorksReferenceNumberFormProvider,
-                                                           val controllerComponents: MessagesControllerComponents,
-                                                           view: PartnershipWorksReferenceNumberView
-                                    )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+class PartnershipWorksReferenceNumberController @Inject() (
+  override val messagesApi: MessagesApi,
+  sessionRepository: SessionRepository,
+  navigator: Navigator,
+  identify: IdentifierAction,
+  getData: DataRetrievalAction,
+  requireData: DataRequiredAction,
+  formProvider: PartnershipWorksReferenceNumberFormProvider,
+  val controllerComponents: MessagesControllerComponents,
+  view: PartnershipWorksReferenceNumberView
+)(implicit ec: ExecutionContext)
+    extends FrontendBaseController
+    with I18nSupport {
 
   val form = formProvider()
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) {
-    implicit request =>
+  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
 
-      logger.info(s"USER ANSWERS JSON = ${request.userAnswers.data}")
-      
-      request.userAnswers
-        .get(SubPartnershipNamePage)
-        .map { partnershipName =>
-          val preparedForm = request.userAnswers.get(PartnershipWorksReferenceNumberPage) match {
-            case None => form
-            case Some(value) => form.fill(value)
-          }
-          Ok(view(preparedForm, mode, partnershipName))
+    logger.info(s"USER ANSWERS JSON = ${request.userAnswers.data}")
+
+    request.userAnswers
+      .get(PartnershipNamePage)
+      .map { partnershipName =>
+        val preparedForm = request.userAnswers.get(PartnershipWorksReferenceNumberPage) match {
+          case None        => form
+          case Some(value) => form.fill(value)
         }
-        .getOrElse(
-          Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-        )
+        Ok(view(preparedForm, mode, partnershipName))
+      }
+      .getOrElse(
+        Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+      )
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
       request.userAnswers
-        .get(SubPartnershipNamePage)
+        .get(PartnershipNamePage)
         .map { partnershipName =>
-          form.bindFromRequest().fold(
-            formWithErrors =>
-              Future.successful(BadRequest(view(formWithErrors, mode, partnershipName))),
-            value =>
-              for {
-                updatedAnswers <- Future.fromTry(request.userAnswers.set(PartnershipWorksReferenceNumberPage, value))
-                _ <- sessionRepository.set(updatedAnswers)
-              } yield Redirect(navigator.nextPage(PartnershipWorksReferenceNumberPage, mode, updatedAnswers))
-          )
+          form
+            .bindFromRequest()
+            .fold(
+              formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, partnershipName))),
+              value =>
+                for {
+                  updatedAnswers <- Future.fromTry(request.userAnswers.set(PartnershipWorksReferenceNumberPage, value))
+                  _              <- sessionRepository.set(updatedAnswers)
+                } yield Redirect(navigator.nextPage(PartnershipWorksReferenceNumberPage, mode, updatedAnswers))
+            )
         }
         .getOrElse(
           Future.successful(

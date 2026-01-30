@@ -25,24 +25,26 @@ class PartnershipWorksReferenceNumberFormProviderSpec extends StringFieldBehavio
 
   val requiredKey = "partnershipWorksReferenceNumber.error.required"
   val invalidKey  = "partnershipWorksReferenceNumber.error.invalid"
-  val lengthKey = "partnershipWorksReferenceNumber.error.length"
-  val maxLength = 20
+  val lengthKey   = "partnershipWorksReferenceNumber.error.length"
+  val maxLength   = 20
 
   val form: Form[String] = new PartnershipWorksReferenceNumberFormProvider()()
-  val fieldName = "value"
+  val fieldName          = "value"
   ".value" - {
 
     def worksReferenceNumbers: Gen[String] =
-      Gen.listOfN(maxLength,
-        Gen.oneOf(
-          ('A' to 'Z') ++
-            ('a' to 'z') ++
-            ('0' to '9') ++
-            Seq(' ', '~', '!', '@', '#', '$', '%', '&', '\'', '(', ')',
-              '*', '+', ',', '-', '.', '/', ':', ';', '=', '?',
-              '_', '{', '}', '£', '€')
+      Gen
+        .listOfN(
+          maxLength,
+          Gen.oneOf(
+            ('A' to 'Z') ++
+              ('a' to 'z') ++
+              ('0' to '9') ++
+              Seq(' ', '~', '!', '@', '#', '$', '%', '&', '\'', '(', ')', '*', '+', ',', '-', '.', '/', ':', ';', '=',
+                '?', '_', '{', '}', '£', '€')
+          )
         )
-      ).map(_.mkString)
+        .map(_.mkString)
 
     behave like fieldThatBindsValidData(
       form,
@@ -63,16 +65,16 @@ class PartnershipWorksReferenceNumberFormProviderSpec extends StringFieldBehavio
       requiredError = FormError(fieldName, requiredKey)
     )
   }
-    "trim leading and trailing spaces" in {
-      val result = form.bind(Map(fieldName -> "   ABC Ltd   "))
-      result.value.value mustBe "ABC Ltd"
-    }
+  "trim leading and trailing spaces" in {
+    val result = form.bind(Map(fieldName -> "   ABC Ltd   "))
+    result.value.value mustBe "ABC Ltd"
+  }
 
-    "reject invalid characters (backtick, pipe)" in {
-      val invalidSamples = Seq("Backtick ` here", "Pipe | symbol")
-      invalidSamples.foreach { value =>
-        val result = form.bind(Map(fieldName -> value))
-        result.errors.map(_.message) must contain(invalidKey)
-      }
+  "reject invalid characters (backtick, pipe)" in {
+    val invalidSamples = Seq("Backtick ` here", "Pipe | symbol")
+    invalidSamples.foreach { value =>
+      val result = form.bind(Map(fieldName -> value))
+      result.errors.map(_.message) must contain(invalidKey)
     }
+  }
 }

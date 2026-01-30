@@ -24,7 +24,7 @@ import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.add.partnership.{PartnershipWorksReferenceNumberPage, SubPartnershipNamePage}
+import pages.add.partnership.{PartnershipNamePage, PartnershipWorksReferenceNumberPage}
 import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
@@ -39,17 +39,18 @@ class PartnershipWorksReferenceNumberControllerSpec extends SpecBase with Mockit
   def onwardRoute = Call("GET", "/foo")
 
   val formProvider = new PartnershipWorksReferenceNumberFormProvider()
-  val form = formProvider()
+  val form         = formProvider()
 
   private val partnershipName = "Test Partnership"
 
   private def uaWithName: UserAnswers =
     emptyUserAnswers
-      .set(SubPartnershipNamePage, partnershipName)
+      .set(PartnershipNamePage, partnershipName)
       .success
       .value
 
-  lazy val partnershipWorksReferenceNumberRoute = controllers.add.partnership.routes.PartnershipWorksReferenceNumberController.onPageLoad(NormalMode).url
+  lazy val partnershipWorksReferenceNumberRoute =
+    controllers.add.partnership.routes.PartnershipWorksReferenceNumberController.onPageLoad(NormalMode).url
 
   "PartnershipWorksReferenceNumber Controller" - {
 
@@ -65,7 +66,10 @@ class PartnershipWorksReferenceNumberControllerSpec extends SpecBase with Mockit
         val view = application.injector.instanceOf[PartnershipWorksReferenceNumberView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode, partnershipName)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode, partnershipName)(
+          request,
+          messages(application)
+        ).toString
       }
     }
 
@@ -87,7 +91,10 @@ class PartnershipWorksReferenceNumberControllerSpec extends SpecBase with Mockit
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill("answer"), NormalMode, partnershipName)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill("answer"), NormalMode, partnershipName)(
+          request,
+          messages(application)
+        ).toString
       }
     }
 
@@ -133,7 +140,10 @@ class PartnershipWorksReferenceNumberControllerSpec extends SpecBase with Mockit
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode, partnershipName)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, NormalMode, partnershipName)(
+          request,
+          messages(application)
+        ).toString
       }
     }
 
@@ -159,6 +169,43 @@ class PartnershipWorksReferenceNumberControllerSpec extends SpecBase with Mockit
         val request =
           FakeRequest(POST, partnershipWorksReferenceNumberRoute)
             .withFormUrlEncodedBody(("value", "answer"))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must redirect to Journey Recovery for a GET when partnership name is missing (userAnswers present)" in {
+
+      val application =
+        applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+
+      running(application) {
+        val request = FakeRequest(GET, partnershipWorksReferenceNumberRoute)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must redirect to Journey Recovery for a POST when partnership name is missing (userAnswers present)" in {
+
+      val mockSessionRepository = mock[SessionRepository]
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+      val application =
+        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, partnershipWorksReferenceNumberRoute)
+            .withFormUrlEncodedBody("value" -> "answer")
 
         val result = route(application, request).value
 
