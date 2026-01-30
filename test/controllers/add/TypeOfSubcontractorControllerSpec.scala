@@ -132,7 +132,7 @@ class TypeOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must redirect to the PartnershipUniqueTaxpayerReference page when valid data Partnership is submitted" in {
+    "must redirect to the PartnershipHasUtrYesNo page when valid data Partnership is submitted" in {
 
       val mockSessionRepository = mock[SessionRepository]
 
