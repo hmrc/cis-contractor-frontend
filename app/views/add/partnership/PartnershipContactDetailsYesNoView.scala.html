@@ -36,7 +36,7 @@
             RadiosViewModel.yesNo(
                 field = form("value"),
                 legend = LegendViewModel(messages("partnershipContactDetailsYesNo.heading")).asPageHeading()
-            )
+            ).withHint(HintViewModel(messages("partnershipContactDetailsYesNo.hint")))
         )
 
         @govukButton(

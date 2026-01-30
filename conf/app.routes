@@ -109,7 +109,7 @@ POST       /add/partnership/partnership-has-utr                         controll
 GET        /add/partnership/change-partnership-has-utr                  controllers.add.partnership.PartnershipHasUtrYesNoController.onPageLoad(mode: Mode = CheckMode)
 POST       /add/partnership/change-partnership-has-utr                  controllers.add.partnership.PartnershipHasUtrYesNoController.onSubmit(mode: Mode = CheckMode)
 
-GET        /add/partnership/partnershipContactDetailsYesNo                        controllers.add.partnership.PartnershipContactDetailsYesNoController.onPageLoad(mode: Mode = NormalMode)
-POST       /add/partnership/partnershipContactDetailsYesNo                        controllers.add.partnership.PartnershipContactDetailsYesNoController.onSubmit(mode: Mode = NormalMode)
-GET        /add/partnership/changePartnershipContactDetailsYesNo                  controllers.add.partnership.PartnershipContactDetailsYesNoController.onPageLoad(mode: Mode = CheckMode)
-POST       /add/partnership/changePartnershipContactDetailsYesNo                  controllers.add.partnership.PartnershipContactDetailsYesNoController.onSubmit(mode: Mode = CheckMode)
+GET        /add/partnership/check-contact-details                           controllers.add.partnership.PartnershipContactDetailsYesNoController.onPageLoad(mode: Mode = NormalMode)
+POST       /add/partnership/check-contact-details                           controllers.add.partnership.PartnershipContactDetailsYesNoController.onSubmit(mode: Mode = NormalMode)
+GET        /add/partnership/change-check-contact-details                    controllers.add.partnership.PartnershipContactDetailsYesNoController.onPageLoad(mode: Mode = CheckMode)
+POST       /add/partnership/change-check-contact-details                    controllers.add.partnership.PartnershipContactDetailsYesNoController.onSubmit(mode: Mode = CheckMode)
