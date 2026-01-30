@@ -19,7 +19,7 @@ package viewmodels.checkAnswers.add
 import models.{CheckMode, UserAnswers}
 import pages.add.TradingNameOfSubcontractorPage
 import play.api.i18n.Messages
-import play.twirl.api.HtmlFormat
+import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
@@ -30,7 +30,7 @@ object TradingNameOfSubcontractorSummary {
     answers.get(TradingNameOfSubcontractorPage).map { answer =>
       SummaryListRowViewModel(
         key = "tradingNameOfSubcontractor.checkYourAnswersLabel",
-        value = ValueViewModel(HtmlFormat.escape(answer).toString),
+        value = ValueViewModel(Text(answer)),
         actions = Seq(
           ActionItemViewModel(
             "site.change",
