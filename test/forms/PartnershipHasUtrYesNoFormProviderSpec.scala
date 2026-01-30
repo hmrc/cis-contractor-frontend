@@ -23,7 +23,7 @@ import play.api.data.FormError
 class PartnershipHasUtrYesNoFormProviderSpec extends BooleanFieldBehaviours {
 
   val requiredKey = "partnershipHasUtrYesNo.error.required"
-  val invalidKey = "error.boolean"
+  val invalidKey  = "error.boolean"
 
   val form = new PartnershipHasUtrYesNoFormProvider()()
 

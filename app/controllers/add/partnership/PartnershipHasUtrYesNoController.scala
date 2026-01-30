@@ -30,16 +30,16 @@ import views.html.add.partnership.PartnershipHasUtrYesNoView
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class PartnershipHasUtrYesNoController @Inject()(
-                                                  override val messagesApi: MessagesApi,
-                                                  sessionRepository: SessionRepository,
-                                                  navigator: Navigator,
-                                                  identify: IdentifierAction,
-                                                  getData: DataRetrievalAction,
-                                                  requireData: DataRequiredAction,
-                                                  formProvider: PartnershipHasUtrYesNoFormProvider,
-                                                  val controllerComponents: MessagesControllerComponents,
-                                                  view: PartnershipHasUtrYesNoView
+class PartnershipHasUtrYesNoController @Inject() (
+  override val messagesApi: MessagesApi,
+  sessionRepository: SessionRepository,
+  navigator: Navigator,
+  identify: IdentifierAction,
+  getData: DataRetrievalAction,
+  requireData: DataRequiredAction,
+  formProvider: PartnershipHasUtrYesNoFormProvider,
+  val controllerComponents: MessagesControllerComponents,
+  view: PartnershipHasUtrYesNoView
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport {
