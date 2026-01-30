@@ -14,13 +14,17 @@
  * limitations under the License.
  */
 
-package pages
+package forms.add.partnership
 
-import play.api.libs.json.JsPath
+import forms.mappings.Mappings
+import play.api.data.Form
 
-case object PartnershipContactDetailsYesNoPage extends QuestionPage[Boolean] {
+import javax.inject.Inject
 
-  override def path: JsPath = JsPath \ toString
+class PartnershipContactDetailsYesNoFormProvider @Inject() extends Mappings {
 
-  override def toString: String = "partnershipContactDetailsYesNo"
+  def apply(): Form[Boolean] =
+    Form(
+      "value" -> boolean("partnershipContactDetailsYesNo.error.required")
+    )
 }

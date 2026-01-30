@@ -1,17 +1,19 @@
-package controllers
+package controllers.add.partnership
 
 import base.SpecBase
-import forms.PartnershipContactDetailsYesNoFormProvider
+import controllers.routes
+import forms.add.partnership.PartnershipContactDetailsYesNoFormProvider
 import models.{NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.PartnershipContactDetailsYesNoPage
+import pages.add.partnership.PartnershipContactDetailsYesNoPage
+import play.api.data.Form
 import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import repositories.SessionRepository
 import views.html.PartnershipContactDetailsYesNoView
 
@@ -22,9 +24,9 @@ class PartnershipContactDetailsYesNoControllerSpec extends SpecBase with Mockito
   def onwardRoute = Call("GET", "/foo")
 
   val formProvider = new PartnershipContactDetailsYesNoFormProvider()
-  val form = formProvider()
+  val form: Form[Boolean] = formProvider()
 
-  lazy val partnershipContactDetailsYesNoRoute = routes.PartnershipContactDetailsYesNoController.onPageLoad(NormalMode).url
+  lazy val partnershipContactDetailsYesNoRoute: Any = routes.PartnershipContactDetailsYesNoController.onPageLoad(NormalMode).url
 
   "PartnershipContactDetailsYesNo Controller" - {
 
