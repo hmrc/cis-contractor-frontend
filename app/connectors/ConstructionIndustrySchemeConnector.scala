@@ -84,17 +84,17 @@ class ConstructionIndustrySchemeConnector @Inject() (config: ServicesConfig, htt
       }
 
   def getSubcontractorUTRs(
-                           cisId: String
-                           )(implicit hc: HeaderCarrier): Future[GetSubcontractorUTRsResponse] =
-      logger.info(
-        s"[ConstructionIndustrySchemeConnector][getSubcontractorUTR] cisId: ${Json.toJson(cisId)}"
-      )
-      http
-        .get(url"$cisBaseUrl/subcontractors/utr/$cisId")
-        .execute[GetSubcontractorUTRsResponse]
-        .map { response =>
-          logger.info(s"[ConstructionIndustrySchemeConnector][getSubcontractorUTRs] Response: $response")
-          response
-        }
+    cisId: String
+  )(implicit hc: HeaderCarrier): Future[GetSubcontractorUTRsResponse] =
+    logger.info(
+      s"[ConstructionIndustrySchemeConnector][getSubcontractorUTR] cisId: ${Json.toJson(cisId)}"
+    )
+    http
+      .get(url"$cisBaseUrl/subcontractors/utr/$cisId")
+      .execute[GetSubcontractorUTRsResponse]
+      .map { response =>
+        logger.info(s"[ConstructionIndustrySchemeConnector][getSubcontractorUTRs] Response: $response")
+        response
+      }
 
 }

@@ -14,14 +14,19 @@
  * limitations under the License.
  */
 
-package models.subcontractor
+package forms.add.partnership
+import forms.Validation
+import forms.mappings.Mappings
+import play.api.data.Form
 
-import play.api.libs.json.{Json, OFormat}
+import javax.inject.Inject
 
-final case class GetSubcontractorUTRsResponse(
-  subcontractorUTRs: Seq[String]
-)
-
-object GetSubcontractorUTRsResponse {
-  implicit val format: OFormat[GetSubcontractorUTRsResponse] = Json.format[GetSubcontractorUTRsResponse]
+class PartnershipWorksReferenceNumberFormProvider @Inject() extends Mappings {
+  def apply(): Form[String] =
+    Form(
+      "value" -> text("partnershipWorksReferenceNumber.error.required")
+        .transform(_.trim, identity)
+        .verifying(regexp(Validation.worksRefRegex, "partnershipWorksReferenceNumber.error.invalid"))
+        .verifying(maxLength(20, "partnershipWorksReferenceNumber.error.length"))
+    )
 }
