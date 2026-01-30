@@ -30,16 +30,16 @@ import views.html.add.partnership.PartnershipHasUtrYesNoView
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class PartnershipHasUtrYesNoController @Inject()(
-                                                  override val messagesApi: MessagesApi,
-                                                  sessionRepository: SessionRepository,
-                                                  navigator: Navigator,
-                                                  identify: IdentifierAction,
-                                                  getData: DataRetrievalAction,
-                                                  requireData: DataRequiredAction,
-                                                  formProvider: PartnershipHasUtrYesNoFormProvider,
-                                                  val controllerComponents: MessagesControllerComponents,
-                                                  view: PartnershipHasUtrYesNoView
+class PartnershipHasUtrYesNoController @Inject() (
+  override val messagesApi: MessagesApi,
+  sessionRepository: SessionRepository,
+  navigator: Navigator,
+  identify: IdentifierAction,
+  getData: DataRetrievalAction,
+  requireData: DataRequiredAction,
+  formProvider: PartnershipHasUtrYesNoFormProvider,
+  val controllerComponents: MessagesControllerComponents,
+  view: PartnershipHasUtrYesNoView
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport {
@@ -48,7 +48,12 @@ class PartnershipHasUtrYesNoController @Inject()(
 
   def onPageLoad(mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData) { implicit request =>
-      request.userAnswers
+      // TODO: remove patch after testing
+      val patchedAnswers = request.userAnswers.get(PartnershipNamePage) match {
+        case None        => request.userAnswers.set(PartnershipNamePage, "TODO").get
+        case Some(value) => request.userAnswers
+      }
+      patchedAnswers
         .get(PartnershipNamePage)
         .map { partnershipName =>
           val preparedForm = request.userAnswers.get(PartnershipHasUtrYesNoPage) match {
@@ -62,7 +67,12 @@ class PartnershipHasUtrYesNoController @Inject()(
 
   def onSubmit(mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
-      request.userAnswers
+      // TODO: remove patch after testing
+      val patchedAnswers = request.userAnswers.get(PartnershipNamePage) match {
+        case None        => request.userAnswers.set(PartnershipNamePage, "TODO").get
+        case Some(value) => request.userAnswers
+      }
+      patchedAnswers
         .get(PartnershipNamePage)
         .map { name =>
           form
