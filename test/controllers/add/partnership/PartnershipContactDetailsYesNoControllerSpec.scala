@@ -15,7 +15,7 @@ import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import repositories.SessionRepository
-import views.html.PartnershipContactDetailsYesNoView
+import views.html.add.partnership.PartnershipContactDetailsYesNoView
 
 import scala.concurrent.Future
 
@@ -23,10 +23,11 @@ class PartnershipContactDetailsYesNoControllerSpec extends SpecBase with Mockito
 
   def onwardRoute = Call("GET", "/foo")
 
-  val formProvider = new PartnershipContactDetailsYesNoFormProvider()
+  val formProvider        = new PartnershipContactDetailsYesNoFormProvider()
   val form: Form[Boolean] = formProvider()
 
-  lazy val partnershipContactDetailsYesNoRoute: Any = routes.PartnershipContactDetailsYesNoController.onPageLoad(NormalMode).url
+  lazy val partnershipContactDetailsYesNoRoute: String =
+    controllers.add.partnership.routes.PartnershipContactDetailsYesNoController.onPageLoad(NormalMode).url
 
   "PartnershipContactDetailsYesNo Controller" - {
 
