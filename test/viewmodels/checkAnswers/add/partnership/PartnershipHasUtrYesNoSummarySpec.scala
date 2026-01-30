@@ -37,8 +37,12 @@ class PartnershipHasUtrYesNoSummarySpec extends SpecBase with GuiceOneAppPerSuit
     "return a row with key (including partnership name), value = yes, and change action when the answer is true" in {
       val ua: UserAnswers =
         emptyUserAnswers
-          .set(PartnershipHasUtrYesNoPage, true).success.value
-          .set(PartnershipNamePage, partnershipName).success.value
+          .set(PartnershipHasUtrYesNoPage, true)
+          .success
+          .value
+          .set(PartnershipNamePage, partnershipName)
+          .success
+          .value
 
       val maybeRow = PartnershipHasUtrYesNoSummary.row(ua)
       maybeRow must not be empty
@@ -63,8 +67,12 @@ class PartnershipHasUtrYesNoSummarySpec extends SpecBase with GuiceOneAppPerSuit
     "return a row with key (including partnership name), value = no, and change action when the answer is false" in {
       val ua: UserAnswers =
         emptyUserAnswers
-          .set(PartnershipHasUtrYesNoPage, false).success.value
-          .set(PartnershipNamePage, partnershipName).success.value
+          .set(PartnershipHasUtrYesNoPage, false)
+          .success
+          .value
+          .set(PartnershipNamePage, partnershipName)
+          .success
+          .value
 
       val maybeRow = PartnershipHasUtrYesNoSummary.row(ua)
       maybeRow must not be empty
@@ -89,7 +97,9 @@ class PartnershipHasUtrYesNoSummarySpec extends SpecBase with GuiceOneAppPerSuit
     "throw MissingRequiredAnswer when the partnership name is missing but the answer exists" in {
       val ua: UserAnswers =
         emptyUserAnswers
-          .set(PartnershipHasUtrYesNoPage, true).success.value
+          .set(PartnershipHasUtrYesNoPage, true)
+          .success
+          .value
 
       an[MissingRequiredAnswer] must be thrownBy {
         PartnershipHasUtrYesNoSummary.row(ua)
