@@ -155,8 +155,8 @@ class TypeOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
         status(result) mustEqual SEE_OTHER
         redirectLocation(
           result
-        ).value mustEqual controllers.add.routes.PartnershipUniqueTaxpayerReferenceController // TODO Update to correct page when implemented
-          .onPageLoad()
+        ).value mustEqual controllers.add.partnership.routes.PartnershipHasUtrYesNoController // TODO Update to correct page when implemented
+          .onPageLoad(NormalMode)
           .url
       }
     }

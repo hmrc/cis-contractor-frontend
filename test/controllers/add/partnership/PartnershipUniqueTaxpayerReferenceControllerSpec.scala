@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package controllers.add
+package controllers.add.partnership
 
 import base.SpecBase
 import controllers.routes
@@ -23,13 +23,13 @@ import models.{NormalMode, UserAnswers}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{verify, verifyNoMoreInteractions, when}
 import org.scalatestplus.mockito.MockitoSugar
-import pages.add.PartnershipUniqueTaxpayerReferencePage
+import pages.add.partnership.{PartnershipNamePage, PartnershipUniqueTaxpayerReferencePage}
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import services.SubcontractorService
 import uk.gov.hmrc.http.HeaderCarrier
-import views.html.add.PartnershipUniqueTaxpayerReferenceView
+import views.html.add.partnership.PartnershipUniqueTaxpayerReferenceView
 
 import scala.concurrent.Future
 
@@ -38,8 +38,13 @@ class PartnershipUniqueTaxpayerReferenceControllerSpec extends SpecBase with Moc
   private val formProvider = new UtrFormProvider()
   private val form         = formProvider()
 
+  private val partnershipName = "Test Partnership"
+
+  private def uaWithName: UserAnswers =
+    emptyUserAnswers.set(PartnershipNamePage, partnershipName).success.value
+
   lazy private val partnershipUniqueTaxpayerReferenceRoute =
-    controllers.add.routes.PartnershipUniqueTaxpayerReferenceController.onPageLoad().url
+    controllers.add.partnership.routes.PartnershipUniqueTaxpayerReferenceController.onPageLoad(NormalMode).url
 
   "PartnershipUniqueTaxpayerReferenceControllerSpec Controller" - {
 
@@ -55,7 +60,7 @@ class PartnershipUniqueTaxpayerReferenceControllerSpec extends SpecBase with Moc
         val view = application.injector.instanceOf[PartnershipUniqueTaxpayerReferenceView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode, "TODO")(request, messages(application)).toString
       }
     }
 
@@ -74,7 +79,10 @@ class PartnershipUniqueTaxpayerReferenceControllerSpec extends SpecBase with Moc
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill("answer"), NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill("answer"), NormalMode, "TODO")(
+          request,
+          messages(application)
+        ).toString
       }
     }
 
@@ -103,8 +111,9 @@ class PartnershipUniqueTaxpayerReferenceControllerSpec extends SpecBase with Moc
 
         status(result) mustEqual SEE_OTHER
 
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
-
+        redirectLocation(
+          result
+        ).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
       }
       verify(mockSubcontractorService).isDuplicateUTR(any[UserAnswers], any[String])(any[HeaderCarrier])
       verifyNoMoreInteractions(mockSubcontractorService)
@@ -141,7 +150,7 @@ class PartnershipUniqueTaxpayerReferenceControllerSpec extends SpecBase with Moc
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(formWithDuplicateError, NormalMode)(
+        contentAsString(result) mustEqual view(formWithDuplicateError, NormalMode, "TODO")(
           request,
           messages(application)
         ).toString
@@ -153,7 +162,7 @@ class PartnershipUniqueTaxpayerReferenceControllerSpec extends SpecBase with Moc
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(uaWithName)).build()
 
       running(application) {
         val request =
@@ -167,7 +176,10 @@ class PartnershipUniqueTaxpayerReferenceControllerSpec extends SpecBase with Moc
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, NormalMode, partnershipName)(
+          request,
+          messages(application)
+        ).toString
       }
     }
 

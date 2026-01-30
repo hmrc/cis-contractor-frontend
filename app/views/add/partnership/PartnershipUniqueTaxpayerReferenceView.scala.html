@@ -28,11 +28,11 @@
     link: Link,
 )
 
-@(form: Form[_], mode: Mode)(implicit request: Request[_], messages: Messages)
+@(form: Form[_], mode: Mode, name: String)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = title(form, messages("partnershipUniqueTaxpayerReference.title"))) {
 
-    @formHelper(action = controllers.add.routes.PartnershipUniqueTaxpayerReferenceController.onSubmit()) {
+    @formHelper(action = controllers.add.partnership.routes.PartnershipUniqueTaxpayerReferenceController.onSubmit(mode)) {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form))
@@ -51,7 +51,7 @@
         @govukInput(
             InputViewModel(
                 field = form("value"),
-                label = LabelViewModel(messages("partnershipUniqueTaxpayerReference.heading2")).asPageHeading().withCssClass("govuk-label--m")
+                label = LabelViewModel(messages("partnershipUniqueTaxpayerReference.heading2", name)).asPageHeading().withCssClass("govuk-label--m")
             )
             .withWidth(Fixed10)
             .withHint(Hint(
