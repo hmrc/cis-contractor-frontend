@@ -12,8 +12,8 @@ GET         /refresh-session                             controllers.KeepAliveCo
 
 GET         /there-is-a-problem                          controllers.JourneyRecoveryController.onPageLoad(continueUrl: Option[RedirectUrl] ?= None)
 
-GET         /add/check-your-answers                    controllers.add.CheckYourAnswersController.onPageLoad()
-POST        /add/check-your-answers                   controllers.add.CheckYourAnswersController.onSubmit()
+GET         /add/check-your-answers                      controllers.add.CheckYourAnswersController.onPageLoad()
+POST        /add/check-your-answers                      controllers.add.CheckYourAnswersController.onSubmit()
 
 GET         /account/sign-out-survey                     controllers.auth.AuthController.signOut()
 GET         /account/sign-out                            controllers.auth.AuthController.signOutNoSurvey()
@@ -103,7 +103,13 @@ GET        /add/partnership/partnership-utr              controllers.add.partner
 POST       /add/partnership/partnership-utr              controllers.add.partnership.PartnershipUniqueTaxpayerReferenceController.onSubmit(mode: Mode = NormalMode)
 GET        /add/partnership/change-partnership-utr       controllers.add.partnership.PartnershipUniqueTaxpayerReferenceController.onPageLoad(mode: Mode = CheckMode)
 POST       /add/partnership/change-partnership-utr       controllers.add.partnership.PartnershipUniqueTaxpayerReferenceController.onSubmit(mode: Mode = CheckMode)
+
 GET        /add/partnership/partnership-has-utr          controllers.add.partnership.PartnershipHasUtrYesNoController.onPageLoad(mode: Mode = NormalMode)
 POST       /add/partnership/partnership-has-utr          controllers.add.partnership.PartnershipHasUtrYesNoController.onSubmit(mode: Mode = NormalMode)
 GET        /add/partnership/change-partnership-has-utr   controllers.add.partnership.PartnershipHasUtrYesNoController.onPageLoad(mode: Mode = CheckMode)
 POST       /add/partnership/change-partnership-has-utr   controllers.add.partnership.PartnershipHasUtrYesNoController.onSubmit(mode: Mode = CheckMode)
+
+GET        /add/partnership/partnership-works-reference  controllers.add.partnership.PartnershipWorksReferenceNumberController.onPageLoad(mode: Mode = NormalMode)
+POST       /add/partnership/partnership-works-reference  controllers.add.partnership.PartnershipWorksReferenceNumberController.onSubmit(mode: Mode = NormalMode)
+GET        /add/partnership/change-partnership-works-reference controllers.add.partnership.PartnershipWorksReferenceNumberController.onPageLoad(mode: Mode = CheckMode)
+POST       /add/partnership/change-partnership-works-reference controllers.add.partnership.PartnershipWorksReferenceNumberController.onSubmit(mode: Mode = CheckMode)

@@ -14,14 +14,19 @@
  * limitations under the License.
  */
 
-package pages.add.partnership
+package forms.add.partnership
+import forms.Validation
+import forms.mappings.Mappings
+import play.api.data.Form
 
-import pages.QuestionPage
-import play.api.libs.json.JsPath
+import javax.inject.Inject
 
-case object PartnershipNamePage extends QuestionPage[String] {
-
-  override def path: JsPath = JsPath \ toString
-
-  override def toString: String = "partnershipName"
+class PartnershipWorksReferenceNumberFormProvider @Inject() extends Mappings {
+  def apply(): Form[String] =
+    Form(
+      "value" -> text("partnershipWorksReferenceNumber.error.required")
+        .transform(_.trim, identity)
+        .verifying(regexp(Validation.worksRefRegex, "partnershipWorksReferenceNumber.error.invalid"))
+        .verifying(maxLength(20, "partnershipWorksReferenceNumber.error.length"))
+    )
 }

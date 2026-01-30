@@ -1,5 +1,5 @@
 /*
- * Copyright 2026 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,12 +16,16 @@
 
 package pages.add.partnership
 
-import pages.QuestionPage
-import play.api.libs.json.JsPath
+import pages.behaviours.PageBehaviours
 
-case object PartnershipNamePage extends QuestionPage[String] {
+class PartnershipWorksReferenceNumberPageSpec extends PageBehaviours {
 
-  override def path: JsPath = JsPath \ toString
+  "PartnershipWorksReferenceNumber" - {
 
-  override def toString: String = "partnershipName"
+    beRetrievable[String](PartnershipWorksReferenceNumberPage)
+
+    beSettable[String](PartnershipWorksReferenceNumberPage)
+
+    beRemovable[String](PartnershipWorksReferenceNumberPage)
+  }
 }
