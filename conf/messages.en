@@ -264,3 +264,9 @@ partnershipHasUtrYesNo.hint = This is 10 numbers, like 1234567890. The UTR will 
 partnershipHasUtrYesNo.checkYourAnswersLabel = Does {0} have a Unique Taxpayer Reference (UTR)?
 partnershipHasUtrYesNo.error.required = Select yes if the partnership has a Unique Taxpayer Reference (UTR)
 partnershipHasUtrYesNo.change.hidden = Unique Taxpayer Reference (UTR)
+
+partnershipContactDetailsYesNo.title = partnershipContactDetailsYesNo
+partnershipContactDetailsYesNo.heading = partnershipContactDetailsYesNo
+partnershipContactDetailsYesNo.checkYourAnswersLabel = partnershipContactDetailsYesNo
+partnershipContactDetailsYesNo.error.required = Select yes if partnershipContactDetailsYesNo
+partnershipContactDetailsYesNo.change.hidden = PartnershipContactDetailsYesNo
