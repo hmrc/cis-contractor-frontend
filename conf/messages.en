@@ -255,4 +255,13 @@ checkYourAnswers.warning = You must verify this subcontractor with HMRC before m
 checkYourAnswers.p1 = By adding this subcontractor you are confirming that, to the best of your knowledge, the details you are providing are correct.
 checkYourAnswers.addSubcontractor = Add subcontractor
 
+partnershipName.title=What is the partnership name?
+partnershipName.heading=What is the partnership name?
+partnershipName.hint=This is the name of the partnership as registered with HM Revenue and Customs
+
+partnershipName.error.required=Enter the registered name of the partnership
+partnershipName.error.length=Partnership name must be 56 characters or less
+partnershipName.error.invalidCharacters=Partnership name contains invalid characters
+
+
 

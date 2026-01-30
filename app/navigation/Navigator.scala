@@ -23,6 +23,7 @@ import pages.*
 import models.*
 import models.add.TypeOfSubcontractor.*
 import pages.add.*
+import pages.add.partnership.PartnershipNamePage
 
 @Singleton
 class Navigator @Inject() () {
@@ -50,6 +51,7 @@ class Navigator @Inject() () {
     case SubcontractorContactDetailsYesNoPage      =>
       userAnswers => navigatorFromSubcontractorContactDetailsYesNoPage(NormalMode)(userAnswers)
     case SubContactDetailsPage                     => _ => controllers.add.routes.CheckYourAnswersController.onPageLoad()
+    case PartnershipNamePage                       => _ => routes.JourneyRecoveryController.onPageLoad()
     case _                                         => _ => routes.IndexController.onPageLoad()
   }
 
@@ -67,6 +69,7 @@ class Navigator @Inject() () {
     case SubContactDetailsPage                => _ => controllers.add.routes.CheckYourAnswersController.onPageLoad()
     case SubcontractorContactDetailsYesNoPage =>
       userAnswers => navigatorFromSubcontractorContactDetailsYesNoPage(CheckMode)(userAnswers)
+    case PartnershipNamePage                  => _ => controllers.add.routes.CheckYourAnswersController.onPageLoad()
     case _                                    => _ => controllers.add.routes.CheckYourAnswersController.onPageLoad()
   }
 
@@ -81,6 +84,8 @@ class Navigator @Inject() () {
     (userAnswers.get(TypeOfSubcontractorPage), mode) match {
       case (Some(Individualorsoletrader), NormalMode) =>
         controllers.add.routes.SubTradingNameYesNoController.onPageLoad(NormalMode)
+      case (Some(Partnership), NormalMode) =>
+        controllers.add.partnership.routes.PartnershipNameController.onPageLoad(NormalMode)
       case (None, _)                                  => routes.JourneyRecoveryController.onPageLoad()
       case (_, NormalMode)                            => routes.JourneyRecoveryController.onPageLoad()
       case (_, CheckMode)                             => controllers.add.routes.CheckYourAnswersController.onPageLoad()

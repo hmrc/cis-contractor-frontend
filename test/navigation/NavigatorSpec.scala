@@ -56,12 +56,12 @@ class NavigatorSpec extends SpecBase {
         ) mustBe routes.JourneyRecoveryController.onPageLoad()
       }
 
-      "must go from a TypeOfSubcontractorPage to JourneyRecovery when Partnership is selected" in {
+      "must go from a TypeOfSubcontractorPage to PartnershipName when Partnership is selected" in {
         navigator.nextPage(
           TypeOfSubcontractorPage,
           NormalMode,
           emptyUserAnswers.setOrException(TypeOfSubcontractorPage, TypeOfSubcontractor.Partnership)
-        ) mustBe routes.JourneyRecoveryController.onPageLoad()
+        ) mustBe controllers.add.partnership.routes.PartnershipNameController.onPageLoad(NormalMode)
       }
 
       "must go from a TypeOfSubcontractorPage to JourneyRecovery when Trust is selected" in {
