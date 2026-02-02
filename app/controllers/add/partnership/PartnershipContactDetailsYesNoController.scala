@@ -20,7 +20,7 @@ import controllers.actions.*
 import forms.add.partnership.PartnershipContactDetailsYesNoFormProvider
 import models.Mode
 import navigation.Navigator
-import pages.add.partnership.PartnershipContactDetailsYesNoPage
+import pages.add.partnership.{PartnershipContactDetailsYesNoPage, PartnershipNamePage}
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -48,26 +48,35 @@ class PartnershipContactDetailsYesNoController @Inject() (
   val form: Form[Boolean] = formProvider()
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
+    request.userAnswers
+      .get(PartnershipNamePage)
+      .map { partnershipName =>
+        val preparedForm = request.userAnswers.get(PartnershipContactDetailsYesNoPage) match {
+          case None        => form
+          case Some(value) => form.fill(value)
+        }
 
-    val preparedForm = request.userAnswers.get(PartnershipContactDetailsYesNoPage) match {
-      case None        => form
-      case Some(value) => form.fill(value)
-    }
-
-    Ok(view(preparedForm, mode))
+        Ok(view(preparedForm, mode, partnershipName))
+      }
+      .getOrElse(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
-      form
-        .bindFromRequest()
-        .fold(
-          formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
-          value =>
-            for {
-              updatedAnswers <- Future.fromTry(request.userAnswers.set(PartnershipContactDetailsYesNoPage, value))
-              _              <- sessionRepository.set(updatedAnswers)
-            } yield Redirect(navigator.nextPage(PartnershipContactDetailsYesNoPage, mode, updatedAnswers))
-        )
+      request.userAnswers
+        .get(PartnershipNamePage)
+        .map { partnershipName =>
+          form
+            .bindFromRequest()
+            .fold(
+              formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, partnershipName))),
+              value =>
+                for {
+                  updatedAnswers <- Future.fromTry(request.userAnswers.set(PartnershipContactDetailsYesNoPage, value))
+                  _              <- sessionRepository.set(updatedAnswers)
+                } yield Redirect(navigator.nextPage(PartnershipContactDetailsYesNoPage, mode, updatedAnswers))
+            )
+        }
+        .getOrElse(Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())))
   }
 }

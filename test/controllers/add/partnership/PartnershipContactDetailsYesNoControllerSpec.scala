@@ -8,7 +8,7 @@ import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.add.partnership.PartnershipContactDetailsYesNoPage
+import pages.add.partnership.{PartnershipContactDetailsYesNoPage, PartnershipNamePage}
 import play.api.data.Form
 import play.api.inject.bind
 import play.api.mvc.Call
@@ -29,11 +29,15 @@ class PartnershipContactDetailsYesNoControllerSpec extends SpecBase with Mockito
   lazy val partnershipContactDetailsYesNoRoute: String =
     controllers.add.partnership.routes.PartnershipContactDetailsYesNoController.onPageLoad(NormalMode).url
 
+  val partnershipName = "Partnership name"
+
   "PartnershipContactDetailsYesNo Controller" - {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val userAnswers = emptyUserAnswers.set(PartnershipNamePage, partnershipName).success.value
+
+      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
       running(application) {
         val request = FakeRequest(GET, partnershipContactDetailsYesNoRoute)
@@ -43,13 +47,22 @@ class PartnershipContactDetailsYesNoControllerSpec extends SpecBase with Mockito
         val view = application.injector.instanceOf[PartnershipContactDetailsYesNoView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode, partnershipName)(
+          request,
+          messages(application)
+        ).toString
       }
     }
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = UserAnswers(userAnswersId).set(PartnershipContactDetailsYesNoPage, true).success.value
+      val userAnswers = UserAnswers(userAnswersId)
+        .set(PartnershipNamePage, partnershipName)
+        .success
+        .value
+        .set(PartnershipContactDetailsYesNoPage, true)
+        .success
+        .value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
@@ -61,7 +74,10 @@ class PartnershipContactDetailsYesNoControllerSpec extends SpecBase with Mockito
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(true), NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill(true), NormalMode, partnershipName)(
+          request,
+          messages(application)
+        ).toString
       }
     }
 
@@ -71,8 +87,10 @@ class PartnershipContactDetailsYesNoControllerSpec extends SpecBase with Mockito
 
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
+      val userAnswers = emptyUserAnswers.set(PartnershipNamePage, partnershipName).success.value
+
       val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        applicationBuilder(userAnswers = Some(userAnswers))
           .overrides(
             bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
             bind[SessionRepository].toInstance(mockSessionRepository)
@@ -93,7 +111,8 @@ class PartnershipContactDetailsYesNoControllerSpec extends SpecBase with Mockito
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val userAnswers = emptyUserAnswers.set(PartnershipNamePage, partnershipName).success.value
+      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
       running(application) {
         val request =
@@ -107,7 +126,24 @@ class PartnershipContactDetailsYesNoControllerSpec extends SpecBase with Mockito
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, NormalMode, partnershipName)(
+          request,
+          messages(application)
+        ).toString
+      }
+    }
+
+    "must redirect to Journey Recovery for a GET if no existing data is found" in {
+
+      val application = applicationBuilder(userAnswers = None).build()
+
+      running(application) {
+        val request = FakeRequest(GET, partnershipContactDetailsYesNoRoute)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
       }
     }
 
