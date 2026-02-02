@@ -277,5 +277,5 @@ partnershipContactDetailsYesNo.title = Do you want to add contact details for th
 partnershipContactDetailsYesNo.heading = Do you want to add contact details for this partnership?
 partnershipContactDetailsYesNo.hint = You can add this information later if you prefer
 partnershipContactDetailsYesNo.checkYourAnswersLabel = Do you want to add contact details for this partnership?
-partnershipContactDetailsYesNo.error.required = Select whether you have the partnership’s contact details
+partnershipContactDetailsYesNo.error.required = Select whether you want to add contact details for this partnership
 partnershipContactDetailsYesNo.change.hidden = Partnership Contact Details
