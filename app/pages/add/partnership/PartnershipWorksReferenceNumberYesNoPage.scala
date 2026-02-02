@@ -18,7 +18,6 @@ package pages.add.partnership
 
 import models.UserAnswers
 import pages.QuestionPage
-import pages.add.TradingNameOfSubcontractorPage
 import play.api.libs.json.JsPath
 
 import scala.util.Try
@@ -32,7 +31,7 @@ case object PartnershipWorksReferenceNumberYesNoPage extends QuestionPage[Boolea
   override def cleanup(value: Option[Boolean], userAnswers: UserAnswers): Try[UserAnswers] =
     if value.contains(false) then {
       userAnswers
-        .remove(TradingNameOfSubcontractorPage) // Need to update to correct page!
+        .remove(PartnershipWorksReferenceNumberPage)
     } else {
       super.cleanup(value, userAnswers)
     }

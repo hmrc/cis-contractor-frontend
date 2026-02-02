@@ -16,7 +16,6 @@
 
 package pages.add.partnership
 
-import pages.add.TradingNameOfSubcontractorPage
 import pages.behaviours.PageBehaviours
 
 class PartnershipWorksReferenceNumberYesNoPageSpec extends PageBehaviours {
@@ -29,13 +28,12 @@ class PartnershipWorksReferenceNumberYesNoPageSpec extends PageBehaviours {
 
     beRemovable[Boolean](PartnershipWorksReferenceNumberYesNoPage)
 
-    // Need to update to correct page!
-    "cleanup: must remove TradingNameOfSubcontractor userAnswers when No is selected" in {
-      val userAnswers = emptyUserAnswers.set(TradingNameOfSubcontractorPage, "ABC").success.value
+    "cleanup: must remove PartnershipWorksReferenceNumber userAnswers when No is selected" in {
+      val userAnswers = emptyUserAnswers.set(PartnershipWorksReferenceNumberPage, "ABC").success.value
 
       val updatedUserAnswers = userAnswers.set(PartnershipWorksReferenceNumberYesNoPage, false).success.value
 
-      updatedUserAnswers.get(TradingNameOfSubcontractorPage) mustBe None
+      updatedUserAnswers.get(PartnershipWorksReferenceNumberPage) mustBe None
     }
 
   }
