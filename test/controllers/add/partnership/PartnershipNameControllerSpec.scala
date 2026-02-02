@@ -96,7 +96,7 @@ class PartnershipNameControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must redirect (currently to Journey Recovery via Navigator) when valid data is submitted" in {
+    "must redirect (currently to Partnership UTR via Navigator) when valid data is submitted" in {
       val mockSessionRepository    = mock[SessionRepository]
       val mockSubcontractorService = mock[SubcontractorService]
 
@@ -120,8 +120,10 @@ class PartnershipNameControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+        redirectLocation(result).value mustEqual
+          controllers.add.partnership.routes.PartnershipUniqueTaxpayerReferenceController
+            .onPageLoad(NormalMode)
+            .url
       }
 
       verify(mockSessionRepository).set(any())
