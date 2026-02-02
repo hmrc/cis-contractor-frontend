@@ -103,3 +103,9 @@ GET        /add/partnership/partnership-has-utr                         controll
 POST       /add/partnership/partnership-has-utr                         controllers.add.partnership.PartnershipHasUtrYesNoController.onSubmit(mode: Mode = NormalMode)
 GET        /add/partnership/change-partnership-has-utr                  controllers.add.partnership.PartnershipHasUtrYesNoController.onPageLoad(mode: Mode = CheckMode)
 POST       /add/partnership/change-partnership-has-utr                  controllers.add.partnership.PartnershipHasUtrYesNoController.onSubmit(mode: Mode = CheckMode)
+
+GET        /add/partnership/address                       controllers.add.partnership.PartnershipAddressOfSubcontractorController.onPageLoad(mode: Mode = NormalMode)
+POST       /add/partnership/address                       controllers.add.partnership.PartnershipAddressOfSubcontractorController.onSubmit(mode: Mode = NormalMode)
+GET        /add/partnership/change-address                controllers.add.partnership.PartnershipAddressOfSubcontractorController.onPageLoad(mode: Mode = CheckMode)
+POST       /add/partnership/change-address                controllers.add.partnership.PartnershipAddressOfSubcontractorController.onSubmit(mode: Mode = CheckMode)
+

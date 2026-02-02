@@ -264,3 +264,34 @@ partnershipHasUtrYesNo.hint = This is 10 numbers, like 1234567890. The UTR will 
 partnershipHasUtrYesNo.checkYourAnswersLabel = Does {0} have a Unique Taxpayer Reference (UTR)?
 partnershipHasUtrYesNo.error.required = Select yes if the partnership has a Unique Taxpayer Reference (UTR)
 partnershipHasUtrYesNo.change.hidden = Unique Taxpayer Reference (UTR)
+
+partnershipAddressOfSubcontractor.title = What is the address for this partnership?
+partnershipAddressOfSubcontractor.heading = What is the address for {0}?
+partnershipAddressOfSubcontractor.addressLine1 = Address line 1
+partnershipAddressOfSubcontractor.addressLine2 = Address line 2 (optional)
+partnershipAddressOfSubcontractor.checkYourAnswersLabel = Subcontractor address
+partnershipAddressOfSubcontractor.change.hidden= subcontractor address
+partnershipAddressOfSubcontractor.error.addressLine1.required = Enter the first line of the address, typically the building and street
+partnershipAddressOfSubcontractor.error.addressLine3.required = Enter the town or city
+partnershipAddressOfSubcontractor.error.postCode.required = Enter postcode in the correct format, like NE88 1AA
+partnershipAddressOfSubcontractor.error.addressLine1.length = Enter an address up to 35 characters
+partnershipAddressOfSubcontractor.error.addressLine2.length = Enter the second line of the address using 35 characters or less
+partnershipAddressOfSubcontractor.addressLine1.change.hidden = address Line 1
+partnershipAddressOfSubcontractor.addressLine2.change.hidden = address line 2 (optional)
+partnershipAddressOfSubcontractor.addressLine3 =  Town or city
+partnershipAddressOfSubcontractor.addressLine4 = County (optional)
+partnershipAddressOfSubcontractor.postCode  = Postcode
+
+partnershipAddressOfSubcontractor.error.addressLine1.invalidCharacters = Enter the first line of the address using letters a to z, numbers, apostrophes, ampersands, commas, hyphens, full stops, forward slashes and spaces
+partnershipAddressOfSubcontractor.error.addressLine2.invalidCharacters = Enter the second line of the address using letters a to z, numbers, apostrophes, ampersands, commas, hyphens, full stops, forward slashes and spaces
+partnershipAddressOfSubcontractor.error.addressLine3.invalidCharacters = Enter the town or city of the address in the correct format, using letters a to z, numbers, apostrophes, ampersands, commas, hyphens, full stops, forward slashes and spaces
+partnershipAddressOfSubcontractor.error.addressLine4.invalidCharacters = Enter a county in the correct format, using letters a to z, numbers, apostrophes, ampersands, commas, hyphens, full stops, forward slashes and spaces
+partnershipAddressOfSubcontractor.error.addressLine4.firstCharMustBeLetter = Enter a county. The first character must be a letter
+partnershipAddressOfSubcontractor.error.addressLine1.firstCharMustBeLetterOrNumber = Enter an address. The first character must be a letter or a number
+partnershipAddressOfSubcontractor.error.postCode.length = Enter a postcode using up to 8 characters, like NE88 1AA
+partnershipAddressOfSubcontractor.error.postCode.invalid = Enter a full UK postcode in the correct format, like NE88 1AA
+partnershipAddressOfSubcontractor.error.addressLine3.length = Enter a town or city using 35 characters or less
+partnershipAddressOfSubcontractor.error.addressLine4.length = Enter a county using 35 characters or less
+partnershipAddressOfSubcontractor.error.addressLine2.firstCharMustBeLetter = Enter an address. The first character must be a letter or a number
+partnershipAddressOfSubcontractor.error.addressLine3.firstCharMustBeLetter = Enter a town or city. The first character must be a letter
+

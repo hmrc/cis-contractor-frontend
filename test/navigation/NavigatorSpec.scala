@@ -22,7 +22,7 @@ import pages.*
 import models.*
 import models.add.{SubcontractorName, TypeOfSubcontractor, UKAddress}
 import pages.add.*
-import pages.add.partnership.PartnershipHasUtrYesNoPage
+import pages.add.partnership.{PartnershipAddressOfSubcontractorPage, PartnershipHasUtrYesNoPage}
 
 class NavigatorSpec extends SpecBase {
 
@@ -167,6 +167,14 @@ class NavigatorSpec extends SpecBase {
           NormalMode,
           UserAnswers("id")
         ) mustBe controllers.add.routes.NationalInsuranceNumberYesNoController.onPageLoad(NormalMode)
+      }
+
+      "must go from a PartnershipAddressOfSubcontractorPage to next page" in {
+        navigator.nextPage(
+          PartnershipAddressOfSubcontractorPage,
+          NormalMode,
+          UserAnswers("id")
+        ) mustBe controllers.add.partnership.routes.PartnershipAddressOfSubcontractorController.onPageLoad(NormalMode)
       }
 
       "must go from a NationalInsuranceNumberYesNoPage to SubNationalInsuranceNumberPage when true" in {

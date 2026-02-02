@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package forms
+package forms.add.partnership
 
 import forms.add.partnership.PartnershipHasUtrYesNoFormProvider
 import forms.behaviours.BooleanFieldBehaviours
