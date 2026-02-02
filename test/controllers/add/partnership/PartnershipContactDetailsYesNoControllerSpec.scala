@@ -42,8 +42,11 @@ class PartnershipContactDetailsYesNoControllerSpec extends SpecBase with Mockito
   val formProvider        = new PartnershipContactDetailsYesNoFormProvider()
   val form: Form[Boolean] = formProvider()
 
-  lazy val partnershipContactDetailsYesNoRoute: String =
+  lazy val partnershipContactDetailsYesNoGetRoute: String =
     controllers.add.partnership.routes.PartnershipContactDetailsYesNoController.onPageLoad(NormalMode).url
+
+  lazy val partnershipContactDetailsYesNoPostRoute: String =
+    controllers.add.partnership.routes.PartnershipContactDetailsYesNoController.onSubmit(NormalMode).url
 
   val partnershipName = "Partnership name"
 
@@ -56,7 +59,7 @@ class PartnershipContactDetailsYesNoControllerSpec extends SpecBase with Mockito
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
       running(application) {
-        val request = FakeRequest(GET, partnershipContactDetailsYesNoRoute)
+        val request = FakeRequest(GET, partnershipContactDetailsYesNoGetRoute)
 
         val result = route(application, request).value
 
@@ -83,7 +86,7 @@ class PartnershipContactDetailsYesNoControllerSpec extends SpecBase with Mockito
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
       running(application) {
-        val request = FakeRequest(GET, partnershipContactDetailsYesNoRoute)
+        val request = FakeRequest(GET, partnershipContactDetailsYesNoGetRoute)
 
         val view = application.injector.instanceOf[PartnershipContactDetailsYesNoView]
 
@@ -115,7 +118,7 @@ class PartnershipContactDetailsYesNoControllerSpec extends SpecBase with Mockito
 
       running(application) {
         val request =
-          FakeRequest(POST, partnershipContactDetailsYesNoRoute)
+          FakeRequest(POST, partnershipContactDetailsYesNoPostRoute)
             .withFormUrlEncodedBody(("value", "true"))
 
         val result = route(application, request).value
@@ -132,7 +135,7 @@ class PartnershipContactDetailsYesNoControllerSpec extends SpecBase with Mockito
 
       running(application) {
         val request =
-          FakeRequest(POST, partnershipContactDetailsYesNoRoute)
+          FakeRequest(POST, partnershipContactDetailsYesNoPostRoute)
             .withFormUrlEncodedBody(("value", ""))
 
         val boundForm = form.bind(Map("value" -> ""))
@@ -154,7 +157,7 @@ class PartnershipContactDetailsYesNoControllerSpec extends SpecBase with Mockito
       val application = applicationBuilder(userAnswers = None).build()
 
       running(application) {
-        val request = FakeRequest(GET, partnershipContactDetailsYesNoRoute)
+        val request = FakeRequest(GET, partnershipContactDetailsYesNoGetRoute)
 
         val result = route(application, request).value
 
@@ -168,7 +171,7 @@ class PartnershipContactDetailsYesNoControllerSpec extends SpecBase with Mockito
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
       running(application) {
-        val request = FakeRequest(GET, partnershipContactDetailsYesNoRoute)
+        val request = FakeRequest(GET, partnershipContactDetailsYesNoGetRoute)
 
         val result = route(application, request).value
 
@@ -183,7 +186,7 @@ class PartnershipContactDetailsYesNoControllerSpec extends SpecBase with Mockito
 
       running(application) {
         val request =
-          FakeRequest(POST, partnershipContactDetailsYesNoRoute)
+          FakeRequest(POST, partnershipContactDetailsYesNoPostRoute)
             .withFormUrlEncodedBody(("value", "true"))
 
         val result = route(application, request).value
@@ -199,7 +202,7 @@ class PartnershipContactDetailsYesNoControllerSpec extends SpecBase with Mockito
 
       running(application) {
         val request =
-          FakeRequest(POST, partnershipContactDetailsYesNoRoute)
+          FakeRequest(POST, partnershipContactDetailsYesNoPostRoute)
             .withFormUrlEncodedBody(("value", "true"))
 
         val result = route(application, request).value
