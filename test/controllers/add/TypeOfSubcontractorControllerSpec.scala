@@ -132,7 +132,7 @@ class TypeOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must redirect to the PartnershipName page when valid data Partnership is submitted" in {
+    "must redirect to the PartnershipHasUtrYesNo page when valid data Partnership is submitted" in {
 
       val mockSessionRepository = mock[SessionRepository]
 
@@ -153,7 +153,9 @@ class TypeOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.add.partnership.routes.PartnershipNameController
+        redirectLocation(
+          result
+        ).value mustEqual controllers.add.partnership.routes.PartnershipHasUtrYesNoController // TODO Update to correct page when implemented
           .onPageLoad(NormalMode)
           .url
       }

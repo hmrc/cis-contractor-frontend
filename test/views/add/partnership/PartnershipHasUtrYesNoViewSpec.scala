@@ -28,10 +28,7 @@ import play.api.mvc.Request
 import play.api.test.FakeRequest
 import views.html.add.partnership.PartnershipHasUtrYesNoView
 
-class PartnershipHasUtrYesNoViewSpec
-  extends AnyWordSpec
-    with Matchers
-    with GuiceOneAppPerSuite {
+class PartnershipHasUtrYesNoViewSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite {
 
   "PartnershipHasUtrYesNoView" should {
 

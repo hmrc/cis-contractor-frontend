@@ -27,6 +27,13 @@ Run integration tests with:
 sbt it/test
 ```
 
+Before committing code, please ensure all tests pass and code coverage is satisfactory and the code has been formatted
+using `sbt scalafmtAll`. Alternatively, you can run the following script in the root directory, which does all
+these steps for you:
+```shell
+./run_all_tests.sh
+```
+
 ### License
 
 This code is open source software licensed under the [Apache 2.0 License]("http://www.apache.org/licenses/LICENSE-2.0.html").
