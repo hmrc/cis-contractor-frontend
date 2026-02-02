@@ -16,7 +16,6 @@
 
 package viewmodels.checkAnswers.add.partnership
 
-import controllers.add.routes
 import models.{CheckMode, UserAnswers}
 import org.scalatest.OptionValues.convertOptionToValuable
 import org.scalatest.TryValues.convertTryToSuccessOrFailure
@@ -57,7 +56,8 @@ class PartnershipContactDetailsYesNoSummarySpec extends AnyFreeSpec with Matcher
 
       val changeAction       = actions.head
       val expectedChangeText = messages("site.change")
-      val expectedHref       = controllers.add.partnership.routes.PartnershipContactDetailsYesNoController.onPageLoad(CheckMode).url
+      val expectedHref       =
+        controllers.add.partnership.routes.PartnershipContactDetailsYesNoController.onPageLoad(CheckMode).url
       val expectedHiddenText = messages("partnershipContactDetailsYesNo.change.hidden")
 
       changeAction.content.asHtml.toString    should include(expectedChangeText)
