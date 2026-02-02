@@ -238,7 +238,7 @@ subContactDetails.error.email.invalid = Enter a valid email address in the corre
 subContactDetails.error.telephone.invalid = Enter a valid phone number
 subContactDetails.email.change.hidden = email address
 subContactDetails.telephone.change.hidden = telephone number
- subContactDetails.change.hidden = contact details
+subContactDetails.change.hidden = contact details
 
 subcontractorsUniqueTaxpayerReference.title = What is the subcontractor’s Unique Taxpayer Reference (UTR)?
 subcontractorsUniqueTaxpayerReference.heading = What is the subcontractor’s Unique Taxpayer Reference (UTR)?
@@ -265,6 +265,16 @@ partnershipWorksReferenceNumber.error.invalid = Enter a valid works reference nu
 partnershipWorksReferenceNumber.error.length = Enter a works reference number less or equal to 20 characters
 partnershipWorksReferenceNumber.change.hidden = partnership works reference
 
+partnershipUniqueTaxpayerReference.title = Partnership Unique Taxpayer Reference (UTR)
+partnershipUniqueTaxpayerReference.heading = Partnership Unique Taxpayer Reference (UTR)
+partnershipUniqueTaxpayerReference.paragraph = The UTR will be on tax returns and other documents from HMRC. It might be called ‘reference’, ‘UTR’, or ‘official use’.
+partnershipUniqueTaxpayerReference.linkText = Get more help to find a UTR (opens in new tab)
+partnershipUniqueTaxpayerReference.heading2 = What is the UTR for {0}?
+partnershipUniqueTaxpayerReference.hint = A UTR is a 10 digit number
+partnershipUniqueTaxpayerReference.error.required = Enter a Unique Taxpayer Reference (UTR), like 1234567890
+partnershipUniqueTaxpayerReference.error.invalid = Your entry for ‘Unique tax reference (UTR)’ is invalid. Please amend.
+partnershipUniqueTaxpayerReference.error.length = Enter a Unique Taxpayer Reference (UTR) using 10 digits
+partnershipUniqueTaxpayerReference.error.duplicate = You have entered a Unique Tax Reference (UTR) of an existing subcontractor. Please amend your entry.
 
 partnershipHasUtrYesNo.title = Does this partnership have a Unique Taxpayer Reference (UTR)?
 partnershipHasUtrYesNo.heading = Does {0} have a Unique Taxpayer Reference (UTR)?
