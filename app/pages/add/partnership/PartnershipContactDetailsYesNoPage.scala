@@ -24,4 +24,13 @@ case object PartnershipContactDetailsYesNoPage extends QuestionPage[Boolean] {
   override def path: JsPath = JsPath \ toString
 
   override def toString: String = "partnershipContactDetailsYesNo"
+
+  // TODO: Clear PartnershipContactDetailsPage when user answers No (not yet implemented)
+  //  override def cleanup(value: Option[Boolean], userAnswers: UserAnswers): Try[UserAnswers] =
+  //    if value.contains(false) then {
+  //      userAnswers
+  //        .remove(PartnershipContactDetailsPage)
+  //    } else {
+  //      super.cleanup(value, userAnswers)
+  //    }
 }
