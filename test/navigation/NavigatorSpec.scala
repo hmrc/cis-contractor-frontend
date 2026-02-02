@@ -74,6 +74,14 @@ class NavigatorSpec extends SpecBase {
         ) mustBe controllers.add.partnership.routes.PartnershipUniqueTaxpayerReferenceController.onPageLoad(NormalMode)
       }
 
+      "must go from PartnershipNamePage to JourneyRecovery in CheckMode" in {
+        navigator.nextPage(
+          PartnershipNamePage,
+          CheckMode,
+          emptyUserAnswers
+        ) mustBe routes.JourneyRecoveryController.onPageLoad()
+      }
+
       "must go from a TypeOfSubcontractorPage to JourneyRecovery when Trust is selected" in {
         navigator.nextPage(
           TypeOfSubcontractorPage,

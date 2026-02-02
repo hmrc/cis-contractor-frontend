@@ -53,7 +53,8 @@ class Navigator @Inject() () {
     case SubcontractorContactDetailsYesNoPage      =>
       userAnswers => navigatorFromSubcontractorContactDetailsYesNoPage(NormalMode)(userAnswers)
     case SubContactDetailsPage                     => _ => controllers.add.routes.CheckYourAnswersController.onPageLoad()
-    case PartnershipNamePage                       => _ => routes.JourneyRecoveryController.onPageLoad()
+    case PartnershipNamePage                       =>
+      _ => controllers.add.partnership.routes.PartnershipUniqueTaxpayerReferenceController.onPageLoad(NormalMode)
     case PartnershipUniqueTaxpayerReferencePage    =>
       // TODO: https://confluence.tools.tax.service.gov.uk/display/RBD/SL0205-H%28PTN%29+-+Works+Ref
       _ => routes.JourneyRecoveryController.onPageLoad()
@@ -74,7 +75,7 @@ class Navigator @Inject() () {
     case SubContactDetailsPage                => _ => controllers.add.routes.CheckYourAnswersController.onPageLoad()
     case SubcontractorContactDetailsYesNoPage =>
       userAnswers => navigatorFromSubcontractorContactDetailsYesNoPage(CheckMode)(userAnswers)
-    case PartnershipNamePage                  => _ => controllers.add.routes.CheckYourAnswersController.onPageLoad()
+    case PartnershipNamePage                  => _ => routes.JourneyRecoveryController.onPageLoad()
     case _                                    => _ => controllers.add.routes.CheckYourAnswersController.onPageLoad()
   }
 
