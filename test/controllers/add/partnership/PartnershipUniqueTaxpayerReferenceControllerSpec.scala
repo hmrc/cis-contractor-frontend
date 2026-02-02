@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package controllers.add
+package controllers.add.partnership
 
 import base.SpecBase
 import controllers.routes
@@ -23,62 +23,70 @@ import models.{NormalMode, UserAnswers}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{verify, verifyNoMoreInteractions, when}
 import org.scalatestplus.mockito.MockitoSugar
-import pages.add.SubcontractorsUniqueTaxpayerReferencePage
+import pages.add.partnership.{PartnershipNamePage, PartnershipUniqueTaxpayerReferencePage}
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import services.SubcontractorService
 import uk.gov.hmrc.http.HeaderCarrier
-import views.html.add.SubcontractorsUniqueTaxpayerReferenceView
+import views.html.add.partnership.PartnershipUniqueTaxpayerReferenceView
 
 import scala.concurrent.Future
 
-class SubcontractorsUniqueTaxpayerReferenceControllerSpec extends SpecBase with MockitoSugar {
+class PartnershipUniqueTaxpayerReferenceControllerSpec extends SpecBase with MockitoSugar {
 
   private val formProvider = new UtrFormProvider()
   private val form         = formProvider()
 
-  lazy private val subcontractorsUniqueTaxpayerReferenceRoute =
-    controllers.add.routes.SubcontractorsUniqueTaxpayerReferenceController.onPageLoad(NormalMode).url
+  private val partnershipName = "Test Partnership"
 
-  "SubcontractorsUniqueTaxpayerReference Controller" - {
+  private def uaWithName: UserAnswers =
+    emptyUserAnswers.set(PartnershipNamePage, partnershipName).success.value
+
+  lazy private val partnershipUniqueTaxpayerReferenceRoute =
+    controllers.add.partnership.routes.PartnershipUniqueTaxpayerReferenceController.onPageLoad(NormalMode).url
+
+  "PartnershipUniqueTaxpayerReferenceControllerSpec Controller" - {
 
     "must return OK and the correct view for a GET" in {
 
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
       running(application) {
-        val request = FakeRequest(GET, subcontractorsUniqueTaxpayerReferenceRoute)
+        val request = FakeRequest(GET, partnershipUniqueTaxpayerReferenceRoute)
 
         val result = route(application, request).value
 
-        val view = application.injector.instanceOf[SubcontractorsUniqueTaxpayerReferenceView]
+        val view = application.injector.instanceOf[PartnershipUniqueTaxpayerReferenceView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode, "TODO")(request, messages(application)).toString
       }
     }
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
       val userAnswers =
-        UserAnswers(userAnswersId).set(SubcontractorsUniqueTaxpayerReferencePage, "answer").success.value
+        UserAnswers(userAnswersId).set(PartnershipUniqueTaxpayerReferencePage, "answer").success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
       running(application) {
-        val request = FakeRequest(GET, subcontractorsUniqueTaxpayerReferenceRoute)
+        val request = FakeRequest(GET, partnershipUniqueTaxpayerReferenceRoute)
 
-        val view = application.injector.instanceOf[SubcontractorsUniqueTaxpayerReferenceView]
+        val view = application.injector.instanceOf[PartnershipUniqueTaxpayerReferenceView]
 
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill("answer"), NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill("answer"), NormalMode, "TODO")(
+          request,
+          messages(application)
+        ).toString
       }
     }
 
-    "must bind the form and redirect to WorksReferenceNumberYesNo Page on POST when valid UTR is submitted" in {
+    "must bind the form and redirect to JourneyRecovery Page on POST when valid UTR is submitted" in {
 
       val validValue = "5860920998"
 
@@ -96,41 +104,19 @@ class SubcontractorsUniqueTaxpayerReferenceControllerSpec extends SpecBase with 
 
       running(application) {
         val request =
-          FakeRequest(POST, subcontractorsUniqueTaxpayerReferenceRoute)
+          FakeRequest(POST, partnershipUniqueTaxpayerReferenceRoute)
             .withFormUrlEncodedBody(("value", validValue))
 
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
 
-        redirectLocation(result).value mustEqual controllers.add.routes.WorksReferenceNumberYesNoController
-          .onPageLoad(NormalMode)
-          .url
+        redirectLocation(
+          result
+        ).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
       }
       verify(mockSubcontractorService).isDuplicateUTR(any[UserAnswers], any[String])(any[HeaderCarrier])
       verifyNoMoreInteractions(mockSubcontractorService)
-    }
-
-    "must bind the form and redirect to WorksReferenceNumberYesNo Page on POST when invalid UTR is submitted" in {
-
-      val invalidValue = "1234567890"
-
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
-
-      running(application) {
-        val request =
-          FakeRequest(POST, subcontractorsUniqueTaxpayerReferenceRoute)
-            .withFormUrlEncodedBody(("value", invalidValue))
-
-        val boundForm = form.bind(Map("value" -> invalidValue))
-
-        val view = application.injector.instanceOf[SubcontractorsUniqueTaxpayerReferenceView]
-
-        val result = route(application, request).value
-
-        status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode)(request, messages(application)).toString
-      }
     }
 
     "must return a Bad Request and show duplicate error when when utr already exists" in {
@@ -151,20 +137,20 @@ class SubcontractorsUniqueTaxpayerReferenceControllerSpec extends SpecBase with 
 
       running(application) {
         val request =
-          FakeRequest(POST, subcontractorsUniqueTaxpayerReferenceRoute)
+          FakeRequest(POST, partnershipUniqueTaxpayerReferenceRoute)
             .withFormUrlEncodedBody(("value", duplicatedUTR))
 
         val boundForm = form.bind(Map("value" -> duplicatedUTR))
 
         val formWithDuplicateError =
-          boundForm.withError("value", "subcontractorsUniqueTaxpayerReference.error.duplicate")
+          boundForm.withError("value", "partnershipUniqueTaxpayerReference.error.duplicate")
 
-        val view = application.injector.instanceOf[SubcontractorsUniqueTaxpayerReferenceView]
+        val view = application.injector.instanceOf[PartnershipUniqueTaxpayerReferenceView]
 
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(formWithDuplicateError, NormalMode)(
+        contentAsString(result) mustEqual view(formWithDuplicateError, NormalMode, "TODO")(
           request,
           messages(application)
         ).toString
@@ -176,21 +162,24 @@ class SubcontractorsUniqueTaxpayerReferenceControllerSpec extends SpecBase with 
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(uaWithName)).build()
 
       running(application) {
         val request =
-          FakeRequest(POST, subcontractorsUniqueTaxpayerReferenceRoute)
+          FakeRequest(POST, partnershipUniqueTaxpayerReferenceRoute)
             .withFormUrlEncodedBody(("value", ""))
 
         val boundForm = form.bind(Map("value" -> ""))
 
-        val view = application.injector.instanceOf[SubcontractorsUniqueTaxpayerReferenceView]
+        val view = application.injector.instanceOf[PartnershipUniqueTaxpayerReferenceView]
 
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, NormalMode, partnershipName)(
+          request,
+          messages(application)
+        ).toString
       }
     }
 
@@ -199,7 +188,7 @@ class SubcontractorsUniqueTaxpayerReferenceControllerSpec extends SpecBase with 
       val application = applicationBuilder(userAnswers = None).build()
 
       running(application) {
-        val request = FakeRequest(GET, subcontractorsUniqueTaxpayerReferenceRoute)
+        val request = FakeRequest(GET, partnershipUniqueTaxpayerReferenceRoute)
 
         val result = route(application, request).value
 
@@ -214,7 +203,7 @@ class SubcontractorsUniqueTaxpayerReferenceControllerSpec extends SpecBase with 
 
       running(application) {
         val request =
-          FakeRequest(POST, subcontractorsUniqueTaxpayerReferenceRoute)
+          FakeRequest(POST, partnershipUniqueTaxpayerReferenceRoute)
             .withFormUrlEncodedBody(("value", "answer"))
 
         val result = route(application, request).value

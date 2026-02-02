@@ -16,7 +16,6 @@
 
 package views.add.partnership
 
-import forms.add.AddressOfSubcontractorFormProvider
 import forms.add.partnership.PartnershipAddressOfSubcontractorFormProvider
 import models.NormalMode
 import org.jsoup.Jsoup
@@ -28,7 +27,6 @@ import play.api.i18n.Messages
 import play.api.mvc.Request
 import play.api.test.FakeRequest
 import play.twirl.api.HtmlFormat
-import views.html.add.AddressOfSubcontractorView
 import views.html.add.partnership.PartnershipAddressOfSubcontractorView
 
 class PartnershipAddressOfSubcontractorViewSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite {

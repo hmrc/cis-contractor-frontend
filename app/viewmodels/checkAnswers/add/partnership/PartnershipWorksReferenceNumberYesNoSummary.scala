@@ -17,39 +17,29 @@
 package viewmodels.checkAnswers.add.partnership
 
 import models.{CheckMode, UserAnswers}
-import pages.add.partnership.{PartnershipHasUtrYesNoPage, PartnershipNamePage}
+import pages.add.partnership.PartnershipWorksReferenceNumberYesNoPage
 import play.api.i18n.Messages
-import uk.gov.hmrc.govukfrontend.views.Aliases.Text
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
 
-object PartnershipHasUtrYesNoSummary {
+object PartnershipWorksReferenceNumberYesNoSummary {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(PartnershipHasUtrYesNoPage).map { answer =>
-      val partnershipName = answers
-        .get(PartnershipNamePage)
-        .getOrElse(throw MissingRequiredAnswer("PartnershipNamePage"))
+    answers.get(PartnershipWorksReferenceNumberYesNoPage).map { answer =>
 
-      val yesNoText = if (answer) messages("site.yes") else messages("site.no")
+      val value = if (answer) "site.yes" else "site.no"
 
       SummaryListRowViewModel(
-        key = KeyViewModel(
-          Text(messages("partnershipHasUtrYesNo.checkYourAnswersLabel", partnershipName))
-        ),
-        value = ValueViewModel(yesNoText),
+        key = "partnershipWorksReferenceNumberYesNo.checkYourAnswersLabel",
+        value = ValueViewModel(value),
         actions = Seq(
           ActionItemViewModel(
-            content = messages("site.change"),
-            href = controllers.add.partnership.routes.PartnershipHasUtrYesNoController
-              .onPageLoad(CheckMode)
-              .url
-          ).withVisuallyHiddenText(
-            messages("partnershipHasUtrYesNo.change.hidden")
+            "site.change",
+            controllers.add.partnership.routes.PartnershipWorksReferenceNumberYesNoController.onPageLoad(CheckMode).url
           )
+            .withVisuallyHiddenText(messages("partnershipWorksReferenceNumberYesNo.change.hidden"))
         )
       )
     }
 }
-final case class MissingRequiredAnswer(page: String) extends RuntimeException(page)
