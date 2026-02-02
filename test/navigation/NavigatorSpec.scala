@@ -23,6 +23,7 @@ import models.*
 import models.add.{SubcontractorName, TypeOfSubcontractor, UKAddress}
 import pages.add.*
 import pages.add.partnership.PartnershipHasUtrYesNoPage
+import pages.add.partnership.PartnershipNamePage
 
 class NavigatorSpec extends SpecBase {
 
@@ -57,12 +58,20 @@ class NavigatorSpec extends SpecBase {
         ) mustBe routes.JourneyRecoveryController.onPageLoad()
       }
 
-      "must go from a TypeOfSubcontractorPage to PartnershipHasUtrYesNoController when Partnership is selected" in {
+      "must go from a TypeOfSubcontractorPage to PartnershipNameController when Partnership is selected" in {
         navigator.nextPage(
           TypeOfSubcontractorPage,
           NormalMode,
           emptyUserAnswers.setOrException(TypeOfSubcontractorPage, TypeOfSubcontractor.Partnership)
-        ) mustBe controllers.add.partnership.routes.PartnershipHasUtrYesNoController.onPageLoad(NormalMode)
+        ) mustBe controllers.add.partnership.routes.PartnershipNameController.onPageLoad(NormalMode)
+      }
+
+      "must go from PartnershipNamePage to PartnershipUniqueTaxpayerReferenceController in NormalMode" in {
+        navigator.nextPage(
+          PartnershipNamePage,
+          NormalMode,
+          emptyUserAnswers
+        ) mustBe controllers.add.partnership.routes.PartnershipUniqueTaxpayerReferenceController.onPageLoad(NormalMode)
       }
 
       "must go from a TypeOfSubcontractorPage to JourneyRecovery when Trust is selected" in {

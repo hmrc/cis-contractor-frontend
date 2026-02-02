@@ -89,7 +89,10 @@ class PartnershipNameControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill("My Partnership"), NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill("My Partnership"), NormalMode)(
+          request,
+          messages(application)
+        ).toString
       }
     }
 
@@ -98,7 +101,8 @@ class PartnershipNameControllerSpec extends SpecBase with MockitoSugar {
       val mockSubcontractorService = mock[SubcontractorService]
 
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
-      when(mockSubcontractorService.updateSubcontractor(any[UserAnswers])(any[HeaderCarrier])) thenReturn Future.successful(())
+      when(mockSubcontractorService.updateSubcontractor(any[UserAnswers])(any[HeaderCarrier])) thenReturn Future
+        .successful(())
 
       val application =
         applicationBuilder(userAnswers = Some(emptyUserAnswers))

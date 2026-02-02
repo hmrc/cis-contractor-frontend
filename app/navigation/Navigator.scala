@@ -89,10 +89,8 @@ class Navigator @Inject() () {
     (userAnswers.get(TypeOfSubcontractorPage), mode) match {
       case (Some(Individualorsoletrader), NormalMode) =>
         controllers.add.routes.SubTradingNameYesNoController.onPageLoad(NormalMode)
-      case (Some(Partnership), NormalMode) =>
-        controllers.add.partnership.routes.PartnershipNameController.onPageLoad(NormalMode)
       case (Some(Partnership), NormalMode)            =>
-        controllers.add.partnership.routes.PartnershipHasUtrYesNoController.onPageLoad(NormalMode)
+        controllers.add.partnership.routes.PartnershipNameController.onPageLoad(NormalMode)
       case (None, _)                                  => routes.JourneyRecoveryController.onPageLoad()
       case (_, NormalMode)                            => routes.JourneyRecoveryController.onPageLoad()
       case (_, CheckMode)                             => controllers.add.routes.CheckYourAnswersController.onPageLoad()

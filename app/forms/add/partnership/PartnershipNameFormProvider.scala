@@ -21,21 +21,21 @@ import play.api.data.Form
 
 import javax.inject.Inject
 
-class PartnershipNameFormProvider @Inject() extends  Mappings {
+class PartnershipNameFormProvider @Inject() extends Mappings {
 
   private val allowedCharsRegex =
     """^[A-Za-z0-9"~!@#\$%*+:\;=\?\s,\.\[\]_\\\{\}\(\)/&'\-\^\u00A3\u20AC]+$"""
 
-  def apply(): Form[String]  =
+  def apply(): Form[String] =
     Form(
       "value" -> text("partnershipName.error.required")
-      .transform(_.trim, identity)
-      .verifying(
-        firstError(
-          maxLength(56,"partnershipName.error.length"),
-          regexp(allowedCharsRegex, "partnershipName.error.invalidCharacters")
+        .transform(_.trim, identity)
+        .verifying(
+          firstError(
+            maxLength(56, "partnershipName.error.length"),
+            regexp(allowedCharsRegex, "partnershipName.error.invalidCharacters")
+          )
         )
-      )
     )
 
 }
