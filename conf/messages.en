@@ -253,9 +253,9 @@ subcontractorsUniqueTaxpayerReference.change.hidden = Unique Taxpayer Reference
 partnershipWorksReferenceNumberYesNo.title = Does this partnership have a works reference number?
 partnershipWorksReferenceNumberYesNo.heading = Does {0} have a works reference number?
 partnershipWorksReferenceNumberYesNo.hint = This is the reference number used to identify your subcontractor’s work or project. It can contain letters and numbers
-partnershipWorksReferenceNumberYesNo.checkYourAnswersLabel = Do you have a works reference number?
+partnershipWorksReferenceNumberYesNo.checkYourAnswersLabel = Partnership has a works reference number
 partnershipWorksReferenceNumberYesNo.error.required = Select one option
-partnershipWorksReferenceNumberYesNo.change.hidden = do you have a works reference number?
+partnershipWorksReferenceNumberYesNo.change.hidden = partnership has a works reference number
 
 checkYourAnswers.heading.sub.h2 = Subcontractor details
 checkYourAnswers.heading.h2 = Now add the subcontractor
