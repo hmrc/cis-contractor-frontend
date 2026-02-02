@@ -38,7 +38,7 @@
         @govukInput(
             InputViewModel(
                 field = form("value"),
-                label = LabelViewModel(messages("partnershipWorksReferenceNumber.heading", partnershipName)).asPageHeading()
+                label = LabelViewModel(messages("partnershipWorksReferenceNumber.heading", partnershipName)).asPageHeading().withCssClass("govuk-label--l")
             )
             .withWidth(Fixed20)
             .withHint(Hint(content = messages("partnershipWorksReferenceNumber.hint")))
