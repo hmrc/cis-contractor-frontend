@@ -278,9 +278,9 @@ partnershipUniqueTaxpayerReference.paragraph = The UTR will be on tax returns an
 partnershipUniqueTaxpayerReference.linkText = Get more help to find a UTR (opens in new tab)
 partnershipUniqueTaxpayerReference.heading2 = What is the UTR for {0}?
 partnershipUniqueTaxpayerReference.hint = A UTR is a 10 digit number
-partnershipUniqueTaxpayerReference.error.required = Enter a Unique Taxpayer Reference (UTR), like 1234567890
+partnershipUniqueTaxpayerReference.error.required = Enter the Unique Taxpayer Reference (UTR) using 10 numbers, like 1234567890
 partnershipUniqueTaxpayerReference.error.invalid = Your entry for ‘Unique tax reference (UTR)’ is invalid. Please amend.
-partnershipUniqueTaxpayerReference.error.length = Enter a Unique Taxpayer Reference (UTR) using 10 digits
+partnershipUniqueTaxpayerReference.error.length = Enter a Unique Taxpayer Reference as a 10 digit number
 partnershipUniqueTaxpayerReference.error.duplicate = You have entered a Unique Tax Reference (UTR) of an existing subcontractor. Please amend your entry.
 
 partnershipHasUtrYesNo.title = Does this partnership have a Unique Taxpayer Reference (UTR)?
