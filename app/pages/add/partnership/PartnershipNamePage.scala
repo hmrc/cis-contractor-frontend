@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package models.subcontractor
+package pages.add.partnership
 
-import play.api.libs.json.{Json, OFormat}
+import pages.QuestionPage
+import play.api.libs.json.JsPath
 
-final case class GetSubcontractorUTRsResponse(
-  subcontractorUTRs: Seq[String]
-)
+case object PartnershipNamePage extends QuestionPage[String] {
 
-object GetSubcontractorUTRsResponse {
-  implicit val format: OFormat[GetSubcontractorUTRsResponse] = Json.format[GetSubcontractorUTRsResponse]
+  override def path: JsPath = JsPath \ toString
+
+  override def toString: String = "partnershipName"
 }

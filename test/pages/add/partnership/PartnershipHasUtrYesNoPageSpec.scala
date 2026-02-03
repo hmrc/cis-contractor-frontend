@@ -14,14 +14,18 @@
  * limitations under the License.
  */
 
-package models.subcontractor
+package pages.add.partnership
 
-import play.api.libs.json.{Json, OFormat}
+import pages.behaviours.PageBehaviours
 
-final case class GetSubcontractorUTRsResponse(
-  subcontractorUTRs: Seq[String]
-)
+class PartnershipHasUtrYesNoPageSpec extends PageBehaviours {
 
-object GetSubcontractorUTRsResponse {
-  implicit val format: OFormat[GetSubcontractorUTRsResponse] = Json.format[GetSubcontractorUTRsResponse]
+  "PartnershipHasUtrYesNoPage" - {
+
+    beRetrievable[Boolean](PartnershipHasUtrYesNoPage)
+
+    beSettable[Boolean](PartnershipHasUtrYesNoPage)
+
+    beRemovable[Boolean](PartnershipHasUtrYesNoPage)
+  }
 }

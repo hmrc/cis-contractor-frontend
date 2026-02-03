@@ -1,5 +1,5 @@
 /*
- * Copyright 2026 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,14 +14,18 @@
  * limitations under the License.
  */
 
-package models.subcontractor
+package pages.add.partnership
 
-import play.api.libs.json.{Json, OFormat}
+import pages.behaviours.PageBehaviours
 
-final case class GetSubcontractorUTRsResponse(
-  subcontractorUTRs: Seq[String]
-)
+class PartnershipWorksReferenceNumberPageSpec extends PageBehaviours {
 
-object GetSubcontractorUTRsResponse {
-  implicit val format: OFormat[GetSubcontractorUTRsResponse] = Json.format[GetSubcontractorUTRsResponse]
+  "PartnershipWorksReferenceNumber" - {
+
+    beRetrievable[String](PartnershipWorksReferenceNumberPage)
+
+    beSettable[String](PartnershipWorksReferenceNumberPage)
+
+    beRemovable[String](PartnershipWorksReferenceNumberPage)
+  }
 }

@@ -14,14 +14,17 @@
  * limitations under the License.
  */
 
-package models.subcontractor
+package forms.add.partnership
 
-import play.api.libs.json.{Json, OFormat}
+import forms.mappings.Mappings
+import play.api.data.Form
 
-final case class GetSubcontractorUTRsResponse(
-  subcontractorUTRs: Seq[String]
-)
+import javax.inject.Inject
 
-object GetSubcontractorUTRsResponse {
-  implicit val format: OFormat[GetSubcontractorUTRsResponse] = Json.format[GetSubcontractorUTRsResponse]
+class PartnershipWorksReferenceNumberYesNoFormProvider @Inject() extends Mappings {
+
+  def apply(): Form[Boolean] =
+    Form(
+      "value" -> boolean("partnershipWorksReferenceNumberYesNo.error.required")
+    )
 }

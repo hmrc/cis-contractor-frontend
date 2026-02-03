@@ -14,14 +14,25 @@
  * limitations under the License.
  */
 
-package models.subcontractor
+package pages.add.partnership
 
-import play.api.libs.json.{Json, OFormat}
+import models.UserAnswers
+import pages.QuestionPage
+import play.api.libs.json.JsPath
 
-final case class GetSubcontractorUTRsResponse(
-  subcontractorUTRs: Seq[String]
-)
+import scala.util.Try
 
-object GetSubcontractorUTRsResponse {
-  implicit val format: OFormat[GetSubcontractorUTRsResponse] = Json.format[GetSubcontractorUTRsResponse]
+case object PartnershipWorksReferenceNumberYesNoPage extends QuestionPage[Boolean] {
+
+  override def path: JsPath = JsPath \ toString
+
+  override def toString: String = "partnershipWorksReferenceNumberYesNo"
+
+  override def cleanup(value: Option[Boolean], userAnswers: UserAnswers): Try[UserAnswers] =
+    if value.contains(false) then {
+      userAnswers
+        .remove(PartnershipWorksReferenceNumberPage)
+    } else {
+      super.cleanup(value, userAnswers)
+    }
 }
