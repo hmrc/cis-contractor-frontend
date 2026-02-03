@@ -19,13 +19,12 @@ package controllers.add
 import controllers.actions.*
 import forms.add.SubcontractorNameFormProvider
 import models.Mode
-import navigation.Navigator
 import models.add.SubcontractorName.format
+import navigation.Navigator
 import pages.add.SubcontractorNamePage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
-import services.SubcontractorService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.add.SubcontractorNameView
 
@@ -40,7 +39,6 @@ class SubcontractorNameController @Inject() (
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   formProvider: SubcontractorNameFormProvider,
-  subcontractorService: SubcontractorService,
   val controllerComponents: MessagesControllerComponents,
   view: SubcontractorNameView
 )(implicit ec: ExecutionContext)
@@ -67,12 +65,10 @@ class SubcontractorNameController @Inject() (
           formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
           value =>
             for {
-              updatedAnswers           <- Future.fromTry(request.userAnswers.set(SubcontractorNamePage, value))
-              userAnswersWithSubbieRef <- subcontractorService.ensureSubcontractorInUserAnswers(updatedAnswers)
-              _                        <- sessionRepository.set(userAnswersWithSubbieRef)
-              _                        <- subcontractorService.updateSubcontractor(userAnswersWithSubbieRef)
+              updatedAnswers <- Future.fromTry(request.userAnswers.set(SubcontractorNamePage, value))
+              _              <- sessionRepository.set(updatedAnswers)
             } yield Redirect(
-              navigator.nextPage(SubcontractorNamePage, mode, userAnswersWithSubbieRef)
+              navigator.nextPage(SubcontractorNamePage, mode, updatedAnswers)
             )
         )
     }
