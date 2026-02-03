@@ -17,7 +17,7 @@
 package controllers.add.partnership
 
 import controllers.actions.*
-import forms.add.UtrFormProvider
+import forms.add.partnership.PartnershipUtrFormProvider
 import models.Mode
 import navigation.Navigator
 import pages.add.partnership.{PartnershipNamePage, PartnershipUniqueTaxpayerReferencePage}
@@ -38,7 +38,7 @@ class PartnershipUniqueTaxpayerReferenceController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
-  formProvider: UtrFormProvider,
+  formProvider: PartnershipUtrFormProvider,
   subcontractorService: SubcontractorService,
   val controllerComponents: MessagesControllerComponents,
   view: PartnershipUniqueTaxpayerReferenceView
