@@ -119,8 +119,8 @@ POST       /add/partnership/partnership-has-works-reference                 cont
 GET        /add/partnership/change-partnership-has-works-reference          controllers.add.partnership.PartnershipWorksReferenceNumberYesNoController.onPageLoad(mode: Mode = CheckMode)
 POST       /add/partnership/change-partnership-has-works-reference          controllers.add.partnership.PartnershipWorksReferenceNumberYesNoController.onSubmit(mode: Mode = CheckMode)
 
-GET        /add/partnership/address                       controllers.add.partnership.PartnershipAddressOfSubcontractorController.onPageLoad(mode: Mode = NormalMode)
-POST       /add/partnership/address                       controllers.add.partnership.PartnershipAddressOfSubcontractorController.onSubmit(mode: Mode = NormalMode)
-GET        /add/partnership/change-address                controllers.add.partnership.PartnershipAddressOfSubcontractorController.onPageLoad(mode: Mode = CheckMode)
-POST       /add/partnership/change-address                controllers.add.partnership.PartnershipAddressOfSubcontractorController.onSubmit(mode: Mode = CheckMode)
+GET        /add/partnership/check-address                       controllers.add.partnership.PartnershipAddressOfSubcontractorController.onPageLoad(mode: Mode = NormalMode)
+POST       /add/partnership/check-address                       controllers.add.partnership.PartnershipAddressOfSubcontractorController.onSubmit(mode: Mode = NormalMode)
+GET        /add/partnership/change-check-address                controllers.add.partnership.PartnershipAddressOfSubcontractorController.onPageLoad(mode: Mode = CheckMode)
+POST       /add/partnership/change-check-address                controllers.add.partnership.PartnershipAddressOfSubcontractorController.onSubmit(mode: Mode = CheckMode)
 
