@@ -169,12 +169,12 @@ class NavigatorSpec extends SpecBase {
         ) mustBe controllers.add.routes.NationalInsuranceNumberYesNoController.onPageLoad(NormalMode)
       }
 
-      "must go from a PartnershipAddressOfSubcontractorPage to next page" in {
+      "must go from a PartnershipAddressPage to next page" in {
         navigator.nextPage(
-          PartnershipAddressOfSubcontractorPage,
+          PartnershipAddressPage,
           NormalMode,
           UserAnswers("id")
-        ) mustBe controllers.add.partnership.routes.PartnershipAddressOfSubcontractorController.onPageLoad(NormalMode)
+        ) mustBe controllers.add.partnership.routes.PartnershipAddressController.onPageLoad(NormalMode)
       }
 
       "must go from a NationalInsuranceNumberYesNoPage to SubNationalInsuranceNumberPage when true" in {

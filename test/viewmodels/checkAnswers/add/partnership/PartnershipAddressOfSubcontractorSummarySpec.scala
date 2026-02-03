@@ -22,18 +22,18 @@ import org.scalatest.OptionValues.convertOptionToValuable
 import org.scalatest.TryValues.convertTryToSuccessOrFailure
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-import pages.add.partnership.PartnershipAddressOfSubcontractorPage
+import pages.add.partnership.PartnershipAddressPage
 import play.api.i18n.Messages
 import play.api.test.Helpers.stubMessages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 
-class PartnershipAddressOfSubcontractorSummarySpec extends AnyWordSpec with Matchers {
+class PartnershipAddressSummarySpec extends AnyWordSpec with Matchers {
 
   implicit val messages: Messages = stubMessages()
 
-  "PartnershipAddressOfSubcontractorSummary.row" should {
+  "PartnershipAddressSummary.row" should {
 
-    "return a SummaryListRow when PartnershipAddressOfSubcontractorPage has an answer" in {
+    "return a SummaryListRow when PartnershipAddressPage has an answer" in {
 
       val address = UKAddress(
         addressLine1 = "10 Downing Street",
@@ -44,16 +44,16 @@ class PartnershipAddressOfSubcontractorSummarySpec extends AnyWordSpec with Matc
       )
 
       val userAnswers =
-        UserAnswers("id").set(PartnershipAddressOfSubcontractorPage, address).success.value
+        UserAnswers("id").set(PartnershipAddressPage, address).success.value
 
-      val result = PartnershipAddressOfSubcontractorSummary.row(userAnswers)
+      val result = PartnershipAddressSummary.row(userAnswers)
 
       result mustBe defined
 
       val row = result.value
 
       row.key.content.asHtml.toString must include(
-        messages("partnershipAddressOfSubcontractor.checkYourAnswersLabel")
+        messages("partnershipAddress.checkYourAnswersLabel")
       )
 
       row.value.content mustBe HtmlContent(
@@ -72,14 +72,14 @@ class PartnershipAddressOfSubcontractorSummarySpec extends AnyWordSpec with Matc
           .url
 
       action.visuallyHiddenText.value mustBe
-        messages("partnershipAddressOfSubcontractor.change.hidden")
+        messages("partnershipAddress.change.hidden")
     }
 
-    "return None when PartnershipAddressOfSubcontractorPage has no answer" in {
+    "return None when PartnershipAddressPage has no answer" in {
 
       val userAnswers = UserAnswers("id")
 
-      PartnershipAddressOfSubcontractorSummary.row(userAnswers) mustBe None
+      PartnershipAddressSummary.row(userAnswers) mustBe None
     }
   }
 }

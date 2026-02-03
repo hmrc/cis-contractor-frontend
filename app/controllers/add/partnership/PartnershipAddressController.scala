@@ -17,29 +17,29 @@
 package controllers.add.partnership
 
 import controllers.actions.*
-import forms.add.partnership.PartnershipAddressOfSubcontractorFormProvider
+import forms.add.partnership.PartnershipAddressFormProvider
 import models.Mode
 import navigation.Navigator
-import pages.add.partnership.{PartnershipAddressOfSubcontractorPage, PartnershipNamePage}
+import pages.add.partnership.{PartnershipAddressPage, PartnershipNamePage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.add.partnership.PartnershipAddressOfSubcontractorView
+import views.html.add.partnership.PartnershipAddressView
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class PartnershipAddressOfSubcontractorController @Inject() (
+class PartnershipAddressController @Inject()(
   override val messagesApi: MessagesApi,
   sessionRepository: SessionRepository,
   navigator: Navigator,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
-  formProvider: PartnershipAddressOfSubcontractorFormProvider,
+  formProvider: PartnershipAddressFormProvider,
   val controllerComponents: MessagesControllerComponents,
-  view: PartnershipAddressOfSubcontractorView
+  view: PartnershipAddressView
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport {
@@ -50,7 +50,7 @@ class PartnershipAddressOfSubcontractorController @Inject() (
     request.userAnswers
       .get(PartnershipNamePage)
       .map { partnershipName =>
-        val preparedForm = request.userAnswers.get(PartnershipAddressOfSubcontractorPage) match {
+        val preparedForm = request.userAnswers.get(PartnershipAddressPage) match {
           case None        => form
           case Some(value) => form.fill(value)
         }
@@ -72,9 +72,9 @@ class PartnershipAddressOfSubcontractorController @Inject() (
               value =>
                 for {
                   updatedAnswers <-
-                    Future.fromTry(request.userAnswers.set(PartnershipAddressOfSubcontractorPage, value))
+                    Future.fromTry(request.userAnswers.set(PartnershipAddressPage, value))
                   _              <- sessionRepository.set(updatedAnswers)
-                } yield Redirect(navigator.nextPage(PartnershipAddressOfSubcontractorPage, mode, updatedAnswers))
+                } yield Redirect(navigator.nextPage(PartnershipAddressPage, mode, updatedAnswers))
             )
         }
         .getOrElse(Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())))

@@ -27,20 +27,20 @@
 
 @(form: Form[_], mode: Mode, partnershipName: String)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = title(form, messages("partnershipAddressOfSubcontractor.title"))) {
+@layout(pageTitle = title(form, messages("partnershipAddress.title"))) {
 
-    @formHelper(action = controllers.add.partnership.routes.PartnershipAddressOfSubcontractorController.onSubmit(mode), Symbol("autoComplete") -> "off") {
+    @formHelper(action = controllers.add.partnership.routes.PartnershipAddressController.onSubmit(mode), Symbol("autoComplete") -> "off") {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form))
         }
 
-        <h1 class="govuk-heading-xl">@messages("partnershipAddressOfSubcontractor.heading", partnershipName)</h1>
+        <h1 class="govuk-heading-xl">@messages("partnershipAddress.heading", partnershipName)</h1>
 
         @govukInput(
             InputViewModel(
                 field = form("addressLine1"),
-                label = LabelViewModel(messages("partnershipAddressOfSubcontractor.addressLine1"))
+                label = LabelViewModel(messages("partnershipAddress.addressLine1"))
             )
             .withWidth(Full)
         )
@@ -48,7 +48,7 @@
         @govukInput(
             InputViewModel(
                 field = form("addressLine2"),
-                label = LabelViewModel(messages("partnershipAddressOfSubcontractor.addressLine2"))
+                label = LabelViewModel(messages("partnershipAddress.addressLine2"))
             )
             .withWidth(Full)
         )
@@ -56,7 +56,7 @@
         @govukInput(
         InputViewModel(
         field = form("addressLine3"),
-        label = LabelViewModel(messages("partnershipAddressOfSubcontractor.addressLine3"))
+        label = LabelViewModel(messages("partnershipAddress.addressLine3"))
         )
         .withWidth(TwoThirds)
         )
@@ -64,7 +64,7 @@
         @govukInput(
         InputViewModel(
         field = form("addressLine4"),
-        label = LabelViewModel(messages("partnershipAddressOfSubcontractor.addressLine4"))
+        label = LabelViewModel(messages("partnershipAddress.addressLine4"))
         )
         .withWidth(TwoThirds)
         )
@@ -72,7 +72,7 @@
         @govukInput(
         InputViewModel(
         field = form("postCode"),
-        label = LabelViewModel(messages("partnershipAddressOfSubcontractor.postCode"))
+        label = LabelViewModel(messages("partnershipAddress.postCode"))
         )
         .withWidth(Fixed10)
         )

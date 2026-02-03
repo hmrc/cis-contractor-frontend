@@ -20,9 +20,9 @@ import forms.behaviours.StringFieldBehaviours
 import org.scalacheck.Gen
 import play.api.data.FormError
 
-class PartnershipAddressOfSubcontractorFormProviderSpec extends StringFieldBehaviours {
+class PartnershipAddressFormProviderSpec extends StringFieldBehaviours {
 
-  private val form = new PartnershipAddressOfSubcontractorFormProvider()()
+  private val form = new PartnershipAddressFormProvider()()
 
   private val maxLength         = 35
   private val postcodeMaxLength = 8
@@ -62,9 +62,9 @@ class PartnershipAddressOfSubcontractorFormProviderSpec extends StringFieldBehav
   ".addressLine1" - {
 
     val fieldName   = "addressLine1"
-    val requiredKey = "partnershipAddressOfSubcontractor.error.addressLine1.required"
-    val lengthKey   = "partnershipAddressOfSubcontractor.error.addressLine1.length"
-    val invalidKey  = "partnershipAddressOfSubcontractor.error.addressLine1.invalidCharacters"
+    val requiredKey = "partnershipAddress.error.addressLine1.required"
+    val lengthKey   = "partnershipAddress.error.addressLine1.length"
+    val invalidKey  = "partnershipAddress.error.addressLine1.invalidCharacters"
 
     behave like fieldThatBindsValidData(
       form,
@@ -97,9 +97,9 @@ class PartnershipAddressOfSubcontractorFormProviderSpec extends StringFieldBehav
   ".addressLine2 (optional)" - {
 
     val fieldName    = "addressLine2"
-    val lengthKey    = "partnershipAddressOfSubcontractor.error.addressLine2.length"
-    val invalidKey   = "partnershipAddressOfSubcontractor.error.addressLine2.invalidCharacters"
-    val firstCharKey = "partnershipAddressOfSubcontractor.error.addressLine2.firstCharMustBeLetter"
+    val lengthKey    = "partnershipAddress.error.addressLine2.length"
+    val invalidKey   = "partnershipAddress.error.addressLine2.invalidCharacters"
+    val firstCharKey = "partnershipAddress.error.addressLine2.firstCharMustBeLetter"
 
     "must bind valid data when provided" in {
       val result = form.bind(
@@ -176,10 +176,10 @@ class PartnershipAddressOfSubcontractorFormProviderSpec extends StringFieldBehav
   ".addressLine3" - {
 
     val fieldName    = "addressLine3"
-    val requiredKey  = "partnershipAddressOfSubcontractor.error.addressLine3.required"
-    val lengthKey    = "partnershipAddressOfSubcontractor.error.addressLine3.length"
-    val invalidKey   = "partnershipAddressOfSubcontractor.error.addressLine3.invalidCharacters"
-    val firstCharKey = "partnershipAddressOfSubcontractor.error.addressLine3.firstCharMustBeLetter"
+    val requiredKey  = "partnershipAddress.error.addressLine3.required"
+    val lengthKey    = "partnershipAddress.error.addressLine3.length"
+    val invalidKey   = "partnershipAddress.error.addressLine3.invalidCharacters"
+    val firstCharKey = "partnershipAddress.error.addressLine3.firstCharMustBeLetter"
 
     behave like fieldThatBindsValidData(
       form,
@@ -218,7 +218,7 @@ class PartnershipAddressOfSubcontractorFormProviderSpec extends StringFieldBehav
   ".addressLine4 (optional)" - {
 
     val fieldName = "addressLine4"
-    val lengthKey = "partnershipAddressOfSubcontractor.error.addressLine4.length"
+    val lengthKey = "partnershipAddress.error.addressLine4.length"
 
     "must bind valid optional data when required fields are present" in {
       val result = form.bind(
@@ -256,9 +256,9 @@ class PartnershipAddressOfSubcontractorFormProviderSpec extends StringFieldBehav
   ".postCode" - {
 
     val fieldName   = "postCode"
-    val requiredKey = "partnershipAddressOfSubcontractor.error.postCode.required"
-    val lengthKey   = "partnershipAddressOfSubcontractor.error.postCode.length"
-    val invalidKey  = "partnershipAddressOfSubcontractor.error.postCode.invalid"
+    val requiredKey = "partnershipAddress.error.postCode.required"
+    val lengthKey   = "partnershipAddress.error.postCode.length"
+    val invalidKey  = "partnershipAddress.error.postCode.invalid"
 
     behave like fieldThatBindsValidData(
       form,

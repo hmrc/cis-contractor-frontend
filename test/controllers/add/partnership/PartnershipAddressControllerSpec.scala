@@ -18,7 +18,7 @@ package controllers.add.partnership
 
 import base.SpecBase
 import controllers.routes
-import forms.add.partnership.PartnershipAddressOfSubcontractorFormProvider
+import forms.add.partnership.PartnershipAddressFormProvider
 import models.add.UKAddress
 import models.{NormalMode, UserAnswers}
 import navigation.Navigator
@@ -26,39 +26,39 @@ import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
-import pages.add.partnership.{PartnershipAddressOfSubcontractorPage, PartnershipNamePage}
+import pages.add.partnership.{PartnershipAddressPage, PartnershipNamePage}
 import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import repositories.SessionRepository
-import views.html.add.partnership.PartnershipAddressOfSubcontractorView
+import views.html.add.partnership.PartnershipAddressView
 
 import scala.concurrent.Future
 
-class PartnershipAddressOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
+class PartnershipAddressControllerSpec extends SpecBase with MockitoSugar {
 
-  private val formProvider = new PartnershipAddressOfSubcontractorFormProvider()
+  private val formProvider = new PartnershipAddressFormProvider()
   private val form         = formProvider()
 
   private val partnershipName = "Test Partnership"
 
   private lazy val routeLoad   =
-    controllers.add.partnership.routes.PartnershipAddressOfSubcontractorController.onPageLoad(NormalMode).url
+    controllers.add.partnership.routes.PartnershipAddressController.onPageLoad(NormalMode).url
   private lazy val routeSubmit =
-    controllers.add.partnership.routes.PartnershipAddressOfSubcontractorController.onSubmit(NormalMode).url
+    controllers.add.partnership.routes.PartnershipAddressController.onSubmit(NormalMode).url
 
   private def uaWithName: UserAnswers =
     emptyUserAnswers.set(PartnershipNamePage, partnershipName).success.value
 
-  "PartnershipAddressOfSubcontractorController" - {
+  "PartnershipAddressController" - {
 
     "must return OK and the correct view for a GET when partnership name is present and no previous answer" in {
       val application = applicationBuilder(userAnswers = Some(uaWithName)).build()
 
       running(application) {
         val request = FakeRequest(GET, routeLoad)
-        val view    = application.injector.instanceOf[PartnershipAddressOfSubcontractorView]
+        val view    = application.injector.instanceOf[PartnershipAddressView]
 
         val result = route(application, request).value
 
@@ -80,7 +80,7 @@ class PartnershipAddressOfSubcontractorControllerSpec extends SpecBase with Mock
       )
 
       val ua = uaWithName
-        .set(PartnershipAddressOfSubcontractorPage, expected)
+        .set(PartnershipAddressPage, expected)
         .success
         .value
 
@@ -88,7 +88,7 @@ class PartnershipAddressOfSubcontractorControllerSpec extends SpecBase with Mock
 
       running(application) {
         val request = FakeRequest(GET, routeLoad)
-        val view    = application.injector.instanceOf[PartnershipAddressOfSubcontractorView]
+        val view    = application.injector.instanceOf[PartnershipAddressView]
         val result  = route(application, request).value
 
         status(result) mustEqual OK
@@ -158,7 +158,7 @@ class PartnershipAddressOfSubcontractorControllerSpec extends SpecBase with Mock
         val uaCaptor = ArgumentCaptor.forClass(classOf[UserAnswers])
         verify(mockSessionRepository, times(1)).set(uaCaptor.capture())
 
-        val saved = uaCaptor.getValue.get(PartnershipAddressOfSubcontractorPage).value
+        val saved = uaCaptor.getValue.get(PartnershipAddressPage).value
         saved.addressLine1 mustBe "value 1"
         saved.addressLine2 mustBe Some("value 2")
         saved.addressLine3 mustBe "value 3"
@@ -189,7 +189,7 @@ class PartnershipAddressOfSubcontractorControllerSpec extends SpecBase with Mock
           )
         )
 
-        val view   = application.injector.instanceOf[PartnershipAddressOfSubcontractorView]
+        val view   = application.injector.instanceOf[PartnershipAddressView]
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST

@@ -22,7 +22,7 @@ import play.api.data.{Form, Forms}
 
 import javax.inject.Inject
 
-class PartnershipAddressOfSubcontractorFormProvider @Inject() extends Mappings {
+class PartnershipAddressFormProvider @Inject() extends Mappings {
 
   private val allowedAddressCharsRegex =
     """^[A-Za-z0-9"~!@#\$%*+:\;=\?\s,\.\[\]_\{\}\(\)/&'\-\^\\£€]+$"""
@@ -38,15 +38,15 @@ class PartnershipAddressOfSubcontractorFormProvider @Inject() extends Mappings {
   def apply(): Form[UKAddress] = Form(
     Forms.mapping(
       "addressLine1" ->
-        text("partnershipAddressOfSubcontractor.error.addressLine1.required")
+        text("partnershipAddress.error.addressLine1.required")
           .transform(_.trim, identity)
           .verifying(
             firstError(
-              maxLength(35, "partnershipAddressOfSubcontractor.error.addressLine1.length"),
-              regexp(allowedAddressCharsRegex, "partnershipAddressOfSubcontractor.error.addressLine1.invalidCharacters"),
+              maxLength(35, "partnershipAddress.error.addressLine1.length"),
+              regexp(allowedAddressCharsRegex, "partnershipAddress.error.addressLine1.invalidCharacters"),
               regexp(
                 firstCharLetterOrDigitRegex,
-                "partnershipAddressOfSubcontractor.error.addressLine1.firstCharMustBeLetterOrNumber"
+                "partnershipAddress.error.addressLine1.firstCharMustBeLetterOrNumber"
               )
             )
           ),
@@ -56,26 +56,26 @@ class PartnershipAddressOfSubcontractorFormProvider @Inject() extends Mappings {
             .transform(_.trim, identity)
             .verifying(
               firstError(
-                maxLength(35, "partnershipAddressOfSubcontractor.error.addressLine2.length"),
+                maxLength(35, "partnershipAddress.error.addressLine2.length"),
                 regexp(
                   allowedAddressCharsRegex,
-                  "partnershipAddressOfSubcontractor.error.addressLine2.invalidCharacters"
+                  "partnershipAddress.error.addressLine2.invalidCharacters"
                 ),
                 regexp(
                   firstCharLetterRegex,
-                  "partnershipAddressOfSubcontractor.error.addressLine2.firstCharMustBeLetter"
+                  "partnershipAddress.error.addressLine2.firstCharMustBeLetter"
                 )
               )
             )
         ),
       "addressLine3" ->
-        text("partnershipAddressOfSubcontractor.error.addressLine3.required")
+        text("partnershipAddress.error.addressLine3.required")
           .transform(_.trim, identity)
           .verifying(
             firstError(
-              maxLength(35, "partnershipAddressOfSubcontractor.error.addressLine3.length"),
-              regexp(allowedAddressCharsRegex, "partnershipAddressOfSubcontractor.error.addressLine3.invalidCharacters"),
-              regexp(firstCharLetterRegex, "partnershipAddressOfSubcontractor.error.addressLine3.firstCharMustBeLetter")
+              maxLength(35, "partnershipAddress.error.addressLine3.length"),
+              regexp(allowedAddressCharsRegex, "partnershipAddress.error.addressLine3.invalidCharacters"),
+              regexp(firstCharLetterRegex, "partnershipAddress.error.addressLine3.firstCharMustBeLetter")
             )
           ),
       "addressLine4" ->
@@ -84,22 +84,22 @@ class PartnershipAddressOfSubcontractorFormProvider @Inject() extends Mappings {
             .transform(_.trim, identity)
             .verifying(
               firstError(
-                maxLength(35, "partnershipAddressOfSubcontractor.error.addressLine4.length"),
-                regexp(allowedAddressCharsRegex, "partnershipAddressOfSubcontractor.error.addressLine4.invalidCharacters"),
-                regexp(firstCharLetterRegex, "partnershipAddressOfSubcontractor.error.addressLine4.firstCharMustBeLetter")
+                maxLength(35, "partnershipAddress.error.addressLine4.length"),
+                regexp(allowedAddressCharsRegex, "partnershipAddress.error.addressLine4.invalidCharacters"),
+                regexp(firstCharLetterRegex, "partnershipAddress.error.addressLine4.firstCharMustBeLetter")
               )
             )
         ),
       "postCode"     ->
-        text("partnershipAddressOfSubcontractor.error.postCode.required")
+        text("partnershipAddress.error.postCode.required")
           .transform(
             _.trim.toUpperCase.replaceAll("\\s+", " "),
             identity
           )
           .verifying(
             firstError(
-              maxLength(8, "partnershipAddressOfSubcontractor.error.postCode.length"),
-              regexp(ukPostcodeRegex, "partnershipAddressOfSubcontractor.error.postCode.invalid")
+              maxLength(8, "partnershipAddress.error.postCode.length"),
+              regexp(ukPostcodeRegex, "partnershipAddress.error.postCode.invalid")
             )
           )
     )((a1: String, a2: Option[String], a3: String, a4: Option[String], pc: String) => UKAddress(a1, a2, a3, a4, pc))(

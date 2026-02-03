@@ -17,7 +17,7 @@
 package viewmodels.checkAnswers.add.partnership
 
 import models.{CheckMode, UserAnswers}
-import pages.add.partnership.PartnershipAddressOfSubcontractorPage
+import pages.add.partnership.PartnershipAddressPage
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
@@ -25,10 +25,10 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
 
-object PartnershipAddressOfSubcontractorSummary {
+object PartnershipAddressSummary {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(PartnershipAddressOfSubcontractorPage).map { answer =>
+    answers.get(PartnershipAddressPage).map { answer =>
 
       val lines: Seq[String] = Seq(
         answer.addressLine1,
@@ -45,13 +45,13 @@ object PartnershipAddressOfSubcontractorSummary {
           .mkString("<br/>")
 
       SummaryListRowViewModel(
-        key = "partnershipAddressOfSubcontractor.checkYourAnswersLabel",
+        key = "partnershipAddress.checkYourAnswersLabel",
         value = ValueViewModel(HtmlContent(escapedWithBreaks)),
         actions = Seq(
           ActionItemViewModel(
             "site.change",
             controllers.add.routes.AddressOfSubcontractorController.onPageLoad(CheckMode).url
-          ).withVisuallyHiddenText(messages("partnershipAddressOfSubcontractor.change.hidden"))
+          ).withVisuallyHiddenText(messages("partnershipAddress.change.hidden"))
             .withAttribute("id" -> "address-of-partnership")
         )
       )

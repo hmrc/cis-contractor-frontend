@@ -37,8 +37,8 @@ class Navigator @Inject() () {
     case SubAddressYesNoPage                       => userAnswers => navigatorFromSubAddressYesNoPage(NormalMode)(userAnswers)
     case AddressOfSubcontractorPage                =>
       _ => controllers.add.routes.NationalInsuranceNumberYesNoController.onPageLoad(NormalMode)
-    case PartnershipAddressOfSubcontractorPage                =>
-      _ => controllers.add.partnership.routes.PartnershipAddressOfSubcontractorController.onPageLoad(NormalMode)
+    case PartnershipAddressPage                =>
+      _ => controllers.add.partnership.routes.PartnershipAddressController.onPageLoad(NormalMode)
     case NationalInsuranceNumberYesNoPage          =>
       userAnswers => navigatorFromNationalInsuranceNumberYesNoPage(NormalMode)(userAnswers)
     case SubNationalInsuranceNumberPage            =>

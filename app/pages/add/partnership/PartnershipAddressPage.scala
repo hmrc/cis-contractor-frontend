@@ -20,9 +20,9 @@ import models.add.UKAddress
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 
-case object PartnershipAddressOfSubcontractorPage extends QuestionPage[UKAddress] {
+case object PartnershipAddressPage extends QuestionPage[UKAddress] {
 
   override def path: JsPath = JsPath \ toString
 
-  override def toString: String = "partnershipAddressOfSubcontractor"
+  override def toString: String = "partnershipAddress"
 }

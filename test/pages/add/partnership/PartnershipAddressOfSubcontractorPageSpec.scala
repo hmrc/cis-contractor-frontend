@@ -19,14 +19,14 @@ package pages.add.partnership
 import models.add.UKAddress
 import pages.behaviours.PageBehaviours
 
-class PartnershipAddressOfSubcontractorPageSpec extends PageBehaviours {
+class PartnershipAddressPageSpec extends PageBehaviours {
 
-  "PartnershipAddressOfSubcontractorPage" - {
+  "PartnershipAddressPage" - {
 
-    beRetrievable[UKAddress](PartnershipAddressOfSubcontractorPage)
+    beRetrievable[UKAddress](PartnershipAddressPage)
 
-    beSettable[UKAddress](PartnershipAddressOfSubcontractorPage)
+    beSettable[UKAddress](PartnershipAddressPage)
 
-    beRemovable[UKAddress](PartnershipAddressOfSubcontractorPage)
+    beRemovable[UKAddress](PartnershipAddressPage)
   }
 }

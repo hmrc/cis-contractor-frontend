@@ -16,7 +16,7 @@
 
 package views.add.partnership
 
-import forms.add.partnership.PartnershipAddressOfSubcontractorFormProvider
+import forms.add.partnership.PartnershipAddressFormProvider
 import models.NormalMode
 import org.jsoup.Jsoup
 import org.scalatest.matchers.must.Matchers
@@ -27,9 +27,9 @@ import play.api.i18n.Messages
 import play.api.mvc.Request
 import play.api.test.FakeRequest
 import play.twirl.api.HtmlFormat
-import views.html.add.partnership.PartnershipAddressOfSubcontractorView
+import views.html.add.partnership.PartnershipAddressView
 
-class PartnershipAddressOfSubcontractorViewSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite {
+class PartnershipAddressViewSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite {
 
   "PartnerShipAddressOfSubcontractorView" should {
     val testName = "Test Name"
@@ -37,12 +37,12 @@ class PartnershipAddressOfSubcontractorViewSpec extends AnyWordSpec with Matcher
       val html: HtmlFormat.Appendable = view(form, NormalMode, testName)
       val doc                         = Jsoup.parse(html.toString())
 
-      doc.select("title").text() must include(messages("partnershipAddressOfSubcontractor.title"))
+      doc.select("title").text() must include(messages("partnershipAddress.title"))
 
-      doc.select("h1").text() mustBe messages("partnershipAddressOfSubcontractor.heading", testName)
+      doc.select("h1").text() mustBe messages("partnershipAddress.heading", testName)
 
       doc.select("form").attr("action") mustBe
-        controllers.add.partnership.routes.PartnershipAddressOfSubcontractorController
+        controllers.add.partnership.routes.PartnershipAddressController
           .onSubmit(NormalMode)
           .url
 
@@ -58,30 +58,30 @@ class PartnershipAddressOfSubcontractorViewSpec extends AnyWordSpec with Matcher
     "display error summary and inline errors when required fields are missing" in new Setup {
       val errorForm: Form[_] =
         form
-          .withError("addressLine1", "partnershipAddressOfSubcontractor.addressLine1.error.required")
-          .withError("postCode", "partnershipAddressOfSubcontractor.postCode.error.required")
+          .withError("addressLine1", "partnershipAddress.addressLine1.error.required")
+          .withError("postCode", "partnershipAddress.postCode.error.required")
 
       val html = view(errorForm, NormalMode,testName)
       val doc  = Jsoup.parse(html.toString())
 
       val summary = doc.select(".govuk-error-summary")
-      summary.text() must include(messages("partnershipAddressOfSubcontractor.addressLine1.error.required"))
-      summary.text() must include(messages("partnershipAddressOfSubcontractor.postCode.error.required"))
+      summary.text() must include(messages("partnershipAddress.addressLine1.error.required"))
+      summary.text() must include(messages("partnershipAddress.postCode.error.required"))
 
       summary.select("a").first().attr("href") mustBe "#addressLine1"
 
       doc.select("#addressLine1-error").text() must include(
-        messages("partnershipAddressOfSubcontractor.addressLine1.error.required")
+        messages("partnershipAddress.addressLine1.error.required")
       )
 
       doc.select("#postCode-error").text() must include(
-        messages("partnershipAddressOfSubcontractor.postCode.error.required")
+        messages("partnershipAddress.postCode.error.required")
       )
     }
   }
 
   trait Setup {
-    val formProvider  = new PartnershipAddressOfSubcontractorFormProvider()
+    val formProvider  = new PartnershipAddressFormProvider()
     val form: Form[_] = formProvider()
 
     implicit val request: Request[_] = FakeRequest()
@@ -91,7 +91,7 @@ class PartnershipAddressOfSubcontractorViewSpec extends AnyWordSpec with Matcher
         app.injector.instanceOf[play.api.i18n.MessagesApi]
       )
 
-    val view: PartnershipAddressOfSubcontractorView =
-      app.injector.instanceOf[PartnershipAddressOfSubcontractorView]
+    val view: PartnershipAddressView =
+      app.injector.instanceOf[PartnershipAddressView]
   }
 }
