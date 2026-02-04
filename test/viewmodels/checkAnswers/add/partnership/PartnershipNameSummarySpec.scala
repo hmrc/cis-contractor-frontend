@@ -59,8 +59,8 @@ class PartnershipNameSummarySpec extends AnyFreeSpec with Matchers {
       val expectedHref       = routes.PartnershipNameController.onPageLoad(CheckMode).url
       val expectedHiddenText = messages("partnershipName.change.hidden")
 
-      changeAction.content.asHtml.toString should include(expectedChangeText)
-      changeAction.href shouldBe expectedHref
+      changeAction.content.asHtml.toString    should include(expectedChangeText)
+      changeAction.href                     shouldBe expectedHref
       changeAction.visuallyHiddenText.value shouldBe expectedHiddenText
     }
 
