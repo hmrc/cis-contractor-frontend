@@ -57,12 +57,28 @@ class NavigatorSpec extends SpecBase {
         ) mustBe routes.JourneyRecoveryController.onPageLoad()
       }
 
-      "must go from a TypeOfSubcontractorPage to PartnershipHasUtrYesNoController when Partnership is selected" in {
+      "must go from a TypeOfSubcontractorPage to PartnershipNameController when Partnership is selected" in {
         navigator.nextPage(
           TypeOfSubcontractorPage,
           NormalMode,
           emptyUserAnswers.setOrException(TypeOfSubcontractorPage, TypeOfSubcontractor.Partnership)
-        ) mustBe controllers.add.partnership.routes.PartnershipHasUtrYesNoController.onPageLoad(NormalMode)
+        ) mustBe controllers.add.partnership.routes.PartnershipNameController.onPageLoad(NormalMode)
+      }
+
+      "must go from PartnershipNamePage to PartnershipUniqueTaxpayerReferenceController in NormalMode" in {
+        navigator.nextPage(
+          PartnershipNamePage,
+          NormalMode,
+          emptyUserAnswers
+        ) mustBe controllers.add.partnership.routes.PartnershipUniqueTaxpayerReferenceController.onPageLoad(NormalMode)
+      }
+
+      "must go from PartnershipNamePage to JourneyRecovery in CheckMode" in {
+        navigator.nextPage(
+          PartnershipNamePage,
+          CheckMode,
+          emptyUserAnswers
+        ) mustBe routes.JourneyRecoveryController.onPageLoad()
       }
 
       "must go from a TypeOfSubcontractorPage to JourneyRecovery when Trust is selected" in {
