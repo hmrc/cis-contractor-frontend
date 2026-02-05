@@ -118,3 +118,8 @@ GET        /add/partnership/partnership-has-works-reference                 cont
 POST       /add/partnership/partnership-has-works-reference                 controllers.add.partnership.PartnershipWorksReferenceNumberYesNoController.onSubmit(mode: Mode = NormalMode)
 GET        /add/partnership/change-partnership-has-works-reference          controllers.add.partnership.PartnershipWorksReferenceNumberYesNoController.onPageLoad(mode: Mode = CheckMode)
 POST       /add/partnership/change-partnership-has-works-reference          controllers.add.partnership.PartnershipWorksReferenceNumberYesNoController.onSubmit(mode: Mode = CheckMode)
+
+GET        /add/partnership/nominated-partner                               controllers.add.partnership.PartnershipNominatedPartnerNameController.onPageLoad(mode: Mode = NormalMode)
+POST       /add/partnership/nominated-partner                               controllers.add.partnership.PartnershipNominatedPartnerNameController.onSubmit(mode: Mode = NormalMode)
+GET        /add/partnership/change-nominated-partner                        controllers.add.partnership.PartnershipNominatedPartnerNameController.onPageLoad(mode: Mode = CheckMode)
+POST       /add/partnership/change-nominated-partner                        controllers.add.partnership.PartnershipNominatedPartnerNameController.onSubmit(mode: Mode = CheckMode)

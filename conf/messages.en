@@ -289,3 +289,13 @@ partnershipHasUtrYesNo.hint = This is 10 numbers, like 1234567890. The UTR will 
 partnershipHasUtrYesNo.checkYourAnswersLabel = Does {0} have a Unique Taxpayer Reference (UTR)?
 partnershipHasUtrYesNo.error.required = Select yes if the partnership has a Unique Taxpayer Reference (UTR)
 partnershipHasUtrYesNo.change.hidden = Unique Taxpayer Reference (UTR)
+
+partnershipNominatedPartnerName.title = Who is the nominated partner for this partnership?
+partnershipNominatedPartnerName.heading = Who is the nominated partner for {0}?
+partnershipNominatedPartnerName.hint = The nominated partner is responsible for managing the partnership's tax affairs
+partnershipNominatedPartnerName.label = Full name
+partnershipNominatedPartnerName.checkYourAnswersLabel = Name
+partnershipNominatedPartnerName.error.required = Enter a full name using letters a to z, apostrophes and dashes
+partnershipNominatedPartnerName.error.invalid = Enter a full name using letters a to z, apostrophes and dashes
+partnershipNominatedPartnerName.error.length = Enter a full name up to 56 characters
+partnershipNominatedPartnerName.change.hidden = name
