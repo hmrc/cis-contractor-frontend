@@ -299,3 +299,10 @@ partnershipHasUtrYesNo.hint = This is 10 numbers, like 1234567890. The UTR will 
 partnershipHasUtrYesNo.checkYourAnswersLabel = Does {0} have a Unique Taxpayer Reference (UTR)?
 partnershipHasUtrYesNo.error.required = Select yes if the partnership has a Unique Taxpayer Reference (UTR)
 partnershipHasUtrYesNo.change.hidden = Unique Taxpayer Reference (UTR)
+
+partnershipAddressYesNo.title = What is the address for this partnership?
+partnershipAddressYesNo.heading = Do you want to add an address for {0}?
+partnershipAddressYesNo.hint = You can add this information later if you prefer
+partnershipAddressYesNo.checkYourAnswersLabel = Partnership Address
+partnershipAddressYesNo.error.required = Select one option
+partnershipAddressYesNo.change.hidden = Partnership Address
