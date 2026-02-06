@@ -344,6 +344,14 @@ class NavigatorSpec extends SpecBase {
         ) mustBe journeyRecovery
       }
 
+      "must go from PartnershipAddressYesNoPage to PartnershipAddressYesNoController in NormalMode" in {
+        navigator.nextPage(
+          PartnershipAddressYesNoPage,
+          NormalMode,
+          emptyUserAnswers
+        ) mustBe controllers.add.partnership.routes.PartnershipAddressYesNoController.onPageLoad(NormalMode)
+      }
+
       "must go from PartnershipContactDetailsYesNoPage" - {
         "to PartnershipContactDetailsPage when answer is Yes" in {
           val answers = UserAnswers(userAnswersId).set(PartnershipContactDetailsYesNoPage, true).success.value
@@ -647,6 +655,14 @@ class NavigatorSpec extends SpecBase {
         val navigator = new Navigator()
         navigator.nextPage(SubTradingNameYesNoPage, CheckMode, emptyUserAnswers) mustBe
           routes.JourneyRecoveryController.onPageLoad()
+      }
+
+      "must go from PartnershipAddressYesNoPage to PartnershipAddressYesNoController in CheckMode" in {
+        navigator.nextPage(
+          PartnershipAddressYesNoPage,
+          CheckMode,
+          emptyUserAnswers
+        ) mustBe controllers.add.partnership.routes.PartnershipAddressYesNoController.onPageLoad(CheckMode)
       }
 
       "must go from PartnershipContactDetailsYesNoPage" - {

@@ -126,8 +126,8 @@ POST       /add/partnership/change-partnership-has-works-reference          cont
 
 GET        /add/partnership/check-address                      controllers.add.partnership.PartnershipAddressYesNoController.onPageLoad(mode: Mode = NormalMode)
 POST       /add/partnership/check-address                     controllers.add.partnership.PartnershipAddressYesNoController.onSubmit(mode: Mode = NormalMode)
-GET        /add/partnership/check-address                 controllers.add.partnership.PartnershipAddressYesNoController.onPageLoad(mode: Mode = CheckMode)
-POST       /add/partnership/check-address                 controllers.add.partnership.PartnershipAddressYesNoController.onSubmit(mode: Mode = CheckMode)
+GET        /add/partnership/change-check-address                 controllers.add.partnership.PartnershipAddressYesNoController.onPageLoad(mode: Mode = CheckMode)
+POST       /add/partnership/change-check-address                 controllers.add.partnership.PartnershipAddressYesNoController.onSubmit(mode: Mode = CheckMode)
 
 GET        /add/partnership/check-contact-details                           controllers.add.partnership.PartnershipContactDetailsYesNoController.onPageLoad(mode: Mode = NormalMode)
 POST       /add/partnership/check-contact-details                           controllers.add.partnership.PartnershipContactDetailsYesNoController.onSubmit(mode: Mode = NormalMode)
