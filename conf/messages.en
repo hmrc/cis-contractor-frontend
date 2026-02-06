@@ -309,3 +309,10 @@ partnershipNominatedPartnerNino.error.length = Enter a valid National Insurance 
 partnershipNominatedPartnerNino.checkYourAnswersLabel = National Insurance number
 partnershipNominatedPartnerNino.change.hidden = nominated partner National Insurance number
 
+
+partnershipContactDetailsYesNo.title = Do you want to add contact details for this partnership?
+partnershipContactDetailsYesNo.heading = Do you want to add contact details for {0}?
+partnershipContactDetailsYesNo.hint = You can add this information later if you prefer
+partnershipContactDetailsYesNo.checkYourAnswersLabel = Add partnership contact details
+partnershipContactDetailsYesNo.error.required = Select whether you want to add contact details for this partnership
+partnershipContactDetailsYesNo.change.hidden = Partnership Contact Details

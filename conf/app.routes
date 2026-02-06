@@ -131,3 +131,8 @@ POST       /add/partnership/change-nominated-partner-national-insurance-number  
 
 
 
+
+GET        /add/partnership/check-contact-details                           controllers.add.partnership.PartnershipContactDetailsYesNoController.onPageLoad(mode: Mode = NormalMode)
+POST       /add/partnership/check-contact-details                           controllers.add.partnership.PartnershipContactDetailsYesNoController.onSubmit(mode: Mode = NormalMode)
+GET        /add/partnership/change-check-contact-details                    controllers.add.partnership.PartnershipContactDetailsYesNoController.onPageLoad(mode: Mode = CheckMode)
+POST       /add/partnership/change-check-contact-details                    controllers.add.partnership.PartnershipContactDetailsYesNoController.onSubmit(mode: Mode = CheckMode)
