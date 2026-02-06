@@ -263,7 +263,7 @@ class Navigator @Inject() () {
       case (None, _)                 => routes.JourneyRecoveryController.onPageLoad()
     }
 
-  private def navigatorFromPartnershipContactDetailsYesNoPage(mode: Mode)(userAnswers: UserAnswers): Call =
+  private def navigatorFromPartnershipContactDetailsYesNoPage(mode: Mode)(userAnswers: UserAnswers): Call      =
     (userAnswers.get(PartnershipContactDetailsYesNoPage), mode) match {
       case (Some(true), _)           =>
         routes.JourneyRecoveryController.onPageLoad() // TODO: SL0201 - B (PTN) - Contact details for partner Controller
