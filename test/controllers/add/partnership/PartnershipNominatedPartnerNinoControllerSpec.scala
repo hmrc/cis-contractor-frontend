@@ -88,7 +88,7 @@ class PartnershipNominatedPartnerNinoControllerSpec extends SpecBase with Mockit
       running(application) {
         val request = FakeRequest(GET, routeUrl)
 
-        val view = application.injector.instanceOf[NominatedPartnerNationalInsuranceNumberView]
+        val view = application.injector.instanceOf[PartnershipNominatedPartnerNinoView]
 
         val result = route(application, request).value
 
