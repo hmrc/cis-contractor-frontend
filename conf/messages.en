@@ -306,3 +306,10 @@ partnershipAddressYesNo.hint = You can add this information later if you prefer
 partnershipAddressYesNo.checkYourAnswersLabel = Partnership Address
 partnershipAddressYesNo.error.required = Select one option
 partnershipAddressYesNo.change.hidden = Partnership Address
+
+partnershipContactDetailsYesNo.title = Do you want to add contact details for this partnership?
+partnershipContactDetailsYesNo.heading = Do you want to add contact details for {0}?
+partnershipContactDetailsYesNo.hint = You can add this information later if you prefer
+partnershipContactDetailsYesNo.checkYourAnswersLabel = Add partnership contact details
+partnershipContactDetailsYesNo.error.required = Select whether you want to add contact details for this partnership
+partnershipContactDetailsYesNo.change.hidden = Partnership Contact Details

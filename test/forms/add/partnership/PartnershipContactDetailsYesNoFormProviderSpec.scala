@@ -14,18 +14,17 @@
  * limitations under the License.
  */
 
-package forms
+package forms.add.partnership
 
-import forms.add.partnership.PartnershipHasUtrYesNoFormProvider
 import forms.behaviours.BooleanFieldBehaviours
 import play.api.data.FormError
 
-class PartnershipHasUtrYesNoFormProviderSpec extends BooleanFieldBehaviours {
+class PartnershipContactDetailsYesNoFormProviderSpec extends BooleanFieldBehaviours {
 
-  val requiredKey = "partnershipHasUtrYesNo.error.required"
+  val requiredKey = "partnershipContactDetailsYesNo.error.required"
   val invalidKey  = "error.boolean"
 
-  val form = new PartnershipHasUtrYesNoFormProvider()()
+  val form = new PartnershipContactDetailsYesNoFormProvider()()
 
   ".value" - {
 
