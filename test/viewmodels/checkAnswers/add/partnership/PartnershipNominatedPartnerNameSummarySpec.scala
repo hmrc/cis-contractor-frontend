@@ -54,13 +54,13 @@ class PartnershipNominatedPartnerNameSummarySpec extends AnyFreeSpec with Matche
       val actions = row.actions.value.items
       actions should have size 1
 
-      val changeAction = actions.head
+      val changeAction       = actions.head
       val expectedChangeText = messages("site.change")
-      val expectedHref = routes.PartnershipNominatedPartnerNameController.onPageLoad(CheckMode).url
+      val expectedHref       = routes.PartnershipNominatedPartnerNameController.onPageLoad(CheckMode).url
       val expectedHiddenText = messages("partnershipNominatedPartnerName.change.hidden")
 
       changeAction.content.asHtml.toString should include(expectedChangeText)
-      changeAction.href shouldBe expectedHref
+      changeAction.href                  shouldBe expectedHref
 
       changeAction.visuallyHiddenText.value shouldBe expectedHiddenText
     }
@@ -70,6 +70,5 @@ class PartnershipNominatedPartnerNameSummarySpec extends AnyFreeSpec with Matche
       PartnershipNominatedPartnerNameSummary.row(answers) shouldBe None
     }
   }
-
 
 }
