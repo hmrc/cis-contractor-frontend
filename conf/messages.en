@@ -309,7 +309,7 @@ partnershipContactDetailsYesNo.change.hidden = Partnership Contact Details
 
 partnershipNominatedPartnerName.title = Who is the nominated partner for this partnership?
 partnershipNominatedPartnerName.heading = Who is the nominated partner for {0}?
-partnershipNominatedPartnerName.hint = The nominated partner is responsible for managing the partnership's tax affairs
+partnershipNominatedPartnerName.hint = The nominated partner is responsible for managing the partnership’s tax affairs
 partnershipNominatedPartnerName.label = Full name
 partnershipNominatedPartnerName.checkYourAnswersLabel = Name
 partnershipNominatedPartnerName.error.required = Enter a full name using letters a to z, apostrophes and dashes
