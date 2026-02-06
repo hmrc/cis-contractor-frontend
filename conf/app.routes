@@ -124,10 +124,10 @@ POST       /add/partnership/partnership-has-works-reference                 cont
 GET        /add/partnership/change-partnership-has-works-reference          controllers.add.partnership.PartnershipWorksReferenceNumberYesNoController.onPageLoad(mode: Mode = CheckMode)
 POST       /add/partnership/change-partnership-has-works-reference          controllers.add.partnership.PartnershipWorksReferenceNumberYesNoController.onSubmit(mode: Mode = CheckMode)
 
-GET        /add/partnership/nominated-partner-national-insurance-number          controllers.add.partnership.PartnershipNominatedPartnerNinoController.onPageLoad(mode: Mode = NormalMode)
-POST       /add/partnership/nominated-partner-national-insurance-number          controllers.add.partnership.PartnershipNominatedPartnerNinoController.onSubmit(mode: Mode = NormalMode)
-GET        /add/partnership/change-nominated-partner-national-insurance-number   controllers.add.partnership.PartnershipNominatedPartnerNinoController.onPageLoad(mode: Mode = CheckMode)
-POST       /add/partnership/change-nominated-partner-national-insurance-number   controllers.add.partnership.PartnershipNominatedPartnerNinoController.onSubmit(mode: Mode = CheckMode)
+GET        /add/partnership/nominated-partner-has-national-insurance-number          controllers.add.partnership.PartnershipNominatedPartnerNinoController.onPageLoad(mode: Mode = NormalMode)
+POST       /add/partnership/nominated-partner-has-national-insurance-number          controllers.add.partnership.PartnershipNominatedPartnerNinoController.onSubmit(mode: Mode = NormalMode)
+GET        /add/partnership/change-nominated-partner-has-national-insurance-number   controllers.add.partnership.PartnershipNominatedPartnerNinoController.onPageLoad(mode: Mode = CheckMode)
+POST       /add/partnership/change-nominated-partner-has-national-insurance-number   controllers.add.partnership.PartnershipNominatedPartnerNinoController.onSubmit(mode: Mode = CheckMode)
 
 
 
