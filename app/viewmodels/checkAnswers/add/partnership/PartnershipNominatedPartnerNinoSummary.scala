@@ -29,13 +29,13 @@ object PartnershipNominatedPartnerNinoSummary {
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
     answers.get(PartnershipNominatedPartnerNinoPage).map { value =>
       SummaryListRowViewModel(
-        key = "PartnershipNominatedPartnerNino.checkYourAnswersLabel",
+        key = "partnershipNominatedPartnerNino.checkYourAnswersLabel",
         value = ValueViewModel(value),
         actions = Seq(
           ActionItemViewModel(
             content = "site.change",
             href = routes.PartnershipNominatedPartnerNinoController.onPageLoad(CheckMode).url
-          ).withVisuallyHiddenText("PartnershipNominatedPartnerNino.change.hidden")
+          ).withVisuallyHiddenText("partnershipNominatedPartnerNino.change.hidden")
         )
       )
     }
