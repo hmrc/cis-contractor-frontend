@@ -343,6 +343,32 @@ class NavigatorSpec extends SpecBase {
           emptyUserAnswers
         ) mustBe journeyRecovery
       }
+
+      "must go from a PartnershipNominatedPartnerUtrYesNoPage to next page when true" in {
+        navigator.nextPage(
+          PartnershipNominatedPartnerUtrYesNoPage,
+          NormalMode,
+          emptyUserAnswers.setOrException(PartnershipNominatedPartnerUtrYesNoPage, true)
+        ) mustBe controllers.add.partnership.routes.PartnershipNominatedPartnerUtrYesNoController
+          .onPageLoad(NormalMode)
+      }
+
+      "must go from a PartnershipNominatedPartnerUtrYesNoPage to next page when false" in {
+        navigator.nextPage(
+          PartnershipNominatedPartnerUtrYesNoPage,
+          NormalMode,
+          emptyUserAnswers.setOrException(PartnershipNominatedPartnerUtrYesNoPage, false)
+        ) mustBe controllers.add.partnership.routes.PartnershipNominatedPartnerUtrYesNoController
+          .onPageLoad(NormalMode)
+      }
+
+      "must go from a PartnershipNominatedPartnerUtrYesNoPage to journey recovery when incomplete info provided" in {
+        navigator.nextPage(
+          PartnershipNominatedPartnerUtrYesNoPage,
+          NormalMode,
+          emptyUserAnswers
+        ) mustBe journeyRecovery
+      }
     }
 
     "in Check mode" - {
@@ -616,6 +642,31 @@ class NavigatorSpec extends SpecBase {
         navigator.nextPage(SubTradingNameYesNoPage, CheckMode, emptyUserAnswers) mustBe
           routes.JourneyRecoveryController.onPageLoad()
       }
+
+      "must go from a PartnershipNominatedPartnerUtrYesNoPage to next page when true" in {
+        navigator.nextPage(
+          PartnershipNominatedPartnerUtrYesNoPage,
+          CheckMode,
+          emptyUserAnswers.setOrException(PartnershipNominatedPartnerUtrYesNoPage, true)
+        ) mustBe controllers.add.partnership.routes.PartnershipNominatedPartnerUtrYesNoController.onPageLoad(CheckMode)
+      }
+
+      "must go from a PartnershipNominatedPartnerUtrYesNoPage to CYA page when false" in {
+        navigator.nextPage(
+          PartnershipNominatedPartnerUtrYesNoPage,
+          CheckMode,
+          emptyUserAnswers.setOrException(PartnershipNominatedPartnerUtrYesNoPage, false)
+        ) mustBe CYA
+      }
+
+      "must go from a PartnershipNominatedPartnerUtrYesNoPage to journey recovery page when incomplete info provided" in {
+        navigator.nextPage(
+          PartnershipNominatedPartnerUtrYesNoPage,
+          CheckMode,
+          emptyUserAnswers
+        ) mustBe journeyRecovery
+      }
+
     }
 
     "navigatorFromSubTradingNameYesNoPage in NormalMode" - {
