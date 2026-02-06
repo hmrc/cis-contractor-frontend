@@ -59,7 +59,11 @@ class Navigator @Inject() () {
       _ => routes.JourneyRecoveryController.onPageLoad()
     case PartnershipWorksReferenceNumberYesNoPage  =>
       userAnswers => navigatorFromPartnershipWorksReferenceNumberYesNoPage(NormalMode)(userAnswers)
-    case _                                         => _ => routes.IndexController.onPageLoad()
+    case PartnershipNominatedPartnerNinoPage       =>
+      // todo: to be wired
+      _ => routes.JourneyRecoveryController.onPageLoad()
+
+    case _ => _ => routes.IndexController.onPageLoad()
   }
 
   private val checkRouteMap: Page => UserAnswers => Call = {
@@ -77,6 +81,7 @@ class Navigator @Inject() () {
     case SubcontractorContactDetailsYesNoPage     =>
       userAnswers => navigatorFromSubcontractorContactDetailsYesNoPage(CheckMode)(userAnswers)
     case PartnershipNamePage                      => _ => routes.JourneyRecoveryController.onPageLoad()
+    case PartnershipNominatedPartnerNinoPage      => _ => controllers.add.routes.CheckYourAnswersController.onPageLoad()
     case PartnershipWorksReferenceNumberYesNoPage =>
       userAnswers => navigatorFromPartnershipWorksReferenceNumberYesNoPage(CheckMode)(userAnswers)
     case _                                        => _ => controllers.add.routes.CheckYourAnswersController.onPageLoad()
