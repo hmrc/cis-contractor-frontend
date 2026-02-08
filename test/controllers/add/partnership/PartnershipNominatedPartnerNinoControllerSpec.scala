@@ -103,7 +103,7 @@ class PartnershipNominatedPartnerNinoControllerSpec extends SpecBase with Mockit
     }
 
     "must redirect when valid data is submitted" in {
-      val mockSessionRepository    = mock[SessionRepository]
+      val mockSessionRepository = mock[SessionRepository]
       val mockSubcontractorService = mock[SubcontractorService]
 
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
@@ -153,7 +153,7 @@ class PartnershipNominatedPartnerNinoControllerSpec extends SpecBase with Mockit
             .withFormUrlEncodedBody("value" -> "INVALID")
 
         val boundForm = form.bind(Map("value" -> "INVALID"))
-        val view      = application.injector.instanceOf[PartnershipNominatedPartnerNinoView]
+        val view = application.injector.instanceOf[PartnershipNominatedPartnerNinoView]
 
         val result = route(application, request).value
 
@@ -192,24 +192,24 @@ class PartnershipNominatedPartnerNinoControllerSpec extends SpecBase with Mockit
         redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
       }
     }
-    
+
     "must throw RuntimeException on a GET when nominated partner name is missing" in {
-      
+
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
-      
-      running (application) {
+
+      running(application) {
         val request = FakeRequest(GET, routeUrl)
         val result = route(application, request).value
-        
+
         val ex = intercept[RuntimeException] {
           Await.result(result, 5.seconds)
         }
-        
+
         ex.getMessage mustBe "Missing nominated partner name"
       }
-      
+
     }
-    
+
     "must throw RuntimeException on a POST when nominated partner name is missing" in {
 
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
@@ -226,6 +226,7 @@ class PartnershipNominatedPartnerNinoControllerSpec extends SpecBase with Mockit
         }
 
         ex.getMessage mustBe "Missing nominated partner name"
+      }
     }
   }
 }

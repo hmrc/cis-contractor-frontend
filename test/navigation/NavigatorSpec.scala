@@ -799,6 +799,14 @@ class NavigatorSpec extends SpecBase {
         ) mustBe routes.JourneyRecoveryController.onPageLoad()
       }
 
+      "must go from PartnershipNominatedPartnerNinoPage to CYA in CheckMode" in {
+        navigator.nextPage(
+          PartnershipNominatedPartnerNinoPage,
+          CheckMode,
+          emptyUserAnswers
+        ) mustBe controllers.add.routes.CheckYourAnswersController.onPageLoad()
+      }
+
     }
   }
 }
