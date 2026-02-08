@@ -34,6 +34,8 @@ import uk.gov.hmrc.http.HeaderCarrier
 import views.html.add.partnership.PartnershipNominatedPartnerNinoView
 
 import scala.concurrent.Future
+import scala.concurrent.Await
+import scala.concurrent.duration.*
 
 class PartnershipNominatedPartnerNinoControllerSpec extends SpecBase with MockitoSugar {
 
@@ -189,6 +191,41 @@ class PartnershipNominatedPartnerNinoControllerSpec extends SpecBase with Mockit
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
       }
+    }
+    
+    "must throw RuntimeException on a GET when nominated partner name is missing" in {
+      
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      
+      running (application) {
+        val request = FakeRequest(GET, routeUrl)
+        val result = route(application, request).value
+        
+        val ex = intercept[RuntimeException] {
+          Await.result(result, 5.seconds)
+        }
+        
+        ex.getMessage mustBe "Missing nominated partner name"
+      }
+      
+    }
+    
+    "must throw RuntimeException on a POST when nominated partner name is missing" in {
+
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, routeUrl)
+            .withFormUrlEncodedBody("value" -> "QQ123456C")
+
+        val result = route(application, request).value
+
+        val ex = intercept[RuntimeException] {
+          Await.result(result, 5.seconds)
+        }
+
+        ex.getMessage mustBe "Missing nominated partner name"
     }
   }
 }
