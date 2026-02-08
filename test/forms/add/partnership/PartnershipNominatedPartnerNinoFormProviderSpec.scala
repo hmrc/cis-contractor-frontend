@@ -16,7 +16,6 @@
 
 package forms.add.partnership
 
-
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 
@@ -28,10 +27,10 @@ class PartnershipNominatedPartnerNinoFormProviderSpec extends AnyFreeSpec with M
 
     "bind valid NINO formats" in {
       val valid = Seq(
-        "QQ123456C",
-        "QQ 12 34 56 C",
-        "qq123456c",
-        "  QQ 12 34 56 C  "
+        "AB123456C",
+        "AB 12 34 56 C",
+        "ab123456c",
+        "  AB 12 34 56 C  "
       )
 
       valid.foreach { v =>
@@ -47,7 +46,7 @@ class PartnershipNominatedPartnerNinoFormProviderSpec extends AnyFreeSpec with M
     }
 
     "error when too long (more than 9 chars ignoring spaces)" in {
-      val bound = form.bind(Map("value" -> "QQ123456CA"))
+      val bound = form.bind(Map("value" -> "AB123456CA"))
       bound.hasErrors mustBe true
       bound.errors.map(_.message) must contain("partnershipNominatedPartnerNino.error.length")
     }
@@ -59,9 +58,14 @@ class PartnershipNominatedPartnerNinoFormProviderSpec extends AnyFreeSpec with M
     }
 
     "allow no suffix letter" in {
-      val bound = form.bind(Map("value" -> "QQ123456"))
+      val bound = form.bind(Map("value" -> "AB123456"))
       bound.hasErrors mustBe false
+    }
+
+    "reject disallowed prefix letters (e.g. Q)" in {
+      val bound = form.bind(Map("value" -> "QQ123456C"))
+      bound.hasErrors mustBe true
+      bound.errors.map(_.message) must contain("partnershipNominatedPartnerNino.error.invalidCharacters")
     }
   }
 }
-

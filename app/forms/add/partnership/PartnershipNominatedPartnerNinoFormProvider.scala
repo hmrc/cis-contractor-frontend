@@ -16,6 +16,7 @@
 
 package forms.add.partnership
 
+import forms.Validation
 import forms.mappings.Mappings
 import play.api.data.Form
 import play.api.data.Forms.single
@@ -24,9 +25,6 @@ import play.api.data.validation.{Constraint, Invalid, Valid}
 class PartnershipNominatedPartnerNinoFormProvider extends Mappings {
 
   private val maxLength = 9
-
-  private val ninoRegex =
-    """^(?i)\s*[A-Z]\s*[A-Z]\s*\d\s*\d\s*\d\s*\d\s*\d\s*\d\s*[A-D]?\s*$"""
 
   private def normalised(value: String): String =
     value.replaceAll("\\s", "").toUpperCase
@@ -39,7 +37,7 @@ class PartnershipNominatedPartnerNinoFormProvider extends Mappings {
 
   private val formatConstraint: Constraint[String] =
     Constraint("constraints.nino.format") { value =>
-      if (value.matches(ninoRegex)) Valid
+      if (value.matches(Validation.ninoRegex)) Valid
       else Invalid("partnershipNominatedPartnerNino.error.invalidCharacters")
     }
 
