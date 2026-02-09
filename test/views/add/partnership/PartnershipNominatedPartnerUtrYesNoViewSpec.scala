@@ -36,14 +36,14 @@ class PartnershipNominatedPartnerUtrYesNoViewSpec extends AnyWordSpec with Match
 
     "render the page with title, heading, radios and submit button" in new Setup {
 
-      private val partnershipName = "Test Partnership"
+      private val nominatedPartnershipName = "Test Nominated Partnership"
 
-      val html: HtmlFormat.Appendable = view(form, NormalMode, partnershipName)
+      val html: HtmlFormat.Appendable = view(form, NormalMode, nominatedPartnershipName)
       val doc: Document               = org.jsoup.Jsoup.parse(html.toString())
       doc.select("title").text() must include(messages("partnershipNominatedPartnerUtrYesNo.title"))
 
       val legend: Elements = doc.select("fieldset legend")
-      legend.text() mustBe messages("partnershipNominatedPartnerUtrYesNo.heading", partnershipName)
+      legend.text() mustBe messages("partnershipNominatedPartnerUtrYesNo.heading", nominatedPartnershipName)
       legend.hasClass("govuk-fieldset__legend--l") mustBe true
 
       val hint: Elements = doc.select("fieldset .govuk-hint")
@@ -69,9 +69,9 @@ class PartnershipNominatedPartnerUtrYesNoViewSpec extends AnyWordSpec with Match
       val errorForm: Form[Boolean] =
         form.withError("value", "partnershipNominatedPartnerUtrYesNo.error.required")
 
-      private val partnershipName = "Test Partnership"
+      private val nominatedPartnershipName = "Test Nominated Partnership"
 
-      val html: HtmlFormat.Appendable = view(errorForm, NormalMode, partnershipName)
+      val html: HtmlFormat.Appendable = view(errorForm, NormalMode, nominatedPartnershipName)
       val doc: Document               = org.jsoup.Jsoup.parse(html.toString())
 
       val summary: Elements = doc.select(".govuk-error-summary")

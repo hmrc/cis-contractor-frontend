@@ -20,7 +20,7 @@ import controllers.actions.*
 import forms.add.partnership.PartnershipNominatedPartnerUtrYesNoFormProvider
 import models.Mode
 import navigation.Navigator
-import pages.add.partnership.{PartnershipNamePage, PartnershipNominatedPartnerUtrYesNoPage}
+import pages.add.partnership.{PartnershipNominatedPartnerNamePage, PartnershipNominatedPartnerUtrYesNoPage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
@@ -48,14 +48,14 @@ class PartnershipNominatedPartnerUtrYesNoController @Inject() (
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
     request.userAnswers
-      .get(PartnershipNamePage)
-      .map { partnershipName =>
+      .get(PartnershipNominatedPartnerNamePage)
+      .map { nominatedPartnershipName =>
         val preparedForm = request.userAnswers.get(PartnershipNominatedPartnerUtrYesNoPage) match {
           case None        => form
           case Some(value) => form.fill(value)
         }
 
-        Ok(view(preparedForm, mode, partnershipName))
+        Ok(view(preparedForm, mode, nominatedPartnershipName))
       }
       .getOrElse(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
   }
@@ -63,12 +63,12 @@ class PartnershipNominatedPartnerUtrYesNoController @Inject() (
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
       request.userAnswers
-        .get(PartnershipNamePage)
-        .map { partnershipName =>
+        .get(PartnershipNominatedPartnerNamePage)
+        .map { nominatedPartnershipName =>
           form
             .bindFromRequest()
             .fold(
-              formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, partnershipName))),
+              formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, nominatedPartnershipName))),
               value =>
                 for {
                   updatedAnswers <-
