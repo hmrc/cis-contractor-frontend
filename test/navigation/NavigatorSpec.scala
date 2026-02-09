@@ -319,7 +319,7 @@ class NavigatorSpec extends SpecBase {
         ) mustBe controllers.add.routes.CheckYourAnswersController.onPageLoad()
       }
 
-      "must go from a PartnershipWorksReferenceNumberYesNoPage to next page when true" in {
+      "must go from a PartnershipWorksReferenceNumberYesNoPage to PartnershipWorksReferenceNumberPage when true" in {
         navigator.nextPage(
           PartnershipWorksReferenceNumberYesNoPage,
           NormalMode,
@@ -666,12 +666,12 @@ class NavigatorSpec extends SpecBase {
         }
       }
 
-      "must go from a PartnershipWorksReferenceNumberYesNoPage to next page when true" in {
+      "must go from a PartnershipWorksReferenceNumberYesNoPage to PartnershipWorksReferenceNumberPage when true" in {
         navigator.nextPage(
           PartnershipWorksReferenceNumberYesNoPage,
           CheckMode,
           emptyUserAnswers.setOrException(PartnershipWorksReferenceNumberYesNoPage, true)
-        ) mustBe controllers.add.partnership.routes.PartnershipWorksReferenceNumberYesNoController.onPageLoad(CheckMode)
+        ) mustBe controllers.add.partnership.routes.PartnershipWorksReferenceNumberController.onPageLoad(CheckMode)
       }
 
       "must go from a PartnershipWorksReferenceNumberYesNoPage to CYA page when false" in {
