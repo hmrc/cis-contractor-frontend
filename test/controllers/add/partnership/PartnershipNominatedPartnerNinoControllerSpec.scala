@@ -103,11 +103,12 @@ class PartnershipNominatedPartnerNinoControllerSpec extends SpecBase with Mockit
     }
 
     "must redirect when valid data is submitted" in {
-      val mockSessionRepository = mock[SessionRepository]
+      val mockSessionRepository    = mock[SessionRepository]
       val mockSubcontractorService = mock[SubcontractorService]
 
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
-      when(mockSubcontractorService.updateSubcontractor(any[UserAnswers])(any[HeaderCarrier])) thenReturn Future.successful(())
+      when(mockSubcontractorService.updateSubcontractor(any[UserAnswers])(any[HeaderCarrier])) thenReturn Future
+        .successful(())
 
       val application =
         applicationBuilder(
@@ -153,7 +154,7 @@ class PartnershipNominatedPartnerNinoControllerSpec extends SpecBase with Mockit
             .withFormUrlEncodedBody("value" -> "INVALID")
 
         val boundForm = form.bind(Map("value" -> "INVALID"))
-        val view = application.injector.instanceOf[PartnershipNominatedPartnerNinoView]
+        val view      = application.injector.instanceOf[PartnershipNominatedPartnerNinoView]
 
         val result = route(application, request).value
 
@@ -199,7 +200,7 @@ class PartnershipNominatedPartnerNinoControllerSpec extends SpecBase with Mockit
 
       running(application) {
         val request = FakeRequest(GET, routeUrl)
-        val result = route(application, request).value
+        val result  = route(application, request).value
 
         val ex = intercept[RuntimeException] {
           Await.result(result, 5.seconds)
@@ -230,4 +231,3 @@ class PartnershipNominatedPartnerNinoControllerSpec extends SpecBase with Mockit
     }
   }
 }
-

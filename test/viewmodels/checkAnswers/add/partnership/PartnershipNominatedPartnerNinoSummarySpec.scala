@@ -28,11 +28,7 @@ import play.api.test.Helpers.stubMessages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.*
 
-class PartnershipNominatedPartnerNinoSummarySpec
-  extends AnyFreeSpec
-    with Matchers
-    with OptionValues
-    with TryValues {
+class PartnershipNominatedPartnerNinoSummarySpec extends AnyFreeSpec with Matchers with OptionValues with TryValues {
 
   implicit val messages: Messages = stubMessages()
 

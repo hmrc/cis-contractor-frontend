@@ -86,7 +86,7 @@ class PartnershipNominatedPartnerNinoViewSpec extends AnyWordSpec with Matchers 
     val form: Form[String] = formProvider()
 
     implicit val request: Request[_] = FakeRequest()
-    implicit val messages: Messages =
+    implicit val messages: Messages  =
       play.api.i18n.MessagesImpl(
         play.api.i18n.Lang.defaultLang,
         app.injector.instanceOf[play.api.i18n.MessagesApi]
