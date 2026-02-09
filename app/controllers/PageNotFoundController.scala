@@ -33,6 +33,5 @@ class PageNotFoundController @Inject() (
 
   def onPageLoad: Action[AnyContent] = Action { implicit request =>
     Ok(view())
-
   }
 }
