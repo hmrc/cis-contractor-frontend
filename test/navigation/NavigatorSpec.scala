@@ -333,7 +333,7 @@ class NavigatorSpec extends SpecBase {
           PartnershipWorksReferenceNumberYesNoPage,
           NormalMode,
           emptyUserAnswers.setOrException(PartnershipWorksReferenceNumberYesNoPage, false)
-        ) mustBe controllers.add.routes.CheckYourAnswersController.onPageLoad()
+        ) mustBe controllers.add.partnership.routes.PartnershipContactDetailsYesNoController.onPageLoad(NormalMode)
       }
 
       "must go from a PartnershipWorksReferenceNumberYesNoPage to journey recovery when incomplete info provided" in {
@@ -342,6 +342,38 @@ class NavigatorSpec extends SpecBase {
           NormalMode,
           emptyUserAnswers
         ) mustBe journeyRecovery
+      }
+
+      "must go from PartnershipContactDetailsYesNoPage" - {
+        "to PartnershipContactDetailsPage when answer is Yes" in {
+          val answers = UserAnswers(userAnswersId).set(PartnershipContactDetailsYesNoPage, true).success.value
+
+          // TODO: SL0201 - B (PTN) - Contact details for partner Controller
+          navigator.nextPage(
+            PartnershipContactDetailsYesNoPage,
+            NormalMode,
+            answers
+          ) mustBe routes.JourneyRecoveryController.onPageLoad()
+        }
+
+        "to PartnershipNominatedPartnerNamePage when answer is No" in {
+          val answers = UserAnswers(userAnswersId).set(PartnershipContactDetailsYesNoPage, false).success.value
+
+          // TODO: SL0205 - B (PTN) - Nominated partner name controller
+          navigator.nextPage(
+            PartnershipContactDetailsYesNoPage,
+            NormalMode,
+            answers
+          ) mustBe routes.JourneyRecoveryController.onPageLoad()
+        }
+
+        "to JourneyRecoveryPage when answer is not present" in {
+          navigator.nextPage(
+            PartnershipContactDetailsYesNoPage,
+            NormalMode,
+            emptyUserAnswers
+          ) mustBe routes.JourneyRecoveryController.onPageLoad()
+        }
       }
     }
 
@@ -615,6 +647,38 @@ class NavigatorSpec extends SpecBase {
         val navigator = new Navigator()
         navigator.nextPage(SubTradingNameYesNoPage, CheckMode, emptyUserAnswers) mustBe
           routes.JourneyRecoveryController.onPageLoad()
+      }
+
+      "must go from PartnershipContactDetailsYesNoPage" - {
+        "to PartnershipContactDetailsPage when answer is Yes" in {
+          val answers = UserAnswers(userAnswersId).set(PartnershipContactDetailsYesNoPage, true).success.value
+
+          // TODO: SL0201 - B (PTN) - Contact details for partner Controller
+          navigator.nextPage(
+            PartnershipContactDetailsYesNoPage,
+            CheckMode,
+            answers
+          ) mustBe routes.JourneyRecoveryController.onPageLoad()
+        }
+
+        "to Partnership CyaPage when answer is No" in {
+          val answers = UserAnswers(userAnswersId).set(PartnershipContactDetailsYesNoPage, false).success.value
+
+          // TODO: Partnership CYA controller
+          navigator.nextPage(
+            PartnershipContactDetailsYesNoPage,
+            CheckMode,
+            answers
+          ) mustBe routes.JourneyRecoveryController.onPageLoad()
+        }
+
+        "to JourneyRecoveryPage when answer is not present" in {
+          navigator.nextPage(
+            PartnershipContactDetailsYesNoPage,
+            CheckMode,
+            emptyUserAnswers
+          ) mustBe routes.JourneyRecoveryController.onPageLoad()
+        }
       }
     }
 

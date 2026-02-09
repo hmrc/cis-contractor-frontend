@@ -175,7 +175,9 @@ class PartnershipWorksReferenceNumberYesNoControllerSpec extends SpecBase with M
         status(result) mustEqual SEE_OTHER
         redirectLocation(
           result
-        ).value mustEqual controllers.add.routes.CheckYourAnswersController.onPageLoad().url
+        ).value mustEqual controllers.add.partnership.routes.PartnershipContactDetailsYesNoController
+          .onPageLoad(NormalMode)
+          .url
       }
     }
 
