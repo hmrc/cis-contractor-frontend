@@ -73,7 +73,7 @@ class NavigatorSpec extends SpecBase {
         ) mustBe controllers.add.partnership.routes.PartnershipHasUtrYesNoController.onPageLoad(NormalMode)
       }
 
-      "must go from PartnershipNamePage to JourneyRecovery in CheckMode" in {
+      "must go from PartnershipNamePage to CheckYourAnswersController in CheckMode" in {
         navigator.nextPage(
           PartnershipNamePage,
           CheckMode,
