@@ -81,7 +81,7 @@ class PartnershipNominatedPartnerNinoControllerSpec extends SpecBase with Mockit
           .set(PartnershipNominatedPartnerNamePage, nominatedPartnerName)
           .success
           .value
-          .set(PartnershipNominatedPartnerNinoPage, "QQ123456C")
+          .set(PartnershipNominatedPartnerNinoPage, "AA123456A")
           .success
           .value
 
@@ -95,7 +95,7 @@ class PartnershipNominatedPartnerNinoControllerSpec extends SpecBase with Mockit
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill("QQ123456C"), NormalMode, nominatedPartnerName)(
+        contentAsString(result) mustEqual view(form.fill("AA123456A"), NormalMode, nominatedPartnerName)(
           request,
           messages(application)
         ).toString
@@ -107,8 +107,7 @@ class PartnershipNominatedPartnerNinoControllerSpec extends SpecBase with Mockit
       val mockSubcontractorService = mock[SubcontractorService]
 
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
-      when(mockSubcontractorService.updateSubcontractor(any[UserAnswers])(any[HeaderCarrier])) thenReturn Future
-        .successful(())
+      when(mockSubcontractorService.updateSubcontractor(any[UserAnswers])(any[HeaderCarrier])) thenReturn Future.successful(())
 
       val application =
         applicationBuilder(
@@ -126,7 +125,7 @@ class PartnershipNominatedPartnerNinoControllerSpec extends SpecBase with Mockit
       running(application) {
         val request =
           FakeRequest(POST, routeUrl)
-            .withFormUrlEncodedBody("value" -> "QQ 12 34 56 C")
+            .withFormUrlEncodedBody("value" -> "AA 12 34 56 A")
 
         val result = route(application, request).value
 
@@ -138,6 +137,7 @@ class PartnershipNominatedPartnerNinoControllerSpec extends SpecBase with Mockit
       verify(mockSubcontractorService).updateSubcontractor(any[UserAnswers])(any[HeaderCarrier])
       verifyNoMoreInteractions(mockSubcontractorService)
     }
+
 
     "must return a Bad Request and errors when invalid data is submitted" in {
       val ua =
