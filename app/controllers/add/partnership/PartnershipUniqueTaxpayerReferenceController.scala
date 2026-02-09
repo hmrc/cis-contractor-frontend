@@ -49,12 +49,7 @@ class PartnershipUniqueTaxpayerReferenceController @Inject() (
   val form = formProvider()
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
-    // TODO: remove patch after testing
-    val patchedAnswers = request.userAnswers.get(PartnershipNamePage) match {
-      case None        => request.userAnswers.set(PartnershipNamePage, "TODO").get
-      case Some(value) => request.userAnswers
-    }
-    patchedAnswers
+    request.userAnswers
       .get(PartnershipNamePage)
       .map { partnershipName =>
         val preparedForm = request.userAnswers.get(PartnershipUniqueTaxpayerReferencePage) match {
@@ -68,12 +63,7 @@ class PartnershipUniqueTaxpayerReferenceController @Inject() (
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
-      // TODO: remove patch after testing
-      val patchedAnswers = request.userAnswers.get(PartnershipNamePage) match {
-        case None        => request.userAnswers.set(PartnershipNamePage, "TODO").get
-        case Some(value) => request.userAnswers
-      }
-      patchedAnswers
+      request.userAnswers
         .get(PartnershipNamePage)
         .map { name =>
           form

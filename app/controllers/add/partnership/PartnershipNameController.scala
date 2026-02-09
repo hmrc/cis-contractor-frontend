@@ -24,7 +24,6 @@ import pages.add.partnership.PartnershipNamePage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
-import services.SubcontractorService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.add.partnership.PartnershipNameView
 
@@ -39,7 +38,6 @@ class PartnershipNameController @Inject() (
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   formProvider: PartnershipNameFormProvider,
-  subcontractorService: SubcontractorService,
   val controllerComponents: MessagesControllerComponents,
   view: PartnershipNameView
 )(implicit ec: ExecutionContext)
@@ -64,7 +62,6 @@ class PartnershipNameController @Inject() (
             for {
               updatedAnswers <- Future.fromTry(request.userAnswers.set(PartnershipNamePage, value))
               _              <- sessionRepository.set(updatedAnswers)
-              _              <- subcontractorService.updateSubcontractor(updatedAnswers)
             } yield Redirect(navigator.nextPage(PartnershipNamePage, mode, updatedAnswers))
         )
     }
