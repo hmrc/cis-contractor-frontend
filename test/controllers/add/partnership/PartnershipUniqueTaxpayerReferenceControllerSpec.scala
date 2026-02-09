@@ -63,7 +63,6 @@ class PartnershipUniqueTaxpayerReferenceControllerSpec extends SpecBase with Moc
         val result = route(application, request).value
 
         val view = application.injector.instanceOf[PartnershipUniqueTaxpayerReferenceView]
-        27
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(form, NormalMode, partnershipName)(
