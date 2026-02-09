@@ -127,7 +127,7 @@ class PartnershipWorksReferenceNumberYesNoControllerSpec extends SpecBase with M
 
     }
 
-    "must redirect to the PartnershipWorksReferenceNumber page when valid data with value Yes is submitted" in {
+    "must redirect to the next page when valid data with value Yes is submitted" in {
       val mockSessionRepository = mock[SessionRepository]
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
@@ -148,7 +148,7 @@ class PartnershipWorksReferenceNumberYesNoControllerSpec extends SpecBase with M
         status(result) mustEqual SEE_OTHER
         redirectLocation(
           result
-        ).value mustEqual controllers.add.partnership.routes.PartnershipWorksReferenceNumberController
+        ).value mustEqual controllers.add.partnership.routes.PartnershipWorksReferenceNumberYesNoController
           .onPageLoad(NormalMode)
           .url
       }
@@ -175,7 +175,7 @@ class PartnershipWorksReferenceNumberYesNoControllerSpec extends SpecBase with M
         status(result) mustEqual SEE_OTHER
         redirectLocation(
           result
-        ).value mustEqual controllers.add.partnership.routes.PartnershipContactDetailsYesNoController
+        ).value mustEqual controllers.add.partnership.routes.PartnershipWorksReferenceNumberYesNoController
           .onPageLoad(NormalMode)
           .url
       }

@@ -80,7 +80,7 @@ class PartnershipNameControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must redirect to PartnershipHasUtrYesNo page when valid data is submitted" in {
+    "must redirect (currently to Partnership UTR via Navigator) when valid data is submitted" in {
       val mockSessionRepository    = mock[SessionRepository]
       val mockSubcontractorService = mock[SubcontractorService]
 
@@ -105,12 +105,13 @@ class PartnershipNameControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual
-          controllers.add.partnership.routes.PartnershipHasUtrYesNoController
+          controllers.add.partnership.routes.PartnershipUniqueTaxpayerReferenceController
             .onPageLoad(NormalMode)
             .url
       }
 
       verify(mockSessionRepository).set(any())
+      verify(mockSubcontractorService).updateSubcontractor(any[UserAnswers])(any[HeaderCarrier])
       verifyNoMoreInteractions(mockSubcontractorService)
     }
 
