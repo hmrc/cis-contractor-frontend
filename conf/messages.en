@@ -306,3 +306,10 @@ partnershipContactDetailsYesNo.hint = You can add this information later if you 
 partnershipContactDetailsYesNo.checkYourAnswersLabel = Add partnership contact details
 partnershipContactDetailsYesNo.error.required = Select whether you want to add contact details for this partnership
 partnershipContactDetailsYesNo.change.hidden = Partnership Contact Details
+
+partnershipNominatedPartnerNinoYesNo.title = Do you know the National Insurance number for this nominated partner?
+partnershipNominatedPartnerNinoYesNo.heading = Do you know the National Insurance number for {0}?
+partnershipNominatedPartnerNinoYesNo.hint = This information will be used to verify them as a subcontractor
+partnershipNominatedPartnerNinoYesNo.checkYourAnswersLabel = Partnership Nominated Partner
+partnershipNominatedPartnerNinoYesNo.error.required = Select whether you know the National Insurance number for this nominated partner
+partnershipNominatedPartnerNinoYesNo.change.hidden = Partnership Nominated Partner

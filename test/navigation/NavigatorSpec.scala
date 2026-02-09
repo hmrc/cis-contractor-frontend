@@ -375,6 +375,15 @@ class NavigatorSpec extends SpecBase {
           ) mustBe routes.JourneyRecoveryController.onPageLoad()
         }
       }
+
+      "must go from PartnershipNominatedPartnerNinoYesNoPage to PartnershipNominatedPartnerNinoYesNoController in NormalMode" in {
+        navigator.nextPage(
+          PartnershipNominatedPartnerNinoYesNoPage,
+          NormalMode,
+          emptyUserAnswers
+        ) mustBe controllers.add.partnership.routes.PartnershipNominatedPartnerNinoYesNoController
+          .onPageLoad(NormalMode)
+      }
     }
 
     "in Check mode" - {
@@ -679,6 +688,14 @@ class NavigatorSpec extends SpecBase {
             emptyUserAnswers
           ) mustBe routes.JourneyRecoveryController.onPageLoad()
         }
+      }
+
+      "must go from PartnershipNominatedPartnerNinoYesNoPage to PartnershipNominatedPartnerNinoYesNoController in CheckMode" in {
+        navigator.nextPage(
+          PartnershipNominatedPartnerNinoYesNoPage,
+          CheckMode,
+          emptyUserAnswers
+        ) mustBe controllers.add.partnership.routes.PartnershipNominatedPartnerNinoYesNoController.onPageLoad(CheckMode)
       }
     }
 

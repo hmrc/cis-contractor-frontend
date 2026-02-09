@@ -128,3 +128,8 @@ GET        /add/partnership/check-contact-details                           cont
 POST       /add/partnership/check-contact-details                           controllers.add.partnership.PartnershipContactDetailsYesNoController.onSubmit(mode: Mode = NormalMode)
 GET        /add/partnership/change-check-contact-details                    controllers.add.partnership.PartnershipContactDetailsYesNoController.onPageLoad(mode: Mode = CheckMode)
 POST       /add/partnership/change-check-contact-details                    controllers.add.partnership.PartnershipContactDetailsYesNoController.onSubmit(mode: Mode = CheckMode)
+
+GET        /add/partnership/nominated-partner-has-national-insurance-number                       controllers.add.partnership.PartnershipNominatedPartnerNinoYesNoController.onPageLoad(mode: Mode = NormalMode)
+POST       /add/partnership/nominated-partner-has-national-insurance-number                        controllers.add.partnership.PartnershipNominatedPartnerNinoYesNoController.onSubmit(mode: Mode = NormalMode)
+GET        /add/partnership/change-nominated-partner-has-national-insurance-number                  controllers.add.partnership.PartnershipNominatedPartnerNinoYesNoController.onPageLoad(mode: Mode = CheckMode)
+POST       /add/partnership/change-nominated-partner-has-national-insurance-number                 controllers.add.partnership.PartnershipNominatedPartnerNinoYesNoController.onSubmit(mode: Mode = CheckMode)
