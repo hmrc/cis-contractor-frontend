@@ -48,7 +48,12 @@ class PartnershipHasUtrYesNoController @Inject() (
 
   def onPageLoad(mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData) { implicit request =>
-      request.userAnswers
+      // TODO: remove patch after testing
+      val patchedAnswers = request.userAnswers.get(PartnershipNamePage) match {
+        case None        => request.userAnswers.set(PartnershipNamePage, "TODO").get
+        case Some(value) => request.userAnswers
+      }
+      patchedAnswers
         .get(PartnershipNamePage)
         .map { partnershipName =>
           val preparedForm = request.userAnswers.get(PartnershipHasUtrYesNoPage) match {
@@ -62,7 +67,12 @@ class PartnershipHasUtrYesNoController @Inject() (
 
   def onSubmit(mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
-      request.userAnswers
+      // TODO: remove patch after testing
+      val patchedAnswers = request.userAnswers.get(PartnershipNamePage) match {
+        case None        => request.userAnswers.set(PartnershipNamePage, "TODO").get
+        case Some(value) => request.userAnswers
+      }
+      patchedAnswers
         .get(PartnershipNamePage)
         .map { name =>
           form
