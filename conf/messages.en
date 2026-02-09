@@ -313,6 +313,6 @@ partnershipNominatedPartnerName.hint = The nominated partner is responsible for 
 partnershipNominatedPartnerName.label = Full name
 partnershipNominatedPartnerName.checkYourAnswersLabel = Name
 partnershipNominatedPartnerName.error.required = Enter a full name using letters a to z, apostrophes and dashes
-partnershipNominatedPartnerName.error.invalid = Enter a full name using letters a to z, apostrophes and dashes
+partnershipNominatedPartnerName.error.invalid = Enter a full name using letters a to z, numbers, apostrophes, ampersands, commas, hyphens, full stops, forward slashes and spaces
 partnershipNominatedPartnerName.error.length = Enter a full name up to 56 characters
 partnershipNominatedPartnerName.change.hidden = name
