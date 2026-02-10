@@ -24,7 +24,7 @@ import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.add.partnership.{NominatedPartnerNamePage, PartnershipNominatedPartnerNinoYesNoPage}
+import pages.add.partnership.{PartnershipNominatedPartnerNamePage, PartnershipNominatedPartnerNinoYesNoPage}
 import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
@@ -41,10 +41,10 @@ class PartnershipNominatedPartnerNinoYesNoControllerSpec extends SpecBase with M
   val formProvider = new PartnershipNominatedPartnerNinoYesNoFormProvider()
   val form         = formProvider()
 
-  private val nominatedPartnerName = "Test Partnership"
+  private val partnershipNominatedPartnerName = "Test Partnership"
 
   private def uaWithName: UserAnswers =
-    emptyUserAnswers.set(NominatedPartnerNamePage, nominatedPartnerName).success.value
+    emptyUserAnswers.set(PartnershipNominatedPartnerNamePage, partnershipNominatedPartnerName).success.value
 
   lazy val routeLoad =
     controllers.add.partnership.routes.PartnershipNominatedPartnerNinoYesNoController.onPageLoad(NormalMode).url
@@ -65,7 +65,7 @@ class PartnershipNominatedPartnerNinoYesNoControllerSpec extends SpecBase with M
         val view = application.injector.instanceOf[PartnershipNominatedPartnerNinoYesNoView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode, nominatedPartnerName)(
+        contentAsString(result) mustEqual view(form, NormalMode, partnershipNominatedPartnerName)(
           request,
           messages(application)
         ).toString
@@ -90,7 +90,7 @@ class PartnershipNominatedPartnerNinoYesNoControllerSpec extends SpecBase with M
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(true), NormalMode, nominatedPartnerName)(
+        contentAsString(result) mustEqual view(form.fill(true), NormalMode, partnershipNominatedPartnerName)(
           request,
           messages(application)
         ).toString
@@ -139,7 +139,7 @@ class PartnershipNominatedPartnerNinoYesNoControllerSpec extends SpecBase with M
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode, nominatedPartnerName)(
+        contentAsString(result) mustEqual view(boundForm, NormalMode, partnershipNominatedPartnerName)(
           request,
           messages(application)
         ).toString
@@ -190,7 +190,7 @@ class PartnershipNominatedPartnerNinoYesNoControllerSpec extends SpecBase with M
       }
     }
 
-    "must redirect to JourneyRecovery if nominatedPartnerName is missing for a POST" in {
+    "must redirect to JourneyRecovery if partnershipNominatedPartnerName is missing for a POST" in {
 
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 

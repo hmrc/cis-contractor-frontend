@@ -26,9 +26,7 @@ import play.api.i18n.Messages
 import play.api.test.Helpers.stubMessages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.*
 
-class PartnershipNominatedPartnerNinoYesNoSummarySpec
-  extends AnyFreeSpec
-    with Matchers {
+class PartnershipNominatedPartnerNinoYesNoSummarySpec extends AnyFreeSpec with Matchers {
 
   implicit val messages: Messages = stubMessages()
 
@@ -61,15 +59,15 @@ class PartnershipNominatedPartnerNinoYesNoSummarySpec
 
       val changeAction       = actions.head
       val expectedChangeText = messages("site.change")
-      val expectedHref =
+      val expectedHref       =
         controllers.add.partnership.routes.PartnershipNominatedPartnerNinoYesNoController
           .onPageLoad(CheckMode)
           .url
       val expectedHiddenText =
         messages("partnershipNominatedPartnerNinoYesNo.change.hidden")
 
-      changeAction.content.asHtml.toString should include(expectedChangeText)
-      changeAction.href shouldBe expectedHref
+      changeAction.content.asHtml.toString    should include(expectedChangeText)
+      changeAction.href                     shouldBe expectedHref
       changeAction.visuallyHiddenText.value shouldBe expectedHiddenText
     }
 

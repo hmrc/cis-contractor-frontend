@@ -20,7 +20,7 @@ import controllers.actions.*
 import forms.add.partnership.PartnershipNominatedPartnerNinoYesNoFormProvider
 import models.Mode
 import navigation.Navigator
-import pages.add.partnership.{NominatedPartnerNamePage, PartnershipNominatedPartnerNinoYesNoPage}
+import pages.add.partnership.{PartnershipNominatedPartnerNamePage, PartnershipNominatedPartnerNinoYesNoPage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
@@ -48,14 +48,14 @@ class PartnershipNominatedPartnerNinoYesNoController @Inject() (
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
     request.userAnswers
-      .get(NominatedPartnerNamePage)
-      .map { nominatedPartnerName =>
+      .get(PartnershipNominatedPartnerNamePage)
+      .map { partnershipNominatedPartnerName =>
         val preparedForm = request.userAnswers.get(PartnershipNominatedPartnerNinoYesNoPage) match {
           case None        => form
           case Some(value) => form.fill(value)
         }
 
-        Ok(view(preparedForm, mode, nominatedPartnerName))
+        Ok(view(preparedForm, mode, partnershipNominatedPartnerName))
       }
       .getOrElse(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
   }
@@ -63,12 +63,13 @@ class PartnershipNominatedPartnerNinoYesNoController @Inject() (
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
       request.userAnswers
-        .get(NominatedPartnerNamePage)
-        .map { nominatedPartnerName =>
+        .get(PartnershipNominatedPartnerNamePage)
+        .map { partnershipNominatedPartnerName =>
           form
             .bindFromRequest()
             .fold(
-              formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, nominatedPartnerName))),
+              formWithErrors =>
+                Future.successful(BadRequest(view(formWithErrors, mode, partnershipNominatedPartnerName))),
               value =>
                 for {
                   updatedAnswers <-

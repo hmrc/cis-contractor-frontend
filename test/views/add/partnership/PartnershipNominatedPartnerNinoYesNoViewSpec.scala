@@ -30,10 +30,7 @@ import play.api.test.FakeRequest
 import play.twirl.api.HtmlFormat
 import views.html.add.partnership.PartnershipNominatedPartnerNinoYesNoView
 
-class PartnershipNominatedPartnerNinoYesNoViewSpec
-  extends AnyWordSpec
-    with Matchers
-    with GuiceOneAppPerSuite {
+class PartnershipNominatedPartnerNinoYesNoViewSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite {
 
   "PartnershipNominatedPartnerNinoYesNoView" should {
 
@@ -43,35 +40,34 @@ class PartnershipNominatedPartnerNinoYesNoViewSpec
 
       val html: HtmlFormat.Appendable = view(form, NormalMode, nominatedPartnerName)
       val doc: Document               = org.jsoup.Jsoup.parse(html.toString())
-      
+
       doc.select("title").text() must include(
         messages("partnershipNominatedPartnerNinoYesNo.title")
       )
-      
+
       val legend: Elements = doc.select("fieldset legend")
       legend.text() mustBe messages(
         "partnershipNominatedPartnerNinoYesNo.heading",
         nominatedPartnerName
       )
       legend.hasClass("govuk-fieldset__legend--l") mustBe true
-      
+
       val hint: Elements = doc.select("fieldset .govuk-hint")
       hint.text() mustBe messages("partnershipNominatedPartnerNinoYesNo.hint")
-      
+
       val radioButtons: Elements = doc.select(".govuk-radios__label")
       radioButtons.size() mustBe 2
       radioButtons.get(0).text mustBe "Yes"
       radioButtons.get(1).text mustBe "No"
-      
+
       doc
         .select("form")
-        .attr("action") mustBe controllers.add.partnership.routes
-        .PartnershipNominatedPartnerNinoYesNoController
+        .attr("action") mustBe controllers.add.partnership.routes.PartnershipNominatedPartnerNinoYesNoController
         .onSubmit(NormalMode)
         .url
-      
+
       doc.select("form").attr("autocomplete") mustBe "off"
-      
+
       doc.select(".govuk-button").text() mustBe messages("site.continue")
     }
 
@@ -84,15 +80,15 @@ class PartnershipNominatedPartnerNinoYesNoViewSpec
 
       val html: HtmlFormat.Appendable = view(errorForm, NormalMode, nominatedPartnerName)
       val doc: Document               = org.jsoup.Jsoup.parse(html.toString())
-      
+
       val summary: Elements = doc.select(".govuk-error-summary")
       summary.text() must include(
         messages("partnershipNominatedPartnerNinoYesNo.error.required")
       )
-      
+
       val linkHref: String = summary.select("a").attr("href")
       linkHref mustBe "#value"
-      
+
       doc.select(".govuk-error-message").text() must include(
         messages("partnershipNominatedPartnerNinoYesNo.error.required")
       )
@@ -104,7 +100,7 @@ class PartnershipNominatedPartnerNinoYesNoViewSpec
     val form: Form[Boolean] = formProvider()
 
     implicit val request: Request[_] = FakeRequest()
-    implicit val messages: Messages =
+    implicit val messages: Messages  =
       play.api.i18n.MessagesImpl(
         play.api.i18n.Lang.defaultLang,
         app.injector.instanceOf[play.api.i18n.MessagesApi]
