@@ -65,20 +65,20 @@ class NavigatorSpec extends SpecBase {
         ) mustBe controllers.add.partnership.routes.PartnershipNameController.onPageLoad(NormalMode)
       }
 
-      "must go from PartnershipNamePage to PartnershipHasUtrYesNoController in NormalMode" in {
+      "must go from PartnershipNamePage to PartnershipUniqueTaxpayerReferenceController in NormalMode" in {
         navigator.nextPage(
           PartnershipNamePage,
           NormalMode,
           emptyUserAnswers
-        ) mustBe controllers.add.partnership.routes.PartnershipHasUtrYesNoController.onPageLoad(NormalMode)
+        ) mustBe controllers.add.partnership.routes.PartnershipUniqueTaxpayerReferenceController.onPageLoad(NormalMode)
       }
 
-      "must go from PartnershipNamePage to CheckYourAnswersController in CheckMode" in {
+      "must go from PartnershipNamePage to JourneyRecovery in CheckMode" in {
         navigator.nextPage(
           PartnershipNamePage,
           CheckMode,
           emptyUserAnswers
-        ) mustBe controllers.add.routes.CheckYourAnswersController.onPageLoad()
+        ) mustBe routes.JourneyRecoveryController.onPageLoad()
       }
 
       "must go from a TypeOfSubcontractorPage to JourneyRecovery when Trust is selected" in {
@@ -126,8 +126,7 @@ class NavigatorSpec extends SpecBase {
           PartnershipHasUtrYesNoPage,
           NormalMode,
           emptyUserAnswers.setOrException(PartnershipHasUtrYesNoPage, false)
-        ) mustBe controllers.add.partnership.routes.PartnershipWorksReferenceNumberYesNoController
-          .onPageLoad(NormalMode)
+        ) mustBe controllers.add.routes.CheckYourAnswersController.onPageLoad()
       }
 
       "must go from a SubTradingNameYesNoPage to journey recovery page when incomplete info provided" in {
@@ -324,7 +323,7 @@ class NavigatorSpec extends SpecBase {
           PartnershipWorksReferenceNumberYesNoPage,
           NormalMode,
           emptyUserAnswers.setOrException(PartnershipWorksReferenceNumberYesNoPage, true)
-        ) mustBe controllers.add.partnership.routes.PartnershipWorksReferenceNumberController
+        ) mustBe controllers.add.partnership.routes.PartnershipWorksReferenceNumberYesNoController
           .onPageLoad(NormalMode)
       }
 
@@ -333,7 +332,8 @@ class NavigatorSpec extends SpecBase {
           PartnershipWorksReferenceNumberYesNoPage,
           NormalMode,
           emptyUserAnswers.setOrException(PartnershipWorksReferenceNumberYesNoPage, false)
-        ) mustBe controllers.add.partnership.routes.PartnershipContactDetailsYesNoController.onPageLoad(NormalMode)
+        ) mustBe controllers.add.partnership.routes.PartnershipWorksReferenceNumberYesNoController
+          .onPageLoad(NormalMode)
       }
 
       "must go from a PartnershipWorksReferenceNumberYesNoPage to journey recovery when incomplete info provided" in {
@@ -578,7 +578,7 @@ class NavigatorSpec extends SpecBase {
           PartnershipWorksReferenceNumberYesNoPage,
           CheckMode,
           emptyUserAnswers.setOrException(PartnershipWorksReferenceNumberYesNoPage, true)
-        ) mustBe controllers.add.partnership.routes.PartnershipWorksReferenceNumberController.onPageLoad(CheckMode)
+        ) mustBe controllers.add.partnership.routes.PartnershipWorksReferenceNumberYesNoController.onPageLoad(CheckMode)
       }
 
       "must go from a PartnershipWorksReferenceNumberYesNoPage to CYA page when false" in {
