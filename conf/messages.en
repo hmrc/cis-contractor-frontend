@@ -300,6 +300,13 @@ partnershipHasUtrYesNo.checkYourAnswersLabel = Does {0} have a Unique Taxpayer R
 partnershipHasUtrYesNo.error.required = Select yes if the partnership has a Unique Taxpayer Reference (UTR)
 partnershipHasUtrYesNo.change.hidden = Unique Taxpayer Reference (UTR)
 
+partnershipAddressYesNo.title = Do you want to add an address for this partnership?
+partnershipAddressYesNo.heading = Do you want to add an address for {0}?
+partnershipAddressYesNo.hint = You can add this information later if you prefer
+partnershipAddressYesNo.checkYourAnswersLabel = what is the address for this partnership?
+partnershipAddressYesNo.error.required = Select whether you want to add an address for this partnership
+partnershipAddressYesNo.change.hidden = what is the address for this partnership?
+
 partnershipContactDetailsYesNo.title = Do you want to add contact details for this partnership?
 partnershipContactDetailsYesNo.heading = Do you want to add contact details for {0}?
 partnershipContactDetailsYesNo.hint = You can add this information later if you prefer

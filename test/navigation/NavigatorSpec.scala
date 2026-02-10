@@ -370,12 +370,12 @@ class NavigatorSpec extends SpecBase {
           .onPageLoad(NormalMode)
       }
 
-      "must go from a PartnershipWorksReferenceNumberYesNoPage to next page when false" in {
+      "must go from a PartnershipWorksReferenceNumberYesNoPage to PartnershipAddressYesNo page when false" in {
         navigator.nextPage(
           PartnershipWorksReferenceNumberYesNoPage,
           NormalMode,
           emptyUserAnswers.setOrException(PartnershipWorksReferenceNumberYesNoPage, false)
-        ) mustBe controllers.add.partnership.routes.PartnershipContactDetailsYesNoController.onPageLoad(NormalMode)
+        ) mustBe controllers.add.partnership.routes.PartnershipAddressYesNoController.onPageLoad(NormalMode)
       }
 
       "must go from a PartnershipWorksReferenceNumberYesNoPage to journey recovery when incomplete info provided" in {
@@ -386,12 +386,12 @@ class NavigatorSpec extends SpecBase {
         ) mustBe journeyRecovery
       }
 
-      "must go from a PartnershipWorksReferenceNumberPage to PartnershipContactDetailsYesNoPage" in {
+      "must go from a PartnershipWorksReferenceNumberPage to PartnershipAddressYesNo page" in {
         navigator.nextPage(
           PartnershipWorksReferenceNumberPage,
           NormalMode,
           emptyUserAnswers.setOrException(PartnershipUniqueTaxpayerReferencePage, "UTR-123")
-        ) mustBe controllers.add.partnership.routes.PartnershipContactDetailsYesNoController.onPageLoad(NormalMode)
+        ) mustBe controllers.add.partnership.routes.PartnershipAddressYesNoController.onPageLoad(NormalMode)
       }
 
       "must go from a PartnershipWorksReferenceNumberPage to CheckYourAnswers Page" in {
@@ -400,6 +400,14 @@ class NavigatorSpec extends SpecBase {
           CheckMode,
           emptyUserAnswers.setOrException(PartnershipUniqueTaxpayerReferencePage, "UTR-123")
         ) mustBe controllers.add.routes.CheckYourAnswersController.onPageLoad()
+      }
+
+      "must go from PartnershipAddressYesNoPage to PartnershipAddressYesNoController in NormalMode" in {
+        navigator.nextPage(
+          PartnershipAddressYesNoPage,
+          NormalMode,
+          emptyUserAnswers
+        ) mustBe controllers.add.partnership.routes.PartnershipAddressYesNoController.onPageLoad(NormalMode)
       }
 
       "must go from PartnershipContactDetailsYesNoPage" - {
@@ -714,6 +722,14 @@ class NavigatorSpec extends SpecBase {
         val navigator = new Navigator()
         navigator.nextPage(SubTradingNameYesNoPage, CheckMode, emptyUserAnswers) mustBe
           routes.JourneyRecoveryController.onPageLoad()
+      }
+
+      "must go from PartnershipAddressYesNoPage to PartnershipAddressYesNoController in CheckMode" in {
+        navigator.nextPage(
+          PartnershipAddressYesNoPage,
+          CheckMode,
+          emptyUserAnswers
+        ) mustBe controllers.add.partnership.routes.PartnershipAddressYesNoController.onPageLoad(CheckMode)
       }
 
       "must go from PartnershipContactDetailsYesNoPage" - {
