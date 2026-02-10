@@ -433,6 +433,15 @@ class NavigatorSpec extends SpecBase {
           ) mustBe routes.JourneyRecoveryController.onPageLoad()
         }
       }
+
+      "must go from a PartnershipNominatedPartnerNamePage to PartnershipNominatedPartnerNamePage" in {
+        navigator.nextPage(
+          PartnershipNominatedPartnerNamePage,
+          NormalMode,
+          UserAnswers("id")
+        ) mustBe controllers.add.partnership.routes.PartnershipNominatedPartnerNameController.onPageLoad(NormalMode)
+      }
+
     }
 
     "in Check mode" - {
@@ -738,6 +747,15 @@ class NavigatorSpec extends SpecBase {
           ) mustBe routes.JourneyRecoveryController.onPageLoad()
         }
       }
+
+      "must go from a PartnershipNominatedPartnerNamePage to CYA" in {
+        navigator.nextPage(
+          PartnershipNominatedPartnerNamePage,
+          CheckMode,
+          UserAnswers("id")
+        ) mustBe CYA
+      }
+
     }
 
     "navigatorFromSubTradingNameYesNoPage in NormalMode" - {
