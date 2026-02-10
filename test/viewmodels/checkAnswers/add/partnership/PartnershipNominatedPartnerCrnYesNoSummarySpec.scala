@@ -55,13 +55,13 @@ class PartnershipNominatedPartnerCrnYesNoSummarySpec extends AnyFreeSpec with Ma
       val actions = row.actions.value.items
       actions should have size 1
 
-      val changeAction = actions.head
+      val changeAction       = actions.head
       val expectedChangeText = messages("site.change")
-      val expectedHref = routes.PartnershipNominatedPartnerCrnYesNoController.onPageLoad(CheckMode).url
+      val expectedHref       = routes.PartnershipNominatedPartnerCrnYesNoController.onPageLoad(CheckMode).url
       val expectedHiddenText = messages("partnershipNominatedPartnerCrnYesNo.change.hidden")
 
-      changeAction.content.asHtml.toString should include(expectedChangeText)
-      changeAction.href shouldBe expectedHref
+      changeAction.content.asHtml.toString    should include(expectedChangeText)
+      changeAction.href                     shouldBe expectedHref
       changeAction.visuallyHiddenText.value shouldBe expectedHiddenText
     }
 
@@ -74,7 +74,7 @@ class PartnershipNominatedPartnerCrnYesNoSummarySpec extends AnyFreeSpec with Ma
       val maybeRow: Option[SummaryListRow] = PartnershipNominatedPartnerCrnYesNoSummary.row(answers)
       maybeRow shouldBe defined
 
-      val row = maybeRow.value
+      val row           = maybeRow.value
       val expectedValue = messages("site.no")
       row.value.content.asHtml.toString should include(expectedValue)
     }

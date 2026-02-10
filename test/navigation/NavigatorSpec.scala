@@ -392,7 +392,6 @@ class NavigatorSpec extends SpecBase {
         ) mustBe controllers.add.partnership.routes.PartnershipNominatedPartnerNameController.onPageLoad(NormalMode)
       }
 
-
       "must go from PartnershipNominatedPartnerCrnYesNo" - {
         "to next page when answer is Yes" in {
           navigator.nextPage(
@@ -741,7 +740,6 @@ class NavigatorSpec extends SpecBase {
           UserAnswers("id")
         ) mustBe CYA
       }
-
 
       "must go from PartnershipNominatedPartnerCrnYesNo" - {
         "to next page when answer is Yes" in {
