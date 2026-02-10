@@ -344,6 +344,14 @@ class NavigatorSpec extends SpecBase {
         ) mustBe journeyRecovery
       }
 
+      "must go from PartnershipAddressYesNoPage to PartnershipAddressYesNoController in NormalMode" in {
+        navigator.nextPage(
+          PartnershipAddressYesNoPage,
+          NormalMode,
+          emptyUserAnswers
+        ) mustBe controllers.add.partnership.routes.PartnershipAddressYesNoController.onPageLoad(NormalMode)
+      }
+
       "must go from PartnershipContactDetailsYesNoPage" - {
         "to PartnershipContactDetailsPage when answer is Yes" in {
           val answers = UserAnswers(userAnswersId).set(PartnershipContactDetailsYesNoPage, true).success.value
@@ -375,6 +383,15 @@ class NavigatorSpec extends SpecBase {
           ) mustBe routes.JourneyRecoveryController.onPageLoad()
         }
       }
+
+      "must go from a PartnershipNominatedPartnerNamePage to PartnershipNominatedPartnerNamePage" in {
+        navigator.nextPage(
+          PartnershipNominatedPartnerNamePage,
+          NormalMode,
+          UserAnswers("id")
+        ) mustBe controllers.add.partnership.routes.PartnershipNominatedPartnerNameController.onPageLoad(NormalMode)
+      }
+
 
       "must go from PartnershipNominatedPartnerCrnYesNo" - {
         "to next page when answer is Yes" in {
@@ -593,30 +610,6 @@ class NavigatorSpec extends SpecBase {
         ) mustBe journeyRecovery
       }
 
-      "must go from a PartnershipWorksReferenceNumberYesNoPage to next page when true" in {
-        navigator.nextPage(
-          PartnershipWorksReferenceNumberYesNoPage,
-          CheckMode,
-          emptyUserAnswers.setOrException(PartnershipWorksReferenceNumberYesNoPage, true)
-        ) mustBe controllers.add.partnership.routes.PartnershipWorksReferenceNumberYesNoController.onPageLoad(CheckMode)
-      }
-
-      "must go from a PartnershipWorksReferenceNumberYesNoPage to CYA page when false" in {
-        navigator.nextPage(
-          PartnershipWorksReferenceNumberYesNoPage,
-          CheckMode,
-          emptyUserAnswers.setOrException(PartnershipWorksReferenceNumberYesNoPage, false)
-        ) mustBe CYA
-      }
-
-      "must go from a PartnershipWorksReferenceNumberYesNoPage to journey recovery page when incomplete info provided" in {
-        navigator.nextPage(
-          PartnershipWorksReferenceNumberYesNoPage,
-          CheckMode,
-          emptyUserAnswers
-        ) mustBe journeyRecovery
-      }
-
       "must go to SubcontractorNameController when answer is No and name is missing" in {
         val ua =
           emptyUserAnswers
@@ -677,6 +670,14 @@ class NavigatorSpec extends SpecBase {
           routes.JourneyRecoveryController.onPageLoad()
       }
 
+      "must go from PartnershipAddressYesNoPage to PartnershipAddressYesNoController in CheckMode" in {
+        navigator.nextPage(
+          PartnershipAddressYesNoPage,
+          CheckMode,
+          emptyUserAnswers
+        ) mustBe controllers.add.partnership.routes.PartnershipAddressYesNoController.onPageLoad(CheckMode)
+      }
+
       "must go from PartnershipContactDetailsYesNoPage" - {
         "to PartnershipContactDetailsPage when answer is Yes" in {
           val answers = UserAnswers(userAnswersId).set(PartnershipContactDetailsYesNoPage, true).success.value
@@ -708,6 +709,39 @@ class NavigatorSpec extends SpecBase {
           ) mustBe routes.JourneyRecoveryController.onPageLoad()
         }
       }
+
+      "must go from a PartnershipWorksReferenceNumberYesNoPage to next page when true" in {
+        navigator.nextPage(
+          PartnershipWorksReferenceNumberYesNoPage,
+          CheckMode,
+          emptyUserAnswers.setOrException(PartnershipWorksReferenceNumberYesNoPage, true)
+        ) mustBe controllers.add.partnership.routes.PartnershipWorksReferenceNumberYesNoController.onPageLoad(CheckMode)
+      }
+
+      "must go from a PartnershipWorksReferenceNumberYesNoPage to CYA page when false" in {
+        navigator.nextPage(
+          PartnershipWorksReferenceNumberYesNoPage,
+          CheckMode,
+          emptyUserAnswers.setOrException(PartnershipWorksReferenceNumberYesNoPage, false)
+        ) mustBe CYA
+      }
+
+      "must go from a PartnershipWorksReferenceNumberYesNoPage to journey recovery page when incomplete info provided" in {
+        navigator.nextPage(
+          PartnershipWorksReferenceNumberYesNoPage,
+          CheckMode,
+          emptyUserAnswers
+        ) mustBe journeyRecovery
+      }
+
+      "must go from a PartnershipNominatedPartnerNamePage to CYA" in {
+        navigator.nextPage(
+          PartnershipNominatedPartnerNamePage,
+          CheckMode,
+          UserAnswers("id")
+        ) mustBe CYA
+      }
+
 
       "must go from PartnershipNominatedPartnerCrnYesNo" - {
         "to next page when answer is Yes" in {
