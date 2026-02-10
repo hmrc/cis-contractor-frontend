@@ -121,13 +121,55 @@ class NavigatorSpec extends SpecBase {
         ) mustBe controllers.add.partnership.routes.PartnershipUniqueTaxpayerReferenceController.onPageLoad(NormalMode)
       }
 
-      "must go from a PartnershipHasUtrYesNo to CheckYourAnswersPage when false" in {
+      "must go from a PartnershipHasUtrYesNo to PartnershipWorksReferenceNumberYesNoCPage when false" in {
         navigator.nextPage(
           PartnershipHasUtrYesNoPage,
           NormalMode,
           emptyUserAnswers.setOrException(PartnershipHasUtrYesNoPage, false)
         ) mustBe controllers.add.partnership.routes.PartnershipWorksReferenceNumberYesNoController
           .onPageLoad(NormalMode)
+      }
+
+      "must go from a PartnershipHasUtrYesNo to JourneyRecovery page when no answer" in {
+        navigator.nextPage(
+          PartnershipHasUtrYesNoPage,
+          NormalMode,
+          emptyUserAnswers
+        ) mustBe journeyRecovery
+      }
+
+      "must go from a PartnershipHasUtrYesNo to PartnershipUniqueTaxpayerReference page when true in CheckMode" in {
+        navigator.nextPage(
+          PartnershipHasUtrYesNoPage,
+          CheckMode,
+          emptyUserAnswers.setOrException(PartnershipHasUtrYesNoPage, true)
+        ) mustBe controllers.add.partnership.routes.PartnershipUniqueTaxpayerReferenceController
+          .onPageLoad(CheckMode)
+      }
+
+      "must go from a PartnershipHasUtrYesNo to PartnershipUniqueTaxpayerReference page when false in CheckMode" in {
+        navigator.nextPage(
+          PartnershipHasUtrYesNoPage,
+          CheckMode,
+          emptyUserAnswers.setOrException(PartnershipHasUtrYesNoPage, false)
+        ) mustBe controllers.add.routes.CheckYourAnswersController.onPageLoad()
+      }
+
+      "must go from a PartnershipUniqueTaxpayerReference to PartnershipWorksReferenceNumberYesNo page" in {
+        navigator.nextPage(
+          PartnershipUniqueTaxpayerReferencePage,
+          NormalMode,
+          emptyUserAnswers.setOrException(PartnershipUniqueTaxpayerReferencePage, "5860920998")
+        ) mustBe controllers.add.partnership.routes.PartnershipWorksReferenceNumberYesNoController
+          .onPageLoad(NormalMode)
+      }
+
+      "must go from a PartnershipUniqueTaxpayerReference to CheckYourAnswers page in CheckMode" in {
+        navigator.nextPage(
+          PartnershipUniqueTaxpayerReferencePage,
+          CheckMode,
+          emptyUserAnswers.setOrException(PartnershipUniqueTaxpayerReferencePage, "5860920998")
+        ) mustBe controllers.add.routes.CheckYourAnswersController.onPageLoad()
       }
 
       "must go from a SubTradingNameYesNoPage to journey recovery page when incomplete info provided" in {
@@ -319,7 +361,7 @@ class NavigatorSpec extends SpecBase {
         ) mustBe controllers.add.routes.CheckYourAnswersController.onPageLoad()
       }
 
-      "must go from a PartnershipWorksReferenceNumberYesNoPage to next page when true" in {
+      "must go from a PartnershipWorksReferenceNumberYesNoPage to PartnershipWorksReferenceNumber page when true" in {
         navigator.nextPage(
           PartnershipWorksReferenceNumberYesNoPage,
           NormalMode,
@@ -342,6 +384,22 @@ class NavigatorSpec extends SpecBase {
           NormalMode,
           emptyUserAnswers
         ) mustBe journeyRecovery
+      }
+
+      "must go from a PartnershipWorksReferenceNumberPage to PartnershipContactDetailsYesNoPage" in {
+        navigator.nextPage(
+          PartnershipWorksReferenceNumberPage,
+          NormalMode,
+          emptyUserAnswers.setOrException(PartnershipUniqueTaxpayerReferencePage, "UTR-123")
+        ) mustBe controllers.add.partnership.routes.PartnershipContactDetailsYesNoController.onPageLoad(NormalMode)
+      }
+
+      "must go from a PartnershipWorksReferenceNumberPage to CheckYourAnswers Page" in {
+        navigator.nextPage(
+          PartnershipWorksReferenceNumberPage,
+          CheckMode,
+          emptyUserAnswers.setOrException(PartnershipUniqueTaxpayerReferencePage, "UTR-123")
+        ) mustBe controllers.add.routes.CheckYourAnswersController.onPageLoad()
       }
 
       "must go from PartnershipContactDetailsYesNoPage" - {

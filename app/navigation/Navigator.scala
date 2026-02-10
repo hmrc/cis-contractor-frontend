@@ -240,11 +240,7 @@ class Navigator @Inject() () {
         controllers.add.partnership.routes.PartnershipWorksReferenceNumberYesNoController.onPageLoad(NormalMode)
 
       case (Some(true), CheckMode) =>
-        ua.get(PartnershipHasUtrYesNoPage)
-          .fold(controllers.add.partnership.routes.PartnershipUniqueTaxpayerReferenceController.onPageLoad(CheckMode)) {
-            _ =>
-              controllers.add.routes.CheckYourAnswersController.onPageLoad()
-          }
+        controllers.add.partnership.routes.PartnershipUniqueTaxpayerReferenceController.onPageLoad(CheckMode)
 
       case (Some(false), CheckMode) =>
         controllers.add.routes.CheckYourAnswersController.onPageLoad()
