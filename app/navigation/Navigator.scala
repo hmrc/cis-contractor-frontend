@@ -63,6 +63,8 @@ class Navigator @Inject() () {
       userAnswers => navigatorFromPartnershipContactDetailsYesNoPage(NormalMode)(userAnswers)
     case PartnershipNominatedPartnerNinoYesNoPage  =>
       _ => controllers.add.partnership.routes.PartnershipNominatedPartnerNinoYesNoController.onPageLoad(NormalMode)
+    case PartnershipNominatedPartnerNamePage       =>
+      _ => controllers.add.partnership.routes.PartnershipNominatedPartnerNameController.onPageLoad(NormalMode)
     case _                                         => _ => routes.IndexController.onPageLoad()
   }
 
@@ -87,6 +89,7 @@ class Navigator @Inject() () {
       userAnswers => navigatorFromPartnershipContactDetailsYesNoPage(CheckMode)(userAnswers)
     case PartnershipNominatedPartnerNinoYesNoPage =>
       _ => controllers.add.partnership.routes.PartnershipNominatedPartnerNinoYesNoController.onPageLoad(CheckMode)
+    case PartnershipNominatedPartnerNamePage      => _ => controllers.add.routes.CheckYourAnswersController.onPageLoad()
     case _                                        => _ => controllers.add.routes.CheckYourAnswersController.onPageLoad()
   }
 

@@ -313,3 +313,13 @@ partnershipNominatedPartnerNinoYesNo.hint = This information will be used to ver
 partnershipNominatedPartnerNinoYesNo.checkYourAnswersLabel = Partnership Nominated Partner
 partnershipNominatedPartnerNinoYesNo.error.required = Select whether you know the National Insurance number for this nominated partner
 partnershipNominatedPartnerNinoYesNo.change.hidden = partnership Nominated Partner
+
+partnershipNominatedPartnerName.title = Who is the nominated partner for this partnership?
+partnershipNominatedPartnerName.heading = Who is the nominated partner for {0}?
+partnershipNominatedPartnerName.hint = The nominated partner is responsible for managing the partnership’s tax affairs
+partnershipNominatedPartnerName.label = Full name
+partnershipNominatedPartnerName.checkYourAnswersLabel = Name
+partnershipNominatedPartnerName.error.required = Enter a full name using letters a to z, apostrophes and dashes
+partnershipNominatedPartnerName.error.invalid = Enter a full name using letters a to z, numbers, apostrophes, ampersands, commas, hyphens, full stops, forward slashes and spaces
+partnershipNominatedPartnerName.error.length = Enter a full name up to 56 characters
+partnershipNominatedPartnerName.change.hidden = name
