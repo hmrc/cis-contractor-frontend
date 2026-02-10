@@ -375,6 +375,34 @@ class NavigatorSpec extends SpecBase {
           ) mustBe routes.JourneyRecoveryController.onPageLoad()
         }
       }
+
+      "must go from PartnershipNominatedPartnerCrnYesNo" - {
+        "to next page when answer is Yes" in {
+          navigator.nextPage(
+            PartnershipNominatedPartnerCrnYesNoPage,
+            NormalMode,
+            emptyUserAnswers.setOrException(PartnershipNominatedPartnerCrnYesNoPage, true)
+          ) mustBe controllers.add.partnership.routes.PartnershipNominatedPartnerCrnYesNoController
+            .onPageLoad(NormalMode)
+        }
+
+        "to next page when answer is No" in {
+          navigator.nextPage(
+            PartnershipNominatedPartnerCrnYesNoPage,
+            NormalMode,
+            emptyUserAnswers.setOrException(PartnershipNominatedPartnerCrnYesNoPage, false)
+          ) mustBe controllers.add.partnership.routes.PartnershipNominatedPartnerCrnYesNoController
+            .onPageLoad(NormalMode)
+        }
+
+        "to JourneyRecoveryPage when answer is not present" in {
+          navigator.nextPage(
+            PartnershipNominatedPartnerCrnYesNoPage,
+            NormalMode,
+            emptyUserAnswers
+          ) mustBe journeyRecovery
+        }
+      }
     }
 
     "in Check mode" - {
@@ -675,6 +703,37 @@ class NavigatorSpec extends SpecBase {
         "to JourneyRecoveryPage when answer is not present" in {
           navigator.nextPage(
             PartnershipContactDetailsYesNoPage,
+            CheckMode,
+            emptyUserAnswers
+          ) mustBe routes.JourneyRecoveryController.onPageLoad()
+        }
+      }
+
+      "must go from PartnershipNominatedPartnerCrnYesNo" - {
+        "to next page when answer is Yes" in {
+          val answers = UserAnswers(userAnswersId).set(PartnershipNominatedPartnerCrnYesNoPage, true).success.value
+
+          navigator.nextPage(
+            PartnershipNominatedPartnerCrnYesNoPage,
+            CheckMode,
+            answers
+          ) mustBe controllers.add.partnership.routes.PartnershipNominatedPartnerCrnYesNoController
+            .onPageLoad(CheckMode)
+        }
+
+        "to Partnership CyaPage when answer is No" in {
+          val answers = UserAnswers(userAnswersId).set(PartnershipNominatedPartnerCrnYesNoPage, false).success.value
+
+          navigator.nextPage(
+            PartnershipNominatedPartnerCrnYesNoPage,
+            CheckMode,
+            answers
+          ) mustBe controllers.add.routes.CheckYourAnswersController.onPageLoad()
+        }
+
+        "to JourneyRecoveryPage when answer is not present" in {
+          navigator.nextPage(
+            PartnershipNominatedPartnerCrnYesNoPage,
             CheckMode,
             emptyUserAnswers
           ) mustBe routes.JourneyRecoveryController.onPageLoad()
