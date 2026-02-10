@@ -59,6 +59,10 @@ class Navigator @Inject() () {
       _ => routes.JourneyRecoveryController.onPageLoad()
     case PartnershipWorksReferenceNumberYesNoPage  =>
       userAnswers => navigatorFromPartnershipWorksReferenceNumberYesNoPage(NormalMode)(userAnswers)
+    case PartnershipAddressYesNoPage               =>
+      _ => controllers.add.partnership.routes.PartnershipAddressYesNoController.onPageLoad(NormalMode)
+    case PartnershipWorksReferenceNumberPage       =>
+      _ => controllers.add.partnership.routes.PartnershipContactDetailsYesNoController.onPageLoad(NormalMode)
     case PartnershipContactDetailsYesNoPage        =>
       userAnswers => navigatorFromPartnershipContactDetailsYesNoPage(NormalMode)(userAnswers)
     case PartnershipNominatedPartnerNamePage       =>
@@ -83,6 +87,9 @@ class Navigator @Inject() () {
     case PartnershipNamePage                      => _ => routes.JourneyRecoveryController.onPageLoad()
     case PartnershipWorksReferenceNumberYesNoPage =>
       userAnswers => navigatorFromPartnershipWorksReferenceNumberYesNoPage(CheckMode)(userAnswers)
+    case PartnershipAddressYesNoPage              =>
+      _ => controllers.add.partnership.routes.PartnershipAddressYesNoController.onPageLoad(CheckMode)
+    case PartnershipWorksReferenceNumberPage      => _ => controllers.add.routes.CheckYourAnswersController.onPageLoad()
     case PartnershipContactDetailsYesNoPage       =>
       userAnswers => navigatorFromPartnershipContactDetailsYesNoPage(CheckMode)(userAnswers)
     case PartnershipNominatedPartnerNamePage      => _ => controllers.add.routes.CheckYourAnswersController.onPageLoad()
