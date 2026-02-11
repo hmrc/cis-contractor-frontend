@@ -65,8 +65,12 @@ class Navigator @Inject() () {
       _ => controllers.add.partnership.routes.PartnershipContactDetailsYesNoController.onPageLoad(NormalMode)
     case PartnershipContactDetailsYesNoPage        =>
       userAnswers => navigatorFromPartnershipContactDetailsYesNoPage(NormalMode)(userAnswers)
+    case PartnershipNominatedPartnerNinoYesNoPage  =>
+      _ => controllers.add.partnership.routes.PartnershipNominatedPartnerNinoYesNoController.onPageLoad(NormalMode)
     case PartnershipNominatedPartnerNamePage       =>
       _ => controllers.add.partnership.routes.PartnershipNominatedPartnerNameController.onPageLoad(NormalMode)
+    case PartnershipAddressYesNoPage               =>
+      _ => controllers.add.partnership.routes.PartnershipAddressYesNoController.onPageLoad(NormalMode)
     case PartnershipNominatedPartnerCrnYesNoPage   =>
       userAnswers => navigatorFromPartnershipNominatedPartnerCrnYesNoPage(NormalMode)(userAnswers)
     case _                                         => _ => routes.IndexController.onPageLoad()
@@ -94,7 +98,11 @@ class Navigator @Inject() () {
     case PartnershipWorksReferenceNumberPage      => _ => controllers.add.routes.CheckYourAnswersController.onPageLoad()
     case PartnershipContactDetailsYesNoPage       =>
       userAnswers => navigatorFromPartnershipContactDetailsYesNoPage(CheckMode)(userAnswers)
+    case PartnershipNominatedPartnerNinoYesNoPage =>
+      _ => controllers.add.partnership.routes.PartnershipNominatedPartnerNinoYesNoController.onPageLoad(CheckMode)
     case PartnershipNominatedPartnerNamePage      => _ => controllers.add.routes.CheckYourAnswersController.onPageLoad()
+    case PartnershipAddressYesNoPage              =>
+      _ => controllers.add.partnership.routes.PartnershipAddressYesNoController.onPageLoad(CheckMode)
     case PartnershipNominatedPartnerCrnYesNoPage  =>
       userAnswers => navigatorFromPartnershipNominatedPartnerCrnYesNoPage(CheckMode)(userAnswers)
     case _                                        => _ => controllers.add.routes.CheckYourAnswersController.onPageLoad()

@@ -384,6 +384,14 @@ class NavigatorSpec extends SpecBase {
         }
       }
 
+      "must go from PartnershipNominatedPartnerNinoYesNoPage to PartnershipNominatedPartnerNinoYesNoController in NormalMode" in {
+        navigator.nextPage(
+          PartnershipNominatedPartnerNinoYesNoPage,
+          NormalMode,
+          emptyUserAnswers
+        ) mustBe controllers.add.partnership.routes.PartnershipNominatedPartnerNinoYesNoController
+          .onPageLoad(NormalMode)
+      }
       "must go from a PartnershipNominatedPartnerNamePage to PartnershipNominatedPartnerNamePage" in {
         navigator.nextPage(
           PartnershipNominatedPartnerNamePage,
@@ -709,6 +717,13 @@ class NavigatorSpec extends SpecBase {
         }
       }
 
+      "must go from PartnershipNominatedPartnerNinoYesNoPage to PartnershipNominatedPartnerNinoYesNoController in CheckMode" in {
+        navigator.nextPage(
+          PartnershipNominatedPartnerNinoYesNoPage,
+          CheckMode,
+          emptyUserAnswers
+        ) mustBe controllers.add.partnership.routes.PartnershipNominatedPartnerNinoYesNoController.onPageLoad(CheckMode)
+      }
       "must go from a PartnershipWorksReferenceNumberYesNoPage to next page when true" in {
         navigator.nextPage(
           PartnershipWorksReferenceNumberYesNoPage,
