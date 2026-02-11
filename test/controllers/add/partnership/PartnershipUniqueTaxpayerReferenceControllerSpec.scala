@@ -38,7 +38,7 @@ class PartnershipUniqueTaxpayerReferenceControllerSpec extends SpecBase with Moc
   private val formProvider = new PartnershipUtrFormProvider()
   private val form         = formProvider()
 
-  private val partnershipName = "Test Partnership"
+  private val partnershipName = "Some Partners LLP"
 
   private def uaWithName: UserAnswers =
     emptyUserAnswers.set(PartnershipNamePage, partnershipName).success.value
@@ -46,11 +46,16 @@ class PartnershipUniqueTaxpayerReferenceControllerSpec extends SpecBase with Moc
   lazy private val partnershipUniqueTaxpayerReferenceRoute =
     controllers.add.partnership.routes.PartnershipUniqueTaxpayerReferenceController.onPageLoad(NormalMode).url
 
+  lazy private val partnershipWorksReferenceNumberYesNoRoute =
+    controllers.add.partnership.routes.PartnershipWorksReferenceNumberYesNoController.onPageLoad(NormalMode).url
+
   "PartnershipUniqueTaxpayerReferenceControllerSpec Controller" - {
 
     "must return OK and the correct view for a GET" in {
+      val userAnswers =
+        UserAnswers(userAnswersId).set(PartnershipNamePage, partnershipName).success.value
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
       running(application) {
         val request = FakeRequest(GET, partnershipUniqueTaxpayerReferenceRoute)
@@ -60,14 +65,20 @@ class PartnershipUniqueTaxpayerReferenceControllerSpec extends SpecBase with Moc
         val view = application.injector.instanceOf[PartnershipUniqueTaxpayerReferenceView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode, "TODO")(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode, partnershipName)(
+          request,
+          messages(application)
+        ).toString
       }
     }
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers =
-        UserAnswers(userAnswersId).set(PartnershipUniqueTaxpayerReferencePage, "answer").success.value
+      val userAnswers = UserAnswers(userAnswersId)
+        .set(PartnershipUniqueTaxpayerReferencePage, "answer")
+        .flatMap(_.set(PartnershipNamePage, partnershipName))
+        .success
+        .value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
@@ -79,7 +90,7 @@ class PartnershipUniqueTaxpayerReferenceControllerSpec extends SpecBase with Moc
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill("answer"), NormalMode, "TODO")(
+        contentAsString(result) mustEqual view(form.fill("answer"), NormalMode, partnershipName)(
           request,
           messages(application)
         ).toString
@@ -96,7 +107,7 @@ class PartnershipUniqueTaxpayerReferenceControllerSpec extends SpecBase with Moc
         .thenReturn(Future.successful(false))
 
       val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        applicationBuilder(userAnswers = Some(uaWithName))
           .overrides(
             bind[SubcontractorService].toInstance(mockSubcontractorService)
           )
@@ -111,10 +122,9 @@ class PartnershipUniqueTaxpayerReferenceControllerSpec extends SpecBase with Moc
 
         status(result) mustEqual SEE_OTHER
 
-        redirectLocation(
-          result
-        ).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+        redirectLocation(result).value mustEqual partnershipWorksReferenceNumberYesNoRoute
       }
+
       verify(mockSubcontractorService).isDuplicateUTR(any[UserAnswers], any[String])(any[HeaderCarrier])
       verifyNoMoreInteractions(mockSubcontractorService)
     }
@@ -129,7 +139,7 @@ class PartnershipUniqueTaxpayerReferenceControllerSpec extends SpecBase with Moc
         .thenReturn(Future.successful(true))
 
       val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        applicationBuilder(userAnswers = Some(uaWithName))
           .overrides(
             bind[SubcontractorService].toInstance(mockSubcontractorService)
           )
@@ -138,9 +148,18 @@ class PartnershipUniqueTaxpayerReferenceControllerSpec extends SpecBase with Moc
       running(application) {
         val request =
           FakeRequest(POST, partnershipUniqueTaxpayerReferenceRoute)
-            .withFormUrlEncodedBody(("value", duplicatedUTR))
+            .withFormUrlEncodedBody(
+              ("value", duplicatedUTR),
+              ("partnershipName", partnershipName)
+            )
 
-        val boundForm = form.bind(Map("value" -> duplicatedUTR))
+        val boundForm = form
+          .bind(
+            Map(
+              ("value", duplicatedUTR),
+              ("partnershipName", partnershipName)
+            )
+          )
 
         val formWithDuplicateError =
           boundForm.withError("value", "partnershipUniqueTaxpayerReference.error.duplicate")
@@ -150,7 +169,7 @@ class PartnershipUniqueTaxpayerReferenceControllerSpec extends SpecBase with Moc
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(formWithDuplicateError, NormalMode, "TODO")(
+        contentAsString(result) mustEqual view(formWithDuplicateError, NormalMode, partnershipName)(
           request,
           messages(application)
         ).toString
@@ -185,7 +204,7 @@ class PartnershipUniqueTaxpayerReferenceControllerSpec extends SpecBase with Moc
 
     "must redirect to Journey Recovery for a GET if no existing data is found" in {
 
-      val application = applicationBuilder(userAnswers = None).build()
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
       running(application) {
         val request = FakeRequest(GET, partnershipUniqueTaxpayerReferenceRoute)
@@ -199,7 +218,7 @@ class PartnershipUniqueTaxpayerReferenceControllerSpec extends SpecBase with Moc
 
     "must redirect to Journey Recovery for a POST if no existing data is found" in {
 
-      val application = applicationBuilder(userAnswers = None).build()
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
       running(application) {
         val request =

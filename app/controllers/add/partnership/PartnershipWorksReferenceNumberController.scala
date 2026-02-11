@@ -21,7 +21,6 @@ import forms.add.partnership.PartnershipWorksReferenceNumberFormProvider
 import models.Mode
 import navigation.Navigator
 import pages.add.partnership.{PartnershipNamePage, PartnershipWorksReferenceNumberPage}
-import play.api.i18n.Lang.logger
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
@@ -48,9 +47,6 @@ class PartnershipWorksReferenceNumberController @Inject() (
   val form = formProvider()
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
-
-    logger.info(s"USER ANSWERS JSON = ${request.userAnswers.data}")
-
     request.userAnswers
       .get(PartnershipNamePage)
       .map { partnershipName =>
