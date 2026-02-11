@@ -344,6 +344,14 @@ class NavigatorSpec extends SpecBase {
         ) mustBe journeyRecovery
       }
 
+      "must go from PartnershipAddressYesNoPage to PartnershipAddressYesNoController in NormalMode" in {
+        navigator.nextPage(
+          PartnershipAddressYesNoPage,
+          NormalMode,
+          emptyUserAnswers
+        ) mustBe controllers.add.partnership.routes.PartnershipAddressYesNoController.onPageLoad(NormalMode)
+      }
+
       "must go from PartnershipContactDetailsYesNoPage" - {
         "to PartnershipContactDetailsPage when answer is Yes" in {
           val answers = UserAnswers(userAnswersId).set(PartnershipContactDetailsYesNoPage, true).success.value
@@ -376,6 +384,14 @@ class NavigatorSpec extends SpecBase {
         }
       }
 
+      "must go from PartnershipNominatedPartnerNinoYesNoPage to PartnershipNominatedPartnerNinoYesNoController in NormalMode" in {
+        navigator.nextPage(
+          PartnershipNominatedPartnerNinoYesNoPage,
+          NormalMode,
+          emptyUserAnswers
+        ) mustBe controllers.add.partnership.routes.PartnershipNominatedPartnerNinoYesNoController
+          .onPageLoad(NormalMode)
+      }
       "must go from a PartnershipNominatedPartnerNamePage to PartnershipNominatedPartnerNamePage" in {
         navigator.nextPage(
           PartnershipNominatedPartnerNamePage,
@@ -634,6 +650,14 @@ class NavigatorSpec extends SpecBase {
           routes.JourneyRecoveryController.onPageLoad()
       }
 
+      "must go from PartnershipAddressYesNoPage to PartnershipAddressYesNoController in CheckMode" in {
+        navigator.nextPage(
+          PartnershipAddressYesNoPage,
+          CheckMode,
+          emptyUserAnswers
+        ) mustBe controllers.add.partnership.routes.PartnershipAddressYesNoController.onPageLoad(CheckMode)
+      }
+
       "must go from PartnershipContactDetailsYesNoPage" - {
         "to PartnershipContactDetailsPage when answer is Yes" in {
           val answers = UserAnswers(userAnswersId).set(PartnershipContactDetailsYesNoPage, true).success.value
@@ -666,6 +690,13 @@ class NavigatorSpec extends SpecBase {
         }
       }
 
+      "must go from PartnershipNominatedPartnerNinoYesNoPage to PartnershipNominatedPartnerNinoYesNoController in CheckMode" in {
+        navigator.nextPage(
+          PartnershipNominatedPartnerNinoYesNoPage,
+          CheckMode,
+          emptyUserAnswers
+        ) mustBe controllers.add.partnership.routes.PartnershipNominatedPartnerNinoYesNoController.onPageLoad(CheckMode)
+      }
       "must go from a PartnershipWorksReferenceNumberYesNoPage to next page when true" in {
         navigator.nextPage(
           PartnershipWorksReferenceNumberYesNoPage,

@@ -300,12 +300,26 @@ partnershipHasUtrYesNo.checkYourAnswersLabel = Does {0} have a Unique Taxpayer R
 partnershipHasUtrYesNo.error.required = Select yes if the partnership has a Unique Taxpayer Reference (UTR)
 partnershipHasUtrYesNo.change.hidden = Unique Taxpayer Reference (UTR)
 
+partnershipAddressYesNo.title = Do you want to add an address for this partnership?
+partnershipAddressYesNo.heading = Do you want to add an address for {0}?
+partnershipAddressYesNo.hint = You can add this information later if you prefer
+partnershipAddressYesNo.checkYourAnswersLabel = what is the address for this partnership?
+partnershipAddressYesNo.error.required = Select whether you want to add an address for this partnership
+partnershipAddressYesNo.change.hidden = what is the address for this partnership?
+
 partnershipContactDetailsYesNo.title = Do you want to add contact details for this partnership?
 partnershipContactDetailsYesNo.heading = Do you want to add contact details for {0}?
 partnershipContactDetailsYesNo.hint = You can add this information later if you prefer
 partnershipContactDetailsYesNo.checkYourAnswersLabel = Add partnership contact details
 partnershipContactDetailsYesNo.error.required = Select whether you want to add contact details for this partnership
 partnershipContactDetailsYesNo.change.hidden = Partnership Contact Details
+
+partnershipNominatedPartnerNinoYesNo.title = Do you know the National Insurance number for this nominated partner?
+partnershipNominatedPartnerNinoYesNo.heading = Do you know the National Insurance number for {0}?
+partnershipNominatedPartnerNinoYesNo.hint = This information will be used to verify them as a subcontractor
+partnershipNominatedPartnerNinoYesNo.checkYourAnswersLabel = Partnership Nominated Partner
+partnershipNominatedPartnerNinoYesNo.error.required = Select whether you know the National Insurance number for this nominated partner
+partnershipNominatedPartnerNinoYesNo.change.hidden = partnership Nominated Partner
 
 partnershipNominatedPartnerName.title = Who is the nominated partner for this partnership?
 partnershipNominatedPartnerName.heading = Who is the nominated partner for {0}?
@@ -325,3 +339,10 @@ partnershipNominatedPartnerCrn.error.length = Enter a valid company registration
 partnershipNominatedPartnerCrn.error.invalidCharacters = Enter a valid company registration number
 partnershipNominatedPartnerCrn.checkYourAnswersLabel = Company registration number
 partnershipNominatedPartnerCrn.change.hidden = company registration number
+
+partnershipAddressYesNo.title = Do you want to add an address for this partnership?
+partnershipAddressYesNo.heading = Do you want to add an address for {0}?
+partnershipAddressYesNo.hint = You can add this information later if you prefer
+partnershipAddressYesNo.checkYourAnswersLabel = What is the address for this partnership?
+partnershipAddressYesNo.error.required = Select whether you want to add an address for this partnership
+partnershipAddressYesNo.change.hidden = what is the address for this partnership?
