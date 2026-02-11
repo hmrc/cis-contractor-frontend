@@ -204,7 +204,7 @@ class PartnershipUniqueTaxpayerReferenceControllerSpec extends SpecBase with Moc
 
     "must redirect to Journey Recovery for a GET if no existing data is found" in {
 
-      val application = applicationBuilder(userAnswers = None).build()
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
       running(application) {
         val request = FakeRequest(GET, partnershipUniqueTaxpayerReferenceRoute)
@@ -218,7 +218,7 @@ class PartnershipUniqueTaxpayerReferenceControllerSpec extends SpecBase with Moc
 
     "must redirect to Journey Recovery for a POST if no existing data is found" in {
 
-      val application = applicationBuilder(userAnswers = None).build()
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
       running(application) {
         val request =
