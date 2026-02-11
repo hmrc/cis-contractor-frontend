@@ -17,52 +17,66 @@
 package controllers.add.partnership
 
 import controllers.actions.*
-import forms.add.partnership.PartnershipNameFormProvider
+import forms.add.partnership.PartnershipNominatedPartnerNameFormProvider
 import models.Mode
 import navigation.Navigator
-import pages.add.partnership.PartnershipNamePage
+import pages.add.partnership.{PartnershipNamePage, PartnershipNominatedPartnerNamePage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.add.partnership.PartnershipNameView
+import views.html.add.partnership.PartnershipNominatedPartnerNameView
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class PartnershipNameController @Inject() (
+class PartnershipNominatedPartnerNameController @Inject() (
   override val messagesApi: MessagesApi,
   sessionRepository: SessionRepository,
   navigator: Navigator,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
-  formProvider: PartnershipNameFormProvider,
+  formProvider: PartnershipNominatedPartnerNameFormProvider,
   val controllerComponents: MessagesControllerComponents,
-  view: PartnershipNameView
+  view: PartnershipNominatedPartnerNameView
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport {
 
-  private val form = formProvider()
+  val form = formProvider()
 
   def onPageLoad(mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData) { implicit request =>
-      val preparedForm = request.userAnswers.get(PartnershipNamePage).fold(form)(form.fill)
-      Ok(view(preparedForm, mode))
+      request.userAnswers
+        .get(PartnershipNamePage)
+        .map { partnershipName =>
+          val preparedForm = request.userAnswers.get(PartnershipNominatedPartnerNamePage) match {
+            case None        => form
+            case Some(value) => form.fill(value)
+          }
+
+          Ok(view(preparedForm, mode, partnershipName))
+        }
+        .getOrElse(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
     }
 
   def onSubmit(mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
-      form
-        .bindFromRequest()
-        .fold(
-          formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
-          value =>
-            for {
-              updatedAnswers <- Future.fromTry(request.userAnswers.set(PartnershipNamePage, value))
-              _              <- sessionRepository.set(updatedAnswers)
-            } yield Redirect(navigator.nextPage(PartnershipNamePage, mode, updatedAnswers))
-        )
+      request.userAnswers
+        .get(PartnershipNamePage)
+        .map { partnershipName =>
+          form
+            .bindFromRequest()
+            .fold(
+              formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, partnershipName))),
+              value =>
+                for {
+                  updatedAnswers <- Future.fromTry(request.userAnswers.set(PartnershipNominatedPartnerNamePage, value))
+                  _              <- sessionRepository.set(updatedAnswers)
+                } yield Redirect(navigator.nextPage(PartnershipNominatedPartnerNamePage, mode, updatedAnswers))
+            )
+        }
+        .getOrElse(Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())))
     }
 }
