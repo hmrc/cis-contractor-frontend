@@ -133,3 +133,8 @@ GET        /add/partnership/nominated-partner                               cont
 POST       /add/partnership/nominated-partner                               controllers.add.partnership.PartnershipNominatedPartnerNameController.onSubmit(mode: Mode = NormalMode)
 GET        /add/partnership/change-nominated-partner                        controllers.add.partnership.PartnershipNominatedPartnerNameController.onPageLoad(mode: Mode = CheckMode)
 POST       /add/partnership/change-nominated-partner                        controllers.add.partnership.PartnershipNominatedPartnerNameController.onSubmit(mode: Mode = CheckMode)
+
+GET        /add/partnership/nominated-partner-company-registration-number         controllers.add.partnership.PartnershipNominatedPartnerCrnController.onPageLoad(mode: Mode = NormalMode)
+POST       /add/partnership/nominated-partner-company-registration-number         controllers.add.partnership.PartnershipNominatedPartnerCrnController.onSubmit(mode: Mode = NormalMode)
+GET        /add/partnership/change-nominated-partner-company-registration-number  controllers.add.partnership.PartnershipNominatedPartnerCrnController.onPageLoad(mode: Mode = CheckMode)
+POST       /add/partnership/change-nominated-partner-company-registration-number  controllers.add.partnership.PartnershipNominatedPartnerCrnController.onSubmit(mode: Mode = CheckMode)

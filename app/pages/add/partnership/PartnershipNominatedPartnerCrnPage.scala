@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,15 +14,13 @@
  * limitations under the License.
  */
 
-package forms
+package pages.add.partnership
 
-object Validation {
+import pages.QuestionPage
+import play.api.libs.json.JsPath
 
-  final val ninoRegex     = """(?i)^[ \t]*[[A-Z]&&[^DFIQUV]][ \t]*[[A-Z]&&[^DFIQUV]][ \t]*[0-9][ \t]*[0-9][ \t]*""" +
-    """[0-9][ \t]*[0-9][ \t]*[0-9][ \t]*[0-9][ \t]*[A-D]?[ \t]*$"""
-  final val worksRefRegex = """^[A-Za-z0-9 ~!@#$%&'()*+,-./:;=?_{}£€]+$"""
-
-  final val companyRegNumberRegex =
-    """(?i)^(?:[A-Z]{2}\d{1,6}|\d{1,8})$"""
-
+case object PartnershipNominatedPartnerCrnPage extends QuestionPage[String] {
+  override def path: JsPath = JsPath \ toString
+  override def toString: String = "nominatedPartnerCompanyRegistrationNumber"
 }
+
