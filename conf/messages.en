@@ -263,7 +263,17 @@ checkYourAnswers.warning = You must verify this subcontractor with HMRC before m
 checkYourAnswers.p1 = By adding this subcontractor you are confirming that, to the best of your knowledge, the details you are providing are correct.
 checkYourAnswers.addSubcontractor = Add subcontractor
 
+partnershipName.title = What is the partnership name?
+partnershipName.heading = What is the partnership name?
+partnershipName.hint = This is the name of the partnership as registered with HM Revenue and Customs
+partnershipName.error.required = Enter the registered name of the partnership
+partnershipName.error.length = Partnership name must be 56 characters or less
+partnershipName.error.invalidCharacters = Partnership name contains invalid characters
+partnershipName.checkYourAnswersLabel = Partnership name
+partnershipName.change.hidden = partnership name
+
 partnershipWorksReferenceNumber.title = What is the works reference number for this partnership
+partnershipWorksReferenceNumber.title = What is the works reference number for this partnership?
 partnershipWorksReferenceNumber.heading = What is the works reference number for {0}?
 partnershipWorksReferenceNumber.hint = This is unique to the construction work or project. You may have received it from the contractor
 partnershipWorksReferenceNumber.checkYourAnswersLabel = Partnership works reference
@@ -278,10 +288,10 @@ partnershipUniqueTaxpayerReference.paragraph = The UTR will be on tax returns an
 partnershipUniqueTaxpayerReference.linkText = Get more help to find a UTR (opens in new tab)
 partnershipUniqueTaxpayerReference.heading2 = What is the UTR for {0}?
 partnershipUniqueTaxpayerReference.hint = A UTR is a 10 digit number
-partnershipUniqueTaxpayerReference.error.required = Enter a Unique Taxpayer Reference (UTR), like 1234567890
-partnershipUniqueTaxpayerReference.error.invalid = Your entry for ‘Unique tax reference (UTR)’ is invalid. Please amend.
-partnershipUniqueTaxpayerReference.error.length = Enter a Unique Taxpayer Reference (UTR) using 10 digits
-partnershipUniqueTaxpayerReference.error.duplicate = You have entered a Unique Tax Reference (UTR) of an existing subcontractor. Please amend your entry.
+partnershipUniqueTaxpayerReference.error.required = Enter a valid Unique Taxpayer Reference (UTR) using 10 numbers, like 1234567890
+partnershipUniqueTaxpayerReference.error.invalid = Enter a valid Unique Taxpayer Reference (UTR) using 10 numbers, like 1234567890
+partnershipUniqueTaxpayerReference.error.length = Enter a valid Unique Taxpayer Reference (UTR) using 10 numbers, like 1234567890
+partnershipUniqueTaxpayerReference.error.duplicate = You have already used this Unique Taxpayer Reference (UTR) for an existing subcontractor
 
 partnershipHasUtrYesNo.title = Does this partnership have a Unique Taxpayer Reference (UTR)?
 partnershipHasUtrYesNo.heading = Does {0} have a Unique Taxpayer Reference (UTR)?
@@ -320,3 +330,41 @@ partnershipAddress.error.addressLine4.length = Enter a county using 35 character
 partnershipAddress.error.addressLine2.firstCharMustBeLetter = Enter an address. The first character must be a letter or a number
 partnershipAddress.error.addressLine3.firstCharMustBeLetter = Enter a town or city. The first character must be a letter
 
+
+partnershipAddressYesNo.title = Do you want to add an address for this partnership?
+partnershipAddressYesNo.heading = Do you want to add an address for {0}?
+partnershipAddressYesNo.hint = You can add this information later if you prefer
+partnershipAddressYesNo.checkYourAnswersLabel = what is the address for this partnership?
+partnershipAddressYesNo.error.required = Select whether you want to add an address for this partnership
+partnershipAddressYesNo.change.hidden = what is the address for this partnership?
+
+partnershipContactDetailsYesNo.title = Do you want to add contact details for this partnership?
+partnershipContactDetailsYesNo.heading = Do you want to add contact details for {0}?
+partnershipContactDetailsYesNo.hint = You can add this information later if you prefer
+partnershipContactDetailsYesNo.checkYourAnswersLabel = Add partnership contact details
+partnershipContactDetailsYesNo.error.required = Select whether you want to add contact details for this partnership
+partnershipContactDetailsYesNo.change.hidden = Partnership Contact Details
+
+partnershipNominatedPartnerNinoYesNo.title = Do you know the National Insurance number for this nominated partner?
+partnershipNominatedPartnerNinoYesNo.heading = Do you know the National Insurance number for {0}?
+partnershipNominatedPartnerNinoYesNo.hint = This information will be used to verify them as a subcontractor
+partnershipNominatedPartnerNinoYesNo.checkYourAnswersLabel = Partnership Nominated Partner
+partnershipNominatedPartnerNinoYesNo.error.required = Select whether you know the National Insurance number for this nominated partner
+partnershipNominatedPartnerNinoYesNo.change.hidden = partnership Nominated Partner
+
+partnershipNominatedPartnerName.title = Who is the nominated partner for this partnership?
+partnershipNominatedPartnerName.heading = Who is the nominated partner for {0}?
+partnershipNominatedPartnerName.hint = The nominated partner is responsible for managing the partnership’s tax affairs
+partnershipNominatedPartnerName.label = Full name
+partnershipNominatedPartnerName.checkYourAnswersLabel = Name
+partnershipNominatedPartnerName.error.required = Enter a full name using letters a to z, apostrophes and dashes
+partnershipNominatedPartnerName.error.invalid = Enter a full name using letters a to z, numbers, apostrophes, ampersands, commas, hyphens, full stops, forward slashes and spaces
+partnershipNominatedPartnerName.error.length = Enter a full name up to 56 characters
+partnershipNominatedPartnerName.change.hidden = name
+
+partnershipAddressYesNo.title = Do you want to add an address for this partnership?
+partnershipAddressYesNo.heading = Do you want to add an address for {0}?
+partnershipAddressYesNo.hint = You can add this information later if you prefer
+partnershipAddressYesNo.checkYourAnswersLabel = What is the address for this partnership?
+partnershipAddressYesNo.error.required = Select whether you want to add an address for this partnership
+partnershipAddressYesNo.change.hidden = what is the address for this partnership?

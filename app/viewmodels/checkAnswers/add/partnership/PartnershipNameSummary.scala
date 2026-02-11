@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,30 +14,31 @@
  * limitations under the License.
  */
 
-package viewmodels.checkAnswers.add
+package viewmodels.checkAnswers.add.partnership
 
+import controllers.add.partnership.routes
 import models.{CheckMode, UserAnswers}
-import pages.add.TradingNameOfSubcontractorPage
+import pages.add.partnership.PartnershipNamePage
 import play.api.i18n.Messages
-import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
+import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
 
-object TradingNameOfSubcontractorSummary {
+object PartnershipNameSummary {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(TradingNameOfSubcontractorPage).map { answer =>
+    answers.get(PartnershipNamePage).map { answer =>
       SummaryListRowViewModel(
-        key = "tradingNameOfSubcontractor.checkYourAnswersLabel",
-        value = ValueViewModel(Text(answer)),
+        key = "partnershipName.checkYourAnswersLabel",
+        value = ValueViewModel(HtmlFormat.escape(answer).toString),
         actions = Seq(
           ActionItemViewModel(
             "site.change",
-            controllers.add.routes.TradingNameOfSubcontractorController.onPageLoad(CheckMode).url
+            routes.PartnershipNameController.onPageLoad(CheckMode).url
           )
-            .withVisuallyHiddenText(messages("tradingNameOfSubcontractor.change.hidden"))
-            .withAttribute("id" -> "trading-name-of-subcontractor")
+            .withVisuallyHiddenText(messages("partnershipName.change.hidden"))
+            .withAttribute("id" -> "partnership-name")
         )
       )
     }

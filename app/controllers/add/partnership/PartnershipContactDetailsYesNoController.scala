@@ -17,50 +17,45 @@
 package controllers.add.partnership
 
 import controllers.actions.*
-import forms.add.partnership.PartnershipUtrFormProvider
+import forms.add.partnership.PartnershipContactDetailsYesNoFormProvider
 import models.Mode
 import navigation.Navigator
-import pages.add.partnership.{PartnershipNamePage, PartnershipUniqueTaxpayerReferencePage}
+import pages.add.partnership.{PartnershipContactDetailsYesNoPage, PartnershipNamePage}
+import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
-import services.SubcontractorService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.add.partnership.PartnershipUniqueTaxpayerReferenceView
+import views.html.add.partnership.PartnershipContactDetailsYesNoView
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class PartnershipUniqueTaxpayerReferenceController @Inject() (
+class PartnershipContactDetailsYesNoController @Inject() (
   override val messagesApi: MessagesApi,
   sessionRepository: SessionRepository,
   navigator: Navigator,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
-  formProvider: PartnershipUtrFormProvider,
-  subcontractorService: SubcontractorService,
+  formProvider: PartnershipContactDetailsYesNoFormProvider,
   val controllerComponents: MessagesControllerComponents,
-  view: PartnershipUniqueTaxpayerReferenceView
+  view: PartnershipContactDetailsYesNoView
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport {
 
-  val form = formProvider()
+  val form: Form[Boolean] = formProvider()
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
-    // TODO: remove patch after testing
-    val patchedAnswers = request.userAnswers.get(PartnershipNamePage) match {
-      case None        => request.userAnswers.set(PartnershipNamePage, "TODO").get
-      case Some(value) => request.userAnswers
-    }
-    patchedAnswers
+    request.userAnswers
       .get(PartnershipNamePage)
       .map { partnershipName =>
-        val preparedForm = request.userAnswers.get(PartnershipUniqueTaxpayerReferencePage) match {
+        val preparedForm = request.userAnswers.get(PartnershipContactDetailsYesNoPage) match {
           case None        => form
           case Some(value) => form.fill(value)
         }
+
         Ok(view(preparedForm, mode, partnershipName))
       }
       .getOrElse(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
@@ -68,37 +63,18 @@ class PartnershipUniqueTaxpayerReferenceController @Inject() (
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
-      // TODO: remove patch after testing
-      val patchedAnswers = request.userAnswers.get(PartnershipNamePage) match {
-        case None        => request.userAnswers.set(PartnershipNamePage, "TODO").get
-        case Some(value) => request.userAnswers
-      }
-      patchedAnswers
+      request.userAnswers
         .get(PartnershipNamePage)
-        .map { name =>
+        .map { partnershipName =>
           form
             .bindFromRequest()
             .fold(
-              formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, name))),
+              formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, partnershipName))),
               value =>
-                subcontractorService.isDuplicateUTR(request.userAnswers, value).flatMap {
-                  case true  =>
-                    val errorForm = form
-                      .fill(value)
-                      .withError(
-                        key = "value",
-                        message = "partnershipUniqueTaxpayerReference.error.duplicate"
-                      )
-                    Future.successful(
-                      BadRequest(view(errorForm, mode, name))
-                    )
-                  case false =>
-                    for {
-                      updatedAnswers <-
-                        Future.fromTry(request.userAnswers.set(PartnershipUniqueTaxpayerReferencePage, value))
-                      _              <- sessionRepository.set(updatedAnswers)
-                    } yield Redirect(navigator.nextPage(PartnershipUniqueTaxpayerReferencePage, mode, updatedAnswers))
-                }
+                for {
+                  updatedAnswers <- Future.fromTry(request.userAnswers.set(PartnershipContactDetailsYesNoPage, value))
+                  _              <- sessionRepository.set(updatedAnswers)
+                } yield Redirect(navigator.nextPage(PartnershipContactDetailsYesNoPage, mode, updatedAnswers))
             )
         }
         .getOrElse(Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())))

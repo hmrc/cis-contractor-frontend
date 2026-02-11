@@ -18,7 +18,7 @@ package controllers.add.partnership
 
 import base.SpecBase
 import controllers.routes
-import forms.add.UtrFormProvider
+import forms.add.partnership.PartnershipUtrFormProvider
 import models.{NormalMode, UserAnswers}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{verify, verifyNoMoreInteractions, when}
@@ -35,7 +35,7 @@ import scala.concurrent.Future
 
 class PartnershipUniqueTaxpayerReferenceControllerSpec extends SpecBase with MockitoSugar {
 
-  private val formProvider = new UtrFormProvider()
+  private val formProvider = new PartnershipUtrFormProvider()
   private val form         = formProvider()
 
   private val partnershipName = "Test Partnership"
