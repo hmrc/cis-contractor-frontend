@@ -24,7 +24,6 @@ import pages.add.SubNationalInsuranceNumberPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
-import services.SubcontractorService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.add.SubNationalInsuranceNumberView
 
@@ -40,7 +39,6 @@ class SubNationalInsuranceNumberController @Inject() (
   requireData: DataRequiredAction,
   formProvider: SubNationalInsuranceNumberFormProvider,
   val controllerComponents: MessagesControllerComponents,
-  subcontractorService: SubcontractorService,
   view: SubNationalInsuranceNumberView
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
@@ -68,7 +66,6 @@ class SubNationalInsuranceNumberController @Inject() (
             for {
               updatedAnswers <- Future.fromTry(request.userAnswers.set(SubNationalInsuranceNumberPage, value))
               _              <- sessionRepository.set(updatedAnswers)
-              _              <- subcontractorService.updateSubcontractor(updatedAnswers)
             } yield Redirect(navigator.nextPage(SubNationalInsuranceNumberPage, mode, updatedAnswers))
         )
   }

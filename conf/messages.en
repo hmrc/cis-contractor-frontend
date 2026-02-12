@@ -266,7 +266,7 @@ checkYourAnswers.addSubcontractor = Add subcontractor
 partnershipName.title = What is the partnership name?
 partnershipName.heading = What is the partnership name?
 partnershipName.hint = This is the name of the partnership as registered with HM Revenue and Customs
-partnershipName.error.required = Enter the registered name of the partnership
+partnershipName.error.required = Enter a valid partnership name
 partnershipName.error.length = Partnership name must be 56 characters or less
 partnershipName.error.invalidCharacters = Partnership name contains invalid characters
 partnershipName.checkYourAnswersLabel = Partnership name
@@ -337,6 +337,13 @@ partnershipAddressYesNo.hint = You can add this information later if you prefer
 partnershipAddressYesNo.checkYourAnswersLabel = What is the address for this partnership?
 partnershipAddressYesNo.error.required = Select whether you want to add an address for this partnership
 partnershipAddressYesNo.change.hidden = what is the address for this partnership?
+
+partnershipNominatedPartnerCrnYesNo.title = Does this nominated partner have a company registration number?
+partnershipNominatedPartnerCrnYesNo.heading = Does {0} have a company registration number?
+partnershipNominatedPartnerCrnYesNo.hint = This only applies if they are a corporate partner or director of a company. This information will be used to verify them as a subcontractor.
+partnershipNominatedPartnerCrnYesNo.checkYourAnswersLabel = Nominated partner has a company registration number
+partnershipNominatedPartnerCrnYesNo.error.required = Select whether this nominated partner has a company registration number
+partnershipNominatedPartnerCrnYesNo.change.hidden = nominated partner has a company registration number
 
 partnershipNominatedPartnerUtrYesNo.title = Do you know the Unique Taxpayer Reference for the nominated partner?
 partnershipNominatedPartnerUtrYesNo.heading = Do you know the Unique Taxpayer Reference for {0}?
