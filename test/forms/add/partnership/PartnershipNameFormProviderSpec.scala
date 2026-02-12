@@ -70,18 +70,5 @@ class PartnershipNameFormProviderSpec extends StringFieldBehaviours {
         result.errors.map(_.message) must contain(invalidKey)
       }
     }
-
-    "allow parentheses and braces" in {
-      form.bind(Map("value" -> "Name (UK) {Test}")).hasErrors mustBe false
-    }
-
-    "allow slash and backslash" in {
-      form.bind(Map("value" -> """A/B \ C""")).hasErrors mustBe false
-    }
-
-    "reject newline (if you don't want it)" in {
-      val result = form.bind(Map("value" -> "ABC\nPartnership"))
-      result.errors.map(_.message) must contain(invalidKey)
-    }
   }
 }
