@@ -21,15 +21,13 @@ import controllers.routes
 import forms.add.partnership.PartnershipNameFormProvider
 import models.{NormalMode, UserAnswers}
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.{verify, verifyNoMoreInteractions, when}
+import org.mockito.Mockito.{verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import pages.add.partnership.PartnershipNamePage
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import repositories.SessionRepository
-import services.SubcontractorService
-import uk.gov.hmrc.http.HeaderCarrier
 import views.html.add.partnership.PartnershipNameView
 
 import scala.concurrent.Future
@@ -81,19 +79,13 @@ class PartnershipNameControllerSpec extends SpecBase with MockitoSugar {
     }
 
     "must redirect to PartnershipHasUtrYesNo page when valid data is submitted" in {
-      val mockSessionRepository    = mock[SessionRepository]
-      val mockSubcontractorService = mock[SubcontractorService]
+      val mockSessionRepository = mock[SessionRepository]
 
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
-      when(mockSubcontractorService.updateSubcontractor(any[UserAnswers])(any[HeaderCarrier])) thenReturn Future
-        .successful(())
 
       val application =
         applicationBuilder(userAnswers = Some(emptyUserAnswers))
-          .overrides(
-            bind[SessionRepository].toInstance(mockSessionRepository),
-            bind[SubcontractorService].toInstance(mockSubcontractorService)
-          )
+          .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
           .build()
 
       running(application) {
@@ -111,7 +103,6 @@ class PartnershipNameControllerSpec extends SpecBase with MockitoSugar {
       }
 
       verify(mockSessionRepository).set(any())
-      verifyNoMoreInteractions(mockSubcontractorService)
     }
 
     "must return a Bad Request and errors when invalid data is submitted" in {
