@@ -17,52 +17,52 @@
 package controllers.add.partnership
 
 import controllers.actions.*
-import forms.add.partnership.PartnershipWorksReferenceNumberFormProvider
+import forms.add.partnership.PartnershipNominatedPartnerNameFormProvider
 import models.Mode
 import navigation.Navigator
-import pages.add.partnership.{PartnershipNamePage, PartnershipWorksReferenceNumberPage}
+import pages.add.partnership.{PartnershipNamePage, PartnershipNominatedPartnerNamePage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.add.partnership.PartnershipWorksReferenceNumberView
+import views.html.add.partnership.PartnershipNominatedPartnerNameView
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class PartnershipWorksReferenceNumberController @Inject() (
+class PartnershipNominatedPartnerNameController @Inject() (
   override val messagesApi: MessagesApi,
   sessionRepository: SessionRepository,
   navigator: Navigator,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
-  formProvider: PartnershipWorksReferenceNumberFormProvider,
+  formProvider: PartnershipNominatedPartnerNameFormProvider,
   val controllerComponents: MessagesControllerComponents,
-  view: PartnershipWorksReferenceNumberView
+  view: PartnershipNominatedPartnerNameView
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport {
 
   val form = formProvider()
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
-    request.userAnswers
-      .get(PartnershipNamePage)
-      .map { partnershipName =>
-        val preparedForm = request.userAnswers.get(PartnershipWorksReferenceNumberPage) match {
-          case None        => form
-          case Some(value) => form.fill(value)
-        }
-        Ok(view(preparedForm, mode, partnershipName))
-      }
-      .getOrElse(
-        Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-      )
-  }
+  def onPageLoad(mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData) { implicit request =>
+      request.userAnswers
+        .get(PartnershipNamePage)
+        .map { partnershipName =>
+          val preparedForm = request.userAnswers.get(PartnershipNominatedPartnerNamePage) match {
+            case None        => form
+            case Some(value) => form.fill(value)
+          }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
-    implicit request =>
+          Ok(view(preparedForm, mode, partnershipName))
+        }
+        .getOrElse(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+    }
+
+  def onSubmit(mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData).async { implicit request =>
       request.userAnswers
         .get(PartnershipNamePage)
         .map { partnershipName =>
@@ -72,15 +72,11 @@ class PartnershipWorksReferenceNumberController @Inject() (
               formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, partnershipName))),
               value =>
                 for {
-                  updatedAnswers <- Future.fromTry(request.userAnswers.set(PartnershipWorksReferenceNumberPage, value))
+                  updatedAnswers <- Future.fromTry(request.userAnswers.set(PartnershipNominatedPartnerNamePage, value))
                   _              <- sessionRepository.set(updatedAnswers)
-                } yield Redirect(navigator.nextPage(PartnershipWorksReferenceNumberPage, mode, updatedAnswers))
+                } yield Redirect(navigator.nextPage(PartnershipNominatedPartnerNamePage, mode, updatedAnswers))
             )
         }
-        .getOrElse(
-          Future.successful(
-            Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-          )
-        )
-  }
+        .getOrElse(Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())))
+    }
 }

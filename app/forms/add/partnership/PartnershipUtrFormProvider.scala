@@ -14,15 +14,21 @@
  * limitations under the License.
  */
 
-package pages.add.partnership
+package forms.add.partnership
 
-import pages.QuestionPage
-import play.api.libs.json.JsPath
+import forms.mappings.Mappings
+import play.api.data.Form
 
-case object PartnershipNamePage extends QuestionPage[String] {
+import javax.inject.Inject
 
-  override def path: JsPath = JsPath \ toString
+class PartnershipUtrFormProvider @Inject() extends Mappings {
 
-  override def toString: String = "partnershipName"
-
+  def apply(): Form[String] =
+    Form(
+      "value" -> utr(
+        requiredKey = "partnershipUniqueTaxpayerReference.error.required",
+        invalidKey = "partnershipUniqueTaxpayerReference.error.invalid",
+        lengthKey = "partnershipUniqueTaxpayerReference.error.length"
+      )
+    )
 }

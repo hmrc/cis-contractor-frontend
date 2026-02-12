@@ -17,66 +17,52 @@
 package controllers.add.partnership
 
 import controllers.actions.*
-import forms.add.partnership.PartnershipHasUtrYesNoFormProvider
+import forms.add.partnership.PartnershipNameFormProvider
 import models.Mode
 import navigation.Navigator
-import pages.add.partnership.{PartnershipHasUtrYesNoPage, PartnershipNamePage}
+import pages.add.partnership.PartnershipNamePage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.add.partnership.PartnershipHasUtrYesNoView
+import views.html.add.partnership.PartnershipNameView
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class PartnershipHasUtrYesNoController @Inject() (
+class PartnershipNameController @Inject() (
   override val messagesApi: MessagesApi,
   sessionRepository: SessionRepository,
   navigator: Navigator,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
-  formProvider: PartnershipHasUtrYesNoFormProvider,
+  formProvider: PartnershipNameFormProvider,
   val controllerComponents: MessagesControllerComponents,
-  view: PartnershipHasUtrYesNoView
+  view: PartnershipNameView
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport {
 
-  val form = formProvider()
+  private val form = formProvider()
 
   def onPageLoad(mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData) { implicit request =>
-      request.userAnswers
-        .get(PartnershipNamePage)
-        .map { partnershipName =>
-          val preparedForm = request.userAnswers.get(PartnershipHasUtrYesNoPage) match {
-            case None        => form
-            case Some(value) => form.fill(value)
-          }
-          Ok(view(preparedForm, mode, partnershipName))
-        }
-        .getOrElse(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+      val preparedForm = request.userAnswers.get(PartnershipNamePage).fold(form)(form.fill)
+      Ok(view(preparedForm, mode))
     }
 
   def onSubmit(mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
-      request.userAnswers
-        .get(PartnershipNamePage)
-        .map { name =>
-          form
-            .bindFromRequest()
-            .fold(
-              formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, name))),
-              value =>
-                for {
-                  updatedAnswers <- Future.fromTry(request.userAnswers.set(PartnershipHasUtrYesNoPage, value))
-                  _              <- sessionRepository.set(updatedAnswers)
-                } yield Redirect(navigator.nextPage(PartnershipHasUtrYesNoPage, mode, updatedAnswers))
-            )
-        }
-        .getOrElse(Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())))
+      form
+        .bindFromRequest()
+        .fold(
+          formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
+          value =>
+            for {
+              updatedAnswers <- Future.fromTry(request.userAnswers.set(PartnershipNamePage, value))
+              _              <- sessionRepository.set(updatedAnswers)
+            } yield Redirect(navigator.nextPage(PartnershipNamePage, mode, updatedAnswers))
+        )
     }
-
 }

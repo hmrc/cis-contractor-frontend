@@ -33,7 +33,6 @@ class Navigator @Inject() () {
     case SubTradingNameYesNoPage                   => userAnswers => navigatorFromSubTradingNameYesNoPage(NormalMode)(userAnswers)
     case TradingNameOfSubcontractorPage            => _ => controllers.add.routes.SubAddressYesNoController.onPageLoad(NormalMode)
     case SubcontractorNamePage                     => _ => controllers.add.routes.SubAddressYesNoController.onPageLoad(NormalMode)
-    case PartnershipHasUtrYesNoPage                => userAnswers => navigatorFromPartnershipHasUtrYesNoPage(NormalMode)(userAnswers)
     case SubAddressYesNoPage                       => userAnswers => navigatorFromSubAddressYesNoPage(NormalMode)(userAnswers)
     case AddressOfSubcontractorPage                =>
       _ => controllers.add.routes.NationalInsuranceNumberYesNoController.onPageLoad(NormalMode)
@@ -52,11 +51,25 @@ class Navigator @Inject() () {
     case SubcontractorContactDetailsYesNoPage      =>
       userAnswers => navigatorFromSubcontractorContactDetailsYesNoPage(NormalMode)(userAnswers)
     case SubContactDetailsPage                     => _ => controllers.add.routes.CheckYourAnswersController.onPageLoad()
+    case PartnershipNamePage                       =>
+      _ => controllers.add.partnership.routes.PartnershipHasUtrYesNoController.onPageLoad(NormalMode)
+    case PartnershipHasUtrYesNoPage                => userAnswers => navigatorFromPartnershipHasUtrYesNoPage(NormalMode)(userAnswers)
     case PartnershipUniqueTaxpayerReferencePage    =>
-      // TODO: https://confluence.tools.tax.service.gov.uk/display/RBD/SL0205-H%28PTN%29+-+Works+Ref
-      _ => routes.JourneyRecoveryController.onPageLoad()
+      _ => controllers.add.partnership.routes.PartnershipWorksReferenceNumberYesNoController.onPageLoad(NormalMode)
     case PartnershipWorksReferenceNumberYesNoPage  =>
       userAnswers => navigatorFromPartnershipWorksReferenceNumberYesNoPage(NormalMode)(userAnswers)
+    case PartnershipWorksReferenceNumberPage       =>
+      _ => controllers.add.partnership.routes.PartnershipAddressYesNoController.onPageLoad(NormalMode)
+    case PartnershipAddressYesNoPage               =>
+      _ => controllers.add.partnership.routes.PartnershipAddressYesNoController.onPageLoad(NormalMode)
+    case PartnershipContactDetailsYesNoPage        =>
+      userAnswers => navigatorFromPartnershipContactDetailsYesNoPage(NormalMode)(userAnswers)
+    case PartnershipNominatedPartnerNinoYesNoPage  =>
+      _ => controllers.add.partnership.routes.PartnershipNominatedPartnerNinoYesNoController.onPageLoad(NormalMode)
+    case PartnershipNominatedPartnerNamePage       =>
+      _ => controllers.add.partnership.routes.PartnershipNominatedPartnerNameController.onPageLoad(NormalMode)
+    case PartnershipNominatedPartnerCrnYesNoPage   =>
+      userAnswers => navigatorFromPartnershipNominatedPartnerCrnYesNoPage(NormalMode)(userAnswers)
     case _                                         => _ => routes.IndexController.onPageLoad()
   }
 
@@ -74,8 +87,21 @@ class Navigator @Inject() () {
     case SubContactDetailsPage                    => _ => controllers.add.routes.CheckYourAnswersController.onPageLoad()
     case SubcontractorContactDetailsYesNoPage     =>
       userAnswers => navigatorFromSubcontractorContactDetailsYesNoPage(CheckMode)(userAnswers)
+    case PartnershipNamePage                      => _ => controllers.add.routes.CheckYourAnswersController.onPageLoad()
+    case PartnershipHasUtrYesNoPage               => userAnswers => navigatorFromPartnershipHasUtrYesNoPage(CheckMode)(userAnswers)
+    case PartnershipUniqueTaxpayerReferencePage   => _ => controllers.add.routes.CheckYourAnswersController.onPageLoad()
     case PartnershipWorksReferenceNumberYesNoPage =>
       userAnswers => navigatorFromPartnershipWorksReferenceNumberYesNoPage(CheckMode)(userAnswers)
+    case PartnershipWorksReferenceNumberPage      => _ => controllers.add.routes.CheckYourAnswersController.onPageLoad()
+    case PartnershipAddressYesNoPage              =>
+      _ => controllers.add.partnership.routes.PartnershipAddressYesNoController.onPageLoad(CheckMode)
+    case PartnershipContactDetailsYesNoPage       =>
+      userAnswers => navigatorFromPartnershipContactDetailsYesNoPage(CheckMode)(userAnswers)
+    case PartnershipNominatedPartnerNinoYesNoPage =>
+      _ => controllers.add.partnership.routes.PartnershipNominatedPartnerNinoYesNoController.onPageLoad(CheckMode)
+    case PartnershipNominatedPartnerNamePage      => _ => controllers.add.routes.CheckYourAnswersController.onPageLoad()
+    case PartnershipNominatedPartnerCrnYesNoPage  =>
+      userAnswers => navigatorFromPartnershipNominatedPartnerCrnYesNoPage(CheckMode)(userAnswers)
     case _                                        => _ => controllers.add.routes.CheckYourAnswersController.onPageLoad()
   }
 
@@ -91,7 +117,7 @@ class Navigator @Inject() () {
       case (Some(Individualorsoletrader), NormalMode) =>
         controllers.add.routes.SubTradingNameYesNoController.onPageLoad(NormalMode)
       case (Some(Partnership), NormalMode)            =>
-        controllers.add.partnership.routes.PartnershipHasUtrYesNoController.onPageLoad(NormalMode)
+        controllers.add.partnership.routes.PartnershipNameController.onPageLoad(NormalMode)
       case (None, _)                                  => routes.JourneyRecoveryController.onPageLoad()
       case (_, NormalMode)                            => routes.JourneyRecoveryController.onPageLoad()
       case (_, CheckMode)                             => controllers.add.routes.CheckYourAnswersController.onPageLoad()
@@ -222,18 +248,11 @@ class Navigator @Inject() () {
 
   private def navigatorFromPartnershipHasUtrYesNoPage(mode: Mode)(ua: UserAnswers): Call =
     (ua.get(PartnershipHasUtrYesNoPage), mode) match {
-      case (Some(true), NormalMode) =>
-        controllers.add.partnership.routes.PartnershipUniqueTaxpayerReferenceController.onPageLoad(NormalMode)
+      case (Some(true), _) =>
+        controllers.add.partnership.routes.PartnershipUniqueTaxpayerReferenceController.onPageLoad(mode)
 
       case (Some(false), NormalMode) =>
-        controllers.add.routes.CheckYourAnswersController.onPageLoad()
-
-      case (Some(true), CheckMode) =>
-        ua.get(PartnershipHasUtrYesNoPage)
-          .fold(controllers.add.partnership.routes.PartnershipUniqueTaxpayerReferenceController.onPageLoad(CheckMode)) {
-            _ =>
-              controllers.add.routes.CheckYourAnswersController.onPageLoad()
-          }
+        controllers.add.partnership.routes.PartnershipWorksReferenceNumberYesNoController.onPageLoad(NormalMode)
 
       case (Some(false), CheckMode) =>
         controllers.add.routes.CheckYourAnswersController.onPageLoad()
@@ -245,11 +264,30 @@ class Navigator @Inject() () {
   private def navigatorFromPartnershipWorksReferenceNumberYesNoPage(mode: Mode)(userAnswers: UserAnswers): Call =
     (userAnswers.get(PartnershipWorksReferenceNumberYesNoPage), mode) match {
       case (Some(true), _)           =>
-        controllers.add.partnership.routes.PartnershipWorksReferenceNumberYesNoController.onPageLoad(mode)
+        controllers.add.partnership.routes.PartnershipWorksReferenceNumberController.onPageLoad(mode)
       case (Some(false), NormalMode) =>
-        controllers.add.partnership.routes.PartnershipWorksReferenceNumberYesNoController.onPageLoad(NormalMode)
+        controllers.add.partnership.routes.PartnershipAddressYesNoController.onPageLoad(NormalMode)
       case (Some(false), CheckMode)  => controllers.add.routes.CheckYourAnswersController.onPageLoad()
       case (None, _)                 => routes.JourneyRecoveryController.onPageLoad()
     }
 
+  private def navigatorFromPartnershipContactDetailsYesNoPage(mode: Mode)(userAnswers: UserAnswers): Call =
+    (userAnswers.get(PartnershipContactDetailsYesNoPage), mode) match {
+      case (Some(true), _)           =>
+        routes.JourneyRecoveryController.onPageLoad() // TODO: SL0201 - B (PTN) - Contact details for partner Controller
+      case (Some(false), NormalMode) =>
+        routes.JourneyRecoveryController.onPageLoad() // TODO: SL0205 - B (PTN) - Nominated partner name controller
+      case (Some(false), CheckMode)  => routes.JourneyRecoveryController.onPageLoad() // TODO: Partnership CYA controller
+      case (None, _)                 => routes.JourneyRecoveryController.onPageLoad()
+    }
+
+  private def navigatorFromPartnershipNominatedPartnerCrnYesNoPage(mode: Mode)(userAnswers: UserAnswers): Call =
+    (userAnswers.get(PartnershipNominatedPartnerCrnYesNoPage), mode) match {
+      case (Some(true), _)           =>
+        controllers.add.partnership.routes.PartnershipNominatedPartnerCrnYesNoController.onPageLoad(mode)
+      case (Some(false), NormalMode) =>
+        controllers.add.partnership.routes.PartnershipNominatedPartnerCrnYesNoController.onPageLoad(NormalMode)
+      case (Some(false), CheckMode)  => controllers.add.routes.CheckYourAnswersController.onPageLoad()
+      case (None, _)                 => routes.JourneyRecoveryController.onPageLoad()
+    }
 }
