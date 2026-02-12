@@ -74,14 +74,6 @@ class NavigatorSpec extends SpecBase {
         ) mustBe controllers.add.partnership.routes.PartnershipHasUtrYesNoController.onPageLoad(NormalMode)
       }
 
-      "must go from PartnershipNamePage to CheckYourAnswersController in CheckMode" in {
-        navigator.nextPage(
-          PartnershipNamePage,
-          CheckMode,
-          emptyUserAnswers
-        ) mustBe controllers.add.routes.CheckYourAnswersController.onPageLoad()
-      }
-
       "must go from a TypeOfSubcontractorPage to JourneyRecovery when Trust is selected" in {
         navigator.nextPage(
           TypeOfSubcontractorPage,

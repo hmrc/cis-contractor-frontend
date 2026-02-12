@@ -107,7 +107,8 @@ class PartnershipNominatedPartnerNinoControllerSpec extends SpecBase with Mockit
       val mockSubcontractorService = mock[SubcontractorService]
 
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
-      when(mockSubcontractorService.updateSubcontractor(any[UserAnswers])(any[HeaderCarrier])) thenReturn Future.successful(())
+      when(mockSubcontractorService.updateSubcontractor(any[UserAnswers])(any[HeaderCarrier])) thenReturn Future
+        .successful(())
 
       val application =
         applicationBuilder(
@@ -137,7 +138,6 @@ class PartnershipNominatedPartnerNinoControllerSpec extends SpecBase with Mockit
       verify(mockSubcontractorService).updateSubcontractor(any[UserAnswers])(any[HeaderCarrier])
       verifyNoMoreInteractions(mockSubcontractorService)
     }
-
 
     "must return a Bad Request and errors when invalid data is submitted" in {
       val ua =
