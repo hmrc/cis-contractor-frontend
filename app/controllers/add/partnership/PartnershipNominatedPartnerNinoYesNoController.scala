@@ -17,31 +17,29 @@
 package controllers.add.partnership
 
 import controllers.actions.*
-import forms.add.partnership.PartnershipUtrFormProvider
+import forms.add.partnership.PartnershipNominatedPartnerNinoYesNoFormProvider
 import models.Mode
 import navigation.Navigator
-import pages.add.partnership.{PartnershipNamePage, PartnershipUniqueTaxpayerReferencePage}
+import pages.add.partnership.{PartnershipNominatedPartnerNamePage, PartnershipNominatedPartnerNinoYesNoPage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
-import services.SubcontractorService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.add.partnership.PartnershipUniqueTaxpayerReferenceView
+import views.html.add.partnership.PartnershipNominatedPartnerNinoYesNoView
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class PartnershipUniqueTaxpayerReferenceController @Inject() (
+class PartnershipNominatedPartnerNinoYesNoController @Inject() (
   override val messagesApi: MessagesApi,
   sessionRepository: SessionRepository,
   navigator: Navigator,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
-  formProvider: PartnershipUtrFormProvider,
-  subcontractorService: SubcontractorService,
+  formProvider: PartnershipNominatedPartnerNinoYesNoFormProvider,
   val controllerComponents: MessagesControllerComponents,
-  view: PartnershipUniqueTaxpayerReferenceView
+  view: PartnershipNominatedPartnerNinoYesNoView
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport {
@@ -50,13 +48,14 @@ class PartnershipUniqueTaxpayerReferenceController @Inject() (
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
     request.userAnswers
-      .get(PartnershipNamePage)
-      .map { partnershipName =>
-        val preparedForm = request.userAnswers.get(PartnershipUniqueTaxpayerReferencePage) match {
+      .get(PartnershipNominatedPartnerNamePage)
+      .map { partnershipNominatedPartnerName =>
+        val preparedForm = request.userAnswers.get(PartnershipNominatedPartnerNinoYesNoPage) match {
           case None        => form
           case Some(value) => form.fill(value)
         }
-        Ok(view(preparedForm, mode, partnershipName))
+
+        Ok(view(preparedForm, mode, partnershipNominatedPartnerName))
       }
       .getOrElse(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
   }
@@ -64,31 +63,19 @@ class PartnershipUniqueTaxpayerReferenceController @Inject() (
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
       request.userAnswers
-        .get(PartnershipNamePage)
-        .map { name =>
+        .get(PartnershipNominatedPartnerNamePage)
+        .map { partnershipNominatedPartnerName =>
           form
             .bindFromRequest()
             .fold(
-              formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, name))),
+              formWithErrors =>
+                Future.successful(BadRequest(view(formWithErrors, mode, partnershipNominatedPartnerName))),
               value =>
-                subcontractorService.isDuplicateUTR(request.userAnswers, value).flatMap {
-                  case true  =>
-                    val errorForm = form
-                      .fill(value)
-                      .withError(
-                        key = "value",
-                        message = "partnershipUniqueTaxpayerReference.error.duplicate"
-                      )
-                    Future.successful(
-                      BadRequest(view(errorForm, mode, name))
-                    )
-                  case false =>
-                    for {
-                      updatedAnswers <-
-                        Future.fromTry(request.userAnswers.set(PartnershipUniqueTaxpayerReferencePage, value))
-                      _              <- sessionRepository.set(updatedAnswers)
-                    } yield Redirect(navigator.nextPage(PartnershipUniqueTaxpayerReferencePage, mode, updatedAnswers))
-                }
+                for {
+                  updatedAnswers <-
+                    Future.fromTry(request.userAnswers.set(PartnershipNominatedPartnerNinoYesNoPage, value))
+                  _              <- sessionRepository.set(updatedAnswers)
+                } yield Redirect(navigator.nextPage(PartnershipNominatedPartnerNinoYesNoPage, mode, updatedAnswers))
             )
         }
         .getOrElse(Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())))
