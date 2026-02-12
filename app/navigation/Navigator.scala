@@ -58,6 +58,9 @@ class Navigator @Inject() () {
       _ => controllers.add.partnership.routes.PartnershipWorksReferenceNumberYesNoController.onPageLoad(NormalMode)
     case PartnershipWorksReferenceNumberYesNoPage  =>
       userAnswers => navigatorFromPartnershipWorksReferenceNumberYesNoPage(NormalMode)(userAnswers)
+    case PartnershipNominatedPartnerNinoPage       =>
+      // todo: to be wired
+      _ => routes.JourneyRecoveryController.onPageLoad()
     case PartnershipWorksReferenceNumberPage       =>
       _ => controllers.add.partnership.routes.PartnershipAddressYesNoController.onPageLoad(NormalMode)
     case PartnershipAddressYesNoPage               =>
@@ -87,6 +90,7 @@ class Navigator @Inject() () {
     case SubContactDetailsPage                    => _ => controllers.add.routes.CheckYourAnswersController.onPageLoad()
     case SubcontractorContactDetailsYesNoPage     =>
       userAnswers => navigatorFromSubcontractorContactDetailsYesNoPage(CheckMode)(userAnswers)
+    case PartnershipNominatedPartnerNinoPage      => _ => controllers.add.routes.CheckYourAnswersController.onPageLoad()
     case PartnershipNamePage                      => _ => controllers.add.routes.CheckYourAnswersController.onPageLoad()
     case PartnershipHasUtrYesNoPage               => userAnswers => navigatorFromPartnershipHasUtrYesNoPage(CheckMode)(userAnswers)
     case PartnershipUniqueTaxpayerReferencePage   => _ => controllers.add.routes.CheckYourAnswersController.onPageLoad()
