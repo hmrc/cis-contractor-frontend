@@ -28,8 +28,6 @@ import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import repositories.SessionRepository
-import services.SubcontractorService
-import uk.gov.hmrc.http.HeaderCarrier
 import views.html.add.partnership.PartnershipNameView
 
 import scala.concurrent.Future
@@ -81,8 +79,7 @@ class PartnershipNameControllerSpec extends SpecBase with MockitoSugar {
     }
 
     "must redirect to PartnershipHasUtrYesNo page when valid data is submitted" in {
-      val mockSessionRepository    = mock[SessionRepository]
-      val mockSubcontractorService = mock[SubcontractorService]
+      val mockSessionRepository = mock[SessionRepository]
 
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
@@ -106,7 +103,6 @@ class PartnershipNameControllerSpec extends SpecBase with MockitoSugar {
       }
 
       verify(mockSessionRepository).set(any())
-      verifyNoMoreInteractions(mockSubcontractorService)
     }
 
     "must return a Bad Request and errors when invalid data is submitted" in {
