@@ -28,10 +28,10 @@ class PartnershipUniqueTaxpayerReferenceFormProviderSpec extends AnyFreeSpec wit
   def validUtrGenerator: Gen[String] = Gen.const(UTRGenerator.randomUTR())
 
   val requiredKey = "partnershipUniqueTaxpayerReference.error.required"
-  val invalidKey = "partnershipUniqueTaxpayerReference.error.invalid"
-  val lengthKey = "partnershipUniqueTaxpayerReference.error.length"
+  val invalidKey  = "partnershipUniqueTaxpayerReference.error.invalid"
+  val lengthKey   = "partnershipUniqueTaxpayerReference.error.length"
 
-  val utrLength = 10
+  val utrLength          = 10
   val form: Form[String] = new PartnershipUtrFormProvider()()
 
   ".value" - {
