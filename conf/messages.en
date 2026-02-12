@@ -300,7 +300,7 @@ partnershipHasUtrYesNo.checkYourAnswersLabel = Does {0} have a Unique Taxpayer R
 partnershipHasUtrYesNo.error.required = Select yes if the partnership has a Unique Taxpayer Reference (UTR)
 partnershipHasUtrYesNo.change.hidden = Unique Taxpayer Reference (UTR)
 
-partnershipNominatedPartnerNino.title = What is the National Insurance number for {0}?
+partnershipNominatedPartnerNino.title = What is the National Insurance number for the nominated partner?
 partnershipNominatedPartnerNino.heading = What is the National Insurance number for {0}?
 partnershipNominatedPartnerNino.hint = National insurance numbers can be found on payslips, P60s and other tax documents. For example, ‘QQ 12 34 56 C’
 partnershipNominatedPartnerNino.error.required = Enter a valid National Insurance Number like QQ 12 34 56 C
