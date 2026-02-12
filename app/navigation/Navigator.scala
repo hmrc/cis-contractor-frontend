@@ -70,6 +70,8 @@ class Navigator @Inject() () {
       _ => controllers.add.partnership.routes.PartnershipNominatedPartnerNameController.onPageLoad(NormalMode)
     case PartnershipNominatedPartnerCrnYesNoPage   =>
       userAnswers => navigatorFromPartnershipNominatedPartnerCrnYesNoPage(NormalMode)(userAnswers)
+    case PartnershipNominatedPartnerUtrYesNoPage   =>
+      userAnswers => navigatorFromPartnershipNominatedPartnerUtrYesNoPage(NormalMode)(userAnswers)
     case _                                         => _ => routes.IndexController.onPageLoad()
   }
 
@@ -102,6 +104,8 @@ class Navigator @Inject() () {
     case PartnershipNominatedPartnerNamePage      => _ => controllers.add.routes.CheckYourAnswersController.onPageLoad()
     case PartnershipNominatedPartnerCrnYesNoPage  =>
       userAnswers => navigatorFromPartnershipNominatedPartnerCrnYesNoPage(CheckMode)(userAnswers)
+    case PartnershipNominatedPartnerUtrYesNoPage  =>
+      userAnswers => navigatorFromPartnershipNominatedPartnerUtrYesNoPage(CheckMode)(userAnswers)
     case _                                        => _ => controllers.add.routes.CheckYourAnswersController.onPageLoad()
   }
 
@@ -271,13 +275,22 @@ class Navigator @Inject() () {
       case (None, _)                 => routes.JourneyRecoveryController.onPageLoad()
     }
 
-  private def navigatorFromPartnershipContactDetailsYesNoPage(mode: Mode)(userAnswers: UserAnswers): Call =
+  private def navigatorFromPartnershipContactDetailsYesNoPage(mode: Mode)(userAnswers: UserAnswers): Call      =
     (userAnswers.get(PartnershipContactDetailsYesNoPage), mode) match {
       case (Some(true), _)           =>
         routes.JourneyRecoveryController.onPageLoad() // TODO: SL0201 - B (PTN) - Contact details for partner Controller
       case (Some(false), NormalMode) =>
         routes.JourneyRecoveryController.onPageLoad() // TODO: SL0205 - B (PTN) - Nominated partner name controller
       case (Some(false), CheckMode)  => routes.JourneyRecoveryController.onPageLoad() // TODO: Partnership CYA controller
+      case (None, _)                 => routes.JourneyRecoveryController.onPageLoad()
+    }
+  private def navigatorFromPartnershipNominatedPartnerUtrYesNoPage(mode: Mode)(userAnswers: UserAnswers): Call =
+    (userAnswers.get(PartnershipNominatedPartnerUtrYesNoPage), mode) match {
+      case (Some(true), _)           =>
+        controllers.add.partnership.routes.PartnershipNominatedPartnerUtrYesNoController.onPageLoad(mode)
+      case (Some(false), NormalMode) =>
+        controllers.add.partnership.routes.PartnershipNominatedPartnerUtrYesNoController.onPageLoad(NormalMode)
+      case (Some(false), CheckMode)  => controllers.add.routes.CheckYourAnswersController.onPageLoad()
       case (None, _)                 => routes.JourneyRecoveryController.onPageLoad()
     }
 

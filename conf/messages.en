@@ -344,3 +344,10 @@ partnershipNominatedPartnerCrnYesNo.hint = This only applies if they are a corpo
 partnershipNominatedPartnerCrnYesNo.checkYourAnswersLabel = Nominated partner has a company registration number
 partnershipNominatedPartnerCrnYesNo.error.required = Select whether this nominated partner has a company registration number
 partnershipNominatedPartnerCrnYesNo.change.hidden = nominated partner has a company registration number
+
+partnershipNominatedPartnerUtrYesNo.title = Do you know the Unique Taxpayer Reference for the nominated partner?
+partnershipNominatedPartnerUtrYesNo.heading = Do you know the Unique Taxpayer Reference for {0}?
+partnershipNominatedPartnerUtrYesNo.hint = This information will be used to verify them as a subcontractor
+partnershipNominatedPartnerUtrYesNo.checkYourAnswersLabel = Nominated partner has a UTR
+partnershipNominatedPartnerUtrYesNo.error.required = Select whether you know the Unique Taxpayer Reference (UTR) for this nominated partner
+partnershipNominatedPartnerUtrYesNo.change.hidden = nominated partner has a UTR
