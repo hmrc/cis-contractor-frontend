@@ -42,7 +42,7 @@ class CheckYourAnswersControllerSpec extends SpecBase {
       addressLine4 = Some("UK"),
       postCode = "SW1A 2AA"
     )
-    val ua =
+    val ua      =
       emptyUserAnswers
         .set(TypeOfSubcontractorPage, TypeOfSubcontractor.Individualorsoletrader)
         .success
@@ -85,8 +85,6 @@ class CheckYourAnswersControllerSpec extends SpecBase {
         .value
 
     "must display all questions and dependent rows when answers are provided" in {
-
-
 
       val application = applicationBuilder(userAnswers = Some(ua)).build()
 
@@ -138,7 +136,7 @@ class CheckYourAnswersControllerSpec extends SpecBase {
       running(application) {
 
         val request = FakeRequest(GET, controllers.add.routes.CheckYourAnswersController.onPageLoad().url)
-        val result = route(application, request).value
+        val result  = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
@@ -201,7 +199,7 @@ class CheckYourAnswersControllerSpec extends SpecBase {
 
       running(application) {
         val request = FakeRequest(POST, controllers.add.routes.CheckYourAnswersController.onSubmit().url)
-        val result = route(application, request).value
+        val result  = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
