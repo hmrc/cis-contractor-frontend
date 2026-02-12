@@ -337,3 +337,10 @@ partnershipAddressYesNo.hint = You can add this information later if you prefer
 partnershipAddressYesNo.checkYourAnswersLabel = What is the address for this partnership?
 partnershipAddressYesNo.error.required = Select whether you want to add an address for this partnership
 partnershipAddressYesNo.change.hidden = what is the address for this partnership?
+
+partnershipNominatedPartnerCrnYesNo.title = Does this nominated partner have a company registration number?
+partnershipNominatedPartnerCrnYesNo.heading = Does {0} have a company registration number?
+partnershipNominatedPartnerCrnYesNo.hint = This only applies if they are a corporate partner or director of a company. This information will be used to verify them as a subcontractor.
+partnershipNominatedPartnerCrnYesNo.checkYourAnswersLabel = Nominated partner has a company registration number
+partnershipNominatedPartnerCrnYesNo.error.required = Select whether this nominated partner has a company registration number
+partnershipNominatedPartnerCrnYesNo.change.hidden = nominated partner has a company registration number
