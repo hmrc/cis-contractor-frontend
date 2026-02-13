@@ -20,7 +20,7 @@ lazy val microservice = (project in file("."))
     defaultSettings(),
     Test / parallelExecution := false,
     Test / fork := false,
-    Runtime / fork := true,
+//    Runtime / fork := true,
     routesGenerator := InjectedRoutesGenerator,
     RoutesKeys.routesImport ++= Seq(
       "models._",
