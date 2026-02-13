@@ -20,7 +20,6 @@ lazy val microservice = (project in file("."))
     defaultSettings(),
     Test / parallelExecution := false,
     Test / fork := false,
-    Runtime / fork := true,
     routesGenerator := InjectedRoutesGenerator,
     RoutesKeys.routesImport ++= Seq(
       "models._",
@@ -51,6 +50,7 @@ lazy val microservice = (project in file("."))
       "-Wconf:src=routes/.*:s",
       "-Wconf:msg=Flag.*repeatedly:s"
     ),
+    scalacOptions := scalacOptions.value.distinct,
     libraryDependencies ++= AppDependencies(),
     retrieveManaged := true,
     pipelineStages := Seq(digest),
