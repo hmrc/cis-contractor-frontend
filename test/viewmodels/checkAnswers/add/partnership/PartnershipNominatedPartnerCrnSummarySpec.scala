@@ -28,7 +28,6 @@ import play.api.test.Helpers.stubMessages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.*
 
-
 class PartnershipNominatedPartnerCrnSummarySpec extends AnyFreeSpec with Matchers with OptionValues {
 
   implicit val messages: Messages = stubMessages()

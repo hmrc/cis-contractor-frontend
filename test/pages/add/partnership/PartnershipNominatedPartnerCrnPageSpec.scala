@@ -29,4 +29,3 @@ class PartnershipNominatedPartnerCrnPageSpec extends PageBehaviours {
     beRemovable[String](PartnershipNominatedPartnerCrnPage)
   }
 }
-

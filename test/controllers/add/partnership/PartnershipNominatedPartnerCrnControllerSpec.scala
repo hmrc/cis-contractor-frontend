@@ -109,7 +109,6 @@ class PartnershipNominatedPartnerCrnControllerSpec extends SpecBase with Mockito
       val mockSubcontractorService = mock[SubcontractorService]
 
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
-      when(mockSubcontractorService.updateSubcontractor(any[UserAnswers])(any[HeaderCarrier])) thenReturn Future.successful(())
 
       val application =
         applicationBuilder(
@@ -136,7 +135,6 @@ class PartnershipNominatedPartnerCrnControllerSpec extends SpecBase with Mockito
       }
 
       verify(mockSessionRepository).set(any())
-      verify(mockSubcontractorService).updateSubcontractor(any[UserAnswers])(any[HeaderCarrier])
       verifyNoMoreInteractions(mockSubcontractorService)
     }
 

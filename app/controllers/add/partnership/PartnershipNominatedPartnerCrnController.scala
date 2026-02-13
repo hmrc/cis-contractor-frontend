@@ -24,26 +24,24 @@ import pages.add.partnership.{PartnershipNominatedPartnerCrnPage, PartnershipNom
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
-import services.SubcontractorService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.add.partnership.PartnershipNominatedPartnerCrnView
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class PartnershipNominatedPartnerCrnController @Inject()(
-                                                          override val messagesApi: MessagesApi,
-                                                          sessionRepository: SessionRepository,
-                                                          navigator: Navigator,
-                                                          identify: IdentifierAction,
-                                                          getData: DataRetrievalAction,
-                                                          requireData: DataRequiredAction,
-                                                          formProvider: PartnershipNominatedPartnerCrnFormProvider,
-                                                          subcontractorService: SubcontractorService,
-                                                          val controllerComponents: MessagesControllerComponents,
-                                                          view: PartnershipNominatedPartnerCrnView
-                                                        )(implicit ec: ExecutionContext)
-  extends FrontendBaseController
+class PartnershipNominatedPartnerCrnController @Inject() (
+  override val messagesApi: MessagesApi,
+  sessionRepository: SessionRepository,
+  navigator: Navigator,
+  identify: IdentifierAction,
+  getData: DataRetrievalAction,
+  requireData: DataRequiredAction,
+  formProvider: PartnershipNominatedPartnerCrnFormProvider,
+  val controllerComponents: MessagesControllerComponents,
+  view: PartnershipNominatedPartnerCrnView
+)(implicit ec: ExecutionContext)
+    extends FrontendBaseController
     with I18nSupport {
 
   private val form = formProvider()
@@ -68,16 +66,15 @@ class PartnershipNominatedPartnerCrnController @Inject()(
           throw new RuntimeException("Missing nominated partner name")
         }
 
-      form.bindFromRequest().fold(
-        formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, mode, nominatedPartnerName))),
-        value =>
-          for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(PartnershipNominatedPartnerCrnPage, value))
-            _              <- sessionRepository.set(updatedAnswers)
-            _              <- subcontractorService.updateSubcontractor(updatedAnswers) // stubbed
-          } yield Redirect(navigator.nextPage(PartnershipNominatedPartnerCrnPage, mode, updatedAnswers))
-      )
+      form
+        .bindFromRequest()
+        .fold(
+          formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, nominatedPartnerName))),
+          value =>
+            for {
+              updatedAnswers <- Future.fromTry(request.userAnswers.set(PartnershipNominatedPartnerCrnPage, value))
+              _              <- sessionRepository.set(updatedAnswers)
+            } yield Redirect(navigator.nextPage(PartnershipNominatedPartnerCrnPage, mode, updatedAnswers))
+        )
     }
 }
-

@@ -33,7 +33,6 @@ class PartnershipNominatedPartnerCrnFormProviderSpec extends AnyFreeSpec with Ma
         "AC 012 345",
         "AB1",
         "ZZ999999",
-        
         "123",
         "00000001",
         "12345678",
@@ -70,11 +69,11 @@ class PartnershipNominatedPartnerCrnFormProviderSpec extends AnyFreeSpec with Ma
     "error when invalid format" in {
       val invalid = Seq(
         "A1",
-        "ABC123", 
+        "ABC123",
         "AB1234567",
         "AC01-234",
-        "AC01£345", 
-        "12AB3456"   
+        "AC01£345",
+        "12AB3456"
       )
 
       invalid.foreach { v =>
