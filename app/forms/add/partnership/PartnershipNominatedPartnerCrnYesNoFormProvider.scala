@@ -14,14 +14,17 @@
  * limitations under the License.
  */
 
-package models.subcontractor
+package forms.add.partnership
 
-import play.api.libs.json.{Json, OFormat}
+import forms.mappings.Mappings
+import play.api.data.Form
 
-final case class CreateSubcontractorResponse(
-  subbieResourceRef: Int
-)
+import javax.inject.Inject
 
-object CreateSubcontractorResponse {
-  implicit val format: OFormat[CreateSubcontractorResponse] = Json.format[CreateSubcontractorResponse]
+class PartnershipNominatedPartnerCrnYesNoFormProvider @Inject() extends Mappings {
+
+  def apply(): Form[Boolean] =
+    Form(
+      "value" -> boolean("partnershipNominatedPartnerCrnYesNo.error.required")
+    )
 }

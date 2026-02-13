@@ -18,68 +18,48 @@ package controllers.add.partnership
 
 import base.SpecBase
 import controllers.routes
-import forms.add.partnership.PartnershipWorksReferenceNumberYesNoFormProvider
+import forms.add.partnership.PartnershipNominatedPartnerCrnYesNoFormProvider
 import models.{NormalMode, UserAnswers}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.add.partnership.{PartnershipNamePage, PartnershipWorksReferenceNumberYesNoPage}
-import play.api.data.Form
+import pages.add.partnership.{PartnershipNominatedPartnerCrnYesNoPage, PartnershipNominatedPartnerNamePage}
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import repositories.SessionRepository
-import views.html.add.partnership.PartnershipWorksReferenceNumberYesNoView
+import views.html.add.partnership.PartnershipNominatedPartnerCrnYesNoView
 
 import scala.concurrent.Future
 
-class PartnershipWorksReferenceNumberYesNoControllerSpec extends SpecBase with MockitoSugar {
+class PartnershipNominatedPartnerCrnYesNoControllerSpec extends SpecBase with MockitoSugar {
 
-  val formProvider        = new PartnershipWorksReferenceNumberYesNoFormProvider()
-  val form: Form[Boolean] = formProvider()
+  private val nominatedPartnershipName = "Test Nominated Partnership"
 
-  private val partnershipName = "Test Partnership"
+  private val formProvider = new PartnershipNominatedPartnerCrnYesNoFormProvider()
+  private val form         = formProvider()
 
-  private lazy val routeLoad =
-    controllers.add.partnership.routes.PartnershipWorksReferenceNumberYesNoController.onPageLoad(NormalMode).url
-
-  private lazy val routeSubmit =
-    controllers.add.partnership.routes.PartnershipWorksReferenceNumberYesNoController.onSubmit(NormalMode).url
+  private lazy val partnershipNominatedPartnerCrnYesNoRoute =
+    controllers.add.partnership.routes.PartnershipNominatedPartnerCrnYesNoController.onPageLoad(NormalMode).url
 
   private def uaWithName: UserAnswers =
-    emptyUserAnswers.set(PartnershipNamePage, partnershipName).success.value
+    emptyUserAnswers.set(PartnershipNominatedPartnerNamePage, nominatedPartnershipName).success.value
 
-  "PartnershipWorksReferenceNumberYesNo Controller" - {
-
-    "must redirect to JourneyRecovery if PartnershipName is missing for a GET" in {
-
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
-
-      running(application) {
-        val request = FakeRequest(GET, routeLoad)
-        val result  = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController
-          .onPageLoad()
-          .url
-      }
-
-    }
+  "PartnershipNominatedPartnerCrnYesNo Controller" - {
 
     "must return OK and the correct view for a GET" in {
 
       val application = applicationBuilder(userAnswers = Some(uaWithName)).build()
 
       running(application) {
-        val request = FakeRequest(GET, routeLoad)
+        val request = FakeRequest(GET, partnershipNominatedPartnerCrnYesNoRoute)
 
         val result = route(application, request).value
 
-        val view = application.injector.instanceOf[PartnershipWorksReferenceNumberYesNoView]
+        val view = application.injector.instanceOf[PartnershipNominatedPartnerCrnYesNoView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode, partnershipName)(
+        contentAsString(result) mustEqual view(form, NormalMode, nominatedPartnershipName)(
           request,
           messages(application)
         ).toString
@@ -88,47 +68,29 @@ class PartnershipWorksReferenceNumberYesNoControllerSpec extends SpecBase with M
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers =
-        uaWithName
-          .set(PartnershipWorksReferenceNumberYesNoPage, true)
-          .success
-          .value
+      val userAnswers = uaWithName.set(PartnershipNominatedPartnerCrnYesNoPage, true).success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
       running(application) {
-        val request = FakeRequest(GET, routeLoad)
-        val view    = application.injector.instanceOf[PartnershipWorksReferenceNumberYesNoView]
-        val result  = route(application, request).value
+        val request = FakeRequest(GET, partnershipNominatedPartnerCrnYesNoRoute)
+
+        val view = application.injector.instanceOf[PartnershipNominatedPartnerCrnYesNoView]
+
+        val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(true), NormalMode, partnershipName)(
+        contentAsString(result) mustEqual view(form.fill(true), NormalMode, nominatedPartnershipName)(
           request,
           messages(application)
         ).toString
       }
     }
 
-    "must redirect to JourneyRecovery if PartnershipName is missing for a POST" in {
+    "must redirect to the next page when valid data with value Yes is submitted" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
-
-      running(application) {
-        val request = FakeRequest(POST, routeSubmit)
-          .withFormUrlEncodedBody(("value", "true"))
-
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController
-          .onPageLoad()
-          .url
-      }
-
-    }
-
-    "must redirect to the PartnershipWorksReferenceNumber page when valid data with value Yes is submitted" in {
       val mockSessionRepository = mock[SessionRepository]
+
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
       val application =
@@ -140,7 +102,7 @@ class PartnershipWorksReferenceNumberYesNoControllerSpec extends SpecBase with M
 
       running(application) {
         val request =
-          FakeRequest(POST, routeSubmit)
+          FakeRequest(POST, partnershipNominatedPartnerCrnYesNoRoute)
             .withFormUrlEncodedBody(("value", "true"))
 
         val result = route(application, request).value
@@ -148,14 +110,16 @@ class PartnershipWorksReferenceNumberYesNoControllerSpec extends SpecBase with M
         status(result) mustEqual SEE_OTHER
         redirectLocation(
           result
-        ).value mustEqual controllers.add.partnership.routes.PartnershipWorksReferenceNumberController
+        ).value mustEqual controllers.add.partnership.routes.PartnershipNominatedPartnerCrnYesNoController
           .onPageLoad(NormalMode)
           .url
       }
     }
 
     "must redirect to the next page when valid data with value No is submitted" in {
+
       val mockSessionRepository = mock[SessionRepository]
+
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
       val application =
@@ -167,7 +131,7 @@ class PartnershipWorksReferenceNumberYesNoControllerSpec extends SpecBase with M
 
       running(application) {
         val request =
-          FakeRequest(POST, routeSubmit)
+          FakeRequest(POST, partnershipNominatedPartnerCrnYesNoRoute)
             .withFormUrlEncodedBody(("value", "false"))
 
         val result = route(application, request).value
@@ -175,7 +139,7 @@ class PartnershipWorksReferenceNumberYesNoControllerSpec extends SpecBase with M
         status(result) mustEqual SEE_OTHER
         redirectLocation(
           result
-        ).value mustEqual controllers.add.partnership.routes.PartnershipAddressYesNoController
+        ).value mustEqual controllers.add.partnership.routes.PartnershipNominatedPartnerCrnYesNoController
           .onPageLoad(NormalMode)
           .url
       }
@@ -187,17 +151,17 @@ class PartnershipWorksReferenceNumberYesNoControllerSpec extends SpecBase with M
 
       running(application) {
         val request =
-          FakeRequest(POST, routeSubmit)
+          FakeRequest(POST, partnershipNominatedPartnerCrnYesNoRoute)
             .withFormUrlEncodedBody(("value", ""))
 
         val boundForm = form.bind(Map("value" -> ""))
 
-        val view = application.injector.instanceOf[PartnershipWorksReferenceNumberYesNoView]
+        val view = application.injector.instanceOf[PartnershipNominatedPartnerCrnYesNoView]
 
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode, partnershipName)(
+        contentAsString(result) mustEqual view(boundForm, NormalMode, nominatedPartnershipName)(
           request,
           messages(application)
         ).toString
@@ -209,8 +173,9 @@ class PartnershipWorksReferenceNumberYesNoControllerSpec extends SpecBase with M
       val application = applicationBuilder(userAnswers = None).build()
 
       running(application) {
-        val request = FakeRequest(GET, routeLoad)
-        val result  = route(application, request).value
+        val request = FakeRequest(GET, partnershipNominatedPartnerCrnYesNoRoute)
+
+        val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
@@ -223,7 +188,7 @@ class PartnershipWorksReferenceNumberYesNoControllerSpec extends SpecBase with M
 
       running(application) {
         val request =
-          FakeRequest(POST, routeSubmit)
+          FakeRequest(POST, partnershipNominatedPartnerCrnYesNoRoute)
             .withFormUrlEncodedBody(("value", "true"))
 
         val result = route(application, request).value
@@ -239,25 +204,57 @@ class PartnershipWorksReferenceNumberYesNoControllerSpec extends SpecBase with M
 
       running(application) {
         val request =
-          FakeRequest(POST, routeSubmit)
+          FakeRequest(POST, partnershipNominatedPartnerCrnYesNoRoute)
             .withFormUrlEncodedBody()
 
-        val form      = new PartnershipWorksReferenceNumberYesNoFormProvider()()
+        val form      = new PartnershipNominatedPartnerCrnYesNoFormProvider()()
         val boundForm = form.bind(Map.empty)
 
-        val view = application.injector.instanceOf[PartnershipWorksReferenceNumberYesNoView]
+        val view = application.injector.instanceOf[PartnershipNominatedPartnerCrnYesNoView]
 
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode, partnershipName)(
+        contentAsString(result) mustEqual view(boundForm, NormalMode, nominatedPartnershipName)(
           request,
           messages(application)
         ).toString
 
         contentAsString(result) must include(
-          messages(application)("partnershipWorksReferenceNumberYesNo.error.required")
+          messages(application)("partnershipNominatedPartnerCrnYesNo.error.required")
         )
+      }
+    }
+
+    "must redirect to JourneyRecovery if NominatedPartnershipName is missing for a GET" in {
+
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+
+      running(application) {
+        val request = FakeRequest(GET, partnershipNominatedPartnerCrnYesNoRoute)
+        val result  = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController
+          .onPageLoad()
+          .url
+      }
+    }
+
+    "must redirect to JourneyRecovery if NominatedPartnershipName is missing for a POST" in {
+
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+
+      running(application) {
+        val request = FakeRequest(POST, partnershipNominatedPartnerCrnYesNoRoute)
+          .withFormUrlEncodedBody(("value", "true"))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController
+          .onPageLoad()
+          .url
       }
     }
   }

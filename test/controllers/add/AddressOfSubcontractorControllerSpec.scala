@@ -47,7 +47,6 @@ import play.api.libs.json.Json
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import repositories.SessionRepository
-import services.SubcontractorService
 import views.html.add.AddressOfSubcontractorView
 
 import scala.concurrent.Future
@@ -112,20 +111,14 @@ class AddressOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must redirect to the NationalInsuranceNumberYesNo page when valid data is submitted and call updateSubcontractor with the updated address" in {
-      val mockSessionRepository    = mock[SessionRepository]
-      val mockSubcontractorService = mock[SubcontractorService]
-
+    "must redirect to the NationalInsuranceNumberYesNo page when valid data is submitted with the updated address" in {
+      val mockSessionRepository = mock[SessionRepository]
       when(mockSessionRepository.set(anyArg())) thenReturn Future.successful(true)
-
-      when(mockSubcontractorService.updateSubcontractor(anyArg())(anyArg()))
-        .thenReturn(Future.successful(()))
 
       val application =
         applicationBuilder(userAnswers = Some(emptyUserAnswers))
           .overrides(
-            bind[SessionRepository].toInstance(mockSessionRepository),
-            bind[SubcontractorService].toInstance(mockSubcontractorService)
+            bind[SessionRepository].toInstance(mockSessionRepository)
           )
           .build()
 
@@ -146,8 +139,9 @@ class AddressOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
         redirectLocation(result).value mustEqual
           controllers.add.routes.NationalInsuranceNumberYesNoController.onPageLoad(NormalMode).url
 
-        val uaCaptor = ArgumentCaptor.forClass(classOf[UserAnswers])
-        verify(mockSubcontractorService, times(1)).updateSubcontractor(uaCaptor.capture())(anyArg())
+        // Capture the UserAnswers passed to the repository
+        val uaCaptor: ArgumentCaptor[UserAnswers] = ArgumentCaptor.forClass(classOf[UserAnswers])
+        verify(mockSessionRepository, times(1)).set(uaCaptor.capture())
 
         val passedUa     = uaCaptor.getValue
         val savedAddress = passedUa.get(AddressOfSubcontractorPage).value
@@ -157,8 +151,6 @@ class AddressOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
         savedAddress.addressLine3 mustBe "value 3"
         savedAddress.addressLine4 mustBe Some("value 4")
         savedAddress.postCode mustBe "NX1 1AA"
-
-        verify(mockSessionRepository, times(1)).set(anyArg())
       }
     }
 

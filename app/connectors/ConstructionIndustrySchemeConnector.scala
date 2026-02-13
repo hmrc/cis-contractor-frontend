@@ -17,13 +17,14 @@
 package connectors
 
 import models.response.CisTaxpayerResponse
-import models.subcontractor.{CreateSubcontractorRequest, CreateSubcontractorResponse, GetSubcontractorUTRsResponse, UpdateSubcontractorRequest}
+import models.subcontractor.GetSubcontractorUTRsResponse
+import models.subcontractor.CreateAndUpdateSubcontractorRequest
 import play.api.Logging
 import play.api.http.Status.NO_CONTENT
 import play.api.libs.json.Json
 import play.api.libs.ws.JsonBodyWritables.writeableOf_JsValue
-import uk.gov.hmrc.http.{HeaderCarrier, HttpReadsInstances, HttpResponse, StringContextOps}
 import uk.gov.hmrc.http.client.HttpClientV2
+import uk.gov.hmrc.http.{HeaderCarrier, HttpReadsInstances, HttpResponse, StringContextOps}
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
 import javax.inject.{Inject, Singleton}
@@ -46,29 +47,14 @@ class ConstructionIndustrySchemeConnector @Inject() (config: ServicesConfig, htt
         response
       }
 
-  def createSubcontractor(
-    payload: CreateSubcontractorRequest
-  )(implicit hc: HeaderCarrier): Future[CreateSubcontractorResponse] =
-    logger.info(
-      s"[ConstructionIndustrySchemeConnector][createSubcontractor] Payload: ${Json.toJson(payload)}"
-    )
-    http
-      .post(url"$cisBaseUrl/subcontractor/create")
-      .withBody(Json.toJson(payload))
-      .execute[CreateSubcontractorResponse]
-      .map { response =>
-        logger.info(s"[ConstructionIndustrySchemeConnector][createSubcontractor] Response: $response")
-        response
-      }
-
-  def updateSubcontractor(
-    payload: UpdateSubcontractorRequest
+  def createAndUpdateSubcontractor(
+    payload: CreateAndUpdateSubcontractorRequest
   )(implicit hc: HeaderCarrier): Future[Unit] =
     logger.info(
-      s"[ConstructionIndustrySchemeConnector][updateSubcontractor] Payload: ${Json.toJson(payload)}"
+      s"[ConstructionIndustrySchemeConnector][createAndUpdateSubcontractor] Payload: ${Json.toJson(payload)}"
     )
     http
-      .post(url"$cisBaseUrl/subcontractor/update")
+      .post(url"$cisBaseUrl/subcontractor/create-and-update")
       .withBody(Json.toJson(payload))
       .execute[HttpResponse]
       .flatMap { response =>
