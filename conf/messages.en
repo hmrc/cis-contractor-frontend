@@ -331,9 +331,9 @@ partnershipNominatedPartnerName.error.invalid = Enter a full name using letters 
 partnershipNominatedPartnerName.error.length = Enter a full name up to 56 characters
 partnershipNominatedPartnerName.change.hidden = name
 
-partnershipNominatedPartnerCrn.title = What is the company registration number this nominated partner?
+partnershipNominatedPartnerCrn.title = What is the company registration number for this nominated partner?
 partnershipNominatedPartnerCrn.heading = What is the company registration number for {0}?
-partnershipNominatedPartnerCrn.hint = Company registration numbers are 8 characters long. They can be either 8 digits (01234567) or 2 letters and 6 digits (AC012345). You can find a company's number on the Companies House register.
+partnershipNominatedPartnerCrn.hint = Company registration numbers are 8 characters long. They can be either 8 digits (01234567) or 2 letters and 6 digits (AC012345). You can find a company’s number on the Companies House register.
 partnershipNominatedPartnerCrn.error.required = Enter a company registration number
 partnershipNominatedPartnerCrn.error.length = Enter a valid company registration number
 partnershipNominatedPartnerCrn.error.invalidCharacters = Enter a valid company registration number
