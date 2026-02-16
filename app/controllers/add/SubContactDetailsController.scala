@@ -24,7 +24,6 @@ import pages.add.SubContactDetailsPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
-import services.SubcontractorService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.add.SubContactDetailsView
 
@@ -40,7 +39,6 @@ class SubContactDetailsController @Inject() (
   requireData: DataRequiredAction,
   formProvider: SubContactDetailsFormProvider,
   val controllerComponents: MessagesControllerComponents,
-  subcontractorService: SubcontractorService,
   view: SubContactDetailsView
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
@@ -68,7 +66,6 @@ class SubContactDetailsController @Inject() (
             for {
               updatedAnswers <- Future.fromTry(request.userAnswers.set(SubContactDetailsPage, value))
               _              <- sessionRepository.set(updatedAnswers)
-              _              <- subcontractorService.updateSubcontractor(updatedAnswers)
             } yield Redirect(navigator.nextPage(SubContactDetailsPage, mode, updatedAnswers))
         )
   }

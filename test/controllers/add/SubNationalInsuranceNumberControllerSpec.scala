@@ -29,18 +29,15 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import queries.SubbieResourceRefQuery
 import repositories.SessionRepository
-import services.SubcontractorService
-import uk.gov.hmrc.http.HeaderCarrier
 import views.html.add.SubNationalInsuranceNumberView
 
 import scala.concurrent.Future
 
 class SubNationalInsuranceNumberControllerSpec extends SpecBase with MockitoSugar {
 
-  val formProvider                                   = new SubNationalInsuranceNumberFormProvider()
-  val form                                           = formProvider()
-  val mockSubcontractorService: SubcontractorService = mock[SubcontractorService]
-  lazy val subNationalInsuranceNumberRoute           =
+  val formProvider                         = new SubNationalInsuranceNumberFormProvider()
+  val form                                 = formProvider()
+  lazy val subNationalInsuranceNumberRoute =
     controllers.add.routes.SubNationalInsuranceNumberController.onPageLoad(NormalMode).url
 
   "SubNationalInsuranceNumber Controller" - {
@@ -89,14 +86,10 @@ class SubNationalInsuranceNumberControllerSpec extends SpecBase with MockitoSuga
 
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
-      when(mockSubcontractorService.updateSubcontractor(any[UserAnswers])(any[HeaderCarrier]))
-        .thenReturn(Future.successful(()))
-
       val application =
         applicationBuilder(userAnswers = Some(mockUserAnswers))
           .overrides(
-            bind[SessionRepository].toInstance(mockSessionRepository),
-            bind[SubcontractorService].toInstance(mockSubcontractorService)
+            bind[SessionRepository].toInstance(mockSessionRepository)
           )
           .build()
 
@@ -164,29 +157,6 @@ class SubNationalInsuranceNumberControllerSpec extends SpecBase with MockitoSuga
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
-      }
-    }
-
-    "must fail the request if updateSubcontractor throws an exception" in {
-
-      when(mockSubcontractorService.updateSubcontractor(any[UserAnswers])(any[HeaderCarrier]))
-        .thenReturn(Future.failed(new RuntimeException("boom")))
-
-      val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
-          .overrides(
-            bind[SubcontractorService].toInstance(mockSubcontractorService)
-          )
-          .build()
-
-      running(application) {
-        val request =
-          FakeRequest(POST, subNationalInsuranceNumberRoute)
-            .withFormUrlEncodedBody("value" -> "AA123456A")
-
-        intercept[RuntimeException] {
-          await(route(application, request).value)
-        }
       }
     }
 
