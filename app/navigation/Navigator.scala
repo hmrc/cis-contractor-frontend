@@ -59,8 +59,7 @@ class Navigator @Inject() () {
     case PartnershipWorksReferenceNumberYesNoPage  =>
       userAnswers => navigatorFromPartnershipWorksReferenceNumberYesNoPage(NormalMode)(userAnswers)
     case PartnershipNominatedPartnerNinoPage       =>
-      // todo: to be wired
-      _ => routes.JourneyRecoveryController.onPageLoad()
+      _ => controllers.add.partnership.routes.PartnershipNominatedPartnerNinoController.onPageLoad(NormalMode)
     case PartnershipWorksReferenceNumberPage       =>
       _ => controllers.add.partnership.routes.PartnershipAddressYesNoController.onPageLoad(NormalMode)
     case PartnershipAddressYesNoPage               =>

@@ -32,52 +32,58 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class PartnershipNominatedPartnerNinoController @Inject() (
-  override val messagesApi: MessagesApi,
-  sessionRepository: SessionRepository,
-  navigator: Navigator,
-  identify: IdentifierAction,
-  getData: DataRetrievalAction,
-  requireData: DataRequiredAction,
-  formProvider: PartnershipNominatedPartnerNinoFormProvider,
-  subcontractorService: SubcontractorService,
-  val controllerComponents: MessagesControllerComponents,
-  view: PartnershipNominatedPartnerNinoView
-)(implicit ec: ExecutionContext)
-    extends FrontendBaseController
+                                                            override val messagesApi: MessagesApi,
+                                                            sessionRepository: SessionRepository,
+                                                            navigator: Navigator,
+                                                            identify: IdentifierAction,
+                                                            getData: DataRetrievalAction,
+                                                            requireData: DataRequiredAction,
+                                                            formProvider: PartnershipNominatedPartnerNinoFormProvider,
+                                                            subcontractorService: SubcontractorService,
+                                                            val controllerComponents: MessagesControllerComponents,
+                                                            view: PartnershipNominatedPartnerNinoView
+                                                          )(implicit ec: ExecutionContext)
+  extends FrontendBaseController
     with I18nSupport {
 
   private val form = formProvider()
 
   def onPageLoad(mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData) { implicit request =>
-      val nominatedPartnerName =
-        request.userAnswers.get(PartnershipNominatedPartnerNamePage).getOrElse {
-          throw new RuntimeException("Missing nominated partner name")
+      request.userAnswers
+        .get(PartnershipNominatedPartnerNamePage)
+        .map { nominatedPartnerName =>
+          val preparedForm =
+            request.userAnswers.get(PartnershipNominatedPartnerNinoPage).fold(form)(form.fill)
+
+          Ok(view(preparedForm, mode, nominatedPartnerName))
         }
-
-      val preparedForm =
-        request.userAnswers.get(PartnershipNominatedPartnerNinoPage).fold(form)(form.fill)
-
-      Ok(view(preparedForm, mode, nominatedPartnerName))
+        .getOrElse(
+          Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+        )
     }
 
   def onSubmit(mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
-      val nominatedPartnerName =
-        request.userAnswers.get(PartnershipNominatedPartnerNamePage).getOrElse {
-          throw new RuntimeException("Missing nominated partner name")
+      request.userAnswers
+        .get(PartnershipNominatedPartnerNamePage)
+        .map { nominatedPartnerName =>
+          form
+            .bindFromRequest()
+            .fold(
+              formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, nominatedPartnerName))),
+              value =>
+                for {
+                  updatedAnswers <- Future.fromTry(request.userAnswers.set(PartnershipNominatedPartnerNinoPage, value))
+                  _              <- sessionRepository.set(updatedAnswers)
+                  _              <- subcontractorService.updateSubcontractor(updatedAnswers)
+                } yield Redirect(navigator.nextPage(PartnershipNominatedPartnerNinoPage, mode, updatedAnswers))
+            )
         }
-
-      form
-        .bindFromRequest()
-        .fold(
-          formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, nominatedPartnerName))),
-          value =>
-            for {
-              updatedAnswers <- Future.fromTry(request.userAnswers.set(PartnershipNominatedPartnerNinoPage, value))
-              _              <- sessionRepository.set(updatedAnswers)
-              _              <- subcontractorService.updateSubcontractor(updatedAnswers)
-            } yield Redirect(navigator.nextPage(PartnershipNominatedPartnerNinoPage, mode, updatedAnswers))
+        .getOrElse(
+          Future.successful(
+            Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+          )
         )
     }
 }

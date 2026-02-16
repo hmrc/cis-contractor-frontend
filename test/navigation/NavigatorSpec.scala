@@ -948,12 +948,12 @@ class NavigatorSpec extends SpecBase {
         ) mustBe CYA
       }
 
-      "must go from NominatedPartnerNationalInsuranceNumberPage to JourneyRecovery" in {
+      "must go from PartnershipNominatedPartnerNinoPage to itself in NormalMode" in {
         navigator.nextPage(
           PartnershipNominatedPartnerNinoPage,
           NormalMode,
           emptyUserAnswers
-        ) mustBe routes.JourneyRecoveryController.onPageLoad()
+        ) mustBe controllers.add.partnership.routes.PartnershipNominatedPartnerNinoController.onPageLoad(NormalMode)
       }
 
       "must go from PartnershipNominatedPartnerNinoPage to CYA in CheckMode" in {

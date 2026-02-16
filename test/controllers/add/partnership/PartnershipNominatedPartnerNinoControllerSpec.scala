@@ -44,9 +44,14 @@ class PartnershipNominatedPartnerNinoControllerSpec extends SpecBase with Mockit
 
   private val nominatedPartnerName = "Jane Doe"
 
-  private lazy val routeUrl =
+  private lazy val getUrl =
     controllers.add.partnership.routes.PartnershipNominatedPartnerNinoController
       .onPageLoad(NormalMode)
+      .url
+
+  private lazy val postUrl =
+    controllers.add.partnership.routes.PartnershipNominatedPartnerNinoController
+      .onSubmit(NormalMode)
       .url
 
   "PartnershipNominatedPartnerNinoController" - {
@@ -61,9 +66,8 @@ class PartnershipNominatedPartnerNinoControllerSpec extends SpecBase with Mockit
       val application = applicationBuilder(userAnswers = Some(ua)).build()
 
       running(application) {
-        val request = FakeRequest(GET, routeUrl)
-
-        val result = route(application, request).value
+        val request = FakeRequest(GET, getUrl)
+        val result  = route(application, request).value
 
         val view = application.injector.instanceOf[PartnershipNominatedPartnerNinoView]
 
@@ -88,11 +92,10 @@ class PartnershipNominatedPartnerNinoControllerSpec extends SpecBase with Mockit
       val application = applicationBuilder(userAnswers = Some(ua)).build()
 
       running(application) {
-        val request = FakeRequest(GET, routeUrl)
+        val request = FakeRequest(GET, getUrl)
+        val result  = route(application, request).value
 
         val view = application.injector.instanceOf[PartnershipNominatedPartnerNinoView]
-
-        val result = route(application, request).value
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(form.fill("AA123456A"), NormalMode, nominatedPartnerName)(
@@ -107,8 +110,7 @@ class PartnershipNominatedPartnerNinoControllerSpec extends SpecBase with Mockit
       val mockSubcontractorService = mock[SubcontractorService]
 
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
-      when(mockSubcontractorService.updateSubcontractor(any[UserAnswers])(any[HeaderCarrier])) thenReturn Future
-        .successful(())
+      when(mockSubcontractorService.updateSubcontractor(any[UserAnswers])(any[HeaderCarrier])) thenReturn Future.successful(())
 
       val application =
         applicationBuilder(
@@ -125,13 +127,14 @@ class PartnershipNominatedPartnerNinoControllerSpec extends SpecBase with Mockit
 
       running(application) {
         val request =
-          FakeRequest(POST, routeUrl)
+          FakeRequest(POST, postUrl)
             .withFormUrlEncodedBody("value" -> "AA 12 34 56 A")
 
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+        redirectLocation(result).value mustEqual controllers.add.partnership.routes.PartnershipNominatedPartnerNinoController.onPageLoad(NormalMode).url
+
       }
 
       verify(mockSessionRepository).set(any())
@@ -150,7 +153,7 @@ class PartnershipNominatedPartnerNinoControllerSpec extends SpecBase with Mockit
 
       running(application) {
         val request =
-          FakeRequest(POST, routeUrl)
+          FakeRequest(POST, postUrl)
             .withFormUrlEncodedBody("value" -> "INVALID")
 
         val boundForm = form.bind(Map("value" -> "INVALID"))
@@ -170,9 +173,8 @@ class PartnershipNominatedPartnerNinoControllerSpec extends SpecBase with Mockit
       val application = applicationBuilder(userAnswers = None).build()
 
       running(application) {
-        val request = FakeRequest(GET, routeUrl)
-
-        val result = route(application, request).value
+        val request = FakeRequest(GET, getUrl)
+        val result  = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
@@ -184,7 +186,7 @@ class PartnershipNominatedPartnerNinoControllerSpec extends SpecBase with Mockit
 
       running(application) {
         val request =
-          FakeRequest(POST, routeUrl)
+          FakeRequest(POST, postUrl)
             .withFormUrlEncodedBody("value" -> "QQ123456C")
 
         val result = route(application, request).value
@@ -194,39 +196,30 @@ class PartnershipNominatedPartnerNinoControllerSpec extends SpecBase with Mockit
       }
     }
 
-    "must throw RuntimeException on a GET when nominated partner name is missing" in {
-
+    "must redirect to Journey Recovery for a GET when nominated partner name is missing" in {
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
       running(application) {
-        val request = FakeRequest(GET, routeUrl)
+        val request = FakeRequest(GET, getUrl)
         val result  = route(application, request).value
 
-        val ex = intercept[RuntimeException] {
-          Await.result(result, 5.seconds)
-        }
-
-        ex.getMessage mustBe "Missing nominated partner name"
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
       }
-
     }
 
-    "must throw RuntimeException on a POST when nominated partner name is missing" in {
-
+    "must redirect to Journey Recovery for a POST when nominated partner name is missing" in {
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
       running(application) {
         val request =
-          FakeRequest(POST, routeUrl)
+          FakeRequest(POST, postUrl)
             .withFormUrlEncodedBody("value" -> "QQ123456C")
 
         val result = route(application, request).value
 
-        val ex = intercept[RuntimeException] {
-          Await.result(result, 5.seconds)
-        }
-
-        ex.getMessage mustBe "Missing nominated partner name"
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
       }
     }
   }
