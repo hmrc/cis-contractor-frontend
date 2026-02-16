@@ -65,9 +65,8 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
       finally source.close()
     val json       = Json.parse(jsonString)
 
-    // Parse as Seq of arrays
     json.as[Seq[Seq[String]]].map {
-      case Seq(name, code) => (name, code) // tuple of (countryName, countryCode)
+      case Seq(name, code) => (name, code)
       case other           => throw new RuntimeException(s"Unexpected format in JSON: $other")
     }
   }

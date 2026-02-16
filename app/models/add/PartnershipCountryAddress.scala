@@ -28,19 +28,6 @@ case class PartnershipCountryAddress(
   country: String
 )
 
-//
-//val field1: String = HtmlFormat.escape(addressLine1).toString + "<br>"
-//val field2: String = if addressLine2.isDefined then HtmlFormat.escape(addressLine2.mkString("")).body + "<br>" else ""
-//val field3: String = HtmlFormat.escape(addressLine3).toString + "<br>"
-//val field4: String = if addressLine4.isDefined then HtmlFormat.escape(addressLine4.mkString("")).body + "<br>" else ""
-//val postcode: String = HtmlFormat.escape(postalCode).toString + "<br>"
-//val fullAddress: String = field1 + field2 + field3 + field4 + postcode
-//
-//def getAddressList(countryOptions: CountryOptions)(using messages: Messages): List[String] = {
-//  val country = countryOptions.getCountryNameFromCode(countryCode)
-//  List(addressLine1, addressLine2.getOrElse(""), addressLine3, addressLine4.getOrElse(""), postalCode, country).filter(_.nonEmpty)
-//}
-
 object PartnershipCountryAddress {
 
   implicit val format: OFormat[PartnershipCountryAddress] = Json.format[PartnershipCountryAddress]
