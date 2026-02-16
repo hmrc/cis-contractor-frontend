@@ -22,19 +22,16 @@ import forms.add.partnership.PartnershipNominatedPartnerCrnFormProvider
 import models.{NormalMode, UserAnswers}
 import navigation.Navigator
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.{verify, verifyNoMoreInteractions, when}
+import org.mockito.Mockito.{verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import pages.add.partnership.{PartnershipNominatedPartnerCrnPage, PartnershipNominatedPartnerNamePage}
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import repositories.SessionRepository
-import services.SubcontractorService
-import uk.gov.hmrc.http.HeaderCarrier
 import views.html.add.partnership.PartnershipNominatedPartnerCrnView
 
-import scala.concurrent.duration.*
-import scala.concurrent.{Await, Future}
+import scala.concurrent.Future
 
 class PartnershipNominatedPartnerCrnControllerSpec extends SpecBase with MockitoSugar {
 
@@ -105,9 +102,7 @@ class PartnershipNominatedPartnerCrnControllerSpec extends SpecBase with Mockito
     }
 
     "must redirect when valid data is submitted" in {
-      val mockSessionRepository    = mock[SessionRepository]
-      val mockSubcontractorService = mock[SubcontractorService]
-
+      val mockSessionRepository = mock[SessionRepository]
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
       val application =
@@ -118,7 +113,6 @@ class PartnershipNominatedPartnerCrnControllerSpec extends SpecBase with Mockito
         )
           .overrides(
             bind[SessionRepository].toInstance(mockSessionRepository),
-            bind[SubcontractorService].toInstance(mockSubcontractorService),
             bind[Navigator].toInstance(new Navigator())
           )
           .build()
@@ -131,11 +125,13 @@ class PartnershipNominatedPartnerCrnControllerSpec extends SpecBase with Mockito
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.add.routes.CheckYourAnswersController.onPageLoad().url
+
+        // ✅ updated expectation: navigator now loops back to same page in NormalMode
+        redirectLocation(result).value mustEqual
+          controllers.add.partnership.routes.PartnershipNominatedPartnerCrnController.onPageLoad(NormalMode).url
       }
 
       verify(mockSessionRepository).set(any())
-      verifyNoMoreInteractions(mockSubcontractorService)
     }
 
     "must return a Bad Request and errors when invalid data is submitted" in {
@@ -192,22 +188,19 @@ class PartnershipNominatedPartnerCrnControllerSpec extends SpecBase with Mockito
       }
     }
 
-    "must throw RuntimeException on a GET when nominated partner name is missing" in {
+    "must redirect to Journey Recovery for a GET when nominated partner name is missing" in {
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
       running(application) {
         val request = FakeRequest(GET, getUrl)
         val result  = route(application, request).value
 
-        val ex = intercept[RuntimeException] {
-          Await.result(result, 5.seconds)
-        }
-
-        ex.getMessage mustBe "Missing nominated partner name"
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
       }
     }
 
-    "must throw RuntimeException on a POST when nominated partner name is missing" in {
+    "must redirect to Journey Recovery for a POST when nominated partner name is missing" in {
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
       running(application) {
@@ -217,11 +210,8 @@ class PartnershipNominatedPartnerCrnControllerSpec extends SpecBase with Mockito
 
         val result = route(application, request).value
 
-        val ex = intercept[RuntimeException] {
-          Await.result(result, 5.seconds)
-        }
-
-        ex.getMessage mustBe "Missing nominated partner name"
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
       }
     }
   }

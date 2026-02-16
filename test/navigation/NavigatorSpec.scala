@@ -903,12 +903,12 @@ class NavigatorSpec extends SpecBase {
         result mustBe CYA
       }
 
-      "must go from PartnershipNominatedPartnerCrnPage to CYA in NormalMode" in {
+      "must go from PartnershipNominatedPartnerCrnPage to PartnershipNominatedPartnerCrnController in NormalMode" in {
         navigator.nextPage(
           PartnershipNominatedPartnerCrnPage,
           NormalMode,
           emptyUserAnswers
-        ) mustBe controllers.add.routes.CheckYourAnswersController.onPageLoad()
+        ) mustBe controllers.add.partnership.routes.PartnershipNominatedPartnerCrnController.onPageLoad(NormalMode)
       }
 
       "must go from PartnershipNominatedPartnerCrnPage to CYA in CheckMode" in {

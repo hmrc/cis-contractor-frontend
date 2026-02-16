@@ -48,33 +48,39 @@ class PartnershipNominatedPartnerCrnController @Inject() (
 
   def onPageLoad(mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData) { implicit request =>
-      val nominatedPartnerName =
-        request.userAnswers.get(PartnershipNominatedPartnerNamePage).getOrElse {
-          throw new RuntimeException("Missing nominated partner name")
+      request.userAnswers
+        .get(PartnershipNominatedPartnerNamePage)
+        .map { nominatedPartnerName =>
+          val preparedForm =
+            request.userAnswers.get(PartnershipNominatedPartnerCrnPage).fold(form)(form.fill)
+
+          Ok(view(preparedForm, mode, nominatedPartnerName))
         }
-
-      val preparedForm =
-        request.userAnswers.get(PartnershipNominatedPartnerCrnPage).fold(form)(form.fill)
-
-      Ok(view(preparedForm, mode, nominatedPartnerName))
+        .getOrElse(
+          Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+        )
     }
 
   def onSubmit(mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
-      val nominatedPartnerName =
-        request.userAnswers.get(PartnershipNominatedPartnerNamePage).getOrElse {
-          throw new RuntimeException("Missing nominated partner name")
+      request.userAnswers
+        .get(PartnershipNominatedPartnerNamePage)
+        .map { nominatedPartnerName =>
+          form
+            .bindFromRequest()
+            .fold(
+              formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, nominatedPartnerName))),
+              value =>
+                for {
+                  updatedAnswers <- Future.fromTry(request.userAnswers.set(PartnershipNominatedPartnerCrnPage, value))
+                  _              <- sessionRepository.set(updatedAnswers)
+                } yield Redirect(navigator.nextPage(PartnershipNominatedPartnerCrnPage, mode, updatedAnswers))
+            )
         }
-
-      form
-        .bindFromRequest()
-        .fold(
-          formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, nominatedPartnerName))),
-          value =>
-            for {
-              updatedAnswers <- Future.fromTry(request.userAnswers.set(PartnershipNominatedPartnerCrnPage, value))
-              _              <- sessionRepository.set(updatedAnswers)
-            } yield Redirect(navigator.nextPage(PartnershipNominatedPartnerCrnPage, mode, updatedAnswers))
+        .getOrElse(
+          Future.successful(
+            Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+          )
         )
     }
 }
