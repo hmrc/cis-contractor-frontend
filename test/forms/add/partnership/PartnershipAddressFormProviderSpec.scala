@@ -88,7 +88,13 @@ class PartnershipAddressFormProviderSpec extends StringFieldBehaviours {
     "must fail when invalid characters are used (while first char is a letter)" in {
       val input  = "A|Street"
       val result = form.bind(
-        Map(fieldName -> input, "addressLine2" -> "B Street", "addressLine3" -> "C Town", "postalCode" -> "SW1A 1AA",  "country" -> "UK")
+        Map(
+          fieldName      -> input,
+          "addressLine2" -> "B Street",
+          "addressLine3" -> "C Town",
+          "postalCode"   -> "SW1A 1AA",
+          "country"      -> "UK"
+        )
       )
       result.errors.exists(_.message == invalidKey) mustBe true
     }
@@ -107,8 +113,8 @@ class PartnershipAddressFormProviderSpec extends StringFieldBehaviours {
           "addressLine1" -> "A Street",
           fieldName      -> "B Street",
           "addressLine3" -> "C Town",
-          "postalCode"     -> "EC1A 1BB",
-          "country" -> "UK"
+          "postalCode"   -> "EC1A 1BB",
+          "country"      -> "UK"
         )
       )
 
@@ -121,8 +127,8 @@ class PartnershipAddressFormProviderSpec extends StringFieldBehaviours {
           "addressLine1" -> "A Street",
           fieldName      -> "",
           "addressLine3" -> "C Town",
-          "postalCode"     -> "EC1A 1BB",
-          "country" -> "UK"
+          "postalCode"   -> "EC1A 1BB",
+          "country"      -> "UK"
         )
       )
 
@@ -134,8 +140,8 @@ class PartnershipAddressFormProviderSpec extends StringFieldBehaviours {
         Map(
           "addressLine1" -> "A Street",
           "addressLine3" -> "C Town",
-          "postalCode"     -> "EC1A 1BB",
-          "country" -> "UK"
+          "postalCode"   -> "EC1A 1BB",
+          "country"      -> "UK"
         )
       )
 
@@ -155,8 +161,8 @@ class PartnershipAddressFormProviderSpec extends StringFieldBehaviours {
           "addressLine1" -> "A Street",
           fieldName      -> "B|Street",
           "addressLine3" -> "C Town",
-          "postalCode"     -> "EC1A 1BB",
-          "country" -> "UK"
+          "postalCode"   -> "EC1A 1BB",
+          "country"      -> "UK"
         )
       )
 
@@ -169,8 +175,8 @@ class PartnershipAddressFormProviderSpec extends StringFieldBehaviours {
           "addressLine1" -> "A Street",
           fieldName      -> "1B Street",
           "addressLine3" -> "C Town",
-          "postalCode"     -> "EC1A 1BB",
-          "country" -> "UK"
+          "postalCode"   -> "EC1A 1BB",
+          "country"      -> "UK"
         )
       )
 
@@ -207,14 +213,26 @@ class PartnershipAddressFormProviderSpec extends StringFieldBehaviours {
 
     "must fail when invalid characters are used (while first char is a letter)" in {
       val result = form.bind(
-        Map("addressLine1" -> "A Street", "addressLine2" -> "B Street", fieldName -> "C|Town", "postalCode" -> "W1A 0AX",  "country" -> "UK")
+        Map(
+          "addressLine1" -> "A Street",
+          "addressLine2" -> "B Street",
+          fieldName      -> "C|Town",
+          "postalCode"   -> "W1A 0AX",
+          "country"      -> "UK"
+        )
       )
       result.errors.exists(_.message == invalidKey) mustBe true
     }
 
     "must fail when first character is not a letter" in {
       val result = form.bind(
-        Map("addressLine1" -> "A Street", "addressLine2" -> "B Street", fieldName -> "1C Town", "postalCode" -> "W1A 0AX",  "country" -> "UK")
+        Map(
+          "addressLine1" -> "A Street",
+          "addressLine2" -> "B Street",
+          fieldName      -> "1C Town",
+          "postalCode"   -> "W1A 0AX",
+          "country"      -> "UK"
+        )
       )
       result.errors.exists(_.message == firstCharKey) mustBe true
     }
@@ -232,8 +250,8 @@ class PartnershipAddressFormProviderSpec extends StringFieldBehaviours {
           "addressLine2" -> "B Street",
           "addressLine3" -> "C Town",
           fieldName      -> "County",
-          "postalCode"     -> "M1 1AE",
-          "country" -> "UK"
+          "postalCode"   -> "M1 1AE",
+          "country"      -> "UK"
         )
       )
       result.errors mustBe empty
@@ -245,8 +263,8 @@ class PartnershipAddressFormProviderSpec extends StringFieldBehaviours {
           "addressLine1" -> "A Street",
           "addressLine2" -> "B Street",
           "addressLine3" -> "C Town",
-          "postalCode"     -> "CR2 6XH",
-          "country" -> "UK"
+          "postalCode"   -> "CR2 6XH",
+          "country"      -> "UK"
         )
       )
       result.errors mustBe empty
@@ -292,7 +310,7 @@ class PartnershipAddressFormProviderSpec extends StringFieldBehaviours {
           Map(
             "addressLine1" -> "A Street",
             "addressLine3" -> "C Town",
-            "postalCode"     -> bad,
+            "postalCode"   -> bad,
             "country"      -> "UK"
           )
         )
@@ -304,7 +322,7 @@ class PartnershipAddressFormProviderSpec extends StringFieldBehaviours {
 
   ".country" - {
 
-    val fieldName = "country"
+    val fieldName   = "country"
     val requiredKey = "partnershipAddress.country.error.required"
 
     behave like fieldThatBindsValidData(

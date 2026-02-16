@@ -17,7 +17,7 @@
 package generators
 
 import models.*
-import models.add.{SubContactDetails, TypeOfSubcontractor, UKAddress, PartnershipCountryAddress}
+import models.add.{PartnershipCountryAddress, SubContactDetails, TypeOfSubcontractor, UKAddress}
 import org.scalacheck.{Arbitrary, Gen}
 import play.api.libs.json.Json
 import org.scalacheck.Arbitrary.arbitrary
@@ -33,8 +33,8 @@ trait ModelGenerators {
         addressLine2 <- Gen.option(Gen.alphaStr)
         addressLine3 <- Gen.alphaStr.suchThat(_.nonEmpty)
         addressLine4 <- Gen.option(Gen.alphaStr)
-        postalCode <- Gen.alphaStr.suchThat(_.nonEmpty)
-        country <- Gen.alphaStr.suchThat(_.nonEmpty)
+        postalCode   <- Gen.alphaStr.suchThat(_.nonEmpty)
+        country      <- Gen.alphaStr.suchThat(_.nonEmpty)
       } yield PartnershipCountryAddress(
         addressLine1 = addressLine1,
         addressLine2 = addressLine2,

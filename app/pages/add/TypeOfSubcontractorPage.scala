@@ -47,8 +47,8 @@ case object TypeOfSubcontractorPage extends QuestionPage[TypeOfSubcontractor] {
           .flatMap(_.remove(UniqueTaxpayerReferenceYesNoPage))
           .flatMap(_.remove(WorksReferenceNumberPage))
           .flatMap(_.remove(WorksReferenceNumberYesNoPage))
-            // add any new page if added in future
-      case _ =>
+      // add any new page if added in future
+      case _                                                        =>
         super.cleanup(value, ua)
     }
   }

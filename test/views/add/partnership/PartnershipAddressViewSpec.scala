@@ -65,7 +65,7 @@ class PartnershipAddressViewSpec extends AnyWordSpec with Matchers with GuiceOne
           .withError("addressLine1", "partnershipAddress.addressLine1.error.required")
           .withError("postalCode", "partnershipAddress.postalCode.error.required")
 
-      val html = view(errorForm, NormalMode,testName, countryOptions)
+      val html = view(errorForm, NormalMode, testName, countryOptions)
       val doc  = Jsoup.parse(html.toString())
 
       val summary = doc.select(".govuk-error-summary")
@@ -86,10 +86,10 @@ class PartnershipAddressViewSpec extends AnyWordSpec with Matchers with GuiceOne
 
   trait Setup {
     val formProvider: PartnershipAddressFormProvider = new PartnershipAddressFormProvider()
-    val form: Form[PartnershipCountryAddress] = formProvider()
+    val form: Form[PartnershipCountryAddress]        = formProvider()
 
-    implicit val request: Request[_] = FakeRequest()
-    implicit val messages: Messages = MessagesImpl(
+    implicit val request: Request[_]          = FakeRequest()
+    implicit val messages: Messages           = MessagesImpl(
       play.api.i18n.Lang.defaultLang,
       app.injector.instanceOf[MessagesApi]
     )

@@ -38,11 +38,9 @@ import views.html.add.partnership.PartnershipAddressView
 import org.scalatest.matchers.must.Matchers
 import config.FrontendAppConfig
 
-
-
 import scala.concurrent.Future
 
-class PartnershipAddressControllerSpec extends SpecBase with MockitoSugar with Matchers{
+class PartnershipAddressControllerSpec extends SpecBase with MockitoSugar with Matchers {
 
   private val formProvider = new PartnershipAddressFormProvider()
   private val form         = formProvider()
@@ -54,23 +52,22 @@ class PartnershipAddressControllerSpec extends SpecBase with MockitoSugar with M
   private lazy val routeSubmit =
     controllers.add.partnership.routes.PartnershipAddressController.onSubmit(NormalMode).url
 
-  private def uaWithName: UserAnswers = {
+  private def uaWithName: UserAnswers =
     emptyUserAnswers.set(PartnershipNamePage, partnershipName).success.value
-  }
-    private val userAnswers = UserAnswers(
-      userAnswersId,
-      Json.obj(
-        PartnershipNamePage.toString -> Json.toJson(partnershipName),
-        PartnershipAddressPage.toString -> Json.obj(
-          "addressLine1" -> "value 1",
-          "addressLine2" -> "value 2",
-          "addressLine3" -> "value 3",
-          "addressLine4" -> "value 4",
-          "postalCode" -> "NX1 1AA",
-          "country" -> "United Kingdom"
-        )
+  private val userAnswers             = UserAnswers(
+    userAnswersId,
+    Json.obj(
+      PartnershipNamePage.toString    -> Json.toJson(partnershipName),
+      PartnershipAddressPage.toString -> Json.obj(
+        "addressLine1" -> "value 1",
+        "addressLine2" -> "value 2",
+        "addressLine3" -> "value 3",
+        "addressLine4" -> "value 4",
+        "postalCode"   -> "NX1 1AA",
+        "country"      -> "United Kingdom"
       )
     )
+  )
 
   "PartnershipAddressController" - {
 
@@ -78,12 +75,12 @@ class PartnershipAddressControllerSpec extends SpecBase with MockitoSugar with M
       val application = applicationBuilder(userAnswers = Some(uaWithName)).build()
 
       running(application) {
-        val request = FakeRequest(GET, routeLoad)
-        val view    = application.injector.instanceOf[PartnershipAddressView]
-        val countryOptions = application.injector.instanceOf[CountryOptions]
-        val appConfig = application.injector.instanceOf[FrontendAppConfig]
+        val request                               = FakeRequest(GET, routeLoad)
+        val view                                  = application.injector.instanceOf[PartnershipAddressView]
+        val countryOptions                        = application.injector.instanceOf[CountryOptions]
+        val appConfig                             = application.injector.instanceOf[FrontendAppConfig]
         implicit val msgs: play.api.i18n.Messages = messages(application)
-        val result = route(application, request).value
+        val result                                = route(application, request).value
 
         status(result) mustBe OK
         contentType(result) mustBe Some("text/html")
@@ -111,12 +108,12 @@ class PartnershipAddressControllerSpec extends SpecBase with MockitoSugar with M
       val application = applicationBuilder(userAnswers = Some(ua)).build()
 
       running(application) {
-        val request = FakeRequest(GET, routeLoad)
-        val view    = application.injector.instanceOf[PartnershipAddressView]
-        val countryOptions = application.injector.instanceOf[CountryOptions]
-        val appConfig = application.injector.instanceOf[FrontendAppConfig]
+        val request                               = FakeRequest(GET, routeLoad)
+        val view                                  = application.injector.instanceOf[PartnershipAddressView]
+        val countryOptions                        = application.injector.instanceOf[CountryOptions]
+        val appConfig                             = application.injector.instanceOf[FrontendAppConfig]
         implicit val msgs: play.api.i18n.Messages = messages(application)
-        val result  = route(application, request).value
+        val result                                = route(application, request).value
 
         status(result) mustBe OK
 
@@ -184,7 +181,7 @@ class PartnershipAddressControllerSpec extends SpecBase with MockitoSugar with M
               "addressLine2" -> "value 2",
               "addressLine3" -> "value 3",
               "addressLine4" -> "value 4",
-              "postalCode"     -> "NX1 1AA",
+              "postalCode"   -> "NX1 1AA",
               "country"      -> "United Kingdom"
             )
 
@@ -202,7 +199,7 @@ class PartnershipAddressControllerSpec extends SpecBase with MockitoSugar with M
         saved.addressLine3 mustBe "value 3"
         saved.addressLine4 mustBe Some("value 4")
         saved.postalCode mustBe "NX1 1AA"
-        saved.country      mustBe "United Kingdom"
+        saved.country mustBe "United Kingdom"
       }
     }
 
@@ -216,7 +213,7 @@ class PartnershipAddressControllerSpec extends SpecBase with MockitoSugar with M
               "addressLine1" -> "",
               "addressLine2" -> "value 2",
               "addressLine3" -> "value 3",
-              "postalCode"     -> "NX1 1AA",
+              "postalCode"   -> "NX1 1AA",
               "country"      -> "United Kingdom"
             )
 
@@ -225,16 +222,16 @@ class PartnershipAddressControllerSpec extends SpecBase with MockitoSugar with M
             "addressLine1" -> "",
             "addressLine2" -> "value 2",
             "addressLine3" -> "value 3",
-            "postalCode"     -> "NX1 1AA",
+            "postalCode"   -> "NX1 1AA",
             "country"      -> "United Kingdom"
           )
         )
 
-        val view   = application.injector.instanceOf[PartnershipAddressView]
-        val countryOptions = application.injector.instanceOf[CountryOptions]
-        val appConfig = application.injector.instanceOf[FrontendAppConfig]
+        val view                                  = application.injector.instanceOf[PartnershipAddressView]
+        val countryOptions                        = application.injector.instanceOf[CountryOptions]
+        val appConfig                             = application.injector.instanceOf[FrontendAppConfig]
         implicit val msgs: play.api.i18n.Messages = messages(application)
-        val result = route(application, request).value
+        val result                                = route(application, request).value
 
         status(result) mustBe BAD_REQUEST
         contentAsString(result) mustBe
@@ -257,7 +254,7 @@ class PartnershipAddressControllerSpec extends SpecBase with MockitoSugar with M
             .withFormUrlEncodedBody(
               "addressLine1" -> "value 1",
               "addressLine3" -> "value 3",
-              "postalCode"     -> "NX1 1AA",
+              "postalCode"   -> "NX1 1AA",
               "country"      -> "United Kingdom"
             )
 
@@ -277,7 +274,7 @@ class PartnershipAddressControllerSpec extends SpecBase with MockitoSugar with M
             .withFormUrlEncodedBody(
               "addressLine1" -> "value 1",
               "addressLine3" -> "value 3",
-              "postalCode"     -> "NX1 1AA",
+              "postalCode"   -> "NX1 1AA",
               "country"      -> "United Kingdom"
             )
 
@@ -310,7 +307,7 @@ class PartnershipAddressControllerSpec extends SpecBase with MockitoSugar with M
             .withFormUrlEncodedBody(
               "addressLine1" -> "value 1",
               "addressLine3" -> "value 3",
-              "postalCode"     -> "NX1 1AA",
+              "postalCode"   -> "NX1 1AA",
               "country"      -> "United Kingdom"
             )
 

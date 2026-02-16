@@ -19,15 +19,14 @@ package models.add
 import play.api.libs.json.*
 import play.api.libs.json.{Json, OFormat}
 
-
 case class PartnershipCountryAddress(
-                      addressLine1: String,
-                      addressLine2: Option[String],
-                      addressLine3: String,
-                      addressLine4: Option[String],
-                      postalCode: String,
-                      country: String
-                    )
+  addressLine1: String,
+  addressLine2: Option[String],
+  addressLine3: String,
+  addressLine4: Option[String],
+  postalCode: String,
+  country: String
+)
 
 //
 //val field1: String = HtmlFormat.escape(addressLine1).toString + "<br>"
@@ -41,8 +40,6 @@ case class PartnershipCountryAddress(
 //  val country = countryOptions.getCountryNameFromCode(countryCode)
 //  List(addressLine1, addressLine2.getOrElse(""), addressLine3, addressLine4.getOrElse(""), postalCode, country).filter(_.nonEmpty)
 //}
-
-
 
 object PartnershipCountryAddress {
 

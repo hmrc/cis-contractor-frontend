@@ -36,7 +36,7 @@ class Navigator @Inject() () {
     case SubAddressYesNoPage                       => userAnswers => navigatorFromSubAddressYesNoPage(NormalMode)(userAnswers)
     case AddressOfSubcontractorPage                =>
       _ => controllers.add.routes.NationalInsuranceNumberYesNoController.onPageLoad(NormalMode)
-    case PartnershipAddressPage                =>
+    case PartnershipAddressPage                    =>
       _ => controllers.add.partnership.routes.PartnershipAddressController.onPageLoad(NormalMode)
     case NationalInsuranceNumberYesNoPage          =>
       userAnswers => navigatorFromNationalInsuranceNumberYesNoPage(NormalMode)(userAnswers)
@@ -70,11 +70,8 @@ class Navigator @Inject() () {
       _ => controllers.add.partnership.routes.PartnershipNominatedPartnerNinoYesNoController.onPageLoad(NormalMode)
     case PartnershipNominatedPartnerNamePage       =>
       _ => controllers.add.partnership.routes.PartnershipNominatedPartnerNameController.onPageLoad(NormalMode)
-<<<<<<< DTR-2928
-=======
     case PartnershipNominatedPartnerCrnYesNoPage   =>
       userAnswers => navigatorFromPartnershipNominatedPartnerCrnYesNoPage(NormalMode)(userAnswers)
->>>>>>> main
     case _                                         => _ => routes.IndexController.onPageLoad()
   }
 
@@ -100,22 +97,16 @@ class Navigator @Inject() () {
     case PartnershipWorksReferenceNumberPage      => _ => controllers.add.routes.CheckYourAnswersController.onPageLoad()
     case PartnershipAddressYesNoPage              =>
       _ => controllers.add.partnership.routes.PartnershipAddressYesNoController.onPageLoad(CheckMode)
-<<<<<<< DTR-2928
-    case PartnershipAddressPage                =>
+    case PartnershipAddressPage                   =>
       _ => controllers.add.partnership.routes.PartnershipAddressController.onPageLoad(CheckMode)
     case PartnershipWorksReferenceNumberPage      => _ => controllers.add.routes.CheckYourAnswersController.onPageLoad()
-=======
->>>>>>> main
     case PartnershipContactDetailsYesNoPage       =>
       userAnswers => navigatorFromPartnershipContactDetailsYesNoPage(CheckMode)(userAnswers)
     case PartnershipNominatedPartnerNinoYesNoPage =>
       _ => controllers.add.partnership.routes.PartnershipNominatedPartnerNinoYesNoController.onPageLoad(CheckMode)
     case PartnershipNominatedPartnerNamePage      => _ => controllers.add.routes.CheckYourAnswersController.onPageLoad()
-<<<<<<< DTR-2928
-=======
     case PartnershipNominatedPartnerCrnYesNoPage  =>
       userAnswers => navigatorFromPartnershipNominatedPartnerCrnYesNoPage(CheckMode)(userAnswers)
->>>>>>> main
     case _                                        => _ => controllers.add.routes.CheckYourAnswersController.onPageLoad()
   }
 

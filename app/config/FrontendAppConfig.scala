@@ -52,21 +52,23 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
     "en" -> Lang("en"),
     "cy" -> Lang("cy")
   )
-  
+
   lazy val timeout: Int   = configuration.get[Int]("timeout-dialog.timeout")
   lazy val countdown: Int = configuration.get[Int]("timeout-dialog.countdown")
 
   lazy val cacheTtl: Long = configuration.get[Int]("mongodb.timeToLiveInSeconds")
 
   lazy val locationCanonicalList: Seq[(String, String)] = {
-    val source = Source.fromResource("location-autocomplete-canonical-list.json")
-    val jsonString = try source.mkString finally source.close()
-    val json = Json.parse(jsonString)
+    val source     = Source.fromResource("location-autocomplete-canonical-list.json")
+    val jsonString =
+      try source.mkString
+      finally source.close()
+    val json       = Json.parse(jsonString)
 
     // Parse as Seq of arrays
     json.as[Seq[Seq[String]]].map {
       case Seq(name, code) => (name, code) // tuple of (countryName, countryCode)
-      case other => throw new RuntimeException(s"Unexpected format in JSON: $other")
+      case other           => throw new RuntimeException(s"Unexpected format in JSON: $other")
     }
   }
 }

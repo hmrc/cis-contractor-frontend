@@ -90,7 +90,7 @@ class PartnershipAddressFormProvider @Inject() extends Mappings {
               )
             )
         ),
-      "postalCode" ->
+      "postalCode"   ->
         text("partnershipAddress.error.postalCode.required")
           .transform(
             _.trim.toUpperCase.replaceAll("\\s+", " "),
@@ -102,7 +102,9 @@ class PartnershipAddressFormProvider @Inject() extends Mappings {
               regexp(ukPostcodeRegex, "partnershipAddress.error.postalCode.invalid")
             )
           ),
-      "country" -> text("partnershipAddress.country.error.required")
-    )(PartnershipCountryAddress.apply)(partnershipCountryAddress => Some(Tuple.fromProductTyped(partnershipCountryAddress)))
+      "country"      -> text("partnershipAddress.country.error.required")
+    )(PartnershipCountryAddress.apply)(partnershipCountryAddress =>
+      Some(Tuple.fromProductTyped(partnershipCountryAddress))
+    )
   )
 }
