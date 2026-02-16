@@ -17,7 +17,7 @@
 package forms.add.partnership
 
 import forms.mappings.Mappings
-import models.add.UKAddress
+import models.add.PartnershipCountryAddress
 import play.api.data.{Form, Forms}
 
 import javax.inject.Inject
@@ -35,7 +35,7 @@ class PartnershipAddressFormProvider @Inject() extends Mappings {
   private val ukPostcodeRegex =
     """^(GIR\s?0AA|(?:(?:[A-Z]{1,2}\d[A-Z\d]?|\d[A-Z]{2})\s?\d[A-Z]{2}))$"""
 
-  def apply(): Form[UKAddress] = Form(
+  def apply(): Form[PartnershipCountryAddress] = Form(
     Forms.mapping(
       "addressLine1" ->
         text("partnershipAddress.error.addressLine1.required")
@@ -63,7 +63,7 @@ class PartnershipAddressFormProvider @Inject() extends Mappings {
                 ),
                 regexp(
                   firstCharLetterRegex,
-                  "partnershipAddress.error.addressLine2.firstCharMustBeLetter"
+                  "partnershipAddress.error.addressLine2.firstCharMustBeLetterOrNumber"
                 )
               )
             )
@@ -75,7 +75,7 @@ class PartnershipAddressFormProvider @Inject() extends Mappings {
             firstError(
               maxLength(35, "partnershipAddress.error.addressLine3.length"),
               regexp(allowedAddressCharsRegex, "partnershipAddress.error.addressLine3.invalidCharacters"),
-              regexp(firstCharLetterRegex, "partnershipAddress.error.addressLine3.firstCharMustBeLetter")
+              regexp(firstCharLetterRegex, "partnershipAddress.error.addressLine3.firstCharMustBeLetterOrNumber")
             )
           ),
       "addressLine4" ->
@@ -86,33 +86,23 @@ class PartnershipAddressFormProvider @Inject() extends Mappings {
               firstError(
                 maxLength(35, "partnershipAddress.error.addressLine4.length"),
                 regexp(allowedAddressCharsRegex, "partnershipAddress.error.addressLine4.invalidCharacters"),
-                regexp(firstCharLetterRegex, "partnershipAddress.error.addressLine4.firstCharMustBeLetter")
+                regexp(firstCharLetterRegex, "partnershipAddress.error.addressLine4.firstCharMustBeLetterOrNumber")
               )
             )
         ),
-      "postCode"     ->
-        text("partnershipAddress.error.postCode.required")
+      "postalCode" ->
+        text("partnershipAddress.error.postalCode.required")
           .transform(
             _.trim.toUpperCase.replaceAll("\\s+", " "),
             identity
           )
           .verifying(
             firstError(
-              maxLength(8, "partnershipAddress.error.postCode.length"),
-              regexp(ukPostcodeRegex, "partnershipAddress.error.postCode.invalid")
+              maxLength(8, "partnershipAddress.error.postalCode.length"),
+              regexp(ukPostcodeRegex, "partnershipAddress.error.postalCode.invalid")
             )
-          )
-    )((a1: String, a2: Option[String], a3: String, a4: Option[String], pc: String) => UKAddress(a1, a2, a3, a4, pc))(
-      address =>
-        Some(
-          (
-            address.addressLine1,
-            address.addressLine2,
-            address.addressLine3,
-            address.addressLine4,
-            address.postCode
-          )
-        )
-    )
+          ),
+      "country" -> text("partnershipAddress.country.error.required")
+    )(PartnershipCountryAddress.apply)(partnershipCountryAddress => Some(Tuple.fromProductTyped(partnershipCountryAddress)))
   )
 }

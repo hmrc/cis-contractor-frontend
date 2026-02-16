@@ -15,17 +15,33 @@
  *@
 
 @import viewmodels.InputWidth._
-@import viewmodels.InputWidth._
+@import utils.CountryOptions
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.select._
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukSelect
+@import config.FrontendAppConfig
+@import uk.gov.hmrc.govukfrontend.views.Implicits.RichSelect
+@import uk.gov.hmrc.hmrcfrontend.views.viewmodels.accessibleautocomplete.AccessibleAutocomplete
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.select.SelectItem
+@import models.add.PartnershipCountryAddress
+@import utils.InputOption
+@import viewmodels.govuk.all._
+@import play.api.data.Form
+@import play.api.mvc.Request
+@import play.api.i18n.Messages
+@import viewmodels.govuk.select._
+
+
 
 @this(
     layout: templates.Layout,
     formHelper: FormWithCSRF,
     govukErrorSummary: GovukErrorSummary,
     govukInput: GovukInput,
+govukSelect: GovukSelect,
     govukButton: GovukButton
 )
 
-@(form: Form[_], mode: Mode, partnershipName: String)(implicit request: Request[_], messages: Messages)
+@(form: Form[PartnershipCountryAddress], mode: Mode, partnershipName: String, countryOptions: Seq[InputOption])(implicit request: Request[_], appConfig: FrontendAppConfig, messages: Messages)
 
 @layout(pageTitle = title(form, messages("partnershipAddress.title"))) {
 
@@ -58,7 +74,7 @@
         field = form("addressLine3"),
         label = LabelViewModel(messages("partnershipAddress.addressLine3"))
         )
-        .withWidth(TwoThirds)
+        .withWidth(Full)
         )
 
         @govukInput(
@@ -66,16 +82,36 @@
         field = form("addressLine4"),
         label = LabelViewModel(messages("partnershipAddress.addressLine4"))
         )
-        .withWidth(TwoThirds)
+        .withWidth(Full)
         )
 
         @govukInput(
         InputViewModel(
-        field = form("postCode"),
-        label = LabelViewModel(messages("partnershipAddress.postCode"))
+        field = form("postalCode"),
+        label = LabelViewModel(messages("partnershipAddress.postalCode"))
         )
         .withWidth(Fixed10)
         )
+
+@govukSelect(
+SelectViewModel(
+field = form("country"),
+items = Seq(SelectItem(value = Some(""))) ++
+countryOptions
+.sortBy(_.label)
+.map(valueOption =>
+SelectItem(
+value = Some(valueOption.value),
+text = valueOption.label
+)
+),
+label = LabelViewModel(messages("partnershipAddress.country"))
+).withCssClass("govuk-input")
+.withFormGroupClasses("govuk-!-width-full")
+.withAttribute("aria-label" -> "country")
+.asAccessibleAutocomplete(Some(AccessibleAutocomplete(defaultValue = Some(""), showAllValues = false, autoSelect = false)))
+)
+
 
         @govukButton(
             ButtonViewModel(messages("site.continue"))

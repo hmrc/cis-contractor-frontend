@@ -16,9 +16,11 @@
 
 package controllers.add.partnership
 
+import config.FrontendAppConfig
 import controllers.actions.*
 import forms.add.partnership.PartnershipAddressFormProvider
 import models.Mode
+import models.add.PartnershipCountryAddress
 import navigation.Navigator
 import pages.add.partnership.{PartnershipAddressPage, PartnershipNamePage}
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -26,6 +28,7 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.add.partnership.PartnershipAddressView
+import utils.CountryOptions
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -38,9 +41,10 @@ class PartnershipAddressController @Inject()(
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   formProvider: PartnershipAddressFormProvider,
+  countryOptions: CountryOptions,
   val controllerComponents: MessagesControllerComponents,
   view: PartnershipAddressView
-)(implicit ec: ExecutionContext)
+)(implicit ec: ExecutionContext, appConfig: FrontendAppConfig)
     extends FrontendBaseController
     with I18nSupport {
 
@@ -55,7 +59,7 @@ class PartnershipAddressController @Inject()(
           case Some(value) => form.fill(value)
         }
 
-        Ok(view(preparedForm, mode, partnershipName))
+        Ok(view(preparedForm, mode, partnershipName, countryOptions.options()))
       }
       .getOrElse(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
   }
@@ -68,7 +72,8 @@ class PartnershipAddressController @Inject()(
           form
             .bindFromRequest()
             .fold(
-              formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, partnershipName))),
+              formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, partnershipName, countryOptions.options()))
+              ),
               value =>
                 for {
                   updatedAnswers <-

@@ -18,6 +18,7 @@ package viewmodels.checkAnswers.add.partnership
 
 import models.{CheckMode, UserAnswers}
 import pages.add.partnership.PartnershipAddressPage
+import models.add.PartnershipCountryAddress
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
@@ -35,7 +36,8 @@ object PartnershipAddressSummary {
         answer.addressLine2.getOrElse(""),
         answer.addressLine3,
         answer.addressLine4.getOrElse(""),
-        answer.postCode
+        answer.postalCode,
+        answer.country
       )
 
       val escapedWithBreaks: String =
@@ -50,7 +52,7 @@ object PartnershipAddressSummary {
         actions = Seq(
           ActionItemViewModel(
             "site.change",
-            controllers.add.routes.AddressOfSubcontractorController.onPageLoad(CheckMode).url
+            controllers.add.partnership.routes.PartnershipAddressController.onPageLoad(CheckMode).url
           ).withVisuallyHiddenText(messages("partnershipAddress.change.hidden"))
             .withAttribute("id" -> "address-of-partnership")
         )

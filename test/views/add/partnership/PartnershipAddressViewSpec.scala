@@ -18,23 +18,26 @@ package views.add.partnership
 
 import forms.add.partnership.PartnershipAddressFormProvider
 import models.NormalMode
+import models.add.PartnershipCountryAddress
 import org.jsoup.Jsoup
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.data.Form
-import play.api.i18n.Messages
+import play.api.i18n.{Messages, MessagesApi, MessagesImpl}
 import play.api.mvc.Request
 import play.api.test.FakeRequest
 import play.twirl.api.HtmlFormat
+import utils.InputOption
+import config.FrontendAppConfig
 import views.html.add.partnership.PartnershipAddressView
 
 class PartnershipAddressViewSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite {
 
-  "PartnerShipAddressOfSubcontractorView" should {
+  "PartnerShipAddressView" should {
     val testName = "Test Name"
     "render the page with title, heading, inputs and submit button" in new Setup {
-      val html: HtmlFormat.Appendable = view(form, NormalMode, testName)
+      val html: HtmlFormat.Appendable = view(form, NormalMode, testName, countryOptions)
       val doc                         = Jsoup.parse(html.toString())
 
       doc.select("title").text() must include(messages("partnershipAddress.title"))
@@ -50,23 +53,24 @@ class PartnershipAddressViewSpec extends AnyWordSpec with Matchers with GuiceOne
       doc.select("input[name=addressLine2]").size() mustBe 1
       doc.select("input[name=addressLine3]").size() mustBe 1
       doc.select("input[name=addressLine4]").size() mustBe 1
-      doc.select("input[name=postCode]").size() mustBe 1
+      doc.select("input[name=postalCode]").size() mustBe 1
+      doc.select("select[name=country]").size() mustBe 1
 
       doc.select(".govuk-button").text() mustBe messages("site.continue")
     }
 
     "display error summary and inline errors when required fields are missing" in new Setup {
-      val errorForm: Form[_] =
+      val errorForm: Form[PartnershipCountryAddress] =
         form
           .withError("addressLine1", "partnershipAddress.addressLine1.error.required")
-          .withError("postCode", "partnershipAddress.postCode.error.required")
+          .withError("postalCode", "partnershipAddress.postalCode.error.required")
 
-      val html = view(errorForm, NormalMode,testName)
+      val html = view(errorForm, NormalMode,testName, countryOptions)
       val doc  = Jsoup.parse(html.toString())
 
       val summary = doc.select(".govuk-error-summary")
       summary.text() must include(messages("partnershipAddress.addressLine1.error.required"))
-      summary.text() must include(messages("partnershipAddress.postCode.error.required"))
+      summary.text() must include(messages("partnershipAddress.postalCode.error.required"))
 
       summary.select("a").first().attr("href") mustBe "#addressLine1"
 
@@ -74,24 +78,28 @@ class PartnershipAddressViewSpec extends AnyWordSpec with Matchers with GuiceOne
         messages("partnershipAddress.addressLine1.error.required")
       )
 
-      doc.select("#postCode-error").text() must include(
-        messages("partnershipAddress.postCode.error.required")
+      doc.select("#postalCode-error").text() must include(
+        messages("partnershipAddress.postalCode.error.required")
       )
     }
   }
 
   trait Setup {
-    val formProvider  = new PartnershipAddressFormProvider()
-    val form: Form[_] = formProvider()
+    val formProvider: PartnershipAddressFormProvider = new PartnershipAddressFormProvider()
+    val form: Form[PartnershipCountryAddress] = formProvider()
 
     implicit val request: Request[_] = FakeRequest()
-    implicit val messages: Messages  =
-      play.api.i18n.MessagesImpl(
-        play.api.i18n.Lang.defaultLang,
-        app.injector.instanceOf[play.api.i18n.MessagesApi]
-      )
+    implicit val messages: Messages = MessagesImpl(
+      play.api.i18n.Lang.defaultLang,
+      app.injector.instanceOf[MessagesApi]
+    )
+    implicit val appConfig: FrontendAppConfig = app.injector.instanceOf[FrontendAppConfig]
 
-    val view: PartnershipAddressView =
-      app.injector.instanceOf[PartnershipAddressView]
+    val countryOptions: Seq[InputOption] = Seq(
+      InputOption("GB", "United Kingdom"),
+      InputOption("IN", "India")
+    )
+
+    val view: PartnershipAddressView = app.injector.instanceOf[PartnershipAddressView]
   }
 }

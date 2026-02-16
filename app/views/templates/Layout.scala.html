@@ -20,16 +20,30 @@
 @import uk.gov.hmrc.hmrcfrontend.views.html.components._
 @import uk.gov.hmrc.govukfrontend.views.html.components._
 @import uk.gov.hmrc.hmrcfrontend.views.viewmodels.hmrcstandardpage._
+@import views.html.helper.CSPNonce
 
 @this(
     appConfig: FrontendAppConfig,
     hmrcTimeoutDialog: HmrcTimeoutDialog,
     hmrcReportTechnicalIssueHelper: HmrcReportTechnicalIssueHelper,
+autocompleteJavascript : HmrcAccessibleAutocompleteJavascript,
+hmrcScripts: HmrcScripts,
+stylesheets: Stylesheets,
     alphaBanner: StandardAlphaBanner,
     hmrcStandardPage: HmrcStandardPage
 )
 
 @(pageTitle: String, showBackLink: Boolean = true, timeout: Boolean = true, showSignOut: Boolean = true, showHmrcBanner: Boolean = false)(contentBlock: Html)(implicit rh: RequestHeader, messages: Messages)
+
+@scripts = {
+@hmrcScripts()
+@autocompleteJavascript()
+<script>
+    window.GOVUKFrontend.initAll();
+</script>
+}
+
+
 
 @head = {
 
@@ -45,7 +59,8 @@
             message             = Some(messages("timeout.message")),
             language            = Some(messages.lang.code)
         ))
-    }
+    } else
+@stylesheets()
 }
 
 @content = {
@@ -56,7 +71,8 @@
 @hmrcStandardPage(HmrcStandardPageParams(
     pageTitle = Some(pageTitle),
     templateOverrides = TemplateOverrides(
-        additionalHeadBlock = Some(head)
+        additionalHeadBlock = Some(head),
+additionalScriptsBlock = Some(scripts)
     ),
     serviceURLs = ServiceURLs(
         serviceUrl = Some(routes.IndexController.onPageLoad().url),

@@ -19,7 +19,8 @@ package controllers.add.partnership
 import base.SpecBase
 import controllers.routes
 import forms.add.partnership.PartnershipAddressFormProvider
-import models.add.UKAddress
+import models.add.PartnershipCountryAddress
+import utils.CountryOptions
 import models.{NormalMode, UserAnswers}
 import navigation.Navigator
 import org.mockito.ArgumentCaptor
@@ -31,12 +32,17 @@ import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
+import play.api.libs.json.Json
 import repositories.SessionRepository
 import views.html.add.partnership.PartnershipAddressView
+import org.scalatest.matchers.must.Matchers
+import config.FrontendAppConfig
+
+
 
 import scala.concurrent.Future
 
-class PartnershipAddressControllerSpec extends SpecBase with MockitoSugar {
+class PartnershipAddressControllerSpec extends SpecBase with MockitoSugar with Matchers{
 
   private val formProvider = new PartnershipAddressFormProvider()
   private val form         = formProvider()
@@ -48,8 +54,23 @@ class PartnershipAddressControllerSpec extends SpecBase with MockitoSugar {
   private lazy val routeSubmit =
     controllers.add.partnership.routes.PartnershipAddressController.onSubmit(NormalMode).url
 
-  private def uaWithName: UserAnswers =
+  private def uaWithName: UserAnswers = {
     emptyUserAnswers.set(PartnershipNamePage, partnershipName).success.value
+  }
+    private val userAnswers = UserAnswers(
+      userAnswersId,
+      Json.obj(
+        PartnershipNamePage.toString -> Json.toJson(partnershipName),
+        PartnershipAddressPage.toString -> Json.obj(
+          "addressLine1" -> "value 1",
+          "addressLine2" -> "value 2",
+          "addressLine3" -> "value 3",
+          "addressLine4" -> "value 4",
+          "postalCode" -> "NX1 1AA",
+          "country" -> "United Kingdom"
+        )
+      )
+    )
 
   "PartnershipAddressController" - {
 
@@ -59,24 +80,27 @@ class PartnershipAddressControllerSpec extends SpecBase with MockitoSugar {
       running(application) {
         val request = FakeRequest(GET, routeLoad)
         val view    = application.injector.instanceOf[PartnershipAddressView]
-
+        val countryOptions = application.injector.instanceOf[CountryOptions]
+        val appConfig = application.injector.instanceOf[FrontendAppConfig]
+        implicit val msgs: play.api.i18n.Messages = messages(application)
         val result = route(application, request).value
 
-        status(result) mustEqual OK
+        status(result) mustBe OK
         contentType(result) mustBe Some("text/html")
         charset(result) mustBe Some("utf-8")
-        contentAsString(result) mustEqual
-          view(form, NormalMode, partnershipName)(request, messages(application)).toString
+        contentAsString(result) mustBe
+          view(form, NormalMode, partnershipName, countryOptions.options())(request, appConfig).toString
       }
     }
 
     "must populate the view correctly on a GET when the question has previously been answered and partnership name is present" in {
-      val expected = UKAddress(
+      val expected = PartnershipCountryAddress(
         addressLine1 = "line 1",
         addressLine2 = Some("line 2"),
         addressLine3 = "line 3",
         addressLine4 = Some("line 4"),
-        postCode = "NX1 1AA"
+        postalCode = "NX1 1AA",
+        country = "United Kingdom"
       )
 
       val ua = uaWithName
@@ -89,13 +113,26 @@ class PartnershipAddressControllerSpec extends SpecBase with MockitoSugar {
       running(application) {
         val request = FakeRequest(GET, routeLoad)
         val view    = application.injector.instanceOf[PartnershipAddressView]
+        val countryOptions = application.injector.instanceOf[CountryOptions]
+        val appConfig = application.injector.instanceOf[FrontendAppConfig]
+        implicit val msgs: play.api.i18n.Messages = messages(application)
         val result  = route(application, request).value
 
-        status(result) mustEqual OK
+        status(result) mustBe OK
+
+        val expected = PartnershipCountryAddress(
+          addressLine1 = "line 1",
+          addressLine2 = Some("line 2"),
+          addressLine3 = "line 3",
+          addressLine4 = Some("line 4"),
+          postalCode = "NX1 1AA",
+          country = "United Kingdom"
+        )
+
         contentType(result) mustBe Some("text/html")
         charset(result) mustBe Some("utf-8")
-        contentAsString(result) mustEqual
-          view(form.fill(expected), NormalMode, partnershipName)(request, messages(application)).toString
+        contentAsString(result) mustBe
+          view(form.fill(expected), NormalMode, partnershipName, countryOptions.options())(request, appConfig).toString
       }
     }
 
@@ -106,8 +143,8 @@ class PartnershipAddressControllerSpec extends SpecBase with MockitoSugar {
         val request = FakeRequest(GET, routeLoad)
         val result  = route(application, request).value
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result).value mustBe routes.JourneyRecoveryController.onPageLoad().url
       }
     }
 
@@ -118,8 +155,8 @@ class PartnershipAddressControllerSpec extends SpecBase with MockitoSugar {
         val request = FakeRequest(GET, routeLoad)
         val result  = route(application, request).value
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result).value mustBe routes.JourneyRecoveryController.onPageLoad().url
       }
     }
 
@@ -147,13 +184,14 @@ class PartnershipAddressControllerSpec extends SpecBase with MockitoSugar {
               "addressLine2" -> "value 2",
               "addressLine3" -> "value 3",
               "addressLine4" -> "value 4",
-              "postCode"     -> "NX1 1AA"
+              "postalCode"     -> "NX1 1AA",
+              "country"      -> "United Kingdom"
             )
 
         val result = route(application, request).value
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual "/dummy-next"
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result).value mustBe "/dummy-next"
 
         val uaCaptor = ArgumentCaptor.forClass(classOf[UserAnswers])
         verify(mockSessionRepository, times(1)).set(uaCaptor.capture())
@@ -163,7 +201,8 @@ class PartnershipAddressControllerSpec extends SpecBase with MockitoSugar {
         saved.addressLine2 mustBe Some("value 2")
         saved.addressLine3 mustBe "value 3"
         saved.addressLine4 mustBe Some("value 4")
-        saved.postCode mustBe "NX1 1AA"
+        saved.postalCode mustBe "NX1 1AA"
+        saved.country      mustBe "United Kingdom"
       }
     }
 
@@ -177,7 +216,8 @@ class PartnershipAddressControllerSpec extends SpecBase with MockitoSugar {
               "addressLine1" -> "",
               "addressLine2" -> "value 2",
               "addressLine3" -> "value 3",
-              "postCode"     -> "NX1 1AA"
+              "postalCode"     -> "NX1 1AA",
+              "country"      -> "United Kingdom"
             )
 
         val boundForm = form.bind(
@@ -185,16 +225,20 @@ class PartnershipAddressControllerSpec extends SpecBase with MockitoSugar {
             "addressLine1" -> "",
             "addressLine2" -> "value 2",
             "addressLine3" -> "value 3",
-            "postCode"     -> "NX1 1AA"
+            "postalCode"     -> "NX1 1AA",
+            "country"      -> "United Kingdom"
           )
         )
 
         val view   = application.injector.instanceOf[PartnershipAddressView]
+        val countryOptions = application.injector.instanceOf[CountryOptions]
+        val appConfig = application.injector.instanceOf[FrontendAppConfig]
+        implicit val msgs: play.api.i18n.Messages = messages(application)
         val result = route(application, request).value
 
-        status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual
-          view(boundForm, NormalMode, partnershipName)(request, messages(application)).toString
+        status(result) mustBe BAD_REQUEST
+        contentAsString(result) mustBe
+          view(boundForm, NormalMode, partnershipName, countryOptions.options())(request, appConfig).toString
       }
     }
 
@@ -213,13 +257,14 @@ class PartnershipAddressControllerSpec extends SpecBase with MockitoSugar {
             .withFormUrlEncodedBody(
               "addressLine1" -> "value 1",
               "addressLine3" -> "value 3",
-              "postCode"     -> "NX1 1AA"
+              "postalCode"     -> "NX1 1AA",
+              "country"      -> "United Kingdom"
             )
 
         val result = route(application, request).value
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result).value mustBe routes.JourneyRecoveryController.onPageLoad().url
       }
     }
 
@@ -232,13 +277,14 @@ class PartnershipAddressControllerSpec extends SpecBase with MockitoSugar {
             .withFormUrlEncodedBody(
               "addressLine1" -> "value 1",
               "addressLine3" -> "value 3",
-              "postCode"     -> "NX1 1AA"
+              "postalCode"     -> "NX1 1AA",
+              "country"      -> "United Kingdom"
             )
 
         val result = route(application, request).value
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result).value mustBe routes.JourneyRecoveryController.onPageLoad().url
       }
     }
 
@@ -264,7 +310,8 @@ class PartnershipAddressControllerSpec extends SpecBase with MockitoSugar {
             .withFormUrlEncodedBody(
               "addressLine1" -> "value 1",
               "addressLine3" -> "value 3",
-              "postCode"     -> "NX1 1AA"
+              "postalCode"     -> "NX1 1AA",
+              "country"      -> "United Kingdom"
             )
 
         val thrown = intercept[RuntimeException] {
