@@ -1,0 +1,50 @@
+/*
+ * Copyright 2025 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package models.add
+
+import play.api.libs.json.*
+import play.api.libs.json.{Json, OFormat}
+
+
+case class PartnershipCountryAddress(
+                      addressLine1: String,
+                      addressLine2: Option[String],
+                      addressLine3: String,
+                      addressLine4: Option[String],
+                      postalCode: String,
+                      country: String
+                    )
+
+//
+//val field1: String = HtmlFormat.escape(addressLine1).toString + "<br>"
+//val field2: String = if addressLine2.isDefined then HtmlFormat.escape(addressLine2.mkString("")).body + "<br>" else ""
+//val field3: String = HtmlFormat.escape(addressLine3).toString + "<br>"
+//val field4: String = if addressLine4.isDefined then HtmlFormat.escape(addressLine4.mkString("")).body + "<br>" else ""
+//val postcode: String = HtmlFormat.escape(postalCode).toString + "<br>"
+//val fullAddress: String = field1 + field2 + field3 + field4 + postcode
+//
+//def getAddressList(countryOptions: CountryOptions)(using messages: Messages): List[String] = {
+//  val country = countryOptions.getCountryNameFromCode(countryCode)
+//  List(addressLine1, addressLine2.getOrElse(""), addressLine3, addressLine4.getOrElse(""), postalCode, country).filter(_.nonEmpty)
+//}
+
+
+
+object PartnershipCountryAddress {
+
+  implicit val format: OFormat[PartnershipCountryAddress] = Json.format[PartnershipCountryAddress]
+}
