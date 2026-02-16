@@ -38,6 +38,8 @@
             @govukErrorSummary(ErrorSummaryViewModel(form))
         }
 
+        @heading(messages("partnershipUniqueTaxpayerReference.heading"))
+
         @paragraph(messages("partnershipUniqueTaxpayerReference.paragraph"))
 
         @link(
@@ -49,7 +51,7 @@
         @govukInput(
             InputViewModel(
                 field = form("value"),
-                label = LabelViewModel(messages("partnershipUniqueTaxpayerReference.heading2", name)).asPageHeading().withCssClass("govuk-fieldset__legend--l")
+                label = LabelViewModel(messages("partnershipUniqueTaxpayerReference.heading2", name)).withCssClass("govuk-label--m")
             )
             .withWidth(Fixed10)
             .withHint(Hint(
