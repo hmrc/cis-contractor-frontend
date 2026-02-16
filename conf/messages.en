@@ -292,6 +292,8 @@ partnershipUniqueTaxpayerReference.error.required = Enter a valid Unique Taxpaye
 partnershipUniqueTaxpayerReference.error.invalid = Enter a valid Unique Taxpayer Reference (UTR) using 10 numbers, like 1234567890
 partnershipUniqueTaxpayerReference.error.length = Enter a valid Unique Taxpayer Reference (UTR) using 10 numbers, like 1234567890
 partnershipUniqueTaxpayerReference.error.duplicate = You have already used this Unique Taxpayer Reference (UTR) for an existing subcontractor
+partnershipUniqueTaxpayerReference.checkYourAnswersLabel = Unique Taxpayer Reference
+partnershipUniqueTaxpayerReference.change.hidden = Unique Taxpayer Reference
 
 partnershipHasUtrYesNo.title = Does this partnership have a Unique Taxpayer Reference (UTR)?
 partnershipHasUtrYesNo.heading = Does {0} have a Unique Taxpayer Reference (UTR)?
@@ -351,6 +353,8 @@ partnershipNominatedPartnerUtr.paragraph = The UTR will be on tax returns and ot
 partnershipNominatedPartnerUtr.linkText = Get more help to find a UTR (opens in new tab)
 partnershipNominatedPartnerUtr.heading2 = What is the Self Assessment UTR for {0}?
 partnershipNominatedPartnerUtr.hint = A UTR is a 10 digit number
+partnershipNominatedPartnerUtr.checkYourAnswersLabel = Nominated partner Unique Taxpayer Reference
 partnershipNominatedPartnerUtr.error.required = Enter a valid Unique Taxpayer Reference (UTR), like 1234567890
 partnershipNominatedPartnerUtr.error.length = Enter a valid Unique Taxpayer Reference (UTR) using 10 digits
 partnershipNominatedPartnerUtr.error.invalid = Enter a valid Unique Taxpayer Reference (UTR) using 10 digits
+partnershipNominatedPartnerUtr.change.hidden = Nominated partner Unique Taxpayer Reference
