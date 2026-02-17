@@ -344,3 +344,10 @@ partnershipNominatedPartnerCrnYesNo.hint = This only applies if they are a corpo
 partnershipNominatedPartnerCrnYesNo.checkYourAnswersLabel = Nominated partner has a company registration number
 partnershipNominatedPartnerCrnYesNo.error.required = Select whether this nominated partner has a company registration number
 partnershipNominatedPartnerCrnYesNo.change.hidden = nominated partner has a company registration number
+
+companyName.title = companyName
+companyName.heading = companyName
+companyName.checkYourAnswersLabel = companyName
+companyName.error.required = Enter companyName
+companyName.error.length = CompanyName must be 100 characters or less
+companyName.change.hidden = CompanyName
