@@ -31,7 +31,7 @@ class PartnershipNominatedPartnerNinoFormProvider extends Mappings {
 
   private val lengthConstraint: Constraint[String] =
     Constraint("constraints.nino.length") { value =>
-      if (normalised(value).length <= maxLength) {
+      if (value.length <= maxLength) {
         Valid
       } else {
         Invalid("partnershipNominatedPartnerNino.error.length")
@@ -42,6 +42,7 @@ class PartnershipNominatedPartnerNinoFormProvider extends Mappings {
     Form(
       single(
         "value" -> text("partnershipNominatedPartnerNino.error.required")
+          .transform(s => normalised(s), identity)
           .verifying(lengthConstraint)
           .verifying(Validation.isNinoValid("value", "partnershipNominatedPartnerNino.error.invalidCharacters"))
       )
