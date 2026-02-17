@@ -31,14 +31,11 @@ class PartnershipNominatedPartnerNinoFormProvider extends Mappings {
 
   private val lengthConstraint: Constraint[String] =
     Constraint("constraints.nino.length") { value =>
-      if (normalised(value).length <= maxLength) Valid
-      else Invalid("partnershipNominatedPartnerNino.error.length")
-    }
-
-  private val formatConstraint: Constraint[String] =
-    Constraint("constraints.nino.format") { value =>
-      if (value.matches(Validation.ninoRegex)) Valid
-      else Invalid("partnershipNominatedPartnerNino.error.invalidCharacters")
+      if (normalised(value).length <= maxLength) {
+        Valid
+      } else {
+        Invalid("partnershipNominatedPartnerNino.error.length")
+      }
     }
 
   def apply(): Form[String] =
@@ -46,7 +43,7 @@ class PartnershipNominatedPartnerNinoFormProvider extends Mappings {
       single(
         "value" -> text("partnershipNominatedPartnerNino.error.required")
           .verifying(lengthConstraint)
-          .verifying(formatConstraint)
+          .verifying(Validation.isNinoValid("value", "partnershipNominatedPartnerNino.error.invalidCharacters"))
       )
     )
 }

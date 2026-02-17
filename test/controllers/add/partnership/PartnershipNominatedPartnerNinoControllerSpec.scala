@@ -110,7 +110,8 @@ class PartnershipNominatedPartnerNinoControllerSpec extends SpecBase with Mockit
       val mockSubcontractorService = mock[SubcontractorService]
 
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
-      when(mockSubcontractorService.updateSubcontractor(any[UserAnswers])(any[HeaderCarrier])) thenReturn Future.successful(())
+      when(mockSubcontractorService.updateSubcontractor(any[UserAnswers])(any[HeaderCarrier])) thenReturn Future
+        .successful(())
 
       val application =
         applicationBuilder(
@@ -133,7 +134,11 @@ class PartnershipNominatedPartnerNinoControllerSpec extends SpecBase with Mockit
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.add.partnership.routes.PartnershipNominatedPartnerNinoController.onPageLoad(NormalMode).url
+        redirectLocation(
+          result
+        ).value mustEqual controllers.add.partnership.routes.PartnershipNominatedPartnerNinoController
+          .onPageLoad(NormalMode)
+          .url
 
       }
 

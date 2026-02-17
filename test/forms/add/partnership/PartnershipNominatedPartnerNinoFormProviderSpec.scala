@@ -57,11 +57,6 @@ class PartnershipNominatedPartnerNinoFormProviderSpec extends AnyFreeSpec with M
       bound.errors.map(_.message) must contain("partnershipNominatedPartnerNino.error.invalidCharacters")
     }
 
-    "allow no suffix letter" in {
-      val bound = form.bind(Map("value" -> "AB123456"))
-      bound.hasErrors mustBe false
-    }
-
     "reject disallowed prefix letters (e.g. Q)" in {
       val bound = form.bind(Map("value" -> "QQ123456C"))
       bound.hasErrors mustBe true
