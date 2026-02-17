@@ -32,7 +32,6 @@ import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import play.api.libs.json.Json
 import repositories.SessionRepository
 import views.html.add.partnership.PartnershipAddressView
 import org.scalatest.matchers.must.Matchers
@@ -54,20 +53,6 @@ class PartnershipAddressControllerSpec extends SpecBase with MockitoSugar with M
 
   private def uaWithName: UserAnswers =
     emptyUserAnswers.set(PartnershipNamePage, partnershipName).success.value
-  private val userAnswers             = UserAnswers(
-    userAnswersId,
-    Json.obj(
-      PartnershipNamePage.toString    -> Json.toJson(partnershipName),
-      PartnershipAddressPage.toString -> Json.obj(
-        "addressLine1" -> "value 1",
-        "addressLine2" -> "value 2",
-        "addressLine3" -> "value 3",
-        "addressLine4" -> "value 4",
-        "postalCode"   -> "NX1 1AA",
-        "country"      -> "United Kingdom"
-      )
-    )
-  )
 
   "PartnershipAddressController" - {
 

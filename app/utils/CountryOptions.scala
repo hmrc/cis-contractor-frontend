@@ -23,8 +23,8 @@ import javax.inject.{Inject, Singleton}
 class CountryOptions @Inject() (config: FrontendAppConfig) {
 
   def options(): Seq[InputOption] =
-    config.locationCanonicalList.map { case (name, code) =>
-      InputOption(value = code, label = name)
+    config.locationCanonicalList.map { case (name, _) =>
+      InputOption(value = name, label = name)
     }
 
   def getCountryNameFromCode(code: String): String =
