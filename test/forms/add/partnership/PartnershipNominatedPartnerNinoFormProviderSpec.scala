@@ -39,6 +39,13 @@ class PartnershipNominatedPartnerNinoFormProviderSpec extends AnyFreeSpec with M
       }
     }
 
+    "bind and normalise data make sure whitespace are removed" in {
+      val data   = Map("value" -> "   AB 12 34 56 C ")
+      val result = form.bind(data)
+      result.errors mustBe empty
+      result.value mustBe Some("AB123456C")
+    }
+
     "error when empty" in {
       val bound = form.bind(Map("value" -> ""))
       bound.hasErrors mustBe true

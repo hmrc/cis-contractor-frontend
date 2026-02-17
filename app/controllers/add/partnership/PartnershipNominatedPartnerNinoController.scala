@@ -24,7 +24,6 @@ import pages.add.partnership.{PartnershipNominatedPartnerNamePage, PartnershipNo
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
-import services.SubcontractorService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.add.partnership.PartnershipNominatedPartnerNinoView
 
@@ -39,7 +38,6 @@ class PartnershipNominatedPartnerNinoController @Inject() (
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   formProvider: PartnershipNominatedPartnerNinoFormProvider,
-  subcontractorService: SubcontractorService,
   val controllerComponents: MessagesControllerComponents,
   view: PartnershipNominatedPartnerNinoView
 )(implicit ec: ExecutionContext)
@@ -55,7 +53,6 @@ class PartnershipNominatedPartnerNinoController @Inject() (
         .map { nominatedPartnerName =>
           val preparedForm =
             request.userAnswers.get(PartnershipNominatedPartnerNinoPage).fold(form)(form.fill)
-
           Ok(view(preparedForm, mode, nominatedPartnerName))
         }
         .getOrElse(
@@ -76,7 +73,6 @@ class PartnershipNominatedPartnerNinoController @Inject() (
                 for {
                   updatedAnswers <- Future.fromTry(request.userAnswers.set(PartnershipNominatedPartnerNinoPage, value))
                   _              <- sessionRepository.set(updatedAnswers)
-                  _              <- subcontractorService.updateSubcontractor(updatedAnswers)
                 } yield Redirect(navigator.nextPage(PartnershipNominatedPartnerNinoPage, mode, updatedAnswers))
             )
         }

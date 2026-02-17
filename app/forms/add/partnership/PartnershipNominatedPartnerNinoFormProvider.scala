@@ -38,13 +38,20 @@ class PartnershipNominatedPartnerNinoFormProvider extends Mappings {
       }
     }
 
+  private val firstErrorConstraint: Constraint[String] =
+    Constraint("constraints.nino.firstError") { value =>
+      lengthConstraint(value) match {
+        case i: Invalid => i
+        case Valid      => Validation.isNinoValid("value", "partnershipNominatedPartnerNino.error.invalidCharacters")(value)
+      }
+    }
+
   def apply(): Form[String] =
     Form(
       single(
         "value" -> text("partnershipNominatedPartnerNino.error.required")
           .transform(s => normalised(s), identity)
-          .verifying(lengthConstraint)
-          .verifying(Validation.isNinoValid("value", "partnershipNominatedPartnerNino.error.invalidCharacters"))
+          .verifying(firstErrorConstraint)
       )
     )
 }

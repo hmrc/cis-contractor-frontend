@@ -307,7 +307,7 @@ partnershipNominatedPartnerNino.error.required = Enter a valid National Insuranc
 partnershipNominatedPartnerNino.error.invalidCharacters = Enter a valid National Insurance Number like QQ 12 34 56 C
 partnershipNominatedPartnerNino.error.length = Enter a valid National Insurance Number up to 9 characters, like QQ 12 34 56 C
 partnershipNominatedPartnerNino.checkYourAnswersLabel = National Insurance number for nominated partner
-partnershipNominatedPartnerNino.change.hidden = National Insurance number for nominated partner
+partnershipNominatedPartnerNino.change.hidden = national Insurance number for nominated partner
 
 
 partnershipAddressYesNo.title = Do you want to add an address for this partnership?

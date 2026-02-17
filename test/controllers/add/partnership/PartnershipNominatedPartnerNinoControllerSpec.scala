@@ -22,20 +22,16 @@ import forms.add.partnership.PartnershipNominatedPartnerNinoFormProvider
 import models.{NormalMode, UserAnswers}
 import navigation.Navigator
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.{verify, verifyNoMoreInteractions, when}
+import org.mockito.Mockito.{verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import pages.add.partnership.{PartnershipNominatedPartnerNamePage, PartnershipNominatedPartnerNinoPage}
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import repositories.SessionRepository
-import services.SubcontractorService
-import uk.gov.hmrc.http.HeaderCarrier
 import views.html.add.partnership.PartnershipNominatedPartnerNinoView
 
 import scala.concurrent.Future
-import scala.concurrent.Await
-import scala.concurrent.duration.*
 
 class PartnershipNominatedPartnerNinoControllerSpec extends SpecBase with MockitoSugar {
 
@@ -106,12 +102,9 @@ class PartnershipNominatedPartnerNinoControllerSpec extends SpecBase with Mockit
     }
 
     "must redirect when valid data is submitted" in {
-      val mockSessionRepository    = mock[SessionRepository]
-      val mockSubcontractorService = mock[SubcontractorService]
+      val mockSessionRepository = mock[SessionRepository]
 
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
-      when(mockSubcontractorService.updateSubcontractor(any[UserAnswers])(any[HeaderCarrier])) thenReturn Future
-        .successful(())
 
       val application =
         applicationBuilder(
@@ -121,7 +114,6 @@ class PartnershipNominatedPartnerNinoControllerSpec extends SpecBase with Mockit
         )
           .overrides(
             bind[SessionRepository].toInstance(mockSessionRepository),
-            bind[SubcontractorService].toInstance(mockSubcontractorService),
             bind[Navigator].toInstance(new Navigator())
           )
           .build()
@@ -143,8 +135,6 @@ class PartnershipNominatedPartnerNinoControllerSpec extends SpecBase with Mockit
       }
 
       verify(mockSessionRepository).set(any())
-      verify(mockSubcontractorService).updateSubcontractor(any[UserAnswers])(any[HeaderCarrier])
-      verifyNoMoreInteractions(mockSubcontractorService)
     }
 
     "must return a Bad Request and errors when invalid data is submitted" in {
