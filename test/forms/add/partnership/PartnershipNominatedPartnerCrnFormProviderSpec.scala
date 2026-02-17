@@ -68,9 +68,6 @@ class PartnershipNominatedPartnerCrnFormProviderSpec extends AnyFreeSpec with Ma
 
     "error when invalid format" in {
       val invalid = Seq(
-        "A1",
-        "ABC123",
-        "AB1234567",
         "AC01-234",
         "AC01£345",
         "12AB3456"

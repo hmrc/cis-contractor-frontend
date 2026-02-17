@@ -338,7 +338,7 @@ partnershipNominatedPartnerCrn.error.required = Enter a company registration num
 partnershipNominatedPartnerCrn.error.length = Enter a valid company registration number
 partnershipNominatedPartnerCrn.error.invalidCharacters = Enter a valid company registration number
 partnershipNominatedPartnerCrn.checkYourAnswersLabel = Company registration number for nominated partner
-partnershipNominatedPartnerCrn.change.hidden = Company registration number for nominated partner
+partnershipNominatedPartnerCrn.change.hidden = company registration number for nominated partner
 
 partnershipAddressYesNo.title = Do you want to add an address for this partnership?
 partnershipAddressYesNo.heading = Do you want to add an address for {0}?
