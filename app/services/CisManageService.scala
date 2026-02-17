@@ -36,22 +36,11 @@ class CisManageService @Inject() (
       case Some(cisId) => Future.successful(userAnswers)
       case None        =>
         cisConnector.getCisTaxpayer().flatMap { tp =>
-          val cisIdString = tp.uniqueId.trim
-          if (cisIdString.isEmpty) {
+          val cisId = tp.uniqueId.trim
+          if (cisId.isEmpty) {
             Future.failed(new RuntimeException("Empty cisId (uniqueId) returned from /cis/taxpayer"))
           } else {
-            val cisIdFuture: Future[Int] =
-              cisIdString.toIntOption match {
-                case Some(value) => Future.successful(value)
-                case None        =>
-                  Future.failed(
-                    new RuntimeException(
-                      "Invalid data format: cisId (uniqueId) returned from /cis/taxpayer"
-                    )
-                  )
-              }
             for {
-              cisId              <- cisIdFuture
               updatedUserAnswers <- Future.fromTry(userAnswers.set(CisIdQuery, cisId))
             } yield updatedUserAnswers
           }

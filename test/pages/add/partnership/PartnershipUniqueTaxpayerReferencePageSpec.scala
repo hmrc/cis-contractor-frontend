@@ -14,14 +14,19 @@
  * limitations under the License.
  */
 
-package models.subcontractor
+package pages.add.partnership
 
-import play.api.libs.json.{Json, OFormat}
+import pages.behaviours.PageBehaviours
 
-final case class CreateSubcontractorResponse(
-  subbieResourceRef: Int
-)
+class PartnershipUniqueTaxpayerReferencePageSpec extends PageBehaviours {
 
-object CreateSubcontractorResponse {
-  implicit val format: OFormat[CreateSubcontractorResponse] = Json.format[CreateSubcontractorResponse]
+  "PartnershipNominatedPartnerUtr" - {
+
+    beRetrievable[String](PartnershipUniqueTaxpayerReferencePage)
+
+    beSettable[String](PartnershipUniqueTaxpayerReferencePage)
+
+    beRemovable[String](PartnershipUniqueTaxpayerReferencePage)
+
+  }
 }

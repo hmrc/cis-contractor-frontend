@@ -14,10 +14,21 @@
  * limitations under the License.
  */
 
-package queries
+package forms.add.partnership
 
-import play.api.libs.json.JsPath
+import forms.mappings.Mappings
+import play.api.data.Form
 
-case object CisIdQuery extends Gettable[String] with Settable[String] {
-  override def path: JsPath = JsPath \ "cisId"
+import javax.inject.Inject
+
+class PartnershipNominatedPartnerUtrFormProvider @Inject() extends Mappings {
+
+  def apply(): Form[String] =
+    Form(
+      "value" -> utr(
+        requiredKey = "partnershipNominatedPartnerUtr.error.required",
+        invalidKey = "partnershipNominatedPartnerUtr.error.invalid",
+        lengthKey = "partnershipNominatedPartnerUtr.error.length"
+      )
+    )
 }

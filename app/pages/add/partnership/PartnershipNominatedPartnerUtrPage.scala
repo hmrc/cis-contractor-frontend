@@ -14,17 +14,14 @@
  * limitations under the License.
  */
 
-package models.subcontractor
+package pages.add.partnership
 
-import models.add.TypeOfSubcontractor
-import play.api.libs.json.{Json, OFormat}
+import pages.QuestionPage
+import play.api.libs.json.JsPath
 
-final case class CreateSubcontractorRequest(
-  schemeId: Int,
-  subcontractorType: TypeOfSubcontractor,
-  version: Int
-)
+case object PartnershipNominatedPartnerUtrPage extends QuestionPage[String] {
 
-object CreateSubcontractorRequest {
-  implicit val format: OFormat[CreateSubcontractorRequest] = Json.format[CreateSubcontractorRequest]
+  override def path: JsPath = JsPath \ toString
+
+  override def toString: String = "partnershipNominatedPartnerUtr"
 }

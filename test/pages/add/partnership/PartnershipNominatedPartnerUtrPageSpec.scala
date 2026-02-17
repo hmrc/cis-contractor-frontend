@@ -14,10 +14,19 @@
  * limitations under the License.
  */
 
-package queries
+package pages.add.partnership
 
-import play.api.libs.json.JsPath
+import pages.behaviours.PageBehaviours
 
-case object CisIdQuery extends Gettable[String] with Settable[String] {
-  override def path: JsPath = JsPath \ "cisId"
+class PartnershipNominatedPartnerUtrPageSpec extends PageBehaviours {
+
+  "PartnershipNominatedPartnerUtr" - {
+
+    beRetrievable[String](PartnershipNominatedPartnerUtrPage)
+
+    beSettable[String](PartnershipNominatedPartnerUtrPage)
+
+    beRemovable[String](PartnershipNominatedPartnerUtrPage)
+
+  }
 }
