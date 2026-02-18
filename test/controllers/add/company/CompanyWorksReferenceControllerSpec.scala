@@ -18,44 +18,43 @@ package controllers.add.company
 
 import base.SpecBase
 import controllers.routes
-import forms.add.company.CompanyWorksReferenceYesNoFormProvider
+import forms.add.company.CompanyWorksReferenceFormProvider
 import models.{NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.add.company.CompanyWorksReferenceYesNoPage
+import pages.add.company.CompanyWorksReferencePage
 import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import repositories.SessionRepository
-import views.html.add.company.CompanyWorksReferenceYesNoView
+import views.html.add.company.CompanyWorksReferenceView
 
 import scala.concurrent.Future
 
-class CompanyWorksReferenceYesNoControllerSpec extends SpecBase with MockitoSugar {
+class CompanyWorksReferenceControllerSpec extends SpecBase with MockitoSugar {
 
   def onwardRoute = Call("GET", "/foo")
 
-  val formProvider = new CompanyWorksReferenceYesNoFormProvider()
-  val form         = formProvider()
+  val formProvider = new CompanyWorksReferenceFormProvider()
+  val form = formProvider()
 
-  lazy val companyWorksReferenceYesNoRoute =
-    controllers.add.company.routes.CompanyWorksReferenceYesNoController.onPageLoad(NormalMode).url
+  lazy val companyWorksReferenceRoute = controllers.add.company.routes.CompanyWorksReferenceController.onPageLoad(NormalMode).url
 
-  "CompanyWorksReferenceYesNo Controller" - {
+  "CompanyWorksReference Controller" - {
 
     "must return OK and the correct view for a GET" in {
 
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
       running(application) {
-        val request = FakeRequest(GET, companyWorksReferenceYesNoRoute)
+        val request = FakeRequest(GET, companyWorksReferenceRoute)
 
         val result = route(application, request).value
 
-        val view = application.injector.instanceOf[CompanyWorksReferenceYesNoView]
+        val view = application.injector.instanceOf[CompanyWorksReferenceView]
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
@@ -64,19 +63,19 @@ class CompanyWorksReferenceYesNoControllerSpec extends SpecBase with MockitoSuga
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = UserAnswers(userAnswersId).set(CompanyWorksReferenceYesNoPage, true).success.value
+      val userAnswers = UserAnswers(userAnswersId).set(CompanyWorksReferencePage, "answer").success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
       running(application) {
-        val request = FakeRequest(GET, companyWorksReferenceYesNoRoute)
+        val request = FakeRequest(GET, companyWorksReferenceRoute)
 
-        val view = application.injector.instanceOf[CompanyWorksReferenceYesNoView]
+        val view = application.injector.instanceOf[CompanyWorksReferenceView]
 
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(true), NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill("answer"), NormalMode)(request, messages(application)).toString
       }
     }
 
@@ -96,8 +95,8 @@ class CompanyWorksReferenceYesNoControllerSpec extends SpecBase with MockitoSuga
 
       running(application) {
         val request =
-          FakeRequest(POST, companyWorksReferenceYesNoRoute)
-            .withFormUrlEncodedBody(("value", "true"))
+          FakeRequest(POST, companyWorksReferenceRoute)
+            .withFormUrlEncodedBody(("value", "answer"))
 
         val result = route(application, request).value
 
@@ -112,12 +111,12 @@ class CompanyWorksReferenceYesNoControllerSpec extends SpecBase with MockitoSuga
 
       running(application) {
         val request =
-          FakeRequest(POST, companyWorksReferenceYesNoRoute)
+          FakeRequest(POST, companyWorksReferenceRoute)
             .withFormUrlEncodedBody(("value", ""))
 
         val boundForm = form.bind(Map("value" -> ""))
 
-        val view = application.injector.instanceOf[CompanyWorksReferenceYesNoView]
+        val view = application.injector.instanceOf[CompanyWorksReferenceView]
 
         val result = route(application, request).value
 
@@ -131,7 +130,7 @@ class CompanyWorksReferenceYesNoControllerSpec extends SpecBase with MockitoSuga
       val application = applicationBuilder(userAnswers = None).build()
 
       running(application) {
-        val request = FakeRequest(GET, companyWorksReferenceYesNoRoute)
+        val request = FakeRequest(GET, companyWorksReferenceRoute)
 
         val result = route(application, request).value
 
@@ -146,8 +145,8 @@ class CompanyWorksReferenceYesNoControllerSpec extends SpecBase with MockitoSuga
 
       running(application) {
         val request =
-          FakeRequest(POST, companyWorksReferenceYesNoRoute)
-            .withFormUrlEncodedBody(("value", "true"))
+          FakeRequest(POST, companyWorksReferenceRoute)
+            .withFormUrlEncodedBody(("value", "answer"))
 
         val result = route(application, request).value
 

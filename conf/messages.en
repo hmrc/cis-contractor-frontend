@@ -425,3 +425,10 @@ companyWorksReferenceYesNo.heading = companyWorksReferenceYesNo
 companyWorksReferenceYesNo.checkYourAnswersLabel = companyWorksReferenceYesNo
 companyWorksReferenceYesNo.error.required = Select yes if companyWorksReferenceYesNo
 companyWorksReferenceYesNo.change.hidden = CompanyWorksReferenceYesNo
+
+companyWorksReference.title = companyWorksReference
+companyWorksReference.heading = companyWorksReference
+companyWorksReference.checkYourAnswersLabel = companyWorksReference
+companyWorksReference.error.required = Enter companyWorksReference
+companyWorksReference.error.length = CompanyWorksReference must be 100 characters or less
+companyWorksReference.change.hidden = CompanyWorksReference
