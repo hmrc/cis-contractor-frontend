@@ -30,20 +30,20 @@
 
 @(form: Form[_], mode: Mode, name: String)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = title(form, messages("partnershipUniqueTaxpayerReference.title"))) {
+@layout(pageTitle = title(form, messages("partnershipNominatedPartnerUtr.title"))) {
 
-    @formHelper(action = controllers.add.partnership.routes.PartnershipUniqueTaxpayerReferenceController.onSubmit(mode)) {
+    @formHelper(action = controllers.add.partnership.routes.PartnershipNominatedPartnerUtrController.onSubmit(mode)) {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form))
         }
 
-        @heading(messages("partnershipUniqueTaxpayerReference.heading"))
+        @heading(messages("partnershipNominatedPartnerUtr.heading"))
 
-        @paragraph(messages("partnershipUniqueTaxpayerReference.paragraph"))
+        @paragraph(messages("partnershipNominatedPartnerUtr.paragraph"))
 
         @link(
-           linkTextKey = "partnershipUniqueTaxpayerReference.linkText",
+           linkTextKey = "partnershipNominatedPartnerUtr.linkText",
            linkUrl = "https://www.gov.uk/find-utr-number",
            isNewTab = true
         )
@@ -51,11 +51,11 @@
         @govukInput(
             InputViewModel(
                 field = form("value"),
-                label = LabelViewModel(messages("partnershipUniqueTaxpayerReference.heading2", name)).withCssClass("govuk-label--m")
+                label = LabelViewModel(messages("partnershipNominatedPartnerUtr.heading2", name)).withCssClass("govuk-label--m")
             )
             .withWidth(Fixed10)
             .withHint(Hint(
-                content = Messages("partnershipUniqueTaxpayerReference.hint"))
+                content = Messages("partnershipNominatedPartnerUtr.hint"))
             )
             .withSpellcheck(false)
             .withAutocomplete("off")
@@ -66,3 +66,4 @@
         )
     }
 }
+
