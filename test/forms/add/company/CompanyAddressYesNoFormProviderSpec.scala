@@ -16,33 +16,25 @@
 
 package forms.add.company
 
-import forms.add.company.CompanyNameFormProvider
-import forms.behaviours.StringFieldBehaviours
+import forms.add.company.CompanyAddressYesNoFormProvider
+import forms.behaviours.BooleanFieldBehaviours
 import play.api.data.FormError
 
-class CompanyNameFormProviderSpec extends StringFieldBehaviours {
+class CompanyAddressYesNoFormProviderSpec extends BooleanFieldBehaviours {
 
-  val requiredKey = "companyName.error.required"
-  val lengthKey   = "companyName.error.length"
-  val maxLength   = 100
+  val requiredKey = "companyAddressYesNo.error.required"
+  val invalidKey = "error.boolean"
 
-  val form = new CompanyNameFormProvider()()
+  val form = new CompanyAddressYesNoFormProvider()()
 
   ".value" - {
 
     val fieldName = "value"
 
-    behave like fieldThatBindsValidData(
+    behave like booleanField(
       form,
       fieldName,
-      stringsWithMaxLength(maxLength)
-    )
-
-    behave like fieldWithMaxLength(
-      form,
-      fieldName,
-      maxLength = maxLength,
-      lengthError = FormError(fieldName, lengthKey, Seq(maxLength))
+      invalidError = FormError(fieldName, invalidKey)
     )
 
     behave like mandatoryField(

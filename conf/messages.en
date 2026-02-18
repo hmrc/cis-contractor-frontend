@@ -351,3 +351,9 @@ companyName.checkYourAnswersLabel = companyName
 companyName.error.required = Enter companyName
 companyName.error.length = CompanyName must be 100 characters or less
 companyName.change.hidden = CompanyName
+
+companyAddressYesNo.title = companyAddressYesNo
+companyAddressYesNo.heading = companyAddressYesNo
+companyAddressYesNo.checkYourAnswersLabel = companyAddressYesNo
+companyAddressYesNo.error.required = Select yes if companyAddressYesNo
+companyAddressYesNo.change.hidden = CompanyAddressYesNo
