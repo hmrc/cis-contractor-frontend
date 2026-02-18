@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,16 +14,15 @@
  * limitations under the License.
  */
 
-package forms.add
+package forms.add.partnership
 
-import forms.mappings.Mappings
 import forms.Validation
+import forms.mappings.Mappings
 import play.api.data.Form
+import play.api.data.Forms.single
 import play.api.data.validation.{Constraint, Invalid, Valid}
 
-import javax.inject.Inject
-
-class SubNationalInsuranceNumberFormProvider @Inject() extends Mappings {
+class PartnershipNominatedPartnerNinoFormProvider extends Mappings {
 
   private val maxLength = 9
 
@@ -32,21 +31,27 @@ class SubNationalInsuranceNumberFormProvider @Inject() extends Mappings {
 
   private val lengthConstraint: Constraint[String] =
     Constraint("constraints.nino.length") { value =>
-      if (normalised(value).length <= maxLength) {
+      if (value.length <= maxLength) {
         Valid
       } else {
-        Invalid("subNationalInsuranceNumber.error.length")
+        Invalid("partnershipNominatedPartnerNino.error.length")
+      }
+    }
+
+  private val firstErrorConstraint: Constraint[String] =
+    Constraint("constraints.nino.firstError") { value =>
+      lengthConstraint(value) match {
+        case i: Invalid => i
+        case Valid      => Validation.isNinoValid("value", "partnershipNominatedPartnerNino.error.invalidCharacters")(value)
       }
     }
 
   def apply(): Form[String] =
     Form(
-      "value" -> nino("subNationalInsuranceNumber.error.required")
-        .verifying(
-          firstError(
-            lengthConstraint,
-            Validation.isNinoValid("value", "subNationalInsuranceNumber.error.invalidCharacters")
-          )
-        )
+      single(
+        "value" -> text("partnershipNominatedPartnerNino.error.required")
+          .transform(s => normalised(s), identity)
+          .verifying(firstErrorConstraint)
+      )
     )
 }

@@ -23,6 +23,7 @@ import models.*
 import models.add.{SubcontractorName, TypeOfSubcontractor, UKAddress}
 import pages.add.*
 import pages.add.partnership.*
+import pages.add.partnership.PartnershipNominatedPartnerNinoPage
 
 class NavigatorSpec extends SpecBase {
 
@@ -71,14 +72,6 @@ class NavigatorSpec extends SpecBase {
           NormalMode,
           emptyUserAnswers
         ) mustBe controllers.add.partnership.routes.PartnershipHasUtrYesNoController.onPageLoad(NormalMode)
-      }
-
-      "must go from PartnershipNamePage to CheckYourAnswersController in CheckMode" in {
-        navigator.nextPage(
-          PartnershipNamePage,
-          CheckMode,
-          emptyUserAnswers
-        ) mustBe controllers.add.routes.CheckYourAnswersController.onPageLoad()
       }
 
       "must go from a TypeOfSubcontractorPage to JourneyRecovery when Trust is selected" in {
@@ -969,6 +962,22 @@ class NavigatorSpec extends SpecBase {
           CheckMode,
           UserAnswers("id")
         ) mustBe CYA
+      }
+
+      "must go from PartnershipNominatedPartnerNinoPage to itself in NormalMode" in {
+        navigator.nextPage(
+          PartnershipNominatedPartnerNinoPage,
+          NormalMode,
+          emptyUserAnswers
+        ) mustBe controllers.add.partnership.routes.PartnershipNominatedPartnerNinoController.onPageLoad(NormalMode)
+      }
+
+      "must go from PartnershipNominatedPartnerNinoPage to CYA in CheckMode" in {
+        navigator.nextPage(
+          PartnershipNominatedPartnerNinoPage,
+          CheckMode,
+          emptyUserAnswers
+        ) mustBe controllers.add.routes.CheckYourAnswersController.onPageLoad()
       }
 
     }
