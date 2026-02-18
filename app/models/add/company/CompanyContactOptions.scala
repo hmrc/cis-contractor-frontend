@@ -29,16 +29,16 @@ object CompanyContactOptions extends Enumerable.Implicits {
   case object Phonenumber extends WithName("phoneNumber") with CompanyContactOptions
 
   val values: Seq[CompanyContactOptions] = Seq(
-    Email, Phonenumber
+    Email,
+    Phonenumber
   )
 
-  def options(implicit messages: Messages): Seq[RadioItem] = values.zipWithIndex.map {
-    case (value, index) =>
-      RadioItem(
-        content = Text(messages(s"companyContactOptions.${value.toString}")),
-        value   = Some(value.toString),
-        id      = Some(s"value_$index")
-      )
+  def options(implicit messages: Messages): Seq[RadioItem] = values.zipWithIndex.map { case (value, index) =>
+    RadioItem(
+      content = Text(messages(s"companyContactOptions.${value.toString}")),
+      value = Some(value.toString),
+      id = Some(s"value_$index")
+    )
   }
 
   implicit val enumerable: Enumerable[CompanyContactOptions] =

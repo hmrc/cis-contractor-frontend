@@ -372,3 +372,10 @@ companyContactOptions.phoneNumber = Phone number
 companyContactOptions.checkYourAnswersLabel = What are the contact details for this company?
 companyContactOptions.error.required = Select companyContactOptions
 companyContactOptions.change.hidden = CompanyContactOptions
+
+companyEmailAddress.title = companyEmailAddress
+companyEmailAddress.heading = companyEmailAddress
+companyEmailAddress.checkYourAnswersLabel = companyEmailAddress
+companyEmailAddress.error.required = Enter companyEmailAddress
+companyEmailAddress.error.length = CompanyEmailAddress must be 100 characters or less
+companyEmailAddress.change.hidden = CompanyEmailAddress

@@ -17,35 +17,26 @@
 package viewmodels.checkAnswers.add.company
 
 import models.{CheckMode, UserAnswers}
-import pages.add.company.CompanyContactOptionsPage
+import pages.add.company.CompanyEmailAddressPage
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
-import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
 
-object CompanyContactOptionsSummary {
+object CompanyEmailAddressSummary  {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(CompanyContactOptionsPage).map { answer =>
+    answers.get(CompanyEmailAddressPage).map {
+      answer =>
 
-      val value = ValueViewModel(
-        HtmlContent(
-          HtmlFormat.escape(messages(s"companyContactOptions.$answer"))
-        )
-      )
-
-      SummaryListRowViewModel(
-        key = "companyContactOptions.checkYourAnswersLabel",
-        value = value,
-        actions = Seq(
-          ActionItemViewModel(
-            "site.change",
-            controllers.add.company.routes.CompanyContactOptionsController.onPageLoad(CheckMode).url
+        SummaryListRowViewModel(
+          key     = "companyEmailAddress.checkYourAnswersLabel",
+          value   = ValueViewModel(HtmlFormat.escape(answer).toString),
+          actions = Seq(
+            ActionItemViewModel("site.change", controllers.add.company.routes.CompanyEmailAddressController.onPageLoad(CheckMode).url)
+              .withVisuallyHiddenText(messages("companyEmailAddress.change.hidden"))
           )
-            .withVisuallyHiddenText(messages("companyContactOptions.change.hidden"))
         )
-      )
     }
 }

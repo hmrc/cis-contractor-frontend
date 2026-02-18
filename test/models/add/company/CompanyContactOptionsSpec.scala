@@ -16,7 +16,6 @@
 
 package models.add.company
 
-import models.add.company.CompanyContactOptions
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Gen
 import org.scalatest.OptionValues
@@ -33,10 +32,11 @@ class CompanyContactOptionsSpec extends AnyFreeSpec with Matchers with ScalaChec
 
       val gen = Gen.oneOf(CompanyContactOptions.values.toSeq)
 
-      forAll(gen) {
-        companyContactOptions =>
-
-          JsString(companyContactOptions.toString).validate[CompanyContactOptions].asOpt.value mustEqual companyContactOptions
+      forAll(gen) { companyContactOptions =>
+        JsString(companyContactOptions.toString)
+          .validate[CompanyContactOptions]
+          .asOpt
+          .value mustEqual companyContactOptions
       }
     }
 
@@ -44,10 +44,8 @@ class CompanyContactOptionsSpec extends AnyFreeSpec with Matchers with ScalaChec
 
       val gen = arbitrary[String] suchThat (!CompanyContactOptions.values.map(_.toString).contains(_))
 
-      forAll(gen) {
-        invalidValue =>
-
-          JsString(invalidValue).validate[CompanyContactOptions] mustEqual JsError("error.invalid")
+      forAll(gen) { invalidValue =>
+        JsString(invalidValue).validate[CompanyContactOptions] mustEqual JsError("error.invalid")
       }
     }
 
@@ -55,10 +53,8 @@ class CompanyContactOptionsSpec extends AnyFreeSpec with Matchers with ScalaChec
 
       val gen = Gen.oneOf(CompanyContactOptions.values.toSeq)
 
-      forAll(gen) {
-        companyContactOptions =>
-
-          Json.toJson(companyContactOptions) mustEqual JsString(companyContactOptions.toString)
+      forAll(gen) { companyContactOptions =>
+        Json.toJson(companyContactOptions) mustEqual JsString(companyContactOptions.toString)
       }
     }
   }

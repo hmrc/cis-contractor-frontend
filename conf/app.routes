@@ -168,3 +168,8 @@ GET        /companyContactOptions                        controllers.add.company
 POST       /companyContactOptions                        controllers.add.company.CompanyContactOptionsController.onSubmit(mode: Mode = NormalMode)
 GET        /changeCompanyContactOptions                  controllers.add.company.CompanyContactOptionsController.onPageLoad(mode: Mode = CheckMode)
 POST       /changeCompanyContactOptions                  controllers.add.company.CompanyContactOptionsController.onSubmit(mode: Mode = CheckMode)
+
+GET        /companyEmailAddress                        controllers.add.company.CompanyEmailAddressController.onPageLoad(mode: Mode = NormalMode)
+POST       /companyEmailAddress                        controllers.add.company.CompanyEmailAddressController.onSubmit(mode: Mode = NormalMode)
+GET        /changeCompanyEmailAddress                  controllers.add.company.CompanyEmailAddressController.onPageLoad(mode: Mode = CheckMode)
+POST       /changeCompanyEmailAddress                  controllers.add.company.CompanyEmailAddressController.onSubmit(mode: Mode = CheckMode)
