@@ -198,3 +198,8 @@ GET        /companyCrnYesNo                        controllers.add.company.Compa
 POST       /companyCrnYesNo                        controllers.add.company.CompanyCrnYesNoController.onSubmit(mode: Mode = NormalMode)
 GET        /changeCompanyCrnYesNo                  controllers.add.company.CompanyCrnYesNoController.onPageLoad(mode: Mode = CheckMode)
 POST       /changeCompanyCrnYesNo                  controllers.add.company.CompanyCrnYesNoController.onSubmit(mode: Mode = CheckMode)
+
+GET        /companyCrn                        controllers.add.company.CompanyCrnController.onPageLoad(mode: Mode = NormalMode)
+POST       /companyCrn                        controllers.add.company.CompanyCrnController.onSubmit(mode: Mode = NormalMode)
+GET        /changeCompanyCrn                  controllers.add.company.CompanyCrnController.onPageLoad(mode: Mode = CheckMode)
+POST       /changeCompanyCrn                  controllers.add.company.CompanyCrnController.onSubmit(mode: Mode = CheckMode)

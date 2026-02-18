@@ -14,32 +14,14 @@
  * limitations under the License.
  */
 
-package forms.add.company
+package pages.add.company
 
-import forms.behaviours.BooleanFieldBehaviours
-import play.api.data.FormError
+import pages.QuestionPage
+import play.api.libs.json.JsPath
 
-class CompanyCrnYesNoFormProviderSpec extends BooleanFieldBehaviours {
+case object CompanyCrnPage extends QuestionPage[String] {
 
-  val requiredKey = "companyCrnYesNo.error.required"
-  val invalidKey  = "error.boolean"
+  override def path: JsPath = JsPath \ toString
 
-  val form = new CompanyCrnYesNoFormProvider()()
-
-  ".value" - {
-
-    val fieldName = "value"
-
-    behave like booleanField(
-      form,
-      fieldName,
-      invalidError = FormError(fieldName, invalidKey)
-    )
-
-    behave like mandatoryField(
-      form,
-      fieldName,
-      requiredError = FormError(fieldName, requiredKey)
-    )
-  }
+  override def toString: String = "companyCrn"
 }

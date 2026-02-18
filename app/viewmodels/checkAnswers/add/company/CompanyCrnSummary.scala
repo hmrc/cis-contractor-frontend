@@ -17,29 +17,26 @@
 package viewmodels.checkAnswers.add.company
 
 import models.{CheckMode, UserAnswers}
-import pages.add.company.CompanyCrnYesNoPage
+import pages.add.company.CompanyCrnPage
 import play.api.i18n.Messages
+import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
 
-object CompanyCrnYesNoSummary {
+object CompanyCrnSummary  {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(CompanyCrnYesNoPage).map { answer =>
+    answers.get(CompanyCrnPage).map {
+      answer =>
 
-      val value = if (answer) "site.yes" else "site.no"
-
-      SummaryListRowViewModel(
-        key = "companyCrnYesNo.checkYourAnswersLabel",
-        value = ValueViewModel(value),
-        actions = Seq(
-          ActionItemViewModel(
-            "site.change",
-            controllers.add.company.routes.CompanyCrnYesNoController.onPageLoad(CheckMode).url
+        SummaryListRowViewModel(
+          key     = "companyCrn.checkYourAnswersLabel",
+          value   = ValueViewModel(HtmlFormat.escape(answer).toString),
+          actions = Seq(
+            ActionItemViewModel("site.change", controllers.add.company.routes.CompanyCrnController.onPageLoad(CheckMode).url)
+              .withVisuallyHiddenText(messages("companyCrn.change.hidden"))
           )
-            .withVisuallyHiddenText(messages("companyCrnYesNo.change.hidden"))
         )
-      )
     }
 }
