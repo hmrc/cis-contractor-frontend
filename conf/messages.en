@@ -386,3 +386,10 @@ companyPhoneNumber.checkYourAnswersLabel = companyPhoneNumber
 companyPhoneNumber.error.required = Enter companyPhoneNumber
 companyPhoneNumber.error.length = CompanyPhoneNumber must be 100 characters or less
 companyPhoneNumber.change.hidden = CompanyPhoneNumber
+
+companyMobileNumber.title = companyMobileNumber
+companyMobileNumber.heading = companyMobileNumber
+companyMobileNumber.checkYourAnswersLabel = companyMobileNumber
+companyMobileNumber.error.required = Enter companyMobileNumber
+companyMobileNumber.error.length = CompanyMobileNumber must be 100 characters or less
+companyMobileNumber.change.hidden = CompanyMobileNumber

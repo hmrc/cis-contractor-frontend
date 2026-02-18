@@ -19,13 +19,13 @@ package forms.add.company
 import forms.behaviours.StringFieldBehaviours
 import play.api.data.FormError
 
-class CompanyPhoneNumberFormProviderSpec extends StringFieldBehaviours {
+class CompanyMobileNumberFormProviderSpec extends StringFieldBehaviours {
 
-  val requiredKey = "companyPhoneNumber.error.required"
-  val lengthKey   = "companyPhoneNumber.error.length"
-  val maxLength   = 100
+  val requiredKey = "companyMobileNumber.error.required"
+  val lengthKey = "companyMobileNumber.error.length"
+  val maxLength = 100
 
-  val form = new CompanyPhoneNumberFormProvider()()
+  val form = new CompanyMobileNumberFormProvider()()
 
   ".value" - {
 
