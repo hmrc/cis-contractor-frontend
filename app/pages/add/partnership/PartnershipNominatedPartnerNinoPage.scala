@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,21 +14,12 @@
  * limitations under the License.
  */
 
-package forms
+package pages.add.partnership
 
-import play.api.data.validation.{Constraint, Invalid, Valid}
-import uk.gov.hmrc.domain.Nino
+import pages.QuestionPage
+import play.api.libs.json.JsPath
 
-object Validation {
-
-  final val worksRefRegex = """^[A-Za-z0-9 ~!@#$%&'()*+,-./:;=?_{}£€]+$"""
-
-  def isNinoValid(value: String, errorKey: String): Constraint[String] =
-    Constraint {
-      case str if Nino.isValid(str.replaceAll("\\s", "").toUpperCase) =>
-        Valid
-      case _                                                          =>
-        Invalid(errorKey, value)
-    }
-
+case object PartnershipNominatedPartnerNinoPage extends QuestionPage[String] {
+  override def path: JsPath     = JsPath \ toString
+  override def toString: String = "nominatedPartnerNationalInsuranceNumber"
 }

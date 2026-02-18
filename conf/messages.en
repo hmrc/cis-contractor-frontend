@@ -292,6 +292,8 @@ partnershipUniqueTaxpayerReference.error.required = Enter a valid Unique Taxpaye
 partnershipUniqueTaxpayerReference.error.invalid = Enter a valid Unique Taxpayer Reference (UTR) using 10 numbers, like 1234567890
 partnershipUniqueTaxpayerReference.error.length = Enter a valid Unique Taxpayer Reference (UTR) using 10 numbers, like 1234567890
 partnershipUniqueTaxpayerReference.error.duplicate = You have already used this Unique Taxpayer Reference (UTR) for an existing subcontractor
+partnershipUniqueTaxpayerReference.checkYourAnswersLabel = Unique Taxpayer Reference
+partnershipUniqueTaxpayerReference.change.hidden = Unique Taxpayer Reference
 
 partnershipHasUtrYesNo.title = Does this partnership have a Unique Taxpayer Reference (UTR)?
 partnershipHasUtrYesNo.heading = Does {0} have a Unique Taxpayer Reference (UTR)?
@@ -299,6 +301,16 @@ partnershipHasUtrYesNo.hint = This is 10 numbers, like 1234567890. The UTR will 
 partnershipHasUtrYesNo.checkYourAnswersLabel = Does {0} have a Unique Taxpayer Reference (UTR)?
 partnershipHasUtrYesNo.error.required = Select yes if the partnership has a Unique Taxpayer Reference (UTR)
 partnershipHasUtrYesNo.change.hidden = Unique Taxpayer Reference (UTR)
+
+partnershipNominatedPartnerNino.title = What is the National Insurance number for the nominated partner?
+partnershipNominatedPartnerNino.heading = What is the National Insurance number for {0}?
+partnershipNominatedPartnerNino.hint = National insurance numbers can be found on payslips, P60s and other tax documents. For example, ‘QQ 12 34 56 C’
+partnershipNominatedPartnerNino.error.required = Enter a National Insurance number
+partnershipNominatedPartnerNino.error.invalidCharacters = Enter a valid National Insurance Number like QQ 12 34 56 C
+partnershipNominatedPartnerNino.error.length = Enter a valid National Insurance Number up to 9 characters, like QQ 12 34 56 C
+partnershipNominatedPartnerNino.checkYourAnswersLabel = National Insurance number for nominated partner
+partnershipNominatedPartnerNino.change.hidden = national Insurance number for nominated partner
+
 
 partnershipAddressYesNo.title = Do you want to add an address for this partnership?
 partnershipAddressYesNo.heading = Do you want to add an address for {0}?
@@ -344,6 +356,18 @@ partnershipNominatedPartnerCrnYesNo.hint = This only applies if they are a corpo
 partnershipNominatedPartnerCrnYesNo.checkYourAnswersLabel = Nominated partner has a company registration number
 partnershipNominatedPartnerCrnYesNo.error.required = Select whether this nominated partner has a company registration number
 partnershipNominatedPartnerCrnYesNo.change.hidden = nominated partner has a company registration number
+
+partnershipNominatedPartnerUtr.title = Nominated partner Self Assessment Unique Taxpayer Reference (UTR)
+partnershipNominatedPartnerUtr.heading = Self Assessment Unique Taxpayer Reference (UTR)
+partnershipNominatedPartnerUtr.paragraph = The UTR will be on tax returns and other documents from HMRC. It might be called ‘reference’, ‘UTR’, or ‘official use’.
+partnershipNominatedPartnerUtr.linkText = Get more help to find a UTR (opens in new tab)
+partnershipNominatedPartnerUtr.heading2 = What is the Self Assessment UTR for {0}?
+partnershipNominatedPartnerUtr.hint = A UTR is a 10 digit number
+partnershipNominatedPartnerUtr.checkYourAnswersLabel = Unique Taxpayer Reference
+partnershipNominatedPartnerUtr.error.required = Enter a valid Unique Taxpayer Reference (UTR), like 1234567890
+partnershipNominatedPartnerUtr.error.length = Enter a valid Unique Taxpayer Reference (UTR) using 10 digits
+partnershipNominatedPartnerUtr.error.invalid = Enter a valid Unique Taxpayer Reference (UTR) using 10 digits
+partnershipNominatedPartnerUtr.change.hidden = nominated partner Unique Taxpayer Reference
 
 companyName.title = companyName
 companyName.heading = companyName
