@@ -432,3 +432,6 @@ companyWorksReference.checkYourAnswersLabel = companyWorksReference
 companyWorksReference.error.required = Enter companyWorksReference
 companyWorksReference.error.length = CompanyWorksReference must be 100 characters or less
 companyWorksReference.change.hidden = CompanyWorksReference
+
+companyCheckYourAnswers.title = companyCheckYourAnswers
+companyCheckYourAnswers.heading = companyCheckYourAnswers
