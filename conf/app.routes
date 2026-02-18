@@ -158,3 +158,8 @@ GET        /companyAddressYesNo                         controllers.add.company.
 POST       /companyAddressYesNo                         controllers.add.company.CompanyAddressYesNoController.onSubmit(mode: Mode = NormalMode)
 GET        /changeCompanyAddressYesNo                   controllers.add.company.CompanyAddressYesNoController.onPageLoad(mode: Mode = CheckMode)
 POST       /changeCompanyAddressYesNo                   controllers.add.company.CompanyAddressYesNoController.onSubmit(mode: Mode = CheckMode)
+
+GET        /companyAddress                        controllers.add.company.CompanyAddressController.onPageLoad(mode: Mode = NormalMode)
+POST       /companyAddress                        controllers.add.company.CompanyAddressController.onSubmit(mode: Mode = NormalMode)
+GET        /changeCompanyAddress                  controllers.add.company.CompanyAddressController.onPageLoad(mode: Mode = CheckMode)
+POST       /changeCompanyAddress                  controllers.add.company.CompanyAddressController.onSubmit(mode: Mode = CheckMode)

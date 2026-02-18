@@ -357,3 +357,10 @@ companyAddressYesNo.heading = companyAddressYesNo
 companyAddressYesNo.checkYourAnswersLabel = companyAddressYesNo
 companyAddressYesNo.error.required = Select yes if companyAddressYesNo
 companyAddressYesNo.change.hidden = CompanyAddressYesNo
+
+companyAddress.title = companyAddress
+companyAddress.heading = companyAddress
+companyAddress.checkYourAnswersLabel = companyAddress
+companyAddress.error.required = Enter companyAddress
+companyAddress.error.length = CompanyAddress must be 100 characters or less
+companyAddress.change.hidden = CompanyAddress

@@ -16,7 +16,6 @@
 
 package forms.add.company
 
-import forms.add.company.CompanyNameFormProvider
 import forms.behaviours.StringFieldBehaviours
 import play.api.data.FormError
 
