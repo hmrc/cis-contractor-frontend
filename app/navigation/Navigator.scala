@@ -96,8 +96,6 @@ class Navigator @Inject() () {
       _ => controllers.add.partnership.routes.PartnershipAddressYesNoController.onPageLoad(CheckMode)
     case PartnershipAddressPage                   =>
       _ => controllers.add.partnership.routes.PartnershipAddressController.onPageLoad(CheckMode)
-    case PartnershipContactDetailsYesNoPage       =>
-      userAnswers => navigatorFromPartnershipContactDetailsYesNoPage(CheckMode)(userAnswers)
     case PartnershipNominatedPartnerNinoYesNoPage =>
       _ => controllers.add.partnership.routes.PartnershipNominatedPartnerNinoYesNoController.onPageLoad(CheckMode)
     case _                                        => _ => controllers.add.routes.CheckYourAnswersController.onPageLoad()
