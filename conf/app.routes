@@ -173,3 +173,8 @@ GET        /companyEmailAddress                        controllers.add.company.C
 POST       /companyEmailAddress                        controllers.add.company.CompanyEmailAddressController.onSubmit(mode: Mode = NormalMode)
 GET        /changeCompanyEmailAddress                  controllers.add.company.CompanyEmailAddressController.onPageLoad(mode: Mode = CheckMode)
 POST       /changeCompanyEmailAddress                  controllers.add.company.CompanyEmailAddressController.onSubmit(mode: Mode = CheckMode)
+
+GET        /companyPhoneNumber                        controllers.add.company.CompanyPhoneNumberController.onPageLoad(mode: Mode = NormalMode)
+POST       /companyPhoneNumber                        controllers.add.company.CompanyPhoneNumberController.onSubmit(mode: Mode = NormalMode)
+GET        /changeCompanyPhoneNumber                  controllers.add.company.CompanyPhoneNumberController.onPageLoad(mode: Mode = CheckMode)
+POST       /changeCompanyPhoneNumber                  controllers.add.company.CompanyPhoneNumberController.onSubmit(mode: Mode = CheckMode)

@@ -379,3 +379,10 @@ companyEmailAddress.checkYourAnswersLabel = companyEmailAddress
 companyEmailAddress.error.required = Enter companyEmailAddress
 companyEmailAddress.error.length = CompanyEmailAddress must be 100 characters or less
 companyEmailAddress.change.hidden = CompanyEmailAddress
+
+companyPhoneNumber.title = companyPhoneNumber
+companyPhoneNumber.heading = companyPhoneNumber
+companyPhoneNumber.checkYourAnswersLabel = companyPhoneNumber
+companyPhoneNumber.error.required = Enter companyPhoneNumber
+companyPhoneNumber.error.length = CompanyPhoneNumber must be 100 characters or less
+companyPhoneNumber.change.hidden = CompanyPhoneNumber
