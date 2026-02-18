@@ -419,3 +419,9 @@ companyCrn.checkYourAnswersLabel = companyCrn
 companyCrn.error.required = Enter companyCrn
 companyCrn.error.length = CompanyCrn must be 100 characters or less
 companyCrn.change.hidden = CompanyCrn
+
+companyWorksReferenceYesNo.title = companyWorksReferenceYesNo
+companyWorksReferenceYesNo.heading = companyWorksReferenceYesNo
+companyWorksReferenceYesNo.checkYourAnswersLabel = companyWorksReferenceYesNo
+companyWorksReferenceYesNo.error.required = Select yes if companyWorksReferenceYesNo
+companyWorksReferenceYesNo.change.hidden = CompanyWorksReferenceYesNo

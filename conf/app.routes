@@ -203,3 +203,8 @@ GET        /companyCrn                        controllers.add.company.CompanyCrn
 POST       /companyCrn                        controllers.add.company.CompanyCrnController.onSubmit(mode: Mode = NormalMode)
 GET        /changeCompanyCrn                  controllers.add.company.CompanyCrnController.onPageLoad(mode: Mode = CheckMode)
 POST       /changeCompanyCrn                  controllers.add.company.CompanyCrnController.onSubmit(mode: Mode = CheckMode)
+
+GET        /companyWorksReferenceYesNo                        controllers.add.company.CompanyWorksReferenceYesNoController.onPageLoad(mode: Mode = NormalMode)
+POST       /companyWorksReferenceYesNo                        controllers.add.company.CompanyWorksReferenceYesNoController.onSubmit(mode: Mode = NormalMode)
+GET        /changeCompanyWorksReferenceYesNo                  controllers.add.company.CompanyWorksReferenceYesNoController.onPageLoad(mode: Mode = CheckMode)
+POST       /changeCompanyWorksReferenceYesNo                  controllers.add.company.CompanyWorksReferenceYesNoController.onSubmit(mode: Mode = CheckMode)
