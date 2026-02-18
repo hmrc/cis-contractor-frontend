@@ -37,9 +37,9 @@ class SubNationalInsuranceNumberFormProviderSpec extends StringFieldBehaviours {
       "AA123456A",
       "BC000000D",
       "se005000c",
-      "AA123456",
-      "YZ555555",
-      "rj888888"
+      "AA123456C",
+      "YZ555555B",
+      "aa888888D"
     )
 
     behave like fieldThatBindsValidData(
@@ -48,18 +48,17 @@ class SubNationalInsuranceNumberFormProviderSpec extends StringFieldBehaviours {
       validNino
     )
 
-    behave like fieldWithMaxLength(
-      form,
-      fieldName,
-      maxLength = maxLength,
-      lengthError = FormError(fieldName, lengthKey, Seq(maxLength))
-    )
-
     behave like mandatoryField(
       form,
       fieldName,
       requiredError = FormError(fieldName, requiredKey)
     )
+
+    "error when too long (more than 9 chars ignoring spaces)" in {
+      val bound = form.bind(Map("value" -> "AB123565456CA"))
+      bound.hasErrors mustBe true
+      bound.errors.map(_.message) must contain("subNationalInsuranceNumber.error.length")
+    }
 
     "remove all whitespaces" in {
       val result = form.bind(Map(fieldName -> "  A A 1 2 3 4 5 6 A  "))

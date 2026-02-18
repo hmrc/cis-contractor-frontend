@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,21 +14,21 @@
  * limitations under the License.
  */
 
-package forms
+package forms.add.partnership
 
-import play.api.data.validation.{Constraint, Invalid, Valid}
-import uk.gov.hmrc.domain.Nino
+import forms.mappings.Mappings
+import play.api.data.Form
 
-object Validation {
+import javax.inject.Inject
 
-  final val worksRefRegex = """^[A-Za-z0-9 ~!@#$%&'()*+,-./:;=?_{}£€]+$"""
+class PartnershipNominatedPartnerUtrFormProvider @Inject() extends Mappings {
 
-  def isNinoValid(value: String, errorKey: String): Constraint[String] =
-    Constraint {
-      case str if Nino.isValid(str.replaceAll("\\s", "").toUpperCase) =>
-        Valid
-      case _                                                          =>
-        Invalid(errorKey, value)
-    }
-
+  def apply(): Form[String] =
+    Form(
+      "value" -> utr(
+        requiredKey = "partnershipNominatedPartnerUtr.error.required",
+        invalidKey = "partnershipNominatedPartnerUtr.error.invalid",
+        lengthKey = "partnershipNominatedPartnerUtr.error.length"
+      )
+    )
 }
