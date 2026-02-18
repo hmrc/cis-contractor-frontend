@@ -17,27 +17,27 @@
 package viewmodels.checkAnswers.add.company
 
 import models.{CheckMode, UserAnswers}
-import pages.add.company.CompanyMobileNumberPage
+import pages.add.company.CompanyUtrYesNoPage
 import play.api.i18n.Messages
-import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
 
-object CompanyMobileNumberSummary {
+object CompanyUtrYesNoSummary  {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(CompanyMobileNumberPage).map { answer =>
-      SummaryListRowViewModel(
-        key = "companyMobileNumber.checkYourAnswersLabel",
-        value = ValueViewModel(HtmlFormat.escape(answer).toString),
-        actions = Seq(
-          ActionItemViewModel(
-            "site.change",
-            controllers.add.company.routes.CompanyMobileNumberController.onPageLoad(CheckMode).url
+    answers.get(CompanyUtrYesNoPage).map {
+      answer =>
+
+        val value = if (answer) "site.yes" else "site.no"
+
+        SummaryListRowViewModel(
+          key     = "companyUtrYesNo.checkYourAnswersLabel",
+          value   = ValueViewModel(value),
+          actions = Seq(
+            ActionItemViewModel("site.change", controllers.add.company.routes.CompanyUtrYesNoController.onPageLoad(CheckMode).url)
+              .withVisuallyHiddenText(messages("companyUtrYesNo.change.hidden"))
           )
-            .withVisuallyHiddenText(messages("companyMobileNumber.change.hidden"))
         )
-      )
     }
 }

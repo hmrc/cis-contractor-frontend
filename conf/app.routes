@@ -183,3 +183,8 @@ GET        /companyMobileNumber                        controllers.add.company.C
 POST       /companyMobileNumber                        controllers.add.company.CompanyMobileNumberController.onSubmit(mode: Mode = NormalMode)
 GET        /changeCompanyMobileNumber                  controllers.add.company.CompanyMobileNumberController.onPageLoad(mode: Mode = CheckMode)
 POST       /changeCompanyMobileNumber                  controllers.add.company.CompanyMobileNumberController.onSubmit(mode: Mode = CheckMode)
+
+GET        /companyUtrYesNo                        controllers.add.company.CompanyUtrYesNoController.onPageLoad(mode: Mode = NormalMode)
+POST       /companyUtrYesNo                        controllers.add.company.CompanyUtrYesNoController.onSubmit(mode: Mode = NormalMode)
+GET        /changeCompanyUtrYesNo                  controllers.add.company.CompanyUtrYesNoController.onPageLoad(mode: Mode = CheckMode)
+POST       /changeCompanyUtrYesNo                  controllers.add.company.CompanyUtrYesNoController.onSubmit(mode: Mode = CheckMode)

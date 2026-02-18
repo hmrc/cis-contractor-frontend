@@ -393,3 +393,9 @@ companyMobileNumber.checkYourAnswersLabel = companyMobileNumber
 companyMobileNumber.error.required = Enter companyMobileNumber
 companyMobileNumber.error.length = CompanyMobileNumber must be 100 characters or less
 companyMobileNumber.change.hidden = CompanyMobileNumber
+
+companyUtrYesNo.title = companyUtrYesNo
+companyUtrYesNo.heading = companyUtrYesNo
+companyUtrYesNo.checkYourAnswersLabel = companyUtrYesNo
+companyUtrYesNo.error.required = Select yes if companyUtrYesNo
+companyUtrYesNo.change.hidden = CompanyUtrYesNo
