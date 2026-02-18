@@ -406,3 +406,9 @@ companyUtr.checkYourAnswersLabel = companyUtr
 companyUtr.error.required = Enter companyUtr
 companyUtr.error.length = CompanyUtr must be 100 characters or less
 companyUtr.change.hidden = CompanyUtr
+
+companyCrnYesNo.title = companyCrnYesNo
+companyCrnYesNo.heading = companyCrnYesNo
+companyCrnYesNo.checkYourAnswersLabel = companyCrnYesNo
+companyCrnYesNo.error.required = Select yes if companyCrnYesNo
+companyCrnYesNo.change.hidden = CompanyCrnYesNo
