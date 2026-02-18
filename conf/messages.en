@@ -399,3 +399,10 @@ companyUtrYesNo.heading = companyUtrYesNo
 companyUtrYesNo.checkYourAnswersLabel = companyUtrYesNo
 companyUtrYesNo.error.required = Select yes if companyUtrYesNo
 companyUtrYesNo.change.hidden = CompanyUtrYesNo
+
+companyUtr.title = companyUtr
+companyUtr.heading = companyUtr
+companyUtr.checkYourAnswersLabel = companyUtr
+companyUtr.error.required = Enter companyUtr
+companyUtr.error.length = CompanyUtr must be 100 characters or less
+companyUtr.change.hidden = CompanyUtr
