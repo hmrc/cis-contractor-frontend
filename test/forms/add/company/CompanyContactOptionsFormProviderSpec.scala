@@ -16,32 +16,24 @@
 
 package forms.add.company
 
-import forms.behaviours.StringFieldBehaviours
+import forms.behaviours.OptionFieldBehaviours
+import models.add.company.CompanyContactOptions
 import play.api.data.FormError
 
-class CompanyAddressFormProviderSpec extends StringFieldBehaviours {
+class CompanyContactOptionsFormProviderSpec extends OptionFieldBehaviours {
 
-  val requiredKey = "companyAddress.error.required"
-  val lengthKey   = "companyAddress.error.length"
-  val maxLength   = 100
-
-  val form = new CompanyAddressFormProvider()()
+  val form = new CompanyContactOptionsFormProvider()()
 
   ".value" - {
 
     val fieldName = "value"
+    val requiredKey = "companyContactOptions.error.required"
 
-    behave like fieldThatBindsValidData(
+    behave like optionsField[CompanyContactOptions](
       form,
       fieldName,
-      stringsWithMaxLength(maxLength)
-    )
-
-    behave like fieldWithMaxLength(
-      form,
-      fieldName,
-      maxLength = maxLength,
-      lengthError = FormError(fieldName, lengthKey, Seq(maxLength))
+      validValues  = CompanyContactOptions.values,
+      invalidError = FormError(fieldName, "error.invalid")
     )
 
     behave like mandatoryField(

@@ -364,3 +364,11 @@ companyAddress.checkYourAnswersLabel = companyAddress
 companyAddress.error.required = Enter companyAddress
 companyAddress.error.length = CompanyAddress must be 100 characters or less
 companyAddress.change.hidden = CompanyAddress
+
+companyContactOptions.title = What are the contact details for this company?
+companyContactOptions.heading = What are the contact details for this company?
+companyContactOptions.email = Email address
+companyContactOptions.phoneNumber = Phone number
+companyContactOptions.checkYourAnswersLabel = What are the contact details for this company?
+companyContactOptions.error.required = Select companyContactOptions
+companyContactOptions.change.hidden = CompanyContactOptions
