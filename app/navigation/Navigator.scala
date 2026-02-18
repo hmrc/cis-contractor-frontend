@@ -58,6 +58,8 @@ class Navigator @Inject() () {
       _ => controllers.add.partnership.routes.PartnershipWorksReferenceNumberYesNoController.onPageLoad(NormalMode)
     case PartnershipWorksReferenceNumberYesNoPage  =>
       userAnswers => navigatorFromPartnershipWorksReferenceNumberYesNoPage(NormalMode)(userAnswers)
+    case PartnershipNominatedPartnerNinoPage       =>
+      _ => controllers.add.partnership.routes.PartnershipNominatedPartnerNinoController.onPageLoad(NormalMode)
     case PartnershipWorksReferenceNumberPage       =>
       _ => controllers.add.partnership.routes.PartnershipAddressYesNoController.onPageLoad(NormalMode)
     case PartnershipAddressYesNoPage               =>
@@ -70,40 +72,30 @@ class Navigator @Inject() () {
       _ => controllers.add.partnership.routes.PartnershipNominatedPartnerNameController.onPageLoad(NormalMode)
     case PartnershipNominatedPartnerCrnYesNoPage   =>
       userAnswers => navigatorFromPartnershipNominatedPartnerCrnYesNoPage(NormalMode)(userAnswers)
+    case PartnershipNominatedPartnerUtrPage        =>
+      _ => controllers.add.partnership.routes.PartnershipNominatedPartnerUtrController.onPageLoad(NormalMode)
     case PartnershipNominatedPartnerUtrYesNoPage   =>
       userAnswers => navigatorFromPartnershipNominatedPartnerUtrYesNoPage(NormalMode)(userAnswers)
     case _                                         => _ => routes.IndexController.onPageLoad()
   }
 
   private val checkRouteMap: Page => UserAnswers => Call = {
-    case TypeOfSubcontractorPage                  => userAnswers => navigatorFromTypeOfSubcontractorPage(CheckMode)(userAnswers)
-    case SubTradingNameYesNoPage                  => userAnswers => navigatorFromSubTradingNameYesNoPage(CheckMode)(userAnswers)
-    case SubAddressYesNoPage                      => userAnswers => navigatorFromSubAddressYesNoPage(CheckMode)(userAnswers)
-    case AddressOfSubcontractorPage               => _ => controllers.add.routes.CheckYourAnswersController.onPageLoad()
-    case NationalInsuranceNumberYesNoPage         =>
-      userAnswers => navigatorFromNationalInsuranceNumberYesNoPage(CheckMode)(userAnswers)
-    case UniqueTaxpayerReferenceYesNoPage         =>
-      userAnswers => navigatorFromUniqueTaxpayerReferenceYesNoPage(CheckMode)(userAnswers)
-    case WorksReferenceNumberYesNoPage            =>
-      userAnswers => navigatorFromWorksReferenceNumberYesNoPage(CheckMode)(userAnswers)
-    case SubContactDetailsPage                    => _ => controllers.add.routes.CheckYourAnswersController.onPageLoad()
-    case SubcontractorContactDetailsYesNoPage     =>
-      userAnswers => navigatorFromSubcontractorContactDetailsYesNoPage(CheckMode)(userAnswers)
-    case PartnershipNamePage                      => _ => controllers.add.routes.CheckYourAnswersController.onPageLoad()
-    case PartnershipHasUtrYesNoPage               => userAnswers => navigatorFromPartnershipHasUtrYesNoPage(CheckMode)(userAnswers)
-    case PartnershipUniqueTaxpayerReferencePage   => _ => controllers.add.routes.CheckYourAnswersController.onPageLoad()
-    case PartnershipWorksReferenceNumberYesNoPage =>
-      userAnswers => navigatorFromPartnershipWorksReferenceNumberYesNoPage(CheckMode)(userAnswers)
-    case PartnershipWorksReferenceNumberPage      => _ => controllers.add.routes.CheckYourAnswersController.onPageLoad()
+    case TypeOfSubcontractorPage                  => navigatorFromTypeOfSubcontractorPage(CheckMode)(_)
+    case SubTradingNameYesNoPage                  => navigatorFromSubTradingNameYesNoPage(CheckMode)(_)
+    case SubAddressYesNoPage                      => navigatorFromSubAddressYesNoPage(CheckMode)(_)
+    case NationalInsuranceNumberYesNoPage         => navigatorFromNationalInsuranceNumberYesNoPage(CheckMode)(_)
+    case UniqueTaxpayerReferenceYesNoPage         => navigatorFromUniqueTaxpayerReferenceYesNoPage(CheckMode)(_)
+    case WorksReferenceNumberYesNoPage            => navigatorFromWorksReferenceNumberYesNoPage(CheckMode)(_)
+    case SubcontractorContactDetailsYesNoPage     => navigatorFromSubcontractorContactDetailsYesNoPage(CheckMode)(_)
+    case PartnershipHasUtrYesNoPage               => navigatorFromPartnershipHasUtrYesNoPage(CheckMode)(_)
+    case PartnershipWorksReferenceNumberYesNoPage => navigatorFromPartnershipWorksReferenceNumberYesNoPage(CheckMode)(_)
+    case PartnershipContactDetailsYesNoPage       => navigatorFromPartnershipContactDetailsYesNoPage(CheckMode)(_)
+    case PartnershipNominatedPartnerCrnYesNoPage  => navigatorFromPartnershipNominatedPartnerCrnYesNoPage(CheckMode)(_)
+    case PartnershipNominatedPartnerNinoPage      => _ => controllers.add.routes.CheckYourAnswersController.onPageLoad()
     case PartnershipAddressYesNoPage              =>
       _ => controllers.add.partnership.routes.PartnershipAddressYesNoController.onPageLoad(CheckMode)
-    case PartnershipContactDetailsYesNoPage       =>
-      userAnswers => navigatorFromPartnershipContactDetailsYesNoPage(CheckMode)(userAnswers)
     case PartnershipNominatedPartnerNinoYesNoPage =>
       _ => controllers.add.partnership.routes.PartnershipNominatedPartnerNinoYesNoController.onPageLoad(CheckMode)
-    case PartnershipNominatedPartnerNamePage      => _ => controllers.add.routes.CheckYourAnswersController.onPageLoad()
-    case PartnershipNominatedPartnerCrnYesNoPage  =>
-      userAnswers => navigatorFromPartnershipNominatedPartnerCrnYesNoPage(CheckMode)(userAnswers)
     case PartnershipNominatedPartnerUtrYesNoPage  =>
       userAnswers => navigatorFromPartnershipNominatedPartnerUtrYesNoPage(CheckMode)(userAnswers)
     case _                                        => _ => controllers.add.routes.CheckYourAnswersController.onPageLoad()
