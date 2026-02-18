@@ -31,24 +31,30 @@ class PartnershipNominatedPartnerCrnFormProvider extends Mappings {
 
   private val lengthConstraint: Constraint[String] =
     Constraint("constraints.crn.length") { value =>
-      if (value.length <= maxLength) Valid
-      else Invalid("partnershipNominatedPartnerCrn.error.length")
+      if (value.length <= maxLength) {
+        Valid
+      } else {
+        Invalid("partnershipNominatedPartnerCrn.error.length")
+      }
     }
 
   private val formatConstraint: Constraint[String] =
     Constraint("constraints.crn.format") { value =>
-      if (value.matches(companyRegNumberRegex)) Valid
-      else Invalid("partnershipNominatedPartnerCrn.error.invalidCharacters")
+      if (value.matches(companyRegNumberRegex)) {
+        Valid
+      } else {
+        Invalid("partnershipNominatedPartnerCrn.error.invalidCharacters")
+      }
     }
-    
+
   private val firstErrorConstraint: Constraint[String] =
     Constraint("constraints.nino.firstError") { value =>
-       lengthConstraint(value) match {
-          case i: Invalid => i
-          case Valid => formatConstraint(value)
-       }
-    } 
-  
+      lengthConstraint(value) match {
+        case i: Invalid => i
+        case Valid      => formatConstraint(value)
+      }
+    }
+
   def apply(): Form[String] =
     Form(
       single(
