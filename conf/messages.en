@@ -336,6 +336,15 @@ partnershipAddress.error.postalCode.invalid = Enter a postal code in the correct
 
 partnershipAddress.country = Country
 partnershipAddress.country.error.required = Enter a country
+partnershipNominatedPartnerNino.title = What is the National Insurance number for the nominated partner?
+partnershipNominatedPartnerNino.heading = What is the National Insurance number for {0}?
+partnershipNominatedPartnerNino.hint = National insurance numbers can be found on payslips, P60s and other tax documents. For example, ‘QQ 12 34 56 C’
+partnershipNominatedPartnerNino.error.required = Enter a valid National Insurance Number like QQ 12 34 56 C
+partnershipNominatedPartnerNino.error.invalidCharacters = Enter a valid National Insurance Number like QQ 12 34 56 C
+partnershipNominatedPartnerNino.error.length = Enter a valid National Insurance Number up to 9 characters, like QQ 12 34 56 C
+partnershipNominatedPartnerNino.checkYourAnswersLabel = National Insurance number for nominated partner
+partnershipNominatedPartnerNino.change.hidden = national Insurance number for nominated partner
+
 
 partnershipAddressYesNo.title = Do you want to add an address for this partnership?
 partnershipAddressYesNo.heading = Do you want to add an address for {0}?
