@@ -38,16 +38,12 @@
             @govukErrorSummary(ErrorSummaryViewModel(form, errorLinkOverrides = Map("value" -> "value_0")))
         }
 
-        @heading(messages("partnershipChooseContactDetails.heading", partnershipName))
-
-        @paragraph(messages("partnershipChooseContactDetails.paragraph"))
-
         @govukRadios(
             RadiosViewModel(
                 field  = form("value"),
-                legend = LegendViewModel("").withCssClass("govuk-sr-only"),
+                legend = LegendViewModel(messages("partnershipChooseContactDetails.heading", partnershipName)).asPageHeading().withCssClass("govuk-fieldset__legend--l"),
                 items  = PartnershipChooseContactDetails.options
-            )
+            ).withHint(HintViewModel(messages("partnershipChooseContactDetails.hint")))
         )
 
         @govukButton(
@@ -55,4 +51,3 @@
         )
     }
 }
-

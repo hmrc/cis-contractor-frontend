@@ -45,8 +45,7 @@ class PartnershipChooseContactDetailsViewSpec extends AnyWordSpec with Matchers 
       val heading: Elements = doc.select("h1")
       heading.text() mustBe messages("partnershipChooseContactDetails.heading", partnershipName)
 
-      val paragraph: String = doc.select("p.govuk-body").first().text()
-      paragraph must include(messages("partnershipChooseContactDetails.paragraph"))
+      doc.select(".govuk-hint").text() mustBe messages("partnershipChooseContactDetails.hint")
 
       val radios: Elements = doc.select(".govuk-radios__input")
       radios.size() mustBe PartnershipChooseContactDetails.values.size
