@@ -478,6 +478,60 @@ class NavigatorSpec extends SpecBase {
           ) mustBe journeyRecovery
         }
       }
+
+      "must go from PartnershipChooseContactDetailsPage" - {
+        "to itself when Email is selected" in {
+          navigator.nextPage(
+            PartnershipChooseContactDetailsPage,
+            NormalMode,
+            emptyUserAnswers.setOrException(
+              PartnershipChooseContactDetailsPage,
+              models.add.PartnershipChooseContactDetails.Email
+            )
+          ) mustBe controllers.add.partnership.routes.PartnershipChooseContactDetailsController.onPageLoad(NormalMode)
+        }
+
+        "to itself when Phone is selected" in {
+          navigator.nextPage(
+            PartnershipChooseContactDetailsPage,
+            NormalMode,
+            emptyUserAnswers.setOrException(
+              PartnershipChooseContactDetailsPage,
+              models.add.PartnershipChooseContactDetails.Phone
+            )
+          ) mustBe controllers.add.partnership.routes.PartnershipChooseContactDetailsController.onPageLoad(NormalMode)
+        }
+
+        "to itself when Mobile is selected" in {
+          navigator.nextPage(
+            PartnershipChooseContactDetailsPage,
+            NormalMode,
+            emptyUserAnswers.setOrException(
+              PartnershipChooseContactDetailsPage,
+              models.add.PartnershipChooseContactDetails.Mobile
+            )
+          ) mustBe controllers.add.partnership.routes.PartnershipChooseContactDetailsController.onPageLoad(NormalMode)
+        }
+
+        "to itself when NoDetails is selected" in {
+          navigator.nextPage(
+            PartnershipChooseContactDetailsPage,
+            NormalMode,
+            emptyUserAnswers.setOrException(
+              PartnershipChooseContactDetailsPage,
+              models.add.PartnershipChooseContactDetails.NoDetails
+            )
+          ) mustBe controllers.add.partnership.routes.PartnershipChooseContactDetailsController.onPageLoad(NormalMode)
+        }
+
+        "to JourneyRecoveryPage when answer is not present" in {
+          navigator.nextPage(
+            PartnershipChooseContactDetailsPage,
+            NormalMode,
+            emptyUserAnswers
+          ) mustBe journeyRecovery
+        }
+      }
     }
 
     "in Check mode" - {
@@ -789,6 +843,60 @@ class NavigatorSpec extends SpecBase {
             CheckMode,
             emptyUserAnswers
           ) mustBe routes.JourneyRecoveryController.onPageLoad()
+        }
+      }
+
+      "must go from PartnershipChooseContactDetailsPage" - {
+        "to itself when Email is selected" in {
+          navigator.nextPage(
+            PartnershipChooseContactDetailsPage,
+            CheckMode,
+            emptyUserAnswers.setOrException(
+              PartnershipChooseContactDetailsPage,
+              models.add.PartnershipChooseContactDetails.Email
+            )
+          ) mustBe controllers.add.partnership.routes.PartnershipChooseContactDetailsController.onPageLoad(CheckMode)
+        }
+
+        "to itself when Phone is selected" in {
+          navigator.nextPage(
+            PartnershipChooseContactDetailsPage,
+            CheckMode,
+            emptyUserAnswers.setOrException(
+              PartnershipChooseContactDetailsPage,
+              models.add.PartnershipChooseContactDetails.Phone
+            )
+          ) mustBe controllers.add.partnership.routes.PartnershipChooseContactDetailsController.onPageLoad(CheckMode)
+        }
+
+        "to itself when Mobile is selected" in {
+          navigator.nextPage(
+            PartnershipChooseContactDetailsPage,
+            CheckMode,
+            emptyUserAnswers.setOrException(
+              PartnershipChooseContactDetailsPage,
+              models.add.PartnershipChooseContactDetails.Mobile
+            )
+          ) mustBe controllers.add.partnership.routes.PartnershipChooseContactDetailsController.onPageLoad(CheckMode)
+        }
+
+        "to itself when NoDetails is selected" in {
+          navigator.nextPage(
+            PartnershipChooseContactDetailsPage,
+            CheckMode,
+            emptyUserAnswers.setOrException(
+              PartnershipChooseContactDetailsPage,
+              models.add.PartnershipChooseContactDetails.NoDetails
+            )
+          ) mustBe controllers.add.partnership.routes.PartnershipChooseContactDetailsController.onPageLoad(CheckMode)
+        }
+
+        "to CYA when answer is not present" in {
+          navigator.nextPage(
+            PartnershipChooseContactDetailsPage,
+            CheckMode,
+            emptyUserAnswers
+          ) mustBe CYA
         }
       }
 

@@ -19,6 +19,8 @@ package views.add.partnership
 import forms.add.partnership.PartnershipChooseContactDetailsFormProvider
 import models.NormalMode
 import models.add.PartnershipChooseContactDetails
+import org.jsoup.nodes.Document
+import org.jsoup.select.Elements
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
@@ -29,25 +31,27 @@ import play.api.test.FakeRequest
 import play.twirl.api.HtmlFormat
 import views.html.add.partnership.PartnershipChooseContactDetailsView
 
+import java.util
+
 class PartnershipChooseContactDetailsViewSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite {
 
   "PartnershipChooseContactDetailsView" should {
 
     "render the page with title, heading, radios and submit button" in new Setup {
       val html: HtmlFormat.Appendable = view(form, NormalMode, partnershipName)
-      val doc                         = org.jsoup.Jsoup.parse(html.toString())
+      val doc: Document               = org.jsoup.Jsoup.parse(html.toString())
       doc.select("title").text() must include(messages("partnershipChooseContactDetails.title"))
 
-      val heading = doc.select("h1")
+      val heading: Elements = doc.select("h1")
       heading.text() mustBe messages("partnershipChooseContactDetails.heading", partnershipName)
 
-      val paragraph = doc.select("p.govuk-body").first().text()
+      val paragraph: String = doc.select("p.govuk-body").first().text()
       paragraph must include(messages("partnershipChooseContactDetails.paragraph"))
 
-      val radios = doc.select(".govuk-radios__input")
+      val radios: Elements = doc.select(".govuk-radios__input")
       radios.size() mustBe PartnershipChooseContactDetails.values.size
 
-      val labels = doc.select(".govuk-radios__label").eachText()
+      val labels: util.List[String] = doc.select(".govuk-radios__label").eachText()
       labels must contain(messages("partnershipChooseContactDetails.email"))
       labels must contain(messages("partnershipChooseContactDetails.phone"))
       labels must contain(messages("partnershipChooseContactDetails.mobile"))
@@ -69,13 +73,13 @@ class PartnershipChooseContactDetailsViewSpec extends AnyWordSpec with Matchers 
       val errorForm: Form[PartnershipChooseContactDetails] =
         form.withError("value", "partnershipChooseContactDetails.error.required")
 
-      val html = view(errorForm, NormalMode, partnershipName)
-      val doc  = org.jsoup.Jsoup.parse(html.toString())
+      val html: HtmlFormat.Appendable = view(errorForm, NormalMode, partnershipName)
+      val doc: Document               = org.jsoup.Jsoup.parse(html.toString())
 
-      val summary = doc.select(".govuk-error-summary")
+      val summary: Elements = doc.select(".govuk-error-summary")
       summary.text() must include(messages("partnershipChooseContactDetails.error.required"))
 
-      val linkHref = summary.select("a").attr("href")
+      val linkHref: String = summary.select("a").attr("href")
       linkHref mustBe "#value_0"
 
       doc.select(".govuk-error-message").text() must include(messages("partnershipChooseContactDetails.error.required"))
@@ -83,9 +87,9 @@ class PartnershipChooseContactDetailsViewSpec extends AnyWordSpec with Matchers 
   }
 
   trait Setup {
-    val formProvider                                = new PartnershipChooseContactDetailsFormProvider()
-    val form: Form[PartnershipChooseContactDetails] = formProvider()
-    val partnershipName                             = "Test Partnership LLP"
+    val formProvider: PartnershipChooseContactDetailsFormProvider = new PartnershipChooseContactDetailsFormProvider()
+    val form: Form[PartnershipChooseContactDetails]               = formProvider()
+    val partnershipName: String                                   = "Test Partnership LLP"
 
     implicit val request: Request[_] = FakeRequest()
     implicit val messages: Messages  =
