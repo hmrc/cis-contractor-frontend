@@ -18,7 +18,7 @@ package controllers.add.partnership
 
 import base.SpecBase
 import forms.add.partnership.PartnershipChooseContactDetailsFormProvider
-import models.add.PartnershipChooseContactDetails
+import models.add.partnership.PartnershipChooseContactDetails
 import models.{CheckMode, NormalMode, UserAnswers}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when

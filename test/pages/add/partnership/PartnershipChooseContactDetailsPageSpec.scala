@@ -16,7 +16,7 @@
 
 package pages.add.partnership
 
-import models.add.PartnershipChooseContactDetails
+import models.add.partnership.PartnershipChooseContactDetails
 import pages.behaviours.PageBehaviours
 
 class PartnershipChooseContactDetailsPageSpec extends PageBehaviours {

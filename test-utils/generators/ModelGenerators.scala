@@ -17,8 +17,8 @@
 package generators
 
 import models.*
-import models.add.{PartnershipChooseContactDetails, SubContactDetails, TypeOfSubcontractor, UKAddress}
 import models.add.company.CompanyContactOptions
+import models.add.partnership.PartnershipChooseContactDetails
 import models.add.{SubContactDetails, TypeOfSubcontractor, UKAddress}
 import org.scalacheck.{Arbitrary, Gen}
 import play.api.libs.json.Json

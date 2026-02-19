@@ -22,7 +22,7 @@ import controllers.routes
 import pages.*
 import models.*
 import models.add.TypeOfSubcontractor.*
-import models.add.PartnershipChooseContactDetails.*
+import models.add.partnership.PartnershipChooseContactDetails.*
 import pages.add.*
 import pages.add.partnership.*
 

@@ -14,13 +14,12 @@
  * limitations under the License.
  */
 
-package models.add
+package models.add.partnership
 
-import models.Enumerable
-import models.WithName
-import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.RadioItem
-import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
+import models.{Enumerable, WithName}
 import play.api.i18n.Messages
+import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
+import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.RadioItem
 
 sealed trait PartnershipChooseContactDetails
 

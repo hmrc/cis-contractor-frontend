@@ -18,7 +18,7 @@ package views.add.partnership
 
 import forms.add.partnership.PartnershipChooseContactDetailsFormProvider
 import models.NormalMode
-import models.add.PartnershipChooseContactDetails
+import models.add.partnership.PartnershipChooseContactDetails
 import org.jsoup.nodes.Document
 import org.jsoup.select.Elements
 import org.scalatest.matchers.must.Matchers

@@ -17,7 +17,7 @@
 package forms.add.partnership
 
 import forms.mappings.Mappings
-import models.add.PartnershipChooseContactDetails
+import models.add.partnership.PartnershipChooseContactDetails
 import play.api.data.Form
 
 import javax.inject.Inject

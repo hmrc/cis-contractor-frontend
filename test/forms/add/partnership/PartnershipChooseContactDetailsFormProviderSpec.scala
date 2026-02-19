@@ -17,7 +17,7 @@
 package forms.add.partnership
 
 import forms.behaviours.OptionFieldBehaviours
-import models.add.PartnershipChooseContactDetails
+import models.add.partnership.PartnershipChooseContactDetails
 import play.api.data.FormError
 
 class PartnershipChooseContactDetailsFormProviderSpec extends OptionFieldBehaviours {
