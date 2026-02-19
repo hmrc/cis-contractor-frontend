@@ -384,3 +384,94 @@ partnershipNominatedPartnerUtrYesNo.hint = This information will be used to veri
 partnershipNominatedPartnerUtrYesNo.checkYourAnswersLabel = Nominated partner has a UTR
 partnershipNominatedPartnerUtrYesNo.error.required = Select whether you know the Unique Taxpayer Reference (UTR) for this nominated partner
 partnershipNominatedPartnerUtrYesNo.change.hidden = nominated partner has a UTR
+
+companyName.title = companyName
+companyName.heading = companyName
+companyName.checkYourAnswersLabel = companyName
+companyName.error.required = Enter companyName
+companyName.error.length = CompanyName must be 100 characters or less
+companyName.change.hidden = CompanyName
+
+companyAddressYesNo.title = companyAddressYesNo
+companyAddressYesNo.heading = companyAddressYesNo
+companyAddressYesNo.checkYourAnswersLabel = companyAddressYesNo
+companyAddressYesNo.error.required = Select yes if companyAddressYesNo
+companyAddressYesNo.change.hidden = CompanyAddressYesNo
+
+companyAddress.title = companyAddress
+companyAddress.heading = companyAddress
+companyAddress.checkYourAnswersLabel = companyAddress
+companyAddress.error.required = Enter companyAddress
+companyAddress.error.length = CompanyAddress must be 100 characters or less
+companyAddress.change.hidden = CompanyAddress
+
+companyContactOptions.title = What are the contact details for this company?
+companyContactOptions.heading = What are the contact details for this company?
+companyContactOptions.email = Email address
+companyContactOptions.phoneNumber = Phone number
+companyContactOptions.checkYourAnswersLabel = What are the contact details for this company?
+companyContactOptions.error.required = Select companyContactOptions
+companyContactOptions.change.hidden = CompanyContactOptions
+
+companyEmailAddress.title = companyEmailAddress
+companyEmailAddress.heading = companyEmailAddress
+companyEmailAddress.checkYourAnswersLabel = companyEmailAddress
+companyEmailAddress.error.required = Enter companyEmailAddress
+companyEmailAddress.error.length = CompanyEmailAddress must be 100 characters or less
+companyEmailAddress.change.hidden = CompanyEmailAddress
+
+companyPhoneNumber.title = companyPhoneNumber
+companyPhoneNumber.heading = companyPhoneNumber
+companyPhoneNumber.checkYourAnswersLabel = companyPhoneNumber
+companyPhoneNumber.error.required = Enter companyPhoneNumber
+companyPhoneNumber.error.length = CompanyPhoneNumber must be 100 characters or less
+companyPhoneNumber.change.hidden = CompanyPhoneNumber
+
+companyMobileNumber.title = companyMobileNumber
+companyMobileNumber.heading = companyMobileNumber
+companyMobileNumber.checkYourAnswersLabel = companyMobileNumber
+companyMobileNumber.error.required = Enter companyMobileNumber
+companyMobileNumber.error.length = CompanyMobileNumber must be 100 characters or less
+companyMobileNumber.change.hidden = CompanyMobileNumber
+
+companyUtrYesNo.title = companyUtrYesNo
+companyUtrYesNo.heading = companyUtrYesNo
+companyUtrYesNo.checkYourAnswersLabel = companyUtrYesNo
+companyUtrYesNo.error.required = Select yes if companyUtrYesNo
+companyUtrYesNo.change.hidden = CompanyUtrYesNo
+
+companyUtr.title = companyUtr
+companyUtr.heading = companyUtr
+companyUtr.checkYourAnswersLabel = companyUtr
+companyUtr.error.required = Enter companyUtr
+companyUtr.error.length = CompanyUtr must be 100 characters or less
+companyUtr.change.hidden = CompanyUtr
+
+companyCrnYesNo.title = companyCrnYesNo
+companyCrnYesNo.heading = companyCrnYesNo
+companyCrnYesNo.checkYourAnswersLabel = companyCrnYesNo
+companyCrnYesNo.error.required = Select yes if companyCrnYesNo
+companyCrnYesNo.change.hidden = CompanyCrnYesNo
+
+companyCrn.title = companyCrn
+companyCrn.heading = companyCrn
+companyCrn.checkYourAnswersLabel = companyCrn
+companyCrn.error.required = Enter companyCrn
+companyCrn.error.length = CompanyCrn must be 100 characters or less
+companyCrn.change.hidden = CompanyCrn
+
+companyWorksReferenceYesNo.title = companyWorksReferenceYesNo
+companyWorksReferenceYesNo.heading = companyWorksReferenceYesNo
+companyWorksReferenceYesNo.checkYourAnswersLabel = companyWorksReferenceYesNo
+companyWorksReferenceYesNo.error.required = Select yes if companyWorksReferenceYesNo
+companyWorksReferenceYesNo.change.hidden = CompanyWorksReferenceYesNo
+
+companyWorksReference.title = companyWorksReference
+companyWorksReference.heading = companyWorksReference
+companyWorksReference.checkYourAnswersLabel = companyWorksReference
+companyWorksReference.error.required = Enter companyWorksReference
+companyWorksReference.error.length = CompanyWorksReference must be 100 characters or less
+companyWorksReference.change.hidden = CompanyWorksReference
+
+companyCheckYourAnswers.title = companyCheckYourAnswers
+companyCheckYourAnswers.heading = companyCheckYourAnswers
