@@ -17,6 +17,7 @@
 package generators
 
 import models.*
+import models.add.company.CompanyContactOptions
 import models.add.{PartnershipCountryAddress, SubContactDetails, TypeOfSubcontractor, UKAddress}
 import org.scalacheck.{Arbitrary, Gen}
 import play.api.libs.json.Json
@@ -43,6 +44,11 @@ trait ModelGenerators {
         postalCode = postalCode,
         country = country
       )
+    }
+  
+  implicit lazy val arbitraryCompanyContactOptions: Arbitrary[CompanyContactOptions] =
+    Arbitrary {
+      Gen.oneOf(CompanyContactOptions.values.toSeq)
     }
 
   implicit lazy val arbitrarySubContactDetails: Arbitrary[SubContactDetails] =
