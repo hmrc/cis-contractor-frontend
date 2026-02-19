@@ -124,6 +124,10 @@ POST       /add/partnership/nominated-partner-national-insurance-number         
 GET        /add/partnership/change-nominated-partner-national-insurance-number   controllers.add.partnership.PartnershipNominatedPartnerNinoController.onPageLoad(mode: Mode = CheckMode)
 POST       /add/partnership/change-nominated-partner-national-insurance-number   controllers.add.partnership.PartnershipNominatedPartnerNinoController.onSubmit(mode: Mode = CheckMode)
 
+GET        /add/partnership/choose-contact-details                      controllers.add.partnership.PartnershipChooseContactDetailsController.onPageLoad(mode: Mode = NormalMode)
+POST       /add/partnership/choose-contact-details                      controllers.add.partnership.PartnershipChooseContactDetailsController.onSubmit(mode: Mode = NormalMode)
+GET        /add/partnership/change-choose-contact-details               controllers.add.partnership.PartnershipChooseContactDetailsController.onPageLoad(mode: Mode = CheckMode)
+POST       /add/partnership/change-choose-contact-details               controllers.add.partnership.PartnershipChooseContactDetailsController.onSubmit(mode: Mode = CheckMode)
 
 GET        /add/partnership/check-contact-details                           controllers.add.partnership.PartnershipContactDetailsYesNoController.onPageLoad(mode: Mode = NormalMode)
 POST       /add/partnership/check-contact-details                           controllers.add.partnership.PartnershipContactDetailsYesNoController.onSubmit(mode: Mode = NormalMode)
