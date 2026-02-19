@@ -321,11 +321,11 @@ partnershipAddressYesNo.change.hidden = what is the address for this partnership
 
 partnershipChooseContactDetails.title = What are the contact details for this partnership?
 partnershipChooseContactDetails.heading = What are the contact details for {0}?
-partnershipChooseContactDetails.hint = Choose which method of contact you would like to add for this partnership. Contact details are only for your own records.
+partnershipChooseContactDetails.hint = Choose which method of contact you would like to add for this subcontractor. Contact details are only for your own records.
 partnershipChooseContactDetails.email = Email address
 partnershipChooseContactDetails.phone = Phone number
 partnershipChooseContactDetails.mobile = Mobile number
-partnershipChooseContactDetails.noDetails = Do not add any contact details for this partnership
+partnershipChooseContactDetails.noDetails = Do not add any contact details for this subcontractor
 partnershipChooseContactDetails.or = or
 partnershipChooseContactDetails.checkYourAnswersLabel = Contact details for partnership
 partnershipChooseContactDetails.error.required = Select which contact details you want to add for this partnership
