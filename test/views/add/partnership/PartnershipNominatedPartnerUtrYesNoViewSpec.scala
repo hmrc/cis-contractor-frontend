@@ -16,7 +16,7 @@
 
 package views.add.partnership
 
-import forms.add.partnership.PartnershipWorksReferenceNumberYesNoFormProvider
+import forms.add.partnership.PartnershipNominatedPartnerUtrYesNoFormProvider
 import models.NormalMode
 import org.jsoup.nodes.Document
 import org.jsoup.select.Elements
@@ -28,25 +28,26 @@ import play.api.i18n.Messages
 import play.api.mvc.Request
 import play.api.test.FakeRequest
 import play.twirl.api.HtmlFormat
-import views.html.add.partnership.PartnershipWorksReferenceNumberYesNoView
+import views.html.add.partnership.PartnershipNominatedPartnerUtrYesNoView
 
-class PartnershipWorksReferenceNumberYesNoViewSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite {
+class PartnershipNominatedPartnerUtrYesNoViewSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite {
 
-  "PartnershipWorksReferenceNumberYesNoView" should {
+  "PartnershipNominatedPartnerUtrYesNoView" should {
 
     "render the page with title, heading, radios and submit button" in new Setup {
-      private val partnershipName = "Test Partnership"
 
-      val html: HtmlFormat.Appendable = view(form, NormalMode, partnershipName)
+      private val nominatedPartnershipName = "Test Nominated Partnership"
+
+      val html: HtmlFormat.Appendable = view(form, NormalMode, nominatedPartnershipName)
       val doc: Document               = org.jsoup.Jsoup.parse(html.toString())
-      doc.select("title").text() must include(messages("partnershipWorksReferenceNumberYesNo.title"))
+      doc.select("title").text() must include(messages("partnershipNominatedPartnerUtrYesNo.title"))
 
       val legend: Elements = doc.select("fieldset legend")
-      legend.text() mustBe messages("partnershipWorksReferenceNumberYesNo.heading", partnershipName)
+      legend.text() mustBe messages("partnershipNominatedPartnerUtrYesNo.heading", nominatedPartnershipName)
       legend.hasClass("govuk-fieldset__legend--l") mustBe true
 
       val hint: Elements = doc.select("fieldset .govuk-hint")
-      hint.text() mustBe messages("partnershipWorksReferenceNumberYesNo.hint")
+      hint.text() mustBe messages("partnershipNominatedPartnerUtrYesNo.hint")
 
       val radioButtons: Elements = doc.select(".govuk-radios__label")
       radioButtons.size() mustBe 2
@@ -55,7 +56,7 @@ class PartnershipWorksReferenceNumberYesNoViewSpec extends AnyWordSpec with Matc
 
       doc
         .select("form")
-        .attr("action") mustBe controllers.add.partnership.routes.PartnershipWorksReferenceNumberYesNoController
+        .attr("action") mustBe controllers.add.partnership.routes.PartnershipNominatedPartnerUtrYesNoController
         .onSubmit(NormalMode)
         .url
 
@@ -66,27 +67,27 @@ class PartnershipWorksReferenceNumberYesNoViewSpec extends AnyWordSpec with Matc
 
     "display error summary and inline error when no option is selected" in new Setup {
       val errorForm: Form[Boolean] =
-        form.withError("value", "partnershipWorksReferenceNumberYesNo.error.required")
+        form.withError("value", "partnershipNominatedPartnerUtrYesNo.error.required")
 
-      private val partnershipName = "Test Partnership"
+      private val nominatedPartnershipName = "Test Nominated Partnership"
 
-      val html: HtmlFormat.Appendable = view(errorForm, NormalMode, partnershipName)
+      val html: HtmlFormat.Appendable = view(errorForm, NormalMode, nominatedPartnershipName)
       val doc: Document               = org.jsoup.Jsoup.parse(html.toString())
 
       val summary: Elements = doc.select(".govuk-error-summary")
-      summary.text() must include(messages("partnershipWorksReferenceNumberYesNo.error.required"))
+      summary.text() must include(messages("partnershipNominatedPartnerUtrYesNo.error.required"))
 
       val linkHref: String = summary.select("a").attr("href")
       linkHref mustBe "#value"
 
       doc.select(".govuk-error-message").text() must include(
-        messages("partnershipWorksReferenceNumberYesNo.error.required")
+        messages("partnershipNominatedPartnerUtrYesNo.error.required")
       )
     }
   }
 
   trait Setup {
-    val formProvider        = new PartnershipWorksReferenceNumberYesNoFormProvider()
+    val formProvider        = new PartnershipNominatedPartnerUtrYesNoFormProvider()
     val form: Form[Boolean] = formProvider()
 
     implicit val request: Request[_] = FakeRequest()
@@ -96,7 +97,7 @@ class PartnershipWorksReferenceNumberYesNoViewSpec extends AnyWordSpec with Matc
         app.injector.instanceOf[play.api.i18n.MessagesApi]
       )
 
-    val view: PartnershipWorksReferenceNumberYesNoView =
-      app.injector.instanceOf[PartnershipWorksReferenceNumberYesNoView]
+    val view: PartnershipNominatedPartnerUtrYesNoView =
+      app.injector.instanceOf[PartnershipNominatedPartnerUtrYesNoView]
   }
 }

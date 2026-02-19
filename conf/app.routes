@@ -154,6 +154,21 @@ POST       /add/partnership/nominated-partner-has-national-insurance-number     
 GET        /add/partnership/change-nominated-partner-has-national-insurance-number   controllers.add.partnership.PartnershipNominatedPartnerNinoYesNoController.onPageLoad(mode: Mode = CheckMode)
 POST       /add/partnership/change-nominated-partner-has-national-insurance-number   controllers.add.partnership.PartnershipNominatedPartnerNinoYesNoController.onSubmit(mode: Mode = CheckMode)
 
+GET        /add/partnership/nominated-partner-company-registration-number         controllers.add.partnership.PartnershipNominatedPartnerCrnController.onPageLoad(mode: Mode = NormalMode)
+POST       /add/partnership/nominated-partner-company-registration-number         controllers.add.partnership.PartnershipNominatedPartnerCrnController.onSubmit(mode: Mode = NormalMode)
+GET        /add/partnership/change-nominated-partner-company-registration-number  controllers.add.partnership.PartnershipNominatedPartnerCrnController.onPageLoad(mode: Mode = CheckMode)
+POST       /add/partnership/change-nominated-partner-company-registration-number  controllers.add.partnership.PartnershipNominatedPartnerCrnController.onSubmit(mode: Mode = CheckMode)
+
+GET        /add/partnership/check-address                      controllers.add.partnership.PartnershipAddressYesNoController.onPageLoad(mode: Mode = NormalMode)
+POST       /add/partnership/check-address                     controllers.add.partnership.PartnershipAddressYesNoController.onSubmit(mode: Mode = NormalMode)
+GET        /add/partnership/change-check-address                 controllers.add.partnership.PartnershipAddressYesNoController.onPageLoad(mode: Mode = CheckMode)
+POST       /add/partnership/change-check-address                 controllers.add.partnership.PartnershipAddressYesNoController.onSubmit(mode: Mode = CheckMode)
+
+GET        /add/partnership/nominated-partner-has-national-insurance-number                       controllers.add.partnership.PartnershipNominatedPartnerNinoYesNoController.onPageLoad(mode: Mode = NormalMode)
+POST       /add/partnership/nominated-partner-has-national-insurance-number                        controllers.add.partnership.PartnershipNominatedPartnerNinoYesNoController.onSubmit(mode: Mode = NormalMode)
+GET        /add/partnership/change-nominated-partner-has-national-insurance-number                  controllers.add.partnership.PartnershipNominatedPartnerNinoYesNoController.onPageLoad(mode: Mode = CheckMode)
+POST       /add/partnership/change-nominated-partner-has-national-insurance-number                 controllers.add.partnership.PartnershipNominatedPartnerNinoYesNoController.onSubmit(mode: Mode = CheckMode)
+
 GET        /add/partnership/nominated-partner-has-company-registration-number        controllers.add.partnership.PartnershipNominatedPartnerCrnYesNoController.onPageLoad(mode: Mode = NormalMode)
 POST       /add/partnership/nominated-partner-has-company-registration-number        controllers.add.partnership.PartnershipNominatedPartnerCrnYesNoController.onSubmit(mode: Mode = NormalMode)
 GET        /add/partnership/change-nominated-partner-has-company-registration-number controllers.add.partnership.PartnershipNominatedPartnerCrnYesNoController.onPageLoad(mode: Mode = CheckMode)
@@ -163,6 +178,11 @@ GET        /add/partnership/nominated-partner-utr        controllers.add.partner
 POST       /add/partnership/nominated-partner-utr        controllers.add.partnership.PartnershipNominatedPartnerUtrController.onSubmit(mode: Mode = NormalMode)
 GET        /add/partnership/change-nominated-partner-utr controllers.add.partnership.PartnershipNominatedPartnerUtrController.onPageLoad(mode: Mode = CheckMode)
 POST       /add/partnership/change-nominated-partner-utr controllers.add.partnership.PartnershipNominatedPartnerUtrController.onSubmit(mode: Mode = CheckMode)
+
+GET        /add/partnership/nominated-partner-has-utr                       controllers.add.partnership.PartnershipNominatedPartnerUtrYesNoController.onPageLoad(mode: Mode = NormalMode)
+POST       /add/partnership/nominated-partner-has-utr                       controllers.add.partnership.PartnershipNominatedPartnerUtrYesNoController.onSubmit(mode: Mode = NormalMode)
+GET        /add/partnership/change-nominated-partner-has-utr                controllers.add.partnership.PartnershipNominatedPartnerUtrYesNoController.onPageLoad(mode: Mode = CheckMode)
+POST       /add/partnership/change-nominated-partner-has-utr                controllers.add.partnership.PartnershipNominatedPartnerUtrYesNoController.onSubmit(mode: Mode = CheckMode)
 
 GET        /companyName                                 controllers.add.company.CompanyNameController.onPageLoad(mode: Mode = NormalMode)
 POST       /companyName                                 controllers.add.company.CompanyNameController.onSubmit(mode: Mode = NormalMode)
