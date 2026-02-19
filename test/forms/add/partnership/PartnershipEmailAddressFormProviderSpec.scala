@@ -16,16 +16,16 @@
 
 package forms.add.partnership
 
-import forms.add.partnership.PartnershipEmailAddressFormProvider
 import forms.behaviours.StringFieldBehaviours
 import play.api.data.FormError
+import org.scalacheck.Gen
 
 class PartnershipEmailAddressFormProviderSpec extends StringFieldBehaviours {
 
   val requiredKey = "partnershipEmailAddress.error.required"
   val invalidKey  = "partnershipEmailAddress.error.invalid"
-  val lengthKey = "partnershipEmailAddress.error.length"
-  val maxLength = 254
+  val lengthKey   = "partnershipEmailAddress.error.length"
+  val maxLength   = 254
 
   val form = new PartnershipEmailAddressFormProvider()()
 
@@ -36,7 +36,12 @@ class PartnershipEmailAddressFormProviderSpec extends StringFieldBehaviours {
     behave like fieldThatBindsValidData(
       form,
       fieldName,
-      stringsWithMaxLength(maxLength)
+      Gen.oneOf(
+        "test@example.com",
+        "name.surname@test.co.uk",
+        "a@b.cd",
+        "user123@test-domain.com"
+      )
     )
 
     behave like fieldWithMaxLength(

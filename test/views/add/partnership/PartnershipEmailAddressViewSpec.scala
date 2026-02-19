@@ -40,7 +40,7 @@ class PartnershipEmailAddressViewSpec extends SpecBase {
           messages(application)
         ).toString()
 
-        html must include(messages(application)("partnershipEmailAddress.heading"))
+        html must include(messages(application)("partnershipEmailAddress.heading", "Test Partnership"))
       }
     }
   }

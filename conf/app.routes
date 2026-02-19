@@ -153,3 +153,8 @@ GET        /add/partnership/nominated-partner-utr        controllers.add.partner
 POST       /add/partnership/nominated-partner-utr        controllers.add.partnership.PartnershipNominatedPartnerUtrController.onSubmit(mode: Mode = NormalMode)
 GET        /add/partnership/change-nominated-partner-utr controllers.add.partnership.PartnershipNominatedPartnerUtrController.onPageLoad(mode: Mode = CheckMode)
 POST       /add/partnership/change-nominated-partner-utr controllers.add.partnership.PartnershipNominatedPartnerUtrController.onSubmit(mode: Mode = CheckMode)
+
+GET        /add/partnership/email-address                        controllers.add.partnership.PartnershipEmailAddressController.onPageLoad(mode: Mode = NormalMode)
+POST       /add/partnership/email-address                        controllers.add.partnership.PartnershipEmailAddressController.onSubmit(mode: Mode = NormalMode)
+GET        /add/partnership/change-email-address                  controllers.add.partnership.PartnershipEmailAddressController.onPageLoad(mode: Mode = CheckMode)
+POST       /add/partnership/change-email-address                  controllers.add.partnership.PartnershipEmailAddressController.onSubmit(mode: Mode = CheckMode)

@@ -20,7 +20,7 @@ import controllers.actions.*
 import forms.add.partnership.PartnershipEmailAddressFormProvider
 import models.Mode
 import navigation.Navigator
-import pages.add.partnership.{PartnershipNamePage, PartnershipEmailAddressPage}
+import pages.add.partnership.{PartnershipEmailAddressPage, PartnershipNamePage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
@@ -30,35 +30,36 @@ import views.html.add.partnership.PartnershipEmailAddressView
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class PartnershipEmailAddressController @Inject()(
-                                        override val messagesApi: MessagesApi,
-                                        sessionRepository: SessionRepository,
-                                        navigator: Navigator,
-                                        identify: IdentifierAction,
-                                        getData: DataRetrievalAction,
-                                        requireData: DataRequiredAction,
-                                        formProvider: PartnershipEmailAddressFormProvider,
-                                        val controllerComponents: MessagesControllerComponents,
-                                        view: PartnershipEmailAddressView
-                                    )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+class PartnershipEmailAddressController @Inject() (
+  override val messagesApi: MessagesApi,
+  sessionRepository: SessionRepository,
+  navigator: Navigator,
+  identify: IdentifierAction,
+  getData: DataRetrievalAction,
+  requireData: DataRequiredAction,
+  formProvider: PartnershipEmailAddressFormProvider,
+  val controllerComponents: MessagesControllerComponents,
+  view: PartnershipEmailAddressView
+)(implicit ec: ExecutionContext)
+    extends FrontendBaseController
+    with I18nSupport {
 
   val form = formProvider()
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) {
-    implicit request =>
-      request.userAnswers
-        .get(PartnershipNamePage)
-        .map { partnershipName =>
-          val preparedForm = request.userAnswers.get(PartnershipEmailAddressPage) match {
-            case None => form
-            case Some(value) => form.fill(value)
-          }
-
-          Ok(view(preparedForm, mode, partnershipName))
+  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
+    request.userAnswers
+      .get(PartnershipNamePage)
+      .map { partnershipName =>
+        val preparedForm = request.userAnswers.get(PartnershipEmailAddressPage) match {
+          case None        => form
+          case Some(value) => form.fill(value)
         }
-        .getOrElse(
-          Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-        )
+
+        Ok(view(preparedForm, mode, partnershipName))
+      }
+      .getOrElse(
+        Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+      )
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
@@ -66,16 +67,16 @@ class PartnershipEmailAddressController @Inject()(
       request.userAnswers
         .get(PartnershipNamePage)
         .map { partnershipName =>
-          form.bindFromRequest().fold(
-            formWithErrors =>
-              Future.successful(BadRequest(view(formWithErrors, mode, partnershipName))),
-
-            value =>
-              for {
-                updatedAnswers <- Future.fromTry(request.userAnswers.set(PartnershipEmailAddressPage, value))
-                _ <- sessionRepository.set(updatedAnswers)
-              } yield Redirect(navigator.nextPage(PartnershipEmailAddressPage, mode, updatedAnswers))
-          )
+          form
+            .bindFromRequest()
+            .fold(
+              formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, partnershipName))),
+              value =>
+                for {
+                  updatedAnswers <- Future.fromTry(request.userAnswers.set(PartnershipEmailAddressPage, value))
+                  _              <- sessionRepository.set(updatedAnswers)
+                } yield Redirect(navigator.nextPage(PartnershipEmailAddressPage, mode, updatedAnswers))
+            )
         }
         .getOrElse(
           Future.successful(

@@ -18,22 +18,25 @@ package forms.add.partnership
 
 import forms.mappings.Mappings
 import play.api.data.Form
+import forms.Validation
 
 import javax.inject.Inject
 
 class PartnershipEmailAddressFormProvider @Inject() extends Mappings {
 
-  private val emailRegex =
-    "^[A-Za-z0-9!#$%&*+\\-/=?^_`{|}~.]+@[A-Za-z0-9!#$%&*+\\-/=?^_`{|}~.]+$"
-
   def apply(): Form[String] =
     Form(
       "value" -> text("partnershipEmailAddress.error.required")
-        .verifying(maxLength(254, "partnershipEmailAddress.error.length"))
         .verifying(
-          regexp(
-            emailRegex,
-            "partnershipEmailAddress.error.invalid"
+          firstError(
+            maxLength(
+              254,
+              "partnershipEmailAddress.error.length"
+            ),
+            regexp(
+              Validation.emailRegex,
+              "partnershipEmailAddress.error.invalid"
+            )
           )
         )
     )

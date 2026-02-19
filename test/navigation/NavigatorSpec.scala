@@ -485,6 +485,14 @@ class NavigatorSpec extends SpecBase {
           ) mustBe journeyRecovery
         }
       }
+
+      "must go from a PartnershipEmailAddressPage to PartnershipEmailAddressPage" in {
+        navigator.nextPage(
+          PartnershipEmailAddressPage,
+          NormalMode,
+          UserAnswers("id")
+        ) mustBe controllers.add.partnership.routes.PartnershipEmailAddressController.onPageLoad(NormalMode)
+      }
     }
 
     "in Check mode" - {
@@ -844,6 +852,14 @@ class NavigatorSpec extends SpecBase {
             emptyUserAnswers
           ) mustBe routes.JourneyRecoveryController.onPageLoad()
         }
+      }
+
+      "must go from PartnershipEmailAddressPage to PartnershipEmailAddressPage in CheckMode" in {
+        navigator.nextPage(
+          PartnershipEmailAddressPage,
+          CheckMode,
+          emptyUserAnswers
+        ) mustBe controllers.add.partnership.routes.PartnershipEmailAddressController.onPageLoad(CheckMode)
       }
     }
 
