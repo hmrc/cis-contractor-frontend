@@ -16,6 +16,7 @@
 
 package controllers
 
+import controllers.actions.DataRetrievalAction
 import controllers.actions.IdentifierAction
 import models.{NormalMode, UserAnswers}
 import play.api.i18n.I18nSupport
@@ -31,14 +32,15 @@ import scala.concurrent.ExecutionContext
 class IndexController @Inject() (
   val controllerComponents: MessagesControllerComponents,
   identify: IdentifierAction,
+  getData: DataRetrievalAction,
   sessionRepository: SessionRepository,
   cisManagerService: CisManageService
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport {
 
-  def onPageLoad(): Action[AnyContent] = identify.async { implicit request =>
-    val userAnswers = UserAnswers(request.userId)
+  def onPageLoad(): Action[AnyContent] = (identify andThen getData).async { implicit request =>
+    val userAnswers = request.userAnswers.getOrElse(UserAnswers(request.userId))
 
     for {
       userAnswersWithCisId <- cisManagerService.ensureCisIdInUserAnswers(userAnswers)
