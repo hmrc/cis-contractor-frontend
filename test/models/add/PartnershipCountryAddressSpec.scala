@@ -30,8 +30,8 @@ class PartnershipCountryAddressSpec extends AnyWordSpec with Matchers {
         addressLine2 = Some("Cobalt Business Park"),
         addressLine3 = "Newcastle",
         addressLine4 = Some("Tyne and Wear"),
-        postalCode   = "NE99 1NE",
-        country      = "United Kingdom"
+        postalCode = "NE99 1NE",
+        country = "United Kingdom"
       )
 
       val json = Json.toJson(address)
