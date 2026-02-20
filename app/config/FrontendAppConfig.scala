@@ -20,6 +20,8 @@ import com.google.inject.{Inject, Singleton}
 import play.api.Configuration
 import play.api.i18n.Lang
 import play.api.mvc.RequestHeader
+import scala.io.Source
+import play.api.libs.json.Json
 
 @Singleton
 class FrontendAppConfig @Inject() (configuration: Configuration) {
@@ -55,4 +57,17 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
   lazy val countdown: Int = configuration.get[Int]("timeout-dialog.countdown")
 
   lazy val cacheTtl: Long = configuration.get[Int]("mongodb.timeToLiveInSeconds")
+
+  lazy val locationCanonicalList: Seq[(String, String)] = {
+    val source     = Source.fromResource("location-autocomplete-canonical-list.json")
+    val jsonString =
+      try source.mkString
+      finally source.close()
+    val json       = Json.parse(jsonString)
+
+    json.as[Seq[Seq[String]]].map {
+      case Seq(name, code) => (name, code)
+      case other           => throw new RuntimeException(s"Unexpected format in JSON: $other")
+    }
+  }
 }

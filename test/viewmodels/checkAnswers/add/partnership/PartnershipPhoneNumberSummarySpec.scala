@@ -39,7 +39,7 @@ class PartnershipPhoneNumberSummarySpec extends AnyFreeSpec with Matchers {
           .success
           .value
 
-      val maybeRow =  PartnershipPhoneNumberSummary.row(answers)
+      val maybeRow = PartnershipPhoneNumberSummary.row(answers)
       maybeRow shouldBe defined
 
       val row = maybeRow.value
@@ -53,13 +53,13 @@ class PartnershipPhoneNumberSummarySpec extends AnyFreeSpec with Matchers {
       val actions = row.actions.value.items
       actions should have size 1
 
-      val changeAction = actions.head
+      val changeAction       = actions.head
       val expectedChangeText = messages("site.change")
-      val expectedHref = routes.PartnershipPhoneNumberController.onPageLoad(CheckMode).url
+      val expectedHref       = routes.PartnershipPhoneNumberController.onPageLoad(CheckMode).url
       val expectedHiddenText = messages("partnershipPhoneNumber.change.hidden")
 
       changeAction.content.asHtml.toString should include(expectedChangeText)
-      changeAction.href shouldBe expectedHref
+      changeAction.href                  shouldBe expectedHref
 
       changeAction.visuallyHiddenText.value shouldBe expectedHiddenText
     }

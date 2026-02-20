@@ -302,6 +302,40 @@ partnershipHasUtrYesNo.checkYourAnswersLabel = Does {0} have a Unique Taxpayer R
 partnershipHasUtrYesNo.error.required = Select yes if the partnership has a Unique Taxpayer Reference (UTR)
 partnershipHasUtrYesNo.change.hidden = Unique Taxpayer Reference (UTR)
 
+partnershipAddress.title = What is the address for this partnership?
+partnershipAddress.heading = What is the address for {0}?
+partnershipAddress.checkYourAnswersLabel = Partnership address
+partnershipAddress.change.hidden = partnership address
+
+partnershipAddress.addressLine1 = Address line 1
+partnershipAddress.error.addressLine1.required = Enter the first line of the address, typically the building and street
+partnershipAddress.error.addressLine1.length = Enter an address up to 35 characters
+partnershipAddress.error.addressLine1.invalidCharacters = Enter the first line of the address using letters a to z, numbers, apostrophes, ampersands, commas, hyphens, full stops, forward slashes and spaces
+partnershipAddress.error.addressLine1.firstCharMustBeLetterOrNumber = Enter an address. The first character must be a letter or a number
+
+partnershipAddress.addressLine2 = Address line 2 (optional)
+partnershipAddress.error.addressLine2.length = Enter the second line of the address using 35 characters or less
+partnershipAddress.error.addressLine2.invalidCharacters = Enter the second line of the address using letters a to z, numbers, apostrophes, ampersands, commas, hyphens, full stops, forward slashes and spaces
+partnershipAddress.error.addressLine2.firstCharMustBeLetterOrNumber = Enter an address. The first character must be a letter or a number
+
+partnershipAddress.addressLine3 = Town or city
+partnershipAddress.error.addressLine3.required = Enter the town or city
+partnershipAddress.error.addressLine3.length = Enter a town or city using 35 characters or less
+partnershipAddress.error.addressLine3.invalidCharacters = Enter a town or city using letters a to z, numbers, apostrophes, ampersands, commas, hyphens, full stops, forward slashes and spaces
+partnershipAddress.error.addressLine3.firstCharMustBeLetterOrNumber = Enter a town or city. The first character must be a letter or a number
+
+partnershipAddress.addressLine4 = County (optional)
+partnershipAddress.error.addressLine4.length = Enter a county using 35 characters or less
+partnershipAddress.error.addressLine4.invalidCharacters = Enter a county using letters a to z, numbers, apostrophes, ampersands, commas, hyphens, full stops, forward slashes and spaces
+partnershipAddress.error.addressLine4.firstCharMustBeLetterOrNumber = Enter a county. The first character must be a letter or a number
+
+partnershipAddress.postalCode = Postal code
+partnershipAddress.error.postalCode.required = Enter a postal code in the correct format
+partnershipAddress.error.postalCode.length = Enter a postal code in the correct format
+partnershipAddress.error.postalCode.invalid = Enter a postal code in the correct format
+
+partnershipAddress.country = Country
+partnershipAddress.country.error.required = Enter a country
 partnershipNominatedPartnerNino.title = What is the National Insurance number for the nominated partner?
 partnershipNominatedPartnerNino.heading = What is the National Insurance number for {0}?
 partnershipNominatedPartnerNino.hint = National insurance numbers can be found on payslips, P60s and other tax documents. For example, ‘QQ 12 34 56 C’
@@ -393,3 +427,94 @@ partnershipPhoneNumber.error.required = Enter a phone number
 partnershipPhoneNumber.error.length = Enter a valid phone number
 partnershipPhoneNumber.error.invalid = Enter a valid phone number
 partnershipPhoneNumber.change.hidden = phone number
+
+companyName.title = companyName
+companyName.heading = companyName
+companyName.checkYourAnswersLabel = companyName
+companyName.error.required = Enter companyName
+companyName.error.length = CompanyName must be 100 characters or less
+companyName.change.hidden = CompanyName
+
+companyAddressYesNo.title = companyAddressYesNo
+companyAddressYesNo.heading = companyAddressYesNo
+companyAddressYesNo.checkYourAnswersLabel = companyAddressYesNo
+companyAddressYesNo.error.required = Select yes if companyAddressYesNo
+companyAddressYesNo.change.hidden = CompanyAddressYesNo
+
+companyAddress.title = companyAddress
+companyAddress.heading = companyAddress
+companyAddress.checkYourAnswersLabel = companyAddress
+companyAddress.error.required = Enter companyAddress
+companyAddress.error.length = CompanyAddress must be 100 characters or less
+companyAddress.change.hidden = CompanyAddress
+
+companyContactOptions.title = What are the contact details for this company?
+companyContactOptions.heading = What are the contact details for this company?
+companyContactOptions.email = Email address
+companyContactOptions.phoneNumber = Phone number
+companyContactOptions.checkYourAnswersLabel = What are the contact details for this company?
+companyContactOptions.error.required = Select companyContactOptions
+companyContactOptions.change.hidden = CompanyContactOptions
+
+companyEmailAddress.title = companyEmailAddress
+companyEmailAddress.heading = companyEmailAddress
+companyEmailAddress.checkYourAnswersLabel = companyEmailAddress
+companyEmailAddress.error.required = Enter companyEmailAddress
+companyEmailAddress.error.length = CompanyEmailAddress must be 100 characters or less
+companyEmailAddress.change.hidden = CompanyEmailAddress
+
+companyPhoneNumber.title = companyPhoneNumber
+companyPhoneNumber.heading = companyPhoneNumber
+companyPhoneNumber.checkYourAnswersLabel = companyPhoneNumber
+companyPhoneNumber.error.required = Enter companyPhoneNumber
+companyPhoneNumber.error.length = CompanyPhoneNumber must be 100 characters or less
+companyPhoneNumber.change.hidden = CompanyPhoneNumber
+
+companyMobileNumber.title = companyMobileNumber
+companyMobileNumber.heading = companyMobileNumber
+companyMobileNumber.checkYourAnswersLabel = companyMobileNumber
+companyMobileNumber.error.required = Enter companyMobileNumber
+companyMobileNumber.error.length = CompanyMobileNumber must be 100 characters or less
+companyMobileNumber.change.hidden = CompanyMobileNumber
+
+companyUtrYesNo.title = companyUtrYesNo
+companyUtrYesNo.heading = companyUtrYesNo
+companyUtrYesNo.checkYourAnswersLabel = companyUtrYesNo
+companyUtrYesNo.error.required = Select yes if companyUtrYesNo
+companyUtrYesNo.change.hidden = CompanyUtrYesNo
+
+companyUtr.title = companyUtr
+companyUtr.heading = companyUtr
+companyUtr.checkYourAnswersLabel = companyUtr
+companyUtr.error.required = Enter companyUtr
+companyUtr.error.length = CompanyUtr must be 100 characters or less
+companyUtr.change.hidden = CompanyUtr
+
+companyCrnYesNo.title = companyCrnYesNo
+companyCrnYesNo.heading = companyCrnYesNo
+companyCrnYesNo.checkYourAnswersLabel = companyCrnYesNo
+companyCrnYesNo.error.required = Select yes if companyCrnYesNo
+companyCrnYesNo.change.hidden = CompanyCrnYesNo
+
+companyCrn.title = companyCrn
+companyCrn.heading = companyCrn
+companyCrn.checkYourAnswersLabel = companyCrn
+companyCrn.error.required = Enter companyCrn
+companyCrn.error.length = CompanyCrn must be 100 characters or less
+companyCrn.change.hidden = CompanyCrn
+
+companyWorksReferenceYesNo.title = companyWorksReferenceYesNo
+companyWorksReferenceYesNo.heading = companyWorksReferenceYesNo
+companyWorksReferenceYesNo.checkYourAnswersLabel = companyWorksReferenceYesNo
+companyWorksReferenceYesNo.error.required = Select yes if companyWorksReferenceYesNo
+companyWorksReferenceYesNo.change.hidden = CompanyWorksReferenceYesNo
+
+companyWorksReference.title = companyWorksReference
+companyWorksReference.heading = companyWorksReference
+companyWorksReference.checkYourAnswersLabel = companyWorksReference
+companyWorksReference.error.required = Enter companyWorksReference
+companyWorksReference.error.length = CompanyWorksReference must be 100 characters or less
+companyWorksReference.change.hidden = CompanyWorksReference
+
+companyCheckYourAnswers.title = companyCheckYourAnswers
+companyCheckYourAnswers.heading = companyCheckYourAnswers

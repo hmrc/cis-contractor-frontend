@@ -16,13 +16,40 @@
 
 package pages.add
 
+import models.UserAnswers
 import models.add.TypeOfSubcontractor
 import pages.QuestionPage
 import play.api.libs.json.JsPath
+
+import scala.util.Try
 
 case object TypeOfSubcontractorPage extends QuestionPage[TypeOfSubcontractor] {
 
   override def path: JsPath = JsPath \ toString
 
   override def toString: String = "typeOfSubcontractor"
+
+  override def cleanup(value: Option[TypeOfSubcontractor], ua: UserAnswers): Try[UserAnswers] = {
+    val previousValue = ua.get(TypeOfSubcontractorPage)
+
+    (previousValue, value) match {
+      case (Some(oldValue), Some(newValue)) if oldValue != newValue =>
+        ua.remove(AddressOfSubcontractorPage)
+          .flatMap(_.remove(NationalInsuranceNumberYesNoPage))
+          .flatMap(_.remove(SubAddressYesNoPage))
+          .flatMap(_.remove(SubContactDetailsPage))
+          .flatMap(_.remove(SubcontractorContactDetailsYesNoPage))
+          .flatMap(_.remove(SubcontractorNamePage))
+          .flatMap(_.remove(SubcontractorsUniqueTaxpayerReferencePage))
+          .flatMap(_.remove(SubNationalInsuranceNumberPage))
+          .flatMap(_.remove(SubTradingNameYesNoPage))
+          .flatMap(_.remove(TradingNameOfSubcontractorPage))
+          .flatMap(_.remove(UniqueTaxpayerReferenceYesNoPage))
+          .flatMap(_.remove(WorksReferenceNumberPage))
+          .flatMap(_.remove(WorksReferenceNumberYesNoPage))
+      // add any new page if added in future
+      case _                                                        =>
+        super.cleanup(value, ua)
+    }
+  }
 }

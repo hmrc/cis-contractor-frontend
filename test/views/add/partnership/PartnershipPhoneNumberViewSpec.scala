@@ -37,7 +37,7 @@ class PartnershipPhoneNumberViewSpec extends AnyWordSpec with Matchers with Guic
       val partnershipName = "Test Partnership"
 
       val html: HtmlFormat.Appendable = view(form, NormalMode, partnershipName)
-      val doc = org.jsoup.Jsoup.parse(html.toString())
+      val doc                         = org.jsoup.Jsoup.parse(html.toString())
 
       doc.select("title").text() must include(messages("partnershipPhoneNumber.title"))
 
@@ -66,7 +66,7 @@ class PartnershipPhoneNumberViewSpec extends AnyWordSpec with Matchers with Guic
         form.withError("value", "partnershipPhoneNumber.error.required")
 
       val html = view(errorForm, NormalMode, partnershipName)
-      val doc = org.jsoup.Jsoup.parse(html.toString())
+      val doc  = org.jsoup.Jsoup.parse(html.toString())
 
       val summary = doc.select(".govuk-error-summary")
       summary.text() must include(messages("partnershipPhoneNumber.error.required"))
@@ -79,11 +79,11 @@ class PartnershipPhoneNumberViewSpec extends AnyWordSpec with Matchers with Guic
   }
 
   trait Setup {
-    val formProvider = new PartnershipPhoneNumberFormProvider()
+    val formProvider       = new PartnershipPhoneNumberFormProvider()
     val form: Form[String] = formProvider()
 
     implicit val request: Request[_] = FakeRequest()
-    implicit val messages: Messages =
+    implicit val messages: Messages  =
       play.api.i18n.MessagesImpl(
         play.api.i18n.Lang.defaultLang,
         app.injector.instanceOf[play.api.i18n.MessagesApi]
