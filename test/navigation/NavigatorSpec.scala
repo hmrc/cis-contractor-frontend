@@ -221,6 +221,14 @@ class NavigatorSpec extends SpecBase {
         ) mustBe controllers.add.routes.NationalInsuranceNumberYesNoController.onPageLoad(NormalMode)
       }
 
+      "must go from a PartnershipAddressPage to next page" in {
+        navigator.nextPage(
+          PartnershipAddressPage,
+          NormalMode,
+          UserAnswers("id")
+        ) mustBe controllers.add.partnership.routes.PartnershipAddressController.onPageLoad(NormalMode)
+      }
+
       "must go from a NationalInsuranceNumberYesNoPage to SubNationalInsuranceNumberPage when true" in {
         navigator.nextPage(
           NationalInsuranceNumberYesNoPage,
@@ -783,6 +791,14 @@ class NavigatorSpec extends SpecBase {
           CheckMode,
           emptyUserAnswers
         ) mustBe controllers.add.partnership.routes.PartnershipAddressYesNoController.onPageLoad(CheckMode)
+      }
+
+      "must go from a PartnershipAddressPage to next page" in {
+        navigator.nextPage(
+          PartnershipAddressPage,
+          CheckMode,
+          emptyUserAnswers
+        ) mustBe controllers.add.partnership.routes.PartnershipAddressController.onPageLoad(CheckMode)
       }
 
       "must go from PartnershipContactDetailsYesNoPage" - {
