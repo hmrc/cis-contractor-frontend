@@ -37,6 +37,8 @@ class Navigator @Inject() () {
     case SubAddressYesNoPage                       => userAnswers => navigatorFromSubAddressYesNoPage(NormalMode)(userAnswers)
     case AddressOfSubcontractorPage                =>
       _ => controllers.add.routes.NationalInsuranceNumberYesNoController.onPageLoad(NormalMode)
+    case PartnershipAddressPage                    =>
+      _ => controllers.add.partnership.routes.PartnershipAddressController.onPageLoad(NormalMode)
     case NationalInsuranceNumberYesNoPage          =>
       userAnswers => navigatorFromNationalInsuranceNumberYesNoPage(NormalMode)(userAnswers)
     case SubNationalInsuranceNumberPage            =>
@@ -99,6 +101,8 @@ class Navigator @Inject() () {
     case PartnershipNominatedPartnerCrnYesNoPage  => navigatorFromPartnershipNominatedPartnerCrnYesNoPage(CheckMode)(_)
     case PartnershipAddressYesNoPage              =>
       _ => controllers.add.partnership.routes.PartnershipAddressYesNoController.onPageLoad(CheckMode)
+    case PartnershipAddressPage                   =>
+      _ => controllers.add.partnership.routes.PartnershipAddressController.onPageLoad(CheckMode)
     case PartnershipNominatedPartnerNinoYesNoPage =>
       _ => controllers.add.partnership.routes.PartnershipNominatedPartnerNinoYesNoController.onPageLoad(CheckMode)
     case PartnershipNominatedPartnerUtrYesNoPage  =>

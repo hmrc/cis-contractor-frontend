@@ -143,6 +143,11 @@ POST       /add/partnership/check-address                controllers.add.partner
 GET        /add/partnership/change-check-address         controllers.add.partnership.PartnershipAddressYesNoController.onPageLoad(mode: Mode = CheckMode)
 POST       /add/partnership/change-check-address         controllers.add.partnership.PartnershipAddressYesNoController.onSubmit(mode: Mode = CheckMode)
 
+GET        /add/partnership/address                       controllers.add.partnership.PartnershipAddressController.onPageLoad(mode: Mode = NormalMode)
+POST       /add/partnership/address                       controllers.add.partnership.PartnershipAddressController.onSubmit(mode: Mode = NormalMode)
+GET        /add/partnership/change-address                controllers.add.partnership.PartnershipAddressController.onPageLoad(mode: Mode = CheckMode)
+POST       /add/partnership/change-address                controllers.add.partnership.PartnershipAddressController.onSubmit(mode: Mode = CheckMode)
+
 GET        /add/partnership/check-contact-details        controllers.add.partnership.PartnershipContactDetailsYesNoController.onPageLoad(mode: Mode = NormalMode)
 POST       /add/partnership/check-contact-details        controllers.add.partnership.PartnershipContactDetailsYesNoController.onSubmit(mode: Mode = NormalMode)
 GET        /add/partnership/change-check-contact-details controllers.add.partnership.PartnershipContactDetailsYesNoController.onPageLoad(mode: Mode = CheckMode)
