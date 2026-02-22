@@ -193,10 +193,10 @@ POST       /add/partnership/nominated-partner-has-utr                       cont
 GET        /add/partnership/change-nominated-partner-has-utr                controllers.add.partnership.PartnershipNominatedPartnerUtrYesNoController.onPageLoad(mode: Mode = CheckMode)
 POST       /add/partnership/change-nominated-partner-has-utr                controllers.add.partnership.PartnershipNominatedPartnerUtrYesNoController.onSubmit(mode: Mode = CheckMode)
 
-GET        /companyName                                 controllers.add.company.CompanyNameController.onPageLoad(mode: Mode = NormalMode)
-POST       /companyName                                 controllers.add.company.CompanyNameController.onSubmit(mode: Mode = NormalMode)
-GET        /changeCompanyName                           controllers.add.company.CompanyNameController.onPageLoad(mode: Mode = CheckMode)
-POST       /changeCompanyName                           controllers.add.company.CompanyNameController.onSubmit(mode: Mode = CheckMode)
+GET        /add/company/company-name                    controllers.add.company.CompanyNameController.onPageLoad(mode: Mode = NormalMode)
+POST       /add/company/company-name                    controllers.add.company.CompanyNameController.onSubmit(mode: Mode = NormalMode)
+GET        /add/company/change-company-name             controllers.add.company.CompanyNameController.onPageLoad(mode: Mode = CheckMode)
+POST       /add/company/change-company-name             controllers.add.company.CompanyNameController.onSubmit(mode: Mode = CheckMode)
 
 GET        /companyAddressYesNo                         controllers.add.company.CompanyAddressYesNoController.onPageLoad(mode: Mode = NormalMode)
 POST       /companyAddressYesNo                         controllers.add.company.CompanyAddressYesNoController.onSubmit(mode: Mode = NormalMode)

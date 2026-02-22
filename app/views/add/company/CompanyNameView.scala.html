@@ -37,8 +37,11 @@
         @govukInput(
             InputViewModel(
                 field = form("value"),
-                label = LabelViewModel(messages("companyName.heading")).asPageHeading()
+                label = LabelViewModel(messages("companyName.heading"))
+                    .asPageHeading()
+                    .withCssClass("govuk-fieldset__legend--l")
             )
+            .withHint(HintViewModel(messages("companyName.hint")))
             .withWidth(Full)
         )
 

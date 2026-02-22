@@ -23,9 +23,20 @@ import javax.inject.Inject
 
 class CompanyNameFormProvider @Inject() extends Mappings {
 
+  private val maximumNameLength: Int = 56
+
+  private val allowedCharsRegex =
+    """^[A-Za-z0-9"~!@#\$%*+:\;=\?\s,\.\[\]_\\\{\}\(\)/&'\-\^\u00A3\u20AC]+$"""
+
   def apply(): Form[String] =
     Form(
       "value" -> text("companyName.error.required")
-        .verifying(maxLength(100, "companyName.error.length"))
+        .transform(_.trim, identity)
+        .verifying(
+          firstError(
+            maxLength(maximumNameLength, "companyName.error.length"),
+            regexp(allowedCharsRegex, "companyName.error.invalidCharacters")
+          )
+        )
     )
 }
