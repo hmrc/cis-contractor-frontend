@@ -63,11 +63,12 @@ class PartnershipNominatedPartnerUtrController @Inject() (
     implicit request =>
       request.userAnswers
         .get(PartnershipNominatedPartnerNamePage)
-        .map { name =>
+        .map { partnershipNominatedPartnerName =>
           form
             .bindFromRequest()
             .fold(
-              formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, name))),
+              formWithErrors =>
+                Future.successful(BadRequest(view(formWithErrors, mode, partnershipNominatedPartnerName))),
               value =>
                 for {
                   updatedAnswers <- Future.fromTry(request.userAnswers.set(PartnershipNominatedPartnerUtrPage, value))
