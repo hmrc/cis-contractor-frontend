@@ -575,6 +575,14 @@ class NavigatorSpec extends SpecBase {
           emptyUserAnswers
         ) mustBe controllers.add.company.routes.CompanyNameController.onPageLoad(NormalMode)
       }
+
+      "must go from a CompanyAddressYesNoPage to CompanyAddressYesNoPage" in {
+        navigator.nextPage(
+          CompanyAddressYesNoPage,
+          NormalMode,
+          UserAnswers("id")
+        ) mustBe controllers.add.company.routes.CompanyAddressYesNoController.onPageLoad(NormalMode)
+      }
     }
 
     "in Check mode" - {
@@ -1022,6 +1030,13 @@ class NavigatorSpec extends SpecBase {
         ) mustBe journeyRecovery
       }
 
+      "must go from CompanyAddressYesNoPage to CompanyAddressYesNoPage in CheckMode" in {
+        navigator.nextPage(
+          CompanyAddressYesNoPage,
+          CheckMode,
+          emptyUserAnswers
+        ) mustBe controllers.add.company.routes.CompanyAddressYesNoController.onPageLoad(CheckMode)
+      }
     }
 
     "navigatorFromSubTradingNameYesNoPage in NormalMode" - {

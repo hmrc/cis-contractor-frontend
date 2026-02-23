@@ -440,11 +440,12 @@ companyName.error.length = Enter a company name up to 56 characters
 companyName.error.invalidCharacters = Enter a company name using letters a to z, numbers, apostrophes, ampersands, commas, hyphens, full stops, forward slashes and spaces
 companyName.change.hidden = company name
 
-companyAddressYesNo.title = companyAddressYesNo
-companyAddressYesNo.heading = companyAddressYesNo
-companyAddressYesNo.checkYourAnswersLabel = companyAddressYesNo
-companyAddressYesNo.error.required = Select yes if companyAddressYesNo
-companyAddressYesNo.change.hidden = CompanyAddressYesNo
+companyAddressYesNo.title = Do you want to add an address for this company?
+companyAddressYesNo.heading = Do you want to add an address for {0}?
+companyAddressYesNo.hint = You can add this information later if you prefer
+companyAddressYesNo.checkYourAnswersLabel = Company Address
+companyAddressYesNo.error.required = Select whether you want to add an address for this company
+companyAddressYesNo.change.hidden = company address
 
 companyAddress.title = companyAddress
 companyAddress.heading = companyAddress
