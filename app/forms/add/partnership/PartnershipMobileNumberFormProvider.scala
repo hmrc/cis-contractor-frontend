@@ -16,6 +16,7 @@
 
 package forms.add.partnership
 
+import forms.mapping.Constants
 import forms.mappings.Mappings
 import play.api.data.Form
 
@@ -24,7 +25,6 @@ import javax.inject.Inject
 class PartnershipMobileNumberFormProvider @Inject() extends Mappings {
 
   private val mobileRegex     = """^[0-9 )(\-]+$"""
-  private val maxMobileLength = 35
 
   def apply(): Form[String] =
     Form(
@@ -33,7 +33,7 @@ class PartnershipMobileNumberFormProvider @Inject() extends Mappings {
         .verifying(
           firstError(
             regexp(mobileRegex, "partnershipMobileNumber.error.invalid"),
-            maxLength(maxMobileLength, "partnershipMobileNumber.error.length")
+            maxLength(Constants.MaxLength35, "partnershipMobileNumber.error.length")
           )
         )
     )

@@ -1046,13 +1046,14 @@ class NavigatorSpec extends SpecBase {
         ) mustBe journeyRecovery
       }
 
-      "must go from a PartnershipMobileNumberPage to CYA" in {
+      "must go from a PartnershipMobileNumberPage to PartnershipMobileNumberPage in CheckMode" in {
         navigator.nextPage(
           PartnershipMobileNumberPage,
           CheckMode,
-          UserAnswers("id")
-        ) mustBe CYA
+          emptyUserAnswers
+        ) mustBe controllers.add.partnership.routes.PartnershipMobileNumberController.onPageLoad(CheckMode)
       }
+
       "must go from CompanyAddressYesNoPage to CompanyAddressYesNoPage in CheckMode" in {
         navigator.nextPage(
           CompanyAddressYesNoPage,
