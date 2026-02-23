@@ -17,6 +17,7 @@
 package forms.add.partnership
 
 import forms.mappings.Mappings
+import mapping.Constants
 import play.api.data.Form
 
 import javax.inject.Inject
@@ -32,7 +33,7 @@ class PartnershipPhoneNumberFormProvider @Inject() extends Mappings {
         .verifying(
           firstError(
             regexp(phoneRegex, "partnershipPhoneNumber.error.invalid"),
-            maxLength(35, "partnershipPhoneNumber.error.length")
+            maxLength(Constants.MaxLength35, "partnershipPhoneNumber.error.length")
           )
         )
     )
