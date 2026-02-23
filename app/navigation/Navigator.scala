@@ -22,6 +22,7 @@ import controllers.routes
 import pages.*
 import models.*
 import models.add.TypeOfSubcontractor.*
+import models.add.partnership.PartnershipChooseContactDetails.*
 import pages.add.*
 import pages.add.partnership.*
 import pages.add.company.*
@@ -71,6 +72,8 @@ class Navigator @Inject() () {
       userAnswers => navigatorFromPartnershipContactDetailsYesNoPage(NormalMode)(userAnswers)
     case PartnershipNominatedPartnerCrnPage        =>
       _ => controllers.add.partnership.routes.PartnershipNominatedPartnerCrnController.onPageLoad(NormalMode)
+    case PartnershipChooseContactDetailsPage       =>
+      userAnswers => navigatorFromChooseContactDetailsPage(NormalMode)(userAnswers)
     case PartnershipNominatedPartnerNinoYesNoPage  =>
       _ => controllers.add.partnership.routes.PartnershipNominatedPartnerNinoYesNoController.onPageLoad(NormalMode)
     case PartnershipNominatedPartnerNamePage       =>
@@ -97,6 +100,7 @@ class Navigator @Inject() () {
     case PartnershipHasUtrYesNoPage               => navigatorFromPartnershipHasUtrYesNoPage(CheckMode)(_)
     case PartnershipWorksReferenceNumberYesNoPage => navigatorFromPartnershipWorksReferenceNumberYesNoPage(CheckMode)(_)
     case PartnershipContactDetailsYesNoPage       => navigatorFromPartnershipContactDetailsYesNoPage(CheckMode)(_)
+    case PartnershipChooseContactDetailsPage      => navigatorFromChooseContactDetailsPage(CheckMode)(_)
     case PartnershipNominatedPartnerCrnYesNoPage  => navigatorFromPartnershipNominatedPartnerCrnYesNoPage(CheckMode)(_)
     case PartnershipAddressYesNoPage              =>
       _ => controllers.add.partnership.routes.PartnershipAddressYesNoController.onPageLoad(CheckMode)
@@ -305,4 +309,24 @@ class Navigator @Inject() () {
       case (Some(false), CheckMode)  => controllers.add.routes.CheckYourAnswersController.onPageLoad()
       case (None, _)                 => routes.JourneyRecoveryController.onPageLoad()
     }
+
+  private def navigatorFromChooseContactDetailsPage(mode: Mode)(userAnswers: UserAnswers): Call =
+    (userAnswers.get(PartnershipChooseContactDetailsPage), mode) match {
+      // TODO: EMAIL       - CIS ANSF PTN: Screen AS-P4 (PTN) - What are the contact details for [partnership name]?
+      case (Some(Email), _)  =>
+        controllers.add.partnership.routes.PartnershipChooseContactDetailsController.onPageLoad(mode)
+
+      // TODO: PHOME       - CIS ANSF PTN: Screen AS-P4 (PTN) - What are the contact details for [partnership name]?
+      case (Some(Phone), _)  =>
+        controllers.add.partnership.routes.PartnershipChooseContactDetailsController.onPageLoad(mode)
+      // TODO: MOBILE      - CIS ANSF PTN: Screen AS-P4 (PTN) - What are the contact details for [partnership name]?
+      case (Some(Mobile), _) =>
+        controllers.add.partnership.routes.PartnershipChooseContactDetailsController.onPageLoad(mode)
+      // TODO: NO DETAILS  - CIS ANSF PTN: Screen AS-P4 (PTN) - What are the contact details for [partnership name]?
+      case (Some(_), _)      =>
+        controllers.add.partnership.routes.PartnershipChooseContactDetailsController.onPageLoad(mode)
+      case (_, CheckMode)    => controllers.add.routes.CheckYourAnswersController.onPageLoad()
+      case _                 => routes.JourneyRecoveryController.onPageLoad()
+    }
+
 }
