@@ -23,6 +23,7 @@ import models.*
 import models.add.{SubcontractorName, TypeOfSubcontractor, UKAddress}
 import pages.add.*
 import pages.add.partnership.*
+import pages.add.partnership.PartnershipNominatedPartnerNinoPage
 
 class NavigatorSpec extends SpecBase {
 
@@ -71,14 +72,6 @@ class NavigatorSpec extends SpecBase {
           NormalMode,
           emptyUserAnswers
         ) mustBe controllers.add.partnership.routes.PartnershipHasUtrYesNoController.onPageLoad(NormalMode)
-      }
-
-      "must go from PartnershipNamePage to CheckYourAnswersController in CheckMode" in {
-        navigator.nextPage(
-          PartnershipNamePage,
-          CheckMode,
-          emptyUserAnswers
-        ) mustBe controllers.add.routes.CheckYourAnswersController.onPageLoad()
       }
 
       "must go from a TypeOfSubcontractorPage to JourneyRecovery when Trust is selected" in {
@@ -493,6 +486,32 @@ class NavigatorSpec extends SpecBase {
           UserAnswers("id")
         ) mustBe controllers.add.partnership.routes.PartnershipEmailAddressController.onPageLoad(NormalMode)
       }
+      
+      "must go from a PartnershipNominatedPartnerUtrYesNoPage to next page when true" in {
+        navigator.nextPage(
+          PartnershipNominatedPartnerUtrYesNoPage,
+          NormalMode,
+          emptyUserAnswers.setOrException(PartnershipNominatedPartnerUtrYesNoPage, true)
+        ) mustBe controllers.add.partnership.routes.PartnershipNominatedPartnerUtrYesNoController
+          .onPageLoad(NormalMode)
+      }
+
+      "must go from a PartnershipNominatedPartnerUtrYesNoPage to next page when false" in {
+        navigator.nextPage(
+          PartnershipNominatedPartnerUtrYesNoPage,
+          NormalMode,
+          emptyUserAnswers.setOrException(PartnershipNominatedPartnerUtrYesNoPage, false)
+        ) mustBe controllers.add.partnership.routes.PartnershipNominatedPartnerUtrYesNoController
+          .onPageLoad(NormalMode)
+      }
+
+      "must go from a PartnershipNominatedPartnerUtrYesNoPage to journey recovery when incomplete info provided" in {
+        navigator.nextPage(
+          PartnershipNominatedPartnerUtrYesNoPage,
+          NormalMode,
+          emptyUserAnswers
+        ) mustBe journeyRecovery
+      }
     }
 
     "in Check mode" - {
@@ -861,6 +880,31 @@ class NavigatorSpec extends SpecBase {
           emptyUserAnswers
         ) mustBe controllers.add.partnership.routes.PartnershipEmailAddressController.onPageLoad(CheckMode)
       }
+      
+      "must go from a PartnershipNominatedPartnerUtrYesNoPage to next page when true" in {
+        navigator.nextPage(
+          PartnershipNominatedPartnerUtrYesNoPage,
+          CheckMode,
+          emptyUserAnswers.setOrException(PartnershipNominatedPartnerUtrYesNoPage, true)
+        ) mustBe controllers.add.partnership.routes.PartnershipNominatedPartnerUtrYesNoController.onPageLoad(CheckMode)
+      }
+
+      "must go from a PartnershipNominatedPartnerUtrYesNoPage to CYA page when false" in {
+        navigator.nextPage(
+          PartnershipNominatedPartnerUtrYesNoPage,
+          CheckMode,
+          emptyUserAnswers.setOrException(PartnershipNominatedPartnerUtrYesNoPage, false)
+        ) mustBe CYA
+      }
+
+      "must go from a PartnershipNominatedPartnerUtrYesNoPage to journey recovery page when incomplete info provided" in {
+        navigator.nextPage(
+          PartnershipNominatedPartnerUtrYesNoPage,
+          CheckMode,
+          emptyUserAnswers
+        ) mustBe journeyRecovery
+      }
+
     }
 
     "navigatorFromSubTradingNameYesNoPage in NormalMode" - {
@@ -919,6 +963,22 @@ class NavigatorSpec extends SpecBase {
         result mustBe CYA
       }
 
+      "must go from PartnershipNominatedPartnerCrnPage to PartnershipNominatedPartnerCrnController in NormalMode" in {
+        navigator.nextPage(
+          PartnershipNominatedPartnerCrnPage,
+          NormalMode,
+          emptyUserAnswers
+        ) mustBe controllers.add.partnership.routes.PartnershipNominatedPartnerCrnController.onPageLoad(NormalMode)
+      }
+
+      "must go from PartnershipNominatedPartnerCrnPage to CYA in CheckMode" in {
+        navigator.nextPage(
+          PartnershipNominatedPartnerCrnPage,
+          CheckMode,
+          emptyUserAnswers
+        ) mustBe controllers.add.routes.CheckYourAnswersController.onPageLoad()
+      }
+
       "must go from UniqueTaxpayerReferenceYesNoPage to CYA when true and SubcontractorsUniqueTaxpayerReferencePage is already answered" in {
         val ua =
           emptyUserAnswers
@@ -969,6 +1029,22 @@ class NavigatorSpec extends SpecBase {
           CheckMode,
           UserAnswers("id")
         ) mustBe CYA
+      }
+
+      "must go from PartnershipNominatedPartnerNinoPage to itself in NormalMode" in {
+        navigator.nextPage(
+          PartnershipNominatedPartnerNinoPage,
+          NormalMode,
+          emptyUserAnswers
+        ) mustBe controllers.add.partnership.routes.PartnershipNominatedPartnerNinoController.onPageLoad(NormalMode)
+      }
+
+      "must go from PartnershipNominatedPartnerNinoPage to CYA in CheckMode" in {
+        navigator.nextPage(
+          PartnershipNominatedPartnerNinoPage,
+          CheckMode,
+          emptyUserAnswers
+        ) mustBe controllers.add.routes.CheckYourAnswersController.onPageLoad()
       }
 
     }

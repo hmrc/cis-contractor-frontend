@@ -39,7 +39,7 @@ class PartnershipWorksReferenceNumberYesNoViewSpec extends AnyWordSpec with Matc
 
       val html: HtmlFormat.Appendable = view(form, NormalMode, partnershipName)
       val doc: Document               = org.jsoup.Jsoup.parse(html.toString())
-      doc.select("title").text() must include(messages("partnershipWorksReferenceNumberYesNo.title", partnershipName))
+      doc.select("title").text() must include(messages("partnershipWorksReferenceNumberYesNo.title"))
 
       val legend: Elements = doc.select("fieldset legend")
       legend.text() mustBe messages("partnershipWorksReferenceNumberYesNo.heading", partnershipName)

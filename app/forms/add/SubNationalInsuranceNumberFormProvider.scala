@@ -19,18 +19,33 @@ package forms.add
 import forms.mappings.Mappings
 import forms.Validation
 import play.api.data.Form
+import play.api.data.validation.{Constraint, Invalid, Valid}
 
 import javax.inject.Inject
 
 class SubNationalInsuranceNumberFormProvider @Inject() extends Mappings {
+
+  private val maxLength = 9
+
+  private def normalised(value: String): String =
+    value.replaceAll("\\s", "").toUpperCase
+
+  private val lengthConstraint: Constraint[String] =
+    Constraint("constraints.nino.length") { value =>
+      if (normalised(value).length <= maxLength) {
+        Valid
+      } else {
+        Invalid("subNationalInsuranceNumber.error.length")
+      }
+    }
 
   def apply(): Form[String] =
     Form(
       "value" -> nino("subNationalInsuranceNumber.error.required")
         .verifying(
           firstError(
-            maxLength(9, "subNationalInsuranceNumber.error.length"),
-            regexp(Validation.ninoRegex, "subNationalInsuranceNumber.error.invalidCharacters")
+            lengthConstraint,
+            Validation.isNinoValid("value", "subNationalInsuranceNumber.error.invalidCharacters")
           )
         )
     )
