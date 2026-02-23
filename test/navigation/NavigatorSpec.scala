@@ -24,6 +24,7 @@ import models.add.partnership.PartnershipChooseContactDetails
 import models.add.{SubcontractorName, TypeOfSubcontractor, UKAddress}
 import pages.add.*
 import pages.add.partnership.*
+import pages.add.company.*
 import pages.add.partnership.PartnershipNominatedPartnerNinoPage
 
 class NavigatorSpec extends SpecBase {
@@ -566,6 +567,14 @@ class NavigatorSpec extends SpecBase {
           emptyUserAnswers
         ) mustBe journeyRecovery
       }
+
+      "must go from a CompanyAddressYesNoPage to CompanyAddressYesNoPage" in {
+        navigator.nextPage(
+          CompanyAddressYesNoPage,
+          NormalMode,
+          UserAnswers("id")
+        ) mustBe controllers.add.company.routes.CompanyAddressYesNoController.onPageLoad(NormalMode)
+      }
     }
 
     "in Check mode" - {
@@ -1013,6 +1022,13 @@ class NavigatorSpec extends SpecBase {
         ) mustBe journeyRecovery
       }
 
+      "must go from CompanyAddressYesNoPage to CompanyAddressYesNoPage in CheckMode" in {
+        navigator.nextPage(
+          CompanyAddressYesNoPage,
+          CheckMode,
+          emptyUserAnswers
+        ) mustBe controllers.add.company.routes.CompanyAddressYesNoController.onPageLoad(CheckMode)
+      }
     }
 
     "navigatorFromSubTradingNameYesNoPage in NormalMode" - {
