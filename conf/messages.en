@@ -424,6 +424,15 @@ partnershipNominatedPartnerUtr.error.length = Enter a valid Unique Taxpayer Refe
 partnershipNominatedPartnerUtr.error.invalid = Enter a valid Unique Taxpayer Reference (UTR) using 10 digits
 partnershipNominatedPartnerUtr.change.hidden = nominated partner Unique Taxpayer Reference
 
+partnershipEmailAddress.title = What is the email address for this partnership?
+partnershipEmailAddress.heading = What is the email address for {0}?
+partnershipEmailAddress.hint = HMRC will never use this email address to contact this subcontractor
+partnershipEmailAddress.checkYourAnswersLabel = Partnership Email Address
+partnershipEmailAddress.error.required = Enter an email address in the correct format, like name@example.com
+partnershipEmailAddress.error.invalid = Enter a valid email address in the correct format, like name@example.com
+partnershipEmailAddress.error.length = Enter a valid email address in the correct format, like name@example.com, up to 254 characters
+partnershipEmailAddress.change.hidden = partnership email address
+
 partnershipNominatedPartnerUtrYesNo.title = Do you know the Unique Taxpayer Reference for the nominated partner?
 partnershipNominatedPartnerUtrYesNo.heading = Do you know the Unique Taxpayer Reference for {0}?
 partnershipNominatedPartnerUtrYesNo.hint = This information will be used to verify them as a subcontractor
