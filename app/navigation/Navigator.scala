@@ -80,6 +80,8 @@ class Navigator @Inject() () {
       _ => controllers.add.partnership.routes.PartnershipNominatedPartnerUtrController.onPageLoad(NormalMode)
     case PartnershipNominatedPartnerUtrYesNoPage   =>
       userAnswers => navigatorFromPartnershipNominatedPartnerUtrYesNoPage(NormalMode)(userAnswers)
+    case PartnershipMobileNumberPage               =>
+      _ => controllers.add.partnership.routes.PartnershipMobileNumberController.onPageLoad(NormalMode)
     case _                                         => _ => routes.IndexController.onPageLoad()
   }
 

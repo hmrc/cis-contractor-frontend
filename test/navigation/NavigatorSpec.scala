@@ -511,6 +511,15 @@ class NavigatorSpec extends SpecBase {
           emptyUserAnswers
         ) mustBe journeyRecovery
       }
+
+      "must go from a PartnershipMobileNumberPage to next Page" in {
+        navigator.nextPage(
+          PartnershipMobileNumberPage,
+          NormalMode,
+          UserAnswers("id")
+        ) mustBe controllers.add.partnership.routes.PartnershipMobileNumberController.onPageLoad(NormalMode)
+      }
+
     }
 
     "in Check mode" - {
@@ -904,6 +913,13 @@ class NavigatorSpec extends SpecBase {
         ) mustBe journeyRecovery
       }
 
+      "must go from a PartnershipMobileNumberPage to CYA" in {
+        navigator.nextPage(
+          PartnershipMobileNumberPage,
+          CheckMode,
+          UserAnswers("id")
+        ) mustBe CYA
+      }
     }
 
     "navigatorFromSubTradingNameYesNoPage in NormalMode" - {
