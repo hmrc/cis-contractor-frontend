@@ -17,5 +17,5 @@
 package mapping
 
 object Constants {
-  final val MaxLength35:          Int    = 35
+  final val MaxLength35: Int = 35
 }
