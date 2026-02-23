@@ -45,7 +45,7 @@ trait ModelGenerators {
         country = country
       )
     }
-  
+
   implicit lazy val arbitraryCompanyContactOptions: Arbitrary[CompanyContactOptions] =
     Arbitrary {
       Gen.oneOf(CompanyContactOptions.values.toSeq)
