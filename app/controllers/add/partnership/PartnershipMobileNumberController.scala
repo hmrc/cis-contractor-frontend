@@ -31,17 +31,18 @@ import views.html.add.partnership.PartnershipMobileNumberView
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class PartnershipMobileNumberController @Inject() (override val messagesApi: MessagesApi,
-                                                   sessionRepository: SessionRepository,
-                                                   navigator: Navigator,
-                                                   identify: IdentifierAction,
-                                                   getData: DataRetrievalAction,
-                                                   requireData: DataRequiredAction,
-                                                   formProvider: PartnershipMobileNumberFormProvider,
-                                                   val controllerComponents: MessagesControllerComponents,
-                                                   view: PartnershipMobileNumberView
-                                                  )(implicit ec: ExecutionContext)
-  extends FrontendBaseController
+class PartnershipMobileNumberController @Inject() (
+  override val messagesApi: MessagesApi,
+  sessionRepository: SessionRepository,
+  navigator: Navigator,
+  identify: IdentifierAction,
+  getData: DataRetrievalAction,
+  requireData: DataRequiredAction,
+  formProvider: PartnershipMobileNumberFormProvider,
+  val controllerComponents: MessagesControllerComponents,
+  view: PartnershipMobileNumberView
+)(implicit ec: ExecutionContext)
+    extends FrontendBaseController
     with I18nSupport {
 
   val form: Form[String] = formProvider()
@@ -51,7 +52,7 @@ class PartnershipMobileNumberController @Inject() (override val messagesApi: Mes
       .get(PartnershipNamePage)
       .map { partnershipName =>
         val preparedForm = request.userAnswers.get(PartnershipMobileNumberPage) match {
-          case None => form
+          case None        => form
           case Some(value) => form.fill(value)
         }
         Ok(view(preparedForm, mode, partnershipName))
@@ -72,7 +73,7 @@ class PartnershipMobileNumberController @Inject() (override val messagesApi: Mes
               value =>
                 for {
                   updatedAnswers <- Future.fromTry(request.userAnswers.set(PartnershipMobileNumberPage, value))
-                  _ <- sessionRepository.set(updatedAnswers)
+                  _              <- sessionRepository.set(updatedAnswers)
                 } yield Redirect(navigator.nextPage(PartnershipMobileNumberPage, mode, updatedAnswers))
             )
         }

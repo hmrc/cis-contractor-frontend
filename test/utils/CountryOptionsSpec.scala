@@ -51,7 +51,7 @@ class CountryOptionsSpec extends AnyWordSpec with Matchers with MockitoSugar {
       val countryOptions = new CountryOptions(mockConfig)
 
       countryOptions.getCountryNameFromCode("United Kingdom") shouldBe "United Kingdom"
-      countryOptions.getCountryNameFromCode("France") shouldBe "France"
+      countryOptions.getCountryNameFromCode("France")         shouldBe "France"
     }
 
     "return input itself if country code/name is not found" in {

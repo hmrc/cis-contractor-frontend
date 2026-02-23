@@ -23,7 +23,7 @@ import javax.inject.Inject
 
 class PartnershipMobileNumberFormProvider @Inject() extends Mappings {
 
-  private val mobileRegex = """^[0-9 )(\-]+$"""
+  private val mobileRegex     = """^[0-9 )(\-]+$"""
   private val maxMobileLength = 35
 
   def apply(): Form[String] =
