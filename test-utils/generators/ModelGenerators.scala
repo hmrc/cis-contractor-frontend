@@ -18,7 +18,8 @@ package generators
 
 import models.*
 import models.add.company.CompanyContactOptions
-import models.add.{SubContactDetails, TypeOfSubcontractor, UKAddress}
+import models.add.partnership.PartnershipChooseContactDetails
+import models.add.{PartnershipCountryAddress, SubContactDetails, TypeOfSubcontractor, UKAddress}
 import org.scalacheck.{Arbitrary, Gen}
 import play.api.libs.json.Json
 import org.scalacheck.Arbitrary.arbitrary
@@ -26,6 +27,25 @@ import org.scalacheck.Arbitrary.arbitrary
 import java.time.Instant
 
 trait ModelGenerators {
+
+  implicit lazy val arbitraryPartnershipCountryAddress: Arbitrary[PartnershipCountryAddress] =
+    Arbitrary {
+      for {
+        addressLine1 <- Gen.alphaStr.suchThat(_.nonEmpty)
+        addressLine2 <- Gen.option(Gen.alphaStr)
+        addressLine3 <- Gen.alphaStr.suchThat(_.nonEmpty)
+        addressLine4 <- Gen.option(Gen.alphaStr)
+        postalCode   <- Gen.alphaStr.suchThat(_.nonEmpty)
+        country      <- Gen.alphaStr.suchThat(_.nonEmpty)
+      } yield PartnershipCountryAddress(
+        addressLine1 = addressLine1,
+        addressLine2 = addressLine2,
+        addressLine3 = addressLine3,
+        addressLine4 = addressLine4,
+        postalCode = postalCode,
+        country = country
+      )
+    }
 
   implicit lazy val arbitraryCompanyContactOptions: Arbitrary[CompanyContactOptions] =
     Arbitrary {
@@ -53,7 +73,12 @@ trait ModelGenerators {
 
   implicit lazy val arbitrarySubcontractorTypes: Arbitrary[TypeOfSubcontractor] =
     Arbitrary {
-      Gen.oneOf(TypeOfSubcontractor.values.toSeq)
+      Gen.oneOf(TypeOfSubcontractor.values)
+    }
+
+  implicit lazy val arbitraryPartnershipChooseContactDetails: Arbitrary[PartnershipChooseContactDetails] =
+    Arbitrary {
+      Gen.oneOf(PartnershipChooseContactDetails.values)
     }
 
   implicit lazy val arbitraryUserAnswers: Arbitrary[UserAnswers] =
