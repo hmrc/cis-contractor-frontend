@@ -20,6 +20,7 @@ import base.SpecBase
 import controllers.routes
 import pages.*
 import models.*
+import models.add.partnership.PartnershipChooseContactDetails
 import models.add.{SubcontractorName, TypeOfSubcontractor, UKAddress}
 import pages.add.*
 import pages.add.partnership.*
@@ -487,6 +488,68 @@ class NavigatorSpec extends SpecBase {
           ) mustBe journeyRecovery
         }
       }
+
+      "must go from a PartnershipEmailAddressPage to PartnershipEmailAddressPage" in {
+        navigator.nextPage(
+          PartnershipEmailAddressPage,
+          NormalMode,
+          UserAnswers("id")
+        ) mustBe controllers.add.partnership.routes.PartnershipEmailAddressController.onPageLoad(NormalMode)
+      }
+      
+      "must go from PartnershipChooseContactDetailsPage" - {
+        "to itself when Email is selected" in {
+          navigator.nextPage(
+            PartnershipChooseContactDetailsPage,
+            NormalMode,
+            emptyUserAnswers.setOrException(
+              PartnershipChooseContactDetailsPage,
+              PartnershipChooseContactDetails.Email
+            )
+          ) mustBe controllers.add.partnership.routes.PartnershipChooseContactDetailsController.onPageLoad(NormalMode)
+        }
+
+        "to itself when Phone is selected" in {
+          navigator.nextPage(
+            PartnershipChooseContactDetailsPage,
+            NormalMode,
+            emptyUserAnswers.setOrException(
+              PartnershipChooseContactDetailsPage,
+              models.add.partnership.PartnershipChooseContactDetails.Phone
+            )
+          ) mustBe controllers.add.partnership.routes.PartnershipChooseContactDetailsController.onPageLoad(NormalMode)
+        }
+
+        "to itself when Mobile is selected" in {
+          navigator.nextPage(
+            PartnershipChooseContactDetailsPage,
+            NormalMode,
+            emptyUserAnswers.setOrException(
+              PartnershipChooseContactDetailsPage,
+              models.add.partnership.PartnershipChooseContactDetails.Mobile
+            )
+          ) mustBe controllers.add.partnership.routes.PartnershipChooseContactDetailsController.onPageLoad(NormalMode)
+        }
+
+        "to itself when NoDetails is selected" in {
+          navigator.nextPage(
+            PartnershipChooseContactDetailsPage,
+            NormalMode,
+            emptyUserAnswers.setOrException(
+              PartnershipChooseContactDetailsPage,
+              models.add.partnership.PartnershipChooseContactDetails.NoDetails
+            )
+          ) mustBe controllers.add.partnership.routes.PartnershipChooseContactDetailsController.onPageLoad(NormalMode)
+        }
+
+        "to JourneyRecoveryPage when answer is not present" in {
+          navigator.nextPage(
+            PartnershipChooseContactDetailsPage,
+            NormalMode,
+            emptyUserAnswers
+          ) mustBe journeyRecovery
+        }
+      }
       "must go from a PartnershipNominatedPartnerUtrYesNoPage to next page when true" in {
         navigator.nextPage(
           PartnershipNominatedPartnerUtrYesNoPage,
@@ -850,6 +913,60 @@ class NavigatorSpec extends SpecBase {
         }
       }
 
+      "must go from PartnershipChooseContactDetailsPage" - {
+        "to itself when Email is selected" in {
+          navigator.nextPage(
+            PartnershipChooseContactDetailsPage,
+            CheckMode,
+            emptyUserAnswers.setOrException(
+              PartnershipChooseContactDetailsPage,
+              models.add.partnership.PartnershipChooseContactDetails.Email
+            )
+          ) mustBe controllers.add.partnership.routes.PartnershipChooseContactDetailsController.onPageLoad(CheckMode)
+        }
+
+        "to itself when Phone is selected" in {
+          navigator.nextPage(
+            PartnershipChooseContactDetailsPage,
+            CheckMode,
+            emptyUserAnswers.setOrException(
+              PartnershipChooseContactDetailsPage,
+              models.add.partnership.PartnershipChooseContactDetails.Phone
+            )
+          ) mustBe controllers.add.partnership.routes.PartnershipChooseContactDetailsController.onPageLoad(CheckMode)
+        }
+
+        "to itself when Mobile is selected" in {
+          navigator.nextPage(
+            PartnershipChooseContactDetailsPage,
+            CheckMode,
+            emptyUserAnswers.setOrException(
+              PartnershipChooseContactDetailsPage,
+              models.add.partnership.PartnershipChooseContactDetails.Mobile
+            )
+          ) mustBe controllers.add.partnership.routes.PartnershipChooseContactDetailsController.onPageLoad(CheckMode)
+        }
+
+        "to itself when NoDetails is selected" in {
+          navigator.nextPage(
+            PartnershipChooseContactDetailsPage,
+            CheckMode,
+            emptyUserAnswers.setOrException(
+              PartnershipChooseContactDetailsPage,
+              models.add.partnership.PartnershipChooseContactDetails.NoDetails
+            )
+          ) mustBe controllers.add.partnership.routes.PartnershipChooseContactDetailsController.onPageLoad(CheckMode)
+        }
+
+        "to CYA when answer is not present" in {
+          navigator.nextPage(
+            PartnershipChooseContactDetailsPage,
+            CheckMode,
+            emptyUserAnswers
+          ) mustBe CYA
+        }
+      }
+
       "must go from a PartnershipNominatedPartnerNamePage to CYA" in {
         navigator.nextPage(
           PartnershipNominatedPartnerNamePage,
@@ -897,6 +1014,14 @@ class NavigatorSpec extends SpecBase {
         }
       }
 
+      "must go from PartnershipEmailAddressPage to PartnershipEmailAddressPage in CheckMode" in {
+        navigator.nextPage(
+          PartnershipEmailAddressPage,
+          CheckMode,
+          emptyUserAnswers
+        ) mustBe controllers.add.partnership.routes.PartnershipEmailAddressController.onPageLoad(CheckMode)
+      }
+      
       "must go from a PartnershipNominatedPartnerUtrYesNoPage to next page when true" in {
         navigator.nextPage(
           PartnershipNominatedPartnerUtrYesNoPage,
