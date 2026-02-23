@@ -19,6 +19,7 @@ package forms.add.partnership
 import forms.mappings.Mappings
 import play.api.data.Form
 import forms.Validation
+import forms.mapping.Constants
 
 import javax.inject.Inject
 
@@ -30,7 +31,7 @@ class PartnershipEmailAddressFormProvider @Inject() extends Mappings {
         .verifying(
           firstError(
             maxLength(
-              254,
+              Constants.MaxLength254,
               "partnershipEmailAddress.error.length"
             ),
             regexp(

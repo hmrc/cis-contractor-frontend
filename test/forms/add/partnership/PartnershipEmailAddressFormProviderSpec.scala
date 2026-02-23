@@ -19,13 +19,14 @@ package forms.add.partnership
 import forms.behaviours.StringFieldBehaviours
 import play.api.data.FormError
 import org.scalacheck.Gen
+import forms.mapping.Constants
 
 class PartnershipEmailAddressFormProviderSpec extends StringFieldBehaviours {
 
   val requiredKey = "partnershipEmailAddress.error.required"
   val invalidKey  = "partnershipEmailAddress.error.invalid"
   val lengthKey   = "partnershipEmailAddress.error.length"
-  val maxLength   = 254
+  val maxLength   = Constants.MaxLength254
 
   val form = new PartnershipEmailAddressFormProvider()()
 
