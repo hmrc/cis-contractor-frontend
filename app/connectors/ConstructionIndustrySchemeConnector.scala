@@ -16,12 +16,13 @@
 
 package connectors
 
+import models.requests.CreateAndUpdateSubcontractorPayload
+import models.requests.CreateAndUpdateSubcontractorPayload.{IndividualOrSoleTraderPayload, PartnershipPayload}
 import models.response.CisTaxpayerResponse
 import models.subcontractor.GetSubcontractorUTRsResponse
-import models.subcontractor.CreateAndUpdateSubcontractorRequest
 import play.api.Logging
 import play.api.http.Status.NO_CONTENT
-import play.api.libs.json.Json
+import play.api.libs.json.{JsValue, Json}
 import play.api.libs.ws.JsonBodyWritables.writeableOf_JsValue
 import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.http.{HeaderCarrier, HttpReadsInstances, HttpResponse, StringContextOps}
@@ -48,26 +49,30 @@ class ConstructionIndustrySchemeConnector @Inject() (config: ServicesConfig, htt
       }
 
   def createAndUpdateSubcontractor(
-    payload: CreateAndUpdateSubcontractorRequest
-  )(implicit hc: HeaderCarrier): Future[Unit] =
+    payload: CreateAndUpdateSubcontractorPayload
+  )(implicit hc: HeaderCarrier): Future[Unit] = {
+
+    val jsonPayload: JsValue = payload match {
+      case p: IndividualOrSoleTraderPayload => Json.toJson(p)
+      case p: PartnershipPayload            => Json.toJson(p)
+    }
+
     logger.info(
-      s"[ConstructionIndustrySchemeConnector][createAndUpdateSubcontractor] Payload: ${Json.toJson(payload)}"
+      s"[ConstructionIndustrySchemeConnector][createAndUpdateSubcontractor] Payload: $jsonPayload"
     )
+
     http
       .post(url"$cisBaseUrl/subcontractor/create-and-update")
-      .withBody(Json.toJson(payload))
+      .withBody(jsonPayload)
       .execute[HttpResponse]
       .flatMap { response =>
         if (response.status == NO_CONTENT) {
           Future.successful(())
         } else {
-          Future.failed(
-            new RuntimeException(
-              s"Update subcontractor failed, returned ${response.status}"
-            )
-          )
+          Future.failed(new RuntimeException(s"Update subcontractor failed, returned ${response.status}"))
         }
       }
+  }
 
   def getSubcontractorUTRs(
     cisId: String
