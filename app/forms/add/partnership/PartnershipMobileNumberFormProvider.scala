@@ -16,15 +16,14 @@
 
 package forms.add.partnership
 
-import forms.mapping.Constants
+import forms.Validation.mobileRegex
+import forms.mappings.Constants
 import forms.mappings.Mappings
 import play.api.data.Form
 
 import javax.inject.Inject
 
 class PartnershipMobileNumberFormProvider @Inject() extends Mappings {
-
-  private val mobileRegex     = """^[0-9 )(\-]+$"""
 
   def apply(): Form[String] =
     Form(

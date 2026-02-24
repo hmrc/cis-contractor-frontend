@@ -23,6 +23,7 @@ object Validation {
 
   final val worksRefRegex = """^[A-Za-z0-9 ~!@#$%&'()*+,-./:;=?_{}£€]+$"""
   final val emailRegex    = """^[A-Za-z0-9!#$%&*+\-/=?^_`{|}~.]+@[A-Za-z0-9!#$%&*+\-/=?^_`{|}~.]+$"""
+  final val mobileRegex   = """^\+?[0-9 ()\-]+$"""
 
   final val companyRegNumberRegex =
     """(?i)^(?:[A-Z]{2}\d{1,6}|\d{1,8})$"""
