@@ -17,7 +17,7 @@
 package forms.add.partnership
 
 import forms.mappings.Mappings
-import models.add.PartnershipCountryAddress
+import models.add.InternationalAddress
 import play.api.data.{Form, Forms}
 
 import javax.inject.Inject
@@ -35,7 +35,7 @@ class PartnershipAddressFormProvider @Inject() extends Mappings {
   private val ukPostcodeRegex =
     """^(GIR\s?0AA|(?:(?:[A-Z]{1,2}\d[A-Z\d]?|\d[A-Z]{2})\s?\d[A-Z]{2}))$"""
 
-  def apply(): Form[PartnershipCountryAddress] = Form(
+  def apply(): Form[InternationalAddress] = Form(
     Forms.mapping(
       "addressLine1" ->
         text("partnershipAddress.error.addressLine1.required")
@@ -103,8 +103,6 @@ class PartnershipAddressFormProvider @Inject() extends Mappings {
             )
           ),
       "country"      -> text("partnershipAddress.country.error.required")
-    )(PartnershipCountryAddress.apply)(partnershipCountryAddress =>
-      Some(Tuple.fromProductTyped(partnershipCountryAddress))
-    )
+    )(InternationalAddress.apply)(internationalAddress => Some(Tuple.fromProductTyped(internationalAddress)))
   )
 }

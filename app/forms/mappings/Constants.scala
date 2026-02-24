@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,19 +14,9 @@
  * limitations under the License.
  */
 
-package pages.add.partnership
+package forms.mapping
 
-import models.add.InternationalAddress
-import pages.behaviours.PageBehaviours
-
-class PartnershipAddressPageSpec extends PageBehaviours {
-
-  "PartnershipAddressPage" - {
-
-    beRetrievable[InternationalAddress](PartnershipAddressPage)
-
-    beSettable[InternationalAddress](PartnershipAddressPage)
-
-    beRemovable[InternationalAddress](PartnershipAddressPage)
-  }
+object Constants {
+  final val MaxLength35: Int = 35
+  final val MaxLength8: Int  = 8
 }

@@ -16,7 +16,7 @@
 
 package viewmodels.checkAnswers.add.company
 
-import models.add.PartnershipCountryAddress
+import models.add.InternationalAddress
 import models.{CheckMode, UserAnswers}
 import org.scalatest.OptionValues.convertOptionToValuable
 import org.scalatest.TryValues.convertTryToSuccessOrFailure
@@ -35,7 +35,7 @@ class CompanyAddressSummarySpec extends AnyWordSpec with Matchers {
 
     "return a SummaryListRow when CompanyAddressPage has an answer" in {
 
-      val address = PartnershipCountryAddress(
+      val address = InternationalAddress(
         addressLine1 = "10 Downing Street",
         addressLine2 = Some("Westminster"),
         addressLine3 = "London",

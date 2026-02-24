@@ -434,8 +434,8 @@ companyAddressYesNo.change.hidden = CompanyAddressYesNo
 
 companyAddress.title = What is the address for this company?
 companyAddress.heading = What is the address for {0}?
-companyAddress.checkYourAnswersLabel = company Address
-companyAddress.change.hidden = company address
+companyAddress.checkYourAnswersLabel = Address
+companyAddress.change.hidden = address
 
 companyAddress.addressLine1 = Address line 1
 companyAddress.error.addressLine1.required = Enter the first line of the address, typically the building and street

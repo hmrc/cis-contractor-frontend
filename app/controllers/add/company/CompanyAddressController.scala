@@ -20,7 +20,7 @@ import config.FrontendAppConfig
 import controllers.actions.*
 import forms.add.company.CompanyAddressFormProvider
 import models.Mode
-import models.add.PartnershipCountryAddress
+import models.add.InternationalAddress
 import navigation.Navigator
 import pages.add.company.{CompanyAddressPage, CompanyNamePage}
 import play.api.i18n.{I18nSupport, MessagesApi}

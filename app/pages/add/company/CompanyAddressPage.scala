@@ -16,11 +16,11 @@
 
 package pages.add.company
 
-import models.add.PartnershipCountryAddress
+import models.add.InternationalAddress
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 
-case object CompanyAddressPage extends QuestionPage[PartnershipCountryAddress] {
+case object CompanyAddressPage extends QuestionPage[InternationalAddress] {
 
   override def path: JsPath = JsPath \ toString
 

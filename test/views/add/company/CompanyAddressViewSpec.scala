@@ -18,7 +18,7 @@ package views.add.company
 
 import forms.add.company.CompanyAddressFormProvider
 import models.NormalMode
-import models.add.PartnershipCountryAddress
+import models.add.InternationalAddress
 import org.jsoup.Jsoup
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
@@ -60,7 +60,7 @@ class CompanyAddressViewSpec extends AnyWordSpec with Matchers with GuiceOneAppP
     }
 
     "display error summary and inline errors when required fields are missing" in new Setup {
-      val errorForm: Form[PartnershipCountryAddress] =
+      val errorForm: Form[InternationalAddress] =
         form
           .withError("addressLine1", "companyAddress.addressLine1.error.required")
           .withError("postalCode", "companyAddress.postalCode.error.required")
@@ -86,7 +86,7 @@ class CompanyAddressViewSpec extends AnyWordSpec with Matchers with GuiceOneAppP
 
   trait Setup {
     val formProvider: CompanyAddressFormProvider = new CompanyAddressFormProvider()
-    val form: Form[PartnershipCountryAddress]        = formProvider()
+    val form: Form[InternationalAddress]         = formProvider()
 
     implicit val request: Request[_]          = FakeRequest()
     implicit val messages: Messages           = MessagesImpl(

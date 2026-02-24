@@ -26,6 +26,17 @@ object Validation {
   final val companyRegNumberRegex =
     """(?i)^(?:[A-Z]{2}\d{1,6}|\d{1,8})$"""
 
+  final val nameRegex =
+    """^[A-Za-z0-9"~!@#\$%*+:\;=\?\s,\.\[\]_\{\}\(\)/&'\-\^\\£€]+$"""
+
+  final val firstCharLetterRegex =
+    """^[A-Za-z].*"""
+
+  final val firstCharLetterOrDigitRegex = """^[A-Za-z0-9].*"""
+
+  final val ukPostcodeRegex =
+    """^(GIR\s?0AA|(?:(?:[A-Z]{1,2}\d[A-Z\d]?|\d[A-Z]{2})\s?\d[A-Z]{2}))$"""
+
   def isNinoValid(value: String, errorKey: String): Constraint[String] =
     Constraint {
       case str if Nino.isValid(str.replaceAll("\\s", "").toUpperCase) =>

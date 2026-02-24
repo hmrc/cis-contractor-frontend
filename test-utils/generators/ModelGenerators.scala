@@ -18,7 +18,7 @@ package generators
 
 import models.*
 import models.add.company.CompanyContactOptions
-import models.add.{PartnershipCountryAddress, SubContactDetails, TypeOfSubcontractor, UKAddress}
+import models.add.{InternationalAddress, SubContactDetails, TypeOfSubcontractor, UKAddress}
 import org.scalacheck.{Arbitrary, Gen}
 import play.api.libs.json.Json
 import org.scalacheck.Arbitrary.arbitrary
@@ -27,7 +27,7 @@ import java.time.Instant
 
 trait ModelGenerators {
 
-  implicit lazy val arbitraryPartnershipCountryAddress: Arbitrary[PartnershipCountryAddress] =
+  implicit lazy val arbitraryInternationalAddress: Arbitrary[InternationalAddress] =
     Arbitrary {
       for {
         addressLine1 <- Gen.alphaStr.suchThat(_.nonEmpty)
@@ -36,7 +36,7 @@ trait ModelGenerators {
         addressLine4 <- Gen.option(Gen.alphaStr)
         postalCode   <- Gen.alphaStr.suchThat(_.nonEmpty)
         country      <- Gen.alphaStr.suchThat(_.nonEmpty)
-      } yield PartnershipCountryAddress(
+      } yield InternationalAddress(
         addressLine1 = addressLine1,
         addressLine2 = addressLine2,
         addressLine3 = addressLine3,

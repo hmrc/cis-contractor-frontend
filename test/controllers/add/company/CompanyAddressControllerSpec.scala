@@ -19,7 +19,7 @@ package controllers.add.company
 import base.SpecBase
 import controllers.routes
 import forms.add.company.CompanyAddressFormProvider
-import models.add.PartnershipCountryAddress
+import models.add.InternationalAddress
 import utils.CountryOptions
 import models.{NormalMode, UserAnswers}
 import org.mockito.ArgumentCaptor
@@ -83,7 +83,7 @@ class CompanyAddressControllerSpec extends SpecBase with MockitoSugar with Match
 
     "must populate the view correctly on a GET when the question has previously been answered and company name is present" in {
 
-      val expected = PartnershipCountryAddress(
+      val expected = InternationalAddress(
         addressLine1 = "line 1",
         addressLine2 = Some("line 2"),
         addressLine3 = "line 3",
@@ -109,7 +109,7 @@ class CompanyAddressControllerSpec extends SpecBase with MockitoSugar with Match
 
         status(result) mustBe OK
 
-        val expected = PartnershipCountryAddress(
+        val expected = InternationalAddress(
           addressLine1 = "line 1",
           addressLine2 = Some("line 2"),
           addressLine3 = "line 3",
