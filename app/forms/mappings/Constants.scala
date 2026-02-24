@@ -14,27 +14,9 @@
  * limitations under the License.
  */
 
-package forms.add.partnership
+package forms.mappings
 
-import forms.Validation
-import forms.mappings.Constants
-import forms.mappings.Mappings
-import play.api.data.Form
-
-import javax.inject.Inject
-
-class PartnershipNameFormProvider @Inject() extends Mappings {
-
-  def apply(): Form[String] =
-    Form(
-      "value" -> text("partnershipName.error.required")
-        .transform(_.trim, identity)
-        .verifying(
-          firstError(
-            maxLength(Constants.MaxLength56, "partnershipName.error.length"),
-            regexp(Validation.nameRegex, "partnershipName.error.invalidCharacters")
-          )
-        )
-    )
-
+object Constants {
+  final val MaxLength254: Int = 254
+  final val MaxLength56: Int  = 56
 }

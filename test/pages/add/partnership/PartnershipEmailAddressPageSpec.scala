@@ -14,27 +14,18 @@
  * limitations under the License.
  */
 
-package forms.add.partnership
+package pages.add.partnership
 
-import forms.Validation
-import forms.mappings.Constants
-import forms.mappings.Mappings
-import play.api.data.Form
+import pages.behaviours.PageBehaviours
 
-import javax.inject.Inject
+class PartnershipEmailAddressPageSpec extends PageBehaviours {
 
-class PartnershipNameFormProvider @Inject() extends Mappings {
+  "PartnershipEmailAddressPage" - {
 
-  def apply(): Form[String] =
-    Form(
-      "value" -> text("partnershipName.error.required")
-        .transform(_.trim, identity)
-        .verifying(
-          firstError(
-            maxLength(Constants.MaxLength56, "partnershipName.error.length"),
-            regexp(Validation.nameRegex, "partnershipName.error.invalidCharacters")
-          )
-        )
-    )
+    beRetrievable[String](PartnershipEmailAddressPage)
 
+    beSettable[String](PartnershipEmailAddressPage)
+
+    beRemovable[String](PartnershipEmailAddressPage)
+  }
 }

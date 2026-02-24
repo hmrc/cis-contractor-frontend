@@ -16,25 +16,29 @@
 
 package forms.add.partnership
 
-import forms.Validation
-import forms.mappings.Constants
 import forms.mappings.Mappings
 import play.api.data.Form
+import forms.Validation
+import forms.mappings.Constants
 
 import javax.inject.Inject
 
-class PartnershipNameFormProvider @Inject() extends Mappings {
+class PartnershipEmailAddressFormProvider @Inject() extends Mappings {
 
   def apply(): Form[String] =
     Form(
-      "value" -> text("partnershipName.error.required")
-        .transform(_.trim, identity)
+      "value" -> text("partnershipEmailAddress.error.required")
         .verifying(
           firstError(
-            maxLength(Constants.MaxLength56, "partnershipName.error.length"),
-            regexp(Validation.nameRegex, "partnershipName.error.invalidCharacters")
+            maxLength(
+              Constants.MaxLength254,
+              "partnershipEmailAddress.error.length"
+            ),
+            regexp(
+              Validation.emailRegex,
+              "partnershipEmailAddress.error.invalid"
+            )
           )
         )
     )
-
 }

@@ -14,69 +14,74 @@
  * limitations under the License.
  */
 
-package controllers.add.company
+package controllers.add.partnership
 
 import controllers.actions.*
-import forms.add.company.CompanyAddressYesNoFormProvider
+import forms.add.partnership.PartnershipEmailAddressFormProvider
 import models.Mode
 import navigation.Navigator
-import pages.add.company.{CompanyAddressYesNoPage, CompanyNamePage}
-import play.api.data.Form
+import pages.add.partnership.{PartnershipEmailAddressPage, PartnershipNamePage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.add.company.CompanyAddressYesNoView
+import views.html.add.partnership.PartnershipEmailAddressView
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class CompanyAddressYesNoController @Inject() (
+class PartnershipEmailAddressController @Inject() (
   override val messagesApi: MessagesApi,
   sessionRepository: SessionRepository,
   navigator: Navigator,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
-  formProvider: CompanyAddressYesNoFormProvider,
+  formProvider: PartnershipEmailAddressFormProvider,
   val controllerComponents: MessagesControllerComponents,
-  view: CompanyAddressYesNoView
+  view: PartnershipEmailAddressView
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport {
 
-  val form: Form[Boolean] = formProvider()
+  val form = formProvider()
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
     request.userAnswers
-      .get(CompanyNamePage)
-      .map { companyName =>
-        val preparedForm = request.userAnswers.get(CompanyAddressYesNoPage) match {
+      .get(PartnershipNamePage)
+      .map { partnershipName =>
+        val preparedForm = request.userAnswers.get(PartnershipEmailAddressPage) match {
           case None        => form
           case Some(value) => form.fill(value)
         }
 
-        Ok(view(preparedForm, mode, companyName))
+        Ok(view(preparedForm, mode, partnershipName))
       }
-      .getOrElse(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+      .getOrElse(
+        Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+      )
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
       request.userAnswers
-        .get(CompanyNamePage)
-        .map { companyName =>
+        .get(PartnershipNamePage)
+        .map { partnershipName =>
           form
             .bindFromRequest()
             .fold(
-              formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, companyName))),
+              formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, partnershipName))),
               value =>
                 for {
-                  updatedAnswers <- Future.fromTry(request.userAnswers.set(CompanyAddressYesNoPage, value))
+                  updatedAnswers <- Future.fromTry(request.userAnswers.set(PartnershipEmailAddressPage, value))
                   _              <- sessionRepository.set(updatedAnswers)
-                } yield Redirect(navigator.nextPage(CompanyAddressYesNoPage, mode, updatedAnswers))
+                } yield Redirect(navigator.nextPage(PartnershipEmailAddressPage, mode, updatedAnswers))
             )
         }
-        .getOrElse(Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())))
+        .getOrElse(
+          Future.successful(
+            Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+          )
+        )
   }
 }
