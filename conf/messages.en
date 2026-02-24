@@ -440,12 +440,14 @@ partnershipNominatedPartnerUtrYesNo.checkYourAnswersLabel = Nominated partner ha
 partnershipNominatedPartnerUtrYesNo.error.required = Select whether you know the Unique Taxpayer Reference (UTR) for this nominated partner
 partnershipNominatedPartnerUtrYesNo.change.hidden = nominated partner has a UTR
 
-companyName.title = companyName
-companyName.heading = companyName
-companyName.checkYourAnswersLabel = companyName
-companyName.error.required = Enter companyName
-companyName.error.length = CompanyName must be 100 characters or less
-companyName.change.hidden = CompanyName
+companyName.title = What is the name of the company?
+companyName.heading = What is the name of the company?
+companyName.hint = This will be the name as registered with Companies House
+companyName.checkYourAnswersLabel = Company name
+companyName.error.required = Enter a company name like ABC Construction Ltd
+companyName.error.length = Enter a company name up to 56 characters
+companyName.error.invalidCharacters = Enter a company name using letters a to z, numbers, apostrophes, ampersands, commas, hyphens, full stops, forward slashes and spaces
+companyName.change.hidden = company name
 
 companyAddressYesNo.title = Do you want to add an address for this company?
 companyAddressYesNo.heading = Do you want to add an address for {0}?

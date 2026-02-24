@@ -21,6 +21,7 @@ import forms.add.company.CompanyAddressYesNoFormProvider
 import models.Mode
 import navigation.Navigator
 import pages.add.company.{CompanyAddressYesNoPage, CompanyNamePage}
+import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
@@ -44,7 +45,7 @@ class CompanyAddressYesNoController @Inject() (
     extends FrontendBaseController
     with I18nSupport {
 
-  val form = formProvider()
+  val form: Form[Boolean] = formProvider()
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
     request.userAnswers
