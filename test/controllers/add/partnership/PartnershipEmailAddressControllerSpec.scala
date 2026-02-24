@@ -14,74 +14,80 @@
  * limitations under the License.
  */
 
-package controllers.add.company
+package controllers.add.partnership
 
 import base.SpecBase
 import controllers.routes
-import forms.add.company.CompanyAddressYesNoFormProvider
+import forms.add.partnership.PartnershipEmailAddressFormProvider
 import models.{NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.add.company.{CompanyAddressYesNoPage, CompanyNamePage}
+import pages.add.partnership.{PartnershipEmailAddressPage, PartnershipNamePage}
 import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import repositories.SessionRepository
-import views.html.add.company.CompanyAddressYesNoView
+import views.html.add.partnership.PartnershipEmailAddressView
 
 import scala.concurrent.Future
 
-class CompanyAddressYesNoControllerSpec extends SpecBase with MockitoSugar {
+class PartnershipEmailAddressControllerSpec extends SpecBase with MockitoSugar {
 
   def onwardRoute = Call("GET", "/foo")
 
-  val formProvider = new CompanyAddressYesNoFormProvider()
+  val formProvider = new PartnershipEmailAddressFormProvider()
   val form         = formProvider()
 
-  private val companyName = "Test Company"
-
-  lazy val companyAddressYesNoRoute =
-    controllers.add.company.routes.CompanyAddressYesNoController.onPageLoad(NormalMode).url
+  private val partnershipName = "Test Partnership"
 
   private def uaWithName: UserAnswers =
-    emptyUserAnswers.set(CompanyNamePage, companyName).success.value
+    emptyUserAnswers
+      .set(PartnershipNamePage, partnershipName)
+      .success
+      .value
 
-  "CompanyAddressYesNo Controller" - {
+  lazy val partnershipEmailAddressRoute =
+    controllers.add.partnership.routes.PartnershipEmailAddressController.onPageLoad(NormalMode).url
+
+  "PartnershipEmailAddress Controller" - {
 
     "must return OK and the correct view for a GET" in {
 
       val application = applicationBuilder(userAnswers = Some(uaWithName)).build()
 
       running(application) {
-        val request = FakeRequest(GET, companyAddressYesNoRoute)
+        val request = FakeRequest(GET, partnershipEmailAddressRoute)
 
         val result = route(application, request).value
 
-        val view = application.injector.instanceOf[CompanyAddressYesNoView]
+        val view = application.injector.instanceOf[PartnershipEmailAddressView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode, companyName)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode, partnershipName)(
+          request,
+          messages(application)
+        ).toString
       }
     }
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = uaWithName.set(CompanyAddressYesNoPage, true).success.value
+      val userAnswers = uaWithName.set(PartnershipEmailAddressPage, "answer").success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
       running(application) {
-        val request = FakeRequest(GET, companyAddressYesNoRoute)
+        val request = FakeRequest(GET, partnershipEmailAddressRoute)
 
-        val view = application.injector.instanceOf[CompanyAddressYesNoView]
+        val view = application.injector.instanceOf[PartnershipEmailAddressView]
 
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(true), NormalMode, companyName)(
+        contentAsString(result) mustEqual view(form.fill("answer"), NormalMode, partnershipName)(
           request,
           messages(application)
         ).toString
@@ -104,8 +110,8 @@ class CompanyAddressYesNoControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, companyAddressYesNoRoute)
-            .withFormUrlEncodedBody(("value", "true"))
+          FakeRequest(POST, partnershipEmailAddressRoute)
+            .withFormUrlEncodedBody(("value", "test@example.com"))
 
         val result = route(application, request).value
 
@@ -120,17 +126,17 @@ class CompanyAddressYesNoControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, companyAddressYesNoRoute)
+          FakeRequest(POST, partnershipEmailAddressRoute)
             .withFormUrlEncodedBody(("value", ""))
 
         val boundForm = form.bind(Map("value" -> ""))
 
-        val view = application.injector.instanceOf[CompanyAddressYesNoView]
+        val view = application.injector.instanceOf[PartnershipEmailAddressView]
 
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode, companyName)(
+        contentAsString(result) mustEqual view(boundForm, NormalMode, partnershipName)(
           request,
           messages(application)
         ).toString
@@ -142,7 +148,7 @@ class CompanyAddressYesNoControllerSpec extends SpecBase with MockitoSugar {
       val application = applicationBuilder(userAnswers = None).build()
 
       running(application) {
-        val request = FakeRequest(GET, companyAddressYesNoRoute)
+        val request = FakeRequest(GET, partnershipEmailAddressRoute)
 
         val result = route(application, request).value
 
@@ -157,8 +163,8 @@ class CompanyAddressYesNoControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, companyAddressYesNoRoute)
-            .withFormUrlEncodedBody(("value", "true"))
+          FakeRequest(POST, partnershipEmailAddressRoute)
+            .withFormUrlEncodedBody(("value", "test@example.com"))
 
         val result = route(application, request).value
 
@@ -167,74 +173,40 @@ class CompanyAddressYesNoControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must redirect to JourneyRecovery if CompanyName is missing for a GET" in {
+    "must redirect to Journey Recovery for a GET when partnership name is missing (userAnswers present)" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
-
-      running(application) {
-        val request = FakeRequest(GET, companyAddressYesNoRoute)
-        val result  = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual
-          controllers.routes.JourneyRecoveryController.onPageLoad().url
-      }
-    }
-
-    "must redirect to JourneyRecovery if CompanyName is missing for a POST" in {
-
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application =
+        applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
       running(application) {
-        val request =
-          FakeRequest(POST, companyAddressYesNoRoute)
-            .withFormUrlEncodedBody(("value", "true"))
+        val request = FakeRequest(GET, partnershipEmailAddressRoute)
 
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual
-          controllers.routes.JourneyRecoveryController.onPageLoad().url
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
       }
     }
 
-    "must return BadRequest when invalid data is submitted and name is present" in {
+    "must redirect to Journey Recovery for a POST when partnership name is missing (userAnswers present)" in {
 
-      val application = applicationBuilder(userAnswers = Some(uaWithName)).build()
+      val mockSessionRepository = mock[SessionRepository]
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
-      running(application) {
-        val request =
-          FakeRequest(POST, companyAddressYesNoRoute)
-            .withFormUrlEncodedBody(("value", ""))
-
-        val boundForm = form.bind(Map("value" -> ""))
-        val view      = application.injector.instanceOf[CompanyAddressYesNoView]
-
-        val result = route(application, request).value
-
-        status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual
-          view(boundForm, NormalMode, companyName)(request, messages(application)).toString
-      }
-    }
-
-    "must return a Bad Request when no value is submitted" in {
-
-      val application = applicationBuilder(userAnswers = Some(uaWithName)).build()
+      val application =
+        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
+          .build()
 
       running(application) {
         val request =
-          FakeRequest(POST, companyAddressYesNoRoute)
-            .withFormUrlEncodedBody()
-
-        val boundForm = form.bind(Map.empty)
-        val view      = application.injector.instanceOf[CompanyAddressYesNoView]
+          FakeRequest(POST, partnershipEmailAddressRoute)
+            .withFormUrlEncodedBody("value" -> "test@example.com")
 
         val result = route(application, request).value
 
-        status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual
-          view(boundForm, NormalMode, companyName)(request, messages(application)).toString
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
       }
     }
   }

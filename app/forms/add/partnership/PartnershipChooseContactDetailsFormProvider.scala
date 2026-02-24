@@ -16,25 +16,16 @@
 
 package forms.add.partnership
 
-import forms.Validation
-import forms.mappings.Constants
 import forms.mappings.Mappings
+import models.add.partnership.PartnershipChooseContactDetails
 import play.api.data.Form
 
 import javax.inject.Inject
 
-class PartnershipNameFormProvider @Inject() extends Mappings {
+class PartnershipChooseContactDetailsFormProvider @Inject() extends Mappings {
 
-  def apply(): Form[String] =
+  def apply(): Form[PartnershipChooseContactDetails] =
     Form(
-      "value" -> text("partnershipName.error.required")
-        .transform(_.trim, identity)
-        .verifying(
-          firstError(
-            maxLength(Constants.MaxLength56, "partnershipName.error.length"),
-            regexp(Validation.nameRegex, "partnershipName.error.invalidCharacters")
-          )
-        )
+      "value" -> enumerable[PartnershipChooseContactDetails]("partnershipChooseContactDetails.error.required")
     )
-
 }

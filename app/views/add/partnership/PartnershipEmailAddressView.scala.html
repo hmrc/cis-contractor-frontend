@@ -14,30 +14,34 @@
  * limitations under the License.
  *@
 
+@import viewmodels.InputWidth._
+
 @this(
     layout: templates.Layout,
     formHelper: FormWithCSRF,
     govukErrorSummary: GovukErrorSummary,
-    govukRadios: GovukRadios,
+    govukInput: GovukInput,
     govukButton: GovukButton
 )
 
 @(form: Form[_], mode: Mode, name: String)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = title(form, messages("companyAddressYesNo.title"))) {
+@layout(pageTitle = title(form, messages("partnershipEmailAddress.title"))) {
 
-    @formHelper(action = controllers.add.company.routes.CompanyAddressYesNoController.onSubmit(mode), Symbol("autoComplete") -> "off") {
+    @formHelper(action = controllers.add.partnership.routes.PartnershipEmailAddressController.onSubmit(mode)) {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form))
         }
 
-        @govukRadios(
-            RadiosViewModel.yesNo(
+        @govukInput(
+            InputViewModel(
                 field = form("value"),
-                legend = LegendViewModel(messages("companyAddressYesNo.heading", name)).asPageHeading().withCssClass("govuk-fieldset__legend--l")
-            ).withHint(Hint(content = Messages("companyAddressYesNo.hint"))
-)
+                label = LabelViewModel(messages("partnershipEmailAddress.heading", name)).asPageHeading().withCssClass("govuk-fieldset__legend--l")
+            )
+            .withHint(HintViewModel(messages("partnershipEmailAddress.hint")))
+            .withWidth(Full)
+            .asEmail()
         )
 
         @govukButton(

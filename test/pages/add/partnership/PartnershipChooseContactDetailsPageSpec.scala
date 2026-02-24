@@ -14,27 +14,19 @@
  * limitations under the License.
  */
 
-package forms.add.partnership
+package pages.add.partnership
 
-import forms.Validation
-import forms.mappings.Constants
-import forms.mappings.Mappings
-import play.api.data.Form
+import models.add.partnership.PartnershipChooseContactDetails
+import pages.behaviours.PageBehaviours
 
-import javax.inject.Inject
+class PartnershipChooseContactDetailsPageSpec extends PageBehaviours {
 
-class PartnershipNameFormProvider @Inject() extends Mappings {
+  "PartnershipChooseContactDetailsPage" - {
 
-  def apply(): Form[String] =
-    Form(
-      "value" -> text("partnershipName.error.required")
-        .transform(_.trim, identity)
-        .verifying(
-          firstError(
-            maxLength(Constants.MaxLength56, "partnershipName.error.length"),
-            regexp(Validation.nameRegex, "partnershipName.error.invalidCharacters")
-          )
-        )
-    )
+    beRetrievable[PartnershipChooseContactDetails](PartnershipChooseContactDetailsPage)
 
+    beSettable[PartnershipChooseContactDetails](PartnershipChooseContactDetailsPage)
+
+    beRemovable[PartnershipChooseContactDetails](PartnershipChooseContactDetailsPage)
+  }
 }

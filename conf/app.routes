@@ -124,6 +124,10 @@ POST       /add/partnership/nominated-partner-national-insurance-number         
 GET        /add/partnership/change-nominated-partner-national-insurance-number   controllers.add.partnership.PartnershipNominatedPartnerNinoController.onPageLoad(mode: Mode = CheckMode)
 POST       /add/partnership/change-nominated-partner-national-insurance-number   controllers.add.partnership.PartnershipNominatedPartnerNinoController.onSubmit(mode: Mode = CheckMode)
 
+GET        /add/partnership/choose-contact-details                      controllers.add.partnership.PartnershipChooseContactDetailsController.onPageLoad(mode: Mode = NormalMode)
+POST       /add/partnership/choose-contact-details                      controllers.add.partnership.PartnershipChooseContactDetailsController.onSubmit(mode: Mode = NormalMode)
+GET        /add/partnership/change-choose-contact-details               controllers.add.partnership.PartnershipChooseContactDetailsController.onPageLoad(mode: Mode = CheckMode)
+POST       /add/partnership/change-choose-contact-details               controllers.add.partnership.PartnershipChooseContactDetailsController.onSubmit(mode: Mode = CheckMode)
 
 GET        /add/partnership/check-contact-details                           controllers.add.partnership.PartnershipContactDetailsYesNoController.onPageLoad(mode: Mode = NormalMode)
 POST       /add/partnership/check-contact-details                           controllers.add.partnership.PartnershipContactDetailsYesNoController.onSubmit(mode: Mode = NormalMode)
@@ -184,20 +188,25 @@ POST       /add/partnership/nominated-partner-utr        controllers.add.partner
 GET        /add/partnership/change-nominated-partner-utr controllers.add.partnership.PartnershipNominatedPartnerUtrController.onPageLoad(mode: Mode = CheckMode)
 POST       /add/partnership/change-nominated-partner-utr controllers.add.partnership.PartnershipNominatedPartnerUtrController.onSubmit(mode: Mode = CheckMode)
 
+GET        /add/partnership/email-address                        controllers.add.partnership.PartnershipEmailAddressController.onPageLoad(mode: Mode = NormalMode)
+POST       /add/partnership/email-address                        controllers.add.partnership.PartnershipEmailAddressController.onSubmit(mode: Mode = NormalMode)
+GET        /add/partnership/change-email-address                  controllers.add.partnership.PartnershipEmailAddressController.onPageLoad(mode: Mode = CheckMode)
+POST       /add/partnership/change-email-address                  controllers.add.partnership.PartnershipEmailAddressController.onSubmit(mode: Mode = CheckMode)
+
 GET        /add/partnership/nominated-partner-has-utr                       controllers.add.partnership.PartnershipNominatedPartnerUtrYesNoController.onPageLoad(mode: Mode = NormalMode)
 POST       /add/partnership/nominated-partner-has-utr                       controllers.add.partnership.PartnershipNominatedPartnerUtrYesNoController.onSubmit(mode: Mode = NormalMode)
 GET        /add/partnership/change-nominated-partner-has-utr                controllers.add.partnership.PartnershipNominatedPartnerUtrYesNoController.onPageLoad(mode: Mode = CheckMode)
 POST       /add/partnership/change-nominated-partner-has-utr                controllers.add.partnership.PartnershipNominatedPartnerUtrYesNoController.onSubmit(mode: Mode = CheckMode)
 
-GET        /companyName                                 controllers.add.company.CompanyNameController.onPageLoad(mode: Mode = NormalMode)
-POST       /companyName                                 controllers.add.company.CompanyNameController.onSubmit(mode: Mode = NormalMode)
-GET        /changeCompanyName                           controllers.add.company.CompanyNameController.onPageLoad(mode: Mode = CheckMode)
-POST       /changeCompanyName                           controllers.add.company.CompanyNameController.onSubmit(mode: Mode = CheckMode)
+GET        /add/company/company-name                    controllers.add.company.CompanyNameController.onPageLoad(mode: Mode = NormalMode)
+POST       /add/company/company-name                    controllers.add.company.CompanyNameController.onSubmit(mode: Mode = NormalMode)
+GET        /add/company/change-company-name             controllers.add.company.CompanyNameController.onPageLoad(mode: Mode = CheckMode)
+POST       /add/company/change-company-name             controllers.add.company.CompanyNameController.onSubmit(mode: Mode = CheckMode)
 
-GET        /companyAddressYesNo                         controllers.add.company.CompanyAddressYesNoController.onPageLoad(mode: Mode = NormalMode)
-POST       /companyAddressYesNo                         controllers.add.company.CompanyAddressYesNoController.onSubmit(mode: Mode = NormalMode)
-GET        /changeCompanyAddressYesNo                   controllers.add.company.CompanyAddressYesNoController.onPageLoad(mode: Mode = CheckMode)
-POST       /changeCompanyAddressYesNo                   controllers.add.company.CompanyAddressYesNoController.onSubmit(mode: Mode = CheckMode)
+GET        /add/company/check-address                        controllers.add.company.CompanyAddressYesNoController.onPageLoad(mode: Mode = NormalMode)
+POST       /add/company/check-address                          controllers.add.company.CompanyAddressYesNoController.onSubmit(mode: Mode = NormalMode)
+GET        /add/company/change-check-address                 controllers.add.company.CompanyAddressYesNoController.onPageLoad(mode: Mode = CheckMode)
+POST       /add/company/change-check-address                  controllers.add.company.CompanyAddressYesNoController.onSubmit(mode: Mode = CheckMode)
 
 GET        /companyAddress                              controllers.add.company.CompanyAddressController.onPageLoad(mode: Mode = NormalMode)
 POST       /companyAddress                              controllers.add.company.CompanyAddressController.onSubmit(mode: Mode = NormalMode)
