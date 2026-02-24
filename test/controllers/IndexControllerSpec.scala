@@ -72,7 +72,10 @@ class IndexControllerSpec extends SpecBase {
       }
 
       verify(mockCisManagerService).ensureCisIdInUserAnswers(any[UserAnswers])(any[HeaderCarrier])
+      verify(mockSessionRepository)
+        .set(mockUserAnswers)
       verifyNoMoreInteractions(mockCisManagerService)
+      verifyNoMoreInteractions(mockSessionRepository)
     }
   }
 }
