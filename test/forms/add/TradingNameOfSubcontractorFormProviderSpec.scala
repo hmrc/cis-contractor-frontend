@@ -17,6 +17,7 @@
 package forms.add
 
 import forms.behaviours.StringFieldBehaviours
+import forms.mappings.Constants
 import org.scalacheck.Gen
 import play.api.data.FormError
 
@@ -25,7 +26,6 @@ class TradingNameOfSubcontractorFormProviderSpec extends StringFieldBehaviours {
   val requiredKey = "tradingNameOfSubcontractor.error.required"
   val lengthKey   = "tradingNameOfSubcontractor.error.length"
   val invalidKey  = "tradingNameOfSubcontractor.error.invalidCharacters"
-  val maxLength   = 56
 
   private val form = new TradingNameOfSubcontractorFormProvider()()
 
@@ -47,8 +47,8 @@ class TradingNameOfSubcontractorFormProviderSpec extends StringFieldBehaviours {
     behave like fieldWithMaxLength(
       form,
       fieldName,
-      maxLength = maxLength,
-      lengthError = FormError(fieldName, lengthKey, Seq(maxLength))
+      maxLength = Constants.MaxLength56,
+      lengthError = FormError(fieldName, lengthKey, Seq(Constants.MaxLength56))
     )
 
     behave like mandatoryField(

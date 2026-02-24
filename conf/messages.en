@@ -440,7 +440,7 @@ partnershipNominatedPartnerUtrYesNo.checkYourAnswersLabel = Nominated partner ha
 partnershipNominatedPartnerUtrYesNo.error.required = Select whether you know the Unique Taxpayer Reference (UTR) for this nominated partner
 partnershipNominatedPartnerUtrYesNo.change.hidden = nominated partner has a UTR
 
-companyName.title = What is the name of the company? - Construction Industry Scheme - GOV.UK
+companyName.title = What is the name of the company?
 companyName.heading = What is the name of the company?
 companyName.hint = This will be the name as registered with Companies House
 companyName.checkYourAnswersLabel = Company name

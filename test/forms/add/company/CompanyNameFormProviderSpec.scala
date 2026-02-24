@@ -17,6 +17,7 @@
 package forms.add.company
 
 import forms.behaviours.StringFieldBehaviours
+import forms.mappings.Constants
 import org.scalacheck.Gen
 import play.api.data.FormError
 
@@ -25,7 +26,6 @@ class CompanyNameFormProviderSpec extends StringFieldBehaviours {
   val requiredKey = "companyName.error.required"
   val lengthKey   = "companyName.error.length"
   val invalidKey  = "companyName.error.invalidCharacters"
-  val maxLength   = 56
 
   private val form = new CompanyNameFormProvider()()
 
@@ -47,8 +47,8 @@ class CompanyNameFormProviderSpec extends StringFieldBehaviours {
     behave like fieldWithMaxLength(
       form,
       fieldName,
-      maxLength = maxLength,
-      lengthError = FormError(fieldName, lengthKey, Seq(maxLength))
+      maxLength = Constants.MaxLength56,
+      lengthError = FormError(fieldName, lengthKey, Seq(Constants.MaxLength56))
     )
 
     behave like mandatoryField(

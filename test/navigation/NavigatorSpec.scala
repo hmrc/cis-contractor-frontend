@@ -496,7 +496,7 @@ class NavigatorSpec extends SpecBase {
           UserAnswers("id")
         ) mustBe controllers.add.partnership.routes.PartnershipEmailAddressController.onPageLoad(NormalMode)
       }
-      
+
       "must go from PartnershipChooseContactDetailsPage" - {
         "to itself when Email is selected" in {
           navigator.nextPage(
@@ -1021,7 +1021,7 @@ class NavigatorSpec extends SpecBase {
           emptyUserAnswers
         ) mustBe controllers.add.partnership.routes.PartnershipEmailAddressController.onPageLoad(CheckMode)
       }
-      
+
       "must go from a PartnershipNominatedPartnerUtrYesNoPage to next page when true" in {
         navigator.nextPage(
           PartnershipNominatedPartnerUtrYesNoPage,

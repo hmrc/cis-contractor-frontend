@@ -19,6 +19,7 @@ package controllers.add.company
 import base.SpecBase
 import controllers.routes
 import forms.add.company.CompanyNameFormProvider
+import forms.mappings.Constants
 import models.{NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
@@ -127,9 +128,8 @@ class CompanyNameControllerSpec extends SpecBase with MockitoSugar {
     }
 
     "must return a Bad Request and errors when invalid data is submitted with length more than 56 characters" in {
-      val maxLength   = 56
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
-      val longInput   = Random.alphanumeric.take(maxLength + 1).mkString
+      val longInput   = Random.alphanumeric.take(Constants.MaxLength56 + 1).mkString
 
       running(application) {
         val request =

@@ -43,6 +43,8 @@
             )
             .withHint(HintViewModel(messages("companyName.hint")))
             .withWidth(Full)
+            .withSpellcheck(false)
+            .withAutocomplete("name")
         )
 
         @govukButton(
