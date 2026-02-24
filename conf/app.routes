@@ -189,6 +189,8 @@ POST       /add/partnership/nominated-partner-has-utr                       cont
 GET        /add/partnership/change-nominated-partner-has-utr                controllers.add.partnership.PartnershipNominatedPartnerUtrYesNoController.onPageLoad(mode: Mode = CheckMode)
 POST       /add/partnership/change-nominated-partner-has-utr                controllers.add.partnership.PartnershipNominatedPartnerUtrYesNoController.onSubmit(mode: Mode = CheckMode)
 
+GET        /add/partnership/subcontractor-added                             controllers.add.partnership.SubcontractorAddedController.onPageLoad()
+
 GET        /companyName                                 controllers.add.company.CompanyNameController.onPageLoad(mode: Mode = NormalMode)
 POST       /companyName                                 controllers.add.company.CompanyNameController.onSubmit(mode: Mode = NormalMode)
 GET        /changeCompanyName                           controllers.add.company.CompanyNameController.onPageLoad(mode: Mode = CheckMode)
