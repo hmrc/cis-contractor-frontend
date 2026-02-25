@@ -25,7 +25,7 @@ object Validation {
   final val emailRegex            = """^[A-Za-z0-9!#$%&*+\-/=?^_`{|}~.]+@[A-Za-z0-9!#$%&*+\-/=?^_`{|}~.]+$"""
   final val nameRegex             = """^[A-Za-z0-9"~!@#\$%*+:\;=\?\s,\.\[\]_\\\{\}\(\)/&'\-\^\u00A3\u20AC]+$"""
   final val worksRefRegex         = """^[A-Za-z0-9 ~!@#$%&'()*+,-./:;=?_{}£€]+$"""
-  final val mobileRegex           = """^\+?[0-9 ()\-]+$"""
+  final val mobileRegex           = """^[0-9 ()\-\+]+$"""
 
   def isNinoValid(value: String, errorKey: String): Constraint[String] =
     Constraint {

@@ -26,7 +26,7 @@ class PartnershipMobileNumberFormProviderSpec extends StringFieldBehaviours {
   val invalidKey  = "partnershipMobileNumber.error.invalid"
   val maxLength   = 35
 
-  private val mobileRegex = "^\\+?[0-9 ()\\-]+$"
+  private val mobileRegex = "^[0-9 ()\\-\\+]+$"
 
   val form = new PartnershipMobileNumberFormProvider()()
 
@@ -37,7 +37,8 @@ class PartnershipMobileNumberFormProviderSpec extends StringFieldBehaviours {
     "(44)77777777777",
     "44-777-777",
     "+44 808 345 0199",
-    "+44 (0)20 7265 0267"
+    "+44 (0)20 7265 0267",
+    "+91 +456 +986 + +"
   )
 
   val invalidMobileNumber: Seq[String] = Seq(
@@ -109,7 +110,8 @@ class PartnershipMobileNumberFormProviderSpec extends StringFieldBehaviours {
         "(91) 56",
         "1-3-5-6-8",
         "+()189()",
-        "1------2"
+        "1------2",
+        "+654+12"
       )
       tooShortNumbers.foreach{ number =>
         val result = form.bind(Map("value" -> number))
