@@ -101,5 +101,31 @@ class PartnershipMobileNumberFormProviderSpec extends StringFieldBehaviours {
       result.hasErrors mustBe false
       result.value.value mustBe "123 456"
     }
+
+    "must display error when fewer than 6 digits are entered" in {
+      val tooShortNumbers = Seq(
+        "12345",
+        "+1 287",
+        "(91) 56",
+        "1-3-5-6-8",
+        "+()189()",
+        "1------2"
+      )
+      tooShortNumbers.foreach{ number =>
+        val result = form.bind(Map("value" -> number))
+        result.errors must contain(
+          FormError("value", "partnershipMobileNumber.error.minSixDigits")
+        )
+      }
+    }
+
+    "must accept mobile number with 6 digits" in {
+      val valid = "123987"
+
+      val result = form.bind(Map("value" -> valid))
+
+      result.errors mustBe empty
+    }
+
   }
 }

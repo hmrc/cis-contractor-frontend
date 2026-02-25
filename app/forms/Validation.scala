@@ -27,9 +27,6 @@ object Validation {
   final val worksRefRegex         = """^[A-Za-z0-9 ~!@#$%&'()*+,-./:;=?_{}£€]+$"""
   final val mobileRegex           = """^\+?[0-9 ()\-]+$"""
 
-  final val companyRegNumberRegex =
-    """(?i)^(?:[A-Z]{2}\d{1,6}|\d{1,8})$"""
-
   def isNinoValid(value: String, errorKey: String): Constraint[String] =
     Constraint {
       case str if Nino.isValid(str.replaceAll("\\s", "").toUpperCase) =>
