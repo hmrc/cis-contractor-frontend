@@ -461,7 +461,7 @@ companyAddress.change.hidden = address
 
 companyAddress.addressLine1 = Address line 1
 companyAddress.error.addressLine1.required = Enter the first line of the address, typically the building and street
-companyAddress.error.addressLine1.length = Enter an address up to 35 characters
+companyAddress.error.addressLine1.length = Enter the first line of the address using 35 characters or less
 companyAddress.error.addressLine1.invalidCharacters = Enter the first line of the address using letters a to z, numbers, apostrophes, ampersands, commas, hyphens, full stops, forward slashes and spaces
 companyAddress.error.addressLine1.firstCharMustBeLetterOrNumber = Enter an address. The first character must be a letter or a number
 
