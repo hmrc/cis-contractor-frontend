@@ -24,8 +24,8 @@ import models.*
 import models.add.TypeOfSubcontractor.*
 import models.add.partnership.PartnershipChooseContactDetails.*
 import pages.add.*
-import pages.add.partnership.*
 import pages.add.company.*
+import pages.add.partnership.*
 
 @Singleton
 class Navigator @Inject() () {
@@ -55,6 +55,9 @@ class Navigator @Inject() () {
     case SubcontractorContactDetailsYesNoPage      =>
       userAnswers => navigatorFromSubcontractorContactDetailsYesNoPage(NormalMode)(userAnswers)
     case SubContactDetailsPage                     => _ => controllers.add.routes.CheckYourAnswersController.onPageLoad()
+    case CompanyNamePage                           => _ => controllers.add.company.routes.CompanyNameController.onPageLoad(NormalMode)
+    case CompanyAddressYesNoPage                   =>
+      _ => controllers.add.company.routes.CompanyAddressYesNoController.onPageLoad(NormalMode)
     case PartnershipNamePage                       =>
       _ => controllers.add.partnership.routes.PartnershipHasUtrYesNoController.onPageLoad(NormalMode)
     case PartnershipHasUtrYesNoPage                => userAnswers => navigatorFromPartnershipHasUtrYesNoPage(NormalMode)(userAnswers)
