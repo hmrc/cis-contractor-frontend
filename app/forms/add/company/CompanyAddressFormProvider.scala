@@ -20,7 +20,7 @@ import forms.mappings.Mappings
 import models.add.InternationalAddress
 import play.api.data.{Form, Forms}
 import forms.Validation
-import forms.mapping.Constants
+import forms.mappings.Constants
 
 import javax.inject.Inject
 

@@ -583,7 +583,7 @@ class NavigatorSpec extends SpecBase {
           UserAnswers("id")
         ) mustBe controllers.add.company.routes.CompanyAddressController.onPageLoad(NormalMode)
       }
-      
+
       "must go from CompanyNamePage to CompanyNameController in NormalMode" in {
         navigator.nextPage(
           CompanyNamePage,
