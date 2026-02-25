@@ -68,7 +68,7 @@ class PartnershipPhoneNumberFormProviderSpec extends StringFieldBehaviours {
       invalidPhoneNumber.foreach { invalidTelephone =>
         val result = form.bind(Map(fieldName -> invalidTelephone))
         result.errors must contain(
-          FormError(fieldName, invalidKey, Seq("^\\+?[0-9 ()\\-]+$"))
+          FormError(fieldName, invalidKey, Seq("^[0-9 ()\\-\\+]+$"))
         )
       }
     }
@@ -97,7 +97,7 @@ class PartnershipPhoneNumberFormProviderSpec extends StringFieldBehaviours {
     "must display error when there is less than 6 digits" in {
       val lessThanSixDigits = Seq(
         "01234",
-        "+01234",
+        "+012+34",
         "+()()123",
         "1------2"
       )
