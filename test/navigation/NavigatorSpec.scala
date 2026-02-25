@@ -23,8 +23,8 @@ import models.*
 import models.add.partnership.PartnershipChooseContactDetails
 import models.add.{SubcontractorName, TypeOfSubcontractor, UKAddress}
 import pages.add.*
-import pages.add.partnership.*
 import pages.add.company.*
+import pages.add.partnership.*
 import pages.add.partnership.PartnershipNominatedPartnerNinoPage
 
 class NavigatorSpec extends SpecBase {
@@ -489,6 +489,14 @@ class NavigatorSpec extends SpecBase {
         }
       }
 
+      "must go from a PartnershipEmailAddressPage to PartnershipEmailAddressPage" in {
+        navigator.nextPage(
+          PartnershipEmailAddressPage,
+          NormalMode,
+          UserAnswers("id")
+        ) mustBe controllers.add.partnership.routes.PartnershipEmailAddressController.onPageLoad(NormalMode)
+      }
+
       "must go from PartnershipChooseContactDetailsPage" - {
         "to itself when Email is selected" in {
           navigator.nextPage(
@@ -574,6 +582,14 @@ class NavigatorSpec extends SpecBase {
           NormalMode,
           UserAnswers("id")
         ) mustBe controllers.add.partnership.routes.PartnershipPhoneNumberController.onPageLoad(NormalMode)
+      }
+
+      "must go from CompanyNamePage to CompanyNameController in NormalMode" in {
+        navigator.nextPage(
+          CompanyNamePage,
+          NormalMode,
+          emptyUserAnswers
+        ) mustBe controllers.add.company.routes.CompanyNameController.onPageLoad(NormalMode)
       }
 
       "must go from a CompanyAddressYesNoPage to CompanyAddressYesNoPage" in {
@@ -1004,6 +1020,14 @@ class NavigatorSpec extends SpecBase {
             emptyUserAnswers
           ) mustBe routes.JourneyRecoveryController.onPageLoad()
         }
+      }
+
+      "must go from PartnershipEmailAddressPage to PartnershipEmailAddressPage in CheckMode" in {
+        navigator.nextPage(
+          PartnershipEmailAddressPage,
+          CheckMode,
+          emptyUserAnswers
+        ) mustBe controllers.add.partnership.routes.PartnershipEmailAddressController.onPageLoad(CheckMode)
       }
 
       "must go from a PartnershipNominatedPartnerUtrYesNoPage to next page when true" in {

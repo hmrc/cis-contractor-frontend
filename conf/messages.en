@@ -424,6 +424,15 @@ partnershipNominatedPartnerUtr.error.length = Enter a valid Unique Taxpayer Refe
 partnershipNominatedPartnerUtr.error.invalid = Enter a valid Unique Taxpayer Reference (UTR) using 10 digits
 partnershipNominatedPartnerUtr.change.hidden = nominated partner Unique Taxpayer Reference
 
+partnershipEmailAddress.title = What is the email address for this partnership?
+partnershipEmailAddress.heading = What is the email address for {0}?
+partnershipEmailAddress.hint = HMRC will never use this email address to contact this subcontractor
+partnershipEmailAddress.checkYourAnswersLabel = Partnership Email Address
+partnershipEmailAddress.error.required = Enter an email address in the correct format, like name@example.com
+partnershipEmailAddress.error.invalid = Enter a valid email address in the correct format, like name@example.com
+partnershipEmailAddress.error.length = Enter a valid email address in the correct format, like name@example.com, up to 254 characters
+partnershipEmailAddress.change.hidden = partnership email address
+
 partnershipNominatedPartnerUtrYesNo.title = Do you know the Unique Taxpayer Reference for the nominated partner?
 partnershipNominatedPartnerUtrYesNo.heading = Do you know the Unique Taxpayer Reference for {0}?
 partnershipNominatedPartnerUtrYesNo.hint = This information will be used to verify them as a subcontractor
@@ -441,12 +450,28 @@ partnershipPhoneNumber.error.invalid = Enter a valid phone number, like 01632 96
 partnershipPhoneNumber.error.minSixDigits = Enter a valid phone number (min six digit)
 partnershipPhoneNumber.change.hidden = phone number
 
-companyName.title = companyName
-companyName.heading = companyName
-companyName.checkYourAnswersLabel = companyName
-companyName.error.required = Enter companyName
-companyName.error.length = CompanyName must be 100 characters or less
-companyName.change.hidden = CompanyName
+subcontractorAdded.title = Partnership subcontractor added
+subcontractorAdded.heading = Subcontractor added
+subcontractorAdded.p1 = You can now find {0} on your list of subcontractors.
+subcontractorAdded.nextSteps.h2 = Next steps
+subcontractorAdded.nextSteps.p1 = Before you can make any payments to this subcontractor, you will need to verify them.
+subcontractorAdded.nextSteps.p2 = Once they’re verified with HMRC, you will be able to:
+subcontractorAdded.nextSteps.list.l1 = make CIS deductions at the correct rate
+subcontractorAdded.nextSteps.list.l2 = include them on a monthly return
+subcontractorAdded.nextSteps.list.l3 = provide them with payment and deduction statements
+subcontractorAdded.nextSteps.link = Manage your subcontractors
+subcontractorAdded.helpAndSupport.h2 = Help and support
+subcontractorAdded.helpAndSupport.p1 = If you need help with the Construction Industry Scheme (CIS) and what it means for you,
+subcontractorAdded.helpAndSupport.p1.link = guidance is available on GOV.UK
+
+companyName.title = What is the name of the company?
+companyName.heading = What is the name of the company?
+companyName.hint = This will be the name as registered with Companies House
+companyName.checkYourAnswersLabel = Company name
+companyName.error.required = Enter a company name like ABC Construction Ltd
+companyName.error.length = Enter a company name up to 56 characters
+companyName.error.invalidCharacters = Enter a company name using letters a to z, numbers, apostrophes, ampersands, commas, hyphens, full stops, forward slashes and spaces
+companyName.change.hidden = company name
 
 companyAddressYesNo.title = Do you want to add an address for this company?
 companyAddressYesNo.heading = Do you want to add an address for {0}?

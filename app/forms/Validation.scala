@@ -21,11 +21,11 @@ import uk.gov.hmrc.domain.Nino
 
 object Validation {
 
-  final val worksRefRegex = """^[A-Za-z0-9 ~!@#$%&'()*+,-./:;=?_{}£€]+$"""
-  final val phoneRegex    = """^\+?[0-9 ()\-]+$"""
-
-  final val companyRegNumberRegex =
-    """(?i)^(?:[A-Z]{2}\d{1,6}|\d{1,8})$"""
+  final val companyRegNumberRegex = """(?i)^(?:[A-Z]{2}\d{1,6}|\d{1,8})$"""
+  final val emailRegex            = """^[A-Za-z0-9!#$%&*+\-/=?^_`{|}~.]+@[A-Za-z0-9!#$%&*+\-/=?^_`{|}~.]+$"""
+  final val nameRegex             = """^[A-Za-z0-9"~!@#\$%*+:\;=\?\s,\.\[\]_\\\{\}\(\)/&'\-\^\u00A3\u20AC]+$"""
+  final val worksRefRegex         = """^[A-Za-z0-9 ~!@#$%&'()*+,-./:;=?_{}£€]+$"""
+  final val phoneRegex            = """^\+?[0-9 ()\-]+$"""
 
   def isNinoValid(value: String, errorKey: String): Constraint[String] =
     Constraint {

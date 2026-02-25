@@ -24,11 +24,11 @@
     govukButton: GovukButton
 )
 
-@(form: Form[_], mode: Mode)(implicit request: Request[_], messages: Messages)
+@(form: Form[_], mode: Mode, name: String)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = title(form, messages("companyName.title"))) {
+@layout(pageTitle = title(form, messages("partnershipEmailAddress.title"))) {
 
-    @formHelper(action = controllers.add.company.routes.CompanyNameController.onSubmit(mode)) {
+    @formHelper(action = controllers.add.partnership.routes.PartnershipEmailAddressController.onSubmit(mode)) {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form))
@@ -37,14 +37,11 @@
         @govukInput(
             InputViewModel(
                 field = form("value"),
-                label = LabelViewModel(messages("companyName.heading"))
-                    .asPageHeading()
-                    .withCssClass("govuk-fieldset__legend--l")
+                label = LabelViewModel(messages("partnershipEmailAddress.heading", name)).asPageHeading().withCssClass("govuk-fieldset__legend--l")
             )
-            .withHint(HintViewModel(messages("companyName.hint")))
+            .withHint(HintViewModel(messages("partnershipEmailAddress.hint")))
             .withWidth(Full)
-            .withSpellcheck(false)
-            .withAutocomplete("name")
+            .asEmail()
         )
 
         @govukButton(

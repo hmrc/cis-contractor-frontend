@@ -14,27 +14,14 @@
  * limitations under the License.
  */
 
-package forms.add.partnership
+package pages.add.partnership
 
-import forms.Validation
-import forms.mappings.Constants
-import forms.mappings.Mappings
-import play.api.data.Form
+import pages.QuestionPage
+import play.api.libs.json.JsPath
 
-import javax.inject.Inject
+case object PartnershipEmailAddressPage extends QuestionPage[String] {
 
-class PartnershipNameFormProvider @Inject() extends Mappings {
+  override def path: JsPath = JsPath \ toString
 
-  def apply(): Form[String] =
-    Form(
-      "value" -> text("partnershipName.error.required")
-        .transform(_.trim, identity)
-        .verifying(
-          firstError(
-            maxLength(Constants.MaxLength56, "partnershipName.error.length"),
-            regexp(Validation.nameRegex, "partnershipName.error.invalidCharacters")
-          )
-        )
-    )
-
+  override def toString: String = "partnershipEmailAddress"
 }
