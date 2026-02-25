@@ -21,8 +21,6 @@ import config.CurrencyFormatter
 import java.time.LocalDate
 import play.api.data.validation.{Constraint, Invalid, Valid}
 
-import scala.util.matching.Regex
-
 trait Constraints {
 
   protected def firstError[A](constraints: Constraint[A]*): Constraint[A] =
@@ -136,17 +134,6 @@ trait Constraints {
         Valid
       } else {
         Invalid(errorKey, CurrencyFormatter.currencyFormat(maximum))
-      }
-    }
-
-  protected def hasMinimumOfSixDigits(errorKey: String): Constraint[String] =
-    Constraint { input =>
-      val digit: Regex = "[0-9]".r
-      val hasMinSixDigits = digit.findAllIn(input).length >= 6
-      if (hasMinSixDigits) {
-        Valid
-      } else {
-        Invalid(errorKey)
       }
     }
 }

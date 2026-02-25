@@ -26,7 +26,7 @@ class PartnershipMobileNumberFormProviderSpec extends StringFieldBehaviours {
   val invalidKey  = "partnershipMobileNumber.error.invalid"
   val maxLength   = 35
 
-  private val mobileRegex = "^[0-9 ()\\-\\+]+$"
+  private val mobileRegex = "^(?=(?:.*\\d){6,})[0-9()+\\- ]*$"
 
   val form = new PartnershipMobileNumberFormProvider()()
 
@@ -116,7 +116,7 @@ class PartnershipMobileNumberFormProviderSpec extends StringFieldBehaviours {
       tooShortNumbers.foreach{ number =>
         val result = form.bind(Map("value" -> number))
         result.errors must contain(
-          FormError("value", "partnershipMobileNumber.error.minSixDigits")
+          FormError("value", invalidKey, Seq(mobileRegex))
         )
       }
     }

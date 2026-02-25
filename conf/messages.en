@@ -554,6 +554,5 @@ partnershipMobileNumber.hint = HMRC will never use this mobile number to contact
 partnershipMobileNumber.error.required = Enter a mobile number
 partnershipMobileNumber.error.length = Enter a valid mobile number, like 07700 900 982 or +44 7700 900 999
 partnershipMobileNumber.error.invalid = Enter a valid mobile number, like 07700 900 982 or +44 7700 900 999
-partnershipMobileNumber.error.minSixDigits = Enter a valid mobile number, like 07700 900 982 or +44 7700 900 999
 partnershipMobileNumber.checkYourAnswersLabel = Mobile number
 partnershipMobileNumber.change.hidden = mobile number
