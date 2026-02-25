@@ -440,6 +440,20 @@ partnershipNominatedPartnerUtrYesNo.checkYourAnswersLabel = Nominated partner ha
 partnershipNominatedPartnerUtrYesNo.error.required = Select whether you know the Unique Taxpayer Reference (UTR) for this nominated partner
 partnershipNominatedPartnerUtrYesNo.change.hidden = nominated partner has a UTR
 
+subcontractorAdded.title = Partnership subcontractor added
+subcontractorAdded.heading = Subcontractor added
+subcontractorAdded.p1 = You can now find {0} on your list of subcontractors.
+subcontractorAdded.nextSteps.h2 = Next steps
+subcontractorAdded.nextSteps.p1 = Before you can make any payments to this subcontractor, you will need to verify them.
+subcontractorAdded.nextSteps.p2 = Once they’re verified with HMRC, you will be able to:
+subcontractorAdded.nextSteps.list.l1 = make CIS deductions at the correct rate
+subcontractorAdded.nextSteps.list.l2 = include them on a monthly return
+subcontractorAdded.nextSteps.list.l3 = provide them with payment and deduction statements
+subcontractorAdded.nextSteps.link = Manage your subcontractors
+subcontractorAdded.helpAndSupport.h2 = Help and support
+subcontractorAdded.helpAndSupport.p1 = If you need help with the Construction Industry Scheme (CIS) and what it means for you,
+subcontractorAdded.helpAndSupport.p1.link = guidance is available on GOV.UK
+
 companyName.title = What is the name of the company?
 companyName.heading = What is the name of the company?
 companyName.hint = This will be the name as registered with Companies House
