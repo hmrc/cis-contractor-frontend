@@ -436,8 +436,9 @@ partnershipPhoneNumber.heading = What is the phone number for {0}?
 partnershipPhoneNumber.hint = HMRC will never use this phone number to contact this subcontractor
 partnershipPhoneNumber.checkYourAnswersLabel = Phone number
 partnershipPhoneNumber.error.required = Enter a phone number
-partnershipPhoneNumber.error.length = Enter a valid phone number
-partnershipPhoneNumber.error.invalid = Enter a valid phone number
+partnershipPhoneNumber.error.length = Enter a valid phone number, like 01632 960 001. For international numbers include the country code.
+partnershipPhoneNumber.error.invalid = Enter a valid phone number, like 01632 960 001. For international numbers include the country code.
+partnershipPhoneNumber.error.minSixDigits = Enter a valid phone number (min six digit)
 partnershipPhoneNumber.change.hidden = phone number
 
 companyName.title = companyName

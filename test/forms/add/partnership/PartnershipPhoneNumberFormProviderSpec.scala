@@ -21,16 +21,17 @@ import play.api.data.FormError
 
 class PartnershipPhoneNumberFormProviderSpec extends StringFieldBehaviours {
 
-  val requiredKey = "partnershipPhoneNumber.error.required"
-  val lengthKey   = "partnershipPhoneNumber.error.length"
-  val invalidKey  = "partnershipPhoneNumber.error.invalid"
-  val maxLength   = 35
+  val requiredKey     = "partnershipPhoneNumber.error.required"
+  val lengthKey       = "partnershipPhoneNumber.error.length"
+  val invalidKey      = "partnershipPhoneNumber.error.invalid"
+  val minSixDigitsKey = "partnershipPhoneNumber.error.minSixDigits"
+  val maxLength       = 35
 
   val form = new PartnershipPhoneNumberFormProvider()()
 
   val validPhoneNumber = Seq(
     "07777777777",
-    "447777777777",
+    "+447777777777",
     "  07777 77777 ",
     "(44)77777777777",
     "44-777-777"
@@ -67,7 +68,7 @@ class PartnershipPhoneNumberFormProviderSpec extends StringFieldBehaviours {
       invalidPhoneNumber.foreach { invalidTelephone =>
         val result = form.bind(Map(fieldName -> invalidTelephone))
         result.errors must contain(
-          FormError(fieldName, invalidKey, Seq("^[0-9 )(\\-]+$"))
+          FormError(fieldName, invalidKey, Seq("^\\+?[0-9 ()\\-]+$"))
         )
       }
     }
@@ -89,6 +90,22 @@ class PartnershipPhoneNumberFormProviderSpec extends StringFieldBehaviours {
         val result = form.bind(Map(fieldName -> tooLongNumbers))
         result.errors must contain(
           FormError(fieldName, lengthKey, Seq(maxLength))
+        )
+      }
+    }
+
+    "must display error when there is less than 6 digits" in {
+      val lessThanSixDigits = Seq(
+        "01234",
+        "+01234",
+        "+()()123",
+        "1------2"
+      )
+
+      lessThanSixDigits.foreach { lessThanSixDigits =>
+        val result = form.bind(Map(fieldName -> lessThanSixDigits))
+        result.errors must contain(
+          FormError(fieldName, minSixDigitsKey)
         )
       }
     }

@@ -16,6 +16,7 @@
 
 package forms.add.partnership
 
+import forms.Validation.phoneRegex
 import forms.mappings.Mappings
 import mapping.Constants
 import play.api.data.Form
@@ -24,8 +25,6 @@ import javax.inject.Inject
 
 class PartnershipPhoneNumberFormProvider @Inject() extends Mappings {
 
-  private val phoneRegex = """^[0-9 )(\-]+$"""
-
   def apply(): Form[String] =
     Form(
       "value" -> text("partnershipPhoneNumber.error.required")
@@ -33,6 +32,7 @@ class PartnershipPhoneNumberFormProvider @Inject() extends Mappings {
         .verifying(
           firstError(
             regexp(phoneRegex, "partnershipPhoneNumber.error.invalid"),
+            hasMinimumOfSixDigits("partnershipPhoneNumber.error.minSixDigits"),
             maxLength(Constants.MaxLength35, "partnershipPhoneNumber.error.length")
           )
         )

@@ -22,6 +22,7 @@ import uk.gov.hmrc.domain.Nino
 object Validation {
 
   final val worksRefRegex = """^[A-Za-z0-9 ~!@#$%&'()*+,-./:;=?_{}£€]+$"""
+  final val phoneRegex    = """^\+?[0-9 ()\-]+$"""
 
   final val companyRegNumberRegex =
     """(?i)^(?:[A-Z]{2}\d{1,6}|\d{1,8})$"""
