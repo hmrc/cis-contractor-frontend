@@ -208,6 +208,11 @@ POST       /add/company/check-address                          controllers.add.c
 GET        /add/company/change-check-address                 controllers.add.company.CompanyAddressYesNoController.onPageLoad(mode: Mode = CheckMode)
 POST       /add/company/change-check-address                  controllers.add.company.CompanyAddressYesNoController.onSubmit(mode: Mode = CheckMode)
 
+GET        /add/company/choose-contact-details                           controllers.add.company.CompanyContactDetailsOptionsController.onPageLoad(mode: Mode = NormalMode)
+POST       /add/company/choose-contact-details                           controllers.add.company.CompanyContactDetailsOptionsController.onSubmit(mode: Mode = NormalMode)
+GET        /add/company/change-choose-contact-details                    controllers.add.company.CompanyContactDetailsOptionsController.onPageLoad(mode: Mode = CheckMode)
+POST       /add/company/change-choose-contact-details                    controllers.add.company.CompanyContactDetailsOptionsController.onSubmit(mode: Mode = CheckMode)
+
 GET        /companyAddress                              controllers.add.company.CompanyAddressController.onPageLoad(mode: Mode = NormalMode)
 POST       /companyAddress                              controllers.add.company.CompanyAddressController.onSubmit(mode: Mode = NormalMode)
 GET        /changeCompanyAddress                        controllers.add.company.CompanyAddressController.onPageLoad(mode: Mode = CheckMode)

@@ -531,3 +531,15 @@ companyWorksReference.change.hidden = CompanyWorksReference
 
 companyCheckYourAnswers.title = companyCheckYourAnswers
 companyCheckYourAnswers.heading = companyCheckYourAnswers
+
+companyContactDetailsOptions.title = What are the contact details for this company?
+companyContactDetailsOptions.heading = What are the contact details for {0}?
+companyContactDetailsOptions.hint = Choose which method of contact you would like to add for this subcontractor. Contact details are only for your own records.
+companyContactDetailsOptions.emailAddress = Email address
+companyContactDetailsOptions.phoneNumber = Phone number
+companyContactDetailsOptions.mobileNumber = Mobile number
+companyContactDetailsOptions.or = or
+companyContactDetailsOptions.noDetails = Do not add any contact details for this subcontractor
+companyContactDetailsOptions.error.required = Select whether you want to add contact details for this company
+companyContactDetailsOptions.checkYourAnswersLabel = Contact details for company
+companyContactDetailsOptions.change.hidden = Contact details for company
