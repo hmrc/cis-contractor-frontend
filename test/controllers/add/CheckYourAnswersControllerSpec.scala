@@ -21,12 +21,14 @@ import controllers.routes
 import models.add.{SubContactDetails, TypeOfSubcontractor, UKAddress}
 import models.{CheckMode, UserAnswers}
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.{verify, verifyNoMoreInteractions, when}
+import org.mockito.Mockito.{never, verify, verifyNoMoreInteractions, when}
 import org.scalatestplus.mockito.MockitoSugar.mock
+import pages.CheckYourAnswersSubmittedPage
 import pages.add.*
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
+import repositories.SessionRepository
 import services.SubcontractorService
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -35,6 +37,7 @@ import scala.concurrent.Future
 class CheckYourAnswersControllerSpec extends SpecBase {
 
   "Check Your Answers Controller" - {
+
     val address = UKAddress(
       addressLine1 = "10 Downing Street",
       addressLine2 = Some("Westminster"),
@@ -42,7 +45,8 @@ class CheckYourAnswersControllerSpec extends SpecBase {
       addressLine4 = Some("UK"),
       postCode = "SW1A 2AA"
     )
-    val ua      =
+
+    val ua =
       emptyUserAnswers
         .set(TypeOfSubcontractorPage, TypeOfSubcontractor.Individualorsoletrader)
         .success
@@ -143,32 +147,63 @@ class CheckYourAnswersControllerSpec extends SpecBase {
       }
     }
 
-    "must redirect to other (confirm page ) when valid data is submitted" in {
+    "must redirect back to CYA and set submitted flag when valid data is submitted" in {
       val mockSubcontractorService = mock[SubcontractorService]
+      val mockSessionRepository    = mock[SessionRepository]
 
       when(mockSubcontractorService.createAndUpdateSubcontractor(any[UserAnswers])(any[HeaderCarrier]))
         .thenReturn(Future.successful(()))
 
+      when(mockSessionRepository.set(any[UserAnswers]))
+        .thenReturn(Future.successful(true))
+
       val application =
         applicationBuilder(userAnswers = Some(ua))
           .overrides(
-            bind[SubcontractorService].toInstance(mockSubcontractorService)
+            bind[SubcontractorService].toInstance(mockSubcontractorService),
+            bind[SessionRepository].toInstance(mockSessionRepository)
           )
           .build()
 
       running(application) {
-        val request =
-          FakeRequest(POST, controllers.add.routes.CheckYourAnswersController.onSubmit().url)
+        val request = FakeRequest(POST, controllers.add.routes.CheckYourAnswersController.onSubmit().url)
 
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.add.routes.CheckYourAnswersController
-          .onPageLoad()
-          .url
+        redirectLocation(result).value mustEqual controllers.add.routes.CheckYourAnswersController.onPageLoad().url
       }
 
       verify(mockSubcontractorService).createAndUpdateSubcontractor(any[UserAnswers])(any[HeaderCarrier])
+      verify(mockSessionRepository).set(any[UserAnswers])
+      verifyNoMoreInteractions(mockSubcontractorService)
+    }
+
+    "must redirect to Journey Recovery and not resubmit when already submitted flag is set" in {
+      val submittedUa =
+        ua.set(CheckYourAnswersSubmittedPage, true).success.value
+
+      val mockSubcontractorService = mock[SubcontractorService]
+      val mockSessionRepository    = mock[SessionRepository]
+
+      val application =
+        applicationBuilder(userAnswers = Some(submittedUa))
+          .overrides(
+            bind[SubcontractorService].toInstance(mockSubcontractorService),
+            bind[SessionRepository].toInstance(mockSessionRepository)
+          )
+          .build()
+
+      running(application) {
+        val request = FakeRequest(POST, controllers.add.routes.CheckYourAnswersController.onSubmit().url)
+        val result  = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+      }
+
+      verify(mockSubcontractorService, never()).createAndUpdateSubcontractor(any[UserAnswers])(any[HeaderCarrier])
+      verify(mockSessionRepository, never()).set(any[UserAnswers])
       verifyNoMoreInteractions(mockSubcontractorService)
     }
 
@@ -184,8 +219,9 @@ class CheckYourAnswersControllerSpec extends SpecBase {
       }
     }
 
-    "must redirect to Journey Recovery when service call fails (recover block)" in {
+    "must redirect to Journey Recovery when service call fails (recover block) and not set submitted flag" in {
       val mockSubcontractorService = mock[SubcontractorService]
+      val mockSessionRepository    = mock[SessionRepository]
 
       when(mockSubcontractorService.createAndUpdateSubcontractor(any[UserAnswers])(any[HeaderCarrier]))
         .thenReturn(Future.failed(new RuntimeException("boom")))
@@ -193,7 +229,8 @@ class CheckYourAnswersControllerSpec extends SpecBase {
       val application =
         applicationBuilder(userAnswers = Some(ua))
           .overrides(
-            bind[SubcontractorService].toInstance(mockSubcontractorService)
+            bind[SubcontractorService].toInstance(mockSubcontractorService),
+            bind[SessionRepository].toInstance(mockSessionRepository)
           )
           .build()
 
@@ -206,6 +243,7 @@ class CheckYourAnswersControllerSpec extends SpecBase {
       }
 
       verify(mockSubcontractorService).createAndUpdateSubcontractor(any[UserAnswers])(any[HeaderCarrier])
+      verify(mockSessionRepository, never()).set(any[UserAnswers])
       verifyNoMoreInteractions(mockSubcontractorService)
     }
 
