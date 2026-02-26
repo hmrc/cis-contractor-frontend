@@ -14,10 +14,8 @@
  * limitations under the License.
  */
 
-package forms.mappings
+package mapping
 
 object Constants {
-  final val MaxLength254: Int = 254
-  final val MaxLength56: Int  = 56
-  final val MaxLength35: Int  = 35
+  final val MaxLength35: Int = 35
 }

@@ -198,6 +198,11 @@ POST       /add/partnership/nominated-partner-has-utr                       cont
 GET        /add/partnership/change-nominated-partner-has-utr                controllers.add.partnership.PartnershipNominatedPartnerUtrYesNoController.onPageLoad(mode: Mode = CheckMode)
 POST       /add/partnership/change-nominated-partner-has-utr                controllers.add.partnership.PartnershipNominatedPartnerUtrYesNoController.onSubmit(mode: Mode = CheckMode)
 
+GET        /add/partnership/phone-number                                    controllers.add.partnership.PartnershipPhoneNumberController.onPageLoad(mode: Mode = NormalMode)
+POST       /add/partnership/phone-number                                    controllers.add.partnership.PartnershipPhoneNumberController.onSubmit(mode: Mode = NormalMode)
+GET        /add/partnership/change-phone-number                             controllers.add.partnership.PartnershipPhoneNumberController.onPageLoad(mode: Mode = CheckMode)
+POST       /add/partnership/change-phone-number                             controllers.add.partnership.PartnershipPhoneNumberController.onSubmit(mode: Mode = CheckMode)
+
 GET        /add/partnership/subcontractor-added                             controllers.add.partnership.SubcontractorAddedController.onPageLoad()
 
 GET        /add/company/company-name                    controllers.add.company.CompanyNameController.onPageLoad(mode: Mode = NormalMode)
