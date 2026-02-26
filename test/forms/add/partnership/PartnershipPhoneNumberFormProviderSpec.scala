@@ -27,6 +27,8 @@ class PartnershipPhoneNumberFormProviderSpec extends StringFieldBehaviours {
   val minSixDigitsKey = "partnershipPhoneNumber.error.minSixDigits"
   val maxLength       = 35
 
+  val phoneRegex = "^(?=(?:.*\\d){6,})[0-9()+\\- ]*$"
+
   val form = new PartnershipPhoneNumberFormProvider()()
 
   val validPhoneNumber = Seq(
@@ -68,7 +70,7 @@ class PartnershipPhoneNumberFormProviderSpec extends StringFieldBehaviours {
       invalidPhoneNumber.foreach { invalidTelephone =>
         val result = form.bind(Map(fieldName -> invalidTelephone))
         result.errors must contain(
-          FormError(fieldName, invalidKey, Seq("^[0-9 ()\\-\\+]+$"))
+          FormError(fieldName, invalidKey, Seq(phoneRegex))
         )
       }
     }
@@ -86,8 +88,8 @@ class PartnershipPhoneNumberFormProviderSpec extends StringFieldBehaviours {
         "    012345678901   234567   890123456789012345    "
       )
 
-      tooLongNumbers.foreach { tooLongNumbers =>
-        val result = form.bind(Map(fieldName -> tooLongNumbers))
+      tooLongNumbers.foreach { number =>
+        val result = form.bind(Map(fieldName -> number))
         result.errors must contain(
           FormError(fieldName, lengthKey, Seq(maxLength))
         )
@@ -102,10 +104,10 @@ class PartnershipPhoneNumberFormProviderSpec extends StringFieldBehaviours {
         "1------2"
       )
 
-      lessThanSixDigits.foreach { lessThanSixDigits =>
-        val result = form.bind(Map(fieldName -> lessThanSixDigits))
+      lessThanSixDigits.foreach { number =>
+        val result = form.bind(Map(fieldName -> number))
         result.errors must contain(
-          FormError(fieldName, minSixDigitsKey)
+          FormError(fieldName, invalidKey, Seq(phoneRegex))
         )
       }
     }

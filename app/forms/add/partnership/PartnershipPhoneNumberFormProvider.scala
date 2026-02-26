@@ -32,7 +32,6 @@ class PartnershipPhoneNumberFormProvider @Inject() extends Mappings {
         .verifying(
           firstError(
             regexp(phoneRegex, "partnershipPhoneNumber.error.invalid"),
-            hasMinimumOfSixDigits("partnershipPhoneNumber.error.minSixDigits"),
             maxLength(Constants.MaxLength35, "partnershipPhoneNumber.error.length")
           )
         )

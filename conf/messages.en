@@ -447,7 +447,6 @@ partnershipPhoneNumber.checkYourAnswersLabel = Phone number
 partnershipPhoneNumber.error.required = Enter a phone number
 partnershipPhoneNumber.error.length = Enter a valid phone number, like 01632 960 001. For international numbers include the country code.
 partnershipPhoneNumber.error.invalid = Enter a valid phone number, like 01632 960 001. For international numbers include the country code.
-partnershipPhoneNumber.error.minSixDigits = Enter a valid phone number, like 01632 960 001. For international numbers include the country code.
 partnershipPhoneNumber.change.hidden = phone number
 
 subcontractorAdded.title = Partnership subcontractor added
