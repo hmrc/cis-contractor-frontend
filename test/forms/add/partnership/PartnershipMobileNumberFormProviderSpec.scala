@@ -113,7 +113,7 @@ class PartnershipMobileNumberFormProviderSpec extends StringFieldBehaviours {
         "1------2",
         "+654+12"
       )
-      tooShortNumbers.foreach{ number =>
+      tooShortNumbers.foreach { number =>
         val result = form.bind(Map("value" -> number))
         result.errors must contain(
           FormError("value", invalidKey, Seq(mobileRegex))

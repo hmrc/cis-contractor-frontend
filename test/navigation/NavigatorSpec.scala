@@ -1069,7 +1069,7 @@ class NavigatorSpec extends SpecBase {
           emptyUserAnswers
         ) mustBe controllers.add.company.routes.CompanyAddressController.onPageLoad(CheckMode)
       }
-      
+
       "must go from a PartnershipMobileNumberPage to PartnershipMobileNumberPage in CheckMode" in {
         navigator.nextPage(
           PartnershipMobileNumberPage,
