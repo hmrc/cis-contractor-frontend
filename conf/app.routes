@@ -210,10 +210,10 @@ POST       /add/company/address                              controllers.add.com
 GET        /add/company/change-address                        controllers.add.company.CompanyAddressController.onPageLoad(mode: Mode = CheckMode)
 POST       /add/company/change-address                        controllers.add.company.CompanyAddressController.onSubmit(mode: Mode = CheckMode)
 
-GET        /companyContactOptions                       controllers.add.company.CompanyContactOptionsController.onPageLoad(mode: Mode = NormalMode)
-POST       /companyContactOptions                       controllers.add.company.CompanyContactOptionsController.onSubmit(mode: Mode = NormalMode)
-GET        /changeCompanyContactOptions                 controllers.add.company.CompanyContactOptionsController.onPageLoad(mode: Mode = CheckMode)
-POST       /changeCompanyContactOptions                 controllers.add.company.CompanyContactOptionsController.onSubmit(mode: Mode = CheckMode)
+GET        /add/company/choose-contact-details                          controllers.add.company.CompanyContactOptionsController.onPageLoad(mode: Mode = NormalMode)
+POST       /add/company/choose-contact-details                          controllers.add.company.CompanyContactOptionsController.onSubmit(mode: Mode = NormalMode)
+GET        /add/company/change-choose-contact-details                   controllers.add.company.CompanyContactOptionsController.onPageLoad(mode: Mode = CheckMode)
+POST       /add/company/change-choose-contact-details                   controllers.add.company.CompanyContactOptionsController.onSubmit(mode: Mode = CheckMode)
 
 GET        /companyEmailAddress                         controllers.add.company.CompanyEmailAddressController.onPageLoad(mode: Mode = NormalMode)
 POST       /companyEmailAddress                         controllers.add.company.CompanyEmailAddressController.onSubmit(mode: Mode = NormalMode)

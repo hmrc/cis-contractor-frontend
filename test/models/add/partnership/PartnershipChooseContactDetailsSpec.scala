@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package models.add.company
+package models.add.partnership
 
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Gen
@@ -24,17 +24,17 @@ import org.scalatest.matchers.must.Matchers
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import play.api.libs.json.{JsError, JsString, Json}
 
-class CompanyContactOptionsSpec extends AnyFreeSpec with Matchers with ScalaCheckPropertyChecks with OptionValues {
+class PartnershipChooseContactDetailsSpec extends AnyFreeSpec with Matchers with ScalaCheckPropertyChecks with OptionValues {
 
-  "CompanyContactOptions" - {
+  "PartnershipChooseContactDetails" - {
 
     "must deserialise valid values" in {
 
-      val gen = Gen.oneOf(CompanyContactOptions.values.toSeq)
+      val gen = Gen.oneOf(PartnershipChooseContactDetails.values.toSeq)
 
       forAll(gen) { value =>
         JsString(value.toString)
-          .validate[CompanyContactOptions]
+          .validate[PartnershipChooseContactDetails]
           .asOpt
           .value mustEqual value
       }
@@ -43,16 +43,16 @@ class CompanyContactOptionsSpec extends AnyFreeSpec with Matchers with ScalaChec
     "must fail to deserialise invalid values" in {
 
       val gen =
-        arbitrary[String] suchThat (!CompanyContactOptions.values.map(_.toString).contains(_))
+        arbitrary[String] suchThat (!PartnershipChooseContactDetails.values.map(_.toString).contains(_))
 
       forAll(gen) { invalidValue =>
-        JsString(invalidValue).validate[CompanyContactOptions] mustEqual JsError("error.invalid")
+        JsString(invalidValue).validate[PartnershipChooseContactDetails] mustEqual JsError("error.invalid")
       }
     }
 
     "must serialise" in {
 
-      val gen = Gen.oneOf(CompanyContactOptions.values.toSeq)
+      val gen = Gen.oneOf(PartnershipChooseContactDetails.values.toSeq)
 
       forAll(gen) { value =>
         Json.toJson(value) mustEqual JsString(value.toString)
