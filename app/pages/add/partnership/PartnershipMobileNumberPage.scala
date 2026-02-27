@@ -14,12 +14,14 @@
  * limitations under the License.
  */
 
-package forms.mappings
+package pages.add.partnership
 
-object Constants {
-  final val MaxLength35: Int  = 35
-  final val MaxLength8: Int   = 8
-  final val MaxLength254: Int = 254
-  final val MaxLength56: Int  = 56
-  final val MaxLength35: Int = 35
+import pages.QuestionPage
+import play.api.libs.json.JsPath
+
+case object PartnershipMobileNumberPage extends QuestionPage[String] {
+
+  override def path: JsPath = JsPath \ toString
+
+  override def toString: String = "partnershipMobileNumber"
 }

@@ -261,3 +261,8 @@ GET        /changeCompanyWorksReference                 controllers.add.company.
 POST       /changeCompanyWorksReference                 controllers.add.company.CompanyWorksReferenceController.onSubmit(mode: Mode = CheckMode)
 
 GET        /companyCheckYourAnswers                     controllers.add.company.CompanyCheckYourAnswersController.onPageLoad()
+
+GET        /add/partnership/mobile-number                       controllers.add.partnership.PartnershipMobileNumberController.onPageLoad(mode: Mode = NormalMode)
+POST       /add/partnership/mobile-number                       controllers.add.partnership.PartnershipMobileNumberController.onSubmit(mode: Mode = NormalMode)
+GET        /add/partnership/change-mobile-number                controllers.add.partnership.PartnershipMobileNumberController.onPageLoad(mode: Mode = CheckMode)
+POST       /add/partnership/change-mobile-number                controllers.add.partnership.PartnershipMobileNumberController.onSubmit(mode: Mode = CheckMode)
