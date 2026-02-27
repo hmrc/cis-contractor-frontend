@@ -35,9 +35,11 @@ package controllers.add
 import com.google.inject.Inject
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
 import models.add.ValidatedSubcontractor
+import pages.add.CheckYourAnswersSubmittedPage
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import repositories.SessionRepository
 import services.SubcontractorService
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -54,6 +56,7 @@ class CheckYourAnswersController @Inject() (
   requireData: DataRequiredAction,
   val controllerComponents: MessagesControllerComponents,
   subcontractorService: SubcontractorService,
+  sessionRepository: SessionRepository,
   view: CheckYourAnswersView
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
@@ -92,28 +95,29 @@ class CheckYourAnswersController @Inject() (
 
   def onSubmit(): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
-      ValidatedSubcontractor.build(request.userAnswers) match {
-        case Right(_) =>
-          subcontractorService
-            .createAndUpdateSubcontractor(request.userAnswers)
-            .map { _ =>
-              Redirect(controllers.add.routes.CheckYourAnswersController.onPageLoad())
-            }
-            .recover { case t =>
-              logger.error(
-                "[CheckYourAnswersController.onSubmit] Failed to create/update subcontractor",
-                t
-              )
-              Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-            }
+      if (request.userAnswers.get(CheckYourAnswersSubmittedPage).contains(true)) {
+        Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+      } else {
+        ValidatedSubcontractor.build(request.userAnswers) match {
 
-        case Left(error) =>
-          logger.error(
-            s"[CheckYourAnswersController.onSubmit] Validation failed: $error"
-          )
-          Future.successful(
-            Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-          )
+          case Right(_) =>
+            subcontractorService
+              .createAndUpdateSubcontractor(request.userAnswers)
+              .flatMap { _ =>
+                Future
+                  .fromTry(request.userAnswers.set(CheckYourAnswersSubmittedPage, true))
+                  .flatMap(updated => sessionRepository.set(updated).map(_ => ()))
+                  .map(_ => Redirect(controllers.add.routes.CheckYourAnswersController.onPageLoad()))
+              }
+              .recover { case t =>
+                logger.error("[CheckYourAnswersController.onSubmit] Failed to create/update subcontractor", t)
+                Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+              }
+
+          case Left(error) =>
+            logger.error(s"[CheckYourAnswersController.onSubmit] Validation failed: $error")
+            Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+        }
       }
     }
 
