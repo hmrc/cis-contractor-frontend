@@ -22,8 +22,7 @@ import controllers.routes
 import pages.*
 import models.*
 import models.add.TypeOfSubcontractor.*
-import models.add.company.CompanyContactOptions.*
-import models.add.partnership.PartnershipChooseContactDetails.*
+import models.contact.ContactOptions.*
 import pages.add.*
 import pages.add.company.*
 import pages.add.partnership.*
@@ -59,7 +58,7 @@ class Navigator @Inject() () {
     case CompanyNamePage                           => _ => controllers.add.company.routes.CompanyNameController.onPageLoad(NormalMode)
     case CompanyAddressYesNoPage                   =>
       _ => controllers.add.company.routes.CompanyAddressYesNoController.onPageLoad(NormalMode)
-    case CompanyContactOptionsPage          =>
+    case CompanyContactOptionsPage                 =>
       userAnswers => navigatorFromCompanyContactOptionsPage(NormalMode)(userAnswers)
     case PartnershipNamePage                       =>
       _ => controllers.add.partnership.routes.PartnershipHasUtrYesNoController.onPageLoad(NormalMode)
@@ -121,7 +120,7 @@ class Navigator @Inject() () {
       _ => controllers.add.partnership.routes.PartnershipEmailAddressController.onPageLoad(CheckMode)
     case PartnershipNominatedPartnerUtrYesNoPage  =>
       userAnswers => navigatorFromPartnershipNominatedPartnerUtrYesNoPage(CheckMode)(userAnswers)
-    case PartnershipMobileNumberPage               =>
+    case PartnershipMobileNumberPage              =>
       _ => controllers.add.partnership.routes.PartnershipMobileNumberController.onPageLoad(CheckMode)
     case CompanyAddressYesNoPage                  =>
       _ => controllers.add.company.routes.CompanyAddressYesNoController.onPageLoad(CheckMode)
@@ -344,16 +343,16 @@ class Navigator @Inject() () {
 
   private def navigatorFromCompanyContactOptionsPage(mode: Mode)(userAnswers: UserAnswers): Call =
     (userAnswers.get(CompanyContactOptionsPage), mode) match {
-      case (Some(EmailAddress), _) =>
+      case (Some(Email), _)  =>
         controllers.add.company.routes.CompanyContactOptionsController.onPageLoad(mode)
-      case (Some(PhoneNumber), _) =>
+      case (Some(Phone), _)  =>
         controllers.add.company.routes.CompanyContactOptionsController.onPageLoad(mode)
-      case (Some(MobileNumber), _) =>
+      case (Some(Mobile), _) =>
         controllers.add.company.routes.CompanyContactOptionsController.onPageLoad(mode)
-      case (Some(_), _) =>
+      case (Some(_), _)      =>
         controllers.add.company.routes.CompanyContactOptionsController.onPageLoad(mode)
-      case (_, CheckMode) => controllers.add.routes.CheckYourAnswersController.onPageLoad()
-      case _ => routes.JourneyRecoveryController.onPageLoad()
+      case (_, CheckMode)    => controllers.add.routes.CheckYourAnswersController.onPageLoad()
+      case _                 => routes.JourneyRecoveryController.onPageLoad()
     }
 
 }

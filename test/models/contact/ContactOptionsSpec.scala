@@ -14,48 +14,47 @@
  * limitations under the License.
  */
 
-package models.add.company
+package models.contact
 
-import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Gen
+import org.scalacheck.Arbitrary.arbitrary
 import org.scalatest.OptionValues
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
-import play.api.libs.json.{JsError, JsString, Json}
+import play.api.libs.json._
 
-class CompanyContactOptionsSpec extends AnyFreeSpec with Matchers with ScalaCheckPropertyChecks with OptionValues {
+class ContactOptionsSpec extends AnyFreeSpec with Matchers with ScalaCheckPropertyChecks with OptionValues {
 
-  "CompanyContactOptions" - {
+  "ContactOptions" - {
 
     "must deserialise valid values" in {
 
-      val gen = Gen.oneOf(CompanyContactOptions.values.toSeq)
+      val gen = Gen.oneOf(ContactOptions.values.toSeq)
 
-      forAll(gen) { value =>
-        JsString(value.toString)
-          .validate[CompanyContactOptions]
+      forAll(gen) { contactOptions =>
+        JsString(contactOptions.toString)
+          .validate[ContactOptions]
           .asOpt
-          .value mustEqual value
+          .value mustEqual contactOptions
       }
     }
 
     "must fail to deserialise invalid values" in {
 
-      val gen =
-        arbitrary[String] suchThat (!CompanyContactOptions.values.map(_.toString).contains(_))
+      val gen = arbitrary[String] suchThat (!ContactOptions.values.map(_.toString).contains(_))
 
       forAll(gen) { invalidValue =>
-        JsString(invalidValue).validate[CompanyContactOptions] mustEqual JsError("error.invalid")
+        JsString(invalidValue).validate[ContactOptions] mustEqual JsError("error.invalid")
       }
     }
 
     "must serialise" in {
 
-      val gen = Gen.oneOf(CompanyContactOptions.values.toSeq)
+      val gen = Gen.oneOf(ContactOptions.values.toSeq)
 
-      forAll(gen) { value =>
-        Json.toJson(value) mustEqual JsString(value.toString)
+      forAll(gen) { contactOptions =>
+        Json.toJson(contactOptions) mustEqual JsString(contactOptions.toString)
       }
     }
   }

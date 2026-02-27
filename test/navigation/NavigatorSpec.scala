@@ -20,9 +20,8 @@ import base.SpecBase
 import controllers.routes
 import pages.*
 import models.*
-import models.add.partnership.PartnershipChooseContactDetails
-import models.add.company.CompanyContactOptions
 import models.add.{SubcontractorName, TypeOfSubcontractor, UKAddress}
+import models.contact.ContactOptions
 import pages.add.*
 import pages.add.company.*
 import pages.add.partnership.*
@@ -505,7 +504,7 @@ class NavigatorSpec extends SpecBase {
             NormalMode,
             emptyUserAnswers.setOrException(
               PartnershipChooseContactDetailsPage,
-              PartnershipChooseContactDetails.Email
+              ContactOptions.Email
             )
           ) mustBe controllers.add.partnership.routes.PartnershipChooseContactDetailsController.onPageLoad(NormalMode)
         }
@@ -516,7 +515,7 @@ class NavigatorSpec extends SpecBase {
             NormalMode,
             emptyUserAnswers.setOrException(
               PartnershipChooseContactDetailsPage,
-              models.add.partnership.PartnershipChooseContactDetails.Phone
+              ContactOptions.Phone
             )
           ) mustBe controllers.add.partnership.routes.PartnershipChooseContactDetailsController.onPageLoad(NormalMode)
         }
@@ -527,7 +526,7 @@ class NavigatorSpec extends SpecBase {
             NormalMode,
             emptyUserAnswers.setOrException(
               PartnershipChooseContactDetailsPage,
-              models.add.partnership.PartnershipChooseContactDetails.Mobile
+              ContactOptions.Mobile
             )
           ) mustBe controllers.add.partnership.routes.PartnershipChooseContactDetailsController.onPageLoad(NormalMode)
         }
@@ -538,7 +537,7 @@ class NavigatorSpec extends SpecBase {
             NormalMode,
             emptyUserAnswers.setOrException(
               PartnershipChooseContactDetailsPage,
-              models.add.partnership.PartnershipChooseContactDetails.NoDetails
+              ContactOptions.NoDetails
             )
           ) mustBe controllers.add.partnership.routes.PartnershipChooseContactDetailsController.onPageLoad(NormalMode)
         }
@@ -600,7 +599,7 @@ class NavigatorSpec extends SpecBase {
             NormalMode,
             emptyUserAnswers.setOrException(
               CompanyContactOptionsPage,
-              CompanyContactOptions.EmailAddress
+              ContactOptions.Email
             )
           ) mustBe controllers.add.company.routes.CompanyContactOptionsController.onPageLoad(NormalMode)
         }
@@ -611,7 +610,7 @@ class NavigatorSpec extends SpecBase {
             NormalMode,
             emptyUserAnswers.setOrException(
               CompanyContactOptionsPage,
-              CompanyContactOptions.PhoneNumber
+              ContactOptions.Phone
             )
           ) mustBe controllers.add.company.routes.CompanyContactOptionsController.onPageLoad(NormalMode)
         }
@@ -622,7 +621,7 @@ class NavigatorSpec extends SpecBase {
             NormalMode,
             emptyUserAnswers.setOrException(
               CompanyContactOptionsPage,
-              CompanyContactOptions.MobileNumber
+              ContactOptions.Mobile
             )
           ) mustBe controllers.add.company.routes.CompanyContactOptionsController.onPageLoad(NormalMode)
         }
@@ -633,7 +632,7 @@ class NavigatorSpec extends SpecBase {
             NormalMode,
             emptyUserAnswers.setOrException(
               CompanyContactOptionsPage,
-              CompanyContactOptions.NoDetails
+              ContactOptions.NoDetails
             )
           ) mustBe controllers.add.company.routes.CompanyContactOptionsController.onPageLoad(NormalMode)
         }
@@ -983,7 +982,7 @@ class NavigatorSpec extends SpecBase {
             CheckMode,
             emptyUserAnswers.setOrException(
               PartnershipChooseContactDetailsPage,
-              models.add.partnership.PartnershipChooseContactDetails.Email
+              ContactOptions.Email
             )
           ) mustBe controllers.add.partnership.routes.PartnershipChooseContactDetailsController.onPageLoad(CheckMode)
         }
@@ -994,7 +993,7 @@ class NavigatorSpec extends SpecBase {
             CheckMode,
             emptyUserAnswers.setOrException(
               PartnershipChooseContactDetailsPage,
-              models.add.partnership.PartnershipChooseContactDetails.Phone
+              ContactOptions.Phone
             )
           ) mustBe controllers.add.partnership.routes.PartnershipChooseContactDetailsController.onPageLoad(CheckMode)
         }
@@ -1005,7 +1004,7 @@ class NavigatorSpec extends SpecBase {
             CheckMode,
             emptyUserAnswers.setOrException(
               PartnershipChooseContactDetailsPage,
-              models.add.partnership.PartnershipChooseContactDetails.Mobile
+              ContactOptions.Mobile
             )
           ) mustBe controllers.add.partnership.routes.PartnershipChooseContactDetailsController.onPageLoad(CheckMode)
         }
@@ -1016,7 +1015,7 @@ class NavigatorSpec extends SpecBase {
             CheckMode,
             emptyUserAnswers.setOrException(
               PartnershipChooseContactDetailsPage,
-              models.add.partnership.PartnershipChooseContactDetails.NoDetails
+              ContactOptions.NoDetails
             )
           ) mustBe controllers.add.partnership.routes.PartnershipChooseContactDetailsController.onPageLoad(CheckMode)
         }
@@ -1124,7 +1123,7 @@ class NavigatorSpec extends SpecBase {
             CheckMode,
             emptyUserAnswers.setOrException(
               CompanyContactOptionsPage,
-              models.add.company.CompanyContactOptions.EmailAddress
+              ContactOptions.Email
             )
           ) mustBe controllers.add.company.routes.CompanyContactOptionsController.onPageLoad(CheckMode)
         }
@@ -1135,7 +1134,7 @@ class NavigatorSpec extends SpecBase {
             CheckMode,
             emptyUserAnswers.setOrException(
               CompanyContactOptionsPage,
-              models.add.company.CompanyContactOptions.PhoneNumber
+              ContactOptions.Phone
             )
           ) mustBe controllers.add.company.routes.CompanyContactOptionsController.onPageLoad(CheckMode)
         }
@@ -1146,7 +1145,7 @@ class NavigatorSpec extends SpecBase {
             CheckMode,
             emptyUserAnswers.setOrException(
               CompanyContactOptionsPage,
-              models.add.company.CompanyContactOptions.MobileNumber
+              ContactOptions.Mobile
             )
           ) mustBe controllers.add.company.routes.CompanyContactOptionsController.onPageLoad(CheckMode)
         }
@@ -1157,7 +1156,7 @@ class NavigatorSpec extends SpecBase {
             CheckMode,
             emptyUserAnswers.setOrException(
               CompanyContactOptionsPage,
-              models.add.company.CompanyContactOptions.NoDetails
+              ContactOptions.NoDetails
             )
           ) mustBe controllers.add.company.routes.CompanyContactOptionsController.onPageLoad(CheckMode)
         }

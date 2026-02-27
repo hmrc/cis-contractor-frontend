@@ -17,7 +17,7 @@
 package viewmodels.checkAnswers.add.partnership
 
 import controllers.add.partnership.routes
-import models.add.partnership.PartnershipChooseContactDetails
+import models.contact.ContactOptions
 import models.{CheckMode, UserAnswers}
 import org.scalatest.OptionValues.convertOptionToValuable
 import org.scalatest.TryValues.convertTryToSuccessOrFailure
@@ -36,7 +36,7 @@ class PartnershipChooseContactDetailsSummarySpec extends AnyFreeSpec with Matche
 
     "must return a SummaryListRow when Email is selected" in {
       val answers = UserAnswers("test-id")
-        .set(PartnershipChooseContactDetailsPage, PartnershipChooseContactDetails.Email)
+        .set(PartnershipChooseContactDetailsPage, ContactOptions.Email)
         .success
         .value
 
@@ -67,7 +67,7 @@ class PartnershipChooseContactDetailsSummarySpec extends AnyFreeSpec with Matche
 
     "must return a SummaryListRow when Phone is selected" in {
       val answers = UserAnswers("test-id")
-        .set(PartnershipChooseContactDetailsPage, PartnershipChooseContactDetails.Phone)
+        .set(PartnershipChooseContactDetailsPage, ContactOptions.Phone)
         .success
         .value
 
@@ -81,7 +81,7 @@ class PartnershipChooseContactDetailsSummarySpec extends AnyFreeSpec with Matche
 
     "must return a SummaryListRow when Mobile is selected" in {
       val answers = UserAnswers("test-id")
-        .set(PartnershipChooseContactDetailsPage, PartnershipChooseContactDetails.Mobile)
+        .set(PartnershipChooseContactDetailsPage, ContactOptions.Mobile)
         .success
         .value
 
@@ -95,7 +95,7 @@ class PartnershipChooseContactDetailsSummarySpec extends AnyFreeSpec with Matche
 
     "must return a SummaryListRow when None is selected" in {
       val answers = UserAnswers("test-id")
-        .set(PartnershipChooseContactDetailsPage, PartnershipChooseContactDetails.NoDetails)
+        .set(PartnershipChooseContactDetailsPage, ContactOptions.NoDetails)
         .success
         .value
 

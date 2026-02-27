@@ -51,9 +51,9 @@ class CompanyContactOptionsViewSpec extends AnyWordSpec with Matchers with Guice
       radios.size() mustBe CompanyContactOptions.values.size
 
       val labels: util.List[String] = doc.select(".govuk-radios__label").eachText()
-      labels must contain(messages("companyContactOptions.emailAddress"))
-      labels must contain(messages("companyContactOptions.phoneNumber"))
-      labels must contain(messages("companyContactOptions.mobileNumber"))
+      labels must contain(messages("companyContactOptions.email"))
+      labels must contain(messages("companyContactOptions.phone"))
+      labels must contain(messages("companyContactOptions.mobile"))
       labels must contain(messages("companyContactOptions.noDetails"))
       labels must not(contain(messages("companyContactOptions.or")))
 

@@ -16,7 +16,7 @@
 
 package viewmodels.checkAnswers.add.company
 
-import models.add.company.CompanyContactOptions
+import models.contact.ContactOptions
 import models.{CheckMode, UserAnswers}
 import org.scalatest.OptionValues.convertOptionToValuable
 import org.scalatest.TryValues.convertTryToSuccessOrFailure
@@ -35,7 +35,7 @@ class CompanyContactOptionsSummarySpec extends AnyFreeSpec with Matchers {
 
     "must return a SummaryListRow when EmailAddress is selected" in {
       val answers = UserAnswers("test-id")
-        .set(CompanyContactOptionsPage, CompanyContactOptions.EmailAddress)
+        .set(CompanyContactOptionsPage, ContactOptions.Email)
         .success
         .value
 
@@ -47,7 +47,7 @@ class CompanyContactOptionsSummarySpec extends AnyFreeSpec with Matchers {
       val expectedKeyText = messages("companyContactOptions.checkYourAnswersLabel")
       row.key.content.asHtml.toString should include(expectedKeyText)
 
-      val expectedValue = messages("companyContactOptions.emailAddress")
+      val expectedValue = messages("companyContactOptions.email")
       row.value.content.asHtml.toString should include(expectedValue)
 
       row.actions shouldBe defined
@@ -66,7 +66,7 @@ class CompanyContactOptionsSummarySpec extends AnyFreeSpec with Matchers {
 
     "must return a SummaryListRow when PhoneNumber is selected" in {
       val answers = UserAnswers("test-id")
-        .set(CompanyContactOptionsPage, CompanyContactOptions.PhoneNumber)
+        .set(CompanyContactOptionsPage, ContactOptions.Phone)
         .success
         .value
 
@@ -74,13 +74,13 @@ class CompanyContactOptionsSummarySpec extends AnyFreeSpec with Matchers {
       maybeRow shouldBe defined
 
       val row           = maybeRow.value
-      val expectedValue = messages("companyContactOptions.phoneNumber")
+      val expectedValue = messages("companyContactOptions.phone")
       row.value.content.asHtml.toString should include(expectedValue)
     }
 
     "must return a SummaryListRow when MobileNumber is selected" in {
       val answers = UserAnswers("test-id")
-        .set(CompanyContactOptionsPage, CompanyContactOptions.MobileNumber)
+        .set(CompanyContactOptionsPage, ContactOptions.Mobile)
         .success
         .value
 
@@ -88,13 +88,13 @@ class CompanyContactOptionsSummarySpec extends AnyFreeSpec with Matchers {
       maybeRow shouldBe defined
 
       val row           = maybeRow.value
-      val expectedValue = messages("companyContactOptions.mobileNumber")
+      val expectedValue = messages("companyContactOptions.mobile")
       row.value.content.asHtml.toString should include(expectedValue)
     }
 
     "must return a SummaryListRow when No Option is selected" in {
       val answers = UserAnswers("test-id")
-        .set(CompanyContactOptionsPage, CompanyContactOptions.NoDetails)
+        .set(CompanyContactOptionsPage, ContactOptions.NoDetails)
         .success
         .value
 

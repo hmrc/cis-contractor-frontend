@@ -18,7 +18,7 @@ package controllers.add.partnership
 
 import base.SpecBase
 import forms.add.partnership.PartnershipChooseContactDetailsFormProvider
-import models.add.partnership.PartnershipChooseContactDetails
+import models.contact.ContactOptions
 import models.{CheckMode, NormalMode, UserAnswers}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
@@ -74,7 +74,7 @@ class PartnershipChooseContactDetailsControllerSpec extends SpecBase with Mockit
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
       val userAnswers = UserAnswers(userAnswersId)
-        .set(PartnershipChooseContactDetailsPage, PartnershipChooseContactDetails.Email)
+        .set(PartnershipChooseContactDetailsPage, ContactOptions.Email)
         .flatMap(_.set(PartnershipNamePage, partnershipName))
         .success
         .value
@@ -90,7 +90,7 @@ class PartnershipChooseContactDetailsControllerSpec extends SpecBase with Mockit
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(
-          form.fill(PartnershipChooseContactDetails.Email),
+          form.fill(ContactOptions.Email),
           NormalMode,
           partnershipName
         )(
@@ -116,7 +116,7 @@ class PartnershipChooseContactDetailsControllerSpec extends SpecBase with Mockit
       running(application) {
         val request =
           FakeRequest(POST, partnershipChooseContactDetailsRoute)
-            .withFormUrlEncodedBody(("value", PartnershipChooseContactDetails.Phone.toString))
+            .withFormUrlEncodedBody(("value", ContactOptions.Phone.toString))
 
         val result = route(application, request).value
 
@@ -176,7 +176,7 @@ class PartnershipChooseContactDetailsControllerSpec extends SpecBase with Mockit
       running(application) {
         val request =
           FakeRequest(POST, partnershipChooseContactDetailsRoute)
-            .withFormUrlEncodedBody(("value", PartnershipChooseContactDetails.Mobile.toString))
+            .withFormUrlEncodedBody(("value", ContactOptions.Mobile.toString))
 
         val result = route(application, request).value
 
@@ -209,7 +209,7 @@ class PartnershipChooseContactDetailsControllerSpec extends SpecBase with Mockit
     "CheckMode GET must populate the view correctly when the question has previously been answered" in {
 
       val userAnswers = UserAnswers(userAnswersId)
-        .set(PartnershipChooseContactDetailsPage, PartnershipChooseContactDetails.Mobile)
+        .set(PartnershipChooseContactDetailsPage, ContactOptions.Mobile)
         .flatMap(_.set(PartnershipNamePage, partnershipName))
         .success
         .value
@@ -225,7 +225,7 @@ class PartnershipChooseContactDetailsControllerSpec extends SpecBase with Mockit
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(
-          form.fill(PartnershipChooseContactDetails.Mobile),
+          form.fill(ContactOptions.Mobile),
           CheckMode,
           partnershipName
         )(
@@ -251,7 +251,7 @@ class PartnershipChooseContactDetailsControllerSpec extends SpecBase with Mockit
       running(application) {
         val request =
           FakeRequest(POST, partnershipChooseContactDetailsCheckRoute)
-            .withFormUrlEncodedBody(("value", PartnershipChooseContactDetails.Email.toString))
+            .withFormUrlEncodedBody(("value", ContactOptions.Email.toString))
 
         val result = route(application, request).value
 
@@ -286,7 +286,7 @@ class PartnershipChooseContactDetailsControllerSpec extends SpecBase with Mockit
       running(application) {
         val request =
           FakeRequest(POST, partnershipChooseContactDetailsCheckRoute)
-            .withFormUrlEncodedBody(("value", PartnershipChooseContactDetails.Phone.toString))
+            .withFormUrlEncodedBody(("value", ContactOptions.Phone.toString))
 
         val result = route(application, request).value
 

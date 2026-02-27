@@ -16,43 +16,16 @@
 
 package models.add.partnership
 
-import models.{Enumerable, WithName}
+import models.contact.ContactOptions
 import play.api.i18n.Messages
-import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
 import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.RadioItem
 
-sealed trait PartnershipChooseContactDetails
+type PartnershipChooseContactDetails = ContactOptions
 
-object PartnershipChooseContactDetails extends Enumerable.Implicits {
+object PartnershipChooseContactDetails {
+  val values: Seq[PartnershipChooseContactDetails] = ContactOptions.values
 
-  case object Email extends WithName("email") with PartnershipChooseContactDetails
-  case object Phone extends WithName("phone") with PartnershipChooseContactDetails
-  case object Mobile extends WithName("mobile") with PartnershipChooseContactDetails
-  case object NoDetails extends WithName("noDetails") with PartnershipChooseContactDetails
+  def options(implicit messages: Messages): Seq[RadioItem] =
+    ContactOptions.options("partnershipChooseContactDetails")
 
-  private case object Or extends PartnershipChooseContactDetails
-
-  private val viewValues: Seq[PartnershipChooseContactDetails] = Seq(
-    Email,
-    Phone,
-    Mobile,
-    Or,
-    NoDetails
-  )
-
-  val values: Seq[PartnershipChooseContactDetails] = viewValues.filter(_.isInstanceOf[WithName])
-
-  def options(implicit messages: Messages): Seq[RadioItem] = viewValues.zipWithIndex.map {
-    case (value: WithName, index) =>
-      RadioItem(
-        content = Text(messages(s"partnershipChooseContactDetails.${value.toString}")),
-        value = Some(value.toString),
-        id = Some(s"value_$index")
-      )
-    case (Or, _)                  =>
-      RadioItem(divider = Some(messages("partnershipChooseContactDetails.or")))
-  }
-
-  implicit val enumerable: Enumerable[PartnershipChooseContactDetails] =
-    Enumerable(values.map(v => v.toString -> v): _*)
 }

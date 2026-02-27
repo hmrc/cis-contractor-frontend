@@ -19,6 +19,7 @@ package controllers.add.company
 import base.SpecBase
 import forms.add.company.CompanyContactOptionsFormProvider
 import models.add.company.CompanyContactOptions
+import models.contact.ContactOptions
 import models.{CheckMode, NormalMode, UserAnswers}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
@@ -61,8 +62,8 @@ class CompanyContactOptionsControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request = FakeRequest(GET, companyContactOptionsRoute)
-        val result = route(application, request).value
-        val view = application.injector.instanceOf[CompanyContactOptionsView]
+        val result  = route(application, request).value
+        val view    = application.injector.instanceOf[CompanyContactOptionsView]
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(form, NormalMode, companyName)(
@@ -75,7 +76,7 @@ class CompanyContactOptionsControllerSpec extends SpecBase with MockitoSugar {
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
       val userAnswers = UserAnswers(userAnswersId)
-        .set(CompanyContactOptionsPage, CompanyContactOptions.EmailAddress)
+        .set(CompanyContactOptionsPage, ContactOptions.Email: CompanyContactOptions)
         .flatMap(_.set(CompanyNamePage, companyName))
         .success
         .value
@@ -84,12 +85,12 @@ class CompanyContactOptionsControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request = FakeRequest(GET, companyContactOptionsRoute)
-        val view = application.injector.instanceOf[CompanyContactOptionsView]
-        val result = route(application, request).value
+        val view    = application.injector.instanceOf[CompanyContactOptionsView]
+        val result  = route(application, request).value
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(
-          form.fill(CompanyContactOptions.EmailAddress),
+          form.fill(ContactOptions.Email: CompanyContactOptions),
           NormalMode,
           companyName
         )(
@@ -115,7 +116,7 @@ class CompanyContactOptionsControllerSpec extends SpecBase with MockitoSugar {
       running(application) {
         val request =
           FakeRequest(POST, companyContactOptionsRoute)
-            .withFormUrlEncodedBody(("value", CompanyContactOptions.PhoneNumber.toString))
+            .withFormUrlEncodedBody(("value", ContactOptions.Phone.toString))
 
         val result = route(application, request).value
 
@@ -137,7 +138,7 @@ class CompanyContactOptionsControllerSpec extends SpecBase with MockitoSugar {
           FakeRequest(POST, companyContactOptionsRoute)
             .withFormUrlEncodedBody()
 
-        val form = new CompanyContactOptionsFormProvider()()
+        val form      = new CompanyContactOptionsFormProvider()()
         val boundForm = form.bind(Map.empty)
 
         val view = application.injector.instanceOf[CompanyContactOptionsView]
@@ -153,7 +154,6 @@ class CompanyContactOptionsControllerSpec extends SpecBase with MockitoSugar {
         contentAsString(result) must include(messages(application)("companyContactOptions.error.required"))
       }
     }
-
 
     "must redirect to Journey Recovery for a GET if company name is missing" in {
 
@@ -176,7 +176,7 @@ class CompanyContactOptionsControllerSpec extends SpecBase with MockitoSugar {
       running(application) {
         val request =
           FakeRequest(POST, companyContactOptionsRoute)
-            .withFormUrlEncodedBody(("value", CompanyContactOptions.MobileNumber.toString))
+            .withFormUrlEncodedBody(("value", ContactOptions.Mobile.toString))
 
         val result = route(application, request).value
 
@@ -209,7 +209,7 @@ class CompanyContactOptionsControllerSpec extends SpecBase with MockitoSugar {
     "CheckMode GET must populate the view correctly when the question has previously been answered for company" in {
 
       val userAnswers = UserAnswers(userAnswersId)
-        .set(CompanyContactOptionsPage, CompanyContactOptions.MobileNumber)
+        .set(CompanyContactOptionsPage, ContactOptions.Mobile: CompanyContactOptions)
         .flatMap(_.set(CompanyNamePage, companyName))
         .success
         .value
@@ -225,7 +225,7 @@ class CompanyContactOptionsControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(
-          form.fill(CompanyContactOptions.MobileNumber),
+          form.fill(ContactOptions.Mobile),
           CheckMode,
           companyName
         )(
@@ -256,7 +256,7 @@ class CompanyContactOptionsControllerSpec extends SpecBase with MockitoSugar {
       running(application) {
         val request =
           FakeRequest(POST, companyContactOptionsCheckRoute)
-            .withFormUrlEncodedBody(("value", CompanyContactOptions.PhoneNumber.toString))
+            .withFormUrlEncodedBody(("value", ContactOptions.Phone.toString))
 
         val result = route(application, request).value
 
