@@ -168,11 +168,6 @@ POST       /add/partnership/nominated-partner-company-registration-number       
 GET        /add/partnership/change-nominated-partner-company-registration-number  controllers.add.partnership.PartnershipNominatedPartnerCrnController.onPageLoad(mode: Mode = CheckMode)
 POST       /add/partnership/change-nominated-partner-company-registration-number  controllers.add.partnership.PartnershipNominatedPartnerCrnController.onSubmit(mode: Mode = CheckMode)
 
-GET        /add/partnership/check-address                      controllers.add.partnership.PartnershipAddressYesNoController.onPageLoad(mode: Mode = NormalMode)
-POST       /add/partnership/check-address                     controllers.add.partnership.PartnershipAddressYesNoController.onSubmit(mode: Mode = NormalMode)
-GET        /add/partnership/change-check-address                 controllers.add.partnership.PartnershipAddressYesNoController.onPageLoad(mode: Mode = CheckMode)
-POST       /add/partnership/change-check-address                 controllers.add.partnership.PartnershipAddressYesNoController.onSubmit(mode: Mode = CheckMode)
-
 GET        /add/partnership/nominated-partner-has-national-insurance-number                       controllers.add.partnership.PartnershipNominatedPartnerNinoYesNoController.onPageLoad(mode: Mode = NormalMode)
 POST       /add/partnership/nominated-partner-has-national-insurance-number                        controllers.add.partnership.PartnershipNominatedPartnerNinoYesNoController.onSubmit(mode: Mode = NormalMode)
 GET        /add/partnership/change-nominated-partner-has-national-insurance-number                  controllers.add.partnership.PartnershipNominatedPartnerNinoYesNoController.onPageLoad(mode: Mode = CheckMode)
@@ -210,10 +205,10 @@ POST       /add/company/check-address                          controllers.add.c
 GET        /add/company/change-check-address                 controllers.add.company.CompanyAddressYesNoController.onPageLoad(mode: Mode = CheckMode)
 POST       /add/company/change-check-address                  controllers.add.company.CompanyAddressYesNoController.onSubmit(mode: Mode = CheckMode)
 
-GET        /companyAddress                              controllers.add.company.CompanyAddressController.onPageLoad(mode: Mode = NormalMode)
-POST       /companyAddress                              controllers.add.company.CompanyAddressController.onSubmit(mode: Mode = NormalMode)
-GET        /changeCompanyAddress                        controllers.add.company.CompanyAddressController.onPageLoad(mode: Mode = CheckMode)
-POST       /changeCompanyAddress                        controllers.add.company.CompanyAddressController.onSubmit(mode: Mode = CheckMode)
+GET        /add/company/address                              controllers.add.company.CompanyAddressController.onPageLoad(mode: Mode = NormalMode)
+POST       /add/company/address                              controllers.add.company.CompanyAddressController.onSubmit(mode: Mode = NormalMode)
+GET        /add/company/change-address                        controllers.add.company.CompanyAddressController.onPageLoad(mode: Mode = CheckMode)
+POST       /add/company/change-address                        controllers.add.company.CompanyAddressController.onSubmit(mode: Mode = CheckMode)
 
 GET        /add/company/choose-contact-details                          controllers.add.company.CompanyContactOptionsController.onPageLoad(mode: Mode = NormalMode)
 POST       /add/company/choose-contact-details                          controllers.add.company.CompanyContactOptionsController.onSubmit(mode: Mode = NormalMode)

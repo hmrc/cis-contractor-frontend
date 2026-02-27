@@ -91,6 +91,8 @@ class Navigator @Inject() () {
       _ => controllers.add.partnership.routes.PartnershipEmailAddressController.onPageLoad(NormalMode)
     case PartnershipNominatedPartnerUtrYesNoPage   =>
       userAnswers => navigatorFromPartnershipNominatedPartnerUtrYesNoPage(NormalMode)(userAnswers)
+    case CompanyAddressPage                        =>
+      _ => controllers.add.company.routes.CompanyAddressController.onPageLoad(NormalMode)
     case PartnershipMobileNumberPage               =>
       _ => controllers.add.partnership.routes.PartnershipMobileNumberController.onPageLoad(NormalMode)
     case _                                         => _ => routes.IndexController.onPageLoad()
@@ -120,6 +122,8 @@ class Navigator @Inject() () {
       _ => controllers.add.partnership.routes.PartnershipEmailAddressController.onPageLoad(CheckMode)
     case PartnershipNominatedPartnerUtrYesNoPage  =>
       userAnswers => navigatorFromPartnershipNominatedPartnerUtrYesNoPage(CheckMode)(userAnswers)
+    case CompanyAddressPage                       =>
+      _ => controllers.add.company.routes.CompanyAddressController.onPageLoad(CheckMode)
     case PartnershipMobileNumberPage              =>
       _ => controllers.add.partnership.routes.PartnershipMobileNumberController.onPageLoad(CheckMode)
     case CompanyAddressYesNoPage                  =>

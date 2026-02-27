@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package viewmodels.checkAnswers.add.partnership
+package viewmodels.checkAnswers.add.company
 
 import models.add.InternationalAddress
 import models.{CheckMode, UserAnswers}
@@ -22,18 +22,18 @@ import org.scalatest.OptionValues.convertOptionToValuable
 import org.scalatest.TryValues.convertTryToSuccessOrFailure
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-import pages.add.partnership.PartnershipAddressPage
+import pages.add.company.CompanyAddressPage
 import play.api.i18n.Messages
 import play.api.test.Helpers.stubMessages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 
-class PartnershipAddressSummarySpec extends AnyWordSpec with Matchers {
+class CompanyAddressSummarySpec extends AnyWordSpec with Matchers {
 
   implicit val messages: Messages = stubMessages()
 
-  "PartnershipAddressSummary.row" should {
+  "CompanyAddressSummary.row" should {
 
-    "return a SummaryListRow when PartnershipAddressPage has an answer" in {
+    "return a SummaryListRow when CompanyAddressPage has an answer" in {
 
       val address = InternationalAddress(
         addressLine1 = "10 Downing Street",
@@ -45,16 +45,16 @@ class PartnershipAddressSummarySpec extends AnyWordSpec with Matchers {
       )
 
       val userAnswers =
-        UserAnswers("id").set(PartnershipAddressPage, address).success.value
+        UserAnswers("id").set(CompanyAddressPage, address).success.value
 
-      val result = PartnershipAddressSummary.row(userAnswers)
+      val result = CompanyAddressSummary.row(userAnswers)
 
       result mustBe defined
 
       val row = result.value
 
       row.key.content.asHtml.toString must include(
-        messages("partnershipAddress.checkYourAnswersLabel")
+        messages("companyAddress.checkYourAnswersLabel")
       )
 
       row.value.content mustBe HtmlContent(
@@ -69,19 +69,19 @@ class PartnershipAddressSummarySpec extends AnyWordSpec with Matchers {
       val action = row.actions.value.items.head
 
       action.href mustBe
-        controllers.add.partnership.routes.PartnershipAddressController
+        controllers.add.company.routes.CompanyAddressController
           .onPageLoad(CheckMode)
           .url
 
       action.visuallyHiddenText.value mustBe
-        messages("partnershipAddress.change.hidden")
+        messages("companyAddress.change.hidden")
     }
 
-    "return None when PartnershipAddressPage has no answer" in {
+    "return None when CompanyAddressPage has no answer" in {
 
       val userAnswers = UserAnswers("id")
 
-      PartnershipAddressSummary.row(userAnswers) mustBe None
+      CompanyAddressSummary.row(userAnswers) mustBe None
     }
   }
 }

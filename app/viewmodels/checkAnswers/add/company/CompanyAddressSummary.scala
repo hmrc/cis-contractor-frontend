@@ -18,8 +18,10 @@ package viewmodels.checkAnswers.add.company
 
 import models.{CheckMode, UserAnswers}
 import pages.add.company.CompanyAddressPage
+import models.add.InternationalAddress
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
+import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
@@ -28,15 +30,32 @@ object CompanyAddressSummary {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
     answers.get(CompanyAddressPage).map { answer =>
+
+      val lines: Seq[String] = Seq(
+        answer.addressLine1,
+        answer.addressLine2.getOrElse(""),
+        answer.addressLine3,
+        answer.addressLine4.getOrElse(""),
+        answer.postalCode,
+        answer.country
+      )
+
+      val escapedWithBreaks: String =
+        lines
+          .filter(_.trim.nonEmpty)
+          .map(HtmlFormat.escape(_).toString)
+          .mkString("<br/>")
+
       SummaryListRowViewModel(
         key = "companyAddress.checkYourAnswersLabel",
-        value = ValueViewModel(HtmlFormat.escape(answer).toString),
+        value = ValueViewModel(HtmlContent(escapedWithBreaks)),
         actions = Seq(
           ActionItemViewModel(
             "site.change",
             controllers.add.company.routes.CompanyAddressController.onPageLoad(CheckMode).url
           )
             .withVisuallyHiddenText(messages("companyAddress.change.hidden"))
+            .withAttribute("id" -> "address-of-partnership")
         )
       )
     }

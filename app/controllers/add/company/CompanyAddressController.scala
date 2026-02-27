@@ -16,16 +16,19 @@
 
 package controllers.add.company
 
+import config.FrontendAppConfig
 import controllers.actions.*
 import forms.add.company.CompanyAddressFormProvider
 import models.Mode
+import models.add.InternationalAddress
 import navigation.Navigator
-import pages.add.company.CompanyAddressPage
+import pages.add.company.{CompanyAddressPage, CompanyNamePage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.add.company.CompanyAddressView
+import utils.CountryOptions
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -38,35 +41,46 @@ class CompanyAddressController @Inject() (
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   formProvider: CompanyAddressFormProvider,
+  countryOptions: CountryOptions,
   val controllerComponents: MessagesControllerComponents,
   view: CompanyAddressView
-)(implicit ec: ExecutionContext)
+)(implicit ec: ExecutionContext, appConfig: FrontendAppConfig)
     extends FrontendBaseController
     with I18nSupport {
 
   val form = formProvider()
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
+    request.userAnswers
+      .get(CompanyNamePage)
+      .map { companyName =>
+        val preparedForm = request.userAnswers.get(CompanyAddressPage) match {
+          case None        => form
+          case Some(value) => form.fill(value)
+        }
 
-    val preparedForm = request.userAnswers.get(CompanyAddressPage) match {
-      case None        => form
-      case Some(value) => form.fill(value)
-    }
-
-    Ok(view(preparedForm, mode))
+        Ok(view(preparedForm, mode, companyName, countryOptions.options()))
+      }
+      .getOrElse(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
-      form
-        .bindFromRequest()
-        .fold(
-          formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
-          value =>
-            for {
-              updatedAnswers <- Future.fromTry(request.userAnswers.set(CompanyAddressPage, value))
-              _              <- sessionRepository.set(updatedAnswers)
-            } yield Redirect(navigator.nextPage(CompanyAddressPage, mode, updatedAnswers))
-        )
+      request.userAnswers
+        .get(CompanyNamePage)
+        .map { companyName =>
+          form
+            .bindFromRequest()
+            .fold(
+              formWithErrors =>
+                Future.successful(BadRequest(view(formWithErrors, mode, companyName, countryOptions.options()))),
+              value =>
+                for {
+                  updatedAnswers <- Future.fromTry(request.userAnswers.set(CompanyAddressPage, value))
+                  _              <- sessionRepository.set(updatedAnswers)
+                } yield Redirect(navigator.nextPage(CompanyAddressPage, mode, updatedAnswers))
+            )
+        }
+        .getOrElse(Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())))
   }
 }
