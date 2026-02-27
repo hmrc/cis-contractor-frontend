@@ -18,9 +18,9 @@ package connectors
 
 import com.github.tomakehurst.wiremock.client.WireMock.{aResponse, get, post, stubFor, urlPathEqualTo}
 import itutil.ApplicationWithWiremock
-import models.add.TypeOfSubcontractor
 import models.add.TypeOfSubcontractor.Individualorsoletrader
-import models.subcontractor.CreateAndUpdateSubcontractorRequest
+import models.requests.CreateAndUpdateSubcontractorPayload
+import models.requests.CreateAndUpdateSubcontractorPayload.IndividualOrSoleTraderPayload
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.matchers.should.Matchers.shouldBe
@@ -37,7 +37,8 @@ class ConstructionIndustrySchemeConnectorSpec
 
   implicit val hc: HeaderCarrier = HeaderCarrier()
 
-  val connector: ConstructionIndustrySchemeConnector = app.injector.instanceOf[ConstructionIndustrySchemeConnector]
+  private val connector: ConstructionIndustrySchemeConnector =
+    app.injector.instanceOf[ConstructionIndustrySchemeConnector]
 
   "getCisTaxpayer" should {
 
@@ -99,23 +100,19 @@ class ConstructionIndustrySchemeConnectorSpec
     val cisId = "200"
 
     "successfully update subcontractor" in {
-
       stubFor(
         post(urlPathEqualTo("/cis/subcontractor/create-and-update"))
-          .willReturn(
-            aResponse()
-              .withStatus(NO_CONTENT)
-          )
+          .willReturn(aResponse().withStatus(NO_CONTENT))
       )
 
-      val result: Unit = connector
-        .createAndUpdateSubcontractor(
-          CreateAndUpdateSubcontractorRequest(
-            cisId = cisId,
-            subcontractorType = Individualorsoletrader
-          )
+      val payload: CreateAndUpdateSubcontractorPayload =
+        IndividualOrSoleTraderPayload(
+          cisId = cisId,
+          subcontractorType = Individualorsoletrader
         )
-        .futureValue
+
+      val result: Unit =
+        connector.createAndUpdateSubcontractor(payload).futureValue
 
       result shouldBe ()
     }
@@ -126,15 +123,14 @@ class ConstructionIndustrySchemeConnectorSpec
           .willReturn(aResponse().withStatus(INTERNAL_SERVER_ERROR).withBody("boom"))
       )
 
+      val payload: CreateAndUpdateSubcontractorPayload =
+        IndividualOrSoleTraderPayload(
+          cisId = cisId,
+          subcontractorType = Individualorsoletrader
+        )
+
       val ex = intercept[Exception] {
-        connector
-          .createAndUpdateSubcontractor(
-            CreateAndUpdateSubcontractorRequest(
-              cisId = cisId,
-              subcontractorType = Individualorsoletrader
-            )
-          )
-          .futureValue
+        connector.createAndUpdateSubcontractor(payload).futureValue
       }
       ex.getMessage must include("returned 500")
     }
@@ -145,13 +141,12 @@ class ConstructionIndustrySchemeConnectorSpec
     val cisId = "cis-123"
 
     "successfully get a subcontractor utr list" in {
-
       val responseJson =
         """
           |{
           |  "subcontractorUTRs": ["1111111111", "2222222222"]
           |}
-                  """.stripMargin
+          |""".stripMargin
 
       stubFor(
         get(urlPathEqualTo(s"/cis/subcontractors/utr/$cisId"))
@@ -162,10 +157,7 @@ class ConstructionIndustrySchemeConnectorSpec
           )
       )
 
-      val result = connector
-        .getSubcontractorUTRs(cisId)
-        .futureValue
-
+      val result = connector.getSubcontractorUTRs(cisId).futureValue
       result.subcontractorUTRs mustBe Seq("1111111111", "2222222222")
     }
 
@@ -176,12 +168,9 @@ class ConstructionIndustrySchemeConnectorSpec
       )
 
       val ex = intercept[Exception] {
-        connector
-          .getSubcontractorUTRs(cisId)
-          .futureValue
+        connector.getSubcontractorUTRs(cisId).futureValue
       }
       ex.getMessage must include("returned 500")
     }
   }
-
 }
