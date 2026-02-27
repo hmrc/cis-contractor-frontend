@@ -21,6 +21,7 @@ import controllers.routes
 import pages.*
 import models.*
 import models.add.partnership.PartnershipChooseContactDetails
+import models.add.company.CompanyContactOptions
 import models.add.{SubcontractorName, TypeOfSubcontractor, UKAddress}
 import pages.add.*
 import pages.add.company.*
@@ -592,6 +593,60 @@ class NavigatorSpec extends SpecBase {
         ) mustBe controllers.add.partnership.routes.PartnershipMobileNumberController.onPageLoad(NormalMode)
       }
 
+      "must go from CompanyContactOptionsPage" - {
+        "to itself when EmailAddress is selected" in {
+          navigator.nextPage(
+            CompanyContactOptionsPage,
+            NormalMode,
+            emptyUserAnswers.setOrException(
+              CompanyContactOptionsPage,
+              CompanyContactOptions.EmailAddress
+            )
+          ) mustBe controllers.add.company.routes.CompanyContactOptionsController.onPageLoad(NormalMode)
+        }
+
+        "to itself when PhoneNumber is selected" in {
+          navigator.nextPage(
+            CompanyContactOptionsPage,
+            NormalMode,
+            emptyUserAnswers.setOrException(
+              CompanyContactOptionsPage,
+              CompanyContactOptions.PhoneNumber
+            )
+          ) mustBe controllers.add.company.routes.CompanyContactOptionsController.onPageLoad(NormalMode)
+        }
+
+        "to itself when MobileNumber is selected" in {
+          navigator.nextPage(
+            CompanyContactOptionsPage,
+            NormalMode,
+            emptyUserAnswers.setOrException(
+              CompanyContactOptionsPage,
+              CompanyContactOptions.MobileNumber
+            )
+          ) mustBe controllers.add.company.routes.CompanyContactOptionsController.onPageLoad(NormalMode)
+        }
+
+        "to itself when NoDetails is selected" in {
+          navigator.nextPage(
+            CompanyContactOptionsPage,
+            NormalMode,
+            emptyUserAnswers.setOrException(
+              CompanyContactOptionsPage,
+              CompanyContactOptions.NoDetails
+            )
+          ) mustBe controllers.add.company.routes.CompanyContactOptionsController.onPageLoad(NormalMode)
+        }
+
+        "to JourneyRecoveryPage when answer is not present" in {
+          navigator.nextPage(
+            CompanyContactOptionsPage,
+            NormalMode,
+            emptyUserAnswers
+          ) mustBe journeyRecovery
+        }
+      }
+
       "must go from a CompanyAddressYesNoPage to CompanyAddressYesNoPage" in {
         navigator.nextPage(
           CompanyAddressYesNoPage,
@@ -1060,6 +1115,60 @@ class NavigatorSpec extends SpecBase {
           CheckMode,
           emptyUserAnswers
         ) mustBe controllers.add.partnership.routes.PartnershipMobileNumberController.onPageLoad(CheckMode)
+      }
+
+      "must go from CompanyContactOptionsPage" - {
+        "to itself when EmailAddress is selected" in {
+          navigator.nextPage(
+            CompanyContactOptionsPage,
+            CheckMode,
+            emptyUserAnswers.setOrException(
+              CompanyContactOptionsPage,
+              models.add.company.CompanyContactOptions.EmailAddress
+            )
+          ) mustBe controllers.add.company.routes.CompanyContactOptionsController.onPageLoad(CheckMode)
+        }
+
+        "to itself when PhoneNumber is selected" in {
+          navigator.nextPage(
+            CompanyContactOptionsPage,
+            CheckMode,
+            emptyUserAnswers.setOrException(
+              CompanyContactOptionsPage,
+              models.add.company.CompanyContactOptions.PhoneNumber
+            )
+          ) mustBe controllers.add.company.routes.CompanyContactOptionsController.onPageLoad(CheckMode)
+        }
+
+        "to itself when MobileNumber is selected" in {
+          navigator.nextPage(
+            CompanyContactOptionsPage,
+            CheckMode,
+            emptyUserAnswers.setOrException(
+              CompanyContactOptionsPage,
+              models.add.company.CompanyContactOptions.MobileNumber
+            )
+          ) mustBe controllers.add.company.routes.CompanyContactOptionsController.onPageLoad(CheckMode)
+        }
+
+        "to itself when NoDetails is selected" in {
+          navigator.nextPage(
+            CompanyContactOptionsPage,
+            CheckMode,
+            emptyUserAnswers.setOrException(
+              CompanyContactOptionsPage,
+              models.add.company.CompanyContactOptions.NoDetails
+            )
+          ) mustBe controllers.add.company.routes.CompanyContactOptionsController.onPageLoad(CheckMode)
+        }
+
+        "to CYA when answer is not present" in {
+          navigator.nextPage(
+            CompanyContactOptionsPage,
+            CheckMode,
+            emptyUserAnswers
+          ) mustBe CYA
+        }
       }
 
       "must go from CompanyAddressYesNoPage to CompanyAddressYesNoPage in CheckMode" in {

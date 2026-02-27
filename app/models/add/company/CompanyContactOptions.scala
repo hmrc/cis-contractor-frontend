@@ -25,20 +25,30 @@ sealed trait CompanyContactOptions
 
 object CompanyContactOptions extends Enumerable.Implicits {
 
-  case object Email extends WithName("email") with CompanyContactOptions
-  case object Phonenumber extends WithName("phoneNumber") with CompanyContactOptions
+  case object EmailAddress extends WithName("emailAddress") with CompanyContactOptions
+  case object PhoneNumber extends WithName("phoneNumber") with CompanyContactOptions
 
-  val values: Seq[CompanyContactOptions] = Seq(
-    Email,
-    Phonenumber
+  case object MobileNumber extends WithName("mobileNumber") with CompanyContactOptions
+
+  case object NoDetails extends WithName("noDetails") with CompanyContactOptions
+
+  private case object Or extends CompanyContactOptions
+
+  private val viewValues: Seq[CompanyContactOptions] = Seq(
+    EmailAddress, PhoneNumber, MobileNumber, Or, NoDetails
   )
 
-  def options(implicit messages: Messages): Seq[RadioItem] = values.zipWithIndex.map { case (value, index) =>
-    RadioItem(
-      content = Text(messages(s"companyContactOptions.${value.toString}")),
-      value = Some(value.toString),
-      id = Some(s"value_$index")
-    )
+  val values: Seq[CompanyContactOptions] = viewValues.filter(_.isInstanceOf[WithName])
+
+  def options(implicit messages: Messages): Seq[RadioItem] = viewValues.zipWithIndex.map {
+    case (value: WithName, index) =>
+      RadioItem(
+        content = Text(messages(s"companyContactOptions.${value.toString}")),
+        value = Some(value.toString),
+        id = Some(s"value_$index")
+      )
+    case (Or, _) =>
+      RadioItem(divider = Some(messages("companyContactOptions.or")))
   }
 
   implicit val enumerable: Enumerable[CompanyContactOptions] =

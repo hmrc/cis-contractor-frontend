@@ -22,6 +22,7 @@ import controllers.routes
 import pages.*
 import models.*
 import models.add.TypeOfSubcontractor.*
+import models.add.company.CompanyContactOptions.*
 import models.add.partnership.PartnershipChooseContactDetails.*
 import pages.add.*
 import pages.add.company.*
@@ -58,6 +59,8 @@ class Navigator @Inject() () {
     case CompanyNamePage                           => _ => controllers.add.company.routes.CompanyNameController.onPageLoad(NormalMode)
     case CompanyAddressYesNoPage                   =>
       _ => controllers.add.company.routes.CompanyAddressYesNoController.onPageLoad(NormalMode)
+    case CompanyContactOptionsPage          =>
+      userAnswers => navigatorFromCompanyContactOptionsPage(NormalMode)(userAnswers)
     case PartnershipNamePage                       =>
       _ => controllers.add.partnership.routes.PartnershipHasUtrYesNoController.onPageLoad(NormalMode)
     case PartnershipHasUtrYesNoPage                => userAnswers => navigatorFromPartnershipHasUtrYesNoPage(NormalMode)(userAnswers)
@@ -102,6 +105,7 @@ class Navigator @Inject() () {
     case UniqueTaxpayerReferenceYesNoPage         => navigatorFromUniqueTaxpayerReferenceYesNoPage(CheckMode)(_)
     case WorksReferenceNumberYesNoPage            => navigatorFromWorksReferenceNumberYesNoPage(CheckMode)(_)
     case SubcontractorContactDetailsYesNoPage     => navigatorFromSubcontractorContactDetailsYesNoPage(CheckMode)(_)
+    case CompanyContactOptionsPage                => navigatorFromCompanyContactOptionsPage(CheckMode)(_)
     case PartnershipHasUtrYesNoPage               => navigatorFromPartnershipHasUtrYesNoPage(CheckMode)(_)
     case PartnershipWorksReferenceNumberYesNoPage => navigatorFromPartnershipWorksReferenceNumberYesNoPage(CheckMode)(_)
     case PartnershipContactDetailsYesNoPage       => navigatorFromPartnershipContactDetailsYesNoPage(CheckMode)(_)
@@ -336,6 +340,20 @@ class Navigator @Inject() () {
         controllers.add.partnership.routes.PartnershipChooseContactDetailsController.onPageLoad(mode)
       case (_, CheckMode)    => controllers.add.routes.CheckYourAnswersController.onPageLoad()
       case _                 => routes.JourneyRecoveryController.onPageLoad()
+    }
+
+  private def navigatorFromCompanyContactOptionsPage(mode: Mode)(userAnswers: UserAnswers): Call =
+    (userAnswers.get(CompanyContactOptionsPage), mode) match {
+      case (Some(EmailAddress), _) =>
+        controllers.add.company.routes.CompanyContactOptionsController.onPageLoad(mode)
+      case (Some(PhoneNumber), _) =>
+        controllers.add.company.routes.CompanyContactOptionsController.onPageLoad(mode)
+      case (Some(MobileNumber), _) =>
+        controllers.add.company.routes.CompanyContactOptionsController.onPageLoad(mode)
+      case (Some(_), _) =>
+        controllers.add.company.routes.CompanyContactOptionsController.onPageLoad(mode)
+      case (_, CheckMode) => controllers.add.routes.CheckYourAnswersController.onPageLoad()
+      case _ => routes.JourneyRecoveryController.onPageLoad()
     }
 
 }
