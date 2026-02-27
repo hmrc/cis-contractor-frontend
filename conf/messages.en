@@ -470,12 +470,40 @@ companyAddressYesNo.checkYourAnswersLabel = Company Address
 companyAddressYesNo.error.required = Select whether you want to add an address for this company
 companyAddressYesNo.change.hidden = company address
 
-companyAddress.title = companyAddress
-companyAddress.heading = companyAddress
-companyAddress.checkYourAnswersLabel = companyAddress
-companyAddress.error.required = Enter companyAddress
-companyAddress.error.length = CompanyAddress must be 100 characters or less
-companyAddress.change.hidden = CompanyAddress
+companyAddress.title = What is the address for this company?
+companyAddress.heading = What is the address for {0}?
+companyAddress.checkYourAnswersLabel = Address
+companyAddress.change.hidden = address
+
+companyAddress.addressLine1 = Address line 1
+companyAddress.error.addressLine1.required = Enter the first line of the address, typically the building and street
+companyAddress.error.addressLine1.length = Enter the first line of the address using 35 characters or less
+companyAddress.error.addressLine1.invalidCharacters = Enter the first line of the address using letters a to z, numbers, apostrophes, ampersands, commas, hyphens, full stops, forward slashes and spaces
+companyAddress.error.addressLine1.firstCharMustBeLetterOrNumber = Enter an address. The first character must be a letter or a number
+
+companyAddress.addressLine2 = Address line 2 (optional)
+companyAddress.error.addressLine2.length = Enter the second line of the address using 35 characters or less
+companyAddress.error.addressLine2.invalidCharacters = Enter the second line of the address using letters a to z, numbers, apostrophes, ampersands, commas, hyphens, full stops, forward slashes and spaces
+companyAddress.error.addressLine2.firstCharMustBeLetterOrNumber = Enter an address. The first character must be a letter or a number
+
+companyAddress.addressLine3 = Town or city
+companyAddress.error.addressLine3.required = Enter the town or city
+companyAddress.error.addressLine3.length = Enter a town or city using 35 characters or less
+companyAddress.error.addressLine3.invalidCharacters = Enter a town or city using letters a to z, numbers, apostrophes, ampersands, commas, hyphens, full stops, forward slashes and spaces
+companyAddress.error.addressLine3.firstCharMustBeLetterOrNumber = Enter a town or city. The first character must be a letter or a number
+
+companyAddress.addressLine4 = County (optional)
+companyAddress.error.addressLine4.length = Enter a county using 35 characters or less
+companyAddress.error.addressLine4.invalidCharacters = Enter a county using letters a to z, numbers, apostrophes, ampersands, commas, hyphens, full stops, forward slashes and spaces
+companyAddress.error.addressLine4.firstCharMustBeLetterOrNumber = Enter a county. The first character must be a letter or a number
+
+companyAddress.postalCode = Postal code
+companyAddress.error.postalCode.required = Enter a postal code in the correct format
+companyAddress.error.postalCode.length = Enter a postal code in the correct format
+companyAddress.error.postalCode.invalid = Enter a postal code in the correct format
+
+companyAddress.country = Country
+companyAddress.country.error.required = Select a country
 
 companyContactOptions.title = What are the contact details for this company?
 companyContactOptions.heading = What are the contact details for this company?

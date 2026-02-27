@@ -18,7 +18,7 @@ package viewmodels.checkAnswers.add.partnership
 
 import models.{CheckMode, UserAnswers}
 import pages.add.partnership.PartnershipAddressPage
-import models.add.PartnershipCountryAddress
+import models.add.InternationalAddress
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent

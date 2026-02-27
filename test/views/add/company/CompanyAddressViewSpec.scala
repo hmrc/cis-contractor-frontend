@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package views.add.partnership
+package views.add.company
 
-import forms.add.partnership.PartnershipAddressFormProvider
+import forms.add.company.CompanyAddressFormProvider
 import models.NormalMode
 import models.add.InternationalAddress
 import org.jsoup.Jsoup
@@ -30,22 +30,22 @@ import play.api.test.FakeRequest
 import play.twirl.api.HtmlFormat
 import utils.InputOption
 import config.FrontendAppConfig
-import views.html.add.partnership.PartnershipAddressView
+import views.html.add.company.CompanyAddressView
 
-class PartnershipAddressViewSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite {
+class CompanyAddressViewSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite {
 
-  "PartnerShipAddressView" should {
+  "CompanyAddressView" should {
     val testName = "Test Name"
     "render the page with title, heading, inputs and submit button" in new Setup {
       val html: HtmlFormat.Appendable = view(form, NormalMode, testName, countryOptions)
       val doc                         = Jsoup.parse(html.toString())
 
-      doc.select("title").text() must include(messages("partnershipAddress.title"))
+      doc.select("title").text() must include(messages("companyAddress.title"))
 
-      doc.select("h1").text() mustBe messages("partnershipAddress.heading", testName)
+      doc.select("h1").text() mustBe messages("companyAddress.heading", testName)
 
       doc.select("form").attr("action") mustBe
-        controllers.add.partnership.routes.PartnershipAddressController
+        controllers.add.company.routes.CompanyAddressController
           .onSubmit(NormalMode)
           .url
 
@@ -62,31 +62,31 @@ class PartnershipAddressViewSpec extends AnyWordSpec with Matchers with GuiceOne
     "display error summary and inline errors when required fields are missing" in new Setup {
       val errorForm: Form[InternationalAddress] =
         form
-          .withError("addressLine1", "partnershipAddress.addressLine1.error.required")
-          .withError("postalCode", "partnershipAddress.postalCode.error.required")
+          .withError("addressLine1", "companyAddress.addressLine1.error.required")
+          .withError("postalCode", "companyAddress.postalCode.error.required")
 
       val html = view(errorForm, NormalMode, testName, countryOptions)
       val doc  = Jsoup.parse(html.toString())
 
       val summary = doc.select(".govuk-error-summary")
-      summary.text() must include(messages("partnershipAddress.addressLine1.error.required"))
-      summary.text() must include(messages("partnershipAddress.postalCode.error.required"))
+      summary.text() must include(messages("companyAddress.addressLine1.error.required"))
+      summary.text() must include(messages("companyAddress.postalCode.error.required"))
 
       summary.select("a").first().attr("href") mustBe "#addressLine1"
 
       doc.select("#addressLine1-error").text() must include(
-        messages("partnershipAddress.addressLine1.error.required")
+        messages("companyAddress.addressLine1.error.required")
       )
 
       doc.select("#postalCode-error").text() must include(
-        messages("partnershipAddress.postalCode.error.required")
+        messages("companyAddress.postalCode.error.required")
       )
     }
   }
 
   trait Setup {
-    val formProvider: PartnershipAddressFormProvider = new PartnershipAddressFormProvider()
-    val form: Form[InternationalAddress]             = formProvider()
+    val formProvider: CompanyAddressFormProvider = new CompanyAddressFormProvider()
+    val form: Form[InternationalAddress]         = formProvider()
 
     implicit val request: Request[_]          = FakeRequest()
     implicit val messages: Messages           = MessagesImpl(
@@ -100,6 +100,6 @@ class PartnershipAddressViewSpec extends AnyWordSpec with Matchers with GuiceOne
       InputOption("IN", "India")
     )
 
-    val view: PartnershipAddressView = app.injector.instanceOf[PartnershipAddressView]
+    val view: CompanyAddressView = app.injector.instanceOf[CompanyAddressView]
   }
 }

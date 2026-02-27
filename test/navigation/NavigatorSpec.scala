@@ -576,6 +576,14 @@ class NavigatorSpec extends SpecBase {
         ) mustBe journeyRecovery
       }
 
+      "must go from a CompanyAddressPage to CompanyAddressPage" in {
+        navigator.nextPage(
+          CompanyAddressPage,
+          NormalMode,
+          UserAnswers("id")
+        ) mustBe controllers.add.company.routes.CompanyAddressController.onPageLoad(NormalMode)
+      }
+
       "must go from CompanyNamePage to CompanyNameController in NormalMode" in {
         navigator.nextPage(
           CompanyNamePage,
@@ -1052,6 +1060,14 @@ class NavigatorSpec extends SpecBase {
           CheckMode,
           emptyUserAnswers
         ) mustBe journeyRecovery
+      }
+
+      "must go from CompanyAddressPage to CompanyAddressPage in CheckMode" in {
+        navigator.nextPage(
+          CompanyAddressPage,
+          CheckMode,
+          emptyUserAnswers
+        ) mustBe controllers.add.company.routes.CompanyAddressController.onPageLoad(CheckMode)
       }
 
       "must go from a PartnershipMobileNumberPage to PartnershipMobileNumberPage in CheckMode" in {
