@@ -53,10 +53,10 @@ class CompanyAddressFormProviderSpec extends StringFieldBehaviours {
 
   private val invalidPostcodes = Gen.oneOf(
     "SW1A|1AA",
-    "$$",
-    "ABCD£",
-    "123456",
-    "AAAA AA"
+    "ABC`123",
+    "ABC😊123",
+    "ABC§123",
+    "ABC©123"
   )
 
   ".addressLine1" - {
