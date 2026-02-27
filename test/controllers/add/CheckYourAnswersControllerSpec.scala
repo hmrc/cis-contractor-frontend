@@ -23,8 +23,7 @@ import models.{CheckMode, UserAnswers}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{never, verify, verifyNoMoreInteractions, when}
 import org.scalatestplus.mockito.MockitoSugar.mock
-import pages.CheckYourAnswersSubmittedPage
-import pages.add.*
+import pages.add.{CheckYourAnswersSubmittedPage, *}
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*

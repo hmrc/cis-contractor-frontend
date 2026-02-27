@@ -16,7 +16,6 @@
 
 package pages.add
 
-import pages.CheckYourAnswersSubmittedPage
 import pages.behaviours.PageBehaviours
 
 class CheckYourAnswersSubmittedPageSpec extends PageBehaviours {
