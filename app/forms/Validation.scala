@@ -28,6 +28,14 @@ object Validation {
   final val mobileRegex           = """^(?=(?:.*\d){6,})[0-9()+\- ]*$"""
   final val phoneRegex            = """^(?=(?:.*\d){6,})[0-9()+\- ]*$"""
 
+  final val firstCharLetterRegex =
+    """^[A-Za-z].*"""
+
+  final val firstCharLetterOrDigitRegex = """^[A-Za-z0-9].*"""
+
+  final val ukPostcodeRegex =
+    """^[A-Za-z0-9 ~!\"@#$%\&\'\(\)\*\+,\-\./:;\<=\>\?\[\\\]^_\{\}\£\€]*$"""
+
   def isNinoValid(value: String, errorKey: String): Constraint[String] =
     Constraint {
       case str if Nino.isValid(str.replaceAll("\\s", "").toUpperCase) =>

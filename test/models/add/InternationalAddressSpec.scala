@@ -20,12 +20,12 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import play.api.libs.json._
 
-class PartnershipCountryAddressSpec extends AnyWordSpec with Matchers {
+class InternationalAddressSpec extends AnyWordSpec with Matchers {
 
-  "PartnershipCountryAddress JSON format" should {
+  "InternationalAddress JSON format" should {
 
-    "serialize PartnershipCountryAddress to JSON" in {
-      val address = PartnershipCountryAddress(
+    "serialize InternationalAddress to JSON" in {
+      val address = InternationalAddress(
         addressLine1 = "Bldg 9C",
         addressLine2 = Some("Cobalt Business Park"),
         addressLine3 = "Newcastle",
@@ -46,7 +46,7 @@ class PartnershipCountryAddressSpec extends AnyWordSpec with Matchers {
       )
     }
 
-    "deserialize JSON to PartnershipCountryAddress when all fields are present" in {
+    "deserialize JSON to InternationalAddress when all fields are present" in {
       val json = Json.obj(
         "addressLine1" -> "Bldg 9C",
         "addressLine2" -> "Cobalt Business Park",
@@ -56,10 +56,10 @@ class PartnershipCountryAddressSpec extends AnyWordSpec with Matchers {
         "country"      -> "United Kingdom"
       )
 
-      val result = json.validate[PartnershipCountryAddress]
+      val result = json.validate[InternationalAddress]
 
       result shouldBe JsSuccess(
-        PartnershipCountryAddress(
+        InternationalAddress(
           "Bldg 9C",
           Some("Cobalt Business Park"),
           "Newcastle",
@@ -70,7 +70,7 @@ class PartnershipCountryAddressSpec extends AnyWordSpec with Matchers {
       )
     }
 
-    "deserialize JSON to PartnershipCountryAddress when optional fields are missing" in {
+    "deserialize JSON to InternationalAddress when optional fields are missing" in {
       val json = Json.obj(
         "addressLine1" -> "Bldg 9C",
         "addressLine3" -> "Newcastle",
@@ -78,10 +78,10 @@ class PartnershipCountryAddressSpec extends AnyWordSpec with Matchers {
         "country"      -> "United Kingdom"
       )
 
-      val result = json.validate[PartnershipCountryAddress]
+      val result = json.validate[InternationalAddress]
 
       result shouldBe JsSuccess(
-        PartnershipCountryAddress(
+        InternationalAddress(
           "Bldg 9C",
           None,
           "Newcastle",

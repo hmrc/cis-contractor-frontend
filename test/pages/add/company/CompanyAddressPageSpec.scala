@@ -14,19 +14,19 @@
  * limitations under the License.
  */
 
-package pages.add.partnership
+package pages.add.company
 
 import models.add.InternationalAddress
 import pages.behaviours.PageBehaviours
 
-class PartnershipAddressPageSpec extends PageBehaviours {
+class CompanyAddressPageSpec extends PageBehaviours {
 
-  "PartnershipAddressPage" - {
+  "CompanyAddressPage" - {
 
-    beRetrievable[InternationalAddress](PartnershipAddressPage)
+    beRetrievable[InternationalAddress](CompanyAddressPage)
 
-    beSettable[InternationalAddress](PartnershipAddressPage)
+    beSettable[InternationalAddress](CompanyAddressPage)
 
-    beRemovable[InternationalAddress](PartnershipAddressPage)
+    beRemovable[InternationalAddress](CompanyAddressPage)
   }
 }

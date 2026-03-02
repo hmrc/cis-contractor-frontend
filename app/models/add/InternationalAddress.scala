@@ -19,7 +19,7 @@ package models.add
 import play.api.libs.json.*
 import play.api.libs.json.{Json, OFormat}
 
-case class PartnershipCountryAddress(
+case class InternationalAddress(
   addressLine1: String,
   addressLine2: Option[String],
   addressLine3: String,
@@ -28,7 +28,7 @@ case class PartnershipCountryAddress(
   country: String
 )
 
-object PartnershipCountryAddress {
+object InternationalAddress {
 
-  implicit val format: OFormat[PartnershipCountryAddress] = Json.format[PartnershipCountryAddress]
+  implicit val format: OFormat[InternationalAddress] = Json.format[InternationalAddress]
 }
