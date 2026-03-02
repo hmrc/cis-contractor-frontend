@@ -576,6 +576,14 @@ class NavigatorSpec extends SpecBase {
         ) mustBe journeyRecovery
       }
 
+      "must go from a PartnershipPhoneNumberPage to next Page" in {
+        navigator.nextPage(
+          PartnershipPhoneNumberPage,
+          NormalMode,
+          UserAnswers("id")
+        ) mustBe controllers.add.partnership.routes.PartnershipPhoneNumberController.onPageLoad(NormalMode)
+      }
+
       "must go from a CompanyAddressPage to CompanyAddressPage" in {
         navigator.nextPage(
           CompanyAddressPage,
@@ -1184,6 +1192,14 @@ class NavigatorSpec extends SpecBase {
             emptyUserAnswers
           ) mustBe CYA
         }
+      }
+
+      "must go from a PartnershipPhoneNumberPage to CYA" in {
+        navigator.nextPage(
+          PartnershipPhoneNumberPage,
+          CheckMode,
+          UserAnswers("id")
+        ) mustBe CYA
       }
 
       "must go from CompanyAddressYesNoPage to CompanyAddressYesNoPage in CheckMode" in {

@@ -440,6 +440,15 @@ partnershipNominatedPartnerUtrYesNo.checkYourAnswersLabel = Nominated partner ha
 partnershipNominatedPartnerUtrYesNo.error.required = Select whether you know the Unique Taxpayer Reference (UTR) for this nominated partner
 partnershipNominatedPartnerUtrYesNo.change.hidden = nominated partner has a UTR
 
+partnershipPhoneNumber.title = What is the phone number for this partnership?
+partnershipPhoneNumber.heading = What is the phone number for {0}?
+partnershipPhoneNumber.hint = HMRC will never use this phone number to contact this subcontractor
+partnershipPhoneNumber.checkYourAnswersLabel = Phone number
+partnershipPhoneNumber.error.required = Enter a phone number
+partnershipPhoneNumber.error.length = Enter a valid phone number, like 01632 960 001. For international numbers include the country code.
+partnershipPhoneNumber.error.invalid = Enter a valid phone number, like 01632 960 001. For international numbers include the country code.
+partnershipPhoneNumber.change.hidden = phone number
+
 subcontractorAdded.title = Partnership subcontractor added
 subcontractorAdded.heading = Subcontractor added
 subcontractorAdded.p1 = You can now find {0} on your list of subcontractors.
