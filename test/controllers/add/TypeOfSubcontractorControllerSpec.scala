@@ -20,7 +20,7 @@ import base.SpecBase
 import controllers.routes
 import forms.add.TypeOfSubcontractorFormProvider
 import models.add.TypeOfSubcontractor
-import models.{NormalMode, UserAnswers}
+import models.{CheckMode, NormalMode, UserAnswers}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
@@ -35,7 +35,9 @@ import scala.concurrent.Future
 
 class TypeOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
 
-  lazy val subcontractorTypesRoute = controllers.add.routes.TypeOfSubcontractorController.onPageLoad(NormalMode).url
+  lazy val subcontractorTypesRoute          = controllers.add.routes.TypeOfSubcontractorController.onPageLoad(NormalMode).url
+  lazy val subcontractorTypesRouteCheckMode =
+    controllers.add.routes.TypeOfSubcontractorController.onPageLoad(CheckMode).url
 
   val formProvider = new TypeOfSubcontractorFormProvider()
   val form         = formProvider()
@@ -226,5 +228,68 @@ class TypeOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
+    "must redirect to the PartnershipName page in Normal mode when submitted answer differs from the existing answer in CheckMode" in {
+
+      val userAnswers =
+        UserAnswers(userAnswersId)
+          .set(TypeOfSubcontractorPage, TypeOfSubcontractor.Individualorsoletrader)
+          .success
+          .value
+
+      val mockSessionRepository = mock[SessionRepository]
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+      val application =
+        applicationBuilder(userAnswers = Some(userAnswers))
+          .overrides(
+            bind[SessionRepository].toInstance(mockSessionRepository)
+          )
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, subcontractorTypesRouteCheckMode)
+            .withFormUrlEncodedBody(("value", TypeOfSubcontractor.Partnership.toString))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.add.partnership.routes.PartnershipNameController
+          .onPageLoad(NormalMode)
+          .url
+      }
+    }
+
+    "must redirect to the CYA page in when submitted answer is the same as the existing answer in CheckMode" in {
+
+      val userAnswers =
+        UserAnswers(userAnswersId)
+          .set(TypeOfSubcontractorPage, TypeOfSubcontractor.Individualorsoletrader)
+          .success
+          .value
+
+      val mockSessionRepository = mock[SessionRepository]
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+      val application =
+        applicationBuilder(userAnswers = Some(userAnswers))
+          .overrides(
+            bind[SessionRepository].toInstance(mockSessionRepository)
+          )
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, subcontractorTypesRouteCheckMode)
+            .withFormUrlEncodedBody(("value", TypeOfSubcontractor.Individualorsoletrader.toString))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.add.routes.CheckYourAnswersController
+          .onPageLoad()
+          .url
+      }
+    }
   }
 }

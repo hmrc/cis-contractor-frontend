@@ -18,7 +18,7 @@ package controllers.add
 
 import controllers.actions.*
 import forms.add.TypeOfSubcontractorFormProvider
-import models.Mode
+import models.{CheckMode, Mode, NormalMode}
 import navigation.Navigator
 import pages.add.TypeOfSubcontractorPage
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -63,10 +63,17 @@ class TypeOfSubcontractorController @Inject() (
         .fold(
           formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
           value =>
+            val oldValue = request.userAnswers.get(TypeOfSubcontractorPage)
+            val newValue = value
+
+            val shouldRestToNormalMode = mode == CheckMode && oldValue.exists(_ != newValue)
+
+            val resolvedMode = if (shouldRestToNormalMode) NormalMode else mode
+
             for {
               updatedAnswers <- Future.fromTry(request.userAnswers.set(TypeOfSubcontractorPage, value))
               _              <- sessionRepository.set(updatedAnswers)
-            } yield Redirect(navigator.nextPage(TypeOfSubcontractorPage, mode, updatedAnswers))
+            } yield Redirect(navigator.nextPage(TypeOfSubcontractorPage, resolvedMode, updatedAnswers))
         )
   }
 }

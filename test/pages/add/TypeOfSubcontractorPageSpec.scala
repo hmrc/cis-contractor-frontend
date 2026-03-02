@@ -17,6 +17,8 @@
 package pages.add
 
 import models.add.TypeOfSubcontractor
+import pages.add.company.CompanyAddressYesNoPage
+import pages.add.partnership.PartnershipAddressYesNoPage
 import pages.behaviours.PageBehaviours
 
 class TypeOfSubcontractorPageSpec extends PageBehaviours {
@@ -28,5 +30,50 @@ class TypeOfSubcontractorPageSpec extends PageBehaviours {
     beSettable[TypeOfSubcontractor](TypeOfSubcontractorPage)
 
     beRemovable[TypeOfSubcontractor](TypeOfSubcontractorPage)
+
+    // TODO Add TrustSubcontractor
+
+    "cleanup: must remove all LimitedCompanySubcontractor, PartnershipSubcontractor and TrustSubcontractor answers when IndividualSoleTraderSubcontractor is selected" in {
+      val userAnswers =
+        emptyUserAnswers
+          .set(NationalInsuranceNumberYesNoPage, true)
+          .success
+          .value
+          .set(CompanyAddressYesNoPage, true)
+          .success
+          .value
+          .set(PartnershipAddressYesNoPage, true)
+          .success
+          .value
+
+      val updatedUserAnswers =
+        userAnswers.set(TypeOfSubcontractorPage, TypeOfSubcontractor.Individualorsoletrader).success.value
+
+      updatedUserAnswers.get(NationalInsuranceNumberYesNoPage) mustBe Some(true)
+      updatedUserAnswers.get(CompanyAddressYesNoPage) mustBe None
+      updatedUserAnswers.get(PartnershipAddressYesNoPage) mustBe None
+    }
+
+    "cleanup: must remove all IndividualSoleTraderSubcontractor, LimitedCompanySubcontractor, PartnershipSubcontractor and TrustSubcontractor answers when PartnershipSubcontractor is selected" in {
+      val userAnswers =
+        emptyUserAnswers
+          .set(NationalInsuranceNumberYesNoPage, true)
+          .success
+          .value
+          .set(CompanyAddressYesNoPage, true)
+          .success
+          .value
+          .set(PartnershipAddressYesNoPage, true)
+          .success
+          .value
+
+      val updatedUserAnswers =
+        userAnswers.set(TypeOfSubcontractorPage, TypeOfSubcontractor.Partnership).success.value
+
+      updatedUserAnswers.get(NationalInsuranceNumberYesNoPage) mustBe None
+      updatedUserAnswers.get(CompanyAddressYesNoPage) mustBe None
+      updatedUserAnswers.get(PartnershipAddressYesNoPage) mustBe Some(true)
+    }
+
   }
 }

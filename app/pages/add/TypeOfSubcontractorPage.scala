@@ -18,38 +18,41 @@ package pages.add
 
 import models.UserAnswers
 import models.add.TypeOfSubcontractor
+import models.add.TypeOfSubcontractor.*
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 
 import scala.util.Try
 
-case object TypeOfSubcontractorPage extends QuestionPage[TypeOfSubcontractor] {
+case object TypeOfSubcontractorPage extends QuestionPage[TypeOfSubcontractor] with Cleanup {
 
   override def path: JsPath = JsPath \ toString
 
   override def toString: String = "typeOfSubcontractor"
 
-  override def cleanup(value: Option[TypeOfSubcontractor], ua: UserAnswers): Try[UserAnswers] = {
-    val previousValue = ua.get(TypeOfSubcontractorPage)
+  override def cleanup(value: Option[TypeOfSubcontractor], ua: UserAnswers): Try[UserAnswers] =
+    value match {
+      case Some(Individualorsoletrader) =>
+        removePartnershipSubcontractor(ua)
+          .flatMap(removeLimitedCompanySubcontractor)
+//          .flatMap(removeTrustSubcontractor)
 
-    (previousValue, value) match {
-      case (Some(oldValue), Some(newValue)) if oldValue != newValue =>
-        ua.remove(AddressOfSubcontractorPage)
-          .flatMap(_.remove(NationalInsuranceNumberYesNoPage))
-          .flatMap(_.remove(SubAddressYesNoPage))
-          .flatMap(_.remove(SubContactDetailsPage))
-          .flatMap(_.remove(SubcontractorContactDetailsYesNoPage))
-          .flatMap(_.remove(SubcontractorNamePage))
-          .flatMap(_.remove(SubcontractorsUniqueTaxpayerReferencePage))
-          .flatMap(_.remove(SubNationalInsuranceNumberPage))
-          .flatMap(_.remove(SubTradingNameYesNoPage))
-          .flatMap(_.remove(TradingNameOfSubcontractorPage))
-          .flatMap(_.remove(UniqueTaxpayerReferenceYesNoPage))
-          .flatMap(_.remove(WorksReferenceNumberPage))
-          .flatMap(_.remove(WorksReferenceNumberYesNoPage))
-      // add any new page if added in future
-      case _                                                        =>
+      case Some(Limitedcompany) =>
+        removeIndividualSoleTraderSubcontractor(ua)
+          .flatMap(removePartnershipSubcontractor)
+//          .flatMap(removeTrustSubcontractor)
+
+      case Some(Partnership) =>
+        removeIndividualSoleTraderSubcontractor(ua)
+          .flatMap(removeLimitedCompanySubcontractor)
+//          .flatMap(removeTrustSubcontractor)
+
+//      case Some(Trust) =>
+//        removeIndividualSoleTraderSubcontractor(ua)
+//          .flatMap(removeLimitedCompanySubcontractor)
+//          .flatMap(removePartnershipSubcontractor)
+
+      case _ =>
         super.cleanup(value, ua)
     }
-  }
 }
