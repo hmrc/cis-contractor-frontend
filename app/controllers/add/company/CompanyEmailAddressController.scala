@@ -20,7 +20,7 @@ import controllers.actions.*
 import forms.add.company.CompanyEmailAddressFormProvider
 import models.Mode
 import navigation.Navigator
-import pages.add.company.CompanyEmailAddressPage
+import pages.add.company.{CompanyEmailAddressPage, CompanyNamePage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
@@ -53,15 +53,17 @@ class CompanyEmailAddressController @Inject() (
       case Some(value) => form.fill(value)
     }
 
-    Ok(view(preparedForm, mode))
+    val companyName = request.userAnswers.get(CompanyNamePage).getOrElse("")
+    Ok(view(preparedForm, mode, companyName))
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
+      val companyName = request.userAnswers.get(CompanyNamePage).getOrElse("")
       form
         .bindFromRequest()
         .fold(
-          formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
+          formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, companyName))),
           value =>
             for {
               updatedAnswers <- Future.fromTry(request.userAnswers.set(CompanyEmailAddressPage, value))

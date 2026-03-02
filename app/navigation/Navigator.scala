@@ -58,6 +58,7 @@ class Navigator @Inject() () {
     case CompanyNamePage                           => _ => controllers.add.company.routes.CompanyNameController.onPageLoad(NormalMode)
     case CompanyAddressYesNoPage                   =>
       _ => controllers.add.company.routes.CompanyAddressYesNoController.onPageLoad(NormalMode)
+    case CompanyEmailAddressPage                   => _ => controllers.add.company.routes.CompanyEmailAddressController.onPageLoad(NormalMode)  
     case PartnershipNamePage                       =>
       _ => controllers.add.partnership.routes.PartnershipHasUtrYesNoController.onPageLoad(NormalMode)
     case PartnershipHasUtrYesNoPage                => userAnswers => navigatorFromPartnershipHasUtrYesNoPage(NormalMode)(userAnswers)

@@ -24,7 +24,7 @@ import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.add.company.CompanyEmailAddressPage
+import pages.add.company.{CompanyEmailAddressPage, CompanyNamePage}
 import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
@@ -47,24 +47,28 @@ class CompanyEmailAddressControllerSpec extends SpecBase with MockitoSugar {
   "CompanyEmailAddress Controller" - {
 
     "must return OK and the correct view for a GET" in {
+      val userAnswers = UserAnswers(userAnswersId).set(CompanyNamePage, "Test Company").success.value
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
       running(application) {
         val request = FakeRequest(GET, companyEmailAddressRoute)
 
         val result = route(application, request).value
 
-        val view = application.injector.instanceOf[CompanyEmailAddressView]
+        val view        = application.injector.instanceOf[CompanyEmailAddressView]
+        val companyName = userAnswers.get(CompanyNamePage).getOrElse("")
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode, companyName)(request, messages(application)).toString
       }
     }
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = UserAnswers(userAnswersId).set(CompanyEmailAddressPage, "answer").success.value
+      val userAnswers = UserAnswers(userAnswersId)
+        .set(CompanyEmailAddressPage, "answer").success.value
+        .set(CompanyNamePage, "Test Company").success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
@@ -74,9 +78,10 @@ class CompanyEmailAddressControllerSpec extends SpecBase with MockitoSugar {
         val view = application.injector.instanceOf[CompanyEmailAddressView]
 
         val result = route(application, request).value
+        val companyName = userAnswers.get(CompanyNamePage).getOrElse("")
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill("answer"), NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill("answer"), NormalMode, companyName)(request, messages(application)).toString
       }
     }
 
@@ -97,7 +102,7 @@ class CompanyEmailAddressControllerSpec extends SpecBase with MockitoSugar {
       running(application) {
         val request =
           FakeRequest(POST, companyEmailAddressRoute)
-            .withFormUrlEncodedBody(("value", "answer"))
+            .withFormUrlEncodedBody(("value", "abc.def@abc.com"))
 
         val result = route(application, request).value
 
@@ -107,8 +112,9 @@ class CompanyEmailAddressControllerSpec extends SpecBase with MockitoSugar {
     }
 
     "must return a Bad Request and errors when invalid data is submitted" in {
-
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val userAnswers = UserAnswers(userAnswersId)
+        .set(CompanyNamePage, "Test Company").success.value
+      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
       running(application) {
         val request =
@@ -120,9 +126,10 @@ class CompanyEmailAddressControllerSpec extends SpecBase with MockitoSugar {
         val view = application.injector.instanceOf[CompanyEmailAddressView]
 
         val result = route(application, request).value
+        val companyName = userAnswers.get(CompanyNamePage).getOrElse("")
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, NormalMode, companyName)(request, messages(application)).toString
       }
     }
 

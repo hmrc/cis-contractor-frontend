@@ -136,4 +136,12 @@ trait Constraints {
         Invalid(errorKey, CurrencyFormatter.currencyFormat(maximum))
       }
     }
+
+  protected def isEmailValid(value: String, errorKey: String): Constraint[String] =
+    Constraint {
+      case str if str.matches(value) =>
+        Valid
+      case _                         =>
+        Invalid(errorKey, value)
+    }
 }
