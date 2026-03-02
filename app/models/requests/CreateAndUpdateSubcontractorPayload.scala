@@ -19,7 +19,7 @@ package models.requests
 import models.add.TypeOfSubcontractor
 import play.api.libs.json.{Json, OFormat}
 
-sealed trait  CreateAndUpdateSubcontractorPayload {
+sealed trait CreateAndUpdateSubcontractorPayload {
   def cisId: String
   def subcontractorType: TypeOfSubcontractor
 }
@@ -27,23 +27,23 @@ sealed trait  CreateAndUpdateSubcontractorPayload {
 object CreateAndUpdateSubcontractorPayload {
 
   final case class IndividualOrSoleTraderPayload(
-      cisId: String,
-      subcontractorType: TypeOfSubcontractor,
-      firstName: Option[String] = None,
-      secondName: Option[String] = None,
-      surname: Option[String] = None,
-      tradingName: Option[String] = None,
-      addressLine1: Option[String] = None,
-      addressLine2: Option[String] = None,
-      city: Option[String] = None,
-      county: Option[String] = None,
-      country: Option[String] = None,
-      postcode: Option[String] = None,
-      nino: Option[String] = None,
-      utr: Option[String] = None,
-      worksReferenceNumber: Option[String] = None,
-      emailAddress: Option[String] = None,
-      phoneNumber: Option[String] = None
+    cisId: String,
+    subcontractorType: TypeOfSubcontractor,
+    firstName: Option[String] = None,
+    secondName: Option[String] = None,
+    surname: Option[String] = None,
+    tradingName: Option[String] = None,
+    addressLine1: Option[String] = None,
+    addressLine2: Option[String] = None,
+    city: Option[String] = None,
+    county: Option[String] = None,
+    country: Option[String] = None,
+    postcode: Option[String] = None,
+    nino: Option[String] = None,
+    utr: Option[String] = None,
+    worksReferenceNumber: Option[String] = None,
+    emailAddress: Option[String] = None,
+    phoneNumber: Option[String] = None
   ) extends CreateAndUpdateSubcontractorPayload
 
   object IndividualOrSoleTraderPayload {
@@ -51,32 +51,31 @@ object CreateAndUpdateSubcontractorPayload {
   }
 
   final case class PartnershipPayload(
-     cisId: String,
-     subcontractorType: TypeOfSubcontractor,
-     utr: Option[String] = None,
-     partnerUtr: Option[String] = None,
-     crn: Option[String] = None,
-     firstName: Option[String] = None,
-     secondName: Option[String] = None,
-     surname: Option[String] = None,
-     nino: Option[String] = None,
-     partnershipTradingName: Option[String] = None,
-     tradingName: Option[String] = None,
-     addressLine1: Option[String] = None,
-     addressLine2: Option[String] = None,
-     city: Option[String] = None,
-     county: Option[String] = None,
-     country: Option[String] = None,
-     postcode: Option[String] = None,
-     emailAddress: Option[String] = None,
-     phoneNumber: Option[String] = None,
-     mobilePhoneNumber: Option[String] = None,
-     worksReferenceNumber: Option[String] = None
-     ) extends CreateAndUpdateSubcontractorPayload
+    cisId: String,
+    subcontractorType: TypeOfSubcontractor,
+    utr: Option[String] = None,
+    partnerUtr: Option[String] = None,
+    crn: Option[String] = None,
+    firstName: Option[String] = None,
+    secondName: Option[String] = None,
+    surname: Option[String] = None,
+    nino: Option[String] = None,
+    partnershipTradingName: Option[String] = None,
+    tradingName: Option[String] = None,
+    addressLine1: Option[String] = None,
+    addressLine2: Option[String] = None,
+    city: Option[String] = None,
+    county: Option[String] = None,
+    country: Option[String] = None,
+    postcode: Option[String] = None,
+    emailAddress: Option[String] = None,
+    phoneNumber: Option[String] = None,
+    mobilePhoneNumber: Option[String] = None,
+    worksReferenceNumber: Option[String] = None
+  ) extends CreateAndUpdateSubcontractorPayload
 
   object PartnershipPayload {
     implicit val format: OFormat[PartnershipPayload] = Json.format[PartnershipPayload]
   }
-
 
 }

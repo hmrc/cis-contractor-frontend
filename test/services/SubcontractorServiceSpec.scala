@@ -18,7 +18,8 @@ package services
 
 import base.SpecBase
 import connectors.ConstructionIndustrySchemeConnector
-import models.add.{SubContactDetails, SubcontractorName, TypeOfSubcontractor, UKAddress}
+import models.add.{InternationalAddress, SubContactDetails, SubcontractorName, TypeOfSubcontractor, UKAddress}
+import models.add.partnership.PartnershipChooseContactDetails
 import models.requests.CreateAndUpdateSubcontractorPayload
 import models.requests.CreateAndUpdateSubcontractorPayload.{IndividualOrSoleTraderPayload, PartnershipPayload}
 import models.subcontractor.GetSubcontractorUTRsResponse
@@ -165,47 +166,57 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
         verifyNoMoreInteractions(mockConnector)
       }
 
-      "should create and update subcontractor (Partnership) when session data is present" in {
-        val mockConnector: ConstructionIndustrySchemeConnector = mock[ConstructionIndustrySchemeConnector]
-        val service                                            = new SubcontractorService(mockConnector)
-
+      def basePartnershipAnswers = {
         val partnershipAddress =
-          models.add.PartnershipCountryAddress(
+          InternationalAddress(
             addressLine1 = "p1",
             addressLine2 = Some("p2"),
-            addressLine3 = "pCity",
-            addressLine4 = Some("pCounty"),
-            postalCode = "pPost",
+            addressLine3 = "London",
+            addressLine4 = Some("Hackney"),
+            postalCode = "N1 5AP",
             country = "United Kingdom"
           )
 
+        emptyUserAnswers
+          .set(CisIdQuery, cisId)
+          .success
+          .value
+          .set(TypeOfSubcontractorPage, TypeOfSubcontractor.Partnership)
+          .success
+          .value
+          .set(PartnershipUniqueTaxpayerReferencePage, "1234567890")
+          .success
+          .value
+          .set(PartnershipNamePage, "Test Partnership")
+          .success
+          .value
+          .set(PartnershipNominatedPartnerNamePage, "Nominated Partner")
+          .success
+          .value
+          .set(PartnershipNominatedPartnerNinoPage, "AA123456A")
+          .success
+          .value
+          .set(PartnershipNominatedPartnerCrnPage, "AC012345")
+          .success
+          .value
+          .set(PartnershipWorksReferenceNumberPage, "WRN-PTN")
+          .success
+          .value
+          .set(PartnershipAddressPage, partnershipAddress)
+          .success
+          .value
+      }
+
+      "should create and update subcontractor (Partnership) with EMAIL contact details" in {
+        val mockConnector = mock[ConstructionIndustrySchemeConnector]
+        val service       = new SubcontractorService(mockConnector)
+
         val userAnswers =
-          emptyUserAnswers
-            .set(CisIdQuery, cisId)
+          basePartnershipAnswers
+            .set(PartnershipChooseContactDetailsPage, PartnershipChooseContactDetails.Email)
             .success
             .value
-            .set(TypeOfSubcontractorPage, TypeOfSubcontractor.Partnership)
-            .success
-            .value
-            .set(PartnershipUniqueTaxpayerReferencePage, "1234567890")
-            .success
-            .value
-            .set(PartnershipNamePage, "Test Partnership")
-            .success
-            .value
-            .set(PartnershipNominatedPartnerNamePage, "Nominated Partner")
-            .success
-            .value
-            .set(PartnershipNominatedPartnerNinoPage, "AA123456A")
-            .success
-            .value
-            .set(PartnershipNominatedPartnerCrnPage, "AC012345")
-            .success
-            .value
-            .set(PartnershipWorksReferenceNumberPage, "WRN-PTN")
-            .success
-            .value
-            .set(PartnershipAddressPage, partnershipAddress)
+            .set(PartnershipEmailAddressPage, "p@example.com")
             .success
             .value
 
@@ -223,9 +234,144 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
             partnershipTradingName = Some("Test Partnership"),
             addressLine1 = Some("p1"),
             addressLine2 = Some("p2"),
-            city = Some("pCity"),
-            county = Some("pCounty"),
-            postcode = Some("pPost"),
+            city = Some("London"),
+            county = Some("Hackney"),
+            postcode = Some("N1 5AP"),
+            country = Some("United Kingdom"),
+            emailAddress = Some("p@example.com"),
+            phoneNumber = None,
+            mobilePhoneNumber = None,
+            worksReferenceNumber = Some("WRN-PTN")
+          )
+
+        when(mockConnector.createAndUpdateSubcontractor(any[CreateAndUpdateSubcontractorPayload])(any[HeaderCarrier]))
+          .thenReturn(Future.successful(()))
+
+        service.createAndUpdateSubcontractor(userAnswers).futureValue mustBe (())
+
+        verify(mockConnector).createAndUpdateSubcontractor(eqTo(expectedPayload))(any[HeaderCarrier])
+        verifyNoMoreInteractions(mockConnector)
+      }
+
+      "should create and update subcontractor (Partnership) with PHONE contact details" in {
+        val mockConnector = mock[ConstructionIndustrySchemeConnector]
+        val service       = new SubcontractorService(mockConnector)
+
+        val userAnswers =
+          basePartnershipAnswers
+            .set(PartnershipChooseContactDetailsPage, PartnershipChooseContactDetails.Phone)
+            .success
+            .value
+            .set(PartnershipPhoneNumberPage, "02071234567")
+            .success
+            .value
+
+        val expectedPayload: CreateAndUpdateSubcontractorPayload =
+          PartnershipPayload(
+            cisId = cisId,
+            subcontractorType = TypeOfSubcontractor.Partnership,
+            utr = Some("1234567890"),
+            firstName = None,
+            secondName = None,
+            surname = None,
+            tradingName = Some("Nominated Partner"),
+            nino = Some("AA123456A"),
+            crn = Some("AC012345"),
+            partnershipTradingName = Some("Test Partnership"),
+            addressLine1 = Some("p1"),
+            addressLine2 = Some("p2"),
+            city = Some("London"),
+            county = Some("Hackney"),
+            postcode = Some("N1 5AP"),
+            country = Some("United Kingdom"),
+            emailAddress = None,
+            phoneNumber = Some("02071234567"),
+            mobilePhoneNumber = None,
+            worksReferenceNumber = Some("WRN-PTN")
+          )
+
+        when(mockConnector.createAndUpdateSubcontractor(any[CreateAndUpdateSubcontractorPayload])(any[HeaderCarrier]))
+          .thenReturn(Future.successful(()))
+
+        service.createAndUpdateSubcontractor(userAnswers).futureValue mustBe (())
+
+        verify(mockConnector).createAndUpdateSubcontractor(eqTo(expectedPayload))(any[HeaderCarrier])
+        verifyNoMoreInteractions(mockConnector)
+      }
+
+      "should create and update subcontractor (Partnership) with MOBILE contact details" in {
+        val mockConnector = mock[ConstructionIndustrySchemeConnector]
+        val service       = new SubcontractorService(mockConnector)
+
+        val userAnswers =
+          basePartnershipAnswers
+            .set(PartnershipChooseContactDetailsPage, PartnershipChooseContactDetails.Mobile)
+            .success
+            .value
+            .set(PartnershipMobileNumberPage, "07123456789")
+            .success
+            .value
+
+        val expectedPayload: CreateAndUpdateSubcontractorPayload =
+          PartnershipPayload(
+            cisId = cisId,
+            subcontractorType = TypeOfSubcontractor.Partnership,
+            utr = Some("1234567890"),
+            firstName = None,
+            secondName = None,
+            surname = None,
+            tradingName = Some("Nominated Partner"),
+            nino = Some("AA123456A"),
+            crn = Some("AC012345"),
+            partnershipTradingName = Some("Test Partnership"),
+            addressLine1 = Some("p1"),
+            addressLine2 = Some("p2"),
+            city = Some("London"),
+            county = Some("Hackney"),
+            postcode = Some("N1 5AP"),
+            country = Some("United Kingdom"),
+            emailAddress = None,
+            phoneNumber = None,
+            mobilePhoneNumber = Some("07123456789"),
+            worksReferenceNumber = Some("WRN-PTN")
+          )
+
+        when(mockConnector.createAndUpdateSubcontractor(any[CreateAndUpdateSubcontractorPayload])(any[HeaderCarrier]))
+          .thenReturn(Future.successful(()))
+
+        service.createAndUpdateSubcontractor(userAnswers).futureValue mustBe (())
+
+        verify(mockConnector).createAndUpdateSubcontractor(eqTo(expectedPayload))(any[HeaderCarrier])
+        verifyNoMoreInteractions(mockConnector)
+      }
+
+      "should create and update subcontractor (Partnership) with NO contact details" in {
+        val mockConnector = mock[ConstructionIndustrySchemeConnector]
+        val service       = new SubcontractorService(mockConnector)
+
+        val userAnswers =
+          basePartnershipAnswers
+            .set(PartnershipChooseContactDetailsPage, PartnershipChooseContactDetails.NoDetails)
+            .success
+            .value
+
+        val expectedPayload: CreateAndUpdateSubcontractorPayload =
+          PartnershipPayload(
+            cisId = cisId,
+            subcontractorType = TypeOfSubcontractor.Partnership,
+            utr = Some("1234567890"),
+            firstName = None,
+            secondName = None,
+            surname = None,
+            tradingName = Some("Nominated Partner"),
+            nino = Some("AA123456A"),
+            crn = Some("AC012345"),
+            partnershipTradingName = Some("Test Partnership"),
+            addressLine1 = Some("p1"),
+            addressLine2 = Some("p2"),
+            city = Some("London"),
+            county = Some("Hackney"),
+            postcode = Some("N1 5AP"),
             country = Some("United Kingdom"),
             emailAddress = None,
             phoneNumber = None,
@@ -286,8 +432,8 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
       val subcontractorUTRs: Seq[String] = Seq("1111111111", "2222222222")
 
       "should return true when a duplicate exists" in {
-        val mockConnector: ConstructionIndustrySchemeConnector = mock[ConstructionIndustrySchemeConnector]
-        val service                                            = new SubcontractorService(mockConnector)
+        val mockConnector = mock[ConstructionIndustrySchemeConnector]
+        val service       = new SubcontractorService(mockConnector)
 
         val userAnswers = emptyUserAnswers.set(CisIdQuery, cisId).success.value
 
@@ -301,8 +447,8 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
       }
 
       "should return false when no duplicate exists" in {
-        val mockConnector: ConstructionIndustrySchemeConnector = mock[ConstructionIndustrySchemeConnector]
-        val service                                            = new SubcontractorService(mockConnector)
+        val mockConnector = mock[ConstructionIndustrySchemeConnector]
+        val service       = new SubcontractorService(mockConnector)
 
         val userAnswers = emptyUserAnswers.set(CisIdQuery, cisId).success.value
 
@@ -316,8 +462,8 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
       }
 
       "should return false when getSubcontractorUTRs return empty list" in {
-        val mockConnector: ConstructionIndustrySchemeConnector = mock[ConstructionIndustrySchemeConnector]
-        val service                                            = new SubcontractorService(mockConnector)
+        val mockConnector = mock[ConstructionIndustrySchemeConnector]
+        val service       = new SubcontractorService(mockConnector)
 
         val userAnswers = emptyUserAnswers.set(CisIdQuery, cisId).success.value
 
@@ -331,8 +477,8 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
       }
 
       "should fail when cisId not found in session data" in {
-        val mockConnector: ConstructionIndustrySchemeConnector = mock[ConstructionIndustrySchemeConnector]
-        val service                                            = new SubcontractorService(mockConnector)
+        val mockConnector = mock[ConstructionIndustrySchemeConnector]
+        val service       = new SubcontractorService(mockConnector)
 
         val exception =
           service.isDuplicateUTR(emptyUserAnswers, utr).failed.futureValue
@@ -342,8 +488,8 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
       }
 
       "should fail when the connector call fails" in {
-        val mockConnector: ConstructionIndustrySchemeConnector = mock[ConstructionIndustrySchemeConnector]
-        val service                                            = new SubcontractorService(mockConnector)
+        val mockConnector = mock[ConstructionIndustrySchemeConnector]
+        val service       = new SubcontractorService(mockConnector)
 
         when(mockConnector.getSubcontractorUTRs(eqTo(cisId.toString))(any[HeaderCarrier]))
           .thenReturn(Future.failed(new Exception("error")))

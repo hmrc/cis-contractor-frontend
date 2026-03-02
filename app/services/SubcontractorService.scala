@@ -19,10 +19,11 @@ package services
 import connectors.ConstructionIndustrySchemeConnector
 import models.UserAnswers
 import models.add.TypeOfSubcontractor.{Individualorsoletrader, Partnership}
+import models.add.partnership.PartnershipChooseContactDetails
 import models.add.{SubcontractorName, TypeOfSubcontractor}
 import models.requests.CreateAndUpdateSubcontractorPayload.{IndividualOrSoleTraderPayload, PartnershipPayload}
 import pages.add.*
-import pages.add.partnership._
+import pages.add.partnership.*
 import play.api.Logging
 import queries.CisIdQuery
 import uk.gov.hmrc.http.HeaderCarrier
@@ -80,11 +81,33 @@ class SubcontractorService @Inject() (
       case None                    => Future.failed(new RuntimeException("TypeOfSubcontractorPage not found in session data"))
     }
 
+  private case class ContactDetails(email: Option[String], phone: Option[String], mobile: Option[String])
+
+  private def partnershipContactDetailsFromUserAnswers(
+    userAnswers: UserAnswers
+  ): ContactDetails =
+    userAnswers.get(PartnershipChooseContactDetailsPage) match {
+      case Some(PartnershipChooseContactDetails.Email) =>
+        ContactDetails(userAnswers.get(PartnershipEmailAddressPage), None, None)
+
+      case Some(PartnershipChooseContactDetails.Phone) =>
+        ContactDetails(None, userAnswers.get(PartnershipPhoneNumberPage), None)
+
+      case Some(PartnershipChooseContactDetails.Mobile) =>
+        ContactDetails(None, None, userAnswers.get(PartnershipMobileNumberPage))
+
+      case Some(PartnershipChooseContactDetails.NoDetails) =>
+        ContactDetails(None, None, None)
+
+      case _ => ContactDetails(None, None, None)
+    }
+
   private def partnershipPayloadFromUserAnswers(
     cisId: String,
     subcontractorType: TypeOfSubcontractor,
     userAnswers: UserAnswers
-  ): PartnershipPayload =
+  ): PartnershipPayload = {
+    val contactDetails = partnershipContactDetailsFromUserAnswers(userAnswers)
     PartnershipPayload(
       cisId = cisId,
       subcontractorType = subcontractorType,
@@ -102,13 +125,12 @@ class SubcontractorService @Inject() (
       county = userAnswers.get(PartnershipAddressPage).flatMap(_.addressLine4),
       postcode = userAnswers.get(PartnershipAddressPage).map(_.postalCode),
       country = userAnswers.get(PartnershipAddressPage).map(_.country),
-      // emailAddress = userAnswers.get(PartnershipChooseContactDetailsPage).map(_email),
-      // phoneNumber = userAnswers.get(PartnershipChooseContactDetailsPage).map(_.phone),
-      emailAddress = None,
-      phoneNumber = None,
-      mobilePhoneNumber = None,
+      emailAddress = contactDetails.email,
+      phoneNumber = contactDetails.phone,
+      mobilePhoneNumber = contactDetails.mobile,
       worksReferenceNumber = userAnswers.get(PartnershipWorksReferenceNumberPage)
     )
+  }
 
   private def individualOrSoleTraderPayloadFromUserAnswers(
     cisId: String,

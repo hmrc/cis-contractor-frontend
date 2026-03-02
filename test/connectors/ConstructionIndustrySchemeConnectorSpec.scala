@@ -20,7 +20,7 @@ import models.add.TypeOfSubcontractor
 import models.requests.CreateAndUpdateSubcontractorPayload
 import models.requests.CreateAndUpdateSubcontractorPayload.{IndividualOrSoleTraderPayload, PartnershipPayload}
 import org.mockito.ArgumentCaptor
-import org.mockito.ArgumentMatchers.{any, eq as meq}
+import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{verify, when}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.matchers.must.Matchers
@@ -35,11 +35,7 @@ import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class ConstructionIndustrySchemeConnectorSpec
-  extends AnyWordSpec
-    with Matchers
-    with MockitoSugar
-    with ScalaFutures {
+class ConstructionIndustrySchemeConnectorSpec extends AnyWordSpec with Matchers with MockitoSugar with ScalaFutures {
 
   implicit val hc: HeaderCarrier = HeaderCarrier()
 
@@ -67,7 +63,7 @@ class ConstructionIndustrySchemeConnectorSpec
         )
 
       connector.createAndUpdateSubcontractor(payload).futureValue mustBe (())
-      
+
       val bodyCaptor: ArgumentCaptor[JsValue] = ArgumentCaptor.forClass(classOf[JsValue])
       verify(rb).withBody(bodyCaptor.capture())(any(), any(), any())
       bodyCaptor.getValue mustBe Json.toJson(payload.asInstanceOf[IndividualOrSoleTraderPayload])
