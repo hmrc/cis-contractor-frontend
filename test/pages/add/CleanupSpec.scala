@@ -51,6 +51,8 @@ class CleanupSpec extends PageBehaviours {
       country = "United Kingdom"
     )
 
+    val phoneNumber = "01234567"
+
     "removeIndividualSoleTraderSubcontractor" - {
 
       val soleTraderAddress = UKAddress(
@@ -158,6 +160,9 @@ class CleanupSpec extends PageBehaviours {
             .set(PartnershipHasUtrYesNoPage, true)
             .success
             .value
+            .set(PartnershipMobileNumberPage, phoneNumber)
+            .success
+            .value
             .set(PartnershipNamePage, name)
             .success
             .value
@@ -182,6 +187,9 @@ class CleanupSpec extends PageBehaviours {
             .set(PartnershipNominatedPartnerUtrYesNoPage, true)
             .success
             .value
+            .set(PartnershipPhoneNumberPage, phoneNumber)
+            .success
+            .value
             .set(PartnershipUniqueTaxpayerReferencePage, taxpayerReference)
             .success
             .value
@@ -200,6 +208,7 @@ class CleanupSpec extends PageBehaviours {
         result.get(PartnershipContactDetailsYesNoPage) mustBe None
         result.get(PartnershipEmailAddressPage) mustBe None
         result.get(PartnershipHasUtrYesNoPage) mustBe None
+        result.get(PartnershipMobileNumberPage) mustBe None
         result.get(PartnershipNamePage) mustBe None
         result.get(PartnershipNominatedPartnerCrnPage) mustBe None
         result.get(PartnershipNominatedPartnerCrnYesNoPage) mustBe None
@@ -208,6 +217,7 @@ class CleanupSpec extends PageBehaviours {
         result.get(PartnershipNominatedPartnerNinoYesNoPage) mustBe None
         result.get(PartnershipNominatedPartnerUtrPage) mustBe None
         result.get(PartnershipNominatedPartnerUtrYesNoPage) mustBe None
+        result.get(PartnershipPhoneNumberPage) mustBe None
         result.get(PartnershipUniqueTaxpayerReferencePage) mustBe None
         result.get(PartnershipWorksReferenceNumberPage) mustBe None
         result.get(PartnershipWorksReferenceNumberYesNoPage) mustBe None
