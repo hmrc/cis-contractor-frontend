@@ -487,6 +487,41 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
         verifyNoMoreInteractions(mockConnector)
       }
 
+      "should fail when subcontractor type not found in session data" in {
+        val mockConnector = mock[ConstructionIndustrySchemeConnector]
+        val service       = new SubcontractorService(mockConnector)
+
+        val userAnswers =
+          emptyUserAnswers
+            .set(CisIdQuery, cisId)
+            .success
+            .value
+
+        val ex = service.createAndUpdateSubcontractor(userAnswers).failed.futureValue
+        ex.getMessage must include("TypeOfSubcontractorPage not found in session data")
+
+        verifyNoMoreInteractions(mockConnector)
+      }
+
+      "should fail when an unsupported subcontractor type is provided" in {
+        val mockConnector = mock[ConstructionIndustrySchemeConnector]
+        val service       = new SubcontractorService(mockConnector)
+
+        val userAnswers =
+          emptyUserAnswers
+            .set(CisIdQuery, cisId)
+            .success
+            .value
+            .set(TypeOfSubcontractorPage, TypeOfSubcontractor.Limitedcompany)
+            .success
+            .value
+
+        val ex = service.createAndUpdateSubcontractor(userAnswers).failed.futureValue
+        ex.getMessage must include("Unsupported subcontractor type: company")
+
+        verifyNoMoreInteractions(mockConnector)
+      }
+
       "should fail when the connector call fails" in {
         val mockConnector = mock[ConstructionIndustrySchemeConnector]
         val service       = new SubcontractorService(mockConnector)
