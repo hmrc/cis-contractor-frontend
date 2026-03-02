@@ -17,35 +17,26 @@
 package forms.add.partnership
 
 import forms.mappings.Mappings
-import models.add.PartnershipCountryAddress
+import models.add.InternationalAddress
 import play.api.data.{Form, Forms}
+import forms.Validation
+import forms.mappings.Constants
 
 import javax.inject.Inject
 
 class PartnershipAddressFormProvider @Inject() extends Mappings {
 
-  private val allowedAddressCharsRegex =
-    """^[A-Za-z0-9"~!@#\$%*+:\;=\?\s,\.\[\]_\{\}\(\)/&'\-\^\\£€]+$"""
-
-  private val firstCharLetterRegex =
-    """^[A-Za-z].*"""
-
-  private val firstCharLetterOrDigitRegex = """^[A-Za-z0-9].*"""
-
-  private val ukPostcodeRegex =
-    """^(GIR\s?0AA|(?:(?:[A-Z]{1,2}\d[A-Z\d]?|\d[A-Z]{2})\s?\d[A-Z]{2}))$"""
-
-  def apply(): Form[PartnershipCountryAddress] = Form(
+  def apply(): Form[InternationalAddress] = Form(
     Forms.mapping(
       "addressLine1" ->
         text("partnershipAddress.error.addressLine1.required")
           .transform(_.trim, identity)
           .verifying(
             firstError(
-              maxLength(35, "partnershipAddress.error.addressLine1.length"),
-              regexp(allowedAddressCharsRegex, "partnershipAddress.error.addressLine1.invalidCharacters"),
+              maxLength(Constants.MaxLength35, "partnershipAddress.error.addressLine1.length"),
+              regexp(Validation.nameRegex, "partnershipAddress.error.addressLine1.invalidCharacters"),
               regexp(
-                firstCharLetterOrDigitRegex,
+                Validation.firstCharLetterOrDigitRegex,
                 "partnershipAddress.error.addressLine1.firstCharMustBeLetterOrNumber"
               )
             )
@@ -56,13 +47,13 @@ class PartnershipAddressFormProvider @Inject() extends Mappings {
             .transform(_.trim, identity)
             .verifying(
               firstError(
-                maxLength(35, "partnershipAddress.error.addressLine2.length"),
+                maxLength(Constants.MaxLength35, "partnershipAddress.error.addressLine2.length"),
                 regexp(
-                  allowedAddressCharsRegex,
+                  Validation.nameRegex,
                   "partnershipAddress.error.addressLine2.invalidCharacters"
                 ),
                 regexp(
-                  firstCharLetterRegex,
+                  Validation.firstCharLetterRegex,
                   "partnershipAddress.error.addressLine2.firstCharMustBeLetterOrNumber"
                 )
               )
@@ -73,9 +64,12 @@ class PartnershipAddressFormProvider @Inject() extends Mappings {
           .transform(_.trim, identity)
           .verifying(
             firstError(
-              maxLength(35, "partnershipAddress.error.addressLine3.length"),
-              regexp(allowedAddressCharsRegex, "partnershipAddress.error.addressLine3.invalidCharacters"),
-              regexp(firstCharLetterRegex, "partnershipAddress.error.addressLine3.firstCharMustBeLetterOrNumber")
+              maxLength(Constants.MaxLength35, "partnershipAddress.error.addressLine3.length"),
+              regexp(Validation.nameRegex, "partnershipAddress.error.addressLine3.invalidCharacters"),
+              regexp(
+                Validation.firstCharLetterRegex,
+                "partnershipAddress.error.addressLine3.firstCharMustBeLetterOrNumber"
+              )
             )
           ),
       "addressLine4" ->
@@ -84,9 +78,12 @@ class PartnershipAddressFormProvider @Inject() extends Mappings {
             .transform(_.trim, identity)
             .verifying(
               firstError(
-                maxLength(35, "partnershipAddress.error.addressLine4.length"),
-                regexp(allowedAddressCharsRegex, "partnershipAddress.error.addressLine4.invalidCharacters"),
-                regexp(firstCharLetterRegex, "partnershipAddress.error.addressLine4.firstCharMustBeLetterOrNumber")
+                maxLength(Constants.MaxLength35, "partnershipAddress.error.addressLine4.length"),
+                regexp(Validation.nameRegex, "partnershipAddress.error.addressLine4.invalidCharacters"),
+                regexp(
+                  Validation.firstCharLetterRegex,
+                  "partnershipAddress.error.addressLine4.firstCharMustBeLetterOrNumber"
+                )
               )
             )
         ),
@@ -98,13 +95,11 @@ class PartnershipAddressFormProvider @Inject() extends Mappings {
           )
           .verifying(
             firstError(
-              maxLength(8, "partnershipAddress.error.postalCode.length"),
-              regexp(ukPostcodeRegex, "partnershipAddress.error.postalCode.invalid")
+              maxLength(Constants.MaxLength8, "partnershipAddress.error.postalCode.length"),
+              regexp(Validation.ukPostcodeRegex, "partnershipAddress.error.postalCode.invalid")
             )
           ),
       "country"      -> text("partnershipAddress.country.error.required")
-    )(PartnershipCountryAddress.apply)(partnershipCountryAddress =>
-      Some(Tuple.fromProductTyped(partnershipCountryAddress))
-    )
+    )(InternationalAddress.apply)(internationalAddress => Some(Tuple.fromProductTyped(internationalAddress)))
   )
 }
