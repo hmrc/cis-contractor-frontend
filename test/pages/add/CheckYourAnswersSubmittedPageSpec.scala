@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,19 +14,18 @@
  * limitations under the License.
  */
 
-package pages.add.partnership
+package pages.add
 
-import models.add.InternationalAddress
 import pages.behaviours.PageBehaviours
 
-class PartnershipAddressPageSpec extends PageBehaviours {
+class CheckYourAnswersSubmittedPageSpec extends PageBehaviours {
 
-  "PartnershipAddressPage" - {
+  "CheckYourAnswersSubmittedPage" - {
 
-    beRetrievable[InternationalAddress](PartnershipAddressPage)
+    beRetrievable[Boolean](CheckYourAnswersSubmittedPage)
 
-    beSettable[InternationalAddress](PartnershipAddressPage)
+    beSettable[Boolean](CheckYourAnswersSubmittedPage)
 
-    beRemovable[InternationalAddress](PartnershipAddressPage)
+    beRemovable[Boolean](CheckYourAnswersSubmittedPage)
   }
 }

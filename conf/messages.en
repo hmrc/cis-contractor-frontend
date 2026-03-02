@@ -440,6 +440,15 @@ partnershipNominatedPartnerUtrYesNo.checkYourAnswersLabel = Nominated partner ha
 partnershipNominatedPartnerUtrYesNo.error.required = Select whether you know the Unique Taxpayer Reference (UTR) for this nominated partner
 partnershipNominatedPartnerUtrYesNo.change.hidden = nominated partner has a UTR
 
+partnershipPhoneNumber.title = What is the phone number for this partnership?
+partnershipPhoneNumber.heading = What is the phone number for {0}?
+partnershipPhoneNumber.hint = HMRC will never use this phone number to contact this subcontractor
+partnershipPhoneNumber.checkYourAnswersLabel = Phone number
+partnershipPhoneNumber.error.required = Enter a phone number
+partnershipPhoneNumber.error.length = Enter a valid phone number, like 01632 960 001. For international numbers include the country code.
+partnershipPhoneNumber.error.invalid = Enter a valid phone number, like 01632 960 001. For international numbers include the country code.
+partnershipPhoneNumber.change.hidden = phone number
+
 subcontractorAdded.title = Partnership subcontractor added
 subcontractorAdded.heading = Subcontractor added
 subcontractorAdded.p1 = You can now find {0} on your list of subcontractors.
@@ -470,12 +479,40 @@ companyAddressYesNo.checkYourAnswersLabel = Company Address
 companyAddressYesNo.error.required = Select whether you want to add an address for this company
 companyAddressYesNo.change.hidden = company address
 
-companyAddress.title = companyAddress
-companyAddress.heading = companyAddress
-companyAddress.checkYourAnswersLabel = companyAddress
-companyAddress.error.required = Enter companyAddress
-companyAddress.error.length = CompanyAddress must be 100 characters or less
-companyAddress.change.hidden = CompanyAddress
+companyAddress.title = What is the address for this company?
+companyAddress.heading = What is the address for {0}?
+companyAddress.checkYourAnswersLabel = Address
+companyAddress.change.hidden = address
+
+companyAddress.addressLine1 = Address line 1
+companyAddress.error.addressLine1.required = Enter the first line of the address, typically the building and street
+companyAddress.error.addressLine1.length = Enter the first line of the address using 35 characters or less
+companyAddress.error.addressLine1.invalidCharacters = Enter the first line of the address using letters a to z, numbers, apostrophes, ampersands, commas, hyphens, full stops, forward slashes and spaces
+companyAddress.error.addressLine1.firstCharMustBeLetterOrNumber = Enter an address. The first character must be a letter or a number
+
+companyAddress.addressLine2 = Address line 2 (optional)
+companyAddress.error.addressLine2.length = Enter the second line of the address using 35 characters or less
+companyAddress.error.addressLine2.invalidCharacters = Enter the second line of the address using letters a to z, numbers, apostrophes, ampersands, commas, hyphens, full stops, forward slashes and spaces
+companyAddress.error.addressLine2.firstCharMustBeLetterOrNumber = Enter an address. The first character must be a letter or a number
+
+companyAddress.addressLine3 = Town or city
+companyAddress.error.addressLine3.required = Enter the town or city
+companyAddress.error.addressLine3.length = Enter a town or city using 35 characters or less
+companyAddress.error.addressLine3.invalidCharacters = Enter a town or city using letters a to z, numbers, apostrophes, ampersands, commas, hyphens, full stops, forward slashes and spaces
+companyAddress.error.addressLine3.firstCharMustBeLetterOrNumber = Enter a town or city. The first character must be a letter or a number
+
+companyAddress.addressLine4 = County (optional)
+companyAddress.error.addressLine4.length = Enter a county using 35 characters or less
+companyAddress.error.addressLine4.invalidCharacters = Enter a county using letters a to z, numbers, apostrophes, ampersands, commas, hyphens, full stops, forward slashes and spaces
+companyAddress.error.addressLine4.firstCharMustBeLetterOrNumber = Enter a county. The first character must be a letter or a number
+
+companyAddress.postalCode = Postal code
+companyAddress.error.postalCode.required = Enter a postal code in the correct format
+companyAddress.error.postalCode.length = Enter a postal code in the correct format
+companyAddress.error.postalCode.invalid = Enter a postal code in the correct format
+
+companyAddress.country = Country
+companyAddress.country.error.required = Select a country
 
 companyContactOptions.title = What are the contact details for this company?
 companyContactOptions.heading = What are the contact details for this company?
@@ -549,3 +586,12 @@ companyWorksReference.change.hidden = CompanyWorksReference
 
 companyCheckYourAnswers.title = companyCheckYourAnswers
 companyCheckYourAnswers.heading = companyCheckYourAnswers
+
+partnershipMobileNumber.title = What is the mobile number for this partnership?
+partnershipMobileNumber.heading = What is the mobile number for {0}?
+partnershipMobileNumber.hint = HMRC will never use this mobile number to contact this subcontractor
+partnershipMobileNumber.error.required = Enter a mobile number
+partnershipMobileNumber.error.length = Enter a valid mobile number, like 07700 900 982 or +44 7700 900 999
+partnershipMobileNumber.error.invalid = Enter a valid mobile number, like 07700 900 982 or +44 7700 900 999
+partnershipMobileNumber.checkYourAnswersLabel = Mobile number
+partnershipMobileNumber.change.hidden = mobile number

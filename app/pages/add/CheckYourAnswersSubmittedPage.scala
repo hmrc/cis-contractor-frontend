@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,19 +14,12 @@
  * limitations under the License.
  */
 
-package pages.add.partnership
+package pages.add
 
-import models.add.InternationalAddress
-import pages.behaviours.PageBehaviours
+import pages.QuestionPage
+import play.api.libs.json.JsPath
 
-class PartnershipAddressPageSpec extends PageBehaviours {
-
-  "PartnershipAddressPage" - {
-
-    beRetrievable[InternationalAddress](PartnershipAddressPage)
-
-    beSettable[InternationalAddress](PartnershipAddressPage)
-
-    beRemovable[InternationalAddress](PartnershipAddressPage)
-  }
+case object CheckYourAnswersSubmittedPage extends QuestionPage[Boolean] {
+  override def path: JsPath = JsPath \ toString
+  override def toString: String = "checkYourAnswersSubmitted"
 }

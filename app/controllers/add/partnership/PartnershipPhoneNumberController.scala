@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,50 +16,46 @@
 
 package controllers.add.partnership
 
-import config.FrontendAppConfig
 import controllers.actions.*
-import forms.add.partnership.PartnershipAddressFormProvider
+import forms.add.partnership.PartnershipPhoneNumberFormProvider
 import models.Mode
-import models.add.InternationalAddress
 import navigation.Navigator
-import pages.add.partnership.{PartnershipAddressPage, PartnershipNamePage}
+import pages.add.partnership.{PartnershipNamePage, PartnershipPhoneNumberPage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.add.partnership.PartnershipAddressView
-import utils.CountryOptions
+import views.html.add.partnership.PartnershipPhoneNumberView
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class PartnershipAddressController @Inject() (
+class PartnershipPhoneNumberController @Inject() (
   override val messagesApi: MessagesApi,
   sessionRepository: SessionRepository,
   navigator: Navigator,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
-  formProvider: PartnershipAddressFormProvider,
-  countryOptions: CountryOptions,
+  formProvider: PartnershipPhoneNumberFormProvider,
   val controllerComponents: MessagesControllerComponents,
-  view: PartnershipAddressView
-)(implicit ec: ExecutionContext, appConfig: FrontendAppConfig)
+  view: PartnershipPhoneNumberView
+)(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport {
 
-  private val form = formProvider()
+  val form = formProvider()
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
     request.userAnswers
       .get(PartnershipNamePage)
       .map { partnershipName =>
-        val preparedForm = request.userAnswers.get(PartnershipAddressPage) match {
+        val preparedForm = request.userAnswers.get(PartnershipPhoneNumberPage) match {
           case None        => form
           case Some(value) => form.fill(value)
         }
 
-        Ok(view(preparedForm, mode, partnershipName, countryOptions.options()))
+        Ok(view(preparedForm, mode, partnershipName))
       }
       .getOrElse(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
   }
@@ -72,14 +68,12 @@ class PartnershipAddressController @Inject() (
           form
             .bindFromRequest()
             .fold(
-              formWithErrors =>
-                Future.successful(BadRequest(view(formWithErrors, mode, partnershipName, countryOptions.options()))),
+              formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, partnershipName))),
               value =>
                 for {
-                  updatedAnswers <-
-                    Future.fromTry(request.userAnswers.set(PartnershipAddressPage, value))
+                  updatedAnswers <- Future.fromTry(request.userAnswers.set(PartnershipPhoneNumberPage, value))
                   _              <- sessionRepository.set(updatedAnswers)
-                } yield Redirect(navigator.nextPage(PartnershipAddressPage, mode, updatedAnswers))
+                } yield Redirect(navigator.nextPage(PartnershipPhoneNumberPage, mode, updatedAnswers))
             )
         }
         .getOrElse(Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())))

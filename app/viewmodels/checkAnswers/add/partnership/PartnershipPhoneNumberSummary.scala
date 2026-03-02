@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,46 +17,27 @@
 package viewmodels.checkAnswers.add.partnership
 
 import models.{CheckMode, UserAnswers}
-import pages.add.partnership.PartnershipAddressPage
-import models.add.InternationalAddress
+import pages.add.partnership.PartnershipPhoneNumberPage
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
-import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
 
-object PartnershipAddressSummary {
+object PartnershipPhoneNumberSummary {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(PartnershipAddressPage).map { answer =>
-
-      val lines: Seq[String] = Seq(
-        answer.addressLine1,
-        answer.addressLine2.getOrElse(""),
-        answer.addressLine3,
-        answer.addressLine4.getOrElse(""),
-        answer.postalCode,
-        answer.country
-      )
-
-      val escapedWithBreaks: String =
-        lines
-          .filter(_.trim.nonEmpty)
-          .map(HtmlFormat.escape(_).toString)
-          .mkString("<br/>")
-
+    answers.get(PartnershipPhoneNumberPage).map { answer =>
       SummaryListRowViewModel(
-        key = "partnershipAddress.checkYourAnswersLabel",
-        value = ValueViewModel(HtmlContent(escapedWithBreaks)),
+        key = "partnershipPhoneNumber.checkYourAnswersLabel",
+        value = ValueViewModel(HtmlFormat.escape(answer).toString),
         actions = Seq(
           ActionItemViewModel(
             "site.change",
-            controllers.add.partnership.routes.PartnershipAddressController.onPageLoad(CheckMode).url
-          ).withVisuallyHiddenText(messages("partnershipAddress.change.hidden"))
-            .withAttribute("id" -> "address-of-partnership")
+            controllers.add.partnership.routes.PartnershipPhoneNumberController.onPageLoad(CheckMode).url
+          )
+            .withVisuallyHiddenText(messages("partnershipPhoneNumber.change.hidden"))
         )
       )
     }
-
 }

@@ -19,7 +19,7 @@ package controllers.add.partnership
 import base.SpecBase
 import controllers.routes
 import forms.add.partnership.PartnershipAddressFormProvider
-import models.add.PartnershipCountryAddress
+import models.add.InternationalAddress
 import utils.CountryOptions
 import models.{NormalMode, UserAnswers}
 import navigation.Navigator
@@ -76,7 +76,7 @@ class PartnershipAddressControllerSpec extends SpecBase with MockitoSugar with M
     }
 
     "must populate the view correctly on a GET when the question has previously been answered and partnership name is present" in {
-      val expected = PartnershipCountryAddress(
+      val expected = InternationalAddress(
         addressLine1 = "line 1",
         addressLine2 = Some("line 2"),
         addressLine3 = "line 3",
@@ -102,7 +102,7 @@ class PartnershipAddressControllerSpec extends SpecBase with MockitoSugar with M
 
         status(result) mustBe OK
 
-        val expected = PartnershipCountryAddress(
+        val expected = InternationalAddress(
           addressLine1 = "line 1",
           addressLine2 = Some("line 2"),
           addressLine3 = "line 3",

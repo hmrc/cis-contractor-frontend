@@ -576,12 +576,36 @@ class NavigatorSpec extends SpecBase {
         ) mustBe journeyRecovery
       }
 
+      "must go from a PartnershipPhoneNumberPage to next Page" in {
+        navigator.nextPage(
+          PartnershipPhoneNumberPage,
+          NormalMode,
+          UserAnswers("id")
+        ) mustBe controllers.add.partnership.routes.PartnershipPhoneNumberController.onPageLoad(NormalMode)
+      }
+
+      "must go from a CompanyAddressPage to CompanyAddressPage" in {
+        navigator.nextPage(
+          CompanyAddressPage,
+          NormalMode,
+          UserAnswers("id")
+        ) mustBe controllers.add.company.routes.CompanyAddressController.onPageLoad(NormalMode)
+      }
+
       "must go from CompanyNamePage to CompanyNameController in NormalMode" in {
         navigator.nextPage(
           CompanyNamePage,
           NormalMode,
           emptyUserAnswers
         ) mustBe controllers.add.company.routes.CompanyNameController.onPageLoad(NormalMode)
+      }
+
+      "must go from a PartnershipMobileNumberPage to next Page" in {
+        navigator.nextPage(
+          PartnershipMobileNumberPage,
+          NormalMode,
+          UserAnswers("id")
+        ) mustBe controllers.add.partnership.routes.PartnershipMobileNumberController.onPageLoad(NormalMode)
       }
 
       "must go from a CompanyAddressYesNoPage to CompanyAddressYesNoPage" in {
@@ -1052,6 +1076,30 @@ class NavigatorSpec extends SpecBase {
           CheckMode,
           emptyUserAnswers
         ) mustBe journeyRecovery
+      }
+
+      "must go from CompanyAddressPage to CompanyAddressPage in CheckMode" in {
+        navigator.nextPage(
+          CompanyAddressPage,
+          CheckMode,
+          emptyUserAnswers
+        ) mustBe controllers.add.company.routes.CompanyAddressController.onPageLoad(CheckMode)
+      }
+
+      "must go from a PartnershipMobileNumberPage to PartnershipMobileNumberPage in CheckMode" in {
+        navigator.nextPage(
+          PartnershipMobileNumberPage,
+          CheckMode,
+          emptyUserAnswers
+        ) mustBe controllers.add.partnership.routes.PartnershipMobileNumberController.onPageLoad(CheckMode)
+      }
+
+      "must go from a PartnershipPhoneNumberPage to CYA" in {
+        navigator.nextPage(
+          PartnershipPhoneNumberPage,
+          CheckMode,
+          UserAnswers("id")
+        ) mustBe CYA
       }
 
       "must go from CompanyAddressYesNoPage to CompanyAddressYesNoPage in CheckMode" in {
