@@ -24,7 +24,7 @@ import scala.util.Try
 
 trait Cleanup {
 
-  def removeIndividualSoleTraderSubcontractor(userAnswers: UserAnswers): Try[UserAnswers] = {
+  def removeIndividualSoleTraderSubcontractor(userAnswers: UserAnswers): Try[UserAnswers] =
     userAnswers
       .remove(AddressOfSubcontractorPage)
       .flatMap(_.remove(NationalInsuranceNumberYesNoPage))
@@ -39,10 +39,9 @@ trait Cleanup {
       .flatMap(_.remove(UniqueTaxpayerReferenceYesNoPage))
       .flatMap(_.remove(WorksReferenceNumberPage))
       .flatMap(_.remove(WorksReferenceNumberYesNoPage))
-  }
-  
+
   // TODO Add unit test for removeLimitedCompanySubcontractor when company journey is done
-  def removeLimitedCompanySubcontractor(userAnswers: UserAnswers): Try[UserAnswers] = {
+  def removeLimitedCompanySubcontractor(userAnswers: UserAnswers): Try[UserAnswers] =
     userAnswers
       .remove(CompanyAddressPage)
       .flatMap(_.remove(CompanyAddressYesNoPage))
@@ -57,9 +56,8 @@ trait Cleanup {
       .flatMap(_.remove(CompanyUtrYesNoPage))
       .flatMap(_.remove(CompanyWorksReferencePage))
       .flatMap(_.remove(CompanyWorksReferenceYesNoPage))
-  }
 
-  def removePartnershipSubcontractor(userAnswers: UserAnswers): Try[UserAnswers] = {
+  def removePartnershipSubcontractor(userAnswers: UserAnswers): Try[UserAnswers] =
     userAnswers
       .remove(PartnershipAddressPage)
       .flatMap(_.remove(PartnershipAddressYesNoPage))
@@ -78,7 +76,6 @@ trait Cleanup {
       .flatMap(_.remove(PartnershipUniqueTaxpayerReferencePage))
       .flatMap(_.remove(PartnershipWorksReferenceNumberPage))
       .flatMap(_.remove(PartnershipWorksReferenceNumberYesNoPage))
-  }
 
 //  def removeTrustSubcontractor(userAnswers: UserAnswers): Try[UserAnswers] = {
 //    userAnswers
