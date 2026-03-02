@@ -17,6 +17,7 @@
 package forms.add.partnership
 
 import forms.behaviours.StringFieldBehaviours
+import forms.mappings.Constants
 import org.scalacheck.Gen
 import play.api.data.FormError
 
@@ -25,7 +26,6 @@ class PartnershipNameFormProviderSpec extends StringFieldBehaviours {
   val requiredKey = "partnershipName.error.required"
   val lengthKey   = "partnershipName.error.length"
   val invalidKey  = "partnershipName.error.invalidCharacters"
-  val maxLength   = 56
 
   private val form = new PartnershipNameFormProvider()()
 
@@ -48,8 +48,8 @@ class PartnershipNameFormProviderSpec extends StringFieldBehaviours {
     behave like fieldWithMaxLength(
       form,
       fieldName,
-      maxLength = maxLength,
-      lengthError = FormError(fieldName, lengthKey, Seq(maxLength))
+      maxLength = Constants.MaxLength56,
+      lengthError = FormError(fieldName, lengthKey, Seq(Constants.MaxLength56))
     )
 
     behave like mandatoryField(

@@ -149,15 +149,13 @@ class PartnershipUniqueTaxpayerReferenceControllerSpec extends SpecBase with Moc
         val request =
           FakeRequest(POST, partnershipUniqueTaxpayerReferenceRoute)
             .withFormUrlEncodedBody(
-              ("value", duplicatedUTR),
-              ("partnershipName", partnershipName)
+              ("value", duplicatedUTR)
             )
 
         val boundForm = form
           .bind(
             Map(
-              ("value", duplicatedUTR),
-              ("partnershipName", partnershipName)
+              ("value", duplicatedUTR)
             )
           )
 

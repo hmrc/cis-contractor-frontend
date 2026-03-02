@@ -22,7 +22,7 @@
 @import uk.gov.hmrc.govukfrontend.views.Implicits.RichSelect
 @import uk.gov.hmrc.hmrcfrontend.views.viewmodels.accessibleautocomplete.AccessibleAutocomplete
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.select.SelectItem
-@import models.add.PartnershipCountryAddress
+@import models.add.InternationalAddress
 @import utils.InputOption
 @import viewmodels.govuk.all._
 @import play.api.data.Form
@@ -41,7 +41,7 @@
     govukButton: GovukButton
 )
 
-@(form: Form[PartnershipCountryAddress], mode: Mode, partnershipName: String, countryOptions: Seq[InputOption])(implicit request: Request[_], appConfig: FrontendAppConfig, messages: Messages)
+@(form: Form[InternationalAddress], mode: Mode, partnershipName: String, countryOptions: Seq[InputOption])(implicit request: Request[_], appConfig: FrontendAppConfig, messages: Messages)
 
 @layout(pageTitle = title(form, messages("partnershipAddress.title"))) {
 

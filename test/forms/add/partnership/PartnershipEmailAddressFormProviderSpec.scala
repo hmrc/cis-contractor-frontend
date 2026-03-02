@@ -19,7 +19,7 @@ package forms.add.partnership
 import forms.behaviours.StringFieldBehaviours
 import play.api.data.FormError
 import org.scalacheck.Gen
-import forms.mapping.Constants
+import forms.mappings.Constants
 
 class PartnershipEmailAddressFormProviderSpec extends StringFieldBehaviours {
 

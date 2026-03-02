@@ -19,6 +19,7 @@ package controllers.add.company
 import base.SpecBase
 import controllers.routes
 import forms.add.company.CompanyNameFormProvider
+import forms.mappings.Constants
 import models.{NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
@@ -33,15 +34,16 @@ import repositories.SessionRepository
 import views.html.add.company.CompanyNameView
 
 import scala.concurrent.Future
+import scala.util.Random
 
 class CompanyNameControllerSpec extends SpecBase with MockitoSugar {
 
   def onwardRoute = Call("GET", "/foo")
 
-  val formProvider = new CompanyNameFormProvider()
-  val form         = formProvider()
+  private val formProvider = new CompanyNameFormProvider()
+  private val form         = formProvider()
 
-  lazy val companyNameRoute = controllers.add.company.routes.CompanyNameController.onPageLoad(NormalMode).url
+  lazy private val companyNameRoute = controllers.add.company.routes.CompanyNameController.onPageLoad(NormalMode).url
 
   "CompanyName Controller" - {
 
@@ -115,6 +117,45 @@ class CompanyNameControllerSpec extends SpecBase with MockitoSugar {
             .withFormUrlEncodedBody(("value", ""))
 
         val boundForm = form.bind(Map("value" -> ""))
+
+        val view = application.injector.instanceOf[CompanyNameView]
+
+        val result = route(application, request).value
+
+        status(result) mustEqual BAD_REQUEST
+        contentAsString(result) mustEqual view(boundForm, NormalMode)(request, messages(application)).toString
+      }
+    }
+
+    "must return a Bad Request and errors when invalid data is submitted with length more than 56 characters" in {
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val longInput   = Random.alphanumeric.take(Constants.MaxLength56 + 1).mkString
+
+      running(application) {
+        val request =
+          FakeRequest(POST, companyNameRoute)
+            .withFormUrlEncodedBody(("value", longInput))
+
+        val boundForm = form.bind(Map("value" -> longInput))
+
+        val view = application.injector.instanceOf[CompanyNameView]
+
+        val result = route(application, request).value
+
+        status(result) mustEqual BAD_REQUEST
+        contentAsString(result) mustEqual view(boundForm, NormalMode)(request, messages(application)).toString
+      }
+    }
+
+    "must return a Bad Request and errors when invalid characters are submitted" in {
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, companyNameRoute)
+            .withFormUrlEncodedBody(("value", "Invalid<>Name"))
+
+        val boundForm = form.bind(Map("value" -> "Invalid<>Name"))
 
         val view = application.injector.instanceOf[CompanyNameView]
 

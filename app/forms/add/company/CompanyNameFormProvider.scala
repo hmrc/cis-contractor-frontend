@@ -16,6 +16,8 @@
 
 package forms.add.company
 
+import forms.Validation
+import forms.mappings.Constants
 import forms.mappings.Mappings
 import play.api.data.Form
 
@@ -26,6 +28,12 @@ class CompanyNameFormProvider @Inject() extends Mappings {
   def apply(): Form[String] =
     Form(
       "value" -> text("companyName.error.required")
-        .verifying(maxLength(100, "companyName.error.length"))
+        .transform(_.trim, identity)
+        .verifying(
+          firstError(
+            maxLength(Constants.MaxLength56, "companyName.error.length"),
+            regexp(Validation.nameRegex, "companyName.error.invalidCharacters")
+          )
+        )
     )
 }

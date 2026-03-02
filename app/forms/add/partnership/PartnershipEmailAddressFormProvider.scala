@@ -19,7 +19,7 @@ package forms.add.partnership
 import forms.mappings.Mappings
 import play.api.data.Form
 import forms.Validation
-import forms.mapping.Constants
+import forms.mappings.Constants
 
 import javax.inject.Inject
 
