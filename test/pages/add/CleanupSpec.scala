@@ -17,7 +17,7 @@
 package pages.add
 
 import models.add.*
-import models.add.partnership.PartnershipChooseContactDetails
+import models.contact.ContactOptions
 import pages.add.partnership.*
 import pages.behaviours.PageBehaviours
 
@@ -148,7 +148,7 @@ class CleanupSpec extends PageBehaviours {
             .set(PartnershipAddressYesNoPage, true)
             .success
             .value
-            .set(PartnershipChooseContactDetailsPage, PartnershipChooseContactDetails.Email)
+            .set(PartnershipChooseContactDetailsPage, ContactOptions.Email)
             .success
             .value
             .set(PartnershipContactDetailsYesNoPage, true)
