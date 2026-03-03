@@ -41,23 +41,26 @@ class CompanyEmailAddressControllerSpec extends SpecBase with MockitoSugar {
   val formProvider = new CompanyEmailAddressFormProvider()
   val form         = formProvider()
 
+  private val companyName = "Test Company"
+
   lazy val companyEmailAddressRoute =
     controllers.add.company.routes.CompanyEmailAddressController.onPageLoad(NormalMode).url
+
+  private def uaWithName: UserAnswers =
+    emptyUserAnswers.set(CompanyNamePage, companyName).success.value
 
   "CompanyEmailAddress Controller" - {
 
     "must return OK and the correct view for a GET" in {
-      val userAnswers = UserAnswers(userAnswersId).set(CompanyNamePage, "Test Company").success.value
 
-      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(uaWithName)).build()
 
       running(application) {
         val request = FakeRequest(GET, companyEmailAddressRoute)
 
         val result = route(application, request).value
 
-        val view        = application.injector.instanceOf[CompanyEmailAddressView]
-        val companyName = userAnswers.get(CompanyNamePage).getOrElse("")
+        val view = application.injector.instanceOf[CompanyEmailAddressView]
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(form, NormalMode, companyName)(request, messages(application)).toString
@@ -66,9 +69,7 @@ class CompanyEmailAddressControllerSpec extends SpecBase with MockitoSugar {
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = UserAnswers(userAnswersId)
-        .set(CompanyEmailAddressPage, "answer").success.value
-        .set(CompanyNamePage, "Test Company").success.value
+      val userAnswers = uaWithName.set(CompanyEmailAddressPage, "abc@test.com").success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
@@ -77,11 +78,14 @@ class CompanyEmailAddressControllerSpec extends SpecBase with MockitoSugar {
 
         val view = application.injector.instanceOf[CompanyEmailAddressView]
 
-        val result = route(application, request).value
+        val result      = route(application, request).value
         val companyName = userAnswers.get(CompanyNamePage).getOrElse("")
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill("answer"), NormalMode, companyName)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill("abc@test.com"), NormalMode, companyName)(
+          request,
+          messages(application)
+        ).toString
       }
     }
 
@@ -92,7 +96,7 @@ class CompanyEmailAddressControllerSpec extends SpecBase with MockitoSugar {
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
       val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        applicationBuilder(userAnswers = Some(uaWithName))
           .overrides(
             bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
             bind[SessionRepository].toInstance(mockSessionRepository)
@@ -102,7 +106,7 @@ class CompanyEmailAddressControllerSpec extends SpecBase with MockitoSugar {
       running(application) {
         val request =
           FakeRequest(POST, companyEmailAddressRoute)
-            .withFormUrlEncodedBody(("value", "abc.def@abc.com"))
+            .withFormUrlEncodedBody(("value", "abc@test.com"))
 
         val result = route(application, request).value
 
@@ -112,9 +116,7 @@ class CompanyEmailAddressControllerSpec extends SpecBase with MockitoSugar {
     }
 
     "must return a Bad Request and errors when invalid data is submitted" in {
-      val userAnswers = UserAnswers(userAnswersId)
-        .set(CompanyNamePage, "Test Company").success.value
-      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(uaWithName)).build()
 
       running(application) {
         val request =
@@ -125,11 +127,13 @@ class CompanyEmailAddressControllerSpec extends SpecBase with MockitoSugar {
 
         val view = application.injector.instanceOf[CompanyEmailAddressView]
 
-        val result = route(application, request).value
-        val companyName = userAnswers.get(CompanyNamePage).getOrElse("")
+        val result      = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode, companyName)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, NormalMode, companyName)(
+          request,
+          messages(application)
+        ).toString
       }
     }
 
@@ -154,7 +158,7 @@ class CompanyEmailAddressControllerSpec extends SpecBase with MockitoSugar {
       running(application) {
         val request =
           FakeRequest(POST, companyEmailAddressRoute)
-            .withFormUrlEncodedBody(("value", "answer"))
+            .withFormUrlEncodedBody(("value", "abc@test.com"))
 
         val result = route(application, request).value
 

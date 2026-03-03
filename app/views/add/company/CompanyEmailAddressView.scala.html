@@ -15,6 +15,7 @@
  *@
 
 @import viewmodels.InputWidth._
+@import viewmodels.LabelSize.Large
 
 @this(
     layout: templates.Layout,
@@ -37,10 +38,12 @@
         @govukInput(
             InputViewModel(
                 field = form("value"),
-                label = LabelViewModel(messages("companyEmailAddress.heading", companyName)).asPageHeading()
+                label = LabelViewModel(messages("companyEmailAddress.heading", companyName)).asPageHeading(Large)
             )
             .withHint(HintViewModel(messages("companyEmailAddress.hintText")))
             .withWidth(Full)
+            .withSpellcheck(false)
+            .asEmail()
         )
 
         @govukButton(

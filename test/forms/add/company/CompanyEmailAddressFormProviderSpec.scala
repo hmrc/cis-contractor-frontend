@@ -18,6 +18,7 @@ package forms.add.company
 
 import forms.Validation
 import forms.behaviours.StringFieldBehaviours
+import forms.mappings.Constants.MaxLength254
 import org.scalacheck.Gen
 import play.api.data.FormError
 
@@ -26,7 +27,6 @@ class CompanyEmailAddressFormProviderSpec extends StringFieldBehaviours {
   val requiredKey = "companyEmailAddress.error.required"
   val lengthKey   = "companyEmailAddress.error.length"
   val invalidKey  = "companyEmailAddress.error.invalid"
-  val maxLength   = 254
 
   val form = new CompanyEmailAddressFormProvider()()
 
@@ -47,8 +47,8 @@ class CompanyEmailAddressFormProviderSpec extends StringFieldBehaviours {
     behave like fieldWithMaxLength(
       form,
       fieldName,
-      maxLength = maxLength,
-      lengthError = FormError(fieldName, lengthKey, Seq(maxLength))
+      maxLength = MaxLength254,
+      lengthError = FormError(fieldName, lengthKey, Seq(MaxLength254))
     )
 
     behave like mandatoryField(
@@ -61,10 +61,10 @@ class CompanyEmailAddressFormProviderSpec extends StringFieldBehaviours {
       form,
       fieldName,
       regexp = Validation.emailRegex,
-      generator = stringsWithMaxLength(maxLength)
+      generator = stringsWithMaxLength(MaxLength254)
         .suchThat(str =>
           str.nonEmpty &&
-            str.length <= maxLength &&
+            str.length <= MaxLength254 &&
             !str.matches(Validation.emailRegex)
         ),
       error = FormError(fieldName, invalidKey, Seq(Validation.emailRegex))

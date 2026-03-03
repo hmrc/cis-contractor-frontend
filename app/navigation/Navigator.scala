@@ -124,6 +124,8 @@ class Navigator @Inject() () {
       userAnswers => navigatorFromPartnershipNominatedPartnerUtrYesNoPage(CheckMode)(userAnswers)
     case CompanyAddressPage                       =>
       _ => controllers.add.company.routes.CompanyAddressController.onPageLoad(CheckMode)
+    case CompanyEmailAddressPage                       =>
+      _ => controllers.add.company.routes.CompanyEmailAddressController.onPageLoad(CheckMode)  
     case PartnershipMobileNumberPage              =>
       _ => controllers.add.partnership.routes.PartnershipMobileNumberController.onPageLoad(CheckMode)
     case PartnershipPhoneNumberPage               => _ => controllers.add.routes.CheckYourAnswersController.onPageLoad()

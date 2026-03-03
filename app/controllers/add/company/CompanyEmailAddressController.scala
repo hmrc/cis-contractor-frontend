@@ -47,28 +47,35 @@ class CompanyEmailAddressController @Inject() (
   val form = formProvider()
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
+    request.userAnswers
+      .get(CompanyNamePage)
+      .map { companyName =>
+        val preparedForm = request.userAnswers.get(CompanyEmailAddressPage) match {
+          case None        => form
+          case Some(value) => form.fill(value)
+        }
 
-    val preparedForm = request.userAnswers.get(CompanyEmailAddressPage) match {
-      case None        => form
-      case Some(value) => form.fill(value)
-    }
-
-    val companyName = request.userAnswers.get(CompanyNamePage).getOrElse("")
-    Ok(view(preparedForm, mode, companyName))
+        Ok(view(preparedForm, mode, companyName))
+      }
+      .getOrElse(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
-      val companyName = request.userAnswers.get(CompanyNamePage).getOrElse("")
-      form
-        .bindFromRequest()
-        .fold(
-          formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, companyName))),
-          value =>
-            for {
-              updatedAnswers <- Future.fromTry(request.userAnswers.set(CompanyEmailAddressPage, value))
-              _              <- sessionRepository.set(updatedAnswers)
-            } yield Redirect(navigator.nextPage(CompanyEmailAddressPage, mode, updatedAnswers))
-        )
+      request.userAnswers
+        .get(CompanyNamePage)
+        .map { companyName =>
+          form
+            .bindFromRequest()
+            .fold(
+              formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, companyName))),
+              value =>
+                for {
+                  updatedAnswers <- Future.fromTry(request.userAnswers.set(CompanyEmailAddressPage, value))
+                  _              <- sessionRepository.set(updatedAnswers)
+                } yield Redirect(navigator.nextPage(CompanyEmailAddressPage, mode, updatedAnswers))
+            )
+        }
+        .getOrElse(Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())))
   }
 }

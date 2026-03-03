@@ -1086,6 +1086,14 @@ class NavigatorSpec extends SpecBase {
         ) mustBe controllers.add.company.routes.CompanyAddressController.onPageLoad(CheckMode)
       }
 
+      "must go from CompanyEmailAddressPage to CompanyEmailAddressPage in CheckMode" in {
+        navigator.nextPage(
+          CompanyEmailAddressPage,
+          CheckMode,
+          emptyUserAnswers
+        ) mustBe controllers.add.company.routes.CompanyEmailAddressController.onPageLoad(CheckMode)
+      }
+
       "must go from a PartnershipMobileNumberPage to PartnershipMobileNumberPage in CheckMode" in {
         navigator.nextPage(
           PartnershipMobileNumberPage,

@@ -525,11 +525,11 @@ companyContactOptions.change.hidden = CompanyContactOptions
 companyEmailAddress.title = What is the email address for this company?
 companyEmailAddress.heading = What is the email address for {0}?
 companyEmailAddress.hintText = HMRC will never use this email address to contact this subcontractor
-companyEmailAddress.checkYourAnswersLabel = company Email Address
-companyEmailAddress.error.required = Enter an email address
+companyEmailAddress.checkYourAnswersLabel = Email Address
+companyEmailAddress.error.required = Enter an email address in the correct format, like name@example.com
 companyEmailAddress.error.invalid = Enter a valid email address in the correct format, like name@example.com
 companyEmailAddress.error.length = Enter a valid email address in the correct format, like name@example.com, up to 254 characters
-companyEmailAddress.change.hidden = Company Email Address
+companyEmailAddress.change.hidden = email Address
 
 companyPhoneNumber.title = companyPhoneNumber
 companyPhoneNumber.heading = companyPhoneNumber
