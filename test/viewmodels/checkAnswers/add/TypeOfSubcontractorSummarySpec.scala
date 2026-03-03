@@ -56,7 +56,7 @@ class TypeOfSubcontractorSummarySpec extends AnyFreeSpec with Matchers {
       actions should have size 1
 
       val changeAction = actions.head
-      changeAction.content.asHtml.toString    should include(messages("site.change"))
+      changeAction.content.asHtml.toString should include(messages("site.change"))
 
       // DTR-2951: Reset journey in NormalMode (not CheckMode)
       changeAction.href                     shouldBe routes.TypeOfSubcontractorController.onPageLoad(NormalMode).url

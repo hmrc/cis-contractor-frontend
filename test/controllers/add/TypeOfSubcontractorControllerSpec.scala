@@ -20,7 +20,7 @@ import base.SpecBase
 import controllers.routes
 import forms.add.TypeOfSubcontractorFormProvider
 import models.add.TypeOfSubcontractor
-import models.{CheckMode, NormalMode, UserAnswers}
+import models.{NormalMode, UserAnswers}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
