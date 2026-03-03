@@ -34,8 +34,9 @@ package controllers.add
 
 import com.google.inject.Inject
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
+import models.UserAnswers
 import models.add.ValidatedSubcontractor
-import pages.add.CheckYourAnswersSubmittedPage
+import pages.add.{ChangingTypeFromCyaPage, CheckYourAnswersSubmittedPage, HasSwitchedTypeFromCyaPage}
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -48,6 +49,7 @@ import viewmodels.govuk.summarylist.*
 import views.html.add.CheckYourAnswersView
 
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.Try
 
 class CheckYourAnswersController @Inject() (
   override val messagesApi: MessagesApi,
@@ -104,12 +106,19 @@ class CheckYourAnswersController @Inject() (
             subcontractorService
               .createAndUpdateSubcontractor(request.userAnswers)
               .flatMap { _ =>
+                val updatedUaTry: Try[UserAnswers] =
+                  for {
+                    ua1 <- request.userAnswers.set(CheckYourAnswersSubmittedPage, true)
+                    ua2 <- ua1.set(ChangingTypeFromCyaPage, false)
+                    ua3 <- ua2.set(HasSwitchedTypeFromCyaPage, false)
+                  } yield ua3
+
                 Future
-                  .fromTry(request.userAnswers.set(CheckYourAnswersSubmittedPage, true))
-                  .flatMap(updated => sessionRepository.set(updated).map(_ => ()))
-                  .map(_ => Redirect(controllers.add.routes.CheckYourAnswersController.onPageLoad()))
-              }
-              .recover { case t =>
+                  .fromTry(updatedUaTry)
+                  .flatMap { updatedUa =>
+                    sessionRepository.set(updatedUa).map(_ => Redirect(controllers.add.routes.CheckYourAnswersController.onPageLoad()))
+                  }
+              }.recover { case t =>
                 logger.error("[CheckYourAnswersController.onSubmit] Failed to create/update subcontractor", t)
                 Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
               }

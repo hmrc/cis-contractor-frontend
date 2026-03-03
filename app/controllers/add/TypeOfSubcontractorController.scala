@@ -20,7 +20,7 @@ import controllers.actions.*
 import forms.add.TypeOfSubcontractorFormProvider
 import models.{CheckMode, Mode, NormalMode}
 import navigation.Navigator
-import pages.add.TypeOfSubcontractorPage
+import pages.add.{ChangingTypeFromCyaPage, HasSwitchedTypeFromCyaPage, TypeOfSubcontractorPage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
@@ -58,22 +58,55 @@ class TypeOfSubcontractorController @Inject() (
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
-      form
-        .bindFromRequest()
-        .fold(
-          formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
-          value =>
-            val oldValue = request.userAnswers.get(TypeOfSubcontractorPage)
-            val newValue = value
+      form.bindFromRequest().fold(
+        formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
+        value => {
+          val oldValue = request.userAnswers.get(TypeOfSubcontractorPage)
+          val newValue = value
 
-            val shouldRestToNormalMode = mode == CheckMode && oldValue.exists(_ != newValue)
+          val changingFromCya = request.userAnswers.get(ChangingTypeFromCyaPage).contains(true)
+          val hasSwitchedType = request.userAnswers.get(HasSwitchedTypeFromCyaPage).contains(true)
 
-            val resolvedMode = if (shouldRestToNormalMode) NormalMode else mode
+          val isDifferentType = oldValue.exists(_ != newValue)
 
-            for {
-              updatedAnswers <- Future.fromTry(request.userAnswers.set(TypeOfSubcontractorPage, value))
-              _              <- sessionRepository.set(updatedAnswers)
-            } yield Redirect(navigator.nextPage(TypeOfSubcontractorPage, resolvedMode, updatedAnswers))
-        )
+          // Existing logic (keep)
+          val shouldResetToNormalModeBecauseDifferentType = mode == CheckMode && isDifferentType
+
+          // New: if they've already switched type, never allow check-mode shortcut back to CYA
+          val shouldForceNormalModeBecauseAlreadySwitched = mode == CheckMode && hasSwitchedType
+
+          val resolvedMode =
+            if (shouldResetToNormalModeBecauseDifferentType || shouldForceNormalModeBecauseAlreadySwitched) NormalMode else mode
+
+          val shouldClearFlagsBecauseNoChange =
+            mode == CheckMode && changingFromCya && !isDifferentType
+
+          val shouldMarkHasSwitched =
+            mode == CheckMode && changingFromCya && isDifferentType
+
+          for {
+            uaWithType <- Future.fromTry(request.userAnswers.set(TypeOfSubcontractorPage, value))
+
+            uaWithFlags <-
+              if (shouldClearFlagsBecauseNoChange) {
+                for {
+                  ua1 <- Future.fromTry(uaWithType.set(ChangingTypeFromCyaPage, false))
+                  ua2 <- Future.fromTry(ua1.set(HasSwitchedTypeFromCyaPage, false))
+                } yield ua2
+              } else if (shouldMarkHasSwitched) {
+                Future.fromTry(uaWithType.set(HasSwitchedTypeFromCyaPage, true))
+                // keep ChangingTypeFromCyaPage = true until CYA is reached again (optional)
+              } else {
+                Future.successful(uaWithType)
+              }
+
+            // IMPORTANT: keep your existing "clear data when type changes" behaviour here
+            // e.g. uaFinal = clearTypeSpecificData(oldValue, newValue, uaWithFlags)
+            // If cleanup already happens inside set(TypeOfSubcontractorPage, ...) via Page.cleanup, you don't need extra code.
+
+            _ <- sessionRepository.set(uaWithFlags)
+          } yield Redirect(navigator.nextPage(TypeOfSubcontractorPage, resolvedMode, uaWithFlags))
+        }
+      )
   }
 }

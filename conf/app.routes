@@ -15,6 +15,8 @@ GET         /there-is-a-problem                          controllers.JourneyReco
 GET         /add/check-your-answers                      controllers.add.CheckYourAnswersController.onPageLoad()
 POST        /add/check-your-answers                      controllers.add.CheckYourAnswersController.onSubmit()
 
+GET         /add/change-type-from-cya                    controllers.add.ChangeTypeFromCyaController.onPageLoad()
+
 GET         /account/sign-out-survey                     controllers.auth.AuthController.signOut()
 GET         /account/sign-out                            controllers.auth.AuthController.signOutNoSurvey()
 GET         /account/signed-out                          controllers.auth.SignedOutController.onPageLoad()
