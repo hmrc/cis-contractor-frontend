@@ -31,9 +31,8 @@ class TypeOfSubcontractorPageSpec extends PageBehaviours {
 
     beRemovable[TypeOfSubcontractor](TypeOfSubcontractorPage)
 
-    // TODO Add TrustSubcontractor
-
-    "cleanup: must remove all LimitedCompanySubcontractor, PartnershipSubcontractor and TrustSubcontractor answers when IndividualSoleTraderSubcontractor is selected" in {
+    // TODO Add TrustSubcontractor to cleanup after Trust Subcontractor is done
+    "cleanup: must remove all LimitedCompany, Partnership and Trust subcontractor answers when IndividualSoleTraderSubcontractor is selected" in {
       val userAnswers =
         emptyUserAnswers
           .set(NationalInsuranceNumberYesNoPage, true)
@@ -54,7 +53,7 @@ class TypeOfSubcontractorPageSpec extends PageBehaviours {
       updatedUserAnswers.get(PartnershipAddressYesNoPage) mustBe None
     }
 
-    "cleanup: must remove all IndividualSoleTraderSubcontractor, LimitedCompanySubcontractor, PartnershipSubcontractor and TrustSubcontractor answers when PartnershipSubcontractor is selected" in {
+    "cleanup: must remove all IndividualSoleTrader, LimitedCompany and Trust subcontractor answers when PartnershipSubcontractor is selected" in {
       val userAnswers =
         emptyUserAnswers
           .set(NationalInsuranceNumberYesNoPage, true)
@@ -74,6 +73,5 @@ class TypeOfSubcontractorPageSpec extends PageBehaviours {
       updatedUserAnswers.get(CompanyAddressYesNoPage) mustBe None
       updatedUserAnswers.get(PartnershipAddressYesNoPage) mustBe Some(true)
     }
-
   }
 }
