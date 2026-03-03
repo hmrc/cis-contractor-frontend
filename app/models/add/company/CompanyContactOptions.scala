@@ -16,31 +16,15 @@
 
 package models.add.company
 
-import models.{Enumerable, WithName}
+import models.contact.ContactOptions
 import play.api.i18n.Messages
-import uk.gov.hmrc.govukfrontend.views.Aliases.Text
 import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.RadioItem
 
-sealed trait CompanyContactOptions
+type CompanyContactOptions = ContactOptions
 
-object CompanyContactOptions extends Enumerable.Implicits {
+object CompanyContactOptions {
+  val values: Seq[CompanyContactOptions] = ContactOptions.values
 
-  case object Email extends WithName("email") with CompanyContactOptions
-  case object Phonenumber extends WithName("phoneNumber") with CompanyContactOptions
-
-  val values: Seq[CompanyContactOptions] = Seq(
-    Email,
-    Phonenumber
-  )
-
-  def options(implicit messages: Messages): Seq[RadioItem] = values.zipWithIndex.map { case (value, index) =>
-    RadioItem(
-      content = Text(messages(s"companyContactOptions.${value.toString}")),
-      value = Some(value.toString),
-      id = Some(s"value_$index")
-    )
-  }
-
-  implicit val enumerable: Enumerable[CompanyContactOptions] =
-    Enumerable(values.map(v => v.toString -> v): _*)
+  def options(implicit messages: Messages): Seq[RadioItem] =
+    ContactOptions.options("companyContactOptions")
 }
