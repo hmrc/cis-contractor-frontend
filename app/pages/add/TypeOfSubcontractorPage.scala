@@ -35,23 +35,15 @@ case object TypeOfSubcontractorPage extends QuestionPage[TypeOfSubcontractor] wi
       case Some(Individualorsoletrader) =>
         removePartnershipSubcontractor(ua)
           .flatMap(removeLimitedCompanySubcontractor)
-//          .flatMap(removeTrustSubcontractor)
 
       case Some(Limitedcompany) =>
         removeIndividualSoleTraderSubcontractor(ua)
           .flatMap(removePartnershipSubcontractor)
-//          .flatMap(removeTrustSubcontractor)
 
       case Some(Partnership) =>
         removeIndividualSoleTraderSubcontractor(ua)
           .flatMap(removeLimitedCompanySubcontractor)
-//          .flatMap(removeTrustSubcontractor)
-
-//      case Some(Trust) =>
-//        removeIndividualSoleTraderSubcontractor(ua)
-//          .flatMap(removeLimitedCompanySubcontractor)
-//          .flatMap(removePartnershipSubcontractor)
-
+        
       case _ =>
         super.cleanup(value, ua)
     }

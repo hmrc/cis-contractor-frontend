@@ -78,10 +78,4 @@ trait Cleanup {
       .flatMap(_.remove(PartnershipUniqueTaxpayerReferencePage))
       .flatMap(_.remove(PartnershipWorksReferenceNumberPage))
       .flatMap(_.remove(PartnershipWorksReferenceNumberYesNoPage))
-
-//  def removeTrustSubcontractor(userAnswers: UserAnswers): Try[UserAnswers] = {
-//    userAnswers
-//      .remove(AddressOfSubcontractorPage)
-//      .flatMap(_.remove(NationalInsuranceNumberYesNoPage))
-//  }
 }
