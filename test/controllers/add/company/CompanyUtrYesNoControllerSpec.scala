@@ -83,6 +83,31 @@ class CompanyUtrYesNoControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
+    "must redirect to the next page when valid data with value Yes is submitted" in {
+
+      val mockSessionRepository = mock[SessionRepository]
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+      val application =
+        applicationBuilder(userAnswers = Some(uaWithName))
+          .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, companyUtrYesNoRoute)
+            .withFormUrlEncodedBody(("value", "true"))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual
+          controllers.add.company.routes.CompanyUtrController
+            .onPageLoad(NormalMode)
+            .url
+      }
+    }
+
     "must redirect to the next page when valid data with value No is submitted" in {
 
       val mockSessionRepository = mock[SessionRepository]
@@ -106,7 +131,7 @@ class CompanyUtrYesNoControllerSpec extends SpecBase with MockitoSugar {
         status(result) mustEqual SEE_OTHER
         redirectLocation(
           result
-        ).value mustEqual controllers.add.company.routes.CompanyUtrYesNoController
+        ).value mustEqual controllers.add.company.routes.CompanyCrnYesNoController
           .onPageLoad(NormalMode)
           .url
       }

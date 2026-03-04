@@ -92,7 +92,7 @@ class Navigator @Inject() () {
     case CompanyAddressPage                        =>
       _ => controllers.add.company.routes.CompanyAddressController.onPageLoad(NormalMode)
     case CompanyUtrYesNoPage                       =>
-      _ => controllers.add.company.routes.CompanyUtrYesNoController.onPageLoad(NormalMode)
+      userAnswers => navigatorFromCompanyUtrYesNoPage(NormalMode)(userAnswers)
     case PartnershipMobileNumberPage               =>
       _ => controllers.add.partnership.routes.PartnershipMobileNumberController.onPageLoad(NormalMode)
     case PartnershipPhoneNumberPage                =>
@@ -131,7 +131,7 @@ class Navigator @Inject() () {
     case CompanyAddressYesNoPage                  =>
       _ => controllers.add.company.routes.CompanyAddressYesNoController.onPageLoad(CheckMode)
     case CompanyUtrYesNoPage                      =>
-      _ => controllers.add.company.routes.CompanyUtrYesNoController.onPageLoad(CheckMode)
+      userAnswers => navigatorFromCompanyUtrYesNoPage(CheckMode)(userAnswers)
     case _                                        => _ => controllers.add.routes.CheckYourAnswersController.onPageLoad()
   }
 
@@ -319,6 +319,15 @@ class Navigator @Inject() () {
       case (Some(false), CheckMode)  => controllers.add.routes.CheckYourAnswersController.onPageLoad()
       case (None, _)                 => routes.JourneyRecoveryController.onPageLoad()
     }
+  private def navigatorFromCompanyUtrYesNoPage(mode: Mode)(userAnswers: UserAnswers): Call =
+      (userAnswers.get(CompanyUtrYesNoPage), mode) match {
+        case (Some(true), _) =>
+          controllers.add.company.routes.CompanyUtrController.onPageLoad(mode)
+        case (Some(false), NormalMode) =>
+          controllers.add.company.routes.CompanyCrnYesNoController.onPageLoad(NormalMode)
+        case (Some(false), CheckMode) => controllers.add.routes.CheckYourAnswersController.onPageLoad()
+        case (None, _) => routes.JourneyRecoveryController.onPageLoad()
+      }
 
   private def navigatorFromPartnershipNominatedPartnerCrnYesNoPage(mode: Mode)(userAnswers: UserAnswers): Call =
     (userAnswers.get(PartnershipNominatedPartnerCrnYesNoPage), mode) match {

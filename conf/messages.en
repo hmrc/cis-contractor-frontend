@@ -546,9 +546,9 @@ companyMobileNumber.change.hidden = CompanyMobileNumber
 companyUtrYesNo.title = Do you know the Unique Taxpayer Reference for this company?
 companyUtrYesNo.heading = Do you know the Unique Taxpayer Reference for {0}?
 companyUtrYesNo.hint = This information will be used to verify the company as a subcontractor
-companyUtrYesNo.checkYourAnswersLabel = Unique Taxpayer Reference (UTR)
+companyUtrYesNo.checkYourAnswersLabel =  Add UTR?
 companyUtrYesNo.error.required = Select whether you know the Unique Taxpayer Reference (UTR) for this company
-companyUtrYesNo.change.hidden = unique taxpayer reference (UTR)
+companyUtrYesNo.change.hidden = UTR
 
 companyUtr.title = companyUtr
 companyUtr.heading = companyUtr
