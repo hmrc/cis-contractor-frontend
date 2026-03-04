@@ -608,6 +608,14 @@ class NavigatorSpec extends SpecBase {
         ) mustBe controllers.add.partnership.routes.PartnershipMobileNumberController.onPageLoad(NormalMode)
       }
 
+      "must go from a CompanyMobileNumberPage to next Page" in {
+        navigator.nextPage(
+          CompanyMobileNumberPage,
+          NormalMode,
+          UserAnswers("id")
+        ) mustBe controllers.add.partnership.routes.PartnershipPhoneNumberController.onPageLoad(NormalMode)
+      }
+
       "must go from a CompanyAddressYesNoPage to CompanyAddressYesNoPage" in {
         navigator.nextPage(
           CompanyAddressYesNoPage,
@@ -1094,6 +1102,14 @@ class NavigatorSpec extends SpecBase {
         ) mustBe CYA
       }
 
+      "must go from a CompanyMobileNumberPage to CompanyMobileNumberPage in CheckMode" in {
+        navigator.nextPage(
+          CompanyMobileNumberPage,
+          CheckMode,
+          emptyUserAnswers
+        ) mustBe controllers.add.company.routes.CompanyMobileNumberController.onPageLoad(CheckMode)
+      }
+      
       "must go from CompanyAddressYesNoPage to CompanyAddressYesNoPage in CheckMode" in {
         navigator.nextPage(
           CompanyAddressYesNoPage,
