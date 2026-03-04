@@ -539,8 +539,8 @@ companyPhoneNumber.hint = HMRC will never use this phone number to contact this 
 companyPhoneNumber.error.required = Enter a phone number
 companyPhoneNumber.error.invalid = Enter a valid phone number, like 01632 960 001. For international numbers include the country code.
 companyPhoneNumber.error.length = Enter a valid phone number, like 01632 960 001. For international numbers include the country code.
-companyPhoneNumber.checkYourAnswersLabel = companyPhoneNumber
-companyPhoneNumber.change.hidden = CompanyPhoneNumber
+companyPhoneNumber.checkYourAnswersLabel = Phone number
+companyPhoneNumber.change.hidden = phone number
 
 companyMobileNumber.title = companyMobileNumber
 companyMobileNumber.heading = companyMobileNumber
