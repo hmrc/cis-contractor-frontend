@@ -25,9 +25,9 @@ sealed trait ContactOptions
 
 object ContactOptions extends Enumerable.Implicits {
 
-  case object Email    extends WithName("email")     with ContactOptions
-  case object Phone    extends WithName("phone")     with ContactOptions
-  case object Mobile   extends WithName("mobile")    with ContactOptions
+  case object Email extends WithName("email") with ContactOptions
+  case object Phone extends WithName("phone") with ContactOptions
+  case object Mobile extends WithName("mobile") with ContactOptions
   case object NoDetails extends WithName("noDetails") with ContactOptions
 
   private case object Or extends ContactOptions
@@ -47,7 +47,7 @@ object ContactOptions extends Enumerable.Implicits {
           value = Some(value.toString),
           id = Some(s"value_$index")
         )
-      case (Or, _) =>
+      case (Or, _)                  =>
         RadioItem(divider = Some(messages(s"$messagePrefix.or")))
     }
 
