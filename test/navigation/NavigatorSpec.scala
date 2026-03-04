@@ -33,6 +33,7 @@ class NavigatorSpec extends SpecBase {
 
   private lazy val journeyRecovery = routes.JourneyRecoveryController.onPageLoad()
   private lazy val CYA             = controllers.add.routes.CheckYourAnswersController.onPageLoad()
+  private lazy val CompanyCYA      = controllers.add.company.routes.CompanyCheckYourAnswersController.onPageLoad()
 
   "Navigator" - {
 
@@ -669,6 +670,14 @@ class NavigatorSpec extends SpecBase {
           UserAnswers("id")
         ) mustBe controllers.add.company.routes.CompanyAddressYesNoController.onPageLoad(NormalMode)
       }
+
+      "must go from a CompanyUtrPage to CompanyUtrPage" in {
+        navigator.nextPage(
+          CompanyUtrPage,
+          NormalMode,
+          UserAnswers("id")
+        ) mustBe controllers.add.company.routes.CompanyUtrController.onPageLoad(NormalMode)
+      }
     }
 
     "in Check mode" - {
@@ -1208,6 +1217,14 @@ class NavigatorSpec extends SpecBase {
           CheckMode,
           emptyUserAnswers
         ) mustBe controllers.add.company.routes.CompanyAddressYesNoController.onPageLoad(CheckMode)
+      }
+
+      "must go from CompanyUtrPage to CompanyCYA in CheckMode" in {
+        navigator.nextPage(
+          CompanyUtrPage,
+          CheckMode,
+          emptyUserAnswers
+        ) mustBe CompanyCYA
       }
     }
 
