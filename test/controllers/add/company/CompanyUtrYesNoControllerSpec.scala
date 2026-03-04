@@ -20,13 +20,11 @@ import base.SpecBase
 import controllers.routes
 import forms.add.company.CompanyUtrYesNoFormProvider
 import models.{NormalMode, UserAnswers}
-import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.add.company.CompanyUtrYesNoPage
+import pages.add.company.{CompanyNamePage, CompanyUtrYesNoPage}
 import play.api.inject.bind
-import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import repositories.SessionRepository
@@ -36,18 +34,21 @@ import scala.concurrent.Future
 
 class CompanyUtrYesNoControllerSpec extends SpecBase with MockitoSugar {
 
-  def onwardRoute = Call("GET", "/foo")
+  private val companyName = "Test Company"
 
   val formProvider = new CompanyUtrYesNoFormProvider()
   val form         = formProvider()
 
   lazy val companyUtrYesNoRoute = controllers.add.company.routes.CompanyUtrYesNoController.onPageLoad(NormalMode).url
 
+  private def uaWithName: UserAnswers =
+    emptyUserAnswers.set(CompanyNamePage, companyName).success.value
+
   "CompanyUtrYesNo Controller" - {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(uaWithName)).build()
 
       running(application) {
         val request = FakeRequest(GET, companyUtrYesNoRoute)
@@ -57,13 +58,13 @@ class CompanyUtrYesNoControllerSpec extends SpecBase with MockitoSugar {
         val view = application.injector.instanceOf[CompanyUtrYesNoView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode, companyName)(request, messages(application)).toString
       }
     }
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = UserAnswers(userAnswersId).set(CompanyUtrYesNoPage, true).success.value
+      val userAnswers = uaWithName.set(CompanyUtrYesNoPage, true).success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
@@ -75,20 +76,22 @@ class CompanyUtrYesNoControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(true), NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill(true), NormalMode, companyName)(
+          request,
+          messages(application)
+        ).toString
       }
     }
 
-    "must redirect to the next page when valid data is submitted" in {
+    "must redirect to the next page when valid data with value No is submitted" in {
 
       val mockSessionRepository = mock[SessionRepository]
 
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
       val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        applicationBuilder(userAnswers = Some(uaWithName))
           .overrides(
-            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
             bind[SessionRepository].toInstance(mockSessionRepository)
           )
           .build()
@@ -96,18 +99,22 @@ class CompanyUtrYesNoControllerSpec extends SpecBase with MockitoSugar {
       running(application) {
         val request =
           FakeRequest(POST, companyUtrYesNoRoute)
-            .withFormUrlEncodedBody(("value", "true"))
+            .withFormUrlEncodedBody(("value", "false"))
 
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual onwardRoute.url
+        redirectLocation(
+          result
+        ).value mustEqual controllers.add.company.routes.CompanyUtrYesNoController
+          .onPageLoad(NormalMode)
+          .url
       }
     }
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(uaWithName)).build()
 
       running(application) {
         val request =
@@ -121,7 +128,10 @@ class CompanyUtrYesNoControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, NormalMode, companyName)(
+          request,
+          messages(application)
+        ).toString
       }
     }
 
@@ -152,6 +162,66 @@ class CompanyUtrYesNoControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must return a Bad Request and errors when no value is submitted" in {
+
+      val application = applicationBuilder(userAnswers = Some(uaWithName)).build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, companyUtrYesNoRoute)
+            .withFormUrlEncodedBody()
+
+        val form      = new CompanyUtrYesNoFormProvider()()
+        val boundForm = form.bind(Map.empty)
+
+        val view = application.injector.instanceOf[CompanyUtrYesNoView]
+
+        val result = route(application, request).value
+
+        status(result) mustEqual BAD_REQUEST
+        contentAsString(result) mustEqual view(boundForm, NormalMode, companyName)(
+          request,
+          messages(application)
+        ).toString
+
+        contentAsString(result) must include(
+          messages(application)("companyUtrYesNo.error.required")
+        )
+      }
+    }
+
+    "must redirect to JourneyRecovery if CompanyName is missing for a GET" in {
+
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+
+      running(application) {
+        val request = FakeRequest(GET, companyUtrYesNoRoute)
+        val result  = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController
+          .onPageLoad()
+          .url
+      }
+    }
+
+    "must redirect to JourneyRecovery if CompanyName is missing for a POST" in {
+
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+
+      running(application) {
+        val request = FakeRequest(POST, companyUtrYesNoRoute)
+          .withFormUrlEncodedBody(("value", "true"))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController
+          .onPageLoad()
+          .url
       }
     }
   }

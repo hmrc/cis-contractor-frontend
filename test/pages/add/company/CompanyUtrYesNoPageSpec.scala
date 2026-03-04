@@ -14,12 +14,18 @@
  * limitations under the License.
  */
 
-package pages.add
+package pages.add.company
 
-import pages.QuestionPage
-import play.api.libs.json.JsPath
+import pages.behaviours.PageBehaviours
 
-case object CheckYourAnswersSubmittedPage extends QuestionPage[Boolean] {
-  override def path: JsPath     = JsPath \ toString
-  override def toString: String = "checkYourAnswersSubmitted"
+class CompanyUtrYesNoPageSpec extends PageBehaviours {
+
+  "CompanyUtrYesNoPage" - {
+
+    beRetrievable[Boolean](CompanyUtrYesNoPage)
+
+    beSettable[Boolean](CompanyUtrYesNoPage)
+
+    beRemovable[Boolean](CompanyUtrYesNoPage)
+  }
 }
