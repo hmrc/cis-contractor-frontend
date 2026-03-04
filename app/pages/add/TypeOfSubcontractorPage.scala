@@ -43,7 +43,7 @@ case object TypeOfSubcontractorPage extends QuestionPage[TypeOfSubcontractor] wi
       case Some(Partnership) =>
         removeIndividualSoleTraderSubcontractor(ua)
           .flatMap(removeLimitedCompanySubcontractor)
-        
+
       case _ =>
         super.cleanup(value, ua)
     }
