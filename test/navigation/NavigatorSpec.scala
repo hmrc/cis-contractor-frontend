@@ -678,6 +678,14 @@ class NavigatorSpec extends SpecBase {
         ) mustBe controllers.add.company.routes.CompanyAddressYesNoController.onPageLoad(NormalMode)
       }
 
+      "must go from CompanyEmailAddressPage to CompanyEmailAddressController in NormalMode" in {
+        navigator.nextPage(
+          CompanyEmailAddressPage,
+          NormalMode,
+          emptyUserAnswers
+        ) mustBe controllers.add.company.routes.CompanyEmailAddressController.onPageLoad(NormalMode)
+      }
+
       "must go from CompanyUtrYesNo" - {
         "to next page when answer is Yes" in {
           navigator.nextPage(
@@ -704,13 +712,6 @@ class NavigatorSpec extends SpecBase {
             emptyUserAnswers
           ) mustBe journeyRecovery
         }
-        
-      "must go from CompanyEmailAddressPage to CompanyEmailAddressController in NormalMode" in {
-        navigator.nextPage(
-          CompanyEmailAddressPage,
-          NormalMode,
-          emptyUserAnswers
-        ) mustBe controllers.add.company.routes.CompanyEmailAddressController.onPageLoad(NormalMode)
       }
     }
 

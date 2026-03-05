@@ -42,13 +42,12 @@ trait StringFieldBehaviours extends FieldBehaviours {
     }
 
   def fieldWithRegexpWithGenerator(
-                                    form: Form[_],
-                                    fieldName: String,
-                                    regexp: String,
-                                    generator: Gen[String],
-                                    error: FormError
-                                  ): Unit =
-
+    form: Form[_],
+    fieldName: String,
+    regexp: String,
+    generator: Gen[String],
+    error: FormError
+  ): Unit =
     s"not bind strings which do not match $regexp" in
       forAll(generator) { string =>
         whenever(!string.matches(regexp) && string.nonEmpty) {
