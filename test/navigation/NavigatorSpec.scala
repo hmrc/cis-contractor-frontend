@@ -662,6 +662,24 @@ class NavigatorSpec extends SpecBase {
         }
       }
 
+      "must go from CompanyCrnYesNoPage" - {
+        "to next page when answer is Yes" in {
+          navigator.nextPage(
+            CompanyCrnYesNoPage,
+            NormalMode,
+            emptyUserAnswers.setOrException(CompanyCrnYesNoPage, true)
+          ) mustBe controllers.add.company.routes.CompanyCrnYesNoController.onPageLoad(NormalMode)
+        }
+
+        "to next page when answer is No" in {
+          navigator.nextPage(
+            CompanyCrnYesNoPage,
+            NormalMode,
+            emptyUserAnswers.setOrException(CompanyCrnYesNoPage, false)
+          ) mustBe controllers.add.company.routes.CompanyCrnYesNoController.onPageLoad(NormalMode)
+        }
+      }
+
       "must go from a CompanyAddressYesNoPage to CompanyAddressYesNoPage" in {
         navigator.nextPage(
           CompanyAddressYesNoPage,
@@ -1200,6 +1218,36 @@ class NavigatorSpec extends SpecBase {
           CheckMode,
           UserAnswers("id")
         ) mustBe CYA
+      }
+
+      "must go from CompanyCrnYesNoPage" - {
+        "to next page when answer is Yes" in {
+          val answers = UserAnswers(userAnswersId).set(CompanyCrnYesNoPage, true).success.value
+
+          navigator.nextPage(
+            CompanyCrnYesNoPage,
+            CheckMode,
+            answers
+          ) mustBe controllers.add.company.routes.CompanyCrnYesNoController.onPageLoad(CheckMode)
+        }
+
+        "to Partnership CyaPage when answer is No" in {
+          val answers = UserAnswers(userAnswersId).set(CompanyCrnYesNoPage, false).success.value
+
+          navigator.nextPage(
+            CompanyCrnYesNoPage,
+            CheckMode,
+            answers
+          ) mustBe controllers.add.routes.CheckYourAnswersController.onPageLoad()
+        }
+
+        "to JourneyRecoveryPage when answer is not present" in {
+          navigator.nextPage(
+            CompanyCrnYesNoPage,
+            CheckMode,
+            emptyUserAnswers
+          ) mustBe routes.JourneyRecoveryController.onPageLoad()
+        }
       }
 
       "must go from CompanyAddressYesNoPage to CompanyAddressYesNoPage in CheckMode" in {
