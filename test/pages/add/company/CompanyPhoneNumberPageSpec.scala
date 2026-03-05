@@ -14,18 +14,18 @@
  * limitations under the License.
  */
 
-package models.add.partnership
+package pages.add.company
 
-import models.contact.ContactOptions
-import play.api.i18n.Messages
-import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.RadioItem
+import pages.behaviours.PageBehaviours
 
-type PartnershipChooseContactDetails = ContactOptions
+class CompanyPhoneNumberPageSpec extends PageBehaviours {
 
-object PartnershipChooseContactDetails {
-  val values: Seq[PartnershipChooseContactDetails] = ContactOptions.values
+  "CompanyPhoneNumberPage" - {
 
-  def options(implicit messages: Messages): Seq[RadioItem] =
-    ContactOptions.options("partnershipChooseContactDetails")
+    beRetrievable[String](CompanyPhoneNumberPage)
 
+    beSettable[String](CompanyPhoneNumberPage)
+
+    beRemovable[String](CompanyPhoneNumberPage)
+  }
 }

@@ -515,12 +515,16 @@ companyAddress.country = Country
 companyAddress.country.error.required = Select a country
 
 companyContactOptions.title = What are the contact details for this company?
-companyContactOptions.heading = What are the contact details for this company?
+companyContactOptions.heading = What are the contact details for {0}?
+companyContactOptions.hint = Choose which method of contact you would like to add for this subcontractor. Contact details are only for your own records.
 companyContactOptions.email = Email address
-companyContactOptions.phoneNumber = Phone number
-companyContactOptions.checkYourAnswersLabel = What are the contact details for this company?
-companyContactOptions.error.required = Select companyContactOptions
-companyContactOptions.change.hidden = CompanyContactOptions
+companyContactOptions.phone = Phone number
+companyContactOptions.mobile = Mobile number
+companyContactOptions.or = or
+companyContactOptions.noDetails = Do not add any contact details for this subcontractor
+companyContactOptions.error.required = Select whether you want to add contact details for this company
+companyContactOptions.checkYourAnswersLabel = Contact details for company
+companyContactOptions.change.hidden = Contact details for company
 
 companyEmailAddress.title = companyEmailAddress
 companyEmailAddress.heading = companyEmailAddress
@@ -529,12 +533,14 @@ companyEmailAddress.error.required = Enter companyEmailAddress
 companyEmailAddress.error.length = CompanyEmailAddress must be 100 characters or less
 companyEmailAddress.change.hidden = CompanyEmailAddress
 
-companyPhoneNumber.title = companyPhoneNumber
-companyPhoneNumber.heading = companyPhoneNumber
-companyPhoneNumber.checkYourAnswersLabel = companyPhoneNumber
-companyPhoneNumber.error.required = Enter companyPhoneNumber
-companyPhoneNumber.error.length = CompanyPhoneNumber must be 100 characters or less
-companyPhoneNumber.change.hidden = CompanyPhoneNumber
+companyPhoneNumber.title = What is the phone number for this company?
+companyPhoneNumber.heading = What is the phone number for {0}?
+companyPhoneNumber.hint = HMRC will never use this phone number to contact this subcontractor
+companyPhoneNumber.error.required = Enter a phone number
+companyPhoneNumber.error.invalid = Enter a valid phone number, like 01632 960 001. For international numbers include the country code.
+companyPhoneNumber.error.length = Enter a valid phone number, like 01632 960 001. For international numbers include the country code.
+companyPhoneNumber.checkYourAnswersLabel = Phone number
+companyPhoneNumber.change.hidden = phone number
 
 companyMobileNumber.title = companyMobileNumber
 companyMobileNumber.heading = companyMobileNumber
