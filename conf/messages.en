@@ -533,12 +533,14 @@ companyEmailAddress.error.required = Enter companyEmailAddress
 companyEmailAddress.error.length = CompanyEmailAddress must be 100 characters or less
 companyEmailAddress.change.hidden = CompanyEmailAddress
 
-companyPhoneNumber.title = companyPhoneNumber
-companyPhoneNumber.heading = companyPhoneNumber
-companyPhoneNumber.checkYourAnswersLabel = companyPhoneNumber
-companyPhoneNumber.error.required = Enter companyPhoneNumber
-companyPhoneNumber.error.length = CompanyPhoneNumber must be 100 characters or less
-companyPhoneNumber.change.hidden = CompanyPhoneNumber
+companyPhoneNumber.title = What is the phone number for this company?
+companyPhoneNumber.heading = What is the phone number for {0}?
+companyPhoneNumber.hint = HMRC will never use this phone number to contact this subcontractor
+companyPhoneNumber.error.required = Enter a phone number
+companyPhoneNumber.error.invalid = Enter a valid phone number, like 01632 960 001. For international numbers include the country code.
+companyPhoneNumber.error.length = Enter a valid phone number, like 01632 960 001. For international numbers include the country code.
+companyPhoneNumber.checkYourAnswersLabel = Phone number
+companyPhoneNumber.change.hidden = phone number
 
 companyMobileNumber.title = What is the mobile number for this company?
 companyMobileNumber.heading = What is the mobile number for {0}?
