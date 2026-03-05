@@ -14,26 +14,18 @@
  * limitations under the License.
  */
 
-package forms.add.company
+package pages.add.company
 
-import forms.Validation
-import forms.mappings.Constants.MaxLength254
-import forms.mappings.Mappings
-import play.api.data.Form
+import pages.behaviours.PageBehaviours
 
-import javax.inject.Inject
+class CompanyEmailAddressPageSpec extends PageBehaviours {
 
-class CompanyEmailAddressFormProvider @Inject() extends Mappings {
+  "CompanyEmailAddressPage" - {
 
-  def apply(): Form[String] =
-    Form(
-      "value" -> text("companyEmailAddress.error.required")
-        .verifying(
-          firstError(
-            maxLength(MaxLength254, "companyEmailAddress.error.length"),
-            regexp(Validation.emailRegex, "companyEmailAddress.error.invalid")
-          )
-        )
-    )
-    
+    beRetrievable[String](CompanyEmailAddressPage)
+
+    beSettable[String](CompanyEmailAddressPage)
+
+    beRemovable[String](CompanyEmailAddressPage)
+  }
 }
