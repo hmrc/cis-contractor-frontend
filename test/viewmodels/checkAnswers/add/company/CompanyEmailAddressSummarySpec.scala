@@ -58,13 +58,13 @@ class CompanyEmailAddressSummarySpec extends AnyFreeSpec with Matchers {
 
       val changeAction       = actions.head
       val expectedChangeText = messages("site.change")
-      val expectedHref = routes.CompanyEmailAddressController
-          .onPageLoad(CheckMode)
-          .url
+      val expectedHref       = routes.CompanyEmailAddressController
+        .onPageLoad(CheckMode)
+        .url
       val expectedHiddenText = messages("companyEmailAddress.change.hidden")
 
-      changeAction.content.asHtml.toString should include(expectedChangeText)
-      changeAction.href shouldBe expectedHref
+      changeAction.content.asHtml.toString    should include(expectedChangeText)
+      changeAction.href                     shouldBe expectedHref
       changeAction.visuallyHiddenText.value shouldBe expectedHiddenText
     }
 

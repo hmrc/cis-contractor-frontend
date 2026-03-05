@@ -14,6 +14,8 @@
  * limitations under the License.
  *@
 
+@import viewmodels.LegendSize.Large
+
 @this(
     layout: templates.Layout,
     formHelper: FormWithCSRF,
@@ -35,7 +37,7 @@
         @govukRadios(
             RadiosViewModel.yesNo(
                 field = form("value"),
-                legend = LegendViewModel(messages("companyCrnYesNo.heading", companyName)).asPageHeading().withCssClass("govuk-fieldset__legend--l")
+                legend = LegendViewModel(messages("companyCrnYesNo.heading", companyName)).asPageHeading(Large)
             ).withHint(Hint(
                 content = Messages("companyCrnYesNo.hint"))
             )

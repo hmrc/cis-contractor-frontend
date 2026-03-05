@@ -60,7 +60,8 @@ class Navigator @Inject() () {
       _ => controllers.add.company.routes.CompanyAddressYesNoController.onPageLoad(NormalMode)
     case CompanyContactOptionsPage                 =>
       userAnswers => navigatorFromCompanyContactOptionsPage(NormalMode)(userAnswers)
-    case CompanyEmailAddressPage                   => _ => controllers.add.company.routes.CompanyEmailAddressController.onPageLoad(NormalMode)
+    case CompanyEmailAddressPage                   =>
+      _ => controllers.add.company.routes.CompanyEmailAddressController.onPageLoad(NormalMode)
     case PartnershipNamePage                       =>
       _ => controllers.add.partnership.routes.PartnershipHasUtrYesNoController.onPageLoad(NormalMode)
     case PartnershipHasUtrYesNoPage                => userAnswers => navigatorFromPartnershipHasUtrYesNoPage(NormalMode)(userAnswers)
@@ -101,7 +102,7 @@ class Navigator @Inject() () {
     case CompanyPhoneNumberPage                    =>
       _ => controllers.add.company.routes.CompanyPhoneNumberController.onPageLoad(NormalMode)
     case CompanyCrnYesNoPage                       =>
-      _ => controllers.add.company.routes.CompanyCrnYesNoController.onPageLoad(NormalMode)
+      userAnswers => navigatorFromCompanyCrnYesNoPage(NormalMode)(userAnswers)
     case _                                         => _ => routes.IndexController.onPageLoad()
   }
 
@@ -132,7 +133,7 @@ class Navigator @Inject() () {
       userAnswers => navigatorFromPartnershipNominatedPartnerUtrYesNoPage(CheckMode)(userAnswers)
     case CompanyAddressPage                       =>
       _ => controllers.add.company.routes.CompanyAddressController.onPageLoad(CheckMode)
-    case CompanyEmailAddressPage                       =>
+    case CompanyEmailAddressPage                  =>
       _ => controllers.add.company.routes.CompanyEmailAddressController.onPageLoad(CheckMode)
     case PartnershipMobileNumberPage              =>
       _ => controllers.add.partnership.routes.PartnershipMobileNumberController.onPageLoad(CheckMode)

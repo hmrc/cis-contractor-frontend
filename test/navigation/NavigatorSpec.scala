@@ -670,7 +670,7 @@ class NavigatorSpec extends SpecBase {
         ) mustBe controllers.add.company.routes.CompanyPhoneNumberController.onPageLoad(NormalMode)
       }
 
-      "must go from CompanyCrnYesNoPage" - {
+      "must go from CompanyCrnYesNo" - {
         "to next page when answer is Yes" in {
           navigator.nextPage(
             CompanyCrnYesNoPage,
@@ -685,6 +685,14 @@ class NavigatorSpec extends SpecBase {
             NormalMode,
             emptyUserAnswers.setOrException(CompanyCrnYesNoPage, false)
           ) mustBe controllers.add.company.routes.CompanyCrnYesNoController.onPageLoad(NormalMode)
+        }
+
+        "to JourneyRecoveryPage when answer is not present" in {
+          navigator.nextPage(
+            CompanyCrnYesNoPage,
+            NormalMode,
+            emptyUserAnswers
+          ) mustBe journeyRecovery
         }
       }
 

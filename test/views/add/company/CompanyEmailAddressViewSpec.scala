@@ -34,16 +34,16 @@ class CompanyEmailAddressViewSpec extends AnyWordSpec with Matchers with GuiceOn
   "CompanyEmailAddressView" should {
 
     "render the page with title, heading, input and submit button" in new Setup {
-      val companyName = "Test Company"
+      val companyName                 = "Test Company"
       val html: HtmlFormat.Appendable = view(form, NormalMode, companyName)
       val doc                         = org.jsoup.Jsoup.parse(html.toString())
 
       doc.select("title").text() must include(messages("companyEmailAddress.title"))
 
       val heading = doc.select("label.govuk-label")
-      heading.text() mustBe messages("companyEmailAddress.heading",companyName)
+      heading.text() mustBe messages("companyEmailAddress.heading", companyName)
 
-      doc.select("form").attr("action") mustBe  controllers.add.company.routes.CompanyEmailAddressController
+      doc.select("form").attr("action") mustBe controllers.add.company.routes.CompanyEmailAddressController
         .onSubmit(NormalMode)
         .url
 
@@ -57,8 +57,8 @@ class CompanyEmailAddressViewSpec extends AnyWordSpec with Matchers with GuiceOn
         form.withError("value", "companyEmailAddress.error.required")
 
       val companyName = "Test Company"
-      val html = view(errorForm, NormalMode, companyName)
-      val doc  = org.jsoup.Jsoup.parse(html.toString())
+      val html        = view(errorForm, NormalMode, companyName)
+      val doc         = org.jsoup.Jsoup.parse(html.toString())
 
       val summary = doc.select(".govuk-error-summary")
       summary.text() must include(messages("companyEmailAddress.error.required"))

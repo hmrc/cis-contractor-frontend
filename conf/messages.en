@@ -568,8 +568,8 @@ companyCrnYesNo.title = Does this company have a company registration number?
 companyCrnYesNo.heading = Does {0} have a company registration number?
 companyCrnYesNo.hint = This information will be used to verify the company as a subcontractor
 companyCrnYesNo.error.required = Select whether this company has a registration number
-companyCrnYesNo.checkYourAnswersLabel = company CrnYesNo
-companyCrnYesNo.change.hidden = Company CrnYesNo
+companyCrnYesNo.checkYourAnswersLabel = Add company registration number?
+companyCrnYesNo.change.hidden = add company registration number
 
 companyCrn.title = companyCrn
 companyCrn.heading = companyCrn
