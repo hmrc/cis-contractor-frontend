@@ -60,6 +60,7 @@ class Navigator @Inject() () {
       _ => controllers.add.company.routes.CompanyAddressYesNoController.onPageLoad(NormalMode)
     case CompanyContactOptionsPage                 =>
       userAnswers => navigatorFromCompanyContactOptionsPage(NormalMode)(userAnswers)
+    case CompanyEmailAddressPage                   => _ => controllers.add.company.routes.CompanyEmailAddressController.onPageLoad(NormalMode)
     case PartnershipNamePage                       =>
       _ => controllers.add.partnership.routes.PartnershipHasUtrYesNoController.onPageLoad(NormalMode)
     case PartnershipHasUtrYesNoPage                => userAnswers => navigatorFromPartnershipHasUtrYesNoPage(NormalMode)(userAnswers)
@@ -99,7 +100,7 @@ class Navigator @Inject() () {
       _ => controllers.add.partnership.routes.PartnershipMobileNumberController.onPageLoad(NormalMode)
     case PartnershipPhoneNumberPage                =>
       _ => controllers.add.partnership.routes.PartnershipPhoneNumberController.onPageLoad(NormalMode)
-    case CompanyPhoneNumberPage                   =>
+    case CompanyPhoneNumberPage                    =>
       _ => controllers.add.company.routes.CompanyPhoneNumberController.onPageLoad(NormalMode)
     case _                                         => _ => routes.IndexController.onPageLoad()
   }
@@ -130,6 +131,8 @@ class Navigator @Inject() () {
       userAnswers => navigatorFromPartnershipNominatedPartnerUtrYesNoPage(CheckMode)(userAnswers)
     case CompanyAddressPage                       =>
       _ => controllers.add.company.routes.CompanyAddressController.onPageLoad(CheckMode)
+    case CompanyEmailAddressPage                       =>
+      _ => controllers.add.company.routes.CompanyEmailAddressController.onPageLoad(CheckMode)
     case PartnershipMobileNumberPage              =>
       _ => controllers.add.partnership.routes.PartnershipMobileNumberController.onPageLoad(CheckMode)
     case PartnershipPhoneNumberPage               => _ => controllers.add.routes.CheckYourAnswersController.onPageLoad()
