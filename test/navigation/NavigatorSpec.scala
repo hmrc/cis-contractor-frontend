@@ -662,6 +662,14 @@ class NavigatorSpec extends SpecBase {
         }
       }
 
+      "must go from a CompanyPhoneNumberPage to next Page" in {
+        navigator.nextPage(
+          CompanyPhoneNumberPage,
+          NormalMode,
+          UserAnswers("id")
+        ) mustBe controllers.add.company.routes.CompanyPhoneNumberController.onPageLoad(NormalMode)
+      }
+
       "must go from CompanyCrnYesNoPage" - {
         "to next page when answer is Yes" in {
           navigator.nextPage(
@@ -686,6 +694,14 @@ class NavigatorSpec extends SpecBase {
           NormalMode,
           UserAnswers("id")
         ) mustBe controllers.add.company.routes.CompanyAddressYesNoController.onPageLoad(NormalMode)
+      }
+
+      "must go from CompanyEmailAddressPage to CompanyEmailAddressController in NormalMode" in {
+        navigator.nextPage(
+          CompanyEmailAddressPage,
+          NormalMode,
+          emptyUserAnswers
+        ) mustBe controllers.add.company.routes.CompanyEmailAddressController.onPageLoad(NormalMode)
       }
     }
 
@@ -1150,6 +1166,14 @@ class NavigatorSpec extends SpecBase {
         ) mustBe controllers.add.company.routes.CompanyAddressController.onPageLoad(CheckMode)
       }
 
+      "must go from CompanyEmailAddressPage to CompanyEmailAddressPage in CheckMode" in {
+        navigator.nextPage(
+          CompanyEmailAddressPage,
+          CheckMode,
+          emptyUserAnswers
+        ) mustBe controllers.add.company.routes.CompanyEmailAddressController.onPageLoad(CheckMode)
+      }
+
       "must go from a PartnershipMobileNumberPage to PartnershipMobileNumberPage in CheckMode" in {
         navigator.nextPage(
           PartnershipMobileNumberPage,
@@ -1218,6 +1242,14 @@ class NavigatorSpec extends SpecBase {
           CheckMode,
           UserAnswers("id")
         ) mustBe CYA
+      }
+
+      "must go from a CompanyPhoneNumberPage to CompanyPhoneNumberPage in CheckMode" in {
+        navigator.nextPage(
+          CompanyPhoneNumberPage,
+          CheckMode,
+          emptyUserAnswers
+        ) mustBe controllers.add.company.routes.CompanyPhoneNumberController.onPageLoad(CheckMode)
       }
 
       "must go from CompanyCrnYesNoPage" - {

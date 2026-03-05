@@ -220,15 +220,15 @@ POST       /add/company/choose-contact-details                          controll
 GET        /add/company/change-choose-contact-details                   controllers.add.company.CompanyContactOptionsController.onPageLoad(mode: Mode = CheckMode)
 POST       /add/company/change-choose-contact-details                   controllers.add.company.CompanyContactOptionsController.onSubmit(mode: Mode = CheckMode)
 
-GET        /companyEmailAddress                         controllers.add.company.CompanyEmailAddressController.onPageLoad(mode: Mode = NormalMode)
-POST       /companyEmailAddress                         controllers.add.company.CompanyEmailAddressController.onSubmit(mode: Mode = NormalMode)
-GET        /changeCompanyEmailAddress                   controllers.add.company.CompanyEmailAddressController.onPageLoad(mode: Mode = CheckMode)
-POST       /changeCompanyEmailAddress                   controllers.add.company.CompanyEmailAddressController.onSubmit(mode: Mode = CheckMode)
+GET        /add/company/email-address                   controllers.add.company.CompanyEmailAddressController.onPageLoad(mode: Mode = NormalMode)
+POST       /add/company/email-address                   controllers.add.company.CompanyEmailAddressController.onSubmit(mode: Mode = NormalMode)
+GET        /add/company/change-email-address            controllers.add.company.CompanyEmailAddressController.onPageLoad(mode: Mode = CheckMode)
+POST       /add/company/change-email-address            controllers.add.company.CompanyEmailAddressController.onSubmit(mode: Mode = CheckMode)
 
-GET        /companyPhoneNumber                          controllers.add.company.CompanyPhoneNumberController.onPageLoad(mode: Mode = NormalMode)
-POST       /companyPhoneNumber                          controllers.add.company.CompanyPhoneNumberController.onSubmit(mode: Mode = NormalMode)
-GET        /changeCompanyPhoneNumber                    controllers.add.company.CompanyPhoneNumberController.onPageLoad(mode: Mode = CheckMode)
-POST       /changeCompanyPhoneNumber                    controllers.add.company.CompanyPhoneNumberController.onSubmit(mode: Mode = CheckMode)
+GET        /add/company/phone-number                            controllers.add.company.CompanyPhoneNumberController.onPageLoad(mode: Mode = NormalMode)
+POST       /add/company/phone-number                            controllers.add.company.CompanyPhoneNumberController.onSubmit(mode: Mode = NormalMode)
+GET        /add/company/change-phone-number                     controllers.add.company.CompanyPhoneNumberController.onPageLoad(mode: Mode = CheckMode)
+POST       /add/company/change-phone-number                     controllers.add.company.CompanyPhoneNumberController.onSubmit(mode: Mode = CheckMode)
 
 GET        /companyMobileNumber                         controllers.add.company.CompanyMobileNumberController.onPageLoad(mode: Mode = NormalMode)
 POST       /companyMobileNumber                         controllers.add.company.CompanyMobileNumberController.onSubmit(mode: Mode = NormalMode)
