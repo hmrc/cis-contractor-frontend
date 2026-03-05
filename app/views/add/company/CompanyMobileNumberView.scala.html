@@ -42,6 +42,9 @@
             )
             .withHint(HintViewModel(messages("companyMobileNumber.hintText")))
             .withWidth(Full)
+            .withInputType("tel")
+            .withSpellcheck(false)
+            .withAutocomplete("tel")
         )
 
         @govukButton(
