@@ -685,6 +685,34 @@ class NavigatorSpec extends SpecBase {
           emptyUserAnswers
         ) mustBe controllers.add.company.routes.CompanyEmailAddressController.onPageLoad(NormalMode)
       }
+
+      "must go from CompanyUtrYesNo" - {
+        "to next page when answer is Yes" in {
+          navigator.nextPage(
+            CompanyUtrYesNoPage,
+            NormalMode,
+            emptyUserAnswers.setOrException(CompanyUtrYesNoPage, true)
+          ) mustBe controllers.add.company.routes.CompanyUtrController
+            .onPageLoad(NormalMode)
+        }
+
+        "to next page when answer is No" in {
+          navigator.nextPage(
+            CompanyUtrYesNoPage,
+            NormalMode,
+            emptyUserAnswers.setOrException(CompanyUtrYesNoPage, false)
+          ) mustBe controllers.add.company.routes.CompanyCrnYesNoController
+            .onPageLoad(NormalMode)
+        }
+
+        "to JourneyRecoveryPage when answer is not present" in {
+          navigator.nextPage(
+            CompanyUtrYesNoPage,
+            NormalMode,
+            emptyUserAnswers
+          ) mustBe journeyRecovery
+        }
+      }
     }
 
     "in Check mode" - {
@@ -1240,6 +1268,37 @@ class NavigatorSpec extends SpecBase {
           CheckMode,
           emptyUserAnswers
         ) mustBe controllers.add.company.routes.CompanyAddressYesNoController.onPageLoad(CheckMode)
+      }
+
+      "must go from CompanyUtrYesNo" - {
+        "to next page when answer is Yes" in {
+          val answers = UserAnswers(userAnswersId).set(CompanyUtrYesNoPage, true).success.value
+
+          navigator.nextPage(
+            CompanyUtrYesNoPage,
+            CheckMode,
+            answers
+          ) mustBe controllers.add.company.routes.CompanyUtrController
+            .onPageLoad(CheckMode)
+        }
+
+        "to Company CyaPage when answer is No" in {
+          val answers = UserAnswers(userAnswersId).set(CompanyUtrYesNoPage, false).success.value
+
+          navigator.nextPage(
+            CompanyUtrYesNoPage,
+            CheckMode,
+            answers
+          ) mustBe CYA
+        }
+
+        "to JourneyRecoveryPage when answer is not present" in {
+          navigator.nextPage(
+            CompanyUtrYesNoPage,
+            CheckMode,
+            emptyUserAnswers
+          ) mustBe routes.JourneyRecoveryController.onPageLoad()
+        }
       }
     }
 

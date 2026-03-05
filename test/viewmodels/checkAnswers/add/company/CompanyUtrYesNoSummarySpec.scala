@@ -16,41 +16,42 @@
 
 package viewmodels.checkAnswers.add.company
 
-import controllers.add.company.routes
 import models.{CheckMode, UserAnswers}
 import org.scalatest.OptionValues.convertOptionToValuable
 import org.scalatest.TryValues.convertTryToSuccessOrFailure
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.should.Matchers
-import pages.add.company.CompanyEmailAddressPage
+import pages.add.company.CompanyUtrYesNoPage
 import play.api.i18n.Messages
 import play.api.test.Helpers.stubMessages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.*
 
-class CompanyEmailAddressSummarySpec extends AnyFreeSpec with Matchers {
+class CompanyUtrYesNoSummarySpec extends AnyFreeSpec with Matchers {
 
   implicit val messages: Messages = stubMessages()
 
-  "CompanyEmailAddressSummary.row" - {
+  "CompanyUtrYesNoSummary.row" - {
 
-    "must return a SummaryListRow when the answer exists" in {
+    "must return a SummaryListRow with 'Yes' when the answer is true" in {
 
-      val answers =
-        UserAnswers("test-id")
-          .set(CompanyEmailAddressPage, "test@example.com")
-          .success
-          .value
+      val answers = UserAnswers("test-id")
+        .set(CompanyUtrYesNoPage, true)
+        .success
+        .value
 
-      val maybeRow = CompanyEmailAddressSummary.row(answers)
+      val maybeRow: Option[SummaryListRow] =
+        CompanyUtrYesNoSummary.row(answers)
 
       maybeRow shouldBe defined
 
       val row = maybeRow.value
 
-      val expectedKeyText = messages("companyEmailAddress.checkYourAnswersLabel")
+      val expectedKeyText =
+        messages("companyUtrYesNo.checkYourAnswersLabel")
       row.key.content.asHtml.toString should include(expectedKeyText)
 
-      row.value.content.asHtml.toString should include("test@example.com")
+      val expectedValue = messages("site.yes")
+      row.value.content.asHtml.toString should include(expectedValue)
 
       row.actions shouldBe defined
       val actions = row.actions.value.items
@@ -58,21 +59,41 @@ class CompanyEmailAddressSummarySpec extends AnyFreeSpec with Matchers {
 
       val changeAction       = actions.head
       val expectedChangeText = messages("site.change")
-      val expectedHref       = routes.CompanyEmailAddressController
-        .onPageLoad(CheckMode)
-        .url
-      val expectedHiddenText = messages("companyEmailAddress.change.hidden")
+      val expectedHref       =
+        controllers.add.company.routes.CompanyUtrYesNoController
+          .onPageLoad(CheckMode)
+          .url
+      val expectedHiddenText =
+        messages("companyUtrYesNo.change.hidden")
 
       changeAction.content.asHtml.toString    should include(expectedChangeText)
       changeAction.href                     shouldBe expectedHref
       changeAction.visuallyHiddenText.value shouldBe expectedHiddenText
     }
 
+    "must return a SummaryListRow with 'No' when the answer is false" in {
+
+      val answers = UserAnswers("test-id")
+        .set(CompanyUtrYesNoPage, false)
+        .success
+        .value
+
+      val maybeRow =
+        CompanyUtrYesNoSummary.row(answers)
+
+      maybeRow shouldBe defined
+
+      val row           = maybeRow.value
+      val expectedValue = messages("site.no")
+
+      row.value.content.asHtml.toString should include(expectedValue)
+    }
+
     "must return None when the answer does not exist" in {
 
       val answers = UserAnswers("test-id")
 
-      CompanyEmailAddressSummary.row(answers) shouldBe None
+      CompanyUtrYesNoSummary.row(answers) shouldBe None
     }
   }
 }

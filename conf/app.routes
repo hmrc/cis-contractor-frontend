@@ -235,10 +235,10 @@ POST       /companyMobileNumber                         controllers.add.company.
 GET        /changeCompanyMobileNumber                   controllers.add.company.CompanyMobileNumberController.onPageLoad(mode: Mode = CheckMode)
 POST       /changeCompanyMobileNumber                   controllers.add.company.CompanyMobileNumberController.onSubmit(mode: Mode = CheckMode)
 
-GET        /companyUtrYesNo                             controllers.add.company.CompanyUtrYesNoController.onPageLoad(mode: Mode = NormalMode)
-POST       /companyUtrYesNo                             controllers.add.company.CompanyUtrYesNoController.onSubmit(mode: Mode = NormalMode)
-GET        /changeCompanyUtrYesNo                       controllers.add.company.CompanyUtrYesNoController.onPageLoad(mode: Mode = CheckMode)
-POST       /changeCompanyUtrYesNo                       controllers.add.company.CompanyUtrYesNoController.onSubmit(mode: Mode = CheckMode)
+GET        /add/company/company-has-utr                           controllers.add.company.CompanyUtrYesNoController.onPageLoad(mode: Mode = NormalMode)
+POST       /add/company/company-has-utr                          controllers.add.company.CompanyUtrYesNoController.onSubmit(mode: Mode = NormalMode)
+GET        /add/company/change-company-has-utr                       controllers.add.company.CompanyUtrYesNoController.onPageLoad(mode: Mode = CheckMode)
+POST       /add/company/change-company-has-utr                       controllers.add.company.CompanyUtrYesNoController.onSubmit(mode: Mode = CheckMode)
 
 GET        /companyUtr                                  controllers.add.company.CompanyUtrController.onPageLoad(mode: Mode = NormalMode)
 POST       /companyUtr                                  controllers.add.company.CompanyUtrController.onSubmit(mode: Mode = NormalMode)
