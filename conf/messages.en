@@ -581,12 +581,14 @@ companyWorksReferenceYesNo.checkYourAnswersLabel = companyWorksReferenceYesNo
 companyWorksReferenceYesNo.error.required = Select yes if companyWorksReferenceYesNo
 companyWorksReferenceYesNo.change.hidden = CompanyWorksReferenceYesNo
 
-companyWorksReference.title = companyWorksReference
-companyWorksReference.heading = companyWorksReference
-companyWorksReference.checkYourAnswersLabel = companyWorksReference
-companyWorksReference.error.required = Enter companyWorksReference
-companyWorksReference.error.length = CompanyWorksReference must be 100 characters or less
-companyWorksReference.change.hidden = CompanyWorksReference
+companyWorksReference.title = What is the works reference number associated with this company?
+companyWorksReference.heading = What is the works reference number associated with {0}?
+companyWorksReference.hintText = This is unique to the construction work or project. You may have received it from the contractor.
+companyWorksReference.checkYourAnswersLabel = Works Reference
+companyWorksReference.error.required = Enter a works reference number
+companyWorksReference.error.invalid = Enter a valid works reference number
+companyWorksReference.error.length = Enter a works reference number, up to 20 characters
+companyWorksReference.change.hidden = works Reference
 
 companyCheckYourAnswers.title = companyCheckYourAnswers
 companyCheckYourAnswers.heading = companyCheckYourAnswers
