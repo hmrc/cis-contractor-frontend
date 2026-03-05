@@ -34,6 +34,5 @@ class CompanyPhoneNumberFormProvider @Inject() extends Mappings {
             maxLength(Constants.MaxLength35, "companyPhoneNumber.error.length")
           )
         )
-
     )
 }
