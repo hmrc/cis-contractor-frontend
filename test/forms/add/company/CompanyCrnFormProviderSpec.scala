@@ -25,15 +25,13 @@ class CompanyCrnFormProviderSpec extends StringFieldBehaviours {
   val lengthKey   = "companyCrn.error.length"
   val invalidKey  = "companyCrn.error.invalid"
 
-  val companyRegNumberRegex = """(?i)^(?:[A-Z]{2}\d{1,6}|\d{1,8})$"""
+  val companyRegNumberRegex = """(?i)^(?:[A-Z]{2}\d{6}|\d{8})$"""
 
   val validCrn: Seq[String] = Seq(
     "AC012345",
     "ac012345",
     "AC 012 345",
-    "AB1",
     "ZZ999999",
-    "123",
     "00000001",
     "12345678",
     "12 34 56 78"
@@ -96,11 +94,27 @@ class CompanyCrnFormProviderSpec extends StringFieldBehaviours {
       }
     }
 
+    "must display error when too short (less than 8 chars ignoring spaces)" in {
+      val tooShortCrn = Seq(
+        "0",
+        "0123456",
+        "AB",
+        "A B 01234",
+        "12   34 "
+      )
+
+      tooShortCrn.foreach { crn =>
+        val result = form.bind(Map(fieldName -> crn))
+        result.errors must contain(
+          FormError(fieldName, invalidKey, Seq(companyRegNumberRegex))
+        )
+      }
+    }
+
     "normalise the value by removing spaces and uppercasing" in {
       val result = form.bind(Map(fieldName -> " a  c 0123 45     "))
       result.hasErrors mustBe false
       result.value.value mustBe "AC012345"
     }
-
   }
 }
