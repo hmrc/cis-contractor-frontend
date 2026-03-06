@@ -565,11 +565,12 @@ companyUtr.error.required = Enter companyUtr
 companyUtr.error.length = CompanyUtr must be 100 characters or less
 companyUtr.change.hidden = CompanyUtr
 
-companyCrnYesNo.title = companyCrnYesNo
-companyCrnYesNo.heading = companyCrnYesNo
-companyCrnYesNo.checkYourAnswersLabel = companyCrnYesNo
-companyCrnYesNo.error.required = Select yes if companyCrnYesNo
-companyCrnYesNo.change.hidden = CompanyCrnYesNo
+companyCrnYesNo.title = Does this company have a company registration number?
+companyCrnYesNo.heading = Does {0} have a company registration number?
+companyCrnYesNo.hint = This information will be used to verify the company as a subcontractor
+companyCrnYesNo.error.required = Select whether this company has a registration number
+companyCrnYesNo.checkYourAnswersLabel = Add company registration number?
+companyCrnYesNo.change.hidden = add company registration number
 
 companyCrn.title = companyCrn
 companyCrn.heading = companyCrn

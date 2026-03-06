@@ -20,13 +20,11 @@ import base.SpecBase
 import controllers.routes
 import forms.add.company.CompanyCrnYesNoFormProvider
 import models.{NormalMode, UserAnswers}
-import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.add.company.CompanyCrnYesNoPage
+import pages.add.company.{CompanyCrnYesNoPage, CompanyNamePage}
 import play.api.inject.bind
-import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import repositories.SessionRepository
@@ -36,18 +34,22 @@ import scala.concurrent.Future
 
 class CompanyCrnYesNoControllerSpec extends SpecBase with MockitoSugar {
 
-  def onwardRoute = Call("GET", "/foo")
+  private val companyName = "Test CompanyName"
 
-  val formProvider = new CompanyCrnYesNoFormProvider()
-  val form         = formProvider()
+  private val formProvider = new CompanyCrnYesNoFormProvider()
+  private val form         = formProvider()
 
-  lazy val companyCrnYesNoRoute = controllers.add.company.routes.CompanyCrnYesNoController.onPageLoad(NormalMode).url
+  private lazy val companyCrnYesNoRoute =
+    controllers.add.company.routes.CompanyCrnYesNoController.onPageLoad(NormalMode).url
+
+  private def uaWithName: UserAnswers =
+    emptyUserAnswers.set(CompanyNamePage, companyName).success.value
 
   "CompanyCrnYesNo Controller" - {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(uaWithName)).build()
 
       running(application) {
         val request = FakeRequest(GET, companyCrnYesNoRoute)
@@ -57,13 +59,16 @@ class CompanyCrnYesNoControllerSpec extends SpecBase with MockitoSugar {
         val view = application.injector.instanceOf[CompanyCrnYesNoView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode, companyName)(
+          request,
+          messages(application)
+        ).toString
       }
     }
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = UserAnswers(userAnswersId).set(CompanyCrnYesNoPage, true).success.value
+      val userAnswers = uaWithName.set(CompanyCrnYesNoPage, true).success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
@@ -75,20 +80,22 @@ class CompanyCrnYesNoControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(true), NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill(true), NormalMode, companyName)(
+          request,
+          messages(application)
+        ).toString
       }
     }
 
-    "must redirect to the next page when valid data is submitted" in {
+    "must redirect to the next page when valid data with value Yes is submitted" in {
 
       val mockSessionRepository = mock[SessionRepository]
 
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
       val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        applicationBuilder(userAnswers = Some(uaWithName))
           .overrides(
-            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
             bind[SessionRepository].toInstance(mockSessionRepository)
           )
           .build()
@@ -101,13 +108,46 @@ class CompanyCrnYesNoControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual onwardRoute.url
+        redirectLocation(
+          result
+        ).value mustEqual controllers.add.company.routes.CompanyCrnYesNoController
+          .onPageLoad(NormalMode)
+          .url
       }
     }
 
-    "must return a Bad Request and errors when invalid data is submitted" in {
+    "must redirect to the next page when valid data with value No is submitted" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val mockSessionRepository = mock[SessionRepository]
+
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+      val application =
+        applicationBuilder(userAnswers = Some(uaWithName))
+          .overrides(
+            bind[SessionRepository].toInstance(mockSessionRepository)
+          )
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, companyCrnYesNoRoute)
+            .withFormUrlEncodedBody(("value", "false"))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(
+          result
+        ).value mustEqual controllers.add.company.routes.CompanyCrnYesNoController
+          .onPageLoad(NormalMode)
+          .url
+      }
+    }
+
+    "must return a Bad Request and errors when invalid data is submitted (name present)" in {
+
+      val application = applicationBuilder(userAnswers = Some(uaWithName)).build()
 
       running(application) {
         val request =
@@ -121,7 +161,10 @@ class CompanyCrnYesNoControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, NormalMode, companyName)(
+          request,
+          messages(application)
+        ).toString
       }
     }
 
@@ -154,5 +197,66 @@ class CompanyCrnYesNoControllerSpec extends SpecBase with MockitoSugar {
         redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
       }
     }
+
+    "must return a Bad Request and errors when no value is submitted" in {
+
+      val application = applicationBuilder(userAnswers = Some(uaWithName)).build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, companyCrnYesNoRoute)
+            .withFormUrlEncodedBody()
+
+        val form      = new CompanyCrnYesNoFormProvider()()
+        val boundForm = form.bind(Map.empty)
+
+        val view = application.injector.instanceOf[CompanyCrnYesNoView]
+
+        val result = route(application, request).value
+
+        status(result) mustEqual BAD_REQUEST
+        contentAsString(result) mustEqual view(boundForm, NormalMode, companyName)(
+          request,
+          messages(application)
+        ).toString
+
+        contentAsString(result) must include(
+          messages(application)("companyCrnYesNo.error.required")
+        )
+      }
+    }
+
+    "must redirect to JourneyRecovery if companyName is missing for a GET" in {
+
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+
+      running(application) {
+        val request = FakeRequest(GET, companyCrnYesNoRoute)
+        val result  = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController
+          .onPageLoad()
+          .url
+      }
+    }
+
+    "must redirect to JourneyRecovery if companyName is missing for a POST" in {
+
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+
+      running(application) {
+        val request = FakeRequest(POST, companyCrnYesNoRoute)
+          .withFormUrlEncodedBody(("value", "true"))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController
+          .onPageLoad()
+          .url
+      }
+    }
+
   }
 }
