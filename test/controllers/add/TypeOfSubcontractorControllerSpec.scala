@@ -35,7 +35,8 @@ import scala.concurrent.Future
 
 class TypeOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
 
-  lazy val subcontractorTypesRoute = controllers.add.routes.TypeOfSubcontractorController.onPageLoad(NormalMode).url
+  private lazy val subcontractorTypesRoute =
+    controllers.add.routes.TypeOfSubcontractorController.onPageLoad(NormalMode).url
 
   val formProvider = new TypeOfSubcontractorFormProvider()
   val form         = formProvider()
@@ -225,6 +226,5 @@ class TypeOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
         contentAsString(result) must include(messages(application)("typeOfSubcontractor.error.required"))
       }
     }
-
   }
 }
