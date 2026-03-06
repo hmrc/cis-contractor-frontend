@@ -41,7 +41,9 @@ class CompanyCrnFormProviderSpec extends StringFieldBehaviours {
   val invalidCrn: Seq[String] = Seq(
     "AC01-234",
     "AC01£345",
-    "12AB3456"
+    "12AB3456",
+    "12  AB  3456",
+    "  12AB3456  "
   )
 
   val form = new CompanyCrnFormProvider()()
