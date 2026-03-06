@@ -34,7 +34,8 @@ class PartnershipNominatedPartnerCrnFormProviderSpec extends AnyFreeSpec with Ma
         "ZZ999999",
         "00000001",
         "12345678",
-        "12 34 56 78"
+        "12 34 56 78",
+        "  12345678  "
       )
 
       valid.foreach { v =>
@@ -54,7 +55,8 @@ class PartnershipNominatedPartnerCrnFormProviderSpec extends AnyFreeSpec with Ma
       val tooLong = Seq(
         "123456789",
         "AB1234567",
-        "12 34 56 78 9"
+        "12 34 56 78 9",
+        "  123456789  "
       )
 
       tooLong.foreach { v =>
@@ -70,7 +72,8 @@ class PartnershipNominatedPartnerCrnFormProviderSpec extends AnyFreeSpec with Ma
         "0123456",
         "AB",
         "A B 01234",
-        "12   34 "
+        "12   34 ",
+        "  1234  "
       )
 
       tooShort.foreach { v =>

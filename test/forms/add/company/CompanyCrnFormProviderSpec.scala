@@ -34,7 +34,8 @@ class CompanyCrnFormProviderSpec extends StringFieldBehaviours {
     "ZZ999999",
     "00000001",
     "12345678",
-    "12 34 56 78"
+    "12 34 56 78",
+    "  12345678  "
   )
 
   val invalidCrn: Seq[String] = Seq(
@@ -83,7 +84,8 @@ class CompanyCrnFormProviderSpec extends StringFieldBehaviours {
       val tooLongCrn = Seq(
         "123456789",
         "AB1234567",
-        "12 34 56 78 9"
+        "12 34 56 78 9",
+        "  123456789  "
       )
 
       tooLongCrn.foreach { crn =>
@@ -100,7 +102,8 @@ class CompanyCrnFormProviderSpec extends StringFieldBehaviours {
         "0123456",
         "AB",
         "A B 01234",
-        "12   34 "
+        "12   34 ",
+        "  1234  "
       )
 
       tooShortCrn.foreach { crn =>
