@@ -14,25 +14,18 @@
  * limitations under the License.
  */
 
-package forms.add.company
+package pages.add.company
 
-import forms.Validation.phoneRegex
-import forms.mappings.{Constants, Mappings}
-import play.api.data.Form
+import pages.behaviours.PageBehaviours
 
-import javax.inject.Inject
+class CompanyEmailAddressPageSpec extends PageBehaviours {
 
-class CompanyPhoneNumberFormProvider @Inject() extends Mappings {
+  "CompanyEmailAddressPage" - {
 
-  def apply(): Form[String] =
-    Form(
-      "value" -> text("companyPhoneNumber.error.required")
-        .transform(_.trim, identity)
-        .verifying(
-          firstError(
-            regexp(phoneRegex, "companyPhoneNumber.error.invalid"),
-            maxLength(Constants.MaxLength35, "companyPhoneNumber.error.length")
-          )
-        )
-    )
+    beRetrievable[String](CompanyEmailAddressPage)
+
+    beSettable[String](CompanyEmailAddressPage)
+
+    beRemovable[String](CompanyEmailAddressPage)
+  }
 }

@@ -60,6 +60,8 @@ class Navigator @Inject() () {
       _ => controllers.add.company.routes.CompanyAddressYesNoController.onPageLoad(NormalMode)
     case CompanyContactOptionsPage                 =>
       userAnswers => navigatorFromCompanyContactOptionsPage(NormalMode)(userAnswers)
+    case CompanyEmailAddressPage                   =>
+      _ => controllers.add.company.routes.CompanyEmailAddressController.onPageLoad(NormalMode)
     case CompanyMobileNumberPage                   =>
       _ => controllers.add.company.routes.CompanyMobileNumberController.onPageLoad(NormalMode)
     case PartnershipNamePage                       =>
@@ -95,11 +97,13 @@ class Navigator @Inject() () {
       userAnswers => navigatorFromPartnershipNominatedPartnerUtrYesNoPage(NormalMode)(userAnswers)
     case CompanyAddressPage                        =>
       _ => controllers.add.company.routes.CompanyAddressController.onPageLoad(NormalMode)
+    case CompanyUtrYesNoPage                       =>
+      userAnswers => navigatorFromCompanyUtrYesNoPage(NormalMode)(userAnswers)
     case PartnershipMobileNumberPage               =>
       _ => controllers.add.partnership.routes.PartnershipMobileNumberController.onPageLoad(NormalMode)
     case PartnershipPhoneNumberPage                =>
       _ => controllers.add.partnership.routes.PartnershipPhoneNumberController.onPageLoad(NormalMode)
-    case CompanyPhoneNumberPage                   =>
+    case CompanyPhoneNumberPage                    =>
       _ => controllers.add.company.routes.CompanyPhoneNumberController.onPageLoad(NormalMode)
     case _                                         => _ => routes.IndexController.onPageLoad()
   }
@@ -130,11 +134,15 @@ class Navigator @Inject() () {
       userAnswers => navigatorFromPartnershipNominatedPartnerUtrYesNoPage(CheckMode)(userAnswers)
     case CompanyAddressPage                       =>
       _ => controllers.add.company.routes.CompanyAddressController.onPageLoad(CheckMode)
+    case CompanyEmailAddressPage                  =>
+      _ => controllers.add.company.routes.CompanyEmailAddressController.onPageLoad(CheckMode)
     case PartnershipMobileNumberPage              =>
       _ => controllers.add.partnership.routes.PartnershipMobileNumberController.onPageLoad(CheckMode)
     case PartnershipPhoneNumberPage               => _ => controllers.add.routes.CheckYourAnswersController.onPageLoad()
     case CompanyAddressYesNoPage                  =>
       _ => controllers.add.company.routes.CompanyAddressYesNoController.onPageLoad(CheckMode)
+    case CompanyUtrYesNoPage                      =>
+      userAnswers => navigatorFromCompanyUtrYesNoPage(CheckMode)(userAnswers)
     case CompanyPhoneNumberPage                   =>
       _ => controllers.add.company.routes.CompanyPhoneNumberController.onPageLoad(CheckMode)
     case CompanyMobileNumberPage                  =>
@@ -323,6 +331,15 @@ class Navigator @Inject() () {
         controllers.add.partnership.routes.PartnershipNominatedPartnerUtrYesNoController.onPageLoad(mode)
       case (Some(false), NormalMode) =>
         controllers.add.partnership.routes.PartnershipNominatedPartnerUtrYesNoController.onPageLoad(NormalMode)
+      case (Some(false), CheckMode)  => controllers.add.routes.CheckYourAnswersController.onPageLoad()
+      case (None, _)                 => routes.JourneyRecoveryController.onPageLoad()
+    }
+  private def navigatorFromCompanyUtrYesNoPage(mode: Mode)(userAnswers: UserAnswers): Call                     =
+    (userAnswers.get(CompanyUtrYesNoPage), mode) match {
+      case (Some(true), _)           =>
+        controllers.add.company.routes.CompanyUtrController.onPageLoad(mode)
+      case (Some(false), NormalMode) =>
+        controllers.add.company.routes.CompanyCrnYesNoController.onPageLoad(NormalMode)
       case (Some(false), CheckMode)  => controllers.add.routes.CheckYourAnswersController.onPageLoad()
       case (None, _)                 => routes.JourneyRecoveryController.onPageLoad()
     }

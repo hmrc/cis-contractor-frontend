@@ -16,7 +16,7 @@
 
 package viewmodels.checkAnswers.add
 
-import models.{CheckMode, UserAnswers}
+import models.{NormalMode, UserAnswers}
 import pages.add.TypeOfSubcontractorPage
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
@@ -42,7 +42,7 @@ object TypeOfSubcontractorSummary {
         actions = Seq(
           ActionItemViewModel(
             "site.change",
-            controllers.add.routes.TypeOfSubcontractorController.onPageLoad(CheckMode).url
+            controllers.add.routes.TypeOfSubcontractorController.onPageLoad(NormalMode).url
           )
             .withVisuallyHiddenText(messages("typeOfSubcontractor.change.hidden"))
             .withAttribute("id" -> "type-of-subcontractor")

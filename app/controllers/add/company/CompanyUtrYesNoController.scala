@@ -20,7 +20,7 @@ import controllers.actions.*
 import forms.add.company.CompanyUtrYesNoFormProvider
 import models.Mode
 import navigation.Navigator
-import pages.add.company.CompanyUtrYesNoPage
+import pages.add.company.{CompanyNamePage, CompanyUtrYesNoPage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
@@ -47,26 +47,35 @@ class CompanyUtrYesNoController @Inject() (
   val form = formProvider()
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
+    request.userAnswers
+      .get(CompanyNamePage)
+      .map { companyName =>
+        val preparedForm = request.userAnswers.get(CompanyUtrYesNoPage) match {
+          case None        => form
+          case Some(value) => form.fill(value)
+        }
 
-    val preparedForm = request.userAnswers.get(CompanyUtrYesNoPage) match {
-      case None        => form
-      case Some(value) => form.fill(value)
-    }
-
-    Ok(view(preparedForm, mode))
+        Ok(view(preparedForm, mode, companyName))
+      }
+      .getOrElse(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
-      form
-        .bindFromRequest()
-        .fold(
-          formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
-          value =>
-            for {
-              updatedAnswers <- Future.fromTry(request.userAnswers.set(CompanyUtrYesNoPage, value))
-              _              <- sessionRepository.set(updatedAnswers)
-            } yield Redirect(navigator.nextPage(CompanyUtrYesNoPage, mode, updatedAnswers))
-        )
+      request.userAnswers
+        .get(CompanyNamePage)
+        .map { companyName =>
+          form
+            .bindFromRequest()
+            .fold(
+              formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, companyName))),
+              value =>
+                for {
+                  updatedAnswers <- Future.fromTry(request.userAnswers.set(CompanyUtrYesNoPage, value))
+                  _              <- sessionRepository.set(updatedAnswers)
+                } yield Redirect(navigator.nextPage(CompanyUtrYesNoPage, mode, updatedAnswers))
+            )
+        }
+        .getOrElse(Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())))
   }
 }

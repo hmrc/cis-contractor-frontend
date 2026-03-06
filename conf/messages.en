@@ -526,12 +526,14 @@ companyContactOptions.error.required = Select whether you want to add contact de
 companyContactOptions.checkYourAnswersLabel = Contact details for company
 companyContactOptions.change.hidden = Contact details for company
 
-companyEmailAddress.title = companyEmailAddress
-companyEmailAddress.heading = companyEmailAddress
-companyEmailAddress.checkYourAnswersLabel = companyEmailAddress
-companyEmailAddress.error.required = Enter companyEmailAddress
-companyEmailAddress.error.length = CompanyEmailAddress must be 100 characters or less
-companyEmailAddress.change.hidden = CompanyEmailAddress
+companyEmailAddress.title = What is the email address for this company?
+companyEmailAddress.heading = What is the email address for {0}?
+companyEmailAddress.hintText = HMRC will never use this email address to contact this subcontractor
+companyEmailAddress.checkYourAnswersLabel = Email Address
+companyEmailAddress.error.required = Enter an email address in the correct format, like name@example.com
+companyEmailAddress.error.invalid = Enter a valid email address in the correct format, like name@example.com
+companyEmailAddress.error.length = Enter a valid email address in the correct format, like name@example.com, up to 254 characters
+companyEmailAddress.change.hidden = email Address
 
 companyPhoneNumber.title = What is the phone number for this company?
 companyPhoneNumber.heading = What is the phone number for {0}?
@@ -551,11 +553,12 @@ companyMobileNumber.error.invalid = Enter a valid mobile number, like 07700 900 
 companyMobileNumber.error.length = Enter a valid mobile number, like 07700 900 982 or +44 7700 900 999
 companyMobileNumber.change.hidden = mobile Number
 
-companyUtrYesNo.title = companyUtrYesNo
-companyUtrYesNo.heading = companyUtrYesNo
-companyUtrYesNo.checkYourAnswersLabel = companyUtrYesNo
-companyUtrYesNo.error.required = Select yes if companyUtrYesNo
-companyUtrYesNo.change.hidden = CompanyUtrYesNo
+companyUtrYesNo.title = Do you know the Unique Taxpayer Reference for this company?
+companyUtrYesNo.heading = Do you know the Unique Taxpayer Reference for {0}?
+companyUtrYesNo.hint = This information will be used to verify the company as a subcontractor
+companyUtrYesNo.checkYourAnswersLabel =  Add UTR?
+companyUtrYesNo.error.required = Select whether you know the Unique Taxpayer Reference (UTR) for this company
+companyUtrYesNo.change.hidden = UTR
 
 companyUtr.title = companyUtr
 companyUtr.heading = companyUtr
