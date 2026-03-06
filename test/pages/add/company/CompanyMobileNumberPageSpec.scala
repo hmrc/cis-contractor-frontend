@@ -14,25 +14,18 @@
  * limitations under the License.
  */
 
-package forms.add.company
+package pages.add.company
 
-import forms.Validation
-import forms.mappings.Constants.MaxLength35
-import forms.mappings.Mappings
-import play.api.data.Form
+import pages.behaviours.PageBehaviours
 
-import javax.inject.Inject
+class CompanyMobileNumberPageSpec extends PageBehaviours {
 
-class CompanyMobileNumberFormProvider @Inject() extends Mappings {
+  "CompanyMobileNumberPage" - {
 
-  def apply(): Form[String] =
-    Form(
-      "value" -> text("companyMobileNumber.error.required")
-        .verifying(
-          firstError(
-            maxLength(MaxLength35, "companyMobileNumber.error.length"),
-            regexp(Validation.mobileRegex, "companyMobileNumber.error.invalid")
-          )
-        )
-    )
+    beRetrievable[String](CompanyMobileNumberPage)
+
+    beSettable[String](CompanyMobileNumberPage)
+
+    beRemovable[String](CompanyMobileNumberPage)
+  }
 }

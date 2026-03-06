@@ -713,6 +713,14 @@ class NavigatorSpec extends SpecBase {
           ) mustBe journeyRecovery
         }
       }
+
+      "must go from a CompanyMobileNumberPage to CompanyMobileNumberPage" in {
+        navigator.nextPage(
+          CompanyMobileNumberPage,
+          NormalMode,
+          UserAnswers("id")
+        ) mustBe controllers.add.company.routes.CompanyMobileNumberController.onPageLoad(NormalMode)
+      }
     }
 
     "in Check mode" - {
@@ -1299,6 +1307,14 @@ class NavigatorSpec extends SpecBase {
             emptyUserAnswers
           ) mustBe routes.JourneyRecoveryController.onPageLoad()
         }
+      }
+
+      "must go from CompanyMobileNumberPage to CompanyMobileNumberPage in CheckMode" in {
+        navigator.nextPage(
+          CompanyMobileNumberPage,
+          CheckMode,
+          emptyUserAnswers
+        ) mustBe controllers.add.company.routes.CompanyMobileNumberController.onPageLoad(CheckMode)
       }
     }
 

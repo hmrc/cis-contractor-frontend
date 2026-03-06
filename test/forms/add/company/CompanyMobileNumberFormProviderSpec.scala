@@ -16,14 +16,17 @@
 
 package forms.add.company
 
+import forms.Validation
 import forms.behaviours.StringFieldBehaviours
+import forms.mappings.Constants.MaxLength35
+import org.scalacheck.Gen
 import play.api.data.FormError
 
 class CompanyMobileNumberFormProviderSpec extends StringFieldBehaviours {
 
   val requiredKey = "companyMobileNumber.error.required"
   val lengthKey   = "companyMobileNumber.error.length"
-  val maxLength   = 100
+  val invalidKey  = "companyMobileNumber.error.invalid"
 
   val form = new CompanyMobileNumberFormProvider()()
 
@@ -34,20 +37,31 @@ class CompanyMobileNumberFormProviderSpec extends StringFieldBehaviours {
     behave like fieldThatBindsValidData(
       form,
       fieldName,
-      stringsWithMaxLength(maxLength)
+      Gen.oneOf(
+        "+44 7700 900 999",
+        "+44 7700 900 111",
+        "07700 900 982"
+      )
     )
 
     behave like fieldWithMaxLength(
       form,
       fieldName,
-      maxLength = maxLength,
-      lengthError = FormError(fieldName, lengthKey, Seq(maxLength))
+      maxLength = MaxLength35,
+      lengthError = FormError(fieldName, lengthKey, Seq(MaxLength35))
     )
 
     behave like mandatoryField(
       form,
       fieldName,
       requiredError = FormError(fieldName, requiredKey)
+    )
+
+    behave like fieldWithRegex(
+      form,
+      fieldName,
+      invalidKey,
+      regex = Validation.mobileRegex
     )
   }
 }
