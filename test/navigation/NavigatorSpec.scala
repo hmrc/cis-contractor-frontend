@@ -715,12 +715,12 @@ class NavigatorSpec extends SpecBase {
         }
       }
 
-      "must go from a CompanyCrnPage to next Page" in {
+      "must go from a CompanyWorksReferenceYesNoPage to next Page" in {
         navigator.nextPage(
           CompanyCrnPage,
           NormalMode,
           UserAnswers("id")
-        ) mustBe controllers.add.company.routes.CompanyCrnController.onPageLoad(NormalMode)
+        ) mustBe controllers.add.company.routes.CompanyWorksReferenceYesNoController.onPageLoad(NormalMode)
       }
     }
 
