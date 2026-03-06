@@ -83,7 +83,7 @@ class CompanyCrnControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must redirect to the CompanyCrn page when valid data is submitted" in {
+    "must redirect to the CompanyWorksReferenceYesNoPage page when valid data is submitted" in {
 
       val mockSessionRepository = mock[SessionRepository]
 
@@ -104,7 +104,9 @@ class CompanyCrnControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual companyCrnRoute
+        redirectLocation(result).value mustEqual controllers.add.company.routes.CompanyWorksReferenceYesNoController
+          .onPageLoad(NormalMode)
+          .url
       }
     }
 
