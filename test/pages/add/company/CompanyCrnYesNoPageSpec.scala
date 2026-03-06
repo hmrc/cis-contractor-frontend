@@ -27,5 +27,13 @@ class CompanyCrnYesNoPageSpec extends PageBehaviours {
     beSettable[Boolean](CompanyCrnYesNoPage)
 
     beRemovable[Boolean](CompanyCrnYesNoPage)
+
+    "cleanup: must remove CompanyReferenceNumber userAnswers when No is selected" in {
+      val userAnswers = emptyUserAnswers.set(CompanyCrnPage, "ABC").success.value
+
+      val updatedUserAnswers = userAnswers.set(CompanyCrnYesNoPage, false).success.value
+
+      updatedUserAnswers.get(CompanyCrnPage) mustBe None
+    }
   }
 }
