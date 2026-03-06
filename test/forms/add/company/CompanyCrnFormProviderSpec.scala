@@ -23,7 +23,27 @@ class CompanyCrnFormProviderSpec extends StringFieldBehaviours {
 
   val requiredKey = "companyCrn.error.required"
   val lengthKey   = "companyCrn.error.length"
-  val maxLength   = 100
+  val invalidKey  = "companyCrn.error.invalid"
+
+  val companyRegNumberRegex = """(?i)^(?:[A-Z]{2}\d{1,6}|\d{1,8})$"""
+
+  val validCrn: Seq[String] = Seq(
+    "AC012345",
+    "ac012345",
+    "AC 012 345",
+    "AB1",
+    "ZZ999999",
+    "123",
+    "00000001",
+    "12345678",
+    "12 34 56 78"
+  )
+
+  val invalidCrn: Seq[String] = Seq(
+    "AC01-234",
+    "AC01£345",
+    "12AB3456"
+  )
 
   val form = new CompanyCrnFormProvider()()
 
@@ -31,23 +51,56 @@ class CompanyCrnFormProviderSpec extends StringFieldBehaviours {
 
     val fieldName = "value"
 
-    behave like fieldThatBindsValidData(
-      form,
-      fieldName,
-      stringsWithMaxLength(maxLength)
-    )
-
-    behave like fieldWithMaxLength(
-      form,
-      fieldName,
-      maxLength = maxLength,
-      lengthError = FormError(fieldName, lengthKey, Seq(maxLength))
-    )
-
     behave like mandatoryField(
       form,
       fieldName,
       requiredError = FormError(fieldName, requiredKey)
     )
+
+    "must bind valid crn data" in {
+      validCrn.foreach { validCrn =>
+        val result = form.bind(Map(fieldName -> validCrn))
+        result.errors must be(empty)
+      }
+    }
+
+    "must reject invalid crn formats" in {
+      invalidCrn.foreach { invalidCrn =>
+        val result = form.bind(Map(fieldName -> invalidCrn))
+        result.errors must contain(
+          FormError(fieldName, invalidKey, Seq(companyRegNumberRegex))
+        )
+      }
+    }
+
+    "must accept valid crn formats" in {
+      validCrn.foreach { validCrn =>
+        val result = form.bind(Map(fieldName -> validCrn))
+        result.errors must be(empty)
+        result.errors must not contain FormError(fieldName, invalidKey)
+      }
+    }
+
+    "must display error when too long (more than 8 chars ignoring spaces)" in {
+      val tooLongCrn = Seq(
+        "123456789",
+        "AB1234567",
+        "12 34 56 78 9"
+      )
+
+      tooLongCrn.foreach { crn =>
+        val result = form.bind(Map(fieldName -> crn))
+        result.errors must contain(
+          FormError(fieldName, invalidKey, Seq(companyRegNumberRegex))
+        )
+      }
+    }
+
+    "normalise the value by removing spaces and uppercasing" in {
+      val result = form.bind(Map(fieldName -> " a  c 0123 45     "))
+      result.hasErrors mustBe false
+      result.value.value mustBe "AC012345"
+    }
+
   }
 }
