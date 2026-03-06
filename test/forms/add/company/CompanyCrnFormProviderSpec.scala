@@ -16,6 +16,7 @@
 
 package forms.add.company
 
+import forms.Validation
 import forms.behaviours.StringFieldBehaviours
 import play.api.data.FormError
 
@@ -25,7 +26,7 @@ class CompanyCrnFormProviderSpec extends StringFieldBehaviours {
   val lengthKey   = "companyCrn.error.length"
   val invalidKey  = "companyCrn.error.invalid"
 
-  val companyRegNumberRegex = """(?i)^(?:[A-Z]{2}\d{6}|\d{8})$"""
+  val companyRegNumberRegex: String = Validation.companyRegNumberRegex
 
   val validCrn: Seq[String] = Seq(
     "AC012345",
