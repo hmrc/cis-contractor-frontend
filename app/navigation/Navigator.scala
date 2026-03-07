@@ -60,6 +60,8 @@ class Navigator @Inject() () {
       _ => controllers.add.company.routes.CompanyAddressYesNoController.onPageLoad(NormalMode)
     case CompanyContactOptionsPage                 =>
       userAnswers => navigatorFromCompanyContactOptionsPage(NormalMode)(userAnswers)
+    case CompanyEmailAddressPage                   =>
+      _ => controllers.add.company.routes.CompanyEmailAddressController.onPageLoad(NormalMode)
     case PartnershipNamePage                       =>
       _ => controllers.add.partnership.routes.PartnershipHasUtrYesNoController.onPageLoad(NormalMode)
     case PartnershipHasUtrYesNoPage                => userAnswers => navigatorFromPartnershipHasUtrYesNoPage(NormalMode)(userAnswers)
@@ -92,6 +94,8 @@ class Navigator @Inject() () {
       userAnswers => navigatorFromPartnershipNominatedPartnerUtrYesNoPage(NormalMode)(userAnswers)
     case CompanyAddressPage                        =>
       _ => controllers.add.company.routes.CompanyAddressController.onPageLoad(NormalMode)
+    case CompanyUtrYesNoPage                       =>
+      userAnswers => navigatorFromCompanyUtrYesNoPage(NormalMode)(userAnswers)
     case PartnershipMobileNumberPage               =>
       _ => controllers.add.partnership.routes.PartnershipMobileNumberController.onPageLoad(NormalMode)
     case PartnershipPhoneNumberPage                =>
@@ -114,10 +118,16 @@ class Navigator @Inject() () {
       _ => controllers.add.company.routes.CompanyAddressController.onPageLoad(CheckMode)
     case CompanyAddressYesNoPage                  =>
       _ => controllers.add.company.routes.CompanyAddressYesNoController.onPageLoad(CheckMode)
+    case CompanyAddressPage                       =>
+      _ => controllers.add.company.routes.CompanyAddressController.onPageLoad(CheckMode)
+    case CompanyEmailAddressPage                  =>
+      _ => controllers.add.company.routes.CompanyEmailAddressController.onPageLoad(CheckMode)
     case CompanyPhoneNumberPage                   =>
       _ => controllers.add.company.routes.CompanyPhoneNumberController.onPageLoad(CheckMode)
     case CompanyNamePage                          =>
       _ => controllers.add.company.routes.CompanyCheckYourAnswersController.onPageLoad()
+    case CompanyUtrYesNoPage                      =>
+      userAnswers => navigatorFromCompanyUtrYesNoPage(CheckMode)(userAnswers)
     case PartnershipNamePage                      =>
       _ => controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
     case PartnershipHasUtrYesNoPage               => navigatorFromPartnershipHasUtrYesNoPage(CheckMode)(_)
@@ -133,6 +143,8 @@ class Navigator @Inject() () {
       _ => controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
     case PartnershipEmailAddressPage              =>
       _ => controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
+    case PartnershipNominatedPartnerUtrYesNoPage  =>
+      userAnswers => navigatorFromPartnershipNominatedPartnerUtrYesNoPage(CheckMode)(userAnswers)
     case PartnershipMobileNumberPage              =>
       _ => controllers.add.partnership.routes.PartnershipMobileNumberController.onPageLoad(CheckMode)
     case PartnershipPhoneNumberPage               => _ => controllers.add.routes.CheckYourAnswersController.onPageLoad()
@@ -336,6 +348,15 @@ class Navigator @Inject() () {
         controllers.add.partnership.routes.PartnershipNominatedPartnerUtrYesNoController.onPageLoad(NormalMode)
       case (Some(false), CheckMode)  =>
         controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
+      case (None, _)                 => routes.JourneyRecoveryController.onPageLoad()
+    }
+  private def navigatorFromCompanyUtrYesNoPage(mode: Mode)(userAnswers: UserAnswers): Call                     =
+    (userAnswers.get(CompanyUtrYesNoPage), mode) match {
+      case (Some(true), _)           =>
+        controllers.add.company.routes.CompanyUtrController.onPageLoad(mode)
+      case (Some(false), NormalMode) =>
+        controllers.add.company.routes.CompanyCrnYesNoController.onPageLoad(NormalMode)
+      case (Some(false), CheckMode)  => controllers.add.routes.CheckYourAnswersController.onPageLoad()
       case (None, _)                 => routes.JourneyRecoveryController.onPageLoad()
     }
 
