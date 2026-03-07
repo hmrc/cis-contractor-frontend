@@ -434,24 +434,20 @@ class NavigatorSpec extends SpecBase {
       "must go from PartnershipContactDetailsYesNoPage" - {
         "to PartnershipContactDetailsPage when answer is Yes" in {
           val answers = UserAnswers(userAnswersId).set(PartnershipContactDetailsYesNoPage, true).success.value
-
-          // TODO: SL0201 - B (PTN) - Contact details for partner Controller
           navigator.nextPage(
             PartnershipContactDetailsYesNoPage,
             NormalMode,
             answers
-          ) mustBe routes.JourneyRecoveryController.onPageLoad()
+          ) mustBe controllers.add.partnership.routes.PartnershipChooseContactDetailsController.onPageLoad(NormalMode)
         }
 
         "to PartnershipNominatedPartnerNamePage when answer is No" in {
           val answers = UserAnswers(userAnswersId).set(PartnershipContactDetailsYesNoPage, false).success.value
-
-          // TODO: SL0205 - B (PTN) - Nominated partner name controller
           navigator.nextPage(
             PartnershipContactDetailsYesNoPage,
             NormalMode,
             answers
-          ) mustBe routes.JourneyRecoveryController.onPageLoad()
+          ) mustBe controllers.add.partnership.routes.PartnershipNominatedPartnerNameController.onPageLoad(NormalMode)
         }
 
         "to JourneyRecoveryPage when answer is not present" in {
@@ -1095,13 +1091,11 @@ class NavigatorSpec extends SpecBase {
       "must go from PartnershipContactDetailsYesNoPage" - {
         "to PartnershipContactDetailsPage when answer is Yes" in {
           val answers = UserAnswers(userAnswersId).set(PartnershipContactDetailsYesNoPage, true).success.value
-
-          // TODO: SL0201 - B (PTN) - Contact details for partner Controller
           navigator.nextPage(
             PartnershipContactDetailsYesNoPage,
             CheckMode,
             answers
-          ) mustBe routes.JourneyRecoveryController.onPageLoad()
+          ) mustBe controllers.add.partnership.routes.PartnershipChooseContactDetailsController.onPageLoad(CheckMode)
         }
 
         "to PartnershipCheckYourAnswers when answer is No" in {

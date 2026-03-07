@@ -114,8 +114,6 @@ class Navigator @Inject() () {
     case WorksReferenceNumberYesNoPage            => navigatorFromWorksReferenceNumberYesNoPage(CheckMode)(_)
     case SubcontractorContactDetailsYesNoPage     => navigatorFromSubcontractorContactDetailsYesNoPage(CheckMode)(_)
     case CompanyContactOptionsPage                => navigatorFromCompanyContactOptionsPage(CheckMode)(_)
-    case CompanyAddressPage                       =>
-      _ => controllers.add.company.routes.CompanyAddressController.onPageLoad(CheckMode)
     case CompanyAddressYesNoPage                  =>
       _ => controllers.add.company.routes.CompanyAddressYesNoController.onPageLoad(CheckMode)
     case CompanyAddressPage                       =>
@@ -143,8 +141,6 @@ class Navigator @Inject() () {
       _ => controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
     case PartnershipEmailAddressPage              =>
       _ => controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
-    case PartnershipNominatedPartnerUtrYesNoPage  =>
-      userAnswers => navigatorFromPartnershipNominatedPartnerUtrYesNoPage(CheckMode)(userAnswers)
     case PartnershipMobileNumberPage              =>
       _ => controllers.add.partnership.routes.PartnershipMobileNumberController.onPageLoad(CheckMode)
     case PartnershipPhoneNumberPage               => _ => controllers.add.routes.CheckYourAnswersController.onPageLoad()
@@ -333,9 +329,9 @@ class Navigator @Inject() () {
   private def navigatorFromPartnershipContactDetailsYesNoPage(mode: Mode)(userAnswers: UserAnswers): Call      =
     (userAnswers.get(PartnershipContactDetailsYesNoPage), mode) match {
       case (Some(true), _)           =>
-        routes.JourneyRecoveryController.onPageLoad() // TODO: SL0201 - B (PTN) - Contact details for partner Controller
+        controllers.add.partnership.routes.PartnershipChooseContactDetailsController.onPageLoad(mode)
       case (Some(false), NormalMode) =>
-        routes.JourneyRecoveryController.onPageLoad() // TODO: SL0205 - B (PTN) - Nominated partner name controller
+        controllers.add.partnership.routes.PartnershipNominatedPartnerNameController.onPageLoad(mode)
       case (Some(false), CheckMode)  =>
         controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
       case (None, _)                 => routes.JourneyRecoveryController.onPageLoad()
