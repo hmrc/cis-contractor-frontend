@@ -449,6 +449,9 @@ partnershipPhoneNumber.error.length = Enter a valid phone number, like 01632 960
 partnershipPhoneNumber.error.invalid = Enter a valid phone number, like 01632 960 001. For international numbers include the country code.
 partnershipPhoneNumber.change.hidden = phone number
 
+partnershipCheckYourAnswers.title = Check your answers
+partnershipCheckYourAnswers.heading = Check your answers
+
 subcontractorAdded.title = Partnership subcontractor added
 subcontractorAdded.heading = Subcontractor added
 subcontractorAdded.p1 = You can now find {0} on your list of subcontractors.
