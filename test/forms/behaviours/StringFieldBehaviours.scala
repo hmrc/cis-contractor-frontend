@@ -16,7 +16,7 @@
 
 package forms.behaviours
 
-import org.scalatest.matchers.should.Matchers.should
+import org.scalacheck.Gen
 import play.api.data.{Form, FormError}
 
 trait StringFieldBehaviours extends FieldBehaviours {
@@ -41,4 +41,18 @@ trait StringFieldBehaviours extends FieldBehaviours {
       }
     }
 
+  def fieldWithRegexpWithGenerator(
+    form: Form[_],
+    fieldName: String,
+    regexp: String,
+    generator: Gen[String],
+    error: FormError
+  ): Unit =
+    s"not bind strings which do not match $regexp" in
+      forAll(generator) { string =>
+        whenever(!string.matches(regexp) && string.nonEmpty) {
+          val result = form.bind(Map(fieldName -> string)).apply(fieldName)
+          result.errors mustEqual Seq(error)
+        }
+      }
 }

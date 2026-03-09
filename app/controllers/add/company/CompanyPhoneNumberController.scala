@@ -51,7 +51,7 @@ class CompanyPhoneNumberController @Inject() (
       .get(CompanyNamePage)
       .map { companyName =>
         val preparedForm = request.userAnswers.get(CompanyPhoneNumberPage) match {
-          case None => form
+          case None        => form
           case Some(value) => form.fill(value)
         }
 
@@ -72,7 +72,7 @@ class CompanyPhoneNumberController @Inject() (
               value =>
                 for {
                   updatedAnswers <- Future.fromTry(request.userAnswers.set(CompanyPhoneNumberPage, value))
-                  _ <- sessionRepository.set(updatedAnswers)
+                  _              <- sessionRepository.set(updatedAnswers)
                 } yield Redirect(navigator.nextPage(CompanyPhoneNumberPage, mode, updatedAnswers))
             )
         }
