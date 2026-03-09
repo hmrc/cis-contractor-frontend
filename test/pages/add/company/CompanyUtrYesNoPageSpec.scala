@@ -16,23 +16,16 @@
 
 package pages.add.company
 
-import models.UserAnswers
-import pages.QuestionPage
-import play.api.libs.json.JsPath
+import pages.behaviours.PageBehaviours
 
-import scala.util.Try
+class CompanyUtrYesNoPageSpec extends PageBehaviours {
 
-case object CompanyUtrYesNoPage extends QuestionPage[Boolean] {
+  "CompanyUtrYesNoPage" - {
 
-  override def path: JsPath = JsPath \ toString
+    beRetrievable[Boolean](CompanyUtrYesNoPage)
 
-  override def toString: String = "companyUtrYesNo"
+    beSettable[Boolean](CompanyUtrYesNoPage)
 
-  override def cleanup(value: Option[Boolean], userAnswers: UserAnswers): Try[UserAnswers] =
-    if value.contains(false) then {
-      userAnswers
-        .remove(CompanyUtrPage)
-    } else {
-      super.cleanup(value, userAnswers)
-    }
+    beRemovable[Boolean](CompanyUtrYesNoPage)
+  }
 }

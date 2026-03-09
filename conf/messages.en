@@ -551,11 +551,12 @@ companyMobileNumber.error.required = Enter companyMobileNumber
 companyMobileNumber.error.length = CompanyMobileNumber must be 100 characters or less
 companyMobileNumber.change.hidden = CompanyMobileNumber
 
-companyUtrYesNo.title = companyUtrYesNo
-companyUtrYesNo.heading = companyUtrYesNo
-companyUtrYesNo.checkYourAnswersLabel = companyUtrYesNo
-companyUtrYesNo.error.required = Select yes if companyUtrYesNo
-companyUtrYesNo.change.hidden = CompanyUtrYesNo
+companyUtrYesNo.title = Do you know the Unique Taxpayer Reference for this company?
+companyUtrYesNo.heading = Do you know the Unique Taxpayer Reference for {0}?
+companyUtrYesNo.hint = This information will be used to verify the company as a subcontractor
+companyUtrYesNo.checkYourAnswersLabel =  Add UTR?
+companyUtrYesNo.error.required = Select whether you know the Unique Taxpayer Reference (UTR) for this company
+companyUtrYesNo.change.hidden = UTR
 
 companyUtr.title = companyUtr
 companyUtr.heading = companyUtr
