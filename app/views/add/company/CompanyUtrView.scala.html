@@ -14,6 +14,7 @@
  * limitations under the License.
  *@
 
+@import viewmodels.LabelSize.Medium
 @import viewmodels.InputWidth._
 @import views.html.components._
 
@@ -44,7 +45,7 @@
         @govukInput(
             InputViewModel(
                 field = form("value"),
-                label = LabelViewModel(messages("companyUtr.label", name)).withCssClass("govuk-label--m")
+                label = LabelViewModel(messages("companyUtr.label", name)).withSize(Medium)
             )
             .withWidth(Fixed10)
             .withHint(Hint(
