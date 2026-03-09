@@ -122,12 +122,12 @@ tradingNameOfSubcontractor.error.length = Enter a trading name up to 56 characte
 tradingNameOfSubcontractor.change.hidden = trading name
 tradingNameOfSubcontractor.error.invalidCharacters = Enter a trading name like ABC Construction Ltd
 
-subAddressYesNo.title = Do you want to add the subcontractor’s address?
-subAddressYesNo.heading = Do you want to add the subcontractor’s address?
-subAddressYesNo.hint = You can add this information now, or later.
-subAddressYesNo.checkYourAnswersLabel = Do you want to add the subcontractor’s address?
-subAddressYesNo.error.required = Select whether or not to add the subcontractor’s address
-subAddressYesNo.change.hidden = do you want to add the subcontractor’s address?
+subAddressYesNo.title = Do you want to add an address for this subcontractor?
+subAddressYesNo.heading = Do you want to add an address for {0}?
+subAddressYesNo.hint = You can add this information later if you prefer
+subAddressYesNo.checkYourAnswersLabel = Add subcontractor address?
+subAddressYesNo.error.required = Select whether you want to add an address for this subcontractor
+subAddressYesNo.change.hidden = add subcontractor address?
 
 nationalInsuranceNumberYesNo.title = Do you have a National Insurance number?
 nationalInsuranceNumberYesNo.heading = Do you have a National Insurance number?

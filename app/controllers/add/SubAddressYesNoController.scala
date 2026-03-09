@@ -26,6 +26,7 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.add.SubAddressYesNoView
+import utils.SubcontractorNameExtractor
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -38,6 +39,7 @@ class SubAddressYesNoController @Inject() (
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   formProvider: SubAddressYesNoFormProvider,
+  subcontractorNameExtractor: SubcontractorNameExtractor,
   val controllerComponents: MessagesControllerComponents,
   view: SubAddressYesNoView
 )(implicit ec: ExecutionContext)
@@ -48,25 +50,35 @@ class SubAddressYesNoController @Inject() (
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
 
-    val preparedForm = request.userAnswers.get(SubAddressYesNoPage) match {
-      case None        => form
-      case Some(value) => form.fill(value)
-    }
+    val subContractorName = subcontractorNameExtractor.getSubContractorName(request.userAnswers)
 
-    Ok(view(preparedForm, mode))
+    subContractorName.fold {
+      Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+    } { subContractorName =>
+      val preparedForm = request.userAnswers.get(SubAddressYesNoPage) match {
+        case None        => form
+        case Some(value) => form.fill(value)
+      }
+      Ok(view(preparedForm, mode, subContractorName))
+    }
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
-      form
-        .bindFromRequest()
-        .fold(
-          formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
-          value =>
-            for {
-              updatedAnswers <- Future.fromTry(request.userAnswers.set(SubAddressYesNoPage, value))
-              _              <- sessionRepository.set(updatedAnswers)
-            } yield Redirect(navigator.nextPage(SubAddressYesNoPage, mode, updatedAnswers))
-        )
+      val subContractorName = subcontractorNameExtractor.getSubContractorName(request.userAnswers)
+      subContractorName.fold {
+        Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+      } { subContractorName =>
+        form
+          .bindFromRequest()
+          .fold(
+            formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, subContractorName))),
+            value =>
+              for {
+                updatedAnswers <- Future.fromTry(request.userAnswers.set(SubAddressYesNoPage, value))
+                _              <- sessionRepository.set(updatedAnswers)
+              } yield Redirect(navigator.nextPage(SubAddressYesNoPage, mode, updatedAnswers))
+          )
+      }
   }
 }

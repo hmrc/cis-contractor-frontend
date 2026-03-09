@@ -19,11 +19,12 @@ package controllers.add
 import base.SpecBase
 import controllers.routes
 import forms.add.SubAddressYesNoFormProvider
+import models.add.SubcontractorName
 import models.{NormalMode, UserAnswers}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.add.SubAddressYesNoPage
+import pages.add.{SubAddressYesNoPage, SubcontractorNamePage}
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
@@ -34,16 +35,23 @@ import scala.concurrent.Future
 
 class SubAddressYesNoControllerSpec extends SpecBase with MockitoSugar {
 
-  val formProvider = new SubAddressYesNoFormProvider()
-  val form         = formProvider()
+  private val formProvider = new SubAddressYesNoFormProvider()
+  private val form         = formProvider()
 
-  lazy val subAddressYesNoRoute = controllers.add.routes.SubAddressYesNoController.onPageLoad(NormalMode).url
+  private lazy val subAddressYesNoRoute = controllers.add.routes.SubAddressYesNoController.onPageLoad(NormalMode).url
+
+  private val subContractorName = SubcontractorName("John", Some("Paul"), "Smith")
+
+  private val name = "John Smith"
+
+  private def uaWithName: UserAnswers =
+    emptyUserAnswers.set(SubcontractorNamePage, subContractorName).success.value
 
   "SubAddressYesNo Controller" - {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(uaWithName)).build()
 
       running(application) {
         val request = FakeRequest(GET, subAddressYesNoRoute)
@@ -53,13 +61,13 @@ class SubAddressYesNoControllerSpec extends SpecBase with MockitoSugar {
         val view = application.injector.instanceOf[SubAddressYesNoView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode, name)(request, messages(application)).toString
       }
     }
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = UserAnswers(userAnswersId).set(SubAddressYesNoPage, true).success.value
+      val userAnswers = uaWithName.set(SubAddressYesNoPage, true).success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
@@ -71,7 +79,10 @@ class SubAddressYesNoControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(true), NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill(true), NormalMode, name)(
+          request,
+          messages(application)
+        ).toString
       }
     }
 
@@ -82,7 +93,7 @@ class SubAddressYesNoControllerSpec extends SpecBase with MockitoSugar {
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
       val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        applicationBuilder(userAnswers = Some(uaWithName))
           .overrides(
             bind[SessionRepository].toInstance(mockSessionRepository)
           )
@@ -109,7 +120,7 @@ class SubAddressYesNoControllerSpec extends SpecBase with MockitoSugar {
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
       val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        applicationBuilder(userAnswers = Some(uaWithName))
           .overrides(
             bind[SessionRepository].toInstance(mockSessionRepository)
           )
@@ -129,9 +140,9 @@ class SubAddressYesNoControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must return a Bad Request and errors when invalid data is submitted" in {
+    "must return a Bad Request and errors when invalid data is submitted (name present)" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(uaWithName)).build()
 
       running(application) {
         val request =
@@ -145,7 +156,10 @@ class SubAddressYesNoControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, NormalMode, name)(
+          request,
+          messages(application)
+        ).toString
       }
     }
 
@@ -181,7 +195,7 @@ class SubAddressYesNoControllerSpec extends SpecBase with MockitoSugar {
 
     "must return a Bad Request and errors when no value is submitted" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(uaWithName)).build()
 
       running(application) {
         val request =
@@ -196,11 +210,50 @@ class SubAddressYesNoControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, NormalMode, name)(
+          request,
+          messages(application)
+        ).toString
 
         contentAsString(result) must include(messages(application)("subAddressYesNo.error.required"))
       }
     }
 
+    "must redirect to Journey Recovery for a GET when subcontractor name is missing (userAnswers present)" in {
+
+      val application =
+        applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+
+      running(application) {
+        val request = FakeRequest(GET, subAddressYesNoRoute)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must redirect to Journey Recovery for a POST when subcontractor name is missing (userAnswers present)" in {
+
+      val mockSessionRepository = mock[SessionRepository]
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+      val application =
+        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, subAddressYesNoRoute)
+            .withFormUrlEncodedBody("value" -> "true")
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
   }
 }
