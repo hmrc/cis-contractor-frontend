@@ -271,3 +271,5 @@ GET        /add/partnership/mobile-number                       controllers.add.
 POST       /add/partnership/mobile-number                       controllers.add.partnership.PartnershipMobileNumberController.onSubmit(mode: Mode = NormalMode)
 GET        /add/partnership/change-mobile-number                controllers.add.partnership.PartnershipMobileNumberController.onPageLoad(mode: Mode = CheckMode)
 POST       /add/partnership/change-mobile-number                controllers.add.partnership.PartnershipMobileNumberController.onSubmit(mode: Mode = CheckMode)
+
+GET        /add/company/companyAdded                       controllers.add.company.CompanyAddedController.onPageLoad()
