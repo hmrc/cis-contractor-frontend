@@ -685,7 +685,7 @@ class NavigatorSpec extends SpecBase {
           emptyUserAnswers
         ) mustBe controllers.add.company.routes.CompanyEmailAddressController.onPageLoad(NormalMode)
       }
-      
+
       "must go from CompanyUtrYesNo" - {
         "to next page when answer is Yes" in {
           navigator.nextPage(
@@ -695,7 +695,7 @@ class NavigatorSpec extends SpecBase {
           ) mustBe controllers.add.company.routes.CompanyUtrController
             .onPageLoad(NormalMode)
         }
-        
+
         "to next page when answer is No" in {
           navigator.nextPage(
             CompanyUtrYesNoPage,
@@ -704,7 +704,7 @@ class NavigatorSpec extends SpecBase {
           ) mustBe controllers.add.company.routes.CompanyCrnYesNoController
             .onPageLoad(NormalMode)
         }
-        
+
         "to JourneyRecoveryPage when answer is not present" in {
           navigator.nextPage(
             CompanyUtrYesNoPage,
@@ -713,8 +713,7 @@ class NavigatorSpec extends SpecBase {
           ) mustBe journeyRecovery
         }
       }
-      
-      
+
       "must go from CompanyWorksReferenceYesNo" - {
         "to next page when answer is Yes" in {
           navigator.nextPage(
@@ -733,7 +732,6 @@ class NavigatorSpec extends SpecBase {
           ) mustBe controllers.add.company.routes.CompanyCheckYourAnswersController
             .onPageLoad()
         }
-            
 
         "to JourneyRecoveryPage when answer is not present" in {
           navigator.nextPage(
@@ -1299,9 +1297,8 @@ class NavigatorSpec extends SpecBase {
           emptyUserAnswers
         ) mustBe controllers.add.company.routes.CompanyAddressYesNoController.onPageLoad(CheckMode)
       }
-      
-      
-       "must go from CompanyUtrYesNo" - {
+
+      "must go from CompanyUtrYesNo" - {
         "to next page when answer is Yes" in {
           val answers = UserAnswers(userAnswersId).set(CompanyUtrYesNoPage, true).success.value
 
@@ -1312,7 +1309,7 @@ class NavigatorSpec extends SpecBase {
           ) mustBe controllers.add.company.routes.CompanyUtrController
             .onPageLoad(CheckMode)
         }
-         
+
         "to Company CyaPage when answer is No" in {
           val answers = UserAnswers(userAnswersId).set(CompanyUtrYesNoPage, false).success.value
 
@@ -1322,8 +1319,8 @@ class NavigatorSpec extends SpecBase {
             answers
           ) mustBe CYA
         }
-         
-          "to JourneyRecoveryPage when answer is not present" in {
+
+        "to JourneyRecoveryPage when answer is not present" in {
           navigator.nextPage(
             CompanyUtrYesNoPage,
             CheckMode,
@@ -1331,8 +1328,6 @@ class NavigatorSpec extends SpecBase {
           ) mustBe routes.JourneyRecoveryController.onPageLoad()
         }
       }
-         
-      
 
       "must go from CompanyWorksReferenceYesNo" - {
         "to next page when answer is Yes" in {
@@ -1343,7 +1338,7 @@ class NavigatorSpec extends SpecBase {
             CheckMode,
             answers
           ) mustBe controllers.add.company.routes.CompanyWorksReferenceController
-           .onPageLoad(CheckMode)
+            .onPageLoad(CheckMode)
         }
 
         "to Company CyaPage when answer is No" in {
