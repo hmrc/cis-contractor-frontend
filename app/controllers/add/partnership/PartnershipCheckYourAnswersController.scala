@@ -17,7 +17,12 @@
 package controllers.add.partnership
 
 import controllers.actions.*
-import play.api.i18n.{I18nSupport, MessagesApi}
+import models.UserAnswers
+import models.add.partnership.ValidatedPartnership
+import models.contact.ContactOptions.*
+import pages.add.partnership.PartnershipChooseContactDetailsPage
+import play.api.Logging
+import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -36,33 +41,48 @@ class PartnershipCheckYourAnswersController @Inject() (
   val controllerComponents: MessagesControllerComponents,
   view: PartnershipCheckYourAnswersView
 ) extends FrontendBaseController
-    with I18nSupport {
+    with I18nSupport
+    with Logging {
+
+  private def contactDetailsPage(ua: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
+    ua.get(PartnershipChooseContactDetailsPage).flatMap {
+      case Email  => PartnershipEmailAddressSummary.row(ua)
+      case Phone  => PartnershipPhoneNumberSummary.row(ua)
+      case Mobile => PartnershipMobileNumberSummary.row(ua)
+      case _      => None
+    }
 
   def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
-    val ua   = request.userAnswers
-    val list = SummaryListViewModel(
-      rows = Seq(
-        TypeOfSubcontractorSummary.row(ua),
-        PartnershipNameSummary.row(ua),
-        PartnershipAddressYesNoSummary.row(ua),
-        PartnershipAddressSummary.row(ua),
-        PartnershipContactDetailsYesNoSummary.row(ua),
-        PartnershipChooseContactDetailsSummary.row(ua),
-        PartnershipHasUtrYesNoSummary.row(ua),
-        PartnershipUniqueTaxpayerReferenceSummary.row(ua),
-        PartnershipNominatedPartnerNameSummary.row(ua),
-        PartnershipNominatedPartnerUtrYesNoSummary.row(ua),
-        PartnershipNominatedPartnerUtrSummary.row(ua),
-        PartnershipNominatedPartnerNinoYesNoSummary.row(ua),
-        PartnershipNominatedPartnerNinoSummary.row(ua),
-        PartnershipNominatedPartnerCrnYesNoSummary.row(ua),
-        PartnershipNominatedPartnerCrnSummary.row(ua),
-        PartnershipWorksReferenceNumberYesNoSummary.row(ua),
-        PartnershipWorksReferenceNumberSummary.row(ua),
-        PartnershipEmailAddressSummary.row(ua)
-      ).flatten
-    )
+    val ua = request.userAnswers
+    ValidatedPartnership.build(ua) match {
+      case Right(_)    =>
+        val list = SummaryListViewModel(
+          rows = Seq(
+            TypeOfSubcontractorSummary.row(ua),
+            PartnershipNameSummary.row(ua),
+            PartnershipAddressYesNoSummary.row(ua),
+            PartnershipAddressSummary.row(ua),
+            PartnershipChooseContactDetailsSummary.row(ua),
+            contactDetailsPage(ua),
+            PartnershipHasUtrYesNoSummary.row(ua),
+            PartnershipUniqueTaxpayerReferenceSummary.row(ua),
+            PartnershipNominatedPartnerNameSummary.row(ua),
+            PartnershipNominatedPartnerUtrYesNoSummary.row(ua),
+            PartnershipNominatedPartnerUtrSummary.row(ua),
+            PartnershipNominatedPartnerNinoYesNoSummary.row(ua),
+            PartnershipNominatedPartnerNinoSummary.row(ua),
+            PartnershipNominatedPartnerCrnYesNoSummary.row(ua),
+            PartnershipNominatedPartnerCrnSummary.row(ua),
+            PartnershipWorksReferenceNumberYesNoSummary.row(ua),
+            PartnershipWorksReferenceNumberSummary.row(ua)
+          ).flatten
+        )
 
-    Ok(view(list))
+        Ok(view(list))
+      case Left(error) =>
+        logger.error(s"[PartnershipCheckYourAnswersController.onPageLoad] Failed to load the page: $error")
+        Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+    }
   }
+
 }
