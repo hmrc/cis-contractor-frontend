@@ -16,14 +16,17 @@
 
 package forms.add.company
 
+import forms.Validation
 import forms.behaviours.StringFieldBehaviours
+import forms.mappings.Constants.MaxLength20
+import org.scalacheck.Gen
 import play.api.data.FormError
 
 class CompanyWorksReferenceFormProviderSpec extends StringFieldBehaviours {
 
   val requiredKey = "companyWorksReference.error.required"
   val lengthKey   = "companyWorksReference.error.length"
-  val maxLength   = 100
+  val invalidKey  = "companyWorksReference.error.invalid"
 
   val form = new CompanyWorksReferenceFormProvider()()
 
@@ -34,14 +37,18 @@ class CompanyWorksReferenceFormProviderSpec extends StringFieldBehaviours {
     behave like fieldThatBindsValidData(
       form,
       fieldName,
-      stringsWithMaxLength(maxLength)
+      Gen.oneOf(
+        "WR-001",
+        "WR-0002",
+        "WR-98"
+      )
     )
 
     behave like fieldWithMaxLength(
       form,
       fieldName,
-      maxLength = maxLength,
-      lengthError = FormError(fieldName, lengthKey, Seq(maxLength))
+      maxLength = MaxLength20,
+      lengthError = FormError(fieldName, lengthKey, Seq(MaxLength20))
     )
 
     behave like mandatoryField(
