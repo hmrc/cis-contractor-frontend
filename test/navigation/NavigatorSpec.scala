@@ -715,6 +715,14 @@ class NavigatorSpec extends SpecBase {
         }
       }
 
+      "must go from a CompanyWorksReferenceYesNoPage to next Page" in {
+        navigator.nextPage(
+          CompanyCrnPage,
+          NormalMode,
+          UserAnswers("id")
+        ) mustBe controllers.add.company.routes.CompanyWorksReferenceYesNoController.onPageLoad(NormalMode)
+      }
+
       "must go from a CompanyUtrPage to CompanyCrnYesNoPage" in {
         navigator.nextPage(
           CompanyUtrPage,
@@ -1308,6 +1316,14 @@ class NavigatorSpec extends SpecBase {
             emptyUserAnswers
           ) mustBe routes.JourneyRecoveryController.onPageLoad()
         }
+      }
+
+      "must go from a CompanyCrnPage to CompanyCYA in CheckMode" in {
+        navigator.nextPage(
+          CompanyCrnPage,
+          CheckMode,
+          emptyUserAnswers
+        ) mustBe CompanyCYA
       }
 
       "must go from CompanyUtrPage to CompanyCYA in CheckMode" in {
