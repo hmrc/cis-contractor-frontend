@@ -85,7 +85,7 @@ class CompanyUtrControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must bind the form and redirect to CompanyUtr Page on POST when valid UTR is submitted" in {
+    "must bind the form and redirect to CompanyCrnYesNoPage on POST when valid UTR is submitted" in {
 
       val validValue = "5860920998"
 
@@ -109,7 +109,9 @@ class CompanyUtrControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual companyUtrRoute
+        redirectLocation(result).value mustEqual controllers.add.company.routes.CompanyCrnYesNoController
+          .onPageLoad(NormalMode)
+          .url
       }
 
       verify(mockSubcontractorService).isDuplicateUTR(any[UserAnswers], any[String])(any[HeaderCarrier])

@@ -104,7 +104,7 @@ class Navigator @Inject() () {
     case CompanyPhoneNumberPage                    =>
       _ => controllers.add.company.routes.CompanyPhoneNumberController.onPageLoad(NormalMode)
     case CompanyUtrPage                            =>
-      _ => controllers.add.company.routes.CompanyUtrController.onPageLoad(NormalMode)
+      _ => controllers.add.company.routes.CompanyCrnYesNoController.onPageLoad(NormalMode)
     case _                                         => _ => routes.IndexController.onPageLoad()
   }
 

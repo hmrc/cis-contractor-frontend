@@ -39,7 +39,7 @@ class CompanyUtrViewSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSu
       val companyName = "Test Company"
 
       val html: HtmlFormat.Appendable = view(form, NormalMode, companyName)
-      val doc: Document  = org.jsoup.Jsoup.parse(html.toString())
+      val doc: Document               = org.jsoup.Jsoup.parse(html.toString())
 
       doc.select("title").text() must include(messages("companyUtr.title"))
 
@@ -72,12 +72,12 @@ class CompanyUtrViewSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSu
         form.withError("value", "companyUtr.error.required")
 
       val html: HtmlFormat.Appendable = view(errorForm, NormalMode, companyName)
-      val doc: Document  = org.jsoup.Jsoup.parse(html.toString())
+      val doc: Document               = org.jsoup.Jsoup.parse(html.toString())
 
       val summary: Elements = doc.select(".govuk-error-summary")
       summary.text() must include(messages("companyUtr.error.required"))
 
-      val linkHref: String  = summary.select("a").attr("href")
+      val linkHref: String = summary.select("a").attr("href")
       linkHref mustBe "#value"
 
       doc.select(".govuk-error-message").text() must include(messages("companyUtr.error.required"))
@@ -85,11 +85,11 @@ class CompanyUtrViewSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSu
   }
 
   trait Setup {
-    val formProvider = new CompanyUtrFormProvider()
+    val formProvider       = new CompanyUtrFormProvider()
     val form: Form[String] = formProvider()
 
     implicit val request: Request[_] = FakeRequest()
-    implicit val messages: Messages =
+    implicit val messages: Messages  =
       play.api.i18n.MessagesImpl(
         play.api.i18n.Lang.defaultLang,
         app.injector.instanceOf[play.api.i18n.MessagesApi]

@@ -53,13 +53,13 @@ class CompanyUtrSummarySpec extends AnyFreeSpec with Matchers {
       val actions = row.actions.value.items
       actions should have size 1
 
-      val changeAction = actions.head
+      val changeAction       = actions.head
       val expectedChangeText = messages("site.change")
-      val expectedHref = routes.CompanyUtrController.onPageLoad(CheckMode).url
+      val expectedHref       = routes.CompanyUtrController.onPageLoad(CheckMode).url
       val expectedHiddenText = messages("companyUtr.change.hidden")
 
       changeAction.content.asHtml.toString should include(expectedChangeText)
-      changeAction.href shouldBe expectedHref
+      changeAction.href                  shouldBe expectedHref
 
       changeAction.visuallyHiddenText.value shouldBe expectedHiddenText
     }
