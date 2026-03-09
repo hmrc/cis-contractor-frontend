@@ -577,11 +577,12 @@ companyCrn.error.required = Enter companyCrn
 companyCrn.error.length = CompanyCrn must be 100 characters or less
 companyCrn.change.hidden = CompanyCrn
 
-companyWorksReferenceYesNo.title = companyWorksReferenceYesNo
-companyWorksReferenceYesNo.heading = companyWorksReferenceYesNo
-companyWorksReferenceYesNo.checkYourAnswersLabel = companyWorksReferenceYesNo
-companyWorksReferenceYesNo.error.required = Select yes if companyWorksReferenceYesNo
-companyWorksReferenceYesNo.change.hidden = CompanyWorksReferenceYesNo
+companyWorksReferenceYesNo.title = Is there a works reference number associated with this company?
+companyWorksReferenceYesNo.heading = Is there a works reference number associated with {0}?
+companyWorksReferenceYesNo.hint = This is the reference number used to identify a subcontractor's work or project. It can contain letters and numbers.
+companyWorksReferenceYesNo.checkYourAnswersLabel = Works reference number
+companyWorksReferenceYesNo.error.required = Select whether there is a works reference number associated with this company
+companyWorksReferenceYesNo.change.hidden = works reference number
 
 companyWorksReference.title = companyWorksReference
 companyWorksReference.heading = companyWorksReference

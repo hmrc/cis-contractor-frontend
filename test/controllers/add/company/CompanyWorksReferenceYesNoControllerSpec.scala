@@ -24,7 +24,7 @@ import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.add.company.CompanyWorksReferenceYesNoPage
+import pages.add.company.{CompanyNamePage, CompanyWorksReferenceYesNoPage}
 import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
@@ -36,58 +36,69 @@ import scala.concurrent.Future
 
 class CompanyWorksReferenceYesNoControllerSpec extends SpecBase with MockitoSugar {
 
+  private val companyName = "Test Company"
+
   def onwardRoute = Call("GET", "/foo")
 
   val formProvider = new CompanyWorksReferenceYesNoFormProvider()
   val form         = formProvider()
 
-  lazy val companyWorksReferenceYesNoRoute =
+  lazy val companyWorksReferenceYesNoGetRoute =
     controllers.add.company.routes.CompanyWorksReferenceYesNoController.onPageLoad(NormalMode).url
+
+  lazy val companyWorksReferenceYesNoPostRoute: String =
+    controllers.add.company.routes.CompanyWorksReferenceYesNoController.onSubmit(NormalMode).url
+
+  private def uaWithName: UserAnswers =
+    emptyUserAnswers.set(CompanyNamePage, companyName).success.value
 
   "CompanyWorksReferenceYesNo Controller" - {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(uaWithName)).build()
 
       running(application) {
-        val request = FakeRequest(GET, companyWorksReferenceYesNoRoute)
+        val request = FakeRequest(GET, companyWorksReferenceYesNoGetRoute)
 
         val result = route(application, request).value
 
         val view = application.injector.instanceOf[CompanyWorksReferenceYesNoView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode, companyName)(request, messages(application)).toString
       }
     }
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = UserAnswers(userAnswersId).set(CompanyWorksReferenceYesNoPage, true).success.value
+      val userAnswers = uaWithName.set(CompanyWorksReferenceYesNoPage, true).success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
       running(application) {
-        val request = FakeRequest(GET, companyWorksReferenceYesNoRoute)
+        val request = FakeRequest(GET, companyWorksReferenceYesNoGetRoute)
 
         val view = application.injector.instanceOf[CompanyWorksReferenceYesNoView]
 
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(true), NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill(true), NormalMode, companyName)(
+          request,
+          messages(application)
+        ).toString
       }
     }
 
-    "must redirect to the next page when valid data is submitted" in {
+    "must redirect to the next page when valid data with value Yes is submitted" in {
 
       val mockSessionRepository = mock[SessionRepository]
 
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
       val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        applicationBuilder(userAnswers = Some(uaWithName))
           .overrides(
             bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
             bind[SessionRepository].toInstance(mockSessionRepository)
@@ -96,8 +107,34 @@ class CompanyWorksReferenceYesNoControllerSpec extends SpecBase with MockitoSuga
 
       running(application) {
         val request =
-          FakeRequest(POST, companyWorksReferenceYesNoRoute)
+          FakeRequest(POST, companyWorksReferenceYesNoPostRoute)
             .withFormUrlEncodedBody(("value", "true"))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual onwardRoute.url
+      }
+    }
+
+    "must redirect to the next page when valid data with value No is submitted" in {
+
+      val mockSessionRepository = mock[SessionRepository]
+
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+      val application =
+        applicationBuilder(userAnswers = Some(uaWithName))
+          .overrides(
+            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
+            bind[SessionRepository].toInstance(mockSessionRepository)
+          )
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, companyWorksReferenceYesNoPostRoute)
+            .withFormUrlEncodedBody(("value", "false"))
 
         val result = route(application, request).value
 
@@ -108,11 +145,11 @@ class CompanyWorksReferenceYesNoControllerSpec extends SpecBase with MockitoSuga
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(uaWithName)).build()
 
       running(application) {
         val request =
-          FakeRequest(POST, companyWorksReferenceYesNoRoute)
+          FakeRequest(POST, companyWorksReferenceYesNoPostRoute)
             .withFormUrlEncodedBody(("value", ""))
 
         val boundForm = form.bind(Map("value" -> ""))
@@ -122,7 +159,10 @@ class CompanyWorksReferenceYesNoControllerSpec extends SpecBase with MockitoSuga
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, NormalMode, companyName)(
+          request,
+          messages(application)
+        ).toString
       }
     }
 
@@ -131,7 +171,7 @@ class CompanyWorksReferenceYesNoControllerSpec extends SpecBase with MockitoSuga
       val application = applicationBuilder(userAnswers = None).build()
 
       running(application) {
-        val request = FakeRequest(GET, companyWorksReferenceYesNoRoute)
+        val request = FakeRequest(GET, companyWorksReferenceYesNoGetRoute)
 
         val result = route(application, request).value
 
@@ -146,13 +186,73 @@ class CompanyWorksReferenceYesNoControllerSpec extends SpecBase with MockitoSuga
 
       running(application) {
         val request =
-          FakeRequest(POST, companyWorksReferenceYesNoRoute)
+          FakeRequest(POST, companyWorksReferenceYesNoPostRoute)
             .withFormUrlEncodedBody(("value", "true"))
 
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must return a Bad Request and errors when no value is submitted" in {
+
+      val application = applicationBuilder(userAnswers = Some(uaWithName)).build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, companyWorksReferenceYesNoPostRoute)
+            .withFormUrlEncodedBody()
+
+        val form      = new CompanyWorksReferenceYesNoFormProvider()()
+        val boundForm = form.bind(Map.empty)
+
+        val view = application.injector.instanceOf[CompanyWorksReferenceYesNoView]
+
+        val result = route(application, request).value
+
+        status(result) mustEqual BAD_REQUEST
+        contentAsString(result) mustEqual view(boundForm, NormalMode, companyName)(
+          request,
+          messages(application)
+        ).toString
+
+        contentAsString(result) must include(
+          messages(application)("companyWorksReferenceYesNo.error.required")
+        )
+      }
+    }
+
+    "must redirect to JourneyRecovery if companyName is missing for a GET" in {
+
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+
+      running(application) {
+        val request = FakeRequest(GET, companyWorksReferenceYesNoGetRoute)
+        val result  = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController
+          .onPageLoad()
+          .url
+      }
+    }
+
+    "must redirect to JourneyRecovery if companyName is missing for a POST" in {
+
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+
+      running(application) {
+        val request = FakeRequest(POST, companyWorksReferenceYesNoPostRoute)
+          .withFormUrlEncodedBody(("value", "true"))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController
+          .onPageLoad()
+          .url
       }
     }
   }

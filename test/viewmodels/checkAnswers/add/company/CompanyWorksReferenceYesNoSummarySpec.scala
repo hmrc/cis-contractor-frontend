@@ -22,35 +22,34 @@ import org.scalatest.OptionValues.convertOptionToValuable
 import org.scalatest.TryValues.convertTryToSuccessOrFailure
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.should.Matchers
-import pages.add.company.CompanyEmailAddressPage
+import pages.add.company.CompanyWorksReferenceYesNoPage
 import play.api.i18n.Messages
 import play.api.test.Helpers.stubMessages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.*
 
-class CompanyEmailAddressSummarySpec extends AnyFreeSpec with Matchers {
+class CompanyWorksReferenceYesNoSummarySpec extends AnyFreeSpec with Matchers {
 
   implicit val messages: Messages = stubMessages()
 
-  "CompanyEmailAddressSummary.row" - {
+  "CompanyWorksReferenceYesNoSummary.row" - {
 
-    "must return a SummaryListRow when the answer exists" in {
+    "must return a SummaryListRow with 'Yes' when the answer is true" in {
+      val answers = UserAnswers("test-id")
+        .set(CompanyWorksReferenceYesNoPage, true)
+        .success
+        .value
 
-      val answers =
-        UserAnswers("test-id")
-          .set(CompanyEmailAddressPage, "test@example.com")
-          .success
-          .value
-
-      val maybeRow = CompanyEmailAddressSummary.row(answers)
-
+      val maybeRow: Option[SummaryListRow] = CompanyWorksReferenceYesNoSummary.row(answers)
       maybeRow shouldBe defined
 
-      val row = maybeRow.value
+      val row =
+        maybeRow.value
 
-      val expectedKeyText = messages("companyEmailAddress.checkYourAnswersLabel")
+      val expectedKeyText = messages("companyWorksReferenceYesNo.checkYourAnswersLabel")
       row.key.content.asHtml.toString should include(expectedKeyText)
 
-      row.value.content.asHtml.toString should include("test@example.com")
+      val expectedValue = messages("site.yes")
+      row.value.content.asHtml.toString should include(expectedValue)
 
       row.actions shouldBe defined
       val actions = row.actions.value.items
@@ -58,21 +57,31 @@ class CompanyEmailAddressSummarySpec extends AnyFreeSpec with Matchers {
 
       val changeAction       = actions.head
       val expectedChangeText = messages("site.change")
-      val expectedHref       = routes.CompanyEmailAddressController
-        .onPageLoad(CheckMode)
-        .url
-      val expectedHiddenText = messages("companyEmailAddress.change.hidden")
+      val expectedHref       = routes.CompanyWorksReferenceYesNoController.onPageLoad(CheckMode).url
+      val expectedHiddenText = messages("companyWorksReferenceYesNo.change.hidden")
 
       changeAction.content.asHtml.toString    should include(expectedChangeText)
       changeAction.href                     shouldBe expectedHref
       changeAction.visuallyHiddenText.value shouldBe expectedHiddenText
     }
 
-    "must return None when the answer does not exist" in {
-
+    "must return a SummaryListRow with 'No' when the answer is false" in {
       val answers = UserAnswers("test-id")
+        .set(CompanyWorksReferenceYesNoPage, false)
+        .success
+        .value
 
-      CompanyEmailAddressSummary.row(answers) shouldBe None
+      val maybeRow: Option[SummaryListRow] = CompanyWorksReferenceYesNoSummary.row(answers)
+      maybeRow shouldBe defined
+
+      val row           = maybeRow.value
+      val expectedValue = messages("site.no")
+      row.value.content.asHtml.toString should include(expectedValue)
+    }
+
+    "must return None when the answer does not exist" in {
+      val answers = UserAnswers("test-id")
+      CompanyWorksReferenceYesNoSummary.row(answers) shouldBe None
     }
   }
 }

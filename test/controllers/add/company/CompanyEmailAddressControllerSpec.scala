@@ -127,7 +127,7 @@ class CompanyEmailAddressControllerSpec extends SpecBase with MockitoSugar {
 
         val view = application.injector.instanceOf[CompanyEmailAddressView]
 
-        val result      = route(application, request).value
+        val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
         contentAsString(result) mustEqual view(boundForm, NormalMode, companyName)(
@@ -173,7 +173,7 @@ class CompanyEmailAddressControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request = FakeRequest(GET, companyEmailAddressRoute)
-        val result = route(application, request).value
+        val result  = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual
