@@ -16,7 +16,6 @@
 
 package forms.add.company
 
-import forms.Validation
 import forms.behaviours.StringFieldBehaviours
 import forms.mappings.Constants.MaxLength20
 import org.scalacheck.Gen

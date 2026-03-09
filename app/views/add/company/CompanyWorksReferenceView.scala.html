@@ -41,7 +41,9 @@
                 label = LabelViewModel(messages("companyWorksReference.heading", companyName)).asPageHeading(Large)
             )
             .withHint(HintViewModel(messages("companyWorksReference.hintText")))
-            .withWidth(Full)
+            .withWidth(Fixed20)
+            .withSpellcheck(false)
+            .withAutocomplete("off")
         )
 
         @govukButton(
