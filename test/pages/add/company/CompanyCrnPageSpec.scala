@@ -14,21 +14,18 @@
  * limitations under the License.
  */
 
-package forms.add.company
+package pages.add.company
 
-import forms.mappings.Mappings
-import play.api.data.Form
+import pages.behaviours.PageBehaviours
 
-import javax.inject.Inject
+class CompanyCrnPageSpec extends PageBehaviours {
 
-class CompanyUtrFormProvider @Inject() extends Mappings {
+  "CompanyCrnPage" - {
 
-  def apply(): Form[String] =
-    Form(
-      "value" -> utr(
-        requiredKey = "companyUtr.error.required",
-        invalidKey = "companyUtr.error.invalid",
-        lengthKey = "companyUtr.error.length"
-      )
-    )
+    beRetrievable[String](CompanyCrnPage)
+
+    beSettable[String](CompanyCrnPage)
+
+    beRemovable[String](CompanyCrnPage)
+  }
 }
