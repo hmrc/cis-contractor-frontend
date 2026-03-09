@@ -17,15 +17,22 @@
 package forms.add.company
 
 import forms.behaviours.StringFieldBehaviours
-import play.api.data.FormError
+import org.scalacheck.Gen
+import org.scalatest.freespec.AnyFreeSpec
+import org.scalatest.matchers.must.Matchers
+import play.api.data.{Form, FormError}
+import utils.UTRGenerator
 
-class CompanyUtrFormProviderSpec extends StringFieldBehaviours {
+class CompanyUtrFormProviderSpec extends AnyFreeSpec with Matchers with StringFieldBehaviours {
+
+  def validUtrGenerator: Gen[String] = Gen.const(UTRGenerator.randomUTR())
 
   val requiredKey = "companyUtr.error.required"
+  val invalidKey  = "companyUtr.error.invalid"
   val lengthKey   = "companyUtr.error.length"
-  val maxLength   = 100
 
-  val form = new CompanyUtrFormProvider()()
+  val utrLength          = 10
+  val form: Form[String] = new CompanyUtrFormProvider()()
 
   ".value" - {
 
@@ -34,14 +41,21 @@ class CompanyUtrFormProviderSpec extends StringFieldBehaviours {
     behave like fieldThatBindsValidData(
       form,
       fieldName,
-      stringsWithMaxLength(maxLength)
+      validDataGenerator = validUtrGenerator
+    )
+
+    behave like fieldWithMinLength(
+      form = form,
+      fieldName = fieldName,
+      minLength = utrLength,
+      lengthError = FormError(fieldName, lengthKey, Seq(utrLength))
     )
 
     behave like fieldWithMaxLength(
-      form,
-      fieldName,
-      maxLength = maxLength,
-      lengthError = FormError(fieldName, lengthKey, Seq(maxLength))
+      form = form,
+      fieldName = fieldName,
+      maxLength = utrLength,
+      lengthError = FormError(fieldName, lengthKey, Seq(utrLength))
     )
 
     behave like mandatoryField(
