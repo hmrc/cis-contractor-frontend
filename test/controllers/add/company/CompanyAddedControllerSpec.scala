@@ -48,7 +48,7 @@ class CompanyAddedControllerSpec extends SpecBase {
         val view = application.injector.instanceOf[CompanyAddedView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(companyName)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(companyName)(request, applicationConfig, messages(application)).toString
       }
     }
 

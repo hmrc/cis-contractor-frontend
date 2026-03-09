@@ -23,6 +23,7 @@ class CompanyAddedViewSpec {
   import org.scalatest.wordspec.AnyWordSpec
   import org.scalatestplus.play.guice.GuiceOneAppPerSuite
   import play.api.i18n.Messages
+  import config.FrontendAppConfig
   import play.api.mvc.Request
   import play.api.test.FakeRequest
   import play.twirl.api.HtmlFormat
@@ -34,33 +35,34 @@ class CompanyAddedViewSpec {
 
       "render the page with the correct main content" in new Setup {
 
+        given FrontendAppConfig = app.injector.instanceOf[FrontendAppConfig]
         private val companyName = "Test Company"
 
         val html: HtmlFormat.Appendable = view(companyName)
-        val doc: Document = org.jsoup.Jsoup.parse(html.toString())
+        val doc: Document               = org.jsoup.Jsoup.parse(html.toString())
 
-        doc.title must include(messages("companyAdded.title"))
+        doc.title             must include(messages("companyAdded.title"))
         doc.select("h1").text must include(messages("companyAdded.heading"))
 
         doc.select("p").text must include(messages("companyAdded.p1", companyName))
 
-        doc.select("h2").text must include(messages("companyAdded.nextSteps.h2"))
-        doc.select("p").text must include(messages("companyAdded.nextSteps.p1"))
-        doc.select("p").text must include(messages("companyAdded.nextSteps.p2"))
-        doc.select("li").text must include(messages("companyAdded.nextSteps.list.l1"))
-        doc.select("li").text must include(messages("companyAdded.nextSteps.list.l2"))
-        doc.select("li").text must include(messages("companyAdded.nextSteps.list.l3"))
+        doc.select("h2").text                     must include(messages("companyAdded.nextSteps.h2"))
+        doc.select("p").text                      must include(messages("companyAdded.nextSteps.p1"))
+        doc.select("p").text                      must include(messages("companyAdded.nextSteps.p2"))
+        doc.select("li").text                     must include(messages("companyAdded.nextSteps.list.l1"))
+        doc.select("li").text                     must include(messages("companyAdded.nextSteps.list.l2"))
+        doc.select("li").text                     must include(messages("companyAdded.nextSteps.list.l3"))
         doc.getElementsByClass("govuk-link").text must include(messages("companyAdded.nextSteps.link"))
 
-        doc.select("h2").text must include(messages("companyAdded.helpAndSupport.h2"))
-        doc.select("p").text must include(messages("companyAdded.helpAndSupport.p1"))
+        doc.select("h2").text                     must include(messages("companyAdded.helpAndSupport.h2"))
+        doc.select("p").text                      must include(messages("companyAdded.helpAndSupport.p1"))
         doc.getElementsByClass("govuk-link").text must include(messages("companyAdded.helpAndSupport.p1.link"))
       }
     }
 
     trait Setup {
       implicit val request: Request[_] = FakeRequest()
-      implicit val messages: Messages =
+      implicit val messages: Messages  =
         play.api.i18n.MessagesImpl(
           play.api.i18n.Lang.defaultLang,
           app.injector.instanceOf[play.api.i18n.MessagesApi]

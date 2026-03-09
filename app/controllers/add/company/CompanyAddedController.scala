@@ -16,6 +16,7 @@
 
 package controllers.add.company
 
+import config.FrontendAppConfig
 import controllers.actions.*
 import pages.add.company.CompanyNamePage
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -25,22 +26,23 @@ import views.html.add.company.CompanyAddedView
 
 import javax.inject.Inject
 
-class CompanyAddedController @Inject()(
-                                       override val messagesApi: MessagesApi,
-                                       identify: IdentifierAction,
-                                       getData: DataRetrievalAction,
-                                       requireData: DataRequiredAction,
-                                       val controllerComponents: MessagesControllerComponents,
-                                       view: CompanyAddedView
-                                     ) extends FrontendBaseController with I18nSupport {
+class CompanyAddedController @Inject() (
+  override val messagesApi: MessagesApi,
+  identify: IdentifierAction,
+  getData: DataRetrievalAction,
+  requireData: DataRequiredAction,
+  val controllerComponents: MessagesControllerComponents,
+  view: CompanyAddedView
+)(implicit appConfig: FrontendAppConfig)
+    extends FrontendBaseController
+    with I18nSupport {
 
-  def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData) {
-    implicit request =>
-      request.userAnswers
-        .get(CompanyNamePage)
-        .map { companyName =>
-          Ok(view(companyName))
-        }
-        .getOrElse(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+  def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
+    request.userAnswers
+      .get(CompanyNamePage)
+      .map { companyName =>
+        Ok(view(companyName))
+      }
+      .getOrElse(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
   }
 }
