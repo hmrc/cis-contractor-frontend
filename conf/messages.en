@@ -558,12 +558,17 @@ companyUtrYesNo.checkYourAnswersLabel =  Add UTR?
 companyUtrYesNo.error.required = Select whether you know the Unique Taxpayer Reference (UTR) for this company
 companyUtrYesNo.change.hidden = UTR
 
-companyUtr.title = companyUtr
-companyUtr.heading = companyUtr
-companyUtr.checkYourAnswersLabel = companyUtr
-companyUtr.error.required = Enter companyUtr
-companyUtr.error.length = CompanyUtr must be 100 characters or less
-companyUtr.change.hidden = CompanyUtr
+companyUtr.title = Corporation Tax Unique Taxpayer Reference (UTR)
+companyUtr.heading = Corporation Tax Unique Taxpayer Reference (UTR)
+companyUtr.p1 = The UTR will be on tax returns and other letters about Corporation Tax. It might be called ‘reference’, ‘UTR’, or ‘official use’.
+companyUtr.label = What is the Corporation Tax UTR for {0}?
+companyUtr.hint = A Corporation Tax UTR is a 10 digit number
+companyUtr.error.required = Enter a valid Unique Taxpayer Reference (UTR)
+companyUtr.error.length = Enter a valid Unique Taxpayer Reference (UTR)
+companyUtr.error.invalid = Enter a valid Unique Taxpayer Reference (UTR)
+companyUtr.error.duplicate = You have already used this Unique Taxpayer Reference (UTR) for an existing subcontractor
+companyUtr.checkYourAnswersLabel = Corporation Tax UTR
+companyUtr.change.hidden = corporation Tax UTR
 
 companyCrnYesNo.title = companyCrnYesNo
 companyCrnYesNo.heading = companyCrnYesNo

@@ -240,10 +240,10 @@ POST       /add/company/company-has-utr                          controllers.add
 GET        /add/company/change-company-has-utr                       controllers.add.company.CompanyUtrYesNoController.onPageLoad(mode: Mode = CheckMode)
 POST       /add/company/change-company-has-utr                       controllers.add.company.CompanyUtrYesNoController.onSubmit(mode: Mode = CheckMode)
 
-GET        /companyUtr                                  controllers.add.company.CompanyUtrController.onPageLoad(mode: Mode = NormalMode)
-POST       /companyUtr                                  controllers.add.company.CompanyUtrController.onSubmit(mode: Mode = NormalMode)
-GET        /changeCompanyUtr                            controllers.add.company.CompanyUtrController.onPageLoad(mode: Mode = CheckMode)
-POST       /changeCompanyUtr                            controllers.add.company.CompanyUtrController.onSubmit(mode: Mode = CheckMode)
+GET        /add/company/company-utr                     controllers.add.company.CompanyUtrController.onPageLoad(mode: Mode = NormalMode)
+POST       /add/company/company-utr                     controllers.add.company.CompanyUtrController.onSubmit(mode: Mode = NormalMode)
+GET        /add/company/change-company-utr              controllers.add.company.CompanyUtrController.onPageLoad(mode: Mode = CheckMode)
+POST       /add/company/change-company-utr              controllers.add.company.CompanyUtrController.onSubmit(mode: Mode = CheckMode)
 
 GET        /companyCrnYesNo                             controllers.add.company.CompanyCrnYesNoController.onPageLoad(mode: Mode = NormalMode)
 POST       /companyCrnYesNo                             controllers.add.company.CompanyCrnYesNoController.onSubmit(mode: Mode = NormalMode)

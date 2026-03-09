@@ -722,6 +722,14 @@ class NavigatorSpec extends SpecBase {
           UserAnswers("id")
         ) mustBe controllers.add.company.routes.CompanyWorksReferenceYesNoController.onPageLoad(NormalMode)
       }
+
+      "must go from a CompanyUtrPage to CompanyCrnYesNoPage" in {
+        navigator.nextPage(
+          CompanyUtrPage,
+          NormalMode,
+          UserAnswers("id")
+        ) mustBe controllers.add.company.routes.CompanyCrnYesNoController.onPageLoad(NormalMode)
+      }
     }
 
     "in Check mode" - {
@@ -1313,6 +1321,14 @@ class NavigatorSpec extends SpecBase {
       "must go from a CompanyCrnPage to CompanyCYA in CheckMode" in {
         navigator.nextPage(
           CompanyCrnPage,
+          CheckMode,
+          emptyUserAnswers
+        ) mustBe CompanyCYA
+      }
+
+      "must go from CompanyUtrPage to CompanyCYA in CheckMode" in {
+        navigator.nextPage(
+          CompanyUtrPage,
           CheckMode,
           emptyUserAnswers
         ) mustBe CompanyCYA
