@@ -33,6 +33,7 @@ class NavigatorSpec extends SpecBase {
 
   private lazy val journeyRecovery = routes.JourneyRecoveryController.onPageLoad()
   private lazy val CYA             = controllers.add.routes.CheckYourAnswersController.onPageLoad()
+  private lazy val CompanyCYA      = controllers.add.company.routes.CompanyCheckYourAnswersController.onPageLoad()
 
   "Navigator" - {
 
@@ -714,6 +715,14 @@ class NavigatorSpec extends SpecBase {
         }
       }
 
+      "must go from a CompanyWorksReferenceYesNoPage to next Page" in {
+        navigator.nextPage(
+          CompanyCrnPage,
+          NormalMode,
+          UserAnswers("id")
+        ) mustBe controllers.add.company.routes.CompanyWorksReferenceYesNoController.onPageLoad(NormalMode)
+      }
+
       "must go from a CompanyMobileNumberPage to CompanyMobileNumberPage" in {
         navigator.nextPage(
           CompanyMobileNumberPage,
@@ -1307,6 +1316,14 @@ class NavigatorSpec extends SpecBase {
             emptyUserAnswers
           ) mustBe routes.JourneyRecoveryController.onPageLoad()
         }
+      }
+
+      "must go from a CompanyCrnPage to CompanyCYA in CheckMode" in {
+        navigator.nextPage(
+          CompanyCrnPage,
+          CheckMode,
+          emptyUserAnswers
+        ) mustBe CompanyCYA
       }
 
       "must go from CompanyMobileNumberPage to CompanyMobileNumberPage in CheckMode" in {
