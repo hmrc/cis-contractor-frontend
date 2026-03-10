@@ -25,7 +25,6 @@ import models.contact.ContactOptions
 import pages.add.*
 import pages.add.company.*
 import pages.add.partnership.*
-import pages.add.partnership.PartnershipNominatedPartnerNinoPage
 
 class NavigatorSpec extends SpecBase {
 
