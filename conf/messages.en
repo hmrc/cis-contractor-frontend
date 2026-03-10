@@ -627,3 +627,12 @@ companyAdded.nextSteps.link = Manage your subcontractors
 companyAdded.helpAndSupport.h2 = Help and support
 companyAdded.helpAndSupport.p1 = If you need help with the Construction Industry Scheme (CIS) and what it means for you,
 companyAdded.helpAndSupport.p1.link = guidance is available on GOV.UK
+
+individualEmailAddress.title = Subcontractor’s contact details
+individualEmailAddress.heading = What is the email address for {0}?
+individualEmailAddress.hintText = HMRC will never use this email address to contact this subcontractor
+individualEmailAddress.checkYourAnswersLabel = Individual Email Address
+individualEmailAddress.error.required = Enter an email address in the correct format, like name@example.com
+individualEmailAddress.error.length = Enter a valid email address in the correct format, like name@example.com
+individualEmailAddress.error.invalid = Enter a valid email address in the correct format, like name@example.com, up to 254 characters
+individualEmailAddress.change.hidden = individual Email Address

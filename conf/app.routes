@@ -273,3 +273,8 @@ GET        /add/partnership/change-mobile-number                controllers.add.
 POST       /add/partnership/change-mobile-number                controllers.add.partnership.PartnershipMobileNumberController.onSubmit(mode: Mode = CheckMode)
 
 GET        /add/company/subcontractor-added                     controllers.add.company.CompanyAddedController.onPageLoad()
+
+GET        /add/email-address                         controllers.add.IndividualEmailAddressController.onPageLoad(mode: Mode = NormalMode)
+POST       /add/email-address                         controllers.add.IndividualEmailAddressController.onSubmit(mode: Mode = NormalMode)
+GET        /add/change-email-address                  controllers.add.IndividualEmailAddressController.onPageLoad(mode: Mode = CheckMode)
+POST       /add/change-email-address                  controllers.add.IndividualEmailAddressController.onSubmit(mode: Mode = CheckMode)
