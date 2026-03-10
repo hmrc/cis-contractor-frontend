@@ -26,7 +26,6 @@ import pages.add.partnership.*
 import play.api.libs.json.*
 
 final case class ValidatedPartnership(
-  typeOfSubcontractor: TypeOfSubcontractor,
   partnershipName: String,
   partnershipAddress: Option[InternationalAddress],
   partnershipContactDetails: ContactOptions,
@@ -44,7 +43,7 @@ final case class ValidatedPartnership(
 object ValidatedPartnership extends Validation {
   def build(answers: UserAnswers): Either[ValidationError, ValidatedPartnership] =
     for {
-      typeOfSubcontractor             <- getType(answers)
+      _                               <- validateType(answers)
       partnershipName                 <- getPageValue(answers, PartnershipNamePage)
       partnershipAddress              <- getOptionalPageValue(answers, PartnershipAddressPage, PartnershipAddressYesNoPage)
       partnershipContactDetails       <- getPageValue(answers, PartnershipChooseContactDetailsPage)
@@ -64,7 +63,6 @@ object ValidatedPartnership extends Validation {
         getOptionalPageValue(answers, PartnershipWorksReferenceNumberPage, PartnershipWorksReferenceNumberYesNoPage)
 
     } yield ValidatedPartnership(
-      typeOfSubcontractor,
       partnershipName,
       partnershipAddress,
       partnershipContactDetails,
@@ -79,8 +77,11 @@ object ValidatedPartnership extends Validation {
       partnershipWorkRefNumber
     )
 
-  private def getType(answers: UserAnswers): Either[ValidationError, TypeOfSubcontractor] =
-    getPageValue(answers, TypeOfSubcontractorPage)
+  private def validateType(answers: UserAnswers): Either[ValidationError, Unit] =
+    getPageValue(answers, TypeOfSubcontractorPage).flatMap {
+      case TypeOfSubcontractor.Partnership => Right(())
+      case _                               => Left(InvalidAnswer(TypeOfSubcontractorPage))
+    }
 
   private def getContactPageValue[A](
     answers: UserAnswers,
