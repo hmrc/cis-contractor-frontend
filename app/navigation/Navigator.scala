@@ -62,6 +62,8 @@ class Navigator @Inject() () {
       userAnswers => navigatorFromCompanyContactOptionsPage(NormalMode)(userAnswers)
     case CompanyEmailAddressPage                   =>
       _ => controllers.add.company.routes.CompanyEmailAddressController.onPageLoad(NormalMode)
+    case CompanyMobileNumberPage                   =>
+      _ => controllers.add.company.routes.CompanyMobileNumberController.onPageLoad(NormalMode)
     case PartnershipNamePage                       =>
       _ => controllers.add.partnership.routes.PartnershipHasUtrYesNoController.onPageLoad(NormalMode)
     case PartnershipHasUtrYesNoPage                => userAnswers => navigatorFromPartnershipHasUtrYesNoPage(NormalMode)(userAnswers)
@@ -155,6 +157,8 @@ class Navigator @Inject() () {
       _ => controllers.add.company.routes.CompanyCheckYourAnswersController.onPageLoad()
     case CompanyUtrPage                           =>
       _ => controllers.add.company.routes.CompanyCheckYourAnswersController.onPageLoad()
+    case CompanyMobileNumberPage                  =>
+      _ => controllers.add.company.routes.CompanyMobileNumberController.onPageLoad(CheckMode)
     case _                                        => _ => controllers.add.routes.CheckYourAnswersController.onPageLoad()
   }
 
