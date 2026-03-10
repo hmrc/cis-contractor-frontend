@@ -16,13 +16,43 @@
 
 package pages.add.partnership
 
+import models.UserAnswers
 import models.add.partnership.PartnershipChooseContactDetails
+import models.contact.ContactOptions.{Email, Mobile, NoDetails, Phone}
 import pages.QuestionPage
 import play.api.libs.json.JsPath
+
+import scala.util.Try
 
 case object PartnershipChooseContactDetailsPage extends QuestionPage[PartnershipChooseContactDetails] {
 
   override def path: JsPath = JsPath \ toString
 
   override def toString: String = "partnershipChooseContactDetails"
+
+  override def cleanup(value: Option[PartnershipChooseContactDetails], userAnswers: UserAnswers): Try[UserAnswers] =
+    value match {
+      case Some(Email)     =>
+        for {
+          ua <- userAnswers.remove(PartnershipPhoneNumberPage)
+          ua <- ua.remove(PartnershipMobileNumberPage)
+        } yield ua
+      case Some(Phone)     =>
+        for {
+          ua <- userAnswers.remove(PartnershipEmailAddressPage)
+          ua <- ua.remove(PartnershipMobileNumberPage)
+        } yield ua
+      case Some(Mobile)    =>
+        for {
+          ua <- userAnswers.remove(PartnershipEmailAddressPage)
+          ua <- ua.remove(PartnershipPhoneNumberPage)
+        } yield ua
+      case Some(NoDetails) =>
+        for {
+          ua <- userAnswers.remove(PartnershipEmailAddressPage)
+          ua <- ua.remove(PartnershipPhoneNumberPage)
+          ua <- ua.remove(PartnershipMobileNumberPage)
+        } yield ua
+      case _               => super.cleanup(value, userAnswers)
+    }
 }

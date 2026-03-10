@@ -287,6 +287,220 @@ class PartnershipCheckYourAnswersControllerSpec extends SpecBase {
       }
     }
 
+    "contact option change cleanup" - {
+
+      // Simulates a user who previously entered a contact value, then changed their contact option via CYA.
+      // The page cleanup should clear the stale value from the old option.
+
+      "must return OK when switching from Email to Phone and stale email is cleaned up" in {
+        val ua = minUa
+          .set(PartnershipChooseContactDetailsPage, ContactOptions.Email)
+          .success
+          .value
+          .set(PartnershipEmailAddressPage, "old@email.com")
+          .success
+          .value
+          .set(PartnershipChooseContactDetailsPage, ContactOptions.Phone)
+          .success
+          .value // cleanup removes email
+          .set(PartnershipPhoneNumberPage, "01234567890")
+          .success
+          .value
+
+        val application = applicationBuilder(userAnswers = Some(ua)).build()
+
+        running(application) {
+          val request =
+            FakeRequest(GET, controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad().url)
+          val result  = route(application, request).value
+
+          status(result) mustEqual OK
+          contentAsString(result) must include("01234567890")
+        }
+      }
+
+      "must return OK when switching from Phone to Mobile and stale phone number is cleaned up" in {
+        val ua = minUa
+          .set(PartnershipChooseContactDetailsPage, ContactOptions.Phone)
+          .success
+          .value
+          .set(PartnershipPhoneNumberPage, "01234567890")
+          .success
+          .value
+          .set(PartnershipChooseContactDetailsPage, ContactOptions.Mobile)
+          .success
+          .value // cleanup removes phone
+          .set(PartnershipMobileNumberPage, "07123456789")
+          .success
+          .value
+
+        val application = applicationBuilder(userAnswers = Some(ua)).build()
+
+        running(application) {
+          val request =
+            FakeRequest(GET, controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad().url)
+          val result  = route(application, request).value
+
+          status(result) mustEqual OK
+          contentAsString(result) must include("07123456789")
+        }
+      }
+
+      "must return OK when switching from Email to NoDetails and stale email is cleaned up" in {
+        val ua = minUa
+          .set(PartnershipChooseContactDetailsPage, ContactOptions.Email)
+          .success
+          .value
+          .set(PartnershipEmailAddressPage, "old@email.com")
+          .success
+          .value
+          .set(PartnershipChooseContactDetailsPage, ContactOptions.NoDetails)
+          .success
+          .value // cleanup removes email
+
+        val application = applicationBuilder(userAnswers = Some(ua)).build()
+
+        running(application) {
+          val request =
+            FakeRequest(GET, controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad().url)
+          val result  = route(application, request).value
+
+          status(result) mustEqual OK
+        }
+      }
+    }
+
+    "YesNo page cleanup" - {
+
+      // Simulates a user who previously answered Yes and provided a value, then changed back to No via CYA.
+      // The page cleanup should clear the stale value so CYA loads correctly.
+
+      "must return OK when CRN YesNo changes from Yes to No and stale CRN value is cleaned up" in {
+        val ua = minUa
+          .set(PartnershipChooseContactDetailsPage, ContactOptions.Email)
+          .success
+          .value
+          .set(PartnershipEmailAddressPage, "one@two.three")
+          .success
+          .value
+          .set(PartnershipNominatedPartnerCrnYesNoPage, true)
+          .success
+          .value
+          .set(PartnershipNominatedPartnerCrnPage, "12345678")
+          .success
+          .value
+          .set(PartnershipNominatedPartnerCrnYesNoPage, false)
+          .success
+          .value // cleanup fires, removes CRN value
+
+        val application = applicationBuilder(userAnswers = Some(ua)).build()
+
+        running(application) {
+          val request =
+            FakeRequest(GET, controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad().url)
+          val result  = route(application, request).value
+
+          status(result) mustEqual OK
+        }
+      }
+
+      "must return OK when Nino YesNo changes from Yes to No and stale Nino value is cleaned up" in {
+        val ua = minUa
+          .set(PartnershipChooseContactDetailsPage, ContactOptions.Email)
+          .success
+          .value
+          .set(PartnershipEmailAddressPage, "one@two.three")
+          .success
+          .value
+          .set(PartnershipNominatedPartnerNinoYesNoPage, true)
+          .success
+          .value
+          .set(PartnershipNominatedPartnerNinoPage, "AB123456C")
+          .success
+          .value
+          .set(PartnershipNominatedPartnerNinoYesNoPage, false)
+          .success
+          .value // cleanup fires, removes Nino value
+
+        val application = applicationBuilder(userAnswers = Some(ua)).build()
+
+        running(application) {
+          val request =
+            FakeRequest(GET, controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad().url)
+          val result  = route(application, request).value
+
+          status(result) mustEqual OK
+        }
+      }
+
+      "must return OK when HasUtr YesNo changes from Yes to No and stale UTR values are cleaned up" in {
+        val ua = minUa
+          .set(PartnershipChooseContactDetailsPage, ContactOptions.Email)
+          .success
+          .value
+          .set(PartnershipEmailAddressPage, "one@two.three")
+          .success
+          .value
+          .set(PartnershipHasUtrYesNoPage, true)
+          .success
+          .value
+          .set(PartnershipUniqueTaxpayerReferencePage, "1234567890")
+          .success
+          .value
+          .set(PartnershipHasUtrYesNoPage, false)
+          .success
+          .value
+
+        val application = applicationBuilder(userAnswers = Some(ua)).build()
+
+        running(application) {
+          val request =
+            FakeRequest(GET, controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad().url)
+          val result  = route(application, request).value
+
+          status(result) mustEqual OK
+        }
+      }
+
+      "must return OK when Address YesNo changes from Yes to No and stale address is cleaned up" in {
+        val address = InternationalAddress(
+          addressLine1 = "1 Test Street",
+          addressLine2 = None,
+          addressLine3 = "Test Town",
+          addressLine4 = None,
+          postalCode = "TE1 1ST",
+          country = "GB"
+        )
+
+        val ua = minUa
+          .set(PartnershipChooseContactDetailsPage, ContactOptions.Email)
+          .success
+          .value
+          .set(PartnershipEmailAddressPage, "one@two.three")
+          .success
+          .value
+          .set(PartnershipAddressYesNoPage, true)
+          .success
+          .value
+          .set(PartnershipAddressPage, address)
+          .success
+          .value
+          .set(PartnershipAddressYesNoPage, false)
+          .success
+          .value // cleanup fires, removes address
+
+        val application = applicationBuilder(userAnswers = Some(ua)).build()
+
+        running(application) {
+          val request =
+            FakeRequest(GET, controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad().url)
+          val result  = route(application, request).value
+
+          status(result) mustEqual OK
+        }
+      }
+    }
+
     "must redirect to Journey Recovery for a GET if no existing data is found" in {
 
       val application = applicationBuilder(userAnswers = None).build()
