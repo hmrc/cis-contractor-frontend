@@ -21,13 +21,12 @@ import pages.add.{SubcontractorNamePage, TradingNameOfSubcontractorPage}
 
 class SubcontractorNameExtractor {
 
-  def getSubContractorName(userAnswers: UserAnswers): Option[String] =
+  def getSubcontractorName(userAnswers: UserAnswers): Option[String] =
     userAnswers
       .get(SubcontractorNamePage)
-      .map { name =>
-        name.firstName + " " + name.lastName
-      }
+      .map(n => s"${n.firstName.trim} ${n.lastName.trim}".trim)
+      .filter(_.nonEmpty)
       .orElse(
-        userAnswers.get(TradingNameOfSubcontractorPage)
+        userAnswers.get(TradingNameOfSubcontractorPage).map(_.trim).filter(_.nonEmpty)
       )
 }
