@@ -30,7 +30,7 @@ import views.html.add.partnership.PartnershipPhoneNumberView
 
 class PartnershipPhoneNumberViewSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite {
 
-  "PartnershipPhoneNumberVieww" should {
+  "PartnershipPhoneNumberView" should {
 
     "render the page with title, heading, input and submit button" in new Setup {
 
@@ -58,7 +58,7 @@ class PartnershipPhoneNumberViewSpec extends AnyWordSpec with Matchers with Guic
       doc.select(".govuk-button").text() mustBe messages("site.continue")
     }
 
-    "display error summary and inline error when no name is entered" in new Setup {
+    "display error summary and inline error when no phone number is entered" in new Setup {
 
       val partnershipName = "Test Partnership"
 
