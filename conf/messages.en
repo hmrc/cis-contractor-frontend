@@ -610,3 +610,17 @@ partnershipMobileNumber.error.length = Enter a valid mobile number, like 07700 9
 partnershipMobileNumber.error.invalid = Enter a valid mobile number, like 07700 900 982 or +44 7700 900 999
 partnershipMobileNumber.checkYourAnswersLabel = Mobile number
 partnershipMobileNumber.change.hidden = mobile number
+
+companyAdded.title = Company subcontractor added
+companyAdded.heading = Subcontractor added
+companyAdded.p1 = You can now find {0} on your list of subcontractors.
+companyAdded.nextSteps.h2 = Next steps
+companyAdded.nextSteps.p1 = Before you can make any payments to this subcontractor, you will need to verify them.
+companyAdded.nextSteps.p2 = Once they’re verified with HMRC, you will be able to:
+companyAdded.nextSteps.list.l1 = make CIS deductions at the correct rate
+companyAdded.nextSteps.list.l2 = include them on a monthly return
+companyAdded.nextSteps.list.l3 = provide them with payment and deduction statements
+companyAdded.nextSteps.link = Manage your subcontractors
+companyAdded.helpAndSupport.h2 = Help and support
+companyAdded.helpAndSupport.p1 = If you need help with the Construction Industry Scheme (CIS) and what it means for you,
+companyAdded.helpAndSupport.p1.link = guidance is available on GOV.UK
