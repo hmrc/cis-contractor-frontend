@@ -129,11 +129,6 @@ POST       /add/partnership/choose-contact-details                      controll
 GET        /add/partnership/change-choose-contact-details               controllers.add.partnership.PartnershipChooseContactDetailsController.onPageLoad(mode: Mode = CheckMode)
 POST       /add/partnership/change-choose-contact-details               controllers.add.partnership.PartnershipChooseContactDetailsController.onSubmit(mode: Mode = CheckMode)
 
-GET        /add/partnership/check-contact-details                           controllers.add.partnership.PartnershipContactDetailsYesNoController.onPageLoad(mode: Mode = NormalMode)
-POST       /add/partnership/check-contact-details                           controllers.add.partnership.PartnershipContactDetailsYesNoController.onSubmit(mode: Mode = NormalMode)
-GET        /add/partnership/change-check-contact-details                    controllers.add.partnership.PartnershipContactDetailsYesNoController.onPageLoad(mode: Mode = CheckMode)
-POST       /add/partnership/change-check-contact-details                    controllers.add.partnership.PartnershipContactDetailsYesNoController.onSubmit(mode: Mode = CheckMode)
-
 GET        /add/partnership/partnership-works-reference             controllers.add.partnership.PartnershipWorksReferenceNumberController.onPageLoad(mode: Mode = NormalMode)
 POST       /add/partnership/partnership-works-reference             controllers.add.partnership.PartnershipWorksReferenceNumberController.onSubmit(mode: Mode = NormalMode)
 GET        /add/partnership/change-partnership-works-reference      controllers.add.partnership.PartnershipWorksReferenceNumberController.onPageLoad(mode: Mode = CheckMode)

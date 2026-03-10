@@ -365,13 +365,6 @@ partnershipChooseContactDetails.checkYourAnswersLabel = Method of contact
 partnershipChooseContactDetails.error.required = Select which contact details you want to add for this partnership
 partnershipChooseContactDetails.change.hidden = contact details for this partnership
 
-partnershipContactDetailsYesNo.title = Do you want to add contact details for this partnership?
-partnershipContactDetailsYesNo.heading = Do you want to add contact details for {0}?
-partnershipContactDetailsYesNo.hint = You can add this information later if you prefer
-partnershipContactDetailsYesNo.checkYourAnswersLabel = Add partnership contact details
-partnershipContactDetailsYesNo.error.required = Select whether you want to add contact details for this partnership
-partnershipContactDetailsYesNo.change.hidden = Partnership Contact Details
-
 partnershipNominatedPartnerNinoYesNo.title = Do you know the National Insurance number for this nominated partner?
 partnershipNominatedPartnerNinoYesNo.heading = Do you know the National Insurance number for {0}?
 partnershipNominatedPartnerNinoYesNo.hint = This information will be used to verify them as a subcontractor
