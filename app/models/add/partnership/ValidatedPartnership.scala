@@ -19,7 +19,8 @@ package models.add.partnership
 import models.add.{InternationalAddress, TypeOfSubcontractor}
 import models.contact.ContactOptions
 import models.contact.ContactOptions.*
-import models.{UserAnswers, Validation, ValidationError}
+import models.{InvalidAnswer, MissingAnswer, UserAnswers, Validation, ValidationError}
+import pages.QuestionPage
 import pages.add.TypeOfSubcontractorPage
 import pages.add.partnership.*
 import play.api.libs.json.*
@@ -80,5 +81,25 @@ object ValidatedPartnership extends Validation {
 
   private def getType(answers: UserAnswers): Either[ValidationError, TypeOfSubcontractor] =
     getPageValue(answers, TypeOfSubcontractorPage)
+
+  private def getContactPageValue[A](
+    answers: UserAnswers,
+    questionPage: QuestionPage[A],
+    contactOptions: ContactOptions
+  )(implicit reads: Reads[A]): Either[ValidationError, Option[A]] =
+    (contactOptions, questionPage) match {
+      case (Email, PartnershipEmailAddressPage)  =>
+        answers.get(questionPage).toRight(MissingAnswer(questionPage)).map(Option(_))
+      case (Phone, PartnershipPhoneNumberPage)   =>
+        answers.get(questionPage).toRight(MissingAnswer(questionPage)).map(Option(_))
+      case (Mobile, PartnershipMobileNumberPage) =>
+        answers.get(questionPage).toRight(MissingAnswer(questionPage)).map(Option(_))
+      case (Email | Phone | Mobile, _)           => Right(None)
+      case (NoDetails, _)                        =>
+        answers
+          .get(questionPage)
+          .fold(Right(None): Either[ValidationError, Option[A]])(_ => Left(InvalidAnswer(questionPage)))
+      case _                                     => Left(InvalidAnswer(questionPage))
+    }
 
 }

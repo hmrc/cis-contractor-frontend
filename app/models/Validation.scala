@@ -16,10 +16,7 @@
 
 package models
 
-import models.contact.ContactOptions
-import models.contact.ContactOptions.{Email, Mobile, Phone}
 import pages.QuestionPage
-import pages.add.partnership.{PartnershipEmailAddressPage, PartnershipMobileNumberPage, PartnershipPhoneNumberPage}
 import play.api.libs.json.Reads
 
 trait Validation {
@@ -30,21 +27,6 @@ trait Validation {
     answers.get(questionPage) match {
       case Some(value) => Right(value)
       case None        => Left(MissingAnswer(questionPage))
-    }
-
-  def getContactPageValue[A](
-    answers: UserAnswers,
-    questionPage: QuestionPage[A],
-    contactOptions: ContactOptions
-  )(implicit reads: Reads[A]): Either[ValidationError, Option[A]] =
-    (contactOptions, questionPage) match {
-      case (Email, PartnershipEmailAddressPage)  =>
-        answers.get(questionPage).toRight(MissingAnswer(questionPage)).map(Option(_))
-      case (Phone, PartnershipPhoneNumberPage)   =>
-        answers.get(questionPage).toRight(MissingAnswer(questionPage)).map(Option(_))
-      case (Mobile, PartnershipMobileNumberPage) =>
-        answers.get(questionPage).toRight(MissingAnswer(questionPage)).map(Option(_))
-      case _                                     => Left(InvalidAnswer(questionPage))
     }
 
   def getOptionalPageValue[A](
