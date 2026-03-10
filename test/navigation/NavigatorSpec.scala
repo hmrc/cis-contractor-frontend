@@ -225,12 +225,12 @@ class NavigatorSpec extends SpecBase {
         ) mustBe controllers.add.routes.NationalInsuranceNumberYesNoController.onPageLoad(NormalMode)
       }
 
-      "must go from a PartnershipAddressPage to PartnershipContactDetailsYesNoController in NormalMode" in {
+      "must go from a PartnershipAddressPage to PartnershipChooseContactDetailsController in NormalMode" in {
         navigator.nextPage(
           PartnershipAddressPage,
           NormalMode,
           UserAnswers("id")
-        ) mustBe controllers.add.partnership.routes.PartnershipContactDetailsYesNoController.onPageLoad(NormalMode)
+        ) mustBe controllers.add.partnership.routes.PartnershipChooseContactDetailsController.onPageLoad(NormalMode)
       }
 
       "must go from a NationalInsuranceNumberYesNoPage to SubNationalInsuranceNumberPage when true" in {
@@ -415,12 +415,12 @@ class NavigatorSpec extends SpecBase {
         ) mustBe controllers.add.partnership.routes.PartnershipAddressController.onPageLoad(NormalMode)
       }
 
-      "must go from PartnershipAddressYesNoPage to PartnershipContactDetailsYesNoController when false in NormalMode" in {
+      "must go from PartnershipAddressYesNoPage to PartnershipChooseContactDetailsController when false in NormalMode" in {
         navigator.nextPage(
           PartnershipAddressYesNoPage,
           NormalMode,
           emptyUserAnswers.setOrException(PartnershipAddressYesNoPage, false)
-        ) mustBe controllers.add.partnership.routes.PartnershipContactDetailsYesNoController.onPageLoad(NormalMode)
+        ) mustBe controllers.add.partnership.routes.PartnershipChooseContactDetailsController.onPageLoad(NormalMode)
       }
 
       "must go from PartnershipAddressYesNoPage to JourneyRecovery when no answer in NormalMode" in {
@@ -429,34 +429,6 @@ class NavigatorSpec extends SpecBase {
           NormalMode,
           emptyUserAnswers
         ) mustBe journeyRecovery
-      }
-
-      "must go from PartnershipContactDetailsYesNoPage" - {
-        "to PartnershipContactDetailsPage when answer is Yes" in {
-          val answers = UserAnswers(userAnswersId).set(PartnershipContactDetailsYesNoPage, true).success.value
-          navigator.nextPage(
-            PartnershipContactDetailsYesNoPage,
-            NormalMode,
-            answers
-          ) mustBe controllers.add.partnership.routes.PartnershipChooseContactDetailsController.onPageLoad(NormalMode)
-        }
-
-        "to PartnershipNominatedPartnerNamePage when answer is No" in {
-          val answers = UserAnswers(userAnswersId).set(PartnershipContactDetailsYesNoPage, false).success.value
-          navigator.nextPage(
-            PartnershipContactDetailsYesNoPage,
-            NormalMode,
-            answers
-          ) mustBe controllers.add.partnership.routes.PartnershipNominatedPartnerNameController.onPageLoad(NormalMode)
-        }
-
-        "to JourneyRecoveryPage when answer is not present" in {
-          navigator.nextPage(
-            PartnershipContactDetailsYesNoPage,
-            NormalMode,
-            emptyUserAnswers
-          ) mustBe routes.JourneyRecoveryController.onPageLoad()
-        }
       }
 
       "must go from PartnershipNominatedPartnerNinoYesNoPage to PartnershipNominatedPartnerNinoController when true in NormalMode" in {
@@ -1086,35 +1058,6 @@ class NavigatorSpec extends SpecBase {
           CheckMode,
           emptyUserAnswers
         ) mustBe partnershipCYA
-      }
-
-      "must go from PartnershipContactDetailsYesNoPage" - {
-        "to PartnershipContactDetailsPage when answer is Yes" in {
-          val answers = UserAnswers(userAnswersId).set(PartnershipContactDetailsYesNoPage, true).success.value
-          navigator.nextPage(
-            PartnershipContactDetailsYesNoPage,
-            CheckMode,
-            answers
-          ) mustBe controllers.add.partnership.routes.PartnershipChooseContactDetailsController.onPageLoad(CheckMode)
-        }
-
-        "to PartnershipCheckYourAnswers when answer is No" in {
-          val answers = UserAnswers(userAnswersId).set(PartnershipContactDetailsYesNoPage, false).success.value
-
-          navigator.nextPage(
-            PartnershipContactDetailsYesNoPage,
-            CheckMode,
-            answers
-          ) mustBe partnershipCYA
-        }
-
-        "to JourneyRecoveryPage when answer is not present" in {
-          navigator.nextPage(
-            PartnershipContactDetailsYesNoPage,
-            CheckMode,
-            emptyUserAnswers
-          ) mustBe routes.JourneyRecoveryController.onPageLoad()
-        }
       }
 
       "must go from PartnershipChooseContactDetailsPage" - {

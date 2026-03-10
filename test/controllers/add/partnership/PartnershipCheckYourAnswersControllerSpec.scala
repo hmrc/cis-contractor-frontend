@@ -503,16 +503,22 @@ class PartnershipCheckYourAnswersControllerSpec extends SpecBase {
 
     "must redirect to Journey Recovery for a GET if the subcontractor type is not Partnership" in {
       val ua = minUa
-        .set(TypeOfSubcontractorPage, TypeOfSubcontractor.Individualorsoletrader).success.value
-        .set(PartnershipChooseContactDetailsPage, ContactOptions.Email).success.value
-        .set(PartnershipEmailAddressPage, "one@two.three").success.value
+        .set(TypeOfSubcontractorPage, TypeOfSubcontractor.Individualorsoletrader)
+        .success
+        .value
+        .set(PartnershipChooseContactDetailsPage, ContactOptions.Email)
+        .success
+        .value
+        .set(PartnershipEmailAddressPage, "one@two.three")
+        .success
+        .value
 
       val application = applicationBuilder(userAnswers = Some(ua)).build()
 
       running(application) {
         val request =
           FakeRequest(GET, controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad().url)
-        val result = route(application, request).value
+        val result  = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value must include("/there-is-a-problem")

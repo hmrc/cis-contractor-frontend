@@ -39,7 +39,7 @@ class Navigator @Inject() () {
     case AddressOfSubcontractorPage                =>
       _ => controllers.add.routes.NationalInsuranceNumberYesNoController.onPageLoad(NormalMode)
     case PartnershipAddressPage                    =>
-      _ => controllers.add.partnership.routes.PartnershipContactDetailsYesNoController.onPageLoad(NormalMode)
+      _ => controllers.add.partnership.routes.PartnershipChooseContactDetailsController.onPageLoad(NormalMode)
     case NationalInsuranceNumberYesNoPage          =>
       userAnswers => navigatorFromNationalInsuranceNumberYesNoPage(NormalMode)(userAnswers)
     case SubNationalInsuranceNumberPage            =>
@@ -74,8 +74,6 @@ class Navigator @Inject() () {
     case PartnershipWorksReferenceNumberPage       =>
       _ => controllers.add.partnership.routes.PartnershipAddressYesNoController.onPageLoad(NormalMode)
     case PartnershipAddressYesNoPage               => userAnswers => navigatorFromPartnershipAddressYesNoPage(NormalMode)(userAnswers)
-    case PartnershipContactDetailsYesNoPage        =>
-      userAnswers => navigatorFromPartnershipContactDetailsYesNoPage(NormalMode)(userAnswers)
     case PartnershipNominatedPartnerCrnPage        =>
       _ => controllers.add.partnership.routes.PartnershipNominatedPartnerCrnController.onPageLoad(NormalMode)
     case PartnershipChooseContactDetailsPage       =>
@@ -134,7 +132,6 @@ class Navigator @Inject() () {
     case PartnershipWorksReferenceNumberYesNoPage => navigatorFromPartnershipWorksReferenceNumberYesNoPage(CheckMode)(_)
     case PartnershipWorksReferenceNumberPage      =>
       _ => controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
-    case PartnershipContactDetailsYesNoPage       => navigatorFromPartnershipContactDetailsYesNoPage(CheckMode)(_)
     case PartnershipChooseContactDetailsPage      => navigatorFromChooseContactDetailsPage(CheckMode)(_)
     case PartnershipAddressYesNoPage              => navigatorFromPartnershipAddressYesNoPage(CheckMode)(_)
     case PartnershipAddressPage                   =>
@@ -326,16 +323,6 @@ class Navigator @Inject() () {
       case (None, _)                 => routes.JourneyRecoveryController.onPageLoad()
     }
 
-  private def navigatorFromPartnershipContactDetailsYesNoPage(mode: Mode)(userAnswers: UserAnswers): Call      =
-    (userAnswers.get(PartnershipContactDetailsYesNoPage), mode) match {
-      case (Some(true), _)           =>
-        controllers.add.partnership.routes.PartnershipChooseContactDetailsController.onPageLoad(mode)
-      case (Some(false), NormalMode) =>
-        controllers.add.partnership.routes.PartnershipNominatedPartnerNameController.onPageLoad(mode)
-      case (Some(false), CheckMode)  =>
-        controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
-      case (None, _)                 => routes.JourneyRecoveryController.onPageLoad()
-    }
   private def navigatorFromPartnershipNominatedPartnerUtrYesNoPage(mode: Mode)(userAnswers: UserAnswers): Call =
     (userAnswers.get(PartnershipNominatedPartnerUtrYesNoPage), mode) match {
       case (Some(true), _)           =>
@@ -392,7 +379,7 @@ class Navigator @Inject() () {
       case (Some(true), NormalMode)  =>
         controllers.add.partnership.routes.PartnershipAddressController.onPageLoad(NormalMode)
       case (Some(false), NormalMode) =>
-        controllers.add.partnership.routes.PartnershipContactDetailsYesNoController.onPageLoad(NormalMode)
+        controllers.add.partnership.routes.PartnershipChooseContactDetailsController.onPageLoad(NormalMode)
       case (Some(true), CheckMode)   =>
         ua.get(PartnershipAddressPage)
           .fold(controllers.add.partnership.routes.PartnershipAddressController.onPageLoad(CheckMode)) { _ =>
