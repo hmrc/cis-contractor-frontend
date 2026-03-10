@@ -255,10 +255,10 @@ POST       /add/company/company-registration-number                             
 GET        /add/company/change-company-registration-number                        controllers.add.company.CompanyCrnController.onPageLoad(mode: Mode = CheckMode)
 POST       /add/company/change-company-registration-number                        controllers.add.company.CompanyCrnController.onSubmit(mode: Mode = CheckMode)
 
-GET        /companyWorksReferenceYesNo                  controllers.add.company.CompanyWorksReferenceYesNoController.onPageLoad(mode: Mode = NormalMode)
-POST       /companyWorksReferenceYesNo                  controllers.add.company.CompanyWorksReferenceYesNoController.onSubmit(mode: Mode = NormalMode)
-GET        /changeCompanyWorksReferenceYesNo            controllers.add.company.CompanyWorksReferenceYesNoController.onPageLoad(mode: Mode = CheckMode)
-POST       /changeCompanyWorksReferenceYesNo            controllers.add.company.CompanyWorksReferenceYesNoController.onSubmit(mode: Mode = CheckMode)
+GET        /add/company/company-has-works-reference                  controllers.add.company.CompanyWorksReferenceYesNoController.onPageLoad(mode: Mode = NormalMode)
+POST       /add/company/company-has-works-reference                 controllers.add.company.CompanyWorksReferenceYesNoController.onSubmit(mode: Mode = NormalMode)
+GET        /add/company/change-company-has-works-reference          controllers.add.company.CompanyWorksReferenceYesNoController.onPageLoad(mode: Mode = CheckMode)
+POST       /add/company/change-company-has-works-reference           controllers.add.company.CompanyWorksReferenceYesNoController.onSubmit(mode: Mode = CheckMode)
 
 GET        /companyWorksReference                       controllers.add.company.CompanyWorksReferenceController.onPageLoad(mode: Mode = NormalMode)
 POST       /companyWorksReference                       controllers.add.company.CompanyWorksReferenceController.onSubmit(mode: Mode = NormalMode)

@@ -103,6 +103,8 @@ class Navigator @Inject() () {
       _ => controllers.add.partnership.routes.PartnershipPhoneNumberController.onPageLoad(NormalMode)
     case CompanyPhoneNumberPage                    =>
       _ => controllers.add.company.routes.CompanyPhoneNumberController.onPageLoad(NormalMode)
+    case CompanyWorksReferenceYesNoPage            =>
+      userAnswers => navigatorFromCompanyWorksReferenceYesNoPage(NormalMode)(userAnswers)
     case CompanyCrnPage                            =>
       _ => controllers.add.company.routes.CompanyWorksReferenceYesNoController.onPageLoad(NormalMode)
     case CompanyUtrPage                            =>
@@ -147,6 +149,8 @@ class Navigator @Inject() () {
       userAnswers => navigatorFromCompanyUtrYesNoPage(CheckMode)(userAnswers)
     case CompanyPhoneNumberPage                   =>
       _ => controllers.add.company.routes.CompanyPhoneNumberController.onPageLoad(CheckMode)
+    case CompanyWorksReferenceYesNoPage           =>
+      userAnswers => navigatorFromCompanyWorksReferenceYesNoPage(CheckMode)(userAnswers)
     case CompanyCrnPage                           =>
       _ => controllers.add.company.routes.CompanyCheckYourAnswersController.onPageLoad()
     case CompanyUtrPage                           =>
@@ -354,6 +358,16 @@ class Navigator @Inject() () {
         controllers.add.partnership.routes.PartnershipNominatedPartnerCrnYesNoController.onPageLoad(mode)
       case (Some(false), NormalMode) =>
         controllers.add.partnership.routes.PartnershipNominatedPartnerCrnYesNoController.onPageLoad(NormalMode)
+      case (Some(false), CheckMode)  => controllers.add.routes.CheckYourAnswersController.onPageLoad()
+      case (None, _)                 => routes.JourneyRecoveryController.onPageLoad()
+    }
+
+  private def navigatorFromCompanyWorksReferenceYesNoPage(mode: Mode)(userAnswers: UserAnswers): Call =
+    (userAnswers.get(CompanyWorksReferenceYesNoPage), mode) match {
+      case (Some(true), _)           =>
+        controllers.add.company.routes.CompanyWorksReferenceController.onPageLoad(mode)
+      case (Some(false), NormalMode) =>
+        controllers.add.company.routes.CompanyCheckYourAnswersController.onPageLoad()
       case (Some(false), CheckMode)  => controllers.add.routes.CheckYourAnswersController.onPageLoad()
       case (None, _)                 => routes.JourneyRecoveryController.onPageLoad()
     }

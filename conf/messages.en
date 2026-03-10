@@ -585,11 +585,12 @@ companyCrn.error.invalid = Enter a valid company registration number
 companyCrn.checkYourAnswersLabel = Company registration number
 companyCrn.change.hidden = company registration number
 
-companyWorksReferenceYesNo.title = companyWorksReferenceYesNo
-companyWorksReferenceYesNo.heading = companyWorksReferenceYesNo
-companyWorksReferenceYesNo.checkYourAnswersLabel = companyWorksReferenceYesNo
-companyWorksReferenceYesNo.error.required = Select yes if companyWorksReferenceYesNo
-companyWorksReferenceYesNo.change.hidden = CompanyWorksReferenceYesNo
+companyWorksReferenceYesNo.title = Is there a works reference number associated with this company?
+companyWorksReferenceYesNo.heading = Is there a works reference number associated with {0}?
+companyWorksReferenceYesNo.hint = This is the reference number used to identify a subcontractor’s work or project. It can contain letters and numbers.
+companyWorksReferenceYesNo.checkYourAnswersLabel = Works reference number
+companyWorksReferenceYesNo.error.required = Select whether there is a works reference number associated with this company
+companyWorksReferenceYesNo.change.hidden = works reference number
 
 companyWorksReference.title = companyWorksReference
 companyWorksReference.heading = companyWorksReference
