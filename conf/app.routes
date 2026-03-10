@@ -245,10 +245,10 @@ POST       /add/company/company-utr                     controllers.add.company.
 GET        /add/company/change-company-utr              controllers.add.company.CompanyUtrController.onPageLoad(mode: Mode = CheckMode)
 POST       /add/company/change-company-utr              controllers.add.company.CompanyUtrController.onSubmit(mode: Mode = CheckMode)
 
-GET        /companyCrnYesNo                             controllers.add.company.CompanyCrnYesNoController.onPageLoad(mode: Mode = NormalMode)
-POST       /companyCrnYesNo                             controllers.add.company.CompanyCrnYesNoController.onSubmit(mode: Mode = NormalMode)
-GET        /changeCompanyCrnYesNo                       controllers.add.company.CompanyCrnYesNoController.onPageLoad(mode: Mode = CheckMode)
-POST       /changeCompanyCrnYesNo                       controllers.add.company.CompanyCrnYesNoController.onSubmit(mode: Mode = CheckMode)
+GET        /add/company/company-has-registration-number                             controllers.add.company.CompanyCrnYesNoController.onPageLoad(mode: Mode = NormalMode)
+POST       /add/company/company-has-registration-number                             controllers.add.company.CompanyCrnYesNoController.onSubmit(mode: Mode = NormalMode)
+GET        /add/company/change-company-has-registration-number                       controllers.add.company.CompanyCrnYesNoController.onPageLoad(mode: Mode = CheckMode)
+POST       /add/company/change-company-has-registration-number                       controllers.add.company.CompanyCrnYesNoController.onSubmit(mode: Mode = CheckMode)
 
 GET        /add/company/company-registration-number                               controllers.add.company.CompanyCrnController.onPageLoad(mode: Mode = NormalMode)
 POST       /add/company/company-registration-number                               controllers.add.company.CompanyCrnController.onSubmit(mode: Mode = NormalMode)

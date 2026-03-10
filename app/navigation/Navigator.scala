@@ -111,6 +111,8 @@ class Navigator @Inject() () {
       _ => controllers.add.company.routes.CompanyWorksReferenceYesNoController.onPageLoad(NormalMode)
     case CompanyUtrPage                            =>
       _ => controllers.add.company.routes.CompanyCrnYesNoController.onPageLoad(NormalMode)
+    case CompanyCrnYesNoPage                       =>
+      userAnswers => navigatorFromCompanyCrnYesNoPage(NormalMode)(userAnswers)
     case _                                         => _ => routes.IndexController.onPageLoad()
   }
 
@@ -128,6 +130,7 @@ class Navigator @Inject() () {
     case PartnershipContactDetailsYesNoPage       => navigatorFromPartnershipContactDetailsYesNoPage(CheckMode)(_)
     case PartnershipChooseContactDetailsPage      => navigatorFromChooseContactDetailsPage(CheckMode)(_)
     case PartnershipNominatedPartnerCrnYesNoPage  => navigatorFromPartnershipNominatedPartnerCrnYesNoPage(CheckMode)(_)
+    case CompanyCrnYesNoPage                      => navigatorFromCompanyCrnYesNoPage(CheckMode)(_)
     case PartnershipAddressYesNoPage              =>
       _ => controllers.add.partnership.routes.PartnershipAddressYesNoController.onPageLoad(CheckMode)
     case PartnershipAddressPage                   =>
@@ -407,6 +410,16 @@ class Navigator @Inject() () {
         controllers.add.company.routes.CompanyContactOptionsController.onPageLoad(mode)
       case (_, CheckMode)    => controllers.add.routes.CheckYourAnswersController.onPageLoad()
       case _                 => routes.JourneyRecoveryController.onPageLoad()
+    }
+
+  private def navigatorFromCompanyCrnYesNoPage(mode: Mode)(userAnswers: UserAnswers): Call =
+    (userAnswers.get(CompanyCrnYesNoPage), mode) match {
+      case (Some(true), _)           =>
+        controllers.add.company.routes.CompanyCrnYesNoController.onPageLoad(mode)
+      case (Some(false), NormalMode) =>
+        controllers.add.company.routes.CompanyCrnYesNoController.onPageLoad(NormalMode)
+      case (Some(false), CheckMode)  => controllers.add.routes.CheckYourAnswersController.onPageLoad()
+      case (None, _)                 => routes.JourneyRecoveryController.onPageLoad()
     }
 
 }
