@@ -15,36 +15,28 @@
  */
 
 package forms.add
+
 import forms.mappings.Mappings
-import models.add.UKAddress
+import models.add.InternationalAddress
 import play.api.data.{Form, Forms}
+import forms.Validation
+import forms.mappings.Constants
 
 import javax.inject.Inject
 
 class AddressOfSubcontractorFormProvider @Inject() extends Mappings {
 
-  private val allowedAddressCharsRegex =
-    """^[A-Za-z0-9"~!@#\$%*+:\;=\?\s,\.\[\]_\{\}\(\)/&'\-\^\\£€]+$"""
-
-  private val firstCharLetterRegex =
-    """^[A-Za-z].*"""
-
-  private val firstCharLetterOrDigitRegex = """^[A-Za-z0-9].*"""
-
-  private val ukPostcodeRegex =
-    """^(GIR\s?0AA|(?:(?:[A-Z]{1,2}\d[A-Z\d]?|\d[A-Z]{2})\s?\d[A-Z]{2}))$"""
-
-  def apply(): Form[UKAddress] = Form(
+  def apply(): Form[InternationalAddress] = Form(
     Forms.mapping(
       "addressLine1" ->
         text("addressOfSubcontractor.error.addressLine1.required")
           .transform(_.trim, identity)
           .verifying(
             firstError(
-              maxLength(35, "addressOfSubcontractor.error.addressLine1.length"),
-              regexp(allowedAddressCharsRegex, "addressOfSubcontractor.error.addressLine1.invalidCharacters"),
+              maxLength(Constants.MaxLength35, "addressOfSubcontractor.error.addressLine1.length"),
+              regexp(Validation.nameRegex, "addressOfSubcontractor.error.addressLine1.invalidCharacters"),
               regexp(
-                firstCharLetterOrDigitRegex,
+                Validation.firstCharLetterOrDigitRegex,
                 "addressOfSubcontractor.error.addressLine1.firstCharMustBeLetterOrNumber"
               )
             )
@@ -55,14 +47,14 @@ class AddressOfSubcontractorFormProvider @Inject() extends Mappings {
             .transform(_.trim, identity)
             .verifying(
               firstError(
-                maxLength(35, "addressOfSubcontractor.error.addressLine2.length"),
+                maxLength(Constants.MaxLength35, "addressOfSubcontractor.error.addressLine2.length"),
                 regexp(
-                  allowedAddressCharsRegex,
+                  Validation.nameRegex,
                   "addressOfSubcontractor.error.addressLine2.invalidCharacters"
                 ),
                 regexp(
-                  firstCharLetterRegex,
-                  "addressOfSubcontractor.error.addressLine2.firstCharMustBeLetter"
+                  Validation.firstCharLetterRegex,
+                  "addressOfSubcontractor.error.addressLine2.firstCharMustBeLetterOrNumber"
                 )
               )
             )
@@ -72,9 +64,12 @@ class AddressOfSubcontractorFormProvider @Inject() extends Mappings {
           .transform(_.trim, identity)
           .verifying(
             firstError(
-              maxLength(35, "addressOfSubcontractor.error.addressLine3.length"),
-              regexp(allowedAddressCharsRegex, "addressOfSubcontractor.error.addressLine3.invalidCharacters"),
-              regexp(firstCharLetterRegex, "addressOfSubcontractor.error.addressLine3.firstCharMustBeLetter")
+              maxLength(Constants.MaxLength35, "addressOfSubcontractor.error.addressLine3.length"),
+              regexp(Validation.nameRegex, "addressOfSubcontractor.error.addressLine3.invalidCharacters"),
+              regexp(
+                Validation.firstCharLetterRegex,
+                "addressOfSubcontractor.error.addressLine3.firstCharMustBeLetterOrNumber"
+              )
             )
           ),
       "addressLine4" ->
@@ -83,35 +78,28 @@ class AddressOfSubcontractorFormProvider @Inject() extends Mappings {
             .transform(_.trim, identity)
             .verifying(
               firstError(
-                maxLength(35, "addressOfSubcontractor.error.addressLine4.length"),
-                regexp(allowedAddressCharsRegex, "addressOfSubcontractor.error.addressLine4.invalidCharacters"),
-                regexp(firstCharLetterRegex, "addressOfSubcontractor.error.addressLine4.firstCharMustBeLetter")
+                maxLength(Constants.MaxLength35, "addressOfSubcontractor.error.addressLine4.length"),
+                regexp(Validation.nameRegex, "addressOfSubcontractor.error.addressLine4.invalidCharacters"),
+                regexp(
+                  Validation.firstCharLetterRegex,
+                  "addressOfSubcontractor.error.addressLine4.firstCharMustBeLetterOrNumber"
+                )
               )
             )
         ),
-      "postCode"     ->
-        text("addressOfSubcontractor.error.postCode.required")
+      "postalCode"   ->
+        text("addressOfSubcontractor.error.postalCode.required")
           .transform(
             _.trim.toUpperCase.replaceAll("\\s+", " "),
             identity
           )
           .verifying(
             firstError(
-              maxLength(8, "addressOfSubcontractor.error.postCode.length"),
-              regexp(ukPostcodeRegex, "addressOfSubcontractor.error.postCode.invalid")
+              maxLength(Constants.MaxLength8, "addressOfSubcontractor.error.postalCode.length"),
+              regexp(Validation.ukPostcodeRegex, "addressOfSubcontractor.error.postalCode.invalid")
             )
-          )
-    )((a1: String, a2: Option[String], a3: String, a4: Option[String], pc: String) => UKAddress(a1, a2, a3, a4, pc))(
-      address =>
-        Some(
-          (
-            address.addressLine1,
-            address.addressLine2,
-            address.addressLine3,
-            address.addressLine4,
-            address.postCode
-          )
-        )
-    )
+          ),
+      "country"      -> text("addressOfSubcontractor.error.country.required")
+    )(InternationalAddress.apply)(internationalAddress => Some(Tuple.fromProductTyped(internationalAddress)))
   )
 }

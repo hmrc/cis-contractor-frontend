@@ -52,7 +52,7 @@ class SubcontractorService @Inject() (
                   addressLine2 = userAnswers.get(AddressOfSubcontractorPage).flatMap(_.addressLine2),
                   addressLine3 = userAnswers.get(AddressOfSubcontractorPage).map(_.addressLine3),
                   addressLine4 = userAnswers.get(AddressOfSubcontractorPage).flatMap(_.addressLine4),
-                  postcode = userAnswers.get(AddressOfSubcontractorPage).map(_.postCode),
+                  postcode = userAnswers.get(AddressOfSubcontractorPage).map(_.postalCode), // major update on DTR-3356
                   nino = userAnswers.get(SubNationalInsuranceNumberPage),
                   utr = userAnswers.get(SubcontractorsUniqueTaxpayerReferencePage),
                   worksReferenceNumber = userAnswers.get(WorksReferenceNumberPage),
