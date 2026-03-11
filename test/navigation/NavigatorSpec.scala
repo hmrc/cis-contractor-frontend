@@ -730,6 +730,14 @@ class NavigatorSpec extends SpecBase {
           UserAnswers("id")
         ) mustBe controllers.add.company.routes.CompanyCrnYesNoController.onPageLoad(NormalMode)
       }
+
+      "must go from a IndividualMobileNumberPage to IndividualMobileNumberPage" in {
+        navigator.nextPage(
+          IndividualMobileNumberPage,
+          NormalMode,
+          UserAnswers("id")
+        ) mustBe controllers.add.routes.IndividualMobileNumberController.onPageLoad(NormalMode)
+      }
     }
 
     "in Check mode" - {
@@ -1332,6 +1340,14 @@ class NavigatorSpec extends SpecBase {
           CheckMode,
           emptyUserAnswers
         ) mustBe CompanyCYA
+      }
+
+      "must go from a IndividualMobileNumberPage to IndividualMobileNumberPage" in {
+        navigator.nextPage(
+          IndividualMobileNumberPage,
+          CheckMode,
+          UserAnswers("id")
+        ) mustBe controllers.add.routes.IndividualMobileNumberController.onPageLoad(CheckMode)
       }
     }
 
