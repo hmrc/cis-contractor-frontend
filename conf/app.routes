@@ -230,10 +230,10 @@ POST       /add/company/phone-number                            controllers.add.
 GET        /add/company/change-phone-number                     controllers.add.company.CompanyPhoneNumberController.onPageLoad(mode: Mode = CheckMode)
 POST       /add/company/change-phone-number                     controllers.add.company.CompanyPhoneNumberController.onSubmit(mode: Mode = CheckMode)
 
-GET        /companyMobileNumber                         controllers.add.company.CompanyMobileNumberController.onPageLoad(mode: Mode = NormalMode)
-POST       /companyMobileNumber                         controllers.add.company.CompanyMobileNumberController.onSubmit(mode: Mode = NormalMode)
-GET        /changeCompanyMobileNumber                   controllers.add.company.CompanyMobileNumberController.onPageLoad(mode: Mode = CheckMode)
-POST       /changeCompanyMobileNumber                   controllers.add.company.CompanyMobileNumberController.onSubmit(mode: Mode = CheckMode)
+GET        /add/company/mobile-number                   controllers.add.company.CompanyMobileNumberController.onPageLoad(mode: Mode = NormalMode)
+POST       /add/company/mobile-number                   controllers.add.company.CompanyMobileNumberController.onSubmit(mode: Mode = NormalMode)
+GET        /add/company/change-mobile-number            controllers.add.company.CompanyMobileNumberController.onPageLoad(mode: Mode = CheckMode)
+POST       /add/company/change-mobile-number            controllers.add.company.CompanyMobileNumberController.onSubmit(mode: Mode = CheckMode)
 
 GET        /add/company/company-has-utr                           controllers.add.company.CompanyUtrYesNoController.onPageLoad(mode: Mode = NormalMode)
 POST       /add/company/company-has-utr                          controllers.add.company.CompanyUtrYesNoController.onSubmit(mode: Mode = NormalMode)
@@ -245,20 +245,20 @@ POST       /add/company/company-utr                     controllers.add.company.
 GET        /add/company/change-company-utr              controllers.add.company.CompanyUtrController.onPageLoad(mode: Mode = CheckMode)
 POST       /add/company/change-company-utr              controllers.add.company.CompanyUtrController.onSubmit(mode: Mode = CheckMode)
 
-GET        /companyCrnYesNo                             controllers.add.company.CompanyCrnYesNoController.onPageLoad(mode: Mode = NormalMode)
-POST       /companyCrnYesNo                             controllers.add.company.CompanyCrnYesNoController.onSubmit(mode: Mode = NormalMode)
-GET        /changeCompanyCrnYesNo                       controllers.add.company.CompanyCrnYesNoController.onPageLoad(mode: Mode = CheckMode)
-POST       /changeCompanyCrnYesNo                       controllers.add.company.CompanyCrnYesNoController.onSubmit(mode: Mode = CheckMode)
+GET        /add/company/company-has-registration-number                             controllers.add.company.CompanyCrnYesNoController.onPageLoad(mode: Mode = NormalMode)
+POST       /add/company/company-has-registration-number                             controllers.add.company.CompanyCrnYesNoController.onSubmit(mode: Mode = NormalMode)
+GET        /add/company/change-company-has-registration-number                       controllers.add.company.CompanyCrnYesNoController.onPageLoad(mode: Mode = CheckMode)
+POST       /add/company/change-company-has-registration-number                       controllers.add.company.CompanyCrnYesNoController.onSubmit(mode: Mode = CheckMode)
 
 GET        /add/company/company-registration-number                               controllers.add.company.CompanyCrnController.onPageLoad(mode: Mode = NormalMode)
 POST       /add/company/company-registration-number                               controllers.add.company.CompanyCrnController.onSubmit(mode: Mode = NormalMode)
 GET        /add/company/change-company-registration-number                        controllers.add.company.CompanyCrnController.onPageLoad(mode: Mode = CheckMode)
 POST       /add/company/change-company-registration-number                        controllers.add.company.CompanyCrnController.onSubmit(mode: Mode = CheckMode)
 
-GET        /companyWorksReferenceYesNo                  controllers.add.company.CompanyWorksReferenceYesNoController.onPageLoad(mode: Mode = NormalMode)
-POST       /companyWorksReferenceYesNo                  controllers.add.company.CompanyWorksReferenceYesNoController.onSubmit(mode: Mode = NormalMode)
-GET        /changeCompanyWorksReferenceYesNo            controllers.add.company.CompanyWorksReferenceYesNoController.onPageLoad(mode: Mode = CheckMode)
-POST       /changeCompanyWorksReferenceYesNo            controllers.add.company.CompanyWorksReferenceYesNoController.onSubmit(mode: Mode = CheckMode)
+GET        /add/company/company-has-works-reference                  controllers.add.company.CompanyWorksReferenceYesNoController.onPageLoad(mode: Mode = NormalMode)
+POST       /add/company/company-has-works-reference                 controllers.add.company.CompanyWorksReferenceYesNoController.onSubmit(mode: Mode = NormalMode)
+GET        /add/company/change-company-has-works-reference          controllers.add.company.CompanyWorksReferenceYesNoController.onPageLoad(mode: Mode = CheckMode)
+POST       /add/company/change-company-has-works-reference           controllers.add.company.CompanyWorksReferenceYesNoController.onSubmit(mode: Mode = CheckMode)
 
 GET        /companyWorksReference                       controllers.add.company.CompanyWorksReferenceController.onPageLoad(mode: Mode = NormalMode)
 POST       /companyWorksReference                       controllers.add.company.CompanyWorksReferenceController.onSubmit(mode: Mode = NormalMode)
@@ -276,3 +276,5 @@ GET        /add/mobile-number                          controllers.add.Individua
 POST       /add/mobile-number                          controllers.add.IndividualMobileNumberController.onSubmit(mode: Mode = NormalMode)
 GET        /add/change-mobile-number                   controllers.add.IndividualMobileNumberController.onPageLoad(mode: Mode = CheckMode)
 POST       /add/change-mobile-number                   controllers.add.IndividualMobileNumberController.onSubmit(mode: Mode = CheckMode)
+
+GET        /add/company/subcontractor-added                     controllers.add.company.CompanyAddedController.onPageLoad()
