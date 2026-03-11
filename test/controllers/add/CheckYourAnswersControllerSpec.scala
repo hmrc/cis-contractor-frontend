@@ -106,7 +106,7 @@ class CheckYourAnswersControllerSpec extends SpecBase {
         content must include("Address")
         content must include("Do you have a National Insurance number?")
         content must include("National Insurance number")
-        content must include("Do you have a Unique Taxpayer Reference (UTR)?")
+        content must include("Add UTR?")
         content must include("Unique Taxpayer Reference")
         content must include("Do you have a works reference number?")
         content must include("Works reference number")

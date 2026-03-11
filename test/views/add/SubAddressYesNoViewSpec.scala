@@ -36,7 +36,7 @@ class SubAddressYesNoViewSpec extends AnyWordSpec with Matchers with GuiceOneApp
 
     "render the page with title, heading, radios and submit button" in new Setup {
 
-      val subcontractorName = "Test SubContractor"
+      val subcontractorName = "Test Subcontractor"
 
       val html: HtmlFormat.Appendable = view(form, NormalMode, subcontractorName)
       val doc: Document               = org.jsoup.Jsoup.parse(html.toString())
@@ -65,7 +65,7 @@ class SubAddressYesNoViewSpec extends AnyWordSpec with Matchers with GuiceOneApp
 
     "display error summary and inline error when no option is selected" in new Setup {
 
-      val subcontractorName = "Test SubContractor"
+      val subcontractorName = "Test Subcontractor"
 
       val errorForm: Form[Boolean] =
         form.withError("value", "subAddressYesNo.error.required")
