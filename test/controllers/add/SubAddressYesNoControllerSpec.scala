@@ -40,12 +40,12 @@ class SubAddressYesNoControllerSpec extends SpecBase with MockitoSugar {
 
   private lazy val subAddressYesNoRoute = controllers.add.routes.SubAddressYesNoController.onPageLoad(NormalMode).url
 
-  private val subContractorName = SubcontractorName("John", Some("Paul"), "Smith")
+  private val subcontractorName = SubcontractorName("John", Some("Paul"), "Smith")
 
   private val name = "John Smith"
 
   private def uaWithName: UserAnswers =
-    emptyUserAnswers.set(SubcontractorNamePage, subContractorName).success.value
+    emptyUserAnswers.set(SubcontractorNamePage, subcontractorName).success.value
 
   "SubAddressYesNo Controller" - {
 

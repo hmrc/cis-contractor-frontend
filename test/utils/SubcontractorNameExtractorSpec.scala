@@ -29,10 +29,10 @@ class SubcontractorNameExtractorSpec extends SpecBase with MockitoSugar {
 
       val subcontractorNameExtractor = new SubcontractorNameExtractor()
 
-      val subContractorName = SubcontractorName("John", Some("Paul"), "Smith")
+      val subcontractorName = SubcontractorName("John", Some("Paul"), "Smith")
 
       val userAnswers = emptyUserAnswers
-        .set(SubcontractorNamePage, subContractorName)
+        .set(SubcontractorNamePage, subcontractorName)
         .success
         .value
 

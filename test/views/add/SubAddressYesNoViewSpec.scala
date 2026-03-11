@@ -36,14 +36,14 @@ class SubAddressYesNoViewSpec extends AnyWordSpec with Matchers with GuiceOneApp
 
     "render the page with title, heading, radios and submit button" in new Setup {
 
-      val subContractorName = "Test SubContractor"
+      val subcontractorName = "Test SubContractor"
 
-      val html: HtmlFormat.Appendable = view(form, NormalMode, subContractorName)
+      val html: HtmlFormat.Appendable = view(form, NormalMode, subcontractorName)
       val doc: Document               = org.jsoup.Jsoup.parse(html.toString())
       doc.select("title").text() must include(messages("subAddressYesNo.title"))
 
       val legend: Elements = doc.select("fieldset legend")
-      legend.text() mustBe messages("subAddressYesNo.heading", subContractorName)
+      legend.text() mustBe messages("subAddressYesNo.heading", subcontractorName)
       legend.hasClass("govuk-fieldset__legend--l") mustBe true
 
       val hint: Elements = doc.select("fieldset .govuk-hint")
@@ -65,12 +65,12 @@ class SubAddressYesNoViewSpec extends AnyWordSpec with Matchers with GuiceOneApp
 
     "display error summary and inline error when no option is selected" in new Setup {
 
-      val subContractorName = "Test SubContractor"
+      val subcontractorName = "Test SubContractor"
 
       val errorForm: Form[Boolean] =
         form.withError("value", "subAddressYesNo.error.required")
 
-      val html: HtmlFormat.Appendable = view(errorForm, NormalMode, subContractorName)
+      val html: HtmlFormat.Appendable = view(errorForm, NormalMode, subcontractorName)
       val doc: Document               = org.jsoup.Jsoup.parse(html.toString())
 
       val summary: Elements = doc.select(".govuk-error-summary")
