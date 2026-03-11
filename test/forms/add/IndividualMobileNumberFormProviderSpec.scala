@@ -22,12 +22,12 @@ import play.api.data.FormError
 class IndividualMobileNumberFormProviderSpec extends StringFieldBehaviours {
 
   val requiredKey = "individualMobileNumber.error.required"
-  val lengthKey = "individualMobileNumber.error.length"
-  val invalidKey = "individualMobileNumber.error.invalid"
-  val maxLength = 35
+  val lengthKey   = "individualMobileNumber.error.length"
+  val invalidKey  = "individualMobileNumber.error.invalid"
+  val maxLength   = 35
 
   private val mobileRegex = "^(?=(?:.*\\d){6,})[0-9()+\\- ]*$"
-  
+
   val form = new IndividualMobileNumberFormProvider()()
 
   val validMobileNumber: Seq[String] = Seq(

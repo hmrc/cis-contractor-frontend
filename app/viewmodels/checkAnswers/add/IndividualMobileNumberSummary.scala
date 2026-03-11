@@ -24,19 +24,20 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
 
-object IndividualMobileNumberSummary  {
+object IndividualMobileNumberSummary {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(IndividualMobileNumberPage).map {
-      answer =>
-
-        SummaryListRowViewModel(
-          key     = "individualMobileNumber.checkYourAnswersLabel",
-          value   = ValueViewModel(HtmlFormat.escape(answer).toString),
-          actions = Seq(
-            ActionItemViewModel("site.change", controllers.add.routes.IndividualMobileNumberController.onPageLoad(CheckMode).url)
-              .withVisuallyHiddenText(messages("individualMobileNumber.change.hidden"))
+    answers.get(IndividualMobileNumberPage).map { answer =>
+      SummaryListRowViewModel(
+        key = "individualMobileNumber.checkYourAnswersLabel",
+        value = ValueViewModel(HtmlFormat.escape(answer).toString),
+        actions = Seq(
+          ActionItemViewModel(
+            "site.change",
+            controllers.add.routes.IndividualMobileNumberController.onPageLoad(CheckMode).url
           )
+            .withVisuallyHiddenText(messages("individualMobileNumber.change.hidden"))
         )
+      )
     }
 }

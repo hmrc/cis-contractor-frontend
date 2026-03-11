@@ -791,7 +791,7 @@ class NavigatorSpec extends SpecBase {
           UserAnswers("id")
         ) mustBe controllers.add.routes.IndividualMobileNumberController.onPageLoad(NormalMode)
       }
-      
+
       "must go from a CompanyMobileNumberPage to CompanyMobileNumberPage" in {
         navigator.nextPage(
           CompanyMobileNumberPage,
@@ -1471,7 +1471,7 @@ class NavigatorSpec extends SpecBase {
           UserAnswers("id")
         ) mustBe controllers.add.routes.IndividualMobileNumberController.onPageLoad(CheckMode)
       }
-      
+
       "must go from CompanyMobileNumberPage to CompanyMobileNumberPage in CheckMode" in {
         navigator.nextPage(
           CompanyMobileNumberPage,

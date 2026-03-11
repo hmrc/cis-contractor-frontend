@@ -24,7 +24,7 @@ class SubcontractorNameExtractor {
   def getSubcontractorName(userAnswers: UserAnswers): Option[String] =
     userAnswers
       .get(SubcontractorNamePage)
-      .map(n => s"${n.firstName.trim} ${n.lastName.trim}".trim) 
+      .map(n => s"${n.firstName.trim} ${n.lastName.trim}".trim)
       .filter(_.nonEmpty)
       .orElse(
         userAnswers.get(TradingNameOfSubcontractorPage).map(_.trim).filter(_.nonEmpty)

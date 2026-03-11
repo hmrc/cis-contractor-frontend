@@ -163,7 +163,7 @@ class Navigator @Inject() () {
     case CompanyUtrPage                           =>
       _ => controllers.add.company.routes.CompanyCheckYourAnswersController.onPageLoad()
     case IndividualMobileNumberPage               =>
-      _ => controllers.add.routes.IndividualMobileNumberController.onPageLoad(NormalMode)
+      _ => controllers.add.routes.IndividualMobileNumberController.onPageLoad(CheckMode)
     case CompanyMobileNumberPage                  =>
       _ => controllers.add.company.routes.CompanyMobileNumberController.onPageLoad(CheckMode)
     case _                                        => _ => controllers.add.routes.CheckYourAnswersController.onPageLoad()

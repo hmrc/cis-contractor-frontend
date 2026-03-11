@@ -40,9 +40,10 @@ class IndividualMobileNumberControllerSpec extends SpecBase with MockitoSugar {
   def onwardRoute = Call("GET", "/foo")
 
   val formProvider = new IndividualMobileNumberFormProvider()
-  val form = formProvider()
+  val form         = formProvider()
 
-  lazy val individualMobileNumberRoute = controllers.add.routes.IndividualMobileNumberController.onPageLoad(NormalMode).url
+  lazy val individualMobileNumberRoute =
+    controllers.add.routes.IndividualMobileNumberController.onPageLoad(NormalMode).url
 
   private val subcontractorName = SubcontractorName("John", Some("Paul"), "Smith")
 
@@ -83,7 +84,10 @@ class IndividualMobileNumberControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill("answer"), NormalMode, name)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill("answer"), NormalMode, name)(
+          request,
+          messages(application)
+        ).toString
       }
     }
 

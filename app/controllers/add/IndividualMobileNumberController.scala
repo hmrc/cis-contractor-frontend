@@ -32,18 +32,20 @@ import utils.SubcontractorNameExtractor
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class IndividualMobileNumberController @Inject()(
-                                        override val messagesApi: MessagesApi,
-                                        sessionRepository: SessionRepository,
-                                        navigator: Navigator,
-                                        identify: IdentifierAction,
-                                        getData: DataRetrievalAction,
-                                        requireData: DataRequiredAction,
-                                        formProvider: IndividualMobileNumberFormProvider,
-                                        subcontractorNameExtractor: SubcontractorNameExtractor,
-                                        val controllerComponents: MessagesControllerComponents,
-                                        view: IndividualMobileNumberView
-                                    )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+class IndividualMobileNumberController @Inject() (
+  override val messagesApi: MessagesApi,
+  sessionRepository: SessionRepository,
+  navigator: Navigator,
+  identify: IdentifierAction,
+  getData: DataRetrievalAction,
+  requireData: DataRequiredAction,
+  formProvider: IndividualMobileNumberFormProvider,
+  subcontractorNameExtractor: SubcontractorNameExtractor,
+  val controllerComponents: MessagesControllerComponents,
+  view: IndividualMobileNumberView
+)(implicit ec: ExecutionContext)
+    extends FrontendBaseController
+    with I18nSupport {
 
   val form = formProvider()
 
@@ -53,13 +55,12 @@ class IndividualMobileNumberController @Inject()(
   private def preparedForm(implicit request: DataRequest[?]) =
     request.userAnswers.get(IndividualMobileNumberPage).fold(form)(form.fill)
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) {
-    implicit request =>
-      subcontractorNameExtractor
-        .getSubcontractorName(request.userAnswers)
-        .fold(recoveryRedirect) { subcontractorName =>
-          Ok(view(preparedForm, mode, subcontractorName))
-        }
+  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
+    subcontractorNameExtractor
+      .getSubcontractorName(request.userAnswers)
+      .fold(recoveryRedirect) { subcontractorName =>
+        Ok(view(preparedForm, mode, subcontractorName))
+      }
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
@@ -67,16 +68,16 @@ class IndividualMobileNumberController @Inject()(
       subcontractorNameExtractor
         .getSubcontractorName(request.userAnswers)
         .fold(Future.successful(recoveryRedirect)) { subcontractorName =>
-          form.bindFromRequest().fold(
-            formWithErrors =>
-              Future.successful(BadRequest(view(formWithErrors, mode, subcontractorName))),
-
-            value =>
-              for {
-                updatedAnswers <- Future.fromTry(request.userAnswers.set(IndividualMobileNumberPage, value))
-                _ <- sessionRepository.set(updatedAnswers)
-              } yield Redirect(navigator.nextPage(IndividualMobileNumberPage, mode, updatedAnswers))
-          )
+          form
+            .bindFromRequest()
+            .fold(
+              formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, subcontractorName))),
+              value =>
+                for {
+                  updatedAnswers <- Future.fromTry(request.userAnswers.set(IndividualMobileNumberPage, value))
+                  _              <- sessionRepository.set(updatedAnswers)
+                } yield Redirect(navigator.nextPage(IndividualMobileNumberPage, mode, updatedAnswers))
+            )
         }
   }
 }
