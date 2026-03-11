@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-package views.add.partnership
+package views.add.company
 
-import forms.add.partnership.PartnershipPhoneNumberFormProvider
+import forms.add.company.CompanyMobileNumberFormProvider
 import models.NormalMode
 import org.scalatest.matchers.must.Matchers
+import org.scalatest.matchers.should.Matchers.should
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.data.Form
@@ -26,30 +27,24 @@ import play.api.i18n.Messages
 import play.api.mvc.Request
 import play.api.test.FakeRequest
 import play.twirl.api.HtmlFormat
-import views.html.add.partnership.PartnershipPhoneNumberView
+import views.html.add.company.CompanyMobileNumberView
 
-class PartnershipPhoneNumberViewSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite {
+class CompanyMobileNumberViewSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite{
 
-  "PartnershipPhoneNumberView" should {
+  "CompanyMobileNumberView" should {
+
 
     "render the page with title, heading, input and submit button" in new Setup {
-
-      val partnershipName = "Test Partnership"
-
-      val html: HtmlFormat.Appendable = view(form, NormalMode, partnershipName)
+      val companyName = "Test Company"
+      val html: HtmlFormat.Appendable = view(form, NormalMode, companyName)
       val doc                         = org.jsoup.Jsoup.parse(html.toString())
 
-      doc.select("title").text() must include(messages("partnershipPhoneNumber.title"))
+      doc.select("title").text() must include(messages("companyMobileNumber.title"))
 
-      val heading = doc.select("h1")
-      heading.text() mustBe messages("partnershipPhoneNumber.heading", partnershipName)
+      val heading = doc.select("label.govuk-label")
+      heading.text() mustBe messages("companyMobileNumber.heading",companyName)
 
-      val hint = doc.select(".govuk-hint")
-      hint.text() mustBe messages("partnershipPhoneNumber.hint")
-
-      doc
-        .select("form")
-        .attr("action") mustBe controllers.add.partnership.routes.PartnershipPhoneNumberController
+      doc.select("form").attr("action") mustBe  controllers.add.company.routes.CompanyMobileNumberController
         .onSubmit(NormalMode)
         .url
 
@@ -58,28 +53,26 @@ class PartnershipPhoneNumberViewSpec extends AnyWordSpec with Matchers with Guic
       doc.select(".govuk-button").text() mustBe messages("site.continue")
     }
 
-    "display error summary and inline error when no phone number is entered" in new Setup {
-
-      val partnershipName = "Test Partnership"
-
+    "display error summary and inline error when no name is entered" in new Setup {
       val errorForm: Form[String] =
-        form.withError("value", "partnershipPhoneNumber.error.required")
+        form.withError("value", "companyMobileNumber.error.required")
 
-      val html = view(errorForm, NormalMode, partnershipName)
+      val companyName = "Test Company"
+      val html = view(errorForm, NormalMode, companyName)
       val doc  = org.jsoup.Jsoup.parse(html.toString())
 
       val summary = doc.select(".govuk-error-summary")
-      summary.text() must include(messages("partnershipPhoneNumber.error.required"))
+      summary.text() must include(messages("companyMobileNumber.error.required"))
 
       val linkHref = summary.select("a").attr("href")
       linkHref mustBe "#value"
 
-      doc.select(".govuk-error-message").text() must include(messages("partnershipPhoneNumber.error.required"))
+      doc.select(".govuk-error-message").text() must include(messages("companyMobileNumber.error.required"))
     }
   }
 
   trait Setup {
-    val formProvider       = new PartnershipPhoneNumberFormProvider()
+    val formProvider       = new CompanyMobileNumberFormProvider()
     val form: Form[String] = formProvider()
 
     implicit val request: Request[_] = FakeRequest()
@@ -89,6 +82,7 @@ class PartnershipPhoneNumberViewSpec extends AnyWordSpec with Matchers with Guic
         app.injector.instanceOf[play.api.i18n.MessagesApi]
       )
 
-    val view: PartnershipPhoneNumberView = app.injector.instanceOf[PartnershipPhoneNumberView]
+    val view: CompanyMobileNumberView = app.injector.instanceOf[CompanyMobileNumberView]
   }
+
 }
