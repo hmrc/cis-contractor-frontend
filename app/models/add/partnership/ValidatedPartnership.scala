@@ -95,7 +95,7 @@ object ValidatedPartnership extends Validation {
       case NoDetails => None
     }
 
-    if (expectedPage.exists(_ == questionPage)) {
+    if (expectedPage.contains(questionPage)) {
       answers.get(questionPage).toRight(MissingAnswer(questionPage)).map(Some(_))
     } else if (expectedPage.isDefined) {
       Right(None)
