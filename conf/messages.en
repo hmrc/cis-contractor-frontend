@@ -420,11 +420,11 @@ partnershipNominatedPartnerUtr.change.hidden = UTR for nominated partner
 partnershipEmailAddress.title = What is the email address for this partnership?
 partnershipEmailAddress.heading = What is the email address for {0}?
 partnershipEmailAddress.hint = HMRC will never use this email address to contact this subcontractor
-partnershipEmailAddress.checkYourAnswersLabel = Partnership Email Address
+partnershipEmailAddress.checkYourAnswersLabel = Email Address
 partnershipEmailAddress.error.required = Enter an email address in the correct format, like name@example.com
 partnershipEmailAddress.error.invalid = Enter a valid email address in the correct format, like name@example.com
 partnershipEmailAddress.error.length = Enter a valid email address in the correct format, like name@example.com, up to 254 characters
-partnershipEmailAddress.change.hidden = partnership email address
+partnershipEmailAddress.change.hidden = email address
 
 partnershipPhoneNumber.title = What is the phone number for this partnership?
 partnershipPhoneNumber.heading = What is the phone number for {0}?
@@ -435,7 +435,7 @@ partnershipPhoneNumber.error.length = Enter a valid phone number, like 01632 960
 partnershipPhoneNumber.error.invalid = Enter a valid phone number, like 01632 960 001. For international numbers include the country code.
 partnershipPhoneNumber.change.hidden = phone number
 
-partnershipCheckYourAnswers.title = Check your answers
+partnershipCheckYourAnswers.title = Check your answers before adding this partnership
 partnershipCheckYourAnswers.heading = Check your answers before adding this partnership
 partnershipCheckYourAnswers.subHeading = Subcontractor details
 partnershipCheckYourAnswers.trailHeading = Now add this subcontractor
