@@ -16,16 +16,26 @@
 
 package forms.add.company
 
-import forms.mappings.Mappings
+import forms.Validation.companyRegNumberRegex
+import forms.mappings.{Constants, Mappings}
 import play.api.data.Form
 
 import javax.inject.Inject
 
 class CompanyCrnFormProvider @Inject() extends Mappings {
 
+  private def normalised(value: String): String =
+    value.replaceAll("\\s", "").toUpperCase
+
   def apply(): Form[String] =
     Form(
       "value" -> text("companyCrn.error.required")
-        .verifying(maxLength(100, "companyCrn.error.length"))
+        .transform(s => normalised(s), identity)
+        .verifying(
+          firstError(
+            regexp(companyRegNumberRegex, "companyCrn.error.invalid"),
+            maxLength(Constants.MaxLength8, "companyCrn.error.length")
+          )
+        )
     )
 }

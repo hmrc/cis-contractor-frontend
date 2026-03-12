@@ -25,7 +25,10 @@ class CompanyUtrFormProvider @Inject() extends Mappings {
 
   def apply(): Form[String] =
     Form(
-      "value" -> text("companyUtr.error.required")
-        .verifying(maxLength(100, "companyUtr.error.length"))
+      "value" -> utr(
+        requiredKey = "companyUtr.error.required",
+        invalidKey = "companyUtr.error.invalid",
+        lengthKey = "companyUtr.error.length"
+      )
     )
 }

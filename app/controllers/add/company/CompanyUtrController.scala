@@ -20,10 +20,11 @@ import controllers.actions.*
 import forms.add.company.CompanyUtrFormProvider
 import models.Mode
 import navigation.Navigator
-import pages.add.company.CompanyUtrPage
+import pages.add.company.{CompanyNamePage, CompanyUtrPage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
+import services.SubcontractorService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.add.company.CompanyUtrView
 
@@ -38,6 +39,7 @@ class CompanyUtrController @Inject() (
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   formProvider: CompanyUtrFormProvider,
+  subcontractorService: SubcontractorService,
   val controllerComponents: MessagesControllerComponents,
   view: CompanyUtrView
 )(implicit ec: ExecutionContext)
@@ -47,26 +49,50 @@ class CompanyUtrController @Inject() (
   val form = formProvider()
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
+    request.userAnswers
+      .get(CompanyNamePage)
+      .map { companyName =>
+        val preparedForm = request.userAnswers.get(CompanyUtrPage) match {
+          case None        => form
+          case Some(value) => form.fill(value)
+        }
 
-    val preparedForm = request.userAnswers.get(CompanyUtrPage) match {
-      case None        => form
-      case Some(value) => form.fill(value)
-    }
+        Ok(view(preparedForm, mode, companyName))
+      }
+      .getOrElse(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
 
-    Ok(view(preparedForm, mode))
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
-      form
-        .bindFromRequest()
-        .fold(
-          formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
-          value =>
-            for {
-              updatedAnswers <- Future.fromTry(request.userAnswers.set(CompanyUtrPage, value))
-              _              <- sessionRepository.set(updatedAnswers)
-            } yield Redirect(navigator.nextPage(CompanyUtrPage, mode, updatedAnswers))
-        )
+      request.userAnswers
+        .get(CompanyNamePage)
+        .map { companyName =>
+          form
+            .bindFromRequest()
+            .fold(
+              formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, companyName))),
+              value =>
+                subcontractorService.isDuplicateUTR(request.userAnswers, value).flatMap {
+                  case true  =>
+                    val errorForm = form
+                      .fill(value)
+                      .withError(
+                        key = "value",
+                        message = "companyUtr.error.duplicate"
+                      )
+                    Future.successful(
+                      BadRequest(view(errorForm, mode, companyName))
+                    )
+                  case false =>
+                    for {
+                      updatedAnswers <-
+                        Future.fromTry(request.userAnswers.set(CompanyUtrPage, value))
+                      _              <- sessionRepository.set(updatedAnswers)
+                    } yield Redirect(navigator.nextPage(CompanyUtrPage, mode, updatedAnswers))
+                }
+            )
+        }
+        .getOrElse(Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())))
   }
 }
