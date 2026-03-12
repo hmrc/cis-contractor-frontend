@@ -16,6 +16,8 @@
 
 package forms.add.company
 
+import forms.Validation
+import forms.mappings.Constants.MaxLength35
 import forms.mappings.Mappings
 import play.api.data.Form
 
@@ -26,6 +28,11 @@ class CompanyMobileNumberFormProvider @Inject() extends Mappings {
   def apply(): Form[String] =
     Form(
       "value" -> text("companyMobileNumber.error.required")
-        .verifying(maxLength(100, "companyMobileNumber.error.length"))
+        .verifying(
+          firstError(
+            maxLength(MaxLength35, "companyMobileNumber.error.length"),
+            regexp(Validation.mobileRegex, "companyMobileNumber.error.invalid")
+          )
+        )
     )
 }

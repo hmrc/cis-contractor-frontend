@@ -18,7 +18,7 @@ package viewmodels.checkAnswers.add
 
 import controllers.add.routes
 import models.add.TypeOfSubcontractor
-import models.{CheckMode, UserAnswers}
+import models.{NormalMode, UserAnswers}
 import org.scalatest.OptionValues.convertOptionToValuable
 import org.scalatest.TryValues.convertTryToSuccessOrFailure
 import org.scalatest.freespec.AnyFreeSpec
@@ -56,8 +56,10 @@ class TypeOfSubcontractorSummarySpec extends AnyFreeSpec with Matchers {
       actions should have size 1
 
       val changeAction = actions.head
-      changeAction.content.asHtml.toString    should include(messages("site.change"))
-      changeAction.href                     shouldBe routes.TypeOfSubcontractorController.onPageLoad(CheckMode).url
+      changeAction.content.asHtml.toString should include(messages("site.change"))
+
+      // DTR-2951: Reset journey in NormalMode (not CheckMode)
+      changeAction.href                     shouldBe routes.TypeOfSubcontractorController.onPageLoad(NormalMode).url
       changeAction.visuallyHiddenText.value shouldBe messages("typeOfSubcontractor.change.hidden")
     }
 

@@ -31,12 +31,11 @@ class PartnershipNominatedPartnerCrnFormProviderSpec extends AnyFreeSpec with Ma
         "AC012345",
         "ac012345",
         "AC 012 345",
-        "AB1",
         "ZZ999999",
-        "123",
         "00000001",
         "12345678",
-        "12 34 56 78"
+        "12 34 56 78",
+        "  12345678  "
       )
 
       valid.foreach { v =>
@@ -56,7 +55,8 @@ class PartnershipNominatedPartnerCrnFormProviderSpec extends AnyFreeSpec with Ma
       val tooLong = Seq(
         "123456789",
         "AB1234567",
-        "12 34 56 78 9"
+        "12 34 56 78 9",
+        "  123456789  "
       )
 
       tooLong.foreach { v =>
@@ -66,11 +66,30 @@ class PartnershipNominatedPartnerCrnFormProviderSpec extends AnyFreeSpec with Ma
       }
     }
 
+    "error when too short (less than 8 chars ignoring spaces)" in {
+      val tooShort = Seq(
+        "0",
+        "0123456",
+        "AB",
+        "A B 01234",
+        "12   34 ",
+        "  1234  "
+      )
+
+      tooShort.foreach { v =>
+        val bound = form.bind(Map("value" -> v))
+        bound.hasErrors mustBe true
+        bound.errors.map(_.message) must contain("partnershipNominatedPartnerCrn.error.invalidCharacters")
+      }
+    }
+
     "error when invalid format" in {
       val invalid = Seq(
         "AC01-234",
         "AC01£345",
-        "12AB3456"
+        "12AB3456",
+        "12  AB  3456",
+        "  12AB3456  "
       )
 
       invalid.foreach { v =>

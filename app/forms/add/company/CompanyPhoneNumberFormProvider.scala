@@ -16,7 +16,8 @@
 
 package forms.add.company
 
-import forms.mappings.Mappings
+import forms.Validation.phoneRegex
+import forms.mappings.{Constants, Mappings}
 import play.api.data.Form
 
 import javax.inject.Inject
@@ -26,6 +27,12 @@ class CompanyPhoneNumberFormProvider @Inject() extends Mappings {
   def apply(): Form[String] =
     Form(
       "value" -> text("companyPhoneNumber.error.required")
-        .verifying(maxLength(100, "companyPhoneNumber.error.length"))
+        .transform(_.trim, identity)
+        .verifying(
+          firstError(
+            regexp(phoneRegex, "companyPhoneNumber.error.invalid"),
+            maxLength(Constants.MaxLength35, "companyPhoneNumber.error.length")
+          )
+        )
     )
 }

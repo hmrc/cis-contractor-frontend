@@ -32,17 +32,18 @@ class CompanyContactOptionsSpec extends AnyFreeSpec with Matchers with ScalaChec
 
       val gen = Gen.oneOf(CompanyContactOptions.values.toSeq)
 
-      forAll(gen) { companyContactOptions =>
-        JsString(companyContactOptions.toString)
+      forAll(gen) { value =>
+        JsString(value.toString)
           .validate[CompanyContactOptions]
           .asOpt
-          .value mustEqual companyContactOptions
+          .value mustEqual value
       }
     }
 
     "must fail to deserialise invalid values" in {
 
-      val gen = arbitrary[String] suchThat (!CompanyContactOptions.values.map(_.toString).contains(_))
+      val gen =
+        arbitrary[String] suchThat (!CompanyContactOptions.values.map(_.toString).contains(_))
 
       forAll(gen) { invalidValue =>
         JsString(invalidValue).validate[CompanyContactOptions] mustEqual JsError("error.invalid")
@@ -53,8 +54,8 @@ class CompanyContactOptionsSpec extends AnyFreeSpec with Matchers with ScalaChec
 
       val gen = Gen.oneOf(CompanyContactOptions.values.toSeq)
 
-      forAll(gen) { companyContactOptions =>
-        Json.toJson(companyContactOptions) mustEqual JsString(companyContactOptions.toString)
+      forAll(gen) { value =>
+        Json.toJson(value) mustEqual JsString(value.toString)
       }
     }
   }

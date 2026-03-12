@@ -20,12 +20,11 @@ import base.SpecBase
 import controllers.routes
 import pages.*
 import models.*
-import models.add.partnership.PartnershipChooseContactDetails
 import models.add.{SubcontractorName, TypeOfSubcontractor, UKAddress}
+import models.contact.ContactOptions
 import pages.add.*
 import pages.add.company.*
 import pages.add.partnership.*
-import pages.add.partnership.PartnershipNominatedPartnerNinoPage
 
 class NavigatorSpec extends SpecBase {
 
@@ -33,6 +32,7 @@ class NavigatorSpec extends SpecBase {
 
   private lazy val journeyRecovery = routes.JourneyRecoveryController.onPageLoad()
   private lazy val CYA             = controllers.add.routes.CheckYourAnswersController.onPageLoad()
+  private lazy val CompanyCYA      = controllers.add.company.routes.CompanyCheckYourAnswersController.onPageLoad()
 
   "Navigator" - {
 
@@ -504,7 +504,7 @@ class NavigatorSpec extends SpecBase {
             NormalMode,
             emptyUserAnswers.setOrException(
               PartnershipChooseContactDetailsPage,
-              PartnershipChooseContactDetails.Email
+              ContactOptions.Email
             )
           ) mustBe controllers.add.partnership.routes.PartnershipChooseContactDetailsController.onPageLoad(NormalMode)
         }
@@ -515,7 +515,7 @@ class NavigatorSpec extends SpecBase {
             NormalMode,
             emptyUserAnswers.setOrException(
               PartnershipChooseContactDetailsPage,
-              models.add.partnership.PartnershipChooseContactDetails.Phone
+              ContactOptions.Phone
             )
           ) mustBe controllers.add.partnership.routes.PartnershipChooseContactDetailsController.onPageLoad(NormalMode)
         }
@@ -526,7 +526,7 @@ class NavigatorSpec extends SpecBase {
             NormalMode,
             emptyUserAnswers.setOrException(
               PartnershipChooseContactDetailsPage,
-              models.add.partnership.PartnershipChooseContactDetails.Mobile
+              ContactOptions.Mobile
             )
           ) mustBe controllers.add.partnership.routes.PartnershipChooseContactDetailsController.onPageLoad(NormalMode)
         }
@@ -537,7 +537,7 @@ class NavigatorSpec extends SpecBase {
             NormalMode,
             emptyUserAnswers.setOrException(
               PartnershipChooseContactDetailsPage,
-              models.add.partnership.PartnershipChooseContactDetails.NoDetails
+              ContactOptions.NoDetails
             )
           ) mustBe controllers.add.partnership.routes.PartnershipChooseContactDetailsController.onPageLoad(NormalMode)
         }
@@ -608,12 +608,188 @@ class NavigatorSpec extends SpecBase {
         ) mustBe controllers.add.partnership.routes.PartnershipMobileNumberController.onPageLoad(NormalMode)
       }
 
+      "must go from CompanyContactOptionsPage" - {
+        "to itself when EmailAddress is selected" in {
+          navigator.nextPage(
+            CompanyContactOptionsPage,
+            NormalMode,
+            emptyUserAnswers.setOrException(
+              CompanyContactOptionsPage,
+              ContactOptions.Email
+            )
+          ) mustBe controllers.add.company.routes.CompanyContactOptionsController.onPageLoad(NormalMode)
+        }
+
+        "to itself when PhoneNumber is selected" in {
+          navigator.nextPage(
+            CompanyContactOptionsPage,
+            NormalMode,
+            emptyUserAnswers.setOrException(
+              CompanyContactOptionsPage,
+              ContactOptions.Phone
+            )
+          ) mustBe controllers.add.company.routes.CompanyContactOptionsController.onPageLoad(NormalMode)
+        }
+
+        "to itself when MobileNumber is selected" in {
+          navigator.nextPage(
+            CompanyContactOptionsPage,
+            NormalMode,
+            emptyUserAnswers.setOrException(
+              CompanyContactOptionsPage,
+              ContactOptions.Mobile
+            )
+          ) mustBe controllers.add.company.routes.CompanyContactOptionsController.onPageLoad(NormalMode)
+        }
+
+        "to itself when NoDetails is selected" in {
+          navigator.nextPage(
+            CompanyContactOptionsPage,
+            NormalMode,
+            emptyUserAnswers.setOrException(
+              CompanyContactOptionsPage,
+              ContactOptions.NoDetails
+            )
+          ) mustBe controllers.add.company.routes.CompanyContactOptionsController.onPageLoad(NormalMode)
+        }
+
+        "to JourneyRecoveryPage when answer is not present" in {
+          navigator.nextPage(
+            CompanyContactOptionsPage,
+            NormalMode,
+            emptyUserAnswers
+          ) mustBe journeyRecovery
+        }
+      }
+
+      "must go from a CompanyPhoneNumberPage to next Page" in {
+        navigator.nextPage(
+          CompanyPhoneNumberPage,
+          NormalMode,
+          UserAnswers("id")
+        ) mustBe controllers.add.company.routes.CompanyPhoneNumberController.onPageLoad(NormalMode)
+      }
+
+      "must go from CompanyCrnYesNo" - {
+        "to next page when answer is Yes" in {
+          navigator.nextPage(
+            CompanyCrnYesNoPage,
+            NormalMode,
+            emptyUserAnswers.setOrException(CompanyCrnYesNoPage, true)
+          ) mustBe controllers.add.company.routes.CompanyCrnYesNoController.onPageLoad(NormalMode)
+        }
+
+        "to next page when answer is No" in {
+          navigator.nextPage(
+            CompanyCrnYesNoPage,
+            NormalMode,
+            emptyUserAnswers.setOrException(CompanyCrnYesNoPage, false)
+          ) mustBe controllers.add.company.routes.CompanyCrnYesNoController.onPageLoad(NormalMode)
+        }
+
+        "to JourneyRecoveryPage when answer is not present" in {
+          navigator.nextPage(
+            CompanyCrnYesNoPage,
+            NormalMode,
+            emptyUserAnswers
+          ) mustBe journeyRecovery
+        }
+      }
+
       "must go from a CompanyAddressYesNoPage to CompanyAddressYesNoPage" in {
         navigator.nextPage(
           CompanyAddressYesNoPage,
           NormalMode,
           UserAnswers("id")
         ) mustBe controllers.add.company.routes.CompanyAddressYesNoController.onPageLoad(NormalMode)
+      }
+
+      "must go from CompanyEmailAddressPage to CompanyEmailAddressController in NormalMode" in {
+        navigator.nextPage(
+          CompanyEmailAddressPage,
+          NormalMode,
+          emptyUserAnswers
+        ) mustBe controllers.add.company.routes.CompanyEmailAddressController.onPageLoad(NormalMode)
+      }
+
+      "must go from CompanyUtrYesNo" - {
+        "to next page when answer is Yes" in {
+          navigator.nextPage(
+            CompanyUtrYesNoPage,
+            NormalMode,
+            emptyUserAnswers.setOrException(CompanyUtrYesNoPage, true)
+          ) mustBe controllers.add.company.routes.CompanyUtrController
+            .onPageLoad(NormalMode)
+        }
+
+        "to next page when answer is No" in {
+          navigator.nextPage(
+            CompanyUtrYesNoPage,
+            NormalMode,
+            emptyUserAnswers.setOrException(CompanyUtrYesNoPage, false)
+          ) mustBe controllers.add.company.routes.CompanyCrnYesNoController
+            .onPageLoad(NormalMode)
+        }
+
+        "to JourneyRecoveryPage when answer is not present" in {
+          navigator.nextPage(
+            CompanyUtrYesNoPage,
+            NormalMode,
+            emptyUserAnswers
+          ) mustBe journeyRecovery
+        }
+      }
+
+      "must go from CompanyWorksReferenceYesNo" - {
+        "to next page when answer is Yes" in {
+          navigator.nextPage(
+            CompanyWorksReferenceYesNoPage,
+            NormalMode,
+            emptyUserAnswers.setOrException(CompanyWorksReferenceYesNoPage, true)
+          ) mustBe controllers.add.company.routes.CompanyWorksReferenceController
+            .onPageLoad(NormalMode)
+        }
+
+        "to next page when answer is No" in {
+          navigator.nextPage(
+            CompanyWorksReferenceYesNoPage,
+            NormalMode,
+            emptyUserAnswers.setOrException(CompanyWorksReferenceYesNoPage, false)
+          ) mustBe controllers.add.company.routes.CompanyCheckYourAnswersController
+            .onPageLoad()
+        }
+
+        "to JourneyRecoveryPage when answer is not present" in {
+          navigator.nextPage(
+            CompanyWorksReferenceYesNoPage,
+            NormalMode,
+            emptyUserAnswers
+          ) mustBe journeyRecovery
+        }
+      }
+
+      "must go from a CompanyWorksReferenceYesNoPage to next Page" in {
+        navigator.nextPage(
+          CompanyCrnPage,
+          NormalMode,
+          UserAnswers("id")
+        ) mustBe controllers.add.company.routes.CompanyWorksReferenceYesNoController.onPageLoad(NormalMode)
+      }
+
+      "must go from a CompanyUtrPage to CompanyCrnYesNoPage" in {
+        navigator.nextPage(
+          CompanyUtrPage,
+          NormalMode,
+          UserAnswers("id")
+        ) mustBe controllers.add.company.routes.CompanyCrnYesNoController.onPageLoad(NormalMode)
+      }
+
+      "must go from a CompanyMobileNumberPage to CompanyMobileNumberPage" in {
+        navigator.nextPage(
+          CompanyMobileNumberPage,
+          NormalMode,
+          UserAnswers("id")
+        ) mustBe controllers.add.company.routes.CompanyMobileNumberController.onPageLoad(NormalMode)
       }
     }
 
@@ -944,7 +1120,7 @@ class NavigatorSpec extends SpecBase {
             CheckMode,
             emptyUserAnswers.setOrException(
               PartnershipChooseContactDetailsPage,
-              models.add.partnership.PartnershipChooseContactDetails.Email
+              ContactOptions.Email
             )
           ) mustBe controllers.add.partnership.routes.PartnershipChooseContactDetailsController.onPageLoad(CheckMode)
         }
@@ -955,7 +1131,7 @@ class NavigatorSpec extends SpecBase {
             CheckMode,
             emptyUserAnswers.setOrException(
               PartnershipChooseContactDetailsPage,
-              models.add.partnership.PartnershipChooseContactDetails.Phone
+              ContactOptions.Phone
             )
           ) mustBe controllers.add.partnership.routes.PartnershipChooseContactDetailsController.onPageLoad(CheckMode)
         }
@@ -966,7 +1142,7 @@ class NavigatorSpec extends SpecBase {
             CheckMode,
             emptyUserAnswers.setOrException(
               PartnershipChooseContactDetailsPage,
-              models.add.partnership.PartnershipChooseContactDetails.Mobile
+              ContactOptions.Mobile
             )
           ) mustBe controllers.add.partnership.routes.PartnershipChooseContactDetailsController.onPageLoad(CheckMode)
         }
@@ -977,7 +1153,7 @@ class NavigatorSpec extends SpecBase {
             CheckMode,
             emptyUserAnswers.setOrException(
               PartnershipChooseContactDetailsPage,
-              models.add.partnership.PartnershipChooseContactDetails.NoDetails
+              ContactOptions.NoDetails
             )
           ) mustBe controllers.add.partnership.routes.PartnershipChooseContactDetailsController.onPageLoad(CheckMode)
         }
@@ -1078,12 +1254,74 @@ class NavigatorSpec extends SpecBase {
         ) mustBe controllers.add.company.routes.CompanyAddressController.onPageLoad(CheckMode)
       }
 
+      "must go from CompanyEmailAddressPage to CompanyEmailAddressPage in CheckMode" in {
+        navigator.nextPage(
+          CompanyEmailAddressPage,
+          CheckMode,
+          emptyUserAnswers
+        ) mustBe controllers.add.company.routes.CompanyEmailAddressController.onPageLoad(CheckMode)
+      }
+
       "must go from a PartnershipMobileNumberPage to PartnershipMobileNumberPage in CheckMode" in {
         navigator.nextPage(
           PartnershipMobileNumberPage,
           CheckMode,
           emptyUserAnswers
         ) mustBe controllers.add.partnership.routes.PartnershipMobileNumberController.onPageLoad(CheckMode)
+      }
+
+      "must go from CompanyContactOptionsPage" - {
+        "to itself when EmailAddress is selected" in {
+          navigator.nextPage(
+            CompanyContactOptionsPage,
+            CheckMode,
+            emptyUserAnswers.setOrException(
+              CompanyContactOptionsPage,
+              ContactOptions.Email
+            )
+          ) mustBe controllers.add.company.routes.CompanyContactOptionsController.onPageLoad(CheckMode)
+        }
+
+        "to itself when PhoneNumber is selected" in {
+          navigator.nextPage(
+            CompanyContactOptionsPage,
+            CheckMode,
+            emptyUserAnswers.setOrException(
+              CompanyContactOptionsPage,
+              ContactOptions.Phone
+            )
+          ) mustBe controllers.add.company.routes.CompanyContactOptionsController.onPageLoad(CheckMode)
+        }
+
+        "to itself when MobileNumber is selected" in {
+          navigator.nextPage(
+            CompanyContactOptionsPage,
+            CheckMode,
+            emptyUserAnswers.setOrException(
+              CompanyContactOptionsPage,
+              ContactOptions.Mobile
+            )
+          ) mustBe controllers.add.company.routes.CompanyContactOptionsController.onPageLoad(CheckMode)
+        }
+
+        "to itself when NoDetails is selected" in {
+          navigator.nextPage(
+            CompanyContactOptionsPage,
+            CheckMode,
+            emptyUserAnswers.setOrException(
+              CompanyContactOptionsPage,
+              ContactOptions.NoDetails
+            )
+          ) mustBe controllers.add.company.routes.CompanyContactOptionsController.onPageLoad(CheckMode)
+        }
+
+        "to CYA when answer is not present" in {
+          navigator.nextPage(
+            CompanyContactOptionsPage,
+            CheckMode,
+            emptyUserAnswers
+          ) mustBe CYA
+        }
       }
 
       "must go from a PartnershipPhoneNumberPage to CYA" in {
@@ -1094,12 +1332,136 @@ class NavigatorSpec extends SpecBase {
         ) mustBe CYA
       }
 
+      "must go from a CompanyPhoneNumberPage to CompanyPhoneNumberPage in CheckMode" in {
+        navigator.nextPage(
+          CompanyPhoneNumberPage,
+          CheckMode,
+          emptyUserAnswers
+        ) mustBe controllers.add.company.routes.CompanyPhoneNumberController.onPageLoad(CheckMode)
+      }
+
+      "must go from CompanyCrnYesNoPage" - {
+        "to next page when answer is Yes" in {
+          val answers = UserAnswers(userAnswersId).set(CompanyCrnYesNoPage, true).success.value
+
+          navigator.nextPage(
+            CompanyCrnYesNoPage,
+            CheckMode,
+            answers
+          ) mustBe controllers.add.company.routes.CompanyCrnYesNoController.onPageLoad(CheckMode)
+        }
+
+        "to Partnership CyaPage when answer is No" in {
+          val answers = UserAnswers(userAnswersId).set(CompanyCrnYesNoPage, false).success.value
+
+          navigator.nextPage(
+            CompanyCrnYesNoPage,
+            CheckMode,
+            answers
+          ) mustBe controllers.add.routes.CheckYourAnswersController.onPageLoad()
+        }
+
+        "to JourneyRecoveryPage when answer is not present" in {
+          navigator.nextPage(
+            CompanyCrnYesNoPage,
+            CheckMode,
+            emptyUserAnswers
+          ) mustBe routes.JourneyRecoveryController.onPageLoad()
+        }
+      }
+
       "must go from CompanyAddressYesNoPage to CompanyAddressYesNoPage in CheckMode" in {
         navigator.nextPage(
           CompanyAddressYesNoPage,
           CheckMode,
           emptyUserAnswers
         ) mustBe controllers.add.company.routes.CompanyAddressYesNoController.onPageLoad(CheckMode)
+      }
+
+      "must go from CompanyUtrYesNo" - {
+        "to next page when answer is Yes" in {
+          val answers = UserAnswers(userAnswersId).set(CompanyUtrYesNoPage, true).success.value
+
+          navigator.nextPage(
+            CompanyUtrYesNoPage,
+            CheckMode,
+            answers
+          ) mustBe controllers.add.company.routes.CompanyUtrController
+            .onPageLoad(CheckMode)
+        }
+
+        "to Company CyaPage when answer is No" in {
+          val answers = UserAnswers(userAnswersId).set(CompanyUtrYesNoPage, false).success.value
+
+          navigator.nextPage(
+            CompanyUtrYesNoPage,
+            CheckMode,
+            answers
+          ) mustBe CYA
+        }
+
+        "to JourneyRecoveryPage when answer is not present" in {
+          navigator.nextPage(
+            CompanyUtrYesNoPage,
+            CheckMode,
+            emptyUserAnswers
+          ) mustBe routes.JourneyRecoveryController.onPageLoad()
+        }
+      }
+
+      "must go from CompanyWorksReferenceYesNo" - {
+        "to next page when answer is Yes" in {
+          val answers = UserAnswers(userAnswersId).set(CompanyWorksReferenceYesNoPage, true).success.value
+
+          navigator.nextPage(
+            CompanyWorksReferenceYesNoPage,
+            CheckMode,
+            answers
+          ) mustBe controllers.add.company.routes.CompanyWorksReferenceController
+            .onPageLoad(CheckMode)
+        }
+
+        "to Company CyaPage when answer is No" in {
+          val answers = UserAnswers(userAnswersId).set(CompanyWorksReferenceYesNoPage, false).success.value
+
+          navigator.nextPage(
+            CompanyWorksReferenceYesNoPage,
+            CheckMode,
+            answers
+          ) mustBe CYA
+        }
+
+        "to JourneyRecoveryPage when answer is not present" in {
+          navigator.nextPage(
+            CompanyWorksReferenceYesNoPage,
+            CheckMode,
+            emptyUserAnswers
+          ) mustBe routes.JourneyRecoveryController.onPageLoad()
+        }
+      }
+
+      "must go from a CompanyCrnPage to CompanyCYA in CheckMode" in {
+        navigator.nextPage(
+          CompanyCrnPage,
+          CheckMode,
+          emptyUserAnswers
+        ) mustBe CompanyCYA
+      }
+
+      "must go from CompanyUtrPage to CompanyCYA in CheckMode" in {
+        navigator.nextPage(
+          CompanyUtrPage,
+          CheckMode,
+          emptyUserAnswers
+        ) mustBe CompanyCYA
+      }
+
+      "must go from CompanyMobileNumberPage to CompanyMobileNumberPage in CheckMode" in {
+        navigator.nextPage(
+          CompanyMobileNumberPage,
+          CheckMode,
+          emptyUserAnswers
+        ) mustBe controllers.add.company.routes.CompanyMobileNumberController.onPageLoad(CheckMode)
       }
     }
 
