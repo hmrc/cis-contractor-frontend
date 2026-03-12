@@ -57,12 +57,11 @@ trait StringFieldBehaviours extends FieldBehaviours {
         }
       }
 
-  def fieldWithRegex(form: Form[_], fieldName: String, errorKey: String, regex: String): Unit = {
+  def fieldWithRegex(form: Form[_], fieldName: String, errorKey: String, regex: String): Unit =
     "must match the pattern" in {
       val invalidData = "12345abc"
-      val result = form.bind(Map(fieldName -> invalidData))
+      val result      = form.bind(Map(fieldName -> invalidData))
       result.errors should contain(FormError(fieldName, errorKey, Seq(regex)))
     }
-  }
 
 }

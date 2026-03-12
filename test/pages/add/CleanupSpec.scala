@@ -147,9 +147,6 @@ class CleanupSpec extends PageBehaviours {
             .set(PartnershipChooseContactDetailsPage, ContactOptions.Email)
             .success
             .value
-            .set(PartnershipContactDetailsYesNoPage, true)
-            .success
-            .value
             .set(PartnershipEmailAddressPage, email)
             .success
             .value
@@ -201,7 +198,6 @@ class CleanupSpec extends PageBehaviours {
         result.get(PartnershipAddressPage) mustBe None
         result.get(PartnershipAddressYesNoPage) mustBe None
         result.get(PartnershipChooseContactDetailsPage) mustBe None
-        result.get(PartnershipContactDetailsYesNoPage) mustBe None
         result.get(PartnershipEmailAddressPage) mustBe None
         result.get(PartnershipHasUtrYesNoPage) mustBe None
         result.get(PartnershipMobileNumberPage) mustBe None
