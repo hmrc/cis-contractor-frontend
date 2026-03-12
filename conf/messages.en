@@ -162,12 +162,12 @@ uniqueTaxpayerReferenceYesNo.checkYourAnswersLabel = Add UTR?
 uniqueTaxpayerReferenceYesNo.error.required = Select whether you know the Unique Taxpayer Reference (UTR) for this subcontractor
 uniqueTaxpayerReferenceYesNo.change.hidden = add UTR?
 
-worksReferenceNumberYesNo.title = Do you have a works reference number?
-worksReferenceNumberYesNo.heading = Do you have a works reference number?
-worksReferenceNumberYesNo.hint = This is your reference number used to identify the subcontractor’s work or project. It can contain letters and numbers
-worksReferenceNumberYesNo.checkYourAnswersLabel = Do you have a works reference number?
-worksReferenceNumberYesNo.error.required = Select whether you have the subcontractor’s work reference number or not
-worksReferenceNumberYesNo.change.hidden = do you have a works reference number?
+worksReferenceNumberYesNo.title = Is there a works reference number associated with this subcontractor?
+worksReferenceNumberYesNo.heading = Is there a works reference number associated with {0}?
+worksReferenceNumberYesNo.hint = This is the reference number used to identify a subcontractor’s work or project. It can contain letters and numbers.
+worksReferenceNumberYesNo.checkYourAnswersLabel = Add works reference number?
+worksReferenceNumberYesNo.error.required = Select whether this subcontractor has a works reference number
+worksReferenceNumberYesNo.change.hidden = add works reference number?
 
 subNationalInsuranceNumber.title = What is the National Insurance number for this subcontractor?
 subNationalInsuranceNumber.heading = What is the National Insurance number for {0}?
