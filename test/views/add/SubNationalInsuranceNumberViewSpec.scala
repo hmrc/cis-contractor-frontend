@@ -18,6 +18,8 @@ package views.add
 
 import forms.add.SubNationalInsuranceNumberFormProvider
 import models.NormalMode
+import org.jsoup.nodes.Document
+import org.jsoup.select.Elements
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
@@ -33,13 +35,16 @@ class SubNationalInsuranceNumberViewSpec extends AnyWordSpec with Matchers with 
   "SubNationalInsuranceNumberView" should {
 
     "render the page with title, heading, input and submit button" in new Setup {
-      val html: HtmlFormat.Appendable = view(form, NormalMode)
-      val doc                         = org.jsoup.Jsoup.parse(html.toString())
+
+      val subcontractorName = "Test Subcontractor"
+
+      val html: HtmlFormat.Appendable = view(form, NormalMode, subcontractorName)
+      val doc: Document               = org.jsoup.Jsoup.parse(html.toString())
 
       doc.select("title").text() must include(messages("subNationalInsuranceNumber.title"))
 
-      val heading = doc.select("label.govuk-label")
-      heading.text() mustBe messages("subNationalInsuranceNumber.heading")
+      val heading: Elements = doc.select("label.govuk-label")
+      heading.text() mustBe messages("subNationalInsuranceNumber.heading", subcontractorName)
 
       doc.select("form").attr("action") mustBe controllers.add.routes.SubNationalInsuranceNumberController
         .onSubmit(NormalMode)
@@ -51,16 +56,19 @@ class SubNationalInsuranceNumberViewSpec extends AnyWordSpec with Matchers with 
     }
 
     "display error summary and inline error when no name is entered" in new Setup {
+
+      val subcontractorName = "Test Subcontractor"
+
       val errorForm: Form[String] =
         form.withError("value", "subNationalInsuranceNumber.error.required")
 
-      val html = view(errorForm, NormalMode)
-      val doc  = org.jsoup.Jsoup.parse(html.toString())
+      val html: HtmlFormat.Appendable = view(errorForm, NormalMode, subcontractorName)
+      val doc: Document               = org.jsoup.Jsoup.parse(html.toString())
 
-      val summary = doc.select(".govuk-error-summary")
+      val summary: Elements = doc.select(".govuk-error-summary")
       summary.text() must include(messages("subNationalInsuranceNumber.error.required"))
 
-      val linkHref = summary.select("a").attr("href")
+      val linkHref: String = summary.select("a").attr("href")
       linkHref mustBe "#value"
 
       doc.select(".govuk-error-message").text() must include(messages("subNationalInsuranceNumber.error.required"))

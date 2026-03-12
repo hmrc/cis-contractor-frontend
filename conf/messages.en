@@ -169,13 +169,13 @@ worksReferenceNumberYesNo.checkYourAnswersLabel = Do you have a works reference 
 worksReferenceNumberYesNo.error.required = Select whether you have the subcontractor’s work reference number or not
 worksReferenceNumberYesNo.change.hidden = do you have a works reference number?
 
-subNationalInsuranceNumber.title = What is the subcontractor’s National Insurance number?
-subNationalInsuranceNumber.heading = What is the subcontractor’s National Insurance number?
-subNationalInsuranceNumber.hint = The subcontractor’s National Insurance number will be on their National Insurance card, benefit letter, payslip or P60
+subNationalInsuranceNumber.title = What is the National Insurance number for this subcontractor?
+subNationalInsuranceNumber.heading = What is the National Insurance number for {0}?
+subNationalInsuranceNumber.hint = National Insurance numbers can be found on payslips, P60s and other tax documents. For example, ‘QQ 12 34 56 C’
 subNationalInsuranceNumber.checkYourAnswersLabel = National Insurance number
-subNationalInsuranceNumber.error.required = Enter a National Insurance Number like QQ 12 34 56 C
-subNationalInsuranceNumber.error.length = Enter a National Insurance Number up to 9 characters, like QQ 12 34 56 C
-subNationalInsuranceNumber.error.invalidCharacters = Enter a National Insurance Number like QQ 12 34 56 C
+subNationalInsuranceNumber.error.required = Enter a National Insurance number
+subNationalInsuranceNumber.error.length = Enter a valid National Insurance Number like QQ 12 34 56 C
+subNationalInsuranceNumber.error.invalidCharacters = Enter a valid National Insurance Number like QQ 12 34 56 C
 subNationalInsuranceNumber.change.hidden = national Insurance number
 
 subcontractorContactDetailsYesNo.title = Do you want to add the subcontractor’s contact details?
