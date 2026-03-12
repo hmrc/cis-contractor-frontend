@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,14 +17,15 @@
 package forms.add
 
 import forms.mappings.Mappings
+import models.add.IndividualChooseContactDetails
 import play.api.data.Form
 
 import javax.inject.Inject
 
-class SubcontractorContactDetailsYesNoFormProvider @Inject() extends Mappings {
+class IndividualChooseContactDetailsFormProvider @Inject() extends Mappings {
 
-  def apply(): Form[Boolean] =
+  def apply(): Form[IndividualChooseContactDetails] =
     Form(
-      "value" -> boolean("subcontractorContactDetailsYesNo.error.required")
+      "value" -> enumerable[IndividualChooseContactDetails]("individualChooseContactDetails.error.required")
     )
 }

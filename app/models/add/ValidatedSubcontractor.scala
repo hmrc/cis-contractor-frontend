@@ -28,8 +28,7 @@ final case class ValidatedSubcontractor(
   address: Option[UKAddress],
   nino: Option[String],
   utr: Option[String],
-  workRefNumber: Option[String],
-  contactDetails: Option[SubContactDetails]
+  workRefNumber: Option[String]
 )
 
 object ValidatedSubcontractor {
@@ -42,7 +41,6 @@ object ValidatedSubcontractor {
       nino                <- getOptionalPageValue(answers, SubNationalInsuranceNumberPage, NationalInsuranceNumberYesNoPage)
       utr                 <- getOptionalPageValue(answers, SubcontractorsUniqueTaxpayerReferencePage, UniqueTaxpayerReferenceYesNoPage)
       workReference       <- getOptionalPageValue(answers, WorksReferenceNumberPage, WorksReferenceNumberYesNoPage)
-      contactDetails      <- getOptionalPageValue(answers, SubContactDetailsPage, SubcontractorContactDetailsYesNoPage)
     } yield ValidatedSubcontractor(
       typeOfSubcontractor,
       tradingName,
@@ -50,8 +48,7 @@ object ValidatedSubcontractor {
       address,
       nino,
       utr,
-      workReference,
-      contactDetails
+      workReference
     )
 
   private def getType(answers: UserAnswers): Either[ValidationError, TypeOfSubcontractor] =

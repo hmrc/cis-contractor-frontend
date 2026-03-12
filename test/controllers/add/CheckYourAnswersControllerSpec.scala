@@ -80,9 +80,6 @@ class CheckYourAnswersControllerSpec extends SpecBase {
         .set(WorksReferenceNumberPage, "WRN-001")
         .success
         .value
-        .set(SubcontractorContactDetailsYesNoPage, true)
-        .success
-        .value
         .set(SubContactDetailsPage, SubContactDetails("test@example.com", "0123456789"))
         .success
         .value
@@ -109,14 +106,12 @@ class CheckYourAnswersControllerSpec extends SpecBase {
         content must include("Unique Taxpayer Reference")
         content must include("Do you have a works reference number?")
         content must include("Works reference number")
-        content must include("Do you want to add the subcontractor’s contact details?")
 
         content must include("ABC Ltd")
         content must include("AB123456C")
         content must include("1234567890")
         content must include("WRN-001")
 
-        content must include("Contact details")
         content must include("test@example.com")
         content must include("0123456789")
 
@@ -125,9 +120,6 @@ class CheckYourAnswersControllerSpec extends SpecBase {
         content must include(controllers.add.routes.NationalInsuranceNumberYesNoController.onPageLoad(CheckMode).url)
         content must include(controllers.add.routes.UniqueTaxpayerReferenceYesNoController.onPageLoad(CheckMode).url)
         content must include(controllers.add.routes.WorksReferenceNumberYesNoController.onPageLoad(CheckMode).url)
-        content must include(
-          controllers.add.routes.SubcontractorContactDetailsYesNoController.onPageLoad(CheckMode).url
-        )
       }
     }
 

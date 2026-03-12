@@ -89,11 +89,6 @@ POST       /add/works-reference-number                   controllers.add.WorksRe
 GET        /add/change-works-reference-number            controllers.add.WorksReferenceNumberController.onPageLoad(mode: Mode = CheckMode)
 POST       /add/change-works-reference-number            controllers.add.WorksReferenceNumberController.onSubmit(mode: Mode = CheckMode)
 
-GET        /add/check-contact-details                    controllers.add.SubcontractorContactDetailsYesNoController.onPageLoad(mode: Mode = NormalMode)
-POST       /add/check-contact-details                    controllers.add.SubcontractorContactDetailsYesNoController.onSubmit(mode: Mode = NormalMode)
-GET        /add/change-check-contact-details             controllers.add.SubcontractorContactDetailsYesNoController.onPageLoad(mode: Mode = CheckMode)
-POST       /add/change-check-contact-details             controllers.add.SubcontractorContactDetailsYesNoController.onSubmit(mode: Mode = CheckMode)
-
 GET        /add/contact-details                          controllers.add.SubContactDetailsController.onPageLoad(mode: Mode = NormalMode)
 POST       /add/contact-details                          controllers.add.SubContactDetailsController.onSubmit(mode: Mode = NormalMode)
 GET        /add/change-contact-details                   controllers.add.SubContactDetailsController.onPageLoad(mode: Mode = CheckMode)
@@ -271,3 +266,8 @@ GET        /add/partnership/mobile-number                       controllers.add.
 POST       /add/partnership/mobile-number                       controllers.add.partnership.PartnershipMobileNumberController.onSubmit(mode: Mode = NormalMode)
 GET        /add/partnership/change-mobile-number                controllers.add.partnership.PartnershipMobileNumberController.onPageLoad(mode: Mode = CheckMode)
 POST       /add/partnership/change-mobile-number                controllers.add.partnership.PartnershipMobileNumberController.onSubmit(mode: Mode = CheckMode)
+
+GET        /add/check-contact-details                           controllers.add.IndividualChooseContactDetailsController.onPageLoad(mode: Mode = NormalMode)
+POST       /add/check-contact-details                           controllers.add.IndividualChooseContactDetailsController.onSubmit(mode: Mode = NormalMode)
+GET        /add/change-check-contact-details                    controllers.add.IndividualChooseContactDetailsController.onPageLoad(mode: Mode = CheckMode)
+POST       /add/change-check-contact-details                    controllers.add.IndividualChooseContactDetailsController.onSubmit(mode: Mode = CheckMode)
