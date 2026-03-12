@@ -20,7 +20,7 @@ import base.SpecBase
 import controllers.routes
 import pages.*
 import models.*
-import models.add.{SubcontractorName, TypeOfSubcontractor, UKAddress}
+import models.add.{SubcontractorName, TypeOfSubcontractor}
 import models.contact.ContactOptions
 import pages.add.*
 import pages.add.company.*

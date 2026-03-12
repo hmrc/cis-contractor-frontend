@@ -243,14 +243,17 @@ subContactDetails.telephone.change.hidden = telephone number
 subContactDetails.change.hidden = contact details
 
 subcontractorsUniqueTaxpayerReference.title = What is the subcontractor’s Unique Taxpayer Reference (UTR)?
-subcontractorsUniqueTaxpayerReference.heading = What is the subcontractor’s Unique Taxpayer Reference (UTR)?
-subcontractorsUniqueTaxpayerReference.hint = This is 10 numbers, like 1234567890. The UTR will be on tax returns and other letters about Self Assessment. It may also be called ‘tax reference’
-subcontractorsUniqueTaxpayerReference.checkYourAnswersLabel = Unique Taxpayer Reference
-subcontractorsUniqueTaxpayerReference.error.required = Enter a Unique Taxpayer Reference (UTR), like 1234567890
-subcontractorsUniqueTaxpayerReference.error.invalid = Your entry for ‘Unique tax reference (UTR)’ is invalid. Please amend.
-subcontractorsUniqueTaxpayerReference.error.length = Enter a Unique Taxpayer Reference (UTR) using 10 digits
-subcontractorsUniqueTaxpayerReference.error.duplicate = You have entered a Unique Tax Reference (UTR) of an existing subcontractor. Please amend your entry.
-subcontractorsUniqueTaxpayerReference.change.hidden = Unique Taxpayer Reference
+subcontractorsUniqueTaxpayerReference.heading = Self Assessment Unique Taxpayer Reference (UTR)?
+subcontractorsUniqueTaxpayerReference.p1 = The UTR will be on tax returns and other documents from HMRC. It might be called ‘reference’, ‘UTR’, or ‘official use’.
+subcontractorsUniqueTaxpayerReference.linkText = Get more help to find a UTR (opens in new tab)
+subcontractorsUniqueTaxpayerReference.label = What is the Self Assessment UTR for {0}?
+subcontractorsUniqueTaxpayerReference.hint = A UTR is a 10 digit number
+subcontractorsUniqueTaxpayerReference.checkYourAnswersLabel = UTR
+subcontractorsUniqueTaxpayerReference.error.required = Enter a valid Unique Taxpayer Reference (UTR) using 10 numbers, like 1234567890
+subcontractorsUniqueTaxpayerReference.error.invalid = Enter a valid Unique Taxpayer Reference (UTR) using 10 numbers, like 1234567890
+subcontractorsUniqueTaxpayerReference.error.length = Enter a valid Unique Taxpayer Reference (UTR) using 10 numbers, like 1234567890
+subcontractorsUniqueTaxpayerReference.error.duplicate = You have already used this Unique Taxpayer Reference (UTR) for an existing subcontractor
+subcontractorsUniqueTaxpayerReference.change.hidden = UTR
 
 partnershipWorksReferenceNumberYesNo.title = Does this partnership have a works reference number?
 partnershipWorksReferenceNumberYesNo.heading = Does {0} have a works reference number?
