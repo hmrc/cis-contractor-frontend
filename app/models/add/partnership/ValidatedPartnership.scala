@@ -54,7 +54,7 @@ object ValidatedPartnership extends Validation {
         getOptionalPageValue(answers, PartnershipUniqueTaxpayerReferencePage, PartnershipHasUtrYesNoPage)
       partnershipNominatedPartnerName <- getPageValue(answers, PartnershipNominatedPartnerNamePage)
       partnershipNominatedPartnerUtr  <-
-        getOptionalPageValue(answers, PartnershipNominatedPartnerUtrPage, PartnershipHasUtrYesNoPage)
+        getOptionalPageValue(answers, PartnershipNominatedPartnerUtrPage, PartnershipNominatedPartnerUtrYesNoPage)
       partnershipNominatedPartnerNino <-
         getOptionalPageValue(answers, PartnershipNominatedPartnerNinoPage, PartnershipNominatedPartnerNinoYesNoPage)
       partnershipNominatedPartnerCrn  <-

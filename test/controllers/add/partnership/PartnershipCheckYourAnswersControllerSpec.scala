@@ -48,6 +48,9 @@ class PartnershipCheckYourAnswersControllerSpec extends SpecBase {
     .set(PartnershipNominatedPartnerCrnYesNoPage, false)
     .success
     .value
+    .set(PartnershipNominatedPartnerUtrYesNoPage, false)
+    .success
+    .value
     .set(PartnershipWorksReferenceNumberYesNoPage, false)
     .success
     .value
@@ -105,6 +108,9 @@ class PartnershipCheckYourAnswersControllerSpec extends SpecBase {
         .success
         .value
         .set(PartnershipUniqueTaxpayerReferencePage, "1234567890")
+        .success
+        .value
+        .set(PartnershipNominatedPartnerUtrYesNoPage, true)
         .success
         .value
         .set(PartnershipNominatedPartnerUtrPage, "9876543210")
