@@ -87,20 +87,23 @@ object ValidatedPartnership extends Validation {
     answers: UserAnswers,
     questionPage: QuestionPage[A],
     contactOptions: ContactOptions
-  )(implicit reads: Reads[A]): Either[ValidationError, Option[A]] =
-    (contactOptions, questionPage) match {
-      case (Email, PartnershipEmailAddressPage)  =>
-        answers.get(questionPage).toRight(MissingAnswer(questionPage)).map(Option(_))
-      case (Phone, PartnershipPhoneNumberPage)   =>
-        answers.get(questionPage).toRight(MissingAnswer(questionPage)).map(Option(_))
-      case (Mobile, PartnershipMobileNumberPage) =>
-        answers.get(questionPage).toRight(MissingAnswer(questionPage)).map(Option(_))
-      case (Email | Phone | Mobile, _)           => Right(None)
-      case (NoDetails, _)                        =>
-        answers
-          .get(questionPage)
-          .fold(Right(None): Either[ValidationError, Option[A]])(_ => Left(InvalidAnswer(questionPage)))
-      case _                                     => Left(InvalidAnswer(questionPage)) // $COVERAGE-OFF$ unreachable: ContactOptions.Or is private
+  )(implicit reads: Reads[A]): Either[ValidationError, Option[A]] = {
+    val expectedPage: Option[QuestionPage[_]] = contactOptions match {
+      case Email     => Some(PartnershipEmailAddressPage)
+      case Phone     => Some(PartnershipPhoneNumberPage)
+      case Mobile    => Some(PartnershipMobileNumberPage)
+      case NoDetails => None
     }
+
+    if (expectedPage.exists(_ == questionPage)) {
+      answers.get(questionPage).toRight(MissingAnswer(questionPage)).map(Some(_))
+    } else if (expectedPage.isDefined) {
+      Right(None)
+    } else {
+      answers
+        .get(questionPage)
+        .fold(Right(None): Either[ValidationError, Option[A]])(_ => Left(InvalidAnswer(questionPage)))
+    }
+  }
 
 }
