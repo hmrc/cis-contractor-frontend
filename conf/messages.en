@@ -185,9 +185,9 @@ subcontractorContactDetailsYesNo.checkYourAnswersLabel = Do you want to add the 
 subcontractorContactDetailsYesNo.error.required = Select whether you have the subcontractor’s contact details
 subcontractorContactDetailsYesNo.change.hidden = do you want to add the subcontractor’s contact details?
 
-worksReferenceNumber.title = What is the works reference number?
-worksReferenceNumber.heading = What is the works reference number?
-worksReferenceNumber.hint = This is a unique reference for the construction work or project. You may have received this from the contractor
+worksReferenceNumber.title = What is the works reference number associated with this subcontractor?
+worksReferenceNumber.heading = What is the works reference number associated with {0}?
+worksReferenceNumber.hint = This is unique to the construction work or project. You may have received it from the contractor.
 worksReferenceNumber.checkYourAnswersLabel = Works reference number
 worksReferenceNumber.error.required = Enter a works reference number
 worksReferenceNumber.error.invalid = Enter a valid works reference number
