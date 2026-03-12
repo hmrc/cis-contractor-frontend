@@ -19,6 +19,8 @@ package views.add
 import forms.add.NationalInsuranceNumberYesNoFormProvider
 import models.NormalMode
 import org.jsoup.Jsoup
+import org.jsoup.nodes.Document
+import org.jsoup.select.Elements
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
@@ -26,7 +28,10 @@ import play.api.data.Form
 import play.api.i18n.{Lang, Messages, MessagesApi, MessagesImpl}
 import play.api.mvc.Request
 import play.api.test.FakeRequest
+import play.twirl.api.HtmlFormat
 import views.html.add.NationalInsuranceNumberYesNoView
+
+import java.util
 
 class NationalInsuranceNumberYesNoViewSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite {
 
@@ -34,21 +39,23 @@ class NationalInsuranceNumberYesNoViewSpec extends AnyWordSpec with Matchers wit
 
     "render the page with title, heading, hint, yes/no radios and submit button" in new Setup {
 
-      val html = view(form, NormalMode)
-      val doc  = Jsoup.parse(html.toString())
+      val subcontractorName = "Test Subcontractor"
+
+      val html: HtmlFormat.Appendable = view(form, NormalMode, subcontractorName)
+      val doc: Document               = Jsoup.parse(html.toString())
 
       doc.select("title").text() must include(messages("nationalInsuranceNumberYesNo.title"))
 
-      val legend = doc.select("fieldset legend")
-      legend.text() mustBe messages("nationalInsuranceNumberYesNo.heading")
+      val legend: Elements = doc.select("fieldset legend")
+      legend.text() mustBe messages("nationalInsuranceNumberYesNo.heading", subcontractorName)
       legend.hasClass("govuk-fieldset__legend--l") mustBe true
 
       doc.select(".govuk-hint").text() mustBe messages("nationalInsuranceNumberYesNo.hint")
 
-      val radios = doc.select(".govuk-radios__input")
+      val radios: Elements = doc.select(".govuk-radios__input")
       radios.size() mustBe 2
 
-      val labels = doc.select(".govuk-radios__label").eachText()
+      val labels: util.List[String] = doc.select(".govuk-radios__label").eachText()
       labels must contain("Yes")
       labels must contain("No")
 
@@ -62,17 +69,19 @@ class NationalInsuranceNumberYesNoViewSpec extends AnyWordSpec with Matchers wit
 
     "display error summary and inline error when no option is selected" in new Setup {
 
-      val errorForm = form.withError("value", "error.required")
+      val subcontractorName = "Test Subcontractor"
 
-      val html = view(errorForm, NormalMode)
-      val doc  = Jsoup.parse(html.toString())
+      val errorForm: Form[Boolean] = form.withError("value", "nationalInsuranceNumberYesNo.error.required")
 
-      val summary = doc.select(".govuk-error-summary")
-      summary.text() must include(messages("error.required"))
+      val html: HtmlFormat.Appendable = view(errorForm, NormalMode, subcontractorName)
+      val doc: Document               = Jsoup.parse(html.toString())
+
+      val summary: Elements = doc.select(".govuk-error-summary")
+      summary.text() must include(messages("nationalInsuranceNumberYesNo.error.required"))
 
       summary.select("a").attr("href") mustBe "#value"
 
-      doc.select(".govuk-error-message").text() must include(messages("error.required"))
+      doc.select(".govuk-error-message").text() must include(messages("nationalInsuranceNumberYesNo.error.required"))
     }
   }
 
