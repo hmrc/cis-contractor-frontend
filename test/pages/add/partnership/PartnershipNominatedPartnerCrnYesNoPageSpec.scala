@@ -28,13 +28,12 @@ class PartnershipNominatedPartnerCrnYesNoPageSpec extends PageBehaviours {
 
     beRemovable[Boolean](PartnershipNominatedPartnerCrnYesNoPage)
 
-    // TODO update to correct page for cleanup
-    "cleanup: must remove PartnershipWorksReferenceNumber userAnswers when No is selected" in {
-      val userAnswers = emptyUserAnswers.set(PartnershipWorksReferenceNumberPage, "ABC").success.value
+    "cleanup: must remove PartnershipNominatedPartnerCrnPage userAnswers when No is selected" in {
+      val userAnswers = emptyUserAnswers.set(PartnershipNominatedPartnerCrnPage, "12345678").success.value
 
       val updatedUserAnswers = userAnswers.set(PartnershipNominatedPartnerCrnYesNoPage, false).success.value
 
-      updatedUserAnswers.get(PartnershipWorksReferenceNumberPage) mustBe None
+      updatedUserAnswers.get(PartnershipNominatedPartnerCrnPage) mustBe None
     }
   }
 
