@@ -100,7 +100,7 @@ object ValidatedPartnership extends Validation {
         answers
           .get(questionPage)
           .fold(Right(None): Either[ValidationError, Option[A]])(_ => Left(InvalidAnswer(questionPage)))
-      case _                                     => Left(InvalidAnswer(questionPage))
+      case _                                     => Left(InvalidAnswer(questionPage)) // $COVERAGE-OFF$ unreachable: ContactOptions.Or is private
     }
 
 }

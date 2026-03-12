@@ -20,7 +20,7 @@ import base.SpecBase
 import controllers.routes
 import pages.*
 import models.*
-import models.add.{SubcontractorName, TypeOfSubcontractor, UKAddress}
+import models.add.{InternationalAddress, SubcontractorName, TypeOfSubcontractor, UKAddress}
 import models.contact.ContactOptions
 import pages.add.*
 import pages.add.company.*
@@ -1112,6 +1112,17 @@ class NavigatorSpec extends SpecBase {
           CheckMode,
           emptyUserAnswers.setOrException(PartnershipAddressYesNoPage, true)
         ) mustBe controllers.add.partnership.routes.PartnershipAddressController.onPageLoad(CheckMode)
+      }
+
+      "must go from PartnershipAddressYesNoPage to PartnershipCheckYourAnswers when true and address already filled in CheckMode" in {
+        val address = InternationalAddress("1 Test Street", None, "Town", None, "AA1 1AA", "GB")
+        navigator.nextPage(
+          PartnershipAddressYesNoPage,
+          CheckMode,
+          emptyUserAnswers
+            .setOrException(PartnershipAddressYesNoPage, true)
+            .setOrException(PartnershipAddressPage, address)
+        ) mustBe partnershipCYA
       }
 
       "must go from PartnershipAddressYesNoPage to PartnershipCheckYourAnswers when false in CheckMode" in {

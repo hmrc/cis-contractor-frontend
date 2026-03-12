@@ -81,7 +81,7 @@ class Navigator @Inject() () {
     case PartnershipChooseContactDetailsPage       =>
       userAnswers => navigatorFromChooseContactDetailsPage(NormalMode)(userAnswers)
     case PartnershipNominatedPartnerNinoYesNoPage  =>
-      userAnswers => nagitatorFromPartnershipNominatedPartnerNinoYesNoPage(NormalMode)(userAnswers)
+      userAnswers => navigatorFromPartnershipNominatedPartnerNinoYesNoPage(NormalMode)(userAnswers)
     case PartnershipNominatedPartnerNamePage       =>
       _ => controllers.add.partnership.routes.PartnershipNominatedPartnerNameController.onPageLoad(NormalMode)
     case PartnershipNominatedPartnerCrnYesNoPage   =>
@@ -159,7 +159,7 @@ class Navigator @Inject() () {
       userAnswers => navigatorFromPartnershipNominatedPartnerUtrYesNoPage(CheckMode)(userAnswers)
     case PartnershipNominatedPartnerUtrPage       =>
       _ => controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
-    case PartnershipNominatedPartnerNinoYesNoPage => nagitatorFromPartnershipNominatedPartnerNinoYesNoPage(CheckMode)(_)
+    case PartnershipNominatedPartnerNinoYesNoPage => navigatorFromPartnershipNominatedPartnerNinoYesNoPage(CheckMode)(_)
     case PartnershipNominatedPartnerNinoPage      =>
       _ => controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
     case PartnershipNominatedPartnerCrnPage       =>
@@ -419,7 +419,7 @@ class Navigator @Inject() () {
       case _                         => routes.JourneyRecoveryController.onPageLoad()
     }
 
-  private def nagitatorFromPartnershipNominatedPartnerNinoYesNoPage(mode: Mode)(ua: UserAnswers): Call =
+  private def navigatorFromPartnershipNominatedPartnerNinoYesNoPage(mode: Mode)(ua: UserAnswers): Call =
     (ua.get(PartnershipNominatedPartnerNinoYesNoPage), mode) match {
       case (Some(true), _)           =>
         controllers.add.partnership.routes.PartnershipNominatedPartnerNinoController.onPageLoad(mode)
