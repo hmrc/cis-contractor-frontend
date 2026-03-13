@@ -29,38 +29,45 @@ class SubcontractorNameExtractorSpec extends SpecBase with MockitoSugar {
 
       val subcontractorNameExtractor = new SubcontractorNameExtractor()
 
-      val subcontractorName = SubcontractorName("John", Some("Paul"), "Smith")
+      val subContractorName =
+        SubcontractorName("John", Some("Paul"), "Smith")
 
-      val userAnswers = emptyUserAnswers
-        .set(SubcontractorNamePage, subcontractorName)
-        .success
-        .value
+      val userAnswers =
+        emptyUserAnswers
+          .set(SubcontractorNamePage, subContractorName)
+          .success
+          .value
 
-      val result = subcontractorNameExtractor.getSubcontractorName(userAnswers)
+      val result =
+        subcontractorNameExtractor.getSubcontractorName(userAnswers)
+
       result mustBe Some("John Smith")
     }
 
-    "should return TradingNameOfSubcontractor when TradingNameOfSubcontractorPage is in userAnswers" in {
+    "should return trading name when TradingNameOfSubcontractorPage exists" in {
 
       val subcontractorNameExtractor = new SubcontractorNameExtractor()
 
-      val tradingNameOfSubcontractor = "ABC Construction LTD"
+      val tradingNameOfSubcontractor = "ABC Contractors"
 
-      val userAnswers = emptyUserAnswers
-        .set(TradingNameOfSubcontractorPage, tradingNameOfSubcontractor)
-        .success
-        .value
+      val userAnswers =
+        emptyUserAnswers
+          .set(TradingNameOfSubcontractorPage, tradingNameOfSubcontractor)
+          .success
+          .value
 
-      val result = subcontractorNameExtractor.getSubcontractorName(userAnswers)
+      val result =
+        subcontractorNameExtractor.getSubcontractorName(userAnswers)
 
       result mustBe Some(tradingNameOfSubcontractor)
     }
 
-    "should return None when SubcontractorNamePage and TradingNameOfSubcontractorPage are not in userAnswers" in {
+    "should return None when no subcontractor name exists" in {
 
       val subcontractorNameExtractor = new SubcontractorNameExtractor()
 
-      val result = subcontractorNameExtractor.getSubcontractorName(emptyUserAnswers)
+      val result =
+        subcontractorNameExtractor.getSubcontractorName(emptyUserAnswers)
 
       result mustBe None
     }
