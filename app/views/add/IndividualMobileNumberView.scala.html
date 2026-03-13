@@ -27,9 +27,9 @@
 
 @(form: Form[_], mode: Mode, name: String)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = title(form, messages("partnershipMobileNumber.title"))) {
+@layout(pageTitle = title(form, messages("individualMobileNumber.title"))) {
 
-    @formHelper(action = controllers.add.partnership.routes.PartnershipMobileNumberController.onSubmit(mode)) {
+    @formHelper(action = controllers.add.routes.IndividualMobileNumberController.onSubmit(mode)) {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form))
@@ -38,9 +38,9 @@
         @govukInput(
             InputViewModel(
                 field = form("value"),
-                label = LabelViewModel(messages("partnershipMobileNumber.heading", name)).asPageHeading(Large)
+                label = LabelViewModel(messages("individualMobileNumber.heading", name)).asPageHeading(Large)
             )
-            .withHint(HintViewModel(messages("partnershipMobileNumber.hint")))
+            .withHint(HintViewModel(messages("individualMobileNumber.hint")))
             .withWidth(Full)
             .withInputType("tel")
             .withSpellcheck(false)

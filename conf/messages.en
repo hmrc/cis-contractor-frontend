@@ -607,6 +607,15 @@ partnershipMobileNumber.error.invalid = Enter a valid mobile number, like 07700 
 partnershipMobileNumber.checkYourAnswersLabel = Mobile number
 partnershipMobileNumber.change.hidden = mobile number
 
+individualMobileNumber.title = What is the mobile number for this subcontractor?
+individualMobileNumber.heading = What is the mobile number for {0}?
+individualMobileNumber.hint = HMRC will never use this mobile number to contact this subcontractor
+individualMobileNumber.checkYourAnswersLabel = Mobile number
+individualMobileNumber.error.required = Enter a mobile number
+individualMobileNumber.error.length = Enter a valid mobile number, like 07700 900 982 or +44 7700 900 999
+individualMobileNumber.error.invalid = Enter a valid mobile number, like 07700 900 982 or +44 7700 900 999
+individualMobileNumber.change.hidden = mobile number
+
 companyAdded.title = Company subcontractor added
 companyAdded.heading = Subcontractor added
 companyAdded.p1 = You can now find {0} on your list of subcontractors.

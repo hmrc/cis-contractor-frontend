@@ -793,6 +793,14 @@ class NavigatorSpec extends SpecBase {
         ) mustBe controllers.add.company.routes.CompanyCrnYesNoController.onPageLoad(NormalMode)
       }
 
+      "must go from IndividualMobileNumberPage to UniqueTaxpayerReferenceYesNoPage in NormalMode" in {
+        navigator.nextPage(
+          IndividualMobileNumberPage,
+          NormalMode,
+          UserAnswers("id")
+        ) mustBe controllers.add.routes.UniqueTaxpayerReferenceYesNoController.onPageLoad(NormalMode)
+      }
+
       "must go from a CompanyMobileNumberPage to CompanyMobileNumberPage" in {
         navigator.nextPage(
           CompanyMobileNumberPage,
@@ -1546,6 +1554,14 @@ class NavigatorSpec extends SpecBase {
           CheckMode,
           emptyUserAnswers
         ) mustBe CompanyCYA
+      }
+
+      "must go from IndividualMobileNumberPage to CheckYourAnswersController in CheckMode" in {
+        navigator.nextPage(
+          IndividualMobileNumberPage,
+          CheckMode,
+          UserAnswers("id")
+        ) mustBe controllers.add.routes.CheckYourAnswersController.onPageLoad()
       }
 
       "must go from CompanyMobileNumberPage to CompanyMobileNumberPage in CheckMode" in {
