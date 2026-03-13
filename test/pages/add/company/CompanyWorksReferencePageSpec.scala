@@ -14,13 +14,18 @@
  * limitations under the License.
  */
 
-package forms.mappings
+package pages.add.company
 
-object Constants {
-  final val MaxLength35: Int  = 35
-  final val MaxLength8: Int   = 8
-  final val MaxLength254: Int = 254
-  final val MaxLength56: Int  = 56
-  final val MaxLength20: Int  = 20
+import pages.behaviours.PageBehaviours
 
+class CompanyWorksReferencePageSpec extends PageBehaviours {
+
+  "CompanyWorksReferencePage" - {
+
+    beRetrievable[String](CompanyWorksReferencePage)
+
+    beSettable[String](CompanyWorksReferencePage)
+
+    beRemovable[String](CompanyWorksReferencePage)
+  }
 }
