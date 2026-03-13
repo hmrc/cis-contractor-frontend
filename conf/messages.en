@@ -527,11 +527,11 @@ companyContactOptions.change.hidden = Contact details for company
 companyEmailAddress.title = What is the email address for this company?
 companyEmailAddress.heading = What is the email address for {0}?
 companyEmailAddress.hintText = HMRC will never use this email address to contact this subcontractor
-companyEmailAddress.checkYourAnswersLabel = Email Address
+companyEmailAddress.checkYourAnswersLabel = Email address
 companyEmailAddress.error.required = Enter an email address in the correct format, like name@example.com
 companyEmailAddress.error.invalid = Enter a valid email address in the correct format, like name@example.com
 companyEmailAddress.error.length = Enter a valid email address in the correct format, like name@example.com, up to 254 characters
-companyEmailAddress.change.hidden = email Address
+companyEmailAddress.change.hidden = email address
 
 companyPhoneNumber.title = What is the phone number for this company?
 companyPhoneNumber.heading = What is the phone number for {0}?
@@ -545,11 +545,11 @@ companyPhoneNumber.change.hidden = phone number
 companyMobileNumber.title = What is the mobile number for this company?
 companyMobileNumber.heading = What is the mobile number for {0}?
 companyMobileNumber.hintText = HMRC will never use this mobile number to contact this subcontractor
-companyMobileNumber.checkYourAnswersLabel = Mobile Number
+companyMobileNumber.checkYourAnswersLabel = Mobile number
 companyMobileNumber.error.required = Enter a mobile number
 companyMobileNumber.error.invalid = Enter a valid mobile number, like 07700 900 982 or +44 7700 900 999
 companyMobileNumber.error.length = Enter a valid mobile number, like 07700 900 982 or +44 7700 900 999
-companyMobileNumber.change.hidden = mobile Number
+companyMobileNumber.change.hidden = mobile number
 
 companyUtrYesNo.title = Do you know the Unique Taxpayer Reference for this company?
 companyUtrYesNo.heading = Do you know the Unique Taxpayer Reference for {0}?
