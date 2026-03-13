@@ -14,12 +14,11 @@
  * limitations under the License.
  */
 
-package views.add.company
+package views.add
 
-import forms.add.company.CompanyMobileNumberFormProvider
+import forms.add.IndividualPhoneNumberFormProvider
 import models.NormalMode
 import org.scalatest.matchers.must.Matchers
-import org.scalatest.matchers.should.Matchers.should
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.data.Form
@@ -27,23 +26,30 @@ import play.api.i18n.Messages
 import play.api.mvc.Request
 import play.api.test.FakeRequest
 import play.twirl.api.HtmlFormat
-import views.html.add.company.CompanyMobileNumberView
+import views.html.add.IndividualPhoneNumberView
 
-class CompanyMobileNumberViewSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite {
+class IndividualPhoneNumberViewSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite {
 
-  "CompanyMobileNumberView" should {
+  "IndividualPhoneNumberView" should {
 
     "render the page with title, heading, input and submit button" in new Setup {
-      val companyName                 = "Test Company"
-      val html: HtmlFormat.Appendable = view(form, NormalMode, companyName)
+
+      val subcontractorName = "Test Name"
+
+      val html: HtmlFormat.Appendable = view(form, NormalMode, subcontractorName)
       val doc                         = org.jsoup.Jsoup.parse(html.toString())
 
-      doc.select("title").text() must include(messages("companyMobileNumber.title"))
+      doc.select("title").text() must include(messages("individualPhoneNumber.title"))
 
-      val heading = doc.select("label.govuk-label")
-      heading.text() mustBe messages("companyMobileNumber.heading", companyName)
+      val heading = doc.select("h1")
+      heading.text() mustBe messages("individualPhoneNumber.heading", subcontractorName)
 
-      doc.select("form").attr("action") mustBe controllers.add.company.routes.CompanyMobileNumberController
+      val hint = doc.select(".govuk-hint")
+      hint.text() mustBe messages("individualPhoneNumber.hint")
+
+      doc
+        .select("form")
+        .attr("action") mustBe controllers.add.routes.IndividualPhoneNumberController
         .onSubmit(NormalMode)
         .url
 
@@ -53,25 +59,27 @@ class CompanyMobileNumberViewSpec extends AnyWordSpec with Matchers with GuiceOn
     }
 
     "display error summary and inline error when no name is entered" in new Setup {
-      val errorForm: Form[String] =
-        form.withError("value", "companyMobileNumber.error.required")
 
-      val companyName = "Test Company"
-      val html        = view(errorForm, NormalMode, companyName)
-      val doc         = org.jsoup.Jsoup.parse(html.toString())
+      val subcontractorName = "Test Name"
+
+      val errorForm: Form[String] =
+        form.withError("value", "individualPhoneNumber.error.required")
+
+      val html = view(errorForm, NormalMode, subcontractorName)
+      val doc  = org.jsoup.Jsoup.parse(html.toString())
 
       val summary = doc.select(".govuk-error-summary")
-      summary.text() must include(messages("companyMobileNumber.error.required"))
+      summary.text() must include(messages("individualPhoneNumber.error.required"))
 
       val linkHref = summary.select("a").attr("href")
       linkHref mustBe "#value"
 
-      doc.select(".govuk-error-message").text() must include(messages("companyMobileNumber.error.required"))
+      doc.select(".govuk-error-message").text() must include(messages("individualPhoneNumber.error.required"))
     }
   }
 
   trait Setup {
-    val formProvider       = new CompanyMobileNumberFormProvider()
+    val formProvider       = new IndividualPhoneNumberFormProvider()
     val form: Form[String] = formProvider()
 
     implicit val request: Request[_] = FakeRequest()
@@ -81,7 +89,6 @@ class CompanyMobileNumberViewSpec extends AnyWordSpec with Matchers with GuiceOn
         app.injector.instanceOf[play.api.i18n.MessagesApi]
       )
 
-    val view: CompanyMobileNumberView = app.injector.instanceOf[CompanyMobileNumberView]
+    val view: IndividualPhoneNumberView = app.injector.instanceOf[IndividualPhoneNumberView]
   }
-
 }
