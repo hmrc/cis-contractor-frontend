@@ -34,7 +34,7 @@ class AddressOfSubcontractorFormProvider @Inject() extends Mappings {
           .verifying(
             firstError(
               maxLength(Constants.MaxLength35, "addressOfSubcontractor.error.addressLine1.length"),
-              regexp(Validation.nameRegex, "addressOfSubcontractor.error.addressLine1.invalidCharacters"),
+              regexp(Validation.addressRegex, "addressOfSubcontractor.error.addressLine1.invalidCharacters"),
               regexp(
                 Validation.firstCharLetterOrDigitRegex,
                 "addressOfSubcontractor.error.addressLine1.firstCharMustBeLetterOrNumber"
@@ -49,7 +49,7 @@ class AddressOfSubcontractorFormProvider @Inject() extends Mappings {
               firstError(
                 maxLength(Constants.MaxLength35, "addressOfSubcontractor.error.addressLine2.length"),
                 regexp(
-                  Validation.nameRegex,
+                  Validation.addressRegex,
                   "addressOfSubcontractor.error.addressLine2.invalidCharacters"
                 ),
                 regexp(
@@ -65,7 +65,7 @@ class AddressOfSubcontractorFormProvider @Inject() extends Mappings {
           .verifying(
             firstError(
               maxLength(Constants.MaxLength35, "addressOfSubcontractor.error.addressLine3.length"),
-              regexp(Validation.nameRegex, "addressOfSubcontractor.error.addressLine3.invalidCharacters"),
+              regexp(Validation.addressRegex, "addressOfSubcontractor.error.addressLine3.invalidCharacters"),
               regexp(
                 Validation.firstCharLetterRegex,
                 "addressOfSubcontractor.error.addressLine3.firstCharMustBeLetterOrNumber"
@@ -79,7 +79,7 @@ class AddressOfSubcontractorFormProvider @Inject() extends Mappings {
             .verifying(
               firstError(
                 maxLength(Constants.MaxLength35, "addressOfSubcontractor.error.addressLine4.length"),
-                regexp(Validation.nameRegex, "addressOfSubcontractor.error.addressLine4.invalidCharacters"),
+                regexp(Validation.addressRegex, "addressOfSubcontractor.error.addressLine4.invalidCharacters"),
                 regexp(
                   Validation.firstCharLetterRegex,
                   "addressOfSubcontractor.error.addressLine4.firstCharMustBeLetterOrNumber"
