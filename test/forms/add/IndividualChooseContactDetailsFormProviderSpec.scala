@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,24 +16,24 @@
 
 package forms.add
 
-import forms.behaviours.BooleanFieldBehaviours
+import forms.behaviours.OptionFieldBehaviours
+import models.add.IndividualChooseContactDetails
 import play.api.data.FormError
 
-class SubcontractorContactDetailsYesNoFormProviderSpec extends BooleanFieldBehaviours {
+class IndividualChooseContactDetailsFormProviderSpec extends OptionFieldBehaviours {
 
-  val requiredKey = "subcontractorContactDetailsYesNo.error.required"
-  val invalidKey  = "error.boolean"
-
-  val form = new SubcontractorContactDetailsYesNoFormProvider()()
+  val form = new IndividualChooseContactDetailsFormProvider()()
 
   ".value" - {
 
-    val fieldName = "value"
+    val fieldName   = "value"
+    val requiredKey = "individualChooseContactDetails.error.required"
 
-    behave like booleanField(
+    behave like optionsField[IndividualChooseContactDetails](
       form,
       fieldName,
-      invalidError = FormError(fieldName, invalidKey)
+      validValues = IndividualChooseContactDetails.values,
+      invalidError = FormError(fieldName, "error.invalid")
     )
 
     behave like mandatoryField(
