@@ -816,7 +816,7 @@ class NavigatorSpec extends SpecBase {
           UserAnswers("id")
         ) mustBe controllers.add.routes.UniqueTaxpayerReferenceYesNoController.onPageLoad(NormalMode)
       }
-      
+
       "must go from a CompanyWorksReferencePage to CompanyCheckYourAnswerPage" in {
         navigator.nextPage(
           CompanyWorksReferencePage,
@@ -1579,7 +1579,7 @@ class NavigatorSpec extends SpecBase {
           UserAnswers("id")
         ) mustBe controllers.add.routes.CheckYourAnswersController.onPageLoad()
       }
-      
+
       "must go from CompanyWorksReferencePage to CompanyCheckYourAnswerPage in CheckMode" in {
         navigator.nextPage(
           CompanyWorksReferencePage,
