@@ -16,16 +16,12 @@
 
 package pages.add
 
-import pages.behaviours.PageBehaviours
+import pages.QuestionPage
+import play.api.libs.json.JsPath
 
-class IndividualEmailAddressPageSpec extends PageBehaviours {
+case object IndividualPhoneNumberPage extends QuestionPage[String] {
 
-  "IndividualEmailAddressPage" - {
+  override def path: JsPath = JsPath \ toString
 
-    beRetrievable[String](IndividualEmailAddressPage)
-
-    beSettable[String](IndividualEmailAddressPage)
-
-    beRemovable[String](IndividualEmailAddressPage)
-  }
+  override def toString: String = "individualPhoneNumber"
 }

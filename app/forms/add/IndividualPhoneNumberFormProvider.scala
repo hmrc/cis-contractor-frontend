@@ -14,18 +14,26 @@
  * limitations under the License.
  */
 
-package pages.add
+package forms.add
 
-import pages.behaviours.PageBehaviours
+import forms.mappings.Mappings
+import play.api.data.Form
+import forms.Validation.phoneRegex
+import forms.mappings.Constants
 
-class IndividualEmailAddressPageSpec extends PageBehaviours {
+import javax.inject.Inject
 
-  "IndividualEmailAddressPage" - {
+class IndividualPhoneNumberFormProvider @Inject() extends Mappings {
 
-    beRetrievable[String](IndividualEmailAddressPage)
-
-    beSettable[String](IndividualEmailAddressPage)
-
-    beRemovable[String](IndividualEmailAddressPage)
-  }
+  def apply(): Form[String] =
+    Form(
+      "value" -> text("individualPhoneNumber.error.required")
+        .transform(_.trim, identity)
+        .verifying(
+          firstError(
+            regexp(phoneRegex, "individualPhoneNumber.error.invalid"),
+            maxLength(Constants.MaxLength35, "individualPhoneNumber.error.length")
+          )
+        )
+    )
 }

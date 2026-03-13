@@ -14,42 +14,40 @@
  * limitations under the License.
  */
 
-package viewmodels.checkAnswers.add.company
+package viewmodels.checkAnswers.add
 
-import controllers.add.company.routes
+import controllers.add.routes
 import models.{CheckMode, UserAnswers}
 import org.scalatest.OptionValues.convertOptionToValuable
 import org.scalatest.TryValues.convertTryToSuccessOrFailure
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.should.Matchers
-import pages.add.company.CompanyWorksReferencePage
+import pages.add.IndividualPhoneNumberPage
 import play.api.i18n.Messages
 import play.api.test.Helpers.stubMessages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.*
 
-class CompanyWorksReferenceSummarySpec extends AnyFreeSpec with Matchers {
+class IndividualPhoneNumberSummarySpec extends AnyFreeSpec with Matchers {
   implicit val messages: Messages = stubMessages()
 
-  "CompanyWorksReferenceSummary.row" - {
+  "IndividualPhoneNumberSummary.row" - {
 
-    "must return a SummaryListRow when the answer exists" in {
-
+    "must return a Summary List Row when the answer exists" in {
       val answers =
         UserAnswers("test-id")
-          .set(CompanyWorksReferencePage, "WR-001")
+          .set(IndividualPhoneNumberPage, "0987456231")
           .success
           .value
 
-      val maybeRow = CompanyWorksReferenceSummary.row(answers)
-
+      val maybeRow = IndividualPhoneNumberSummary.row(answers)
       maybeRow shouldBe defined
 
       val row = maybeRow.value
 
-      val expectedKeyText = messages("companyWorksReference.checkYourAnswersLabel")
+      val expectedKeyText = messages("individualPhoneNumber.checkYourAnswersLabel")
       row.key.content.asHtml.toString should include(expectedKeyText)
 
-      row.value.content.asHtml.toString should include("WR-001")
+      row.value.content.asHtml.toString should include("0987456231")
 
       row.actions shouldBe defined
       val actions = row.actions.value.items
@@ -57,21 +55,18 @@ class CompanyWorksReferenceSummarySpec extends AnyFreeSpec with Matchers {
 
       val changeAction       = actions.head
       val expectedChangeText = messages("site.change")
-      val expectedHref       = routes.CompanyWorksReferenceController
-        .onPageLoad(CheckMode)
-        .url
-      val expectedHiddenText = messages("companyWorksReference.change.hidden")
+      val expectedHref       = routes.IndividualPhoneNumberController.onPageLoad(CheckMode).url
+      val expectedHiddenText = messages("individualPhoneNumber.change.hidden")
 
-      changeAction.content.asHtml.toString    should include(expectedChangeText)
-      changeAction.href                     shouldBe expectedHref
+      changeAction.content.asHtml.toString should include(expectedChangeText)
+      changeAction.href                  shouldBe expectedHref
+
       changeAction.visuallyHiddenText.value shouldBe expectedHiddenText
     }
 
     "must return None when the answer does not exist" in {
-
       val answers = UserAnswers("test-id")
-
-      CompanyWorksReferenceSummary.row(answers) shouldBe None
+      IndividualPhoneNumberSummary.row(answers) shouldBe None
     }
   }
 }
