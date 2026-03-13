@@ -34,7 +34,7 @@ class IndividualEmailAddressViewSpec extends AnyWordSpec with Matchers with Guic
   "IndividualEmailAddressView" should {
 
     "render the page with title, heading, input and submit button" in new Setup {
-      val subContractorName                 = "John Smith"
+      val subContractorName           = "John Smith"
       val html: HtmlFormat.Appendable = view(form, NormalMode, subContractorName)
       val doc                         = org.jsoup.Jsoup.parse(html.toString())
 
@@ -57,8 +57,8 @@ class IndividualEmailAddressViewSpec extends AnyWordSpec with Matchers with Guic
         form.withError("value", "individualEmailAddress.error.required")
 
       val subContractorName = "John Smith"
-      val html        = view(errorForm, NormalMode, subContractorName)
-      val doc         = org.jsoup.Jsoup.parse(html.toString())
+      val html              = view(errorForm, NormalMode, subContractorName)
+      val doc               = org.jsoup.Jsoup.parse(html.toString())
 
       val summary = doc.select(".govuk-error-summary")
       summary.text() must include(messages("individualEmailAddress.error.required"))
@@ -84,4 +84,3 @@ class IndividualEmailAddressViewSpec extends AnyWordSpec with Matchers with Guic
     val view: IndividualEmailAddressView = app.injector.instanceOf[IndividualEmailAddressView]
   }
 }
-
