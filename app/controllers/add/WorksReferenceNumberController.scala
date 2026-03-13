@@ -19,12 +19,14 @@ package controllers.add
 import controllers.actions.*
 import forms.add.WorksReferenceNumberFormProvider
 import models.Mode
+import models.requests.DataRequest
 import navigation.Navigator
 import pages.add.WorksReferenceNumberPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import utils.SubcontractorNameExtractor
 import views.html.add.WorksReferenceNumberView
 
 import javax.inject.Inject
@@ -38,35 +40,46 @@ class WorksReferenceNumberController @Inject() (
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   formProvider: WorksReferenceNumberFormProvider,
+  subcontractorNameExtractor: SubcontractorNameExtractor,
   val controllerComponents: MessagesControllerComponents,
   view: WorksReferenceNumberView
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport {
 
-  val form = formProvider()
+  private val form = formProvider()
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
+  private def recoveryRedirect =
+    Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
 
-    val preparedForm = request.userAnswers.get(WorksReferenceNumberPage) match {
-      case None        => form
-      case Some(value) => form.fill(value)
+  private def preparedForm(implicit request: DataRequest[?]) =
+    request.userAnswers.get(WorksReferenceNumberPage).fold(form)(form.fill)
+
+  def onPageLoad(mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData) { implicit request =>
+      subcontractorNameExtractor
+        .getSubcontractorName(request.userAnswers)
+        .fold(recoveryRedirect) { subcontractorName =>
+          Ok(view(preparedForm, mode, subcontractorName))
+        }
     }
 
-    Ok(view(preparedForm, mode))
-  }
+  def onSubmit(mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData).async { implicit request =>
+      subcontractorNameExtractor
+        .getSubcontractorName(request.userAnswers)
+        .fold(Future.successful(recoveryRedirect)) { subcontractorName =>
+          form
+            .bindFromRequest()
+            .fold(
+              formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, subcontractorName))),
+              value =>
+                for {
+                  updatedAnswers <- Future.fromTry(request.userAnswers.set(WorksReferenceNumberPage, value))
+                  _              <- sessionRepository.set(updatedAnswers)
+                } yield Redirect(navigator.nextPage(WorksReferenceNumberPage, mode, updatedAnswers))
+            )
+        }
+    }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
-    implicit request =>
-      form
-        .bindFromRequest()
-        .fold(
-          formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
-          value =>
-            for {
-              updatedAnswers <- Future.fromTry(request.userAnswers.set(WorksReferenceNumberPage, value))
-              _              <- sessionRepository.set(updatedAnswers)
-            } yield Redirect(navigator.nextPage(WorksReferenceNumberPage, mode, updatedAnswers))
-        )
-  }
 }

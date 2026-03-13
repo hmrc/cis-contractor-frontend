@@ -81,7 +81,10 @@ class CompanyWorksReferenceControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill("WR-001"), NormalMode, companyName)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill("WR-001"), NormalMode, companyName)(
+          request,
+          messages(application)
+        ).toString
       }
     }
 
@@ -127,7 +130,10 @@ class CompanyWorksReferenceControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode, companyName)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, NormalMode, companyName)(
+          request,
+          messages(application)
+        ).toString
       }
     }
 
@@ -167,7 +173,7 @@ class CompanyWorksReferenceControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request = FakeRequest(GET, companyWorksReferenceRoute)
-        val result = route(application, request).value
+        val result  = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual

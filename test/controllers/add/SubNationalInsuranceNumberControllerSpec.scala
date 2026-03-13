@@ -19,15 +19,15 @@ package controllers.add
 import base.SpecBase
 import controllers.routes
 import forms.add.SubNationalInsuranceNumberFormProvider
+import models.add.SubcontractorName
 import models.{NormalMode, UserAnswers}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.add.SubNationalInsuranceNumberPage
+import pages.add.{SubNationalInsuranceNumberPage, SubcontractorNamePage}
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import queries.SubbieResourceRefQuery
 import repositories.SessionRepository
 import views.html.add.SubNationalInsuranceNumberView
 
@@ -35,16 +35,23 @@ import scala.concurrent.Future
 
 class SubNationalInsuranceNumberControllerSpec extends SpecBase with MockitoSugar {
 
-  val formProvider                         = new SubNationalInsuranceNumberFormProvider()
-  val form                                 = formProvider()
-  lazy val subNationalInsuranceNumberRoute =
+  private val formProvider                         = new SubNationalInsuranceNumberFormProvider()
+  private val form                                 = formProvider()
+  private lazy val subNationalInsuranceNumberRoute =
     controllers.add.routes.SubNationalInsuranceNumberController.onPageLoad(NormalMode).url
+
+  private val subcontractorName = SubcontractorName("John", Some("Paul"), "Smith")
+
+  private val name = "John Smith"
+
+  private def uaWithName: UserAnswers =
+    emptyUserAnswers.set(SubcontractorNamePage, subcontractorName).success.value
 
   "SubNationalInsuranceNumber Controller" - {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(uaWithName)).build()
 
       running(application) {
         val request = FakeRequest(GET, subNationalInsuranceNumberRoute)
@@ -54,13 +61,13 @@ class SubNationalInsuranceNumberControllerSpec extends SpecBase with MockitoSuga
         val view = application.injector.instanceOf[SubNationalInsuranceNumberView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode, name)(request, messages(application)).toString
       }
     }
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = UserAnswers(userAnswersId).set(SubNationalInsuranceNumberPage, "answer").success.value
+      val userAnswers = uaWithName.set(SubNationalInsuranceNumberPage, "answer").success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
@@ -72,31 +79,25 @@ class SubNationalInsuranceNumberControllerSpec extends SpecBase with MockitoSuga
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill("answer"), NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill("answer"), NormalMode, name)(
+          request,
+          messages(application)
+        ).toString
       }
     }
 
-    "must redirect to the UniqueTaxpayerReferenceYesNo page when valid data is submitted" in {
+    "must bind the form and redirect to the UniqueTaxpayerReferenceYesNo page on POST when valid data is submitted" in {
 
-      val mockSessionRepository = mock[SessionRepository]
-      val mockUserAnswers       = emptyUserAnswers
-        .set(SubbieResourceRefQuery, 2)
-        .success
-        .value
-
-      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+      val validValue = "AA123456A"
 
       val application =
-        applicationBuilder(userAnswers = Some(mockUserAnswers))
-          .overrides(
-            bind[SessionRepository].toInstance(mockSessionRepository)
-          )
+        applicationBuilder(userAnswers = Some(uaWithName))
           .build()
 
       running(application) {
         val request =
           FakeRequest(POST, subNationalInsuranceNumberRoute)
-            .withFormUrlEncodedBody(("value", "AA123456A"))
+            .withFormUrlEncodedBody(("value", validValue))
 
         val result = route(application, request).value
 
@@ -109,7 +110,7 @@ class SubNationalInsuranceNumberControllerSpec extends SpecBase with MockitoSuga
 
     "must return a Bad Request and errors when invalid data is submitted with length is more than 9 character" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(uaWithName)).build()
       val answer      = "AA1234567A"
 
       running(application) {
@@ -124,13 +125,13 @@ class SubNationalInsuranceNumberControllerSpec extends SpecBase with MockitoSuga
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, NormalMode, name)(request, messages(application)).toString
       }
     }
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(uaWithName)).build()
       running(application) {
         val request =
           FakeRequest(POST, subNationalInsuranceNumberRoute)
@@ -143,7 +144,7 @@ class SubNationalInsuranceNumberControllerSpec extends SpecBase with MockitoSuga
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, NormalMode, name)(request, messages(application)).toString
       }
     }
 
@@ -167,6 +168,43 @@ class SubNationalInsuranceNumberControllerSpec extends SpecBase with MockitoSuga
         val request =
           FakeRequest(POST, subNationalInsuranceNumberRoute)
             .withFormUrlEncodedBody(("value", "answer"))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must redirect to Journey Recovery for a GET when subcontractor name is missing (userAnswers present)" in {
+
+      val application =
+        applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+
+      running(application) {
+        val request = FakeRequest(GET, subNationalInsuranceNumberRoute)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must redirect to Journey Recovery for a POST when subcontractor name is missing (userAnswers present)" in {
+
+      val mockSessionRepository = mock[SessionRepository]
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+      val application =
+        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, subNationalInsuranceNumberRoute)
+            .withFormUrlEncodedBody("value" -> "AA1234567A")
 
         val result = route(application, request).value
 

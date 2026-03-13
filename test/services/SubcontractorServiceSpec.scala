@@ -18,7 +18,7 @@ package services
 
 import base.SpecBase
 import connectors.ConstructionIndustrySchemeConnector
-import models.add.{SubContactDetails, SubcontractorName, TypeOfSubcontractor, UKAddress}
+import models.add.{InternationalAddress, SubContactDetails, SubcontractorName, TypeOfSubcontractor}
 import models.subcontractor.GetSubcontractorUTRsResponse
 import models.subcontractor.CreateAndUpdateSubcontractorRequest
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
@@ -58,7 +58,14 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
           .value
           .set(
             AddressOfSubcontractorPage,
-            UKAddress("addressLine1", Some("addressLine2"), "addressLine3", Some("addressLine4"), "postCode")
+            InternationalAddress(
+              "addressLine1",
+              Some("addressLine2"),
+              "addressLine3",
+              Some("addressLine4"),
+              "postalCode",
+              "country" // major update on DTR-3356
+            )
           )
           .success
           .value
@@ -83,7 +90,7 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
           addressLine2 = Some("addressLine2"),
           addressLine3 = Some("addressLine3"),
           addressLine4 = Some("addressLine4"),
-          postcode = Some("postCode"),
+          postcode = Some("postalCode"), // major update on DTR-3356
           nino = Some("nino"),
           utr = Some("utr"),
           worksReferenceNumber = Some("workRef"),
@@ -118,7 +125,14 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
           .value
           .set(
             AddressOfSubcontractorPage,
-            UKAddress("addressLine1", Some("addressLine2"), "addressLine3", Some("addressLine4"), "postCode")
+            InternationalAddress(
+              "addressLine1",
+              Some("addressLine2"),
+              "addressLine3",
+              Some("addressLine4"),
+              "postalCode",
+              "country" // major update on DTR-3356
+            )
           )
           .success
           .value
@@ -145,7 +159,7 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
           addressLine2 = Some("addressLine2"),
           addressLine3 = Some("addressLine3"),
           addressLine4 = Some("addressLine4"),
-          postcode = Some("postCode"),
+          postcode = Some("postalCode"), // major update on DTR-3356
           nino = Some("nino"),
           utr = Some("utr"),
           worksReferenceNumber = Some("workRef"),

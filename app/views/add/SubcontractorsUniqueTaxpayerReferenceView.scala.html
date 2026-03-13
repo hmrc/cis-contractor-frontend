@@ -15,16 +15,21 @@
  *@
 
 @import viewmodels.InputWidth._
+@import views.html.components._
+@import viewmodels.LabelSize.Medium
 
 @this(
     layout: templates.Layout,
     formHelper: FormWithCSRF,
     govukErrorSummary: GovukErrorSummary,
     govukInput: GovukInput,
-    govukButton: GovukButton
+    govukButton: GovukButton,
+    heading: H1,
+    paragraph: Paragraph,
+    link: Link,
 )
 
-@(form: Form[_], mode: Mode)(implicit request: Request[_], messages: Messages)
+@(form: Form[_], mode: Mode, name: String)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = title(form, messages("subcontractorsUniqueTaxpayerReference.title"))) {
 
@@ -34,10 +39,20 @@
             @govukErrorSummary(ErrorSummaryViewModel(form))
         }
 
+        @heading(messages("subcontractorsUniqueTaxpayerReference.heading"))
+
+        @paragraph(messages("subcontractorsUniqueTaxpayerReference.p1"))
+
+        @link(
+            linkTextKey = "subcontractorsUniqueTaxpayerReference.linkText",
+            linkUrl = "https://www.gov.uk/find-utr-number",
+            isNewTab = true
+        )
+
         @govukInput(
             InputViewModel(
                 field = form("value"),
-                label = LabelViewModel(messages("subcontractorsUniqueTaxpayerReference.heading")).asPageHeading().withCssClass("govuk-label--l")
+                label = LabelViewModel(messages("subcontractorsUniqueTaxpayerReference.label", name)).withSize(Medium)
             )
             .withWidth(Fixed10)
             .withHint(Hint(

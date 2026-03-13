@@ -20,7 +20,7 @@ import base.SpecBase
 import controllers.routes
 import pages.*
 import models.*
-import models.add.{InternationalAddress, SubcontractorName, TypeOfSubcontractor, UKAddress}
+import models.add.{InternationalAddress, SubcontractorName, TypeOfSubcontractor}
 import models.contact.ContactOptions
 import pages.add.*
 import pages.add.company.*
@@ -1611,12 +1611,13 @@ class NavigatorSpec extends SpecBase {
       }
 
       "must go from SubAddressYesNoPage to CYA when true and AddressOfSubcontractorPage is already answered" in {
-        val addressSample = models.add.UKAddress(
+        val addressSample = models.add.InternationalAddress(
           addressLine1 = "10 Example Street",
           addressLine2 = Some("Suite 2"),
           addressLine3 = "Newcastle",
           addressLine4 = Some("Tyne & Wear"),
-          postCode = "NE1 1AA"
+          postalCode = "NE1 1AA",
+          country = "United Kingdom"
         )
 
         val ua     =
