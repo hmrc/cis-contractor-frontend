@@ -16,6 +16,8 @@
 
 package forms.add.company
 
+import forms.Validation
+import forms.mappings.Constants.MaxLength20
 import forms.mappings.Mappings
 import play.api.data.Form
 
@@ -26,6 +28,15 @@ class CompanyWorksReferenceFormProvider @Inject() extends Mappings {
   def apply(): Form[String] =
     Form(
       "value" -> text("companyWorksReference.error.required")
-        .verifying(maxLength(100, "companyWorksReference.error.length"))
+        .transform(
+          _.trim.toUpperCase.replaceAll("\\s+", " "),
+          identity
+        )
+        .verifying(
+          firstError(
+            maxLength(MaxLength20, "companyWorksReference.error.length"),
+            regexp(Validation.worksRefRegex, "companyWorksReference.error.invalid")
+          )
+        )
     )
 }

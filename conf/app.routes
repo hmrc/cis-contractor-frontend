@@ -253,10 +253,10 @@ POST       /add/company/company-has-works-reference                 controllers.
 GET        /add/company/change-company-has-works-reference          controllers.add.company.CompanyWorksReferenceYesNoController.onPageLoad(mode: Mode = CheckMode)
 POST       /add/company/change-company-has-works-reference           controllers.add.company.CompanyWorksReferenceYesNoController.onSubmit(mode: Mode = CheckMode)
 
-GET        /companyWorksReference                        controllers.add.company.CompanyWorksReferenceController.onPageLoad(mode: Mode = NormalMode)
-POST       /companyWorksReference                        controllers.add.company.CompanyWorksReferenceController.onSubmit(mode: Mode = NormalMode)
-GET        /changeCompanyWorksReference                  controllers.add.company.CompanyWorksReferenceController.onPageLoad(mode: Mode = CheckMode)
-POST       /changeCompanyWorksReference                  controllers.add.company.CompanyWorksReferenceController.onSubmit(mode: Mode = CheckMode)
+GET        /add/company/company-works-reference         controllers.add.company.CompanyWorksReferenceController.onPageLoad(mode: Mode = NormalMode)
+POST       /add/company/company-works-reference         controllers.add.company.CompanyWorksReferenceController.onSubmit(mode: Mode = NormalMode)
+GET        /add/company/change-company-works-reference  controllers.add.company.CompanyWorksReferenceController.onPageLoad(mode: Mode = CheckMode)
+POST       /add/company/change-company-works-reference  controllers.add.company.CompanyWorksReferenceController.onSubmit(mode: Mode = CheckMode)
 
 GET        /companyCheckYourAnswers                      controllers.add.company.CompanyCheckYourAnswersController.onPageLoad()
 
