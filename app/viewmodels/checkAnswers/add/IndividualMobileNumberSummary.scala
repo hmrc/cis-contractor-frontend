@@ -14,31 +14,29 @@
  * limitations under the License.
  */
 
-package viewmodels.checkAnswers.add.partnership
+package viewmodels.checkAnswers.add
 
 import models.{CheckMode, UserAnswers}
-import pages.add.partnership.PartnershipContactDetailsYesNoPage
+import pages.add.IndividualMobileNumberPage
 import play.api.i18n.Messages
+import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
 
-object PartnershipContactDetailsYesNoSummary {
+object IndividualMobileNumberSummary {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(PartnershipContactDetailsYesNoPage).map { answer =>
-
-      val value = if (answer) "site.yes" else "site.no"
-
+    answers.get(IndividualMobileNumberPage).map { answer =>
       SummaryListRowViewModel(
-        key = "partnershipContactDetailsYesNo.checkYourAnswersLabel",
-        value = ValueViewModel(value),
+        key = "individualMobileNumber.checkYourAnswersLabel",
+        value = ValueViewModel(HtmlFormat.escape(answer).toString),
         actions = Seq(
           ActionItemViewModel(
             "site.change",
-            controllers.add.partnership.routes.PartnershipContactDetailsYesNoController.onPageLoad(CheckMode).url
+            controllers.add.routes.IndividualMobileNumberController.onPageLoad(CheckMode).url
           )
-            .withVisuallyHiddenText(messages("partnershipContactDetailsYesNo.change.hidden"))
+            .withVisuallyHiddenText(messages("individualMobileNumber.change.hidden"))
         )
       )
     }

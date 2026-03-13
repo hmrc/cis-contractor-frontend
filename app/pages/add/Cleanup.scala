@@ -62,7 +62,6 @@ trait Cleanup {
       .remove(PartnershipAddressPage)
       .flatMap(_.remove(PartnershipAddressYesNoPage))
       .flatMap(_.remove(PartnershipChooseContactDetailsPage))
-      .flatMap(_.remove(PartnershipContactDetailsYesNoPage))
       .flatMap(_.remove(PartnershipEmailAddressPage))
       .flatMap(_.remove(PartnershipHasUtrYesNoPage))
       .flatMap(_.remove(PartnershipMobileNumberPage))

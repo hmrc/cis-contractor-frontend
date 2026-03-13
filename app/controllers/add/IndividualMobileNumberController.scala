@@ -14,69 +14,70 @@
  * limitations under the License.
  */
 
-package controllers.add.partnership
+package controllers.add
 
 import controllers.actions.*
-import forms.add.partnership.PartnershipContactDetailsYesNoFormProvider
+import forms.add.IndividualMobileNumberFormProvider
 import models.Mode
+import models.requests.DataRequest
 import navigation.Navigator
-import pages.add.partnership.{PartnershipContactDetailsYesNoPage, PartnershipNamePage}
-import play.api.data.Form
+import pages.add.IndividualMobileNumberPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.add.partnership.PartnershipContactDetailsYesNoView
+import views.html.add.IndividualMobileNumberView
+import utils.SubcontractorNameExtractor
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class PartnershipContactDetailsYesNoController @Inject() (
+class IndividualMobileNumberController @Inject() (
   override val messagesApi: MessagesApi,
   sessionRepository: SessionRepository,
   navigator: Navigator,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
-  formProvider: PartnershipContactDetailsYesNoFormProvider,
+  formProvider: IndividualMobileNumberFormProvider,
+  subcontractorNameExtractor: SubcontractorNameExtractor,
   val controllerComponents: MessagesControllerComponents,
-  view: PartnershipContactDetailsYesNoView
+  view: IndividualMobileNumberView
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport {
 
-  val form: Form[Boolean] = formProvider()
+  val form = formProvider()
+
+  private def recoveryRedirect =
+    Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+
+  private def preparedForm(implicit request: DataRequest[?]) =
+    request.userAnswers.get(IndividualMobileNumberPage).fold(form)(form.fill)
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
-    request.userAnswers
-      .get(PartnershipNamePage)
-      .map { partnershipName =>
-        val preparedForm = request.userAnswers.get(PartnershipContactDetailsYesNoPage) match {
-          case None        => form
-          case Some(value) => form.fill(value)
-        }
-
-        Ok(view(preparedForm, mode, partnershipName))
+    subcontractorNameExtractor
+      .getSubcontractorName(request.userAnswers)
+      .fold(recoveryRedirect) { subcontractorName =>
+        Ok(view(preparedForm, mode, subcontractorName))
       }
-      .getOrElse(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
-      request.userAnswers
-        .get(PartnershipNamePage)
-        .map { partnershipName =>
+      subcontractorNameExtractor
+        .getSubcontractorName(request.userAnswers)
+        .fold(Future.successful(recoveryRedirect)) { subcontractorName =>
           form
             .bindFromRequest()
             .fold(
-              formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, partnershipName))),
+              formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, subcontractorName))),
               value =>
                 for {
-                  updatedAnswers <- Future.fromTry(request.userAnswers.set(PartnershipContactDetailsYesNoPage, value))
+                  updatedAnswers <- Future.fromTry(request.userAnswers.set(IndividualMobileNumberPage, value))
                   _              <- sessionRepository.set(updatedAnswers)
-                } yield Redirect(navigator.nextPage(PartnershipContactDetailsYesNoPage, mode, updatedAnswers))
+                } yield Redirect(navigator.nextPage(IndividualMobileNumberPage, mode, updatedAnswers))
             )
         }
-        .getOrElse(Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())))
   }
 }

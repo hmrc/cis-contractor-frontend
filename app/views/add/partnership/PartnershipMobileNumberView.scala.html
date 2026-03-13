@@ -15,6 +15,7 @@
  *@
 
 @import viewmodels.InputWidth._
+@import viewmodels.LabelSize.Large
 
 @this(
     layout: templates.Layout,
@@ -37,7 +38,7 @@
         @govukInput(
             InputViewModel(
                 field = form("value"),
-                label = LabelViewModel(messages("partnershipMobileNumber.heading", name)).asPageHeading().withCssClass("govuk-fieldset__legend--l")
+                label = LabelViewModel(messages("partnershipMobileNumber.heading", name)).asPageHeading(Large)
             )
             .withHint(HintViewModel(messages("partnershipMobileNumber.hint")))
             .withWidth(Full)

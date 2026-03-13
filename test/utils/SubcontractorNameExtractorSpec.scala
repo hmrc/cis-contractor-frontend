@@ -16,17 +16,60 @@
 
 package utils
 
-import models.UserAnswers
+import base.SpecBase
+import models.add.SubcontractorName
+import org.scalatestplus.mockito.MockitoSugar
 import pages.add.{SubcontractorNamePage, TradingNameOfSubcontractorPage}
 
-class SubcontractorNameExtractor {
+class SubcontractorNameExtractorSpec extends SpecBase with MockitoSugar {
 
-  def getSubcontractorName(userAnswers: UserAnswers): Option[String] =
-    userAnswers
-      .get(SubcontractorNamePage)
-      .map(n => s"${n.firstName.trim} ${n.lastName.trim}".trim)
-      .filter(_.nonEmpty)
-      .orElse(
-        userAnswers.get(TradingNameOfSubcontractorPage).map(_.trim).filter(_.nonEmpty)
-      )
+  "SubcontractorNameExtractor" - {
+
+    "should return the subcontractor firstName and lastName when SubcontractorNamePage is in userAnswers" in {
+
+      val subcontractorNameExtractor = new SubcontractorNameExtractor()
+
+      val subContractorName =
+        SubcontractorName("John", Some("Paul"), "Smith")
+
+      val userAnswers =
+        emptyUserAnswers
+          .set(SubcontractorNamePage, subContractorName)
+          .success
+          .value
+
+      val result =
+        subcontractorNameExtractor.getSubcontractorName(userAnswers)
+
+      result mustBe Some("John Smith")
+    }
+
+    "should return trading name when TradingNameOfSubcontractorPage exists" in {
+
+      val subcontractorNameExtractor = new SubcontractorNameExtractor()
+
+      val tradingNameOfSubcontractor = "ABC Contractors"
+
+      val userAnswers =
+        emptyUserAnswers
+          .set(TradingNameOfSubcontractorPage, tradingNameOfSubcontractor)
+          .success
+          .value
+
+      val result =
+        subcontractorNameExtractor.getSubcontractorName(userAnswers)
+
+      result mustBe Some(tradingNameOfSubcontractor)
+    }
+
+    "should return None when no subcontractor name exists" in {
+
+      val subcontractorNameExtractor = new SubcontractorNameExtractor()
+
+      val result =
+        subcontractorNameExtractor.getSubcontractorName(emptyUserAnswers)
+
+      result mustBe None
+    }
+  }
 }
