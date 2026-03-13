@@ -16,7 +16,6 @@
 
 package forms.add
 
-import forms.add.IndividualPhoneNumberFormProvider
 import forms.behaviours.StringFieldBehaviours
 import play.api.data.FormError
 
