@@ -334,35 +334,6 @@ class NavigatorSpec extends SpecBase {
         ) mustBe controllers.add.routes.CheckYourAnswersController.onPageLoad()
       }
 
-//      "must go from a SubcontractorContactDetailsYesNoPage to SubContactDetailsPage when true" in {
-//        navigator.nextPage(
-//          SubcontractorContactDetailsYesNoPage,
-//          NormalMode,
-//          emptyUserAnswers.setOrException(SubcontractorContactDetailsYesNoPage, true)
-//        ) mustBe controllers.add.routes.SubContactDetailsController.onPageLoad(NormalMode)
-//      }
-//
-//      "must go from SubcontractorContactDetailsYesNoPage to CYA when false" in {
-//        val ua =
-//          emptyUserAnswers
-//            .setOrException(SubcontractorContactDetailsYesNoPage, false)
-//
-//        val navigator = new Navigator
-//        navigator.nextPage(
-//          SubcontractorContactDetailsYesNoPage,
-//          NormalMode,
-//          ua
-//        ) mustBe controllers.add.routes.CheckYourAnswersController.onPageLoad()
-//      }
-//
-//      "must go from a SubcontractorContactDetailsYesNoPage to journey recovery when incomplete info provided" in {
-//        navigator.nextPage(
-//          SubcontractorContactDetailsYesNoPage,
-//          NormalMode,
-//          emptyUserAnswers
-//        ) mustBe journeyRecovery
-//      }
-
       "must go from a SubContactDetailsPage to CYA" in {
         navigator.nextPage(
           SubContactDetailsPage,
