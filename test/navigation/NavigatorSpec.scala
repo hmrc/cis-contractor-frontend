@@ -785,6 +785,14 @@ class NavigatorSpec extends SpecBase {
         ) mustBe controllers.add.company.routes.CompanyMobileNumberController.onPageLoad(NormalMode)
       }
 
+      "must go from a CompanyWorksReferencePage to CompanyCheckYourAnswerPage" in {
+        navigator.nextPage(
+          CompanyWorksReferencePage,
+          NormalMode,
+          UserAnswers("id")
+        ) mustBe controllers.add.company.routes.CompanyCheckYourAnswersController.onPageLoad()
+      }
+
       "must go from IndividualChooseContactDetailsPage" - {
         "to itself when EmailAddress is selected" in {
           navigator.nextPage(
@@ -1615,6 +1623,14 @@ class NavigatorSpec extends SpecBase {
           CheckMode,
           emptyUserAnswers
         ) mustBe controllers.add.company.routes.CompanyMobileNumberController.onPageLoad(CheckMode)
+      }
+
+      "must go from CompanyWorksReferencePage to CompanyCheckYourAnswerPage in CheckMode" in {
+        navigator.nextPage(
+          CompanyWorksReferencePage,
+          CheckMode,
+          emptyUserAnswers
+        ) mustBe controllers.add.company.routes.CompanyCheckYourAnswersController.onPageLoad()
       }
     }
 
