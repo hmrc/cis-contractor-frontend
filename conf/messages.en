@@ -623,5 +623,5 @@ individualChooseContactDetails.mobile = Mobile number
 individualChooseContactDetails.or = or
 individualChooseContactDetails.noDetails = Do not add any contact details for this subcontractor
 individualChooseContactDetails.error.required = Select whether you want to add contact details for this subcontractor
-individualChooseContactDetails.checkYourAnswersLabel = Contact details for subcontractor
-individualChooseContactDetails.change.hidden = Contact details for subcontractor
+individualChooseContactDetails.checkYourAnswersLabel = Method of contact
+individualChooseContactDetails.change.hidden = method of contact

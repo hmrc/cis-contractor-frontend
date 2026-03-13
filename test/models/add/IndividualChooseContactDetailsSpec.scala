@@ -25,7 +25,11 @@ import org.scalatest.matchers.must.Matchers
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import play.api.libs.json.{JsError, JsString, Json}
 
-class IndividualChooseContactDetailsSpec extends AnyFreeSpec with Matchers with ScalaCheckPropertyChecks with OptionValues {
+class IndividualChooseContactDetailsSpec
+    extends AnyFreeSpec
+    with Matchers
+    with ScalaCheckPropertyChecks
+    with OptionValues {
 
   "IndividualChooseContactDetails" - {
 
@@ -45,10 +49,8 @@ class IndividualChooseContactDetailsSpec extends AnyFreeSpec with Matchers with 
 
       val gen = arbitrary[String] suchThat (!IndividualChooseContactDetails.values.map(_.toString).contains(_))
 
-      forAll(gen) {
-        invalidValue =>
-
-          JsString(invalidValue).validate[IndividualChooseContactDetails] mustEqual JsError("error.invalid")
+      forAll(gen) { invalidValue =>
+        JsString(invalidValue).validate[IndividualChooseContactDetails] mustEqual JsError("error.invalid")
       }
     }
 
@@ -56,10 +58,8 @@ class IndividualChooseContactDetailsSpec extends AnyFreeSpec with Matchers with 
 
       val gen = Gen.oneOf(IndividualChooseContactDetails.values.toSeq)
 
-      forAll(gen) {
-        individualChooseContactDetails =>
-
-          Json.toJson(individualChooseContactDetails) mustEqual JsString(individualChooseContactDetails.toString)
+      forAll(gen) { individualChooseContactDetails =>
+        Json.toJson(individualChooseContactDetails) mustEqual JsString(individualChooseContactDetails.toString)
       }
     }
   }

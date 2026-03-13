@@ -112,4 +112,3 @@ class IndividualChooseContactDetailsSummarySpec extends AnyFreeSpec with Matcher
     }
   }
 }
-

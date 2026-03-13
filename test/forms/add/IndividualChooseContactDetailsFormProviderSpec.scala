@@ -26,13 +26,13 @@ class IndividualChooseContactDetailsFormProviderSpec extends OptionFieldBehaviou
 
   ".value" - {
 
-    val fieldName = "value"
+    val fieldName   = "value"
     val requiredKey = "individualChooseContactDetails.error.required"
 
     behave like optionsField[IndividualChooseContactDetails](
       form,
       fieldName,
-      validValues  = IndividualChooseContactDetails.values,
+      validValues = IndividualChooseContactDetails.values,
       invalidError = FormError(fieldName, "error.invalid")
     )
 

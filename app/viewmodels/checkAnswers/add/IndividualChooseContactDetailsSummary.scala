@@ -25,25 +25,27 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
 
-object IndividualChooseContactDetailsSummary  {
+object IndividualChooseContactDetailsSummary {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(IndividualChooseContactDetailsPage).map {
-      answer =>
+    answers.get(IndividualChooseContactDetailsPage).map { answer =>
 
-        val value = ValueViewModel(
-          HtmlContent(
-            HtmlFormat.escape(messages(s"individualChooseContactDetails.$answer"))
-          )
+      val value = ValueViewModel(
+        HtmlContent(
+          HtmlFormat.escape(messages(s"individualChooseContactDetails.$answer"))
         )
+      )
 
-        SummaryListRowViewModel(
-          key     = "individualChooseContactDetails.checkYourAnswersLabel",
-          value   = value,
-          actions = Seq(
-            ActionItemViewModel("site.change", controllers.add.routes.IndividualChooseContactDetailsController.onPageLoad(CheckMode).url)
-              .withVisuallyHiddenText(messages("individualChooseContactDetails.change.hidden"))
+      SummaryListRowViewModel(
+        key = "individualChooseContactDetails.checkYourAnswersLabel",
+        value = value,
+        actions = Seq(
+          ActionItemViewModel(
+            "site.change",
+            controllers.add.routes.IndividualChooseContactDetailsController.onPageLoad(CheckMode).url
           )
+            .withVisuallyHiddenText(messages("individualChooseContactDetails.change.hidden"))
         )
+      )
     }
 }

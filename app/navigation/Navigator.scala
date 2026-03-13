@@ -24,7 +24,6 @@ import models.*
 import models.add.TypeOfSubcontractor.*
 import models.contact.ContactOptions.*
 import pages.add.*
-import pages.add.IndividualChooseContactDetailsPage
 import pages.add.company.*
 import pages.add.partnership.*
 

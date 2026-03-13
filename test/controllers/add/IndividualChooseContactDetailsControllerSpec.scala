@@ -34,11 +34,12 @@ import views.html.add.IndividualChooseContactDetailsView
 import scala.concurrent.Future
 
 class IndividualChooseContactDetailsControllerSpec extends SpecBase with MockitoSugar {
-  
-  private val formProvider = new IndividualChooseContactDetailsFormProvider()
-  private val form = formProvider()
 
-  lazy private val individualChooseContactDetailsRoute = controllers.add.routes.IndividualChooseContactDetailsController.onPageLoad(NormalMode).url
+  private val formProvider = new IndividualChooseContactDetailsFormProvider()
+  private val form         = formProvider()
+
+  lazy private val individualChooseContactDetailsRoute =
+    controllers.add.routes.IndividualChooseContactDetailsController.onPageLoad(NormalMode).url
 
   lazy private val individualChooseContactDetailsCheckRoute =
     controllers.add.routes.IndividualChooseContactDetailsController.onPageLoad(CheckMode).url
@@ -60,8 +61,8 @@ class IndividualChooseContactDetailsControllerSpec extends SpecBase with Mockito
 
       running(application) {
         val request = FakeRequest(GET, individualChooseContactDetailsRoute)
-        val result = route(application, request).value
-        val view = application.injector.instanceOf[IndividualChooseContactDetailsView]
+        val result  = route(application, request).value
+        val view    = application.injector.instanceOf[IndividualChooseContactDetailsView]
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(form, NormalMode, name)(
@@ -83,8 +84,8 @@ class IndividualChooseContactDetailsControllerSpec extends SpecBase with Mockito
 
       running(application) {
         val request = FakeRequest(GET, individualChooseContactDetailsRoute)
-        val view = application.injector.instanceOf[IndividualChooseContactDetailsView]
-        val result = route(application, request).value
+        val view    = application.injector.instanceOf[IndividualChooseContactDetailsView]
+        val result  = route(application, request).value
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(
@@ -127,7 +128,6 @@ class IndividualChooseContactDetailsControllerSpec extends SpecBase with Mockito
       }
     }
 
-
     "must return a Bad Request and error when no value is submitted" in {
 
       val application = applicationBuilder(userAnswers = Some(uaWithName)).build()
@@ -137,7 +137,7 @@ class IndividualChooseContactDetailsControllerSpec extends SpecBase with Mockito
           FakeRequest(POST, individualChooseContactDetailsRoute)
             .withFormUrlEncodedBody()
 
-        val form = new IndividualChooseContactDetailsFormProvider()()
+        val form      = new IndividualChooseContactDetailsFormProvider()()
         val boundForm = form.bind(Map.empty)
 
         val view = application.injector.instanceOf[IndividualChooseContactDetailsView]
@@ -263,7 +263,6 @@ class IndividualChooseContactDetailsControllerSpec extends SpecBase with Mockito
         redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
       }
     }
-
 
   }
 }

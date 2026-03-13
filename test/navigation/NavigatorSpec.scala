@@ -1614,7 +1614,6 @@ class NavigatorSpec extends SpecBase {
         }
       }
 
-
       "must go from CompanyUtrPage to CompanyCYA in CheckMode" in {
         navigator.nextPage(
           CompanyUtrPage,
