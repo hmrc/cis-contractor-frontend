@@ -17,6 +17,7 @@
 package forms.behaviours
 
 import org.scalacheck.Gen
+import org.scalatest.matchers.should.Matchers.should
 import play.api.data.{Form, FormError}
 
 trait StringFieldBehaviours extends FieldBehaviours {
@@ -55,4 +56,12 @@ trait StringFieldBehaviours extends FieldBehaviours {
           result.errors mustEqual Seq(error)
         }
       }
+
+  def fieldWithRegex(form: Form[_], fieldName: String, errorKey: String, regex: String): Unit =
+    "must match the pattern" in {
+      val invalidData = "12345abc"
+      val result      = form.bind(Map(fieldName -> invalidData))
+      result.errors should contain(FormError(fieldName, errorKey, Seq(regex)))
+    }
+
 }

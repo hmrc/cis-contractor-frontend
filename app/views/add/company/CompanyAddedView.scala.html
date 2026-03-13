@@ -1,0 +1,68 @@
+@*
+ * Copyright 2026 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import views.html.components._
+@import config.FrontendAppConfig
+
+@this(
+     layout: templates.Layout,
+     govukPanel: GovukPanel,
+     govukButton: GovukButton,
+     h2:H2,
+     paragraph: Paragraph,
+     bulletList: BulletList,
+     link: Link,
+)
+
+@(companyName: String)(implicit request: Request[_], appConfig: FrontendAppConfig, messages: Messages)
+
+      @layout(
+          pageTitle = titleNoForm(messages("companyAdded.title")), showBackLink = false
+      ) {
+
+      @govukPanel(Panel(
+         title = messages("companyAdded.heading"),
+      ))
+
+      @paragraph(messages("companyAdded.p1", companyName))
+
+      @h2(messages("companyAdded.nextSteps.h2"))
+
+      @paragraph(messages("companyAdded.nextSteps.p1"))
+
+      @paragraph(messages("companyAdded.nextSteps.p2"))
+
+      @bulletList(Seq(
+        messages("companyAdded.nextSteps.list.l1"),
+        messages("companyAdded.nextSteps.list.l2"),
+        messages("companyAdded.nextSteps.list.l3")
+      ))
+
+      @link(
+         linkTextKey = "companyAdded.nextSteps.link",
+         linkUrl = "#"
+      )
+
+     @h2(messages("companyAdded.helpAndSupport.h2"))
+
+     @link(
+       linkTextKey = "companyAdded.helpAndSupport.p1.link",
+       linkUrl = appConfig.govUkCISGuidanceUrl,
+       hasFullStop = true,
+       prefixTextKey = "companyAdded.helpAndSupport.p1",
+       isNewTab = false
+     )
+}

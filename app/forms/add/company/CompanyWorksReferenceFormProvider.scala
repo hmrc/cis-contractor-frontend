@@ -28,6 +28,10 @@ class CompanyWorksReferenceFormProvider @Inject() extends Mappings {
   def apply(): Form[String] =
     Form(
       "value" -> text("companyWorksReference.error.required")
+        .transform(
+          _.trim.toUpperCase.replaceAll("\\s+", " "),
+          identity
+        )
         .verifying(
           firstError(
             maxLength(MaxLength20, "companyWorksReference.error.length"),

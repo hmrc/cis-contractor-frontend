@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,37 +14,38 @@
  * limitations under the License.
  */
 
-package viewmodels.checkAnswers.add.partnership
+package viewmodels.checkAnswers.add.company
 
+import controllers.add.company.routes
 import models.{CheckMode, UserAnswers}
 import org.scalatest.OptionValues.convertOptionToValuable
 import org.scalatest.TryValues.convertTryToSuccessOrFailure
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.should.Matchers
-import pages.add.partnership.PartnershipContactDetailsYesNoPage
+import pages.add.company.CompanyWorksReferenceYesNoPage
 import play.api.i18n.Messages
 import play.api.test.Helpers.stubMessages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.*
 
-class PartnershipContactDetailsYesNoSummarySpec extends AnyFreeSpec with Matchers {
+class CompanyWorksReferenceYesNoSummarySpec extends AnyFreeSpec with Matchers {
 
   implicit val messages: Messages = stubMessages()
 
-  "PartnershipContactDetailsYesNoSummary.row" - {
+  "CompanyWorksReferenceYesNoSummary.row" - {
 
     "must return a SummaryListRow with 'Yes' when the answer is true" in {
       val answers = UserAnswers("test-id")
-        .set(PartnershipContactDetailsYesNoPage, true)
+        .set(CompanyWorksReferenceYesNoPage, true)
         .success
         .value
 
-      val maybeRow: Option[SummaryListRow] = PartnershipContactDetailsYesNoSummary.row(answers)
+      val maybeRow: Option[SummaryListRow] = CompanyWorksReferenceYesNoSummary.row(answers)
       maybeRow shouldBe defined
 
       val row =
         maybeRow.value
 
-      val expectedKeyText = messages("partnershipContactDetailsYesNo.checkYourAnswersLabel")
+      val expectedKeyText = messages("companyWorksReferenceYesNo.checkYourAnswersLabel")
       row.key.content.asHtml.toString should include(expectedKeyText)
 
       val expectedValue = messages("site.yes")
@@ -56,9 +57,8 @@ class PartnershipContactDetailsYesNoSummarySpec extends AnyFreeSpec with Matcher
 
       val changeAction       = actions.head
       val expectedChangeText = messages("site.change")
-      val expectedHref       =
-        controllers.add.partnership.routes.PartnershipContactDetailsYesNoController.onPageLoad(CheckMode).url
-      val expectedHiddenText = messages("partnershipContactDetailsYesNo.change.hidden")
+      val expectedHref       = routes.CompanyWorksReferenceYesNoController.onPageLoad(CheckMode).url
+      val expectedHiddenText = messages("companyWorksReferenceYesNo.change.hidden")
 
       changeAction.content.asHtml.toString    should include(expectedChangeText)
       changeAction.href                     shouldBe expectedHref
@@ -67,11 +67,11 @@ class PartnershipContactDetailsYesNoSummarySpec extends AnyFreeSpec with Matcher
 
     "must return a SummaryListRow with 'No' when the answer is false" in {
       val answers = UserAnswers("test-id")
-        .set(PartnershipContactDetailsYesNoPage, false)
+        .set(CompanyWorksReferenceYesNoPage, false)
         .success
         .value
 
-      val maybeRow: Option[SummaryListRow] = PartnershipContactDetailsYesNoSummary.row(answers)
+      val maybeRow: Option[SummaryListRow] = CompanyWorksReferenceYesNoSummary.row(answers)
       maybeRow shouldBe defined
 
       val row           = maybeRow.value
@@ -81,7 +81,7 @@ class PartnershipContactDetailsYesNoSummarySpec extends AnyFreeSpec with Matcher
 
     "must return None when the answer does not exist" in {
       val answers = UserAnswers("test-id")
-      PartnershipContactDetailsYesNoSummary.row(answers) shouldBe None
+      CompanyWorksReferenceYesNoSummary.row(answers) shouldBe None
     }
   }
 }

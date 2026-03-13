@@ -14,24 +14,18 @@
  * limitations under the License.
  */
 
-package pages.add.partnership
+package pages.add.company
 
-import models.UserAnswers
-import pages.QuestionPage
-import play.api.libs.json.JsPath
+import pages.behaviours.PageBehaviours
 
-import scala.util.Try
+class CompanyWorksReferenceYesNoPageSpec extends PageBehaviours {
 
-case object PartnershipHasUtrYesNoPage extends QuestionPage[Boolean] {
+  "CompanyWorksReferenceYesNoPage" - {
 
-  override def path: JsPath = JsPath \ toString
+    beRetrievable[Boolean](CompanyWorksReferenceYesNoPage)
 
-  override def toString: String = "partnershipHasUtrYesNo"
+    beSettable[Boolean](CompanyWorksReferenceYesNoPage)
 
-  override def cleanup(value: Option[Boolean], userAnswers: UserAnswers): Try[UserAnswers] =
-    if value.contains(false) then {
-      userAnswers.remove(PartnershipUniqueTaxpayerReferencePage)
-    } else {
-      super.cleanup(value, userAnswers)
-    }
+    beRemovable[Boolean](CompanyWorksReferenceYesNoPage)
+  }
 }

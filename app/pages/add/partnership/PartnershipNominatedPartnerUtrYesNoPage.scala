@@ -28,11 +28,9 @@ case object PartnershipNominatedPartnerUtrYesNoPage extends QuestionPage[Boolean
 
   override def toString: String = "partnershipNominatedPartnerUtrYesNo"
 
-  // TODO replace with the correct page
   override def cleanup(value: Option[Boolean], userAnswers: UserAnswers): Try[UserAnswers] =
     if value.contains(false) then {
-      userAnswers
-        .remove(PartnershipWorksReferenceNumberPage)
+      userAnswers.remove(PartnershipNominatedPartnerUtrPage)
     } else {
       super.cleanup(value, userAnswers)
     }

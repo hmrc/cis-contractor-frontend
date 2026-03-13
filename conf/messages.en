@@ -75,7 +75,7 @@ typeOfSubcontractor.partnership = Partnership
 typeOfSubcontractor.trust = Trust
 typeOfSubcontractor.checkYourAnswersLabel = Type
 typeOfSubcontractor.error.required = Select how the subcontractor is operating
-typeOfSubcontractor.change.hidden = subcontractor type
+typeOfSubcontractor.change.hidden = type
 
 unauthorised.guidance.org.p1.prefix = If you are a contractor or subcontractor, you will need to register with
 unauthorised.guidance.org.p1.link = Construction Industry Scheme
@@ -253,9 +253,9 @@ subcontractorsUniqueTaxpayerReference.change.hidden = Unique Taxpayer Reference
 partnershipWorksReferenceNumberYesNo.title = Does this partnership have a works reference number?
 partnershipWorksReferenceNumberYesNo.heading = Does {0} have a works reference number?
 partnershipWorksReferenceNumberYesNo.hint = This is the reference number used to identify your subcontractor’s work or project. It can contain letters and numbers
-partnershipWorksReferenceNumberYesNo.checkYourAnswersLabel = Partnership has a works reference number
+partnershipWorksReferenceNumberYesNo.checkYourAnswersLabel = Add works reference number?
 partnershipWorksReferenceNumberYesNo.error.required = Select one option
-partnershipWorksReferenceNumberYesNo.change.hidden = partnership has a works reference number
+partnershipWorksReferenceNumberYesNo.change.hidden = add works reference number?
 
 checkYourAnswers.heading.sub.h2 = Subcontractor details
 checkYourAnswers.heading.h2 = Now add the subcontractor
@@ -276,11 +276,11 @@ partnershipWorksReferenceNumber.title = What is the works reference number for t
 partnershipWorksReferenceNumber.title = What is the works reference number for this partnership?
 partnershipWorksReferenceNumber.heading = What is the works reference number for {0}?
 partnershipWorksReferenceNumber.hint = This is unique to the construction work or project. You may have received it from the contractor
-partnershipWorksReferenceNumber.checkYourAnswersLabel = Partnership works reference
+partnershipWorksReferenceNumber.checkYourAnswersLabel = Works reference number
 partnershipWorksReferenceNumber.error.required = Enter a works reference number
 partnershipWorksReferenceNumber.error.invalid = Enter a valid works reference number
 partnershipWorksReferenceNumber.error.length = Enter a works reference number less or equal to 20 characters
-partnershipWorksReferenceNumber.change.hidden = partnership works reference
+partnershipWorksReferenceNumber.change.hidden = works reference number
 
 partnershipUniqueTaxpayerReference.title = Partnership Unique Taxpayer Reference (UTR)
 partnershipUniqueTaxpayerReference.heading = Partnership Unique Taxpayer Reference (UTR)
@@ -292,20 +292,20 @@ partnershipUniqueTaxpayerReference.error.required = Enter a valid Unique Taxpaye
 partnershipUniqueTaxpayerReference.error.invalid = Enter a valid Unique Taxpayer Reference (UTR) using 10 numbers, like 1234567890
 partnershipUniqueTaxpayerReference.error.length = Enter a valid Unique Taxpayer Reference (UTR) using 10 numbers, like 1234567890
 partnershipUniqueTaxpayerReference.error.duplicate = You have already used this Unique Taxpayer Reference (UTR) for an existing subcontractor
-partnershipUniqueTaxpayerReference.checkYourAnswersLabel = Unique Taxpayer Reference
-partnershipUniqueTaxpayerReference.change.hidden = Unique Taxpayer Reference
+partnershipUniqueTaxpayerReference.checkYourAnswersLabel = Partnership UTR
+partnershipUniqueTaxpayerReference.change.hidden = partnership UTR
 
 partnershipHasUtrYesNo.title = Does this partnership have a Unique Taxpayer Reference (UTR)?
 partnershipHasUtrYesNo.heading = Does {0} have a Unique Taxpayer Reference (UTR)?
 partnershipHasUtrYesNo.hint = This is 10 numbers, like 1234567890. The UTR will be on tax returns and other letters about Self Assessment. It may also be called ‘tax reference’, or ‘UTR’
-partnershipHasUtrYesNo.checkYourAnswersLabel = Does {0} have a Unique Taxpayer Reference (UTR)?
+partnershipHasUtrYesNo.checkYourAnswersLabel = Add UTR?
 partnershipHasUtrYesNo.error.required = Select yes if the partnership has a Unique Taxpayer Reference (UTR)
-partnershipHasUtrYesNo.change.hidden = Unique Taxpayer Reference (UTR)
+partnershipHasUtrYesNo.change.hidden = add UTR?
 
 partnershipAddress.title = What is the address for this partnership?
 partnershipAddress.heading = What is the address for {0}?
-partnershipAddress.checkYourAnswersLabel = Partnership address
-partnershipAddress.change.hidden = partnership address
+partnershipAddress.checkYourAnswersLabel = Address
+partnershipAddress.change.hidden = address
 
 partnershipAddress.addressLine1 = Address line 1
 partnershipAddress.error.addressLine1.required = Enter the first line of the address, typically the building and street
@@ -349,9 +349,9 @@ partnershipNominatedPartnerNino.change.hidden = national Insurance number for no
 partnershipAddressYesNo.title = Do you want to add an address for this partnership?
 partnershipAddressYesNo.heading = Do you want to add an address for {0}?
 partnershipAddressYesNo.hint = You can add this information later if you prefer
-partnershipAddressYesNo.checkYourAnswersLabel = what is the address for this partnership?
+partnershipAddressYesNo.checkYourAnswersLabel = Add partnership address?
 partnershipAddressYesNo.error.required = Select whether you want to add an address for this partnership
-partnershipAddressYesNo.change.hidden = what is the address for this partnership?
+partnershipAddressYesNo.change.hidden = add partnership address?
 
 partnershipChooseContactDetails.title = What are the contact details for this partnership?
 partnershipChooseContactDetails.heading = What are the contact details for {0}?
@@ -361,33 +361,26 @@ partnershipChooseContactDetails.phone = Phone number
 partnershipChooseContactDetails.mobile = Mobile number
 partnershipChooseContactDetails.noDetails = Do not add any contact details for this subcontractor
 partnershipChooseContactDetails.or = or
-partnershipChooseContactDetails.checkYourAnswersLabel = Contact details for partnership
+partnershipChooseContactDetails.checkYourAnswersLabel = Method of contact
 partnershipChooseContactDetails.error.required = Select which contact details you want to add for this partnership
-partnershipChooseContactDetails.change.hidden = contact details for this partnership
-
-partnershipContactDetailsYesNo.title = Do you want to add contact details for this partnership?
-partnershipContactDetailsYesNo.heading = Do you want to add contact details for {0}?
-partnershipContactDetailsYesNo.hint = You can add this information later if you prefer
-partnershipContactDetailsYesNo.checkYourAnswersLabel = Add partnership contact details
-partnershipContactDetailsYesNo.error.required = Select whether you want to add contact details for this partnership
-partnershipContactDetailsYesNo.change.hidden = Partnership Contact Details
+partnershipChooseContactDetails.change.hidden = method of contact
 
 partnershipNominatedPartnerNinoYesNo.title = Do you know the National Insurance number for this nominated partner?
 partnershipNominatedPartnerNinoYesNo.heading = Do you know the National Insurance number for {0}?
 partnershipNominatedPartnerNinoYesNo.hint = This information will be used to verify them as a subcontractor
-partnershipNominatedPartnerNinoYesNo.checkYourAnswersLabel = Partnership Nominated Partner
+partnershipNominatedPartnerNinoYesNo.checkYourAnswersLabel = Add National Insurance number for nominated partner?
 partnershipNominatedPartnerNinoYesNo.error.required = Select whether you know the National Insurance number for this nominated partner
-partnershipNominatedPartnerNinoYesNo.change.hidden = partnership Nominated Partner
+partnershipNominatedPartnerNinoYesNo.change.hidden = add National Insurance number for nominated partner?
 
 partnershipNominatedPartnerName.title = Who is the nominated partner for this partnership?
 partnershipNominatedPartnerName.heading = Who is the nominated partner for {0}?
 partnershipNominatedPartnerName.hint = The nominated partner is responsible for managing the partnership’s tax affairs
 partnershipNominatedPartnerName.label = Full name
-partnershipNominatedPartnerName.checkYourAnswersLabel = Name
+partnershipNominatedPartnerName.checkYourAnswersLabel = Nominated partner
 partnershipNominatedPartnerName.error.required = Enter a valid full name
 partnershipNominatedPartnerName.error.invalid = Enter a full name using letters a to z, numbers, apostrophes, ampersands, commas, hyphens, full stops, forward slashes and spaces
 partnershipNominatedPartnerName.error.length = Enter a full name up to 56 characters
-partnershipNominatedPartnerName.change.hidden = name
+partnershipNominatedPartnerName.change.hidden = nominated partner
 
 partnershipNominatedPartnerCrn.title = What is the company registration number for this nominated partner?
 partnershipNominatedPartnerCrn.heading = What is the company registration number for {0}?
@@ -398,19 +391,19 @@ partnershipNominatedPartnerCrn.error.invalidCharacters = Enter a valid company r
 partnershipNominatedPartnerCrn.checkYourAnswersLabel = Company registration number for nominated partner
 partnershipNominatedPartnerCrn.change.hidden = company registration number for nominated partner
 
-partnershipAddressYesNo.title = Do you want to add an address for this partnership?
-partnershipAddressYesNo.heading = Do you want to add an address for {0}?
-partnershipAddressYesNo.hint = You can add this information later if you prefer
-partnershipAddressYesNo.checkYourAnswersLabel = What is the address for this partnership?
-partnershipAddressYesNo.error.required = Select whether you want to add an address for this partnership
-partnershipAddressYesNo.change.hidden = what is the address for this partnership?
-
 partnershipNominatedPartnerCrnYesNo.title = Does this nominated partner have a company registration number?
 partnershipNominatedPartnerCrnYesNo.heading = Does {0} have a company registration number?
 partnershipNominatedPartnerCrnYesNo.hint = This only applies if they are a corporate partner or director of a company. This information will be used to verify them as a subcontractor.
-partnershipNominatedPartnerCrnYesNo.checkYourAnswersLabel = Nominated partner has a company registration number
+partnershipNominatedPartnerCrnYesNo.checkYourAnswersLabel = Add company registration number for nominated partner?
 partnershipNominatedPartnerCrnYesNo.error.required = Select whether this nominated partner has a company registration number
-partnershipNominatedPartnerCrnYesNo.change.hidden = nominated partner has a company registration number
+partnershipNominatedPartnerCrnYesNo.change.hidden = add company registration number for nominated partner?
+
+partnershipNominatedPartnerUtrYesNo.title = Do you know the Unique Taxpayer Reference for the nominated partner?
+partnershipNominatedPartnerUtrYesNo.heading = Do you know the Unique Taxpayer Reference for {0}?
+partnershipNominatedPartnerUtrYesNo.hint = This information will be used to verify them as a subcontractor
+partnershipNominatedPartnerUtrYesNo.checkYourAnswersLabel = Add UTR for nominated partner?
+partnershipNominatedPartnerUtrYesNo.error.required = Select whether you know the Unique Taxpayer Reference (UTR) for this nominated partner
+partnershipNominatedPartnerUtrYesNo.change.hidden = add UTR for nominated partner?
 
 partnershipNominatedPartnerUtr.title = Nominated partner Self Assessment Unique Taxpayer Reference (UTR)
 partnershipNominatedPartnerUtr.heading = Self Assessment Unique Taxpayer Reference (UTR)
@@ -418,27 +411,20 @@ partnershipNominatedPartnerUtr.paragraph = The UTR will be on tax returns and ot
 partnershipNominatedPartnerUtr.linkText = Get more help to find a UTR (opens in new tab)
 partnershipNominatedPartnerUtr.heading2 = What is the Self Assessment UTR for {0}?
 partnershipNominatedPartnerUtr.hint = A UTR is a 10 digit number
-partnershipNominatedPartnerUtr.checkYourAnswersLabel = Unique Taxpayer Reference
+partnershipNominatedPartnerUtr.checkYourAnswersLabel = UTR for nominated partner
 partnershipNominatedPartnerUtr.error.required = Enter a valid Unique Taxpayer Reference (UTR), like 1234567890
 partnershipNominatedPartnerUtr.error.length = Enter a valid Unique Taxpayer Reference (UTR) using 10 digits
 partnershipNominatedPartnerUtr.error.invalid = Enter a valid Unique Taxpayer Reference (UTR) using 10 digits
-partnershipNominatedPartnerUtr.change.hidden = nominated partner Unique Taxpayer Reference
+partnershipNominatedPartnerUtr.change.hidden = UTR for nominated partner
 
 partnershipEmailAddress.title = What is the email address for this partnership?
 partnershipEmailAddress.heading = What is the email address for {0}?
 partnershipEmailAddress.hint = HMRC will never use this email address to contact this subcontractor
-partnershipEmailAddress.checkYourAnswersLabel = Partnership Email Address
+partnershipEmailAddress.checkYourAnswersLabel = Email Address
 partnershipEmailAddress.error.required = Enter an email address in the correct format, like name@example.com
 partnershipEmailAddress.error.invalid = Enter a valid email address in the correct format, like name@example.com
 partnershipEmailAddress.error.length = Enter a valid email address in the correct format, like name@example.com, up to 254 characters
-partnershipEmailAddress.change.hidden = partnership email address
-
-partnershipNominatedPartnerUtrYesNo.title = Do you know the Unique Taxpayer Reference for the nominated partner?
-partnershipNominatedPartnerUtrYesNo.heading = Do you know the Unique Taxpayer Reference for {0}?
-partnershipNominatedPartnerUtrYesNo.hint = This information will be used to verify them as a subcontractor
-partnershipNominatedPartnerUtrYesNo.checkYourAnswersLabel = Nominated partner has a UTR
-partnershipNominatedPartnerUtrYesNo.error.required = Select whether you know the Unique Taxpayer Reference (UTR) for this nominated partner
-partnershipNominatedPartnerUtrYesNo.change.hidden = nominated partner has a UTR
+partnershipEmailAddress.change.hidden = email address
 
 partnershipPhoneNumber.title = What is the phone number for this partnership?
 partnershipPhoneNumber.heading = What is the phone number for {0}?
@@ -448,6 +434,13 @@ partnershipPhoneNumber.error.required = Enter a phone number
 partnershipPhoneNumber.error.length = Enter a valid phone number, like 01632 960 001. For international numbers include the country code.
 partnershipPhoneNumber.error.invalid = Enter a valid phone number, like 01632 960 001. For international numbers include the country code.
 partnershipPhoneNumber.change.hidden = phone number
+
+partnershipCheckYourAnswers.title = Check your answers before adding this partnership
+partnershipCheckYourAnswers.heading = Check your answers before adding this partnership
+partnershipCheckYourAnswers.subHeading = Subcontractor details
+partnershipCheckYourAnswers.trailHeading = Now add this subcontractor
+partnershipCheckYourAnswers.trailText = By adding this subcontractor you are confirming that, to the best of your knowledge, the details you are providing are correct.
+partnershipCheckYourAnswers.continue = Accept and submit
 
 subcontractorAdded.title = Partnership subcontractor added
 subcontractorAdded.heading = Subcontractor added
@@ -544,12 +537,14 @@ companyPhoneNumber.error.length = Enter a valid phone number, like 01632 960 001
 companyPhoneNumber.checkYourAnswersLabel = Phone number
 companyPhoneNumber.change.hidden = phone number
 
-companyMobileNumber.title = companyMobileNumber
-companyMobileNumber.heading = companyMobileNumber
-companyMobileNumber.checkYourAnswersLabel = companyMobileNumber
-companyMobileNumber.error.required = Enter companyMobileNumber
-companyMobileNumber.error.length = CompanyMobileNumber must be 100 characters or less
-companyMobileNumber.change.hidden = CompanyMobileNumber
+companyMobileNumber.title = What is the mobile number for this company?
+companyMobileNumber.heading = What is the mobile number for {0}?
+companyMobileNumber.hintText = HMRC will never use this mobile number to contact this subcontractor
+companyMobileNumber.checkYourAnswersLabel = Mobile Number
+companyMobileNumber.error.required = Enter a mobile number
+companyMobileNumber.error.invalid = Enter a valid mobile number, like 07700 900 982 or +44 7700 900 999
+companyMobileNumber.error.length = Enter a valid mobile number, like 07700 900 982 or +44 7700 900 999
+companyMobileNumber.change.hidden = mobile Number
 
 companyUtrYesNo.title = Do you know the Unique Taxpayer Reference for this company?
 companyUtrYesNo.heading = Do you know the Unique Taxpayer Reference for {0}?
@@ -570,11 +565,12 @@ companyUtr.error.duplicate = You have already used this Unique Taxpayer Referenc
 companyUtr.checkYourAnswersLabel = Corporation Tax UTR
 companyUtr.change.hidden = corporation Tax UTR
 
-companyCrnYesNo.title = companyCrnYesNo
-companyCrnYesNo.heading = companyCrnYesNo
-companyCrnYesNo.checkYourAnswersLabel = companyCrnYesNo
-companyCrnYesNo.error.required = Select yes if companyCrnYesNo
-companyCrnYesNo.change.hidden = CompanyCrnYesNo
+companyCrnYesNo.title = Does this company have a company registration number?
+companyCrnYesNo.heading = Does {0} have a company registration number?
+companyCrnYesNo.hint = This information will be used to verify the company as a subcontractor
+companyCrnYesNo.error.required = Select whether this company has a registration number
+companyCrnYesNo.checkYourAnswersLabel = Add company registration number?
+companyCrnYesNo.change.hidden = add company registration number
 
 companyCrn.title = What is the company registration number for this company?
 companyCrn.heading = What is the company registration number for {0}?
@@ -585,11 +581,12 @@ companyCrn.error.invalid = Enter a valid company registration number
 companyCrn.checkYourAnswersLabel = Company registration number
 companyCrn.change.hidden = company registration number
 
-companyWorksReferenceYesNo.title = companyWorksReferenceYesNo
-companyWorksReferenceYesNo.heading = companyWorksReferenceYesNo
-companyWorksReferenceYesNo.checkYourAnswersLabel = companyWorksReferenceYesNo
-companyWorksReferenceYesNo.error.required = Select yes if companyWorksReferenceYesNo
-companyWorksReferenceYesNo.change.hidden = CompanyWorksReferenceYesNo
+companyWorksReferenceYesNo.title = Is there a works reference number associated with this company?
+companyWorksReferenceYesNo.heading = Is there a works reference number associated with {0}?
+companyWorksReferenceYesNo.hint = This is the reference number used to identify a subcontractor’s work or project. It can contain letters and numbers.
+companyWorksReferenceYesNo.checkYourAnswersLabel = Works reference number
+companyWorksReferenceYesNo.error.required = Select whether there is a works reference number associated with this company
+companyWorksReferenceYesNo.change.hidden = works reference number
 
 companyWorksReference.title = What is the works reference number associated with this company?
 companyWorksReference.heading = What is the works reference number associated with {0}?
@@ -611,3 +608,17 @@ partnershipMobileNumber.error.length = Enter a valid mobile number, like 07700 9
 partnershipMobileNumber.error.invalid = Enter a valid mobile number, like 07700 900 982 or +44 7700 900 999
 partnershipMobileNumber.checkYourAnswersLabel = Mobile number
 partnershipMobileNumber.change.hidden = mobile number
+
+companyAdded.title = Company subcontractor added
+companyAdded.heading = Subcontractor added
+companyAdded.p1 = You can now find {0} on your list of subcontractors.
+companyAdded.nextSteps.h2 = Next steps
+companyAdded.nextSteps.p1 = Before you can make any payments to this subcontractor, you will need to verify them.
+companyAdded.nextSteps.p2 = Once they’re verified with HMRC, you will be able to:
+companyAdded.nextSteps.list.l1 = make CIS deductions at the correct rate
+companyAdded.nextSteps.list.l2 = include them on a monthly return
+companyAdded.nextSteps.list.l3 = provide them with payment and deduction statements
+companyAdded.nextSteps.link = Manage your subcontractors
+companyAdded.helpAndSupport.h2 = Help and support
+companyAdded.helpAndSupport.p1 = If you need help with the Construction Industry Scheme (CIS) and what it means for you,
+companyAdded.helpAndSupport.p1.link = guidance is available on GOV.UK

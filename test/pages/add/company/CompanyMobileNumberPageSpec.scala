@@ -14,18 +14,18 @@
  * limitations under the License.
  */
 
-package pages.add.partnership
+package pages.add.company
 
 import pages.behaviours.PageBehaviours
 
-class PartnershipContactDetailsYesNoPageSpec extends PageBehaviours {
+class CompanyMobileNumberPageSpec extends PageBehaviours {
 
-  "PartnershipContactDetailsYesNoPage" - {
+  "CompanyMobileNumberPage" - {
 
-    beRetrievable[Boolean](PartnershipContactDetailsYesNoPage)
+    beRetrievable[String](CompanyMobileNumberPage)
 
-    beSettable[Boolean](PartnershipContactDetailsYesNoPage)
+    beSettable[String](CompanyMobileNumberPage)
 
-    beRemovable[Boolean](PartnershipContactDetailsYesNoPage)
+    beRemovable[String](CompanyMobileNumberPage)
   }
 }
