@@ -15,6 +15,7 @@
  *@
 
 @import views.html.components._
+@import viewmodels.LegendSize.Large
 
 @this(
     layout: templates.Layout,
@@ -39,7 +40,7 @@
         @govukRadios(
             RadiosViewModel.yesNo(
                 field = form("value"),
-                legend = LegendViewModel(messages("worksReferenceNumberYesNo.heading", name)).asPageHeading().withCssClass("govuk-fieldset__legend--l")
+                legend = LegendViewModel(messages("worksReferenceNumberYesNo.heading", name)).asPageHeading(Large)
             ).withHint(HintViewModel(messages("worksReferenceNumberYesNo.hint")))
         )
 
