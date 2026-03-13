@@ -824,6 +824,14 @@ class NavigatorSpec extends SpecBase {
           UserAnswers("id")
         ) mustBe controllers.add.company.routes.CompanyCheckYourAnswersController.onPageLoad()
       }
+
+      "must go from a IndividualEmailAddressPage to IndividualEmailAddressPage" in {
+        navigator.nextPage(
+          IndividualEmailAddressPage,
+          NormalMode,
+          UserAnswers("id")
+        ) mustBe controllers.add.routes.UniqueTaxpayerReferenceYesNoController.onPageLoad(NormalMode)
+      }
     }
 
     "in Check mode" - {
@@ -1438,6 +1446,14 @@ class NavigatorSpec extends SpecBase {
           CheckMode,
           emptyUserAnswers
         ) mustBe controllers.add.company.routes.CompanyPhoneNumberController.onPageLoad(CheckMode)
+      }
+
+      "must go from a IndividualEmailAddressPage to IndividualEmailAddressPage" in {
+        navigator.nextPage(
+          IndividualEmailAddressPage,
+          CheckMode,
+          UserAnswers("id")
+        ) mustBe controllers.add.routes.CheckYourAnswersController.onPageLoad()
       }
 
       "must go from CompanyCrnYesNoPage" - {
