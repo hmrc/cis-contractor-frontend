@@ -267,6 +267,11 @@ POST       /add/change-mobile-number                   controllers.add.Individua
 
 GET        /add/company/subcontractor-added                     controllers.add.company.CompanyAddedController.onPageLoad()
 
+GET        /add/email-address                         controllers.add.IndividualEmailAddressController.onPageLoad(mode: Mode = NormalMode)
+POST       /add/email-address                         controllers.add.IndividualEmailAddressController.onSubmit(mode: Mode = NormalMode)
+GET        /add/change-email-address                  controllers.add.IndividualEmailAddressController.onPageLoad(mode: Mode = CheckMode)
+POST       /add/change-email-address                  controllers.add.IndividualEmailAddressController.onSubmit(mode: Mode = CheckMode)
+
 GET        /add/check-contact-details                           controllers.add.IndividualChooseContactDetailsController.onPageLoad(mode: Mode = NormalMode)
 POST       /add/check-contact-details                           controllers.add.IndividualChooseContactDetailsController.onSubmit(mode: Mode = NormalMode)
 GET        /add/change-check-contact-details                    controllers.add.IndividualChooseContactDetailsController.onPageLoad(mode: Mode = CheckMode)
