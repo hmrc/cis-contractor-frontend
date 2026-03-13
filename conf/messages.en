@@ -242,8 +242,8 @@ subContactDetails.email.change.hidden = email address
 subContactDetails.telephone.change.hidden = telephone number
 subContactDetails.change.hidden = contact details
 
-subcontractorsUniqueTaxpayerReference.title = Self Assessment Unique Taxpayer Reference (UTR)?
-subcontractorsUniqueTaxpayerReference.heading = Self Assessment Unique Taxpayer Reference (UTR)?
+subcontractorsUniqueTaxpayerReference.title = Self Assessment Unique Taxpayer Reference (UTR)
+subcontractorsUniqueTaxpayerReference.heading = Self Assessment Unique Taxpayer Reference (UTR)
 subcontractorsUniqueTaxpayerReference.p1 = The UTR will be on tax returns and other documents from HMRC. It might be called ‘reference’, ‘UTR’, or ‘official use’.
 subcontractorsUniqueTaxpayerReference.linkText = Get more help to find a UTR (opens in new tab)
 subcontractorsUniqueTaxpayerReference.label = What is the Self Assessment UTR for {0}?
