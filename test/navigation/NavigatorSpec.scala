@@ -797,7 +797,7 @@ class NavigatorSpec extends SpecBase {
           IndividualEmailAddressPage,
           NormalMode,
           UserAnswers("id")
-        ) mustBe controllers.add.routes.IndividualEmailAddressController.onPageLoad(NormalMode)
+        ) mustBe controllers.add.routes.UniqueTaxpayerReferenceYesNoController.onPageLoad(NormalMode)
       }
     }
 
@@ -1353,7 +1353,7 @@ class NavigatorSpec extends SpecBase {
           IndividualEmailAddressPage,
           CheckMode,
           UserAnswers("id")
-        ) mustBe controllers.add.routes.IndividualEmailAddressController.onPageLoad(CheckMode)
+        ) mustBe controllers.add.routes.CheckYourAnswersController.onPageLoad()
       }
 
       "must go from CompanyCrnYesNoPage" - {

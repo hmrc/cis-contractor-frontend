@@ -28,6 +28,10 @@ class IndividualEmailAddressFormProvider @Inject() extends Mappings {
   def apply(): Form[String] =
     Form(
       "value" -> text("individualEmailAddress.error.required")
+        .transform(
+          _.trim.toUpperCase.replaceAll("\\s+", " "),
+          identity
+        )
         .verifying(
           firstError(
             maxLength(MaxLength254, "individualEmailAddress.error.length"),
