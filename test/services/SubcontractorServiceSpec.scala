@@ -19,7 +19,7 @@ package services
 import base.SpecBase
 import connectors.ConstructionIndustrySchemeConnector
 import models.add.{InternationalAddress, SubContactDetails, SubcontractorName, TypeOfSubcontractor, UKAddress}
-import models.add.partnership.PartnershipChooseContactDetails
+import models.contact.ContactOptions
 import models.requests.CreateAndUpdateSubcontractorPayload
 import models.requests.CreateAndUpdateSubcontractorPayload.{IndividualOrSoleTraderPayload, PartnershipPayload}
 import models.subcontractor.GetSubcontractorUTRsResponse
@@ -213,7 +213,7 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
 
         val userAnswers =
           basePartnershipAnswers
-            .set(PartnershipChooseContactDetailsPage, PartnershipChooseContactDetails.Email)
+            .set(PartnershipChooseContactDetailsPage, ContactOptions.Email)
             .success
             .value
             .set(PartnershipEmailAddressPage, "p@example.com")
@@ -225,13 +225,11 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
             cisId = cisId,
             subcontractorType = TypeOfSubcontractor.Partnership,
             utr = Some("1234567890"),
-            firstName = None,
-            secondName = None,
-            surname = None,
+            partnerUtr = None,
+            partnershipTradingName = Some("Test Partnership"),
             tradingName = Some("Nominated Partner"),
             nino = Some("AA123456A"),
             crn = Some("AC012345"),
-            partnershipTradingName = Some("Test Partnership"),
             addressLine1 = Some("p1"),
             addressLine2 = Some("p2"),
             city = Some("London"),
@@ -259,7 +257,7 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
 
         val userAnswers =
           basePartnershipAnswers
-            .set(PartnershipChooseContactDetailsPage, PartnershipChooseContactDetails.Phone)
+            .set(PartnershipChooseContactDetailsPage, ContactOptions.Phone)
             .success
             .value
             .set(PartnershipPhoneNumberPage, "02071234567")
@@ -271,13 +269,11 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
             cisId = cisId,
             subcontractorType = TypeOfSubcontractor.Partnership,
             utr = Some("1234567890"),
-            firstName = None,
-            secondName = None,
-            surname = None,
+            partnerUtr = None,
+            partnershipTradingName = Some("Test Partnership"),
             tradingName = Some("Nominated Partner"),
             nino = Some("AA123456A"),
             crn = Some("AC012345"),
-            partnershipTradingName = Some("Test Partnership"),
             addressLine1 = Some("p1"),
             addressLine2 = Some("p2"),
             city = Some("London"),
@@ -305,7 +301,7 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
 
         val userAnswers =
           basePartnershipAnswers
-            .set(PartnershipChooseContactDetailsPage, PartnershipChooseContactDetails.Mobile)
+            .set(PartnershipChooseContactDetailsPage, ContactOptions.Mobile)
             .success
             .value
             .set(PartnershipMobileNumberPage, "07123456789")
@@ -317,13 +313,11 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
             cisId = cisId,
             subcontractorType = TypeOfSubcontractor.Partnership,
             utr = Some("1234567890"),
-            firstName = None,
-            secondName = None,
-            surname = None,
+            partnerUtr = None,
+            partnershipTradingName = Some("Test Partnership"),
             tradingName = Some("Nominated Partner"),
             nino = Some("AA123456A"),
             crn = Some("AC012345"),
-            partnershipTradingName = Some("Test Partnership"),
             addressLine1 = Some("p1"),
             addressLine2 = Some("p2"),
             city = Some("London"),
@@ -351,7 +345,7 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
 
         val userAnswers =
           basePartnershipAnswers
-            .set(PartnershipChooseContactDetailsPage, PartnershipChooseContactDetails.NoDetails)
+            .set(PartnershipChooseContactDetailsPage, ContactOptions.NoDetails)
             .success
             .value
 
@@ -360,13 +354,11 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
             cisId = cisId,
             subcontractorType = TypeOfSubcontractor.Partnership,
             utr = Some("1234567890"),
-            firstName = None,
-            secondName = None,
-            surname = None,
+            partnerUtr = None,
+            partnershipTradingName = Some("Test Partnership"),
             tradingName = Some("Nominated Partner"),
             nino = Some("AA123456A"),
             crn = Some("AC012345"),
-            partnershipTradingName = Some("Test Partnership"),
             addressLine1 = Some("p1"),
             addressLine2 = Some("p2"),
             city = Some("London"),

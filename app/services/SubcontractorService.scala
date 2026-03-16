@@ -19,7 +19,7 @@ package services
 import connectors.ConstructionIndustrySchemeConnector
 import models.UserAnswers
 import models.add.TypeOfSubcontractor.{Individualorsoletrader, Partnership}
-import models.add.partnership.PartnershipChooseContactDetails
+import models.contact.ContactOptions
 import models.add.{SubcontractorName, TypeOfSubcontractor}
 import models.requests.CreateAndUpdateSubcontractorPayload.{IndividualOrSoleTraderPayload, PartnershipPayload}
 import pages.add.*
@@ -87,16 +87,16 @@ class SubcontractorService @Inject() (
     userAnswers: UserAnswers
   ): ContactDetails =
     userAnswers.get(PartnershipChooseContactDetailsPage) match {
-      case Some(PartnershipChooseContactDetails.Email) =>
+      case Some(ContactOptions.Email) =>
         ContactDetails(userAnswers.get(PartnershipEmailAddressPage), None, None)
 
-      case Some(PartnershipChooseContactDetails.Phone) =>
+      case Some(ContactOptions.Phone) =>
         ContactDetails(None, userAnswers.get(PartnershipPhoneNumberPage), None)
 
-      case Some(PartnershipChooseContactDetails.Mobile) =>
+      case Some(ContactOptions.Mobile) =>
         ContactDetails(None, None, userAnswers.get(PartnershipMobileNumberPage))
 
-      case Some(PartnershipChooseContactDetails.NoDetails) =>
+      case Some(ContactOptions.NoDetails) =>
         ContactDetails(None, None, None)
 
       case _ => ContactDetails(None, None, None)
@@ -107,18 +107,18 @@ class SubcontractorService @Inject() (
     subcontractorType: TypeOfSubcontractor,
     userAnswers: UserAnswers
   ): PartnershipPayload = {
+
     val contactDetails = partnershipContactDetailsFromUserAnswers(userAnswers)
+
     PartnershipPayload(
       cisId = cisId,
       subcontractorType = subcontractorType,
       utr = userAnswers.get(PartnershipUniqueTaxpayerReferencePage),
-      firstName = None,
-      secondName = None,
-      surname = None,
+      partnerUtr = userAnswers.get(PartnershipNominatedPartnerUtrPage),
+      partnershipTradingName = userAnswers.get(PartnershipNamePage),
       tradingName = userAnswers.get(PartnershipNominatedPartnerNamePage),
       nino = userAnswers.get(PartnershipNominatedPartnerNinoPage),
       crn = userAnswers.get(PartnershipNominatedPartnerCrnPage),
-      partnershipTradingName = userAnswers.get(PartnershipNamePage),
       addressLine1 = userAnswers.get(PartnershipAddressPage).map(_.addressLine1),
       addressLine2 = userAnswers.get(PartnershipAddressPage).flatMap(_.addressLine2),
       city = userAnswers.get(PartnershipAddressPage).map(_.addressLine3),
