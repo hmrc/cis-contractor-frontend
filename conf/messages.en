@@ -636,3 +636,21 @@ companyAdded.nextSteps.link = Manage your subcontractors
 companyAdded.helpAndSupport.h2 = Help and support
 companyAdded.helpAndSupport.p1 = If you need help with the Construction Industry Scheme (CIS) and what it means for you,
 companyAdded.helpAndSupport.p1.link = guidance is available on GOV.UK
+
+individualPhoneNumber.title = What is the phone number for this subcontractor?
+individualPhoneNumber.heading = What is the phone number for {0}?
+individualPhoneNumber.hint = HMRC will never use this phone number to contact this subcontractor
+individualPhoneNumber.checkYourAnswersLabel = Phone number
+individualPhoneNumber.error.required = Enter a phone number
+individualPhoneNumber.error.length = Enter a valid phone number, like 01632 960 001. For international numbers include the country code.
+individualPhoneNumber.error.invalid = Enter a valid phone number, like 01632 960 001. For international numbers include the country code.
+individualPhoneNumber.change.hidden = phone number
+
+individualEmailAddress.title = What is the email address for this subcontractor?
+individualEmailAddress.heading = What is the email address for {0}?
+individualEmailAddress.hintText = HMRC will never use this email address to contact this subcontractor
+individualEmailAddress.checkYourAnswersLabel = Email Address
+individualEmailAddress.error.required = Enter an email address in the correct format, like name@example.com
+individualEmailAddress.error.length = Enter a valid email address in the correct format, like name@example.com, up to 254 characters
+individualEmailAddress.error.invalid = Enter a valid email address in the correct format, like name@example.com
+individualEmailAddress.change.hidden = email Address

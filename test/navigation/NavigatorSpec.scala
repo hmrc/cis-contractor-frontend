@@ -809,12 +809,28 @@ class NavigatorSpec extends SpecBase {
         ) mustBe controllers.add.company.routes.CompanyMobileNumberController.onPageLoad(NormalMode)
       }
 
+      "must go from IndividualPhoneNumberPage to UniqueTaxpayerReferenceYesNoPage in NormalMode" in {
+        navigator.nextPage(
+          IndividualPhoneNumberPage,
+          NormalMode,
+          UserAnswers("id")
+        ) mustBe controllers.add.routes.UniqueTaxpayerReferenceYesNoController.onPageLoad(NormalMode)
+      }
+
       "must go from a CompanyWorksReferencePage to CompanyCheckYourAnswerPage" in {
         navigator.nextPage(
           CompanyWorksReferencePage,
           NormalMode,
           UserAnswers("id")
         ) mustBe controllers.add.company.routes.CompanyCheckYourAnswersController.onPageLoad()
+      }
+
+      "must go from a IndividualEmailAddressPage to IndividualEmailAddressPage" in {
+        navigator.nextPage(
+          IndividualEmailAddressPage,
+          NormalMode,
+          UserAnswers("id")
+        ) mustBe controllers.add.routes.UniqueTaxpayerReferenceYesNoController.onPageLoad(NormalMode)
       }
     }
 
@@ -1432,6 +1448,14 @@ class NavigatorSpec extends SpecBase {
         ) mustBe controllers.add.company.routes.CompanyPhoneNumberController.onPageLoad(CheckMode)
       }
 
+      "must go from a IndividualEmailAddressPage to IndividualEmailAddressPage" in {
+        navigator.nextPage(
+          IndividualEmailAddressPage,
+          CheckMode,
+          UserAnswers("id")
+        ) mustBe controllers.add.routes.CheckYourAnswersController.onPageLoad()
+      }
+
       "must go from CompanyCrnYesNoPage" - {
         "to next page when answer is Yes" in {
           val answers = UserAnswers(userAnswersId).set(CompanyCrnYesNoPage, true).success.value
@@ -1562,6 +1586,14 @@ class NavigatorSpec extends SpecBase {
           CheckMode,
           emptyUserAnswers
         ) mustBe controllers.add.company.routes.CompanyMobileNumberController.onPageLoad(CheckMode)
+      }
+
+      "must go from IndividualPhoneNumberPage to CheckYourAnswersController in CheckMode" in {
+        navigator.nextPage(
+          IndividualPhoneNumberPage,
+          CheckMode,
+          UserAnswers("id")
+        ) mustBe controllers.add.routes.CheckYourAnswersController.onPageLoad()
       }
 
       "must go from CompanyWorksReferencePage to CompanyCheckYourAnswerPage in CheckMode" in {
