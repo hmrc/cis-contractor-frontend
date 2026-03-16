@@ -174,8 +174,8 @@ subNationalInsuranceNumber.heading = What is the National Insurance number for {
 subNationalInsuranceNumber.hint = National Insurance numbers can be found on payslips, P60s and other tax documents. For example, ‘QQ 12 34 56 C’
 subNationalInsuranceNumber.checkYourAnswersLabel = National Insurance number
 subNationalInsuranceNumber.error.required = Enter a National Insurance number
-subNationalInsuranceNumber.error.length = Enter a valid National Insurance Number like QQ 12 34 56 C
-subNationalInsuranceNumber.error.invalidCharacters = Enter a valid National Insurance Number like QQ 12 34 56 C
+subNationalInsuranceNumber.error.length = Enter a valid National Insurance Number
+subNationalInsuranceNumber.error.invalidCharacters = Enter a valid National Insurance Number
 subNationalInsuranceNumber.change.hidden = national Insurance number
 
 subcontractorContactDetailsYesNo.title = Do you want to add the subcontractor’s contact details?
