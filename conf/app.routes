@@ -94,11 +94,6 @@ POST       /add/check-contact-details                    controllers.add.Subcont
 GET        /add/change-check-contact-details             controllers.add.SubcontractorContactDetailsYesNoController.onPageLoad(mode: Mode = CheckMode)
 POST       /add/change-check-contact-details             controllers.add.SubcontractorContactDetailsYesNoController.onSubmit(mode: Mode = CheckMode)
 
-GET        /add/contact-details                          controllers.add.SubContactDetailsController.onPageLoad(mode: Mode = NormalMode)
-POST       /add/contact-details                          controllers.add.SubContactDetailsController.onSubmit(mode: Mode = NormalMode)
-GET        /add/change-contact-details                   controllers.add.SubContactDetailsController.onPageLoad(mode: Mode = CheckMode)
-POST       /add/change-contact-details                   controllers.add.SubContactDetailsController.onSubmit(mode: Mode = CheckMode)
-
 GET        /add/partnership/partnership-name             controllers.add.partnership.PartnershipNameController.onPageLoad(mode: Mode = NormalMode)
 POST       /add/partnership/partnership-name             controllers.add.partnership.PartnershipNameController.onSubmit(mode: Mode = NormalMode)
 GET        /add/partnership/change-partnership-name      controllers.add.partnership.PartnershipNameController.onPageLoad(mode: Mode = CheckMode)

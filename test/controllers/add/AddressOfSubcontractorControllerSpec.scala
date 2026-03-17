@@ -137,7 +137,7 @@ class AddressOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual
-          controllers.add.routes.NationalInsuranceNumberYesNoController.onPageLoad(NormalMode).url
+          controllers.add.routes.UniqueTaxpayerReferenceYesNoController.onPageLoad(NormalMode).url
 
         // Capture the UserAnswers passed to the repository
         val uaCaptor: ArgumentCaptor[UserAnswers] = ArgumentCaptor.forClass(classOf[UserAnswers])

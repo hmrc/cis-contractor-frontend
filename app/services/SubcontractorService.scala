@@ -55,9 +55,7 @@ class SubcontractorService @Inject() (
                   postcode = userAnswers.get(AddressOfSubcontractorPage).map(_.postCode),
                   nino = userAnswers.get(SubNationalInsuranceNumberPage),
                   utr = userAnswers.get(SubcontractorsUniqueTaxpayerReferencePage),
-                  worksReferenceNumber = userAnswers.get(WorksReferenceNumberPage),
-                  emailAddress = userAnswers.get(SubContactDetailsPage).map(_.email),
-                  phoneNumber = userAnswers.get(SubContactDetailsPage).map(_.telephone)
+                  worksReferenceNumber = userAnswers.get(WorksReferenceNumberPage)
                 )
       _      <- cisConnector.createAndUpdateSubcontractor(payload)
     } yield ()

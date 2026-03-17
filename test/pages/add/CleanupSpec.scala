@@ -63,11 +63,6 @@ class CleanupSpec extends PageBehaviours {
         postCode = "NX1 1AA"
       )
 
-      val contactDetails = SubContactDetails(
-        email = "value 1",
-        telephone = "value 2"
-      )
-
       val subcontractorName = SubcontractorName(
         firstName = "John",
         middleName = Some("Paul"),
@@ -85,12 +80,6 @@ class CleanupSpec extends PageBehaviours {
             .success
             .value
             .set(SubAddressYesNoPage, true)
-            .success
-            .value
-            .set(SubContactDetailsPage, contactDetails)
-            .success
-            .value
-            .set(SubcontractorContactDetailsYesNoPage, true)
             .success
             .value
             .set(SubcontractorNamePage, subcontractorName)
@@ -123,8 +112,6 @@ class CleanupSpec extends PageBehaviours {
         result.get(AddressOfSubcontractorPage) mustBe None
         result.get(NationalInsuranceNumberYesNoPage) mustBe None
         result.get(SubAddressYesNoPage) mustBe None
-        result.get(SubContactDetailsPage) mustBe None
-        result.get(SubcontractorContactDetailsYesNoPage) mustBe None
         result.get(SubcontractorNamePage) mustBe None
         result.get(SubcontractorsUniqueTaxpayerReferencePage) mustBe None
         result.get(SubNationalInsuranceNumberPage) mustBe None

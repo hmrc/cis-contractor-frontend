@@ -124,7 +124,7 @@ class UniqueTaxpayerReferenceYesNoControllerSpec extends SpecBase with MockitoSu
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.add.routes.WorksReferenceNumberYesNoController
+        redirectLocation(result).value mustEqual controllers.add.routes.NationalInsuranceNumberYesNoController
           .onPageLoad(NormalMode)
           .url
       }

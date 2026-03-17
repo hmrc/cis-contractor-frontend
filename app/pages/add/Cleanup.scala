@@ -29,7 +29,6 @@ trait Cleanup {
       .remove(AddressOfSubcontractorPage)
       .flatMap(_.remove(NationalInsuranceNumberYesNoPage))
       .flatMap(_.remove(SubAddressYesNoPage))
-      .flatMap(_.remove(SubContactDetailsPage))
       .flatMap(_.remove(SubcontractorContactDetailsYesNoPage))
       .flatMap(_.remove(SubcontractorNamePage))
       .flatMap(_.remove(SubcontractorsUniqueTaxpayerReferencePage))

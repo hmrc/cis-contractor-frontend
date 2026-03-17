@@ -37,24 +37,24 @@ class Navigator @Inject() () {
     case SubcontractorNamePage                     => _ => controllers.add.routes.SubAddressYesNoController.onPageLoad(NormalMode)
     case SubAddressYesNoPage                       => userAnswers => navigatorFromSubAddressYesNoPage(NormalMode)(userAnswers)
     case AddressOfSubcontractorPage                =>
-      _ => controllers.add.routes.NationalInsuranceNumberYesNoController.onPageLoad(NormalMode)
+      _ => controllers.add.routes.UniqueTaxpayerReferenceYesNoController.onPageLoad(NormalMode)
     case PartnershipAddressPage                    =>
       _ => controllers.add.partnership.routes.PartnershipAddressController.onPageLoad(NormalMode)
     case NationalInsuranceNumberYesNoPage          =>
       userAnswers => navigatorFromNationalInsuranceNumberYesNoPage(NormalMode)(userAnswers)
     case SubNationalInsuranceNumberPage            =>
-      _ => controllers.add.routes.UniqueTaxpayerReferenceYesNoController.onPageLoad(NormalMode)
+      _ => controllers.add.routes.WorksReferenceNumberYesNoController.onPageLoad(NormalMode)
     case UniqueTaxpayerReferenceYesNoPage          =>
       userAnswers => navigatorFromUniqueTaxpayerReferenceYesNoPage(NormalMode)(userAnswers)
     case SubcontractorsUniqueTaxpayerReferencePage =>
-      _ => controllers.add.routes.WorksReferenceNumberYesNoController.onPageLoad(NormalMode)
+      _ => controllers.add.routes.NationalInsuranceNumberYesNoController.onPageLoad(NormalMode)
     case WorksReferenceNumberYesNoPage             =>
       userAnswers => navigatorFromWorksReferenceNumberYesNoPage(NormalMode)(userAnswers)
     case WorksReferenceNumberPage                  =>
-      _ => controllers.add.routes.SubcontractorContactDetailsYesNoController.onPageLoad(NormalMode)
-    case SubcontractorContactDetailsYesNoPage      =>
-      userAnswers => navigatorFromSubcontractorContactDetailsYesNoPage(NormalMode)(userAnswers)
-    case SubContactDetailsPage                     => _ => controllers.add.routes.CheckYourAnswersController.onPageLoad()
+      _ => controllers.add.routes.CheckYourAnswersController.onPageLoad()
+//    case SubcontractorContactDetailsYesNoPage      =>
+//      userAnswers => navigatorFromSubcontractorContactDetailsYesNoPage(NormalMode)(userAnswers)
+//    case SubContactDetailsPage                     => _ => controllers.add.routes.CheckYourAnswersController.onPageLoad()
     case CompanyNamePage                           => _ => controllers.add.company.routes.CompanyNameController.onPageLoad(NormalMode)
     case CompanyAddressYesNoPage                   =>
       _ => controllers.add.company.routes.CompanyAddressYesNoController.onPageLoad(NormalMode)
@@ -123,7 +123,7 @@ class Navigator @Inject() () {
     case NationalInsuranceNumberYesNoPage         => navigatorFromNationalInsuranceNumberYesNoPage(CheckMode)(_)
     case UniqueTaxpayerReferenceYesNoPage         => navigatorFromUniqueTaxpayerReferenceYesNoPage(CheckMode)(_)
     case WorksReferenceNumberYesNoPage            => navigatorFromWorksReferenceNumberYesNoPage(CheckMode)(_)
-    case SubcontractorContactDetailsYesNoPage     => navigatorFromSubcontractorContactDetailsYesNoPage(CheckMode)(_)
+//    case SubcontractorContactDetailsYesNoPage     => navigatorFromSubcontractorContactDetailsYesNoPage(CheckMode)(_)
     case CompanyContactOptionsPage                => navigatorFromCompanyContactOptionsPage(CheckMode)(_)
     case PartnershipHasUtrYesNoPage               => navigatorFromPartnershipHasUtrYesNoPage(CheckMode)(_)
     case PartnershipWorksReferenceNumberYesNoPage => navigatorFromPartnershipWorksReferenceNumberYesNoPage(CheckMode)(_)
@@ -212,7 +212,7 @@ class Navigator @Inject() () {
       case (Some(true), NormalMode)  =>
         controllers.add.routes.AddressOfSubcontractorController.onPageLoad(NormalMode)
       case (Some(false), NormalMode) =>
-        controllers.add.routes.NationalInsuranceNumberYesNoController.onPageLoad(NormalMode)
+        controllers.add.routes.UniqueTaxpayerReferenceYesNoController.onPageLoad(NormalMode)
       case (Some(true), CheckMode)   =>
         ua.get(AddressOfSubcontractorPage)
           .fold(controllers.add.routes.AddressOfSubcontractorController.onPageLoad(CheckMode)) { _ =>
@@ -230,7 +230,7 @@ class Navigator @Inject() () {
       case (Some(true), NormalMode)  =>
         controllers.add.routes.SubNationalInsuranceNumberController.onPageLoad(NormalMode)
       case (Some(false), NormalMode) =>
-        controllers.add.routes.UniqueTaxpayerReferenceYesNoController.onPageLoad(NormalMode)
+        controllers.add.routes.WorksReferenceNumberYesNoController.onPageLoad(NormalMode)
       case (Some(true), CheckMode)   =>
         ua.get(SubNationalInsuranceNumberPage)
           .fold(controllers.add.routes.SubNationalInsuranceNumberController.onPageLoad(CheckMode)) { _ =>
@@ -248,7 +248,7 @@ class Navigator @Inject() () {
         controllers.add.routes.SubcontractorsUniqueTaxpayerReferenceController.onPageLoad(NormalMode)
 
       case (Some(false), NormalMode) =>
-        controllers.add.routes.WorksReferenceNumberYesNoController.onPageLoad(NormalMode)
+        controllers.add.routes.NationalInsuranceNumberYesNoController.onPageLoad(NormalMode)
 
       case (Some(true), CheckMode) =>
         ua.get(SubcontractorsUniqueTaxpayerReferencePage)
@@ -270,7 +270,7 @@ class Navigator @Inject() () {
         controllers.add.routes.WorksReferenceNumberController.onPageLoad(NormalMode)
 
       case (Some(false), NormalMode) =>
-        controllers.add.routes.SubcontractorContactDetailsYesNoController.onPageLoad(NormalMode)
+        controllers.add.routes.CheckYourAnswersController.onPageLoad()
       case (Some(true), CheckMode)   =>
         ua.get(WorksReferenceNumberPage)
           .fold(controllers.add.routes.WorksReferenceNumberController.onPageLoad(CheckMode)) { _ =>
@@ -284,27 +284,27 @@ class Navigator @Inject() () {
         routes.JourneyRecoveryController.onPageLoad()
     }
 
-  private def navigatorFromSubcontractorContactDetailsYesNoPage(mode: Mode)(ua: UserAnswers): Call =
-    (ua.get(SubcontractorContactDetailsYesNoPage), mode) match {
-
-      case (Some(true), NormalMode) =>
-        controllers.add.routes.SubContactDetailsController.onPageLoad(NormalMode)
-
-      case (Some(false), NormalMode) =>
-        controllers.add.routes.CheckYourAnswersController.onPageLoad()
-
-      case (Some(true), CheckMode) =>
-        ua.get(SubContactDetailsPage)
-          .fold(controllers.add.routes.SubContactDetailsController.onPageLoad(CheckMode)) { _ =>
-            controllers.add.routes.CheckYourAnswersController.onPageLoad()
-          }
-
-      case (Some(false), CheckMode) =>
-        controllers.add.routes.CheckYourAnswersController.onPageLoad()
-
-      case _ =>
-        routes.JourneyRecoveryController.onPageLoad()
-    }
+//  private def navigatorFromSubcontractorContactDetailsYesNoPage(mode: Mode)(ua: UserAnswers): Call =
+//    (ua.get(SubcontractorContactDetailsYesNoPage), mode) match {
+//
+//      case (Some(true), NormalMode) =>
+//        controllers.add.routes.SubContactDetailsController.onPageLoad(NormalMode)
+//
+//      case (Some(false), NormalMode) =>
+//        controllers.add.routes.CheckYourAnswersController.onPageLoad()
+//
+//      case (Some(true), CheckMode) =>
+//        ua.get(SubContactDetailsPage)
+//          .fold(controllers.add.routes.SubContactDetailsController.onPageLoad(CheckMode)) { _ =>
+//            controllers.add.routes.CheckYourAnswersController.onPageLoad()
+//          }
+//
+//      case (Some(false), CheckMode) =>
+//        controllers.add.routes.CheckYourAnswersController.onPageLoad()
+//
+//      case _ =>
+//        routes.JourneyRecoveryController.onPageLoad()
+//    }
 
   private def navigatorFromPartnershipHasUtrYesNoPage(mode: Mode)(ua: UserAnswers): Call =
     (ua.get(PartnershipHasUtrYesNoPage), mode) match {

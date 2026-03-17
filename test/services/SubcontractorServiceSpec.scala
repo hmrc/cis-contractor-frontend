@@ -18,7 +18,7 @@ package services
 
 import base.SpecBase
 import connectors.ConstructionIndustrySchemeConnector
-import models.add.{SubContactDetails, SubcontractorName, TypeOfSubcontractor, UKAddress}
+import models.add.{SubcontractorName, TypeOfSubcontractor, UKAddress}
 import models.subcontractor.GetSubcontractorUTRsResponse
 import models.subcontractor.CreateAndUpdateSubcontractorRequest
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
@@ -71,9 +71,6 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
           .set(WorksReferenceNumberPage, "workRef")
           .success
           .value
-          .set(SubContactDetailsPage, SubContactDetails("email", "phone"))
-          .success
-          .value
 
         val expectedUpdateRequest = CreateAndUpdateSubcontractorRequest(
           cisId = cisId,
@@ -86,9 +83,7 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
           postcode = Some("postCode"),
           nino = Some("nino"),
           utr = Some("utr"),
-          worksReferenceNumber = Some("workRef"),
-          emailAddress = Some("email"),
-          phoneNumber = Some("phone")
+          worksReferenceNumber = Some("workRef")
         )
 
         when(mockConnector.createAndUpdateSubcontractor(any[CreateAndUpdateSubcontractorRequest])(any[HeaderCarrier]))
@@ -131,9 +126,6 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
           .set(WorksReferenceNumberPage, "workRef")
           .success
           .value
-          .set(SubContactDetailsPage, SubContactDetails("email", "phone"))
-          .success
-          .value
 
         val expectedUpdateRequest = CreateAndUpdateSubcontractorRequest(
           cisId = cisId,
@@ -148,9 +140,7 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
           postcode = Some("postCode"),
           nino = Some("nino"),
           utr = Some("utr"),
-          worksReferenceNumber = Some("workRef"),
-          emailAddress = Some("email"),
-          phoneNumber = Some("phone")
+          worksReferenceNumber = Some("workRef")
         )
 
         when(mockConnector.createAndUpdateSubcontractor(any[CreateAndUpdateSubcontractorRequest])(any[HeaderCarrier]))

@@ -224,22 +224,6 @@ addressOfSubcontractor.error.addressLine4.length = Enter a county using 35 chara
 addressOfSubcontractor.error.addressLine2.firstCharMustBeLetter = Enter an address. The first character must be a letter or a number
 addressOfSubcontractor.error.addressLine3.firstCharMustBeLetter = Enter a town or city. The first character must be a letter
 
-subContactDetails.title = Subcontractor’s contact details
-subContactDetails.heading = Subcontractor’s contact details
-subContactDetails.email = Email address
-subContactDetails.telephone = Telephone number
-subContactDetails.telephone.hint = For international numbers, include the country code, like +33 for a French number
-subContactDetails.checkYourAnswersLabel = Contact details
-subContactDetails.error.email.required = Enter an email address in the correct format, like name@example.com
-subContactDetails.error.telephone.required = Enter a telephone number
-subContactDetails.error.email.length = Enter a valid email address in the correct format, like name@example.com, up to 254 characters
-subContactDetails.error.telephone.length = Enter a phone number up to 35 characters, using numbers
-subContactDetails.error.email.invalid = Enter a valid email address in the correct format, like name@example.com
-subContactDetails.error.telephone.invalid = Enter a valid phone number
-subContactDetails.email.change.hidden = email address
-subContactDetails.telephone.change.hidden = telephone number
-subContactDetails.change.hidden = contact details
-
 subcontractorsUniqueTaxpayerReference.title = What is the subcontractor’s Unique Taxpayer Reference (UTR)?
 subcontractorsUniqueTaxpayerReference.heading = What is the subcontractor’s Unique Taxpayer Reference (UTR)?
 subcontractorsUniqueTaxpayerReference.hint = This is 10 numbers, like 1234567890. The UTR will be on tax returns and other letters about Self Assessment. It may also be called ‘tax reference’

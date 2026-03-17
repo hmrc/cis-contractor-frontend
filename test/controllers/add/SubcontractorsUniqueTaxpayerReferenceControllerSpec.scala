@@ -78,7 +78,7 @@ class SubcontractorsUniqueTaxpayerReferenceControllerSpec extends SpecBase with 
       }
     }
 
-    "must bind the form and redirect to WorksReferenceNumberYesNo Page on POST when valid UTR is submitted" in {
+    "must bind the form and redirect to NationalInsuranceNumberYesNo Page on POST when valid UTR is submitted" in {
 
       val validValue = "5860920998"
 
@@ -103,7 +103,7 @@ class SubcontractorsUniqueTaxpayerReferenceControllerSpec extends SpecBase with 
 
         status(result) mustEqual SEE_OTHER
 
-        redirectLocation(result).value mustEqual controllers.add.routes.WorksReferenceNumberYesNoController
+        redirectLocation(result).value mustEqual controllers.add.routes.NationalInsuranceNumberYesNoController
           .onPageLoad(NormalMode)
           .url
       }

@@ -29,22 +29,21 @@ import play.api.test.FakeRequest
 import play.twirl.api.HtmlFormat
 import views.html.add.company.CompanyMobileNumberView
 
-class CompanyMobileNumberViewSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite{
+class CompanyMobileNumberViewSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite {
 
   "CompanyMobileNumberView" should {
 
-
     "render the page with title, heading, input and submit button" in new Setup {
-      val companyName = "Test Company"
+      val companyName                 = "Test Company"
       val html: HtmlFormat.Appendable = view(form, NormalMode, companyName)
       val doc                         = org.jsoup.Jsoup.parse(html.toString())
 
       doc.select("title").text() must include(messages("companyMobileNumber.title"))
 
       val heading = doc.select("label.govuk-label")
-      heading.text() mustBe messages("companyMobileNumber.heading",companyName)
+      heading.text() mustBe messages("companyMobileNumber.heading", companyName)
 
-      doc.select("form").attr("action") mustBe  controllers.add.company.routes.CompanyMobileNumberController
+      doc.select("form").attr("action") mustBe controllers.add.company.routes.CompanyMobileNumberController
         .onSubmit(NormalMode)
         .url
 
@@ -58,8 +57,8 @@ class CompanyMobileNumberViewSpec extends AnyWordSpec with Matchers with GuiceOn
         form.withError("value", "companyMobileNumber.error.required")
 
       val companyName = "Test Company"
-      val html = view(errorForm, NormalMode, companyName)
-      val doc  = org.jsoup.Jsoup.parse(html.toString())
+      val html        = view(errorForm, NormalMode, companyName)
+      val doc         = org.jsoup.Jsoup.parse(html.toString())
 
       val summary = doc.select(".govuk-error-summary")
       summary.text() must include(messages("companyMobileNumber.error.required"))
