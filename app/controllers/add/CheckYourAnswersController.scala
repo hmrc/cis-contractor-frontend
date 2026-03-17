@@ -81,7 +81,6 @@ class CheckYourAnswersController @Inject() (
             SubcontractorsUniqueTaxpayerReferenceSummary.row(ua),
             WorksReferenceNumberYesNoSummary.row(ua),
             WorksReferenceNumberSummary.row(ua),
-            SubcontractorContactDetailsYesNoSummary.row(ua),
             SubContactDetailsSummary.row(ua)
           ).flatten
         )

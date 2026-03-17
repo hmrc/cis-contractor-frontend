@@ -90,9 +90,6 @@ class CleanupSpec extends PageBehaviours {
             .set(SubContactDetailsPage, contactDetails)
             .success
             .value
-            .set(SubcontractorContactDetailsYesNoPage, true)
-            .success
-            .value
             .set(SubcontractorNamePage, subcontractorName)
             .success
             .value
@@ -127,7 +124,6 @@ class CleanupSpec extends PageBehaviours {
         result.get(NationalInsuranceNumberYesNoPage) mustBe None
         result.get(SubAddressYesNoPage) mustBe None
         result.get(SubContactDetailsPage) mustBe None
-        result.get(SubcontractorContactDetailsYesNoPage) mustBe None
         result.get(SubcontractorNamePage) mustBe None
         result.get(SubcontractorsUniqueTaxpayerReferencePage) mustBe None
         result.get(SubNationalInsuranceNumberPage) mustBe None

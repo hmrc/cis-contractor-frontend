@@ -178,13 +178,6 @@ subNationalInsuranceNumber.error.length = Enter a National Insurance Number up t
 subNationalInsuranceNumber.error.invalidCharacters = Enter a National Insurance Number like QQ 12 34 56 C
 subNationalInsuranceNumber.change.hidden = national Insurance number
 
-subcontractorContactDetailsYesNo.title = Do you want to add the subcontractor’s contact details?
-subcontractorContactDetailsYesNo.heading = Do you want to add the subcontractor’s contact details?
-subcontractorContactDetailsYesNo.hint = You can add the subcontractor’s email address and telephone number now or add them later
-subcontractorContactDetailsYesNo.checkYourAnswersLabel = Do you want to add the subcontractor’s contact details?
-subcontractorContactDetailsYesNo.error.required = Select whether you have the subcontractor’s contact details
-subcontractorContactDetailsYesNo.change.hidden = do you want to add the subcontractor’s contact details?
-
 worksReferenceNumber.title = What is the works reference number?
 worksReferenceNumber.heading = What is the works reference number?
 worksReferenceNumber.hint = This is a unique reference for the construction work or project. You may have received this from the contractor
@@ -649,3 +642,15 @@ individualEmailAddress.error.required = Enter an email address in the correct fo
 individualEmailAddress.error.length = Enter a valid email address in the correct format, like name@example.com, up to 254 characters
 individualEmailAddress.error.invalid = Enter a valid email address in the correct format, like name@example.com
 individualEmailAddress.change.hidden = email Address
+
+individualChooseContactDetails.title = Do you want to add contact details?
+individualChooseContactDetails.heading = What are the contact details for {0}?
+individualChooseContactDetails.hint = Choose which method of contact you would like to add for this subcontractor. Contact details are only for your own records.
+individualChooseContactDetails.email = Email address
+individualChooseContactDetails.phone = Phone number
+individualChooseContactDetails.mobile = Mobile number
+individualChooseContactDetails.or = or
+individualChooseContactDetails.noDetails = Do not add any contact details for this subcontractor
+individualChooseContactDetails.error.required = Select whether you want to add contact details for this subcontractor
+individualChooseContactDetails.checkYourAnswersLabel = Method of contact
+individualChooseContactDetails.change.hidden = method of contact

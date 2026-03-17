@@ -305,12 +305,17 @@ class NavigatorSpec extends SpecBase {
         ) mustBe controllers.add.routes.WorksReferenceNumberController.onPageLoad(NormalMode)
       }
 
-      "must go from a WorksReferenceNumberYesNoPage to SubcontractorContactDetailsYesNoPage when false" in {
+      "must go from a WorksReferenceNumberYesNoPage to CYA when false" in {
+        val ua =
+          emptyUserAnswers
+            .setOrException(WorksReferenceNumberYesNoPage, false)
+
+        val navigator = new Navigator
         navigator.nextPage(
           WorksReferenceNumberYesNoPage,
           NormalMode,
-          emptyUserAnswers.setOrException(WorksReferenceNumberYesNoPage, false)
-        ) mustBe controllers.add.routes.SubcontractorContactDetailsYesNoController.onPageLoad(NormalMode)
+          ua
+        ) mustBe controllers.add.routes.CheckYourAnswersController.onPageLoad()
       }
 
       "must go from a WorksReferenceNumberYesNoPage to journey recovery when incomplete info provided" in {
@@ -321,41 +326,12 @@ class NavigatorSpec extends SpecBase {
         ) mustBe journeyRecovery
       }
 
-      "must go from a WorksReferenceNumberPage to SubcontractorContactDetailsYesNoPage" in {
+      "must go from a WorksReferenceNumberPage to CYA" in {
         navigator.nextPage(
           WorksReferenceNumberPage,
           NormalMode,
           UserAnswers("id")
-        ) mustBe controllers.add.routes.SubcontractorContactDetailsYesNoController.onPageLoad(NormalMode)
-      }
-
-      "must go from a SubcontractorContactDetailsYesNoPage to SubContactDetailsPage when true" in {
-        navigator.nextPage(
-          SubcontractorContactDetailsYesNoPage,
-          NormalMode,
-          emptyUserAnswers.setOrException(SubcontractorContactDetailsYesNoPage, true)
-        ) mustBe controllers.add.routes.SubContactDetailsController.onPageLoad(NormalMode)
-      }
-
-      "must go from SubcontractorContactDetailsYesNoPage to CYA when false" in {
-        val ua =
-          emptyUserAnswers
-            .setOrException(SubcontractorContactDetailsYesNoPage, false)
-
-        val navigator = new Navigator
-        navigator.nextPage(
-          SubcontractorContactDetailsYesNoPage,
-          NormalMode,
-          ua
         ) mustBe controllers.add.routes.CheckYourAnswersController.onPageLoad()
-      }
-
-      "must go from a SubcontractorContactDetailsYesNoPage to journey recovery when incomplete info provided" in {
-        navigator.nextPage(
-          SubcontractorContactDetailsYesNoPage,
-          NormalMode,
-          emptyUserAnswers
-        ) mustBe journeyRecovery
       }
 
       "must go from a SubContactDetailsPage to CYA" in {
@@ -832,6 +808,61 @@ class NavigatorSpec extends SpecBase {
           UserAnswers("id")
         ) mustBe controllers.add.routes.UniqueTaxpayerReferenceYesNoController.onPageLoad(NormalMode)
       }
+
+      "must go from IndividualChooseContactDetailsPage" - {
+        "to itself when EmailAddress is selected" in {
+          navigator.nextPage(
+            IndividualChooseContactDetailsPage,
+            NormalMode,
+            emptyUserAnswers.setOrException(
+              IndividualChooseContactDetailsPage,
+              ContactOptions.Email
+            )
+          ) mustBe controllers.add.routes.IndividualChooseContactDetailsController.onPageLoad(NormalMode)
+        }
+
+        "to itself when PhoneNumber is selected" in {
+          navigator.nextPage(
+            IndividualChooseContactDetailsPage,
+            NormalMode,
+            emptyUserAnswers.setOrException(
+              IndividualChooseContactDetailsPage,
+              ContactOptions.Phone
+            )
+          ) mustBe controllers.add.routes.IndividualChooseContactDetailsController.onPageLoad(NormalMode)
+        }
+
+        "to itself when MobileNumber is selected" in {
+          navigator.nextPage(
+            IndividualChooseContactDetailsPage,
+            NormalMode,
+            emptyUserAnswers.setOrException(
+              IndividualChooseContactDetailsPage,
+              ContactOptions.Mobile
+            )
+          ) mustBe controllers.add.routes.IndividualChooseContactDetailsController.onPageLoad(NormalMode)
+        }
+
+        "to itself when NoDetails is selected" in {
+          navigator.nextPage(
+            IndividualChooseContactDetailsPage,
+            NormalMode,
+            emptyUserAnswers.setOrException(
+              IndividualChooseContactDetailsPage,
+              ContactOptions.NoDetails
+            )
+          ) mustBe controllers.add.routes.IndividualChooseContactDetailsController.onPageLoad(NormalMode)
+        }
+
+        "to JourneyRecoveryPage when answer is not present" in {
+          navigator.nextPage(
+            IndividualChooseContactDetailsPage,
+            NormalMode,
+            emptyUserAnswers
+          ) mustBe journeyRecovery
+        }
+      }
+
     }
 
     "in Check mode" - {
@@ -970,30 +1001,6 @@ class NavigatorSpec extends SpecBase {
       "must go from a UniqueTaxpayerReferenceYesNoPage to journey recovery when incomplete info provided" in {
         navigator.nextPage(
           UniqueTaxpayerReferenceYesNoPage,
-          CheckMode,
-          emptyUserAnswers
-        ) mustBe journeyRecovery
-      }
-
-      "must go from a SubcontractorContactDetailsYesNoPage to next page when true" in {
-        navigator.nextPage(
-          SubcontractorContactDetailsYesNoPage,
-          CheckMode,
-          emptyUserAnswers.setOrException(SubcontractorContactDetailsYesNoPage, true)
-        ) mustBe controllers.add.routes.SubContactDetailsController.onPageLoad(CheckMode)
-      }
-
-      "must go from a SubcontractorContactDetailsYesNoPage to CYA page when false" in {
-        navigator.nextPage(
-          SubcontractorContactDetailsYesNoPage,
-          CheckMode,
-          emptyUserAnswers.setOrException(SubcontractorContactDetailsYesNoPage, false)
-        ) mustBe CYA
-      }
-
-      "must go from a SubcontractorContactDetailsYesNoPage to journey recovery when incomplete info provided" in {
-        navigator.nextPage(
-          SubcontractorContactDetailsYesNoPage,
           CheckMode,
           emptyUserAnswers
         ) mustBe journeyRecovery
@@ -1564,6 +1571,60 @@ class NavigatorSpec extends SpecBase {
         ) mustBe CompanyCYA
       }
 
+      "must go from IndividualChooseContactDetailsPage" - {
+        "to itself when EmailAddress is selected" in {
+          navigator.nextPage(
+            IndividualChooseContactDetailsPage,
+            CheckMode,
+            emptyUserAnswers.setOrException(
+              IndividualChooseContactDetailsPage,
+              ContactOptions.Email
+            )
+          ) mustBe controllers.add.routes.IndividualChooseContactDetailsController.onPageLoad(CheckMode)
+        }
+
+        "to itself when PhoneNumber is selected" in {
+          navigator.nextPage(
+            IndividualChooseContactDetailsPage,
+            CheckMode,
+            emptyUserAnswers.setOrException(
+              IndividualChooseContactDetailsPage,
+              ContactOptions.Phone
+            )
+          ) mustBe controllers.add.routes.IndividualChooseContactDetailsController.onPageLoad(CheckMode)
+        }
+
+        "to itself when MobileNumber is selected" in {
+          navigator.nextPage(
+            IndividualChooseContactDetailsPage,
+            CheckMode,
+            emptyUserAnswers.setOrException(
+              IndividualChooseContactDetailsPage,
+              ContactOptions.Mobile
+            )
+          ) mustBe controllers.add.routes.IndividualChooseContactDetailsController.onPageLoad(CheckMode)
+        }
+
+        "to itself when NoDetails is selected" in {
+          navigator.nextPage(
+            IndividualChooseContactDetailsPage,
+            CheckMode,
+            emptyUserAnswers.setOrException(
+              IndividualChooseContactDetailsPage,
+              ContactOptions.NoDetails
+            )
+          ) mustBe controllers.add.routes.IndividualChooseContactDetailsController.onPageLoad(CheckMode)
+        }
+
+        "to CYA when answer is not present" in {
+          navigator.nextPage(
+            IndividualChooseContactDetailsPage,
+            CheckMode,
+            emptyUserAnswers
+          ) mustBe CYA
+        }
+      }
+
       "must go from CompanyUtrPage to CompanyCYA in CheckMode" in {
         navigator.nextPage(
           CompanyUtrPage,
@@ -1702,22 +1763,6 @@ class NavigatorSpec extends SpecBase {
             .value // sample WRN
 
         val result = navigator.nextPage(WorksReferenceNumberYesNoPage, CheckMode, ua)
-        result mustBe CYA
-      }
-
-      "must go from SubcontractorContactDetailsYesNoPage to CYA in CheckMode when true and SubContactDetailsPage is already answered" in {
-        val contactDetailsSample = models.add.SubContactDetails("test@test.com", "11222121221")
-
-        val ua =
-          emptyUserAnswers
-            .set(SubcontractorContactDetailsYesNoPage, true)
-            .success
-            .value
-            .set(SubContactDetailsPage, contactDetailsSample)
-            .success
-            .value
-
-        val result = navigator.nextPage(SubcontractorContactDetailsYesNoPage, CheckMode, ua)
         result mustBe CYA
       }
 
