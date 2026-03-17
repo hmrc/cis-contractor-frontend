@@ -18,14 +18,14 @@ package pages.add
 
 import pages.behaviours.PageBehaviours
 
-class IndividualEmailAddressPageSpec extends PageBehaviours {
+class IndividualPhoneNumberPageSpec extends PageBehaviours {
 
-  "IndividualEmailAddressPage" - {
+  "IndividualPhoneNumber" - {
 
-    beRetrievable[String](IndividualEmailAddressPage)
+    beRetrievable[String](IndividualPhoneNumberPage)
 
-    beSettable[String](IndividualEmailAddressPage)
+    beSettable[String](IndividualPhoneNumberPage)
 
-    beRemovable[String](IndividualEmailAddressPage)
+    beRemovable[String](IndividualPhoneNumberPage)
   }
 }

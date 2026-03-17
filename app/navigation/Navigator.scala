@@ -110,6 +110,8 @@ class Navigator @Inject() () {
       _ => controllers.add.routes.UniqueTaxpayerReferenceYesNoController.onPageLoad(NormalMode)
     case CompanyCrnYesNoPage                       =>
       userAnswers => navigatorFromCompanyCrnYesNoPage(NormalMode)(userAnswers)
+    case IndividualPhoneNumberPage                 =>
+      _ => controllers.add.routes.UniqueTaxpayerReferenceYesNoController.onPageLoad(NormalMode)
     case IndividualChooseContactDetailsPage        =>
       userAnswers => navigatorFromIndividualChooseContactDetailsPage(NormalMode)(userAnswers)
     case CompanyWorksReferencePage                 =>
@@ -182,6 +184,8 @@ class Navigator @Inject() () {
       _ => controllers.add.routes.CheckYourAnswersController.onPageLoad()
     case CompanyMobileNumberPage                  =>
       _ => controllers.add.company.routes.CompanyMobileNumberController.onPageLoad(CheckMode)
+    case IndividualPhoneNumberPage                =>
+      _ => controllers.add.routes.CheckYourAnswersController.onPageLoad()
     case IndividualEmailAddressPage               =>
       _ => controllers.add.routes.CheckYourAnswersController.onPageLoad()
     case _                                        => _ => controllers.add.routes.CheckYourAnswersController.onPageLoad()

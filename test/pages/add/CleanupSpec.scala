@@ -114,6 +114,9 @@ class CleanupSpec extends PageBehaviours {
             .set(WorksReferenceNumberYesNoPage, true)
             .success
             .value
+            .set(IndividualPhoneNumberPage, phoneNumber)
+            .success
+            .value
 
         val result = cleanup.removeIndividualSoleTraderSubcontractor(userAnswers).success.value
 
@@ -129,6 +132,7 @@ class CleanupSpec extends PageBehaviours {
         result.get(UniqueTaxpayerReferenceYesNoPage) mustBe None
         result.get(WorksReferenceNumberPage) mustBe None
         result.get(WorksReferenceNumberYesNoPage) mustBe None
+        result.get(IndividualPhoneNumberPage) mustBe None
       }
     }
 

@@ -14,74 +14,77 @@
  * limitations under the License.
  */
 
-package controllers.add.company
+package controllers.add
 
 import base.SpecBase
 import controllers.routes
-import forms.add.company.CompanyWorksReferenceFormProvider
+import forms.add.IndividualPhoneNumberFormProvider
 import models.{NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.add.company.{CompanyNamePage, CompanyWorksReferencePage}
+import pages.add.{IndividualPhoneNumberPage, SubcontractorNamePage}
+import models.add.SubcontractorName
 import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import repositories.SessionRepository
-import views.html.add.company.CompanyWorksReferenceView
+import views.html.add.IndividualPhoneNumberView
 
 import scala.concurrent.Future
 
-class CompanyWorksReferenceControllerSpec extends SpecBase with MockitoSugar {
+class IndividualPhoneNumberControllerSpec extends SpecBase with MockitoSugar {
 
   def onwardRoute = Call("GET", "/foo")
 
-  val formProvider = new CompanyWorksReferenceFormProvider()
+  val formProvider = new IndividualPhoneNumberFormProvider()
   val form         = formProvider()
 
-  private val companyName = "Test Company"
+  lazy val individualPhoneNumberRoute =
+    controllers.add.routes.IndividualPhoneNumberController.onPageLoad(NormalMode).url
 
-  lazy val companyWorksReferenceRoute =
-    controllers.add.company.routes.CompanyWorksReferenceController.onPageLoad(NormalMode).url
+  private val subcontractorName = SubcontractorName("John", Some("Paul"), "Smith")
+
+  private val name = "John Smith"
 
   private def uaWithName: UserAnswers =
-    emptyUserAnswers.set(CompanyNamePage, companyName).success.value
+    emptyUserAnswers.set(SubcontractorNamePage, subcontractorName).success.value
 
-  "CompanyWorksReference Controller" - {
+  "IndividualPhoneNumber Controller" - {
 
     "must return OK and the correct view for a GET" in {
 
       val application = applicationBuilder(userAnswers = Some(uaWithName)).build()
 
       running(application) {
-        val request = FakeRequest(GET, companyWorksReferenceRoute)
+        val request = FakeRequest(GET, individualPhoneNumberRoute)
 
         val result = route(application, request).value
 
-        val view = application.injector.instanceOf[CompanyWorksReferenceView]
+        val view = application.injector.instanceOf[IndividualPhoneNumberView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode, companyName)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode, name)(request, messages(application)).toString
       }
     }
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = uaWithName.set(CompanyWorksReferencePage, "WR-001").success.value
+      val userAnswers = uaWithName.set(IndividualPhoneNumberPage, "answer").success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
       running(application) {
-        val request = FakeRequest(GET, companyWorksReferenceRoute)
+        val request = FakeRequest(GET, individualPhoneNumberRoute)
 
-        val view = application.injector.instanceOf[CompanyWorksReferenceView]
+        val view = application.injector.instanceOf[IndividualPhoneNumberView]
 
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill("WR-001"), NormalMode, companyName)(
+        contentAsString(result) mustEqual view(form.fill("answer"), NormalMode, name)(
           request,
           messages(application)
         ).toString
@@ -104,8 +107,8 @@ class CompanyWorksReferenceControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, companyWorksReferenceRoute)
-            .withFormUrlEncodedBody(("value", "WR-001"))
+          FakeRequest(POST, individualPhoneNumberRoute)
+            .withFormUrlEncodedBody(("value", "0123456789"))
 
         val result = route(application, request).value
 
@@ -120,20 +123,17 @@ class CompanyWorksReferenceControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, companyWorksReferenceRoute)
+          FakeRequest(POST, individualPhoneNumberRoute)
             .withFormUrlEncodedBody(("value", ""))
 
         val boundForm = form.bind(Map("value" -> ""))
 
-        val view = application.injector.instanceOf[CompanyWorksReferenceView]
+        val view = application.injector.instanceOf[IndividualPhoneNumberView]
 
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode, companyName)(
-          request,
-          messages(application)
-        ).toString
+        contentAsString(result) mustEqual view(boundForm, NormalMode, name)(request, messages(application)).toString
       }
     }
 
@@ -142,7 +142,7 @@ class CompanyWorksReferenceControllerSpec extends SpecBase with MockitoSugar {
       val application = applicationBuilder(userAnswers = None).build()
 
       running(application) {
-        val request = FakeRequest(GET, companyWorksReferenceRoute)
+        val request = FakeRequest(GET, individualPhoneNumberRoute)
 
         val result = route(application, request).value
 
@@ -157,8 +157,8 @@ class CompanyWorksReferenceControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, companyWorksReferenceRoute)
-            .withFormUrlEncodedBody(("value", "WR-001"))
+          FakeRequest(POST, individualPhoneNumberRoute)
+            .withFormUrlEncodedBody(("value", "answer"))
 
         val result = route(application, request).value
 
@@ -167,34 +167,40 @@ class CompanyWorksReferenceControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must redirect to JourneyRecovery if CompanyName is missing for a GET" in {
+    "must redirect to Journey Recovery for a GET when subcontractor name is missing (userAnswers present)" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
-
-      running(application) {
-        val request = FakeRequest(GET, companyWorksReferenceRoute)
-        val result  = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual
-          controllers.routes.JourneyRecoveryController.onPageLoad().url
-      }
-    }
-
-    "must redirect to JourneyRecovery if CompanyName is missing for a POST" in {
-
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application =
+        applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
       running(application) {
-        val request =
-          FakeRequest(POST, companyWorksReferenceRoute)
-            .withFormUrlEncodedBody(("value", "WR-001"))
+        val request = FakeRequest(GET, individualPhoneNumberRoute)
 
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual
-          controllers.routes.JourneyRecoveryController.onPageLoad().url
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must redirect to Journey Recovery for a POST when subcontractor name is missing (userAnswers present)" in {
+
+      val mockSessionRepository = mock[SessionRepository]
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+      val application =
+        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, individualPhoneNumberRoute)
+            .withFormUrlEncodedBody("value" -> "true")
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
       }
     }
   }

@@ -39,6 +39,7 @@ trait Cleanup {
       .flatMap(_.remove(UniqueTaxpayerReferenceYesNoPage))
       .flatMap(_.remove(WorksReferenceNumberPage))
       .flatMap(_.remove(WorksReferenceNumberYesNoPage))
+      .flatMap(_.remove(IndividualPhoneNumberPage))
 
   // TODO Add unit test for removeLimitedCompanySubcontractor when company journey is done
   def removeLimitedCompanySubcontractor(userAnswers: UserAnswers): Try[UserAnswers] =
