@@ -29,7 +29,7 @@ class CompanyWorksReferenceFormProvider @Inject() extends Mappings {
     Form(
       "value" -> text("companyWorksReference.error.required")
         .transform(
-          _.trim.toUpperCase.replaceAll("\\s+", " "),
+          _.trim.replaceAll("\\s+", " "),
           identity
         )
         .verifying(
