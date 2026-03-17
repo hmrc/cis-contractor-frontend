@@ -14,23 +14,14 @@
  * limitations under the License.
  */
 
-package pages.add.partnership
+package pages.add
 
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 
-case object PartnershipContactDetailsYesNoPage extends QuestionPage[Boolean] {
+case object IndividualPhoneNumberPage extends QuestionPage[String] {
 
   override def path: JsPath = JsPath \ toString
 
-  override def toString: String = "partnershipContactDetailsYesNo"
-
-  // TODO: Clear PartnershipContactDetailsPage when user answers No (not yet implemented)
-  //  override def cleanup(value: Option[Boolean], userAnswers: UserAnswers): Try[UserAnswers] =
-  //    if value.contains(false) then {
-  //      userAnswers
-  //        .remove(PartnershipContactDetailsPage)
-  //    } else {
-  //      super.cleanup(value, userAnswers)
-  //    }
+  override def toString: String = "individualPhoneNumber"
 }

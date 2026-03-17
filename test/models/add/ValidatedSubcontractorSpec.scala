@@ -353,38 +353,6 @@ class ValidatedSubcontractorSpec extends SpecBase with Matchers {
         }
       }
 
-//      "when SubcontractorContactDetailsYesNoPage is missing" in {
-//        val answers =
-//          emptyUserAnswers
-//            .set(TypeOfSubcontractorPage, TypeOfSubcontractor.Individualorsoletrader)
-//            .success
-//            .value
-//            .set(SubTradingNameYesNoPage, true)
-//            .success
-//            .value
-//            .set(TradingNameOfSubcontractorPage, "ABC Ltd")
-//            .success
-//            .value
-//            .set(SubAddressYesNoPage, false)
-//            .success
-//            .value
-//            .set(NationalInsuranceNumberYesNoPage, false)
-//            .success
-//            .value
-//            .set(UniqueTaxpayerReferenceYesNoPage, false)
-//            .success
-//            .value
-//            .set(WorksReferenceNumberYesNoPage, false)
-//            .success
-//            .value
-//
-//        val result = ValidatedSubcontractor.build(answers)
-//
-//        inside(result) { case Left(error) =>
-//          error mustBe MissingAnswer(SubcontractorContactDetailsYesNoPage)
-//        }
-//      }
-
       "when user said yes to SubTradingNameYesNoPage but TradingNameOfSubcontractorPage is missing" in {
         val answers =
           emptyUserAnswers
@@ -570,41 +538,6 @@ class ValidatedSubcontractorSpec extends SpecBase with Matchers {
           error mustBe InvalidAnswer(WorksReferenceNumberPage)
         }
       }
-
-//      "when user said yes to SubcontractorContactDetailsYesNoPage but SubContactDetailsPage is missing" in {
-//        val answers =
-//          emptyUserAnswers
-//            .set(TypeOfSubcontractorPage, TypeOfSubcontractor.Individualorsoletrader)
-//            .success
-//            .value
-//            .set(SubTradingNameYesNoPage, true)
-//            .success
-//            .value
-//            .set(TradingNameOfSubcontractorPage, "ABC Ltd")
-//            .success
-//            .value
-//            .set(SubAddressYesNoPage, false)
-//            .success
-//            .value
-//            .set(NationalInsuranceNumberYesNoPage, false)
-//            .success
-//            .value
-//            .set(UniqueTaxpayerReferenceYesNoPage, false)
-//            .success
-//            .value
-//            .set(WorksReferenceNumberYesNoPage, false)
-//            .success
-//            .value
-//            .set(SubcontractorContactDetailsYesNoPage, true)
-//            .success
-//            .value
-//
-//        val result = ValidatedSubcontractor.build(answers)
-//
-//        inside(result) { case Left(error) =>
-//          error mustBe InvalidAnswer(SubContactDetailsPage)
-//        }
-//      }
 
       "when user skipped SubTradingNameYesNoPage but answered TradingNameOfSubcontractorPage" in {
         val answers =

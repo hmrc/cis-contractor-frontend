@@ -106,6 +106,9 @@ class CleanupSpec extends PageBehaviours {
             .set(WorksReferenceNumberYesNoPage, true)
             .success
             .value
+            .set(IndividualPhoneNumberPage, phoneNumber)
+            .success
+            .value
 
         val result = cleanup.removeIndividualSoleTraderSubcontractor(userAnswers).success.value
 
@@ -120,6 +123,7 @@ class CleanupSpec extends PageBehaviours {
         result.get(UniqueTaxpayerReferenceYesNoPage) mustBe None
         result.get(WorksReferenceNumberPage) mustBe None
         result.get(WorksReferenceNumberYesNoPage) mustBe None
+        result.get(IndividualPhoneNumberPage) mustBe None
       }
     }
 
@@ -136,9 +140,6 @@ class CleanupSpec extends PageBehaviours {
             .success
             .value
             .set(PartnershipChooseContactDetailsPage, ContactOptions.Email)
-            .success
-            .value
-            .set(PartnershipContactDetailsYesNoPage, true)
             .success
             .value
             .set(PartnershipEmailAddressPage, email)
@@ -192,7 +193,6 @@ class CleanupSpec extends PageBehaviours {
         result.get(PartnershipAddressPage) mustBe None
         result.get(PartnershipAddressYesNoPage) mustBe None
         result.get(PartnershipChooseContactDetailsPage) mustBe None
-        result.get(PartnershipContactDetailsYesNoPage) mustBe None
         result.get(PartnershipEmailAddressPage) mustBe None
         result.get(PartnershipHasUtrYesNoPage) mustBe None
         result.get(PartnershipMobileNumberPage) mustBe None

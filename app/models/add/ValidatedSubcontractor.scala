@@ -16,10 +16,9 @@
 
 package models.add
 
-import models.{InvalidAnswer, MissingAnswer, UserAnswers, ValidationError}
+import models.{InvalidAnswer, UserAnswers, Validation, ValidationError}
 import pages.add.*
-import pages.QuestionPage
-import play.api.libs.json._
+import play.api.libs.json.*
 
 final case class ValidatedSubcontractor(
   typeOfSubcontractor: TypeOfSubcontractor,
@@ -31,7 +30,7 @@ final case class ValidatedSubcontractor(
   workRefNumber: Option[String]
 )
 
-object ValidatedSubcontractor {
+object ValidatedSubcontractor extends Validation {
   def build(answers: UserAnswers): Either[ValidationError, ValidatedSubcontractor] =
     for {
       typeOfSubcontractor <- getType(answers)
@@ -51,23 +50,8 @@ object ValidatedSubcontractor {
       workReference
     )
 
-  private def getType(answers: UserAnswers): Either[ValidationError, TypeOfSubcontractor] =
-    answers.get(TypeOfSubcontractorPage) match {
-      case Some(value) => Right(value)
-      case _           => Left(MissingAnswer(TypeOfSubcontractorPage))
-    }
-
-  private def getOptionalPageValue[A](
-    answers: UserAnswers,
-    questionPage: QuestionPage[A],
-    yesNoPage: QuestionPage[Boolean]
-  )(implicit reads: Reads[A]): Either[ValidationError, Option[A]] =
-    (answers.get(questionPage), answers.get(yesNoPage)) match {
-      case (_, None)                 => Left(MissingAnswer(yesNoPage))
-      case (Some(value), Some(true)) => Right(Some(value))
-      case (None, Some(false))       => Right(None)
-      case _                         => Left(InvalidAnswer(questionPage))
-    }
+  def getType(answers: UserAnswers): Either[ValidationError, TypeOfSubcontractor] =
+    getPageValue(answers, TypeOfSubcontractorPage)
 
   // SubTradingNameYesNoPage is inverted for SubcontractorNamePage
   // Yes  -> SubcontractorNamePage not required

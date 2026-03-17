@@ -35,7 +35,7 @@ object PartnershipNominatedPartnerNinoSummary {
           ActionItemViewModel(
             content = "site.change",
             href = routes.PartnershipNominatedPartnerNinoController.onPageLoad(CheckMode).url
-          ).withVisuallyHiddenText("partnershipNominatedPartnerNino.change.hidden")
+          ).withVisuallyHiddenText(messages("partnershipNominatedPartnerNino.change.hidden"))
         )
       )
     }

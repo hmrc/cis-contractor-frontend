@@ -14,18 +14,26 @@
  * limitations under the License.
  */
 
-package pages.add.partnership
+package forms.add
 
-import pages.behaviours.PageBehaviours
+import forms.mappings.Mappings
+import play.api.data.Form
+import forms.Validation.phoneRegex
+import forms.mappings.Constants
 
-class PartnershipContactDetailsYesNoPageSpec extends PageBehaviours {
+import javax.inject.Inject
 
-  "PartnershipContactDetailsYesNoPage" - {
+class IndividualPhoneNumberFormProvider @Inject() extends Mappings {
 
-    beRetrievable[Boolean](PartnershipContactDetailsYesNoPage)
-
-    beSettable[Boolean](PartnershipContactDetailsYesNoPage)
-
-    beRemovable[Boolean](PartnershipContactDetailsYesNoPage)
-  }
+  def apply(): Form[String] =
+    Form(
+      "value" -> text("individualPhoneNumber.error.required")
+        .transform(_.trim, identity)
+        .verifying(
+          firstError(
+            regexp(phoneRegex, "individualPhoneNumber.error.invalid"),
+            maxLength(Constants.MaxLength35, "individualPhoneNumber.error.length")
+          )
+        )
+    )
 }

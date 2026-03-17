@@ -15,6 +15,7 @@
  *@
 
 @import models.add.company.CompanyContactOptions
+@import viewmodels.LegendSize.Large
 
 @this(
     layout: templates.Layout,
@@ -37,7 +38,7 @@
         @govukRadios(
             RadiosViewModel(
                 field  = form("value"),
-                legend = LegendViewModel(messages("companyContactOptions.heading", companyName)).asPageHeading().withCssClass("govuk-fieldset__legend--l"),
+                legend = LegendViewModel(messages("companyContactOptions.heading", companyName)).asPageHeading(Large),
                 items  = CompanyContactOptions.options
             ).withHint(HintViewModel(messages("companyContactOptions.hint")))
         )

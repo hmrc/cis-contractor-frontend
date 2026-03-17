@@ -14,29 +14,36 @@
  * limitations under the License.
  *@
 
+@import viewmodels.InputWidth._
+@import viewmodels.LabelSize.Large
+
 @this(
     layout: templates.Layout,
     formHelper: FormWithCSRF,
     govukErrorSummary: GovukErrorSummary,
-    govukRadios: GovukRadios,
+    govukInput: GovukInput,
     govukButton: GovukButton
 )
 
-@(form: Form[_], mode: Mode, partnershipName: String)(implicit request: Request[_], messages: Messages)
+@(form: Form[_], mode: Mode, subcontractorName: String)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = title(form, messages("partnershipContactDetailsYesNo.title"))) {
+@layout(pageTitle = title(form, messages("individualEmailAddress.title"))) {
 
-    @formHelper(action = controllers.add.partnership.routes.PartnershipContactDetailsYesNoController.onSubmit(mode), Symbol("autoComplete") -> "off") {
+    @formHelper(action = controllers.add.routes.IndividualEmailAddressController.onSubmit(mode)) {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form))
         }
 
-        @govukRadios(
-            RadiosViewModel.yesNo(
+        @govukInput(
+            InputViewModel(
                 field = form("value"),
-                legend = LegendViewModel(messages("partnershipContactDetailsYesNo.heading", partnershipName)).asPageHeading().withCssClass("govuk-fieldset__legend--l")
-            ).withHint(HintViewModel(messages("partnershipContactDetailsYesNo.hint")))
+                label = LabelViewModel(messages("individualEmailAddress.heading", subcontractorName)).asPageHeading(Large)
+                )
+                .withHint(HintViewModel(messages("individualEmailAddress.hintText")))
+                .withWidth(Full)
+                .withSpellcheck(false)
+                .asEmail()
         )
 
         @govukButton(

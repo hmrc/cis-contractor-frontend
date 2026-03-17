@@ -14,31 +14,37 @@
  * limitations under the License.
  */
 
-package viewmodels.checkAnswers.add.partnership
+package viewmodels.checkAnswers.add
 
 import models.{CheckMode, UserAnswers}
-import pages.add.partnership.PartnershipContactDetailsYesNoPage
+import pages.add.IndividualChooseContactDetailsPage
 import play.api.i18n.Messages
+import play.twirl.api.HtmlFormat
+import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
 
-object PartnershipContactDetailsYesNoSummary {
+object IndividualChooseContactDetailsSummary {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(PartnershipContactDetailsYesNoPage).map { answer =>
+    answers.get(IndividualChooseContactDetailsPage).map { answer =>
 
-      val value = if (answer) "site.yes" else "site.no"
+      val value = ValueViewModel(
+        HtmlContent(
+          HtmlFormat.escape(messages(s"individualChooseContactDetails.$answer"))
+        )
+      )
 
       SummaryListRowViewModel(
-        key = "partnershipContactDetailsYesNo.checkYourAnswersLabel",
-        value = ValueViewModel(value),
+        key = "individualChooseContactDetails.checkYourAnswersLabel",
+        value = value,
         actions = Seq(
           ActionItemViewModel(
             "site.change",
-            controllers.add.partnership.routes.PartnershipContactDetailsYesNoController.onPageLoad(CheckMode).url
+            controllers.add.routes.IndividualChooseContactDetailsController.onPageLoad(CheckMode).url
           )
-            .withVisuallyHiddenText(messages("partnershipContactDetailsYesNo.change.hidden"))
+            .withVisuallyHiddenText(messages("individualChooseContactDetails.change.hidden"))
         )
       )
     }

@@ -16,12 +16,22 @@
 
 package pages.add.partnership
 
+import models.UserAnswers
 import pages.QuestionPage
 import play.api.libs.json.JsPath
+
+import scala.util.Try
 
 case object PartnershipHasUtrYesNoPage extends QuestionPage[Boolean] {
 
   override def path: JsPath = JsPath \ toString
 
   override def toString: String = "partnershipHasUtrYesNo"
+
+  override def cleanup(value: Option[Boolean], userAnswers: UserAnswers): Try[UserAnswers] =
+    if value.contains(false) then {
+      userAnswers.remove(PartnershipUniqueTaxpayerReferencePage)
+    } else {
+      super.cleanup(value, userAnswers)
+    }
 }

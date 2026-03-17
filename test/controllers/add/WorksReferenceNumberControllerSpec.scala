@@ -71,7 +71,7 @@ class WorksReferenceNumberControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must bind the form and redirect to SubcontractorContactDetailsYesNo page on POST when valid data is submitted" in {
+    "must bind the form and redirect to CheckYourAnswersController page on POST when valid data is submitted" in {
 
       val validValue = "1234567-AB"
 

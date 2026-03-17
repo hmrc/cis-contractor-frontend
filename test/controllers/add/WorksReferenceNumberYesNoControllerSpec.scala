@@ -104,7 +104,7 @@ class WorksReferenceNumberYesNoControllerSpec extends SpecBase with MockitoSugar
       }
     }
 
-    "must redirect to the SubcontractorContactDetailsYesNo page when valid data with value No is submitted" in {
+    "must redirect to the CYA page when valid data with value No is submitted" in {
 
       val mockSessionRepository = mock[SessionRepository]
 
