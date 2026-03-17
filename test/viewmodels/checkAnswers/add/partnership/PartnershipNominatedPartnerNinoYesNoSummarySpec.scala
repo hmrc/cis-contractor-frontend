@@ -25,6 +25,7 @@ import pages.add.partnership.PartnershipNominatedPartnerNinoYesNoPage
 import play.api.i18n.Messages
 import play.api.test.Helpers.stubMessages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.*
+import org.scalatest.matchers.must.Matchers.must
 
 class PartnershipNominatedPartnerNinoYesNoSummarySpec extends AnyFreeSpec with Matchers {
 
@@ -69,6 +70,7 @@ class PartnershipNominatedPartnerNinoYesNoSummarySpec extends AnyFreeSpec with M
       changeAction.content.asHtml.toString    should include(expectedChangeText)
       changeAction.href                     shouldBe expectedHref
       changeAction.visuallyHiddenText.value shouldBe expectedHiddenText
+      changeAction.attributes                   must contain("id" -> "add-nominated-partner-nino")
     }
 
     "must return a SummaryListRow with 'No' when the answer is false" in {

@@ -39,6 +39,7 @@ object PartnershipWorksReferenceNumberYesNoSummary {
             controllers.add.partnership.routes.PartnershipWorksReferenceNumberYesNoController.onPageLoad(CheckMode).url
           )
             .withVisuallyHiddenText(messages("partnershipWorksReferenceNumberYesNo.change.hidden"))
+            .withAttribute("id" -> "add-partnership-works-reference-number")
         )
       )
     }
