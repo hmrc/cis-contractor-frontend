@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,29 +17,34 @@
 package viewmodels.checkAnswers.add
 
 import models.{CheckMode, UserAnswers}
-import pages.add.SubcontractorContactDetailsYesNoPage
+import pages.add.IndividualChooseContactDetailsPage
 import play.api.i18n.Messages
+import play.twirl.api.HtmlFormat
+import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
 
-object SubcontractorContactDetailsYesNoSummary {
+object IndividualChooseContactDetailsSummary {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(SubcontractorContactDetailsYesNoPage).map { answer =>
+    answers.get(IndividualChooseContactDetailsPage).map { answer =>
 
-      val value = if (answer) "site.yes" else "site.no"
+      val value = ValueViewModel(
+        HtmlContent(
+          HtmlFormat.escape(messages(s"individualChooseContactDetails.$answer"))
+        )
+      )
 
       SummaryListRowViewModel(
-        key = "subcontractorContactDetailsYesNo.checkYourAnswersLabel",
-        value = ValueViewModel(value),
+        key = "individualChooseContactDetails.checkYourAnswersLabel",
+        value = value,
         actions = Seq(
           ActionItemViewModel(
             "site.change",
-            controllers.add.routes.SubcontractorContactDetailsYesNoController.onPageLoad(CheckMode).url
+            controllers.add.routes.IndividualChooseContactDetailsController.onPageLoad(CheckMode).url
           )
-            .withVisuallyHiddenText(messages("subcontractorContactDetailsYesNo.change.hidden"))
-            .withAttribute("id" -> "subcontractor-contact-details-yes-no")
+            .withVisuallyHiddenText(messages("individualChooseContactDetails.change.hidden"))
         )
       )
     }

@@ -79,9 +79,6 @@ class ValidatedSubcontractorSpec extends SpecBase with Matchers {
             .set(WorksReferenceNumberPage, "WRN-001")
             .success
             .value
-            .set(SubcontractorContactDetailsYesNoPage, true)
-            .success
-            .value
             .set(SubContactDetailsPage, contactDetails)
             .success
             .value
@@ -96,8 +93,7 @@ class ValidatedSubcontractorSpec extends SpecBase with Matchers {
             address = Some(address),
             nino = Some("AB123456C"),
             utr = Some("1234567890"),
-            workRefNumber = Some("WRN-001"),
-            contactDetails = Some(contactDetails)
+            workRefNumber = Some("WRN-001")
           )
         )
       }
@@ -139,9 +135,6 @@ class ValidatedSubcontractorSpec extends SpecBase with Matchers {
             .set(WorksReferenceNumberPage, "WRN-001")
             .success
             .value
-            .set(SubcontractorContactDetailsYesNoPage, true)
-            .success
-            .value
             .set(SubContactDetailsPage, contactDetails)
             .success
             .value
@@ -156,8 +149,7 @@ class ValidatedSubcontractorSpec extends SpecBase with Matchers {
             address = Some(address),
             nino = Some("AB123456C"),
             utr = Some("1234567890"),
-            workRefNumber = Some("WRN-001"),
-            contactDetails = Some(contactDetails)
+            workRefNumber = Some("WRN-001")
           )
         )
       }
@@ -187,9 +179,6 @@ class ValidatedSubcontractorSpec extends SpecBase with Matchers {
             .set(WorksReferenceNumberYesNoPage, false)
             .success
             .value
-            .set(SubcontractorContactDetailsYesNoPage, false)
-            .success
-            .value
 
         val result = ValidatedSubcontractor.build(answers)
 
@@ -201,8 +190,7 @@ class ValidatedSubcontractorSpec extends SpecBase with Matchers {
             address = None,
             nino = None,
             utr = None,
-            workRefNumber = None,
-            contactDetails = None
+            workRefNumber = None
           )
         )
       }
@@ -232,9 +220,6 @@ class ValidatedSubcontractorSpec extends SpecBase with Matchers {
             .set(WorksReferenceNumberYesNoPage, false)
             .success
             .value
-            .set(SubcontractorContactDetailsYesNoPage, false)
-            .success
-            .value
 
         val result = ValidatedSubcontractor.build(answers)
 
@@ -246,8 +231,7 @@ class ValidatedSubcontractorSpec extends SpecBase with Matchers {
             address = None,
             nino = None,
             utr = None,
-            workRefNumber = None,
-            contactDetails = None
+            workRefNumber = None
           )
         )
       }
@@ -375,38 +359,6 @@ class ValidatedSubcontractorSpec extends SpecBase with Matchers {
         }
       }
 
-      "when SubcontractorContactDetailsYesNoPage is missing" in {
-        val answers =
-          emptyUserAnswers
-            .set(TypeOfSubcontractorPage, TypeOfSubcontractor.Individualorsoletrader)
-            .success
-            .value
-            .set(SubTradingNameYesNoPage, true)
-            .success
-            .value
-            .set(TradingNameOfSubcontractorPage, "ABC Ltd")
-            .success
-            .value
-            .set(SubAddressYesNoPage, false)
-            .success
-            .value
-            .set(NationalInsuranceNumberYesNoPage, false)
-            .success
-            .value
-            .set(UniqueTaxpayerReferenceYesNoPage, false)
-            .success
-            .value
-            .set(WorksReferenceNumberYesNoPage, false)
-            .success
-            .value
-
-        val result = ValidatedSubcontractor.build(answers)
-
-        inside(result) { case Left(error) =>
-          error mustBe MissingAnswer(SubcontractorContactDetailsYesNoPage)
-        }
-      }
-
       "when user said yes to SubTradingNameYesNoPage but TradingNameOfSubcontractorPage is missing" in {
         val answers =
           emptyUserAnswers
@@ -428,11 +380,7 @@ class ValidatedSubcontractorSpec extends SpecBase with Matchers {
             .set(WorksReferenceNumberYesNoPage, false)
             .success
             .value
-            .set(SubcontractorContactDetailsYesNoPage, false)
-            .success
-            .value
-
-        val result = ValidatedSubcontractor.build(answers)
+        val result  = ValidatedSubcontractor.build(answers)
 
         inside(result) { case Left(error) =>
           error mustBe InvalidAnswer(TradingNameOfSubcontractorPage)
@@ -458,9 +406,6 @@ class ValidatedSubcontractorSpec extends SpecBase with Matchers {
             .success
             .value
             .set(WorksReferenceNumberYesNoPage, false)
-            .success
-            .value
-            .set(SubcontractorContactDetailsYesNoPage, false)
             .success
             .value
 
@@ -495,9 +440,6 @@ class ValidatedSubcontractorSpec extends SpecBase with Matchers {
             .set(WorksReferenceNumberYesNoPage, false)
             .success
             .value
-            .set(SubcontractorContactDetailsYesNoPage, false)
-            .success
-            .value
 
         val result = ValidatedSubcontractor.build(answers)
 
@@ -528,9 +470,6 @@ class ValidatedSubcontractorSpec extends SpecBase with Matchers {
             .success
             .value
             .set(WorksReferenceNumberYesNoPage, false)
-            .success
-            .value
-            .set(SubcontractorContactDetailsYesNoPage, false)
             .success
             .value
 
@@ -565,9 +504,6 @@ class ValidatedSubcontractorSpec extends SpecBase with Matchers {
             .set(WorksReferenceNumberYesNoPage, false)
             .success
             .value
-            .set(SubcontractorContactDetailsYesNoPage, false)
-            .success
-            .value
 
         val result = ValidatedSubcontractor.build(answers)
 
@@ -600,49 +536,11 @@ class ValidatedSubcontractorSpec extends SpecBase with Matchers {
             .set(WorksReferenceNumberYesNoPage, true)
             .success
             .value
-            .set(SubcontractorContactDetailsYesNoPage, false)
-            .success
-            .value
 
         val result = ValidatedSubcontractor.build(answers)
 
         inside(result) { case Left(error) =>
           error mustBe InvalidAnswer(WorksReferenceNumberPage)
-        }
-      }
-
-      "when user said yes to SubcontractorContactDetailsYesNoPage but SubContactDetailsPage is missing" in {
-        val answers =
-          emptyUserAnswers
-            .set(TypeOfSubcontractorPage, TypeOfSubcontractor.Individualorsoletrader)
-            .success
-            .value
-            .set(SubTradingNameYesNoPage, true)
-            .success
-            .value
-            .set(TradingNameOfSubcontractorPage, "ABC Ltd")
-            .success
-            .value
-            .set(SubAddressYesNoPage, false)
-            .success
-            .value
-            .set(NationalInsuranceNumberYesNoPage, false)
-            .success
-            .value
-            .set(UniqueTaxpayerReferenceYesNoPage, false)
-            .success
-            .value
-            .set(WorksReferenceNumberYesNoPage, false)
-            .success
-            .value
-            .set(SubcontractorContactDetailsYesNoPage, true)
-            .success
-            .value
-
-        val result = ValidatedSubcontractor.build(answers)
-
-        inside(result) { case Left(error) =>
-          error mustBe InvalidAnswer(SubContactDetailsPage)
         }
       }
 
@@ -665,9 +563,6 @@ class ValidatedSubcontractorSpec extends SpecBase with Matchers {
             .success
             .value
             .set(WorksReferenceNumberYesNoPage, false)
-            .success
-            .value
-            .set(SubcontractorContactDetailsYesNoPage, false)
             .success
             .value
 
@@ -697,9 +592,6 @@ class ValidatedSubcontractorSpec extends SpecBase with Matchers {
             .success
             .value
             .set(WorksReferenceNumberYesNoPage, false)
-            .success
-            .value
-            .set(SubcontractorContactDetailsYesNoPage, false)
             .success
             .value
 
@@ -734,9 +626,6 @@ class ValidatedSubcontractorSpec extends SpecBase with Matchers {
             .set(WorksReferenceNumberYesNoPage, false)
             .success
             .value
-            .set(SubcontractorContactDetailsYesNoPage, false)
-            .success
-            .value
 
         val result = ValidatedSubcontractor.build(answers)
 
@@ -767,9 +656,6 @@ class ValidatedSubcontractorSpec extends SpecBase with Matchers {
             .success
             .value
             .set(WorksReferenceNumberYesNoPage, false)
-            .success
-            .value
-            .set(SubcontractorContactDetailsYesNoPage, false)
             .success
             .value
 
@@ -804,9 +690,6 @@ class ValidatedSubcontractorSpec extends SpecBase with Matchers {
             .set(WorksReferenceNumberYesNoPage, false)
             .success
             .value
-            .set(SubcontractorContactDetailsYesNoPage, false)
-            .success
-            .value
 
         val result = ValidatedSubcontractor.build(answers)
 
@@ -839,9 +722,6 @@ class ValidatedSubcontractorSpec extends SpecBase with Matchers {
             .set(WorksReferenceNumberPage, "WRN-001")
             .success
             .value
-            .set(SubcontractorContactDetailsYesNoPage, false)
-            .success
-            .value
 
         val result = ValidatedSubcontractor.build(answers)
 
@@ -850,40 +730,40 @@ class ValidatedSubcontractorSpec extends SpecBase with Matchers {
         }
       }
 
-      "when the user skipped SubcontractorContactDetailsYesNoPage but answered SubContactDetailsPage" in {
-        val answers =
-          emptyUserAnswers
-            .set(TypeOfSubcontractorPage, TypeOfSubcontractor.Individualorsoletrader)
-            .success
-            .value
-            .set(SubTradingNameYesNoPage, true)
-            .success
-            .value
-            .set(TradingNameOfSubcontractorPage, "ABC Ltd")
-            .success
-            .value
-            .set(SubAddressYesNoPage, false)
-            .success
-            .value
-            .set(NationalInsuranceNumberYesNoPage, false)
-            .success
-            .value
-            .set(UniqueTaxpayerReferenceYesNoPage, false)
-            .success
-            .value
-            .set(WorksReferenceNumberYesNoPage, false)
-            .success
-            .value
-            .set(SubContactDetailsPage, contactDetails)
-            .success
-            .value
-
-        val result = ValidatedSubcontractor.build(answers)
-
-        inside(result) { case Left(error) =>
-          error mustBe MissingAnswer(SubcontractorContactDetailsYesNoPage)
-        }
-      }
+//      "when the user skipped SubcontractorContactDetailsYesNoPage but answered SubContactDetailsPage" in {
+//        val answers =
+//          emptyUserAnswers
+//            .set(TypeOfSubcontractorPage, TypeOfSubcontractor.Individualorsoletrader)
+//            .success
+//            .value
+//            .set(SubTradingNameYesNoPage, true)
+//            .success
+//            .value
+//            .set(TradingNameOfSubcontractorPage, "ABC Ltd")
+//            .success
+//            .value
+//            .set(SubAddressYesNoPage, false)
+//            .success
+//            .value
+//            .set(NationalInsuranceNumberYesNoPage, false)
+//            .success
+//            .value
+//            .set(UniqueTaxpayerReferenceYesNoPage, false)
+//            .success
+//            .value
+//            .set(WorksReferenceNumberYesNoPage, false)
+//            .success
+//            .value
+//            .set(SubContactDetailsPage, contactDetails)
+//            .success
+//            .value
+//
+//        val result = ValidatedSubcontractor.build(answers)
+//
+//        inside(result) { case Left(error) =>
+//          error mustBe MissingAnswer(SubcontractorContactDetailsYesNoPage)
+//        }
+//      }
 
       "when user said yes to SubTradingNameYesNoPage and answered SubcontractorNamePage" in {
         val answers =
@@ -910,9 +790,6 @@ class ValidatedSubcontractorSpec extends SpecBase with Matchers {
             .success
             .value
             .set(WorksReferenceNumberYesNoPage, false)
-            .success
-            .value
-            .set(SubcontractorContactDetailsYesNoPage, false)
             .success
             .value
 
@@ -948,9 +825,6 @@ class ValidatedSubcontractorSpec extends SpecBase with Matchers {
             .success
             .value
             .set(WorksReferenceNumberYesNoPage, false)
-            .success
-            .value
-            .set(SubcontractorContactDetailsYesNoPage, false)
             .success
             .value
 
