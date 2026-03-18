@@ -46,7 +46,7 @@
 
 @layout(pageTitle = title(form, messages("addressOfSubcontractor.title"))) {
 
-    @formHelper(action = controllers.add.routes.AddressOfSubcontractorController.onSubmit(mode), Symbol("autoComplete") -> "off") {
+    @formHelper(action = controllers.add.routes.AddressOfSubcontractorController.onSubmit(mode)) {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form))
@@ -60,6 +60,7 @@
                 label = LabelViewModel(messages("addressOfSubcontractor.addressLine1"))
             )
             .withWidth(Full)
+            .withAutocomplete("address-line1")
         )
 
         @govukInput(
@@ -68,6 +69,7 @@
                 label = LabelViewModel(messages("addressOfSubcontractor.addressLine2"))
             )
             .withWidth(Full)
+            .withAutocomplete("address-line2")
         )
 
         @govukInput(
@@ -76,6 +78,7 @@
                 label = LabelViewModel(messages("addressOfSubcontractor.addressLine3"))
             )
             .withWidth(Full)
+            .withAutocomplete("address-level2")
         )
 
         @govukInput(
@@ -92,6 +95,7 @@
                 label = LabelViewModel(messages("addressOfSubcontractor.postalCode"))
             )
             .withWidth(Fixed10)
+            .withAutocomplete("postal-code")
         )
 
         @govukSelect(
