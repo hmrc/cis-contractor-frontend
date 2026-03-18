@@ -551,7 +551,6 @@ class PartnershipCheckYourAnswersControllerSpec extends SpecBase {
       page: pages.QuestionPage[A],
       value: A
     )(implicit w: Writes[A]): models.UserAnswers = {
-      val t   = page.path.json.prune
       val put = page.path.json.put(Json.toJson(value))
 
       ua.data.transform(put) match {
