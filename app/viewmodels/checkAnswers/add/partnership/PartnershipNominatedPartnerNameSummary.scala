@@ -37,6 +37,7 @@ object PartnershipNominatedPartnerNameSummary {
             controllers.add.partnership.routes.PartnershipNominatedPartnerNameController.onPageLoad(CheckMode).url
           )
             .withVisuallyHiddenText(messages("partnershipNominatedPartnerName.change.hidden"))
+            .withAttribute("id" -> "nominated-partner-name")
         )
       )
     }

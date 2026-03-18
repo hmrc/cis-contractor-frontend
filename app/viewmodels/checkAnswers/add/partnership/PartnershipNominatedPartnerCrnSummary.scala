@@ -37,6 +37,7 @@ object PartnershipNominatedPartnerCrnSummary {
             content = Text(messages("site.change")),
             href = routes.PartnershipNominatedPartnerCrnController.onPageLoad(CheckMode).url
           ).withVisuallyHiddenText(messages("partnershipNominatedPartnerCrn.change.hidden"))
+            .withAttribute("id" -> "nominated-partner-crn")
         )
       )
     }
