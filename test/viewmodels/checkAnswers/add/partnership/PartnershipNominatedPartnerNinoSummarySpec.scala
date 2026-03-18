@@ -27,6 +27,7 @@ import play.api.i18n.Messages
 import play.api.test.Helpers.stubMessages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.*
+import org.scalatest.matchers.must.Matchers.must
 
 class PartnershipNominatedPartnerNinoSummarySpec extends AnyFreeSpec with Matchers with OptionValues with TryValues {
 
@@ -52,6 +53,7 @@ class PartnershipNominatedPartnerNinoSummarySpec extends AnyFreeSpec with Matche
       action.href mustBe routes.PartnershipNominatedPartnerNinoController.onPageLoad(CheckMode).url
       action.content mustBe Text(messages("site.change"))
       action.visuallyHiddenText mustBe Some(messages("partnershipNominatedPartnerNino.change.hidden"))
+      action.attributes must contain("id" -> "nominated-partner-nino")
     }
 
     "must return None when the answer does not exist" in {

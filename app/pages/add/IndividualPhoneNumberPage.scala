@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,16 +16,12 @@
 
 package pages.add
 
-import pages.behaviours.PageBehaviours
+import pages.QuestionPage
+import play.api.libs.json.JsPath
 
-class SubcontractorContactDetailsYesNoPageSpec extends PageBehaviours {
+case object IndividualPhoneNumberPage extends QuestionPage[String] {
 
-  "SubcontractorContactDetailsYesNoPage" - {
+  override def path: JsPath = JsPath \ toString
 
-    beRetrievable[Boolean](SubcontractorContactDetailsYesNoPage)
-
-    beSettable[Boolean](SubcontractorContactDetailsYesNoPage)
-
-    beRemovable[Boolean](SubcontractorContactDetailsYesNoPage)
-  }
+  override def toString: String = "individualPhoneNumber"
 }

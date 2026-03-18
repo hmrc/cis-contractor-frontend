@@ -35,6 +35,7 @@ object PartnershipWorksReferenceNumberSummary {
         actions = Seq(
           ActionItemViewModel("site.change", routes.PartnershipWorksReferenceNumberController.onPageLoad(CheckMode).url)
             .withVisuallyHiddenText(messages("partnershipWorksReferenceNumber.change.hidden"))
+            .withAttribute("id" -> "partnership-works-reference-number")
         )
       )
     }

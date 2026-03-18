@@ -21,5 +21,6 @@ object Constants {
   final val MaxLength8: Int   = 8
   final val MaxLength254: Int = 254
   final val MaxLength56: Int  = 56
+  final val MaxLength20: Int  = 20
 
 }
