@@ -21,6 +21,7 @@ import controllers.actions.*
 import pages.add.company.CompanyNamePage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import queries.CisIdQuery
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.add.company.CompanyAddedView
 
@@ -38,11 +39,12 @@ class CompanyAddedController @Inject() (
     with I18nSupport {
 
   def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
-    request.userAnswers
-      .get(CompanyNamePage)
-      .map { companyName =>
-        Ok(view(companyName))
-      }
-      .getOrElse(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+    val ua = request.userAnswers
+    (ua.get(CompanyNamePage), ua.get(CisIdQuery)) match {
+      case (Some(companyName), Some(cisId)) =>
+        Ok(view(companyName, s"${appConfig.manageSubcontractorsUrl}/$cisId"))
+      case _                                =>
+        Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+    }
   }
 }
