@@ -32,7 +32,7 @@ index.heading = Construction Industry Scheme
 index.guidance = Welcome to cis-contractor-frontend. Please see the README file for a guide to getting started.
 
 checkYourAnswers.title = Check your answers
-checkYourAnswers.heading = Check your answers
+checkYourAnswers.heading = Check your answers before adding this individual
 
 journeyRecovery.continue.title = Sorry, there is a problem with the service
 journeyRecovery.continue.heading = Sorry, there is a problem with the service
@@ -110,31 +110,31 @@ unauthorised.agent.p2.suffix = to use this service.
 subTradingNameYesNo.title = Does the subcontractor use a trading name?
 subTradingNameYesNo.heading = Does the subcontractor use a trading name?
 subTradingNameYesNo.hint = This is a business name, different from their own name.
-subTradingNameYesNo.checkYourAnswersLabel = Does the subcontractor use a trading name?
+subTradingNameYesNo.checkYourAnswersLabel = Does subcontractor use a trading name?
 subTradingNameYesNo.error.required = Select whether or not the subcontractor uses a trading name
-subTradingNameYesNo.change.hidden = does the subcontractor use a trading name?
+subTradingNameYesNo.change.hidden = does subcontractor use a trading name?
 
 tradingNameOfSubcontractor.title = What is the subcontractor’s trading name?
 tradingNameOfSubcontractor.heading = What is the subcontractor’s trading name?
-tradingNameOfSubcontractor.checkYourAnswersLabel = Trading name
+tradingNameOfSubcontractor.checkYourAnswersLabel = Subcontractor trading name
 tradingNameOfSubcontractor.error.required = Enter a trading name like ABC Construction Ltd
 tradingNameOfSubcontractor.error.length = Enter a trading name up to 56 characters
-tradingNameOfSubcontractor.change.hidden = trading name
+tradingNameOfSubcontractor.change.hidden = subcontractor trading name
 tradingNameOfSubcontractor.error.invalidCharacters = Enter a trading name like ABC Construction Ltd
 
 subAddressYesNo.title = Do you want to add the subcontractor’s address?
 subAddressYesNo.heading = Do you want to add the subcontractor’s address?
 subAddressYesNo.hint = You can add this information now, or later.
-subAddressYesNo.checkYourAnswersLabel = Do you want to add the subcontractor’s address?
+subAddressYesNo.checkYourAnswersLabel = Add Subcontractor address?
 subAddressYesNo.error.required = Select whether or not to add the subcontractor’s address
-subAddressYesNo.change.hidden = do you want to add the subcontractor’s address?
+subAddressYesNo.change.hidden = add Subcontractor address?
 
 nationalInsuranceNumberYesNo.title = Do you have a National Insurance number?
 nationalInsuranceNumberYesNo.heading = Do you have a National Insurance number?
 nationalInsuranceNumberYesNo.hint = A National Insurance number is made up of letters and numbers, like ‘QQ 12 34 56 A’
-nationalInsuranceNumberYesNo.checkYourAnswersLabel = Do you have a National Insurance number?
+nationalInsuranceNumberYesNo.checkYourAnswersLabel = Add National Insurance number?
 nationalInsuranceNumberYesNo.error.required = Select whether you have the subcontractor’s National Insurance number or not
-nationalInsuranceNumberYesNo.change.hidden = do you have a National Insurance number?
+nationalInsuranceNumberYesNo.change.hidden = add National Insurance number?
 
 subcontractorName.title = What is the subcontractor’s name?
 subcontractorName.heading = What is the subcontractor’s name?
@@ -152,22 +152,22 @@ subcontractorName.lastName.error.required = Enter a last name
 subcontractorName.lastName.error.invalidCharacters = Enter a last name in the correct format using letters a to z, numbers 0 to 9, ampersands (&), apostrophes, full stops, round brackets, forward slashes, commas and dashes
 subcontractorName.lastName.error.firstChar = Enter a last name. The first character must be a letter
 subcontractorName.lastName.error.length = Enter a last name up to 35 characters
-subcontractorName.checkYourAnswersLabel = Name
-subcontractorName.change.hidden = name
+subcontractorName.checkYourAnswersLabel = Subcontractor name
+subcontractorName.change.hidden = subcontractor name
 
 uniqueTaxpayerReferenceYesNo.title = Do you have a Unique Taxpayer Reference (UTR)?
 uniqueTaxpayerReferenceYesNo.heading = Do you have a Unique Taxpayer Reference (UTR)?
 uniqueTaxpayerReferenceYesNo.hint = This is 10 numbers, like 1234567890. The UTR will be on tax returns and other letters about Self Assessment. It may also be called ‘tax reference’
-uniqueTaxpayerReferenceYesNo.checkYourAnswersLabel = Do you have a Unique Taxpayer Reference (UTR)?
+uniqueTaxpayerReferenceYesNo.checkYourAnswersLabel = Add UTR?
 uniqueTaxpayerReferenceYesNo.error.required = Select whether or not you have the subcontractor’s Unique Tax Reference
-uniqueTaxpayerReferenceYesNo.change.hidden = do you have a Unique Taxpayer Reference (UTR)?
+uniqueTaxpayerReferenceYesNo.change.hidden = add UTR?
 
 worksReferenceNumberYesNo.title = Do you have a works reference number?
 worksReferenceNumberYesNo.heading = Do you have a works reference number?
 worksReferenceNumberYesNo.hint = This is your reference number used to identify the subcontractor’s work or project. It can contain letters and numbers
-worksReferenceNumberYesNo.checkYourAnswersLabel = Do you have a works reference number?
+worksReferenceNumberYesNo.checkYourAnswersLabel = Add works reference number?
 worksReferenceNumberYesNo.error.required = Select whether you have the subcontractor’s work reference number or not
-worksReferenceNumberYesNo.change.hidden = do you have a works reference number?
+worksReferenceNumberYesNo.change.hidden = add works reference number?
 
 subNationalInsuranceNumber.title = What is the subcontractor’s National Insurance number?
 subNationalInsuranceNumber.heading = What is the subcontractor’s National Insurance number?
@@ -191,8 +191,8 @@ addressOfSubcontractor.title = What is the subcontractor’s address?
 addressOfSubcontractor.heading = What is the subcontractor’s address?
 addressOfSubcontractor.addressLine1 = Address line 1
 addressOfSubcontractor.addressLine2 = Address line 2 (optional)
-addressOfSubcontractor.checkYourAnswersLabel = Subcontractor address
-addressOfSubcontractor.change.hidden= subcontractor address
+addressOfSubcontractor.checkYourAnswersLabel = Address
+addressOfSubcontractor.change.hidden= address
 addressOfSubcontractor.error.addressLine1.required = Enter the first line of the address, typically the building and street
 addressOfSubcontractor.error.addressLine3.required = Enter the town or city
 addressOfSubcontractor.error.postCode.required = Enter postcode in the correct format, like NE88 1AA
@@ -220,12 +220,12 @@ addressOfSubcontractor.error.addressLine3.firstCharMustBeLetter = Enter a town o
 subcontractorsUniqueTaxpayerReference.title = What is the subcontractor’s Unique Taxpayer Reference (UTR)?
 subcontractorsUniqueTaxpayerReference.heading = What is the subcontractor’s Unique Taxpayer Reference (UTR)?
 subcontractorsUniqueTaxpayerReference.hint = This is 10 numbers, like 1234567890. The UTR will be on tax returns and other letters about Self Assessment. It may also be called ‘tax reference’
-subcontractorsUniqueTaxpayerReference.checkYourAnswersLabel = Unique Taxpayer Reference
+subcontractorsUniqueTaxpayerReference.checkYourAnswersLabel = UTR
 subcontractorsUniqueTaxpayerReference.error.required = Enter a Unique Taxpayer Reference (UTR), like 1234567890
 subcontractorsUniqueTaxpayerReference.error.invalid = Your entry for ‘Unique tax reference (UTR)’ is invalid. Please amend.
 subcontractorsUniqueTaxpayerReference.error.length = Enter a Unique Taxpayer Reference (UTR) using 10 digits
 subcontractorsUniqueTaxpayerReference.error.duplicate = You have entered a Unique Tax Reference (UTR) of an existing subcontractor. Please amend your entry.
-subcontractorsUniqueTaxpayerReference.change.hidden = Unique Taxpayer Reference
+subcontractorsUniqueTaxpayerReference.change.hidden = UTR
 
 partnershipWorksReferenceNumberYesNo.title = Does this partnership have a works reference number?
 partnershipWorksReferenceNumberYesNo.heading = Does {0} have a works reference number?
@@ -235,10 +235,9 @@ partnershipWorksReferenceNumberYesNo.error.required = Select one option
 partnershipWorksReferenceNumberYesNo.change.hidden = add works reference number?
 
 checkYourAnswers.heading.sub.h2 = Subcontractor details
-checkYourAnswers.heading.h2 = Now add the subcontractor
-checkYourAnswers.warning = You must verify this subcontractor with HMRC before making any payments to them.
+checkYourAnswers.heading.h2 = Now add this subcontractor
 checkYourAnswers.p1 = By adding this subcontractor you are confirming that, to the best of your knowledge, the details you are providing are correct.
-checkYourAnswers.addSubcontractor = Add subcontractor
+checkYourAnswers.addSubcontractor = Accept and submit
 
 partnershipName.title = What is the partnership name?
 partnershipName.heading = What is the partnership name?

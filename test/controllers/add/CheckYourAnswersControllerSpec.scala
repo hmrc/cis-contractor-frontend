@@ -93,15 +93,15 @@ class CheckYourAnswersControllerSpec extends SpecBase {
         status(result) mustEqual OK
 
         content must include("Type")
-        content must include("Does the subcontractor use a trading name?")
-        content must include("Trading name")
-        content must include("Do you want to add the subcontractor’s address?")
-        content must include("Subcontractor address")
-        content must include("Do you have a National Insurance number?")
+        content must include("Does subcontractor use a trading name?")
+        content must include("Subcontractor trading name")
+        content must include("Add Subcontractor address?")
+        content must include("Address")
+        content must include("Add UTR?")
+        content must include("UTR")
+        content must include("Add National Insurance number?")
         content must include("National Insurance number")
-        content must include("Do you have a Unique Taxpayer Reference (UTR)?")
-        content must include("Unique Taxpayer Reference")
-        content must include("Do you have a works reference number?")
+        content must include("Add works reference number?")
         content must include("Works reference number")
 
         content must include("ABC Ltd")
