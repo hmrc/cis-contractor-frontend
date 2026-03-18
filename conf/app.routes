@@ -266,3 +266,6 @@ GET        /add/partnership/change-mobile-number         controllers.add.partner
 POST       /add/partnership/change-mobile-number         controllers.add.partnership.PartnershipMobileNumberController.onSubmit(mode: Mode = CheckMode)
 
 GET        /add/company/subcontractor-added                     controllers.add.company.CompanyAddedController.onPageLoad()
+
+GET        /add/partnership/check-your-answers           controllers.add.partnership.PartnershipCheckYourAnswersController.onPageLoad()
+POST       /add/partnership/check-your-answers           controllers.add.partnership.PartnershipCheckYourAnswersController.onSubmit()
