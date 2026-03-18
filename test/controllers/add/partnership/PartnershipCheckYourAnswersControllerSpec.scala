@@ -760,4 +760,75 @@ class PartnershipCheckYourAnswersControllerSpec extends SpecBase {
     }
   }
 
+  "must redirect to Journey Recovery and not resubmit when already submitted flag is set" in {
+    val submittedUa =
+      validUaForSubmit.set(CheckYourAnswersSubmittedPage, true).success.value
+
+    val mockSubcontractorService = mock[SubcontractorService]
+    val mockSessionRepository    = mock[SessionRepository]
+
+    val application =
+      applicationBuilder(userAnswers = Some(submittedUa))
+        .overrides(
+          bind[SubcontractorService].toInstance(mockSubcontractorService),
+          bind[SessionRepository].toInstance(mockSessionRepository)
+        )
+        .build()
+
+    running(application) {
+      val request =
+        FakeRequest(POST, controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onSubmit().url)
+      val result  = route(application, request).value
+
+      status(result) mustEqual SEE_OTHER
+      redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+    }
+
+    verify(mockSubcontractorService, never()).createAndUpdateSubcontractor(any[UserAnswers])(any[HeaderCarrier])
+    verify(mockSessionRepository, never()).set(any[UserAnswers])
+    verifyNoMoreInteractions(mockSubcontractorService)
+  }
+
+  "must redirect to Journey Recovery on submit (POST) if no existing data is found" in {
+    val application = applicationBuilder(userAnswers = None).build()
+
+    running(application) {
+      val request =
+        FakeRequest(POST, controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onSubmit().url)
+      val result  = route(application, request).value
+
+      status(result) mustEqual SEE_OTHER
+      redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+    }
+  }
+
+  "must redirect to Journey Recovery when service call fails (recover block) and not set submitted flag" in {
+    val mockSubcontractorService = mock[SubcontractorService]
+    val mockSessionRepository    = mock[SessionRepository]
+
+    when(mockSubcontractorService.createAndUpdateSubcontractor(any[UserAnswers])(any[HeaderCarrier]))
+      .thenReturn(Future.failed(new RuntimeException("boom")))
+
+    val application =
+      applicationBuilder(userAnswers = Some(validUaForSubmit))
+        .overrides(
+          bind[SubcontractorService].toInstance(mockSubcontractorService),
+          bind[SessionRepository].toInstance(mockSessionRepository)
+        )
+        .build()
+
+    running(application) {
+      val request =
+        FakeRequest(POST, controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onSubmit().url)
+      val result  = route(application, request).value
+
+      status(result) mustEqual SEE_OTHER
+      redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+    }
+
+    verify(mockSubcontractorService).createAndUpdateSubcontractor(any[UserAnswers])(any[HeaderCarrier])
+    verify(mockSessionRepository, never()).set(any[UserAnswers])
+    verifyNoMoreInteractions(mockSubcontractorService)
+  }
+
 }

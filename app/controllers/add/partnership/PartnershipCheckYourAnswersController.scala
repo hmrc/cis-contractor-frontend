@@ -106,7 +106,9 @@ class PartnershipCheckYourAnswersController @Inject() (
                 Future
                   .fromTry(request.userAnswers.set(CheckYourAnswersSubmittedPage, true))
                   .flatMap(updated => sessionRepository.set(updated).map(_ => ()))
-                  .map(_ => Redirect(controllers.add.routes.P.onPageLoad()))
+                  .map(_ =>
+                    Redirect(controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad())
+                  )
               }
               .recover { case t =>
                 logger.error(
