@@ -20,7 +20,7 @@ import base.SpecBase
 import controllers.routes
 import forms.add.partnership.PartnershipNominatedPartnerCrnFormProvider
 import models.{NormalMode, UserAnswers}
-import navigation.Navigator
+import navigation.add.PartnershipNavigator
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{verify, when}
 import org.scalatestplus.mockito.MockitoSugar
@@ -113,7 +113,7 @@ class PartnershipNominatedPartnerCrnControllerSpec extends SpecBase with Mockito
         )
           .overrides(
             bind[SessionRepository].toInstance(mockSessionRepository),
-            bind[Navigator].toInstance(new Navigator())
+            bind[PartnershipNavigator].toInstance(new PartnershipNavigator())
           )
           .build()
 

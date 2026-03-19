@@ -19,7 +19,7 @@ package pages.add.company
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 
-case object CompanyWorksReferenceYesNoPage extends QuestionPage[Boolean] {
+case object CompanyWorksReferenceYesNoPage extends QuestionPage[Boolean] with CompanyPage {
 
   override def path: JsPath = JsPath \ toString
 
