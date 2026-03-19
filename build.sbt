@@ -54,9 +54,15 @@ lazy val microservice = (project in file("."))
     libraryDependencies ++= AppDependencies(),
     retrieveManaged := true,
     pipelineStages := Seq(digest),
-    Assets / pipelineStages := Seq(concat)
+    Assets / pipelineStages := Seq(concat),
+    columnarFmtConfig := ColumnarConfig(
+      sections        = appRoutesSections,
+      lineLimit       = 160,
+      fileGlob        = "conf/app.routes",
+      fileHeader      = "# Routes",
+      formatterConfig = ColumnarFormatterConfig.playRoutes
+    )
   )
-
 lazy val testSettings: Seq[Def.Setting[?]] = Seq(
   fork := true,
   unmanagedSourceDirectories += baseDirectory.value / "test-utils"
@@ -66,3 +72,18 @@ lazy val it =
   (project in file("it"))
     .enablePlugins(PlayScala)
     .dependsOn(microservice % "test->test")
+
+lazy val appRoutesSections = Seq(
+  ColumnarSection("# Infrastructure"),
+  ColumnarSection("# Errors & Auth",
+    primaryPrefixes = Seq("/there-is-a-problem", "/page-not-found", "/access-denied",
+      "/account/", "/unauthorised", "/system-error/")),
+  ColumnarSection("# Individual",
+    primaryPrefixes = Seq("/add/")),
+  ColumnarSection("# Company",
+    primaryPrefixes   = Seq("/add/company/"),
+    secondaryPrefixes = Seq("controllers.add.company.")),
+  ColumnarSection("# Partnership",
+    primaryPrefixes   = Seq("/add/partnership/"),
+    secondaryPrefixes = Seq("controllers.add.partnership."))
+)
