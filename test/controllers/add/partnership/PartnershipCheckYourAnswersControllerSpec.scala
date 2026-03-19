@@ -23,6 +23,7 @@ import pages.add.TypeOfSubcontractorPage
 import pages.add.partnership.*
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
+import play.api.libs.json._
 
 class PartnershipCheckYourAnswersControllerSpec extends SpecBase {
 
@@ -534,6 +535,168 @@ class PartnershipCheckYourAnswersControllerSpec extends SpecBase {
     "must redirect to Journey Recovery for a GET if no existing data is found" in {
 
       val application = applicationBuilder(userAnswers = None).build()
+
+      running(application) {
+        val request =
+          FakeRequest(GET, controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad().url)
+        val result  = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value must include("/there-is-a-problem")
+      }
+    }
+
+    def withStaleValue[A](
+      ua: models.UserAnswers,
+      page: pages.QuestionPage[A],
+      value: A
+    )(implicit w: Writes[A]): models.UserAnswers = {
+      val put = page.path.json.put(Json.toJson(value))
+
+      ua.data.transform(put) match {
+        case JsSuccess(updated: JsObject, _) => ua.copy(data = updated)
+        case _                               => ua
+      }
+    }
+
+    "must redirect to Journey Recovery when AddressYesNo is false but address value is still present (stale session)" in {
+
+      val address = InternationalAddress(
+        addressLine1 = "1 Test Street",
+        addressLine2 = None,
+        addressLine3 = "Test Town",
+        addressLine4 = None,
+        postalCode = "TE1 1ST",
+        country = "GB"
+      )
+
+      val uaBase =
+        minUa
+          .set(PartnershipChooseContactDetailsPage, ContactOptions.Email)
+          .success
+          .value
+          .set(PartnershipEmailAddressPage, "one@two.three")
+          .success
+          .value
+          .set(PartnershipAddressYesNoPage, false)
+          .success
+          .value
+
+      val ua = withStaleValue(uaBase, PartnershipAddressPage, address)
+
+      val application = applicationBuilder(userAnswers = Some(ua)).build()
+
+      running(application) {
+        val request =
+          FakeRequest(GET, controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad().url)
+        val result  = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value must include("/there-is-a-problem")
+      }
+    }
+
+    "must redirect to Journey Recovery when HasUtrYesNo is false but partnership UTR value is still present (stale session)" in {
+
+      val uaBase =
+        minUa
+          .set(PartnershipChooseContactDetailsPage, ContactOptions.Email)
+          .success
+          .value
+          .set(PartnershipEmailAddressPage, "one@two.three")
+          .success
+          .value
+          .set(PartnershipHasUtrYesNoPage, false)
+          .success
+          .value
+
+      val ua = withStaleValue(uaBase, PartnershipUniqueTaxpayerReferencePage, "1234567890")
+
+      val application = applicationBuilder(userAnswers = Some(ua)).build()
+
+      running(application) {
+        val request =
+          FakeRequest(GET, controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad().url)
+        val result  = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value must include("/there-is-a-problem")
+      }
+    }
+
+    "must redirect to Journey Recovery when NominatedPartnerNinoYesNo is false but NINO value is still present (stale session)" in {
+
+      val uaBase =
+        minUa
+          .set(PartnershipChooseContactDetailsPage, ContactOptions.Email)
+          .success
+          .value
+          .set(PartnershipEmailAddressPage, "one@two.three")
+          .success
+          .value
+          .set(PartnershipNominatedPartnerNinoYesNoPage, false)
+          .success
+          .value
+
+      val ua = withStaleValue(uaBase, PartnershipNominatedPartnerNinoPage, "AB123456C")
+
+      val application = applicationBuilder(userAnswers = Some(ua)).build()
+
+      running(application) {
+        val request =
+          FakeRequest(GET, controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad().url)
+        val result  = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value must include("/there-is-a-problem")
+      }
+    }
+
+    "must redirect to Journey Recovery when NominatedPartnerCrnYesNo is false but CRN value is still present (stale session)" in {
+
+      val uaBase =
+        minUa
+          .set(PartnershipChooseContactDetailsPage, ContactOptions.Email)
+          .success
+          .value
+          .set(PartnershipEmailAddressPage, "one@two.three")
+          .success
+          .value
+          .set(PartnershipNominatedPartnerCrnYesNoPage, false)
+          .success
+          .value
+
+      val ua = withStaleValue(uaBase, PartnershipNominatedPartnerCrnPage, "12345678")
+
+      val application = applicationBuilder(userAnswers = Some(ua)).build()
+
+      running(application) {
+        val request =
+          FakeRequest(GET, controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad().url)
+        val result  = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value must include("/there-is-a-problem")
+      }
+    }
+
+    "must redirect to Journey Recovery when WorksReferenceNumberYesNo is false but WRN value is still present (stale session)" in {
+
+      val uaBase =
+        minUa
+          .set(PartnershipChooseContactDetailsPage, ContactOptions.Email)
+          .success
+          .value
+          .set(PartnershipEmailAddressPage, "one@two.three")
+          .success
+          .value
+          .set(PartnershipWorksReferenceNumberYesNoPage, false)
+          .success
+          .value
+
+      val ua = withStaleValue(uaBase, PartnershipWorksReferenceNumberPage, "WRN-001")
+
+      val application = applicationBuilder(userAnswers = Some(ua)).build()
 
       running(application) {
         val request =
