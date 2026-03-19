@@ -38,23 +38,23 @@ class SharedNavigator @Inject() () extends NavigatorForJourney {
 
   private val normalRoutes: Page => UserAnswers => Call = {
     case TypeOfSubcontractorPage => userAnswers => navigatorFromTypeOfSubcontractorPage(NormalMode)(userAnswers)
-    case _                                         => _ => routes.IndexController.onPageLoad()
+    case _                       => _ => routes.IndexController.onPageLoad()
   }
 
   private val checkRouteMap: Page => UserAnswers => Call = {
     case TypeOfSubcontractorPage => navigatorFromTypeOfSubcontractorPage(CheckMode)(_)
-    case _ => _ => controllers.add.routes.CheckYourAnswersController.onPageLoad()
+    case _                       => _ => controllers.add.routes.CheckYourAnswersController.onPageLoad()
   }
-  
+
   private def navigatorFromTypeOfSubcontractorPage(mode: Mode)(userAnswers: UserAnswers): Call =
     (userAnswers.get(TypeOfSubcontractorPage), mode) match {
       case (Some(Individualorsoletrader), NormalMode) =>
         controllers.add.routes.SubTradingNameYesNoController.onPageLoad(NormalMode)
-      case (Some(Partnership), NormalMode) =>
+      case (Some(Partnership), NormalMode)            =>
         controllers.add.partnership.routes.PartnershipNameController.onPageLoad(NormalMode)
-      case (None, _) => routes.JourneyRecoveryController.onPageLoad()
-      case (_, NormalMode) => routes.JourneyRecoveryController.onPageLoad()
-      case (_, CheckMode) => controllers.add.routes.CheckYourAnswersController.onPageLoad()
+      case (None, _)                                  => routes.JourneyRecoveryController.onPageLoad()
+      case (_, NormalMode)                            => routes.JourneyRecoveryController.onPageLoad()
+      case (_, CheckMode)                             => controllers.add.routes.CheckYourAnswersController.onPageLoad()
     }
 
 }

@@ -25,19 +25,19 @@ import play.api.mvc.Call
 import javax.inject.{Inject, Singleton}
 
 @Singleton
-class TrustNavigator @Inject()() extends NavigatorForJourney {
+class TrustNavigator @Inject() () extends NavigatorForJourney {
 
   override def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers): Call = mode match {
     case NormalMode =>
       normalRoutes(page)(userAnswers)
-    case CheckMode =>
+    case CheckMode  =>
       checkRouteMap(page)(userAnswers)
   }
 
   private val normalRoutes: Page => UserAnswers => Call =
-    (_ => _ => routes.IndexController.onPageLoad())
+    _ => _ => routes.IndexController.onPageLoad()
 
   private val checkRouteMap: Page => UserAnswers => Call =
-    (_ => _ => controllers.add.routes.CheckYourAnswersController.onPageLoad())
+    _ => _ => controllers.add.routes.CheckYourAnswersController.onPageLoad()
 
 }

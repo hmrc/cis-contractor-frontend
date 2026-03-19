@@ -25,10 +25,10 @@ import pages.add.TypeOfSubcontractorPage
 
 class SharedNavigatorSpec extends SpecBase {
 
-  val navigator = new SharedNavigator
+  val navigator                    = new SharedNavigator
   private lazy val journeyRecovery = routes.JourneyRecoveryController.onPageLoad()
-  private lazy val CYA = controllers.add.routes.CheckYourAnswersController.onPageLoad()
-  
+  private lazy val CYA             = controllers.add.routes.CheckYourAnswersController.onPageLoad()
+
   "SharedNavigator" - {
 
     "in Normal mode" - {
@@ -62,7 +62,6 @@ class SharedNavigatorSpec extends SpecBase {
           emptyUserAnswers.setOrException(TypeOfSubcontractorPage, TypeOfSubcontractor.Partnership)
         ) mustBe controllers.add.partnership.routes.PartnershipNameController.onPageLoad(NormalMode)
       }
-
 
       "must go from a TypeOfSubcontractorPage to JourneyRecovery when Trust is selected" in {
         navigator.nextPage(
@@ -110,9 +109,9 @@ class SharedNavigatorSpec extends SpecBase {
           emptyUserAnswers
         ) mustBe journeyRecovery
       }
-      
+
     }
-    
+
   }
 
 }

@@ -39,7 +39,7 @@ class PartnershipNominatedPartnerNinoYesNoControllerSpec extends SpecBase with M
 
   def onwardRoute: Call = Call("GET", "/foo")
 
-  val formProvider = new PartnershipNominatedPartnerNinoYesNoFormProvider()
+  val formProvider        = new PartnershipNominatedPartnerNinoYesNoFormProvider()
   val form: Form[Boolean] = formProvider()
 
   private val partnershipNominatedPartnerName = "Test Partnership"
@@ -101,7 +101,7 @@ class PartnershipNominatedPartnerNinoYesNoControllerSpec extends SpecBase with M
     "must redirect to the next page when valid data is submitted" in {
 
       val mockSessionRepository = mock[SessionRepository]
-      val mockNavigator = mock[Navigator]
+      val mockNavigator         = mock[Navigator]
 
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
       when(mockNavigator.nextPage(any(), any(), any())).thenReturn(onwardRoute)

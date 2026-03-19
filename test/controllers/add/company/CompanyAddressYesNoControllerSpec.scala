@@ -39,7 +39,7 @@ class CompanyAddressYesNoControllerSpec extends SpecBase with MockitoSugar {
 
   def onwardRoute: Call = Call("GET", "/foo")
 
-  val formProvider = new CompanyAddressYesNoFormProvider()
+  val formProvider        = new CompanyAddressYesNoFormProvider()
   val form: Form[Boolean] = formProvider()
 
   private val companyName = "Test Company"
@@ -92,7 +92,7 @@ class CompanyAddressYesNoControllerSpec extends SpecBase with MockitoSugar {
     "must redirect to the next page when valid data is submitted" in {
 
       val mockSessionRepository = mock[SessionRepository]
-      val mockNavigator = mock[Navigator]
+      val mockNavigator         = mock[Navigator]
 
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
       when(mockNavigator.nextPage(any(), any(), any())).thenReturn(onwardRoute)

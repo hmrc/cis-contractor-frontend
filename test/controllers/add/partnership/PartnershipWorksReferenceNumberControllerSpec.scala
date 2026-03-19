@@ -39,7 +39,7 @@ class PartnershipWorksReferenceNumberControllerSpec extends SpecBase with Mockit
 
   def onwardRoute: Call = Call("GET", "/foo")
 
-  val formProvider = new PartnershipWorksReferenceNumberFormProvider()
+  val formProvider       = new PartnershipWorksReferenceNumberFormProvider()
   val form: Form[String] = formProvider()
 
   private val partnershipName = "Test Partnership"
@@ -102,7 +102,7 @@ class PartnershipWorksReferenceNumberControllerSpec extends SpecBase with Mockit
     "must redirect to the next page when valid data is submitted" in {
 
       val mockSessionRepository = mock[SessionRepository]
-      val mockNavigator = mock[Navigator]
+      val mockNavigator         = mock[Navigator]
 
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
       when(mockNavigator.nextPage(any(), any(), any())).thenReturn(onwardRoute)

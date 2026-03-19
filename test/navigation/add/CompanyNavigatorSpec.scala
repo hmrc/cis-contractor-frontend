@@ -25,11 +25,10 @@ import pages.add.company.*
 
 class CompanyNavigatorSpec extends SpecBase {
 
-  val navigator = new CompanyNavigator
+  val navigator                    = new CompanyNavigator
   private lazy val journeyRecovery = routes.JourneyRecoveryController.onPageLoad()
   private lazy val CYA             = controllers.add.routes.CheckYourAnswersController.onPageLoad()
   private lazy val CompanyCYA      = controllers.add.company.routes.CompanyCheckYourAnswersController.onPageLoad()
-
 
   "CompanyNavigator" - {
 
@@ -480,7 +479,7 @@ class CompanyNavigatorSpec extends SpecBase {
           emptyUserAnswers
         ) mustBe controllers.add.company.routes.CompanyCheckYourAnswersController.onPageLoad()
       }
-      
+
     }
 
   }
