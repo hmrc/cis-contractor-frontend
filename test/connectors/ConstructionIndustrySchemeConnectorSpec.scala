@@ -87,7 +87,7 @@ class ConstructionIndustrySchemeConnectorSpec extends AnyWordSpec with Matchers 
           cisId = "11",
           subcontractorType = TypeOfSubcontractor.Partnership,
           utr = Some("1234567890"),
-          tradingName = Some("Nominated Partner")
+          partnerTradingName = Some("Nominated Partner")
         )
 
       connector.createAndUpdateSubcontractor(payload).futureValue mustBe (())
