@@ -20,7 +20,7 @@ import models.add.SubContactDetails
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 
-case object SubContactDetailsPage extends QuestionPage[SubContactDetails] with IndividualPage {
+case object SubContactDetailsPage extends QuestionPage[SubContactDetails] with IndividualJourney {
 
   override def path: JsPath = JsPath \ toString
 

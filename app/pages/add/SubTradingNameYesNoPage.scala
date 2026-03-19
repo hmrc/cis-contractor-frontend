@@ -22,7 +22,7 @@ import play.api.libs.json.JsPath
 
 import scala.util.Try
 
-case object SubTradingNameYesNoPage extends QuestionPage[Boolean] with IndividualPage {
+case object SubTradingNameYesNoPage extends QuestionPage[Boolean] with IndividualJourney {
 
   override def path: JsPath = JsPath \ toString
 

@@ -25,10 +25,10 @@ import org.scalatest.freespec.AnyFreeSpec
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.mockito.MockitoSugar.mock
 import pages.Page
-import pages.add.company.CompanyPage
-import pages.add.partnership.PartnershipPage
-import pages.add.trust.TrustPage
-import pages.add.IndividualPage
+import pages.add.company.CompanyJourney
+import pages.add.partnership.PartnershipJourney
+import pages.add.trust.TrustJourney
+import pages.add.IndividualJourney
 import play.api.mvc.Call
 
 class NavigatorSpec extends SpecBase {
@@ -38,8 +38,8 @@ class NavigatorSpec extends SpecBase {
 
   "Navigator" - {
 
-    "must delegate to IndividualNavigator when page is an IndividualPage" in {
-      case object TestIndividualPage extends Page with IndividualPage
+    "must delegate to IndividualNavigator when page is an IndividualJourney" in {
+      case object TestIndividualPage extends Page with IndividualJourney
 
       val individual  = mock[IndividualNavigator]
       val company     = mock[CompanyNavigator]
@@ -62,8 +62,8 @@ class NavigatorSpec extends SpecBase {
       verify(shared, never()).nextPage(any(), any(), any())
     }
 
-    "must delegate to CompanyNavigator when page is a CompanyPage" in {
-      case object TestCompanyPage extends Page with CompanyPage
+    "must delegate to CompanyNavigator when page is a CompanyJourney" in {
+      case object TestCompanyPage extends Page with CompanyJourney
 
       val individual  = mock[IndividualNavigator]
       val company     = mock[CompanyNavigator]
@@ -87,7 +87,7 @@ class NavigatorSpec extends SpecBase {
     }
 
     "must delegate to PartnershipNavigator when page is a PartnershipPage" in {
-      case object TestPartnershipPage extends Page with PartnershipPage
+      case object TestPartnershipPage extends Page with PartnershipJourney
 
       val individual  = mock[IndividualNavigator]
       val company     = mock[CompanyNavigator]
@@ -110,8 +110,8 @@ class NavigatorSpec extends SpecBase {
       verify(shared, never()).nextPage(any(), any(), any())
     }
 
-    "must delegate to TrustNavigator when page is a TrustPage" in {
-      case object TestTrustPage extends Page with TrustPage
+    "must delegate to TrustNavigator when page is a TrustJourney" in {
+      case object TestTrustPage extends Page with TrustJourney
 
       val individual  = mock[IndividualNavigator]
       val company     = mock[CompanyNavigator]

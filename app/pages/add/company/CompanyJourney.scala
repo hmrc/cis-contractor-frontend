@@ -18,4 +18,4 @@ package pages.add.company
 
 import pages.Page
 
-trait CompanyPage extends Page
+trait CompanyJourney extends Page
