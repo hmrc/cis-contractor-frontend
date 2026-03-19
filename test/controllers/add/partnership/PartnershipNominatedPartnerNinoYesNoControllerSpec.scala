@@ -20,11 +20,12 @@ import base.SpecBase
 import controllers.routes
 import forms.add.partnership.PartnershipNominatedPartnerNinoYesNoFormProvider
 import models.{NormalMode, UserAnswers}
-import navigation.{FakeNavigator, Navigator}
+import navigation.Navigator
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
 import pages.add.partnership.{PartnershipNominatedPartnerNamePage, PartnershipNominatedPartnerNinoYesNoPage}
+import play.api.data.Form
 import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
@@ -36,17 +37,17 @@ import scala.concurrent.Future
 
 class PartnershipNominatedPartnerNinoYesNoControllerSpec extends SpecBase with MockitoSugar {
 
-  def onwardRoute = Call("GET", "/foo")
+  def onwardRoute: Call = Call("GET", "/foo")
 
   val formProvider = new PartnershipNominatedPartnerNinoYesNoFormProvider()
-  val form         = formProvider()
+  val form: Form[Boolean] = formProvider()
 
   private val partnershipNominatedPartnerName = "Test Partnership"
 
   private def uaWithName: UserAnswers =
     emptyUserAnswers.set(PartnershipNominatedPartnerNamePage, partnershipNominatedPartnerName).success.value
 
-  lazy val routeLoad =
+  lazy val routeLoad: String =
     controllers.add.partnership.routes.PartnershipNominatedPartnerNinoYesNoController.onPageLoad(NormalMode).url
 
   private lazy val routeSubmit =
@@ -100,13 +101,15 @@ class PartnershipNominatedPartnerNinoYesNoControllerSpec extends SpecBase with M
     "must redirect to the next page when valid data is submitted" in {
 
       val mockSessionRepository = mock[SessionRepository]
+      val mockNavigator = mock[Navigator]
 
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+      when(mockNavigator.nextPage(any(), any(), any())).thenReturn(onwardRoute)
 
       val application =
         applicationBuilder(userAnswers = Some(uaWithName))
           .overrides(
-            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
+            bind[Navigator].toInstance(mockNavigator),
             bind[SessionRepository].toInstance(mockSessionRepository)
           )
           .build()

@@ -24,7 +24,7 @@ import play.api.libs.json.JsPath
 
 import scala.util.Try
 
-case object TypeOfSubcontractorPage extends QuestionPage[TypeOfSubcontractor] with Cleanup {
+case object TypeOfSubcontractorPage extends QuestionPage[TypeOfSubcontractor] with SharedPage with Cleanup {
 
   override def path: JsPath = JsPath \ toString
 

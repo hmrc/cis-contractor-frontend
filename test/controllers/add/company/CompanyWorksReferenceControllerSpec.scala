@@ -20,11 +20,12 @@ import base.SpecBase
 import controllers.routes
 import forms.add.company.CompanyWorksReferenceFormProvider
 import models.{NormalMode, UserAnswers}
-import navigation.{FakeNavigator, Navigator}
+import navigation.Navigator
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
 import pages.add.company.{CompanyNamePage, CompanyWorksReferencePage}
+import play.api.data.Form
 import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
@@ -36,14 +37,14 @@ import scala.concurrent.Future
 
 class CompanyWorksReferenceControllerSpec extends SpecBase with MockitoSugar {
 
-  def onwardRoute = Call("GET", "/foo")
+  def onwardRoute: Call = Call("GET", "/foo")
 
   val formProvider = new CompanyWorksReferenceFormProvider()
-  val form         = formProvider()
+  val form: Form[String] = formProvider()
 
   private val companyName = "Test Company"
 
-  lazy val companyWorksReferenceRoute =
+  lazy val companyWorksReferenceRoute: String =
     controllers.add.company.routes.CompanyWorksReferenceController.onPageLoad(NormalMode).url
 
   private def uaWithName: UserAnswers =
@@ -91,13 +92,15 @@ class CompanyWorksReferenceControllerSpec extends SpecBase with MockitoSugar {
     "must redirect to the next page when valid data is submitted" in {
 
       val mockSessionRepository = mock[SessionRepository]
+      val mockNavigator = mock[Navigator]
 
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+      when(mockNavigator.nextPage(any(), any(), any())).thenReturn(onwardRoute)
 
       val application =
         applicationBuilder(userAnswers = Some(uaWithName))
           .overrides(
-            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
+            bind[Navigator].toInstance(mockNavigator),
             bind[SessionRepository].toInstance(mockSessionRepository)
           )
           .build()
