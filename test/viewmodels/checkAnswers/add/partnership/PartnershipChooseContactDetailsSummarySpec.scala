@@ -27,6 +27,7 @@ import pages.add.partnership.PartnershipChooseContactDetailsPage
 import play.api.i18n.Messages
 import play.api.test.Helpers.stubMessages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.*
+import org.scalatest.matchers.must.Matchers.must
 
 class PartnershipChooseContactDetailsSummarySpec extends AnyFreeSpec with Matchers {
 
@@ -63,6 +64,7 @@ class PartnershipChooseContactDetailsSummarySpec extends AnyFreeSpec with Matche
       changeAction.content.asHtml.toString    should include(expectedChangeText)
       changeAction.href                     shouldBe expectedHref
       changeAction.visuallyHiddenText.value shouldBe expectedHiddenText
+      changeAction.attributes                   must contain("id" -> "partnership-method-of-contact")
     }
 
     "must return a SummaryListRow when Phone is selected" in {

@@ -89,11 +89,6 @@ POST       /add/works-reference-number                   controllers.add.WorksRe
 GET        /add/change-works-reference-number            controllers.add.WorksReferenceNumberController.onPageLoad(mode: Mode = CheckMode)
 POST       /add/change-works-reference-number            controllers.add.WorksReferenceNumberController.onSubmit(mode: Mode = CheckMode)
 
-GET        /add/check-contact-details                    controllers.add.SubcontractorContactDetailsYesNoController.onPageLoad(mode: Mode = NormalMode)
-POST       /add/check-contact-details                    controllers.add.SubcontractorContactDetailsYesNoController.onSubmit(mode: Mode = NormalMode)
-GET        /add/change-check-contact-details             controllers.add.SubcontractorContactDetailsYesNoController.onPageLoad(mode: Mode = CheckMode)
-POST       /add/change-check-contact-details             controllers.add.SubcontractorContactDetailsYesNoController.onSubmit(mode: Mode = CheckMode)
-
 GET        /add/contact-details                          controllers.add.SubContactDetailsController.onPageLoad(mode: Mode = NormalMode)
 POST       /add/contact-details                          controllers.add.SubContactDetailsController.onSubmit(mode: Mode = NormalMode)
 GET        /add/change-contact-details                   controllers.add.SubContactDetailsController.onPageLoad(mode: Mode = CheckMode)
@@ -254,10 +249,10 @@ POST       /add/company/company-has-works-reference                 controllers.
 GET        /add/company/change-company-has-works-reference          controllers.add.company.CompanyWorksReferenceYesNoController.onPageLoad(mode: Mode = CheckMode)
 POST       /add/company/change-company-has-works-reference           controllers.add.company.CompanyWorksReferenceYesNoController.onSubmit(mode: Mode = CheckMode)
 
-GET        /companyWorksReference                        controllers.add.company.CompanyWorksReferenceController.onPageLoad(mode: Mode = NormalMode)
-POST       /companyWorksReference                        controllers.add.company.CompanyWorksReferenceController.onSubmit(mode: Mode = NormalMode)
-GET        /changeCompanyWorksReference                  controllers.add.company.CompanyWorksReferenceController.onPageLoad(mode: Mode = CheckMode)
-POST       /changeCompanyWorksReference                  controllers.add.company.CompanyWorksReferenceController.onSubmit(mode: Mode = CheckMode)
+GET        /add/company/company-works-reference         controllers.add.company.CompanyWorksReferenceController.onPageLoad(mode: Mode = NormalMode)
+POST       /add/company/company-works-reference         controllers.add.company.CompanyWorksReferenceController.onSubmit(mode: Mode = NormalMode)
+GET        /add/company/change-company-works-reference  controllers.add.company.CompanyWorksReferenceController.onPageLoad(mode: Mode = CheckMode)
+POST       /add/company/change-company-works-reference  controllers.add.company.CompanyWorksReferenceController.onSubmit(mode: Mode = CheckMode)
 
 GET        /companyCheckYourAnswers                      controllers.add.company.CompanyCheckYourAnswersController.onPageLoad()
 
@@ -272,3 +267,18 @@ GET        /add/change-mobile-number                   controllers.add.Individua
 POST       /add/change-mobile-number                   controllers.add.IndividualMobileNumberController.onSubmit(mode: Mode = CheckMode)
 
 GET        /add/company/subcontractor-added                     controllers.add.company.CompanyAddedController.onPageLoad()
+
+GET        /add/phone-number                       controllers.add.IndividualPhoneNumberController.onPageLoad(mode: Mode = NormalMode)
+POST       /add/phone-number                        controllers.add.IndividualPhoneNumberController.onSubmit(mode: Mode = NormalMode)
+GET        /add/change-phone-number                 controllers.add.IndividualPhoneNumberController.onPageLoad(mode: Mode = CheckMode)
+POST       /add/change-phone-number                  controllers.add.IndividualPhoneNumberController.onSubmit(mode: Mode = CheckMode)
+
+GET        /add/email-address                         controllers.add.IndividualEmailAddressController.onPageLoad(mode: Mode = NormalMode)
+POST       /add/email-address                         controllers.add.IndividualEmailAddressController.onSubmit(mode: Mode = NormalMode)
+GET        /add/change-email-address                  controllers.add.IndividualEmailAddressController.onPageLoad(mode: Mode = CheckMode)
+POST       /add/change-email-address                  controllers.add.IndividualEmailAddressController.onSubmit(mode: Mode = CheckMode)
+
+GET        /add/check-contact-details                           controllers.add.IndividualChooseContactDetailsController.onPageLoad(mode: Mode = NormalMode)
+POST       /add/check-contact-details                           controllers.add.IndividualChooseContactDetailsController.onSubmit(mode: Mode = NormalMode)
+GET        /add/change-check-contact-details                    controllers.add.IndividualChooseContactDetailsController.onPageLoad(mode: Mode = CheckMode)
+POST       /add/change-check-contact-details                    controllers.add.IndividualChooseContactDetailsController.onSubmit(mode: Mode = CheckMode)

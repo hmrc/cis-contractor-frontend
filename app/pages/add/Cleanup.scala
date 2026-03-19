@@ -30,15 +30,16 @@ trait Cleanup {
       .flatMap(_.remove(NationalInsuranceNumberYesNoPage))
       .flatMap(_.remove(SubAddressYesNoPage))
       .flatMap(_.remove(SubContactDetailsPage))
-      .flatMap(_.remove(SubcontractorContactDetailsYesNoPage))
       .flatMap(_.remove(SubcontractorNamePage))
       .flatMap(_.remove(SubcontractorsUniqueTaxpayerReferencePage))
+      .flatMap(_.remove(IndividualChooseContactDetailsPage))
       .flatMap(_.remove(SubNationalInsuranceNumberPage))
       .flatMap(_.remove(SubTradingNameYesNoPage))
       .flatMap(_.remove(TradingNameOfSubcontractorPage))
       .flatMap(_.remove(UniqueTaxpayerReferenceYesNoPage))
       .flatMap(_.remove(WorksReferenceNumberPage))
       .flatMap(_.remove(WorksReferenceNumberYesNoPage))
+      .flatMap(_.remove(IndividualPhoneNumberPage))
 
   // TODO Add unit test for removeLimitedCompanySubcontractor when company journey is done
   def removeLimitedCompanySubcontractor(userAnswers: UserAnswers): Try[UserAnswers] =

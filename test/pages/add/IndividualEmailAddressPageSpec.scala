@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,17 +14,18 @@
  * limitations under the License.
  */
 
-package forms.add
+package pages.add
 
-import forms.mappings.Mappings
-import play.api.data.Form
+import pages.behaviours.PageBehaviours
 
-import javax.inject.Inject
+class IndividualEmailAddressPageSpec extends PageBehaviours {
 
-class SubcontractorContactDetailsYesNoFormProvider @Inject() extends Mappings {
+  "IndividualEmailAddressPage" - {
 
-  def apply(): Form[Boolean] =
-    Form(
-      "value" -> boolean("subcontractorContactDetailsYesNo.error.required")
-    )
+    beRetrievable[String](IndividualEmailAddressPage)
+
+    beSettable[String](IndividualEmailAddressPage)
+
+    beRemovable[String](IndividualEmailAddressPage)
+  }
 }

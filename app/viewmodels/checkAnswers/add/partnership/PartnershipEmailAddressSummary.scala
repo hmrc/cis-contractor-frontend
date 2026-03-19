@@ -37,6 +37,7 @@ object PartnershipEmailAddressSummary {
             controllers.add.partnership.routes.PartnershipEmailAddressController.onPageLoad(CheckMode).url
           )
             .withVisuallyHiddenText(messages("partnershipEmailAddress.change.hidden"))
+            .withAttribute("id" -> "partnership-email-address")
         )
       )
     }
