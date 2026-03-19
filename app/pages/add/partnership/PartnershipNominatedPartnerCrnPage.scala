@@ -19,7 +19,7 @@ package pages.add.partnership
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 
-case object PartnershipNominatedPartnerCrnPage extends QuestionPage[String] {
+case object PartnershipNominatedPartnerCrnPage extends QuestionPage[String] with PartnershipJourney {
   override def path: JsPath     = JsPath \ toString
   override def toString: String = "nominatedPartnerCompanyRegistrationNumber"
 }
