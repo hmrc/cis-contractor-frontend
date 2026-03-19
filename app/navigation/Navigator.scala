@@ -19,10 +19,10 @@ package navigation
 import javax.inject.{Inject, Singleton}
 import pages.*
 import models.*
-import pages.add.*
-import pages.add.company.*
-import pages.add.partnership.*
-import pages.add.trust.*
+import pages.add.IndividualJourney
+import pages.add.company.CompanyJourney
+import pages.add.partnership.PartnershipJourney
+import pages.add.trust.TrustJourney
 import play.api.mvc.Call
 
 @Singleton
@@ -39,10 +39,10 @@ class Navigator @Inject() (
 
   private def navigatorFor(page: Page): NavigatorForJourney =
     page match {
-      case _: IndividualPage  => individualNavigator
-      case _: CompanyPage     => companyNavigator
-      case _: PartnershipPage => partnershipNavigator
-      case _: TrustPage       => trustNavigator
-      case _                  => sharedNavigator
+      case _: IndividualJourney  => individualNavigator
+      case _: CompanyJourney     => companyNavigator
+      case _: PartnershipJourney => partnershipNavigator
+      case _: TrustJourney       => trustNavigator
+      case _                     => sharedNavigator
     }
 }

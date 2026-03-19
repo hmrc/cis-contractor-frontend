@@ -20,7 +20,7 @@ import models.add.company.CompanyContactOptions
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 
-case object CompanyContactOptionsPage extends QuestionPage[CompanyContactOptions] with CompanyPage {
+case object CompanyContactOptionsPage extends QuestionPage[CompanyContactOptions] with CompanyJourney {
 
   override def path: JsPath = JsPath \ toString
 

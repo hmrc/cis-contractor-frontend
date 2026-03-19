@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-package pages.add.trust
+package pages.add.partnership
 
 import pages.Page
 
-trait TrustPage extends Page
+trait PartnershipJourney extends Page

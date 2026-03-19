@@ -26,7 +26,7 @@ import scala.util.Try
 
 case object PartnershipChooseContactDetailsPage
     extends QuestionPage[PartnershipChooseContactDetails]
-    with PartnershipPage {
+    with PartnershipJourney {
 
   override def path: JsPath = JsPath \ toString
 

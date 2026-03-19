@@ -18,4 +18,4 @@ package pages.add
 
 import pages.Page
 
-trait SharedPage extends Page
+trait SharedJourney extends Page

@@ -22,7 +22,7 @@ import play.api.libs.json.JsPath
 
 case object IndividualChooseContactDetailsPage
     extends QuestionPage[IndividualChooseContactDetails]
-    with IndividualPage {
+    with IndividualJourney {
 
   override def path: JsPath = JsPath \ toString
 
