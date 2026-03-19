@@ -122,7 +122,7 @@ class IndividualChooseContactDetailsControllerSpec extends SpecBase with Mockito
         status(result) mustEqual SEE_OTHER
         redirectLocation(
           result
-        ).value mustEqual controllers.add.routes.IndividualChooseContactDetailsController
+        ).value mustEqual controllers.add.routes.IndividualPhoneNumberController
           .onPageLoad(NormalMode)
           .url
       }

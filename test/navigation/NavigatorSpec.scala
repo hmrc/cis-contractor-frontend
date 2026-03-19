@@ -820,7 +820,7 @@ class NavigatorSpec extends SpecBase {
               IndividualChooseContactDetailsPage,
               ContactOptions.Email
             )
-          ) mustBe controllers.add.routes.IndividualChooseContactDetailsController.onPageLoad(NormalMode)
+          ) mustBe controllers.add.routes.IndividualEmailAddressController.onPageLoad(NormalMode)
         }
 
         "to itself when PhoneNumber is selected" in {
@@ -831,7 +831,7 @@ class NavigatorSpec extends SpecBase {
               IndividualChooseContactDetailsPage,
               ContactOptions.Phone
             )
-          ) mustBe controllers.add.routes.IndividualChooseContactDetailsController.onPageLoad(NormalMode)
+          ) mustBe controllers.add.routes.IndividualPhoneNumberController.onPageLoad(NormalMode)
         }
 
         "to itself when MobileNumber is selected" in {
@@ -842,7 +842,7 @@ class NavigatorSpec extends SpecBase {
               IndividualChooseContactDetailsPage,
               ContactOptions.Mobile
             )
-          ) mustBe controllers.add.routes.IndividualChooseContactDetailsController.onPageLoad(NormalMode)
+          ) mustBe controllers.add.routes.IndividualMobileNumberController.onPageLoad(NormalMode)
         }
 
         "to itself when NoDetails is selected" in {
@@ -853,7 +853,7 @@ class NavigatorSpec extends SpecBase {
               IndividualChooseContactDetailsPage,
               ContactOptions.NoDetails
             )
-          ) mustBe controllers.add.routes.IndividualChooseContactDetailsController.onPageLoad(NormalMode)
+          ) mustBe controllers.add.routes.CheckYourAnswersController.onPageLoad()
         }
 
         "to JourneyRecoveryPage when answer is not present" in {
@@ -1656,7 +1656,7 @@ class NavigatorSpec extends SpecBase {
               IndividualChooseContactDetailsPage,
               ContactOptions.Email
             )
-          ) mustBe controllers.add.routes.IndividualChooseContactDetailsController.onPageLoad(CheckMode)
+          ) mustBe controllers.add.routes.IndividualEmailAddressController.onPageLoad(CheckMode)
         }
 
         "to itself when PhoneNumber is selected" in {
@@ -1667,7 +1667,7 @@ class NavigatorSpec extends SpecBase {
               IndividualChooseContactDetailsPage,
               ContactOptions.Phone
             )
-          ) mustBe controllers.add.routes.IndividualChooseContactDetailsController.onPageLoad(CheckMode)
+          ) mustBe controllers.add.routes.IndividualPhoneNumberController.onPageLoad(CheckMode)
         }
 
         "to itself when MobileNumber is selected" in {
@@ -1678,7 +1678,7 @@ class NavigatorSpec extends SpecBase {
               IndividualChooseContactDetailsPage,
               ContactOptions.Mobile
             )
-          ) mustBe controllers.add.routes.IndividualChooseContactDetailsController.onPageLoad(CheckMode)
+          ) mustBe controllers.add.routes.IndividualMobileNumberController.onPageLoad(CheckMode)
         }
 
         "to itself when NoDetails is selected" in {
@@ -1689,7 +1689,7 @@ class NavigatorSpec extends SpecBase {
               IndividualChooseContactDetailsPage,
               ContactOptions.NoDetails
             )
-          ) mustBe controllers.add.routes.IndividualChooseContactDetailsController.onPageLoad(CheckMode)
+          ) mustBe CYA
         }
 
         "to CYA when answer is not present" in {

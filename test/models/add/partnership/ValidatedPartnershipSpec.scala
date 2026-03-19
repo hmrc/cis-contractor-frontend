@@ -31,27 +31,46 @@ class ValidatedPartnershipSpec extends SpecBase with Matchers {
 
   private val minRequired =
     emptyUserAnswers
-      .set(TypeOfSubcontractorPage, TypeOfSubcontractor.Partnership).success.value
-      .set(PartnershipNamePage, "Test Partnership").success.value
-      .set(PartnershipAddressYesNoPage, false).success.value
-      .set(PartnershipChooseContactDetailsPage, ContactOptions.NoDetails).success.value
-      .set(PartnershipHasUtrYesNoPage, false).success.value
-      .set(PartnershipNominatedPartnerNamePage, "Nominated Partner").success.value
-      .set(PartnershipNominatedPartnerUtrYesNoPage, false).success.value
-      .set(PartnershipNominatedPartnerNinoYesNoPage, false).success.value
-      .set(PartnershipNominatedPartnerCrnYesNoPage, false).success.value
-      .set(PartnershipWorksReferenceNumberYesNoPage, false).success.value
+      .set(TypeOfSubcontractorPage, TypeOfSubcontractor.Partnership)
+      .success
+      .value
+      .set(PartnershipNamePage, "Test Partnership")
+      .success
+      .value
+      .set(PartnershipAddressYesNoPage, false)
+      .success
+      .value
+      .set(PartnershipChooseContactDetailsPage, ContactOptions.NoDetails)
+      .success
+      .value
+      .set(PartnershipHasUtrYesNoPage, false)
+      .success
+      .value
+      .set(PartnershipNominatedPartnerNamePage, "Nominated Partner")
+      .success
+      .value
+      .set(PartnershipNominatedPartnerUtrYesNoPage, false)
+      .success
+      .value
+      .set(PartnershipNominatedPartnerNinoYesNoPage, false)
+      .success
+      .value
+      .set(PartnershipNominatedPartnerCrnYesNoPage, false)
+      .success
+      .value
+      .set(PartnershipWorksReferenceNumberYesNoPage, false)
+      .success
+      .value
 
   private def withStaleValue[A](
-                                 ua: models.UserAnswers,
-                                 page: pages.QuestionPage[A],
-                                 value: A
-                               )(implicit w: Writes[A]): models.UserAnswers =
+    ua: models.UserAnswers,
+    page: pages.QuestionPage[A],
+    value: A
+  )(implicit w: Writes[A]): models.UserAnswers =
     ua.data.setObject(page.path, Json.toJson(value)) match {
       case JsSuccess(updated, _) => ua.copy(data = updated)
       case JsError(_)            => ua
     }
-
 
   "ValidatedPartnership.build" - {
 
@@ -62,14 +81,18 @@ class ValidatedPartnershipSpec extends SpecBase with Matchers {
     "fail when TypeOfSubcontractor is not Partnership" in {
       val ua =
         minRequired
-          .set(TypeOfSubcontractorPage, TypeOfSubcontractor.Individualorsoletrader).success.value
+          .set(TypeOfSubcontractorPage, TypeOfSubcontractor.Individualorsoletrader)
+          .success
+          .value
 
       ValidatedPartnership.build(ua) mustBe Left(InvalidAnswer(TypeOfSubcontractorPage))
     }
 
     "fail when a required page is missing (PartnershipNamePage)" in {
       val ua = emptyUserAnswers
-        .set(TypeOfSubcontractorPage, TypeOfSubcontractor.Partnership).success.value
+        .set(TypeOfSubcontractorPage, TypeOfSubcontractor.Partnership)
+        .success
+        .value
 
       ValidatedPartnership.build(ua) mustBe Left(MissingAnswer(PartnershipNamePage))
     }
@@ -77,17 +100,22 @@ class ValidatedPartnershipSpec extends SpecBase with Matchers {
     "require email address when contact option is Email" in {
       val ua =
         minRequired
-          .set(PartnershipChooseContactDetailsPage, ContactOptions.Email).success.value
+          .set(PartnershipChooseContactDetailsPage, ContactOptions.Email)
+          .success
+          .value
 
-   
       ValidatedPartnership.build(ua) mustBe Left(MissingAnswer(PartnershipEmailAddressPage))
     }
 
     "build when contact option is Email and email address is present" in {
       val ua =
         minRequired
-          .set(PartnershipChooseContactDetailsPage, ContactOptions.Email).success.value
-          .set(PartnershipEmailAddressPage, "a@b.com").success.value
+          .set(PartnershipChooseContactDetailsPage, ContactOptions.Email)
+          .success
+          .value
+          .set(PartnershipEmailAddressPage, "a@b.com")
+          .success
+          .value
 
       ValidatedPartnership.build(ua) mustBe a[Right[?, ?]]
     }
@@ -101,7 +129,9 @@ class ValidatedPartnershipSpec extends SpecBase with Matchers {
     "require address when AddressYesNo is true" in {
       val ua =
         minRequired
-          .set(PartnershipAddressYesNoPage, true).success.value
+          .set(PartnershipAddressYesNoPage, true)
+          .success
+          .value
 
       ValidatedPartnership.build(ua) mustBe Left(InvalidAnswer(PartnershipAddressPage))
     }
@@ -110,14 +140,15 @@ class ValidatedPartnershipSpec extends SpecBase with Matchers {
       val address = InternationalAddress("1", None, "City", None, "AA1 1AA", "GB")
       val ua      = withStaleValue(minRequired, PartnershipAddressPage, address)
 
-    
       ValidatedPartnership.build(ua) mustBe Left(InvalidAnswer(PartnershipAddressPage))
     }
 
     "require partnership UTR when HasUtrYesNo is true" in {
       val ua =
         minRequired
-          .set(PartnershipHasUtrYesNoPage, true).success.value
+          .set(PartnershipHasUtrYesNoPage, true)
+          .success
+          .value
 
       ValidatedPartnership.build(ua) mustBe Left(InvalidAnswer(PartnershipUniqueTaxpayerReferencePage))
     }
@@ -130,7 +161,9 @@ class ValidatedPartnershipSpec extends SpecBase with Matchers {
     "require nominated partner NINO when NinoYesNo is true" in {
       val ua =
         minRequired
-          .set(PartnershipNominatedPartnerNinoYesNoPage, true).success.value
+          .set(PartnershipNominatedPartnerNinoYesNoPage, true)
+          .success
+          .value
 
       ValidatedPartnership.build(ua) mustBe Left(InvalidAnswer(PartnershipNominatedPartnerNinoPage))
     }
@@ -143,7 +176,9 @@ class ValidatedPartnershipSpec extends SpecBase with Matchers {
     "require nominated partner CRN when CrnYesNo is true" in {
       val ua =
         minRequired
-          .set(PartnershipNominatedPartnerCrnYesNoPage, true).success.value
+          .set(PartnershipNominatedPartnerCrnYesNoPage, true)
+          .success
+          .value
 
       ValidatedPartnership.build(ua) mustBe Left(InvalidAnswer(PartnershipNominatedPartnerCrnPage))
     }
@@ -156,7 +191,9 @@ class ValidatedPartnershipSpec extends SpecBase with Matchers {
     "require works reference number when WorksReferenceNumberYesNo is true" in {
       val ua =
         minRequired
-          .set(PartnershipWorksReferenceNumberYesNoPage, true).success.value
+          .set(PartnershipWorksReferenceNumberYesNoPage, true)
+          .success
+          .value
 
       ValidatedPartnership.build(ua) mustBe Left(InvalidAnswer(PartnershipWorksReferenceNumberPage))
     }
