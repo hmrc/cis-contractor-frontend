@@ -26,12 +26,11 @@ import pages.add.partnership.*
 
 class PartnershipNavigatorSpec extends SpecBase {
 
-  val navigator = new PartnershipNavigator
+  val navigator                    = new PartnershipNavigator
   private lazy val journeyRecovery = routes.JourneyRecoveryController.onPageLoad()
-  private lazy val CYA = controllers.add.routes.CheckYourAnswersController.onPageLoad()
+  private lazy val CYA             = controllers.add.routes.CheckYourAnswersController.onPageLoad()
   private lazy val partnershipCYA  =
     controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
-
 
   "PartnershipNavigator" - {
 
@@ -110,8 +109,6 @@ class PartnershipNavigatorSpec extends SpecBase {
         ) mustBe partnershipCYA
       }
 
-
-
       "must go from a PartnershipAddressPage to PartnershipChooseContactDetailsController in NormalMode" in {
         navigator.nextPage(
           PartnershipAddressPage,
@@ -119,8 +116,6 @@ class PartnershipNavigatorSpec extends SpecBase {
           UserAnswers("id")
         ) mustBe controllers.add.partnership.routes.PartnershipChooseContactDetailsController.onPageLoad(NormalMode)
       }
-
-
 
       "must go from a PartnershipWorksReferenceNumberYesNoPage to PartnershipWorksReferenceNumber page when true" in {
         navigator.nextPage(
@@ -412,8 +407,6 @@ class PartnershipNavigatorSpec extends SpecBase {
         ) mustBe journeyRecovery
       }
 
-
-
       "must go from PartnershipAddressYesNoPage to PartnershipAddressController when true and address not yet filled in CheckMode" in {
         navigator.nextPage(
           PartnershipAddressYesNoPage,
@@ -646,7 +639,6 @@ class PartnershipNavigatorSpec extends SpecBase {
           emptyUserAnswers
         ) mustBe partnershipCYA
       }
-
 
       "must go from PartnershipNominatedPartnerCrnPage to PartnershipCheckYourAnswers" in {
         navigator.nextPage(

@@ -34,7 +34,7 @@ class TrustNavigatorSpec extends SpecBase {
         case object UnknownPage extends Page
         navigator.nextPage(UnknownPage, NormalMode, UserAnswers("id")) mustBe routes.IndexController.onPageLoad()
       }
-      
+
     }
 
     "in Check mode" - {
@@ -49,7 +49,7 @@ class TrustNavigatorSpec extends SpecBase {
         ) mustBe controllers.add.routes.CheckYourAnswersController
           .onPageLoad()
       }
-      
+
     }
 
   }

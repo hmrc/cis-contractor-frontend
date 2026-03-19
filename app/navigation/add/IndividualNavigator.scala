@@ -67,19 +67,19 @@ class IndividualNavigator @Inject() () extends NavigatorForJourney {
   }
 
   private val checkRouteMap: Page => UserAnswers => Call = {
-    case SubTradingNameYesNoPage => navigatorFromSubTradingNameYesNoPage(CheckMode)(_)
-    case SubAddressYesNoPage => navigatorFromSubAddressYesNoPage(CheckMode)(_)
-    case NationalInsuranceNumberYesNoPage => navigatorFromNationalInsuranceNumberYesNoPage(CheckMode)(_)
-    case UniqueTaxpayerReferenceYesNoPage => navigatorFromUniqueTaxpayerReferenceYesNoPage(CheckMode)(_)
-    case WorksReferenceNumberYesNoPage => navigatorFromWorksReferenceNumberYesNoPage(CheckMode)(_)
+    case SubTradingNameYesNoPage            => navigatorFromSubTradingNameYesNoPage(CheckMode)(_)
+    case SubAddressYesNoPage                => navigatorFromSubAddressYesNoPage(CheckMode)(_)
+    case NationalInsuranceNumberYesNoPage   => navigatorFromNationalInsuranceNumberYesNoPage(CheckMode)(_)
+    case UniqueTaxpayerReferenceYesNoPage   => navigatorFromUniqueTaxpayerReferenceYesNoPage(CheckMode)(_)
+    case WorksReferenceNumberYesNoPage      => navigatorFromWorksReferenceNumberYesNoPage(CheckMode)(_)
     case IndividualChooseContactDetailsPage => navigatorFromIndividualChooseContactDetailsPage(CheckMode)(_)
-    case IndividualMobileNumberPage =>
+    case IndividualMobileNumberPage         =>
       _ => controllers.add.routes.CheckYourAnswersController.onPageLoad()
-    case IndividualPhoneNumberPage =>
+    case IndividualPhoneNumberPage          =>
       _ => controllers.add.routes.CheckYourAnswersController.onPageLoad()
-    case IndividualEmailAddressPage =>
+    case IndividualEmailAddressPage         =>
       _ => controllers.add.routes.CheckYourAnswersController.onPageLoad()
-    case _ => _ => controllers.add.routes.CheckYourAnswersController.onPageLoad()
+    case _                                  => _ => controllers.add.routes.CheckYourAnswersController.onPageLoad()
   }
 
   private def navigatorFromSubTradingNameYesNoPage(mode: Mode)(ua: UserAnswers): Call =
@@ -185,17 +185,16 @@ class IndividualNavigator @Inject() () extends NavigatorForJourney {
 
   private def navigatorFromIndividualChooseContactDetailsPage(mode: Mode)(userAnswers: UserAnswers): Call =
     (userAnswers.get(IndividualChooseContactDetailsPage), mode) match {
-      case (Some(Email), _) =>
+      case (Some(Email), _)  =>
         controllers.add.routes.IndividualChooseContactDetailsController.onPageLoad(mode)
-      case (Some(Phone), _) =>
+      case (Some(Phone), _)  =>
         controllers.add.routes.IndividualChooseContactDetailsController.onPageLoad(mode)
       case (Some(Mobile), _) =>
         controllers.add.routes.IndividualChooseContactDetailsController.onPageLoad(mode)
-      case (Some(_), _) =>
+      case (Some(_), _)      =>
         controllers.add.routes.IndividualChooseContactDetailsController.onPageLoad(mode)
-      case (_, CheckMode) => controllers.add.routes.CheckYourAnswersController.onPageLoad()
-      case _ => routes.JourneyRecoveryController.onPageLoad()
+      case (_, CheckMode)    => controllers.add.routes.CheckYourAnswersController.onPageLoad()
+      case _                 => routes.JourneyRecoveryController.onPageLoad()
     }
-  
-  
+
 }

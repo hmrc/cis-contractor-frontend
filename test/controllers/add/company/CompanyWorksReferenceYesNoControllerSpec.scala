@@ -41,7 +41,7 @@ class CompanyWorksReferenceYesNoControllerSpec extends SpecBase with MockitoSuga
 
   def onwardRoute: Call = Call("GET", "/foo")
 
-  val formProvider = new CompanyWorksReferenceYesNoFormProvider()
+  val formProvider        = new CompanyWorksReferenceYesNoFormProvider()
   val form: Form[Boolean] = formProvider()
 
   lazy val companyWorksReferenceYesNoGetRoute: String =
@@ -95,7 +95,7 @@ class CompanyWorksReferenceYesNoControllerSpec extends SpecBase with MockitoSuga
     "must redirect to the next page when valid data with value Yes is submitted" in {
 
       val mockSessionRepository = mock[SessionRepository]
-      val mockNavigator = mock[Navigator]
+      val mockNavigator         = mock[Navigator]
 
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
       when(mockNavigator.nextPage(any(), any(), any())).thenReturn(onwardRoute)
@@ -123,7 +123,7 @@ class CompanyWorksReferenceYesNoControllerSpec extends SpecBase with MockitoSuga
     "must redirect to the next page when valid data with value No is submitted" in {
 
       val mockSessionRepository = mock[SessionRepository]
-      val mockNavigator = mock[Navigator]
+      val mockNavigator         = mock[Navigator]
 
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
       when(mockNavigator.nextPage(any(), any(), any())).thenReturn(onwardRoute)

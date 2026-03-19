@@ -26,23 +26,23 @@ import pages.add.trust.*
 import play.api.mvc.Call
 
 @Singleton
-class Navigator @Inject()(
-                           individualNavigator: navigation.add.IndividualNavigator,
-                           companyNavigator: navigation.add.CompanyNavigator,
-                           partnershipNavigator: navigation.add.PartnershipNavigator,
-                           trustNavigator: navigation.add.TrustNavigator,
-                           sharedNavigator: navigation.add.SharedNavigator
-                         ) {
+class Navigator @Inject() (
+  individualNavigator: navigation.add.IndividualNavigator,
+  companyNavigator: navigation.add.CompanyNavigator,
+  partnershipNavigator: navigation.add.PartnershipNavigator,
+  trustNavigator: navigation.add.TrustNavigator,
+  sharedNavigator: navigation.add.SharedNavigator
+) {
 
   def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers): Call =
     navigatorFor(page).nextPage(page, mode, userAnswers)
 
   private def navigatorFor(page: Page): NavigatorForJourney =
     page match {
-      case _: IndividualPage => individualNavigator
-      case _: CompanyPage => companyNavigator
+      case _: IndividualPage  => individualNavigator
+      case _: CompanyPage     => companyNavigator
       case _: PartnershipPage => partnershipNavigator
-      case _: TrustPage => trustNavigator
-      case _ => sharedNavigator
+      case _: TrustPage       => trustNavigator
+      case _                  => sharedNavigator
     }
 }

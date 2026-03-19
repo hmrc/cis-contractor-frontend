@@ -26,9 +26,9 @@ import pages.add.*
 
 class IndividualNavigatorSpec extends SpecBase {
 
-  val navigator = new IndividualNavigator
+  val navigator                    = new IndividualNavigator
   private lazy val journeyRecovery = routes.JourneyRecoveryController.onPageLoad()
-  private lazy val CYA = controllers.add.routes.CheckYourAnswersController.onPageLoad()
+  private lazy val CYA             = controllers.add.routes.CheckYourAnswersController.onPageLoad()
 
   "IndividualNavigator" - {
 
@@ -678,9 +678,6 @@ class IndividualNavigatorSpec extends SpecBase {
         result mustBe CYA
       }
 
-
-
-
       "must go from UniqueTaxpayerReferenceYesNoPage to CYA when true and SubcontractorsUniqueTaxpayerReferencePage is already answered" in {
         val ua =
           emptyUserAnswers
@@ -720,6 +717,5 @@ class IndividualNavigatorSpec extends SpecBase {
     }
 
   }
-
 
 }
