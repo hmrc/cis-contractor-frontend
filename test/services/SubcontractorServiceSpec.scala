@@ -24,12 +24,13 @@ import models.requests.CreateAndUpdateSubcontractorPayload
 import models.requests.CreateAndUpdateSubcontractorPayload.{IndividualOrSoleTraderPayload, PartnershipPayload}
 import models.subcontractor.GetSubcontractorUTRsResponse
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
-import org.mockito.Mockito.{verify, verifyNoMoreInteractions, when}
-import org.scalatestplus.mockito.MockitoSugar
+import org.mockito.Mockito.{times,verify, verifyNoMoreInteractions, when}
 import pages.add.*
 import pages.add.partnership.*
 import queries.CisIdQuery
 import uk.gov.hmrc.http.HeaderCarrier
+import org.mockito.ArgumentCaptor
+import org.scalatestplus.mockito.MockitoSugar
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -339,7 +340,9 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
         verifyNoMoreInteractions(mockConnector)
       }
 
-      "should create and update subcontractor (Partnership) with NO contact details" in {
+
+
+      "should create and update subcontractor (Partnership) with NO contact details (no contact fields sent)" in {
         val mockConnector = mock[ConstructionIndustrySchemeConnector]
         val service       = new SubcontractorService(mockConnector)
 
@@ -349,34 +352,44 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
             .success
             .value
 
-        val expectedPayload: CreateAndUpdateSubcontractorPayload =
-          PartnershipPayload(
-            cisId = cisId,
-            subcontractorType = TypeOfSubcontractor.Partnership,
-            utr = Some("1234567890"),
-            partnerUtr = None,
-            partnershipTradingName = Some("Test Partnership"),
-            partnerTradingName = Some("Nominated Partner"),
-            partnerNino = Some("AA123456A"),
-            partnerCrn = Some("AC012345"),
-            addressLine1 = Some("p1"),
-            addressLine2 = Some("p2"),
-            city = Some("London"),
-            county = Some("Hackney"),
-            postcode = Some("N1 5AP"),
-            country = Some("United Kingdom"),
-            emailAddress = None,
-            phoneNumber = None,
-            mobilePhoneNumber = None,
-            worksReferenceNumber = Some("WRN-PTN")
-          )
-
         when(mockConnector.createAndUpdateSubcontractor(any[CreateAndUpdateSubcontractorPayload])(any[HeaderCarrier]))
           .thenReturn(Future.successful(()))
 
         service.createAndUpdateSubcontractor(userAnswers).futureValue mustBe (())
 
-        verify(mockConnector).createAndUpdateSubcontractor(eqTo(expectedPayload))(any[HeaderCarrier])
+        val captor: ArgumentCaptor[CreateAndUpdateSubcontractorPayload] =
+          ArgumentCaptor.forClass(classOf[CreateAndUpdateSubcontractorPayload])
+
+        verify(mockConnector, times(1))
+          .createAndUpdateSubcontractor(captor.capture())(any[HeaderCarrier])
+
+        val sent = captor.getValue
+
+        sent mustBe a[PartnershipPayload]
+
+        val partnershipSent = sent.asInstanceOf[PartnershipPayload]
+
+        partnershipSent mustBe PartnershipPayload(
+          cisId = cisId,
+          subcontractorType = TypeOfSubcontractor.Partnership,
+          utr = Some("1234567890"),
+          partnerUtr = None,
+          partnershipTradingName = Some("Test Partnership"),
+          partnerTradingName = Some("Nominated Partner"),
+          partnerNino = Some("AA123456A"),
+          partnerCrn = Some("AC012345"),
+          addressLine1 = Some("p1"),
+          addressLine2 = Some("p2"),
+          city = Some("London"),
+          county = Some("Hackney"),
+          postcode = Some("N1 5AP"),
+          country = Some("United Kingdom"),
+          emailAddress = None,
+          phoneNumber = None,
+          mobilePhoneNumber = None,
+          worksReferenceNumber = Some("WRN-PTN")
+        )
+
         verifyNoMoreInteractions(mockConnector)
       }
 
