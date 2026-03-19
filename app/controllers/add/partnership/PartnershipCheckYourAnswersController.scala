@@ -30,6 +30,7 @@ import viewmodels.checkAnswers.add.TypeOfSubcontractorSummary
 import viewmodels.checkAnswers.add.partnership.{PartnershipWorksReferenceNumberYesNoSummary, *}
 import viewmodels.govuk.summarylist.*
 import views.html.add.partnership.PartnershipCheckYourAnswersView
+import scala.concurrent.Future
 
 import javax.inject.Inject
 
@@ -84,5 +85,18 @@ class PartnershipCheckYourAnswersController @Inject() (
         Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
     }
   }
+
+  def onSubmit(): Action[AnyContent] =
+    (identify andThen getData andThen requireData).async { implicit request =>
+      ValidatedPartnership.build(request.userAnswers) match {
+        case Right(_)    =>
+          Future.successful(
+            Redirect(controllers.add.partnership.routes.SubcontractorAddedController.onPageLoad())
+          )
+        case Left(error) =>
+          logger.error(s"[PartnershipCheckYourAnswersController.onSubmit] Validation failed: $error")
+          Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+      }
+    }
 
 }
