@@ -55,12 +55,26 @@ lazy val microservice = (project in file("."))
     retrieveManaged := true,
     pipelineStages := Seq(digest),
     Assets / pipelineStages := Seq(concat),
-    columnarFmtConfig := ColumnarConfig(
-      sections        = appRoutesSections,
-      lineLimit       = 160,
-      fileGlob        = "conf/app.routes",
-      fileHeader      = "# Routes",
-      formatterConfig = ColumnarFormatterConfig.playRoutes
+    columnarFmtConfig := Seq(
+      ColumnarConfig(
+        sections        = appRoutesSections,
+        lineLimit       = 160 * 1,
+        fileGlob        = "conf/app.routes",
+        fileHeader      = "# Routes",
+        formatterConfig = ColumnarFormatterConfig.playRoutes
+      ),
+      ColumnarConfig(
+        sections        = messagesSections,
+        lineLimit       = 120 * 1,
+        fileGlob        = "conf/messages.*",
+        formatterConfig = ColumnarFormatterConfig(
+          parse        = ColumnarFormatterConfig.playRoutes.parse,
+          primaryCol   = 0,
+          secondaryCol = 0,
+          dedupeKey    = cols => cols(0),
+          subkeyFn     = cols => cols(0).takeWhile(_ != '.')
+        )
+      )
     )
   )
 lazy val testSettings: Seq[Def.Setting[?]] = Seq(
@@ -72,6 +86,19 @@ lazy val it =
   (project in file("it"))
     .enablePlugins(PlayScala)
     .dependsOn(microservice % "test->test")
+
+lazy val messagesSections = Seq(
+  ColumnarSection("# Infrastructure",
+    primaryPrefixes = Seq("service", "site", "date", "error", "timeout", "index",
+                          "checkYourAnswers", "journeyRecovery", "signedOut")),
+  ColumnarSection("# Errors & Auth",
+    primaryPrefixes = Seq("pageNotFound", "systemError", "accessDenied", "unauthorised")),
+  ColumnarSection("# Individual and Common"),
+  ColumnarSection("# Partnership",
+    primaryPrefixes = Seq("partnership")),
+  ColumnarSection("# Company",
+    primaryPrefixes = Seq("company"))
+)
 
 lazy val appRoutesSections = Seq(
   ColumnarSection("# Infrastructure"),
