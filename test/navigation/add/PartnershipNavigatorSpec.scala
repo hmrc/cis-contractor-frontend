@@ -26,362 +26,263 @@ import pages.add.partnership.*
 
 class PartnershipNavigatorSpec extends SpecBase {
 
-  val navigator                    = new PartnershipNavigator
+  val navigator = new PartnershipNavigator
   private lazy val journeyRecovery = routes.JourneyRecoveryController.onPageLoad()
-  private lazy val CYA             = controllers.add.routes.CheckYourAnswersController.onPageLoad()
-  private lazy val partnershipCYA  =
+  private lazy val CYA = controllers.add.routes.CheckYourAnswersController.onPageLoad()
+  private lazy val partnershipCYA =
     controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
 
   "PartnershipNavigator" - {
 
     "in Normal mode" - {
 
-      "must go from a page that doesn't exist in the route map to Index" in {
-
-        case object UnknownPage extends Page
-        navigator.nextPage(UnknownPage, NormalMode, UserAnswers("id")) mustBe routes.IndexController.onPageLoad()
-      }
-
-      "must go from PartnershipNamePage to PartnershipHasUtrYesNoController in NormalMode" in {
-        navigator.nextPage(
-          PartnershipNamePage,
-          NormalMode,
-          emptyUserAnswers
-        ) mustBe controllers.add.partnership.routes.PartnershipHasUtrYesNoController.onPageLoad(NormalMode)
-      }
-
-      "must go from a PartnershipHasUtrYesNo to PartnershipUniqueTaxpayerReferencePage when true" in {
-        navigator.nextPage(
-          PartnershipHasUtrYesNoPage,
-          NormalMode,
-          emptyUserAnswers.setOrException(PartnershipHasUtrYesNoPage, true)
-        ) mustBe controllers.add.partnership.routes.PartnershipUniqueTaxpayerReferenceController.onPageLoad(NormalMode)
-      }
-
-      "must go from a PartnershipHasUtrYesNo to PartnershipWorksReferenceNumberYesNoCPage when false" in {
-        navigator.nextPage(
-          PartnershipHasUtrYesNoPage,
-          NormalMode,
-          emptyUserAnswers.setOrException(PartnershipHasUtrYesNoPage, false)
-        ) mustBe controllers.add.partnership.routes.PartnershipWorksReferenceNumberYesNoController
-          .onPageLoad(NormalMode)
-      }
-
-      "must go from a PartnershipHasUtrYesNo to JourneyRecovery page when no answer" in {
-        navigator.nextPage(
-          PartnershipHasUtrYesNoPage,
-          NormalMode,
-          emptyUserAnswers
-        ) mustBe journeyRecovery
-      }
-
-      "must go from a PartnershipHasUtrYesNo to PartnershipUniqueTaxpayerReference page when true in CheckMode" in {
-        navigator.nextPage(
-          PartnershipHasUtrYesNoPage,
-          CheckMode,
-          emptyUserAnswers.setOrException(PartnershipHasUtrYesNoPage, true)
-        ) mustBe controllers.add.partnership.routes.PartnershipUniqueTaxpayerReferenceController
-          .onPageLoad(CheckMode)
-      }
-
-      "must go from a PartnershipHasUtrYesNo to PartnershipCheckYourAnswers page when false in CheckMode" in {
-        navigator.nextPage(
-          PartnershipHasUtrYesNoPage,
-          CheckMode,
-          emptyUserAnswers.setOrException(PartnershipHasUtrYesNoPage, false)
-        ) mustBe partnershipCYA
-      }
-
-      "must go from a PartnershipUniqueTaxpayerReference to PartnershipWorksReferenceNumberYesNo page" in {
-        navigator.nextPage(
-          PartnershipUniqueTaxpayerReferencePage,
-          NormalMode,
-          emptyUserAnswers.setOrException(PartnershipUniqueTaxpayerReferencePage, "5860920998")
-        ) mustBe controllers.add.partnership.routes.PartnershipWorksReferenceNumberYesNoController
-          .onPageLoad(NormalMode)
-      }
-
-      "must go from a PartnershipUniqueTaxpayerReference to PartnershipCheckYourAnswers page in CheckMode" in {
-        navigator.nextPage(
-          PartnershipUniqueTaxpayerReferencePage,
-          CheckMode,
-          emptyUserAnswers.setOrException(PartnershipUniqueTaxpayerReferencePage, "5860920998")
-        ) mustBe partnershipCYA
-      }
-
-      "must go from a PartnershipAddressPage to PartnershipChooseContactDetailsController in NormalMode" in {
-        navigator.nextPage(
-          PartnershipAddressPage,
-          NormalMode,
-          UserAnswers("id")
-        ) mustBe controllers.add.partnership.routes.PartnershipChooseContactDetailsController.onPageLoad(NormalMode)
-      }
-
-      "must go from a PartnershipWorksReferenceNumberYesNoPage to PartnershipWorksReferenceNumber page when true" in {
+    "must go from a PartnershipWorksReferenceNumberYesNoPage to PartnershipWorksReferenceNumber page when true" in {
         navigator.nextPage(
           PartnershipWorksReferenceNumberYesNoPage,
           NormalMode,
           emptyUserAnswers.setOrException(PartnershipWorksReferenceNumberYesNoPage, true)
         ) mustBe controllers.add.partnership.routes.PartnershipWorksReferenceNumberController
           .onPageLoad(NormalMode)
-      }
+     }
 
-      "must go from a PartnershipWorksReferenceNumberYesNoPage to PartnershipAddressYesNo page when false" in {
+    "must go from a PartnershipWorksReferenceNumberYesNoPage to PartnershipAddressYesNo page when false" in {
+      navigator.nextPage(
+        PartnershipWorksReferenceNumberYesNoPage,
+        NormalMode,
+        emptyUserAnswers.setOrException(PartnershipWorksReferenceNumberYesNoPage, false)
+      ) mustBe controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
+    }
+
+    "must go from a PartnershipWorksReferenceNumberYesNoPage to journey recovery when incomplete info provided" in {
+      navigator.nextPage(
+        PartnershipWorksReferenceNumberYesNoPage,
+        NormalMode,
+        emptyUserAnswers
+      ) mustBe journeyRecovery
+    }
+
+    "must go from a PartnershipWorksReferenceNumberPage to PartnershipCheckYourAnswers page" in {
+      navigator.nextPage(
+        PartnershipWorksReferenceNumberPage,
+        NormalMode,
+        emptyUserAnswers.setOrException(PartnershipUniqueTaxpayerReferencePage, "UTR-123")
+      ) mustBe controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
+    }
+
+    "must go from PartnershipAddressYesNoPage to PartnershipAddressController when true in NormalMode" in {
+      navigator.nextPage(
+        PartnershipAddressYesNoPage,
+        NormalMode,
+        emptyUserAnswers.setOrException(PartnershipAddressYesNoPage, true)
+      ) mustBe controllers.add.partnership.routes.PartnershipAddressController.onPageLoad(NormalMode)
+    }
+
+    "must go from PartnershipAddressYesNoPage to PartnershipChooseContactDetailsController when false in NormalMode" in {
+      navigator.nextPage(
+        PartnershipAddressYesNoPage,
+        NormalMode,
+        emptyUserAnswers.setOrException(PartnershipAddressYesNoPage, false)
+      ) mustBe controllers.add.partnership.routes.PartnershipChooseContactDetailsController.onPageLoad(NormalMode)
+    }
+
+    "must go from PartnershipAddressYesNoPage to JourneyRecovery when no answer in NormalMode" in {
+      navigator.nextPage(
+        PartnershipAddressYesNoPage,
+        NormalMode,
+        emptyUserAnswers
+      ) mustBe journeyRecovery
+    }
+
+    "must go from PartnershipNominatedPartnerNinoYesNoPage to PartnershipNominatedPartnerNinoController when true in NormalMode" in {
+      navigator.nextPage(
+        PartnershipNominatedPartnerNinoYesNoPage,
+        NormalMode,
+        emptyUserAnswers.setOrException(PartnershipNominatedPartnerNinoYesNoPage, true)
+      ) mustBe controllers.add.partnership.routes.PartnershipNominatedPartnerNinoController.onPageLoad(NormalMode)
+    }
+
+    "must go from PartnershipNominatedPartnerNinoYesNoPage to PartnershipNominatedPartnerCrnYesNoController when false in NormalMode" in {
+      navigator.nextPage(
+        PartnershipNominatedPartnerNinoYesNoPage,
+        NormalMode,
+        emptyUserAnswers.setOrException(PartnershipNominatedPartnerNinoYesNoPage, false)
+      ) mustBe controllers.add.partnership.routes.PartnershipNominatedPartnerCrnYesNoController.onPageLoad(NormalMode)
+    }
+
+    "must go from PartnershipNominatedPartnerNinoYesNoPage to JourneyRecovery when no answer in NormalMode" in {
+      navigator.nextPage(
+        PartnershipNominatedPartnerNinoYesNoPage,
+        NormalMode,
+        emptyUserAnswers
+      ) mustBe journeyRecovery
+    }
+    "must go from a PartnershipNominatedPartnerNamePage to PartnershipNominatedPartnerUtrYesNoController" in {
+      navigator.nextPage(
+        PartnershipNominatedPartnerNamePage,
+        NormalMode,
+        UserAnswers("id")
+      ) mustBe controllers.add.partnership.routes.PartnershipNominatedPartnerUtrYesNoController.onPageLoad(NormalMode)
+    }
+
+    "must go from PartnershipNominatedPartnerCrnYesNo" - {
+      "to next page when answer is Yes" in {
         navigator.nextPage(
-          PartnershipWorksReferenceNumberYesNoPage,
+          PartnershipNominatedPartnerCrnYesNoPage,
           NormalMode,
-          emptyUserAnswers.setOrException(PartnershipWorksReferenceNumberYesNoPage, false)
-        ) mustBe controllers.add.partnership.routes.PartnershipAddressYesNoController.onPageLoad(NormalMode)
+          emptyUserAnswers.setOrException(PartnershipNominatedPartnerCrnYesNoPage, true)
+        ) mustBe controllers.add.partnership.routes.PartnershipNominatedPartnerCrnController
+          .onPageLoad(NormalMode)
       }
 
-      "must go from a PartnershipWorksReferenceNumberYesNoPage to journey recovery when incomplete info provided" in {
+      "to next page when answer is No" in {
         navigator.nextPage(
-          PartnershipWorksReferenceNumberYesNoPage,
+          PartnershipNominatedPartnerCrnYesNoPage,
+          NormalMode,
+          emptyUserAnswers.setOrException(PartnershipNominatedPartnerCrnYesNoPage, false)
+        ) mustBe controllers.add.partnership.routes.PartnershipWorksReferenceNumberYesNoController
+          .onPageLoad(NormalMode)
+      }
+
+      "to JourneyRecoveryPage when answer is not present" in {
+        navigator.nextPage(
+          PartnershipNominatedPartnerCrnYesNoPage,
           NormalMode,
           emptyUserAnswers
         ) mustBe journeyRecovery
       }
+    }
 
-      "must go from a PartnershipWorksReferenceNumberPage to PartnershipAddressYesNo page" in {
+    "must go from a PartnershipEmailAddressPage to PartnershipHasUtrYesNoController" in {
+      navigator.nextPage(
+        PartnershipEmailAddressPage,
+        NormalMode,
+        UserAnswers("id")
+      ) mustBe controllers.add.partnership.routes.PartnershipHasUtrYesNoController.onPageLoad(NormalMode)
+    }
+
+    "must go from PartnershipChooseContactDetailsPage" - {
+      "to itself when Email is selected" in {
         navigator.nextPage(
-          PartnershipWorksReferenceNumberPage,
+          PartnershipChooseContactDetailsPage,
           NormalMode,
-          emptyUserAnswers.setOrException(PartnershipUniqueTaxpayerReferencePage, "UTR-123")
-        ) mustBe controllers.add.partnership.routes.PartnershipAddressYesNoController.onPageLoad(NormalMode)
-      }
-
-      "must go from a PartnershipWorksReferenceNumberPage to PartnershipCheckYourAnswers page in CheckMode" in {
-        navigator.nextPage(
-          PartnershipWorksReferenceNumberPage,
-          CheckMode,
-          emptyUserAnswers.setOrException(PartnershipUniqueTaxpayerReferencePage, "UTR-123")
-        ) mustBe partnershipCYA
-      }
-
-      "must go from PartnershipAddressYesNoPage to PartnershipAddressController when true in NormalMode" in {
-        navigator.nextPage(
-          PartnershipAddressYesNoPage,
-          NormalMode,
-          emptyUserAnswers.setOrException(PartnershipAddressYesNoPage, true)
-        ) mustBe controllers.add.partnership.routes.PartnershipAddressController.onPageLoad(NormalMode)
-      }
-
-      "must go from PartnershipAddressYesNoPage to PartnershipChooseContactDetailsController when false in NormalMode" in {
-        navigator.nextPage(
-          PartnershipAddressYesNoPage,
-          NormalMode,
-          emptyUserAnswers.setOrException(PartnershipAddressYesNoPage, false)
-        ) mustBe controllers.add.partnership.routes.PartnershipChooseContactDetailsController.onPageLoad(NormalMode)
-      }
-
-      "must go from PartnershipAddressYesNoPage to JourneyRecovery when no answer in NormalMode" in {
-        navigator.nextPage(
-          PartnershipAddressYesNoPage,
-          NormalMode,
-          emptyUserAnswers
-        ) mustBe journeyRecovery
-      }
-
-      "must go from PartnershipNominatedPartnerNinoYesNoPage to PartnershipNominatedPartnerNinoController when true in NormalMode" in {
-        navigator.nextPage(
-          PartnershipNominatedPartnerNinoYesNoPage,
-          NormalMode,
-          emptyUserAnswers.setOrException(PartnershipNominatedPartnerNinoYesNoPage, true)
-        ) mustBe controllers.add.partnership.routes.PartnershipNominatedPartnerNinoController.onPageLoad(NormalMode)
-      }
-
-      "must go from PartnershipNominatedPartnerNinoYesNoPage to PartnershipNominatedPartnerCrnYesNoController when false in NormalMode" in {
-        navigator.nextPage(
-          PartnershipNominatedPartnerNinoYesNoPage,
-          NormalMode,
-          emptyUserAnswers.setOrException(PartnershipNominatedPartnerNinoYesNoPage, false)
-        ) mustBe controllers.add.partnership.routes.PartnershipNominatedPartnerCrnYesNoController.onPageLoad(NormalMode)
-      }
-
-      "must go from PartnershipNominatedPartnerNinoYesNoPage to JourneyRecovery when no answer in NormalMode" in {
-        navigator.nextPage(
-          PartnershipNominatedPartnerNinoYesNoPage,
-          NormalMode,
-          emptyUserAnswers
-        ) mustBe journeyRecovery
-      }
-      "must go from a PartnershipNominatedPartnerNamePage to PartnershipNominatedPartnerNamePage" in {
-        navigator.nextPage(
-          PartnershipNominatedPartnerNamePage,
-          NormalMode,
-          UserAnswers("id")
-        ) mustBe controllers.add.partnership.routes.PartnershipNominatedPartnerNameController.onPageLoad(NormalMode)
-      }
-
-      "must go from PartnershipNominatedPartnerCrnYesNo" - {
-        "to next page when answer is Yes" in {
-          navigator.nextPage(
-            PartnershipNominatedPartnerCrnYesNoPage,
-            NormalMode,
-            emptyUserAnswers.setOrException(PartnershipNominatedPartnerCrnYesNoPage, true)
-          ) mustBe controllers.add.partnership.routes.PartnershipNominatedPartnerCrnYesNoController
-            .onPageLoad(NormalMode)
-        }
-
-        "to next page when answer is No" in {
-          navigator.nextPage(
-            PartnershipNominatedPartnerCrnYesNoPage,
-            NormalMode,
-            emptyUserAnswers.setOrException(PartnershipNominatedPartnerCrnYesNoPage, false)
-          ) mustBe controllers.add.partnership.routes.PartnershipNominatedPartnerCrnYesNoController
-            .onPageLoad(NormalMode)
-        }
-
-        "to JourneyRecoveryPage when answer is not present" in {
-          navigator.nextPage(
-            PartnershipNominatedPartnerCrnYesNoPage,
-            NormalMode,
-            emptyUserAnswers
-          ) mustBe journeyRecovery
-        }
-      }
-
-      "must go from a PartnershipEmailAddressPage to PartnershipEmailAddressPage" in {
-        navigator.nextPage(
-          PartnershipEmailAddressPage,
-          NormalMode,
-          UserAnswers("id")
+          emptyUserAnswers.setOrException(
+            PartnershipChooseContactDetailsPage,
+            ContactOptions.Email
+          )
         ) mustBe controllers.add.partnership.routes.PartnershipEmailAddressController.onPageLoad(NormalMode)
       }
 
-      "must go from PartnershipChooseContactDetailsPage" - {
-        "to itself when Email is selected" in {
-          navigator.nextPage(
-            PartnershipChooseContactDetailsPage,
-            NormalMode,
-            emptyUserAnswers.setOrException(
-              PartnershipChooseContactDetailsPage,
-              ContactOptions.Email
-            )
-          ) mustBe controllers.add.partnership.routes.PartnershipChooseContactDetailsController.onPageLoad(NormalMode)
-        }
-
-        "to itself when Phone is selected" in {
-          navigator.nextPage(
-            PartnershipChooseContactDetailsPage,
-            NormalMode,
-            emptyUserAnswers.setOrException(
-              PartnershipChooseContactDetailsPage,
-              ContactOptions.Phone
-            )
-          ) mustBe controllers.add.partnership.routes.PartnershipChooseContactDetailsController.onPageLoad(NormalMode)
-        }
-
-        "to itself when Mobile is selected" in {
-          navigator.nextPage(
-            PartnershipChooseContactDetailsPage,
-            NormalMode,
-            emptyUserAnswers.setOrException(
-              PartnershipChooseContactDetailsPage,
-              ContactOptions.Mobile
-            )
-          ) mustBe controllers.add.partnership.routes.PartnershipChooseContactDetailsController.onPageLoad(NormalMode)
-        }
-
-        "to itself when NoDetails is selected" in {
-          navigator.nextPage(
-            PartnershipChooseContactDetailsPage,
-            NormalMode,
-            emptyUserAnswers.setOrException(
-              PartnershipChooseContactDetailsPage,
-              ContactOptions.NoDetails
-            )
-          ) mustBe controllers.add.partnership.routes.PartnershipChooseContactDetailsController.onPageLoad(NormalMode)
-        }
-
-        "to JourneyRecoveryPage when answer is not present" in {
-          navigator.nextPage(
-            PartnershipChooseContactDetailsPage,
-            NormalMode,
-            emptyUserAnswers
-          ) mustBe journeyRecovery
-        }
-      }
-      "must go from a PartnershipNominatedPartnerUtrYesNoPage to next page when true" in {
+      "to itself when Phone is selected" in {
         navigator.nextPage(
-          PartnershipNominatedPartnerUtrYesNoPage,
+          PartnershipChooseContactDetailsPage,
           NormalMode,
-          emptyUserAnswers.setOrException(PartnershipNominatedPartnerUtrYesNoPage, true)
-        ) mustBe controllers.add.partnership.routes.PartnershipNominatedPartnerUtrYesNoController
-          .onPageLoad(NormalMode)
+          emptyUserAnswers.setOrException(
+            PartnershipChooseContactDetailsPage,
+            ContactOptions.Phone
+          )
+        ) mustBe controllers.add.partnership.routes.PartnershipPhoneNumberController.onPageLoad(NormalMode)
       }
 
-      "must go from a PartnershipNominatedPartnerUtrYesNoPage to next page when false" in {
+      "to itself when Mobile is selected" in {
         navigator.nextPage(
-          PartnershipNominatedPartnerUtrYesNoPage,
+          PartnershipChooseContactDetailsPage,
           NormalMode,
-          emptyUserAnswers.setOrException(PartnershipNominatedPartnerUtrYesNoPage, false)
-        ) mustBe controllers.add.partnership.routes.PartnershipNominatedPartnerUtrYesNoController
-          .onPageLoad(NormalMode)
+          emptyUserAnswers.setOrException(
+            PartnershipChooseContactDetailsPage,
+            ContactOptions.Mobile
+          )
+        ) mustBe controllers.add.partnership.routes.PartnershipMobileNumberController.onPageLoad(NormalMode)
       }
 
-      "must go from a PartnershipNominatedPartnerUtrYesNoPage to journey recovery when incomplete info provided" in {
+      "to itself when NoDetails is selected" in {
         navigator.nextPage(
-          PartnershipNominatedPartnerUtrYesNoPage,
+          PartnershipChooseContactDetailsPage,
+          NormalMode,
+          emptyUserAnswers.setOrException(
+            PartnershipChooseContactDetailsPage,
+            ContactOptions.NoDetails
+          )
+        ) mustBe controllers.add.partnership.routes.PartnershipHasUtrYesNoController.onPageLoad(NormalMode)
+      }
+
+      "to JourneyRecoveryPage when answer is not present" in {
+        navigator.nextPage(
+          PartnershipChooseContactDetailsPage,
           NormalMode,
           emptyUserAnswers
         ) mustBe journeyRecovery
       }
-
-      "must go from a PartnershipNominatedPartnerUtrPage to PartnershipNominatedPartnerUtrController in NormalMode" in {
-        navigator.nextPage(
-          PartnershipNominatedPartnerUtrPage,
-          NormalMode,
-          emptyUserAnswers
-        ) mustBe controllers.add.partnership.routes.PartnershipNominatedPartnerUtrController.onPageLoad(NormalMode)
-      }
-
-      "must go from a PartnershipPhoneNumberPage to next Page" in {
-        navigator.nextPage(
-          PartnershipPhoneNumberPage,
-          NormalMode,
-          UserAnswers("id")
-        ) mustBe controllers.add.partnership.routes.PartnershipPhoneNumberController.onPageLoad(NormalMode)
-      }
-
-      "must go from a PartnershipMobileNumberPage to next Page" in {
-        navigator.nextPage(
-          PartnershipMobileNumberPage,
-          NormalMode,
-          UserAnswers("id")
-        ) mustBe controllers.add.partnership.routes.PartnershipMobileNumberController.onPageLoad(NormalMode)
-      }
-
-      "must go from PartnershipNominatedPartnerNinoPage to itself" in {
-        navigator.nextPage(
-          PartnershipNominatedPartnerNinoPage,
-          NormalMode,
-          emptyUserAnswers
-        ) mustBe controllers.add.partnership.routes.PartnershipNominatedPartnerNinoController.onPageLoad(NormalMode)
-      }
-
-      "must go from PartnershipNominatedPartnerCrnPage to PartnershipNominatedPartnerCrnController" in {
-        navigator.nextPage(
-          PartnershipNominatedPartnerCrnPage,
-          NormalMode,
-          emptyUserAnswers
-        ) mustBe controllers.add.partnership.routes.PartnershipNominatedPartnerCrnController.onPageLoad(NormalMode)
-      }
-
+    }
+    "must go from a PartnershipNominatedPartnerUtrYesNoPage to next page when true" in {
+      navigator.nextPage(
+        PartnershipNominatedPartnerUtrYesNoPage,
+        NormalMode,
+        emptyUserAnswers.setOrException(PartnershipNominatedPartnerUtrYesNoPage, true)
+      ) mustBe controllers.add.partnership.routes.PartnershipNominatedPartnerUtrController
+        .onPageLoad(NormalMode)
     }
 
+    "must go from a PartnershipNominatedPartnerUtrYesNoPage to next page when false" in {
+      navigator.nextPage(
+        PartnershipNominatedPartnerUtrYesNoPage,
+        NormalMode,
+        emptyUserAnswers.setOrException(PartnershipNominatedPartnerUtrYesNoPage, false)
+      ) mustBe controllers.add.partnership.routes.PartnershipNominatedPartnerNinoYesNoController
+        .onPageLoad(NormalMode)
+    }
+
+    "must go from a PartnershipNominatedPartnerUtrYesNoPage to journey recovery when incomplete info provided" in {
+      navigator.nextPage(
+        PartnershipNominatedPartnerUtrYesNoPage,
+        NormalMode,
+        emptyUserAnswers
+      ) mustBe journeyRecovery
+    }
+
+    "must go from a PartnershipNominatedPartnerUtrPage to PartnershipNominatedPartnerNinoYesNoController in NormalMode" in {
+      navigator.nextPage(
+        PartnershipNominatedPartnerUtrPage,
+        NormalMode,
+        emptyUserAnswers
+      ) mustBe controllers.add.partnership.routes.PartnershipNominatedPartnerNinoYesNoController
+        .onPageLoad(NormalMode)
+    }
+
+    "must go from a PartnershipPhoneNumberPage to next Page" in {
+      navigator.nextPage(
+        PartnershipPhoneNumberPage,
+        NormalMode,
+        UserAnswers("id")
+      ) mustBe controllers.add.partnership.routes.PartnershipHasUtrYesNoController.onPageLoad(NormalMode)
+    }
+
+    "must go from a PartnershipMobileNumberPage to next Page" in {
+      navigator.nextPage(
+        PartnershipMobileNumberPage,
+        NormalMode,
+        UserAnswers("id")
+      ) mustBe controllers.add.partnership.routes.PartnershipHasUtrYesNoController.onPageLoad(NormalMode)
+    }
+
+    "must go from PartnershipNominatedPartnerNinoPage to PartnershipNominatedPartnerCrnYesNoController in NormalMode" in {
+      navigator.nextPage(
+        PartnershipNominatedPartnerNinoPage,
+        NormalMode,
+        emptyUserAnswers
+      ) mustBe controllers.add.partnership.routes.PartnershipNominatedPartnerCrnYesNoController.onPageLoad(NormalMode)
+    }
+
+    "must go from PartnershipNominatedPartnerCrnPage to PartnershipWorksReferenceNumberYesNoController in NormalMode" in {
+      navigator.nextPage(
+        PartnershipNominatedPartnerCrnPage,
+        NormalMode,
+        emptyUserAnswers
+      ) mustBe controllers.add.partnership.routes.PartnershipWorksReferenceNumberYesNoController
+        .onPageLoad(NormalMode)
+    }
+  }
+
     "in Check mode" - {
-
-      "must go from a page that doesn't exist in the edit route map to CheckYourAnswers" in {
-
-        case object UnknownPage extends Page
-        navigator.nextPage(
-          UnknownPage,
-          CheckMode,
-          UserAnswers("id")
-        ) mustBe controllers.add.routes.CheckYourAnswersController
-          .onPageLoad()
-      }
 
       "must go from a PartnershipWorksReferenceNumberYesNoPage to next page when true" in {
         navigator.nextPage(
@@ -434,6 +335,14 @@ class PartnershipNavigatorSpec extends SpecBase {
         ) mustBe partnershipCYA
       }
 
+      "must go from a PartnershipWorksReferenceNumberPage to PartnershipCheckYourAnswers page in CheckMode" in {
+        navigator.nextPage(
+          PartnershipWorksReferenceNumberPage,
+          CheckMode,
+          emptyUserAnswers.setOrException(PartnershipUniqueTaxpayerReferencePage, "UTR-123")
+        ) mustBe partnershipCYA
+      }
+
       "must go from PartnershipAddressYesNoPage to JourneyRecovery when no answer in CheckMode" in {
         navigator.nextPage(
           PartnershipAddressYesNoPage,
@@ -447,11 +356,10 @@ class PartnershipNavigatorSpec extends SpecBase {
           PartnershipAddressPage,
           CheckMode,
           emptyUserAnswers
-        ) mustBe partnershipCYA
+        ) mustBe controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
       }
 
       "must go from PartnershipChooseContactDetailsPage" - {
-
         "to itself when Email is selected" in {
           navigator.nextPage(
             PartnershipChooseContactDetailsPage,
@@ -460,7 +368,7 @@ class PartnershipNavigatorSpec extends SpecBase {
               PartnershipChooseContactDetailsPage,
               ContactOptions.Email
             )
-          ) mustBe controllers.add.partnership.routes.PartnershipChooseContactDetailsController.onPageLoad(CheckMode)
+          ) mustBe controllers.add.partnership.routes.PartnershipEmailAddressController.onPageLoad(CheckMode)
         }
 
         "to itself when Phone is selected" in {
@@ -471,7 +379,7 @@ class PartnershipNavigatorSpec extends SpecBase {
               PartnershipChooseContactDetailsPage,
               ContactOptions.Phone
             )
-          ) mustBe controllers.add.partnership.routes.PartnershipChooseContactDetailsController.onPageLoad(CheckMode)
+          ) mustBe controllers.add.partnership.routes.PartnershipPhoneNumberController.onPageLoad(CheckMode)
         }
 
         "to itself when Mobile is selected" in {
@@ -482,7 +390,7 @@ class PartnershipNavigatorSpec extends SpecBase {
               PartnershipChooseContactDetailsPage,
               ContactOptions.Mobile
             )
-          ) mustBe controllers.add.partnership.routes.PartnershipChooseContactDetailsController.onPageLoad(CheckMode)
+          ) mustBe controllers.add.partnership.routes.PartnershipMobileNumberController.onPageLoad(CheckMode)
         }
 
         "to itself when NoDetails is selected" in {
@@ -493,7 +401,7 @@ class PartnershipNavigatorSpec extends SpecBase {
               PartnershipChooseContactDetailsPage,
               ContactOptions.NoDetails
             )
-          ) mustBe controllers.add.partnership.routes.PartnershipChooseContactDetailsController.onPageLoad(CheckMode)
+          ) mustBe controllers.add.partnership.routes.PartnershipHasUtrYesNoController.onPageLoad(CheckMode)
         }
 
         "to PartnershipCheckYourAnswers when answer is not present" in {
@@ -537,6 +445,14 @@ class PartnershipNavigatorSpec extends SpecBase {
         ) mustBe journeyRecovery
       }
 
+      "must go from a PartnershipUniqueTaxpayerReference to PartnershipCheckYourAnswers page in CheckMode" in {
+        navigator.nextPage(
+          PartnershipUniqueTaxpayerReferencePage,
+          CheckMode,
+          emptyUserAnswers.setOrException(PartnershipUniqueTaxpayerReferencePage, "5860920998")
+        ) mustBe partnershipCYA
+      }
+
       "must go from PartnershipNominatedPartnerCrnYesNo" - {
         "to next page when answer is Yes" in {
           val answers = UserAnswers(userAnswersId).set(PartnershipNominatedPartnerCrnYesNoPage, true).success.value
@@ -545,7 +461,7 @@ class PartnershipNavigatorSpec extends SpecBase {
             PartnershipNominatedPartnerCrnYesNoPage,
             CheckMode,
             answers
-          ) mustBe controllers.add.partnership.routes.PartnershipNominatedPartnerCrnYesNoController
+          ) mustBe controllers.add.partnership.routes.PartnershipNominatedPartnerCrnController
             .onPageLoad(CheckMode)
         }
 
@@ -573,7 +489,7 @@ class PartnershipNavigatorSpec extends SpecBase {
           PartnershipEmailAddressPage,
           CheckMode,
           emptyUserAnswers
-        ) mustBe partnershipCYA
+        ) mustBe controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
       }
 
       "must go from a PartnershipNominatedPartnerUtrYesNoPage to next page when true" in {
@@ -581,7 +497,7 @@ class PartnershipNavigatorSpec extends SpecBase {
           PartnershipNominatedPartnerUtrYesNoPage,
           CheckMode,
           emptyUserAnswers.setOrException(PartnershipNominatedPartnerUtrYesNoPage, true)
-        ) mustBe controllers.add.partnership.routes.PartnershipNominatedPartnerUtrYesNoController.onPageLoad(CheckMode)
+        ) mustBe controllers.add.partnership.routes.PartnershipNominatedPartnerUtrController.onPageLoad(CheckMode)
       }
 
       "must go from a PartnershipNominatedPartnerUtrYesNoPage to PartnershipCheckYourAnswers page when false" in {
@@ -601,27 +517,85 @@ class PartnershipNavigatorSpec extends SpecBase {
       }
 
       "must go from PartnershipNominatedPartnerUtrPage to PartnershipCheckYourAnswers in CheckMode" in {
+
+        val answers =
+          emptyUserAnswers
+            .set(PartnershipNominatedPartnerUtrPage, "1234567890") // adjust type if Utr is not String
+            .success
+            .value
+
         navigator.nextPage(
           PartnershipNominatedPartnerUtrPage,
           CheckMode,
-          emptyUserAnswers
+          answers
         ) mustBe partnershipCYA
       }
 
-      "must go from PartnershipNamePage to PartnershipCheckYourAnswers in CheckMode" in {
+      "must go from PartnershipNamePage to PartnershipAddressYesNoController in CheckMode" in {
         navigator.nextPage(
           PartnershipNamePage,
           CheckMode,
           emptyUserAnswers
-        ) mustBe partnershipCYA
+        ) mustBe controllers.add.partnership.routes.PartnershipAddressYesNoController.onPageLoad(CheckMode)
       }
 
-      "must go from a PartnershipMobileNumberPage to PartnershipMobileNumberPage in CheckMode" in {
+      "must go from a PartnershipMobileNumberPage to PartnershipHasUtrYesNoController in CheckMode" in {
         navigator.nextPage(
           PartnershipMobileNumberPage,
           CheckMode,
           emptyUserAnswers
-        ) mustBe controllers.add.partnership.routes.PartnershipMobileNumberController.onPageLoad(CheckMode)
+        ) mustBe controllers.add.partnership.routes.PartnershipHasUtrYesNoController.onPageLoad(CheckMode)
+      }
+
+      "PartnershipNominatedPartnerNinoPage in CheckMode" - {
+        "must go from PartnershipNominatedPartnerNinoPage to PartnershipNominatedPartnerCrnYesNoController in CheckMode" in {
+          val answersWithNino =
+            emptyUserAnswers
+              .set(PartnershipNominatedPartnerNinoPage, "AA123456A")
+              .success
+              .value
+
+          navigator.nextPage(
+            PartnershipNominatedPartnerNinoPage,
+            CheckMode,
+            answersWithNino
+          ) mustBe controllers.add.partnership.routes.PartnershipNominatedPartnerCrnYesNoController
+            .onPageLoad(CheckMode)
+        }
+
+        "to JourneyRecovery when answer is missing" in {
+          navigator.nextPage(
+            PartnershipNominatedPartnerNinoPage,
+            CheckMode,
+            emptyUserAnswers
+          ) mustBe routes.JourneyRecoveryController.onPageLoad()
+        }
+      }
+
+      "PartnershipNominatedPartnerCrnPage in CheckMode" - {
+        "must go to PartnershipCheckYourAnswersController in CheckMode when answer exists" in {
+          val userAnswers = emptyUserAnswers
+            .set(PartnershipNominatedPartnerCrnYesNoPage, true)
+            .success
+            .value
+            .set(PartnershipNominatedPartnerCrnPage, "12345678")
+            .success
+            .value
+
+          navigator.nextPage(
+            PartnershipNominatedPartnerCrnPage,
+            CheckMode,
+            userAnswers
+          ) mustBe controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
+        }
+
+        "must go to JourneyRecovery when answer is missing" in {
+          navigator.nextPage(
+            PartnershipNominatedPartnerCrnPage,
+            CheckMode,
+            emptyUserAnswers
+          ) mustBe routes.JourneyRecoveryController.onPageLoad()
+        }
       }
 
       "must go from a PartnershipPhoneNumberPage to CYA" in {
@@ -629,22 +603,6 @@ class PartnershipNavigatorSpec extends SpecBase {
           PartnershipPhoneNumberPage,
           CheckMode,
           UserAnswers("id")
-        ) mustBe CYA
-      }
-
-      "must go from PartnershipNominatedPartnerNinoPage to PartnershipCheckYourAnswers" in {
-        navigator.nextPage(
-          PartnershipNominatedPartnerNinoPage,
-          CheckMode,
-          emptyUserAnswers
-        ) mustBe partnershipCYA
-      }
-
-      "must go from PartnershipNominatedPartnerCrnPage to PartnershipCheckYourAnswers" in {
-        navigator.nextPage(
-          PartnershipNominatedPartnerCrnPage,
-          CheckMode,
-          emptyUserAnswers
         ) mustBe partnershipCYA
       }
 
