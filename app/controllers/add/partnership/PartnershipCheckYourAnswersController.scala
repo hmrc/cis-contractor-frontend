@@ -93,38 +93,37 @@ class PartnershipCheckYourAnswersController @Inject() (
   }
 
   def onSubmit(): Action[AnyContent] =
-  (identify andThen getData andThen requireData).async { implicit request =>
+    (identify andThen getData andThen requireData).async { implicit request =>
+      if (request.userAnswers.get(CheckYourAnswersSubmittedPage).contains(true)) {
+        Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+      } else {
 
-    if (request.userAnswers.get(CheckYourAnswersSubmittedPage).contains(true)) {
-      Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
-    } else {
+        ValidatedPartnership.build(request.userAnswers) match {
 
-      ValidatedPartnership.build(request.userAnswers) match {
+          case Right(_) =>
+            subcontractorService
+              .createAndUpdateSubcontractor(request.userAnswers)
+              .flatMap { _ =>
+                Future
+                  .fromTry(request.userAnswers.set(CheckYourAnswersSubmittedPage, true))
+                  .flatMap(updated => sessionRepository.set(updated).map(_ => ()))
+                  .map { _ =>
+                    Redirect(controllers.add.partnership.routes.SubcontractorAddedController.onPageLoad())
+                  }
+              }
+              .recover { case t =>
+                logger.error(
+                  "[PartnershipCheckYourAnswersController.onSubmit] Failed to create/update subcontractor",
+                  t
+                )
+                Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+              }
 
-        case Right(_) =>
-          subcontractorService
-            .createAndUpdateSubcontractor(request.userAnswers)
-            .flatMap { _ =>
-              Future
-                .fromTry(request.userAnswers.set(CheckYourAnswersSubmittedPage, true))
-                .flatMap(updated => sessionRepository.set(updated).map(_ => ()))
-                .map { _ =>
-                  Redirect(controllers.add.partnership.routes.SubcontractorAddedController.onPageLoad())
-                }
-            }
-            .recover { case t =>
-              logger.error(
-                "[PartnershipCheckYourAnswersController.onSubmit] Failed to create/update subcontractor",
-                t
-              )
-              Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-            }
-
-        case Left(error) =>
-          logger.error(s"[PartnershipCheckYourAnswersController.onSubmit] Validation failed: $error")
-          Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+          case Left(error) =>
+            logger.error(s"[PartnershipCheckYourAnswersController.onSubmit] Validation failed: $error")
+            Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+        }
       }
     }
-  }
 
 }

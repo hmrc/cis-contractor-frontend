@@ -37,74 +37,74 @@ class PartnershipNavigator @Inject() () extends NavigatorForJourney {
   }
 
   private val normalRoutes: Page => UserAnswers => Call = {
-    case PartnershipNamePage =>
+    case PartnershipNamePage                      =>
       _ => controllers.add.partnership.routes.PartnershipAddressYesNoController.onPageLoad(NormalMode)
-    case PartnershipAddressYesNoPage =>
+    case PartnershipAddressYesNoPage              =>
       userAnswers => navigatorFromPartnershipAddressYesNoPage(NormalMode)(userAnswers)
-    case PartnershipAddressPage =>
+    case PartnershipAddressPage                   =>
       _ => controllers.add.partnership.routes.PartnershipChooseContactDetailsController.onPageLoad(NormalMode)
-    case PartnershipChooseContactDetailsPage =>
+    case PartnershipChooseContactDetailsPage      =>
       userAnswers => navigatorFromChooseContactDetailsPage(NormalMode)(userAnswers)
-    case PartnershipEmailAddressPage =>
+    case PartnershipEmailAddressPage              =>
       _ => controllers.add.partnership.routes.PartnershipHasUtrYesNoController.onPageLoad(NormalMode)
-    case PartnershipMobileNumberPage =>
+    case PartnershipMobileNumberPage              =>
       _ => controllers.add.partnership.routes.PartnershipHasUtrYesNoController.onPageLoad(NormalMode)
-    case PartnershipPhoneNumberPage =>
+    case PartnershipPhoneNumberPage               =>
       _ => controllers.add.partnership.routes.PartnershipHasUtrYesNoController.onPageLoad(NormalMode)
-    case PartnershipHasUtrYesNoPage => userAnswers => navigatorFromPartnershipHasUtrYesNoPage(NormalMode)(userAnswers)
-    case PartnershipUniqueTaxpayerReferencePage =>
+    case PartnershipHasUtrYesNoPage               => userAnswers => navigatorFromPartnershipHasUtrYesNoPage(NormalMode)(userAnswers)
+    case PartnershipUniqueTaxpayerReferencePage   =>
       _ => controllers.add.partnership.routes.PartnershipNominatedPartnerNameController.onPageLoad(NormalMode)
-    case PartnershipNominatedPartnerNamePage =>
+    case PartnershipNominatedPartnerNamePage      =>
       _ => controllers.add.partnership.routes.PartnershipNominatedPartnerUtrYesNoController.onPageLoad(NormalMode)
     case PartnershipWorksReferenceNumberYesNoPage =>
       userAnswers => navigatorFromPartnershipWorksReferenceNumberYesNoPage(NormalMode)(userAnswers)
-    case PartnershipNominatedPartnerNinoPage =>
+    case PartnershipNominatedPartnerNinoPage      =>
       _ => controllers.add.partnership.routes.PartnershipNominatedPartnerCrnYesNoController.onPageLoad(NormalMode)
-    case PartnershipWorksReferenceNumberPage =>
+    case PartnershipWorksReferenceNumberPage      =>
       _ => controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
-    case PartnershipNominatedPartnerCrnPage =>
+    case PartnershipNominatedPartnerCrnPage       =>
       _ => controllers.add.partnership.routes.PartnershipWorksReferenceNumberYesNoController.onPageLoad(NormalMode)
     case PartnershipNominatedPartnerNinoYesNoPage =>
       userAnswers => navigatorFromPartnershipNominatedPartnerNinoYesNoPage(NormalMode)(userAnswers)
-    case PartnershipNominatedPartnerCrnYesNoPage =>
+    case PartnershipNominatedPartnerCrnYesNoPage  =>
       userAnswers => navigatorFromPartnershipNominatedPartnerCrnYesNoPage(NormalMode)(userAnswers)
-    case PartnershipNominatedPartnerUtrPage =>
+    case PartnershipNominatedPartnerUtrPage       =>
       _ => controllers.add.partnership.routes.PartnershipNominatedPartnerNinoYesNoController.onPageLoad(NormalMode)
-    case PartnershipNominatedPartnerUtrYesNoPage =>
+    case PartnershipNominatedPartnerUtrYesNoPage  =>
       userAnswers => navigatorFromPartnershipNominatedPartnerUtrYesNoPage(NormalMode)(userAnswers)
     case _                                        => _ => routes.IndexController.onPageLoad()
   }
 
   private val checkRouteMap: Page => UserAnswers => Call = {
-    case PartnershipHasUtrYesNoPage => navigatorFromPartnershipHasUtrYesNoPage(CheckMode)(_)
+    case PartnershipHasUtrYesNoPage               => navigatorFromPartnershipHasUtrYesNoPage(CheckMode)(_)
     case PartnershipWorksReferenceNumberYesNoPage => navigatorFromPartnershipWorksReferenceNumberYesNoPage(CheckMode)(_)
-    case PartnershipChooseContactDetailsPage => navigatorFromChooseContactDetailsPage(CheckMode)(_)
-    case PartnershipNominatedPartnerCrnYesNoPage => navigatorFromPartnershipNominatedPartnerCrnYesNoPage(CheckMode)(_)
-    case PartnershipNamePage =>
+    case PartnershipChooseContactDetailsPage      => navigatorFromChooseContactDetailsPage(CheckMode)(_)
+    case PartnershipNominatedPartnerCrnYesNoPage  => navigatorFromPartnershipNominatedPartnerCrnYesNoPage(CheckMode)(_)
+    case PartnershipNamePage                      =>
       _ => controllers.add.partnership.routes.PartnershipAddressYesNoController.onPageLoad(CheckMode)
-    case PartnershipAddressYesNoPage =>
+    case PartnershipAddressYesNoPage              =>
       userAnswers => navigatorFromPartnershipAddressYesNoPage(CheckMode)(userAnswers)
-    case PartnershipAddressPage =>
+    case PartnershipAddressPage                   =>
       _ => controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
-    case PartnershipMobileNumberPage =>
+    case PartnershipMobileNumberPage              =>
       _ => controllers.add.partnership.routes.PartnershipHasUtrYesNoController.onPageLoad(CheckMode)
-    case PartnershipPhoneNumberPage =>
+    case PartnershipPhoneNumberPage               =>
       _ => controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
     case PartnershipNominatedPartnerNinoYesNoPage =>
       userAnswers => navigatorFromPartnershipNominatedPartnerNinoYesNoPage(CheckMode)(userAnswers)
-    case PartnershipNominatedPartnerNinoPage => navigatorFromPartnershipNominatedPartnerNinoPage(CheckMode)(_)
-    case PartnershipNominatedPartnerNamePage =>
+    case PartnershipNominatedPartnerNinoPage      => navigatorFromPartnershipNominatedPartnerNinoPage(CheckMode)(_)
+    case PartnershipNominatedPartnerNamePage      =>
       _ => controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
-    case PartnershipEmailAddressPage =>
+    case PartnershipEmailAddressPage              =>
       _ => controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
-    case PartnershipNominatedPartnerUtrYesNoPage =>
+    case PartnershipNominatedPartnerUtrYesNoPage  =>
       userAnswers => navigatorFromPartnershipNominatedPartnerUtrYesNoPage(CheckMode)(userAnswers)
-    case PartnershipNominatedPartnerUtrPage =>
+    case PartnershipNominatedPartnerUtrPage       =>
       _ => controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
-    case PartnershipNominatedPartnerCrnPage => navigatorFromPartnershipNominatedPartnerCrnPage(CheckMode)(_)
-    case PartnershipWorksReferenceNumberPage =>
+    case PartnershipNominatedPartnerCrnPage       => navigatorFromPartnershipNominatedPartnerCrnPage(CheckMode)(_)
+    case PartnershipWorksReferenceNumberPage      =>
       _ => controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
-    case PartnershipUniqueTaxpayerReferencePage =>
+    case PartnershipUniqueTaxpayerReferencePage   =>
       _ => controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
     case _                                        => _ => controllers.add.routes.CheckYourAnswersController.onPageLoad()
   }
@@ -113,7 +113,7 @@ class PartnershipNavigator @Inject() () extends NavigatorForJourney {
     ua.get(PartnershipNominatedPartnerNinoPage) match {
       case Some(_) =>
         controllers.add.partnership.routes.PartnershipNominatedPartnerCrnYesNoController.onPageLoad(mode)
-      case None =>
+      case None    =>
         routes.JourneyRecoveryController.onPageLoad()
     }
 
@@ -146,11 +146,11 @@ class PartnershipNavigator @Inject() () extends NavigatorForJourney {
 
   private def navigatorFromPartnershipWorksReferenceNumberYesNoPage(mode: Mode)(userAnswers: UserAnswers): Call =
     (userAnswers.get(PartnershipWorksReferenceNumberYesNoPage), mode) match {
-      case (Some(true), _) =>
+      case (Some(true), _)  =>
         controllers.add.partnership.routes.PartnershipWorksReferenceNumberController.onPageLoad(mode)
       case (Some(false), _) =>
         controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
-      case (None, _) => routes.JourneyRecoveryController.onPageLoad()
+      case (None, _)        => routes.JourneyRecoveryController.onPageLoad()
     }
 
   private def navigatorFromPartnershipNominatedPartnerUtrYesNoPage(mode: Mode)(userAnswers: UserAnswers): Call =
@@ -252,19 +252,19 @@ class PartnershipNavigator @Inject() () extends NavigatorForJourney {
   private def navigatorFromChooseContactDetailsPage(mode: Mode)(userAnswers: UserAnswers): Call =
     (userAnswers.get(PartnershipChooseContactDetailsPage), mode) match {
       // TODO: EMAIL       - CIS ANSF PTN: Screen AS-P4 (PTN) - What are the contact details for [partnership name]?
-      case (Some(Email), _) =>
+      case (Some(Email), _)  =>
         controllers.add.partnership.routes.PartnershipEmailAddressController.onPageLoad(mode)
 
       // TODO: PHONE       - CIS ANSF PTN: Screen AS-P4 (PTN) - What are the contact details for [partnership name]?
-      case (Some(Phone), _) =>
+      case (Some(Phone), _)  =>
         controllers.add.partnership.routes.PartnershipPhoneNumberController.onPageLoad(mode)
       // TODO: MOBILE      - CIS ANSF PTN: Screen AS-P4 (PTN) - What are the contact details for [partnership name]?
       case (Some(Mobile), _) =>
         controllers.add.partnership.routes.PartnershipMobileNumberController.onPageLoad(mode)
       // TODO: NO DETAILS  - CIS ANSF PTN: Screen AS-P4 (PTN) - What are the contact details for [partnership name]?
-      case (Some(_), _) =>
+      case (Some(_), _)      =>
         controllers.add.partnership.routes.PartnershipHasUtrYesNoController.onPageLoad(mode)
-      case (_, CheckMode) => controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
-      case _ => routes.JourneyRecoveryController.onPageLoad()
+      case (_, CheckMode)    => controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
+      case _                 => routes.JourneyRecoveryController.onPageLoad()
     }
 }

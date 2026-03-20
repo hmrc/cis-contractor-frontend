@@ -186,13 +186,13 @@ class IndividualNavigator @Inject() () extends NavigatorForJourney {
   private def navigatorFromIndividualChooseContactDetailsPage(mode: Mode)(userAnswers: UserAnswers): Call =
     (userAnswers.get(IndividualChooseContactDetailsPage), mode) match {
       case (Some(Email), _)  =>
-        controllers.add.routes.IndividualChooseContactDetailsController.onPageLoad(mode)
+        controllers.add.routes.IndividualEmailAddressController.onPageLoad(mode)
       case (Some(Phone), _)  =>
-        controllers.add.routes.IndividualChooseContactDetailsController.onPageLoad(mode)
+        controllers.add.routes.IndividualPhoneNumberController.onPageLoad(mode)
       case (Some(Mobile), _) =>
-        controllers.add.routes.IndividualChooseContactDetailsController.onPageLoad(mode)
+        controllers.add.routes.IndividualMobileNumberController.onPageLoad(mode)
       case (Some(_), _)      =>
-        controllers.add.routes.IndividualChooseContactDetailsController.onPageLoad(mode)
+        controllers.add.routes.CheckYourAnswersController.onPageLoad()
       case (_, CheckMode)    => controllers.add.routes.CheckYourAnswersController.onPageLoad()
       case _                 => routes.JourneyRecoveryController.onPageLoad()
     }
