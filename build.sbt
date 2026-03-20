@@ -97,7 +97,9 @@ lazy val messagesSections = Seq(
   ColumnarSection("# Partnership",
     primaryPrefixes = Seq("partnership")),
   ColumnarSection("# Company",
-    primaryPrefixes = Seq("company"))
+    primaryPrefixes = Seq("company")),
+  ColumnarSection("# Trust",
+    primaryPrefixes = Seq("trust"))
 )
 
 lazy val appRoutesSections = Seq(
@@ -112,5 +114,8 @@ lazy val appRoutesSections = Seq(
     secondaryPrefixes = Seq("controllers.add.company.")),
   ColumnarSection("# Partnership",
     primaryPrefixes   = Seq("/add/partnership/"),
-    secondaryPrefixes = Seq("controllers.add.partnership."))
+    secondaryPrefixes = Seq("controllers.add.partnership.")),
+  ColumnarSection("# Trust",
+    primaryPrefixes   = Seq("/trust"),
+    secondaryPrefixes = Seq("controllers.add.trust.")),
 )
