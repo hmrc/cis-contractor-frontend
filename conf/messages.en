@@ -176,7 +176,7 @@ subNationalInsuranceNumber.checkYourAnswersLabel = National Insurance number
 subNationalInsuranceNumber.error.required = Enter a National Insurance number
 subNationalInsuranceNumber.error.length = Enter a valid National Insurance number
 subNationalInsuranceNumber.error.invalidCharacters = Enter a valid National Insurance number
-subNationalInsuranceNumber.change.hidden = national Insurance number
+subNationalInsuranceNumber.change.hidden = National Insurance number
 
 worksReferenceNumber.title = What is the works reference number associated with this subcontractor?
 worksReferenceNumber.heading = What is the works reference number associated with {0}?
@@ -341,7 +341,7 @@ partnershipNominatedPartnerNino.error.required = Enter a National Insurance numb
 partnershipNominatedPartnerNino.error.invalidCharacters = Enter a valid National Insurance number
 partnershipNominatedPartnerNino.error.length = Enter a valid National Insurance number
 partnershipNominatedPartnerNino.checkYourAnswersLabel = National Insurance number for nominated partner
-partnershipNominatedPartnerNino.change.hidden = national Insurance number for nominated partner
+partnershipNominatedPartnerNino.change.hidden = National Insurance number for nominated partner
 
 
 partnershipAddressYesNo.title = Do you want to add an address for this partnership?
