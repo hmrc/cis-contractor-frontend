@@ -654,3 +654,91 @@ individualChooseContactDetails.noDetails = Do not add any contact details for th
 individualChooseContactDetails.error.required = Select whether you want to add contact details for this subcontractor
 individualChooseContactDetails.checkYourAnswersLabel = Method of contact
 individualChooseContactDetails.change.hidden = method of contact
+
+trustName.title = trustName
+trustName.heading = trustName
+trustName.checkYourAnswersLabel = trustName
+trustName.error.required = Enter trustName
+trustName.error.length = TrustName must be 56 characters or less
+trustName.change.hidden = TrustName
+
+trustAddressYesNo.title = trustAddressYesNo
+trustAddressYesNo.heading = trustAddressYesNo
+trustAddressYesNo.checkYourAnswersLabel = trustAddressYesNo
+trustAddressYesNo.error.required = Select yes if trustAddressYesNo
+trustAddressYesNo.change.hidden = TrustAddressYesNo
+
+trustAddress.title = trustAddress
+trustAddress.heading = trustAddress
+trustAddress.checkYourAnswersLabel = trustAddress
+trustAddress.error.required = Enter trustAddress
+trustAddress.error.length = TrustAddress must be 35 characters or less
+trustAddress.change.hidden = TrustAddress
+
+trustContactOptions.title = What are the contact details for this trust?
+trustContactOptions.heading = What are the contact details for this trust?
+trustContactOptions.email = Email address
+trustContactOptions.phone = Phone number
+trustContactOptions.mobile = Mobile number
+trustContactOptions.noDetails = Do not add any contact details for this subcontractor
+trustContactOptions.or = or
+trustContactOptions.checkYourAnswersLabel = What are the contact details for this trust?
+trustContactOptions.error.required = Select trustContactOptions
+trustContactOptions.change.hidden = TrustContactOptions
+
+trustEmailAddress.title = trustEmailAddress
+trustEmailAddress.heading = trustEmailAddress
+trustEmailAddress.checkYourAnswersLabel = trustEmailAddress
+trustEmailAddress.error.required = Enter trustEmailAddress
+trustEmailAddress.error.length = TrustEmailAddress must be 254 characters or less
+trustEmailAddress.change.hidden = TrustEmailAddress
+
+trustPhoneNumber.title = trustPhoneNumber
+trustPhoneNumber.heading = trustPhoneNumber
+trustPhoneNumber.checkYourAnswersLabel = trustPhoneNumber
+trustPhoneNumber.error.required = Enter trustPhoneNumber
+trustPhoneNumber.error.length = TrustPhoneNumber must be 35 characters or less
+trustPhoneNumber.change.hidden = TrustPhoneNumber
+
+trustMobileNumber.title = trustMobileNumber
+trustMobileNumber.heading = trustMobileNumber
+trustMobileNumber.checkYourAnswersLabel = trustMobileNumber
+trustMobileNumber.error.required = Enter trustMobileNumber
+trustMobileNumber.error.length = TrustMobileNumber must be 35 characters or less
+trustMobileNumber.change.hidden = TrustMobileNumber
+
+trustUtrYesNo.title = trustUtrYesNo
+trustUtrYesNo.heading = trustUtrYesNo
+trustUtrYesNo.checkYourAnswersLabel = trustUtrYesNo
+trustUtrYesNo.error.required = Select yes if trustUtrYesNo
+trustUtrYesNo.change.hidden = TrustUtrYesNo
+
+trustUtr.title = trustUtr
+trustUtr.heading = trustUtr
+trustUtr.checkYourAnswersLabel = trustUtr
+trustUtr.error.required = Enter trustUtr
+trustUtr.error.length = TrustUtr must be 10 characters or less
+trustUtr.change.hidden = TrustUtr
+
+trustWorksReferenceYesNo.title = trustWorksReferenceYesNo
+trustWorksReferenceYesNo.heading = trustWorksReferenceYesNo
+trustWorksReferenceYesNo.checkYourAnswersLabel = trustWorksReferenceYesNo
+trustWorksReferenceYesNo.error.required = Select yes if trustWorksReferenceYesNo
+trustWorksReferenceYesNo.change.hidden = TrustWorksReferenceYesNo
+
+rustWorksReference.title = rustWorksReference
+rustWorksReference.heading = rustWorksReference
+rustWorksReference.checkYourAnswersLabel = rustWorksReference
+rustWorksReference.error.required = Enter rustWorksReference
+rustWorksReference.error.length = rustWorksReference must be 20 characters or less
+rustWorksReference.change.hidden = rustWorksReference
+
+trustWorksReference.title = trustWorksReference
+trustWorksReference.heading = trustWorksReference
+trustWorksReference.checkYourAnswersLabel = trustWorksReference
+trustWorksReference.error.required = Enter trustWorksReference
+trustWorksReference.error.length = TrustWorksReference must be 20 characters or less
+trustWorksReference.change.hidden = TrustWorksReference
+
+trustCheckYourAnswers.title = trustCheckYourAnswers
+trustCheckYourAnswers.heading = trustCheckYourAnswers

@@ -831,11 +831,10 @@ class PartnershipCheckYourAnswersControllerSpec extends SpecBase {
     verifyNoMoreInteractions(mockSubcontractorService)
   }
 
-
   "must redirect to Journey Recovery on submit when validation fails (Left(error))" in {
     val mockSubcontractorService = mock[SubcontractorService]
-    val mockSessionRepository = mock[SessionRepository]
-    
+    val mockSessionRepository    = mock[SessionRepository]
+
     val invalidUa =
       emptyUserAnswers
         .set(TypeOfSubcontractorPage, TypeOfSubcontractor.Partnership)
@@ -852,7 +851,7 @@ class PartnershipCheckYourAnswersControllerSpec extends SpecBase {
 
     running(application) {
       val request = FakeRequest(POST, controllers.add.routes.CheckYourAnswersController.onSubmit().url)
-      val result = route(application, request).value
+      val result  = route(application, request).value
 
       status(result) mustEqual SEE_OTHER
       redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url

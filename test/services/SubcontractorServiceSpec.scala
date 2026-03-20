@@ -24,7 +24,7 @@ import models.requests.CreateAndUpdateSubcontractorPayload
 import models.requests.CreateAndUpdateSubcontractorPayload.{IndividualOrSoleTraderPayload, PartnershipPayload}
 import models.subcontractor.GetSubcontractorUTRsResponse
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
-import org.mockito.Mockito.{times,verify, verifyNoMoreInteractions, when}
+import org.mockito.Mockito.{times, verify, verifyNoMoreInteractions, when}
 import pages.add.*
 import pages.add.partnership.*
 import queries.CisIdQuery
@@ -339,8 +339,6 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
         verify(mockConnector).createAndUpdateSubcontractor(eqTo(expectedPayload))(any[HeaderCarrier])
         verifyNoMoreInteractions(mockConnector)
       }
-
-
 
       "should create and update subcontractor (Partnership) with NO contact details (no contact fields sent)" in {
         val mockConnector = mock[ConstructionIndustrySchemeConnector]
