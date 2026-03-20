@@ -17,12 +17,42 @@
 package pages.add.company
 
 import models.add.company.CompanyContactOptions
+import models.contact.ContactOptions
 import pages.QuestionPage
 import play.api.libs.json.JsPath
+import scala.util.Try
+import models.UserAnswers
 
 case object CompanyContactOptionsPage extends QuestionPage[CompanyContactOptions] with CompanyJourney {
 
   override def path: JsPath = JsPath \ toString
 
   override def toString: String = "companyContactOptions"
+
+  override def cleanup(value: Option[CompanyContactOptions], userAnswers: UserAnswers): Try[UserAnswers] =
+    value match {
+      case Some(ContactOptions.Email) =>
+        userAnswers
+          .remove(CompanyPhoneNumberPage)
+          .flatMap(_.remove(CompanyMobileNumberPage))
+
+      case Some(ContactOptions.Phone) =>
+        userAnswers
+          .remove(CompanyEmailAddressPage)
+          .flatMap(_.remove(CompanyMobileNumberPage))
+
+      case Some(ContactOptions.Mobile) =>
+        userAnswers
+          .remove(CompanyEmailAddressPage)
+          .flatMap(_.remove(CompanyPhoneNumberPage))
+
+      case Some(ContactOptions.NoDetails) =>
+        userAnswers
+          .remove(CompanyEmailAddressPage)
+          .flatMap(_.remove(CompanyPhoneNumberPage))
+          .flatMap(_.remove(CompanyMobileNumberPage))
+
+      case _ =>
+        super.cleanup(value, userAnswers)
+    }
 }

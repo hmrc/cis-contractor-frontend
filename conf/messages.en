@@ -654,3 +654,10 @@ individualChooseContactDetails.noDetails = Do not add any contact details for th
 individualChooseContactDetails.error.required = Select whether you want to add contact details for this subcontractor
 individualChooseContactDetails.checkYourAnswersLabel = Method of contact
 individualChooseContactDetails.change.hidden = method of contact
+
+partnershipCheckYourAnswers.title = Check your answers before adding this company
+partnershipCheckYourAnswers.heading = Check your answers before adding this company
+partnershipCheckYourAnswers.subHeading = Subcontractor details
+partnershipCheckYourAnswers.trailHeading = Now add this subcontractor
+partnershipCheckYourAnswers.trailText = By adding this subcontractor you are confirming that, to the best of your knowledge, the details you are providing are correct.
+partnershipCheckYourAnswers.continue = Accept and submit

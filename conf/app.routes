@@ -283,3 +283,5 @@ POST       /add/check-contact-details                           controllers.add.
 GET        /add/change-check-contact-details                    controllers.add.IndividualChooseContactDetailsController.onPageLoad(mode: Mode = CheckMode)
 POST       /add/change-check-contact-details                    controllers.add.IndividualChooseContactDetailsController.onSubmit(mode: Mode = CheckMode)
 
+GET        /add/company/check-your-answers           controllers.add.company.CompanyCheckYourAnswersController.onPageLoad()
+POST       /add/company/check-your-answers           controllers.add.company.CompanyCheckYourAnswersController.onSubmit()
