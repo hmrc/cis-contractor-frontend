@@ -25,25 +25,27 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
 
-object TrustContactOptionsSummary  {
+object TrustContactOptionsSummary {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(TrustContactOptionsPage).map {
-      answer =>
+    answers.get(TrustContactOptionsPage).map { answer =>
 
-        val value = ValueViewModel(
-          HtmlContent(
-            HtmlFormat.escape(messages(s"trustContactOptions.$answer"))
-          )
+      val value = ValueViewModel(
+        HtmlContent(
+          HtmlFormat.escape(messages(s"trustContactOptions.$answer"))
         )
+      )
 
-        SummaryListRowViewModel(
-          key     = "trustContactOptions.checkYourAnswersLabel",
-          value   = value,
-          actions = Seq(
-            ActionItemViewModel("site.change", controllers.add.trust.routes.TrustContactOptionsController.onPageLoad(CheckMode).url)
-              .withVisuallyHiddenText(messages("trustContactOptions.change.hidden"))
+      SummaryListRowViewModel(
+        key = "trustContactOptions.checkYourAnswersLabel",
+        value = value,
+        actions = Seq(
+          ActionItemViewModel(
+            "site.change",
+            controllers.add.trust.routes.TrustContactOptionsController.onPageLoad(CheckMode).url
           )
+            .withVisuallyHiddenText(messages("trustContactOptions.change.hidden"))
         )
+      )
     }
 }

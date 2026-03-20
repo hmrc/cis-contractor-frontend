@@ -22,7 +22,7 @@ import play.api.data.FormError
 class TrustUtrYesNoFormProviderSpec extends BooleanFieldBehaviours {
 
   val requiredKey = "trustUtrYesNo.error.required"
-  val invalidKey = "error.boolean"
+  val invalidKey  = "error.boolean"
 
   val form = new TrustUtrYesNoFormProvider()()
 

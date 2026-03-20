@@ -23,21 +23,23 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
 
-object TrustAddressYesNoSummary  {
+object TrustAddressYesNoSummary {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(TrustAddressYesNoPage).map {
-      answer =>
+    answers.get(TrustAddressYesNoPage).map { answer =>
 
-        val value = if (answer) "site.yes" else "site.no"
+      val value = if (answer) "site.yes" else "site.no"
 
-        SummaryListRowViewModel(
-          key     = "trustAddressYesNo.checkYourAnswersLabel",
-          value   = ValueViewModel(value),
-          actions = Seq(
-            ActionItemViewModel("site.change", controllers.add.trust.routes.TrustAddressYesNoController.onPageLoad(CheckMode).url)
-              .withVisuallyHiddenText(messages("trustAddressYesNo.change.hidden"))
+      SummaryListRowViewModel(
+        key = "trustAddressYesNo.checkYourAnswersLabel",
+        value = ValueViewModel(value),
+        actions = Seq(
+          ActionItemViewModel(
+            "site.change",
+            controllers.add.trust.routes.TrustAddressYesNoController.onPageLoad(CheckMode).url
           )
+            .withVisuallyHiddenText(messages("trustAddressYesNo.change.hidden"))
         )
+      )
     }
 }

@@ -24,19 +24,20 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
 
-object TrustWorksReferenceSummary  {
+object TrustWorksReferenceSummary {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(TrustWorksReferencePage).map {
-      answer =>
-
-        SummaryListRowViewModel(
-          key     = "trustWorksReference.checkYourAnswersLabel",
-          value   = ValueViewModel(HtmlFormat.escape(answer).toString),
-          actions = Seq(
-            ActionItemViewModel("site.change", controllers.add.trust.routes.TrustWorksReferenceController.onPageLoad(CheckMode).url)
-              .withVisuallyHiddenText(messages("trustWorksReference.change.hidden"))
+    answers.get(TrustWorksReferencePage).map { answer =>
+      SummaryListRowViewModel(
+        key = "trustWorksReference.checkYourAnswersLabel",
+        value = ValueViewModel(HtmlFormat.escape(answer).toString),
+        actions = Seq(
+          ActionItemViewModel(
+            "site.change",
+            controllers.add.trust.routes.TrustWorksReferenceController.onPageLoad(CheckMode).url
           )
+            .withVisuallyHiddenText(messages("trustWorksReference.change.hidden"))
         )
+      )
     }
 }

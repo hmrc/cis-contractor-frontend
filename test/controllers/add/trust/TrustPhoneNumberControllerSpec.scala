@@ -39,9 +39,10 @@ class TrustPhoneNumberControllerSpec extends SpecBase with MockitoSugar {
   def onwardRoute = Call("GET", "/foo")
 
   val formProvider = new TrustPhoneNumberFormProvider()
-  val form = formProvider()
+  val form         = formProvider()
 
-  lazy val trustPhoneNumberRoute: String = controllers.add.trust.routes.TrustPhoneNumberController.onPageLoad(NormalMode).url
+  lazy val trustPhoneNumberRoute: String =
+    controllers.add.trust.routes.TrustPhoneNumberController.onPageLoad(NormalMode).url
 
   "TrustPhoneNumber Controller" - {
 

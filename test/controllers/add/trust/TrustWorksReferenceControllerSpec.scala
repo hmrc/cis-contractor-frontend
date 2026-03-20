@@ -39,9 +39,10 @@ class TrustWorksReferenceControllerSpec extends SpecBase with MockitoSugar {
   def onwardRoute = Call("GET", "/foo")
 
   val formProvider = new TrustWorksReferenceFormProvider()
-  val form = formProvider()
+  val form         = formProvider()
 
-  lazy val trustWorksReferenceRoute: String = controllers.add.trust.routes.TrustWorksReferenceController.onPageLoad(NormalMode).url
+  lazy val trustWorksReferenceRoute: String =
+    controllers.add.trust.routes.TrustWorksReferenceController.onPageLoad(NormalMode).url
 
   "TrustWorksReference Controller" - {
 

@@ -22,8 +22,8 @@ import play.api.data.FormError
 class TrustWorksReferenceFormProviderSpec extends StringFieldBehaviours {
 
   val requiredKey = "trustWorksReference.error.required"
-  val lengthKey = "trustWorksReference.error.length"
-  val maxLength = 20
+  val lengthKey   = "trustWorksReference.error.length"
+  val maxLength   = 20
 
   val form = new TrustWorksReferenceFormProvider()()
 

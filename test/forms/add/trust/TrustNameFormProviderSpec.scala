@@ -22,8 +22,8 @@ import play.api.data.FormError
 class TrustNameFormProviderSpec extends StringFieldBehaviours {
 
   val requiredKey = "trustName.error.required"
-  val lengthKey = "trustName.error.length"
-  val maxLength = 56
+  val lengthKey   = "trustName.error.length"
+  val maxLength   = 56
 
   val form = new TrustNameFormProvider()()
 

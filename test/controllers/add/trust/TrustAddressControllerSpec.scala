@@ -39,7 +39,7 @@ class TrustAddressControllerSpec extends SpecBase with MockitoSugar {
   def onwardRoute = Call("GET", "/foo")
 
   val formProvider = new TrustAddressFormProvider()
-  val form = formProvider()
+  val form         = formProvider()
 
   lazy val trustAddressRoute: String = controllers.add.trust.routes.TrustAddressController.onPageLoad(NormalMode).url
 

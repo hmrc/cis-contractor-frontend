@@ -24,19 +24,17 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
 
-object TrustUtrSummary  {
+object TrustUtrSummary {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(TrustUtrPage).map {
-      answer =>
-
-        SummaryListRowViewModel(
-          key     = "trustUtr.checkYourAnswersLabel",
-          value   = ValueViewModel(HtmlFormat.escape(answer).toString),
-          actions = Seq(
-            ActionItemViewModel("site.change", controllers.add.trust.routes.TrustUtrController.onPageLoad(CheckMode).url)
-              .withVisuallyHiddenText(messages("trustUtr.change.hidden"))
-          )
+    answers.get(TrustUtrPage).map { answer =>
+      SummaryListRowViewModel(
+        key = "trustUtr.checkYourAnswersLabel",
+        value = ValueViewModel(HtmlFormat.escape(answer).toString),
+        actions = Seq(
+          ActionItemViewModel("site.change", controllers.add.trust.routes.TrustUtrController.onPageLoad(CheckMode).url)
+            .withVisuallyHiddenText(messages("trustUtr.change.hidden"))
         )
+      )
     }
 }

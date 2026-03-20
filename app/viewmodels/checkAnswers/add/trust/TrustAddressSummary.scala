@@ -24,19 +24,20 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
 
-object TrustAddressSummary  {
+object TrustAddressSummary {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(TrustAddressPage).map {
-      answer =>
-
-        SummaryListRowViewModel(
-          key     = "trustAddress.checkYourAnswersLabel",
-          value   = ValueViewModel(HtmlFormat.escape(answer).toString),
-          actions = Seq(
-            ActionItemViewModel("site.change", controllers.add.trust.routes.TrustAddressController.onPageLoad(CheckMode).url)
-              .withVisuallyHiddenText(messages("trustAddress.change.hidden"))
+    answers.get(TrustAddressPage).map { answer =>
+      SummaryListRowViewModel(
+        key = "trustAddress.checkYourAnswersLabel",
+        value = ValueViewModel(HtmlFormat.escape(answer).toString),
+        actions = Seq(
+          ActionItemViewModel(
+            "site.change",
+            controllers.add.trust.routes.TrustAddressController.onPageLoad(CheckMode).url
           )
+            .withVisuallyHiddenText(messages("trustAddress.change.hidden"))
         )
+      )
     }
 }

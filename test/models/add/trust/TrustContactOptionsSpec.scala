@@ -33,10 +33,8 @@ class TrustContactOptionsSpec extends AnyFreeSpec with Matchers with ScalaCheckP
 
       val gen = Gen.oneOf(TrustContactOptions.values.toSeq)
 
-      forAll(gen) {
-        trustContactOptions =>
-
-          JsString(trustContactOptions.toString).validate[TrustContactOptions].asOpt.value mustEqual trustContactOptions
+      forAll(gen) { trustContactOptions =>
+        JsString(trustContactOptions.toString).validate[TrustContactOptions].asOpt.value mustEqual trustContactOptions
       }
     }
 
@@ -44,10 +42,8 @@ class TrustContactOptionsSpec extends AnyFreeSpec with Matchers with ScalaCheckP
 
       val gen = arbitrary[String] suchThat (!TrustContactOptions.values.map(_.toString).contains(_))
 
-      forAll(gen) {
-        invalidValue =>
-
-          JsString(invalidValue).validate[TrustContactOptions] mustEqual JsError("error.invalid")
+      forAll(gen) { invalidValue =>
+        JsString(invalidValue).validate[TrustContactOptions] mustEqual JsError("error.invalid")
       }
     }
 
@@ -55,10 +51,8 @@ class TrustContactOptionsSpec extends AnyFreeSpec with Matchers with ScalaCheckP
 
       val gen = Gen.oneOf(TrustContactOptions.values.toSeq)
 
-      forAll(gen) {
-        trustContactOptions =>
-
-          Json.toJson(trustContactOptions) mustEqual JsString(trustContactOptions.toString)
+      forAll(gen) { trustContactOptions =>
+        Json.toJson(trustContactOptions) mustEqual JsString(trustContactOptions.toString)
       }
     }
   }

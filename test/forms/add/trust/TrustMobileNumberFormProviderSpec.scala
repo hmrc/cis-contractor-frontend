@@ -22,8 +22,8 @@ import play.api.data.FormError
 class TrustMobileNumberFormProviderSpec extends StringFieldBehaviours {
 
   val requiredKey = "trustMobileNumber.error.required"
-  val lengthKey = "trustMobileNumber.error.length"
-  val maxLength = 35
+  val lengthKey   = "trustMobileNumber.error.length"
+  val maxLength   = 35
 
   val form = new TrustMobileNumberFormProvider()()
 

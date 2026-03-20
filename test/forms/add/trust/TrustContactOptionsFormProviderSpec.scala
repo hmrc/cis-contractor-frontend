@@ -26,13 +26,13 @@ class TrustContactOptionsFormProviderSpec extends OptionFieldBehaviours {
 
   ".value" - {
 
-    val fieldName = "value"
+    val fieldName   = "value"
     val requiredKey = "trustContactOptions.error.required"
 
     behave like optionsField[TrustContactOptions](
       form,
       fieldName,
-      validValues  = TrustContactOptions.values,
+      validValues = TrustContactOptions.values,
       invalidError = FormError(fieldName, "error.invalid")
     )
 
