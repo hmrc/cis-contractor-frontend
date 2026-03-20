@@ -47,7 +47,7 @@ object PartnershipHasUtrYesNoSummary {
               .url
           ).withVisuallyHiddenText(
             messages("partnershipHasUtrYesNo.change.hidden")
-          )
+          ).withAttribute("id" -> "add-partnership-utr")
         )
       )
     }

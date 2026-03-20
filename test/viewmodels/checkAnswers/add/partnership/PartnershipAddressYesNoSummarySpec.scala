@@ -24,6 +24,7 @@ import play.api.i18n.{Lang, Messages, MessagesImpl}
 import play.api.test.Helpers.*
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.*
+import org.scalatest.matchers.must.Matchers.must
 
 class PartnershipAddressYesNoSummarySpec extends SpecBase with GuiceOneAppPerSuite {
 
@@ -57,6 +58,7 @@ class PartnershipAddressYesNoSummarySpec extends SpecBase with GuiceOneAppPerSui
         .url
       action.content mustBe Text(messages("site.change"))
       action.visuallyHiddenText mustBe Some(messages("partnershipAddressYesNo.change.hidden"))
+      action.attributes must contain("id" -> "add-partnership-address")
     }
 
     "return a row with key, value = no, and change action when the answer is false" in {
@@ -84,6 +86,7 @@ class PartnershipAddressYesNoSummarySpec extends SpecBase with GuiceOneAppPerSui
         .url
       action.content mustBe Text(messages("site.change"))
       action.visuallyHiddenText mustBe Some(messages("partnershipAddressYesNo.change.hidden"))
+      action.attributes must contain("id" -> "add-partnership-address")
     }
 
     "return None when the answer is missing" in {

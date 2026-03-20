@@ -26,6 +26,7 @@ import pages.add.partnership.PartnershipNominatedPartnerUtrPage
 import play.api.i18n.Messages
 import play.api.test.Helpers.stubMessages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.*
+import org.scalatest.matchers.must.Matchers.must
 
 class PartnershipNominatedPartnerUtrSummarySpec extends AnyFreeSpec with Matchers {
 
@@ -62,6 +63,7 @@ class PartnershipNominatedPartnerUtrSummarySpec extends AnyFreeSpec with Matcher
       changeAction.content.asHtml.toString    should include(expectedChangeText)
       changeAction.href                     shouldBe expectedHref
       changeAction.visuallyHiddenText.value shouldBe expectedHiddenText
+      changeAction.attributes                   must contain("id" -> "nominated-partner-utr")
     }
 
     "must return None when the answer does not exist" in {
