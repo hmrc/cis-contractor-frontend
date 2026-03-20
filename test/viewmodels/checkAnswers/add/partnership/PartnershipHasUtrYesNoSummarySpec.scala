@@ -24,6 +24,7 @@ import play.api.i18n.{Lang, Messages, MessagesImpl}
 import play.api.test.Helpers.*
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.*
+import org.scalatest.matchers.must.Matchers.must
 
 class PartnershipHasUtrYesNoSummarySpec extends SpecBase with GuiceOneAppPerSuite {
 
@@ -62,6 +63,7 @@ class PartnershipHasUtrYesNoSummarySpec extends SpecBase with GuiceOneAppPerSuit
         .url
       action.content mustBe Text(messages("site.change"))
       action.visuallyHiddenText mustBe Some(messages("partnershipHasUtrYesNo.change.hidden"))
+      action.attributes must contain("id" -> "add-partnership-utr")
     }
 
     "return a row with key (including partnership name), value = no, and change action when the answer is false" in {
@@ -92,6 +94,7 @@ class PartnershipHasUtrYesNoSummarySpec extends SpecBase with GuiceOneAppPerSuit
         .url
       action.content mustBe Text(messages("site.change"))
       action.visuallyHiddenText mustBe Some(messages("partnershipHasUtrYesNo.change.hidden"))
+      action.attributes must contain("id" -> "add-partnership-utr")
     }
 
     "throw MissingRequiredAnswer when the partnership name is missing but the answer exists" in {

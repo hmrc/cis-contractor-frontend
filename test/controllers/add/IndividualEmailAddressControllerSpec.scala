@@ -21,11 +21,12 @@ import controllers.routes
 import forms.add.IndividualEmailAddressFormProvider
 import models.add.SubcontractorName
 import models.{NormalMode, UserAnswers}
-import navigation.{FakeNavigator, Navigator}
+import navigation.Navigator
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
 import pages.add.{IndividualEmailAddressPage, SubcontractorNamePage}
+import play.api.data.Form
 import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
@@ -37,12 +38,12 @@ import scala.concurrent.Future
 
 class IndividualEmailAddressControllerSpec extends SpecBase with MockitoSugar {
 
-  def onwardRoute = Call("GET", "/foo")
+  def onwardRoute: Call = Call("GET", "/foo")
 
-  val formProvider = new IndividualEmailAddressFormProvider()
-  val form         = formProvider()
+  val formProvider       = new IndividualEmailAddressFormProvider()
+  val form: Form[String] = formProvider()
 
-  lazy val individualEmailAddressRoute =
+  lazy val individualEmailAddressRoute: String =
     controllers.add.routes.IndividualEmailAddressController.onPageLoad(NormalMode).url
 
   private val subContractorName = SubcontractorName("John", Some("Paul"), "Smith")
@@ -97,13 +98,15 @@ class IndividualEmailAddressControllerSpec extends SpecBase with MockitoSugar {
     "must redirect to the next page when valid data is submitted" in {
 
       val mockSessionRepository = mock[SessionRepository]
+      val mockNavigator         = mock[Navigator]
 
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+      when(mockNavigator.nextPage(any(), any(), any())).thenReturn(onwardRoute)
 
       val application =
         applicationBuilder(userAnswers = Some(uaWithName))
           .overrides(
-            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
+            bind[Navigator].toInstance(mockNavigator),
             bind[SessionRepository].toInstance(mockSessionRepository)
           )
           .build()

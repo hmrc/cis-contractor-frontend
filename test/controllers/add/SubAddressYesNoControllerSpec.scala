@@ -102,7 +102,7 @@ class SubAddressYesNoControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must redirect to the NationalInsuranceNumberYesNo page when valid data with value No is submitted" in {
+    "must redirect to the UniqueTaxpayerReferenceYesNo page when valid data with value No is submitted" in {
 
       val mockSessionRepository = mock[SessionRepository]
 

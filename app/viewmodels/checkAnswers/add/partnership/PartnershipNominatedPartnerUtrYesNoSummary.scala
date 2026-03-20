@@ -39,6 +39,7 @@ object PartnershipNominatedPartnerUtrYesNoSummary {
             controllers.add.partnership.routes.PartnershipNominatedPartnerUtrYesNoController.onPageLoad(CheckMode).url
           )
             .withVisuallyHiddenText(messages("partnershipNominatedPartnerUtrYesNo.change.hidden"))
+            .withAttribute("id" -> "add-nominated-partner-utr")
         )
       )
     }

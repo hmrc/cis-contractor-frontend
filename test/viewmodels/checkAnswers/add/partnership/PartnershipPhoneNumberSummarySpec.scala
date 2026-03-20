@@ -26,6 +26,7 @@ import pages.add.partnership.PartnershipPhoneNumberPage
 import play.api.i18n.Messages
 import play.api.test.Helpers.stubMessages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.*
+import org.scalatest.matchers.must.Matchers.must
 
 class PartnershipPhoneNumberSummarySpec extends AnyFreeSpec with Matchers {
   implicit val messages: Messages = stubMessages()
@@ -62,6 +63,7 @@ class PartnershipPhoneNumberSummarySpec extends AnyFreeSpec with Matchers {
       changeAction.href                  shouldBe expectedHref
 
       changeAction.visuallyHiddenText.value shouldBe expectedHiddenText
+      changeAction.attributes                   must contain("id" -> "partnership-phone-number")
     }
 
     "must return None when the answer does not exist" in {

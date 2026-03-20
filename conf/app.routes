@@ -182,6 +182,7 @@ POST       /add/partnership/change-phone-number          controllers.add.partner
 GET        /add/partnership/subcontractor-added          controllers.add.partnership.SubcontractorAddedController.onPageLoad()
 
 GET        /add/partnership/check-your-answers           controllers.add.partnership.PartnershipCheckYourAnswersController.onPageLoad()
+POST       /add/partnership/check-your-answers           controllers.add.partnership.PartnershipCheckYourAnswersController.onSubmit()
 
 GET        /add/company/company-name                     controllers.add.company.CompanyNameController.onPageLoad(mode: Mode = NormalMode)
 POST       /add/company/company-name                     controllers.add.company.CompanyNameController.onSubmit(mode: Mode = NormalMode)
@@ -276,3 +277,4 @@ GET        /add/check-contact-details                           controllers.add.
 POST       /add/check-contact-details                           controllers.add.IndividualChooseContactDetailsController.onSubmit(mode: Mode = NormalMode)
 GET        /add/change-check-contact-details                    controllers.add.IndividualChooseContactDetailsController.onPageLoad(mode: Mode = CheckMode)
 POST       /add/change-check-contact-details                    controllers.add.IndividualChooseContactDetailsController.onSubmit(mode: Mode = CheckMode)
+

@@ -30,7 +30,7 @@
 
 @layout(pageTitle = titleNoForm(messages("partnershipCheckYourAnswers.title"))) {
 
-    @formHelper(action = controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad(), Symbol("autoComplete") -> "off") {
+    @formHelper(action = controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onSubmit(), Symbol("autoComplete") -> "off") {
 
         @h1("partnershipCheckYourAnswers.heading")
 

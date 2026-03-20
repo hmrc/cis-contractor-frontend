@@ -18,9 +18,12 @@ package services
 
 import connectors.ConstructionIndustrySchemeConnector
 import models.UserAnswers
+import models.add.TypeOfSubcontractor.{Individualorsoletrader, Partnership}
+import models.contact.ContactOptions
 import models.add.{SubcontractorName, TypeOfSubcontractor}
-import models.subcontractor.CreateAndUpdateSubcontractorRequest
+import models.requests.CreateAndUpdateSubcontractorPayload.{IndividualOrSoleTraderPayload, PartnershipPayload}
 import pages.add.*
+import pages.add.partnership.*
 import play.api.Logging
 import queries.CisIdQuery
 import uk.gov.hmrc.http.HeaderCarrier
@@ -41,22 +44,19 @@ class SubcontractorService @Inject() (
       cisId             <- getCisId(userAnswers)
       subcontractorType <- getSubcontractorType(userAnswers)
 
-      payload = CreateAndUpdateSubcontractorRequest(
-                  cisId = cisId,
-                  subcontractorType = subcontractorType,
-                  firstName = userAnswers.get(SubcontractorNamePage).map(_.firstName),
-                  secondName = userAnswers.get(SubcontractorNamePage).flatMap(_.middleName),
-                  surname = userAnswers.get(SubcontractorNamePage).map(_.lastName),
-                  tradingName = userAnswers.get(TradingNameOfSubcontractorPage),
-                  addressLine1 = userAnswers.get(AddressOfSubcontractorPage).map(_.addressLine1),
-                  addressLine2 = userAnswers.get(AddressOfSubcontractorPage).flatMap(_.addressLine2),
-                  addressLine3 = userAnswers.get(AddressOfSubcontractorPage).map(_.addressLine3),
-                  addressLine4 = userAnswers.get(AddressOfSubcontractorPage).flatMap(_.addressLine4),
-                  postcode = userAnswers.get(AddressOfSubcontractorPage).map(_.postCode),
-                  nino = userAnswers.get(SubNationalInsuranceNumberPage),
-                  utr = userAnswers.get(SubcontractorsUniqueTaxpayerReferencePage),
-                  worksReferenceNumber = userAnswers.get(WorksReferenceNumberPage)
-                )
+      payload = {
+        subcontractorType match {
+
+          case Individualorsoletrader =>
+            individualOrSoleTraderPayloadFromUserAnswers(cisId, subcontractorType, userAnswers)
+
+          case Partnership =>
+            partnershipPayloadFromUserAnswers(cisId, subcontractorType, userAnswers)
+
+          case other =>
+            throw new RuntimeException(s"Unsupported subcontractor type: $other")
+        }
+      }
       _      <- cisConnector.createAndUpdateSubcontractor(payload)
     } yield ()
 
@@ -80,4 +80,78 @@ class SubcontractorService @Inject() (
       case Some(subcontractorType) => Future.successful(subcontractorType)
       case None                    => Future.failed(new RuntimeException("TypeOfSubcontractorPage not found in session data"))
     }
+
+  private case class ContactDetails(email: Option[String], phone: Option[String], mobile: Option[String])
+
+  private def partnershipContactDetailsFromUserAnswers(
+    userAnswers: UserAnswers
+  ): ContactDetails =
+    userAnswers.get(PartnershipChooseContactDetailsPage) match {
+      case Some(ContactOptions.Email) =>
+        ContactDetails(userAnswers.get(PartnershipEmailAddressPage), None, None)
+
+      case Some(ContactOptions.Phone) =>
+        ContactDetails(None, userAnswers.get(PartnershipPhoneNumberPage), None)
+
+      case Some(ContactOptions.Mobile) =>
+        ContactDetails(None, None, userAnswers.get(PartnershipMobileNumberPage))
+
+      case Some(ContactOptions.NoDetails) =>
+        ContactDetails(None, None, None)
+
+      case _ => ContactDetails(None, None, None)
+    }
+
+  private def partnershipPayloadFromUserAnswers(
+    cisId: String,
+    subcontractorType: TypeOfSubcontractor,
+    userAnswers: UserAnswers
+  ): PartnershipPayload = {
+
+    val contactDetails = partnershipContactDetailsFromUserAnswers(userAnswers)
+
+    PartnershipPayload(
+      cisId = cisId,
+      subcontractorType = subcontractorType,
+      utr = userAnswers.get(PartnershipUniqueTaxpayerReferencePage),
+      partnerUtr = userAnswers.get(PartnershipNominatedPartnerUtrPage),
+      partnershipTradingName = userAnswers.get(PartnershipNamePage),
+      partnerTradingName = userAnswers.get(PartnershipNominatedPartnerNamePage),
+      partnerNino = userAnswers.get(PartnershipNominatedPartnerNinoPage),
+      partnerCrn = userAnswers.get(PartnershipNominatedPartnerCrnPage),
+      addressLine1 = userAnswers.get(PartnershipAddressPage).map(_.addressLine1),
+      addressLine2 = userAnswers.get(PartnershipAddressPage).flatMap(_.addressLine2),
+      city = userAnswers.get(PartnershipAddressPage).map(_.addressLine3),
+      county = userAnswers.get(PartnershipAddressPage).flatMap(_.addressLine4),
+      postcode = userAnswers.get(PartnershipAddressPage).map(_.postalCode),
+      country = userAnswers.get(PartnershipAddressPage).map(_.country),
+      emailAddress = contactDetails.email,
+      phoneNumber = contactDetails.phone,
+      mobilePhoneNumber = contactDetails.mobile,
+      worksReferenceNumber = userAnswers.get(PartnershipWorksReferenceNumberPage)
+    )
+  }
+
+  private def individualOrSoleTraderPayloadFromUserAnswers(
+    cisId: String,
+    subcontractorType: TypeOfSubcontractor,
+    userAnswers: UserAnswers
+  ): IndividualOrSoleTraderPayload =
+    IndividualOrSoleTraderPayload(
+      cisId = cisId,
+      subcontractorType = subcontractorType,
+      firstName = userAnswers.get(SubcontractorNamePage).map(_.firstName),
+      secondName = userAnswers.get(SubcontractorNamePage).flatMap(_.middleName),
+      surname = userAnswers.get(SubcontractorNamePage).map(_.lastName),
+      tradingName = userAnswers.get(TradingNameOfSubcontractorPage),
+      addressLine1 = userAnswers.get(AddressOfSubcontractorPage).map(_.addressLine1),
+      addressLine2 = userAnswers.get(AddressOfSubcontractorPage).flatMap(_.addressLine2),
+      city = userAnswers.get(AddressOfSubcontractorPage).map(_.addressLine3),
+      county = userAnswers.get(AddressOfSubcontractorPage).flatMap(_.addressLine4),
+      postcode = userAnswers.get(AddressOfSubcontractorPage).map(_.postCode),
+      nino = userAnswers.get(SubNationalInsuranceNumberPage),
+      utr = userAnswers.get(SubcontractorsUniqueTaxpayerReferencePage),
+      worksReferenceNumber = userAnswers.get(WorksReferenceNumberPage)
+    )
+
 }

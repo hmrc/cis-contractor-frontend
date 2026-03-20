@@ -37,6 +37,7 @@ object PartnershipMobileNumberSummary {
             controllers.add.partnership.routes.PartnershipMobileNumberController.onPageLoad(CheckMode).url
           )
             .withVisuallyHiddenText(messages("partnershipMobileNumber.change.hidden"))
+            .withAttribute("id" -> "partnership-mobile-number")
         )
       )
     }
