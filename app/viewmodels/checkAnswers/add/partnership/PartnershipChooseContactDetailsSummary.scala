@@ -37,7 +37,7 @@ object PartnershipChooseContactDetailsSummary {
             routes.PartnershipChooseContactDetailsController.onPageLoad(CheckMode).url
           )
             .withVisuallyHiddenText(messages("partnershipChooseContactDetails.change.hidden"))
-            .withAttribute("id" -> "partnership-choose-contact-details")
+            .withAttribute("id" -> "partnership-method-of-contact")
         )
       )
     }

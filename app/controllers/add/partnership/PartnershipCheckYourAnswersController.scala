@@ -24,13 +24,17 @@ import pages.add.partnership.PartnershipChooseContactDetailsPage
 import play.api.Logging
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import repositories.SessionRepository
+import services.SubcontractorService
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.checkAnswers.add.TypeOfSubcontractorSummary
 import viewmodels.checkAnswers.add.partnership.{PartnershipWorksReferenceNumberYesNoSummary, *}
 import viewmodels.govuk.summarylist.*
 import views.html.add.partnership.PartnershipCheckYourAnswersView
+import pages.add.CheckYourAnswersSubmittedPage
 
+import scala.concurrent.{ExecutionContext, Future}
 import javax.inject.Inject
 
 class PartnershipCheckYourAnswersController @Inject() (
@@ -39,8 +43,11 @@ class PartnershipCheckYourAnswersController @Inject() (
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   val controllerComponents: MessagesControllerComponents,
+  subcontractorService: SubcontractorService,
+  sessionRepository: SessionRepository,
   view: PartnershipCheckYourAnswersView
-) extends FrontendBaseController
+)(implicit ec: ExecutionContext)
+    extends FrontendBaseController
     with I18nSupport
     with Logging {
 
@@ -84,5 +91,38 @@ class PartnershipCheckYourAnswersController @Inject() (
         Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
     }
   }
+
+  def onSubmit(): Action[AnyContent] =
+    (identify andThen getData andThen requireData).async { implicit request =>
+      if (request.userAnswers.get(CheckYourAnswersSubmittedPage).contains(true)) {
+        Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+      } else {
+        ValidatedPartnership.build(request.userAnswers) match {
+
+          case Right(_) =>
+            subcontractorService
+              .createAndUpdateSubcontractor(request.userAnswers)
+              .flatMap { _ =>
+                Future
+                  .fromTry(request.userAnswers.set(CheckYourAnswersSubmittedPage, true))
+                  .flatMap(updated => sessionRepository.set(updated).map(_ => ()))
+                  .map(_ =>
+                    Redirect(controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad())
+                  )
+              }
+              .recover { case t =>
+                logger.error(
+                  "[CheckYourAnswersController.onSubmit] Failed to create/update partnership subcontractor",
+                  t
+                )
+                Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+              }
+
+          case Left(error) =>
+            logger.error(s"[CheckYourAnswersController.onSubmit] Validation failed: $error")
+            Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+        }
+      }
+    }
 
 }

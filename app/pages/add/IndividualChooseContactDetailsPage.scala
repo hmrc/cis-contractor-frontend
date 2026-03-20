@@ -23,7 +23,9 @@ import pages.QuestionPage
 import play.api.libs.json.JsPath
 import scala.util.{Success, Try}
 
-case object IndividualChooseContactDetailsPage extends QuestionPage[IndividualChooseContactDetails] {
+case object IndividualChooseContactDetailsPage
+    extends QuestionPage[IndividualChooseContactDetails]
+    with IndividualJourney {
 
   override def path: JsPath = JsPath \ toString
 

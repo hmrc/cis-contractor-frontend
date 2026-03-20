@@ -39,6 +39,7 @@ object PartnershipNominatedPartnerNinoYesNoSummary {
             controllers.add.partnership.routes.PartnershipNominatedPartnerNinoYesNoController.onPageLoad(CheckMode).url
           )
             .withVisuallyHiddenText(messages("partnershipNominatedPartnerNinoYesNo.change.hidden"))
+            .withAttribute("id" -> "add-nominated-partner-nino")
         )
       )
     }

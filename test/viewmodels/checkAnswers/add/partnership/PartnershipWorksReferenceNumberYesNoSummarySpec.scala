@@ -26,6 +26,7 @@ import pages.add.partnership.PartnershipWorksReferenceNumberYesNoPage
 import play.api.i18n.Messages
 import play.api.test.Helpers.stubMessages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.*
+import org.scalatest.matchers.must.Matchers.must
 
 class PartnershipWorksReferenceNumberYesNoSummarySpec extends AnyFreeSpec with Matchers {
 
@@ -63,6 +64,7 @@ class PartnershipWorksReferenceNumberYesNoSummarySpec extends AnyFreeSpec with M
       changeAction.content.asHtml.toString    should include(expectedChangeText)
       changeAction.href                     shouldBe expectedHref
       changeAction.visuallyHiddenText.value shouldBe expectedHiddenText
+      changeAction.attributes                   must contain("id" -> "add-partnership-works-reference-number")
     }
 
     "must return a SummaryListRow with 'No' when the answer is false" in {
