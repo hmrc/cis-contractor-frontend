@@ -39,6 +39,7 @@ object PartnershipAddressYesNoSummary {
             controllers.add.partnership.routes.PartnershipAddressYesNoController.onPageLoad(CheckMode).url
           )
             .withVisuallyHiddenText(messages("partnershipAddressYesNo.change.hidden"))
+            .withAttribute("id" -> "add-partnership-address")
         )
       )
     }
