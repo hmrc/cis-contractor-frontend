@@ -206,7 +206,7 @@ class NavigatorSpec extends SpecBase {
           SubAddressYesNoPage,
           NormalMode,
           emptyUserAnswers.setOrException(SubAddressYesNoPage, false)
-        ) mustBe controllers.add.routes.NationalInsuranceNumberYesNoController.onPageLoad(NormalMode)
+        ) mustBe controllers.add.routes.IndividualChooseContactDetailsController.onPageLoad(NormalMode)
       }
 
       "must go from a SubAddressYesNoPage to journey recovery when incomplete info provided" in {
@@ -222,7 +222,7 @@ class NavigatorSpec extends SpecBase {
           AddressOfSubcontractorPage,
           NormalMode,
           UserAnswers("id")
-        ) mustBe controllers.add.routes.NationalInsuranceNumberYesNoController.onPageLoad(NormalMode)
+        ) mustBe controllers.add.routes.IndividualChooseContactDetailsController.onPageLoad(NormalMode)
       }
 
       "must go from a PartnershipAddressPage to PartnershipChooseContactDetailsController in NormalMode" in {
@@ -246,7 +246,7 @@ class NavigatorSpec extends SpecBase {
           NationalInsuranceNumberYesNoPage,
           NormalMode,
           emptyUserAnswers.setOrException(NationalInsuranceNumberYesNoPage, false)
-        ) mustBe controllers.add.routes.UniqueTaxpayerReferenceYesNoController.onPageLoad(NormalMode)
+        ) mustBe controllers.add.routes.WorksReferenceNumberYesNoController.onPageLoad(NormalMode)
       }
 
       "must go from a NationalInsuranceNumberYesNoPage to journey recovery when incomplete info provided" in {
@@ -262,7 +262,7 @@ class NavigatorSpec extends SpecBase {
           SubNationalInsuranceNumberPage,
           NormalMode,
           UserAnswers("id")
-        ) mustBe controllers.add.routes.UniqueTaxpayerReferenceYesNoController.onPageLoad(NormalMode)
+        ) mustBe controllers.add.routes.WorksReferenceNumberYesNoController.onPageLoad(NormalMode)
       }
 
       "must go from a UniqueTaxpayerReferenceYesNoPage to SubcontractorsUniqueTaxpayerReferencePage when true" in {
@@ -278,7 +278,7 @@ class NavigatorSpec extends SpecBase {
           UniqueTaxpayerReferenceYesNoPage,
           NormalMode,
           emptyUserAnswers.setOrException(UniqueTaxpayerReferenceYesNoPage, false)
-        ) mustBe controllers.add.routes.WorksReferenceNumberYesNoController.onPageLoad(NormalMode)
+        ) mustBe controllers.add.routes.NationalInsuranceNumberYesNoController.onPageLoad(NormalMode)
       }
 
       "must go from a UniqueTaxpayerReferenceYesNoPage to journey recovery when incomplete info provided" in {
@@ -294,7 +294,7 @@ class NavigatorSpec extends SpecBase {
           SubcontractorsUniqueTaxpayerReferencePage,
           NormalMode,
           UserAnswers("id")
-        ) mustBe controllers.add.routes.WorksReferenceNumberYesNoController.onPageLoad(NormalMode)
+        ) mustBe controllers.add.routes.NationalInsuranceNumberYesNoController.onPageLoad(NormalMode)
       }
 
       "must go from a WorksReferenceNumberYesNoPage to WorksReferenceNumberPage when true" in {
