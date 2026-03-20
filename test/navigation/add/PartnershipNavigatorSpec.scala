@@ -518,7 +518,7 @@ class PartnershipNavigatorSpec extends SpecBase {
 
         val answers =
           emptyUserAnswers
-            .set(PartnershipNominatedPartnerUtrPage, "1234567890") // adjust type if Utr is not String
+            .set(PartnershipNominatedPartnerUtrPage, "1234567890") 
             .success
             .value
 
