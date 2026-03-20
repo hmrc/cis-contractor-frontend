@@ -44,6 +44,7 @@
                 label = LabelViewModel(messages("subcontractorName.firstName"))
             )
             .withWidth(Full)
+            .withAutocomplete("given-name")
         )
 
         @govukInput(
@@ -52,6 +53,7 @@
                 label = LabelViewModel(messages("subcontractorName.middleName"))
             )
             .withWidth(Full)
+            .withAutocomplete("additional-name")
         )
 
         @govukInput(
@@ -60,6 +62,7 @@
                 label = LabelViewModel(messages("subcontractorName.lastName"))
             )
             .withWidth(Full)
+            .withAutocomplete("family-name")
         )
 
         @govukButton(
