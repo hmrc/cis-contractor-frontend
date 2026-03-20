@@ -17,7 +17,6 @@
 package forms.add
 
 import forms.Validation
-import forms.add.IndividualEmailAddressFormProvider
 import forms.behaviours.StringFieldBehaviours
 import forms.mappings.Constants.MaxLength254
 import org.scalacheck.Gen
