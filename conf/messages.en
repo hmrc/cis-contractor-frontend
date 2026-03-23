@@ -660,12 +660,14 @@ individualChooseContactDetails.error.required = Select whether you want to add c
 individualChooseContactDetails.checkYourAnswersLabel = Method of contact
 individualChooseContactDetails.change.hidden = method of contact
 
-trustName.title = trustName
-trustName.heading = trustName
-trustName.checkYourAnswersLabel = trustName
-trustName.error.required = Enter trustName
-trustName.error.length = TrustName must be 56 characters or less
-trustName.change.hidden = TrustName
+trustName.title = What is the name of the trust?
+trustName.heading = What is the name of the trust?
+trustName.hint = This will be the name as registered with HMRC
+trustName.checkYourAnswersLabel = Trust name
+trustName.error.required = Enter a trust name like ABC Construction Ltd
+trustName.error.length = Enter a trust name up to 56 characters
+trustName.error.invalidCharacters = Enter a trust name using letters a to z, numbers, apostrophes, ampersands, commas, hyphens, full stops, forward slashes and spaces
+trustName.change.hidden = trust name
 
 trustAddressYesNo.title = trustAddressYesNo
 trustAddressYesNo.heading = trustAddressYesNo
