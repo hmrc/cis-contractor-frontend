@@ -141,9 +141,7 @@ class SubcontractorService @Inject() (
       country = userAnswers.get(AddressOfSubcontractorPage).map(_.country),
       nino = userAnswers.get(SubNationalInsuranceNumberPage),
       utr = userAnswers.get(SubcontractorsUniqueTaxpayerReferencePage),
-      worksReferenceNumber = userAnswers.get(WorksReferenceNumberPage),
-      emailAddress = userAnswers.get(SubContactDetailsPage).map(_.email),
-      phoneNumber = userAnswers.get(SubContactDetailsPage).map(_.telephone)
+      worksReferenceNumber = userAnswers.get(WorksReferenceNumberPage)
     )
 
   private def companyContactDetailsFromUserAnswers(userAnswers: UserAnswers): ContactDetails =

@@ -18,7 +18,7 @@ package services
 
 import base.SpecBase
 import connectors.ConstructionIndustrySchemeConnector
-import models.add.{InternationalAddress, SubContactDetails, SubcontractorName, TypeOfSubcontractor}
+import models.add.{InternationalAddress, SubcontractorName, TypeOfSubcontractor}
 import models.contact.ContactOptions
 import pages.add.company._
 import models.requests.CreateAndUpdateSubcontractorPayload
@@ -83,9 +83,6 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
             .set(WorksReferenceNumberPage, "workRef")
             .success
             .value
-            .set(SubContactDetailsPage, SubContactDetails("email", "phone"))
-            .success
-            .value
 
         val expectedPayload: CreateAndUpdateSubcontractorPayload =
           IndividualOrSoleTraderPayload(
@@ -100,9 +97,7 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
             country = Some("United Kingdom"),
             nino = Some("nino"),
             utr = Some("utr"),
-            worksReferenceNumber = Some("workRef"),
-            emailAddress = Some("email"),
-            phoneNumber = Some("phone")
+            worksReferenceNumber = Some("workRef")
           )
 
         when(mockConnector.createAndUpdateSubcontractor(any[CreateAndUpdateSubcontractorPayload])(any[HeaderCarrier]))
@@ -151,9 +146,6 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
             .set(WorksReferenceNumberPage, "workRef")
             .success
             .value
-            .set(SubContactDetailsPage, SubContactDetails("email", "phone"))
-            .success
-            .value
 
         val expectedPayload: CreateAndUpdateSubcontractorPayload =
           IndividualOrSoleTraderPayload(
@@ -170,9 +162,7 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
             country = Some("United Kingdom"),
             nino = Some("nino"),
             utr = Some("utr"),
-            worksReferenceNumber = Some("workRef"),
-            emailAddress = Some("email"),
-            phoneNumber = Some("phone")
+            worksReferenceNumber = Some("workRef")
           )
 
         when(mockConnector.createAndUpdateSubcontractor(any[CreateAndUpdateSubcontractorPayload])(any[HeaderCarrier]))

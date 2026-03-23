@@ -86,7 +86,7 @@ class SubNationalInsuranceNumberControllerSpec extends SpecBase with MockitoSuga
       }
     }
 
-    "must bind the form and redirect to the UniqueTaxpayerReferenceYesNo page on POST when valid data is submitted" in {
+    "must redirect to the WorksReferenceNumberYesNo page when valid data is submitted" in {
 
       val validValue = "AA123456A"
 
@@ -102,7 +102,7 @@ class SubNationalInsuranceNumberControllerSpec extends SpecBase with MockitoSuga
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.add.routes.UniqueTaxpayerReferenceYesNoController
+        redirectLocation(result).value mustEqual controllers.add.routes.WorksReferenceNumberYesNoController
           .onPageLoad(NormalMode)
           .url
       }
