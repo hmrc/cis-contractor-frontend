@@ -14,6 +14,8 @@
  * limitations under the License.
  *@
 
+@import viewmodels.LegendSize.Large
+
 @this(
     layout: templates.Layout,
     formHelper: FormWithCSRF,
@@ -22,7 +24,7 @@
     govukButton: GovukButton
 )
 
-@(form: Form[_], mode: Mode)(implicit request: Request[_], messages: Messages)
+@(form: Form[_], mode: Mode, name: String)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = title(form, messages("uniqueTaxpayerReferenceYesNo.title"))) {
 
@@ -35,9 +37,8 @@
         @govukRadios(
             RadiosViewModel.yesNo(
                 field = form("value"),
-                legend = LegendViewModel(messages("uniqueTaxpayerReferenceYesNo.heading"))
-                    .asPageHeading()
-                    .withCssClass("govuk-fieldset__legend--l")
+                legend = LegendViewModel(messages("uniqueTaxpayerReferenceYesNo.heading", name))
+                    .asPageHeading(Large)
             ).withHint(HintViewModel(messages("uniqueTaxpayerReferenceYesNo.hint")))
         )
 
