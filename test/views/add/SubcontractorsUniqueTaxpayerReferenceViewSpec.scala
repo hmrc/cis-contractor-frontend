@@ -18,6 +18,8 @@ package views.add
 
 import forms.add.UtrFormProvider
 import models.NormalMode
+import org.jsoup.nodes.Document
+import org.jsoup.select.Elements
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
@@ -33,13 +35,27 @@ class SubcontractorsUniqueTaxpayerReferenceViewSpec extends AnyWordSpec with Mat
   "SubcontractorsUniqueTaxpayerReferenceView" should {
 
     "render the page with title, heading, input and submit button" in new Setup {
-      val html: HtmlFormat.Appendable = view(form, NormalMode)
-      val doc                         = org.jsoup.Jsoup.parse(html.toString())
+
+      val subcontractorName = "Test Subcontractor"
+
+      val html: HtmlFormat.Appendable = view(form, NormalMode, subcontractorName)
+      val doc: Document               = org.jsoup.Jsoup.parse(html.toString())
 
       doc.select("title").text() must include(messages("subcontractorsUniqueTaxpayerReference.title"))
 
-      val heading = doc.select("label.govuk-label")
-      heading.text() mustBe messages("subcontractorsUniqueTaxpayerReference.heading")
+      doc.select("h1").text must include(messages("subcontractorsUniqueTaxpayerReference.heading"))
+
+      doc.select("p").text must include(messages("subcontractorsUniqueTaxpayerReference.p1"))
+
+      doc.getElementsByClass("govuk-link").text must include(messages("subcontractorsUniqueTaxpayerReference.linkText"))
+
+      doc.select("label[for=value]").text() mustBe messages(
+        "subcontractorsUniqueTaxpayerReference.label",
+        subcontractorName
+      )
+
+      val hint: Elements = doc.select(".govuk-hint")
+      hint.text() mustBe messages("subcontractorsUniqueTaxpayerReference.hint")
 
       doc.select("form").attr("action") mustBe controllers.add.routes.SubcontractorsUniqueTaxpayerReferenceController
         .onSubmit(NormalMode)
@@ -51,16 +67,19 @@ class SubcontractorsUniqueTaxpayerReferenceViewSpec extends AnyWordSpec with Mat
     }
 
     "display error summary and inline error when no name is entered" in new Setup {
+
+      val subcontractorName = "Test Subcontractor"
+
       val errorForm: Form[String] =
         form.withError("value", "subcontractorsUniqueTaxpayerReference.error.required")
 
-      val html = view(errorForm, NormalMode)
-      val doc  = org.jsoup.Jsoup.parse(html.toString())
+      val html: HtmlFormat.Appendable = view(errorForm, NormalMode, subcontractorName)
+      val doc: Document               = org.jsoup.Jsoup.parse(html.toString())
 
-      val summary = doc.select(".govuk-error-summary")
+      val summary: Elements = doc.select(".govuk-error-summary")
       summary.text() must include(messages("subcontractorsUniqueTaxpayerReference.error.required"))
 
-      val linkHref = summary.select("a").attr("href")
+      val linkHref: String = summary.select("a").attr("href")
       linkHref mustBe "#value"
 
       doc.select(".govuk-error-message").text() must include(

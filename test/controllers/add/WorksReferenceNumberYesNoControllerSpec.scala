@@ -19,11 +19,12 @@ package controllers.add
 import base.SpecBase
 import controllers.routes
 import forms.add.WorksReferenceNumberYesNoFormProvider
+import models.add.SubcontractorName
 import models.{NormalMode, UserAnswers}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.add.WorksReferenceNumberYesNoPage
+import pages.add.{SubcontractorNamePage, WorksReferenceNumberYesNoPage}
 import play.api.data.Form
 import play.api.inject.bind
 import play.api.test.FakeRequest
@@ -35,17 +36,24 @@ import scala.concurrent.Future
 
 class WorksReferenceNumberYesNoControllerSpec extends SpecBase with MockitoSugar {
 
-  val formProvider        = new WorksReferenceNumberYesNoFormProvider()
-  val form: Form[Boolean] = formProvider()
+  private val formProvider        = new WorksReferenceNumberYesNoFormProvider()
+  private val form: Form[Boolean] = formProvider()
 
-  lazy val worksReferenceNumberYesNoRoute: String =
+  private lazy val worksReferenceNumberYesNoRoute: String =
     controllers.add.routes.WorksReferenceNumberYesNoController.onPageLoad(NormalMode).url
+
+  private val subcontractorName = SubcontractorName("John", Some("Paul"), "Smith")
+
+  private val name = "John Smith"
+
+  private def uaWithName: UserAnswers =
+    emptyUserAnswers.set(SubcontractorNamePage, subcontractorName).success.value
 
   "WorksReferenceNumberYesNo Controller" - {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(uaWithName)).build()
 
       running(application) {
         val request = FakeRequest(GET, worksReferenceNumberYesNoRoute)
@@ -55,13 +63,13 @@ class WorksReferenceNumberYesNoControllerSpec extends SpecBase with MockitoSugar
         val view = application.injector.instanceOf[WorksReferenceNumberYesNoView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode, name)(request, messages(application)).toString
       }
     }
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = UserAnswers(userAnswersId).set(WorksReferenceNumberYesNoPage, true).success.value
+      val userAnswers = uaWithName.set(WorksReferenceNumberYesNoPage, true).success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
@@ -73,7 +81,10 @@ class WorksReferenceNumberYesNoControllerSpec extends SpecBase with MockitoSugar
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(true), NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill(true), NormalMode, name)(
+          request,
+          messages(application)
+        ).toString
       }
     }
 
@@ -84,7 +95,7 @@ class WorksReferenceNumberYesNoControllerSpec extends SpecBase with MockitoSugar
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
       val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        applicationBuilder(userAnswers = Some(uaWithName))
           .overrides(
             bind[SessionRepository].toInstance(mockSessionRepository)
           )
@@ -111,7 +122,7 @@ class WorksReferenceNumberYesNoControllerSpec extends SpecBase with MockitoSugar
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
       val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        applicationBuilder(userAnswers = Some(uaWithName))
           .overrides(
             bind[SessionRepository].toInstance(mockSessionRepository)
           )
@@ -125,13 +136,15 @@ class WorksReferenceNumberYesNoControllerSpec extends SpecBase with MockitoSugar
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.add.routes.CheckYourAnswersController.onPageLoad().url
+        redirectLocation(result).value mustEqual controllers.add.routes.CheckYourAnswersController
+          .onPageLoad()
+          .url
       }
     }
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(uaWithName)).build()
 
       running(application) {
         val request =
@@ -145,7 +158,7 @@ class WorksReferenceNumberYesNoControllerSpec extends SpecBase with MockitoSugar
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, NormalMode, name)(request, messages(application)).toString
       }
     }
 
@@ -171,6 +184,43 @@ class WorksReferenceNumberYesNoControllerSpec extends SpecBase with MockitoSugar
         val request =
           FakeRequest(POST, worksReferenceNumberYesNoRoute)
             .withFormUrlEncodedBody(("value", "true"))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must redirect to Journey Recovery for a GET when subcontractor name is missing (userAnswers present)" in {
+
+      val application =
+        applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+
+      running(application) {
+        val request = FakeRequest(GET, worksReferenceNumberYesNoRoute)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must redirect to Journey Recovery for a POST when subcontractor name is missing (userAnswers present)" in {
+
+      val mockSessionRepository = mock[SessionRepository]
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+      val application =
+        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, worksReferenceNumberYesNoRoute)
+            .withFormUrlEncodedBody("value" -> "true")
 
         val result = route(application, request).value
 

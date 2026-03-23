@@ -55,17 +55,13 @@ class CleanupSpec extends PageBehaviours {
 
     "removeIndividualSoleTraderSubcontractor" - {
 
-      val soleTraderAddress = UKAddress(
+      val soleTraderAddress = InternationalAddress(
         addressLine1 = "value 1",
         addressLine2 = Some("value 2"),
         addressLine3 = "value 3",
         addressLine4 = Some("value 4"),
-        postCode = "NX1 1AA"
-      )
-
-      val contactDetails = SubContactDetails(
-        email = "value 1",
-        telephone = "value 2"
+        postalCode = "NX1 1AA",
+        country = "United Kingdom"
       )
 
       val subcontractorName = SubcontractorName(
@@ -85,9 +81,6 @@ class CleanupSpec extends PageBehaviours {
             .success
             .value
             .set(SubAddressYesNoPage, true)
-            .success
-            .value
-            .set(SubContactDetailsPage, contactDetails)
             .success
             .value
             .set(SubcontractorNamePage, subcontractorName)
@@ -123,7 +116,6 @@ class CleanupSpec extends PageBehaviours {
         result.get(AddressOfSubcontractorPage) mustBe None
         result.get(NationalInsuranceNumberYesNoPage) mustBe None
         result.get(SubAddressYesNoPage) mustBe None
-        result.get(SubContactDetailsPage) mustBe None
         result.get(SubcontractorNamePage) mustBe None
         result.get(SubcontractorsUniqueTaxpayerReferencePage) mustBe None
         result.get(SubNationalInsuranceNumberPage) mustBe None

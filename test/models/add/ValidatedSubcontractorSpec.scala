@@ -25,17 +25,16 @@ import pages.add.*
 
 class ValidatedSubcontractorSpec extends SpecBase with Matchers {
 
-  val address = UKAddress(
+  val address = InternationalAddress(
     addressLine1 = "10 Downing Street",
     addressLine2 = Some("Westminster"),
     addressLine3 = "London",
-    addressLine4 = Some("UK"),
-    postCode = "SW1A 2AA"
+    addressLine4 = Some("Greater London"),
+    postalCode = "SW1A 2AA",
+    country = "United Kingdom"
   )
 
   val subcontractorName = SubcontractorName("firstname", Some("middle name"), "lastname")
-
-  val contactDetails = SubContactDetails("test@example.com", "0123456789")
 
   ".build" - {
 
@@ -76,9 +75,6 @@ class ValidatedSubcontractorSpec extends SpecBase with Matchers {
             .success
             .value
             .set(WorksReferenceNumberPage, "WRN-001")
-            .success
-            .value
-            .set(SubContactDetailsPage, contactDetails)
             .success
             .value
 
@@ -132,9 +128,6 @@ class ValidatedSubcontractorSpec extends SpecBase with Matchers {
             .success
             .value
             .set(WorksReferenceNumberPage, "WRN-001")
-            .success
-            .value
-            .set(SubContactDetailsPage, contactDetails)
             .success
             .value
 
@@ -295,6 +288,9 @@ class ValidatedSubcontractorSpec extends SpecBase with Matchers {
             .set(SubAddressYesNoPage, false)
             .success
             .value
+            .set(UniqueTaxpayerReferenceYesNoPage, false)
+            .success
+            .value
 
         val result = ValidatedSubcontractor.build(answers)
 
@@ -379,7 +375,8 @@ class ValidatedSubcontractorSpec extends SpecBase with Matchers {
             .set(WorksReferenceNumberYesNoPage, false)
             .success
             .value
-        val result  = ValidatedSubcontractor.build(answers)
+
+        val result = ValidatedSubcontractor.build(answers)
 
         inside(result) { case Left(error) =>
           error mustBe InvalidAnswer(TradingNameOfSubcontractorPage)

@@ -18,7 +18,7 @@ package controllers.add
 
 import base.SpecBase
 import controllers.routes
-import models.add.{SubContactDetails, TypeOfSubcontractor, UKAddress}
+import models.add.{InternationalAddress, TypeOfSubcontractor}
 import models.{CheckMode, UserAnswers}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{never, verify, verifyNoMoreInteractions, when}
@@ -37,12 +37,13 @@ class CheckYourAnswersControllerSpec extends SpecBase {
 
   "Check Your Answers Controller" - {
 
-    val address = UKAddress(
+    val address = InternationalAddress(
       addressLine1 = "10 Downing Street",
       addressLine2 = Some("Westminster"),
       addressLine3 = "London",
-      addressLine4 = Some("UK"),
-      postCode = "SW1A 2AA"
+      addressLine4 = Some("Greater London"),
+      postalCode = "SW1A 2AA",
+      country = "United Kingdom"
     )
 
     val ua =
@@ -80,9 +81,6 @@ class CheckYourAnswersControllerSpec extends SpecBase {
         .set(WorksReferenceNumberPage, "WRN-001")
         .success
         .value
-        .set(SubContactDetailsPage, SubContactDetails("test@example.com", "0123456789"))
-        .success
-        .value
 
     "must display all questions and dependent rows when answers are provided" in {
 
@@ -96,15 +94,15 @@ class CheckYourAnswersControllerSpec extends SpecBase {
         status(result) mustEqual OK
 
         content must include("Type")
-        content must include("Does the subcontractor use a trading name?")
-        content must include("Trading name")
-        content must include("Do you want to add the subcontractor’s address?")
-        content must include("Subcontractor address")
-        content must include("Do you have a National Insurance number?")
+        content must include("Does subcontractor use a trading name?")
+        content must include("Subcontractor trading name")
+        content must include("Add subcontractor address?")
+        content must include("Address")
+        content must include("Add UTR?")
+        content must include("UTR")
+        content must include("Add National Insurance number?")
         content must include("National Insurance number")
-        content must include("Do you have a Unique Taxpayer Reference (UTR)?")
-        content must include("Unique Taxpayer Reference")
-        content must include("Do you have a works reference number?")
+        content must include("Add works reference number?")
         content must include("Works reference number")
 
         content must include("ABC Ltd")
@@ -112,13 +110,10 @@ class CheckYourAnswersControllerSpec extends SpecBase {
         content must include("1234567890")
         content must include("WRN-001")
 
-        content must include("test@example.com")
-        content must include("0123456789")
-
         content must include(controllers.add.routes.SubTradingNameYesNoController.onPageLoad(CheckMode).url)
         content must include(controllers.add.routes.SubAddressYesNoController.onPageLoad(CheckMode).url)
-        content must include(controllers.add.routes.NationalInsuranceNumberYesNoController.onPageLoad(CheckMode).url)
         content must include(controllers.add.routes.UniqueTaxpayerReferenceYesNoController.onPageLoad(CheckMode).url)
+        content must include(controllers.add.routes.NationalInsuranceNumberYesNoController.onPageLoad(CheckMode).url)
         content must include(controllers.add.routes.WorksReferenceNumberYesNoController.onPageLoad(CheckMode).url)
       }
     }
