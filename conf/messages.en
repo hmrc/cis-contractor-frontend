@@ -662,11 +662,12 @@ trustName.error.required = Enter trustName
 trustName.error.length = TrustName must be 56 characters or less
 trustName.change.hidden = TrustName
 
-trustAddressYesNo.title = trustAddressYesNo
-trustAddressYesNo.heading = trustAddressYesNo
-trustAddressYesNo.checkYourAnswersLabel = trustAddressYesNo
-trustAddressYesNo.error.required = Select yes if trustAddressYesNo
-trustAddressYesNo.change.hidden = TrustAddressYesNo
+trustAddressYesNo.title = Do you want to add an address for this trust?
+trustAddressYesNo.heading = Do you want to add an address for {0}?
+trustAddressYesNo.hint = You can add this information later if you prefer
+trustAddressYesNo.error.required = Select whether you want to add an address for this trust
+trustAddressYesNo.checkYourAnswersLabel = Add trust address?
+trustAddressYesNo.change.hidden = add trust address?
 
 trustAddress.title = trustAddress
 trustAddress.heading = trustAddress

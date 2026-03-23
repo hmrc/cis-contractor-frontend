@@ -39,6 +39,7 @@ object TrustAddressYesNoSummary {
             controllers.add.trust.routes.TrustAddressYesNoController.onPageLoad(CheckMode).url
           )
             .withVisuallyHiddenText(messages("trustAddressYesNo.change.hidden"))
+            .withAttribute("id" -> "add-trust-address")
         )
       )
     }
