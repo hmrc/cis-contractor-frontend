@@ -53,19 +53,6 @@ class SubcontractorCleanupSpec extends SpecBase {
 
   val phoneNumber = "01234567"
 
-  val soleTraderAddress = UKAddress(
-    addressLine1 = "value 1",
-    addressLine2 = Some("value 2"),
-    addressLine3 = "value 3",
-    addressLine4 = Some("value 4"),
-    postCode = "NX1 1AA"
-  )
-
-  val contactDetails = SubContactDetails(
-    email = "value 1",
-    telephone = "value 2"
-  )
-
   val subcontractorName = SubcontractorName(
     firstName = "John",
     middleName = Some("Paul"),
@@ -78,16 +65,25 @@ class SubcontractorCleanupSpec extends SpecBase {
 
       val userAnswers =
         emptyUserAnswers
-          .set(AddressOfSubcontractorPage, soleTraderAddress)
+          .set(AddressOfSubcontractorPage, address)
+          .success
+          .value
+          .set(IndividualChooseContactDetailsPage, ContactOptions.Email)
+          .success
+          .value
+          .set(IndividualEmailAddressPage, email)
+          .success
+          .value
+          .set(IndividualMobileNumberPage, phoneNumber)
+          .success
+          .value
+          .set(IndividualPhoneNumberPage, phoneNumber)
           .success
           .value
           .set(NationalInsuranceNumberYesNoPage, true)
           .success
           .value
           .set(SubAddressYesNoPage, true)
-          .success
-          .value
-          .set(SubContactDetailsPage, contactDetails)
           .success
           .value
           .set(SubcontractorNamePage, subcontractorName)
@@ -114,16 +110,16 @@ class SubcontractorCleanupSpec extends SpecBase {
           .set(WorksReferenceNumberYesNoPage, true)
           .success
           .value
-          .set(IndividualPhoneNumberPage, phoneNumber)
-          .success
-          .value
 
       val result = removeIndividualSoleTraderSubcontractor(userAnswers).success.value
 
       result.get(AddressOfSubcontractorPage) mustBe None
+      result.get(IndividualChooseContactDetailsPage) mustBe None
+      result.get(IndividualEmailAddressPage) mustBe None
+      result.get(IndividualMobileNumberPage) mustBe None
+      result.get(IndividualPhoneNumberPage) mustBe None
       result.get(NationalInsuranceNumberYesNoPage) mustBe None
       result.get(SubAddressYesNoPage) mustBe None
-      result.get(SubContactDetailsPage) mustBe None
       result.get(SubcontractorNamePage) mustBe None
       result.get(SubcontractorsUniqueTaxpayerReferencePage) mustBe None
       result.get(SubNationalInsuranceNumberPage) mustBe None
@@ -132,9 +128,7 @@ class SubcontractorCleanupSpec extends SpecBase {
       result.get(UniqueTaxpayerReferenceYesNoPage) mustBe None
       result.get(WorksReferenceNumberPage) mustBe None
       result.get(WorksReferenceNumberYesNoPage) mustBe None
-      result.get(IndividualPhoneNumberPage) mustBe None
     }
-
   }
 
   ".removeLimitedCompanySubcontractor" - {
@@ -350,16 +344,25 @@ class SubcontractorCleanupSpec extends SpecBase {
           .set(TypeOfSubcontractorPage, TypeOfSubcontractor.Individualorsoletrader)
           .success
           .value
-          .set(AddressOfSubcontractorPage, soleTraderAddress)
+          .set(AddressOfSubcontractorPage, address)
+          .success
+          .value
+          .set(IndividualChooseContactDetailsPage, ContactOptions.Email)
+          .success
+          .value
+          .set(IndividualEmailAddressPage, email)
+          .success
+          .value
+          .set(IndividualMobileNumberPage, phoneNumber)
+          .success
+          .value
+          .set(IndividualPhoneNumberPage, phoneNumber)
           .success
           .value
           .set(NationalInsuranceNumberYesNoPage, true)
           .success
           .value
           .set(SubAddressYesNoPage, true)
-          .success
-          .value
-          .set(SubContactDetailsPage, contactDetails)
           .success
           .value
           .set(SubcontractorNamePage, subcontractorName)
@@ -384,9 +387,6 @@ class SubcontractorCleanupSpec extends SpecBase {
           .success
           .value
           .set(WorksReferenceNumberYesNoPage, true)
-          .success
-          .value
-          .set(IndividualPhoneNumberPage, phoneNumber)
           .success
           .value
           .set(CompanyAddressPage, address)
@@ -521,9 +521,12 @@ class SubcontractorCleanupSpec extends SpecBase {
       result.get(TypeOfSubcontractorPage) mustBe None
 
       result.get(AddressOfSubcontractorPage) mustBe None
+      result.get(IndividualChooseContactDetailsPage) mustBe None
+      result.get(IndividualEmailAddressPage) mustBe None
+      result.get(IndividualMobileNumberPage) mustBe None
+      result.get(IndividualPhoneNumberPage) mustBe None
       result.get(NationalInsuranceNumberYesNoPage) mustBe None
       result.get(SubAddressYesNoPage) mustBe None
-      result.get(SubContactDetailsPage) mustBe None
       result.get(SubcontractorNamePage) mustBe None
       result.get(SubcontractorsUniqueTaxpayerReferencePage) mustBe None
       result.get(SubNationalInsuranceNumberPage) mustBe None
@@ -532,7 +535,6 @@ class SubcontractorCleanupSpec extends SpecBase {
       result.get(UniqueTaxpayerReferenceYesNoPage) mustBe None
       result.get(WorksReferenceNumberPage) mustBe None
       result.get(WorksReferenceNumberYesNoPage) mustBe None
-      result.get(IndividualPhoneNumberPage) mustBe None
 
       result.get(CompanyAddressPage) mustBe None
       result.get(CompanyAddressYesNoPage) mustBe None

@@ -29,18 +29,20 @@ object SubcontractorCleanup {
   def removeIndividualSoleTraderSubcontractor(userAnswers: UserAnswers): Try[UserAnswers] =
     userAnswers
       .remove(AddressOfSubcontractorPage)
+      .flatMap(_.remove(IndividualChooseContactDetailsPage))
+      .flatMap(_.remove(IndividualEmailAddressPage))
+      .flatMap(_.remove(IndividualMobileNumberPage))
+      .flatMap(_.remove(IndividualPhoneNumberPage))
       .flatMap(_.remove(NationalInsuranceNumberYesNoPage))
       .flatMap(_.remove(SubAddressYesNoPage))
       .flatMap(_.remove(SubcontractorNamePage))
       .flatMap(_.remove(SubcontractorsUniqueTaxpayerReferencePage))
-      .flatMap(_.remove(IndividualChooseContactDetailsPage))
       .flatMap(_.remove(SubNationalInsuranceNumberPage))
       .flatMap(_.remove(SubTradingNameYesNoPage))
       .flatMap(_.remove(TradingNameOfSubcontractorPage))
       .flatMap(_.remove(UniqueTaxpayerReferenceYesNoPage))
       .flatMap(_.remove(WorksReferenceNumberPage))
       .flatMap(_.remove(WorksReferenceNumberYesNoPage))
-      .flatMap(_.remove(IndividualPhoneNumberPage))
 
   def removeLimitedCompanySubcontractor(userAnswers: UserAnswers): Try[UserAnswers] =
     userAnswers
