@@ -19,11 +19,12 @@ package controllers.add
 import base.SpecBase
 import controllers.routes
 import forms.add.UtrFormProvider
+import models.add.SubcontractorName
 import models.{NormalMode, UserAnswers}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{verify, verifyNoMoreInteractions, when}
 import org.scalatestplus.mockito.MockitoSugar
-import pages.add.SubcontractorsUniqueTaxpayerReferencePage
+import pages.add.{SubcontractorNamePage, SubcontractorsUniqueTaxpayerReferencePage}
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
@@ -41,11 +42,18 @@ class SubcontractorsUniqueTaxpayerReferenceControllerSpec extends SpecBase with 
   lazy private val subcontractorsUniqueTaxpayerReferenceRoute =
     controllers.add.routes.SubcontractorsUniqueTaxpayerReferenceController.onPageLoad(NormalMode).url
 
+  private val subcontractorName = SubcontractorName("John", Some("Paul"), "Smith")
+
+  private val name = "John Smith"
+
+  private def uaWithName: UserAnswers =
+    emptyUserAnswers.set(SubcontractorNamePage, subcontractorName).success.value
+
   "SubcontractorsUniqueTaxpayerReference Controller" - {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(uaWithName)).build()
 
       running(application) {
         val request = FakeRequest(GET, subcontractorsUniqueTaxpayerReferenceRoute)
@@ -55,14 +63,13 @@ class SubcontractorsUniqueTaxpayerReferenceControllerSpec extends SpecBase with 
         val view = application.injector.instanceOf[SubcontractorsUniqueTaxpayerReferenceView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode, name)(request, messages(application)).toString
       }
     }
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers =
-        UserAnswers(userAnswersId).set(SubcontractorsUniqueTaxpayerReferencePage, "answer").success.value
+      val userAnswers = uaWithName.set(SubcontractorsUniqueTaxpayerReferencePage, "answer").success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
@@ -74,7 +81,10 @@ class SubcontractorsUniqueTaxpayerReferenceControllerSpec extends SpecBase with 
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill("answer"), NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill("answer"), NormalMode, name)(
+          request,
+          messages(application)
+        ).toString
       }
     }
 
@@ -88,7 +98,7 @@ class SubcontractorsUniqueTaxpayerReferenceControllerSpec extends SpecBase with 
         .thenReturn(Future.successful(false))
 
       val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        applicationBuilder(userAnswers = Some(uaWithName))
           .overrides(
             bind[SubcontractorService].toInstance(mockSubcontractorService)
           )
@@ -115,7 +125,7 @@ class SubcontractorsUniqueTaxpayerReferenceControllerSpec extends SpecBase with 
 
       val invalidValue = "1234567890"
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(uaWithName)).build()
 
       running(application) {
         val request =
@@ -129,7 +139,7 @@ class SubcontractorsUniqueTaxpayerReferenceControllerSpec extends SpecBase with 
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, NormalMode, name)(request, messages(application)).toString
       }
     }
 
@@ -143,7 +153,7 @@ class SubcontractorsUniqueTaxpayerReferenceControllerSpec extends SpecBase with 
         .thenReturn(Future.successful(true))
 
       val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        applicationBuilder(userAnswers = Some(uaWithName))
           .overrides(
             bind[SubcontractorService].toInstance(mockSubcontractorService)
           )
@@ -164,7 +174,7 @@ class SubcontractorsUniqueTaxpayerReferenceControllerSpec extends SpecBase with 
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(formWithDuplicateError, NormalMode)(
+        contentAsString(result) mustEqual view(formWithDuplicateError, NormalMode, name)(
           request,
           messages(application)
         ).toString
@@ -176,7 +186,7 @@ class SubcontractorsUniqueTaxpayerReferenceControllerSpec extends SpecBase with 
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(uaWithName)).build()
 
       running(application) {
         val request =
@@ -190,7 +200,7 @@ class SubcontractorsUniqueTaxpayerReferenceControllerSpec extends SpecBase with 
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, NormalMode, name)(request, messages(application)).toString
       }
     }
 
@@ -216,6 +226,45 @@ class SubcontractorsUniqueTaxpayerReferenceControllerSpec extends SpecBase with 
         val request =
           FakeRequest(POST, subcontractorsUniqueTaxpayerReferenceRoute)
             .withFormUrlEncodedBody(("value", "answer"))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must redirect to Journey Recovery for a GET when subcontractor name is missing (userAnswers present)" in {
+
+      val application =
+        applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+
+      running(application) {
+        val request = FakeRequest(GET, subcontractorsUniqueTaxpayerReferenceRoute)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must redirect to Journey Recovery for a POST when subcontractor name is missing (userAnswers present)" in {
+
+      val mockSubcontractorService = mock[SubcontractorService]
+
+      when(mockSubcontractorService.isDuplicateUTR(any[UserAnswers], any[String])(any[HeaderCarrier]))
+        .thenReturn(Future.successful(false))
+
+      val application =
+        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          .overrides(bind[SubcontractorService].toInstance(mockSubcontractorService))
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, subcontractorsUniqueTaxpayerReferenceRoute)
+            .withFormUrlEncodedBody("value" -> "5860920998")
 
         val result = route(application, request).value
 

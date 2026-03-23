@@ -25,12 +25,13 @@ import pages.add.*
 
 class ValidatedSubcontractorSpec extends SpecBase with Matchers {
 
-  val address = UKAddress(
+  val address = InternationalAddress(
     addressLine1 = "10 Downing Street",
     addressLine2 = Some("Westminster"),
     addressLine3 = "London",
-    addressLine4 = Some("UK"),
-    postCode = "SW1A 2AA"
+    addressLine4 = Some("Greater London"),
+    postalCode = "SW1A 2AA",
+    country = "United Kingdom"
   )
 
   val subcontractorName = SubcontractorName("firstname", Some("middle name"), "lastname")

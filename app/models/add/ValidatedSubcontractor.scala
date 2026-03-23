@@ -24,7 +24,7 @@ final case class ValidatedSubcontractor(
   typeOfSubcontractor: TypeOfSubcontractor,
   tradingName: Option[String],
   subcontractorName: Option[SubcontractorName],
-  address: Option[UKAddress],
+  address: Option[InternationalAddress],
   utr: Option[String],
   nino: Option[String],
   workRefNumber: Option[String]

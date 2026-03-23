@@ -55,12 +55,13 @@ class CleanupSpec extends PageBehaviours {
 
     "removeIndividualSoleTraderSubcontractor" - {
 
-      val soleTraderAddress = UKAddress(
+      val soleTraderAddress = InternationalAddress(
         addressLine1 = "value 1",
         addressLine2 = Some("value 2"),
         addressLine3 = "value 3",
         addressLine4 = Some("value 4"),
-        postCode = "NX1 1AA"
+        postalCode = "NX1 1AA",
+        country = "United Kingdom"
       )
 
       val subcontractorName = SubcontractorName(
