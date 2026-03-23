@@ -850,7 +850,8 @@ class PartnershipCheckYourAnswersControllerSpec extends SpecBase {
         .build()
 
     running(application) {
-      val request = FakeRequest(POST, controllers.add.routes.CheckYourAnswersController.onSubmit().url)
+      val request =
+        FakeRequest(POST, controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onSubmit().url)
       val result  = route(application, request).value
 
       status(result) mustEqual SEE_OTHER
