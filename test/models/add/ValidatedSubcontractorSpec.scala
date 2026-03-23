@@ -36,8 +36,6 @@ class ValidatedSubcontractorSpec extends SpecBase with Matchers {
 
   val subcontractorName = SubcontractorName("firstname", Some("middle name"), "lastname")
 
-  val contactDetails = SubContactDetails("test@example.com", "0123456789")
-
   ".build" - {
 
     "must return a ValidatedSubcontractor when all mandatory questions are answered" - {
@@ -77,9 +75,6 @@ class ValidatedSubcontractorSpec extends SpecBase with Matchers {
             .success
             .value
             .set(WorksReferenceNumberPage, "WRN-001")
-            .success
-            .value
-            .set(SubContactDetailsPage, contactDetails)
             .success
             .value
 
@@ -133,9 +128,6 @@ class ValidatedSubcontractorSpec extends SpecBase with Matchers {
             .success
             .value
             .set(WorksReferenceNumberPage, "WRN-001")
-            .success
-            .value
-            .set(SubContactDetailsPage, contactDetails)
             .success
             .value
 
@@ -296,6 +288,9 @@ class ValidatedSubcontractorSpec extends SpecBase with Matchers {
             .set(SubAddressYesNoPage, false)
             .success
             .value
+            .set(UniqueTaxpayerReferenceYesNoPage, false)
+            .success
+            .value
 
         val result = ValidatedSubcontractor.build(answers)
 
@@ -380,7 +375,8 @@ class ValidatedSubcontractorSpec extends SpecBase with Matchers {
             .set(WorksReferenceNumberYesNoPage, false)
             .success
             .value
-        val result  = ValidatedSubcontractor.build(answers)
+
+        val result = ValidatedSubcontractor.build(answers)
 
         inside(result) { case Left(error) =>
           error mustBe InvalidAnswer(TradingNameOfSubcontractorPage)

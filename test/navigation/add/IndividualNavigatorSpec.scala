@@ -136,12 +136,12 @@ class IndividualNavigatorSpec extends SpecBase {
         ) mustBe journeyRecovery
       }
 
-      "must go from a SubNationalInsuranceNumberPage to UniqueTaxpayerReferenceYesNoPage" in {
+      "must go from a SubNationalInsuranceNumberPage to WorksReferenceNumberYesNoPage" in {
         navigator.nextPage(
           SubNationalInsuranceNumberPage,
           NormalMode,
           UserAnswers("id")
-        ) mustBe controllers.add.routes.UniqueTaxpayerReferenceYesNoController.onPageLoad(NormalMode)
+        ) mustBe controllers.add.routes.WorksReferenceNumberYesNoController.onPageLoad(NormalMode)
       }
 
       "must go from a UniqueTaxpayerReferenceYesNoPage to SubcontractorsUniqueTaxpayerReferencePage when true" in {
@@ -168,12 +168,12 @@ class IndividualNavigatorSpec extends SpecBase {
         ) mustBe journeyRecovery
       }
 
-      "must go from a SubcontractorsUniqueTaxpayerReferencePage to WorksReferenceNumberYesNoController" in {
+      "must go from a SubcontractorsUniqueTaxpayerReferencePage to NationalInsuranceNumberYesNoController" in {
         navigator.nextPage(
           SubcontractorsUniqueTaxpayerReferencePage,
           NormalMode,
           UserAnswers("id")
-        ) mustBe controllers.add.routes.WorksReferenceNumberYesNoController.onPageLoad(NormalMode)
+        ) mustBe controllers.add.routes.NationalInsuranceNumberYesNoController.onPageLoad(NormalMode)
       }
 
       "must go from a WorksReferenceNumberYesNoPage to WorksReferenceNumberPage when true" in {
@@ -208,14 +208,6 @@ class IndividualNavigatorSpec extends SpecBase {
       "must go from a WorksReferenceNumberPage to CYA" in {
         navigator.nextPage(
           WorksReferenceNumberPage,
-          NormalMode,
-          UserAnswers("id")
-        ) mustBe controllers.add.routes.CheckYourAnswersController.onPageLoad()
-      }
-
-      "must go from a SubContactDetailsPage to CYA" in {
-        navigator.nextPage(
-          SubContactDetailsPage,
           NormalMode,
           UserAnswers("id")
         ) mustBe controllers.add.routes.CheckYourAnswersController.onPageLoad()
@@ -705,14 +697,6 @@ class IndividualNavigatorSpec extends SpecBase {
 
         val result = navigator.nextPage(WorksReferenceNumberYesNoPage, CheckMode, ua)
         result mustBe CYA
-      }
-
-      "must go from a SubContactDetailsPage to CYA" in {
-        navigator.nextPage(
-          SubContactDetailsPage,
-          CheckMode,
-          UserAnswers("id")
-        ) mustBe CYA
       }
 
     }

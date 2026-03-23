@@ -75,13 +75,12 @@ class CheckYourAnswersController @Inject() (
             TradingNameOfSubcontractorSummary.row(ua),
             SubAddressYesNoSummary.row(ua),
             AddressOfSubcontractorSummary.row(ua),
-            NationalInsuranceNumberYesNoSummary.row(ua),
-            SubNationalInsuranceNumberSummary.row(ua),
             UniqueTaxpayerReferenceYesNoSummary.row(ua),
             SubcontractorsUniqueTaxpayerReferenceSummary.row(ua),
+            NationalInsuranceNumberYesNoSummary.row(ua),
+            SubNationalInsuranceNumberSummary.row(ua),
             WorksReferenceNumberYesNoSummary.row(ua),
-            WorksReferenceNumberSummary.row(ua),
-            SubContactDetailsSummary.row(ua)
+            WorksReferenceNumberSummary.row(ua)
           ).flatten
         )
 

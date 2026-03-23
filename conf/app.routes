@@ -89,11 +89,6 @@ POST       /add/works-reference-number                   controllers.add.WorksRe
 GET        /add/change-works-reference-number            controllers.add.WorksReferenceNumberController.onPageLoad(mode: Mode = CheckMode)
 POST       /add/change-works-reference-number            controllers.add.WorksReferenceNumberController.onSubmit(mode: Mode = CheckMode)
 
-GET        /add/contact-details                          controllers.add.SubContactDetailsController.onPageLoad(mode: Mode = NormalMode)
-POST       /add/contact-details                          controllers.add.SubContactDetailsController.onSubmit(mode: Mode = NormalMode)
-GET        /add/change-contact-details                   controllers.add.SubContactDetailsController.onPageLoad(mode: Mode = CheckMode)
-POST       /add/change-contact-details                   controllers.add.SubContactDetailsController.onSubmit(mode: Mode = CheckMode)
-
 GET        /add/partnership/partnership-name             controllers.add.partnership.PartnershipNameController.onPageLoad(mode: Mode = NormalMode)
 POST       /add/partnership/partnership-name             controllers.add.partnership.PartnershipNameController.onSubmit(mode: Mode = NormalMode)
 GET        /add/partnership/change-partnership-name      controllers.add.partnership.PartnershipNameController.onPageLoad(mode: Mode = CheckMode)
