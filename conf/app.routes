@@ -184,7 +184,7 @@ POST       /add/partnership/phone-number                 controllers.add.partner
 GET        /add/partnership/change-phone-number          controllers.add.partnership.PartnershipPhoneNumberController.onPageLoad(mode: Mode = CheckMode)
 POST       /add/partnership/change-phone-number          controllers.add.partnership.PartnershipPhoneNumberController.onSubmit(mode: Mode = CheckMode)
 
-GET        /add/partnership/subcontractor-added          controllers.add.partnership.SubcontractorAddedController.onPageLoad()
+GET        /add/partnership/subcontractor-added1          controllers.add.partnership.SubcontractorAddedController.onPageLoad()
 
 GET        /add/partnership/check-your-answers           controllers.add.partnership.PartnershipCheckYourAnswersController.onPageLoad()
 POST       /add/partnership/check-your-answers           controllers.add.partnership.PartnershipCheckYourAnswersController.onSubmit()
@@ -266,7 +266,7 @@ POST       /add/mobile-number                          controllers.add.Individua
 GET        /add/change-mobile-number                   controllers.add.IndividualMobileNumberController.onPageLoad(mode: Mode = CheckMode)
 POST       /add/change-mobile-number                   controllers.add.IndividualMobileNumberController.onSubmit(mode: Mode = CheckMode)
 
-GET        /add/company/subcontractor-added                     controllers.add.company.CompanyAddedController.onPageLoad()
+GET        /add/company/subcontractor-added1                     controllers.add.company.CompanyAddedController.onPageLoad()
 
 GET        /add/phone-number                       controllers.add.IndividualPhoneNumberController.onPageLoad(mode: Mode = NormalMode)
 POST       /add/phone-number                        controllers.add.IndividualPhoneNumberController.onSubmit(mode: Mode = NormalMode)
@@ -340,3 +340,7 @@ POST       /changeTrustWorksReference                  controllers.add.trust.Tru
 
 GET        /trustCheckYourAnswers                       controllers.add.trust.TrustCheckYourAnswersController.onPageLoad()
 
+GET        /add/individual/subcontractor-added                  controllers.add.SubcontractorAddedController.individualSubcontractorAdded()
+GET        /add/company/subcontractor-added                     controllers.add.SubcontractorAddedController.companySubcontractorAdded()
+GET        /add/partnership/subcontractor-added                 controllers.add.SubcontractorAddedController.partnershipSubcontractorAdded()
+GET        /add/trust/subcontractor-added                       controllers.add.SubcontractorAddedController.trustSubcontractorAdded()

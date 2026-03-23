@@ -14,15 +14,17 @@
  * limitations under the License.
  */
 
-package pages.add
+package utils
 
 import models.UserAnswers
+import pages.add.*
 import pages.add.partnership.*
 import pages.add.company.*
+import pages.add.trust.*
 
 import scala.util.Try
 
-trait Cleanup {
+object SubcontractorCleanup {
 
   def removeIndividualSoleTraderSubcontractor(userAnswers: UserAnswers): Try[UserAnswers] =
     userAnswers
@@ -41,7 +43,6 @@ trait Cleanup {
       .flatMap(_.remove(WorksReferenceNumberYesNoPage))
       .flatMap(_.remove(IndividualPhoneNumberPage))
 
-  // TODO Add unit test for removeLimitedCompanySubcontractor when company journey is done
   def removeLimitedCompanySubcontractor(userAnswers: UserAnswers): Try[UserAnswers] =
     userAnswers
       .remove(CompanyAddressPage)
@@ -78,4 +79,26 @@ trait Cleanup {
       .flatMap(_.remove(PartnershipUniqueTaxpayerReferencePage))
       .flatMap(_.remove(PartnershipWorksReferenceNumberPage))
       .flatMap(_.remove(PartnershipWorksReferenceNumberYesNoPage))
+
+  def removeTrustSubcontractor(userAnswers: UserAnswers): Try[UserAnswers] =
+    userAnswers
+      .remove(TrustAddressPage)
+      .flatMap(_.remove(TrustAddressYesNoPage))
+      .flatMap(_.remove(TrustContactOptionsPage))
+      .flatMap(_.remove(TrustEmailAddressPage))
+      .flatMap(_.remove(TrustMobileNumberPage))
+      .flatMap(_.remove(TrustNamePage))
+      .flatMap(_.remove(TrustPhoneNumberPage))
+      .flatMap(_.remove(TrustUtrPage))
+      .flatMap(_.remove(TrustUtrYesNoPage))
+      .flatMap(_.remove(TrustWorksReferencePage))
+      .flatMap(_.remove(TrustWorksReferenceYesNoPage))
+
+  def removeAllSubcontractor(userAnswers: UserAnswers): Try[UserAnswers] =
+    removeIndividualSoleTraderSubcontractor(userAnswers)
+      .flatMap(removeLimitedCompanySubcontractor)
+      .flatMap(removePartnershipSubcontractor)
+      .flatMap(removeTrustSubcontractor)
+      .flatMap(_.remove(TypeOfSubcontractorPage))
+
 }

@@ -21,10 +21,11 @@ import models.add.TypeOfSubcontractor
 import models.add.TypeOfSubcontractor.*
 import pages.QuestionPage
 import play.api.libs.json.JsPath
+import utils.SubcontractorCleanup.*
 
 import scala.util.Try
 
-case object TypeOfSubcontractorPage extends QuestionPage[TypeOfSubcontractor] with SharedJourney with Cleanup {
+case object TypeOfSubcontractorPage extends QuestionPage[TypeOfSubcontractor] with SharedJourney {
 
   override def path: JsPath = JsPath \ toString
 
@@ -35,14 +36,22 @@ case object TypeOfSubcontractorPage extends QuestionPage[TypeOfSubcontractor] wi
       case Some(Individualorsoletrader) =>
         removePartnershipSubcontractor(ua)
           .flatMap(removeLimitedCompanySubcontractor)
+          .flatMap(removeTrustSubcontractor)
 
       case Some(Limitedcompany) =>
         removeIndividualSoleTraderSubcontractor(ua)
           .flatMap(removePartnershipSubcontractor)
+          .flatMap(removeTrustSubcontractor)
 
       case Some(Partnership) =>
         removeIndividualSoleTraderSubcontractor(ua)
           .flatMap(removeLimitedCompanySubcontractor)
+          .flatMap(removeTrustSubcontractor)
+
+      case Some(Trust) =>
+        removeIndividualSoleTraderSubcontractor(ua)
+          .flatMap(removeLimitedCompanySubcontractor)
+          .flatMap(removePartnershipSubcontractor)
 
       case _ =>
         super.cleanup(value, ua)

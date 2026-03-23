@@ -435,7 +435,7 @@ partnershipCheckYourAnswers.trailHeading = Now add this subcontractor
 partnershipCheckYourAnswers.trailText = By adding this subcontractor you are confirming that, to the best of your knowledge, the details you are providing are correct.
 partnershipCheckYourAnswers.continue = Accept and submit
 
-subcontractorAdded.title = Partnership subcontractor added
+subcontractorAdded.title = {0} subcontractor added
 subcontractorAdded.heading = Subcontractor added
 subcontractorAdded.p1 = You can now find {0} on your list of subcontractors.
 subcontractorAdded.nextSteps.h2 = Next steps
@@ -448,6 +448,10 @@ subcontractorAdded.nextSteps.link = Manage your subcontractors
 subcontractorAdded.helpAndSupport.h2 = Help and support
 subcontractorAdded.helpAndSupport.p1 = If you need help with the Construction Industry Scheme (CIS) and what it means for you,
 subcontractorAdded.helpAndSupport.p1.link = guidance is available on GOV.UK
+subcontractorAdded.individual = Individual
+subcontractorAdded.company = Company
+subcontractorAdded.partnership = Partnership
+subcontractorAdded.trust = Trust
 
 companyName.title = What is the name of the company?
 companyName.heading = What is the name of the company?
