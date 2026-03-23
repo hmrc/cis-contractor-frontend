@@ -16,7 +16,6 @@
 
 package models.add.company
 
-
 import models.add.{InternationalAddress, TypeOfSubcontractor}
 import models.contact.ContactOptions
 import models.contact.ContactOptions.*
@@ -27,16 +26,16 @@ import pages.add.company.*
 import play.api.libs.json.Reads
 
 final case class ValidatedCompany(
-                                   companyName: String,
-                                   companyAddress: Option[InternationalAddress],
-                                   companyContactDetails: ContactOptions,
-                                   companyEmail: Option[String],
-                                   companyPhone: Option[String],
-                                   companyMobile: Option[String],
-                                   companyUtr: Option[String],
-                                   companyCrn: Option[String],
-                                   companyWorksReferenceNumber: Option[String]
-                                 )
+  companyName: String,
+  companyAddress: Option[InternationalAddress],
+  companyContactDetails: ContactOptions,
+  companyEmail: Option[String],
+  companyPhone: Option[String],
+  companyMobile: Option[String],
+  companyUtr: Option[String],
+  companyCrn: Option[String],
+  companyWorksReferenceNumber: Option[String]
+)
 
 object ValidatedCompany extends Validation {
 
@@ -76,10 +75,10 @@ object ValidatedCompany extends Validation {
     }
 
   private def getContactPageValue[A](
-                                      answers: UserAnswers,
-                                      questionPage: QuestionPage[A],
-                                      contactOptions: ContactOptions
-                                    )(implicit reads: Reads[A]): Either[ValidationError, Option[A]] = {
+    answers: UserAnswers,
+    questionPage: QuestionPage[A],
+    contactOptions: ContactOptions
+  )(implicit reads: Reads[A]): Either[ValidationError, Option[A]] = {
 
     val expectedPage: Option[QuestionPage[_]] = contactOptions match {
       case Email     => Some(CompanyEmailAddressPage)
@@ -91,7 +90,7 @@ object ValidatedCompany extends Validation {
     if (expectedPage.contains(questionPage)) {
       answers.get(questionPage).toRight(MissingAnswer(questionPage)).map(Some(_))
     } else if (expectedPage.isDefined) {
-    
+
       Right(None)
     } else {
       answers

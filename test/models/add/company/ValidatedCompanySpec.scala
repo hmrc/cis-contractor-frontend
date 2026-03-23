@@ -47,19 +47,33 @@ class ValidatedCompanySpec extends SpecBase with Matchers {
 
   private val minRequired: UserAnswers =
     emptyUserAnswers
-      .set(TypeOfSubcontractorPage, TypeOfSubcontractor.Limitedcompany).success.value
-      .set(CompanyNamePage, "Test Company Ltd").success.value
-      .set(CompanyAddressYesNoPage, false).success.value
-      .set(CompanyContactOptionsPage, ContactOptions.NoDetails).success.value
-      .set(CompanyUtrYesNoPage, false).success.value
-      .set(CompanyCrnYesNoPage, false).success.value
-      .set(CompanyWorksReferenceYesNoPage, false).success.value
+      .set(TypeOfSubcontractorPage, TypeOfSubcontractor.Limitedcompany)
+      .success
+      .value
+      .set(CompanyNamePage, "Test Company Ltd")
+      .success
+      .value
+      .set(CompanyAddressYesNoPage, false)
+      .success
+      .value
+      .set(CompanyContactOptionsPage, ContactOptions.NoDetails)
+      .success
+      .value
+      .set(CompanyUtrYesNoPage, false)
+      .success
+      .value
+      .set(CompanyCrnYesNoPage, false)
+      .success
+      .value
+      .set(CompanyWorksReferenceYesNoPage, false)
+      .success
+      .value
 
   private def withStaleValue[A](
-                                 ua: UserAnswers,
-                                 page: QuestionPage[A],
-                                 value: A
-                               )(implicit w: Writes[A]): UserAnswers =
+    ua: UserAnswers,
+    page: QuestionPage[A],
+    value: A
+  )(implicit w: Writes[A]): UserAnswers =
     ua.data.setObject(page.path, Json.toJson(value)) match {
       case JsSuccess(updated, _) => ua.copy(data = updated)
       case JsError(_)            => ua

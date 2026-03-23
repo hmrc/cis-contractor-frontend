@@ -37,7 +37,7 @@ import org.jsoup.select.Elements
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
-import play.api.i18n.{Lang, Messages, MessagesImpl, MessagesApi}
+import play.api.i18n.{Lang, Messages, MessagesApi, MessagesImpl}
 import play.api.mvc.Request
 import play.api.test.FakeRequest
 import play.twirl.api.HtmlFormat
@@ -57,12 +57,12 @@ class CompanyCheckYourAnswersViewSpec extends AnyWordSpec with Matchers with Gui
 
       val heading: Elements = doc.select("h1")
       heading.text() mustBe messages("companyCheckYourAnswers.heading")
-      
+
       doc.select("h2").eachText() must contain(messages("companyCheckYourAnswers.subHeading"))
       doc.select("h2").eachText() must contain(messages("companyCheckYourAnswers.trailHeading"))
 
       doc.select("p").text() must include(messages("companyCheckYourAnswers.trailText"))
-      
+
       doc.select(".govuk-summary-list").size() mustBe 1
 
       doc
@@ -84,7 +84,7 @@ class CompanyCheckYourAnswersViewSpec extends AnyWordSpec with Matchers with Gui
     implicit val messages: Messages      = MessagesImpl(Lang.defaultLang, messagesApi)
 
     val view: CompanyCheckYourAnswersView = app.injector.instanceOf[CompanyCheckYourAnswersView]
-    
+
     val list: SummaryList =
       SummaryList(
         rows = Seq(
