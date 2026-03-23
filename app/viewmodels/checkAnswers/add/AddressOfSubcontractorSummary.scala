@@ -18,6 +18,7 @@ package viewmodels.checkAnswers.add
 
 import models.{CheckMode, UserAnswers}
 import pages.add.AddressOfSubcontractorPage
+import models.add.InternationalAddress
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
@@ -35,7 +36,8 @@ object AddressOfSubcontractorSummary {
         answer.addressLine2.getOrElse(""),
         answer.addressLine3,
         answer.addressLine4.getOrElse(""),
-        answer.postCode
+        answer.postalCode,
+        answer.country
       )
 
       val escapedWithBreaks: String =

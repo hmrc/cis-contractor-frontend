@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,19 +14,17 @@
  * limitations under the License.
  */
 
-package models.add
+package models.add.trust
 
-import play.api.libs.json.*
+import models.contact.ContactOptions
+import play.api.i18n.Messages
+import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.RadioItem
 
-case class UKAddress(
-  addressLine1: String,
-  addressLine2: Option[String],
-  addressLine3: String,
-  addressLine4: Option[String],
-  postCode: String
-)
+type TrustContactOptions = ContactOptions
 
-object UKAddress {
+object TrustContactOptions {
+  val values: Seq[TrustContactOptions] = ContactOptions.values
 
-  implicit val format: OFormat[UKAddress] = Json.format
+  def options(implicit messages: Messages): Seq[RadioItem] =
+    ContactOptions.options("trustContactOptions")
 }

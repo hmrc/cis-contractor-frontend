@@ -283,5 +283,62 @@ POST       /add/check-contact-details                           controllers.add.
 GET        /add/change-check-contact-details                    controllers.add.IndividualChooseContactDetailsController.onPageLoad(mode: Mode = CheckMode)
 POST       /add/change-check-contact-details                    controllers.add.IndividualChooseContactDetailsController.onSubmit(mode: Mode = CheckMode)
 
+GET        /trustName                        controllers.add.trust.TrustNameController.onPageLoad(mode: Mode = NormalMode)
+POST       /trustName                        controllers.add.trust.TrustNameController.onSubmit(mode: Mode = NormalMode)
+GET        /changeTrustName                  controllers.add.trust.TrustNameController.onPageLoad(mode: Mode = CheckMode)
+POST       /changeTrustName                  controllers.add.trust.TrustNameController.onSubmit(mode: Mode = CheckMode)
+
+GET        /trustAddressYesNo                        controllers.add.trust.TrustAddressYesNoController.onPageLoad(mode: Mode = NormalMode)
+POST       /trustAddressYesNo                        controllers.add.trust.TrustAddressYesNoController.onSubmit(mode: Mode = NormalMode)
+GET        /changeTrustAddressYesNo                  controllers.add.trust.TrustAddressYesNoController.onPageLoad(mode: Mode = CheckMode)
+POST       /changeTrustAddressYesNo                  controllers.add.trust.TrustAddressYesNoController.onSubmit(mode: Mode = CheckMode)
+
+GET        /trustAddress                        controllers.add.trust.TrustAddressController.onPageLoad(mode: Mode = NormalMode)
+POST       /trustAddress                        controllers.add.trust.TrustAddressController.onSubmit(mode: Mode = NormalMode)
+GET        /changeTrustAddress                  controllers.add.trust.TrustAddressController.onPageLoad(mode: Mode = CheckMode)
+POST       /changeTrustAddress                  controllers.add.trust.TrustAddressController.onSubmit(mode: Mode = CheckMode)
+
+GET        /trustContactOptions                        controllers.add.trust.TrustContactOptionsController.onPageLoad(mode: Mode = NormalMode)
+POST       /trustContactOptions                        controllers.add.trust.TrustContactOptionsController.onSubmit(mode: Mode = NormalMode)
+GET        /changeTrustContactOptions                  controllers.add.trust.TrustContactOptionsController.onPageLoad(mode: Mode = CheckMode)
+POST       /changeTrustContactOptions                  controllers.add.trust.TrustContactOptionsController.onSubmit(mode: Mode = CheckMode)
+
+GET        /trustEmailAddress                        controllers.add.trust.TrustEmailAddressController.onPageLoad(mode: Mode = NormalMode)
+POST       /trustEmailAddress                        controllers.add.trust.TrustEmailAddressController.onSubmit(mode: Mode = NormalMode)
+GET        /changeTrustEmailAddress                  controllers.add.trust.TrustEmailAddressController.onPageLoad(mode: Mode = CheckMode)
+POST       /changeTrustEmailAddress                  controllers.add.trust.TrustEmailAddressController.onSubmit(mode: Mode = CheckMode)
+
+GET        /trustPhoneNumber                        controllers.add.trust.TrustPhoneNumberController.onPageLoad(mode: Mode = NormalMode)
+POST       /trustPhoneNumber                        controllers.add.trust.TrustPhoneNumberController.onSubmit(mode: Mode = NormalMode)
+GET        /changeTrustPhoneNumber                  controllers.add.trust.TrustPhoneNumberController.onPageLoad(mode: Mode = CheckMode)
+POST       /changeTrustPhoneNumber                  controllers.add.trust.TrustPhoneNumberController.onSubmit(mode: Mode = CheckMode)
+
+GET        /trustMobileNumber                        controllers.add.trust.TrustMobileNumberController.onPageLoad(mode: Mode = NormalMode)
+POST       /trustMobileNumber                        controllers.add.trust.TrustMobileNumberController.onSubmit(mode: Mode = NormalMode)
+GET        /changeTrustMobileNumber                  controllers.add.trust.TrustMobileNumberController.onPageLoad(mode: Mode = CheckMode)
+POST       /changeTrustMobileNumber                  controllers.add.trust.TrustMobileNumberController.onSubmit(mode: Mode = CheckMode)
+
+GET        /trustUtrYesNo                        controllers.add.trust.TrustUtrYesNoController.onPageLoad(mode: Mode = NormalMode)
+POST       /trustUtrYesNo                        controllers.add.trust.TrustUtrYesNoController.onSubmit(mode: Mode = NormalMode)
+GET        /changeTrustUtrYesNo                  controllers.add.trust.TrustUtrYesNoController.onPageLoad(mode: Mode = CheckMode)
+POST       /changeTrustUtrYesNo                  controllers.add.trust.TrustUtrYesNoController.onSubmit(mode: Mode = CheckMode)
+
+GET        /trustUtr                        controllers.add.trust.TrustUtrController.onPageLoad(mode: Mode = NormalMode)
+POST       /trustUtr                        controllers.add.trust.TrustUtrController.onSubmit(mode: Mode = NormalMode)
+GET        /changeTrustUtr                  controllers.add.trust.TrustUtrController.onPageLoad(mode: Mode = CheckMode)
+POST       /changeTrustUtr                  controllers.add.trust.TrustUtrController.onSubmit(mode: Mode = CheckMode)
+
+GET        /trustWorksReferenceYesNo                        controllers.add.trust.TrustWorksReferenceYesNoController.onPageLoad(mode: Mode = NormalMode)
+POST       /trustWorksReferenceYesNo                        controllers.add.trust.TrustWorksReferenceYesNoController.onSubmit(mode: Mode = NormalMode)
+GET        /changeTrustWorksReferenceYesNo                  controllers.add.trust.TrustWorksReferenceYesNoController.onPageLoad(mode: Mode = CheckMode)
+POST       /changeTrustWorksReferenceYesNo                  controllers.add.trust.TrustWorksReferenceYesNoController.onSubmit(mode: Mode = CheckMode)
+
+GET        /trustWorksReference                        controllers.add.trust.TrustWorksReferenceController.onPageLoad(mode: Mode = NormalMode)
+POST       /trustWorksReference                        controllers.add.trust.TrustWorksReferenceController.onSubmit(mode: Mode = NormalMode)
+GET        /changeTrustWorksReference                  controllers.add.trust.TrustWorksReferenceController.onPageLoad(mode: Mode = CheckMode)
+POST       /changeTrustWorksReference                  controllers.add.trust.TrustWorksReferenceController.onSubmit(mode: Mode = CheckMode)
+
+GET        /trustCheckYourAnswers                       controllers.add.trust.TrustCheckYourAnswersController.onPageLoad()
+
 GET        /add/company/check-your-answers           controllers.add.company.CompanyCheckYourAnswersController.onPageLoad()
 POST       /add/company/check-your-answers           controllers.add.company.CompanyCheckYourAnswersController.onSubmit()
