@@ -20,7 +20,6 @@ import base.SpecBase
 import controllers.routes
 import models.UserAnswers
 import models.add.{InternationalAddress, TypeOfSubcontractor}
-import models.add.company.CompanyContactOptions
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{never, verify, verifyNoMoreInteractions, when}
 import org.scalatestplus.mockito.MockitoSugar.mock
@@ -33,8 +32,6 @@ import play.api.test.Helpers.*
 import repositories.SessionRepository
 import services.SubcontractorService
 import uk.gov.hmrc.http.HeaderCarrier
-import play.api.libs.json.*
-import pages.QuestionPage
 import models.contact.ContactOptions
 
 import scala.concurrent.Future
@@ -42,7 +39,6 @@ import scala.concurrent.Future
 class CompanyCheckYourAnswersControllerSpec extends SpecBase {
 
   import play.api.libs.json.*
-  import pages.QuestionPage
 
   private def withStaleValue[A](
     ua: models.UserAnswers,
