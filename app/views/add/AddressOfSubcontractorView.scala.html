@@ -15,27 +15,44 @@
  *@
 
 @import viewmodels.InputWidth._
+@import views.html.components._
 @import viewmodels.InputWidth._
+@import utils.CountryOptions
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.select._
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukSelect
+@import config.FrontendAppConfig
+@import uk.gov.hmrc.govukfrontend.views.Implicits.RichSelect
+@import uk.gov.hmrc.hmrcfrontend.views.viewmodels.accessibleautocomplete.AccessibleAutocomplete
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.select.SelectItem
+@import models.add.InternationalAddress
+@import utils.InputOption
+@import viewmodels.govuk.all._
+@import play.api.data.Form
+@import play.api.mvc.Request
+@import play.api.i18n.Messages
+@import viewmodels.govuk.select._
 
 @this(
     layout: templates.Layout,
     formHelper: FormWithCSRF,
     govukErrorSummary: GovukErrorSummary,
     govukInput: GovukInput,
-    govukButton: GovukButton
+    govukSelect: GovukSelect,
+    govukButton: GovukButton,
+    header: H1
 )
 
-@(form: Form[_], mode: Mode)(implicit request: Request[_], messages: Messages)
+@(form: Form[InternationalAddress], mode: Mode, name: String, countryOptions: Seq[InputOption])(implicit request: Request[_], appConfig: FrontendAppConfig, messages: Messages)
 
 @layout(pageTitle = title(form, messages("addressOfSubcontractor.title"))) {
 
-    @formHelper(action = controllers.add.routes.AddressOfSubcontractorController.onSubmit(mode), Symbol("autoComplete") -> "off") {
+    @formHelper(action = controllers.add.routes.AddressOfSubcontractorController.onSubmit(mode)) {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form))
         }
 
-        <h1 class="govuk-heading-xl">@messages("addressOfSubcontractor.heading")</h1>
+        @header(messages("addressOfSubcontractor.heading", name))
 
         @govukInput(
             InputViewModel(
@@ -43,6 +60,7 @@
                 label = LabelViewModel(messages("addressOfSubcontractor.addressLine1"))
             )
             .withWidth(Full)
+            .withAutocomplete("address-line1")
         )
 
         @govukInput(
@@ -51,30 +69,58 @@
                 label = LabelViewModel(messages("addressOfSubcontractor.addressLine2"))
             )
             .withWidth(Full)
+            .withAutocomplete("address-line2")
         )
 
         @govukInput(
-        InputViewModel(
-        field = form("addressLine3"),
-        label = LabelViewModel(messages("addressOfSubcontractor.addressLine3"))
-        )
-        .withWidth(TwoThirds)
-        )
-
-        @govukInput(
-        InputViewModel(
-        field = form("addressLine4"),
-        label = LabelViewModel(messages("addressOfSubcontractor.addressLine4"))
-        )
-        .withWidth(TwoThirds)
+            InputViewModel(
+                field = form("addressLine3"),
+                label = LabelViewModel(messages("addressOfSubcontractor.addressLine3"))
+            )
+            .withWidth(Full)
+            .withAutocomplete("address-level2")
         )
 
         @govukInput(
-        InputViewModel(
-        field = form("postCode"),
-        label = LabelViewModel(messages("addressOfSubcontractor.postCode"))
+            InputViewModel(
+                field = form("addressLine4"),
+                label = LabelViewModel(messages("addressOfSubcontractor.addressLine4"))
+            )
+            .withWidth(Full)
         )
-        .withWidth(Fixed10)
+
+        @govukInput(
+            InputViewModel(
+                field = form("postalCode"),
+                label = LabelViewModel(messages("addressOfSubcontractor.postalCode"))
+            )
+            .withWidth(Fixed10)
+            .withAutocomplete("postal-code")
+        )
+
+        @govukSelect(
+            SelectViewModel(
+            field = form("country"),
+            items = Seq(SelectItem(value = Some(""))) ++
+            countryOptions
+                .sortBy(_.label)
+                .map(valueOption =>
+                    SelectItem(
+                        value = Some(valueOption.value),
+                        text = valueOption.label
+                    )
+                ),
+            label = LabelViewModel(messages("companyAddress.country"))
+        )
+        .withCssClass("govuk-input")
+        .withFormGroupClasses("govuk-!-width-full")
+        .withAttribute("aria-label" -> "country")
+        .asAccessibleAutocomplete(
+            Some(
+                AccessibleAutocomplete(
+                    defaultValue = Some(""),
+                    showAllValues = false,
+                    autoSelect = false)))
         )
 
         @govukButton(

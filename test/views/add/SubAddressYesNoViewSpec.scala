@@ -18,6 +18,8 @@ package views.add
 
 import forms.add.SubAddressYesNoFormProvider
 import models.NormalMode
+import org.jsoup.nodes.Document
+import org.jsoup.select.Elements
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
@@ -33,18 +35,21 @@ class SubAddressYesNoViewSpec extends AnyWordSpec with Matchers with GuiceOneApp
   "SubAddressYesNoView" should {
 
     "render the page with title, heading, radios and submit button" in new Setup {
-      val html: HtmlFormat.Appendable = view(form, NormalMode)
-      val doc                         = org.jsoup.Jsoup.parse(html.toString())
+
+      val subcontractorName = "Test Subcontractor"
+
+      val html: HtmlFormat.Appendable = view(form, NormalMode, subcontractorName)
+      val doc: Document               = org.jsoup.Jsoup.parse(html.toString())
       doc.select("title").text() must include(messages("subAddressYesNo.title"))
 
-      val legend = doc.select("fieldset legend")
-      legend.text() mustBe messages("subAddressYesNo.heading")
+      val legend: Elements = doc.select("fieldset legend")
+      legend.text() mustBe messages("subAddressYesNo.heading", subcontractorName)
       legend.hasClass("govuk-fieldset__legend--l") mustBe true
 
-      val hint = doc.select("fieldset .govuk-hint")
+      val hint: Elements = doc.select("fieldset .govuk-hint")
       hint.text() mustBe messages("subAddressYesNo.hint")
 
-      val radioButtons = doc.select(".govuk-radios__label")
+      val radioButtons: Elements = doc.select(".govuk-radios__label")
       radioButtons.size() mustBe 2
       radioButtons.get(0).text mustBe "Yes"
       radioButtons.get(1).text mustBe "No"
@@ -59,16 +64,19 @@ class SubAddressYesNoViewSpec extends AnyWordSpec with Matchers with GuiceOneApp
     }
 
     "display error summary and inline error when no option is selected" in new Setup {
+
+      val subcontractorName = "Test Subcontractor"
+
       val errorForm: Form[Boolean] =
         form.withError("value", "subAddressYesNo.error.required")
 
-      val html = view(errorForm, NormalMode)
-      val doc  = org.jsoup.Jsoup.parse(html.toString())
+      val html: HtmlFormat.Appendable = view(errorForm, NormalMode, subcontractorName)
+      val doc: Document               = org.jsoup.Jsoup.parse(html.toString())
 
-      val summary = doc.select(".govuk-error-summary")
+      val summary: Elements = doc.select(".govuk-error-summary")
       summary.text() must include(messages("subAddressYesNo.error.required"))
 
-      val linkHref = summary.select("a").attr("href")
+      val linkHref: String = summary.select("a").attr("href")
       linkHref mustBe "#value"
 
       doc.select(".govuk-error-message").text() must include(messages("subAddressYesNo.error.required"))

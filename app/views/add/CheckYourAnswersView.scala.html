@@ -19,7 +19,6 @@
 @this(
     layout: templates.Layout,
     govukSummaryList: GovukSummaryList,
-    govukWarningText: GovukWarningText,
     h1:H1,
     h2:H2,
     p:Paragraph,
@@ -38,9 +37,6 @@
 
         @govukSummaryList(list)
         @h2("checkYourAnswers.heading.h2")
-        @govukWarningText(
-         WarningText(content = HtmlContent(messages("checkYourAnswers.warning")))
-        )
         @p("checkYourAnswers.p1")
 
         @govukButton(

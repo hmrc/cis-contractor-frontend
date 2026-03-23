@@ -17,7 +17,7 @@
 package viewmodels.checkAnswers.add
 
 import models.{CheckMode, UserAnswers}
-import models.add.UKAddress
+import models.add.InternationalAddress
 import org.scalatest.OptionValues.convertOptionToValuable
 import org.scalatest.TryValues.convertTryToSuccessOrFailure
 import org.scalatest.matchers.must.Matchers
@@ -35,12 +35,13 @@ class AddressOfSubcontractorSummarySpec extends AnyWordSpec with Matchers {
 
     "return a SummaryListRow when AddressOfSubcontractorPage has an answer" in {
 
-      val address = UKAddress(
+      val address = InternationalAddress(
         addressLine1 = "10 Downing Street",
         addressLine2 = Some("Westminster"),
         addressLine3 = "London",
         addressLine4 = Some("Greater London"),
-        postCode = "SW1A 2AA"
+        postalCode = "SW1A 2AA",
+        country = "United Kingdom"
       )
 
       val userAnswers =
@@ -61,7 +62,8 @@ class AddressOfSubcontractorSummarySpec extends AnyWordSpec with Matchers {
           "Westminster<br/>" +
           "London<br/>" +
           "Greater London<br/>" +
-          "SW1A 2AA"
+          "SW1A 2AA<br/>" +
+          "United Kingdom"
       )
 
       val action = row.actions.value.items.head

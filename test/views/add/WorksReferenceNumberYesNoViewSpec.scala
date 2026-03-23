@@ -34,12 +34,14 @@ class WorksReferenceNumberYesNoViewSpec extends AnyWordSpec with Matchers with G
 
   "WorksReferenceNumberYesNoView" should {
     "render the page with title, heading, radios and submit button" in new Setup {
-      val html: HtmlFormat.Appendable = view(form, NormalMode)
+      val subcontractorName = "Test Subcontractor"
+
+      val html: HtmlFormat.Appendable = view(form, NormalMode, subcontractorName)
       val doc: Document               = org.jsoup.Jsoup.parse(html.body)
       doc.select("title").text() must include(messages("worksReferenceNumberYesNo.title"))
 
       val legend: Elements = doc.select("fieldset legend")
-      legend.text() mustBe messages("worksReferenceNumberYesNo.heading")
+      legend.text() mustBe messages("worksReferenceNumberYesNo.heading", subcontractorName)
       legend.hasClass("govuk-fieldset__legend--l") mustBe true
 
       val hint: Elements = doc.select("fieldset .govuk-hint")
@@ -60,10 +62,12 @@ class WorksReferenceNumberYesNoViewSpec extends AnyWordSpec with Matchers with G
     }
 
     "display error summary and inline error when no option is selected" in new Setup {
+      val subcontractorName = "Test Subcontractor"
+
       val errorForm: Form[Boolean] =
         form.withError("value", "worksReferenceNumberYesNo.error.required")
 
-      val html: HtmlFormat.Appendable = view(errorForm, NormalMode)
+      val html: HtmlFormat.Appendable = view(errorForm, NormalMode, subcontractorName)
       val doc: Document               = org.jsoup.Jsoup.parse(html.body)
 
       val summary: Elements = doc.select(".govuk-error-summary")

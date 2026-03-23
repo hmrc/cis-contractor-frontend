@@ -34,7 +34,7 @@ class PartnershipAddressFormProvider @Inject() extends Mappings {
           .verifying(
             firstError(
               maxLength(Constants.MaxLength35, "partnershipAddress.error.addressLine1.length"),
-              regexp(Validation.nameRegex, "partnershipAddress.error.addressLine1.invalidCharacters"),
+              regexp(Validation.addressRegex, "partnershipAddress.error.addressLine1.invalidCharacters"),
               regexp(
                 Validation.firstCharLetterOrDigitRegex,
                 "partnershipAddress.error.addressLine1.firstCharMustBeLetterOrNumber"
@@ -49,7 +49,7 @@ class PartnershipAddressFormProvider @Inject() extends Mappings {
               firstError(
                 maxLength(Constants.MaxLength35, "partnershipAddress.error.addressLine2.length"),
                 regexp(
-                  Validation.nameRegex,
+                  Validation.addressRegex,
                   "partnershipAddress.error.addressLine2.invalidCharacters"
                 ),
                 regexp(
@@ -65,7 +65,7 @@ class PartnershipAddressFormProvider @Inject() extends Mappings {
           .verifying(
             firstError(
               maxLength(Constants.MaxLength35, "partnershipAddress.error.addressLine3.length"),
-              regexp(Validation.nameRegex, "partnershipAddress.error.addressLine3.invalidCharacters"),
+              regexp(Validation.addressRegex, "partnershipAddress.error.addressLine3.invalidCharacters"),
               regexp(
                 Validation.firstCharLetterRegex,
                 "partnershipAddress.error.addressLine3.firstCharMustBeLetterOrNumber"
@@ -79,7 +79,7 @@ class PartnershipAddressFormProvider @Inject() extends Mappings {
             .verifying(
               firstError(
                 maxLength(Constants.MaxLength35, "partnershipAddress.error.addressLine4.length"),
-                regexp(Validation.nameRegex, "partnershipAddress.error.addressLine4.invalidCharacters"),
+                regexp(Validation.addressRegex, "partnershipAddress.error.addressLine4.invalidCharacters"),
                 regexp(
                   Validation.firstCharLetterRegex,
                   "partnershipAddress.error.addressLine4.firstCharMustBeLetterOrNumber"
