@@ -704,12 +704,14 @@ trustPhoneNumber.error.required = Enter trustPhoneNumber
 trustPhoneNumber.error.length = TrustPhoneNumber must be 35 characters or less
 trustPhoneNumber.change.hidden = TrustPhoneNumber
 
-trustMobileNumber.title = trustMobileNumber
-trustMobileNumber.heading = trustMobileNumber
-trustMobileNumber.checkYourAnswersLabel = trustMobileNumber
-trustMobileNumber.error.required = Enter trustMobileNumber
-trustMobileNumber.error.length = TrustMobileNumber must be 35 characters or less
-trustMobileNumber.change.hidden = TrustMobileNumber
+trustMobileNumber.title = What is the mobile number for this trust?
+trustMobileNumber.heading = What is the mobile number for {0}?
+trustMobileNumber.hint = HMRC will never use this mobile number to contact this subcontractor
+trustMobileNumber.checkYourAnswersLabel = Mobile number
+trustMobileNumber.error.required = Enter a mobile number
+trustMobileNumber.error.invalid = Enter a valid mobile number, like 07700 900 982 or +44 7700 900 999
+trustMobileNumber.error.length = Enter a valid mobile number, like 07700 900 982 or +44 7700 900 999
+trustMobileNumber.change.hidden = mobile number
 
 trustUtrYesNo.title = trustUtrYesNo
 trustUtrYesNo.heading = trustUtrYesNo

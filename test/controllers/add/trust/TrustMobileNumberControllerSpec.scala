@@ -41,14 +41,19 @@ class TrustMobileNumberControllerSpec extends SpecBase with MockitoSugar {
   val formProvider = new TrustMobileNumberFormProvider()
   val form         = formProvider()
 
+  private val trustName = "Test Trust"
+
   lazy val trustMobileNumberRoute: String =
     controllers.add.trust.routes.TrustMobileNumberController.onPageLoad(NormalMode).url
+
+    private def uaWithName: UserAnswers =
+      emptyUserAnswers.set(TrustNamePage, trustName).success.value
 
   "TrustMobileNumber Controller" - {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(uaWithName)).build()
 
       running(application) {
         val request = FakeRequest(GET, trustMobileNumberRoute)
@@ -58,7 +63,7 @@ class TrustMobileNumberControllerSpec extends SpecBase with MockitoSugar {
         val view = application.injector.instanceOf[TrustMobileNumberView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode, trustName)(request, messages(application)).toString
       }
     }
 
