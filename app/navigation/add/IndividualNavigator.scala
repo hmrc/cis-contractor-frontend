@@ -41,20 +41,19 @@ class IndividualNavigator @Inject() () extends NavigatorForJourney {
     case SubcontractorNamePage                     => _ => controllers.add.routes.SubAddressYesNoController.onPageLoad(NormalMode)
     case SubAddressYesNoPage                       => userAnswers => navigatorFromSubAddressYesNoPage(NormalMode)(userAnswers)
     case AddressOfSubcontractorPage                =>
-      _ => controllers.add.routes.NationalInsuranceNumberYesNoController.onPageLoad(NormalMode)
-    case NationalInsuranceNumberYesNoPage          =>
-      userAnswers => navigatorFromNationalInsuranceNumberYesNoPage(NormalMode)(userAnswers)
-    case SubNationalInsuranceNumberPage            =>
       _ => controllers.add.routes.UniqueTaxpayerReferenceYesNoController.onPageLoad(NormalMode)
     case UniqueTaxpayerReferenceYesNoPage          =>
       userAnswers => navigatorFromUniqueTaxpayerReferenceYesNoPage(NormalMode)(userAnswers)
     case SubcontractorsUniqueTaxpayerReferencePage =>
+      _ => controllers.add.routes.NationalInsuranceNumberYesNoController.onPageLoad(NormalMode)
+    case NationalInsuranceNumberYesNoPage          =>
+      userAnswers => navigatorFromNationalInsuranceNumberYesNoPage(NormalMode)(userAnswers)
+    case SubNationalInsuranceNumberPage            =>
       _ => controllers.add.routes.WorksReferenceNumberYesNoController.onPageLoad(NormalMode)
     case WorksReferenceNumberYesNoPage             =>
       userAnswers => navigatorFromWorksReferenceNumberYesNoPage(NormalMode)(userAnswers)
     case WorksReferenceNumberPage                  =>
       _ => controllers.add.routes.CheckYourAnswersController.onPageLoad()
-    case SubContactDetailsPage                     => _ => controllers.add.routes.CheckYourAnswersController.onPageLoad()
     case IndividualMobileNumberPage                =>
       _ => controllers.add.routes.UniqueTaxpayerReferenceYesNoController.onPageLoad(NormalMode)
     case IndividualPhoneNumberPage                 =>
@@ -111,7 +110,7 @@ class IndividualNavigator @Inject() () extends NavigatorForJourney {
       case (Some(true), NormalMode)  =>
         controllers.add.routes.AddressOfSubcontractorController.onPageLoad(NormalMode)
       case (Some(false), NormalMode) =>
-        controllers.add.routes.NationalInsuranceNumberYesNoController.onPageLoad(NormalMode)
+        controllers.add.routes.UniqueTaxpayerReferenceYesNoController.onPageLoad(NormalMode)
       case (Some(true), CheckMode)   =>
         ua.get(AddressOfSubcontractorPage)
           .fold(controllers.add.routes.AddressOfSubcontractorController.onPageLoad(CheckMode)) { _ =>
@@ -129,7 +128,7 @@ class IndividualNavigator @Inject() () extends NavigatorForJourney {
       case (Some(true), NormalMode)  =>
         controllers.add.routes.SubNationalInsuranceNumberController.onPageLoad(NormalMode)
       case (Some(false), NormalMode) =>
-        controllers.add.routes.UniqueTaxpayerReferenceYesNoController.onPageLoad(NormalMode)
+        controllers.add.routes.WorksReferenceNumberYesNoController.onPageLoad(NormalMode)
       case (Some(true), CheckMode)   =>
         ua.get(SubNationalInsuranceNumberPage)
           .fold(controllers.add.routes.SubNationalInsuranceNumberController.onPageLoad(CheckMode)) { _ =>
@@ -147,7 +146,7 @@ class IndividualNavigator @Inject() () extends NavigatorForJourney {
         controllers.add.routes.SubcontractorsUniqueTaxpayerReferenceController.onPageLoad(NormalMode)
 
       case (Some(false), NormalMode) =>
-        controllers.add.routes.WorksReferenceNumberYesNoController.onPageLoad(NormalMode)
+        controllers.add.routes.NationalInsuranceNumberYesNoController.onPageLoad(NormalMode)
 
       case (Some(true), CheckMode) =>
         ua.get(SubcontractorsUniqueTaxpayerReferencePage)

@@ -16,15 +16,18 @@
 
 package controllers.add
 
+import config.FrontendAppConfig
 import controllers.actions.*
 import forms.add.AddressOfSubcontractorFormProvider
 import models.Mode
+import models.requests.DataRequest
 import navigation.Navigator
 import pages.add.AddressOfSubcontractorPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import utils.{CountryOptions, SubcontractorNameExtractor}
 import views.html.add.AddressOfSubcontractorView
 
 import javax.inject.Inject
@@ -37,36 +40,48 @@ class AddressOfSubcontractorController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
+  subcontractorNameExtractor: SubcontractorNameExtractor,
   formProvider: AddressOfSubcontractorFormProvider,
+  countryOptions: CountryOptions,
   val controllerComponents: MessagesControllerComponents,
   view: AddressOfSubcontractorView
-)(implicit ec: ExecutionContext)
+)(implicit ec: ExecutionContext, appConfig: FrontendAppConfig)
     extends FrontendBaseController
     with I18nSupport {
 
-  val form = formProvider()
+  private val form = formProvider()
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
+  private def recoveryRedirect =
+    Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
 
-    val preparedForm = request.userAnswers.get(AddressOfSubcontractorPage) match {
-      case None        => form
-      case Some(value) => form.fill(value)
+  private def preparedForm(implicit request: DataRequest[?]) =
+    request.userAnswers.get(AddressOfSubcontractorPage).fold(form)(form.fill)
+
+  def onPageLoad(mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData) { implicit request =>
+      subcontractorNameExtractor
+        .getSubcontractorName(request.userAnswers)
+        .fold(recoveryRedirect) { subcontractorName =>
+          Ok(view(preparedForm, mode, subcontractorName, countryOptions.options()))
+        }
     }
 
-    Ok(view(preparedForm, mode))
-  }
-
-  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
-    implicit request =>
-      form
-        .bindFromRequest()
-        .fold(
-          formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
-          value =>
-            for {
-              updatedAnswers <- Future.fromTry(request.userAnswers.set(AddressOfSubcontractorPage, value))
-              _              <- sessionRepository.set(updatedAnswers)
-            } yield Redirect(navigator.nextPage(AddressOfSubcontractorPage, mode, updatedAnswers))
-        )
-  }
+  def onSubmit(mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData).async { implicit request =>
+      subcontractorNameExtractor
+        .getSubcontractorName(request.userAnswers)
+        .fold(Future.successful(recoveryRedirect)) { subcontractorName =>
+          form
+            .bindFromRequest()
+            .fold(
+              formWithErrors =>
+                Future.successful(BadRequest(view(formWithErrors, mode, subcontractorName, countryOptions.options()))),
+              value =>
+                for {
+                  updatedAnswers <- Future.fromTry(request.userAnswers.set(AddressOfSubcontractorPage, value))
+                  _              <- sessionRepository.set(updatedAnswers)
+                } yield Redirect(navigator.nextPage(AddressOfSubcontractorPage, mode, updatedAnswers))
+            )
+        }
+    }
 }

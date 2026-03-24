@@ -18,7 +18,7 @@ package services
 
 import base.SpecBase
 import connectors.ConstructionIndustrySchemeConnector
-import models.add.{InternationalAddress, SubContactDetails, SubcontractorName, TypeOfSubcontractor, UKAddress}
+import models.add.{InternationalAddress, SubcontractorName, TypeOfSubcontractor}
 import models.contact.ContactOptions
 import models.requests.CreateAndUpdateSubcontractorPayload
 import models.requests.CreateAndUpdateSubcontractorPayload.{IndividualOrSoleTraderPayload, PartnershipPayload}
@@ -62,7 +62,14 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
             .value
             .set(
               AddressOfSubcontractorPage,
-              UKAddress("addressLine1", Some("addressLine2"), "addressLine3", Some("addressLine4"), "postCode")
+              InternationalAddress(
+                "addressLine1",
+                Some("addressLine2"),
+                "addressLine3",
+                Some("addressLine4"),
+                "postalCode",
+                "United Kingdom"
+              )
             )
             .success
             .value
@@ -75,9 +82,6 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
             .set(WorksReferenceNumberPage, "workRef")
             .success
             .value
-            .set(SubContactDetailsPage, SubContactDetails("email", "phone"))
-            .success
-            .value
 
         val expectedPayload: CreateAndUpdateSubcontractorPayload =
           IndividualOrSoleTraderPayload(
@@ -88,12 +92,11 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
             addressLine2 = Some("addressLine2"),
             city = Some("addressLine3"),
             county = Some("addressLine4"),
-            postcode = Some("postCode"),
+            postcode = Some("postalCode"),
+            country = Some("United Kingdom"),
             nino = Some("nino"),
             utr = Some("utr"),
-            worksReferenceNumber = Some("workRef"),
-            emailAddress = Some("email"),
-            phoneNumber = Some("phone")
+            worksReferenceNumber = Some("workRef")
           )
 
         when(mockConnector.createAndUpdateSubcontractor(any[CreateAndUpdateSubcontractorPayload])(any[HeaderCarrier]))
@@ -122,7 +125,14 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
             .value
             .set(
               AddressOfSubcontractorPage,
-              UKAddress("addressLine1", Some("addressLine2"), "addressLine3", Some("addressLine4"), "postCode")
+              InternationalAddress(
+                "addressLine1",
+                Some("addressLine2"),
+                "addressLine3",
+                Some("addressLine4"),
+                "postalCode",
+                "United Kingdom"
+              )
             )
             .success
             .value
@@ -133,9 +143,6 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
             .success
             .value
             .set(WorksReferenceNumberPage, "workRef")
-            .success
-            .value
-            .set(SubContactDetailsPage, SubContactDetails("email", "phone"))
             .success
             .value
 
@@ -150,12 +157,11 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
             addressLine2 = Some("addressLine2"),
             city = Some("addressLine3"),
             county = Some("addressLine4"),
-            postcode = Some("postCode"),
+            postcode = Some("postalCode"),
+            country = Some("United Kingdom"),
             nino = Some("nino"),
             utr = Some("utr"),
-            worksReferenceNumber = Some("workRef"),
-            emailAddress = Some("email"),
-            phoneNumber = Some("phone")
+            worksReferenceNumber = Some("workRef")
           )
 
         when(mockConnector.createAndUpdateSubcontractor(any[CreateAndUpdateSubcontractorPayload])(any[HeaderCarrier]))
