@@ -24,9 +24,9 @@ final case class ValidatedSubcontractor(
   typeOfSubcontractor: TypeOfSubcontractor,
   tradingName: Option[String],
   subcontractorName: Option[SubcontractorName],
-  address: Option[UKAddress],
-  nino: Option[String],
+  address: Option[InternationalAddress],
   utr: Option[String],
+  nino: Option[String],
   workRefNumber: Option[String]
 )
 
@@ -37,16 +37,16 @@ object ValidatedSubcontractor extends Validation {
       tradingName         <- getOptionalPageValue(answers, TradingNameOfSubcontractorPage, SubTradingNameYesNoPage)
       subcontractorName   <- getOptionalNamePage(answers)
       address             <- getOptionalPageValue(answers, AddressOfSubcontractorPage, SubAddressYesNoPage)
-      nino                <- getOptionalPageValue(answers, SubNationalInsuranceNumberPage, NationalInsuranceNumberYesNoPage)
       utr                 <- getOptionalPageValue(answers, SubcontractorsUniqueTaxpayerReferencePage, UniqueTaxpayerReferenceYesNoPage)
+      nino                <- getOptionalPageValue(answers, SubNationalInsuranceNumberPage, NationalInsuranceNumberYesNoPage)
       workReference       <- getOptionalPageValue(answers, WorksReferenceNumberPage, WorksReferenceNumberYesNoPage)
     } yield ValidatedSubcontractor(
       typeOfSubcontractor,
       tradingName,
       subcontractorName,
       address,
-      nino,
       utr,
+      nino,
       workReference
     )
 

@@ -34,7 +34,7 @@ class CompanyAddressFormProvider @Inject() extends Mappings {
           .verifying(
             firstError(
               maxLength(Constants.MaxLength35, "companyAddress.error.addressLine1.length"),
-              regexp(Validation.nameRegex, "companyAddress.error.addressLine1.invalidCharacters"),
+              regexp(Validation.addressRegex, "companyAddress.error.addressLine1.invalidCharacters"),
               regexp(
                 Validation.firstCharLetterOrDigitRegex,
                 "companyAddress.error.addressLine1.firstCharMustBeLetterOrNumber"
@@ -49,7 +49,7 @@ class CompanyAddressFormProvider @Inject() extends Mappings {
               firstError(
                 maxLength(Constants.MaxLength35, "companyAddress.error.addressLine2.length"),
                 regexp(
-                  Validation.nameRegex,
+                  Validation.addressRegex,
                   "companyAddress.error.addressLine2.invalidCharacters"
                 ),
                 regexp(
@@ -65,7 +65,7 @@ class CompanyAddressFormProvider @Inject() extends Mappings {
           .verifying(
             firstError(
               maxLength(Constants.MaxLength35, "companyAddress.error.addressLine3.length"),
-              regexp(Validation.nameRegex, "companyAddress.error.addressLine3.invalidCharacters"),
+              regexp(Validation.addressRegex, "companyAddress.error.addressLine3.invalidCharacters"),
               regexp(Validation.firstCharLetterRegex, "companyAddress.error.addressLine3.firstCharMustBeLetterOrNumber")
             )
           ),
@@ -76,7 +76,7 @@ class CompanyAddressFormProvider @Inject() extends Mappings {
             .verifying(
               firstError(
                 maxLength(Constants.MaxLength35, "companyAddress.error.addressLine4.length"),
-                regexp(Validation.nameRegex, "companyAddress.error.addressLine4.invalidCharacters"),
+                regexp(Validation.addressRegex, "companyAddress.error.addressLine4.invalidCharacters"),
                 regexp(
                   Validation.firstCharLetterRegex,
                   "companyAddress.error.addressLine4.firstCharMustBeLetterOrNumber"
