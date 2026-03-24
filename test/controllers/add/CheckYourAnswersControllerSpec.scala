@@ -19,6 +19,7 @@ package controllers.add
 import base.SpecBase
 import controllers.routes
 import models.add.{InternationalAddress, TypeOfSubcontractor}
+import models.contact.ContactOptions
 import models.{CheckMode, UserAnswers}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{never, verify, verifyNoMoreInteractions, when}
@@ -46,7 +47,7 @@ class CheckYourAnswersControllerSpec extends SpecBase {
       country = "United Kingdom"
     )
 
-    val ua =
+    val minUa =
       emptyUserAnswers
         .set(TypeOfSubcontractorPage, TypeOfSubcontractor.Individualorsoletrader)
         .success
@@ -61,6 +62,18 @@ class CheckYourAnswersControllerSpec extends SpecBase {
         .success
         .value
         .set(AddressOfSubcontractorPage, address)
+        .success
+        .value
+        .set(IndividualChooseContactDetailsPage, ContactOptions.Phone)
+        .success
+        .value
+        .set(IndividualEmailAddressPage, "abc@test.com")
+        .success
+        .value
+        .set(IndividualPhoneNumberPage, "07123456789")
+        .success
+        .value
+        .set(IndividualMobileNumberPage, "07987654321")
         .success
         .value
         .set(NationalInsuranceNumberYesNoPage, true)
@@ -84,7 +97,7 @@ class CheckYourAnswersControllerSpec extends SpecBase {
 
     "must display all questions and dependent rows when answers are provided" in {
 
-      val application = applicationBuilder(userAnswers = Some(ua)).build()
+      val application = applicationBuilder(userAnswers = Some(minUa)).build()
 
       running(application) {
         val request = FakeRequest(GET, controllers.add.routes.CheckYourAnswersController.onPageLoad().url)
@@ -98,6 +111,8 @@ class CheckYourAnswersControllerSpec extends SpecBase {
         content must include("Subcontractor trading name")
         content must include("Add subcontractor address?")
         content must include("Address")
+        content must include("Method of contact")
+        content must include("Phone number")
         content must include("Add UTR?")
         content must include("UTR")
         content must include("Add National Insurance number?")
@@ -112,6 +127,7 @@ class CheckYourAnswersControllerSpec extends SpecBase {
 
         content must include(controllers.add.routes.SubTradingNameYesNoController.onPageLoad(CheckMode).url)
         content must include(controllers.add.routes.SubAddressYesNoController.onPageLoad(CheckMode).url)
+        content must include(controllers.add.routes.IndividualChooseContactDetailsController.onPageLoad(CheckMode).url)
         content must include(controllers.add.routes.UniqueTaxpayerReferenceYesNoController.onPageLoad(CheckMode).url)
         content must include(controllers.add.routes.NationalInsuranceNumberYesNoController.onPageLoad(CheckMode).url)
         content must include(controllers.add.routes.WorksReferenceNumberYesNoController.onPageLoad(CheckMode).url)
@@ -144,7 +160,7 @@ class CheckYourAnswersControllerSpec extends SpecBase {
         .thenReturn(Future.successful(true))
 
       val application =
-        applicationBuilder(userAnswers = Some(ua))
+        applicationBuilder(userAnswers = Some(minUa))
           .overrides(
             bind[SubcontractorService].toInstance(mockSubcontractorService),
             bind[SessionRepository].toInstance(mockSessionRepository)
@@ -167,7 +183,7 @@ class CheckYourAnswersControllerSpec extends SpecBase {
 
     "must redirect to Journey Recovery and not resubmit when already submitted flag is set" in {
       val submittedUa =
-        ua.set(CheckYourAnswersSubmittedPage, true).success.value
+        minUa.set(CheckYourAnswersSubmittedPage, true).success.value
 
       val mockSubcontractorService = mock[SubcontractorService]
       val mockSessionRepository    = mock[SessionRepository]
@@ -213,7 +229,7 @@ class CheckYourAnswersControllerSpec extends SpecBase {
         .thenReturn(Future.failed(new RuntimeException("boom")))
 
       val application =
-        applicationBuilder(userAnswers = Some(ua))
+        applicationBuilder(userAnswers = Some(minUa))
           .overrides(
             bind[SubcontractorService].toInstance(mockSubcontractorService),
             bind[SessionRepository].toInstance(mockSessionRepository)
@@ -257,5 +273,235 @@ class CheckYourAnswersControllerSpec extends SpecBase {
         redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
       }
     }
+
+    "individual contact option validation" - {
+
+      "must return OK when Phone is selected and a phone number is present" in {
+        val ua = minUa
+          .set(IndividualChooseContactDetailsPage, ContactOptions.Phone)
+          .success
+          .value
+          .set(IndividualPhoneNumberPage, "01234567890")
+          .success
+          .value
+
+        val application = applicationBuilder(userAnswers = Some(ua)).build()
+
+        running(application) {
+          val request =
+            FakeRequest(GET, controllers.add.routes.CheckYourAnswersController.onPageLoad().url)
+          val result  = route(application, request).value
+
+          status(result) mustEqual OK
+          contentAsString(result) must include("01234567890")
+        }
+      }
+
+      "must return OK when Mobile is selected and a mobile number is present" in {
+        val ua = minUa
+          .set(IndividualChooseContactDetailsPage, ContactOptions.Mobile)
+          .success
+          .value
+          .set(IndividualMobileNumberPage, "07123456789")
+          .success
+          .value
+
+        val application = applicationBuilder(userAnswers = Some(ua)).build()
+
+        running(application) {
+          val request =
+            FakeRequest(GET, controllers.add.routes.CheckYourAnswersController.onPageLoad().url)
+          val result  = route(application, request).value
+
+          status(result) mustEqual OK
+          contentAsString(result) must include("07123456789")
+        }
+      }
+
+      "must return OK when NoDetails is selected and no contact details are present" in {
+        val ua = minUa
+          .set(IndividualChooseContactDetailsPage, ContactOptions.NoDetails)
+          .success
+          .value
+
+        val application = applicationBuilder(userAnswers = Some(ua)).build()
+
+        running(application) {
+          val request =
+            FakeRequest(GET, controllers.add.routes.CheckYourAnswersController.onPageLoad().url)
+          val result  = route(application, request).value
+
+          status(result) mustEqual OK
+        }
+      }
+
+      "must redirect to Journey Recovery when Email is selected but the email address is missing" in {
+        val ua = minUa
+          .set(IndividualChooseContactDetailsPage, ContactOptions.Email)
+          .success
+          .value
+          .remove(IndividualEmailAddressPage)
+          .success
+          .value
+
+        val application = applicationBuilder(userAnswers = Some(ua)).build()
+
+        running(application) {
+          val request =
+            FakeRequest(GET, controllers.add.routes.CheckYourAnswersController.onPageLoad().url)
+          val result  = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value must include("/there-is-a-problem")
+        }
+      }
+
+      "must redirect to Journey Recovery when Phone is selected but the phone number is missing" in {
+        val ua = minUa
+          .set(IndividualChooseContactDetailsPage, ContactOptions.Phone)
+          .success
+          .value
+          .remove(IndividualPhoneNumberPage)
+          .success
+          .value
+
+        val application = applicationBuilder(userAnswers = Some(ua)).build()
+
+        running(application) {
+          val request =
+            FakeRequest(GET, controllers.add.routes.CheckYourAnswersController.onPageLoad().url)
+          val result  = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value must include("/there-is-a-problem")
+        }
+      }
+
+      "must redirect to Journey Recovery when Mobile is selected but the mobile number is missing" in {
+        val ua = minUa
+          .set(IndividualChooseContactDetailsPage, ContactOptions.Mobile)
+          .success
+          .value
+          .remove(IndividualMobileNumberPage)
+          .success
+          .value
+
+        val application = applicationBuilder(userAnswers = Some(ua)).build()
+
+        running(application) {
+          val request =
+            FakeRequest(GET, controllers.add.routes.CheckYourAnswersController.onPageLoad().url)
+          val result  = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value must include("/there-is-a-problem")
+        }
+      }
+
+      "must redirect to Journey Recovery when NoDetails is selected but stale contact data remains in the session" in {
+        val ua = minUa
+          .set(IndividualChooseContactDetailsPage, ContactOptions.NoDetails)
+          .success
+          .value
+          .set(IndividualEmailAddressPage, "stale@email.com")
+          .success
+          .value
+
+        val application = applicationBuilder(userAnswers = Some(ua)).build()
+
+        running(application) {
+          val request =
+            FakeRequest(GET, controllers.add.routes.CheckYourAnswersController.onPageLoad().url)
+          val result  = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value must include("/there-is-a-problem")
+        }
+      }
+    }
+
+    "contact option change cleanup" - {
+
+      // Simulates a user who previously entered a contact value, then changed their contact option via CYA.
+      // The page cleanup should clear the stale value from the old option.
+
+      "must return OK when switching from Email to Phone and stale email is cleaned up" in {
+        val ua = minUa
+          .set(IndividualChooseContactDetailsPage, ContactOptions.Email)
+          .success
+          .value
+          .set(IndividualEmailAddressPage, "old@email.com")
+          .success
+          .value
+          .set(IndividualChooseContactDetailsPage, ContactOptions.Phone)
+          .success
+          .value // cleanup removes email
+          .set(IndividualPhoneNumberPage, "01234567890")
+          .success
+          .value
+
+        val application = applicationBuilder(userAnswers = Some(ua)).build()
+
+        running(application) {
+          val request =
+            FakeRequest(GET, controllers.add.routes.CheckYourAnswersController.onPageLoad().url)
+          val result  = route(application, request).value
+
+          status(result) mustEqual OK
+          contentAsString(result) must include("01234567890")
+        }
+      }
+
+      "must return OK when switching from Phone to Mobile and stale phone number is cleaned up" in {
+        val ua = minUa
+          .set(IndividualChooseContactDetailsPage, ContactOptions.Phone)
+          .success
+          .value
+          .set(IndividualPhoneNumberPage, "01234567890")
+          .success
+          .value
+          .set(IndividualChooseContactDetailsPage, ContactOptions.Mobile)
+          .success
+          .value // cleanup removes phone
+          .set(IndividualMobileNumberPage, "07123456789")
+          .success
+          .value
+
+        val application = applicationBuilder(userAnswers = Some(ua)).build()
+
+        running(application) {
+          val request =
+            FakeRequest(GET, controllers.add.routes.CheckYourAnswersController.onPageLoad().url)
+          val result  = route(application, request).value
+
+          status(result) mustEqual OK
+          contentAsString(result) must include("07123456789")
+        }
+      }
+
+      "must return OK when switching from Email to NoDetails and stale email is cleaned up" in {
+        val ua = minUa
+          .set(IndividualChooseContactDetailsPage, ContactOptions.Email)
+          .success
+          .value
+          .set(IndividualEmailAddressPage, "old@email.com")
+          .success
+          .value
+          .set(IndividualChooseContactDetailsPage, ContactOptions.NoDetails)
+          .success
+          .value // cleanup removes email
+
+        val application = applicationBuilder(userAnswers = Some(ua)).build()
+
+        running(application) {
+          val request =
+            FakeRequest(GET, controllers.add.routes.CheckYourAnswersController.onPageLoad().url)
+          val result  = route(application, request).value
+
+          status(result) mustEqual OK
+        }
+      }
+    }
+
   }
 }
