@@ -19,7 +19,7 @@ package navigation.add
 import javax.inject.{Inject, Singleton}
 import navigation.NavigatorForJourney
 import controllers.routes
-import models.contact.ContactOptions.{Email, Mobile, Phone}
+import models.contact.ContactOptions.{Email, Mobile, NoDetails, Phone}
 import models.{CheckMode, Mode, NormalMode, UserAnswers}
 import pages.Page
 import pages.add.*
@@ -41,7 +41,7 @@ class IndividualNavigator @Inject() () extends NavigatorForJourney {
     case SubcontractorNamePage                     => _ => controllers.add.routes.SubAddressYesNoController.onPageLoad(NormalMode)
     case SubAddressYesNoPage                       => userAnswers => navigatorFromSubAddressYesNoPage(NormalMode)(userAnswers)
     case AddressOfSubcontractorPage                =>
-      _ => controllers.add.routes.UniqueTaxpayerReferenceYesNoController.onPageLoad(NormalMode)
+      _ => controllers.add.routes.IndividualChooseContactDetailsController.onPageLoad(NormalMode)
     case UniqueTaxpayerReferenceYesNoPage          =>
       userAnswers => navigatorFromUniqueTaxpayerReferenceYesNoPage(NormalMode)(userAnswers)
     case SubcontractorsUniqueTaxpayerReferencePage =>
@@ -110,7 +110,7 @@ class IndividualNavigator @Inject() () extends NavigatorForJourney {
       case (Some(true), NormalMode)  =>
         controllers.add.routes.AddressOfSubcontractorController.onPageLoad(NormalMode)
       case (Some(false), NormalMode) =>
-        controllers.add.routes.UniqueTaxpayerReferenceYesNoController.onPageLoad(NormalMode)
+        controllers.add.routes.IndividualChooseContactDetailsController.onPageLoad(NormalMode)
       case (Some(true), CheckMode)   =>
         ua.get(AddressOfSubcontractorPage)
           .fold(controllers.add.routes.AddressOfSubcontractorController.onPageLoad(CheckMode)) { _ =>
@@ -184,16 +184,18 @@ class IndividualNavigator @Inject() () extends NavigatorForJourney {
 
   private def navigatorFromIndividualChooseContactDetailsPage(mode: Mode)(userAnswers: UserAnswers): Call =
     (userAnswers.get(IndividualChooseContactDetailsPage), mode) match {
-      case (Some(Email), _)  =>
-        controllers.add.routes.IndividualChooseContactDetailsController.onPageLoad(mode)
-      case (Some(Phone), _)  =>
-        controllers.add.routes.IndividualChooseContactDetailsController.onPageLoad(mode)
-      case (Some(Mobile), _) =>
-        controllers.add.routes.IndividualChooseContactDetailsController.onPageLoad(mode)
-      case (Some(_), _)      =>
-        controllers.add.routes.IndividualChooseContactDetailsController.onPageLoad(mode)
-      case (_, CheckMode)    => controllers.add.routes.CheckYourAnswersController.onPageLoad()
-      case _                 => routes.JourneyRecoveryController.onPageLoad()
+      case (Some(Email), _)             =>
+        controllers.add.routes.IndividualEmailAddressController.onPageLoad(mode)
+      case (Some(Phone), _)             =>
+        controllers.add.routes.IndividualPhoneNumberController.onPageLoad(mode)
+      case (Some(Mobile), _)            =>
+        controllers.add.routes.IndividualMobileNumberController.onPageLoad(mode)
+      case (Some(NoDetails), CheckMode) =>
+        controllers.add.routes.CheckYourAnswersController.onPageLoad()
+      case (Some(_), _)                 =>
+        controllers.add.routes.UniqueTaxpayerReferenceYesNoController.onPageLoad(mode)
+      case (_, CheckMode)               => controllers.add.routes.CheckYourAnswersController.onPageLoad()
+      case _                            => routes.JourneyRecoveryController.onPageLoad()
     }
 
 }
