@@ -320,10 +320,16 @@ class PartnershipNavigatorSpec extends SpecBase {
       }
 
       "must go from PartnershipNominatedPartnerNinoPage to PartnershipNominatedPartnerCrnYesNoController in NormalMode" in {
+        val answersWithNino =
+          emptyUserAnswers
+            .set(PartnershipNominatedPartnerNinoPage, "AA123456A")
+            .success
+            .value
+
         navigator.nextPage(
           PartnershipNominatedPartnerNinoPage,
           NormalMode,
-          emptyUserAnswers
+          answersWithNino
         ) mustBe controllers.add.partnership.routes.PartnershipNominatedPartnerCrnYesNoController.onPageLoad(NormalMode)
       }
 
@@ -787,7 +793,7 @@ class PartnershipNavigatorSpec extends SpecBase {
       }
 
       "PartnershipNominatedPartnerNinoPage in CheckMode" - {
-        "must go from PartnershipNominatedPartnerNinoPage to PartnershipNominatedPartnerCrnYesNoController in CheckMode" in {
+        "must go from PartnershipNominatedPartnerNinoPage to PartnershipCheckYourAnswersController in CheckMode" in {
           val answersWithNino =
             emptyUserAnswers
               .set(PartnershipNominatedPartnerNinoPage, "AA123456A")
@@ -798,8 +804,8 @@ class PartnershipNavigatorSpec extends SpecBase {
             PartnershipNominatedPartnerNinoPage,
             CheckMode,
             answersWithNino
-          ) mustBe controllers.add.partnership.routes.PartnershipNominatedPartnerCrnYesNoController
-            .onPageLoad(CheckMode)
+          ) mustBe controllers.add.partnership.routes.PartnershipCheckYourAnswersController
+            .onPageLoad()
         }
 
         "to JourneyRecovery when answer is missing" in {

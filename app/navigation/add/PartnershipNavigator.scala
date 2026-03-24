@@ -110,10 +110,14 @@ class PartnershipNavigator @Inject() () extends NavigatorForJourney {
   }
 
   private def navigatorFromPartnershipNominatedPartnerNinoPage(mode: Mode)(ua: UserAnswers): Call =
-    ua.get(PartnershipNominatedPartnerNinoPage) match {
-      case Some(_) =>
-        controllers.add.partnership.routes.PartnershipNominatedPartnerCrnYesNoController.onPageLoad(mode)
-      case None    =>
+    (ua.get(PartnershipNominatedPartnerNinoPage), mode) match {
+      case (Some(_), NormalMode) =>
+        controllers.add.partnership.routes.PartnershipNominatedPartnerCrnYesNoController.onPageLoad(NormalMode)
+
+      case (Some(_), CheckMode) =>
+        controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
+
+      case (None, _) =>
         routes.JourneyRecoveryController.onPageLoad()
     }
 
