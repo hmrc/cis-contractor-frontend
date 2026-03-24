@@ -20,6 +20,7 @@ import controllers.routes
 import models.{CheckMode, Mode, NormalMode, UserAnswers}
 import navigation.NavigatorForJourney
 import pages.Page
+import pages.add.trust.TrustAddressPage
 import play.api.mvc.Call
 
 import javax.inject.{Inject, Singleton}
@@ -34,10 +35,14 @@ class TrustNavigator @Inject() () extends NavigatorForJourney {
       checkRouteMap(page)(userAnswers)
   }
 
-  private val normalRoutes: Page => UserAnswers => Call =
-    _ => _ => routes.IndexController.onPageLoad()
+  private val normalRoutes: Page => UserAnswers => Call = {
+    case TrustAddressPage => _ => controllers.add.trust.routes.TrustContactOptionsController.onPageLoad(NormalMode)
+    case _                => _ => routes.IndexController.onPageLoad()
+  }
 
-  private val checkRouteMap: Page => UserAnswers => Call =
-    _ => _ => controllers.add.routes.CheckYourAnswersController.onPageLoad()
+  private val checkRouteMap: Page => UserAnswers => Call = {
+    case TrustAddressPage => _ => controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
+    case _                => _ => controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
+  }
 
 }

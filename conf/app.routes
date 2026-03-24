@@ -288,10 +288,10 @@ POST       /trustAddressYesNo                        controllers.add.trust.Trust
 GET        /changeTrustAddressYesNo                  controllers.add.trust.TrustAddressYesNoController.onPageLoad(mode: Mode = CheckMode)
 POST       /changeTrustAddressYesNo                  controllers.add.trust.TrustAddressYesNoController.onSubmit(mode: Mode = CheckMode)
 
-GET        /trustAddress                        controllers.add.trust.TrustAddressController.onPageLoad(mode: Mode = NormalMode)
-POST       /trustAddress                        controllers.add.trust.TrustAddressController.onSubmit(mode: Mode = NormalMode)
-GET        /changeTrustAddress                  controllers.add.trust.TrustAddressController.onPageLoad(mode: Mode = CheckMode)
-POST       /changeTrustAddress                  controllers.add.trust.TrustAddressController.onSubmit(mode: Mode = CheckMode)
+GET        /add/trust/address                   controllers.add.trust.TrustAddressController.onPageLoad(mode: Mode = NormalMode)
+POST       /add/trust/address                   controllers.add.trust.TrustAddressController.onSubmit(mode: Mode = NormalMode)
+GET        /add/trust/change-address            controllers.add.trust.TrustAddressController.onPageLoad(mode: Mode = CheckMode)
+POST       /add/trust/change-address            controllers.add.trust.TrustAddressController.onSubmit(mode: Mode = CheckMode)
 
 GET        /trustContactOptions                        controllers.add.trust.TrustContactOptionsController.onPageLoad(mode: Mode = NormalMode)
 POST       /trustContactOptions                        controllers.add.trust.TrustContactOptionsController.onSubmit(mode: Mode = NormalMode)
