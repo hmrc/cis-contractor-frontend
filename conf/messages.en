@@ -465,9 +465,9 @@ companyName.change.hidden = company name
 companyAddressYesNo.title = Do you want to add an address for this company?
 companyAddressYesNo.heading = Do you want to add an address for {0}?
 companyAddressYesNo.hint = You can add this information later if you prefer
-companyAddressYesNo.checkYourAnswersLabel = Company Address
+companyAddressYesNo.checkYourAnswersLabel = Add company address?
 companyAddressYesNo.error.required = Select whether you want to add an address for this company
-companyAddressYesNo.change.hidden = company address
+companyAddressYesNo.change.hidden = add company address?
 
 companyAddress.title = What is the address for this company?
 companyAddress.heading = What is the address for {0}?
@@ -513,8 +513,8 @@ companyContactOptions.mobile = Mobile number
 companyContactOptions.or = or
 companyContactOptions.noDetails = Do not add any contact details for this subcontractor
 companyContactOptions.error.required = Select whether you want to add contact details for this company
-companyContactOptions.checkYourAnswersLabel = Contact details for company
-companyContactOptions.change.hidden = Contact details for company
+companyContactOptions.checkYourAnswersLabel = Method of contact
+companyContactOptions.change.hidden = method of contact
 
 companyEmailAddress.title = What is the email address for this company?
 companyEmailAddress.heading = What is the email address for {0}?
@@ -548,7 +548,7 @@ companyUtrYesNo.heading = Do you know the Unique Taxpayer Reference for {0}?
 companyUtrYesNo.hint = This information will be used to verify the company as a subcontractor
 companyUtrYesNo.checkYourAnswersLabel =  Add UTR?
 companyUtrYesNo.error.required = Select whether you know the Unique Taxpayer Reference (UTR) for this company
-companyUtrYesNo.change.hidden = UTR
+companyUtrYesNo.change.hidden = add UTR?
 
 companyUtr.title = Corporation Tax Unique Taxpayer Reference (UTR)
 companyUtr.heading = Corporation Tax Unique Taxpayer Reference (UTR)
@@ -567,7 +567,7 @@ companyCrnYesNo.heading = Does {0} have a company registration number?
 companyCrnYesNo.hint = This information will be used to verify the company as a subcontractor
 companyCrnYesNo.error.required = Select whether this company has a registration number
 companyCrnYesNo.checkYourAnswersLabel = Add company registration number?
-companyCrnYesNo.change.hidden = add company registration number
+companyCrnYesNo.change.hidden = add company registration number?
 
 companyCrn.title = What is the company registration number for this company?
 companyCrn.heading = What is the company registration number for {0}?
@@ -581,9 +581,9 @@ companyCrn.change.hidden = company registration number
 companyWorksReferenceYesNo.title = Is there a works reference number associated with this company?
 companyWorksReferenceYesNo.heading = Is there a works reference number associated with {0}?
 companyWorksReferenceYesNo.hint = This is the reference number used to identify a subcontractor’s work or project. It can contain letters and numbers.
-companyWorksReferenceYesNo.checkYourAnswersLabel = Works reference number
+companyWorksReferenceYesNo.checkYourAnswersLabel = Add works reference number?
 companyWorksReferenceYesNo.error.required = Select whether there is a works reference number associated with this company
-companyWorksReferenceYesNo.change.hidden = works reference number
+companyWorksReferenceYesNo.change.hidden = add works reference number?
 
 companyWorksReference.title = What is the works reference number associated with this company?
 companyWorksReference.heading = What is the works reference number associated with {0}?
@@ -594,8 +594,12 @@ companyWorksReference.error.invalid = Enter a valid works reference number
 companyWorksReference.error.length = Enter a works reference number, up to 20 characters
 companyWorksReference.change.hidden = works reference number
 
-companyCheckYourAnswers.title = companyCheckYourAnswers
-companyCheckYourAnswers.heading = companyCheckYourAnswers
+companyCheckYourAnswers.title = Check your answers before adding this company
+companyCheckYourAnswers.heading = Check your answers before adding this company
+companyCheckYourAnswers.subHeading = Subcontractor details
+companyCheckYourAnswers.trailHeading = Now add this subcontractor
+companyCheckYourAnswers.trailText = By adding this subcontractor you are confirming that, to the best of your knowledge, the details you are providing are correct.
+companyCheckYourAnswers.continue = Accept and submit
 
 partnershipMobileNumber.title = What is the mobile number for this partnership?
 partnershipMobileNumber.heading = What is the mobile number for {0}?
@@ -746,10 +750,3 @@ trustWorksReference.change.hidden = TrustWorksReference
 
 trustCheckYourAnswers.title = trustCheckYourAnswers
 trustCheckYourAnswers.heading = trustCheckYourAnswers
-
-partnershipCheckYourAnswers.title = Check your answers before adding this company
-partnershipCheckYourAnswers.heading = Check your answers before adding this company
-partnershipCheckYourAnswers.subHeading = Subcontractor details
-partnershipCheckYourAnswers.trailHeading = Now add this subcontractor
-partnershipCheckYourAnswers.trailText = By adding this subcontractor you are confirming that, to the best of your knowledge, the details you are providing are correct.
-partnershipCheckYourAnswers.continue = Accept and submit
