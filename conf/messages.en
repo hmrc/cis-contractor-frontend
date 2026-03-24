@@ -697,12 +697,14 @@ trustEmailAddress.error.required = Enter trustEmailAddress
 trustEmailAddress.error.length = TrustEmailAddress must be 254 characters or less
 trustEmailAddress.change.hidden = TrustEmailAddress
 
-trustPhoneNumber.title = trustPhoneNumber
-trustPhoneNumber.heading = trustPhoneNumber
-trustPhoneNumber.checkYourAnswersLabel = trustPhoneNumber
-trustPhoneNumber.error.required = Enter trustPhoneNumber
-trustPhoneNumber.error.length = TrustPhoneNumber must be 35 characters or less
-trustPhoneNumber.change.hidden = TrustPhoneNumber
+trustPhoneNumber.title = What is the phone number for this trust?
+trustPhoneNumber.heading = What is the phone number for {0}?
+trustPhoneNumber.hint = HMRC will never use this phone number to contact this subcontractor
+trustPhoneNumber.checkYourAnswersLabel = Phone number
+trustPhoneNumber.error.required = Enter a phone number
+trustPhoneNumber.error.invalid = Enter a valid phone number, like 01632 960 001. For international numbers include the country code.
+trustPhoneNumber.error.length = Enter a valid phone number, like 01632 960 001. For international numbers include the country code.
+trustPhoneNumber.change.hidden = phone number
 
 trustMobileNumber.title = trustMobileNumber
 trustMobileNumber.heading = trustMobileNumber

@@ -20,6 +20,7 @@ import base.SpecBase
 import controllers.routes
 import models.{CheckMode, NormalMode, UserAnswers}
 import pages.Page
+import pages.add.trust.TrustPhoneNumberPage
 
 class TrustNavigatorSpec extends SpecBase {
 
@@ -35,6 +36,14 @@ class TrustNavigatorSpec extends SpecBase {
         navigator.nextPage(UnknownPage, NormalMode, UserAnswers("id")) mustBe routes.IndexController.onPageLoad()
       }
 
+      "must go from a TrustPhoneNumberPage to TrustUtrYesNoPage" in {
+        navigator.nextPage(
+          TrustPhoneNumberPage,
+          NormalMode,
+          UserAnswers("id")
+        ) mustBe controllers.add.trust.routes.TrustUtrYesNoController.onPageLoad(NormalMode)
+      }
+
     }
 
     "in Check mode" - {
@@ -48,6 +57,14 @@ class TrustNavigatorSpec extends SpecBase {
           UserAnswers("id")
         ) mustBe controllers.add.routes.CheckYourAnswersController
           .onPageLoad()
+      }
+
+      "must go from TrustPhoneNumberPage to CheckYourAnswersPage in CheckMode" in {
+        navigator.nextPage(
+          TrustPhoneNumberPage,
+          CheckMode,
+          emptyUserAnswers
+        ) mustBe controllers.add.routes.CheckYourAnswersController.onPageLoad()
       }
 
     }
