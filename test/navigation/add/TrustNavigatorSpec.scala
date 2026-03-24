@@ -50,14 +50,14 @@ class TrustNavigatorSpec extends SpecBase {
           controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
       }
 
-      "must go from a page that doesn't exist in the edit route map to CheckYourAnswers" in {
+      "must go from a page that doesn't exist in the edit route map to TrustCheckYourAnswers" in {
 
         case object UnknownPage extends Page
         navigator.nextPage(
           UnknownPage,
           CheckMode,
           UserAnswers("id")
-        ) mustBe controllers.add.routes.CheckYourAnswersController
+        ) mustBe controllers.add.trust.routes.TrustCheckYourAnswersController
           .onPageLoad()
       }
 

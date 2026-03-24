@@ -15,6 +15,7 @@
  *@
 
 @import viewmodels.InputWidth._
+@import viewmodels.LabelSize.Large
 
 @this(
     layout: templates.Layout,
@@ -38,11 +39,12 @@
             InputViewModel(
                 field = form("value"),
                 label = LabelViewModel(messages("trustName.heading"))
-                    .asPageHeading()
-                    .withCssClass("govuk-fieldset__legend--l")
+                    .asPageHeading(Large)
             )
             .withHint(HintViewModel(messages("trustName.hint")))
             .withWidth(Full)
+            .withSpellcheck(false)
+            .withAutocomplete("name")
         )
 
         @govukButton(
