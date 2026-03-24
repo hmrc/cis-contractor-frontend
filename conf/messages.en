@@ -691,12 +691,14 @@ trustContactOptions.checkYourAnswersLabel = What are the contact details for thi
 trustContactOptions.error.required = Select trustContactOptions
 trustContactOptions.change.hidden = TrustContactOptions
 
-trustEmailAddress.title = trustEmailAddress
-trustEmailAddress.heading = trustEmailAddress
-trustEmailAddress.checkYourAnswersLabel = trustEmailAddress
-trustEmailAddress.error.required = Enter trustEmailAddress
-trustEmailAddress.error.length = TrustEmailAddress must be 254 characters or less
-trustEmailAddress.change.hidden = TrustEmailAddress
+trustEmailAddress.title = What is the email address for this trust?
+trustEmailAddress.heading = What is the email address for {0}?
+trustEmailAddress.hint = HMRC will never use this email address to contact this subcontractor
+trustEmailAddress.checkYourAnswersLabel = Email Address
+trustEmailAddress.error.required = Enter an email address in the correct format, like name@example.com
+trustEmailAddress.error.length = Enter a valid email address in the correct format, like name@example.com, up to 254 characters
+trustEmailAddress.error.invalid = Enter a valid email address in the correct format, like name@example.com
+trustEmailAddress.change.hidden = email address
 
 trustPhoneNumber.title = trustPhoneNumber
 trustPhoneNumber.heading = trustPhoneNumber

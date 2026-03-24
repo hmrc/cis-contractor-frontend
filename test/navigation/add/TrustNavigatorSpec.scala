@@ -20,6 +20,7 @@ import base.SpecBase
 import controllers.routes
 import models.{CheckMode, NormalMode, UserAnswers}
 import pages.Page
+import pages.add.trust.*
 
 class TrustNavigatorSpec extends SpecBase {
 
@@ -28,6 +29,13 @@ class TrustNavigatorSpec extends SpecBase {
   "TrustNavigator" - {
 
     "in Normal mode" - {
+
+      "must go from TrustEmailAddressPage to TrustUtrYesNoController" in {
+        val ua = emptyUserAnswers.set(TrustEmailAddressPage, "test@test.com").success.value
+
+        navigator.nextPage(TrustEmailAddressPage, NormalMode, ua) mustBe
+          controllers.add.trust.routes.TrustUtrYesNoController.onPageLoad(NormalMode)
+      }
 
       "must go from a page that doesn't exist in the route map to Index" in {
 
@@ -38,6 +46,13 @@ class TrustNavigatorSpec extends SpecBase {
     }
 
     "in Check mode" - {
+
+      "must go from TrustEmailAddressPage to TrustUtrYesNoController" in {
+        val ua = emptyUserAnswers.set(TrustEmailAddressPage, "test@test.com").success.value
+
+        navigator.nextPage(TrustEmailAddressPage, CheckMode, ua) mustBe
+          controllers.add.trust.routes.TrustUtrYesNoController.onPageLoad(CheckMode)
+      }
 
       "must go from a page that doesn't exist in the edit route map to CheckYourAnswers" in {
 

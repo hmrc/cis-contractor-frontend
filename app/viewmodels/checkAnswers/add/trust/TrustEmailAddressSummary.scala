@@ -37,6 +37,7 @@ object TrustEmailAddressSummary {
             controllers.add.trust.routes.TrustEmailAddressController.onPageLoad(CheckMode).url
           )
             .withVisuallyHiddenText(messages("trustEmailAddress.change.hidden"))
+            .withAttribute("id" -> "trust-email-address")
         )
       )
     }
