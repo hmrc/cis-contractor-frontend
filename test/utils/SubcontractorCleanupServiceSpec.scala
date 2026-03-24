@@ -22,7 +22,7 @@ import pages.add.company.CompanyAddressYesNoPage
 import pages.add.partnership.PartnershipAddressYesNoPage
 import pages.add.trust.TrustAddressYesNoPage
 
-class SubcontractorCleanupServiceSpec extends SpecBase  {
+class SubcontractorCleanupServiceSpec extends SpecBase {
 
   val defaultSubcontractorCleanupService = new DefaultSubcontractorCleanupService()
 
@@ -47,7 +47,6 @@ class SubcontractorCleanupServiceSpec extends SpecBase  {
           .set(CheckYourAnswersSubmittedPage, true)
           .success
           .value
-
 
       val result = defaultSubcontractorCleanupService.clean(userAnswers).success.value
 
