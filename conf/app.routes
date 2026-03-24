@@ -249,7 +249,8 @@ POST       /add/company/company-works-reference         controllers.add.company.
 GET        /add/company/change-company-works-reference  controllers.add.company.CompanyWorksReferenceController.onPageLoad(mode: Mode = CheckMode)
 POST       /add/company/change-company-works-reference  controllers.add.company.CompanyWorksReferenceController.onSubmit(mode: Mode = CheckMode)
 
-GET        /companyCheckYourAnswers                      controllers.add.company.CompanyCheckYourAnswersController.onPageLoad()
+GET        /add/company/check-your-answers           controllers.add.company.CompanyCheckYourAnswersController.onPageLoad()
+POST       /add/company/check-your-answers           controllers.add.company.CompanyCheckYourAnswersController.onSubmit()
 
 GET        /add/partnership/mobile-number                controllers.add.partnership.PartnershipMobileNumberController.onPageLoad(mode: Mode = NormalMode)
 POST       /add/partnership/mobile-number                controllers.add.partnership.PartnershipMobileNumberController.onSubmit(mode: Mode = NormalMode)
@@ -334,6 +335,3 @@ GET        /changeTrustWorksReference                  controllers.add.trust.Tru
 POST       /changeTrustWorksReference                  controllers.add.trust.TrustWorksReferenceController.onSubmit(mode: Mode = CheckMode)
 
 GET        /trustCheckYourAnswers                       controllers.add.trust.TrustCheckYourAnswersController.onPageLoad()
-
-GET        /add/company/check-your-answers           controllers.add.company.CompanyCheckYourAnswersController.onPageLoad()
-POST       /add/company/check-your-answers           controllers.add.company.CompanyCheckYourAnswersController.onSubmit()
