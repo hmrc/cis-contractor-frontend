@@ -22,23 +22,31 @@ import models.UserAnswers
 import pages.add.company.CompanyNamePage
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
+import queries.CisIdQuery
 import views.html.add.company.CompanyAddedView
 
 class CompanyAddedControllerSpec extends SpecBase {
 
   private val companyName = "Test Company"
+  private val cisId       = "12345"
 
   private lazy val companyAddedRoute =
     controllers.add.company.routes.CompanyAddedController.onPageLoad().url
 
-  private def uaWithName: UserAnswers =
-    emptyUserAnswers.set(CompanyNamePage, companyName).success.value
+  private def uaWithNameAndCisId: UserAnswers =
+    emptyUserAnswers
+      .set(CompanyNamePage, companyName)
+      .success
+      .value
+      .set(CisIdQuery, cisId)
+      .success
+      .value
 
   "CompanyAddedController" - {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(uaWithName)).build()
+      val application = applicationBuilder(userAnswers = Some(uaWithNameAndCisId)).build()
 
       running(application) {
         val request = FakeRequest(GET, companyAddedRoute)
@@ -48,7 +56,11 @@ class CompanyAddedControllerSpec extends SpecBase {
         val view = application.injector.instanceOf[CompanyAddedView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(companyName)(request, applicationConfig, messages(application)).toString
+        contentAsString(result) mustEqual view(companyName, s"${applicationConfig.manageSubcontractorsUrl}/$cisId")(
+          request,
+          applicationConfig,
+          messages(application)
+        ).toString
       }
     }
 
@@ -68,16 +80,29 @@ class CompanyAddedControllerSpec extends SpecBase {
 
     "must redirect to JourneyRecovery if company name is missing for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application =
+        applicationBuilder(userAnswers = Some(emptyUserAnswers.set(CisIdQuery, cisId).success.value)).build()
 
       running(application) {
         val request = FakeRequest(GET, companyAddedRoute)
         val result  = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController
-          .onPageLoad()
-          .url
+        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must redirect to JourneyRecovery if cisId is missing for a GET" in {
+
+      val application =
+        applicationBuilder(userAnswers = Some(emptyUserAnswers.set(CompanyNamePage, companyName).success.value)).build()
+
+      running(application) {
+        val request = FakeRequest(GET, companyAddedRoute)
+        val result  = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
       }
     }
   }
