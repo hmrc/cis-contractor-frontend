@@ -37,12 +37,12 @@ class TrustNavigatorSpec extends SpecBase {
         navigator.nextPage(UnknownPage, NormalMode, UserAnswers("id")) mustBe routes.IndexController.onPageLoad()
       }
 
-      "must go from a TrustAddressYesNoPage to TrustAddressYesNoPage" in {
+      "must go from a TrustAddressYesNoPage to TrustAddressPage" in {
         navigator.nextPage(
           TrustAddressYesNoPage,
           NormalMode,
           UserAnswers("id")
-        ) mustBe controllers.add.trust.routes.TrustAddressYesNoController.onPageLoad(NormalMode)
+        ) mustBe controllers.add.trust.routes.TrustAddressController.onPageLoad(NormalMode)
       }
 
     }
@@ -60,12 +60,12 @@ class TrustNavigatorSpec extends SpecBase {
           .onPageLoad()
       }
 
-      "must go from TrustAddressYesNoPage to TrustAddressYesNoPage in CheckMode" in {
+      "must go from TrustAddressYesNoPage to TrustAddressPage in CheckMode" in {
         navigator.nextPage(
           TrustAddressYesNoPage,
           CheckMode,
           emptyUserAnswers
-        ) mustBe controllers.add.trust.routes.TrustAddressYesNoController.onPageLoad(CheckMode)
+        ) mustBe controllers.add.trust.routes.TrustAddressController.onPageLoad(CheckMode)
       }
 
     }
