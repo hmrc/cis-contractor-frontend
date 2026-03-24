@@ -29,4 +29,3 @@ class TrustAddressYesNoPageSpec extends PageBehaviours {
     beRemovable[Boolean](TrustAddressYesNoPage)
   }
 }
-

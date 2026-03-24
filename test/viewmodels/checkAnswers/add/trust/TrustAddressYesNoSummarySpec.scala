@@ -95,4 +95,3 @@ class TrustAddressYesNoSummarySpec extends SpecBase with GuiceOneAppPerSuite {
     }
   }
 }
-

@@ -51,7 +51,7 @@ class TrustAddressYesNoController @Inject() (
       .get(TrustNamePage)
       .map { trustName =>
         val preparedForm = request.userAnswers.get(TrustAddressYesNoPage) match {
-          case None => form
+          case None        => form
           case Some(value) => form.fill(value)
         }
 
@@ -72,7 +72,7 @@ class TrustAddressYesNoController @Inject() (
               value =>
                 for {
                   updatedAnswers <- Future.fromTry(request.userAnswers.set(TrustAddressYesNoPage, value))
-                  _ <- sessionRepository.set(updatedAnswers)
+                  _              <- sessionRepository.set(updatedAnswers)
                 } yield Redirect(navigator.nextPage(TrustAddressYesNoPage, mode, updatedAnswers))
             )
         }

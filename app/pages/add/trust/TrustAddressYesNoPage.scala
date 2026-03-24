@@ -27,12 +27,12 @@ case object TrustAddressYesNoPage extends QuestionPage[Boolean] {
   override def path: JsPath = JsPath \ toString
 
   override def toString: String = "trustAddressYesNo"
-  
+
   override def cleanup(value: Option[Boolean], userAnswers: UserAnswers): Try[UserAnswers] =
     if value.contains(false) then {
       userAnswers.remove(TrustAddressPage)
     } else {
       super.cleanup(value, userAnswers)
     }
-  
+
 }

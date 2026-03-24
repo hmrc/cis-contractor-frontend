@@ -38,8 +38,8 @@ import scala.concurrent.Future
 class TrustAddressYesNoControllerSpec extends SpecBase with MockitoSugar {
 
   def onwardRoute = Call("GET", "/foo")
-  
-  val formProvider = new TrustAddressYesNoFormProvider()
+
+  val formProvider        = new TrustAddressYesNoFormProvider()
   val form: Form[Boolean] = formProvider()
 
   private val trustName = "Test trustName"
@@ -82,7 +82,10 @@ class TrustAddressYesNoControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(true), NormalMode, trustName)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill(true), NormalMode, trustName)(
+          request,
+          messages(application)
+        ).toString
       }
     }
 
@@ -130,7 +133,10 @@ class TrustAddressYesNoControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode, trustName)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, NormalMode, trustName)(
+          request,
+          messages(application)
+        ).toString
       }
     }
 
@@ -170,7 +176,7 @@ class TrustAddressYesNoControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request = FakeRequest(GET, trustAddressYesNoRoute)
-        val result = route(application, request).value
+        val result  = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual
@@ -205,7 +211,7 @@ class TrustAddressYesNoControllerSpec extends SpecBase with MockitoSugar {
             .withFormUrlEncodedBody(("value", ""))
 
         val boundForm = form.bind(Map("value" -> ""))
-        val view = application.injector.instanceOf[TrustAddressYesNoView]
+        val view      = application.injector.instanceOf[TrustAddressYesNoView]
 
         val result = route(application, request).value
 
@@ -225,7 +231,7 @@ class TrustAddressYesNoControllerSpec extends SpecBase with MockitoSugar {
             .withFormUrlEncodedBody()
 
         val boundForm = form.bind(Map.empty)
-        val view = application.injector.instanceOf[TrustAddressYesNoView]
+        val view      = application.injector.instanceOf[TrustAddressYesNoView]
 
         val result = route(application, request).value
 
@@ -234,6 +240,6 @@ class TrustAddressYesNoControllerSpec extends SpecBase with MockitoSugar {
           view(boundForm, NormalMode, trustName)(request, messages(application)).toString
       }
     }
-    
+
   }
 }

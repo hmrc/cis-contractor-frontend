@@ -71,4 +71,3 @@ class TrustNavigatorSpec extends SpecBase {
     }
   }
 }
-
