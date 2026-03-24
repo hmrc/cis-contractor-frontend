@@ -21,7 +21,6 @@ import models.add.TypeOfSubcontractor
 import models.UserAnswers
 import models.add.TypeOfSubcontractor.*
 import models.requests.DataRequest
-import utils.SubcontractorCleanup.removeAllSubcontractor
 import pages.add.company.CompanyNamePage
 import pages.add.CheckYourAnswersSubmittedPage
 import pages.add.partnership.PartnershipNamePage
@@ -31,7 +30,7 @@ import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import utils.SubcontractorNameExtractor
+import utils.{DefaultSubcontractorCleanupService, SubcontractorNameExtractor}
 import views.html.add.SubcontractorAddedView
 
 import scala.util.{Failure, Success, Try}
@@ -45,6 +44,7 @@ class SubcontractorAddedController @Inject() (
   requireData: DataRequiredAction,
   subcontractorNameExtractor: SubcontractorNameExtractor,
   sessionRepository: SessionRepository,
+  cleanupService: DefaultSubcontractorCleanupService,
   val controllerComponents: MessagesControllerComponents,
   view: SubcontractorAddedView
 )(implicit ec: ExecutionContext)
@@ -93,8 +93,7 @@ class SubcontractorAddedController @Inject() (
 
       name.fold(Future.successful(recoveryRedirect)) { name =>
 
-        val cleanedUaTry: Try[UserAnswers] =
-          removeAllSubcontractor(request.userAnswers).flatMap(_.set(CheckYourAnswersSubmittedPage, false))
+        val cleanedUaTry: Try[UserAnswers] = cleanupService.clean(request.userAnswers)
 
         cleanedUaTry match {
           case Success(cleanedUa) =>

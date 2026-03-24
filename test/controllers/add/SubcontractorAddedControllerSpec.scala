@@ -35,6 +35,7 @@ import views.html.add.SubcontractorAddedView
 import scala.concurrent.Future
 import play.api.inject.bind
 import queries.CisIdQuery
+import utils.DefaultSubcontractorCleanupService
 
 class SubcontractorAddedControllerSpec extends SpecBase with MockitoSugar {
 
@@ -72,9 +73,14 @@ class SubcontractorAddedControllerSpec extends SpecBase with MockitoSugar {
 
         val view = application.injector.instanceOf[SubcontractorAddedView]
 
+        val subcontractorTypeTitle = messages(application)("subcontractorAdded.individual")
+
         val result = route(application, request).value
         status(result) mustBe OK
-        contentAsString(result) mustEqual view(subcontractorName, "Individual")(request, messages(application)).toString
+        contentAsString(result) mustEqual view(subcontractorName, subcontractorTypeTitle)(
+          request,
+          messages(application)
+        ).toString
 
         verify(mockRepo, times(1)).set(any())
       }
@@ -122,9 +128,14 @@ class SubcontractorAddedControllerSpec extends SpecBase with MockitoSugar {
 
         val view = application.injector.instanceOf[SubcontractorAddedView]
 
+        val subcontractorTypeTitle = messages(application)("subcontractorAdded.individual")
+
         val result = route(application, request).value
         status(result) mustBe OK
-        contentAsString(result) mustEqual view(subcontractorName, "Individual")(request, messages(application)).toString
+        contentAsString(result) mustEqual view(subcontractorName, subcontractorTypeTitle)(
+          request,
+          messages(application)
+        ).toString
 
         val captor: ArgumentCaptor[models.UserAnswers] = ArgumentCaptor.forClass(classOf[models.UserAnswers])
         verify(mockRepo, atLeastOnce()).set(captor.capture())
@@ -179,7 +190,7 @@ class SubcontractorAddedControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must redirect to JourneyRecovery for a GET when CheckYourAnswersSubmittedPage is not in ua" in {
+    "must not clear user answer and redirect to JourneyRecovery for a GET when CheckYourAnswersSubmittedPage is not in ua" in {
       def ua: UserAnswers =
         emptyUserAnswers
           .set(TradingNameOfSubcontractorPage, subcontractorName)
@@ -208,7 +219,7 @@ class SubcontractorAddedControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must redirect to JourneyRecovery for a GET when CheckYourAnswersSubmittedPage(false) is in ua" in {
+    "must not clear user answer and redirect to JourneyRecovery for a GET when CheckYourAnswersSubmittedPage(false) is in ua" in {
       def ua: UserAnswers =
         emptyUserAnswers
           .set(TradingNameOfSubcontractorPage, subcontractorName)
@@ -240,7 +251,7 @@ class SubcontractorAddedControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must redirect to JourneyRecovery for a GET when CheckYourAnswersSubmittedPage(true) in ua and subcontractorName(individual) is not in ua " in {
+    "must not clear ua and redirect to JourneyRecovery for a GET when CheckYourAnswersSubmittedPage(true) in ua and subcontractorName(individual) is not in ua " in {
       def ua: UserAnswers =
         emptyUserAnswers
           .set(CheckYourAnswersSubmittedPage, true)
@@ -265,6 +276,43 @@ class SubcontractorAddedControllerSpec extends SpecBase with MockitoSugar {
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
 
+        verify(mockRepo, times(0)).set(any())
+      }
+    }
+
+    "must redirect to JourneyRecovery and not persist when cleanup fails" in {
+
+      def ua: UserAnswers =
+        emptyUserAnswers
+          .set(TradingNameOfSubcontractorPage, subcontractorName)
+          .success
+          .value
+          .set(CheckYourAnswersSubmittedPage, true)
+          .success
+          .value
+
+      val mockRepo    = mock[SessionRepository]
+      val mockCleanup = mock[DefaultSubcontractorCleanupService]
+
+      when(mockRepo.set(any())).thenReturn(Future.successful(true))
+      when(mockCleanup.clean(any())).thenReturn(scala.util.Failure(new RuntimeException("boom")))
+
+      val application =
+        applicationBuilder(userAnswers = Some(ua))
+          .overrides(
+            bind[SessionRepository].toInstance(mockRepo),
+            bind[DefaultSubcontractorCleanupService].toInstance(mockCleanup)
+          )
+          .build()
+
+      running(application) {
+        val request = FakeRequest(GET, individualSubcontractorAddedRoute)
+        val result  = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+
+        verify(mockCleanup, times(1)).clean(any())
         verify(mockRepo, times(0)).set(any())
       }
     }
@@ -302,9 +350,11 @@ class SubcontractorAddedControllerSpec extends SpecBase with MockitoSugar {
 
         val view = application.injector.instanceOf[SubcontractorAddedView]
 
+        val subcontractorTypeTitle = messages(application)("subcontractorAdded.company")
+
         val result = route(application, request).value
         status(result) mustBe OK
-        contentAsString(result) mustEqual view(subcontractorName, "Company")(
+        contentAsString(result) mustEqual view(subcontractorName, subcontractorTypeTitle)(
           request,
           messages(application)
         ).toString
@@ -355,9 +405,14 @@ class SubcontractorAddedControllerSpec extends SpecBase with MockitoSugar {
 
         val view = application.injector.instanceOf[SubcontractorAddedView]
 
+        val subcontractorTypeTitle = messages(application)("subcontractorAdded.company")
+
         val result = route(application, request).value
         status(result) mustBe OK
-        contentAsString(result) mustEqual view(subcontractorName, "Company")(request, messages(application)).toString
+        contentAsString(result) mustEqual view(subcontractorName, subcontractorTypeTitle)(
+          request,
+          messages(application)
+        ).toString
 
         val captor: ArgumentCaptor[models.UserAnswers] = ArgumentCaptor.forClass(classOf[models.UserAnswers])
         verify(mockRepo, atLeastOnce()).set(captor.capture())
@@ -412,7 +467,7 @@ class SubcontractorAddedControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must redirect to JourneyRecovery for a GET when CheckYourAnswersSubmittedPage is not in ua" in {
+    "must not clear user answer and redirect to JourneyRecovery for a GET when CheckYourAnswersSubmittedPage is not in ua" in {
       def ua: UserAnswers =
         emptyUserAnswers
           .set(CompanyNamePage, subcontractorName)
@@ -441,7 +496,7 @@ class SubcontractorAddedControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must redirect to JourneyRecovery for a GET when CheckYourAnswersSubmittedPage(false) is in ua" in {
+    "must not clear user answer and redirect to JourneyRecovery for a GET when CheckYourAnswersSubmittedPage(false) is in ua" in {
       def ua: UserAnswers =
         emptyUserAnswers
           .set(CompanyNamePage, subcontractorName)
@@ -473,7 +528,7 @@ class SubcontractorAddedControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must redirect to JourneyRecovery for a GET when CheckYourAnswersSubmittedPage(true) in ua and subcontractorName(company) is not in ua " in {
+    "must not clear user answer and redirect to JourneyRecovery for a GET when CheckYourAnswersSubmittedPage(true) in ua and subcontractorName(company) is not in ua " in {
       def ua: UserAnswers =
         emptyUserAnswers
           .set(CheckYourAnswersSubmittedPage, true)
@@ -498,6 +553,43 @@ class SubcontractorAddedControllerSpec extends SpecBase with MockitoSugar {
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
 
+        verify(mockRepo, times(0)).set(any())
+      }
+    }
+
+    "must redirect to JourneyRecovery and not persist when cleanup fails" in {
+
+      def ua: UserAnswers =
+        emptyUserAnswers
+          .set(CompanyNamePage, subcontractorName)
+          .success
+          .value
+          .set(CheckYourAnswersSubmittedPage, true)
+          .success
+          .value
+
+      val mockRepo    = mock[SessionRepository]
+      val mockCleanup = mock[DefaultSubcontractorCleanupService]
+
+      when(mockRepo.set(any())).thenReturn(Future.successful(true))
+      when(mockCleanup.clean(any())).thenReturn(scala.util.Failure(new RuntimeException("boom")))
+
+      val application =
+        applicationBuilder(userAnswers = Some(ua))
+          .overrides(
+            bind[SessionRepository].toInstance(mockRepo),
+            bind[DefaultSubcontractorCleanupService].toInstance(mockCleanup)
+          )
+          .build()
+
+      running(application) {
+        val request = FakeRequest(GET, companySubcontractorAddedRoute)
+        val result  = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+
+        verify(mockCleanup, times(1)).clean(any())
         verify(mockRepo, times(0)).set(any())
       }
     }
@@ -535,9 +627,11 @@ class SubcontractorAddedControllerSpec extends SpecBase with MockitoSugar {
 
         val view = application.injector.instanceOf[SubcontractorAddedView]
 
+        val subcontractorTypeTitle = messages(application)("subcontractorAdded.partnership")
+
         val result = route(application, request).value
         status(result) mustBe OK
-        contentAsString(result) mustEqual view(subcontractorName, "Partnership")(
+        contentAsString(result) mustEqual view(subcontractorName, subcontractorTypeTitle)(
           request,
           messages(application)
         ).toString
@@ -588,9 +682,11 @@ class SubcontractorAddedControllerSpec extends SpecBase with MockitoSugar {
 
         val view = application.injector.instanceOf[SubcontractorAddedView]
 
+        val subcontractorTypeTitle = messages(application)("subcontractorAdded.partnership")
+
         val result = route(application, request).value
         status(result) mustBe OK
-        contentAsString(result) mustEqual view(subcontractorName, "Partnership")(
+        contentAsString(result) mustEqual view(subcontractorName, subcontractorTypeTitle)(
           request,
           messages(application)
         ).toString
@@ -648,7 +744,7 @@ class SubcontractorAddedControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must redirect to JourneyRecovery for a GET when CheckYourAnswersSubmittedPage is not in ua" in {
+    "must not clear user answer and redirect to JourneyRecovery for a GET when CheckYourAnswersSubmittedPage is not in ua" in {
       def ua: UserAnswers =
         emptyUserAnswers
           .set(PartnershipNamePage, subcontractorName)
@@ -677,7 +773,7 @@ class SubcontractorAddedControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must redirect to JourneyRecovery for a GET when CheckYourAnswersSubmittedPage(false) is in ua" in {
+    "must not clear user answer and redirect to JourneyRecovery for a GET when CheckYourAnswersSubmittedPage(false) is in ua" in {
       def ua: UserAnswers =
         emptyUserAnswers
           .set(PartnershipNamePage, subcontractorName)
@@ -709,7 +805,7 @@ class SubcontractorAddedControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must redirect to JourneyRecovery for a GET when CheckYourAnswersSubmittedPage(true) in ua and subcontractorName(partnership) is not in ua " in {
+    "must not clear user answer and redirect to JourneyRecovery for a GET when CheckYourAnswersSubmittedPage(true) in ua and subcontractorName(partnership) is not in ua " in {
       def ua: UserAnswers =
         emptyUserAnswers
           .set(CheckYourAnswersSubmittedPage, true)
@@ -734,6 +830,43 @@ class SubcontractorAddedControllerSpec extends SpecBase with MockitoSugar {
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
 
+        verify(mockRepo, times(0)).set(any())
+      }
+    }
+
+    "must redirect to JourneyRecovery and not persist when cleanup fails" in {
+
+      def ua: UserAnswers =
+        emptyUserAnswers
+          .set(PartnershipNamePage, subcontractorName)
+          .success
+          .value
+          .set(CheckYourAnswersSubmittedPage, true)
+          .success
+          .value
+
+      val mockRepo    = mock[SessionRepository]
+      val mockCleanup = mock[DefaultSubcontractorCleanupService]
+
+      when(mockRepo.set(any())).thenReturn(Future.successful(true))
+      when(mockCleanup.clean(any())).thenReturn(scala.util.Failure(new RuntimeException("boom")))
+
+      val application =
+        applicationBuilder(userAnswers = Some(ua))
+          .overrides(
+            bind[SessionRepository].toInstance(mockRepo),
+            bind[DefaultSubcontractorCleanupService].toInstance(mockCleanup)
+          )
+          .build()
+
+      running(application) {
+        val request = FakeRequest(GET, partnershipSubcontractorAddedRoute)
+        val result  = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+
+        verify(mockCleanup, times(1)).clean(any())
         verify(mockRepo, times(0)).set(any())
       }
     }
@@ -771,9 +904,11 @@ class SubcontractorAddedControllerSpec extends SpecBase with MockitoSugar {
 
         val view = application.injector.instanceOf[SubcontractorAddedView]
 
+        val subcontractorTypeTitle = messages(application)("subcontractorAdded.trust")
+
         val result = route(application, request).value
         status(result) mustBe OK
-        contentAsString(result) mustEqual view(subcontractorName, "Trust")(
+        contentAsString(result) mustEqual view(subcontractorName, subcontractorTypeTitle)(
           request,
           messages(application)
         ).toString
@@ -824,9 +959,14 @@ class SubcontractorAddedControllerSpec extends SpecBase with MockitoSugar {
 
         val view = application.injector.instanceOf[SubcontractorAddedView]
 
+        val subcontractorTypeTitle = messages(application)("subcontractorAdded.trust")
+
         val result = route(application, request).value
         status(result) mustBe OK
-        contentAsString(result) mustEqual view(subcontractorName, "Trust")(request, messages(application)).toString
+        contentAsString(result) mustEqual view(subcontractorName, subcontractorTypeTitle)(
+          request,
+          messages(application)
+        ).toString
 
         val captor: ArgumentCaptor[models.UserAnswers] = ArgumentCaptor.forClass(classOf[models.UserAnswers])
         verify(mockRepo, atLeastOnce()).set(captor.capture())
@@ -881,10 +1021,10 @@ class SubcontractorAddedControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must redirect to JourneyRecovery for a GET when CheckYourAnswersSubmittedPage is not in ua" in {
+    "must not clear user answer and redirect to JourneyRecovery for a GET when CheckYourAnswersSubmittedPage is not in ua" in {
       def ua: UserAnswers =
         emptyUserAnswers
-          .set(PartnershipNamePage, subcontractorName)
+          .set(TrustNamePage, subcontractorName)
           .success
           .value
 
@@ -910,10 +1050,10 @@ class SubcontractorAddedControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must redirect to JourneyRecovery for a GET when CheckYourAnswersSubmittedPage(false) is in ua" in {
+    "must not clear user answer and redirect to JourneyRecovery for a GET when CheckYourAnswersSubmittedPage(false) is in ua" in {
       def ua: UserAnswers =
         emptyUserAnswers
-          .set(PartnershipNamePage, subcontractorName)
+          .set(TrustNamePage, subcontractorName)
           .success
           .value
           .set(CheckYourAnswersSubmittedPage, false)
@@ -942,7 +1082,7 @@ class SubcontractorAddedControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must redirect to JourneyRecovery for a GET when CheckYourAnswersSubmittedPage(true) in ua and subcontractorName(trust) is not in ua " in {
+    "must not clear user answer and redirect to JourneyRecovery for a GET when CheckYourAnswersSubmittedPage(true) in ua and subcontractorName(trust) is not in ua " in {
       def ua: UserAnswers =
         emptyUserAnswers
           .set(CheckYourAnswersSubmittedPage, true)
@@ -967,6 +1107,42 @@ class SubcontractorAddedControllerSpec extends SpecBase with MockitoSugar {
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
 
+        verify(mockRepo, times(0)).set(any())
+      }
+    }
+
+    "must redirect to JourneyRecovery and not persist when cleanup fails" in {
+
+      def ua: UserAnswers =
+        emptyUserAnswers
+          .set(TrustNamePage, subcontractorName)
+          .success
+          .value
+          .set(CheckYourAnswersSubmittedPage, true)
+          .success
+          .value
+
+      val mockRepo    = mock[SessionRepository]
+      val mockCleanup = mock[DefaultSubcontractorCleanupService]
+
+      when(mockCleanup.clean(any())).thenReturn(scala.util.Failure(new RuntimeException("boom")))
+
+      val application =
+        applicationBuilder(userAnswers = Some(ua))
+          .overrides(
+            bind[SessionRepository].toInstance(mockRepo),
+            bind[DefaultSubcontractorCleanupService].toInstance(mockCleanup)
+          )
+          .build()
+
+      running(application) {
+        val request = FakeRequest(GET, trustSubcontractorAddedRoute)
+        val result  = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+
+        verify(mockCleanup, times(1)).clean(any())
         verify(mockRepo, times(0)).set(any())
       }
     }
