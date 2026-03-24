@@ -81,13 +81,13 @@ class PartnershipNavigator @Inject() () extends NavigatorForJourney {
     case PartnershipChooseContactDetailsPage      => navigatorFromChooseContactDetailsPage(CheckMode)(_)
     case PartnershipNominatedPartnerCrnYesNoPage  => navigatorFromPartnershipNominatedPartnerCrnYesNoPage(CheckMode)(_)
     case PartnershipNamePage                      =>
-      _ => controllers.add.partnership.routes.PartnershipAddressYesNoController.onPageLoad(CheckMode)
+      _ => controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
     case PartnershipAddressYesNoPage              =>
       userAnswers => navigatorFromPartnershipAddressYesNoPage(CheckMode)(userAnswers)
     case PartnershipAddressPage                   =>
       _ => controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
     case PartnershipMobileNumberPage              =>
-      _ => controllers.add.partnership.routes.PartnershipHasUtrYesNoController.onPageLoad(CheckMode)
+      _ => controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
     case PartnershipPhoneNumberPage               =>
       _ => controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
     case PartnershipNominatedPartnerNinoYesNoPage =>
@@ -131,26 +131,46 @@ class PartnershipNavigator @Inject() () extends NavigatorForJourney {
 
   private def navigatorFromPartnershipHasUtrYesNoPage(mode: Mode)(ua: UserAnswers): Call =
     (ua.get(PartnershipHasUtrYesNoPage), mode) match {
-      case (Some(true), _) =>
-        controllers.add.partnership.routes.PartnershipUniqueTaxpayerReferenceController.onPageLoad(mode)
 
-      case (Some(false), NormalMode) =>
-        controllers.add.partnership.routes.PartnershipNominatedPartnerNameController.onPageLoad(NormalMode)
+      case (Some(true), CheckMode) if ua.get(PartnershipUniqueTaxpayerReferencePage).isDefined =>
+        controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
+
+      case (Some(true), CheckMode) =>
+        controllers.add.partnership.routes.PartnershipUniqueTaxpayerReferenceController.onPageLoad(CheckMode)
 
       case (Some(false), CheckMode) =>
         controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
+
+      case (Some(true), NormalMode) =>
+        controllers.add.partnership.routes.PartnershipUniqueTaxpayerReferenceController.onPageLoad(NormalMode)
+
+      case (Some(false), NormalMode) =>
+        controllers.add.partnership.routes.PartnershipNominatedPartnerNameController.onPageLoad(NormalMode)
 
       case _ =>
         routes.JourneyRecoveryController.onPageLoad()
     }
 
-  private def navigatorFromPartnershipWorksReferenceNumberYesNoPage(mode: Mode)(userAnswers: UserAnswers): Call =
-    (userAnswers.get(PartnershipWorksReferenceNumberYesNoPage), mode) match {
-      case (Some(true), _)  =>
-        controllers.add.partnership.routes.PartnershipWorksReferenceNumberController.onPageLoad(mode)
-      case (Some(false), _) =>
+  private def navigatorFromPartnershipWorksReferenceNumberYesNoPage(mode: Mode)(ua: UserAnswers): Call =
+    (ua.get(PartnershipWorksReferenceNumberYesNoPage), mode) match {
+
+      case (Some(true), CheckMode) if ua.get(PartnershipWorksReferenceNumberPage).isDefined =>
         controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
-      case (None, _)        => routes.JourneyRecoveryController.onPageLoad()
+
+      case (Some(true), CheckMode) =>
+        controllers.add.partnership.routes.PartnershipWorksReferenceNumberController.onPageLoad(CheckMode)
+
+      case (Some(false), CheckMode) =>
+        controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
+
+      case (Some(true), NormalMode) =>
+        controllers.add.partnership.routes.PartnershipWorksReferenceNumberController.onPageLoad(NormalMode)
+
+      case (Some(false), NormalMode) =>
+        controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
+
+      case _ =>
+        routes.JourneyRecoveryController.onPageLoad()
     }
 
   private def navigatorFromPartnershipNominatedPartnerUtrYesNoPage(mode: Mode)(userAnswers: UserAnswers): Call =
@@ -251,20 +271,33 @@ class PartnershipNavigator @Inject() () extends NavigatorForJourney {
 
   private def navigatorFromChooseContactDetailsPage(mode: Mode)(userAnswers: UserAnswers): Call =
     (userAnswers.get(PartnershipChooseContactDetailsPage), mode) match {
-      // TODO: EMAIL       - CIS ANSF PTN: Screen AS-P4 (PTN) - What are the contact details for [partnership name]?
-      case (Some(Email), _)  =>
-        controllers.add.partnership.routes.PartnershipEmailAddressController.onPageLoad(mode)
+      // CheckMode
+      case (Some(Email), CheckMode) =>
+        controllers.add.partnership.routes.PartnershipEmailAddressController.onPageLoad(CheckMode)
 
+      case (Some(Phone), CheckMode) =>
+        controllers.add.partnership.routes.PartnershipPhoneNumberController.onPageLoad(CheckMode)
+
+      case (Some(Mobile), CheckMode)  =>
+        controllers.add.partnership.routes.PartnershipMobileNumberController.onPageLoad(CheckMode)
+
+      // CheckMode: NoDetails returns straight to CYA
+      case (Some(_), CheckMode)       =>
+        controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
+
+      // TODO: EMAIL       - CIS ANSF PTN: Screen AS-P4 (PTN) - What are the contact details for [partnership name]?
+      case (Some(Email), NormalMode)  =>
+        controllers.add.partnership.routes.PartnershipEmailAddressController.onPageLoad(NormalMode)
       // TODO: PHONE       - CIS ANSF PTN: Screen AS-P4 (PTN) - What are the contact details for [partnership name]?
-      case (Some(Phone), _)  =>
-        controllers.add.partnership.routes.PartnershipPhoneNumberController.onPageLoad(mode)
+      case (Some(Phone), NormalMode)  =>
+        controllers.add.partnership.routes.PartnershipPhoneNumberController.onPageLoad(NormalMode)
       // TODO: MOBILE      - CIS ANSF PTN: Screen AS-P4 (PTN) - What are the contact details for [partnership name]?
-      case (Some(Mobile), _) =>
-        controllers.add.partnership.routes.PartnershipMobileNumberController.onPageLoad(mode)
+      case (Some(Mobile), NormalMode) =>
+        controllers.add.partnership.routes.PartnershipMobileNumberController.onPageLoad(NormalMode)
       // TODO: NO DETAILS  - CIS ANSF PTN: Screen AS-P4 (PTN) - What are the contact details for [partnership name]?
-      case (Some(_), _)      =>
-        controllers.add.partnership.routes.PartnershipHasUtrYesNoController.onPageLoad(mode)
-      case (_, CheckMode)    => controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
-      case _                 => routes.JourneyRecoveryController.onPageLoad()
+      case (Some(_), NormalMode)      =>
+        controllers.add.partnership.routes.PartnershipHasUtrYesNoController.onPageLoad(NormalMode)
+      case (None, CheckMode)          => controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
+      case _                          => routes.JourneyRecoveryController.onPageLoad()
     }
 }

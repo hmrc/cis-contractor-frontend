@@ -69,6 +69,14 @@ class PartnershipNavigatorSpec extends SpecBase {
         ) mustBe controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
       }
 
+      "must go from PartnershipUniqueTaxpayerReferencePage to PartnershipNominatedPartnerNameController in NormalMode" in {
+        navigator.nextPage(
+          PartnershipUniqueTaxpayerReferencePage,
+          NormalMode,
+          emptyUserAnswers.setOrException(PartnershipUniqueTaxpayerReferencePage, "5860920998")
+        ) mustBe controllers.add.partnership.routes.PartnershipNominatedPartnerNameController.onPageLoad(NormalMode)
+      }
+
       "must go from PartnershipAddressPage to PartnershipChooseContactDetailsController in NormalMode" in {
         val address = InternationalAddress("1 Test Street", None, "Town", None, "AA1 1AA", "GB")
 
@@ -132,6 +140,14 @@ class PartnershipNavigatorSpec extends SpecBase {
           NormalMode,
           UserAnswers("id")
         ) mustBe controllers.add.partnership.routes.PartnershipNominatedPartnerUtrYesNoController.onPageLoad(NormalMode)
+      }
+
+      "must go from PartnershipNamePage to PartnershipAddressYesNoController in NormalMode" in {
+        navigator.nextPage(
+          PartnershipNamePage,
+          NormalMode,
+          emptyUserAnswers
+        ) mustBe controllers.add.partnership.routes.PartnershipAddressYesNoController.onPageLoad(NormalMode)
       }
 
       "must go from PartnershipNominatedPartnerCrnYesNo" - {
@@ -383,6 +399,23 @@ class PartnershipNavigatorSpec extends SpecBase {
         ) mustBe controllers.add.partnership.routes.PartnershipWorksReferenceNumberController.onPageLoad(CheckMode)
       }
 
+      "must go from PartnershipWorksReferenceNumberYesNoPage to CYA when answer is true in CheckMode and works reference number already exists" in {
+        val answers =
+          emptyUserAnswers
+            .set(PartnershipWorksReferenceNumberYesNoPage, true)
+            .success
+            .value
+            .set(PartnershipWorksReferenceNumberPage, "WRN-12345")
+            .success
+            .value
+
+        navigator.nextPage(
+          PartnershipWorksReferenceNumberYesNoPage,
+          CheckMode,
+          answers
+        ) mustBe controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
+      }
+
       "must go from a PartnershipWorksReferenceNumberYesNoPage to PartnershipCheckYourAnswers page when false" in {
         navigator.nextPage(
           PartnershipWorksReferenceNumberYesNoPage,
@@ -498,7 +531,7 @@ class PartnershipNavigatorSpec extends SpecBase {
           ) mustBe controllers.add.partnership.routes.PartnershipMobileNumberController.onPageLoad(CheckMode)
         }
 
-        "to itself when NoDetails is selected" in {
+        "to PartnershipCheckYourAnswersController when NoDetails is selected in CheckMode" in {
           navigator.nextPage(
             PartnershipChooseContactDetailsPage,
             CheckMode,
@@ -506,7 +539,7 @@ class PartnershipNavigatorSpec extends SpecBase {
               PartnershipChooseContactDetailsPage,
               ContactOptions.NoDetails
             )
-          ) mustBe controllers.add.partnership.routes.PartnershipHasUtrYesNoController.onPageLoad(CheckMode)
+          ) mustBe controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
         }
 
         "to PartnershipCheckYourAnswers when answer is not present" in {
@@ -737,20 +770,20 @@ class PartnershipNavigatorSpec extends SpecBase {
         ) mustBe partnershipCYA
       }
 
-      "must go from PartnershipNamePage to PartnershipAddressYesNoController in CheckMode" in {
+      "must go from PartnershipNamePage to PartnershipCheckYourAnswersController in CheckMode" in {
         navigator.nextPage(
           PartnershipNamePage,
           CheckMode,
           emptyUserAnswers
-        ) mustBe controllers.add.partnership.routes.PartnershipAddressYesNoController.onPageLoad(CheckMode)
+        ) mustBe controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
       }
 
-      "must go from a PartnershipMobileNumberPage to PartnershipHasUtrYesNoController in CheckMode" in {
+      "must go from a PartnershipMobileNumberPage to PartnershipCheckYourAnswersController in CheckMode" in {
         navigator.nextPage(
           PartnershipMobileNumberPage,
           CheckMode,
           emptyUserAnswers
-        ) mustBe controllers.add.partnership.routes.PartnershipHasUtrYesNoController.onPageLoad(CheckMode)
+        ) mustBe controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
       }
 
       "PartnershipNominatedPartnerNinoPage in CheckMode" - {
@@ -788,6 +821,23 @@ class PartnershipNavigatorSpec extends SpecBase {
           ) mustBe controllers.add.partnership.routes.PartnershipUniqueTaxpayerReferenceController.onPageLoad(CheckMode)
         }
 
+        "must go to PartnershipCheckYourAnswersController when answer is true in CheckMode and UTR is already provided" in {
+          val answers =
+            emptyUserAnswers
+              .set(PartnershipHasUtrYesNoPage, true)
+              .success
+              .value
+              .set(PartnershipUniqueTaxpayerReferencePage, "1234567890")
+              .success
+              .value
+
+          navigator.nextPage(
+            PartnershipHasUtrYesNoPage,
+            CheckMode,
+            answers
+          ) mustBe controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
+        }
+
         "must go to PartnershipCheckYourAnswersController when answer is false" in {
           navigator.nextPage(
             PartnershipHasUtrYesNoPage,
@@ -806,19 +856,18 @@ class PartnershipNavigatorSpec extends SpecBase {
       }
 
       "PartnershipNominatedPartnerCrnPage in CheckMode" - {
-        "must go to PartnershipCheckYourAnswersController in CheckMode when answer exists" in {
-          val userAnswers = emptyUserAnswers
-            .set(PartnershipNominatedPartnerCrnYesNoPage, true)
-            .success
-            .value
-            .set(PartnershipNominatedPartnerCrnPage, "12345678")
-            .success
-            .value
+        "must go from PartnershipNominatedPartnerCrnPage to PartnershipCheckYourAnswersController when CRN exists in CheckMode" in {
+
+          val answers =
+            emptyUserAnswers
+              .set(PartnershipNominatedPartnerCrnPage, "12345678")
+              .success
+              .value
 
           navigator.nextPage(
             PartnershipNominatedPartnerCrnPage,
             CheckMode,
-            userAnswers
+            answers
           ) mustBe controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
         }
 
