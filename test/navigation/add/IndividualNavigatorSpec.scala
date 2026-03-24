@@ -88,12 +88,12 @@ class IndividualNavigatorSpec extends SpecBase {
         ) mustBe controllers.add.routes.AddressOfSubcontractorController.onPageLoad(NormalMode)
       }
 
-      "must go from a SubAddressYesNoPage to UniqueTaxpayerReferenceYesNoPage when false" in {
+      "must go from a SubAddressYesNoPage to IndividualChooseContactDetailsPage when false" in {
         navigator.nextPage(
           SubAddressYesNoPage,
           NormalMode,
           emptyUserAnswers.setOrException(SubAddressYesNoPage, false)
-        ) mustBe controllers.add.routes.UniqueTaxpayerReferenceYesNoController.onPageLoad(NormalMode)
+        ) mustBe controllers.add.routes.IndividualChooseContactDetailsController.onPageLoad(NormalMode)
       }
 
       "must go from a SubAddressYesNoPage to journey recovery when incomplete info provided" in {
@@ -104,12 +104,12 @@ class IndividualNavigatorSpec extends SpecBase {
         ) mustBe journeyRecovery
       }
 
-      "must go from a AddressOfSubcontractorPage to UniqueTaxpayerReferenceYesNoPage" in {
+      "must go from a AddressOfSubcontractorPage to IndividualChooseContactDetailsPage" in {
         navigator.nextPage(
           AddressOfSubcontractorPage,
           NormalMode,
           UserAnswers("id")
-        ) mustBe controllers.add.routes.UniqueTaxpayerReferenceYesNoController.onPageLoad(NormalMode)
+        ) mustBe controllers.add.routes.IndividualChooseContactDetailsController.onPageLoad(NormalMode)
       }
 
       "must go from a NationalInsuranceNumberYesNoPage to SubNationalInsuranceNumberPage when true" in {
@@ -238,7 +238,7 @@ class IndividualNavigatorSpec extends SpecBase {
       }
 
       "must go from IndividualChooseContactDetailsPage" - {
-        "to itself when EmailAddress is selected" in {
+        "to IndividualEmailAddressPage when EmailAddress is selected" in {
           navigator.nextPage(
             IndividualChooseContactDetailsPage,
             NormalMode,
@@ -249,7 +249,7 @@ class IndividualNavigatorSpec extends SpecBase {
           ) mustBe controllers.add.routes.IndividualEmailAddressController.onPageLoad(NormalMode)
         }
 
-        "to itself when PhoneNumber is selected" in {
+        "to IndividualPhoneNumberPage when PhoneNumber is selected" in {
           navigator.nextPage(
             IndividualChooseContactDetailsPage,
             NormalMode,
@@ -260,7 +260,7 @@ class IndividualNavigatorSpec extends SpecBase {
           ) mustBe controllers.add.routes.IndividualPhoneNumberController.onPageLoad(NormalMode)
         }
 
-        "to itself when MobileNumber is selected" in {
+        "to IndividualMobileNumberPage when MobileNumber is selected" in {
           navigator.nextPage(
             IndividualChooseContactDetailsPage,
             NormalMode,
@@ -271,7 +271,7 @@ class IndividualNavigatorSpec extends SpecBase {
           ) mustBe controllers.add.routes.IndividualMobileNumberController.onPageLoad(NormalMode)
         }
 
-        "to itself when NoDetails is selected" in {
+        "to UniqueTaxpayerReferenceYesNoPage when NoDetails is selected" in {
           navigator.nextPage(
             IndividualChooseContactDetailsPage,
             NormalMode,
@@ -279,7 +279,7 @@ class IndividualNavigatorSpec extends SpecBase {
               IndividualChooseContactDetailsPage,
               ContactOptions.NoDetails
             )
-          ) mustBe controllers.add.routes.CheckYourAnswersController.onPageLoad()
+          ) mustBe controllers.add.routes.UniqueTaxpayerReferenceYesNoController.onPageLoad(NormalMode)
         }
 
         "to JourneyRecoveryPage when answer is not present" in {
@@ -542,7 +542,7 @@ class IndividualNavigatorSpec extends SpecBase {
       }
 
       "must go from IndividualChooseContactDetailsPage" - {
-        "to itself when EmailAddress is selected" in {
+        "to IndividualEmailAddressPage when EmailAddress is selected" in {
           navigator.nextPage(
             IndividualChooseContactDetailsPage,
             CheckMode,
@@ -553,7 +553,7 @@ class IndividualNavigatorSpec extends SpecBase {
           ) mustBe controllers.add.routes.IndividualEmailAddressController.onPageLoad(CheckMode)
         }
 
-        "to itself when PhoneNumber is selected" in {
+        "to IndividualPhoneNumberPage when PhoneNumber is selected" in {
           navigator.nextPage(
             IndividualChooseContactDetailsPage,
             CheckMode,
@@ -564,7 +564,7 @@ class IndividualNavigatorSpec extends SpecBase {
           ) mustBe controllers.add.routes.IndividualPhoneNumberController.onPageLoad(CheckMode)
         }
 
-        "to itself when MobileNumber is selected" in {
+        "to IndividualMobileNumberPage when MobileNumber is selected" in {
           navigator.nextPage(
             IndividualChooseContactDetailsPage,
             CheckMode,
@@ -575,7 +575,7 @@ class IndividualNavigatorSpec extends SpecBase {
           ) mustBe controllers.add.routes.IndividualMobileNumberController.onPageLoad(CheckMode)
         }
 
-        "to itself when NoDetails is selected" in {
+        "to CheckYourAnswersPage when NoDetails is selected" in {
           navigator.nextPage(
             IndividualChooseContactDetailsPage,
             CheckMode,
