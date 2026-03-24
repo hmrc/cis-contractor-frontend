@@ -114,7 +114,7 @@ class UniqueTaxpayerReferenceYesNoControllerSpec extends SpecBase with MockitoSu
       }
     }
 
-    "must redirect to the WorksReferenceNumberYesNo page when valid data with value No is submitted" in {
+    "must redirect to the NationalInsuranceNumberYesNoPage page when valid data with value No is submitted" in {
 
       val mockSessionRepository = mock[SessionRepository]
 
