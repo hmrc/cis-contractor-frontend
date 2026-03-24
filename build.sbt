@@ -116,6 +116,6 @@ lazy val appRoutesSections = Seq(
     primaryPrefixes   = Seq("/add/partnership/"),
     secondaryPrefixes = Seq("controllers.add.partnership.")),
   ColumnarSection("# Trust",
-    primaryPrefixes   = Seq("/trust"),
+    primaryPrefixes   = Seq("/add/trust"),
     secondaryPrefixes = Seq("controllers.add.trust.")),
 )
