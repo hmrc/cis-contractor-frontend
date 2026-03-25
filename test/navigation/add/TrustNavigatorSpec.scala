@@ -69,12 +69,12 @@ class TrustNavigatorSpec extends SpecBase {
           .onPageLoad()
       }
 
-      "must go from TrustPhoneNumberPage to CheckYourAnswersPage in CheckMode" in {
+      "must go from TrustPhoneNumberPage to TrustCheckYourAnswersPage in CheckMode" in {
         navigator.nextPage(
           TrustPhoneNumberPage,
           CheckMode,
           emptyUserAnswers
-        ) mustBe controllers.add.routes.CheckYourAnswersController.onPageLoad()
+        ) mustBe controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
       }
 
     }
