@@ -159,6 +159,7 @@ class CompanyCheckYourAnswersControllerSpec extends SpecBase {
         content must include("1234567890")
         content must include("AC012345")
         content must include("WRN-001")
+        content must include("1 Test Street")
       }
     }
 
@@ -340,6 +341,86 @@ class CompanyCheckYourAnswersControllerSpec extends SpecBase {
   }
 
   "company contact option validation" - {
+
+    "must return OK when Email is selected and a mobile number is present" in {
+      val ua = minUa
+        .set(CompanyContactOptionsPage, ContactOptions.Email)
+        .success
+        .value
+        .set(CompanyEmailAddressPage, "one@two.three")
+        .success
+        .value
+
+      val application = applicationBuilder(userAnswers = Some(ua)).build()
+
+      running(application) {
+        val request =
+          FakeRequest(GET, controllers.add.company.routes.CompanyCheckYourAnswersController.onPageLoad().url)
+        val result  = route(application, request).value
+
+        status(result) mustEqual OK
+        contentAsString(result) must include("one@two.three")
+      }
+    }
+
+    "must return OK when Phone is selected and a phone number is present" in {
+      val ua = minUa
+        .set(CompanyContactOptionsPage, ContactOptions.Phone)
+        .success
+        .value
+        .set(CompanyPhoneNumberPage, "01234567890")
+        .success
+        .value
+
+      val application = applicationBuilder(userAnswers = Some(ua)).build()
+
+      running(application) {
+        val request =
+          FakeRequest(GET, controllers.add.company.routes.CompanyCheckYourAnswersController.onPageLoad().url)
+        val result  = route(application, request).value
+
+        status(result) mustEqual OK
+        contentAsString(result) must include("01234567890")
+      }
+    }
+
+    "must return OK when Mobile is selected and a mobile number is present" in {
+      val ua = minUa
+        .set(CompanyContactOptionsPage, ContactOptions.Mobile)
+        .success
+        .value
+        .set(CompanyMobileNumberPage, "07123456789")
+        .success
+        .value
+
+      val application = applicationBuilder(userAnswers = Some(ua)).build()
+
+      running(application) {
+        val request =
+          FakeRequest(GET, controllers.add.company.routes.CompanyCheckYourAnswersController.onPageLoad().url)
+        val result  = route(application, request).value
+
+        status(result) mustEqual OK
+        contentAsString(result) must include("07123456789")
+      }
+    }
+
+    "must return OK when NoDetails is selected and no contact details are present" in {
+      val ua = minUa
+        .set(CompanyContactOptionsPage, ContactOptions.NoDetails)
+        .success
+        .value
+
+      val application = applicationBuilder(userAnswers = Some(ua)).build()
+
+      running(application) {
+        val request =
+          FakeRequest(GET, controllers.add.company.routes.CompanyCheckYourAnswersController.onPageLoad().url)
+        val result  = route(application, request).value
+
+        status(result) mustEqual OK
+      }
+    }
 
     "must redirect to Journey Recovery when Email is selected but email address is missing" in {
       val ua =
