@@ -276,6 +276,27 @@ class CheckYourAnswersControllerSpec extends SpecBase {
 
     "individual contact option validation" - {
 
+      "must return OK when Email is selected and a email address is present" in {
+        val ua = minUa
+          .set(IndividualChooseContactDetailsPage, ContactOptions.Email)
+          .success
+          .value
+          .set(IndividualEmailAddressPage, "abc@test.com")
+          .success
+          .value
+
+        val application = applicationBuilder(userAnswers = Some(ua)).build()
+
+        running(application) {
+          val request =
+            FakeRequest(GET, controllers.add.routes.CheckYourAnswersController.onPageLoad().url)
+          val result  = route(application, request).value
+
+          status(result) mustEqual OK
+          contentAsString(result) must include("abc@test.com")
+        }
+      }
+
       "must return OK when Phone is selected and a phone number is present" in {
         val ua = minUa
           .set(IndividualChooseContactDetailsPage, ContactOptions.Phone)
