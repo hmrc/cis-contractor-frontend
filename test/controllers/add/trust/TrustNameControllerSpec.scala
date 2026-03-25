@@ -20,28 +20,25 @@ import base.SpecBase
 import controllers.routes
 import forms.add.trust.TrustNameFormProvider
 import models.{NormalMode, UserAnswers}
-import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.when
+import org.mockito.Mockito.{verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import pages.add.trust.TrustNamePage
 import play.api.inject.bind
-import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import repositories.SessionRepository
 import views.html.add.trust.TrustNameView
 
 import scala.concurrent.Future
+import scala.util.Random
 
 class TrustNameControllerSpec extends SpecBase with MockitoSugar {
 
-  def onwardRoute = Call("GET", "/foo")
+  private val formProvider = new TrustNameFormProvider()
+  private val form         = formProvider()
 
-  val formProvider = new TrustNameFormProvider()
-  val form         = formProvider()
-
-  lazy val trustNameRoute: String = controllers.add.trust.routes.TrustNameController.onPageLoad(NormalMode).url
+  private lazy val trustNameRoute: String = controllers.add.trust.routes.TrustNameController.onPageLoad(NormalMode).url
 
   "TrustName Controller" - {
 
@@ -79,30 +76,29 @@ class TrustNameControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must redirect to the next page when valid data is submitted" in {
-
+    "must redirect to TrustAddressYesNo page when valid data is submitted" in {
       val mockSessionRepository = mock[SessionRepository]
 
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
       val application =
         applicationBuilder(userAnswers = Some(emptyUserAnswers))
-          .overrides(
-            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
-            bind[SessionRepository].toInstance(mockSessionRepository)
-          )
+          .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
           .build()
 
       running(application) {
         val request =
           FakeRequest(POST, trustNameRoute)
-            .withFormUrlEncodedBody(("value", "answer"))
+            .withFormUrlEncodedBody(("value", "My Trust"))
 
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual onwardRoute.url
+        redirectLocation(result).value mustEqual
+          controllers.add.trust.routes.TrustAddressYesNoController.onPageLoad(NormalMode).url
       }
+
+      verify(mockSessionRepository).set(any())
     }
 
     "must return a Bad Request and errors when invalid data is submitted" in {
@@ -115,6 +111,26 @@ class TrustNameControllerSpec extends SpecBase with MockitoSugar {
             .withFormUrlEncodedBody(("value", ""))
 
         val boundForm = form.bind(Map("value" -> ""))
+
+        val view = application.injector.instanceOf[TrustNameView]
+
+        val result = route(application, request).value
+
+        status(result) mustEqual BAD_REQUEST
+        contentAsString(result) mustEqual view(boundForm, NormalMode)(request, messages(application)).toString
+      }
+    }
+
+    "must return a Bad Request and errors when invalid data is submitted with length more than 56 characters" in {
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val longInput   = Random.alphanumeric.take(57 + 0).mkString
+
+      running(application) {
+        val request =
+          FakeRequest(POST, trustNameRoute)
+            .withFormUrlEncodedBody(("value", longInput))
+
+        val boundForm = form.bind(Map("value" -> longInput))
 
         val view = application.injector.instanceOf[TrustNameView]
 
