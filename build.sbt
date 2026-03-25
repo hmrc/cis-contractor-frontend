@@ -9,6 +9,8 @@ lazy val appName: String = "cis-contractor-frontend"
 ThisBuild / majorVersion := 0
 ThisBuild / scalaVersion := "3.3.6"
 
+onLoad in Global ~= (_ andThen ("git config core.hooksPath hooks" :: _))
+
 lazy val microservice = (project in file("."))
   .enablePlugins(PlayScala, SbtDistributablesPlugin)
   .disablePlugins(JUnitXmlReportPlugin) //Required to prevent https://github.com/scalatest/scalatest/issues/1427
@@ -54,9 +56,29 @@ lazy val microservice = (project in file("."))
     libraryDependencies ++= AppDependencies(),
     retrieveManaged := true,
     pipelineStages := Seq(digest),
-    Assets / pipelineStages := Seq(concat)
+    Assets / pipelineStages := Seq(concat),
+    columnarFmtConfig := Seq(
+      ColumnarConfig(
+        sections        = appRoutesSections,
+        lineLimit       = 160 * 1,
+        fileGlob        = "conf/app.routes",
+        fileHeader      = "# Routes",
+        formatterConfig = ColumnarFormatterConfig.playRoutes
+      ),
+      ColumnarConfig(
+        sections        = messagesSections,
+        lineLimit       = 120 * 1,
+        fileGlob        = "conf/messages.*",
+        formatterConfig = ColumnarFormatterConfig(
+          parse        = ColumnarFormatterConfig.playRoutes.parse,
+          primaryCol   = 0,
+          secondaryCol = 0,
+          dedupeKey    = cols => cols(0),
+          subkeyFn     = cols => cols(0).takeWhile(_ != '.')
+        )
+      )
+    )
   )
-
 lazy val testSettings: Seq[Def.Setting[?]] = Seq(
   fork := true,
   unmanagedSourceDirectories += baseDirectory.value / "test-utils"
@@ -66,3 +88,36 @@ lazy val it =
   (project in file("it"))
     .enablePlugins(PlayScala)
     .dependsOn(microservice % "test->test")
+
+lazy val messagesSections = Seq(
+  ColumnarSection("# Infrastructure",
+    primaryPrefixes = Seq("service", "site", "date", "error", "timeout", "index",
+                          "checkYourAnswers", "journeyRecovery", "signedOut")),
+  ColumnarSection("# Errors & Auth",
+    primaryPrefixes = Seq("pageNotFound", "systemError", "accessDenied", "unauthorised")),
+  ColumnarSection("# Individual and Common"),
+  ColumnarSection("# Partnership",
+    primaryPrefixes = Seq("partnership")),
+  ColumnarSection("# Company",
+    primaryPrefixes = Seq("company")),
+  ColumnarSection("# Trust",
+    primaryPrefixes = Seq("trust"))
+)
+
+lazy val appRoutesSections = Seq(
+  ColumnarSection("# Infrastructure"),
+  ColumnarSection("# Errors & Auth",
+    primaryPrefixes = Seq("/there-is-a-problem", "/page-not-found", "/access-denied",
+      "/account/", "/unauthorised", "/system-error/")),
+  ColumnarSection("# Individual",
+    primaryPrefixes = Seq("/add/")),
+  ColumnarSection("# Company",
+    primaryPrefixes   = Seq("/add/company/"),
+    secondaryPrefixes = Seq("controllers.add.company.")),
+  ColumnarSection("# Partnership",
+    primaryPrefixes   = Seq("/add/partnership/"),
+    secondaryPrefixes = Seq("controllers.add.partnership.")),
+  ColumnarSection("# Trust",
+    primaryPrefixes   = Seq("/add/trust"),
+    secondaryPrefixes = Seq("controllers.add.trust.")),
+)
