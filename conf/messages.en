@@ -269,7 +269,6 @@ partnershipName.error.invalidCharacters = Enter a valid partnership name
 partnershipName.checkYourAnswersLabel = Partnership name
 partnershipName.change.hidden = partnership name
 
-partnershipWorksReferenceNumber.title = What is the works reference number for this partnership
 partnershipWorksReferenceNumber.title = What is the works reference number for this partnership?
 partnershipWorksReferenceNumber.heading = What is the works reference number for {0}?
 partnershipWorksReferenceNumber.hint = This is unique to the construction work or project. You may have received it from the contractor
@@ -737,12 +736,14 @@ rustWorksReference.error.required = Enter rustWorksReference
 rustWorksReference.error.length = rustWorksReference must be 20 characters or less
 rustWorksReference.change.hidden = rustWorksReference
 
-trustWorksReference.title = trustWorksReference
-trustWorksReference.heading = trustWorksReference
-trustWorksReference.checkYourAnswersLabel = trustWorksReference
-trustWorksReference.error.required = Enter trustWorksReference
-trustWorksReference.error.length = TrustWorksReference must be 20 characters or less
-trustWorksReference.change.hidden = TrustWorksReference
+trustWorksReference.title = What is the works reference number associated with this trust?
+trustWorksReference.heading = 	What is the works reference number associated with {0}?
+trustWorksReference.hint = This is unique to the construction work or project
+trustWorksReference.checkYourAnswersLabel = Works reference number
+trustWorksReference.error.required = Enter a works reference number
+trustWorksReference.error.invalid = Enter a valid works reference number
+trustWorksReference.error.length = 	Enter a works reference number, up to 20 characters
+trustWorksReference.change.hidden = works reference number
 
 trustCheckYourAnswers.title = trustCheckYourAnswers
 trustCheckYourAnswers.heading = trustCheckYourAnswers
