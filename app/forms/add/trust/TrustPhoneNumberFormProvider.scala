@@ -27,7 +27,7 @@ class TrustPhoneNumberFormProvider @Inject() extends Mappings {
   def apply(): Form[String] =
     Form(
       "value" -> text("trustPhoneNumber.error.required")
-        .transform(_.trim, identity) 
+        .transform(_.trim, identity)
         .verifying(
           firstError(
             maxLength(Constants.MaxLength35, "trustPhoneNumber.error.length"),
