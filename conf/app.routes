@@ -278,10 +278,10 @@ POST       /add/check-contact-details                           controllers.add.
 GET        /add/change-check-contact-details                    controllers.add.IndividualChooseContactDetailsController.onPageLoad(mode: Mode = CheckMode)
 POST       /add/change-check-contact-details                    controllers.add.IndividualChooseContactDetailsController.onSubmit(mode: Mode = CheckMode)
 
-GET        /trustName                        controllers.add.trust.TrustNameController.onPageLoad(mode: Mode = NormalMode)
-POST       /trustName                        controllers.add.trust.TrustNameController.onSubmit(mode: Mode = NormalMode)
-GET        /changeTrustName                  controllers.add.trust.TrustNameController.onPageLoad(mode: Mode = CheckMode)
-POST       /changeTrustName                  controllers.add.trust.TrustNameController.onSubmit(mode: Mode = CheckMode)
+GET        /add/trust/trust-name                        controllers.add.trust.TrustNameController.onPageLoad(mode: Mode = NormalMode)
+POST       /add/trust/trust-name                        controllers.add.trust.TrustNameController.onSubmit(mode: Mode = NormalMode)
+GET        /add/trust/change-trust-name                 controllers.add.trust.TrustNameController.onPageLoad(mode: Mode = CheckMode)
+POST       /add/trust/change-trust-name                 controllers.add.trust.TrustNameController.onSubmit(mode: Mode = CheckMode)
 
 GET        /trustAddressYesNo                        controllers.add.trust.TrustAddressYesNoController.onPageLoad(mode: Mode = NormalMode)
 POST       /trustAddressYesNo                        controllers.add.trust.TrustAddressYesNoController.onSubmit(mode: Mode = NormalMode)

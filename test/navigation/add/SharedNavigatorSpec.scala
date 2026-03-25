@@ -63,12 +63,12 @@ class SharedNavigatorSpec extends SpecBase {
         ) mustBe controllers.add.partnership.routes.PartnershipNameController.onPageLoad(NormalMode)
       }
 
-      "must go from a TypeOfSubcontractorPage to JourneyRecovery when Trust is selected" in {
+      "must go from a TypeOfSubcontractorPage to TrustNameController when Trust is selected" in {
         navigator.nextPage(
           TypeOfSubcontractorPage,
           NormalMode,
           emptyUserAnswers.setOrException(TypeOfSubcontractorPage, TypeOfSubcontractor.Trust)
-        ) mustBe routes.JourneyRecoveryController.onPageLoad()
+        ) mustBe controllers.add.trust.routes.TrustNameController.onPageLoad(NormalMode)
       }
 
       "must go from a TypeOfSubcontractorPage to journey recovery page when incomplete info provided" in {
