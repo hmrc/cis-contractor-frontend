@@ -16,6 +16,8 @@
 
 package forms.add.trust
 
+import forms.Validation
+import forms.mappings.Constants
 import forms.mappings.Mappings
 import play.api.data.Form
 
@@ -26,6 +28,12 @@ class TrustNameFormProvider @Inject() extends Mappings {
   def apply(): Form[String] =
     Form(
       "value" -> text("trustName.error.required")
-        .verifying(maxLength(56, "trustName.error.length"))
+        .transform(_.trim, identity)
+        .verifying(
+          firstError(
+            maxLength(Constants.MaxLength56, "trustName.error.length"),
+            regexp(Validation.nameRegex, "trustName.error.invalidCharacters")
+          )
+        )
     )
 }

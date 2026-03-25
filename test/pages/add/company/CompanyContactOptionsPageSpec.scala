@@ -34,8 +34,12 @@ class CompanyContactOptionsPageSpec extends PageBehaviours {
 
       "must remove CompanyPhoneNumberPage, CompanyMobileNumberPage userAnswers when Email is selected" in {
         val userAnswers = emptyUserAnswers
-          .set(CompanyPhoneNumberPage, "01234567890").success.value
-          .set(CompanyMobileNumberPage, "01234567890").success.value
+          .set(CompanyPhoneNumberPage, "01234567890")
+          .success
+          .value
+          .set(CompanyMobileNumberPage, "01234567890")
+          .success
+          .value
 
         val updatedUserAnswers = userAnswers.set(CompanyContactOptionsPage, ContactOptions.Email).success.value
 
@@ -45,8 +49,12 @@ class CompanyContactOptionsPageSpec extends PageBehaviours {
 
       "must remove CompanyEmailAddressPage, CompanyMobileNumberPage userAnswers when Phone is selected" in {
         val userAnswers = emptyUserAnswers
-          .set(CompanyEmailAddressPage, "old@email.com").success.value
-          .set(CompanyMobileNumberPage, "01234567890").success.value
+          .set(CompanyEmailAddressPage, "old@email.com")
+          .success
+          .value
+          .set(CompanyMobileNumberPage, "01234567890")
+          .success
+          .value
 
         val updatedUserAnswers = userAnswers.set(CompanyContactOptionsPage, ContactOptions.Phone).success.value
 
@@ -56,8 +64,12 @@ class CompanyContactOptionsPageSpec extends PageBehaviours {
 
       "must remove CompanyEmailAddressPage, CompanyPhoneNumberPage userAnswers when Mobile is selected" in {
         val userAnswers = emptyUserAnswers
-          .set(CompanyEmailAddressPage, "old@email.com").success.value
-          .set(CompanyPhoneNumberPage, "01234567890").success.value
+          .set(CompanyEmailAddressPage, "old@email.com")
+          .success
+          .value
+          .set(CompanyPhoneNumberPage, "01234567890")
+          .success
+          .value
 
         val updatedUserAnswers = userAnswers.set(CompanyContactOptionsPage, ContactOptions.Mobile).success.value
 
@@ -67,9 +79,15 @@ class CompanyContactOptionsPageSpec extends PageBehaviours {
 
       "must remove CompanyEmailAddressPage, CompanyMobileNumberPage, CompanyPhoneNumberPage userAnswers when NoDetails is selected" in {
         val userAnswers = emptyUserAnswers
-          .set(CompanyEmailAddressPage, "old@email.com").success.value
-          .set(CompanyPhoneNumberPage, "01234567890").success.value
-          .set(CompanyMobileNumberPage, "01234567890").success.value
+          .set(CompanyEmailAddressPage, "old@email.com")
+          .success
+          .value
+          .set(CompanyPhoneNumberPage, "01234567890")
+          .success
+          .value
+          .set(CompanyMobileNumberPage, "01234567890")
+          .success
+          .value
 
         val updatedUserAnswers = userAnswers.set(CompanyContactOptionsPage, ContactOptions.NoDetails).success.value
 
