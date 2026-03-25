@@ -17,31 +17,39 @@
 package forms.add.trust
 
 import forms.behaviours.StringFieldBehaviours
+import forms.mappings.Constants
+import org.scalacheck.Gen
 import play.api.data.FormError
 
 class TrustNameFormProviderSpec extends StringFieldBehaviours {
 
   val requiredKey = "trustName.error.required"
   val lengthKey   = "trustName.error.length"
-  val maxLength   = 56
+  val invalidKey  = "trustName.error.invalidCharacters"
 
-  val form = new TrustNameFormProvider()()
+  private val form = new TrustNameFormProvider()()
 
   ".value" - {
 
     val fieldName = "value"
 
-    behave like fieldThatBindsValidData(
-      form,
-      fieldName,
-      stringsWithMaxLength(maxLength)
+    val validNamesGen: Gen[String] = Gen.oneOf(
+      "ABC Trust",
+      "A&B Family Trust",
+      "North-East Builders (UK) Trust",
+      "Symbols ~!@#$%*+:;=?",
+      "Contains £ and €",
+      "Dollar $ sign",
+      "Name with [brackets] and underscores_"
     )
+
+    behave like fieldThatBindsValidData(form, fieldName, validNamesGen)
 
     behave like fieldWithMaxLength(
       form,
       fieldName,
-      maxLength = maxLength,
-      lengthError = FormError(fieldName, lengthKey, Seq(maxLength))
+      maxLength = Constants.MaxLength56,
+      lengthError = FormError(fieldName, lengthKey, Seq(Constants.MaxLength56))
     )
 
     behave like mandatoryField(
@@ -49,5 +57,18 @@ class TrustNameFormProviderSpec extends StringFieldBehaviours {
       fieldName,
       requiredError = FormError(fieldName, requiredKey)
     )
+
+    "trim leading and trailing spaces" in {
+      val result = form.bind(Map(fieldName -> "   ABC Trust   "))
+      result.value.value mustBe "ABC Trust"
+    }
+
+    "reject invalid characters (backtick, pipe)" in {
+      val invalidNames = Seq("Backtick ` here", "Pipe | symbol")
+      invalidNames.foreach { name =>
+        val result = form.bind(Map(fieldName -> name))
+        result.errors.map(_.message) must contain(invalidKey)
+      }
+    }
   }
 }
