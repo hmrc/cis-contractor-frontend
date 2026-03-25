@@ -377,7 +377,7 @@ class CheckYourAnswersControllerSpec extends SpecBase {
         }
       }
 
-      "must redirect to Journey Recovery when Mobile is selected but the mobile number is missing" in {
+      "must redirect to Journey Recovery when Mobile is selected but mobile number is missing" in {
         val ua = minUa
           .set(IndividualChooseContactDetailsPage, ContactOptions.Mobile)
           .success
