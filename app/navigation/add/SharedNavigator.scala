@@ -17,7 +17,7 @@
 package navigation.add
 
 import controllers.routes
-import models.add.TypeOfSubcontractor.{Individualorsoletrader, Partnership}
+import models.add.TypeOfSubcontractor.{Individualorsoletrader, Partnership, Trust}
 import models.{CheckMode, Mode, NormalMode, UserAnswers}
 import navigation.NavigatorForJourney
 import pages.Page
@@ -52,6 +52,8 @@ class SharedNavigator @Inject() () extends NavigatorForJourney {
         controllers.add.routes.SubTradingNameYesNoController.onPageLoad(NormalMode)
       case (Some(Partnership), NormalMode)            =>
         controllers.add.partnership.routes.PartnershipNameController.onPageLoad(NormalMode)
+      case (Some(Trust), NormalMode)                  =>
+        controllers.add.trust.routes.TrustNameController.onPageLoad(NormalMode)
       case (None, _)                                  => routes.JourneyRecoveryController.onPageLoad()
       case (_, NormalMode)                            => routes.JourneyRecoveryController.onPageLoad()
       case (_, CheckMode)                             => controllers.add.routes.CheckYourAnswersController.onPageLoad()

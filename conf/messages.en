@@ -32,7 +32,7 @@ index.heading = Construction Industry Scheme
 index.guidance = Welcome to cis-contractor-frontend. Please see the README file for a guide to getting started.
 
 checkYourAnswers.title = Check your answers
-checkYourAnswers.heading = Check your answers
+checkYourAnswers.heading = Check your answers before adding this individual
 
 journeyRecovery.continue.title = Sorry, there is a problem with the service
 journeyRecovery.continue.heading = Sorry, there is a problem with the service
@@ -109,17 +109,17 @@ unauthorised.agent.p2.suffix = to use this service.
 
 subTradingNameYesNo.title = Does the subcontractor use a trading name?
 subTradingNameYesNo.heading = Does the subcontractor use a trading name?
-subTradingNameYesNo.hint = This is a business name, different from their own name
-subTradingNameYesNo.checkYourAnswersLabel = Does the subcontractor use a trading name?
+subTradingNameYesNo.hint = This is a business name, different from their own name.
+subTradingNameYesNo.checkYourAnswersLabel = Does subcontractor use a trading name?
 subTradingNameYesNo.error.required = Select whether or not the subcontractor uses a trading name
-subTradingNameYesNo.change.hidden = does the subcontractor use a trading name?
+subTradingNameYesNo.change.hidden = does subcontractor use a trading name?
 
 tradingNameOfSubcontractor.title = What is the subcontractor’s trading name?
 tradingNameOfSubcontractor.heading = What is the subcontractor’s trading name?
-tradingNameOfSubcontractor.checkYourAnswersLabel = Trading name
+tradingNameOfSubcontractor.checkYourAnswersLabel = Subcontractor trading name
 tradingNameOfSubcontractor.error.required = Enter a trading name like ABC Construction Ltd
 tradingNameOfSubcontractor.error.length = Enter a trading name up to 56 characters
-tradingNameOfSubcontractor.change.hidden = trading name
+tradingNameOfSubcontractor.change.hidden = subcontractor trading name
 tradingNameOfSubcontractor.error.invalidCharacters = Enter a trading name like ABC Construction Ltd
 
 subAddressYesNo.title = Do you want to add an address for this subcontractor?
@@ -256,10 +256,9 @@ partnershipWorksReferenceNumberYesNo.error.required = Select one option
 partnershipWorksReferenceNumberYesNo.change.hidden = add works reference number?
 
 checkYourAnswers.heading.sub.h2 = Subcontractor details
-checkYourAnswers.heading.h2 = Now add the subcontractor
-checkYourAnswers.warning = You must verify this subcontractor with HMRC before making any payments to them.
+checkYourAnswers.heading.h2 = Now add this subcontractor
 checkYourAnswers.p1 = By adding this subcontractor you are confirming that, to the best of your knowledge, the details you are providing are correct.
-checkYourAnswers.addSubcontractor = Add subcontractor
+checkYourAnswers.addSubcontractor = Accept and submit
 
 partnershipName.title = What is the partnership name?
 partnershipName.heading = What is the partnership name?
@@ -660,12 +659,14 @@ individualChooseContactDetails.error.required = Select whether you want to add c
 individualChooseContactDetails.checkYourAnswersLabel = Method of contact
 individualChooseContactDetails.change.hidden = method of contact
 
-trustName.title = trustName
-trustName.heading = trustName
-trustName.checkYourAnswersLabel = trustName
-trustName.error.required = Enter trustName
-trustName.error.length = TrustName must be 56 characters or less
-trustName.change.hidden = TrustName
+trustName.title = What is the name of the trust?
+trustName.heading = What is the name of the trust?
+trustName.hint = This will be the name as registered with HMRC
+trustName.checkYourAnswersLabel = Trust name
+trustName.error.required = Enter a trust name like ABC Construction Ltd
+trustName.error.length = Enter a trust name up to 56 characters
+trustName.error.invalidCharacters = Enter a trust name using letters a to z, numbers, apostrophes, ampersands, commas, hyphens, full stops, forward slashes and spaces
+trustName.change.hidden = trust name
 
 trustAddressYesNo.title = trustAddressYesNo
 trustAddressYesNo.heading = trustAddressYesNo
