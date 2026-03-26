@@ -701,11 +701,12 @@ trustMobileNumber.error.required                =  Enter trustMobileNumber
 trustMobileNumber.error.length                  =  TrustMobileNumber must be 35 characters or less
 trustMobileNumber.change.hidden                 =  TrustMobileNumber
 
-trustUtrYesNo.title                             =  trustUtrYesNo
-trustUtrYesNo.heading                           =  trustUtrYesNo
-trustUtrYesNo.checkYourAnswersLabel             =  trustUtrYesNo
-trustUtrYesNo.error.required                    =  Select yes if trustUtrYesNo
-trustUtrYesNo.change.hidden                     =  TrustUtrYesNo
+trustUtrYesNo.title                             =  Do you know the Unique Taxpayer Reference for this trust?
+trustUtrYesNo.heading                           =  Do you know the Unique Taxpayer Reference for {0}?
+trustUtrYesNo.hint                              =  This information will be used to verify the trust as a subcontractor
+trustUtrYesNo.checkYourAnswersLabel             =  Add UTR?
+trustUtrYesNo.error.required                    =  Select whether you know the Unique Taxpayer Reference (UTR) for this trust
+trustUtrYesNo.change.hidden                     =  add UTR?
 
 trustUtr.title                                  =  trustUtr
 trustUtr.heading                                =  trustUtr

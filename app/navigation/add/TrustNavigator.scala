@@ -36,13 +36,30 @@ class TrustNavigator @Inject() () extends NavigatorForJourney {
   }
 
   private val normalRoutes: Page => UserAnswers => Call = {
-    case TrustNamePage => _ => controllers.add.trust.routes.TrustAddressYesNoController.onPageLoad(NormalMode)
-    case _             => _ => routes.IndexController.onPageLoad()
+    case TrustNamePage     => _ => controllers.add.trust.routes.TrustAddressYesNoController.onPageLoad(NormalMode)
+    case TrustUtrYesNoPage => userAnswers => navigatorFromTrustUtrYesNoPage(NormalMode)(userAnswers)
+    case _                 => _ => routes.IndexController.onPageLoad()
   }
 
   private val checkRouteMap: Page => UserAnswers => Call = {
-    case TrustNamePage => _ => controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
-    case _             => _ => controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
+    case TrustNamePage     => _ => controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
+    case TrustUtrYesNoPage => navigatorFromTrustUtrYesNoPage(CheckMode)(_)
+    case _                 => _ => controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
   }
+
+  private def navigatorFromTrustUtrYesNoPage(mode: Mode)(ua: UserAnswers): Call =
+    (ua.get(TrustUtrYesNoPage), mode) match {
+      case (Some(true), _) =>
+        controllers.add.trust.routes.TrustUtrController.onPageLoad(mode)
+
+      case (Some(false), NormalMode) =>
+        controllers.add.trust.routes.TrustWorksReferenceYesNoController.onPageLoad(NormalMode)
+
+      case (Some(false), CheckMode) =>
+        controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
+
+      case _ =>
+        routes.JourneyRecoveryController.onPageLoad()
+    }
 
 }

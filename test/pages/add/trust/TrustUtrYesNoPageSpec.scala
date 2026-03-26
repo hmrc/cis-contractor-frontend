@@ -16,12 +16,16 @@
 
 package pages.add.trust
 
-import pages.QuestionPage
-import play.api.libs.json.JsPath
+import pages.behaviours.PageBehaviours
 
-case object TrustUtrYesNoPage extends QuestionPage[Boolean] with TrustJourney {
+class TrustUtrYesNoPageSpec extends PageBehaviours {
 
-  override def path: JsPath = JsPath \ toString
+  "TrustUtrYesNoPage" - {
 
-  override def toString: String = "trustUtrYesNo"
+    beRetrievable[Boolean](TrustUtrYesNoPage)
+
+    beSettable[Boolean](TrustUtrYesNoPage)
+
+    beRemovable[Boolean](TrustUtrYesNoPage)
+  }
 }
