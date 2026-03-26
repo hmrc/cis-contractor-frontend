@@ -293,10 +293,10 @@ POST       /trustAddress                        controllers.add.trust.TrustAddre
 GET        /changeTrustAddress                  controllers.add.trust.TrustAddressController.onPageLoad(mode: Mode = CheckMode)
 POST       /changeTrustAddress                  controllers.add.trust.TrustAddressController.onSubmit(mode: Mode = CheckMode)
 
-GET        /trustContactOptions                        controllers.add.trust.TrustContactOptionsController.onPageLoad(mode: Mode = NormalMode)
-POST       /trustContactOptions                        controllers.add.trust.TrustContactOptionsController.onSubmit(mode: Mode = NormalMode)
-GET        /changeTrustContactOptions                  controllers.add.trust.TrustContactOptionsController.onPageLoad(mode: Mode = CheckMode)
-POST       /changeTrustContactOptions                  controllers.add.trust.TrustContactOptionsController.onSubmit(mode: Mode = CheckMode)
+GET        /add/trust/choose-contact-details                        controllers.add.trust.TrustContactOptionsController.onPageLoad(mode: Mode = NormalMode)
+POST       /add/trust/choose-contact-details                        controllers.add.trust.TrustContactOptionsController.onSubmit(mode: Mode = NormalMode)
+GET        /add/trust/change-choose-contact-details                  controllers.add.trust.TrustContactOptionsController.onPageLoad(mode: Mode = CheckMode)
+POST       /add/trust/change-choose-contact-details                  controllers.add.trust.TrustContactOptionsController.onSubmit(mode: Mode = CheckMode)
 
 GET        /trustEmailAddress                        controllers.add.trust.TrustEmailAddressController.onPageLoad(mode: Mode = NormalMode)
 POST       /trustEmailAddress                        controllers.add.trust.TrustEmailAddressController.onSubmit(mode: Mode = NormalMode)

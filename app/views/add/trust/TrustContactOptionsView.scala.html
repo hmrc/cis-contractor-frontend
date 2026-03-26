@@ -25,7 +25,7 @@
     govukButton: GovukButton
 )
 
-@(form: Form[_], mode: Mode)(implicit request: Request[_], messages: Messages)
+@(form: Form[_], mode: Mode, trustName: String)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = title(form, messages("trustContactOptions.title"))) {
 
@@ -38,9 +38,9 @@
         @govukRadios(
             RadiosViewModel(
                 field  = form("value"),
-                legend = LegendViewModel(messages("trustContactOptions.heading")).asPageHeading(Large),
+                legend = LegendViewModel(messages("trustContactOptions.heading", trustName)).asPageHeading(Large),
                 items  = TrustContactOptions.options
-            )
+            ).withHint(HintViewModel(messages("trustContactOptions.hint")))
         )
 
         @govukButton(

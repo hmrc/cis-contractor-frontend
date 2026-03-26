@@ -16,13 +16,44 @@
 
 package pages.add.trust
 
+import models.UserAnswers
 import models.add.trust.TrustContactOptions
+import models.contact.ContactOptions.{Email, Mobile, NoDetails, Phone}
 import pages.QuestionPage
 import play.api.libs.json.JsPath
+
+import scala.util.Try
 
 case object TrustContactOptionsPage extends QuestionPage[TrustContactOptions] {
 
   override def path: JsPath = JsPath \ toString
 
   override def toString: String = "trustContactOptions"
+
+  override def cleanup(value: Option[TrustContactOptions], userAnswers: UserAnswers): Try[UserAnswers] =
+    value match {
+      case Some(Email)     =>
+        for {
+          ua <- userAnswers.remove(TrustPhoneNumberPage)
+          ua <- ua.remove(TrustMobileNumberPage)
+        } yield ua
+      case Some(Phone)     =>
+        for {
+          ua <- userAnswers.remove(TrustEmailAddressPage)
+          ua <- ua.remove(TrustMobileNumberPage)
+        } yield ua
+      case Some(Mobile)    =>
+        for {
+          ua <- userAnswers.remove(TrustEmailAddressPage)
+          ua <- ua.remove(TrustPhoneNumberPage)
+        } yield ua
+      case Some(NoDetails) =>
+        for {
+          ua <- userAnswers.remove(TrustEmailAddressPage)
+          ua <- ua.remove(TrustPhoneNumberPage)
+          ua <- ua.remove(TrustMobileNumberPage)
+        } yield ua
+      case _               => super.cleanup(value, userAnswers)
+    }
+
 }

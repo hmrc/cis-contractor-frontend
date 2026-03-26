@@ -32,10 +32,9 @@ case object IndividualChooseContactDetailsPage
   override def toString: String = "individualChooseContactDetails"
 
   override def cleanup(
-                        value: Option[IndividualChooseContactDetails],
-                        userAnswers: UserAnswers
-                      ): Try[UserAnswers] = {
-
+    value: Option[IndividualChooseContactDetails],
+    userAnswers: UserAnswers
+  ): Try[UserAnswers] =
     value match {
 
       case Some(ContactOptions.Email) =>
@@ -66,5 +65,4 @@ case object IndividualChooseContactDetailsPage
       case None =>
         Success(userAnswers)
     }
-  }
 }

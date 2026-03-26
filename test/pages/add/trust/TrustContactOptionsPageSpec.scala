@@ -14,3 +14,20 @@
  * limitations under the License.
  */
 
+package pages.add.trust
+
+import models.add.trust.TrustContactOptions
+import pages.behaviours.PageBehaviours
+
+class TrustContactOptionsPageSpec extends PageBehaviours {
+
+  "TrustContactOptionsPage" - {
+
+    beRetrievable[TrustContactOptions](TrustContactOptionsPage)
+
+    beSettable[TrustContactOptions](TrustContactOptionsPage)
+
+    beRemovable[TrustContactOptions](TrustContactOptionsPage)
+  }
+}
+

@@ -16,10 +16,11 @@
 
 package navigation.add
 
-import controllers.routes
+import models.contact.ContactOptions.{Email, Mobile, NoDetails, Phone}
 import models.{CheckMode, Mode, NormalMode, UserAnswers}
 import navigation.NavigatorForJourney
 import pages.Page
+import pages.add.trust.TrustContactOptionsPage
 import play.api.mvc.Call
 
 import javax.inject.{Inject, Singleton}
@@ -34,10 +35,38 @@ class TrustNavigator @Inject() () extends NavigatorForJourney {
       checkRouteMap(page)(userAnswers)
   }
 
-  private val normalRoutes: Page => UserAnswers => Call =
-    _ => _ => routes.IndexController.onPageLoad()
+  private val normalRoutes: Page => UserAnswers => Call = {
+    case TrustContactOptionsPage => userAnswers => navigatorFromTrustContactOptionsPage(NormalMode)(userAnswers)
+    case _                       => _ => controllers.routes.IndexController.onPageLoad()
+  }
 
-  private val checkRouteMap: Page => UserAnswers => Call =
-    _ => _ => controllers.add.routes.CheckYourAnswersController.onPageLoad()
+  private val checkRouteMap: Page => UserAnswers => Call = {
+    case TrustContactOptionsPage => userAnswers => navigatorFromTrustContactOptionsPage(CheckMode)(userAnswers)
+    case _                       => _ => controllers.add.routes.CheckYourAnswersController.onPageLoad()
+  }
+
+  private def navigatorFromTrustContactOptionsPage(mode: Mode)(userAnswers: UserAnswers): Call =
+    mode match {
+      case CheckMode =>
+        controllers.add.trust.routes.TrustContactOptionsController.onPageLoad(CheckMode)
+
+      case NormalMode =>
+        userAnswers.get(TrustContactOptionsPage) match {
+          case Some(Email) =>
+            controllers.add.trust.routes.TrustEmailAddressController.onPageLoad(NormalMode)
+
+          case Some(Phone) =>
+            controllers.add.trust.routes.TrustPhoneNumberController.onPageLoad(NormalMode)
+
+          case Some(Mobile) =>
+            controllers.add.trust.routes.TrustMobileNumberController.onPageLoad(NormalMode)
+
+          case Some(NoDetails) =>
+            controllers.add.routes.CheckYourAnswersController.onPageLoad()
+
+          case _ =>
+            controllers.routes.JourneyRecoveryController.onPageLoad()
+        }
+    }
 
 }
