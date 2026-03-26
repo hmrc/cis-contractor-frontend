@@ -18,6 +18,8 @@ package forms.add.trust
 
 import forms.mappings.Mappings
 import play.api.data.Form
+import forms.mappings.Constants.MaxLength20
+import forms.Validation
 
 import javax.inject.Inject
 
@@ -26,6 +28,15 @@ class TrustWorksReferenceFormProvider @Inject() extends Mappings {
   def apply(): Form[String] =
     Form(
       "value" -> text("trustWorksReference.error.required")
-        .verifying(maxLength(20, "trustWorksReference.error.length"))
+        .transform(
+          _.trim.replaceAll("\\s+", " "),
+          identity
+        )
+        .verifying(
+          firstError(
+            maxLength(MaxLength20, "trustWorksReference.error.length"),
+            regexp(Validation.worksRefRegex, "trustWorksReference.error.invalid")
+          )
+        )
     )
 }
