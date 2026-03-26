@@ -19,6 +19,7 @@ package navigation.add
 import base.SpecBase
 import controllers.routes
 import models.{CheckMode, NormalMode, UserAnswers}
+import org.scalactic.Prettifier.default
 import pages.Page
 import pages.add.trust.*
 
@@ -46,6 +47,14 @@ class TrustNavigatorSpec extends SpecBase {
         navigator.nextPage(UnknownPage, NormalMode, UserAnswers("id")) mustBe routes.IndexController.onPageLoad()
       }
 
+      "must go from a TrustAddressYesNoPage to TrustAddressPage" in {
+        navigator.nextPage(
+          TrustAddressYesNoPage,
+          NormalMode,
+          UserAnswers("id")
+        ) mustBe controllers.add.trust.routes.TrustAddressController.onPageLoad(NormalMode)
+      }
+
     }
 
     "in Check mode" - {
@@ -60,6 +69,14 @@ class TrustNavigatorSpec extends SpecBase {
           controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
       }
 
+      "must go from TrustAddressYesNoPage to TrustAddressPage in CheckMode" in {
+        navigator.nextPage(
+          TrustAddressYesNoPage,
+          CheckMode,
+          emptyUserAnswers
+        ) mustBe controllers.add.trust.routes.TrustAddressController.onPageLoad(CheckMode)
+      }
+
       "must go from a page that doesn't exist in the edit route map to TrustCheckYourAnswers" in {
 
         case object UnknownPage extends Page
@@ -72,7 +89,5 @@ class TrustNavigatorSpec extends SpecBase {
       }
 
     }
-
   }
-
 }
