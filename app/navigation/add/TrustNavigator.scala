@@ -45,7 +45,7 @@ class TrustNavigator @Inject() () extends NavigatorForJourney {
   private val checkRouteMap: Page => UserAnswers => Call = {
     case TrustNamePage           => _ => controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
     case TrustWorksReferencePage => _ => controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
-     case TrustAddressYesNoPage  => _ => controllers.add.trust.routes.TrustAddressController.onPageLoad(CheckMode)
+    case TrustAddressYesNoPage   => _ => controllers.add.trust.routes.TrustAddressController.onPageLoad(CheckMode)
     case _                       => _ => controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
   }
 
