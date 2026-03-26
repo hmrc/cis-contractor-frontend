@@ -16,6 +16,7 @@
 
 package navigation.add
 
+import controllers.routes
 import models.contact.ContactOptions.{Email, Mobile, Phone}
 import models.{CheckMode, Mode, NormalMode, UserAnswers}
 import navigation.NavigatorForJourney
@@ -36,14 +37,16 @@ class TrustNavigator @Inject() () extends NavigatorForJourney {
   }
 
   private val normalRoutes: Page => UserAnswers => Call = {
-    case TrustContactOptionsPage => userAnswers => navigatorFromTrustContactOptionsPage(NormalMode)(userAnswers)
     case TrustNamePage           => _ => controllers.add.trust.routes.TrustAddressYesNoController.onPageLoad(NormalMode)
-    case _                       => _ => controllers.routes.IndexController.onPageLoad()
+    case TrustAddressYesNoPage   => _ => controllers.add.trust.routes.TrustAddressController.onPageLoad(NormalMode)
+    case TrustContactOptionsPage => userAnswers => navigatorFromTrustContactOptionsPage(NormalMode)(userAnswers)
+    case _                       => _ => routes.IndexController.onPageLoad()
   }
 
   private val checkRouteMap: Page => UserAnswers => Call = {
-    case TrustContactOptionsPage => userAnswers => navigatorFromTrustContactOptionsPage(CheckMode)(userAnswers)
     case TrustNamePage           => _ => controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
+    case TrustAddressYesNoPage   => _ => controllers.add.trust.routes.TrustAddressController.onPageLoad(CheckMode)
+    case TrustContactOptionsPage => userAnswers => navigatorFromTrustContactOptionsPage(CheckMode)(userAnswers)
     case _                       => _ => controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
   }
 

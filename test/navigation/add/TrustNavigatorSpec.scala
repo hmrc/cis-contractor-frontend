@@ -20,9 +20,9 @@ import base.SpecBase
 import controllers.routes
 import models.contact.ContactOptions
 import models.{CheckMode, NormalMode, UserAnswers}
+import org.scalactic.Prettifier.default
 import pages.Page
-import pages.add.trust.{TrustContactOptionsPage, TrustNamePage}
-
+import pages.add.trust.*
 class TrustNavigatorSpec extends SpecBase {
 
   val navigator = new TrustNavigator
@@ -34,11 +34,6 @@ class TrustNavigatorSpec extends SpecBase {
   "TrustNavigator" - {
 
     "in Normal mode" - {
-
-      "must go from TrustNamePage to TrustAddressYesNoPage" in {
-        navigator.nextPage(TrustNamePage, NormalMode, UserAnswers("id")) mustBe
-          controllers.add.trust.routes.TrustAddressYesNoController.onPageLoad(NormalMode)
-      }
 
       "must go from a page that doesn't exist in the route map to Index" in {
 
@@ -101,6 +96,19 @@ class TrustNavigatorSpec extends SpecBase {
         }
       }
 
+      "must go from TrustNamePage to TrustAddressYesNoPage" in {
+        navigator.nextPage(TrustNamePage, NormalMode, UserAnswers("id")) mustBe
+          controllers.add.trust.routes.TrustAddressYesNoController.onPageLoad(NormalMode)
+      }
+
+      "must go from a TrustAddressYesNoPage to TrustAddressPage" in {
+        navigator.nextPage(
+          TrustAddressYesNoPage,
+          NormalMode,
+          UserAnswers("id")
+        ) mustBe controllers.add.trust.routes.TrustAddressController.onPageLoad(NormalMode)
+      }
+
     }
 
     "in Check mode" - {
@@ -121,6 +129,13 @@ class TrustNavigatorSpec extends SpecBase {
           .onPageLoad()
       }
 
+      "must go from TrustAddressYesNoPage to TrustAddressPage in CheckMode" in {
+        navigator.nextPage(
+          TrustAddressYesNoPage,
+          CheckMode,
+          emptyUserAnswers
+        ) mustBe controllers.add.trust.routes.TrustAddressController.onPageLoad(CheckMode)
+      }
       "must go from TrustContactOptionsPage" - {
 
         "to itself when Email is selected" in {
@@ -179,5 +194,4 @@ class TrustNavigatorSpec extends SpecBase {
     }
 
   }
-
 }

@@ -791,41 +791,6 @@ class ValidatedSubcontractorSpec extends SpecBase with Matchers {
         }
       }
 
-//      "when the user skipped SubcontractorContactDetailsYesNoPage but answered SubContactDetailsPage" in {
-//        val answers =
-//          emptyUserAnswers
-//            .set(TypeOfSubcontractorPage, TypeOfSubcontractor.Individualorsoletrader)
-//            .success
-//            .value
-//            .set(SubTradingNameYesNoPage, true)
-//            .success
-//            .value
-//            .set(TradingNameOfSubcontractorPage, "ABC Ltd")
-//            .success
-//            .value
-//            .set(SubAddressYesNoPage, false)
-//            .success
-//            .value
-//            .set(NationalInsuranceNumberYesNoPage, false)
-//            .success
-//            .value
-//            .set(UniqueTaxpayerReferenceYesNoPage, false)
-//            .success
-//            .value
-//            .set(WorksReferenceNumberYesNoPage, false)
-//            .success
-//            .value
-//            .set(SubContactDetailsPage, contactDetails)
-//            .success
-//            .value
-//
-//        val result = ValidatedSubcontractor.build(answers)
-//
-//        inside(result) { case Left(error) =>
-//          error mustBe MissingAnswer(SubcontractorContactDetailsYesNoPage)
-//        }
-//      }
-
       "when user said yes to SubTradingNameYesNoPage and answered SubcontractorNamePage" in {
         val answers =
           emptyUserAnswers
