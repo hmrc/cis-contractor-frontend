@@ -547,6 +547,7 @@ companyContactOptions.phone                                      =  Phone number
 companyContactOptions.mobile                                     =  Mobile number
 companyContactOptions.or                                         =  or
 companyContactOptions.noDetails                                  =  Do not add any contact details for this subcontractor
+companyContactOptions.cya.noDetails                              =  None
 companyContactOptions.error.required                             =  Select whether you want to add contact details for this company
 companyContactOptions.checkYourAnswersLabel                      =  Method of contact
 companyContactOptions.change.hidden                              =  method of contact

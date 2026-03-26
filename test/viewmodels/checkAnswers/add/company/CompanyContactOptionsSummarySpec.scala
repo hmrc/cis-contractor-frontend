@@ -102,7 +102,7 @@ class CompanyContactOptionsSummarySpec extends AnyFreeSpec with Matchers {
       maybeRow shouldBe defined
 
       val row           = maybeRow.value
-      val expectedValue = messages("companyContactOptions.noDetails")
+      val expectedValue = messages("companyContactOptions.cya.noDetails")
       row.value.content.asHtml.toString should include(expectedValue)
     }
 
