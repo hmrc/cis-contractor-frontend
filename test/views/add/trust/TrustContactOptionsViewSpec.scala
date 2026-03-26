@@ -88,7 +88,7 @@ class TrustContactOptionsViewSpec extends AnyWordSpec with Matchers with GuiceOn
   trait Setup {
     val formProvider: TrustContactOptionsFormProvider = new TrustContactOptionsFormProvider()
     val form: Form[TrustContactOptions]               = formProvider()
-    val trustName: String                                   = "Test trustName"
+    val trustName: String                             = "Test trustName"
 
     implicit val request: Request[_] = FakeRequest()
     implicit val messages: Messages  =

@@ -16,11 +16,11 @@
 
 package navigation.add
 
-import models.contact.ContactOptions.{Email, Mobile, NoDetails, Phone}
+import models.contact.ContactOptions.{Email, Mobile, Phone}
 import models.{CheckMode, Mode, NormalMode, UserAnswers}
 import navigation.NavigatorForJourney
 import pages.Page
-import pages.add.trust.TrustContactOptionsPage
+import pages.add.trust.*
 import play.api.mvc.Call
 
 import javax.inject.{Inject, Singleton}
@@ -37,36 +37,29 @@ class TrustNavigator @Inject() () extends NavigatorForJourney {
 
   private val normalRoutes: Page => UserAnswers => Call = {
     case TrustContactOptionsPage => userAnswers => navigatorFromTrustContactOptionsPage(NormalMode)(userAnswers)
+    case TrustNamePage           => _ => controllers.add.trust.routes.TrustAddressYesNoController.onPageLoad(NormalMode)
     case _                       => _ => controllers.routes.IndexController.onPageLoad()
   }
 
   private val checkRouteMap: Page => UserAnswers => Call = {
     case TrustContactOptionsPage => userAnswers => navigatorFromTrustContactOptionsPage(CheckMode)(userAnswers)
-    case _                       => _ => controllers.add.routes.CheckYourAnswersController.onPageLoad()
+    case TrustNamePage           => _ => controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
+    case _                       => _ => controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
   }
 
   private def navigatorFromTrustContactOptionsPage(mode: Mode)(userAnswers: UserAnswers): Call =
-    mode match {
-      case CheckMode =>
-        controllers.add.trust.routes.TrustContactOptionsController.onPageLoad(CheckMode)
-
-      case NormalMode =>
-        userAnswers.get(TrustContactOptionsPage) match {
-          case Some(Email) =>
-            controllers.add.trust.routes.TrustEmailAddressController.onPageLoad(NormalMode)
-
-          case Some(Phone) =>
-            controllers.add.trust.routes.TrustPhoneNumberController.onPageLoad(NormalMode)
-
-          case Some(Mobile) =>
-            controllers.add.trust.routes.TrustMobileNumberController.onPageLoad(NormalMode)
-
-          case Some(NoDetails) =>
-            controllers.add.routes.CheckYourAnswersController.onPageLoad()
-
-          case _ =>
-            controllers.routes.JourneyRecoveryController.onPageLoad()
-        }
+    (userAnswers.get(TrustContactOptionsPage), mode) match {
+      case (Some(Email), _)  =>
+        controllers.add.trust.routes.TrustEmailAddressController.onPageLoad(mode)
+      case (Some(Phone), _)  =>
+        controllers.add.trust.routes.TrustPhoneNumberController.onPageLoad(mode)
+      case (Some(Mobile), _) =>
+        controllers.add.trust.routes.TrustMobileNumberController.onPageLoad(mode)
+      case (Some(_), _)      =>
+        controllers.add.trust.routes.TrustContactOptionsController.onPageLoad(mode)
+      case (_, CheckMode)    =>
+        controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
+      case _                 => controllers.routes.JourneyRecoveryController.onPageLoad()
     }
 
 }

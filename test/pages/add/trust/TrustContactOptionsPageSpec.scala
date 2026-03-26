@@ -30,4 +30,3 @@ class TrustContactOptionsPageSpec extends PageBehaviours {
     beRemovable[TrustContactOptions](TrustContactOptionsPage)
   }
 }
-

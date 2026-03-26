@@ -18,36 +18,162 @@ package navigation.add
 
 import base.SpecBase
 import controllers.routes
+import models.contact.ContactOptions
 import models.{CheckMode, NormalMode, UserAnswers}
 import pages.Page
+import pages.add.trust.{TrustContactOptionsPage, TrustNamePage}
 
 class TrustNavigatorSpec extends SpecBase {
 
   val navigator = new TrustNavigator
 
+  private lazy val journeyRecovery = routes.JourneyRecoveryController.onPageLoad()
+  private lazy val trustCYA        =
+    controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
+
   "TrustNavigator" - {
 
     "in Normal mode" - {
+
+      "must go from TrustNamePage to TrustAddressYesNoPage" in {
+        navigator.nextPage(TrustNamePage, NormalMode, UserAnswers("id")) mustBe
+          controllers.add.trust.routes.TrustAddressYesNoController.onPageLoad(NormalMode)
+      }
 
       "must go from a page that doesn't exist in the route map to Index" in {
 
         case object UnknownPage extends Page
         navigator.nextPage(UnknownPage, NormalMode, UserAnswers("id")) mustBe routes.IndexController.onPageLoad()
+
+      }
+
+      "must go from TrustContactOptionsPage" - {
+        "to itself when Email is selected" in {
+          navigator.nextPage(
+            TrustContactOptionsPage,
+            NormalMode,
+            emptyUserAnswers.setOrException(
+              TrustContactOptionsPage,
+              ContactOptions.Email
+            )
+          ) mustBe controllers.add.trust.routes.TrustEmailAddressController.onPageLoad(NormalMode)
+        }
+
+        "to itself when Phone is selected" in {
+          navigator.nextPage(
+            TrustContactOptionsPage,
+            NormalMode,
+            emptyUserAnswers.setOrException(
+              TrustContactOptionsPage,
+              ContactOptions.Phone
+            )
+          ) mustBe controllers.add.trust.routes.TrustPhoneNumberController.onPageLoad(NormalMode)
+        }
+
+        "to itself when Mobile is selected" in {
+          navigator.nextPage(
+            TrustContactOptionsPage,
+            NormalMode,
+            emptyUserAnswers.setOrException(
+              TrustContactOptionsPage,
+              ContactOptions.Mobile
+            )
+          ) mustBe controllers.add.trust.routes.TrustMobileNumberController.onPageLoad(NormalMode)
+        }
+
+        "to itself when NoDetails is selected" in {
+          navigator.nextPage(
+            TrustContactOptionsPage,
+            NormalMode,
+            emptyUserAnswers.setOrException(
+              TrustContactOptionsPage,
+              ContactOptions.NoDetails
+            )
+          ) mustBe controllers.add.trust.routes.TrustContactOptionsController.onPageLoad(NormalMode)
+        }
+
+        "to JourneyRecoveryPage when answer is not present" in {
+          navigator.nextPage(
+            TrustContactOptionsPage,
+            NormalMode,
+            emptyUserAnswers
+          ) mustBe journeyRecovery
+        }
       }
 
     }
 
     "in Check mode" - {
 
-      "must go from a page that doesn't exist in the edit route map to CheckYourAnswers" in {
+      "must go from TrustNamePage to TrustCheckYourAnswers" in {
+        navigator.nextPage(TrustNamePage, CheckMode, UserAnswers("id")) mustBe
+          controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
+      }
+
+      "must go from a page that doesn't exist in the edit route map to TrustCheckYourAnswers" in {
 
         case object UnknownPage extends Page
         navigator.nextPage(
           UnknownPage,
           CheckMode,
           UserAnswers("id")
-        ) mustBe controllers.add.routes.CheckYourAnswersController
+        ) mustBe controllers.add.trust.routes.TrustCheckYourAnswersController
           .onPageLoad()
+      }
+
+      "must go from TrustContactOptionsPage" - {
+
+        "to itself when Email is selected" in {
+          navigator.nextPage(
+            TrustContactOptionsPage,
+            CheckMode,
+            emptyUserAnswers.setOrException(
+              TrustContactOptionsPage,
+              ContactOptions.Email
+            )
+          ) mustBe controllers.add.trust.routes.TrustEmailAddressController.onPageLoad(CheckMode)
+        }
+
+        "to itself when Phone is selected" in {
+          navigator.nextPage(
+            TrustContactOptionsPage,
+            CheckMode,
+            emptyUserAnswers.setOrException(
+              TrustContactOptionsPage,
+              ContactOptions.Phone
+            )
+          ) mustBe controllers.add.trust.routes.TrustPhoneNumberController.onPageLoad(CheckMode)
+        }
+
+        "to itself when Mobile is selected" in {
+          navigator.nextPage(
+            TrustContactOptionsPage,
+            CheckMode,
+            emptyUserAnswers.setOrException(
+              TrustContactOptionsPage,
+              ContactOptions.Mobile
+            )
+          ) mustBe controllers.add.trust.routes.TrustMobileNumberController.onPageLoad(CheckMode)
+        }
+
+        "to itself when NoDetails is selected" in {
+          navigator.nextPage(
+            TrustContactOptionsPage,
+            CheckMode,
+            emptyUserAnswers.setOrException(
+              TrustContactOptionsPage,
+              ContactOptions.NoDetails
+            )
+          ) mustBe controllers.add.trust.routes.TrustContactOptionsController.onPageLoad(CheckMode)
+        }
+
+        "to TrustCheckYourAnswers when answer is not present" in {
+          navigator.nextPage(
+            TrustContactOptionsPage,
+            CheckMode,
+            emptyUserAnswers
+          ) mustBe trustCYA
+        }
       }
 
     }
