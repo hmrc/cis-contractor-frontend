@@ -21,7 +21,7 @@ import controllers.routes
 import models.{CheckMode, NormalMode, UserAnswers}
 import org.scalactic.Prettifier.default
 import pages.Page
-import pages.add.trust.{TrustAddressYesNoPage, TrustNamePage}
+import pages.add.trust.*
 
 class TrustNavigatorSpec extends SpecBase {
 
@@ -31,15 +31,20 @@ class TrustNavigatorSpec extends SpecBase {
 
     "in Normal mode" - {
 
+      "must go from TrustNamePage to TrustAddressYesNoPage" in {
+        navigator.nextPage(TrustNamePage, NormalMode, UserAnswers("id")) mustBe
+          controllers.add.trust.routes.TrustAddressYesNoController.onPageLoad(NormalMode)
+      }
+
+      "must go from TrustAddressPage to TrustContactOptionsController" in {
+        navigator.nextPage(TrustAddressPage, NormalMode, UserAnswers("id")) mustBe
+          controllers.add.trust.routes.TrustContactOptionsController.onPageLoad(NormalMode)
+      }
+
       "must go from a page that doesn't exist in the route map to Index" in {
 
         case object UnknownPage extends Page
         navigator.nextPage(UnknownPage, NormalMode, UserAnswers("id")) mustBe routes.IndexController.onPageLoad()
-      }
-
-      "must go from TrustNamePage to TrustAddressYesNoPage" in {
-        navigator.nextPage(TrustNamePage, NormalMode, UserAnswers("id")) mustBe
-          controllers.add.trust.routes.TrustAddressYesNoController.onPageLoad(NormalMode)
       }
 
       "must go from a TrustAddressYesNoPage to TrustAddressPage" in {
@@ -59,6 +64,19 @@ class TrustNavigatorSpec extends SpecBase {
           controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
       }
 
+      "must go from TrustAddressPage to TrustCheckYourAnswersController" in {
+        navigator.nextPage(TrustAddressPage, CheckMode, UserAnswers("id")) mustBe
+          controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
+      }
+
+      "must go from TrustAddressYesNoPage to TrustAddressPage in CheckMode" in {
+        navigator.nextPage(
+          TrustAddressYesNoPage,
+          CheckMode,
+          emptyUserAnswers
+        ) mustBe controllers.add.trust.routes.TrustAddressController.onPageLoad(CheckMode)
+      }
+
       "must go from a page that doesn't exist in the edit route map to TrustCheckYourAnswers" in {
 
         case object UnknownPage extends Page
@@ -68,14 +86,6 @@ class TrustNavigatorSpec extends SpecBase {
           UserAnswers("id")
         ) mustBe controllers.add.trust.routes.TrustCheckYourAnswersController
           .onPageLoad()
-      }
-
-      "must go from TrustAddressYesNoPage to TrustAddressPage in CheckMode" in {
-        navigator.nextPage(
-          TrustAddressYesNoPage,
-          CheckMode,
-          emptyUserAnswers
-        ) mustBe controllers.add.trust.routes.TrustAddressController.onPageLoad(CheckMode)
       }
 
     }
