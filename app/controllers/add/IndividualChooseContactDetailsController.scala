@@ -25,6 +25,8 @@ import pages.add.IndividualChooseContactDetailsPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
+import uk.gov.hmrc.govukfrontend.views.Aliases.Text
+import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.RadioItem
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.add.IndividualChooseContactDetailsView
 import utils.SubcontractorNameExtractor
@@ -55,10 +57,39 @@ class IndividualChooseContactDetailsController @Inject() (
     request.userAnswers.get(IndividualChooseContactDetailsPage).fold(form)(form.fill)
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
+    // val list = Seq("2021-2202", "2022-2203")
+
     subcontractorNameExtractor
       .getSubcontractorName(request.userAnswers)
       .fold(recoveryRedirect) { subcontractorName =>
-        Ok(view(preparedForm, mode, subcontractorName))
+
+        val options: Seq[String] =
+          Seq("2021-2202", "2022-2023", "2023-2024", "2024-2025", "2025-2026", "noDetails")
+
+        val radioItems: Seq[RadioItem] =
+          options.zipWithIndex.flatMap {
+            case (value, index) if value == "noDetails" =>
+              Seq(
+                // Divider before "noDetails"
+                RadioItem(divider = Some("site.or")),
+                RadioItem(
+                  value = Some(value),
+                  content = Text(s"contact.$value"),
+                  id = Some(s"value_$index")
+                )
+              )
+
+            case (value, index) =>
+              Seq(
+                RadioItem(
+                  value = Some(value),
+                  content = Text(s"contact.$value"),
+                  id = Some(s"value_$index")
+                )
+              )
+          }
+
+        Ok(view(preparedForm, mode, subcontractorName, radioItems))
       }
   }
 
@@ -70,7 +101,7 @@ class IndividualChooseContactDetailsController @Inject() (
           form
             .bindFromRequest()
             .fold(
-              formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, subcontractorName))),
+              formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, subcontractorName, Seq.empty))),
               value =>
                 for {
                   updatedAnswers <- Future.fromTry(request.userAnswers.set(IndividualChooseContactDetailsPage, value))
