@@ -1,749 +1,731 @@
-service.name = Construction Industry Scheme
-
-site.back = Back
-site.remove = Remove
-site.change = Change
-site.no = No
-site.yes = Yes
-site.continue = Continue
-site.start = Start now
-site.startAgain = Start again
-site.signIn = Sign in
-site.govuk = GOV.UK
-
-date.day = Day
-date.month = Month
-date.year = Year
-date.error.day = day
-date.error.month = month
-date.error.year = year
-error.boolean = Please give an answer
-timeout.title = You’re about to be signed out
-timeout.message = For security reasons, you will be signed out of this service in
-timeout.keepAlive = Stay signed in
-timeout.signOut = Sign out
-
-error.title.prefix = Error:
-error.prefix = Error
-error.summary.title = There is a problem
-
-index.title = Construction Industry Scheme
-index.heading = Construction Industry Scheme
-index.guidance = Welcome to cis-contractor-frontend. Please see the README file for a guide to getting started.
-
-checkYourAnswers.title = Check your answers
-checkYourAnswers.heading = Check your answers before adding this individual
-
-journeyRecovery.continue.title = Sorry, there is a problem with the service
-journeyRecovery.continue.heading = Sorry, there is a problem with the service
-journeyRecovery.continue.guidance = [Add content to explain how to proceed.]
-journeyRecovery.startAgain.title = Sorry, there is a problem with the service
-journeyRecovery.startAgain.heading = Sorry, there is a problem with the service
-journeyRecovery.startAgain.guidance = [Add content to explain why the user needs to start again.]
-
-signedOut.title = For your security, we signed you out
-signedOut.heading = For your security, we signed you out
-signedOut.guidance = We did not save your answers.
-
-pageNotFound.title      = Page not found
-pageNotFound.heading    = Page not found
-pageNotFound.p1         = If you typed the web address, check it is correct.
-pageNotFound.p2         = If you pasted the web address, check you copied the entire address.
-pageNotFound.p3         = If the web address is correct or you selected a link or button, contact the
-pageNotFound.link       = HMRC Online Services Helpdesk
-pageNotFound.p4         = if you need to speak to someone.
-
-systemError.title       = Sorry, there is a problem with this service
-systemError.heading     = Sorry, there is a problem with this service
-systemError.p1          = Try again later.
-systemError.p2          = Contact the
-systemError.link        = HMRC Online Services Helpdesk
-systemError.p3          = if you need to speak to someone about Construction Industry Scheme and quote the reference number:
-
-accessDenied.title      = Sorry, there is a problem with the service
-accessDenied.heading    = Sorry, there is a problem with the service
-accessDenied.link       = Return to the Construction Industry Scheme start page.
-
-unauthorised.title = You can’t access this service with this account
-unauthorised.heading = You can’t access this service with this account
-
-typeOfSubcontractor.title = What type of subcontractor are you adding?
-typeOfSubcontractor.heading = What type of subcontractor are you adding?
-typeOfSubcontractor.soletrader = Individual or sole trader
-typeOfSubcontractor.company = Limited company
-typeOfSubcontractor.partnership = Partnership
-typeOfSubcontractor.trust = Trust
-typeOfSubcontractor.checkYourAnswersLabel = Type
-typeOfSubcontractor.error.required = Select how the subcontractor is operating
-typeOfSubcontractor.change.hidden = type
-
-unauthorised.guidance.org.p1.prefix = If you are a contractor or subcontractor, you will need to register with
-unauthorised.guidance.org.p1.link = Construction Industry Scheme
-unauthorised.guidance.org.p1.suffix = to access this service.
-unauthorised.guidance.agent.p2.prefix = If you are an agent, you will need to request access to
-unauthorised.guidance.agent.p2.link = PAYE for Agents
-unauthorised.guidance.agent.p2.suffix = to use this service.
-
-unauthorised.org.title = You need to register to use this service
-unauthorised.org.heading = You need to register to use this service
-unauthorised.org.p1 = You are signed in with an organisation account.
-unauthorised.org.guidance.p2.prefix = Register with the
-unauthorised.org.guidance.p2.link = Construction Industry Scheme
-unauthorised.org.guidance.p2.suffix = to access this service.
-
-unauthorised.org.standard.title = Sorry, you are unable to use this service
-unauthorised.org.standard.heading = Sorry, you are unable to use this service
-unauthorised.org.standard.paragraph = Return to
-unauthorised.org.standard.guidance.link = Construction Industry Scheme
-
-unauthorised.individual.title = Sorry, you are unable to use this service
-unauthorised.individual.heading = Sorry, you are unable to use this service
-unauthorised.individual.p1 = You are signed in with an individual account. Only users with an organisation or agent services accounts can use this service.
-
-unauthorised.agent.title = Sorry, you are unable to use this service
-unauthorised.agent.heading = Sorry, you are unable to use this service
-unauthorised.agent.p1 = You are signed in with an agent account.
-unauthorised.agent.p2.prefix = You need to request access to
-unauthorised.agent.p2.link = PAYE for Agents
-unauthorised.agent.p2.suffix = to use this service.
-
-subTradingNameYesNo.title = Does the subcontractor use a trading name?
-subTradingNameYesNo.heading = Does the subcontractor use a trading name?
-subTradingNameYesNo.hint = This is a business name, different from their own name.
-subTradingNameYesNo.checkYourAnswersLabel = Does subcontractor use a trading name?
-subTradingNameYesNo.error.required = Select whether or not the subcontractor uses a trading name
-subTradingNameYesNo.change.hidden = does subcontractor use a trading name?
-
-tradingNameOfSubcontractor.title = What is the subcontractor’s trading name?
-tradingNameOfSubcontractor.heading = What is the subcontractor’s trading name?
-tradingNameOfSubcontractor.checkYourAnswersLabel = Subcontractor trading name
-tradingNameOfSubcontractor.error.required = Enter a trading name like ABC Construction Ltd
-tradingNameOfSubcontractor.error.length = Enter a trading name up to 56 characters
-tradingNameOfSubcontractor.change.hidden = subcontractor trading name
-tradingNameOfSubcontractor.error.invalidCharacters = Enter a trading name like ABC Construction Ltd
-
-subAddressYesNo.title = Do you want to add an address for this subcontractor?
-subAddressYesNo.heading = Do you want to add an address for {0}?
-subAddressYesNo.hint = You can add this information later if you prefer
-subAddressYesNo.checkYourAnswersLabel = Add subcontractor address?
-subAddressYesNo.error.required = Select whether you want to add an address for this subcontractor
-subAddressYesNo.change.hidden = add subcontractor address?
-
-nationalInsuranceNumberYesNo.title = Do you know the National Insurance number for this subcontractor?
-nationalInsuranceNumberYesNo.heading = Do you know the National Insurance number for {0}?
-nationalInsuranceNumberYesNo.hint = This information will be used to verify them as a subcontractor
-nationalInsuranceNumberYesNo.checkYourAnswersLabel = Add National Insurance number?
-nationalInsuranceNumberYesNo.error.required = Select whether you know the National Insurance number for this subcontractor
-nationalInsuranceNumberYesNo.change.hidden = add National Insurance number?
-
-subcontractorName.title = What is the subcontractor’s name?
-subcontractorName.heading = What is the subcontractor’s name?
-subcontractorName.firstName = First name
-subcontractorName.middleName = Middle names
-subcontractorName.lastName = Last name
-subcontractorName.firstName.error.required = Enter a first name
-subcontractorName.firstName.error.invalidCharacters = Enter a first name using letters a to z, apostrophes and dashes
-subcontractorName.firstName.error.firstChar = Enter a first name. The first character must be a letter
-subcontractorName.firstName.error.length = Enter a first name up to 35 characters
-subcontractorName.middleName.error.invalidCharacters = Middle names must only use letters a to z, apostrophes and dashes
-subcontractorName.middleName.error.firstChar = Middle names must have a letter as the first character
-subcontractorName.middleName.error.length = Middle names must be 35 characters or less
-subcontractorName.lastName.error.required = Enter a last name
-subcontractorName.lastName.error.invalidCharacters = Enter a last name using letters a to z, numbers 0 to 9, ampersands (&), apostrophes, full stops, round brackets, forward slashes, commas and dashes
-subcontractorName.lastName.error.firstChar = Enter a last name. The first character must be a letter
-subcontractorName.lastName.error.length = Enter a last name up to 35 characters
-subcontractorName.checkYourAnswersLabel = Subcontractor name
-subcontractorName.change.hidden = subcontractor name
-
-uniqueTaxpayerReferenceYesNo.title = Do you know the Unique Taxpayer Reference (UTR) for this subcontractor?
-uniqueTaxpayerReferenceYesNo.heading = Do you know the Unique Taxpayer Reference (UTR) for {0}?
-uniqueTaxpayerReferenceYesNo.hint = This information will be used to verify them as a subcontractor
-uniqueTaxpayerReferenceYesNo.checkYourAnswersLabel = Add UTR?
-uniqueTaxpayerReferenceYesNo.error.required = Select whether you know the Unique Taxpayer Reference (UTR) for this subcontractor
-uniqueTaxpayerReferenceYesNo.change.hidden = add UTR?
-
-worksReferenceNumberYesNo.title = Is there a works reference number associated with this subcontractor?
-worksReferenceNumberYesNo.heading = Is there a works reference number associated with {0}?
-worksReferenceNumberYesNo.hint = This is the reference number used to identify a subcontractor’s work or project. It can contain letters and numbers.
-worksReferenceNumberYesNo.checkYourAnswersLabel = Add works reference number?
-worksReferenceNumberYesNo.error.required = Select whether this subcontractor has a works reference number
-worksReferenceNumberYesNo.change.hidden = add works reference number?
-
-subNationalInsuranceNumber.title = What is the National Insurance number for this subcontractor?
-subNationalInsuranceNumber.heading = What is the National Insurance number for {0}?
-subNationalInsuranceNumber.hint = National Insurance numbers can be found on payslips, P60s and other tax documents. For example, ‘QQ 12 34 56 C’
-subNationalInsuranceNumber.checkYourAnswersLabel = National Insurance number
-subNationalInsuranceNumber.error.required = Enter a National Insurance number
-subNationalInsuranceNumber.error.length = Enter a valid National Insurance number
-subNationalInsuranceNumber.error.invalidCharacters = Enter a valid National Insurance number
-subNationalInsuranceNumber.change.hidden = National Insurance number
-
-worksReferenceNumber.title = What is the works reference number associated with this subcontractor?
-worksReferenceNumber.heading = What is the works reference number associated with {0}?
-worksReferenceNumber.hint = This is unique to the construction work or project. You may have received it from the contractor.
-worksReferenceNumber.checkYourAnswersLabel = Works reference number
-worksReferenceNumber.error.required = Enter a works reference number
-worksReferenceNumber.error.invalid = Enter a valid works reference number
-worksReferenceNumber.error.length = Enter a works reference number, up to 20 characters
-worksReferenceNumber.change.hidden = works reference number
-
-addressOfSubcontractor.title = What is the address for this subcontractor?
-addressOfSubcontractor.heading = 	What is the address for {0}?
-addressOfSubcontractor.addressLine1 = Address line 1
-addressOfSubcontractor.addressLine2 = Address line 2 (optional)
-addressOfSubcontractor.checkYourAnswersLabel = Address
-addressOfSubcontractor.change.hidden= address
-addressOfSubcontractor.error.addressLine1.required = Enter the first line of the address, typically the building and street
-addressOfSubcontractor.error.addressLine3.required = Enter a town or city
-addressOfSubcontractor.error.postalCode.required = Enter a postal code
-addressOfSubcontractor.error.country.required = Select a country
-addressOfSubcontractor.error.addressLine1.length = Enter the first line of the address up to 35 characters
-addressOfSubcontractor.error.addressLine2.length = Enter the second line of the address using 35 characters or less
-addressOfSubcontractor.addressLine1.change.hidden = address Line 1
-addressOfSubcontractor.addressLine2.change.hidden = address line 2 (optional)
-addressOfSubcontractor.addressLine3 =  Town or city
-addressOfSubcontractor.addressLine4 = County (optional)
-addressOfSubcontractor.postalCode = Postal code
-addressOfSubcontractor.country = Country
-
-addressOfSubcontractor.error.addressLine1.invalidCharacters = Enter the first line of the address using letters a to z, numbers, apostrophes, ampersands, commas, hyphens, full stops, forward slashes and spaces
-addressOfSubcontractor.error.addressLine2.invalidCharacters = Enter the second line of the address using letters a to z, numbers, apostrophes, ampersands, commas, hyphens, full stops, forward slashes and spaces
-addressOfSubcontractor.error.addressLine3.invalidCharacters = Enter a town or city using letters a to z, numbers, apostrophes, ampersands, commas, hyphens, full stops, forward slashes and spaces
-addressOfSubcontractor.error.addressLine4.invalidCharacters = Enter a county using letters a to z, numbers, apostrophes, ampersands, commas, hyphens, full stops, forward slashes and spaces
-addressOfSubcontractor.error.addressLine1.firstCharMustBeLetterOrNumber = Enter an address. The first character must be a letter or a number
-addressOfSubcontractor.error.addressLine2.firstCharMustBeLetterOrNumber = Enter an address. The first character must be a letter or a number
-addressOfSubcontractor.error.addressLine3.firstCharMustBeLetterOrNumber = Enter a town or city. The first character must be a letter or a number
-addressOfSubcontractor.error.addressLine4.firstCharMustBeLetterOrNumber = Enter a county. The first character must be a letter or a number
-addressOfSubcontractor.error.postalCode.length = Enter a postal code in the correct format
-addressOfSubcontractor.error.postalCode.invalid = Enter a postal code in the correct format
-addressOfSubcontractor.error.addressLine3.length = Enter a town or city using 35 characters or less
-addressOfSubcontractor.error.addressLine4.length = Enter a county using 35 characters or less
-
-subContactDetails.title = Subcontractor’s contact details
-subContactDetails.heading = Subcontractor’s contact details
-subContactDetails.email = Email address
-subContactDetails.telephone = Telephone number
-subContactDetails.telephone.hint = For international numbers, include the country code, like +33 for a French number
-subContactDetails.checkYourAnswersLabel = Contact details
-subContactDetails.error.email.required = Enter an email address in the correct format, like name@example.com
-subContactDetails.error.telephone.required = Enter a telephone number
-subContactDetails.error.email.length = Enter a valid email address in the correct format, like name@example.com, up to 254 characters
-subContactDetails.error.telephone.length = Enter a phone number up to 35 characters, using numbers
-subContactDetails.error.email.invalid = Enter a valid email address in the correct format, like name@example.com
-subContactDetails.error.telephone.invalid = Enter a valid phone number
-subContactDetails.email.change.hidden = email address
-subContactDetails.telephone.change.hidden = telephone number
-subContactDetails.change.hidden = contact details
-
-subcontractorsUniqueTaxpayerReference.title = Self Assessment Unique Taxpayer Reference (UTR)
-subcontractorsUniqueTaxpayerReference.heading = Self Assessment Unique Taxpayer Reference (UTR)
-subcontractorsUniqueTaxpayerReference.p1 = The UTR will be on tax returns and other documents from HMRC. It might be called ‘reference’, ‘UTR’, or ‘official use’.
-subcontractorsUniqueTaxpayerReference.linkText = Get more help to find a UTR (opens in new tab)
-subcontractorsUniqueTaxpayerReference.label = What is the Self Assessment UTR for {0}?
-subcontractorsUniqueTaxpayerReference.hint = A UTR is a 10 digit number
-subcontractorsUniqueTaxpayerReference.checkYourAnswersLabel = UTR
-subcontractorsUniqueTaxpayerReference.error.required = Enter a valid Unique Taxpayer Reference (UTR) using 10 numbers, like 1234567890
-subcontractorsUniqueTaxpayerReference.error.invalid = Enter a valid Unique Taxpayer Reference (UTR) using 10 numbers, like 1234567890
-subcontractorsUniqueTaxpayerReference.error.length = Enter a valid Unique Taxpayer Reference (UTR) using 10 numbers, like 1234567890
-subcontractorsUniqueTaxpayerReference.error.duplicate = You have already used this Unique Taxpayer Reference (UTR) for an existing subcontractor
-subcontractorsUniqueTaxpayerReference.change.hidden = UTR
-
-partnershipWorksReferenceNumberYesNo.title = Does this partnership have a works reference number?
-partnershipWorksReferenceNumberYesNo.heading = Does {0} have a works reference number?
-partnershipWorksReferenceNumberYesNo.hint = This is the reference number used to identify your subcontractor’s work or project. It can contain letters and numbers
-partnershipWorksReferenceNumberYesNo.checkYourAnswersLabel = Add works reference number?
-partnershipWorksReferenceNumberYesNo.error.required = Select one option
-partnershipWorksReferenceNumberYesNo.change.hidden = add works reference number?
-
-checkYourAnswers.heading.sub.h2 = Subcontractor details
-checkYourAnswers.heading.h2 = Now add this subcontractor
-checkYourAnswers.p1 = By adding this subcontractor you are confirming that, to the best of your knowledge, the details you are providing are correct.
-checkYourAnswers.addSubcontractor = Accept and submit
-
-partnershipName.title = What is the partnership name?
-partnershipName.heading = What is the partnership name?
-partnershipName.hint = This is the name of the partnership as registered with HM Revenue and Customs
-partnershipName.error.required = Enter the registered name of the partnership
-partnershipName.error.length = Partnership names must be 56 characters or less
-partnershipName.error.invalidCharacters = Enter a valid partnership name
-partnershipName.checkYourAnswersLabel = Partnership name
-partnershipName.change.hidden = partnership name
-
-partnershipWorksReferenceNumber.title = What is the works reference number for this partnership?
-partnershipWorksReferenceNumber.heading = What is the works reference number for {0}?
-partnershipWorksReferenceNumber.hint = This is unique to the construction work or project. You may have received it from the contractor
-partnershipWorksReferenceNumber.checkYourAnswersLabel = Works reference number
-partnershipWorksReferenceNumber.error.required = Enter a works reference number
-partnershipWorksReferenceNumber.error.invalid = Enter a valid works reference number
-partnershipWorksReferenceNumber.error.length = Enter a works reference number less or equal to 20 characters
-partnershipWorksReferenceNumber.change.hidden = works reference number
-
-partnershipUniqueTaxpayerReference.title = Partnership Unique Taxpayer Reference (UTR)
-partnershipUniqueTaxpayerReference.heading = Partnership Unique Taxpayer Reference (UTR)
-partnershipUniqueTaxpayerReference.paragraph = The UTR will be on tax returns and other documents from HMRC. It might be called ‘reference’, ‘UTR’, or ‘official use’.
-partnershipUniqueTaxpayerReference.linkText = Get more help to find a UTR (opens in new tab)
-partnershipUniqueTaxpayerReference.heading2 = What is the UTR for {0}?
-partnershipUniqueTaxpayerReference.hint = A UTR is a 10 digit number
-partnershipUniqueTaxpayerReference.error.required = Enter a valid Unique Taxpayer Reference (UTR) using 10 numbers, like 1234567890
-partnershipUniqueTaxpayerReference.error.invalid = Enter a valid Unique Taxpayer Reference (UTR) using 10 numbers, like 1234567890
-partnershipUniqueTaxpayerReference.error.length = Enter a valid Unique Taxpayer Reference (UTR) using 10 numbers, like 1234567890
-partnershipUniqueTaxpayerReference.error.duplicate = You have already used this Unique Taxpayer Reference (UTR) for an existing subcontractor
-partnershipUniqueTaxpayerReference.checkYourAnswersLabel = Partnership UTR
-partnershipUniqueTaxpayerReference.change.hidden = partnership UTR
-
-partnershipHasUtrYesNo.title = Does this partnership have a Unique Taxpayer Reference (UTR)?
-partnershipHasUtrYesNo.heading = Does {0} have a Unique Taxpayer Reference (UTR)?
-partnershipHasUtrYesNo.hint = This is 10 numbers, like 1234567890. The UTR will be on tax returns and other letters about Self Assessment. It may also be called ‘tax reference’, or ‘UTR’
-partnershipHasUtrYesNo.checkYourAnswersLabel = Add UTR?
-partnershipHasUtrYesNo.error.required = Select yes if the partnership has a Unique Taxpayer Reference (UTR)
-partnershipHasUtrYesNo.change.hidden = add UTR?
-
-partnershipAddress.title = What is the address for this partnership?
-partnershipAddress.heading = What is the address for {0}?
-partnershipAddress.checkYourAnswersLabel = Address
-partnershipAddress.change.hidden = address
-
-partnershipAddress.addressLine1 = Address line 1
-partnershipAddress.error.addressLine1.required = Enter the first line of the address, typically the building and street
-partnershipAddress.error.addressLine1.length = Enter an address up to 35 characters
-partnershipAddress.error.addressLine1.invalidCharacters = Enter the first line of the address using letters a to z, numbers, apostrophes, ampersands, commas, hyphens, full stops, forward slashes and spaces
-partnershipAddress.error.addressLine1.firstCharMustBeLetterOrNumber = Enter an address. The first character must be a letter or a number
-
-partnershipAddress.addressLine2 = Address line 2 (optional)
-partnershipAddress.error.addressLine2.length = Enter the second line of the address using 35 characters or less
-partnershipAddress.error.addressLine2.invalidCharacters = Enter the second line of the address using letters a to z, numbers, apostrophes, ampersands, commas, hyphens, full stops, forward slashes and spaces
-partnershipAddress.error.addressLine2.firstCharMustBeLetterOrNumber = Enter an address. The first character must be a letter or a number
-
-partnershipAddress.addressLine3 = Town or city
-partnershipAddress.error.addressLine3.required = Enter the town or city
-partnershipAddress.error.addressLine3.length = Enter a town or city using 35 characters or less
-partnershipAddress.error.addressLine3.invalidCharacters = Enter a town or city using letters a to z, numbers, apostrophes, ampersands, commas, hyphens, full stops, forward slashes and spaces
-partnershipAddress.error.addressLine3.firstCharMustBeLetterOrNumber = Enter a town or city. The first character must be a letter or a number
-
-partnershipAddress.addressLine4 = County (optional)
-partnershipAddress.error.addressLine4.length = Enter a county using 35 characters or less
-partnershipAddress.error.addressLine4.invalidCharacters = Enter a county using letters a to z, numbers, apostrophes, ampersands, commas, hyphens, full stops, forward slashes and spaces
-partnershipAddress.error.addressLine4.firstCharMustBeLetterOrNumber = Enter a county. The first character must be a letter or a number
-
-partnershipAddress.postalCode = Postal code
-partnershipAddress.error.postalCode.required = Enter a postal code in the correct format
-partnershipAddress.error.postalCode.length = Enter a postal code in the correct format
-partnershipAddress.error.postalCode.invalid = Enter a postal code in the correct format
-
-partnershipAddress.country = Country
-partnershipAddress.country.error.required = Enter a country
-partnershipNominatedPartnerNino.title = What is the National Insurance number for the nominated partner?
-partnershipNominatedPartnerNino.heading = What is the National Insurance number for {0}?
-partnershipNominatedPartnerNino.hint = National insurance numbers can be found on payslips, P60s and other tax documents. For example, ‘QQ 12 34 56 C’
-partnershipNominatedPartnerNino.error.required = Enter a National Insurance number
-partnershipNominatedPartnerNino.error.invalidCharacters = Enter a valid National Insurance number
-partnershipNominatedPartnerNino.error.length = Enter a valid National Insurance number
-partnershipNominatedPartnerNino.checkYourAnswersLabel = National Insurance number for nominated partner
-partnershipNominatedPartnerNino.change.hidden = National Insurance number for nominated partner
-
-
-partnershipAddressYesNo.title = Do you want to add an address for this partnership?
-partnershipAddressYesNo.heading = Do you want to add an address for {0}?
-partnershipAddressYesNo.hint = You can add this information later if you prefer
-partnershipAddressYesNo.checkYourAnswersLabel = Add partnership address?
-partnershipAddressYesNo.error.required = Select whether you want to add an address for this partnership
-partnershipAddressYesNo.change.hidden = add partnership address?
-
-partnershipChooseContactDetails.title = What are the contact details for this partnership?
-partnershipChooseContactDetails.heading = What are the contact details for {0}?
-partnershipChooseContactDetails.hint = Choose which method of contact you would like to add for this subcontractor. Contact details are only for your own records.
-partnershipChooseContactDetails.email = Email address
-partnershipChooseContactDetails.phone = Phone number
-partnershipChooseContactDetails.mobile = Mobile number
-partnershipChooseContactDetails.noDetails = Do not add any contact details for this subcontractor
-partnershipChooseContactDetails.or = or
-partnershipChooseContactDetails.checkYourAnswersLabel = Method of contact
-partnershipChooseContactDetails.error.required = Select which contact details you want to add for this partnership
-partnershipChooseContactDetails.change.hidden = method of contact
-
-partnershipNominatedPartnerNinoYesNo.title = Do you know the National Insurance number for this nominated partner?
-partnershipNominatedPartnerNinoYesNo.heading = Do you know the National Insurance number for {0}?
-partnershipNominatedPartnerNinoYesNo.hint = This information will be used to verify them as a subcontractor
-partnershipNominatedPartnerNinoYesNo.checkYourAnswersLabel = Add National Insurance number for nominated partner?
-partnershipNominatedPartnerNinoYesNo.error.required = Select whether you know the National Insurance number for this nominated partner
-partnershipNominatedPartnerNinoYesNo.change.hidden = add National Insurance number for nominated partner?
-
-partnershipNominatedPartnerName.title = Who is the nominated partner for this partnership?
-partnershipNominatedPartnerName.heading = Who is the nominated partner for {0}?
-partnershipNominatedPartnerName.hint = The nominated partner is responsible for managing the partnership’s tax affairs
-partnershipNominatedPartnerName.label = Full name
-partnershipNominatedPartnerName.checkYourAnswersLabel = Nominated partner
-partnershipNominatedPartnerName.error.required = Enter a valid full name
-partnershipNominatedPartnerName.error.invalid = Enter a full name using letters a to z, numbers, apostrophes, ampersands, commas, hyphens, full stops, forward slashes and spaces
-partnershipNominatedPartnerName.error.length = Enter a full name up to 56 characters
-partnershipNominatedPartnerName.change.hidden = nominated partner
-
-partnershipNominatedPartnerCrn.title = What is the company registration number for this nominated partner?
-partnershipNominatedPartnerCrn.heading = What is the company registration number for {0}?
-partnershipNominatedPartnerCrn.hint = Company registration numbers are 8 characters long. They can be either 8 digits (01234567) or 2 letters and 6 digits (AC012345). You can find a company’s number on the Companies House register.
-partnershipNominatedPartnerCrn.error.required = Enter a company registration number
-partnershipNominatedPartnerCrn.error.length = Enter a valid company registration number
-partnershipNominatedPartnerCrn.error.invalidCharacters = Enter a valid company registration number
-partnershipNominatedPartnerCrn.checkYourAnswersLabel = Company registration number for nominated partner
-partnershipNominatedPartnerCrn.change.hidden = company registration number for nominated partner
-
-partnershipNominatedPartnerCrnYesNo.title = Does this nominated partner have a company registration number?
-partnershipNominatedPartnerCrnYesNo.heading = Does {0} have a company registration number?
-partnershipNominatedPartnerCrnYesNo.hint = This only applies if they are a corporate partner or director of a company. This information will be used to verify them as a subcontractor.
-partnershipNominatedPartnerCrnYesNo.checkYourAnswersLabel = Add company registration number for nominated partner?
-partnershipNominatedPartnerCrnYesNo.error.required = Select whether this nominated partner has a company registration number
-partnershipNominatedPartnerCrnYesNo.change.hidden = add company registration number for nominated partner?
-
-partnershipNominatedPartnerUtrYesNo.title = Do you know the Unique Taxpayer Reference for the nominated partner?
-partnershipNominatedPartnerUtrYesNo.heading = Do you know the Unique Taxpayer Reference for {0}?
-partnershipNominatedPartnerUtrYesNo.hint = This information will be used to verify them as a subcontractor
-partnershipNominatedPartnerUtrYesNo.checkYourAnswersLabel = Add UTR for nominated partner?
-partnershipNominatedPartnerUtrYesNo.error.required = Select whether you know the Unique Taxpayer Reference (UTR) for this nominated partner
-partnershipNominatedPartnerUtrYesNo.change.hidden = add UTR for nominated partner?
-
-partnershipNominatedPartnerUtr.title = Nominated partner Self Assessment Unique Taxpayer Reference (UTR)
-partnershipNominatedPartnerUtr.heading = Self Assessment Unique Taxpayer Reference (UTR)
-partnershipNominatedPartnerUtr.paragraph = The UTR will be on tax returns and other documents from HMRC. It might be called ‘reference’, ‘UTR’, or ‘official use’.
-partnershipNominatedPartnerUtr.linkText = Get more help to find a UTR (opens in new tab)
-partnershipNominatedPartnerUtr.heading2 = What is the Self Assessment UTR for {0}?
-partnershipNominatedPartnerUtr.hint = A UTR is a 10 digit number
-partnershipNominatedPartnerUtr.checkYourAnswersLabel = UTR for nominated partner
-partnershipNominatedPartnerUtr.error.required = Enter a valid Unique Taxpayer Reference (UTR), like 1234567890
-partnershipNominatedPartnerUtr.error.length = Enter a valid Unique Taxpayer Reference (UTR) using 10 digits
-partnershipNominatedPartnerUtr.error.invalid = Enter a valid Unique Taxpayer Reference (UTR) using 10 digits
-partnershipNominatedPartnerUtr.change.hidden = UTR for nominated partner
-
-partnershipEmailAddress.title = What is the email address for this partnership?
-partnershipEmailAddress.heading = What is the email address for {0}?
-partnershipEmailAddress.hint = HMRC will never use this email address to contact this subcontractor
-partnershipEmailAddress.checkYourAnswersLabel = Email address
-partnershipEmailAddress.error.required = Enter an email address in the correct format, like name@example.com
-partnershipEmailAddress.error.invalid = Enter a valid email address in the correct format, like name@example.com
-partnershipEmailAddress.error.length = Enter a valid email address in the correct format, like name@example.com, up to 254 characters
-partnershipEmailAddress.change.hidden = email address
-
-partnershipPhoneNumber.title = What is the phone number for this partnership?
-partnershipPhoneNumber.heading = What is the phone number for {0}?
-partnershipPhoneNumber.hint = HMRC will never use this phone number to contact this subcontractor
-partnershipPhoneNumber.checkYourAnswersLabel = Phone number
-partnershipPhoneNumber.error.required = Enter a phone number
-partnershipPhoneNumber.error.length = Enter a valid phone number, like 01632 960 001. For international numbers include the country code.
-partnershipPhoneNumber.error.invalid = Enter a valid phone number, like 01632 960 001. For international numbers include the country code.
-partnershipPhoneNumber.change.hidden = phone number
-
-partnershipCheckYourAnswers.title = Check your answers before adding this partnership
-partnershipCheckYourAnswers.heading = Check your answers before adding this partnership
-partnershipCheckYourAnswers.subHeading = Subcontractor details
-partnershipCheckYourAnswers.trailHeading = Now add this subcontractor
-partnershipCheckYourAnswers.trailText = By adding this subcontractor you are confirming that, to the best of your knowledge, the details you are providing are correct.
-partnershipCheckYourAnswers.continue = Accept and submit
-
-subcontractorAdded.title = Partnership subcontractor added
-subcontractorAdded.heading = Subcontractor added
-subcontractorAdded.p1 = You can now find {0} on your list of subcontractors.
-subcontractorAdded.nextSteps.h2 = Next steps
-subcontractorAdded.nextSteps.p1 = Before you can make any payments to this subcontractor, you will need to verify them.
-subcontractorAdded.nextSteps.p2 = Once they’re verified with HMRC, you will be able to:
-subcontractorAdded.nextSteps.list.l1 = make CIS deductions at the correct rate
-subcontractorAdded.nextSteps.list.l2 = include them on a monthly return
-subcontractorAdded.nextSteps.list.l3 = provide them with payment and deduction statements
-subcontractorAdded.nextSteps.link = Manage your subcontractors
-subcontractorAdded.helpAndSupport.h2 = Help and support
-subcontractorAdded.helpAndSupport.p1 = If you need help with the Construction Industry Scheme (CIS) and what it means for you,
-subcontractorAdded.helpAndSupport.p1.link = guidance is available on GOV.UK
-
-companyName.title = What is the name of the company?
-companyName.heading = What is the name of the company?
-companyName.hint = This will be the name as registered with Companies House
-companyName.checkYourAnswersLabel = Company name
-companyName.error.required = Enter a company name like ABC Construction Ltd
-companyName.error.length = Enter a company name up to 56 characters
-companyName.error.invalidCharacters = Enter a company name using letters a to z, numbers, apostrophes, ampersands, commas, hyphens, full stops, forward slashes and spaces
-companyName.change.hidden = company name
-
-companyAddressYesNo.title = Do you want to add an address for this company?
-companyAddressYesNo.heading = Do you want to add an address for {0}?
-companyAddressYesNo.hint = You can add this information later if you prefer
-companyAddressYesNo.checkYourAnswersLabel = Company Address
-companyAddressYesNo.error.required = Select whether you want to add an address for this company
-companyAddressYesNo.change.hidden = company address
-
-companyAddress.title = What is the address for this company?
-companyAddress.heading = What is the address for {0}?
-companyAddress.checkYourAnswersLabel = Address
-companyAddress.change.hidden = address
-
-companyAddress.addressLine1 = Address line 1
-companyAddress.error.addressLine1.required = Enter the first line of the address, typically the building and street
-companyAddress.error.addressLine1.length = Enter the first line of the address using 35 characters or less
-companyAddress.error.addressLine1.invalidCharacters = Enter the first line of the address using letters a to z, numbers, apostrophes, ampersands, commas, hyphens, full stops, forward slashes and spaces
-companyAddress.error.addressLine1.firstCharMustBeLetterOrNumber = Enter an address. The first character must be a letter or a number
-
-companyAddress.addressLine2 = Address line 2 (optional)
-companyAddress.error.addressLine2.length = Enter the second line of the address using 35 characters or less
-companyAddress.error.addressLine2.invalidCharacters = Enter the second line of the address using letters a to z, numbers, apostrophes, ampersands, commas, hyphens, full stops, forward slashes and spaces
-companyAddress.error.addressLine2.firstCharMustBeLetterOrNumber = Enter an address. The first character must be a letter or a number
-
-companyAddress.addressLine3 = Town or city
-companyAddress.error.addressLine3.required = Enter the town or city
-companyAddress.error.addressLine3.length = Enter a town or city using 35 characters or less
-companyAddress.error.addressLine3.invalidCharacters = Enter a town or city using letters a to z, numbers, apostrophes, ampersands, commas, hyphens, full stops, forward slashes and spaces
-companyAddress.error.addressLine3.firstCharMustBeLetterOrNumber = Enter a town or city. The first character must be a letter or a number
-
-companyAddress.addressLine4 = County (optional)
-companyAddress.error.addressLine4.length = Enter a county using 35 characters or less
-companyAddress.error.addressLine4.invalidCharacters = Enter a county using letters a to z, numbers, apostrophes, ampersands, commas, hyphens, full stops, forward slashes and spaces
-companyAddress.error.addressLine4.firstCharMustBeLetterOrNumber = Enter a county. The first character must be a letter or a number
-
-companyAddress.postalCode = Postal code
-companyAddress.error.postalCode.required = Enter a postal code in the correct format
-companyAddress.error.postalCode.length = Enter a postal code in the correct format
-companyAddress.error.postalCode.invalid = Enter a postal code in the correct format
-
-companyAddress.country = Country
-companyAddress.country.error.required = Select a country
-
-companyContactOptions.title = What are the contact details for this company?
-companyContactOptions.heading = What are the contact details for {0}?
-companyContactOptions.hint = Choose which method of contact you would like to add for this subcontractor. Contact details are only for your own records.
-companyContactOptions.email = Email address
-companyContactOptions.phone = Phone number
-companyContactOptions.mobile = Mobile number
-companyContactOptions.or = or
-companyContactOptions.noDetails = Do not add any contact details for this subcontractor
-companyContactOptions.error.required = Select whether you want to add contact details for this company
-companyContactOptions.checkYourAnswersLabel = Contact details for company
-companyContactOptions.change.hidden = Contact details for company
-
-companyEmailAddress.title = What is the email address for this company?
-companyEmailAddress.heading = What is the email address for {0}?
-companyEmailAddress.hintText = HMRC will never use this email address to contact this subcontractor
-companyEmailAddress.checkYourAnswersLabel = Email address
-companyEmailAddress.error.required = Enter an email address in the correct format, like name@example.com
-companyEmailAddress.error.invalid = Enter a valid email address in the correct format, like name@example.com
-companyEmailAddress.error.length = Enter a valid email address in the correct format, like name@example.com, up to 254 characters
-companyEmailAddress.change.hidden = email address
-
-companyPhoneNumber.title = What is the phone number for this company?
-companyPhoneNumber.heading = What is the phone number for {0}?
-companyPhoneNumber.hint = HMRC will never use this phone number to contact this subcontractor
-companyPhoneNumber.error.required = Enter a phone number
-companyPhoneNumber.error.invalid = Enter a valid phone number, like 01632 960 001. For international numbers include the country code.
-companyPhoneNumber.error.length = Enter a valid phone number, like 01632 960 001. For international numbers include the country code.
-companyPhoneNumber.checkYourAnswersLabel = Phone number
-companyPhoneNumber.change.hidden = phone number
-
-companyMobileNumber.title = What is the mobile number for this company?
-companyMobileNumber.heading = What is the mobile number for {0}?
-companyMobileNumber.hintText = HMRC will never use this mobile number to contact this subcontractor
-companyMobileNumber.checkYourAnswersLabel = Mobile number
-companyMobileNumber.error.required = Enter a mobile number
-companyMobileNumber.error.invalid = Enter a valid mobile number, like 07700 900 982 or +44 7700 900 999
-companyMobileNumber.error.length = Enter a valid mobile number, like 07700 900 982 or +44 7700 900 999
-companyMobileNumber.change.hidden = mobile number
-
-companyUtrYesNo.title = Do you know the Unique Taxpayer Reference for this company?
-companyUtrYesNo.heading = Do you know the Unique Taxpayer Reference for {0}?
-companyUtrYesNo.hint = This information will be used to verify the company as a subcontractor
-companyUtrYesNo.checkYourAnswersLabel =  Add UTR?
-companyUtrYesNo.error.required = Select whether you know the Unique Taxpayer Reference (UTR) for this company
-companyUtrYesNo.change.hidden = UTR
-
-companyUtr.title = Corporation Tax Unique Taxpayer Reference (UTR)
-companyUtr.heading = Corporation Tax Unique Taxpayer Reference (UTR)
-companyUtr.p1 = The UTR will be on tax returns and other letters about Corporation Tax. It might be called ‘reference’, ‘UTR’, or ‘official use’.
-companyUtr.label = What is the Corporation Tax UTR for {0}?
-companyUtr.hint = A Corporation Tax UTR is a 10 digit number
-companyUtr.error.required = Enter a valid Unique Taxpayer Reference (UTR)
-companyUtr.error.length = Enter a valid Unique Taxpayer Reference (UTR)
-companyUtr.error.invalid = Enter a valid Unique Taxpayer Reference (UTR)
-companyUtr.error.duplicate = You have already used this Unique Taxpayer Reference (UTR) for an existing subcontractor
-companyUtr.checkYourAnswersLabel = Corporation Tax UTR
-companyUtr.change.hidden = corporation Tax UTR
-
-companyCrnYesNo.title = Does this company have a company registration number?
-companyCrnYesNo.heading = Does {0} have a company registration number?
-companyCrnYesNo.hint = This information will be used to verify the company as a subcontractor
-companyCrnYesNo.error.required = Select whether this company has a registration number
-companyCrnYesNo.checkYourAnswersLabel = Add company registration number?
-companyCrnYesNo.change.hidden = add company registration number
-
-companyCrn.title = What is the company registration number for this company?
-companyCrn.heading = What is the company registration number for {0}?
-companyCrn.hint = Company registration numbers are 8 characters long. They can be either 8 digits (01234567) or 2 letters and 6 digits (AC012345). You can find a company’s number on the Companies House register.
-companyCrn.error.required = Enter a company registration number
-companyCrn.error.length = Enter a valid company registration number
-companyCrn.error.invalid = Enter a valid company registration number
-companyCrn.checkYourAnswersLabel = Company registration number
-companyCrn.change.hidden = company registration number
-
-companyWorksReferenceYesNo.title = Is there a works reference number associated with this company?
-companyWorksReferenceYesNo.heading = Is there a works reference number associated with {0}?
-companyWorksReferenceYesNo.hint = This is the reference number used to identify a subcontractor’s work or project. It can contain letters and numbers.
-companyWorksReferenceYesNo.checkYourAnswersLabel = Works reference number
-companyWorksReferenceYesNo.error.required = Select whether there is a works reference number associated with this company
-companyWorksReferenceYesNo.change.hidden = works reference number
-
-companyWorksReference.title = What is the works reference number associated with this company?
-companyWorksReference.heading = What is the works reference number associated with {0}?
-companyWorksReference.hintText = This is unique to the construction work or project. You may have received it from the contractor.
-companyWorksReference.checkYourAnswersLabel = Works reference number
-companyWorksReference.error.required = Enter a works reference number
-companyWorksReference.error.invalid = Enter a valid works reference number
-companyWorksReference.error.length = Enter a works reference number, up to 20 characters
-companyWorksReference.change.hidden = works reference number
-
-companyCheckYourAnswers.title = companyCheckYourAnswers
-companyCheckYourAnswers.heading = companyCheckYourAnswers
-
-partnershipMobileNumber.title = What is the mobile number for this partnership?
-partnershipMobileNumber.heading = What is the mobile number for {0}?
-partnershipMobileNumber.hint = HMRC will never use this mobile number to contact this subcontractor
-partnershipMobileNumber.error.required = Enter a mobile number
-partnershipMobileNumber.error.length = Enter a valid mobile number, like 07700 900 982 or +44 7700 900 999
-partnershipMobileNumber.error.invalid = Enter a valid mobile number, like 07700 900 982 or +44 7700 900 999
-partnershipMobileNumber.checkYourAnswersLabel = Mobile number
-partnershipMobileNumber.change.hidden = mobile number
-
-individualMobileNumber.title = What is the mobile number for this subcontractor?
-individualMobileNumber.heading = What is the mobile number for {0}?
-individualMobileNumber.hint = HMRC will never use this mobile number to contact this subcontractor
-individualMobileNumber.checkYourAnswersLabel = Mobile number
-individualMobileNumber.error.required = Enter a mobile number
-individualMobileNumber.error.length = Enter a valid mobile number, like 07700 900 982 or +44 7700 900 999
-individualMobileNumber.error.invalid = Enter a valid mobile number, like 07700 900 982 or +44 7700 900 999
-individualMobileNumber.change.hidden = mobile number
-
-companyAdded.title = Company subcontractor added
-companyAdded.heading = Subcontractor added
-companyAdded.p1 = You can now find {0} on your list of subcontractors.
-companyAdded.nextSteps.h2 = Next steps
-companyAdded.nextSteps.p1 = Before you can make any payments to this subcontractor, you will need to verify them.
-companyAdded.nextSteps.p2 = Once they’re verified with HMRC, you will be able to:
-companyAdded.nextSteps.list.l1 = make CIS deductions at the correct rate
-companyAdded.nextSteps.list.l2 = include them on a monthly return
-companyAdded.nextSteps.list.l3 = provide them with payment and deduction statements
-companyAdded.nextSteps.link = Manage your subcontractors
-companyAdded.helpAndSupport.h2 = Help and support
-companyAdded.helpAndSupport.p1 = If you need help with the Construction Industry Scheme (CIS) and what it means for you,
-companyAdded.helpAndSupport.p1.link = guidance is available on GOV.UK
-
-individualPhoneNumber.title = What is the phone number for this subcontractor?
-individualPhoneNumber.heading = What is the phone number for {0}?
-individualPhoneNumber.hint = HMRC will never use this phone number to contact this subcontractor
-individualPhoneNumber.checkYourAnswersLabel = Phone number
-individualPhoneNumber.error.required = Enter a phone number
-individualPhoneNumber.error.length = Enter a valid phone number, like 01632 960 001. For international numbers include the country code.
-individualPhoneNumber.error.invalid = Enter a valid phone number, like 01632 960 001. For international numbers include the country code.
-individualPhoneNumber.change.hidden = phone number
-
-individualEmailAddress.title = What is the email address for this subcontractor?
-individualEmailAddress.heading = What is the email address for {0}?
-individualEmailAddress.hintText = HMRC will never use this email address to contact this subcontractor
-individualEmailAddress.checkYourAnswersLabel = Email Address
-individualEmailAddress.error.required = Enter an email address in the correct format, like name@example.com
-individualEmailAddress.error.length = Enter a valid email address in the correct format, like name@example.com, up to 254 characters
-individualEmailAddress.error.invalid = Enter a valid email address in the correct format, like name@example.com
-individualEmailAddress.change.hidden = email Address
-
-individualChooseContactDetails.title = Do you want to add contact details?
-individualChooseContactDetails.heading = What are the contact details for {0}?
-individualChooseContactDetails.hint = Choose which method of contact you would like to add for this subcontractor. Contact details are only for your own records.
-individualChooseContactDetails.email = Email address
-individualChooseContactDetails.phone = Phone number
-individualChooseContactDetails.mobile = Mobile number
-individualChooseContactDetails.or = or
-individualChooseContactDetails.noDetails = Do not add any contact details for this subcontractor
-individualChooseContactDetails.error.required = Select whether you want to add contact details for this subcontractor
-individualChooseContactDetails.checkYourAnswersLabel = Method of contact
-individualChooseContactDetails.change.hidden = method of contact
-
-trustName.title = trustName
-trustName.heading = trustName
-trustName.checkYourAnswersLabel = trustName
-trustName.error.required = Enter trustName
-trustName.error.length = TrustName must be 56 characters or less
-trustName.change.hidden = TrustName
-
-trustAddressYesNo.title = trustAddressYesNo
-trustAddressYesNo.heading = trustAddressYesNo
-trustAddressYesNo.checkYourAnswersLabel = trustAddressYesNo
-trustAddressYesNo.error.required = Select yes if trustAddressYesNo
-trustAddressYesNo.change.hidden = TrustAddressYesNo
-
-trustAddress.title = trustAddress
-trustAddress.heading = trustAddress
-trustAddress.checkYourAnswersLabel = trustAddress
-trustAddress.error.required = Enter trustAddress
-trustAddress.error.length = TrustAddress must be 35 characters or less
-trustAddress.change.hidden = TrustAddress
-
-trustContactOptions.title = What are the contact details for this trust?
-trustContactOptions.heading = What are the contact details for this trust?
-trustContactOptions.email = Email address
-trustContactOptions.phone = Phone number
-trustContactOptions.mobile = Mobile number
-trustContactOptions.noDetails = Do not add any contact details for this subcontractor
-trustContactOptions.or = or
-trustContactOptions.checkYourAnswersLabel = What are the contact details for this trust?
-trustContactOptions.error.required = Select trustContactOptions
-trustContactOptions.change.hidden = TrustContactOptions
-
-trustEmailAddress.title = trustEmailAddress
-trustEmailAddress.heading = trustEmailAddress
-trustEmailAddress.checkYourAnswersLabel = trustEmailAddress
-trustEmailAddress.error.required = Enter trustEmailAddress
-trustEmailAddress.error.length = TrustEmailAddress must be 254 characters or less
-trustEmailAddress.change.hidden = TrustEmailAddress
-
-trustPhoneNumber.title = trustPhoneNumber
-trustPhoneNumber.heading = trustPhoneNumber
-trustPhoneNumber.checkYourAnswersLabel = trustPhoneNumber
-trustPhoneNumber.error.required = Enter trustPhoneNumber
-trustPhoneNumber.error.length = TrustPhoneNumber must be 35 characters or less
-trustPhoneNumber.change.hidden = TrustPhoneNumber
-
-trustMobileNumber.title = trustMobileNumber
-trustMobileNumber.heading = trustMobileNumber
-trustMobileNumber.checkYourAnswersLabel = trustMobileNumber
-trustMobileNumber.error.required = Enter trustMobileNumber
-trustMobileNumber.error.length = TrustMobileNumber must be 35 characters or less
-trustMobileNumber.change.hidden = TrustMobileNumber
-
-trustUtrYesNo.title = trustUtrYesNo
-trustUtrYesNo.heading = trustUtrYesNo
-trustUtrYesNo.checkYourAnswersLabel = trustUtrYesNo
-trustUtrYesNo.error.required = Select yes if trustUtrYesNo
-trustUtrYesNo.change.hidden = TrustUtrYesNo
-
-trustUtr.title = trustUtr
-trustUtr.heading = trustUtr
-trustUtr.checkYourAnswersLabel = trustUtr
-trustUtr.error.required = Enter trustUtr
-trustUtr.error.length = TrustUtr must be 10 characters or less
-trustUtr.change.hidden = TrustUtr
-
-trustWorksReferenceYesNo.title = trustWorksReferenceYesNo
-trustWorksReferenceYesNo.heading = trustWorksReferenceYesNo
-trustWorksReferenceYesNo.checkYourAnswersLabel = trustWorksReferenceYesNo
-trustWorksReferenceYesNo.error.required = Select yes if trustWorksReferenceYesNo
-trustWorksReferenceYesNo.change.hidden = TrustWorksReferenceYesNo
-
-rustWorksReference.title = rustWorksReference
-rustWorksReference.heading = rustWorksReference
-rustWorksReference.checkYourAnswersLabel = rustWorksReference
-rustWorksReference.error.required = Enter rustWorksReference
-rustWorksReference.error.length = rustWorksReference must be 20 characters or less
-rustWorksReference.change.hidden = rustWorksReference
-
-trustWorksReference.title = What is the works reference number associated with this trust?
-trustWorksReference.heading = 	What is the works reference number associated with {0}?
-trustWorksReference.hint = This is unique to the construction work or project
-trustWorksReference.checkYourAnswersLabel = Works reference number
-trustWorksReference.error.required = Enter a works reference number
-trustWorksReference.error.invalid = Enter a valid works reference number
-trustWorksReference.error.length = 	Enter a works reference number, up to 20 characters
-trustWorksReference.change.hidden = works reference number
-
-trustCheckYourAnswers.title = trustCheckYourAnswers
-trustCheckYourAnswers.heading = trustCheckYourAnswers
+# Infrastructure
+service.name                         =  Construction Industry Scheme
+
+site.back                            =  Back
+site.remove                          =  Remove
+site.change                          =  Change
+site.no                              =  No
+site.yes                             =  Yes
+site.continue                        =  Continue
+site.start                           =  Start now
+site.startAgain                      =  Start again
+site.signIn                          =  Sign in
+site.govuk                           =  GOV.UK
+
+date.day                             =  Day
+date.month                           =  Month
+date.year                            =  Year
+date.error.day                       =  day
+date.error.month                     =  month
+date.error.year                      =  year
+
+error.boolean                        =  Please give an answer
+
+timeout.title                        =  You’re about to be signed out
+timeout.message                      =  For security reasons, you will be signed out of this service in
+timeout.keepAlive                    =  Stay signed in
+timeout.signOut                      =  Sign out
+
+error.title.prefix                   =  Error:
+error.prefix                         =  Error
+error.summary.title                  =  There is a problem
+
+index.title                          =  Construction Industry Scheme
+index.heading                        =  Construction Industry Scheme
+index.guidance                       =  Welcome to cis-contractor-frontend. Please see the README file for a guide to getting started.
+
+checkYourAnswers.title               =  Check your answers
+checkYourAnswers.heading             =  Check your answers before adding this individual
+
+journeyRecovery.continue.title       =  Sorry, there is a problem with the service
+journeyRecovery.continue.heading     =  Sorry, there is a problem with the service
+journeyRecovery.continue.guidance    =  [Add content to explain how to proceed.]
+journeyRecovery.startAgain.title     =  Sorry, there is a problem with the service
+journeyRecovery.startAgain.heading   =  Sorry, there is a problem with the service
+journeyRecovery.startAgain.guidance  =  [Add content to explain why the user needs to start again.]
+
+signedOut.title                      =  For your security, we signed you out
+signedOut.heading                    =  For your security, we signed you out
+signedOut.guidance                   =  We did not save your answers.
+
+checkYourAnswers.heading.sub.h2      =  Subcontractor details
+checkYourAnswers.heading.h2          =  Now add this subcontractor
+checkYourAnswers.p1                  =  By adding this subcontractor you are confirming that, to the best of your knowledge, the details you are providing are correct.
+checkYourAnswers.addSubcontractor    =  Accept and submit
+
+# Errors & Auth
+pageNotFound.title                       =  Page not found
+pageNotFound.heading                     =  Page not found
+pageNotFound.p1                          =  If you typed the web address, check it is correct.
+pageNotFound.p2                          =  If you pasted the web address, check you copied the entire address.
+pageNotFound.p3                          =  If the web address is correct or you selected a link or button, contact the
+pageNotFound.link                        =  HMRC Online Services Helpdesk
+pageNotFound.p4                          =  if you need to speak to someone.
+
+systemError.title                        =  Sorry, there is a problem with this service
+systemError.heading                      =  Sorry, there is a problem with this service
+systemError.p1                           =  Try again later.
+systemError.p2                           =  Contact the
+systemError.link                         =  HMRC Online Services Helpdesk
+systemError.p3                           =  if you need to speak to someone about Construction Industry Scheme and quote the reference number:
+
+accessDenied.title                       =  Sorry, there is a problem with the service
+accessDenied.heading                     =  Sorry, there is a problem with the service
+accessDenied.link                        =  Return to the Construction Industry Scheme start page.
+
+unauthorised.title                       =  You can’t access this service with this account
+unauthorised.heading                     =  You can’t access this service with this account
+unauthorised.guidance.org.p1.prefix      =  If you are a contractor or subcontractor, you will need to register with
+unauthorised.guidance.org.p1.link        =  Construction Industry Scheme
+unauthorised.guidance.org.p1.suffix      =  to access this service.
+unauthorised.guidance.agent.p2.prefix    =  If you are an agent, you will need to request access to
+unauthorised.guidance.agent.p2.link      =  PAYE for Agents
+unauthorised.guidance.agent.p2.suffix    =  to use this service.
+unauthorised.org.title                   =  You need to register to use this service
+unauthorised.org.heading                 =  You need to register to use this service
+unauthorised.org.p1                      =  You are signed in with an organisation account.
+unauthorised.org.guidance.p2.prefix      =  Register with the
+unauthorised.org.guidance.p2.link        =  Construction Industry Scheme
+unauthorised.org.guidance.p2.suffix      =  to access this service.
+unauthorised.org.standard.title          =  Sorry, you are unable to use this service
+unauthorised.org.standard.heading        =  Sorry, you are unable to use this service
+unauthorised.org.standard.paragraph      =  Return to
+unauthorised.org.standard.guidance.link  =  Construction Industry Scheme
+unauthorised.individual.title            =  Sorry, you are unable to use this service
+unauthorised.individual.heading          =  Sorry, you are unable to use this service
+unauthorised.individual.p1               =  You are signed in with an individual account. Only users with an organisation or agent services accounts can use this service.
+unauthorised.agent.title                 =  Sorry, you are unable to use this service
+unauthorised.agent.heading               =  Sorry, you are unable to use this service
+unauthorised.agent.p1                    =  You are signed in with an agent account.
+unauthorised.agent.p2.prefix             =  You need to request access to
+unauthorised.agent.p2.link               =  PAYE for Agents
+unauthorised.agent.p2.suffix             =  to use this service.
+
+# Individual and Common
+typeOfSubcontractor.title                                                =  What type of subcontractor are you adding?
+typeOfSubcontractor.heading                                              =  What type of subcontractor are you adding?
+typeOfSubcontractor.soletrader                                           =  Individual or sole trader
+typeOfSubcontractor.company                                              =  Limited company
+typeOfSubcontractor.partnership                                          =  Partnership
+typeOfSubcontractor.trust                                                =  Trust
+typeOfSubcontractor.checkYourAnswersLabel                                =  Type
+typeOfSubcontractor.error.required                                       =  Select how the subcontractor is operating
+typeOfSubcontractor.change.hidden                                        =  type
+
+subTradingNameYesNo.title                                                =  Does the subcontractor use a trading name?
+subTradingNameYesNo.heading                                              =  Does the subcontractor use a trading name?
+subTradingNameYesNo.hint                                                 =  This is a business name, different from their own name.
+subTradingNameYesNo.checkYourAnswersLabel                                =  Does subcontractor use a trading name?
+subTradingNameYesNo.error.required                                       =  Select whether or not the subcontractor uses a trading name
+subTradingNameYesNo.change.hidden                                        =  does subcontractor use a trading name?
+
+tradingNameOfSubcontractor.title                                         =  What is the subcontractor’s trading name?
+tradingNameOfSubcontractor.heading                                       =  What is the subcontractor’s trading name?
+tradingNameOfSubcontractor.checkYourAnswersLabel                         =  Subcontractor trading name
+tradingNameOfSubcontractor.error.required                                =  Enter a trading name like ABC Construction Ltd
+tradingNameOfSubcontractor.error.length                                  =  Enter a trading name up to 56 characters
+tradingNameOfSubcontractor.change.hidden                                 =  subcontractor trading name
+tradingNameOfSubcontractor.error.invalidCharacters                       =  Enter a trading name like ABC Construction Ltd
+
+subAddressYesNo.title                                                    =  Do you want to add an address for this subcontractor?
+subAddressYesNo.heading                                                  =  Do you want to add an address for {0}?
+subAddressYesNo.hint                                                     =  You can add this information later if you prefer
+subAddressYesNo.checkYourAnswersLabel                                    =  Add subcontractor address?
+subAddressYesNo.error.required                                           =  Select whether you want to add an address for this subcontractor
+subAddressYesNo.change.hidden                                            =  add subcontractor address?
+
+nationalInsuranceNumberYesNo.title                                       =  Do you know the National Insurance number for this subcontractor?
+nationalInsuranceNumberYesNo.heading                                     =  Do you know the National Insurance number for {0}?
+nationalInsuranceNumberYesNo.hint                                        =  This information will be used to verify them as a subcontractor
+nationalInsuranceNumberYesNo.checkYourAnswersLabel                       =  Add National Insurance number?
+nationalInsuranceNumberYesNo.error.required                              =  Select whether you know the National Insurance number for this subcontractor
+nationalInsuranceNumberYesNo.change.hidden                               =  add National Insurance number?
+
+subcontractorName.title                                                  =  What is the subcontractor’s name?
+subcontractorName.heading                                                =  What is the subcontractor’s name?
+subcontractorName.firstName                                              =  First name
+subcontractorName.middleName                                             =  Middle names
+subcontractorName.lastName                                               =  Last name
+subcontractorName.firstName.error.required                               =  Enter a first name
+subcontractorName.firstName.error.invalidCharacters                      =  Enter a first name using letters a to z, apostrophes and dashes
+subcontractorName.firstName.error.firstChar                              =  Enter a first name. The first character must be a letter
+subcontractorName.firstName.error.length                                 =  Enter a first name up to 35 characters
+subcontractorName.middleName.error.invalidCharacters                     =  Middle names must only use letters a to z, apostrophes and dashes
+subcontractorName.middleName.error.firstChar                             =  Middle names must have a letter as the first character
+subcontractorName.middleName.error.length                                =  Middle names must be 35 characters or less
+subcontractorName.lastName.error.required                                =  Enter a last name
+subcontractorName.lastName.error.invalidCharacters                       =  Enter a last name using letters a to z, numbers 0 to 9, ampersands (&), apostrophes, full stops, round brackets, forward slashes, commas and dashes
+subcontractorName.lastName.error.firstChar                               =  Enter a last name. The first character must be a letter
+subcontractorName.lastName.error.length                                  =  Enter a last name up to 35 characters
+subcontractorName.checkYourAnswersLabel                                  =  Subcontractor name
+subcontractorName.change.hidden                                          =  subcontractor name
+
+uniqueTaxpayerReferenceYesNo.title                                       =  Do you know the Unique Taxpayer Reference (UTR) for this subcontractor?
+uniqueTaxpayerReferenceYesNo.heading                                     =  Do you know the Unique Taxpayer Reference (UTR) for {0}?
+uniqueTaxpayerReferenceYesNo.hint                                        =  This information will be used to verify them as a subcontractor
+uniqueTaxpayerReferenceYesNo.checkYourAnswersLabel                       =  Add UTR?
+uniqueTaxpayerReferenceYesNo.error.required                              =  Select whether you know the Unique Taxpayer Reference (UTR) for this subcontractor
+uniqueTaxpayerReferenceYesNo.change.hidden                               =  add UTR?
+
+worksReferenceNumberYesNo.title                                          =  Is there a works reference number associated with this subcontractor?
+worksReferenceNumberYesNo.heading                                        =  Is there a works reference number associated with {0}?
+worksReferenceNumberYesNo.hint                                           =  This is the reference number used to identify a subcontractor’s work or project. It can contain letters and numbers.
+worksReferenceNumberYesNo.checkYourAnswersLabel                          =  Add works reference number?
+worksReferenceNumberYesNo.error.required                                 =  Select whether this subcontractor has a works reference number
+worksReferenceNumberYesNo.change.hidden                                  =  add works reference number?
+
+subNationalInsuranceNumber.title                                         =  What is the National Insurance number for this subcontractor?
+subNationalInsuranceNumber.heading                                       =  What is the National Insurance number for {0}?
+subNationalInsuranceNumber.hint                                          =  National Insurance numbers can be found on payslips, P60s and other tax documents. For example, ‘QQ 12 34 56 C’
+subNationalInsuranceNumber.checkYourAnswersLabel                         =  National Insurance number
+subNationalInsuranceNumber.error.required                                =  Enter a National Insurance number
+subNationalInsuranceNumber.error.length                                  =  Enter a valid National Insurance number
+subNationalInsuranceNumber.error.invalidCharacters                       =  Enter a valid National Insurance number
+subNationalInsuranceNumber.change.hidden                                 =  National Insurance number
+
+worksReferenceNumber.title                                               =  What is the works reference number associated with this subcontractor?
+worksReferenceNumber.heading                                             =  What is the works reference number associated with {0}?
+worksReferenceNumber.hint                                                =  This is unique to the construction work or project. You may have received it from the contractor.
+worksReferenceNumber.checkYourAnswersLabel                               =  Works reference number
+worksReferenceNumber.error.required                                      =  Enter a works reference number
+worksReferenceNumber.error.invalid                                       =  Enter a valid works reference number
+worksReferenceNumber.error.length                                        =  Enter a works reference number, up to 20 characters
+worksReferenceNumber.change.hidden                                       =  works reference number
+
+addressOfSubcontractor.title                                             =  What is the address for this subcontractor?
+addressOfSubcontractor.heading                                           =  What is the address for {0}?
+addressOfSubcontractor.addressLine1                                      =  Address line 1
+addressOfSubcontractor.addressLine2                                      =  Address line 2 (optional)
+addressOfSubcontractor.checkYourAnswersLabel                             =  Address
+addressOfSubcontractor.error.addressLine1.required                       =  Enter the first line of the address, typically the building and street
+addressOfSubcontractor.error.addressLine3.required                       =  Enter a town or city
+addressOfSubcontractor.error.postalCode.required                         =  Enter a postal code
+addressOfSubcontractor.error.country.required                            =  Select a country
+addressOfSubcontractor.error.addressLine1.length                         =  Enter the first line of the address up to 35 characters
+addressOfSubcontractor.error.addressLine2.length                         =  Enter the second line of the address using 35 characters or less
+addressOfSubcontractor.addressLine1.change.hidden                        =  address Line 1
+addressOfSubcontractor.addressLine2.change.hidden                        =  address line 2 (optional)
+addressOfSubcontractor.addressLine3                                      =  Town or city
+addressOfSubcontractor.addressLine4                                      =  County (optional)
+addressOfSubcontractor.postalCode                                        =  Postal code
+addressOfSubcontractor.country                                           =  Country
+addressOfSubcontractor.error.addressLine1.invalidCharacters              =  Enter the first line of the address using letters a to z, numbers, apostrophes, ampersands, commas, hyphens, full stops, forward slashes and spaces
+addressOfSubcontractor.error.addressLine2.invalidCharacters              =  Enter the second line of the address using letters a to z, numbers, apostrophes, ampersands, commas, hyphens, full stops, forward slashes and spaces
+addressOfSubcontractor.error.addressLine3.invalidCharacters              =  Enter a town or city using letters a to z, numbers, apostrophes, ampersands, commas, hyphens, full stops, forward slashes and spaces
+addressOfSubcontractor.error.addressLine4.invalidCharacters              =  Enter a county using letters a to z, numbers, apostrophes, ampersands, commas, hyphens, full stops, forward slashes and spaces
+addressOfSubcontractor.error.addressLine1.firstCharMustBeLetterOrNumber  =  Enter an address. The first character must be a letter or a number
+addressOfSubcontractor.error.addressLine2.firstCharMustBeLetterOrNumber  =  Enter an address. The first character must be a letter or a number
+addressOfSubcontractor.error.addressLine3.firstCharMustBeLetterOrNumber  =  Enter a town or city. The first character must be a letter or a number
+addressOfSubcontractor.error.addressLine4.firstCharMustBeLetterOrNumber  =  Enter a county. The first character must be a letter or a number
+addressOfSubcontractor.error.postalCode.length                           =  Enter a postal code in the correct format
+addressOfSubcontractor.error.postalCode.invalid                          =  Enter a postal code in the correct format
+addressOfSubcontractor.error.addressLine3.length                         =  Enter a town or city using 35 characters or less
+addressOfSubcontractor.error.addressLine4.length                         =  Enter a county using 35 characters or less
+
+subContactDetails.title                                                  =  Subcontractor’s contact details
+subContactDetails.heading                                                =  Subcontractor’s contact details
+subContactDetails.email                                                  =  Email address
+subContactDetails.telephone                                              =  Telephone number
+subContactDetails.telephone.hint                                         =  For international numbers, include the country code, like +33 for a French number
+subContactDetails.checkYourAnswersLabel                                  =  Contact details
+subContactDetails.error.email.required                                   =  Enter an email address in the correct format, like name@example.com
+subContactDetails.error.telephone.required                               =  Enter a telephone number
+subContactDetails.error.email.length                                     =  Enter a valid email address in the correct format, like name@example.com, up to 254 characters
+subContactDetails.error.telephone.length                                 =  Enter a phone number up to 35 characters, using numbers
+subContactDetails.error.email.invalid                                    =  Enter a valid email address in the correct format, like name@example.com
+subContactDetails.error.telephone.invalid                                =  Enter a valid phone number
+subContactDetails.email.change.hidden                                    =  email address
+subContactDetails.telephone.change.hidden                                =  telephone number
+subContactDetails.change.hidden                                          =  contact details
+
+subcontractorsUniqueTaxpayerReference.title                              =  Self Assessment Unique Taxpayer Reference (UTR)
+subcontractorsUniqueTaxpayerReference.heading                            =  Self Assessment Unique Taxpayer Reference (UTR)
+subcontractorsUniqueTaxpayerReference.p1                                 =  The UTR will be on tax returns and other documents from HMRC. It might be called ‘reference’, ‘UTR’, or ‘official use’.
+subcontractorsUniqueTaxpayerReference.linkText                           =  Get more help to find a UTR (opens in new tab)
+subcontractorsUniqueTaxpayerReference.label                              =  What is the Self Assessment UTR for {0}?
+subcontractorsUniqueTaxpayerReference.hint                               =  A UTR is a 10 digit number
+subcontractorsUniqueTaxpayerReference.checkYourAnswersLabel              =  UTR
+subcontractorsUniqueTaxpayerReference.error.required                     =  Enter a valid Unique Taxpayer Reference (UTR) using 10 numbers, like 1234567890
+subcontractorsUniqueTaxpayerReference.error.invalid                      =  Enter a valid Unique Taxpayer Reference (UTR) using 10 numbers, like 1234567890
+subcontractorsUniqueTaxpayerReference.error.length                       =  Enter a valid Unique Taxpayer Reference (UTR) using 10 numbers, like 1234567890
+subcontractorsUniqueTaxpayerReference.error.duplicate                    =  You have already used this Unique Taxpayer Reference (UTR) for an existing subcontractor
+subcontractorsUniqueTaxpayerReference.change.hidden                      =  UTR
+
+subcontractorAdded.title                                                 =  Partnership subcontractor added
+subcontractorAdded.heading                                               =  Subcontractor added
+subcontractorAdded.p1                                                    =  You can now find {0} on your list of subcontractors.
+subcontractorAdded.nextSteps.h2                                          =  Next steps
+subcontractorAdded.nextSteps.p1                                          =  Before you can make any payments to this subcontractor, you will need to verify them.
+subcontractorAdded.nextSteps.p2                                          =  Once they’re verified with HMRC, you will be able to:
+subcontractorAdded.nextSteps.list.l1                                     =  make CIS deductions at the correct rate
+subcontractorAdded.nextSteps.list.l2                                     =  include them on a monthly return
+subcontractorAdded.nextSteps.list.l3                                     =  provide them with payment and deduction statements
+subcontractorAdded.nextSteps.link                                        =  Manage your subcontractors
+subcontractorAdded.helpAndSupport.h2                                     =  Help and support
+subcontractorAdded.helpAndSupport.p1                                     =  If you need help with the Construction Industry Scheme (CIS) and what it means for you,
+subcontractorAdded.helpAndSupport.p1.link                                =  guidance is available on GOV.UK
+
+individualMobileNumber.title                                             =  What is the mobile number for this subcontractor?
+individualMobileNumber.heading                                           =  What is the mobile number for {0}?
+individualMobileNumber.hint                                              =  HMRC will never use this mobile number to contact this subcontractor
+individualMobileNumber.checkYourAnswersLabel                             =  Mobile number
+individualMobileNumber.error.required                                    =  Enter a mobile number
+individualMobileNumber.error.length                                      =  Enter a valid mobile number, like 07700 900 982 or +44 7700 900 999
+individualMobileNumber.error.invalid                                     =  Enter a valid mobile number, like 07700 900 982 or +44 7700 900 999
+individualMobileNumber.change.hidden                                     =  mobile number
+
+individualPhoneNumber.title                                              =  What is the phone number for this subcontractor?
+individualPhoneNumber.heading                                            =  What is the phone number for {0}?
+individualPhoneNumber.hint                                               =  HMRC will never use this phone number to contact this subcontractor
+individualPhoneNumber.checkYourAnswersLabel                              =  Phone number
+individualPhoneNumber.error.required                                     =  Enter a phone number
+individualPhoneNumber.error.length                                       =  Enter a valid phone number, like 01632 960 001. For international numbers include the country code.
+individualPhoneNumber.error.invalid                                      =  Enter a valid phone number, like 01632 960 001. For international numbers include the country code.
+individualPhoneNumber.change.hidden                                      =  phone number
+
+individualEmailAddress.title                                             =  What is the email address for this subcontractor?
+individualEmailAddress.heading                                           =  What is the email address for {0}?
+individualEmailAddress.hintText                                          =  HMRC will never use this email address to contact this subcontractor
+individualEmailAddress.checkYourAnswersLabel                             =  Email Address
+individualEmailAddress.error.required                                    =  Enter an email address in the correct format, like name@example.com
+individualEmailAddress.error.length                                      =  Enter a valid email address in the correct format, like name@example.com, up to 254 characters
+individualEmailAddress.error.invalid                                     =  Enter a valid email address in the correct format, like name@example.com
+individualEmailAddress.change.hidden                                     =  email Address
+
+individualChooseContactDetails.title                                     =  Do you want to add contact details?
+individualChooseContactDetails.heading                                   =  What are the contact details for {0}?
+individualChooseContactDetails.hint                                      =  Choose which method of contact you would like to add for this subcontractor. Contact details are only for your own records.
+individualChooseContactDetails.email                                     =  Email address
+individualChooseContactDetails.phone                                     =  Phone number
+individualChooseContactDetails.mobile                                    =  Mobile number
+individualChooseContactDetails.or                                        =  or
+individualChooseContactDetails.noDetails                                 =  Do not add any contact details for this subcontractor
+individualChooseContactDetails.error.required                            =  Select whether you want to add contact details for this subcontractor
+individualChooseContactDetails.checkYourAnswersLabel                     =  Method of contact
+individualChooseContactDetails.change.hidden                             =  method of contact
+
+# Partnership
+partnershipWorksReferenceNumberYesNo.title                           =  Does this partnership have a works reference number?
+partnershipWorksReferenceNumberYesNo.heading                         =  Does {0} have a works reference number?
+partnershipWorksReferenceNumberYesNo.hint                            =  This is the reference number used to identify your subcontractor’s work or project. It can contain letters and numbers
+partnershipWorksReferenceNumberYesNo.checkYourAnswersLabel           =  Add works reference number?
+partnershipWorksReferenceNumberYesNo.error.required                  =  Select one option
+partnershipWorksReferenceNumberYesNo.change.hidden                   =  add works reference number?
+
+partnershipName.title                                                =  What is the partnership name?
+partnershipName.heading                                              =  What is the partnership name?
+partnershipName.hint                                                 =  This is the name of the partnership as registered with HM Revenue and Customs
+partnershipName.error.required                                       =  Enter the registered name of the partnership
+partnershipName.error.length                                         =  Partnership names must be 56 characters or less
+partnershipName.error.invalidCharacters                              =  Enter a valid partnership name
+partnershipName.checkYourAnswersLabel                                =  Partnership name
+partnershipName.change.hidden                                        =  partnership name
+
+partnershipWorksReferenceNumber.title                                =  What is the works reference number for this partnership?
+partnershipWorksReferenceNumber.heading                              =  What is the works reference number for {0}?
+partnershipWorksReferenceNumber.hint                                 =  This is unique to the construction work or project. You may have received it from the contractor
+partnershipWorksReferenceNumber.checkYourAnswersLabel                =  Works reference number
+partnershipWorksReferenceNumber.error.required                       =  Enter a works reference number
+partnershipWorksReferenceNumber.error.invalid                        =  Enter a valid works reference number
+partnershipWorksReferenceNumber.error.length                         =  Enter a works reference number less or equal to 20 characters
+partnershipWorksReferenceNumber.change.hidden                        =  works reference number
+
+partnershipUniqueTaxpayerReference.title                             =  Partnership Unique Taxpayer Reference (UTR)
+partnershipUniqueTaxpayerReference.heading                           =  Partnership Unique Taxpayer Reference (UTR)
+partnershipUniqueTaxpayerReference.paragraph                         =  The UTR will be on tax returns and other documents from HMRC. It might be called ‘reference’, ‘UTR’, or ‘official use’.
+partnershipUniqueTaxpayerReference.linkText                          =  Get more help to find a UTR (opens in new tab)
+partnershipUniqueTaxpayerReference.heading2                          =  What is the UTR for {0}?
+partnershipUniqueTaxpayerReference.hint                              =  A UTR is a 10 digit number
+partnershipUniqueTaxpayerReference.error.required                    =  Enter a valid Unique Taxpayer Reference (UTR) using 10 numbers, like 1234567890
+partnershipUniqueTaxpayerReference.error.invalid                     =  Enter a valid Unique Taxpayer Reference (UTR) using 10 numbers, like 1234567890
+partnershipUniqueTaxpayerReference.error.length                      =  Enter a valid Unique Taxpayer Reference (UTR) using 10 numbers, like 1234567890
+partnershipUniqueTaxpayerReference.error.duplicate                   =  You have already used this Unique Taxpayer Reference (UTR) for an existing subcontractor
+partnershipUniqueTaxpayerReference.checkYourAnswersLabel             =  Partnership UTR
+partnershipUniqueTaxpayerReference.change.hidden                     =  partnership UTR
+
+partnershipHasUtrYesNo.title                                         =  Does this partnership have a Unique Taxpayer Reference (UTR)?
+partnershipHasUtrYesNo.heading                                       =  Does {0} have a Unique Taxpayer Reference (UTR)?
+partnershipHasUtrYesNo.hint                                          =  This is 10 numbers, like 1234567890. The UTR will be on tax returns and other letters about Self Assessment. It may also be called ‘tax reference’, or ‘UTR’
+partnershipHasUtrYesNo.checkYourAnswersLabel                         =  Add UTR?
+partnershipHasUtrYesNo.error.required                                =  Select yes if the partnership has a Unique Taxpayer Reference (UTR)
+partnershipHasUtrYesNo.change.hidden                                 =  add UTR?
+
+partnershipAddress.title                                             =  What is the address for this partnership?
+partnershipAddress.heading                                           =  What is the address for {0}?
+partnershipAddress.checkYourAnswersLabel                             =  Address
+partnershipAddress.change.hidden                                     =  address
+partnershipAddress.addressLine1                                      =  Address line 1
+partnershipAddress.error.addressLine1.required                       =  Enter the first line of the address, typically the building and street
+partnershipAddress.error.addressLine1.length                         =  Enter an address up to 35 characters
+partnershipAddress.error.addressLine1.invalidCharacters              =  Enter the first line of the address using letters a to z, numbers, apostrophes, ampersands, commas, hyphens, full stops, forward slashes and spaces
+partnershipAddress.error.addressLine1.firstCharMustBeLetterOrNumber  =  Enter an address. The first character must be a letter or a number
+partnershipAddress.addressLine2                                      =  Address line 2 (optional)
+partnershipAddress.error.addressLine2.length                         =  Enter the second line of the address using 35 characters or less
+partnershipAddress.error.addressLine2.invalidCharacters              =  Enter the second line of the address using letters a to z, numbers, apostrophes, ampersands, commas, hyphens, full stops, forward slashes and spaces
+partnershipAddress.error.addressLine2.firstCharMustBeLetterOrNumber  =  Enter an address. The first character must be a letter or a number
+partnershipAddress.addressLine3                                      =  Town or city
+partnershipAddress.error.addressLine3.required                       =  Enter the town or city
+partnershipAddress.error.addressLine3.length                         =  Enter a town or city using 35 characters or less
+partnershipAddress.error.addressLine3.invalidCharacters              =  Enter a town or city using letters a to z, numbers, apostrophes, ampersands, commas, hyphens, full stops, forward slashes and spaces
+partnershipAddress.error.addressLine3.firstCharMustBeLetterOrNumber  =  Enter a town or city. The first character must be a letter or a number
+partnershipAddress.addressLine4                                      =  County (optional)
+partnershipAddress.error.addressLine4.length                         =  Enter a county using 35 characters or less
+partnershipAddress.error.addressLine4.invalidCharacters              =  Enter a county using letters a to z, numbers, apostrophes, ampersands, commas, hyphens, full stops, forward slashes and spaces
+partnershipAddress.error.addressLine4.firstCharMustBeLetterOrNumber  =  Enter a county. The first character must be a letter or a number
+partnershipAddress.postalCode                                        =  Postal code
+partnershipAddress.error.postalCode.required                         =  Enter a postal code in the correct format
+partnershipAddress.error.postalCode.length                           =  Enter a postal code in the correct format
+partnershipAddress.error.postalCode.invalid                          =  Enter a postal code in the correct format
+partnershipAddress.country                                           =  Country
+partnershipAddress.country.error.required                            =  Enter a country
+
+partnershipNominatedPartnerNino.title                                =  What is the National Insurance number for the nominated partner?
+partnershipNominatedPartnerNino.heading                              =  What is the National Insurance number for {0}?
+partnershipNominatedPartnerNino.hint                                 =  National insurance numbers can be found on payslips, P60s and other tax documents. For example, ‘QQ 12 34 56 C’
+partnershipNominatedPartnerNino.error.required                       =  Enter a National Insurance number
+partnershipNominatedPartnerNino.error.invalidCharacters              =  Enter a valid National Insurance number
+partnershipNominatedPartnerNino.error.length                         =  Enter a valid National Insurance number
+partnershipNominatedPartnerNino.checkYourAnswersLabel                =  National Insurance number for nominated partner
+partnershipNominatedPartnerNino.change.hidden                        =  National Insurance number for nominated partner
+
+partnershipAddressYesNo.title                                        =  Do you want to add an address for this partnership?
+partnershipAddressYesNo.heading                                      =  Do you want to add an address for {0}?
+partnershipAddressYesNo.hint                                         =  You can add this information later if you prefer
+partnershipAddressYesNo.checkYourAnswersLabel                        =  Add partnership address?
+partnershipAddressYesNo.error.required                               =  Select whether you want to add an address for this partnership
+partnershipAddressYesNo.change.hidden                                =  add partnership address?
+
+partnershipChooseContactDetails.title                                =  What are the contact details for this partnership?
+partnershipChooseContactDetails.heading                              =  What are the contact details for {0}?
+partnershipChooseContactDetails.hint                                 =  Choose which method of contact you would like to add for this subcontractor. Contact details are only for your own records.
+partnershipChooseContactDetails.email                                =  Email address
+partnershipChooseContactDetails.phone                                =  Phone number
+partnershipChooseContactDetails.mobile                               =  Mobile number
+partnershipChooseContactDetails.noDetails                            =  Do not add any contact details for this subcontractor
+partnershipChooseContactDetails.or                                   =  or
+partnershipChooseContactDetails.checkYourAnswersLabel                =  Method of contact
+partnershipChooseContactDetails.error.required                       =  Select which contact details you want to add for this partnership
+partnershipChooseContactDetails.change.hidden                        =  method of contact
+
+partnershipNominatedPartnerNinoYesNo.title                           =  Do you know the National Insurance number for this nominated partner?
+partnershipNominatedPartnerNinoYesNo.heading                         =  Do you know the National Insurance number for {0}?
+partnershipNominatedPartnerNinoYesNo.hint                            =  This information will be used to verify them as a subcontractor
+partnershipNominatedPartnerNinoYesNo.checkYourAnswersLabel           =  Add National Insurance number for nominated partner?
+partnershipNominatedPartnerNinoYesNo.error.required                  =  Select whether you know the National Insurance number for this nominated partner
+partnershipNominatedPartnerNinoYesNo.change.hidden                   =  add National Insurance number for nominated partner?
+
+partnershipNominatedPartnerName.title                                =  Who is the nominated partner for this partnership?
+partnershipNominatedPartnerName.heading                              =  Who is the nominated partner for {0}?
+partnershipNominatedPartnerName.hint                                 =  The nominated partner is responsible for managing the partnership’s tax affairs
+partnershipNominatedPartnerName.label                                =  Full name
+partnershipNominatedPartnerName.checkYourAnswersLabel                =  Nominated partner
+partnershipNominatedPartnerName.error.required                       =  Enter a valid full name
+partnershipNominatedPartnerName.error.invalid                        =  Enter a full name using letters a to z, numbers, apostrophes, ampersands, commas, hyphens, full stops, forward slashes and spaces
+partnershipNominatedPartnerName.error.length                         =  Enter a full name up to 56 characters
+partnershipNominatedPartnerName.change.hidden                        =  nominated partner
+
+partnershipNominatedPartnerCrn.title                                 =  What is the company registration number for this nominated partner?
+partnershipNominatedPartnerCrn.heading                               =  What is the company registration number for {0}?
+partnershipNominatedPartnerCrn.hint                                  =  Company registration numbers are 8 characters long. They can be either 8 digits (01234567) or 2 letters and 6 digits (AC012345). You can find a company’s number on the Companies House register.
+partnershipNominatedPartnerCrn.error.required                        =  Enter a company registration number
+partnershipNominatedPartnerCrn.error.length                          =  Enter a valid company registration number
+partnershipNominatedPartnerCrn.error.invalidCharacters               =  Enter a valid company registration number
+partnershipNominatedPartnerCrn.checkYourAnswersLabel                 =  Company registration number for nominated partner
+partnershipNominatedPartnerCrn.change.hidden                         =  company registration number for nominated partner
+
+partnershipNominatedPartnerCrnYesNo.title                            =  Does this nominated partner have a company registration number?
+partnershipNominatedPartnerCrnYesNo.heading                          =  Does {0} have a company registration number?
+partnershipNominatedPartnerCrnYesNo.hint                             =  This only applies if they are a corporate partner or director of a company. This information will be used to verify them as a subcontractor.
+partnershipNominatedPartnerCrnYesNo.checkYourAnswersLabel            =  Add company registration number for nominated partner?
+partnershipNominatedPartnerCrnYesNo.error.required                   =  Select whether this nominated partner has a company registration number
+partnershipNominatedPartnerCrnYesNo.change.hidden                    =  add company registration number for nominated partner?
+
+partnershipNominatedPartnerUtrYesNo.title                            =  Do you know the Unique Taxpayer Reference for the nominated partner?
+partnershipNominatedPartnerUtrYesNo.heading                          =  Do you know the Unique Taxpayer Reference for {0}?
+partnershipNominatedPartnerUtrYesNo.hint                             =  This information will be used to verify them as a subcontractor
+partnershipNominatedPartnerUtrYesNo.checkYourAnswersLabel            =  Add UTR for nominated partner?
+partnershipNominatedPartnerUtrYesNo.error.required                   =  Select whether you know the Unique Taxpayer Reference (UTR) for this nominated partner
+partnershipNominatedPartnerUtrYesNo.change.hidden                    =  add UTR for nominated partner?
+
+partnershipNominatedPartnerUtr.title                                 =  Nominated partner Self Assessment Unique Taxpayer Reference (UTR)
+partnershipNominatedPartnerUtr.heading                               =  Self Assessment Unique Taxpayer Reference (UTR)
+partnershipNominatedPartnerUtr.paragraph                             =  The UTR will be on tax returns and other documents from HMRC. It might be called ‘reference’, ‘UTR’, or ‘official use’.
+partnershipNominatedPartnerUtr.linkText                              =  Get more help to find a UTR (opens in new tab)
+partnershipNominatedPartnerUtr.heading2                              =  What is the Self Assessment UTR for {0}?
+partnershipNominatedPartnerUtr.hint                                  =  A UTR is a 10 digit number
+partnershipNominatedPartnerUtr.checkYourAnswersLabel                 =  UTR for nominated partner
+partnershipNominatedPartnerUtr.error.required                        =  Enter a valid Unique Taxpayer Reference (UTR), like 1234567890
+partnershipNominatedPartnerUtr.error.length                          =  Enter a valid Unique Taxpayer Reference (UTR) using 10 digits
+partnershipNominatedPartnerUtr.error.invalid                         =  Enter a valid Unique Taxpayer Reference (UTR) using 10 digits
+partnershipNominatedPartnerUtr.change.hidden                         =  UTR for nominated partner
+
+partnershipEmailAddress.title                                        =  What is the email address for this partnership?
+partnershipEmailAddress.heading                                      =  What is the email address for {0}?
+partnershipEmailAddress.hint                                         =  HMRC will never use this email address to contact this subcontractor
+partnershipEmailAddress.checkYourAnswersLabel                        =  Email address
+partnershipEmailAddress.error.required                               =  Enter an email address in the correct format, like name@example.com
+partnershipEmailAddress.error.invalid                                =  Enter a valid email address in the correct format, like name@example.com
+partnershipEmailAddress.error.length                                 =  Enter a valid email address in the correct format, like name@example.com, up to 254 characters
+partnershipEmailAddress.change.hidden                                =  email address
+
+partnershipPhoneNumber.title                                         =  What is the phone number for this partnership?
+partnershipPhoneNumber.heading                                       =  What is the phone number for {0}?
+partnershipPhoneNumber.hint                                          =  HMRC will never use this phone number to contact this subcontractor
+partnershipPhoneNumber.checkYourAnswersLabel                         =  Phone number
+partnershipPhoneNumber.error.required                                =  Enter a phone number
+partnershipPhoneNumber.error.length                                  =  Enter a valid phone number, like 01632 960 001. For international numbers include the country code.
+partnershipPhoneNumber.error.invalid                                 =  Enter a valid phone number, like 01632 960 001. For international numbers include the country code.
+partnershipPhoneNumber.change.hidden                                 =  phone number
+
+partnershipCheckYourAnswers.title                                    =  Check your answers before adding this partnership
+partnershipCheckYourAnswers.heading                                  =  Check your answers before adding this partnership
+partnershipCheckYourAnswers.subHeading                               =  Subcontractor details
+partnershipCheckYourAnswers.trailHeading                             =  Now add this subcontractor
+partnershipCheckYourAnswers.trailText                                =  By adding this subcontractor you are confirming that, to the best of your knowledge, the details you are providing are correct.
+partnershipCheckYourAnswers.continue                                 =  Accept and submit
+
+partnershipMobileNumber.title                                        =  What is the mobile number for this partnership?
+partnershipMobileNumber.heading                                      =  What is the mobile number for {0}?
+partnershipMobileNumber.hint                                         =  HMRC will never use this mobile number to contact this subcontractor
+partnershipMobileNumber.error.required                               =  Enter a mobile number
+partnershipMobileNumber.error.length                                 =  Enter a valid mobile number, like 07700 900 982 or +44 7700 900 999
+partnershipMobileNumber.error.invalid                                =  Enter a valid mobile number, like 07700 900 982 or +44 7700 900 999
+partnershipMobileNumber.checkYourAnswersLabel                        =  Mobile number
+partnershipMobileNumber.change.hidden                                =  mobile number
+
+# Company
+companyName.title                                                =  What is the name of the company?
+companyName.heading                                              =  What is the name of the company?
+companyName.hint                                                 =  This will be the name as registered with Companies House
+companyName.checkYourAnswersLabel                                =  Company name
+companyName.error.required                                       =  Enter a company name like ABC Construction Ltd
+companyName.error.length                                         =  Enter a company name up to 56 characters
+companyName.error.invalidCharacters                              =  Enter a company name using letters a to z, numbers, apostrophes, ampersands, commas, hyphens, full stops, forward slashes and spaces
+companyName.change.hidden                                        =  company name
+
+companyAddressYesNo.title                                        =  Do you want to add an address for this company?
+companyAddressYesNo.heading                                      =  Do you want to add an address for {0}?
+companyAddressYesNo.hint                                         =  You can add this information later if you prefer
+companyAddressYesNo.checkYourAnswersLabel                        =  Company Address
+companyAddressYesNo.error.required                               =  Select whether you want to add an address for this company
+companyAddressYesNo.change.hidden                                =  company address
+
+companyAddress.title                                             =  What is the address for this company?
+companyAddress.heading                                           =  What is the address for {0}?
+companyAddress.checkYourAnswersLabel                             =  Address
+companyAddress.change.hidden                                     =  address
+companyAddress.addressLine1                                      =  Address line 1
+companyAddress.error.addressLine1.required                       =  Enter the first line of the address, typically the building and street
+companyAddress.error.addressLine1.length                         =  Enter the first line of the address using 35 characters or less
+companyAddress.error.addressLine1.invalidCharacters              =  Enter the first line of the address using letters a to z, numbers, apostrophes, ampersands, commas, hyphens, full stops, forward slashes and spaces
+companyAddress.error.addressLine1.firstCharMustBeLetterOrNumber  =  Enter an address. The first character must be a letter or a number
+companyAddress.addressLine2                                      =  Address line 2 (optional)
+companyAddress.error.addressLine2.length                         =  Enter the second line of the address using 35 characters or less
+companyAddress.error.addressLine2.invalidCharacters              =  Enter the second line of the address using letters a to z, numbers, apostrophes, ampersands, commas, hyphens, full stops, forward slashes and spaces
+companyAddress.error.addressLine2.firstCharMustBeLetterOrNumber  =  Enter an address. The first character must be a letter or a number
+companyAddress.addressLine3                                      =  Town or city
+companyAddress.error.addressLine3.required                       =  Enter the town or city
+companyAddress.error.addressLine3.length                         =  Enter a town or city using 35 characters or less
+companyAddress.error.addressLine3.invalidCharacters              =  Enter a town or city using letters a to z, numbers, apostrophes, ampersands, commas, hyphens, full stops, forward slashes and spaces
+companyAddress.error.addressLine3.firstCharMustBeLetterOrNumber  =  Enter a town or city. The first character must be a letter or a number
+companyAddress.addressLine4                                      =  County (optional)
+companyAddress.error.addressLine4.length                         =  Enter a county using 35 characters or less
+companyAddress.error.addressLine4.invalidCharacters              =  Enter a county using letters a to z, numbers, apostrophes, ampersands, commas, hyphens, full stops, forward slashes and spaces
+companyAddress.error.addressLine4.firstCharMustBeLetterOrNumber  =  Enter a county. The first character must be a letter or a number
+companyAddress.postalCode                                        =  Postal code
+companyAddress.error.postalCode.required                         =  Enter a postal code in the correct format
+companyAddress.error.postalCode.length                           =  Enter a postal code in the correct format
+companyAddress.error.postalCode.invalid                          =  Enter a postal code in the correct format
+companyAddress.country                                           =  Country
+companyAddress.country.error.required                            =  Select a country
+
+companyContactOptions.title                                      =  What are the contact details for this company?
+companyContactOptions.heading                                    =  What are the contact details for {0}?
+companyContactOptions.hint                                       =  Choose which method of contact you would like to add for this subcontractor. Contact details are only for your own records.
+companyContactOptions.email                                      =  Email address
+companyContactOptions.phone                                      =  Phone number
+companyContactOptions.mobile                                     =  Mobile number
+companyContactOptions.or                                         =  or
+companyContactOptions.noDetails                                  =  Do not add any contact details for this subcontractor
+companyContactOptions.error.required                             =  Select whether you want to add contact details for this company
+companyContactOptions.checkYourAnswersLabel                      =  Contact details for company
+companyContactOptions.change.hidden                              =  Contact details for company
+
+companyEmailAddress.title                                        =  What is the email address for this company?
+companyEmailAddress.heading                                      =  What is the email address for {0}?
+companyEmailAddress.hintText                                     =  HMRC will never use this email address to contact this subcontractor
+companyEmailAddress.checkYourAnswersLabel                        =  Email address
+companyEmailAddress.error.required                               =  Enter an email address in the correct format, like name@example.com
+companyEmailAddress.error.invalid                                =  Enter a valid email address in the correct format, like name@example.com
+companyEmailAddress.error.length                                 =  Enter a valid email address in the correct format, like name@example.com, up to 254 characters
+companyEmailAddress.change.hidden                                =  email address
+
+companyPhoneNumber.title                                         =  What is the phone number for this company?
+companyPhoneNumber.heading                                       =  What is the phone number for {0}?
+companyPhoneNumber.hint                                          =  HMRC will never use this phone number to contact this subcontractor
+companyPhoneNumber.error.required                                =  Enter a phone number
+companyPhoneNumber.error.invalid                                 =  Enter a valid phone number, like 01632 960 001. For international numbers include the country code.
+companyPhoneNumber.error.length                                  =  Enter a valid phone number, like 01632 960 001. For international numbers include the country code.
+companyPhoneNumber.checkYourAnswersLabel                         =  Phone number
+companyPhoneNumber.change.hidden                                 =  phone number
+
+companyMobileNumber.title                                        =  What is the mobile number for this company?
+companyMobileNumber.heading                                      =  What is the mobile number for {0}?
+companyMobileNumber.hintText                                     =  HMRC will never use this mobile number to contact this subcontractor
+companyMobileNumber.checkYourAnswersLabel                        =  Mobile number
+companyMobileNumber.error.required                               =  Enter a mobile number
+companyMobileNumber.error.invalid                                =  Enter a valid mobile number, like 07700 900 982 or +44 7700 900 999
+companyMobileNumber.error.length                                 =  Enter a valid mobile number, like 07700 900 982 or +44 7700 900 999
+companyMobileNumber.change.hidden                                =  mobile number
+
+companyUtrYesNo.title                                            =  Do you know the Unique Taxpayer Reference for this company?
+companyUtrYesNo.heading                                          =  Do you know the Unique Taxpayer Reference for {0}?
+companyUtrYesNo.hint                                             =  This information will be used to verify the company as a subcontractor
+companyUtrYesNo.checkYourAnswersLabel                            =  Add UTR?
+companyUtrYesNo.error.required                                   =  Select whether you know the Unique Taxpayer Reference (UTR) for this company
+companyUtrYesNo.change.hidden                                    =  UTR
+
+companyUtr.title                                                 =  Corporation Tax Unique Taxpayer Reference (UTR)
+companyUtr.heading                                               =  Corporation Tax Unique Taxpayer Reference (UTR)
+companyUtr.p1                                                    =  The UTR will be on tax returns and other letters about Corporation Tax. It might be called ‘reference’, ‘UTR’, or ‘official use’.
+companyUtr.label                                                 =  What is the Corporation Tax UTR for {0}?
+companyUtr.hint                                                  =  A Corporation Tax UTR is a 10 digit number
+companyUtr.error.required                                        =  Enter a valid Unique Taxpayer Reference (UTR)
+companyUtr.error.length                                          =  Enter a valid Unique Taxpayer Reference (UTR)
+companyUtr.error.invalid                                         =  Enter a valid Unique Taxpayer Reference (UTR)
+companyUtr.error.duplicate                                       =  You have already used this Unique Taxpayer Reference (UTR) for an existing subcontractor
+companyUtr.checkYourAnswersLabel                                 =  Corporation Tax UTR
+companyUtr.change.hidden                                         =  corporation Tax UTR
+
+companyCrnYesNo.title                                            =  Does this company have a company registration number?
+companyCrnYesNo.heading                                          =  Does {0} have a company registration number?
+companyCrnYesNo.hint                                             =  This information will be used to verify the company as a subcontractor
+companyCrnYesNo.error.required                                   =  Select whether this company has a registration number
+companyCrnYesNo.checkYourAnswersLabel                            =  Add company registration number?
+companyCrnYesNo.change.hidden                                    =  add company registration number
+
+companyCrn.title                                                 =  What is the company registration number for this company?
+companyCrn.heading                                               =  What is the company registration number for {0}?
+companyCrn.hint                                                  =  Company registration numbers are 8 characters long. They can be either 8 digits (01234567) or 2 letters and 6 digits (AC012345). You can find a company’s number on the Companies House register.
+companyCrn.error.required                                        =  Enter a company registration number
+companyCrn.error.length                                          =  Enter a valid company registration number
+companyCrn.error.invalid                                         =  Enter a valid company registration number
+companyCrn.checkYourAnswersLabel                                 =  Company registration number
+companyCrn.change.hidden                                         =  company registration number
+
+companyWorksReferenceYesNo.title                                 =  Is there a works reference number associated with this company?
+companyWorksReferenceYesNo.heading                               =  Is there a works reference number associated with {0}?
+companyWorksReferenceYesNo.hint                                  =  This is the reference number used to identify a subcontractor’s work or project. It can contain letters and numbers.
+companyWorksReferenceYesNo.checkYourAnswersLabel                 =  Works reference number
+companyWorksReferenceYesNo.error.required                        =  Select whether there is a works reference number associated with this company
+companyWorksReferenceYesNo.change.hidden                         =  works reference number
+
+companyWorksReference.title                                      =  What is the works reference number associated with this company?
+companyWorksReference.heading                                    =  What is the works reference number associated with {0}?
+companyWorksReference.hintText                                   =  This is unique to the construction work or project. You may have received it from the contractor.
+companyWorksReference.checkYourAnswersLabel                      =  Works reference number
+companyWorksReference.error.required                             =  Enter a works reference number
+companyWorksReference.error.invalid                              =  Enter a valid works reference number
+companyWorksReference.error.length                               =  Enter a works reference number, up to 20 characters
+companyWorksReference.change.hidden                              =  works reference number
+
+companyCheckYourAnswers.title                                    =  companyCheckYourAnswers
+companyCheckYourAnswers.heading                                  =  companyCheckYourAnswers
+
+companyAdded.title                                               =  Company subcontractor added
+companyAdded.heading                                             =  Subcontractor added
+companyAdded.p1                                                  =  You can now find {0} on your list of subcontractors.
+companyAdded.nextSteps.h2                                        =  Next steps
+companyAdded.nextSteps.p1                                        =  Before you can make any payments to this subcontractor, you will need to verify them.
+companyAdded.nextSteps.p2                                        =  Once they’re verified with HMRC, you will be able to:
+companyAdded.nextSteps.list.l1                                   =  make CIS deductions at the correct rate
+companyAdded.nextSteps.list.l2                                   =  include them on a monthly return
+companyAdded.nextSteps.list.l3                                   =  provide them with payment and deduction statements
+companyAdded.nextSteps.link                                      =  Manage your subcontractors
+companyAdded.helpAndSupport.h2                                   =  Help and support
+companyAdded.helpAndSupport.p1                                   =  If you need help with the Construction Industry Scheme (CIS) and what it means for you,
+companyAdded.helpAndSupport.p1.link                              =  guidance is available on GOV.UK
+
+# Trust
+trustName.title                                 =  What is the name of the trust?
+trustName.heading                               =  What is the name of the trust?
+trustName.hint                                  =  This will be the name as registered with HMRC
+trustName.checkYourAnswersLabel                 =  Trust name
+trustName.error.required                        =  Enter a trust name like ABC Construction Ltd
+trustName.error.length                          =  Enter a trust name up to 56 characters
+trustName.error.invalidCharacters               =  Enter a trust name using letters a to z, numbers, apostrophes, ampersands, commas, hyphens, full stops, forward slashes and spaces
+trustName.change.hidden                         =  trust name
+
+trustAddressYesNo.title                         =  trustAddressYesNo
+trustAddressYesNo.heading                       =  trustAddressYesNo
+trustAddressYesNo.checkYourAnswersLabel         =  trustAddressYesNo
+trustAddressYesNo.error.required                =  Select yes if trustAddressYesNo
+trustAddressYesNo.change.hidden                 =  TrustAddressYesNo
+
+trustAddress.title                              =  trustAddress
+trustAddress.heading                            =  trustAddress
+trustAddress.checkYourAnswersLabel              =  trustAddress
+trustAddress.error.required                     =  Enter trustAddress
+trustAddress.error.length                       =  TrustAddress must be 35 characters or less
+trustAddress.change.hidden                      =  TrustAddress
+
+trustContactOptions.title                       =  What are the contact details for this trust?
+trustContactOptions.heading                     =  What are the contact details for this trust?
+trustContactOptions.email                       =  Email address
+trustContactOptions.phone                       =  Phone number
+trustContactOptions.mobile                      =  Mobile number
+trustContactOptions.noDetails                   =  Do not add any contact details for this subcontractor
+trustContactOptions.or                          =  or
+trustContactOptions.checkYourAnswersLabel       =  What are the contact details for this trust?
+trustContactOptions.error.required              =  Select trustContactOptions
+trustContactOptions.change.hidden               =  TrustContactOptions
+
+trustEmailAddress.title                         =  trustEmailAddress
+trustEmailAddress.heading                       =  trustEmailAddress
+trustEmailAddress.checkYourAnswersLabel         =  trustEmailAddress
+trustEmailAddress.error.required                =  Enter trustEmailAddress
+trustEmailAddress.error.length                  =  TrustEmailAddress must be 254 characters or less
+trustEmailAddress.change.hidden                 =  TrustEmailAddress
+
+trustPhoneNumber.title                          =  trustPhoneNumber
+trustPhoneNumber.heading                        =  trustPhoneNumber
+trustPhoneNumber.checkYourAnswersLabel          =  trustPhoneNumber
+trustPhoneNumber.error.required                 =  Enter trustPhoneNumber
+trustPhoneNumber.error.length                   =  TrustPhoneNumber must be 35 characters or less
+trustPhoneNumber.change.hidden                  =  TrustPhoneNumber
+
+trustMobileNumber.title                         =  trustMobileNumber
+trustMobileNumber.heading                       =  trustMobileNumber
+trustMobileNumber.checkYourAnswersLabel         =  trustMobileNumber
+trustMobileNumber.error.required                =  Enter trustMobileNumber
+trustMobileNumber.error.length                  =  TrustMobileNumber must be 35 characters or less
+trustMobileNumber.change.hidden                 =  TrustMobileNumber
+
+trustUtrYesNo.title                             =  trustUtrYesNo
+trustUtrYesNo.heading                           =  trustUtrYesNo
+trustUtrYesNo.checkYourAnswersLabel             =  trustUtrYesNo
+trustUtrYesNo.error.required                    =  Select yes if trustUtrYesNo
+trustUtrYesNo.change.hidden                     =  TrustUtrYesNo
+
+trustUtr.title                                  =  trustUtr
+trustUtr.heading                                =  trustUtr
+trustUtr.checkYourAnswersLabel                  =  trustUtr
+trustUtr.error.required                         =  Enter trustUtr
+trustUtr.error.length                           =  TrustUtr must be 10 characters or less
+trustUtr.change.hidden                          =  TrustUtr
+
+trustWorksReferenceYesNo.title                  =  trustWorksReferenceYesNo
+trustWorksReferenceYesNo.heading                =  trustWorksReferenceYesNo
+trustWorksReferenceYesNo.checkYourAnswersLabel  =  trustWorksReferenceYesNo
+trustWorksReferenceYesNo.error.required         =  Select yes if trustWorksReferenceYesNo
+trustWorksReferenceYesNo.change.hidden          =  TrustWorksReferenceYesNo
+
+trustWorksReference.title                       =  trustWorksReference
+trustWorksReference.heading                     =  trustWorksReference
+trustWorksReference.checkYourAnswersLabel       =  trustWorksReference
+trustWorksReference.error.required              =  Enter trustWorksReference
+trustWorksReference.error.length                =  TrustWorksReference must be 20 characters or less
+trustWorksReference.change.hidden               =  TrustWorksReference
+
+trustCheckYourAnswers.title                     =  trustCheckYourAnswers
+trustCheckYourAnswers.heading                   =  trustCheckYourAnswers

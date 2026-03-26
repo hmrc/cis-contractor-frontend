@@ -19,7 +19,7 @@ package pages.add.trust
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 
-case object TrustNamePage extends QuestionPage[String] {
+case object TrustNamePage extends QuestionPage[String] with TrustJourney {
 
   override def path: JsPath = JsPath \ toString
 
