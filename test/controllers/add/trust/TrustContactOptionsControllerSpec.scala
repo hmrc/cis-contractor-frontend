@@ -64,7 +64,7 @@ class TrustContactOptionsControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must populate the view correctly on a GET when the question has previously been answered" in {
+    "must populate the view correctly on GET when the question has previously been answered" in {
 
       val userAnswers = UserAnswers(userAnswersId)
         .set(TrustContactOptionsPage, ContactOptions.Email)
