@@ -13,15 +13,3 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package pages.add.trust
-
-import pages.QuestionPage
-import play.api.libs.json.JsPath
-
-case object TrustWorksReferencePage extends QuestionPage[String] with TrustJourney {
-
-  override def path: JsPath = JsPath \ toString
-
-  override def toString: String = "trustWorksReference"
-}

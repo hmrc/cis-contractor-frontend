@@ -20,7 +20,7 @@ import base.SpecBase
 import controllers.routes
 import models.{CheckMode, NormalMode, UserAnswers}
 import pages.Page
-import pages.add.trust.TrustNamePage
+import pages.add.trust.*
 
 class TrustNavigatorSpec extends SpecBase {
 
@@ -33,6 +33,14 @@ class TrustNavigatorSpec extends SpecBase {
       "must go from TrustNamePage to TrustAddressYesNoPage" in {
         navigator.nextPage(TrustNamePage, NormalMode, UserAnswers("id")) mustBe
           controllers.add.trust.routes.TrustAddressYesNoController.onPageLoad(NormalMode)
+      }
+
+      "must go from a TrustWorksReferencePage to TrustCheckYourAnswerPage" in {
+        navigator.nextPage(
+          TrustWorksReferencePage,
+          NormalMode,
+          UserAnswers("id")
+        ) mustBe controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
       }
 
       "must go from a page that doesn't exist in the route map to Index" in {
@@ -48,6 +56,14 @@ class TrustNavigatorSpec extends SpecBase {
       "must go from TrustNamePage to TrustCheckYourAnswers" in {
         navigator.nextPage(TrustNamePage, CheckMode, UserAnswers("id")) mustBe
           controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
+      }
+
+      "must go from TrustWorksReferencePage to TrustCheckYourAnswerPage in CheckMode" in {
+        navigator.nextPage(
+          TrustWorksReferencePage,
+          CheckMode,
+          emptyUserAnswers
+        ) mustBe controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
       }
 
       "must go from a page that doesn't exist in the edit route map to TrustCheckYourAnswers" in {
