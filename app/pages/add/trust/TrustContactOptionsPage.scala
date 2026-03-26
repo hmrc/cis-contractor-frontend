@@ -24,7 +24,7 @@ import play.api.libs.json.JsPath
 
 import scala.util.Try
 
-case object TrustContactOptionsPage extends QuestionPage[TrustContactOptions] {
+case object TrustContactOptionsPage extends QuestionPage[TrustContactOptions] with TrustJourney {
 
   override def path: JsPath = JsPath \ toString
 
