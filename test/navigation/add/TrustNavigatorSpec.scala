@@ -21,7 +21,7 @@ import controllers.routes
 import models.{CheckMode, NormalMode, UserAnswers}
 import org.scalactic.Prettifier.default
 import pages.Page
-import pages.add.trust.{TrustAddressYesNoPage, TrustNamePage}
+import pages.add.trust.*
 
 class TrustNavigatorSpec extends SpecBase {
 
@@ -31,10 +31,11 @@ class TrustNavigatorSpec extends SpecBase {
 
     "in Normal mode" - {
 
-      "must go from a page that doesn't exist in the route map to Index" in {
+      "must go from TrustEmailAddressPage to TrustUtrYesNoController" in {
+        val ua = emptyUserAnswers.set(TrustEmailAddressPage, "test@test.com").success.value
 
-        case object UnknownPage extends Page
-        navigator.nextPage(UnknownPage, NormalMode, UserAnswers("id")) mustBe routes.IndexController.onPageLoad()
+        navigator.nextPage(TrustEmailAddressPage, NormalMode, ua) mustBe
+          controllers.add.trust.routes.TrustUtrYesNoController.onPageLoad(NormalMode)
       }
 
       "must go from TrustNamePage to TrustAddressYesNoPage" in {
@@ -49,10 +50,23 @@ class TrustNavigatorSpec extends SpecBase {
           UserAnswers("id")
         ) mustBe controllers.add.trust.routes.TrustAddressController.onPageLoad(NormalMode)
       }
+      
+      "must go from a page that doesn't exist in the route map to Index" in {
+
+        case object UnknownPage extends Page
+        navigator.nextPage(UnknownPage, NormalMode, UserAnswers("id")) mustBe routes.IndexController.onPageLoad()
+      }
 
     }
 
     "in Check mode" - {
+
+      "must go from TrustEmailAddressPage to TrustCheckYourAnswers in CheckMode" in {
+        val ua = emptyUserAnswers.set(TrustEmailAddressPage, "test@test.com").success.value
+
+        navigator.nextPage(TrustEmailAddressPage, CheckMode, ua) mustBe
+          controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
+      }
 
       "must go from TrustNamePage to TrustCheckYourAnswers" in {
         navigator.nextPage(TrustNamePage, CheckMode, UserAnswers("id")) mustBe
