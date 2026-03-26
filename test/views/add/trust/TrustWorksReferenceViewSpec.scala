@@ -34,7 +34,7 @@ class TrustWorksReferenceViewSpec extends AnyWordSpec with Matchers with GuiceOn
   "TrustWorksReferenceView" should {
 
     "render the page with title, heading, input and submit button" in new Setup {
-      val trustName                 = "Test Trust"
+      val trustName                   = "Test Trust"
       val html: HtmlFormat.Appendable = view(form, NormalMode, trustName)
       val doc                         = org.jsoup.Jsoup.parse(html.toString())
 
@@ -57,8 +57,8 @@ class TrustWorksReferenceViewSpec extends AnyWordSpec with Matchers with GuiceOn
         form.withError("value", "trustWorksReference.error.required")
 
       val trustName = "Test Trust"
-      val html        = view(errorForm, NormalMode, trustName)
-      val doc         = org.jsoup.Jsoup.parse(html.toString())
+      val html      = view(errorForm, NormalMode, trustName)
+      val doc       = org.jsoup.Jsoup.parse(html.toString())
 
       val summary = doc.select(".govuk-error-summary")
       summary.text() must include(messages("trustWorksReference.error.required"))
