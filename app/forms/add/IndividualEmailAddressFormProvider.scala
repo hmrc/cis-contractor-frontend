@@ -29,7 +29,7 @@ class IndividualEmailAddressFormProvider @Inject() extends Mappings {
     Form(
       "value" -> text("individualEmailAddress.error.required")
         .transform(
-          _.trim.toUpperCase.replaceAll("\\s+", " "),
+          _.trim.replaceAll("\\s+", " "),
           identity
         )
         .verifying(
