@@ -1,4 +1,4 @@
-# Routes
+# microservice specific routes
 
 # Infrastructure
 ->   /hmrc-frontend    hmrcfrontend.Routes
@@ -315,10 +315,10 @@ POST  /trustEmailAddress               controllers.add.trust.TrustEmailAddressCo
 GET   /changeTrustEmailAddress         controllers.add.trust.TrustEmailAddressController.onPageLoad(mode: Mode = CheckMode)
 POST  /changeTrustEmailAddress         controllers.add.trust.TrustEmailAddressController.onSubmit(mode: Mode = CheckMode)
 
-GET   /trustPhoneNumber                controllers.add.trust.TrustPhoneNumberController.onPageLoad(mode: Mode = NormalMode)
-POST  /trustPhoneNumber                controllers.add.trust.TrustPhoneNumberController.onSubmit(mode: Mode = NormalMode)
-GET   /changeTrustPhoneNumber          controllers.add.trust.TrustPhoneNumberController.onPageLoad(mode: Mode = CheckMode)
-POST  /changeTrustPhoneNumber          controllers.add.trust.TrustPhoneNumberController.onSubmit(mode: Mode = CheckMode)
+GET   /add/trust/phone-number          controllers.add.trust.TrustPhoneNumberController.onPageLoad(mode: Mode = NormalMode)
+POST  /add/trust/phone-number          controllers.add.trust.TrustPhoneNumberController.onSubmit(mode: Mode = NormalMode)
+GET   /add/trust/change-phone-number   controllers.add.trust.TrustPhoneNumberController.onPageLoad(mode: Mode = CheckMode)
+POST  /add/trust/change-phone-number   controllers.add.trust.TrustPhoneNumberController.onSubmit(mode: Mode = CheckMode)
 
 GET   /trustMobileNumber               controllers.add.trust.TrustMobileNumberController.onPageLoad(mode: Mode = NormalMode)
 POST  /trustMobileNumber               controllers.add.trust.TrustMobileNumberController.onSubmit(mode: Mode = NormalMode)
