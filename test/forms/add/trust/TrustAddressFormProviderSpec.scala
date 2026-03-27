@@ -238,12 +238,25 @@ class TrustAddressFormProviderSpec extends StringFieldBehaviours {
       result.errors.exists(_.message == invalidKey) mustBe true
     }
 
-    "must fail when first character is not a letter" in {
+    "must bind valid data when first character is a digit" in {
       val result = form.bind(
         Map(
           "addressLine1" -> "A Street",
           "addressLine2" -> "B Street",
           fieldName      -> "1C Town",
+          "postalCode"   -> "W1A 0AX",
+          "country"      -> "UK"
+        )
+      )
+      result.errors mustBe empty
+    }
+
+    "must fail when first character is not a letter or digit" in {
+      val result = form.bind(
+        Map(
+          "addressLine1" -> "A Street",
+          "addressLine2" -> "B Street",
+          fieldName      -> "!C Town",
           "postalCode"   -> "W1A 0AX",
           "country"      -> "UK"
         )

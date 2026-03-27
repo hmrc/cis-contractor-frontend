@@ -67,7 +67,7 @@ class PartnershipAddressFormProvider @Inject() extends Mappings {
               maxLength(Constants.MaxLength35, "partnershipAddress.error.addressLine3.length"),
               regexp(Validation.addressRegex, "partnershipAddress.error.addressLine3.invalidCharacters"),
               regexp(
-                Validation.firstCharLetterRegex,
+                Validation.firstCharLetterOrDigitRegex,
                 "partnershipAddress.error.addressLine3.firstCharMustBeLetterOrNumber"
               )
             )
@@ -81,7 +81,7 @@ class PartnershipAddressFormProvider @Inject() extends Mappings {
                 maxLength(Constants.MaxLength35, "partnershipAddress.error.addressLine4.length"),
                 regexp(Validation.addressRegex, "partnershipAddress.error.addressLine4.invalidCharacters"),
                 regexp(
-                  Validation.firstCharLetterRegex,
+                  Validation.firstCharLetterOrDigitRegex,
                   "partnershipAddress.error.addressLine4.firstCharMustBeLetterOrNumber"
                 )
               )

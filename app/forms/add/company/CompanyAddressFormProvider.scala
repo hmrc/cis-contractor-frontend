@@ -66,7 +66,10 @@ class CompanyAddressFormProvider @Inject() extends Mappings {
             firstError(
               maxLength(Constants.MaxLength35, "companyAddress.error.addressLine3.length"),
               regexp(Validation.addressRegex, "companyAddress.error.addressLine3.invalidCharacters"),
-              regexp(Validation.firstCharLetterRegex, "companyAddress.error.addressLine3.firstCharMustBeLetterOrNumber")
+              regexp(
+                Validation.firstCharLetterOrDigitRegex,
+                "companyAddress.error.addressLine3.firstCharMustBeLetterOrNumber"
+              )
             )
           ),
       "addressLine4" ->
@@ -78,7 +81,7 @@ class CompanyAddressFormProvider @Inject() extends Mappings {
                 maxLength(Constants.MaxLength35, "companyAddress.error.addressLine4.length"),
                 regexp(Validation.addressRegex, "companyAddress.error.addressLine4.invalidCharacters"),
                 regexp(
-                  Validation.firstCharLetterRegex,
+                  Validation.firstCharLetterOrDigitRegex,
                   "companyAddress.error.addressLine4.firstCharMustBeLetterOrNumber"
                 )
               )
