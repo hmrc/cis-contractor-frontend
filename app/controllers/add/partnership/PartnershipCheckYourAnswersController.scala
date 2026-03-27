@@ -97,6 +97,7 @@ class PartnershipCheckYourAnswersController @Inject() (
       if (request.userAnswers.get(CheckYourAnswersSubmittedPage).contains(true)) {
         Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
       } else {
+
         ValidatedPartnership.build(request.userAnswers) match {
 
           case Right(_) =>
@@ -106,20 +107,20 @@ class PartnershipCheckYourAnswersController @Inject() (
                 Future
                   .fromTry(request.userAnswers.set(CheckYourAnswersSubmittedPage, true))
                   .flatMap(updated => sessionRepository.set(updated).map(_ => ()))
-                  .map(_ =>
-                    Redirect(controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad())
-                  )
+                  .map { _ =>
+                    Redirect(controllers.add.partnership.routes.SubcontractorAddedController.onPageLoad())
+                  }
               }
               .recover { case t =>
                 logger.error(
-                  "[CheckYourAnswersController.onSubmit] Failed to create/update partnership subcontractor",
+                  "[PartnershipCheckYourAnswersController.onSubmit] Failed to create/update subcontractor",
                   t
                 )
                 Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
               }
 
           case Left(error) =>
-            logger.error(s"[CheckYourAnswersController.onSubmit] Validation failed: $error")
+            logger.error(s"[PartnershipCheckYourAnswersController.onSubmit] Validation failed: $error")
             Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
         }
       }

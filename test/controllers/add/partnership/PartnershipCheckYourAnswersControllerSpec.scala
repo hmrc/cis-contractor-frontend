@@ -751,7 +751,7 @@ class PartnershipCheckYourAnswersControllerSpec extends SpecBase {
         status(result) mustEqual SEE_OTHER
         redirectLocation(
           result
-        ).value mustEqual controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad().url
+        ).value mustEqual controllers.add.partnership.routes.SubcontractorAddedController.onPageLoad().url
       }
 
       verify(mockSubcontractorService).createAndUpdateSubcontractor(any[UserAnswers])(any[HeaderCarrier])
@@ -850,7 +850,8 @@ class PartnershipCheckYourAnswersControllerSpec extends SpecBase {
         .build()
 
     running(application) {
-      val request = FakeRequest(POST, controllers.add.routes.CheckYourAnswersController.onSubmit().url)
+      val request =
+        FakeRequest(POST, controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onSubmit().url)
       val result  = route(application, request).value
 
       status(result) mustEqual SEE_OTHER

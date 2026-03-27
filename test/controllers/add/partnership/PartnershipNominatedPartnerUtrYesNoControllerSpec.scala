@@ -113,7 +113,7 @@ class PartnershipNominatedPartnerUtrYesNoControllerSpec extends SpecBase with Mo
         status(result) mustEqual SEE_OTHER
         redirectLocation(
           result
-        ).value mustEqual controllers.add.partnership.routes.PartnershipNominatedPartnerUtrYesNoController
+        ).value mustEqual controllers.add.partnership.routes.PartnershipNominatedPartnerUtrController
           .onPageLoad(NormalMode)
           .url
       }
@@ -142,7 +142,7 @@ class PartnershipNominatedPartnerUtrYesNoControllerSpec extends SpecBase with Mo
         status(result) mustEqual SEE_OTHER
         redirectLocation(
           result
-        ).value mustEqual controllers.add.partnership.routes.PartnershipNominatedPartnerUtrYesNoController
+        ).value mustEqual controllers.add.partnership.routes.PartnershipNominatedPartnerNinoYesNoController
           .onPageLoad(NormalMode)
           .url
       }
