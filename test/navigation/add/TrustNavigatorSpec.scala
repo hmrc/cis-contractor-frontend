@@ -23,13 +23,12 @@ import models.{CheckMode, NormalMode, UserAnswers}
 import org.scalactic.Prettifier.default
 import pages.Page
 import pages.add.trust.*
+
 class TrustNavigatorSpec extends SpecBase {
 
-  val navigator = new TrustNavigator
-
+  val navigator                    = new TrustNavigator
   private lazy val journeyRecovery = routes.JourneyRecoveryController.onPageLoad()
-  private lazy val trustCYA        =
-    controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
+  private lazy val trustCYA        = controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
 
   "TrustNavigator" - {
 
@@ -40,6 +39,40 @@ class TrustNavigatorSpec extends SpecBase {
         case object UnknownPage extends Page
         navigator.nextPage(UnknownPage, NormalMode, UserAnswers("id")) mustBe routes.IndexController.onPageLoad()
 
+      }
+
+      "must go from TrustNamePage to TrustAddressYesNoPage" in {
+        navigator.nextPage(TrustNamePage, NormalMode, UserAnswers("id")) mustBe
+          controllers.add.trust.routes.TrustAddressYesNoController.onPageLoad(NormalMode)
+      }
+
+      "must go from a TrustAddressYesNoPage to TrustAddressPage when true" in {
+        navigator.nextPage(
+          TrustAddressYesNoPage,
+          NormalMode,
+          emptyUserAnswers.setOrException(TrustAddressYesNoPage, true)
+        ) mustBe controllers.add.trust.routes.TrustAddressController.onPageLoad(NormalMode)
+      }
+
+      "must go from a TrustAddressYesNoPage to TrustContactOptions when false" in {
+        navigator.nextPage(
+          TrustAddressYesNoPage,
+          NormalMode,
+          emptyUserAnswers.setOrException(TrustAddressYesNoPage, false)
+        ) mustBe controllers.add.trust.routes.TrustContactOptionsController.onPageLoad(NormalMode)
+      }
+
+      "must go from a TrustAddressYesNoPage to journey recovery when incomplete info provided" in {
+        navigator.nextPage(
+          TrustAddressYesNoPage,
+          NormalMode,
+          emptyUserAnswers
+        ) mustBe journeyRecovery
+      }
+
+      "must go from TrustAddressPage to TrustContactOptionsController" in {
+        navigator.nextPage(TrustAddressPage, NormalMode, UserAnswers("id")) mustBe
+          controllers.add.trust.routes.TrustContactOptionsController.onPageLoad(NormalMode)
       }
 
       "must go from TrustContactOptionsPage" - {
@@ -96,19 +129,6 @@ class TrustNavigatorSpec extends SpecBase {
         }
       }
 
-      "must go from TrustNamePage to TrustAddressYesNoPage" in {
-        navigator.nextPage(TrustNamePage, NormalMode, UserAnswers("id")) mustBe
-          controllers.add.trust.routes.TrustAddressYesNoController.onPageLoad(NormalMode)
-      }
-
-      "must go from a TrustAddressYesNoPage to TrustAddressPage" in {
-        navigator.nextPage(
-          TrustAddressYesNoPage,
-          NormalMode,
-          UserAnswers("id")
-        ) mustBe controllers.add.trust.routes.TrustAddressController.onPageLoad(NormalMode)
-      }
-
     }
 
     "in Check mode" - {
@@ -116,6 +136,38 @@ class TrustNavigatorSpec extends SpecBase {
       "must go from TrustNamePage to TrustCheckYourAnswers" in {
         navigator.nextPage(TrustNamePage, CheckMode, UserAnswers("id")) mustBe
           controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
+      }
+
+//      "must go from TrustAddressYesNoPage to TrustAddressPage in CheckMode" in {
+//        navigator.nextPage(
+//          TrustAddressYesNoPage,
+//          CheckMode,
+//          emptyUserAnswers
+//        ) mustBe controllers.add.trust.routes.TrustAddressController.onPageLoad(CheckMode)
+//      }
+
+      "must go from a SubAddressYesNoPage to next page when true" in {
+        navigator.nextPage(
+          TrustAddressYesNoPage,
+          CheckMode,
+          emptyUserAnswers.setOrException(TrustAddressYesNoPage, true)
+        ) mustBe controllers.add.trust.routes.TrustAddressController.onPageLoad(CheckMode)
+      }
+
+      "must go from a TrustAddressYesNoPage to CYA page when false" in {
+        navigator.nextPage(
+          TrustAddressYesNoPage,
+          CheckMode,
+          emptyUserAnswers.setOrException(TrustAddressYesNoPage, false)
+        ) mustBe trustCYA
+      }
+
+      "must go from a TrustAddressYesNoPage to journey recovery page when incomplete info provided" in {
+        navigator.nextPage(
+          TrustAddressYesNoPage,
+          CheckMode,
+          emptyUserAnswers
+        ) mustBe journeyRecovery
       }
 
       "must go from a page that doesn't exist in the edit route map to TrustCheckYourAnswers" in {
@@ -129,13 +181,11 @@ class TrustNavigatorSpec extends SpecBase {
           .onPageLoad()
       }
 
-      "must go from TrustAddressYesNoPage to TrustAddressPage in CheckMode" in {
-        navigator.nextPage(
-          TrustAddressYesNoPage,
-          CheckMode,
-          emptyUserAnswers
-        ) mustBe controllers.add.trust.routes.TrustAddressController.onPageLoad(CheckMode)
+      "must go from TrustAddressPage to TrustCheckYourAnswersController" in {
+        navigator.nextPage(TrustAddressPage, CheckMode, UserAnswers("id")) mustBe
+          controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
       }
+
       "must go from TrustContactOptionsPage" - {
 
         "to itself when Email is selected" in {

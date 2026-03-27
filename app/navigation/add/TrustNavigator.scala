@@ -38,17 +38,36 @@ class TrustNavigator @Inject() () extends NavigatorForJourney {
 
   private val normalRoutes: Page => UserAnswers => Call = {
     case TrustNamePage           => _ => controllers.add.trust.routes.TrustAddressYesNoController.onPageLoad(NormalMode)
-    case TrustAddressYesNoPage   => _ => controllers.add.trust.routes.TrustAddressController.onPageLoad(NormalMode)
+    case TrustAddressYesNoPage   => userAnswers => navigatorFromTrustAddressYesNoPage(NormalMode)(userAnswers)
+    case TrustAddressPage        => _ => controllers.add.trust.routes.TrustContactOptionsController.onPageLoad(NormalMode)
     case TrustContactOptionsPage => userAnswers => navigatorFromTrustContactOptionsPage(NormalMode)(userAnswers)
     case _                       => _ => routes.IndexController.onPageLoad()
   }
 
   private val checkRouteMap: Page => UserAnswers => Call = {
     case TrustNamePage           => _ => controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
-    case TrustAddressYesNoPage   => _ => controllers.add.trust.routes.TrustAddressController.onPageLoad(CheckMode)
+    case TrustAddressYesNoPage   => navigatorFromTrustAddressYesNoPage(CheckMode)(_)
+    case TrustAddressPage        => _ => controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
     case TrustContactOptionsPage => userAnswers => navigatorFromTrustContactOptionsPage(CheckMode)(userAnswers)
     case _                       => _ => controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
   }
+
+  private def navigatorFromTrustAddressYesNoPage(mode: Mode)(ua: UserAnswers): Call =
+    (ua.get(TrustAddressYesNoPage), mode) match {
+      case (Some(true), NormalMode)  =>
+        controllers.add.trust.routes.TrustAddressController.onPageLoad(NormalMode)
+      case (Some(false), NormalMode) =>
+        controllers.add.trust.routes.TrustContactOptionsController.onPageLoad(NormalMode)
+      case (Some(true), CheckMode)   =>
+        ua.get(TrustAddressPage)
+          .fold(controllers.add.trust.routes.TrustAddressController.onPageLoad(CheckMode)) { _ =>
+            controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
+          }
+      case (Some(false), CheckMode)  =>
+        controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
+      case _                         =>
+        routes.JourneyRecoveryController.onPageLoad()
+    }
 
   private def navigatorFromTrustContactOptionsPage(mode: Mode)(userAnswers: UserAnswers): Call =
     (userAnswers.get(TrustContactOptionsPage), mode) match {
