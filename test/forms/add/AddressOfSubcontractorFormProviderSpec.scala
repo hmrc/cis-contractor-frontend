@@ -169,11 +169,25 @@ class AddressOfSubcontractorFormProviderSpec extends StringFieldBehaviours {
       result.errors.exists(_.message == invalidKey) mustBe true
     }
 
-    "must fail when first character is not a letter (when provided)" in {
+    "must bind valid data when first character is a digit (when provided)" in {
       val result = form.bind(
         Map(
           "addressLine1" -> "A Street",
           fieldName      -> "1B Street",
+          "addressLine3" -> "C Town",
+          "postalCode"   -> "EC1A 1BB",
+          "country"      -> "UK"
+        )
+      )
+
+      result.errors mustBe empty
+    }
+
+    "must fail when first character is not a letter or digit (when provided)" in {
+      val result = form.bind(
+        Map(
+          "addressLine1" -> "A Street",
+          fieldName      -> "!B Street",
           "addressLine3" -> "C Town",
           "postalCode"   -> "EC1A 1BB",
           "country"      -> "UK"

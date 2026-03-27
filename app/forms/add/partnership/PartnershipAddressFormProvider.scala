@@ -53,7 +53,7 @@ class PartnershipAddressFormProvider @Inject() extends Mappings {
                   "partnershipAddress.error.addressLine2.invalidCharacters"
                 ),
                 regexp(
-                  Validation.firstCharLetterRegex,
+                  Validation.firstCharLetterOrDigitRegex,
                   "partnershipAddress.error.addressLine2.firstCharMustBeLetterOrNumber"
                 )
               )

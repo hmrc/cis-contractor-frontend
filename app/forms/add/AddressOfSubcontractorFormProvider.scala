@@ -53,7 +53,7 @@ class AddressOfSubcontractorFormProvider @Inject() extends Mappings {
                   "addressOfSubcontractor.error.addressLine2.invalidCharacters"
                 ),
                 regexp(
-                  Validation.firstCharLetterRegex,
+                  Validation.firstCharLetterOrDigitRegex,
                   "addressOfSubcontractor.error.addressLine2.firstCharMustBeLetterOrNumber"
                 )
               )
