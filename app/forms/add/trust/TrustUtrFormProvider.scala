@@ -25,7 +25,10 @@ class TrustUtrFormProvider @Inject() extends Mappings {
 
   def apply(): Form[String] =
     Form(
-      "value" -> text("trustUtr.error.required")
-        .verifying(maxLength(10, "trustUtr.error.length"))
+      "value" -> utr(
+        requiredKey = "trustUtr.error.required",
+        invalidKey = "trustUtr.error.invalid",
+        lengthKey = "trustUtr.error.length"
+      )
     )
 }
