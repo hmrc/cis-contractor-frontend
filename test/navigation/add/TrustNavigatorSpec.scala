@@ -138,14 +138,6 @@ class TrustNavigatorSpec extends SpecBase {
           controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
       }
 
-//      "must go from TrustAddressYesNoPage to TrustAddressPage in CheckMode" in {
-//        navigator.nextPage(
-//          TrustAddressYesNoPage,
-//          CheckMode,
-//          emptyUserAnswers
-//        ) mustBe controllers.add.trust.routes.TrustAddressController.onPageLoad(CheckMode)
-//      }
-
       "must go from a SubAddressYesNoPage to next page when true" in {
         navigator.nextPage(
           TrustAddressYesNoPage,
