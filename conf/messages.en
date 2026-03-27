@@ -714,12 +714,17 @@ trustUtrYesNo.checkYourAnswersLabel                            =  trustUtrYesNo
 trustUtrYesNo.error.required                                   =  Select yes if trustUtrYesNo
 trustUtrYesNo.change.hidden                                    =  TrustUtrYesNo
 
-trustUtr.title                                                 =  trustUtr
-trustUtr.heading                                               =  trustUtr
-trustUtr.checkYourAnswersLabel                                 =  trustUtr
-trustUtr.error.required                                        =  Enter trustUtr
-trustUtr.error.length                                          =  TrustUtr must be 10 characters or less
-trustUtr.change.hidden                                         =  TrustUtr
+trustUtr.title                                                 =  Trust Unique Taxpayer Reference (UTR)
+trustUtr.heading                                               =  What is the UTR for {0}?
+trustUtr.p1                                                    =  The UTR will be on tax returns and other documents from HMRC.
+trustUtr.label                                                 =  What is the Self Assessment UTR for {0}?
+trustUtr.hint                                                  =  A UTR is a 10 digit number
+trustUtr.checkYourAnswersLabel                                 =  Trust UTR
+trustUtr.error.required                                        =  Enter a valid Unique Taxpayer Reference (UTR)
+trustUtr.error.length                                          =  Enter a valid Unique Taxpayer Reference (UTR)
+trustUtr.error.invalid                                         =  Enter a valid Unique Taxpayer Reference (UTR)
+trustUtr.error.duplicate                                       =  You have already used this Unique Taxpayer Reference (UTR) for an existing subcontractor
+trustUtr.change.hidden                                         =  trust UTR
 
 trustWorksReferenceYesNo.title                                 =  trustWorksReferenceYesNo
 trustWorksReferenceYesNo.heading                               =  trustWorksReferenceYesNo
