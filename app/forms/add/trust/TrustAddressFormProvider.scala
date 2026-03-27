@@ -47,7 +47,10 @@ class TrustAddressFormProvider @Inject() extends Mappings {
           firstError(
             maxLength(Constants.MaxLength35, "trustAddress.error.addressLine2.length"),
             regexp(Validation.addressRegex, "trustAddress.error.addressLine2.invalidCharacters"),
-            regexp(Validation.firstCharLetterRegex, "trustAddress.error.addressLine2.firstCharMustBeLetterOrNumber")
+            regexp(
+              Validation.firstCharLetterOrDigitRegex,
+              "trustAddress.error.addressLine2.firstCharMustBeLetterOrNumber"
+            )
           )
         )
     )
@@ -59,7 +62,10 @@ class TrustAddressFormProvider @Inject() extends Mappings {
         firstError(
           maxLength(Constants.MaxLength35, "trustAddress.error.addressLine3.length"),
           regexp(Validation.addressRegex, "trustAddress.error.addressLine3.invalidCharacters"),
-          regexp(Validation.firstCharLetterRegex, "trustAddress.error.addressLine3.firstCharMustBeLetterOrNumber")
+          regexp(
+            Validation.firstCharLetterOrDigitRegex,
+            "trustAddress.error.addressLine3.firstCharMustBeLetterOrNumber"
+          )
         )
       )
 
@@ -71,7 +77,10 @@ class TrustAddressFormProvider @Inject() extends Mappings {
           firstError(
             maxLength(Constants.MaxLength35, "trustAddress.error.addressLine4.length"),
             regexp(Validation.addressRegex, "trustAddress.error.addressLine4.invalidCharacters"),
-            regexp(Validation.firstCharLetterRegex, "trustAddress.error.addressLine4.firstCharMustBeLetterOrNumber")
+            regexp(
+              Validation.firstCharLetterOrDigitRegex,
+              "trustAddress.error.addressLine4.firstCharMustBeLetterOrNumber"
+            )
           )
         )
     )
