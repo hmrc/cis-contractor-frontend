@@ -16,15 +16,17 @@
 
 package controllers.add.trust
 
+import config.FrontendAppConfig
 import controllers.actions.*
 import forms.add.trust.TrustAddressFormProvider
 import models.Mode
 import navigation.Navigator
-import pages.add.trust.TrustAddressPage
+import pages.add.trust.{TrustAddressPage, TrustNamePage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import utils.CountryOptions
 import views.html.add.trust.TrustAddressView
 
 import javax.inject.Inject
@@ -38,35 +40,46 @@ class TrustAddressController @Inject() (
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   formProvider: TrustAddressFormProvider,
+  countryOptions: CountryOptions,
   val controllerComponents: MessagesControllerComponents,
   view: TrustAddressView
-)(implicit ec: ExecutionContext)
+)(implicit ec: ExecutionContext, appConfig: FrontendAppConfig)
     extends FrontendBaseController
     with I18nSupport {
 
-  val form = formProvider()
+  private val form = formProvider()
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
+    request.userAnswers
+      .get(TrustNamePage)
+      .map { trustName =>
+        val preparedForm = request.userAnswers.get(TrustAddressPage) match {
+          case None        => form
+          case Some(value) => form.fill(value)
+        }
 
-    val preparedForm = request.userAnswers.get(TrustAddressPage) match {
-      case None        => form
-      case Some(value) => form.fill(value)
-    }
-
-    Ok(view(preparedForm, mode))
+        Ok(view(preparedForm, mode, trustName, countryOptions.options()))
+      }
+      .getOrElse(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
-      form
-        .bindFromRequest()
-        .fold(
-          formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
-          value =>
-            for {
-              updatedAnswers <- Future.fromTry(request.userAnswers.set(TrustAddressPage, value))
-              _              <- sessionRepository.set(updatedAnswers)
-            } yield Redirect(navigator.nextPage(TrustAddressPage, mode, updatedAnswers))
-        )
+      request.userAnswers
+        .get(TrustNamePage)
+        .map { trustName =>
+          form
+            .bindFromRequest()
+            .fold(
+              formWithErrors =>
+                Future.successful(BadRequest(view(formWithErrors, mode, trustName, countryOptions.options()))),
+              value =>
+                for {
+                  updatedAnswers <- Future.fromTry(request.userAnswers.set(TrustAddressPage, value))
+                  _              <- sessionRepository.set(updatedAnswers)
+                } yield Redirect(navigator.nextPage(TrustAddressPage, mode, updatedAnswers))
+            )
+        }
+        .getOrElse(Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())))
   }
 }

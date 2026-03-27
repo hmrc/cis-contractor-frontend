@@ -184,18 +184,39 @@ class IndividualNavigator @Inject() () extends NavigatorForJourney {
 
   private def navigatorFromIndividualChooseContactDetailsPage(mode: Mode)(userAnswers: UserAnswers): Call =
     (userAnswers.get(IndividualChooseContactDetailsPage), mode) match {
-      case (Some(Email), _)             =>
-        controllers.add.routes.IndividualEmailAddressController.onPageLoad(mode)
-      case (Some(Phone), _)             =>
-        controllers.add.routes.IndividualPhoneNumberController.onPageLoad(mode)
-      case (Some(Mobile), _)            =>
-        controllers.add.routes.IndividualMobileNumberController.onPageLoad(mode)
+
+      case (Some(Email), NormalMode) =>
+        controllers.add.routes.IndividualEmailAddressController.onPageLoad(NormalMode)
+      case (Some(Email), CheckMode)  =>
+        userAnswers
+          .get(IndividualEmailAddressPage)
+          .fold(controllers.add.routes.IndividualEmailAddressController.onPageLoad(CheckMode)) { _ =>
+            controllers.add.routes.CheckYourAnswersController.onPageLoad()
+          }
+
+      case (Some(Phone), NormalMode) =>
+        controllers.add.routes.IndividualPhoneNumberController.onPageLoad(NormalMode)
+      case (Some(Phone), CheckMode)  =>
+        userAnswers
+          .get(IndividualPhoneNumberPage)
+          .fold(controllers.add.routes.IndividualPhoneNumberController.onPageLoad(CheckMode)) { _ =>
+            controllers.add.routes.CheckYourAnswersController.onPageLoad()
+          }
+
+      case (Some(Mobile), NormalMode) =>
+        controllers.add.routes.IndividualMobileNumberController.onPageLoad(NormalMode)
+      case (Some(Mobile), CheckMode)  =>
+        userAnswers
+          .get(IndividualMobileNumberPage)
+          .fold(controllers.add.routes.IndividualMobileNumberController.onPageLoad(CheckMode)) { _ =>
+            controllers.add.routes.CheckYourAnswersController.onPageLoad()
+          }
+
       case (Some(NoDetails), CheckMode) =>
         controllers.add.routes.CheckYourAnswersController.onPageLoad()
-      case (Some(_), _)                 =>
-        controllers.add.routes.UniqueTaxpayerReferenceYesNoController.onPageLoad(mode)
-      case (_, CheckMode)               => controllers.add.routes.CheckYourAnswersController.onPageLoad()
-      case _                            => routes.JourneyRecoveryController.onPageLoad()
-    }
 
+      case (Some(_), _) =>
+        controllers.add.routes.UniqueTaxpayerReferenceYesNoController.onPageLoad(mode)
+      case _            => routes.JourneyRecoveryController.onPageLoad()
+    }
 }
