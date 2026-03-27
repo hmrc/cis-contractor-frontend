@@ -71,26 +71,29 @@ class TrustNavigator @Inject() () extends NavigatorForJourney {
 
   private def navigatorFromTrustContactOptionsPage(mode: Mode)(userAnswers: UserAnswers): Call =
     (userAnswers.get(TrustContactOptionsPage), mode) match {
-      case (Some(Email), NormalMode)  =>
+      case (Some(Email), NormalMode) =>
         controllers.add.trust.routes.TrustEmailAddressController.onPageLoad(NormalMode)
-      case (Some(Email), CheckMode)             =>
-        userAnswers.get(TrustEmailAddressPage)
+      case (Some(Email), CheckMode)  =>
+        userAnswers
+          .get(TrustEmailAddressPage)
           .fold(controllers.add.trust.routes.TrustEmailAddressController.onPageLoad(CheckMode)) { _ =>
             controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
           }
 
-      case (Some(Phone), NormalMode)  =>
+      case (Some(Phone), NormalMode) =>
         controllers.add.trust.routes.TrustPhoneNumberController.onPageLoad(NormalMode)
-      case (Some(Phone), CheckMode)             =>
-        userAnswers.get(TrustPhoneNumberPage)
+      case (Some(Phone), CheckMode)  =>
+        userAnswers
+          .get(TrustPhoneNumberPage)
           .fold(controllers.add.trust.routes.TrustPhoneNumberController.onPageLoad(CheckMode)) { _ =>
             controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
           }
 
       case (Some(Mobile), NormalMode) =>
         controllers.add.trust.routes.TrustMobileNumberController.onPageLoad(NormalMode)
-      case (Some(Mobile), CheckMode)             =>
-        userAnswers.get(TrustMobileNumberPage)
+      case (Some(Mobile), CheckMode)  =>
+        userAnswers
+          .get(TrustMobileNumberPage)
           .fold(controllers.add.trust.routes.TrustMobileNumberController.onPageLoad(CheckMode)) { _ =>
             controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
           }
@@ -98,10 +101,10 @@ class TrustNavigator @Inject() () extends NavigatorForJourney {
       case (Some(NoDetails), CheckMode) =>
         controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
 
-      case (Some(_), _)      =>
+      case (Some(_), _) =>
         controllers.add.trust.routes.TrustUtrYesNoController.onPageLoad(mode)
 
-      case _                 => controllers.routes.JourneyRecoveryController.onPageLoad()
+      case _ => controllers.routes.JourneyRecoveryController.onPageLoad()
     }
 
 }
