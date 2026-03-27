@@ -117,7 +117,7 @@ class TrustNavigatorSpec extends SpecBase {
               TrustContactOptionsPage,
               ContactOptions.NoDetails
             )
-          ) mustBe controllers.add.trust.routes.TrustContactOptionsController.onPageLoad(NormalMode)
+          ) mustBe controllers.add.trust.routes.TrustUtrYesNoController.onPageLoad(NormalMode)
         }
 
         "to JourneyRecoveryPage when answer is not present" in {
@@ -180,7 +180,7 @@ class TrustNavigatorSpec extends SpecBase {
 
       "must go from TrustContactOptionsPage" - {
 
-        "to itself when Email is selected" in {
+        "to TrustEmailAddressPage when EmailAddress is selected" in {
           navigator.nextPage(
             TrustContactOptionsPage,
             CheckMode,
@@ -191,7 +191,20 @@ class TrustNavigatorSpec extends SpecBase {
           ) mustBe controllers.add.trust.routes.TrustEmailAddressController.onPageLoad(CheckMode)
         }
 
-        "to itself when Phone is selected" in {
+        "to CYA page when Email option is not changed in CheckMode" in {
+          val answers =
+            emptyUserAnswers
+              .setOrException(TrustContactOptionsPage, ContactOptions.Email)
+              .setOrException(TrustEmailAddressPage, "test@test.com")
+
+          navigator.nextPage(
+            TrustContactOptionsPage,
+            CheckMode,
+            answers
+          ) mustBe controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
+        }
+
+        "to TrustPhoneNumberPage when PhoneOption is selected" in {
           navigator.nextPage(
             TrustContactOptionsPage,
             CheckMode,
@@ -202,7 +215,20 @@ class TrustNavigatorSpec extends SpecBase {
           ) mustBe controllers.add.trust.routes.TrustPhoneNumberController.onPageLoad(CheckMode)
         }
 
-        "to itself when Mobile is selected" in {
+        "to CYA page when Phone option is not changed in CheckMode" in {
+          val answers =
+            emptyUserAnswers
+              .setOrException(TrustContactOptionsPage, ContactOptions.Phone)
+              .setOrException(TrustPhoneNumberPage, "0987654333")
+
+          navigator.nextPage(
+            TrustContactOptionsPage,
+            CheckMode,
+            answers
+          ) mustBe controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
+        }
+
+        "to TrustMobileNumberPage when MobileOption is selected" in {
           navigator.nextPage(
             TrustContactOptionsPage,
             CheckMode,
@@ -213,6 +239,19 @@ class TrustNavigatorSpec extends SpecBase {
           ) mustBe controllers.add.trust.routes.TrustMobileNumberController.onPageLoad(CheckMode)
         }
 
+        "to CYA page when Mobile option is not changed in CheckMode" in {
+          val answers =
+            emptyUserAnswers
+              .setOrException(TrustContactOptionsPage, ContactOptions.Mobile)
+              .setOrException(TrustMobileNumberPage, "0987654499")
+
+          navigator.nextPage(
+            TrustContactOptionsPage,
+            CheckMode,
+            answers
+          ) mustBe controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
+        }
+
         "to itself when NoDetails is selected" in {
           navigator.nextPage(
             TrustContactOptionsPage,
@@ -221,7 +260,7 @@ class TrustNavigatorSpec extends SpecBase {
               TrustContactOptionsPage,
               ContactOptions.NoDetails
             )
-          ) mustBe controllers.add.trust.routes.TrustContactOptionsController.onPageLoad(CheckMode)
+          ) mustBe controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
         }
 
         "to TrustCheckYourAnswers when answer is not present" in {
@@ -229,7 +268,7 @@ class TrustNavigatorSpec extends SpecBase {
             TrustContactOptionsPage,
             CheckMode,
             emptyUserAnswers
-          ) mustBe trustCYA
+          ) mustBe journeyRecovery
         }
       }
 

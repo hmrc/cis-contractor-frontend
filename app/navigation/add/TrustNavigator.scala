@@ -17,7 +17,7 @@
 package navigation.add
 
 import controllers.routes
-import models.contact.ContactOptions.{Email, Mobile, Phone}
+import models.contact.ContactOptions.{Email, Mobile, NoDetails, Phone}
 import models.{CheckMode, Mode, NormalMode, UserAnswers}
 import navigation.NavigatorForJourney
 import pages.Page
@@ -71,16 +71,36 @@ class TrustNavigator @Inject() () extends NavigatorForJourney {
 
   private def navigatorFromTrustContactOptionsPage(mode: Mode)(userAnswers: UserAnswers): Call =
     (userAnswers.get(TrustContactOptionsPage), mode) match {
-      case (Some(Email), _)  =>
-        controllers.add.trust.routes.TrustEmailAddressController.onPageLoad(mode)
-      case (Some(Phone), _)  =>
-        controllers.add.trust.routes.TrustPhoneNumberController.onPageLoad(mode)
-      case (Some(Mobile), _) =>
-        controllers.add.trust.routes.TrustMobileNumberController.onPageLoad(mode)
-      case (Some(_), _)      =>
-        controllers.add.trust.routes.TrustContactOptionsController.onPageLoad(mode)
-      case (_, CheckMode)    =>
+      case (Some(Email), NormalMode)  =>
+        controllers.add.trust.routes.TrustEmailAddressController.onPageLoad(NormalMode)
+      case (Some(Email), CheckMode)             =>
+        userAnswers.get(TrustEmailAddressPage)
+          .fold(controllers.add.trust.routes.TrustEmailAddressController.onPageLoad(CheckMode)) { _ =>
+            controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
+          }
+
+      case (Some(Phone), NormalMode)  =>
+        controllers.add.trust.routes.TrustPhoneNumberController.onPageLoad(NormalMode)
+      case (Some(Phone), CheckMode)             =>
+        userAnswers.get(TrustPhoneNumberPage)
+          .fold(controllers.add.trust.routes.TrustPhoneNumberController.onPageLoad(CheckMode)) { _ =>
+            controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
+          }
+
+      case (Some(Mobile), NormalMode) =>
+        controllers.add.trust.routes.TrustMobileNumberController.onPageLoad(NormalMode)
+      case (Some(Mobile), CheckMode)             =>
+        userAnswers.get(TrustMobileNumberPage)
+          .fold(controllers.add.trust.routes.TrustMobileNumberController.onPageLoad(CheckMode)) { _ =>
+            controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
+          }
+
+      case (Some(NoDetails), CheckMode) =>
         controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
+
+      case (Some(_), _)      =>
+        controllers.add.trust.routes.TrustUtrYesNoController.onPageLoad(mode)
+
       case _                 => controllers.routes.JourneyRecoveryController.onPageLoad()
     }
 
