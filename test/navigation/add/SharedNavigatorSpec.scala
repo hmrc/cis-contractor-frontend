@@ -47,12 +47,12 @@ class SharedNavigatorSpec extends SpecBase {
         ) mustBe controllers.add.routes.SubTradingNameYesNoController.onPageLoad(NormalMode)
       }
 
-      "must go from a TypeOfSubcontractorPage to JourneyRecovery when Limitedcompany is selected" in {
+      "must go from a TypeOfSubcontractorPage to CompanyNameController when Limitedcompany is selected" in {
         navigator.nextPage(
           TypeOfSubcontractorPage,
           NormalMode,
           emptyUserAnswers.setOrException(TypeOfSubcontractorPage, TypeOfSubcontractor.Limitedcompany)
-        ) mustBe routes.JourneyRecoveryController.onPageLoad()
+        ) mustBe controllers.add.company.routes.CompanyNameController.onPageLoad(NormalMode)
       }
 
       "must go from a TypeOfSubcontractorPage to PartnershipNameController when Partnership is selected" in {

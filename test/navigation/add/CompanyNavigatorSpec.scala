@@ -27,7 +27,6 @@ class CompanyNavigatorSpec extends SpecBase {
 
   val navigator                    = new CompanyNavigator
   private lazy val journeyRecovery = routes.JourneyRecoveryController.onPageLoad()
-  private lazy val CYA             = controllers.add.routes.CheckYourAnswersController.onPageLoad()
   private lazy val CompanyCYA      = controllers.add.company.routes.CompanyCheckYourAnswersController.onPageLoad()
 
   "CompanyNavigator" - {
@@ -56,7 +55,7 @@ class CompanyNavigatorSpec extends SpecBase {
       }
 
       "must go from CompanyContactOptionsPage" - {
-        "to itself when EmailAddress is selected" in {
+        "to CompanyEmailAddressPage when EmailAddress is selected" in {
           navigator.nextPage(
             CompanyContactOptionsPage,
             NormalMode,
@@ -64,10 +63,10 @@ class CompanyNavigatorSpec extends SpecBase {
               CompanyContactOptionsPage,
               ContactOptions.Email
             )
-          ) mustBe controllers.add.company.routes.CompanyContactOptionsController.onPageLoad(NormalMode)
+          ) mustBe controllers.add.company.routes.CompanyEmailAddressController.onPageLoad(NormalMode)
         }
 
-        "to itself when PhoneNumber is selected" in {
+        "to CompanyPhoneNumberPage when PhoneNumber is selected" in {
           navigator.nextPage(
             CompanyContactOptionsPage,
             NormalMode,
@@ -75,10 +74,10 @@ class CompanyNavigatorSpec extends SpecBase {
               CompanyContactOptionsPage,
               ContactOptions.Phone
             )
-          ) mustBe controllers.add.company.routes.CompanyContactOptionsController.onPageLoad(NormalMode)
+          ) mustBe controllers.add.company.routes.CompanyPhoneNumberController.onPageLoad(NormalMode)
         }
 
-        "to itself when MobileNumber is selected" in {
+        "to CompanyMobileNumberPage when MobileNumber is selected" in {
           navigator.nextPage(
             CompanyContactOptionsPage,
             NormalMode,
@@ -86,10 +85,10 @@ class CompanyNavigatorSpec extends SpecBase {
               CompanyContactOptionsPage,
               ContactOptions.Mobile
             )
-          ) mustBe controllers.add.company.routes.CompanyContactOptionsController.onPageLoad(NormalMode)
+          ) mustBe controllers.add.company.routes.CompanyMobileNumberController.onPageLoad(NormalMode)
         }
 
-        "to itself when NoDetails is selected" in {
+        "to CompanyUtrYesNoPage when NoDetails is selected" in {
           navigator.nextPage(
             CompanyContactOptionsPage,
             NormalMode,
@@ -97,7 +96,7 @@ class CompanyNavigatorSpec extends SpecBase {
               CompanyContactOptionsPage,
               ContactOptions.NoDetails
             )
-          ) mustBe controllers.add.company.routes.CompanyContactOptionsController.onPageLoad(NormalMode)
+          ) mustBe controllers.add.company.routes.CompanyUtrYesNoController.onPageLoad(NormalMode)
         }
 
         "to JourneyRecoveryPage when answer is not present" in {
@@ -118,20 +117,20 @@ class CompanyNavigatorSpec extends SpecBase {
       }
 
       "must go from CompanyCrnYesNo" - {
-        "to next page when answer is Yes" in {
+        "to CompanyCrnPage when answer is Yes" in {
           navigator.nextPage(
             CompanyCrnYesNoPage,
             NormalMode,
             emptyUserAnswers.setOrException(CompanyCrnYesNoPage, true)
-          ) mustBe controllers.add.company.routes.CompanyCrnYesNoController.onPageLoad(NormalMode)
+          ) mustBe controllers.add.company.routes.CompanyCrnController.onPageLoad(NormalMode)
         }
 
-        "to next page when answer is No" in {
+        "to CompanyWorksReferenceYesNoPage when answer is No" in {
           navigator.nextPage(
             CompanyCrnYesNoPage,
             NormalMode,
             emptyUserAnswers.setOrException(CompanyCrnYesNoPage, false)
-          ) mustBe controllers.add.company.routes.CompanyCrnYesNoController.onPageLoad(NormalMode)
+          ) mustBe controllers.add.company.routes.CompanyWorksReferenceYesNoController.onPageLoad(NormalMode)
         }
 
         "to JourneyRecoveryPage when answer is not present" in {
@@ -143,12 +142,30 @@ class CompanyNavigatorSpec extends SpecBase {
         }
       }
 
-      "must go from a CompanyAddressYesNoPage to CompanyAddressYesNoPage" in {
-        navigator.nextPage(
-          CompanyAddressYesNoPage,
-          NormalMode,
-          UserAnswers("id")
-        ) mustBe controllers.add.company.routes.CompanyAddressYesNoController.onPageLoad(NormalMode)
+      "must go from CompanyAddressYesNoPage" - {
+        "to CompanyAddress page when answer is Yes" in {
+          navigator.nextPage(
+            CompanyAddressYesNoPage,
+            NormalMode,
+            emptyUserAnswers.setOrException(CompanyAddressYesNoPage, true)
+          ) mustBe controllers.add.company.routes.CompanyAddressController.onPageLoad(NormalMode)
+        }
+
+        "to CompanyContactOptions page when answer is No" in {
+          navigator.nextPage(
+            CompanyAddressYesNoPage,
+            NormalMode,
+            emptyUserAnswers.setOrException(CompanyAddressYesNoPage, false)
+          ) mustBe controllers.add.company.routes.CompanyContactOptionsController.onPageLoad(NormalMode)
+        }
+
+        "to JourneyRecoveryPage when answer is not present" in {
+          navigator.nextPage(
+            CompanyAddressYesNoPage,
+            NormalMode,
+            emptyUserAnswers
+          ) mustBe journeyRecovery
+        }
       }
 
       "must go from CompanyEmailAddressPage to CompanyEmailAddressController in NormalMode" in {
@@ -160,7 +177,7 @@ class CompanyNavigatorSpec extends SpecBase {
       }
 
       "must go from CompanyUtrYesNo" - {
-        "to next page when answer is Yes" in {
+        "to CompanyUtrPage when answer is Yes" in {
           navigator.nextPage(
             CompanyUtrYesNoPage,
             NormalMode,
@@ -169,7 +186,7 @@ class CompanyNavigatorSpec extends SpecBase {
             .onPageLoad(NormalMode)
         }
 
-        "to next page when answer is No" in {
+        "to CompanyCrnYesNoPage when answer is No" in {
           navigator.nextPage(
             CompanyUtrYesNoPage,
             NormalMode,
@@ -188,7 +205,7 @@ class CompanyNavigatorSpec extends SpecBase {
       }
 
       "must go from CompanyWorksReferenceYesNo" - {
-        "to next page when answer is Yes" in {
+        "to CompanyWorksReferencePage when answer is Yes" in {
           navigator.nextPage(
             CompanyWorksReferenceYesNoPage,
             NormalMode,
@@ -197,13 +214,12 @@ class CompanyNavigatorSpec extends SpecBase {
             .onPageLoad(NormalMode)
         }
 
-        "to next page when answer is No" in {
+        "to Company CYA when answer is No" in {
           navigator.nextPage(
             CompanyWorksReferenceYesNoPage,
             NormalMode,
             emptyUserAnswers.setOrException(CompanyWorksReferenceYesNoPage, false)
-          ) mustBe controllers.add.company.routes.CompanyCheckYourAnswersController
-            .onPageLoad()
+          ) mustBe CompanyCYA
         }
 
         "to JourneyRecoveryPage when answer is not present" in {
@@ -244,7 +260,7 @@ class CompanyNavigatorSpec extends SpecBase {
           CompanyWorksReferencePage,
           NormalMode,
           UserAnswers("id")
-        ) mustBe controllers.add.company.routes.CompanyCheckYourAnswersController.onPageLoad()
+        ) mustBe CompanyCYA
       }
 
     }
@@ -267,27 +283,27 @@ class CompanyNavigatorSpec extends SpecBase {
           CompanyNamePage,
           CheckMode,
           emptyUserAnswers
-        ) mustBe controllers.add.company.routes.CompanyCheckYourAnswersController.onPageLoad()
+        ) mustBe CompanyCYA
       }
 
-      "must go from CompanyAddressPage to CompanyAddressPage in CheckMode" in {
+      "must go from CompanyAddressPage to Company CYA in CheckMode" in {
         navigator.nextPage(
           CompanyAddressPage,
           CheckMode,
           emptyUserAnswers
-        ) mustBe controllers.add.company.routes.CompanyAddressController.onPageLoad(CheckMode)
+        ) mustBe CompanyCYA
       }
 
-      "must go from CompanyEmailAddressPage to CompanyEmailAddressPage in CheckMode" in {
+      "must go from CompanyEmailAddressPage to Company CYA in CheckMode" in {
         navigator.nextPage(
           CompanyEmailAddressPage,
           CheckMode,
           emptyUserAnswers
-        ) mustBe controllers.add.company.routes.CompanyEmailAddressController.onPageLoad(CheckMode)
+        ) mustBe CompanyCYA
       }
 
       "must go from CompanyContactOptionsPage" - {
-        "to itself when EmailAddress is selected" in {
+        "to CompanyEmailAddress page when EmailAddress is selected and CompanyEmailAddressPage is not answered" in {
           navigator.nextPage(
             CompanyContactOptionsPage,
             CheckMode,
@@ -295,10 +311,23 @@ class CompanyNavigatorSpec extends SpecBase {
               CompanyContactOptionsPage,
               ContactOptions.Email
             )
-          ) mustBe controllers.add.company.routes.CompanyContactOptionsController.onPageLoad(CheckMode)
+          ) mustBe controllers.add.company.routes.CompanyEmailAddressController.onPageLoad(CheckMode)
         }
 
-        "to itself when PhoneNumber is selected" in {
+        "to Company CYA page when EmailAddress is selected and CompanyEmailAddressPage is answered" in {
+          navigator.nextPage(
+            CompanyContactOptionsPage,
+            CheckMode,
+            emptyUserAnswers
+              .setOrException(
+                CompanyContactOptionsPage,
+                ContactOptions.Email
+              )
+              .setOrException(CompanyEmailAddressPage, "old@email.com")
+          ) mustBe CompanyCYA
+        }
+
+        "to CompanyPhoneNumberPage when PhoneNumber is selected and CompanyPhoneNumberPage is not answered" in {
           navigator.nextPage(
             CompanyContactOptionsPage,
             CheckMode,
@@ -306,10 +335,23 @@ class CompanyNavigatorSpec extends SpecBase {
               CompanyContactOptionsPage,
               ContactOptions.Phone
             )
-          ) mustBe controllers.add.company.routes.CompanyContactOptionsController.onPageLoad(CheckMode)
+          ) mustBe controllers.add.company.routes.CompanyPhoneNumberController.onPageLoad(CheckMode)
         }
 
-        "to itself when MobileNumber is selected" in {
+        "to Company CYA when PhoneNumber is selected and CompanyPhoneNumberPage is answered" in {
+          navigator.nextPage(
+            CompanyContactOptionsPage,
+            CheckMode,
+            emptyUserAnswers
+              .setOrException(
+                CompanyContactOptionsPage,
+                ContactOptions.Phone
+              )
+              .setOrException(CompanyPhoneNumberPage, "0123456")
+          ) mustBe CompanyCYA
+        }
+
+        "to CompanyMobileNumberPage when MobileNumber is selected and CompanyMobileNumberPage is not answered" in {
           navigator.nextPage(
             CompanyContactOptionsPage,
             CheckMode,
@@ -317,10 +359,23 @@ class CompanyNavigatorSpec extends SpecBase {
               CompanyContactOptionsPage,
               ContactOptions.Mobile
             )
-          ) mustBe controllers.add.company.routes.CompanyContactOptionsController.onPageLoad(CheckMode)
+          ) mustBe controllers.add.company.routes.CompanyMobileNumberController.onPageLoad(CheckMode)
         }
 
-        "to itself when NoDetails is selected" in {
+        "to CompanyMobileNumberPage when MobileNumber is selected and CompanyMobileNumberPage is answered" in {
+          navigator.nextPage(
+            CompanyContactOptionsPage,
+            CheckMode,
+            emptyUserAnswers
+              .setOrException(
+                CompanyContactOptionsPage,
+                ContactOptions.Mobile
+              )
+              .setOrException(CompanyMobileNumberPage, "0123456")
+          ) mustBe CompanyCYA
+        }
+
+        "to company CYA when NoDetails is selected" in {
           navigator.nextPage(
             CompanyContactOptionsPage,
             CheckMode,
@@ -328,7 +383,7 @@ class CompanyNavigatorSpec extends SpecBase {
               CompanyContactOptionsPage,
               ContactOptions.NoDetails
             )
-          ) mustBe controllers.add.company.routes.CompanyContactOptionsController.onPageLoad(CheckMode)
+          ) mustBe CompanyCYA
         }
 
         "to CYA when answer is not present" in {
@@ -336,37 +391,54 @@ class CompanyNavigatorSpec extends SpecBase {
             CompanyContactOptionsPage,
             CheckMode,
             emptyUserAnswers
-          ) mustBe CYA
+          ) mustBe journeyRecovery
         }
       }
 
-      "must go from a CompanyPhoneNumberPage to CompanyPhoneNumberPage in CheckMode" in {
+      "must go from a CompanyPhoneNumberPage to Company CYA in CheckMode" in {
         navigator.nextPage(
           CompanyPhoneNumberPage,
           CheckMode,
           emptyUserAnswers
-        ) mustBe controllers.add.company.routes.CompanyPhoneNumberController.onPageLoad(CheckMode)
+        ) mustBe CompanyCYA
       }
 
       "must go from CompanyCrnYesNoPage" - {
-        "to next page when answer is Yes" in {
-          val answers = UserAnswers(userAnswersId).set(CompanyCrnYesNoPage, true).success.value
+        "to CompanyCrnPage when answer is Yes and CompanyCrnPage is not answered before" in {
+          val answers = emptyUserAnswers.set(CompanyCrnYesNoPage, true).success.value
 
           navigator.nextPage(
             CompanyCrnYesNoPage,
             CheckMode,
             answers
-          ) mustBe controllers.add.company.routes.CompanyCrnYesNoController.onPageLoad(CheckMode)
+          ) mustBe controllers.add.company.routes.CompanyCrnController.onPageLoad(CheckMode)
         }
 
-        "to Partnership CyaPage when answer is No" in {
-          val answers = UserAnswers(userAnswersId).set(CompanyCrnYesNoPage, false).success.value
+        "to Company CYA when answer is Yes and CompanyCrnPage is answered before" in {
+          val answers =
+            emptyUserAnswers
+              .set(CompanyCrnPage, "AC012345")
+              .success
+              .value
+              .set(CompanyCrnYesNoPage, true)
+              .success
+              .value
 
           navigator.nextPage(
             CompanyCrnYesNoPage,
             CheckMode,
             answers
-          ) mustBe controllers.add.routes.CheckYourAnswersController.onPageLoad()
+          ) mustBe CompanyCYA
+        }
+
+        "to Company CYA when answer is No" in {
+          val answers = emptyUserAnswers.set(CompanyCrnYesNoPage, false).success.value
+
+          navigator.nextPage(
+            CompanyCrnYesNoPage,
+            CheckMode,
+            answers
+          ) mustBe CompanyCYA
         }
 
         "to JourneyRecoveryPage when answer is not present" in {
@@ -378,17 +450,66 @@ class CompanyNavigatorSpec extends SpecBase {
         }
       }
 
-      "must go from CompanyAddressYesNoPage to CompanyAddressYesNoPage in CheckMode" in {
-        navigator.nextPage(
-          CompanyAddressYesNoPage,
-          CheckMode,
-          emptyUserAnswers
-        ) mustBe controllers.add.company.routes.CompanyAddressYesNoController.onPageLoad(CheckMode)
+      "must go from CompanyAddressYesNoPage" - {
+        "to CompanyAddress page when answer is Yes and CompanyAddressPage is not answered before" in {
+          val answers = emptyUserAnswers.set(CompanyAddressYesNoPage, true).success.value
+
+          navigator.nextPage(
+            CompanyAddressYesNoPage,
+            CheckMode,
+            answers
+          ) mustBe controllers.add.company.routes.CompanyAddressController.onPageLoad(CheckMode)
+        }
+
+        "to Company CYA when answer is Yes and CompanyAddressPage is answered before" in {
+
+          val address = models.add.InternationalAddress(
+            addressLine1 = "10 Example Street",
+            addressLine2 = Some("Suite 2"),
+            addressLine3 = "Newcastle",
+            addressLine4 = Some("Tyne & Wear"),
+            postalCode = "NE1 1AA",
+            country = "United Kingdom"
+          )
+
+          val answers =
+            emptyUserAnswers
+              .set(CompanyAddressPage, address)
+              .success
+              .value
+              .set(CompanyAddressYesNoPage, true)
+              .success
+              .value
+
+          navigator.nextPage(
+            CompanyAddressYesNoPage,
+            CheckMode,
+            answers
+          ) mustBe CompanyCYA
+        }
+
+        "to Company CYA when answer is No" in {
+          val answers = emptyUserAnswers.set(CompanyAddressYesNoPage, false).success.value
+
+          navigator.nextPage(
+            CompanyAddressYesNoPage,
+            CheckMode,
+            answers
+          ) mustBe CompanyCYA
+        }
+
+        "to JourneyRecoveryPage when answer is not present" in {
+          navigator.nextPage(
+            CompanyAddressYesNoPage,
+            CheckMode,
+            emptyUserAnswers
+          ) mustBe routes.JourneyRecoveryController.onPageLoad()
+        }
       }
 
       "must go from CompanyUtrYesNo" - {
-        "to next page when answer is Yes" in {
-          val answers = UserAnswers(userAnswersId).set(CompanyUtrYesNoPage, true).success.value
+        "to next page when answer is Yes and CompanyUtrPage is not answered before" in {
+          val answers = emptyUserAnswers.set(CompanyUtrYesNoPage, true).success.value
 
           navigator.nextPage(
             CompanyUtrYesNoPage,
@@ -398,14 +519,31 @@ class CompanyNavigatorSpec extends SpecBase {
             .onPageLoad(CheckMode)
         }
 
-        "to Company CyaPage when answer is No" in {
-          val answers = UserAnswers(userAnswersId).set(CompanyUtrYesNoPage, false).success.value
+        "to Company CYA when answer is Yes and CompanyUtrPage is answered before" in {
+          val answers =
+            emptyUserAnswers
+              .set(CompanyUtrPage, "7777777777")
+              .success
+              .value
+              .set(CompanyUtrYesNoPage, true)
+              .success
+              .value
 
           navigator.nextPage(
             CompanyUtrYesNoPage,
             CheckMode,
             answers
-          ) mustBe CYA
+          ) mustBe CompanyCYA
+        }
+
+        "to Company CYA when answer is No" in {
+          val answers = emptyUserAnswers.set(CompanyUtrYesNoPage, false).success.value
+
+          navigator.nextPage(
+            CompanyUtrYesNoPage,
+            CheckMode,
+            answers
+          ) mustBe CompanyCYA
         }
 
         "to JourneyRecoveryPage when answer is not present" in {
@@ -418,8 +556,8 @@ class CompanyNavigatorSpec extends SpecBase {
       }
 
       "must go from CompanyWorksReferenceYesNo" - {
-        "to next page when answer is Yes" in {
-          val answers = UserAnswers(userAnswersId).set(CompanyWorksReferenceYesNoPage, true).success.value
+        "to CompanyWorksReferencePage when answer is Yes and CompanyWorksReferencePage is not answered before" in {
+          val answers = emptyUserAnswers.set(CompanyWorksReferenceYesNoPage, true).success.value
 
           navigator.nextPage(
             CompanyWorksReferenceYesNoPage,
@@ -429,14 +567,31 @@ class CompanyNavigatorSpec extends SpecBase {
             .onPageLoad(CheckMode)
         }
 
-        "to Company CyaPage when answer is No" in {
-          val answers = UserAnswers(userAnswersId).set(CompanyWorksReferenceYesNoPage, false).success.value
+        "to Company CYA when answer is Yes and CompanyWorksReferencePage is answered before" in {
+          val answers =
+            emptyUserAnswers
+              .set(CompanyWorksReferencePage, "WR-001")
+              .success
+              .value
+              .set(CompanyWorksReferenceYesNoPage, true)
+              .success
+              .value
 
           navigator.nextPage(
             CompanyWorksReferenceYesNoPage,
             CheckMode,
             answers
-          ) mustBe CYA
+          ) mustBe CompanyCYA
+        }
+
+        "to Company CYA when answer is No" in {
+          val answers = emptyUserAnswers.set(CompanyWorksReferenceYesNoPage, false).success.value
+
+          navigator.nextPage(
+            CompanyWorksReferenceYesNoPage,
+            CheckMode,
+            answers
+          ) mustBe CompanyCYA
         }
 
         "to JourneyRecoveryPage when answer is not present" in {
@@ -464,12 +619,12 @@ class CompanyNavigatorSpec extends SpecBase {
         ) mustBe CompanyCYA
       }
 
-      "must go from CompanyMobileNumberPage to CompanyMobileNumberPage in CheckMode" in {
+      "must go from CompanyMobileNumberPage to Company CYA in CheckMode" in {
         navigator.nextPage(
           CompanyMobileNumberPage,
           CheckMode,
           emptyUserAnswers
-        ) mustBe controllers.add.company.routes.CompanyMobileNumberController.onPageLoad(CheckMode)
+        ) mustBe CompanyCYA
       }
 
       "must go from CompanyWorksReferencePage to CompanyCheckYourAnswerPage in CheckMode" in {
@@ -477,7 +632,7 @@ class CompanyNavigatorSpec extends SpecBase {
           CompanyWorksReferencePage,
           CheckMode,
           emptyUserAnswers
-        ) mustBe controllers.add.company.routes.CompanyCheckYourAnswersController.onPageLoad()
+        ) mustBe CompanyCYA
       }
 
     }

@@ -572,6 +572,125 @@ class CompanyCheckYourAnswersControllerSpec extends SpecBase {
 
   "company YesNo stale session" - {
 
+    "must return OK when CompanyAddressYesNoPage changes from Yes to No and stale UTR values are cleaned up" in {
+
+      val address = InternationalAddress("1 Test Street", None, "City", None, "AA1 1AA", "GB")
+
+      val ua = minUa
+        .set(CompanyContactOptionsPage, ContactOptions.Email)
+        .success
+        .value
+        .set(CompanyEmailAddressPage, "one@two.three")
+        .success
+        .value
+        .set(CompanyAddressYesNoPage, true)
+        .success
+        .value
+        .set(CompanyAddressPage, address)
+        .success
+        .value
+        .set(CompanyAddressYesNoPage, false)
+        .success
+        .value
+
+      val application = applicationBuilder(userAnswers = Some(ua)).build()
+
+      running(application) {
+        val request =
+          FakeRequest(GET, controllers.add.company.routes.CompanyCheckYourAnswersController.onPageLoad().url)
+        val result  = route(application, request).value
+
+        status(result) mustEqual OK
+      }
+    }
+
+    "must return OK when CompanyUtrYesNoPage changes from Yes to No and stale UTR values are cleaned up" in {
+      val ua = minUa
+        .set(CompanyContactOptionsPage, ContactOptions.Email)
+        .success
+        .value
+        .set(CompanyEmailAddressPage, "one@two.three")
+        .success
+        .value
+        .set(CompanyUtrYesNoPage, true)
+        .success
+        .value
+        .set(CompanyUtrPage, "1234567890")
+        .success
+        .value
+        .set(CompanyUtrYesNoPage, false)
+        .success
+        .value
+
+      val application = applicationBuilder(userAnswers = Some(ua)).build()
+
+      running(application) {
+        val request =
+          FakeRequest(GET, controllers.add.company.routes.CompanyCheckYourAnswersController.onPageLoad().url)
+        val result  = route(application, request).value
+
+        status(result) mustEqual OK
+      }
+    }
+
+    "must return OK when CompanyCrnYesNoPage changes from Yes to No and stale Crn values are cleaned up" in {
+      val ua = minUa
+        .set(CompanyContactOptionsPage, ContactOptions.Email)
+        .success
+        .value
+        .set(CompanyEmailAddressPage, "one@two.three")
+        .success
+        .value
+        .set(CompanyCrnYesNoPage, true)
+        .success
+        .value
+        .set(CompanyCrnPage, "AC012345")
+        .success
+        .value
+        .set(CompanyCrnYesNoPage, false)
+        .success
+        .value
+
+      val application = applicationBuilder(userAnswers = Some(ua)).build()
+
+      running(application) {
+        val request =
+          FakeRequest(GET, controllers.add.company.routes.CompanyCheckYourAnswersController.onPageLoad().url)
+        val result  = route(application, request).value
+
+        status(result) mustEqual OK
+      }
+    }
+
+    "must return OK when CompanyWorksReferenceYesNoPage changes from Yes to No and stale WorksReference values are cleaned up" in {
+      val ua = minUa
+        .set(CompanyContactOptionsPage, ContactOptions.Email)
+        .success
+        .value
+        .set(CompanyEmailAddressPage, "one@two.three")
+        .success
+        .value
+        .set(CompanyWorksReferenceYesNoPage, true)
+        .success
+        .value
+        .set(CompanyWorksReferencePage, "WRN-001")
+        .success
+        .value
+        .set(CompanyWorksReferenceYesNoPage, false)
+        .success
+        .value
+
+      val application = applicationBuilder(userAnswers = Some(ua)).build()
+
+      running(application) {
+        val request =
+          FakeRequest(GET, controllers.add.company.routes.CompanyCheckYourAnswersController.onPageLoad().url)
+        val result  = route(application, request).value
+
+        status(result) mustEqual OK
+      }
+    }
+
     "must redirect to Journey Recovery when AddressYesNo is false but address value is present (stale session)" in {
       val address = InternationalAddress("1 Test Street", None, "City", None, "AA1 1AA", "GB")
 
