@@ -185,7 +185,8 @@ POST  /add/company/company-works-reference                 controllers.add.compa
 GET   /add/company/change-company-works-reference          controllers.add.company.CompanyWorksReferenceController.onPageLoad(mode: Mode = CheckMode)
 POST  /add/company/change-company-works-reference          controllers.add.company.CompanyWorksReferenceController.onSubmit(mode: Mode = CheckMode)
 
-GET   /companyCheckYourAnswers                             controllers.add.company.CompanyCheckYourAnswersController.onPageLoad()
+GET   /add/company/check-your-answers                      controllers.add.company.CompanyCheckYourAnswersController.onPageLoad()
+POST  /add/company/check-your-answers                      controllers.add.company.CompanyCheckYourAnswersController.onSubmit()
 
 GET   /add/company/subcontractor-added                     controllers.add.company.CompanyAddedController.onPageLoad()
 

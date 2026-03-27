@@ -17,7 +17,7 @@
 package connectors
 
 import models.requests.CreateAndUpdateSubcontractorPayload
-import models.requests.CreateAndUpdateSubcontractorPayload.{IndividualOrSoleTraderPayload, PartnershipPayload}
+import models.requests.CreateAndUpdateSubcontractorPayload.*
 import models.response.CisTaxpayerResponse
 import models.subcontractor.GetSubcontractorUTRsResponse
 import play.api.Logging
@@ -55,6 +55,7 @@ class ConstructionIndustrySchemeConnector @Inject() (config: ServicesConfig, htt
     val jsonPayload: JsValue = payload match {
       case p: IndividualOrSoleTraderPayload => Json.toJson(p)
       case p: PartnershipPayload            => Json.toJson(p)
+      case p: CompanyPayload                => Json.toJson(p)
     }
 
     logger.info(

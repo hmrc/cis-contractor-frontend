@@ -16,6 +16,7 @@
 
 package viewmodels.checkAnswers.add.company
 
+import models.contact.ContactOptions
 import models.{CheckMode, UserAnswers}
 import pages.add.company.CompanyContactOptionsPage
 import play.api.i18n.Messages
@@ -27,9 +28,12 @@ object CompanyContactOptionsSummary {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
     answers.get(CompanyContactOptionsPage).map { answer =>
+
+      def updatedAnswer = if (answer == ContactOptions.NoDetails) "cya.noDetails" else answer
+
       SummaryListRowViewModel(
         key = "companyContactOptions.checkYourAnswersLabel",
-        value = ValueViewModel(messages(s"companyContactOptions.$answer")),
+        value = ValueViewModel(messages(s"companyContactOptions.$updatedAnswer")),
         actions = Seq(
           ActionItemViewModel(
             "site.change",

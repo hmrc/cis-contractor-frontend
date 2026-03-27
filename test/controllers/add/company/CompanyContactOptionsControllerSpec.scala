@@ -123,7 +123,7 @@ class CompanyContactOptionsControllerSpec extends SpecBase with MockitoSugar {
         status(result) mustEqual SEE_OTHER
         redirectLocation(
           result
-        ).value mustEqual controllers.add.company.routes.CompanyContactOptionsController
+        ).value mustEqual controllers.add.company.routes.CompanyPhoneNumberController
           .onPageLoad(NormalMode)
           .url
       }
