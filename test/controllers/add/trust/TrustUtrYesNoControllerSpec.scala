@@ -20,13 +20,11 @@ import base.SpecBase
 import controllers.routes
 import forms.add.trust.TrustUtrYesNoFormProvider
 import models.{NormalMode, UserAnswers}
-import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.add.trust.TrustUtrYesNoPage
+import pages.add.trust.{TrustNamePage, TrustUtrYesNoPage}
 import play.api.inject.bind
-import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import repositories.SessionRepository
@@ -36,101 +34,149 @@ import scala.concurrent.Future
 
 class TrustUtrYesNoControllerSpec extends SpecBase with MockitoSugar {
 
-  def onwardRoute = Call("GET", "/foo")
+  private val formProvider = new TrustUtrYesNoFormProvider()
+  private val form         = formProvider()
 
-  val formProvider = new TrustUtrYesNoFormProvider()
-  val form         = formProvider()
+  private val trustName = "Test Trust"
 
-  lazy val trustUtrYesNoRoute: String = controllers.add.trust.routes.TrustUtrYesNoController.onPageLoad(NormalMode).url
+  private lazy val routeLoad   = controllers.add.trust.routes.TrustUtrYesNoController.onPageLoad(NormalMode).url
+  private lazy val routeSubmit = controllers.add.trust.routes.TrustUtrYesNoController.onSubmit(NormalMode).url
+
+  private def uaWithName: UserAnswers =
+    emptyUserAnswers.set(TrustNamePage, trustName).success.value
 
   "TrustUtrYesNo Controller" - {
 
-    "must return OK and the correct view for a GET" in {
-
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+    "must return OK and the correct view for a GET when name is present" in {
+      val application = applicationBuilder(userAnswers = Some(uaWithName)).build()
 
       running(application) {
-        val request = FakeRequest(GET, trustUtrYesNoRoute)
-
-        val result = route(application, request).value
-
-        val view = application.injector.instanceOf[TrustUtrYesNoView]
+        val request = FakeRequest(GET, routeLoad)
+        val result  = route(application, request).value
+        val view    = application.injector.instanceOf[TrustUtrYesNoView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode, trustName)(request, messages(application)).toString
       }
     }
 
-    "must populate the view correctly on a GET when the question has previously been answered" in {
-
-      val userAnswers = UserAnswers(userAnswersId).set(TrustUtrYesNoPage, true).success.value
+    "must populate the view correctly on a GET when the question has previously been answered and name is present" in {
+      val userAnswers =
+        uaWithName
+          .set(TrustUtrYesNoPage, true)
+          .success
+          .value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
       running(application) {
-        val request = FakeRequest(GET, trustUtrYesNoRoute)
-
-        val view = application.injector.instanceOf[TrustUtrYesNoView]
-
-        val result = route(application, request).value
+        val request = FakeRequest(GET, routeLoad)
+        val view    = application.injector.instanceOf[TrustUtrYesNoView]
+        val result  = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(true), NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill(true), NormalMode, trustName)(
+          request,
+          messages(application)
+        ).toString
       }
     }
 
-    "must redirect to the next page when valid data is submitted" in {
+    "must redirect to Journey Recovery for a GET when trust name is missing (userAnswers present)" in {
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
+      running(application) {
+        val request = FakeRequest(GET, routeLoad)
+        val result  = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must redirect to TrustUtrController when yes is submitted" in {
       val mockSessionRepository = mock[SessionRepository]
-
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
       val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        applicationBuilder(userAnswers = Some(uaWithName))
           .overrides(
-            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
             bind[SessionRepository].toInstance(mockSessionRepository)
           )
           .build()
 
       running(application) {
         val request =
-          FakeRequest(POST, trustUtrYesNoRoute)
-            .withFormUrlEncodedBody(("value", "true"))
+          FakeRequest(POST, routeSubmit)
+            .withFormUrlEncodedBody("value" -> "true")
 
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual onwardRoute.url
+        redirectLocation(result).value mustEqual controllers.add.trust.routes.TrustUtrController
+          .onPageLoad(NormalMode)
+          .url
       }
     }
 
-    "must return a Bad Request and errors when invalid data is submitted" in {
+    "must redirect to TrustWorksReferenceYesNoController when no is submitted" in {
+      val mockSessionRepository = mock[SessionRepository]
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application =
+        applicationBuilder(userAnswers = Some(uaWithName))
+          .overrides(
+            bind[SessionRepository].toInstance(mockSessionRepository)
+          )
+          .build()
 
       running(application) {
         val request =
-          FakeRequest(POST, trustUtrYesNoRoute)
-            .withFormUrlEncodedBody(("value", ""))
-
-        val boundForm = form.bind(Map("value" -> ""))
-
-        val view = application.injector.instanceOf[TrustUtrYesNoView]
+          FakeRequest(POST, routeSubmit)
+            .withFormUrlEncodedBody("value" -> "false")
 
         val result = route(application, request).value
 
-        status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode)(request, messages(application)).toString
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.add.trust.routes.TrustWorksReferenceYesNoController
+          .onPageLoad(NormalMode)
+          .url
       }
     }
 
-    "must redirect to Journey Recovery for a GET if no existing data is found" in {
-
-      val application = applicationBuilder(userAnswers = None).build()
+    "must return a Bad Request and errors when invalid data is submitted (name present)" in {
+      val application = applicationBuilder(userAnswers = Some(uaWithName)).build()
 
       running(application) {
-        val request = FakeRequest(GET, trustUtrYesNoRoute)
+        val request =
+          FakeRequest(POST, routeSubmit)
+            .withFormUrlEncodedBody("value" -> "")
+
+        val boundForm = form.bind(Map("value" -> ""))
+        val view      = application.injector.instanceOf[TrustUtrYesNoView]
+        val result    = route(application, request).value
+
+        status(result) mustEqual BAD_REQUEST
+        contentAsString(result) mustEqual view(boundForm, NormalMode, trustName)(
+          request,
+          messages(application)
+        ).toString
+      }
+    }
+
+    "must redirect to Journey Recovery for a POST when trust name is missing (userAnswers present)" in {
+      val mockSessionRepository = mock[SessionRepository]
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+      val application =
+        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, routeSubmit)
+            .withFormUrlEncodedBody("value" -> "true")
 
         val result = route(application, request).value
 
@@ -139,14 +185,25 @@ class TrustUtrYesNoControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must redirect to Journey Recovery for a POST if no existing data is found" in {
+    "must redirect to Journey Recovery for a GET if no existing data is found" in {
+      val application = applicationBuilder(userAnswers = None).build()
 
+      running(application) {
+        val request = FakeRequest(GET, routeLoad)
+        val result  = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must redirect to Journey Recovery for a POST if no existing data is found" in {
       val application = applicationBuilder(userAnswers = None).build()
 
       running(application) {
         val request =
-          FakeRequest(POST, trustUtrYesNoRoute)
-            .withFormUrlEncodedBody(("value", "true"))
+          FakeRequest(POST, routeSubmit)
+            .withFormUrlEncodedBody("value" -> "true")
 
         val result = route(application, request).value
 
