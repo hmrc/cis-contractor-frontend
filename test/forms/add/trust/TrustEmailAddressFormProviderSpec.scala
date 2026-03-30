@@ -18,12 +18,15 @@ package forms.add.trust
 
 import forms.behaviours.StringFieldBehaviours
 import play.api.data.FormError
+import org.scalacheck.Gen
+import forms.mappings.Constants
 
 class TrustEmailAddressFormProviderSpec extends StringFieldBehaviours {
 
   val requiredKey = "trustEmailAddress.error.required"
+  val invalidKey  = "trustEmailAddress.error.invalid"
   val lengthKey   = "trustEmailAddress.error.length"
-  val maxLength   = 254
+  val maxLength   = Constants.MaxLength254
 
   val form = new TrustEmailAddressFormProvider()()
 
@@ -34,7 +37,12 @@ class TrustEmailAddressFormProviderSpec extends StringFieldBehaviours {
     behave like fieldThatBindsValidData(
       form,
       fieldName,
-      stringsWithMaxLength(maxLength)
+      Gen.oneOf(
+        "test@example.com",
+        "name.surname@test.co.uk",
+        "a@b.cd",
+        "user123@test-domain.com"
+      )
     )
 
     behave like fieldWithMaxLength(
