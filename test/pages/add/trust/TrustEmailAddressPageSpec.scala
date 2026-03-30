@@ -16,23 +16,16 @@
 
 package pages.add.trust
 
-import models.UserAnswers
-import pages.QuestionPage
-import play.api.libs.json.JsPath
+import pages.behaviours.PageBehaviours
 
-import scala.util.Try
+class TrustEmailAddressPageSpec extends PageBehaviours {
 
-case object TrustAddressYesNoPage extends QuestionPage[Boolean] {
+  "TrustEmailAddressPage" - {
 
-  override def path: JsPath = JsPath \ toString
+    beRetrievable[String](TrustEmailAddressPage)
 
-  override def toString: String = "trustAddressYesNo"
+    beSettable[String](TrustEmailAddressPage)
 
-  override def cleanup(value: Option[Boolean], userAnswers: UserAnswers): Try[UserAnswers] =
-    if value.contains(false) then {
-      userAnswers.remove(TrustAddressPage)
-    } else {
-      super.cleanup(value, userAnswers)
-    }
-
+    beRemovable[String](TrustEmailAddressPage)
+  }
 }

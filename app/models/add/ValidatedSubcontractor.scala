@@ -16,7 +16,10 @@
 
 package models.add
 
-import models.{InvalidAnswer, UserAnswers, Validation, ValidationError}
+import models.contact.ContactOptions
+import models.contact.ContactOptions.*
+import models.{InvalidAnswer, MissingAnswer, UserAnswers, Validation, ValidationError}
+import pages.QuestionPage
 import pages.add.*
 import play.api.libs.json.*
 
@@ -25,6 +28,10 @@ final case class ValidatedSubcontractor(
   tradingName: Option[String],
   subcontractorName: Option[SubcontractorName],
   address: Option[InternationalAddress],
+  individualContactDetails: ContactOptions,
+  individualEmail: Option[String],
+  individualPhone: Option[String],
+  individualMobile: Option[String],
   utr: Option[String],
   nino: Option[String],
   workRefNumber: Option[String]
@@ -33,24 +40,32 @@ final case class ValidatedSubcontractor(
 object ValidatedSubcontractor extends Validation {
   def build(answers: UserAnswers): Either[ValidationError, ValidatedSubcontractor] =
     for {
-      typeOfSubcontractor <- getType(answers)
-      tradingName         <- getOptionalPageValue(answers, TradingNameOfSubcontractorPage, SubTradingNameYesNoPage)
-      subcontractorName   <- getOptionalNamePage(answers)
-      address             <- getOptionalPageValue(answers, AddressOfSubcontractorPage, SubAddressYesNoPage)
-      utr                 <- getOptionalPageValue(answers, SubcontractorsUniqueTaxpayerReferencePage, UniqueTaxpayerReferenceYesNoPage)
-      nino                <- getOptionalPageValue(answers, SubNationalInsuranceNumberPage, NationalInsuranceNumberYesNoPage)
-      workReference       <- getOptionalPageValue(answers, WorksReferenceNumberPage, WorksReferenceNumberYesNoPage)
+      typeOfSubcontractor      <- getType(answers)
+      tradingName              <- getOptionalPageValue(answers, TradingNameOfSubcontractorPage, SubTradingNameYesNoPage)
+      subcontractorName        <- getOptionalNamePage(answers)
+      address                  <- getOptionalPageValue(answers, AddressOfSubcontractorPage, SubAddressYesNoPage)
+      individualContactDetails <- getPageValue(answers, IndividualChooseContactDetailsPage)
+      individualEmail          <- getContactPageValue(answers, IndividualEmailAddressPage, individualContactDetails)
+      individualPhone          <- getContactPageValue(answers, IndividualPhoneNumberPage, individualContactDetails)
+      individualMobile         <- getContactPageValue(answers, IndividualMobileNumberPage, individualContactDetails)
+      utr                      <- getOptionalPageValue(answers, SubcontractorsUniqueTaxpayerReferencePage, UniqueTaxpayerReferenceYesNoPage)
+      nino                     <- getOptionalPageValue(answers, SubNationalInsuranceNumberPage, NationalInsuranceNumberYesNoPage)
+      workReference            <- getOptionalPageValue(answers, WorksReferenceNumberPage, WorksReferenceNumberYesNoPage)
     } yield ValidatedSubcontractor(
       typeOfSubcontractor,
       tradingName,
       subcontractorName,
       address,
+      individualContactDetails,
+      individualEmail,
+      individualPhone,
+      individualMobile,
       utr,
       nino,
       workReference
     )
 
-  def getType(answers: UserAnswers): Either[ValidationError, TypeOfSubcontractor] =
+  private def getType(answers: UserAnswers): Either[ValidationError, TypeOfSubcontractor] =
     getPageValue(answers, TypeOfSubcontractorPage)
 
   // SubTradingNameYesNoPage is inverted for SubcontractorNamePage
@@ -63,4 +78,28 @@ object ValidatedSubcontractor extends Validation {
       case (None, Some(true))         => Right(None)
       case _                          => Left(InvalidAnswer(SubcontractorNamePage))
     }
+
+  private def getContactPageValue[A](
+    answers: UserAnswers,
+    questionPage: QuestionPage[A],
+    contactOptions: ContactOptions
+  )(implicit reads: Reads[A]): Either[ValidationError, Option[A]] = {
+    val expectedPage: Option[QuestionPage[_]] = contactOptions match {
+      case Email     => Some(IndividualEmailAddressPage)
+      case Phone     => Some(IndividualPhoneNumberPage)
+      case Mobile    => Some(IndividualMobileNumberPage)
+      case NoDetails => None
+    }
+
+    if (expectedPage.contains(questionPage)) {
+      answers.get(questionPage).toRight(MissingAnswer(questionPage)).map(Some(_))
+    } else if (expectedPage.isDefined) {
+      Right(None)
+    } else {
+      answers
+        .get(questionPage)
+        .fold(Right(None): Either[ValidationError, Option[A]])(_ => Left(InvalidAnswer(questionPage)))
+    }
+  }
+
 }
