@@ -16,14 +16,17 @@
 
 package forms.add.trust
 
+import forms.Validation
 import forms.behaviours.StringFieldBehaviours
+import forms.mappings.Constants.MaxLength35
+import org.scalacheck.Gen
 import play.api.data.FormError
 
 class TrustMobileNumberFormProviderSpec extends StringFieldBehaviours {
 
   val requiredKey = "trustMobileNumber.error.required"
   val lengthKey   = "trustMobileNumber.error.length"
-  val maxLength   = 35
+  val invalidKey  = "trustMobileNumber.error.invalid"
 
   val form = new TrustMobileNumberFormProvider()()
 
@@ -34,20 +37,33 @@ class TrustMobileNumberFormProviderSpec extends StringFieldBehaviours {
     behave like fieldThatBindsValidData(
       form,
       fieldName,
-      stringsWithMaxLength(maxLength)
+      Gen.oneOf(
+        "07777777777",
+        "+447777777777",
+        "  07777 77777 ",
+        "(44)77777777777",
+        "44-777-777"
+      )
     )
 
     behave like fieldWithMaxLength(
       form,
       fieldName,
-      maxLength = maxLength,
-      lengthError = FormError(fieldName, lengthKey, Seq(maxLength))
+      maxLength = MaxLength35,
+      lengthError = FormError(fieldName, lengthKey, Seq(MaxLength35))
     )
 
     behave like mandatoryField(
       form,
       fieldName,
       requiredError = FormError(fieldName, requiredKey)
+    )
+
+    behave like fieldWithRegex(
+      form,
+      fieldName,
+      invalidKey,
+      regex = Validation.mobileRegex
     )
   }
 }
