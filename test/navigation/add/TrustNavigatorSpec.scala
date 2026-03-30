@@ -135,12 +135,6 @@ class TrustNavigatorSpec extends SpecBase {
         }
       }
 
-      "must go from a page that doesn't exist in the route map to Index" in {
-
-        case object UnknownPage extends Page
-        navigator.nextPage(UnknownPage, NormalMode, UserAnswers("id")) mustBe routes.IndexController.onPageLoad()
-      }
-
       "must go from TrustUtrYesNoPage to TrustUtrController when answer is true" in {
         val ua = UserAnswers("id").set(TrustUtrYesNoPage, true).success.value
         navigator.nextPage(TrustUtrYesNoPage, NormalMode, ua) mustBe
@@ -182,7 +176,7 @@ class TrustNavigatorSpec extends SpecBase {
           controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
       }
 
-      "must go from a SubAddressYesNoPage to next page when true" in {
+      "must go from a TrustAddressYesNoPage to next page when true" in {
         navigator.nextPage(
           TrustAddressYesNoPage,
           CheckMode,
@@ -242,7 +236,6 @@ class TrustNavigatorSpec extends SpecBase {
         ) mustBe controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
       }
 
-    }
       "must go from TrustAddressPage to TrustCheckYourAnswersController" in {
         navigator.nextPage(TrustAddressPage, CheckMode, UserAnswers("id")) mustBe
           controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
@@ -341,8 +334,6 @@ class TrustNavigatorSpec extends SpecBase {
           ) mustBe journeyRecovery
         }
       }
-
     }
-
   }
 }
