@@ -43,6 +43,11 @@ class TrustNavigatorSpec extends SpecBase {
           UserAnswers("id")
         ) mustBe controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
       }
+      
+      "must go from TrustAddressPage to TrustContactOptionsController" in {
+        navigator.nextPage(TrustAddressPage, NormalMode, UserAnswers("id")) mustBe
+          controllers.add.trust.routes.TrustContactOptionsController.onPageLoad(NormalMode)
+      }
 
       "must go from a TrustAddressYesNoPage to TrustAddressPage" in {
         navigator.nextPage(
@@ -75,15 +80,9 @@ class TrustNavigatorSpec extends SpecBase {
         ) mustBe controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
       }
 
-      "must go from a page that doesn't exist in the edit route map to TrustCheckYourAnswers" in {
-
-        case object UnknownPage extends Page
-        navigator.nextPage(
-          UnknownPage,
-          CheckMode,
-          UserAnswers("id")
-        ) mustBe controllers.add.trust.routes.TrustCheckYourAnswersController
-          .onPageLoad()
+      "must go from TrustAddressPage to TrustCheckYourAnswersController" in {
+        navigator.nextPage(TrustAddressPage, CheckMode, UserAnswers("id")) mustBe
+          controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
       }
 
       "must go from TrustAddressYesNoPage to TrustAddressPage in CheckMode" in {
@@ -92,6 +91,17 @@ class TrustNavigatorSpec extends SpecBase {
           CheckMode,
           emptyUserAnswers
         ) mustBe controllers.add.trust.routes.TrustAddressController.onPageLoad(CheckMode)
+      }
+
+      "must go from a page that does not exist in the edit route map to TrustCheckYourAnswers" in {
+
+        case object UnknownPage extends Page
+        navigator.nextPage(
+          UnknownPage,
+          CheckMode,
+          UserAnswers("id")
+        ) mustBe controllers.add.trust.routes.TrustCheckYourAnswersController
+          .onPageLoad()
       }
 
     }

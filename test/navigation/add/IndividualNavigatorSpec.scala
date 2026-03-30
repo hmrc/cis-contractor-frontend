@@ -533,14 +533,6 @@ class IndividualNavigatorSpec extends SpecBase {
           routes.JourneyRecoveryController.onPageLoad()
       }
 
-      "must go from a IndividualEmailAddressPage to IndividualEmailAddressPage" in {
-        navigator.nextPage(
-          IndividualEmailAddressPage,
-          CheckMode,
-          UserAnswers("id")
-        ) mustBe controllers.add.routes.CheckYourAnswersController.onPageLoad()
-      }
-
       "must go from IndividualChooseContactDetailsPage" - {
         "to IndividualEmailAddressPage when EmailAddress is selected" in {
           navigator.nextPage(
@@ -551,6 +543,19 @@ class IndividualNavigatorSpec extends SpecBase {
               ContactOptions.Email
             )
           ) mustBe controllers.add.routes.IndividualEmailAddressController.onPageLoad(CheckMode)
+        }
+
+        "to CYA page when Email option is not changed in CheckMode" in {
+          val answers =
+            emptyUserAnswers
+              .setOrException(IndividualChooseContactDetailsPage, ContactOptions.Email)
+              .setOrException(IndividualEmailAddressPage, "test@test.com")
+
+          navigator.nextPage(
+            IndividualChooseContactDetailsPage,
+            CheckMode,
+            answers
+          ) mustBe controllers.add.routes.CheckYourAnswersController.onPageLoad()
         }
 
         "to IndividualPhoneNumberPage when PhoneNumber is selected" in {
@@ -564,6 +569,19 @@ class IndividualNavigatorSpec extends SpecBase {
           ) mustBe controllers.add.routes.IndividualPhoneNumberController.onPageLoad(CheckMode)
         }
 
+        "to CYA page when Phone option is not changed in CheckMode" in {
+          val answers =
+            emptyUserAnswers
+              .setOrException(IndividualChooseContactDetailsPage, ContactOptions.Phone)
+              .setOrException(IndividualPhoneNumberPage, "0987654321")
+
+          navigator.nextPage(
+            IndividualChooseContactDetailsPage,
+            CheckMode,
+            answers
+          ) mustBe controllers.add.routes.CheckYourAnswersController.onPageLoad()
+        }
+
         "to IndividualMobileNumberPage when MobileNumber is selected" in {
           navigator.nextPage(
             IndividualChooseContactDetailsPage,
@@ -573,6 +591,19 @@ class IndividualNavigatorSpec extends SpecBase {
               ContactOptions.Mobile
             )
           ) mustBe controllers.add.routes.IndividualMobileNumberController.onPageLoad(CheckMode)
+        }
+
+        "to CYA page when Mobile option is not changed in CheckMode" in {
+          val answers =
+            emptyUserAnswers
+              .setOrException(IndividualChooseContactDetailsPage, ContactOptions.Mobile)
+              .setOrException(IndividualMobileNumberPage, "0987654322")
+
+          navigator.nextPage(
+            IndividualChooseContactDetailsPage,
+            CheckMode,
+            answers
+          ) mustBe controllers.add.routes.CheckYourAnswersController.onPageLoad()
         }
 
         "to CheckYourAnswersPage when NoDetails is selected" in {
@@ -591,8 +622,16 @@ class IndividualNavigatorSpec extends SpecBase {
             IndividualChooseContactDetailsPage,
             CheckMode,
             emptyUserAnswers
-          ) mustBe CYA
+          ) mustBe journeyRecovery
         }
+      }
+
+      "must go from a IndividualEmailAddressPage to CheckYourAnswersController" in {
+        navigator.nextPage(
+          IndividualEmailAddressPage,
+          CheckMode,
+          UserAnswers("id")
+        ) mustBe controllers.add.routes.CheckYourAnswersController.onPageLoad()
       }
 
       "must go from IndividualMobileNumberPage to CheckYourAnswersController in CheckMode" in {
