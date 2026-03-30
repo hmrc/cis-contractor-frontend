@@ -27,7 +27,7 @@ class WorksReferenceNumberFormProvider @Inject() extends Mappings {
   def apply(): Form[String] =
     Form(
       "value" -> text("worksReferenceNumber.error.required")
-        .transform(_.trim, identity)
+        .transform(_.trim.replaceAll("""[\t\r\n]+""", ""), identity)
         .verifying(regexp(Validation.worksRefRegex, "worksReferenceNumber.error.invalid"))
         .verifying(maxLength(20, "worksReferenceNumber.error.length"))
     )

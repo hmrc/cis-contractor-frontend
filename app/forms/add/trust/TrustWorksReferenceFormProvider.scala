@@ -29,7 +29,7 @@ class TrustWorksReferenceFormProvider @Inject() extends Mappings {
     Form(
       "value" -> text("trustWorksReference.error.required")
         .transform(
-          _.trim.replaceAll("\\s+", " "),
+          _.trim.replaceAll("""[\t\r\n]+""", ""),
           identity
         )
         .verifying(
