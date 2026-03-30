@@ -285,7 +285,7 @@ class SubcontractorCleanupSpec extends SpecBase {
 
       val userAnswers =
         emptyUserAnswers
-          .set(TrustAddressPage, "aaa")
+          .set(TrustAddressPage, address)
           .success
           .value
           .set(TrustAddressYesNoPage, true)
@@ -294,25 +294,25 @@ class SubcontractorCleanupSpec extends SpecBase {
           .set(TrustContactOptionsPage, ContactOptions.Email)
           .success
           .value
-          .set(TrustEmailAddressPage, "aaa")
+          .set(TrustEmailAddressPage, email)
           .success
           .value
-          .set(TrustMobileNumberPage, "aaa")
+          .set(TrustMobileNumberPage, phoneNumber)
           .success
           .value
-          .set(TrustNamePage, "aaa")
+          .set(TrustNamePage, name)
           .success
           .value
-          .set(TrustPhoneNumberPage, "aaa")
+          .set(TrustPhoneNumberPage, phoneNumber)
           .success
           .value
-          .set(TrustUtrPage, "aaa")
+          .set(TrustUtrPage, utr)
           .success
           .value
           .set(TrustUtrYesNoPage, true)
           .success
           .value
-          .set(TrustWorksReferencePage, "aaa")
+          .set(TrustWorksReferencePage, worksReferenceNumber)
           .success
           .value
           .set(TrustWorksReferenceYesNoPage, true)
@@ -482,7 +482,7 @@ class SubcontractorCleanupSpec extends SpecBase {
           .set(PartnershipWorksReferenceNumberYesNoPage, true)
           .success
           .value
-          .set(TrustAddressPage, "aaa")
+          .set(TrustAddressPage, address)
           .success
           .value
           .set(TrustAddressYesNoPage, true)
@@ -491,25 +491,25 @@ class SubcontractorCleanupSpec extends SpecBase {
           .set(TrustContactOptionsPage, ContactOptions.Email)
           .success
           .value
-          .set(TrustEmailAddressPage, "aaa")
+          .set(TrustEmailAddressPage, email)
           .success
           .value
-          .set(TrustMobileNumberPage, "aaa")
+          .set(TrustMobileNumberPage, phoneNumber)
           .success
           .value
-          .set(TrustNamePage, "aaa")
+          .set(TrustNamePage, name)
           .success
           .value
-          .set(TrustPhoneNumberPage, "aaa")
+          .set(TrustPhoneNumberPage, phoneNumber)
           .success
           .value
-          .set(TrustUtrPage, "aaa")
+          .set(TrustUtrPage, utr)
           .success
           .value
           .set(TrustUtrYesNoPage, true)
           .success
           .value
-          .set(TrustWorksReferencePage, "aaa")
+          .set(TrustWorksReferencePage, worksReferenceNumber)
           .success
           .value
           .set(TrustWorksReferenceYesNoPage, true)
