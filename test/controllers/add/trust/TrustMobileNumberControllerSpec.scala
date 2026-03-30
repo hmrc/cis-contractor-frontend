@@ -81,7 +81,10 @@ class TrustMobileNumberControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill("07700 900 982"), NormalMode, trustName)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill("07700 900 982"), NormalMode, trustName)(
+          request,
+          messages(application)
+        ).toString
       }
     }
 
@@ -127,7 +130,10 @@ class TrustMobileNumberControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode, trustName)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, NormalMode, trustName)(
+          request,
+          messages(application)
+        ).toString
       }
     }
 
@@ -167,7 +173,7 @@ class TrustMobileNumberControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request = FakeRequest(GET, trustMobileNumberRoute)
-        val result = route(application, request).value
+        val result  = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual
