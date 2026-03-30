@@ -43,7 +43,7 @@ class TrustNavigatorSpec extends SpecBase {
           UserAnswers("id")
         ) mustBe controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
       }
-      
+
       "must go from TrustAddressPage to TrustContactOptionsController" in {
         navigator.nextPage(TrustAddressPage, NormalMode, UserAnswers("id")) mustBe
           controllers.add.trust.routes.TrustContactOptionsController.onPageLoad(NormalMode)
