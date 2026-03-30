@@ -16,12 +16,16 @@
 
 package pages.add.trust
 
-import pages.QuestionPage
-import play.api.libs.json.JsPath
+import pages.behaviours.PageBehaviours
 
-case object TrustPhoneNumberPage extends QuestionPage[String] with TrustJourney {
+class TrustPhoneNumberPageSpec extends PageBehaviours {
 
-  override def path: JsPath = JsPath \ toString
+  "TrustPhoneNumberPage" - {
 
-  override def toString: String = "trustPhoneNumber"
+    beRetrievable[String](TrustPhoneNumberPage)
+
+    beSettable[String](TrustPhoneNumberPage)
+
+    beRemovable[String](TrustPhoneNumberPage)
+  }
 }

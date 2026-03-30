@@ -61,6 +61,31 @@ class TrustNavigatorSpec extends SpecBase {
         navigator.nextPage(UnknownPage, NormalMode, UserAnswers("id")) mustBe routes.IndexController.onPageLoad()
       }
 
+      "must go from TrustUtrYesNoPage to TrustUtrController when answer is true" in {
+        val ua = UserAnswers("id").set(TrustUtrYesNoPage, true).success.value
+        navigator.nextPage(TrustUtrYesNoPage, NormalMode, ua) mustBe
+          controllers.add.trust.routes.TrustUtrController.onPageLoad(NormalMode)
+      }
+
+      "must go from TrustUtrYesNoPage to TrustWorksReferenceYesNoController when answer is false" in {
+        val ua = UserAnswers("id").set(TrustUtrYesNoPage, false).success.value
+        navigator.nextPage(TrustUtrYesNoPage, NormalMode, ua) mustBe
+          controllers.add.trust.routes.TrustWorksReferenceYesNoController.onPageLoad(NormalMode)
+      }
+
+      "must go from TrustUtrYesNoPage to JourneyRecovery when no answer is present" in {
+        navigator.nextPage(TrustUtrYesNoPage, NormalMode, UserAnswers("id")) mustBe
+          routes.JourneyRecoveryController.onPageLoad()
+      }
+
+      "must go from a TrustPhoneNumberPage to TrustUtrYesNoPage" in {
+        navigator.nextPage(
+          TrustPhoneNumberPage,
+          NormalMode,
+          UserAnswers("id")
+        ) mustBe controllers.add.trust.routes.TrustUtrYesNoController.onPageLoad(NormalMode)
+      }
+
     }
 
     "in Check mode" - {
@@ -90,6 +115,23 @@ class TrustNavigatorSpec extends SpecBase {
         ) mustBe controllers.add.trust.routes.TrustAddressController.onPageLoad(CheckMode)
       }
 
+      "must go from TrustUtrYesNoPage to TrustUtrController when answer is true" in {
+        val ua = UserAnswers("id").set(TrustUtrYesNoPage, true).success.value
+        navigator.nextPage(TrustUtrYesNoPage, CheckMode, ua) mustBe
+          controllers.add.trust.routes.TrustUtrController.onPageLoad(CheckMode)
+      }
+
+      "must go from TrustUtrYesNoPage to TrustCheckYourAnswers when answer is false" in {
+        val ua = UserAnswers("id").set(TrustUtrYesNoPage, false).success.value
+        navigator.nextPage(TrustUtrYesNoPage, CheckMode, ua) mustBe
+          controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
+      }
+
+      "must go from TrustUtrYesNoPage to JourneyRecovery when no answer is present" in {
+        navigator.nextPage(TrustUtrYesNoPage, CheckMode, UserAnswers("id")) mustBe
+          routes.JourneyRecoveryController.onPageLoad()
+      }
+
       "must go from a page that does not exist in the edit route map to TrustCheckYourAnswers" in {
 
         case object UnknownPage extends Page
@@ -99,6 +141,14 @@ class TrustNavigatorSpec extends SpecBase {
           UserAnswers("id")
         ) mustBe controllers.add.trust.routes.TrustCheckYourAnswersController
           .onPageLoad()
+      }
+
+      "must go from TrustPhoneNumberPage to TrustCheckYourAnswersPage in CheckMode" in {
+        navigator.nextPage(
+          TrustPhoneNumberPage,
+          CheckMode,
+          emptyUserAnswers
+        ) mustBe controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
       }
 
     }
