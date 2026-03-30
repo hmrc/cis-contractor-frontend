@@ -687,14 +687,14 @@ trustContactOptions.checkYourAnswersLabel                      =  What are the c
 trustContactOptions.error.required                             =  Select trustContactOptions
 trustContactOptions.change.hidden                              =  TrustContactOptions
 
-trustEmailAddress.title                                        = What is the email address for this trust?
-trustEmailAddress.heading                                      = What is the email address for {0}?
-trustEmailAddress.hint                                         = HMRC will never use this email address to contact this subcontractor
-trustEmailAddress.checkYourAnswersLabel                        = Email Address
-trustEmailAddress.error.required                               = Enter an email address in the correct format, like name@example.com
-trustEmailAddress.error.length                                 = Enter a valid email address in the correct format, like name@example.com, up to 254 characters
-trustEmailAddress.error.invalid                                = Enter a valid email address in the correct format, like name@example.com
-trustEmailAddress.change.hidden                                = email address
+trustEmailAddress.title                                        =  What is the email address for this trust?
+trustEmailAddress.heading                                      =  What is the email address for {0}?
+trustEmailAddress.hint                                         =  HMRC will never use this email address to contact this subcontractor
+trustEmailAddress.checkYourAnswersLabel                        =  Email Address
+trustEmailAddress.error.required                               =  Enter an email address in the correct format, like name@example.com
+trustEmailAddress.error.length                                 =  Enter a valid email address in the correct format, like name@example.com, up to 254 characters
+trustEmailAddress.error.invalid                                =  Enter a valid email address in the correct format, like name@example.com
+trustEmailAddress.change.hidden                                =  email address
 
 trustPhoneNumber.title                                         =  trustPhoneNumber
 trustPhoneNumber.heading                                       =  trustPhoneNumber
@@ -710,11 +710,12 @@ trustMobileNumber.error.required                               =  Enter trustMob
 trustMobileNumber.error.length                                 =  TrustMobileNumber must be 35 characters or less
 trustMobileNumber.change.hidden                                =  TrustMobileNumber
 
-trustUtrYesNo.title                                            =  trustUtrYesNo
-trustUtrYesNo.heading                                          =  trustUtrYesNo
-trustUtrYesNo.checkYourAnswersLabel                            =  trustUtrYesNo
-trustUtrYesNo.error.required                                   =  Select yes if trustUtrYesNo
-trustUtrYesNo.change.hidden                                    =  TrustUtrYesNo
+trustUtrYesNo.title                                            =  Do you know the Unique Taxpayer Reference for this trust?
+trustUtrYesNo.heading                                          =  Do you know the Unique Taxpayer Reference for {0}?
+trustUtrYesNo.hint                                             =  This information will be used to verify the trust as a subcontractor
+trustUtrYesNo.checkYourAnswersLabel                            =  Add UTR?
+trustUtrYesNo.error.required                                   =  Select whether you know the Unique Taxpayer Reference (UTR) for this trust
+trustUtrYesNo.change.hidden                                    =  add UTR?
 
 trustUtr.title                                                 =  trustUtr
 trustUtr.heading                                               =  trustUtr
