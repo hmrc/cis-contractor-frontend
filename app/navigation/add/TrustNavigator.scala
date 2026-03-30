@@ -36,7 +36,9 @@ class TrustNavigator @Inject() () extends NavigatorForJourney {
   }
 
   private val normalRoutes: Page => UserAnswers => Call = {
+
     case TrustNamePage         => _ => controllers.add.trust.routes.TrustAddressYesNoController.onPageLoad(NormalMode)
+    case TrustEmailAddressPage => _ => controllers.add.trust.routes.TrustUtrYesNoController.onPageLoad(NormalMode)
     case TrustAddressYesNoPage => _ => controllers.add.trust.routes.TrustAddressController.onPageLoad(NormalMode)
     case TrustAddressPage      => _ => controllers.add.trust.routes.TrustContactOptionsController.onPageLoad(NormalMode)
     case TrustUtrYesNoPage     => userAnswers => navigatorFromTrustUtrYesNoPage(NormalMode)(userAnswers)
@@ -44,7 +46,9 @@ class TrustNavigator @Inject() () extends NavigatorForJourney {
   }
 
   private val checkRouteMap: Page => UserAnswers => Call = {
+
     case TrustNamePage         => _ => controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
+    case TrustEmailAddressPage => _ => controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
     case TrustAddressYesNoPage => _ => controllers.add.trust.routes.TrustAddressController.onPageLoad(CheckMode)
     case TrustAddressPage      => _ => controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
     case TrustUtrYesNoPage     => navigatorFromTrustUtrYesNoPage(CheckMode)(_)
