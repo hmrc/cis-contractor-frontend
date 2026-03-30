@@ -677,7 +677,8 @@ trustAddress.country                                           =  Country
 trustAddress.country.error.required                            =  Select a country
 
 trustContactOptions.title                                      =  What are the contact details for this trust?
-trustContactOptions.heading                                    =  What are the contact details for this trust?
+trustContactOptions.heading                                    =  What are the contact details for {0}?
+trustContactOptions.hint                                       =  Choose which method of contact you would like to add for this subcontractor. Contact details are only for your own records.
 trustContactOptions.email                                      =  Email address
 trustContactOptions.phone                                      =  Phone number
 trustContactOptions.mobile                                     =  Mobile number
