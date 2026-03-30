@@ -17,7 +17,7 @@
 package navigation.add
 
 import controllers.routes
-import models.contact.ContactOptions.{Email, Mobile, Phone}
+import models.contact.ContactOptions.{Email, Mobile, NoDetails, Phone}
 import models.{CheckMode, Mode, NormalMode, UserAnswers}
 import navigation.NavigatorForJourney
 import pages.Page
@@ -275,33 +275,34 @@ class PartnershipNavigator @Inject() () extends NavigatorForJourney {
 
   private def navigatorFromChooseContactDetailsPage(mode: Mode)(userAnswers: UserAnswers): Call =
     (userAnswers.get(PartnershipChooseContactDetailsPage), mode) match {
-      // CheckMode
-      case (Some(Email), CheckMode) =>
-        controllers.add.partnership.routes.PartnershipEmailAddressController.onPageLoad(CheckMode)
-
-      case (Some(Phone), CheckMode) =>
-        controllers.add.partnership.routes.PartnershipPhoneNumberController.onPageLoad(CheckMode)
-
-      case (Some(Mobile), CheckMode)  =>
-        controllers.add.partnership.routes.PartnershipMobileNumberController.onPageLoad(CheckMode)
-
-      // CheckMode: NoDetails returns straight to CYA
-      case (Some(_), CheckMode)       =>
-        controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
-
-      // TODO: EMAIL       - CIS ANSF PTN: Screen AS-P4 (PTN) - What are the contact details for [partnership name]?
-      case (Some(Email), NormalMode)  =>
+      case (Some(Email), NormalMode)     =>
         controllers.add.partnership.routes.PartnershipEmailAddressController.onPageLoad(NormalMode)
-      // TODO: PHONE       - CIS ANSF PTN: Screen AS-P4 (PTN) - What are the contact details for [partnership name]?
-      case (Some(Phone), NormalMode)  =>
+      case (Some(Phone), NormalMode)     =>
         controllers.add.partnership.routes.PartnershipPhoneNumberController.onPageLoad(NormalMode)
-      // TODO: MOBILE      - CIS ANSF PTN: Screen AS-P4 (PTN) - What are the contact details for [partnership name]?
-      case (Some(Mobile), NormalMode) =>
+      case (Some(Mobile), NormalMode)    =>
         controllers.add.partnership.routes.PartnershipMobileNumberController.onPageLoad(NormalMode)
-      // TODO: NO DETAILS  - CIS ANSF PTN: Screen AS-P4 (PTN) - What are the contact details for [partnership name]?
-      case (Some(_), NormalMode)      =>
+      case (Some(NoDetails), NormalMode) =>
         controllers.add.partnership.routes.PartnershipHasUtrYesNoController.onPageLoad(NormalMode)
-      case (None, CheckMode)          => controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
-      case _                          => routes.JourneyRecoveryController.onPageLoad()
+      case (Some(Email), CheckMode)      =>
+        userAnswers
+          .get(PartnershipEmailAddressPage)
+          .fold(controllers.add.partnership.routes.PartnershipEmailAddressController.onPageLoad(CheckMode)) { _ =>
+            controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
+          }
+      case (Some(Phone), CheckMode)      =>
+        userAnswers
+          .get(PartnershipPhoneNumberPage)
+          .fold(controllers.add.partnership.routes.PartnershipPhoneNumberController.onPageLoad(CheckMode)) { _ =>
+            controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
+          }
+      case (Some(Mobile), CheckMode)     =>
+        userAnswers
+          .get(PartnershipMobileNumberPage)
+          .fold(controllers.add.partnership.routes.PartnershipMobileNumberController.onPageLoad(CheckMode)) { _ =>
+            controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
+          }
+      case (Some(NoDetails), CheckMode)  =>
+        controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
+      case _                             => routes.JourneyRecoveryController.onPageLoad()
     }
 }

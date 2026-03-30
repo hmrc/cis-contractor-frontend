@@ -220,7 +220,7 @@ class PartnershipNavigatorSpec extends SpecBase {
           ) mustBe controllers.add.partnership.routes.PartnershipMobileNumberController.onPageLoad(NormalMode)
         }
 
-        "to itself when NoDetails is selected" in {
+        "to PartnershipHasUtrYesNoPage when NoDetails is selected" in {
           navigator.nextPage(
             PartnershipChooseContactDetailsPage,
             NormalMode,
@@ -548,13 +548,52 @@ class PartnershipNavigatorSpec extends SpecBase {
           ) mustBe controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
         }
 
-        "to PartnershipCheckYourAnswers when answer is not present" in {
+        "to JourneyRecovery when answer is not present" in {
           navigator.nextPage(
             PartnershipChooseContactDetailsPage,
             CheckMode,
             emptyUserAnswers
-          ) mustBe partnershipCYA
+          ) mustBe journeyRecovery
         }
+      }
+
+      "to PartnershipCheckYourAnswersController when Email is selected in CheckMode and email address already exists" in {
+        val answers =
+          emptyUserAnswers
+            .setOrException(PartnershipChooseContactDetailsPage, ContactOptions.Email)
+            .setOrException(PartnershipEmailAddressPage, "test@test.com")
+
+        navigator.nextPage(
+          PartnershipChooseContactDetailsPage,
+          CheckMode,
+          answers
+        ) mustBe controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
+      }
+
+      "to PartnershipCheckYourAnswersController when Phone is selected in CheckMode and phone number already exists" in {
+        val answers =
+          emptyUserAnswers
+            .setOrException(PartnershipChooseContactDetailsPage, ContactOptions.Phone)
+            .setOrException(PartnershipPhoneNumberPage, "01234567890")
+
+        navigator.nextPage(
+          PartnershipChooseContactDetailsPage,
+          CheckMode,
+          answers
+        ) mustBe controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
+      }
+
+      "to PartnershipCheckYourAnswersController when Mobile is selected in CheckMode and mobile number already exists" in {
+        val answers =
+          emptyUserAnswers
+            .setOrException(PartnershipChooseContactDetailsPage, ContactOptions.Mobile)
+            .setOrException(PartnershipMobileNumberPage, "07123456789")
+
+        navigator.nextPage(
+          PartnershipChooseContactDetailsPage,
+          CheckMode,
+          answers
+        ) mustBe controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
       }
 
       "must go from a PartnershipNominatedPartnerNamePage to PartnershipCheckYourAnswers in CheckMode" in {
