@@ -119,6 +119,8 @@ POST  /add/check-contact-details                   controllers.add.IndividualCho
 GET   /add/change-check-contact-details            controllers.add.IndividualChooseContactDetailsController.onPageLoad(mode: Mode = CheckMode)
 POST  /add/change-check-contact-details            controllers.add.IndividualChooseContactDetailsController.onSubmit(mode: Mode = CheckMode)
 
+GET   /add/individual/subcontractor-added          controllers.add.SubcontractorAddedController.individualSubcontractorAdded()
+
 # Company
 GET   /add/company/company-name                            controllers.add.company.CompanyNameController.onPageLoad(mode: Mode = NormalMode)
 POST  /add/company/company-name                            controllers.add.company.CompanyNameController.onSubmit(mode: Mode = NormalMode)
@@ -187,7 +189,7 @@ POST  /add/company/change-company-works-reference          controllers.add.compa
 
 GET   /companyCheckYourAnswers                             controllers.add.company.CompanyCheckYourAnswersController.onPageLoad()
 
-GET   /add/company/subcontractor-added                     controllers.add.company.CompanyAddedController.onPageLoad()
+GET   /add/company/subcontractor-added                     controllers.add.SubcontractorAddedController.companySubcontractorAdded()
 
 # Partnership
 GET   /add/partnership/partnership-name         controllers.add.partnership.PartnershipNameController.onPageLoad(mode: Mode = NormalMode)
@@ -275,8 +277,6 @@ POST  /add/partnership/phone-number         controllers.add.partnership.Partners
 GET   /add/partnership/change-phone-number  controllers.add.partnership.PartnershipPhoneNumberController.onPageLoad(mode: Mode = CheckMode)
 POST  /add/partnership/change-phone-number  controllers.add.partnership.PartnershipPhoneNumberController.onSubmit(mode: Mode = CheckMode)
 
-GET   /add/partnership/subcontractor-added  controllers.add.partnership.SubcontractorAddedController.onPageLoad()
-
 GET   /add/partnership/check-your-answers  controllers.add.partnership.PartnershipCheckYourAnswersController.onPageLoad()
 POST  /add/partnership/check-your-answers  controllers.add.partnership.PartnershipCheckYourAnswersController.onSubmit()
 
@@ -284,6 +284,8 @@ GET   /add/partnership/mobile-number         controllers.add.partnership.Partner
 POST  /add/partnership/mobile-number         controllers.add.partnership.PartnershipMobileNumberController.onSubmit(mode: Mode = NormalMode)
 GET   /add/partnership/change-mobile-number  controllers.add.partnership.PartnershipMobileNumberController.onPageLoad(mode: Mode = CheckMode)
 POST  /add/partnership/change-mobile-number  controllers.add.partnership.PartnershipMobileNumberController.onSubmit(mode: Mode = CheckMode)
+
+GET   /add/partnership/subcontractor-added  controllers.add.SubcontractorAddedController.partnershipSubcontractorAdded()
 
 # Trust
 GET   /add/trust/trust-name            controllers.add.trust.TrustNameController.onPageLoad(mode: Mode = NormalMode)
@@ -342,3 +344,5 @@ GET   /changeTrustWorksReference       controllers.add.trust.TrustWorksReference
 POST  /changeTrustWorksReference       controllers.add.trust.TrustWorksReferenceController.onSubmit(mode: Mode = CheckMode)
 
 GET   /trustCheckYourAnswers           controllers.add.trust.TrustCheckYourAnswersController.onPageLoad()
+
+GET   /add/trust/subcontractor-added   controllers.add.SubcontractorAddedController.trustSubcontractorAdded()

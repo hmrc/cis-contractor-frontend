@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package views.add.partnership
+package views.add
 
 import org.jsoup.nodes.Document
 import org.scalatest.matchers.must.Matchers
@@ -24,7 +24,7 @@ import play.api.i18n.Messages
 import play.api.mvc.Request
 import play.api.test.FakeRequest
 import play.twirl.api.HtmlFormat
-import views.html.add.partnership.SubcontractorAddedView
+import views.html.add.SubcontractorAddedView
 
 class SubcontractorAddedViewSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite {
 
@@ -32,15 +32,16 @@ class SubcontractorAddedViewSpec extends AnyWordSpec with Matchers with GuiceOne
 
     "render the page with the correct main content" in new Setup {
 
-      private val partnershipName = "Test Partnership"
+      private val subcontractorName = "Test subcontractor"
+      private val subcontractorType = "Test"
 
-      val html: HtmlFormat.Appendable = view(partnershipName)
+      val html: HtmlFormat.Appendable = view(subcontractorName, subcontractorType)
       val doc: Document               = org.jsoup.Jsoup.parse(html.toString())
 
-      doc.title             must include(messages("subcontractorAdded.title"))
+      doc.title             must include(messages("subcontractorAdded.title", subcontractorType))
       doc.select("h1").text must include(messages("subcontractorAdded.heading"))
 
-      doc.select("p").text must include(messages("subcontractorAdded.p1", partnershipName))
+      doc.select("p").text must include(messages("subcontractorAdded.p1", subcontractorName))
 
       doc.select("h2").text                     must include(messages("subcontractorAdded.nextSteps.h2"))
       doc.select("p").text                      must include(messages("subcontractorAdded.nextSteps.p1"))
