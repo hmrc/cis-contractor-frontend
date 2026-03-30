@@ -78,6 +78,14 @@ class TrustNavigatorSpec extends SpecBase {
           routes.JourneyRecoveryController.onPageLoad()
       }
 
+      "must go from a TrustPhoneNumberPage to TrustUtrYesNoPage" in {
+        navigator.nextPage(
+          TrustPhoneNumberPage,
+          NormalMode,
+          UserAnswers("id")
+        ) mustBe controllers.add.trust.routes.TrustUtrYesNoController.onPageLoad(NormalMode)
+      }
+
     }
 
     "in Check mode" - {
@@ -133,6 +141,14 @@ class TrustNavigatorSpec extends SpecBase {
           UserAnswers("id")
         ) mustBe controllers.add.trust.routes.TrustCheckYourAnswersController
           .onPageLoad()
+      }
+
+      "must go from TrustPhoneNumberPage to TrustCheckYourAnswersPage in CheckMode" in {
+        navigator.nextPage(
+          TrustPhoneNumberPage,
+          CheckMode,
+          emptyUserAnswers
+        ) mustBe controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
       }
 
     }
