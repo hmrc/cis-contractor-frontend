@@ -26,6 +26,7 @@
     govukButton: GovukButton,
     heading: H1,
     paragraph: Paragraph,
+    link: Link,
 )
 
 @(form: Form[_], mode: Mode, name: String)(implicit request: Request[_], messages: Messages)
@@ -41,6 +42,12 @@
         @heading(messages("trustUtr.heading"))
 
         @paragraph(messages("trustUtr.p1"))
+
+        @link(
+            linkTextKey = "trustUtr.linkText",
+            linkUrl = "https://www.gov.uk/find-utr-number",
+            isNewTab = true
+        )
 
         @govukInput(
             InputViewModel(

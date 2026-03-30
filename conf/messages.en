@@ -718,9 +718,10 @@ trustUtrYesNo.error.required                                   =  Select whether
 trustUtrYesNo.change.hidden                                    =  add UTR?
 
 trustUtr.title                                                 =  Trust Unique Taxpayer Reference (UTR)
-trustUtr.heading                                               =  What is the UTR for {0}?
+trustUtr.heading                                               =  Trust Unique Taxpayer Reference (UTR)
 trustUtr.p1                                                    =  The UTR will be on tax returns and other documents from HMRC.
-trustUtr.label                                                 =  What is the Self Assessment UTR for {0}?
+trustUtr.linkText                                              =  Get more help to find a UTR (opens in new tab)
+trustUtr.label                                                 =  What is the UTR for {0}?
 trustUtr.hint                                                  =  A UTR is a 10 digit number
 trustUtr.checkYourAnswersLabel                                 =  Trust UTR
 trustUtr.error.required                                        =  Enter a valid Unique Taxpayer Reference (UTR)
