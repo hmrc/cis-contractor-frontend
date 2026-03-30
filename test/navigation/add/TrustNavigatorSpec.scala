@@ -33,10 +33,10 @@ class TrustNavigatorSpec extends SpecBase {
 
       "must go from TrustEmailAddressPage to TrustUtrYesNoController" in {
         val ua = emptyUserAnswers.set(TrustEmailAddressPage, "test@test.com").success.value
-         navigator.nextPage(TrustEmailAddressPage, NormalMode, ua) mustBe
+        navigator.nextPage(TrustEmailAddressPage, NormalMode, ua) mustBe
           controllers.add.trust.routes.TrustUtrYesNoController.onPageLoad(NormalMode)
       }
-      
+
       "must go from TrustNamePage to TrustAddressYesNoPage" in {
         navigator.nextPage(TrustNamePage, NormalMode, UserAnswers("id")) mustBe
           controllers.add.trust.routes.TrustAddressYesNoController.onPageLoad(NormalMode)
