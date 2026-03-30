@@ -290,10 +290,6 @@ GET   /add/trust/trust-name            controllers.add.trust.TrustNameController
 POST  /add/trust/trust-name            controllers.add.trust.TrustNameController.onSubmit(mode: Mode = NormalMode)
 GET   /add/trust/change-trust-name     controllers.add.trust.TrustNameController.onPageLoad(mode: Mode = CheckMode)
 POST  /add/trust/change-trust-name     controllers.add.trust.TrustNameController.onSubmit(mode: Mode = CheckMode)
-GET   /trustName                       controllers.add.trust.TrustNameController.onPageLoad(mode: Mode = NormalMode)
-POST  /trustName                       controllers.add.trust.TrustNameController.onSubmit(mode: Mode = NormalMode)
-GET   /changeTrustName                 controllers.add.trust.TrustNameController.onPageLoad(mode: Mode = CheckMode)
-POST  /changeTrustName                 controllers.add.trust.TrustNameController.onSubmit(mode: Mode = CheckMode)
 
 GET   /add/trust/check-address         controllers.add.trust.TrustAddressYesNoController.onPageLoad(mode: Mode = NormalMode)
 POST  /add/trust/check-address         controllers.add.trust.TrustAddressYesNoController.onSubmit(mode: Mode = NormalMode)
@@ -310,10 +306,10 @@ POST  /trustContactOptions             controllers.add.trust.TrustContactOptions
 GET   /changeTrustContactOptions       controllers.add.trust.TrustContactOptionsController.onPageLoad(mode: Mode = CheckMode)
 POST  /changeTrustContactOptions       controllers.add.trust.TrustContactOptionsController.onSubmit(mode: Mode = CheckMode)
 
-GET   /trustEmailAddress               controllers.add.trust.TrustEmailAddressController.onPageLoad(mode: Mode = NormalMode)
-POST  /trustEmailAddress               controllers.add.trust.TrustEmailAddressController.onSubmit(mode: Mode = NormalMode)
-GET   /changeTrustEmailAddress         controllers.add.trust.TrustEmailAddressController.onPageLoad(mode: Mode = CheckMode)
-POST  /changeTrustEmailAddress         controllers.add.trust.TrustEmailAddressController.onSubmit(mode: Mode = CheckMode)
+GET   /add/trust/email-address         controllers.add.trust.TrustEmailAddressController.onPageLoad(mode: Mode = NormalMode)
+POST  /add/trust/email-address         controllers.add.trust.TrustEmailAddressController.onSubmit(mode: Mode = NormalMode)
+GET   /add/trust/change-email-address  controllers.add.trust.TrustEmailAddressController.onPageLoad(mode: Mode = CheckMode)
+POST  /add/trust/change-email-address  controllers.add.trust.TrustEmailAddressController.onSubmit(mode: Mode = CheckMode)
 
 GET   /trustPhoneNumber                controllers.add.trust.TrustPhoneNumberController.onPageLoad(mode: Mode = NormalMode)
 POST  /trustPhoneNumber                controllers.add.trust.TrustPhoneNumberController.onSubmit(mode: Mode = NormalMode)

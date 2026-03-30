@@ -18,6 +18,8 @@ package forms.add.trust
 
 import forms.mappings.Mappings
 import play.api.data.Form
+import forms.Validation
+import forms.mappings.Constants
 
 import javax.inject.Inject
 
@@ -26,6 +28,17 @@ class TrustEmailAddressFormProvider @Inject() extends Mappings {
   def apply(): Form[String] =
     Form(
       "value" -> text("trustEmailAddress.error.required")
-        .verifying(maxLength(254, "trustEmailAddress.error.length"))
+        .verifying(
+          firstError(
+            maxLength(
+              Constants.MaxLength254,
+              "trustEmailAddress.error.length"
+            ),
+            regexp(
+              Validation.emailRegex,
+              "trustEmailAddress.error.invalid"
+            )
+          )
+        )
     )
 }
