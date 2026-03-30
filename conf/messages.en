@@ -687,14 +687,14 @@ trustContactOptions.checkYourAnswersLabel                      =  What are the c
 trustContactOptions.error.required                             =  Select trustContactOptions
 trustContactOptions.change.hidden                              =  TrustContactOptions
 
-trustEmailAddress.title                                        = What is the email address for this trust?
-trustEmailAddress.heading                                      = What is the email address for {0}?
-trustEmailAddress.hint                                         = HMRC will never use this email address to contact this subcontractor
-trustEmailAddress.checkYourAnswersLabel                        = Email Address
-trustEmailAddress.error.required                               = Enter an email address in the correct format, like name@example.com
-trustEmailAddress.error.length                                 = Enter a valid email address in the correct format, like name@example.com, up to 254 characters
-trustEmailAddress.error.invalid                                = Enter a valid email address in the correct format, like name@example.com
-trustEmailAddress.change.hidden                                = email address
+trustEmailAddress.title                                        =  What is the email address for this trust?
+trustEmailAddress.heading                                      =  What is the email address for {0}?
+trustEmailAddress.hint                                         =  HMRC will never use this email address to contact this subcontractor
+trustEmailAddress.checkYourAnswersLabel                        =  Email Address
+trustEmailAddress.error.required                               =  Enter an email address in the correct format, like name@example.com
+trustEmailAddress.error.length                                 =  Enter a valid email address in the correct format, like name@example.com, up to 254 characters
+trustEmailAddress.error.invalid                                =  Enter a valid email address in the correct format, like name@example.com
+trustEmailAddress.change.hidden                                =  email address
 
 trustPhoneNumber.title                                         =  What is the phone number for this trust?
 trustPhoneNumber.heading                                       =  What is the phone number for {0}?

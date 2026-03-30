@@ -1,4 +1,4 @@
-# microservice specific routes
+# Routes
 
 # Infrastructure
 ->   /hmrc-frontend    hmrcfrontend.Routes
