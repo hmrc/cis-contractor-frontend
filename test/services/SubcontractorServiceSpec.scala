@@ -398,6 +398,57 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
         verifyNoMoreInteractions(mockConnector)
       }
 
+      "should create and update subcontractor (Partnership) with none in contact details (no contact fields sent)" in {
+        val mockConnector = mock[ConstructionIndustrySchemeConnector]
+        val service       = new SubcontractorService(mockConnector)
+
+        val userAnswers =
+          basePartnershipAnswers
+            .remove(PartnershipChooseContactDetailsPage)
+            .success
+            .value
+
+        when(mockConnector.createAndUpdateSubcontractor(any[CreateAndUpdateSubcontractorPayload])(any[HeaderCarrier]))
+          .thenReturn(Future.successful(()))
+
+        service.createAndUpdateSubcontractor(userAnswers).futureValue mustBe (())
+
+        val captor: ArgumentCaptor[CreateAndUpdateSubcontractorPayload] =
+          ArgumentCaptor.forClass(classOf[CreateAndUpdateSubcontractorPayload])
+
+        verify(mockConnector, times(1))
+          .createAndUpdateSubcontractor(captor.capture())(any[HeaderCarrier])
+
+        val sent = captor.getValue
+
+        sent mustBe a[PartnershipPayload]
+
+        val partnershipSent = sent.asInstanceOf[PartnershipPayload]
+
+        partnershipSent mustBe PartnershipPayload(
+          cisId = cisId,
+          subcontractorType = TypeOfSubcontractor.Partnership,
+          utr = Some("1234567890"),
+          partnerUtr = None,
+          partnershipTradingName = Some("Test Partnership"),
+          partnerTradingName = Some("Nominated Partner"),
+          partnerNino = Some("AA123456A"),
+          partnerCrn = Some("AC012345"),
+          addressLine1 = Some("p1"),
+          addressLine2 = Some("p2"),
+          city = Some("London"),
+          county = Some("Hackney"),
+          postcode = Some("N1 5AP"),
+          country = Some("United Kingdom"),
+          emailAddress = None,
+          phoneNumber = None,
+          mobilePhoneNumber = None,
+          worksReferenceNumber = Some("WRN-PTN")
+        )
+
+        verifyNoMoreInteractions(mockConnector)
+      }
+
       "should fail when cisId not found in session data" in {
         val mockConnector: ConstructionIndustrySchemeConnector = mock[ConstructionIndustrySchemeConnector]
         val service                                            = new SubcontractorService(mockConnector)
@@ -611,6 +662,38 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
         val userAnswers =
           baseCompanyAnswers
             .set(CompanyContactOptionsPage, ContactOptions.NoDetails)
+            .success
+            .value
+
+        when(mockConnector.createAndUpdateSubcontractor(any[CreateAndUpdateSubcontractorPayload])(any[HeaderCarrier]))
+          .thenReturn(Future.successful(()))
+
+        service.createAndUpdateSubcontractor(userAnswers).futureValue mustBe (())
+
+        val captor: ArgumentCaptor[CreateAndUpdateSubcontractorPayload] =
+          ArgumentCaptor.forClass(classOf[CreateAndUpdateSubcontractorPayload])
+
+        verify(mockConnector, times(1))
+          .createAndUpdateSubcontractor(captor.capture())(any[HeaderCarrier])
+
+        val sent = captor.getValue
+        sent mustBe a[CompanyPayload]
+
+        val companySent = sent.asInstanceOf[CompanyPayload]
+        companySent.emailAddress mustBe None
+        companySent.phoneNumber mustBe None
+        companySent.mobilePhoneNumber mustBe None
+
+        verifyNoMoreInteractions(mockConnector)
+      }
+
+      "should create and update subcontractor (Company) with none in contact details (no contact fields sent)" in {
+        val mockConnector = mock[ConstructionIndustrySchemeConnector]
+        val service       = new SubcontractorService(mockConnector)
+
+        val userAnswers =
+          baseCompanyAnswers
+            .remove(CompanyContactOptionsPage)
             .success
             .value
 
