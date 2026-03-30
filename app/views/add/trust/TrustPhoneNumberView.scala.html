@@ -15,6 +15,7 @@
  *@
 
 @import viewmodels.InputWidth._
+@import viewmodels.LabelSize.Large
 
 @this(
     layout: templates.Layout,
@@ -24,7 +25,7 @@
     govukButton: GovukButton
 )
 
-@(form: Form[_], mode: Mode)(implicit request: Request[_], messages: Messages)
+@(form: Form[_], mode: Mode, trustName: String)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = title(form, messages("trustPhoneNumber.title"))) {
 
@@ -37,9 +38,13 @@
         @govukInput(
             InputViewModel(
                 field = form("value"),
-                label = LabelViewModel(messages("trustPhoneNumber.heading")).asPageHeading()
+                label = LabelViewModel(messages("trustPhoneNumber.heading", trustName)).asPageHeading(Large)
             )
-            .withWidth(Full)
+                .withHint(HintViewModel(messages("trustPhoneNumber.hint")))
+                .withWidth(Full)
+                .withInputType("tel")
+                .withSpellcheck(false)
+                .withAutocomplete("tel")
         )
 
         @govukButton(

@@ -16,7 +16,8 @@
 
 package forms.add.trust
 
-import forms.mappings.Mappings
+import forms.Validation.phoneRegex
+import forms.mappings.{Constants, Mappings}
 import play.api.data.Form
 
 import javax.inject.Inject
@@ -26,6 +27,12 @@ class TrustPhoneNumberFormProvider @Inject() extends Mappings {
   def apply(): Form[String] =
     Form(
       "value" -> text("trustPhoneNumber.error.required")
-        .verifying(maxLength(35, "trustPhoneNumber.error.length"))
+        .transform(_.trim, identity)
+        .verifying(
+          firstError(
+            maxLength(Constants.MaxLength35, "trustPhoneNumber.error.length"),
+            regexp(phoneRegex, "trustPhoneNumber.error.invalid")
+          )
+        )
     )
 }
