@@ -40,6 +40,7 @@ class TrustNavigator @Inject() () extends NavigatorForJourney {
     case TrustNamePage => _ => controllers.add.trust.routes.TrustAddressYesNoController.onPageLoad(NormalMode)
     case TrustEmailAddressPage => _ => controllers.add.trust.routes.TrustUtrYesNoController.onPageLoad(NormalMode)
     case TrustAddressYesNoPage => _ => controllers.add.trust.routes.TrustAddressController.onPageLoad(NormalMode)
+    case TrustAddressPage      => _ => controllers.add.trust.routes.TrustContactOptionsController.onPageLoad(NormalMode)
     case _ => _ => routes.IndexController.onPageLoad()
   }
 
@@ -48,6 +49,7 @@ class TrustNavigator @Inject() () extends NavigatorForJourney {
     case TrustNamePage => _ => controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
     case TrustEmailAddressPage => _ => controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
     case TrustAddressYesNoPage => _ => controllers.add.trust.routes.TrustAddressController.onPageLoad(CheckMode)
+    case TrustAddressPage      => _ => controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
     case _ => _ => controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
   }
 

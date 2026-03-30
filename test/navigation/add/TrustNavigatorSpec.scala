@@ -33,14 +33,18 @@ class TrustNavigatorSpec extends SpecBase {
 
       "must go from TrustEmailAddressPage to TrustUtrYesNoController" in {
         val ua = emptyUserAnswers.set(TrustEmailAddressPage, "test@test.com").success.value
-
-        navigator.nextPage(TrustEmailAddressPage, NormalMode, ua) mustBe
+         navigator.nextPage(TrustEmailAddressPage, NormalMode, ua) mustBe
           controllers.add.trust.routes.TrustUtrYesNoController.onPageLoad(NormalMode)
       }
-
+      
       "must go from TrustNamePage to TrustAddressYesNoPage" in {
         navigator.nextPage(TrustNamePage, NormalMode, UserAnswers("id")) mustBe
           controllers.add.trust.routes.TrustAddressYesNoController.onPageLoad(NormalMode)
+      }
+
+      "must go from TrustAddressPage to TrustContactOptionsController" in {
+        navigator.nextPage(TrustAddressPage, NormalMode, UserAnswers("id")) mustBe
+          controllers.add.trust.routes.TrustContactOptionsController.onPageLoad(NormalMode)
       }
 
       "must go from a TrustAddressYesNoPage to TrustAddressPage" in {
@@ -73,15 +77,9 @@ class TrustNavigatorSpec extends SpecBase {
           controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
       }
 
-      "must go from a page that doesn't exist in the edit route map to TrustCheckYourAnswers" in {
-
-        case object UnknownPage extends Page
-        navigator.nextPage(
-          UnknownPage,
-          CheckMode,
-          UserAnswers("id")
-        ) mustBe controllers.add.trust.routes.TrustCheckYourAnswersController
-          .onPageLoad()
+      "must go from TrustAddressPage to TrustCheckYourAnswersController" in {
+        navigator.nextPage(TrustAddressPage, CheckMode, UserAnswers("id")) mustBe
+          controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
       }
 
       "must go from TrustAddressYesNoPage to TrustAddressPage in CheckMode" in {
@@ -90,6 +88,17 @@ class TrustNavigatorSpec extends SpecBase {
           CheckMode,
           emptyUserAnswers
         ) mustBe controllers.add.trust.routes.TrustAddressController.onPageLoad(CheckMode)
+      }
+
+      "must go from a page that does not exist in the edit route map to TrustCheckYourAnswers" in {
+
+        case object UnknownPage extends Page
+        navigator.nextPage(
+          UnknownPage,
+          CheckMode,
+          UserAnswers("id")
+        ) mustBe controllers.add.trust.routes.TrustCheckYourAnswersController
+          .onPageLoad()
       }
 
     }
