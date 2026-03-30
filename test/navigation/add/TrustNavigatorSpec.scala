@@ -111,7 +111,7 @@ class TrustNavigatorSpec extends SpecBase {
           routes.JourneyRecoveryController.onPageLoad()
       }
 
-      "must go from a page that doesn't exist in the edit route map to TrustCheckYourAnswers" in {
+      "must go from a page that does not exist in the edit route map to TrustCheckYourAnswers" in {
 
         case object UnknownPage extends Page
         navigator.nextPage(
