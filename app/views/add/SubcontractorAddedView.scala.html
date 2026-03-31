@@ -27,7 +27,7 @@
 
 )
 
-@(name: String, subcontractorType: String)(implicit request: Request[_], messages: Messages)
+@(name: String, subcontractorType: String, manageSubcontractorsUrl: String)(implicit request: Request[_], messages: Messages)
 
 @layout(
     pageTitle = titleNoForm(messages("subcontractorAdded.title", subcontractorType)),
@@ -54,7 +54,7 @@
 
     @link(
     linkTextKey = "subcontractorAdded.nextSteps.link",
-    linkUrl = "#"
+    linkUrl = manageSubcontractorsUrl
     )
 
     @h2(messages("subcontractorAdded.helpAndSupport.h2"))
