@@ -751,7 +751,7 @@ class PartnershipCheckYourAnswersControllerSpec extends SpecBase {
         status(result) mustEqual SEE_OTHER
         redirectLocation(
           result
-        ).value mustEqual controllers.add.partnership.routes.SubcontractorAddedController.onPageLoad().url
+        ).value mustEqual controllers.add.routes.SubcontractorAddedController.partnershipSubcontractorAdded().url
       }
 
       verify(mockSubcontractorService).createAndUpdateSubcontractor(any[UserAnswers])(any[HeaderCarrier])

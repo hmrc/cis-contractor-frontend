@@ -108,7 +108,7 @@ class PartnershipCheckYourAnswersController @Inject() (
                   .fromTry(request.userAnswers.set(CheckYourAnswersSubmittedPage, true))
                   .flatMap(updated => sessionRepository.set(updated).map(_ => ()))
                   .map { _ =>
-                    Redirect(controllers.add.partnership.routes.SubcontractorAddedController.onPageLoad())
+                    Redirect(controllers.add.routes.SubcontractorAddedController.partnershipSubcontractorAdded())
                   }
               }
               .recover { case t =>
