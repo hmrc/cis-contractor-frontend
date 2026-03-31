@@ -39,6 +39,7 @@ object TrustUtrYesNoSummary {
             controllers.add.trust.routes.TrustUtrYesNoController.onPageLoad(CheckMode).url
           )
             .withVisuallyHiddenText(messages("trustUtrYesNo.change.hidden"))
+            .withAttribute("id" -> "add-trust-utr")
         )
       )
     }

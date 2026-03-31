@@ -16,10 +16,11 @@
 
 package pages.add.trust
 
+import models.add.InternationalAddress
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 
-case object TrustAddressPage extends QuestionPage[String] {
+case object TrustAddressPage extends QuestionPage[InternationalAddress] with TrustJourney {
 
   override def path: JsPath = JsPath \ toString
 
