@@ -14,25 +14,21 @@
  * limitations under the License.
  */
 
-package forms.add.trust
+package utils
 
-import forms.Validation.mobileRegex
-import forms.mappings.{Constants, Mappings}
-import play.api.data.Form
+import jakarta.inject.Singleton
+import models.UserAnswers
+import pages.add.CheckYourAnswersSubmittedPage
+import utils.SubcontractorCleanup.removeAllSubcontractor
 
-import javax.inject.Inject
+import scala.util.Try
 
-class TrustMobileNumberFormProvider @Inject() extends Mappings {
+trait SubcontractorCleanupService {
+  def clean(ua: UserAnswers): Try[UserAnswers]
+}
 
-  def apply(): Form[String] =
-    Form(
-      "value" -> text("trustMobileNumber.error.required")
-        .transform(_.trim, identity)
-        .verifying(
-          firstError(
-            maxLength(Constants.MaxLength35, "trustMobileNumber.error.length"),
-            regexp(mobileRegex, "trustMobileNumber.error.invalid")
-          )
-        )
-    )
+@Singleton
+class DefaultSubcontractorCleanupService extends SubcontractorCleanupService {
+  override def clean(ua: UserAnswers): Try[UserAnswers] =
+    removeAllSubcontractor(ua).flatMap(_.set(CheckYourAnswersSubmittedPage, false))
 }
