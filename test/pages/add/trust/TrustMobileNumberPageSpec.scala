@@ -14,25 +14,18 @@
  * limitations under the License.
  */
 
-package forms.add.trust
+package pages.add.trust
 
-import forms.Validation.mobileRegex
-import forms.mappings.{Constants, Mappings}
-import play.api.data.Form
+import pages.behaviours.PageBehaviours
 
-import javax.inject.Inject
+class TrustMobileNumberPageSpec extends PageBehaviours {
 
-class TrustMobileNumberFormProvider @Inject() extends Mappings {
+  "TrustMobileNumberPage" - {
 
-  def apply(): Form[String] =
-    Form(
-      "value" -> text("trustMobileNumber.error.required")
-        .transform(_.trim, identity)
-        .verifying(
-          firstError(
-            maxLength(Constants.MaxLength35, "trustMobileNumber.error.length"),
-            regexp(mobileRegex, "trustMobileNumber.error.invalid")
-          )
-        )
-    )
+    beRetrievable[String](TrustMobileNumberPage)
+
+    beSettable[String](TrustMobileNumberPage)
+
+    beRemovable[String](TrustMobileNumberPage)
+  }
 }
