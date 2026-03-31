@@ -318,10 +318,10 @@ POST  /add/trust/phone-number          controllers.add.trust.TrustPhoneNumberCon
 GET   /add/trust/change-phone-number   controllers.add.trust.TrustPhoneNumberController.onPageLoad(mode: Mode = CheckMode)
 POST  /add/trust/change-phone-number   controllers.add.trust.TrustPhoneNumberController.onSubmit(mode: Mode = CheckMode)
 
-GET   /trustMobileNumber               controllers.add.trust.TrustMobileNumberController.onPageLoad(mode: Mode = NormalMode)
-POST  /trustMobileNumber               controllers.add.trust.TrustMobileNumberController.onSubmit(mode: Mode = NormalMode)
-GET   /changeTrustMobileNumber         controllers.add.trust.TrustMobileNumberController.onPageLoad(mode: Mode = CheckMode)
-POST  /changeTrustMobileNumber         controllers.add.trust.TrustMobileNumberController.onSubmit(mode: Mode = CheckMode)
+GET   /add/trust/mobile-number         controllers.add.trust.TrustMobileNumberController.onPageLoad(mode: Mode = NormalMode)
+POST  /add/trust/mobile-number         controllers.add.trust.TrustMobileNumberController.onSubmit(mode: Mode = NormalMode)
+GET   /add/trust/change-mobile-number  controllers.add.trust.TrustMobileNumberController.onPageLoad(mode: Mode = CheckMode)
+POST  /add/trust/change-mobile-number  controllers.add.trust.TrustMobileNumberController.onSubmit(mode: Mode = CheckMode)
 
 GET   /add/trust/trust-has-utr         controllers.add.trust.TrustUtrYesNoController.onPageLoad(mode: Mode = NormalMode)
 POST  /add/trust/trust-has-utr         controllers.add.trust.TrustUtrYesNoController.onSubmit(mode: Mode = NormalMode)
