@@ -345,4 +345,4 @@ POST  /changeTrustWorksReference                controllers.add.trust.TrustWorks
 
 GET   /trustCheckYourAnswers                    controllers.add.trust.TrustCheckYourAnswersController.onPageLoad()
 
-GET   /add/trust/subcontractor-added   controllers.add.SubcontractorAddedController.trustSubcontractorAdded()
+GET   /add/trust/subcontractor-added            controllers.add.SubcontractorAddedController.trustSubcontractorAdded()
