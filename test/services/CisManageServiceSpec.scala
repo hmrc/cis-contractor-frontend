@@ -18,12 +18,15 @@ package services
 
 import base.SpecBase
 import connectors.ConstructionIndustrySchemeConnector
+import models.agent.AgentClientData
 import models.response.CisTaxpayerResponse
-import org.mockito.ArgumentMatchers.any
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{verify, verifyNoInteractions, verifyNoMoreInteractions, when}
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.mockito.MockitoSugar.mock
+import play.api.libs.json.{JsValue, Json}
 import queries.CisIdQuery
+import repositories.SessionRepository
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -33,6 +36,13 @@ final class CisManageServiceSpec extends SpecBase with MockitoSugar {
   implicit val hc: HeaderCarrier    = HeaderCarrier()
   implicit val ec: ExecutionContext = scala.concurrent.ExecutionContext.global
 
+  private def newService(): (CisManageService, ConstructionIndustrySchemeConnector, SessionRepository) = {
+    val connector = mock[ConstructionIndustrySchemeConnector]
+    val sessionRepo = mock[SessionRepository]
+    val service = new CisManageService(connector)
+    (service, connector, sessionRepo)
+  }
+  
   "SubcontractorService" - {
 
     "ensureCisIdInUserAnswers" - {
@@ -173,5 +183,70 @@ final class CisManageServiceSpec extends SpecBase with MockitoSugar {
         verifyNoMoreInteractions(mockConnector)
       }
     }
+
+    "hasClient" - {
+
+      "delegate to connector and return the boolean" in {
+        val (service, connector, sessionRepo) = newService()
+
+        when(connector.hasClient(eqTo("163"), eqTo("AB0063"))(any[HeaderCarrier]))
+          .thenReturn(Future.successful(true))
+
+        service.hasClient("163", "AB0063").futureValue mustBe true
+
+        verify(connector).hasClient(eqTo("163"), eqTo("AB0063"))(any[HeaderCarrier])
+        verifyNoInteractions(sessionRepo)
+      }
+    }
+
+    "getAgentClient" - {
+
+      "delegate to connector and return the agent client data when present" in {
+        val (service, connector, _) = newService()
+        val userId = "123"
+
+        val validAgentClientData = AgentClientData("CLIENT-123", "163", "AB0063", Some("ABC Construction Ltd"))
+        val validJson: JsValue = Json.toJson(validAgentClientData)
+
+        when(connector.getAgentClient(eqTo(userId))(any[HeaderCarrier]))
+          .thenReturn(
+            Future.successful(Some(validJson))
+          )
+
+        val result = service.getAgentClient(userId).futureValue
+        result mustBe Some(AgentClientData("CLIENT-123", "163", "AB0063", Some("ABC Construction Ltd")))
+
+        verify(connector).getAgentClient(eqTo(userId))(any[HeaderCarrier])
+      }
+
+      "delegate to connector and return None when agent client data is not present" in {
+        val (service, connector, _) = newService()
+        val invalidJson = Json.obj("unexpected" -> "field")
+
+        when(connector.getAgentClient(eqTo("bar"))(any[HeaderCarrier]))
+          .thenReturn(
+            Future.successful(Some(invalidJson))
+          )
+
+        val result = service.getAgentClient("bar").futureValue
+        result mustBe None
+
+        verify(connector).getAgentClient(eqTo("bar"))(any[HeaderCarrier])
+      }
+
+      "return None when connector returns None" in {
+        val (service, connector, _) = newService()
+
+        when(connector.getAgentClient("baz")).thenReturn(Future.successful(None))
+
+        val result = service.getAgentClient("baz").futureValue
+        result mustBe None
+
+        verify(connector).getAgentClient(eqTo("baz"))(any[HeaderCarrier])
+
+      }
+    }
+
+
   }
 }

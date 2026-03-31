@@ -18,7 +18,9 @@ package services
 
 import connectors.ConstructionIndustrySchemeConnector
 import models.UserAnswers
+import models.agent.AgentClientData
 import play.api.Logging
+import play.api.libs.json.{JsError, JsSuccess}
 import queries.CisIdQuery
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -46,4 +48,20 @@ class CisManageService @Inject() (
           }
         }
     }
+
+  def hasClient(taxOfficeNumber: String, taxOfficeReference: String)(implicit hc: HeaderCarrier): Future[Boolean] =
+    cisConnector.hasClient(taxOfficeNumber, taxOfficeReference)
+
+  def getAgentClient(userId: String)(implicit hc: HeaderCarrier): Future[Option[AgentClientData]] =
+    cisConnector.getAgentClient(userId).map {
+      case Some(jsValue) =>
+        jsValue.validate[AgentClientData] match {
+          case JsSuccess(agentClientData, _) => Some(agentClientData)
+          case JsError(errors) =>
+            logger.warn(s"[CisManageService] Invalid AgentClientData JSON for userId=$userId: $errors")
+            None
+        }
+      case None => None
+    }
+
 }
