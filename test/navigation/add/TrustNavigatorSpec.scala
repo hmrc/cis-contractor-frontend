@@ -315,7 +315,7 @@ class TrustNavigatorSpec extends SpecBase {
           ) mustBe controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
         }
 
-        "to itself when NoDetails is selected" in {
+        "to CYA when NoDetails is selected" in {
           navigator.nextPage(
             TrustContactOptionsPage,
             CheckMode,
