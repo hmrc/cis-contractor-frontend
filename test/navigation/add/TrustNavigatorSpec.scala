@@ -160,6 +160,14 @@ class TrustNavigatorSpec extends SpecBase {
         ) mustBe controllers.add.trust.routes.TrustUtrYesNoController.onPageLoad(NormalMode)
       }
 
+      "must go from a TrustMobileNumberPage to TrustUtrYesNoPage" in {
+        navigator.nextPage(
+          TrustMobileNumberPage,
+          NormalMode,
+          UserAnswers("id")
+        ) mustBe controllers.add.trust.routes.TrustUtrYesNoController.onPageLoad(NormalMode)
+      }
+
     }
 
     "in Check mode" - {
@@ -231,6 +239,14 @@ class TrustNavigatorSpec extends SpecBase {
       "must go from TrustPhoneNumberPage to TrustCheckYourAnswersPage in CheckMode" in {
         navigator.nextPage(
           TrustPhoneNumberPage,
+          CheckMode,
+          emptyUserAnswers
+        ) mustBe controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
+      }
+
+      "must go from TrustMobileNumberPage to TrustCheckYourAnswersPage in CheckMode" in {
+        navigator.nextPage(
+          TrustMobileNumberPage,
           CheckMode,
           emptyUserAnswers
         ) mustBe controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
