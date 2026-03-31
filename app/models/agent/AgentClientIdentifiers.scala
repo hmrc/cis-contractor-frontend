@@ -17,7 +17,7 @@
 package models.agent
 
 final case class AgentClientIdentifiers(
-                                         uniqueId: String,
-                                         taxOfficeNumber: String,
-                                         taxOfficeReference: String
-                                       )
+  uniqueId: String,
+  taxOfficeNumber: String,
+  taxOfficeReference: String
+)

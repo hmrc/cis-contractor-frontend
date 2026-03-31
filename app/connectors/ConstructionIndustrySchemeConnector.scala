@@ -99,16 +99,16 @@ class ConstructionIndustrySchemeConnector @Inject() (config: ServicesConfig, htt
       .map(_.hasClient)
 
   def getAgentClient(userId: String)(implicit
-                                     hc: HeaderCarrier
+    hc: HeaderCarrier
   ): Future[Option[JsValue]] =
     http
       .get(url"$cisBaseUrl/user-cache/agent-client/$userId")
       .execute[HttpResponse]
       .map { response =>
         response.status match {
-          case OK => Some(response.json)
+          case OK        => Some(response.json)
           case NOT_FOUND => None
-          case _ => throw new HttpException(response.body, response.status)
+          case _         => throw new HttpException(response.body, response.status)
         }
       }
 

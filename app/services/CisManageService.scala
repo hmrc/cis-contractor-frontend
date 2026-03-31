@@ -57,11 +57,11 @@ class CisManageService @Inject() (
       case Some(jsValue) =>
         jsValue.validate[AgentClientData] match {
           case JsSuccess(agentClientData, _) => Some(agentClientData)
-          case JsError(errors) =>
+          case JsError(errors)               =>
             logger.warn(s"[CisManageService] Invalid AgentClientData JSON for userId=$userId: $errors")
             None
         }
-      case None => None
+      case None          => None
     }
 
 }

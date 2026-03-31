@@ -52,12 +52,12 @@ trait SpecBase
   def messages(app: Application): Messages = app.injector.instanceOf[MessagesApi].preferred(FakeRequest())
 
   protected def applicationBuilder(
-                                    userAnswers: Option[UserAnswers] = None,
-                                    additionalBindings: Seq[Binding[_]] = Nil,
-                                    isAgent: Boolean = false,
-                                    hasAgentRef: Boolean = true,
-                                    hasEmployeeRef: Boolean = true
-                                  ): GuiceApplicationBuilder =
+    userAnswers: Option[UserAnswers] = None,
+    additionalBindings: Seq[Binding[_]] = Nil,
+    isAgent: Boolean = false,
+    hasAgentRef: Boolean = true,
+    hasEmployeeRef: Boolean = true
+  ): GuiceApplicationBuilder =
     new GuiceApplicationBuilder()
       .configure("play.http.router" -> "app.Routes")
       .overrides(

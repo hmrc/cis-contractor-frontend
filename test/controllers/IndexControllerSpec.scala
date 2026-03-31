@@ -53,10 +53,9 @@ class IndexControllerSpec extends SpecBase {
         userAnswers = None,
         hasAgentRef = false
       ).overrides(
-          bind[SessionRepository].toInstance(mockSessionRepository),
-          bind[CisManageService].toInstance(mockCisManagerService)
-        )
-        .build()
+        bind[SessionRepository].toInstance(mockSessionRepository),
+        bind[CisManageService].toInstance(mockCisManagerService)
+      ).build()
 
       running(application) {
         val request = FakeRequest(GET, routes.IndexController.onPageLoad().url)
@@ -85,8 +84,8 @@ class IndexControllerSpec extends SpecBase {
       val mockCisManagerService = mock[CisManageService]
 
       val uniqueId = "unique-id-123"
-      val ton = "taxOfficeNumber"
-      val tor = "taxOfficeReference"
+      val ton      = "taxOfficeNumber"
+      val tor      = "taxOfficeReference"
 
       when(mockCisManagerService.getAgentClient(any[String])(any[HeaderCarrier]))
         .thenReturn(
@@ -112,10 +111,9 @@ class IndexControllerSpec extends SpecBase {
         isAgent = true,
         hasEmployeeRef = false
       ).overrides(
-          bind[SessionRepository].toInstance(mockSessionRepository),
-          bind[CisManageService].toInstance(mockCisManagerService)
-        )
-        .build()
+        bind[SessionRepository].toInstance(mockSessionRepository),
+        bind[CisManageService].toInstance(mockCisManagerService)
+      ).build()
 
       running(application) {
         val request = FakeRequest(GET, routes.IndexController.onPageLoad().url)
@@ -153,10 +151,9 @@ class IndexControllerSpec extends SpecBase {
         isAgent = true,
         hasEmployeeRef = false
       ).overrides(
-          bind[SessionRepository].toInstance(mockSessionRepository),
-          bind[CisManageService].toInstance(mockCisManagerService)
-        )
-        .build()
+        bind[SessionRepository].toInstance(mockSessionRepository),
+        bind[CisManageService].toInstance(mockCisManagerService)
+      ).build()
 
       running(application) {
         val request = FakeRequest(GET, routes.IndexController.onPageLoad().url)
@@ -183,8 +180,8 @@ class IndexControllerSpec extends SpecBase {
       val mockCisManagerService = mock[CisManageService]
 
       val uniqueId = "unique-id-123"
-      val ton = "taxOfficeNumber"
-      val tor = "taxOfficeReference"
+      val ton      = "taxOfficeNumber"
+      val tor      = "taxOfficeReference"
 
       when(mockCisManagerService.getAgentClient(any[String])(any[HeaderCarrier]))
         .thenReturn(
@@ -208,10 +205,9 @@ class IndexControllerSpec extends SpecBase {
         isAgent = true,
         hasEmployeeRef = false
       ).overrides(
-          bind[SessionRepository].toInstance(mockSessionRepository),
-          bind[CisManageService].toInstance(mockCisManagerService)
-        )
-        .build()
+        bind[SessionRepository].toInstance(mockSessionRepository),
+        bind[CisManageService].toInstance(mockCisManagerService)
+      ).build()
 
       running(application) {
         val request = FakeRequest(GET, routes.IndexController.onPageLoad().url)
@@ -238,8 +234,8 @@ class IndexControllerSpec extends SpecBase {
       val mockCisManagerService = mock[CisManageService]
 
       val uniqueId = "unique-id-123"
-      val ton = "taxOfficeNumber"
-      val tor = "taxOfficeReference"
+      val ton      = "taxOfficeNumber"
+      val tor      = "taxOfficeReference"
 
       when(mockCisManagerService.getAgentClient(any[String])(any[HeaderCarrier]))
         .thenReturn(
@@ -263,10 +259,9 @@ class IndexControllerSpec extends SpecBase {
         isAgent = true,
         hasEmployeeRef = false
       ).overrides(
-          bind[SessionRepository].toInstance(mockSessionRepository),
-          bind[CisManageService].toInstance(mockCisManagerService)
-        )
-        .build()
+        bind[SessionRepository].toInstance(mockSessionRepository),
+        bind[CisManageService].toInstance(mockCisManagerService)
+      ).build()
 
       running(application) {
         val request = FakeRequest(GET, routes.IndexController.onPageLoad().url)
@@ -300,10 +295,9 @@ class IndexControllerSpec extends SpecBase {
         isAgent = true,
         hasEmployeeRef = false
       ).overrides(
-          bind[SessionRepository].toInstance(mockSessionRepository),
-          bind[CisManageService].toInstance(mockCisManagerService)
-        )
-        .build()
+        bind[SessionRepository].toInstance(mockSessionRepository),
+        bind[CisManageService].toInstance(mockCisManagerService)
+      ).build()
 
       running(application) {
         val request = FakeRequest(GET, routes.IndexController.onPageLoad().url)

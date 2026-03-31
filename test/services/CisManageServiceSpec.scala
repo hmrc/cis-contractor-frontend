@@ -37,12 +37,12 @@ final class CisManageServiceSpec extends SpecBase with MockitoSugar {
   implicit val ec: ExecutionContext = scala.concurrent.ExecutionContext.global
 
   private def newService(): (CisManageService, ConstructionIndustrySchemeConnector, SessionRepository) = {
-    val connector = mock[ConstructionIndustrySchemeConnector]
+    val connector   = mock[ConstructionIndustrySchemeConnector]
     val sessionRepo = mock[SessionRepository]
-    val service = new CisManageService(connector)
+    val service     = new CisManageService(connector)
     (service, connector, sessionRepo)
   }
-  
+
   "SubcontractorService" - {
 
     "ensureCisIdInUserAnswers" - {
@@ -203,10 +203,10 @@ final class CisManageServiceSpec extends SpecBase with MockitoSugar {
 
       "delegate to connector and return the agent client data when present" in {
         val (service, connector, _) = newService()
-        val userId = "123"
+        val userId                  = "123"
 
         val validAgentClientData = AgentClientData("CLIENT-123", "163", "AB0063", Some("ABC Construction Ltd"))
-        val validJson: JsValue = Json.toJson(validAgentClientData)
+        val validJson: JsValue   = Json.toJson(validAgentClientData)
 
         when(connector.getAgentClient(eqTo(userId))(any[HeaderCarrier]))
           .thenReturn(
@@ -221,7 +221,7 @@ final class CisManageServiceSpec extends SpecBase with MockitoSugar {
 
       "delegate to connector and return None when agent client data is not present" in {
         val (service, connector, _) = newService()
-        val invalidJson = Json.obj("unexpected" -> "field")
+        val invalidJson             = Json.obj("unexpected" -> "field")
 
         when(connector.getAgentClient(eqTo("bar"))(any[HeaderCarrier]))
           .thenReturn(
@@ -246,7 +246,6 @@ final class CisManageServiceSpec extends SpecBase with MockitoSugar {
 
       }
     }
-
 
   }
 }

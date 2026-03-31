@@ -44,7 +44,8 @@ class IndexController @Inject() (
   cisManagerService: CisManageService
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
-    with I18nSupport with Logging {
+    with I18nSupport
+    with Logging {
 
   def onPageLoad(): Action[AnyContent] = (identify andThen getData).async { implicit request =>
     val userAnswers = request.userAnswers.getOrElse(UserAnswers(request.userId))
@@ -58,13 +59,13 @@ class IndexController @Inject() (
   }
 
   private def handleRequest(
-                             agentClient: Option[AgentClientIdentifiers],
-                             userAnswers: UserAnswers
-                           )(implicit request: OptionalDataRequest[AnyContent]): Future[Result] =
+    agentClient: Option[AgentClientIdentifiers],
+    userAnswers: UserAnswers
+  )(implicit request: OptionalDataRequest[AnyContent]): Future[Result] =
     if (!request.isAgent) {
       for {
         updated <- cisManagerService.ensureCisIdInUserAnswers(userAnswers)
-        _ <- sessionRepository.set(updated)
+        _       <- sessionRepository.set(updated)
       } yield Redirect(addSubcontractorRoutes.TypeOfSubcontractorController.onPageLoad(NormalMode))
     } else {
       agentClient match {
@@ -76,8 +77,9 @@ class IndexController @Inject() (
           cisManagerService
             .hasClient(ton.trim, tor.trim)
             .flatMap {
-              case true => storeInstanceId(uniqueId.trim, userAnswers)
-                .map(_ => Redirect(addSubcontractorRoutes.TypeOfSubcontractorController.onPageLoad(NormalMode)))
+              case true  =>
+                storeInstanceId(uniqueId.trim, userAnswers)
+                  .map(_ => Redirect(addSubcontractorRoutes.TypeOfSubcontractorController.onPageLoad(NormalMode)))
               case false =>
                 logger.warn(s"[IndexController] hasClient=false for taxOfficeNumber=$ton taxOfficeReference=$tor")
                 Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
@@ -89,11 +91,16 @@ class IndexController @Inject() (
       }
     }
 
-  private def getAgentClient(implicit request: OptionalDataRequest[_], hc: HeaderCarrier): Future[Option[AgentClientIdentifiers]] =
+  private def getAgentClient(implicit
+    request: OptionalDataRequest[_],
+    hc: HeaderCarrier
+  ): Future[Option[AgentClientIdentifiers]] =
     if (request.isAgent) {
-      cisManagerService.getAgentClient(request.userId).map(_.map { data =>
-        AgentClientIdentifiers(data.uniqueId, data.taxOfficeNumber, data.taxOfficeReference)
-      })
+      cisManagerService
+        .getAgentClient(request.userId)
+        .map(_.map { data =>
+          AgentClientIdentifiers(data.uniqueId, data.taxOfficeNumber, data.taxOfficeReference)
+        })
     } else {
       Future.successful(None)
     }
@@ -101,7 +108,7 @@ class IndexController @Inject() (
   private def storeInstanceId(instanceId: String, userAnswers: UserAnswers): Future[Unit] =
     for {
       updated <- Future.fromTry(userAnswers.set(CisIdQuery, instanceId))
-      _ <- sessionRepository.set(updated)
+      _       <- sessionRepository.set(updated)
     } yield ()
 
 }
