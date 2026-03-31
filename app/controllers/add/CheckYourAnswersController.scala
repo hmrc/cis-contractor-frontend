@@ -117,7 +117,9 @@ class CheckYourAnswersController @Inject() (
                 Future
                   .fromTry(request.userAnswers.set(CheckYourAnswersSubmittedPage, true))
                   .flatMap(updated => sessionRepository.set(updated).map(_ => ()))
-                  .map(_ => Redirect(controllers.add.routes.CheckYourAnswersController.onPageLoad()))
+                  .map(_ =>
+                    Redirect(controllers.add.routes.SubcontractorAddedController.individualSubcontractorAdded())
+                  )
               }
               .recover { case t =>
                 logger.error("[CheckYourAnswersController.onSubmit] Failed to create/update subcontractor", t)
