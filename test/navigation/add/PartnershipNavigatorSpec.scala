@@ -58,7 +58,7 @@ class PartnershipNavigatorSpec extends SpecBase {
         ) mustBe controllers.add.partnership.routes.PartnershipUniqueTaxpayerReferenceController.onPageLoad(NormalMode)
       }
 
-      "must go from a PartnershipHasUtrYesNo to PartnershipWorksReferenceNumberYesNoCPage when false" in {
+      "must go from a PartnershipHasUtrYesNo to PartnershipWorksReferenceNumberYesNoPage when false" in {
         navigator.nextPage(
           PartnershipHasUtrYesNoPage,
           NormalMode,

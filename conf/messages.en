@@ -726,11 +726,12 @@ trustUtr.error.required                                        =  Enter trustUtr
 trustUtr.error.length                                          =  TrustUtr must be 10 characters or less
 trustUtr.change.hidden                                         =  TrustUtr
 
-trustWorksReferenceYesNo.title                                 =  trustWorksReferenceYesNo
-trustWorksReferenceYesNo.heading                               =  trustWorksReferenceYesNo
-trustWorksReferenceYesNo.checkYourAnswersLabel                 =  trustWorksReferenceYesNo
-trustWorksReferenceYesNo.error.required                        =  Select yes if trustWorksReferenceYesNo
-trustWorksReferenceYesNo.change.hidden                         =  TrustWorksReferenceYesNo
+trustWorksReferenceYesNo.title                                 =  Is there a works reference number associated with this trust?
+trustWorksReferenceYesNo.heading                               =  Is there a works reference number associated with {0}?
+trustWorksReferenceYesNo.hint                                  =  This is the reference number used to identify a subcontractor's work or project. It can contain letters and numbers.
+trustWorksReferenceYesNo.checkYourAnswersLabel                 =  Works reference number
+trustWorksReferenceYesNo.error.required                        =  Select whether there is a works reference number associated with this trust
+trustWorksReferenceYesNo.change.hidden                         =  works reference number
 
 trustWorksReference.title                                      =  trustWorksReference
 trustWorksReference.heading                                    =  trustWorksReference

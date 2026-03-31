@@ -331,10 +331,10 @@ POST  /trustUtr                        controllers.add.trust.TrustUtrController.
 GET   /changeTrustUtr                  controllers.add.trust.TrustUtrController.onPageLoad(mode: Mode = CheckMode)
 POST  /changeTrustUtr                  controllers.add.trust.TrustUtrController.onSubmit(mode: Mode = CheckMode)
 
-GET   /trustWorksReferenceYesNo        controllers.add.trust.TrustWorksReferenceYesNoController.onPageLoad(mode: Mode = NormalMode)
-POST  /trustWorksReferenceYesNo        controllers.add.trust.TrustWorksReferenceYesNoController.onSubmit(mode: Mode = NormalMode)
-GET   /changeTrustWorksReferenceYesNo  controllers.add.trust.TrustWorksReferenceYesNoController.onPageLoad(mode: Mode = CheckMode)
-POST  /changeTrustWorksReferenceYesNo  controllers.add.trust.TrustWorksReferenceYesNoController.onSubmit(mode: Mode = CheckMode)
+GET   /add/trust/trust-has-works-reference         controllers.add.trust.TrustWorksReferenceYesNoController.onPageLoad(mode: Mode = NormalMode)
+POST  /add/trust/trust-has-works-reference         controllers.add.trust.TrustWorksReferenceYesNoController.onSubmit(mode: Mode = NormalMode)
+GET   /add/trust/change-trust-has-works-reference  controllers.add.trust.TrustWorksReferenceYesNoController.onPageLoad(mode: Mode = CheckMode)
+POST  /add/trust/change-trust-has-works-reference  controllers.add.trust.TrustWorksReferenceYesNoController.onSubmit(mode: Mode = CheckMode)
 
 GET   /trustWorksReference             controllers.add.trust.TrustWorksReferenceController.onPageLoad(mode: Mode = NormalMode)
 POST  /trustWorksReference             controllers.add.trust.TrustWorksReferenceController.onSubmit(mode: Mode = NormalMode)
