@@ -147,6 +147,10 @@ class TrustNavigatorSpec extends SpecBase {
           controllers.add.trust.routes.TrustWorksReferenceYesNoController.onPageLoad(NormalMode)
       }
 
+      "must go from TrustUtrYesNoPage to JourneyRecovery when answer is not present" in {
+        navigator.nextPage(TrustUtrYesNoPage, NormalMode, emptyUserAnswers) mustBe journeyRecovery
+      }
+
       "must go from TrustUtrPage to TrustWorksReferenceYesNoController" in {
         navigator.nextPage(TrustUtrPage, NormalMode, emptyUserAnswers) mustBe
           controllers.add.trust.routes.TrustWorksReferenceYesNoController.onPageLoad(NormalMode)
