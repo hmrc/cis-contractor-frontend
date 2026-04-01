@@ -681,15 +681,16 @@ trustAddress.country                                           =  Country
 trustAddress.country.error.required                            =  Select a country
 
 trustContactOptions.title                                      =  What are the contact details for this trust?
-trustContactOptions.heading                                    =  What are the contact details for this trust?
+trustContactOptions.heading                                    =  What are the contact details for {0}?
+trustContactOptions.hint                                       =  Choose which method of contact you would like to add for this subcontractor. Contact details are only for your own records.
 trustContactOptions.email                                      =  Email address
 trustContactOptions.phone                                      =  Phone number
 trustContactOptions.mobile                                     =  Mobile number
 trustContactOptions.noDetails                                  =  Do not add any contact details for this subcontractor
 trustContactOptions.or                                         =  or
-trustContactOptions.checkYourAnswersLabel                      =  What are the contact details for this trust?
-trustContactOptions.error.required                             =  Select trustContactOptions
-trustContactOptions.change.hidden                              =  TrustContactOptions
+trustContactOptions.error.required                             =  Select whether you want to add contact details for this trust
+trustContactOptions.checkYourAnswersLabel                      =  Method of contact
+trustContactOptions.change.hidden                              =  method of contact
 
 trustEmailAddress.title                                        =  What is the email address for this trust?
 trustEmailAddress.heading                                      =  What is the email address for {0}?
