@@ -128,7 +128,7 @@ class PartnershipNominatedPartnerCrnControllerSpec extends SpecBase with Mockito
 
         // ✅ updated expectation: navigator now loops back to same page in NormalMode
         redirectLocation(result).value mustEqual
-          controllers.add.partnership.routes.PartnershipNominatedPartnerCrnController.onPageLoad(NormalMode).url
+          controllers.add.partnership.routes.PartnershipWorksReferenceNumberYesNoController.onPageLoad(NormalMode).url
       }
 
       verify(mockSessionRepository).set(any())

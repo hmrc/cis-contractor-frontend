@@ -123,7 +123,7 @@ class PartnershipChooseContactDetailsControllerSpec extends SpecBase with Mockit
         status(result) mustEqual SEE_OTHER
         redirectLocation(
           result
-        ).value mustEqual controllers.add.partnership.routes.PartnershipChooseContactDetailsController
+        ).value mustEqual controllers.add.partnership.routes.PartnershipPhoneNumberController
           .onPageLoad(NormalMode)
           .url
       }
@@ -259,7 +259,7 @@ class PartnershipChooseContactDetailsControllerSpec extends SpecBase with Mockit
         // TODO: CIS ANSF PTN: Screen AS-P4 (PTN) What are the contact details for [partnership name]?
         redirectLocation(
           result
-        ).value mustEqual controllers.add.partnership.routes.PartnershipChooseContactDetailsController
+        ).value mustEqual controllers.add.partnership.routes.PartnershipEmailAddressController
           .onPageLoad(CheckMode)
           .url
       }
