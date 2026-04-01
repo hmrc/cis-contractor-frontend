@@ -22,7 +22,7 @@ import play.api.libs.json.JsPath
 
 import scala.util.Try
 
-case object TrustWorksReferenceYesNoPage extends QuestionPage[Boolean] {
+case object TrustWorksReferenceYesNoPage extends QuestionPage[Boolean] with TrustJourney {
 
   override def path: JsPath = JsPath \ toString
 

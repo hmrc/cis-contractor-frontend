@@ -735,7 +735,7 @@ trustUtr.change.hidden                                         =  TrustUtr
 
 trustWorksReferenceYesNo.title                                 =  Is there a works reference number associated with this trust?
 trustWorksReferenceYesNo.heading                               =  Is there a works reference number associated with {0}?
-trustWorksReferenceYesNo.hint                                  =  This is the reference number used to identify a subcontractor's work or project. It can contain letters and numbers.
+trustWorksReferenceYesNo.hint                                  =  This is the reference number used to identify a subcontractor’s work or project. It can contain letters and numbers.
 trustWorksReferenceYesNo.checkYourAnswersLabel                 =  Works reference number
 trustWorksReferenceYesNo.error.required                        =  Select whether there is a works reference number associated with this trust
 trustWorksReferenceYesNo.change.hidden                         =  works reference number
