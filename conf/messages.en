@@ -726,12 +726,18 @@ trustUtrYesNo.checkYourAnswersLabel                            =  Add UTR?
 trustUtrYesNo.error.required                                   =  Select whether you know the Unique Taxpayer Reference (UTR) for this trust
 trustUtrYesNo.change.hidden                                    =  add UTR?
 
-trustUtr.title                                                 =  trustUtr
-trustUtr.heading                                               =  trustUtr
-trustUtr.checkYourAnswersLabel                                 =  trustUtr
-trustUtr.error.required                                        =  Enter trustUtr
-trustUtr.error.length                                          =  TrustUtr must be 10 characters or less
-trustUtr.change.hidden                                         =  TrustUtr
+trustUtr.title                                                 =  Trust Unique Taxpayer Reference (UTR)
+trustUtr.heading                                               =  Trust Unique Taxpayer Reference (UTR)
+trustUtr.p1                                                    =  The UTR will be on tax returns and other documents from HMRC.
+trustUtr.linkText                                              =  Get more help to find a UTR (opens in new tab)
+trustUtr.label                                                 =  What is the UTR for {0}?
+trustUtr.hint                                                  =  A UTR is a 10 digit number
+trustUtr.checkYourAnswersLabel                                 =  Trust UTR
+trustUtr.error.required                                        =  Enter a valid Unique Taxpayer Reference (UTR)
+trustUtr.error.length                                          =  Enter a valid Unique Taxpayer Reference (UTR)
+trustUtr.error.invalid                                         =  Enter a valid Unique Taxpayer Reference (UTR)
+trustUtr.error.duplicate                                       =  You have already used this Unique Taxpayer Reference (UTR) for an existing subcontractor
+trustUtr.change.hidden                                         =  trust UTR
 
 trustWorksReferenceYesNo.title                                 =  Is there a works reference number associated with this trust?
 trustWorksReferenceYesNo.heading                               =  Is there a works reference number associated with {0}?

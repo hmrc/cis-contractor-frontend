@@ -43,11 +43,11 @@ class TrustNavigator @Inject() () extends NavigatorForJourney {
     case TrustAddressYesNoPage        => userAnswers => navigatorFromTrustAddressYesNoPage(NormalMode)(userAnswers)
     case TrustAddressPage             => _ => controllers.add.trust.routes.TrustContactOptionsController.onPageLoad(NormalMode)
     case TrustUtrYesNoPage            => userAnswers => navigatorFromTrustUtrYesNoPage(NormalMode)(userAnswers)
+    case TrustUtrPage                 => _ => controllers.add.trust.routes.TrustWorksReferenceYesNoController.onPageLoad(NormalMode)
     case TrustPhoneNumberPage         => _ => controllers.add.trust.routes.TrustUtrYesNoController.onPageLoad(NormalMode)
     case TrustMobileNumberPage        => _ => controllers.add.trust.routes.TrustUtrYesNoController.onPageLoad(NormalMode)
     case TrustContactOptionsPage      => userAnswers => navigatorFromTrustContactOptionsPage(NormalMode)(userAnswers)
-    case TrustWorksReferenceYesNoPage =>
-      userAnswers => navigatorFromTrustWorksReferenceYesNoPage(NormalMode)(userAnswers)
+    case TrustWorksReferenceYesNoPage => userAnswers => navigatorFromTrustWorksReferenceYesNoPage(NormalMode)(userAnswers)
     case _                            => _ => routes.IndexController.onPageLoad()
   }
 
@@ -58,6 +58,7 @@ class TrustNavigator @Inject() () extends NavigatorForJourney {
     case TrustAddressYesNoPage        => navigatorFromTrustAddressYesNoPage(CheckMode)(_)
     case TrustAddressPage             => _ => controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
     case TrustUtrYesNoPage            => navigatorFromTrustUtrYesNoPage(CheckMode)(_)
+    case TrustUtrPage                 => _ => controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
     case TrustPhoneNumberPage         => _ => controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
     case TrustMobileNumberPage        => _ => controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
     case TrustContactOptionsPage      => userAnswers => navigatorFromTrustContactOptionsPage(CheckMode)(userAnswers)
@@ -67,9 +68,7 @@ class TrustNavigator @Inject() () extends NavigatorForJourney {
 
   private def navigatorFromTrustUtrYesNoPage(mode: Mode)(ua: UserAnswers): Call =
     (ua.get(TrustUtrYesNoPage), mode) match {
-      case (Some(true), _) =>
-        controllers.add.trust.routes.TrustUtrController.onPageLoad(mode)
-
+      case (Some(true), _)           => controllers.add.trust.routes.TrustUtrController.onPageLoad(mode)
       case (Some(false), NormalMode) =>
         controllers.add.trust.routes.TrustWorksReferenceYesNoController.onPageLoad(NormalMode)
 

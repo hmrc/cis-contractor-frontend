@@ -34,6 +34,7 @@ object TrustUtrSummary {
         actions = Seq(
           ActionItemViewModel("site.change", controllers.add.trust.routes.TrustUtrController.onPageLoad(CheckMode).url)
             .withVisuallyHiddenText(messages("trustUtr.change.hidden"))
+            .withAttribute("id" -> "trust-utr")
         )
       )
     }
