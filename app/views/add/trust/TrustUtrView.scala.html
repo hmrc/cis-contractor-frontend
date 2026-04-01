@@ -14,17 +14,22 @@
  * limitations under the License.
  *@
 
+@import viewmodels.LabelSize.Medium
 @import viewmodels.InputWidth._
+@import views.html.components._
 
 @this(
     layout: templates.Layout,
     formHelper: FormWithCSRF,
     govukErrorSummary: GovukErrorSummary,
     govukInput: GovukInput,
-    govukButton: GovukButton
+    govukButton: GovukButton,
+    heading: H1,
+    paragraph: Paragraph,
+    link: Link,
 )
 
-@(form: Form[_], mode: Mode)(implicit request: Request[_], messages: Messages)
+@(form: Form[_], mode: Mode, name: String)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = title(form, messages("trustUtr.title"))) {
 
@@ -34,12 +39,27 @@
             @govukErrorSummary(ErrorSummaryViewModel(form))
         }
 
+        @heading(messages("trustUtr.heading"))
+
+        @paragraph(messages("trustUtr.p1"))
+
+        @link(
+            linkTextKey = "trustUtr.linkText",
+            linkUrl = "https://www.gov.uk/find-utr-number",
+            isNewTab = true
+        )
+
         @govukInput(
             InputViewModel(
                 field = form("value"),
-                label = LabelViewModel(messages("trustUtr.heading")).asPageHeading()
+                label = LabelViewModel(messages("trustUtr.label", name)).withSize(Medium)
             )
-            .withWidth(Full)
+            .withWidth(Fixed10)
+            .withHint(Hint(
+            content = Messages("trustUtr.hint"))
+            )
+            .withSpellcheck(false)
+            .withAutocomplete("off")
         )
 
         @govukButton(
