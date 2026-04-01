@@ -187,7 +187,7 @@ class TrustNavigatorSpec extends SpecBase {
           ) mustBe routes.JourneyRecoveryController.onPageLoad()
         }
       }
-      
+
       "must go from a TrustMobileNumberPage to TrustUtrYesNoPage" in {
         navigator.nextPage(
           TrustMobileNumberPage,
@@ -303,7 +303,7 @@ class TrustNavigatorSpec extends SpecBase {
           ) mustBe routes.JourneyRecoveryController.onPageLoad()
         }
       }
-      
+
       "must go from TrustMobileNumberPage to TrustCheckYourAnswersPage in CheckMode" in {
         navigator.nextPage(
           TrustMobileNumberPage,
