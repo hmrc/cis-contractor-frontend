@@ -105,7 +105,7 @@ class PartnershipNominatedPartnerUtrControllerSpec extends SpecBase with Mockito
 
         redirectLocation(
           result
-        ).value mustEqual controllers.add.partnership.routes.PartnershipNominatedPartnerUtrController
+        ).value mustEqual controllers.add.partnership.routes.PartnershipNominatedPartnerNinoYesNoController
           .onPageLoad(NormalMode)
           .url
       }
