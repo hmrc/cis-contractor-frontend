@@ -22,6 +22,7 @@ import models.add.InternationalAddress
 import models.contact.ContactOptions
 import models.{CheckMode, NormalMode, UserAnswers}
 import pages.add.partnership.*
+import pages.Page
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 
@@ -42,14 +43,6 @@ class PartnershipNavigatorSpec extends SpecBase {
         navigator.nextPage(UnknownPage, NormalMode, UserAnswers("id")) mustBe routes.IndexController.onPageLoad()
       }
 
-      "must go from PartnershipNamePage to PartnershipHasUtrYesNoController in NormalMode" in {
-        navigator.nextPage(
-          PartnershipNamePage,
-          NormalMode,
-          emptyUserAnswers
-        ) mustBe controllers.add.partnership.routes.PartnershipHasUtrYesNoController.onPageLoad(NormalMode)
-      }
-
       "must go from a PartnershipHasUtrYesNo to PartnershipUniqueTaxpayerReferencePage when true" in {
         navigator.nextPage(
           PartnershipHasUtrYesNoPage,
@@ -58,12 +51,12 @@ class PartnershipNavigatorSpec extends SpecBase {
         ) mustBe controllers.add.partnership.routes.PartnershipUniqueTaxpayerReferenceController.onPageLoad(NormalMode)
       }
 
-      "must go from a PartnershipHasUtrYesNo to PartnershipWorksReferenceNumberYesNoPage when false" in {
+      "must go from a PartnershipHasUtrYesNo to PartnershipNominatedPartnerNameController when false" in {
         navigator.nextPage(
           PartnershipHasUtrYesNoPage,
           NormalMode,
           emptyUserAnswers.setOrException(PartnershipHasUtrYesNoPage, false)
-        ) mustBe controllers.add.partnership.routes.PartnershipWorksReferenceNumberYesNoController
+        ) mustBe controllers.add.partnership.routes.PartnershipNominatedPartnerNameController
           .onPageLoad(NormalMode)
       }
 
@@ -92,12 +85,12 @@ class PartnershipNavigatorSpec extends SpecBase {
         ) mustBe partnershipCYA
       }
 
-      "must go from a PartnershipUniqueTaxpayerReference to PartnershipWorksReferenceNumberYesNo page" in {
+      "must go from a PartnershipUniqueTaxpayerReference to PartnershipNominatedPartnerName page" in {
         navigator.nextPage(
           PartnershipUniqueTaxpayerReferencePage,
           NormalMode,
           emptyUserAnswers.setOrException(PartnershipUniqueTaxpayerReferencePage, "5860920998")
-        ) mustBe controllers.add.partnership.routes.PartnershipWorksReferenceNumberYesNoController
+        ) mustBe controllers.add.partnership.routes.PartnershipNominatedPartnerNameController
           .onPageLoad(NormalMode)
       }
 
