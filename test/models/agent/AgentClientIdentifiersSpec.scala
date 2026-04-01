@@ -45,4 +45,3 @@ class AgentClientIdentifiersSpec extends AnyFreeSpec with Matchers {
     }
   }
 }
-
