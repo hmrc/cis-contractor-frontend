@@ -149,7 +149,7 @@ class CheckYourAnswersControllerSpec extends SpecBase {
       }
     }
 
-    "must redirect back to CYA and set submitted flag when valid data is submitted" in {
+    "must redirect to  and set submitted flag when valid data is submitted" in {
       val mockSubcontractorService = mock[SubcontractorService]
       val mockSessionRepository    = mock[SessionRepository]
 
@@ -173,7 +173,9 @@ class CheckYourAnswersControllerSpec extends SpecBase {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.add.routes.CheckYourAnswersController.onPageLoad().url
+        redirectLocation(result).value mustEqual controllers.add.routes.SubcontractorAddedController
+          .individualSubcontractorAdded()
+          .url
       }
 
       verify(mockSubcontractorService).createAndUpdateSubcontractor(any[UserAnswers])(any[HeaderCarrier])

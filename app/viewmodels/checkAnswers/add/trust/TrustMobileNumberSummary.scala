@@ -37,6 +37,7 @@ object TrustMobileNumberSummary {
             controllers.add.trust.routes.TrustMobileNumberController.onPageLoad(CheckMode).url
           )
             .withVisuallyHiddenText(messages("trustMobileNumber.change.hidden"))
+            .withAttribute("id" -> "trust-mobile-number")
         )
       )
     }
