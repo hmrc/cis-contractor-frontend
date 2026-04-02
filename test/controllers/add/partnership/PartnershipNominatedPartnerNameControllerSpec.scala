@@ -115,7 +115,7 @@ class PartnershipNominatedPartnerNameControllerSpec extends SpecBase with Mockit
         status(result) mustEqual SEE_OTHER
         redirectLocation(
           result
-        ).value mustEqual controllers.add.partnership.routes.PartnershipNominatedPartnerNameController
+        ).value mustEqual controllers.add.partnership.routes.PartnershipNominatedPartnerUtrYesNoController
           .onPageLoad(NormalMode)
           .url
       }

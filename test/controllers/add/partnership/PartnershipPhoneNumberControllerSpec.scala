@@ -108,7 +108,7 @@ class PartnershipPhoneNumberControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.add.partnership.routes.PartnershipPhoneNumberController
+        redirectLocation(result).value mustEqual controllers.add.partnership.routes.PartnershipHasUtrYesNoController
           .onPageLoad(NormalMode)
           .url
       }

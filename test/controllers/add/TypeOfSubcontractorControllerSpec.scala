@@ -17,7 +17,6 @@
 package controllers.add
 
 import base.SpecBase
-import controllers.routes
 import forms.add.TypeOfSubcontractorFormProvider
 import models.add.TypeOfSubcontractor
 import models.{NormalMode, UserAnswers}
@@ -108,7 +107,7 @@ class TypeOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must redirect to the JourneyRecovery page when valid data Limitedcompany is submitted" in {
+    "must redirect to the CompanyName page when valid data Limitedcompany is submitted" in {
 
       val mockSessionRepository = mock[SessionRepository]
 
@@ -129,7 +128,9 @@ class TypeOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+        redirectLocation(result).value mustEqual controllers.add.company.routes.CompanyNameController
+          .onPageLoad(NormalMode)
+          .url
       }
     }
 

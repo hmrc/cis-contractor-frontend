@@ -128,7 +128,7 @@ class PartnershipNominatedPartnerNinoControllerSpec extends SpecBase with Mockit
         status(result) mustEqual SEE_OTHER
         redirectLocation(
           result
-        ).value mustEqual controllers.add.partnership.routes.PartnershipNominatedPartnerNinoController
+        ).value mustEqual controllers.add.partnership.routes.PartnershipNominatedPartnerCrnYesNoController
           .onPageLoad(NormalMode)
           .url
 

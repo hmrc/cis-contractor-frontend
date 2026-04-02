@@ -27,5 +27,13 @@ class CompanyUtrYesNoPageSpec extends PageBehaviours {
     beSettable[Boolean](CompanyUtrYesNoPage)
 
     beRemovable[Boolean](CompanyUtrYesNoPage)
+
+    "cleanup: must remove CompanyUtr userAnswers when No is selected" in {
+      val userAnswers = emptyUserAnswers.set(CompanyUtrPage, "7777777777").success.value
+
+      val updatedUserAnswers = userAnswers.set(CompanyUtrYesNoPage, false).success.value
+
+      updatedUserAnswers.get(CompanyUtrPage) mustBe None
+    }
   }
 }

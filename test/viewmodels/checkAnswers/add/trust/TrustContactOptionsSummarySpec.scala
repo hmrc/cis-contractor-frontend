@@ -14,40 +14,42 @@
  * limitations under the License.
  */
 
-package viewmodels.checkAnswers.add.company
+package viewmodels.checkAnswers.add.trust
 
+import controllers.add.trust.routes
 import models.contact.ContactOptions
 import models.{CheckMode, UserAnswers}
 import org.scalatest.OptionValues.convertOptionToValuable
 import org.scalatest.TryValues.convertTryToSuccessOrFailure
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.should.Matchers
-import pages.add.company.CompanyContactOptionsPage
+import pages.add.trust.TrustContactOptionsPage
 import play.api.i18n.Messages
 import play.api.test.Helpers.stubMessages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.*
+import org.scalatest.matchers.must.Matchers.must
 
-class CompanyContactOptionsSummarySpec extends AnyFreeSpec with Matchers {
+class TrustContactOptionsSummarySpec extends AnyFreeSpec with Matchers {
 
   implicit val messages: Messages = stubMessages()
 
-  "CompanyContactOptionsSummary.row" - {
+  "TrustContactOptionsSummary.row" - {
 
-    "must return a SummaryListRow when EmailAddress is selected" in {
+    "must return a SummaryListRow when Email is selected" in {
       val answers = UserAnswers("test-id")
-        .set(CompanyContactOptionsPage, ContactOptions.Email)
+        .set(TrustContactOptionsPage, ContactOptions.Email)
         .success
         .value
 
-      val maybeRow: Option[SummaryListRow] = CompanyContactOptionsSummary.row(answers)
+      val maybeRow: Option[SummaryListRow] = TrustContactOptionsSummary.row(answers)
       maybeRow shouldBe defined
 
       val row = maybeRow.value
 
-      val expectedKeyText = messages("companyContactOptions.checkYourAnswersLabel")
+      val expectedKeyText = messages("trustContactOptions.checkYourAnswersLabel")
       row.key.content.asHtml.toString should include(expectedKeyText)
 
-      val expectedValue = messages("companyContactOptions.email")
+      val expectedValue = messages("trustContactOptions.email")
       row.value.content.asHtml.toString should include(expectedValue)
 
       row.actions shouldBe defined
@@ -56,59 +58,60 @@ class CompanyContactOptionsSummarySpec extends AnyFreeSpec with Matchers {
 
       val changeAction       = actions.head
       val expectedChangeText = messages("site.change")
-      val expectedHref       = controllers.add.company.routes.CompanyContactOptionsController.onPageLoad(CheckMode).url
-      val expectedHiddenText = messages("companyContactOptions.change.hidden")
+      val expectedHref       = routes.TrustContactOptionsController.onPageLoad(CheckMode).url
+      val expectedHiddenText = messages("trustContactOptions.change.hidden")
 
       changeAction.content.asHtml.toString    should include(expectedChangeText)
       changeAction.href                     shouldBe expectedHref
       changeAction.visuallyHiddenText.value shouldBe expectedHiddenText
+      changeAction.attributes                   must contain("id" -> "trust-contact-details")
     }
 
-    "must return a SummaryListRow when PhoneNumber is selected" in {
+    "must return a SummaryListRow when Phone is selected" in {
       val answers = UserAnswers("test-id")
-        .set(CompanyContactOptionsPage, ContactOptions.Phone)
+        .set(TrustContactOptionsPage, ContactOptions.Phone)
         .success
         .value
 
-      val maybeRow: Option[SummaryListRow] = CompanyContactOptionsSummary.row(answers)
+      val maybeRow: Option[SummaryListRow] = TrustContactOptionsSummary.row(answers)
       maybeRow shouldBe defined
 
       val row           = maybeRow.value
-      val expectedValue = messages("companyContactOptions.phone")
+      val expectedValue = messages("trustContactOptions.phone")
       row.value.content.asHtml.toString should include(expectedValue)
     }
 
-    "must return a SummaryListRow when MobileNumber is selected" in {
+    "must return a SummaryListRow when Mobile is selected" in {
       val answers = UserAnswers("test-id")
-        .set(CompanyContactOptionsPage, ContactOptions.Mobile)
+        .set(TrustContactOptionsPage, ContactOptions.Mobile)
         .success
         .value
 
-      val maybeRow: Option[SummaryListRow] = CompanyContactOptionsSummary.row(answers)
+      val maybeRow: Option[SummaryListRow] = TrustContactOptionsSummary.row(answers)
       maybeRow shouldBe defined
 
       val row           = maybeRow.value
-      val expectedValue = messages("companyContactOptions.mobile")
+      val expectedValue = messages("trustContactOptions.mobile")
       row.value.content.asHtml.toString should include(expectedValue)
     }
 
-    "must return a SummaryListRow when No Option is selected" in {
+    "must return a SummaryListRow when None is selected" in {
       val answers = UserAnswers("test-id")
-        .set(CompanyContactOptionsPage, ContactOptions.NoDetails)
+        .set(TrustContactOptionsPage, ContactOptions.NoDetails)
         .success
         .value
 
-      val maybeRow: Option[SummaryListRow] = CompanyContactOptionsSummary.row(answers)
+      val maybeRow: Option[SummaryListRow] = TrustContactOptionsSummary.row(answers)
       maybeRow shouldBe defined
 
       val row           = maybeRow.value
-      val expectedValue = messages("companyContactOptions.cya.noDetails")
+      val expectedValue = messages("trustContactOptions.noDetails")
       row.value.content.asHtml.toString should include(expectedValue)
     }
 
     "must return None when the answer does not exist" in {
       val answers = UserAnswers("test-id")
-      CompanyContactOptionsSummary.row(answers) shouldBe None
+      TrustContactOptionsSummary.row(answers) shouldBe None
     }
   }
 }

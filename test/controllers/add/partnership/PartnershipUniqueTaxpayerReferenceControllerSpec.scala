@@ -46,9 +46,6 @@ class PartnershipUniqueTaxpayerReferenceControllerSpec extends SpecBase with Moc
   lazy private val partnershipUniqueTaxpayerReferenceRoute =
     controllers.add.partnership.routes.PartnershipUniqueTaxpayerReferenceController.onPageLoad(NormalMode).url
 
-  lazy private val partnershipWorksReferenceNumberYesNoRoute =
-    controllers.add.partnership.routes.PartnershipWorksReferenceNumberYesNoController.onPageLoad(NormalMode).url
-
   "PartnershipUniqueTaxpayerReferenceControllerSpec Controller" - {
 
     "must return OK and the correct view for a GET" in {
@@ -122,7 +119,10 @@ class PartnershipUniqueTaxpayerReferenceControllerSpec extends SpecBase with Moc
 
         status(result) mustEqual SEE_OTHER
 
-        redirectLocation(result).value mustEqual partnershipWorksReferenceNumberYesNoRoute
+        redirectLocation(result).value mustEqual
+          controllers.add.partnership.routes.PartnershipNominatedPartnerNameController
+            .onPageLoad(NormalMode)
+            .url
       }
 
       verify(mockSubcontractorService).isDuplicateUTR(any[UserAnswers], any[String])(any[HeaderCarrier])
