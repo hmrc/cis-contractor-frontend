@@ -172,6 +172,13 @@ class TrustNavigatorSpec extends SpecBase {
         ) mustBe controllers.add.trust.routes.TrustUtrYesNoController.onPageLoad(NormalMode)
       }
 
+      "must go from a TrustWorksReferencePage to TrustCheckYourAnswerPage" in {
+        navigator.nextPage(
+          TrustWorksReferencePage,
+          NormalMode,
+          UserAnswers("id")
+        ) mustBe controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
+      }
     }
 
     "in Check mode" - {
@@ -343,6 +350,14 @@ class TrustNavigatorSpec extends SpecBase {
               TrustContactOptionsPage,
               ContactOptions.NoDetails
             )
+          ) mustBe controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
+        }
+
+        "must go from TrustWorksReferencePage to TrustCheckYourAnswerPage in CheckMode" in {
+          navigator.nextPage(
+            TrustWorksReferencePage,
+            CheckMode,
+            emptyUserAnswers
           ) mustBe controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
         }
 
