@@ -22,7 +22,7 @@ import models.add.{InternationalAddress, SubcontractorName, TypeOfSubcontractor}
 import models.contact.ContactOptions
 import pages.add.company._
 import models.requests.CreateAndUpdateSubcontractorPayload
-import models.requests.CreateAndUpdateSubcontractorPayload.{CompanyPayload, IndividualOrSoleTraderPayload, PartnershipPayload}
+import models.requests.CreateAndUpdateSubcontractorPayload.{CompanyPayload, IndividualOrSoleTraderPayload, PartnershipPayload, TrustPayload}
 import models.subcontractor.GetSubcontractorUTRsResponse
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{times, verify, verifyNoMoreInteractions, when}
@@ -32,6 +32,7 @@ import queries.CisIdQuery
 import uk.gov.hmrc.http.HeaderCarrier
 import org.mockito.ArgumentCaptor
 import org.scalatestplus.mockito.MockitoSugar
+import pages.add.trust.*
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -718,6 +719,232 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
 
         verifyNoMoreInteractions(mockConnector)
       }
+
+      def baseTrustAnswers = {
+        val trustAddress =
+          InternationalAddress(
+            addressLine1 = "t1",
+            addressLine2 = Some("t2"),
+            addressLine3 = "London",
+            addressLine4 = Some("Hackney"),
+            postalCode = "N1 5AP",
+            country = "United Kingdom"
+          )
+
+        emptyUserAnswers
+          .set(CisIdQuery, cisId)
+          .success
+          .value
+          .set(TypeOfSubcontractorPage, TypeOfSubcontractor.Trust)
+          .success
+          .value
+          .set(TrustNamePage, "Test Trust")
+          .success
+          .value
+          .set(TrustAddressYesNoPage, true)
+          .success
+          .value
+          .set(TrustAddressPage, trustAddress)
+          .success
+          .value
+          .set(TrustUtrYesNoPage, true)
+          .success
+          .value
+          .set(TrustUtrPage, "1234567890")
+          .success
+          .value
+          .set(TrustWorksReferenceYesNoPage, true)
+          .success
+          .value
+          .set(TrustWorksReferencePage, "WRN-TRUST")
+          .success
+          .value
+      }
+
+      "should create and update subcontractor (Trust) with EMAIL contact details" in {
+        val mockConnector = mock[ConstructionIndustrySchemeConnector]
+        val service       = new SubcontractorService(mockConnector)
+
+        val userAnswers =
+          baseTrustAnswers
+            .set(TrustContactOptionsPage, ContactOptions.Email)
+            .success
+            .value
+            .set(TrustEmailAddressPage, "t@example.com")
+            .success
+            .value
+
+        val expectedPayload: CreateAndUpdateSubcontractorPayload =
+          TrustPayload(
+            cisId = cisId,
+            subcontractorType = TypeOfSubcontractor.Trust,
+            trustTradingName = Some("Test Trust"),
+            utr = Some("1234567890"),
+            addressLine1 = Some("t1"),
+            addressLine2 = Some("t2"),
+            city = Some("London"),
+            county = Some("Hackney"),
+            postcode = Some("N1 5AP"),
+            country = Some("United Kingdom"),
+            emailAddress = Some("t@example.com"),
+            phoneNumber = None,
+            mobilePhoneNumber = None,
+            worksReferenceNumber = Some("WRN-TRUST")
+          )
+
+        when(mockConnector.createAndUpdateSubcontractor(any[CreateAndUpdateSubcontractorPayload])(any[HeaderCarrier]))
+          .thenReturn(Future.successful(()))
+
+        service.createAndUpdateSubcontractor(userAnswers).futureValue mustBe ()
+
+        verify(mockConnector).createAndUpdateSubcontractor(eqTo(expectedPayload))(any[HeaderCarrier])
+        verifyNoMoreInteractions(mockConnector)
+      }
+
+      "should create and update subcontractor (Trust) with PHONE contact details" in {
+        val mockConnector = mock[ConstructionIndustrySchemeConnector]
+        val service       = new SubcontractorService(mockConnector)
+
+        val userAnswers =
+          baseTrustAnswers
+            .set(TrustContactOptionsPage, ContactOptions.Phone)
+            .success
+            .value
+            .set(TrustPhoneNumberPage, "02071234567")
+            .success
+            .value
+
+        val expectedPayload: CreateAndUpdateSubcontractorPayload =
+          TrustPayload(
+            cisId = cisId,
+            subcontractorType = TypeOfSubcontractor.Trust,
+            trustTradingName = Some("Test Trust"),
+            utr = Some("1234567890"),
+            addressLine1 = Some("t1"),
+            addressLine2 = Some("t2"),
+            city = Some("London"),
+            county = Some("Hackney"),
+            postcode = Some("N1 5AP"),
+            country = Some("United Kingdom"),
+            emailAddress = None,
+            phoneNumber = Some("02071234567"),
+            mobilePhoneNumber = None,
+            worksReferenceNumber = Some("WRN-TRUST")
+          )
+
+        when(mockConnector.createAndUpdateSubcontractor(any[CreateAndUpdateSubcontractorPayload])(any[HeaderCarrier]))
+          .thenReturn(Future.successful(()))
+
+        service.createAndUpdateSubcontractor(userAnswers).futureValue mustBe ()
+
+        verify(mockConnector).createAndUpdateSubcontractor(eqTo(expectedPayload))(any[HeaderCarrier])
+        verifyNoMoreInteractions(mockConnector)
+      }
+
+      "should create and update subcontractor (Trust) with MOBILE contact details" in {
+        val mockConnector = mock[ConstructionIndustrySchemeConnector]
+        val service       = new SubcontractorService(mockConnector)
+
+        val userAnswers =
+          baseTrustAnswers
+            .set(TrustContactOptionsPage, ContactOptions.Mobile)
+            .success
+            .value
+            .set(TrustMobileNumberPage, "07123456789")
+            .success
+            .value
+
+        val expectedPayload: CreateAndUpdateSubcontractorPayload =
+          TrustPayload(
+            cisId = cisId,
+            subcontractorType = TypeOfSubcontractor.Trust,
+            trustTradingName = Some("Test Trust"),
+            utr = Some("1234567890"),
+            addressLine1 = Some("t1"),
+            addressLine2 = Some("t2"),
+            city = Some("London"),
+            county = Some("Hackney"),
+            postcode = Some("N1 5AP"),
+            country = Some("United Kingdom"),
+            emailAddress = None,
+            phoneNumber = None,
+            mobilePhoneNumber = Some("07123456789"),
+            worksReferenceNumber = Some("WRN-TRUST")
+          )
+
+        when(mockConnector.createAndUpdateSubcontractor(any[CreateAndUpdateSubcontractorPayload])(any[HeaderCarrier]))
+          .thenReturn(Future.successful(()))
+
+        service.createAndUpdateSubcontractor(userAnswers).futureValue mustBe ()
+
+        verify(mockConnector).createAndUpdateSubcontractor(eqTo(expectedPayload))(any[HeaderCarrier])
+        verifyNoMoreInteractions(mockConnector)
+      }
+
+      "should create and update subcontractor (Trust) with NO contact details (no contact fields sent)" in {
+        val mockConnector = mock[ConstructionIndustrySchemeConnector]
+        val service       = new SubcontractorService(mockConnector)
+
+        val userAnswers =
+          baseTrustAnswers
+            .set(TrustContactOptionsPage, ContactOptions.NoDetails)
+            .success
+            .value
+
+        when(mockConnector.createAndUpdateSubcontractor(any[CreateAndUpdateSubcontractorPayload])(any[HeaderCarrier]))
+          .thenReturn(Future.successful(()))
+
+        service.createAndUpdateSubcontractor(userAnswers).futureValue mustBe ()
+
+        val captor: ArgumentCaptor[CreateAndUpdateSubcontractorPayload] =
+          ArgumentCaptor.forClass(classOf[CreateAndUpdateSubcontractorPayload])
+
+        verify(mockConnector, times(1))
+          .createAndUpdateSubcontractor(captor.capture())(any[HeaderCarrier])
+
+        val sent = captor.getValue
+        sent mustBe a[TrustPayload]
+
+        val trustSent = sent.asInstanceOf[TrustPayload]
+        trustSent.emailAddress mustBe None
+        trustSent.phoneNumber mustBe None
+        trustSent.mobilePhoneNumber mustBe None
+
+        verifyNoMoreInteractions(mockConnector)
+      }
+
+      "should create and update subcontractor (Trust) when contact options are missing (no contact fields sent)" in {
+        val mockConnector = mock[ConstructionIndustrySchemeConnector]
+        val service       = new SubcontractorService(mockConnector)
+
+        val userAnswers =
+          baseTrustAnswers
+            .remove(TrustContactOptionsPage)
+            .success
+            .value
+
+        when(mockConnector.createAndUpdateSubcontractor(any[CreateAndUpdateSubcontractorPayload])(any[HeaderCarrier]))
+          .thenReturn(Future.successful(()))
+
+        service.createAndUpdateSubcontractor(userAnswers).futureValue mustBe ()
+
+        val captor: ArgumentCaptor[CreateAndUpdateSubcontractorPayload] =
+          ArgumentCaptor.forClass(classOf[CreateAndUpdateSubcontractorPayload])
+
+        verify(mockConnector, times(1))
+          .createAndUpdateSubcontractor(captor.capture())(any[HeaderCarrier])
+
+        val sent = captor.getValue
+        sent mustBe a[TrustPayload]
+
+        val trustSent = sent.asInstanceOf[TrustPayload]
+        trustSent.emailAddress mustBe None
+        trustSent.phoneNumber mustBe None
+        trustSent.mobilePhoneNumber mustBe None
+
+        verifyNoMoreInteractions(mockConnector)
+      }
+
     }
 
     "isDuplicateUTR(" - {
@@ -794,25 +1021,6 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
 
         val ex = service.createAndUpdateSubcontractor(userAnswers).failed.futureValue
         ex.getMessage must include("TypeOfSubcontractorPage not found in session data")
-
-        verifyNoMoreInteractions(mockConnector)
-      }
-
-      "should fail when an unsupported subcontractor type is provided" in {
-        val mockConnector = mock[ConstructionIndustrySchemeConnector]
-        val service       = new SubcontractorService(mockConnector)
-
-        val userAnswers =
-          emptyUserAnswers
-            .set(CisIdQuery, cisId)
-            .success
-            .value
-            .set(TypeOfSubcontractorPage, TypeOfSubcontractor.Trust)
-            .success
-            .value
-
-        val ex = service.createAndUpdateSubcontractor(userAnswers).failed.futureValue
-        ex.getMessage must include("Unsupported subcontractor type: trust")
 
         verifyNoMoreInteractions(mockConnector)
       }

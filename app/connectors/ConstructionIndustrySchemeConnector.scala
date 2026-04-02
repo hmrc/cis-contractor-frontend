@@ -56,6 +56,7 @@ class ConstructionIndustrySchemeConnector @Inject() (config: ServicesConfig, htt
       case p: IndividualOrSoleTraderPayload => Json.toJson(p)
       case p: PartnershipPayload            => Json.toJson(p)
       case p: CompanyPayload                => Json.toJson(p)
+      case p: TrustPayload                  => Json.toJson(p)
     }
 
     logger.info(
