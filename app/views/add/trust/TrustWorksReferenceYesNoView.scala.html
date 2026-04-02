@@ -39,8 +39,9 @@
                 field = form("value"),
                 legend = LegendViewModel(messages("trustWorksReferenceYesNo.heading", name)).asPageHeading(Large)
             )
+            .withIdPrefix("trust-works-reference-yes-no")
             .withHint(Hint(
-            content = Messages("trustWorksReferenceYesNo.hint")))
+            content = Text(Messages("trustWorksReferenceYesNo.hint"))))
         )
 
         @govukButton(
