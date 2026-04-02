@@ -338,10 +338,10 @@ POST  /add/trust/trust-has-works-reference       controllers.add.trust.TrustWork
 GET   /add/trust/change-trust-has-works-reference controllers.add.trust.TrustWorksReferenceYesNoController.onPageLoad(mode: Mode = CheckMode)
 POST  /add/trust/change-trust-has-works-reference controllers.add.trust.TrustWorksReferenceYesNoController.onSubmit(mode: Mode = CheckMode)
 
-GET   /trustWorksReference                      controllers.add.trust.TrustWorksReferenceController.onPageLoad(mode: Mode = NormalMode)
-POST  /trustWorksReference                      controllers.add.trust.TrustWorksReferenceController.onSubmit(mode: Mode = NormalMode)
-GET   /changeTrustWorksReference                controllers.add.trust.TrustWorksReferenceController.onPageLoad(mode: Mode = CheckMode)
-POST  /changeTrustWorksReference                controllers.add.trust.TrustWorksReferenceController.onSubmit(mode: Mode = CheckMode)
+GET   /add/trust/trust-works-reference         controllers.add.trust.TrustWorksReferenceController.onPageLoad(mode: Mode = NormalMode)
+POST  /add/trust/trust-works-reference         controllers.add.trust.TrustWorksReferenceController.onSubmit(mode: Mode = NormalMode)
+GET   /add/trust/change-trust-works-reference  controllers.add.trust.TrustWorksReferenceController.onPageLoad(mode: Mode = CheckMode)
+POST  /add/trust/change-trust-works-reference  controllers.add.trust.TrustWorksReferenceController.onSubmit(mode: Mode = CheckMode)
 
 GET   /trustCheckYourAnswers                    controllers.add.trust.TrustCheckYourAnswersController.onPageLoad()
 
