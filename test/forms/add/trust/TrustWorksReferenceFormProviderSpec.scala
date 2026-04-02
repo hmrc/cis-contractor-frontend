@@ -18,11 +18,13 @@ package forms.add.trust
 
 import forms.behaviours.StringFieldBehaviours
 import play.api.data.FormError
+import org.scalacheck.Gen
 
 class TrustWorksReferenceFormProviderSpec extends StringFieldBehaviours {
 
   val requiredKey = "trustWorksReference.error.required"
   val lengthKey   = "trustWorksReference.error.length"
+  val invalidKey  = "companyWorksReference.error.invalid"
   val maxLength   = 20
 
   val form = new TrustWorksReferenceFormProvider()()
@@ -34,7 +36,11 @@ class TrustWorksReferenceFormProviderSpec extends StringFieldBehaviours {
     behave like fieldThatBindsValidData(
       form,
       fieldName,
-      stringsWithMaxLength(maxLength)
+      Gen.oneOf(
+        "WR-001",
+        "WR-0002",
+        "WR-98"
+      )
     )
 
     behave like fieldWithMaxLength(

@@ -97,7 +97,7 @@ class PartnershipNameControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual
-          controllers.add.partnership.routes.PartnershipHasUtrYesNoController
+          controllers.add.partnership.routes.PartnershipAddressYesNoController
             .onPageLoad(NormalMode)
             .url
       }

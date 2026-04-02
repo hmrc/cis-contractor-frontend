@@ -20,10 +20,11 @@ import controllers.actions.*
 import forms.add.trust.TrustUtrFormProvider
 import models.Mode
 import navigation.Navigator
-import pages.add.trust.TrustUtrPage
+import pages.add.trust.{TrustNamePage, TrustUtrPage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
+import services.SubcontractorService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.add.trust.TrustUtrView
 
@@ -38,6 +39,7 @@ class TrustUtrController @Inject() (
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   formProvider: TrustUtrFormProvider,
+  subcontractorService: SubcontractorService,
   val controllerComponents: MessagesControllerComponents,
   view: TrustUtrView
 )(implicit ec: ExecutionContext)
@@ -47,26 +49,45 @@ class TrustUtrController @Inject() (
   val form = formProvider()
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
-
-    val preparedForm = request.userAnswers.get(TrustUtrPage) match {
-      case None        => form
-      case Some(value) => form.fill(value)
-    }
-
-    Ok(view(preparedForm, mode))
+    request.userAnswers
+      .get(TrustNamePage)
+      .map { trustName =>
+        val preparedForm = request.userAnswers.get(TrustUtrPage) match {
+          case None        => form
+          case Some(value) => form.fill(value)
+        }
+        Ok(view(preparedForm, mode, trustName))
+      }
+      .getOrElse(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
-      form
-        .bindFromRequest()
-        .fold(
-          formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
-          value =>
-            for {
-              updatedAnswers <- Future.fromTry(request.userAnswers.set(TrustUtrPage, value))
-              _              <- sessionRepository.set(updatedAnswers)
-            } yield Redirect(navigator.nextPage(TrustUtrPage, mode, updatedAnswers))
-        )
+      request.userAnswers
+        .get(TrustNamePage)
+        .map { trustName =>
+          form
+            .bindFromRequest()
+            .fold(
+              formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, trustName))),
+              value =>
+                subcontractorService.isDuplicateUTR(request.userAnswers, value).flatMap {
+                  case true  =>
+                    val errorForm = form
+                      .fill(value)
+                      .withError(
+                        key = "value",
+                        message = "trustUtr.error.duplicate"
+                      )
+                    Future.successful(BadRequest(view(errorForm, mode, trustName)))
+                  case false =>
+                    for {
+                      updatedAnswers <- Future.fromTry(request.userAnswers.set(TrustUtrPage, value))
+                      _              <- sessionRepository.set(updatedAnswers)
+                    } yield Redirect(navigator.nextPage(TrustUtrPage, mode, updatedAnswers))
+                }
+            )
+        }
+        .getOrElse(Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())))
   }
 }

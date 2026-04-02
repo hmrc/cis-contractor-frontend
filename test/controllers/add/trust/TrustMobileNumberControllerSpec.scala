@@ -24,7 +24,7 @@ import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.add.trust.TrustMobileNumberPage
+import pages.add.trust.{TrustMobileNumberPage, TrustNamePage}
 import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
@@ -41,14 +41,19 @@ class TrustMobileNumberControllerSpec extends SpecBase with MockitoSugar {
   val formProvider = new TrustMobileNumberFormProvider()
   val form         = formProvider()
 
+  private val trustName = "Test Trust"
+
   lazy val trustMobileNumberRoute: String =
     controllers.add.trust.routes.TrustMobileNumberController.onPageLoad(NormalMode).url
+
+  private def uaWithName: UserAnswers =
+    emptyUserAnswers.set(TrustNamePage, trustName).success.value
 
   "TrustMobileNumber Controller" - {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(uaWithName)).build()
 
       running(application) {
         val request = FakeRequest(GET, trustMobileNumberRoute)
@@ -58,13 +63,13 @@ class TrustMobileNumberControllerSpec extends SpecBase with MockitoSugar {
         val view = application.injector.instanceOf[TrustMobileNumberView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode, trustName)(request, messages(application)).toString
       }
     }
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = UserAnswers(userAnswersId).set(TrustMobileNumberPage, "answer").success.value
+      val userAnswers = uaWithName.set(TrustMobileNumberPage, "07700 900 982").success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
@@ -76,7 +81,10 @@ class TrustMobileNumberControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill("answer"), NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill("07700 900 982"), NormalMode, trustName)(
+          request,
+          messages(application)
+        ).toString
       }
     }
 
@@ -87,7 +95,7 @@ class TrustMobileNumberControllerSpec extends SpecBase with MockitoSugar {
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
       val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        applicationBuilder(userAnswers = Some(uaWithName))
           .overrides(
             bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
             bind[SessionRepository].toInstance(mockSessionRepository)
@@ -97,7 +105,7 @@ class TrustMobileNumberControllerSpec extends SpecBase with MockitoSugar {
       running(application) {
         val request =
           FakeRequest(POST, trustMobileNumberRoute)
-            .withFormUrlEncodedBody(("value", "answer"))
+            .withFormUrlEncodedBody(("value", "07700 900 982"))
 
         val result = route(application, request).value
 
@@ -108,7 +116,7 @@ class TrustMobileNumberControllerSpec extends SpecBase with MockitoSugar {
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(uaWithName)).build()
 
       running(application) {
         val request =
@@ -122,7 +130,10 @@ class TrustMobileNumberControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, NormalMode, trustName)(
+          request,
+          messages(application)
+        ).toString
       }
     }
 
@@ -153,6 +164,37 @@ class TrustMobileNumberControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must redirect to JourneyRecovery if trustName is missing for a GET" in {
+
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+
+      running(application) {
+        val request = FakeRequest(GET, trustMobileNumberRoute)
+        val result  = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual
+          controllers.routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must redirect to JourneyRecovery if trustName is missing for a POST" in {
+
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, trustMobileNumberRoute)
+            .withFormUrlEncodedBody(("value", "07700 900 982"))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual
+          controllers.routes.JourneyRecoveryController.onPageLoad().url
       }
     }
   }

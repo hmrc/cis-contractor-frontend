@@ -235,7 +235,7 @@ subcontractorsUniqueTaxpayerReference.error.length                       =  Ente
 subcontractorsUniqueTaxpayerReference.error.duplicate                    =  You have already used this Unique Taxpayer Reference (UTR) for an existing subcontractor
 subcontractorsUniqueTaxpayerReference.change.hidden                      =  UTR
 
-subcontractorAdded.title                                                 =  Partnership subcontractor added
+subcontractorAdded.title                                                 =  {0} subcontractor added
 subcontractorAdded.heading                                               =  Subcontractor added
 subcontractorAdded.p1                                                    =  You can now find {0} on your list of subcontractors.
 subcontractorAdded.nextSteps.h2                                          =  Next steps
@@ -248,6 +248,10 @@ subcontractorAdded.nextSteps.link                                        =  Mana
 subcontractorAdded.helpAndSupport.h2                                     =  Help and support
 subcontractorAdded.helpAndSupport.p1                                     =  If you need help with the Construction Industry Scheme (CIS) and what it means for you,
 subcontractorAdded.helpAndSupport.p1.link                                =  guidance is available on GOV.UK
+subcontractorAdded.individual                                            =  Individual
+subcontractorAdded.company                                               =  Company
+subcontractorAdded.partnership                                           =  Partnership
+subcontractorAdded.trust                                                 =  Trust
 
 individualMobileNumber.title                                             =  What is the mobile number for this subcontractor?
 individualMobileNumber.heading                                           =  What is the mobile number for {0}?
@@ -682,15 +686,16 @@ trustAddress.country                                           =  Country
 trustAddress.country.error.required                            =  Select a country
 
 trustContactOptions.title                                      =  What are the contact details for this trust?
-trustContactOptions.heading                                    =  What are the contact details for this trust?
+trustContactOptions.heading                                    =  What are the contact details for {0}?
+trustContactOptions.hint                                       =  Choose which method of contact you would like to add for this subcontractor. Contact details are only for your own records.
 trustContactOptions.email                                      =  Email address
 trustContactOptions.phone                                      =  Phone number
 trustContactOptions.mobile                                     =  Mobile number
 trustContactOptions.noDetails                                  =  Do not add any contact details for this subcontractor
 trustContactOptions.or                                         =  or
-trustContactOptions.checkYourAnswersLabel                      =  What are the contact details for this trust?
-trustContactOptions.error.required                             =  Select trustContactOptions
-trustContactOptions.change.hidden                              =  TrustContactOptions
+trustContactOptions.error.required                             =  Select whether you want to add contact details for this trust
+trustContactOptions.checkYourAnswersLabel                      =  Method of contact
+trustContactOptions.change.hidden                              =  method of contact
 
 trustEmailAddress.title                                        =  What is the email address for this trust?
 trustEmailAddress.heading                                      =  What is the email address for {0}?
@@ -710,12 +715,14 @@ trustPhoneNumber.error.invalid                                 =  Enter a valid 
 trustPhoneNumber.error.length                                  =  Enter a valid phone number, like 01632 960 001. For international numbers include the country code.
 trustPhoneNumber.change.hidden                                 =  phone number
 
-trustMobileNumber.title                                        =  trustMobileNumber
-trustMobileNumber.heading                                      =  trustMobileNumber
-trustMobileNumber.checkYourAnswersLabel                        =  trustMobileNumber
-trustMobileNumber.error.required                               =  Enter trustMobileNumber
-trustMobileNumber.error.length                                 =  TrustMobileNumber must be 35 characters or less
-trustMobileNumber.change.hidden                                =  TrustMobileNumber
+trustMobileNumber.title                                        =  What is the mobile number for this trust?
+trustMobileNumber.heading                                      =  What is the mobile number for {0}?
+trustMobileNumber.hint                                         =  HMRC will never use this mobile number to contact this subcontractor
+trustMobileNumber.checkYourAnswersLabel                        =  Mobile number
+trustMobileNumber.error.required                               =  Enter a mobile number
+trustMobileNumber.error.invalid                                =  Enter a valid mobile number, like 07700 900 982 or +44 7700 900 999
+trustMobileNumber.error.length                                 =  Enter a valid mobile number, like 07700 900 982 or +44 7700 900 999
+trustMobileNumber.change.hidden                                =  mobile number
 
 trustUtrYesNo.title                                            =  Do you know the Unique Taxpayer Reference for this trust?
 trustUtrYesNo.heading                                          =  Do you know the Unique Taxpayer Reference for {0}?
@@ -724,12 +731,18 @@ trustUtrYesNo.checkYourAnswersLabel                            =  Add UTR?
 trustUtrYesNo.error.required                                   =  Select whether you know the Unique Taxpayer Reference (UTR) for this trust
 trustUtrYesNo.change.hidden                                    =  add UTR?
 
-trustUtr.title                                                 =  trustUtr
-trustUtr.heading                                               =  trustUtr
-trustUtr.checkYourAnswersLabel                                 =  trustUtr
-trustUtr.error.required                                        =  Enter trustUtr
-trustUtr.error.length                                          =  TrustUtr must be 10 characters or less
-trustUtr.change.hidden                                         =  TrustUtr
+trustUtr.title                                                 =  Trust Unique Taxpayer Reference (UTR)
+trustUtr.heading                                               =  Trust Unique Taxpayer Reference (UTR)
+trustUtr.p1                                                    =  The UTR will be on tax returns and other documents from HMRC.
+trustUtr.linkText                                              =  Get more help to find a UTR (opens in new tab)
+trustUtr.label                                                 =  What is the UTR for {0}?
+trustUtr.hint                                                  =  A UTR is a 10 digit number
+trustUtr.checkYourAnswersLabel                                 =  Trust UTR
+trustUtr.error.required                                        =  Enter a valid Unique Taxpayer Reference (UTR)
+trustUtr.error.length                                          =  Enter a valid Unique Taxpayer Reference (UTR)
+trustUtr.error.invalid                                         =  Enter a valid Unique Taxpayer Reference (UTR)
+trustUtr.error.duplicate                                       =  You have already used this Unique Taxpayer Reference (UTR) for an existing subcontractor
+trustUtr.change.hidden                                         =  trust UTR
 
 trustWorksReferenceYesNo.title                                 =  trustWorksReferenceYesNo
 trustWorksReferenceYesNo.heading                               =  trustWorksReferenceYesNo
@@ -737,12 +750,14 @@ trustWorksReferenceYesNo.checkYourAnswersLabel                 =  trustWorksRefe
 trustWorksReferenceYesNo.error.required                        =  Select yes if trustWorksReferenceYesNo
 trustWorksReferenceYesNo.change.hidden                         =  TrustWorksReferenceYesNo
 
-trustWorksReference.title                                      =  trustWorksReference
-trustWorksReference.heading                                    =  trustWorksReference
-trustWorksReference.checkYourAnswersLabel                      =  trustWorksReference
-trustWorksReference.error.required                             =  Enter trustWorksReference
-trustWorksReference.error.length                               =  TrustWorksReference must be 20 characters or less
-trustWorksReference.change.hidden                              =  TrustWorksReference
+trustWorksReference.title                                      = What is the works reference number associated with this trust?
+trustWorksReference.heading                                    = What is the works reference number associated with {0}?
+trustWorksReference.hint                                       = This is unique to the construction work or project
+trustWorksReference.checkYourAnswersLabel                      = Works reference number
+trustWorksReference.error.required                             = Enter a works reference number
+trustWorksReference.error.invalid                              = Enter a valid works reference number
+trustWorksReference.error.length                               = Enter a works reference number, up to 20 characters
+trustWorksReference.change.hidden                              = works reference number
 
 trustCheckYourAnswers.title                                    =  trustCheckYourAnswers
 trustCheckYourAnswers.heading                                  =  trustCheckYourAnswers

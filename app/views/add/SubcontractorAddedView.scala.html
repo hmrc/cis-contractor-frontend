@@ -27,10 +27,10 @@
 
 )
 
-@(name: String)(implicit request: Request[_], messages: Messages)
+@(name: String, subcontractorType: String)(implicit request: Request[_], messages: Messages)
 
 @layout(
-    pageTitle = titleNoForm(messages("subcontractorAdded.title")),
+    pageTitle = titleNoForm(messages("subcontractorAdded.title", subcontractorType)),
     showBackLink = false
 ) {
 
@@ -47,14 +47,14 @@
     @paragraph(messages("subcontractorAdded.nextSteps.p2"))
 
     @bulletList(Seq(
-            messages("subcontractorAdded.nextSteps.list.l1"),
-            messages("subcontractorAdded.nextSteps.list.l2"),
-            messages("subcontractorAdded.nextSteps.list.l3")
+    messages("subcontractorAdded.nextSteps.list.l1"),
+    messages("subcontractorAdded.nextSteps.list.l2"),
+    messages("subcontractorAdded.nextSteps.list.l3")
     ))
 
     @link(
-        linkTextKey = "subcontractorAdded.nextSteps.link",
-        linkUrl = "#"
+    linkTextKey = "subcontractorAdded.nextSteps.link",
+    linkUrl = "#"
     )
 
     @h2(messages("subcontractorAdded.helpAndSupport.h2"))
