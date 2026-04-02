@@ -17,6 +17,7 @@
 package pages.add.company
 
 import models.add.company.CompanyContactOptions
+import models.contact.ContactOptions
 import pages.behaviours.PageBehaviours
 
 class CompanyContactOptionsPageSpec extends PageBehaviours {
@@ -28,5 +29,72 @@ class CompanyContactOptionsPageSpec extends PageBehaviours {
     beSettable[CompanyContactOptions](CompanyContactOptionsPage)
 
     beRemovable[CompanyContactOptions](CompanyContactOptionsPage)
+
+    "cleanup" - {
+
+      "must remove CompanyPhoneNumberPage, CompanyMobileNumberPage userAnswers when Email is selected" in {
+        val userAnswers = emptyUserAnswers
+          .set(CompanyPhoneNumberPage, "01234567890")
+          .success
+          .value
+          .set(CompanyMobileNumberPage, "01234567890")
+          .success
+          .value
+
+        val updatedUserAnswers = userAnswers.set(CompanyContactOptionsPage, ContactOptions.Email).success.value
+
+        updatedUserAnswers.get(CompanyPhoneNumberPage) mustBe None
+        updatedUserAnswers.get(CompanyMobileNumberPage) mustBe None
+      }
+
+      "must remove CompanyEmailAddressPage, CompanyMobileNumberPage userAnswers when Phone is selected" in {
+        val userAnswers = emptyUserAnswers
+          .set(CompanyEmailAddressPage, "old@email.com")
+          .success
+          .value
+          .set(CompanyMobileNumberPage, "01234567890")
+          .success
+          .value
+
+        val updatedUserAnswers = userAnswers.set(CompanyContactOptionsPage, ContactOptions.Phone).success.value
+
+        updatedUserAnswers.get(CompanyEmailAddressPage) mustBe None
+        updatedUserAnswers.get(CompanyMobileNumberPage) mustBe None
+      }
+
+      "must remove CompanyEmailAddressPage, CompanyPhoneNumberPage userAnswers when Mobile is selected" in {
+        val userAnswers = emptyUserAnswers
+          .set(CompanyEmailAddressPage, "old@email.com")
+          .success
+          .value
+          .set(CompanyPhoneNumberPage, "01234567890")
+          .success
+          .value
+
+        val updatedUserAnswers = userAnswers.set(CompanyContactOptionsPage, ContactOptions.Mobile).success.value
+
+        updatedUserAnswers.get(CompanyEmailAddressPage) mustBe None
+        updatedUserAnswers.get(CompanyPhoneNumberPage) mustBe None
+      }
+
+      "must remove CompanyEmailAddressPage, CompanyMobileNumberPage, CompanyPhoneNumberPage userAnswers when NoDetails is selected" in {
+        val userAnswers = emptyUserAnswers
+          .set(CompanyEmailAddressPage, "old@email.com")
+          .success
+          .value
+          .set(CompanyPhoneNumberPage, "01234567890")
+          .success
+          .value
+          .set(CompanyMobileNumberPage, "01234567890")
+          .success
+          .value
+
+        val updatedUserAnswers = userAnswers.set(CompanyContactOptionsPage, ContactOptions.NoDetails).success.value
+
+        updatedUserAnswers.get(CompanyEmailAddressPage) mustBe None
+        updatedUserAnswers.get(CompanyPhoneNumberPage) mustBe None
+        updatedUserAnswers.get(CompanyMobileNumberPage) mustBe None
+      }
+    }
   }
 }

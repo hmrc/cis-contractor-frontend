@@ -17,6 +17,7 @@
 package forms.add.partnership
 import forms.Validation
 import forms.mappings.Mappings
+import forms.mappings.Constants.MaxLength20
 import play.api.data.Form
 
 import javax.inject.Inject
@@ -25,8 +26,12 @@ class PartnershipWorksReferenceNumberFormProvider @Inject() extends Mappings {
   def apply(): Form[String] =
     Form(
       "value" -> text("partnershipWorksReferenceNumber.error.required")
-        .transform(_.trim, identity)
-        .verifying(regexp(Validation.worksRefRegex, "partnershipWorksReferenceNumber.error.invalid"))
-        .verifying(maxLength(20, "partnershipWorksReferenceNumber.error.length"))
+        .transform(_.trim.replaceAll("""[\t\r\n]+""", ""), identity)
+        .verifying(
+          firstError(
+            maxLength(MaxLength20, "partnershipWorksReferenceNumber.error.length"),
+            regexp(Validation.worksRefRegex, "partnershipWorksReferenceNumber.error.invalid")
+          )
+        )
     )
 }

@@ -37,6 +37,7 @@ object TrustWorksReferenceSummary {
             controllers.add.trust.routes.TrustWorksReferenceController.onPageLoad(CheckMode).url
           )
             .withVisuallyHiddenText(messages("trustWorksReference.change.hidden"))
+            .withAttribute("id" -> "trust-works-reference")
         )
       )
     }

@@ -14,25 +14,19 @@
  * limitations under the License.
  */
 
-package pages.add.company
+package pages.add.trust
 
-import models.UserAnswers
-import pages.QuestionPage
-import play.api.libs.json.JsPath
+import models.add.trust.TrustContactOptions
+import pages.behaviours.PageBehaviours
 
-import scala.util.Try
+class TrustContactOptionsPageSpec extends PageBehaviours {
 
-case object CompanyWorksReferenceYesNoPage extends QuestionPage[Boolean] with CompanyJourney {
+  "TrustContactOptionsPage" - {
 
-  override def path: JsPath = JsPath \ toString
+    beRetrievable[TrustContactOptions](TrustContactOptionsPage)
 
-  override def toString: String = "companyWorksReferenceYesNo"
+    beSettable[TrustContactOptions](TrustContactOptionsPage)
 
-  override def cleanup(value: Option[Boolean], userAnswers: UserAnswers): Try[UserAnswers] =
-    if value.contains(false) then {
-      userAnswers
-        .remove(CompanyWorksReferencePage)
-    } else {
-      super.cleanup(value, userAnswers)
-    }
+    beRemovable[TrustContactOptions](TrustContactOptionsPage)
+  }
 }
