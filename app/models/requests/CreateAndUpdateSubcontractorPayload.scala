@@ -75,4 +75,26 @@ object CreateAndUpdateSubcontractorPayload {
     implicit val format: OFormat[PartnershipPayload] = Json.format[PartnershipPayload]
   }
 
+  final case class CompanyPayload(
+    cisId: String,
+    subcontractorType: TypeOfSubcontractor,
+    utr: Option[String] = None,
+    crn: Option[String] = None,
+    tradingName: Option[String] = None,
+    addressLine1: Option[String] = None,
+    addressLine2: Option[String] = None,
+    city: Option[String] = None,
+    county: Option[String] = None,
+    country: Option[String] = None,
+    postcode: Option[String] = None,
+    emailAddress: Option[String] = None,
+    phoneNumber: Option[String] = None,
+    mobilePhoneNumber: Option[String] = None,
+    worksReferenceNumber: Option[String] = None
+  ) extends CreateAndUpdateSubcontractorPayload
+
+  object CompanyPayload {
+    implicit val format: OFormat[CompanyPayload] = Json.format[CompanyPayload]
+  }
+
 }

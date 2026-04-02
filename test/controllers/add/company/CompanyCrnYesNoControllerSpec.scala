@@ -87,7 +87,7 @@ class CompanyCrnYesNoControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must redirect to the next page when valid data with value Yes is submitted" in {
+    "must redirect to the CompanyCrnPage when valid data with value Yes is submitted" in {
 
       val mockSessionRepository = mock[SessionRepository]
 
@@ -110,13 +110,13 @@ class CompanyCrnYesNoControllerSpec extends SpecBase with MockitoSugar {
         status(result) mustEqual SEE_OTHER
         redirectLocation(
           result
-        ).value mustEqual controllers.add.company.routes.CompanyCrnYesNoController
+        ).value mustEqual controllers.add.company.routes.CompanyCrnController
           .onPageLoad(NormalMode)
           .url
       }
     }
 
-    "must redirect to the next page when valid data with value No is submitted" in {
+    "must redirect to the CompanyWorksReferenceYesNoPage when valid data with value No is submitted" in {
 
       val mockSessionRepository = mock[SessionRepository]
 
@@ -139,7 +139,7 @@ class CompanyCrnYesNoControllerSpec extends SpecBase with MockitoSugar {
         status(result) mustEqual SEE_OTHER
         redirectLocation(
           result
-        ).value mustEqual controllers.add.company.routes.CompanyCrnYesNoController
+        ).value mustEqual controllers.add.company.routes.CompanyWorksReferenceYesNoController
           .onPageLoad(NormalMode)
           .url
       }
