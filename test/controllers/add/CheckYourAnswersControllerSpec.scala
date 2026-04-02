@@ -18,7 +18,7 @@ package controllers.add
 
 import base.SpecBase
 import controllers.routes
-import models.add.{InternationalAddress, TypeOfSubcontractor}
+import models.add.{InternationalAddress, SubcontractorName, TypeOfSubcontractor}
 import models.contact.ContactOptions
 import models.{CheckMode, UserAnswers}
 import org.mockito.ArgumentMatchers.any
@@ -31,80 +31,132 @@ import play.api.test.Helpers.*
 import repositories.SessionRepository
 import services.SubcontractorService
 import uk.gov.hmrc.http.HeaderCarrier
+import play.api.libs.json.*
 
 import scala.concurrent.Future
 
 class CheckYourAnswersControllerSpec extends SpecBase {
 
+  private def withStaleValue[A](
+    ua: models.UserAnswers,
+    page: pages.QuestionPage[A],
+    value: A
+  )(implicit w: Writes[A]): models.UserAnswers = {
+    val put = page.path.json.put(Json.toJson(value))
+    ua.data.transform(put) match {
+      case JsSuccess(updated: JsObject, _) => ua.copy(data = updated)
+      case _                               => ua
+    }
+  }
+
+  private val minUa: UserAnswers =
+    emptyUserAnswers
+      .set(TypeOfSubcontractorPage, TypeOfSubcontractor.Individualorsoletrader)
+      .success
+      .value
+      .set(SubTradingNameYesNoPage, true)
+      .success
+      .value
+      .set(TradingNameOfSubcontractorPage, "ABC Ltd")
+      .success
+      .value
+      .set(SubAddressYesNoPage, false)
+      .success
+      .value
+      .set(NationalInsuranceNumberYesNoPage, false)
+      .success
+      .value
+      .set(UniqueTaxpayerReferenceYesNoPage, false)
+      .success
+      .value
+      .set(WorksReferenceNumberYesNoPage, false)
+      .success
+      .value
+
+  private val validUaForSubmit: UserAnswers =
+    minUa
+      .set(IndividualChooseContactDetailsPage, ContactOptions.NoDetails)
+      .success
+      .value
+
+  private lazy val CYARoute = controllers.add.routes.CheckYourAnswersController.onPageLoad().url
+
   "Check Your Answers Controller" - {
 
-    val address = InternationalAddress(
-      addressLine1 = "10 Downing Street",
-      addressLine2 = Some("Westminster"),
-      addressLine3 = "London",
-      addressLine4 = Some("Greater London"),
-      postalCode = "SW1A 2AA",
-      country = "United Kingdom"
-    )
+    "must return OK and the correct view for a GET when optionals are not present" in {
+      val ua =
+        minUa
+          .set(IndividualChooseContactDetailsPage, ContactOptions.NoDetails)
+          .success
+          .value
 
-    val minUa =
-      emptyUserAnswers
-        .set(TypeOfSubcontractorPage, TypeOfSubcontractor.Individualorsoletrader)
-        .success
-        .value
-        .set(SubTradingNameYesNoPage, true)
-        .success
-        .value
-        .set(TradingNameOfSubcontractorPage, "ABC Ltd")
-        .success
-        .value
-        .set(SubAddressYesNoPage, true)
-        .success
-        .value
-        .set(AddressOfSubcontractorPage, address)
-        .success
-        .value
-        .set(IndividualChooseContactDetailsPage, ContactOptions.Phone)
-        .success
-        .value
-        .set(IndividualEmailAddressPage, "abc@test.com")
-        .success
-        .value
-        .set(IndividualPhoneNumberPage, "07123456789")
-        .success
-        .value
-        .set(IndividualMobileNumberPage, "07987654321")
-        .success
-        .value
-        .set(NationalInsuranceNumberYesNoPage, true)
-        .success
-        .value
-        .set(SubNationalInsuranceNumberPage, "AB123456C")
-        .success
-        .value
-        .set(UniqueTaxpayerReferenceYesNoPage, true)
-        .success
-        .value
-        .set(SubcontractorsUniqueTaxpayerReferencePage, "1234567890")
-        .success
-        .value
-        .set(WorksReferenceNumberYesNoPage, true)
-        .success
-        .value
-        .set(WorksReferenceNumberPage, "WRN-001")
-        .success
-        .value
-
-    "must display all questions and dependent rows when answers are provided" in {
-
-      val application = applicationBuilder(userAnswers = Some(minUa)).build()
+      val application = applicationBuilder(userAnswers = Some(ua)).build()
 
       running(application) {
-        val request = FakeRequest(GET, controllers.add.routes.CheckYourAnswersController.onPageLoad().url)
-        val result  = route(application, request).value
+        val request =
+          FakeRequest(GET, CYARoute)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual OK
+        contentAsString(result) must include("ABC Ltd")
+      }
+    }
+
+    "must return OK and the correct view for a GET when all optionals are present" in {
+      val address = InternationalAddress(
+        addressLine1 = "1 Test Street",
+        addressLine2 = None,
+        addressLine3 = "Test Town",
+        addressLine4 = None,
+        postalCode = "TE1 1ST",
+        country = "GB"
+      )
+
+      val ua =
+        minUa
+          .set(IndividualChooseContactDetailsPage, ContactOptions.Email)
+          .success
+          .value
+          .set(IndividualEmailAddressPage, "one@two.three")
+          .success
+          .value
+          .set(SubAddressYesNoPage, true)
+          .success
+          .value
+          .set(AddressOfSubcontractorPage, address)
+          .success
+          .value
+          .set(UniqueTaxpayerReferenceYesNoPage, true)
+          .success
+          .value
+          .set(SubcontractorsUniqueTaxpayerReferencePage, "1234567890")
+          .success
+          .value
+          .set(NationalInsuranceNumberYesNoPage, true)
+          .success
+          .value
+          .set(SubNationalInsuranceNumberPage, "AB123456C")
+          .success
+          .value
+          .set(WorksReferenceNumberYesNoPage, true)
+          .success
+          .value
+          .set(WorksReferenceNumberPage, "WRN-001")
+          .success
+          .value
+
+      val application = applicationBuilder(userAnswers = Some(ua)).build()
+
+      running(application) {
+        val request =
+          FakeRequest(GET, CYARoute)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual OK
 
         val content = contentAsString(result)
-        status(result) mustEqual OK
 
         content must include("Type")
         content must include("Does subcontractor use a trading name?")
@@ -112,7 +164,7 @@ class CheckYourAnswersControllerSpec extends SpecBase {
         content must include("Add subcontractor address?")
         content must include("Address")
         content must include("Method of contact")
-        content must include("Phone number")
+        content must include("Email Address")
         content must include("Add UTR?")
         content must include("UTR")
         content must include("Add National Insurance number?")
@@ -121,9 +173,11 @@ class CheckYourAnswersControllerSpec extends SpecBase {
         content must include("Works reference number")
 
         content must include("ABC Ltd")
-        content must include("AB123456C")
+        content must include("one@two.three")
         content must include("1234567890")
+        content must include("AB123456C")
         content must include("WRN-001")
+        content must include("1 Test Street")
 
         content must include(controllers.add.routes.SubTradingNameYesNoController.onPageLoad(CheckMode).url)
         content must include(controllers.add.routes.SubAddressYesNoController.onPageLoad(CheckMode).url)
@@ -134,22 +188,41 @@ class CheckYourAnswersControllerSpec extends SpecBase {
       }
     }
 
-    "must redirect to Journey Recovery on page load (GET) when validation fails (Left(error))" in {
-      val invalidUserAnswers = emptyUserAnswers
+    "must redirect to Journey Recovery for a GET if validation fails (incomplete / url hopped)" in {
+      val invalidUa =
+        emptyUserAnswers
+          .set(TypeOfSubcontractorPage, TypeOfSubcontractor.Individualorsoletrader)
+          .success
+          .value
 
-      val application = applicationBuilder(userAnswers = Some(invalidUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(invalidUa)).build()
 
       running(application) {
+        val request =
+          FakeRequest(GET, CYARoute)
 
-        val request = FakeRequest(GET, controllers.add.routes.CheckYourAnswersController.onPageLoad().url)
-        val result  = route(application, request).value
+        val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
       }
     }
 
-    "must redirect to  and set submitted flag when valid data is submitted" in {
+    "must redirect to Journey Recovery for a GET if no existing data is found" in {
+      val application = applicationBuilder(userAnswers = None).build()
+
+      running(application) {
+        val request =
+          FakeRequest(GET, CYARoute)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must redirect to SubcontractorAdded page and set submitted flag when valid data is submitted" in {
       val mockSubcontractorService = mock[SubcontractorService]
       val mockSessionRepository    = mock[SessionRepository]
 
@@ -160,7 +233,7 @@ class CheckYourAnswersControllerSpec extends SpecBase {
         .thenReturn(Future.successful(true))
 
       val application =
-        applicationBuilder(userAnswers = Some(minUa))
+        applicationBuilder(userAnswers = Some(validUaForSubmit))
           .overrides(
             bind[SubcontractorService].toInstance(mockSubcontractorService),
             bind[SessionRepository].toInstance(mockSessionRepository)
@@ -168,7 +241,8 @@ class CheckYourAnswersControllerSpec extends SpecBase {
           .build()
 
       running(application) {
-        val request = FakeRequest(POST, controllers.add.routes.CheckYourAnswersController.onSubmit().url)
+        val request =
+          FakeRequest(POST, CYARoute)
 
         val result = route(application, request).value
 
@@ -185,7 +259,7 @@ class CheckYourAnswersControllerSpec extends SpecBase {
 
     "must redirect to Journey Recovery and not resubmit when already submitted flag is set" in {
       val submittedUa =
-        minUa.set(CheckYourAnswersSubmittedPage, true).success.value
+        validUaForSubmit.set(CheckYourAnswersSubmittedPage, true).success.value
 
       val mockSubcontractorService = mock[SubcontractorService]
       val mockSessionRepository    = mock[SessionRepository]
@@ -199,8 +273,73 @@ class CheckYourAnswersControllerSpec extends SpecBase {
           .build()
 
       running(application) {
-        val request = FakeRequest(POST, controllers.add.routes.CheckYourAnswersController.onSubmit().url)
-        val result  = route(application, request).value
+        val request =
+          FakeRequest(POST, CYARoute)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+      }
+
+      verify(mockSubcontractorService, never()).createAndUpdateSubcontractor(any[UserAnswers])(any[HeaderCarrier])
+      verify(mockSessionRepository, never()).set(any[UserAnswers])
+      verifyNoMoreInteractions(mockSubcontractorService)
+    }
+
+    "must redirect to Journey Recovery when service call fails (recover block) and not set submitted flag" in {
+      val mockSubcontractorService = mock[SubcontractorService]
+      val mockSessionRepository    = mock[SessionRepository]
+
+      when(mockSubcontractorService.createAndUpdateSubcontractor(any[UserAnswers])(any[HeaderCarrier]))
+        .thenReturn(Future.failed(new RuntimeException("boom")))
+
+      val application =
+        applicationBuilder(userAnswers = Some(validUaForSubmit))
+          .overrides(
+            bind[SubcontractorService].toInstance(mockSubcontractorService),
+            bind[SessionRepository].toInstance(mockSessionRepository)
+          )
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, CYARoute)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+      }
+
+      verify(mockSubcontractorService).createAndUpdateSubcontractor(any[UserAnswers])(any[HeaderCarrier])
+      verify(mockSessionRepository, never()).set(any[UserAnswers])
+      verifyNoMoreInteractions(mockSubcontractorService)
+    }
+
+    "must redirect to Journey Recovery on submit when validation fails (Left(error)) and not call service" in {
+      val mockSubcontractorService = mock[SubcontractorService]
+      val mockSessionRepository    = mock[SessionRepository]
+
+      val invalidUa =
+        emptyUserAnswers
+          .set(TypeOfSubcontractorPage, TypeOfSubcontractor.Individualorsoletrader)
+          .success
+          .value
+
+      val application =
+        applicationBuilder(userAnswers = Some(invalidUa))
+          .overrides(
+            bind[SubcontractorService].toInstance(mockSubcontractorService),
+            bind[SessionRepository].toInstance(mockSessionRepository)
+          )
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, CYARoute)
+
+        val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
@@ -215,75 +354,24 @@ class CheckYourAnswersControllerSpec extends SpecBase {
       val application = applicationBuilder(userAnswers = None).build()
 
       running(application) {
-        val request = FakeRequest(POST, controllers.add.routes.CheckYourAnswersController.onSubmit().url)
-        val result  = route(application, request).value
+        val request =
+          FakeRequest(POST, CYARoute)
+
+        val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
       }
     }
 
-    "must redirect to Journey Recovery when service call fails (recover block) and not set submitted flag" in {
-      val mockSubcontractorService = mock[SubcontractorService]
-      val mockSessionRepository    = mock[SessionRepository]
+    "company contact option validation" - {
 
-      when(mockSubcontractorService.createAndUpdateSubcontractor(any[UserAnswers])(any[HeaderCarrier]))
-        .thenReturn(Future.failed(new RuntimeException("boom")))
-
-      val application =
-        applicationBuilder(userAnswers = Some(minUa))
-          .overrides(
-            bind[SubcontractorService].toInstance(mockSubcontractorService),
-            bind[SessionRepository].toInstance(mockSessionRepository)
-          )
-          .build()
-
-      running(application) {
-        val request = FakeRequest(POST, controllers.add.routes.CheckYourAnswersController.onSubmit().url)
-        val result  = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
-      }
-
-      verify(mockSubcontractorService).createAndUpdateSubcontractor(any[UserAnswers])(any[HeaderCarrier])
-      verify(mockSessionRepository, never()).set(any[UserAnswers])
-      verifyNoMoreInteractions(mockSubcontractorService)
-    }
-
-    "must redirect to Journey Recovery on submit when user answers are incomplete" in {
-
-      val incompleteUserAnswers =
-        emptyUserAnswers
-          .set(TypeOfSubcontractorPage, TypeOfSubcontractor.Individualorsoletrader)
-          .success
-          .value
-          .set(SubTradingNameYesNoPage, true)
-          .success
-          .value
-          .set(TradingNameOfSubcontractorPage, "ABC Ltd")
-          .success
-          .value
-
-      val application = applicationBuilder(userAnswers = Some(incompleteUserAnswers)).build()
-
-      running(application) {
-        val request = FakeRequest(POST, controllers.add.routes.CheckYourAnswersController.onSubmit().url)
-        val result  = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
-      }
-    }
-
-    "individual contact option validation" - {
-
-      "must return OK when Email is selected and a email address is present" in {
+      "must return OK when Email is selected and a email is present" in {
         val ua = minUa
           .set(IndividualChooseContactDetailsPage, ContactOptions.Email)
           .success
           .value
-          .set(IndividualEmailAddressPage, "abc@test.com")
+          .set(IndividualEmailAddressPage, "one@two.three")
           .success
           .value
 
@@ -291,11 +379,11 @@ class CheckYourAnswersControllerSpec extends SpecBase {
 
         running(application) {
           val request =
-            FakeRequest(GET, controllers.add.routes.CheckYourAnswersController.onPageLoad().url)
+            FakeRequest(GET, CYARoute)
           val result  = route(application, request).value
 
           status(result) mustEqual OK
-          contentAsString(result) must include("abc@test.com")
+          contentAsString(result) must include("one@two.three")
         }
       }
 
@@ -312,7 +400,7 @@ class CheckYourAnswersControllerSpec extends SpecBase {
 
         running(application) {
           val request =
-            FakeRequest(GET, controllers.add.routes.CheckYourAnswersController.onPageLoad().url)
+            FakeRequest(GET, CYARoute)
           val result  = route(application, request).value
 
           status(result) mustEqual OK
@@ -333,7 +421,7 @@ class CheckYourAnswersControllerSpec extends SpecBase {
 
         running(application) {
           val request =
-            FakeRequest(GET, controllers.add.routes.CheckYourAnswersController.onPageLoad().url)
+            FakeRequest(GET, CYARoute)
           val result  = route(application, request).value
 
           status(result) mustEqual OK
@@ -351,92 +439,78 @@ class CheckYourAnswersControllerSpec extends SpecBase {
 
         running(application) {
           val request =
-            FakeRequest(GET, controllers.add.routes.CheckYourAnswersController.onPageLoad().url)
+            FakeRequest(GET, CYARoute)
           val result  = route(application, request).value
 
           status(result) mustEqual OK
         }
       }
 
-      "must redirect to Journey Recovery when Email is selected but the email address is missing" in {
-        val ua = minUa
-          .set(IndividualChooseContactDetailsPage, ContactOptions.Email)
-          .success
-          .value
-          .remove(IndividualEmailAddressPage)
-          .success
-          .value
+      "must redirect to Journey Recovery when Email is selected but email address is missing" in {
+        val ua =
+          minUa
+            .set(IndividualChooseContactDetailsPage, ContactOptions.Email)
+            .success
+            .value
 
         val application = applicationBuilder(userAnswers = Some(ua)).build()
-
         running(application) {
           val request =
-            FakeRequest(GET, controllers.add.routes.CheckYourAnswersController.onPageLoad().url)
+            FakeRequest(GET, CYARoute)
           val result  = route(application, request).value
-
           status(result) mustEqual SEE_OTHER
           redirectLocation(result).value must include("/there-is-a-problem")
         }
       }
 
-      "must redirect to Journey Recovery when Phone is selected but the phone number is missing" in {
-        val ua = minUa
-          .set(IndividualChooseContactDetailsPage, ContactOptions.Phone)
-          .success
-          .value
-          .remove(IndividualPhoneNumberPage)
-          .success
-          .value
+      "must redirect to Journey Recovery when Phone is selected but phone number is missing" in {
+        val ua =
+          minUa
+            .set(IndividualChooseContactDetailsPage, ContactOptions.Phone)
+            .success
+            .value
 
         val application = applicationBuilder(userAnswers = Some(ua)).build()
-
         running(application) {
           val request =
-            FakeRequest(GET, controllers.add.routes.CheckYourAnswersController.onPageLoad().url)
+            FakeRequest(GET, CYARoute)
           val result  = route(application, request).value
-
           status(result) mustEqual SEE_OTHER
           redirectLocation(result).value must include("/there-is-a-problem")
         }
       }
 
       "must redirect to Journey Recovery when Mobile is selected but mobile number is missing" in {
-        val ua = minUa
-          .set(IndividualChooseContactDetailsPage, ContactOptions.Mobile)
-          .success
-          .value
-          .remove(IndividualMobileNumberPage)
-          .success
-          .value
+        val ua =
+          minUa
+            .set(IndividualChooseContactDetailsPage, ContactOptions.Mobile)
+            .success
+            .value
 
         val application = applicationBuilder(userAnswers = Some(ua)).build()
-
         running(application) {
           val request =
-            FakeRequest(GET, controllers.add.routes.CheckYourAnswersController.onPageLoad().url)
+            FakeRequest(GET, CYARoute)
           val result  = route(application, request).value
-
           status(result) mustEqual SEE_OTHER
           redirectLocation(result).value must include("/there-is-a-problem")
         }
       }
 
-      "must redirect to Journey Recovery when NoDetails is selected but stale contact data remains in the session" in {
-        val ua = minUa
-          .set(IndividualChooseContactDetailsPage, ContactOptions.NoDetails)
-          .success
-          .value
-          .set(IndividualEmailAddressPage, "stale@email.com")
-          .success
-          .value
+      "must redirect to Journey Recovery when NoDetails is selected but stale contact data exists" in {
+        val uaBase =
+          minUa
+            .set(IndividualChooseContactDetailsPage, ContactOptions.NoDetails)
+            .success
+            .value
+
+        val ua = withStaleValue(uaBase, IndividualEmailAddressPage, "stale@email.com")
 
         val application = applicationBuilder(userAnswers = Some(ua)).build()
-
         running(application) {
           val request =
-            FakeRequest(GET, controllers.add.routes.CheckYourAnswersController.onPageLoad().url)
+            FakeRequest(GET, CYARoute)
           val result  = route(application, request).value
-
           status(result) mustEqual SEE_OTHER
           redirectLocation(result).value must include("/there-is-a-problem")
         }
@@ -445,86 +519,417 @@ class CheckYourAnswersControllerSpec extends SpecBase {
 
     "contact option change cleanup" - {
 
-      // Simulates a user who previously entered a contact value, then changed their contact option via CYA.
-      // The page cleanup should clear the stale value from the old option.
-
       "must return OK when switching from Email to Phone and stale email is cleaned up" in {
-        val ua = minUa
-          .set(IndividualChooseContactDetailsPage, ContactOptions.Email)
-          .success
-          .value
-          .set(IndividualEmailAddressPage, "old@email.com")
-          .success
-          .value
-          .set(IndividualChooseContactDetailsPage, ContactOptions.Phone)
-          .success
-          .value // cleanup removes email
-          .set(IndividualPhoneNumberPage, "01234567890")
-          .success
-          .value
+        val ua =
+          minUa
+            .set(IndividualChooseContactDetailsPage, ContactOptions.Email)
+            .success
+            .value
+            .set(IndividualEmailAddressPage, "old@email.com")
+            .success
+            .value
+            .set(IndividualChooseContactDetailsPage, ContactOptions.Phone)
+            .success
+            .value
+            .set(IndividualPhoneNumberPage, "01234567890")
+            .success
+            .value
 
         val application = applicationBuilder(userAnswers = Some(ua)).build()
-
         running(application) {
           val request =
-            FakeRequest(GET, controllers.add.routes.CheckYourAnswersController.onPageLoad().url)
+            FakeRequest(GET, CYARoute)
           val result  = route(application, request).value
-
           status(result) mustEqual OK
           contentAsString(result) must include("01234567890")
         }
       }
 
-      "must return OK when switching from Phone to Mobile and stale phone number is cleaned up" in {
-        val ua = minUa
-          .set(IndividualChooseContactDetailsPage, ContactOptions.Phone)
-          .success
-          .value
-          .set(IndividualPhoneNumberPage, "01234567890")
-          .success
-          .value
-          .set(IndividualChooseContactDetailsPage, ContactOptions.Mobile)
-          .success
-          .value // cleanup removes phone
-          .set(IndividualMobileNumberPage, "07123456789")
-          .success
-          .value
+      "must return OK when switching from Phone to Mobile and stale phone is cleaned up" in {
+        val ua =
+          minUa
+            .set(IndividualChooseContactDetailsPage, ContactOptions.Phone)
+            .success
+            .value
+            .set(IndividualPhoneNumberPage, "01234567890")
+            .success
+            .value
+            .set(IndividualChooseContactDetailsPage, ContactOptions.Mobile)
+            .success
+            .value
+            .set(IndividualMobileNumberPage, "07123456789")
+            .success
+            .value
 
         val application = applicationBuilder(userAnswers = Some(ua)).build()
-
         running(application) {
           val request =
-            FakeRequest(GET, controllers.add.routes.CheckYourAnswersController.onPageLoad().url)
+            FakeRequest(GET, CYARoute)
           val result  = route(application, request).value
-
           status(result) mustEqual OK
           contentAsString(result) must include("07123456789")
         }
       }
 
       "must return OK when switching from Email to NoDetails and stale email is cleaned up" in {
-        val ua = minUa
-          .set(IndividualChooseContactDetailsPage, ContactOptions.Email)
-          .success
-          .value
-          .set(IndividualEmailAddressPage, "old@email.com")
-          .success
-          .value
-          .set(IndividualChooseContactDetailsPage, ContactOptions.NoDetails)
-          .success
-          .value // cleanup removes email
+        val ua =
+          minUa
+            .set(IndividualChooseContactDetailsPage, ContactOptions.Email)
+            .success
+            .value
+            .set(IndividualEmailAddressPage, "old@email.com")
+            .success
+            .value
+            .set(IndividualChooseContactDetailsPage, ContactOptions.NoDetails)
+            .success
+            .value
 
         val application = applicationBuilder(userAnswers = Some(ua)).build()
-
         running(application) {
           val request =
-            FakeRequest(GET, controllers.add.routes.CheckYourAnswersController.onPageLoad().url)
+            FakeRequest(GET, CYARoute)
           val result  = route(application, request).value
-
           status(result) mustEqual OK
         }
       }
     }
 
+    "YesNo stale session" - {
+
+      "must return OK when SubTradingNameYesNoPage changes from Yes to No and stale TradingNameOfSubcontractor values are cleaned up" in {
+
+        val name = SubcontractorName("John", Some("Paul"), "Smith")
+
+        val ua = minUa
+          .set(IndividualChooseContactDetailsPage, ContactOptions.Email)
+          .success
+          .value
+          .set(IndividualEmailAddressPage, "one@two.three")
+          .success
+          .value
+          .set(SubTradingNameYesNoPage, true)
+          .success
+          .value
+          .set(TradingNameOfSubcontractorPage, "ABC Ltd")
+          .success
+          .value
+          .set(SubTradingNameYesNoPage, false)
+          .success
+          .value
+          .set(SubcontractorNamePage, name)
+          .success
+          .value
+
+        val application = applicationBuilder(userAnswers = Some(ua)).build()
+
+        running(application) {
+          val request =
+            FakeRequest(GET, CYARoute)
+          val result  = route(application, request).value
+
+          status(result) mustEqual OK
+        }
+      }
+
+      "must return OK when SubTradingNameYesNoPage changes from No to Yes and stale SubcontractorNamePage values are cleaned up" in {
+
+        val name = SubcontractorName("John", Some("Paul"), "Smith")
+
+        val ua = minUa
+          .set(IndividualChooseContactDetailsPage, ContactOptions.Email)
+          .success
+          .value
+          .set(IndividualEmailAddressPage, "one@two.three")
+          .success
+          .value
+          .set(SubTradingNameYesNoPage, false)
+          .success
+          .value
+          .set(SubcontractorNamePage, name)
+          .success
+          .value
+          .set(SubTradingNameYesNoPage, true)
+          .success
+          .value
+          .set(TradingNameOfSubcontractorPage, "ABC Ltd")
+          .success
+          .value
+
+        val application = applicationBuilder(userAnswers = Some(ua)).build()
+
+        running(application) {
+          val request =
+            FakeRequest(GET, CYARoute)
+          val result  = route(application, request).value
+
+          status(result) mustEqual OK
+        }
+      }
+
+      "must return OK when SubAddressYesNo changes from Yes to No and stale UTR values are cleaned up" in {
+
+        val address = InternationalAddress("1 Test Street", None, "City", None, "AA1 1AA", "GB")
+
+        val ua = minUa
+          .set(IndividualChooseContactDetailsPage, ContactOptions.Email)
+          .success
+          .value
+          .set(IndividualEmailAddressPage, "one@two.three")
+          .success
+          .value
+          .set(SubAddressYesNoPage, true)
+          .success
+          .value
+          .set(AddressOfSubcontractorPage, address)
+          .success
+          .value
+          .set(SubAddressYesNoPage, false)
+          .success
+          .value
+
+        val application = applicationBuilder(userAnswers = Some(ua)).build()
+
+        running(application) {
+          val request =
+            FakeRequest(GET, CYARoute)
+          val result  = route(application, request).value
+
+          status(result) mustEqual OK
+        }
+      }
+
+      "must return OK when UniqueTaxpayerReferenceYesNo changes from Yes to No and stale UTR values are cleaned up" in {
+        val ua = minUa
+          .set(IndividualChooseContactDetailsPage, ContactOptions.Email)
+          .success
+          .value
+          .set(IndividualEmailAddressPage, "one@two.three")
+          .success
+          .value
+          .set(UniqueTaxpayerReferenceYesNoPage, true)
+          .success
+          .value
+          .set(SubcontractorsUniqueTaxpayerReferencePage, "1234567890")
+          .success
+          .value
+          .set(UniqueTaxpayerReferenceYesNoPage, false)
+          .success
+          .value
+
+        val application = applicationBuilder(userAnswers = Some(ua)).build()
+
+        running(application) {
+          val request =
+            FakeRequest(GET, CYARoute)
+          val result  = route(application, request).value
+
+          status(result) mustEqual OK
+        }
+      }
+
+      "must return OK when NationalInsuranceNumberYesNo changes from Yes to No and stale NationalInsuranceNumber values are cleaned up" in {
+        val ua = minUa
+          .set(IndividualChooseContactDetailsPage, ContactOptions.Email)
+          .success
+          .value
+          .set(IndividualEmailAddressPage, "one@two.three")
+          .success
+          .value
+          .set(NationalInsuranceNumberYesNoPage, true)
+          .success
+          .value
+          .set(SubNationalInsuranceNumberPage, "AC012345C")
+          .success
+          .value
+          .set(NationalInsuranceNumberYesNoPage, false)
+          .success
+          .value
+
+        val application = applicationBuilder(userAnswers = Some(ua)).build()
+
+        running(application) {
+          val request =
+            FakeRequest(GET, CYARoute)
+          val result  = route(application, request).value
+
+          status(result) mustEqual OK
+        }
+      }
+
+      "must return OK when WorksReferenceNumberYesNo changes from Yes to No and stale WorksReference values are cleaned up" in {
+        val ua = minUa
+          .set(IndividualChooseContactDetailsPage, ContactOptions.Email)
+          .success
+          .value
+          .set(IndividualEmailAddressPage, "one@two.three")
+          .success
+          .value
+          .set(WorksReferenceNumberYesNoPage, true)
+          .success
+          .value
+          .set(WorksReferenceNumberPage, "WRN-001")
+          .success
+          .value
+          .set(WorksReferenceNumberYesNoPage, false)
+          .success
+          .value
+
+        val application = applicationBuilder(userAnswers = Some(ua)).build()
+
+        running(application) {
+          val request =
+            FakeRequest(GET, CYARoute)
+          val result  = route(application, request).value
+
+          status(result) mustEqual OK
+        }
+      }
+
+      "must redirect to Journey Recovery when SubTradingNameYesNoPage is false but TradingNameOfSubcontractor value is present (stale session)" in {
+
+        val name = SubcontractorName("John", Some("Paul"), "Smith")
+
+        val uaBase =
+          minUa
+            .set(IndividualChooseContactDetailsPage, ContactOptions.NoDetails)
+            .success
+            .value
+            .set(SubTradingNameYesNoPage, false)
+            .success
+            .value
+            .set(SubcontractorNamePage, name)
+            .success
+            .value
+
+        val ua = withStaleValue(uaBase, TradingNameOfSubcontractorPage, "ABC Ltd")
+
+        val application = applicationBuilder(userAnswers = Some(ua)).build()
+        running(application) {
+          val request =
+            FakeRequest(GET, CYARoute)
+          val result  = route(application, request).value
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value must include("/there-is-a-problem")
+        }
+      }
+
+      "must redirect to Journey Recovery when SubTradingNameYesNoPage is true but TradingNameOfSubcontractor value is present (stale session)" in {
+
+        val name = SubcontractorName("John", Some("Paul"), "Smith")
+
+        val uaBase =
+          minUa
+            .set(IndividualChooseContactDetailsPage, ContactOptions.NoDetails)
+            .success
+            .value
+            .set(SubTradingNameYesNoPage, true)
+            .success
+            .value
+            .set(TradingNameOfSubcontractorPage, "ABC Ltd")
+            .success
+            .value
+
+        val ua = withStaleValue(uaBase, SubcontractorNamePage, name)
+
+        val application = applicationBuilder(userAnswers = Some(ua)).build()
+        running(application) {
+          val request =
+            FakeRequest(GET, CYARoute)
+          val result  = route(application, request).value
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value must include("/there-is-a-problem")
+        }
+      }
+
+      "must redirect to Journey Recovery when AddressYesNo is false but address value is present (stale session)" in {
+        val address = InternationalAddress("1 Test Street", None, "City", None, "AA1 1AA", "GB")
+
+        val uaBase =
+          minUa
+            .set(IndividualChooseContactDetailsPage, ContactOptions.NoDetails)
+            .success
+            .value
+            .set(SubAddressYesNoPage, false)
+            .success
+            .value
+
+        val ua = withStaleValue(uaBase, AddressOfSubcontractorPage, address)
+
+        val application = applicationBuilder(userAnswers = Some(ua)).build()
+        running(application) {
+          val request =
+            FakeRequest(GET, CYARoute)
+          val result  = route(application, request).value
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value must include("/there-is-a-problem")
+        }
+      }
+
+      "must redirect to Journey Recovery when UniqueTaxpayerReferenceYesNo is false but UTR value is present (stale session)" in {
+        val uaBase =
+          minUa
+            .set(IndividualChooseContactDetailsPage, ContactOptions.NoDetails)
+            .success
+            .value
+            .set(UniqueTaxpayerReferenceYesNoPage, false)
+            .success
+            .value
+
+        val ua = withStaleValue(uaBase, SubcontractorsUniqueTaxpayerReferencePage, "1234567890")
+
+        val application = applicationBuilder(userAnswers = Some(ua)).build()
+        running(application) {
+          val request =
+            FakeRequest(GET, CYARoute)
+          val result  = route(application, request).value
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value must include("/there-is-a-problem")
+        }
+      }
+
+      "must redirect to Journey Recovery when NationalInsuranceNumberYesNo is false but nino value is present (stale session)" in {
+        val uaBase =
+          minUa
+            .set(IndividualChooseContactDetailsPage, ContactOptions.NoDetails)
+            .success
+            .value
+            .set(NationalInsuranceNumberYesNoPage, false)
+            .success
+            .value
+
+        val ua = withStaleValue(uaBase, SubNationalInsuranceNumberPage, "AC0123456C")
+
+        val application = applicationBuilder(userAnswers = Some(ua)).build()
+        running(application) {
+          val request =
+            FakeRequest(GET, CYARoute)
+          val result  = route(application, request).value
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value must include("/there-is-a-problem")
+        }
+      }
+
+      "must redirect to Journey Recovery when WorksReferenceYesNo is false but works ref is present (stale session)" in {
+        val uaBase =
+          minUa
+            .set(IndividualChooseContactDetailsPage, ContactOptions.NoDetails)
+            .success
+            .value
+            .set(WorksReferenceNumberYesNoPage, false)
+            .success
+            .value
+
+        val ua = withStaleValue(uaBase, WorksReferenceNumberPage, "WRN-001")
+
+        val application = applicationBuilder(userAnswers = Some(ua)).build()
+        running(application) {
+          val request =
+            FakeRequest(GET, CYARoute)
+          val result  = route(application, request).value
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value must include("/there-is-a-problem")
+        }
+      }
+    }
   }
 }
