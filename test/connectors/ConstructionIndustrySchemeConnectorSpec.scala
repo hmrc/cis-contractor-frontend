@@ -149,4 +149,33 @@ class ConstructionIndustrySchemeConnectorSpec extends AnyWordSpec with Matchers 
       ex.getMessage mustBe s"Update subcontractor failed, returned $INTERNAL_SERVER_ERROR"
     }
   }
+
+  "return Unit when CIS responds with NO_CONTENT (204) for TrustPayload" in {
+    val config = mock[ServicesConfig]
+    val http   = mock[HttpClientV2]
+    val rb     = mock[RequestBuilder]
+
+    when(config.baseUrl("construction-industry-scheme")).thenReturn("http://cis-host")
+
+    when(http.post(any())(any())).thenReturn(rb)
+    when(rb.withBody(any[JsValue]())(any(), any(), any())).thenReturn(rb)
+    when(rb.execute[HttpResponse](any(), any())).thenReturn(Future.successful(HttpResponse(NO_CONTENT, "")))
+
+    val connector = new ConstructionIndustrySchemeConnector(config, http)
+
+    val payload: CreateAndUpdateSubcontractorPayload =
+      TrustPayload(
+        cisId = "12",
+        subcontractorType = TypeOfSubcontractor.Trust,
+        trustTradingName = Some("Test Trust"),
+        utr = Some("1234567890"),
+        worksReferenceNumber = Some("WRN-TRUST")
+      )
+
+    connector.createAndUpdateSubcontractor(payload).futureValue mustBe (())
+
+    val bodyCaptor: ArgumentCaptor[JsValue] = ArgumentCaptor.forClass(classOf[JsValue])
+    verify(rb).withBody(bodyCaptor.capture())(any(), any(), any())
+    bodyCaptor.getValue mustBe Json.toJson(payload.asInstanceOf[TrustPayload])
+  }
 }
