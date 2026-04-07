@@ -36,10 +36,8 @@ import scala.concurrent.Future
 
 class CompanyContactOptionsControllerSpec extends SpecBase with MockitoSugar {
 
-  def onwardRoute = Call("GET", "/foo")
-
-  val formProvider = new CompanyContactOptionsFormProvider()
-  val form         = formProvider()
+  private val formProvider = new CompanyContactOptionsFormProvider()
+  private val form         = formProvider()
 
   private val companyName = "Some Company LLP"
 
@@ -100,7 +98,36 @@ class CompanyContactOptionsControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must save the answer and redirect to next page when valid data is submitted" in {
+    "must save the answer and redirect to CompanyEmailAddress page when valid data with value Email is submitted" in {
+
+      val mockSessionRepository = mock[SessionRepository]
+
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+      val application =
+        applicationBuilder(userAnswers = Some(uaWithName))
+          .overrides(
+            bind[SessionRepository].toInstance(mockSessionRepository)
+          )
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, companyContactOptionsRoute)
+            .withFormUrlEncodedBody(("value", ContactOptions.Email.toString))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(
+          result
+        ).value mustEqual controllers.add.company.routes.CompanyEmailAddressController
+          .onPageLoad(NormalMode)
+          .url
+      }
+    }
+
+    "must save the answer and redirect to CompanyPhoneNumber page when valid data with value Phone is submitted" in {
 
       val mockSessionRepository = mock[SessionRepository]
 
@@ -124,6 +151,64 @@ class CompanyContactOptionsControllerSpec extends SpecBase with MockitoSugar {
         redirectLocation(
           result
         ).value mustEqual controllers.add.company.routes.CompanyPhoneNumberController
+          .onPageLoad(NormalMode)
+          .url
+      }
+    }
+
+    "must save the answer and redirect to next page when valid data with value Mobile is submitted" in {
+
+      val mockSessionRepository = mock[SessionRepository]
+
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+      val application =
+        applicationBuilder(userAnswers = Some(uaWithName))
+          .overrides(
+            bind[SessionRepository].toInstance(mockSessionRepository)
+          )
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, companyContactOptionsRoute)
+            .withFormUrlEncodedBody(("value", ContactOptions.Mobile.toString))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(
+          result
+        ).value mustEqual controllers.add.company.routes.CompanyMobileNumberController
+          .onPageLoad(NormalMode)
+          .url
+      }
+    }
+
+    "must save the answer and redirect to next page when valid data with value NoDetails is submitted" in {
+
+      val mockSessionRepository = mock[SessionRepository]
+
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+      val application =
+        applicationBuilder(userAnswers = Some(uaWithName))
+          .overrides(
+            bind[SessionRepository].toInstance(mockSessionRepository)
+          )
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, companyContactOptionsRoute)
+            .withFormUrlEncodedBody(("value", ContactOptions.NoDetails.toString))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(
+          result
+        ).value mustEqual controllers.add.company.routes.CompanyUtrYesNoController
           .onPageLoad(NormalMode)
           .url
       }
