@@ -18,22 +18,22 @@ package pages.add.trust
 
 import pages.behaviours.PageBehaviours
 
-class TrustUtrYesNoPageSpec extends PageBehaviours {
+class TrustWorksReferenceYesNoPageSpec extends PageBehaviours {
 
-  "TrustUtrYesNoPage" - {
+  "TrustWorksReferenceYesNoPage" - {
 
-    beRetrievable[Boolean](TrustUtrYesNoPage)
+    beRetrievable[Boolean](TrustWorksReferenceYesNoPage)
 
-    beSettable[Boolean](TrustUtrYesNoPage)
+    beSettable[Boolean](TrustWorksReferenceYesNoPage)
 
-    beRemovable[Boolean](TrustUtrYesNoPage)
+    beRemovable[Boolean](TrustWorksReferenceYesNoPage)
 
-    "cleanup: must remove TrustUtr userAnswers when No is selected" in {
-      val userAnswers = emptyUserAnswers.set(TrustUtrPage, "1234567890").success.value
+    "cleanup: must remove TrustWorksReference userAnswers when No is selected" in {
+      val userAnswers = emptyUserAnswers.set(TrustWorksReferencePage, "12345678").success.value
 
-      val updatedUserAnswers = userAnswers.set(TrustUtrYesNoPage, false).success.value
+      val updatedUserAnswers = userAnswers.set(TrustWorksReferenceYesNoPage, false).success.value
 
-      updatedUserAnswers.get(TrustUtrPage) mustBe None
+      updatedUserAnswers.get(TrustWorksReferencePage) mustBe None
     }
   }
 }

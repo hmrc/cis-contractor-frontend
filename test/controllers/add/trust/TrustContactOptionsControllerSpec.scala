@@ -20,11 +20,19 @@ import base.SpecBase
 import forms.add.trust.TrustContactOptionsFormProvider
 import models.contact.ContactOptions
 import models.{CheckMode, NormalMode, UserAnswers}
+import navigation.Navigator
+import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
 import pages.add.trust.{TrustContactOptionsPage, TrustNamePage}
+import play.api.inject.bind
+import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
+import repositories.SessionRepository
 import views.html.add.trust.TrustContactOptionsView
+
+import scala.concurrent.Future
 
 class TrustContactOptionsControllerSpec extends SpecBase with MockitoSugar {
 
@@ -90,6 +98,34 @@ class TrustContactOptionsControllerSpec extends SpecBase with MockitoSugar {
           request,
           messages(application)
         ).toString
+      }
+    }
+
+    "must redirect to the next page when valid data is submitted" in {
+
+      val mockSessionRepository = mock[SessionRepository]
+      val mockNavigator         = mock[Navigator]
+
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+      when(mockNavigator.nextPage(any(), any(), any())).thenReturn(Call("GET", "/foo"))
+
+      val application =
+        applicationBuilder(userAnswers = Some(uaWithName))
+          .overrides(
+            bind[Navigator].toInstance(mockNavigator),
+            bind[SessionRepository].toInstance(mockSessionRepository)
+          )
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, trustContactOptionsRoute)
+            .withFormUrlEncodedBody(("value", ContactOptions.Email.toString))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual "/foo"
       }
     }
 
@@ -196,6 +232,34 @@ class TrustContactOptionsControllerSpec extends SpecBase with MockitoSugar {
           request,
           messages(application)
         ).toString
+      }
+    }
+
+    "CheckMode POST must redirect to the next page when valid data is submitted" in {
+
+      val mockSessionRepository = mock[SessionRepository]
+      val mockNavigator         = mock[Navigator]
+
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+      when(mockNavigator.nextPage(any(), any(), any())).thenReturn(Call("GET", "/foo"))
+
+      val application =
+        applicationBuilder(userAnswers = Some(uaWithName))
+          .overrides(
+            bind[Navigator].toInstance(mockNavigator),
+            bind[SessionRepository].toInstance(mockSessionRepository)
+          )
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, trustContactOptionsCheckRoute)
+            .withFormUrlEncodedBody(("value", ContactOptions.Phone.toString))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual "/foo"
       }
     }
 
