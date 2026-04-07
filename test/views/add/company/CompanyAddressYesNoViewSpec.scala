@@ -76,7 +76,7 @@ class CompanyAddressYesNoViewSpec extends AnyWordSpec with Matchers with GuiceOn
 
       val summary = doc.select(".govuk-error-summary")
       summary.text() must include(messages("companyAddressYesNo.error.required"))
-      summary.select("a").attr("href") mustBe "#value"
+      summary.select("a").attr("href") mustBe "#value_0"
 
       doc.select(".govuk-error-message").text() must include(messages("companyAddressYesNo.error.required"))
     }
