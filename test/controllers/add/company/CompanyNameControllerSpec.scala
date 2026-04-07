@@ -21,13 +21,11 @@ import controllers.routes
 import forms.add.company.CompanyNameFormProvider
 import forms.mappings.Constants
 import models.{NormalMode, UserAnswers}
-import navigation.Navigator
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
 import pages.add.company.CompanyNamePage
 import play.api.inject.bind
-import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import repositories.SessionRepository
