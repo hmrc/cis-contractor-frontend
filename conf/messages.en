@@ -750,14 +750,14 @@ trustWorksReferenceYesNo.checkYourAnswersLabel                 =  trustWorksRefe
 trustWorksReferenceYesNo.error.required                        =  Select yes if trustWorksReferenceYesNo
 trustWorksReferenceYesNo.change.hidden                         =  TrustWorksReferenceYesNo
 
-trustWorksReference.title                                      = What is the works reference number associated with this trust?
-trustWorksReference.heading                                    = What is the works reference number associated with {0}?
-trustWorksReference.hint                                       = This is unique to the construction work or project
-trustWorksReference.checkYourAnswersLabel                      = Works reference number
-trustWorksReference.error.required                             = Enter a works reference number
-trustWorksReference.error.invalid                              = Enter a valid works reference number
-trustWorksReference.error.length                               = Enter a works reference number, up to 20 characters
-trustWorksReference.change.hidden                              = works reference number
+trustWorksReference.title                                      =  What is the works reference number associated with this trust?
+trustWorksReference.heading                                    =  What is the works reference number associated with {0}?
+trustWorksReference.hint                                       =  This is unique to the construction work or project
+trustWorksReference.checkYourAnswersLabel                      =  Works reference number
+trustWorksReference.error.required                             =  Enter a works reference number
+trustWorksReference.error.invalid                              =  Enter a valid works reference number
+trustWorksReference.error.length                               =  Enter a works reference number, up to 20 characters
+trustWorksReference.change.hidden                              =  works reference number
 
 trustCheckYourAnswers.title                                    =  trustCheckYourAnswers
 trustCheckYourAnswers.heading                                  =  trustCheckYourAnswers
