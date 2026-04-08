@@ -18,6 +18,7 @@ package navigation.add
 
 import base.SpecBase
 import controllers.routes
+import models.add.InternationalAddress
 import models.contact.ContactOptions
 import models.{CheckMode, NormalMode, UserAnswers}
 import org.scalactic.Prettifier.default
@@ -247,12 +248,19 @@ class TrustNavigatorSpec extends SpecBase {
           controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
       }
 
-      "must go from a TrustAddressYesNoPage to next page when true" in {
+      "must go from a TrustAddressYesNoPage to TrustAddressController when true and address not yet answered" in {
         navigator.nextPage(
           TrustAddressYesNoPage,
           CheckMode,
           emptyUserAnswers.setOrException(TrustAddressYesNoPage, true)
         ) mustBe controllers.add.trust.routes.TrustAddressController.onPageLoad(CheckMode)
+      }
+
+      "must go from a TrustAddressYesNoPage to TrustCheckYourAnswers when true and address already answered" in {
+        val ua = emptyUserAnswers
+          .setOrException(TrustAddressYesNoPage, true)
+          .setOrException(TrustAddressPage, InternationalAddress("line1", None, "line3", None, "AA1 1AA", "GB"))
+        navigator.nextPage(TrustAddressYesNoPage, CheckMode, ua) mustBe trustCYA
       }
 
       "must go from a TrustAddressYesNoPage to CYA page when false" in {
@@ -271,10 +279,17 @@ class TrustNavigatorSpec extends SpecBase {
         ) mustBe journeyRecovery
       }
 
-      "must go from TrustUtrYesNoPage to TrustUtrController when answer is true" in {
+      "must go from TrustUtrYesNoPage to TrustUtrController when answer is true and UTR not yet answered" in {
         val ua = UserAnswers("id").set(TrustUtrYesNoPage, true).success.value
         navigator.nextPage(TrustUtrYesNoPage, CheckMode, ua) mustBe
           controllers.add.trust.routes.TrustUtrController.onPageLoad(CheckMode)
+      }
+
+      "must go from TrustUtrYesNoPage to TrustCheckYourAnswers when answer is true and UTR already answered" in {
+        val ua = emptyUserAnswers
+          .setOrException(TrustUtrYesNoPage, true)
+          .setOrException(TrustUtrPage, "1234567890")
+        navigator.nextPage(TrustUtrYesNoPage, CheckMode, ua) mustBe trustCYA
       }
 
       "must go from TrustUtrYesNoPage to TrustCheckYourAnswers when answered No" in {
