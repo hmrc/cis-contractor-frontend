@@ -17,6 +17,8 @@
 package controllers.add.trust
 
 import controllers.actions.*
+import models.add.trust.ValidatedTrust
+import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -25,16 +27,26 @@ import views.html.add.trust.TrustCheckYourAnswersView
 import javax.inject.Inject
 
 class TrustCheckYourAnswersController @Inject() (
-  override val messagesApi: MessagesApi,
-  identify: IdentifierAction,
-  getData: DataRetrievalAction,
-  requireData: DataRequiredAction,
-  val controllerComponents: MessagesControllerComponents,
-  view: TrustCheckYourAnswersView
-) extends FrontendBaseController
-    with I18nSupport {
+                                                  override val messagesApi: MessagesApi,
+                                                  identify: IdentifierAction,
+                                                  getData: DataRetrievalAction,
+                                                  requireData: DataRequiredAction,
+                                                  val controllerComponents: MessagesControllerComponents,
+                                                  view: TrustCheckYourAnswersView
+                                                ) extends FrontendBaseController
+  with I18nSupport
+  with Logging {
 
-  def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
-    Ok(view())
-  }
+  def onPageLoad: Action[AnyContent] =
+    (identify andThen getData andThen requireData) { implicit request =>
+      val ua = request.userAnswers
+
+      ValidatedTrust.build(ua) match {
+        case Right(_) =>
+          Ok(view())
+        case Left(error) =>
+          logger.error(s"[TrustCheckYourAnswersController.onPageLoad] Failed to load the page: $error")
+          Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+      }
+    }
 }
