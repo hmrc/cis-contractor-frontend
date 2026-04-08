@@ -35,5 +35,6 @@ class TrustWorksReferenceYesNoPageSpec extends PageBehaviours {
 
       updatedUserAnswers.get(TrustWorksReferencePage) mustBe None
     }
+
   }
 }

@@ -164,6 +164,34 @@ class TrustNavigatorSpec extends SpecBase {
         ) mustBe controllers.add.trust.routes.TrustUtrYesNoController.onPageLoad(NormalMode)
       }
 
+      "must go from TrustWorksReferenceYesNo" - {
+        "to next page when answer is Yes" in {
+          navigator.nextPage(
+            TrustWorksReferenceYesNoPage,
+            NormalMode,
+            emptyUserAnswers.setOrException(TrustWorksReferenceYesNoPage, true)
+          ) mustBe controllers.add.trust.routes.TrustWorksReferenceController
+            .onPageLoad(NormalMode)
+        }
+
+        "to next page when answer is No" in {
+          navigator.nextPage(
+            TrustWorksReferenceYesNoPage,
+            NormalMode,
+            emptyUserAnswers.setOrException(TrustWorksReferenceYesNoPage, false)
+          ) mustBe controllers.add.trust.routes.TrustCheckYourAnswersController
+            .onPageLoad()
+        }
+
+        "to JourneyRecoveryPage when answer is not present" in {
+          navigator.nextPage(
+            TrustWorksReferenceYesNoPage,
+            NormalMode,
+            emptyUserAnswers
+          ) mustBe routes.JourneyRecoveryController.onPageLoad()
+        }
+      }
+
       "must go from a TrustMobileNumberPage to TrustUtrYesNoPage" in {
         navigator.nextPage(
           TrustMobileNumberPage,
@@ -281,6 +309,38 @@ class TrustNavigatorSpec extends SpecBase {
           CheckMode,
           emptyUserAnswers
         ) mustBe controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
+      }
+
+      "must go from TrustWorksReferenceYesNo" - {
+        "to next page when answer is Yes" in {
+          val answers = UserAnswers(userAnswersId).set(TrustWorksReferenceYesNoPage, true).success.value
+
+          navigator.nextPage(
+            TrustWorksReferenceYesNoPage,
+            CheckMode,
+            answers
+          ) mustBe controllers.add.trust.routes.TrustWorksReferenceController
+            .onPageLoad(CheckMode)
+        }
+
+        "to Trust CyaPage when answer is No" in {
+          val answers = UserAnswers(userAnswersId).set(TrustWorksReferenceYesNoPage, false).success.value
+
+          navigator.nextPage(
+            TrustWorksReferenceYesNoPage,
+            CheckMode,
+            answers
+          ) mustBe controllers.add.trust.routes.TrustCheckYourAnswersController
+            .onPageLoad()
+        }
+
+        "to JourneyRecoveryPage when answer is not present" in {
+          navigator.nextPage(
+            TrustWorksReferenceYesNoPage,
+            CheckMode,
+            emptyUserAnswers
+          ) mustBe routes.JourneyRecoveryController.onPageLoad()
+        }
       }
 
       "must go from TrustMobileNumberPage to TrustCheckYourAnswersPage in CheckMode" in {

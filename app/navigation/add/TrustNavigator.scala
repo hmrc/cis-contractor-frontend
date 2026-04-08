@@ -63,9 +63,8 @@ class TrustNavigator @Inject() () extends NavigatorForJourney {
     case TrustUtrPage                 => _ => controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
     case TrustPhoneNumberPage         => _ => controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
     case TrustMobileNumberPage        => _ => controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
-    case TrustContactOptionsPage      => userAnswers => navigatorFromTrustContactOptionsPage(CheckMode)(userAnswers)
-    case TrustWorksReferenceYesNoPage =>
-      userAnswers => navigatorFromTrustWorksReferenceYesNoPage(CheckMode)(userAnswers)
+    case TrustContactOptionsPage      => navigatorFromTrustContactOptionsPage(CheckMode)(_)
+    case TrustWorksReferenceYesNoPage => navigatorFromTrustWorksReferenceYesNoPage(CheckMode)(_)
     case TrustWorksReferencePage      => _ => controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
     case _                            => _ => controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
   }

@@ -16,8 +16,8 @@
 
 package pages.add.trust
 
-import models.UserAnswers
 import pages.QuestionPage
+import models.UserAnswers
 import play.api.libs.json.JsPath
 
 import scala.util.Try
