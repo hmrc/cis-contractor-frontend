@@ -75,6 +75,8 @@ class CompanyAddressSummarySpec extends AnyWordSpec with Matchers {
 
       action.visuallyHiddenText.value mustBe
         messages("companyAddress.change.hidden")
+
+      action.attributes must contain("id" -> "address-of-company")
     }
 
     "return None when CompanyAddressPage has no answer" in {

@@ -39,6 +39,7 @@ object CompanyCrnYesNoSummary {
             controllers.add.company.routes.CompanyCrnYesNoController.onPageLoad(CheckMode).url
           )
             .withVisuallyHiddenText(messages("companyCrnYesNo.change.hidden"))
+            .withAttribute("id" -> "add-company-crn")
         )
       )
     }

@@ -37,6 +37,7 @@ object CompanyWorksReferenceSummary {
             controllers.add.company.routes.CompanyWorksReferenceController.onPageLoad(CheckMode).url
           )
             .withVisuallyHiddenText(messages("companyWorksReference.change.hidden"))
+            .withAttribute("id" -> "company-works-reference")
         )
       )
     }
