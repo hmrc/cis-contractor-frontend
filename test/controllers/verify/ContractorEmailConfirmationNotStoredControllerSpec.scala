@@ -41,7 +41,8 @@ class ContractorEmailConfirmationNotStoredControllerSpec extends SpecBase with M
   val formProvider = new ContractorEmailConfirmationNotStoredFormProvider()
   private val form = formProvider()
 
-  private lazy val contractorEmailConfirmationNotStoredRoute = controllers.verify.routes.ContractorEmailConfirmationNotStoredController.onPageLoad(NormalMode).url
+  private lazy val contractorEmailConfirmationNotStoredRoute =
+    controllers.verify.routes.ContractorEmailConfirmationNotStoredController.onPageLoad(NormalMode).url
 
   "ContractorEmailConfirmationNotStored Controller" - {
 

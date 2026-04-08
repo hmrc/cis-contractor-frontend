@@ -23,21 +23,23 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
 
-object ContractorEmailConfirmationNotStoredSummary  {
+object ContractorEmailConfirmationNotStoredSummary {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(ContractorEmailConfirmationNotStoredPage).map {
-      answer =>
+    answers.get(ContractorEmailConfirmationNotStoredPage).map { answer =>
 
-        val value = if (answer) "site.yes" else "site.no"
+      val value = if (answer) "site.yes" else "site.no"
 
-        SummaryListRowViewModel(
-          key     = "contractorEmailConfirmationNotStored.checkYourAnswersLabel",
-          value   = ValueViewModel(value),
-          actions = Seq(
-            ActionItemViewModel("site.change", controllers.verify.routes.ContractorEmailConfirmationNotStoredController.onPageLoad(CheckMode).url)
-              .withVisuallyHiddenText(messages("contractorEmailConfirmationNotStored.change.hidden"))
+      SummaryListRowViewModel(
+        key = "contractorEmailConfirmationNotStored.checkYourAnswersLabel",
+        value = ValueViewModel(value),
+        actions = Seq(
+          ActionItemViewModel(
+            "site.change",
+            controllers.verify.routes.ContractorEmailConfirmationNotStoredController.onPageLoad(CheckMode).url
           )
+            .withVisuallyHiddenText(messages("contractorEmailConfirmationNotStored.change.hidden"))
         )
+      )
     }
 }

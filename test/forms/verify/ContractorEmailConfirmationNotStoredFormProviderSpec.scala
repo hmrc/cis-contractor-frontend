@@ -22,7 +22,7 @@ import play.api.data.FormError
 class ContractorEmailConfirmationNotStoredFormProviderSpec extends BooleanFieldBehaviours {
 
   val requiredKey = "contractorEmailConfirmationNotStored.error.required"
-  val invalidKey = "error.boolean"
+  val invalidKey  = "error.boolean"
 
   val form = new ContractorEmailConfirmationNotStoredFormProvider()()
 
