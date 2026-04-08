@@ -17,6 +17,11 @@
 package controllers.add.trust
 
 import base.SpecBase
+import controllers.routes
+import models.add.TypeOfSubcontractor
+import models.contact.ContactOptions
+import pages.add.TypeOfSubcontractorPage
+import pages.add.trust.*
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import views.html.add.trust.TrustCheckYourAnswersView
@@ -25,9 +30,30 @@ class TrustCheckYourAnswersControllerSpec extends SpecBase {
 
   "TrustCheckYourAnswers Controller" - {
 
-    "must return OK and the correct view for a GET" in {
+    "must return OK and the correct view for a GET when answers are valid" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val validUa =
+        emptyUserAnswers
+          .set(TypeOfSubcontractorPage, TypeOfSubcontractor.Trust)
+          .success
+          .value
+          .set(TrustNamePage, "Test Trust")
+          .success
+          .value
+          .set(TrustAddressYesNoPage, false)
+          .success
+          .value
+          .set(TrustContactOptionsPage, ContactOptions.NoDetails)
+          .success
+          .value
+          .set(TrustUtrYesNoPage, false)
+          .success
+          .value
+          .set(TrustWorksReferenceYesNoPage, false)
+          .success
+          .value
+
+      val application = applicationBuilder(userAnswers = Some(validUa)).build()
 
       running(application) {
         val request = FakeRequest(GET, controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad().url)
@@ -38,6 +64,40 @@ class TrustCheckYourAnswersControllerSpec extends SpecBase {
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view()(request, messages(application)).toString
+      }
+    }
+
+    "must redirect to Journey Recovery for a GET when validation fails (incomplete / URL-hopped CYA)" in {
+
+      val invalidUa =
+        emptyUserAnswers
+          .set(TypeOfSubcontractorPage, TypeOfSubcontractor.Trust)
+          .success
+          .value
+
+      val application = applicationBuilder(userAnswers = Some(invalidUa)).build()
+
+      running(application) {
+        val request = FakeRequest(GET, controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad().url)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must redirect to Journey Recovery for a GET if no existing data is found" in {
+
+      val application = applicationBuilder(userAnswers = None).build()
+
+      running(application) {
+        val request = FakeRequest(GET, controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad().url)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
       }
     }
   }
