@@ -19,6 +19,7 @@ package navigation
 import base.SpecBase
 import models.{NormalMode, UserAnswers}
 import navigation.add.{CompanyNavigator, IndividualNavigator, PartnershipNavigator, SharedNavigator, TrustNavigator}
+import navigation.verify.VerifyNavigator
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{never, verify, when}
 import org.scalatest.freespec.AnyFreeSpec
@@ -46,12 +47,13 @@ class NavigatorSpec extends SpecBase {
       val partnership = mock[PartnershipNavigator]
       val trust       = mock[TrustNavigator]
       val shared      = mock[SharedNavigator]
+      val verifyNav   = mock[VerifyNavigator]
 
       val expected = Call("GET", "/individual")
       when(individual.nextPage(any(), any(), any())).thenReturn(expected)
 
       val navigator =
-        new Navigator(individual, company, partnership, trust, shared)
+        new Navigator(individual, company, partnership, trust, shared, verifyNav)
 
       navigator.nextPage(TestIndividualPage, mode, ua) mustBe expected
 
@@ -70,12 +72,13 @@ class NavigatorSpec extends SpecBase {
       val partnership = mock[PartnershipNavigator]
       val trust       = mock[TrustNavigator]
       val shared      = mock[SharedNavigator]
+      val verifyNav   = mock[VerifyNavigator]
 
       val expected = Call("GET", "/company")
       when(company.nextPage(any(), any(), any())).thenReturn(expected)
 
       val navigator =
-        new Navigator(individual, company, partnership, trust, shared)
+        new Navigator(individual, company, partnership, trust, shared, verifyNav)
 
       navigator.nextPage(TestCompanyPage, mode, ua) mustBe expected
 
@@ -94,12 +97,13 @@ class NavigatorSpec extends SpecBase {
       val partnership = mock[PartnershipNavigator]
       val trust       = mock[TrustNavigator]
       val shared      = mock[SharedNavigator]
+      val verifyNav   = mock[VerifyNavigator]
 
       val expected = Call("GET", "/partnership")
       when(partnership.nextPage(any(), any(), any())).thenReturn(expected)
 
       val navigator =
-        new Navigator(individual, company, partnership, trust, shared)
+        new Navigator(individual, company, partnership, trust, shared, verifyNav)
 
       navigator.nextPage(TestPartnershipPage, mode, ua) mustBe expected
 
@@ -118,12 +122,13 @@ class NavigatorSpec extends SpecBase {
       val partnership = mock[PartnershipNavigator]
       val trust       = mock[TrustNavigator]
       val shared      = mock[SharedNavigator]
+      val verifyNav   = mock[VerifyNavigator]
 
       val expected = Call("GET", "/trust")
       when(trust.nextPage(any(), any(), any())).thenReturn(expected)
 
       val navigator =
-        new Navigator(individual, company, partnership, trust, shared)
+        new Navigator(individual, company, partnership, trust, shared, verifyNav)
 
       navigator.nextPage(TestTrustPage, mode, ua) mustBe expected
 
@@ -142,12 +147,13 @@ class NavigatorSpec extends SpecBase {
       val partnership = mock[PartnershipNavigator]
       val trust       = mock[TrustNavigator]
       val shared      = mock[SharedNavigator]
+      val verifyNav   = mock[VerifyNavigator]
 
       val expected = Call("GET", "/shared")
       when(shared.nextPage(any(), any(), any())).thenReturn(expected)
 
       val navigator =
-        new Navigator(individual, company, partnership, trust, shared)
+        new Navigator(individual, company, partnership, trust, shared, verifyNav)
 
       navigator.nextPage(TestUnknownPage, mode, ua) mustBe expected
 
