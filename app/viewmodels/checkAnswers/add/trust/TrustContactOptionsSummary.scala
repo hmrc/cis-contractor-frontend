@@ -20,6 +20,7 @@ import models.{CheckMode, UserAnswers}
 import pages.add.trust.TrustContactOptionsPage
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
+import utils.Utils
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
 
@@ -27,9 +28,10 @@ object TrustContactOptionsSummary {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
     answers.get(TrustContactOptionsPage).map { answer =>
+      val cyaMsg = Utils.findFirstMessagesValue(Seq(s"trustContactOptions.cya.$answer", s"trustContactOptions.$answer"))
       SummaryListRowViewModel(
         key = "trustContactOptions.checkYourAnswersLabel",
-        value = ValueViewModel(messages(s"trustContactOptions.$answer")),
+        value = ValueViewModel(cyaMsg),
         actions = Seq(
           ActionItemViewModel(
             "site.change",

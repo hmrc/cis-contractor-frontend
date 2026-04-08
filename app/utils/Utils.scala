@@ -16,6 +16,22 @@
 
 package utils
 
+import play.api.i18n.Messages
+
 object Utils {
   val emptyString: String = ""
+
+  /** Finds the first messages value for a given set of keys
+    * @param keys
+    * @param messages
+    * @return
+    *   message value or the key if not found
+    */
+  def findFirstMessagesValue(keys: Seq[String])(implicit messages: Messages): String = {
+    require(keys.nonEmpty, "keys must not be empty")
+    keys
+      .collectFirst { case key if messages(key) != key => messages(key) }
+      .getOrElse(keys.head)
+  }
+
 }
