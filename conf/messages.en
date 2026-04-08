@@ -759,5 +759,9 @@ trustWorksReference.error.invalid                              =  Enter a valid 
 trustWorksReference.error.length                               =  Enter a works reference number, up to 20 characters
 trustWorksReference.change.hidden                              =  works reference number
 
-trustCheckYourAnswers.title                                    =  trustCheckYourAnswers
-trustCheckYourAnswers.heading                                  =  trustCheckYourAnswers
+trustCheckYourAnswers.title                                    =  Check your answers before adding this trust
+trustCheckYourAnswers.heading                                  =  Check your answers before adding this trust
+trustCheckYourAnswers.subHeading                               =  Subcontractor details
+trustCheckYourAnswers.trailHeading                             =  Now add this subcontractor
+trustCheckYourAnswers.trailText                                =  By adding this subcontractor you are confirming that, to the best of your knowledge, the details you are providing are correct.
+trustCheckYourAnswers.continue                                 =  Accept and submit

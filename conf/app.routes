@@ -344,6 +344,7 @@ POST  /add/trust/trust-works-reference          controllers.add.trust.TrustWorks
 GET   /add/trust/change-trust-works-reference   controllers.add.trust.TrustWorksReferenceController.onPageLoad(mode: Mode = CheckMode)
 POST  /add/trust/change-trust-works-reference   controllers.add.trust.TrustWorksReferenceController.onSubmit(mode: Mode = CheckMode)
 
-GET   /trustCheckYourAnswers                    controllers.add.trust.TrustCheckYourAnswersController.onPageLoad()
+GET   /add/trust/check-your-answers             controllers.add.trust.TrustCheckYourAnswersController.onPageLoad()
+POST  /add/trust/check-your-answers             controllers.add.trust.TrustCheckYourAnswersController.onSubmit()
 
 GET   /add/trust/subcontractor-added            controllers.add.SubcontractorAddedController.trustSubcontractorAdded()
