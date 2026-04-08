@@ -27,22 +27,22 @@ import views.html.add.trust.TrustCheckYourAnswersView
 import javax.inject.Inject
 
 class TrustCheckYourAnswersController @Inject() (
-                                                  override val messagesApi: MessagesApi,
-                                                  identify: IdentifierAction,
-                                                  getData: DataRetrievalAction,
-                                                  requireData: DataRequiredAction,
-                                                  val controllerComponents: MessagesControllerComponents,
-                                                  view: TrustCheckYourAnswersView
-                                                ) extends FrontendBaseController
-  with I18nSupport
-  with Logging {
+  override val messagesApi: MessagesApi,
+  identify: IdentifierAction,
+  getData: DataRetrievalAction,
+  requireData: DataRequiredAction,
+  val controllerComponents: MessagesControllerComponents,
+  view: TrustCheckYourAnswersView
+) extends FrontendBaseController
+    with I18nSupport
+    with Logging {
 
   def onPageLoad: Action[AnyContent] =
     (identify andThen getData andThen requireData) { implicit request =>
       val ua = request.userAnswers
 
       ValidatedTrust.build(ua) match {
-        case Right(_) =>
+        case Right(_)    =>
           Ok(view())
         case Left(error) =>
           logger.error(s"[TrustCheckYourAnswersController.onPageLoad] Failed to load the page: $error")

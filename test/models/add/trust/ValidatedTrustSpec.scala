@@ -31,18 +31,30 @@ class ValidatedTrustSpec extends SpecBase with Matchers {
 
   private val minRequired: UserAnswers =
     emptyUserAnswers
-      .set(TypeOfSubcontractorPage, TypeOfSubcontractor.Trust).success.value
-      .set(TrustNamePage, "Test Trust").success.value
-      .set(TrustAddressYesNoPage, false).success.value
-      .set(TrustContactOptionsPage, ContactOptions.NoDetails).success.value
-      .set(TrustUtrYesNoPage, false).success.value
-      .set(TrustWorksReferenceYesNoPage, false).success.value
+      .set(TypeOfSubcontractorPage, TypeOfSubcontractor.Trust)
+      .success
+      .value
+      .set(TrustNamePage, "Test Trust")
+      .success
+      .value
+      .set(TrustAddressYesNoPage, false)
+      .success
+      .value
+      .set(TrustContactOptionsPage, ContactOptions.NoDetails)
+      .success
+      .value
+      .set(TrustUtrYesNoPage, false)
+      .success
+      .value
+      .set(TrustWorksReferenceYesNoPage, false)
+      .success
+      .value
 
   private def withStaleValue[A](
-                                 ua: UserAnswers,
-                                 page: pages.QuestionPage[A],
-                                 value: A
-                               )(implicit w: Writes[A]): UserAnswers =
+    ua: UserAnswers,
+    page: pages.QuestionPage[A],
+    value: A
+  )(implicit w: Writes[A]): UserAnswers =
     ua.data.setObject(page.path, Json.toJson(value)) match {
       case JsSuccess(updated, _) => ua.copy(data = updated)
       case JsError(_)            => ua
@@ -57,7 +69,9 @@ class ValidatedTrustSpec extends SpecBase with Matchers {
     "fail when TypeOfSubcontractor is not Trust" in {
       val ua =
         minRequired
-          .set(TypeOfSubcontractorPage, TypeOfSubcontractor.Partnership).success.value
+          .set(TypeOfSubcontractorPage, TypeOfSubcontractor.Partnership)
+          .success
+          .value
 
       ValidatedTrust.build(ua) mustBe Left(InvalidAnswer(TypeOfSubcontractorPage))
     }
@@ -65,11 +79,21 @@ class ValidatedTrustSpec extends SpecBase with Matchers {
     "fail when a required page is missing (TrustNamePage)" in {
       val ua =
         emptyUserAnswers
-          .set(TypeOfSubcontractorPage, TypeOfSubcontractor.Trust).success.value
-          .set(TrustAddressYesNoPage, false).success.value
-          .set(TrustContactOptionsPage, ContactOptions.NoDetails).success.value
-          .set(TrustUtrYesNoPage, false).success.value
-          .set(TrustWorksReferenceYesNoPage, false).success.value
+          .set(TypeOfSubcontractorPage, TypeOfSubcontractor.Trust)
+          .success
+          .value
+          .set(TrustAddressYesNoPage, false)
+          .success
+          .value
+          .set(TrustContactOptionsPage, ContactOptions.NoDetails)
+          .success
+          .value
+          .set(TrustUtrYesNoPage, false)
+          .success
+          .value
+          .set(TrustWorksReferenceYesNoPage, false)
+          .success
+          .value
 
       ValidatedTrust.build(ua) mustBe Left(MissingAnswer(TrustNamePage))
     }
@@ -79,7 +103,9 @@ class ValidatedTrustSpec extends SpecBase with Matchers {
       "require email address when contact option is Email" in {
         val ua =
           minRequired
-            .set(TrustContactOptionsPage, ContactOptions.Email).success.value
+            .set(TrustContactOptionsPage, ContactOptions.Email)
+            .success
+            .value
 
         ValidatedTrust.build(ua) mustBe Left(MissingAnswer(TrustEmailAddressPage))
       }
@@ -87,8 +113,12 @@ class ValidatedTrustSpec extends SpecBase with Matchers {
       "build when contact option is Email and email address is present" in {
         val ua =
           minRequired
-            .set(TrustContactOptionsPage, ContactOptions.Email).success.value
-            .set(TrustEmailAddressPage, "a@b.com").success.value
+            .set(TrustContactOptionsPage, ContactOptions.Email)
+            .success
+            .value
+            .set(TrustEmailAddressPage, "a@b.com")
+            .success
+            .value
 
         ValidatedTrust.build(ua) mustBe a[Right[?, ?]]
       }
@@ -96,7 +126,9 @@ class ValidatedTrustSpec extends SpecBase with Matchers {
       "require phone number when contact option is Phone" in {
         val ua =
           minRequired
-            .set(TrustContactOptionsPage, ContactOptions.Phone).success.value
+            .set(TrustContactOptionsPage, ContactOptions.Phone)
+            .success
+            .value
 
         ValidatedTrust.build(ua) mustBe Left(MissingAnswer(TrustPhoneNumberPage))
       }
@@ -104,8 +136,12 @@ class ValidatedTrustSpec extends SpecBase with Matchers {
       "build when contact option is Phone and phone number is present" in {
         val ua =
           minRequired
-            .set(TrustContactOptionsPage, ContactOptions.Phone).success.value
-            .set(TrustPhoneNumberPage, "01234567890").success.value
+            .set(TrustContactOptionsPage, ContactOptions.Phone)
+            .success
+            .value
+            .set(TrustPhoneNumberPage, "01234567890")
+            .success
+            .value
 
         ValidatedTrust.build(ua) mustBe a[Right[?, ?]]
       }
@@ -113,7 +149,9 @@ class ValidatedTrustSpec extends SpecBase with Matchers {
       "require mobile number when contact option is Mobile" in {
         val ua =
           minRequired
-            .set(TrustContactOptionsPage, ContactOptions.Mobile).success.value
+            .set(TrustContactOptionsPage, ContactOptions.Mobile)
+            .success
+            .value
 
         ValidatedTrust.build(ua) mustBe Left(MissingAnswer(TrustMobileNumberPage))
       }
@@ -121,8 +159,12 @@ class ValidatedTrustSpec extends SpecBase with Matchers {
       "build when contact option is Mobile and mobile number is present" in {
         val ua =
           minRequired
-            .set(TrustContactOptionsPage, ContactOptions.Mobile).success.value
-            .set(TrustMobileNumberPage, "07123456789").success.value
+            .set(TrustContactOptionsPage, ContactOptions.Mobile)
+            .success
+            .value
+            .set(TrustMobileNumberPage, "07123456789")
+            .success
+            .value
 
         ValidatedTrust.build(ua) mustBe a[Right[?, ?]]
       }
@@ -148,7 +190,9 @@ class ValidatedTrustSpec extends SpecBase with Matchers {
       "require address when TrustAddressYesNo is true" in {
         val ua =
           minRequired
-            .set(TrustAddressYesNoPage, true).success.value
+            .set(TrustAddressYesNoPage, true)
+            .success
+            .value
 
         ValidatedTrust.build(ua) mustBe Left(InvalidAnswer(TrustAddressPage))
       }
@@ -165,8 +209,12 @@ class ValidatedTrustSpec extends SpecBase with Matchers {
 
         val ua =
           minRequired
-            .set(TrustAddressYesNoPage, true).success.value
-            .set(TrustAddressPage, address).success.value
+            .set(TrustAddressYesNoPage, true)
+            .success
+            .value
+            .set(TrustAddressPage, address)
+            .success
+            .value
 
         ValidatedTrust.build(ua) mustBe a[Right[?, ?]]
       }
@@ -177,7 +225,9 @@ class ValidatedTrustSpec extends SpecBase with Matchers {
       "require UTR when TrustUtrYesNo is true" in {
         val ua =
           minRequired
-            .set(TrustUtrYesNoPage, true).success.value
+            .set(TrustUtrYesNoPage, true)
+            .success
+            .value
 
         ValidatedTrust.build(ua) mustBe Left(InvalidAnswer(TrustUtrPage))
       }
@@ -190,8 +240,12 @@ class ValidatedTrustSpec extends SpecBase with Matchers {
       "build when TrustUtrYesNo is true and UTR is present" in {
         val ua =
           minRequired
-            .set(TrustUtrYesNoPage, true).success.value
-            .set(TrustUtrPage, "1234567890").success.value
+            .set(TrustUtrYesNoPage, true)
+            .success
+            .value
+            .set(TrustUtrPage, "1234567890")
+            .success
+            .value
 
         ValidatedTrust.build(ua) mustBe a[Right[?, ?]]
       }
@@ -202,7 +256,9 @@ class ValidatedTrustSpec extends SpecBase with Matchers {
       "require works reference when TrustWorksReferenceYesNo is true" in {
         val ua =
           minRequired
-            .set(TrustWorksReferenceYesNoPage, true).success.value
+            .set(TrustWorksReferenceYesNoPage, true)
+            .success
+            .value
 
         ValidatedTrust.build(ua) mustBe Left(InvalidAnswer(TrustWorksReferencePage))
       }
@@ -215,8 +271,12 @@ class ValidatedTrustSpec extends SpecBase with Matchers {
       "build when TrustWorksReferenceYesNo is true and works reference is present" in {
         val ua =
           minRequired
-            .set(TrustWorksReferenceYesNoPage, true).success.value
-            .set(TrustWorksReferencePage, "WRN-001").success.value
+            .set(TrustWorksReferenceYesNoPage, true)
+            .success
+            .value
+            .set(TrustWorksReferencePage, "WRN-001")
+            .success
+            .value
 
         ValidatedTrust.build(ua) mustBe a[Right[?, ?]]
       }

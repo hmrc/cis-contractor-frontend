@@ -26,35 +26,35 @@ import pages.add.trust.*
 import play.api.libs.json.Reads
 
 final case class ValidatedTrust(
-                                 trustName: String,
-                                 trustAddress: Option[InternationalAddress],
-                                 trustContactDetails: TrustContactOptions,
-                                 trustEmail: Option[String],
-                                 trustPhone: Option[String],
-                                 trustMobile: Option[String],
-                                 trustUtr: Option[String],
-                                 trustWorkRefNumber: Option[String]
-                               )
+  trustName: String,
+  trustAddress: Option[InternationalAddress],
+  trustContactDetails: TrustContactOptions,
+  trustEmail: Option[String],
+  trustPhone: Option[String],
+  trustMobile: Option[String],
+  trustUtr: Option[String],
+  trustWorkRefNumber: Option[String]
+)
 
 object ValidatedTrust extends Validation {
 
   def build(answers: UserAnswers): Either[ValidationError, ValidatedTrust] =
     for {
-      _                  <- validateType(answers)
+      _ <- validateType(answers)
 
-      trustName           <- getPageValue(answers, TrustNamePage)
+      trustName <- getPageValue(answers, TrustNamePage)
 
-      trustAddress        <- getOptionalPageValue(answers, TrustAddressPage, TrustAddressYesNoPage)
+      trustAddress <- getOptionalPageValue(answers, TrustAddressPage, TrustAddressYesNoPage)
 
       trustContactDetails <- getPageValue(answers, TrustContactOptionsPage)
 
-      trustEmail          <- getContactPageValue(answers, TrustEmailAddressPage, trustContactDetails)
-      trustPhone          <- getContactPageValue(answers, TrustPhoneNumberPage, trustContactDetails)
-      trustMobile         <- getContactPageValue(answers, TrustMobileNumberPage, trustContactDetails)
+      trustEmail  <- getContactPageValue(answers, TrustEmailAddressPage, trustContactDetails)
+      trustPhone  <- getContactPageValue(answers, TrustPhoneNumberPage, trustContactDetails)
+      trustMobile <- getContactPageValue(answers, TrustMobileNumberPage, trustContactDetails)
 
-      trustUtr            <- getOptionalPageValue(answers, TrustUtrPage, TrustUtrYesNoPage)
+      trustUtr <- getOptionalPageValue(answers, TrustUtrPage, TrustUtrYesNoPage)
 
-      trustWorkRefNumber  <- getOptionalPageValue(answers, TrustWorksReferencePage, TrustWorksReferenceYesNoPage)
+      trustWorkRefNumber <- getOptionalPageValue(answers, TrustWorksReferencePage, TrustWorksReferenceYesNoPage)
 
     } yield ValidatedTrust(
       trustName = trustName,
@@ -74,10 +74,10 @@ object ValidatedTrust extends Validation {
     }
 
   private def getContactPageValue[A](
-                                      answers: UserAnswers,
-                                      questionPage: QuestionPage[A],
-                                      contactOptions: TrustContactOptions
-                                    )(implicit reads: Reads[A]): Either[ValidationError, Option[A]] = {
+    answers: UserAnswers,
+    questionPage: QuestionPage[A],
+    contactOptions: TrustContactOptions
+  )(implicit reads: Reads[A]): Either[ValidationError, Option[A]] = {
 
     val expectedPage: Option[QuestionPage[_]] = contactOptions match {
       case Email     => Some(TrustEmailAddressPage)
@@ -88,11 +88,9 @@ object ValidatedTrust extends Validation {
 
     if (expectedPage.contains(questionPage)) {
       answers.get(questionPage).toRight(MissingAnswer(questionPage)).map(Some(_))
-    }
-    else if (expectedPage.isDefined) {
+    } else if (expectedPage.isDefined) {
       Right(None)
-    }
-    else {
+    } else {
       answers
         .get(questionPage)
         .fold(Right(None): Either[ValidationError, Option[A]])(_ => Left(InvalidAnswer(questionPage)))
