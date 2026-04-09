@@ -37,6 +37,7 @@ object CompanyUtrSummary {
             controllers.add.company.routes.CompanyUtrController.onPageLoad(CheckMode).url
           )
             .withVisuallyHiddenText(messages("companyUtr.change.hidden"))
+            .withAttribute("id" -> "company-utr")
         )
       )
     }

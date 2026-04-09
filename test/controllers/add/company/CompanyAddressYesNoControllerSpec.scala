@@ -20,14 +20,12 @@ import base.SpecBase
 import controllers.routes
 import forms.add.company.CompanyAddressYesNoFormProvider
 import models.{NormalMode, UserAnswers}
-import navigation.Navigator
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
 import pages.add.company.{CompanyAddressYesNoPage, CompanyNamePage}
 import play.api.data.Form
 import play.api.inject.bind
-import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import repositories.SessionRepository
@@ -36,8 +34,6 @@ import views.html.add.company.CompanyAddressYesNoView
 import scala.concurrent.Future
 
 class CompanyAddressYesNoControllerSpec extends SpecBase with MockitoSugar {
-
-  def onwardRoute: Call = Call("GET", "/foo")
 
   val formProvider        = new CompanyAddressYesNoFormProvider()
   val form: Form[Boolean] = formProvider()
@@ -89,18 +85,15 @@ class CompanyAddressYesNoControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must redirect to the next page when valid data is submitted" in {
+    "must redirect to the CompanyAddress page when valid data with value Yes is submitted" in {
 
       val mockSessionRepository = mock[SessionRepository]
-      val mockNavigator         = mock[Navigator]
 
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
-      when(mockNavigator.nextPage(any(), any(), any())).thenReturn(onwardRoute)
 
       val application =
         applicationBuilder(userAnswers = Some(uaWithName))
           .overrides(
-            bind[Navigator].toInstance(mockNavigator),
             bind[SessionRepository].toInstance(mockSessionRepository)
           )
           .build()
@@ -113,7 +106,36 @@ class CompanyAddressYesNoControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual onwardRoute.url
+        redirectLocation(result).value mustEqual controllers.add.company.routes.CompanyAddressController
+          .onPageLoad(NormalMode)
+          .url
+      }
+    }
+
+    "must redirect to the CompanyContactOptions page when valid data with value No is submitted" in {
+
+      val mockSessionRepository = mock[SessionRepository]
+
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+      val application =
+        applicationBuilder(userAnswers = Some(uaWithName))
+          .overrides(
+            bind[SessionRepository].toInstance(mockSessionRepository)
+          )
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, companyAddressYesNoRoute)
+            .withFormUrlEncodedBody(("value", "false"))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.add.company.routes.CompanyContactOptionsController
+          .onPageLoad(NormalMode)
+          .url
       }
     }
 

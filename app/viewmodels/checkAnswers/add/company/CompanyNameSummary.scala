@@ -37,6 +37,7 @@ object CompanyNameSummary {
             controllers.add.company.routes.CompanyNameController.onPageLoad(CheckMode).url
           )
             .withVisuallyHiddenText(messages("companyName.change.hidden"))
+            .withAttribute("id" -> "company-name")
         )
       )
     }

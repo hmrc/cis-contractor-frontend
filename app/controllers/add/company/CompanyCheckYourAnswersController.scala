@@ -104,7 +104,7 @@ class CompanyCheckYourAnswersController @Inject() (
                 Future
                   .fromTry(request.userAnswers.set(CheckYourAnswersSubmittedPage, true))
                   .flatMap(updated => sessionRepository.set(updated).map(_ => ()))
-                  .map(_ => Redirect(controllers.add.company.routes.CompanyCheckYourAnswersController.onPageLoad()))
+                  .map(_ => Redirect(controllers.add.routes.SubcontractorAddedController.companySubcontractorAdded()))
               }
               .recover { case t =>
                 logger.error(
