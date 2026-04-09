@@ -39,6 +39,7 @@ object ContractorEmailConfirmationNotStoredSummary {
             controllers.verify.routes.ContractorEmailConfirmationNotStoredController.onPageLoad(CheckMode).url
           )
             .withVisuallyHiddenText(messages("contractorEmailConfirmationNotStored.change.hidden"))
+            .withAttribute("id" -> "contractor-email-confirmation-not-stored")
         )
       )
     }
