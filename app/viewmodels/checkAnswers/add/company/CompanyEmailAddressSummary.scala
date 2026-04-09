@@ -37,6 +37,7 @@ object CompanyEmailAddressSummary {
             controllers.add.company.routes.CompanyEmailAddressController.onPageLoad(CheckMode).url
           )
             .withVisuallyHiddenText(messages("companyEmailAddress.change.hidden"))
+            .withAttribute("id" -> "company-email-address")
         )
       )
     }
