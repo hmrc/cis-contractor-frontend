@@ -54,7 +54,7 @@ class EmailAddressViewSpec extends AnyWordSpec with Matchers with GuiceOneAppPer
 
     "render the page with SM-01c hint when email is not stored" in new Setup {
       val html: HtmlFormat.Appendable = view(form, NormalMode, "emailAddress.hint.notStored")
-      val doc = org.jsoup.Jsoup.parse(html.toString())
+      val doc                         = org.jsoup.Jsoup.parse(html.toString())
 
       doc.select(".govuk-hint").text() must include(messages("emailAddress.hint.notStored"))
     }
@@ -63,8 +63,8 @@ class EmailAddressViewSpec extends AnyWordSpec with Matchers with GuiceOneAppPer
       val errorForm: Form[String] =
         form.withError("value", "emailAddress.error.required")
 
-      val html        = view(errorForm, NormalMode, "emailAddress.hint")
-      val doc         = org.jsoup.Jsoup.parse(html.toString())
+      val html = view(errorForm, NormalMode, "emailAddress.hint")
+      val doc  = org.jsoup.Jsoup.parse(html.toString())
 
       val summary = doc.select(".govuk-error-summary")
       summary.text() must include(messages("emailAddress.error.required"))

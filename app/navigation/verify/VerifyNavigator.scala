@@ -31,19 +31,19 @@ class VerifyNavigator @Inject() () extends NavigatorForJourney {
   override def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers): Call = mode match {
     case NormalMode =>
       normalRoutes(page)(userAnswers)
-    case CheckMode =>
+    case CheckMode  =>
       checkRouteMap(page)(userAnswers)
   }
 
   private val normalRoutes: Page => UserAnswers => Call = {
     case EmailAddressPage =>
       _ => controllers.verify.routes.EmailAddressController.onPageLoad(NormalMode)
-    case _ => _ => routes.IndexController.onPageLoad()
+    case _                => _ => routes.IndexController.onPageLoad()
   }
 
   private val checkRouteMap: Page => UserAnswers => Call = {
     case EmailAddressPage =>
       _ => controllers.add.routes.CheckYourAnswersController.onPageLoad()
-    case _ => _ => controllers.add.routes.CheckYourAnswersController.onPageLoad()
+    case _                => _ => controllers.add.routes.CheckYourAnswersController.onPageLoad()
   }
 }

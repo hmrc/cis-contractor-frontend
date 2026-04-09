@@ -24,7 +24,7 @@ import navigation.Navigator
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.verify.{EmailAddressPage, ContractorEmailConfirmationNotStoredPage}
+import pages.verify.{ContractorEmailConfirmationNotStoredPage, EmailAddressPage}
 import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
@@ -39,19 +39,24 @@ class EmailAddressControllerSpec extends SpecBase with MockitoSugar {
   def onwardRoute = Call("GET", "/foo")
 
   val formProvider = new EmailAddressFormProvider()
-  val form = formProvider()
+  val form         = formProvider()
 
   lazy val emailAddressRoute = controllers.verify.routes.EmailAddressController.onPageLoad(NormalMode).url
 
   private def uaWithAlternateEmail(email: String): UserAnswers =
     emptyUserAnswers
-      .set(ContractorEmailConfirmationNotStoredPage, true).success.value
-      .set(EmailAddressPage, email).success.value
-
+      .set(ContractorEmailConfirmationNotStoredPage, true)
+      .success
+      .value
+      .set(EmailAddressPage, email)
+      .success
+      .value
 
   private def uaWithNoAlternateEmail: UserAnswers =
     emptyUserAnswers
-      .set(ContractorEmailConfirmationNotStoredPage, false).success.value
+      .set(ContractorEmailConfirmationNotStoredPage, false)
+      .success
+      .value
 
   "EmailAddress Controller" - {
 
@@ -75,7 +80,6 @@ class EmailAddressControllerSpec extends SpecBase with MockitoSugar {
           )(request, messages(application)).toString
       }
     }
-
 
     "must return OK and the correct view for a GET when email IS stored (alternate email confirmation)" in {
 
@@ -110,7 +114,7 @@ class EmailAddressControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request = FakeRequest(GET, emailAddressRoute)
-        val view = application.injector.instanceOf[EmailAddressView]
+        val view    = application.injector.instanceOf[EmailAddressView]
 
         val result = route(application, request).value
 
@@ -124,11 +128,10 @@ class EmailAddressControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-
     "must redirect to the next page when valid data is submitted" in {
 
       val mockSessionRepository = mock[SessionRepository]
-      val mockNavigator = mock[Navigator]
+      val mockNavigator         = mock[Navigator]
 
       when(mockNavigator.nextPage(any(), any(), any())).thenReturn(onwardRoute)
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
@@ -153,7 +156,6 @@ class EmailAddressControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-
     "must return a Bad Request and errors when invalid data is submitted and email is NOT stored" in {
 
       val application =
@@ -165,7 +167,7 @@ class EmailAddressControllerSpec extends SpecBase with MockitoSugar {
             .withFormUrlEncodedBody("value" -> "")
 
         val boundForm = form.bind(Map("value" -> ""))
-        val view = application.injector.instanceOf[EmailAddressView]
+        val view      = application.injector.instanceOf[EmailAddressView]
 
         val result = route(application, request).value
 
@@ -178,7 +180,6 @@ class EmailAddressControllerSpec extends SpecBase with MockitoSugar {
           )(request, messages(application)).toString
       }
     }
-
 
     "must return a Bad Request and errors when invalid data is submitted and email IS stored" in {
 
@@ -205,7 +206,6 @@ class EmailAddressControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-
     "must redirect to Journey Recovery for a GET if no existing data is found" in {
 
       val application =
@@ -221,7 +221,6 @@ class EmailAddressControllerSpec extends SpecBase with MockitoSugar {
           routes.JourneyRecoveryController.onPageLoad().url
       }
     }
-
 
     "must redirect to Journey Recovery for a POST if no existing data is found" in {
 
