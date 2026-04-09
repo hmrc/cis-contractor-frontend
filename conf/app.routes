@@ -347,3 +347,8 @@ POST  /add/trust/change-trust-works-reference   controllers.add.trust.TrustWorks
 GET   /trustCheckYourAnswers                    controllers.add.trust.TrustCheckYourAnswersController.onPageLoad()
 
 GET   /add/trust/subcontractor-added            controllers.add.SubcontractorAddedController.trustSubcontractorAdded()
+
+GET        /verify/enter-confirmation-email                       controllers.verify.EmailAddressController.onPageLoad(mode: Mode = NormalMode)
+POST       /verify/enter-confirmation-email                       controllers.verify.EmailAddressController.onSubmit(mode: Mode = NormalMode)
+GET        /verify/change-enter-confirmation-email                  controllers.verify.EmailAddressController.onPageLoad(mode: Mode = CheckMode)
+POST       /verify/change-enter-confirmation-email                 controllers.verify.EmailAddressController.onSubmit(mode: Mode = CheckMode)
