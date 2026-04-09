@@ -744,11 +744,12 @@ trustUtr.error.invalid                                         =  Enter a valid 
 trustUtr.error.duplicate                                       =  You have already used this Unique Taxpayer Reference (UTR) for an existing subcontractor
 trustUtr.change.hidden                                         =  trust UTR
 
-trustWorksReferenceYesNo.title                                 =  trustWorksReferenceYesNo
-trustWorksReferenceYesNo.heading                               =  trustWorksReferenceYesNo
-trustWorksReferenceYesNo.checkYourAnswersLabel                 =  trustWorksReferenceYesNo
-trustWorksReferenceYesNo.error.required                        =  Select yes if trustWorksReferenceYesNo
-trustWorksReferenceYesNo.change.hidden                         =  TrustWorksReferenceYesNo
+trustWorksReferenceYesNo.title                                 =  Is there a works reference number associated with this trust?
+trustWorksReferenceYesNo.heading                               =  Is there a works reference number associated with {0}?
+trustWorksReferenceYesNo.hint                                  =  This is the reference number used to identify a subcontractor’s work or project. It can contain letters and numbers.
+trustWorksReferenceYesNo.checkYourAnswersLabel                 =  Works reference number
+trustWorksReferenceYesNo.error.required                        =  Select whether there is a works reference number associated with this trust
+trustWorksReferenceYesNo.change.hidden                         =  works reference number
 
 trustWorksReference.title                                      =  What is the works reference number associated with this trust?
 trustWorksReference.heading                                    =  What is the works reference number associated with {0}?
