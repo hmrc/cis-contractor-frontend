@@ -340,6 +340,16 @@ class ValidatedSubcontractorSpec extends SpecBase with Matchers {
 
     "must return error" - {
 
+      "fail when TypeOfSubcontractor is not Individualorsoletrader" in {
+        val ua =
+          minRequired
+            .set(TypeOfSubcontractorPage, TypeOfSubcontractor.Partnership)
+            .success
+            .value
+
+        ValidatedSubcontractor.build(ua) mustBe Left(InvalidAnswer(TypeOfSubcontractorPage))
+      }
+
       "when TypeOfSubcontractorPage is missing" in {
         val result = ValidatedSubcontractor.build(emptyUserAnswers)
 
