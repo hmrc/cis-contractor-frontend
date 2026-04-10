@@ -763,8 +763,8 @@ trustWorksReference.change.hidden                              =  works referenc
 trustCheckYourAnswers.title                                    =  trustCheckYourAnswers
 trustCheckYourAnswers.heading                                  =  trustCheckYourAnswers
 
-contractorEmailConfirmationNotStored.title                               =  Do you want an email confirmation of this verification request?
-contractorEmailConfirmationNotStored.heading                             =  Do you want an email confirmation of this verification request?
-contractorEmailConfirmationNotStored.checkYourAnswersLabel               =  Do you want confirmation by email?
-contractorEmailConfirmationNotStored.error.required                      =  Select yes if you want an email confirmation of this verification request
-contractorEmailConfirmationNotStored.change.hidden                       =  Do you want confirmation by email?
+verify.contractorEmailConfirmationNotStored.title                               =  Do you want an email confirmation of this verification request?
+verify.contractorEmailConfirmationNotStored.heading                             =  Do you want an email confirmation of this verification request?
+verify.contractorEmailConfirmationNotStored.checkYourAnswersLabel               =  Do you want confirmation by email?
+verify.contractorEmailConfirmationNotStored.error.required                      =  Select yes if you want an email confirmation of this verification request
+verify.contractorEmailConfirmationNotStored.change.hidden                       =  Do you want confirmation by email?

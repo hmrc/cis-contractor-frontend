@@ -31,14 +31,14 @@ object ContractorEmailConfirmationNotStoredSummary {
       val value = if (answer) "site.yes" else "site.no"
 
       SummaryListRowViewModel(
-        key = "contractorEmailConfirmationNotStored.checkYourAnswersLabel",
+        key = "verify.contractorEmailConfirmationNotStored.checkYourAnswersLabel",
         value = ValueViewModel(value),
         actions = Seq(
           ActionItemViewModel(
             "site.change",
             controllers.verify.routes.ContractorEmailConfirmationNotStoredController.onPageLoad(CheckMode).url
           )
-            .withVisuallyHiddenText(messages("contractorEmailConfirmationNotStored.change.hidden"))
+            .withVisuallyHiddenText(messages("verify.contractorEmailConfirmationNotStored.change.hidden"))
             .withAttribute("id" -> "contractor-email-confirmation-not-stored")
         )
       )

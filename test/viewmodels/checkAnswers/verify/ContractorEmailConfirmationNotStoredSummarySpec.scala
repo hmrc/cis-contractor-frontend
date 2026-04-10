@@ -48,7 +48,7 @@ class ContractorEmailConfirmationNotStoredSummarySpec extends AnyFreeSpec with M
       val row = maybeRow.value
 
       val expectedKeyText =
-        messages("contractorEmailConfirmationNotStored.checkYourAnswersLabel")
+        messages("verify.contractorEmailConfirmationNotStored.checkYourAnswersLabel")
       row.key.content.asHtml.toString should include(expectedKeyText)
 
       val expectedValue =
@@ -68,7 +68,7 @@ class ContractorEmailConfirmationNotStoredSummarySpec extends AnyFreeSpec with M
           .onPageLoad(CheckMode)
           .url
       val expectedHiddenText =
-        messages("contractorEmailConfirmationNotStored.change.hidden")
+        messages("verify.contractorEmailConfirmationNotStored.change.hidden")
 
       changeAction.content.asHtml.toString    should include(expectedChangeText)
       changeAction.href                     shouldBe expectedHref

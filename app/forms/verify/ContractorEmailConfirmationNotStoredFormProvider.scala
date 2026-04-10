@@ -25,6 +25,6 @@ class ContractorEmailConfirmationNotStoredFormProvider @Inject() extends Mapping
 
   def apply(): Form[Boolean] =
     Form(
-      "value" -> boolean("contractorEmailConfirmationNotStored.error.required")
+      "value" -> boolean("verify.contractorEmailConfirmationNotStored.error.required")
     )
 }

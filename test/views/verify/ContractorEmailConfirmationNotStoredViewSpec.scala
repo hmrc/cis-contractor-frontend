@@ -38,11 +38,11 @@ class ContractorEmailConfirmationNotStoredViewSpec extends AnyWordSpec with Matc
       val doc  = Jsoup.parse(html.toString())
 
       doc.select("title").text() must include(
-        messages("contractorEmailConfirmationNotStored.title")
+        messages("verify.contractorEmailConfirmationNotStored.title")
       )
 
       val legend = doc.select("fieldset legend")
-      legend.text() mustBe messages("contractorEmailConfirmationNotStored.heading")
+      legend.text() mustBe messages("verify.contractorEmailConfirmationNotStored.heading")
       legend.hasClass("govuk-fieldset__legend--l") mustBe true
 
       val radios = doc.select(".govuk-radios__input")
@@ -65,20 +65,20 @@ class ContractorEmailConfirmationNotStoredViewSpec extends AnyWordSpec with Matc
     "display error summary and inline error when no option is selected" in new Setup {
 
       val errorForm =
-        form.withError("value", "contractorEmailConfirmationNotStored.error.required")
+        form.withError("value", "verify.contractorEmailConfirmationNotStored.error.required")
 
       val html = view(errorForm, NormalMode)
       val doc  = Jsoup.parse(html.toString())
 
       val errorSummary = doc.select(".govuk-error-summary")
       errorSummary.text() must include(
-        messages("contractorEmailConfirmationNotStored.error.required")
+        messages("verify.contractorEmailConfirmationNotStored.error.required")
       )
 
       errorSummary.select("a").attr("href") mustBe "#value"
 
       doc.select(".govuk-error-message").text() must include(
-        messages("contractorEmailConfirmationNotStored.error.required")
+        messages("verify.contractorEmailConfirmationNotStored.error.required")
       )
     }
   }
