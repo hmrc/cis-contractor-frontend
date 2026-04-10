@@ -55,7 +55,7 @@ object CompanyAddressSummary {
             controllers.add.company.routes.CompanyAddressController.onPageLoad(CheckMode).url
           )
             .withVisuallyHiddenText(messages("companyAddress.change.hidden"))
-            .withAttribute("id" -> "address-of-partnership")
+            .withAttribute("id" -> "address-of-company")
         )
       )
     }

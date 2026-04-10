@@ -21,6 +21,7 @@ import models.{CheckMode, UserAnswers}
 import org.scalatest.OptionValues.convertOptionToValuable
 import org.scalatest.TryValues.convertTryToSuccessOrFailure
 import org.scalatest.freespec.AnyFreeSpec
+import org.scalatest.matchers.must.Matchers.must
 import org.scalatest.matchers.should.Matchers
 import pages.add.company.CompanyPhoneNumberPage
 import play.api.i18n.Messages
@@ -63,6 +64,7 @@ class CompanyPhoneNumberSummarySpec extends AnyFreeSpec with Matchers {
       changeAction.href                  shouldBe expectedHref
 
       changeAction.visuallyHiddenText.value shouldBe expectedHiddenText
+      changeAction.attributes                   must contain("id" -> "company-phone-number")
     }
 
     "must return None when the answer does not exist" in {

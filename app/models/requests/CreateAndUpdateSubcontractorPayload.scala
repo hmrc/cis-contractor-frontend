@@ -43,7 +43,8 @@ object CreateAndUpdateSubcontractorPayload {
     utr: Option[String] = None,
     worksReferenceNumber: Option[String] = None,
     emailAddress: Option[String] = None,
-    phoneNumber: Option[String] = None
+    phoneNumber: Option[String] = None,
+    mobilePhoneNumber: Option[String] = None
   ) extends CreateAndUpdateSubcontractorPayload
 
   object IndividualOrSoleTraderPayload {

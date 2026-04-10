@@ -39,6 +39,7 @@ object CompanyAddressYesNoSummary {
             controllers.add.company.routes.CompanyAddressYesNoController.onPageLoad(CheckMode).url
           )
             .withVisuallyHiddenText(messages("companyAddressYesNo.change.hidden"))
+            .withAttribute("id" -> "add-company-address")
         )
       )
     }
