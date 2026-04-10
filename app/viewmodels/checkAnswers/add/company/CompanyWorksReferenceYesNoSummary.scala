@@ -39,6 +39,7 @@ object CompanyWorksReferenceYesNoSummary {
             controllers.add.company.routes.CompanyWorksReferenceYesNoController.onPageLoad(CheckMode).url
           )
             .withVisuallyHiddenText(messages("companyWorksReferenceYesNo.change.hidden"))
+            .withAttribute("id" -> "add-company-works-reference")
         )
       )
     }

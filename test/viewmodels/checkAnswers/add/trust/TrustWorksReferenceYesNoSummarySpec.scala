@@ -14,38 +14,38 @@
  * limitations under the License.
  */
 
-package viewmodels.checkAnswers.add.company
+package viewmodels.checkAnswers.add.trust
 
+import controllers.add.trust.routes
 import models.{CheckMode, UserAnswers}
 import org.scalatest.OptionValues.convertOptionToValuable
 import org.scalatest.TryValues.convertTryToSuccessOrFailure
 import org.scalatest.freespec.AnyFreeSpec
-import org.scalatest.matchers.must.Matchers.must
 import org.scalatest.matchers.should.Matchers
-import pages.add.company.CompanyCrnYesNoPage
+import pages.add.trust.TrustWorksReferenceYesNoPage
 import play.api.i18n.Messages
 import play.api.test.Helpers.stubMessages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.*
 
-class CompanyCrnYesNoSummarySpec extends AnyFreeSpec with Matchers {
+class TrustWorksReferenceYesNoSummarySpec extends AnyFreeSpec with Matchers {
 
   implicit val messages: Messages = stubMessages()
 
-  "CompanyCrnYesNoSummary.row" - {
+  "TrustWorksReferenceYesNoSummary.row" - {
 
     "must return a SummaryListRow with 'Yes' when the answer is true" in {
       val answers = UserAnswers("test-id")
-        .set(CompanyCrnYesNoPage, true)
+        .set(TrustWorksReferenceYesNoPage, true)
         .success
         .value
 
-      val maybeRow: Option[SummaryListRow] = CompanyCrnYesNoSummary.row(answers)
+      val maybeRow: Option[SummaryListRow] = TrustWorksReferenceYesNoSummary.row(answers)
       maybeRow shouldBe defined
 
       val row =
         maybeRow.value
 
-      val expectedKeyText = messages("companyCrnYesNo.checkYourAnswersLabel")
+      val expectedKeyText = messages("trustWorksReferenceYesNo.checkYourAnswersLabel")
       row.key.content.asHtml.toString should include(expectedKeyText)
 
       val expectedValue = messages("site.yes")
@@ -57,22 +57,21 @@ class CompanyCrnYesNoSummarySpec extends AnyFreeSpec with Matchers {
 
       val changeAction       = actions.head
       val expectedChangeText = messages("site.change")
-      val expectedHref       = controllers.add.company.routes.CompanyCrnYesNoController.onPageLoad(CheckMode).url
-      val expectedHiddenText = messages("companyCrnYesNo.change.hidden")
+      val expectedHref       = routes.TrustWorksReferenceYesNoController.onPageLoad(CheckMode).url
+      val expectedHiddenText = messages("trustWorksReferenceYesNo.change.hidden")
 
       changeAction.content.asHtml.toString    should include(expectedChangeText)
       changeAction.href                     shouldBe expectedHref
       changeAction.visuallyHiddenText.value shouldBe expectedHiddenText
-      changeAction.attributes                   must contain("id" -> "add-company-crn")
     }
 
     "must return a SummaryListRow with 'No' when the answer is false" in {
       val answers = UserAnswers("test-id")
-        .set(CompanyCrnYesNoPage, false)
+        .set(TrustWorksReferenceYesNoPage, false)
         .success
         .value
 
-      val maybeRow: Option[SummaryListRow] = CompanyCrnYesNoSummary.row(answers)
+      val maybeRow: Option[SummaryListRow] = TrustWorksReferenceYesNoSummary.row(answers)
       maybeRow shouldBe defined
 
       val row           = maybeRow.value
@@ -82,8 +81,7 @@ class CompanyCrnYesNoSummarySpec extends AnyFreeSpec with Matchers {
 
     "must return None when the answer does not exist" in {
       val answers = UserAnswers("test-id")
-      CompanyCrnYesNoSummary.row(answers) shouldBe None
+      TrustWorksReferenceYesNoSummary.row(answers) shouldBe None
     }
   }
-
 }

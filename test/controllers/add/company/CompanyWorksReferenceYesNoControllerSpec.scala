@@ -20,14 +20,12 @@ import base.SpecBase
 import controllers.routes
 import forms.add.company.CompanyWorksReferenceYesNoFormProvider
 import models.{NormalMode, UserAnswers}
-import navigation.Navigator
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
 import pages.add.company.{CompanyNamePage, CompanyWorksReferenceYesNoPage}
 import play.api.data.Form
 import play.api.inject.bind
-import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import repositories.SessionRepository
@@ -38,8 +36,6 @@ import scala.concurrent.Future
 class CompanyWorksReferenceYesNoControllerSpec extends SpecBase with MockitoSugar {
 
   private val companyName = "Test Company"
-
-  def onwardRoute: Call = Call("GET", "/foo")
 
   val formProvider        = new CompanyWorksReferenceYesNoFormProvider()
   val form: Form[Boolean] = formProvider()
@@ -92,18 +88,15 @@ class CompanyWorksReferenceYesNoControllerSpec extends SpecBase with MockitoSuga
       }
     }
 
-    "must redirect to the next page when valid data with value Yes is submitted" in {
+    "must redirect to the CompanyWorksReference page when valid data with value Yes is submitted" in {
 
       val mockSessionRepository = mock[SessionRepository]
-      val mockNavigator         = mock[Navigator]
 
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
-      when(mockNavigator.nextPage(any(), any(), any())).thenReturn(onwardRoute)
 
       val application =
         applicationBuilder(userAnswers = Some(uaWithName))
           .overrides(
-            bind[Navigator].toInstance(mockNavigator),
             bind[SessionRepository].toInstance(mockSessionRepository)
           )
           .build()
@@ -116,22 +109,21 @@ class CompanyWorksReferenceYesNoControllerSpec extends SpecBase with MockitoSuga
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual onwardRoute.url
+        redirectLocation(result).value mustEqual controllers.add.company.routes.CompanyWorksReferenceController
+          .onPageLoad(NormalMode)
+          .url
       }
     }
 
-    "must redirect to the next page when valid data with value No is submitted" in {
+    "must redirect to the company CYA page when valid data with value No is submitted" in {
 
       val mockSessionRepository = mock[SessionRepository]
-      val mockNavigator         = mock[Navigator]
 
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
-      when(mockNavigator.nextPage(any(), any(), any())).thenReturn(onwardRoute)
 
       val application =
         applicationBuilder(userAnswers = Some(uaWithName))
           .overrides(
-            bind[Navigator].toInstance(mockNavigator),
             bind[SessionRepository].toInstance(mockSessionRepository)
           )
           .build()
@@ -144,7 +136,9 @@ class CompanyWorksReferenceYesNoControllerSpec extends SpecBase with MockitoSuga
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual onwardRoute.url
+        redirectLocation(result).value mustEqual controllers.add.company.routes.CompanyCheckYourAnswersController
+          .onPageLoad()
+          .url
       }
     }
 

@@ -43,7 +43,8 @@ object CreateAndUpdateSubcontractorPayload {
     utr: Option[String] = None,
     worksReferenceNumber: Option[String] = None,
     emailAddress: Option[String] = None,
-    phoneNumber: Option[String] = None
+    phoneNumber: Option[String] = None,
+    mobilePhoneNumber: Option[String] = None
   ) extends CreateAndUpdateSubcontractorPayload
 
   object IndividualOrSoleTraderPayload {
@@ -95,6 +96,27 @@ object CreateAndUpdateSubcontractorPayload {
 
   object CompanyPayload {
     implicit val format: OFormat[CompanyPayload] = Json.format[CompanyPayload]
+  }
+
+  final case class TrustPayload(
+    cisId: String,
+    subcontractorType: TypeOfSubcontractor,
+    utr: Option[String] = None,
+    trustTradingName: Option[String] = None,
+    addressLine1: Option[String] = None,
+    addressLine2: Option[String] = None,
+    city: Option[String] = None,
+    county: Option[String] = None,
+    country: Option[String] = None,
+    postcode: Option[String] = None,
+    emailAddress: Option[String] = None,
+    phoneNumber: Option[String] = None,
+    mobilePhoneNumber: Option[String] = None,
+    worksReferenceNumber: Option[String] = None
+  ) extends CreateAndUpdateSubcontractorPayload
+
+  object TrustPayload {
+    implicit val format: OFormat[TrustPayload] = Json.format[TrustPayload]
   }
 
 }

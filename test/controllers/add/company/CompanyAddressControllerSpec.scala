@@ -42,10 +42,8 @@ import scala.concurrent.Future
 
 class CompanyAddressControllerSpec extends SpecBase with MockitoSugar with Matchers {
 
-  def onwardRoute = Call("GET", "/foo")
-
-  val formProvider = new CompanyAddressFormProvider()
-  val form         = formProvider()
+  private val formProvider = new CompanyAddressFormProvider()
+  private val form         = formProvider()
 
   private val companyName = "Test Company"
 
@@ -139,21 +137,16 @@ class CompanyAddressControllerSpec extends SpecBase with MockitoSugar with Match
       }
     }
 
-    "must redirect to the next page when valid data is submitted (and persist the address) when company name is present" in {
+    "must redirect to the CompanyContactOptions page when valid data is submitted (and persist the address) when company name is present" in {
 
       val mockSessionRepository = mock[SessionRepository]
 
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
-      val mockNavigator = mock[Navigator]
-      when(mockNavigator.nextPage(any(), any(), any()))
-        .thenReturn(Call("GET", "/dummy-next"))
-
       val application =
         applicationBuilder(userAnswers = Some(uaWithName))
           .overrides(
-            bind[SessionRepository].toInstance(mockSessionRepository),
-            bind[Navigator].toInstance(mockNavigator)
+            bind[SessionRepository].toInstance(mockSessionRepository)
           )
           .build()
 
@@ -172,7 +165,9 @@ class CompanyAddressControllerSpec extends SpecBase with MockitoSugar with Match
         val result = route(application, request).value
 
         status(result) mustBe SEE_OTHER
-        redirectLocation(result).value mustBe "/dummy-next"
+        redirectLocation(result).value mustEqual controllers.add.company.routes.CompanyContactOptionsController
+          .onPageLoad(NormalMode)
+          .url
 
         val uaCaptor = ArgumentCaptor.forClass(classOf[UserAnswers])
         verify(mockSessionRepository, times(1)).set(uaCaptor.capture())

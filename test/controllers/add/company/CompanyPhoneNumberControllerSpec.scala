@@ -86,7 +86,7 @@ class CompanyPhoneNumberControllerSpec extends SpecBase with MockitoSugar {
         ).toString
       }
     }
-    "must redirect to the next page when valid data submitted" in {
+    "must redirect to the CompanyUtrYesNo page when valid data submitted" in {
 
       val mockSessionRepository = mock[SessionRepository]
 
@@ -107,7 +107,7 @@ class CompanyPhoneNumberControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.add.company.routes.CompanyPhoneNumberController
+        redirectLocation(result).value mustEqual controllers.add.company.routes.CompanyUtrYesNoController
           .onPageLoad(NormalMode)
           .url
       }

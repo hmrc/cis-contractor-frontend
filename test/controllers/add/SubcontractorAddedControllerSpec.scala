@@ -40,6 +40,7 @@ import utils.DefaultSubcontractorCleanupService
 class SubcontractorAddedControllerSpec extends SpecBase with MockitoSugar {
 
   private val subcontractorName = "Test subcontractor"
+  private val cisId             = "12345"
 
   "SubcontractorAddedController.individualSubcontractorAdded" - {
 
@@ -54,6 +55,9 @@ class SubcontractorAddedControllerSpec extends SpecBase with MockitoSugar {
           .success
           .value
           .set(CheckYourAnswersSubmittedPage, true)
+          .success
+          .value
+          .set(CisIdQuery, cisId)
           .success
           .value
 
@@ -77,7 +81,11 @@ class SubcontractorAddedControllerSpec extends SpecBase with MockitoSugar {
 
         val result = route(application, request).value
         status(result) mustBe OK
-        contentAsString(result) mustEqual view(subcontractorName, subcontractorTypeTitle)(
+        contentAsString(result) mustEqual view(
+          subcontractorName,
+          subcontractorTypeTitle,
+          s"${applicationConfig.manageSubcontractorsUrl}/$cisId"
+        )(
           request,
           messages(application)
         ).toString
@@ -132,7 +140,11 @@ class SubcontractorAddedControllerSpec extends SpecBase with MockitoSugar {
 
         val result = route(application, request).value
         status(result) mustBe OK
-        contentAsString(result) mustEqual view(subcontractorName, subcontractorTypeTitle)(
+        contentAsString(result) mustEqual view(
+          subcontractorName,
+          subcontractorTypeTitle,
+          s"${applicationConfig.manageSubcontractorsUrl}/10"
+        )(
           request,
           messages(application)
         ).toString
@@ -160,6 +172,9 @@ class SubcontractorAddedControllerSpec extends SpecBase with MockitoSugar {
           .success
           .value
           .set(CheckYourAnswersSubmittedPage, true)
+          .success
+          .value
+          .set(CisIdQuery, cisId)
           .success
           .value
 
@@ -290,6 +305,9 @@ class SubcontractorAddedControllerSpec extends SpecBase with MockitoSugar {
           .set(CheckYourAnswersSubmittedPage, true)
           .success
           .value
+          .set(CisIdQuery, cisId)
+          .success
+          .value
 
       val mockRepo    = mock[SessionRepository]
       val mockCleanup = mock[DefaultSubcontractorCleanupService]
@@ -316,6 +334,39 @@ class SubcontractorAddedControllerSpec extends SpecBase with MockitoSugar {
         verify(mockRepo, times(0)).set(any())
       }
     }
+
+    "must redirect to JourneyRecovery for a GET when CisId is missing" in {
+
+      def ua: UserAnswers =
+        emptyUserAnswers
+          .set(TradingNameOfSubcontractorPage, subcontractorName)
+          .success
+          .value
+          .set(CheckYourAnswersSubmittedPage, true)
+          .success
+          .value
+
+      val mockRepo = mock[SessionRepository]
+
+      when(mockRepo.set(any())).thenReturn(Future.successful(true))
+
+      val application =
+        applicationBuilder(userAnswers = Some(ua))
+          .overrides(
+            bind[SessionRepository].toInstance(mockRepo)
+          )
+          .build()
+
+      running(application) {
+        val request = FakeRequest(GET, individualSubcontractorAddedRoute)
+        val result  = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+
+        verify(mockRepo, times(0)).set(any())
+      }
+    }
   }
 
   "SubcontractorAddedController.companySubcontractorAdded" - {
@@ -331,6 +382,9 @@ class SubcontractorAddedControllerSpec extends SpecBase with MockitoSugar {
           .success
           .value
           .set(CheckYourAnswersSubmittedPage, true)
+          .success
+          .value
+          .set(CisIdQuery, cisId)
           .success
           .value
 
@@ -354,7 +408,11 @@ class SubcontractorAddedControllerSpec extends SpecBase with MockitoSugar {
 
         val result = route(application, request).value
         status(result) mustBe OK
-        contentAsString(result) mustEqual view(subcontractorName, subcontractorTypeTitle)(
+        contentAsString(result) mustEqual view(
+          subcontractorName,
+          subcontractorTypeTitle,
+          s"${applicationConfig.manageSubcontractorsUrl}/$cisId"
+        )(
           request,
           messages(application)
         ).toString
@@ -409,7 +467,11 @@ class SubcontractorAddedControllerSpec extends SpecBase with MockitoSugar {
 
         val result = route(application, request).value
         status(result) mustBe OK
-        contentAsString(result) mustEqual view(subcontractorName, subcontractorTypeTitle)(
+        contentAsString(result) mustEqual view(
+          subcontractorName,
+          subcontractorTypeTitle,
+          s"${applicationConfig.manageSubcontractorsUrl}/10"
+        )(
           request,
           messages(application)
         ).toString
@@ -437,6 +499,9 @@ class SubcontractorAddedControllerSpec extends SpecBase with MockitoSugar {
           .success
           .value
           .set(CheckYourAnswersSubmittedPage, true)
+          .success
+          .value
+          .set(CisIdQuery, cisId)
           .success
           .value
 
@@ -567,6 +632,9 @@ class SubcontractorAddedControllerSpec extends SpecBase with MockitoSugar {
           .set(CheckYourAnswersSubmittedPage, true)
           .success
           .value
+          .set(CisIdQuery, cisId)
+          .success
+          .value
 
       val mockRepo    = mock[SessionRepository]
       val mockCleanup = mock[DefaultSubcontractorCleanupService]
@@ -593,6 +661,39 @@ class SubcontractorAddedControllerSpec extends SpecBase with MockitoSugar {
         verify(mockRepo, times(0)).set(any())
       }
     }
+
+    "must redirect to JourneyRecovery for a GET when CisId is missing" in {
+
+      def ua: UserAnswers =
+        emptyUserAnswers
+          .set(CompanyNamePage, subcontractorName)
+          .success
+          .value
+          .set(CheckYourAnswersSubmittedPage, true)
+          .success
+          .value
+
+      val mockRepo = mock[SessionRepository]
+
+      when(mockRepo.set(any())).thenReturn(Future.successful(true))
+
+      val application =
+        applicationBuilder(userAnswers = Some(ua))
+          .overrides(
+            bind[SessionRepository].toInstance(mockRepo)
+          )
+          .build()
+
+      running(application) {
+        val request = FakeRequest(GET, companySubcontractorAddedRoute)
+        val result  = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+
+        verify(mockRepo, times(0)).set(any())
+      }
+    }
   }
 
   "SubcontractorAddedController.partnershipSubcontractorAdded" - {
@@ -608,6 +709,9 @@ class SubcontractorAddedControllerSpec extends SpecBase with MockitoSugar {
           .success
           .value
           .set(CheckYourAnswersSubmittedPage, true)
+          .success
+          .value
+          .set(CisIdQuery, cisId)
           .success
           .value
 
@@ -631,7 +735,11 @@ class SubcontractorAddedControllerSpec extends SpecBase with MockitoSugar {
 
         val result = route(application, request).value
         status(result) mustBe OK
-        contentAsString(result) mustEqual view(subcontractorName, subcontractorTypeTitle)(
+        contentAsString(result) mustEqual view(
+          subcontractorName,
+          subcontractorTypeTitle,
+          s"${applicationConfig.manageSubcontractorsUrl}/$cisId"
+        )(
           request,
           messages(application)
         ).toString
@@ -686,7 +794,11 @@ class SubcontractorAddedControllerSpec extends SpecBase with MockitoSugar {
 
         val result = route(application, request).value
         status(result) mustBe OK
-        contentAsString(result) mustEqual view(subcontractorName, subcontractorTypeTitle)(
+        contentAsString(result) mustEqual view(
+          subcontractorName,
+          subcontractorTypeTitle,
+          s"${applicationConfig.manageSubcontractorsUrl}/10"
+        )(
           request,
           messages(application)
         ).toString
@@ -714,6 +826,9 @@ class SubcontractorAddedControllerSpec extends SpecBase with MockitoSugar {
           .success
           .value
           .set(CheckYourAnswersSubmittedPage, true)
+          .success
+          .value
+          .set(CisIdQuery, cisId)
           .success
           .value
 
@@ -844,6 +959,9 @@ class SubcontractorAddedControllerSpec extends SpecBase with MockitoSugar {
           .set(CheckYourAnswersSubmittedPage, true)
           .success
           .value
+          .set(CisIdQuery, cisId)
+          .success
+          .value
 
       val mockRepo    = mock[SessionRepository]
       val mockCleanup = mock[DefaultSubcontractorCleanupService]
@@ -870,6 +988,39 @@ class SubcontractorAddedControllerSpec extends SpecBase with MockitoSugar {
         verify(mockRepo, times(0)).set(any())
       }
     }
+
+    "must redirect to JourneyRecovery for a GET when CisId is missing" in {
+
+      def ua: UserAnswers =
+        emptyUserAnswers
+          .set(PartnershipNamePage, subcontractorName)
+          .success
+          .value
+          .set(CheckYourAnswersSubmittedPage, true)
+          .success
+          .value
+
+      val mockRepo = mock[SessionRepository]
+
+      when(mockRepo.set(any())).thenReturn(Future.successful(true))
+
+      val application =
+        applicationBuilder(userAnswers = Some(ua))
+          .overrides(
+            bind[SessionRepository].toInstance(mockRepo)
+          )
+          .build()
+
+      running(application) {
+        val request = FakeRequest(GET, partnershipSubcontractorAddedRoute)
+        val result  = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+
+        verify(mockRepo, times(0)).set(any())
+      }
+    }
   }
 
   "SubcontractorAddedController.trustSubcontractorAdded" - {
@@ -885,6 +1036,9 @@ class SubcontractorAddedControllerSpec extends SpecBase with MockitoSugar {
           .success
           .value
           .set(CheckYourAnswersSubmittedPage, true)
+          .success
+          .value
+          .set(CisIdQuery, cisId)
           .success
           .value
 
@@ -908,7 +1062,11 @@ class SubcontractorAddedControllerSpec extends SpecBase with MockitoSugar {
 
         val result = route(application, request).value
         status(result) mustBe OK
-        contentAsString(result) mustEqual view(subcontractorName, subcontractorTypeTitle)(
+        contentAsString(result) mustEqual view(
+          subcontractorName,
+          subcontractorTypeTitle,
+          s"${applicationConfig.manageSubcontractorsUrl}/$cisId"
+        )(
           request,
           messages(application)
         ).toString
@@ -963,7 +1121,11 @@ class SubcontractorAddedControllerSpec extends SpecBase with MockitoSugar {
 
         val result = route(application, request).value
         status(result) mustBe OK
-        contentAsString(result) mustEqual view(subcontractorName, subcontractorTypeTitle)(
+        contentAsString(result) mustEqual view(
+          subcontractorName,
+          subcontractorTypeTitle,
+          s"${applicationConfig.manageSubcontractorsUrl}/10"
+        )(
           request,
           messages(application)
         ).toString
@@ -991,6 +1153,9 @@ class SubcontractorAddedControllerSpec extends SpecBase with MockitoSugar {
           .success
           .value
           .set(CheckYourAnswersSubmittedPage, true)
+          .success
+          .value
+          .set(CisIdQuery, cisId)
           .success
           .value
 
@@ -1121,6 +1286,9 @@ class SubcontractorAddedControllerSpec extends SpecBase with MockitoSugar {
           .set(CheckYourAnswersSubmittedPage, true)
           .success
           .value
+          .set(CisIdQuery, cisId)
+          .success
+          .value
 
       val mockRepo    = mock[SessionRepository]
       val mockCleanup = mock[DefaultSubcontractorCleanupService]
@@ -1143,6 +1311,39 @@ class SubcontractorAddedControllerSpec extends SpecBase with MockitoSugar {
         redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
 
         verify(mockCleanup, times(1)).clean(any())
+        verify(mockRepo, times(0)).set(any())
+      }
+    }
+
+    "must redirect to JourneyRecovery for a GET when CisId is missing" in {
+
+      def ua: UserAnswers =
+        emptyUserAnswers
+          .set(TrustNamePage, subcontractorName)
+          .success
+          .value
+          .set(CheckYourAnswersSubmittedPage, true)
+          .success
+          .value
+
+      val mockRepo = mock[SessionRepository]
+
+      when(mockRepo.set(any())).thenReturn(Future.successful(true))
+
+      val application =
+        applicationBuilder(userAnswers = Some(ua))
+          .overrides(
+            bind[SessionRepository].toInstance(mockRepo)
+          )
+          .build()
+
+      running(application) {
+        val request = FakeRequest(GET, trustSubcontractorAddedRoute)
+        val result  = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+
         verify(mockRepo, times(0)).set(any())
       }
     }
