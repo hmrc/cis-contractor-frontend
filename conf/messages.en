@@ -292,6 +292,10 @@ individualChooseContactDetails.error.required                            =  Sele
 individualChooseContactDetails.checkYourAnswersLabel                     =  Method of contact
 individualChooseContactDetails.change.hidden                             =  method of contact
 
+verify.submissionSending.title                                           =  Submitting your verification request
+verify.submissionSending.heading                                         =  Your verification request is being sent to HMRC
+verify.submissionSending.paragraph                                       =  Do not refresh this page or press the back button while your submission is being processed.
+
 # Partnership
 partnershipWorksReferenceNumberYesNo.title                           =  Does this partnership have a works reference number?
 partnershipWorksReferenceNumberYesNo.heading                         =  Does {0} have a works reference number?
