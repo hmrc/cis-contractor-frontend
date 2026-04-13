@@ -18,7 +18,7 @@ package navigation
 
 import models.{Mode, UserAnswers}
 import navigation.add.*
-import navigation.verify.*
+import navigation.verify.VerifyNavigator
 import pages.Page
 import play.api.mvc.Call
 

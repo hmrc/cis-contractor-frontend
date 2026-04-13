@@ -57,6 +57,7 @@ class CompanyAddressYesNoSummarySpec extends SpecBase with GuiceOneAppPerSuite {
         .url
       action.content mustBe Text(messages("site.change"))
       action.visuallyHiddenText mustBe Some(messages("companyAddressYesNo.change.hidden"))
+      action.attributes must contain("id" -> "add-company-address")
     }
 
     "return a row with key, value = no, and change action when the answer is false" in {

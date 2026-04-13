@@ -36,14 +36,36 @@ class VerifyNavigator @Inject() () extends NavigatorForJourney {
   }
 
   private val normalRoutes: Page => UserAnswers => Call = {
+    case ContractorEmailConfirmationNotStoredPage =>
+      userAnswers => navigatorFromContractorEmailConfirmationNotStoredPage(NormalMode)(userAnswers)
     case EmailAddressPage =>
       _ => controllers.verify.routes.EmailAddressController.onPageLoad(NormalMode)
     case _                => _ => routes.IndexController.onPageLoad()
   }
 
   private val checkRouteMap: Page => UserAnswers => Call = {
+    case ContractorEmailConfirmationNotStoredPage =>
+      userAnswers => navigatorFromContractorEmailConfirmationNotStoredPage(CheckMode)(userAnswers)
     case EmailAddressPage =>
       _ => controllers.add.routes.CheckYourAnswersController.onPageLoad()
     case _                => _ => controllers.add.routes.CheckYourAnswersController.onPageLoad()
   }
+  
+   private def navigatorFromContractorEmailConfirmationNotStoredPage(mode: Mode)(ua: UserAnswers): Call =
+    (ua.get(ContractorEmailConfirmationNotStoredPage), mode) match {
+      case (Some(true), _) =>
+        // ToDo: navigate to next page after the page is implemented
+        controllers.verify.routes.ContractorEmailConfirmationNotStoredController.onPageLoad(NormalMode)
+
+      case (Some(false), NormalMode) =>
+        // ToDo: navigate to next page after the page is implemented
+        controllers.verify.routes.ContractorEmailConfirmationNotStoredController.onPageLoad(NormalMode)
+      case (Some(false), CheckMode)  =>
+        // ToDo: navigate CYA page after the page is implemented and implement the logic to handle dependent pages
+        routes.IndexController.onPageLoad()
+
+      case _ =>
+        routes.IndexController.onPageLoad()
+    }
+  
 }

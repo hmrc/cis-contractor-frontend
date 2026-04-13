@@ -27,5 +27,13 @@ class TrustUtrYesNoPageSpec extends PageBehaviours {
     beSettable[Boolean](TrustUtrYesNoPage)
 
     beRemovable[Boolean](TrustUtrYesNoPage)
+
+    "cleanup: must remove TrustUtr userAnswers when No is selected" in {
+      val userAnswers = emptyUserAnswers.set(TrustUtrPage, "1234567890").success.value
+
+      val updatedUserAnswers = userAnswers.set(TrustUtrYesNoPage, false).success.value
+
+      updatedUserAnswers.get(TrustUtrPage) mustBe None
+    }
   }
 }

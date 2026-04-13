@@ -25,7 +25,9 @@ import pages.verify.*
 
 class VerifyNavigatorSpec extends SpecBase {
 
-  val navigator = new VerifyNavigator
+  val navigator = new VerifyNavigator()
+  
+  private lazy val journeyRecovery = routes.JourneyRecoveryController.onPageLoad()
 
   "VerifyNavigator" - {
 
@@ -42,6 +44,34 @@ class VerifyNavigatorSpec extends SpecBase {
         val ua = emptyUserAnswers.set(EmailAddressPage, "test@test.com").success.value
         navigator.nextPage(EmailAddressPage, NormalMode, ua) mustBe
           controllers.verify.routes.EmailAddressController.onPageLoad(NormalMode)
+      }
+      
+      "must go from a page that doesn't exist in the route map to JourneyRecovery" in {
+        case object UnknownPage extends Page
+
+        navigator.nextPage(UnknownPage, NormalMode, UserAnswers("id")) mustBe journeyRecovery
+      }
+
+      "must go from ContractorEmailConfirmationNotStoredPage to ContractorEmailConfirmationNotStoredController when answer is true" in {
+        val ua = emptyUserAnswers.setOrException(ContractorEmailConfirmationNotStoredPage, true)
+
+        navigator.nextPage(ContractorEmailConfirmationNotStoredPage, NormalMode, ua) mustBe
+          controllers.verify.routes.ContractorEmailConfirmationNotStoredController.onPageLoad(NormalMode)
+      }
+
+      "must go from ContractorEmailConfirmationNotStoredPage to ContractorEmailConfirmationNotStoredController when answer is false" in {
+        val ua = emptyUserAnswers.setOrException(ContractorEmailConfirmationNotStoredPage, false)
+
+        navigator.nextPage(ContractorEmailConfirmationNotStoredPage, NormalMode, ua) mustBe
+          controllers.verify.routes.ContractorEmailConfirmationNotStoredController.onPageLoad(NormalMode)
+      }
+
+      "must go from ContractorEmailConfirmationNotStoredPage to Index when answer is not present" in {
+        navigator.nextPage(
+          ContractorEmailConfirmationNotStoredPage,
+          NormalMode,
+          emptyUserAnswers
+        ) mustBe routes.IndexController.onPageLoad()
       }
     }
 
@@ -65,6 +95,33 @@ class VerifyNavigatorSpec extends SpecBase {
           .onPageLoad()
       }
 
+      "must go from a page that doesn't exist in the route map to JourneyRecovery" in {
+        case object UnknownPage extends Page
+
+        navigator.nextPage(UnknownPage, CheckMode, UserAnswers("id")) mustBe journeyRecovery
+      }
+
+      "must go from ContractorEmailConfirmationNotStoredPage to ContractorEmailConfirmationNotStoredController when answer is true" in {
+        val ua = emptyUserAnswers.setOrException(ContractorEmailConfirmationNotStoredPage, true)
+
+        navigator.nextPage(ContractorEmailConfirmationNotStoredPage, CheckMode, ua) mustBe
+          controllers.verify.routes.ContractorEmailConfirmationNotStoredController.onPageLoad(NormalMode)
+      }
+
+      "must go from ContractorEmailConfirmationNotStoredPage to Index when answer is false" in {
+        val ua = emptyUserAnswers.setOrException(ContractorEmailConfirmationNotStoredPage, false)
+
+        navigator.nextPage(ContractorEmailConfirmationNotStoredPage, CheckMode, ua) mustBe
+          routes.IndexController.onPageLoad()
+      }
+
+      "must go from ContractorEmailConfirmationNotStoredPage to Index when answer is not present" in {
+        navigator.nextPage(
+          ContractorEmailConfirmationNotStoredPage,
+          CheckMode,
+          emptyUserAnswers
+        ) mustBe routes.IndexController.onPageLoad()
+      }
     }
   }
 }

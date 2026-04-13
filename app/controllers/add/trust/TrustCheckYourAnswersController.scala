@@ -17,11 +17,24 @@
 package controllers.add.trust
 
 import controllers.actions.*
-import play.api.i18n.{I18nSupport, MessagesApi}
+import models.UserAnswers
+import models.add.trust.ValidatedTrust
+import models.contact.ContactOptions.*
+import pages.add.CheckYourAnswersSubmittedPage
+import pages.add.trust.TrustContactOptionsPage
+import play.api.Logging
+import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import repositories.SessionRepository
+import services.SubcontractorService
+import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import viewmodels.checkAnswers.add.TypeOfSubcontractorSummary
+import viewmodels.checkAnswers.add.trust.*
+import viewmodels.govuk.summarylist.*
 import views.html.add.trust.TrustCheckYourAnswersView
 
+import scala.concurrent.{ExecutionContext, Future}
 import javax.inject.Inject
 
 class TrustCheckYourAnswersController @Inject() (
@@ -30,11 +43,77 @@ class TrustCheckYourAnswersController @Inject() (
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   val controllerComponents: MessagesControllerComponents,
+  subcontractorService: SubcontractorService,
+  sessionRepository: SessionRepository,
   view: TrustCheckYourAnswersView
-) extends FrontendBaseController
-    with I18nSupport {
+)(implicit ec: ExecutionContext)
+    extends FrontendBaseController
+    with I18nSupport
+    with Logging {
 
-  def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
-    Ok(view())
-  }
+  private def contactDetailsRow(ua: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
+    ua.get(TrustContactOptionsPage).flatMap {
+      case Email  => TrustEmailAddressSummary.row(ua)
+      case Phone  => TrustPhoneNumberSummary.row(ua)
+      case Mobile => TrustMobileNumberSummary.row(ua)
+      case _      => None
+    }
+
+  def onPageLoad: Action[AnyContent] =
+    (identify andThen getData andThen requireData) { implicit request =>
+      val ua = request.userAnswers
+
+      ValidatedTrust.build(ua) match {
+        case Right(_)    =>
+          val list = SummaryListViewModel(
+            rows = Seq(
+              TypeOfSubcontractorSummary.row(ua),
+              TrustNameSummary.row(ua),
+              TrustAddressYesNoSummary.row(ua),
+              TrustAddressSummary.row(ua),
+              TrustContactOptionsSummary.row(ua),
+              contactDetailsRow(ua),
+              TrustUtrYesNoSummary.row(ua),
+              TrustUtrSummary.row(ua),
+              TrustWorksReferenceYesNoSummary.row(ua),
+              TrustWorksReferenceSummary.row(ua)
+            ).flatten
+          )
+          Ok(view(list))
+        case Left(error) =>
+          logger.error(s"[TrustCheckYourAnswersController.onPageLoad] Failed to load the page: $error")
+          Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+      }
+    }
+
+  def onSubmit(): Action[AnyContent] =
+    (identify andThen getData andThen requireData).async { implicit request =>
+      if (request.userAnswers.get(CheckYourAnswersSubmittedPage).contains(true)) {
+        Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+      } else {
+        ValidatedTrust.build(request.userAnswers) match {
+          case Right(_)    =>
+            subcontractorService
+              .createAndUpdateSubcontractor(request.userAnswers)
+              .flatMap { _ =>
+                Future
+                  .fromTry(request.userAnswers.set(CheckYourAnswersSubmittedPage, true))
+                  .flatMap(updated => sessionRepository.set(updated).map(_ => ()))
+                  .map { _ =>
+                    Redirect(controllers.add.routes.SubcontractorAddedController.trustSubcontractorAdded())
+                  }
+              }
+              .recover { case t =>
+                logger.error(
+                  "[TrustCheckYourAnswersController.onSubmit] Failed to create/update subcontractor",
+                  t
+                )
+                Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+              }
+          case Left(error) =>
+            logger.error(s"[TrustCheckYourAnswersController.onSubmit] Validation failed: $error")
+            Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+        }
+      }
+    }
 }

@@ -30,6 +30,7 @@ import pages.add.company.CompanyJourney
 import pages.add.partnership.PartnershipJourney
 import pages.add.trust.TrustJourney
 import pages.add.IndividualJourney
+import pages.verify.VerifyJourney
 import play.api.mvc.Call
 
 class NavigatorSpec extends SpecBase {
@@ -42,18 +43,18 @@ class NavigatorSpec extends SpecBase {
     "must delegate to IndividualNavigator when page is an IndividualJourney" in {
       case object TestIndividualPage extends Page with IndividualJourney
 
-      val individual      = mock[IndividualNavigator]
-      val company         = mock[CompanyNavigator]
-      val partnership     = mock[PartnershipNavigator]
-      val trust           = mock[TrustNavigator]
-      val shared          = mock[SharedNavigator]
-      val verifyNavigator = mock[VerifyNavigator]
+      val individual  = mock[IndividualNavigator]
+      val company     = mock[CompanyNavigator]
+      val partnership = mock[PartnershipNavigator]
+      val trust       = mock[TrustNavigator]
+      val shared      = mock[SharedNavigator]
+      val verifyNav   = mock[VerifyNavigator]
 
       val expected = Call("GET", "/individual")
       when(individual.nextPage(any(), any(), any())).thenReturn(expected)
 
       val navigator =
-        new Navigator(individual, company, partnership, trust, shared, verifyNavigator)
+        new Navigator(individual, company, partnership, trust, shared, verifyNav)
 
       navigator.nextPage(TestIndividualPage, mode, ua) mustBe expected
 
@@ -67,18 +68,18 @@ class NavigatorSpec extends SpecBase {
     "must delegate to CompanyNavigator when page is a CompanyJourney" in {
       case object TestCompanyPage extends Page with CompanyJourney
 
-      val individual      = mock[IndividualNavigator]
-      val company         = mock[CompanyNavigator]
-      val partnership     = mock[PartnershipNavigator]
-      val trust           = mock[TrustNavigator]
-      val shared          = mock[SharedNavigator]
-      val verifyNavigator = mock[VerifyNavigator]
+      val individual  = mock[IndividualNavigator]
+      val company     = mock[CompanyNavigator]
+      val partnership = mock[PartnershipNavigator]
+      val trust       = mock[TrustNavigator]
+      val shared      = mock[SharedNavigator]
+      val verifyNav   = mock[VerifyNavigator]
 
       val expected = Call("GET", "/company")
       when(company.nextPage(any(), any(), any())).thenReturn(expected)
 
       val navigator =
-        new Navigator(individual, company, partnership, trust, shared, verifyNavigator)
+        new Navigator(individual, company, partnership, trust, shared, verifyNav)
 
       navigator.nextPage(TestCompanyPage, mode, ua) mustBe expected
 
@@ -92,18 +93,18 @@ class NavigatorSpec extends SpecBase {
     "must delegate to PartnershipNavigator when page is a PartnershipPage" in {
       case object TestPartnershipPage extends Page with PartnershipJourney
 
-      val individual      = mock[IndividualNavigator]
-      val company         = mock[CompanyNavigator]
-      val partnership     = mock[PartnershipNavigator]
-      val trust           = mock[TrustNavigator]
-      val shared          = mock[SharedNavigator]
-      val verifyNavigator = mock[VerifyNavigator]
+      val individual  = mock[IndividualNavigator]
+      val company     = mock[CompanyNavigator]
+      val partnership = mock[PartnershipNavigator]
+      val trust       = mock[TrustNavigator]
+      val shared      = mock[SharedNavigator]
+      val verifyNav   = mock[VerifyNavigator]
 
       val expected = Call("GET", "/partnership")
       when(partnership.nextPage(any(), any(), any())).thenReturn(expected)
 
       val navigator =
-        new Navigator(individual, company, partnership, trust, shared, verifyNavigator)
+        new Navigator(individual, company, partnership, trust, shared, verifyNav)
 
       navigator.nextPage(TestPartnershipPage, mode, ua) mustBe expected
 
@@ -117,18 +118,18 @@ class NavigatorSpec extends SpecBase {
     "must delegate to TrustNavigator when page is a TrustJourney" in {
       case object TestTrustPage extends Page with TrustJourney
 
-      val individual      = mock[IndividualNavigator]
-      val company         = mock[CompanyNavigator]
-      val partnership     = mock[PartnershipNavigator]
-      val trust           = mock[TrustNavigator]
-      val shared          = mock[SharedNavigator]
-      val verifyNavigator = mock[VerifyNavigator]
+      val individual  = mock[IndividualNavigator]
+      val company     = mock[CompanyNavigator]
+      val partnership = mock[PartnershipNavigator]
+      val trust       = mock[TrustNavigator]
+      val shared      = mock[SharedNavigator]
+      val verifyNav   = mock[VerifyNavigator]
 
       val expected = Call("GET", "/trust")
       when(trust.nextPage(any(), any(), any())).thenReturn(expected)
 
       val navigator =
-        new Navigator(individual, company, partnership, trust, shared, verifyNavigator)
+        new Navigator(individual, company, partnership, trust, shared, verifyNav)
 
       navigator.nextPage(TestTrustPage, mode, ua) mustBe expected
 
@@ -140,7 +141,7 @@ class NavigatorSpec extends SpecBase {
     }
 
     "must delegate to VerifyNavigator when page is a VerifyJourney" in {
-      case object TestVerifyPage extends Page with pages.verify.VerifyJourney
+      case object TestVerifyPage extends Page with VerifyJourney
 
       val individual  = mock[IndividualNavigator]
       val company     = mock[CompanyNavigator]
@@ -152,7 +153,8 @@ class NavigatorSpec extends SpecBase {
       val expected = Call("GET", "/verify")
       when(verifyNav.nextPage(any(), any(), any())).thenReturn(expected)
 
-      val navigator = new Navigator(individual, company, partnership, trust, shared, verifyNav)
+      val navigator =
+        new Navigator(individual, company, partnership, trust, shared, verifyNav)
 
       navigator.nextPage(TestVerifyPage, mode, ua) mustBe expected
 
@@ -167,18 +169,18 @@ class NavigatorSpec extends SpecBase {
     "must delegate to SharedNavigator when page is not a journey-specific page" in {
       case object TestUnknownPage extends Page
 
-      val individual      = mock[IndividualNavigator]
-      val company         = mock[CompanyNavigator]
-      val partnership     = mock[PartnershipNavigator]
-      val trust           = mock[TrustNavigator]
-      val shared          = mock[SharedNavigator]
-      val verifyNavigator = mock[VerifyNavigator]
+      val individual  = mock[IndividualNavigator]
+      val company     = mock[CompanyNavigator]
+      val partnership = mock[PartnershipNavigator]
+      val trust       = mock[TrustNavigator]
+      val shared      = mock[SharedNavigator]
+      val verifyNav   = mock[VerifyNavigator]
 
       val expected = Call("GET", "/shared")
       when(shared.nextPage(any(), any(), any())).thenReturn(expected)
 
       val navigator =
-        new Navigator(individual, company, partnership, trust, shared, verifyNavigator)
+        new Navigator(individual, company, partnership, trust, shared, verifyNav)
 
       navigator.nextPage(TestUnknownPage, mode, ua) mustBe expected
 

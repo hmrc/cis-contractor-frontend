@@ -47,41 +47,51 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
 
     "createAndUpdateSubcontractor" - {
 
+      def baseIndividualAnswers = {
+        val individualAddress =
+          InternationalAddress(
+            addressLine1 = "i1",
+            addressLine2 = Some("i2"),
+            addressLine3 = "London",
+            addressLine4 = Some("Hackney"),
+            postalCode = "N1 5AP",
+            country = "United Kingdom"
+          )
+
+        emptyUserAnswers
+          .set(CisIdQuery, cisId)
+          .success
+          .value
+          .set(TypeOfSubcontractorPage, TypeOfSubcontractor.Individualorsoletrader)
+          .success
+          .value
+          .set(AddressOfSubcontractorPage, individualAddress)
+          .success
+          .value
+          .set(SubNationalInsuranceNumberPage, "AC012345")
+          .success
+          .value
+          .set(SubcontractorsUniqueTaxpayerReferencePage, "1234567890")
+          .success
+          .value
+          .set(WorksReferenceNumberPage, "WRN-IND")
+          .success
+          .value
+      }
+
       "should create and update subcontractor (Individualorsoletrader) when session data is present with trading name" in {
         val mockConnector: ConstructionIndustrySchemeConnector = mock[ConstructionIndustrySchemeConnector]
         val service                                            = new SubcontractorService(mockConnector)
 
         val userAnswers =
-          emptyUserAnswers
-            .set(CisIdQuery, cisId)
-            .success
-            .value
-            .set(TypeOfSubcontractorPage, TypeOfSubcontractor.Individualorsoletrader)
-            .success
-            .value
+          baseIndividualAnswers
             .set(TradingNameOfSubcontractorPage, "trading name")
             .success
             .value
-            .set(
-              AddressOfSubcontractorPage,
-              InternationalAddress(
-                "addressLine1",
-                Some("addressLine2"),
-                "addressLine3",
-                Some("addressLine4"),
-                "postalCode",
-                "United Kingdom"
-              )
-            )
+            .set(IndividualChooseContactDetailsPage, ContactOptions.Email)
             .success
             .value
-            .set(SubNationalInsuranceNumberPage, "nino")
-            .success
-            .value
-            .set(SubcontractorsUniqueTaxpayerReferencePage, "utr")
-            .success
-            .value
-            .set(WorksReferenceNumberPage, "workRef")
+            .set(IndividualEmailAddressPage, "i@example.com")
             .success
             .value
 
@@ -90,15 +100,18 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
             cisId = cisId,
             subcontractorType = TypeOfSubcontractor.Individualorsoletrader,
             tradingName = Some("trading name"),
-            addressLine1 = Some("addressLine1"),
-            addressLine2 = Some("addressLine2"),
-            city = Some("addressLine3"),
-            county = Some("addressLine4"),
-            postcode = Some("postalCode"),
+            addressLine1 = Some("i1"),
+            addressLine2 = Some("i2"),
+            city = Some("London"),
+            county = Some("Hackney"),
+            postcode = Some("N1 5AP"),
             country = Some("United Kingdom"),
-            nino = Some("nino"),
-            utr = Some("utr"),
-            worksReferenceNumber = Some("workRef")
+            nino = Some("AC012345"),
+            utr = Some("1234567890"),
+            worksReferenceNumber = Some("WRN-IND"),
+            emailAddress = Some("i@example.com"),
+            phoneNumber = None,
+            mobilePhoneNumber = None
           )
 
         when(mockConnector.createAndUpdateSubcontractor(any[CreateAndUpdateSubcontractorPayload])(any[HeaderCarrier]))
@@ -115,36 +128,14 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
         val service                                            = new SubcontractorService(mockConnector)
 
         val userAnswers =
-          emptyUserAnswers
-            .set(CisIdQuery, cisId)
-            .success
-            .value
-            .set(TypeOfSubcontractorPage, TypeOfSubcontractor.Individualorsoletrader)
-            .success
-            .value
+          baseIndividualAnswers
             .set(SubcontractorNamePage, SubcontractorName("firstname", Some("middle name"), "lastname"))
             .success
             .value
-            .set(
-              AddressOfSubcontractorPage,
-              InternationalAddress(
-                "addressLine1",
-                Some("addressLine2"),
-                "addressLine3",
-                Some("addressLine4"),
-                "postalCode",
-                "United Kingdom"
-              )
-            )
+            .set(IndividualChooseContactDetailsPage, ContactOptions.Email)
             .success
             .value
-            .set(SubNationalInsuranceNumberPage, "nino")
-            .success
-            .value
-            .set(SubcontractorsUniqueTaxpayerReferencePage, "utr")
-            .success
-            .value
-            .set(WorksReferenceNumberPage, "workRef")
+            .set(IndividualEmailAddressPage, "i@example.com")
             .success
             .value
 
@@ -155,15 +146,232 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
             firstName = Some("firstname"),
             secondName = Some("middle name"),
             surname = Some("lastname"),
-            addressLine1 = Some("addressLine1"),
-            addressLine2 = Some("addressLine2"),
-            city = Some("addressLine3"),
-            county = Some("addressLine4"),
-            postcode = Some("postalCode"),
+            addressLine1 = Some("i1"),
+            addressLine2 = Some("i2"),
+            city = Some("London"),
+            county = Some("Hackney"),
+            postcode = Some("N1 5AP"),
             country = Some("United Kingdom"),
-            nino = Some("nino"),
-            utr = Some("utr"),
-            worksReferenceNumber = Some("workRef")
+            nino = Some("AC012345"),
+            utr = Some("1234567890"),
+            worksReferenceNumber = Some("WRN-IND"),
+            emailAddress = Some("i@example.com"),
+            phoneNumber = None,
+            mobilePhoneNumber = None
+          )
+
+        when(mockConnector.createAndUpdateSubcontractor(any[CreateAndUpdateSubcontractorPayload])(any[HeaderCarrier]))
+          .thenReturn(Future.successful(()))
+
+        service.createAndUpdateSubcontractor(userAnswers).futureValue mustBe (())
+
+        verify(mockConnector).createAndUpdateSubcontractor(eqTo(expectedPayload))(any[HeaderCarrier])
+        verifyNoMoreInteractions(mockConnector)
+      }
+
+      "should create and update subcontractor (Individualorsoletrader) with EMAIL contact details" in {
+        val mockConnector: ConstructionIndustrySchemeConnector = mock[ConstructionIndustrySchemeConnector]
+        val service                                            = new SubcontractorService(mockConnector)
+
+        val userAnswers =
+          baseIndividualAnswers
+            .set(TradingNameOfSubcontractorPage, "trading name")
+            .success
+            .value
+            .set(IndividualChooseContactDetailsPage, ContactOptions.Email)
+            .success
+            .value
+            .set(IndividualEmailAddressPage, "i@example.com")
+            .success
+            .value
+
+        val expectedPayload: CreateAndUpdateSubcontractorPayload =
+          IndividualOrSoleTraderPayload(
+            cisId = cisId,
+            subcontractorType = TypeOfSubcontractor.Individualorsoletrader,
+            tradingName = Some("trading name"),
+            addressLine1 = Some("i1"),
+            addressLine2 = Some("i2"),
+            city = Some("London"),
+            county = Some("Hackney"),
+            postcode = Some("N1 5AP"),
+            country = Some("United Kingdom"),
+            nino = Some("AC012345"),
+            utr = Some("1234567890"),
+            worksReferenceNumber = Some("WRN-IND"),
+            emailAddress = Some("i@example.com"),
+            phoneNumber = None,
+            mobilePhoneNumber = None
+          )
+
+        when(mockConnector.createAndUpdateSubcontractor(any[CreateAndUpdateSubcontractorPayload])(any[HeaderCarrier]))
+          .thenReturn(Future.successful(()))
+
+        service.createAndUpdateSubcontractor(userAnswers).futureValue mustBe (())
+
+        verify(mockConnector).createAndUpdateSubcontractor(eqTo(expectedPayload))(any[HeaderCarrier])
+        verifyNoMoreInteractions(mockConnector)
+      }
+
+      "should create and update subcontractor (Individualorsoletrader) with PHONE contact details" in {
+        val mockConnector: ConstructionIndustrySchemeConnector = mock[ConstructionIndustrySchemeConnector]
+        val service                                            = new SubcontractorService(mockConnector)
+
+        val userAnswers =
+          baseIndividualAnswers
+            .set(TradingNameOfSubcontractorPage, "trading name")
+            .success
+            .value
+            .set(IndividualChooseContactDetailsPage, ContactOptions.Phone)
+            .success
+            .value
+            .set(IndividualPhoneNumberPage, "02071234567")
+            .success
+            .value
+
+        val expectedPayload: CreateAndUpdateSubcontractorPayload =
+          IndividualOrSoleTraderPayload(
+            cisId = cisId,
+            subcontractorType = TypeOfSubcontractor.Individualorsoletrader,
+            tradingName = Some("trading name"),
+            addressLine1 = Some("i1"),
+            addressLine2 = Some("i2"),
+            city = Some("London"),
+            county = Some("Hackney"),
+            postcode = Some("N1 5AP"),
+            country = Some("United Kingdom"),
+            nino = Some("AC012345"),
+            utr = Some("1234567890"),
+            worksReferenceNumber = Some("WRN-IND"),
+            emailAddress = None,
+            phoneNumber = Some("02071234567"),
+            mobilePhoneNumber = None
+          )
+
+        when(mockConnector.createAndUpdateSubcontractor(any[CreateAndUpdateSubcontractorPayload])(any[HeaderCarrier]))
+          .thenReturn(Future.successful(()))
+
+        service.createAndUpdateSubcontractor(userAnswers).futureValue mustBe (())
+
+        verify(mockConnector).createAndUpdateSubcontractor(eqTo(expectedPayload))(any[HeaderCarrier])
+        verifyNoMoreInteractions(mockConnector)
+      }
+
+      "should create and update subcontractor (Individualorsoletrader) with MOBILE contact details" in {
+        val mockConnector: ConstructionIndustrySchemeConnector = mock[ConstructionIndustrySchemeConnector]
+        val service                                            = new SubcontractorService(mockConnector)
+
+        val userAnswers =
+          baseIndividualAnswers
+            .set(TradingNameOfSubcontractorPage, "trading name")
+            .success
+            .value
+            .set(IndividualChooseContactDetailsPage, ContactOptions.Mobile)
+            .success
+            .value
+            .set(IndividualMobileNumberPage, "07123456789")
+            .success
+            .value
+
+        val expectedPayload: CreateAndUpdateSubcontractorPayload =
+          IndividualOrSoleTraderPayload(
+            cisId = cisId,
+            subcontractorType = TypeOfSubcontractor.Individualorsoletrader,
+            tradingName = Some("trading name"),
+            addressLine1 = Some("i1"),
+            addressLine2 = Some("i2"),
+            city = Some("London"),
+            county = Some("Hackney"),
+            postcode = Some("N1 5AP"),
+            country = Some("United Kingdom"),
+            nino = Some("AC012345"),
+            utr = Some("1234567890"),
+            worksReferenceNumber = Some("WRN-IND"),
+            emailAddress = None,
+            phoneNumber = None,
+            mobilePhoneNumber = Some("07123456789")
+          )
+
+        when(mockConnector.createAndUpdateSubcontractor(any[CreateAndUpdateSubcontractorPayload])(any[HeaderCarrier]))
+          .thenReturn(Future.successful(()))
+
+        service.createAndUpdateSubcontractor(userAnswers).futureValue mustBe (())
+
+        verify(mockConnector).createAndUpdateSubcontractor(eqTo(expectedPayload))(any[HeaderCarrier])
+        verifyNoMoreInteractions(mockConnector)
+      }
+
+      "should create and update subcontractor (Individualorsoletrader) with NO contact details (no contact fields sent)" in {
+        val mockConnector: ConstructionIndustrySchemeConnector = mock[ConstructionIndustrySchemeConnector]
+        val service                                            = new SubcontractorService(mockConnector)
+
+        val userAnswers =
+          baseIndividualAnswers
+            .set(TradingNameOfSubcontractorPage, "trading name")
+            .success
+            .value
+            .set(IndividualChooseContactDetailsPage, ContactOptions.NoDetails)
+            .success
+            .value
+
+        val expectedPayload: CreateAndUpdateSubcontractorPayload =
+          IndividualOrSoleTraderPayload(
+            cisId = cisId,
+            subcontractorType = TypeOfSubcontractor.Individualorsoletrader,
+            tradingName = Some("trading name"),
+            addressLine1 = Some("i1"),
+            addressLine2 = Some("i2"),
+            city = Some("London"),
+            county = Some("Hackney"),
+            postcode = Some("N1 5AP"),
+            country = Some("United Kingdom"),
+            nino = Some("AC012345"),
+            utr = Some("1234567890"),
+            worksReferenceNumber = Some("WRN-IND"),
+            emailAddress = None,
+            phoneNumber = None,
+            mobilePhoneNumber = None
+          )
+
+        when(mockConnector.createAndUpdateSubcontractor(any[CreateAndUpdateSubcontractorPayload])(any[HeaderCarrier]))
+          .thenReturn(Future.successful(()))
+
+        service.createAndUpdateSubcontractor(userAnswers).futureValue mustBe (())
+
+        verify(mockConnector).createAndUpdateSubcontractor(eqTo(expectedPayload))(any[HeaderCarrier])
+        verifyNoMoreInteractions(mockConnector)
+      }
+
+      "should create and update subcontractor (Individualorsoletrader) when contact options are missing (no contact fields sent)" in {
+        val mockConnector: ConstructionIndustrySchemeConnector = mock[ConstructionIndustrySchemeConnector]
+        val service                                            = new SubcontractorService(mockConnector)
+
+        val userAnswers =
+          baseIndividualAnswers
+            .set(TradingNameOfSubcontractorPage, "trading name")
+            .success
+            .value
+            .set(IndividualChooseContactDetailsPage, ContactOptions.NoDetails)
+            .success
+            .value
+
+        val expectedPayload: CreateAndUpdateSubcontractorPayload =
+          IndividualOrSoleTraderPayload(
+            cisId = cisId,
+            subcontractorType = TypeOfSubcontractor.Individualorsoletrader,
+            tradingName = Some("trading name"),
+            addressLine1 = Some("i1"),
+            addressLine2 = Some("i2"),
+            city = Some("London"),
+            county = Some("Hackney"),
+            postcode = Some("N1 5AP"),
+            country = Some("United Kingdom"),
+            nino = Some("AC012345"),
+            utr = Some("1234567890"),
+            worksReferenceNumber = Some("WRN-IND"),
+            emailAddress = None,
+            phoneNumber = None,
+            mobilePhoneNumber = None
           )
 
         when(mockConnector.createAndUpdateSubcontractor(any[CreateAndUpdateSubcontractorPayload])(any[HeaderCarrier]))
@@ -399,7 +607,7 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
         verifyNoMoreInteractions(mockConnector)
       }
 
-      "should create and update subcontractor (Partnership) with none in contact details (no contact fields sent)" in {
+      "should create and update subcontractor (Partnership) when contact options are missing (no contact fields sent)" in {
         val mockConnector = mock[ConstructionIndustrySchemeConnector]
         val service       = new SubcontractorService(mockConnector)
 
@@ -688,7 +896,7 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
         verifyNoMoreInteractions(mockConnector)
       }
 
-      "should create and update subcontractor (Company) with none in contact details (no contact fields sent)" in {
+      "should create and update subcontractor (Company) when contact options are missing (no contact fields sent)" in {
         val mockConnector = mock[ConstructionIndustrySchemeConnector]
         val service       = new SubcontractorService(mockConnector)
 
