@@ -14,27 +14,19 @@
  * limitations under the License.
  */
 
-package pages.add.trust
+package pages.verify
 
 import pages.behaviours.PageBehaviours
 
-class TrustWorksReferenceYesNoPageSpec extends PageBehaviours {
+class ContractorEmailConfirmationNotStoredPageSpec extends PageBehaviours {
 
-  "TrustWorksReferenceYesNoPage" - {
+  "ContractorEmailConfirmationNotStoredPage" - {
 
-    beRetrievable[Boolean](TrustWorksReferenceYesNoPage)
+    beRetrievable[Boolean](ContractorEmailConfirmationNotStoredPage)
 
-    beSettable[Boolean](TrustWorksReferenceYesNoPage)
+    beSettable[Boolean](ContractorEmailConfirmationNotStoredPage)
 
-    beRemovable[Boolean](TrustWorksReferenceYesNoPage)
-
-    "cleanup: must remove TrustWorksReference userAnswers when No is selected" in {
-      val userAnswers = emptyUserAnswers.set(TrustWorksReferencePage, "12345678").success.value
-
-      val updatedUserAnswers = userAnswers.set(TrustWorksReferenceYesNoPage, false).success.value
-
-      updatedUserAnswers.get(TrustWorksReferencePage) mustBe None
-    }
-
+    beRemovable[Boolean](ContractorEmailConfirmationNotStoredPage)
   }
+
 }

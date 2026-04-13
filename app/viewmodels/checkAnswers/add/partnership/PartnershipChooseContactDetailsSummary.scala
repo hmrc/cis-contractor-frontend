@@ -21,6 +21,7 @@ import models.{CheckMode, UserAnswers}
 import pages.add.partnership.PartnershipChooseContactDetailsPage
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
+import utils.Utils
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
 
@@ -28,9 +29,12 @@ object PartnershipChooseContactDetailsSummary {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
     answers.get(PartnershipChooseContactDetailsPage).map { answer =>
+      val cyaMsg = Utils.findFirstMessagesValue(
+        Seq(s"partnershipChooseContactDetails.cya.$answer", s"partnershipChooseContactDetails.$answer")
+      )
       SummaryListRowViewModel(
         key = "partnershipChooseContactDetails.checkYourAnswersLabel",
-        value = ValueViewModel(messages(s"partnershipChooseContactDetails.$answer")),
+        value = ValueViewModel(cyaMsg),
         actions = Seq(
           ActionItemViewModel(
             "site.change",

@@ -20,11 +20,17 @@ import base.SpecBase
 import forms.add.trust.TrustContactOptionsFormProvider
 import models.contact.ContactOptions
 import models.{CheckMode, NormalMode, UserAnswers}
+import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
 import pages.add.trust.{TrustContactOptionsPage, TrustNamePage}
+import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
+import repositories.SessionRepository
 import views.html.add.trust.TrustContactOptionsView
+
+import scala.concurrent.Future
 
 class TrustContactOptionsControllerSpec extends SpecBase with MockitoSugar {
 
@@ -90,6 +96,31 @@ class TrustContactOptionsControllerSpec extends SpecBase with MockitoSugar {
           request,
           messages(application)
         ).toString
+      }
+    }
+
+    "must save the answer and redirect to TrustEmailAddress page when valid data with value Email is submitted" in {
+
+      val mockSessionRepository = mock[SessionRepository]
+
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+      val application =
+        applicationBuilder(userAnswers = Some(uaWithName))
+          .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, trustContactOptionsRoute)
+            .withFormUrlEncodedBody(("value", ContactOptions.Email.toString))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.add.trust.routes.TrustEmailAddressController
+          .onPageLoad(NormalMode)
+          .url
       }
     }
 
@@ -196,6 +227,31 @@ class TrustContactOptionsControllerSpec extends SpecBase with MockitoSugar {
           request,
           messages(application)
         ).toString
+      }
+    }
+
+    "CheckMode POST must save the answer and redirect to TrustEmailAddress page when valid data with value Email is submitted" in {
+
+      val mockSessionRepository = mock[SessionRepository]
+
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+      val application =
+        applicationBuilder(userAnswers = Some(uaWithName))
+          .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, trustContactOptionsCheckRoute)
+            .withFormUrlEncodedBody(("value", ContactOptions.Email.toString))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.add.trust.routes.TrustEmailAddressController
+          .onPageLoad(CheckMode)
+          .url
       }
     }
 

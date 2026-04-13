@@ -17,6 +17,7 @@
 package pages.add.trust
 
 import models.add.trust.TrustContactOptions
+import models.contact.ContactOptions
 import pages.behaviours.PageBehaviours
 
 class TrustContactOptionsPageSpec extends PageBehaviours {
@@ -28,5 +29,72 @@ class TrustContactOptionsPageSpec extends PageBehaviours {
     beSettable[TrustContactOptions](TrustContactOptionsPage)
 
     beRemovable[TrustContactOptions](TrustContactOptionsPage)
+
+    "cleanup" - {
+
+      "must remove TrustPhoneNumberPage and TrustMobileNumberPage when Email is selected" in {
+        val userAnswers = emptyUserAnswers
+          .set(TrustPhoneNumberPage, "01234567890")
+          .success
+          .value
+          .set(TrustMobileNumberPage, "01234567890")
+          .success
+          .value
+
+        val updatedUserAnswers = userAnswers.set(TrustContactOptionsPage, ContactOptions.Email).success.value
+
+        updatedUserAnswers.get(TrustPhoneNumberPage) mustBe None
+        updatedUserAnswers.get(TrustMobileNumberPage) mustBe None
+      }
+
+      "must remove TrustEmailAddressPage and TrustMobileNumberPage when Phone is selected" in {
+        val userAnswers = emptyUserAnswers
+          .set(TrustEmailAddressPage, "old@email.com")
+          .success
+          .value
+          .set(TrustMobileNumberPage, "01234567890")
+          .success
+          .value
+
+        val updatedUserAnswers = userAnswers.set(TrustContactOptionsPage, ContactOptions.Phone).success.value
+
+        updatedUserAnswers.get(TrustEmailAddressPage) mustBe None
+        updatedUserAnswers.get(TrustMobileNumberPage) mustBe None
+      }
+
+      "must remove TrustEmailAddressPage and TrustPhoneNumberPage when Mobile is selected" in {
+        val userAnswers = emptyUserAnswers
+          .set(TrustEmailAddressPage, "old@email.com")
+          .success
+          .value
+          .set(TrustPhoneNumberPage, "01234567890")
+          .success
+          .value
+
+        val updatedUserAnswers = userAnswers.set(TrustContactOptionsPage, ContactOptions.Mobile).success.value
+
+        updatedUserAnswers.get(TrustEmailAddressPage) mustBe None
+        updatedUserAnswers.get(TrustPhoneNumberPage) mustBe None
+      }
+
+      "must remove TrustEmailAddressPage, TrustPhoneNumberPage and TrustMobileNumberPage when NoDetails is selected" in {
+        val userAnswers = emptyUserAnswers
+          .set(TrustEmailAddressPage, "old@email.com")
+          .success
+          .value
+          .set(TrustPhoneNumberPage, "01234567890")
+          .success
+          .value
+          .set(TrustMobileNumberPage, "01234567890")
+          .success
+          .value
+
+        val updatedUserAnswers = userAnswers.set(TrustContactOptionsPage, ContactOptions.NoDetails).success.value
+
+        updatedUserAnswers.get(TrustEmailAddressPage) mustBe None
+        updatedUserAnswers.get(TrustPhoneNumberPage) mustBe None
+        updatedUserAnswers.get(TrustMobileNumberPage) mustBe None
+      }
+    }
   }
 }

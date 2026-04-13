@@ -24,14 +24,25 @@ import org.scalatest.TryValues.convertTryToSuccessOrFailure
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.should.Matchers
 import pages.add.partnership.PartnershipChooseContactDetailsPage
-import play.api.i18n.Messages
-import play.api.test.Helpers.stubMessages
+import play.api.i18n.{DefaultMessagesApi, Lang, Messages}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.*
 import org.scalatest.matchers.must.Matchers.must
 
 class PartnershipChooseContactDetailsSummarySpec extends AnyFreeSpec with Matchers {
 
-  implicit val messages: Messages = stubMessages()
+  implicit val messages: Messages = new DefaultMessagesApi(
+    Map(
+      "en" -> Map(
+        "partnershipChooseContactDetails.checkYourAnswersLabel" -> "Method of contact",
+        "partnershipChooseContactDetails.email"                 -> "Email address",
+        "partnershipChooseContactDetails.phone"                 -> "Phone number",
+        "partnershipChooseContactDetails.mobile"                -> "Mobile number",
+        "partnershipChooseContactDetails.cya.noDetails"         -> "None",
+        "partnershipChooseContactDetails.change.hidden"         -> "method of contact",
+        "site.change"                                           -> "Change"
+      )
+    )
+  ).preferred(Seq(Lang("en")))
 
   "PartnershipChooseContactDetailsSummary.row" - {
 
@@ -105,7 +116,7 @@ class PartnershipChooseContactDetailsSummarySpec extends AnyFreeSpec with Matche
       maybeRow shouldBe defined
 
       val row           = maybeRow.value
-      val expectedValue = messages("partnershipChooseContactDetails.noDetails")
+      val expectedValue = "None"
       row.value.content.asHtml.toString should include(expectedValue)
     }
 
