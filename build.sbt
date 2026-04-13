@@ -1,3 +1,4 @@
+import com.briskware.sbt.columnar.ColumnarFormatPlugin.autoImport.ColumnarSection
 import play.sbt.routes.RoutesKeys
 import sbt.Def
 import scoverage.ScoverageKeys
@@ -101,7 +102,9 @@ lazy val messagesSections = Seq(
   ColumnarSection("# Company",
     primaryPrefixes = Seq("company")),
   ColumnarSection("# Trust",
-    primaryPrefixes = Seq("trust"))
+    primaryPrefixes = Seq("trust")),
+  ColumnarSection("# Verify",
+    primaryPrefixes = Seq("verify"))
 )
 
 lazy val appRoutesSections = Seq(
