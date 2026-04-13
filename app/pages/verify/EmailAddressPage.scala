@@ -23,5 +23,5 @@ case object EmailAddressPage extends QuestionPage[String] with VerifyJourney {
 
   override def path: JsPath = JsPath \ toString
 
-  override def toString: String = "emailAddress"
+  override def toString: String = "verifyEmailAddress"
 }
