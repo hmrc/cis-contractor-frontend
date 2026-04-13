@@ -34,5 +34,4 @@ case object TrustWorksReferenceYesNoPage extends QuestionPage[Boolean] with Trus
     } else {
       super.cleanup(value, userAnswers)
     }
-
 }

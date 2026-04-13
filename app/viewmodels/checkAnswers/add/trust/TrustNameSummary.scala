@@ -34,6 +34,7 @@ object TrustNameSummary {
         actions = Seq(
           ActionItemViewModel("site.change", controllers.add.trust.routes.TrustNameController.onPageLoad(CheckMode).url)
             .withVisuallyHiddenText(messages("trustName.change.hidden"))
+            .withAttribute("id" -> "trust-name")
         )
       )
     }
