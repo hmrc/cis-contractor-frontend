@@ -18,6 +18,7 @@ package navigation
 
 import models.{Mode, UserAnswers}
 import navigation.add.*
+import navigation.verify.VerifyNavigator
 import pages.Page
 import play.api.mvc.Call
 
@@ -30,7 +31,8 @@ class FakeNavigator(desiredRoute: Call)
       new CompanyNavigator(),
       new PartnershipNavigator(),
       new TrustNavigator(),
-      new SharedNavigator()
+      new SharedNavigator(),
+      new VerifyNavigator()
     ) {
 
   override def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers): Call =
