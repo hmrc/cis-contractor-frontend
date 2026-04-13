@@ -20,6 +20,7 @@ import models.{CheckMode, UserAnswers}
 import org.scalatest.OptionValues.convertOptionToValuable
 import org.scalatest.TryValues.convertTryToSuccessOrFailure
 import org.scalatest.freespec.AnyFreeSpec
+import org.scalatest.matchers.must.Matchers.must
 import org.scalatest.matchers.should.Matchers
 import pages.add.company.CompanyCrnYesNoPage
 import play.api.i18n.Messages
@@ -62,6 +63,7 @@ class CompanyCrnYesNoSummarySpec extends AnyFreeSpec with Matchers {
       changeAction.content.asHtml.toString    should include(expectedChangeText)
       changeAction.href                     shouldBe expectedHref
       changeAction.visuallyHiddenText.value shouldBe expectedHiddenText
+      changeAction.attributes                   must contain("id" -> "add-company-crn")
     }
 
     "must return a SummaryListRow with 'No' when the answer is false" in {

@@ -39,6 +39,7 @@ object CompanyUtrYesNoSummary {
             controllers.add.company.routes.CompanyUtrYesNoController.onPageLoad(CheckMode).url
           )
             .withVisuallyHiddenText(messages("companyUtrYesNo.change.hidden"))
+            .withAttribute("id" -> "add-company-utr")
         )
       )
     }

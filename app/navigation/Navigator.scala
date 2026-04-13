@@ -23,6 +23,7 @@ import pages.add.IndividualJourney
 import pages.add.company.CompanyJourney
 import pages.add.partnership.PartnershipJourney
 import pages.add.trust.TrustJourney
+import pages.verify.VerifyJourney
 import play.api.mvc.Call
 
 @Singleton
@@ -31,7 +32,8 @@ class Navigator @Inject() (
   companyNavigator: navigation.add.CompanyNavigator,
   partnershipNavigator: navigation.add.PartnershipNavigator,
   trustNavigator: navigation.add.TrustNavigator,
-  sharedNavigator: navigation.add.SharedNavigator
+  sharedNavigator: navigation.add.SharedNavigator,
+  verifyNavigator: navigation.verify.VerifyNavigator
 ) {
 
   def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers): Call =
@@ -43,6 +45,7 @@ class Navigator @Inject() (
       case _: CompanyJourney     => companyNavigator
       case _: PartnershipJourney => partnershipNavigator
       case _: TrustJourney       => trustNavigator
+      case _: VerifyJourney      => verifyNavigator
       case _                     => sharedNavigator
     }
 }

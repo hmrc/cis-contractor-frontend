@@ -22,6 +22,7 @@ import models.add.InternationalAddress
 import models.contact.ContactOptions
 import models.{CheckMode, NormalMode, UserAnswers}
 import pages.add.partnership.*
+import pages.Page
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 
@@ -35,6 +36,79 @@ class PartnershipNavigatorSpec extends SpecBase {
   "PartnershipNavigator" - {
 
     "in Normal mode" - {
+
+      "must go from a page that doesn't exist in the route map to Index" in {
+
+        case object UnknownPage extends Page
+        navigator.nextPage(UnknownPage, NormalMode, UserAnswers("id")) mustBe routes.IndexController.onPageLoad()
+      }
+
+      "must go from a PartnershipHasUtrYesNo to PartnershipUniqueTaxpayerReferencePage when true" in {
+        navigator.nextPage(
+          PartnershipHasUtrYesNoPage,
+          NormalMode,
+          emptyUserAnswers.setOrException(PartnershipHasUtrYesNoPage, true)
+        ) mustBe controllers.add.partnership.routes.PartnershipUniqueTaxpayerReferenceController.onPageLoad(NormalMode)
+      }
+
+      "must go from a PartnershipHasUtrYesNo to PartnershipNominatedPartnerNameController when false" in {
+        navigator.nextPage(
+          PartnershipHasUtrYesNoPage,
+          NormalMode,
+          emptyUserAnswers.setOrException(PartnershipHasUtrYesNoPage, false)
+        ) mustBe controllers.add.partnership.routes.PartnershipNominatedPartnerNameController
+          .onPageLoad(NormalMode)
+      }
+
+      "must go from a PartnershipHasUtrYesNo to JourneyRecovery page when no answer" in {
+        navigator.nextPage(
+          PartnershipHasUtrYesNoPage,
+          NormalMode,
+          emptyUserAnswers
+        ) mustBe journeyRecovery
+      }
+
+      "must go from a PartnershipHasUtrYesNo to PartnershipUniqueTaxpayerReference page when true in CheckMode" in {
+        navigator.nextPage(
+          PartnershipHasUtrYesNoPage,
+          CheckMode,
+          emptyUserAnswers.setOrException(PartnershipHasUtrYesNoPage, true)
+        ) mustBe controllers.add.partnership.routes.PartnershipUniqueTaxpayerReferenceController
+          .onPageLoad(CheckMode)
+      }
+
+      "must go from a PartnershipHasUtrYesNo to PartnershipCheckYourAnswers page when false in CheckMode" in {
+        navigator.nextPage(
+          PartnershipHasUtrYesNoPage,
+          CheckMode,
+          emptyUserAnswers.setOrException(PartnershipHasUtrYesNoPage, false)
+        ) mustBe partnershipCYA
+      }
+
+      "must go from a PartnershipUniqueTaxpayerReference to PartnershipNominatedPartnerName page" in {
+        navigator.nextPage(
+          PartnershipUniqueTaxpayerReferencePage,
+          NormalMode,
+          emptyUserAnswers.setOrException(PartnershipUniqueTaxpayerReferencePage, "5860920998")
+        ) mustBe controllers.add.partnership.routes.PartnershipNominatedPartnerNameController
+          .onPageLoad(NormalMode)
+      }
+
+      "must go from a PartnershipUniqueTaxpayerReference to PartnershipCheckYourAnswers page in CheckMode" in {
+        navigator.nextPage(
+          PartnershipUniqueTaxpayerReferencePage,
+          CheckMode,
+          emptyUserAnswers.setOrException(PartnershipUniqueTaxpayerReferencePage, "5860920998")
+        ) mustBe partnershipCYA
+      }
+
+      "must go from a PartnershipAddressPage to PartnershipChooseContactDetailsController in NormalMode" in {
+        navigator.nextPage(
+          PartnershipAddressPage,
+          NormalMode,
+          UserAnswers("id")
+        ) mustBe controllers.add.partnership.routes.PartnershipChooseContactDetailsController.onPageLoad(NormalMode)
+      }
 
       "must go from a PartnershipWorksReferenceNumberYesNoPage to PartnershipWorksReferenceNumber page when true" in {
         navigator.nextPage(
@@ -337,7 +411,7 @@ class PartnershipNavigatorSpec extends SpecBase {
         navigator.nextPage(
           PartnershipNominatedPartnerCrnPage,
           NormalMode,
-          emptyUserAnswers
+          emptyUserAnswers.setOrException(PartnershipNominatedPartnerCrnPage, "12345678")
         ) mustBe controllers.add.partnership.routes.PartnershipWorksReferenceNumberYesNoController
           .onPageLoad(NormalMode)
       }

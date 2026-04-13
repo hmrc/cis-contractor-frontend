@@ -24,14 +24,26 @@ import org.scalatest.TryValues.convertTryToSuccessOrFailure
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.should.Matchers
 import pages.add.trust.TrustContactOptionsPage
-import play.api.i18n.Messages
-import play.api.test.Helpers.stubMessages
+import play.api.i18n.{DefaultMessagesApi, Lang, Messages}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.*
 import org.scalatest.matchers.must.Matchers.must
 
 class TrustContactOptionsSummarySpec extends AnyFreeSpec with Matchers {
 
-  implicit val messages: Messages = stubMessages()
+  implicit val messages: Messages = new DefaultMessagesApi(
+    Map(
+      "en" -> Map(
+        "trustContactOptions.checkYourAnswersLabel" -> "Method of contact",
+        "trustContactOptions.email"                 -> "Email address",
+        "trustContactOptions.phone"                 -> "Phone number",
+        "trustContactOptions.mobile"                -> "Mobile number",
+        "trustContactOptions.noDetails"             -> "Do not add any contact details for this subcontractor",
+        "trustContactOptions.cya.noDetails"         -> "None",
+        "trustContactOptions.change.hidden"         -> "method of contact",
+        "site.change"                               -> "Change"
+      )
+    )
+  ).preferred(Seq(Lang("en")))
 
   "TrustContactOptionsSummary.row" - {
 
@@ -49,7 +61,7 @@ class TrustContactOptionsSummarySpec extends AnyFreeSpec with Matchers {
       val expectedKeyText = messages("trustContactOptions.checkYourAnswersLabel")
       row.key.content.asHtml.toString should include(expectedKeyText)
 
-      val expectedValue = messages("trustContactOptions.email")
+      val expectedValue = "Email address"
       row.value.content.asHtml.toString should include(expectedValue)
 
       row.actions shouldBe defined
@@ -77,7 +89,7 @@ class TrustContactOptionsSummarySpec extends AnyFreeSpec with Matchers {
       maybeRow shouldBe defined
 
       val row           = maybeRow.value
-      val expectedValue = messages("trustContactOptions.phone")
+      val expectedValue = "Phone number"
       row.value.content.asHtml.toString should include(expectedValue)
     }
 
@@ -91,7 +103,7 @@ class TrustContactOptionsSummarySpec extends AnyFreeSpec with Matchers {
       maybeRow shouldBe defined
 
       val row           = maybeRow.value
-      val expectedValue = messages("trustContactOptions.mobile")
+      val expectedValue = "Mobile number"
       row.value.content.asHtml.toString should include(expectedValue)
     }
 
@@ -105,7 +117,7 @@ class TrustContactOptionsSummarySpec extends AnyFreeSpec with Matchers {
       maybeRow shouldBe defined
 
       val row           = maybeRow.value
-      val expectedValue = messages("trustContactOptions.noDetails")
+      val expectedValue = "None"
       row.value.content.asHtml.toString should include(expectedValue)
     }
 

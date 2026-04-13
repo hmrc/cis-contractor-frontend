@@ -37,6 +37,7 @@ object CompanyCrnSummary {
             controllers.add.company.routes.CompanyCrnController.onPageLoad(CheckMode).url
           )
             .withVisuallyHiddenText(messages("companyCrn.change.hidden"))
+            .withAttribute("id" -> "company-crn")
         )
       )
     }

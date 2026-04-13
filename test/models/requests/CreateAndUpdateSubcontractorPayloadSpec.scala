@@ -46,7 +46,8 @@ class CreateAndUpdateSubcontractorPayloadSpec extends AnyWordSpec with Matchers 
         utr = Some("1234567890"),
         worksReferenceNumber = Some("WRN-001"),
         emailAddress = Some("hello@hmrc.co.uk"),
-        phoneNumber = Some("0123456789")
+        phoneNumber = Some("0123456789"),
+        mobilePhoneNumber = Some("07123456789")
       )
 
       val js = Json.toJson(model)
