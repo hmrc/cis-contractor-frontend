@@ -26,30 +26,23 @@ import pages.verify.*
 class VerifyNavigatorSpec extends SpecBase {
 
   val navigator = new VerifyNavigator()
-  
+
   private lazy val journeyRecovery = routes.JourneyRecoveryController.onPageLoad()
 
   "VerifyNavigator" - {
 
     "in Normal mode" - {
 
-      "must go from a page that doesn't exist in the route map to Index" in {
-
-        case object UnknownPage extends Page
-        navigator.nextPage(UnknownPage, NormalMode, UserAnswers("id")) mustBe routes.IndexController.onPageLoad()
-
-      }
-
       "must go from EmailAddressPage to next page" in {
         val ua = emptyUserAnswers.set(EmailAddressPage, "test@test.com").success.value
         navigator.nextPage(EmailAddressPage, NormalMode, ua) mustBe
           controllers.verify.routes.EmailAddressController.onPageLoad(NormalMode)
       }
-      
-      "must go from a page that doesn't exist in the route map to JourneyRecovery" in {
+
+      "must go from a page that doesn't exist in the route map to Index" in {
         case object UnknownPage extends Page
 
-        navigator.nextPage(UnknownPage, NormalMode, UserAnswers("id")) mustBe journeyRecovery
+        navigator.nextPage(UnknownPage, NormalMode, UserAnswers("id")) mustBe routes.IndexController.onPageLoad()
       }
 
       "must go from ContractorEmailConfirmationNotStoredPage to ContractorEmailConfirmationNotStoredController when answer is true" in {
@@ -77,28 +70,21 @@ class VerifyNavigatorSpec extends SpecBase {
 
     "in Check mode" - {
 
-      "must go from EmailAddressPage to CheckYourAnswers in CheckMode" in {
+      "must go from EmailAddressPage to EmailAddressPage in CheckMode" in {
         val ua = emptyUserAnswers.set(EmailAddressPage, "test@test.com").success.value
 
-        navigator.nextPage(EmailAddressPage, CheckMode, ua) mustBe controllers.add.routes.CheckYourAnswersController
-          .onPageLoad()
+        navigator.nextPage(EmailAddressPage, CheckMode, ua) mustBe controllers.verify.routes.EmailAddressController
+          .onPageLoad(CheckMode)
       }
 
-      "must go from a page that does not exist in the edit route map to CheckYourAnswers" in {
-
+      "must go from a page that doesn't exist in the route map to Index" in {
         case object UnknownPage extends Page
+
         navigator.nextPage(
           UnknownPage,
           CheckMode,
           UserAnswers("id")
-        ) mustBe controllers.add.routes.CheckYourAnswersController
-          .onPageLoad()
-      }
-
-      "must go from a page that doesn't exist in the route map to JourneyRecovery" in {
-        case object UnknownPage extends Page
-
-        navigator.nextPage(UnknownPage, CheckMode, UserAnswers("id")) mustBe journeyRecovery
+        ) mustBe controllers.add.routes.CheckYourAnswersController.onPageLoad()
       }
 
       "must go from ContractorEmailConfirmationNotStoredPage to ContractorEmailConfirmationNotStoredController when answer is true" in {
