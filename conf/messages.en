@@ -296,6 +296,11 @@ individualChooseContactDetails.change.hidden                             =  meth
 verify.submissionSending.title                                           =  Submitting your verification request
 verify.submissionSending.heading                                         =  Your verification request is being sent to HMRC
 verify.submissionSending.paragraph                                       =  Do not refresh this page or press the back button while your submission is being processed.
+verify.contractorEmailConfirmationNotStored.title                        =  Do you want an email confirmation of this verification request?
+verify.contractorEmailConfirmationNotStored.heading                      =  Do you want an email confirmation of this verification request?
+verify.contractorEmailConfirmationNotStored.checkYourAnswersLabel        =  Do you want confirmation by email?
+verify.contractorEmailConfirmationNotStored.error.required               =  Select yes if you want an email confirmation of this verification request
+verify.contractorEmailConfirmationNotStored.change.hidden                =  do you want confirmation by email?
 
 # Partnership
 partnershipWorksReferenceNumberYesNo.title                           =  Does this partnership have a works reference number?
@@ -773,9 +778,3 @@ trustCheckYourAnswers.subHeading                               =  Subcontractor 
 trustCheckYourAnswers.trailHeading                             =  Now add this subcontractor
 trustCheckYourAnswers.trailText                                =  By adding this subcontractor you are confirming that, to the best of your knowledge, the details you are providing are correct.
 trustCheckYourAnswers.continue                                 =  Accept and submit
-
-verify.contractorEmailConfirmationNotStored.title                               =  Do you want an email confirmation of this verification request?
-verify.contractorEmailConfirmationNotStored.heading                             =  Do you want an email confirmation of this verification request?
-verify.contractorEmailConfirmationNotStored.checkYourAnswersLabel               =  Do you want confirmation by email?
-verify.contractorEmailConfirmationNotStored.error.required                      =  Select yes if you want an email confirmation of this verification request
-verify.contractorEmailConfirmationNotStored.change.hidden                       =  do you want confirmation by email?
