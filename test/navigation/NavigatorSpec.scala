@@ -138,16 +138,16 @@ class NavigatorSpec extends SpecBase {
       verify(partnership, never()).nextPage(any(), any(), any())
       verify(shared, never()).nextPage(any(), any(), any())
     }
-    
+
     "must delegate to VerifyNavigator when page is a VerifyJourney" in {
       case object TestVerifyPage extends Page with pages.verify.VerifyJourney
 
-      val individual = mock[IndividualNavigator]
-      val company = mock[CompanyNavigator]
+      val individual  = mock[IndividualNavigator]
+      val company     = mock[CompanyNavigator]
       val partnership = mock[PartnershipNavigator]
-      val trust = mock[TrustNavigator]
-      val shared = mock[SharedNavigator]
-      val verifyNav = mock[VerifyNavigator]
+      val trust       = mock[TrustNavigator]
+      val shared      = mock[SharedNavigator]
+      val verifyNav   = mock[VerifyNavigator]
 
       val expected = Call("GET", "/verify")
       when(verifyNav.nextPage(any(), any(), any())).thenReturn(expected)
