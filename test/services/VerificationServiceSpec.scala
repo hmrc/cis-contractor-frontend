@@ -70,11 +70,11 @@ final class VerificationServiceSpec extends SpecBase with MockitoSugar {
         .thenReturn(Future.successful(true))
 
       val result = service.refreshNewestVerificationBatch(ua).futureValue
-      
+
       result.get(NewestVerificationBatchResponsePage) mustBe Some(response)
-      
+
       verify(mockConnector).getNewestVerificationBatch(eqTo(instanceId))(any[HeaderCarrier])
-      
+
       verify(mockRepo).set(
         org.mockito.ArgumentMatchers.argThat { (saved: UserAnswers) =>
           saved.get(NewestVerificationBatchResponsePage).contains(response)
@@ -120,7 +120,7 @@ final class VerificationServiceSpec extends SpecBase with MockitoSugar {
     }
 
     "must propagate failure when setting NewestVerificationBatchResponsePage fails and not write to session repo" in {
-      
+
       final case class BadType(value: String)
       case object BadSetPage extends QuestionPage[BadType] {
         override def path: JsPath = JsPath \ "badSetPage"
@@ -133,20 +133,21 @@ final class VerificationServiceSpec extends SpecBase with MockitoSugar {
       }
 
       val mockConnector = mock[ConstructionIndustrySchemeConnector]
-      val mockRepo = mock[SessionRepository]
-      
-      class TestService(conn: ConstructionIndustrySchemeConnector, repo: SessionRepository)(implicit ec: ExecutionContext)
-        extends VerificationBatchService(conn, repo) {
+      val mockRepo      = mock[SessionRepository]
+
+      class TestService(conn: ConstructionIndustrySchemeConnector, repo: SessionRepository)(implicit
+        ec: ExecutionContext
+      ) extends VerificationBatchService(conn, repo) {
 
         def refreshAndForceBadSet(ua: UserAnswers)(implicit hc: HeaderCarrier): Future[UserAnswers] =
           for {
             instanceId <- ua.get(CisIdQuery)
-              .map(Future.successful)
-              .getOrElse(Future.failed(new RuntimeException("InstanceIdQuery not found in session data")))
-            resp <- conn.getNewestVerificationBatch(instanceId)
-            
+                            .map(Future.successful)
+                            .getOrElse(Future.failed(new RuntimeException("InstanceIdQuery not found in session data")))
+            resp       <- conn.getNewestVerificationBatch(instanceId)
+
             _ <- Future.fromTry(ua.set(NewestVerificationBatchResponsePage, resp))
-            
+
             bad <- Future.fromTry(ua.set(BadSetPage, BadType("x")))
 
             _ <- repo.set(bad)
