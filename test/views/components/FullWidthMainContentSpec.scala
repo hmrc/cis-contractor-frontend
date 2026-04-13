@@ -25,7 +25,6 @@ import views.html.components.FullWidthMainContent
 
 class FullWidthMainContentSpec extends SpecBase with Matchers with ScalaCheckPropertyChecks {
 
-
   private def expectedHtml(content: String) =
     s"""
        |<div class="govuk-grid-row">
@@ -37,7 +36,7 @@ class FullWidthMainContentSpec extends SpecBase with Matchers with ScalaCheckPro
 
   "FullWidthMainContent" - {
     "render as expected when given a contentBlock" in new Setup {
-      val content = """<h1 class="govuk-heading-xl">Page heading</h1><p class="govuk-body">Some page content</p>"""
+      val content                         = """<h1 class="govuk-heading-xl">Page heading</h1><p class="govuk-body">Some page content</p>"""
       val component: FullWidthMainContent = fullWidthMainContent
       component(Html(content)) mustBe Html(expectedHtml(content))
     }
@@ -50,15 +49,14 @@ class FullWidthMainContentSpec extends SpecBase with Matchers with ScalaCheckPro
     "have all template methods implemented" in new Setup {
 
       val component: FullWidthMainContent = fullWidthMainContent
-      forAll {
-        (contentBlock: String) =>
-          component.render(Html(contentBlock)) mustBe component.ref.f(Html(contentBlock))
+      forAll { (contentBlock: String) =>
+        component.render(Html(contentBlock)) mustBe component.ref.f(Html(contentBlock))
       }
     }
   }
 
   trait Setup {
-    val app: Application = applicationBuilder().build()
+    val app: Application                           = applicationBuilder().build()
     val fullWidthMainContent: FullWidthMainContent = app.injector.instanceOf[FullWidthMainContent]
   }
 }
