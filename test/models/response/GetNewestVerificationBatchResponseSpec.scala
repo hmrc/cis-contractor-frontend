@@ -16,7 +16,6 @@
 
 package models.response
 
-
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import play.api.libs.json.{JsSuccess, Json}
@@ -383,4 +382,3 @@ final class GetNewestVerificationBatchResponseSpec extends AnyWordSpec with Matc
     }
   }
 }
-

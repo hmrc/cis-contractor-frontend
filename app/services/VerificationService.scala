@@ -27,16 +27,17 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class VerificationBatchService @Inject()(
-     cisConnector: ConstructionIndustrySchemeConnector,
-     sessionRepository: SessionRepository
+class VerificationBatchService @Inject() (
+  cisConnector: ConstructionIndustrySchemeConnector,
+  sessionRepository: SessionRepository
 )(implicit ec: ExecutionContext) {
 
   def refreshNewestVerificationBatch(userAnswers: UserAnswers)(implicit hc: HeaderCarrier): Future[UserAnswers] =
     for {
-      instanceId <- userAnswers.get(CisIdQuery)
-        .map(Future.successful)
-        .getOrElse(Future.failed(new RuntimeException("InstanceIdQuery not found in session data")))
+      instanceId <- userAnswers
+                      .get(CisIdQuery)
+                      .map(Future.successful)
+                      .getOrElse(Future.failed(new RuntimeException("InstanceIdQuery not found in session data")))
 
       response <- cisConnector.getNewestVerificationBatch(instanceId)
       updated  <- Future.fromTry(userAnswers.set(NewestVerificationBatchResponsePage, response))

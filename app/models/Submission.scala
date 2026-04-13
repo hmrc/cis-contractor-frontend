@@ -20,26 +20,25 @@ import play.api.libs.json.{Json, OFormat}
 import java.time.LocalDateTime
 
 case class Submission(
-                       submissionId: Long,
-                       submissionType: String,
-                       activeObjectId: Option[Long],
-                       status: Option[String],
-                       hmrcMarkGenerated: Option[String],
-                       hmrcMarkGgis: Option[String],
-                       emailRecipient: Option[String],
-                       acceptedTime: Option[String],
-                       createDate: Option[LocalDateTime],
-                       lastUpdate: Option[LocalDateTime],
-                       schemeId: Long,
-                       agentId: Option[String],
-                       l_Migrated: Option[Long],
-                       submissionRequestDate: Option[LocalDateTime],
-                       govTalkErrorCode: Option[String],
-                       govTalkErrorType: Option[String],
-                       govTalkErrorMessage: Option[String]
-                     )
+  submissionId: Long,
+  submissionType: String,
+  activeObjectId: Option[Long],
+  status: Option[String],
+  hmrcMarkGenerated: Option[String],
+  hmrcMarkGgis: Option[String],
+  emailRecipient: Option[String],
+  acceptedTime: Option[String],
+  createDate: Option[LocalDateTime],
+  lastUpdate: Option[LocalDateTime],
+  schemeId: Long,
+  agentId: Option[String],
+  l_Migrated: Option[Long],
+  submissionRequestDate: Option[LocalDateTime],
+  govTalkErrorCode: Option[String],
+  govTalkErrorType: Option[String],
+  govTalkErrorMessage: Option[String]
+)
 
 object Submission {
   given format: OFormat[Submission] = Json.format[Submission]
 }
-
