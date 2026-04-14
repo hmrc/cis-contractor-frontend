@@ -359,3 +359,7 @@ POST  /verify/enter-confirmation-email             controllers.verify.EmailAddre
 GET   /verify/change-enter-confirmation-email      controllers.verify.EmailAddressController.onPageLoad(mode: Mode = CheckMode)
 POST  /verify/change-enter-confirmation-email      controllers.verify.EmailAddressController.onSubmit(mode: Mode = CheckMode)
 
+GET   /verify/confirmation-email-not-stored         controllers.verify.ContractorEmailConfirmationNotStoredController.onPageLoad(mode: Mode = NormalMode)
+POST  /verify/confirmation-email-not-stored         controllers.verify.ContractorEmailConfirmationNotStoredController.onSubmit(mode: Mode = NormalMode)
+GET   /verify/change-confirmation-email-not-stored  controllers.verify.ContractorEmailConfirmationNotStoredController.onPageLoad(mode: Mode = CheckMode)
+POST  /verify/change-confirmation-email-not-stored  controllers.verify.ContractorEmailConfirmationNotStoredController.onSubmit(mode: Mode = CheckMode)
