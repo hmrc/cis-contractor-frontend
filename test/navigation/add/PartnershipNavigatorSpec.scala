@@ -411,7 +411,7 @@ class PartnershipNavigatorSpec extends SpecBase {
         navigator.nextPage(
           PartnershipNominatedPartnerCrnPage,
           NormalMode,
-          emptyUserAnswers
+          emptyUserAnswers.setOrException(PartnershipNominatedPartnerCrnPage, "12345678")
         ) mustBe controllers.add.partnership.routes.PartnershipWorksReferenceNumberYesNoController
           .onPageLoad(NormalMode)
       }

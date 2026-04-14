@@ -22,6 +22,7 @@ import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
+import utils.Utils
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
 
@@ -29,10 +30,12 @@ object IndividualChooseContactDetailsSummary {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
     answers.get(IndividualChooseContactDetailsPage).map { answer =>
-
-      val value = ValueViewModel(
+      val cyaMsg = Utils.findFirstMessagesValue(
+        Seq(s"individualChooseContactDetails.cya.$answer", s"individualChooseContactDetails.$answer")
+      )
+      val value  = ValueViewModel(
         HtmlContent(
-          HtmlFormat.escape(messages(s"individualChooseContactDetails.$answer"))
+          HtmlFormat.escape(cyaMsg)
         )
       )
 

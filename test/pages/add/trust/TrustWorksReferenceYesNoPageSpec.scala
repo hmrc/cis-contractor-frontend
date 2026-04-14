@@ -28,8 +28,8 @@ class TrustWorksReferenceYesNoPageSpec extends PageBehaviours {
 
     beRemovable[Boolean](TrustWorksReferenceYesNoPage)
 
-    "cleanup: must remove TrustWorksReferenceYesNo userAnswers when No is selected" in {
-      val userAnswers = emptyUserAnswers.set(TrustWorksReferencePage, "ABC").success.value
+    "cleanup: must remove TrustWorksReference userAnswers when No is selected" in {
+      val userAnswers = emptyUserAnswers.set(TrustWorksReferencePage, "12345678").success.value
 
       val updatedUserAnswers = userAnswers.set(TrustWorksReferenceYesNoPage, false).success.value
 
