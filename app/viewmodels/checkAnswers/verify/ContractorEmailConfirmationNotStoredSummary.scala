@@ -14,27 +14,32 @@
  * limitations under the License.
  */
 
-package viewmodels.checkAnswers.add.trust
+package viewmodels.checkAnswers.verify
 
 import models.{CheckMode, UserAnswers}
-import pages.add.trust.TrustNamePage
+import pages.verify.ContractorEmailConfirmationNotStoredPage
 import play.api.i18n.Messages
-import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
 
-object TrustNameSummary {
+object ContractorEmailConfirmationNotStoredSummary {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(TrustNamePage).map { answer =>
+    answers.get(ContractorEmailConfirmationNotStoredPage).map { answer =>
+
+      val value = if (answer) "site.yes" else "site.no"
+
       SummaryListRowViewModel(
-        key = "trustName.checkYourAnswersLabel",
-        value = ValueViewModel(HtmlFormat.escape(answer).toString),
+        key = "verify.contractorEmailConfirmationNotStored.checkYourAnswersLabel",
+        value = ValueViewModel(value),
         actions = Seq(
-          ActionItemViewModel("site.change", controllers.add.trust.routes.TrustNameController.onPageLoad(CheckMode).url)
-            .withVisuallyHiddenText(messages("trustName.change.hidden"))
-            .withAttribute("id" -> "trust-name")
+          ActionItemViewModel(
+            "site.change",
+            controllers.verify.routes.ContractorEmailConfirmationNotStoredController.onPageLoad(CheckMode).url
+          )
+            .withVisuallyHiddenText(messages("verify.contractorEmailConfirmationNotStored.change.hidden"))
+            .withAttribute("id" -> "contractor-email-confirmation-not-stored")
         )
       )
     }

@@ -14,25 +14,17 @@
  * limitations under the License.
  */
 
-package pages.add.trust
+package forms.verify
 
-import models.UserAnswers
-import pages.QuestionPage
-import play.api.libs.json.JsPath
+import forms.mappings.Mappings
+import play.api.data.Form
 
-import scala.util.Try
+import javax.inject.Inject
 
-case object TrustAddressYesNoPage extends QuestionPage[Boolean] with TrustJourney {
+class ContractorEmailConfirmationNotStoredFormProvider @Inject() extends Mappings {
 
-  override def path: JsPath = JsPath \ toString
-
-  override def toString: String = "trustAddressYesNo"
-
-  override def cleanup(value: Option[Boolean], userAnswers: UserAnswers): Try[UserAnswers] =
-    if value.contains(false) then {
-      userAnswers.remove(TrustAddressPage)
-    } else {
-      super.cleanup(value, userAnswers)
-    }
-
+  def apply(): Form[Boolean] =
+    Form(
+      "value" -> boolean("verify.contractorEmailConfirmationNotStored.error.required")
+    )
 }
