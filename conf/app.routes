@@ -20,6 +20,7 @@ GET   /verify/verify-declaration                    controllers.verify.Verificat
 POST  /verify/verify-declaration                    controllers.verify.VerificationDeclarationController.onSubmit(mode: Mode = NormalMode)
 GET   /verify/change-verify-declaration             controllers.verify.VerificationDeclarationController.onPageLoad(mode: Mode = CheckMode)
 POST  /verify/change-verify-declaration             controllers.verify.VerificationDeclarationController.onSubmit(mode: Mode = CheckMode)
+GET   /verify/submitting-verification-request       controllers.verify.SubmissionSendingController.onPageLoad()
 
 # Errors & Auth
 GET  /there-is-a-problem               controllers.JourneyRecoveryController.onPageLoad(continueUrl: Option[RedirectUrl] ?= None)
