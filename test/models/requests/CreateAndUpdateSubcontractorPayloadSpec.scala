@@ -17,7 +17,7 @@
 package models.requests
 
 import models.add.TypeOfSubcontractor
-import models.requests.CreateAndUpdateSubcontractorPayload.{IndividualOrSoleTraderPayload, PartnershipPayload}
+import models.requests.CreateAndUpdateSubcontractorPayload.{CompanyPayload, IndividualOrSoleTraderPayload, PartnershipPayload, TrustPayload}
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import play.api.libs.json.Json
@@ -46,7 +46,8 @@ class CreateAndUpdateSubcontractorPayloadSpec extends AnyWordSpec with Matchers 
         utr = Some("1234567890"),
         worksReferenceNumber = Some("WRN-001"),
         emailAddress = Some("hello@hmrc.co.uk"),
-        phoneNumber = Some("0123456789")
+        phoneNumber = Some("0123456789"),
+        mobilePhoneNumber = Some("07123456789")
       )
 
       val js = Json.toJson(model)
@@ -142,6 +143,121 @@ class CreateAndUpdateSubcontractorPayloadSpec extends AnyWordSpec with Matchers 
         )
 
       jsonMissing.validate[PartnershipPayload].isError mustBe true
+    }
+  }
+
+  "CompanyPayload JSON format" should {
+
+    val cisId = "12"
+
+    "round-trip (writes -> reads) with all fields populated" in {
+      val model = CompanyPayload(
+        cisId = cisId,
+        subcontractorType = TypeOfSubcontractor.Limitedcompany,
+        utr = Some("1234567890"),
+        crn = Some("AC012345"),
+        tradingName = Some("ACME Ltd"),
+        addressLine1 = Some("addressLine1"),
+        addressLine2 = Some("addressLine2"),
+        city = Some("city"),
+        county = Some("county"),
+        country = Some("country"),
+        postcode = Some("NE1 1AA"),
+        emailAddress = Some("hello@hmrc.co.uk"),
+        phoneNumber = Some("0123456789"),
+        mobilePhoneNumber = Some("07123456789"),
+        worksReferenceNumber = Some("WRN-003")
+      )
+
+      val js = Json.toJson(model)
+      js.as[CompanyPayload] mustBe model
+    }
+
+    "parse minimal JSON with only required fields" in {
+      val json =
+        Json.parse(
+          """
+            |{
+            |  "cisId": "12",
+            |  "subcontractorType": "company"
+            |}
+          """.stripMargin
+        )
+
+      val parsed = json.as[CompanyPayload]
+      parsed.cisId mustBe cisId
+      parsed.subcontractorType mustBe TypeOfSubcontractor.Limitedcompany
+    }
+
+    "fail to parse when a required field is missing" in {
+      val jsonMissing =
+        Json.parse(
+          """
+            |{
+            |  "subcontractorType": "company",
+            |  "utr": "1234567890"
+            |}
+          """.stripMargin
+        )
+
+      jsonMissing.validate[CompanyPayload].isError mustBe true
+    }
+  }
+
+  "TrustPayload JSON format" should {
+
+    val cisId = "13"
+
+    "round-trip (writes -> reads) with all fields populated" in {
+      val model = TrustPayload(
+        cisId = cisId,
+        subcontractorType = TypeOfSubcontractor.Trust,
+        utr = Some("1234567890"),
+        trustTradingName = Some("Trading Trust Name"),
+        addressLine1 = Some("addressLine1"),
+        addressLine2 = Some("addressLine2"),
+        city = Some("city"),
+        county = Some("county"),
+        country = Some("country"),
+        postcode = Some("NE1 1AA"),
+        emailAddress = Some("hello@hmrc.co.uk"),
+        phoneNumber = Some("0123456789"),
+        mobilePhoneNumber = Some("07123456789"),
+        worksReferenceNumber = Some("WRN-004")
+      )
+
+      val js = Json.toJson(model)
+      js.as[TrustPayload] mustBe model
+    }
+
+    "parse minimal JSON with only required fields" in {
+      val json =
+        Json.parse(
+          """
+            |{
+            |  "cisId": "13",
+            |  "subcontractorType": "trust"
+            |}
+          """.stripMargin
+        )
+
+      val parsed = json.as[TrustPayload]
+      parsed.cisId mustBe cisId
+      parsed.subcontractorType mustBe TypeOfSubcontractor.Trust
+    }
+
+    "fail to parse when a required field is missing" in {
+      val jsonMissing =
+        Json.parse(
+          """
+            |{
+            |  "subcontractorType": "trust",
+            |  "utr": "1234567890"
+            |}
+          """.stripMargin
+        )
+
+      jsonMissing.validate[TrustPayload].isError mustBe true
     }
   }
 }

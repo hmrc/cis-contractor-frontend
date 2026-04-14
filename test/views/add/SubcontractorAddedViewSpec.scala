@@ -32,10 +32,12 @@ class SubcontractorAddedViewSpec extends AnyWordSpec with Matchers with GuiceOne
 
     "render the page with the correct main content" in new Setup {
 
-      private val subcontractorName = "Test subcontractor"
-      private val subcontractorType = "Test"
+      private val subcontractorName       = "Test subcontractor"
+      private val subcontractorType       = "Test"
+      private val manageSubcontractorsUrl =
+        "http://localhost:6996/construction-industry-scheme/management/manage-subcontractors/12345"
 
-      val html: HtmlFormat.Appendable = view(subcontractorName, subcontractorType)
+      val html: HtmlFormat.Appendable = view(subcontractorName, subcontractorType, manageSubcontractorsUrl)
       val doc: Document               = org.jsoup.Jsoup.parse(html.toString())
 
       doc.title             must include(messages("subcontractorAdded.title", subcontractorType))
@@ -43,13 +45,16 @@ class SubcontractorAddedViewSpec extends AnyWordSpec with Matchers with GuiceOne
 
       doc.select("p").text must include(messages("subcontractorAdded.p1", subcontractorName))
 
-      doc.select("h2").text                     must include(messages("subcontractorAdded.nextSteps.h2"))
-      doc.select("p").text                      must include(messages("subcontractorAdded.nextSteps.p1"))
-      doc.select("p").text                      must include(messages("subcontractorAdded.nextSteps.p2"))
-      doc.select("li").text                     must include(messages("subcontractorAdded.nextSteps.list.l1"))
-      doc.select("li").text                     must include(messages("subcontractorAdded.nextSteps.list.l2"))
-      doc.select("li").text                     must include(messages("subcontractorAdded.nextSteps.list.l3"))
-      doc.getElementsByClass("govuk-link").text must include(messages("subcontractorAdded.nextSteps.link"))
+      doc.select("h2").text must include(messages("subcontractorAdded.nextSteps.h2"))
+      doc.select("p").text  must include(messages("subcontractorAdded.nextSteps.p1"))
+      doc.select("p").text  must include(messages("subcontractorAdded.nextSteps.p2"))
+      doc.select("li").text must include(messages("subcontractorAdded.nextSteps.list.l1"))
+      doc.select("li").text must include(messages("subcontractorAdded.nextSteps.list.l2"))
+      doc.select("li").text must include(messages("subcontractorAdded.nextSteps.list.l3"))
+
+      val links = doc.getElementsByClass("govuk-body").select("a")
+      links.text must include(messages("subcontractorAdded.nextSteps.link"))
+      links.attr("href") mustEqual manageSubcontractorsUrl
 
       doc.select("h2").text                     must include(messages("subcontractorAdded.helpAndSupport.h2"))
       doc.select("p").text                      must include(messages("subcontractorAdded.helpAndSupport.p1"))

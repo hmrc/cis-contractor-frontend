@@ -16,6 +16,7 @@
 
 package controllers.add
 
+import config.FrontendAppConfig
 import controllers.actions.*
 import models.add.TypeOfSubcontractor
 import models.UserAnswers
@@ -28,6 +29,7 @@ import pages.add.trust.TrustNamePage
 import play.api.i18n.Lang.logger
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
+import queries.CisIdQuery
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.{DefaultSubcontractorCleanupService, SubcontractorNameExtractor}
@@ -46,7 +48,8 @@ class SubcontractorAddedController @Inject() (
   sessionRepository: SessionRepository,
   cleanupService: DefaultSubcontractorCleanupService,
   val controllerComponents: MessagesControllerComponents,
-  view: SubcontractorAddedView
+  view: SubcontractorAddedView,
+  appConfig: FrontendAppConfig
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport {
@@ -91,19 +94,24 @@ class SubcontractorAddedController @Inject() (
         case Trust                  => (request.userAnswers.get(TrustNamePage), Messages("subcontractorAdded.trust"))
       }
 
-      name.fold(Future.successful(recoveryRedirect)) { name =>
+      val cisId: Option[String] = request.userAnswers.get(CisIdQuery)
 
-        val cleanedUaTry: Try[UserAnswers] = cleanupService.clean(request.userAnswers)
+      (name, cisId) match {
+        case (Some(name), Some(cisId)) =>
+          val manageSubcontractorsUrl        = s"${appConfig.manageSubcontractorsUrl}/$cisId"
+          val cleanedUaTry: Try[UserAnswers] = cleanupService.clean(request.userAnswers)
 
-        cleanedUaTry match {
-          case Success(cleanedUa) =>
-            sessionRepository.set(cleanedUa).map { _ =>
-              Ok(view(name, subcontractorTypeTitle))
-            }
-          case Failure(exception) =>
-            logger.warn(s"Failed to clean user answers: $exception")
-            Future.successful(recoveryRedirect)
-        }
+          cleanedUaTry match {
+            case Success(cleanedUa) =>
+              sessionRepository.set(cleanedUa).map { _ =>
+                Ok(view(name, subcontractorTypeTitle, manageSubcontractorsUrl))
+              }
+            case Failure(exception) =>
+              logger.warn(s"Failed to clean user answers: $exception")
+              Future.successful(recoveryRedirect)
+          }
+        case _                         =>
+          Future.successful(recoveryRedirect)
       }
     } else {
       Future.successful(recoveryRedirect)

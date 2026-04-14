@@ -27,5 +27,14 @@ class CompanyWorksReferenceYesNoPageSpec extends PageBehaviours {
     beSettable[Boolean](CompanyWorksReferenceYesNoPage)
 
     beRemovable[Boolean](CompanyWorksReferenceYesNoPage)
+
+    "cleanup: must remove CompanyWorksReference userAnswers when No is selected" in {
+      val userAnswers = emptyUserAnswers.set(CompanyWorksReferencePage, "WR-001").success.value
+
+      val updatedUserAnswers = userAnswers.set(CompanyWorksReferenceYesNoPage, false).success.value
+
+      updatedUserAnswers.get(CompanyWorksReferencePage) mustBe None
+    }
+
   }
 }

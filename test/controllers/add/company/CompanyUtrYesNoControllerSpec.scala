@@ -36,10 +36,11 @@ class CompanyUtrYesNoControllerSpec extends SpecBase with MockitoSugar {
 
   private val companyName = "Test Company"
 
-  val formProvider = new CompanyUtrYesNoFormProvider()
-  val form         = formProvider()
+  private val formProvider = new CompanyUtrYesNoFormProvider()
+  private val form         = formProvider()
 
-  lazy val companyUtrYesNoRoute = controllers.add.company.routes.CompanyUtrYesNoController.onPageLoad(NormalMode).url
+  private lazy val companyUtrYesNoRoute =
+    controllers.add.company.routes.CompanyUtrYesNoController.onPageLoad(NormalMode).url
 
   private def uaWithName: UserAnswers =
     emptyUserAnswers.set(CompanyNamePage, companyName).success.value
@@ -83,7 +84,7 @@ class CompanyUtrYesNoControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must redirect to the next page when valid data with value Yes is submitted" in {
+    "must redirect to the CompanyUtr page when valid data with value Yes is submitted" in {
 
       val mockSessionRepository = mock[SessionRepository]
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
@@ -108,7 +109,7 @@ class CompanyUtrYesNoControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must redirect to the next page when valid data with value No is submitted" in {
+    "must redirect to the CompanyCrnYesNo page when valid data with value No is submitted" in {
 
       val mockSessionRepository = mock[SessionRepository]
 

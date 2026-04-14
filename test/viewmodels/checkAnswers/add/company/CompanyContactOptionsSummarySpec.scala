@@ -21,6 +21,7 @@ import models.{CheckMode, UserAnswers}
 import org.scalatest.OptionValues.convertOptionToValuable
 import org.scalatest.TryValues.convertTryToSuccessOrFailure
 import org.scalatest.freespec.AnyFreeSpec
+import org.scalatest.matchers.must.Matchers.must
 import org.scalatest.matchers.should.Matchers
 import pages.add.company.CompanyContactOptionsPage
 import play.api.i18n.Messages
@@ -62,6 +63,7 @@ class CompanyContactOptionsSummarySpec extends AnyFreeSpec with Matchers {
       changeAction.content.asHtml.toString    should include(expectedChangeText)
       changeAction.href                     shouldBe expectedHref
       changeAction.visuallyHiddenText.value shouldBe expectedHiddenText
+      changeAction.attributes                   must contain("id" -> "company-contact-details")
     }
 
     "must return a SummaryListRow when PhoneNumber is selected" in {
@@ -102,7 +104,7 @@ class CompanyContactOptionsSummarySpec extends AnyFreeSpec with Matchers {
       maybeRow shouldBe defined
 
       val row           = maybeRow.value
-      val expectedValue = messages("companyContactOptions.noDetails")
+      val expectedValue = messages("companyContactOptions.cya.noDetails")
       row.value.content.asHtml.toString should include(expectedValue)
     }
 

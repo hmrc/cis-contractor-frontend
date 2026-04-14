@@ -17,17 +17,14 @@
 package controllers.add.trust
 
 import base.SpecBase
-import controllers.routes
 import forms.add.trust.TrustContactOptionsFormProvider
-import models.add.trust.TrustContactOptions
-import models.{NormalMode, UserAnswers}
-import navigation.{FakeNavigator, Navigator}
+import models.contact.ContactOptions
+import models.{CheckMode, NormalMode, UserAnswers}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.add.trust.TrustContactOptionsPage
+import pages.add.trust.{TrustContactOptionsPage, TrustNamePage}
 import play.api.inject.bind
-import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import repositories.SessionRepository
@@ -37,19 +34,26 @@ import scala.concurrent.Future
 
 class TrustContactOptionsControllerSpec extends SpecBase with MockitoSugar {
 
-  def onwardRoute = Call("GET", "/foo")
+  private val formProvider = new TrustContactOptionsFormProvider()
+  private val form         = formProvider()
+
+  private val trustName = "Test trustName"
+
+  private def uaWithName: UserAnswers = emptyUserAnswers.set(TrustNamePage, trustName).success.value
 
   lazy val trustContactOptionsRoute: String =
     controllers.add.trust.routes.TrustContactOptionsController.onPageLoad(NormalMode).url
 
-  val formProvider = new TrustContactOptionsFormProvider()
-  val form         = formProvider()
+  lazy val trustContactOptionsCheckRoute: String =
+    controllers.add.trust.routes.TrustContactOptionsController.onPageLoad(CheckMode).url
 
   "TrustContactOptions Controller" - {
 
     "must return OK and the correct view for a GET" in {
+      val userAnswers =
+        UserAnswers(userAnswersId).set(TrustNamePage, trustName).success.value
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
       running(application) {
         val request = FakeRequest(GET, trustContactOptionsRoute)
@@ -59,14 +63,20 @@ class TrustContactOptionsControllerSpec extends SpecBase with MockitoSugar {
         val view = application.injector.instanceOf[TrustContactOptionsView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode, trustName)(
+          request,
+          messages(application)
+        ).toString
       }
     }
 
-    "must populate the view correctly on a GET when the question has previously been answered" in {
+    "must populate the view correctly on GET when the question has previously been answered" in {
 
-      val userAnswers =
-        UserAnswers(userAnswersId).set(TrustContactOptionsPage, TrustContactOptions.values.head).success.value
+      val userAnswers = UserAnswers(userAnswersId)
+        .set(TrustContactOptionsPage, ContactOptions.Email)
+        .flatMap(_.set(TrustNamePage, trustName))
+        .success
+        .value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
@@ -78,62 +88,71 @@ class TrustContactOptionsControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(TrustContactOptions.values.head), NormalMode)(
+        contentAsString(result) mustEqual view(
+          form.fill(ContactOptions.Email),
+          NormalMode,
+          trustName
+        )(
           request,
           messages(application)
         ).toString
       }
     }
 
-    "must redirect to the next page when valid data is submitted" in {
+    "must save the answer and redirect to TrustEmailAddress page when valid data with value Email is submitted" in {
 
       val mockSessionRepository = mock[SessionRepository]
 
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
       val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
-          .overrides(
-            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
-            bind[SessionRepository].toInstance(mockSessionRepository)
-          )
+        applicationBuilder(userAnswers = Some(uaWithName))
+          .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
           .build()
 
       running(application) {
         val request =
           FakeRequest(POST, trustContactOptionsRoute)
-            .withFormUrlEncodedBody(("value", TrustContactOptions.values.head.toString))
+            .withFormUrlEncodedBody(("value", ContactOptions.Email.toString))
 
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual onwardRoute.url
+        redirectLocation(result).value mustEqual controllers.add.trust.routes.TrustEmailAddressController
+          .onPageLoad(NormalMode)
+          .url
       }
     }
 
-    "must return a Bad Request and errors when invalid data is submitted" in {
+    "must return a Bad Request and errors when no value is submitted" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(uaWithName)).build()
 
       running(application) {
         val request =
           FakeRequest(POST, trustContactOptionsRoute)
-            .withFormUrlEncodedBody(("value", "invalid value"))
+            .withFormUrlEncodedBody()
 
-        val boundForm = form.bind(Map("value" -> "invalid value"))
+        val form      = new TrustContactOptionsFormProvider()()
+        val boundForm = form.bind(Map.empty)
 
         val view = application.injector.instanceOf[TrustContactOptionsView]
 
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, NormalMode, trustName)(
+          request,
+          messages(application)
+        ).toString
+
+        contentAsString(result) must include(messages(application)("trustContactOptions.error.required"))
       }
     }
 
-    "must redirect to Journey Recovery for a GET if no existing data is found" in {
+    "must redirect to Journey Recovery for a GET if partnership name is missing" in {
 
-      val application = applicationBuilder(userAnswers = None).build()
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
       running(application) {
         val request = FakeRequest(GET, trustContactOptionsRoute)
@@ -141,25 +160,132 @@ class TrustContactOptionsControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
       }
     }
 
-    "redirect to Journey Recovery for a POST if no existing data is found" in {
+    "must redirect to Journey Recovery for a POST if trust name is missing" in {
 
-      val application = applicationBuilder(userAnswers = None).build()
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
       running(application) {
         val request =
           FakeRequest(POST, trustContactOptionsRoute)
-            .withFormUrlEncodedBody(("value", TrustContactOptions.values.head.toString))
+            .withFormUrlEncodedBody(("value", ContactOptions.Mobile.toString))
 
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
       }
     }
+
+    "CheckMode GET must return OK and the correct view" in {
+      val userAnswers =
+        UserAnswers(userAnswersId).set(TrustNamePage, trustName).success.value
+
+      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
+
+      running(application) {
+        val request = FakeRequest(GET, trustContactOptionsCheckRoute)
+
+        val result = route(application, request).value
+
+        val view = application.injector.instanceOf[TrustContactOptionsView]
+
+        status(result) mustEqual OK
+        contentAsString(result) mustEqual view(form, CheckMode, trustName)(
+          request,
+          messages(application)
+        ).toString
+      }
+    }
+
+    "CheckMode GET must populate the view correctly when the question has previously been answered" in {
+
+      val userAnswers = UserAnswers(userAnswersId)
+        .set(TrustContactOptionsPage, ContactOptions.Mobile)
+        .flatMap(_.set(TrustNamePage, trustName))
+        .success
+        .value
+
+      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
+
+      running(application) {
+        val request = FakeRequest(GET, trustContactOptionsCheckRoute)
+
+        val view = application.injector.instanceOf[TrustContactOptionsView]
+
+        val result = route(application, request).value
+
+        status(result) mustEqual OK
+        contentAsString(result) mustEqual view(
+          form.fill(ContactOptions.Mobile),
+          CheckMode,
+          trustName
+        )(
+          request,
+          messages(application)
+        ).toString
+      }
+    }
+
+    "CheckMode POST must save the answer and redirect to TrustEmailAddress page when valid data with value Email is submitted" in {
+
+      val mockSessionRepository = mock[SessionRepository]
+
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+      val application =
+        applicationBuilder(userAnswers = Some(uaWithName))
+          .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, trustContactOptionsCheckRoute)
+            .withFormUrlEncodedBody(("value", ContactOptions.Email.toString))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.add.trust.routes.TrustEmailAddressController
+          .onPageLoad(CheckMode)
+          .url
+      }
+    }
+
+    "CheckMode POST must redirect to Journey Recovery for a POST if trust name is missing" in {
+
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, trustContactOptionsCheckRoute)
+            .withFormUrlEncodedBody(("value", ContactOptions.Phone.toString))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "CheckMode POST must redirect to Journey Recovery for a POST if partnership name is missing" in {
+
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, trustContactOptionsCheckRoute)
+            .withFormUrlEncodedBody(("value", ContactOptions.Phone.toString))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
   }
 }

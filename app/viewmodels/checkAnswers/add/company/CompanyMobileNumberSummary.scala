@@ -37,6 +37,7 @@ object CompanyMobileNumberSummary {
             controllers.add.company.routes.CompanyMobileNumberController.onPageLoad(CheckMode).url
           )
             .withVisuallyHiddenText(messages("companyMobileNumber.change.hidden"))
+            .withAttribute("id" -> "company-mobile-number")
         )
       )
     }

@@ -14,14 +14,36 @@
  * limitations under the License.
  *@
 
+@import views.html.components._
+
 @this(
-        layout: templates.Layout,
-        govukButton: GovukButton
+    layout: templates.Layout,
+    govukSummaryList: GovukSummaryList,
+    h1: H1,
+    h2: H2,
+    p: Paragraph,
+    govukButton: GovukButton,
+    formHelper: FormWithCSRF
 )
 
-@()(implicit request: Request[_], messages: Messages)
+@(list: SummaryList)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = titleNoForm(messages("trustCheckYourAnswers.title"))) {
 
-    <h1 class="govuk-heading-xl">@messages("trustCheckYourAnswers.heading")</h1>
+    @formHelper(action = controllers.add.trust.routes.TrustCheckYourAnswersController.onSubmit(), Symbol("autoComplete") -> "off") {
+
+        @h1("trustCheckYourAnswers.heading")
+
+        @h2("trustCheckYourAnswers.subHeading")
+
+        @govukSummaryList(list)
+
+        @h2("trustCheckYourAnswers.trailHeading")
+
+        @p("trustCheckYourAnswers.trailText")
+
+        @govukButton(
+            ButtonViewModel(messages("trustCheckYourAnswers.continue"))
+        )
+    }
 }
