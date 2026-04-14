@@ -75,7 +75,17 @@ lazy val microservice = (project in file("."))
           primaryCol   = 0,
           secondaryCol = 0,
           dedupeKey    = cols => cols(0),
-          subkeyFn     = cols => cols(0).takeWhile(_ != '.')
+          subkeyFn     = cols => {
+            val key      = cols(0)
+            val firstDot = key.indexOf('.')
+            if (firstDot < 0) key
+            else {
+              val prefix    = key.take(firstDot)
+              val secondDot = key.indexOf('.', firstDot + 1)
+              if (prefix == "verify" && secondDot >= 0) key.take(secondDot)
+              else prefix
+            }
+          }
         )
       )
     )
