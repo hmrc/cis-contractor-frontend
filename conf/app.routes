@@ -11,11 +11,6 @@ GET   /language/:lang                               controllers.LanguageSwitchCo
 
 GET   /refresh-session                              controllers.KeepAliveController.keepAlive()
 
-GET   /verify/confirmation-email-not-stored         controllers.verify.ContractorEmailConfirmationNotStoredController.onPageLoad(mode: Mode = NormalMode)
-POST  /verify/confirmation-email-not-stored         controllers.verify.ContractorEmailConfirmationNotStoredController.onSubmit(mode: Mode = NormalMode)
-GET   /verify/change-confirmation-email-not-stored  controllers.verify.ContractorEmailConfirmationNotStoredController.onPageLoad(mode: Mode = CheckMode)
-POST  /verify/change-confirmation-email-not-stored  controllers.verify.ContractorEmailConfirmationNotStoredController.onSubmit(mode: Mode = CheckMode)
-
 # Errors & Auth
 GET  /there-is-a-problem               controllers.JourneyRecoveryController.onPageLoad(continueUrl: Option[RedirectUrl] ?= None)
 
