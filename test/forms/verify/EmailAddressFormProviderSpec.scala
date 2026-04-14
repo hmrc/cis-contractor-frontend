@@ -24,9 +24,9 @@ import org.scalacheck.Gen
 
 class EmailAddressFormProviderSpec extends StringFieldBehaviours {
 
-  val requiredKey = "emailAddress.error.required"
-  val lengthKey   = "emailAddress.error.length"
-  val invalidKey  = "emailAddress.error.invalid"
+  val requiredKey = "verify.emailAddress.error.required"
+  val lengthKey   = "verify.emailAddress.error.length"
+  val invalidKey  = "verify.emailAddress.error.invalid"
 
   val form = new EmailAddressFormProvider()()
 

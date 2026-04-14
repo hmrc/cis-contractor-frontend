@@ -76,7 +76,7 @@ class EmailAddressControllerSpec extends SpecBase with MockitoSugar {
           view(
             form,
             NormalMode,
-            "emailAddress.hint.notStored"
+            "verify.emailAddress.hint.notStored"
           )(request, messages(application)).toString
       }
     }
@@ -99,7 +99,7 @@ class EmailAddressControllerSpec extends SpecBase with MockitoSugar {
           view(
             form.fill("stored@example.com"),
             NormalMode,
-            "emailAddress.hint"
+            "verify.emailAddress.hint"
           )(request, messages(application)).toString
       }
     }
@@ -123,7 +123,7 @@ class EmailAddressControllerSpec extends SpecBase with MockitoSugar {
           view(
             form.fill("abc@test.com"),
             NormalMode,
-            "emailAddress.hint"
+            "verify.emailAddress.hint"
           )(request, messages(application)).toString
       }
     }
@@ -176,7 +176,7 @@ class EmailAddressControllerSpec extends SpecBase with MockitoSugar {
           view(
             boundForm,
             NormalMode,
-            "emailAddress.hint.notStored"
+            "verify.emailAddress.hint.notStored"
           )(request, messages(application)).toString
       }
     }
@@ -201,7 +201,7 @@ class EmailAddressControllerSpec extends SpecBase with MockitoSugar {
           view(
             boundForm,
             NormalMode,
-            "emailAddress.hint"
+            "verify.emailAddress.hint"
           )(request, messages(application)).toString
       }
     }

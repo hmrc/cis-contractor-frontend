@@ -34,13 +34,13 @@ class EmailAddressViewSpec extends AnyWordSpec with Matchers with GuiceOneAppPer
   "EmailAddressView" should {
 
     "render the page with title, heading, input and submit button" in new Setup {
-      val html: HtmlFormat.Appendable = view(form, NormalMode, "emailAddress.hint")
+      val html: HtmlFormat.Appendable = view(form, NormalMode, "verify.emailAddress.hint")
       val doc                         = org.jsoup.Jsoup.parse(html.toString())
 
-      doc.select("title").text() must include(messages("emailAddress.title"))
+      doc.select("title").text() must include(messages("verify.emailAddress.title"))
 
       val heading = doc.select("label.govuk-label")
-      heading.text() mustBe messages("emailAddress.heading")
+      heading.text() mustBe messages("verify.emailAddress.heading")
 
       doc.select("form").attr("action") mustBe controllers.verify.routes.EmailAddressController
         .onSubmit(NormalMode)
@@ -49,30 +49,30 @@ class EmailAddressViewSpec extends AnyWordSpec with Matchers with GuiceOneAppPer
       doc.select("input[name=value]").size() mustBe 1
 
       doc.select(".govuk-button").text() mustBe messages("site.continue")
-      doc.select(".govuk-hint").text() must include(messages("emailAddress.hint"))
+      doc.select(".govuk-hint").text() must include(messages("verify.emailAddress.hint"))
     }
 
     "render the page with SM-01c hint when email is not stored" in new Setup {
-      val html: HtmlFormat.Appendable = view(form, NormalMode, "emailAddress.hint.notStored")
+      val html: HtmlFormat.Appendable = view(form, NormalMode, "verify.emailAddress.hint.notStored")
       val doc                         = org.jsoup.Jsoup.parse(html.toString())
 
-      doc.select(".govuk-hint").text() must include(messages("emailAddress.hint.notStored"))
+      doc.select(".govuk-hint").text() must include(messages("verify.emailAddress.hint.notStored"))
     }
 
     "display error summary and inline error when no name is entered" in new Setup {
       val errorForm: Form[String] =
-        form.withError("value", "emailAddress.error.required")
+        form.withError("value", "verify.emailAddress.error.required")
 
-      val html = view(errorForm, NormalMode, "emailAddress.hint")
+      val html = view(errorForm, NormalMode, "verify.emailAddress.hint")
       val doc  = org.jsoup.Jsoup.parse(html.toString())
 
       val summary = doc.select(".govuk-error-summary")
-      summary.text() must include(messages("emailAddress.error.required"))
+      summary.text() must include(messages("verify.emailAddress.error.required"))
 
       val linkHref = summary.select("a").attr("href")
       linkHref mustBe "#value"
 
-      doc.select(".govuk-error-message").text() must include(messages("emailAddress.error.required"))
+      doc.select(".govuk-error-message").text() must include(messages("verify.emailAddress.error.required"))
     }
   }
 

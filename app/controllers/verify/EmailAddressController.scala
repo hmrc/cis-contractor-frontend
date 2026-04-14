@@ -50,8 +50,8 @@ class EmailAddressController @Inject() (
   private def hintKey(answers: UserAnswers): String = {
     val isAlternateEmail = answers.get(ContractorEmailConfirmationNotStoredPage).contains(true)
 
-    if (isAlternateEmail) "emailAddress.hint"
-    else "emailAddress.hint.notStored"
+    if (isAlternateEmail) "verify.emailAddress.hint"
+    else "verify.emailAddress.hint.notStored"
   }
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>

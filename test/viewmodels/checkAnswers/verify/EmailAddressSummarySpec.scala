@@ -47,7 +47,7 @@ class EmailAddressSummarySpec extends AnyFreeSpec with Matchers {
 
       val row = maybeRow.value
 
-      val expectedKeyText = messages("emailAddress.checkYourAnswersLabel")
+      val expectedKeyText = messages("verify.emailAddress.checkYourAnswersLabel")
       row.key.content.asHtml.toString should include(expectedKeyText)
 
       row.value.content.asHtml.toString should include("test@example.com")
@@ -61,7 +61,7 @@ class EmailAddressSummarySpec extends AnyFreeSpec with Matchers {
       val expectedHref       = routes.EmailAddressController
         .onPageLoad(CheckMode)
         .url
-      val expectedHiddenText = messages("emailAddress.change.hidden")
+      val expectedHiddenText = messages("verify.emailAddress.change.hidden")
 
       changeAction.content.asHtml.toString    should include(expectedChangeText)
       changeAction.href                     shouldBe expectedHref

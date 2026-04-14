@@ -29,11 +29,11 @@ object EmailAddressSummary {
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
     answers.get(EmailAddressPage).map { answer =>
       SummaryListRowViewModel(
-        key = "emailAddress.checkYourAnswersLabel",
+        key = "verify.emailAddress.checkYourAnswersLabel",
         value = ValueViewModel(HtmlFormat.escape(answer).toString),
         actions = Seq(
           ActionItemViewModel("site.change", controllers.verify.routes.EmailAddressController.onPageLoad(CheckMode).url)
-            .withVisuallyHiddenText(messages("emailAddress.change.hidden"))
+            .withVisuallyHiddenText(messages("verify.emailAddress.change.hidden"))
             .withAttribute("id" -> "email-address")
         )
       )
