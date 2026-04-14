@@ -347,3 +347,5 @@ POST  /add/trust/change-trust-works-reference   controllers.add.trust.TrustWorks
 GET   /trustCheckYourAnswers                    controllers.add.trust.TrustCheckYourAnswersController.onPageLoad()
 
 GET   /add/trust/subcontractor-added            controllers.add.SubcontractorAddedController.trustSubcontractorAdded()
+
+GET  /verification/newest                       controllers.verification.NewestVerificationBatchController.onPageLoad()

@@ -170,7 +170,7 @@ class ConstructionIndustrySchemeConnectorSpec extends AnyWordSpec with Matchers 
           verifications = Nil,
           submission = Nil,
           monthlyReturn = Nil,
-          mrSubmission = Nil
+          monthlyReturnSubmission = Nil
         )
 
       when(rb.execute[GetNewestVerificationBatchResponse](any(), any()))
