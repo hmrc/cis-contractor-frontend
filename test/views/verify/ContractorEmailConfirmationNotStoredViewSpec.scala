@@ -75,7 +75,7 @@ class ContractorEmailConfirmationNotStoredViewSpec extends AnyWordSpec with Matc
         messages("verify.contractorEmailConfirmationNotStored.error.required")
       )
 
-      errorSummary.select("a").attr("href") mustBe "#value"
+      errorSummary.select("a").attr("href") mustBe "#value_0"
 
       doc.select(".govuk-error-message").text() must include(
         messages("verify.contractorEmailConfirmationNotStored.error.required")
