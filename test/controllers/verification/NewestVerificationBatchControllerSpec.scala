@@ -33,7 +33,7 @@ import scala.concurrent.Future
 
 class NewestVerificationBatchControllerSpec extends SpecBase with MockitoSugar {
 
-  private val endpointUrl = "/verification/newest" 
+  private val endpointUrl = "/verification/newest"
 
   "NewestVerificationBatchController" - {
 
@@ -57,7 +57,7 @@ class NewestVerificationBatchControllerSpec extends SpecBase with MockitoSugar {
 
         val uaCaptor = ArgumentCaptor.forClass(classOf[UserAnswers])
         verify(mockService).refreshNewestVerificationBatch(uaCaptor.capture())(any[HeaderCarrier])
-        
+
         uaCaptor.getValue.id mustBe emptyUserAnswers.id
         uaCaptor.getValue.data mustBe emptyUserAnswers.data
 
