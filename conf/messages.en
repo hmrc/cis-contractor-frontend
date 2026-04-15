@@ -780,3 +780,14 @@ verify.contractorEmailConfirmationNotStored.heading                =  Do you wan
 verify.contractorEmailConfirmationNotStored.checkYourAnswersLabel  =  Do you want confirmation by email?
 verify.contractorEmailConfirmationNotStored.error.required         =  Select yes if you want an email confirmation of this verification request
 verify.contractorEmailConfirmationNotStored.change.hidden          =  do you want confirmation by email?
+
+verify.contractorEmailConfirmationStored.title                     =  Do you want an email confirmation of this verification request?
+verify.contractorEmailConfirmationStored.heading                   =  Do you want an email confirmation of this verification request?
+verify.contractorEmailConfirmationStored.paragraph                 =  Your email address is currently {0}. You can get a confirmation sent to this address or use a different one.
+verify.contractorEmailConfirmationStored.currentEmail              =  Send confirmation to current email address
+verify.contractorEmailConfirmationStored.differentEmail            =  Use a different email address
+verify.contractorEmailConfirmationStored.or                        =  or
+verify.contractorEmailConfirmationStored.doNotSend                 =  Do not send an email confirmation
+verify.contractorEmailConfirmationStored.checkYourAnswersLabel     =  Do you want confirmation by email?
+verify.contractorEmailConfirmationStored.error.required            =  Select whether you want an email confirmation of this verification request
+verify.contractorEmailConfirmationStored.change.hidden             =  whether you want an email confirmation

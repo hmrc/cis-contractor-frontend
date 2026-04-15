@@ -21,7 +21,8 @@ import jakarta.inject.Singleton
 import models.{CheckMode, Mode, NormalMode, UserAnswers}
 import navigation.NavigatorForJourney
 import pages.Page
-import pages.verify.ContractorEmailConfirmationNotStoredPage
+import pages.verify.{ContractorEmailConfirmationNotStoredPage, ContractorEmailConfirmationStoredPage}
+import models.verify.ContractorEmailConfirmationStored.{CurrentEmail, DifferentEmail, DoNotSend}
 import play.api.mvc.Call
 
 import javax.inject.Inject
@@ -40,12 +41,16 @@ class VerifyNavigator @Inject() () extends NavigatorForJourney {
 
     case ContractorEmailConfirmationNotStoredPage =>
       userAnswers => navigatorFromContractorEmailConfirmationNotStoredPage(NormalMode)(userAnswers)
+    case ContractorEmailConfirmationStoredPage    =>
+      userAnswers => navigatorFromContractorEmailConfirmationStoredPage(NormalMode)(userAnswers)
     case _                                        => _ => controllers.routes.JourneyRecoveryController.onPageLoad()
   }
 
   private def checkRouteMap: Page => UserAnswers => Call = {
     case ContractorEmailConfirmationNotStoredPage =>
       userAnswers => navigatorFromContractorEmailConfirmationNotStoredPage(CheckMode)(userAnswers)
+    case ContractorEmailConfirmationStoredPage    =>
+      userAnswers => navigatorFromContractorEmailConfirmationStoredPage(CheckMode)(userAnswers)
     case _                                        => _ => controllers.routes.JourneyRecoveryController.onPageLoad()
 
   }
@@ -65,6 +70,24 @@ class VerifyNavigator @Inject() () extends NavigatorForJourney {
 
       case _ =>
         routes.IndexController.onPageLoad()
+    }
+
+  private def navigatorFromContractorEmailConfirmationStoredPage(mode: Mode)(ua: UserAnswers): Call =
+    (ua.get(ContractorEmailConfirmationStoredPage), mode) match {
+      case (Some(CurrentEmail), _) =>
+        // TODO: navigate to VF-06 Verify declaration once implemented
+        controllers.routes.JourneyRecoveryController.onPageLoad()
+
+      case (Some(DifferentEmail), _) =>
+        // TODO: navigate to SM-01b Enter alternate email once implemented
+        controllers.routes.JourneyRecoveryController.onPageLoad()
+
+      case (Some(DoNotSend), _) =>
+        // TODO: navigate to VF-06 Verify declaration once implemented
+        controllers.routes.JourneyRecoveryController.onPageLoad()
+
+      case _ =>
+        controllers.routes.JourneyRecoveryController.onPageLoad()
     }
 
 }
