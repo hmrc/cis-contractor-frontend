@@ -23,7 +23,7 @@ import models.contact.ContactOptions
 import pages.add.company._
 import models.requests.CreateAndUpdateSubcontractorPayload
 import models.requests.CreateAndUpdateSubcontractorPayload.{CompanyPayload, IndividualOrSoleTraderPayload, PartnershipPayload, TrustPayload}
-import models.subcontractor.GetSubcontractorUTRsResponse
+import models.response.GetSubcontractorUTRsResponse
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{times, verify, verifyNoMoreInteractions, when}
 import pages.add.*
