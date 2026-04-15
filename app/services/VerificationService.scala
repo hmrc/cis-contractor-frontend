@@ -27,7 +27,7 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class VerificationBatchService @Inject() (
+class VerificationService @Inject()(
   cisConnector: ConstructionIndustrySchemeConnector,
   sessionRepository: SessionRepository
 )(implicit ec: ExecutionContext) {

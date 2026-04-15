@@ -26,7 +26,7 @@ import org.scalatestplus.mockito.MockitoSugar
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import services.VerificationBatchService
+import services.VerificationService
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.Future
@@ -38,14 +38,14 @@ class NewestVerificationBatchControllerSpec extends SpecBase with MockitoSugar {
   "NewestVerificationBatchController" - {
 
     "must return OK with confirmation message when refreshNewestVerificationBatch succeeds" in {
-      val mockService = mock[VerificationBatchService]
+      val mockService = mock[VerificationService]
 
       when(mockService.refreshNewestVerificationBatch(any[UserAnswers])(any[HeaderCarrier]))
         .thenReturn(Future.successful(emptyUserAnswers))
 
       val application =
         applicationBuilder(userAnswers = Some(emptyUserAnswers))
-          .overrides(bind[VerificationBatchService].toInstance(mockService))
+          .overrides(bind[VerificationService].toInstance(mockService))
           .build()
 
       running(application) {
@@ -66,14 +66,14 @@ class NewestVerificationBatchControllerSpec extends SpecBase with MockitoSugar {
     }
 
     "must redirect to JourneyRecovery when refreshNewestVerificationBatch fails" in {
-      val mockService = mock[VerificationBatchService]
+      val mockService = mock[VerificationService]
 
       when(mockService.refreshNewestVerificationBatch(any[UserAnswers])(any[HeaderCarrier]))
         .thenReturn(Future.failed(new RuntimeException("boom")))
 
       val application =
         applicationBuilder(userAnswers = Some(emptyUserAnswers))
-          .overrides(bind[VerificationBatchService].toInstance(mockService))
+          .overrides(bind[VerificationService].toInstance(mockService))
           .build()
 
       running(application) {
@@ -89,11 +89,11 @@ class NewestVerificationBatchControllerSpec extends SpecBase with MockitoSugar {
     }
 
     "must redirect to JourneyRecovery when no existing data is found (requireData fails)" in {
-      val mockService = mock[VerificationBatchService]
+      val mockService = mock[VerificationService]
 
       val application =
         applicationBuilder(userAnswers = None)
-          .overrides(bind[VerificationBatchService].toInstance(mockService))
+          .overrides(bind[VerificationService].toInstance(mockService))
           .build()
 
       running(application) {

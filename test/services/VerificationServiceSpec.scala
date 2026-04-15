@@ -55,7 +55,7 @@ final class VerificationServiceSpec extends SpecBase with MockitoSugar {
     "must fetch newest verification batch, store in UserAnswers, persist to session repo, and return updated answers" in {
       val mockConnector = mock[ConstructionIndustrySchemeConnector]
       val mockRepo      = mock[SessionRepository]
-      val service       = new VerificationBatchService(mockConnector, mockRepo)
+      val service       = new VerificationService(mockConnector, mockRepo)
 
       val ua =
         emptyUserAnswers
@@ -87,7 +87,7 @@ final class VerificationServiceSpec extends SpecBase with MockitoSugar {
     "must fail when CisIdQuery (instance id) is missing and not call connector nor repo" in {
       val mockConnector = mock[ConstructionIndustrySchemeConnector]
       val mockRepo      = mock[SessionRepository]
-      val service       = new VerificationBatchService(mockConnector, mockRepo)
+      val service       = new VerificationService(mockConnector, mockRepo)
 
       val ex = service.refreshNewestVerificationBatch(emptyUserAnswers).failed.futureValue
       ex.getMessage must include("InstanceIdQuery not found in session data")
@@ -100,7 +100,7 @@ final class VerificationServiceSpec extends SpecBase with MockitoSugar {
     "must propagate connector failure and not write to session repo" in {
       val mockConnector = mock[ConstructionIndustrySchemeConnector]
       val mockRepo      = mock[SessionRepository]
-      val service       = new VerificationBatchService(mockConnector, mockRepo)
+      val service       = new VerificationService(mockConnector, mockRepo)
 
       val ua =
         emptyUserAnswers
@@ -137,7 +137,7 @@ final class VerificationServiceSpec extends SpecBase with MockitoSugar {
 
       class TestService(conn: ConstructionIndustrySchemeConnector, repo: SessionRepository)(implicit
         ec: ExecutionContext
-      ) extends VerificationBatchService(conn, repo) {
+      ) extends VerificationService(conn, repo) {
 
         def refreshAndForceBadSet(ua: UserAnswers)(implicit hc: HeaderCarrier): Future[UserAnswers] =
           for {
