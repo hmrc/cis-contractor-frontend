@@ -355,3 +355,5 @@ GET   /add/trust/check-your-answers                controllers.add.trust.TrustCh
 POST  /add/trust/check-your-answers                controllers.add.trust.TrustCheckYourAnswersController.onSubmit()
 
 GET   /add/trust/subcontractor-added               controllers.add.SubcontractorAddedController.trustSubcontractorAdded()
+
+GET  /verification/newest                       controllers.verification.NewestVerificationBatchController.onPageLoad()
