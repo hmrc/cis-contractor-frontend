@@ -304,8 +304,8 @@ verify.contractorEmailConfirmationNotStored.change.hidden                =  do y
 
 verify.noSubcontractorsAdded.title                                       = No subcontractors added
 verify.noSubcontractorsAdded.heading                                     = Verify your subcontractors
-verify.noSubcontractorsAdded.p1                                          = You don't have any subcontractors at the moment.
-verify.noSubcontractorsAdded.p2                                          = You will need to add some subcontractors first
+verify.noSubcontractorsAdded.p1                                          = You don’t have any subcontractors at the moment.
+verify.noSubcontractorsAdded.p2                                          = You will need to
 verify.noSubcontractorsAdded.p2.link                                     = add some subcontractors first
 verify.noSubcontractorsAdded.p2.end                                      = before you can create a verification request or monthly return.
 verify.noSubcontractorsAdded.p3                                          = Back to
