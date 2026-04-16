@@ -792,3 +792,13 @@ verify.verificationDeclaration.list.l1                                          
 verify.verificationDeclaration.list.l2                                          =  the information given in this verification request is correct and complete to the best of your knowledge and belief.
 verify.verificationDeclaration.warningText                                      =  If you give any false information you may face financial penalties and prosecution.
 verify.verificationDeclaration.confirm                                          =  Confirm
+
+verify.verificationRequestInProgress.title = Verification request in progress
+verify.verificationRequestInProgress.heading = Verification request in progress
+verify.verificationRequestInProgress.p1 = HMRC has not responded to your previous verification request.
+verify.verificationRequestInProgress.p2 = You must wait for this response before you can verify any more subcontractors.
+verify.verificationRequestInProgress.p3 = If you have any questions about this verification request,
+verify.verificationRequestInProgress.p3.link = contact HMRC.
+verify.verificationRequestInProgress.p4 = Back to
+verify.verificationRequestInProgress.p4.link = Manage your subcontractors.
+
