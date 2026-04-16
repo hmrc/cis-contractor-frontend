@@ -21,10 +21,7 @@ import forms.verify.ContractorEmailConfirmationStoredFormProvider
 import models.Mode
 import models.requests.DataRequest
 import navigation.Navigator
-import pages.add.IndividualEmailAddressPage
-import pages.add.company.CompanyEmailAddressPage
-import pages.add.partnership.PartnershipEmailAddressPage
-import pages.add.trust.TrustEmailAddressPage
+import pages.verification.NewestVerificationBatchResponsePage
 import pages.verify.ContractorEmailConfirmationStoredPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -56,15 +53,11 @@ class ContractorEmailConfirmationStoredController @Inject() (
   private def preparedForm(implicit request: DataRequest[?]) =
     request.userAnswers.get(ContractorEmailConfirmationStoredPage).fold(form)(form.fill)
 
-  // TODO: replace with retrieval of the contractor's stored email address from the appropriate service/session
-  //       for now just pick up any email address to facilitate testing
-  private def getEmailAddress(implicit request: DataRequest[?]): Option[String] = {
-    val ua = request.userAnswers
-    ua.get(CompanyEmailAddressPage)
-      .orElse(ua.get(IndividualEmailAddressPage))
-      .orElse(ua.get(PartnershipEmailAddressPage))
-      .orElse(ua.get(TrustEmailAddressPage))
-  }
+  private def getEmailAddress(implicit request: DataRequest[?]): Option[String] =
+    request.userAnswers
+      .get(NewestVerificationBatchResponsePage)
+      .flatMap(_.scheme.headOption)
+      .flatMap(_.emailAddress)
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
     getEmailAddress
