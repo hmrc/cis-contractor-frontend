@@ -51,11 +51,8 @@ class VerificationDeclarationController @Inject() (
 
   def onSubmit(mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
-
-      val value: Boolean = true // User clicked Confirm
-
       for {
-        updatedAnswers <- Future.fromTry(request.userAnswers.set(VerificationDeclarationPage, value))
+        updatedAnswers <- Future.fromTry(request.userAnswers.set(VerificationDeclarationPage, true))
         _              <- sessionRepository.set(updatedAnswers)
       } yield Redirect(navigator.nextPage(VerificationDeclarationPage, mode, updatedAnswers))
 

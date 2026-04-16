@@ -44,24 +44,19 @@ class VerificationDeclarationViewSpec extends SpecBase {
         val html = view(form, mode)
         val doc  = Jsoup.parse(html.toString)
 
-        // Title contains expected message (layout may append service name)
         doc.title() must include(msgs("verify.verificationDeclaration.title"))
 
-        // H1
         doc.select("h1").text() mustEqual msgs("verify.verificationDeclaration.heading")
 
-        // Content
         doc.text() must include(msgs("verify.verificationDeclaration.p1"))
         doc.text() must include(msgs("verify.verificationDeclaration.list.l1"))
         doc.text() must include(msgs("verify.verificationDeclaration.list.l2"))
         doc.text() must include(msgs("verify.verificationDeclaration.warningText"))
 
-        // Form action + method
         val formEl = doc.select("form").first()
         formEl.attr("action") mustEqual controllers.verify.routes.VerificationDeclarationController.onSubmit().url
         formEl.attr("method").toLowerCase mustEqual "post"
 
-        // Confirm button
         doc.select("button.govuk-button").text() mustEqual msgs("verify.verificationDeclaration.confirm")
       }
     }
