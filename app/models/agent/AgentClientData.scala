@@ -14,23 +14,18 @@
  * limitations under the License.
  */
 
-package viewmodels
+package models.agent
 
-package object govuk {
+import play.api.libs.json.*
+import play.api.libs.json.Reads.*
 
-  object all
-      extends ImplicitConversions
-      with BackLinkFluency
-      with ButtonFluency
-      with CheckboxFluency
-      with DateFluency
-      with ErrorSummaryFluency
-      with FieldsetFluency
-      with HintFluency
-      with InputFluency
-      with LabelFluency
-      with RadiosFluency
-      with SummaryListFluency
-      with TagFluency
-      with WarningTextFluency
+case class AgentClientData(
+  uniqueId: String,
+  taxOfficeNumber: String,
+  taxOfficeReference: String,
+  schemeName: Option[String]
+)
+
+object AgentClientData {
+  implicit val format: Format[AgentClientData] = Json.format[AgentClientData]
 }

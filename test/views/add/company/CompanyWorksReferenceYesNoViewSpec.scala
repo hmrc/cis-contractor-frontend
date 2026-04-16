@@ -87,7 +87,7 @@ class CompanyWorksReferenceYesNoViewSpec extends AnyWordSpec with Matchers with 
       )
 
       val linkHref: String = summary.select("a").attr("href")
-      linkHref mustBe "#value"
+      linkHref mustBe "#value_0"
 
       doc.select(".govuk-error-message").text() must include(
         messages("companyWorksReferenceYesNo.error.required")
