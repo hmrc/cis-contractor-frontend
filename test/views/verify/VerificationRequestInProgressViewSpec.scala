@@ -1,19 +1,3 @@
-/*
- * Copyright 2026 HM Revenue & Customs
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package views.verify
 
 import config.FrontendAppConfig
@@ -28,12 +12,27 @@ import views.html.verify.VerificationRequestInProgressView
 
 class VerificationRequestInProgressViewSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite {
 
+  implicit val request: Request[_] =
+    FakeRequest()
+
+  implicit val messages: Messages =
+    MessagesImpl(
+      Lang.defaultLang,
+      app.injector.instanceOf[MessagesApi]
+    )
+
+  implicit val appConfig: FrontendAppConfig =
+    app.injector.instanceOf[FrontendAppConfig]
+
+  val view: VerificationRequestInProgressView =
+    app.injector.instanceOf[VerificationRequestInProgressView]
+
   "VerificationRequestInProgressView" should {
 
-    "render the page with correct title, heading, paragraphs and links" in new Setup {
+    "render the page with correct title, heading, paragraphs and links" in {
 
-      private val html = view()
-      private val doc  = Jsoup.parse(html.toString())
+      val html = view()
+      val doc  = Jsoup.parse(html.toString())
 
       doc.select("title").text() must include(
         messages("verificationRequestInProgress.title")
@@ -51,9 +50,8 @@ class VerificationRequestInProgressViewSpec extends AnyWordSpec with Matchers wi
         messages("verify.verificationRequestInProgress.p2")
       )
 
-      private val serviceDeskLink =
+      val serviceDeskLink =
         doc.select(s"a[href='${appConfig.hmrcOnlineServiceDeskUrl}']")
-
       serviceDeskLink.size() mustBe 1
       serviceDeskLink.text() mustBe
         messages("verify.verificationRequestInProgress.p3.link")
@@ -62,9 +60,8 @@ class VerificationRequestInProgressViewSpec extends AnyWordSpec with Matchers wi
         messages("verify.verificationRequestInProgress.p3")
       )
 
-      private val manageSubcontractorsLink =
+      val manageSubcontractorsLink =
         doc.select(s"a[href='${appConfig.manageSubcontractorsUrl}']")
-
       manageSubcontractorsLink.size() mustBe 1
       manageSubcontractorsLink.text() mustBe
         messages("verify.verificationRequestInProgress.p4.link")
@@ -73,23 +70,5 @@ class VerificationRequestInProgressViewSpec extends AnyWordSpec with Matchers wi
         messages("verify.verificationRequestInProgress.p4")
       )
     }
-  }
-
-  trait Setup {
-
-    implicit val request: Request[_] =
-      FakeRequest()
-
-    implicit val messages: Messages =
-      MessagesImpl(
-        Lang.defaultLang,
-        app.injector.instanceOf[MessagesApi]
-      )
-
-    implicit val appConfig: FrontendAppConfig =
-      app.injector.instanceOf[FrontendAppConfig]
-
-    val view: VerificationRequestInProgressView =
-      app.injector.instanceOf[VerificationRequestInProgressView]
   }
 }
