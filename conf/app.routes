@@ -16,12 +16,18 @@ POST  /verify/confirmation-email-not-stored         controllers.verify.Contracto
 GET   /verify/change-confirmation-email-not-stored  controllers.verify.ContractorEmailConfirmationNotStoredController.onPageLoad(mode: Mode = CheckMode)
 POST  /verify/change-confirmation-email-not-stored  controllers.verify.ContractorEmailConfirmationNotStoredController.onSubmit(mode: Mode = CheckMode)
 
+GET   /verify/verification-declaration              controllers.verify.VerificationDeclarationController.onPageLoad(mode: Mode = NormalMode)
+POST  /verify/verification-declaration              controllers.verify.VerificationDeclarationController.onSubmit(mode: Mode = NormalMode)
+
 GET   /verify/submitting-verification-request       controllers.verify.SubmissionSendingController.onPageLoad()
+
+GET   /verification/newest                          controllers.verification.NewestVerificationBatchController.onPageLoad()
 
 # Errors & Auth
 GET  /there-is-a-problem               controllers.JourneyRecoveryController.onPageLoad(continueUrl: Option[RedirectUrl] ?= None)
 
 GET  /account/sign-out-survey          controllers.auth.AuthController.signOut()
+
 GET  /account/sign-out                 controllers.auth.AuthController.signOutNoSurvey()
 
 GET  /account/signed-out               controllers.auth.SignedOutController.onPageLoad()

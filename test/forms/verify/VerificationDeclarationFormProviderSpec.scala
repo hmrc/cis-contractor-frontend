@@ -14,14 +14,25 @@
  * limitations under the License.
  */
 
-package models.subcontractor
+package forms.verify
 
-import play.api.libs.json.{Json, OFormat}
+import forms.behaviours.StringFieldBehaviours
+import play.api.data.FormError
 
-final case class GetSubcontractorUTRsResponse(
-  subcontractorUTRs: Seq[String]
-)
+class VerificationDeclarationFormProviderSpec extends StringFieldBehaviours {
 
-object GetSubcontractorUTRsResponse {
-  implicit val format: OFormat[GetSubcontractorUTRsResponse] = Json.format[GetSubcontractorUTRsResponse]
+  private val requiredKey = "verificationDeclaration.error.required"
+
+  private val form = new VerificationDeclarationFormProvider()()
+
+  ".value" - {
+
+    val fieldName = "value"
+
+    behave like mandatoryField(
+      form,
+      fieldName,
+      requiredError = FormError(fieldName, requiredKey)
+    )
+  }
 }

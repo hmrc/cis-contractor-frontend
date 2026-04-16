@@ -16,7 +16,7 @@
 
 package connectors
 
-import com.github.tomakehurst.wiremock.client.WireMock.{aResponse, get, post, stubFor, urlPathEqualTo}
+import com.github.tomakehurst.wiremock.client.WireMock.{aResponse, get, post, stubFor, urlEqualTo, urlPathEqualTo}
 import itutil.ApplicationWithWiremock
 import models.add.TypeOfSubcontractor.Individualorsoletrader
 import models.requests.CreateAndUpdateSubcontractorPayload
@@ -25,8 +25,9 @@ import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.matchers.should.Matchers.shouldBe
 import org.scalatest.wordspec.AnyWordSpec
-import play.api.http.Status.{INTERNAL_SERVER_ERROR, NO_CONTENT, OK}
-import uk.gov.hmrc.http.HeaderCarrier
+import play.api.http.Status.{FORBIDDEN, INTERNAL_SERVER_ERROR, NOT_FOUND, NO_CONTENT, OK}
+import play.api.libs.json.{JsValue, Json}
+import uk.gov.hmrc.http.{HeaderCarrier, HttpException, UpstreamErrorResponse}
 
 class ConstructionIndustrySchemeConnectorSpec
     extends AnyWordSpec
@@ -173,4 +174,93 @@ class ConstructionIndustrySchemeConnectorSpec
       ex.getMessage must include("returned 500")
     }
   }
+
+  "getAgentClient" should {
+
+    val userId = "some-user-id"
+    val validJson: JsValue = Json.obj(
+      "uniqueId" -> "1",
+      "taxOfficeNumber" -> "123",
+      "taxOfficeReference" -> "AB001"
+    )
+
+    "returns Some(Json) if OK" in {
+      stubFor(
+        get(urlEqualTo(s"/cis/user-cache/agent-client/$userId"))
+          .willReturn(
+            aResponse()
+              .withStatus(OK)
+              .withBody(Json.stringify(validJson))
+          )
+      )
+
+      val result = connector.getAgentClient(userId).futureValue
+
+      result mustBe Some(validJson)
+    }
+
+    "returns None if NOT_FOUND" in {
+      stubFor(
+        get(urlEqualTo(s"/cis/user-cache/agent-client/$userId"))
+          .willReturn(
+            aResponse()
+              .withStatus(NOT_FOUND)
+          )
+      )
+
+      val result = connector.getAgentClient(userId).futureValue
+
+      result mustBe None
+    }
+
+    "throws HttpException for other codes" in {
+      stubFor(
+        get(urlEqualTo(s"/cis/user-cache/agent-client/$userId"))
+          .willReturn(
+            aResponse()
+              .withStatus(INTERNAL_SERVER_ERROR)
+              .withBody("Something broke")
+          )
+
+      )
+
+      val result = connector
+        .getAgentClient(userId)
+        .failed
+        .futureValue
+
+      result mustBe a[HttpException]
+      result.getMessage must include("Something broke")
+    }
+
+  }
+  
+  "hasClient(taxOfficeNumber, taxOfficeReference)" should {
+
+    "GET /cis/agent/has-client/:ton/:tor and return true when BE returns 200" in {
+      stubFor(
+        get(urlPathEqualTo("/cis/agent/has-client/163/AB0063"))
+          .willReturn(
+            aResponse()
+              .withStatus(OK)
+              .withHeader("Content-Type", "application/json")
+              .withBody("""{ "hasClient": true }""")
+          )
+      )
+
+      connector.hasClient("163", "AB0063").futureValue mustBe true
+    }
+
+    "fail the future when BE returns non-200 (e.g. 403)" in {
+      stubFor(
+        get(urlPathEqualTo("/cis/agent/has-client/163/AB0063"))
+          .willReturn(aResponse().withStatus(FORBIDDEN).withBody("""{"error":"nope"}"""))
+      )
+
+      val ex = connector.hasClient("163", "AB0063").failed.futureValue
+      ex mustBe a[UpstreamErrorResponse]
+      ex.asInstanceOf[UpstreamErrorResponse].statusCode mustBe FORBIDDEN
+    }
+  }
+
 }

@@ -789,8 +789,16 @@ verify.emailAddress.error.length                               = Enter a valid e
 verify.emailAddress.error.invalid                              =  Enter a valid email address in the correct format, like name@example.com
 verify.emailAddress.change.hidden                              = email address
 
-verify.contractorEmailConfirmationNotStored.title               =  Do you want an email confirmation of this verification request?
-verify.contractorEmailConfirmationNotStored.heading             =  Do you want an email confirmation of this verification request?
-verify.contractorEmailConfirmationNotStored.checkYourAnswersLabel =  Do you want confirmation by email?
-verify.contractorEmailConfirmationNotStored.error.required       =  Select yes if you want an email confirmation of this verification request
-verify.contractorEmailConfirmationNotStored.change.hidden        =  do you want confirmation by email?
+verify.contractorEmailConfirmationNotStored.title                               =  Do you want an email confirmation of this verification request?
+verify.contractorEmailConfirmationNotStored.heading                             =  Do you want an email confirmation of this verification request?
+verify.contractorEmailConfirmationNotStored.checkYourAnswersLabel               =  Do you want confirmation by email?
+verify.contractorEmailConfirmationNotStored.error.required                      =  Select yes if you want an email confirmation of this verification request
+verify.contractorEmailConfirmationNotStored.change.hidden                       =  do you want confirmation by email?
+
+verify.verificationDeclaration.title                                            =  Verification declaration
+verify.verificationDeclaration.heading                                          =  Declaration
+verify.verificationDeclaration.p1                                               =  By submitting this verification request, you confirm that:
+verify.verificationDeclaration.list.l1                                          =  a formal arrangement is in place (for example, tender accepted, contract agreed, order placed) for all of the subcontractors to be verified in this request.
+verify.verificationDeclaration.list.l2                                          =  the information given in this verification request is correct and complete to the best of your knowledge and belief.
+verify.verificationDeclaration.warningText                                      =  If you give any false information you may face financial penalties and prosecution.
+verify.verificationDeclaration.confirm                                          =  Confirm
