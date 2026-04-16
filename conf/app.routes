@@ -18,6 +18,8 @@ POST  /verify/change-confirmation-email-not-stored  controllers.verify.Contracto
 
 GET   /verify/submitting-verification-request       controllers.verify.SubmissionSendingController.onPageLoad()
 
+GET   /verification/newest                          controllers.verification.NewestVerificationBatchController.onPageLoad()
+
 # Errors & Auth
 GET  /there-is-a-problem               controllers.JourneyRecoveryController.onPageLoad(continueUrl: Option[RedirectUrl] ?= None)
 

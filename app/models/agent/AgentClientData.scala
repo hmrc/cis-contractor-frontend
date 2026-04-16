@@ -1,5 +1,5 @@
 /*
- * Copyright 2026 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,14 +14,18 @@
  * limitations under the License.
  */
 
-package models.subcontractor
+package models.agent
 
-import play.api.libs.json.{Json, OFormat}
+import play.api.libs.json.*
+import play.api.libs.json.Reads.*
 
-final case class GetSubcontractorUTRsResponse(
-  subcontractorUTRs: Seq[String]
+case class AgentClientData(
+  uniqueId: String,
+  taxOfficeNumber: String,
+  taxOfficeReference: String,
+  schemeName: Option[String]
 )
 
-object GetSubcontractorUTRsResponse {
-  implicit val format: OFormat[GetSubcontractorUTRsResponse] = Json.format[GetSubcontractorUTRsResponse]
+object AgentClientData {
+  implicit val format: Format[AgentClientData] = Json.format[AgentClientData]
 }

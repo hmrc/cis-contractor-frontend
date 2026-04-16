@@ -87,7 +87,7 @@ class TrustWorksReferenceYesNoViewSpec extends AnyWordSpec with Matchers with Gu
       )
 
       val linkHref: String = summary.select("a").attr("href")
-      linkHref mustBe "#value"
+      linkHref mustBe "#value_0"
 
       doc.select(".govuk-error-message").text() must include(
         messages("trustWorksReferenceYesNo.error.required")

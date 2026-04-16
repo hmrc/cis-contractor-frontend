@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package models.subcontractor
+package models.response
 
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
