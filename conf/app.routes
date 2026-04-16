@@ -21,6 +21,11 @@ POST  /verify/verification-declaration              controllers.verify.Verificat
 
 GET   /verify/submitting-verification-request       controllers.verify.SubmissionSendingController.onPageLoad()
 
+GET   /verify/no-new-subcontractors-to-verify                        controllers.verify.VerifyYourSubcontractorsController.onPageLoad(mode: Mode = NormalMode)
+POST  /verify/no-new-subcontractors-to-verify                        controllers.verify.VerifyYourSubcontractorsController.onSubmit(mode: Mode = NormalMode)
+GET   /verify/change-no-new-subcontractors-to-verify                 controllers.verify.VerifyYourSubcontractorsController.onPageLoad(mode: Mode = CheckMode)
+POST  /verify/change-no-new-subcontractors-to-verify                 controllers.verify.VerifyYourSubcontractorsController.onSubmit(mode: Mode = CheckMode)
+
 GET   /verification/newest                          controllers.verification.NewestVerificationBatchController.onPageLoad()
 
 # Errors & Auth

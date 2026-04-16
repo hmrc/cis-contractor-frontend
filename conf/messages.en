@@ -792,3 +792,16 @@ verify.verificationDeclaration.list.l1                                          
 verify.verificationDeclaration.list.l2                                          =  the information given in this verification request is correct and complete to the best of your knowledge and belief.
 verify.verificationDeclaration.warningText                                      =  If you give any false information you may face financial penalties and prosecution.
 verify.verificationDeclaration.confirm                                          =  Confirm
+
+verify.verifyYourSubcontractors.title = No new subcontractors to verify
+verify.verifyYourSubcontractors.heading = Verify your subcontractors
+verify.verifyYourSubcontractors.p1 = There are no unverified subcontractors that you need to verify at the moment.
+verify.verifyYourSubcontractors.p2 = However, you can reverify any of your existing subcontractors to make sure that their tax treatment is correct and up to date.
+verify.verifyYourSubcontractors.p3 = You may want to reverify subcontractors if they:
+verify.verifyYourSubcontractors.list.l1 = have recently changed any of their information
+verify.verifyYourSubcontractors.list.l2 = have not been included on a return recently and have lost their verified status
+verify.verifyYourSubcontractors.list.l3 = are about to lose their verified status
+verify.verifyYourSubcontractors.heading2 = 	Do you want to add existing subcontractors to this verification request?
+verifyYourSubcontractors.checkYourAnswersLabel = Do you want to add existing subcontractors to this verification request?
+verifyYourSubcontractors.error.required = Select yes if you want to add existing subcontractors to this verification request
+verifyYourSubcontractors.change.hidden = do you want to add existing subcontractors to this verification request?
