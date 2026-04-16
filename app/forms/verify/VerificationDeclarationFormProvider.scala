@@ -23,8 +23,8 @@ import play.api.data.Form
 
 class VerificationDeclarationFormProvider @Inject() extends Mappings {
 
-  def apply(): Form[String] =
+  def apply(): Form[Boolean] =
     Form(
-      "value" -> text("verificationDeclaration.error.required")
+      "value" -> boolean("verificationDeclaration.error.required")
     )
 }

@@ -17,10 +17,10 @@
 package controllers.verify
 
 import controllers.actions.*
-import forms.verify.VerificationDeclarationFormProvider
 import models.Mode
 import navigation.Navigator
 import pages.verify.VerificationDeclarationPage
+import forms.verify.VerificationDeclarationFormProvider
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
@@ -52,10 +52,7 @@ class VerificationDeclarationController @Inject() (
   def onSubmit(mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
 
-      val value: String =
-        request.body.asFormUrlEncoded
-          .flatMap(_.get("value").flatMap(_.headOption))
-          .getOrElse("confirmed")
+      val value: Boolean = true // User clicked Confirm
 
       for {
         updatedAnswers <- Future.fromTry(request.userAnswers.set(VerificationDeclarationPage, value))

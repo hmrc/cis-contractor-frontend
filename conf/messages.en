@@ -785,12 +785,10 @@ verify.contractorEmailConfirmationNotStored.checkYourAnswersLabel               
 verify.contractorEmailConfirmationNotStored.error.required                      =  Select yes if you want an email confirmation of this verification request
 verify.contractorEmailConfirmationNotStored.change.hidden                       =  do you want confirmation by email?
 
-verify.verificationDeclaration.title                                            =  Verification declaration - Construction Industry Scheme
+verify.verificationDeclaration.title                                            =  Verification declaration
 verify.verificationDeclaration.heading                                          =  Declaration
-verify.verificationDeclaration.checkYourAnswersLabel                            =  verificationDeclaration
 verify.verificationDeclaration.p1                                               =  By submitting this verification request, you confirm that:
 verify.verificationDeclaration.list.l1                                          =  a formal arrangement is in place (for example, tender accepted, contract agreed, order placed) for all of the subcontractors to be verified in this request.
 verify.verificationDeclaration.list.l2                                          =  the information given in this verification request is correct and complete to the best of your knowledge and belief.
 verify.verificationDeclaration.warningText                                      =  If you give any false information you may face financial penalties and prosecution.
 verify.verificationDeclaration.confirm                                          =  Confirm
-verify.verificationDeclaration.change.hidden                                    =  verificationDeclaration

@@ -28,10 +28,13 @@
         warningInsetText: components.WarningInsetText
 )
 
-@(form: Form[String], mode: Mode)(implicit request: Request[_], messages: Messages)
-@layout(pageTitle = titleNoForm(messages("verificationDeclaration.title"))) {
+@(form: Form[Boolean],  mode: Mode)(implicit request: Request[_], messages: Messages)
+@layout(pageTitle = titleNoForm(messages("verify.verificationDeclaration.title"))) {
 
-    @formHelper(action = controllers.verify.routes.VerificationDeclarationController.onSubmit(mode), Symbol("autoComplete") -> "off") {
+    @formHelper(
+        action = controllers.verify.routes.VerificationDeclarationController.onSubmit(),
+        Symbol("autoComplete") -> "off"
+    ) {
 
         @heading(
             messages("verify.verificationDeclaration.heading")

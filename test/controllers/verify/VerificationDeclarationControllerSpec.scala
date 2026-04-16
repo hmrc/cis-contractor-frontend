@@ -21,11 +21,14 @@ import forms.verify.VerificationDeclarationFormProvider
 import models.NormalMode
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
+import org.scalatest.matchers.must.Matchers._
 import views.html.verify.VerificationDeclarationView
 
 class VerificationDeclarationControllerSpec extends SpecBase {
 
   "VerificationDeclarationController" - {
+
+    val mode = NormalMode
 
     "must return OK and the correct view for a GET" in {
 
@@ -34,13 +37,11 @@ class VerificationDeclarationControllerSpec extends SpecBase {
 
       running(application) {
 
-        val mode = NormalMode
-
         val request =
           FakeRequest(
             GET,
             controllers.verify.routes.VerificationDeclarationController
-              .onPageLoad(mode)
+              .onPageLoad()
               .url
           )
 
@@ -67,13 +68,11 @@ class VerificationDeclarationControllerSpec extends SpecBase {
 
       running(application) {
 
-        val mode = NormalMode
-
         val request =
           FakeRequest(
             POST,
             controllers.verify.routes.VerificationDeclarationController
-              .onSubmit(mode)
+              .onSubmit()
               .url
           )
 
