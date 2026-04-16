@@ -19,6 +19,7 @@ package generators
 import models.*
 import models.contact.ContactOptions
 import models.add.{InternationalAddress, TypeOfSubcontractor}
+import models.verify.ContractorEmailConfirmationStored
 import org.scalacheck.{Arbitrary, Gen}
 import play.api.libs.json.Json
 
@@ -53,6 +54,11 @@ trait ModelGenerators {
   implicit lazy val arbitrarySubcontractorTypes: Arbitrary[TypeOfSubcontractor] =
     Arbitrary {
       Gen.oneOf(TypeOfSubcontractor.values)
+    }
+
+  implicit lazy val arbitraryContractorEmailConfirmationStored: Arbitrary[ContractorEmailConfirmationStored] =
+    Arbitrary {
+      Gen.oneOf(ContractorEmailConfirmationStored.values)
     }
 
   implicit lazy val arbitraryUserAnswers: Arbitrary[UserAnswers] =
