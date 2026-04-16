@@ -20,6 +20,7 @@ GET   /verify/verification-declaration              controllers.verify.Verificat
 POST  /verify/verification-declaration              controllers.verify.VerificationDeclarationController.onSubmit(mode: Mode = NormalMode)
 
 GET   /verify/submitting-verification-request       controllers.verify.SubmissionSendingController.onPageLoad()
+GET   /verify/no-subcontractors-added               controllers.verify.NoSubcontractorsAddedController.onPageLoad()
 
 GET   /verification/newest                          controllers.verification.NewestVerificationBatchController.onPageLoad()
 

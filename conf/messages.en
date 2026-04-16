@@ -302,6 +302,16 @@ verify.contractorEmailConfirmationNotStored.checkYourAnswersLabel        =  Do y
 verify.contractorEmailConfirmationNotStored.error.required               =  Select yes if you want an email confirmation of this verification request
 verify.contractorEmailConfirmationNotStored.change.hidden                =  do you want confirmation by email?
 
+verify.noSubcontractorsAdded.title                                       = No subcontractors added
+verify.noSubcontractorsAdded.heading                                     = Verify your subcontractors
+verify.noSubcontractorsAdded.p1                                          = You don't have any subcontractors at the moment.
+verify.noSubcontractorsAdded.p2                                          = You will need to add some subcontractors first
+verify.noSubcontractorsAdded.p2.link                                     = add some subcontractors first
+verify.noSubcontractorsAdded.p2.end                                      = before you can create a verification request or monthly return.
+verify.noSubcontractorsAdded.p3                                          = Back to
+verify.noSubcontractorsAdded.p3.link                                     = Manage your subcontractors
+
+
 # Partnership
 partnershipWorksReferenceNumberYesNo.title                           =  Does this partnership have a works reference number?
 partnershipWorksReferenceNumberYesNo.heading                         =  Does {0} have a works reference number?
