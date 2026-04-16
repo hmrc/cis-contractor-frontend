@@ -79,7 +79,7 @@ class NationalInsuranceNumberYesNoViewSpec extends AnyWordSpec with Matchers wit
       val summary: Elements = doc.select(".govuk-error-summary")
       summary.text() must include(messages("nationalInsuranceNumberYesNo.error.required"))
 
-      summary.select("a").attr("href") mustBe "#value"
+      summary.select("a").attr("href") mustBe "#value_0"
 
       doc.select(".govuk-error-message").text() must include(messages("nationalInsuranceNumberYesNo.error.required"))
     }

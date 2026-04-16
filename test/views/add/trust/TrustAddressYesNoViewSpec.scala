@@ -76,7 +76,7 @@ class TrustAddressYesNoViewSpec extends AnyWordSpec with Matchers with GuiceOneA
 
       val summary = doc.select(".govuk-error-summary")
       summary.text() must include(messages("trustAddressYesNo.error.required"))
-      summary.select("a").attr("href") mustBe "#value"
+      summary.select("a").attr("href") mustBe "#value_0"
 
       doc.select(".govuk-error-message").text() must include(messages("trustAddressYesNo.error.required"))
     }
