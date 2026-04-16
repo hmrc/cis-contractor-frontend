@@ -293,6 +293,9 @@ individualChooseContactDetails.error.required                            =  Sele
 individualChooseContactDetails.checkYourAnswersLabel                     =  Method of contact
 individualChooseContactDetails.change.hidden                             =  method of contact
 
+verify.submissionSending.title                                           =  Submitting your verification request
+verify.submissionSending.heading                                         =  Your verification request is being sent to HMRC
+verify.submissionSending.paragraph                                       =  Do not refresh this page or press the back button while your submission is being processed.
 verify.contractorEmailConfirmationNotStored.title                        =  Do you want an email confirmation of this verification request?
 verify.contractorEmailConfirmationNotStored.heading                      =  Do you want an email confirmation of this verification request?
 verify.contractorEmailConfirmationNotStored.checkYourAnswersLabel        =  Do you want confirmation by email?
