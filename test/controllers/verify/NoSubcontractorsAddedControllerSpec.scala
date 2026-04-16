@@ -28,7 +28,7 @@ class NoSubcontractorsAddedControllerSpec extends SpecBase {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application          = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
       val addSubcontractorsUrl = controllers.add.routes.TypeOfSubcontractorController.onPageLoad(NormalMode).url
 
       running(application) {
@@ -39,7 +39,11 @@ class NoSubcontractorsAddedControllerSpec extends SpecBase {
         val view = application.injector.instanceOf[NoSubcontractorsAddedView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(addSubcontractorsUrl)(request, applicationConfig, messages(application)).toString
+        contentAsString(result) mustEqual view(addSubcontractorsUrl)(
+          request,
+          applicationConfig,
+          messages(application)
+        ).toString
       }
     }
   }

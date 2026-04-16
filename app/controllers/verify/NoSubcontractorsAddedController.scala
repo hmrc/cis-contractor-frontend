@@ -26,17 +26,18 @@ import views.html.verify.NoSubcontractorsAddedView
 
 import javax.inject.Inject
 
-class NoSubcontractorsAddedController @Inject()(
-                                       override val messagesApi: MessagesApi,
-                                       identify: IdentifierAction,
-                                       getData: DataRetrievalAction,
-                                       requireData: DataRequiredAction,
-                                       val controllerComponents: MessagesControllerComponents,
-                                       view: NoSubcontractorsAddedView
-                                     )(implicit appConfig: FrontendAppConfig) extends FrontendBaseController with I18nSupport {
+class NoSubcontractorsAddedController @Inject() (
+  override val messagesApi: MessagesApi,
+  identify: IdentifierAction,
+  getData: DataRetrievalAction,
+  requireData: DataRequiredAction,
+  val controllerComponents: MessagesControllerComponents,
+  view: NoSubcontractorsAddedView
+)(implicit appConfig: FrontendAppConfig)
+    extends FrontendBaseController
+    with I18nSupport {
 
-  def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData) {
-    implicit request =>
-      Ok(view(controllers.add.routes.TypeOfSubcontractorController.onPageLoad(NormalMode).url))
+  def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
+    Ok(view(controllers.add.routes.TypeOfSubcontractorController.onPageLoad(NormalMode).url))
   }
 }
