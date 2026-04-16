@@ -37,9 +37,9 @@ class VerificationDeclarationViewSpec extends SpecBase {
         implicit val request = FakeRequest()
         implicit val msgs    = messages(application)
 
-        val view = application.injector.instanceOf[VerificationDeclarationView]
+        val view                = application.injector.instanceOf[VerificationDeclarationView]
         val form: Form[Boolean] = application.injector.instanceOf[VerificationDeclarationFormProvider].apply()
-        val mode: Mode = NormalMode
+        val mode: Mode          = NormalMode
 
         val html = view(form, mode)
         val doc  = Jsoup.parse(html.toString)
