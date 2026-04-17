@@ -23,6 +23,7 @@
     govukRadios: GovukRadios,
     govukButton: GovukButton,
     heading: H1,
+    bulletList: BulletList,
     paragraph: Paragraph
 )
 
@@ -33,17 +34,24 @@
     @formHelper(action = controllers.verify.routes.VerifyYourSubcontractorsController.onSubmit(mode), Symbol("autoComplete") -> "off") {
 
         @if(form.errors.nonEmpty) {
-            @govukErrorSummary(ErrorSummaryViewModel(form))
+            @govukErrorSummary(ErrorSummaryViewModel(form, errorLinkOverrides = Map("value" -> "value_0")))
         }
 
-@heading(messages("verify.verifyYourSubcontractors.heading"), classes = "govuk-heading-xl")
-@paragraph(messages("verify.verifyYourSubcontractors.p1"))
-@paragraph(messages("verify.verifyYourSubcontractors.p2"))
-@paragraph(messages("verify.verifyYourSubcontractors.p3"))
+        @heading(messages("verify.verifyYourSubcontractors.heading"))
+        @paragraph(messages("verify.verifyYourSubcontractors.p1"))
+        @paragraph(messages("verify.verifyYourSubcontractors.p2"))
+        @paragraph(messages("verify.verifyYourSubcontractors.p3"))
+
+        @bulletList(Seq(
+            messages("verify.verifyYourSubcontractors.list.l1"),
+            messages("verify.verifyYourSubcontractors.list.l2"),
+            messages("verify.verifyYourSubcontractors.list.l3")
+        ))
+
         @govukRadios(
             RadiosViewModel.yesNo(
                 field = form("value"),
-                legend = LegendViewModel(messages("verify.verifyYourSubcontractors.heading2"))
+                legend = LegendViewModel(messages("verify.verifyYourSubcontractors.heading2")).withCssClass("govuk-fieldset__legend--m")
             )
         )
 
