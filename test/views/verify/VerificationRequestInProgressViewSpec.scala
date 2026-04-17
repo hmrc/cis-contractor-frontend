@@ -67,7 +67,7 @@ class VerificationRequestInProgressViewSpec extends AnyWordSpec with Matchers wi
       )
 
       val serviceDeskLink =
-        doc.select(s"a[href='${appConfig.hmrcOnlineServiceDeskUrl}']")
+        doc.select(s"a[href='${appConfig.cisGeneralEnquiries}']")
       serviceDeskLink.size() mustBe 1
       serviceDeskLink.text() mustBe
         messages("verify.verificationRequestInProgress.p3.link")
