@@ -16,7 +16,7 @@
 
 package views.verify
 
-import forms.verify.VerifyYourSubcontractorsFormProvider
+import forms.verify.VerifyYourSubcontractorsYesNoFormProvider
 import models.NormalMode
 import org.jsoup.Jsoup
 import org.scalatest.matchers.must.Matchers
@@ -26,9 +26,9 @@ import play.api.data.Form
 import play.api.i18n.{Lang, Messages, MessagesApi, MessagesImpl}
 import play.api.mvc.Request
 import play.api.test.FakeRequest
-import views.html.verify.VerifyYourSubcontractorsView
+import views.html.verify.VerifyYourSubcontractorsYesNoView
 
-class VerifyYourSubcontractorsViewSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite {
+class VerifyYourSubcontractorsYesNoViewSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite {
 
   "VerifyYourSubcontractorsView" should {
 
@@ -38,26 +38,26 @@ class VerifyYourSubcontractorsViewSpec extends AnyWordSpec with Matchers with Gu
       val doc  = Jsoup.parse(html.toString())
 
       doc.select("title").text() must include(
-        messages("verifyYourSubcontractors.title")
+        messages("verify.verifyYourSubcontractorsYesNo.title")
       )
 
       doc.select("h1").text() mustBe
-        messages("verify.verifyYourSubcontractors.heading")
+        messages("verify.verifyYourSubcontractorsYesNo.heading")
 
       doc.select("p.govuk-body").text() must include(
-        messages("verify.verifyYourSubcontractors.p1")
+        messages("verify.verifyYourSubcontractorsYesNo.p1")
       )
       doc.select("p.govuk-body").text() must include(
-        messages("verify.verifyYourSubcontractors.p2")
+        messages("verify.verifyYourSubcontractorsYesNo.p2")
       )
       doc.select("p.govuk-body").text() must include(
-        messages("verify.verifyYourSubcontractors.p3")
+        messages("verify.verifyYourSubcontractorsYesNo.p3")
       )
 
       val bullets = doc.select("ul.govuk-list--bullet li").eachText()
-      bullets must contain(messages("verify.verifyYourSubcontractors.list.l1"))
-      bullets must contain(messages("verify.verifyYourSubcontractors.list.l2"))
-      bullets must contain(messages("verify.verifyYourSubcontractors.list.l3"))
+      bullets must contain(messages("verify.verifyYourSubcontractorsYesNo.list.l1"))
+      bullets must contain(messages("verify.verifyYourSubcontractorsYesNo.list.l2"))
+      bullets must contain(messages("verify.verifyYourSubcontractorsYesNo.list.l3"))
 
       doc.select(".govuk-radios__input").size() mustBe 2
 
@@ -66,7 +66,7 @@ class VerifyYourSubcontractorsViewSpec extends AnyWordSpec with Matchers with Gu
       labels must contain("No")
 
       doc.select("form").attr("action") mustBe
-        controllers.verify.routes.VerifyYourSubcontractorsController
+        controllers.verify.routes.VerifyYourSubcontractorsYesNoController
           .onSubmit(NormalMode)
           .url
 
@@ -79,20 +79,20 @@ class VerifyYourSubcontractorsViewSpec extends AnyWordSpec with Matchers with Gu
     "display error summary and inline error when no option is selected" in new Setup {
 
       val errorForm =
-        form.withError("value", "verify.verifyYourSubcontractors.error.required")
+        form.withError("value", "verify.verifyYourSubcontractorsYesNo.error.required")
 
       val html = view(errorForm, NormalMode)
       val doc  = Jsoup.parse(html.toString())
 
       val errorSummary = doc.select(".govuk-error-summary")
       errorSummary.text() must include(
-        messages("verify.verifyYourSubcontractors.error.required")
+        messages("verify.verifyYourSubcontractorsYesNo.error.required")
       )
 
       errorSummary.select("a").attr("href") mustBe "#value_0"
 
       doc.select(".govuk-error-message").text() must include(
-        messages("verify.verifyYourSubcontractors.error.required")
+        messages("verify.verifyYourSubcontractorsYesNo.error.required")
       )
     }
   }
@@ -100,7 +100,7 @@ class VerifyYourSubcontractorsViewSpec extends AnyWordSpec with Matchers with Gu
   trait Setup {
 
     private val formProvider =
-      new VerifyYourSubcontractorsFormProvider()
+      new VerifyYourSubcontractorsYesNoFormProvider()
 
     val form: Form[Boolean] =
       formProvider()
@@ -114,7 +114,7 @@ class VerifyYourSubcontractorsViewSpec extends AnyWordSpec with Matchers with Gu
         app.injector.instanceOf[MessagesApi]
       )
 
-    val view: VerifyYourSubcontractorsView =
-      app.injector.instanceOf[VerifyYourSubcontractorsView]
+    val view: VerifyYourSubcontractorsYesNoView =
+      app.injector.instanceOf[VerifyYourSubcontractorsYesNoView]
   }
 }

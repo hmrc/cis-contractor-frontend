@@ -18,31 +18,31 @@ package controllers.verify
 
 import base.SpecBase
 import controllers.routes
-import forms.verify.VerifyYourSubcontractorsFormProvider
+import forms.verify.VerifyYourSubcontractorsYesNoFormProvider
 import models.{NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.verify.VerifyYourSubcontractorsPage
+import pages.verify.VerifyYourSubcontractorsYesNoPage
 import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import repositories.SessionRepository
-import views.html.verify.VerifyYourSubcontractorsView
+import views.html.verify.VerifyYourSubcontractorsYesNoView
 
 import scala.concurrent.Future
 
-class VerifyYourSubcontractorsControllerSpec extends SpecBase with MockitoSugar {
+class VerifyYourSubcontractorsYesNoControllerSpec extends SpecBase with MockitoSugar {
 
   def onwardRoute = Call("GET", "/foo")
 
-  val formProvider = new VerifyYourSubcontractorsFormProvider()
+  val formProvider = new VerifyYourSubcontractorsYesNoFormProvider()
   private val form = formProvider()
 
   private lazy val verifyYourSubcontractorsRoute =
-    controllers.verify.routes.VerifyYourSubcontractorsController.onPageLoad(NormalMode).url
+    controllers.verify.routes.VerifyYourSubcontractorsYesNoController.onPageLoad(NormalMode).url
 
   "VerifyYourSubcontractors Controller" - {
 
@@ -55,7 +55,7 @@ class VerifyYourSubcontractorsControllerSpec extends SpecBase with MockitoSugar 
 
         val result = route(application, request).value
 
-        val view = application.injector.instanceOf[VerifyYourSubcontractorsView]
+        val view = application.injector.instanceOf[VerifyYourSubcontractorsYesNoView]
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
@@ -64,14 +64,14 @@ class VerifyYourSubcontractorsControllerSpec extends SpecBase with MockitoSugar 
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = UserAnswers(userAnswersId).set(VerifyYourSubcontractorsPage, true).success.value
+      val userAnswers = UserAnswers(userAnswersId).set(VerifyYourSubcontractorsYesNoPage, true).success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
       running(application) {
         val request = FakeRequest(GET, verifyYourSubcontractorsRoute)
 
-        val view = application.injector.instanceOf[VerifyYourSubcontractorsView]
+        val view = application.injector.instanceOf[VerifyYourSubcontractorsYesNoView]
 
         val result = route(application, request).value
 
@@ -117,7 +117,7 @@ class VerifyYourSubcontractorsControllerSpec extends SpecBase with MockitoSugar 
 
         val boundForm = form.bind(Map("value" -> ""))
 
-        val view = application.injector.instanceOf[VerifyYourSubcontractorsView]
+        val view = application.injector.instanceOf[VerifyYourSubcontractorsYesNoView]
 
         val result = route(application, request).value
 

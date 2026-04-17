@@ -17,28 +17,28 @@
 package viewmodels.checkAnswers.verify
 
 import models.{CheckMode, UserAnswers}
-import pages.verify.VerifyYourSubcontractorsPage
+import pages.verify.VerifyYourSubcontractorsYesNoPage
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
 
-object VerifyYourSubcontractorsSummary {
+object VerifyYourSubcontractorsYesNoSummary {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(VerifyYourSubcontractorsPage).map { answer =>
+    answers.get(VerifyYourSubcontractorsYesNoPage).map { answer =>
 
       val value = if (answer) "site.yes" else "site.no"
 
       SummaryListRowViewModel(
-        key = "verify.verifyYourSubcontractors.checkYourAnswersLabel",
+        key = "verify.verifyYourSubcontractorsYesNo.checkYourAnswersLabel",
         value = ValueViewModel(value),
         actions = Seq(
           ActionItemViewModel(
             "site.change",
-            controllers.verify.routes.VerifyYourSubcontractorsController.onPageLoad(CheckMode).url
+            controllers.verify.routes.VerifyYourSubcontractorsYesNoController.onPageLoad(CheckMode).url
           )
-            .withVisuallyHiddenText(messages("verify.verifyYourSubcontractors.change.hidden"))
+            .withVisuallyHiddenText(messages("verify.verifyYourSubcontractorsYesNo.change.hidden"))
         )
       )
     }

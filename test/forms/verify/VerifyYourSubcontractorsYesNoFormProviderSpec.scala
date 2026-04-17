@@ -16,15 +16,30 @@
 
 package forms.verify
 
-import forms.mappings.Mappings
-import play.api.data.Form
+import forms.behaviours.BooleanFieldBehaviours
+import play.api.data.FormError
 
-import javax.inject.Inject
+class VerifyYourSubcontractorsYesNoFormProviderSpec extends BooleanFieldBehaviours {
 
-class VerifyYourSubcontractorsFormProvider @Inject() extends Mappings {
+  val requiredKey = "verify.verifyYourSubcontractorsYesNo.error.required"
+  val invalidKey  = "error.boolean"
 
-  def apply(): Form[Boolean] =
-    Form(
-      "value" -> boolean("verify.verifyYourSubcontractors.error.required")
+  val form = new VerifyYourSubcontractorsYesNoFormProvider()()
+
+  ".value" - {
+
+    val fieldName = "value"
+
+    behave like booleanField(
+      form,
+      fieldName,
+      invalidError = FormError(fieldName, invalidKey)
     )
+
+    behave like mandatoryField(
+      form,
+      fieldName,
+      requiredError = FormError(fieldName, requiredKey)
+    )
+  }
 }
