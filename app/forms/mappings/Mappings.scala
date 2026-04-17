@@ -16,8 +16,9 @@
 
 package forms.mappings
 
+import forms.Validation
 import models.Enumerable
-import play.api.data.FieldMapping
+import play.api.data.{FieldMapping, Mapping}
 import play.api.data.Forms.of
 import play.api.i18n.Messages
 
@@ -72,4 +73,14 @@ trait Mappings extends Formatters with Constraints {
 
   protected def utr(requiredKey: String, invalidKey: String, lengthKey: String): FieldMapping[String] =
     of(utrFormatter(requiredKey, invalidKey, lengthKey))
+
+  protected def emailAddress(requiredKey: String, lengthKey: String, invalidKey: String): Mapping[String] =
+    text(requiredKey)
+      .transform(_.trim, identity)
+      .verifying(
+        firstError(
+          maxLength(Constants.MaxLength254, lengthKey),
+          regexp(Validation.emailRegex, invalidKey)
+        )
+      )
 }

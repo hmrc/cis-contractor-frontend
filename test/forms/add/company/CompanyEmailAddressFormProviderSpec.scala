@@ -40,7 +40,9 @@ class CompanyEmailAddressFormProviderSpec extends StringFieldBehaviours {
       Gen.oneOf(
         "test@test.com",
         "user123@example.co.uk",
-        "firstname.lastname@test-domain.com"
+        "firstname.lastname@test-domain.com",
+        "x+tag@mail.org",
+        "a@b.cd"
       )
     )
 
