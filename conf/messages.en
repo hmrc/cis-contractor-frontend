@@ -779,6 +779,16 @@ trustCheckYourAnswers.trailHeading                             =  Now add this s
 trustCheckYourAnswers.trailText                                =  By adding this subcontractor you are confirming that, to the best of your knowledge, the details you are providing are correct.
 trustCheckYourAnswers.continue                                 =  Accept and submit
 
+verify.emailAddress.title                                      = What email address should HMRC send this confirmation to?
+verify.emailAddress.heading                                    = What email address should HMRC send this confirmation to?
+verify.emailAddress.hint                                       = HMRC will only use this email address to confirm this verification request. Your saved email address will not be changed.
+verify.emailAddress.hint.notStored                             = HMRC will only use this email address to confirm this verification request
+verify.emailAddress.checkYourAnswersLabel                      = Email Address
+verify.emailAddress.error.required                             = Enter an email address in the correct format, like name@example.com
+verify.emailAddress.error.length                               = Enter a valid email address in the correct format, like name@example.com, up to 254 characters
+verify.emailAddress.error.invalid                              =  Enter a valid email address in the correct format, like name@example.com
+verify.emailAddress.change.hidden                              = email address
+
 verify.contractorEmailConfirmationNotStored.title                               =  Do you want an email confirmation of this verification request?
 verify.contractorEmailConfirmationNotStored.heading                             =  Do you want an email confirmation of this verification request?
 verify.contractorEmailConfirmationNotStored.checkYourAnswersLabel               =  Do you want confirmation by email?

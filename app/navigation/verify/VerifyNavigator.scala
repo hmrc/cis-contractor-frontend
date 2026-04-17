@@ -17,37 +17,38 @@
 package navigation.verify
 
 import controllers.routes
-import jakarta.inject.Singleton
 import models.{CheckMode, Mode, NormalMode, UserAnswers}
 import navigation.NavigatorForJourney
 import pages.Page
-import pages.verify.ContractorEmailConfirmationNotStoredPage
+import pages.verify.*
 import play.api.mvc.Call
 
-import javax.inject.Inject
+import javax.inject.{Inject, Singleton}
 
 @Singleton
 class VerifyNavigator @Inject() () extends NavigatorForJourney {
 
-  override def nextPage(page: Page, mode: Mode, userAnswers: models.UserAnswers): Call = mode match {
+  override def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers): Call = mode match {
     case NormalMode =>
       normalRoutes(page)(userAnswers)
     case CheckMode  =>
       checkRouteMap(page)(userAnswers)
   }
 
-  private def normalRoutes: Page => UserAnswers => Call = {
-
+  private val normalRoutes: Page => UserAnswers => Call = {
     case ContractorEmailConfirmationNotStoredPage =>
       userAnswers => navigatorFromContractorEmailConfirmationNotStoredPage(NormalMode)(userAnswers)
-    case _                                        => _ => controllers.routes.JourneyRecoveryController.onPageLoad()
+    case EmailAddressPage                         =>
+      _ => controllers.verify.routes.EmailAddressController.onPageLoad(NormalMode)
+    case _                                        => _ => routes.IndexController.onPageLoad()
   }
 
-  private def checkRouteMap: Page => UserAnswers => Call = {
+  private val checkRouteMap: Page => UserAnswers => Call = {
     case ContractorEmailConfirmationNotStoredPage =>
       userAnswers => navigatorFromContractorEmailConfirmationNotStoredPage(CheckMode)(userAnswers)
-    case _                                        => _ => controllers.routes.JourneyRecoveryController.onPageLoad()
-
+    case EmailAddressPage                         =>
+      _ => controllers.verify.routes.EmailAddressController.onPageLoad(CheckMode)
+    case _                                        => _ => controllers.add.routes.CheckYourAnswersController.onPageLoad()
   }
 
   private def navigatorFromContractorEmailConfirmationNotStoredPage(mode: Mode)(ua: UserAnswers): Call =
