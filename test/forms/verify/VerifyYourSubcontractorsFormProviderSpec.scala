@@ -21,7 +21,7 @@ import play.api.data.FormError
 
 class VerifyYourSubcontractorsFormProviderSpec extends BooleanFieldBehaviours {
 
-  val requiredKey = "verifyYourSubcontractors.error.required"
+  val requiredKey = "verify.verifyYourSubcontractors.error.required"
   val invalidKey  = "error.boolean"
 
   val form = new VerifyYourSubcontractorsFormProvider()()

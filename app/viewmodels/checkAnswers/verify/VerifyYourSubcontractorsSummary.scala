@@ -31,14 +31,14 @@ object VerifyYourSubcontractorsSummary {
       val value = if (answer) "site.yes" else "site.no"
 
       SummaryListRowViewModel(
-        key = "verifyYourSubcontractors.checkYourAnswersLabel",
+        key = "verify.verifyYourSubcontractors.checkYourAnswersLabel",
         value = ValueViewModel(value),
         actions = Seq(
           ActionItemViewModel(
             "site.change",
             controllers.verify.routes.VerifyYourSubcontractorsController.onPageLoad(CheckMode).url
           )
-            .withVisuallyHiddenText(messages("verifyYourSubcontractors.change.hidden"))
+            .withVisuallyHiddenText(messages("verify.verifyYourSubcontractors.change.hidden"))
         )
       )
     }
