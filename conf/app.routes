@@ -23,6 +23,8 @@ GET   /verify/submitting-verification-request       controllers.verify.Submissio
 
 GET   /verification/newest                          controllers.verification.NewestVerificationBatchController.onPageLoad()
 
+GET   /verify/verification-request-in-progress     controllers.verify.VerificationRequestInProgressController.onPageLoad()
+
 # Errors & Auth
 GET  /there-is-a-problem               controllers.JourneyRecoveryController.onPageLoad(continueUrl: Option[RedirectUrl] ?= None)
 
