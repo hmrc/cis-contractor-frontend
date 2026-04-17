@@ -14,17 +14,18 @@
  * limitations under the License.
  */
 
-package forms.verify
+package pages.verify
 
-import forms.mappings.Mappings
-import play.api.data.Form
+import pages.behaviours.PageBehaviours
 
-import javax.inject.Inject
+class VerifyYourSubcontractorsPageSpec extends PageBehaviours {
 
-class VerifyYourSubcontractorsFormProvider @Inject() extends Mappings {
+  "VerifyYourSubcontractorsPage" - {
 
-  def apply(): Form[Boolean] =
-    Form(
-      "value" -> boolean("verify.verifyYourSubcontractors.error.required")
-    )
+    beRetrievable[Boolean](VerifyYourSubcontractorsPage)
+
+    beSettable[Boolean](VerifyYourSubcontractorsPage)
+
+    beRemovable[Boolean](VerifyYourSubcontractorsPage)
+  }
 }

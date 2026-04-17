@@ -48,7 +48,7 @@ class VerifyYourSubcontractorsSummarySpec extends AnyFreeSpec with Matchers {
       val row = maybeRow.value
 
       val expectedKeyText =
-        messages("verifyYourSubcontractors.checkYourAnswersLabel")
+        messages("verify.verifyYourSubcontractors.checkYourAnswersLabel")
       row.key.content.asHtml.toString should include(expectedKeyText)
 
       val expectedValue =
@@ -68,7 +68,7 @@ class VerifyYourSubcontractorsSummarySpec extends AnyFreeSpec with Matchers {
           .onPageLoad(CheckMode)
           .url
       val expectedHiddenText =
-        messages("verifyYourSubcontractors.change.hidden")
+        messages("verify.verifyYourSubcontractors.change.hidden")
 
       changeAction.content.asHtml.toString    should include(expectedChangeText)
       changeAction.href                     shouldBe expectedHref
