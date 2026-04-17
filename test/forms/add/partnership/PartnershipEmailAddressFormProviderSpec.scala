@@ -16,10 +16,11 @@
 
 package forms.add.partnership
 
+import forms.Validation
 import forms.behaviours.StringFieldBehaviours
-import play.api.data.FormError
-import org.scalacheck.Gen
 import forms.mappings.Constants
+import org.scalacheck.Gen
+import play.api.data.FormError
 
 class PartnershipEmailAddressFormProviderSpec extends StringFieldBehaviours {
 
@@ -41,7 +42,8 @@ class PartnershipEmailAddressFormProviderSpec extends StringFieldBehaviours {
         "test@example.com",
         "name.surname@test.co.uk",
         "a@b.cd",
-        "user123@test-domain.com"
+        "user123@test-domain.com",
+        "x+tag@mail.org"
       )
     )
 
@@ -56,6 +58,19 @@ class PartnershipEmailAddressFormProviderSpec extends StringFieldBehaviours {
       form,
       fieldName,
       requiredError = FormError(fieldName, requiredKey)
+    )
+
+    behave like fieldWithRegexpWithGenerator(
+      form,
+      fieldName,
+      regexp = Validation.emailRegex,
+      generator = stringsWithMaxLength(maxLength)
+        .suchThat(str =>
+          str.nonEmpty &&
+            str.length <= maxLength &&
+            !str.matches(Validation.emailRegex)
+        ),
+      error = FormError(fieldName, invalidKey, Seq(Validation.emailRegex))
     )
   }
 }

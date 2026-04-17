@@ -22,7 +22,8 @@ import uk.gov.hmrc.domain.Nino
 object Validation {
 
   final val companyRegNumberRegex = """(?i)^(?:[A-Z]{2}\d{6}|\d{8})$"""
-  final val emailRegex            = """^[A-Za-z0-9!#$%&*+-/=?^_`{|}~.]+@[A-Za-z0-9!#$%&*+-/=?^_`{|}~.]+$"""
+  final val emailRegex            =
+    """^[A-Za-z0-9!#$%&'*+\-/=?^_`{|}~.]+@[A-Za-z0-9]([A-Za-z0-9\-]*[A-Za-z0-9])?(\.[A-Za-z0-9]([A-Za-z0-9\-]*[A-Za-z0-9])?)*\.[A-Za-z]{2,}$"""
   final val nameRegex             = """^[A-Za-z0-9"~!@#\$%*+:\;=\?\s,\.\[\]_\\\{\}\(\)/&'\-\^\u00A3\u20AC]+$"""
   final val worksRefRegex         = """^[A-Za-z0-9 ~!@#$%&'()*+,-./:;=?_{}£€]+$"""
   final val mobileRegex           = """^(?=(?:.*\d){6,})[0-9()+\- ]*$"""
