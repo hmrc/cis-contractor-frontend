@@ -17,29 +17,29 @@
 package controllers.verify
 
 import controllers.actions.*
-import forms.verify.VerifyYourSubcontractorsFormProvider
+import forms.verify.VerifyYourSubcontractorsYesNoFormProvider
 import models.Mode
 import navigation.Navigator
-import pages.verify.VerifyYourSubcontractorsPage
+import pages.verify.VerifyYourSubcontractorsYesNoPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.verify.VerifyYourSubcontractorsView
+import views.html.verify.VerifyYourSubcontractorsYesNoView
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class VerifyYourSubcontractorsController @Inject() (
+class VerifyYourSubcontractorsYesNoController @Inject() (
   override val messagesApi: MessagesApi,
   sessionRepository: SessionRepository,
   navigator: Navigator,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
-  formProvider: VerifyYourSubcontractorsFormProvider,
+  formProvider: VerifyYourSubcontractorsYesNoFormProvider,
   val controllerComponents: MessagesControllerComponents,
-  view: VerifyYourSubcontractorsView
+  view: VerifyYourSubcontractorsYesNoView
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport {
@@ -48,7 +48,7 @@ class VerifyYourSubcontractorsController @Inject() (
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
 
-    val preparedForm = request.userAnswers.get(VerifyYourSubcontractorsPage) match {
+    val preparedForm = request.userAnswers.get(VerifyYourSubcontractorsYesNoPage) match {
       case None        => form
       case Some(value) => form.fill(value)
     }
@@ -64,9 +64,9 @@ class VerifyYourSubcontractorsController @Inject() (
           formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
           value =>
             for {
-              updatedAnswers <- Future.fromTry(request.userAnswers.set(VerifyYourSubcontractorsPage, value))
+              updatedAnswers <- Future.fromTry(request.userAnswers.set(VerifyYourSubcontractorsYesNoPage, value))
               _              <- sessionRepository.set(updatedAnswers)
-            } yield Redirect(navigator.nextPage(VerifyYourSubcontractorsPage, mode, updatedAnswers))
+            } yield Redirect(navigator.nextPage(VerifyYourSubcontractorsYesNoPage, mode, updatedAnswers))
         )
   }
 }
