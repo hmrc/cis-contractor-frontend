@@ -51,7 +51,7 @@ class VerificationRequestInProgressViewSpec extends AnyWordSpec with Matchers wi
       val doc  = Jsoup.parse(html.toString())
 
       doc.select("title").text() must include(
-        messages("verificationRequestInProgress.title")
+        messages("verify.verificationRequestInProgress.title")
       )
 
       doc.select("h1").size() mustBe 1
