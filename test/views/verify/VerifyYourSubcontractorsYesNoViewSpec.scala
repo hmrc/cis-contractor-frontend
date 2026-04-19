@@ -17,7 +17,6 @@
 package views.verify
 
 import forms.verify.VerifyYourSubcontractorsYesNoFormProvider
-import models.NormalMode
 import org.jsoup.Jsoup
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
@@ -34,7 +33,7 @@ class VerifyYourSubcontractorsYesNoViewSpec extends AnyWordSpec with Matchers wi
 
     "render the page with title, heading, paragraphs, bullet list, radios and continue button" in new Setup {
 
-      val html = view(form, NormalMode)
+      val html = view(form)
       val doc  = Jsoup.parse(html.toString())
 
       doc.select("title").text() must include(
@@ -66,9 +65,7 @@ class VerifyYourSubcontractorsYesNoViewSpec extends AnyWordSpec with Matchers wi
       labels must contain("No")
 
       doc.select("form").attr("action") mustBe
-        controllers.verify.routes.VerifyYourSubcontractorsYesNoController
-          .onSubmit(NormalMode)
-          .url
+        controllers.verify.routes.VerifyYourSubcontractorsYesNoController.onSubmit.url
 
       doc.select("form").attr("autocomplete") mustBe "off"
 
@@ -81,7 +78,7 @@ class VerifyYourSubcontractorsYesNoViewSpec extends AnyWordSpec with Matchers wi
       val errorForm =
         form.withError("value", "verify.verifyYourSubcontractorsYesNo.error.required")
 
-      val html = view(errorForm, NormalMode)
+      val html = view(errorForm)
       val doc  = Jsoup.parse(html.toString())
 
       val errorSummary = doc.select(".govuk-error-summary")

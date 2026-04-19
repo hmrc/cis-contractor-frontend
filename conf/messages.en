@@ -802,6 +802,4 @@ verify.verifyYourSubcontractorsYesNo.list.l1                                    
 verify.verifyYourSubcontractorsYesNo.list.l2                                    = have not been included on a return recently and have lost their verified status
 verify.verifyYourSubcontractorsYesNo.list.l3                                    = are about to lose their verified status
 verify.verifyYourSubcontractorsYesNo.heading2                                   = Do you want to add existing subcontractors to this verification request?
-verify.verifyYourSubcontractorsYesNo.checkYourAnswersLabel                      = Do you want to add existing subcontractors to this verification request?
 verify.verifyYourSubcontractorsYesNo.error.required                             = Select yes if you want to add existing subcontractors to this verification request
-verify.verifyYourSubcontractorsYesNo.change.hidden                              = do you want to add existing subcontractors to this verification request?

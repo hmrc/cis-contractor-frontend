@@ -19,7 +19,7 @@ package controllers.verify
 import base.SpecBase
 import controllers.routes
 import forms.verify.VerifyYourSubcontractorsYesNoFormProvider
-import models.{NormalMode, UserAnswers}
+import models.UserAnswers
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
@@ -42,7 +42,7 @@ class VerifyYourSubcontractorsYesNoControllerSpec extends SpecBase with MockitoS
   private val form = formProvider()
 
   private lazy val verifyYourSubcontractorsRoute =
-    controllers.verify.routes.VerifyYourSubcontractorsYesNoController.onPageLoad(NormalMode).url
+    controllers.verify.routes.VerifyYourSubcontractorsYesNoController.onPageLoad.url
 
   "VerifyYourSubcontractors Controller" - {
 
@@ -58,7 +58,7 @@ class VerifyYourSubcontractorsYesNoControllerSpec extends SpecBase with MockitoS
         val view = application.injector.instanceOf[VerifyYourSubcontractorsYesNoView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form)(request, messages(application)).toString
       }
     }
 
@@ -76,7 +76,7 @@ class VerifyYourSubcontractorsYesNoControllerSpec extends SpecBase with MockitoS
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(true), NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill(true))(request, messages(application)).toString
       }
     }
 
@@ -122,7 +122,7 @@ class VerifyYourSubcontractorsYesNoControllerSpec extends SpecBase with MockitoS
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm)(request, messages(application)).toString
       }
     }
 
