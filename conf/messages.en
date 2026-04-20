@@ -799,7 +799,7 @@ verify.contractorEmailConfirmationStored.or                        =  or
 verify.contractorEmailConfirmationStored.doNotSend                 =  Do not send an email confirmation
 verify.contractorEmailConfirmationStored.checkYourAnswersLabel     =  Do you want confirmation by email?
 verify.contractorEmailConfirmationStored.error.required            =  Select whether you want an email confirmation of this verification request
-verify.contractorEmailConfirmationStored.change.hidden             =  whether you want an email confirmation
+verify.contractorEmailConfirmationStored.change.hidden             =  do you want confirmation by email?
 
 verify.verificationDeclaration.title                               =  Verification declaration
 verify.verificationDeclaration.heading                             =  Declaration
