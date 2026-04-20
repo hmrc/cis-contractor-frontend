@@ -73,7 +73,7 @@ class VerifyNavigatorSpec extends SpecBase {
             .onPageLoad(NormalMode)
             .url
       }
-      
+
       "must go from ContractorEmailConfirmationStoredPage to JourneyRecovery when answer is CurrentEmail" in {
         val ua = emptyUserAnswers.setOrException(
           ContractorEmailConfirmationStoredPage,
@@ -144,7 +144,7 @@ class VerifyNavigatorSpec extends SpecBase {
             .onPageLoad(CheckMode)
             .url
       }
-      
+
       "must go from ContractorEmailConfirmationStoredPage to JourneyRecovery when answer is CurrentEmail" in {
         val ua = emptyUserAnswers.setOrException(
           ContractorEmailConfirmationStoredPage,

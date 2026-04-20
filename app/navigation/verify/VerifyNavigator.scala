@@ -80,7 +80,7 @@ class VerifyNavigator @Inject() () extends NavigatorForJourney {
     val _ = ua
     controllers.verify.routes.SelectSubcontractorController.onPageLoad(mode)
   }
-  
+
   private def navigatorFromContractorEmailConfirmationStoredPage(mode: Mode)(ua: UserAnswers): Call =
     (ua.get(ContractorEmailConfirmationStoredPage), mode) match {
       case (Some(CurrentEmail), _) =>
