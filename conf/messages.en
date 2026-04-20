@@ -789,22 +789,22 @@ trustCheckYourAnswers.trailHeading                             =  Now add this s
 trustCheckYourAnswers.trailText                                =  By adding this subcontractor you are confirming that, to the best of your knowledge, the details you are providing are correct.
 trustCheckYourAnswers.continue                                 =  Accept and submit
 
-selectSubcontractor.title                                      = Which subcontractors do you want to verify?
-selectSubcontractor.heading                                    = Which subcontractors do you want to verify?
-selectSubcontractor.hint                                       = Select the unverified subcontractors you want to add to this verification request.
-selectSubcontractor.brodyMartin                                = Brody, Martin
-selectSubcontractor.hooperAssociates                           = Hooper and Associates
-selectSubcontractor.checkYourAnswersLabel                      = Which subcontractors do you want to verify?
-selectSubcontractor.error.required                             = Select at least one subcontractor to verify
-selectSubcontractor.change.hidden                              = SelectSubcontractor
+verify.selectSubcontractor.title                                      = Which subcontractors do you want to verify?
+verify.selectSubcontractor.heading                                    = Which subcontractors do you want to verify?
+verify.selectSubcontractor.hint                                       = Select the unverified subcontractors you want to add to this verification request.
+verify.selectSubcontractor.brodyMartin                                = Brody, Martin
+verify.selectSubcontractor.hooperAssociates                           = Hooper and Associates
+verify.selectSubcontractor.checkYourAnswersLabel                      = Which subcontractors do you want to verify?
+verify.selectSubcontractor.error.required                             = Select at least one subcontractor to verify
+verify.selectSubcontractor.change.hidden                              = SelectSubcontractor
 
-selectSubcontractor.alphaPlumbing                              =Alpha Plumbing
-selectSubcontractor.betaBuilders                               =Beta Builders
-selectSubcontractor.gammaConstruction                          =Gamma Construction
-selectSubcontractor.deltaElectrical                            =Delta Electrical
-selectSubcontractor.epsilonCarpentry                           =Epsilon Carpentry
-selectSubcontractor.zetaRoofing                                =Zeta Roofing
-selectSubcontractor.etaPlastering                              =Eta Plastering
+verify.selectSubcontractor.alphaPlumbing                              =Alpha Plumbing
+verify.selectSubcontractor.betaBuilders                               =Beta Builders
+verify.selectSubcontractor.gammaConstruction                          =Gamma Construction
+verify.selectSubcontractor.deltaElectrical                            =Delta Electrical
+verify.selectSubcontractor.epsilonCarpentry                           =Epsilon Carpentry
+verify.selectSubcontractor.zetaRoofing                                =Zeta Roofing
+verify.selectSubcontractor.etaPlastering                              =Eta Plastering
 
 site.pagination.previous                                       =Previous
 site.pagination.next                                           =Next

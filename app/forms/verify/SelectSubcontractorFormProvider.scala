@@ -27,7 +27,7 @@ class SelectSubcontractorFormProvider @Inject() extends Mappings {
 
   def apply(): Form[Set[SelectSubcontractor]] =
     Form(
-      "value" -> set(enumerable[SelectSubcontractor]("selectSubcontractor.error.required"))
-        .verifying(nonEmptySet("selectSubcontractor.error.required"))
+      "value" -> set(enumerable[SelectSubcontractor]("verify.selectSubcontractor.error.required"))
+        .verifying(nonEmptySet("verify.selectSubcontractor.error.required"))
     )
 }

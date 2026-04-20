@@ -27,7 +27,7 @@ class SelectSubcontractorFormProviderSpec extends CheckboxFieldBehaviours {
   ".value" - {
 
     val fieldName   = "value"
-    val requiredKey = "selectSubcontractor.error.required"
+    val requiredKey = "verify.selectSubcontractor.error.required"
 
     behave like checkboxField[SelectSubcontractor](
       form,

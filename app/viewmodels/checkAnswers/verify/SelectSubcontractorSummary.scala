@@ -34,21 +34,21 @@ object SelectSubcontractorSummary {
         HtmlContent(
           answers
             .map { answer =>
-              HtmlFormat.escape(messages(s"selectSubcontractor.$answer")).toString
+              HtmlFormat.escape(messages(s"verify.selectSubcontractor.$answer")).toString
             }
             .mkString(",<br>")
         )
       )
 
       SummaryListRowViewModel(
-        key = "selectSubcontractor.checkYourAnswersLabel",
+        key = "verify.selectSubcontractor.checkYourAnswersLabel",
         value = value,
         actions = Seq(
           ActionItemViewModel(
             "site.change",
             controllers.verify.routes.SelectSubcontractorController.onPageLoad(CheckMode).url
           )
-            .withVisuallyHiddenText(messages("selectSubcontractor.change.hidden"))
+            .withVisuallyHiddenText(messages("verify.selectSubcontractor.change.hidden"))
             .withAttribute("id" -> "select-subcontractor")
         )
       )

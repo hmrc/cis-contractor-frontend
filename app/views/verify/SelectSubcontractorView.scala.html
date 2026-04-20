@@ -29,7 +29,7 @@
 
 @(form: Form[_], mode: Mode, checkboxItems: Seq[CheckboxItem], paginationViewModel: PaginationViewModel, page: Int)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = title(form, messages("selectSubcontractor.title"))) {
+@layout(pageTitle = title(form, messages("verify.selectSubcontractor.title"))) {
 
     @formHelper(action = controllers.verify.routes.SelectSubcontractorController.onSubmit(mode, page), Symbol("autoComplete") -> "off") {
 
@@ -41,13 +41,13 @@
             CheckboxesViewModel(
                 form   = form,
                 name   = "value",
-                legend = LegendViewModel(messages("selectSubcontractor.heading")).asPageHeading(Large),
+                legend = LegendViewModel(messages("verify.selectSubcontractor.heading")).asPageHeading(Large),
                 items  = checkboxItems
 
                 ).copy(
                 hint = Some(
                     Hint(
-                        content = Text(messages("selectSubcontractor.hint"))
+                        content = Text(messages("verify.selectSubcontractor.hint"))
                     )
               )
            )

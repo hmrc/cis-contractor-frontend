@@ -47,11 +47,11 @@ class SelectSubcontractorViewSpec extends SpecBase with Matchers {
 
       val doc: Document = Jsoup.parse(html.body)
 
-      doc.title must include(messages("selectSubcontractor.title"))
+      doc.title must include(messages("verify.selectSubcontractor.title"))
 
-      doc.select("h1").text mustBe messages("selectSubcontractor.heading")
+      doc.select("h1").text mustBe messages("verify.selectSubcontractor.heading")
 
-      doc.select(".govuk-hint").text mustBe messages("selectSubcontractor.hint")
+      doc.select(".govuk-hint").text mustBe messages("verify.selectSubcontractor.hint")
 
       doc.select(".govuk-checkboxes__item").size() mustBe checkboxItems.size
 

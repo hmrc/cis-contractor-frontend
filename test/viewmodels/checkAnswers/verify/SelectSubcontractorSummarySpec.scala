@@ -53,12 +53,12 @@ class SelectSubcontractorSummarySpec extends SpecBase with Matchers {
 
       val row = result.value
 
-      row.key.content.asHtml.toString must include(messages("selectSubcontractor.checkYourAnswersLabel"))
+      row.key.content.asHtml.toString must include(messages("verify.selectSubcontractor.checkYourAnswersLabel"))
 
       val valueHtml = row.value.content.asHtml.toString
 
-      valueHtml must include(messages("selectSubcontractor.brodyMartin"))
-      valueHtml must include(messages("selectSubcontractor.alphaPlumbing"))
+      valueHtml must include(messages("verify.selectSubcontractor.brodyMartin"))
+      valueHtml must include(messages("verify.selectSubcontractor.alphaPlumbing"))
       valueHtml must include("<br>")
 
       row.actions mustBe defined
@@ -75,7 +75,7 @@ class SelectSubcontractorSummarySpec extends SpecBase with Matchers {
       action.content.asHtml.toString must include(messages("site.change"))
 
       action.visuallyHiddenText mustBe Some(
-        messages("selectSubcontractor.change.hidden")
+        messages("verify.selectSubcontractor.change.hidden")
       )
 
       action.attributes must contain("id" -> "select-subcontractor")
@@ -100,7 +100,7 @@ class SelectSubcontractorSummarySpec extends SpecBase with Matchers {
 
       val valueHtml = row.value.content.asHtml.toString
 
-      valueHtml must include(messages("selectSubcontractor.deltaElectrical"))
+      valueHtml must include(messages("verify.selectSubcontractor.deltaElectrical"))
       valueHtml must not include "<br>"
     }
 
