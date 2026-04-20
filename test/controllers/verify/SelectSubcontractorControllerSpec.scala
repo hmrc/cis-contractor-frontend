@@ -264,7 +264,7 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
           FakeRequest(POST, url(1))
             .withFormUrlEncodedBody(
               "value[0]" -> SelectSubcontractor.values.head.toString,
-              "gotoPage"  -> "2"
+              "gotoPage" -> "2"
             )
 
         val result = route(application, request).value
@@ -302,7 +302,7 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
       val page1Selection: Set[SelectSubcontractor] = Set(SelectSubcontractor.BrodyMartin)
-      val userAnswers =
+      val userAnswers                              =
         UserAnswers(userAnswersId)
           .set(SelectSubcontractorPage, page1Selection)
           .success
