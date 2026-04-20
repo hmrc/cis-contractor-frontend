@@ -26,6 +26,11 @@ import java.time.Instant
 
 trait ModelGenerators {
 
+  implicit lazy val arbitrarySelectSubcontractor: Arbitrary[SelectSubcontractor] =
+    Arbitrary {
+      Gen.oneOf(SelectSubcontractor.values)
+    }
+
   implicit lazy val arbitraryInternationalAddress: Arbitrary[InternationalAddress] =
     Arbitrary {
       for {

@@ -21,7 +21,7 @@ import jakarta.inject.Singleton
 import models.{CheckMode, Mode, NormalMode, UserAnswers}
 import navigation.NavigatorForJourney
 import pages.Page
-import pages.verify.ContractorEmailConfirmationNotStoredPage
+import pages.verify.*
 import play.api.mvc.Call
 
 import javax.inject.Inject
@@ -40,12 +40,16 @@ class VerifyNavigator @Inject() () extends NavigatorForJourney {
 
     case ContractorEmailConfirmationNotStoredPage =>
       userAnswers => navigatorFromContractorEmailConfirmationNotStoredPage(NormalMode)(userAnswers)
+    case SelectSubcontractorPage                  =>
+      userAnswers => navigatorFromSelectSubcontractorPage(NormalMode)(userAnswers)
     case _                                        => _ => controllers.routes.JourneyRecoveryController.onPageLoad()
   }
 
   private def checkRouteMap: Page => UserAnswers => Call = {
     case ContractorEmailConfirmationNotStoredPage =>
       userAnswers => navigatorFromContractorEmailConfirmationNotStoredPage(CheckMode)(userAnswers)
+    case SelectSubcontractorPage                  =>
+      userAnswers => navigatorFromSelectSubcontractorPage(CheckMode)(userAnswers)
     case _                                        => _ => controllers.routes.JourneyRecoveryController.onPageLoad()
 
   }
@@ -66,5 +70,10 @@ class VerifyNavigator @Inject() () extends NavigatorForJourney {
       case _ =>
         routes.IndexController.onPageLoad()
     }
+
+  private def navigatorFromSelectSubcontractorPage(mode: Mode)(ua: UserAnswers): Call = {
+    val _ = ua
+    controllers.verify.routes.SelectSubcontractorController.onPageLoad(mode)
+  }
 
 }

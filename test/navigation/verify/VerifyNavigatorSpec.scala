@@ -21,7 +21,7 @@ import controllers.routes
 import models.{CheckMode, NormalMode, UserAnswers}
 import org.scalactic.Prettifier.default
 import pages.Page
-import pages.verify.ContractorEmailConfirmationNotStoredPage
+import pages.verify.*
 
 class VerifyNavigatorSpec extends SpecBase {
 
@@ -60,6 +60,18 @@ class VerifyNavigatorSpec extends SpecBase {
           emptyUserAnswers
         ) mustBe routes.IndexController.onPageLoad()
       }
+
+      "must go from SelectSubcontractorPage to SelectSubcontractorController in NormalMode" in {
+        val ua = UserAnswers("id")
+
+        val result =
+          navigator.nextPage(SelectSubcontractorPage, NormalMode, ua)
+
+        result.url mustBe
+          controllers.verify.routes.SelectSubcontractorController
+            .onPageLoad(NormalMode)
+            .url
+      }
     }
 
     "in Check mode" - {
@@ -90,6 +102,18 @@ class VerifyNavigatorSpec extends SpecBase {
           CheckMode,
           emptyUserAnswers
         ) mustBe routes.IndexController.onPageLoad()
+      }
+
+      "must go from SelectSubcontractorPage to SelectSubcontractorController in CheckMode" in {
+        val ua = UserAnswers("id")
+
+        val result =
+          navigator.nextPage(SelectSubcontractorPage, CheckMode, ua)
+
+        result.url mustBe
+          controllers.verify.routes.SelectSubcontractorController
+            .onPageLoad(CheckMode)
+            .url
       }
     }
   }
