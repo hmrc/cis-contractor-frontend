@@ -350,8 +350,6 @@ POST  /add/trust/check-your-answers                controllers.add.trust.TrustCh
 GET   /add/trust/subcontractor-added               controllers.add.SubcontractorAddedController.trustSubcontractorAdded()
 
 # Verify
-GET   /verification/newest                          controllers.verification.NewestVerificationBatchController.onPageLoad()
-
 GET   /verify/confirmation-email-not-stored         controllers.verify.ContractorEmailConfirmationNotStoredController.onPageLoad(mode: Mode = NormalMode)
 POST  /verify/confirmation-email-not-stored         controllers.verify.ContractorEmailConfirmationNotStoredController.onSubmit(mode: Mode = NormalMode)
 GET   /verify/change-confirmation-email-not-stored  controllers.verify.ContractorEmailConfirmationNotStoredController.onPageLoad(mode: Mode = CheckMode)
@@ -361,6 +359,12 @@ GET   /verify/verification-declaration              controllers.verify.Verificat
 POST  /verify/verification-declaration              controllers.verify.VerificationDeclarationController.onSubmit(mode: Mode = NormalMode)
 
 GET   /verify/submitting-verification-request       controllers.verify.SubmissionSendingController.onPageLoad()
+
+GET   /verify/no-subcontractors-added               controllers.verify.NoSubcontractorsAddedController.onPageLoad()
+
+GET   /verification/newest                          controllers.verification.NewestVerificationBatchController.onPageLoad()
+
+GET   /verify/verification-request-in-progress      controllers.verify.VerificationRequestInProgressController.onPageLoad()
 
 GET   /verify/confirmation-email-stored             controllers.verify.ContractorEmailConfirmationStoredController.onPageLoad(mode: Mode = NormalMode)
 POST  /verify/confirmation-email-stored             controllers.verify.ContractorEmailConfirmationStoredController.onSubmit(mode: Mode = NormalMode)

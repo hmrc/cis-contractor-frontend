@@ -781,6 +781,15 @@ verify.contractorEmailConfirmationNotStored.checkYourAnswersLabel  =  Do you wan
 verify.contractorEmailConfirmationNotStored.error.required         =  Select yes if you want an email confirmation of this verification request
 verify.contractorEmailConfirmationNotStored.change.hidden          =  do you want confirmation by email?
 
+verify.noSubcontractorsAdded.title                                 =  No subcontractors added
+verify.noSubcontractorsAdded.heading                               =  Verify your subcontractors
+verify.noSubcontractorsAdded.p1                                    =  You don’t have any subcontractors at the moment.
+verify.noSubcontractorsAdded.p2                                    =  You will need to
+verify.noSubcontractorsAdded.p2.link                               =  add some subcontractors first
+verify.noSubcontractorsAdded.p2.end                                =  before you can create a verification request or monthly return.
+verify.noSubcontractorsAdded.p3                                    =  Back to
+verify.noSubcontractorsAdded.p3.link                               =  Manage your subcontractors
+
 verify.contractorEmailConfirmationStored.title                     =  Do you want an email confirmation of this verification request?
 verify.contractorEmailConfirmationStored.heading                   =  Do you want an email confirmation of this verification request?
 verify.contractorEmailConfirmationStored.paragraph                 =  Your email address is currently {0}. You can get a confirmation sent to this address or use a different one.
@@ -799,3 +808,12 @@ verify.verificationDeclaration.list.l1                             =  a formal a
 verify.verificationDeclaration.list.l2                             =  the information given in this verification request is correct and complete to the best of your knowledge and belief.
 verify.verificationDeclaration.warningText                         =  If you give any false information you may face financial penalties and prosecution.
 verify.verificationDeclaration.confirm                             =  Confirm
+
+verify.verificationRequestInProgress.title                         =  Verification request in progress
+verify.verificationRequestInProgress.heading                       =  Verification request in progress
+verify.verificationRequestInProgress.p1                            =  HMRC has not responded to your previous verification request.
+verify.verificationRequestInProgress.p2                            =  You must wait for this response before you can verify any more subcontractors.
+verify.verificationRequestInProgress.p3                            =  If you have any questions about this verification request,
+verify.verificationRequestInProgress.p3.link                       =  contact HMRC.
+verify.verificationRequestInProgress.p4                            =  Back to
+verify.verificationRequestInProgress.p4.link                       =  Manage your subcontractors.
