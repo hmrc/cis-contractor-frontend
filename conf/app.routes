@@ -1,36 +1,20 @@
 # Routes
 
 # Infrastructure
-->    /hmrc-frontend                                hmrcfrontend.Routes
+->   /hmrc-frontend    hmrcfrontend.Routes
 
-GET   /                                             controllers.IndexController.onPageLoad()
+GET  /                 controllers.IndexController.onPageLoad()
 
-GET   /assets/*file                                 controllers.Assets.versioned(path="/public", file: Asset)
+GET  /assets/*file     controllers.Assets.versioned(path="/public", file: Asset)
 
-GET   /language/:lang                               controllers.LanguageSwitchController.switchToLanguage(lang: String)
+GET  /language/:lang   controllers.LanguageSwitchController.switchToLanguage(lang: String)
 
-GET   /refresh-session                              controllers.KeepAliveController.keepAlive()
-
-GET   /verify/confirmation-email-not-stored         controllers.verify.ContractorEmailConfirmationNotStoredController.onPageLoad(mode: Mode = NormalMode)
-POST  /verify/confirmation-email-not-stored         controllers.verify.ContractorEmailConfirmationNotStoredController.onSubmit(mode: Mode = NormalMode)
-GET   /verify/change-confirmation-email-not-stored  controllers.verify.ContractorEmailConfirmationNotStoredController.onPageLoad(mode: Mode = CheckMode)
-POST  /verify/change-confirmation-email-not-stored  controllers.verify.ContractorEmailConfirmationNotStoredController.onSubmit(mode: Mode = CheckMode)
-
-GET   /verify/verification-declaration              controllers.verify.VerificationDeclarationController.onPageLoad(mode: Mode = NormalMode)
-POST  /verify/verification-declaration              controllers.verify.VerificationDeclarationController.onSubmit(mode: Mode = NormalMode)
-
-GET   /verify/submitting-verification-request       controllers.verify.SubmissionSendingController.onPageLoad()
-GET   /verify/no-subcontractors-added               controllers.verify.NoSubcontractorsAddedController.onPageLoad()
-
-GET   /verification/newest                          controllers.verification.NewestVerificationBatchController.onPageLoad()
-
-GET   /verify/verification-request-in-progress     controllers.verify.VerificationRequestInProgressController.onPageLoad()
+GET  /refresh-session  controllers.KeepAliveController.keepAlive()
 
 # Errors & Auth
 GET  /there-is-a-problem               controllers.JourneyRecoveryController.onPageLoad(continueUrl: Option[RedirectUrl] ?= None)
 
 GET  /account/sign-out-survey          controllers.auth.AuthController.signOut()
-
 GET  /account/sign-out                 controllers.auth.AuthController.signOutNoSurvey()
 
 GET  /account/signed-out               controllers.auth.SignedOutController.onPageLoad()
@@ -364,3 +348,25 @@ GET   /add/trust/check-your-answers                controllers.add.trust.TrustCh
 POST  /add/trust/check-your-answers                controllers.add.trust.TrustCheckYourAnswersController.onSubmit()
 
 GET   /add/trust/subcontractor-added               controllers.add.SubcontractorAddedController.trustSubcontractorAdded()
+
+# Verify
+GET   /verify/confirmation-email-not-stored         controllers.verify.ContractorEmailConfirmationNotStoredController.onPageLoad(mode: Mode = NormalMode)
+POST  /verify/confirmation-email-not-stored         controllers.verify.ContractorEmailConfirmationNotStoredController.onSubmit(mode: Mode = NormalMode)
+GET   /verify/change-confirmation-email-not-stored  controllers.verify.ContractorEmailConfirmationNotStoredController.onPageLoad(mode: Mode = CheckMode)
+POST  /verify/change-confirmation-email-not-stored  controllers.verify.ContractorEmailConfirmationNotStoredController.onSubmit(mode: Mode = CheckMode)
+
+GET   /verify/verification-declaration              controllers.verify.VerificationDeclarationController.onPageLoad(mode: Mode = NormalMode)
+POST  /verify/verification-declaration              controllers.verify.VerificationDeclarationController.onSubmit(mode: Mode = NormalMode)
+
+GET   /verify/submitting-verification-request       controllers.verify.SubmissionSendingController.onPageLoad()
+
+GET   /verify/no-subcontractors-added               controllers.verify.NoSubcontractorsAddedController.onPageLoad()
+
+GET   /verification/newest                          controllers.verification.NewestVerificationBatchController.onPageLoad()
+
+GET   /verify/verification-request-in-progress      controllers.verify.VerificationRequestInProgressController.onPageLoad()
+
+GET   /verify/confirmation-email-stored             controllers.verify.ContractorEmailConfirmationStoredController.onPageLoad(mode: Mode = NormalMode)
+POST  /verify/confirmation-email-stored             controllers.verify.ContractorEmailConfirmationStoredController.onSubmit(mode: Mode = NormalMode)
+GET   /verify/change-confirmation-email-stored      controllers.verify.ContractorEmailConfirmationStoredController.onPageLoad(mode: Mode = CheckMode)
+POST  /verify/change-confirmation-email-stored      controllers.verify.ContractorEmailConfirmationStoredController.onSubmit(mode: Mode = CheckMode)
