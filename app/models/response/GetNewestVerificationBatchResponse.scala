@@ -20,13 +20,11 @@ import play.api.libs.json.{Json, OFormat}
 import models.*
 
 final case class GetNewestVerificationBatchResponse(
-  scheme: Seq[ContractorScheme],
   subcontractors: Seq[Subcontractor],
   verificationBatch: Seq[VerificationBatch],
   verifications: Seq[Verification],
   submission: Seq[Submission],
-  monthlyReturn: Seq[MonthlyReturn],
-  monthlyReturnSubmission: Seq[Submission]
+  monthlyReturn: Seq[MonthlyReturn]
 )
 
 object GetNewestVerificationBatchResponse {

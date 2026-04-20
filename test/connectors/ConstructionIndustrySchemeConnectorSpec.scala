@@ -164,13 +164,11 @@ class ConstructionIndustrySchemeConnectorSpec extends AnyWordSpec with Matchers 
 
       val expected =
         GetNewestVerificationBatchResponse(
-          scheme = Nil,
           subcontractors = Nil,
           verificationBatch = Nil,
           verifications = Nil,
           submission = Nil,
-          monthlyReturn = Nil,
-          monthlyReturnSubmission = Nil
+          monthlyReturn = Nil
         )
 
       when(rb.execute[GetNewestVerificationBatchResponse](any(), any()))
