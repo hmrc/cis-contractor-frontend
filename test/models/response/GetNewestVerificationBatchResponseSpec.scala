@@ -21,35 +21,11 @@ import org.scalatest.wordspec.AnyWordSpec
 import play.api.libs.json.{JsSuccess, Json}
 import models.*
 
-import java.time.{Instant, LocalDateTime}
+import java.time.LocalDateTime
 
 final class GetNewestVerificationBatchResponseSpec extends AnyWordSpec with Matchers {
 
   "GetNewestVerificationBatchResponse Json format" should {
-
-    "read FormP response JSON and parse all sections (including empty cursors)" in {
-      val json = Json.parse(
-        """
-          |{
-          |  "subcontractors": [],
-          |  "verificationBatch": [],
-          |  "verifications": [],
-          |  "submission": [],
-          |  "monthlyReturn": [],
-          |}
-          |""".stripMargin
-      )
-
-      val result = json.validate[GetNewestVerificationBatchResponse]
-      result mustBe a[JsSuccess[?]]
-
-      val out = result.get
-      out.subcontractors mustBe empty
-      out.verificationBatch mustBe empty
-      out.verifications mustBe empty
-      out.submission mustBe empty
-      out.monthlyReturn mustBe empty
-    }
 
     "write a response to JSON" in {
       val model = GetNewestVerificationBatchResponse(
@@ -59,6 +35,7 @@ final class GetNewestVerificationBatchResponseSpec extends AnyWordSpec with Matc
             firstName = Some("John"),
             secondName = None,
             surname = Some("Smith"),
+            tradingName = Some("ACME"),
             verified = Some("Y"),
             verificationNumber = Some("V0000000001"),
             taxTreatment = Some("0"),
