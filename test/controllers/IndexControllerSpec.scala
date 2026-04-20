@@ -17,9 +17,11 @@
 package controllers
 
 import base.SpecBase
-import models.{NormalMode, UserAnswers}
-import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.{verify, verifyNoMoreInteractions, when}
+import models.UserAnswers
+import models.agent.AgentClientData
+import org.mockito.ArgumentCaptor
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
+import org.mockito.Mockito.{never, times, verify, verifyNoMoreInteractions, when}
 import org.scalatestplus.mockito.MockitoSugar.mock
 import play.api.inject.bind
 import play.api.test.FakeRequest
@@ -33,32 +35,27 @@ import scala.concurrent.Future
 
 class IndexControllerSpec extends SpecBase {
 
-  "Index Controller" - {
+  "IndexController" - {
 
-    "must return OK and the correct view for a GET" in {
+    "must redirect to TypeOfSubcontractor for a GET when user is an Org user" in {
 
       val mockSessionRepository = mock[SessionRepository]
       val mockCisManagerService = mock[CisManageService]
 
-      val cisId           = "10"
-      val mockUserAnswers = emptyUserAnswers
-        .set(CisIdQuery, cisId)
-        .success
-        .value
+      val updatedUserAnswers: UserAnswers = emptyUserAnswers
+
+      when(mockCisManagerService.ensureCisIdInUserAnswers(any[UserAnswers])(any[HeaderCarrier]))
+        .thenReturn(Future.successful(updatedUserAnswers))
 
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
-      when(mockCisManagerService.ensureCisIdInUserAnswers(any[UserAnswers])(any[HeaderCarrier])).thenReturn(
-        Future
-          .successful(mockUserAnswers)
-      )
-
-      val application = applicationBuilder(userAnswers = None)
-        .overrides(
-          bind[SessionRepository].toInstance(mockSessionRepository),
-          bind[CisManageService].toInstance(mockCisManagerService)
-        )
-        .build()
+      val application = applicationBuilder(
+        userAnswers = None,
+        hasAgentRef = false
+      ).overrides(
+        bind[SessionRepository].toInstance(mockSessionRepository),
+        bind[CisManageService].toInstance(mockCisManagerService)
+      ).build()
 
       running(application) {
         val request = FakeRequest(GET, routes.IndexController.onPageLoad().url)
@@ -67,13 +64,256 @@ class IndexControllerSpec extends SpecBase {
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual controllers.add.routes.TypeOfSubcontractorController
-          .onPageLoad(NormalMode)
+          .onPageLoad(models.NormalMode)
           .url
       }
 
       verify(mockCisManagerService).ensureCisIdInUserAnswers(any[UserAnswers])(any[HeaderCarrier])
-      verify(mockSessionRepository)
-        .set(mockUserAnswers)
+      verify(mockCisManagerService, never()).getAgentClient(any[String])(any[HeaderCarrier])
+      verify(mockCisManagerService, never()).hasClient(any[String], any[String])(any[HeaderCarrier])
+
+      verify(mockSessionRepository).set(eqTo(updatedUserAnswers))
+
+      verifyNoMoreInteractions(mockCisManagerService)
+      verifyNoMoreInteractions(mockSessionRepository)
+    }
+
+    "must redirect to TypeOfSubcontractor for a GET when user is an Agent and the client exists" in {
+
+      val mockSessionRepository = mock[SessionRepository]
+      val mockCisManagerService = mock[CisManageService]
+
+      val uniqueId = "unique-id-123"
+      val ton      = "taxOfficeNumber"
+      val tor      = "taxOfficeReference"
+
+      when(mockCisManagerService.getAgentClient(any[String])(any[HeaderCarrier]))
+        .thenReturn(
+          Future.successful(
+            Some(
+              AgentClientData(
+                uniqueId = uniqueId,
+                taxOfficeNumber = ton,
+                taxOfficeReference = tor,
+                schemeName = None
+              )
+            )
+          )
+        )
+
+      when(mockCisManagerService.hasClient(eqTo(ton.trim), eqTo(tor.trim))(any[HeaderCarrier]))
+        .thenReturn(Future.successful(true))
+
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+      val application = applicationBuilder(
+        userAnswers = Some(emptyUserAnswers),
+        isAgent = true,
+        hasEmployeeRef = false
+      ).overrides(
+        bind[SessionRepository].toInstance(mockSessionRepository),
+        bind[CisManageService].toInstance(mockCisManagerService)
+      ).build()
+
+      running(application) {
+        val request = FakeRequest(GET, routes.IndexController.onPageLoad().url)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.add.routes.TypeOfSubcontractorController
+          .onPageLoad(models.NormalMode)
+          .url
+      }
+
+      verify(mockCisManagerService, never()).ensureCisIdInUserAnswers(any[UserAnswers])(any[HeaderCarrier])
+      verify(mockCisManagerService).getAgentClient(any[String])(any[HeaderCarrier])
+      verify(mockCisManagerService).hasClient(eqTo(ton.trim), eqTo(tor.trim))(any[HeaderCarrier])
+
+      val captor: ArgumentCaptor[UserAnswers] = ArgumentCaptor.forClass(classOf[UserAnswers])
+      verify(mockSessionRepository, times(1)).set(captor.capture())
+      captor.getValue.get(CisIdQuery).value mustEqual uniqueId
+
+      verifyNoMoreInteractions(mockCisManagerService)
+      verifyNoMoreInteractions(mockSessionRepository)
+    }
+
+    "must redirect to JourneyRecovery when user is an Agent and agentClient is None" in {
+
+      val mockSessionRepository = mock[SessionRepository]
+      val mockCisManagerService = mock[CisManageService]
+
+      when(mockCisManagerService.getAgentClient(any[String])(any[HeaderCarrier]))
+        .thenReturn(Future.successful(None))
+
+      val application = applicationBuilder(
+        userAnswers = Some(emptyUserAnswers),
+        isAgent = true,
+        hasEmployeeRef = false
+      ).overrides(
+        bind[SessionRepository].toInstance(mockSessionRepository),
+        bind[CisManageService].toInstance(mockCisManagerService)
+      ).build()
+
+      running(application) {
+        val request = FakeRequest(GET, routes.IndexController.onPageLoad().url)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+      }
+
+      verify(mockCisManagerService).getAgentClient(any[String])(any[HeaderCarrier])
+      verify(mockCisManagerService, never()).hasClient(any[String], any[String])(any[HeaderCarrier])
+      verify(mockCisManagerService, never()).ensureCisIdInUserAnswers(any[UserAnswers])(any[HeaderCarrier])
+
+      verify(mockSessionRepository, never()).set(any())
+
+      verifyNoMoreInteractions(mockCisManagerService)
+      verifyNoMoreInteractions(mockSessionRepository)
+    }
+
+    "must redirect to JourneyRecovery when user is an Agent, agentClient is Some, and hasClient returns false" in {
+
+      val mockSessionRepository = mock[SessionRepository]
+      val mockCisManagerService = mock[CisManageService]
+
+      val uniqueId = "unique-id-123"
+      val ton      = "taxOfficeNumber"
+      val tor      = "taxOfficeReference"
+
+      when(mockCisManagerService.getAgentClient(any[String])(any[HeaderCarrier]))
+        .thenReturn(
+          Future.successful(
+            Some(
+              AgentClientData(
+                uniqueId = uniqueId,
+                taxOfficeNumber = ton,
+                taxOfficeReference = tor,
+                schemeName = None
+              )
+            )
+          )
+        )
+
+      when(mockCisManagerService.hasClient(eqTo(ton.trim), eqTo(tor.trim))(any[HeaderCarrier]))
+        .thenReturn(Future.successful(false))
+
+      val application = applicationBuilder(
+        userAnswers = Some(emptyUserAnswers),
+        isAgent = true,
+        hasEmployeeRef = false
+      ).overrides(
+        bind[SessionRepository].toInstance(mockSessionRepository),
+        bind[CisManageService].toInstance(mockCisManagerService)
+      ).build()
+
+      running(application) {
+        val request = FakeRequest(GET, routes.IndexController.onPageLoad().url)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+      }
+
+      verify(mockCisManagerService).getAgentClient(any[String])(any[HeaderCarrier])
+      verify(mockCisManagerService).hasClient(eqTo(ton.trim), eqTo(tor.trim))(any[HeaderCarrier])
+      verify(mockCisManagerService, never()).ensureCisIdInUserAnswers(any[UserAnswers])(any[HeaderCarrier])
+
+      verify(mockSessionRepository, never()).set(any())
+
+      verifyNoMoreInteractions(mockCisManagerService)
+      verifyNoMoreInteractions(mockSessionRepository)
+    }
+
+    "must redirect to JourneyRecovery when user is an Agent, agentClient is Some, and hasClient fails with NonFatal exception" in {
+
+      val mockSessionRepository = mock[SessionRepository]
+      val mockCisManagerService = mock[CisManageService]
+
+      val uniqueId = "unique-id-123"
+      val ton      = "taxOfficeNumber"
+      val tor      = "taxOfficeReference"
+
+      when(mockCisManagerService.getAgentClient(any[String])(any[HeaderCarrier]))
+        .thenReturn(
+          Future.successful(
+            Some(
+              AgentClientData(
+                uniqueId = uniqueId,
+                taxOfficeNumber = ton,
+                taxOfficeReference = tor,
+                schemeName = None
+              )
+            )
+          )
+        )
+
+      when(mockCisManagerService.hasClient(eqTo(ton.trim), eqTo(tor.trim))(any[HeaderCarrier]))
+        .thenReturn(Future.failed(new RuntimeException("boom")))
+
+      val application = applicationBuilder(
+        userAnswers = Some(emptyUserAnswers),
+        isAgent = true,
+        hasEmployeeRef = false
+      ).overrides(
+        bind[SessionRepository].toInstance(mockSessionRepository),
+        bind[CisManageService].toInstance(mockCisManagerService)
+      ).build()
+
+      running(application) {
+        val request = FakeRequest(GET, routes.IndexController.onPageLoad().url)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+      }
+
+      verify(mockCisManagerService).getAgentClient(any[String])(any[HeaderCarrier])
+      verify(mockCisManagerService).hasClient(eqTo(ton.trim), eqTo(tor.trim))(any[HeaderCarrier])
+      verify(mockCisManagerService, never()).ensureCisIdInUserAnswers(any[UserAnswers])(any[HeaderCarrier])
+
+      verify(mockSessionRepository, never()).set(any())
+
+      verifyNoMoreInteractions(mockCisManagerService)
+      verifyNoMoreInteractions(mockSessionRepository)
+    }
+
+    "must redirect to JourneyRecovery when user is an Agent and getAgentClient fails with NonFatal exception (outer recover)" in {
+
+      val mockSessionRepository = mock[SessionRepository]
+      val mockCisManagerService = mock[CisManageService]
+
+      when(mockCisManagerService.getAgentClient(any[String])(any[HeaderCarrier]))
+        .thenReturn(Future.failed(new RuntimeException("boom-getAgentClient")))
+
+      val application = applicationBuilder(
+        userAnswers = Some(emptyUserAnswers),
+        isAgent = true,
+        hasEmployeeRef = false
+      ).overrides(
+        bind[SessionRepository].toInstance(mockSessionRepository),
+        bind[CisManageService].toInstance(mockCisManagerService)
+      ).build()
+
+      running(application) {
+        val request = FakeRequest(GET, routes.IndexController.onPageLoad().url)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+      }
+
+      verify(mockCisManagerService, never()).ensureCisIdInUserAnswers(any[UserAnswers])(any[HeaderCarrier])
+      verify(mockCisManagerService).getAgentClient(any[String])(any[HeaderCarrier])
+
+      verify(mockCisManagerService, never()).hasClient(any[String], any[String])(any[HeaderCarrier])
+      verify(mockSessionRepository, never()).set(any())
+
       verifyNoMoreInteractions(mockCisManagerService)
       verifyNoMoreInteractions(mockSessionRepository)
     }

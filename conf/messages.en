@@ -302,6 +302,16 @@ verify.contractorEmailConfirmationNotStored.checkYourAnswersLabel        =  Do y
 verify.contractorEmailConfirmationNotStored.error.required               =  Select yes if you want an email confirmation of this verification request
 verify.contractorEmailConfirmationNotStored.change.hidden                =  do you want confirmation by email?
 
+verify.noSubcontractorsAdded.title                                       = No subcontractors added
+verify.noSubcontractorsAdded.heading                                     = Verify your subcontractors
+verify.noSubcontractorsAdded.p1                                          = You don’t have any subcontractors at the moment.
+verify.noSubcontractorsAdded.p2                                          = You will need to
+verify.noSubcontractorsAdded.p2.link                                     = add some subcontractors first
+verify.noSubcontractorsAdded.p2.end                                      = before you can create a verification request or monthly return.
+verify.noSubcontractorsAdded.p3                                          = Back to
+verify.noSubcontractorsAdded.p3.link                                     = Manage your subcontractors
+
+
 # Partnership
 partnershipWorksReferenceNumberYesNo.title                           =  Does this partnership have a works reference number?
 partnershipWorksReferenceNumberYesNo.heading                         =  Does {0} have a works reference number?
@@ -799,3 +809,17 @@ selectSubcontractor.etaPlastering                              =Eta Plastering
 site.pagination.previous                                       =Previous
 site.pagination.next                                           =Next
 site.pagination.landmark                                       =Pagination
+
+verify.contractorEmailConfirmationNotStored.title                               =  Do you want an email confirmation of this verification request?
+verify.contractorEmailConfirmationNotStored.heading                             =  Do you want an email confirmation of this verification request?
+verify.contractorEmailConfirmationNotStored.checkYourAnswersLabel               =  Do you want confirmation by email?
+verify.contractorEmailConfirmationNotStored.error.required                      =  Select yes if you want an email confirmation of this verification request
+verify.contractorEmailConfirmationNotStored.change.hidden                       =  do you want confirmation by email?
+
+verify.verificationDeclaration.title                                            =  Verification declaration
+verify.verificationDeclaration.heading                                          =  Declaration
+verify.verificationDeclaration.p1                                               =  By submitting this verification request, you confirm that:
+verify.verificationDeclaration.list.l1                                          =  a formal arrangement is in place (for example, tender accepted, contract agreed, order placed) for all of the subcontractors to be verified in this request.
+verify.verificationDeclaration.list.l2                                          =  the information given in this verification request is correct and complete to the best of your knowledge and belief.
+verify.verificationDeclaration.warningText                                      =  If you give any false information you may face financial penalties and prosecution.
+verify.verificationDeclaration.confirm                                          =  Confirm

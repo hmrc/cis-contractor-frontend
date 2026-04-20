@@ -69,7 +69,7 @@ class SubTradingNameYesNoViewSpec extends AnyWordSpec with Matchers with GuiceOn
       summary.text() must include(messages("subTradingNameYesNo.error.required"))
 
       val linkHref = summary.select("a").attr("href")
-      linkHref mustBe "#value"
+      linkHref mustBe "#value_0"
 
       doc.select(".govuk-error-message").text() must include(messages("subTradingNameYesNo.error.required"))
     }
