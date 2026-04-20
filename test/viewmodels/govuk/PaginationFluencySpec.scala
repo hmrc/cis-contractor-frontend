@@ -53,10 +53,11 @@ class PaginationFluencySpec extends PlaySpec {
 
     "support withPrevious and withNext" in {
       val previous = PaginationFluency.PaginationLinkViewModel("/prev")
-      val next = PaginationFluency.PaginationLinkViewModel("/next")
+      val next     = PaginationFluency.PaginationLinkViewModel("/next")
 
       val result =
-        PaginationFluency.PaginationViewModel()
+        PaginationFluency
+          .PaginationViewModel()
           .withPrevious(previous)
           .withNext(next)
 
@@ -69,8 +70,7 @@ class PaginationFluencySpec extends PlaySpec {
         PaginationFluency.PaginationItemViewModel("1", "/page/1")
 
       val result =
-        PaginationFluency.PaginationViewModel(Seq(item))
-          .asPagination
+        PaginationFluency.PaginationViewModel(Seq(item)).asPagination
 
       result.items.get.head.number mustBe Some("1")
     }
@@ -97,7 +97,8 @@ class PaginationFluencySpec extends PlaySpec {
 
     "support withCurrent and withVisuallyHiddenText" in {
       val item =
-        PaginationFluency.PaginationItemViewModel("1", "/page/1")
+        PaginationFluency
+          .PaginationItemViewModel("1", "/page/1")
           .withCurrent(true)
           .withVisuallyHiddenText("Page 1")
 
@@ -110,7 +111,8 @@ class PaginationFluencySpec extends PlaySpec {
 
     "build link with text and label" in {
       val link =
-        PaginationFluency.PaginationLinkViewModel("/next")
+        PaginationFluency
+          .PaginationLinkViewModel("/next")
           .withText("Next")
           .withLabelText("Go to next page")
 
@@ -121,7 +123,8 @@ class PaginationFluencySpec extends PlaySpec {
 
     "convert to PaginationLink" in {
       val link =
-        PaginationFluency.PaginationLinkViewModel("/next")
+        PaginationFluency
+          .PaginationLinkViewModel("/next")
           .withText("Next")
 
       val result =
