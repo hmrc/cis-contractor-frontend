@@ -58,7 +58,7 @@ object SelectSubcontractor extends Enumerable.Implicits {
   def checkboxItems(implicit messages: Messages): Seq[CheckboxItem] =
     values.zipWithIndex.map { case (value, index) =>
       CheckboxItemViewModel(
-        content = Text(messages(s"selectSubcontractor.${value.toString}")),
+        content = Text(messages(s"verify.selectSubcontractor.${value.toString}")),
         fieldId = "value",
         index = index,
         value = value.toString

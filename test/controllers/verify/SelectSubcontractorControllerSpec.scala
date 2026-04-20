@@ -248,5 +248,86 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
           controllers.routes.JourneyRecoveryController.onPageLoad().url
       }
     }
+
+    "must redirect to target page and save selections when gotoPage field is present" in {
+
+      val mockSessionRepository = mock[SessionRepository]
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+      val application =
+        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, url(1))
+            .withFormUrlEncodedBody(
+              "value[0]" -> SelectSubcontractor.values.head.toString,
+              "gotoPage" -> "2"
+            )
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual url(2)
+      }
+    }
+
+    "must redirect to target page without requiring a selection when gotoPage field is present" in {
+
+      val mockSessionRepository = mock[SessionRepository]
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+      val application =
+        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, url(1))
+            .withFormUrlEncodedBody("gotoPage" -> "2")
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual url(2)
+      }
+    }
+
+    "must preserve selections from other pages when submitting from a given page" in {
+
+      val mockSessionRepository = mock[SessionRepository]
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+      val page1Selection: Set[SelectSubcontractor] = Set(SelectSubcontractor.BrodyMartin)
+      val userAnswers                              =
+        UserAnswers(userAnswersId)
+          .set(SelectSubcontractorPage, page1Selection)
+          .success
+          .value
+
+      val application =
+        applicationBuilder(userAnswers = Some(userAnswers))
+          .overrides(
+            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
+            bind[SessionRepository].toInstance(mockSessionRepository)
+          )
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, url(2))
+            .withFormUrlEncodedBody(
+              "value[0]" -> SelectSubcontractor.EpsilonCarpentry.toString
+            )
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual onwardRoute.url
+      }
+    }
   }
 }

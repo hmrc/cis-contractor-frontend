@@ -129,6 +129,56 @@ class SelectSubcontractorViewSpec extends SpecBase with Matchers {
       doc.select(".govuk-pagination__prev").size() mustBe 0
       doc.select(".govuk-pagination__next").size() mustBe 0
     }
+
+    "must render pagination buttons as submit controls with correct gotoPage values" in new Setup {
+
+      val pagination = PaginationViewModel(
+        items = Seq(
+          PaginationItemViewModel("1", "/test?page=1").withCurrent(true),
+          PaginationItemViewModel("2", "/test?page=2"),
+          PaginationItemViewModel("3", "/test?page=3")
+        ),
+        previous = Some(PaginationLinkViewModel("/test?page=1")),
+        next = Some(PaginationLinkViewModel("/test?page=3"))
+      )
+
+      val html = view(form, mode, checkboxItems, pagination, page = 2)
+      val doc  = Jsoup.parse(html.body)
+
+      val prevButton =
+        doc.select(".govuk-pagination__prev button[name=gotoPage][value=1]")
+
+      prevButton.size mustBe 1
+      prevButton.text must include(messages("site.pagination.previous"))
+
+      // ✅ Page number buttons
+      doc.select(".govuk-pagination__item button[name=gotoPage][value=1]").size mustBe 1
+      doc.select(".govuk-pagination__item button[name=gotoPage][value=2]").size mustBe 1
+      doc.select(".govuk-pagination__item button[name=gotoPage][value=3]").size mustBe 1
+
+      val nextButton =
+        doc.select(".govuk-pagination__next button[name=gotoPage][value=3]")
+
+      nextButton.size mustBe 1
+      nextButton.text must include(messages("site.pagination.next"))
+    }
+
+    "must mark the current pagination item with aria-current" in new Setup {
+
+      val pagination = PaginationViewModel(
+        items = Seq(
+          PaginationItemViewModel("1", "/test?page=1"),
+          PaginationItemViewModel("2", "/test?page=2").withCurrent(true),
+          PaginationItemViewModel("3", "/test?page=3")
+        )
+      )
+
+      val html = view(form, mode, checkboxItems, pagination, page = 2)
+      val doc  = Jsoup.parse(html.body)
+
+      doc.select(".govuk-pagination__item--current").size mustBe 1
+      doc.select(".govuk-pagination__item--current [aria-current=page]").size mustBe 1
+    }
   }
 
   trait Setup {
