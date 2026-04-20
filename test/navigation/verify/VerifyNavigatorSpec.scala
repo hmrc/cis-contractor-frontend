@@ -21,7 +21,8 @@ import controllers.routes
 import models.{CheckMode, NormalMode, UserAnswers}
 import org.scalactic.Prettifier.default
 import pages.Page
-import pages.verify.*
+import models.verify.ContractorEmailConfirmationStored
+import pages.verify.{ContractorEmailConfirmationNotStoredPage, ContractorEmailConfirmationStoredPage, SelectSubcontractorPage}
 
 class VerifyNavigatorSpec extends SpecBase {
 
@@ -72,6 +73,34 @@ class VerifyNavigatorSpec extends SpecBase {
             .onPageLoad(NormalMode)
             .url
       }
+      
+      "must go from ContractorEmailConfirmationStoredPage to JourneyRecovery when answer is CurrentEmail" in {
+        val ua = emptyUserAnswers.setOrException(
+          ContractorEmailConfirmationStoredPage,
+          ContractorEmailConfirmationStored.CurrentEmail
+        )
+        navigator.nextPage(ContractorEmailConfirmationStoredPage, NormalMode, ua) mustBe journeyRecovery
+      }
+
+      "must go from ContractorEmailConfirmationStoredPage to JourneyRecovery when answer is DifferentEmail" in {
+        val ua = emptyUserAnswers.setOrException(
+          ContractorEmailConfirmationStoredPage,
+          ContractorEmailConfirmationStored.DifferentEmail
+        )
+        navigator.nextPage(ContractorEmailConfirmationStoredPage, NormalMode, ua) mustBe journeyRecovery
+      }
+
+      "must go from ContractorEmailConfirmationStoredPage to JourneyRecovery when answer is DoNotSend" in {
+        val ua = emptyUserAnswers.setOrException(
+          ContractorEmailConfirmationStoredPage,
+          ContractorEmailConfirmationStored.DoNotSend
+        )
+        navigator.nextPage(ContractorEmailConfirmationStoredPage, NormalMode, ua) mustBe journeyRecovery
+      }
+
+      "must go from ContractorEmailConfirmationStoredPage to JourneyRecovery when answer is not present" in {
+        navigator.nextPage(ContractorEmailConfirmationStoredPage, NormalMode, emptyUserAnswers) mustBe journeyRecovery
+      }
     }
 
     "in Check mode" - {
@@ -114,6 +143,34 @@ class VerifyNavigatorSpec extends SpecBase {
           controllers.verify.routes.SelectSubcontractorController
             .onPageLoad(CheckMode)
             .url
+      }
+      
+      "must go from ContractorEmailConfirmationStoredPage to JourneyRecovery when answer is CurrentEmail" in {
+        val ua = emptyUserAnswers.setOrException(
+          ContractorEmailConfirmationStoredPage,
+          ContractorEmailConfirmationStored.CurrentEmail
+        )
+        navigator.nextPage(ContractorEmailConfirmationStoredPage, CheckMode, ua) mustBe journeyRecovery
+      }
+
+      "must go from ContractorEmailConfirmationStoredPage to JourneyRecovery when answer is DifferentEmail" in {
+        val ua = emptyUserAnswers.setOrException(
+          ContractorEmailConfirmationStoredPage,
+          ContractorEmailConfirmationStored.DifferentEmail
+        )
+        navigator.nextPage(ContractorEmailConfirmationStoredPage, CheckMode, ua) mustBe journeyRecovery
+      }
+
+      "must go from ContractorEmailConfirmationStoredPage to JourneyRecovery when answer is DoNotSend" in {
+        val ua = emptyUserAnswers.setOrException(
+          ContractorEmailConfirmationStoredPage,
+          ContractorEmailConfirmationStored.DoNotSend
+        )
+        navigator.nextPage(ContractorEmailConfirmationStoredPage, CheckMode, ua) mustBe journeyRecovery
+      }
+
+      "must go from ContractorEmailConfirmationStoredPage to JourneyRecovery when answer is not present" in {
+        navigator.nextPage(ContractorEmailConfirmationStoredPage, CheckMode, emptyUserAnswers) mustBe journeyRecovery
       }
     }
   }
