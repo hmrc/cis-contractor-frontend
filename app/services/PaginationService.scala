@@ -22,9 +22,9 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.checkboxes.CheckboxItem
 import javax.inject.{Inject, Singleton}
 
 final case class CheckboxPaginationResult(
-                                           paginatedData: Seq[CheckboxItem],
-                                           paginationViewModel: PaginationViewModel
-                                         )
+  paginatedData: Seq[CheckboxItem],
+  paginationViewModel: PaginationViewModel
+)
 
 @Singleton
 class PaginationService @Inject() {
@@ -32,10 +32,10 @@ class PaginationService @Inject() {
   private val pageSize = 6
 
   def paginateCheckboxItems(
-                             allItems: Seq[CheckboxItem],
-                             currentPage: Int,
-                             baseUrl: String
-                           ): CheckboxPaginationResult = {
+    allItems: Seq[CheckboxItem],
+    currentPage: Int,
+    baseUrl: String
+  ): CheckboxPaginationResult = {
 
     val totalPages = math.ceil(allItems.size.toDouble / pageSize).toInt.max(1)
     val page       = currentPage.max(1).min(totalPages)
@@ -53,7 +53,7 @@ class PaginationService @Inject() {
             (1 to totalPages).map { p =>
               PaginationItemViewModel(
                 number = p.toString,
-                href   = s"$baseUrl?page=$p"
+                href = s"$baseUrl?page=$p"
               ).withCurrent(p == page)
             }
           )

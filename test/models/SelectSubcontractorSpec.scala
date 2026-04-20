@@ -24,7 +24,12 @@ import org.scalatest.matchers.must.Matchers
 import org.scalatest.OptionValues
 import play.api.libs.json.{JsError, JsString, Json}
 
-class SelectSubcontractorSpec extends AnyFreeSpec with Matchers with ScalaCheckPropertyChecks with OptionValues with ModelGenerators {
+class SelectSubcontractorSpec
+    extends AnyFreeSpec
+    with Matchers
+    with ScalaCheckPropertyChecks
+    with OptionValues
+    with ModelGenerators {
 
   "SelectSubcontractor" - {
 
@@ -32,10 +37,8 @@ class SelectSubcontractorSpec extends AnyFreeSpec with Matchers with ScalaCheckP
 
       val gen = arbitrary[SelectSubcontractor]
 
-      forAll(gen) {
-        selectSubcontractor =>
-
-          JsString(selectSubcontractor.toString).validate[SelectSubcontractor].asOpt.value mustEqual selectSubcontractor
+      forAll(gen) { selectSubcontractor =>
+        JsString(selectSubcontractor.toString).validate[SelectSubcontractor].asOpt.value mustEqual selectSubcontractor
       }
     }
 
@@ -43,10 +46,8 @@ class SelectSubcontractorSpec extends AnyFreeSpec with Matchers with ScalaCheckP
 
       val gen = arbitrary[String] suchThat (!SelectSubcontractor.values.map(_.toString).contains(_))
 
-      forAll(gen) {
-        invalidValue =>
-
-          JsString(invalidValue).validate[SelectSubcontractor] mustEqual JsError("error.invalid")
+      forAll(gen) { invalidValue =>
+        JsString(invalidValue).validate[SelectSubcontractor] mustEqual JsError("error.invalid")
       }
     }
 
@@ -54,10 +55,8 @@ class SelectSubcontractorSpec extends AnyFreeSpec with Matchers with ScalaCheckP
 
       val gen = arbitrary[SelectSubcontractor]
 
-      forAll(gen) {
-        selectSubcontractor =>
-
-          Json.toJson(selectSubcontractor) mustEqual JsString(selectSubcontractor.toString)
+      forAll(gen) { selectSubcontractor =>
+        Json.toJson(selectSubcontractor) mustEqual JsString(selectSubcontractor.toString)
       }
     }
   }

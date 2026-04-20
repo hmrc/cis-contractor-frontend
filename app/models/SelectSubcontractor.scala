@@ -43,7 +43,6 @@ object SelectSubcontractor extends Enumerable.Implicits {
 
   case object EtaPlastering extends WithName("etaPlastering") with SelectSubcontractor
 
-
   val values: Seq[SelectSubcontractor] = Seq(
     BrodyMartin,
     Hooperassociates,
@@ -57,14 +56,13 @@ object SelectSubcontractor extends Enumerable.Implicits {
   )
 
   def checkboxItems(implicit messages: Messages): Seq[CheckboxItem] =
-    values.zipWithIndex.map {
-      case (value, index) =>
-        CheckboxItemViewModel(
-          content = Text(messages(s"selectSubcontractor.${value.toString}")),
-          fieldId = "value",
-          index   = index,
-          value   = value.toString
-        )
+    values.zipWithIndex.map { case (value, index) =>
+      CheckboxItemViewModel(
+        content = Text(messages(s"selectSubcontractor.${value.toString}")),
+        fieldId = "value",
+        index = index,
+        value = value.toString
+      )
     }
 
   implicit val enumerable: Enumerable[SelectSubcontractor] =

@@ -27,7 +27,7 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist._
 
 class SelectSubcontractorSummarySpec extends SpecBase with Matchers {
 
-  private val messagesApi = stubMessagesApi()
+  private val messagesApi                 = stubMessagesApi()
   private implicit val messages: Messages =
     MessagesImpl(Lang.defaultLang, messagesApi)
 
@@ -101,7 +101,7 @@ class SelectSubcontractorSummarySpec extends SpecBase with Matchers {
       val valueHtml = row.value.content.asHtml.toString
 
       valueHtml must include(messages("selectSubcontractor.deltaElectrical"))
-      valueHtml must not include("<br>")
+      valueHtml must not include "<br>"
     }
 
     "must return None when no answer is present" in {

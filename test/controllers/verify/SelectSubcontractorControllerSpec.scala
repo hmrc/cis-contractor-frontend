@@ -40,7 +40,7 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
   def onwardRoute = Call("GET", "/foo")
 
   val formProvider = new SelectSubcontractorFormProvider()
-  val form = formProvider()
+  val form         = formProvider()
 
   val paginationService = new PaginationService()
 
@@ -61,7 +61,7 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
 
         val view = application.injector.instanceOf[SelectSubcontractorView]
 
-        val allItems = SelectSubcontractor.checkboxItems
+        val allItems         = SelectSubcontractor.checkboxItems
         val paginationResult =
           paginationService.paginateCheckboxItems(allItems, 1, url(1))
 
@@ -82,19 +82,20 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
       val userAnswers =
         UserAnswers(userAnswersId)
           .set(SelectSubcontractorPage, SelectSubcontractor.values.toSet)
-          .success.value
+          .success
+          .value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
       running(application) {
         val request = FakeRequest(GET, url(1))
-        val result = route(application, request).value
+        val result  = route(application, request).value
 
         implicit val msgs: Messages = messages(application)
 
         val view = application.injector.instanceOf[SelectSubcontractorView]
 
-        val allItems = SelectSubcontractor.checkboxItems
+        val allItems         = SelectSubcontractor.checkboxItems
         val paginationResult =
           paginationService.paginateCheckboxItems(allItems, 1, url(1))
 
@@ -153,7 +154,7 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
 
         implicit val msgs: Messages = messages(application)
 
-        val allItems = SelectSubcontractor.checkboxItems
+        val allItems         = SelectSubcontractor.checkboxItems
         val paginationResult =
           paginationService.paginateCheckboxItems(allItems, 1, url(1))
 
@@ -177,7 +178,7 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request = FakeRequest(GET, url(2))
-        val result = route(application, request).value
+        val result  = route(application, request).value
 
         status(result) mustEqual OK
       }

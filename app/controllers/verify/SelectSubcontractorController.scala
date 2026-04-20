@@ -33,22 +33,21 @@ import models.SelectSubcontractor
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class SelectSubcontractorController @Inject()(
-                                               override val messagesApi: MessagesApi,
-                                               sessionRepository: SessionRepository,
-                                               navigator: Navigator,
-                                               identify: IdentifierAction,
-                                               getData: DataRetrievalAction,
-                                               formProvider: SelectSubcontractorFormProvider,
-                                               paginationService: PaginationService,
-                                               val controllerComponents: MessagesControllerComponents,
-                                               view: SelectSubcontractorView
-                                             )(implicit ec: ExecutionContext)
-  extends FrontendBaseController
+class SelectSubcontractorController @Inject() (
+  override val messagesApi: MessagesApi,
+  sessionRepository: SessionRepository,
+  navigator: Navigator,
+  identify: IdentifierAction,
+  getData: DataRetrievalAction,
+  formProvider: SelectSubcontractorFormProvider,
+  paginationService: PaginationService,
+  val controllerComponents: MessagesControllerComponents,
+  view: SelectSubcontractorView
+)(implicit ec: ExecutionContext)
+    extends FrontendBaseController
     with I18nSupport {
 
   private val form = formProvider()
-
 
   def onPageLoad(mode: Mode, page: Int = 1): Action[AnyContent] =
     (identify andThen getData) { implicit request =>
@@ -61,7 +60,6 @@ class SelectSubcontractorController @Inject()(
           Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
 
         case Some(ua) =>
-
           val preparedForm =
             ua.get(SelectSubcontractorPage)
               .map(form.fill)
@@ -99,7 +97,6 @@ class SelectSubcontractorController @Inject()(
           )
 
         case Some(ua) =>
-
           val allItems =
             SelectSubcontractor.checkboxItems
 
@@ -110,28 +107,29 @@ class SelectSubcontractorController @Inject()(
               routes.SelectSubcontractorController.onPageLoad(mode, 1).url
             )
 
-          form.bindFromRequest().fold(
-            formWithErrors =>
-              Future.successful(
-                BadRequest(
-                  view(
-                    formWithErrors,
-                    mode,
-                    result.paginatedData,
-                    result.paginationViewModel,
-                    page
+          form
+            .bindFromRequest()
+            .fold(
+              formWithErrors =>
+                Future.successful(
+                  BadRequest(
+                    view(
+                      formWithErrors,
+                      mode,
+                      result.paginatedData,
+                      result.paginationViewModel,
+                      page
+                    )
                   )
+                ),
+              value =>
+                for {
+                  updatedAnswers <- Future.fromTry(ua.set(SelectSubcontractorPage, value))
+                  _              <- sessionRepository.set(updatedAnswers)
+                } yield Redirect(
+                  navigator.nextPage(SelectSubcontractorPage, mode, updatedAnswers)
                 )
-              ),
-
-            value =>
-              for {
-                updatedAnswers <- Future.fromTry(ua.set(SelectSubcontractorPage, value))
-                _ <- sessionRepository.set(updatedAnswers)
-              } yield Redirect(
-                navigator.nextPage(SelectSubcontractorPage, mode, updatedAnswers)
-              )
-          )
+            )
       }
     }
 }

@@ -25,29 +25,32 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
 
-object SelectSubcontractorSummary  {
+object SelectSubcontractorSummary {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(SelectSubcontractorPage).map {
-      answers =>
+    answers.get(SelectSubcontractorPage).map { answers =>
 
-        val value = ValueViewModel(
-          HtmlContent(
-            answers.map {
-              answer => HtmlFormat.escape(messages(s"selectSubcontractor.$answer")).toString
+      val value = ValueViewModel(
+        HtmlContent(
+          answers
+            .map { answer =>
+              HtmlFormat.escape(messages(s"selectSubcontractor.$answer")).toString
             }
             .mkString(",<br>")
-          )
         )
+      )
 
-        SummaryListRowViewModel(
-          key     = "selectSubcontractor.checkYourAnswersLabel",
-          value   = value,
-          actions = Seq(
-            ActionItemViewModel("site.change", controllers.verify.routes.SelectSubcontractorController.onPageLoad(CheckMode).url)
-              .withVisuallyHiddenText(messages("selectSubcontractor.change.hidden"))
-              .withAttribute("id" -> "select-subcontractor")
+      SummaryListRowViewModel(
+        key = "selectSubcontractor.checkYourAnswersLabel",
+        value = value,
+        actions = Seq(
+          ActionItemViewModel(
+            "site.change",
+            controllers.verify.routes.SelectSubcontractorController.onPageLoad(CheckMode).url
           )
+            .withVisuallyHiddenText(messages("selectSubcontractor.change.hidden"))
+            .withAttribute("id" -> "select-subcontractor")
         )
+      )
     }
 }

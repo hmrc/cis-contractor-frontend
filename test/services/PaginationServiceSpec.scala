@@ -113,7 +113,7 @@ class PaginationServiceSpec extends AnyWordSpec with Matchers {
       val result = service.paginateCheckboxItems(items(12), 2, baseUrl)
 
       // page 1: 1-6, page 2: 7-12
-      result.paginatedData.map(_.value) mustBe Seq("7","8","9","10","11","12")
+      result.paginatedData.map(_.value) mustBe Seq("7", "8", "9", "10", "11", "12")
       result.paginationViewModel.next mustBe None
       result.paginationViewModel.previous.isDefined mustBe true
     }
