@@ -71,5 +71,15 @@ class CompanyEmailAddressFormProviderSpec extends StringFieldBehaviours {
         ),
       error = FormError(fieldName, invalidKey, Seq(Validation.emailRegex))
     )
+
+    "not bind an email whose domain decodes to non-letter/digit characters" in {
+      val result = form.bind(Map(fieldName -> "test@xn--domain-8ia.com")).apply(fieldName)
+      result.errors mustEqual Seq(FormError(fieldName, invalidKey))
+    }
+
+    "bind an email with a valid internationalised domain label" in {
+      val result = form.bind(Map(fieldName -> "test@xn--mnchen-3ya.de")).apply(fieldName)
+      result.errors mustBe empty
+    }
   }
 }

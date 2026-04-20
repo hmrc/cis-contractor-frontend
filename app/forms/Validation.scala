@@ -16,7 +16,9 @@
 
 package forms
 
+import java.net.IDN
 import play.api.data.validation.{Constraint, Invalid, Valid}
+import scala.util.Try
 import uk.gov.hmrc.domain.Nino
 
 object Validation {
@@ -37,6 +39,23 @@ object Validation {
 
   final val ukPostcodeRegex =
     """^[A-Za-z0-9 ~!\"@#$%\&\'\(\)\*\+,\-\./:;\<=\>\?\[\\\]^_\{\}\£\€]*$"""
+
+  def noPunycodeDomain(errorKey: String): Constraint[String] =
+    Constraint { email =>
+      val domain           = email.split("@", 2).lift(1).getOrElse("")
+      val hasPunycodeLabel = domain.split('.').exists(_.toLowerCase.startsWith("xn--"))
+      if (hasPunycodeLabel) Invalid(errorKey) else Valid
+    }
+
+  def noInvalidDomainCharacters(errorKey: String): Constraint[String] =
+    Constraint { email =>
+      val domain          = email.split("@", 2).lift(1).getOrElse("")
+      val hasInvalidLabel = domain.split('.').exists { label =>
+        val decoded = Try(IDN.toUnicode(label)).getOrElse(label)
+        decoded.exists(c => !Character.isLetterOrDigit(c) && c != '-')
+      }
+      if (hasInvalidLabel) Invalid(errorKey) else Valid
+    }
 
   def isNinoValid(value: String, errorKey: String): Constraint[String] =
     Constraint {
