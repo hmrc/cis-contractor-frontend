@@ -360,4 +360,13 @@ POST  /verify/verification-declaration              controllers.verify.Verificat
 
 GET   /verify/submitting-verification-request       controllers.verify.SubmissionSendingController.onPageLoad()
 
+GET   /verify/no-subcontractors-added               controllers.verify.NoSubcontractorsAddedController.onPageLoad()
+
 GET   /verification/newest                          controllers.verification.NewestVerificationBatchController.onPageLoad()
+
+GET   /verify/verification-request-in-progress      controllers.verify.VerificationRequestInProgressController.onPageLoad()
+
+GET   /verify/confirmation-email-stored             controllers.verify.ContractorEmailConfirmationStoredController.onPageLoad(mode: Mode = NormalMode)
+POST  /verify/confirmation-email-stored             controllers.verify.ContractorEmailConfirmationStoredController.onSubmit(mode: Mode = NormalMode)
+GET   /verify/change-confirmation-email-stored      controllers.verify.ContractorEmailConfirmationStoredController.onPageLoad(mode: Mode = CheckMode)
+POST  /verify/change-confirmation-email-stored      controllers.verify.ContractorEmailConfirmationStoredController.onSubmit(mode: Mode = CheckMode)
