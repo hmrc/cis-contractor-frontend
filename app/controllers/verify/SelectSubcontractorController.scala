@@ -104,7 +104,7 @@ class SelectSubcontractorController @Inject() (
             paginationService.paginateCheckboxItems(
               allItems,
               page,
-              routes.SelectSubcontractorController.onPageLoad(mode, page).url
+              routes.SelectSubcontractorController.onPageLoad(mode).url
             )
 
           val currentPageValues: Set[SelectSubcontractor] =
@@ -115,6 +115,17 @@ class SelectSubcontractorController @Inject() (
           val otherPageValues: Set[SelectSubcontractor] =
             ua.get(SelectSubcontractorPage).getOrElse(Set.empty).diff(currentPageValues)
 
+          val currentSelectedValues: Set[SelectSubcontractor] =
+            request.body.asFormUrlEncoded
+              .getOrElse(Map.empty)
+              .filter { case (k, _) => k == "value" || k.matches("""value\[\d+]""") }
+              .values
+              .flatten
+              .flatMap(v => SelectSubcontractor.values.find(_.toString == v))
+              .toSet
+
+          val mergedValues = otherPageValues ++ currentSelectedValues
+
           val gotoPage: Option[Int] =
             request.body.asFormUrlEncoded
               .flatMap(_.get("gotoPage"))
@@ -123,53 +134,42 @@ class SelectSubcontractorController @Inject() (
 
           gotoPage match {
             case Some(targetPage) =>
-              val currentSelectedValues: Set[SelectSubcontractor] =
-                request.body.asFormUrlEncoded
-                  .getOrElse(Map.empty)
-                  .filter { case (k, _) => k == "value" || k.matches("""value\[\d+]""") }
-                  .values
-                  .flatten
-                  .flatMap(v => SelectSubcontractor.values.find(_.toString == v))
-                  .toSet
-
-              val mergedValues = otherPageValues ++ currentSelectedValues
-
-              val saveAction: Future[UserAnswers] =
-                if (mergedValues.nonEmpty) {
-                  Future.fromTry(ua.set(SelectSubcontractorPage, mergedValues))
-                } else {
-                  Future.successful(ua)
-                }
-
               for {
-                updatedAnswers <- saveAction
+                updatedAnswers <- Future.fromTry(ua.set(SelectSubcontractorPage, mergedValues))
                 _              <- sessionRepository.set(updatedAnswers)
               } yield Redirect(routes.SelectSubcontractorController.onPageLoad(mode, targetPage))
 
             case None =>
-              form
-                .bindFromRequest()
-                .fold(
-                  formWithErrors =>
-                    Future.successful(
-                      BadRequest(
-                        view(
-                          formWithErrors,
-                          mode,
-                          result.paginatedData,
-                          result.paginationViewModel,
-                          page
+              if (mergedValues.nonEmpty) {
+                for {
+                  updatedAnswers <- Future.fromTry(ua.set(SelectSubcontractorPage, mergedValues))
+                  _              <- sessionRepository.set(updatedAnswers)
+                } yield Redirect(navigator.nextPage(SelectSubcontractorPage, mode, updatedAnswers))
+              } else {
+                form
+                  .bindFromRequest()
+                  .fold(
+                    formWithErrors =>
+                      Future.successful(
+                        BadRequest(
+                          view(
+                            formWithErrors,
+                            mode,
+                            result.paginatedData,
+                            result.paginationViewModel,
+                            page
+                          )
                         )
+                      ),
+                    value =>
+                      for {
+                        updatedAnswers <- Future.fromTry(ua.set(SelectSubcontractorPage, value ++ otherPageValues))
+                        _              <- sessionRepository.set(updatedAnswers)
+                      } yield Redirect(
+                        navigator.nextPage(SelectSubcontractorPage, mode, updatedAnswers)
                       )
-                    ),
-                  value =>
-                    for {
-                      updatedAnswers <- Future.fromTry(ua.set(SelectSubcontractorPage, value ++ otherPageValues))
-                      _              <- sessionRepository.set(updatedAnswers)
-                    } yield Redirect(
-                      navigator.nextPage(SelectSubcontractorPage, mode, updatedAnswers)
-                    )
-                )
+                  )
+              }
           }
       }
     }

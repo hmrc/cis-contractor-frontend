@@ -20,11 +20,14 @@ import base.SpecBase
 import forms.verify.SelectSubcontractorFormProvider
 import models.{NormalMode, SelectSubcontractor, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
+import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.when
-import play.api.i18n.Messages
+import org.mockito.Mockito.{verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import pages.verify.SelectSubcontractorPage
+import play.api.data.Forms.*
+import play.api.data.Form
+import play.api.i18n.Messages
 import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
@@ -32,19 +35,20 @@ import play.api.test.Helpers.*
 import repositories.SessionRepository
 import services.PaginationService
 import views.html.verify.SelectSubcontractorView
+import javax.inject.Inject
 
 import scala.concurrent.Future
 
 class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
 
-  def onwardRoute = Call("GET", "/foo")
+  def onwardRoute: Call = Call("GET", "/foo")
 
   val formProvider = new SelectSubcontractorFormProvider()
-  val form         = formProvider()
+  val form: Form[Set[SelectSubcontractor]] = formProvider()
 
   val paginationService = new PaginationService()
 
-  def url(page: Int = 1) =
+  def url(page: Int = 1): String =
     controllers.verify.routes.SelectSubcontractorController.onPageLoad(NormalMode, page).url
 
   "SelectSubcontractor Controller" - {
@@ -55,13 +59,13 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request = FakeRequest(GET, url(1))
-        val result  = route(application, request).value
+        val result = route(application, request).value
 
         implicit val msgs: Messages = messages(application)
 
         val view = application.injector.instanceOf[SelectSubcontractorView]
 
-        val allItems         = SelectSubcontractor.checkboxItems
+        val allItems = SelectSubcontractor.checkboxItems
         val paginationResult =
           paginationService.paginateCheckboxItems(allItems, 1, url(1))
 
@@ -89,13 +93,13 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request = FakeRequest(GET, url(1))
-        val result  = route(application, request).value
+        val result = route(application, request).value
 
         implicit val msgs: Messages = messages(application)
 
         val view = application.injector.instanceOf[SelectSubcontractorView]
 
-        val allItems         = SelectSubcontractor.checkboxItems
+        val allItems = SelectSubcontractor.checkboxItems
         val paginationResult =
           paginationService.paginateCheckboxItems(allItems, 1, url(1))
 
@@ -114,7 +118,6 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
     "must redirect to the next page when valid data is submitted" in {
 
       val mockSessionRepository = mock[SessionRepository]
-
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
       val application =
@@ -154,7 +157,7 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
 
         implicit val msgs: Messages = messages(application)
 
-        val allItems         = SelectSubcontractor.checkboxItems
+        val allItems = SelectSubcontractor.checkboxItems
         val paginationResult =
           paginationService.paginateCheckboxItems(allItems, 1, url(1))
 
@@ -178,7 +181,7 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request = FakeRequest(GET, url(2))
-        val result  = route(application, request).value
+        val result = route(application, request).value
 
         status(result) mustEqual OK
       }
@@ -274,7 +277,7 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must redirect to target page without requiring a selection when gotoPage field is present" in {
+    "must redirect when gotoPage is present even if no selections exist anywhere" in {
 
       val mockSessionRepository = mock[SessionRepository]
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
@@ -293,6 +296,71 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual url(2)
+
+        val captor: ArgumentCaptor[UserAnswers] = ArgumentCaptor.forClass(classOf[UserAnswers])
+        verify(mockSessionRepository).set(captor.capture())
+        captor.getValue.get(SelectSubcontractorPage).value mustEqual Set.empty[SelectSubcontractor]
+      }
+    }
+
+    "must redirect to target page when gotoPage is present and there are prior selections (even if current page submits none)" in {
+
+      val mockSessionRepository = mock[SessionRepository]
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+      val priorSelection: Set[SelectSubcontractor] = Set(SelectSubcontractor.BrodyMartin)
+      val userAnswers =
+        UserAnswers(userAnswersId)
+          .set(SelectSubcontractorPage, priorSelection)
+          .success
+          .value
+
+      val application =
+        applicationBuilder(userAnswers = Some(userAnswers))
+          .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, url(1))
+            .withFormUrlEncodedBody("gotoPage" -> "2")
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual url(2)
+      }
+    }
+
+    "must redirect to next page when Continue is submitted on page 2 with no selections but prior page selections saved" in {
+
+      val mockSessionRepository = mock[SessionRepository]
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+      val page1Selection: Set[SelectSubcontractor] = Set(SelectSubcontractor.BrodyMartin)
+      val userAnswers =
+        UserAnswers(userAnswersId)
+          .set(SelectSubcontractorPage, page1Selection)
+          .success
+          .value
+
+      val application =
+        applicationBuilder(userAnswers = Some(userAnswers))
+          .overrides(
+            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
+            bind[SessionRepository].toInstance(mockSessionRepository)
+          )
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, url(2))
+            .withFormUrlEncodedBody()
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual onwardRoute.url
       }
     }
 
@@ -302,7 +370,7 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
       val page1Selection: Set[SelectSubcontractor] = Set(SelectSubcontractor.BrodyMartin)
-      val userAnswers                              =
+      val userAnswers =
         UserAnswers(userAnswersId)
           .set(SelectSubcontractorPage, page1Selection)
           .success
@@ -327,7 +395,136 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual onwardRoute.url
+
+        val captor: ArgumentCaptor[UserAnswers] = ArgumentCaptor.forClass(classOf[UserAnswers])
+        verify(mockSessionRepository).set(captor.capture())
+        captor.getValue.get(SelectSubcontractorPage).value mustEqual
+          (page1Selection + SelectSubcontractor.EpsilonCarpentry)
       }
     }
+
+    "must merge newly selected values with otherPageValues when mergedValues is empty and no gotoPage is provided (fold success path)" in {
+
+      val mockSessionRepository = mock[SessionRepository]
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+      val application =
+        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          .overrides(
+            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
+            bind[SessionRepository].toInstance(mockSessionRepository)
+          )
+          .build()
+
+      running(application) {
+
+        implicit val msgs: Messages = messages(application)
+
+        val allItems = SelectSubcontractor.checkboxItems
+
+        val page1 =
+          paginationService.paginateCheckboxItems(allItems, 1, url(1))
+
+        val page2 =
+          paginationService.paginateCheckboxItems(allItems, 2, url(2))
+
+        val page1Values: Set[SelectSubcontractor] =
+          page1.paginatedData
+            .flatMap(item => SelectSubcontractor.values.find(_.toString == item.value))
+            .toSet
+
+        val page2Values: Set[SelectSubcontractor] =
+          page2.paginatedData
+            .flatMap(item => SelectSubcontractor.values.find(_.toString == item.value))
+            .toSet
+
+        page2Values.nonEmpty mustBe true
+
+        val otherPageSelection: Set[SelectSubcontractor] = Set(page2Values.head)
+
+        val userAnswers =
+          UserAnswers(userAnswersId)
+            .set(SelectSubcontractorPage, otherPageSelection)
+            .success
+            .value
+
+        val appWithAnswers =
+          applicationBuilder(userAnswers = Some(userAnswers))
+            .overrides(
+              bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
+              bind[SessionRepository].toInstance(mockSessionRepository)
+            )
+            .build()
+
+        running(appWithAnswers) {
+
+          val newSelectionOnPage1: SelectSubcontractor =
+            page1Values.diff(otherPageSelection).head
+
+          val request =
+            FakeRequest(POST, url(1))
+              .withFormUrlEncodedBody(
+                "value[0]" -> newSelectionOnPage1.toString
+              )
+
+          val result = route(appWithAnswers, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual onwardRoute.url
+
+          val captor: ArgumentCaptor[UserAnswers] = ArgumentCaptor.forClass(classOf[UserAnswers])
+          verify(mockSessionRepository).set(captor.capture())
+
+          captor.getValue.get(SelectSubcontractorPage).value mustEqual
+            (otherPageSelection + newSelectionOnPage1)
+        }
+      }
+    }
+
+    "must hit fold success branch and save (value ++ otherPageValues) when mergedValues is empty (test-only form provider override)" in {
+
+      // A test-only form provider that always binds successfully and returns a fixed non-empty Set
+      class TestSelectSubcontractorFormProvider @Inject()() extends SelectSubcontractorFormProvider {
+        override def apply(): Form[Set[SelectSubcontractor]] =
+          Form(
+            single(
+              // ignore request content; always return a valid non-empty set
+              "value" -> ignored(Set(SelectSubcontractor.values.head))
+            )
+          )
+      }
+
+      val mockSessionRepository = mock[SessionRepository]
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+      // Ensure otherPageValues will be empty too (no prior selections),
+      // so mergedValues = otherPageValues ++ currentSelectedValues stays empty
+      val application =
+        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          .overrides(
+            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
+            bind[SessionRepository].toInstance(mockSessionRepository),
+            bind[SelectSubcontractorFormProvider].to[TestSelectSubcontractorFormProvider]
+          )
+          .build()
+
+      running(application) {
+        // no gotoPage, and no submitted value keys -> currentSelectedValues == empty
+        val request = FakeRequest(POST, url(1)).withFormUrlEncodedBody()
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual onwardRoute.url
+
+        // verify it saved the value from the form (plus empty otherPageValues)
+        val captor: ArgumentCaptor[UserAnswers] = ArgumentCaptor.forClass(classOf[UserAnswers])
+        verify(mockSessionRepository).set(captor.capture())
+
+        captor.getValue.get(SelectSubcontractorPage).value mustEqual
+          Set(SelectSubcontractor.values.head)
+      }
+    }
+
   }
 }

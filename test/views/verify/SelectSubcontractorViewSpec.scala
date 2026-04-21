@@ -18,19 +18,21 @@ package views.verify
 
 import base.SpecBase
 import forms.verify.SelectSubcontractorFormProvider
-import models.SelectSubcontractor
+import models.{Mode, SelectSubcontractor}
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
+import org.jsoup.select.Elements
 import org.scalatest.matchers.must.Matchers
 import play.api.Application
 import play.api.data.Form
 import play.api.i18n.Messages
 import play.api.test.FakeRequest
 import play.twirl.api.HtmlFormat
-import play.api.mvc._
+import play.api.mvc.*
 import play.api.i18n.MessagesApi
 import play.api.test.Helpers.GET
-import viewmodels.govuk.PaginationFluency._
+import uk.gov.hmrc.govukfrontend.views.viewmodels.checkboxes.CheckboxItem
+import viewmodels.govuk.PaginationFluency.*
 import views.html.verify.SelectSubcontractorView
 
 class SelectSubcontractorViewSpec extends SpecBase with Matchers {
@@ -39,7 +41,7 @@ class SelectSubcontractorViewSpec extends SpecBase with Matchers {
 
     "must render heading, hint, checkboxes and button" in new Setup {
 
-      val items =
+      val items: Seq[CheckboxItem] =
         SelectSubcontractor.checkboxItems(messages)
 
       val html: HtmlFormat.Appendable =
@@ -63,17 +65,36 @@ class SelectSubcontractorViewSpec extends SpecBase with Matchers {
       val formWithError: Form[Set[SelectSubcontractor]] =
         form.bind(Map("value" -> ""))
 
-      val html = view(formWithError, mode, checkboxItems, PaginationViewModel(), page = 1)
+      val html: HtmlFormat.Appendable = view(formWithError, mode, checkboxItems, PaginationViewModel(), page = 1)
 
-      val doc = Jsoup.parse(html.body)
+      val doc: Document = Jsoup.parse(html.body)
 
       doc.title must startWith(messages("error.title.prefix"))
       doc.select(".govuk-error-summary").size() mustBe 1
     }
 
+    "must render error summary link targeting the first checkbox on the current page" in new Setup {
+
+      val formWithError: Form[Set[SelectSubcontractor]] =
+        form.bind(Map("value" -> ""))
+
+      val page1Items: Seq[CheckboxItem] = SelectSubcontractor.checkboxItems(messages).slice(0, 6)
+      val page2Items: Seq[CheckboxItem] = SelectSubcontractor.checkboxItems(messages).slice(6, 9)
+
+      val docPage1: Document = Jsoup.parse(
+        view(formWithError, mode, page1Items, PaginationViewModel(), page = 1).body
+      )
+      docPage1.select(".govuk-error-summary__list a").attr("href") mustBe "#value_0"
+
+      val docPage2: Document = Jsoup.parse(
+        view(formWithError, mode, page2Items, PaginationViewModel(), page = 2).body
+      )
+      docPage2.select(".govuk-error-summary__list a").attr("href") mustBe "#value_6"
+    }
+
     "must render pagination when multiple pages exist" in new Setup {
 
-      val pagination = PaginationViewModel(
+      val pagination: PaginationViewModel = PaginationViewModel(
         items = Seq(
           PaginationItemViewModel("1", "/test?page=1").withCurrent(true),
           PaginationItemViewModel("2", "/test?page=2")
@@ -84,9 +105,9 @@ class SelectSubcontractorViewSpec extends SpecBase with Matchers {
         )
       )
 
-      val html = view(form, mode, checkboxItems, pagination, page = 1)
+      val html: HtmlFormat.Appendable = view(form, mode, checkboxItems, pagination, page = 1)
 
-      val doc = Jsoup.parse(html.body)
+      val doc: Document = Jsoup.parse(html.body)
 
       doc.select(".govuk-pagination").size() mustBe 1
       doc.select(".govuk-pagination__item").size() mustBe 2
@@ -95,7 +116,7 @@ class SelectSubcontractorViewSpec extends SpecBase with Matchers {
 
     "must render previous and next on middle page" in new Setup {
 
-      val pagination = PaginationViewModel(
+      val pagination: PaginationViewModel = PaginationViewModel(
         items = Seq(
           PaginationItemViewModel("1", "/test?page=1"),
           PaginationItemViewModel("2", "/test?page=2").withCurrent(true),
@@ -111,9 +132,9 @@ class SelectSubcontractorViewSpec extends SpecBase with Matchers {
         )
       )
 
-      val html = view(form, mode, checkboxItems, pagination, page = 2)
+      val html: HtmlFormat.Appendable = view(form, mode, checkboxItems, pagination, page = 2)
 
-      val doc = Jsoup.parse(html.body)
+      val doc: Document = Jsoup.parse(html.body)
 
       doc.select(".govuk-pagination__prev").size() mustBe 1
       doc.select(".govuk-pagination__next").size() mustBe 1
@@ -121,9 +142,9 @@ class SelectSubcontractorViewSpec extends SpecBase with Matchers {
 
     "must NOT render pagination links when only one page" in new Setup {
 
-      val html = view(form, mode, checkboxItems, PaginationViewModel(), page = 1)
+      val html: HtmlFormat.Appendable = view(form, mode, checkboxItems, PaginationViewModel(), page = 1)
 
-      val doc = Jsoup.parse(html.body)
+      val doc: Document = Jsoup.parse(html.body)
 
       doc.select(".govuk-pagination__item").size() mustBe 0
       doc.select(".govuk-pagination__prev").size() mustBe 0
@@ -132,7 +153,7 @@ class SelectSubcontractorViewSpec extends SpecBase with Matchers {
 
     "must render pagination buttons as submit controls with correct gotoPage values" in new Setup {
 
-      val pagination = PaginationViewModel(
+      val pagination: PaginationViewModel = PaginationViewModel(
         items = Seq(
           PaginationItemViewModel("1", "/test?page=1").withCurrent(true),
           PaginationItemViewModel("2", "/test?page=2"),
@@ -142,10 +163,10 @@ class SelectSubcontractorViewSpec extends SpecBase with Matchers {
         next = Some(PaginationLinkViewModel("/test?page=3"))
       )
 
-      val html = view(form, mode, checkboxItems, pagination, page = 2)
-      val doc  = Jsoup.parse(html.body)
+      val html: HtmlFormat.Appendable = view(form, mode, checkboxItems, pagination, page = 2)
+      val doc: Document = Jsoup.parse(html.body)
 
-      val prevButton =
+      val prevButton: Elements =
         doc.select(".govuk-pagination__prev button[name=gotoPage][value=1]")
 
       prevButton.size mustBe 1
@@ -156,7 +177,7 @@ class SelectSubcontractorViewSpec extends SpecBase with Matchers {
       doc.select(".govuk-pagination__item button[name=gotoPage][value=2]").size mustBe 1
       doc.select(".govuk-pagination__item button[name=gotoPage][value=3]").size mustBe 1
 
-      val nextButton =
+      val nextButton: Elements =
         doc.select(".govuk-pagination__next button[name=gotoPage][value=3]")
 
       nextButton.size mustBe 1
@@ -165,7 +186,7 @@ class SelectSubcontractorViewSpec extends SpecBase with Matchers {
 
     "must mark the current pagination item with aria-current" in new Setup {
 
-      val pagination = PaginationViewModel(
+      val pagination: PaginationViewModel = PaginationViewModel(
         items = Seq(
           PaginationItemViewModel("1", "/test?page=1"),
           PaginationItemViewModel("2", "/test?page=2").withCurrent(true),
@@ -173,8 +194,8 @@ class SelectSubcontractorViewSpec extends SpecBase with Matchers {
         )
       )
 
-      val html = view(form, mode, checkboxItems, pagination, page = 2)
-      val doc  = Jsoup.parse(html.body)
+      val html: HtmlFormat.Appendable = view(form, mode, checkboxItems, pagination, page = 2)
+      val doc: Document = Jsoup.parse(html.body)
 
       doc.select(".govuk-pagination__item--current").size mustBe 1
       doc.select(".govuk-pagination__item--current [aria-current=page]").size mustBe 1
@@ -202,6 +223,6 @@ class SelectSubcontractorViewSpec extends SpecBase with Matchers {
     val checkboxItems: Seq[uk.gov.hmrc.govukfrontend.views.viewmodels.checkboxes.CheckboxItem] =
       SelectSubcontractor.checkboxItems
 
-    val mode = models.NormalMode
+    val mode: Mode = models.NormalMode
   }
 }
