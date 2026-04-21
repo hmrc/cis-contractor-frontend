@@ -43,7 +43,7 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
 
   def onwardRoute: Call = Call("GET", "/foo")
 
-  val formProvider = new SelectSubcontractorFormProvider()
+  val formProvider                         = new SelectSubcontractorFormProvider()
   val form: Form[Set[SelectSubcontractor]] = formProvider()
 
   val paginationService = new PaginationService()
@@ -59,13 +59,13 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request = FakeRequest(GET, url(1))
-        val result = route(application, request).value
+        val result  = route(application, request).value
 
         implicit val msgs: Messages = messages(application)
 
         val view = application.injector.instanceOf[SelectSubcontractorView]
 
-        val allItems = SelectSubcontractor.checkboxItems
+        val allItems         = SelectSubcontractor.checkboxItems
         val paginationResult =
           paginationService.paginateCheckboxItems(allItems, 1, url(1))
 
@@ -93,13 +93,13 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request = FakeRequest(GET, url(1))
-        val result = route(application, request).value
+        val result  = route(application, request).value
 
         implicit val msgs: Messages = messages(application)
 
         val view = application.injector.instanceOf[SelectSubcontractorView]
 
-        val allItems = SelectSubcontractor.checkboxItems
+        val allItems         = SelectSubcontractor.checkboxItems
         val paginationResult =
           paginationService.paginateCheckboxItems(allItems, 1, url(1))
 
@@ -157,7 +157,7 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
 
         implicit val msgs: Messages = messages(application)
 
-        val allItems = SelectSubcontractor.checkboxItems
+        val allItems         = SelectSubcontractor.checkboxItems
         val paginationResult =
           paginationService.paginateCheckboxItems(allItems, 1, url(1))
 
@@ -181,7 +181,7 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request = FakeRequest(GET, url(2))
-        val result = route(application, request).value
+        val result  = route(application, request).value
 
         status(result) mustEqual OK
       }
@@ -309,7 +309,7 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
       val priorSelection: Set[SelectSubcontractor] = Set(SelectSubcontractor.BrodyMartin)
-      val userAnswers =
+      val userAnswers                              =
         UserAnswers(userAnswersId)
           .set(SelectSubcontractorPage, priorSelection)
           .success
@@ -338,7 +338,7 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
       val page1Selection: Set[SelectSubcontractor] = Set(SelectSubcontractor.BrodyMartin)
-      val userAnswers =
+      val userAnswers                              =
         UserAnswers(userAnswersId)
           .set(SelectSubcontractorPage, page1Selection)
           .success
@@ -370,7 +370,7 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
       val page1Selection: Set[SelectSubcontractor] = Set(SelectSubcontractor.BrodyMartin)
-      val userAnswers =
+      val userAnswers                              =
         UserAnswers(userAnswersId)
           .set(SelectSubcontractorPage, page1Selection)
           .success
@@ -484,7 +484,7 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
     "must hit fold success branch and save (value ++ otherPageValues) when mergedValues is empty (test-only form provider override)" in {
 
       // A test-only form provider that always binds successfully and returns a fixed non-empty Set
-      class TestSelectSubcontractorFormProvider @Inject()() extends SelectSubcontractorFormProvider {
+      class TestSelectSubcontractorFormProvider @Inject() () extends SelectSubcontractorFormProvider {
         override def apply(): Form[Set[SelectSubcontractor]] =
           Form(
             single(

@@ -164,7 +164,7 @@ class SelectSubcontractorViewSpec extends SpecBase with Matchers {
       )
 
       val html: HtmlFormat.Appendable = view(form, mode, checkboxItems, pagination, page = 2)
-      val doc: Document = Jsoup.parse(html.body)
+      val doc: Document               = Jsoup.parse(html.body)
 
       val prevButton: Elements =
         doc.select(".govuk-pagination__prev button[name=gotoPage][value=1]")
@@ -195,7 +195,7 @@ class SelectSubcontractorViewSpec extends SpecBase with Matchers {
       )
 
       val html: HtmlFormat.Appendable = view(form, mode, checkboxItems, pagination, page = 2)
-      val doc: Document = Jsoup.parse(html.body)
+      val doc: Document               = Jsoup.parse(html.body)
 
       doc.select(".govuk-pagination__item--current").size mustBe 1
       doc.select(".govuk-pagination__item--current [aria-current=page]").size mustBe 1
