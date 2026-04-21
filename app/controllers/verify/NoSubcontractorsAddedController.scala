@@ -21,6 +21,7 @@ import controllers.actions.*
 import models.NormalMode
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import queries.CisIdQuery
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.verify.NoSubcontractorsAddedView
 
@@ -38,6 +39,18 @@ class NoSubcontractorsAddedController @Inject() (
     with I18nSupport {
 
   def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
-    Ok(view(controllers.add.routes.TypeOfSubcontractorController.onPageLoad(NormalMode).url))
+
+    val addSubcontractorsUrl = controllers.add.routes.TypeOfSubcontractorController.onPageLoad(NormalMode).url
+
+    request.userAnswers.get(CisIdQuery) match {
+      case Some(cisId) =>
+        val manageSubcontractorsUrl =
+          s"${appConfig.manageSubcontractorsUrl}/$cisId"
+        Ok(view(addSubcontractorsUrl, manageSubcontractorsUrl))
+
+      case None =>
+        Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+
+    }
   }
 }

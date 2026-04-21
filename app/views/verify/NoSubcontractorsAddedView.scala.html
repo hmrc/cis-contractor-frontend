@@ -15,7 +15,6 @@
  *@
 
 @import views.html.components._
-@import config.FrontendAppConfig
 
 @this(
         layout: templates.Layout,
@@ -24,7 +23,7 @@
         link: Link
 )
 
-@(addSubcontractorsUrl: String)(implicit request: Request[_], appConfig: FrontendAppConfig, messages: Messages)
+@(addSubcontractorsUrl: String, manageSubcontractorsUrl: String)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = titleNoForm(messages("verify.noSubcontractorsAdded.title"))) {
 
@@ -38,7 +37,7 @@
         )
         @link(
             "verify.noSubcontractorsAdded.p3.link",
-            appConfig.manageSubcontractorsUrl,
+            manageSubcontractorsUrl,
             prefixTextKey = "verify.noSubcontractorsAdded.p3",
             hasFullStop = true
         )
