@@ -45,12 +45,18 @@ class NoSubcontractorsAddedViewSpec extends AnyWordSpec with Matchers with Guice
 
   "NoSubcontractorsAddedView" should {
 
-    "render the page with correct title, heading, first paragraph and both links" in {
+    "render the page with correct title, heading, paragraphs and both links" in {
 
-      val addSubcontractorsUrl = "/add-subcontractors"
+      val addSubcontractorsUrl    = "/add-subcontractors"
+      val manageSubcontractorsUrl = "/manage-subcontractors/T1234567"
 
-      val html = view(addSubcontractorsUrl)
-      val doc  = Jsoup.parse(html.toString())
+      val html =
+        view(addSubcontractorsUrl, manageSubcontractorsUrl)(
+          request,
+          messages
+        )
+
+      val doc = Jsoup.parse(html.toString())
 
       doc.select("title").text() must include(
         messages("verify.noSubcontractorsAdded.title")
@@ -78,14 +84,18 @@ class NoSubcontractorsAddedViewSpec extends AnyWordSpec with Matchers with Guice
       )
 
       val manageLink =
-        doc.select(s"a[href='${appConfig.manageSubcontractorsUrl}']")
+        doc.select(s"a[href='$manageSubcontractorsUrl']")
       manageLink.size() mustBe 1
       manageLink.text() mustBe
         messages("verify.noSubcontractorsAdded.p3.link")
 
-      manageLink.first().parent().text() must include(
+      val manageText = manageLink.first().parent().text()
+
+      manageText must include(
         messages("verify.noSubcontractorsAdded.p3")
       )
+
+      manageText.trim.endsWith(".") mustBe true
     }
   }
 }

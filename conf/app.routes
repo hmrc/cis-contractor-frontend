@@ -375,3 +375,6 @@ GET   /verify/enter-confirmation-email             controllers.verify.EmailAddre
 POST  /verify/enter-confirmation-email             controllers.verify.EmailAddressController.onSubmit(mode: Mode = NormalMode)
 GET   /verify/change-enter-confirmation-email      controllers.verify.EmailAddressController.onPageLoad(mode: Mode = CheckMode)
 POST  /verify/change-enter-confirmation-email      controllers.verify.EmailAddressController.onSubmit(mode: Mode = CheckMode)
+
+GET   /verify/no-new-subcontractors-to-verify       controllers.verify.VerifyYourSubcontractorsYesNoController.onPageLoad
+POST  /verify/no-new-subcontractors-to-verify       controllers.verify.VerifyYourSubcontractorsYesNoController.onSubmit
