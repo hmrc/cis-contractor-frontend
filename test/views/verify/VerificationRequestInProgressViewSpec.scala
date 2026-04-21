@@ -47,8 +47,16 @@ class VerificationRequestInProgressViewSpec extends AnyWordSpec with Matchers wi
 
     "render the page with correct title, heading, paragraphs and links" in {
 
-      val html = view()
-      val doc  = Jsoup.parse(html.toString())
+      val manageSubcontractorsUrl = "/manage-subcontractors/T1234567"
+
+      val html =
+        view(manageSubcontractorsUrl)(
+          request,
+          appConfig,
+          messages
+        )
+
+      val doc = Jsoup.parse(html.toString())
 
       doc.select("title").text() must include(
         messages("verify.verificationRequestInProgress.title")
@@ -68,6 +76,7 @@ class VerificationRequestInProgressViewSpec extends AnyWordSpec with Matchers wi
 
       val serviceDeskLink =
         doc.select(s"a[href='${appConfig.cisGeneralEnquiries}']")
+
       serviceDeskLink.size() mustBe 1
       serviceDeskLink.text() mustBe
         messages("verify.verificationRequestInProgress.p3.link")
@@ -76,15 +85,21 @@ class VerificationRequestInProgressViewSpec extends AnyWordSpec with Matchers wi
         messages("verify.verificationRequestInProgress.p3")
       )
 
-      val manageSubcontractorsLink =
-        doc.select(s"a[href='${appConfig.manageSubcontractorsUrl}']")
-      manageSubcontractorsLink.size() mustBe 1
-      manageSubcontractorsLink.text() mustBe
+      val manageLink =
+        doc.select(s"a[href='$manageSubcontractorsUrl']")
+
+      manageLink.size() mustBe 1
+      manageLink.text() mustBe
         messages("verify.verificationRequestInProgress.p4.link")
 
-      manageSubcontractorsLink.first().parent().text() must include(
+      val manageText =
+        manageLink.first().parent().text()
+
+      manageText must include(
         messages("verify.verificationRequestInProgress.p4")
       )
+
+      manageText.trim.endsWith(".") mustBe true
     }
   }
 }
