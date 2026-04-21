@@ -827,4 +827,4 @@ verify.verificationRequestInProgress.p2                            =  You must w
 verify.verificationRequestInProgress.p3.link                       =  Contact HMRC
 verify.verificationRequestInProgress.p3                            =  if you have any questions about this verification request.
 verify.verificationRequestInProgress.p4                            =  Back to
-verify.verificationRequestInProgress.p4.link                       =  Manage your subcontractors.
+verify.verificationRequestInProgress.p4.link                       =  Manage your subcontractors
