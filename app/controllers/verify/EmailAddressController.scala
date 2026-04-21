@@ -20,12 +20,13 @@ import controllers.actions.*
 import forms.verify.EmailAddressFormProvider
 import models.Mode
 import navigation.Navigator
-import pages.verify.{ContractorEmailConfirmationNotStoredPage, EmailAddressPage}
+import pages.verify.EmailAddressPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.verify.EmailAddressView
+import pages.verification.NewestVerificationBatchResponsePage
 import models.UserAnswers
 
 import javax.inject.Inject
@@ -48,13 +49,20 @@ class EmailAddressController @Inject() (
   val form = formProvider()
 
   private def hintKey(answers: UserAnswers): String = {
-    val isAlternateEmail = answers.get(ContractorEmailConfirmationNotStoredPage).contains(true)
 
-    if (isAlternateEmail) "verify.emailAddress.hint"
+    val hasStoredEmail =
+      answers
+        .get(NewestVerificationBatchResponsePage)
+        .exists { response =>
+          response.scheme.exists(_.emailAddress.exists(_.nonEmpty))
+        }
+
+    if (hasStoredEmail) "verify.emailAddress.hint"
     else "verify.emailAddress.hint.notStored"
   }
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
+
     val preparedForm = request.userAnswers.get(EmailAddressPage) match {
       case None        => form
       case Some(value) => form.fill(value)
