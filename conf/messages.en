@@ -817,3 +817,13 @@ verify.verificationRequestInProgress.p3                            =  If you hav
 verify.verificationRequestInProgress.p3.link                       =  contact HMRC.
 verify.verificationRequestInProgress.p4                            =  Back to
 verify.verificationRequestInProgress.p4.link                       =  Manage your subcontractors.
+
+verify.reverifyExistingSubcontractors.title                                            = Reverify Existing Subcontractors
+verify.reverifyExistingSubcontractors.heading                                          = Reverify Existing Subcontractors
+verify.reverifyExistingSubcontractors.p1                                               = To make sure that their tax treatment is correct and up to date, you can reverify any of your existing subcontractors.
+verify.reverifyExistingSubcontractors.p2                                               = You may want to reverify subcontractors if they:
+verify.reverifyExistingSubcontractors.list.l1                                          = have recently changed any of their information
+verify.reverifyExistingSubcontractors.list.l2                                          = have not been included on a return recently and have lost their verified status
+verify.reverifyExistingSubcontractors.list.l3                                          = are about to lose their verified status
+verify.reverifyExistingSubcontractors.subHeading                                       = Do you want to add other subcontractors to this verification request?
+verify.reverifyExistingSubcontractors.error.required                                   = Select yes if you want to add existing subcontractors to this verification request

@@ -11,6 +11,9 @@ GET  /language/:lang   controllers.LanguageSwitchController.switchToLanguage(lan
 
 GET  /refresh-session  controllers.KeepAliveController.keepAlive()
 
+GET   /verify/reverify-existing-subcontractors      controllers.verify.ReverifyExistingSubcontractorsController.onPageLoad(mode: Mode = NormalMode)
+POST  /verify/reverify-existing-subcontractors      controllers.verify.ReverifyExistingSubcontractorsController.onSubmit(mode: Mode = NormalMode)
+
 # Errors & Auth
 GET  /there-is-a-problem               controllers.JourneyRecoveryController.onPageLoad(continueUrl: Option[RedirectUrl] ?= None)
 
