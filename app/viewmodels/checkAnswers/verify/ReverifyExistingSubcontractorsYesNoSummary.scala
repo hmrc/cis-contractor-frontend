@@ -17,7 +17,6 @@
 package viewmodels.checkAnswers.verify
 
 import controllers.verify.routes
-//import models.CheckMode
 import models.UserAnswers
 import pages.verify.ReverifyExistingSubcontractorsYesNoPage
 import play.api.i18n.Messages
