@@ -26,7 +26,6 @@ import play.api.data.Forms.*
 import play.api.i18n.{Lang, Messages, MessagesApi, MessagesImpl}
 import play.api.mvc.Request
 import play.api.test.FakeRequest
-import utils.Utils.firstRadioId
 import views.html.verify.ReverifyExistingSubcontractorsYesNoView
 
 class ReverifyExistingSubcontractorsViewYesNoSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite {
@@ -83,7 +82,7 @@ class ReverifyExistingSubcontractorsViewYesNoSpec extends AnyWordSpec with Match
         messages("verify.reverifyExistingSubcontractorsYesNo.error.required")
       )
 
-      errorSummary.select("a").attr("href") mustBe s"#$firstRadioId"
+      errorSummary.select("a").attr("href") mustBe "#value_0"
     }
   }
 
