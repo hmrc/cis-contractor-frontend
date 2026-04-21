@@ -20,6 +20,7 @@ import base.SpecBase
 import models.NormalMode
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
+import queries.CisIdQuery
 import views.html.verify.NoSubcontractorsAddedView
 
 class NoSubcontractorsAddedControllerSpec extends SpecBase {
@@ -28,22 +29,62 @@ class NoSubcontractorsAddedControllerSpec extends SpecBase {
 
     "must return OK and the correct view for a GET" in {
 
-      val application          = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
-      val addSubcontractorsUrl = controllers.add.routes.TypeOfSubcontractorController.onPageLoad(NormalMode).url
+      val cisId = "T1234567"
+
+      val userAnswers =
+        emptyUserAnswers.set(CisIdQuery, cisId).success.value
+
+      val application =
+        applicationBuilder(userAnswers = Some(userAnswers)).build()
+
+      val addSubcontractorsUrl =
+        controllers.add.routes.TypeOfSubcontractorController
+          .onPageLoad(NormalMode)
+          .url
+
+      val manageSubcontractorsUrl =
+        s"${applicationConfig.manageSubcontractorsUrl}/$cisId"
 
       running(application) {
-        val request = FakeRequest(GET, controllers.verify.routes.NoSubcontractorsAddedController.onPageLoad().url)
+
+        val request =
+          FakeRequest(
+            GET,
+            controllers.verify.routes.NoSubcontractorsAddedController.onPageLoad().url
+          )
 
         val result = route(application, request).value
 
-        val view = application.injector.instanceOf[NoSubcontractorsAddedView]
+        val view =
+          application.injector.instanceOf[NoSubcontractorsAddedView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(addSubcontractorsUrl)(
-          request,
-          applicationConfig,
-          messages(application)
-        ).toString
+        contentAsString(result) mustEqual
+          view(addSubcontractorsUrl, manageSubcontractorsUrl)(
+            request,
+            messages(application)
+          ).toString
+      }
+    }
+
+    "must redirect to Journey Recovery when CisId is missing" in {
+
+      val application =
+        applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(
+            GET,
+            controllers.verify.routes.NoSubcontractorsAddedController.onPageLoad().url
+          )
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual
+          controllers.routes.JourneyRecoveryController.onPageLoad().url
       }
     }
   }
