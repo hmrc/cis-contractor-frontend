@@ -24,7 +24,6 @@ import pages.add.*
 import play.api.libs.json.*
 
 final case class ValidatedSubcontractor(
-  typeOfSubcontractor: TypeOfSubcontractor,
   tradingName: Option[String],
   subcontractorName: Option[SubcontractorName],
   address: Option[InternationalAddress],
@@ -40,7 +39,7 @@ final case class ValidatedSubcontractor(
 object ValidatedSubcontractor extends Validation {
   def build(answers: UserAnswers): Either[ValidationError, ValidatedSubcontractor] =
     for {
-      typeOfSubcontractor      <- getType(answers)
+      typeOfSubcontractor      <- validateType(answers)
       tradingName              <- getOptionalPageValue(answers, TradingNameOfSubcontractorPage, SubTradingNameYesNoPage)
       subcontractorName        <- getOptionalNamePage(answers)
       address                  <- getOptionalPageValue(answers, AddressOfSubcontractorPage, SubAddressYesNoPage)
@@ -52,7 +51,6 @@ object ValidatedSubcontractor extends Validation {
       nino                     <- getOptionalPageValue(answers, SubNationalInsuranceNumberPage, NationalInsuranceNumberYesNoPage)
       workReference            <- getOptionalPageValue(answers, WorksReferenceNumberPage, WorksReferenceNumberYesNoPage)
     } yield ValidatedSubcontractor(
-      typeOfSubcontractor,
       tradingName,
       subcontractorName,
       address,
@@ -65,8 +63,11 @@ object ValidatedSubcontractor extends Validation {
       workReference
     )
 
-  private def getType(answers: UserAnswers): Either[ValidationError, TypeOfSubcontractor] =
-    getPageValue(answers, TypeOfSubcontractorPage)
+  private def validateType(answers: UserAnswers): Either[ValidationError, Unit] =
+    getPageValue(answers, TypeOfSubcontractorPage).flatMap {
+      case TypeOfSubcontractor.Individualorsoletrader => Right(())
+      case _                                          => Left(InvalidAnswer(TypeOfSubcontractorPage))
+    }
 
   // SubTradingNameYesNoPage is inverted for SubcontractorNamePage
   // Yes  -> SubcontractorNamePage not required

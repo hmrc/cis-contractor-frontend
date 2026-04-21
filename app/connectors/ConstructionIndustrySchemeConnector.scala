@@ -20,15 +20,21 @@ import models.requests.CreateAndUpdateSubcontractorPayload
 import models.requests.CreateAndUpdateSubcontractorPayload.*
 import models.response.{CisTaxpayerResponse, GetCurrentVerificationBatchResponse, GetNewestVerificationBatchResponse, GetSubcontractorUTRsResponse}
 import play.api.Logging
-import play.api.http.Status.NO_CONTENT
-import play.api.libs.json.{JsValue, Json}
+import play.api.http.Status.{NOT_FOUND, NO_CONTENT, OK}
+import play.api.libs.json.{JsValue, Json, OFormat}
 import play.api.libs.ws.JsonBodyWritables.writeableOf_JsValue
 import uk.gov.hmrc.http.client.HttpClientV2
-import uk.gov.hmrc.http.{HeaderCarrier, HttpReadsInstances, HttpResponse, StringContextOps}
+import uk.gov.hmrc.http.{HeaderCarrier, HttpException, HttpReadsInstances, HttpResponse, StringContextOps}
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
+
+final case class HasClientResponse(hasClient: Boolean)
+
+object HasClientResponse {
+  implicit val format: OFormat[HasClientResponse] = Json.format[HasClientResponse]
+}
 
 @Singleton
 class ConstructionIndustrySchemeConnector @Inject() (config: ServicesConfig, http: HttpClientV2)(implicit
@@ -75,18 +81,36 @@ class ConstructionIndustrySchemeConnector @Inject() (config: ServicesConfig, htt
       }
   }
 
-  def getSubcontractorUTRs(
-    cisId: String
-  )(implicit hc: HeaderCarrier): Future[GetSubcontractorUTRsResponse] =
-    logger.info(
-      s"[ConstructionIndustrySchemeConnector][getSubcontractorUTR] cisId: ${Json.toJson(cisId)}"
-    )
+  def getSubcontractorUTRs(cisId: String)(implicit hc: HeaderCarrier): Future[GetSubcontractorUTRsResponse] = {
+    logger.info(s"[ConstructionIndustrySchemeConnector][getSubcontractorUTRs] cisId: $cisId")
+
     http
       .get(url"$cisBaseUrl/subcontractors/utr/$cisId")
       .execute[GetSubcontractorUTRsResponse]
       .map { response =>
         logger.info(s"[ConstructionIndustrySchemeConnector][getSubcontractorUTRs] Response: $response")
         response
+      }
+  }
+
+  def hasClient(taxOfficeNumber: String, taxOfficeReference: String)(implicit hc: HeaderCarrier): Future[Boolean] =
+    http
+      .get(url"$cisBaseUrl/agent/has-client/$taxOfficeNumber/$taxOfficeReference")
+      .execute[HasClientResponse]
+      .map(_.hasClient)
+
+  def getAgentClient(userId: String)(implicit
+    hc: HeaderCarrier
+  ): Future[Option[JsValue]] =
+    http
+      .get(url"$cisBaseUrl/user-cache/agent-client/$userId")
+      .execute[HttpResponse]
+      .map { response =>
+        response.status match {
+          case OK        => Some(response.json)
+          case NOT_FOUND => None
+          case _         => throw new HttpException(response.body, response.status)
+        }
       }
 
   def getNewestVerificationBatch(
