@@ -818,6 +818,15 @@ verify.verificationRequestInProgress.p3.link                       =  contact HM
 verify.verificationRequestInProgress.p4                            =  Back to
 verify.verificationRequestInProgress.p4.link                       =  Manage your subcontractors.
 
+verify.verificationRequestInProgress.title                         = Verification request in progress
+verify.verificationRequestInProgress.heading                       = Verification request in progress
+verify.verificationRequestInProgress.p1                            = HMRC has not responded to your previous verification request.
+verify.verificationRequestInProgress.p2                            = You must wait for this response before you can verify any more subcontractors.
+verify.verificationRequestInProgress.p3                            = If you have any questions about this verification request,
+verify.verificationRequestInProgress.p3.link                       = contact HMRC.
+verify.verificationRequestInProgress.p4                            = Back to
+verify.verificationRequestInProgress.p4.link                       = Manage your subcontractors.
+
 verify.reverifyExistingSubcontractorsYesNo.title                   =  Reverify Existing Subcontractors
 verify.reverifyExistingSubcontractorsYesNo.heading                 =  Reverify Existing Subcontractors
 verify.reverifyExistingSubcontractorsYesNo.p1                      =  To make sure that their tax treatment is correct and up to date, you can reverify any of your existing subcontractors.
@@ -826,5 +835,5 @@ verify.reverifyExistingSubcontractorsYesNo.list.l1                 =  have recen
 verify.reverifyExistingSubcontractorsYesNo.list.l2                 =  have not been included on a return recently and have lost their verified status
 verify.reverifyExistingSubcontractorsYesNo.list.l3                 =  are about to lose their verified status
 verify.reverifyExistingSubcontractorsYesNo.subHeading              =  Do you want to add other subcontractors to this verification request?
-verify.reverifyExistingSubcontractorsYesNo.checkYourAnswersLabel   =  reverifyExistingSubcontractorsYesNo
 verify.reverifyExistingSubcontractorsYesNo.error.required          =  Select yes if you want to add existing subcontractors to this verification request
+
