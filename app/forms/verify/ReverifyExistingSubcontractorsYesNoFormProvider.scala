@@ -18,13 +18,13 @@ package forms.verify
 
 import forms.mappings.Mappings
 import play.api.data.Form
+
 import javax.inject.Inject
-import models.verify.ReverifyExistingSubcontractors
 
-class ReverifyExistingSubcontractorsFormProvider @Inject() extends Mappings {
+class ReverifyExistingSubcontractorsYesNoFormProvider @Inject() extends Mappings {
 
-  def apply(): Form[ReverifyExistingSubcontractors] =
+  def apply(): Form[Boolean] =
     Form(
-      "value" -> enumerable[ReverifyExistingSubcontractors]("verify.reverifyExistingSubcontractors.error.required")
+      "value" -> boolean("verify.reverifyExistingSubcontractorsYesNo.error.required")
     )
 }

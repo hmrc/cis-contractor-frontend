@@ -18,11 +18,10 @@ package pages.verify
 
 import pages.QuestionPage
 import play.api.libs.json.JsPath
-import models.verify.ReverifyExistingSubcontractors
 
-case object ReverifyExistingSubcontractorsPage extends QuestionPage[ReverifyExistingSubcontractors] {
+case object ReverifyExistingSubcontractorsYesNoPage extends QuestionPage[Boolean] {
 
   override def path: JsPath = JsPath \ toString
 
-  override def toString: String = "reverifyExistingSubcontractors"
+  override def toString: String = "reverifyExistingSubcontractorsYesNo"
 }

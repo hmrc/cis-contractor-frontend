@@ -27,11 +27,11 @@ import play.api.i18n.{Lang, Messages, MessagesApi, MessagesImpl}
 import play.api.mvc.Request
 import play.api.test.FakeRequest
 import utils.Utils.firstRadioId
-import views.html.verify.ReverifyExistingSubcontractorsView
+import views.html.verify.ReverifyExistingSubcontractorsYesNoView
 
-class ReverifyExistingSubcontractorsViewSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite {
+class ReverifyExistingSubcontractorsViewYesNoSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite {
 
-  "ReverifyExistingSubcontractorsView" should {
+  "ReverifyExistingSubcontractorsYesNoView" should {
 
     "render the page with title, heading, paragraphs, bullet list, radios and continue button" in new Setup {
 
@@ -39,22 +39,22 @@ class ReverifyExistingSubcontractorsViewSpec extends AnyWordSpec with Matchers w
       val doc  = Jsoup.parse(html.toString())
 
       doc.select("title").text() must include(
-        messages("verify.reverifyExistingSubcontractors.title")
+        messages("verify.reverifyExistingSubcontractorsYesNo.title")
       )
 
-      doc.select("h1").text() must include(messages("verify.reverifyExistingSubcontractors.heading"))
+      doc.select("h1").text() must include(messages("verify.reverifyExistingSubcontractorsYesNo.heading"))
 
       val paragraphs = doc.select("p").eachText()
-      paragraphs must contain(messages("verify.reverifyExistingSubcontractors.p1"))
-      paragraphs must contain(messages("verify.reverifyExistingSubcontractors.p2"))
+      paragraphs must contain(messages("verify.reverifyExistingSubcontractorsYesNo.p1"))
+      paragraphs must contain(messages("verify.reverifyExistingSubcontractorsYesNo.p2"))
 
       val bullets = doc.select("ul li").eachText()
-      bullets must contain(messages("verify.reverifyExistingSubcontractors.list.l1"))
-      bullets must contain(messages("verify.reverifyExistingSubcontractors.list.l2"))
-      bullets must contain(messages("verify.reverifyExistingSubcontractors.list.l3"))
+      bullets must contain(messages("verify.reverifyExistingSubcontractorsYesNo.list.l1"))
+      bullets must contain(messages("verify.reverifyExistingSubcontractorsYesNo.list.l2"))
+      bullets must contain(messages("verify.reverifyExistingSubcontractorsYesNo.list.l3"))
 
       doc.select("form").attr("action") mustBe
-        controllers.verify.routes.ReverifyExistingSubcontractorsController
+        controllers.verify.routes.ReverifyExistingSubcontractorsYesNoController
           .onSubmit()
           .url
 
@@ -63,7 +63,7 @@ class ReverifyExistingSubcontractorsViewSpec extends AnyWordSpec with Matchers w
       doc.select("input[type=radio][name=value]").size() must be > 0
 
       val legend = doc.select("fieldset legend")
-      legend.text() mustBe messages("verify.reverifyExistingSubcontractors.subHeading")
+      legend.text() mustBe messages("verify.reverifyExistingSubcontractorsYesNo.subHeading")
 
       doc.select(".govuk-button").text() mustBe messages("site.continue")
     }
@@ -71,7 +71,7 @@ class ReverifyExistingSubcontractorsViewSpec extends AnyWordSpec with Matchers w
     "display error summary when no option is selected, linking to the first radio id" in new Setup {
 
       val errorForm =
-        form.withError("value", "verify.reverifyExistingSubcontractors.error.required")
+        form.withError("value", "verify.reverifyExistingSubcontractorsYesNo.error.required")
 
       val html = view(errorForm, NormalMode)
       val doc  = Jsoup.parse(html.toString())
@@ -80,7 +80,7 @@ class ReverifyExistingSubcontractorsViewSpec extends AnyWordSpec with Matchers w
       errorSummary.size() mustBe 1
 
       errorSummary.text() must include(
-        messages("verify.reverifyExistingSubcontractors.error.required")
+        messages("verify.reverifyExistingSubcontractorsYesNo.error.required")
       )
 
       errorSummary.select("a").attr("href") mustBe s"#$firstRadioId"
@@ -101,7 +101,7 @@ class ReverifyExistingSubcontractorsViewSpec extends AnyWordSpec with Matchers w
         app.injector.instanceOf[MessagesApi]
       )
 
-    val view: ReverifyExistingSubcontractorsView =
-      app.injector.instanceOf[ReverifyExistingSubcontractorsView]
+    val view: ReverifyExistingSubcontractorsYesNoView =
+      app.injector.instanceOf[ReverifyExistingSubcontractorsYesNoView]
   }
 }

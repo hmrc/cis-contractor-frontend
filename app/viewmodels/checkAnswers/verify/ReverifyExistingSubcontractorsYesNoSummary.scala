@@ -17,40 +17,27 @@
 package viewmodels.checkAnswers.verify
 
 import controllers.verify.routes
+//import models.CheckMode
 import models.UserAnswers
-import pages.verify.ReverifyExistingSubcontractorsPage
+import pages.verify.ReverifyExistingSubcontractorsYesNoPage
 import play.api.i18n.Messages
-import play.twirl.api.HtmlFormat
-//import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
-import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
 
-object ReverifyExistingSubcontractorsSummary {
+object ReverifyExistingSubcontractorsYesNoSummary {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(ReverifyExistingSubcontractorsPage).map { answer =>
+    answers.get(ReverifyExistingSubcontractorsYesNoPage).map { answer =>
 
-      val answerText = answer.toString match {
-        case "option1" => messages("site.yes")
-        case _         => messages("site.no")
-      }
-
-      val value = ValueViewModel(
-        HtmlContent(HtmlFormat.escape(answerText))
-      )
+      val value = if (answer) "site.yes" else "site.no"
 
       SummaryListRowViewModel(
-        key = "reverifyExistingSubcontractors.checkYourAnswersLabel",
-        value = value,
+        key = "reverifyExistingSubcontractorsYesNo.checkYourAnswersLabel",
+        value = ValueViewModel(value),
         actions = Seq(
-          ActionItemViewModel(
-            "site.change",
-            routes.ReverifyExistingSubcontractorsController.onPageLoad().url
-          ).withVisuallyHiddenText(
-            messages("reverifyExistingSubcontractors.change.hidden")
-          )
+          ActionItemViewModel("site.change", routes.ReverifyExistingSubcontractorsYesNoController.onPageLoad().url)
+            .withVisuallyHiddenText(messages("reverifyExistingSubcontractorsYesNo.change.hidden"))
         )
       )
     }

@@ -17,24 +17,16 @@
 package pages.verify
 
 import base.SpecBase
-import models.verify.ReverifyExistingSubcontractors
 import pages.behaviours.PageBehaviours
-import org.scalacheck.Arbitrary
-import org.scalacheck.Gen
 
-class ReverifyExistingSubcontractorsPageSpec extends SpecBase with PageBehaviours {
+class ReverifyExistingSubcontractorsYesNoPageSpec extends SpecBase with PageBehaviours {
 
-  implicit val arbitraryReverifyExistingSubcontractors: Arbitrary[ReverifyExistingSubcontractors] =
-    Arbitrary(
-      Gen.oneOf(ReverifyExistingSubcontractors.values)
-    )
+  "ReverifyExistingSubcontractorsYesNoPage" - {
 
-  "ReverifyExistingSubcontractorsPage" - {
+    beRetrievable[Boolean](ReverifyExistingSubcontractorsYesNoPage)
 
-    beRetrievable[ReverifyExistingSubcontractors](ReverifyExistingSubcontractorsPage)
+    beSettable[Boolean](ReverifyExistingSubcontractorsYesNoPage)
 
-    beSettable[ReverifyExistingSubcontractors](ReverifyExistingSubcontractorsPage)
-
-    beRemovable[ReverifyExistingSubcontractors](ReverifyExistingSubcontractorsPage)
+    beRemovable[Boolean](ReverifyExistingSubcontractorsYesNoPage)
   }
 }

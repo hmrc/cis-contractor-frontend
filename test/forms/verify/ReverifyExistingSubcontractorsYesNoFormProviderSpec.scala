@@ -16,25 +16,24 @@
 
 package forms.verify
 
-import forms.behaviours.OptionFieldBehaviours
-import models.verify.ReverifyExistingSubcontractors
+import forms.behaviours.BooleanFieldBehaviours
 import play.api.data.FormError
 
-class ReverifyExistingSubcontractorsFormProviderSpec extends OptionFieldBehaviours {
+class ReverifyExistingSubcontractorsYesNoFormProviderSpec extends BooleanFieldBehaviours {
 
-  val form = new ReverifyExistingSubcontractorsFormProvider()()
+  val requiredKey = "verify.reverifyExistingSubcontractorsYesNo.error.required"
+  val invalidKey  = "error.boolean"
+
+  val form = new ReverifyExistingSubcontractorsYesNoFormProvider()()
 
   ".value" - {
 
-    val fieldName   = "value"
-    val requiredKey =
-      "verify.reverifyExistingSubcontractors.error.required"
+    val fieldName = "value"
 
-    behave like optionsField[ReverifyExistingSubcontractors](
+    behave like booleanField(
       form,
       fieldName,
-      validValues = ReverifyExistingSubcontractors.values,
-      invalidError = FormError(fieldName, "error.invalid")
+      invalidError = FormError(fieldName, invalidKey)
     )
 
     behave like mandatoryField(

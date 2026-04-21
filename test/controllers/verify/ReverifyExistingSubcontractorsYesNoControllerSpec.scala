@@ -18,38 +18,44 @@ package controllers.verify
 
 import base.SpecBase
 import controllers.routes
-import forms.verify.ReverifyExistingSubcontractorsFormProvider
-import models.verify.ReverifyExistingSubcontractors
+import forms.verify.ReverifyExistingSubcontractorsYesNoFormProvider
 import models.{NormalMode, UserAnswers}
+import navigation.{FakeNavigator, Navigator}
+import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.verify.ReverifyExistingSubcontractorsPage
+import pages.verify.ReverifyExistingSubcontractorsYesNoPage
+import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import views.html.verify.ReverifyExistingSubcontractorsView
+import repositories.SessionRepository
+import views.html.verify.ReverifyExistingSubcontractorsYesNoView
 
-class ReverifyExistingSubcontractorsControllerSpec extends SpecBase with MockitoSugar {
+import scala.concurrent.Future
+
+class ReverifyExistingSubcontractorsYesNoControllerSpec extends SpecBase with MockitoSugar {
 
   def onwardRoute = Call("GET", "/foo")
 
-  lazy val reverifyExistingSubcontractorsRoute =
-    controllers.verify.routes.ReverifyExistingSubcontractorsController.onPageLoad().url
-
-  val formProvider = new ReverifyExistingSubcontractorsFormProvider()
+  val formProvider = new ReverifyExistingSubcontractorsYesNoFormProvider()
   val form         = formProvider()
 
-  "ReverifyExistingSubcontractors Controller" - {
+  lazy val reverifyExistingSubcontractorsYesNoRoute =
+    controllers.verify.routes.ReverifyExistingSubcontractorsYesNoController.onPageLoad().url
+
+  "ReverifyExistingSubcontractorsYesNo Controller" - {
 
     "must return OK and the correct view for a GET" in {
 
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
       running(application) {
-        val request = FakeRequest(GET, reverifyExistingSubcontractorsRoute)
+        val request = FakeRequest(GET, reverifyExistingSubcontractorsYesNoRoute)
 
         val result = route(application, request).value
 
-        val view = application.injector.instanceOf[ReverifyExistingSubcontractorsView]
+        val view = application.injector.instanceOf[ReverifyExistingSubcontractorsYesNoView]
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
@@ -58,25 +64,45 @@ class ReverifyExistingSubcontractorsControllerSpec extends SpecBase with Mockito
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = UserAnswers(userAnswersId)
-        .set(ReverifyExistingSubcontractorsPage, ReverifyExistingSubcontractors.Option1)
-        .success
-        .value
+      val userAnswers = UserAnswers(userAnswersId).set(ReverifyExistingSubcontractorsYesNoPage, true).success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
       running(application) {
-        val request = FakeRequest(GET, reverifyExistingSubcontractorsRoute)
+        val request = FakeRequest(GET, reverifyExistingSubcontractorsYesNoRoute)
 
-        val view = application.injector.instanceOf[ReverifyExistingSubcontractorsView]
+        val view = application.injector.instanceOf[ReverifyExistingSubcontractorsYesNoView]
 
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(ReverifyExistingSubcontractors.Option1), NormalMode)(
-          request,
-          messages(application)
-        ).toString
+        contentAsString(result) mustEqual view(form.fill(true), NormalMode)(request, messages(application)).toString
+      }
+    }
+
+    "must redirect to the next page when valid data is submitted" in {
+
+      val mockSessionRepository = mock[SessionRepository]
+
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+      val application =
+        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          .overrides(
+            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
+            bind[SessionRepository].toInstance(mockSessionRepository)
+          )
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, reverifyExistingSubcontractorsYesNoRoute)
+            .withFormUrlEncodedBody(("value", "true"))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual onwardRoute.url
       }
     }
 
@@ -86,12 +112,12 @@ class ReverifyExistingSubcontractorsControllerSpec extends SpecBase with Mockito
 
       running(application) {
         val request =
-          FakeRequest(POST, reverifyExistingSubcontractorsRoute)
-            .withFormUrlEncodedBody(("value", "invalid value"))
+          FakeRequest(POST, reverifyExistingSubcontractorsYesNoRoute)
+            .withFormUrlEncodedBody(("value", ""))
 
-        val boundForm = form.bind(Map("value" -> "invalid value"))
+        val boundForm = form.bind(Map("value" -> ""))
 
-        val view = application.injector.instanceOf[ReverifyExistingSubcontractorsView]
+        val view = application.injector.instanceOf[ReverifyExistingSubcontractorsYesNoView]
 
         val result = route(application, request).value
 
@@ -105,7 +131,7 @@ class ReverifyExistingSubcontractorsControllerSpec extends SpecBase with Mockito
       val application = applicationBuilder(userAnswers = None).build()
 
       running(application) {
-        val request = FakeRequest(GET, reverifyExistingSubcontractorsRoute)
+        val request = FakeRequest(GET, reverifyExistingSubcontractorsYesNoRoute)
 
         val result = route(application, request).value
 
@@ -114,19 +140,18 @@ class ReverifyExistingSubcontractorsControllerSpec extends SpecBase with Mockito
       }
     }
 
-    "redirect to Journey Recovery for a POST if no existing data is found" in {
+    "must redirect to Journey Recovery for a POST if no existing data is found" in {
 
       val application = applicationBuilder(userAnswers = None).build()
 
       running(application) {
         val request =
-          FakeRequest(POST, reverifyExistingSubcontractorsRoute)
-            .withFormUrlEncodedBody(("value", ReverifyExistingSubcontractors.values.head.toString))
+          FakeRequest(POST, reverifyExistingSubcontractorsYesNoRoute)
+            .withFormUrlEncodedBody(("value", "true"))
 
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-
         redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
       }
     }
