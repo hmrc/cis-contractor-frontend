@@ -21,11 +21,12 @@ import controllers.routes
 import models.{CheckMode, NormalMode, UserAnswers}
 import org.scalactic.Prettifier.default
 import pages.Page
+import models.verify.ContractorEmailConfirmationStored
 import pages.verify.*
 
 class VerifyNavigatorSpec extends SpecBase {
 
-  val navigator = new VerifyNavigator()
+  private val navigator = new VerifyNavigator()
 
   private lazy val journeyRecovery = routes.JourneyRecoveryController.onPageLoad()
 
@@ -33,16 +34,10 @@ class VerifyNavigatorSpec extends SpecBase {
 
     "in Normal mode" - {
 
-      "must go from EmailAddressPage to next page" in {
-        val ua = emptyUserAnswers.set(EmailAddressPage, "test@test.com").success.value
-        navigator.nextPage(EmailAddressPage, NormalMode, ua) mustBe
-          controllers.verify.routes.EmailAddressController.onPageLoad(NormalMode)
-      }
-
-      "must go from a page that doesn't exist in the route map to Index" in {
+      "must go from a page that doesn't exist in the route map to JourneyRecovery" in {
         case object UnknownPage extends Page
 
-        navigator.nextPage(UnknownPage, NormalMode, UserAnswers("id")) mustBe routes.IndexController.onPageLoad()
+        navigator.nextPage(UnknownPage, NormalMode, UserAnswers("id")) mustBe journeyRecovery
       }
 
       "must go from ContractorEmailConfirmationNotStoredPage to ContractorEmailConfirmationNotStoredController when answer is true" in {
@@ -66,25 +61,48 @@ class VerifyNavigatorSpec extends SpecBase {
           emptyUserAnswers
         ) mustBe routes.IndexController.onPageLoad()
       }
+
+      "must go from ContractorEmailConfirmationStoredPage to JourneyRecovery when answer is CurrentEmail" in {
+        val ua = emptyUserAnswers.setOrException(
+          ContractorEmailConfirmationStoredPage,
+          ContractorEmailConfirmationStored.CurrentEmail
+        )
+        navigator.nextPage(ContractorEmailConfirmationStoredPage, NormalMode, ua) mustBe journeyRecovery
+      }
+
+      "must go from ContractorEmailConfirmationStoredPage to JourneyRecovery when answer is DifferentEmail" in {
+        val ua = emptyUserAnswers.setOrException(
+          ContractorEmailConfirmationStoredPage,
+          ContractorEmailConfirmationStored.DifferentEmail
+        )
+        navigator.nextPage(ContractorEmailConfirmationStoredPage, NormalMode, ua) mustBe journeyRecovery
+      }
+
+      "must go from ContractorEmailConfirmationStoredPage to JourneyRecovery when answer is DoNotSend" in {
+        val ua = emptyUserAnswers.setOrException(
+          ContractorEmailConfirmationStoredPage,
+          ContractorEmailConfirmationStored.DoNotSend
+        )
+        navigator.nextPage(ContractorEmailConfirmationStoredPage, NormalMode, ua) mustBe journeyRecovery
+      }
+
+      "must go from ContractorEmailConfirmationStoredPage to JourneyRecovery when answer is not present" in {
+        navigator.nextPage(ContractorEmailConfirmationStoredPage, NormalMode, emptyUserAnswers) mustBe journeyRecovery
+      }
+
+      "must go from EmailAddressPage to next page" in {
+        val ua = emptyUserAnswers.set(EmailAddressPage, "test@test.com").success.value
+        navigator.nextPage(EmailAddressPage, NormalMode, ua) mustBe
+          controllers.verify.routes.EmailAddressController.onPageLoad(NormalMode)
+      }
     }
 
     "in Check mode" - {
 
-      "must go from EmailAddressPage to EmailAddressPage in CheckMode" in {
-        val ua = emptyUserAnswers.set(EmailAddressPage, "test@test.com").success.value
-
-        navigator.nextPage(EmailAddressPage, CheckMode, ua) mustBe controllers.verify.routes.EmailAddressController
-          .onPageLoad(CheckMode)
-      }
-
-      "must go from a page that doesn't exist in the route map to Index" in {
+      "must go from a page that doesn't exist in the route map to JourneyRecovery" in {
         case object UnknownPage extends Page
 
-        navigator.nextPage(
-          UnknownPage,
-          CheckMode,
-          UserAnswers("id")
-        ) mustBe controllers.add.routes.CheckYourAnswersController.onPageLoad()
+        navigator.nextPage(UnknownPage, CheckMode, UserAnswers("id")) mustBe journeyRecovery
       }
 
       "must go from ContractorEmailConfirmationNotStoredPage to ContractorEmailConfirmationNotStoredController when answer is true" in {
@@ -107,6 +125,41 @@ class VerifyNavigatorSpec extends SpecBase {
           CheckMode,
           emptyUserAnswers
         ) mustBe routes.IndexController.onPageLoad()
+      }
+
+      "must go from ContractorEmailConfirmationStoredPage to JourneyRecovery when answer is CurrentEmail" in {
+        val ua = emptyUserAnswers.setOrException(
+          ContractorEmailConfirmationStoredPage,
+          ContractorEmailConfirmationStored.CurrentEmail
+        )
+        navigator.nextPage(ContractorEmailConfirmationStoredPage, CheckMode, ua) mustBe journeyRecovery
+      }
+
+      "must go from ContractorEmailConfirmationStoredPage to JourneyRecovery when answer is DifferentEmail" in {
+        val ua = emptyUserAnswers.setOrException(
+          ContractorEmailConfirmationStoredPage,
+          ContractorEmailConfirmationStored.DifferentEmail
+        )
+        navigator.nextPage(ContractorEmailConfirmationStoredPage, CheckMode, ua) mustBe journeyRecovery
+      }
+
+      "must go from ContractorEmailConfirmationStoredPage to JourneyRecovery when answer is DoNotSend" in {
+        val ua = emptyUserAnswers.setOrException(
+          ContractorEmailConfirmationStoredPage,
+          ContractorEmailConfirmationStored.DoNotSend
+        )
+        navigator.nextPage(ContractorEmailConfirmationStoredPage, CheckMode, ua) mustBe journeyRecovery
+      }
+
+      "must go from ContractorEmailConfirmationStoredPage to JourneyRecovery when answer is not present" in {
+        navigator.nextPage(ContractorEmailConfirmationStoredPage, CheckMode, emptyUserAnswers) mustBe journeyRecovery
+      }
+
+      "must go from EmailAddressPage to EmailAddressPage in CheckMode" in {
+        val ua = emptyUserAnswers.set(EmailAddressPage, "test@test.com").success.value
+
+        navigator.nextPage(EmailAddressPage, CheckMode, ua) mustBe controllers.verify.routes.EmailAddressController
+          .onPageLoad(CheckMode)
       }
     }
   }

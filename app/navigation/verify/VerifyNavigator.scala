@@ -17,38 +17,46 @@
 package navigation.verify
 
 import controllers.routes
+import jakarta.inject.Singleton
 import models.{CheckMode, Mode, NormalMode, UserAnswers}
 import navigation.NavigatorForJourney
 import pages.Page
 import pages.verify.*
+import models.verify.ContractorEmailConfirmationStored.{CurrentEmail, DifferentEmail, DoNotSend}
 import play.api.mvc.Call
 
-import javax.inject.{Inject, Singleton}
+import javax.inject.Inject
 
 @Singleton
 class VerifyNavigator @Inject() () extends NavigatorForJourney {
 
-  override def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers): Call = mode match {
+  override def nextPage(page: Page, mode: Mode, userAnswers: models.UserAnswers): Call = mode match {
     case NormalMode =>
       normalRoutes(page)(userAnswers)
     case CheckMode  =>
       checkRouteMap(page)(userAnswers)
   }
 
-  private val normalRoutes: Page => UserAnswers => Call = {
+  private def normalRoutes: Page => UserAnswers => Call = {
+
     case ContractorEmailConfirmationNotStoredPage =>
       userAnswers => navigatorFromContractorEmailConfirmationNotStoredPage(NormalMode)(userAnswers)
+    case ContractorEmailConfirmationStoredPage    =>
+      userAnswers => navigatorFromContractorEmailConfirmationStoredPage(NormalMode)(userAnswers)
     case EmailAddressPage                         =>
       _ => controllers.verify.routes.EmailAddressController.onPageLoad(NormalMode)
-    case _                                        => _ => routes.IndexController.onPageLoad()
+    case _                                        => _ => controllers.routes.JourneyRecoveryController.onPageLoad()
   }
 
-  private val checkRouteMap: Page => UserAnswers => Call = {
+  private def checkRouteMap: Page => UserAnswers => Call = {
     case ContractorEmailConfirmationNotStoredPage =>
       userAnswers => navigatorFromContractorEmailConfirmationNotStoredPage(CheckMode)(userAnswers)
+    case ContractorEmailConfirmationStoredPage    =>
+      userAnswers => navigatorFromContractorEmailConfirmationStoredPage(CheckMode)(userAnswers)
     case EmailAddressPage                         =>
       _ => controllers.verify.routes.EmailAddressController.onPageLoad(CheckMode)
-    case _                                        => _ => controllers.add.routes.CheckYourAnswersController.onPageLoad()
+    case _                                        => _ => controllers.routes.JourneyRecoveryController.onPageLoad()
+
   }
 
   private def navigatorFromContractorEmailConfirmationNotStoredPage(mode: Mode)(ua: UserAnswers): Call =
@@ -66,6 +74,24 @@ class VerifyNavigator @Inject() () extends NavigatorForJourney {
 
       case _ =>
         routes.IndexController.onPageLoad()
+    }
+
+  private def navigatorFromContractorEmailConfirmationStoredPage(mode: Mode)(ua: UserAnswers): Call =
+    (ua.get(ContractorEmailConfirmationStoredPage), mode) match {
+      case (Some(CurrentEmail), _) =>
+        // TODO: navigate to VF-06 Verify declaration once implemented
+        controllers.routes.JourneyRecoveryController.onPageLoad()
+
+      case (Some(DifferentEmail), _) =>
+        // TODO: navigate to SM-01b Enter alternate email once implemented
+        controllers.routes.JourneyRecoveryController.onPageLoad()
+
+      case (Some(DoNotSend), _) =>
+        // TODO: navigate to VF-06 Verify declaration once implemented
+        controllers.routes.JourneyRecoveryController.onPageLoad()
+
+      case _ =>
+        controllers.routes.JourneyRecoveryController.onPageLoad()
     }
 
 }
