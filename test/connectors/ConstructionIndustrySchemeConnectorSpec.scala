@@ -19,7 +19,7 @@ package connectors
 import models.add.TypeOfSubcontractor
 import models.requests.CreateAndUpdateSubcontractorPayload
 import models.requests.CreateAndUpdateSubcontractorPayload.*
-import models.response.GetNewestVerificationBatchResponse
+import models.response.{GetCurrentVerificationBatchResponse, GetNewestVerificationBatchResponse}
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{verify, when}
@@ -32,8 +32,8 @@ import play.api.libs.json.{JsValue, Json}
 import uk.gov.hmrc.http.client.{HttpClientV2, RequestBuilder}
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
-import java.net.URL
 
+import java.net.URL
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
@@ -188,6 +188,41 @@ class ConstructionIndustrySchemeConnectorSpec extends AnyWordSpec with Matchers 
       verify(http).get(urlCaptor.capture())(any[HeaderCarrier])
 
       urlCaptor.getValue.toString must include("/cis/verification-batch/newest/INST-123")
+    }
+  }
+
+  "ConstructionIndustrySchemeConnector.getCurrentVerificationBatch" should {
+
+    "return GetCurrentVerificationBatchResponse when CIS returns a valid response" in {
+      val config = mock[ServicesConfig]
+      val http   = mock[HttpClientV2]
+      val rb     = mock[RequestBuilder]
+
+      when(config.baseUrl("construction-industry-scheme")).thenReturn("http://cis-host")
+      when(http.get(any())(any())).thenReturn(rb)
+
+      val expected =
+        GetCurrentVerificationBatchResponse(
+          subcontractors = Nil,
+          verificationBatch = Nil,
+          verifications = Nil
+        )
+
+      when(rb.execute[GetCurrentVerificationBatchResponse](any(), any()))
+        .thenReturn(Future.successful(expected))
+
+      val connector = new ConstructionIndustrySchemeConnector(config, http)
+
+      val instanceId = "INST-123"
+      val result     = connector.getCurrentVerificationBatch(instanceId).futureValue
+
+      result mustBe expected
+
+      val urlCaptor: ArgumentCaptor[URL] = ArgumentCaptor.forClass(classOf[URL])
+
+      verify(http).get(urlCaptor.capture())(any[HeaderCarrier])
+
+      urlCaptor.getValue.toString must include("/cis/verification-batch/current/INST-123")
     }
   }
 

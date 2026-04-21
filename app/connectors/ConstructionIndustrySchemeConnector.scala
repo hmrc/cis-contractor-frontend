@@ -18,8 +18,7 @@ package connectors
 
 import models.requests.CreateAndUpdateSubcontractorPayload
 import models.requests.CreateAndUpdateSubcontractorPayload.*
-import models.response.CisTaxpayerResponse
-import models.response.{GetNewestVerificationBatchResponse, GetSubcontractorUTRsResponse}
+import models.response.{CisTaxpayerResponse, GetCurrentVerificationBatchResponse, GetNewestVerificationBatchResponse, GetSubcontractorUTRsResponse}
 import play.api.Logging
 import play.api.http.Status.NO_CONTENT
 import play.api.libs.json.{JsValue, Json}
@@ -99,6 +98,19 @@ class ConstructionIndustrySchemeConnector @Inject() (config: ServicesConfig, htt
       .map { response =>
         logger.info(
           s"[ConstructionIndustrySchemeConnector][getNewestVerificationBatch] instanceId=$instanceId - Response received"
+        )
+        response
+      }
+
+  def getCurrentVerificationBatch(
+    instanceId: String
+  )(implicit hc: HeaderCarrier): Future[GetCurrentVerificationBatchResponse] =
+    http
+      .get(url"$cisBaseUrl/verification-batch/current/$instanceId")
+      .execute[GetCurrentVerificationBatchResponse]
+      .map { response =>
+        logger.info(
+          s"[ConstructionIndustrySchemeConnector][getCurrentVerificationBatch] instanceId=$instanceId - Response received"
         )
         response
       }
