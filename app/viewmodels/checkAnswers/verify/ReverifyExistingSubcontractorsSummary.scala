@@ -32,14 +32,6 @@ object ReverifyExistingSubcontractorsSummary {
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
     answers.get(ReverifyExistingSubcontractorsPage).map { answer =>
 
-      /*
-      val value = ValueViewModel(
-        Text(
-          if (answer) messages("site.yes") else messages("site.no")
-        )
-      )
-       */
-
       val answerText = answer.toString match {
         case "option1" => messages("site.yes")
         case _         => messages("site.no")
