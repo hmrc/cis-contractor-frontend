@@ -17,11 +17,9 @@
 package utils
 
 import play.api.i18n.Messages
-import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.RadioItem
 
 object Utils {
   val emptyString: String = ""
-  val firstRadioId        = "value_0"
 
   /** Finds the first messages value for a given set of keys
     * @param keys
@@ -35,8 +33,5 @@ object Utils {
       .collectFirst { case key if messages(key) != key => messages(key) }
       .getOrElse(keys.head)
   }
-
-  def withIds(items: Seq[RadioItem], prefix: String = "value"): Seq[RadioItem] =
-    items.zipWithIndex.map { case (item, i) => item.copy(id = Some(s"${prefix}_$i")) }
 
 }
