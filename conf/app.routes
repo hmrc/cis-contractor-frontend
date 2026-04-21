@@ -370,3 +370,6 @@ GET   /verify/confirmation-email-stored             controllers.verify.Contracto
 POST  /verify/confirmation-email-stored             controllers.verify.ContractorEmailConfirmationStoredController.onSubmit(mode: Mode = NormalMode)
 GET   /verify/change-confirmation-email-stored      controllers.verify.ContractorEmailConfirmationStoredController.onPageLoad(mode: Mode = CheckMode)
 POST  /verify/change-confirmation-email-stored      controllers.verify.ContractorEmailConfirmationStoredController.onSubmit(mode: Mode = CheckMode)
+
+GET   /verify/no-new-subcontractors-to-verify       controllers.verify.VerifyYourSubcontractorsYesNoController.onPageLoad
+POST  /verify/no-new-subcontractors-to-verify       controllers.verify.VerifyYourSubcontractorsYesNoController.onSubmit
