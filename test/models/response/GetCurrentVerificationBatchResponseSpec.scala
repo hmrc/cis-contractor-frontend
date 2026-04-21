@@ -72,7 +72,6 @@ class GetCurrentVerificationBatchResponseSpec extends AnyWordSpec with Matchers 
       (sub0 \ "crn").as[String] mustBe "AC012345"
       (sub0 \ "partnerUtr").as[String] mustBe "5860920998"
 
-
       val vb0 = (json \ "verificationBatch")(0)
 
       (vb0 \ "verificationBatchId").as[Long] mustBe 99L
@@ -90,7 +89,7 @@ class GetCurrentVerificationBatchResponseSpec extends AnyWordSpec with Matchers 
       val model = GetCurrentVerificationBatchResponse(
         subcontractors = Seq.empty,
         verificationBatch = Seq.empty,
-        verifications = Seq.empty,
+        verifications = Seq.empty
       )
 
       val json = Json.toJson(model)

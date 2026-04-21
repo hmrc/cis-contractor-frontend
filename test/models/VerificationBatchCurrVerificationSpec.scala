@@ -26,13 +26,13 @@ class VerificationBatchCurrVerificationSpec extends SpecBase {
         verificationBatchId = 1L,
         verifBatchResourceRef = Some(10L)
       )
-      val json = Json.toJson(verificationBatch)
+      val json              = Json.toJson(verificationBatch)
 
       (json \ "verificationBatchId").as[Long] mustBe 1L
       (json \ "verifBatchResourceRef").as[Long] mustBe 10L
     }
     "deserialize from JSON correctly" in {
-      val json = Json.parse(
+      val json   = Json.parse(
         """
           |{
           |  "verificationBatchId": 1,
@@ -49,8 +49,8 @@ class VerificationBatchCurrVerificationSpec extends SpecBase {
         verificationBatchId = 1L,
         verifBatchResourceRef = Some(10L)
       )
-      val json = Json.toJson(verificationBatch)
-      val result = json.as[VerificationBatchCurrVerification]
+      val json              = Json.toJson(verificationBatch)
+      val result            = json.as[VerificationBatchCurrVerification]
       result mustBe verificationBatch
     }
   }
