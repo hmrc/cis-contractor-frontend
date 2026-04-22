@@ -35,8 +35,7 @@ class NewestVerificationBatchResponsePageSpec extends SpecBase {
         verificationBatch = Nil,
         verifications = Nil,
         submission = Nil,
-        monthlyReturn = Nil,
-        monthlyReturnSubmission = Nil
+        monthlyReturn = Nil
       )
 
       val uaWithValue =
@@ -55,8 +54,7 @@ class NewestVerificationBatchResponsePageSpec extends SpecBase {
         verificationBatch = Nil,
         verifications = Nil,
         submission = Nil,
-        monthlyReturn = Nil,
-        monthlyReturnSubmission = Nil
+        monthlyReturn = Nil
       )
 
       val uaWithValue =
@@ -81,8 +79,7 @@ class NewestVerificationBatchResponsePageSpec extends SpecBase {
         verificationBatch = Nil,
         verifications = Nil,
         submission = Nil,
-        monthlyReturn = Nil,
-        monthlyReturnSubmission = Nil
+        monthlyReturn = Nil
       )
 
       val uaWithValue =

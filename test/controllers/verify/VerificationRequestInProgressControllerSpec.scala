@@ -19,6 +19,7 @@ package controllers.verify
 import base.SpecBase
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
+import queries.CisIdQuery
 import views.html.verify.VerificationRequestInProgressView
 
 class VerificationRequestInProgressControllerSpec extends SpecBase {
@@ -27,18 +28,54 @@ class VerificationRequestInProgressControllerSpec extends SpecBase {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val cisId = "T1234567"
+
+      val userAnswers =
+        emptyUserAnswers.set(CisIdQuery, cisId).success.value
+
+      val application =
+        applicationBuilder(userAnswers = Some(userAnswers)).build()
 
       running(application) {
+
         val request =
-          FakeRequest(GET, controllers.verify.routes.VerificationRequestInProgressController.onPageLoad().url)
+          FakeRequest(
+            GET,
+            controllers.verify.routes.VerificationRequestInProgressController.onPageLoad().url
+          )
 
         val result = route(application, request).value
 
         val view = application.injector.instanceOf[VerificationRequestInProgressView]
 
+        val expectedManageSubcontractorsUrl =
+          s"${applicationConfig.manageSubcontractorsUrl}/$cisId"
+
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view()(request, applicationConfig, messages(application)).toString
+        contentAsString(result) mustEqual
+          view(expectedManageSubcontractorsUrl)(
+            request,
+            applicationConfig,
+            messages(application)
+          ).toString
+      }
+    }
+
+    "must redirect to Journey Recovery when CisId is missing" in {
+
+      val application =
+        applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(GET, controllers.verify.routes.VerificationRequestInProgressController.onPageLoad().url)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual
+          controllers.routes.JourneyRecoveryController.onPageLoad().url
       }
     }
   }
