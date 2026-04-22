@@ -293,15 +293,6 @@ individualChooseContactDetails.error.required                            =  Sele
 individualChooseContactDetails.checkYourAnswersLabel                     =  Method of contact
 individualChooseContactDetails.change.hidden                             =  method of contact
 
-verify.submissionSending.title                                           =  Submitting your verification request
-verify.submissionSending.heading                                         =  Your verification request is being sent to HMRC
-verify.submissionSending.paragraph                                       =  Do not refresh this page or press the back button while your submission is being processed.
-verify.contractorEmailConfirmationNotStored.title                        =  Do you want an email confirmation of this verification request?
-verify.contractorEmailConfirmationNotStored.heading                      =  Do you want an email confirmation of this verification request?
-verify.contractorEmailConfirmationNotStored.checkYourAnswersLabel        =  Do you want confirmation by email?
-verify.contractorEmailConfirmationNotStored.error.required               =  Select yes if you want an email confirmation of this verification request
-verify.contractorEmailConfirmationNotStored.change.hidden                =  do you want confirmation by email?
-
 # Partnership
 partnershipWorksReferenceNumberYesNo.title                           =  Does this partnership have a works reference number?
 partnershipWorksReferenceNumberYesNo.heading                         =  Does {0} have a works reference number?
@@ -779,16 +770,61 @@ trustCheckYourAnswers.trailHeading                             =  Now add this s
 trustCheckYourAnswers.trailText                                =  By adding this subcontractor you are confirming that, to the best of your knowledge, the details you are providing are correct.
 trustCheckYourAnswers.continue                                 =  Accept and submit
 
-verify.contractorEmailConfirmationNotStored.title                               =  Do you want an email confirmation of this verification request?
-verify.contractorEmailConfirmationNotStored.heading                             =  Do you want an email confirmation of this verification request?
-verify.contractorEmailConfirmationNotStored.checkYourAnswersLabel               =  Do you want confirmation by email?
-verify.contractorEmailConfirmationNotStored.error.required                      =  Select yes if you want an email confirmation of this verification request
-verify.contractorEmailConfirmationNotStored.change.hidden                       =  do you want confirmation by email?
+# Verify
+verify.submissionSending.title                                     =  Submitting your verification request
+verify.submissionSending.heading                                   =  Your verification request is being sent to HMRC
+verify.submissionSending.paragraph                                 =  Do not refresh this page or press the back button while your submission is being processed.
 
-verify.verificationDeclaration.title                                            =  Verification declaration
-verify.verificationDeclaration.heading                                          =  Declaration
-verify.verificationDeclaration.p1                                               =  By submitting this verification request, you confirm that:
-verify.verificationDeclaration.list.l1                                          =  a formal arrangement is in place (for example, tender accepted, contract agreed, order placed) for all of the subcontractors to be verified in this request.
-verify.verificationDeclaration.list.l2                                          =  the information given in this verification request is correct and complete to the best of your knowledge and belief.
-verify.verificationDeclaration.warningText                                      =  If you give any false information you may face financial penalties and prosecution.
-verify.verificationDeclaration.confirm                                          =  Confirm
+verify.contractorEmailConfirmationNotStored.title                  =  Do you want an email confirmation of this verification request?
+verify.contractorEmailConfirmationNotStored.heading                =  Do you want an email confirmation of this verification request?
+verify.contractorEmailConfirmationNotStored.checkYourAnswersLabel  =  Do you want confirmation by email?
+verify.contractorEmailConfirmationNotStored.error.required         =  Select yes if you want an email confirmation of this verification request
+verify.contractorEmailConfirmationNotStored.change.hidden          =  do you want confirmation by email?
+
+verify.noSubcontractorsAdded.title                                 =  No subcontractors added
+verify.noSubcontractorsAdded.heading                               =  Verify your subcontractors
+verify.noSubcontractorsAdded.p1                                    =  You do not have any subcontractors at the moment.
+verify.noSubcontractorsAdded.p2                                    =  You will need to
+verify.noSubcontractorsAdded.p2.link                               =  add some subcontractors first
+verify.noSubcontractorsAdded.p2.end                                =  before you can create a verification request or monthly return.
+verify.noSubcontractorsAdded.p3                                    =  Back to
+verify.noSubcontractorsAdded.p3.link                               =  Manage your subcontractors
+
+verify.contractorEmailConfirmationStored.title                     =  Do you want an email confirmation of this verification request?
+verify.contractorEmailConfirmationStored.heading                   =  Do you want an email confirmation of this verification request?
+verify.contractorEmailConfirmationStored.paragraph                 =  Your email address is currently {0}. You can get a confirmation sent to this address or use a different one.
+verify.contractorEmailConfirmationStored.currentEmail              =  Send confirmation to current email address
+verify.contractorEmailConfirmationStored.differentEmail            =  Use a different email address
+verify.contractorEmailConfirmationStored.or                        =  or
+verify.contractorEmailConfirmationStored.doNotSend                 =  Do not send an email confirmation
+verify.contractorEmailConfirmationStored.checkYourAnswersLabel     =  Do you want confirmation by email?
+verify.contractorEmailConfirmationStored.error.required            =  Select whether you want an email confirmation of this verification request
+verify.contractorEmailConfirmationStored.change.hidden             =  do you want confirmation by email?
+
+verify.verificationDeclaration.title                               =  Verification declaration
+verify.verificationDeclaration.heading                             =  Declaration
+verify.verificationDeclaration.p1                                  =  By submitting this verification request, you confirm that:
+verify.verificationDeclaration.list.l1                             =  a formal arrangement is in place (for example, tender accepted, contract agreed, order placed) for all of the subcontractors to be verified in this request.
+verify.verificationDeclaration.list.l2                             =  the information given in this verification request is correct and complete to the best of your knowledge and belief.
+verify.verificationDeclaration.warningText                         =  If you give any false information you may face financial penalties and prosecution.
+verify.verificationDeclaration.confirm                             =  Confirm
+
+verify.verifyYourSubcontractorsYesNo.title                                      = No new subcontractors to verify
+verify.verifyYourSubcontractorsYesNo.heading                                    = Verify your subcontractors
+verify.verifyYourSubcontractorsYesNo.p1                                         = There are no unverified subcontractors that you need to verify at the moment.
+verify.verifyYourSubcontractorsYesNo.p2                                         = However, you can reverify any of your existing subcontractors to make sure that their tax treatment is correct and up to date.
+verify.verifyYourSubcontractorsYesNo.p3                                         = You may want to reverify subcontractors if they:
+verify.verifyYourSubcontractorsYesNo.list.l1                                    = have recently changed any of their information
+verify.verifyYourSubcontractorsYesNo.list.l2                                    = have not been included on a return recently and have lost their verified status
+verify.verifyYourSubcontractorsYesNo.list.l3                                    = are about to lose their verified status
+verify.verifyYourSubcontractorsYesNo.heading2                                   = Do you want to add existing subcontractors to this verification request?
+verify.verifyYourSubcontractorsYesNo.error.required                             = Select yes if you want to add existing subcontractors to this verification request
+
+verify.verificationRequestInProgress.title                         =  Verification request in progress
+verify.verificationRequestInProgress.heading                       =  Verification request in progress
+verify.verificationRequestInProgress.p1                            =  HMRC has not responded to your previous verification request yet.
+verify.verificationRequestInProgress.p2                            =  You must wait for this response before you can verify any more subcontractors.
+verify.verificationRequestInProgress.p3.link                       =  Contact HMRC
+verify.verificationRequestInProgress.p3                            =  if you have any questions about this verification request.
+verify.verificationRequestInProgress.p4                            =  Back to
+verify.verificationRequestInProgress.p4.link                       =  Manage your subcontractors
