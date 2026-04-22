@@ -51,7 +51,7 @@ final class MonthlyReturnSpec extends AnyWordSpec with Matchers {
 
     "round-trip (model -> json -> model) without losing data" in {
       val model = MonthlyReturn(777L, Some("N"))
-      val json = Json.toJson(model)
+      val json  = Json.toJson(model)
       json.validate[MonthlyReturn] mustBe JsSuccess(model)
     }
   }

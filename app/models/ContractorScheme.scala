@@ -19,13 +19,12 @@ package models
 import play.api.libs.json.{Json, OFormat}
 
 case class ContractorScheme(
-                                            accountsOfficeReference: String,
-                                            utr: Option[String] = None,
-                                            name: Option[String] = None,
-                                            emailAddress: Option[String] = None,
+  accountsOfficeReference: String,
+  utr: Option[String] = None,
+  name: Option[String] = None,
+  emailAddress: Option[String] = None
+)
 
-                                          )
-
-object ContractorScheme{
+object ContractorScheme {
   given OFormat[ContractorScheme] = Json.format[ContractorScheme]
 }

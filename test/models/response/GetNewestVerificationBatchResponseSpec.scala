@@ -34,7 +34,7 @@ final class GetNewestVerificationBatchResponseSpec extends AnyWordSpec with Matc
             accountsOfficeReference = "123PA00123456",
             utr = Some("1111111111"),
             name = Some("ABC Construction Ltd"),
-            emailAddress = Some("ops@example.com"),
+            emailAddress = Some("ops@example.com")
           )
         ),
         subcontractors = Seq(
