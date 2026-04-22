@@ -42,7 +42,7 @@ class ReverifyExistingSubcontractorsYesNoControllerSpec extends SpecBase with Mo
   val form         = formProvider()
 
   lazy val reverifyExistingSubcontractorsYesNoRoute =
-    controllers.verify.routes.ReverifyExistingSubcontractorsYesNoController.onPageLoad().url
+    controllers.verify.routes.ReverifyExistingSubcontractorsYesNoController.onPageLoad(NormalMode).url
 
   "ReverifyExistingSubcontractorsYesNo Controller" - {
 

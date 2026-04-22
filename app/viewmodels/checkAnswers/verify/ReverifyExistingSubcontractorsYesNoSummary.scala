@@ -17,7 +17,7 @@
 package viewmodels.checkAnswers.verify
 
 import controllers.verify.routes
-import models.UserAnswers
+import models.{CheckMode, UserAnswers}
 import pages.verify.ReverifyExistingSubcontractorsYesNoPage
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
@@ -35,7 +35,10 @@ object ReverifyExistingSubcontractorsYesNoSummary {
         key = "verify.reverifyExistingSubcontractorsYesNo.checkYourAnswersLabel",
         value = ValueViewModel(value),
         actions = Seq(
-          ActionItemViewModel("site.change", routes.ReverifyExistingSubcontractorsYesNoController.onPageLoad().url)
+          ActionItemViewModel(
+            "site.change",
+            routes.ReverifyExistingSubcontractorsYesNoController.onPageLoad(CheckMode).url
+          )
             .withVisuallyHiddenText(messages("verify.reverifyExistingSubcontractorsYesNo.change.hidden"))
             .withAttribute("id" -> "reverify-existing-subcontractors-yes-no")
         )

@@ -54,7 +54,7 @@ class ReverifyExistingSubcontractorsViewYesNoSpec extends AnyWordSpec with Match
 
       doc.select("form").attr("action") mustBe
         controllers.verify.routes.ReverifyExistingSubcontractorsYesNoController
-          .onSubmit()
+          .onSubmit(NormalMode)
           .url
 
       doc.select("form").attr("autocomplete") mustBe "off"

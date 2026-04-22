@@ -32,7 +32,7 @@
 
 @layout(pageTitle = title(form, messages("verify.reverifyExistingSubcontractorsYesNo.title"))) {
 
-    @formHelper(action = controllers.verify.routes.ReverifyExistingSubcontractorsYesNoController.onSubmit(), Symbol("autoComplete") -> "off") {
+    @formHelper(action = controllers.verify.routes.ReverifyExistingSubcontractorsYesNoController.onSubmit(mode), Symbol("autoComplete") -> "off") {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form, errorLinkOverrides = Map("value" -> "value_0")))

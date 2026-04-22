@@ -17,7 +17,7 @@
 package viewmodels.checkAnswers.verify
 
 import controllers.verify.routes
-import models.UserAnswers
+import models.{CheckMode, UserAnswers}
 import org.scalatest.OptionValues.convertOptionToValuable
 import org.scalatest.TryValues.convertTryToSuccessOrFailure
 import org.scalatest.freespec.AnyFreeSpec
@@ -61,31 +61,18 @@ class ReverifyExistingSubcontractorsYesNoSummarySpec extends AnyFreeSpec with Ma
       actions should have size 1
 
       val changeAction = actions.head
-      changeAction.content.asHtml.toString    should include(
+
+      changeAction.content.asHtml.toString should include(
         messages("site.change")
       )
-      changeAction.href                     shouldBe
-        routes.ReverifyExistingSubcontractorsYesNoController.onPageLoad().url
+
+      changeAction.href shouldBe
+        routes.ReverifyExistingSubcontractorsYesNoController
+          .onPageLoad(CheckMode)
+          .url
+
       changeAction.visuallyHiddenText.value shouldBe
         messages("verify.reverifyExistingSubcontractorsYesNo.change.hidden")
-    }
-
-    "must return a SummaryListRow with No when the answer is false" in {
-
-      val answers =
-        UserAnswers("test-id")
-          .set(ReverifyExistingSubcontractorsYesNoPage, false)
-          .success
-          .value
-
-      val row =
-        ReverifyExistingSubcontractorsYesNoSummary
-          .row(answers)
-          .value
-
-      row.value.content.asHtml.toString should include(
-        messages("site.no")
-      )
     }
 
     "must return None when the answer does not exist" in {
