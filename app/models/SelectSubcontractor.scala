@@ -19,14 +19,14 @@ package models
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.checkboxes.CheckboxItem
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
-import viewmodels.govuk.checkbox._
+import viewmodels.govuk.checkbox.CheckboxItemViewModel
 
 sealed trait SelectSubcontractor
 
 object SelectSubcontractor extends Enumerable.Implicits {
 
   case object BrodyMartin extends WithName("brodyMartin") with SelectSubcontractor
-  case object Hooperassociates extends WithName("hooperAssociates") with SelectSubcontractor
+  case object HooperAssociates extends WithName("hooperAssociates") with SelectSubcontractor
 
   case object AlphaPlumbing extends WithName("alphaPlumbing") with SelectSubcontractor
 
@@ -36,7 +36,6 @@ object SelectSubcontractor extends Enumerable.Implicits {
 
   case object DeltaElectrical extends WithName("deltaElectrical") with SelectSubcontractor
 
-  // These will appear on page 2
   case object EpsilonCarpentry extends WithName("epsilonCarpentry") with SelectSubcontractor
 
   case object ZetaRoofing extends WithName("zetaRoofing") with SelectSubcontractor
@@ -45,7 +44,7 @@ object SelectSubcontractor extends Enumerable.Implicits {
 
   val values: Seq[SelectSubcontractor] = Seq(
     BrodyMartin,
-    Hooperassociates,
+    HooperAssociates,
     AlphaPlumbing,
     BetaBuilders,
     GammaConstruction,
