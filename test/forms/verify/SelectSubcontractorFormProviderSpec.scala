@@ -17,7 +17,6 @@
 package forms.verify
 
 import forms.behaviours.CheckboxFieldBehaviours
-import models.SelectSubcontractor
 import play.api.data.FormError
 
 class SelectSubcontractorFormProviderSpec extends CheckboxFieldBehaviours {
@@ -29,17 +28,18 @@ class SelectSubcontractorFormProviderSpec extends CheckboxFieldBehaviours {
     val fieldName   = "value"
     val requiredKey = "verify.selectSubcontractor.error.required"
 
-    behave like checkboxField[SelectSubcontractor](
-      form,
-      fieldName,
-      validValues = SelectSubcontractor.values,
-      invalidError = FormError(s"$fieldName[0]", "error.invalid")
-    )
+    "bind a submitted checkbox ID successfully" in {
+      val result = form.bind(Map(s"$fieldName[0]" -> "brodyMartin"))
+      result.errors mustBe empty
+      result.get mustEqual Set("brodyMartin")
+    }
 
-    behave like mandatoryCheckboxField(
-      form,
-      fieldName,
-      requiredKey
-    )
+    "bind multiple submitted checkbox IDs successfully" in {
+      val result = form.bind(Map(s"$fieldName[0]" -> "brodyMartin", s"$fieldName[1]" -> "alphaPlumbing"))
+      result.errors mustBe empty
+      result.get mustEqual Set("brodyMartin", "alphaPlumbing")
+    }
+
+    behave like mandatoryCheckboxField(form, fieldName, requiredKey)
   }
 }

@@ -17,8 +17,9 @@
 package views.verify
 
 import base.SpecBase
+import controllers.verify.SelectSubcontractorController
 import forms.verify.SelectSubcontractorFormProvider
-import models.{Mode, SelectSubcontractor}
+import models.{Mode, SubcontractorViewModel}
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.jsoup.select.Elements
@@ -41,9 +42,6 @@ class SelectSubcontractorViewSpec extends SpecBase with Matchers {
 
     "must render heading, hint, checkboxes and button" in new Setup {
 
-      val items: Seq[CheckboxItem] =
-        SelectSubcontractor.checkboxItems(messages)
-
       val html: HtmlFormat.Appendable =
         view(form, mode, checkboxItems, PaginationViewModel(), page = 1)
 
@@ -62,7 +60,7 @@ class SelectSubcontractorViewSpec extends SpecBase with Matchers {
 
     "must render error summary when form has errors" in new Setup {
 
-      val formWithError: Form[Set[SelectSubcontractor]] =
+      val formWithError: Form[Set[String]] =
         form.bind(Map("value" -> ""))
 
       val html: HtmlFormat.Appendable = view(formWithError, mode, checkboxItems, PaginationViewModel(), page = 1)
@@ -75,11 +73,12 @@ class SelectSubcontractorViewSpec extends SpecBase with Matchers {
 
     "must render error summary link targeting the first checkbox on the current page" in new Setup {
 
-      val formWithError: Form[Set[SelectSubcontractor]] =
+      val formWithError: Form[Set[String]] =
         form.bind(Map("value" -> ""))
 
-      val page1Items: Seq[CheckboxItem] = SelectSubcontractor.checkboxItems(messages).slice(0, 6)
-      val page2Items: Seq[CheckboxItem] = SelectSubcontractor.checkboxItems(messages).slice(6, 9)
+      val allItems                      = SubcontractorViewModel.checkboxItems(SelectSubcontractorController.subcontractors)
+      val page1Items: Seq[CheckboxItem] = allItems.slice(0, 6)
+      val page2Items: Seq[CheckboxItem] = allItems.slice(6, 9)
 
       val docPage1: Document = Jsoup.parse(
         view(formWithError, mode, page1Items, PaginationViewModel(), page = 1).body
@@ -96,13 +95,10 @@ class SelectSubcontractorViewSpec extends SpecBase with Matchers {
 
       val pagination: PaginationViewModel = PaginationViewModel(
         items = Seq(
-          PaginationItemViewModel("1", "/test?page=1").withCurrent(true),
-          PaginationItemViewModel("2", "/test?page=2")
+          PaginationItemViewModel("1", "").withCurrent(true),
+          PaginationItemViewModel("2", "")
         ),
-        next = Some(
-          PaginationLinkViewModel("/test?page=2")
-            .withText("site.pagination.next")
-        )
+        next = Some(PaginationLinkViewModel("").withText("site.pagination.next"))
       )
 
       val html: HtmlFormat.Appendable = view(form, mode, checkboxItems, pagination, page = 1)
@@ -118,18 +114,12 @@ class SelectSubcontractorViewSpec extends SpecBase with Matchers {
 
       val pagination: PaginationViewModel = PaginationViewModel(
         items = Seq(
-          PaginationItemViewModel("1", "/test?page=1"),
-          PaginationItemViewModel("2", "/test?page=2").withCurrent(true),
-          PaginationItemViewModel("3", "/test?page=3")
+          PaginationItemViewModel("1", ""),
+          PaginationItemViewModel("2", "").withCurrent(true),
+          PaginationItemViewModel("3", "")
         ),
-        previous = Some(
-          PaginationLinkViewModel("/test?page=1")
-            .withText("site.pagination.previous")
-        ),
-        next = Some(
-          PaginationLinkViewModel("/test?page=3")
-            .withText("site.pagination.next")
-        )
+        previous = Some(PaginationLinkViewModel("").withText("site.pagination.previous")),
+        next = Some(PaginationLinkViewModel("").withText("site.pagination.next"))
       )
 
       val html: HtmlFormat.Appendable = view(form, mode, checkboxItems, pagination, page = 2)
@@ -155,12 +145,12 @@ class SelectSubcontractorViewSpec extends SpecBase with Matchers {
 
       val pagination: PaginationViewModel = PaginationViewModel(
         items = Seq(
-          PaginationItemViewModel("1", "/test?page=1").withCurrent(true),
-          PaginationItemViewModel("2", "/test?page=2"),
-          PaginationItemViewModel("3", "/test?page=3")
+          PaginationItemViewModel("1", "").withCurrent(true),
+          PaginationItemViewModel("2", ""),
+          PaginationItemViewModel("3", "")
         ),
-        previous = Some(PaginationLinkViewModel("/test?page=1")),
-        next = Some(PaginationLinkViewModel("/test?page=3"))
+        previous = Some(PaginationLinkViewModel("")),
+        next = Some(PaginationLinkViewModel(""))
       )
 
       val html: HtmlFormat.Appendable = view(form, mode, checkboxItems, pagination, page = 2)
@@ -172,7 +162,6 @@ class SelectSubcontractorViewSpec extends SpecBase with Matchers {
       prevButton.size mustBe 1
       prevButton.text must include(messages("site.pagination.previous"))
 
-      // ✅ Page number buttons
       doc.select(".govuk-pagination__item button[name=gotoPage][value=1]").size mustBe 1
       doc.select(".govuk-pagination__item button[name=gotoPage][value=2]").size mustBe 1
       doc.select(".govuk-pagination__item button[name=gotoPage][value=3]").size mustBe 1
@@ -188,9 +177,9 @@ class SelectSubcontractorViewSpec extends SpecBase with Matchers {
 
       val pagination: PaginationViewModel = PaginationViewModel(
         items = Seq(
-          PaginationItemViewModel("1", "/test?page=1"),
-          PaginationItemViewModel("2", "/test?page=2").withCurrent(true),
-          PaginationItemViewModel("3", "/test?page=3")
+          PaginationItemViewModel("1", ""),
+          PaginationItemViewModel("2", "").withCurrent(true),
+          PaginationItemViewModel("3", "")
         )
       )
 
@@ -217,11 +206,10 @@ class SelectSubcontractorViewSpec extends SpecBase with Matchers {
     val formProvider: SelectSubcontractorFormProvider =
       app.injector.instanceOf[SelectSubcontractorFormProvider]
 
-    val form: Form[Set[SelectSubcontractor]] =
-      formProvider()
+    val form: Form[Set[String]] = formProvider()
 
-    val checkboxItems: Seq[uk.gov.hmrc.govukfrontend.views.viewmodels.checkboxes.CheckboxItem] =
-      SelectSubcontractor.checkboxItems
+    val checkboxItems: Seq[CheckboxItem] =
+      SubcontractorViewModel.checkboxItems(SelectSubcontractorController.subcontractors)
 
     val mode: Mode = models.NormalMode
   }

@@ -18,19 +18,34 @@ package controllers.verify
 
 import controllers.actions.*
 import forms.verify.SelectSubcontractorFormProvider
-import models.Mode
+import models.{Mode, SubcontractorViewModel}
 import navigation.Navigator
 import pages.verify.SelectSubcontractorPage
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
+import services.PaginationService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.verify.SelectSubcontractorView
-import services.PaginationService
-import models.SelectSubcontractor
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
+
+object SelectSubcontractorController {
+
+  // Placeholder list — will be replaced with a backend call when the connector is implemented
+  val subcontractors: Seq[SubcontractorViewModel] = Seq(
+    SubcontractorViewModel("100", "Brody Martin"),
+    SubcontractorViewModel("95", "Hooper Associates"),
+    SubcontractorViewModel("96", "Alpha Plumbing"),
+    SubcontractorViewModel("98", "Beta Builders"),
+    SubcontractorViewModel("97", "Gamma Construction"),
+    SubcontractorViewModel("99", "Delta Electrical"),
+    SubcontractorViewModel("101", "Epsilon Carpentry"),
+    SubcontractorViewModel("103", "Zeta Roofing"),
+    SubcontractorViewModel("102", "Eta Plastering")
+  )
+}
 
 class SelectSubcontractorController @Inject() (
   override val messagesApi: MessagesApi,
@@ -61,24 +76,16 @@ class SelectSubcontractorController @Inject() (
         case Some(ua) =>
           val preparedForm =
             ua.get(SelectSubcontractorPage)
-              .map(form.fill)
+              .map(subs => form.fill(subs.map(_.id)))
               .getOrElse(form)
 
           val result =
             paginationService.paginateCheckboxItems(
-              SelectSubcontractor.checkboxItems,
+              SubcontractorViewModel.checkboxItems(SelectSubcontractorController.subcontractors),
               page
             )
 
-          Ok(
-            view(
-              preparedForm,
-              mode,
-              result.paginatedData,
-              result.paginationViewModel,
-              page
-            )
-          )
+          Ok(view(preparedForm, mode, result.paginatedData, result.paginationViewModel, page))
       }
     }
 
@@ -90,34 +97,31 @@ class SelectSubcontractorController @Inject() (
       request.userAnswers match {
 
         case None =>
-          Future.successful(
-            Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-          )
+          Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
 
         case Some(ua) =>
-          val allItems =
-            SelectSubcontractor.checkboxItems
+          val allSubs  = SelectSubcontractorController.subcontractors
+          val allItems = SubcontractorViewModel.checkboxItems(allSubs)
 
           val result =
-            paginationService.paginateCheckboxItems(
-              allItems,
-              page
-            )
+            paginationService.paginateCheckboxItems(allItems, page)
 
-          val currentPageValues: Set[SelectSubcontractor] =
-            result.paginatedData
-              .flatMap(item => SelectSubcontractor.values.find(_.toString == item.value))
-              .toSet
+          val currentPageIds: Set[String] =
+            result.paginatedData.map(_.value).toSet
 
-          val otherPageValues: Set[SelectSubcontractor] =
-            ua.get(SelectSubcontractorPage).getOrElse(Set.empty).diff(currentPageValues)
+          val otherPageValues: Set[SubcontractorViewModel] =
+            ua.get(SelectSubcontractorPage)
+              .getOrElse(Set.empty)
+              .filterNot(sub => currentPageIds.contains(sub.id))
 
           val boundForm = form.bindFromRequest()
 
-          val currentSelectedValues: Set[SelectSubcontractor] =
-            boundForm.value.getOrElse(Set.empty)
+          val currentSelectedValues: Set[SubcontractorViewModel] =
+            boundForm.value
+              .getOrElse(Set.empty)
+              .flatMap(id => allSubs.find(_.id == id))
 
-          val mergedValues = otherPageValues ++ currentSelectedValues
+          val mergedValues: Set[SubcontractorViewModel] = otherPageValues ++ currentSelectedValues
 
           val gotoPage: Option[Int] =
             request.body.asFormUrlEncoded
@@ -139,28 +143,20 @@ class SelectSubcontractorController @Inject() (
                   _              <- sessionRepository.set(updatedAnswers)
                 } yield Redirect(navigator.nextPage(SelectSubcontractorPage, mode, updatedAnswers))
               } else {
-                boundForm
-                  .fold(
-                    formWithErrors =>
-                      Future.successful(
-                        BadRequest(
-                          view(
-                            formWithErrors,
-                            mode,
-                            result.paginatedData,
-                            result.paginationViewModel,
-                            page
-                          )
-                        )
-                      ),
-                    value =>
-                      for {
-                        updatedAnswers <- Future.fromTry(ua.set(SelectSubcontractorPage, value ++ otherPageValues))
-                        _              <- sessionRepository.set(updatedAnswers)
-                      } yield Redirect(
-                        navigator.nextPage(SelectSubcontractorPage, mode, updatedAnswers)
+                boundForm.fold(
+                  formWithErrors =>
+                    Future.successful(
+                      BadRequest(
+                        view(formWithErrors, mode, result.paginatedData, result.paginationViewModel, page)
                       )
-                  )
+                    ),
+                  ids =>
+                    val selected = ids.flatMap(id => allSubs.find(_.id == id)) ++ otherPageValues
+                    for {
+                      updatedAnswers <- Future.fromTry(ua.set(SelectSubcontractorPage, selected))
+                      _              <- sessionRepository.set(updatedAnswers)
+                    } yield Redirect(navigator.nextPage(SelectSubcontractorPage, mode, updatedAnswers))
+                )
               }
           }
       }

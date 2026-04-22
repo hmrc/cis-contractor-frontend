@@ -16,7 +16,7 @@
 
 package generators
 
-import models.*
+import models.{SubcontractorViewModel, *}
 import models.contact.ContactOptions
 import models.add.{InternationalAddress, TypeOfSubcontractor}
 import models.verify.ContractorEmailConfirmationStored
@@ -27,9 +27,12 @@ import java.time.Instant
 
 trait ModelGenerators {
 
-  implicit lazy val arbitrarySelectSubcontractor: Arbitrary[SelectSubcontractor] =
+  implicit lazy val arbitrarySubcontractorViewModel: Arbitrary[SubcontractorViewModel] =
     Arbitrary {
-      Gen.oneOf(SelectSubcontractor.values)
+      for {
+        id   <- Gen.alphaStr.suchThat(_.nonEmpty)
+        name <- Gen.alphaStr.suchThat(_.nonEmpty)
+      } yield SubcontractorViewModel(id, name)
     }
 
   implicit lazy val arbitraryInternationalAddress: Arbitrary[InternationalAddress] =

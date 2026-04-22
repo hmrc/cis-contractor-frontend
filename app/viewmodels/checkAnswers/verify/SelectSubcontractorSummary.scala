@@ -16,7 +16,7 @@
 
 package viewmodels.checkAnswers.verify
 
-import models.{CheckMode, UserAnswers}
+import models.{CheckMode, SubcontractorViewModel, UserAnswers}
 import pages.verify.SelectSubcontractorPage
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
@@ -33,9 +33,7 @@ object SelectSubcontractorSummary {
       val value = ValueViewModel(
         HtmlContent(
           answers
-            .map { answer =>
-              HtmlFormat.escape(messages(s"verify.selectSubcontractor.$answer")).toString
-            }
+            .map(sub => HtmlFormat.escape(sub.name).toString)
             .mkString(",<br>")
         )
       )

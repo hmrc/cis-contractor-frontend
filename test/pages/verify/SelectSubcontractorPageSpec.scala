@@ -16,17 +16,17 @@
 
 package pages.verify
 
-import models.SelectSubcontractor
+import models.SubcontractorViewModel
 import pages.behaviours.PageBehaviours
 
 class SelectSubcontractorPageSpec extends PageBehaviours {
 
   "SelectSubcontractorPage" - {
 
-    beRetrievable[Set[SelectSubcontractor]](SelectSubcontractorPage)
+    beRetrievable[Set[SubcontractorViewModel]](SelectSubcontractorPage)
 
-    beSettable[Set[SelectSubcontractor]](SelectSubcontractorPage)
+    beSettable[Set[SubcontractorViewModel]](SelectSubcontractorPage)
 
-    beRemovable[Set[SelectSubcontractor]](SelectSubcontractorPage)
+    beRemovable[Set[SubcontractorViewModel]](SelectSubcontractorPage)
   }
 }

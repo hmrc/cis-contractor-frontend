@@ -17,7 +17,7 @@
 package viewmodels.checkAnswers.verify
 
 import base.SpecBase
-import models.{CheckMode, SelectSubcontractor, UserAnswers}
+import models.{CheckMode, SubcontractorViewModel, UserAnswers}
 import org.scalatest.OptionValues._
 import org.scalatest.matchers.must.Matchers
 import pages.verify.SelectSubcontractorPage
@@ -28,8 +28,11 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist._
 class SelectSubcontractorSummarySpec extends SpecBase with Matchers {
 
   private val messagesApi                 = stubMessagesApi()
-  private implicit val messages: Messages =
-    MessagesImpl(Lang.defaultLang, messagesApi)
+  private implicit val messages: Messages = MessagesImpl(Lang.defaultLang, messagesApi)
+
+  private val brodyMartin   = SubcontractorViewModel("brodyMartin", "Brody Martin")
+  private val alphaPlumbing = SubcontractorViewModel("alphaPlumbing", "Alpha Plumbing")
+  private val deltaElec     = SubcontractorViewModel("deltaElectrical", "Delta Electrical")
 
   "SelectSubcontractorSummary.row" - {
 
@@ -37,13 +40,7 @@ class SelectSubcontractorSummarySpec extends SpecBase with Matchers {
 
       val answers: UserAnswers =
         emptyUserAnswers
-          .set(
-            SelectSubcontractorPage,
-            Set(
-              SelectSubcontractor.BrodyMartin,
-              SelectSubcontractor.AlphaPlumbing
-            )
-          )
+          .set(SelectSubcontractorPage, Set(brodyMartin, alphaPlumbing))
           .success
           .value
 
@@ -57,8 +54,8 @@ class SelectSubcontractorSummarySpec extends SpecBase with Matchers {
 
       val valueHtml = row.value.content.asHtml.toString
 
-      valueHtml must include(messages("verify.selectSubcontractor.brodyMartin"))
-      valueHtml must include(messages("verify.selectSubcontractor.alphaPlumbing"))
+      valueHtml must include("Brody Martin")
+      valueHtml must include("Alpha Plumbing")
       valueHtml must include("<br>")
 
       row.actions mustBe defined
@@ -85,10 +82,7 @@ class SelectSubcontractorSummarySpec extends SpecBase with Matchers {
 
       val answers: UserAnswers =
         emptyUserAnswers
-          .set(
-            SelectSubcontractorPage,
-            Set(SelectSubcontractor.DeltaElectrical)
-          )
+          .set(SelectSubcontractorPage, Set(deltaElec))
           .success
           .value
 
@@ -96,21 +90,14 @@ class SelectSubcontractorSummarySpec extends SpecBase with Matchers {
 
       result mustBe defined
 
-      val row = result.value
+      val valueHtml = result.value.value.content.asHtml.toString
 
-      val valueHtml = row.value.content.asHtml.toString
-
-      valueHtml must include(messages("verify.selectSubcontractor.deltaElectrical"))
+      valueHtml must include("Delta Electrical")
       valueHtml must not include "<br>"
     }
 
     "must return None when no answer is present" in {
-
-      val answers = emptyUserAnswers
-
-      val result = SelectSubcontractorSummary.row(answers)
-
-      result mustBe None
+      SelectSubcontractorSummary.row(emptyUserAnswers) mustBe None
     }
   }
 }

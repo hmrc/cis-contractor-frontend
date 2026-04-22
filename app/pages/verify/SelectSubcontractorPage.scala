@@ -16,11 +16,11 @@
 
 package pages.verify
 
-import models.SelectSubcontractor
+import models.SubcontractorViewModel
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 
-case object SelectSubcontractorPage extends QuestionPage[Set[SelectSubcontractor]] with VerifyJourney {
+case object SelectSubcontractorPage extends QuestionPage[Set[SubcontractorViewModel]] with VerifyJourney {
 
   override def path: JsPath = JsPath \ toString
 

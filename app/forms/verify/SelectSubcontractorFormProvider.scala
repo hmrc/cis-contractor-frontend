@@ -17,7 +17,6 @@
 package forms.verify
 
 import forms.mappings.Mappings
-import models.SelectSubcontractor
 import play.api.data.Form
 import play.api.data.Forms.set
 
@@ -25,9 +24,9 @@ import javax.inject.Inject
 
 class SelectSubcontractorFormProvider @Inject() extends Mappings {
 
-  def apply(): Form[Set[SelectSubcontractor]] =
+  def apply(): Form[Set[String]] =
     Form(
-      "value" -> set(enumerable[SelectSubcontractor]("verify.selectSubcontractor.error.required"))
+      "value" -> set(text("verify.selectSubcontractor.error.required"))
         .verifying(nonEmptySet("verify.selectSubcontractor.error.required"))
     )
 }
