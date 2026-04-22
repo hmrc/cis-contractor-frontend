@@ -32,7 +32,8 @@ class SubcontractorCurrVerificationSpec extends SpecBase {
         utr = Some("1111111111"),
         nino = Some("AA123456A"),
         crn = Some("AC012345"),
-        partnerUtr = Some("5860920998")
+        partnerUtr = Some("5860920998"),
+        partnershipTradingName = Some("ACME trading")
       )
       val json           = Json.toJson(subcontractors)
 
@@ -46,6 +47,7 @@ class SubcontractorCurrVerificationSpec extends SpecBase {
       (json \ "nino").as[String] mustBe "AA123456A"
       (json \ "crn").as[String] mustBe "AC012345"
       (json \ "partnerUtr").as[String] mustBe "5860920998"
+      (json \ "partnershipTradingName").as[String] mustBe "ACME trading"
     }
     "deserialize from JSON correctly" in {
       val json   = Json.parse(
@@ -60,7 +62,8 @@ class SubcontractorCurrVerificationSpec extends SpecBase {
           |  "utr" : "1111111111",
           |  "nino" : "AA123456A",
           |  "crn" : "AC012345",
-          |  "partnerUtr" : "5860920998"
+          |  "partnerUtr" : "5860920998",
+          |  "partnershipTradingName" : "ACME trading"
           |}
           |""".stripMargin
       )
@@ -75,6 +78,7 @@ class SubcontractorCurrVerificationSpec extends SpecBase {
       result.nino mustBe Some("AA123456A")
       result.crn mustBe Some("AC012345")
       result.partnerUtr mustBe Some("5860920998")
+      result.partnershipTradingName mustBe Some("ACME trading")
     }
     "round-trip serialize and deserialize correctly" in {
       val subcontractors = SubcontractorCurrVerification(
@@ -87,7 +91,8 @@ class SubcontractorCurrVerificationSpec extends SpecBase {
         utr = Some("1111111111"),
         nino = Some("AA123456A"),
         crn = Some("AC012345"),
-        partnerUtr = Some("5860920998")
+        partnerUtr = Some("5860920998"),
+        partnershipTradingName = Some("ACME trading")
       )
       val json           = Json.toJson(subcontractors)
       val result         = json.as[SubcontractorCurrVerification]

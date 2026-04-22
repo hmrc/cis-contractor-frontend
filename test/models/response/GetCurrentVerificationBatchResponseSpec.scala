@@ -38,7 +38,8 @@ class GetCurrentVerificationBatchResponseSpec extends AnyWordSpec with Matchers 
             utr = Some("1111111111"),
             nino = Some("AA123456A"),
             crn = Some("AC012345"),
-            partnerUtr = Some("5860920998")
+            partnerUtr = Some("5860920998"),
+            partnershipTradingName = Some("ACME trading")
           )
         ),
         verificationBatch = Seq(
@@ -71,6 +72,7 @@ class GetCurrentVerificationBatchResponseSpec extends AnyWordSpec with Matchers 
       (sub0 \ "nino").as[String] mustBe "AA123456A"
       (sub0 \ "crn").as[String] mustBe "AC012345"
       (sub0 \ "partnerUtr").as[String] mustBe "5860920998"
+      (sub0 \ "partnershipTradingName").as[String] mustBe "ACME trading"
 
       val vb0 = (json \ "verificationBatch")(0)
 
