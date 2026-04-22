@@ -53,6 +53,10 @@ checkYourAnswers.heading.h2          =  Now add this subcontractor
 checkYourAnswers.p1                  =  By adding this subcontractor you are confirming that, to the best of your knowledge, the details you are providing are correct.
 checkYourAnswers.addSubcontractor    =  Accept and submit
 
+site.pagination.previous             =  Previous
+site.pagination.next                 =  Next
+site.pagination.landmark             =  Pagination
+
 # Errors & Auth
 pageNotFound.title                       =  Page not found
 pageNotFound.heading                     =  Page not found
@@ -809,16 +813,16 @@ verify.verificationDeclaration.list.l2                             =  the inform
 verify.verificationDeclaration.warningText                         =  If you give any false information you may face financial penalties and prosecution.
 verify.verificationDeclaration.confirm                             =  Confirm
 
-verify.verifyYourSubcontractorsYesNo.title                                      = No new subcontractors to verify
-verify.verifyYourSubcontractorsYesNo.heading                                    = Verify your subcontractors
-verify.verifyYourSubcontractorsYesNo.p1                                         = There are no unverified subcontractors that you need to verify at the moment.
-verify.verifyYourSubcontractorsYesNo.p2                                         = However, you can reverify any of your existing subcontractors to make sure that their tax treatment is correct and up to date.
-verify.verifyYourSubcontractorsYesNo.p3                                         = You may want to reverify subcontractors if they:
-verify.verifyYourSubcontractorsYesNo.list.l1                                    = have recently changed any of their information
-verify.verifyYourSubcontractorsYesNo.list.l2                                    = have not been included on a return recently and have lost their verified status
-verify.verifyYourSubcontractorsYesNo.list.l3                                    = are about to lose their verified status
-verify.verifyYourSubcontractorsYesNo.heading2                                   = Do you want to add existing subcontractors to this verification request?
-verify.verifyYourSubcontractorsYesNo.error.required                             = Select yes if you want to add existing subcontractors to this verification request
+verify.verifyYourSubcontractorsYesNo.title                         =  No new subcontractors to verify
+verify.verifyYourSubcontractorsYesNo.heading                       =  Verify your subcontractors
+verify.verifyYourSubcontractorsYesNo.p1                            =  There are no unverified subcontractors that you need to verify at the moment.
+verify.verifyYourSubcontractorsYesNo.p2                            =  However, you can reverify any of your existing subcontractors to make sure that their tax treatment is correct and up to date.
+verify.verifyYourSubcontractorsYesNo.p3                            =  You may want to reverify subcontractors if they:
+verify.verifyYourSubcontractorsYesNo.list.l1                       =  have recently changed any of their information
+verify.verifyYourSubcontractorsYesNo.list.l2                       =  have not been included on a return recently and have lost their verified status
+verify.verifyYourSubcontractorsYesNo.list.l3                       =  are about to lose their verified status
+verify.verifyYourSubcontractorsYesNo.heading2                      =  Do you want to add existing subcontractors to this verification request?
+verify.verifyYourSubcontractorsYesNo.error.required                =  Select yes if you want to add existing subcontractors to this verification request
 
 verify.verificationRequestInProgress.title                         =  Verification request in progress
 verify.verificationRequestInProgress.heading                       =  Verification request in progress
@@ -829,23 +833,18 @@ verify.verificationRequestInProgress.p3                            =  if you hav
 verify.verificationRequestInProgress.p4                            =  Back to
 verify.verificationRequestInProgress.p4.link                       =  Manage your subcontractors.
 
-verify.selectSubcontractor.title                                      = Which subcontractors do you want to verify?
-verify.selectSubcontractor.heading                                    = Which subcontractors do you want to verify?
-verify.selectSubcontractor.hint                                       = Select the unverified subcontractors you want to add to this verification request.
-verify.selectSubcontractor.brodyMartin                                = Brody, Martin
-verify.selectSubcontractor.hooperAssociates                           = Hooper and Associates
-verify.selectSubcontractor.checkYourAnswersLabel                      = Which subcontractors do you want to verify?
-verify.selectSubcontractor.error.required                             = Select at least one subcontractor to verify
-verify.selectSubcontractor.change.hidden                              = SelectSubcontractor
-
-verify.selectSubcontractor.alphaPlumbing                              = Alpha Plumbing
-verify.selectSubcontractor.betaBuilders                               = Beta Builders
-verify.selectSubcontractor.gammaConstruction                          = Gamma Construction
-verify.selectSubcontractor.deltaElectrical                            = Delta Electrical
-verify.selectSubcontractor.epsilonCarpentry                           = Epsilon Carpentry
-verify.selectSubcontractor.zetaRoofing                                = Zeta Roofing
-verify.selectSubcontractor.etaPlastering                              = Eta Plastering
-
-site.pagination.previous                                              = Previous
-site.pagination.next                                                  = Next
-site.pagination.landmark                                              = Pagination
+verify.selectSubcontractor.title                                   =  Which subcontractors do you want to verify?
+verify.selectSubcontractor.heading                                 =  Which subcontractors do you want to verify?
+verify.selectSubcontractor.hint                                    =  Select the unverified subcontractors you want to add to this verification request.
+verify.selectSubcontractor.brodyMartin                             =  Brody, Martin
+verify.selectSubcontractor.hooperAssociates                        =  Hooper and Associates
+verify.selectSubcontractor.checkYourAnswersLabel                   =  Which subcontractors do you want to verify?
+verify.selectSubcontractor.error.required                          =  Select at least one subcontractor to verify
+verify.selectSubcontractor.change.hidden                           =  SelectSubcontractor
+verify.selectSubcontractor.alphaPlumbing                           =  Alpha Plumbing
+verify.selectSubcontractor.betaBuilders                            =  Beta Builders
+verify.selectSubcontractor.gammaConstruction                       =  Gamma Construction
+verify.selectSubcontractor.deltaElectrical                         =  Delta Electrical
+verify.selectSubcontractor.epsilonCarpentry                        =  Epsilon Carpentry
+verify.selectSubcontractor.zetaRoofing                             =  Zeta Roofing
+verify.selectSubcontractor.etaPlastering                           =  Eta Plastering

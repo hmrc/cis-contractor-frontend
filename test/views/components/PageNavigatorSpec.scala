@@ -42,14 +42,14 @@ class PageNavigatorSpec extends SpecBase with Matchers {
           PaginationItemViewModel("2", "/test?page=2")
         )
       )
-      val doc = parse(pageNavigator(pagination, page = 1))
+      val doc        = parse(pageNavigator(pagination, page = 1))
       doc.select(".govuk-pagination").size() mustBe 1
       doc.select(".govuk-pagination__item").size() mustBe 2
     }
 
     "must render a previous button with value page - 1" in new Setup {
       val pagination = PaginationViewModel(
-        items    = Seq(PaginationItemViewModel("2", "/test?page=2").withCurrent(true)),
+        items = Seq(PaginationItemViewModel("2", "/test?page=2").withCurrent(true)),
         previous = Some(PaginationLinkViewModel("/test?page=1"))
       )
       val doc        = parse(pageNavigator(pagination, page = 2))
@@ -61,7 +61,7 @@ class PageNavigatorSpec extends SpecBase with Matchers {
     "must render a next button with value page + 1" in new Setup {
       val pagination = PaginationViewModel(
         items = Seq(PaginationItemViewModel("1", "/test?page=1").withCurrent(true)),
-        next  = Some(PaginationLinkViewModel("/test?page=2"))
+        next = Some(PaginationLinkViewModel("/test?page=2"))
       )
       val doc        = parse(pageNavigator(pagination, page = 1))
       val nextButton = doc.select(".govuk-pagination__next button[name=gotoPage][value=2]")
@@ -73,7 +73,7 @@ class PageNavigatorSpec extends SpecBase with Matchers {
       val pagination = PaginationViewModel(
         items = Seq(PaginationItemViewModel("1", "/test?page=1").withCurrent(true))
       )
-      val doc = parse(pageNavigator(pagination, page = 1))
+      val doc        = parse(pageNavigator(pagination, page = 1))
       doc.select(".govuk-pagination__prev").size() mustBe 0
     }
 
@@ -81,7 +81,7 @@ class PageNavigatorSpec extends SpecBase with Matchers {
       val pagination = PaginationViewModel(
         items = Seq(PaginationItemViewModel("1", "/test?page=1").withCurrent(true))
       )
-      val doc = parse(pageNavigator(pagination, page = 1))
+      val doc        = parse(pageNavigator(pagination, page = 1))
       doc.select(".govuk-pagination__next").size() mustBe 0
     }
 
@@ -93,7 +93,7 @@ class PageNavigatorSpec extends SpecBase with Matchers {
           PaginationItemViewModel("3", "/test?page=3")
         )
       )
-      val doc = parse(pageNavigator(pagination, page = 2))
+      val doc        = parse(pageNavigator(pagination, page = 2))
       doc.select(".govuk-pagination__item--current").size() mustBe 1
       doc.select(".govuk-pagination__item--current [aria-current=page]").size() mustBe 1
     }
@@ -106,7 +106,7 @@ class PageNavigatorSpec extends SpecBase with Matchers {
           PaginationItemViewModel("3", "/test?page=3")
         )
       )
-      val doc = parse(pageNavigator(pagination, page = 1))
+      val doc        = parse(pageNavigator(pagination, page = 1))
       doc.select(".govuk-pagination__item button[name=gotoPage][value=1]").size() mustBe 1
       doc.select(".govuk-pagination__item button[name=gotoPage][value=2]").size() mustBe 1
       doc.select(".govuk-pagination__item button[name=gotoPage][value=3]").size() mustBe 1
@@ -114,19 +114,19 @@ class PageNavigatorSpec extends SpecBase with Matchers {
 
     "must use the landmark label from the view model" in new Setup {
       val pagination = PaginationViewModel(
-        items         = Seq(PaginationItemViewModel("1", "/test?page=1")),
+        items = Seq(PaginationItemViewModel("1", "/test?page=1")),
         landmarkLabel = "site.pagination.landmark"
       )
-      val doc = parse(pageNavigator(pagination, page = 1))
+      val doc        = parse(pageNavigator(pagination, page = 1))
       doc.select(".govuk-pagination").attr("aria-label") mustBe messages("site.pagination.landmark")
     }
   }
 
   trait Setup {
-    val app                            = applicationBuilder().build()
-    val pageNavigator: PageNavigator   = app.injector.instanceOf[PageNavigator]
+    val app                                                                = applicationBuilder().build()
+    val pageNavigator: PageNavigator                                       = app.injector.instanceOf[PageNavigator]
     implicit val request: FakeRequest[play.api.mvc.AnyContentAsEmpty.type] = FakeRequest()
-    implicit val messages: Messages    = app.injector.instanceOf[play.api.i18n.MessagesApi].preferred(request)
+    implicit val messages: Messages                                        = app.injector.instanceOf[play.api.i18n.MessagesApi].preferred(request)
 
     def parse(html: play.twirl.api.Html): Document = Jsoup.parse(html.body)
   }
