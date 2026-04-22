@@ -22,7 +22,8 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.checkboxes.CheckboxItem
 
 class PaginationServiceSpec extends AnyWordSpec with Matchers {
 
-  private val service = new PaginationService()
+  private val defaultConfig = PaginationConfig()
+  private val service       = new PaginationService(defaultConfig)
   private val baseUrl = "/test-url"
 
   private def checkbox(id: String, content: String): CheckboxItem =
@@ -46,7 +47,7 @@ class PaginationServiceSpec extends AnyWordSpec with Matchers {
       result.paginationViewModel.next mustBe None
     }
 
-    "return single page when items are within page size (<= 6)" in {
+    "return single page when items are within page size (<= recordsPerPage)" in {
       val result = service.paginateCheckboxItems(items(6), 1, baseUrl)
 
       result.paginatedData.length mustBe 6
@@ -118,10 +119,17 @@ class PaginationServiceSpec extends AnyWordSpec with Matchers {
       result.paginationViewModel.previous.isDefined mustBe true
     }
 
-    "ensure page size is always 6" in {
+    "use recordsPerPage from config as page size" in {
       val result = service.paginateCheckboxItems(items(100), 1, baseUrl)
 
-      result.paginatedData.length mustBe 6
+      result.paginatedData.length mustBe defaultConfig.recordsPerPage
+    }
+
+    "respect a custom recordsPerPage config" in {
+      val customService = new PaginationService(PaginationConfig(recordsPerPage = 3))
+      val result        = customService.paginateCheckboxItems(items(10), 1, baseUrl)
+
+      result.paginatedData.length mustBe 3
     }
 
     "generate full pagination structure for 3 pages" in {
