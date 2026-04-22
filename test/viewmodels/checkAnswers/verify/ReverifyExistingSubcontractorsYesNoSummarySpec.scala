@@ -49,7 +49,7 @@ class ReverifyExistingSubcontractorsYesNoSummarySpec extends AnyFreeSpec with Ma
       val row = maybeRow.value
 
       row.key.content.asHtml.toString should include(
-        messages("reverifyExistingSubcontractorsYesNo.checkYourAnswersLabel")
+        messages("verify.reverifyExistingSubcontractorsYesNo.checkYourAnswersLabel")
       )
 
       row.value.content.asHtml.toString should include(
@@ -67,7 +67,7 @@ class ReverifyExistingSubcontractorsYesNoSummarySpec extends AnyFreeSpec with Ma
       changeAction.href                     shouldBe
         routes.ReverifyExistingSubcontractorsYesNoController.onPageLoad().url
       changeAction.visuallyHiddenText.value shouldBe
-        messages("reverifyExistingSubcontractorsYesNo.change.hidden")
+        messages("verify.reverifyExistingSubcontractorsYesNo.change.hidden")
     }
 
     "must return a SummaryListRow with No when the answer is false" in {

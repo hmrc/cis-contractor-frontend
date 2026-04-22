@@ -32,11 +32,12 @@ object ReverifyExistingSubcontractorsYesNoSummary {
       val value = if (answer) "site.yes" else "site.no"
 
       SummaryListRowViewModel(
-        key = "reverifyExistingSubcontractorsYesNo.checkYourAnswersLabel",
+        key = "verify.reverifyExistingSubcontractorsYesNo.checkYourAnswersLabel",
         value = ValueViewModel(value),
         actions = Seq(
           ActionItemViewModel("site.change", routes.ReverifyExistingSubcontractorsYesNoController.onPageLoad().url)
-            .withVisuallyHiddenText(messages("reverifyExistingSubcontractorsYesNo.change.hidden"))
+            .withVisuallyHiddenText(messages("verify.reverifyExistingSubcontractorsYesNo.change.hidden"))
+            .withAttribute("id" -> "reverify-existing-subcontractors-yes-no")
         )
       )
     }
