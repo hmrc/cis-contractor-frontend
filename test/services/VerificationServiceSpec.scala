@@ -41,6 +41,7 @@ final class VerificationServiceSpec extends SpecBase with MockitoSugar {
 
   private val response =
     GetNewestVerificationBatchResponse(
+      scheme = Nil,
       subcontractors = Nil,
       verificationBatch = Nil,
       verifications = Nil,

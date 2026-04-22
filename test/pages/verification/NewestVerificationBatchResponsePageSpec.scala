@@ -30,6 +30,7 @@ class NewestVerificationBatchResponsePageSpec extends SpecBase {
 
     "must be able to set and get a value" in {
       val model = GetNewestVerificationBatchResponse(
+        scheme = Nil,
         subcontractors = Nil,
         verificationBatch = Nil,
         verifications = Nil,
@@ -48,6 +49,7 @@ class NewestVerificationBatchResponsePageSpec extends SpecBase {
 
     "must be able to remove the value" in {
       val model = GetNewestVerificationBatchResponse(
+        scheme = Nil,
         subcontractors = Nil,
         verificationBatch = Nil,
         verifications = Nil,
@@ -72,6 +74,7 @@ class NewestVerificationBatchResponsePageSpec extends SpecBase {
 
     "must serialise to the expected JSON key" in {
       val model = GetNewestVerificationBatchResponse(
+        scheme = Nil,
         subcontractors = Nil,
         verificationBatch = Nil,
         verifications = Nil,

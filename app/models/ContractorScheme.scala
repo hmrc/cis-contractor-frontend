@@ -17,22 +17,15 @@
 package models
 
 import play.api.libs.json.{Json, OFormat}
-import java.time.LocalDateTime
 
-case class Subcontractor(
-  subcontractorId: Long,
-  firstName: Option[String],
-  secondName: Option[String],
-  surname: Option[String],
-  tradingName: Option[String],
-  partnershipTradingName: Option[String],
-  verified: Option[String],
-  verificationNumber: Option[String],
-  taxTreatment: Option[String],
-  verificationDate: Option[LocalDateTime],
-  lastMonthlyReturnDate: Option[LocalDateTime],
-  createDate: Option[LocalDateTime]
-)
+case class ContractorScheme(
+                                            accountsOfficeReference: String,
+                                            utr: Option[String] = None,
+                                            name: Option[String] = None,
+                                            emailAddress: Option[String] = None,
 
-object Subcontractor:
-  given format: OFormat[Subcontractor] = Json.format[Subcontractor]
+                                          )
+
+object ContractorScheme{
+  given OFormat[ContractorScheme] = Json.format[ContractorScheme]
+}

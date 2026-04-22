@@ -164,6 +164,7 @@ class ConstructionIndustrySchemeConnectorSpec extends AnyWordSpec with Matchers 
 
       val expected =
         GetNewestVerificationBatchResponse(
+          scheme = Nil,
           subcontractors = Nil,
           verificationBatch = Nil,
           verifications = Nil,
