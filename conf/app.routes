@@ -375,3 +375,6 @@ GET   /verify/select-subcontractors-to-verify      controllers.verify.SelectSubc
 POST  /verify/select-subcontractors-to-verify      controllers.verify.SelectSubcontractorController.onSubmit(mode: Mode = NormalMode, page: Int ?= 1)
 GET   /verify/change-select-subcontractors-to-verify controllers.verify.SelectSubcontractorController.onPageLoad(mode: Mode = CheckMode, page: Int ?= 1)
 POST  /verify/change-select-subcontractors-to-verify controllers.verify.SelectSubcontractorController.onSubmit(mode: Mode = CheckMode, page: Int ?= 1)
+
+GET   /verify/no-new-subcontractors-to-verify       controllers.verify.VerifyYourSubcontractorsYesNoController.onPageLoad
+POST  /verify/no-new-subcontractors-to-verify       controllers.verify.VerifyYourSubcontractorsYesNoController.onSubmit

@@ -24,7 +24,7 @@
         link: Link
 )
 
-@()(implicit request: Request[_],appConfig: FrontendAppConfig, messages: Messages)
+@(manageSubcontractorsUrl: String)(implicit request: Request[_], appConfig: FrontendAppConfig, messages: Messages)
 
 @layout(pageTitle = titleNoForm(messages("verify.verificationRequestInProgress.title"))) {
 
@@ -34,11 +34,12 @@
     @link(
         "verify.verificationRequestInProgress.p3.link",
         appConfig.cisGeneralEnquiries,
-        prefixTextKey = "verify.verificationRequestInProgress.p3"
+        suffixTextKey = "verify.verificationRequestInProgress.p3"
     )
     @link(
         "verify.verificationRequestInProgress.p4.link",
-        appConfig.manageSubcontractorsUrl,
-        prefixTextKey = "verify.verificationRequestInProgress.p4"
+        manageSubcontractorsUrl,
+        prefixTextKey = "verify.verificationRequestInProgress.p4",
+        hasFullStop = true
     )
 }
