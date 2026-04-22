@@ -19,7 +19,6 @@ package controllers.verify
 import controllers.actions.*
 import forms.verify.SelectSubcontractorFormProvider
 import models.Mode
-import models.UserAnswers
 import navigation.Navigator
 import pages.verify.SelectSubcontractorPage
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
