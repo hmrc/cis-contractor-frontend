@@ -18,22 +18,9 @@ package models
 
 import play.api.libs.json.{Json, OFormat}
 
-import java.time.LocalDateTime
-
 case class MonthlyReturn(
   monthlyReturnId: Long,
-  taxYear: Int,
-  taxMonth: Int,
-  nilReturnIndicator: Option[String],
-  decEmpStatusConsidered: Option[String],
-  decAllSubsVerified: Option[String],
-  decInformationCorrect: Option[String],
-  decNoMoreSubPayments: Option[String],
-  decNilReturnNoPayments: Option[String],
-  status: Option[String],
-  lastUpdate: Option[LocalDateTime],
-  amendment: Option[String],
-  supersededBy: Option[Long]
+  decNoMoreSubPayments: Option[String] = None
 )
 
 object MonthlyReturn:
