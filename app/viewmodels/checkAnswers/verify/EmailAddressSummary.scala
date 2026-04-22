@@ -34,7 +34,7 @@ object EmailAddressSummary {
         actions = Seq(
           ActionItemViewModel("site.change", controllers.verify.routes.EmailAddressController.onPageLoad(CheckMode).url)
             .withVisuallyHiddenText(messages("verify.emailAddress.change.hidden"))
-            .withAttribute("id" -> "email-address")
+            .withAttribute("id" -> "verify-email-address")
         )
       )
     }

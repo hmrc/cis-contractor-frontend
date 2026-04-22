@@ -29,6 +29,8 @@ import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
 import models.response.GetNewestVerificationBatchResponse
+import pages.verify.EmailAddressPage
+import views.html.verify.EmailAddressView
 import play.api.test.Helpers.*
 import repositories.SessionRepository
 
@@ -39,7 +41,6 @@ class EmailAddressControllerSpec extends SpecBase with MockitoSugar {
   private val onwardRoute: Call = Call("GET", "/foo")
 
   private val formProvider = new EmailAddressFormProvider()
-  private val form         = formProvider()
 
   private lazy val routeUrl =
     controllers.verify.routes.EmailAddressController.onPageLoad(NormalMode).url
@@ -137,6 +138,28 @@ class EmailAddressControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual onwardRoute.url
+      }
+    }
+
+    "must prefill the form when EmailAddressPage has a value" in {
+
+      val userAnswers =
+        emptyUserAnswers
+          .set(EmailAddressPage, "stored@test.com")
+          .success
+          .value
+
+      val app = applicationBuilder(userAnswers = Some(userAnswers)).build()
+
+      running(app) {
+        val request = FakeRequest(GET, routeUrl)
+        val result  = route(app, request).value
+
+        status(result) mustEqual OK
+
+        val html = contentAsString(result)
+
+        html must include("""value="stored@test.com"""")
       }
     }
 
