@@ -80,8 +80,7 @@ trait Mappings extends Formatters with Constraints {
       .verifying(
         firstError(
           maxLength(Constants.MaxLength254, lengthKey),
-          regexp(Validation.emailRegex, invalidKey),
-          Validation.noPunycodeDomain(invalidKey)
+          regexp(Validation.emailRegex, invalidKey)
         )
       )
 }

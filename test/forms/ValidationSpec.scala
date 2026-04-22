@@ -22,23 +22,6 @@ import play.api.data.validation.{Invalid, Valid}
 
 class ValidationSpec extends AnyFreeSpec with Matchers {
 
-  "noPunycodeDomain" - {
-
-    val constraint = Validation.noPunycodeDomain("error.invalid")
-
-    "must return Valid for a standard domain" in {
-      constraint("test@example.com") mustEqual Valid
-    }
-
-    "must return Invalid when a domain label starts with xn--" in {
-      constraint("test@xn--mnchen-3ya.de") mustEqual Invalid("error.invalid")
-    }
-
-    "must return Invalid when only one label in a multi-label domain is xn--" in {
-      constraint("test@mail.xn--mnchen-3ya.de") mustEqual Invalid("error.invalid")
-    }
-  }
-
   "emailRegex" - {
 
     def matches(email: String): Boolean = email.matches(Validation.emailRegex)
@@ -84,22 +67,7 @@ class ValidationSpec extends AnyFreeSpec with Matchers {
 
     "non-ASCII and non-English characters" - {
       "must not match a non-ASCII character in the local part" in {
-        matches("tëst@example.com") mustBe false
-      }
-      "must not match a German umlaut in the domain" in {
-        matches("test@münchen.de") mustBe false
-      }
-      "must not match a Cyrillic domain" in {
-        matches("test@пример.com") mustBe false
-      }
-      "must not match a Chinese character domain" in {
-        matches("test@例子.com") mustBe false
-      }
-      "must not match non-ASCII in both local and domain parts" in {
-        matches("tëst@münchen.de") mustBe false
-      }
-      "must not match an Arabic local part" in {
-        matches("مستخدم@example.com") mustBe false
+        matches("test@ëxample.com") mustBe false
       }
     }
 

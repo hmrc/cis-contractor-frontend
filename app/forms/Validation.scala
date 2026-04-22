@@ -37,13 +37,6 @@ object Validation {
   final val ukPostcodeRegex =
     """^[A-Za-z0-9 ~!\"@#$%\&\'\(\)\*\+,\-\./:;\<=\>\?\[\\\]^_\{\}\£\€]*$"""
 
-  def noPunycodeDomain(errorKey: String): Constraint[String] =
-    Constraint { email =>
-      val domain           = email.split("@", 2).lift(1).getOrElse("")
-      val hasPunycodeLabel = domain.split('.').exists(_.toLowerCase.startsWith("xn--"))
-      if (hasPunycodeLabel) Invalid(errorKey) else Valid
-    }
-
   def isNinoValid(value: String, errorKey: String): Constraint[String] =
     Constraint {
       case str if Nino.isValid(str.replaceAll("\\s", "").toUpperCase) =>

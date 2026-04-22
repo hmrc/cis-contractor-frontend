@@ -81,10 +81,5 @@ class CompanyEmailAddressFormProviderSpec extends StringFieldBehaviours {
       val result = form.bind(Map(fieldName -> "test@münchen.de")).apply(fieldName)
       result.errors mustEqual Seq(FormError(fieldName, invalidKey, Seq(Validation.emailRegex)))
     }
-
-    "not bind an email with a Punycode domain" in {
-      val result = form.bind(Map(fieldName -> "test@xn--mnchen-3ya.de")).apply(fieldName)
-      result.errors mustEqual Seq(FormError(fieldName, invalidKey))
-    }
   }
 }
