@@ -39,8 +39,7 @@ class PaginationService(val config: PaginationConfig) {
 
   def paginateCheckboxItems(
     allItems: Seq[CheckboxItem],
-    currentPage: Int,
-    baseUrl: String
+    currentPage: Int
   ): CheckboxPaginationResult = {
 
     val totalPages = math.ceil(allItems.size.toDouble / config.recordsPerPage).toInt.max(1)
@@ -57,26 +56,16 @@ class PaginationService(val config: PaginationConfig) {
         PaginationViewModel()
           .withItems(
             (1 to totalPages).map { p =>
-              PaginationItemViewModel(
-                number = p.toString,
-                href = s"$baseUrl?page=$p"
-              ).withCurrent(p == page)
+              PaginationItemViewModel(number = p.toString, href = "")
+                .withCurrent(p == page)
             }
           )
           .copy(
             previous =
-              if (page > 1)
-                Some(
-                  PaginationLinkViewModel(s"$baseUrl?page=${page - 1}")
-                    .withText("site.pagination.previous")
-                )
+              if (page > 1) Some(PaginationLinkViewModel("").withText("site.pagination.previous"))
               else None,
             next =
-              if (page < totalPages)
-                Some(
-                  PaginationLinkViewModel(s"$baseUrl?page=${page + 1}")
-                    .withText("site.pagination.next")
-                )
+              if (page < totalPages) Some(PaginationLinkViewModel("").withText("site.pagination.next"))
               else None
           )
 

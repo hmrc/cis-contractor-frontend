@@ -67,7 +67,7 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
 
         val allItems         = SelectSubcontractor.checkboxItems
         val paginationResult =
-          paginationService.paginateCheckboxItems(allItems, 1, url(1))
+          paginationService.paginateCheckboxItems(allItems, 1)
 
         status(result) mustEqual OK
 
@@ -101,7 +101,7 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
 
         val allItems         = SelectSubcontractor.checkboxItems
         val paginationResult =
-          paginationService.paginateCheckboxItems(allItems, 1, url(1))
+          paginationService.paginateCheckboxItems(allItems, 1)
 
         status(result) mustEqual OK
 
@@ -159,7 +159,7 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
 
         val allItems         = SelectSubcontractor.checkboxItems
         val paginationResult =
-          paginationService.paginateCheckboxItems(allItems, 1, url(1))
+          paginationService.paginateCheckboxItems(allItems, 1)
 
         val result = route(application, request).value
 
@@ -423,10 +423,10 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
         val allItems = SelectSubcontractor.checkboxItems
 
         val page1 =
-          paginationService.paginateCheckboxItems(allItems, 1, url(1))
+          paginationService.paginateCheckboxItems(allItems, 1)
 
         val page2 =
-          paginationService.paginateCheckboxItems(allItems, 2, url(2))
+          paginationService.paginateCheckboxItems(allItems, 2)
 
         val page1Values: Set[SelectSubcontractor] =
           page1.paginatedData

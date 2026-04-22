@@ -67,8 +67,7 @@ class SelectSubcontractorController @Inject() (
           val result =
             paginationService.paginateCheckboxItems(
               SelectSubcontractor.checkboxItems,
-              page,
-              routes.SelectSubcontractorController.onPageLoad(mode, page).url
+              page
             )
 
           Ok(
@@ -102,8 +101,7 @@ class SelectSubcontractorController @Inject() (
           val result =
             paginationService.paginateCheckboxItems(
               allItems,
-              page,
-              routes.SelectSubcontractorController.onPageLoad(mode, page).url
+              page
             )
 
           val currentPageValues: Set[SelectSubcontractor] =
