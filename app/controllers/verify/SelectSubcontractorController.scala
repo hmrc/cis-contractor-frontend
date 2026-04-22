@@ -115,14 +115,10 @@ class SelectSubcontractorController @Inject() (
           val otherPageValues: Set[SelectSubcontractor] =
             ua.get(SelectSubcontractorPage).getOrElse(Set.empty).diff(currentPageValues)
 
+          val boundForm = form.bindFromRequest()
+
           val currentSelectedValues: Set[SelectSubcontractor] =
-            request.body.asFormUrlEncoded
-              .getOrElse(Map.empty)
-              .filter { case (k, _) => k == "value" || k.matches("""value\[\d+]""") }
-              .values
-              .flatten
-              .flatMap(v => SelectSubcontractor.values.find(_.toString == v))
-              .toSet
+            boundForm.value.getOrElse(Set.empty)
 
           val mergedValues = otherPageValues ++ currentSelectedValues
 
@@ -146,8 +142,7 @@ class SelectSubcontractorController @Inject() (
                   _              <- sessionRepository.set(updatedAnswers)
                 } yield Redirect(navigator.nextPage(SelectSubcontractorPage, mode, updatedAnswers))
               } else {
-                form
-                  .bindFromRequest()
+                boundForm
                   .fold(
                     formWithErrors =>
                       Future.successful(
