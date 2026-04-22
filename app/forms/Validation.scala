@@ -16,16 +16,13 @@
 
 package forms
 
-import java.net.IDN
 import play.api.data.validation.{Constraint, Invalid, Valid}
-import scala.util.Try
 import uk.gov.hmrc.domain.Nino
 
 object Validation {
 
   final val companyRegNumberRegex = """(?i)^(?:[A-Z]{2}\d{6}|\d{8})$"""
-  final val emailRegex            =
-    """^[A-Za-z0-9!#$%&'*+\-/=?^_`{|}~.]+@[A-Za-z0-9]([A-Za-z0-9\-]*[A-Za-z0-9])?(\.[A-Za-z0-9]([A-Za-z0-9\-]*[A-Za-z0-9])?)*\.[A-Za-z]{2,}$"""
+  final val emailRegex            = """^([a-zA-Z0-9.!#$%&''*+/=?^_`{|}~-]+)@([a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*)$"""
   final val nameRegex             = """^[A-Za-z0-9"~!@#\$%*+:\;=\?\s,\.\[\]_\\\{\}\(\)/&'\-\^\u00A3\u20AC]+$"""
   final val worksRefRegex         = """^[A-Za-z0-9 ~!@#$%&'()*+,-./:;=?_{}£€]+$"""
   final val mobileRegex           = """^(?=(?:.*\d){6,})[0-9()+\- ]*$"""
@@ -45,16 +42,6 @@ object Validation {
       val domain           = email.split("@", 2).lift(1).getOrElse("")
       val hasPunycodeLabel = domain.split('.').exists(_.toLowerCase.startsWith("xn--"))
       if (hasPunycodeLabel) Invalid(errorKey) else Valid
-    }
-
-  def noInvalidDomainCharacters(errorKey: String): Constraint[String] =
-    Constraint { email =>
-      val domain          = email.split("@", 2).lift(1).getOrElse("")
-      val hasInvalidLabel = domain.split('.').exists { label =>
-        val decoded = Try(IDN.toUnicode(label)).getOrElse(label)
-        decoded.exists(c => !Character.isLetterOrDigit(c) && c != '-')
-      }
-      if (hasInvalidLabel) Invalid(errorKey) else Valid
     }
 
   def isNinoValid(value: String, errorKey: String): Constraint[String] =

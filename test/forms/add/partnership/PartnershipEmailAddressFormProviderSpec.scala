@@ -73,14 +73,19 @@ class PartnershipEmailAddressFormProviderSpec extends StringFieldBehaviours {
       error = FormError(fieldName, invalidKey, Seq(Validation.emailRegex))
     )
 
-    "not bind an email whose domain decodes to non-letter/digit characters" in {
-      val result = form.bind(Map(fieldName -> "test@xn--domain-8ia.com")).apply(fieldName)
-      result.errors mustEqual Seq(FormError(fieldName, invalidKey))
+    "bind an email with an IPv4 domain" in {
+      val result = form.bind(Map(fieldName -> "test@192.168.1.1")).apply(fieldName)
+      result.errors mustBe empty
     }
 
-    "bind an email with a valid internationalised domain label" in {
+    "not bind an email with a non-ASCII domain" in {
+      val result = form.bind(Map(fieldName -> "test@münchen.de")).apply(fieldName)
+      result.errors mustEqual Seq(FormError(fieldName, invalidKey, Seq(Validation.emailRegex)))
+    }
+
+    "not bind an email with a Punycode domain" in {
       val result = form.bind(Map(fieldName -> "test@xn--mnchen-3ya.de")).apply(fieldName)
-      result.errors mustBe empty
+      result.errors mustEqual Seq(FormError(fieldName, invalidKey))
     }
   }
 }

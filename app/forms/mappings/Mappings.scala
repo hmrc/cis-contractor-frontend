@@ -81,7 +81,7 @@ trait Mappings extends Formatters with Constraints {
         firstError(
           maxLength(Constants.MaxLength254, lengthKey),
           regexp(Validation.emailRegex, invalidKey),
-          Validation.noInvalidDomainCharacters(invalidKey)
+          Validation.noPunycodeDomain(invalidKey)
         )
       )
 }
