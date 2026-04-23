@@ -16,11 +16,11 @@
 
 package pages.verify
 
-import models.verify.UnverifiedSubcontractor
+import models.Subcontractor
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 
-case object UnverifiedSubcontractorsPage extends QuestionPage[Seq[UnverifiedSubcontractor]] {
+case object UnverifiedSubcontractorsPage extends QuestionPage[Seq[Subcontractor]] {
 
   override def path: JsPath =
     JsPath \ toString

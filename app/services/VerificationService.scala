@@ -17,7 +17,6 @@
 package services
 
 import connectors.ConstructionIndustrySchemeConnector
-import models.verify.UnverifiedSubcontractor
 import models.{Subcontractor, UserAnswers}
 import pages.verification.NewestVerificationBatchResponsePage
 import pages.verify.UnverifiedSubcontractorsPage
@@ -42,7 +41,7 @@ class VerificationService @Inject() (
                       .getOrElse(Future.failed(new RuntimeException("InstanceIdQuery not found in session data")))
 
       response  <- cisConnector.getNewestVerificationBatch(instanceId)
-      unverified = toUnverifiedSubcontractors(response.subcontractors)
+      unverified = unverifiedSubcontractors(response.subcontractors)
 
       updated <- Future.fromTry(
                    userAnswers
@@ -53,19 +52,10 @@ class VerificationService @Inject() (
       _ <- sessionRepository.set(updated)
     } yield updated
 
-  private def toUnverifiedSubcontractors(
+  private def unverifiedSubcontractors(
     subcontractors: Seq[Subcontractor]
-  ): Seq[UnverifiedSubcontractor] =
-    subcontractors
-      .filter(isUnverified)
-      .map { s =>
-        UnverifiedSubcontractor(
-          subcontractorId = s.subcontractorId,
-          firstName = s.firstName,
-          secondName = s.secondName,
-          surname = s.surname
-        )
-      }
+  ): Seq[Subcontractor] =
+    subcontractors.filter(isUnverified)
 
   private def isUnverified(sub: Subcontractor): Boolean =
     !sub.verified.contains("Y")

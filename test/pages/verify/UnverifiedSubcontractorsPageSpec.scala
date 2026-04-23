@@ -17,33 +17,19 @@
 package pages.verify
 
 import base.SpecBase
-import models.verify.UnverifiedSubcontractor
+import generators.ModelGenerators
+import models.Subcontractor
 import org.scalacheck.{Arbitrary, Gen}
 import pages.behaviours.PageBehaviours
 
-class UnverifiedSubcontractorsPageSpec extends SpecBase with PageBehaviours {
-
-  implicit val arbitraryUnverifiedSubcontractor: Arbitrary[UnverifiedSubcontractor] =
-    Arbitrary {
-      for {
-        id         <- Gen.posNum[Long]
-        firstName  <- Gen.option(Gen.alphaStr.suchThat(_.nonEmpty))
-        secondName <- Gen.option(Gen.alphaStr.suchThat(_.nonEmpty))
-        surname    <- Gen.option(Gen.alphaStr.suchThat(_.nonEmpty))
-      } yield UnverifiedSubcontractor(
-        subcontractorId = id,
-        firstName = firstName,
-        secondName = secondName,
-        surname = surname
-      )
-    }
+class UnverifiedSubcontractorsPageSpec extends SpecBase with PageBehaviours with ModelGenerators {
 
   "UnverifiedSubcontractorsPage" - {
 
-    beRetrievable[Seq[UnverifiedSubcontractor]](UnverifiedSubcontractorsPage)
+    beRetrievable[Seq[Subcontractor]](UnverifiedSubcontractorsPage)
 
-    beSettable[Seq[UnverifiedSubcontractor]](UnverifiedSubcontractorsPage)
+    beSettable[Seq[Subcontractor]](UnverifiedSubcontractorsPage)
 
-    beRemovable[Seq[UnverifiedSubcontractor]](UnverifiedSubcontractorsPage)
+    beRemovable[Seq[Subcontractor]](UnverifiedSubcontractorsPage)
   }
 }
