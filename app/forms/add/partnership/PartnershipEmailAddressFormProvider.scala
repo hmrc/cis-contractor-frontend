@@ -18,8 +18,6 @@ package forms.add.partnership
 
 import forms.mappings.Mappings
 import play.api.data.Form
-import forms.Validation
-import forms.mappings.Constants
 
 import javax.inject.Inject
 
@@ -27,18 +25,10 @@ class PartnershipEmailAddressFormProvider @Inject() extends Mappings {
 
   def apply(): Form[String] =
     Form(
-      "value" -> text("partnershipEmailAddress.error.required")
-        .verifying(
-          firstError(
-            maxLength(
-              Constants.MaxLength254,
-              "partnershipEmailAddress.error.length"
-            ),
-            regexp(
-              Validation.emailRegex,
-              "partnershipEmailAddress.error.invalid"
-            )
-          )
-        )
+      "value" -> emailAddress(
+        "partnershipEmailAddress.error.required",
+        "partnershipEmailAddress.error.length",
+        "partnershipEmailAddress.error.invalid"
+      )
     )
 }

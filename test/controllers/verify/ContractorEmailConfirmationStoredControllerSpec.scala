@@ -49,11 +49,9 @@ class ContractorEmailConfirmationStoredControllerSpec extends SpecBase with Mock
     controllers.verify.routes.ContractorEmailConfirmationStoredController.onPageLoad(NormalMode).url
 
   private val testScheme = ContractorScheme(
-    schemeId = 1,
-    instanceId = "instance1",
-    accountsOfficeReference = "123PA12345678",
-    taxOfficeNumber = "123",
-    taxOfficeReference = "AB12345",
+    accountsOfficeReference = Some("123PA12345678"),
+    utr = Some("123"),
+    name = Some("peter"),
     emailAddress = Some(testEmail)
   )
 
@@ -63,8 +61,7 @@ class ContractorEmailConfirmationStoredControllerSpec extends SpecBase with Mock
     verificationBatch = Seq.empty,
     verifications = Seq.empty,
     submission = Seq.empty,
-    monthlyReturn = Seq.empty,
-    monthlyReturnSubmission = Seq.empty
+    monthlyReturn = Seq.empty
   )
 
   private def userAnswersWithEmail: UserAnswers =
