@@ -829,8 +829,8 @@ verify.verificationRequestInProgress.p3                            =  if you hav
 verify.verificationRequestInProgress.p4                            =  Back to
 verify.verificationRequestInProgress.p4.link                       =  Manage your subcontractors
 
-verify.reverifyExistingSubcontractorsYesNo.title                   =  Reverify Existing Subcontractors
-verify.reverifyExistingSubcontractorsYesNo.heading                 =  Reverify Existing Subcontractors
+verify.reverifyExistingSubcontractorsYesNo.title                   =  Reverify existing subcontractors
+verify.reverifyExistingSubcontractorsYesNo.heading                 =  Reverify existing subcontractors
 verify.reverifyExistingSubcontractorsYesNo.p1                      =  To make sure that their tax treatment is correct and up to date, you can reverify any of your existing subcontractors.
 verify.reverifyExistingSubcontractorsYesNo.p2                      =  You may want to reverify subcontractors if they:
 verify.reverifyExistingSubcontractorsYesNo.list.l1                 =  have recently changed any of their information

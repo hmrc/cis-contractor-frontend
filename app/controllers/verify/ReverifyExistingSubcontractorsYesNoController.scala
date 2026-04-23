@@ -19,7 +19,6 @@ package controllers.verify
 import controllers.actions.*
 import forms.verify.ReverifyExistingSubcontractorsYesNoFormProvider
 import models.Mode
-import navigation.Navigator
 import pages.verify.ReverifyExistingSubcontractorsYesNoPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -33,7 +32,6 @@ import scala.concurrent.{ExecutionContext, Future}
 class ReverifyExistingSubcontractorsYesNoController @Inject() (
   override val messagesApi: MessagesApi,
   sessionRepository: SessionRepository,
-  navigator: Navigator,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
@@ -56,8 +54,8 @@ class ReverifyExistingSubcontractorsYesNoController @Inject() (
     Ok(view(preparedForm, mode))
   }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
-    implicit request =>
+  def onSubmit(mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData).async { implicit request =>
       form
         .bindFromRequest()
         .fold(
@@ -66,7 +64,7 @@ class ReverifyExistingSubcontractorsYesNoController @Inject() (
             for {
               updatedAnswers <- Future.fromTry(request.userAnswers.set(ReverifyExistingSubcontractorsYesNoPage, value))
               _              <- sessionRepository.set(updatedAnswers)
-            } yield Redirect(navigator.nextPage(ReverifyExistingSubcontractorsYesNoPage, mode, updatedAnswers))
+            } yield Redirect(routes.ReverifyExistingSubcontractorsYesNoController.onPageLoad(mode))
         )
-  }
+    }
 }

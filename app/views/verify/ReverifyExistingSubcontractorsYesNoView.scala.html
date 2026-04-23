@@ -59,8 +59,8 @@
         @govukRadios(
             RadiosViewModel.yesNo(
                 field = form("value"),
-                legend = LegendViewModel(messages("verify.reverifyExistingSubcontractorsYesNo.subHeading")).asPageHeading(Medium)
-            ).inline(),
+                legend = LegendViewModel(messages("verify.reverifyExistingSubcontractorsYesNo.subHeading")).asFieldSetHeading(size = Medium)
+            ),
         )
 
         @govukButton(
