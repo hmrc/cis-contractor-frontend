@@ -43,7 +43,15 @@ class SelectSubcontractorViewSpec extends SpecBase with Matchers {
     "must render heading, hint, checkboxes and button" in new Setup {
 
       val html: HtmlFormat.Appendable =
-        view(form, mode, checkboxItems, PaginationViewModel(), page = 1, startIndex = 1, totalCount = checkboxItems.size)
+        view(
+          form,
+          mode,
+          checkboxItems,
+          PaginationViewModel(),
+          page = 1,
+          startIndex = 1,
+          totalCount = checkboxItems.size
+        )
 
       val doc: Document = Jsoup.parse(html.body)
 
@@ -63,7 +71,15 @@ class SelectSubcontractorViewSpec extends SpecBase with Matchers {
       val formWithError: Form[Set[String]] =
         form.bind(Map("value" -> ""))
 
-      val html: HtmlFormat.Appendable = view(formWithError, mode, checkboxItems, PaginationViewModel(), page = 1, startIndex = 1, totalCount = checkboxItems.size)
+      val html: HtmlFormat.Appendable = view(
+        formWithError,
+        mode,
+        checkboxItems,
+        PaginationViewModel(),
+        page = 1,
+        startIndex = 1,
+        totalCount = checkboxItems.size
+      )
 
       val doc: Document = Jsoup.parse(html.body)
 
@@ -81,12 +97,28 @@ class SelectSubcontractorViewSpec extends SpecBase with Matchers {
       val page2Items: Seq[CheckboxItem] = allItems.slice(6, 9)
 
       val docPage1: Document = Jsoup.parse(
-        view(formWithError, mode, page1Items, PaginationViewModel(), page = 1, startIndex = 1, totalCount = allItems.size).body
+        view(
+          formWithError,
+          mode,
+          page1Items,
+          PaginationViewModel(),
+          page = 1,
+          startIndex = 1,
+          totalCount = allItems.size
+        ).body
       )
       docPage1.select(".govuk-error-summary__list a").attr("href") mustBe "#value_0"
 
       val docPage2: Document = Jsoup.parse(
-        view(formWithError, mode, page2Items, PaginationViewModel(), page = 2, startIndex = 7, totalCount = allItems.size).body
+        view(
+          formWithError,
+          mode,
+          page2Items,
+          PaginationViewModel(),
+          page = 2,
+          startIndex = 7,
+          totalCount = allItems.size
+        ).body
       )
       docPage2.select(".govuk-error-summary__list a").attr("href") mustBe "#value_6"
     }
@@ -101,7 +133,8 @@ class SelectSubcontractorViewSpec extends SpecBase with Matchers {
         next = Some(PaginationLinkViewModel("").withText("site.pagination.next"))
       )
 
-      val html: HtmlFormat.Appendable = view(form, mode, checkboxItems, pagination, page = 1, startIndex = 1, totalCount = checkboxItems.size)
+      val html: HtmlFormat.Appendable =
+        view(form, mode, checkboxItems, pagination, page = 1, startIndex = 1, totalCount = checkboxItems.size)
 
       val doc: Document = Jsoup.parse(html.body)
 
@@ -122,7 +155,8 @@ class SelectSubcontractorViewSpec extends SpecBase with Matchers {
         next = Some(PaginationLinkViewModel("").withText("site.pagination.next"))
       )
 
-      val html: HtmlFormat.Appendable = view(form, mode, checkboxItems, pagination, page = 2, startIndex = 7, totalCount = checkboxItems.size)
+      val html: HtmlFormat.Appendable =
+        view(form, mode, checkboxItems, pagination, page = 2, startIndex = 7, totalCount = checkboxItems.size)
 
       val doc: Document = Jsoup.parse(html.body)
 
@@ -132,7 +166,15 @@ class SelectSubcontractorViewSpec extends SpecBase with Matchers {
 
     "must NOT render pagination links when only one page" in new Setup {
 
-      val html: HtmlFormat.Appendable = view(form, mode, checkboxItems, PaginationViewModel(), page = 1, startIndex = 1, totalCount = checkboxItems.size)
+      val html: HtmlFormat.Appendable = view(
+        form,
+        mode,
+        checkboxItems,
+        PaginationViewModel(),
+        page = 1,
+        startIndex = 1,
+        totalCount = checkboxItems.size
+      )
 
       val doc: Document = Jsoup.parse(html.body)
 
@@ -153,7 +195,8 @@ class SelectSubcontractorViewSpec extends SpecBase with Matchers {
         next = Some(PaginationLinkViewModel(""))
       )
 
-      val html: HtmlFormat.Appendable = view(form, mode, checkboxItems, pagination, page = 2, startIndex = 7, totalCount = checkboxItems.size)
+      val html: HtmlFormat.Appendable =
+        view(form, mode, checkboxItems, pagination, page = 2, startIndex = 7, totalCount = checkboxItems.size)
       val doc: Document               = Jsoup.parse(html.body)
 
       val prevButton: Elements =
@@ -183,7 +226,8 @@ class SelectSubcontractorViewSpec extends SpecBase with Matchers {
         )
       )
 
-      val html: HtmlFormat.Appendable = view(form, mode, checkboxItems, pagination, page = 2, startIndex = 7, totalCount = checkboxItems.size)
+      val html: HtmlFormat.Appendable =
+        view(form, mode, checkboxItems, pagination, page = 2, startIndex = 7, totalCount = checkboxItems.size)
       val doc: Document               = Jsoup.parse(html.body)
 
       doc.select(".govuk-pagination__item--current").size mustBe 1

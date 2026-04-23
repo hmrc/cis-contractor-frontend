@@ -28,7 +28,7 @@ object SubcontractorViewModel {
   implicit val format: OFormat[SubcontractorViewModel] = Json.format[SubcontractorViewModel]
 
   def checkboxItems(subcontractors: Seq[SubcontractorViewModel]): Seq[CheckboxItem] =
-    subcontractors.zipWithIndex.map { case (sub, index) =>
+    subcontractors.sortBy(_.name).zipWithIndex.map { case (sub, index) =>
       CheckboxItemViewModel(
         content = Text(sub.name),
         fieldId = "value",

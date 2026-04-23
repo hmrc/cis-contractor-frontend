@@ -840,4 +840,3 @@ verify.selectSubcontractor.checkYourAnswersLabel                   =  Subcontrac
 verify.selectSubcontractor.showingResults                          =  Showing {0} to {1} of {2} results
 verify.selectSubcontractor.error.required                          =  Select at least one subcontractor to verify
 verify.selectSubcontractor.change.hidden                           =  subcontractors to verify
-

@@ -85,7 +85,17 @@ class SelectSubcontractorController @Inject() (
               page
             )
 
-          Ok(view(preparedForm, mode, result.paginatedData, result.paginationViewModel, page, result.startIndex, result.totalCount))
+          Ok(
+            view(
+              preparedForm,
+              mode,
+              result.paginatedData,
+              result.paginationViewModel,
+              page,
+              result.startIndex,
+              result.totalCount
+            )
+          )
       }
     }
 
@@ -147,7 +157,15 @@ class SelectSubcontractorController @Inject() (
                   formWithErrors =>
                     Future.successful(
                       BadRequest(
-                        view(formWithErrors, mode, result.paginatedData, result.paginationViewModel, page, result.startIndex, result.totalCount)
+                        view(
+                          formWithErrors,
+                          mode,
+                          result.paginatedData,
+                          result.paginationViewModel,
+                          page,
+                          result.startIndex,
+                          result.totalCount
+                        )
                       )
                     ),
                   ids =>
