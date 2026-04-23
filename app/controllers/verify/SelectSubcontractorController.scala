@@ -33,7 +33,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 object SelectSubcontractorController {
 
-  // Placeholder list — will be replaced with a backend call when the connector is implemented
+  // Placeholder list — TODO will be replaced with a backend call when the connector is implemented
   val subcontractors: Seq[SubcontractorViewModel] = Seq(
     SubcontractorViewModel("100", "Brody Martin"),
     SubcontractorViewModel("95", "Hooper Associates"),
@@ -85,7 +85,7 @@ class SelectSubcontractorController @Inject() (
               page
             )
 
-          Ok(view(preparedForm, mode, result.paginatedData, result.paginationViewModel, page))
+          Ok(view(preparedForm, mode, result.paginatedData, result.paginationViewModel, page, result.startIndex, result.totalCount))
       }
     }
 
@@ -147,7 +147,7 @@ class SelectSubcontractorController @Inject() (
                   formWithErrors =>
                     Future.successful(
                       BadRequest(
-                        view(formWithErrors, mode, result.paginatedData, result.paginationViewModel, page)
+                        view(formWithErrors, mode, result.paginatedData, result.paginationViewModel, page, result.startIndex, result.totalCount)
                       )
                     ),
                   ids =>

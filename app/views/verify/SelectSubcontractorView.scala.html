@@ -27,7 +27,14 @@
     pageNavigator: components.PageNavigator
 )
 
-@(form: Form[_], mode: Mode, checkboxItems: Seq[CheckboxItem], paginationViewModel: PaginationViewModel, page: Int)(implicit request: Request[_], messages: Messages)
+@(form: Form[_], mode: Mode, checkboxItems: Seq[CheckboxItem], paginationViewModel: PaginationViewModel, page: Int, startIndex: Int, totalCount: Int)(implicit request: Request[_], messages: Messages)
+
+@hintContent = {
+    @messages("verify.selectSubcontractor.hint")
+    @if(paginationViewModel.items.nonEmpty) {
+        <p class="govuk-body govuk-!-margin-bottom-3 govuk-!-margin-top-3">@messages("verify.selectSubcontractor.showingResults", startIndex, startIndex + checkboxItems.size - 1, totalCount)</p>
+    }
+}
 
 @layout(pageTitle = title(form, messages("verify.selectSubcontractor.title"))) {
 
@@ -47,7 +54,7 @@
                 ).copy(
                 hint = Some(
                     Hint(
-                        content = Text(messages("verify.selectSubcontractor.hint"))
+                        content = HtmlContent(hintContent)
                     )
               )
            )

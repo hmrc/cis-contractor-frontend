@@ -17,7 +17,6 @@
 package forms.verify
 
 import forms.behaviours.CheckboxFieldBehaviours
-import play.api.data.FormError
 
 class SelectSubcontractorFormProviderSpec extends CheckboxFieldBehaviours {
 

@@ -75,7 +75,9 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
           NormalMode,
           paginationResult.paginatedData,
           paginationResult.paginationViewModel,
-          1
+          1,
+          paginationResult.startIndex,
+          paginationResult.totalCount
         )(request, messages(application)).toString
       }
     }
@@ -106,7 +108,9 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
           NormalMode,
           paginationResult.paginatedData,
           paginationResult.paginationViewModel,
-          1
+          1,
+          paginationResult.startIndex,
+          paginationResult.totalCount
         )(request, messages(application)).toString
       }
     }
@@ -161,7 +165,9 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
           NormalMode,
           paginationResult.paginatedData,
           paginationResult.paginationViewModel,
-          1
+          1,
+          paginationResult.startIndex,
+          paginationResult.totalCount
         )(request, messages(application)).toString
       }
     }

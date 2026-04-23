@@ -835,16 +835,9 @@ verify.verificationRequestInProgress.p4.link                       =  Manage you
 
 verify.selectSubcontractor.title                                   =  Which subcontractors do you want to verify?
 verify.selectSubcontractor.heading                                 =  Which subcontractors do you want to verify?
-verify.selectSubcontractor.hint                                    =  Select the unverified subcontractors you want to add to this verification request.
-verify.selectSubcontractor.brodyMartin                             =  Brody, Martin
-verify.selectSubcontractor.hooperAssociates                        =  Hooper and Associates
-verify.selectSubcontractor.checkYourAnswersLabel                   =  Which subcontractors do you want to verify?
+verify.selectSubcontractor.hint                                    =  Select the unverified subcontractors you want to add to this verification request
+verify.selectSubcontractor.checkYourAnswersLabel                   =  Subcontractors to verify
+verify.selectSubcontractor.showingResults                          =  Showing {0} to {1} of {2} results
 verify.selectSubcontractor.error.required                          =  Select at least one subcontractor to verify
-verify.selectSubcontractor.change.hidden                           =  SelectSubcontractor
-verify.selectSubcontractor.alphaPlumbing                           =  Alpha Plumbing
-verify.selectSubcontractor.betaBuilders                            =  Beta Builders
-verify.selectSubcontractor.gammaConstruction                       =  Gamma Construction
-verify.selectSubcontractor.deltaElectrical                         =  Delta Electrical
-verify.selectSubcontractor.epsilonCarpentry                        =  Epsilon Carpentry
-verify.selectSubcontractor.zetaRoofing                             =  Zeta Roofing
-verify.selectSubcontractor.etaPlastering                           =  Eta Plastering
+verify.selectSubcontractor.change.hidden                           =  subcontractors to verify
+
