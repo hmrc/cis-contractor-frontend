@@ -785,6 +785,14 @@ verify.contractorEmailConfirmationNotStored.checkYourAnswersLabel  =  Do you wan
 verify.contractorEmailConfirmationNotStored.error.required         =  Select yes if you want an email confirmation of this verification request
 verify.contractorEmailConfirmationNotStored.change.hidden          =  do you want confirmation by email?
 
+verify.verificationDeclaration.title                               =  Verification declaration
+verify.verificationDeclaration.heading                             =  Declaration
+verify.verificationDeclaration.p1                                  =  By submitting this verification request, you confirm that:
+verify.verificationDeclaration.list.l1                             =  a formal arrangement is in place (for example, tender accepted, contract agreed, order placed) for all of the subcontractors to be verified in this request.
+verify.verificationDeclaration.list.l2                             =  the information given in this verification request is correct and complete to the best of your knowledge and belief.
+verify.verificationDeclaration.warningText                         =  If you give any false information you may face financial penalties and prosecution.
+verify.verificationDeclaration.confirm                             =  Confirm
+
 verify.noSubcontractorsAdded.title                                 =  No subcontractors added
 verify.noSubcontractorsAdded.heading                               =  Verify your subcontractors
 verify.noSubcontractorsAdded.p1                                    =  You do not have any subcontractors at the moment.
@@ -804,14 +812,6 @@ verify.contractorEmailConfirmationStored.doNotSend                 =  Do not sen
 verify.contractorEmailConfirmationStored.checkYourAnswersLabel     =  Do you want confirmation by email?
 verify.contractorEmailConfirmationStored.error.required            =  Select whether you want an email confirmation of this verification request
 verify.contractorEmailConfirmationStored.change.hidden             =  do you want confirmation by email?
-
-verify.verificationDeclaration.title                               =  Verification declaration
-verify.verificationDeclaration.heading                             =  Declaration
-verify.verificationDeclaration.p1                                  =  By submitting this verification request, you confirm that:
-verify.verificationDeclaration.list.l1                             =  a formal arrangement is in place (for example, tender accepted, contract agreed, order placed) for all of the subcontractors to be verified in this request.
-verify.verificationDeclaration.list.l2                             =  the information given in this verification request is correct and complete to the best of your knowledge and belief.
-verify.verificationDeclaration.warningText                         =  If you give any false information you may face financial penalties and prosecution.
-verify.verificationDeclaration.confirm                             =  Confirm
 
 verify.verifyYourSubcontractorsYesNo.title                         =  No new subcontractors to verify
 verify.verifyYourSubcontractorsYesNo.heading                       =  Verify your subcontractors
