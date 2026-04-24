@@ -53,6 +53,10 @@ checkYourAnswers.heading.h2          =  Now add this subcontractor
 checkYourAnswers.p1                  =  By adding this subcontractor you are confirming that, to the best of your knowledge, the details you are providing are correct.
 checkYourAnswers.addSubcontractor    =  Accept and submit
 
+site.pagination.previous             =  Previous
+site.pagination.next                 =  Next
+site.pagination.landmark             =  Pagination
+
 # Errors & Auth
 pageNotFound.title                       =  Page not found
 pageNotFound.heading                     =  Page not found
@@ -827,7 +831,15 @@ verify.verificationRequestInProgress.p2                            =  You must w
 verify.verificationRequestInProgress.p3.link                       =  Contact HMRC
 verify.verificationRequestInProgress.p3                            =  if you have any questions about this verification request.
 verify.verificationRequestInProgress.p4                            =  Back to
-verify.verificationRequestInProgress.p4.link                       =  Manage your subcontractors
+verify.verificationRequestInProgress.p4.link                       =  Manage your subcontractors.
+
+verify.selectSubcontractor.title                                   =  Which subcontractors do you want to verify?
+verify.selectSubcontractor.heading                                 =  Which subcontractors do you want to verify?
+verify.selectSubcontractor.hint                                    =  Select the unverified subcontractors you want to add to this verification request
+verify.selectSubcontractor.checkYourAnswersLabel                   =  Subcontractors to verify
+verify.selectSubcontractor.showingResults                          =  Showing {0} to {1} of {2} results
+verify.selectSubcontractor.error.required                          =  Select at least one subcontractor to verify
+verify.selectSubcontractor.change.hidden                           =  subcontractors to verify
 
 verify.reverifyExistingSubcontractorsYesNo.title                   =  Reverify existing subcontractors
 verify.reverifyExistingSubcontractorsYesNo.heading                 =  Reverify existing subcontractors

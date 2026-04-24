@@ -22,7 +22,7 @@ import models.{CheckMode, NormalMode, UserAnswers}
 import org.scalactic.Prettifier.default
 import pages.Page
 import models.verify.ContractorEmailConfirmationStored
-import pages.verify.{ContractorEmailConfirmationNotStoredPage, ContractorEmailConfirmationStoredPage}
+import pages.verify.{ContractorEmailConfirmationNotStoredPage, ContractorEmailConfirmationStoredPage, SelectSubcontractorPage}
 
 class VerifyNavigatorSpec extends SpecBase {
 
@@ -60,6 +60,18 @@ class VerifyNavigatorSpec extends SpecBase {
           NormalMode,
           emptyUserAnswers
         ) mustBe routes.IndexController.onPageLoad()
+      }
+
+      "must go from SelectSubcontractorPage to SelectSubcontractorController in NormalMode" in {
+        val ua = UserAnswers("id")
+
+        val result =
+          navigator.nextPage(SelectSubcontractorPage, NormalMode, ua)
+
+        result.url mustBe
+          controllers.verify.routes.SelectSubcontractorController
+            .onPageLoad(NormalMode)
+            .url
       }
 
       "must go from ContractorEmailConfirmationStoredPage to JourneyRecovery when answer is CurrentEmail" in {
@@ -119,6 +131,18 @@ class VerifyNavigatorSpec extends SpecBase {
           CheckMode,
           emptyUserAnswers
         ) mustBe routes.IndexController.onPageLoad()
+      }
+
+      "must go from SelectSubcontractorPage to SelectSubcontractorController in CheckMode" in {
+        val ua = UserAnswers("id")
+
+        val result =
+          navigator.nextPage(SelectSubcontractorPage, CheckMode, ua)
+
+        result.url mustBe
+          controllers.verify.routes.SelectSubcontractorController
+            .onPageLoad(CheckMode)
+            .url
       }
 
       "must go from ContractorEmailConfirmationStoredPage to JourneyRecovery when answer is CurrentEmail" in {
