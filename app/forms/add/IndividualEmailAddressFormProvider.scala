@@ -16,8 +16,6 @@
 
 package forms.add
 
-import forms.Validation
-import forms.mappings.Constants.MaxLength254
 import forms.mappings.Mappings
 import play.api.data.Form
 
@@ -27,16 +25,10 @@ class IndividualEmailAddressFormProvider @Inject() extends Mappings {
 
   def apply(): Form[String] =
     Form(
-      "value" -> text("individualEmailAddress.error.required")
-        .transform(
-          _.trim.replaceAll("\\s+", " "),
-          identity
-        )
-        .verifying(
-          firstError(
-            maxLength(MaxLength254, "individualEmailAddress.error.length"),
-            regexp(Validation.emailRegex, "individualEmailAddress.error.invalid")
-          )
-        )
+      "value" -> emailAddress(
+        "individualEmailAddress.error.required",
+        "individualEmailAddress.error.length",
+        "individualEmailAddress.error.invalid"
+      )
     )
 }

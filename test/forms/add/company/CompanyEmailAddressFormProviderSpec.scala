@@ -40,7 +40,9 @@ class CompanyEmailAddressFormProviderSpec extends StringFieldBehaviours {
       Gen.oneOf(
         "test@test.com",
         "user123@example.co.uk",
-        "firstname.lastname@test-domain.com"
+        "firstname.lastname@test-domain.com",
+        "x+tag@mail.org",
+        "a@b.cd"
       )
     )
 
@@ -69,5 +71,15 @@ class CompanyEmailAddressFormProviderSpec extends StringFieldBehaviours {
         ),
       error = FormError(fieldName, invalidKey, Seq(Validation.emailRegex))
     )
+
+    "bind an email with an IPv4 domain" in {
+      val result = form.bind(Map(fieldName -> "test@192.168.1.1")).apply(fieldName)
+      result.errors mustBe empty
+    }
+
+    "not bind an email with a non-ASCII domain" in {
+      val result = form.bind(Map(fieldName -> "test@münchen.de")).apply(fieldName)
+      result.errors mustEqual Seq(FormError(fieldName, invalidKey, Seq(Validation.emailRegex)))
+    }
   }
 }

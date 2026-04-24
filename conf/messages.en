@@ -781,6 +781,14 @@ verify.contractorEmailConfirmationNotStored.checkYourAnswersLabel  =  Do you wan
 verify.contractorEmailConfirmationNotStored.error.required         =  Select yes if you want an email confirmation of this verification request
 verify.contractorEmailConfirmationNotStored.change.hidden          =  do you want confirmation by email?
 
+verify.verificationDeclaration.title                               =  Verification declaration
+verify.verificationDeclaration.heading                             =  Declaration
+verify.verificationDeclaration.p1                                  =  By submitting this verification request, you confirm that:
+verify.verificationDeclaration.list.l1                             =  a formal arrangement is in place (for example, tender accepted, contract agreed, order placed) for all of the subcontractors to be verified in this request.
+verify.verificationDeclaration.list.l2                             =  the information given in this verification request is correct and complete to the best of your knowledge and belief.
+verify.verificationDeclaration.warningText                         =  If you give any false information you may face financial penalties and prosecution.
+verify.verificationDeclaration.confirm                             =  Confirm
+
 verify.noSubcontractorsAdded.title                                 =  No subcontractors added
 verify.noSubcontractorsAdded.heading                               =  Verify your subcontractors
 verify.noSubcontractorsAdded.p1                                    =  You do not have any subcontractors at the moment.
@@ -801,24 +809,16 @@ verify.contractorEmailConfirmationStored.checkYourAnswersLabel     =  Do you wan
 verify.contractorEmailConfirmationStored.error.required            =  Select whether you want an email confirmation of this verification request
 verify.contractorEmailConfirmationStored.change.hidden             =  do you want confirmation by email?
 
-verify.verificationDeclaration.title                               =  Verification declaration
-verify.verificationDeclaration.heading                             =  Declaration
-verify.verificationDeclaration.p1                                  =  By submitting this verification request, you confirm that:
-verify.verificationDeclaration.list.l1                             =  a formal arrangement is in place (for example, tender accepted, contract agreed, order placed) for all of the subcontractors to be verified in this request.
-verify.verificationDeclaration.list.l2                             =  the information given in this verification request is correct and complete to the best of your knowledge and belief.
-verify.verificationDeclaration.warningText                         =  If you give any false information you may face financial penalties and prosecution.
-verify.verificationDeclaration.confirm                             =  Confirm
-
-verify.verifyYourSubcontractorsYesNo.title                                      = No new subcontractors to verify
-verify.verifyYourSubcontractorsYesNo.heading                                    = Verify your subcontractors
-verify.verifyYourSubcontractorsYesNo.p1                                         = There are no unverified subcontractors that you need to verify at the moment.
-verify.verifyYourSubcontractorsYesNo.p2                                         = However, you can reverify any of your existing subcontractors to make sure that their tax treatment is correct and up to date.
-verify.verifyYourSubcontractorsYesNo.p3                                         = You may want to reverify subcontractors if they:
-verify.verifyYourSubcontractorsYesNo.list.l1                                    = have recently changed any of their information
-verify.verifyYourSubcontractorsYesNo.list.l2                                    = have not been included on a return recently and have lost their verified status
-verify.verifyYourSubcontractorsYesNo.list.l3                                    = are about to lose their verified status
-verify.verifyYourSubcontractorsYesNo.heading2                                   = Do you want to add existing subcontractors to this verification request?
-verify.verifyYourSubcontractorsYesNo.error.required                             = Select yes if you want to add existing subcontractors to this verification request
+verify.verifyYourSubcontractorsYesNo.title                         =  No new subcontractors to verify
+verify.verifyYourSubcontractorsYesNo.heading                       =  Verify your subcontractors
+verify.verifyYourSubcontractorsYesNo.p1                            =  There are no unverified subcontractors that you need to verify at the moment.
+verify.verifyYourSubcontractorsYesNo.p2                            =  However, you can reverify any of your existing subcontractors to make sure that their tax treatment is correct and up to date.
+verify.verifyYourSubcontractorsYesNo.p3                            =  You may want to reverify subcontractors if they:
+verify.verifyYourSubcontractorsYesNo.list.l1                       =  have recently changed any of their information
+verify.verifyYourSubcontractorsYesNo.list.l2                       =  have not been included on a return recently and have lost their verified status
+verify.verifyYourSubcontractorsYesNo.list.l3                       =  are about to lose their verified status
+verify.verifyYourSubcontractorsYesNo.heading2                      =  Do you want to add existing subcontractors to this verification request?
+verify.verifyYourSubcontractorsYesNo.error.required                =  Select yes if you want to add existing subcontractors to this verification request
 
 verify.verificationRequestInProgress.title                         =  Verification request in progress
 verify.verificationRequestInProgress.heading                       =  Verification request in progress
@@ -840,3 +840,15 @@ verify.emailAddress.error.invalid                              =  Enter a valid 
 verify.emailAddress.change.hidden                              = email address
 
 verify.verificationRequestInProgress.p4.link                       =  Manage your subcontractors
+
+verify.reverifyExistingSubcontractorsYesNo.title                   =  Reverify existing subcontractors
+verify.reverifyExistingSubcontractorsYesNo.heading                 =  Reverify existing subcontractors
+verify.reverifyExistingSubcontractorsYesNo.p1                      =  To make sure that their tax treatment is correct and up to date, you can reverify any of your existing subcontractors.
+verify.reverifyExistingSubcontractorsYesNo.p2                      =  You may want to reverify subcontractors if they:
+verify.reverifyExistingSubcontractorsYesNo.list.l1                 =  have recently changed any of their information
+verify.reverifyExistingSubcontractorsYesNo.list.l2                 =  have not been included on a return recently and have lost their verified status
+verify.reverifyExistingSubcontractorsYesNo.list.l3                 =  are about to lose their verified status
+verify.reverifyExistingSubcontractorsYesNo.subHeading              =  Do you want to add other subcontractors to this verification request?
+verify.reverifyExistingSubcontractorsYesNo.error.required          =  Select yes if you want to add existing subcontractors to this verification request
+verify.reverifyExistingSubcontractorsYesNo.checkYourAnswersLabel   =  Do you want to add other subcontractors to this verification request?
+verify.reverifyExistingSubcontractorsYesNo.change.hidden           =  do you want to add other subcontractors to this verification request?
