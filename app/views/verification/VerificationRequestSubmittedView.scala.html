@@ -1,0 +1,101 @@
+@*
+ * Copyright 2026 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import views.html.components._
+@import viewmodels.verification.VerificationSubmittedViewModel
+
+@this(
+layout: templates.Layout,
+h1: H1,
+h2: H2,
+p: Paragraph
+)
+
+@(vm: VerificationSubmittedViewModel)(implicit request: Request[_], messages: Messages)
+
+@layout(pageTitle = titleNoForm(messages("verificationRequestSubmitted.title"))) {
+
+<div class="govuk-panel govuk-panel--confirmation">
+    <h1 class="govuk-panel__title">@messages("verificationRequestSubmitted.heading")</h1>
+    <div class="govuk-panel__body">
+        @messages("verificationRequestSubmitted.referenceNumber")<br/>
+        <strong>@vm.referenceNumber</strong>
+    </div>
+</div>
+
+<p class="govuk-body">
+    @messages("verificationRequestSubmitted.submittedAt", vm.submittedAt.toLocalTime.toString, vm.submittedAt.toLocalDate.toString)
+</p>
+
+<h2 class="govuk-heading-m">@messages("verificationRequestSubmitted.details.heading")</h2>
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-one-third">
+        <p class="govuk-body govuk-!-font-weight-bold">@messages("verificationRequestSubmitted.toVerify.label")</p>
+    </div>
+    <div class="govuk-grid-column-two-thirds">
+        <ul class="govuk-list govuk-list--bullet">
+            @for(name <- vm.subcontractorsToVerify) {
+            <li>@name</li>
+            }
+        </ul>
+    </div>
+</div>
+
+@if(vm.showReverify) {
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-one-third">
+        <p class="govuk-body govuk-!-font-weight-bold">@messages("verificationRequestSubmitted.toReverify.label")</p>
+    </div>
+    <div class="govuk-grid-column-two-thirds">
+        <ul class="govuk-list govuk-list--bullet">
+            @for(name <- vm.subcontractorsToReverify) {
+            <li>@name</li>
+            }
+        </ul>
+    </div>
+</div>
+}
+
+@if(vm.showEmail) {
+<p class="govuk-body">
+    @messages("verificationRequestSubmitted.emailConfirmation", vm.confirmationEmail.get)
+</p>
+}
+
+<p class="govuk-body">
+    @messages("verificationRequestSubmitted.history.prefix")
+    <a class="govuk-link" href="#">@messages("verificationRequestSubmitted.history.link")</a>.
+</p>
+
+<div class="govuk-inset-text">
+    <p class="govuk-body">@messages("verificationRequestSubmitted.print.text")</p>
+    <a class="govuk-link" href="#">@messages("verificationRequestSubmitted.print.link")</a>
+</div>
+
+<h2 class="govuk-heading-m">@messages("verificationRequestSubmitted.help.heading")</h2>
+<p class="govuk-body">@messages("verificationRequestSubmitted.help.text")</p>
+<p class="govuk-body">
+    @messages("verificationRequestSubmitted.backTo.prefix")
+    <a class="govuk-link" href="#">@messages("verificationRequestSubmitted.backTo.link")</a>.
+</p>
+
+<h2 class="govuk-heading-m">@messages("verificationRequestSubmitted.beforeYouGo.heading")</h2>
+<p class="govuk-body">@messages("verificationRequestSubmitted.beforeYouGo.text")</p>
+<p class="govuk-body">
+    <a class="govuk-link" href="#">@messages("verificationRequestSubmitted.beforeYouGo.link")</a>
+</p>
+}
