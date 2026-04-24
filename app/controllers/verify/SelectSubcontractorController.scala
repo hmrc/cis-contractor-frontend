@@ -24,7 +24,7 @@ import pages.verify.SelectSubcontractorPage
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
-import services.PaginationService
+import services.{PaginationService, SubcontractorSource}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.verify.SelectSubcontractorView
 
@@ -32,19 +32,7 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 object SelectSubcontractorController {
-
-  // Placeholder list — TODO will be replaced with a backend call when the connector is implemented
-  val subcontractors: Seq[SubcontractorViewModel] = Seq(
-    SubcontractorViewModel("100", "Brody Martin"),
-    SubcontractorViewModel("95", "Hooper Associates"),
-    SubcontractorViewModel("96", "Alpha Plumbing"),
-    SubcontractorViewModel("98", "Beta Builders"),
-    SubcontractorViewModel("97", "Gamma Construction"),
-    SubcontractorViewModel("99", "Delta Electrical"),
-    SubcontractorViewModel("101", "Epsilon Carpentry"),
-    SubcontractorViewModel("103", "Zeta Roofing"),
-    SubcontractorViewModel("102", "Eta Plastering")
-  )
+  val subcontractors: Seq[SubcontractorViewModel] = SubcontractorSource.subcontractors
 }
 
 class SelectSubcontractorController @Inject() (
@@ -55,6 +43,7 @@ class SelectSubcontractorController @Inject() (
   getData: DataRetrievalAction,
   formProvider: SelectSubcontractorFormProvider,
   paginationService: PaginationService,
+  subcontractorSource: SubcontractorSource,
   val controllerComponents: MessagesControllerComponents,
   view: SelectSubcontractorView
 )(implicit ec: ExecutionContext)
@@ -73,6 +62,9 @@ class SelectSubcontractorController @Inject() (
         case None =>
           Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
 
+        case Some(_) if subcontractorSource.get().isEmpty =>
+          Redirect(routes.NoSubcontractorsAddedController.onPageLoad())
+
         case Some(ua) =>
           val preparedForm =
             ua.get(SelectSubcontractorPage)
@@ -81,7 +73,7 @@ class SelectSubcontractorController @Inject() (
 
           val result =
             paginationService.paginateCheckboxItems(
-              SubcontractorViewModel.checkboxItems(SelectSubcontractorController.subcontractors),
+              SubcontractorViewModel.checkboxItems(subcontractorSource.get()),
               page
             )
 
@@ -110,7 +102,7 @@ class SelectSubcontractorController @Inject() (
           Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
 
         case Some(ua) =>
-          val allSubs  = SelectSubcontractorController.subcontractors
+          val allSubs  = subcontractorSource.get()
           val allItems = SubcontractorViewModel.checkboxItems(allSubs)
 
           val result =

@@ -32,7 +32,7 @@ import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import repositories.SessionRepository
-import services.PaginationService
+import services.{PaginationService, SubcontractorSource}
 import views.html.verify.SelectSubcontractorView
 import javax.inject.Inject
 
@@ -218,6 +218,26 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual
           controllers.routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must redirect to NoSubcontractorsAdded on GET when subcontractors list is empty" in {
+
+      val mockSubcontractorSource = mock[SubcontractorSource]
+      when(mockSubcontractorSource.get()) thenReturn Seq.empty
+
+      val application =
+        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          .overrides(bind[SubcontractorSource].toInstance(mockSubcontractorSource))
+          .build()
+
+      running(application) {
+        val request = FakeRequest(GET, url(1))
+        val result  = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual
+          controllers.verify.routes.NoSubcontractorsAddedController.onPageLoad().url
       }
     }
 
