@@ -30,7 +30,6 @@ import play.api.mvc.Call
 import play.api.test.FakeRequest
 import models.response.GetNewestVerificationBatchResponse
 import pages.verify.EmailAddressPage
-import views.html.verify.EmailAddressView
 import play.api.test.Helpers.*
 import repositories.SessionRepository
 
@@ -46,22 +45,10 @@ class EmailAddressControllerSpec extends SpecBase with MockitoSugar {
     controllers.verify.routes.EmailAddressController.onPageLoad(NormalMode).url
 
   private def scheme(email: Option[String]) = ContractorScheme(
-    schemeId = 1,
-    instanceId = "inst1",
-    accountsOfficeReference = "accRef",
-    taxOfficeNumber = "123",
-    taxOfficeReference = "taxRef",
+    accountsOfficeReference = Some("accRef"),
     utr = None,
     name = None,
-    emailAddress = email,
-    displayWelcomePage = None,
-    prePopCount = None,
-    prePopSuccessful = None,
-    subcontractorCounter = None,
-    verificationBatchCounter = None,
-    createDate = None,
-    lastUpdate = None,
-    version = None
+    emailAddress = email
   )
 
   private def response(email: Option[String]) = GetNewestVerificationBatchResponse(
@@ -70,8 +57,7 @@ class EmailAddressControllerSpec extends SpecBase with MockitoSugar {
     verificationBatch = Seq.empty,
     verifications = Seq.empty,
     submission = Seq.empty,
-    monthlyReturn = Seq.empty,
-    monthlyReturnSubmission = Seq.empty
+    monthlyReturn = Seq.empty
   )
 
   private def ua(email: Option[String]): UserAnswers =
