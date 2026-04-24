@@ -18,19 +18,18 @@ package controllers.verify
 
 import base.SpecBase
 import controllers.routes
-import forms.verify.EmailAddressFormProvider
 import models._
+import models.response.GetNewestVerificationBatchResponse
+import models.verify.ContractorEmailConfirmationStored
 import navigation.Navigator
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
 import pages.verification.NewestVerificationBatchResponsePage
+import pages.verify.{ContractorEmailConfirmationNotStoredPage, ContractorEmailConfirmationStoredPage, EmailAddressPage}
 import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
-import models.response.GetNewestVerificationBatchResponse
-import pages.verify.EmailAddressPage
-import views.html.verify.EmailAddressView
 import play.api.test.Helpers.*
 import repositories.SessionRepository
 
@@ -39,8 +38,6 @@ import scala.concurrent.Future
 class EmailAddressControllerSpec extends SpecBase with MockitoSugar {
 
   private val onwardRoute: Call = Call("GET", "/foo")
-
-  private val formProvider = new EmailAddressFormProvider()
 
   private lazy val routeUrl =
     controllers.verify.routes.EmailAddressController.onPageLoad(NormalMode).url
@@ -76,10 +73,7 @@ class EmailAddressControllerSpec extends SpecBase with MockitoSugar {
 
   private def ua(email: Option[String]): UserAnswers =
     emptyUserAnswers
-      .set(
-        NewestVerificationBatchResponsePage,
-        response(email)
-      )
+      .set(NewestVerificationBatchResponsePage, response(email))
       .success
       .value
 
@@ -93,9 +87,7 @@ class EmailAddressControllerSpec extends SpecBase with MockitoSugar {
         val result  = route(app, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) must include(
-          messages(app)("verify.emailAddress.hint")
-        )
+        contentAsString(result) must include(messages(app)("verify.emailAddress.hint"))
       }
     }
 
@@ -107,9 +99,62 @@ class EmailAddressControllerSpec extends SpecBase with MockitoSugar {
         val result  = route(app, request).value
 
         status(result) mustEqual OK
+        contentAsString(result) must include(messages(app)("verify.emailAddress.hint.notStored"))
+      }
+    }
+
+    // ✅ AC3: Back link - SM-01a -> SM-01b -> Back goes to SM-01a
+    "must render a back link to ContractorEmailConfirmationNotStored when user came from NotStored journey" in {
+      val userAnswers =
+        ua(Some("stored@test.com"))
+          .set(ContractorEmailConfirmationNotStoredPage, true)
+          .success
+          .value
+
+      val app = applicationBuilder(userAnswers = Some(userAnswers)).build()
+
+      running(app) {
+        val request = FakeRequest(GET, routeUrl)
+        val result  = route(app, request).value
+
+        status(result) mustEqual OK
         contentAsString(result) must include(
-          messages(app)("verify.emailAddress.hint.notStored")
+          controllers.verify.routes.ContractorEmailConfirmationNotStoredController.onPageLoad(NormalMode).url
         )
+      }
+    }
+
+    // ✅ AC3: Back link - SM-01 -> SM-01b -> Back goes to SM-01
+    "must render a back link to ContractorEmailConfirmationStored when user came from Stored journey (DifferentEmail)" in {
+      val userAnswers =
+        ua(Some("stored@test.com"))
+          .set(ContractorEmailConfirmationStoredPage, ContractorEmailConfirmationStored.DifferentEmail)
+          .success
+          .value
+
+      val app = applicationBuilder(userAnswers = Some(userAnswers)).build()
+
+      running(app) {
+        val request = FakeRequest(GET, routeUrl)
+        val result  = route(app, request).value
+
+        status(result) mustEqual OK
+        contentAsString(result) must include(
+          controllers.verify.routes.ContractorEmailConfirmationStoredController.onPageLoad(NormalMode).url
+        )
+      }
+    }
+
+    // ✅ AC3 fallback: no history -> JourneyRecovery back link
+    "must render a back link to JourneyRecovery when no page history exists" in {
+      val app = applicationBuilder(userAnswers = Some(ua(Some("stored@test.com")))).build()
+
+      running(app) {
+        val request = FakeRequest(GET, routeUrl)
+        val result  = route(app, request).value
+
+        status(result) mustEqual OK
+        contentAsString(result) must include(routes.JourneyRecoveryController.onPageLoad().url)
       }
     }
 
@@ -156,10 +201,7 @@ class EmailAddressControllerSpec extends SpecBase with MockitoSugar {
         val result  = route(app, request).value
 
         status(result) mustEqual OK
-
-        val html = contentAsString(result)
-
-        html must include("""value="stored@test.com"""")
+        contentAsString(result) must include("""value="stored@test.com"""")
       }
     }
 

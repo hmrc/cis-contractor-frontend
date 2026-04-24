@@ -16,43 +16,50 @@
 
 @import viewmodels.InputWidth._
 @import viewmodels.LabelSize.Large
+@import play.api.mvc.Call
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.backlink.BackLink
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
 
 @this(
     layout: templates.Layout,
     formHelper: FormWithCSRF,
     govukErrorSummary: GovukErrorSummary,
     govukInput: GovukInput,
-    govukButton: GovukButton
+    govukButton: GovukButton,
+    govukBackLink: GovukBackLink
 )
 
-@(form: Form[_], mode: Mode, hintKey: String)(implicit request: Request[_], messages: Messages)
+@(form: Form[_], mode: Mode, hintKey: String, backLink: Call)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = title(form, messages("verify.emailAddress.title"))) {
+@layout(
+  pageTitle     = title(form, messages("verify.emailAddress.title")),
+  showBackLink  = false
+) {
 
-    @formHelper(action = controllers.verify.routes.EmailAddressController.onSubmit(mode)) {
+  @govukBackLink(
+    BackLink(
+      href    = backLink.url,
+      content = Text(messages("site.back"))
+    )
+  )
 
-        @if(form.errors.nonEmpty) {
-            @govukErrorSummary(ErrorSummaryViewModel(form))
-        }
+  @formHelper(action = controllers.verify.routes.EmailAddressController.onSubmit(mode)) {
 
-        @govukInput(
-            InputViewModel(
-                field = form("value"),
-                label = LabelViewModel(messages("verify.emailAddress.heading")).asPageHeading(Large)
-
-            )
-            .withHint(
-            Hint(
-            content = Text(messages(hintKey))
-            )
-            )
-            .withWidth(Full)
-            .withSpellcheck(false)
-            .asEmail()
-        )
-
-        @govukButton(
-            ButtonViewModel(messages("site.continue"))
-        )
+    @if(form.errors.nonEmpty) {
+      @govukErrorSummary(ErrorSummaryViewModel(form))
     }
+
+    @govukInput(
+      InputViewModel(
+        field = form("value"),
+        label = LabelViewModel(messages("verify.emailAddress.heading")).asPageHeading(Large)
+      )
+      .withHint(Hint(content = Text(messages(hintKey))))
+      .withWidth(Full)
+      .withSpellcheck(false)
+      .asEmail()
+    )
+
+    @govukButton(ButtonViewModel(messages("site.continue")))
+  }
 }
