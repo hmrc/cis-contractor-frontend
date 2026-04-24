@@ -102,7 +102,7 @@ class EmailAddressControllerSpec extends SpecBase with MockitoSugar {
         contentAsString(result) must include(messages(app)("verify.emailAddress.hint.notStored"))
       }
     }
-    
+
     "must render a back link to ContractorEmailConfirmationNotStored when user came from NotStored journey" in {
       val userAnswers =
         ua(Some("stored@test.com"))
@@ -122,7 +122,7 @@ class EmailAddressControllerSpec extends SpecBase with MockitoSugar {
         )
       }
     }
-    
+
     "must render a back link to ContractorEmailConfirmationStored when user came from Stored journey (DifferentEmail)" in {
       val userAnswers =
         ua(Some("stored@test.com"))
@@ -142,7 +142,7 @@ class EmailAddressControllerSpec extends SpecBase with MockitoSugar {
         )
       }
     }
-    
+
     "must render a back link to JourneyRecovery when no page history exists" in {
       val app = applicationBuilder(userAnswers = Some(ua(Some("stored@test.com")))).build()
 
