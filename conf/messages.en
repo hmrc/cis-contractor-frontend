@@ -840,3 +840,15 @@ verify.selectSubcontractor.checkYourAnswersLabel                   =  Subcontrac
 verify.selectSubcontractor.showingResults                          =  Showing {0} to {1} of {2} results
 verify.selectSubcontractor.error.required                          =  Select at least one subcontractor to verify
 verify.selectSubcontractor.change.hidden                           =  subcontractors to verify
+
+verify.reverifyExistingSubcontractorsYesNo.title                   =  Reverify existing subcontractors
+verify.reverifyExistingSubcontractorsYesNo.heading                 =  Reverify existing subcontractors
+verify.reverifyExistingSubcontractorsYesNo.p1                      =  To make sure that their tax treatment is correct and up to date, you can reverify any of your existing subcontractors.
+verify.reverifyExistingSubcontractorsYesNo.p2                      =  You may want to reverify subcontractors if they:
+verify.reverifyExistingSubcontractorsYesNo.list.l1                 =  have recently changed any of their information
+verify.reverifyExistingSubcontractorsYesNo.list.l2                 =  have not been included on a return recently and have lost their verified status
+verify.reverifyExistingSubcontractorsYesNo.list.l3                 =  are about to lose their verified status
+verify.reverifyExistingSubcontractorsYesNo.subHeading              =  Do you want to add other subcontractors to this verification request?
+verify.reverifyExistingSubcontractorsYesNo.error.required          =  Select yes if you want to add existing subcontractors to this verification request
+verify.reverifyExistingSubcontractorsYesNo.checkYourAnswersLabel   =  Do you want to add other subcontractors to this verification request?
+verify.reverifyExistingSubcontractorsYesNo.change.hidden           =  do you want to add other subcontractors to this verification request?
