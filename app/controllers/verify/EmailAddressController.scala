@@ -33,17 +33,17 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class EmailAddressController @Inject() (
-                                         override val messagesApi: MessagesApi,
-                                         sessionRepository: SessionRepository,
-                                         navigator: Navigator,
-                                         identify: IdentifierAction,
-                                         getData: DataRetrievalAction,
-                                         requireData: DataRequiredAction,
-                                         formProvider: EmailAddressFormProvider,
-                                         val controllerComponents: MessagesControllerComponents,
-                                         view: EmailAddressView
-                                       )(implicit ec: ExecutionContext)
-  extends FrontendBaseController
+  override val messagesApi: MessagesApi,
+  sessionRepository: SessionRepository,
+  navigator: Navigator,
+  identify: IdentifierAction,
+  getData: DataRetrievalAction,
+  requireData: DataRequiredAction,
+  formProvider: EmailAddressFormProvider,
+  val controllerComponents: MessagesControllerComponents,
+  view: EmailAddressView
+)(implicit ec: ExecutionContext)
+    extends FrontendBaseController
     with I18nSupport {
 
   val form = formProvider()
@@ -67,7 +67,7 @@ class EmailAddressController @Inject() (
         answers.get(ContractorEmailConfirmationNotStoredPage) match {
           case Some(true) =>
             controllers.verify.routes.ContractorEmailConfirmationNotStoredController.onPageLoad(mode)
-          case _ =>
+          case _          =>
             controllers.routes.JourneyRecoveryController.onPageLoad()
         }
     }
@@ -81,19 +81,20 @@ class EmailAddressController @Inject() (
     Ok(view(preparedForm, mode, hintKey(request.userAnswers), backLink(request.userAnswers, mode)))
   }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async { implicit request =>
-    form
-      .bindFromRequest()
-      .fold(
-        formWithErrors =>
-          Future.successful(
-            BadRequest(view(formWithErrors, mode, hintKey(request.userAnswers), backLink(request.userAnswers, mode)))
-          ),
-        value =>
-          for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(EmailAddressPage, value))
-            _              <- sessionRepository.set(updatedAnswers)
-          } yield Redirect(navigator.nextPage(EmailAddressPage, mode, updatedAnswers))
-      )
+  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
+    implicit request =>
+      form
+        .bindFromRequest()
+        .fold(
+          formWithErrors =>
+            Future.successful(
+              BadRequest(view(formWithErrors, mode, hintKey(request.userAnswers), backLink(request.userAnswers, mode)))
+            ),
+          value =>
+            for {
+              updatedAnswers <- Future.fromTry(request.userAnswers.set(EmailAddressPage, value))
+              _              <- sessionRepository.set(updatedAnswers)
+            } yield Redirect(navigator.nextPage(EmailAddressPage, mode, updatedAnswers))
+        )
   }
 }

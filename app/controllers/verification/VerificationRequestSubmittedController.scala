@@ -28,14 +28,14 @@ import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 
 class VerificationRequestSubmittedController @Inject() (
-                                                         override val messagesApi: MessagesApi,
-                                                         identify: IdentifierAction,
-                                                         getData: DataRetrievalAction,
-                                                         requireData: DataRequiredAction,
-                                                         val controllerComponents: MessagesControllerComponents,
-                                                         view: VerificationRequestSubmittedView
-                                                       )(implicit ec: ExecutionContext)
-  extends FrontendBaseController
+  override val messagesApi: MessagesApi,
+  identify: IdentifierAction,
+  getData: DataRetrievalAction,
+  requireData: DataRequiredAction,
+  val controllerComponents: MessagesControllerComponents,
+  view: VerificationRequestSubmittedView
+)(implicit ec: ExecutionContext)
+    extends FrontendBaseController
     with I18nSupport
     with Logging {
 
@@ -50,7 +50,8 @@ class VerificationRequestSubmittedController @Inject() (
       val vm = VerificationSubmittedViewModel(
         referenceNumber = "Reference number",
         submittedAt = java.time.LocalDateTime.now(),
-        subcontractorsToVerify = Seq("Brody, Martin", "Hooper And Associates", "Quint Transportation", "The Kintner Group"),
+        subcontractorsToVerify =
+          Seq("Brody, Martin", "Hooper And Associates", "Quint Transportation", "The Kintner Group"),
         subcontractorsToReverify = Seq.empty,
         confirmationEmail = None
       )

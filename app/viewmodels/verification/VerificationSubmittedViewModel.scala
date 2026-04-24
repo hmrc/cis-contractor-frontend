@@ -19,12 +19,12 @@ package viewmodels.verification
 import java.time.LocalDateTime
 
 case class VerificationSubmittedViewModel(
-   referenceNumber: String,
-   submittedAt: LocalDateTime,
-   subcontractorsToVerify: Seq[String],
-   subcontractorsToReverify: Seq[String] = Seq.empty,
-   confirmationEmail: Option[String] = None
- ) {
-  def showEmail: Boolean = confirmationEmail.isDefined
+  referenceNumber: String,
+  submittedAt: LocalDateTime,
+  subcontractorsToVerify: Seq[String],
+  subcontractorsToReverify: Seq[String] = Seq.empty,
+  confirmationEmail: Option[String] = None
+) {
+  def showEmail: Boolean    = confirmationEmail.isDefined
   def showReverify: Boolean = subcontractorsToReverify.nonEmpty
 }

@@ -88,7 +88,7 @@ class EmailAddressViewSpec extends AnyWordSpec with Matchers with GuiceOneAppPer
       controllers.verify.routes.ContractorEmailConfirmationNotStoredController.onPageLoad(NormalMode)
 
     implicit val request: Request[_] = FakeRequest()
-    implicit val messages: Messages =
+    implicit val messages: Messages  =
       play.api.i18n.MessagesImpl(
         play.api.i18n.Lang.defaultLang,
         app.injector.instanceOf[play.api.i18n.MessagesApi]

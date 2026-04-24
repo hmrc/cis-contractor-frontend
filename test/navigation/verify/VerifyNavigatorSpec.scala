@@ -38,7 +38,7 @@ class VerifyNavigatorSpec extends SpecBase {
 
         navigator.nextPage(UnknownPage, NormalMode, UserAnswers("id")) mustBe journeyRecovery
       }
-      
+
       "must go from ContractorEmailConfirmationNotStoredPage to EmailAddressController when answer is true" in {
         val ua = emptyUserAnswers.setOrException(ContractorEmailConfirmationNotStoredPage, true)
 
@@ -69,7 +69,7 @@ class VerifyNavigatorSpec extends SpecBase {
 
         navigator.nextPage(ContractorEmailConfirmationStoredPage, NormalMode, ua) mustBe journeyRecovery
       }
-      
+
       "must go from ContractorEmailConfirmationStoredPage to EmailAddressController when answer is DifferentEmail" in {
         val ua = emptyUserAnswers.setOrException(
           ContractorEmailConfirmationStoredPage,
@@ -93,7 +93,7 @@ class VerifyNavigatorSpec extends SpecBase {
         navigator.nextPage(ContractorEmailConfirmationStoredPage, NormalMode, emptyUserAnswers) mustBe journeyRecovery
       }
 
-      //update test once VF-06 is completed
+      // update test once VF-06 is completed
       "must go from EmailAddressPage to EmailAddressController in NormalMode" in {
         val ua = emptyUserAnswers.set(EmailAddressPage, "test@test.com").success.value
 
@@ -109,7 +109,7 @@ class VerifyNavigatorSpec extends SpecBase {
 
         navigator.nextPage(UnknownPage, CheckMode, UserAnswers("id")) mustBe journeyRecovery
       }
-      
+
       "must go from ContractorEmailConfirmationNotStoredPage to EmailAddressController when answer is true" in {
         val ua = emptyUserAnswers.setOrException(ContractorEmailConfirmationNotStoredPage, true)
 
@@ -139,7 +139,7 @@ class VerifyNavigatorSpec extends SpecBase {
 
         navigator.nextPage(ContractorEmailConfirmationStoredPage, CheckMode, ua) mustBe journeyRecovery
       }
-      
+
       "must go from ContractorEmailConfirmationStoredPage to EmailAddressController when answer is DifferentEmail" in {
         val ua = emptyUserAnswers.setOrException(
           ContractorEmailConfirmationStoredPage,
