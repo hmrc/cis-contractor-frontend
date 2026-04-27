@@ -77,7 +77,6 @@ class VerificationRequestSubmittedViewSpec extends AnyWordSpec with Matchers wit
         messages("verify.verificationRequestSubmitted.email.verification.link")
       )
 
-      // Inset text print section
       doc.select(".govuk-inset-text").text must include(
         messages("verify.verificationRequestSubmitted.print.text")
       )
