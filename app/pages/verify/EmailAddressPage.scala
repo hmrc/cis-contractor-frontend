@@ -14,22 +14,14 @@
  * limitations under the License.
  */
 
-package forms.add.company
+package pages.verify
 
-import forms.mappings.Mappings
-import play.api.data.Form
+import pages.QuestionPage
+import play.api.libs.json.JsPath
 
-import javax.inject.Inject
+case object EmailAddressPage extends QuestionPage[String] with VerifyJourney {
 
-class CompanyEmailAddressFormProvider @Inject() extends Mappings {
+  override def path: JsPath = JsPath \ toString
 
-  def apply(): Form[String] =
-    Form(
-      "value" -> emailAddress(
-        "companyEmailAddress.error.required",
-        "companyEmailAddress.error.length",
-        "companyEmailAddress.error.invalid"
-      )
-    )
-
+  override def toString: String = "verifyEmailAddress"
 }

@@ -14,22 +14,17 @@
  * limitations under the License.
  */
 
-package forms.add.company
+package forms.verify
 
 import forms.mappings.Mappings
 import play.api.data.Form
 
 import javax.inject.Inject
 
-class CompanyEmailAddressFormProvider @Inject() extends Mappings {
+class ReverifyExistingSubcontractorsYesNoFormProvider @Inject() extends Mappings {
 
-  def apply(): Form[String] =
+  def apply(): Form[Boolean] =
     Form(
-      "value" -> emailAddress(
-        "companyEmailAddress.error.required",
-        "companyEmailAddress.error.length",
-        "companyEmailAddress.error.invalid"
-      )
+      "value" -> boolean("verify.reverifyExistingSubcontractorsYesNo.error.required")
     )
-
 }

@@ -14,22 +14,25 @@
  * limitations under the License.
  */
 
-package forms.add.company
+package forms.verify
 
 import forms.mappings.Mappings
 import play.api.data.Form
+import forms.mappings.Constants.MaxLength254
+import forms.Validation
 
 import javax.inject.Inject
 
-class CompanyEmailAddressFormProvider @Inject() extends Mappings {
+class EmailAddressFormProvider @Inject() extends Mappings {
 
   def apply(): Form[String] =
     Form(
-      "value" -> emailAddress(
-        "companyEmailAddress.error.required",
-        "companyEmailAddress.error.length",
-        "companyEmailAddress.error.invalid"
-      )
+      "value" -> text("verify.emailAddress.error.required")
+        .verifying(
+          firstError(
+            maxLength(MaxLength254, "verify.emailAddress.error.length"),
+            regexp(Validation.emailRegex, "verify.emailAddress.error.invalid")
+          )
+        )
     )
-
 }

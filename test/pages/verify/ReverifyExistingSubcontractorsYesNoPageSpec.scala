@@ -14,22 +14,19 @@
  * limitations under the License.
  */
 
-package forms.add.company
+package pages.verify
 
-import forms.mappings.Mappings
-import play.api.data.Form
+import base.SpecBase
+import pages.behaviours.PageBehaviours
 
-import javax.inject.Inject
+class ReverifyExistingSubcontractorsYesNoPageSpec extends SpecBase with PageBehaviours {
 
-class CompanyEmailAddressFormProvider @Inject() extends Mappings {
+  "ReverifyExistingSubcontractorsYesNoPage" - {
 
-  def apply(): Form[String] =
-    Form(
-      "value" -> emailAddress(
-        "companyEmailAddress.error.required",
-        "companyEmailAddress.error.length",
-        "companyEmailAddress.error.invalid"
-      )
-    )
+    beRetrievable[Boolean](ReverifyExistingSubcontractorsYesNoPage)
 
+    beSettable[Boolean](ReverifyExistingSubcontractorsYesNoPage)
+
+    beRemovable[Boolean](ReverifyExistingSubcontractorsYesNoPage)
+  }
 }

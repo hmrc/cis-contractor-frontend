@@ -14,22 +14,22 @@
  * limitations under the License.
  */
 
-package forms.add.company
+package pages.verify
 
-import forms.mappings.Mappings
-import play.api.data.Form
+import base.SpecBase
+import generators.ModelGenerators
+import models.Subcontractor
+import org.scalacheck.{Arbitrary, Gen}
+import pages.behaviours.PageBehaviours
 
-import javax.inject.Inject
+class UnverifiedSubcontractorsPageSpec extends SpecBase with PageBehaviours with ModelGenerators {
 
-class CompanyEmailAddressFormProvider @Inject() extends Mappings {
+  "UnverifiedSubcontractorsPage" - {
 
-  def apply(): Form[String] =
-    Form(
-      "value" -> emailAddress(
-        "companyEmailAddress.error.required",
-        "companyEmailAddress.error.length",
-        "companyEmailAddress.error.invalid"
-      )
-    )
+    beRetrievable[Seq[Subcontractor]](UnverifiedSubcontractorsPage)
 
+    beSettable[Seq[Subcontractor]](UnverifiedSubcontractorsPage)
+
+    beRemovable[Seq[Subcontractor]](UnverifiedSubcontractorsPage)
+  }
 }

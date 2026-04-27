@@ -14,22 +14,18 @@
  * limitations under the License.
  */
 
-package forms.add.company
+package pages.verify
 
-import forms.mappings.Mappings
-import play.api.data.Form
+import pages.behaviours.PageBehaviours
 
-import javax.inject.Inject
+class EmailAddressPageSpec extends PageBehaviours {
 
-class CompanyEmailAddressFormProvider @Inject() extends Mappings {
+  "EmailAddressPage" - {
 
-  def apply(): Form[String] =
-    Form(
-      "value" -> emailAddress(
-        "companyEmailAddress.error.required",
-        "companyEmailAddress.error.length",
-        "companyEmailAddress.error.invalid"
-      )
-    )
+    beRetrievable[String](EmailAddressPage)
 
+    beSettable[String](EmailAddressPage)
+
+    beRemovable[String](EmailAddressPage)
+  }
 }
