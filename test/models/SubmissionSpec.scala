@@ -16,15 +16,4 @@
 
 package models
 
-import play.api.libs.json.{Json, OFormat}
-
-case class ContractorScheme(
-  accountsOfficeReference: Option[String],
-  utr: Option[String] = None,
-  name: Option[String] = None,
-  emailAddress: Option[String] = None
-)
-
-object ContractorScheme {
-  given OFormat[ContractorScheme] = Json.format[ContractorScheme]
-}
+class SubmissionSpec

@@ -16,10 +16,11 @@
 
 package forms.add.partnership
 
+import forms.Validation
 import forms.behaviours.StringFieldBehaviours
-import play.api.data.FormError
-import org.scalacheck.Gen
 import forms.mappings.Constants
+import org.scalacheck.Gen
+import play.api.data.FormError
 
 class PartnershipEmailAddressFormProviderSpec extends StringFieldBehaviours {
 
@@ -41,7 +42,8 @@ class PartnershipEmailAddressFormProviderSpec extends StringFieldBehaviours {
         "test@example.com",
         "name.surname@test.co.uk",
         "a@b.cd",
-        "user123@test-domain.com"
+        "user123@test-domain.com",
+        "x+tag@mail.org"
       )
     )
 
@@ -57,5 +59,28 @@ class PartnershipEmailAddressFormProviderSpec extends StringFieldBehaviours {
       fieldName,
       requiredError = FormError(fieldName, requiredKey)
     )
+
+    behave like fieldWithRegexpWithGenerator(
+      form,
+      fieldName,
+      regexp = Validation.emailRegex,
+      generator = stringsWithMaxLength(maxLength)
+        .suchThat(str =>
+          str.nonEmpty &&
+            str.length <= maxLength &&
+            !str.matches(Validation.emailRegex)
+        ),
+      error = FormError(fieldName, invalidKey, Seq(Validation.emailRegex))
+    )
+
+    "bind an email with an IPv4 domain" in {
+      val result = form.bind(Map(fieldName -> "test@192.168.1.1")).apply(fieldName)
+      result.errors mustBe empty
+    }
+
+    "not bind an email with a non-ASCII domain" in {
+      val result = form.bind(Map(fieldName -> "test@münchen.de")).apply(fieldName)
+      result.errors mustEqual Seq(FormError(fieldName, invalidKey, Seq(Validation.emailRegex)))
+    }
   }
 }

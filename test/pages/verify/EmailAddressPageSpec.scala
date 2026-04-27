@@ -14,17 +14,18 @@
  * limitations under the License.
  */
 
-package models
+package pages.verify
 
-import play.api.libs.json.{Json, OFormat}
+import pages.behaviours.PageBehaviours
 
-case class ContractorScheme(
-  accountsOfficeReference: Option[String],
-  utr: Option[String] = None,
-  name: Option[String] = None,
-  emailAddress: Option[String] = None
-)
+class EmailAddressPageSpec extends PageBehaviours {
 
-object ContractorScheme {
-  given OFormat[ContractorScheme] = Json.format[ContractorScheme]
+  "EmailAddressPage" - {
+
+    beRetrievable[String](EmailAddressPage)
+
+    beSettable[String](EmailAddressPage)
+
+    beRemovable[String](EmailAddressPage)
+  }
 }

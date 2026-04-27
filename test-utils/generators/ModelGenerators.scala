@@ -23,7 +23,7 @@ import models.verify.ContractorEmailConfirmationStored
 import org.scalacheck.{Arbitrary, Gen}
 import play.api.libs.json.Json
 
-import java.time.Instant
+import java.time.{Instant, LocalDateTime, ZoneOffset}
 
 trait ModelGenerators {
 
@@ -62,7 +62,7 @@ trait ModelGenerators {
 
   implicit lazy val arbitraryContactOptions: Arbitrary[ContactOptions] =
     Arbitrary {
-      Gen.oneOf(ContactOptions.values.toSeq)
+      Gen.oneOf(ContactOptions.values)
     }
 
   implicit lazy val arbitrarySubcontractorTypes: Arbitrary[TypeOfSubcontractor] =
@@ -85,4 +85,39 @@ trait ModelGenerators {
         lastUpdated = Instant.now()
       )
     }
+
+  implicit lazy val arbitrarySubcontractor: Arbitrary[Subcontractor] =
+    Arbitrary {
+      for {
+        subcontractorId        <- Gen.posNum[Long]
+        firstName              <- Gen.option(Gen.alphaStr.suchThat(_.nonEmpty))
+        secondName             <- Gen.option(Gen.alphaStr.suchThat(_.nonEmpty))
+        surname                <- Gen.option(Gen.alphaStr.suchThat(_.nonEmpty))
+        tradingName            <- Gen.option(Gen.alphaStr.suchThat(_.nonEmpty))
+        partnershipTradingName <- Gen.option(Gen.alphaStr.suchThat(_.nonEmpty))
+        verified               <- Gen.option(Gen.oneOf("Y", "N"))
+        verificationNumber     <- Gen.option(Gen.alphaNumStr.suchThat(_.nonEmpty))
+        taxTreatment           <- Gen.option(Gen.alphaStr.suchThat(_.nonEmpty))
+        verificationDate       <- Gen.option(genLocalDateTime)
+        lastMonthlyReturnDate  <- Gen.option(genLocalDateTime)
+        createDate             <- Gen.option(genLocalDateTime)
+      } yield Subcontractor(
+        subcontractorId = subcontractorId,
+        firstName = firstName,
+        secondName = secondName,
+        surname = surname,
+        tradingName = tradingName,
+        partnershipTradingName = partnershipTradingName,
+        verified = verified,
+        verificationNumber = verificationNumber,
+        taxTreatment = taxTreatment,
+        verificationDate = verificationDate,
+        lastMonthlyReturnDate = lastMonthlyReturnDate,
+        createDate = createDate
+      )
+    }
+  private val genLocalDateTime: Gen[LocalDateTime]                   =
+    Gen
+      .choose(0L, System.currentTimeMillis())
+      .map(ms => LocalDateTime.ofEpochSecond(ms / 1000, 0, ZoneOffset.UTC))
 }

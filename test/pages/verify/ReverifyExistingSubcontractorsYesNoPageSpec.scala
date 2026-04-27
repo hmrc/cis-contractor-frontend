@@ -14,17 +14,19 @@
  * limitations under the License.
  */
 
-package models
+package pages.verify
 
-import play.api.libs.json.{Json, OFormat}
+import base.SpecBase
+import pages.behaviours.PageBehaviours
 
-case class ContractorScheme(
-  accountsOfficeReference: Option[String],
-  utr: Option[String] = None,
-  name: Option[String] = None,
-  emailAddress: Option[String] = None
-)
+class ReverifyExistingSubcontractorsYesNoPageSpec extends SpecBase with PageBehaviours {
 
-object ContractorScheme {
-  given OFormat[ContractorScheme] = Json.format[ContractorScheme]
+  "ReverifyExistingSubcontractorsYesNoPage" - {
+
+    beRetrievable[Boolean](ReverifyExistingSubcontractorsYesNoPage)
+
+    beSettable[Boolean](ReverifyExistingSubcontractorsYesNoPage)
+
+    beRemovable[Boolean](ReverifyExistingSubcontractorsYesNoPage)
+  }
 }

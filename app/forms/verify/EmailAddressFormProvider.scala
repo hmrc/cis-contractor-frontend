@@ -14,17 +14,25 @@
  * limitations under the License.
  */
 
-package models
+package forms.verify
 
-import play.api.libs.json.{Json, OFormat}
+import forms.mappings.Mappings
+import play.api.data.Form
+import forms.mappings.Constants.MaxLength254
+import forms.Validation
 
-case class ContractorScheme(
-  accountsOfficeReference: Option[String],
-  utr: Option[String] = None,
-  name: Option[String] = None,
-  emailAddress: Option[String] = None
-)
+import javax.inject.Inject
 
-object ContractorScheme {
-  given OFormat[ContractorScheme] = Json.format[ContractorScheme]
+class EmailAddressFormProvider @Inject() extends Mappings {
+
+  def apply(): Form[String] =
+    Form(
+      "value" -> text("verify.emailAddress.error.required")
+        .verifying(
+          firstError(
+            maxLength(MaxLength254, "verify.emailAddress.error.length"),
+            regexp(Validation.emailRegex, "verify.emailAddress.error.invalid")
+          )
+        )
+    )
 }

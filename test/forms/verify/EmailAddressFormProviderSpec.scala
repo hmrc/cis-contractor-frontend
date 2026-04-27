@@ -14,21 +14,21 @@
  * limitations under the License.
  */
 
-package forms.add
+package forms.verify
 
 import forms.Validation
 import forms.behaviours.StringFieldBehaviours
+import play.api.data.FormError
 import forms.mappings.Constants.MaxLength254
 import org.scalacheck.Gen
-import play.api.data.FormError
 
-class IndividualEmailAddressFormProviderSpec extends StringFieldBehaviours {
+class EmailAddressFormProviderSpec extends StringFieldBehaviours {
 
-  val requiredKey = "individualEmailAddress.error.required"
-  val lengthKey   = "individualEmailAddress.error.length"
-  val invalidKey  = "individualEmailAddress.error.invalid"
+  val requiredKey = "verify.emailAddress.error.required"
+  val lengthKey   = "verify.emailAddress.error.length"
+  val invalidKey  = "verify.emailAddress.error.invalid"
 
-  val form = new IndividualEmailAddressFormProvider()()
+  val form = new EmailAddressFormProvider()()
 
   ".value" - {
 
@@ -38,11 +38,10 @@ class IndividualEmailAddressFormProviderSpec extends StringFieldBehaviours {
       form,
       fieldName,
       Gen.oneOf(
-        "test@test.com",
-        "user123@example.co.uk",
-        "firstname.lastname@test-domain.com",
-        "x+tag@mail.org",
-        "a@b.cd"
+        "test@example.com",
+        "name.surname@test.co.uk",
+        "a@b.cd",
+        "user123@test-domain.com"
       )
     )
 
@@ -71,15 +70,5 @@ class IndividualEmailAddressFormProviderSpec extends StringFieldBehaviours {
         ),
       error = FormError(fieldName, invalidKey, Seq(Validation.emailRegex))
     )
-
-    "bind an email with an IPv4 domain" in {
-      val result = form.bind(Map(fieldName -> "test@192.168.1.1")).apply(fieldName)
-      result.errors mustBe empty
-    }
-
-    "not bind an email with a non-ASCII domain" in {
-      val result = form.bind(Map(fieldName -> "test@münchen.de")).apply(fieldName)
-      result.errors mustEqual Seq(FormError(fieldName, invalidKey, Seq(Validation.emailRegex)))
-    }
   }
 }

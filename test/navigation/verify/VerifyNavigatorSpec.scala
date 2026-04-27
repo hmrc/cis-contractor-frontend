@@ -96,6 +96,12 @@ class VerifyNavigatorSpec extends SpecBase {
 
         result mustBe controllers.verify.routes.ContractorEmailConfirmationStoredController.onPageLoad(NormalMode)
       }
+      
+      "must go from EmailAddressPage to next page" in {
+        val ua = emptyUserAnswers.set(EmailAddressPage, "test@test.com").success.value
+        navigator.nextPage(EmailAddressPage, NormalMode, ua) mustBe
+          controllers.verify.routes.EmailAddressController.onPageLoad(NormalMode)
+      }
     }
 
     "in Check mode" - {
@@ -161,6 +167,13 @@ class VerifyNavigatorSpec extends SpecBase {
         val result = navigator.nextPage(SelectSubcontractorsToReverifyPage, CheckMode, emptyUserAnswers)
 
         result mustBe controllers.verify.routes.ContractorEmailConfirmationStoredController.onPageLoad(CheckMode)
+      }
+        
+      "must go from EmailAddressPage to EmailAddressPage in CheckMode" in {
+        val ua = emptyUserAnswers.set(EmailAddressPage, "test@test.com").success.value
+
+        navigator.nextPage(EmailAddressPage, CheckMode, ua) mustBe controllers.verify.routes.EmailAddressController
+          .onPageLoad(CheckMode)
       }
     }
   }
