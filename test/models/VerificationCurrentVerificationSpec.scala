@@ -19,10 +19,10 @@ package models
 import base.SpecBase
 import play.api.libs.json.Json
 
-class VerificationCurrVerificationSpec extends SpecBase {
-  "VerificationCurrVerification" - {
+class VerificationCurrentVerificationSpec extends SpecBase {
+  "VerificationCurrentVerification" - {
     "serialize to JSON correctly" in {
-      val verification = VerificationCurrVerification(
+      val verification = VerificationCurrentVerification(
         verificationId = 1L,
         verificationBatchId = Some(10L),
         subcontractorId = Some(2L),
@@ -46,21 +46,21 @@ class VerificationCurrVerificationSpec extends SpecBase {
           |}
           |""".stripMargin
       )
-      val result = json.as[VerificationCurrVerification]
+      val result = json.as[VerificationCurrentVerification]
       result.verificationId mustBe 1L
       result.verificationBatchId mustBe Some(10L)
       result.subcontractorId mustBe Some(2L)
       result.verificationResourceRef mustBe Some(20L)
     }
     "round-trip serialize and deserialize correctly" in {
-      val verification = VerificationCurrVerification(
+      val verification = VerificationCurrentVerification(
         verificationId = 1L,
         verificationBatchId = Some(10L),
         subcontractorId = Some(2L),
         verificationResourceRef = Some(20L)
       )
       val json         = Json.toJson(verification)
-      val result       = json.as[VerificationCurrVerification]
+      val result       = json.as[VerificationCurrentVerification]
       result mustBe verification
     }
   }

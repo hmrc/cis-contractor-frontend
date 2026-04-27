@@ -19,10 +19,10 @@ package models
 import base.SpecBase
 import play.api.libs.json.Json
 
-class SubcontractorCurrVerificationSpec extends SpecBase {
-  "SubcontractorCurrVerification" - {
+class SubcontractorCurrentVerificationSpec extends SpecBase {
+  "SubcontractorCurrentVerification" - {
     "serialize to JSON correctly" in {
-      val subcontractors = SubcontractorCurrVerification(
+      val subcontractors = SubcontractorCurrentVerification(
         subcontractorId = 1L,
         subbieResourceRef = Some(10L),
         firstName = Some("John"),
@@ -67,7 +67,7 @@ class SubcontractorCurrVerificationSpec extends SpecBase {
           |}
           |""".stripMargin
       )
-      val result = json.as[SubcontractorCurrVerification]
+      val result = json.as[SubcontractorCurrentVerification]
       result.subcontractorId mustBe 1L
       result.subbieResourceRef mustBe Some(10L)
       result.firstName mustBe Some("John")
@@ -81,7 +81,7 @@ class SubcontractorCurrVerificationSpec extends SpecBase {
       result.partnershipTradingName mustBe Some("ACME trading")
     }
     "round-trip serialize and deserialize correctly" in {
-      val subcontractors = SubcontractorCurrVerification(
+      val subcontractors = SubcontractorCurrentVerification(
         subcontractorId = 1L,
         subbieResourceRef = Some(10L),
         firstName = Some("John"),
@@ -95,7 +95,7 @@ class SubcontractorCurrVerificationSpec extends SpecBase {
         partnershipTradingName = Some("ACME trading")
       )
       val json           = Json.toJson(subcontractors)
-      val result         = json.as[SubcontractorCurrVerification]
+      val result         = json.as[SubcontractorCurrentVerification]
       result mustBe subcontractors
     }
   }

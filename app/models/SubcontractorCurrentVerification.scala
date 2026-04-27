@@ -18,7 +18,7 @@ package models
 
 import play.api.libs.json.{JsObject, Json, OFormat, Reads, Writes}
 
-case class SubcontractorCurrVerification(
+case class SubcontractorCurrentVerification(
   subcontractorId: Long,
   subbieResourceRef: Option[Long],
   firstName: Option[String],
@@ -32,6 +32,6 @@ case class SubcontractorCurrVerification(
   partnershipTradingName: Option[String]
 )
 
-object SubcontractorCurrVerification {
-  given format: OFormat[SubcontractorCurrVerification] = Json.format[SubcontractorCurrVerification]
+object SubcontractorCurrentVerification {
+  given format: OFormat[SubcontractorCurrentVerification] = Json.format[SubcontractorCurrentVerification]
 }
