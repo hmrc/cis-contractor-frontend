@@ -22,7 +22,7 @@ import models.{CheckMode, NormalMode, UserAnswers}
 import org.scalactic.Prettifier.default
 import pages.Page
 import models.verify.ContractorEmailConfirmationStored
-import pages.verify.{ContractorEmailConfirmationNotStoredPage, ContractorEmailConfirmationStoredPage, SelectSubcontractorPage}
+import pages.verify.*
 
 class VerifyNavigatorSpec extends SpecBase {
 
@@ -101,6 +101,12 @@ class VerifyNavigatorSpec extends SpecBase {
       "must go from ContractorEmailConfirmationStoredPage to JourneyRecovery when answer is not present" in {
         navigator.nextPage(ContractorEmailConfirmationStoredPage, NormalMode, emptyUserAnswers) mustBe journeyRecovery
       }
+
+      "must go from EmailAddressPage to next page" in {
+        val ua = emptyUserAnswers.set(EmailAddressPage, "test@test.com").success.value
+        navigator.nextPage(EmailAddressPage, NormalMode, ua) mustBe
+          controllers.verify.routes.EmailAddressController.onPageLoad(NormalMode)
+      }
     }
 
     "in Check mode" - {
@@ -171,6 +177,13 @@ class VerifyNavigatorSpec extends SpecBase {
 
       "must go from ContractorEmailConfirmationStoredPage to JourneyRecovery when answer is not present" in {
         navigator.nextPage(ContractorEmailConfirmationStoredPage, CheckMode, emptyUserAnswers) mustBe journeyRecovery
+      }
+
+      "must go from EmailAddressPage to EmailAddressPage in CheckMode" in {
+        val ua = emptyUserAnswers.set(EmailAddressPage, "test@test.com").success.value
+
+        navigator.nextPage(EmailAddressPage, CheckMode, ua) mustBe controllers.verify.routes.EmailAddressController
+          .onPageLoad(CheckMode)
       }
     }
   }

@@ -21,7 +21,7 @@ import jakarta.inject.Singleton
 import models.{CheckMode, Mode, NormalMode, UserAnswers}
 import navigation.NavigatorForJourney
 import pages.Page
-import pages.verify.{ContractorEmailConfirmationNotStoredPage, ContractorEmailConfirmationStoredPage, SelectSubcontractorPage}
+import pages.verify.*
 import models.verify.ContractorEmailConfirmationStored.{CurrentEmail, DifferentEmail, DoNotSend}
 import play.api.mvc.Call
 
@@ -45,6 +45,8 @@ class VerifyNavigator @Inject() () extends NavigatorForJourney {
       userAnswers => navigatorFromSelectSubcontractorPage(NormalMode)(userAnswers)
     case ContractorEmailConfirmationStoredPage    =>
       userAnswers => navigatorFromContractorEmailConfirmationStoredPage(NormalMode)(userAnswers)
+    case EmailAddressPage                         =>
+      _ => controllers.verify.routes.EmailAddressController.onPageLoad(NormalMode)
     case _                                        => _ => controllers.routes.JourneyRecoveryController.onPageLoad()
   }
 
@@ -55,6 +57,8 @@ class VerifyNavigator @Inject() () extends NavigatorForJourney {
       userAnswers => navigatorFromSelectSubcontractorPage(CheckMode)(userAnswers)
     case ContractorEmailConfirmationStoredPage    =>
       userAnswers => navigatorFromContractorEmailConfirmationStoredPage(CheckMode)(userAnswers)
+    case EmailAddressPage                         =>
+      _ => controllers.verify.routes.EmailAddressController.onPageLoad(CheckMode)
     case _                                        => _ => controllers.routes.JourneyRecoveryController.onPageLoad()
 
   }

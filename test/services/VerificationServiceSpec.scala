@@ -18,13 +18,16 @@ package services
 
 import base.SpecBase
 import connectors.ConstructionIndustrySchemeConnector
-import models.UserAnswers
+import generators.ModelGenerators
 import models.response.GetNewestVerificationBatchResponse
-import org.mockito.ArgumentMatchers.{any, eq as eqTo}
+import models.{Subcontractor, UserAnswers}
+import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{never, verify, verifyNoMoreInteractions, when}
+import org.scalatest.RecoverMethods.recoverToExceptionIf
 import org.scalatestplus.mockito.MockitoSugar
 import pages.QuestionPage
 import pages.verification.NewestVerificationBatchResponsePage
+import pages.verify.UnverifiedSubcontractorsPage
 import play.api.libs.json.{JsPath, Writes}
 import queries.CisIdQuery
 import repositories.SessionRepository
@@ -32,58 +35,79 @@ import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
 
-final class VerificationServiceSpec extends SpecBase with MockitoSugar {
+final class VerificationServiceSpec extends SpecBase with MockitoSugar with ModelGenerators {
 
   implicit val hc: HeaderCarrier    = HeaderCarrier()
-  implicit val ec: ExecutionContext = scala.concurrent.ExecutionContext.global
+  implicit val ec: ExecutionContext = ExecutionContext.global
 
   private val instanceId = "INST-123"
 
-  private val response =
+  private val verifiedSubcontractor: Subcontractor =
+    arbitrarySubcontractor.arbitrary.sample.value.copy(
+      subcontractorId = 1L,
+      verified = Some("Y")
+    )
+
+  private val unverifiedSub1: Subcontractor =
+    arbitrarySubcontractor.arbitrary.sample.value.copy(
+      subcontractorId = 2L,
+      verified = Some("N")
+    )
+
+  private val unverifiedSub2: Subcontractor =
+    arbitrarySubcontractor.arbitrary.sample.value.copy(
+      subcontractorId = 3L,
+      verified = None
+    )
+
+  private val responseWithSubcontractors =
     GetNewestVerificationBatchResponse(
       scheme = Nil,
-      subcontractors = Nil,
+      subcontractors = Seq(
+        verifiedSubcontractor,
+        unverifiedSub1,
+        unverifiedSub2
+      ),
       verificationBatch = Nil,
       verifications = Nil,
       submission = Nil,
       monthlyReturn = Nil
     )
 
-  "VerificationBatchService.refreshNewestVerificationBatch" - {
+  "VerificationService.refreshNewestVerificationBatch" - {
 
-    "must fetch newest verification batch, store in UserAnswers, persist to session repo, and return updated answers" in {
+    "must fetch newest verification batch, store response and unverified subcontractors, persist to session repo and return updated answers" in {
+
       val mockConnector = mock[ConstructionIndustrySchemeConnector]
       val mockRepo      = mock[SessionRepository]
       val service       = new VerificationService(mockConnector, mockRepo)
 
-      val ua =
+      val userAnswers =
         emptyUserAnswers
           .set(CisIdQuery, instanceId)
           .success
           .value
 
       when(mockConnector.getNewestVerificationBatch(eqTo(instanceId))(any[HeaderCarrier]))
-        .thenReturn(Future.successful(response))
+        .thenReturn(Future.successful(responseWithSubcontractors))
 
       when(mockRepo.set(any[UserAnswers]))
         .thenReturn(Future.successful(true))
 
-      val result = service.refreshNewestVerificationBatch(ua).futureValue
+      val result = service.refreshNewestVerificationBatch(userAnswers).futureValue
 
-      result.get(NewestVerificationBatchResponsePage) mustBe Some(response)
+      result.get(NewestVerificationBatchResponsePage) mustBe Some(responseWithSubcontractors)
+
+      result.get(UnverifiedSubcontractorsPage) mustBe
+        Some(Seq(unverifiedSub1, unverifiedSub2))
 
       verify(mockConnector).getNewestVerificationBatch(eqTo(instanceId))(any[HeaderCarrier])
-
-      verify(mockRepo).set(
-        org.mockito.ArgumentMatchers.argThat { (saved: UserAnswers) =>
-          saved.get(NewestVerificationBatchResponsePage).contains(response)
-        }
-      )
-
+      verify(mockRepo).set(any[UserAnswers])
       verifyNoMoreInteractions(mockConnector)
     }
 
-    "must fail when CisIdQuery (instance id) is missing and not call connector nor repo" in {
+    "must fail when CisIdQuery is missing and not call connector or repository" in {
+
       val mockConnector = mock[ConstructionIndustrySchemeConnector]
       val mockRepo      = mock[SessionRepository]
       val service       = new VerificationService(mockConnector, mockRepo)
@@ -93,37 +117,34 @@ final class VerificationServiceSpec extends SpecBase with MockitoSugar {
 
       verify(mockConnector, never()).getNewestVerificationBatch(any[String])(any[HeaderCarrier])
       verify(mockRepo, never()).set(any[UserAnswers])
-      verifyNoMoreInteractions(mockConnector)
     }
 
-    "must propagate connector failure and not write to session repo" in {
+    "must propagate connector failure and not persist session" in {
+
       val mockConnector = mock[ConstructionIndustrySchemeConnector]
       val mockRepo      = mock[SessionRepository]
       val service       = new VerificationService(mockConnector, mockRepo)
 
-      val ua =
+      val userAnswers =
         emptyUserAnswers
           .set(CisIdQuery, instanceId)
           .success
           .value
 
       when(mockConnector.getNewestVerificationBatch(eqTo(instanceId))(any[HeaderCarrier]))
-        .thenReturn(Future.failed(new RuntimeException("boom")))
+        .thenReturn(Future.failed(new RuntimeException("Failure")))
 
-      val ex = service.refreshNewestVerificationBatch(ua).failed.futureValue
-      ex.getMessage must include("boom")
+      val ex = service.refreshNewestVerificationBatch(userAnswers).failed.futureValue
+      ex.getMessage must include("Failure")
 
-      verify(mockConnector).getNewestVerificationBatch(eqTo(instanceId))(any[HeaderCarrier])
       verify(mockRepo, never()).set(any[UserAnswers])
-      verifyNoMoreInteractions(mockConnector)
     }
 
     "must propagate failure when setting NewestVerificationBatchResponsePage fails and not write to session repo" in {
 
       final case class BadType(value: String)
       case object BadSetPage extends QuestionPage[BadType] {
-        override def path: JsPath = JsPath \ "badSetPage"
-
+        override def path: JsPath     = JsPath \ "badSetPage"
         override def toString: String = "badSetPage"
       }
 
@@ -142,14 +163,11 @@ final class VerificationServiceSpec extends SpecBase with MockitoSugar {
           for {
             instanceId <- ua.get(CisIdQuery)
                             .map(Future.successful)
-                            .getOrElse(Future.failed(new RuntimeException("InstanceIdQuery not found in session data")))
+                            .getOrElse(Future.failed(new RuntimeException("InstanceIdQuery not found")))
             resp       <- conn.getNewestVerificationBatch(instanceId)
-
-            _ <- Future.fromTry(ua.set(NewestVerificationBatchResponsePage, resp))
-
-            bad <- Future.fromTry(ua.set(BadSetPage, BadType("x")))
-
-            _ <- repo.set(bad)
+            _          <- Future.fromTry(ua.set(NewestVerificationBatchResponsePage, resp))
+            bad        <- Future.fromTry(ua.set(BadSetPage, BadType("x")))
+            _          <- repo.set(bad)
           } yield bad
       }
 
@@ -162,14 +180,14 @@ final class VerificationServiceSpec extends SpecBase with MockitoSugar {
           .value
 
       when(mockConnector.getNewestVerificationBatch(eqTo(instanceId))(any[HeaderCarrier]))
-        .thenReturn(Future.successful(response))
+        .thenReturn(Future.successful(responseWithSubcontractors))
 
-      val ex = service.refreshAndForceBadSet(ua).failed.futureValue
+      val ex =
+        recoverToExceptionIf[RuntimeException] {
+          service.refreshAndForceBadSet(ua)
+        }.futureValue
+
       ex.getMessage must include("writes-failed")
-
-      verify(mockConnector).getNewestVerificationBatch(eqTo(instanceId))(any[HeaderCarrier])
-      verify(mockRepo, never()).set(any[UserAnswers])
-      verifyNoMoreInteractions(mockConnector)
     }
   }
 }

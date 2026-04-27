@@ -376,6 +376,11 @@ POST  /verify/select-subcontractors-to-verify          controllers.verify.Select
 GET   /verify/change-select-subcontractors-to-verify   controllers.verify.SelectSubcontractorController.onPageLoad(mode: Mode = CheckMode, page: Int ?= 1)
 POST  /verify/change-select-subcontractors-to-verify   controllers.verify.SelectSubcontractorController.onSubmit(mode: Mode = CheckMode, page: Int ?= 1)
 
+GET   /verify/enter-confirmation-email                 controllers.verify.EmailAddressController.onPageLoad(mode: Mode = NormalMode)
+POST  /verify/enter-confirmation-email                 controllers.verify.EmailAddressController.onSubmit(mode: Mode = NormalMode)
+GET   /verify/change-enter-confirmation-email          controllers.verify.EmailAddressController.onPageLoad(mode: Mode = CheckMode)
+POST  /verify/change-enter-confirmation-email          controllers.verify.EmailAddressController.onSubmit(mode: Mode = CheckMode)
+
 GET   /verify/reverify-existing-subcontractors         controllers.verify.ReverifyExistingSubcontractorsYesNoController.onPageLoad(mode: Mode = NormalMode)
 POST  /verify/reverify-existing-subcontractors         controllers.verify.ReverifyExistingSubcontractorsYesNoController.onSubmit(mode: Mode = NormalMode)
 GET   /verify/change-reverify-existing-subcontractors  controllers.verify.ReverifyExistingSubcontractorsYesNoController.onPageLoad(mode: Mode = CheckMode)

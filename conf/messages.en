@@ -831,7 +831,7 @@ verify.verificationRequestInProgress.p2                            =  You must w
 verify.verificationRequestInProgress.p3.link                       =  Contact HMRC
 verify.verificationRequestInProgress.p3                            =  if you have any questions about this verification request.
 verify.verificationRequestInProgress.p4                            =  Back to
-verify.verificationRequestInProgress.p4.link                       =  Manage your subcontractors.
+verify.verificationRequestInProgress.p4.link                       =  Manage your subcontractors
 
 verify.selectSubcontractor.title                                   =  Which subcontractors do you want to verify?
 verify.selectSubcontractor.heading                                 =  Which subcontractors do you want to verify?
@@ -840,6 +840,16 @@ verify.selectSubcontractor.checkYourAnswersLabel                   =  Subcontrac
 verify.selectSubcontractor.showingResults                          =  Showing {0} to {1} of {2} results
 verify.selectSubcontractor.error.required                          =  Select at least one subcontractor to verify
 verify.selectSubcontractor.change.hidden                           =  subcontractors to verify
+
+verify.emailAddress.title                                          =  What email address should HMRC send this confirmation to?
+verify.emailAddress.heading                                        =  What email address should HMRC send this confirmation to?
+verify.emailAddress.hint                                           =  HMRC will only use this email address to confirm this verification request. Your saved email address will not be changed.
+verify.emailAddress.hint.notStored                                 =  HMRC will only use this email address to confirm this verification request
+verify.emailAddress.checkYourAnswersLabel                          =  Email Address
+verify.emailAddress.error.required                                 =  Enter an email address in the correct format, like name@example.com
+verify.emailAddress.error.length                                   =  Enter a valid email address in the correct format, like name@example.com, up to 254 characters
+verify.emailAddress.error.invalid                                  =  Enter a valid email address in the correct format, like name@example.com
+verify.emailAddress.change.hidden                                  =  email address
 
 verify.reverifyExistingSubcontractorsYesNo.title                   =  Reverify existing subcontractors
 verify.reverifyExistingSubcontractorsYesNo.heading                 =  Reverify existing subcontractors
