@@ -364,8 +364,6 @@ GET   /verify/no-subcontractors-added                  controllers.verify.NoSubc
 
 GET   /verify/newest                                   controllers.verify.NewestVerificationBatchController.onPageLoad()
 
-GET   /verify/current                                  controllers.verify.CurrentVerificationBatchController.onPageLoad()
-
 GET   /verify/verification-request-in-progress         controllers.verify.VerificationRequestInProgressController.onPageLoad()
 
 GET   /verify/confirmation-email-stored                controllers.verify.ContractorEmailConfirmationStoredController.onPageLoad(mode: Mode = NormalMode)
