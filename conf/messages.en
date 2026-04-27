@@ -828,3 +828,35 @@ verify.verificationRequestInProgress.p3.link                       =  Contact HM
 verify.verificationRequestInProgress.p3                            =  if you have any questions about this verification request.
 verify.verificationRequestInProgress.p4                            =  Back to
 verify.verificationRequestInProgress.p4.link                       =  Manage your subcontractors
+
+verify.selectSubcontractorsToReverify.title                        = Which subcontractors do you want to reverify?
+verify.selectSubcontractorsToReverify.heading                      = Which subcontractors do you want to reverify?
+verify.selectSubcontractorsToReverify.hint                         = Select the existing subcontractors you want to include in this verification request
+verify.selectSubcontractorsToReverify.grantAlan                    = Grant,Alan
+verify.selectSubcontractorsToReverify.hammondHouse                 = Hammond House
+verify.selectSubcontractorsToReverify.checkYourAnswersLabel        = Which subcontractors do you want to reverify?
+verify.selectSubcontractorsToReverify.error.required               = Select at least one subcontractor to verify
+verify.selectSubcontractorsToReverify.change.hidden                = select subcontractors to reverify
+
+
+verify.selectSubcontractorsToReverify.include = Include
+verify.selectSubcontractorsToReverify.name = Name
+verify.selectSubcontractorsToReverify.utr = UTR
+verify.selectSubcontractorsToReverify.verified = Verified
+verify.selectSubcontractorsToReverify.verificationNumber = Verification number
+verify.selectSubcontractorsToReverify.taxTreatment = Tax treatment
+verify.selectSubcontractorsToReverify.dateAdded = Date added
+
+
+verify.selectSubcontractorsToReverify.ingenResearch = Ingenresearch
+verify.selectSubcontractorsToReverify.malcolmAndSattler = Malcolmandsattler
+verify.selectSubcontractorsToReverify.brightwellPartners = Brightwellpartners
+verify.selectSubcontractorsToReverify.carterfieldsLtd = Carterfieldsltd
+verify.selectSubcontractorsToReverify.northbridgeBuild = Northbridgebuild
+verify.selectSubcontractorsToReverify.oakthornServices = Oakthornservices
+
+site.pagination.previous             =  Previous
+site.pagination.next                 =  Next
+site.pagination.landmark             =  Pagination
+
+verify.selectSubcontractor.showingResults                          =  Showing {0} to {1} of {2} results

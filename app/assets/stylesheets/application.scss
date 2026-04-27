@@ -4,6 +4,57 @@
  */
  @use "autocomplete";
 
+
+.govuk-pagination__link--button {
+  background: none;
+  border: 0;
+  cursor: pointer;
+  font-size: inherit;
+  font-family: inherit;
+  padding: 0;
+  color: #1d70b8;
+  text-decoration: underline;
+
+  &:hover {
+    color: #003078;
+  }
+
+  &:focus {
+    outline: 3px solid transparent;
+    color: #0b0c0c;
+    background-color: #ffdd00;
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
+    box-shadow: 0 -2px #ffdd00, 0 4px #0b0c0c;
+    text-decoration: none;
+  }
+}
+
+.govuk-pagination__item--current .govuk-pagination__link--button {
+  color: #fff;
+
+  &:hover {
+    color: rgba(255, 255, 255, .99);
+  }
+
+  &:focus {
+    color: #0b0c0c;
+  }
+}
+
+#subcontractor-table th,
+#subcontractor-table td {
+  white-space: nowrap;
+  padding-right: 25px;
+  vertical-align: middle;
+}
+
+#subcontractor-table th:first-child,
+#subcontractor-table td:first-child {
+  width: 40px;
+  padding-right: 10px;
+}
+
 .js-visible {
   display: none !important;
 }

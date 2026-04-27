@@ -27,6 +27,20 @@ import java.time.Instant
 
 trait ModelGenerators {
 
+  implicit lazy val arbitrarySelectSubcontractorsToReverify: Arbitrary[Set[String]] =
+    Arbitrary {
+      Gen
+        .someOf(
+          "brightwellPartners",
+          "carterfieldsLtd",
+          "grantalan",
+          "hammondhouse",
+          "ingenResearch",
+          "malcolmAndSattler"
+        )
+        .map(_.toSet)
+    }
+
   implicit lazy val arbitraryInternationalAddress: Arbitrary[InternationalAddress] =
     Arbitrary {
       for {
