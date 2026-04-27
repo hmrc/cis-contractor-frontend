@@ -371,6 +371,11 @@ POST  /verify/confirmation-email-stored                controllers.verify.Contra
 GET   /verify/change-confirmation-email-stored         controllers.verify.ContractorEmailConfirmationStoredController.onPageLoad(mode: Mode = CheckMode)
 POST  /verify/change-confirmation-email-stored         controllers.verify.ContractorEmailConfirmationStoredController.onSubmit(mode: Mode = CheckMode)
 
+GET   /verify/enter-confirmation-email             controllers.verify.EmailAddressController.onPageLoad(mode: Mode = NormalMode)
+POST  /verify/enter-confirmation-email             controllers.verify.EmailAddressController.onSubmit(mode: Mode = NormalMode)
+GET   /verify/change-enter-confirmation-email      controllers.verify.EmailAddressController.onPageLoad(mode: Mode = CheckMode)
+POST  /verify/change-enter-confirmation-email      controllers.verify.EmailAddressController.onSubmit(mode: Mode = CheckMode)
+
 GET   /verify/reverify-existing-subcontractors         controllers.verify.ReverifyExistingSubcontractorsYesNoController.onPageLoad(mode: Mode = NormalMode)
 POST  /verify/reverify-existing-subcontractors         controllers.verify.ReverifyExistingSubcontractorsYesNoController.onSubmit(mode: Mode = NormalMode)
 GET   /verify/change-reverify-existing-subcontractors  controllers.verify.ReverifyExistingSubcontractorsYesNoController.onPageLoad(mode: Mode = CheckMode)
