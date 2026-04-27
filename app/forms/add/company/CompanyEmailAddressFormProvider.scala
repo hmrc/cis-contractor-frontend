@@ -16,8 +16,6 @@
 
 package forms.add.company
 
-import forms.Validation
-import forms.mappings.Constants.MaxLength254
 import forms.mappings.Mappings
 import play.api.data.Form
 
@@ -27,13 +25,11 @@ class CompanyEmailAddressFormProvider @Inject() extends Mappings {
 
   def apply(): Form[String] =
     Form(
-      "value" -> text("companyEmailAddress.error.required")
-        .verifying(
-          firstError(
-            maxLength(MaxLength254, "companyEmailAddress.error.length"),
-            regexp(Validation.emailRegex, "companyEmailAddress.error.invalid")
-          )
-        )
+      "value" -> emailAddress(
+        "companyEmailAddress.error.required",
+        "companyEmailAddress.error.length",
+        "companyEmailAddress.error.invalid"
+      )
     )
 
 }

@@ -15,26 +15,15 @@
  */
 
 package models
-
 import play.api.libs.json.{Json, OFormat}
-
-import java.time.LocalDateTime
 
 final case class Verification(
   verificationId: Long,
   matched: Option[String],
   verificationNumber: Option[String],
   taxTreatment: Option[String],
-  actionIndicator: Option[String],
   verificationBatchId: Option[Long],
-  schemeId: Option[Long],
-  subcontractorId: Option[Long],
-  subcontractorName: Option[String],
-  verificationResourceRef: Option[Long],
-  proceed: Option[String],
-  createDate: Option[LocalDateTime],
-  lastUpdate: Option[LocalDateTime],
-  version: Option[Int]
+  subcontractorId: Option[Long]
 )
 
 object Verification:

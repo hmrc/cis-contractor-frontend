@@ -14,17 +14,17 @@
  * limitations under the License.
  */
 
-package models
+package forms.verify
 
-import play.api.libs.json.{Json, OFormat}
+import forms.mappings.Mappings
+import play.api.data.Form
 
-case class ContractorScheme(
-  accountsOfficeReference: Option[String],
-  utr: Option[String] = None,
-  name: Option[String] = None,
-  emailAddress: Option[String] = None
-)
+import javax.inject.Inject
 
-object ContractorScheme {
-  given OFormat[ContractorScheme] = Json.format[ContractorScheme]
+class ReverifyExistingSubcontractorsYesNoFormProvider @Inject() extends Mappings {
+
+  def apply(): Form[Boolean] =
+    Form(
+      "value" -> boolean("verify.reverifyExistingSubcontractorsYesNo.error.required")
+    )
 }

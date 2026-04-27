@@ -14,17 +14,17 @@
  * limitations under the License.
  */
 
-package models
+package pages.verify
 
-import play.api.libs.json.{Json, OFormat}
+import models.Subcontractor
+import pages.QuestionPage
+import play.api.libs.json.JsPath
 
-case class ContractorScheme(
-  accountsOfficeReference: Option[String],
-  utr: Option[String] = None,
-  name: Option[String] = None,
-  emailAddress: Option[String] = None
-)
+case object UnverifiedSubcontractorsPage extends QuestionPage[Seq[Subcontractor]] {
 
-object ContractorScheme {
-  given OFormat[ContractorScheme] = Json.format[ContractorScheme]
+  override def path: JsPath =
+    JsPath \ toString
+
+  override def toString: String =
+    "unverifiedSubcontractors"
 }

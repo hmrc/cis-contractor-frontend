@@ -14,17 +14,22 @@
  * limitations under the License.
  */
 
-package models
+package pages.verify
 
-import play.api.libs.json.{Json, OFormat}
+import base.SpecBase
+import generators.ModelGenerators
+import models.Subcontractor
+import org.scalacheck.{Arbitrary, Gen}
+import pages.behaviours.PageBehaviours
 
-case class ContractorScheme(
-  accountsOfficeReference: Option[String],
-  utr: Option[String] = None,
-  name: Option[String] = None,
-  emailAddress: Option[String] = None
-)
+class UnverifiedSubcontractorsPageSpec extends SpecBase with PageBehaviours with ModelGenerators {
 
-object ContractorScheme {
-  given OFormat[ContractorScheme] = Json.format[ContractorScheme]
+  "UnverifiedSubcontractorsPage" - {
+
+    beRetrievable[Seq[Subcontractor]](UnverifiedSubcontractorsPage)
+
+    beSettable[Seq[Subcontractor]](UnverifiedSubcontractorsPage)
+
+    beRemovable[Seq[Subcontractor]](UnverifiedSubcontractorsPage)
+  }
 }
