@@ -24,7 +24,7 @@ object SubcontractorSource {
 
   // Placeholder list — TODO will be replaced with a backend call when the connector is implemented
   val subcontractors: Seq[SubcontractorViewModel] = Seq(
-    SubcontractorViewModel("100", "Brody Martin"),
+    SubcontractorViewModel("100", "Brody, Martin"),
     SubcontractorViewModel("95", "Hooper Associates"),
     SubcontractorViewModel("96", "Alpha Plumbing"),
     SubcontractorViewModel("98", "Beta Builders"),
