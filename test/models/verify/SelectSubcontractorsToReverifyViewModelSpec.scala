@@ -54,7 +54,7 @@ class SelectSubcontractorsToReverifyViewModelSpec extends SpecBase {
         )
 
       result.size mustBe 2
-      
+
       result.head.id mustBe Some("value-0_0")
       result.head.value mustBe "id-1"
       result.head.content mustBe Text("Brightwell Partners")
