@@ -19,7 +19,7 @@ package services
 import connectors.ConstructionIndustrySchemeConnector
 import models.{Subcontractor, UserAnswers}
 import pages.verification.NewestVerificationBatchResponsePage
-import pages.verify.UnverifiedSubcontractorsPage
+import pages.verify.{CurrentVerificationBatchResponsePage, UnverifiedSubcontractorsPage}
 import queries.CisIdQuery
 import repositories.SessionRepository
 import uk.gov.hmrc.http.HeaderCarrier
@@ -50,6 +50,18 @@ class VerificationService @Inject() (
                  )
 
       _ <- sessionRepository.set(updated)
+    } yield updated
+
+  def getCurrentVerificationBatch(userAnswers: UserAnswers)(implicit hc: HeaderCarrier): Future[UserAnswers] =
+    for {
+      instanceId <- userAnswers
+                      .get(CisIdQuery)
+                      .map(Future.successful)
+                      .getOrElse(Future.failed(new RuntimeException("InstanceIdQuery not found in session data")))
+
+      response <- cisConnector.getCurrentVerificationBatch(instanceId)
+      updated  <- Future.fromTry(userAnswers.set(CurrentVerificationBatchResponsePage, response))
+      _        <- sessionRepository.set(updated)
     } yield updated
 
   private def unverifiedSubcontractors(
