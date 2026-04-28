@@ -96,7 +96,7 @@ class VerifyNavigatorSpec extends SpecBase {
 
         result mustBe controllers.verify.routes.ContractorEmailConfirmationStoredController.onPageLoad(NormalMode)
       }
-      
+
       "must go from EmailAddressPage to next page" in {
         val ua = emptyUserAnswers.set(EmailAddressPage, "test@test.com").success.value
         navigator.nextPage(EmailAddressPage, NormalMode, ua) mustBe
@@ -168,7 +168,7 @@ class VerifyNavigatorSpec extends SpecBase {
 
         result mustBe controllers.verify.routes.ContractorEmailConfirmationStoredController.onPageLoad(CheckMode)
       }
-        
+
       "must go from EmailAddressPage to EmailAddressPage in CheckMode" in {
         val ua = emptyUserAnswers.set(EmailAddressPage, "test@test.com").success.value
 
