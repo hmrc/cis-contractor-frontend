@@ -18,7 +18,6 @@ package controllers.verify
 
 import base.SpecBase
 import controllers.routes
-import forms.verify.EmailAddressFormProvider
 import models._
 import navigation.Navigator
 import org.mockito.ArgumentMatchers.any
@@ -38,8 +37,6 @@ import scala.concurrent.Future
 class EmailAddressControllerSpec extends SpecBase with MockitoSugar {
 
   private val onwardRoute: Call = Call("GET", "/foo")
-
-  private val formProvider = new EmailAddressFormProvider()
 
   private lazy val routeUrl =
     controllers.verify.routes.EmailAddressController.onPageLoad(NormalMode).url

@@ -41,6 +41,8 @@ class VerifyNavigator @Inject() () extends NavigatorForJourney {
 
     case ContractorEmailConfirmationNotStoredPage =>
       userAnswers => navigatorFromContractorEmailConfirmationNotStoredPage(NormalMode)(userAnswers)
+    case SelectSubcontractorPage                  =>
+      userAnswers => navigatorFromSelectSubcontractorPage(NormalMode)(userAnswers)
     case ContractorEmailConfirmationStoredPage    =>
       userAnswers => navigatorFromContractorEmailConfirmationStoredPage(NormalMode)(userAnswers)
     case SelectSubcontractorsToReverifyPage       =>
@@ -53,6 +55,8 @@ class VerifyNavigator @Inject() () extends NavigatorForJourney {
   private def checkRouteMap: Page => UserAnswers => Call = {
     case ContractorEmailConfirmationNotStoredPage =>
       userAnswers => navigatorFromContractorEmailConfirmationNotStoredPage(CheckMode)(userAnswers)
+    case SelectSubcontractorPage                  =>
+      userAnswers => navigatorFromSelectSubcontractorPage(CheckMode)(userAnswers)
     case ContractorEmailConfirmationStoredPage    =>
       userAnswers => navigatorFromContractorEmailConfirmationStoredPage(CheckMode)(userAnswers)
     case SelectSubcontractorsToReverifyPage       =>
@@ -79,6 +83,11 @@ class VerifyNavigator @Inject() () extends NavigatorForJourney {
       case _ =>
         routes.IndexController.onPageLoad()
     }
+
+  private def navigatorFromSelectSubcontractorPage(mode: Mode)(ua: UserAnswers): Call = {
+    val _ = ua
+    controllers.verify.routes.SelectSubcontractorController.onPageLoad(mode)
+  }
 
   private def navigatorFromContractorEmailConfirmationStoredPage(mode: Mode)(ua: UserAnswers): Call =
     (ua.get(ContractorEmailConfirmationStoredPage), mode) match {

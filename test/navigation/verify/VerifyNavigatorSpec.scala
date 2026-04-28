@@ -62,6 +62,18 @@ class VerifyNavigatorSpec extends SpecBase {
         ) mustBe routes.IndexController.onPageLoad()
       }
 
+      "must go from SelectSubcontractorPage to SelectSubcontractorController in NormalMode" in {
+        val ua = UserAnswers("id")
+
+        val result =
+          navigator.nextPage(SelectSubcontractorPage, NormalMode, ua)
+
+        result.url mustBe
+          controllers.verify.routes.SelectSubcontractorController
+            .onPageLoad(NormalMode)
+            .url
+      }
+
       "must go from ContractorEmailConfirmationStoredPage to JourneyRecovery when answer is CurrentEmail" in {
         val ua = emptyUserAnswers.setOrException(
           ContractorEmailConfirmationStoredPage,
@@ -132,6 +144,18 @@ class VerifyNavigatorSpec extends SpecBase {
           CheckMode,
           emptyUserAnswers
         ) mustBe routes.IndexController.onPageLoad()
+      }
+
+      "must go from SelectSubcontractorPage to SelectSubcontractorController in CheckMode" in {
+        val ua = UserAnswers("id")
+
+        val result =
+          navigator.nextPage(SelectSubcontractorPage, CheckMode, ua)
+
+        result.url mustBe
+          controllers.verify.routes.SelectSubcontractorController
+            .onPageLoad(CheckMode)
+            .url
       }
 
       "must go from ContractorEmailConfirmationStoredPage to JourneyRecovery when answer is CurrentEmail" in {
