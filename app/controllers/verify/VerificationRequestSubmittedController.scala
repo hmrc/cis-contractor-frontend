@@ -48,9 +48,10 @@ class VerificationRequestSubmittedController @Inject() (
         submittedAt = LocalDateTime.now(),
         subcontractorsToVerify =
           Seq("Brody, Martin", "Hooper And Associates", "Quint Transportation", "The Kintner Group"),
+        //  Seq.empty,
         //  To check the validation of empty reverify list
-        //  subcontractorsToReverify = Seq.empty,
         subcontractorsToReverify = Seq("Grant, Alan", "InGen Research"),
+        //  Seq.empty,
         //  To test no email provided scenario
         //  confirmationEmail = None
         confirmationEmail = Some("test@testmail.com")

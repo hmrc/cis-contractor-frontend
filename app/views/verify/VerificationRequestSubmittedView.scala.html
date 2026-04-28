@@ -69,22 +69,24 @@
         )
     )
 
-    @govukSummaryList(
-        SummaryListViewModel(
-            rows = Seq(
-                SummaryListRowViewModel(
-                    key = messages("verify.verificationRequestSubmitted.subcontractorsToVerify.label"),
-                    value = ValueViewModel(
-                        HtmlContent(
-                            vm.subcontractorsToVerify
-                            .map(name => s"<li>$name</li>")
-                            .mkString("<ul class='govuk-list govuk-list--bullet'>", "", "</ul>")
+    @if(vm.showVerify) {
+        @govukSummaryList(
+            SummaryListViewModel(
+                rows = Seq(
+                    SummaryListRowViewModel(
+                        key = messages("verify.verificationRequestSubmitted.subcontractorsToVerify.label"),
+                        value = ValueViewModel(
+                            HtmlContent(
+                                vm.subcontractorsToVerify
+                                .map(name => s"<li>$name</li>")
+                                .mkString("<ul class='govuk-list govuk-list--bullet'>", "", "</ul>")
+                            )
                         )
                     )
                 )
             )
         )
-    )
+    }
 
     @if(vm.showReverify) {
         @govukSummaryList(
@@ -121,7 +123,7 @@
     @link(
         linkTextKey = "verify.verificationRequestSubmitted.email.verification.link",
         linkUrl = appConfig.cisGeneralEnquiries, // TODO: Link to be updated later
-        // TODO: Link to be opened in new tab ? isNewTab = true,
+        hasFullStop = true,
         prefixTextKey = "verify.verificationRequestSubmitted.email.verification"
     )
 
@@ -144,7 +146,7 @@
     @link(
         linkTextKey = "verify.verificationRequestSubmitted.needHelp.contactHMRC.link",
         linkUrl = appConfig.cisGeneralEnquiries,
-        // TODO: Link to be opened in new tab ? isNewTab = true,
+        hasFullStop = true,
         prefixTextKey = "verify.verificationRequestSubmitted.needHelp.p1",
     )
 
@@ -156,10 +158,8 @@
 
     @link(
         linkTextKey = "verify.verificationRequestSubmitted.needHelp.manageSubcontractors.link",
-        linkUrl = appConfig.manageSubcontractorsUrl,  // TODO: Link to be confirmed and verified
-      //   TODO: Validate the URL in application.conf file
-      //   manageSubcontractors                      = "http://localhost:6996/construction-industry-scheme/management/manage-subcontractors"
-      //   TODO: Link to be opened in new tab ? isNewTab = true,
+        linkUrl = appConfig.manageSubcontractorsUrl,  // TODO: Link to be updated later.
+        hasFullStop = true,
         prefixTextKey = "verify.verificationRequestSubmitted.needHelp.p3",
     )
 
@@ -176,7 +176,6 @@
     @link(
         "verify.verificationRequestSubmitted.feedback.survey.link",
         appConfig.exitSurveyUrl, // TODO: Link to be confirmed & verified
-        isNewTab = true, // TODO: Link to be opened in new tab ?
         suffixTextKey = "verify.verificationRequestSubmitted.feedback.p2"
     )
 }
