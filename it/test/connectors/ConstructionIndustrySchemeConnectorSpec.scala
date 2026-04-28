@@ -263,4 +263,57 @@ class ConstructionIndustrySchemeConnectorSpec
     }
   }
 
+  "getCurrentVerificationBatch" should {
+
+    val instanceId = "cis-123"
+
+    "successfully get a current verification batch" in {
+      val responseJson =
+        """
+          |{
+          |  "subcontractors": [
+          |    {
+          |      "subcontractorId": 1
+          |    }
+          |  ],
+          |  "verificationBatch": [
+          |    {
+          |      "verificationBatchId": 99
+          |    }
+          |  ],
+          |  "verifications": [
+          |    {
+          |      "verificationId": 1001
+          |    }
+          |  ]
+          |}
+          |""".stripMargin
+
+      stubFor(
+        get(urlPathEqualTo(s"/cis/verification-batch/current/$instanceId"))
+          .willReturn(
+            aResponse()
+              .withStatus(OK)
+              .withBody(responseJson)
+          )
+      )
+
+      val result = connector.getCurrentVerificationBatch(instanceId).futureValue
+      result.subcontractors.map(_.subcontractorId) mustBe Seq(1L)
+      result.verificationBatch.map(_.verificationBatchId) mustBe Seq(99L)
+      result.verifications.map(_.verificationId) mustBe Seq(1001L)
+    }
+
+    "propagate upstream error on non-2xx" in {
+      stubFor(
+        get(urlPathEqualTo(s"/cis/verification-batch/current/$instanceId"))
+          .willReturn(aResponse().withStatus(INTERNAL_SERVER_ERROR).withBody("boom"))
+      )
+
+      val ex = intercept[Exception] {
+        connector.getCurrentVerificationBatch(instanceId).futureValue
+      }
+      ex.getMessage must include("returned 500")
+    }
+  }
 }
