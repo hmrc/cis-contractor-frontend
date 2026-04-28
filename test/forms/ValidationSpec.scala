@@ -18,7 +18,6 @@ package forms
 
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
-import play.api.data.validation.{Invalid, Valid}
 
 class ValidationSpec extends AnyFreeSpec with Matchers {
 

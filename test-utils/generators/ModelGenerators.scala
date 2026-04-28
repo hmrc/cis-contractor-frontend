@@ -16,7 +16,7 @@
 
 package generators
 
-import models.*
+import models.{SubcontractorViewModel, *}
 import models.contact.ContactOptions
 import models.add.{InternationalAddress, TypeOfSubcontractor}
 import models.verify.ContractorEmailConfirmationStored
@@ -26,6 +26,14 @@ import play.api.libs.json.Json
 import java.time.{Instant, LocalDateTime, ZoneOffset}
 
 trait ModelGenerators {
+
+  implicit lazy val arbitrarySubcontractorViewModel: Arbitrary[SubcontractorViewModel] =
+    Arbitrary {
+      for {
+        id   <- Gen.alphaStr.suchThat(_.nonEmpty)
+        name <- Gen.alphaStr.suchThat(_.nonEmpty)
+      } yield SubcontractorViewModel(id, name)
+    }
 
   implicit lazy val arbitraryInternationalAddress: Arbitrary[InternationalAddress] =
     Arbitrary {
