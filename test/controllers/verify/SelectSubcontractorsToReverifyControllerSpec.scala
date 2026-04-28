@@ -67,7 +67,13 @@ class SelectSubcontractorsToReverifyControllerSpec extends SpecBase with Mockito
 
       val ua =
         emptyUserAnswers
-          .setOrException(SelectSubcontractorsToReverifyPage, Set("brightwellPartners", "carterfieldsLtd"))
+          .setOrException(
+            SelectSubcontractorsToReverifyPage,
+            Set(
+              "brightwellPartners|Brightwell Partners",
+              "carterfieldsLtd|Carterfields Ltd"
+            )
+          )
 
       val application = applicationBuilder(userAnswers = Some(ua)).build()
 
@@ -75,7 +81,9 @@ class SelectSubcontractorsToReverifyControllerSpec extends SpecBase with Mockito
 
         val request = FakeRequest(
           GET,
-          controllers.verify.routes.SelectSubcontractorsToReverifyController.onPageLoad(NormalMode, 1).url
+          controllers.verify.routes.SelectSubcontractorsToReverifyController
+            .onPageLoad(NormalMode, 1)
+            .url
         )
 
         val result = route(application, request).value
@@ -94,16 +102,18 @@ class SelectSubcontractorsToReverifyControllerSpec extends SpecBase with Mockito
           afterId.take(250)
         }
 
+        val rows = SubcontractorReverifyData.rows
+
         val v0 = inputSnippet("value-0")
-        v0 must include("""value="brightwellPartners"""")
+        v0 must include(s"""value="${rows(0).id}|${rows(0).name}"""")
         v0 must include("checked")
 
         val v1 = inputSnippet("value-1")
-        v1 must include("""value="carterfieldsLtd"""")
+        v1 must include(s"""value="${rows(1).id}|${rows(1).name}"""")
         v1 must include("checked")
 
         val v2 = inputSnippet("value-2")
-        v2 must include("""value="Grantalan"""")
+        v2 must include(s"""value="${rows(2).id}|${rows(2).name}"""")
         v2 must not include "checked"
       }
     }

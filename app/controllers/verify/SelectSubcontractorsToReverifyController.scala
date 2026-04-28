@@ -67,7 +67,7 @@ class SelectSubcontractorsToReverifyController @Inject() (
       val preparedForm =
         request.userAnswers
           .get(SelectSubcontractorsToReverifyPage)
-          .map(_.intersect(currentPageIds))
+          .map(_.filter(v => currentPageIds.contains(v.split("\\|")(0))))
           .map(form.fill)
           .getOrElse(form)
 
@@ -107,7 +107,7 @@ class SelectSubcontractorsToReverifyController @Inject() (
         request.userAnswers
           .get(SelectSubcontractorsToReverifyPage)
           .getOrElse(Set.empty[String])
-          .diff(currentPageIds)
+          .filterNot(v => currentPageIds.contains(v.split("\\|").headOption.getOrElse("")))
 
       val mergedSelections: Set[String] =
         previousSelections ++ currentSelections
@@ -120,7 +120,6 @@ class SelectSubcontractorsToReverifyController @Inject() (
 
       gotoPage match {
 
-        // ✅ Pagination click (NO validation)
         case Some(targetPage) =>
           for {
             updatedAnswers <- Future.fromTry(
@@ -131,8 +130,7 @@ class SelectSubcontractorsToReverifyController @Inject() (
             routes.SelectSubcontractorsToReverifyController.onPageLoad(mode, targetPage)
           )
 
-        // ✅ Continue button (WITH validation)
-        case None             =>
+        case None =>
           boundForm.fold(
             formWithErrors =>
               Future.successful(
