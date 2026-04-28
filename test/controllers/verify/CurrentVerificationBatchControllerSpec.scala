@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package controllers.verification
+package controllers.verify
 
 import base.SpecBase
 import controllers.routes
@@ -32,7 +32,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 import scala.concurrent.Future
 
 class CurrentVerificationBatchControllerSpec extends SpecBase with MockitoSugar {
-  private val endpointUrl = "/verification/current"
+  private val endpointUrl = "/verify/current"
 
   "CurrentVerificationBatchController" - {
 

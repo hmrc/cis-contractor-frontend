@@ -26,8 +26,8 @@ import org.mockito.Mockito.{never, verify, verifyNoMoreInteractions, when}
 import org.scalatest.RecoverMethods.recoverToExceptionIf
 import org.scalatestplus.mockito.MockitoSugar
 import pages.QuestionPage
-import pages.verification.{CurrentVerificationBatchResponsePage, NewestVerificationBatchResponsePage}
-import pages.verify.UnverifiedSubcontractorsPage
+import pages.verification.NewestVerificationBatchResponsePage
+import pages.verify.{CurrentVerificationBatchResponsePage, UnverifiedSubcontractorsPage}
 import play.api.libs.json.{JsPath, Writes}
 import queries.CisIdQuery
 import repositories.SessionRepository

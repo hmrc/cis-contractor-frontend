@@ -364,7 +364,7 @@ GET   /verify/no-subcontractors-added                  controllers.verify.NoSubc
 
 GET   /verification/newest                             controllers.verification.NewestVerificationBatchController.onPageLoad()
 
-GET   /verification/current                            controllers.verification.CurrentVerificationBatchController.onPageLoad()
+GET   /verify/current                                  controllers.verify.CurrentVerificationBatchController.onPageLoad()
 
 GET   /verify/verification-request-in-progress         controllers.verify.VerificationRequestInProgressController.onPageLoad()
 

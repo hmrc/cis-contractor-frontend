@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package pages.verification
+package pages.verify
 
 import models.response.GetCurrentVerificationBatchResponse
 import pages.QuestionPage
