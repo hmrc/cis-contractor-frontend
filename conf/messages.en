@@ -833,6 +833,22 @@ verify.verificationRequestInProgress.p3                                 =  if yo
 verify.verificationRequestInProgress.p4                                 =  Back to
 verify.verificationRequestInProgress.p4.link                            =  Manage your subcontractors
 
+verify.selectSubcontractor.title                                   =  Which subcontractors do you want to verify?
+verify.selectSubcontractor.heading                                 =  Which subcontractors do you want to verify?
+verify.selectSubcontractor.hint                                    =  Select the unverified subcontractors you want to add to this verification request
+verify.selectSubcontractor.checkYourAnswersLabel                   =  Subcontractors to verify
+verify.selectSubcontractor.showingResults                          =  Showing {0} to {1} of {2} results
+verify.selectSubcontractor.error.required                          =  Select at least one subcontractor to verify
+verify.selectSubcontractor.change.hidden                           =  subcontractors to verify
+verify.verificationRequestInProgress.title                         =  Verification request in progress
+verify.verificationRequestInProgress.heading                       =  Verification request in progress
+verify.verificationRequestInProgress.p1                            =  HMRC has not responded to your previous verification request yet.
+verify.verificationRequestInProgress.p2                            =  You must wait for this response before you can verify any more subcontractors.
+verify.verificationRequestInProgress.p3.link                       =  Contact HMRC
+verify.verificationRequestInProgress.p3                            =  if you have any questions about this verification request.
+verify.verificationRequestInProgress.p4                            =  Back to
+verify.verificationRequestInProgress.p4.link                       =  Manage your subcontractors
+
 verify.selectSubcontractorsToReverify.title                        = Which subcontractors do you want to reverify?
 verify.selectSubcontractorsToReverify.heading                      = Which subcontractors do you want to reverify?
 verify.selectSubcontractorsToReverify.hint                         = Select the existing subcontractors you want to include in this verification request
