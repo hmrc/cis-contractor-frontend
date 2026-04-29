@@ -39,7 +39,7 @@ trait ModelGenerators {
         )
         .map(_.toSet)
     }
-  
+
   implicit lazy val arbitrarySubcontractorViewModel: Arbitrary[SubcontractorViewModel] =
     Arbitrary {
       for {
