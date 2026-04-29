@@ -59,7 +59,6 @@ class CreateVerificationBatchAndVerificationsController @Inject() (
       request.userAnswers.get(CurrentVerificationBatchResponsePage) match {
 
         case None =>
-          // We rely on CurrentVerificationBatchResponsePage for the id->resourceRef mapping in the service.
           Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
 
         case Some(_) if hasCurrentBatch(request.userAnswers) =>
