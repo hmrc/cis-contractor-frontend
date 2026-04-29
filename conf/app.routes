@@ -390,3 +390,5 @@ POST  /verify/change-reverify-existing-subcontractors  controllers.verify.Reveri
 
 GET   /verify/no-new-subcontractors-to-verify          controllers.verify.VerifyYourSubcontractorsYesNoController.onPageLoad
 POST  /verify/no-new-subcontractors-to-verify          controllers.verify.VerifyYourSubcontractorsYesNoController.onSubmit
+
+GET   /verify/verification-request-submitted           controllers.verify.VerificationRequestSubmittedController.onPageLoad()
