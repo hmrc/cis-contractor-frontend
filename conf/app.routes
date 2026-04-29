@@ -364,7 +364,7 @@ GET   /verify/no-subcontractors-added                  controllers.verify.NoSubc
 
 GET   /verification/newest                             controllers.verification.NewestVerificationBatchController.onPageLoad()
 
-GET   /verification/current                            controllers.verification.CurrentVerificationBatchController.onPageLoad()
+GET   /verify/current                                  controllers.verify.CurrentVerificationBatchController.onPageLoad()
 
 GET   /verify/verification-request-in-progress         controllers.verify.VerificationRequestInProgressController.onPageLoad()
 
@@ -372,6 +372,11 @@ GET   /verify/confirmation-email-stored                controllers.verify.Contra
 POST  /verify/confirmation-email-stored                controllers.verify.ContractorEmailConfirmationStoredController.onSubmit(mode: Mode = NormalMode)
 GET   /verify/change-confirmation-email-stored         controllers.verify.ContractorEmailConfirmationStoredController.onPageLoad(mode: Mode = CheckMode)
 POST  /verify/change-confirmation-email-stored         controllers.verify.ContractorEmailConfirmationStoredController.onSubmit(mode: Mode = CheckMode)
+
+GET   /verify/select-subcontractors-to-verify          controllers.verify.SelectSubcontractorController.onPageLoad(mode: Mode = NormalMode, page: Int ?= 1)
+POST  /verify/select-subcontractors-to-verify          controllers.verify.SelectSubcontractorController.onSubmit(mode: Mode = NormalMode, page: Int ?= 1)
+GET   /verify/change-select-subcontractors-to-verify   controllers.verify.SelectSubcontractorController.onPageLoad(mode: Mode = CheckMode, page: Int ?= 1)
+POST  /verify/change-select-subcontractors-to-verify   controllers.verify.SelectSubcontractorController.onSubmit(mode: Mode = CheckMode, page: Int ?= 1)
 
 GET   /verify/enter-confirmation-email                 controllers.verify.EmailAddressController.onPageLoad(mode: Mode = NormalMode)
 POST  /verify/enter-confirmation-email                 controllers.verify.EmailAddressController.onSubmit(mode: Mode = NormalMode)
