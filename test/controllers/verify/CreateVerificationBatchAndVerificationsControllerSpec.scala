@@ -112,7 +112,7 @@ class CreateVerificationBatchAndVerificationsControllerSpec extends SpecBase wit
         val controller = app.injector.instanceOf[CreateVerificationBatchAndVerificationsController]
 
         val request = FakeRequest(POST, "/test-only")
-        val result = controller.onSubmit()(request)
+        val result  = controller.onSubmit()(request)
 
         status(result) mustBe SEE_OTHER
         redirectLocation(result).value mustBe routes.JourneyRecoveryController.onPageLoad().url
@@ -143,7 +143,7 @@ class CreateVerificationBatchAndVerificationsControllerSpec extends SpecBase wit
         val controller = app.injector.instanceOf[CreateVerificationBatchAndVerificationsController]
 
         val request = FakeRequest(POST, "/test-only")
-        val result = controller.onSubmit()(request)
+        val result  = controller.onSubmit()(request)
 
         status(result) mustBe OK
         contentAsString(result) must include("Current verification batch exists")
@@ -181,7 +181,7 @@ class CreateVerificationBatchAndVerificationsControllerSpec extends SpecBase wit
         val controller = app.injector.instanceOf[CreateVerificationBatchAndVerificationsController]
 
         val request = FakeRequest(POST, "/test-only")
-        val result = controller.onSubmit()(request)
+        val result  = controller.onSubmit()(request)
 
         status(result) mustBe SEE_OTHER
         redirectLocation(result).value mustBe routes.IndexController.onPageLoad().url
@@ -190,7 +190,7 @@ class CreateVerificationBatchAndVerificationsControllerSpec extends SpecBase wit
 
         verify(mockService)
           .createVerificationBatchAndVerifications(eqTo(ua), idsCaptor.capture(), eqTo(None))(any())
-        
+
         idsCaptor.getValue mustBe Seq(10L, 20L, 30L)
       }
     }
@@ -220,7 +220,7 @@ class CreateVerificationBatchAndVerificationsControllerSpec extends SpecBase wit
         val controller = app.injector.instanceOf[CreateVerificationBatchAndVerificationsController]
 
         val request = FakeRequest(POST, "/test-only")
-        val result = controller.onSubmit()(request)
+        val result  = controller.onSubmit()(request)
 
         status(result) mustBe SEE_OTHER
         redirectLocation(result).value mustBe routes.JourneyRecoveryController.onPageLoad().url

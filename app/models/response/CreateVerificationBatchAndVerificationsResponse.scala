@@ -16,11 +16,10 @@
 
 package models.response
 
-
 import play.api.libs.json.{Json, OFormat}
 
 final case class CreateVerificationBatchAndVerificationsResponse(
-    verificationBatchResourceReference: Long
+  verificationBatchResourceReference: Long
 )
 
 object CreateVerificationBatchAndVerificationsResponse {
