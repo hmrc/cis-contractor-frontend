@@ -27,6 +27,7 @@ import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.verify.SelectSubcontractorsToReverifyView
 import viewmodels.verify.SubcontractorReverifyData
+import models.verify.SelectedSubcontractors
 import services.PaginationToReverifyService
 
 import javax.inject.Inject
@@ -62,13 +63,10 @@ class SelectSubcontractorsToReverifyController @Inject() (
           baseUrl = controllers.verify.routes.SelectSubcontractorsToReverifyController.onPageLoad(mode).url
         )
 
-      val currentPageIds = result.items.map(_.id).toSet
-
       val preparedForm =
         request.userAnswers
           .get(SelectSubcontractorsToReverifyPage)
-          .map(_.filter(v => currentPageIds.contains(v.split("\\|")(0))))
-          .map(form.fill)
+          .map(subs => form.fill(subs.map(_.id)))
           .getOrElse(form)
 
       Ok(
@@ -97,19 +95,24 @@ class SelectSubcontractorsToReverifyController @Inject() (
 
       val boundForm = form.bindFromRequest()
 
-      val currentSelections: Set[String] =
+      val selectedIds: Set[String] =
         boundForm.value.getOrElse(Set.empty)
 
-      val currentPageIds =
+      val allSubs = allRows
+
+      val currentSelections: Set[SelectedSubcontractors] =
+        selectedIds.flatMap(id => allSubs.find(_.id == id).map(row => SelectedSubcontractors(row.id, row.name)))
+
+      val currentPageIds: Set[String] =
         result.items.map(_.id).toSet
 
-      val previousSelections: Set[String] =
+      val previousSelections: Set[SelectedSubcontractors] =
         request.userAnswers
           .get(SelectSubcontractorsToReverifyPage)
-          .getOrElse(Set.empty[String])
-          .filterNot(v => currentPageIds.contains(v.split("\\|").headOption.getOrElse("")))
+          .getOrElse(Set.empty)
+          .filterNot(sub => currentPageIds.contains(sub.id))
 
-      val mergedSelections: Set[String] =
+      val mergedSelections: Set[SelectedSubcontractors] =
         previousSelections ++ currentSelections
 
       val gotoPage: Option[Int] =

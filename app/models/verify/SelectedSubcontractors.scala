@@ -14,25 +14,16 @@
  * limitations under the License.
  */
 
-package pages.verify
+package models.verify
 
-import pages.behaviours.PageBehaviours
-import models.verify.SelectedSubcontractors
+import play.api.libs.json.{Json, OFormat}
 
-class SelectSubcontractorsToReverifyPageSpec extends PageBehaviours {
+case class SelectedSubcontractors(
+  id: String,
+  name: String
+)
 
-  "SelectSubcontractorsToReverifyPage" - {
-
-    beRetrievable[Set[SelectedSubcontractors]](
-      SelectSubcontractorsToReverifyPage
-    )
-
-    beSettable[Set[SelectedSubcontractors]](
-      SelectSubcontractorsToReverifyPage
-    )
-
-    beRemovable[Set[SelectedSubcontractors]](
-      SelectSubcontractorsToReverifyPage
-    )
-  }
+object SelectedSubcontractors {
+  implicit val format: OFormat[SelectedSubcontractors] =
+    Json.format[SelectedSubcontractors]
 }

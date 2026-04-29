@@ -81,8 +81,8 @@
 
                     rows = rows.zipWithIndex.map { case (row, idx) =>
                         val checkboxId = s"value-$idx"
-                        val value = s"${row.id}|${row.name}"
-                        val isChecked = selected.contains(value)
+                        val value = row.id
+                        val isChecked = selected.contains(row.id)
 
                         Seq(
 
@@ -95,7 +95,7 @@
                                    id="$checkboxId"
                                    name="value[]"
                                    type="checkbox"
-                                   value="${row.id}|${row.name}"
+                                   value="${row.id}"
                                    ${if (isChecked) "checked" else ""} />
                             <label class="govuk-label govuk-checkboxes__label"
                                    for="$checkboxId">

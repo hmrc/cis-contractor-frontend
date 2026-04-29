@@ -23,6 +23,7 @@ import org.scalatest.matchers.must.Matchers
 import pages.verify.SelectSubcontractorsToReverifyPage
 import play.api.i18n.{Lang, Messages, MessagesImpl}
 import play.api.test.Helpers.stubMessagesApi
+import models.verify.SelectedSubcontractors
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist._
 
 class SelectSubcontractorsToReverifySummarySpec extends SpecBase with Matchers {
@@ -36,7 +37,13 @@ class SelectSubcontractorsToReverifySummarySpec extends SpecBase with Matchers {
 
       val answers: UserAnswers =
         emptyUserAnswers
-          .set(SelectSubcontractorsToReverifyPage, Set("Grantalan", "Hammondhouse"))
+          .set(
+            SelectSubcontractorsToReverifyPage,
+            Set(
+              SelectedSubcontractors("Grantalan", "Grant, Alan"),
+              SelectedSubcontractors("Hammondhouse", "Hammond House")
+            )
+          )
           .success
           .value
 
@@ -52,8 +59,8 @@ class SelectSubcontractorsToReverifySummarySpec extends SpecBase with Matchers {
 
       val valueHtml = row.value.content.asHtml.toString
 
-      valueHtml must include(messages("verify.selectSubcontractorsToReverify.Grantalan"))
-      valueHtml must include(messages("verify.selectSubcontractorsToReverify.Hammondhouse"))
+      valueHtml must include("Grant, Alan")
+      valueHtml must include("Hammond House")
       valueHtml must include("<br>")
 
       row.actions mustBe defined
@@ -79,7 +86,10 @@ class SelectSubcontractorsToReverifySummarySpec extends SpecBase with Matchers {
 
       val answers: UserAnswers =
         emptyUserAnswers
-          .set(SelectSubcontractorsToReverifyPage, Set("Ingenresearch"))
+          .set(
+            SelectSubcontractorsToReverifyPage,
+            Set(SelectedSubcontractors("Ingenresearch", "InGen Research"))
+          )
           .success
           .value
 
@@ -89,7 +99,7 @@ class SelectSubcontractorsToReverifySummarySpec extends SpecBase with Matchers {
 
       val valueHtml = result.value.value.content.asHtml.toString
 
-      valueHtml must include(messages("verify.selectSubcontractorsToReverify.Ingenresearch"))
+      valueHtml must include("InGen Research")
       valueHtml must not include "<br>"
     }
 
