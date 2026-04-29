@@ -20,7 +20,7 @@ import base.SpecBase
 import viewmodels.verify.SubcontractorReverifyRow
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
 
-class SelectSubcontractorsToReverifyViewModelSpec extends SpecBase {
+class SubcontractorsToReverifyViewModelSpec extends SpecBase {
 
   "checkboxItems" - {
 

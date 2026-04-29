@@ -20,7 +20,7 @@ import models.{CheckMode, UserAnswers}
 import pages.verify.SelectSubcontractorsToReverifyPage
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
-import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
+import uk.gov.hmrc.govukfrontend.views.viewmodels.content.{HtmlContent, Text}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
@@ -28,28 +28,23 @@ import viewmodels.implicits.*
 object SelectSubcontractorsToReverifySummary {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(SelectSubcontractorsToReverifyPage).map { answers =>
+    answers.get(SelectSubcontractorsToReverifyPage).filter(_.nonEmpty).map { selected =>
 
-      val value = ValueViewModel(
-        HtmlContent(
-          answers
-            .map { answer =>
-              HtmlFormat.escape(messages(s"verify.selectSubcontractorsToReverify.$answer")).toString
-            }
-            .mkString(",<br>")
-        )
-      )
+      val valueHtml =
+        selected.toSeq
+          .sortBy(_.id)
+          .map(s => HtmlFormat.escape(s.name).toString)
+          .mkString("<br>")
 
       SummaryListRowViewModel(
-        key = "verify.selectSubcontractorsToReverify.checkYourAnswersLabel",
-        value = value,
+        key = messages("verify.selectSubcontractorsToReverify.checkYourAnswersLabel"),
+        value = ValueViewModel(HtmlContent(valueHtml)),
         actions = Seq(
           ActionItemViewModel(
-            "site.change",
-            controllers.verify.routes.SelectSubcontractorsToReverifyController.onPageLoad(CheckMode).url
-          )
-            .withVisuallyHiddenText(messages("verify.selectSubcontractorsToReverify.change.hidden"))
-            .withAttribute("id" -> "select-subcontractors-to-reverify")
+            content = Text(messages("site.change")),
+            href = controllers.verify.routes.SelectSubcontractorsToReverifyController.onPageLoad(CheckMode).url
+          ).withVisuallyHiddenText(messages("verify.selectSubcontractorsToReverify.change.hidden"))
+            .withAttribute("id", "select-subcontractors-to-reverify")
         )
       )
     }

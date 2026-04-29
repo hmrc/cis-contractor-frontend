@@ -32,6 +32,7 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import repositories.SessionRepository
 import services.PaginationToReverifyService
+import models.verify.SelectedSubcontractors
 import viewmodels.verify.SubcontractorReverifyData
 import views.html.verify.SelectSubcontractorsToReverifyView
 
@@ -70,8 +71,8 @@ class SelectSubcontractorsToReverifyControllerSpec extends SpecBase with Mockito
           .setOrException(
             SelectSubcontractorsToReverifyPage,
             Set(
-              "brightwellPartners|Brightwell Partners",
-              "carterfieldsLtd|Carterfields Ltd"
+              SelectedSubcontractors("brightwellPartners", "Brightwell Partners"),
+              SelectedSubcontractors("carterfieldsLtd", "Carterfields Ltd")
             )
           )
 
@@ -105,15 +106,15 @@ class SelectSubcontractorsToReverifyControllerSpec extends SpecBase with Mockito
         val rows = SubcontractorReverifyData.rows
 
         val v0 = inputSnippet("value-0")
-        v0 must include(s"""value="${rows(0).id}|${rows(0).name}"""")
+        v0 must include(s"""value="${rows(0).id}"""")
         v0 must include("checked")
 
         val v1 = inputSnippet("value-1")
-        v1 must include(s"""value="${rows(1).id}|${rows(1).name}"""")
+        v1 must include(s"""value="${rows(1).id}"""")
         v1 must include("checked")
 
         val v2 = inputSnippet("value-2")
-        v2 must include(s"""value="${rows(2).id}|${rows(2).name}"""")
+        v2 must include(s"""value="${rows(2).id}"""")
         v2 must not include "checked"
       }
     }
@@ -122,7 +123,13 @@ class SelectSubcontractorsToReverifyControllerSpec extends SpecBase with Mockito
 
       val userAnswers =
         UserAnswers(userAnswersId)
-          .set(SelectSubcontractorsToReverifyPage, Set(firstRow.id, secondRow.id))
+          .set(
+            SelectSubcontractorsToReverifyPage,
+            Set(
+              SelectedSubcontractors(firstRow.id, firstRow.name),
+              SelectedSubcontractors(secondRow.id, secondRow.name)
+            )
+          )
           .success
           .value
 
@@ -312,7 +319,7 @@ class SelectSubcontractorsToReverifyControllerSpec extends SpecBase with Mockito
 
         captor.getValue
           .get(SelectSubcontractorsToReverifyPage)
-          .value must contain(firstRow.id)
+          .value must contain(SelectedSubcontractors(firstRow.id, firstRow.name))
       }
     }
 
@@ -323,7 +330,10 @@ class SelectSubcontractorsToReverifyControllerSpec extends SpecBase with Mockito
 
       val existingAnswers =
         UserAnswers(userAnswersId)
-          .set(SelectSubcontractorsToReverifyPage, Set(firstRow.id))
+          .set(
+            SelectSubcontractorsToReverifyPage,
+            Set(SelectedSubcontractors(firstRow.id, firstRow.name))
+          )
           .success
           .value
 
@@ -353,7 +363,7 @@ class SelectSubcontractorsToReverifyControllerSpec extends SpecBase with Mockito
 
         captor.getValue
           .get(SelectSubcontractorsToReverifyPage)
-          .value mustEqual Set(secondRow.id)
+          .value mustEqual Set(SelectedSubcontractors(secondRow.id, secondRow.name))
       }
     }
 
