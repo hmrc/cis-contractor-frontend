@@ -851,14 +851,6 @@ verify.selectSubcontractorsToReverify.verificationNumber           = Verificatio
 verify.selectSubcontractorsToReverify.taxTreatment                 = Tax treatment
 verify.selectSubcontractorsToReverify.dateAdded                    = Date added
 
-
-verify.selectSubcontractorsToReverify.ingenResearch                = Ingenresearch
-verify.selectSubcontractorsToReverify.malcolmAndSattler            = Malcolmandsattler
-verify.selectSubcontractorsToReverify.brightwellPartners           = Brightwellpartners
-verify.selectSubcontractorsToReverify.carterfieldsLtd              = Carterfieldsltd
-verify.selectSubcontractorsToReverify.northbridgeBuild             = Northbridgebuild
-verify.selectSubcontractorsToReverify.oakthornServices             = Oakthornservices
-
 site.pagination.previous                                           =  Previous
 site.pagination.next                                               =  Next
 site.pagination.landmark                                           =  Pagination

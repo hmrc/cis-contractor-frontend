@@ -28,6 +28,8 @@
     govukCheckboxes: GovukCheckboxes,
     govukTable: GovukTable,
     govukButton: GovukButton,
+    h1: H1,
+    paragraph: Paragraph,
     pageNavigator: components.PageNavigator
 )
 
@@ -47,13 +49,9 @@
             )
         }
 
-        <h1 class="govuk-heading-l govuk-!-margin-bottom-2" style="white-space: nowrap;">
-        @messages("verify.selectSubcontractorsToReverify.heading")
-        </h1>
+        @h1(messages("verify.selectSubcontractorsToReverify.heading"))
 
-        <p class="govuk-body govuk-!-margin-top-0 govuk-!-margin-bottom-3" style="white-space: nowrap;">
-        @messages("verify.selectSubcontractorsToReverify.hint")
-        </p>
+        @paragraph(messages("verify.selectSubcontractorsToReverify.hint"))
 
         @if(paginationViewModel.items.nonEmpty) {
             <p class="govuk-body govuk-!-margin-bottom-4 govuk-!-margin-top-5">
