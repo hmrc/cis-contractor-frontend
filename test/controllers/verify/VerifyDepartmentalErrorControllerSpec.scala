@@ -64,7 +64,10 @@ class VerifyDepartmentalErrorControllerSpec extends SpecBase with MockitoSugar {
         val view = application.injector.instanceOf[VerifyDepartmentalErrorView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(s"${applicationConfig.manageSubcontractorsUrl}/$cisId")(request, messages(application)).toString
+        contentAsString(result) mustEqual view(s"${applicationConfig.manageSubcontractorsUrl}/$cisId")(
+          request,
+          messages(application)
+        ).toString
       }
     }
 

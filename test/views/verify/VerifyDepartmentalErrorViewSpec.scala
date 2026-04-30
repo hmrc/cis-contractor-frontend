@@ -27,7 +27,6 @@ import play.api.test.FakeRequest
 import play.twirl.api.HtmlFormat
 import views.html.verify.VerifyDepartmentalErrorView
 
-
 class VerifyDepartmentalErrorViewSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite {
   "VerifyDepartmentalErrorView" should {
 
@@ -36,10 +35,11 @@ class VerifyDepartmentalErrorViewSpec extends AnyWordSpec with Matchers with Gui
       private val manageSubcontractorsUrl =
         "http://localhost:6996/construction-industry-scheme/management/manage-subcontractors/12345"
 
-      private val contactHMRCURL = "https://www.gov.uk/find-hmrc-contacts/construction-industry-scheme-general-enquiries"
+      private val contactHMRCURL =
+        "https://www.gov.uk/find-hmrc-contacts/construction-industry-scheme-general-enquiries"
 
       val html: HtmlFormat.Appendable = view(manageSubcontractorsUrl)
-      val doc: Document = org.jsoup.Jsoup.parse(html.toString())
+      val doc: Document               = org.jsoup.Jsoup.parse(html.toString())
 
       doc.select("title").text() must include(messages("verify.verifyDepartmentalError.title"))
 
@@ -47,8 +47,10 @@ class VerifyDepartmentalErrorViewSpec extends AnyWordSpec with Matchers with Gui
 
       doc.select("p").text must include(messages("verify.verifyDepartmentalError.p1"))
 
-      doc.select("p").text must include(messages("verify.verifyDepartmentalError.contactHMRC.p1"))
-      doc.getElementsByClass("govuk-link").text must include(messages("verify.verifyDepartmentalError.contactHMRC.p1.link"))
+      doc.select("p").text                      must include(messages("verify.verifyDepartmentalError.contactHMRC.p1"))
+      doc.getElementsByClass("govuk-link").text must include(
+        messages("verify.verifyDepartmentalError.contactHMRC.p1.link")
+      )
 
       val contactHMRCLink: Elements =
         doc.select(s"a[href='$contactHMRCURL']")
@@ -80,7 +82,7 @@ class VerifyDepartmentalErrorViewSpec extends AnyWordSpec with Matchers with Gui
 
   trait Setup {
     implicit val request: Request[_] = FakeRequest()
-    implicit val messages: Messages =
+    implicit val messages: Messages  =
       play.api.i18n.MessagesImpl(
         play.api.i18n.Lang.defaultLang,
         app.injector.instanceOf[play.api.i18n.MessagesApi]
