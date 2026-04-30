@@ -65,19 +65,15 @@ class VerifyNavigator @Inject() () extends NavigatorForJourney {
 
   private def navigatorFromContractorEmailConfirmationNotStoredPage(mode: Mode)(ua: UserAnswers): Call =
     (ua.get(ContractorEmailConfirmationNotStoredPage), mode) match {
-      case (Some(true), _) =>
-        // ToDo: navigate to next page after the page is implemented
-        controllers.verify.routes.ContractorEmailConfirmationNotStoredController.onPageLoad(NormalMode)
+      case (Some(true), m) =>
+        controllers.verify.routes.EmailAddressController.onPageLoad(m)
 
-      case (Some(false), NormalMode) =>
-        // ToDo: navigate to next page after the page is implemented
-        controllers.verify.routes.ContractorEmailConfirmationNotStoredController.onPageLoad(NormalMode)
-      case (Some(false), CheckMode)  =>
-        // ToDo: navigate CYA page after the page is implemented and implement the logic to handle dependent pages
-        routes.IndexController.onPageLoad()
+      case (Some(false), _) =>
+        // todo: navigae to VF-06 exists when it exist
+        controllers.routes.JourneyRecoveryController.onPageLoad()
 
       case _ =>
-        routes.IndexController.onPageLoad()
+        routes.JourneyRecoveryController.onPageLoad()
     }
 
   private def navigatorFromSelectSubcontractorPage(mode: Mode)(ua: UserAnswers): Call = {
@@ -91,9 +87,8 @@ class VerifyNavigator @Inject() () extends NavigatorForJourney {
         // TODO: navigate to VF-06 Verify declaration once implemented
         controllers.routes.JourneyRecoveryController.onPageLoad()
 
-      case (Some(DifferentEmail), _) =>
-        // TODO: navigate to SM-01b Enter alternate email once implemented
-        controllers.routes.JourneyRecoveryController.onPageLoad()
+      case (Some(DifferentEmail), m) =>
+        controllers.verify.routes.EmailAddressController.onPageLoad(m)
 
       case (Some(DoNotSend), _) =>
         // TODO: navigate to VF-06 Verify declaration once implemented

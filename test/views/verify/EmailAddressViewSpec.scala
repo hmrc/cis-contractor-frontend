@@ -19,12 +19,11 @@ package views.verify
 import forms.verify.EmailAddressFormProvider
 import models.NormalMode
 import org.scalatest.matchers.must.Matchers
-import org.scalatest.matchers.should.Matchers.should
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.data.Form
 import play.api.i18n.Messages
-import play.api.mvc.Request
+import play.api.mvc.{Call, Request}
 import play.api.test.FakeRequest
 import play.twirl.api.HtmlFormat
 import views.html.verify.EmailAddressView
@@ -33,8 +32,8 @@ class EmailAddressViewSpec extends AnyWordSpec with Matchers with GuiceOneAppPer
 
   "EmailAddressView" should {
 
-    "render the page with title, heading, input and submit button" in new Setup {
-      val html: HtmlFormat.Appendable = view(form, NormalMode, "verify.emailAddress.hint")
+    "render the page with title, heading, input, back link and submit button" in new Setup {
+      val html: HtmlFormat.Appendable = view(form, NormalMode, "verify.emailAddress.hint", backLink)
       val doc                         = org.jsoup.Jsoup.parse(html.toString())
 
       doc.select("title").text() must include(messages("verify.emailAddress.title"))
@@ -50,20 +49,25 @@ class EmailAddressViewSpec extends AnyWordSpec with Matchers with GuiceOneAppPer
 
       doc.select(".govuk-button").text() mustBe messages("site.continue")
       doc.select(".govuk-hint").text() must include(messages("verify.emailAddress.hint"))
+
+      val back = doc.select("a.govuk-back-link")
+      back.size() mustBe 1
+      back.text() mustBe messages("site.back")
+      back.attr("href") mustBe backLink.url
     }
 
     "render the page with SM-01c hint when email is not stored" in new Setup {
-      val html: HtmlFormat.Appendable = view(form, NormalMode, "verify.emailAddress.hint.notStored")
+      val html: HtmlFormat.Appendable = view(form, NormalMode, "verify.emailAddress.hint.notStored", backLink)
       val doc                         = org.jsoup.Jsoup.parse(html.toString())
 
       doc.select(".govuk-hint").text() must include(messages("verify.emailAddress.hint.notStored"))
     }
 
-    "display error summary and inline error when no name is entered" in new Setup {
+    "display error summary and inline error when no email is entered" in new Setup {
       val errorForm: Form[String] =
         form.withError("value", "verify.emailAddress.error.required")
 
-      val html = view(errorForm, NormalMode, "verify.emailAddress.hint")
+      val html = view(errorForm, NormalMode, "verify.emailAddress.hint", backLink)
       val doc  = org.jsoup.Jsoup.parse(html.toString())
 
       val summary = doc.select(".govuk-error-summary")
@@ -79,6 +83,9 @@ class EmailAddressViewSpec extends AnyWordSpec with Matchers with GuiceOneAppPer
   trait Setup {
     val formProvider       = new EmailAddressFormProvider()
     val form: Form[String] = formProvider()
+
+    val backLink: Call =
+      controllers.verify.routes.ContractorEmailConfirmationNotStoredController.onPageLoad(NormalMode)
 
     implicit val request: Request[_] = FakeRequest()
     implicit val messages: Messages  =

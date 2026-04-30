@@ -19,11 +19,14 @@ package controllers.verify
 import base.SpecBase
 import controllers.routes
 import models._
+import models.response.GetNewestVerificationBatchResponse
+import models.verify.ContractorEmailConfirmationStored
 import navigation.Navigator
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
 import pages.verification.NewestVerificationBatchResponsePage
+import pages.verify.{ContractorEmailConfirmationNotStoredPage, ContractorEmailConfirmationStoredPage, EmailAddressPage}
 import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
@@ -59,10 +62,7 @@ class EmailAddressControllerSpec extends SpecBase with MockitoSugar {
 
   private def ua(email: Option[String]): UserAnswers =
     emptyUserAnswers
-      .set(
-        NewestVerificationBatchResponsePage,
-        response(email)
-      )
+      .set(NewestVerificationBatchResponsePage, response(email))
       .success
       .value
 
@@ -76,9 +76,7 @@ class EmailAddressControllerSpec extends SpecBase with MockitoSugar {
         val result  = route(app, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) must include(
-          messages(app)("verify.emailAddress.hint")
-        )
+        contentAsString(result) must include(messages(app)("verify.emailAddress.hint"))
       }
     }
 
@@ -90,9 +88,59 @@ class EmailAddressControllerSpec extends SpecBase with MockitoSugar {
         val result  = route(app, request).value
 
         status(result) mustEqual OK
+        contentAsString(result) must include(messages(app)("verify.emailAddress.hint.notStored"))
+      }
+    }
+
+    "must render a back link to ContractorEmailConfirmationNotStored when user came from NotStored journey" in {
+      val userAnswers =
+        ua(Some("stored@test.com"))
+          .set(ContractorEmailConfirmationNotStoredPage, true)
+          .success
+          .value
+
+      val app = applicationBuilder(userAnswers = Some(userAnswers)).build()
+
+      running(app) {
+        val request = FakeRequest(GET, routeUrl)
+        val result  = route(app, request).value
+
+        status(result) mustEqual OK
         contentAsString(result) must include(
-          messages(app)("verify.emailAddress.hint.notStored")
+          controllers.verify.routes.ContractorEmailConfirmationNotStoredController.onPageLoad(NormalMode).url
         )
+      }
+    }
+
+    "must render a back link to ContractorEmailConfirmationStored when user came from Stored journey (DifferentEmail)" in {
+      val userAnswers =
+        ua(Some("stored@test.com"))
+          .set(ContractorEmailConfirmationStoredPage, ContractorEmailConfirmationStored.DifferentEmail)
+          .success
+          .value
+
+      val app = applicationBuilder(userAnswers = Some(userAnswers)).build()
+
+      running(app) {
+        val request = FakeRequest(GET, routeUrl)
+        val result  = route(app, request).value
+
+        status(result) mustEqual OK
+        contentAsString(result) must include(
+          controllers.verify.routes.ContractorEmailConfirmationStoredController.onPageLoad(NormalMode).url
+        )
+      }
+    }
+
+    "must render a back link to JourneyRecovery when no page history exists" in {
+      val app = applicationBuilder(userAnswers = Some(ua(Some("stored@test.com")))).build()
+
+      running(app) {
+        val request = FakeRequest(GET, routeUrl)
+        val result  = route(app, request).value
+
+        status(result) mustEqual OK
+        contentAsString(result) must include(routes.JourneyRecoveryController.onPageLoad().url)
       }
     }
 
@@ -139,10 +187,7 @@ class EmailAddressControllerSpec extends SpecBase with MockitoSugar {
         val result  = route(app, request).value
 
         status(result) mustEqual OK
-
-        val html = contentAsString(result)
-
-        html must include("""value="stored@test.com"""")
+        contentAsString(result) must include("""value="stored@test.com"""")
       }
     }
 
