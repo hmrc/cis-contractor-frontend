@@ -49,12 +49,12 @@ class EmailAddressControllerSpec extends SpecBase with MockitoSugar {
   )
 
   private def response(email: Option[String]) = GetNewestVerificationBatchResponse(
-    scheme = Seq(scheme(email)),
+    scheme = Some(scheme(email)),
     subcontractors = Seq.empty,
-    verificationBatch = Seq.empty,
+    verificationBatch = None,
     verifications = Seq.empty,
-    submission = Seq.empty,
-    monthlyReturn = Seq.empty
+    submission = None,
+    monthlyReturn = None
   )
 
   private def ua(email: Option[String]): UserAnswers =

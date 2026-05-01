@@ -56,12 +56,12 @@ class ContractorEmailConfirmationStoredControllerSpec extends SpecBase with Mock
   )
 
   private val testResponse = GetNewestVerificationBatchResponse(
-    scheme = Seq(testScheme),
+    scheme = Some(testScheme),
     subcontractors = Seq.empty,
-    verificationBatch = Seq.empty,
+    verificationBatch = None,
     verifications = Seq.empty,
-    submission = Seq.empty,
-    monthlyReturn = Seq.empty
+    submission = None,
+    monthlyReturn = None
   )
 
   private def userAnswersWithEmail: UserAnswers =
@@ -108,7 +108,7 @@ class ContractorEmailConfirmationStoredControllerSpec extends SpecBase with Mock
 
     "must redirect to Journey Recovery for a GET when the email address is absent from the scheme" in {
 
-      val responseWithNoEmail = testResponse.copy(scheme = Seq(testScheme.copy(emailAddress = None)))
+      val responseWithNoEmail = testResponse.copy(scheme = Some(testScheme.copy(emailAddress = None)))
       val userAnswers         = emptyUserAnswers.set(NewestVerificationBatchResponsePage, responseWithNoEmail).success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
@@ -196,7 +196,7 @@ class ContractorEmailConfirmationStoredControllerSpec extends SpecBase with Mock
 
     "must redirect to Journey Recovery for a POST when the email address is absent from the scheme" in {
 
-      val responseWithNoEmail = testResponse.copy(scheme = Seq(testScheme.copy(emailAddress = None)))
+      val responseWithNoEmail = testResponse.copy(scheme = Some(testScheme.copy(emailAddress = None)))
       val userAnswers         = emptyUserAnswers.set(NewestVerificationBatchResponsePage, responseWithNoEmail).success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
