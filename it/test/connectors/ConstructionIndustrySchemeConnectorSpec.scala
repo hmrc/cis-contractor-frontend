@@ -276,11 +276,9 @@ class ConstructionIndustrySchemeConnectorSpec
           |      "subcontractorId": 1
           |    }
           |  ],
-          |  "verificationBatch": [
-          |    {
+          |  "verificationBatch": {
           |      "verificationBatchId": 99
-          |    }
-          |  ],
+          |    },
           |  "verifications": [
           |    {
           |      "verificationId": 1001
@@ -300,7 +298,7 @@ class ConstructionIndustrySchemeConnectorSpec
 
       val result = connector.getCurrentVerificationBatch(instanceId).futureValue
       result.subcontractors.map(_.subcontractorId) mustBe Seq(1L)
-      result.verificationBatch.map(_.verificationBatchId) mustBe Seq(99L)
+      result.verificationBatch.map(_.verificationBatchId) mustBe Some(99L)
       result.verifications.map(_.verificationId) mustBe Seq(1001L)
     }
 
