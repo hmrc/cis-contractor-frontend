@@ -20,13 +20,12 @@ import controllers.actions.*
 import forms.verify.EmailAddressFormProvider
 import models.Mode
 import navigation.Navigator
-import pages.verify.EmailAddressPage
+import pages.verify.{EmailAddressPage, NewestVerificationBatchResponsePage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.verify.EmailAddressView
-import pages.verification.NewestVerificationBatchResponsePage
 import models.UserAnswers
 
 import javax.inject.Inject

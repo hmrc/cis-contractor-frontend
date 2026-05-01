@@ -23,12 +23,11 @@ import navigation.Navigator
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.verification.NewestVerificationBatchResponsePage
 import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
 import models.response.GetNewestVerificationBatchResponse
-import pages.verify.EmailAddressPage
+import pages.verify.{EmailAddressPage, NewestVerificationBatchResponsePage}
 import play.api.test.Helpers.*
 import repositories.SessionRepository
 
