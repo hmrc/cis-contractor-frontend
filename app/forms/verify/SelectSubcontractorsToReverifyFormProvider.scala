@@ -19,16 +19,30 @@ package forms.verify
 import forms.mappings.Mappings
 import play.api.data.Form
 import play.api.data.Forms.set
+import play.api.data.validation.Constraint
 
 import javax.inject.Inject
 
 class SelectSubcontractorsToReverifyFormProvider @Inject() extends Mappings {
 
-  private val requiredKey = "verify.selectSubcontractorsToReverify.error.required"
-
-  def apply(): Form[Set[String]] =
+  def apply(
+    requireSelection: Boolean
+  ): Form[Set[String]] =
     Form(
-      "value" -> set(text(requiredKey))
-        .verifying(requiredKey, _.nonEmpty)
+      "value" -> set(text())
+        .verifying(requiredIf(requireSelection))
     )
+
+  private def requiredIf(
+    condition: Boolean
+  ): Constraint[Set[String]] =
+    Constraint { values =>
+      if (!condition || values.nonEmpty) {
+        play.api.data.validation.Valid
+      } else {
+        play.api.data.validation.Invalid(
+          "verify.selectSubcontractorsToReverify.error.required"
+        )
+      }
+    }
 }

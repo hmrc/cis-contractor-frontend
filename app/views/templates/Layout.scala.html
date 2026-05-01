@@ -48,7 +48,11 @@
 
 @head = {
 
-  @if(timeout) {
+
+    <link rel="stylesheet"
+    href="@controllers.routes.Assets.versioned("stylesheets/moj-frontend.min.css")">
+
+@if(timeout) {
     @hmrcTimeoutDialog(
       TimeoutDialog(
         timeout             = Some(appConfig.timeout),

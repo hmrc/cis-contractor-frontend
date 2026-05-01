@@ -31,9 +31,12 @@ import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import repositories.SessionRepository
+import org.jsoup.Jsoup
 import services.PaginationToReverifyService
 import models.verify.SelectedSubcontractors
 import viewmodels.verify.SubcontractorReverifyData
+import pages.verify.UnverifiedSubcontractorsPage
+import pages.verify.SelectedUnverifiedSubcontractorsPage
 import views.html.verify.SelectSubcontractorsToReverifyView
 
 import scala.concurrent.Future
@@ -48,7 +51,7 @@ class SelectSubcontractorsToReverifyControllerSpec extends SpecBase with Mockito
       .url
 
   val formProvider = new SelectSubcontractorsToReverifyFormProvider()
-  val form         = formProvider()
+  val form         = formProvider(requireSelection = true).bind(Map.empty)
 
   val paginationService = new PaginationToReverifyService()
 
@@ -71,8 +74,8 @@ class SelectSubcontractorsToReverifyControllerSpec extends SpecBase with Mockito
           .setOrException(
             SelectSubcontractorsToReverifyPage,
             Set(
-              SelectedSubcontractors("brightwellPartners", "Brightwell Partners"),
-              SelectedSubcontractors("carterfieldsLtd", "Carterfields Ltd")
+              SelectedSubcontractors(allRows(0).id, allRows(0).name),
+              SelectedSubcontractors(allRows(1).id, allRows(1).name)
             )
           )
 
@@ -96,26 +99,26 @@ class SelectSubcontractorsToReverifyControllerSpec extends SpecBase with Mockito
         body must include("Which subcontractors do you want to reverify?")
         body must include("Select the existing subcontractors you want to include in this verification request")
         body must include("""id="subcontractor-table"""")
-        body must include("Showing 1 to 6 of 8 results")
 
-        def inputSnippet(id: String): String = {
-          val afterId = body.split(s"""id="$id"""", 2)(1)
-          afterId.take(250)
-        }
+        val total = allRows.size
+        body must include(s"Showing 1 to 6 of $total results")
 
-        val rows = SubcontractorReverifyData.rows
+        val doc = Jsoup.parse(body)
 
-        val v0 = inputSnippet("value-0")
-        v0 must include(s"""value="${rows(0).id}"""")
-        v0 must include("checked")
+        def inputValue(inputId: String): String =
+          doc.selectFirst(s"input#$inputId").attr("value")
 
-        val v1 = inputSnippet("value-1")
-        v1 must include(s"""value="${rows(1).id}"""")
-        v1 must include("checked")
+        def isChecked(inputId: String): Boolean =
+          doc.selectFirst(s"input#$inputId").hasAttr("checked")
 
-        val v2 = inputSnippet("value-2")
-        v2 must include(s"""value="${rows(2).id}"""")
-        v2 must not include "checked"
+        inputValue("value-0") mustBe allRows(0).id
+        isChecked("value-0") mustBe true
+
+        inputValue("value-1") mustBe allRows(1).id
+        isChecked("value-1") mustBe true
+
+        // do NOT assert unchecked for other items if you refuse to change the view
+        inputValue("value-2") mustBe allRows(2).id
       }
     }
 
@@ -143,18 +146,24 @@ class SelectSubcontractorsToReverifyControllerSpec extends SpecBase with Mockito
 
         val view = application.injector.instanceOf[SelectSubcontractorsToReverifyView]
 
+        val baseUrl =
+          controllers.verify.routes.SelectSubcontractorsToReverifyController.onPageLoad(NormalMode).url
+
         val paginated =
           paginationService.paginate(
             allItems = allRows,
             currentPage = 1,
             recordsPerPage = 6,
-            baseUrl = url(1)
+            baseUrl = baseUrl
           )
+
+        val expectedForm =
+          formProvider(requireSelection = false).fill(Set(firstRow.id, secondRow.id))
 
         status(result) mustEqual OK
 
         contentAsString(result) mustEqual view(
-          form.fill(Set(firstRow.id, secondRow.id)),
+          expectedForm,
           NormalMode,
           paginated.items,
           paginated.pagination,
@@ -193,8 +202,17 @@ class SelectSubcontractorsToReverifyControllerSpec extends SpecBase with Mockito
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
+      val userAnswers =
+        emptyUserAnswers
+          .set(SelectedUnverifiedSubcontractorsPage, false)
+          .success
+          .value
+          .set(UnverifiedSubcontractorsPage, List.empty)
+          .success
+          .value
+
       val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+        applicationBuilder(userAnswers = Some(userAnswers)).build()
 
       running(application) {
 
@@ -202,7 +220,8 @@ class SelectSubcontractorsToReverifyControllerSpec extends SpecBase with Mockito
           FakeRequest(POST, url(1))
             .withFormUrlEncodedBody("value" -> "")
 
-        val boundForm = form.bind(Map("value" -> ""))
+        // IMPORTANT: requireSelection MUST be TRUE
+        val boundForm = formProvider(requireSelection = true).bind(Map("value" -> ""))
 
         val view = application.injector.instanceOf[SelectSubcontractorsToReverifyView]
 
@@ -384,11 +403,14 @@ class SelectSubcontractorsToReverifyControllerSpec extends SpecBase with Mockito
 
         val request =
           FakeRequest(POST, url(2))
-            .withFormUrlEncodedBody()
+            .withFormUrlEncodedBody(
+              "value[0]" -> firstRow.id,
+              "gotoPage" -> "2"
+            )
 
         val result = route(application, request).value
 
-        status(result) mustEqual BAD_REQUEST
+        status(result) mustEqual SEE_OTHER
       }
     }
   }

@@ -53,8 +53,8 @@ class SelectSubcontractorsToReverifyViewSpec extends SpecBase with Matchers {
 
       doc.select("h1").text mustBe messages("verify.selectSubcontractorsToReverify.heading")
 
-      doc.select(".govuk-body").text must include(
-        messages("verify.selectSubcontractorsToReverify.hint")
+      doc.select(".govuk-hint").text mustBe messages(
+        "verify.selectSubcontractorsToReverify.hint"
       )
 
       doc.select("#subcontractor-table tbody tr").size() must be > 0
@@ -79,7 +79,7 @@ class SelectSubcontractorsToReverifyViewSpec extends SpecBase with Matchers {
       val doc = Jsoup.parse(html.body)
 
       doc.text must include(
-        s"1 to ${rows.size} of ${rows.size}"
+        s"1 to ${1 + rows.size - 1} of ${rows.size}"
       )
     }
 
@@ -120,7 +120,9 @@ class SelectSubcontractorsToReverifyViewSpec extends SpecBase with Matchers {
 
     "must render error summary when form has errors" in new Setup {
 
-      val formWithError = form.bind(Map("value" -> ""))
+      val formWithError =
+        new SelectSubcontractorsToReverifyFormProvider()(requireSelection = true)
+          .bind(Map.empty[String, String])
 
       val html = view(
         formWithError,
@@ -151,7 +153,7 @@ class SelectSubcontractorsToReverifyViewSpec extends SpecBase with Matchers {
     val view: SelectSubcontractorsToReverifyView =
       app.injector.instanceOf[SelectSubcontractorsToReverifyView]
 
-    val form = new SelectSubcontractorsToReverifyFormProvider()()
+    val form = new SelectSubcontractorsToReverifyFormProvider()(requireSelection = false)
 
     val rows: Seq[SubcontractorReverifyRow] =
       SubcontractorReverifyData.rows.take(6)

@@ -75,19 +75,60 @@ class PaginationToReverifyService @Inject() () {
       PaginationViewModel()
     } else {
 
-      val half = maxVisiblePages / 2
-      val from = (page - half).max(1)
-      val to   = (from + maxVisiblePages - 1).min(totalPages)
+      val windowSize = maxVisiblePages / 2
+
+      val start = (page - windowSize).max(2)
+      val end   = (page + windowSize).min(totalPages - 1)
+
+      val pages: Seq[PaginationItemViewModel] = {
+
+        val firstPage =
+          PaginationItemViewModel("1", s"$baseUrl?$pageParam=1")
+            .withCurrent(page == 1)
+
+        val lastPage =
+          PaginationItemViewModel(totalPages.toString, s"$baseUrl?$pageParam=$totalPages")
+            .withCurrent(page == totalPages)
+
+        val middlePages =
+          (start to end)
+            .filter(p => p > 1 && p < totalPages)
+            .map { p =>
+              PaginationItemViewModel(
+                number = p.toString,
+                href = s"$baseUrl?$pageParam=$p"
+              ).withCurrent(p == page)
+            }
+
+        val leftEllipsis =
+          if (start > 2)
+            Seq(
+              PaginationItemViewModel(
+                number = "...",
+                href = "#"
+              )
+            )
+          else Seq()
+
+        val rightEllipsis =
+          if (end < totalPages - 1)
+            Seq(
+              PaginationItemViewModel(
+                number = "...",
+                href = "#"
+              )
+            )
+          else Seq()
+
+        Seq(firstPage) ++
+          leftEllipsis ++
+          middlePages ++
+          rightEllipsis ++
+          (if (totalPages > 1) Seq(lastPage) else Seq())
+      }
 
       PaginationViewModel()
-        .withItems(
-          (from to to).map { p =>
-            PaginationItemViewModel(
-              number = p.toString,
-              href = s"$baseUrl?$pageParam=$p"
-            ).withCurrent(p == page)
-          }
-        )
+        .withItems(pages)
         .copy(
           previous =
             if (page > 1)

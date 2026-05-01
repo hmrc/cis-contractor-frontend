@@ -839,6 +839,7 @@ verify.selectSubcontractorsToReverify.hint                         = Select the 
 verify.selectSubcontractorsToReverify.checkYourAnswersLabel        = Which subcontractors do you want to reverify?
 verify.selectSubcontractorsToReverify.error.required               = Select at least one subcontractor to verify
 verify.selectSubcontractorsToReverify.change.hidden                = select subcontractors to reverify
+verify.selectSubcontractorsToReverify.showingResults               =  Showing {0} to {1} of {2} results
 
 
 verify.selectSubcontractorsToReverify.include                      = Include
