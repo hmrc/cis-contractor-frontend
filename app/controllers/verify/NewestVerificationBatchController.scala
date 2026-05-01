@@ -17,6 +17,9 @@
 package controllers.verify
 
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
+import models.NormalMode
+import pages.verify.NewestVerificationBatchResponsePage
+import pages.verify.UnverifiedSubcontractorsPage
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -42,11 +45,30 @@ class NewestVerificationBatchController @Inject() (
     (identify andThen getData andThen requireData).async { implicit request =>
       verificationBatchService
         .refreshNewestVerificationBatch(request.userAnswers)
-        .map { _ =>
-          Ok("newest verification batch saved to session")
+        .map { updatedAnswers =>
+
+          val batch      = updatedAnswers.get(NewestVerificationBatchResponsePage)
+          val unverified = updatedAnswers.get(UnverifiedSubcontractorsPage).getOrElse(Seq.empty)
+
+          batch match {
+            case Some(response) if response.subcontractors.isEmpty =>
+              Redirect(controllers.verify.routes.NoSubcontractorsAddedController.onPageLoad())
+
+            case Some(response) if response.subcontractors.nonEmpty && unverified.isEmpty =>
+              Redirect(controllers.verify.routes.VerifyYourSubcontractorsYesNoController.onPageLoad)
+
+            case Some(_) =>
+              Redirect(controllers.verify.routes.SelectSubcontractorController.onPageLoad(NormalMode))
+
+            case None =>
+              Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+          }
         }
         .recover { case t =>
-          logger.error("[NewestVerificationBatchController.onPageLoad] Failed to refresh newest verification batch", t)
+          logger.error(
+            "[NewestVerificationBatchController.onPageLoad] Failed to refresh newest verification batch",
+            t
+          )
           Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
         }
     }

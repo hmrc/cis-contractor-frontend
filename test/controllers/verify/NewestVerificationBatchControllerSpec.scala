@@ -18,30 +18,62 @@ package controllers.verify
 
 import base.SpecBase
 import controllers.routes
-import models.UserAnswers
-import org.mockito.ArgumentCaptor
+import models.response.GetNewestVerificationBatchResponse
+import models.{NormalMode, Subcontractor, UserAnswers}
+import generators.ModelGenerators
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{never, verify, verifyNoMoreInteractions, when}
 import org.scalatestplus.mockito.MockitoSugar
+import pages.verify.NewestVerificationBatchResponsePage
+import pages.verify.UnverifiedSubcontractorsPage
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import services.VerificationService
 import uk.gov.hmrc.http.HeaderCarrier
 
+import java.time.LocalDateTime
 import scala.concurrent.Future
 
-class NewestVerificationBatchControllerSpec extends SpecBase with MockitoSugar {
+class NewestVerificationBatchControllerSpec extends SpecBase with MockitoSugar with ModelGenerators {
 
   private val endpointUrl = "/verify/newest"
 
+  private val verifiedSubcontractor: Subcontractor =
+    arbitrarySubcontractor.arbitrary.sample.value.copy(
+      subcontractorId = 1L,
+      verified = Some("Y")
+    )
+
+  private val unverifiedSubcontractor: Subcontractor =
+    arbitrarySubcontractor.arbitrary.sample.value.copy(
+      subcontractorId = 2L,
+      verified = Some("N")
+    )
+
+  private def newestBatchResponse(subcontractors: Seq[Subcontractor]) =
+    GetNewestVerificationBatchResponse(
+      scheme = None,
+      subcontractors = subcontractors,
+      verificationBatch = None,
+      verifications = Seq.empty,
+      submission = None,
+      monthlyReturn = None
+    )
+
   "NewestVerificationBatchController" - {
 
-    "must return OK with confirmation message when refreshNewestVerificationBatch succeeds" in {
+    "must redirect to NoSubcontractorsAdded when no subcontractors exist" in {
       val mockService = mock[VerificationService]
 
+      val updatedAnswers =
+        emptyUserAnswers
+          .set(NewestVerificationBatchResponsePage, newestBatchResponse(Seq.empty))
+          .success
+          .value
+
       when(mockService.refreshNewestVerificationBatch(any[UserAnswers])(any[HeaderCarrier]))
-        .thenReturn(Future.successful(emptyUserAnswers))
+        .thenReturn(Future.successful(updatedAnswers))
 
       val application =
         applicationBuilder(userAnswers = Some(emptyUserAnswers))
@@ -49,18 +81,83 @@ class NewestVerificationBatchControllerSpec extends SpecBase with MockitoSugar {
           .build()
 
       running(application) {
-        val request = FakeRequest(GET, endpointUrl)
-        val result  = route(application, request).value
+        val result = route(application, FakeRequest(GET, endpointUrl)).value
 
-        status(result) mustEqual OK
-        contentAsString(result) mustBe "newest verification batch saved to session"
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result).value mustBe
+          controllers.verify.routes.NoSubcontractorsAddedController.onPageLoad().url
 
-        val uaCaptor = ArgumentCaptor.forClass(classOf[UserAnswers])
-        verify(mockService).refreshNewestVerificationBatch(uaCaptor.capture())(any[HeaderCarrier])
+        verify(mockService).refreshNewestVerificationBatch(any[UserAnswers])(any[HeaderCarrier])
+        verifyNoMoreInteractions(mockService)
+      }
+    }
 
-        uaCaptor.getValue.id mustBe emptyUserAnswers.id
-        uaCaptor.getValue.data mustBe emptyUserAnswers.data
+    "must redirect to VerifyYourSubcontractorsYesNo when all subcontractors are verified" in {
+      val mockService = mock[VerificationService]
 
+      val updatedAnswers =
+        emptyUserAnswers
+          .set(
+            NewestVerificationBatchResponsePage,
+            newestBatchResponse(Seq(verifiedSubcontractor))
+          )
+          .flatMap(_.set(UnverifiedSubcontractorsPage, Seq.empty))
+          .success
+          .value
+
+      when(mockService.refreshNewestVerificationBatch(any[UserAnswers])(any[HeaderCarrier]))
+        .thenReturn(Future.successful(updatedAnswers))
+
+      val application =
+        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          .overrides(bind[VerificationService].toInstance(mockService))
+          .build()
+
+      running(application) {
+        val result = route(application, FakeRequest(GET, endpointUrl)).value
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result).value mustBe
+          controllers.verify.routes.VerifyYourSubcontractorsYesNoController.onPageLoad.url
+
+        verify(mockService).refreshNewestVerificationBatch(any[UserAnswers])(any[HeaderCarrier])
+        verifyNoMoreInteractions(mockService)
+      }
+    }
+
+    "must redirect to SelectSubcontractor when unverified subcontractors exist" in {
+      val mockService = mock[VerificationService]
+
+      val unverified = unverifiedSubcontractor
+
+      val updatedAnswers =
+        emptyUserAnswers
+          .set(
+            NewestVerificationBatchResponsePage,
+            newestBatchResponse(Seq(unverified))
+          )
+          .flatMap(_.set(UnverifiedSubcontractorsPage, Seq(unverified)))
+          .success
+          .value
+
+      when(mockService.refreshNewestVerificationBatch(any[UserAnswers])(any[HeaderCarrier]))
+        .thenReturn(Future.successful(updatedAnswers))
+
+      val application =
+        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          .overrides(bind[VerificationService].toInstance(mockService))
+          .build()
+
+      running(application) {
+        val result = route(application, FakeRequest(GET, endpointUrl)).value
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result).value mustBe
+          controllers.verify.routes.SelectSubcontractorController
+            .onPageLoad(NormalMode)
+            .url
+
+        verify(mockService).refreshNewestVerificationBatch(any[UserAnswers])(any[HeaderCarrier])
         verifyNoMoreInteractions(mockService)
       }
     }
