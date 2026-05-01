@@ -28,7 +28,7 @@ import play.api.mvc.Request
 import play.api.test.FakeRequest
 import views.html.verify.ReverifyExistingSubcontractorsYesNoView
 
-class ReverifyExistingSubcontractorsViewYesNoSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite {
+class ReverifyExistingSubcontractorsYesNoViewSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite {
 
   "ReverifyExistingSubcontractorsYesNoView" should {
 
