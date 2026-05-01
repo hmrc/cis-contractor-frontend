@@ -20,12 +20,25 @@ import models.{SubcontractorViewModel, *}
 import models.contact.ContactOptions
 import models.add.{InternationalAddress, TypeOfSubcontractor}
 import models.verify.ContractorEmailConfirmationStored
+import models.verify.SelectedSubcontractors
 import org.scalacheck.{Arbitrary, Gen}
 import play.api.libs.json.Json
 
 import java.time.{Instant, LocalDateTime, ZoneOffset}
 
 trait ModelGenerators {
+
+  implicit lazy val arbitrarySelectSubcontractorsToReverify: Arbitrary[Set[SelectedSubcontractors]] =
+    Arbitrary {
+      Gen
+        .listOf(
+          for {
+            id   <- Gen.alphaStr.suchThat(_.nonEmpty)
+            name <- Gen.alphaStr.suchThat(_.nonEmpty)
+          } yield SelectedSubcontractors(id, name)
+        )
+        .map(_.toSet)
+    }
 
   implicit lazy val arbitrarySubcontractorViewModel: Arbitrary[SubcontractorViewModel] =
     Arbitrary {

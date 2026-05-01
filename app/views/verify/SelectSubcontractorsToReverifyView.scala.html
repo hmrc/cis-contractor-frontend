@@ -1,0 +1,145 @@
+@*
+ * Copyright 2026 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import viewmodels.LegendSize.Large
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.table._
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.content._
+@import viewmodels.verify.SubcontractorReverifyRow
+@import viewmodels.govuk.PaginationFluency._
+@import views.html.components._
+
+@this(
+    layout: templates.Layout,
+    formHelper: FormWithCSRF,
+    govukErrorSummary: GovukErrorSummary,
+    govukCheckboxes: GovukCheckboxes,
+    govukTable: GovukTable,
+    govukButton: GovukButton,
+    pageNavigator: components.PageNavigator
+)
+
+@(form: Form[Set[String]], mode: Mode, rows: Seq[SubcontractorReverifyRow], paginationViewModel: PaginationViewModel, page: Int, startIndex: Int, totalCount: Int)(implicit request: Request[_], messages: Messages)
+
+@css = {
+    <link href='@controllers.routes.Assets.versioned("stylesheets/moj-frontend.min.css")' media="all" rel="stylesheet" type="text/css" />
+}
+
+@layout(pageTitle = title(form, messages("verify.selectSubcontractorsToReverify.title"))) {
+
+    @formHelper(
+        action = controllers.verify.routes.SelectSubcontractorsToReverifyController.onSubmit(mode, page),
+        Symbol("autoComplete") -> "off"
+    ) {
+
+        @if(form.errors.nonEmpty) {
+            @govukErrorSummary(
+                ErrorSummaryViewModel(form, errorLinkOverrides = Map("value" -> "value-0"))
+            )
+        }
+
+        <fieldset class="govuk-fieldset">
+
+            <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
+                <h1 class="govuk-fieldset__heading">
+                @messages("verify.selectSubcontractorsToReverify.heading")
+                </h1>
+            </legend>
+
+            <div class="govuk-hint">
+            @messages("verify.selectSubcontractorsToReverify.hint")
+            </div>
+
+        @if(paginationViewModel.items.nonEmpty) {
+            <p class="govuk-body govuk-!-margin-bottom-4 govuk-!-margin-top-5">
+            @messages("verify.selectSubcontractorsToReverify.showingResults", startIndex, startIndex + rows.size - 1, totalCount)
+            </p>
+        }
+
+        @defining(
+            form.value.getOrElse(Set.empty[String])
+        ) { selected =>
+
+            <div class="govuk-table__container">
+            @govukTable(
+                Table(
+                    caption = None,
+
+                    head = Some(Seq(
+                        HeadCell(Text(messages("verify.selectSubcontractorsToReverify.include"))),
+                        HeadCell(Text(messages("verify.selectSubcontractorsToReverify.name"))),
+                        HeadCell(Text(messages("verify.selectSubcontractorsToReverify.utr"))),
+                        HeadCell(Text(messages("verify.selectSubcontractorsToReverify.verified"))),
+                        HeadCell(Text(messages("verify.selectSubcontractorsToReverify.verificationNumber"))),
+                        HeadCell(Text(messages("verify.selectSubcontractorsToReverify.taxTreatment"))),
+                        HeadCell(Text(messages("verify.selectSubcontractorsToReverify.dateAdded")))
+                    )),
+
+                    rows = rows.zipWithIndex.map { case (row, idx) =>
+                        val checkboxId = s"value-$idx"
+                        val value = row.id
+                        val isChecked = selected.contains(row.id)
+
+                        Seq(
+
+                            TableRow(
+                                content = HtmlContent(
+                                    s"""
+                        <div class="govuk-checkboxes govuk-checkboxes--small">
+                          <div class="govuk-checkboxes__item">
+                            <input class="govuk-checkboxes__input"
+                                   id="$checkboxId"
+                                   name="value[]"
+                                   type="checkbox"
+                                   value="${row.id}"
+                                   ${if (isChecked) "checked" else ""} />
+                            <label class="govuk-label govuk-checkboxes__label"
+                                   for="$checkboxId">
+                              <span class="govuk-visually-hidden">
+                                Select ${row.name}
+                              </span>
+                            </label>
+                          </div>
+                        </div>
+                        """
+                                )
+                            ),
+
+                            TableRow(Text(row.name)),
+                            TableRow(Text(row.utr)),
+                            TableRow(Text(row.verified)),
+                            TableRow(Text(row.verificationNumber)),
+                            TableRow(Text(row.taxTreatment)),
+                            TableRow(Text(row.dateAdded))
+                        )
+                    },
+
+                    attributes = Map(
+                        "id" -> "subcontractor-table",
+                        "class" -> "govuk-table govuk-table--small-text-until-tablet"
+                    )
+                )
+            )
+
+            @pageNavigator(paginationViewModel, page)
+
+            @govukButton(
+                ButtonViewModel(messages("site.continue"))
+            )
+        }
+    }
+}
+</div>
+</fieldset>

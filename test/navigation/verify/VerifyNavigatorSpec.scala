@@ -102,6 +102,13 @@ class VerifyNavigatorSpec extends SpecBase {
         navigator.nextPage(ContractorEmailConfirmationStoredPage, NormalMode, emptyUserAnswers) mustBe journeyRecovery
       }
 
+      "must go from SelectSubcontractorsToReverifyPage to ContractorEmailConfirmationStoredController in NormalMode" in {
+
+        val result = navigator.nextPage(SelectSubcontractorsToReverifyPage, NormalMode, emptyUserAnswers)
+
+        result mustBe controllers.verify.routes.ContractorEmailConfirmationStoredController.onPageLoad(NormalMode)
+      }
+
       "must go from EmailAddressPage to next page" in {
         val ua = emptyUserAnswers.set(EmailAddressPage, "test@test.com").success.value
         navigator.nextPage(EmailAddressPage, NormalMode, ua) mustBe
@@ -177,6 +184,13 @@ class VerifyNavigatorSpec extends SpecBase {
 
       "must go from ContractorEmailConfirmationStoredPage to JourneyRecovery when answer is not present" in {
         navigator.nextPage(ContractorEmailConfirmationStoredPage, CheckMode, emptyUserAnswers) mustBe journeyRecovery
+      }
+
+      "must go from SelectSubcontractorsToReverifyPage to ContractorEmailConfirmationStoredController in CheckMode" in {
+
+        val result = navigator.nextPage(SelectSubcontractorsToReverifyPage, CheckMode, emptyUserAnswers)
+
+        result mustBe controllers.verify.routes.ContractorEmailConfirmationStoredController.onPageLoad(CheckMode)
       }
 
       "must go from EmailAddressPage to EmailAddressPage in CheckMode" in {

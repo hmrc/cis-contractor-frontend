@@ -42,6 +42,19 @@
   }
 }
 
+#subcontractor-table th,
+#subcontractor-table td {
+  white-space: nowrap;
+  padding-right: 25px;
+  vertical-align: middle;
+}
+
+#subcontractor-table th:first-child,
+#subcontractor-table td:first-child {
+  width: 40px;
+  padding-right: 10px;
+}
+
 .js-visible {
   display: none !important;
 }
