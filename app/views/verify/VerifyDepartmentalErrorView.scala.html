@@ -18,7 +18,6 @@
 
 @this(
         layout: templates.Layout,
-        govukButton: GovukButton,
         header: H1,
         paragraph: Paragraph,
         link: Link
@@ -26,7 +25,10 @@
 
 @(manageSubcontractorsUrl: String)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = titleNoForm(messages("verify.verifyDepartmentalError.title"))) {
+@layout(
+    pageTitle = titleNoForm(messages("verify.verifyDepartmentalError.title")),
+    showBackLink = false
+) {
 
     @header(messages("verify.verifyDepartmentalError.heading"), classes = "govuk-heading-xl")
 
