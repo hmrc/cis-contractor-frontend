@@ -95,6 +95,12 @@ trait ModelGenerators {
         verificationDate       <- Gen.option(genLocalDateTime)
         lastMonthlyReturnDate  <- Gen.option(genLocalDateTime)
         createDate             <- Gen.option(genLocalDateTime)
+        subcontractorType      <- Gen.option(Gen.alphaStr.suchThat(_.nonEmpty))
+        subbieResourceRef      <- Gen.option(Gen.posNum[Long])
+        utr                    <- Gen.option(Gen.alphaStr.suchThat(_.nonEmpty))
+        partnerUtr             <- Gen.option(Gen.alphaStr.suchThat(_.nonEmpty))
+        crn                    <- Gen.option(Gen.alphaStr.suchThat(_.nonEmpty))
+        nino                   <- Gen.option(Gen.alphaStr.suchThat(_.nonEmpty))
       } yield Subcontractor(
         subcontractorId = subcontractorId,
         firstName = firstName,
@@ -107,7 +113,13 @@ trait ModelGenerators {
         taxTreatment = taxTreatment,
         verificationDate = verificationDate,
         lastMonthlyReturnDate = lastMonthlyReturnDate,
-        createDate = createDate
+        createDate = createDate,
+        subcontractorType = subcontractorType,
+        subbieResourceRef = subbieResourceRef,
+        utr = utr,
+        partnerUtr = partnerUtr,
+        crn = crn,
+        nino = nino
       )
     }
   private val genLocalDateTime: Gen[LocalDateTime]                   =

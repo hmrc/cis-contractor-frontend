@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package controllers.verification
+package controllers.verify
 
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
 import play.api.Logging

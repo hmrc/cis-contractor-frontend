@@ -26,8 +26,7 @@ import org.mockito.Mockito.{never, verify, verifyNoMoreInteractions, when}
 import org.scalatest.RecoverMethods.recoverToExceptionIf
 import org.scalatestplus.mockito.MockitoSugar
 import pages.QuestionPage
-import pages.verification.NewestVerificationBatchResponsePage
-import pages.verify.{CurrentVerificationBatchResponsePage, UnverifiedSubcontractorsPage}
+import pages.verify.{CurrentVerificationBatchResponsePage, NewestVerificationBatchResponsePage, UnverifiedSubcontractorsPage}
 import play.api.libs.json.{JsPath, Writes}
 import queries.CisIdQuery
 import repositories.SessionRepository
@@ -62,16 +61,16 @@ final class VerificationServiceSpec extends SpecBase with MockitoSugar with Mode
 
   private val responseWithSubcontractors =
     GetNewestVerificationBatchResponse(
-      scheme = Nil,
+      scheme = None,
       subcontractors = Seq(
         verifiedSubcontractor,
         unverifiedSub1,
         unverifiedSub2
       ),
-      verificationBatch = Nil,
+      verificationBatch = None,
       verifications = Nil,
-      submission = Nil,
-      monthlyReturn = Nil
+      submission = None,
+      monthlyReturn = None
     )
 
   "VerificationService.refreshNewestVerificationBatch" - {
@@ -198,7 +197,7 @@ final class VerificationServiceSpec extends SpecBase with MockitoSugar with Mode
     val response =
       GetCurrentVerificationBatchResponse(
         subcontractors = Nil,
-        verificationBatch = Nil,
+        verificationBatch = None,
         verifications = Nil
       )
 
