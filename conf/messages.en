@@ -863,6 +863,14 @@ verify.reverifyExistingSubcontractorsYesNo.error.required               =  Selec
 verify.reverifyExistingSubcontractorsYesNo.checkYourAnswersLabel        =  Do you want to add other subcontractors to this verification request?
 verify.reverifyExistingSubcontractorsYesNo.change.hidden                =  do you want to add other subcontractors to this verification request?
 
+verify.verifyDepartmentalError.title                               =  There was a problem with your verification request
+verify.verifyDepartmentalError.heading                             =  There was a problem with your verification request
+verify.verifyDepartmentalError.p1                                  =  The subcontractors that you selected have not been verified and your request has not been saved.
+verify.verifyDepartmentalError.contactHMRC.p1                      =  for more help.
+verify.verifyDepartmentalError.contactHMRC.p1.link                 =  Contact HMRC by phone
+verify.verifyDepartmentalError.manageSubcontractors.p1             =  Back to
+verify.verifyDepartmentalError.manageSubcontractors.p1.link        =  Manage your subcontractors
+
 verify.verificationRequestSubmitted.title                               =  Verification request submitted
 verify.verificationRequestSubmitted.heading                             =  Verification request submitted
 verify.verificationRequestSubmitted.reference                           =  Your verification reference number
