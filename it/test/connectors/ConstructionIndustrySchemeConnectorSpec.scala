@@ -20,6 +20,8 @@ import com.github.tomakehurst.wiremock.client.WireMock.{aResponse, get, post, st
 import itutil.ApplicationWithWiremock
 import models.add.TypeOfSubcontractor.Individualorsoletrader
 import models.requests.CreateAndUpdateSubcontractorPayload
+import models.requests.CreateVerificationBatchAndVerificationsRequest
+import models.response.CreateVerificationBatchAndVerificationsResponse
 import models.requests.CreateAndUpdateSubcontractorPayload.IndividualOrSoleTraderPayload
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.matchers.must.Matchers
@@ -316,4 +318,57 @@ class ConstructionIndustrySchemeConnectorSpec
       ex.getMessage must include("returned 500")
     }
   }
+
+  "createVerificationBatchAndVerifications" should {
+
+    "successfully create verification batch and verifications when BE returns 200" in {
+      val instanceId = "inst-123"
+
+      val requestModel =
+        CreateVerificationBatchAndVerificationsRequest(
+          instanceId = instanceId,
+          verificationResourceReferences = Seq(111L, 222L, 333L),
+          actionIndicator = Some("A")
+        )
+
+      val responseJson =
+        """
+          |{
+          |  "verificationBatchResourceReference": 666
+          |}
+          |""".stripMargin
+
+      stubFor(
+        post(urlPathEqualTo("/cis/verification-batch/create"))
+          .willReturn(
+            aResponse()
+              .withStatus(OK)
+              .withHeader("Content-Type", "application/json")
+              .withBody(responseJson)
+          )
+      )
+
+      val result = connector.createVerificationBatchAndVerifications(requestModel).futureValue
+
+      result mustBe CreateVerificationBatchAndVerificationsResponse(verificationBatchResourceReference = 666)
+    }
+
+    "propagate upstream error on non-2xx (e.g. 500)" in {
+      val requestModel =
+        CreateVerificationBatchAndVerificationsRequest(
+          instanceId = "inst-123",
+          verificationResourceReferences = Seq(111L),
+          actionIndicator = None
+        )
+
+      stubFor(
+        post(urlPathEqualTo("/cis/verification-batch/create"))
+          .willReturn(aResponse().withStatus(INTERNAL_SERVER_ERROR).withBody("boom"))
+      )
+
+      val ex = connector.createVerificationBatchAndVerifications(requestModel).failed.futureValue
+      ex.getMessage must include("returned 500")
+    }
+  }
+
 }

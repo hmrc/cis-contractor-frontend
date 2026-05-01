@@ -18,8 +18,9 @@ package services
 
 import connectors.ConstructionIndustrySchemeConnector
 import models.{Subcontractor, UserAnswers}
-import pages.verification.NewestVerificationBatchResponsePage
 import pages.verify.{CurrentVerificationBatchResponsePage, UnverifiedSubcontractorsPage}
+import models.requests.CreateVerificationBatchAndVerificationsRequest
+import pages.verification.NewestVerificationBatchResponsePage
 import queries.CisIdQuery
 import repositories.SessionRepository
 import uk.gov.hmrc.http.HeaderCarrier
@@ -63,6 +64,56 @@ class VerificationService @Inject() (
       updated  <- Future.fromTry(userAnswers.set(CurrentVerificationBatchResponsePage, response))
       _        <- sessionRepository.set(updated)
     } yield updated
+
+  def createVerificationBatchAndVerifications(
+    userAnswers: UserAnswers,
+    selectedSubcontractorIds: Seq[Long],
+    actionIndicator: Option[String] = None
+  )(implicit hc: HeaderCarrier): Future[UserAnswers] =
+    for {
+      instanceId <- userAnswers
+                      .get(CisIdQuery)
+                      .map(Future.successful)
+                      .getOrElse(Future.failed(new RuntimeException("InstanceIdQuery not found in session data")))
+
+      _ <- if (selectedSubcontractorIds.nonEmpty) Future.successful(())
+           else Future.failed(new RuntimeException("No subcontractors selected"))
+
+      current <-
+        userAnswers
+          .get(CurrentVerificationBatchResponsePage)
+          .map(Future.successful)
+          .getOrElse(
+            Future.failed(new RuntimeException("CurrentVerificationBatchResponsePage not found in session data"))
+          )
+
+      idToRef = current.subcontractors.flatMap(s => s.subbieResourceRef.map(ref => s.subcontractorId -> ref)).toMap
+
+      verificationResourceRefs <- Future.fromTry {
+                                    scala.util.Try {
+                                      selectedSubcontractorIds.distinct.map { id =>
+                                        idToRef.getOrElse(
+                                          id,
+                                          throw new RuntimeException(
+                                            s"Missing subbieResourceRef for subcontractorId=$id in current verification batch"
+                                          )
+                                        )
+                                      }
+                                    }
+                                  }
+
+      _ <- cisConnector.createVerificationBatchAndVerifications(
+             CreateVerificationBatchAndVerificationsRequest(
+               instanceId = instanceId,
+               verificationResourceReferences = verificationResourceRefs,
+               actionIndicator = actionIndicator
+             )
+           )
+
+      afterCurrent <- getCurrentVerificationBatch(userAnswers)
+      afterNewest  <- refreshNewestVerificationBatch(afterCurrent)
+      _            <- sessionRepository.set(afterNewest)
+    } yield afterNewest
 
   private def unverifiedSubcontractors(
     subcontractors: Seq[Subcontractor]
