@@ -164,12 +164,12 @@ class ConstructionIndustrySchemeConnectorSpec extends AnyWordSpec with Matchers 
 
       val expected =
         GetNewestVerificationBatchResponse(
-          scheme = Nil,
+          scheme = None,
           subcontractors = Nil,
-          verificationBatch = Nil,
+          verificationBatch = None,
           verifications = Nil,
-          submission = Nil,
-          monthlyReturn = Nil
+          submission = None,
+          monthlyReturn = None
         )
 
       when(rb.execute[GetNewestVerificationBatchResponse](any(), any()))
@@ -203,7 +203,7 @@ class ConstructionIndustrySchemeConnectorSpec extends AnyWordSpec with Matchers 
       val expected =
         GetCurrentVerificationBatchResponse(
           subcontractors = Nil,
-          verificationBatch = Nil,
+          verificationBatch = None,
           verifications = Nil
         )
 

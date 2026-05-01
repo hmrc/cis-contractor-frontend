@@ -62,16 +62,16 @@ final class VerificationServiceSpec extends SpecBase with MockitoSugar with Mode
 
   private val responseWithSubcontractors =
     GetNewestVerificationBatchResponse(
-      scheme = Nil,
+      scheme = None,
       subcontractors = Seq(
         verifiedSubcontractor,
         unverifiedSub1,
         unverifiedSub2
       ),
-      verificationBatch = Nil,
+      verificationBatch = None,
       verifications = Nil,
-      submission = Nil,
-      monthlyReturn = Nil
+      submission = None,
+      monthlyReturn = None
     )
 
   "VerificationService.refreshNewestVerificationBatch" - {
@@ -198,7 +198,7 @@ final class VerificationServiceSpec extends SpecBase with MockitoSugar with Mode
     val response =
       GetCurrentVerificationBatchResponse(
         subcontractors = Nil,
-        verificationBatch = Nil,
+        verificationBatch = None,
         verifications = Nil
       )
 
