@@ -18,7 +18,6 @@ package pages.verify
 
 import base.SpecBase
 import models.response.GetNewestVerificationBatchResponse
-import pages.verify.NewestVerificationBatchResponsePage
 import play.api.libs.json.Json
 
 class NewestVerificationBatchResponsePageSpec extends SpecBase {
