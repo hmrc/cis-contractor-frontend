@@ -870,3 +870,10 @@ verify.verifyDepartmentalError.contactHMRC.p1                      =  for more h
 verify.verifyDepartmentalError.contactHMRC.p1.link                 =  Contact HMRC by phone
 verify.verifyDepartmentalError.manageSubcontractors.p1             =  Back to
 verify.verifyDepartmentalError.manageSubcontractors.p1.link        =  Manage your subcontractors
+
+verify.inactiveSchemeWarning.title                                 = Your scheme is not active
+verify.inactiveSchemeWarning.heading                               = Your scheme is not active
+verify.inactiveSchemeWarning.p1                                    = Your scheme was recently made inactive.
+verify.inactiveSchemeWarning.p2                                    = You must contact HMRC by phone to reactivate your scheme before you can pay any more subcontractors.
+verify.inactiveSchemeWarning.warningText                           = Any verification request that you send while your scheme is inactive will fail when you try to submit it.
+verify.inactiveSchemeWarning.cancel                                = Cancel request
