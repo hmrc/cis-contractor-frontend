@@ -20,6 +20,8 @@ import com.github.tomakehurst.wiremock.client.WireMock.{aResponse, get, post, st
 import itutil.ApplicationWithWiremock
 import models.add.TypeOfSubcontractor.Individualorsoletrader
 import models.requests.CreateAndUpdateSubcontractorPayload
+import models.requests.CreateVerificationBatchAndVerificationsRequest
+import models.response.CreateVerificationBatchAndVerificationsResponse
 import models.requests.CreateAndUpdateSubcontractorPayload.IndividualOrSoleTraderPayload
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.matchers.must.Matchers
