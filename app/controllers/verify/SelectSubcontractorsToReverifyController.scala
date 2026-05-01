@@ -28,6 +28,8 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.verify.SelectSubcontractorsToReverifyView
 import viewmodels.verify.SubcontractorReverifyData
 import models.verify.SelectedSubcontractors
+import pages.verify.UnverifiedSubcontractorsPage
+import pages.verify.SelectedUnverifiedSubcontractorsPage
 import services.PaginationToReverifyService
 
 import javax.inject.Inject
@@ -48,8 +50,6 @@ class SelectSubcontractorsToReverifyController @Inject() (
     extends FrontendBaseController
     with I18nSupport {
 
-  val form = formProvider()
-
   private val allRows = SubcontractorReverifyData.rows
 
   def onPageLoad(mode: Mode, page: Int = 1): Action[AnyContent] =
@@ -66,8 +66,8 @@ class SelectSubcontractorsToReverifyController @Inject() (
       val preparedForm =
         request.userAnswers
           .get(SelectSubcontractorsToReverifyPage)
-          .map(subs => form.fill(subs.map(_.id)))
-          .getOrElse(form)
+          .map(subs => formProvider(requireSelection = false).fill(subs.map(_.id)))
+          .getOrElse(formProvider(requireSelection = false))
 
       Ok(
         view(
@@ -90,30 +90,42 @@ class SelectSubcontractorsToReverifyController @Inject() (
           allItems = allRows,
           currentPage = page,
           recordsPerPage = 6,
-          baseUrl = controllers.verify.routes.SelectSubcontractorsToReverifyController.onPageLoad(mode).url
+          baseUrl = routes.SelectSubcontractorsToReverifyController.onPageLoad(mode).url
         )
 
-      val boundForm = form.bindFromRequest()
+      val hasUnverified: Boolean =
+        request.userAnswers.get(UnverifiedSubcontractorsPage).exists(_.nonEmpty)
 
-      val selectedIds: Set[String] =
-        boundForm.value.getOrElse(Set.empty)
+      val hasSelectedUnverifiedEarlier: Boolean =
+        request.userAnswers.get(SelectedUnverifiedSubcontractorsPage).contains(true)
 
-      val allSubs = allRows
+      val requireSelection: Boolean =
+        !hasUnverified && !hasSelectedUnverifiedEarlier
 
-      val currentSelections: Set[SelectedSubcontractors] =
-        selectedIds.flatMap(id => allSubs.find(_.id == id).map(row => SelectedSubcontractors(row.id, row.name)))
+      val boundForm = formProvider(requireSelection).bindFromRequest()
+
+      val selectedIdsThisPage: Set[String] =
+        boundForm.value.getOrElse(Set.empty[String])
 
       val currentPageIds: Set[String] =
         result.items.map(_.id).toSet
 
-      val previousSelections: Set[SelectedSubcontractors] =
+      val existingSelections: Set[SelectedSubcontractors] =
         request.userAnswers
           .get(SelectSubcontractorsToReverifyPage)
           .getOrElse(Set.empty)
-          .filterNot(sub => currentPageIds.contains(sub.id))
+
+      val previousSelections: Set[SelectedSubcontractors] =
+        existingSelections.filterNot(sub => currentPageIds.contains(sub.id))
+
+      val currentSelections: Set[SelectedSubcontractors] =
+        selectedIdsThisPage.flatMap(id => allRows.find(_.id == id).map(r => SelectedSubcontractors(r.id, r.name)))
 
       val mergedSelections: Set[SelectedSubcontractors] =
         previousSelections ++ currentSelections
+
+      val hasAnyReverifySelection: Boolean =
+        mergedSelections.nonEmpty
 
       val gotoPage: Option[Int] =
         request.body.asFormUrlEncoded
@@ -134,31 +146,48 @@ class SelectSubcontractorsToReverifyController @Inject() (
           )
 
         case None =>
-          boundForm.fold(
-            formWithErrors =>
-              Future.successful(
-                BadRequest(
-                  view(
-                    formWithErrors,
-                    mode,
-                    result.items,
-                    result.pagination,
-                    page,
-                    result.startIndex,
-                    result.totalCount
+          if (hasUnverified && !hasSelectedUnverifiedEarlier && !hasAnyReverifySelection) {
+            Future.successful(
+              Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+            )
+
+          } else if (hasUnverified && hasSelectedUnverifiedEarlier && !hasAnyReverifySelection) {
+            for {
+              updatedAnswers <- Future.fromTry(
+                                  request.userAnswers.set(SelectSubcontractorsToReverifyPage, mergedSelections)
+                                )
+              _              <- sessionRepository.set(updatedAnswers)
+            } yield Redirect(
+              navigator.nextPage(SelectSubcontractorsToReverifyPage, mode, updatedAnswers)
+            )
+
+          } else {
+            boundForm.fold(
+              formWithErrors =>
+                Future.successful(
+                  BadRequest(
+                    view(
+                      formWithErrors,
+                      mode,
+                      result.items,
+                      result.pagination,
+                      page,
+                      result.startIndex,
+                      result.totalCount
+                    )
                   )
+                ),
+              _ =>
+                for {
+                  updatedAnswers <- Future.fromTry(
+                                      request.userAnswers.set(SelectSubcontractorsToReverifyPage, mergedSelections)
+                                    )
+                  _              <- sessionRepository.set(updatedAnswers)
+                } yield Redirect(
+                  navigator.nextPage(SelectSubcontractorsToReverifyPage, mode, updatedAnswers)
                 )
-              ),
-            _ =>
-              for {
-                updatedAnswers <- Future.fromTry(
-                                    request.userAnswers.set(SelectSubcontractorsToReverifyPage, mergedSelections)
-                                  )
-                _              <- sessionRepository.set(updatedAnswers)
-              } yield Redirect(
-                navigator.nextPage(SelectSubcontractorsToReverifyPage, mode, updatedAnswers)
-              )
-          )
+            )
+          }
       }
     }
 }

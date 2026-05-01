@@ -28,13 +28,14 @@
     govukCheckboxes: GovukCheckboxes,
     govukTable: GovukTable,
     govukButton: GovukButton,
-    h1: H1,
-    paragraph: Paragraph,
     pageNavigator: components.PageNavigator
 )
 
-
 @(form: Form[Set[String]], mode: Mode, rows: Seq[SubcontractorReverifyRow], paginationViewModel: PaginationViewModel, page: Int, startIndex: Int, totalCount: Int)(implicit request: Request[_], messages: Messages)
+
+@css = {
+    <link href='@controllers.routes.Assets.versioned("stylesheets/moj-frontend.min.css")' media="all" rel="stylesheet" type="text/css" />
+}
 
 @layout(pageTitle = title(form, messages("verify.selectSubcontractorsToReverify.title"))) {
 
@@ -49,13 +50,21 @@
             )
         }
 
-        @h1(messages("verify.selectSubcontractorsToReverify.heading"))
+        <fieldset class="govuk-fieldset">
 
-        @paragraph(messages("verify.selectSubcontractorsToReverify.hint"))
+            <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
+                <h1 class="govuk-fieldset__heading">
+                @messages("verify.selectSubcontractorsToReverify.heading")
+                </h1>
+            </legend>
+
+            <div class="govuk-hint">
+            @messages("verify.selectSubcontractorsToReverify.hint")
+            </div>
 
         @if(paginationViewModel.items.nonEmpty) {
             <p class="govuk-body govuk-!-margin-bottom-4 govuk-!-margin-top-5">
-            @messages("verify.selectSubcontractor.showingResults", startIndex, startIndex + rows.size - 1, totalCount)
+            @messages("verify.selectSubcontractorsToReverify.showingResults", startIndex, startIndex + rows.size - 1, totalCount)
             </p>
         }
 
@@ -63,6 +72,7 @@
             form.value.getOrElse(Set.empty[String])
         ) { selected =>
 
+            <div class="govuk-table__container">
             @govukTable(
                 Table(
                     caption = None,
@@ -131,4 +141,5 @@
         }
     }
 }
-
+</div>
+</fieldset>

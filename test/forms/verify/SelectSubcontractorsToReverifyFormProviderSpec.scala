@@ -17,24 +17,26 @@
 package forms.verify
 
 import forms.behaviours.CheckboxFieldBehaviours
+import play.api.data.FormError
 
 class SelectSubcontractorsToReverifyFormProviderSpec extends CheckboxFieldBehaviours {
 
-  val form = new SelectSubcontractorsToReverifyFormProvider()()
+  private val requiredKey = "verify.selectSubcontractorsToReverify.error.required"
+  private val fieldName   = "value"
 
-  ".value" - {
+  "when selection IS required" - {
 
-    val fieldName   = "value"
-    val requiredKey = "verify.selectSubcontractorsToReverify.error.required"
+    val form = new SelectSubcontractorsToReverifyFormProvider()(requireSelection = true)
 
-    behave like mandatoryCheckboxField(
-      form,
-      fieldName,
-      requiredKey
-    )
+    "fail when nothing selected" in {
+      val result = form.bind(Map.empty[String, String])
+
+      result.errors must contain(
+        FormError("value", requiredKey)
+      )
+    }
 
     "bind multiple selected values correctly" in {
-
       val data = Map(
         "value[0]" -> "Grantalan",
         "value[1]" -> "Hammondhouse"
@@ -44,12 +46,28 @@ class SelectSubcontractorsToReverifyFormProviderSpec extends CheckboxFieldBehavi
 
       result.value.value mustBe Set("Grantalan", "Hammondhouse")
     }
+  }
 
-    "reject empty submission" in {
+  "when selection is NOT required" - {
 
+    val form = new SelectSubcontractorsToReverifyFormProvider()(requireSelection = false)
+
+    "allow empty submission" in {
       val result = form.bind(Map.empty[String, String])
 
-      result.errors.headOption.value.message mustBe requiredKey
+      result.errors mustBe empty
+      result.value mustBe Some(Set.empty)
+    }
+
+    "bind multiple selected values correctly" in {
+      val data = Map(
+        "value[0]" -> "Grantalan",
+        "value[1]" -> "Hammondhouse"
+      )
+
+      val result = form.bind(data)
+
+      result.value.value mustBe Set("Grantalan", "Hammondhouse")
     }
   }
 }
