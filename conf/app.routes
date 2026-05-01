@@ -392,3 +392,5 @@ GET   /verify/no-new-subcontractors-to-verify          controllers.verify.Verify
 POST  /verify/no-new-subcontractors-to-verify          controllers.verify.VerifyYourSubcontractorsYesNoController.onSubmit
 
 GET   /verify/problem-with-verification-warning        controllers.verify.VerifyDepartmentalErrorController.onPageLoad()
+
+GET   /verify/inactive-scheme-warning                    controllers.verify.InactiveSchemeWarningController.onPageLoad()
