@@ -898,3 +898,10 @@ verify.inactiveSchemeWarning.p1                                    = Your scheme
 verify.inactiveSchemeWarning.p2                                    = You must contact HMRC by phone to reactivate your scheme before you can pay any more subcontractors.
 verify.inactiveSchemeWarning.warningText                           = Any verification request that you send while your scheme is inactive will fail when you try to submit it.
 verify.inactiveSchemeWarning.cancel                                = Cancel request
+
+verify.verificationNotSubmittedWarning.title                       = Your verification request cannot be submitted
+verify.verificationNotSubmittedWarning.heading                     = Your verification request cannot be submitted
+verify.verificationNotSubmittedWarning.link1.text                  = Contact HMRC by phone
+verify.verificationNotSubmittedWarning.link1.suffix                = for more help.
+verify.verificationNotSubmittedWarning.link2.text                  = Manage your subcontractors
+verify.verificationNotSubmittedWarning.link2.prefix                = Back to
