@@ -906,3 +906,9 @@ verify.verificationNotSubmittedWarning.link1.text                  = contact HMR
 verify.verificationNotSubmittedWarning.link1.suffix                = for more help.
 verify.verificationNotSubmittedWarning.link2.text                  = Manage your subcontractors
 verify.verificationNotSubmittedWarning.link2.prefix                = Back to
+
+verify.noSubcontractorsSelectedWarning.title                       = Select at least one subcontractor
+verify.noSubcontractorsSelectedWarning.heading                     = Your verification request cannot be submitted
+verify.noSubcontractorsSelectedWarning.p                           = You need to select at least one subcontractor to send a verification request.
+verify.noSubcontractorsSelectedWarning.button                      = Select subcontractors
+verify.noSubcontractorsSelectedWarning.cancel                      = Cancel request
