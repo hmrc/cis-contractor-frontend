@@ -37,9 +37,9 @@
 
 <div class="govuk-button-group">
     @govukButton(
-        ButtonViewModel(messages("site.continue")).asLink("#")
+        ButtonViewModel(messages("site.continue")).asLink("#").withAttribute("id" -> "continue-button")
     )
-    <a class="govuk-link" href="#">@messages("verify.inactiveSchemeWarning.cancel")</a>
+    <a class="govuk-link" id="cancel-link" href="#">@messages("verify.inactiveSchemeWarning.cancel")</a>
 </div>
 
 }
