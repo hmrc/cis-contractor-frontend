@@ -46,7 +46,7 @@
             )
         }
 
-        <fieldset class="govuk-fieldset">
+        <fieldset class="govuk-fieldset" aria-describedby="reverify-sub-hint">
 
             <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
                 <h1 class="govuk-fieldset__heading">
@@ -54,7 +54,7 @@
                 </h1>
             </legend>
 
-            <div class="govuk-hint">
+            <div id="reverify-sub-hint" class="govuk-hint">
             @messages("verify.selectSubcontractorsToReverify.hint")
             </div>
 

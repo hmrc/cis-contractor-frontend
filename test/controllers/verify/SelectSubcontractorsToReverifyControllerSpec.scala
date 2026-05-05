@@ -33,10 +33,11 @@ import org.jsoup.Jsoup
 import services.PaginationToReverifyService
 import models.verify.SelectedSubcontractors
 import models.Subcontractor
+import pages.verify.SelectSubcontractorPage
 import org.mockito.Mockito.{never, verify, when}
+import models.SubcontractorViewModel
 import viewmodels.verify.SubcontractorReverifyData
 import pages.verify.UnverifiedSubcontractorsPage
-import pages.verify.SelectedUnverifiedSubcontractorsPage
 import views.html.verify.SelectSubcontractorsToReverifyView
 
 import scala.concurrent.Future
@@ -78,7 +79,13 @@ class SelectSubcontractorsToReverifyControllerSpec extends SpecBase with Mockito
       taxTreatment = None,
       verificationDate = None,
       lastMonthlyReturnDate = None,
-      createDate = None
+      createDate = None,
+      subcontractorType = None,
+      subbieResourceRef = None,
+      utr = None,
+      partnerUtr = None,
+      crn = None,
+      nino = None
     )
 
   "SubcontractorsToReverifyViewModel Controller" - {
@@ -258,7 +265,7 @@ class SelectSubcontractorsToReverifyControllerSpec extends SpecBase with Mockito
 
       val userAnswers =
         emptyUserAnswers
-          .set(SelectedUnverifiedSubcontractorsPage, false)
+          .set(SelectSubcontractorPage, Set.empty)
           .success
           .value
           .set(UnverifiedSubcontractorsPage, List.empty)
@@ -408,7 +415,7 @@ class SelectSubcontractorsToReverifyControllerSpec extends SpecBase with Mockito
           )
           .success
           .value
-          .set(SelectedUnverifiedSubcontractorsPage, false)
+          .set(SelectSubcontractorPage, Set.empty)
           .success
           .value
 
@@ -445,7 +452,10 @@ class SelectSubcontractorsToReverifyControllerSpec extends SpecBase with Mockito
           )
           .success
           .value
-          .set(SelectedUnverifiedSubcontractorsPage, true)
+          .set(
+            SelectSubcontractorPage,
+            Set(SubcontractorViewModel(firstRow.id, firstRow.name))
+          )
           .success
           .value
 

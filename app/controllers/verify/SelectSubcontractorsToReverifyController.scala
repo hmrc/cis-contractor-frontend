@@ -29,7 +29,7 @@ import views.html.verify.SelectSubcontractorsToReverifyView
 import viewmodels.verify.SubcontractorReverifyData
 import models.verify.SelectedSubcontractors
 import pages.verify.UnverifiedSubcontractorsPage
-import pages.verify.SelectedUnverifiedSubcontractorsPage
+import pages.verify.SelectSubcontractorPage
 import services.PaginationToReverifyService
 
 import javax.inject.Inject
@@ -97,7 +97,7 @@ class SelectSubcontractorsToReverifyController @Inject() (
         request.userAnswers.get(UnverifiedSubcontractorsPage).exists(_.nonEmpty)
 
       val hasSelectedUnverifiedEarlier: Boolean =
-        request.userAnswers.get(SelectedUnverifiedSubcontractorsPage).contains(true)
+        request.userAnswers.get(SelectSubcontractorPage).exists(_.nonEmpty)
 
       val requireSelection: Boolean =
         !hasUnverified && !hasSelectedUnverifiedEarlier
