@@ -55,7 +55,7 @@ class CreateVerificationBatchAndVerificationsControllerSpec extends SpecBase wit
   private val emptyCurrent: GetCurrentVerificationBatchResponse =
     GetCurrentVerificationBatchResponse(
       subcontractors = Nil,
-      verificationBatch = Nil,
+      verificationBatch = None,
       verifications = Nil
     )
 
@@ -76,7 +76,7 @@ class CreateVerificationBatchAndVerificationsControllerSpec extends SpecBase wit
           partnershipTradingName = None
         )
       ),
-      verificationBatch = Seq(
+      verificationBatch = Some(
         VerificationBatchCurrentVerification(
           verificationBatchId = 999L,
           verifBatchResourceRef = Some(7777L)

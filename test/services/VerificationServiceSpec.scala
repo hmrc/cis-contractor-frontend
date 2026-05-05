@@ -361,7 +361,7 @@ final class VerificationServiceSpec extends SpecBase with MockitoSugar with Mode
             partnershipTradingName = None
           )
         ),
-        verificationBatch = Seq(
+        verificationBatch = Some(
           VerificationBatchCurrentVerification(
             verificationBatchId = 999L,
             verifBatchResourceRef = Some(7777L)
