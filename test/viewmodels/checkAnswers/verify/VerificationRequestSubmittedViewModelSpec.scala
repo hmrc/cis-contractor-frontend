@@ -16,23 +16,27 @@
 
 package viewmodels.checkAnswers.verify
 
+import models.UserAnswers
+import models.SubcontractorViewModel
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.should.Matchers
+import org.scalatest.TryValues.convertTryToSuccessOrFailure
+import pages.verify.{EmailAddressPage, SelectSubcontractorPage}
 
 import java.time.LocalDateTime
 
-class VerificationSubmittedViewModelSpec extends AnyFreeSpec with Matchers {
+class VerificationRequestSubmittedViewModelSpec extends AnyFreeSpec with Matchers {
 
   private val now = LocalDateTime.of(2026, 4, 27, 10, 30)
 
-  "VerificationSubmittedViewModel" - {
+  "VerificationRequestSubmittedViewModel" - {
 
     "showEmail" - {
 
       "must return true when confirmationEmail is defined" in {
 
         val vm =
-          VerificationSubmittedViewModel(
+          VerificationRequestSubmittedViewModel(
             referenceNumber = "REF123",
             submittedAt = now,
             subcontractorsToVerify = Seq("Sub A"),
@@ -45,7 +49,7 @@ class VerificationSubmittedViewModelSpec extends AnyFreeSpec with Matchers {
       "must return false when confirmationEmail is not defined" in {
 
         val vm =
-          VerificationSubmittedViewModel(
+          VerificationRequestSubmittedViewModel(
             referenceNumber = "REF123",
             submittedAt = now,
             subcontractorsToVerify = Seq("Sub A"),
@@ -61,7 +65,7 @@ class VerificationSubmittedViewModelSpec extends AnyFreeSpec with Matchers {
       "must return true when subcontractorsToVerify is non-empty" in {
 
         val vm =
-          VerificationSubmittedViewModel(
+          VerificationRequestSubmittedViewModel(
             referenceNumber = "REF123",
             submittedAt = now,
             subcontractorsToVerify = Seq("Sub A")
@@ -73,7 +77,7 @@ class VerificationSubmittedViewModelSpec extends AnyFreeSpec with Matchers {
       "must return false when subcontractorsToVerify is empty" in {
 
         val vm =
-          VerificationSubmittedViewModel(
+          VerificationRequestSubmittedViewModel(
             referenceNumber = "REF123",
             submittedAt = now,
             subcontractorsToVerify = Seq.empty
@@ -88,7 +92,7 @@ class VerificationSubmittedViewModelSpec extends AnyFreeSpec with Matchers {
       "must return true when subcontractorsToReverify is non-empty" in {
 
         val vm =
-          VerificationSubmittedViewModel(
+          VerificationRequestSubmittedViewModel(
             referenceNumber = "REF123",
             submittedAt = now,
             subcontractorsToVerify = Seq("Sub A"),
@@ -101,7 +105,7 @@ class VerificationSubmittedViewModelSpec extends AnyFreeSpec with Matchers {
       "must return false when subcontractorsToReverify is empty" in {
 
         val vm =
-          VerificationSubmittedViewModel(
+          VerificationRequestSubmittedViewModel(
             referenceNumber = "REF123",
             submittedAt = now,
             subcontractorsToVerify = Seq("Sub A"),
@@ -110,6 +114,60 @@ class VerificationSubmittedViewModelSpec extends AnyFreeSpec with Matchers {
 
         vm.showReverify shouldBe false
       }
+    }
+  }
+
+  "VerificationRequestSubmittedViewModel.fromUserAnswers" - {
+
+    "must map subcontractorsToVerify from SelectSubcontractorPage" in {
+
+      val subcontractors =
+        Set(
+          SubcontractorViewModel(id = "ID1", name = "Brody, Martin"),
+          SubcontractorViewModel(id = "ID2", name = "Hooper And Associates")
+        )
+
+      val userAnswers =
+        UserAnswers("id")
+          .set(SelectSubcontractorPage, subcontractors)
+          .success
+          .value
+
+      val vm =
+        VerificationRequestSubmittedViewModel.fromUserAnswers(userAnswers)
+
+      vm.subcontractorsToVerify shouldBe
+        Seq("Brody, Martin", "Hooper And Associates")
+
+      vm.showVerify shouldBe true
+    }
+
+    "must map confirmationEmail from EmailAddressPage when present" in {
+
+      val userAnswers =
+        UserAnswers("id")
+          .set(EmailAddressPage, "test@testmail.com")
+          .success
+          .value
+
+      val vm =
+        VerificationRequestSubmittedViewModel.fromUserAnswers(userAnswers)
+
+      vm.confirmationEmail shouldBe Some("test@testmail.com")
+      vm.showEmail         shouldBe true
+    }
+
+    "must return empty values when pages are absent" in {
+
+      val vm =
+        VerificationRequestSubmittedViewModel.fromUserAnswers(
+          UserAnswers("id")
+        )
+
+      vm.subcontractorsToVerify shouldBe Seq.empty
+      vm.confirmationEmail      shouldBe None
+      vm.showVerify             shouldBe false
+      vm.showEmail              shouldBe false
     }
   }
 }

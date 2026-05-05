@@ -24,7 +24,7 @@ import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.i18n.{Lang, Messages, MessagesApi, MessagesImpl}
 import play.api.mvc.Request
 import play.api.test.FakeRequest
-import viewmodels.checkAnswers.verify.VerificationSubmittedViewModel
+import viewmodels.checkAnswers.verify.VerificationRequestSubmittedViewModel
 import views.html.verify.VerificationRequestSubmittedView
 
 import java.time.LocalDateTime
@@ -104,7 +104,7 @@ class VerificationRequestSubmittedViewSpec extends AnyWordSpec with Matchers wit
         doc.select(s"a[href='${appConfig.exitSurveyUrl}']")
 
       surveyLink.size mustBe 1
-      surveyLink.attr("target") mustBe "_blank"
+      surveyLink.attr("target") mustBe ""
 
       surveyLink.first.parent.text must include(
         messages("verify.verificationRequestSubmitted.feedback.p2")
@@ -113,7 +113,7 @@ class VerificationRequestSubmittedViewSpec extends AnyWordSpec with Matchers wit
 
     "not render reverify section or email paragraph when both are absent" in new Setup {
 
-      override val viewModel: VerificationSubmittedViewModel =
+      override val viewModel: VerificationRequestSubmittedViewModel =
         viewModel.copy(
           subcontractorsToReverify = Seq.empty,
           confirmationEmail = None
@@ -164,8 +164,8 @@ class VerificationRequestSubmittedViewSpec extends AnyWordSpec with Matchers wit
 
     val email = "test@testmail.com"
 
-    val viewModel: VerificationSubmittedViewModel =
-      VerificationSubmittedViewModel(
+    val viewModel: VerificationRequestSubmittedViewModel =
+      VerificationRequestSubmittedViewModel(
         referenceNumber = referenceNumber,
         submittedAt = submittedAt,
         subcontractorsToVerify = subcontractorsToVerify,

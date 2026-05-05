@@ -21,10 +21,8 @@ import controllers.actions.*
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import viewmodels.checkAnswers.verify.VerificationSubmittedViewModel
+import viewmodels.checkAnswers.verify.VerificationRequestSubmittedViewModel
 import views.html.verify.VerificationRequestSubmittedView
-
-import java.time.LocalDateTime
 import javax.inject.Inject
 
 class VerificationRequestSubmittedController @Inject() (
@@ -43,20 +41,9 @@ class VerificationRequestSubmittedController @Inject() (
 
       // TODO: Replace this with your real source:
       // TODO: Replace 1. referenceNumber 2. submittedAt 3. verify list 4. Reverify lists 5. confirmationEmail
-      val vm = VerificationSubmittedViewModel(
-        referenceNumber = "Reference number 12345",
-        submittedAt = LocalDateTime.now(),
-        subcontractorsToVerify =
-          Seq("Brody, Martin", "Hooper And Associates", "Quint Transportation", "The Kintner Group"),
-        //  Seq.empty,
-        //  To check the validation of empty reverify list
-        subcontractorsToReverify = Seq("Grant, Alan", "InGen Research"),
-        //  Seq.empty,
-        //  To test no email provided scenario
-        //  confirmationEmail = None
-        confirmationEmail = Some("test@testmail.com")
-      )
-
+      val vm =
+        VerificationRequestSubmittedViewModel
+          .fromUserAnswers(request.userAnswers)
       Ok(view(vm))
     }
 }

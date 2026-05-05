@@ -24,7 +24,7 @@
 @import viewmodels.govuk.summarylist.SummaryListViewModel
 
 @import views.html.components._
-@import viewmodels.checkAnswers.verify.VerificationSubmittedViewModel
+@import viewmodels.checkAnswers.verify.VerificationRequestSubmittedViewModel
 
 
 @this(
@@ -39,7 +39,7 @@
         link: Link
 )
 
-@(vm: VerificationSubmittedViewModel
+@(vm: VerificationRequestSubmittedViewModel
 )(implicit request: Request[_],appConfig: FrontendAppConfig, messages: Messages)
 
 @layout(pageTitle = titleNoForm(messages("verify.verificationRequestSubmitted.title"))) {

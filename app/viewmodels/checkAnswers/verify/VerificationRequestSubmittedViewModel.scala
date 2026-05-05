@@ -15,9 +15,11 @@
  */
 
 package viewmodels.checkAnswers.verify
+import models.UserAnswers
+import pages.verify._
 import java.time.LocalDateTime
 
-case class VerificationSubmittedViewModel(
+case class VerificationRequestSubmittedViewModel(
   referenceNumber: String,
   submittedAt: LocalDateTime,
   subcontractorsToVerify: Seq[String],
@@ -27,4 +29,22 @@ case class VerificationSubmittedViewModel(
   def showEmail: Boolean    = confirmationEmail.isDefined
   def showVerify: Boolean   = subcontractorsToVerify.nonEmpty
   def showReverify: Boolean = subcontractorsToReverify.nonEmpty
+}
+
+object VerificationRequestSubmittedViewModel {
+
+  def fromUserAnswers(userAnswers: UserAnswers): VerificationRequestSubmittedViewModel =
+    VerificationRequestSubmittedViewModel(
+      //  TODO: Replace below with actuals - 1. referenceNumber 2. submittedAt
+      referenceNumber = "Reference Number 12345",
+      submittedAt = LocalDateTime.now(),
+      subcontractorsToVerify = userAnswers
+        .get(SelectSubcontractorPage)
+        .getOrElse(Seq.empty)
+        .map(_.name)
+        .toSeq,
+      //  TODO: Replace below hardcoded values with - SelectSubcontractorsToReverifyPage
+      subcontractorsToReverify = Seq("Grant, Alan", "InGen Research"),
+      confirmationEmail = userAnswers.get(EmailAddressPage)
+    )
 }

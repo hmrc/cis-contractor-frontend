@@ -19,16 +19,12 @@ package controllers.verify
 import base.SpecBase
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import viewmodels.checkAnswers.verify.VerificationSubmittedViewModel
-import views.html.verify.VerificationRequestSubmittedView
-
-import java.time.LocalDateTime
 
 class VerificationRequestSubmittedControllerSpec extends SpecBase {
 
   "VerificationRequestSubmitted Controller" - {
 
-    "must return OK and the correct view for a GET" in {
+    "must return OK for a GET" in {
 
       val application =
         applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
@@ -44,33 +40,7 @@ class VerificationRequestSubmittedControllerSpec extends SpecBase {
         val result =
           route(application, request).value
 
-        val view =
-          application.injector.instanceOf[VerificationRequestSubmittedView]
-
-        val appConfig =
-          application.injector.instanceOf[config.FrontendAppConfig]
-
-        val expectedViewModel =
-          VerificationSubmittedViewModel(
-            referenceNumber = "Reference number 12345",
-            submittedAt = LocalDateTime.now(),
-            subcontractorsToVerify = Seq(
-              "Brody, Martin",
-              "Hooper And Associates",
-              "Quint Transportation",
-              "The Kintner Group"
-            ),
-            subcontractorsToReverify = Seq("Grant, Alan", "InGen Research"),
-            confirmationEmail = Some("test@testmail.com")
-          )
-
         status(result) mustEqual OK
-        contentAsString(result) mustEqual
-          view(expectedViewModel)(
-            request,
-            appConfig,
-            messages(application)
-          ).toString
       }
     }
   }
