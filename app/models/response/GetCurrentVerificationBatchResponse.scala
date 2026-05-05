@@ -19,15 +19,12 @@ package models.response
 import play.api.libs.json.{Json, OFormat}
 import models.*
 
-final case class GetNewestVerificationBatchResponse(
-  scheme: Option[ContractorScheme],
-  subcontractors: Seq[Subcontractor],
-  verificationBatch: Option[VerificationBatch],
-  verifications: Seq[Verification],
-  submission: Option[Submission],
-  monthlyReturn: Option[MonthlyReturn]
+final case class GetCurrentVerificationBatchResponse(
+  subcontractors: Seq[SubcontractorCurrentVerification],
+  verificationBatch: Option[VerificationBatchCurrentVerification],
+  verifications: Seq[VerificationCurrentVerification]
 )
 
-object GetNewestVerificationBatchResponse {
-  given format: OFormat[GetNewestVerificationBatchResponse] = Json.format[GetNewestVerificationBatchResponse]
+object GetCurrentVerificationBatchResponse {
+  given format: OFormat[GetCurrentVerificationBatchResponse] = Json.format[GetCurrentVerificationBatchResponse]
 }

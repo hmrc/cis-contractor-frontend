@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package controllers.verification
+package controllers.verify
 
 import base.SpecBase
 import controllers.routes
@@ -33,7 +33,7 @@ import scala.concurrent.Future
 
 class NewestVerificationBatchControllerSpec extends SpecBase with MockitoSugar {
 
-  private val endpointUrl = "/verification/newest"
+  private val endpointUrl = "/verify/newest"
 
   "NewestVerificationBatchController" - {
 

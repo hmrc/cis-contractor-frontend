@@ -39,24 +39,30 @@ trait ModelGenerators {
         )
         .map(_.toSet)
     }
+  
+  private val genNonEmptyAlphaStr: Gen[String] =
+    Gen.nonEmptyListOf(Gen.alphaChar).map(_.mkString)
+
+  private val genNonEmptyAlphaNumStr: Gen[String] =
+    Gen.nonEmptyListOf(Gen.alphaNumChar).map(_.mkString)
 
   implicit lazy val arbitrarySubcontractorViewModel: Arbitrary[SubcontractorViewModel] =
     Arbitrary {
       for {
-        id   <- Gen.alphaStr.suchThat(_.nonEmpty)
-        name <- Gen.alphaStr.suchThat(_.nonEmpty)
+        id   <- genNonEmptyAlphaStr
+        name <- genNonEmptyAlphaStr
       } yield SubcontractorViewModel(id, name)
     }
 
   implicit lazy val arbitraryInternationalAddress: Arbitrary[InternationalAddress] =
     Arbitrary {
       for {
-        addressLine1 <- Gen.alphaStr.suchThat(_.nonEmpty)
+        addressLine1 <- genNonEmptyAlphaStr
         addressLine2 <- Gen.option(Gen.alphaStr)
-        addressLine3 <- Gen.alphaStr.suchThat(_.nonEmpty)
+        addressLine3 <- genNonEmptyAlphaStr
         addressLine4 <- Gen.option(Gen.alphaStr)
-        postalCode   <- Gen.alphaStr.suchThat(_.nonEmpty)
-        country      <- Gen.alphaStr.suchThat(_.nonEmpty)
+        postalCode   <- genNonEmptyAlphaStr
+        country      <- genNonEmptyAlphaStr
       } yield InternationalAddress(
         addressLine1 = addressLine1,
         addressLine2 = addressLine2,
@@ -97,17 +103,23 @@ trait ModelGenerators {
     Arbitrary {
       for {
         subcontractorId        <- Gen.posNum[Long]
-        firstName              <- Gen.option(Gen.alphaStr.suchThat(_.nonEmpty))
-        secondName             <- Gen.option(Gen.alphaStr.suchThat(_.nonEmpty))
-        surname                <- Gen.option(Gen.alphaStr.suchThat(_.nonEmpty))
-        tradingName            <- Gen.option(Gen.alphaStr.suchThat(_.nonEmpty))
-        partnershipTradingName <- Gen.option(Gen.alphaStr.suchThat(_.nonEmpty))
+        firstName              <- Gen.option(genNonEmptyAlphaStr)
+        secondName             <- Gen.option(genNonEmptyAlphaStr)
+        surname                <- Gen.option(genNonEmptyAlphaStr)
+        tradingName            <- Gen.option(genNonEmptyAlphaStr)
+        partnershipTradingName <- Gen.option(genNonEmptyAlphaStr)
         verified               <- Gen.option(Gen.oneOf("Y", "N"))
-        verificationNumber     <- Gen.option(Gen.alphaNumStr.suchThat(_.nonEmpty))
-        taxTreatment           <- Gen.option(Gen.alphaStr.suchThat(_.nonEmpty))
+        verificationNumber     <- Gen.option(genNonEmptyAlphaNumStr)
+        taxTreatment           <- Gen.option(genNonEmptyAlphaStr)
         verificationDate       <- Gen.option(genLocalDateTime)
         lastMonthlyReturnDate  <- Gen.option(genLocalDateTime)
         createDate             <- Gen.option(genLocalDateTime)
+        subcontractorType      <- Gen.option(genNonEmptyAlphaStr)
+        subbieResourceRef      <- Gen.option(Gen.posNum[Long])
+        utr                    <- Gen.option(genNonEmptyAlphaStr)
+        partnerUtr             <- Gen.option(genNonEmptyAlphaStr)
+        crn                    <- Gen.option(genNonEmptyAlphaStr)
+        nino                   <- Gen.option(genNonEmptyAlphaStr)
       } yield Subcontractor(
         subcontractorId = subcontractorId,
         firstName = firstName,
@@ -120,7 +132,13 @@ trait ModelGenerators {
         taxTreatment = taxTreatment,
         verificationDate = verificationDate,
         lastMonthlyReturnDate = lastMonthlyReturnDate,
-        createDate = createDate
+        createDate = createDate,
+        subcontractorType = subcontractorType,
+        subbieResourceRef = subbieResourceRef,
+        utr = utr,
+        partnerUtr = partnerUtr,
+        crn = crn,
+        nino = nino
       )
     }
   private val genLocalDateTime: Gen[LocalDateTime]                   =

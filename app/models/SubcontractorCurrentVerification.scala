@@ -14,15 +14,24 @@
  * limitations under the License.
  */
 
-package pages.verification
+package models
 
-import models.response.GetNewestVerificationBatchResponse
-import pages.QuestionPage
-import play.api.libs.json.JsPath
+import play.api.libs.json.{JsObject, Json, OFormat, Reads, Writes}
 
-case object NewestVerificationBatchResponsePage extends QuestionPage[GetNewestVerificationBatchResponse] {
+case class SubcontractorCurrentVerification(
+  subcontractorId: Long,
+  subbieResourceRef: Option[Long],
+  firstName: Option[String],
+  secondName: Option[String],
+  surname: Option[String],
+  tradingName: Option[String],
+  utr: Option[String],
+  nino: Option[String],
+  crn: Option[String],
+  partnerUtr: Option[String],
+  partnershipTradingName: Option[String]
+)
 
-  override def path: JsPath = JsPath \ toString
-
-  override def toString: String = "newestVerificationBatchResponse"
+object SubcontractorCurrentVerification {
+  given format: OFormat[SubcontractorCurrentVerification] = Json.format[SubcontractorCurrentVerification]
 }

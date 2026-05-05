@@ -362,7 +362,9 @@ GET   /verify/submitting-verification-request          controllers.verify.Submis
 
 GET   /verify/no-subcontractors-added                  controllers.verify.NoSubcontractorsAddedController.onPageLoad()
 
-GET   /verification/newest                             controllers.verification.NewestVerificationBatchController.onPageLoad()
+GET   /verify/newest                                   controllers.verify.NewestVerificationBatchController.onPageLoad()
+
+GET   /verify/current                                  controllers.verify.CurrentVerificationBatchController.onPageLoad()
 
 GET   /verify/verification-request-in-progress         controllers.verify.VerificationRequestInProgressController.onPageLoad()
 
@@ -394,3 +396,5 @@ POST  /verify/change-reverify-existing-subcontractors  controllers.verify.Reveri
 
 GET   /verify/no-new-subcontractors-to-verify          controllers.verify.VerifyYourSubcontractorsYesNoController.onPageLoad
 POST  /verify/no-new-subcontractors-to-verify          controllers.verify.VerifyYourSubcontractorsYesNoController.onSubmit
+
+GET   /verify/problem-with-verification-warning        controllers.verify.VerifyDepartmentalErrorController.onPageLoad()

@@ -14,40 +14,37 @@
  * limitations under the License.
  */
 
-package controllers.verification
+package controllers.verify
 
-import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
-import play.api.Logging
+import config.FrontendAppConfig
+import controllers.actions.*
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.VerificationService
+import queries.CisIdQuery
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import views.html.verify.VerifyDepartmentalErrorView
 
 import javax.inject.Inject
-import scala.concurrent.ExecutionContext
 
-class NewestVerificationBatchController @Inject() (
+class VerifyDepartmentalErrorController @Inject() (
   override val messagesApi: MessagesApi,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   val controllerComponents: MessagesControllerComponents,
-  verificationBatchService: VerificationService
-)(implicit ec: ExecutionContext)
-    extends FrontendBaseController
-    with I18nSupport
-    with Logging {
+  view: VerifyDepartmentalErrorView,
+  appConfig: FrontendAppConfig
+) extends FrontendBaseController
+    with I18nSupport {
 
-  def onPageLoad(): Action[AnyContent] =
-    (identify andThen getData andThen requireData).async { implicit request =>
-      verificationBatchService
-        .refreshNewestVerificationBatch(request.userAnswers)
-        .map { _ =>
-          Ok("newest verification batch saved to session")
-        }
-        .recover { case t =>
-          logger.error("[NewestVerificationBatchController.onPageLoad] Failed to refresh newest verification batch", t)
-          Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-        }
+  def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
+    request.userAnswers.get(CisIdQuery) match {
+      case Some(cisId) =>
+        val manageSubcontractorsUrl = s"${appConfig.manageSubcontractorsUrl}/$cisId"
+        Ok(view(manageSubcontractorsUrl))
+
+      case None =>
+        Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
     }
+  }
 }
