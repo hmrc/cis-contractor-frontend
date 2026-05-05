@@ -22,7 +22,6 @@ import play.api.data.FormError
 class SelectSubcontractorsToReverifyFormProviderSpec extends CheckboxFieldBehaviours {
 
   private val requiredKey = "verify.selectSubcontractorsToReverify.error.required"
-  private val fieldName   = "value"
 
   "when selection IS required" - {
 

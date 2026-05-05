@@ -33,10 +33,6 @@
 
 @(form: Form[Set[String]], mode: Mode, rows: Seq[SubcontractorReverifyRow], paginationViewModel: PaginationViewModel, page: Int, startIndex: Int, totalCount: Int)(implicit request: Request[_], messages: Messages)
 
-@css = {
-    <link href='@controllers.routes.Assets.versioned("stylesheets/moj-frontend.min.css")' media="all" rel="stylesheet" type="text/css" />
-}
-
 @layout(pageTitle = title(form, messages("verify.selectSubcontractorsToReverify.title"))) {
 
     @formHelper(
@@ -135,9 +131,11 @@
 
             @pageNavigator(paginationViewModel, page)
 
+            <div class="govuk-button-group">
             @govukButton(
                 ButtonViewModel(messages("site.continue"))
             )
+            </div>
         }
     }
 }
