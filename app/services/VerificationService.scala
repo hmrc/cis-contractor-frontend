@@ -18,9 +18,8 @@ package services
 
 import connectors.ConstructionIndustrySchemeConnector
 import models.{Subcontractor, UserAnswers}
-import pages.verify.{CurrentVerificationBatchResponsePage, UnverifiedSubcontractorsPage}
 import models.requests.CreateVerificationBatchAndVerificationsRequest
-import pages.verification.NewestVerificationBatchResponsePage
+import pages.verify.{CurrentVerificationBatchResponsePage, NewestVerificationBatchResponsePage, UnverifiedSubcontractorsPage}
 import queries.CisIdQuery
 import repositories.SessionRepository
 import uk.gov.hmrc.http.HeaderCarrier
