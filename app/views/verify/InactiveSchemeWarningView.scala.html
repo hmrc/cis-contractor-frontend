@@ -21,9 +21,8 @@
         heading: H1,
         paragraph: Paragraph,
         warning: WarningInsetText,
-        button: ButtonWithLink,
-        link: Link
-)
+        govukButton: GovukButton
+    )
 
 @()(implicit request: Request[_], messages: Messages)
 
@@ -36,9 +35,11 @@
 
     @warning(messages("verify.inactiveSchemeWarning.warningText"))
 
-    <div class="govuk-button-group">
-        @button(linkTextKey = "site.continue", linkUrl = "#")
-        @link(linkTextKey = "verify.inactiveSchemeWarning.cancel", linkUrl = "#")
-    </div>
+<div class="govuk-button-group">
+    @govukButton(
+        ButtonViewModel(messages("site.continue")).asLink("#")
+    )
+    <a class="govuk-link" href="#">@messages("verify.inactiveSchemeWarning.cancel")</a>
+</div>
 
 }
