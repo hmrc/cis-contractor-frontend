@@ -22,18 +22,18 @@ import forms.verify.SelectSubcontractorsToReverifyFormProvider
 import models.{NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.when
-import org.mockito.Mockito.verify
 import org.scalatestplus.mockito.MockitoSugar
 import pages.verify.SelectSubcontractorsToReverifyPage
 import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import repositories.SessionRepository
 import org.jsoup.Jsoup
 import services.PaginationToReverifyService
 import models.verify.SelectedSubcontractors
+import models.Subcontractor
+import org.mockito.Mockito.{never, verify, when}
 import viewmodels.verify.SubcontractorReverifyData
 import pages.verify.UnverifiedSubcontractorsPage
 import pages.verify.SelectedUnverifiedSubcontractorsPage
@@ -64,6 +64,22 @@ class SelectSubcontractorsToReverifyControllerSpec extends SpecBase with Mockito
     controllers.verify.routes.SelectSubcontractorsToReverifyController
       .onPageLoad(NormalMode, page)
       .url
+
+  def testSubcontractor(id: Long, name: String): Subcontractor =
+    Subcontractor(
+      subcontractorId = id,
+      firstName = Some(name),
+      secondName = None,
+      surname = None,
+      tradingName = None,
+      partnershipTradingName = None,
+      verified = None,
+      verificationNumber = None,
+      taxTreatment = None,
+      verificationDate = None,
+      lastMonthlyReturnDate = None,
+      createDate = None
+    )
 
   "SubcontractorsToReverifyViewModel Controller" - {
 
@@ -119,6 +135,44 @@ class SelectSubcontractorsToReverifyControllerSpec extends SpecBase with Mockito
 
         // do NOT assert unchecked for other items if you refuse to change the view
         inputValue("value-2") mustBe allRows(2).id
+      }
+    }
+
+    "must return empty form when no previous answer exists (getOrElse path)" in {
+
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+
+      running(application) {
+
+        val request = FakeRequest(GET, url(1))
+        val result  = route(application, request).value
+
+        val view = application.injector.instanceOf[SelectSubcontractorsToReverifyView]
+
+        val baseUrl =
+          controllers.verify.routes.SelectSubcontractorsToReverifyController.onPageLoad(NormalMode).url
+
+        val paginated =
+          paginationService.paginate(
+            allItems = allRows,
+            currentPage = 1,
+            recordsPerPage = 6,
+            baseUrl = baseUrl
+          )
+
+        val expectedForm = formProvider(requireSelection = false)
+
+        status(result) mustEqual OK
+
+        contentAsString(result) mustEqual view(
+          expectedForm,
+          NormalMode,
+          paginated.items,
+          paginated.pagination,
+          1,
+          paginated.startIndex,
+          paginated.totalCount
+        )(request, messages(application)).toString
       }
     }
 
@@ -220,7 +274,6 @@ class SelectSubcontractorsToReverifyControllerSpec extends SpecBase with Mockito
           FakeRequest(POST, url(1))
             .withFormUrlEncodedBody("value" -> "")
 
-        // IMPORTANT: requireSelection MUST be TRUE
         val boundForm = formProvider(requireSelection = true).bind(Map("value" -> ""))
 
         val view = application.injector.instanceOf[SelectSubcontractorsToReverifyView]
@@ -339,6 +392,88 @@ class SelectSubcontractorsToReverifyControllerSpec extends SpecBase with Mockito
         captor.getValue
           .get(SelectSubcontractorsToReverifyPage)
           .value must contain(SelectedSubcontractors(firstRow.id, firstRow.name))
+      }
+    }
+
+    "must redirect to Journey Recovery for case None when hasUnverified && !hasSelectedUnverifiedEarlier && !hasAnyReverifySelection" in {
+
+      val mockSessionRepository = mock[SessionRepository]
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+      val userAnswers =
+        emptyUserAnswers
+          .set(
+            UnverifiedSubcontractorsPage,
+            Seq(testSubcontractor(1L, "Test Subcontractor"))
+          )
+          .success
+          .value
+          .set(SelectedUnverifiedSubcontractorsPage, false)
+          .success
+          .value
+
+      val application =
+        applicationBuilder(userAnswers = Some(userAnswers))
+          .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
+          .build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(POST, url(1))
+            .withFormUrlEncodedBody("value" -> "")
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+
+        verify(mockSessionRepository, never()).set(any())
+      }
+    }
+
+    "must redirect using navigator when case None and hasUnverified && hasSelectedUnverifiedEarlier && no selections exist" in {
+
+      val mockSessionRepository = mock[SessionRepository]
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+      val userAnswers =
+        emptyUserAnswers
+          .set(
+            UnverifiedSubcontractorsPage,
+            Seq(testSubcontractor(1L, "Test Subcontractor"))
+          )
+          .success
+          .value
+          .set(SelectedUnverifiedSubcontractorsPage, true)
+          .success
+          .value
+
+      val application =
+        applicationBuilder(userAnswers = Some(userAnswers))
+          .overrides(
+            bind[SessionRepository].toInstance(mockSessionRepository),
+            bind[Navigator].toInstance(new FakeNavigator(onwardRoute))
+          )
+          .build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(POST, url(1))
+            .withFormUrlEncodedBody("value" -> "")
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual onwardRoute.url
+
+        val captor = org.mockito.ArgumentCaptor.forClass(classOf[UserAnswers])
+        verify(mockSessionRepository).set(captor.capture())
+
+        captor.getValue
+          .get(SelectSubcontractorsToReverifyPage)
+          .value mustBe empty
       }
     }
 
