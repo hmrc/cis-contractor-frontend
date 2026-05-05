@@ -5,6 +5,40 @@
  @use "autocomplete";
 
 
+@media (max-width: 768px) {
+
+  .govuk-table__container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin-bottom: 20px;
+  }
+
+  #subcontractor-table {
+    min-width: 900px;
+  }
+}
+
+@media (min-width: 769px) {
+
+  .govuk-table__container {
+    overflow-x: visible;
+  }
+
+  #subcontractor-table {
+    min-width: auto;
+  }
+}
+
+@media (max-width: 1024px) {
+
+  #subcontractor-table th {
+    white-space: normal !important;
+    word-break: break-word;
+    overflow-wrap: break-word;
+    line-height: 1.2;
+  }
+}
+
 .govuk-pagination__link--button {
   background: none;
   border: 0;
