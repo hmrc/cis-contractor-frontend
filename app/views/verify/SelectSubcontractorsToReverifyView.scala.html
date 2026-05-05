@@ -58,86 +58,86 @@
             @messages("verify.selectSubcontractorsToReverify.hint")
             </div>
 
-        @if(paginationViewModel.items.nonEmpty) {
-            <p class="govuk-body govuk-!-margin-bottom-4 govuk-!-margin-top-5">
-            @messages("verify.selectSubcontractorsToReverify.showingResults", startIndex, startIndex + rows.size - 1, totalCount)
-            </p>
-        }
+            @if(paginationViewModel.items.nonEmpty) {
+                <p class="govuk-body govuk-!-margin-bottom-4 govuk-!-margin-top-5">
+                @messages("verify.selectSubcontractorsToReverify.showingResults", startIndex, startIndex + rows.size - 1, totalCount)
+                </p>
+            }
 
-        @defining(
-            form.value.getOrElse(Set.empty[String])
-        ) { selected =>
+            @defining(
+                form.value.getOrElse(Set.empty[String])
+            ) { selected =>
 
-            <div class="govuk-table__container">
-            @govukTable(
-                Table(
-                    caption = None,
+                <div class="govuk-table__container">
+                    @govukTable(
+                        Table(
+                            caption = None,
 
-                    head = Some(Seq(
-                        HeadCell(Text(messages("verify.selectSubcontractorsToReverify.include"))),
-                        HeadCell(Text(messages("verify.selectSubcontractorsToReverify.name"))),
-                        HeadCell(Text(messages("verify.selectSubcontractorsToReverify.utr"))),
-                        HeadCell(Text(messages("verify.selectSubcontractorsToReverify.verified"))),
-                        HeadCell(Text(messages("verify.selectSubcontractorsToReverify.verificationNumber"))),
-                        HeadCell(Text(messages("verify.selectSubcontractorsToReverify.taxTreatment"))),
-                        HeadCell(Text(messages("verify.selectSubcontractorsToReverify.dateAdded")))
-                    )),
+                            head = Some(Seq(
+                                HeadCell(Text(messages("verify.selectSubcontractorsToReverify.include"))),
+                                HeadCell(Text(messages("verify.selectSubcontractorsToReverify.name"))),
+                                HeadCell(Text(messages("verify.selectSubcontractorsToReverify.utr"))),
+                                HeadCell(Text(messages("verify.selectSubcontractorsToReverify.verified"))),
+                                HeadCell(Text(messages("verify.selectSubcontractorsToReverify.verificationNumber"))),
+                                HeadCell(Text(messages("verify.selectSubcontractorsToReverify.taxTreatment"))),
+                                HeadCell(Text(messages("verify.selectSubcontractorsToReverify.dateAdded")))
+                            )),
 
-                    rows = rows.zipWithIndex.map { case (row, idx) =>
-                        val checkboxId = s"value-$idx"
-                        val value = row.id
-                        val isChecked = selected.contains(row.id)
+                            rows = rows.zipWithIndex.map { case (row, idx) =>
+                                val checkboxId = s"value-$idx"
+                                val value = row.id
+                                val isChecked = selected.contains(row.id)
 
-                        Seq(
+                                Seq(
 
-                            TableRow(
-                                content = HtmlContent(
-                                    s"""
-                        <div class="govuk-checkboxes govuk-checkboxes--small">
-                          <div class="govuk-checkboxes__item">
-                            <input class="govuk-checkboxes__input"
-                                   id="$checkboxId"
-                                   name="value[]"
-                                   type="checkbox"
-                                   value="${row.id}"
-                                   ${if (isChecked) "checked" else ""} />
-                            <label class="govuk-label govuk-checkboxes__label"
-                                   for="$checkboxId">
-                              <span class="govuk-visually-hidden">
-                                Select ${row.name}
-                              </span>
-                            </label>
-                          </div>
-                        </div>
-                        """
+                                    TableRow(
+                                        content = HtmlContent(
+                                            s"""
+                                <div class="govuk-checkboxes govuk-checkboxes--small">
+                                  <div class="govuk-checkboxes__item">
+                                    <input class="govuk-checkboxes__input"
+                                           id="$checkboxId"
+                                           name="value[]"
+                                           type="checkbox"
+                                           value="${row.id}"
+                                           ${if (isChecked) "checked" else ""} />
+                                    <label class="govuk-label govuk-checkboxes__label"
+                                           for="$checkboxId">
+                                      <span class="govuk-visually-hidden">
+                                        Select ${row.name}
+                                      </span>
+                                    </label>
+                                  </div>
+                                </div>
+                                """
+                                        )
+                                    ),
+
+                                    TableRow(Text(row.name)),
+                                    TableRow(Text(row.utr)),
+                                    TableRow(Text(row.verified)),
+                                    TableRow(Text(row.verificationNumber)),
+                                    TableRow(Text(row.taxTreatment)),
+                                    TableRow(Text(row.dateAdded))
                                 )
-                            ),
+                            },
 
-                            TableRow(Text(row.name)),
-                            TableRow(Text(row.utr)),
-                            TableRow(Text(row.verified)),
-                            TableRow(Text(row.verificationNumber)),
-                            TableRow(Text(row.taxTreatment)),
-                            TableRow(Text(row.dateAdded))
+                            attributes = Map(
+                                "id" -> "subcontractor-table",
+                                "class" -> "govuk-table govuk-table--small-text-until-tablet"
+                            )
                         )
-                    },
-
-                    attributes = Map(
-                        "id" -> "subcontractor-table",
-                        "class" -> "govuk-table govuk-table--small-text-until-tablet"
                     )
-                )
-            )
+
+                </div>
 
             @pageNavigator(paginationViewModel, page)
 
-            <div class="govuk-button-group">
             @govukButton(
                 ButtonViewModel(messages("site.continue"))
             )
-            </div>
-        }
+            }
+        </fieldset>
     }
 }
-</div>
-</fieldset>
+
