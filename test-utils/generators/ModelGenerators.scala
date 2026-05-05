@@ -39,7 +39,7 @@ trait ModelGenerators {
         )
         .map(_.toSet)
     }
-  
+
   private val genNonEmptyAlphaStr: Gen[String] =
     Gen.nonEmptyListOf(Gen.alphaChar).map(_.mkString)
 
