@@ -2,8 +2,49 @@
     Styling in this and other .scss files will be compiled by the sbt-sass-compiler plugin: https://github.com/hmrc/sbt-sass-compiler
     If you encounter any issue with Sass compilation using the plugin, please reach out to the PlatUI team.
  */
- @use "autocomplete";
+@use "autocomplete";
 
+
+@media (max-width: 768px) {
+
+  .govuk-table__container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin-bottom: 20px;
+  }
+
+  #subcontractor-table {
+    min-width: 900px;
+  }
+}
+
+@media (min-width: 769px) {
+
+  .govuk-table__container {
+    overflow-x: visible;
+  }
+
+  #subcontractor-table {
+    min-width: auto;
+  }
+}
+
+@media (min-width: 970px) {
+
+  #subcontractor-table th {
+    white-space: nowrap !important;
+  }
+  #subcontractor-table td {
+    white-space: nowrap;
+  }
+}
+
+@media (max-width: 1024px) {
+
+  #subcontractor-table th {
+    white-space: normal;
+  }
+}
 
 .govuk-pagination__link--button {
   background: none;
@@ -42,6 +83,23 @@
   }
 }
 
+#subcontractor-table th,
+#subcontractor-table td {
+  padding-right: 25px;
+  vertical-align: middle;
+}
+
+#subcontractor-table th {
+  overflow-wrap: break-word;
+  line-height: 1.2;
+}
+
+#subcontractor-table th:first-child,
+#subcontractor-table td:first-child {
+  width: 40px;
+  padding-right: 10px;
+}
+
 .js-visible {
   display: none !important;
 }
@@ -67,14 +125,14 @@
 }
 
 .loading-spinner__content {
-    padding-top: 20px;
+  padding-top: 20px;
 }
 
 @keyframes loading-spinner-animation {
-    0% {
-      transform: rotate(0deg);
+  0% {
+    transform: rotate(0deg);
   }
   100% {
-      transform: rotate(360deg);
+    transform: rotate(360deg);
   }
 }
