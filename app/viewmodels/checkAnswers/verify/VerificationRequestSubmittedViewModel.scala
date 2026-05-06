@@ -43,8 +43,11 @@ object VerificationRequestSubmittedViewModel {
         .getOrElse(Seq.empty)
         .map(_.name)
         .toSeq,
-      //  TODO: Replace below hardcoded values with - SelectSubcontractorsToReverifyPage
-      subcontractorsToReverify = Seq("Grant, Alan", "InGen Research"),
+      subcontractorsToReverify =  userAnswers
+        .get(SelectSubcontractorsToReverifyPage)
+        .getOrElse(Seq.empty)
+        .map(_.name)
+        .toSeq,
       confirmationEmail = userAnswers.get(EmailAddressPage)
     )
 }
