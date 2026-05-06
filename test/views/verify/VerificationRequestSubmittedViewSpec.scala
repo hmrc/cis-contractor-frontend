@@ -71,7 +71,7 @@ class VerificationRequestSubmittedViewSpec extends AnyWordSpec with Matchers wit
       doc.select("p.govuk-body").text must include(email)
 
       val emailVerificationLink =
-        doc.select(s"a[href='${appConfig.cisGeneralEnquiries}']")
+        doc.select(s"a[href='#']")
 
       emailVerificationLink.text must include(
         messages("verify.verificationRequestSubmitted.email.verification.link")
