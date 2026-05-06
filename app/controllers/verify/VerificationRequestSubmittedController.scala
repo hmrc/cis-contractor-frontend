@@ -38,9 +38,6 @@ class VerificationRequestSubmittedController @Inject() (
 
   def onPageLoad(): Action[AnyContent] =
     (identify andThen getData andThen requireData) { implicit request =>
-
-      // TODO: Replace this with your real source:
-      // TODO: Replace 1. referenceNumber 2. submittedAt 3. verify list 4. Reverify lists 5. confirmationEmail
       val vm =
         VerificationRequestSubmittedViewModel
           .fromUserAnswers(request.userAnswers)
