@@ -43,7 +43,7 @@ object VerificationRequestSubmittedViewModel {
         .getOrElse(Seq.empty)
         .map(_.name)
         .toSeq,
-      subcontractorsToReverify =  userAnswers
+      subcontractorsToReverify = userAnswers
         .get(SelectSubcontractorsToReverifyPage)
         .getOrElse(Seq.empty)
         .map(_.name)
