@@ -42,14 +42,14 @@
 @(vm: VerificationRequestSubmittedViewModel
 )(implicit request: Request[_],appConfig: FrontendAppConfig, messages: Messages)
 
-@layout(pageTitle = titleNoForm(messages("verify.verificationRequestSubmitted.title"))) {
+@layout(pageTitle = titleNoForm(messages("verify.verificationRequestSubmitted.title")), showBackLink = false) {
 
     @govukPanel(
         Panel(
             title = Text(messages("verify.verificationRequestSubmitted.heading")),
             content = HtmlContent(
                 s"""
-                <p>${messages("verify.verificationRequestSubmitted.reference")}</p>
+                ${messages("verify.verificationRequestSubmitted.reference")}<br>
                 <strong>(${HtmlFormat.escape(vm.referenceNumber)})</strong>
                 """
             )
@@ -79,10 +79,10 @@
                             HtmlContent(
                                 vm.subcontractorsToVerify
                                 .map(name => s"<li>$name</li>")
-                                .mkString("<ul class='govuk-list govuk-list--bullet'>", "", "</ul>")
+                                .mkString("<ul class='govuk-list govuk-list--bullet govuk-!-margin-bottom-0'>", "", "</ul>")
                             )
                         )
-                    )
+                    ).withCssClass("govuk-summary-list__row--no-border")
                 )
             )
         )
@@ -98,10 +98,10 @@
                             HtmlContent(
                                 vm.subcontractorsToReverify
                                 .map(name => s"<li>$name</li>")
-                                .mkString("<ul class='govuk-list govuk-list--bullet'>", "", "</ul>")
+                                .mkString("<ul class='govuk-list govuk-list--bullet govuk-!-margin-bottom-0'>", "", "</ul>")
                             )
                         )
-                    )
+                    ).withCssClass("govuk-summary-list__row--no-border")
                 )
             )
         )
@@ -122,7 +122,7 @@
 
     @link(
         linkTextKey = "verify.verificationRequestSubmitted.email.verification.link",
-        linkUrl = appConfig.cisGeneralEnquiries, // TODO: Link to be updated later
+        linkUrl = "#", // TODO: Link to be updated later
         hasFullStop = true,
         prefixTextKey = "verify.verificationRequestSubmitted.email.verification"
     )
