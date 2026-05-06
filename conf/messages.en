@@ -901,7 +901,8 @@ verify.inactiveSchemeWarning.cancel                                = Cancel requ
 
 verify.verificationNotSubmittedWarning.title                       = Your verification request cannot be submitted
 verify.verificationNotSubmittedWarning.heading                     = Your verification request cannot be submitted
-verify.verificationNotSubmittedWarning.link1.text                  = Contact HMRC by phone
+verify.verificationNotSubmittedWarning.link1.prefix                = You must
+verify.verificationNotSubmittedWarning.link1.text                  = contact HMRC
 verify.verificationNotSubmittedWarning.link1.suffix                = for more help.
 verify.verificationNotSubmittedWarning.link2.text                  = Manage your subcontractors
 verify.verificationNotSubmittedWarning.link2.prefix                = Back to
