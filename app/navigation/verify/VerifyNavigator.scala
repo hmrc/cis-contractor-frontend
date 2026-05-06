@@ -43,12 +43,14 @@ class VerifyNavigator @Inject() () extends NavigatorForJourney {
       userAnswers => navigatorFromContractorEmailConfirmationNotStoredPage(NormalMode)(userAnswers)
     case SelectSubcontractorPage                  =>
       userAnswers => navigatorFromSelectSubcontractorPage(NormalMode)(userAnswers)
+    case ReverifyExistingSubcontractorsYesNoPage  =>
+      userAnswers => navigatorFromReverifyExistingSubcontractorsYesNoPage(NormalMode)(userAnswers)
     case ContractorEmailConfirmationStoredPage    =>
       userAnswers => navigatorFromContractorEmailConfirmationStoredPage(NormalMode)(userAnswers)
     case SelectSubcontractorsToReverifyPage       =>
       _ => controllers.verify.routes.ContractorEmailConfirmationStoredController.onPageLoad(NormalMode)
     case EmailAddressPage                         =>
-      _ => controllers.verify.routes.EmailAddressController.onPageLoad(NormalMode)
+      _ => controllers.verify.routes.VerifyCheckYourAnswersController.onPageLoad()
     case _                                        => _ => controllers.routes.JourneyRecoveryController.onPageLoad()
   }
 
@@ -57,54 +59,57 @@ class VerifyNavigator @Inject() () extends NavigatorForJourney {
       userAnswers => navigatorFromContractorEmailConfirmationNotStoredPage(CheckMode)(userAnswers)
     case SelectSubcontractorPage                  =>
       userAnswers => navigatorFromSelectSubcontractorPage(CheckMode)(userAnswers)
+    case ReverifyExistingSubcontractorsYesNoPage  =>
+      userAnswers => navigatorFromReverifyExistingSubcontractorsYesNoPage(CheckMode)(userAnswers)
     case ContractorEmailConfirmationStoredPage    =>
       userAnswers => navigatorFromContractorEmailConfirmationStoredPage(CheckMode)(userAnswers)
     case SelectSubcontractorsToReverifyPage       =>
       _ => controllers.verify.routes.ContractorEmailConfirmationStoredController.onPageLoad(CheckMode)
     case EmailAddressPage                         =>
-      _ => controllers.verify.routes.EmailAddressController.onPageLoad(CheckMode)
+      _ => controllers.verify.routes.VerifyCheckYourAnswersController.onPageLoad()
     case _                                        => _ => controllers.routes.JourneyRecoveryController.onPageLoad()
-
   }
 
   private def navigatorFromContractorEmailConfirmationNotStoredPage(mode: Mode)(ua: UserAnswers): Call =
     (ua.get(ContractorEmailConfirmationNotStoredPage), mode) match {
-      case (Some(true), _) =>
-        // ToDo: navigate to next page after the page is implemented
-        controllers.verify.routes.ContractorEmailConfirmationNotStoredController.onPageLoad(NormalMode)
-
-      case (Some(false), NormalMode) =>
-        // ToDo: navigate to next page after the page is implemented
-        controllers.verify.routes.ContractorEmailConfirmationNotStoredController.onPageLoad(NormalMode)
-      case (Some(false), CheckMode)  =>
-        // ToDo: navigate CYA page after the page is implemented and implement the logic to handle dependent pages
-        routes.IndexController.onPageLoad()
-
-      case _ =>
-        routes.IndexController.onPageLoad()
+      case (Some(true), _)  => controllers.verify.routes.EmailAddressController.onPageLoad(NormalMode)
+      case (Some(false), _) => controllers.verify.routes.VerifyCheckYourAnswersController.onPageLoad()
+      case _                => controllers.routes.JourneyRecoveryController.onPageLoad()
     }
 
   private def navigatorFromSelectSubcontractorPage(mode: Mode)(ua: UserAnswers): Call = {
     val _ = ua
-    controllers.verify.routes.SelectSubcontractorController.onPageLoad(mode)
+    mode match {
+      case NormalMode => controllers.verify.routes.ReverifyExistingSubcontractorsYesNoController.onPageLoad(NormalMode)
+      case CheckMode  => controllers.verify.routes.VerifyCheckYourAnswersController.onPageLoad()
+    }
   }
+
+  private def navigatorFromReverifyExistingSubcontractorsYesNoPage(mode: Mode)(ua: UserAnswers): Call =
+    (ua.get(ReverifyExistingSubcontractorsYesNoPage), mode) match {
+      case (Some(true), _)           =>
+        // TODO: navigate to VF-03c Subcontractors to reverify once implemented
+        controllers.routes.JourneyRecoveryController.onPageLoad()
+      case (Some(false), NormalMode) =>
+        val hasStoredEmail = ua
+          .get(NewestVerificationBatchResponsePage)
+          .flatMap(_.scheme.headOption)
+          .flatMap(_.emailAddress)
+          .isDefined
+        if (hasStoredEmail) controllers.verify.routes.ContractorEmailConfirmationStoredController.onPageLoad(NormalMode)
+        else controllers.verify.routes.ContractorEmailConfirmationNotStoredController.onPageLoad(NormalMode)
+      case (Some(false), CheckMode)  =>
+        controllers.verify.routes.VerifyCheckYourAnswersController.onPageLoad()
+      case _                         =>
+        controllers.routes.JourneyRecoveryController.onPageLoad()
+    }
 
   private def navigatorFromContractorEmailConfirmationStoredPage(mode: Mode)(ua: UserAnswers): Call =
     (ua.get(ContractorEmailConfirmationStoredPage), mode) match {
-      case (Some(CurrentEmail), _) =>
-        // TODO: navigate to VF-06 Verify declaration once implemented
-        controllers.routes.JourneyRecoveryController.onPageLoad()
-
-      case (Some(DifferentEmail), _) =>
-        // TODO: navigate to SM-01b Enter alternate email once implemented
-        controllers.routes.JourneyRecoveryController.onPageLoad()
-
-      case (Some(DoNotSend), _) =>
-        // TODO: navigate to VF-06 Verify declaration once implemented
-        controllers.routes.JourneyRecoveryController.onPageLoad()
-
-      case _ =>
-        controllers.routes.JourneyRecoveryController.onPageLoad()
+      case (Some(CurrentEmail), _)   => controllers.verify.routes.VerifyCheckYourAnswersController.onPageLoad()
+      case (Some(DifferentEmail), _) => controllers.verify.routes.EmailAddressController.onPageLoad(NormalMode)
+      case (Some(DoNotSend), _)      => controllers.verify.routes.VerifyCheckYourAnswersController.onPageLoad()
+      case _                         => controllers.routes.JourneyRecoveryController.onPageLoad()
     }
 
 }
