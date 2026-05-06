@@ -77,9 +77,13 @@
                         key = messages("verify.verificationRequestSubmitted.subcontractorsToVerify.label"),
                         value = ValueViewModel(
                             HtmlContent(
-                                vm.subcontractorsToVerify
-                                .map(name => s"<li>$name</li>")
-                                .mkString("<ul class='govuk-list govuk-list--bullet govuk-!-margin-bottom-0'>", "", "</ul>")
+                                if (vm.subcontractorsToVerify.size > 1) {
+                                    vm.subcontractorsToVerify
+                                    .map(name => s"<li>$name</li>")
+                                    .mkString("<ul class='govuk-list govuk-list--bullet govuk-!-margin-bottom-0'>", "", "</ul>")
+                                } else {
+                                    vm.subcontractorsToVerify.headOption.getOrElse("")
+                                }
                             )
                         )
                     ).withCssClass("govuk-summary-list__row--no-border")
@@ -96,9 +100,13 @@
                         key = messages("verify.verificationRequestSubmitted.subcontractorsToReverify.label"),
                         value = ValueViewModel(
                             HtmlContent(
-                                vm.subcontractorsToReverify
-                                .map(name => s"<li>$name</li>")
-                                .mkString("<ul class='govuk-list govuk-list--bullet govuk-!-margin-bottom-0'>", "", "</ul>")
+                                if (vm.subcontractorsToReverify.size > 1) {
+                                    vm.subcontractorsToReverify
+                                    .map(name => s"<li>$name</li>")
+                                    .mkString("<ul class='govuk-list govuk-list--bullet govuk-!-margin-bottom-0'>", "", "</ul>")
+                                } else {
+                                    vm.subcontractorsToReverify.headOption.getOrElse("")
+                                }
                             )
                         )
                     ).withCssClass("govuk-summary-list__row--no-border")
