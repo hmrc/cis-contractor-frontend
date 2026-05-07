@@ -17,11 +17,11 @@
 package controllers.verify
 
 import base.SpecBase
-import models.{NormalMode, UserAnswers}
+import models.UserAnswers
 import org.scalatest.matchers.must.Matchers
 import play.api.http.Status
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import queries.CisIdQuery
 import views.html.verify.NoSubcontractorsSelectedWarningView
 
