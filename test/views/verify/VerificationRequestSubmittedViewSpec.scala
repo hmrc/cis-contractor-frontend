@@ -90,7 +90,7 @@ class VerificationRequestSubmittedViewSpec extends AnyWordSpec with Matchers wit
       )
 
       val manageLink =
-        doc.select(s"a[href='${appConfig.manageSubcontractorsUrl}/${cisId}']")
+        doc.select(s"a[href='${appConfig.manageSubcontractorsUrl}/$cisId']")
 
       manageLink.size() mustBe 1
       manageLink.text() mustBe
