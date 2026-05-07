@@ -16,6 +16,7 @@
 
 package pages.verify
 
+import models.UserAnswers
 import pages.behaviours.PageBehaviours
 
 class ContractorEmailConfirmationNotStoredPageSpec extends PageBehaviours {
@@ -23,10 +24,51 @@ class ContractorEmailConfirmationNotStoredPageSpec extends PageBehaviours {
   "ContractorEmailConfirmationNotStoredPage" - {
 
     beRetrievable[Boolean](ContractorEmailConfirmationNotStoredPage)
-
     beSettable[Boolean](ContractorEmailConfirmationNotStoredPage)
-
     beRemovable[Boolean](ContractorEmailConfirmationNotStoredPage)
-  }
 
+    "cleanup" - {
+
+      "must remove EmailAddressPage when answer is false (stale email must be cleared)" in {
+        val answers =
+          UserAnswers("id")
+            .setOrException(EmailAddressPage, "new@test.com")
+            .setOrException(ContractorEmailConfirmationNotStoredPage, true) // previous choice
+
+        val result =
+          ContractorEmailConfirmationNotStoredPage
+            .cleanup(Some(false), answers)
+            .success
+            .value
+
+        result.get(EmailAddressPage) mustBe None
+      }
+
+      "must keep EmailAddressPage when answer is true" in {
+        val answers =
+          UserAnswers("id")
+            .setOrException(EmailAddressPage, "new@test.com")
+
+        val result =
+          ContractorEmailConfirmationNotStoredPage
+            .cleanup(Some(true), answers)
+            .success
+            .value
+
+        result.get(EmailAddressPage) mustBe Some("new@test.com")
+      }
+
+      "must keep answers unchanged when no answer is provided" in {
+        val answers = UserAnswers("id")
+
+        val result =
+          ContractorEmailConfirmationNotStoredPage
+            .cleanup(None, answers)
+            .success
+            .value
+
+        result mustEqual answers
+      }
+    }
+  }
 }

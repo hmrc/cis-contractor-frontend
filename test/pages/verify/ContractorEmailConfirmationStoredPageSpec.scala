@@ -25,56 +25,64 @@ class ContractorEmailConfirmationStoredPageSpec extends PageBehaviours {
   "ContractorEmailConfirmationStoredPage" - {
 
     beRetrievable[ContractorEmailConfirmationStored](ContractorEmailConfirmationStoredPage)
-
     beSettable[ContractorEmailConfirmationStored](ContractorEmailConfirmationStoredPage)
-
     beRemovable[ContractorEmailConfirmationStored](ContractorEmailConfirmationStoredPage)
 
     "cleanup" - {
 
-      "must retain user answers when the answer is DifferentEmail" in {
-        val answers = UserAnswers("id")
-          .setOrException(ContractorEmailConfirmationStoredPage, ContractorEmailConfirmationStored.DifferentEmail)
+      "must retain EmailAddressPage when the answer is DifferentEmail" in {
+        val answers =
+          UserAnswers("id")
+            .setOrException(EmailAddressPage, "alt@test.com")
+            .setOrException(ContractorEmailConfirmationStoredPage, ContractorEmailConfirmationStored.DifferentEmail)
 
-        val result = ContractorEmailConfirmationStoredPage
-          .cleanup(Some(ContractorEmailConfirmationStored.DifferentEmail), answers)
-          .success
-          .value
+        val result =
+          ContractorEmailConfirmationStoredPage
+            .cleanup(Some(ContractorEmailConfirmationStored.DifferentEmail), answers)
+            .success
+            .value
 
-        result mustEqual answers
+        result.get(EmailAddressPage) mustBe Some("alt@test.com")
       }
 
-      "must retain user answers when the answer is CurrentEmail" in {
-        val answers = UserAnswers("id")
-          .setOrException(ContractorEmailConfirmationStoredPage, ContractorEmailConfirmationStored.CurrentEmail)
+      "must remove EmailAddressPage when the answer is CurrentEmail (stale email must be cleared)" in {
+        val answers =
+          UserAnswers("id")
+            .setOrException(EmailAddressPage, "alt@test.com")
+            .setOrException(ContractorEmailConfirmationStoredPage, ContractorEmailConfirmationStored.DifferentEmail)
 
-        val result = ContractorEmailConfirmationStoredPage
-          .cleanup(Some(ContractorEmailConfirmationStored.CurrentEmail), answers)
-          .success
-          .value
+        val result =
+          ContractorEmailConfirmationStoredPage
+            .cleanup(Some(ContractorEmailConfirmationStored.CurrentEmail), answers)
+            .success
+            .value
 
-        result mustEqual answers
+        result.get(EmailAddressPage) mustBe None
       }
 
-      "must retain user answers when the answer is DoNotSend" in {
-        val answers = UserAnswers("id")
-          .setOrException(ContractorEmailConfirmationStoredPage, ContractorEmailConfirmationStored.DoNotSend)
+      "must remove EmailAddressPage when the answer is DoNotSend (stale email must be cleared)" in {
+        val answers =
+          UserAnswers("id")
+            .setOrException(EmailAddressPage, "alt@test.com")
+            .setOrException(ContractorEmailConfirmationStoredPage, ContractorEmailConfirmationStored.DifferentEmail)
 
-        val result = ContractorEmailConfirmationStoredPage
-          .cleanup(Some(ContractorEmailConfirmationStored.DoNotSend), answers)
-          .success
-          .value
+        val result =
+          ContractorEmailConfirmationStoredPage
+            .cleanup(Some(ContractorEmailConfirmationStored.DoNotSend), answers)
+            .success
+            .value
 
-        result mustEqual answers
+        result.get(EmailAddressPage) mustBe None
       }
 
       "must retain user answers when there is no answer" in {
         val answers = UserAnswers("id")
 
-        val result = ContractorEmailConfirmationStoredPage
-          .cleanup(None, answers)
-          .success
-          .value
+        val result =
+          ContractorEmailConfirmationStoredPage
+            .cleanup(None, answers)
+            .success
+            .value
 
         result mustEqual answers
       }
