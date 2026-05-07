@@ -891,3 +891,8 @@ verify.verifyDepartmentalError.contactHMRC.p1                      =  for more h
 verify.verifyDepartmentalError.contactHMRC.p1.link                 =  Contact HMRC by phone
 verify.verifyDepartmentalError.manageSubcontractors.p1             =  Back to
 verify.verifyDepartmentalError.manageSubcontractors.p1.link        =  Manage your subcontractors
+
+contractorDetails.title    = Contractor details
+contractorDetails.heading  = Contractor details
+contractorDetails.p1       = Use this service to confirm or change the contractor's email or scheme name associated with this account.
+contractorDetails.p2       = You will need the contractor Unique Tax Reference (UTR) to do this.
