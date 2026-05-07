@@ -44,10 +44,8 @@ object VerificationRequestSubmittedViewModel {
       // TODO: Replace below with actuals - 1. referenceNumber 2. submittedAt
       referenceNumber = "Reference Number 12345",
       submittedAt = LocalDateTime.now(),
-      subcontractorsToVerify =
-        namesFrom(userAnswers.get(SelectSubcontractorPage))(_.name),
-      subcontractorsToReverify =
-        namesFrom(userAnswers.get(SelectSubcontractorsToReverifyPage))(_.name),
+      subcontractorsToVerify = namesFrom(userAnswers.get(SelectSubcontractorPage))(_.name),
+      subcontractorsToReverify = namesFrom(userAnswers.get(SelectSubcontractorsToReverifyPage))(_.name),
       confirmationEmail = userAnswers.get(EmailAddressPage)
     )
 }
