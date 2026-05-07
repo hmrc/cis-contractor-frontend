@@ -50,7 +50,7 @@
             content = HtmlContent(
                 s"""
                 ${messages("verify.verificationRequestSubmitted.reference")}<br>
-                <strong>(${HtmlFormat.escape(vm.referenceNumber)})</strong>
+                <strong>${HtmlFormat.escape(vm.referenceNumber)}</strong>
                 """
             )
         )
@@ -166,7 +166,9 @@
 
     @link(
         linkTextKey = "verify.verificationRequestSubmitted.needHelp.manageSubcontractors.link",
-        linkUrl = appConfig.manageSubcontractorsUrl,  // TODO: Link to be updated later.
+        linkUrl = vm.cisId.map(id =>
+                        s"${appConfig.manageSubcontractorsUrl}/${id}"
+                    ).getOrElse("#"),
         hasFullStop = true,
         prefixTextKey = "verify.verificationRequestSubmitted.needHelp.p3",
     )

@@ -16,38 +16,38 @@
 
 package viewmodels.checkAnswers.verify
 import models.UserAnswers
-import pages.verify._
+import pages.verify.*
+import queries.CisIdQuery
+
 import java.time.LocalDateTime
 
 case class VerificationRequestSubmittedViewModel(
+  cisId: Option[String] = None,
   referenceNumber: String,
   submittedAt: LocalDateTime,
-  subcontractorsToVerify: Seq[String],
+  subcontractorsToVerify: Seq[String] = Seq.empty,
   subcontractorsToReverify: Seq[String] = Seq.empty,
   confirmationEmail: Option[String] = None
 ) {
-  def showEmail: Boolean    = confirmationEmail.isDefined
-  def showVerify: Boolean   = subcontractorsToVerify.nonEmpty
-  def showReverify: Boolean = subcontractorsToReverify.nonEmpty
+  val showEmail: Boolean    = confirmationEmail.isDefined
+  val showVerify: Boolean   = subcontractorsToVerify.nonEmpty
+  val showReverify: Boolean = subcontractorsToReverify.nonEmpty
 }
-
 object VerificationRequestSubmittedViewModel {
+
+  private def namesFrom[A](maybe: Option[Iterable[A]])(name: A => String): Seq[String] =
+    maybe.fold(Seq.empty)(_.map(name).toSeq)
 
   def fromUserAnswers(userAnswers: UserAnswers): VerificationRequestSubmittedViewModel =
     VerificationRequestSubmittedViewModel(
-      //  TODO: Replace below with actuals - 1. referenceNumber 2. submittedAt
+      cisId = userAnswers.get(CisIdQuery),
+      // TODO: Replace below with actuals - 1. referenceNumber 2. submittedAt
       referenceNumber = "Reference Number 12345",
       submittedAt = LocalDateTime.now(),
-      subcontractorsToVerify = userAnswers
-        .get(SelectSubcontractorPage)
-        .getOrElse(Seq.empty)
-        .map(_.name)
-        .toSeq,
-      subcontractorsToReverify = userAnswers
-        .get(SelectSubcontractorsToReverifyPage)
-        .getOrElse(Seq.empty)
-        .map(_.name)
-        .toSeq,
+      subcontractorsToVerify =
+        namesFrom(userAnswers.get(SelectSubcontractorPage))(_.name),
+      subcontractorsToReverify =
+        namesFrom(userAnswers.get(SelectSubcontractorsToReverifyPage))(_.name),
       confirmationEmail = userAnswers.get(EmailAddressPage)
     )
 }
