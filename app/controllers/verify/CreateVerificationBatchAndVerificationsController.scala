@@ -17,8 +17,7 @@
 package controllers.verify
 
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
-import pages.verification.CurrentVerificationBatchResponsePage
-import pages.verify.{SelectSubcontractorPage, SelectSubcontractorsToReverifyPage}
+import pages.verify.{CurrentVerificationBatchResponsePage, SelectSubcontractorPage, SelectSubcontractorsToReverifyPage}
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}

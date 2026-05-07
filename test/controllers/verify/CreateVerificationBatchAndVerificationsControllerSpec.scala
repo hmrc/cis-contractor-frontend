@@ -26,16 +26,21 @@ import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{never, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
-import pages.verification.CurrentVerificationBatchResponsePage
-import pages.verify.{SelectSubcontractorPage, SelectSubcontractorsToReverifyPage}
+import pages.verify.{CurrentVerificationBatchResponsePage, SelectSubcontractorPage, SelectSubcontractorsToReverifyPage}
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import services.VerificationService
-
+import connectors.ConstructionIndustrySchemeConnector
 import scala.concurrent.Future
+import repositories.SessionRepository
+import scala.concurrent.ExecutionContext
+import uk.gov.hmrc.http.HeaderCarrier
 
 class CreateVerificationBatchAndVerificationsControllerSpec extends SpecBase with MockitoSugar {
+
+  implicit val ec: ExecutionContext = scala.concurrent.ExecutionContext.global
+  implicit val hc: HeaderCarrier    = HeaderCarrier()
 
   private val emptyCurrent: GetCurrentVerificationBatchResponse =
     GetCurrentVerificationBatchResponse(
@@ -85,6 +90,40 @@ class CreateVerificationBatchAndVerificationsControllerSpec extends SpecBase wit
       val ua =
         emptyUserAnswers
           .set(SelectSubcontractorPage, Set(SubcontractorViewModel("10", "Name 10")))
+          .success
+          .value
+
+      val app =
+        applicationBuilder(userAnswers = Some(ua))
+          .overrides(bind[VerificationService].toInstance(mockService))
+          .build()
+
+      running(app) {
+        val controller = app.injector.instanceOf[CreateVerificationBatchAndVerificationsController]
+
+        val request = FakeRequest(POST, "/test-only")
+        val result  = controller.onSubmit()(request)
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result).value mustBe routes.JourneyRecoveryController.onPageLoad().url
+
+        verify(mockService, never())
+          .createVerificationBatchAndVerifications(any[UserAnswers], any[Seq[Long]], any())(any())
+      }
+    }
+
+    "must redirect to JourneyRecovery when an invalid subcontractor id is found (parseIds Left) and not call service" in {
+      val mockService = mock[VerificationService]
+
+      val ua =
+        emptyUserAnswers
+          .set(CurrentVerificationBatchResponsePage, emptyCurrent)
+          .success
+          .value
+          .set(
+            SelectSubcontractorPage,
+            Set(SubcontractorViewModel("not-a-long", "Bad Id"))
+          )
           .success
           .value
 
@@ -224,5 +263,125 @@ class CreateVerificationBatchAndVerificationsControllerSpec extends SpecBase wit
         redirectLocation(result).value mustBe routes.JourneyRecoveryController.onPageLoad().url
       }
     }
+  }
+
+  "must default missing SelectSubcontractorPage to empty (getOrElse Seq.empty) and use only reverify ids" in {
+    val mockService = mock[VerificationService]
+
+    val ua =
+      emptyUserAnswers
+        .set(CurrentVerificationBatchResponsePage, emptyCurrent)
+        .success
+        .value
+        .set(
+          SelectSubcontractorsToReverifyPage,
+          Set(
+            SelectedSubcontractors("30", "Name 30"),
+            SelectedSubcontractors("20", "Name 20")
+          )
+        )
+        .success
+        .value
+
+    when(mockService.createVerificationBatchAndVerifications(any[UserAnswers], any[Seq[Long]], eqTo(None))(any()))
+      .thenReturn(Future.successful(ua))
+
+    val app =
+      applicationBuilder(userAnswers = Some(ua))
+        .overrides(bind[VerificationService].toInstance(mockService))
+        .build()
+
+    running(app) {
+      val controller = app.injector.instanceOf[CreateVerificationBatchAndVerificationsController]
+
+      val request = FakeRequest(POST, "/test-only")
+      val result  = controller.onSubmit()(request)
+
+      status(result) mustBe SEE_OTHER
+      redirectLocation(result).value mustBe routes.IndexController.onPageLoad().url
+
+      val idsCaptor = ArgumentCaptor.forClass(classOf[Seq[Long]])
+      verify(mockService).createVerificationBatchAndVerifications(eqTo(ua), idsCaptor.capture(), eqTo(None))(any())
+
+      idsCaptor.getValue.sorted mustBe Seq(20L, 30L)
+    }
+  }
+
+  "must default missing SelectSubcontractorsToReverifyPage to empty (getOrElse Seq.empty) and use only verify ids" in {
+    val mockService = mock[VerificationService]
+
+    val ua =
+      emptyUserAnswers
+        .set(CurrentVerificationBatchResponsePage, emptyCurrent)
+        .success
+        .value
+        .set(
+          SelectSubcontractorPage,
+          Set(
+            SubcontractorViewModel("10", "Name 10"),
+            SubcontractorViewModel("20", "Name 20")
+          )
+        )
+        .success
+        .value
+
+    when(mockService.createVerificationBatchAndVerifications(any[UserAnswers], any[Seq[Long]], eqTo(None))(any()))
+      .thenReturn(Future.successful(ua))
+
+    val app =
+      applicationBuilder(userAnswers = Some(ua))
+        .overrides(bind[VerificationService].toInstance(mockService))
+        .build()
+
+    running(app) {
+      val controller = app.injector.instanceOf[CreateVerificationBatchAndVerificationsController]
+
+      val request = FakeRequest(POST, "/test-only")
+      val result  = controller.onSubmit()(request)
+
+      status(result) mustBe SEE_OTHER
+      redirectLocation(result).value mustBe routes.IndexController.onPageLoad().url
+
+      val idsCaptor = ArgumentCaptor.forClass(classOf[Seq[Long]])
+      verify(mockService).createVerificationBatchAndVerifications(eqTo(ua), idsCaptor.capture(), eqTo(None))(any())
+
+      idsCaptor.getValue.sorted mustBe Seq(10L, 20L)
+    }
+  }
+
+  "must fail when CisIdQuery is missing (InstanceIdQuery not found in session data) and not call connector nor repo" in {
+    val mockConnector = mock[ConstructionIndustrySchemeConnector]
+    val mockRepo      = mock[SessionRepository]
+    val service       = new VerificationService(mockConnector, mockRepo)
+
+    val currentBatchResponse =
+      GetCurrentVerificationBatchResponse(
+        subcontractors = Nil,
+        verificationBatch = None,
+        verifications = Nil
+      )
+
+    val ua =
+      emptyUserAnswers
+        .set(CurrentVerificationBatchResponsePage, currentBatchResponse)
+        .success
+        .value
+
+    val ex =
+      service
+        .createVerificationBatchAndVerifications(
+          userAnswers = ua,
+          selectedSubcontractorIds = Seq(10L),
+          actionIndicator = None
+        )
+        .failed
+        .futureValue
+
+    ex.getMessage must include("InstanceIdQuery not found in session data")
+
+    verify(mockConnector, never()).createVerificationBatchAndVerifications(any())(any())
+    verify(mockConnector, never()).getCurrentVerificationBatch(any[String])(any())
+    verify(mockConnector, never()).getNewestVerificationBatch(any[String])(any())
+    verify(mockRepo, never()).set(any())
   }
 }
