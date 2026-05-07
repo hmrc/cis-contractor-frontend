@@ -17,6 +17,7 @@
 package views.verify
 
 import config.FrontendAppConfig
+import models.NormalMode
 import org.jsoup.Jsoup
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
@@ -49,8 +50,13 @@ class NoSubcontractorsSelectedWarningViewSpec extends AnyWordSpec with Matchers 
 
       val manageSubcontractorsUrl = "/manage-subcontractors"
 
+      val selectSubcontractorsToReverifyUrl =
+        controllers.verify.routes.SelectSubcontractorsToReverifyController
+          .onPageLoad(NormalMode)
+          .url
+
       val html =
-        view(manageSubcontractorsUrl)(
+        view(manageSubcontractorsUrl, selectSubcontractorsToReverifyUrl)(
           request,
           messages
         )
@@ -76,13 +82,15 @@ class NoSubcontractorsSelectedWarningViewSpec extends AnyWordSpec with Matchers 
       primaryButton.size() mustBe 1
       primaryButton.text() mustBe
         messages("verify.noSubcontractorsSelectedWarning.button")
-      primaryButton.attr("href") mustBe "#"
+      primaryButton.attr("href") mustBe selectSubcontractorsToReverifyUrl
+      primaryButton.attr("id") mustBe "select-button"
 
       val cancelLink = buttonGroup.select("a.govuk-link")
       cancelLink.size() mustBe 1
       cancelLink.text() mustBe
         messages("verify.noSubcontractorsSelectedWarning.cancel")
       cancelLink.attr("href") mustBe manageSubcontractorsUrl
+      cancelLink.attr("id") mustBe "cancel-link"
     }
   }
 }

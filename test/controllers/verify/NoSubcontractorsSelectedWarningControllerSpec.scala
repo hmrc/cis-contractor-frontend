@@ -17,7 +17,7 @@
 package controllers.verify
 
 import base.SpecBase
-import models.UserAnswers
+import models.{NormalMode, UserAnswers}
 import org.scalatest.matchers.must.Matchers
 import play.api.http.Status
 import play.api.test.FakeRequest
@@ -30,6 +30,8 @@ class NoSubcontractorsSelectedWarningControllerSpec extends SpecBase with Matche
   private val cisId                    = "12345"
   private val manageSubcontractorsBase = applicationConfig.manageSubcontractorsUrl
   private val expectedManageUrl        = s"$manageSubcontractorsBase/$cisId"
+
+  private val expectedSelectSubcontractorsToReverifyUrl = "/verify/select-subcontractors-to-reverify"
 
   "NoSubcontractorsSelectedWarningController" - {
 
@@ -55,7 +57,7 @@ class NoSubcontractorsSelectedWarningControllerSpec extends SpecBase with Matche
 
         status(result) mustBe Status.OK
         contentAsString(result) mustBe
-          view(expectedManageUrl)(request, messages(application)).toString
+          view(expectedManageUrl, expectedSelectSubcontractorsToReverifyUrl)(request, messages(application)).toString
       }
     }
 

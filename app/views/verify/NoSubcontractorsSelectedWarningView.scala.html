@@ -21,18 +21,21 @@
         paragraph: Paragraph,
         heading: H1,
         link: Link,
+        govukButton: GovukButton,
         button: ButtonWithLink
 )
 
-@(manageSubcontractorsUrl: String)(implicit request: Request[_], messages: Messages)
+@(manageSubcontractorsUrl: String, SelectSubcontractorsToReverifyUrl: String)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = titleNoForm(messages("verify.noSubcontractorsSelectedWarning.title")), showBackLink = false) {
 
   @heading(messages("verify.noSubcontractorsSelectedWarning.heading"))
   @paragraph(messages("verify.noSubcontractorsSelectedWarning.p"))
 
-  <div class="govuk-button-group">
-   @button(linkTextKey = "verify.noSubcontractorsSelectedWarning.button", linkUrl = "#")
-   @link(linkTextKey = "verify.noSubcontractorsSelectedWarning.cancel", linkUrl = manageSubcontractorsUrl)
-  </div>
+<div class="govuk-button-group">
+    @govukButton(
+    ButtonViewModel(messages("verify.noSubcontractorsSelectedWarning.button")).asLink(SelectSubcontractorsToReverifyUrl).withAttribute("id" -> "select-button")
+    )
+    @link(linkTextKey = "verify.noSubcontractorsSelectedWarning.cancel", linkUrl = manageSubcontractorsUrl, linkId = "cancel-link")
+</div>
 }

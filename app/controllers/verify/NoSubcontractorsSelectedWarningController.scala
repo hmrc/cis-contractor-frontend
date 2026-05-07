@@ -18,6 +18,7 @@ package controllers.verify
 
 import config.FrontendAppConfig
 import controllers.actions.*
+import models.NormalMode
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import queries.CisIdQuery
@@ -38,10 +39,12 @@ class NoSubcontractorsSelectedWarningController @Inject() (
     with I18nSupport {
 
   def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
+    val SelectSubcontractorsToReverifyUrl =
+      controllers.verify.routes.SelectSubcontractorsToReverifyController.onPageLoad(NormalMode).url
     request.userAnswers.get(CisIdQuery) match {
       case Some(cisId) =>
         val manageSubcontractorsUrl = s"${appConfig.manageSubcontractorsUrl}/$cisId"
-        Ok(view(manageSubcontractorsUrl))
+        Ok(view(manageSubcontractorsUrl, SelectSubcontractorsToReverifyUrl))
 
       case None =>
         Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
