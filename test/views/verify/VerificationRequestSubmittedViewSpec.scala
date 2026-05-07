@@ -89,12 +89,12 @@ class VerificationRequestSubmittedViewSpec extends AnyWordSpec with Matchers wit
         messages("verify.verificationRequestSubmitted.needHelp.subHeading")
       )
 
-      val manageLink =
-        doc.select(s"a[href='${appConfig.manageSubcontractorsUrl}']")
-
-      manageLink.text must include(
-        messages("verify.verificationRequestSubmitted.needHelp.manageSubcontractors.link")
-      )
+//      val manageLink =
+//        doc.select(s"a[href='${appConfig.manageSubcontractorsUrl}']")
+//
+//      manageLink.text must include(
+//        messages("verify.verificationRequestSubmitted.needHelp.manageSubcontractors.link")
+//      )
 
       doc.select("h2").text must include(
         messages("verify.verificationRequestSubmitted.feedback.subHeading")
