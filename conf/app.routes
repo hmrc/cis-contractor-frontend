@@ -402,3 +402,5 @@ GET   /verify/problem-with-verification-warning        controllers.verify.Verify
 GET   /verify/inactive-scheme-warning                    controllers.verify.InactiveSchemeWarningController.onPageLoad()
 
 GET   /verify/verification-not-submitted-warning       controllers.verify.VerificationNotSubmittedWarningController.onPageLoad()
+
+GET   /verify/no-subcontractors-selected-warning       controllers.verify.NoSubcontractorsSelectedWarningController.onPageLoad()
