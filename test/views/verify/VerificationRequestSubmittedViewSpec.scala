@@ -89,12 +89,12 @@ class VerificationRequestSubmittedViewSpec extends AnyWordSpec with Matchers wit
         messages("verify.verificationRequestSubmitted.needHelp.subHeading")
       )
 
-//      val manageLink =
-//        doc.select(s"a[href='${appConfig.manageSubcontractorsUrl}']")
-//
-//      manageLink.text must include(
-//        messages("verify.verificationRequestSubmitted.needHelp.manageSubcontractors.link")
-//      )
+      val manageLink =
+        doc.select(s"a[href='${appConfig.manageSubcontractorsUrl}/${cisId}']")
+
+      manageLink.size() mustBe 1
+      manageLink.text() mustBe
+        messages("verify.verificationRequestSubmitted.needHelp.manageSubcontractors.link")
 
       doc.select("h2").text must include(
         messages("verify.verificationRequestSubmitted.feedback.subHeading")
@@ -164,8 +164,11 @@ class VerificationRequestSubmittedViewSpec extends AnyWordSpec with Matchers wit
 
     val email = "test@testmail.com"
 
+    val cisId = "1"
+
     val viewModel: VerificationRequestSubmittedViewModel =
       VerificationRequestSubmittedViewModel(
+        cisId = Some(cisId),
         referenceNumber = referenceNumber,
         submittedAt = submittedAt,
         subcontractorsToVerify = subcontractorsToVerify,
