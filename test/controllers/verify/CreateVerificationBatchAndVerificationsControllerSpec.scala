@@ -14,35 +14,20 @@
  * limitations under the License.
  */
 
-/*
- * Copyright 2026 HM Revenue & Customs
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package controllers.verify
 
 import base.SpecBase
 import controllers.routes
 import models.UserAnswers
 import models.response.GetCurrentVerificationBatchResponse
-import models.{SubcontractorCurrentVerification, VerificationBatchCurrentVerification, VerificationCurrentVerification}
+import models.{SubcontractorCurrentVerification, SubcontractorViewModel, VerificationBatchCurrentVerification, VerificationCurrentVerification}
+import models.verify.SelectedSubcontractors
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{never, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import pages.verification.CurrentVerificationBatchResponsePage
-import pages.verify.{ReverifySubcontractorsPage, SelectedSubcontractorsToVerifyPage}
+import pages.verify.{SelectSubcontractorPage, SelectSubcontractorsToReverifyPage}
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
@@ -99,7 +84,7 @@ class CreateVerificationBatchAndVerificationsControllerSpec extends SpecBase wit
 
       val ua =
         emptyUserAnswers
-          .set(SelectedSubcontractorsToVerifyPage, Seq(10L))
+          .set(SelectSubcontractorPage, Set(SubcontractorViewModel("10", "Name 10")))
           .success
           .value
 
@@ -122,7 +107,7 @@ class CreateVerificationBatchAndVerificationsControllerSpec extends SpecBase wit
       }
     }
 
-    "must return OK (placeholder) when current batch exists and not call service (TODO: modify later)" in {
+    "must return OK (placeholder) when current batch exists and not call service (todo: call modify controller later)" in {
       val mockService = mock[VerificationService]
 
       val ua =
@@ -130,7 +115,7 @@ class CreateVerificationBatchAndVerificationsControllerSpec extends SpecBase wit
           .set(CurrentVerificationBatchResponsePage, nonEmptyCurrent)
           .success
           .value
-          .set(SelectedSubcontractorsToVerifyPage, Seq(10L))
+          .set(SelectSubcontractorPage, Set(SubcontractorViewModel("10", "Name 10")))
           .success
           .value
 
@@ -153,7 +138,7 @@ class CreateVerificationBatchAndVerificationsControllerSpec extends SpecBase wit
       }
     }
 
-    "must call service with distinct combined IDs when current batch is empty and then redirect to Index" in {
+    "must call service with distinct combined ids when current batch is empty and then redirect to Index" in {
       val mockService = mock[VerificationService]
 
       val ua =
@@ -161,10 +146,23 @@ class CreateVerificationBatchAndVerificationsControllerSpec extends SpecBase wit
           .set(CurrentVerificationBatchResponsePage, emptyCurrent)
           .success
           .value
-          .set(SelectedSubcontractorsToVerifyPage, Seq(10L, 20L, 10L))
+          .set(
+            SelectSubcontractorPage,
+            Set(
+              SubcontractorViewModel("10", "Name 10"),
+              SubcontractorViewModel("20", "Name 20"),
+              SubcontractorViewModel("10", "Name 10")
+            )
+          )
           .success
           .value
-          .set(ReverifySubcontractorsPage, Seq(30L, 20L))
+          .set(
+            SelectSubcontractorsToReverifyPage,
+            Set(
+              SelectedSubcontractors("30", "Name 30"),
+              SelectedSubcontractors("20", "Name 20")
+            )
+          )
           .success
           .value
 
@@ -203,7 +201,7 @@ class CreateVerificationBatchAndVerificationsControllerSpec extends SpecBase wit
           .set(CurrentVerificationBatchResponsePage, emptyCurrent)
           .success
           .value
-          .set(SelectedSubcontractorsToVerifyPage, Seq(10L))
+          .set(SelectSubcontractorPage, Set(SubcontractorViewModel("10", "Name 10")))
           .success
           .value
 

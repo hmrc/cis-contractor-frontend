@@ -18,7 +18,7 @@ package controllers.verify
 
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
 import pages.verification.CurrentVerificationBatchResponsePage
-import pages.verify.{ReverifySubcontractorsPage, SelectedSubcontractorsToVerifyPage}
+import pages.verify.{SelectSubcontractorPage, SelectSubcontractorsToReverifyPage}
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -45,44 +45,64 @@ class CreateVerificationBatchAndVerificationsController @Inject() (
       current.verificationBatch.nonEmpty || current.verifications.nonEmpty
     }
 
+  private def parseIds(label: String, ids: Iterable[String]): Either[String, Seq[Long]] = {
+    val parsed = ids.toSeq.distinct.map(_.trim).map(_.toLongOption)
+    if (parsed.forall(_.isDefined)) Right(parsed.flatten)
+    else Left(s"Invalid subcontractor id(s) found in $label")
+  }
+
   def onSubmit(): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
 
-      val vf03Ids: Seq[Long] =
-        request.userAnswers.get(SelectedSubcontractorsToVerifyPage).getOrElse(Nil)
+      val verifyIdsRaw: Seq[String] =
+        request.userAnswers
+          .get(SelectSubcontractorPage)
+          .map(_.toSeq.map(_.id))
+          .getOrElse(Seq.empty)
 
-      val vf03cIds: Seq[Long] =
-        request.userAnswers.get(ReverifySubcontractorsPage).getOrElse(Nil)
+      val reverifyIdsRaw: Seq[String] =
+        request.userAnswers
+          .get(SelectSubcontractorsToReverifyPage)
+          .map(_.toSeq.map(_.id))
+          .getOrElse(Seq.empty)
 
-      val selectedIds = (vf03Ids ++ vf03cIds).distinct
+      val selectedIdsEither =
+        for {
+          verifyIds   <- parseIds("SelectSubcontractorPage", verifyIdsRaw)
+          reverifyIds <- parseIds("SelectSubcontractorsToReverifyPage", reverifyIdsRaw)
+        } yield (verifyIds ++ reverifyIds).distinct
 
-      request.userAnswers.get(CurrentVerificationBatchResponsePage) match {
+      selectedIdsEither match {
 
-        case None =>
+        case Left(msg) =>
+          logger.error(s"[CreateVerificationBatchAndVerificationsController.onSubmit] $msg")
           Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
 
-        case Some(_) if hasCurrentBatch(request.userAnswers) =>
-          // Todo: when modifyCurrentBatch endpoint is implemented, call that here instead.
-          Future.successful(Ok("Current verification batch exists - modify flow to be implemented"))
+        case Right(selectedIds) =>
+          request.userAnswers.get(CurrentVerificationBatchResponsePage) match {
 
-        case Some(_) =>
-          verificationService
-            .createVerificationBatchAndVerifications(
-              userAnswers = request.userAnswers,
-              selectedSubcontractorIds = selectedIds,
-              actionIndicator = None
-            )
-            .map { _ =>
-              // Todo redirect to the real page later
-              Redirect(controllers.routes.IndexController.onPageLoad())
-            }
-            .recover { case t =>
-              logger.error(
-                "[CreateVerificationBatchAndVerificationsController.onSubmit] Failed to create verification batch/verifications",
-                t
-              )
-              Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-            }
+            case None =>
+              Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+
+            case Some(_) if hasCurrentBatch(request.userAnswers) =>
+              Future.successful(Ok("Current verification batch exists - modify flow to be implemented"))
+
+            case Some(_) =>
+              verificationService
+                .createVerificationBatchAndVerifications(
+                  userAnswers = request.userAnswers,
+                  selectedSubcontractorIds = selectedIds,
+                  actionIndicator = None
+                )
+                .map(_ => Redirect(controllers.routes.IndexController.onPageLoad()))
+                .recover { case t =>
+                  logger.error(
+                    "[CreateVerificationBatchAndVerificationsController.onSubmit] Failed to create verification batch/verifications",
+                    t
+                  )
+                  Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+                }
+          }
       }
     }
 }
