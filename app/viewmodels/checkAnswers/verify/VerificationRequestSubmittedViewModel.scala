@@ -22,13 +22,13 @@ import queries.CisIdQuery
 import java.time.LocalDateTime
 
 case class VerificationRequestSubmittedViewModel(
-                                                  cisId: Option[String] = None,
-                                                  referenceNumber: String,
-                                                  submittedAt: LocalDateTime,
-                                                  subcontractorsToVerify: Seq[String] = Seq.empty,
-                                                  subcontractorsToReverify: Seq[String] = Seq.empty,
-                                                  confirmationEmail: Option[String] = None
-                                                ) {
+  cisId: Option[String] = None,
+  referenceNumber: String,
+  submittedAt: LocalDateTime,
+  subcontractorsToVerify: Seq[String] = Seq.empty,
+  subcontractorsToReverify: Seq[String] = Seq.empty,
+  confirmationEmail: Option[String] = None
+) {
   val showEmail: Boolean    = confirmationEmail.isDefined
   val showVerify: Boolean   = subcontractorsToVerify.nonEmpty
   val showReverify: Boolean = subcontractorsToReverify.nonEmpty

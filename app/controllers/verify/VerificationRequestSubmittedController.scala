@@ -26,14 +26,14 @@ import views.html.verify.VerificationRequestSubmittedView
 import javax.inject.Inject
 
 class VerificationRequestSubmittedController @Inject() (
-                                                         override val messagesApi: MessagesApi,
-                                                         identify: IdentifierAction,
-                                                         getData: DataRetrievalAction,
-                                                         requireData: DataRequiredAction,
-                                                         val controllerComponents: MessagesControllerComponents,
-                                                         view: VerificationRequestSubmittedView
-                                                       )(implicit appConfig: FrontendAppConfig)
-  extends FrontendBaseController
+  override val messagesApi: MessagesApi,
+  identify: IdentifierAction,
+  getData: DataRetrievalAction,
+  requireData: DataRequiredAction,
+  val controllerComponents: MessagesControllerComponents,
+  view: VerificationRequestSubmittedView
+)(implicit appConfig: FrontendAppConfig)
+    extends FrontendBaseController
     with I18nSupport {
 
   def onPageLoad(): Action[AnyContent] =
