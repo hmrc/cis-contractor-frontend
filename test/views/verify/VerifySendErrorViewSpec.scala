@@ -36,14 +36,14 @@ class VerifySendErrorViewSpec extends AnyWordSpec with Matchers with GuiceOneApp
         "http://localhost:6996/construction-industry-scheme/management/manage-subcontractors/12345"
 
       val html: HtmlFormat.Appendable = view(manageSubcontractorsUrl)
-      val doc: Document = org.jsoup.Jsoup.parse(html.toString())
+      val doc: Document               = org.jsoup.Jsoup.parse(html.toString())
 
       doc.select("title").text() must include(messages("verify.verifySendError.title"))
 
       doc.select("h1").text must include(messages("verify.verifySendError.heading"))
 
       doc.select("p").text must include(messages("verify.verifySendError.p1"))
-      
+
       val verificationHistoryLink: Elements =
         doc.select(s"a[href='#']")
       verificationHistoryLink.size() mustBe 1
@@ -76,7 +76,7 @@ class VerifySendErrorViewSpec extends AnyWordSpec with Matchers with GuiceOneApp
 
   trait Setup {
     implicit val request: Request[_] = FakeRequest()
-    implicit val messages: Messages =
+    implicit val messages: Messages  =
       play.api.i18n.MessagesImpl(
         play.api.i18n.Lang.defaultLang,
         app.injector.instanceOf[play.api.i18n.MessagesApi]
