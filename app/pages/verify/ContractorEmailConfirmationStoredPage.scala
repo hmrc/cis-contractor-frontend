@@ -22,7 +22,7 @@ import models.verify.ContractorEmailConfirmationStored.DifferentEmail
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 
-import scala.util.{Success, Try}
+import scala.util.Try
 
 case object ContractorEmailConfirmationStoredPage
     extends QuestionPage[ContractorEmailConfirmationStored]
@@ -37,9 +37,8 @@ case object ContractorEmailConfirmationStoredPage
     userAnswers: UserAnswers
   ): Try[UserAnswers] =
     value match {
-      case Some(DifferentEmail) => Success(userAnswers)
-      case _                    =>
-        // TODO: remove ContractorEmailConfirmationAlternateEmailPage once SM-01b is implemented
-        Success(userAnswers)
+      case Some(DifferentEmail) => super.cleanup(value, userAnswers) // keep EmailAddressPage
+      case Some(_)              => userAnswers.remove(EmailAddressPage) // CurrentEmail / DoNotSend
+      case None                 => super.cleanup(value, userAnswers)
     }
 }
