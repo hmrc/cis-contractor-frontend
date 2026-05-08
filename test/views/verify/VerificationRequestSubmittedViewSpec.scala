@@ -19,8 +19,6 @@ package views.verify
 import base.SpecBase
 import config.FrontendAppConfig
 import org.jsoup.Jsoup
-import org.scalatest.matchers.must.Matchers
-import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.i18n.{Lang, Messages, MessagesApi, MessagesImpl}
 import play.api.mvc.Request
