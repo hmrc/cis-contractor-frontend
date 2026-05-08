@@ -30,7 +30,7 @@ import java.time.LocalDateTime
 
 class VerificationRequestSubmittedViewModelSpec extends SpecBase {
 
-  private val now = LocalDateTime.of(2026, 4, 27, 10, 30)
+  private val now   = LocalDateTime.of(2026, 4, 27, 10, 30)
   private val cisId = "12345"
 
   "VerificationRequestSubmittedViewModel" - {
@@ -167,27 +167,28 @@ class VerificationRequestSubmittedViewModelSpec extends SpecBase {
       val vm =
         VerificationRequestSubmittedViewModel.fromUserAnswers(userAnswers, applicationConfig)
 
-      vm.confirmationEmail shouldBe Some("test@testmail.com")
-      vm.showEmail shouldBe true
-      vm.subcontractorsToVerify shouldBe Seq.empty
-      vm.showVerify shouldBe false
+      vm.confirmationEmail        shouldBe Some("test@testmail.com")
+      vm.showEmail                shouldBe true
+      vm.subcontractorsToVerify   shouldBe Seq.empty
+      vm.showVerify               shouldBe false
       vm.subcontractorsToReverify shouldBe Seq.empty
-      vm.showReverify shouldBe false
+      vm.showReverify             shouldBe false
     }
 
     "must return empty values when pages are absent" in {
 
       val vm =
         VerificationRequestSubmittedViewModel.fromUserAnswers(
-          UserAnswers("id").set(CisIdQuery, cisId).success.value, applicationConfig
+          UserAnswers("id").set(CisIdQuery, cisId).success.value,
+          applicationConfig
         )
 
-      vm.subcontractorsToVerify shouldBe Seq.empty
+      vm.subcontractorsToVerify   shouldBe Seq.empty
       vm.subcontractorsToReverify shouldBe Seq.empty
-      vm.confirmationEmail shouldBe None
-      vm.showVerify shouldBe false
-      vm.showReverify shouldBe false
-      vm.showEmail shouldBe false
+      vm.confirmationEmail        shouldBe None
+      vm.showVerify               shouldBe false
+      vm.showReverify             shouldBe false
+      vm.showEmail                shouldBe false
     }
   }
 }

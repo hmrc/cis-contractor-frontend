@@ -42,7 +42,8 @@ object VerificationRequestSubmittedViewModel {
   def fromUserAnswers(userAnswers: UserAnswers, appConfig: FrontendAppConfig): VerificationRequestSubmittedViewModel =
     val cisId = userAnswers.get(CisIdQuery) match {
       case Some(cisId) => cisId
-      case _ => throw new IllegalStateException("[VerificationRequestSubmittedViewModel] cisId missing from userAnswers")
+      case _           =>
+        throw new IllegalStateException("[VerificationRequestSubmittedViewModel] cisId missing from userAnswers")
     }
     VerificationRequestSubmittedViewModel(
       manageSubcontractorsUrl = s"${appConfig.manageSubcontractorsUrl}/$cisId",
