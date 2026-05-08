@@ -40,7 +40,7 @@ class VerificationRequestSubmittedController @Inject() (
     (identify andThen getData andThen requireData) { implicit request =>
       val vm =
         VerificationRequestSubmittedViewModel
-          .fromUserAnswers(request.userAnswers)
+          .fromUserAnswers(request.userAnswers, appConfig)
       Ok(view(vm))
     }
 }

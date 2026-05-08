@@ -16,18 +16,22 @@
 
 package viewmodels.checkAnswers.verify
 
+import base.SpecBase
 import models.UserAnswers
 import models.SubcontractorViewModel
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.TryValues.convertTryToSuccessOrFailure
+import org.scalatest.matchers.should.Matchers.shouldBe
 import pages.verify.{EmailAddressPage, SelectSubcontractorPage}
+import queries.CisIdQuery
 
 import java.time.LocalDateTime
 
-class VerificationRequestSubmittedViewModelSpec extends AnyFreeSpec with Matchers {
+class VerificationRequestSubmittedViewModelSpec extends SpecBase {
 
   private val now = LocalDateTime.of(2026, 4, 27, 10, 30)
+  private val cisId = "12345"
 
   "VerificationRequestSubmittedViewModel" - {
 
@@ -37,6 +41,7 @@ class VerificationRequestSubmittedViewModelSpec extends AnyFreeSpec with Matcher
 
         val vm =
           VerificationRequestSubmittedViewModel(
+            manageSubcontractorsUrl = s"${applicationConfig.manageSubcontractorsUrl}/$cisId",
             referenceNumber = "REF123",
             submittedAt = now,
             subcontractorsToVerify = Seq("Sub A"),
@@ -50,6 +55,7 @@ class VerificationRequestSubmittedViewModelSpec extends AnyFreeSpec with Matcher
 
         val vm =
           VerificationRequestSubmittedViewModel(
+            manageSubcontractorsUrl = s"${applicationConfig.manageSubcontractorsUrl}/$cisId",
             referenceNumber = "REF123",
             submittedAt = now,
             subcontractorsToVerify = Seq("Sub A"),
@@ -66,6 +72,7 @@ class VerificationRequestSubmittedViewModelSpec extends AnyFreeSpec with Matcher
 
         val vm =
           VerificationRequestSubmittedViewModel(
+            manageSubcontractorsUrl = s"${applicationConfig.manageSubcontractorsUrl}/$cisId",
             referenceNumber = "REF123",
             submittedAt = now,
             subcontractorsToVerify = Seq("Sub A")
@@ -78,9 +85,9 @@ class VerificationRequestSubmittedViewModelSpec extends AnyFreeSpec with Matcher
 
         val vm =
           VerificationRequestSubmittedViewModel(
+            manageSubcontractorsUrl = s"${applicationConfig.manageSubcontractorsUrl}/$cisId",
             referenceNumber = "REF123",
-            submittedAt = now,
-            subcontractorsToVerify = Seq.empty
+            submittedAt = now
           )
 
         vm.showVerify shouldBe false
@@ -93,6 +100,7 @@ class VerificationRequestSubmittedViewModelSpec extends AnyFreeSpec with Matcher
 
         val vm =
           VerificationRequestSubmittedViewModel(
+            manageSubcontractorsUrl = s"${applicationConfig.manageSubcontractorsUrl}/$cisId",
             referenceNumber = "REF123",
             submittedAt = now,
             subcontractorsToVerify = Seq("Sub A"),
@@ -106,10 +114,10 @@ class VerificationRequestSubmittedViewModelSpec extends AnyFreeSpec with Matcher
 
         val vm =
           VerificationRequestSubmittedViewModel(
+            manageSubcontractorsUrl = s"${applicationConfig.manageSubcontractorsUrl}/$cisId",
             referenceNumber = "REF123",
             submittedAt = now,
-            subcontractorsToVerify = Seq("Sub A"),
-            subcontractorsToReverify = Seq.empty
+            subcontractorsToVerify = Seq("Sub A")
           )
 
         vm.showReverify shouldBe false
@@ -132,9 +140,12 @@ class VerificationRequestSubmittedViewModelSpec extends AnyFreeSpec with Matcher
           .set(SelectSubcontractorPage, subcontractors)
           .success
           .value
+          .set(CisIdQuery, cisId)
+          .success
+          .value
 
       val vm =
-        VerificationRequestSubmittedViewModel.fromUserAnswers(userAnswers)
+        VerificationRequestSubmittedViewModel.fromUserAnswers(userAnswers, applicationConfig)
 
       vm.subcontractorsToVerify shouldBe
         Seq("Brody, Martin", "Hooper And Associates")
@@ -149,25 +160,34 @@ class VerificationRequestSubmittedViewModelSpec extends AnyFreeSpec with Matcher
           .set(EmailAddressPage, "test@testmail.com")
           .success
           .value
+          .set(CisIdQuery, cisId)
+          .success
+          .value
 
       val vm =
-        VerificationRequestSubmittedViewModel.fromUserAnswers(userAnswers)
+        VerificationRequestSubmittedViewModel.fromUserAnswers(userAnswers, applicationConfig)
 
       vm.confirmationEmail shouldBe Some("test@testmail.com")
-      vm.showEmail         shouldBe true
+      vm.showEmail shouldBe true
+      vm.subcontractorsToVerify shouldBe Seq.empty
+      vm.showVerify shouldBe false
+      vm.subcontractorsToReverify shouldBe Seq.empty
+      vm.showReverify shouldBe false
     }
 
     "must return empty values when pages are absent" in {
 
       val vm =
         VerificationRequestSubmittedViewModel.fromUserAnswers(
-          UserAnswers("id")
+          UserAnswers("id").set(CisIdQuery, cisId).success.value, applicationConfig
         )
 
       vm.subcontractorsToVerify shouldBe Seq.empty
-      vm.confirmationEmail      shouldBe None
-      vm.showVerify             shouldBe false
-      vm.showEmail              shouldBe false
+      vm.subcontractorsToReverify shouldBe Seq.empty
+      vm.confirmationEmail shouldBe None
+      vm.showVerify shouldBe false
+      vm.showReverify shouldBe false
+      vm.showEmail shouldBe false
     }
   }
 }

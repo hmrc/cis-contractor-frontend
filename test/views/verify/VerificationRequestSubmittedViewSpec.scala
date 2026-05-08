@@ -16,6 +16,7 @@
 
 package views.verify
 
+import base.SpecBase
 import config.FrontendAppConfig
 import org.jsoup.Jsoup
 import org.scalatest.matchers.must.Matchers
@@ -30,9 +31,9 @@ import views.html.verify.VerificationRequestSubmittedView
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
-class VerificationRequestSubmittedViewSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite {
+class VerificationRequestSubmittedViewSpec extends SpecBase with GuiceOneAppPerSuite {
 
-  "VerificationRequestSubmittedView" should {
+  "VerificationRequestSubmittedView" - {
 
     "render the page correctly when reverify list and email are present" in new Setup {
 
@@ -168,7 +169,7 @@ class VerificationRequestSubmittedViewSpec extends AnyWordSpec with Matchers wit
 
     val viewModel: VerificationRequestSubmittedViewModel =
       VerificationRequestSubmittedViewModel(
-        cisId = Some(cisId),
+        manageSubcontractorsUrl = s"${applicationConfig.manageSubcontractorsUrl}/$cisId",
         referenceNumber = referenceNumber,
         submittedAt = submittedAt,
         subcontractorsToVerify = subcontractorsToVerify,

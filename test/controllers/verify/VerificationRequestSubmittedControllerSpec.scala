@@ -19,15 +19,20 @@ package controllers.verify
 import base.SpecBase
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
+import queries.CisIdQuery
 
 class VerificationRequestSubmittedControllerSpec extends SpecBase {
+
+  private val cisId = "12345"
 
   "VerificationRequestSubmitted Controller" - {
 
     "must return OK for a GET" in {
 
+      val ua = emptyUserAnswers.set(CisIdQuery, cisId).success.value
+
       val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+        applicationBuilder(userAnswers = Some(ua)).build()
 
       running(application) {
 
