@@ -913,7 +913,7 @@ verify.noSubcontractorsSelectedWarning.p                           = You need to
 verify.noSubcontractorsSelectedWarning.button                      = Select subcontractors
 verify.noSubcontractorsSelectedWarning.cancel                      = Cancel request
 
-contractorDetails.title    = Contractor details
-contractorDetails.heading  = Contractor details
-contractorDetails.p1       = Use this service to confirm or change the contractor's email or scheme name associated with this account.
-contractorDetails.p2       = You will need the contractor Unique Tax Reference (UTR) to do this.
+contractorDetails.contractorDetailsIndex.title    = Contractor details
+contractorDetails.contractorDetailsIndex.heading  = Contractor details
+contractorDetails.contractorDetailsIndex.p1       = Use this service to confirm or change the contractor's email or scheme name associated with this account.
+contractorDetails.contractorDetailsIndex.p2       = You will need the contractor Unique Tax Reference (UTR) to do this.

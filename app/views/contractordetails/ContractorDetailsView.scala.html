@@ -26,15 +26,15 @@
 
 @()(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = titleNoForm(messages("contractorDetails.title")), showSignOut = false) {
+@layout(pageTitle = titleNoForm(messages("contractorDetails.contractorDetailsIndex.title")), showSignOut = false) {
     @formHelper(action = controllers.contractordetails.routes.ContractorDetailsController.onSubmit(), Symbol("autoComplete") -> "off") {
 
-        @h1(messages("contractorDetails.heading"))
-        @paragraph(messages("contractorDetails.p1"))
-        @paragraph(messages("contractorDetails.p2"))
+        @h1(messages("contractorDetails.contractorDetailsIndex.heading"))
+        @paragraph(messages("contractorDetails.contractorDetailsIndex.p1"))
+        @paragraph(messages("contractorDetails.contractorDetailsIndex.p2"))
 
         @govukButton(Button(
-            content = Text(messages("site.continue")),
+            content = Text(messages("site.continue"))
         ))
     }
 }
