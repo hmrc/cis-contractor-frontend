@@ -891,3 +891,11 @@ verify.verifyDepartmentalError.contactHMRC.p1                      =  for more h
 verify.verifyDepartmentalError.contactHMRC.p1.link                 =  Contact HMRC by phone
 verify.verifyDepartmentalError.manageSubcontractors.p1             =  Back to
 verify.verifyDepartmentalError.manageSubcontractors.p1.link        =  Manage your subcontractors
+
+# Contractor UTR
+contractorUtr.title                                                =  What is the contractor's unique taxpayer reference
+contractorUtr.heading                                              =  What is the contractor's Unique Taxpayer Reference (UTR)?
+contractorUtr.p1                                                   =  A UTR is a 10-digit number issued by HMRC to identify individuals or companies for tax purposes.
+contractorUtr.error.required                                       =  Enter the contractor's 10-digit unique taxpayer reference
+contractorUtr.error.invalid                                        =  You have entered a unique taxpayer reference in an incorrect format. A UTR contains 10-digits
+contractorUtr.error.length                                         =  Enter a valid Unique Taxpayer Reference (UTR) using 10 numbers, like 1234567890
