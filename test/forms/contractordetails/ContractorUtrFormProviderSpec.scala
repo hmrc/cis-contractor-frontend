@@ -23,8 +23,6 @@ import org.scalatest.matchers.must.Matchers
 import play.api.data.{Form, FormError}
 import utils.UTRGenerator
 
-
-
 class ContractorUtrFormProviderSpec extends AnyFreeSpec with Matchers with StringFieldBehaviours {
 
   def validUtrGenerator: Gen[String] = Gen.const(UTRGenerator.randomUTR())

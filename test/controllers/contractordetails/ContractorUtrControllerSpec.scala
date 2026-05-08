@@ -19,7 +19,7 @@ package controllers.contractordetails
 import base.SpecBase
 import controllers.routes
 import forms.contractordetails.ContractorUtrFormProvider
-import models.{NormalMode, CheckMode}
+import models.{CheckMode, NormalMode}
 import pages.contractordetails.ContractorUtrPage
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*

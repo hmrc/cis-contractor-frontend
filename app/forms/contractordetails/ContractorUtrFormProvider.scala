@@ -27,8 +27,8 @@ class ContractorUtrFormProvider @Inject() extends Mappings {
     Form(
       "value" -> utr(
         requiredKey = "contractorUtr.error.required",
-        invalidKey  = "contractorUtr.error.invalid",
-        lengthKey   = "contractorUtr.error.invalid"
+        invalidKey = "contractorUtr.error.invalid",
+        lengthKey = "contractorUtr.error.invalid"
       )
     )
 }

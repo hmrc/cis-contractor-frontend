@@ -78,12 +78,12 @@ class ContractorUtrViewSpec extends SpecBase with Matchers {
       play.api.i18n.Lang.defaultLang,
       app.injector.instanceOf[play.api.i18n.MessagesApi]
     )
-    lazy val html: HtmlFormat.Appendable = view(form, NormalMode)
-    lazy val doc: Document               = Jsoup.parse(html.body)
+    lazy val html: HtmlFormat.Appendable          = view(form, NormalMode)
+    lazy val doc: Document                        = Jsoup.parse(html.body)
   }
 
   trait ErrorSetup extends Setup {
-    val errorForm: Form[String]            = form.withError("value", "contractorUtr.error.required")
+    val errorForm: Form[String]                   = form.withError("value", "contractorUtr.error.required")
     override lazy val html: HtmlFormat.Appendable = view(errorForm, NormalMode)
     override lazy val doc: Document               = Jsoup.parse(html.body)
   }
