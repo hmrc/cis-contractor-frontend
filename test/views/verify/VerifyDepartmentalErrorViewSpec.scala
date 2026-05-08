@@ -47,20 +47,15 @@ class VerifyDepartmentalErrorViewSpec extends AnyWordSpec with Matchers with Gui
 
       doc.select("p").text must include(messages("verify.verifyDepartmentalError.p1"))
 
-      doc.select("p").text                      must include(messages("verify.verifyDepartmentalError.contactHMRC.p1"))
-      doc.getElementsByClass("govuk-link").text must include(
-        messages("verify.verifyDepartmentalError.contactHMRC.p1.link")
-      )
-
       val contactHMRCLink: Elements =
         doc.select(s"a[href='$contactHMRCURL']")
       contactHMRCLink.size() mustBe 1
       contactHMRCLink.text() mustBe
         messages("verify.verifyDepartmentalError.contactHMRC.p1.link")
 
-      val contactHMRText: String = contactHMRCLink.first().parent().text()
+      val contactHMRCText: String = contactHMRCLink.first().parent().text()
 
-      contactHMRText must include(
+      contactHMRCText must include(
         messages("verify.verifyDepartmentalError.contactHMRC.p1")
       )
 
