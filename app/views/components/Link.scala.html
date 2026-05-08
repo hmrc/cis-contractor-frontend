@@ -27,7 +27,8 @@
     prefixTextKey: String = emptyString,
     suffixTextKey: String = emptyString,
     extraClasses: String = emptyString,
-    bold: Boolean = false
+    bold: Boolean = false,
+    linkId: String = emptyString
 )(implicit messages: Messages)
 
 @defining {
@@ -35,9 +36,9 @@
         @{Html(messages(prefixTextKey))}
     }
     @if(hasFullStop) {
-        <a href="@linkUrl" class="govuk-link @if(bold){govuk-!-font-weight-bold}" @if(isNewTab){rel="noreferrer noopener" target="_blank"}>@{Html(messages(linkTextKey))}</a>.
+        <a href="@linkUrl" class="govuk-link @if(bold){govuk-!-font-weight-bold}" @if(linkId.nonEmpty){id="@linkId"} @if(isNewTab){rel="noreferrer noopener" target="_blank"}>@{Html(messages(linkTextKey))}</a>.
     } else {
-        <a href="@linkUrl" class="govuk-link @if(bold){govuk-!-font-weight-bold}" @if(isNewTab){rel="noreferrer noopener" target="_blank"}>@{Html(messages(linkTextKey))}</a>
+        <a href="@linkUrl" class="govuk-link @if(bold){govuk-!-font-weight-bold}" @if(linkId.nonEmpty){id="@linkId"} @if(isNewTab){rel="noreferrer noopener" target="_blank"}>@{Html(messages(linkTextKey))}</a>
     }
 
     @if(suffixTextKey.nonEmpty) {
