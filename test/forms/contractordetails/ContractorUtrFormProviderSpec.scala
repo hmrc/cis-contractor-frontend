@@ -27,8 +27,8 @@ class ContractorUtrFormProviderSpec extends AnyFreeSpec with Matchers with Strin
 
   def validUtrGenerator: Gen[String] = Gen.const(UTRGenerator.randomUTR())
 
-  val requiredKey = "contractorUtr.error.required"
-  val invalidKey  = "contractorUtr.error.invalid"
+  val requiredKey = "contractorDetails.contractorUtr.error.required"
+  val invalidKey  = "contractorDetails.contractorUtr.error.invalid"
   val lengthKey   = invalidKey
 
   val utrLength          = 10

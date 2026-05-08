@@ -913,9 +913,11 @@ verify.noSubcontractorsSelectedWarning.p                           = You need to
 verify.noSubcontractorsSelectedWarning.button                      = Select subcontractors
 verify.noSubcontractorsSelectedWarning.cancel                      = Cancel request
 
-contractorUtr.title                                                =  What is the contractor's unique taxpayer reference
-contractorUtr.heading                                              =  What is the contractor's Unique Taxpayer Reference (UTR)?
-contractorUtr.p1                                                   =  A UTR is a 10-digit number issued by HMRC to identify individuals or companies for tax purposes.
-contractorUtr.error.required                                       =  Enter the contractor's 10-digit unique taxpayer reference
-contractorUtr.error.invalid                                        =  You have entered a unique taxpayer reference in an incorrect format. A UTR contains 10-digits
-contractorUtr.error.length                                         =  Enter a valid Unique Taxpayer Reference (UTR) using 10 numbers, like 1234567890
+contractorDetails.contractorUtr.title                                                =  What is the contractor's unique taxpayer reference
+contractorDetails.contractorUtr.heading                                              =  What is the contractor's Unique Taxpayer Reference (UTR)?
+contractorDetails.contractorUtr.p1                                                   =  A UTR is a 10-digit number issued by HMRC to identify individuals or companies for tax purposes.
+contractorDetails.contractorUtr.checkYourAnswersLabel                                =  What is the contractor's Unique Taxpayer Reference (UTR)?
+contractorDetails.contractorUtr.change.hidden                                        =  What is the contractor's Unique Taxpayer Reference (UTR)?
+contractorDetails.contractorUtr.error.required                                       =  Enter the contractor's 10-digit unique taxpayer reference
+contractorDetails.contractorUtr.error.invalid                                        =  You have entered a unique taxpayer reference in an incorrect format. A UTR contains 10-digits
+contractorDetails.contractorUtr.error.length                                         =  Enter a valid Unique Taxpayer Reference (UTR) using 10 numbers, like 1234567890

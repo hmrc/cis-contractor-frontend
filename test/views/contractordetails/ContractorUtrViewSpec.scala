@@ -33,15 +33,15 @@ class ContractorUtrViewSpec extends SpecBase with Matchers {
   "ContractorUtrView" - {
 
     "must display the correct title" in new Setup {
-      doc.title must include(messages("contractorUtr.title"))
+      doc.title must include(messages("contractorDetails.contractorUtr.title"))
     }
 
     "must display the correct heading" in new Setup {
-      doc.select("h1").text must include(messages("contractorUtr.heading"))
+      doc.select("h1").text must include(messages("contractorDetails.contractorUtr.heading"))
     }
 
     "must display paragraph 1" in new Setup {
-      doc.select("p").text must include(messages("contractorUtr.p1"))
+      doc.select("p").text must include(messages("contractorDetails.contractorUtr.p1"))
     }
 
     "must display a text input field" in new Setup {
@@ -59,8 +59,8 @@ class ContractorUtrViewSpec extends SpecBase with Matchers {
 
     "must display error summary and inline error when form has errors" in new ErrorSetup {
       doc.select(".govuk-error-summary").size mustBe 1
-      doc.select(".govuk-error-summary").text must include(messages("contractorUtr.error.required"))
-      doc.select(".govuk-error-message").text must include(messages("contractorUtr.error.required"))
+      doc.select(".govuk-error-summary").text must include(messages("contractorDetails.contractorUtr.error.required"))
+      doc.select(".govuk-error-message").text must include(messages("contractorDetails.contractorUtr.error.required"))
     }
 
     "must display title with error prefix when form has errors" in new ErrorSetup {
@@ -83,7 +83,7 @@ class ContractorUtrViewSpec extends SpecBase with Matchers {
   }
 
   trait ErrorSetup extends Setup {
-    val errorForm: Form[String]                   = form.withError("value", "contractorUtr.error.required")
+    val errorForm: Form[String]                   = form.withError("value", "contractorDetails.contractorUtr.error.required")
     override lazy val html: HtmlFormat.Appendable = view(errorForm, NormalMode)
     override lazy val doc: Document               = Jsoup.parse(html.body)
   }
