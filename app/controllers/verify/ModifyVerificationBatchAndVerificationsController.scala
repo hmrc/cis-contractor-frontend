@@ -76,7 +76,7 @@ class ModifyVerificationBatchAndVerificationsController @Inject() (
             instanceId <- instanceIdF
 
             current <- currentBatchFromSession(request.userAnswers)
-            
+
             idToRef: Map[Long, Long] =
               current.subcontractors.flatMap(s => s.subbieResourceRef.map(ref => s.subcontractorId -> ref)).toMap
 
