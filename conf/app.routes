@@ -372,6 +372,7 @@ GET   /verify/confirmation-email-stored                controllers.verify.Contra
 POST  /verify/confirmation-email-stored                controllers.verify.ContractorEmailConfirmationStoredController.onSubmit(mode: Mode = NormalMode)
 GET   /verify/change-confirmation-email-stored         controllers.verify.ContractorEmailConfirmationStoredController.onPageLoad(mode: Mode = CheckMode)
 POST  /verify/change-confirmation-email-stored         controllers.verify.ContractorEmailConfirmationStoredController.onSubmit(mode: Mode = CheckMode)
+POST  /verify/verification-batch/modify                controllers.verify.ModifyVerificationBatchAndVerificationsController.onSubmit()
 
 
 GET   /verify/select-subcontractors-to-reverify        controllers.verify.SelectSubcontractorsToReverifyController.onPageLoad(mode: Mode = NormalMode, page: Int ?= 1)

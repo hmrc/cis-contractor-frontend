@@ -26,6 +26,7 @@ import models.VerificationBatchCurrentVerification
 import models.VerificationCurrentVerification
 import models.response.CreateVerificationBatchAndVerificationsResponse
 import models.requests.CreateVerificationBatchAndVerificationsRequest
+import models.requests.ModifyVerificationsRequest
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{never, verify, verifyNoMoreInteractions, when}
@@ -507,6 +508,97 @@ final class VerificationServiceSpec extends SpecBase with MockitoSugar with Mode
 
       verify(mockConnector, never()).createVerificationBatchAndVerifications(any())(any())
       verify(mockRepo, never()).set(any())
+    }
+  }
+
+  "VerificationService.modifyVerificationBatchAndVerifications" - {
+
+    "must call modify endpoint, refresh current+newest and persist" in {
+
+      val mockConnector = mock[ConstructionIndustrySchemeConnector]
+      val mockRepo      = mock[SessionRepository]
+      val service       = new VerificationService(mockConnector, mockRepo)
+
+      val currentResp =
+        GetCurrentVerificationBatchResponse(
+          subcontractors = Nil,
+          verificationBatch = None,
+          verifications = Nil
+        )
+
+      val ua =
+        emptyUserAnswers
+          .set(CisIdQuery, instanceId)
+          .success
+          .value
+          .set(CurrentVerificationBatchResponsePage, currentResp)
+          .success
+          .value
+
+      val req = ModifyVerificationsRequest(
+        instanceId = instanceId,
+        deleteVerifications = None,
+        createVerifications = None
+      )
+
+      when(mockConnector.modifyVerificationBatch(eqTo(req))(any[HeaderCarrier]))
+        .thenReturn(Future.successful(()))
+
+      when(mockConnector.getCurrentVerificationBatch(eqTo(instanceId))(any[HeaderCarrier]))
+        .thenReturn(Future.successful(currentResp))
+
+      when(mockConnector.getNewestVerificationBatch(eqTo(instanceId))(any[HeaderCarrier]))
+        .thenReturn(Future.successful(responseWithSubcontractors))
+
+      when(mockRepo.set(any[UserAnswers]))
+        .thenReturn(Future.successful(true))
+
+      val result =
+        service
+          .modifyVerificationBatchAndVerifications(ua, req)
+          .futureValue
+
+      result.get(NewestVerificationBatchResponsePage) mustBe Some(responseWithSubcontractors)
+      result.get(UnverifiedSubcontractorsPage) mustBe Some(Seq(unverifiedSub1, unverifiedSub2))
+
+      verify(mockConnector).modifyVerificationBatch(eqTo(req))(any[HeaderCarrier])
+      verify(mockConnector).getCurrentVerificationBatch(eqTo(instanceId))(any[HeaderCarrier])
+      verify(mockConnector).getNewestVerificationBatch(eqTo(instanceId))(any[HeaderCarrier])
+      verify(mockRepo, org.mockito.Mockito.times(3)).set(any[UserAnswers])
+    }
+
+    "must propagate failure when modify endpoint fails and not refresh/persist" in {
+      val mockConnector = mock[ConstructionIndustrySchemeConnector]
+      val mockRepo      = mock[SessionRepository]
+      val service       = new VerificationService(mockConnector, mockRepo)
+
+      val ua =
+        emptyUserAnswers
+          .set(CisIdQuery, instanceId)
+          .success
+          .value
+
+      val req = ModifyVerificationsRequest(
+        instanceId = instanceId,
+        deleteVerifications = None,
+        createVerifications = None
+      )
+
+      when(mockConnector.modifyVerificationBatch(eqTo(req))(any[HeaderCarrier]))
+        .thenReturn(Future.failed(new RuntimeException("boom")))
+
+      val ex =
+        service
+          .modifyVerificationBatchAndVerifications(ua, req)
+          .failed
+          .futureValue
+
+      ex.getMessage must include("boom")
+
+      verify(mockConnector).modifyVerificationBatch(eqTo(req))(any[HeaderCarrier])
+      verify(mockConnector, never()).getCurrentVerificationBatch(any[String])(any[HeaderCarrier])
+      verify(mockConnector, never()).getNewestVerificationBatch(any[String])(any[HeaderCarrier])
+      verify(mockRepo, never()).set(any[UserAnswers])
     }
   }
 }
