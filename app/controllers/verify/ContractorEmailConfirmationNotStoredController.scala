@@ -19,10 +19,11 @@ package controllers.verify
 import controllers.actions.*
 import forms.verify.ContractorEmailConfirmationNotStoredFormProvider
 import models.Mode
+import models.UserAnswers
 import navigation.Navigator
-import pages.verify.ContractorEmailConfirmationNotStoredPage
+import pages.verify.{ContractorEmailConfirmationNotStoredPage, NewestVerificationBatchResponsePage}
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.verify.ContractorEmailConfirmationNotStoredView
@@ -46,27 +47,43 @@ class ContractorEmailConfirmationNotStoredController @Inject() (
 
   val form = formProvider()
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
+  private def hasStoredEmail(ua: UserAnswers): Boolean =
+    ua.get(NewestVerificationBatchResponsePage)
+      .exists(_.scheme.exists(_.emailAddress.exists(_.nonEmpty)))
 
-    val preparedForm = request.userAnswers.get(ContractorEmailConfirmationNotStoredPage) match {
-      case None        => form
-      case Some(value) => form.fill(value)
+  private def redirectToStored(mode: Mode): Result =
+    Redirect(controllers.verify.routes.ContractorEmailConfirmationStoredController.onPageLoad(mode))
+
+  def onPageLoad(mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData) { implicit request =>
+      if (hasStoredEmail(request.userAnswers)) {
+        redirectToStored(mode)
+      } else {
+        val preparedForm = request.userAnswers.get(ContractorEmailConfirmationNotStoredPage) match {
+          case None        => form
+          case Some(value) => form.fill(value)
+        }
+
+        Ok(view(preparedForm, mode))
+      }
     }
 
-    Ok(view(preparedForm, mode))
-  }
-
-  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
-    implicit request =>
-      form
-        .bindFromRequest()
-        .fold(
-          formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
-          value =>
-            for {
-              updatedAnswers <- Future.fromTry(request.userAnswers.set(ContractorEmailConfirmationNotStoredPage, value))
-              _              <- sessionRepository.set(updatedAnswers)
-            } yield Redirect(navigator.nextPage(ContractorEmailConfirmationNotStoredPage, mode, updatedAnswers))
-        )
-  }
+  def onSubmit(mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData).async { implicit request =>
+      if (hasStoredEmail(request.userAnswers)) {
+        Future.successful(redirectToStored(mode))
+      } else {
+        form
+          .bindFromRequest()
+          .fold(
+            formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
+            value =>
+              for {
+                updatedAnswers <-
+                  Future.fromTry(request.userAnswers.set(ContractorEmailConfirmationNotStoredPage, value))
+                _              <- sessionRepository.set(updatedAnswers)
+              } yield Redirect(navigator.nextPage(ContractorEmailConfirmationNotStoredPage, mode, updatedAnswers))
+          )
+      }
+    }
 }

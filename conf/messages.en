@@ -929,3 +929,11 @@ verify.verificationRequestSubmitted.feedback.subHeading                 =  Befor
 verify.verificationRequestSubmitted.feedback.p1                         =  Your feedback helps us make our service better.
 verify.verificationRequestSubmitted.feedback.p2                         =  to share your feedback on this service.
 verify.verificationRequestSubmitted.feedback.survey.link                =  Take a short survey
+
+verify.verifySendError.title                                            =  Verification sent but not received by HMRC
+verify.verifySendError.heading                                          =  Verification request submitted
+verify.verifySendError.p1                                               =  Your verification request has been sent, but HMRC has not received it yet.
+verify.verifySendError.verificationHistory.p1                           =  When it has been received, you’ll find it in your
+verify.verifySendError.verificationHistory.p1.link                      =  verification history
+verify.verifySendError.manageSubcontractors.p1                          =  Back to
+verify.verifySendError.manageSubcontractors.p1.link                     =  Manage your subcontractors
