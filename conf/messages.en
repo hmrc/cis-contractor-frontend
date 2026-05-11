@@ -833,26 +833,20 @@ verify.verificationRequestInProgress.p3                            =  if you hav
 verify.verificationRequestInProgress.p4                            =  Back to
 verify.verificationRequestInProgress.p4.link                       =  Manage your subcontractors
 
-verify.selectSubcontractorsToReverify.title                        = Which subcontractors do you want to reverify?
-verify.selectSubcontractorsToReverify.heading                      = Which subcontractors do you want to reverify?
-verify.selectSubcontractorsToReverify.hint                         = Select the existing subcontractors you want to include in this verification request
-verify.selectSubcontractorsToReverify.checkYourAnswersLabel        = Which subcontractors do you want to reverify?
-verify.selectSubcontractorsToReverify.error.required               = Select at least one subcontractor to verify
-verify.selectSubcontractorsToReverify.change.hidden                = select subcontractors to reverify
+verify.selectSubcontractorsToReverify.title                        =  Which subcontractors do you want to reverify?
+verify.selectSubcontractorsToReverify.heading                      =  Which subcontractors do you want to reverify?
+verify.selectSubcontractorsToReverify.hint                         =  Select the existing subcontractors you want to include in this verification request
+verify.selectSubcontractorsToReverify.checkYourAnswersLabel        =  Which subcontractors do you want to reverify?
+verify.selectSubcontractorsToReverify.error.required               =  Select at least one subcontractor to verify
+verify.selectSubcontractorsToReverify.change.hidden                =  select subcontractors to reverify
 verify.selectSubcontractorsToReverify.showingResults               =  Showing {0} to {1} of {2} results
-
-
-verify.selectSubcontractorsToReverify.include                      = Include
-verify.selectSubcontractorsToReverify.name                         = Name
-verify.selectSubcontractorsToReverify.utr                          = UTR
-verify.selectSubcontractorsToReverify.verified                     = Verified
-verify.selectSubcontractorsToReverify.verificationNumber           = Verification number
-verify.selectSubcontractorsToReverify.taxTreatment                 = Tax treatment
-verify.selectSubcontractorsToReverify.dateAdded                    = Date added
-
-site.pagination.previous                                           =  Previous
-site.pagination.next                                               =  Next
-site.pagination.landmark                                           =  Pagination
+verify.selectSubcontractorsToReverify.include                      =  Include
+verify.selectSubcontractorsToReverify.name                         =  Name
+verify.selectSubcontractorsToReverify.utr                          =  UTR
+verify.selectSubcontractorsToReverify.verified                     =  Verified
+verify.selectSubcontractorsToReverify.verificationNumber           =  Verification number
+verify.selectSubcontractorsToReverify.taxTreatment                 =  Tax treatment
+verify.selectSubcontractorsToReverify.dateAdded                    =  Date added
 
 verify.selectSubcontractor.title                                   =  Which subcontractors do you want to verify?
 verify.selectSubcontractor.heading                                 =  Which subcontractors do you want to verify?
@@ -892,26 +886,34 @@ verify.verifyDepartmentalError.contactHMRC.p1.link                 =  Contact HM
 verify.verifyDepartmentalError.manageSubcontractors.p1             =  Back to
 verify.verifyDepartmentalError.manageSubcontractors.p1.link        =  Manage your subcontractors
 
-verify.inactiveSchemeWarning.title                                 = Your scheme is not active
-verify.inactiveSchemeWarning.heading                               = Your scheme is not active
-verify.inactiveSchemeWarning.p1                                    = Your scheme was recently made inactive.
-verify.inactiveSchemeWarning.p2                                    = You must contact HMRC by phone to reactivate your scheme before you can pay any more subcontractors.
-verify.inactiveSchemeWarning.warningText                           = Any verification request that you send while your scheme is inactive will fail when you try to submit it.
-verify.inactiveSchemeWarning.cancel                                = Cancel request
+verify.inactiveSchemeWarning.title                                 =  Your scheme is not active
+verify.inactiveSchemeWarning.heading                               =  Your scheme is not active
+verify.inactiveSchemeWarning.p1                                    =  Your scheme was recently made inactive.
+verify.inactiveSchemeWarning.p2                                    =  You must contact HMRC by phone to reactivate your scheme before you can pay any more subcontractors.
+verify.inactiveSchemeWarning.warningText                           =  Any verification request that you send while your scheme is inactive will fail when you try to submit it.
+verify.inactiveSchemeWarning.cancel                                =  Cancel request
 
-verify.verificationNotSubmittedWarning.title                       = Your verification request cannot be submitted
-verify.verificationNotSubmittedWarning.heading                     = Your verification request cannot be submitted
-verify.verificationNotSubmittedWarning.link1.prefix                = You must
-verify.verificationNotSubmittedWarning.link1.text                  = contact HMRC
-verify.verificationNotSubmittedWarning.link1.suffix                = for more help.
-verify.verificationNotSubmittedWarning.link2.text                  = Manage your subcontractors
-verify.verificationNotSubmittedWarning.link2.prefix                = Back to
+verify.verificationNotSubmittedWarning.title                       =  Your verification request cannot be submitted
+verify.verificationNotSubmittedWarning.heading                     =  Your verification request cannot be submitted
+verify.verificationNotSubmittedWarning.link1.prefix                =  You must
+verify.verificationNotSubmittedWarning.link1.text                  =  contact HMRC
+verify.verificationNotSubmittedWarning.link1.suffix                =  for more help.
+verify.verificationNotSubmittedWarning.link2.text                  =  Manage your subcontractors
+verify.verificationNotSubmittedWarning.link2.prefix                =  Back to
 
-verify.noSubcontractorsSelectedWarning.title                       = Select at least one subcontractor
-verify.noSubcontractorsSelectedWarning.heading                     = Your verification request cannot be submitted
-verify.noSubcontractorsSelectedWarning.p                           = You need to select at least one subcontractor to send a verification request.
-verify.noSubcontractorsSelectedWarning.button                      = Select subcontractors
-verify.noSubcontractorsSelectedWarning.cancel                      = Cancel request
+verify.noSubcontractorsSelectedWarning.title                       =  Select at least one subcontractor
+verify.noSubcontractorsSelectedWarning.heading                     =  Your verification request cannot be submitted
+verify.noSubcontractorsSelectedWarning.p                           =  You need to select at least one subcontractor to send a verification request.
+verify.noSubcontractorsSelectedWarning.button                      =  Select subcontractors
+verify.noSubcontractorsSelectedWarning.cancel                      =  Cancel request
+
+verify.verifySendError.title                                       =  Verification sent but not received by HMRC
+verify.verifySendError.heading                                     =  Verification request submitted
+verify.verifySendError.p1                                          =  Your verification request has been sent, but HMRC has not received it yet.
+verify.verifySendError.verificationHistory.p1                      =  When it has been received, you’ll find it in your
+verify.verifySendError.verificationHistory.p1.link                 =  verification history
+verify.verifySendError.manageSubcontractors.p1                     =  Back to
+verify.verifySendError.manageSubcontractors.p1.link                =  Manage your subcontractors
 
 contractorDetails.contractorUtr.title                                                =  What is the contractor's unique taxpayer reference
 contractorDetails.contractorUtr.heading                                              =  What is the contractor's Unique Taxpayer Reference (UTR)?
