@@ -71,9 +71,15 @@ class VerifyNavigator @Inject() () extends NavigatorForJourney {
 
   private def navigatorFromContractorEmailConfirmationNotStoredPage(mode: Mode)(ua: UserAnswers): Call =
     (ua.get(ContractorEmailConfirmationNotStoredPage), mode) match {
-      case (Some(true), _)  => controllers.verify.routes.EmailAddressController.onPageLoad(mode)
-      case (Some(false), _) => controllers.verify.routes.VerifyCheckYourAnswersController.onPageLoad()
-      case _                => controllers.routes.JourneyRecoveryController.onPageLoad()
+
+      case (Some(true), m) =>
+        controllers.verify.routes.EmailAddressController.onPageLoad(m)
+
+      case (Some(false), _) =>
+        controllers.verify.routes.VerifyCheckYourAnswersController.onPageLoad()
+
+      case _ =>
+        controllers.routes.JourneyRecoveryController.onPageLoad()
     }
 
   private def navigatorFromSelectSubcontractorPage(mode: Mode)(ua: UserAnswers): Call = {
@@ -114,10 +120,17 @@ class VerifyNavigator @Inject() () extends NavigatorForJourney {
 
   private def navigatorFromContractorEmailConfirmationStoredPage(mode: Mode)(ua: UserAnswers): Call =
     (ua.get(ContractorEmailConfirmationStoredPage), mode) match {
-      case (Some(CurrentEmail), _)   => controllers.verify.routes.VerifyCheckYourAnswersController.onPageLoad()
-      case (Some(DifferentEmail), _) => controllers.verify.routes.EmailAddressController.onPageLoad(mode)
-      case (Some(DoNotSend), _)      => controllers.verify.routes.VerifyCheckYourAnswersController.onPageLoad()
-      case _                         => controllers.routes.JourneyRecoveryController.onPageLoad()
-    }
 
+      case (Some(CurrentEmail), _) =>
+        controllers.verify.routes.VerifyCheckYourAnswersController.onPageLoad()
+
+      case (Some(DifferentEmail), m) =>
+        controllers.verify.routes.EmailAddressController.onPageLoad(m)
+
+      case (Some(DoNotSend), _) =>
+        controllers.verify.routes.VerifyCheckYourAnswersController.onPageLoad()
+
+      case _ =>
+        controllers.routes.JourneyRecoveryController.onPageLoad()
+    }
 }

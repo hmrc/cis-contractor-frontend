@@ -14,22 +14,15 @@
  * limitations under the License.
  */
 
-package pages.verify
+package models.response
 
-import models.UserAnswers
-import pages.QuestionPage
-import play.api.libs.json.JsPath
-import scala.util.Try
+import play.api.libs.json.{Json, OFormat}
 
-case object ContractorEmailConfirmationNotStoredPage extends QuestionPage[Boolean] with VerifyJourney {
+final case class CreateVerificationBatchAndVerificationsResponse(
+  verificationBatchResourceReference: Long
+)
 
-  override def path: JsPath = JsPath \ toString
-
-  override def toString: String = "contractorEmailConfirmationNotStored"
-
-  override def cleanup(value: Option[Boolean], userAnswers: UserAnswers): Try[UserAnswers] =
-    value match {
-      case Some(false) => userAnswers.remove(EmailAddressPage)
-      case _           => super.cleanup(value, userAnswers)
-    }
+object CreateVerificationBatchAndVerificationsResponse {
+  given OFormat[CreateVerificationBatchAndVerificationsResponse] =
+    Json.format[CreateVerificationBatchAndVerificationsResponse]
 }

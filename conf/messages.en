@@ -886,6 +886,27 @@ verify.verifyDepartmentalError.contactHMRC.p1.link                 =  Contact HM
 verify.verifyDepartmentalError.manageSubcontractors.p1             =  Back to
 verify.verifyDepartmentalError.manageSubcontractors.p1.link        =  Manage your subcontractors
 
+verify.inactiveSchemeWarning.title                                 =  Your scheme is not active
+verify.inactiveSchemeWarning.heading                               =  Your scheme is not active
+verify.inactiveSchemeWarning.p1                                    =  Your scheme was recently made inactive.
+verify.inactiveSchemeWarning.p2                                    =  You must contact HMRC by phone to reactivate your scheme before you can pay any more subcontractors.
+verify.inactiveSchemeWarning.warningText                           =  Any verification request that you send while your scheme is inactive will fail when you try to submit it.
+verify.inactiveSchemeWarning.cancel                                =  Cancel request
+
+verify.verificationNotSubmittedWarning.title                       =  Your verification request cannot be submitted
+verify.verificationNotSubmittedWarning.heading                     =  Your verification request cannot be submitted
+verify.verificationNotSubmittedWarning.link1.prefix                =  You must
+verify.verificationNotSubmittedWarning.link1.text                  =  contact HMRC
+verify.verificationNotSubmittedWarning.link1.suffix                =  for more help.
+verify.verificationNotSubmittedWarning.link2.text                  =  Manage your subcontractors
+verify.verificationNotSubmittedWarning.link2.prefix                =  Back to
+
+verify.noSubcontractorsSelectedWarning.title                       =  Select at least one subcontractor
+verify.noSubcontractorsSelectedWarning.heading                     =  Your verification request cannot be submitted
+verify.noSubcontractorsSelectedWarning.p                           =  You need to select at least one subcontractor to send a verification request.
+verify.noSubcontractorsSelectedWarning.button                      =  Select subcontractors
+verify.noSubcontractorsSelectedWarning.cancel                      =  Cancel request
+
 verify.verifyCheckYourAnswers.title                                =  Check your answers before submitting your verification request
 verify.verifyCheckYourAnswers.heading                              =  Check your answers before submitting your verification request
 verify.verifyCheckYourAnswers.subHeading                           =  Subcontractors to verify

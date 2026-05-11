@@ -398,5 +398,11 @@ POST  /verify/no-new-subcontractors-to-verify  controllers.verify.VerifyYourSubc
 
 GET   /verify/problem-with-verification-warning  controllers.verify.VerifyDepartmentalErrorController.onPageLoad()
 
+GET   /verify/inactive-scheme-warning  controllers.verify.InactiveSchemeWarningController.onPageLoad()
+
+GET   /verify/verification-not-submitted-warning  controllers.verify.VerificationNotSubmittedWarningController.onPageLoad()
+
+GET   /verify/no-subcontractors-selected-warning  controllers.verify.NoSubcontractorsSelectedWarningController.onPageLoad()
+
 GET   /verify/check-your-answers  controllers.verify.VerifyCheckYourAnswersController.onPageLoad()
 POST  /verify/check-your-answers  controllers.verify.VerifyCheckYourAnswersController.onSubmit()
