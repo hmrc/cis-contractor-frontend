@@ -21,19 +21,18 @@ import models.Subcontractor
 import java.time.{LocalDate, Month}
 
 object ReverificationRules {
-  
 
-  /**
-   * reVerification required rule
-   *
-   *use only when subcontractor.verified == Some("Y"):
-   *  - if verificationDate is NOT present => reVerification required.
-   *  - else compute startDate(currentDate).
-   *    - If verificationDate is between startDate and currentDate  => reverifcation not required.
-   *    - If verificationDate is before startDate:
-   *        - If lastMonthlyReturnDate exists AND is between startDate and currentDate (inclusive) => reverifcation not required.
-   *        - else => required.
-   */
+  /** reVerification required rule
+    *
+    * use only when subcontractor.verified == Some("Y"):
+    *   - if verificationDate is NOT present => reVerification required.
+    *   - else compute startDate(currentDate).
+    *     - If verificationDate is between startDate and currentDate => reverifcation not required.
+    *     - If verificationDate is before startDate:
+    *       - If lastMonthlyReturnDate exists AND is between startDate and currentDate (inclusive) => reverifcation not
+    *         required.
+    *       - else => required.
+    */
   def reverifyRequired(sub: Subcontractor, currentDate: LocalDate): Boolean = {
     val isPreviouslyVerified = sub.verified.contains("Y")
     if (!isPreviouslyVerified) {
@@ -58,7 +57,7 @@ object ReverificationRules {
             lastMonthlyReturnDateOpt match {
               case Some(lmr) if isBetweenInclusive(lmr, start, currentDate) =>
                 false
-              case _ =>
+              case _                                                        =>
                 true
             }
           }
@@ -71,12 +70,12 @@ object ReverificationRules {
 
   def startDate(currentDate: LocalDate): LocalDate = {
     val date24MonthsPrior = currentDate.minusYears(2)
-    val sixAprilThatYear = LocalDate.of(date24MonthsPrior.getYear, Month.APRIL, 6)
+    val sixAprilThatYear  = LocalDate.of(date24MonthsPrior.getYear, Month.APRIL, 6)
 
     val startYear =
       if (date24MonthsPrior.isBefore(sixAprilThatYear)) date24MonthsPrior.getYear - 1
       else date24MonthsPrior.getYear
 
     LocalDate.of(startYear, Month.APRIL, 6)
-  }  
+  }
 }

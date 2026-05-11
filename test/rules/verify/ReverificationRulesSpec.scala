@@ -16,7 +16,6 @@
 
 package rules.verify
 
-
 import models.Subcontractor
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
@@ -27,16 +26,16 @@ import java.time.LocalDate
 class ReverificationRulesSpec extends AnyWordSpec with Matchers {
 
   private def sub(
-                   verified: Option[String] = Some("Y"),
-                   verificationDate: Option[LocalDateTime] = None,
-                   lastMonthlyReturnDate: Option[LocalDateTime] = None,
-                   subcontractorType: Option[String] = None,
-                   subbieResourceRef: Option[Long] = None,
-                   utr: Option[String] = None,
-                   partnerUtr: Option[String] = None,
-                   crn: Option[String] = None,
-                   nino: Option[String] = None
-                 ): Subcontractor =
+    verified: Option[String] = Some("Y"),
+    verificationDate: Option[LocalDateTime] = None,
+    lastMonthlyReturnDate: Option[LocalDateTime] = None,
+    subcontractorType: Option[String] = None,
+    subbieResourceRef: Option[Long] = None,
+    utr: Option[String] = None,
+    partnerUtr: Option[String] = None,
+    crn: Option[String] = None,
+    nino: Option[String] = None
+  ): Subcontractor =
     Subcontractor(
       subcontractorId = 1L,
       firstName = None,
@@ -62,8 +61,8 @@ class ReverificationRulesSpec extends AnyWordSpec with Matchers {
 
     "match the examples in the spec" in {
       ReverificationRules.startDate(LocalDate.of(2026, 1, 25)) mustBe LocalDate.of(2023, 4, 6)
-      ReverificationRules.startDate(LocalDate.of(2026, 4, 5))  mustBe LocalDate.of(2023, 4, 6)
-      ReverificationRules.startDate(LocalDate.of(2026, 4, 6))  mustBe LocalDate.of(2024, 4, 6)
+      ReverificationRules.startDate(LocalDate.of(2026, 4, 5)) mustBe LocalDate.of(2023, 4, 6)
+      ReverificationRules.startDate(LocalDate.of(2026, 4, 6)) mustBe LocalDate.of(2024, 4, 6)
       ReverificationRules.startDate(LocalDate.of(2026, 4, 25)) mustBe LocalDate.of(2024, 4, 6)
     }
   }
