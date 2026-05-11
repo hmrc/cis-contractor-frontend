@@ -403,3 +403,5 @@ GET   /verify/inactive-scheme-warning  controllers.verify.InactiveSchemeWarningC
 GET   /verify/verification-not-submitted-warning  controllers.verify.VerificationNotSubmittedWarningController.onPageLoad()
 
 GET   /verify/no-subcontractors-selected-warning  controllers.verify.NoSubcontractorsSelectedWarningController.onPageLoad()
+
+GET   /verify/verification-sent-not-received-warning  controllers.verify.VerifySendErrorController.onPageLoad()
