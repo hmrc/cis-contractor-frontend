@@ -25,50 +25,49 @@ import play.api.i18n.Messages
 import play.api.mvc.Request
 import play.api.test.FakeRequest
 import play.twirl.api.HtmlFormat
-import views.html.verify.VerifyDepartmentalErrorView
+import views.html.verify.VerifySendErrorView
 
-class VerifyDepartmentalErrorViewSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite {
-  "VerifyDepartmentalErrorView" should {
+class VerifySendErrorViewSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite {
+  "VerifySendErrorView" should {
 
     "render the page with correct title, heading, paragraphs and both links" in new Setup {
 
       private val manageSubcontractorsUrl =
         "http://localhost:6996/construction-industry-scheme/management/manage-subcontractors/12345"
 
-      private val contactHMRCURL =
-        "https://www.gov.uk/find-hmrc-contacts/construction-industry-scheme-general-enquiries"
-
       val html: HtmlFormat.Appendable = view(manageSubcontractorsUrl)
       val doc: Document               = org.jsoup.Jsoup.parse(html.toString())
 
-      doc.select("title").text() must include(messages("verify.verifyDepartmentalError.title"))
+      doc.select("title").text() must include(messages("verify.verifySendError.title"))
 
-      doc.select("h1").text must include(messages("verify.verifyDepartmentalError.heading"))
+      doc.select("h1").text must include(messages("verify.verifySendError.heading"))
 
-      doc.select("p").text must include(messages("verify.verifyDepartmentalError.p1"))
+      doc.select("p").text must include(messages("verify.verifySendError.p1"))
 
-      val contactHMRCLink: Elements =
-        doc.select(s"a[href='$contactHMRCURL']")
-      contactHMRCLink.size() mustBe 1
-      contactHMRCLink.text() mustBe
-        messages("verify.verifyDepartmentalError.contactHMRC.p1.link")
+      val verificationHistoryLink: Elements =
+        doc.select(s"a[href='#']")
+      verificationHistoryLink.size() mustBe 1
+      verificationHistoryLink.text() mustBe
+        messages("verify.verifySendError.verificationHistory.p1.link")
 
-      val contactHMRCText: String = contactHMRCLink.first().parent().text()
+      val verificationHistoryText: String = verificationHistoryLink.first().parent().text()
 
-      contactHMRCText must include(
-        messages("verify.verifyDepartmentalError.contactHMRC.p1")
+      verificationHistoryText must include(
+        messages("verify.verifySendError.verificationHistory.p1")
       )
+
+      verificationHistoryText.trim.endsWith(".") mustBe true
 
       val manageLink: Elements =
         doc.select(s"a[href='$manageSubcontractorsUrl']")
       manageLink.size() mustBe 1
       manageLink.text() mustBe
-        messages("verify.verifyDepartmentalError.manageSubcontractors.p1.link")
+        messages("verify.verifySendError.manageSubcontractors.p1.link")
 
       val manageText: String = manageLink.first().parent().text()
 
       manageText must include(
-        messages("verify.verifyDepartmentalError.manageSubcontractors.p1")
+        messages("verify.verifySendError.manageSubcontractors.p1")
       )
 
       manageText.trim.endsWith(".") mustBe true
@@ -83,6 +82,7 @@ class VerifyDepartmentalErrorViewSpec extends AnyWordSpec with Matchers with Gui
         app.injector.instanceOf[play.api.i18n.MessagesApi]
       )
 
-    val view: VerifyDepartmentalErrorView = app.injector.instanceOf[VerifyDepartmentalErrorView]
+    val view: VerifySendErrorView = app.injector.instanceOf[VerifySendErrorView]
   }
+
 }
