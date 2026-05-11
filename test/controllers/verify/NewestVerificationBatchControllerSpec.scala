@@ -19,7 +19,7 @@ package controllers.verify
 import base.SpecBase
 import controllers.routes
 import models.response.GetNewestVerificationBatchResponse
-import models.{NormalMode, Subcontractor, UserAnswers}
+import models.{MonthlyReturn, NormalMode, Subcontractor, Submission, UserAnswers}
 import generators.ModelGenerators
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{never, verify, verifyNoMoreInteractions, when}
@@ -51,15 +51,22 @@ class NewestVerificationBatchControllerSpec extends SpecBase with MockitoSugar w
       verified = Some("N")
     )
 
-  private def newestBatchResponse(subcontractors: Seq[Subcontractor]) =
+  private def newestBatchResponse(
+    subcontractors: Seq[Subcontractor],
+    submission: Option[Submission] = None,
+    monthlyReturn: Option[MonthlyReturn] = None
+  ) =
     GetNewestVerificationBatchResponse(
       scheme = None,
       subcontractors = subcontractors,
       verificationBatch = None,
       verifications = Seq.empty,
-      submission = None,
-      monthlyReturn = None
+      submission = submission,
+      monthlyReturn = monthlyReturn
     )
+
+  private val activeMonthlyReturn   = MonthlyReturn(monthlyReturnId = 1L, decNoMoreSubPayments = Some("N"))
+  private val inactiveMonthlyReturn = MonthlyReturn(monthlyReturnId = 1L, decNoMoreSubPayments = Some("Y"))
 
   "NewestVerificationBatchController" - {
 
@@ -130,11 +137,18 @@ class NewestVerificationBatchControllerSpec extends SpecBase with MockitoSugar w
 
       val unverified = unverifiedSubcontractor
 
+      val submission = Submission(
+        submissionId = 1L,
+        activeObjectId = None,
+        submissionRequestDate = Some(LocalDateTime.of(2026, 1, 1, 0, 0)),
+        status = Some("ACCEPTED")
+      )
+
       val updatedAnswers =
         emptyUserAnswers
           .set(
             NewestVerificationBatchResponsePage,
-            newestBatchResponse(Seq(unverified))
+            newestBatchResponse(Seq(unverified), Some(submission), Some(activeMonthlyReturn))
           )
           .flatMap(_.set(UnverifiedSubcontractorsPage, Seq(unverified)))
           .success
@@ -156,6 +170,121 @@ class NewestVerificationBatchControllerSpec extends SpecBase with MockitoSugar w
           controllers.verify.routes.SelectSubcontractorController
             .onPageLoad(NormalMode)
             .url
+
+        verify(mockService).refreshNewestVerificationBatch(any[UserAnswers])(any[HeaderCarrier])
+        verifyNoMoreInteractions(mockService)
+      }
+    }
+
+    "must redirect to InactiveSchemeWarning when inactivity declared and within 6 months" in {
+      val mockService = mock[VerificationService]
+
+      val submission = Submission(
+        submissionId = 1L,
+        activeObjectId = None,
+        submissionRequestDate = Some(LocalDateTime.of(2026, 1, 1, 0, 0)),
+        status = Some("ACCEPTED")
+      )
+
+      val updatedAnswers =
+        emptyUserAnswers
+          .set(
+            NewestVerificationBatchResponsePage,
+            newestBatchResponse(Seq(unverifiedSubcontractor), Some(submission), Some(inactiveMonthlyReturn))
+          )
+          .flatMap(_.set(UnverifiedSubcontractorsPage, Seq(unverifiedSubcontractor)))
+          .success
+          .value
+
+      when(mockService.refreshNewestVerificationBatch(any[UserAnswers])(any[HeaderCarrier]))
+        .thenReturn(Future.successful(updatedAnswers))
+
+      val application =
+        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          .overrides(bind[VerificationService].toInstance(mockService))
+          .build()
+
+      running(application) {
+        val result = route(application, FakeRequest(GET, endpointUrl)).value
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result).value mustBe
+          controllers.verify.routes.InactiveSchemeWarningController.onPageLoad().url
+
+        verify(mockService).refreshNewestVerificationBatch(any[UserAnswers])(any[HeaderCarrier])
+        verifyNoMoreInteractions(mockService)
+      }
+    }
+
+    "must redirect to SelectSubcontractor when inactivity declared but more than 6 months ago" in {
+      val mockService = mock[VerificationService]
+
+      val submission = Submission(
+        submissionId = 1L,
+        activeObjectId = None,
+        submissionRequestDate = Some(LocalDateTime.of(2025, 10, 1, 0, 0)),
+        status = Some("ACCEPTED")
+      )
+
+      val updatedAnswers =
+        emptyUserAnswers
+          .set(
+            NewestVerificationBatchResponsePage,
+            newestBatchResponse(Seq(unverifiedSubcontractor), Some(submission), Some(inactiveMonthlyReturn))
+          )
+          .flatMap(_.set(UnverifiedSubcontractorsPage, Seq(unverifiedSubcontractor)))
+          .success
+          .value
+
+      when(mockService.refreshNewestVerificationBatch(any[UserAnswers])(any[HeaderCarrier]))
+        .thenReturn(Future.successful(updatedAnswers))
+
+      val application =
+        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          .overrides(bind[VerificationService].toInstance(mockService))
+          .build()
+
+      running(application) {
+        val result = route(application, FakeRequest(GET, endpointUrl)).value
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result).value mustBe
+          controllers.verify.routes.SelectSubcontractorController
+            .onPageLoad(NormalMode)
+            .url
+
+        verify(mockService).refreshNewestVerificationBatch(any[UserAnswers])(any[HeaderCarrier])
+        verifyNoMoreInteractions(mockService)
+      }
+    }
+
+    "must redirect to JourneyRecovery when monthlyReturn or submission is missing" in {
+      val mockService = mock[VerificationService]
+
+      val updatedAnswers =
+        emptyUserAnswers
+          .set(
+            NewestVerificationBatchResponsePage,
+            newestBatchResponse(Seq(unverifiedSubcontractor))
+          )
+          .flatMap(_.set(UnverifiedSubcontractorsPage, Seq(unverifiedSubcontractor)))
+          .success
+          .value
+
+      when(mockService.refreshNewestVerificationBatch(any[UserAnswers])(any[HeaderCarrier]))
+        .thenReturn(Future.successful(updatedAnswers))
+
+      val application =
+        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          .overrides(bind[VerificationService].toInstance(mockService))
+          .build()
+
+      running(application) {
+        val result = route(application, FakeRequest(GET, endpointUrl)).value
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result).value mustBe
+          controllers.routes.JourneyRecoveryController.onPageLoad().url
 
         verify(mockService).refreshNewestVerificationBatch(any[UserAnswers])(any[HeaderCarrier])
         verifyNoMoreInteractions(mockService)

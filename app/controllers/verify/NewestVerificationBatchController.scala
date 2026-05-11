@@ -28,6 +28,7 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext
+import java.time.LocalDateTime
 
 class NewestVerificationBatchController @Inject() (
   override val messagesApi: MessagesApi,
@@ -40,6 +41,34 @@ class NewestVerificationBatchController @Inject() (
     extends FrontendBaseController
     with I18nSupport
     with Logging {
+
+  private sealed trait InactivityStatus
+  private object InactivityStatus {
+    case object Active extends InactivityStatus
+    case object Inactive extends InactivityStatus
+    case object MissingData extends InactivityStatus
+    val SixMonths: Long = 6
+  }
+
+  private def checkSchemeInactivity(response: models.response.GetNewestVerificationBatchResponse): InactivityStatus =
+    (response.monthlyReturn, response.submission) match {
+      case (None, _) | (_, None) =>
+        // Missing data - route to JourneyRecovery
+        InactivityStatus.MissingData
+
+      case (Some(monthlyReturn), Some(submission)) =>
+        if (!monthlyReturn.decNoMoreSubPayments.contains("Y")) {
+          InactivityStatus.Active
+        } else {
+          submission.submissionRequestDate match {
+            case Some(requestDate) =>
+              val sixMonthsLater = requestDate.plusMonths(InactivityStatus.SixMonths)
+              if (LocalDateTime.now().isBefore(sixMonthsLater)) InactivityStatus.Inactive else InactivityStatus.Active
+            case None              =>
+              InactivityStatus.MissingData
+          }
+        }
+    }
 
   def onPageLoad(): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
@@ -57,8 +86,19 @@ class NewestVerificationBatchController @Inject() (
             case Some(response) if response.subcontractors.nonEmpty && unverified.isEmpty =>
               Redirect(controllers.verify.routes.VerifyYourSubcontractorsYesNoController.onPageLoad)
 
-            case Some(_) =>
-              Redirect(controllers.verify.routes.SelectSubcontractorController.onPageLoad(NormalMode))
+            case Some(response) =>
+              val inactivityResult = checkSchemeInactivity(response)
+
+              inactivityResult match {
+                case InactivityStatus.MissingData =>
+                  Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+
+                case InactivityStatus.Inactive =>
+                  Redirect(controllers.verify.routes.InactiveSchemeWarningController.onPageLoad())
+
+                case InactivityStatus.Active =>
+                  Redirect(controllers.verify.routes.SelectSubcontractorController.onPageLoad(NormalMode))
+              }
 
             case None =>
               Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
