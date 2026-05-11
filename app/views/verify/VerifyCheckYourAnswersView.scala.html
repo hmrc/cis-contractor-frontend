@@ -20,7 +20,6 @@
     layout: templates.Layout,
     govukSummaryList: GovukSummaryList,
     h1: H1,
-    h2: H2,
     govukButton: GovukButton,
     formHelper: FormWithCSRF
 )
@@ -32,7 +31,6 @@
     @formHelper(action = controllers.verify.routes.VerifyCheckYourAnswersController.onSubmit(), Symbol("autoComplete") -> "off") {
 
         @h1("verify.verifyCheckYourAnswers.heading")
-        @h2("verify.verifyCheckYourAnswers.subHeading")
 
         @govukSummaryList(list)
 

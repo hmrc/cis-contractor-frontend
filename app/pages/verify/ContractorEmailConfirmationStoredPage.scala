@@ -38,8 +38,6 @@ case object ContractorEmailConfirmationStoredPage
   ): Try[UserAnswers] =
     value match {
       case Some(DifferentEmail) => Success(userAnswers)
-      case _                    =>
-        // TODO: remove ContractorEmailConfirmationAlternateEmailPage once SM-01b is implemented
-        Success(userAnswers)
+      case _                    => userAnswers.remove(EmailAddressPage)
     }
 }

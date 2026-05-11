@@ -17,38 +17,313 @@
 package controllers.verify
 
 import base.SpecBase
+import models.verify.ContractorEmailConfirmationStored
+import models.verify.ContractorEmailConfirmationStored.{CurrentEmail, DifferentEmail, DoNotSend}
+import models.verify.SelectedSubcontractors
+import models.{ContractorScheme, Subcontractor, SubcontractorViewModel}
+import models.response.GetNewestVerificationBatchResponse
+import org.jsoup.Jsoup
+import pages.verify._
 import play.api.test.FakeRequest
-import play.api.test.Helpers.*
-import views.html.verify.VerifyCheckYourAnswersView
+import play.api.test.Helpers._
 
 class VerifyCheckYourAnswersControllerSpec extends SpecBase {
 
   private lazy val onPageLoadRoute = controllers.verify.routes.VerifyCheckYourAnswersController.onPageLoad().url
   private lazy val onSubmitRoute   = controllers.verify.routes.VerifyCheckYourAnswersController.onSubmit().url
 
+  private val brodyMartin         = SubcontractorViewModel("1", "Brody, Martin")
+  private val hooperAndAssociates = SubcontractorViewModel("2", "Hooper And Associates")
+  private val quintTransportation = SubcontractorViewModel("3", "Quint Transportation")
+
+  private val grantAlan     = SelectedSubcontractors("4", "Grant, Alan")
+  private val ingenResearch = SelectedSubcontractors("5", "InGen Research")
+
+  private val aSubcontractor: Subcontractor = Subcontractor(
+    subcontractorId = 1L,
+    firstName = None,
+    secondName = None,
+    surname = None,
+    tradingName = Some("Brody & Co"),
+    partnershipTradingName = None,
+    verified = None,
+    verificationNumber = None,
+    taxTreatment = None,
+    verificationDate = None,
+    lastMonthlyReturnDate = None,
+    createDate = None,
+    subcontractorType = None,
+    subbieResourceRef = None,
+    utr = None,
+    partnerUtr = None,
+    crn = None,
+    nino = None
+  )
+
+  private def batchResponseWithEmail(
+    email: String,
+    subs: Seq[Subcontractor] = Seq.empty
+  ): GetNewestVerificationBatchResponse =
+    GetNewestVerificationBatchResponse(
+      scheme = Some(ContractorScheme(accountsOfficeReference = None, emailAddress = Some(email))),
+      subcontractors = subs,
+      verificationBatch = None,
+      verifications = Seq.empty,
+      submission = None,
+      monthlyReturn = None
+    )
+
   "VerifyCheckYourAnswersController" - {
 
     "onPageLoad" - {
 
-      "must return OK and render the view" in {
-        val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
-        running(application) {
-          val request = FakeRequest(GET, onPageLoadRoute)
-          val result  = route(application, request).value
-          val view    = application.injector.instanceOf[VerifyCheckYourAnswersView]
+      // ─── Scenario 1: single subcontractor, stored email, CurrentEmail ───────────
+      "Scenario 1 — single subcontractor with stored email" - {
 
-          status(result) mustEqual OK
-          contentAsString(result) mustEqual view(
-            viewmodels.govuk.summarylist.SummaryListViewModel(rows = Seq.empty)
-          )(request, messages(application)).toString
+        "must return OK" in {
+          val ua = emptyUserAnswers
+            .setOrException(SelectSubcontractorPage, Set(brodyMartin))
+            .setOrException(NewestVerificationBatchResponsePage, batchResponseWithEmail("agent@example.com"))
+            .setOrException(ContractorEmailConfirmationStoredPage, CurrentEmail)
+
+          val application = applicationBuilder(userAnswers = Some(ua)).build()
+          running(application) {
+            val result = route(application, FakeRequest(GET, onPageLoadRoute)).value
+            status(result) mustEqual OK
+          }
+        }
+
+        "must render the subcontractor as plain text (no bullet)" in {
+          val ua = emptyUserAnswers
+            .setOrException(SelectSubcontractorPage, Set(brodyMartin))
+            .setOrException(NewestVerificationBatchResponsePage, batchResponseWithEmail("agent@example.com"))
+            .setOrException(ContractorEmailConfirmationStoredPage, CurrentEmail)
+
+          val application = applicationBuilder(userAnswers = Some(ua)).build()
+          running(application) {
+            val result = route(application, FakeRequest(GET, onPageLoadRoute)).value
+            val doc    = Jsoup.parse(contentAsString(result))
+
+            val rows = doc.select(".govuk-summary-list__row")
+            rows.size() mustBe 2
+
+            val subRow = rows.get(0)
+            subRow.select(".govuk-summary-list__value").text() mustBe "Brody, Martin"
+            subRow.select(".govuk-list--bullet").size() mustBe 0
+          }
+        }
+
+        "must render the stored email inline in bold in the email confirmation row" in {
+          val ua = emptyUserAnswers
+            .setOrException(SelectSubcontractorPage, Set(brodyMartin))
+            .setOrException(NewestVerificationBatchResponsePage, batchResponseWithEmail("agent@example.com"))
+            .setOrException(ContractorEmailConfirmationStoredPage, CurrentEmail)
+
+          val application = applicationBuilder(userAnswers = Some(ua)).build()
+          running(application) {
+            val result = route(application, FakeRequest(GET, onPageLoadRoute)).value
+            val doc    = Jsoup.parse(contentAsString(result))
+
+            val emailRow = doc.select(".govuk-summary-list__row").get(1)
+            emailRow.select(".govuk-summary-list__value").text() must include("agent@example.com")
+            emailRow.select(".govuk-summary-list__value strong").text() mustBe "agent@example.com"
+          }
+        }
+
+        "must not render the reverify or email address rows" in {
+          val ua = emptyUserAnswers
+            .setOrException(SelectSubcontractorPage, Set(brodyMartin))
+            .setOrException(NewestVerificationBatchResponsePage, batchResponseWithEmail("agent@example.com"))
+            .setOrException(ContractorEmailConfirmationStoredPage, CurrentEmail)
+
+          val application = applicationBuilder(userAnswers = Some(ua)).build()
+          running(application) {
+            val result = route(application, FakeRequest(GET, onPageLoadRoute)).value
+            val doc    = Jsoup.parse(contentAsString(result))
+
+            doc.select(".govuk-summary-list__row").size() mustBe 2
+          }
+        }
+      }
+
+      // ─── Scenario 2: multiple subcontractors, stored email, CurrentEmail ──────
+      "Scenario 2/3 — multiple subcontractors with stored email" - {
+
+        "must render subcontractors as a bullet list" in {
+          val ua = emptyUserAnswers
+            .setOrException(SelectSubcontractorPage, Set(brodyMartin, hooperAndAssociates, quintTransportation))
+            .setOrException(NewestVerificationBatchResponsePage, batchResponseWithEmail("agent@example.com"))
+            .setOrException(ContractorEmailConfirmationStoredPage, CurrentEmail)
+
+          val application = applicationBuilder(userAnswers = Some(ua)).build()
+          running(application) {
+            val result = route(application, FakeRequest(GET, onPageLoadRoute)).value
+            val doc    = Jsoup.parse(contentAsString(result))
+
+            val subRow  = doc.select(".govuk-summary-list__row").get(0)
+            val bullets = subRow.select(".govuk-list--bullet li")
+            bullets.size() mustBe 3
+          }
+        }
+      }
+
+      // ─── Scenario 4: multiple subcontractors, DifferentEmail, user email ────────
+      "Scenario 4 — user selects a different email address" - {
+
+        "must show 'Use a different email address' in the confirmation row and the entered email separately" in {
+          val ua = emptyUserAnswers
+            .setOrException(SelectSubcontractorPage, Set(brodyMartin, hooperAndAssociates))
+            .setOrException(NewestVerificationBatchResponsePage, batchResponseWithEmail("scheme@example.com"))
+            .setOrException(ContractorEmailConfirmationStoredPage, DifferentEmail)
+            .setOrException(EmailAddressPage, "override@example.com")
+
+          val application = applicationBuilder(userAnswers = Some(ua)).build()
+          running(application) {
+            val result = route(application, FakeRequest(GET, onPageLoadRoute)).value
+            val doc    = Jsoup.parse(contentAsString(result))
+
+            val rows = doc.select(".govuk-summary-list__row")
+            rows.size() mustBe 3
+
+            val confirmRow = rows.get(1)
+            confirmRow.select(".govuk-summary-list__value").text() must include(
+              messages(application)("verify.contractorEmailConfirmationStored.differentEmail")
+            )
+
+            val emailRow = rows.get(2)
+            emailRow.select(".govuk-summary-list__value").text() mustBe "override@example.com"
+          }
+        }
+      }
+
+      // ─── Scenario 5: multiple subcontractors, DoNotSend ─────────────────────────
+      "Scenario 5 — user selects do not send an email" - {
+
+        "must show 'Do not send an email confirmation' and no separate email row" in {
+          val ua = emptyUserAnswers
+            .setOrException(SelectSubcontractorPage, Set(brodyMartin, hooperAndAssociates))
+            .setOrException(NewestVerificationBatchResponsePage, batchResponseWithEmail("scheme@example.com"))
+            .setOrException(ContractorEmailConfirmationStoredPage, DoNotSend)
+
+          val application = applicationBuilder(userAnswers = Some(ua)).build()
+          running(application) {
+            val result = route(application, FakeRequest(GET, onPageLoadRoute)).value
+            val doc    = Jsoup.parse(contentAsString(result))
+
+            val rows = doc.select(".govuk-summary-list__row")
+            rows.size() mustBe 2
+
+            val confirmRow = rows.get(1)
+            confirmRow.select(".govuk-summary-list__value").text() mustBe
+              messages(application)("verify.contractorEmailConfirmationStored.doNotSend")
+          }
+        }
+      }
+
+      // ─── Scenario 6: verify + reverify, stored email ─────────────────────────────
+      "Scenario 6 — verification and reverification with stored email" - {
+
+        "must render all four rows in the correct order" in {
+          val ua = emptyUserAnswers
+            .setOrException(SelectSubcontractorPage, Set(brodyMartin, hooperAndAssociates))
+            .setOrException(ReverifyExistingSubcontractorsYesNoPage, true)
+            .setOrException(SelectSubcontractorsToReverifyPage, Set(grantAlan, ingenResearch))
+            .setOrException(
+              NewestVerificationBatchResponsePage,
+              batchResponseWithEmail("agent@example.com", Seq(aSubcontractor))
+            )
+            .setOrException(ContractorEmailConfirmationStoredPage, CurrentEmail)
+
+          val application = applicationBuilder(userAnswers = Some(ua)).build()
+          running(application) {
+            val result = route(application, FakeRequest(GET, onPageLoadRoute)).value
+            val doc    = Jsoup.parse(contentAsString(result))
+
+            val rows = doc.select(".govuk-summary-list__row")
+            rows.size() mustBe 4
+
+            rows.get(0).select(".govuk-summary-list__key").text() must include(
+              messages(application)("verify.selectSubcontractor.checkYourAnswersLabel")
+            )
+            rows.get(1).select(".govuk-summary-list__key").text() must include(
+              messages(application)("verify.reverifyExistingSubcontractorsYesNo.checkYourAnswersLabel")
+            )
+            rows.get(2).select(".govuk-summary-list__key").text() must include(
+              messages(application)("verify.selectSubcontractorsToReverify.checkYourAnswersLabel")
+            )
+            rows.get(3).select(".govuk-summary-list__key").text() must include(
+              messages(application)("verify.contractorEmailConfirmationStored.checkYourAnswersLabel")
+            )
+          }
+        }
+
+        "must render reverify subcontractors as a bullet list" in {
+          val ua = emptyUserAnswers
+            .setOrException(SelectSubcontractorPage, Set(brodyMartin, hooperAndAssociates))
+            .setOrException(ReverifyExistingSubcontractorsYesNoPage, true)
+            .setOrException(SelectSubcontractorsToReverifyPage, Set(grantAlan, ingenResearch))
+            .setOrException(
+              NewestVerificationBatchResponsePage,
+              batchResponseWithEmail("agent@example.com", Seq(aSubcontractor))
+            )
+            .setOrException(ContractorEmailConfirmationStoredPage, CurrentEmail)
+
+          val application = applicationBuilder(userAnswers = Some(ua)).build()
+          running(application) {
+            val result = route(application, FakeRequest(GET, onPageLoadRoute)).value
+            val doc    = Jsoup.parse(contentAsString(result))
+
+            val reverifyRow = doc.select(".govuk-summary-list__row").get(2)
+            val bullets     = reverifyRow.select(".govuk-list--bullet li")
+            bullets.size() mustBe 2
+          }
+        }
+
+        "must render reverify Yes/No row with 'No' but no selection row when answer is false" in {
+          val ua = emptyUserAnswers
+            .setOrException(SelectSubcontractorPage, Set(brodyMartin, hooperAndAssociates))
+            .setOrException(ReverifyExistingSubcontractorsYesNoPage, false)
+            .setOrException(
+              NewestVerificationBatchResponsePage,
+              batchResponseWithEmail("agent@example.com", Seq(aSubcontractor))
+            )
+            .setOrException(ContractorEmailConfirmationStoredPage, CurrentEmail)
+
+          val application = applicationBuilder(userAnswers = Some(ua)).build()
+          running(application) {
+            val result = route(application, FakeRequest(GET, onPageLoadRoute)).value
+            val doc    = Jsoup.parse(contentAsString(result))
+
+            val rows = doc.select(".govuk-summary-list__row")
+            rows.size() mustBe 3
+
+            rows.get(1).select(".govuk-summary-list__key").text() must include(
+              messages(application)("verify.reverifyExistingSubcontractorsYesNo.checkYourAnswersLabel")
+            )
+            rows.get(1).select(".govuk-summary-list__value").text() mustBe messages(application)("site.no")
+          }
+        }
+
+        "must not render the reverify row when the batch has no existing subcontractors" in {
+          val ua = emptyUserAnswers
+            .setOrException(SelectSubcontractorPage, Set(brodyMartin, hooperAndAssociates))
+            .setOrException(NewestVerificationBatchResponsePage, batchResponseWithEmail("agent@example.com"))
+            .setOrException(ContractorEmailConfirmationStoredPage, CurrentEmail)
+
+          val application = applicationBuilder(userAnswers = Some(ua)).build()
+          running(application) {
+            val result = route(application, FakeRequest(GET, onPageLoadRoute)).value
+            val doc    = Jsoup.parse(contentAsString(result))
+
+            doc.select(".govuk-summary-list__row").size() mustBe 2
+          }
         }
       }
 
       "must redirect to Journey Recovery when there is no session data" in {
         val application = applicationBuilder(userAnswers = None).build()
         running(application) {
-          val request = FakeRequest(GET, onPageLoadRoute)
-          val result  = route(application, request).value
+          val result = route(application, FakeRequest(GET, onPageLoadRoute)).value
 
           status(result) mustEqual SEE_OTHER
           redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
@@ -61,8 +336,7 @@ class VerifyCheckYourAnswersControllerSpec extends SpecBase {
       "must redirect to Submission Sending" in {
         val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
         running(application) {
-          val request = FakeRequest(POST, onSubmitRoute)
-          val result  = route(application, request).value
+          val result = route(application, FakeRequest(POST, onSubmitRoute)).value
 
           status(result) mustEqual SEE_OTHER
           redirectLocation(result).value mustEqual controllers.verify.routes.SubmissionSendingController

@@ -42,6 +42,7 @@ class VerifyCheckYourAnswersController @Inject() (
       rows = Seq(
         SelectSubcontractorSummary.row(ua),
         ReverifyExistingSubcontractorsYesNoSummary.row(ua),
+        SelectSubcontractorsToReverifySummary.row(ua),
         ContractorEmailConfirmationStoredSummary.row(ua),
         ContractorEmailConfirmationNotStoredSummary.row(ua),
         EmailAddressSummary.row(ua)

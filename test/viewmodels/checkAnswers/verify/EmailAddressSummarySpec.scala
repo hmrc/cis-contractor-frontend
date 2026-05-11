@@ -17,12 +17,13 @@
 package viewmodels.checkAnswers.verify
 
 import controllers.verify.routes
+import models.verify.ContractorEmailConfirmationStored.{CurrentEmail, DifferentEmail, DoNotSend}
 import models.{CheckMode, UserAnswers}
 import org.scalatest.OptionValues.convertOptionToValuable
 import org.scalatest.TryValues.convertTryToSuccessOrFailure
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.should.Matchers
-import pages.verify.EmailAddressPage
+import pages.verify.{ContractorEmailConfirmationNotStoredPage, ContractorEmailConfirmationStoredPage, EmailAddressPage}
 import play.api.i18n.Messages
 import play.api.test.Helpers.stubMessages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.*
@@ -33,10 +34,13 @@ class EmailAddressSummarySpec extends AnyFreeSpec with Matchers {
 
   "EmailAddressSummary.row" - {
 
-    "must return a SummaryListRow when the answer exists" in {
+    "must return a SummaryListRow when DifferentEmail is selected and email is present" in {
 
       val answers =
         UserAnswers("test-id")
+          .set(ContractorEmailConfirmationStoredPage, DifferentEmail)
+          .success
+          .value
           .set(EmailAddressPage, "test@example.com")
           .success
           .value
@@ -68,11 +72,62 @@ class EmailAddressSummarySpec extends AnyFreeSpec with Matchers {
       changeAction.visuallyHiddenText.value shouldBe expectedHiddenText
     }
 
-    "must return None when the answer does not exist" in {
+    "must return a SummaryListRow when ContractorEmailConfirmationNotStored is true and email is present" in {
 
-      val answers = UserAnswers("test-id")
+      val answers =
+        UserAnswers("test-id")
+          .set(ContractorEmailConfirmationNotStoredPage, true)
+          .success
+          .value
+          .set(EmailAddressPage, "entered@example.com")
+          .success
+          .value
+
+      EmailAddressSummary.row(answers) shouldBe defined
+    }
+
+    "must return None when CurrentEmail is selected (email shown inline, not as separate row)" in {
+
+      val answers =
+        UserAnswers("test-id")
+          .set(ContractorEmailConfirmationStoredPage, CurrentEmail)
+          .success
+          .value
+          .set(EmailAddressPage, "stale@example.com")
+          .success
+          .value
 
       EmailAddressSummary.row(answers) shouldBe None
+    }
+
+    "must return None when DoNotSend is selected" in {
+
+      val answers =
+        UserAnswers("test-id")
+          .set(ContractorEmailConfirmationStoredPage, DoNotSend)
+          .success
+          .value
+          .set(EmailAddressPage, "stale@example.com")
+          .success
+          .value
+
+      EmailAddressSummary.row(answers) shouldBe None
+    }
+
+    "must return None when ContractorEmailConfirmationNotStored is false" in {
+
+      val answers =
+        UserAnswers("test-id")
+          .set(ContractorEmailConfirmationNotStoredPage, false)
+          .success
+          .value
+
+      EmailAddressSummary.row(answers) shouldBe None
+    }
+
+    "must return None when no confirmation page answer is present" in {
+
+      EmailAddressSummary.row(UserAnswers("test-id")) shouldBe None
     }
   }
 }

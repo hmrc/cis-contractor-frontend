@@ -93,9 +93,10 @@ class VerifyNavigatorSpec extends SpecBase {
 
       "ReverifyExistingSubcontractorsYesNoPage" - {
 
-        "must go to JourneyRecovery when answer is true (VF-03c not yet implemented)" in {
+        "must go to SelectSubcontractorsToReverifyController when answer is true" in {
           val ua = emptyUserAnswers.setOrException(ReverifyExistingSubcontractorsYesNoPage, true)
-          navigator.nextPage(ReverifyExistingSubcontractorsYesNoPage, NormalMode, ua) mustBe journeyRecovery
+          navigator.nextPage(ReverifyExistingSubcontractorsYesNoPage, NormalMode, ua) mustBe
+            controllers.verify.routes.SelectSubcontractorsToReverifyController.onPageLoad(NormalMode)
         }
 
         "must go to ContractorEmailConfirmationStoredController when answer is false and email is stored" in {
@@ -155,9 +156,22 @@ class VerifyNavigatorSpec extends SpecBase {
         }
       }
 
-      "must go from SelectSubcontractorsToReverifyPage to ContractorEmailConfirmationStoredController in NormalMode" in {
-        val result = navigator.nextPage(SelectSubcontractorsToReverifyPage, NormalMode, emptyUserAnswers)
-        result mustBe controllers.verify.routes.ContractorEmailConfirmationStoredController.onPageLoad(NormalMode)
+      "SelectSubcontractorsToReverifyPage" - {
+
+        "must go to ContractorEmailConfirmationStoredController in NormalMode when email is stored" in {
+          val ua = emptyUserAnswers.setOrException(
+            NewestVerificationBatchResponsePage,
+            batchResponseWithEmail("test@example.com")
+          )
+          navigator.nextPage(SelectSubcontractorsToReverifyPage, NormalMode, ua) mustBe
+            controllers.verify.routes.ContractorEmailConfirmationStoredController.onPageLoad(NormalMode)
+        }
+
+        "must go to ContractorEmailConfirmationNotStoredController in NormalMode when no email is stored" in {
+          val ua = emptyUserAnswers.setOrException(NewestVerificationBatchResponsePage, batchResponseNoEmail)
+          navigator.nextPage(SelectSubcontractorsToReverifyPage, NormalMode, ua) mustBe
+            controllers.verify.routes.ContractorEmailConfirmationNotStoredController.onPageLoad(NormalMode)
+        }
       }
 
       "must go to VerifyCheckYourAnswers from EmailAddressPage in NormalMode" in {
@@ -176,10 +190,10 @@ class VerifyNavigatorSpec extends SpecBase {
 
       "ContractorEmailConfirmationNotStoredPage" - {
 
-        "must go to EmailAddressController when answer is true" in {
+        "must go to EmailAddressController in CheckMode when answer is true" in {
           val ua = emptyUserAnswers.setOrException(ContractorEmailConfirmationNotStoredPage, true)
           navigator.nextPage(ContractorEmailConfirmationNotStoredPage, CheckMode, ua) mustBe
-            controllers.verify.routes.EmailAddressController.onPageLoad(NormalMode)
+            controllers.verify.routes.EmailAddressController.onPageLoad(CheckMode)
         }
 
         "must go to VerifyCheckYourAnswers when answer is false" in {
@@ -205,9 +219,10 @@ class VerifyNavigatorSpec extends SpecBase {
 
       "ReverifyExistingSubcontractorsYesNoPage" - {
 
-        "must go to JourneyRecovery when answer is true (VF-03c not yet implemented)" in {
+        "must go to SelectSubcontractorsToReverifyController in CheckMode when answer is true" in {
           val ua = emptyUserAnswers.setOrException(ReverifyExistingSubcontractorsYesNoPage, true)
-          navigator.nextPage(ReverifyExistingSubcontractorsYesNoPage, CheckMode, ua) mustBe journeyRecovery
+          navigator.nextPage(ReverifyExistingSubcontractorsYesNoPage, CheckMode, ua) mustBe
+            controllers.verify.routes.SelectSubcontractorsToReverifyController.onPageLoad(CheckMode)
         }
 
         "must go to VerifyCheckYourAnswers when answer is false" in {
@@ -234,13 +249,13 @@ class VerifyNavigatorSpec extends SpecBase {
           navigator.nextPage(ContractorEmailConfirmationStoredPage, CheckMode, ua) mustBe cya
         }
 
-        "must go to EmailAddressController when answer is DifferentEmail" in {
+        "must go to EmailAddressController in CheckMode when answer is DifferentEmail" in {
           val ua = emptyUserAnswers.setOrException(
             ContractorEmailConfirmationStoredPage,
             ContractorEmailConfirmationStored.DifferentEmail
           )
           navigator.nextPage(ContractorEmailConfirmationStoredPage, CheckMode, ua) mustBe
-            controllers.verify.routes.EmailAddressController.onPageLoad(NormalMode)
+            controllers.verify.routes.EmailAddressController.onPageLoad(CheckMode)
         }
 
         "must go to VerifyCheckYourAnswers when answer is DoNotSend" in {
@@ -256,9 +271,8 @@ class VerifyNavigatorSpec extends SpecBase {
         }
       }
 
-      "must go from SelectSubcontractorsToReverifyPage to ContractorEmailConfirmationStoredController in CheckMode" in {
-        val result = navigator.nextPage(SelectSubcontractorsToReverifyPage, CheckMode, emptyUserAnswers)
-        result mustBe controllers.verify.routes.ContractorEmailConfirmationStoredController.onPageLoad(CheckMode)
+      "must go to VerifyCheckYourAnswers from SelectSubcontractorsToReverifyPage in CheckMode" in {
+        navigator.nextPage(SelectSubcontractorsToReverifyPage, CheckMode, emptyUserAnswers) mustBe cya
       }
 
       "must go to VerifyCheckYourAnswers from EmailAddressPage in CheckMode" in {

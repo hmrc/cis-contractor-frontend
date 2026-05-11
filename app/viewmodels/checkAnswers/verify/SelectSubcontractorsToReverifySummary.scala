@@ -30,11 +30,13 @@ object SelectSubcontractorsToReverifySummary {
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
     answers.get(SelectSubcontractorsToReverifyPage).filter(_.nonEmpty).map { selected =>
 
-      val valueHtml =
-        selected.toSeq
-          .sortBy(_.id)
-          .map(s => HtmlFormat.escape(s.name).toString)
-          .mkString("<br>")
+      val names = selected.toSeq.sortBy(_.id).map(s => HtmlFormat.escape(s.name).toString)
+
+      val valueHtml = names match {
+        case Seq(single) => single
+        case multiple    =>
+          multiple.mkString("<ul class=\"govuk-list govuk-list--bullet\"><li>", "</li><li>", "</li></ul>")
+      }
 
       SummaryListRowViewModel(
         key = messages("verify.selectSubcontractorsToReverify.checkYourAnswersLabel"),

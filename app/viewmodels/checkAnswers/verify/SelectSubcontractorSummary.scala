@@ -30,13 +30,15 @@ object SelectSubcontractorSummary {
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
     answers.get(SelectSubcontractorPage).map { answers =>
 
-      val value = ValueViewModel(
-        HtmlContent(
-          answers
-            .map(sub => HtmlFormat.escape(sub.name).toString)
-            .mkString(",<br>")
-        )
-      )
+      val names = answers.map(sub => HtmlFormat.escape(sub.name).toString).toSeq
+
+      val valueHtml = names match {
+        case Seq(single) => single
+        case multiple    =>
+          multiple.mkString("<ul class=\"govuk-list govuk-list--bullet\"><li>", "</li><li>", "</li></ul>")
+      }
+
+      val value = ValueViewModel(HtmlContent(valueHtml))
 
       SummaryListRowViewModel(
         key = "verify.selectSubcontractor.checkYourAnswersLabel",
