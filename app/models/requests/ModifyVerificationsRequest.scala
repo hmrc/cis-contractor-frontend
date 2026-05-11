@@ -19,27 +19,27 @@ package models.requests
 import play.api.libs.json.{Json, OFormat}
 
 final case class CreateVerifications(
-                                      verificationBatchResourceRef: Long,
-                                      verificationResourceReferences: Seq[Long]
-                                    )
+  verificationBatchResourceRef: Long,
+  verificationResourceReferences: Seq[Long]
+)
 
 object CreateVerifications {
   given OFormat[CreateVerifications] = Json.format[CreateVerifications]
 }
 
 final case class DeleteVerifications(
-                                      verificationResourceReferences: Seq[Long]
-                                    )
+  verificationResourceReferences: Seq[Long]
+)
 
 object DeleteVerifications {
   given OFormat[DeleteVerifications] = Json.format[DeleteVerifications]
 }
 
 final case class ModifyVerificationsRequest(
-                                             instanceId: String,
-                                             deleteVerifications: Option[DeleteVerifications],
-                                             createVerifications: Option[CreateVerifications]
-                                           )
+  instanceId: String,
+  deleteVerifications: Option[DeleteVerifications],
+  createVerifications: Option[CreateVerifications]
+)
 
 object ModifyVerificationsRequest {
   given OFormat[ModifyVerificationsRequest] = Json.format[ModifyVerificationsRequest]

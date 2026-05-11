@@ -31,14 +31,14 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class ModifyVerificationBatchAndVerificationsController @Inject() (
-                                                                    override val messagesApi: MessagesApi,
-                                                                    identify: IdentifierAction,
-                                                                    getData: DataRetrievalAction,
-                                                                    requireData: DataRequiredAction,
-                                                                    val controllerComponents: MessagesControllerComponents,
-                                                                    verificationService: VerificationService
-                                                                  )(implicit ec: ExecutionContext)
-  extends FrontendBaseController
+  override val messagesApi: MessagesApi,
+  identify: IdentifierAction,
+  getData: DataRetrievalAction,
+  requireData: DataRequiredAction,
+  val controllerComponents: MessagesControllerComponents,
+  verificationService: VerificationService
+)(implicit ec: ExecutionContext)
+    extends FrontendBaseController
     with I18nSupport
     with Logging {
 
@@ -63,7 +63,6 @@ class ModifyVerificationBatchAndVerificationsController @Inject() (
           reverifyIds <- parseIds("SelectSubcontractorsToReverifyPage", reverifyIdsRaw)
         } yield (verifyIds ++ reverifyIds).distinct
 
-
       selectedIdsEither match {
 
         case Left(msg) =>
@@ -77,17 +76,16 @@ class ModifyVerificationBatchAndVerificationsController @Inject() (
             instanceId <- instanceIdF
 
             current <- currentBatchFromSession(request.userAnswers)
-
-            // Map subcontractorId -> subbieResourceRef (verificationResourceReference expected by BE)
-            idToRef: Map[Long, Long] = current.subcontractors.flatMap(s => s.subbieResourceRef.map(ref => s.subcontractorId -> ref)).toMap
+            
+            idToRef: Map[Long, Long] =
+              current.subcontractors.flatMap(s => s.subbieResourceRef.map(ref => s.subcontractorId -> ref)).toMap
 
             selectedRefs <- selectedRefsFromIds(selectedSubcontractorIds, idToRef)
 
             existingRefs = current.verifications.flatMap(_.verificationResourceRef).distinct
 
-
             //  if selected exists, formP missing(current batch) => Add (createRefs)
-            //if selected missing, formP exists(current batch) => Remove (deleteRefs)
+            // if selected missing, formP exists(current batch) => Remove (deleteRefs)
             createRefs = selectedRefs.filterNot(existingRefs.contains)
             deleteRefs = existingRefs.filterNot(selectedRefs.contains)
 
@@ -111,27 +109,27 @@ class ModifyVerificationBatchAndVerificationsController @Inject() (
     }
 
   private def instanceIdFromSession(userAnswers: models.UserAnswers): Future[String] =
-      userAnswers
-        .get(CisIdQuery)
-        .map(Future.successful)
-        .getOrElse(Future.failed(new RuntimeException("InstanceIdQuery not found in session data")))
+    userAnswers
+      .get(CisIdQuery)
+      .map(Future.successful)
+      .getOrElse(Future.failed(new RuntimeException("InstanceIdQuery not found in session data")))
 
   private def parseIds(label: String, ids: Iterable[String]): Either[String, Seq[Long]] = {
-      val parsed = ids.toSeq.distinct.map(_.trim).map(_.toLongOption)
-      if (parsed.forall(_.isDefined)) Right(parsed.flatten)
-      else Left(s"Invalid subcontractor id(s) found in $label")
-    }
+    val parsed = ids.toSeq.distinct.map(_.trim).map(_.toLongOption)
+    if (parsed.forall(_.isDefined)) Right(parsed.flatten)
+    else Left(s"Invalid subcontractor id(s) found in $label")
+  }
 
   private def currentBatchFromSession(userAnswers: models.UserAnswers): Future[GetCurrentVerificationBatchResponse] =
-      userAnswers
-        .get(CurrentVerificationBatchResponsePage)
-        .map(Future.successful)
-        .getOrElse(Future.failed(new RuntimeException("CurrentVerificationBatchResponsePage not found in session data")))
+    userAnswers
+      .get(CurrentVerificationBatchResponsePage)
+      .map(Future.successful)
+      .getOrElse(Future.failed(new RuntimeException("CurrentVerificationBatchResponsePage not found in session data")))
 
   private def selectedRefsFromIds(
-                                   selectedSubcontractorIds: Seq[Long],
-                                   idToRef: Map[Long, Long]
-                                 ): Future[Seq[Long]] =
+    selectedSubcontractorIds: Seq[Long],
+    idToRef: Map[Long, Long]
+  ): Future[Seq[Long]] =
     Future.fromTry {
       scala.util.Try {
         selectedSubcontractorIds.distinct.map { id =>
@@ -146,11 +144,11 @@ class ModifyVerificationBatchAndVerificationsController @Inject() (
     }
 
   private def buildModifyRequest(
-                                  instanceId: String,
-                                  current: GetCurrentVerificationBatchResponse,
-                                  createRefs: Seq[Long],
-                                  deleteRefs: Seq[Long]
-                                ): ModifyVerificationsRequest = {
+    instanceId: String,
+    current: GetCurrentVerificationBatchResponse,
+    createRefs: Seq[Long],
+    deleteRefs: Seq[Long]
+  ): ModifyVerificationsRequest = {
 
     val verificationBatchResourceRefOpt =
       current.verificationBatch.flatMap(_.verifBatchResourceRef)
@@ -161,8 +159,7 @@ class ModifyVerificationBatchAndVerificationsController @Inject() (
 
     ModifyVerificationsRequest(
       instanceId = instanceId,
-      deleteVerifications =
-        if (deleteRefs.nonEmpty) Some(DeleteVerifications(deleteRefs)) else None,
+      deleteVerifications = if (deleteRefs.nonEmpty) Some(DeleteVerifications(deleteRefs)) else None,
       createVerifications =
         if (createRefs.nonEmpty)
           Some(CreateVerifications(verificationBatchResourceRefOpt.get, createRefs))

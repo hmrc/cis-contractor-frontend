@@ -16,7 +16,6 @@
 
 package models.requests
 
-
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import play.api.libs.json.{JsSuccess, Json}
@@ -34,7 +33,7 @@ class ModifyVerificationsRequestSpec extends AnyWordSpec with Matchers {
       val json = Json.toJson(model)
 
       json mustBe Json.obj(
-        "verificationBatchResourceRef" -> 12345L,
+        "verificationBatchResourceRef"   -> 12345L,
         "verificationResourceReferences" -> Json.arr(111L, 222L)
       )
 
@@ -65,18 +64,19 @@ class ModifyVerificationsRequestSpec extends AnyWordSpec with Matchers {
       val model = ModifyVerificationsRequest(
         instanceId = "INST-123",
         deleteVerifications = Some(DeleteVerifications(Seq(10L, 20L))),
-        createVerifications = Some(CreateVerifications(verificationBatchResourceRef = 999L, verificationResourceReferences = Seq(30L)))
+        createVerifications =
+          Some(CreateVerifications(verificationBatchResourceRef = 999L, verificationResourceReferences = Seq(30L)))
       )
 
       val json = Json.toJson(model)
 
       json mustBe Json.obj(
-        "instanceId" -> "INST-123",
+        "instanceId"          -> "INST-123",
         "deleteVerifications" -> Json.obj(
           "verificationResourceReferences" -> Json.arr(10L, 20L)
         ),
         "createVerifications" -> Json.obj(
-          "verificationBatchResourceRef" -> 999L,
+          "verificationBatchResourceRef"   -> 999L,
           "verificationResourceReferences" -> Json.arr(30L)
         )
       )
@@ -88,15 +88,16 @@ class ModifyVerificationsRequestSpec extends AnyWordSpec with Matchers {
       val model = ModifyVerificationsRequest(
         instanceId = "INST-123",
         deleteVerifications = None,
-        createVerifications = Some(CreateVerifications(verificationBatchResourceRef = 999L, verificationResourceReferences = Seq(30L, 40L)))
+        createVerifications =
+          Some(CreateVerifications(verificationBatchResourceRef = 999L, verificationResourceReferences = Seq(30L, 40L)))
       )
 
       val json = Json.toJson(model)
 
       json mustBe Json.obj(
-        "instanceId" -> "INST-123",
+        "instanceId"          -> "INST-123",
         "createVerifications" -> Json.obj(
-          "verificationBatchResourceRef" -> 999L,
+          "verificationBatchResourceRef"   -> 999L,
           "verificationResourceReferences" -> Json.arr(30L, 40L)
         )
       )
@@ -114,7 +115,7 @@ class ModifyVerificationsRequestSpec extends AnyWordSpec with Matchers {
       val json = Json.toJson(model)
 
       json mustBe Json.obj(
-        "instanceId" -> "INST-123",
+        "instanceId"          -> "INST-123",
         "deleteVerifications" -> Json.obj(
           "verificationResourceReferences" -> Json.arr(10L)
         )

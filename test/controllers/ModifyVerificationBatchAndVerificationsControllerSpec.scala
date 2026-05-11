@@ -42,7 +42,7 @@ class ModifyVerificationBatchAndVerificationsControllerSpec extends SpecBase wit
   implicit val hc: HeaderCarrier    = HeaderCarrier()
 
   private val instanceId = "INST-123"
-  
+
   private val currentBatch: GetCurrentVerificationBatchResponse =
     GetCurrentVerificationBatchResponse(
       subcontractors = Seq(
@@ -115,21 +115,31 @@ class ModifyVerificationBatchAndVerificationsControllerSpec extends SpecBase wit
 
       // selected: 10, 20 => refs 1111,2222
       // existing: 1111,3333
-      //createRefs = 2222 ; deleteRefs = 3333
+      // createRefs = 2222 ; deleteRefs = 3333
       val ua =
         emptyUserAnswers
-          .set(CisIdQuery, instanceId).success.value
-          .set(CurrentVerificationBatchResponsePage, currentBatch).success.value
+          .set(CisIdQuery, instanceId)
+          .success
+          .value
+          .set(CurrentVerificationBatchResponsePage, currentBatch)
+          .success
+          .value
           .set(
             SelectSubcontractorPage,
             Set(
               SubcontractorViewModel("10", "Name 10"),
               SubcontractorViewModel("20", "Name 20")
             )
-          ).success.value
-          .set(SelectSubcontractorsToReverifyPage, Set.empty[SelectedSubcontractors]).success.value
+          )
+          .success
+          .value
+          .set(SelectSubcontractorsToReverifyPage, Set.empty[SelectedSubcontractors])
+          .success
+          .value
 
-      when(mockService.modifyVerificationBatchAndVerifications(any[UserAnswers], any[ModifyVerificationsRequest])(any()))
+      when(
+        mockService.modifyVerificationBatchAndVerifications(any[UserAnswers], any[ModifyVerificationsRequest])(any())
+      )
         .thenReturn(Future.successful(ua))
 
       val app =
@@ -150,7 +160,8 @@ class ModifyVerificationBatchAndVerificationsControllerSpec extends SpecBase wit
         reqCaptor.getValue mustBe ModifyVerificationsRequest(
           instanceId = instanceId,
           deleteVerifications = Some(DeleteVerifications(Seq(3333L))),
-          createVerifications = Some(CreateVerifications(verificationBatchResourceRef = 7777L, verificationResourceReferences = Seq(2222L)))
+          createVerifications =
+            Some(CreateVerifications(verificationBatchResourceRef = 7777L, verificationResourceReferences = Seq(2222L)))
         )
       }
     }
@@ -159,18 +170,24 @@ class ModifyVerificationBatchAndVerificationsControllerSpec extends SpecBase wit
       val mockService = mock[VerificationService]
 
       // selected: 10,30 => refs 1111,3333
-      //existing: 1111,3333 => so no changes required
+      // existing: 1111,3333 => so no changes required
       val ua =
         emptyUserAnswers
-          .set(CisIdQuery, instanceId).success.value
-          .set(CurrentVerificationBatchResponsePage, currentBatch).success.value
+          .set(CisIdQuery, instanceId)
+          .success
+          .value
+          .set(CurrentVerificationBatchResponsePage, currentBatch)
+          .success
+          .value
           .set(
             SelectSubcontractorPage,
             Set(
               SubcontractorViewModel("10", "Name 10"),
               SubcontractorViewModel("30", "Name 30")
             )
-          ).success.value
+          )
+          .success
+          .value
 
       val app =
         applicationBuilder(userAnswers = Some(ua))
@@ -193,9 +210,15 @@ class ModifyVerificationBatchAndVerificationsControllerSpec extends SpecBase wit
 
       val ua =
         emptyUserAnswers
-          .set(CisIdQuery, instanceId).success.value
-          .set(CurrentVerificationBatchResponsePage, currentBatch).success.value
-          .set(SelectSubcontractorPage, Set(SubcontractorViewModel("not-a-long", "Bad"))).success.value
+          .set(CisIdQuery, instanceId)
+          .success
+          .value
+          .set(CurrentVerificationBatchResponsePage, currentBatch)
+          .success
+          .value
+          .set(SelectSubcontractorPage, Set(SubcontractorViewModel("not-a-long", "Bad")))
+          .success
+          .value
 
       val app =
         applicationBuilder(userAnswers = Some(ua))
@@ -218,8 +241,12 @@ class ModifyVerificationBatchAndVerificationsControllerSpec extends SpecBase wit
 
       val ua =
         emptyUserAnswers
-          .set(CurrentVerificationBatchResponsePage, currentBatch).success.value
-          .set(SelectSubcontractorPage, Set(SubcontractorViewModel("10", "Name 10"))).success.value
+          .set(CurrentVerificationBatchResponsePage, currentBatch)
+          .success
+          .value
+          .set(SelectSubcontractorPage, Set(SubcontractorViewModel("10", "Name 10")))
+          .success
+          .value
 
       val app =
         applicationBuilder(userAnswers = Some(ua))
@@ -242,8 +269,12 @@ class ModifyVerificationBatchAndVerificationsControllerSpec extends SpecBase wit
 
       val ua =
         emptyUserAnswers
-          .set(CisIdQuery, instanceId).success.value
-          .set(SelectSubcontractorPage, Set(SubcontractorViewModel("10", "Name 10"))).success.value
+          .set(CisIdQuery, instanceId)
+          .success
+          .value
+          .set(SelectSubcontractorPage, Set(SubcontractorViewModel("10", "Name 10")))
+          .success
+          .value
 
       val app =
         applicationBuilder(userAnswers = Some(ua))
@@ -267,9 +298,15 @@ class ModifyVerificationBatchAndVerificationsControllerSpec extends SpecBase wit
       // select 40 which doesn't exist in currentBatch.subcontractors so thsi should fail
       val ua =
         emptyUserAnswers
-          .set(CisIdQuery, instanceId).success.value
-          .set(CurrentVerificationBatchResponsePage, currentBatch).success.value
-          .set(SelectSubcontractorPage, Set(SubcontractorViewModel("40", "Name 40"))).success.value
+          .set(CisIdQuery, instanceId)
+          .success
+          .value
+          .set(CurrentVerificationBatchResponsePage, currentBatch)
+          .success
+          .value
+          .set(SelectSubcontractorPage, Set(SubcontractorViewModel("40", "Name 40")))
+          .success
+          .value
 
       val app =
         applicationBuilder(userAnswers = Some(ua))
@@ -299,9 +336,15 @@ class ModifyVerificationBatchAndVerificationsControllerSpec extends SpecBase wit
       // but verificationBatchResourceRef missing => so we fail and redirect to journeyRecovery
       val ua =
         emptyUserAnswers
-          .set(CisIdQuery, instanceId).success.value
-          .set(CurrentVerificationBatchResponsePage, currentWithoutBatchRef).success.value
-          .set(SelectSubcontractorPage, Set(SubcontractorViewModel("20", "Name 20"))).success.value
+          .set(CisIdQuery, instanceId)
+          .success
+          .value
+          .set(CurrentVerificationBatchResponsePage, currentWithoutBatchRef)
+          .success
+          .value
+          .set(SelectSubcontractorPage, Set(SubcontractorViewModel("20", "Name 20")))
+          .success
+          .value
 
       val app =
         applicationBuilder(userAnswers = Some(ua))
