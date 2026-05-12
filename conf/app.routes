@@ -404,7 +404,11 @@ GET   /verify/verification-not-submitted-warning  controllers.verify.Verificatio
 
 GET   /verify/no-subcontractors-selected-warning  controllers.verify.NoSubcontractorsSelectedWarningController.onPageLoad()
 
+GET   /verify/verification-request-submitted  controllers.verify.VerificationRequestSubmittedController.onPageLoad()
+
 GET   /verify/verification-sent-not-received-warning  controllers.verify.VerifySendErrorController.onPageLoad()
+
+POST  /verify/verification-batch-create    controllers.verify.CreateVerificationBatchAndVerificationsController.onSubmit()
 
 GET   /what-is-contractors-utr         controllers.contractordetails.ContractorUtrController.onPageLoad(mode: Mode = NormalMode)
 POST  /what-is-contractors-utr         controllers.contractordetails.ContractorUtrController.onSubmit(mode: Mode = NormalMode)
