@@ -27,9 +27,9 @@
 
 @(form: Form[_], mode: Mode)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = title(form, messages("schemeName.title"))) {
+@layout(pageTitle = title(form, messages("contractordetails.schemeName.title"))) {
 
-    @formHelper(action = routes.SchemeNameController.onSubmit(mode)) {
+    @formHelper(action =  controllers.contractordetails.routes.SchemeNameController.onSubmit(mode)) {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form))
@@ -38,7 +38,7 @@
         @govukInput(
             InputViewModel(
                 field = form("value"),
-                label = LabelViewModel(messages("schemeName.heading")).asPageHeading(LabelSize.Large)
+                label = LabelViewModel(messages("contractordetails.schemeName.heading")).asPageHeading(LabelSize.Large)
             )
             .withWidth(Full)
         )

@@ -14,16 +14,15 @@
  * limitations under the License.
  */
 
-package viewmodels.checkAnswers
+package viewmodels.checkAnswers.contractordetails
 
-import controllers.routes
 import models.{CheckMode, UserAnswers}
-import pages.SchemeNamePage
+import pages.contractordetails.SchemeNamePage
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
-import viewmodels.govuk.summarylist._
-import viewmodels.implicits._
+import viewmodels.govuk.summarylist.*
+import viewmodels.implicits.*
 
 object SchemeNameSummary  {
 
@@ -32,11 +31,11 @@ object SchemeNameSummary  {
       answer =>
 
         SummaryListRowViewModel(
-          key     = "schemeName.checkYourAnswersLabel",
+          key     = "contractordetails.schemeName.checkYourAnswersLabel",
           value   = ValueViewModel(HtmlFormat.escape(answer).toString),
           actions = Seq(
-            ActionItemViewModel("site.change", routes.SchemeNameController.onPageLoad(CheckMode).url)
-              .withVisuallyHiddenText(messages("schemeName.change.hidden"))
+            ActionItemViewModel("site.change", controllers.contractordetails.routes.SchemeNameController.onPageLoad(CheckMode).url)
+              .withVisuallyHiddenText(messages("contractordetails.schemeName.change.hidden"))
           )
         )
     }

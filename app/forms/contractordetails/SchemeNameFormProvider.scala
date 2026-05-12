@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package forms
-
-import javax.inject.Inject
+package forms.contractordetails
 
 import forms.mappings.Mappings
 import play.api.data.Form
+
+import javax.inject.Inject
 
 class SchemeNameFormProvider @Inject() extends Mappings {
 
@@ -29,10 +29,10 @@ class SchemeNameFormProvider @Inject() extends Mappings {
 
   def apply(): Form[String] =
     Form(
-      "value" -> text("schemeName.error.required")
+      "value" -> text("contractordetails.schemeName.error.required")
         .verifying(
-          maxLength(maxLengthSchemeName, "schemeName.error.length"),
-          regexp(regexSchemeName, "schemeName.error.invalidCharacters")
+          maxLength(maxLengthSchemeName, "contractordetails.schemeName.error.length"),
+          regexp(regexSchemeName, "contractordetails.schemeName.error.invalidCharacters")
         )
     )
 }

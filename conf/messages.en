@@ -938,10 +938,10 @@ verify.verifySendError.verificationHistory.p1.link                      =  verif
 verify.verifySendError.manageSubcontractors.p1                          =  Back to
 verify.verifySendError.manageSubcontractors.p1.link                     =  Manage your subcontractors
 
-schemeName.title                                                        = What is the contractor’s scheme name?
-schemeName.heading                                                      = What is the contractor’s scheme name?
-schemeName.checkYourAnswersLabel                                        = Scheme name
-schemeName.error.required                                               = Enter the scheme name
-schemeName.error.length                                                 = The scheme name you entered contains too many characters
-schemeName.error.invalidCharacters                                      = You have entered a scheme name in an incorrect format
-schemeName.change.hidden                                                = Scheme Name
+contractordetails.schemeName.title                                      = What is the contractor’s scheme name?
+contractordetails.schemeName.heading                                    = What is the contractor’s scheme name?
+contractordetails.schemeName.checkYourAnswersLabel                      = Scheme name
+contractordetails.schemeName.error.required                             = Enter the scheme name
+contractordetails.schemeName.error.length                               = The scheme name you entered contains too many characters
+contractordetails.schemeName.error.invalidCharacters                    = You have entered a scheme name in an incorrect format
+contractordetails.schemeName.change.hidden                              = Scheme Name

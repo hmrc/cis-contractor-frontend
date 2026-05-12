@@ -14,13 +14,21 @@
  * limitations under the License.
  */
 
-package pages
+package pages.contractordetails
 
+import base.SpecBase
 import play.api.libs.json.JsPath
 
-case object SchemeNamePage extends QuestionPage[String] {
+class SchemeNamePageSpec extends SpecBase {
 
-  override def path: JsPath = JsPath \ toString
+  "SchemeNamePage" - {
 
-  override def toString: String = "schemeName"
+    "have the correct path" in {
+      SchemeNamePage.path mustBe (JsPath \ "schemeName")
+    }
+
+    "have the correct toString" in {
+      SchemeNamePage.toString mustBe "schemeName"
+    }
+  }
 }

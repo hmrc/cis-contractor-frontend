@@ -410,7 +410,7 @@ GET   /verify/verification-sent-not-received-warning  controllers.verify.VerifyS
 
 POST  /verify/verification-batch-create    controllers.verify.CreateVerificationBatchAndVerificationsController.onSubmit()
 
-GET        /enter-contractor-scheme-name                  controllers.SchemeNameController.onPageLoad(mode: Mode = NormalMode)
-POST       /enter-contractor-scheme-name                  controllers.SchemeNameController.onSubmit(mode: Mode = NormalMode)
-GET        /change-enter-contractor-scheme-name           controllers.SchemeNameController.onPageLoad(mode: Mode = CheckMode)
-POST       /change-enter-contractor-scheme-name           controllers.SchemeNameController.onSubmit(mode: Mode = CheckMode)
+GET        /enter-contractor-scheme-name                  controllers.contractordetails.SchemeNameController.onPageLoad(mode: Mode = NormalMode)
+POST       /enter-contractor-scheme-name                  controllers.contractordetails.SchemeNameController.onSubmit(mode: Mode = NormalMode)
+GET        /change-enter-contractor-scheme-name           controllers.contractordetails.SchemeNameController.onPageLoad(mode: Mode = CheckMode)
+POST       /change-enter-contractor-scheme-name           controllers.contractordetails.SchemeNameController.onSubmit(mode: Mode = CheckMode)
