@@ -17,6 +17,8 @@
 package controllers.verify
 
 import controllers.actions.*
+import models.verify.ValidatedVerify
+import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -34,24 +36,36 @@ class VerifyCheckYourAnswersController @Inject() (
   val controllerComponents: MessagesControllerComponents,
   view: VerifyCheckYourAnswersView
 ) extends FrontendBaseController
-    with I18nSupport {
+    with I18nSupport
+    with Logging {
 
   def onPageLoad(): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
-    val ua   = request.userAnswers
-    val list = SummaryListViewModel(
-      rows = Seq(
-        SelectSubcontractorSummary.row(ua),
-        ReverifyExistingSubcontractorsYesNoSummary.row(ua),
-        SelectSubcontractorsToReverifySummary.row(ua),
-        ContractorEmailConfirmationStoredSummary.row(ua),
-        ContractorEmailConfirmationNotStoredSummary.row(ua),
-        EmailAddressSummary.row(ua)
-      ).flatten
-    )
-    Ok(view(list))
+    val ua = request.userAnswers
+    ValidatedVerify.build(ua) match {
+      case Right(_)    =>
+        val list = SummaryListViewModel(
+          rows = Seq(
+            SelectSubcontractorSummary.row(ua),
+            ReverifyExistingSubcontractorsYesNoSummary.row(ua),
+            SelectSubcontractorsToReverifySummary.row(ua),
+            ContractorEmailConfirmationStoredSummary.row(ua),
+            ContractorEmailConfirmationNotStoredSummary.row(ua),
+            EmailAddressSummary.row(ua)
+          ).flatten
+        )
+        Ok(view(list))
+      case Left(error) =>
+        logger.error(s"[VerifyCheckYourAnswersController.onPageLoad] Validation failed: $error")
+        Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+    }
   }
 
   def onSubmit(): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
-    Redirect(controllers.verify.routes.SubmissionSendingController.onPageLoad())
+    ValidatedVerify.build(request.userAnswers) match {
+      case Right(_)    => Redirect(controllers.verify.routes.SubmissionSendingController.onPageLoad())
+      case Left(error) =>
+        logger.error(s"[VerifyCheckYourAnswersController.onSubmit] Validation failed: $error")
+        Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+    }
   }
 }

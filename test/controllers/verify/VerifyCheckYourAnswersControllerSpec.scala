@@ -83,6 +83,7 @@ class VerifyCheckYourAnswersControllerSpec extends SpecBase {
         "must return OK" in {
           val ua = emptyUserAnswers
             .setOrException(SelectSubcontractorPage, Set(brodyMartin))
+            .setOrException(ReverifyExistingSubcontractorsYesNoPage, false)
             .setOrException(NewestVerificationBatchResponsePage, batchResponseWithEmail("agent@example.com"))
             .setOrException(ContractorEmailConfirmationStoredPage, CurrentEmail)
 
@@ -96,6 +97,7 @@ class VerifyCheckYourAnswersControllerSpec extends SpecBase {
         "must render the subcontractor as plain text (no bullet)" in {
           val ua = emptyUserAnswers
             .setOrException(SelectSubcontractorPage, Set(brodyMartin))
+            .setOrException(ReverifyExistingSubcontractorsYesNoPage, false)
             .setOrException(NewestVerificationBatchResponsePage, batchResponseWithEmail("agent@example.com"))
             .setOrException(ContractorEmailConfirmationStoredPage, CurrentEmail)
 
@@ -116,6 +118,7 @@ class VerifyCheckYourAnswersControllerSpec extends SpecBase {
         "must render the stored email inline in bold in the email confirmation row" in {
           val ua = emptyUserAnswers
             .setOrException(SelectSubcontractorPage, Set(brodyMartin))
+            .setOrException(ReverifyExistingSubcontractorsYesNoPage, false)
             .setOrException(NewestVerificationBatchResponsePage, batchResponseWithEmail("agent@example.com"))
             .setOrException(ContractorEmailConfirmationStoredPage, CurrentEmail)
 
@@ -133,6 +136,7 @@ class VerifyCheckYourAnswersControllerSpec extends SpecBase {
         "must not render the reverify or email address rows" in {
           val ua = emptyUserAnswers
             .setOrException(SelectSubcontractorPage, Set(brodyMartin))
+            .setOrException(ReverifyExistingSubcontractorsYesNoPage, false)
             .setOrException(NewestVerificationBatchResponsePage, batchResponseWithEmail("agent@example.com"))
             .setOrException(ContractorEmailConfirmationStoredPage, CurrentEmail)
 
@@ -152,6 +156,7 @@ class VerifyCheckYourAnswersControllerSpec extends SpecBase {
         "must render subcontractors as a bullet list" in {
           val ua = emptyUserAnswers
             .setOrException(SelectSubcontractorPage, Set(brodyMartin, hooperAndAssociates, quintTransportation))
+            .setOrException(ReverifyExistingSubcontractorsYesNoPage, false)
             .setOrException(NewestVerificationBatchResponsePage, batchResponseWithEmail("agent@example.com"))
             .setOrException(ContractorEmailConfirmationStoredPage, CurrentEmail)
 
@@ -173,6 +178,7 @@ class VerifyCheckYourAnswersControllerSpec extends SpecBase {
         "must show 'Use a different email address' in the confirmation row and the entered email separately" in {
           val ua = emptyUserAnswers
             .setOrException(SelectSubcontractorPage, Set(brodyMartin, hooperAndAssociates))
+            .setOrException(ReverifyExistingSubcontractorsYesNoPage, false)
             .setOrException(NewestVerificationBatchResponsePage, batchResponseWithEmail("scheme@example.com"))
             .setOrException(ContractorEmailConfirmationStoredPage, DifferentEmail)
             .setOrException(EmailAddressPage, "override@example.com")
@@ -202,6 +208,7 @@ class VerifyCheckYourAnswersControllerSpec extends SpecBase {
         "must show 'Do not send an email confirmation' and no separate email row" in {
           val ua = emptyUserAnswers
             .setOrException(SelectSubcontractorPage, Set(brodyMartin, hooperAndAssociates))
+            .setOrException(ReverifyExistingSubcontractorsYesNoPage, false)
             .setOrException(NewestVerificationBatchResponsePage, batchResponseWithEmail("scheme@example.com"))
             .setOrException(ContractorEmailConfirmationStoredPage, DoNotSend)
 
@@ -307,6 +314,7 @@ class VerifyCheckYourAnswersControllerSpec extends SpecBase {
         "must not render the reverify row when the batch has no existing subcontractors" in {
           val ua = emptyUserAnswers
             .setOrException(SelectSubcontractorPage, Set(brodyMartin, hooperAndAssociates))
+            .setOrException(ReverifyExistingSubcontractorsYesNoPage, false)
             .setOrException(NewestVerificationBatchResponsePage, batchResponseWithEmail("agent@example.com"))
             .setOrException(ContractorEmailConfirmationStoredPage, CurrentEmail)
 
@@ -329,12 +337,27 @@ class VerifyCheckYourAnswersControllerSpec extends SpecBase {
           redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
         }
       }
+
+      "must redirect to Journey Recovery when session data is incomplete" in {
+        val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+        running(application) {
+          val result = route(application, FakeRequest(GET, onPageLoadRoute)).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+        }
+      }
     }
 
     "onSubmit" - {
 
-      "must redirect to Submission Sending" in {
-        val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      "must redirect to Submission Sending when answers are valid" in {
+        val ua = emptyUserAnswers
+          .setOrException(SelectSubcontractorPage, Set(brodyMartin))
+          .setOrException(ReverifyExistingSubcontractorsYesNoPage, false)
+          .setOrException(ContractorEmailConfirmationStoredPage, DoNotSend)
+
+        val application = applicationBuilder(userAnswers = Some(ua)).build()
         running(application) {
           val result = route(application, FakeRequest(POST, onSubmitRoute)).value
 
@@ -342,6 +365,16 @@ class VerifyCheckYourAnswersControllerSpec extends SpecBase {
           redirectLocation(result).value mustEqual controllers.verify.routes.SubmissionSendingController
             .onPageLoad()
             .url
+        }
+      }
+
+      "must redirect to Journey Recovery when answers fail validation" in {
+        val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+        running(application) {
+          val result = route(application, FakeRequest(POST, onSubmitRoute)).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
         }
       }
     }
