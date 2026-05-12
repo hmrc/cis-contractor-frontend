@@ -408,5 +408,7 @@ GET   /verify/verification-request-submitted  controllers.verify.VerificationReq
 
 GET   /verify/verification-sent-not-received-warning  controllers.verify.VerifySendErrorController.onPageLoad()
 
+POST  /verify/verification-batch-create  controllers.verify.CreateVerificationBatchAndVerificationsController.onSubmit()
+
 GET   /verify/check-your-answers  controllers.verify.VerifyCheckYourAnswersController.onPageLoad()
 POST  /verify/check-your-answers  controllers.verify.VerifyCheckYourAnswersController.onSubmit()
