@@ -21,10 +21,10 @@ import play.api.data.FormError
 
 class SchemeNameFormProviderSpec extends StringFieldBehaviours {
 
-  val requiredKey = "contractordetails.schemeName.error.required"
-  val lengthKey = "contractordetails.schemeName.error.length"
+  val requiredKey            = "contractordetails.schemeName.error.required"
+  val lengthKey              = "contractordetails.schemeName.error.length"
   val invalidCharactersError = "contractordetails.schemeName.error.invalidCharacters"
-  val maxLength = 56
+  val maxLength              = 56
 
   val form = new SchemeNameFormProvider()()
 
@@ -53,8 +53,7 @@ class SchemeNameFormProviderSpec extends StringFieldBehaviours {
         "Test: Scheme 1",
         "Name_With[Brackets]",
         "Name{Curly}Braces",
-        "A&B Scheme",
-
+        "A&B Scheme"
       )
       validSchemeNames.foreach { validSchemeName =>
         val result = form.bind(Map(fieldName -> validSchemeName))

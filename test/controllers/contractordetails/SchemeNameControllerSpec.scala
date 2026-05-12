@@ -39,10 +39,11 @@ class SchemeNameControllerSpec extends SpecBase with MockitoSugar {
 
   def onwardRoute = Call("GET", "/foo")
 
-  val formProvider = new SchemeNameFormProvider()
+  val formProvider       = new SchemeNameFormProvider()
   val form: Form[String] = formProvider()
 
-  lazy val schemeNameRoute: String = controllers.contractordetails.routes.SchemeNameController.onPageLoad(NormalMode).url
+  lazy val schemeNameRoute: String =
+    controllers.contractordetails.routes.SchemeNameController.onPageLoad(NormalMode).url
 
   "SchemeName Controller" - {
 

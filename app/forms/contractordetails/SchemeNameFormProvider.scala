@@ -24,7 +24,7 @@ import javax.inject.Inject
 class SchemeNameFormProvider @Inject() extends Mappings {
 
   private val maxLengthSchemeName = 56
-  private val regexSchemeName =
+  private val regexSchemeName     =
     "^[A-Za-z0-9\"\\~\\!\\@\\#\\$\\%\\*\\+\\:\\;\\=\\?\\s,\\.\\[\\]\\_\\{\\}\\(\\)/\\&\\'\\-\\^\\\\£€]+$"
 
   def apply(): Form[String] =

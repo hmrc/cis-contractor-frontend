@@ -59,8 +59,8 @@ class SchemeNameSummarySpec extends AnyFreeSpec with Matchers {
       val expectedHref       = routes.SchemeNameController.onPageLoad(CheckMode).url
       val expectedHiddenText = messages("contractordetails.schemeName.change.hidden")
 
-      changeAction.content.asHtml.toString should include(expectedChangeText)
-      changeAction.href                  shouldBe expectedHref
+      changeAction.content.asHtml.toString    should include(expectedChangeText)
+      changeAction.href                     shouldBe expectedHref
       changeAction.visuallyHiddenText.value shouldBe expectedHiddenText
     }
 

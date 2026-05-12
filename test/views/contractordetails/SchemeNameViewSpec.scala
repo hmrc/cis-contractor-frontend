@@ -33,21 +33,21 @@ class SchemeNameViewSpec extends SpecBase {
     "must return the correct html" in new Setup {
       val doc = Jsoup.parse(html.body)
       doc.select("title").text must include(messages("contractordetails.schemeName.title"))
-      doc.select("h1").text must include(messages("contractordetails.schemeName.heading"))
+      doc.select("h1").text    must include(messages("contractordetails.schemeName.heading"))
       doc.select("input[type=text]").size() mustBe 1
     }
   }
 
   trait Setup {
-    val app: Application = applicationBuilder().build()
-    val view: SchemeNameView = app.injector.instanceOf[SchemeNameView]
-    val formProvider = new SchemeNameFormProvider()
-    val form: Form[String] = formProvider()
+    val app: Application                          = applicationBuilder().build()
+    val view: SchemeNameView                      = app.injector.instanceOf[SchemeNameView]
+    val formProvider                              = new SchemeNameFormProvider()
+    val form: Form[String]                        = formProvider()
     implicit val request: play.api.mvc.Request[_] = FakeRequest()
-    implicit val messages: Messages = play.api.i18n.MessagesImpl(
+    implicit val messages: Messages               = play.api.i18n.MessagesImpl(
       play.api.i18n.Lang.defaultLang,
       app.injector.instanceOf[play.api.i18n.MessagesApi]
     )
-    val html: HtmlFormat.Appendable = view(form, NormalMode)
+    val html: HtmlFormat.Appendable               = view(form, NormalMode)
   }
 }
