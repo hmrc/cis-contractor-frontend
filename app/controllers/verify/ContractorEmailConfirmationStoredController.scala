@@ -49,25 +49,30 @@ class ContractorEmailConfirmationStoredController @Inject() (
 
   private def recoveryRedirect = Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
 
+  private def emailNotStoredRedirect(mode: Mode) = Redirect(
+    controllers.verify.routes.ContractorEmailConfirmationNotStoredController.onPageLoad(mode)
+  )
+
   private def preparedForm(implicit request: DataRequest[?]) =
     request.userAnswers.get(ContractorEmailConfirmationStoredPage).fold(form)(form.fill)
 
-  private def getEmailAddress(implicit request: DataRequest[?]): Option[String] =
-    request.userAnswers
-      .get(NewestVerificationBatchResponsePage)
-      .flatMap(_.scheme.headOption)
-      .flatMap(_.emailAddress)
+  private def getEmailAddress(implicit request: DataRequest[?]): Either[Unit, Option[String]] =
+    request.userAnswers.get(NewestVerificationBatchResponsePage) match {
+      case None           => Left(())
+      case Some(response) => Right(response.scheme.flatMap(_.emailAddress))
+    }
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
-    getEmailAddress
-      .fold(recoveryRedirect) { emailAddress =>
-        Ok(view(preparedForm, mode, emailAddress))
-      }
+    getEmailAddress match {
+      case Left(_)            => recoveryRedirect
+      case Right(None)        => emailNotStoredRedirect(mode)
+      case Right(Some(email)) => Ok(view(preparedForm, mode, email))
+    }
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
-      getEmailAddress
+      getEmailAddress.toOption.flatten
         .fold(Future.successful(recoveryRedirect)) { emailAddress =>
           form
             .bindFromRequest()

@@ -105,7 +105,7 @@ class ContractorEmailConfirmationStoredControllerSpec extends SpecBase with Mock
       }
     }
 
-    "must redirect to Journey Recovery for a GET when the email address is absent from the scheme" in {
+    "must redirect to ContractorEmailConfirmationNotStored for a GET when the email address is absent from the scheme" in {
 
       val responseWithNoEmail = testResponse.copy(scheme = Some(testScheme.copy(emailAddress = None)))
       val userAnswers         = emptyUserAnswers.set(NewestVerificationBatchResponsePage, responseWithNoEmail).success.value
@@ -117,7 +117,8 @@ class ContractorEmailConfirmationStoredControllerSpec extends SpecBase with Mock
         val result  = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+        redirectLocation(result).value mustEqual
+          controllers.verify.routes.ContractorEmailConfirmationNotStoredController.onPageLoad(NormalMode).url
       }
     }
 
@@ -190,6 +191,22 @@ class ContractorEmailConfirmationStoredControllerSpec extends SpecBase with Mock
           request,
           messages(application)
         ).toString
+      }
+    }
+
+    "must redirect to Journey Recovery for a POST when no batch response is stored" in {
+
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, contractorEmailConfirmationStoredRoute)
+            .withFormUrlEncodedBody(("value", "currentEmail"))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
       }
     }
 
