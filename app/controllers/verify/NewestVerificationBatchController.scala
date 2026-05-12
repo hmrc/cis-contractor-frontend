@@ -70,6 +70,27 @@ class NewestVerificationBatchController @Inject() (
         }
     }
 
+  private def routeFromResponse(
+    response: models.response.GetNewestVerificationBatchResponse,
+    unverified: Seq[models.Subcontractor]
+  ): play.api.mvc.Result =
+    checkSchemeInactivity(response) match {
+      case InactivityStatus.MissingData =>
+        Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+
+      case InactivityStatus.Inactive =>
+        Redirect(controllers.verify.routes.InactiveSchemeWarningController.onPageLoad())
+
+      case InactivityStatus.Active if response.subcontractors.isEmpty =>
+        Redirect(controllers.verify.routes.NoSubcontractorsAddedController.onPageLoad())
+
+      case InactivityStatus.Active if unverified.isEmpty =>
+        Redirect(controllers.verify.routes.VerifyYourSubcontractorsYesNoController.onPageLoad)
+
+      case InactivityStatus.Active =>
+        Redirect(controllers.verify.routes.SelectSubcontractorController.onPageLoad(NormalMode))
+    }
+
   def onPageLoad(): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
       verificationBatchService
@@ -80,28 +101,8 @@ class NewestVerificationBatchController @Inject() (
           val unverified = updatedAnswers.get(UnverifiedSubcontractorsPage).getOrElse(Seq.empty)
 
           batch match {
-            case Some(response) if response.subcontractors.isEmpty =>
-              Redirect(controllers.verify.routes.NoSubcontractorsAddedController.onPageLoad())
-
-            case Some(response) if response.subcontractors.nonEmpty && unverified.isEmpty =>
-              Redirect(controllers.verify.routes.VerifyYourSubcontractorsYesNoController.onPageLoad)
-
-            case Some(response) =>
-              val inactivityResult = checkSchemeInactivity(response)
-
-              inactivityResult match {
-                case InactivityStatus.MissingData =>
-                  Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-
-                case InactivityStatus.Inactive =>
-                  Redirect(controllers.verify.routes.InactiveSchemeWarningController.onPageLoad())
-
-                case InactivityStatus.Active =>
-                  Redirect(controllers.verify.routes.SelectSubcontractorController.onPageLoad(NormalMode))
-              }
-
-            case None =>
-              Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+            case None           => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+            case Some(response) => routeFromResponse(response, unverified)
           }
         }
         .recover { case t =>
