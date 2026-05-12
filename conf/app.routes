@@ -409,3 +409,8 @@ GET   /verify/verification-request-submitted  controllers.verify.VerificationReq
 GET   /verify/verification-sent-not-received-warning  controllers.verify.VerifySendErrorController.onPageLoad()
 
 POST  /verify/verification-batch-create    controllers.verify.CreateVerificationBatchAndVerificationsController.onSubmit()
+
+GET        /enter-contractors-email                         controllers.contractordetails.EnterContractorEmailAddressController.onPageLoad(mode: Mode = NormalMode)
+POST       /enter-contractors-email                         controllers.contractordetails.EnterContractorEmailAddressController.onSubmit(mode: Mode = NormalMode)
+GET        /change-enter-contractors-email                  controllers.contractordetails.EnterContractorEmailAddressController.onPageLoad(mode: Mode = CheckMode)
+POST       /change-enter-contractors-email                  controllers.contractordetails.EnterContractorEmailAddressController.onSubmit(mode: Mode = CheckMode)

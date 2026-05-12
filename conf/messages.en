@@ -937,3 +937,11 @@ verify.verifySendError.verificationHistory.p1                           =  When 
 verify.verifySendError.verificationHistory.p1.link                      =  verification history
 verify.verifySendError.manageSubcontractors.p1                          =  Back to
 verify.verifySendError.manageSubcontractors.p1.link                     =  Manage your subcontractors
+
+contractorDetails.enterContractorEmailAddress.title                     = Enter the contractor's email address
+contractorDetails.enterContractorEmailAddress.heading                   = Enter the contractor's email address
+contractorDetails.enterContractorEmailAddress.checkYourAnswersLabel     = Enter the contractor's email address
+contractorDetails.enterContractorEmailAddress.error.required            = Enter the contractor's email address
+contractorDetails.enterContractorEmailAddress.error.length              = The email you entered contains too many characters
+contractorDetails.enterContractorEmailAddress.error.invalid             = You have entered an email in an incorrect format
+contractorDetails.enterContractorEmailAddress.change.hidden             = Enter the contractor's email address
