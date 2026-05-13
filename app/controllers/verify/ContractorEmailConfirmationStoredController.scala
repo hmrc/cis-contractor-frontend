@@ -21,7 +21,7 @@ import forms.verify.ContractorEmailConfirmationStoredFormProvider
 import models.Mode
 import models.requests.DataRequest
 import navigation.Navigator
-import pages.verify.{ContractorEmailConfirmationStoredPage, NewestVerificationBatchResponsePage}
+import pages.verify.{ContractorEmailConfirmationNotStoredPage, ContractorEmailConfirmationStoredPage, NewestVerificationBatchResponsePage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
@@ -80,8 +80,10 @@ class ContractorEmailConfirmationStoredController @Inject() (
               formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, emailAddress))),
               value =>
                 for {
+                  cleanedAnswers <-
+                    Future.fromTry(request.userAnswers.remove(ContractorEmailConfirmationNotStoredPage))
                   updatedAnswers <-
-                    Future.fromTry(request.userAnswers.set(ContractorEmailConfirmationStoredPage, value))
+                    Future.fromTry(cleanedAnswers.set(ContractorEmailConfirmationStoredPage, value))
                   _              <- sessionRepository.set(updatedAnswers)
                 } yield Redirect(navigator.nextPage(ContractorEmailConfirmationStoredPage, mode, updatedAnswers))
             )
