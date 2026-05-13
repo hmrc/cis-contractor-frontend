@@ -362,6 +362,9 @@ GET   /verify/submitting-verification-request  controllers.verify.SubmissionSend
 
 GET   /verify/no-subcontractors-added  controllers.verify.NoSubcontractorsAddedController.onPageLoad()
 
+GET   /verify/check-verification-batch-readiness         controllers.verify.CheckVerificationBatchReadinessController.onPageLoad(mode: Mode = NormalMode)
+GET   /verify/change-check-verification-batch-readiness  controllers.verify.CheckVerificationBatchReadinessController.onPageLoad(mode: Mode = CheckMode)
+
 GET   /verify/newest  controllers.verify.NewestVerificationBatchController.onPageLoad()
 
 GET   /verify/current  controllers.verify.CurrentVerificationBatchController.onPageLoad()

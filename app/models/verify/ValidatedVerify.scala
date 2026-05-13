@@ -41,6 +41,11 @@ object ValidatedVerify extends Validation {
                                     case _                    => Right(())
                                   }
       emailToUse               <- resolveEmail(answers)
+      _                        <- Either.cond(
+                                    answers.get(VerificationBatchReadinessPage).contains(true),
+                                    (),
+                                    MissingAnswer(VerificationBatchReadinessPage)
+                                  )
     } yield ValidatedVerify(selectedSubcontractors, reverifyExisting, subcontractorsToReverify, emailToUse)
 
   private def resolveEmail(answers: UserAnswers): Either[ValidationError, Option[String]] =

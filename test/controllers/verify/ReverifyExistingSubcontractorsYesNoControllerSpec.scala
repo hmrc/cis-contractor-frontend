@@ -90,7 +90,7 @@ class ReverifyExistingSubcontractorsYesNoControllerSpec extends SpecBase with Mo
       }
     }
 
-    "must redirect to ContractorEmailConfirmationNotStored on POST with false when no email is stored" in {
+    "must redirect to CheckVerificationBatchReadiness on POST with false" in {
 
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
@@ -103,7 +103,7 @@ class ReverifyExistingSubcontractorsYesNoControllerSpec extends SpecBase with Mo
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual
-          controllers.verify.routes.ContractorEmailConfirmationNotStoredController.onPageLoad(NormalMode).url
+          controllers.verify.routes.CheckVerificationBatchReadinessController.onPageLoad(NormalMode).url
       }
     }
 
