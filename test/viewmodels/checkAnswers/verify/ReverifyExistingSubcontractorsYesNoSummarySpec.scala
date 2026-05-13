@@ -17,12 +17,13 @@
 package viewmodels.checkAnswers.verify
 
 import controllers.verify.routes
-import models.{CheckMode, UserAnswers}
+import models.response.GetNewestVerificationBatchResponse
+import models.{CheckMode, ContractorScheme, Subcontractor, UserAnswers}
 import org.scalatest.OptionValues.convertOptionToValuable
 import org.scalatest.TryValues.convertTryToSuccessOrFailure
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.should.Matchers
-import pages.verify.ReverifyExistingSubcontractorsYesNoPage
+import pages.verify.{NewestVerificationBatchResponsePage, ReverifyExistingSubcontractorsYesNoPage}
 import play.api.i18n.Messages
 import play.api.test.Helpers.stubMessages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
@@ -31,12 +32,49 @@ class ReverifyExistingSubcontractorsYesNoSummarySpec extends AnyFreeSpec with Ma
 
   implicit val messages: Messages = stubMessages()
 
+  private val aSubcontractor = Subcontractor(
+    subcontractorId = 1L,
+    firstName = None,
+    secondName = None,
+    surname = None,
+    tradingName = Some("Brody & Co"),
+    partnershipTradingName = None,
+    verified = None,
+    verificationNumber = None,
+    taxTreatment = None,
+    verificationDate = None,
+    lastMonthlyReturnDate = None,
+    createDate = None,
+    subcontractorType = None,
+    subbieResourceRef = None,
+    utr = None,
+    partnerUtr = None,
+    crn = None,
+    nino = None
+  )
+
+  private def batchWithSubcontractors(subs: Subcontractor*): GetNewestVerificationBatchResponse =
+    GetNewestVerificationBatchResponse(
+      scheme = Some(ContractorScheme(accountsOfficeReference = None, emailAddress = None)),
+      subcontractors = subs.toSeq,
+      verificationBatch = None,
+      verifications = Seq.empty,
+      submission = None,
+      monthlyReturn = None
+    )
+
+  private val emptyBatch: GetNewestVerificationBatchResponse =
+    batchWithSubcontractors()
+
   "ReverifyExistingSubcontractorsYesNoSummary.row" - {
 
-    "must return a SummaryListRow with Yes when the answer is true" in {
+    "must return a SummaryListRow with Yes when the answer is true and batch has subcontractors" in {
 
       val answers =
         UserAnswers("test-id")
+          .set(NewestVerificationBatchResponsePage, batchWithSubcontractors(aSubcontractor))
+          .success
+          .value
           .set(ReverifyExistingSubcontractorsYesNoPage, true)
           .success
           .value
@@ -75,9 +113,54 @@ class ReverifyExistingSubcontractorsYesNoSummarySpec extends AnyFreeSpec with Ma
         messages("verify.reverifyExistingSubcontractorsYesNo.change.hidden")
     }
 
-    "must return None when the answer does not exist" in {
+    "must return a SummaryListRow with No when the answer is false and batch has subcontractors" in {
 
-      val answers = UserAnswers("test-id")
+      val answers =
+        UserAnswers("test-id")
+          .set(NewestVerificationBatchResponsePage, batchWithSubcontractors(aSubcontractor))
+          .success
+          .value
+          .set(ReverifyExistingSubcontractorsYesNoPage, false)
+          .success
+          .value
+
+      val row = ReverifyExistingSubcontractorsYesNoSummary.row(answers)
+      row                                   shouldBe defined
+      row.value.value.content.asHtml.toString should include(messages("site.no"))
+    }
+
+    "must return None when the batch has no subcontractors (question was not presented)" in {
+
+      val answers =
+        UserAnswers("test-id")
+          .set(NewestVerificationBatchResponsePage, emptyBatch)
+          .success
+          .value
+          .set(ReverifyExistingSubcontractorsYesNoPage, true)
+          .success
+          .value
+
+      ReverifyExistingSubcontractorsYesNoSummary.row(answers) shouldBe None
+    }
+
+    "must return None when the batch response is absent" in {
+
+      val answers =
+        UserAnswers("test-id")
+          .set(ReverifyExistingSubcontractorsYesNoPage, true)
+          .success
+          .value
+
+      ReverifyExistingSubcontractorsYesNoSummary.row(answers) shouldBe None
+    }
+
+    "must return None when the answer does not exist even if batch has subcontractors" in {
+
+      val answers =
+        UserAnswers("test-id")
+          .set(NewestVerificationBatchResponsePage, batchWithSubcontractors(aSubcontractor))
+          .success
+          .value
 
       ReverifyExistingSubcontractorsYesNoSummary.row(answers) shouldBe None
     }

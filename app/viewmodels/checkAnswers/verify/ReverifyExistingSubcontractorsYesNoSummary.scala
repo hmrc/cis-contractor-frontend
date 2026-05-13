@@ -18,7 +18,7 @@ package viewmodels.checkAnswers.verify
 
 import controllers.verify.routes
 import models.{CheckMode, UserAnswers}
-import pages.verify.ReverifyExistingSubcontractorsYesNoPage
+import pages.verify.{NewestVerificationBatchResponsePage, ReverifyExistingSubcontractorsYesNoPage}
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
@@ -26,22 +26,28 @@ import viewmodels.implicits.*
 
 object ReverifyExistingSubcontractorsYesNoSummary {
 
+  private def hasReverifiableSubcontractors(answers: UserAnswers): Boolean =
+    answers.get(NewestVerificationBatchResponsePage).exists(_.subcontractors.nonEmpty)
+
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(ReverifyExistingSubcontractorsYesNoPage).map { answer =>
+    Option
+      .when(hasReverifiableSubcontractors(answers))(answers.get(ReverifyExistingSubcontractorsYesNoPage))
+      .flatten
+      .map { answer =>
 
-      val value = if (answer) "site.yes" else "site.no"
+        val value = if (answer) "site.yes" else "site.no"
 
-      SummaryListRowViewModel(
-        key = "verify.reverifyExistingSubcontractorsYesNo.checkYourAnswersLabel",
-        value = ValueViewModel(value),
-        actions = Seq(
-          ActionItemViewModel(
-            "site.change",
-            routes.ReverifyExistingSubcontractorsYesNoController.onPageLoad(CheckMode).url
+        SummaryListRowViewModel(
+          key = "verify.reverifyExistingSubcontractorsYesNo.checkYourAnswersLabel",
+          value = ValueViewModel(value),
+          actions = Seq(
+            ActionItemViewModel(
+              "site.change",
+              routes.ReverifyExistingSubcontractorsYesNoController.onPageLoad(CheckMode).url
+            )
+              .withVisuallyHiddenText(messages("verify.reverifyExistingSubcontractorsYesNo.change.hidden"))
+              .withAttribute("id" -> "reverify-existing-subcontractors-yes-no")
           )
-            .withVisuallyHiddenText(messages("verify.reverifyExistingSubcontractorsYesNo.change.hidden"))
-            .withAttribute("id" -> "reverify-existing-subcontractors-yes-no")
         )
-      )
-    }
+      }
 }
