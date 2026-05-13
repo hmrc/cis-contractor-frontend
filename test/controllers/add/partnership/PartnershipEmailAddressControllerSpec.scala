@@ -19,12 +19,13 @@ package controllers.add.partnership
 import base.SpecBase
 import controllers.routes
 import forms.add.partnership.PartnershipEmailAddressFormProvider
+import models.contact.ContactOptions.{Email, Phone}
 import models.{NormalMode, UserAnswers}
 import navigation.Navigator
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.add.partnership.{PartnershipEmailAddressPage, PartnershipNamePage}
+import pages.add.partnership.{PartnershipChooseContactDetailsPage, PartnershipEmailAddressPage, PartnershipNamePage}
 import play.api.data.Form
 import play.api.inject.bind
 import play.api.mvc.Call
@@ -50,14 +51,26 @@ class PartnershipEmailAddressControllerSpec extends SpecBase with MockitoSugar {
       .success
       .value
 
+  private def uaWithNameAndEmailChoice: UserAnswers =
+    uaWithName
+      .set(PartnershipChooseContactDetailsPage, Email)
+      .success
+      .value
+
+  private def uaWithNameAndPhoneChoice: UserAnswers =
+    uaWithName
+      .set(PartnershipChooseContactDetailsPage, Phone)
+      .success
+      .value
+
   lazy val partnershipEmailAddressRoute: String =
     controllers.add.partnership.routes.PartnershipEmailAddressController.onPageLoad(NormalMode).url
 
-  "PartnershipEmailAddress Controller" - {
+  "PartnershipEmailAddressController" - {
 
-    "must return OK and the correct view for a GET" in {
+    "must return OK and the correct view for a GET when Email is selected" in {
 
-      val application = applicationBuilder(userAnswers = Some(uaWithName)).build()
+      val application = applicationBuilder(userAnswers = Some(uaWithNameAndEmailChoice)).build()
 
       running(application) {
         val request = FakeRequest(GET, partnershipEmailAddressRoute)
@@ -74,9 +87,13 @@ class PartnershipEmailAddressControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must populate the view correctly on a GET when the question has previously been answered" in {
+    "must populate the view correctly on a GET when the question has previously been answered and Email is selected" in {
 
-      val userAnswers = uaWithName.set(PartnershipEmailAddressPage, "answer").success.value
+      val userAnswers =
+        uaWithNameAndEmailChoice
+          .set(PartnershipEmailAddressPage, "answer@test.com")
+          .success
+          .value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
@@ -88,10 +105,24 @@ class PartnershipEmailAddressControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill("answer"), NormalMode, partnershipName)(
+        contentAsString(result) mustEqual view(form.fill("answer@test.com"), NormalMode, partnershipName)(
           request,
           messages(application)
         ).toString
+      }
+    }
+
+    "must redirect to Journey Recovery for a GET when Phone is selected" in {
+
+      val application = applicationBuilder(userAnswers = Some(uaWithNameAndPhoneChoice)).build()
+
+      running(application) {
+        val request = FakeRequest(GET, partnershipEmailAddressRoute)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
       }
     }
 
@@ -178,8 +209,21 @@ class PartnershipEmailAddressControllerSpec extends SpecBase with MockitoSugar {
 
     "must redirect to Journey Recovery for a GET when partnership name is missing (userAnswers present)" in {
 
-      val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+
+      running(application) {
+        val request = FakeRequest(GET, partnershipEmailAddressRoute)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must redirect to Journey Recovery for a GET when contact choice is missing" in {
+
+      val application = applicationBuilder(userAnswers = Some(uaWithName)).build()
 
       running(application) {
         val request = FakeRequest(GET, partnershipEmailAddressRoute)
