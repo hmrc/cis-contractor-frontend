@@ -16,12 +16,14 @@
 
 package viewmodels.checkAnswers.verify
 
+import models.verify.ContractorEmailConfirmationStored.CurrentEmail
 import models.{CheckMode, UserAnswers}
 import pages.verify.ContractorEmailConfirmationStoredPage
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
+import utils.VerifyEmailResolver
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
 
@@ -30,11 +32,17 @@ object ContractorEmailConfirmationStoredSummary {
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
     answers.get(ContractorEmailConfirmationStoredPage).map { answer =>
 
-      val value = ValueViewModel(
-        HtmlContent(
-          HtmlFormat.escape(messages(s"verify.contractorEmailConfirmationStored.$answer"))
-        )
-      )
+      val label = messages(s"verify.contractorEmailConfirmationStored.$answer")
+
+      val displayText = answer match {
+        case CurrentEmail =>
+          VerifyEmailResolver.resolvedEmail(answers).fold(label) { email =>
+            s"$label: <strong>${HtmlFormat.escape(email)}</strong>"
+          }
+        case _            => HtmlFormat.escape(label).toString
+      }
+
+      val value = ValueViewModel(HtmlContent(displayText))
 
       SummaryListRowViewModel(
         key = "verify.contractorEmailConfirmationStored.checkYourAnswersLabel",

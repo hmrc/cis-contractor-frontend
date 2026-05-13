@@ -468,11 +468,11 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must hit fold success branch and save selected subcontractors when mergedValues is empty (test-only form provider override)" in {
+    "must hit fold success branch when form binds but submitted ids match no known subcontractor" in {
 
       class TestSelectSubcontractorFormProvider @Inject() () extends SelectSubcontractorFormProvider {
         override def apply(): Form[Set[String]] =
-          Form(single("value" -> ignored(Set(allSubs.head.id))))
+          Form(single("value" -> ignored(Set("non-existent-id"))))
       }
 
       val mockSessionRepository = mock[SessionRepository]
@@ -498,7 +498,7 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
         val captor: ArgumentCaptor[UserAnswers] = ArgumentCaptor.forClass(classOf[UserAnswers])
         verify(mockSessionRepository).set(captor.capture())
 
-        captor.getValue.get(SelectSubcontractorPage).value mustEqual Set(allSubs.head)
+        captor.getValue.get(SelectSubcontractorPage).value mustEqual Set.empty[SubcontractorViewModel]
       }
     }
   }

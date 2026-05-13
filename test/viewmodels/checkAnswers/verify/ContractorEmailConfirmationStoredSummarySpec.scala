@@ -18,12 +18,13 @@ package viewmodels.checkAnswers.verify
 
 import controllers.verify.routes
 import models.verify.ContractorEmailConfirmationStored
-import models.{CheckMode, UserAnswers}
+import models.{CheckMode, ContractorScheme, UserAnswers}
+import models.response.GetNewestVerificationBatchResponse
 import org.scalatest.OptionValues.convertOptionToValuable
 import org.scalatest.TryValues.convertTryToSuccessOrFailure
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.should.Matchers
-import pages.verify.ContractorEmailConfirmationStoredPage
+import pages.verify.{ContractorEmailConfirmationStoredPage, NewestVerificationBatchResponsePage}
 import play.api.i18n.Messages
 import play.api.test.Helpers.stubMessages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.*
@@ -32,33 +33,68 @@ class ContractorEmailConfirmationStoredSummarySpec extends AnyFreeSpec with Matc
 
   implicit val messages: Messages = stubMessages()
 
+  private def batchResponseWithEmail(email: String): GetNewestVerificationBatchResponse =
+    GetNewestVerificationBatchResponse(
+      scheme = Some(ContractorScheme(accountsOfficeReference = None, emailAddress = Some(email))),
+      subcontractors = Seq.empty,
+      verificationBatch = None,
+      verifications = Seq.empty,
+      submission = None,
+      monthlyReturn = None
+    )
+
   "ContractorEmailConfirmationStoredSummary.row" - {
 
-    "must return a SummaryListRow when the answer exists" in {
+    "CurrentEmail" - {
+
+      "must show the label with inline email in bold when a stored email is present" in {
+
+        val answers = UserAnswers("test-id")
+          .set(ContractorEmailConfirmationStoredPage, ContractorEmailConfirmationStored.CurrentEmail)
+          .success
+          .value
+          .set(NewestVerificationBatchResponsePage, batchResponseWithEmail("agent@example.com"))
+          .success
+          .value
+
+        val row       = ContractorEmailConfirmationStoredSummary.row(answers).value
+        val valueHtml = row.value.content.asHtml.toString
+
+        valueHtml should include(messages("verify.contractorEmailConfirmationStored.currentEmail"))
+        valueHtml should include("<strong>")
+        valueHtml should include("agent@example.com")
+      }
+
+      "must show only the label when no stored email is present" in {
+
+        val answers = UserAnswers("test-id")
+          .set(ContractorEmailConfirmationStoredPage, ContractorEmailConfirmationStored.CurrentEmail)
+          .success
+          .value
+
+        val row       = ContractorEmailConfirmationStoredSummary.row(answers).value
+        val valueHtml = row.value.content.asHtml.toString
+
+        valueHtml should include(messages("verify.contractorEmailConfirmationStored.currentEmail"))
+        valueHtml should not include "<strong>"
+      }
+    }
+
+    "must show the correct label and Change link" in {
 
       val answers = UserAnswers("test-id")
         .set(ContractorEmailConfirmationStoredPage, ContractorEmailConfirmationStored.CurrentEmail)
         .success
         .value
 
-      val maybeRow = ContractorEmailConfirmationStoredSummary.row(answers)
-      maybeRow shouldBe defined
-
-      val row = maybeRow.value
+      val row = ContractorEmailConfirmationStoredSummary.row(answers).value
 
       row.key.content.asHtml.toString should include(
         messages("verify.contractorEmailConfirmationStored.checkYourAnswersLabel")
       )
 
-      row.value.content.asHtml.toString should include(
-        messages("verify.contractorEmailConfirmationStored.currentEmail")
-      )
-
       row.actions shouldBe defined
-      val actions = row.actions.value.items
-      actions should have size 1
-
-      val changeAction = actions.head
+      val changeAction = row.actions.value.items.head
       changeAction.content.asHtml.toString    should include(messages("site.change"))
       changeAction.href                     shouldBe routes.ContractorEmailConfirmationStoredController.onPageLoad(CheckMode).url
       changeAction.visuallyHiddenText.value shouldBe messages(

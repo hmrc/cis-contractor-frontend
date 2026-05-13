@@ -61,7 +61,7 @@ class SelectSubcontractorsToReverifySummarySpec extends SpecBase with Matchers {
 
       valueHtml must include("Grant, Alan")
       valueHtml must include("Hammond House")
-      valueHtml must include("<br>")
+      valueHtml must include("govuk-list--bullet")
 
       row.actions mustBe defined
 
