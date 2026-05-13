@@ -16,12 +16,19 @@
 
 package pages.verify
 
+import models.UserAnswers
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 
-case object ReverifyExistingSubcontractorsYesNoPage extends QuestionPage[Boolean] {
+import scala.util.Try
+
+case object ReverifyExistingSubcontractorsYesNoPage extends QuestionPage[Boolean] with VerifyJourney {
 
   override def path: JsPath = JsPath \ toString
 
   override def toString: String = "reverifyExistingSubcontractorsYesNo"
+
+  override def cleanup(value: Option[Boolean], userAnswers: UserAnswers): Try[UserAnswers] =
+    if value.contains(false) then userAnswers.remove(SelectSubcontractorsToReverifyPage)
+    else super.cleanup(value, userAnswers)
 }
