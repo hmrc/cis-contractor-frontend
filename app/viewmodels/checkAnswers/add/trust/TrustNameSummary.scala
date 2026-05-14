@@ -19,7 +19,6 @@ package viewmodels.checkAnswers.add.trust
 import models.{CheckMode, UserAnswers}
 import pages.add.trust.TrustNamePage
 import play.api.i18n.Messages
-import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
@@ -30,7 +29,7 @@ object TrustNameSummary {
     answers.get(TrustNamePage).map { answer =>
       SummaryListRowViewModel(
         key = "trustName.checkYourAnswersLabel",
-        value = ValueViewModel(HtmlFormat.escape(answer).toString),
+        value = ValueViewModel(answer),
         actions = Seq(
           ActionItemViewModel("site.change", controllers.add.trust.routes.TrustNameController.onPageLoad(CheckMode).url)
             .withVisuallyHiddenText(messages("trustName.change.hidden"))
