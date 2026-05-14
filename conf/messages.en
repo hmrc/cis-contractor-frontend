@@ -942,3 +942,6 @@ verify.verifyCheckYourAnswers.title                                     =  Check
 verify.verifyCheckYourAnswers.heading                                   =  Check your answers before submitting your verification request
 verify.verifyCheckYourAnswers.subHeading                                =  Subcontractors to verify
 verify.verifyCheckYourAnswers.confirm                                   =  Confirm and submit
+
+contractorDetails.title = Contractor details
+contractorDetails.heading = Contractor details
