@@ -82,7 +82,6 @@ class ValidatedVerifySpec extends SpecBase with Matchers {
       ValidatedVerify.build(minRequired) mustBe Right(
         ValidatedVerify(
           selectedSubcontractors = Set(brodyMartin),
-          reverifyExisting = false,
           subcontractorsToReverify = None,
           emailToUse = None
         )
@@ -102,7 +101,6 @@ class ValidatedVerifySpec extends SpecBase with Matchers {
       ValidatedVerify.build(ua) mustBe Right(
         ValidatedVerify(
           selectedSubcontractors = Set(brodyMartin),
-          reverifyExisting = true,
           subcontractorsToReverify = Some(Set(grantAlan)),
           emailToUse = None
         )
@@ -174,19 +172,28 @@ class ValidatedVerifySpec extends SpecBase with Matchers {
       ValidatedVerify.build(ua).map(_.emailToUse) mustBe Right(None)
     }
 
-    // ─── Failure: missing required pages ─────────────────────────────────────
-
-    "fail when SelectSubcontractorPage is missing" in {
-      ValidatedVerify.build(emptyUserAnswers) mustBe Left(MissingAnswer(SelectSubcontractorPage))
-    }
-
-    "fail when ReverifyExistingSubcontractorsYesNoPage is missing" in {
+    "not fail when optional ReverifyExistingSubcontractorsYesNoPage is missing" in {
       val ua = emptyUserAnswers
         .set(SelectSubcontractorPage, Set(brodyMartin))
         .success
         .value
+        .set(ContractorEmailConfirmationStoredPage, ContractorEmailConfirmationStored.DoNotSend)
+        .success
+        .value
 
-      ValidatedVerify.build(ua) mustBe Left(MissingAnswer(ReverifyExistingSubcontractorsYesNoPage))
+      ValidatedVerify.build(ua) mustBe Right(
+        ValidatedVerify(
+          selectedSubcontractors = Set(brodyMartin),
+          subcontractorsToReverify = None,
+          emailToUse = None
+        )
+      )
+    }
+
+    // ─── Failure: missing required pages ─────────────────────────────────────
+
+    "fail when SelectSubcontractorPage is missing" in {
+      ValidatedVerify.build(emptyUserAnswers) mustBe Left(MissingAnswer(SelectSubcontractorPage))
     }
 
     "fail when reverify=true but SelectSubcontractorsToReverifyPage is absent" in {

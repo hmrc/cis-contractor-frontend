@@ -129,7 +129,7 @@ class ReverifyExistingSubcontractorsYesNoSummarySpec extends AnyFreeSpec with Ma
       row.value.value.content.asHtml.toString should include(messages("site.no"))
     }
 
-    "must return None when the batch has no subcontractors (question was not presented)" in {
+    "must return a SummaryListRow when the ReverifyExistingSubcontractorsYesNoPage question was presented" in {
 
       val answers =
         UserAnswers("test-id")
@@ -140,18 +140,9 @@ class ReverifyExistingSubcontractorsYesNoSummarySpec extends AnyFreeSpec with Ma
           .success
           .value
 
-      ReverifyExistingSubcontractorsYesNoSummary.row(answers) shouldBe None
-    }
-
-    "must return None when the batch response is absent" in {
-
-      val answers =
-        UserAnswers("test-id")
-          .set(ReverifyExistingSubcontractorsYesNoPage, true)
-          .success
-          .value
-
-      ReverifyExistingSubcontractorsYesNoSummary.row(answers) shouldBe None
+      val row = ReverifyExistingSubcontractorsYesNoSummary.row(answers)
+      row                                   shouldBe defined
+      row.value.value.content.asHtml.toString should include(messages("site.yes"))
     }
 
     "must return None when the answer does not exist even if batch has subcontractors" in {
