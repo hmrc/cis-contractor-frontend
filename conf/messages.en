@@ -949,4 +949,4 @@ contractordetails.schemeName.checkYourAnswersLabel                      = Scheme
 contractordetails.schemeName.error.required                             = Enter the scheme name
 contractordetails.schemeName.error.length                               = The scheme name you entered contains too many characters
 contractordetails.schemeName.error.invalidCharacters                    = You have entered a scheme name in an incorrect format
-contractordetails.schemeName.change.hidden                              = Scheme Name
+contractordetails.schemeName.change.hidden                              = scheme Name

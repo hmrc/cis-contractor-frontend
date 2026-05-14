@@ -18,20 +18,18 @@ package forms.contractordetails
 
 import forms.mappings.Mappings
 import play.api.data.Form
+import forms.Validation.regexSchemeName
+import forms.mappings.Constants._
 
 import javax.inject.Inject
 
 class SchemeNameFormProvider @Inject() extends Mappings {
 
-  private val maxLengthSchemeName = 56
-  private val regexSchemeName     =
-    "^[A-Za-z0-9\"\\~\\!\\@\\#\\$\\%\\*\\+\\:\\;\\=\\?\\s,\\.\\[\\]\\_\\{\\}\\(\\)/\\&\\'\\-\\^\\\\£€]+$"
-
   def apply(): Form[String] =
     Form(
       "value" -> text("contractordetails.schemeName.error.required")
         .verifying(
-          maxLength(maxLengthSchemeName, "contractordetails.schemeName.error.length"),
+          maxLength(MaxLength56, "contractordetails.schemeName.error.length"),
           regexp(regexSchemeName, "contractordetails.schemeName.error.invalidCharacters")
         )
     )

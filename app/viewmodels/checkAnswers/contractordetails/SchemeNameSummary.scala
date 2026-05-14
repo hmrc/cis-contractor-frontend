@@ -37,6 +37,7 @@ object SchemeNameSummary {
             controllers.contractordetails.routes.SchemeNameController.onPageLoad(CheckMode).url
           )
             .withVisuallyHiddenText(messages("contractordetails.schemeName.change.hidden"))
+            .withAttribute("id" -> "scheme-name")
         )
       )
     }

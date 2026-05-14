@@ -413,7 +413,7 @@ POST  /verify/verification-batch-create  controllers.verify.CreateVerificationBa
 GET   /verify/check-your-answers  controllers.verify.VerifyCheckYourAnswersController.onPageLoad()
 POST  /verify/check-your-answers  controllers.verify.VerifyCheckYourAnswersController.onSubmit()
 
-GET        /enter-contractor-scheme-name                  controllers.contractordetails.SchemeNameController.onPageLoad(mode: Mode = NormalMode)
-POST       /enter-contractor-scheme-name                  controllers.contractordetails.SchemeNameController.onSubmit(mode: Mode = NormalMode)
-GET        /change-enter-contractor-scheme-name           controllers.contractordetails.SchemeNameController.onPageLoad(mode: Mode = CheckMode)
-POST       /change-enter-contractor-scheme-name           controllers.contractordetails.SchemeNameController.onSubmit(mode: Mode = CheckMode)
+GET        /what-is-contractors-scheme-name                  controllers.contractordetails.SchemeNameController.onPageLoad(mode: Mode = NormalMode)
+POST       /what-is-contractors-scheme-name                  controllers.contractordetails.SchemeNameController.onSubmit(mode: Mode = NormalMode)
+GET        /change-what-is-contractors-scheme-name           controllers.contractordetails.SchemeNameController.onPageLoad(mode: Mode = CheckMode)
+POST       /change-what-is-contractors-scheme-name           controllers.contractordetails.SchemeNameController.onSubmit(mode: Mode = CheckMode)
