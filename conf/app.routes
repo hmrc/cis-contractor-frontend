@@ -404,3 +404,6 @@ GET   /verify/inactive-scheme-warning                    controllers.verify.Inac
 GET   /verify/verification-not-submitted-warning       controllers.verify.VerificationNotSubmittedWarningController.onPageLoad()
 
 GET   /verify/no-subcontractors-selected-warning       controllers.verify.NoSubcontractorsSelectedWarningController.onPageLoad()
+
+GET  /verify/verification-status/reverification-decision     controllers.verify.VerificationStatusController.goToReverificationDecision(mode: Mode = NormalMode)
+GET  /verify/verification-status/select-subcontractors       controllers.verify.VerificationStatusController.goToSelectSubcontractorsToReverify(mode: Mode = NormalMode)

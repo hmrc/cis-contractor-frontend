@@ -65,7 +65,7 @@ object ReverificationRules {
     }
   }
 
-  private def isBetweenInclusive(d: LocalDate, start: LocalDate, end: LocalDate): Boolean =
+  def isBetweenInclusive(d: LocalDate, start: LocalDate, end: LocalDate): Boolean =
     !d.isBefore(start) && !d.isAfter(end)
 
   def startDate(currentDate: LocalDate): LocalDate = {
