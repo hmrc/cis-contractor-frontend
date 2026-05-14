@@ -20,10 +20,14 @@ import models.Subcontractor
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
-import java.time.LocalDateTime
-import java.time.LocalDate
+import java.time.{LocalDate, LocalDateTime}
 
 class ReverificationRulesSpec extends AnyWordSpec with Matchers {
+
+  private val testSubcontractorId: Long = 1L
+  private val daysBeforeStart: Long     = 10L
+  private val daysAfterStart: Long      = 5L
+  private val oneDay: Long              = 1L
 
   private def sub(
     verified: Option[String] = Some("Y"),
@@ -32,12 +36,10 @@ class ReverificationRulesSpec extends AnyWordSpec with Matchers {
     subcontractorType: Option[String] = None,
     subbieResourceRef: Option[Long] = None,
     utr: Option[String] = None,
-    partnerUtr: Option[String] = None,
-    crn: Option[String] = None,
-    nino: Option[String] = None
+    partnerUtr: Option[String] = None
   ): Subcontractor =
     Subcontractor(
-      subcontractorId = 1L,
+      subcontractorId = testSubcontractorId,
       firstName = None,
       secondName = None,
       surname = None,
@@ -53,8 +55,8 @@ class ReverificationRulesSpec extends AnyWordSpec with Matchers {
       subbieResourceRef = subbieResourceRef,
       utr = utr,
       partnerUtr = partnerUtr,
-      crn = crn,
-      nino = nino
+      crn = None,
+      nino = None
     )
 
   "ReverificationRules.startDate" should {
@@ -84,11 +86,18 @@ class ReverificationRulesSpec extends AnyWordSpec with Matchers {
       val current = LocalDate.of(2026, 1, 25)
       val start   = ReverificationRules.startDate(current)
 
-      val s = sub(verificationDate = Some(start.plusDays(1).atStartOfDay()))
+      val s = sub(verificationDate = Some(start.plusDays(oneDay).atStartOfDay()))
       ReverificationRules.reverifyRequired(s, current) mustBe false
 
       val s2 = sub(verificationDate = Some(start.atStartOfDay()))
       ReverificationRules.reverifyRequired(s2, current) mustBe false
+    }
+
+    "AC2: not require reVerification when verificationDate == currentDate (upper bound inclusive)" in {
+      val current = LocalDate.of(2026, 1, 25)
+
+      val s = sub(verificationDate = Some(current.atStartOfDay()))
+      ReverificationRules.reverifyRequired(s, current) mustBe false
     }
 
     "AC3: not require reVerification when verificationDate is before startDate but lastMonthlyReturnDate is between startDate and currentDate" in {
@@ -96,8 +105,32 @@ class ReverificationRulesSpec extends AnyWordSpec with Matchers {
       val start   = ReverificationRules.startDate(current)
 
       val s = sub(
-        verificationDate = Some(start.minusDays(10).atStartOfDay()),
-        lastMonthlyReturnDate = Some(start.plusDays(5).atStartOfDay())
+        verificationDate = Some(start.minusDays(daysBeforeStart).atStartOfDay()),
+        lastMonthlyReturnDate = Some(start.plusDays(daysAfterStart).atStartOfDay())
+      )
+
+      ReverificationRules.reverifyRequired(s, current) mustBe false
+    }
+
+    "AC3: not require reVerification when verificationDate is before startDate but lastMonthlyReturnDate == startDate (lower bound inclusive)" in {
+      val current = LocalDate.of(2026, 1, 25)
+      val start   = ReverificationRules.startDate(current)
+
+      val s = sub(
+        verificationDate = Some(start.minusDays(daysBeforeStart).atStartOfDay()),
+        lastMonthlyReturnDate = Some(start.atStartOfDay())
+      )
+
+      ReverificationRules.reverifyRequired(s, current) mustBe false
+    }
+
+    "AC3: not require reVerification when verificationDate is before startDate but lastMonthlyReturnDate == currentDate (upper bound inclusive)" in {
+      val current = LocalDate.of(2026, 1, 25)
+      val start   = ReverificationRules.startDate(current)
+
+      val s = sub(
+        verificationDate = Some(start.minusDays(daysBeforeStart).atStartOfDay()),
+        lastMonthlyReturnDate = Some(current.atStartOfDay())
       )
 
       ReverificationRules.reverifyRequired(s, current) mustBe false
@@ -108,8 +141,8 @@ class ReverificationRulesSpec extends AnyWordSpec with Matchers {
       val start   = ReverificationRules.startDate(current)
 
       val s = sub(
-        verificationDate = Some(start.minusDays(10).atStartOfDay()),
-        lastMonthlyReturnDate = Some(start.minusDays(1).atStartOfDay())
+        verificationDate = Some(start.minusDays(daysBeforeStart).atStartOfDay()),
+        lastMonthlyReturnDate = Some(start.minusDays(oneDay).atStartOfDay())
       )
 
       ReverificationRules.reverifyRequired(s, current) mustBe true
@@ -120,7 +153,18 @@ class ReverificationRulesSpec extends AnyWordSpec with Matchers {
       val start   = ReverificationRules.startDate(current)
 
       val s = sub(
-        verificationDate = Some(start.minusDays(10).atStartOfDay()),
+        verificationDate = Some(start.minusDays(daysBeforeStart).atStartOfDay()),
+        lastMonthlyReturnDate = None
+      )
+
+      ReverificationRules.reverifyRequired(s, current) mustBe true
+    }
+
+    "require reVerification when verificationDate is in the future and lastMonthlyReturnDate is missing" in {
+      val current = LocalDate.of(2026, 1, 25)
+
+      val s = sub(
+        verificationDate = Some(current.plusDays(oneDay).atStartOfDay()),
         lastMonthlyReturnDate = None
       )
 
