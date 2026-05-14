@@ -28,15 +28,14 @@ import javax.inject.Inject
 import java.time.LocalDate
 
 class VerificationStatusController @Inject() (
-                                               override val messagesApi: MessagesApi,
-                                               identify: IdentifierAction,
-                                               getData: DataRetrievalAction,
-                                               requireData: DataRequiredAction,
-                                               val controllerComponents: MessagesControllerComponents
-                                             )
-  extends FrontendBaseController
+  override val messagesApi: MessagesApi,
+  identify: IdentifierAction,
+  getData: DataRetrievalAction,
+  requireData: DataRequiredAction,
+  val controllerComponents: MessagesControllerComponents
+) extends FrontendBaseController
     with I18nSupport
-    with Logging  {
+    with Logging {
 
   private def recovery: Result =
     Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
@@ -45,7 +44,6 @@ class VerificationStatusController @Inject() (
     request.userAnswers
       .get(NewestVerificationBatchResponsePage)
       .exists(_.subcontractors.exists(_.verified.contains("Y")))
-
 
   def goToReverificationDecision(mode: Mode = NormalMode): Action[AnyContent] =
     (identify andThen getData andThen requireData) { implicit request =>
@@ -91,12 +89,7 @@ class VerificationStatusController @Inject() (
         }
       }
       // END TEMP DEBUG LOGGING
-      
-      
-      
-      
-      
-      
+
       if (hasVerifiedSubcontractors) {
         Redirect(controllers.verify.routes.SelectSubcontractorsToReverifyController.onPageLoad(mode))
       } else {

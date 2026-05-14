@@ -84,7 +84,7 @@ class VerificationStatusControllerSpec extends SpecBase {
       val app = applicationBuilder(userAnswers = Some(ua)).build()
 
       running(app) {
-        val request = FakeRequest(GET, goToReverificationDecisionUrl)
+        val request    = FakeRequest(GET, goToReverificationDecisionUrl)
         val controller = app.injector.instanceOf[VerificationStatusController]
         val result     = controller.goToReverificationDecision()(request)
 
@@ -112,7 +112,7 @@ class VerificationStatusControllerSpec extends SpecBase {
       val app = applicationBuilder(userAnswers = Some(ua)).build()
 
       running(app) {
-        val request = FakeRequest(GET, goToReverificationDecisionUrl)
+        val request    = FakeRequest(GET, goToReverificationDecisionUrl)
         val controller = app.injector.instanceOf[VerificationStatusController]
         val result     = controller.goToReverificationDecision()(request)
 
@@ -125,7 +125,7 @@ class VerificationStatusControllerSpec extends SpecBase {
       val app = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
       running(app) {
-        val request = FakeRequest(GET, goToReverificationDecisionUrl)
+        val request    = FakeRequest(GET, goToReverificationDecisionUrl)
         val controller = app.injector.instanceOf[VerificationStatusController]
         val result     = controller.goToReverificationDecision()(request)
 
@@ -138,7 +138,7 @@ class VerificationStatusControllerSpec extends SpecBase {
       val app = applicationBuilder(userAnswers = None).build()
 
       running(app) {
-        val request = FakeRequest(GET, goToReverificationDecisionUrl)
+        val request    = FakeRequest(GET, goToReverificationDecisionUrl)
         val controller = app.injector.instanceOf[VerificationStatusController]
         val result     = controller.goToReverificationDecision()(request)
 
@@ -167,7 +167,7 @@ class VerificationStatusControllerSpec extends SpecBase {
       val app = applicationBuilder(userAnswers = Some(ua)).build()
 
       running(app) {
-        val request = FakeRequest(GET, goToSelectSubcontractorsToReverifyUrl)
+        val request    = FakeRequest(GET, goToSelectSubcontractorsToReverifyUrl)
         val controller = app.injector.instanceOf[VerificationStatusController]
         val result     = controller.goToSelectSubcontractorsToReverify()(request)
 
@@ -194,7 +194,7 @@ class VerificationStatusControllerSpec extends SpecBase {
       val app = applicationBuilder(userAnswers = Some(ua)).build()
 
       running(app) {
-        val request = FakeRequest(GET, goToSelectSubcontractorsToReverifyUrl)
+        val request    = FakeRequest(GET, goToSelectSubcontractorsToReverifyUrl)
         val controller = app.injector.instanceOf[VerificationStatusController]
         val result     = controller.goToSelectSubcontractorsToReverify()(request)
 
@@ -207,7 +207,7 @@ class VerificationStatusControllerSpec extends SpecBase {
       val app = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
       running(app) {
-        val request = FakeRequest(GET, goToSelectSubcontractorsToReverifyUrl)
+        val request    = FakeRequest(GET, goToSelectSubcontractorsToReverifyUrl)
         val controller = app.injector.instanceOf[VerificationStatusController]
         val result     = controller.goToSelectSubcontractorsToReverify()(request)
 
@@ -220,7 +220,7 @@ class VerificationStatusControllerSpec extends SpecBase {
       val app = applicationBuilder(userAnswers = None).build()
 
       running(app) {
-        val request = FakeRequest(GET, goToSelectSubcontractorsToReverifyUrl)
+        val request    = FakeRequest(GET, goToSelectSubcontractorsToReverifyUrl)
         val controller = app.injector.instanceOf[VerificationStatusController]
         val result     = controller.goToSelectSubcontractorsToReverify()(request)
 
