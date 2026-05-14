@@ -56,7 +56,6 @@ class NewestVerificationBatchController @Inject() (
           batch match {
 
             case Some(response) =>
-
               val status =
                 response.verificationBatch.flatMap(_.status)
 
@@ -68,7 +67,6 @@ class NewestVerificationBatchController @Inject() (
                   )
 
                 case SubmissionStatusCheckResult.Continue =>
-
                   if (response.subcontractors.isEmpty) {
                     Redirect(
                       controllers.verify.routes.NoSubcontractorsAddedController.onPageLoad()
@@ -89,7 +87,7 @@ class NewestVerificationBatchController @Inject() (
                 controllers.routes.JourneyRecoveryController.onPageLoad()
               )
           }
-          }
+        }
         .recover { case t =>
           logger.error(
             "[NewestVerificationBatchController.onPageLoad] Failed to refresh newest verification batch",

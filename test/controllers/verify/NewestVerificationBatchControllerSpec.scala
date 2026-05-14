@@ -54,9 +54,9 @@ class NewestVerificationBatchControllerSpec extends SpecBase with MockitoSugar w
     )
 
   private def newestBatchResponse(
-                                   subcontractors: Seq[Subcontractor],
-                                   status: Option[String] = None
-                                 ) =
+    subcontractors: Seq[Subcontractor],
+    status: Option[String] = None
+  ) =
     GetNewestVerificationBatchResponse(
       scheme = None,
       subcontractors = subcontractors,
@@ -75,7 +75,7 @@ class NewestVerificationBatchControllerSpec extends SpecBase with MockitoSugar w
   "NewestVerificationBatchController" - {
 
     "must redirect to NoSubcontractorsAdded when no subcontractors exist" in {
-      val mockService = mock[VerificationService]
+      val mockService       = mock[VerificationService]
       val mockStatusService = mock[CheckLatestSubmissionStatusService]
 
       val updatedAnswers =
@@ -111,7 +111,7 @@ class NewestVerificationBatchControllerSpec extends SpecBase with MockitoSugar w
     }
 
     "must redirect to VerifyYourSubcontractorsYesNo when all subcontractors are verified" in {
-      val mockService = mock[VerificationService]
+      val mockService       = mock[VerificationService]
       val mockStatusService = mock[CheckLatestSubmissionStatusService]
 
       val updatedAnswers =
@@ -151,7 +151,7 @@ class NewestVerificationBatchControllerSpec extends SpecBase with MockitoSugar w
     }
 
     "must redirect to SelectSubcontractor when unverified subcontractors exist" in {
-      val mockService = mock[VerificationService]
+      val mockService       = mock[VerificationService]
       val mockStatusService = mock[CheckLatestSubmissionStatusService]
 
       val unverified = unverifiedSubcontractor
@@ -198,7 +198,7 @@ class NewestVerificationBatchControllerSpec extends SpecBase with MockitoSugar w
     "must redirect to VerificationRequestInProgress when submission status check returns ShowPendingVerificationWarning" in {
 
       val mockVerificationService = mock[VerificationService]
-      val mockStatusService = mock[CheckLatestSubmissionStatusService]
+      val mockStatusService       = mock[CheckLatestSubmissionStatusService]
 
       val updatedAnswers =
         emptyUserAnswers
@@ -248,7 +248,7 @@ class NewestVerificationBatchControllerSpec extends SpecBase with MockitoSugar w
     }
 
     "must redirect to JourneyRecovery when NewestVerificationBatchResponsePage is missing" in {
-      val mockService = mock[VerificationService]
+      val mockService       = mock[VerificationService]
       val mockStatusService = mock[CheckLatestSubmissionStatusService]
 
       when(mockService.refreshNewestVerificationBatch(any[UserAnswers])(any[HeaderCarrier]))
@@ -263,7 +263,7 @@ class NewestVerificationBatchControllerSpec extends SpecBase with MockitoSugar w
           .build()
 
       when(mockStatusService.check(any()))
-          .thenReturn(SubmissionStatusCheckResult.Continue)
+        .thenReturn(SubmissionStatusCheckResult.Continue)
 
       running(application) {
         val result = route(application, FakeRequest(GET, endpointUrl)).value
@@ -278,7 +278,7 @@ class NewestVerificationBatchControllerSpec extends SpecBase with MockitoSugar w
     }
 
     "must redirect to JourneyRecovery when refreshNewestVerificationBatch fails" in {
-      val mockService = mock[VerificationService]
+      val mockService       = mock[VerificationService]
       val mockStatusService = mock[CheckLatestSubmissionStatusService]
 
       when(mockService.refreshNewestVerificationBatch(any[UserAnswers])(any[HeaderCarrier]))
@@ -308,7 +308,7 @@ class NewestVerificationBatchControllerSpec extends SpecBase with MockitoSugar w
     }
 
     "must redirect to JourneyRecovery when no existing data is found (requireData fails)" in {
-      val mockService = mock[VerificationService]
+      val mockService       = mock[VerificationService]
       val mockStatusService = mock[CheckLatestSubmissionStatusService]
 
       val application =

@@ -28,15 +28,13 @@ object SubmissionStatusCheckResult {
 
   case object Continue extends SubmissionStatusCheckResult
 
-  case object ShowPendingVerificationWarning
-    extends SubmissionStatusCheckResult
+  case object ShowPendingVerificationWarning extends SubmissionStatusCheckResult
 }
 
 @Singleton
-class CheckLatestSubmissionStatusService @Inject()() {
+class CheckLatestSubmissionStatusService @Inject() () {
 
-  def check(status: Option[String]): SubmissionStatusCheckResult = {
-
+  def check(status: Option[String]): SubmissionStatusCheckResult =
     status
       .flatMap(VerificationBatchStatus.from) match {
 
@@ -55,5 +53,4 @@ class CheckLatestSubmissionStatusService @Inject()() {
       case Some(Accepted) =>
         SubmissionStatusCheckResult.ShowPendingVerificationWarning
     }
-  }
 }
