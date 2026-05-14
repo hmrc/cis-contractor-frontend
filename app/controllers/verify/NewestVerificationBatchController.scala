@@ -24,6 +24,8 @@ import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.VerificationService
+import services.SubmissionStatusCheckResult
+import services.CheckLatestSubmissionStatusService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
 import javax.inject.Inject
@@ -35,7 +37,8 @@ class NewestVerificationBatchController @Inject() (
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   val controllerComponents: MessagesControllerComponents,
-  verificationBatchService: VerificationService
+  verificationBatchService: VerificationService,
+  checkLatestSubmissionStatusService: CheckLatestSubmissionStatusService
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport
@@ -51,19 +54,42 @@ class NewestVerificationBatchController @Inject() (
           val unverified = updatedAnswers.get(UnverifiedSubcontractorsPage).getOrElse(Seq.empty)
 
           batch match {
-            case Some(response) if response.subcontractors.isEmpty =>
-              Redirect(controllers.verify.routes.NoSubcontractorsAddedController.onPageLoad())
 
-            case Some(response) if response.subcontractors.nonEmpty && unverified.isEmpty =>
-              Redirect(controllers.verify.routes.VerifyYourSubcontractorsYesNoController.onPageLoad)
+            case Some(response) =>
 
-            case Some(_) =>
-              Redirect(controllers.verify.routes.SelectSubcontractorController.onPageLoad(NormalMode))
+              val status =
+                response.verificationBatch.flatMap(_.status)
+
+              checkLatestSubmissionStatusService.check(status) match {
+
+                case SubmissionStatusCheckResult.ShowPendingVerificationWarning =>
+                  Redirect(
+                    controllers.verify.routes.VerificationRequestInProgressController.onPageLoad()
+                  )
+
+                case SubmissionStatusCheckResult.Continue =>
+
+                  if (response.subcontractors.isEmpty) {
+                    Redirect(
+                      controllers.verify.routes.NoSubcontractorsAddedController.onPageLoad()
+                    )
+                  } else if (unverified.isEmpty) {
+                    Redirect(
+                      controllers.verify.routes.VerifyYourSubcontractorsYesNoController.onPageLoad
+                    )
+                  } else {
+                    Redirect(
+                      controllers.verify.routes.SelectSubcontractorController.onPageLoad(NormalMode)
+                    )
+                  }
+              }
 
             case None =>
-              Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+              Redirect(
+                controllers.routes.JourneyRecoveryController.onPageLoad()
+              )
           }
-        }
+          }
         .recover { case t =>
           logger.error(
             "[NewestVerificationBatchController.onPageLoad] Failed to refresh newest verification batch",
