@@ -107,7 +107,7 @@ class VerifyCheckYourAnswersControllerSpec extends SpecBase {
             val doc    = Jsoup.parse(contentAsString(result))
 
             val rows = doc.select(".govuk-summary-list__row")
-            rows.size() mustBe 2
+            rows.size() mustBe 3
 
             val subRow = rows.get(0)
             subRow.select(".govuk-summary-list__value").text() mustBe "Brody, Martin"
@@ -127,7 +127,8 @@ class VerifyCheckYourAnswersControllerSpec extends SpecBase {
             val result = route(application, FakeRequest(GET, onPageLoadRoute)).value
             val doc    = Jsoup.parse(contentAsString(result))
 
-            val emailRow = doc.select(".govuk-summary-list__row").get(1)
+            val emailRows = doc.select(".govuk-summary-list__row")
+            val emailRow  = emailRows.get(2)
             emailRow.select(".govuk-summary-list__value").text() must include("agent@example.com")
             emailRow.select(".govuk-summary-list__value strong").text() mustBe "agent@example.com"
           }
@@ -145,7 +146,7 @@ class VerifyCheckYourAnswersControllerSpec extends SpecBase {
             val result = route(application, FakeRequest(GET, onPageLoadRoute)).value
             val doc    = Jsoup.parse(contentAsString(result))
 
-            doc.select(".govuk-summary-list__row").size() mustBe 2
+            doc.select(".govuk-summary-list__row").size() mustBe 3
           }
         }
       }
@@ -189,14 +190,14 @@ class VerifyCheckYourAnswersControllerSpec extends SpecBase {
             val doc    = Jsoup.parse(contentAsString(result))
 
             val rows = doc.select(".govuk-summary-list__row")
-            rows.size() mustBe 3
+            rows.size() mustBe 4
 
-            val confirmRow = rows.get(1)
+            val confirmRow = rows.get(2)
             confirmRow.select(".govuk-summary-list__value").text() must include(
               messages(application)("verify.contractorEmailConfirmationStored.differentEmail")
             )
 
-            val emailRow = rows.get(2)
+            val emailRow = rows.get(3)
             emailRow.select(".govuk-summary-list__value").text() mustBe "override@example.com"
           }
         }
@@ -218,9 +219,9 @@ class VerifyCheckYourAnswersControllerSpec extends SpecBase {
             val doc    = Jsoup.parse(contentAsString(result))
 
             val rows = doc.select(".govuk-summary-list__row")
-            rows.size() mustBe 2
+            rows.size() mustBe 3
 
-            val confirmRow = rows.get(1)
+            val confirmRow = rows.get(2)
             confirmRow.select(".govuk-summary-list__value").text() mustBe
               messages(application)("verify.contractorEmailConfirmationStored.doNotSend")
           }
@@ -323,8 +324,23 @@ class VerifyCheckYourAnswersControllerSpec extends SpecBase {
             val result = route(application, FakeRequest(GET, onPageLoadRoute)).value
             val doc    = Jsoup.parse(contentAsString(result))
 
-            doc.select(".govuk-summary-list__row").size() mustBe 2
+            doc.select(".govuk-summary-list__row").size() mustBe 3
           }
+        }
+      }
+
+      "must not render the reverify row when the reverify yes/no page wasn't answered" in {
+        val ua = emptyUserAnswers
+          .setOrException(SelectSubcontractorPage, Set(brodyMartin, hooperAndAssociates))
+          .setOrException(NewestVerificationBatchResponsePage, batchResponseWithEmail("agent@example.com"))
+          .setOrException(ContractorEmailConfirmationStoredPage, CurrentEmail)
+
+        val application = applicationBuilder(userAnswers = Some(ua)).build()
+        running(application) {
+          val result = route(application, FakeRequest(GET, onPageLoadRoute)).value
+          val doc    = Jsoup.parse(contentAsString(result))
+
+          doc.select(".govuk-summary-list__row").size() mustBe 2
         }
       }
 
