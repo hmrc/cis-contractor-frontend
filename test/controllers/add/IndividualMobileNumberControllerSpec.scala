@@ -19,13 +19,14 @@ package controllers.add
 import base.SpecBase
 import controllers.routes
 import forms.add.IndividualMobileNumberFormProvider
+import models.add.SubcontractorName
+import models.contact.ContactOptions.Mobile
 import models.{NormalMode, UserAnswers}
 import navigation.Navigator
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.add.{IndividualMobileNumberPage, SubcontractorNamePage}
-import models.add.SubcontractorName
+import pages.add.{IndividualChooseContactDetailsPage, IndividualMobileNumberPage, SubcontractorNamePage}
 import play.api.data.Form
 import play.api.inject.bind
 import play.api.mvc.Call
@@ -53,11 +54,20 @@ class IndividualMobileNumberControllerSpec extends SpecBase with MockitoSugar {
   private def uaWithName: UserAnswers =
     emptyUserAnswers.set(SubcontractorNamePage, subcontractorName).success.value
 
+  private def uaWithNameAndMobileChoice: UserAnswers =
+    buildAnswersWithContactChoice(
+      emptyUserAnswers,
+      SubcontractorNamePage,
+      subcontractorName,
+      IndividualChooseContactDetailsPage,
+      Mobile
+    )
+
   "IndividualMobileNumber Controller" - {
 
-    "must return OK and the correct view for a GET" in {
+    "must return OK and the correct view for a GET when Mobile is selected" in {
 
-      val application = applicationBuilder(userAnswers = Some(uaWithName)).build()
+      val application = applicationBuilder(userAnswers = Some(uaWithNameAndMobileChoice)).build()
 
       running(application) {
         val request = FakeRequest(GET, individualMobileNumberRoute)
@@ -67,13 +77,20 @@ class IndividualMobileNumberControllerSpec extends SpecBase with MockitoSugar {
         val view = application.injector.instanceOf[IndividualMobileNumberView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode, name)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode, name)(
+          request,
+          messages(application)
+        ).toString
       }
     }
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = uaWithName.set(IndividualMobileNumberPage, "answer").success.value
+      val userAnswers =
+        uaWithNameAndMobileChoice
+          .set(IndividualMobileNumberPage, "07123456789")
+          .success
+          .value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
@@ -85,10 +102,24 @@ class IndividualMobileNumberControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill("answer"), NormalMode, name)(
+        contentAsString(result) mustEqual view(form.fill("07123456789"), NormalMode, name)(
           request,
           messages(application)
         ).toString
+      }
+    }
+
+    "must redirect to Journey Recovery for a GET when Mobile is not selected" in {
+
+      val application = applicationBuilder(userAnswers = Some(uaWithName)).build()
+
+      running(application) {
+        val request = FakeRequest(GET, individualMobileNumberRoute)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
       }
     }
 
@@ -136,7 +167,10 @@ class IndividualMobileNumberControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode, name)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, NormalMode, name)(
+          request,
+          messages(application)
+        ).toString
       }
     }
 
@@ -170,35 +204,12 @@ class IndividualMobileNumberControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must redirect to Journey Recovery for a GET when subcontractor name is missing (userAnswers present)" in {
+    "must redirect to Journey Recovery when subcontractor name is missing" in {
 
-      val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
       running(application) {
         val request = FakeRequest(GET, individualMobileNumberRoute)
-
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
-      }
-    }
-
-    "must redirect to Journey Recovery for a POST when subcontractor name is missing (userAnswers present)" in {
-
-      val mockSessionRepository = mock[SessionRepository]
-      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
-
-      val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
-          .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
-          .build()
-
-      running(application) {
-        val request =
-          FakeRequest(POST, individualMobileNumberRoute)
-            .withFormUrlEncodedBody("value" -> "true")
 
         val result = route(application, request).value
 

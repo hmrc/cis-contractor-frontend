@@ -19,12 +19,13 @@ package controllers.add.trust
 import base.SpecBase
 import controllers.routes
 import forms.add.trust.TrustPhoneNumberFormProvider
+import models.contact.ContactOptions.Phone
 import models.{NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.add.trust.{TrustNamePage, TrustPhoneNumberPage}
+import pages.add.trust.{TrustContactOptionsPage, TrustNamePage, TrustPhoneNumberPage}
 import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
@@ -47,13 +48,25 @@ class TrustPhoneNumberControllerSpec extends SpecBase with MockitoSugar {
     controllers.add.trust.routes.TrustPhoneNumberController.onPageLoad(NormalMode).url
 
   private def uaWithName: UserAnswers =
-    emptyUserAnswers.set(TrustNamePage, trustName).success.value
+    emptyUserAnswers
+      .set(TrustNamePage, trustName)
+      .success
+      .value
 
-  "TrustPhoneNumber Controller" - {
+  private def uaWithNameAndPhoneChoice: UserAnswers =
+    buildAnswersWithContactChoice(
+      emptyUserAnswers,
+      TrustNamePage,
+      trustName,
+      TrustContactOptionsPage,
+      Phone
+    )
 
-    "must return OK and the correct view for a GET" in {
+  "TrustPhoneNumberController" - {
 
-      val application = applicationBuilder(userAnswers = Some(uaWithName)).build()
+    "must return OK and the correct view for a GET when Phone is selected" in {
+
+      val application = applicationBuilder(userAnswers = Some(uaWithNameAndPhoneChoice)).build()
 
       running(application) {
         val request = FakeRequest(GET, trustPhoneNumberRoute)
@@ -63,13 +76,20 @@ class TrustPhoneNumberControllerSpec extends SpecBase with MockitoSugar {
         val view = application.injector.instanceOf[TrustPhoneNumberView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode, trustName)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode, trustName)(
+          request,
+          messages(application)
+        ).toString
       }
     }
 
-    "must populate the view correctly on a GET when the question has previously been answered" in {
+    "must populate the view correctly on a GET when previously answered" in {
 
-      val userAnswers = uaWithName.set(TrustPhoneNumberPage, "0123456723").success.value
+      val userAnswers =
+        uaWithNameAndPhoneChoice
+          .set(TrustPhoneNumberPage, "0123456723")
+          .success
+          .value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
@@ -85,6 +105,20 @@ class TrustPhoneNumberControllerSpec extends SpecBase with MockitoSugar {
           request,
           messages(application)
         ).toString
+      }
+    }
+
+    "must redirect to Journey Recovery for a GET when Phone is not selected" in {
+
+      val application = applicationBuilder(userAnswers = Some(uaWithName)).build()
+
+      running(application) {
+        val request = FakeRequest(GET, trustPhoneNumberRoute)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
       }
     }
 
@@ -105,7 +139,7 @@ class TrustPhoneNumberControllerSpec extends SpecBase with MockitoSugar {
       running(application) {
         val request =
           FakeRequest(POST, trustPhoneNumberRoute)
-            .withFormUrlEncodedBody(("value", " 01632 960 001"))
+            .withFormUrlEncodedBody(("value", "01632 960 001"))
 
         val result = route(application, request).value
 
@@ -167,34 +201,17 @@ class TrustPhoneNumberControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must redirect to JourneyRecovery if trustName is missing for a GET" in {
+    "must redirect to Journey Recovery when trust name is missing" in {
 
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
       running(application) {
         val request = FakeRequest(GET, trustPhoneNumberRoute)
-        val result  = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual
-          controllers.routes.JourneyRecoveryController.onPageLoad().url
-      }
-    }
-
-    "must redirect to JourneyRecovery if trustName is missing for a POST" in {
-
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
-
-      running(application) {
-        val request =
-          FakeRequest(POST, trustPhoneNumberRoute)
-            .withFormUrlEncodedBody(("value", "01632 960 001"))
 
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual
-          controllers.routes.JourneyRecoveryController.onPageLoad().url
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
       }
     }
   }

@@ -52,16 +52,22 @@ class PartnershipEmailAddressControllerSpec extends SpecBase with MockitoSugar {
       .value
 
   private def uaWithNameAndEmailChoice: UserAnswers =
-    uaWithName
-      .set(PartnershipChooseContactDetailsPage, Email)
-      .success
-      .value
+    buildAnswersWithContactChoice(
+      emptyUserAnswers,
+      PartnershipNamePage,
+      partnershipName,
+      PartnershipChooseContactDetailsPage,
+      Email
+    )
 
   private def uaWithNameAndPhoneChoice: UserAnswers =
-    uaWithName
-      .set(PartnershipChooseContactDetailsPage, Phone)
-      .success
-      .value
+    buildAnswersWithContactChoice(
+      emptyUserAnswers,
+      PartnershipNamePage,
+      partnershipName,
+      PartnershipChooseContactDetailsPage,
+      Phone
+    )
 
   lazy val partnershipEmailAddressRoute: String =
     controllers.add.partnership.routes.PartnershipEmailAddressController.onPageLoad(NormalMode).url
@@ -87,7 +93,7 @@ class PartnershipEmailAddressControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must populate the view correctly on a GET when the question has previously been answered and Email is selected" in {
+    "must populate the view correctly on a GET when previously answered" in {
 
       val userAnswers =
         uaWithNameAndEmailChoice
@@ -112,9 +118,23 @@ class PartnershipEmailAddressControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must redirect to Journey Recovery for a GET when Phone is selected" in {
+    "must redirect to Journey Recovery for a GET when wrong contact option is selected" in {
 
       val application = applicationBuilder(userAnswers = Some(uaWithNameAndPhoneChoice)).build()
+
+      running(application) {
+        val request = FakeRequest(GET, partnershipEmailAddressRoute)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must redirect to Journey Recovery when contact choice is missing" in {
+
+      val application = applicationBuilder(userAnswers = Some(uaWithName)).build()
 
       running(application) {
         val request = FakeRequest(GET, partnershipEmailAddressRoute)
@@ -207,48 +227,12 @@ class PartnershipEmailAddressControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must redirect to Journey Recovery for a GET when partnership name is missing (userAnswers present)" in {
+    "must redirect to Journey Recovery when partnership name is missing" in {
 
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
       running(application) {
         val request = FakeRequest(GET, partnershipEmailAddressRoute)
-
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
-      }
-    }
-
-    "must redirect to Journey Recovery for a GET when contact choice is missing" in {
-
-      val application = applicationBuilder(userAnswers = Some(uaWithName)).build()
-
-      running(application) {
-        val request = FakeRequest(GET, partnershipEmailAddressRoute)
-
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
-      }
-    }
-
-    "must redirect to Journey Recovery for a POST when partnership name is missing (userAnswers present)" in {
-
-      val mockSessionRepository = mock[SessionRepository]
-      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
-
-      val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
-          .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
-          .build()
-
-      running(application) {
-        val request =
-          FakeRequest(POST, partnershipEmailAddressRoute)
-            .withFormUrlEncodedBody("value" -> "test@example.com")
 
         val result = route(application, request).value
 

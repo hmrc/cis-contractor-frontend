@@ -17,6 +17,7 @@
 package controllers.add.partnership
 
 import controllers.actions.*
+import controllers.helpers.ContactGuard
 import forms.add.partnership.PartnershipPhoneNumberFormProvider
 import models.Mode
 import models.contact.ContactOptions.Phone
@@ -43,26 +44,23 @@ class PartnershipPhoneNumberController @Inject() (
   view: PartnershipPhoneNumberView
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
-    with I18nSupport {
+    with I18nSupport
+    with ContactGuard {
 
   val form = formProvider()
 
   def onPageLoad(mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData) { implicit request =>
+      requireContactChoice(
+        request.userAnswers.get(PartnershipNamePage),
+        request.userAnswers.get(PartnershipChooseContactDetailsPage),
+        Phone
+      ) { partnershipName =>
 
-      (
-        for {
-          partnershipName <- request.userAnswers.get(PartnershipNamePage)
-          contactChoice <- request.userAnswers.get(PartnershipChooseContactDetailsPage)
-          if contactChoice == Phone
-        } yield {
-          val preparedForm =
-            request.userAnswers.get(PartnershipPhoneNumberPage).fold(form)(form.fill)
+        val preparedForm =
+          request.userAnswers.get(PartnershipPhoneNumberPage).fold(form)(form.fill)
 
-          Ok(view(preparedForm, mode, partnershipName))
-        }
-        ).getOrElse {
-        Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+        Ok(view(preparedForm, mode, partnershipName))
       }
     }
 

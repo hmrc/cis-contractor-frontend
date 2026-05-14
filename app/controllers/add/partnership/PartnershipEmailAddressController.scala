@@ -17,6 +17,7 @@
 package controllers.add.partnership
 
 import controllers.actions.*
+import controllers.helpers.ContactGuard
 import forms.add.partnership.PartnershipEmailAddressFormProvider
 import models.Mode
 import models.contact.ContactOptions.Email
@@ -43,26 +44,23 @@ class PartnershipEmailAddressController @Inject() (
   view: PartnershipEmailAddressView
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
-    with I18nSupport {
+    with I18nSupport
+    with ContactGuard {
 
   val form = formProvider()
 
   def onPageLoad(mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData) { implicit request =>
+      requireContactChoice(
+        request.userAnswers.get(PartnershipNamePage),
+        request.userAnswers.get(PartnershipChooseContactDetailsPage),
+        Email
+      ) { partnershipName =>
 
-      (
-        for {
-          partnershipName <- request.userAnswers.get(PartnershipNamePage)
-          contactChoice <- request.userAnswers.get(PartnershipChooseContactDetailsPage)
-          if contactChoice == Email
-        } yield {
-          val preparedForm =
-            request.userAnswers.get(PartnershipEmailAddressPage).fold(form)(form.fill)
+        val preparedForm =
+          request.userAnswers.get(PartnershipEmailAddressPage).fold(form)(form.fill)
 
-          Ok(view(preparedForm, mode, partnershipName))
-        }
-        ).getOrElse {
-        Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+        Ok(view(preparedForm, mode, partnershipName))
       }
     }
 

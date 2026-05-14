@@ -17,10 +17,12 @@
 package controllers.add.trust
 
 import controllers.actions.*
+import controllers.helpers.ContactGuard
 import forms.add.trust.TrustEmailAddressFormProvider
 import models.Mode
+import models.contact.ContactOptions.Email
 import navigation.Navigator
-import pages.add.trust.{TrustEmailAddressPage, TrustNamePage}
+import pages.add.trust.{TrustContactOptionsPage, TrustEmailAddressPage, TrustNamePage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
@@ -42,25 +44,25 @@ class TrustEmailAddressController @Inject() (
   view: TrustEmailAddressView
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
-    with I18nSupport {
+    with I18nSupport
+    with ContactGuard {
 
   val form = formProvider()
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
-    request.userAnswers
-      .get(TrustNamePage)
-      .map { trustName =>
-        val preparedForm = request.userAnswers.get(TrustEmailAddressPage) match {
-          case None        => form
-          case Some(value) => form.fill(value)
-        }
+  def onPageLoad(mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData) { implicit request =>
+      requireContactChoice(
+        request.userAnswers.get(TrustNamePage),
+        request.userAnswers.get(TrustContactOptionsPage),
+        Email
+      ) { trustName =>
+
+        val preparedForm =
+          request.userAnswers.get(TrustEmailAddressPage).fold(form)(form.fill)
 
         Ok(view(preparedForm, mode, trustName))
       }
-      .getOrElse(
-        Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-      )
-  }
+    }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
