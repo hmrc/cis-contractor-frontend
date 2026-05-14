@@ -129,7 +129,7 @@ class ReverifyExistingSubcontractorsYesNoSummarySpec extends AnyFreeSpec with Ma
       row.value.value.content.asHtml.toString should include(messages("site.no"))
     }
 
-    "must return a SummaryLitRow when the ReverifyExistingSubcontractorsYesNoPage question was presented" in {
+    "must return a SummaryListRow when the ReverifyExistingSubcontractorsYesNoPage question was presented" in {
 
       val answers =
         UserAnswers("test-id")
