@@ -18,7 +18,6 @@ package services
 
 import base.SpecBase
 import services.SubmissionStatusCheckResult.*
-import models.verify.VerificationBatchStatus.*
 
 class CheckLatestSubmissionStatusServiceSpec extends SpecBase {
 
