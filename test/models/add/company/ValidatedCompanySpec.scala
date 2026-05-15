@@ -32,10 +32,10 @@
 package models.add.company
 
 import base.SpecBase
-import models.add.{InternationalAddress, TypeOfSubcontractor}
+import models.add.InternationalAddress
 import models.contact.ContactOptions
 import models.contact.ContactOptions.*
-import models.{InvalidAnswer, MissingAnswer, UserAnswers}
+import models.{InvalidAnswer, MissingAnswer, TypeOfSubcontractor, UserAnswers}
 import models.RichJsObject
 import pages.QuestionPage
 import pages.add.TypeOfSubcontractorPage

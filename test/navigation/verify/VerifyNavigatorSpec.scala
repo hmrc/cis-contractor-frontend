@@ -18,8 +18,7 @@ package navigation.verify
 
 import base.SpecBase
 import controllers.routes
-import models.{CheckMode, ContractorScheme, NormalMode, UserAnswers}
-import models.response.GetNewestVerificationBatchResponse
+import models.{CheckMode, NormalMode, UserAnswers}
 import models.verify.ContractorEmailConfirmationStored
 import pages.Page
 import pages.verify.*
@@ -30,26 +29,6 @@ class VerifyNavigatorSpec extends SpecBase {
 
   private lazy val journeyRecovery = routes.JourneyRecoveryController.onPageLoad()
   private lazy val cya             = controllers.verify.routes.VerifyCheckYourAnswersController.onPageLoad()
-
-  private def batchResponseWithEmail(email: String): GetNewestVerificationBatchResponse =
-    GetNewestVerificationBatchResponse(
-      scheme = Some(ContractorScheme(accountsOfficeReference = None, emailAddress = Some(email))),
-      subcontractors = Seq.empty,
-      verificationBatch = None,
-      verifications = Seq.empty,
-      submission = None,
-      monthlyReturn = None
-    )
-
-  private val batchResponseNoEmail: GetNewestVerificationBatchResponse =
-    GetNewestVerificationBatchResponse(
-      scheme = Some(ContractorScheme(accountsOfficeReference = None, emailAddress = None)),
-      subcontractors = Seq.empty,
-      verificationBatch = None,
-      verifications = Seq.empty,
-      submission = None,
-      monthlyReturn = None
-    )
 
   "VerifyNavigator" - {
 

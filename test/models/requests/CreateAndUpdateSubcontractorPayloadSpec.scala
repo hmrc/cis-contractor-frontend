@@ -16,7 +16,7 @@
 
 package models.requests
 
-import models.add.TypeOfSubcontractor
+import models.TypeOfSubcontractor
 import models.requests.CreateAndUpdateSubcontractorPayload.{CompanyPayload, IndividualOrSoleTraderPayload, PartnershipPayload, TrustPayload}
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec

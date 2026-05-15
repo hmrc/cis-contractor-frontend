@@ -18,9 +18,8 @@ package controllers.add
 
 import config.FrontendAppConfig
 import controllers.actions.*
-import models.add.TypeOfSubcontractor
-import models.UserAnswers
-import models.add.TypeOfSubcontractor.*
+import models.{TypeOfSubcontractor, UserAnswers}
+import models.TypeOfSubcontractor.*
 import models.requests.DataRequest
 import pages.add.company.CompanyNamePage
 import pages.add.CheckYourAnswersSubmittedPage

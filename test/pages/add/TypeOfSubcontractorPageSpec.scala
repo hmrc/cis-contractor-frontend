@@ -16,7 +16,7 @@
 
 package pages.add
 
-import models.add.TypeOfSubcontractor
+import models.TypeOfSubcontractor
 import pages.add.company.CompanyAddressYesNoPage
 import pages.add.partnership.PartnershipAddressYesNoPage
 import pages.add.trust.TrustAddressYesNoPage

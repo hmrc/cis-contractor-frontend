@@ -18,8 +18,8 @@ package controllers.verify
 
 import base.SpecBase
 import models.response.GetNewestVerificationBatchResponse
-import models.{CheckMode, ContractorScheme, NormalMode, Subcontractor, SubcontractorViewModel}
-import pages.verify.{NewestVerificationBatchResponsePage, SelectSubcontractorPage, VerificationBatchReadinessPage}
+import models.{ContractorScheme, NormalMode, Subcontractor, SubcontractorViewModel}
+import pages.verify.{NewestVerificationBatchResponsePage, SelectSubcontractorPage}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 

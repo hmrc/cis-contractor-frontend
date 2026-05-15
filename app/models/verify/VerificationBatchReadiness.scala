@@ -16,7 +16,8 @@
 
 package models.verify
 
-import models.Subcontractor
+import models.{Subcontractor, TypeOfSubcontractor}
+import models.TypeOfSubcontractor.*
 
 object VerificationBatchReadiness {
 
@@ -27,13 +28,14 @@ object VerificationBatchReadiness {
       selectedSubs.size == selectedIds.size && selectedSubs.forall(isSubcontractorReady)
     }
 
-  def isSubcontractorReady(sub: Subcontractor): Boolean = sub.subcontractorType match {
-    case Some("soletrader")  => isIndividualReady(sub)
-    case Some("company")     => isCompanyReady(sub)
-    case Some("trust")       => isTrustReady(sub)
-    case Some("partnership") => isPartnershipReady(sub)
-    case _                   => false
-  }
+  def isSubcontractorReady(sub: Subcontractor): Boolean =
+    sub.subcontractorType.flatMap(TypeOfSubcontractor.enumerable.withName) match {
+      case Some(Individualorsoletrader) => isIndividualReady(sub)
+      case Some(Limitedcompany)         => isCompanyReady(sub)
+      case Some(Trust)                  => isTrustReady(sub)
+      case Some(Partnership)            => isPartnershipReady(sub)
+      case _                            => false
+    }
 
   private def isIndividualReady(sub: Subcontractor): Boolean = {
     val hasName = sub.tradingName.isDefined || (sub.firstName.isDefined && sub.surname.isDefined)
