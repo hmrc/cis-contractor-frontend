@@ -18,6 +18,7 @@ package controllers.verify
 
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
 import models.NormalMode
+import models.verify.VerificationBatchStatus
 import pages.verify.NewestVerificationBatchResponsePage
 import pages.verify.UnverifiedSubcontractorsPage
 import play.api.Logging
@@ -37,8 +38,7 @@ class NewestVerificationBatchController @Inject() (
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   val controllerComponents: MessagesControllerComponents,
-  verificationBatchService: VerificationService,
-  checkLatestSubmissionStatusService: CheckLatestSubmissionStatusService
+  verificationBatchService: VerificationService
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport
@@ -56,10 +56,17 @@ class NewestVerificationBatchController @Inject() (
           batch match {
 
             case Some(response) =>
-              val status =
-                response.verificationBatch.flatMap(_.status)
+              val status = response.verificationBatch.flatMap(_.status).flatMap { raw =>
+                val parsed = VerificationBatchStatus.from(raw)
+                if (parsed.isEmpty) {
+                  logger.warn(
+                    s"[NewestVerificationBatchController.onPageLoad] Unrecognised verification batch status: $raw"
+                  )
+                }
+                parsed
+              }
 
-              checkLatestSubmissionStatusService.check(status) match {
+              CheckLatestSubmissionStatusService.check(status) match {
 
                 case SubmissionStatusCheckResult.ShowPendingVerificationWarning =>
                   Redirect(

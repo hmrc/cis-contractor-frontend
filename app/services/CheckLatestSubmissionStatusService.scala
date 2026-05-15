@@ -19,9 +19,6 @@ package services
 import models.verify.VerificationBatchStatus
 import models.verify.VerificationBatchStatus.*
 
-import javax.inject.Inject
-import javax.inject.Singleton
-
 sealed trait SubmissionStatusCheckResult
 
 object SubmissionStatusCheckResult {
@@ -31,26 +28,13 @@ object SubmissionStatusCheckResult {
   case object ShowPendingVerificationWarning extends SubmissionStatusCheckResult
 }
 
-@Singleton
-class CheckLatestSubmissionStatusService @Inject() () {
+object CheckLatestSubmissionStatusService {
 
-  def check(status: Option[String]): SubmissionStatusCheckResult =
-    status
-      .flatMap(VerificationBatchStatus.from) match {
-
-      case None =>
+  def check(status: Option[VerificationBatchStatus]): SubmissionStatusCheckResult =
+    status match {
+      case None | Some(Started) | Some(Validated) =>
         SubmissionStatusCheckResult.Continue
-
-      case Some(Started) =>
-        SubmissionStatusCheckResult.Continue
-
-      case Some(Validated) =>
-        SubmissionStatusCheckResult.Continue
-
-      case Some(Pending) =>
-        SubmissionStatusCheckResult.ShowPendingVerificationWarning
-
-      case Some(Accepted) =>
+      case Some(Pending) | Some(Accepted)         =>
         SubmissionStatusCheckResult.ShowPendingVerificationWarning
     }
 }

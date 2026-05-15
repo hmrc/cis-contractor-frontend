@@ -17,47 +17,36 @@
 package services
 
 import base.SpecBase
+import models.verify.VerificationBatchStatus.*
 import services.SubmissionStatusCheckResult.*
 
 class CheckLatestSubmissionStatusServiceSpec extends SpecBase {
 
-  private val service = new CheckLatestSubmissionStatusService()
-
-  "CheckLatestSubmissionStatusService" - {
+  "CheckLatestSubmissionStatusService.check" - {
 
     "must return Continue when status is not present" in {
 
-      service.check(None) mustEqual Continue
+      CheckLatestSubmissionStatusService.check(None) mustEqual Continue
     }
 
-    "must return Continue when status is STARTED" in {
+    "must return Continue when status is Started" in {
 
-      service.check(Some("STARTED")) mustEqual Continue
+      CheckLatestSubmissionStatusService.check(Some(Started)) mustEqual Continue
     }
 
-    "must return Continue when status is VALIDATED" in {
+    "must return Continue when status is Validated" in {
 
-      service.check(Some("VALIDATED")) mustEqual Continue
+      CheckLatestSubmissionStatusService.check(Some(Validated)) mustEqual Continue
     }
 
-    "must return ShowPendingVerificationWarning when status is PENDING" in {
+    "must return ShowPendingVerificationWarning when status is Pending" in {
 
-      service.check(Some("PENDING")) mustEqual ShowPendingVerificationWarning
+      CheckLatestSubmissionStatusService.check(Some(Pending)) mustEqual ShowPendingVerificationWarning
     }
 
-    "must return ShowPendingVerificationWarning when status is ACCEPTED" in {
+    "must return ShowPendingVerificationWarning when status is Accepted" in {
 
-      service.check(Some("ACCEPTED")) mustEqual ShowPendingVerificationWarning
-    }
-
-    "must return Continue when status is unknown" in {
-
-      service.check(Some("UNKNOWN")) mustEqual Continue
-    }
-
-    "must return Continue when status is empty" in {
-
-      service.check(Some("")) mustEqual Continue
+      CheckLatestSubmissionStatusService.check(Some(Accepted)) mustEqual ShowPendingVerificationWarning
     }
   }
 }
