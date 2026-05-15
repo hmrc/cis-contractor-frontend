@@ -21,7 +21,7 @@ import forms.verify.SelectSubcontractorFormProvider
 import models.{Mode, Subcontractor, SubcontractorViewModel, UserAnswers}
 import navigation.Navigator
 import pages.verify.{NewestVerificationBatchResponsePage, SelectSubcontractorPage, UnverifiedSubcontractorsPage}
-import play.api.i18n.{I18nSupport, Messages, MessagesApi}
+import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import repositories.SessionRepository
 import services.PaginationService
@@ -50,8 +50,6 @@ class SelectSubcontractorController @Inject() (
 
   def onPageLoad(mode: Mode, page: Int = 1): Action[AnyContent] =
     (identify andThen getData andThen requireData) { implicit request =>
-
-      implicit val messages: Messages = messagesApi.preferred(request)
 
       val userAnswers = request.userAnswers
 
@@ -92,8 +90,6 @@ class SelectSubcontractorController @Inject() (
   def onSubmit(mode: Mode, page: Int = 1): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
 
-      implicit val messages: Messages = messagesApi.preferred(request)
-
       val ua = request.userAnswers
 
       ua.get(UnverifiedSubcontractorsPage) match {
@@ -108,8 +104,7 @@ class SelectSubcontractorController @Inject() (
           val subcontractorsVm: Seq[SubcontractorViewModel] =
             SubcontractorViewModel.fromSubcontractors(unverifiedSubcontractors)
 
-          val allSubs  = subcontractorsVm
-          val allItems = SubcontractorViewModel.checkboxItems(allSubs)
+          val allItems = SubcontractorViewModel.checkboxItems(subcontractorsVm)
 
           val result =
             paginationService.paginateCheckboxItems(allItems, page)
@@ -127,7 +122,7 @@ class SelectSubcontractorController @Inject() (
           val currentSelectedValues: Set[SubcontractorViewModel] =
             boundForm.value
               .getOrElse(Set.empty)
-              .flatMap(id => allSubs.find(_.id == id))
+              .flatMap(id => subcontractorsVm.find(_.id == id))
 
           val mergedValues: Set[SubcontractorViewModel] = otherPageValues ++ currentSelectedValues
 
@@ -167,7 +162,7 @@ class SelectSubcontractorController @Inject() (
                       )
                     ),
                   ids =>
-                    val selected = ids.flatMap(id => allSubs.find(_.id == id)) ++ otherPageValues
+                    val selected = ids.flatMap(id => subcontractorsVm.find(_.id == id)) ++ otherPageValues
                     for {
                       updatedAnswers <- Future.fromTry(ua.set(SelectSubcontractorPage, selected))
                       _              <- sessionRepository.set(updatedAnswers)
