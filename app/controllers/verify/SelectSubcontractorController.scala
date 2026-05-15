@@ -18,22 +18,18 @@ package controllers.verify
 
 import controllers.actions.*
 import forms.verify.SelectSubcontractorFormProvider
-import models.{Mode, SubcontractorViewModel}
+import models.{Mode, Subcontractor, SubcontractorViewModel, UserAnswers}
 import navigation.Navigator
-import pages.verify.SelectSubcontractorPage
+import pages.verify.{NewestVerificationBatchResponsePage, SelectSubcontractorPage, UnverifiedSubcontractorsPage}
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import repositories.SessionRepository
-import services.{PaginationService, SubcontractorSource}
+import services.PaginationService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.verify.SelectSubcontractorView
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
-
-object SelectSubcontractorController {
-  val subcontractors: Seq[SubcontractorViewModel] = SubcontractorSource.subcontractors
-}
 
 class SelectSubcontractorController @Inject() (
   override val messagesApi: MessagesApi,
@@ -41,9 +37,9 @@ class SelectSubcontractorController @Inject() (
   navigator: Navigator,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
+  requireData: DataRequiredAction,
   formProvider: SelectSubcontractorFormProvider,
   paginationService: PaginationService,
-  subcontractorSource: SubcontractorSource,
   val controllerComponents: MessagesControllerComponents,
   view: SelectSubcontractorView
 )(implicit ec: ExecutionContext)
@@ -53,27 +49,26 @@ class SelectSubcontractorController @Inject() (
   private val form = formProvider()
 
   def onPageLoad(mode: Mode, page: Int = 1): Action[AnyContent] =
-    (identify andThen getData) { implicit request =>
+    (identify andThen getData andThen requireData) { implicit request =>
 
       implicit val messages: Messages = messagesApi.preferred(request)
 
-      request.userAnswers match {
+      val userAnswers = request.userAnswers
 
-        case None =>
-          Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-
-        case Some(_) if subcontractorSource.get().isEmpty =>
-          Redirect(routes.NoSubcontractorsAddedController.onPageLoad())
-
-        case Some(ua) =>
+      getUnverifiedSubcontractorsOrRedirect(userAnswers) match {
+        case Right(unverifiedSubcontractors) =>
           val preparedForm =
-            ua.get(SelectSubcontractorPage)
+            userAnswers
+              .get(SelectSubcontractorPage)
               .map(subs => form.fill(subs.map(_.id)))
               .getOrElse(form)
 
+          val subcontractorsVm: Seq[SubcontractorViewModel] =
+            SubcontractorViewModel.fromSubcontractors(unverifiedSubcontractors)
+
           val result =
             paginationService.paginateCheckboxItems(
-              SubcontractorViewModel.checkboxItems(subcontractorSource.get()),
+              SubcontractorViewModel.checkboxItems(subcontractorsVm),
               page
             )
 
@@ -88,21 +83,32 @@ class SelectSubcontractorController @Inject() (
               result.totalCount
             )
           )
+
+        case Left(redirectResult) =>
+          redirectResult
       }
     }
 
   def onSubmit(mode: Mode, page: Int = 1): Action[AnyContent] =
-    (identify andThen getData).async { implicit request =>
+    (identify andThen getData andThen requireData).async { implicit request =>
 
       implicit val messages: Messages = messagesApi.preferred(request)
 
-      request.userAnswers match {
+      val ua = request.userAnswers
+
+      ua.get(UnverifiedSubcontractorsPage) match {
 
         case None =>
           Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
 
-        case Some(ua) =>
-          val allSubs  = subcontractorSource.get()
+        case Some(unverifiedSubcontractors) if unverifiedSubcontractors.isEmpty =>
+          Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+
+        case Some(unverifiedSubcontractors) =>
+          val subcontractorsVm: Seq[SubcontractorViewModel] =
+            SubcontractorViewModel.fromSubcontractors(unverifiedSubcontractors)
+
+          val allSubs  = subcontractorsVm
           val allItems = SubcontractorViewModel.checkboxItems(allSubs)
 
           val result =
@@ -171,4 +177,26 @@ class SelectSubcontractorController @Inject() (
           }
       }
     }
+
+  private def getUnverifiedSubcontractorsOrRedirect(userAnswers: UserAnswers): Either[Result, Seq[Subcontractor]] =
+    userAnswers.get(NewestVerificationBatchResponsePage) match {
+      case None =>
+        Left(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+
+      case Some(newestVerificationBatchResponse) if newestVerificationBatchResponse.subcontractors.isEmpty =>
+        Left(Redirect(routes.NoSubcontractorsAddedController.onPageLoad()))
+
+      case Some(_) =>
+        userAnswers.get(UnverifiedSubcontractorsPage) match {
+          case Some(unverifiedSubcontractors) if unverifiedSubcontractors.nonEmpty =>
+            Right(unverifiedSubcontractors)
+
+          case Some(_) =>
+            Left(Redirect(controllers.verify.routes.VerifyYourSubcontractorsYesNoController.onPageLoad))
+
+          case None =>
+            Left(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+        }
+    }
+
 }

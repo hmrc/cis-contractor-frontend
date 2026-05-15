@@ -16,6 +16,8 @@
 
 package models
 
+import models.add.TypeOfSubcontractor
+import models.add.TypeOfSubcontractor.*
 import play.api.libs.json.{Json, OFormat}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.checkboxes.CheckboxItem
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
@@ -28,12 +30,53 @@ object SubcontractorViewModel {
   implicit val format: OFormat[SubcontractorViewModel] = Json.format[SubcontractorViewModel]
 
   def checkboxItems(subcontractors: Seq[SubcontractorViewModel]): Seq[CheckboxItem] =
-    subcontractors.sortBy(_.name).zipWithIndex.map { case (sub, index) =>
+    subcontractors.sortBy(_.name.toLowerCase).zipWithIndex.map { case (sub, index) =>
       CheckboxItemViewModel(
         content = Text(sub.name),
         fieldId = "value",
         index = index,
         value = sub.id
       )
+    }
+
+  def fromSubcontractors(subcontractors: Seq[Subcontractor]): Seq[SubcontractorViewModel] =
+    subcontractors.flatMap(fromSubcontractor)
+
+  private def fromSubcontractor(subcontractor: Subcontractor): Option[SubcontractorViewModel] =
+    for {
+      name <- getSubcontractorName(subcontractor)
+    } yield SubcontractorViewModel(
+      id = subcontractor.subcontractorId.toString,
+      name = name
+    )
+
+  private def getSubcontractorName(subcontractor: Subcontractor): Option[String] =
+
+    val typeOfSubcontractor: Option[TypeOfSubcontractor] =
+      subcontractor.subcontractorType.flatMap(TypeOfSubcontractor.fromString)
+
+    typeOfSubcontractor match {
+      case Some(Individualorsoletrader) =>
+        val soleTraderName: Option[String] =
+          for {
+            surname   <- subcontractor.surname.map(_.trim).filter(_.nonEmpty)
+            firstName <- subcontractor.firstName.map(_.trim).filter(_.nonEmpty)
+          } yield s"$surname, $firstName"
+
+        soleTraderName.orElse(
+          subcontractor.tradingName.map(_.trim).filter(_.nonEmpty)
+        )
+
+      case Some(Limitedcompany) =>
+        subcontractor.tradingName
+
+      case Some(Partnership) =>
+        subcontractor.partnershipTradingName
+
+      case Some(Trust) =>
+        subcontractor.tradingName
+
+      case None =>
+        Some("Unknown Name")
     }
 }
