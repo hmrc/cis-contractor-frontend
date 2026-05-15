@@ -17,12 +17,60 @@
 @this(
     layout: templates.Layout,
     govukButton: GovukButton,
-    h1: components.H1
+    govukTable: GovukTable,
+    govukSummaryList: GovukSummaryList,
+    h1: components.H1,
+    h2: components.H2,
+    link: components.Link
 )
 
-@()(implicit request: Request[_], messages: Messages)
+@(accountsOfficeReference: String, uniqueTaxpayerReference: String, schemeName: String, email: String)(implicit request: Request[_], messages: Messages)
+
+@helperRow(label: String, value: String, url: String)(implicit messages: Messages) = @{
+    if (value.trim.isEmpty) {
+        SummaryListRowViewModel(
+            key   = KeyViewModel(messages(label)),
+            value = ValueViewModel(messages("")),
+            actions = Seq(
+            ActionItemViewModel(
+                Text(messages("contractorDetails.table.link.addDetails")),
+                url
+                )
+            )
+        )
+    } else {
+        SummaryListRowViewModel(
+            key   = KeyViewModel(messages(label)),
+            value = ValueViewModel(value),
+            actions = Seq(
+                ActionItemViewModel(
+                Text(messages("site.change")),
+                url
+                )
+            )
+        )
+    }
+}
 
 @layout(pageTitle = titleNoForm(messages("contractorDetails.title"))) {
 
     @h1("contractorDetails.heading", classes = "govuk-heading-xl")
+    @h2(messages("contractorDetails.accountsOfficeReference", accountsOfficeReference))
+
+    @govukSummaryList(
+        SummaryListViewModel(
+        Seq(
+            helperRow("contractorDetails.table.uniqueTaxpayerReference", uniqueTaxpayerReference, "#"),
+            helperRow("contractorDetails.table.schemeName", schemeName, "#"),
+            helperRow("contractorDetails.table.email", email, "#")
+            )
+        )
+    )
+
+
+    @govukButton(
+        ButtonViewModel(messages("site.saveAndContinue"))
+    )
+
+    @link("contractorDetails.link", "#")
 }

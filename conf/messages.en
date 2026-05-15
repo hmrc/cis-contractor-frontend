@@ -11,6 +11,7 @@ site.start                           =  Start now
 site.startAgain                      =  Start again
 site.signIn                          =  Sign in
 site.govuk                           =  GOV.UK
+site.saveAndContinue                 = Save and continue
 
 date.day                             =  Day
 date.month                           =  Month
@@ -943,5 +944,11 @@ verify.verifyCheckYourAnswers.heading                                   =  Check
 verify.verifyCheckYourAnswers.subHeading                                =  Subcontractors to verify
 verify.verifyCheckYourAnswers.confirm                                   =  Confirm and submit
 
-contractorDetails.title = Contractor details
-contractorDetails.heading = Contractor details
+contractorDetails.title                                                 = Contractor details
+contractorDetails.heading                                               = Contractor details
+contractorDetails.accountsOfficeReference                               = Accounts office reference: {0}
+contractorDetails.table.uniqueTaxpayerReference                         = Unique taxpayer reference
+contractorDetails.table.schemeName                                      = Scheme name
+contractorDetails.table.email                                           = Email
+contractorDetails.table.link.addDetails                                 = Add details
+contractorDetails.link                                                  = Return to CIS dashboard

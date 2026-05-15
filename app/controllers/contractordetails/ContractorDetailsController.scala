@@ -31,10 +31,22 @@ class ContractorDetailsController @Inject() (
   requireData: DataRequiredAction,
   val controllerComponents: MessagesControllerComponents,
   view: ContractorDetailsView
-) extends FrontendBaseController with I18nSupport {
+) extends FrontendBaseController
+    with I18nSupport {
 
-  def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData) {
-    implicit request =>
-      Ok(view())
+  def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
+    val accountsOfficeReference = "123 PA 87654321"
+    val uniqueTaxpayerReference = "1234444555"
+    val schemeName              = "\tScheme 123"
+    val email                   = "test@business.com"
+
+    Ok(
+      view(
+        accountsOfficeReference,
+        uniqueTaxpayerReference,
+        schemeName,
+        email
+      )
+    )
   }
 }
