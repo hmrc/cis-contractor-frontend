@@ -387,14 +387,51 @@ class NewestVerificationBatchControllerSpec extends SpecBase with MockitoSugar w
       }
     }
 
-    "must redirect to JourneyRecovery when monthlyReturn or submission is missing" in {
+    "must treat scheme as active and redirect to SelectSubcontractor when no monthly return has been submitted" in {
       val mockService = mock[VerificationService]
 
       val updatedAnswers =
         emptyUserAnswers
           .set(
             NewestVerificationBatchResponsePage,
-            newestBatchResponse(Seq(unverifiedSubcontractor))
+            newestBatchResponse(Seq(unverifiedSubcontractor), monthlyReturn = None)
+          )
+          .flatMap(_.set(UnverifiedSubcontractorsPage, Seq(unverifiedSubcontractor)))
+          .success
+          .value
+
+      when(mockService.refreshNewestVerificationBatch(any[UserAnswers])(any[HeaderCarrier]))
+        .thenReturn(Future.successful(updatedAnswers))
+
+      val application =
+        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          .overrides(bind[VerificationService].toInstance(mockService))
+          .build()
+
+      running(application) {
+        val result = route(application, FakeRequest(GET, endpointUrl)).value
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result).value mustBe
+          controllers.verify.routes.SelectSubcontractorController.onPageLoad(NormalMode).url
+
+        verify(mockService).refreshNewestVerificationBatch(any[UserAnswers])(any[HeaderCarrier])
+        verifyNoMoreInteractions(mockService)
+      }
+    }
+
+    "must redirect to JourneyRecovery when inactivity declared but submission is missing" in {
+      val mockService = mock[VerificationService]
+
+      val updatedAnswers =
+        emptyUserAnswers
+          .set(
+            NewestVerificationBatchResponsePage,
+            newestBatchResponse(
+              Seq(unverifiedSubcontractor),
+              submission = None,
+              monthlyReturn = Some(inactiveMonthlyReturn)
+            )
           )
           .flatMap(_.set(UnverifiedSubcontractorsPage, Seq(unverifiedSubcontractor)))
           .success

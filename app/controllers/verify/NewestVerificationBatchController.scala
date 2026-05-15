@@ -51,22 +51,27 @@ class NewestVerificationBatchController @Inject() (
   }
 
   private def checkSchemeInactivity(response: models.response.GetNewestVerificationBatchResponse): InactivityStatus =
-    (response.monthlyReturn, response.submission) match {
-      case (None, _) | (_, None) =>
-        // Missing data - route to JourneyRecovery
-        InactivityStatus.MissingData
+    response.monthlyReturn match {
+      case None =>
+        // No monthly return submitted - scheme is active
+        InactivityStatus.Active
 
-      case (Some(monthlyReturn), Some(submission)) =>
-        if (!monthlyReturn.decNoMoreSubPayments.contains("Y")) {
-          InactivityStatus.Active
-        } else {
-          submission.submissionRequestDate match {
-            case Some(requestDate) =>
-              val sixMonthsLater = requestDate.plusMonths(InactivityStatus.SixMonths)
-              if (LocalDateTime.now().isBefore(sixMonthsLater)) InactivityStatus.Inactive else InactivityStatus.Active
-            case None              =>
-              InactivityStatus.MissingData
-          }
+      case Some(monthlyReturn) if !monthlyReturn.decNoMoreSubPayments.contains("Y") =>
+        InactivityStatus.Active
+
+      case Some(_) =>
+        response.submission match {
+          case None =>
+            InactivityStatus.MissingData
+
+          case Some(submission) =>
+            submission.submissionRequestDate match {
+              case Some(requestDate) =>
+                val sixMonthsLater = requestDate.plusMonths(InactivityStatus.SixMonths)
+                if (LocalDateTime.now().isBefore(sixMonthsLater)) InactivityStatus.Inactive else InactivityStatus.Active
+              case None              =>
+                InactivityStatus.MissingData
+            }
         }
     }
 
