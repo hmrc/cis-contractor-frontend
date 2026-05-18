@@ -39,44 +39,51 @@ object SubcontractorViewModel {
       )
     }
 
-  def fromSubcontractors(subcontractors: Seq[Subcontractor]): Seq[SubcontractorViewModel] =
-    subcontractors.flatMap(fromSubcontractor)
+  def fromSubcontractors(subcontractors: Seq[Subcontractor]): Either[String,Seq[SubcontractorViewModel]] =
+    subcontractors.foldLeft[Either[String, Seq[SubcontractorViewModel]]](Right(Seq.empty)) {
+      case (Right(viewModels), subcontractor) =>
+        fromSubcontractor(subcontractor).map(viewModel => viewModels :+ viewModel)
 
-  private def fromSubcontractor(subcontractor: Subcontractor): Option[SubcontractorViewModel] =
+      case (left @ Left(_), _) =>
+        left
+    }
+
+  private def fromSubcontractor(subcontractor: Subcontractor): Either[String, SubcontractorViewModel] =
     for {
-      name <- getSubcontractorName(subcontractor)
+      subcontractorType <- getSubcontractorType(subcontractor)
+      name <- getSubcontractorName(subcontractor, subcontractorType)
     } yield SubcontractorViewModel(
       id = subcontractor.subcontractorId.toString,
       name = name
     )
 
-  private def getSubcontractorName(subcontractor: Subcontractor): Option[String] =
+  private def getSubcontractorName(subcontractor: Subcontractor, subcontractorType: TypeOfSubcontractor): Either[String, String] =
 
-    val typeOfSubcontractor: Option[TypeOfSubcontractor] =
-      subcontractor.subcontractorType.flatMap(TypeOfSubcontractor.fromString)
+    subcontractorType match {
+      case Individualorsoletrader =>
+              val soleTraderName: Option[String] =
+                for {
+                  surname   <- subcontractor.surname.map(_.trim).filter(_.nonEmpty)
+                  firstName <- subcontractor.firstName.map(_.trim).filter(_.nonEmpty)
+                } yield s"$surname, $firstName"
 
-    typeOfSubcontractor match {
-      case Some(Individualorsoletrader) =>
-        val soleTraderName: Option[String] =
-          for {
-            surname   <- subcontractor.surname.map(_.trim).filter(_.nonEmpty)
-            firstName <- subcontractor.firstName.map(_.trim).filter(_.nonEmpty)
-          } yield s"$surname, $firstName"
+              soleTraderName
+                .orElse(subcontractor.tradingName.map(_.trim).filter(_.nonEmpty))
+                .toRight(s"Missing name for for subcontractor id ${subcontractor.subcontractorId}")
 
-        soleTraderName.orElse(
-          subcontractor.tradingName.map(_.trim).filter(_.nonEmpty)
-        )
+      case Limitedcompany =>
+        subcontractor.tradingName.toRight(s"Missing tradingName for for subcontractor id ${subcontractor.subcontractorId}")
 
-      case Some(Limitedcompany) =>
-        subcontractor.tradingName
+      case Partnership =>
+        subcontractor.partnershipTradingName.toRight(s"Missing partnershipTradingName for for subcontractor id ${subcontractor.subcontractorId}")
 
-      case Some(Partnership) =>
-        subcontractor.partnershipTradingName
-
-      case Some(Trust) =>
-        subcontractor.tradingName
-
-      case None =>
-        Some("Unknown Name")
+      case Trust =>
+        subcontractor.tradingName.toRight(s"Missing tradingName for for subcontractor id ${subcontractor.subcontractorId}")
     }
+    
+    
+  private def getSubcontractorType(subcontractor: Subcontractor): Either[String, TypeOfSubcontractor] =
+    subcontractor.subcontractorType
+      .flatMap(TypeOfSubcontractor.fromString)
+      .toRight(s"Unknown or missing subcontractor type for subcontractor id ${subcontractor.subcontractorId}")
 }
