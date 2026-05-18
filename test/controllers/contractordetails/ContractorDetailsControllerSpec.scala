@@ -52,7 +52,8 @@ class ContractorDetailsControllerSpec extends SpecBase {
             contractorDetailsViewModel.uniqueTaxpayerReference,
             contractorDetailsViewModel.schemeName,
             contractorDetailsViewModel.email
-        ))(
+          )
+        )(
           request,
           messages(application)
         ).toString

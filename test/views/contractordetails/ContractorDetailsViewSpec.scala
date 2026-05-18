@@ -51,7 +51,8 @@ class ContractorDetailsViewSpec extends SpecBase {
     }
 
     "must show Add details links when values are empty" in new Setup {
-      val html: HtmlFormat.Appendable = view(contractorDetailsViewModel.copy(uniqueTaxpayerReference = "", schemeName = "", email = ""))
+      val html: HtmlFormat.Appendable =
+        view(contractorDetailsViewModel.copy(uniqueTaxpayerReference = "", schemeName = "", email = ""))
 
       val doc: Document = Jsoup.parse(html.body)
 
