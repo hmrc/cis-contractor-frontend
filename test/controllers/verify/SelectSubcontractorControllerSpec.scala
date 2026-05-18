@@ -106,7 +106,7 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
       .success
       .value
 
-  private val allSubs          = SubcontractorViewModel.fromSubcontractors(subcontractors)
+  private val (_, allSubs)     = SubcontractorViewModel.fromSubcontractors(subcontractors)
   private val brodyMartin      = allSubs.head // first subcontractor, on page 1
   private val epsilonCarpentry = allSubs(6) // seventh subcontractor, on page 2 (pageSize = 6)
 
@@ -357,6 +357,79 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual
           controllers.routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must redirect to Journey Recovery on GET when every unverified subcontractor has a missing or unknown type" in {
+
+      val invalidSubcontractors: Seq[Subcontractor] = generateSubcontractors(3).map(_.copy(subcontractorType = None))
+
+      val responseWithInvalid: GetNewestVerificationBatchResponse =
+        getNewestVerificationBatchResponse.copy(subcontractors = invalidSubcontractors)
+
+      def uaWithAllInvalid: UserAnswers =
+        emptyUserAnswers
+          .set(NewestVerificationBatchResponsePage, responseWithInvalid)
+          .success
+          .value
+          .set(UnverifiedSubcontractorsPage, invalidSubcontractors)
+          .success
+          .value
+
+      val application = applicationBuilder(userAnswers = Some(uaWithAllInvalid)).build()
+
+      running(application) {
+        val request = FakeRequest(GET, url(1))
+        val result  = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual
+          controllers.routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must render the page with only valid rows on GET when some unverified subcontractors have a missing type" in {
+
+      val validSubs   = generateSubcontractors(2)
+      val invalidSubs = generateSubcontractors(1).map(_.copy(subcontractorId = 99L, subcontractorType = None))
+      val mixed       = validSubs ++ invalidSubs
+
+      val responseWithMixed: GetNewestVerificationBatchResponse =
+        getNewestVerificationBatchResponse.copy(subcontractors = mixed)
+
+      def uaWithMixed: UserAnswers =
+        emptyUserAnswers
+          .set(NewestVerificationBatchResponsePage, responseWithMixed)
+          .success
+          .value
+          .set(UnverifiedSubcontractorsPage, mixed)
+          .success
+          .value
+
+      val application = applicationBuilder(userAnswers = Some(uaWithMixed)).build()
+
+      running(application) {
+        val request = FakeRequest(GET, url(1))
+        val result  = route(application, request).value
+
+        val (_, validViewModels) = SubcontractorViewModel.fromSubcontractors(mixed)
+        val view                 = application.injector.instanceOf[SelectSubcontractorView]
+        val items                = SubcontractorViewModel.checkboxItems(validViewModels)
+        val paginationResult     = paginationService.paginateCheckboxItems(items, 1)
+
+        status(result) mustEqual OK
+
+        contentAsString(result) mustEqual view(
+          form,
+          NormalMode,
+          paginationResult.paginatedData,
+          paginationResult.paginationViewModel,
+          1,
+          paginationResult.startIndex,
+          paginationResult.totalCount
+        )(request, messages(application)).toString
+
+        validViewModels.size mustEqual 2
       }
     }
 

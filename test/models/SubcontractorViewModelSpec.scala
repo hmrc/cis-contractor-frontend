@@ -91,7 +91,7 @@ class SubcontractorViewModelSpec extends SpecBase {
   }
 
   "SubcontractorViewModel.fromSubcontractors" - {
-    "map subcontractors into view models using subbieResourceRef / firstName / surname / subcontractorType / subbieResourceRef " in {
+    "map subcontractors into view models using firstName / surname / tradingName / partnershipTradingName / subcontractorType" in {
       val subcontractors = Seq(
         subcontractor(
           subcontractorId = 10L,
@@ -122,33 +122,19 @@ class SubcontractorViewModelSpec extends SpecBase {
         )
       )
 
-      val result = SubcontractorViewModel.fromSubcontractors(subcontractors)
+      val (errors, viewModels) = SubcontractorViewModel.fromSubcontractors(subcontractors)
 
-      result shouldBe Seq(
-        SubcontractorViewModel(
-          id = "10",
-          name = "Smith, John"
-        ),
-        SubcontractorViewModel(
-          id = "20",
-          name = "ABC Property Services"
-        ),
-        SubcontractorViewModel(
-          id = "30",
-          name = "ABC Construction Ltd"
-        ),
-        SubcontractorViewModel(
-          id = "40",
-          name = "ABC Partnership"
-        ),
-        SubcontractorViewModel(
-          id = "50",
-          name = "ABC Trust"
-        )
+      errors     shouldBe empty
+      viewModels shouldBe Seq(
+        SubcontractorViewModel(id = "10", name = "Smith, John"),
+        SubcontractorViewModel(id = "20", name = "ABC Property Services"),
+        SubcontractorViewModel(id = "30", name = "ABC Construction Ltd"),
+        SubcontractorViewModel(id = "40", name = "ABC Partnership"),
+        SubcontractorViewModel(id = "50", name = "ABC Trust")
       )
     }
 
-    "return 'Unknow name' when subcontractorType is None" in {
+    "drop the row and return an error when subcontractorType is None" in {
       val subcontractors = List(
         subcontractor(
           subcontractorId = 10L,
@@ -159,17 +145,14 @@ class SubcontractorViewModelSpec extends SpecBase {
         )
       )
 
-      val result = SubcontractorViewModel.fromSubcontractors(subcontractors)
+      val (errors, viewModels) = SubcontractorViewModel.fromSubcontractors(subcontractors)
 
-      result shouldBe Seq(
-        SubcontractorViewModel(
-          id = "10",
-          name = "Unknown Name"
-        )
-      )
+      viewModels shouldBe empty
+      errors       should have size 1
+      errors.head  should include("subcontractor id 10")
     }
 
-    "return 'Unknow name' when subcontractorType is not recognised" in {
+    "drop the row and return an error when subcontractorType is not recognised" in {
       val subcontractors = List(
         subcontractor(
           subcontractorId = 10L,
@@ -180,14 +163,55 @@ class SubcontractorViewModelSpec extends SpecBase {
         )
       )
 
-      val result = SubcontractorViewModel.fromSubcontractors(subcontractors)
+      val (errors, viewModels) = SubcontractorViewModel.fromSubcontractors(subcontractors)
 
-      result shouldBe Seq(
-        SubcontractorViewModel(
-          id = "10",
-          name = "Unknown Name"
+      viewModels shouldBe empty
+      errors       should have size 1
+      errors.head  should include("subcontractor id 10")
+    }
+
+    "keep valid rows and drop invalid rows, returning both errors and view models" in {
+      val subcontractors = Seq(
+        subcontractor(
+          subcontractorId = 10L,
+          tradingName = Some("ABC Construction Ltd"),
+          subcontractorType = Some("company")
+        ),
+        subcontractor(
+          subcontractorId = 20L,
+          subcontractorType = None
+        ),
+        subcontractor(
+          subcontractorId = 30L,
+          partnershipTradingName = Some("ABC Partnership"),
+          subcontractorType = Some("partnership")
         )
       )
+
+      val (errors, viewModels) = SubcontractorViewModel.fromSubcontractors(subcontractors)
+
+      viewModels shouldBe Seq(
+        SubcontractorViewModel(id = "10", name = "ABC Construction Ltd"),
+        SubcontractorViewModel(id = "30", name = "ABC Partnership")
+      )
+      errors       should have size 1
+      errors.head  should include("subcontractor id 20")
+    }
+
+    "drop a Limitedcompany row whose tradingName is blank" in {
+      val subcontractors = List(
+        subcontractor(
+          subcontractorId = 10L,
+          tradingName = Some("   "),
+          subcontractorType = Some("company")
+        )
+      )
+
+      val (errors, viewModels) = SubcontractorViewModel.fromSubcontractors(subcontractors)
+
+      viewModels shouldBe empty
+      errors       should have size 1
+      errors.head  should include("Missing tradingName")
     }
   }
 }
