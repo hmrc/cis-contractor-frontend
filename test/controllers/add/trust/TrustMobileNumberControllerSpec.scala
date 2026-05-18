@@ -19,12 +19,13 @@ package controllers.add.trust
 import base.SpecBase
 import controllers.routes
 import forms.add.trust.TrustMobileNumberFormProvider
+import models.contact.ContactOptions.Mobile
 import models.{NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.add.trust.{TrustMobileNumberPage, TrustNamePage}
+import pages.add.trust.{TrustContactOptionsPage, TrustMobileNumberPage, TrustNamePage}
 import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
@@ -47,13 +48,25 @@ class TrustMobileNumberControllerSpec extends SpecBase with MockitoSugar {
     controllers.add.trust.routes.TrustMobileNumberController.onPageLoad(NormalMode).url
 
   private def uaWithName: UserAnswers =
-    emptyUserAnswers.set(TrustNamePage, trustName).success.value
+    emptyUserAnswers
+      .set(TrustNamePage, trustName)
+      .success
+      .value
 
-  "TrustMobileNumber Controller" - {
+  private def uaWithNameAndMobileChoice: UserAnswers =
+    buildAnswersWithContactChoice(
+      emptyUserAnswers,
+      TrustNamePage,
+      trustName,
+      TrustContactOptionsPage,
+      Mobile
+    )
 
-    "must return OK and the correct view for a GET" in {
+  "TrustMobileNumberController" - {
 
-      val application = applicationBuilder(userAnswers = Some(uaWithName)).build()
+    "must return OK and the correct view for a GET when Mobile is selected" in {
+
+      val application = applicationBuilder(userAnswers = Some(uaWithNameAndMobileChoice)).build()
 
       running(application) {
         val request = FakeRequest(GET, trustMobileNumberRoute)
@@ -63,13 +76,20 @@ class TrustMobileNumberControllerSpec extends SpecBase with MockitoSugar {
         val view = application.injector.instanceOf[TrustMobileNumberView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode, trustName)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode, trustName)(
+          request,
+          messages(application)
+        ).toString
       }
     }
 
-    "must populate the view correctly on a GET when the question has previously been answered" in {
+    "must populate the view correctly on a GET when previously answered" in {
 
-      val userAnswers = uaWithName.set(TrustMobileNumberPage, "07700 900 982").success.value
+      val userAnswers =
+        uaWithNameAndMobileChoice
+          .set(TrustMobileNumberPage, "07700 900 982")
+          .success
+          .value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
@@ -85,6 +105,20 @@ class TrustMobileNumberControllerSpec extends SpecBase with MockitoSugar {
           request,
           messages(application)
         ).toString
+      }
+    }
+
+    "must redirect to Journey Recovery for a GET when Mobile is not selected" in {
+
+      val application = applicationBuilder(userAnswers = Some(uaWithName)).build()
+
+      running(application) {
+        val request = FakeRequest(GET, trustMobileNumberRoute)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
       }
     }
 
@@ -167,17 +201,17 @@ class TrustMobileNumberControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must redirect to JourneyRecovery if trustName is missing for a GET" in {
+    "must redirect to Journey Recovery when trust name is missing" in {
 
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
       running(application) {
         val request = FakeRequest(GET, trustMobileNumberRoute)
-        val result  = route(application, request).value
+
+        val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual
-          controllers.routes.JourneyRecoveryController.onPageLoad().url
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
       }
     }
 
