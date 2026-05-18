@@ -942,3 +942,11 @@ verify.verifyCheckYourAnswers.title                                     =  Check
 verify.verifyCheckYourAnswers.heading                                   =  Check your answers before submitting your verification request
 verify.verifyCheckYourAnswers.subHeading                                =  Subcontractors to verify
 verify.verifyCheckYourAnswers.confirm                                   =  Confirm and submit
+
+contractorDetailsUpdated.title = Contractor Details Updated
+contractorDetailsUpdated.heading = Contractor Details Updated
+contractorDetailsUpdated.p1.details.prefix = You have successfully changed the contractor details for {0}. You can
+contractorDetailsUpdated.p1.details.link = view the change on your contractor details
+contractorDetailsUpdated.returnToDashboard.link = Return to CIS dashboard
+contractorDetailsUpdated.p2.whatDidYouThink.link = What did you think of this service?
+contractorDetailsUpdated.p2.whatDidYouThink.suffix = (takes 30 seconds)
