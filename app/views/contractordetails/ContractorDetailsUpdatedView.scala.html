@@ -26,29 +26,29 @@
 
 @(contractorName: String)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = titleNoForm(messages("contractorDetails.contractorDetailsUpdated.title")), showBackLink = false, showSignOut = false) {
+@layout(pageTitle = titleNoForm(messages("contractordetails.contractorDetailsUpdated.title")), showBackLink = false, showSignOut = false) {
 
     @govukPanel(
         Panel(title = Text(
-            messages("contractorDetails.contractorDetailsUpdated.heading")
+            messages("contractordetails.contractorDetailsUpdated.heading")
         ))
     )
 
     @link(
-        linkTextKey = "contractorDetails.contractorDetailsUpdated.p1.details.link",
+        linkTextKey = "contractordetails.contractorDetailsUpdated.p1.details.link",
         linkUrl = "#",
         hasFullStop = true,
-        prefixTextKey = messages("contractorDetails.contractorDetailsUpdated.p1.details.prefix", contractorName)
+        prefixTextKey = messages("contractordetails.contractorDetailsUpdated.p1.details.prefix", contractorName)
     )
 
     @link(
-        linkTextKey = "contractorDetails.contractorDetailsUpdated.returnToDashboard.link",
+        linkTextKey = "contractordetails.contractorDetailsUpdated.returnToDashboard.link",
         linkUrl = "#"
     )
 
     @link(
-        linkTextKey = "contractorDetails.contractorDetailsUpdated.p2.whatDidYouThink.link",
+        linkTextKey = "contractordetails.contractorDetailsUpdated.p2.whatDidYouThink.link",
         linkUrl = "#",
-        suffixTextKey = "contractorDetails.contractorDetailsUpdated.p2.whatDidYouThink.suffix"
+        suffixTextKey = "contractordetails.contractorDetailsUpdated.p2.whatDidYouThink.suffix"
     )
 }

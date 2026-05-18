@@ -35,22 +35,22 @@ class ContractorDetailsUpdatedViewSpec extends SpecBase with Matchers {
       val html: HtmlFormat.Appendable = view(contractorName)
       val doc: Document               = Jsoup.parse(html.body)
 
-      doc.title must include(messages("contractorDetails.contractorDetailsUpdated.title"))
+      doc.title must include(messages("contractordetails.contractorDetailsUpdated.title"))
 
-      doc.select("h1").text must include(messages("contractorDetails.contractorDetailsUpdated.heading"))
+      doc.select("h1").text must include(messages("contractordetails.contractorDetailsUpdated.heading"))
 
       doc.select("p").text must include(
-        messages("contractorDetails.contractorDetailsUpdated.p1.details.prefix", contractorName)
+        messages("contractordetails.contractorDetailsUpdated.p1.details.prefix", contractorName)
       )
 
-      doc.select("a").text must include(messages("contractorDetails.contractorDetailsUpdated.p1.details.link"))
+      doc.select("a").text must include(messages("contractordetails.contractorDetailsUpdated.p1.details.link"))
 
-      doc.select("a").text must include(messages("contractorDetails.contractorDetailsUpdated.returnToDashboard.link"))
+      doc.select("a").text must include(messages("contractordetails.contractorDetailsUpdated.returnToDashboard.link"))
 
-      doc.select("a").text must include(messages("contractorDetails.contractorDetailsUpdated.p2.whatDidYouThink.link"))
+      doc.select("a").text must include(messages("contractordetails.contractorDetailsUpdated.p2.whatDidYouThink.link"))
 
       doc.select("p").text must include(
-        messages("contractorDetails.contractorDetailsUpdated.p2.whatDidYouThink.suffix")
+        messages("contractordetails.contractorDetailsUpdated.p2.whatDidYouThink.suffix")
       )
     }
 
