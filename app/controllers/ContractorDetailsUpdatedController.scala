@@ -23,18 +23,17 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.ContractorDetailsUpdatedView
 
-class ContractorDetailsUpdatedController @Inject()(
-                                       override val messagesApi: MessagesApi,
-                                       identify: IdentifierAction,
-                                       getData: DataRetrievalAction,
-                                       requireData: DataRequiredAction,
-                                       val controllerComponents: MessagesControllerComponents,
-                                       view: ContractorDetailsUpdatedView
-                                     ) extends FrontendBaseController with I18nSupport {
+class ContractorDetailsUpdatedController @Inject() (
+  override val messagesApi: MessagesApi,
+  identify: IdentifierAction,
+  getData: DataRetrievalAction,
+  requireData: DataRequiredAction,
+  val controllerComponents: MessagesControllerComponents,
+  view: ContractorDetailsUpdatedView
+) extends FrontendBaseController
+    with I18nSupport {
 
-  def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData) {
-    implicit request =>
-
+  def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
 //      request.userAnswers.get(SelectedSubcontractorPage(index)) match {
 //        case None =>
 //          Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
@@ -42,7 +41,7 @@ class ContractorDetailsUpdatedController @Inject()(
 //        case Some(subcontractor) =>
 //          Ok(view(form, mode, subcontractor.name, index))
 //      }
-      
-      Ok(view())
+
+    Ok(view())
   }
 }

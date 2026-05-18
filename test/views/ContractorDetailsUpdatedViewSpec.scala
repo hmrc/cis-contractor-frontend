@@ -60,7 +60,7 @@ class ContractorDetailsUpdatedViewSpec extends SpecBase with Matchers {
 
   trait Setup {
     val app: Application                          = applicationBuilder().build()
-    val view: ContractorDetailsUpdatedView               = app.injector.instanceOf[ContractorDetailsUpdatedView]
+    val view: ContractorDetailsUpdatedView        = app.injector.instanceOf[ContractorDetailsUpdatedView]
     implicit val request: play.api.mvc.Request[_] = FakeRequest()
     implicit val messages: Messages               = play.api.i18n.MessagesImpl(
       play.api.i18n.Lang.defaultLang,
