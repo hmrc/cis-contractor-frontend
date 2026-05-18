@@ -21,7 +21,7 @@ import forms.verify.ContractorEmailConfirmationStoredFormProvider
 import models.Mode
 import models.requests.DataRequest
 import navigation.Navigator
-import pages.verify.{ContractorEmailConfirmationStoredPage, NewestVerificationBatchResponsePage}
+import pages.verify.{ContractorEmailConfirmationNotStoredPage, ContractorEmailConfirmationStoredPage, NewestVerificationBatchResponsePage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
@@ -49,25 +49,30 @@ class ContractorEmailConfirmationStoredController @Inject() (
 
   private def recoveryRedirect = Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
 
+  private def emailNotStoredRedirect(mode: Mode) = Redirect(
+    controllers.verify.routes.ContractorEmailConfirmationNotStoredController.onPageLoad(mode)
+  )
+
   private def preparedForm(implicit request: DataRequest[?]) =
     request.userAnswers.get(ContractorEmailConfirmationStoredPage).fold(form)(form.fill)
 
-  private def getEmailAddress(implicit request: DataRequest[?]): Option[String] =
-    request.userAnswers
-      .get(NewestVerificationBatchResponsePage)
-      .flatMap(_.scheme.headOption)
-      .flatMap(_.emailAddress)
+  private def getEmailAddress(implicit request: DataRequest[?]): Either[Unit, Option[String]] =
+    request.userAnswers.get(NewestVerificationBatchResponsePage) match {
+      case None           => Left(())
+      case Some(response) => Right(response.scheme.flatMap(_.emailAddress))
+    }
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
-    getEmailAddress
-      .fold(recoveryRedirect) { emailAddress =>
-        Ok(view(preparedForm, mode, emailAddress))
-      }
+    getEmailAddress match {
+      case Left(_)            => recoveryRedirect
+      case Right(None)        => emailNotStoredRedirect(mode)
+      case Right(Some(email)) => Ok(view(preparedForm, mode, email))
+    }
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
-      getEmailAddress
+      getEmailAddress.toOption.flatten
         .fold(Future.successful(recoveryRedirect)) { emailAddress =>
           form
             .bindFromRequest()
@@ -75,8 +80,10 @@ class ContractorEmailConfirmationStoredController @Inject() (
               formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, emailAddress))),
               value =>
                 for {
+                  cleanedAnswers <-
+                    Future.fromTry(request.userAnswers.remove(ContractorEmailConfirmationNotStoredPage))
                   updatedAnswers <-
-                    Future.fromTry(request.userAnswers.set(ContractorEmailConfirmationStoredPage, value))
+                    Future.fromTry(cleanedAnswers.set(ContractorEmailConfirmationStoredPage, value))
                   _              <- sessionRepository.set(updatedAnswers)
                 } yield Redirect(navigator.nextPage(ContractorEmailConfirmationStoredPage, mode, updatedAnswers))
             )
