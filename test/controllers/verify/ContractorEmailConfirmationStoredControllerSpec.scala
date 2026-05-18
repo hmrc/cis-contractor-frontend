@@ -24,9 +24,10 @@ import models.{ContractorScheme, NormalMode, UserAnswers}
 import models.response.GetNewestVerificationBatchResponse
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
+import org.mockito.ArgumentCaptor
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.verify.{ContractorEmailConfirmationStoredPage, NewestVerificationBatchResponsePage}
+import pages.verify.{ContractorEmailConfirmationNotStoredPage, ContractorEmailConfirmationStoredPage, NewestVerificationBatchResponsePage}
 import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
@@ -105,7 +106,7 @@ class ContractorEmailConfirmationStoredControllerSpec extends SpecBase with Mock
       }
     }
 
-    "must redirect to Journey Recovery for a GET when the email address is absent from the scheme" in {
+    "must redirect to ContractorEmailConfirmationNotStored for a GET when the email address is absent from the scheme" in {
 
       val responseWithNoEmail = testResponse.copy(scheme = Some(testScheme.copy(emailAddress = None)))
       val userAnswers         = emptyUserAnswers.set(NewestVerificationBatchResponsePage, responseWithNoEmail).success.value
@@ -117,7 +118,8 @@ class ContractorEmailConfirmationStoredControllerSpec extends SpecBase with Mock
         val result  = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+        redirectLocation(result).value mustEqual
+          controllers.verify.routes.ContractorEmailConfirmationNotStoredController.onPageLoad(NormalMode).url
       }
     }
 
@@ -172,6 +174,40 @@ class ContractorEmailConfirmationStoredControllerSpec extends SpecBase with Mock
       }
     }
 
+    "must remove ContractorEmailConfirmationNotStoredPage from user answers when submitting" in {
+
+      val ua = userAnswersWithEmail
+        .set(ContractorEmailConfirmationNotStoredPage, true)
+        .success
+        .value
+
+      val mockSessionRepository               = mock[SessionRepository]
+      val captor: ArgumentCaptor[UserAnswers] = ArgumentCaptor.forClass(classOf[UserAnswers])
+      when(mockSessionRepository.set(captor.capture())) thenReturn Future.successful(true)
+
+      val application =
+        applicationBuilder(userAnswers = Some(ua))
+          .overrides(
+            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
+            bind[SessionRepository].toInstance(mockSessionRepository)
+          )
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, contractorEmailConfirmationStoredRoute)
+            .withFormUrlEncodedBody(("value", "currentEmail"))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual onwardRoute.url
+
+        val savedAnswers = captor.getValue
+        savedAnswers.get(ContractorEmailConfirmationNotStoredPage) mustEqual None
+      }
+    }
+
     "must return a Bad Request and errors when invalid data is submitted" in {
 
       val application = applicationBuilder(userAnswers = Some(userAnswersWithEmail)).build()
@@ -190,6 +226,22 @@ class ContractorEmailConfirmationStoredControllerSpec extends SpecBase with Mock
           request,
           messages(application)
         ).toString
+      }
+    }
+
+    "must redirect to Journey Recovery for a POST when no batch response is stored" in {
+
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, contractorEmailConfirmationStoredRoute)
+            .withFormUrlEncodedBody(("value", "currentEmail"))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
       }
     }
 

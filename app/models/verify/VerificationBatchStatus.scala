@@ -14,14 +14,23 @@
  * limitations under the License.
  */
 
-package pages.verify
+package models.verify
 
-import pages.QuestionPage
-import play.api.libs.json.JsPath
+sealed trait VerificationBatchStatus
 
-case object VerifyYourSubcontractorsYesNoPage extends QuestionPage[Boolean] with VerifyJourney {
+object VerificationBatchStatus {
 
-  override def path: JsPath = JsPath \ toString
+  case object Started extends VerificationBatchStatus
+  case object Validated extends VerificationBatchStatus
+  case object Pending extends VerificationBatchStatus
+  case object Accepted extends VerificationBatchStatus
 
-  override def toString: String = "verifyYourSubcontractors"
+  def from(value: String): Option[VerificationBatchStatus] =
+    value match {
+      case "STARTED"   => Some(Started)
+      case "VALIDATED" => Some(Validated)
+      case "PENDING"   => Some(Pending)
+      case "ACCEPTED"  => Some(Accepted)
+      case _           => None
+    }
 }

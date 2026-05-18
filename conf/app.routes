@@ -408,9 +408,12 @@ GET   /verify/verification-request-submitted  controllers.verify.VerificationReq
 
 GET   /verify/verification-sent-not-received-warning  controllers.verify.VerifySendErrorController.onPageLoad()
 
-POST  /verify/verification-batch-create    controllers.verify.CreateVerificationBatchAndVerificationsController.onSubmit()
+POST  /verify/verification-batch-create  controllers.verify.CreateVerificationBatchAndVerificationsController.onSubmit()
 
-GET        /enter-contractors-email                         controllers.contractordetails.EnterContractorEmailAddressController.onPageLoad(mode: Mode = NormalMode)
-POST       /enter-contractors-email                         controllers.contractordetails.EnterContractorEmailAddressController.onSubmit(mode: Mode = NormalMode)
-GET        /change-enter-contractors-email                  controllers.contractordetails.EnterContractorEmailAddressController.onPageLoad(mode: Mode = CheckMode)
-POST       /change-enter-contractors-email                  controllers.contractordetails.EnterContractorEmailAddressController.onSubmit(mode: Mode = CheckMode)
+GET   /verify/check-your-answers  controllers.verify.VerifyCheckYourAnswersController.onPageLoad()
+POST  /verify/check-your-answers  controllers.verify.VerifyCheckYourAnswersController.onSubmit()
+
+GET        /contractor-details/what-is-contractors-email                        controllers.contractordetails.EnterContractorEmailAddressController.onPageLoad(mode: Mode = NormalMode)
+POST       /contractor-details/what-is-contractors-email                        controllers.contractordetails.EnterContractorEmailAddressController.onSubmit(mode: Mode = NormalMode)
+GET        /contractor-details/change-what-is-contractors-email                 controllers.contractordetails.EnterContractorEmailAddressController.onPageLoad(mode: Mode = CheckMode)
+POST       /contractor-details/change-what-is-contractors-email                 controllers.contractordetails.EnterContractorEmailAddressController.onSubmit(mode: Mode = CheckMode)

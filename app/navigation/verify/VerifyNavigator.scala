@@ -42,12 +42,14 @@ class VerifyNavigator @Inject() () extends NavigatorForJourney {
       userAnswers => navigatorFromContractorEmailConfirmationNotStoredPage(NormalMode)(userAnswers)
     case SelectSubcontractorPage                  =>
       userAnswers => navigatorFromSelectSubcontractorPage(NormalMode)(userAnswers)
+    case ReverifyExistingSubcontractorsYesNoPage  =>
+      userAnswers => navigatorFromReverifyExistingSubcontractorsYesNoPage(NormalMode)(userAnswers)
     case ContractorEmailConfirmationStoredPage    =>
       userAnswers => navigatorFromContractorEmailConfirmationStoredPage(NormalMode)(userAnswers)
     case SelectSubcontractorsToReverifyPage       =>
-      _ => controllers.verify.routes.ContractorEmailConfirmationStoredController.onPageLoad(NormalMode)
+      userAnswers => navigatorFromSelectSubcontractorsToReverifyPage(NormalMode)(userAnswers)
     case EmailAddressPage                         =>
-      _ => controllers.verify.routes.EmailAddressController.onPageLoad(NormalMode)
+      _ => controllers.verify.routes.VerifyCheckYourAnswersController.onPageLoad()
     case _                                        => _ => controllers.routes.JourneyRecoveryController.onPageLoad()
   }
 
@@ -56,14 +58,15 @@ class VerifyNavigator @Inject() () extends NavigatorForJourney {
       userAnswers => navigatorFromContractorEmailConfirmationNotStoredPage(CheckMode)(userAnswers)
     case SelectSubcontractorPage                  =>
       userAnswers => navigatorFromSelectSubcontractorPage(CheckMode)(userAnswers)
+    case ReverifyExistingSubcontractorsYesNoPage  =>
+      userAnswers => navigatorFromReverifyExistingSubcontractorsYesNoPage(CheckMode)(userAnswers)
     case ContractorEmailConfirmationStoredPage    =>
       userAnswers => navigatorFromContractorEmailConfirmationStoredPage(CheckMode)(userAnswers)
     case SelectSubcontractorsToReverifyPage       =>
-      _ => controllers.verify.routes.ContractorEmailConfirmationStoredController.onPageLoad(CheckMode)
+      userAnswers => navigatorFromSelectSubcontractorsToReverifyPage(CheckMode)(userAnswers)
     case EmailAddressPage                         =>
-      _ => controllers.verify.routes.EmailAddressController.onPageLoad(CheckMode)
+      _ => controllers.verify.routes.VerifyCheckYourAnswersController.onPageLoad()
     case _                                        => _ => controllers.routes.JourneyRecoveryController.onPageLoad()
-
   }
 
   private def navigatorFromContractorEmailConfirmationNotStoredPage(mode: Mode)(ua: UserAnswers): Call =
@@ -73,7 +76,7 @@ class VerifyNavigator @Inject() () extends NavigatorForJourney {
         controllers.verify.routes.EmailAddressController.onPageLoad(m)
 
       case (Some(false), _) =>
-        controllers.verify.routes.VerificationDeclarationController.onPageLoad()
+        controllers.verify.routes.VerifyCheckYourAnswersController.onPageLoad()
 
       case _ =>
         controllers.routes.JourneyRecoveryController.onPageLoad()
@@ -81,20 +84,51 @@ class VerifyNavigator @Inject() () extends NavigatorForJourney {
 
   private def navigatorFromSelectSubcontractorPage(mode: Mode)(ua: UserAnswers): Call = {
     val _ = ua
-    controllers.verify.routes.SelectSubcontractorController.onPageLoad(mode)
+    mode match {
+      case NormalMode => controllers.verify.routes.ReverifyExistingSubcontractorsYesNoController.onPageLoad(NormalMode)
+      case CheckMode  => controllers.verify.routes.VerifyCheckYourAnswersController.onPageLoad()
+    }
+  }
+
+  private def navigatorFromReverifyExistingSubcontractorsYesNoPage(mode: Mode)(ua: UserAnswers): Call =
+    (ua.get(ReverifyExistingSubcontractorsYesNoPage), mode) match {
+      case (Some(true), _)           =>
+        controllers.verify.routes.SelectSubcontractorsToReverifyController.onPageLoad(mode)
+      case (Some(false), NormalMode) =>
+        emailConfirmationPage(ua, NormalMode)
+      case (Some(false), CheckMode)  =>
+        controllers.verify.routes.VerifyCheckYourAnswersController.onPageLoad()
+      case _                         =>
+        controllers.routes.JourneyRecoveryController.onPageLoad()
+    }
+
+  private def navigatorFromSelectSubcontractorsToReverifyPage(mode: Mode)(ua: UserAnswers): Call =
+    mode match {
+      case NormalMode => emailConfirmationPage(ua, NormalMode)
+      case CheckMode  => controllers.verify.routes.VerifyCheckYourAnswersController.onPageLoad()
+    }
+
+  private def emailConfirmationPage(ua: UserAnswers, mode: Mode): Call = {
+    val hasStoredEmail = ua
+      .get(NewestVerificationBatchResponsePage)
+      .flatMap(_.scheme)
+      .flatMap(_.emailAddress)
+      .isDefined
+    if (hasStoredEmail) controllers.verify.routes.ContractorEmailConfirmationStoredController.onPageLoad(mode)
+    else controllers.verify.routes.ContractorEmailConfirmationNotStoredController.onPageLoad(mode)
   }
 
   private def navigatorFromContractorEmailConfirmationStoredPage(mode: Mode)(ua: UserAnswers): Call =
     (ua.get(ContractorEmailConfirmationStoredPage), mode) match {
 
       case (Some(CurrentEmail), _) =>
-        controllers.verify.routes.VerificationDeclarationController.onPageLoad()
+        controllers.verify.routes.VerifyCheckYourAnswersController.onPageLoad()
 
       case (Some(DifferentEmail), m) =>
         controllers.verify.routes.EmailAddressController.onPageLoad(m)
 
       case (Some(DoNotSend), _) =>
-        controllers.verify.routes.VerificationDeclarationController.onPageLoad()
+        controllers.verify.routes.VerifyCheckYourAnswersController.onPageLoad()
 
       case _ =>
         controllers.routes.JourneyRecoveryController.onPageLoad()
