@@ -20,6 +20,7 @@ import controllers.actions.*
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import viewmodels.contractordetails.ContractorDetailsViewModel
 import views.html.contractordetails.ContractorDetailsView
 
 import javax.inject.Inject
@@ -35,18 +36,13 @@ class ContractorDetailsController @Inject() (
     with I18nSupport {
 
   def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
-    val accountsOfficeReference = "123 PA 87654321"
-    val uniqueTaxpayerReference = "1234444555"
-    val schemeName              = "\tScheme 123"
-    val email                   = "test@business.com"
-
-    Ok(
-      view(
-        accountsOfficeReference,
-        uniqueTaxpayerReference,
-        schemeName,
-        email
-      )
+    val contractorDetailsViewModel = ContractorDetailsViewModel(
+      accountsOfficeReference = "123 PA 87654321",
+      uniqueTaxpayerReference = "1234444555",
+      schemeName = "\tScheme 123",
+      email = "test@business.com"
     )
+
+    Ok(view(contractorDetailsViewModel))
   }
 }

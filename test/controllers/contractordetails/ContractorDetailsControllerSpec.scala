@@ -19,14 +19,17 @@ package controllers.contractordetails
 import base.SpecBase
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
+import viewmodels.contractordetails.ContractorDetailsViewModel
 import views.html.contractordetails.ContractorDetailsView
 
 class ContractorDetailsControllerSpec extends SpecBase {
 
-  val accountsOfficeReference = "123 PA 87654321"
-  val uniqueTaxpayerReference = "1234444555"
-  val schemeName              = "\tScheme 123"
-  val email                   = "test@business.com"
+  val contractorDetailsViewModel: ContractorDetailsViewModel = ContractorDetailsViewModel(
+    accountsOfficeReference = "123 PA 87654321",
+    uniqueTaxpayerReference = "1234444555",
+    schemeName = "\tScheme 123",
+    email = "test@business.com"
+  )
 
   "ContractorDetails Controller" - {
 
@@ -43,7 +46,13 @@ class ContractorDetailsControllerSpec extends SpecBase {
         val view = application.injector.instanceOf[ContractorDetailsView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(accountsOfficeReference, uniqueTaxpayerReference, schemeName, email)(
+        contentAsString(result) mustEqual view(
+          ContractorDetailsViewModel(
+            contractorDetailsViewModel.accountsOfficeReference,
+            contractorDetailsViewModel.uniqueTaxpayerReference,
+            contractorDetailsViewModel.schemeName,
+            contractorDetailsViewModel.email
+        ))(
           request,
           messages(application)
         ).toString

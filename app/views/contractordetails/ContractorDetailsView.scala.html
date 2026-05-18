@@ -14,6 +14,8 @@
  * limitations under the License.
  *@
 
+@import viewmodels.contractordetails.ContractorDetailsViewModel
+
 @this(
     layout: templates.Layout,
     govukButton: GovukButton,
@@ -24,7 +26,7 @@
     link: components.Link
 )
 
-@(accountsOfficeReference: String, uniqueTaxpayerReference: String, schemeName: String, email: String)(implicit request: Request[_], messages: Messages)
+@(contractorDetailsViewModel: ContractorDetailsViewModel)(implicit request: Request[_], messages: Messages)
 
 @helperRow(label: String, value: String, url: String)(implicit messages: Messages) = @{
     if (value.trim.isEmpty) {
@@ -55,14 +57,14 @@
 @layout(pageTitle = titleNoForm(messages("contractorDetails.title"))) {
 
     @h1("contractorDetails.heading", classes = "govuk-heading-xl")
-    @h2(messages("contractorDetails.accountsOfficeReference", accountsOfficeReference))
+    @h2(messages("contractorDetails.accountsOfficeReference", contractorDetailsViewModel.accountsOfficeReference))
 
     @govukSummaryList(
         SummaryListViewModel(
         Seq(
-            helperRow("contractorDetails.table.uniqueTaxpayerReference", uniqueTaxpayerReference, "#"),
-            helperRow("contractorDetails.table.schemeName", schemeName, "#"),
-            helperRow("contractorDetails.table.email", email, "#")
+            helperRow("contractorDetails.table.uniqueTaxpayerReference", contractorDetailsViewModel.uniqueTaxpayerReference, "#"),
+            helperRow("contractorDetails.table.schemeName", contractorDetailsViewModel.schemeName, "#"),
+            helperRow("contractorDetails.table.email", contractorDetailsViewModel.email, "#")
             )
         )
     )
