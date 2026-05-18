@@ -36,13 +36,13 @@ class ContractorDetailsViewSpec extends SpecBase {
       val doc: Document = Jsoup.parse(html.body)
 
       doc.select(".govuk-summary-list__key").text must include(
-        messages("contractorDetails.contractorDetails.table.uniqueTaxpayerReference")
+        messages("contractordetails.contractorDetails.table.uniqueTaxpayerReference")
       )
       doc.select(".govuk-summary-list__key").text must include(
-        messages("contractorDetails.contractorDetails.table.schemeName")
+        messages("contractordetails.contractorDetails.table.schemeName")
       )
       doc.select(".govuk-summary-list__key").text must include(
-        messages("contractorDetails.contractorDetails.table.email")
+        messages("contractordetails.contractorDetails.table.email")
       )
 
       doc.select(".govuk-summary-list__value").text must include(contractorDetailsViewModel.uniqueTaxpayerReference)
@@ -51,7 +51,7 @@ class ContractorDetailsViewSpec extends SpecBase {
 
       val links: String = doc.select(".govuk-link").text
       links must include(messages("site.change"))
-      links must include(messages("contractorDetails.contractorDetails.link"))
+      links must include(messages("contractordetails.contractorDetails.link"))
     }
 
     "must show Add details links when values are empty" in new Setup {
@@ -61,13 +61,13 @@ class ContractorDetailsViewSpec extends SpecBase {
       val doc: Document = Jsoup.parse(html.body)
 
       doc.select(".govuk-summary-list__key").text must include(
-        messages("contractorDetails.contractorDetails.table.uniqueTaxpayerReference")
+        messages("contractordetails.contractorDetails.table.uniqueTaxpayerReference")
       )
       doc.select(".govuk-summary-list__key").text must include(
-        messages("contractorDetails.contractorDetails.table.schemeName")
+        messages("contractordetails.contractorDetails.table.schemeName")
       )
       doc.select(".govuk-summary-list__key").text must include(
-        messages("contractorDetails.contractorDetails.table.email")
+        messages("contractordetails.contractorDetails.table.email")
       )
 
       doc.select(".govuk-summary-list__value").eachText().forEach { value =>
@@ -75,7 +75,7 @@ class ContractorDetailsViewSpec extends SpecBase {
       }
 
       val links: String = doc.select(".govuk-link").text
-      links must include(messages("contractorDetails.contractorDetails.table.link.addDetails"))
+      links must include(messages("contractordetails.contractorDetails.table.link.addDetails"))
     }
   }
 

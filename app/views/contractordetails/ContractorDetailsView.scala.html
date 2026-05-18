@@ -35,7 +35,7 @@
             value = ValueViewModel(messages("")),
             actions = Seq(
             ActionItemViewModel(
-                Text(messages("contractorDetails.contractorDetails.table.link.addDetails")),
+                Text(messages("contractordetails.contractorDetails.table.link.addDetails")),
                 url
                 )
             )
@@ -54,17 +54,17 @@
     }
 }
 
-@layout(pageTitle = titleNoForm(messages("contractorDetails.contractorDetails.title"))) {
+@layout(pageTitle = titleNoForm(messages("contractordetails.contractorDetails.title"))) {
 
-    @h1("contractorDetails.contractorDetails.heading", classes = "govuk-heading-xl")
-    @h2(messages("contractorDetails.contractorDetails.accountsOfficeReference", contractorDetailsViewModel.accountsOfficeReference))
+    @h1("contractordetails.contractorDetails.heading", classes = "govuk-heading-xl")
+    @h2(messages("contractordetails.contractorDetails.accountsOfficeReference", contractorDetailsViewModel.accountsOfficeReference))
 
     @govukSummaryList(
         SummaryListViewModel(
         Seq(
-            helperRow("contractorDetails.contractorDetails.table.uniqueTaxpayerReference", contractorDetailsViewModel.uniqueTaxpayerReference, "#"),
-            helperRow("contractorDetails.contractorDetails.table.schemeName", contractorDetailsViewModel.schemeName, "#"),
-            helperRow("contractorDetails.contractorDetails.table.email", contractorDetailsViewModel.email, "#")
+            helperRow("contractordetails.contractorDetails.table.uniqueTaxpayerReference", contractorDetailsViewModel.uniqueTaxpayerReference, "#"),
+            helperRow("contractordetails.contractorDetails.table.schemeName", contractorDetailsViewModel.schemeName, "#"),
+            helperRow("contractordetails.contractorDetails.table.email", contractorDetailsViewModel.email, "#")
             )
         )
     )
@@ -74,5 +74,5 @@
         ButtonViewModel(messages("site.saveAndContinue"))
     )
 
-    @link("contractorDetails.contractorDetails.link", "#")
+    @link("contractordetails.contractorDetails.link", "#")
 }
