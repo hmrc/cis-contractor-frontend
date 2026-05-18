@@ -21,7 +21,10 @@ class ContractorDetailsUpdatedControllerSpec extends SpecBase {
         val view = application.injector.instanceOf[ContractorDetailsUpdatedView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(contractorName = "Test Contractor")(request, messages(application)).toString
+        contentAsString(result) mustEqual view(contractorName = "Test Contractor")(
+          request,
+          messages(application)
+        ).toString
       }
     }
   }

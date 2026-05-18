@@ -31,7 +31,7 @@ class ContractorDetailsUpdatedViewSpec extends SpecBase with Matchers {
   "ContractorDetailsUpdatedView" - {
 
     "must render the page with correct heading, paragraphs, and other contents" in new Setup {
-      val contractorName: String = "Test Contractor"
+      val contractorName: String      = "Test Contractor"
       val html: HtmlFormat.Appendable = view(contractorName)
       val doc: Document               = Jsoup.parse(html.body)
 
@@ -51,7 +51,7 @@ class ContractorDetailsUpdatedViewSpec extends SpecBase with Matchers {
     }
 
     "must not show back link or sign out link" in new Setup {
-      val contractorName: String = "Test Contractor"
+      val contractorName: String      = "Test Contractor"
       val html: HtmlFormat.Appendable = view(contractorName)
       val doc: Document               = Jsoup.parse(html.body)
 
