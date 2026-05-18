@@ -1,15 +1,15 @@
 # Routes
 
 # Infrastructure
-->   /hmrc-frontend    hmrcfrontend.Routes
+->   /hmrc-frontend               hmrcfrontend.Routes
 
-GET  /                 controllers.IndexController.onPageLoad()
+GET  /                            controllers.IndexController.onPageLoad()
 
-GET  /assets/*file     controllers.Assets.versioned(path="/public", file: Asset)
+GET  /assets/*file                controllers.Assets.versioned(path="/public", file: Asset)
 
-GET  /language/:lang   controllers.LanguageSwitchController.switchToLanguage(lang: String)
+GET  /language/:lang              controllers.LanguageSwitchController.switchToLanguage(lang: String)
 
-GET  /refresh-session  controllers.KeepAliveController.keepAlive()
+GET  /refresh-session             controllers.KeepAliveController.keepAlive()
 
 # Errors & Auth
 GET  /there-is-a-problem               controllers.JourneyRecoveryController.onPageLoad(continueUrl: Option[RedirectUrl] ?= None)
@@ -413,4 +413,4 @@ POST  /verify/verification-batch-create  controllers.verify.CreateVerificationBa
 GET   /verify/check-your-answers  controllers.verify.VerifyCheckYourAnswersController.onPageLoad()
 POST  /verify/check-your-answers  controllers.verify.VerifyCheckYourAnswersController.onSubmit()
 
-GET   /contractor-details-updated                       controllers.ContractorDetailsUpdatedController.onPageLoad()
+GET   /contractor-details/contractor-details-updated                       controllers.ContractorDetailsUpdatedController.onPageLoad()
