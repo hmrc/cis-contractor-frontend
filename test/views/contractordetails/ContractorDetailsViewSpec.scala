@@ -36,10 +36,10 @@ class ContractorDetailsViewSpec extends SpecBase {
       val doc: Document = Jsoup.parse(html.body)
 
       doc.select(".govuk-summary-list__key").text must include(
-        messages("contractorDetails.table.uniqueTaxpayerReference")
+        messages("contractorDetails.contractorDetails.table.uniqueTaxpayerReference")
       )
-      doc.select(".govuk-summary-list__key").text must include(messages("contractorDetails.table.schemeName"))
-      doc.select(".govuk-summary-list__key").text must include(messages("contractorDetails.table.email"))
+      doc.select(".govuk-summary-list__key").text must include(messages("contractorDetails.contractorDetails.table.schemeName"))
+      doc.select(".govuk-summary-list__key").text must include(messages("contractorDetails.contractorDetails.table.email"))
 
       doc.select(".govuk-summary-list__value").text must include(contractorDetailsViewModel.uniqueTaxpayerReference)
       doc.select(".govuk-summary-list__value").text must include(contractorDetailsViewModel.schemeName.trim)
@@ -47,7 +47,7 @@ class ContractorDetailsViewSpec extends SpecBase {
 
       val links: String = doc.select(".govuk-link").text
       links must include(messages("site.change"))
-      links must include(messages("contractorDetails.link"))
+      links must include(messages("contractorDetails.contractorDetails.link"))
     }
 
     "must show Add details links when values are empty" in new Setup {
@@ -57,17 +57,17 @@ class ContractorDetailsViewSpec extends SpecBase {
       val doc: Document = Jsoup.parse(html.body)
 
       doc.select(".govuk-summary-list__key").text must include(
-        messages("contractorDetails.table.uniqueTaxpayerReference")
+        messages("contractorDetails.contractorDetails.table.uniqueTaxpayerReference")
       )
-      doc.select(".govuk-summary-list__key").text must include(messages("contractorDetails.table.schemeName"))
-      doc.select(".govuk-summary-list__key").text must include(messages("contractorDetails.table.email"))
+      doc.select(".govuk-summary-list__key").text must include(messages("contractorDetails.contractorDetails.table.schemeName"))
+      doc.select(".govuk-summary-list__key").text must include(messages("contractorDetails.contractorDetails.table.email"))
 
       doc.select(".govuk-summary-list__value").eachText().forEach { value =>
         value mustBe ""
       }
 
       val links: String = doc.select(".govuk-link").text
-      links must include(messages("contractorDetails.table.link.addDetails"))
+      links must include(messages("contractorDetails.contractorDetails.table.link.addDetails"))
     }
   }
 

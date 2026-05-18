@@ -35,7 +35,7 @@
             value = ValueViewModel(messages("")),
             actions = Seq(
             ActionItemViewModel(
-                Text(messages("contractorDetails.table.link.addDetails")),
+                Text(messages("contractorDetails.contractorDetails.table.link.addDetails")),
                 url
                 )
             )
@@ -54,17 +54,17 @@
     }
 }
 
-@layout(pageTitle = titleNoForm(messages("contractorDetails.title"))) {
+@layout(pageTitle = titleNoForm(messages("contractorDetails.contractorDetails.title"))) {
 
-    @h1("contractorDetails.heading", classes = "govuk-heading-xl")
-    @h2(messages("contractorDetails.accountsOfficeReference", contractorDetailsViewModel.accountsOfficeReference))
+    @h1("contractorDetails.contractorDetails.heading", classes = "govuk-heading-xl")
+    @h2(messages("contractorDetails.contractorDetails.accountsOfficeReference", contractorDetailsViewModel.accountsOfficeReference))
 
     @govukSummaryList(
         SummaryListViewModel(
         Seq(
-            helperRow("contractorDetails.table.uniqueTaxpayerReference", contractorDetailsViewModel.uniqueTaxpayerReference, "#"),
-            helperRow("contractorDetails.table.schemeName", contractorDetailsViewModel.schemeName, "#"),
-            helperRow("contractorDetails.table.email", contractorDetailsViewModel.email, "#")
+            helperRow("contractorDetails.contractorDetails.table.uniqueTaxpayerReference", contractorDetailsViewModel.uniqueTaxpayerReference, "#"),
+            helperRow("contractorDetails.contractorDetails.table.schemeName", contractorDetailsViewModel.schemeName, "#"),
+            helperRow("contractorDetails.contractorDetails.table.email", contractorDetailsViewModel.email, "#")
             )
         )
     )
@@ -74,5 +74,5 @@
         ButtonViewModel(messages("site.saveAndContinue"))
     )
 
-    @link("contractorDetails.link", "#")
+    @link("contractorDetails.contractorDetails.link", "#")
 }
