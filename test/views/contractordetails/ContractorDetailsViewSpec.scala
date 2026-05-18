@@ -38,8 +38,12 @@ class ContractorDetailsViewSpec extends SpecBase {
       doc.select(".govuk-summary-list__key").text must include(
         messages("contractorDetails.contractorDetails.table.uniqueTaxpayerReference")
       )
-      doc.select(".govuk-summary-list__key").text must include(messages("contractorDetails.contractorDetails.table.schemeName"))
-      doc.select(".govuk-summary-list__key").text must include(messages("contractorDetails.contractorDetails.table.email"))
+      doc.select(".govuk-summary-list__key").text must include(
+        messages("contractorDetails.contractorDetails.table.schemeName")
+      )
+      doc.select(".govuk-summary-list__key").text must include(
+        messages("contractorDetails.contractorDetails.table.email")
+      )
 
       doc.select(".govuk-summary-list__value").text must include(contractorDetailsViewModel.uniqueTaxpayerReference)
       doc.select(".govuk-summary-list__value").text must include(contractorDetailsViewModel.schemeName.trim)
@@ -59,8 +63,12 @@ class ContractorDetailsViewSpec extends SpecBase {
       doc.select(".govuk-summary-list__key").text must include(
         messages("contractorDetails.contractorDetails.table.uniqueTaxpayerReference")
       )
-      doc.select(".govuk-summary-list__key").text must include(messages("contractorDetails.contractorDetails.table.schemeName"))
-      doc.select(".govuk-summary-list__key").text must include(messages("contractorDetails.contractorDetails.table.email"))
+      doc.select(".govuk-summary-list__key").text must include(
+        messages("contractorDetails.contractorDetails.table.schemeName")
+      )
+      doc.select(".govuk-summary-list__key").text must include(
+        messages("contractorDetails.contractorDetails.table.email")
+      )
 
       doc.select(".govuk-summary-list__value").eachText().forEach { value =>
         value mustBe ""
