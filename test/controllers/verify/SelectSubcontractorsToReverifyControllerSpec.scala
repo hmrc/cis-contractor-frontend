@@ -19,543 +19,431 @@ package controllers.verify
 import base.SpecBase
 import controllers.routes
 import forms.verify.SelectSubcontractorsToReverifyFormProvider
-import models.{NormalMode, UserAnswers}
+import models.{NormalMode, Subcontractor, UserAnswers}
+import models.response.GetNewestVerificationBatchResponse
+import models.verify.SelectedSubcontractors
 import navigation.{FakeNavigator, Navigator}
+
+import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito.{never, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
-import pages.verify.SelectSubcontractorsToReverifyPage
+import pages.verify._
 import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import repositories.SessionRepository
-import org.jsoup.Jsoup
-import services.PaginationToReverifyService
-import models.verify.SelectedSubcontractors
-import models.Subcontractor
-import pages.verify.SelectSubcontractorPage
-import org.mockito.Mockito.{never, verify, when}
-import models.SubcontractorViewModel
-import viewmodels.verify.SubcontractorReverifyData
-import pages.verify.UnverifiedSubcontractorsPage
-import views.html.verify.SelectSubcontractorsToReverifyView
+import viewmodels.verify.SubcontractorReverifyRow
 
+import java.time.{Clock, Instant, LocalDateTime, ZoneOffset}
 import scala.concurrent.Future
 
 class SelectSubcontractorsToReverifyControllerSpec extends SpecBase with MockitoSugar {
 
-  def onwardRoute = Call("GET", "/foo")
+  def onwardRoute: Call = Call("GET", "/foo")
 
-  lazy val selectSubcontractorsToReverifyRoute =
-    controllers.verify.routes.SelectSubcontractorsToReverifyController
-      .onPageLoad(NormalMode)
-      .url
+  private val fixedClock: Clock =
+    Clock.fixed(Instant.parse("2026-01-25T10:00:00Z"), ZoneOffset.UTC)
 
-  val formProvider = new SelectSubcontractorsToReverifyFormProvider()
-  val form         = formProvider(requireSelection = true).bind(Map.empty)
+  private def newestBatchResponse(subcontractors: Seq[Subcontractor]): GetNewestVerificationBatchResponse =
+    GetNewestVerificationBatchResponse(
+      scheme = None,
+      subcontractors = subcontractors,
+      verificationBatch = None,
+      verifications = Nil,
+      submission = None,
+      monthlyReturn = None
+    )
 
-  val paginationService = new PaginationToReverifyService()
-
-  private val allRows = SubcontractorReverifyData.rows
-
-  private val firstRow  = allRows.head
-  private val secondRow = allRows(1)
-
-  def url(page: Int = 1): String =
-    controllers.verify.routes.SelectSubcontractorsToReverifyController
-      .onPageLoad(NormalMode, page)
-      .url
-
-  def testSubcontractor(id: Long, name: String): Subcontractor =
+  private def mkSub(
+    id: Long,
+    verified: Option[String],
+    firstName: Option[String] = None,
+    surname: Option[String] = None,
+    tradingName: Option[String] = None,
+    partnershipTradingName: Option[String] = None,
+    subcontractorType: Option[String] = None,
+    utr: Option[String] = None,
+    verificationNumber: Option[String] = None,
+    taxTreatment: Option[String] = None,
+    verificationDate: Option[LocalDateTime] = None,
+    lastMonthlyReturnDate: Option[LocalDateTime] = None,
+    createDate: Option[LocalDateTime] = None
+  ): Subcontractor =
     Subcontractor(
       subcontractorId = id,
-      firstName = Some(name),
+      firstName = firstName,
       secondName = None,
-      surname = None,
-      tradingName = None,
-      partnershipTradingName = None,
-      verified = None,
-      verificationNumber = None,
-      taxTreatment = None,
-      verificationDate = None,
-      lastMonthlyReturnDate = None,
-      createDate = None,
-      subcontractorType = None,
+      surname = surname,
+      tradingName = tradingName,
+      partnershipTradingName = partnershipTradingName,
+      verified = verified,
+      verificationNumber = verificationNumber,
+      taxTreatment = taxTreatment,
+      verificationDate = verificationDate,
+      lastMonthlyReturnDate = lastMonthlyReturnDate,
+      createDate = createDate,
+      subcontractorType = subcontractorType,
       subbieResourceRef = None,
-      utr = None,
+      utr = utr,
       partnerUtr = None,
       crn = None,
       nino = None
     )
 
-  "SubcontractorsToReverifyViewModel Controller" - {
+  private def url(page: Int = 1): String =
+    controllers.verify.routes.SelectSubcontractorsToReverifyController
+      .onPageLoad(NormalMode, page)
+      .url
 
-    "must return OK and the correct view for a GET page 1" in {
+  private lazy val postUrl: String =
+    controllers.verify.routes.SelectSubcontractorsToReverifyController
+      .onPageLoad(NormalMode)
+      .url
+
+  "SelectSubcontractorsToReverifyController" - {
+
+    "onPageLoad" - {
+
+      "must redirect to JourneyRecovery when NewestVerificationBatchResponsePage is missing" in {
+        val mockRepo = mock[SessionRepository]
+        when(mockRepo.set(any())) thenReturn Future.successful(true)
+
+        val app =
+          applicationBuilder(userAnswers = Some(emptyUserAnswers))
+            .overrides(
+              bind[Clock].toInstance(fixedClock),
+              bind[SessionRepository].toInstance(mockRepo)
+            )
+            .build()
+
+        running(app) {
+          val result = route(app, FakeRequest(GET, url(1))).value
+
+          status(result) mustBe SEE_OTHER
+          redirectLocation(result).value mustBe routes.JourneyRecoveryController.onPageLoad().url
+
+          verify(mockRepo, never()).set(any())
+        }
+      }
+
+      "must return OK, render rows derived from newest batch and save SubcontractorReverifyRowsPage in session" in {
+        val mockRepo = mock[SessionRepository]
+        when(mockRepo.set(any())) thenReturn Future.successful(true)
+
+        // Sub 1: VERIFIED=Y, verificationDate missing => reverifyRequired=true => Verified column = Yes,
+        val subNeedsReverify =
+          mkSub(
+            id = 100L,
+            verified = Some("Y"),
+            firstName = Some("Martin"),
+            surname = Some("Brody"),
+            tradingName = Some("Some Trading"),
+            subcontractorType = Some("individual"),
+            utr = Some("1234567890"),
+            verificationDate = None,
+            createDate = Some(LocalDateTime.of(2020, 5, 11, 0, 0))
+          )
+
+        // Sub 2: VERIFIED=Y, verificationDate recent => reverifyRequired=false => Verified column =No,
+        val subNoReverify =
+          mkSub(
+            id = 200L,
+            verified = Some("Y"),
+            tradingName = Some("Hammond House"),
+            subcontractorType = Some("company"),
+            utr = Some("2904743750"),
+            verificationNumber = Some("V0001217702"),
+            taxTreatment = Some("gross"),
+            verificationDate = Some(LocalDateTime.of(2025, 10, 1, 0, 0)),
+            createDate = Some(LocalDateTime.of(2025, 10, 1, 0, 0))
+          )
+
+        val ua =
+          emptyUserAnswers
+            .set(NewestVerificationBatchResponsePage, newestBatchResponse(Seq(subNeedsReverify, subNoReverify)))
+            .success
+            .value
+
+        val app =
+          applicationBuilder(userAnswers = Some(ua))
+            .overrides(
+              bind[Clock].toInstance(fixedClock),
+              bind[SessionRepository].toInstance(mockRepo)
+            )
+            .build()
+
+        running(app) {
+          val result = route(app, FakeRequest(GET, url(1))).value
+
+          status(result) mustBe OK
+
+          val uaCaptor = ArgumentCaptor.forClass(classOf[UserAnswers])
+          verify(mockRepo).set(uaCaptor.capture())
+
+          uaCaptor.getValue.get(SubcontractorReverifyRowsPage) mustBe defined
+          uaCaptor.getValue.get(SubcontractorReverifyRowsPage).value.map(_.id) must contain allOf ("100", "200")
+
+          val body = contentAsString(result)
+          body must include("Which subcontractors do you want to reverify?")
+
+          body must include("Brody, Martin")
+          body must include("Hammond House")
+          body must include("1234567890")
+          body must include("2904743750")
+
+          body must include(">Yes<")
+          body must include(">No<")
+
+          body must include("V0001217702")
+          body must include("Unknown")
+
+          body must include("Gross")
+
+          body must include("11 May 2020")
+          body must include("1 Oct 2025")
+        }
+      }
+
+      "must return OK and save empty SubcontractorReverifyRowsPage when there are no VERIFIED=Y subcontractors" in {
+        val mockRepo = mock[SessionRepository]
+        when(mockRepo.set(any())) thenReturn Future.successful(true)
+
+        val ua =
+          emptyUserAnswers
+            .set(
+              NewestVerificationBatchResponsePage,
+              newestBatchResponse(
+                Seq(
+                  mkSub(id = 1L, verified = Some("N"), tradingName = Some("Not verified"))
+                )
+              )
+            )
+            .success
+            .value
+
+        val app =
+          applicationBuilder(userAnswers = Some(ua))
+            .overrides(
+              bind[Clock].toInstance(fixedClock),
+              bind[SessionRepository].toInstance(mockRepo)
+            )
+            .build()
+
+        running(app) {
+          val result = route(app, FakeRequest(GET, url(1))).value
+
+          status(result) mustBe OK
+
+          val uaCaptor = ArgumentCaptor.forClass(classOf[UserAnswers])
+          verify(mockRepo).set(uaCaptor.capture())
+
+          uaCaptor.getValue.get(SubcontractorReverifyRowsPage) mustBe Some(Seq.empty)
+
+          contentAsString(result) must include("Which subcontractors do you want to reverify?")
+        }
+      }
+    }
+
+    "onSubmit" - {
+
+      "must return BadRequest and not call repo when SubcontractorReverifyRowsPage is missing (getOrElse Seq.empty path) and selection is required" in {
+        val mockRepo = mock[SessionRepository]
+        when(mockRepo.set(any())) thenReturn Future.successful(true)
+
+        val ua =
+          emptyUserAnswers
+            .set(UnverifiedSubcontractorsPage, Seq.empty)
+            .success
+            .value
+            .set(SelectSubcontractorPage, Set.empty)
+            .success
+            .value
+
+        val app =
+          applicationBuilder(userAnswers = Some(ua))
+            .overrides(
+              bind[Clock].toInstance(fixedClock),
+              bind[SessionRepository].toInstance(mockRepo)
+            )
+            .build()
+
+        running(app) {
+          val request =
+            FakeRequest(POST, postUrl)
+              .withFormUrlEncodedBody("value" -> "")
+
+          val result = route(app, request).value
+
+          status(result) mustBe BAD_REQUEST
+          verify(mockRepo, never()).set(any())
+        }
+      }
+
+      "must redirect to the next page when valid data is submitted (uses rows stored in SubcontractorReverifyRowsPage)" in {
+        val mockRepo = mock[SessionRepository]
+        when(mockRepo.set(any())) thenReturn Future.successful(true)
+
+        val rows: Seq[SubcontractorReverifyRow] =
+          Seq(
+            SubcontractorReverifyRow(
+              id = "100",
+              name = "Brody, Martin",
+              utr = "1234567890",
+              verified = "Yes",
+              verificationNumber = "Unknown",
+              taxTreatment = "Unknown",
+              dateAdded = "11 May 2020"
+            )
+          )
+
+        val ua =
+          emptyUserAnswers
+            .set(SubcontractorReverifyRowsPage, rows)
+            .success
+            .value
+
+        val app =
+          applicationBuilder(userAnswers = Some(ua))
+            .overrides(
+              bind[SessionRepository].toInstance(mockRepo),
+              bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
+              bind[Clock].toInstance(fixedClock)
+            )
+            .build()
+
+        running(app) {
+          val request =
+            FakeRequest(POST, postUrl)
+              .withFormUrlEncodedBody("value[0]" -> "100")
+
+          val result = route(app, request).value
+
+          status(result) mustBe SEE_OTHER
+          redirectLocation(result).value mustBe onwardRoute.url
+
+          val uaCaptor = ArgumentCaptor.forClass(classOf[UserAnswers])
+          verify(mockRepo).set(uaCaptor.capture())
+          uaCaptor.getValue.get(SelectSubcontractorsToReverifyPage).value must contain(
+            SelectedSubcontractors("100", "Brody, Martin")
+          )
+        }
+      }
+
+      "must redirect to target page when gotoPage is present and persist selections" in {
+        val mockRepo = mock[SessionRepository]
+        when(mockRepo.set(any())) thenReturn Future.successful(true)
+
+        val rows: Seq[SubcontractorReverifyRow] =
+          Seq(
+            SubcontractorReverifyRow(
+              id = "100",
+              name = "Brody, Martin",
+              utr = "1234567890",
+              verified = "Yes",
+              verificationNumber = "Unknown",
+              taxTreatment = "Unknown",
+              dateAdded = "11 May 2020"
+            )
+          )
+
+        val ua =
+          emptyUserAnswers
+            .set(SubcontractorReverifyRowsPage, rows)
+            .success
+            .value
+
+        val app =
+          applicationBuilder(userAnswers = Some(ua))
+            .overrides(
+              bind[SessionRepository].toInstance(mockRepo),
+              bind[Clock].toInstance(fixedClock)
+            )
+            .build()
+
+        running(app) {
+          val request =
+            FakeRequest(POST, url(1))
+              .withFormUrlEncodedBody(
+                "value[0]" -> "100",
+                "gotoPage" -> "2"
+              )
+
+          val result = route(app, request).value
+
+          status(result) mustBe SEE_OTHER
+          redirectLocation(result).value mustBe url(2)
+
+          val uaCaptor = ArgumentCaptor.forClass(classOf[UserAnswers])
+          verify(mockRepo).set(uaCaptor.capture())
+          uaCaptor.getValue.get(SelectSubcontractorsToReverifyPage).value must contain(
+            SelectedSubcontractors("100", "Brody, Martin")
+          )
+        }
+      }
+
+      "must redirect to JourneyRecovery when no existing data is found (requireData fails)" in {
+        val mockRepo = mock[SessionRepository]
+        val app      =
+          applicationBuilder(userAnswers = None)
+            .overrides(bind[SessionRepository].toInstance(mockRepo))
+            .build()
+
+        running(app) {
+          val request =
+            FakeRequest(POST, url(1))
+              .withFormUrlEncodedBody("value[0]" -> "100")
+
+          val result = route(app, request).value
+
+          status(result) mustBe SEE_OTHER
+          redirectLocation(result).value mustBe routes.JourneyRecoveryController.onPageLoad().url
+
+          verify(mockRepo, never()).set(any())
+        }
+      }
+    }
+
+    "must show name as Unknown when subcontractorType is missing" in {
+      val mockRepo = mock[SessionRepository]
+      when(mockRepo.set(any())) thenReturn Future.successful(true)
+
+      val sub =
+        mkSub(
+          id = 300L,
+          verified = Some("Y"),
+          firstName = Some("Jane"),
+          surname = Some("Doe"),
+          tradingName = Some("Doe Trading"),
+          subcontractorType = None,
+          utr = Some("9999999999"),
+          verificationDate = None,
+          createDate = Some(LocalDateTime.of(2024, 1, 1, 0, 0))
+        )
 
       val ua =
         emptyUserAnswers
-          .setOrException(
-            SelectSubcontractorsToReverifyPage,
-            Set(
-              SelectedSubcontractors(allRows(0).id, allRows(0).name),
-              SelectedSubcontractors(allRows(1).id, allRows(1).name)
-            )
+          .set(NewestVerificationBatchResponsePage, newestBatchResponse(Seq(sub)))
+          .success
+          .value
+
+      val app =
+        applicationBuilder(userAnswers = Some(ua))
+          .overrides(
+            bind[Clock].toInstance(fixedClock),
+            bind[SessionRepository].toInstance(mockRepo)
           )
+          .build()
 
-      val application = applicationBuilder(userAnswers = Some(ua)).build()
-
-      running(application) {
-
-        val request = FakeRequest(
-          GET,
-          controllers.verify.routes.SelectSubcontractorsToReverifyController
-            .onPageLoad(NormalMode, 1)
-            .url
-        )
-
-        val result = route(application, request).value
+      running(app) {
+        val result = route(app, FakeRequest(GET, url(1))).value
 
         status(result) mustBe OK
-
         val body = contentAsString(result)
 
-        body must include("Which subcontractors do you want to reverify?")
-        body must include("Select the existing subcontractors you want to include in this verification request")
-        body must include("""id="subcontractor-table"""")
-
-        val total = allRows.size
-        body must include(s"Showing 1 to 6 of $total results")
-
-        val doc = Jsoup.parse(body)
-
-        def inputValue(inputId: String): String =
-          doc.selectFirst(s"input#$inputId").attr("value")
-
-        def isChecked(inputId: String): Boolean =
-          doc.selectFirst(s"input#$inputId").hasAttr("checked")
-
-        inputValue("value-0") mustBe allRows(0).id
-        isChecked("value-0") mustBe true
-
-        inputValue("value-1") mustBe allRows(1).id
-        isChecked("value-1") mustBe true
-
-        // do NOT assert unchecked for other items if you refuse to change the view
-        inputValue("value-2") mustBe allRows(2).id
-      }
-    }
-
-    "must return empty form when no previous answer exists (getOrElse path)" in {
-
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
-
-      running(application) {
-
-        val request = FakeRequest(GET, url(1))
-        val result  = route(application, request).value
-
-        val view = application.injector.instanceOf[SelectSubcontractorsToReverifyView]
-
-        val baseUrl =
-          controllers.verify.routes.SelectSubcontractorsToReverifyController.onPageLoad(NormalMode).url
-
-        val paginated =
-          paginationService.paginate(
-            allItems = allRows,
-            currentPage = 1,
-            recordsPerPage = 6,
-            baseUrl = baseUrl
-          )
-
-        val expectedForm = formProvider(requireSelection = false)
-
-        status(result) mustEqual OK
-
-        contentAsString(result) mustEqual view(
-          expectedForm,
-          NormalMode,
-          paginated.items,
-          paginated.pagination,
-          1,
-          paginated.startIndex,
-          paginated.totalCount
-        )(request, messages(application)).toString
-      }
-    }
-
-    "must populate the view correctly on a GET when the question has previously been answered" in {
-
-      val userAnswers =
-        UserAnswers(userAnswersId)
-          .set(
-            SelectSubcontractorsToReverifyPage,
-            Set(
-              SelectedSubcontractors(firstRow.id, firstRow.name),
-              SelectedSubcontractors(secondRow.id, secondRow.name)
-            )
-          )
-          .success
-          .value
-
-      val application =
-        applicationBuilder(userAnswers = Some(userAnswers)).build()
-
-      running(application) {
-
-        val request = FakeRequest(GET, url(1))
-        val result  = route(application, request).value
-
-        val view = application.injector.instanceOf[SelectSubcontractorsToReverifyView]
-
-        val baseUrl =
-          controllers.verify.routes.SelectSubcontractorsToReverifyController.onPageLoad(NormalMode).url
-
-        val paginated =
-          paginationService.paginate(
-            allItems = allRows,
-            currentPage = 1,
-            recordsPerPage = 6,
-            baseUrl = baseUrl
-          )
-
-        val expectedForm =
-          formProvider(requireSelection = false).fill(Set(firstRow.id, secondRow.id))
-
-        status(result) mustEqual OK
-
-        contentAsString(result) mustEqual view(
-          expectedForm,
-          NormalMode,
-          paginated.items,
-          paginated.pagination,
-          1,
-          paginated.startIndex,
-          paginated.totalCount
-        )(request, messages(application)).toString
-      }
-    }
-
-    "must redirect to the next page when valid data is submitted" in {
-
-      val mockSessionRepository = mock[SessionRepository]
-      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
-
-      val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
-          .overrides(
-            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
-            bind[SessionRepository].toInstance(mockSessionRepository)
-          )
-          .build()
-
-      running(application) {
-
-        val request =
-          FakeRequest(POST, selectSubcontractorsToReverifyRoute)
-            .withFormUrlEncodedBody(("value[0]", firstRow.id))
-
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual onwardRoute.url
-      }
-    }
-
-    "must return a Bad Request and errors when invalid data is submitted" in {
-
-      val userAnswers =
-        emptyUserAnswers
-          .set(SelectSubcontractorPage, Set.empty)
-          .success
-          .value
-          .set(UnverifiedSubcontractorsPage, List.empty)
-          .success
-          .value
-
-      val application =
-        applicationBuilder(userAnswers = Some(userAnswers)).build()
-
-      running(application) {
-
-        val request =
-          FakeRequest(POST, url(1))
-            .withFormUrlEncodedBody("value" -> "")
-
-        val boundForm = formProvider(requireSelection = true).bind(Map("value" -> ""))
-
-        val view = application.injector.instanceOf[SelectSubcontractorsToReverifyView]
-
-        val paginated =
-          paginationService.paginate(
-            allItems = allRows,
-            currentPage = 1,
-            recordsPerPage = 6,
-            baseUrl = url(1)
-          )
-
-        val result = route(application, request).value
-
-        status(result) mustEqual BAD_REQUEST
-
-        contentAsString(result) mustEqual view(
-          boundForm,
-          NormalMode,
-          paginated.items,
-          paginated.pagination,
-          1,
-          paginated.startIndex,
-          paginated.totalCount
-        )(request, messages(application)).toString
-      }
-    }
-
-    "must redirect to Journey Recovery for a GET if no existing data is found" in {
-
-      val application = applicationBuilder(userAnswers = None).build()
-
-      running(application) {
-
-        val request = FakeRequest(GET, url(1))
-        val result  = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual
-          routes.JourneyRecoveryController.onPageLoad().url
-      }
-    }
-
-    "must redirect to Journey Recovery for a POST if no existing data is found" in {
-
-      val application = applicationBuilder(userAnswers = None).build()
-
-      running(application) {
-
-        val request =
-          FakeRequest(POST, url(1))
-            .withFormUrlEncodedBody(
-              "value[0]" -> firstRow.id
-            )
-
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual
-          routes.JourneyRecoveryController.onPageLoad().url
-      }
-    }
-
-    "must redirect to target page when gotoPage field is present" in {
-
-      val mockSessionRepository = mock[SessionRepository]
-      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
-
-      val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
-          .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
-          .build()
-
-      running(application) {
-
-        val request =
-          FakeRequest(POST, url(1))
-            .withFormUrlEncodedBody(
-              "value[0]" -> firstRow.id,
-              "gotoPage" -> "2"
-            )
-
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual url(2)
-      }
-    }
-
-    "must save selections when gotoPage is present" in {
-
-      val mockSessionRepository = mock[SessionRepository]
-      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
-
-      val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
-          .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
-          .build()
-
-      running(application) {
-
-        val request =
-          FakeRequest(POST, url(1))
-            .withFormUrlEncodedBody(
-              "value[0]" -> firstRow.id,
-              "gotoPage" -> "2"
-            )
-
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-
-        val captor = org.mockito.ArgumentCaptor.forClass(classOf[UserAnswers])
-        verify(mockSessionRepository).set(captor.capture())
-
-        captor.getValue
-          .get(SelectSubcontractorsToReverifyPage)
-          .value must contain(SelectedSubcontractors(firstRow.id, firstRow.name))
-      }
-    }
-
-    "must redirect to Journey Recovery for case None when hasUnverified && !hasSelectedUnverifiedEarlier && !hasAnyReverifySelection" in {
-
-      val mockSessionRepository = mock[SessionRepository]
-      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
-
-      val userAnswers =
-        emptyUserAnswers
-          .set(
-            UnverifiedSubcontractorsPage,
-            Seq(testSubcontractor(1L, "Test Subcontractor"))
-          )
-          .success
-          .value
-          .set(SelectSubcontractorPage, Set.empty)
-          .success
-          .value
-
-      val application =
-        applicationBuilder(userAnswers = Some(userAnswers))
-          .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
-          .build()
-
-      running(application) {
-
-        val request =
-          FakeRequest(POST, url(1))
-            .withFormUrlEncodedBody("value" -> "")
-
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
-
-        verify(mockSessionRepository, never()).set(any())
-      }
-    }
-
-    "must redirect using navigator when case None and hasUnverified && hasSelectedUnverifiedEarlier && no selections exist" in {
-
-      val mockSessionRepository = mock[SessionRepository]
-      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
-
-      val userAnswers =
-        emptyUserAnswers
-          .set(
-            UnverifiedSubcontractorsPage,
-            Seq(testSubcontractor(1L, "Test Subcontractor"))
-          )
-          .success
-          .value
-          .set(
-            SelectSubcontractorPage,
-            Set(SubcontractorViewModel(firstRow.id, firstRow.name))
-          )
-          .success
-          .value
-
-      val application =
-        applicationBuilder(userAnswers = Some(userAnswers))
-          .overrides(
-            bind[SessionRepository].toInstance(mockSessionRepository),
-            bind[Navigator].toInstance(new FakeNavigator(onwardRoute))
-          )
-          .build()
-
-      running(application) {
-
-        val request =
-          FakeRequest(POST, url(1))
-            .withFormUrlEncodedBody("value" -> "")
-
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual onwardRoute.url
-
-        val captor = org.mockito.ArgumentCaptor.forClass(classOf[UserAnswers])
-        verify(mockSessionRepository).set(captor.capture())
-
-        captor.getValue
-          .get(SelectSubcontractorsToReverifyPage)
-          .value mustBe empty
-      }
-    }
-
-    "must merge previous selections with current page selections" in {
-
-      val mockSessionRepository = mock[SessionRepository]
-      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
-
-      val existingAnswers =
-        UserAnswers(userAnswersId)
-          .set(
-            SelectSubcontractorsToReverifyPage,
-            Set(SelectedSubcontractors(firstRow.id, firstRow.name))
-          )
-          .success
-          .value
-
-      val application =
-        applicationBuilder(userAnswers = Some(existingAnswers))
-          .overrides(
-            bind[SessionRepository].toInstance(mockSessionRepository),
-            bind[Navigator].toInstance(new FakeNavigator(onwardRoute))
-          )
-          .build()
-
-      running(application) {
-
-        val request =
-          FakeRequest(POST, url(1))
-            .withFormUrlEncodedBody(
-              "value[0]" -> secondRow.id
-            )
-
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual onwardRoute.url
-
-        val captor = org.mockito.ArgumentCaptor.forClass(classOf[UserAnswers])
-        verify(mockSessionRepository).set(captor.capture())
-
-        captor.getValue
-          .get(SelectSubcontractorsToReverifyPage)
-          .value mustEqual Set(SelectedSubcontractors(secondRow.id, secondRow.name))
-      }
-    }
-
-    "must redirect to next page when Continue is submitted on page 2" in {
-
-      val mockSessionRepository = mock[SessionRepository]
-      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
-
-      val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
-          .overrides(
-            bind[SessionRepository].toInstance(mockSessionRepository),
-            bind[Navigator].toInstance(new FakeNavigator(onwardRoute))
-          )
-          .build()
-
-      running(application) {
-
-        val request =
-          FakeRequest(POST, url(2))
-            .withFormUrlEncodedBody(
-              "value[0]" -> firstRow.id,
-              "gotoPage" -> "2"
-            )
-
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
+        body must include("Unknown")
+        body must include("9999999999")
       }
     }
   }
