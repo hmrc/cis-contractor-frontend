@@ -28,7 +28,7 @@ object ContractorEmailConfirmationNotStoredSummary {
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
     answers.get(ContractorEmailConfirmationNotStoredPage).map { answer =>
 
-      val value = if (answer) "site.yes" else "site.no"
+      val value = if (answer) "site.yes" else "verify.contractorEmailConfirmationStored.doNotSend"
 
       SummaryListRowViewModel(
         key = "verify.contractorEmailConfirmationNotStored.checkYourAnswersLabel",

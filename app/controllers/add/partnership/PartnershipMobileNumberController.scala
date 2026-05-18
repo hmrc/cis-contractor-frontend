@@ -17,10 +17,12 @@
 package controllers.add.partnership
 
 import controllers.actions.*
+import controllers.helpers.ContactGuard
 import forms.add.partnership.PartnershipMobileNumberFormProvider
 import models.Mode
+import models.contact.ContactOptions.Mobile
 import navigation.Navigator
-import pages.add.partnership.{PartnershipMobileNumberPage, PartnershipNamePage}
+import pages.add.partnership.{PartnershipChooseContactDetailsPage, PartnershipMobileNumberPage, PartnershipNamePage}
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -43,23 +45,25 @@ class PartnershipMobileNumberController @Inject() (
   view: PartnershipMobileNumberView
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
-    with I18nSupport {
+    with I18nSupport
+    with ContactGuard {
 
   val form: Form[String] = formProvider()
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
-    request.userAnswers
-      .get(PartnershipNamePage)
-      .map { partnershipName =>
-        val preparedForm = request.userAnswers.get(PartnershipMobileNumberPage) match {
-          case None        => form
-          case Some(value) => form.fill(value)
-        }
+  def onPageLoad(mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData) { implicit request =>
+      requireContactChoice(
+        request.userAnswers.get(PartnershipNamePage),
+        request.userAnswers.get(PartnershipChooseContactDetailsPage),
+        Mobile
+      ) { partnershipName =>
+
+        val preparedForm =
+          request.userAnswers.get(PartnershipMobileNumberPage).fold(form)(form.fill)
+
         Ok(view(preparedForm, mode, partnershipName))
       }
-      .getOrElse(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
-
-  }
+    }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>

@@ -75,7 +75,7 @@ class ContractorEmailConfirmationNotStoredSummarySpec extends AnyFreeSpec with M
       changeAction.visuallyHiddenText.value shouldBe expectedHiddenText
     }
 
-    "must return a SummaryListRow with 'No' when the answer is false" in {
+    "must return a SummaryListRow with 'Do not send an email confirmation' when the answer is false" in {
 
       val answers = UserAnswers("test-id")
         .set(ContractorEmailConfirmationNotStoredPage, false)
@@ -89,7 +89,7 @@ class ContractorEmailConfirmationNotStoredSummarySpec extends AnyFreeSpec with M
 
       val row = maybeRow.value
       row.value.content.asHtml.toString should include(
-        messages("site.no")
+        messages("verify.contractorEmailConfirmationStored.doNotSend")
       )
     }
 
