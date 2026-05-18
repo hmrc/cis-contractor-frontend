@@ -21,6 +21,6 @@ import pages.QuestionPage
 import play.api.libs.json.JsPath
 
 case object SubcontractorReverifyRowsPage extends QuestionPage[Seq[SubcontractorReverifyRow]] with VerifyJourney {
-  override def path: JsPath = JsPath \ toString
+  override def path: JsPath     = JsPath \ toString
   override def toString: String = "subcontractorReverifyRows"
 }

@@ -18,7 +18,6 @@ package controllers.verify
 
 import base.SpecBase
 import controllers.routes
-import forms.verify.SelectSubcontractorsToReverifyFormProvider
 import models.{NormalMode, Subcontractor, UserAnswers}
 import models.response.GetNewestVerificationBatchResponse
 import models.verify.SelectedSubcontractors
