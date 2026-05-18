@@ -31,14 +31,15 @@ class ContractorDetailsUpdatedViewSpec extends SpecBase with Matchers {
   "ContractorDetailsUpdatedView" - {
 
     "must render the page with correct heading, paragraphs, and other contents" in new Setup {
-      val html: HtmlFormat.Appendable = view()
+      val contractorName: String = "Test Contractor"
+      val html: HtmlFormat.Appendable = view(contractorName)
       val doc: Document               = Jsoup.parse(html.body)
 
       doc.title must include(messages("contractorDetailsUpdated.title"))
 
       doc.select("h1").text must include(messages("contractorDetailsUpdated.heading"))
 
-      doc.select("p").text must include(messages("contractorDetailsUpdated.p1.details.prefix"))
+      doc.select("p").text must include(messages("contractorDetailsUpdated.p1.details.prefix", contractorName))
 
       doc.select("a").text must include(messages("contractorDetailsUpdated.p1.details.link"))
 
@@ -50,7 +51,8 @@ class ContractorDetailsUpdatedViewSpec extends SpecBase with Matchers {
     }
 
     "must not show back link or sign out link" in new Setup {
-      val html: HtmlFormat.Appendable = view()
+      val contractorName: String = "Test Contractor"
+      val html: HtmlFormat.Appendable = view(contractorName)
       val doc: Document               = Jsoup.parse(html.body)
 
       doc.getElementsByClass("govuk-back-link").size mustBe 0

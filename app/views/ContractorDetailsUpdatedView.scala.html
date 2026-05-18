@@ -24,7 +24,7 @@
     link: Link
 )
 
-@()(implicit request: Request[_], messages: Messages)
+@(contractorName: String)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = titleNoForm(messages("contractorDetailsUpdated.title")), showBackLink = false, showSignOut = false) {
 
@@ -38,7 +38,7 @@
         linkTextKey = "contractorDetailsUpdated.p1.details.link",
         linkUrl = "#",
         hasFullStop = true,
-        prefixTextKey = "contractorDetailsUpdated.p1.details.prefix"
+        prefixTextKey = messages("contractorDetailsUpdated.p1.details.prefix", contractorName)
     )
 
     @link(

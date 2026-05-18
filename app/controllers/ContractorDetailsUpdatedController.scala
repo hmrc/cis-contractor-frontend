@@ -34,14 +34,8 @@ class ContractorDetailsUpdatedController @Inject() (
     with I18nSupport {
 
   def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
-//      request.userAnswers.get(SelectedSubcontractorPage(index)) match {
-//        case None =>
-//          Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-//
-//        case Some(subcontractor) =>
-//          Ok(view(form, mode, subcontractor.name, index))
-//      }
+    val contractorName: String = "Test Contractor"
 
-    Ok(view())
+    Ok(view(contractorName))
   }
 }
