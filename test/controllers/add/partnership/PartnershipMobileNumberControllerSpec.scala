@@ -19,16 +19,18 @@ package controllers.add.partnership
 import base.SpecBase
 import controllers.routes
 import forms.add.partnership.PartnershipMobileNumberFormProvider
+import models.contact.ContactOptions.{Email, Mobile}
 import models.{NormalMode, UserAnswers}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.add.partnership.{PartnershipMobileNumberPage, PartnershipNamePage}
+import pages.add.partnership.{PartnershipChooseContactDetailsPage, PartnershipMobileNumberPage, PartnershipNamePage}
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import repositories.SessionRepository
 import views.html.add.partnership.PartnershipMobileNumberView
+
 import scala.concurrent.Future
 
 class PartnershipMobileNumberControllerSpec extends SpecBase with MockitoSugar {
@@ -42,13 +44,34 @@ class PartnershipMobileNumberControllerSpec extends SpecBase with MockitoSugar {
     controllers.add.partnership.routes.PartnershipMobileNumberController.onPageLoad(NormalMode).url
 
   private def uaWithName: UserAnswers =
-    emptyUserAnswers.set(PartnershipNamePage, partnershipName).success.value
+    emptyUserAnswers
+      .set(PartnershipNamePage, partnershipName)
+      .success
+      .value
 
-  "PartnershipMobileNumber Controller" - {
+  private def uaWithNameAndMobileChoice: UserAnswers =
+    buildAnswersWithContactChoice(
+      emptyUserAnswers,
+      PartnershipNamePage,
+      partnershipName,
+      PartnershipChooseContactDetailsPage,
+      Mobile
+    )
 
-    "must return OK and the correct view for a GET" in {
+  private def uaWithNameAndEmailChoice: UserAnswers =
+    buildAnswersWithContactChoice(
+      emptyUserAnswers,
+      PartnershipNamePage,
+      partnershipName,
+      PartnershipChooseContactDetailsPage,
+      Email
+    )
 
-      val application = applicationBuilder(userAnswers = Some(uaWithName)).build()
+  "PartnershipMobileNumberController" - {
+
+    "must return OK and the correct view for a GET when Mobile is selected" in {
+
+      val application = applicationBuilder(userAnswers = Some(uaWithNameAndMobileChoice)).build()
 
       running(application) {
         val request = FakeRequest(GET, partnershipMobileNumberRoute)
@@ -65,9 +88,13 @@ class PartnershipMobileNumberControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must populate the view correctly on a GET when the question has previously been answered" in {
+    "must populate the view correctly on a GET when previously answered" in {
 
-      val userAnswers = uaWithName.set(PartnershipMobileNumberPage, "6789432190").success.value
+      val userAnswers =
+        uaWithNameAndMobileChoice
+          .set(PartnershipMobileNumberPage, "6789432190")
+          .success
+          .value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
@@ -83,6 +110,34 @@ class PartnershipMobileNumberControllerSpec extends SpecBase with MockitoSugar {
           request,
           messages(application)
         ).toString
+      }
+    }
+
+    "must redirect to Journey Recovery for a GET when wrong contact option is selected" in {
+
+      val application = applicationBuilder(userAnswers = Some(uaWithNameAndEmailChoice)).build()
+
+      running(application) {
+        val request = FakeRequest(GET, partnershipMobileNumberRoute)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must redirect to Journey Recovery when contact choice is missing" in {
+
+      val application = applicationBuilder(userAnswers = Some(uaWithName)).build()
+
+      running(application) {
+        val request = FakeRequest(GET, partnershipMobileNumberRoute)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
       }
     }
 
@@ -113,7 +168,7 @@ class PartnershipMobileNumberControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must return a Bad Request and errors when invalid data is submitted (name present)" in {
+    "must return a Bad Request and errors when invalid data is submitted" in {
 
       val application = applicationBuilder(userAnswers = Some(uaWithName)).build()
 
@@ -166,10 +221,9 @@ class PartnershipMobileNumberControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must redirect to Journey Recovery for a GET when partnership name is missing (userAnswers present)" in {
+    "must redirect to Journey Recovery when partnership name is missing" in {
 
-      val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
       running(application) {
         val request = FakeRequest(GET, partnershipMobileNumberRoute)

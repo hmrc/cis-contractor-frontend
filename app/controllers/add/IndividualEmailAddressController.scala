@@ -17,11 +17,13 @@
 package controllers.add
 
 import controllers.actions.*
+import controllers.helpers.ContactGuard
 import forms.add.IndividualEmailAddressFormProvider
 import models.Mode
+import models.contact.ContactOptions.Email
 import navigation.Navigator
 import models.requests.DataRequest
-import pages.add.IndividualEmailAddressPage
+import pages.add.{IndividualChooseContactDetailsPage, IndividualEmailAddressPage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
@@ -45,7 +47,8 @@ class IndividualEmailAddressController @Inject() (
   view: IndividualEmailAddressView
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
-    with I18nSupport {
+    with I18nSupport
+    with ContactGuard {
 
   private val form = formProvider()
 
@@ -55,13 +58,16 @@ class IndividualEmailAddressController @Inject() (
   private def preparedForm(implicit request: DataRequest[?]) =
     request.userAnswers.get(IndividualEmailAddressPage).fold(form)(form.fill)
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
-    subcontractorNameExtractor
-      .getSubcontractorName(request.userAnswers)
-      .fold(recoveryRedirect) { subcontractorName =>
+  def onPageLoad(mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData) { implicit request =>
+      requireContactChoice(
+        subcontractorNameExtractor.getSubcontractorName(request.userAnswers),
+        request.userAnswers.get(IndividualChooseContactDetailsPage),
+        Email
+      ) { subcontractorName =>
         Ok(view(preparedForm, mode, subcontractorName))
       }
-  }
+    }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>

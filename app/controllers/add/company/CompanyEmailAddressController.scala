@@ -17,10 +17,13 @@
 package controllers.add.company
 
 import controllers.actions.*
+import controllers.helpers.ContactGuard
 import forms.add.company.CompanyEmailAddressFormProvider
 import models.Mode
+import models.contact.ContactOptions.Email
 import navigation.Navigator
-import pages.add.company.{CompanyEmailAddressPage, CompanyNamePage}
+import pages.add.company.{CompanyContactOptionsPage, CompanyEmailAddressPage, CompanyNamePage}
+import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
@@ -42,23 +45,24 @@ class CompanyEmailAddressController @Inject() (
   view: CompanyEmailAddressView
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
-    with I18nSupport {
+    with I18nSupport
+    with ContactGuard {
 
-  val form = formProvider()
+  val form: Form[String] = formProvider()
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
-    request.userAnswers
-      .get(CompanyNamePage)
-      .map { companyName =>
-        val preparedForm = request.userAnswers.get(CompanyEmailAddressPage) match {
-          case None        => form
-          case Some(value) => form.fill(value)
-        }
+  def onPageLoad(mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData) { implicit request =>
+      requireContactChoice(
+        request.userAnswers.get(CompanyNamePage),
+        request.userAnswers.get(CompanyContactOptionsPage),
+        Email
+      ) { companyName =>
+        val preparedForm =
+          request.userAnswers.get(CompanyEmailAddressPage).fold(form)(form.fill)
 
         Ok(view(preparedForm, mode, companyName))
       }
-      .getOrElse(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
-  }
+    }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
