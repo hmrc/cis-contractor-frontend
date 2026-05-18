@@ -14,32 +14,30 @@
  * limitations under the License.
  */
 
-package viewmodels.checkAnswers.verify
+package viewmodels.checkAnswers.contractordetails
 
-import controllers.verify.routes
 import models.{CheckMode, UserAnswers}
-import pages.verify.ReverifyExistingSubcontractorsYesNoPage
+import pages.contractordetails.SchemeNamePage
 import play.api.i18n.Messages
+import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
 
-object ReverifyExistingSubcontractorsYesNoSummary {
+object SchemeNameSummary {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(ReverifyExistingSubcontractorsYesNoPage).map { answer =>
-      val value = if (answer) "site.yes" else "site.no"
-
+    answers.get(SchemeNamePage).map { answer =>
       SummaryListRowViewModel(
-        key = "verify.reverifyExistingSubcontractorsYesNo.checkYourAnswersLabel",
-        value = ValueViewModel(value),
+        key = "contractordetails.schemeName.checkYourAnswersLabel",
+        value = ValueViewModel(HtmlFormat.escape(answer).toString),
         actions = Seq(
           ActionItemViewModel(
             "site.change",
-            routes.ReverifyExistingSubcontractorsYesNoController.onPageLoad(CheckMode).url
+            controllers.contractordetails.routes.SchemeNameController.onPageLoad(CheckMode).url
           )
-            .withVisuallyHiddenText(messages("verify.reverifyExistingSubcontractorsYesNo.change.hidden"))
-            .withAttribute("id" -> "reverify-existing-subcontractors-yes-no")
+            .withVisuallyHiddenText(messages("contractordetails.schemeName.change.hidden"))
+            .withAttribute("id" -> "scheme-name")
         )
       )
     }
