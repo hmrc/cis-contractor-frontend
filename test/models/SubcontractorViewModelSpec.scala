@@ -198,6 +198,39 @@ class SubcontractorViewModelSpec extends SpecBase {
       errors.head  should include("subcontractor id 20")
     }
 
+    "drop a Individualorsoletrader row whose firstName and surname is blank" in {
+      val subcontractors = List(
+        subcontractor(
+          subcontractorId = 10L,
+          firstName = Some("   "),
+          surname = Some("   "),
+          subcontractorType = Some("soletrader")
+        )
+      )
+
+      val (errors, viewModels) = SubcontractorViewModel.fromSubcontractors(subcontractors)
+
+      viewModels shouldBe empty
+      errors       should have size 1
+      errors.head  should include("Missing name")
+    }
+
+    "drop a Individualorsoletrader row whose tradingName is blank" in {
+      val subcontractors = List(
+        subcontractor(
+          subcontractorId = 10L,
+          tradingName = Some("   "),
+          subcontractorType = Some("soletrader")
+        )
+      )
+
+      val (errors, viewModels) = SubcontractorViewModel.fromSubcontractors(subcontractors)
+
+      viewModels shouldBe empty
+      errors       should have size 1
+      errors.head  should include("Missing name")
+    }
+
     "drop a Limitedcompany row whose tradingName is blank" in {
       val subcontractors = List(
         subcontractor(
@@ -213,5 +246,38 @@ class SubcontractorViewModelSpec extends SpecBase {
       errors       should have size 1
       errors.head  should include("Missing tradingName")
     }
+
+    "drop a Partnership row whose partnershipTradingName is blank" in {
+      val subcontractors = List(
+        subcontractor(
+          subcontractorId = 10L,
+          partnershipTradingName = Some("   "),
+          subcontractorType = Some("partnership")
+        )
+      )
+
+      val (errors, viewModels) = SubcontractorViewModel.fromSubcontractors(subcontractors)
+
+      viewModels shouldBe empty
+      errors       should have size 1
+      errors.head  should include("Missing partnershipTradingName")
+    }
+
+    "drop a Trust row whose tradingName is blank" in {
+      val subcontractors = List(
+        subcontractor(
+          subcontractorId = 10L,
+          tradingName = Some("   "),
+          subcontractorType = Some("trust")
+        )
+      )
+
+      val (errors, viewModels) = SubcontractorViewModel.fromSubcontractors(subcontractors)
+
+      viewModels shouldBe empty
+      errors       should have size 1
+      errors.head  should include("Missing tradingName")
+    }
+
   }
 }

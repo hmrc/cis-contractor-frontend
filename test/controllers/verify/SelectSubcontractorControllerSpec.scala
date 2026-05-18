@@ -532,6 +532,37 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
+    "must redirect to Journey Recovery for a POST when every unverified subcontractor has a missing or unknown type" in {
+
+      val invalidSubcontractors: Seq[Subcontractor] = generateSubcontractors(3).map(_.copy(subcontractorType = None))
+
+      def uaWithNoUnverifiedSubcontractor: UserAnswers =
+        emptyUserAnswers
+          .set(UnverifiedSubcontractorsPage, invalidSubcontractors)
+          .success
+          .value
+
+      val mockSessionRepository = mock[SessionRepository]
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+      val application =
+        applicationBuilder(userAnswers = Some(uaWithNoUnverifiedSubcontractor))
+          .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, url(1))
+            .withFormUrlEncodedBody("value[0]" -> allSubs.head.id)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual
+          controllers.routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
     "must redirect to target page and save selections when gotoPage field is present" in {
 
       val mockSessionRepository = mock[SessionRepository]
