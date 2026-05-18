@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package views
+package views.contractordetails
 
 import base.SpecBase
 import org.jsoup.Jsoup
@@ -24,7 +24,7 @@ import play.api.Application
 import play.api.i18n.Messages
 import play.api.test.FakeRequest
 import play.twirl.api.HtmlFormat
-import views.html.ContractorDetailsUpdatedView
+import views.html.contractordetails.ContractorDetailsUpdatedView
 
 class ContractorDetailsUpdatedViewSpec extends SpecBase with Matchers {
 
@@ -35,19 +35,19 @@ class ContractorDetailsUpdatedViewSpec extends SpecBase with Matchers {
       val html: HtmlFormat.Appendable = view(contractorName)
       val doc: Document               = Jsoup.parse(html.body)
 
-      doc.title must include(messages("contractorDetailsUpdated.title"))
+      doc.title must include(messages("contractorDetails.contractorDetailsUpdated.title"))
 
-      doc.select("h1").text must include(messages("contractorDetailsUpdated.heading"))
+      doc.select("h1").text must include(messages("contractorDetails.contractorDetailsUpdated.heading"))
 
-      doc.select("p").text must include(messages("contractorDetailsUpdated.p1.details.prefix", contractorName))
+      doc.select("p").text must include(messages("contractorDetails.contractorDetailsUpdated.p1.details.prefix", contractorName))
 
-      doc.select("a").text must include(messages("contractorDetailsUpdated.p1.details.link"))
+      doc.select("a").text must include(messages("contractorDetails.contractorDetailsUpdated.p1.details.link"))
 
-      doc.select("a").text must include(messages("contractorDetailsUpdated.returnToDashboard.link"))
+      doc.select("a").text must include(messages("contractorDetails.contractorDetailsUpdated.returnToDashboard.link"))
 
-      doc.select("a").text must include(messages("contractorDetailsUpdated.p2.whatDidYouThink.link"))
+      doc.select("a").text must include(messages("contractorDetails.contractorDetailsUpdated.p2.whatDidYouThink.link"))
 
-      doc.select("p").text must include(messages("contractorDetailsUpdated.p2.whatDidYouThink.suffix"))
+      doc.select("p").text must include(messages("contractorDetails.contractorDetailsUpdated.p2.whatDidYouThink.suffix"))
     }
 
     "must not show back link or sign out link" in new Setup {

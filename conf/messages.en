@@ -297,13 +297,13 @@ individualChooseContactDetails.error.required                            =  Sele
 individualChooseContactDetails.checkYourAnswersLabel                     =  Method of contact
 individualChooseContactDetails.change.hidden                             =  method of contact
 
-contractorDetailsUpdated.title                                           =  Contractor Details Updated
-contractorDetailsUpdated.heading                                         =  Contractor Details Updated
-contractorDetailsUpdated.p1.details.prefix                               =  You have successfully changed the contractor details for {0}. You can
-contractorDetailsUpdated.p1.details.link                                 =  view the change on your contractor details
-contractorDetailsUpdated.returnToDashboard.link                          =  Return to CIS dashboard
-contractorDetailsUpdated.p2.whatDidYouThink.link                         =  What did you think of this service?
-contractorDetailsUpdated.p2.whatDidYouThink.suffix                       =  (takes 30 seconds)
+contractorDetails.contractorDetailsUpdated.title                                           =  Contractor Details Updated
+contractorDetails.contractorDetailsUpdated.heading                                         =  Contractor Details Updated
+contractorDetails.contractorDetailsUpdated.p1.details.prefix                               =  You have successfully changed the contractor details for {0}. You can
+contractorDetails.contractorDetailsUpdated.p1.details.link                                 =  view the change on your contractor details
+contractorDetails.contractorDetailsUpdated.returnToDashboard.link                          =  Return to CIS dashboard
+contractorDetails.contractorDetailsUpdated.p2.whatDidYouThink.link                         =  What did you think of this service?
+contractorDetails.contractorDetailsUpdated.p2.whatDidYouThink.suffix                       =  (takes 30 seconds)
 
 # Partnership
 partnershipWorksReferenceNumberYesNo.title                           =  Does this partnership have a works reference number?

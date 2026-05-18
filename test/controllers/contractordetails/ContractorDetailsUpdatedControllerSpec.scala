@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package controllers
+package controllers.contractordetails
 
 import base.SpecBase
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import views.html.ContractorDetailsUpdatedView
+import views.html.contractordetails.ContractorDetailsUpdatedView
 
 class ContractorDetailsUpdatedControllerSpec extends SpecBase {
 

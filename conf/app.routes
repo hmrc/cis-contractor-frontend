@@ -413,4 +413,4 @@ POST  /verify/verification-batch-create  controllers.verify.CreateVerificationBa
 GET   /verify/check-your-answers  controllers.verify.VerifyCheckYourAnswersController.onPageLoad()
 POST  /verify/check-your-answers  controllers.verify.VerifyCheckYourAnswersController.onSubmit()
 
-GET   /contractor-details/contractor-details-updated                       controllers.ContractorDetailsUpdatedController.onPageLoad()
+GET   /contractor-details/contractor-details-updated                       controllers.contractordetails.ContractorDetailsUpdatedController.onPageLoad()
