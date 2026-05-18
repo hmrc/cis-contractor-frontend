@@ -39,7 +39,9 @@ class ContractorDetailsUpdatedViewSpec extends SpecBase with Matchers {
 
       doc.select("h1").text must include(messages("contractorDetails.contractorDetailsUpdated.heading"))
 
-      doc.select("p").text must include(messages("contractorDetails.contractorDetailsUpdated.p1.details.prefix", contractorName))
+      doc.select("p").text must include(
+        messages("contractorDetails.contractorDetailsUpdated.p1.details.prefix", contractorName)
+      )
 
       doc.select("a").text must include(messages("contractorDetails.contractorDetailsUpdated.p1.details.link"))
 
@@ -47,7 +49,9 @@ class ContractorDetailsUpdatedViewSpec extends SpecBase with Matchers {
 
       doc.select("a").text must include(messages("contractorDetails.contractorDetailsUpdated.p2.whatDidYouThink.link"))
 
-      doc.select("p").text must include(messages("contractorDetails.contractorDetailsUpdated.p2.whatDidYouThink.suffix"))
+      doc.select("p").text must include(
+        messages("contractorDetails.contractorDetailsUpdated.p2.whatDidYouThink.suffix")
+      )
     }
 
     "must not show back link or sign out link" in new Setup {
