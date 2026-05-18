@@ -36,12 +36,15 @@ import base.SpecBase
 import controllers.routes
 import forms.verify.ContractorEmailConfirmationNotStoredFormProvider
 import models.NormalMode
+import models.UserAnswers
+import models.verify.ContractorEmailConfirmationStored
 import models.response.GetNewestVerificationBatchResponse
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
+import org.mockito.ArgumentCaptor
 import org.mockito.Mockito.{never, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
-import pages.verify.{ContractorEmailConfirmationNotStoredPage, NewestVerificationBatchResponsePage}
+import pages.verify.{ContractorEmailConfirmationNotStoredPage, ContractorEmailConfirmationStoredPage, NewestVerificationBatchResponsePage}
 import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
@@ -205,6 +208,44 @@ class ContractorEmailConfirmationNotStoredControllerSpec extends SpecBase with M
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual onwardRoute.url
+      }
+    }
+
+    "must remove ContractorEmailConfirmationStoredPage from user answers when submitting (no stored email, stored already set)" in {
+
+      val ua =
+        emptyUserAnswers
+          .set(NewestVerificationBatchResponsePage, newestResponse(None))
+          .success
+          .value
+          .set(ContractorEmailConfirmationStoredPage, ContractorEmailConfirmationStored.CurrentEmail)
+          .success
+          .value
+
+      val mockSessionRepository               = mock[SessionRepository]
+      val captor: ArgumentCaptor[UserAnswers] = ArgumentCaptor.forClass(classOf[UserAnswers])
+      when(mockSessionRepository.set(captor.capture())) thenReturn Future.successful(true)
+
+      val application =
+        applicationBuilder(userAnswers = Some(ua))
+          .overrides(
+            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
+            bind[SessionRepository].toInstance(mockSessionRepository)
+          )
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, routeUrl)
+            .withFormUrlEncodedBody(("value", "true"))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual onwardRoute.url
+
+        val savedAnswers = captor.getValue
+        savedAnswers.get(ContractorEmailConfirmationStoredPage) mustEqual None
       }
     }
 
