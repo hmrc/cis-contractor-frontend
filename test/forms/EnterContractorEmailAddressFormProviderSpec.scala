@@ -16,7 +16,6 @@
 
 package forms
 
-import forms.Validation
 import forms.behaviours.StringFieldBehaviours
 import forms.contractordetails.EnterContractorEmailAddressFormProvider
 import org.scalacheck.Gen
