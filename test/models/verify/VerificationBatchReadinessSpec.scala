@@ -172,6 +172,18 @@ class VerificationBatchReadinessSpec extends SpecBase {
       VerificationBatchReadiness.isSubcontractorReady(s) mustBe false
     }
 
+    // ─── Blank / whitespace fields ────────────────────────────────────────────
+
+    "fails when a required field is present but blank" in {
+      val s = sub(1, Some("company"), utr = Some("1234567890"), tradingName = Some(""))
+      VerificationBatchReadiness.isSubcontractorReady(s) mustBe false
+    }
+
+    "fails when a required field is whitespace only" in {
+      val s = sub(1, Some("company"), utr = Some("   "), tradingName = Some("Acme Ltd"))
+      VerificationBatchReadiness.isSubcontractorReady(s) mustBe false
+    }
+
     // ─── Unknown type ────────────────────────────────────────────────────────
 
     "fails when subcontractorType is absent" in {

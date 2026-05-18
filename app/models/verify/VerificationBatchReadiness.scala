@@ -37,19 +37,26 @@ object VerificationBatchReadiness {
       case _                            => false
     }
 
+  private def nonBlank(opt: Option[String]): Boolean = opt.exists(_.trim.nonEmpty)
+
   private def isIndividualReady(sub: Subcontractor): Boolean = {
-    val hasName = sub.tradingName.isDefined || (sub.firstName.isDefined && sub.surname.isDefined)
-    hasName && sub.utr.isDefined
+    val hasName =
+      nonBlank(sub.tradingName) || (
+        nonBlank(sub.firstName) && nonBlank(sub.surname)
+      )
+
+    hasName && nonBlank(sub.utr)
   }
 
   private def isCompanyReady(sub: Subcontractor): Boolean =
-    sub.tradingName.isDefined && sub.utr.isDefined
+    nonBlank(sub.tradingName) && nonBlank(sub.utr)
 
   private def isTrustReady(sub: Subcontractor): Boolean =
-    sub.tradingName.isDefined && sub.utr.isDefined
+    nonBlank(sub.tradingName) && nonBlank(sub.utr)
 
   private def isPartnershipReady(sub: Subcontractor): Boolean = {
-    val hasPartnerIdentifier = sub.partnerUtr.isDefined || sub.nino.isDefined || sub.crn.isDefined
-    sub.utr.isDefined && sub.partnershipTradingName.isDefined && hasPartnerIdentifier
+    val hasPartnerIdentifier = nonBlank(sub.partnerUtr) || nonBlank(sub.nino) || nonBlank(sub.crn)
+
+    hasPartnerIdentifier && nonBlank(sub.utr) && nonBlank(sub.partnershipTradingName)
   }
 }

@@ -86,7 +86,8 @@ class VerifyNavigator @Inject() () extends NavigatorForJourney {
     val _ = ua
     mode match {
       case NormalMode => controllers.verify.routes.ReverifyExistingSubcontractorsYesNoController.onPageLoad(NormalMode)
-      case CheckMode  => controllers.verify.routes.CheckVerificationBatchReadinessController.onPageLoad(CheckMode)
+      case CheckMode  =>
+        controllers.verify.routes.CheckVerificationBatchReadinessController.checkVerificationBatchReadiness()
     }
   }
 
@@ -95,7 +96,7 @@ class VerifyNavigator @Inject() () extends NavigatorForJourney {
       case (Some(true), _)           =>
         controllers.verify.routes.SelectSubcontractorsToReverifyController.onPageLoad(mode)
       case (Some(false), NormalMode) =>
-        controllers.verify.routes.CheckVerificationBatchReadinessController.onPageLoad(NormalMode)
+        controllers.verify.routes.CheckVerificationBatchReadinessController.checkVerificationBatchReadiness()
       case (Some(false), CheckMode)  =>
         controllers.verify.routes.VerifyCheckYourAnswersController.onPageLoad()
       case _                         =>
@@ -105,7 +106,8 @@ class VerifyNavigator @Inject() () extends NavigatorForJourney {
   private def navigatorFromSelectSubcontractorsToReverifyPage(mode: Mode)(ua: UserAnswers): Call = {
     val _ = ua
     mode match {
-      case NormalMode => controllers.verify.routes.CheckVerificationBatchReadinessController.onPageLoad(NormalMode)
+      case NormalMode =>
+        controllers.verify.routes.CheckVerificationBatchReadinessController.checkVerificationBatchReadiness()
       case CheckMode  => controllers.verify.routes.VerifyCheckYourAnswersController.onPageLoad()
     }
   }

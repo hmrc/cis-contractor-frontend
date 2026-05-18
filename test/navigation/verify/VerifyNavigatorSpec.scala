@@ -81,7 +81,7 @@ class VerifyNavigatorSpec extends SpecBase {
         "must go to CheckVerificationBatchReadinessController when answer is false" in {
           val ua = emptyUserAnswers.setOrException(ReverifyExistingSubcontractorsYesNoPage, false)
           navigator.nextPage(ReverifyExistingSubcontractorsYesNoPage, NormalMode, ua) mustBe
-            controllers.verify.routes.CheckVerificationBatchReadinessController.onPageLoad(NormalMode)
+            controllers.verify.routes.CheckVerificationBatchReadinessController.checkVerificationBatchReadiness()
         }
 
         "must go to JourneyRecovery when answer is not present" in {
@@ -129,7 +129,7 @@ class VerifyNavigatorSpec extends SpecBase {
 
         "must go to CheckVerificationBatchReadinessController in NormalMode" in {
           navigator.nextPage(SelectSubcontractorsToReverifyPage, NormalMode, emptyUserAnswers) mustBe
-            controllers.verify.routes.CheckVerificationBatchReadinessController.onPageLoad(NormalMode)
+            controllers.verify.routes.CheckVerificationBatchReadinessController.checkVerificationBatchReadiness()
         }
       }
 
@@ -173,7 +173,7 @@ class VerifyNavigatorSpec extends SpecBase {
 
         "must go to CheckVerificationBatchReadinessController in CheckMode" in {
           navigator.nextPage(SelectSubcontractorPage, CheckMode, emptyUserAnswers) mustBe
-            controllers.verify.routes.CheckVerificationBatchReadinessController.onPageLoad(CheckMode)
+            controllers.verify.routes.CheckVerificationBatchReadinessController.checkVerificationBatchReadiness()
         }
       }
 

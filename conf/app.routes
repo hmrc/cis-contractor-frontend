@@ -362,8 +362,7 @@ GET   /verify/submitting-verification-request  controllers.verify.SubmissionSend
 
 GET   /verify/no-subcontractors-added  controllers.verify.NoSubcontractorsAddedController.onPageLoad()
 
-GET   /verify/check-verification-batch-readiness         controllers.verify.CheckVerificationBatchReadinessController.onPageLoad(mode: Mode = NormalMode)
-GET   /verify/change-check-verification-batch-readiness  controllers.verify.CheckVerificationBatchReadinessController.onPageLoad(mode: Mode = CheckMode)
+GET   /verify/check-verification-batch-readiness  controllers.verify.CheckVerificationBatchReadinessController.checkVerificationBatchReadiness(mode: Mode = NormalMode)
 
 GET   /verify/newest  controllers.verify.NewestVerificationBatchController.onPageLoad()
 
@@ -416,7 +415,8 @@ POST  /verify/verification-batch-create  controllers.verify.CreateVerificationBa
 GET   /verify/check-your-answers  controllers.verify.VerifyCheckYourAnswersController.onPageLoad()
 POST  /verify/check-your-answers  controllers.verify.VerifyCheckYourAnswersController.onSubmit()
 
-GET   /contractor-details/what-is-contractors-scheme-name                  controllers.contractordetails.SchemeNameController.onPageLoad(mode: Mode = NormalMode)
-POST  /contractor-details/what-is-contractors-scheme-name                  controllers.contractordetails.SchemeNameController.onSubmit(mode: Mode = NormalMode)
-GET   /contractor-details/change-what-is-contractors-scheme-name           controllers.contractordetails.SchemeNameController.onPageLoad(mode: Mode = CheckMode)
-POST  /contractor-details/change-what-is-contractors-scheme-name           controllers.contractordetails.SchemeNameController.onSubmit(mode: Mode = CheckMode)
+# Contractor Details
+GET   /contractor-details/what-is-contractors-scheme-name         controllers.contractordetails.SchemeNameController.onPageLoad(mode: Mode = NormalMode)
+POST  /contractor-details/what-is-contractors-scheme-name         controllers.contractordetails.SchemeNameController.onSubmit(mode: Mode = NormalMode)
+GET   /contractor-details/change-what-is-contractors-scheme-name  controllers.contractordetails.SchemeNameController.onPageLoad(mode: Mode = CheckMode)
+POST  /contractor-details/change-what-is-contractors-scheme-name  controllers.contractordetails.SchemeNameController.onSubmit(mode: Mode = CheckMode)

@@ -17,7 +17,7 @@
 package controllers.verify
 
 import controllers.actions.*
-import models.{CheckMode, Mode, NormalMode, UserAnswers}
+import models.{Mode, NormalMode, UserAnswers}
 import models.verify.VerificationBatchReadiness
 import pages.verify.{NewestVerificationBatchResponsePage, SelectSubcontractorPage, VerificationBatchReadinessPage}
 import play.api.Logging
@@ -41,7 +41,7 @@ class CheckVerificationBatchReadinessController @Inject() (
     with I18nSupport
     with Logging {
 
-  def onPageLoad(mode: Mode): Action[AnyContent] =
+  def checkVerificationBatchReadiness(mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
       val ua = request.userAnswers
 
@@ -58,7 +58,7 @@ class CheckVerificationBatchReadinessController @Inject() (
           } yield {
             val redirect = mode match {
               case NormalMode => nextEmailConfirmationPage(ua)
-              case CheckMode  => controllers.verify.routes.VerifyCheckYourAnswersController.onPageLoad()
+              case _          => controllers.verify.routes.VerifyCheckYourAnswersController.onPageLoad()
             }
             Redirect(redirect)
           }
@@ -68,7 +68,9 @@ class CheckVerificationBatchReadinessController @Inject() (
           Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
 
         case None =>
-          logger.error("[CheckVerificationBatchReadinessController.onPageLoad] Missing required session data")
+          logger.error(
+            "[CheckVerificationBatchReadinessController.checkVerificationBatchReadiness] Missing required session data"
+          )
           Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
       }
     }
@@ -79,7 +81,10 @@ class CheckVerificationBatchReadinessController @Inject() (
       .flatMap(_.scheme)
       .flatMap(_.emailAddress)
       .isDefined
-    if (hasStoredEmail) controllers.verify.routes.ContractorEmailConfirmationStoredController.onPageLoad(NormalMode)
-    else controllers.verify.routes.ContractorEmailConfirmationNotStoredController.onPageLoad(NormalMode)
+    if (hasStoredEmail) {
+      controllers.verify.routes.ContractorEmailConfirmationStoredController.onPageLoad(NormalMode)
+    } else {
+      controllers.verify.routes.ContractorEmailConfirmationNotStoredController.onPageLoad(NormalMode)
+    }
   }
 }

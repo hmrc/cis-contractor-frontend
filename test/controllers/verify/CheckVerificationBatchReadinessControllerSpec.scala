@@ -26,7 +26,6 @@ import play.api.test.Helpers.*
 class CheckVerificationBatchReadinessControllerSpec extends SpecBase {
 
   private val normalModeUrl = "/verify/check-verification-batch-readiness"
-  private val checkModeUrl  = "/verify/change-check-verification-batch-readiness"
 
   private def readyIndividual(id: Long): Subcontractor = Subcontractor(
     subcontractorId = id,
@@ -123,24 +122,6 @@ class CheckVerificationBatchReadinessControllerSpec extends SpecBase {
           status(result) mustEqual SEE_OTHER
           redirectLocation(result).value mustEqual
             controllers.verify.routes.ContractorEmailConfirmationNotStoredController.onPageLoad(NormalMode).url
-        }
-      }
-    }
-
-    "CheckMode — batch ready" - {
-
-      "must redirect to VerifyCheckYourAnswers" in {
-        val ua = emptyUserAnswers
-          .setOrException(SelectSubcontractorPage, Set(selectedSub))
-          .setOrException(NewestVerificationBatchResponsePage, batchResponse(Seq(readyIndividual(1))))
-
-        val application = applicationBuilder(userAnswers = Some(ua)).build()
-        running(application) {
-          val result = route(application, FakeRequest(GET, checkModeUrl)).value
-
-          status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual
-            controllers.verify.routes.VerifyCheckYourAnswersController.onPageLoad().url
         }
       }
     }

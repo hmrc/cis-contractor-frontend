@@ -115,6 +115,8 @@ lazy val messagesSections = Seq(
     primaryPrefixes = Seq("trust")),
   ColumnarSection("# Verify",
     primaryPrefixes = Seq("verify")),
+  ColumnarSection("# Contractor Details",
+    primaryPrefixes = Seq("contractordetails")),
 )
 
 lazy val appRoutesSections = Seq(
@@ -136,4 +138,7 @@ lazy val appRoutesSections = Seq(
   ColumnarSection("# Verify",
     primaryPrefixes   = Seq("/verify", "/verification"),
     secondaryPrefixes = Seq("controllers.verify.", "controllers.verification.")),
+  ColumnarSection("# Contractor Details",
+    primaryPrefixes   = Seq("/contractor-details"),
+    secondaryPrefixes = Seq("controllers.contractordetails.")),
 )
