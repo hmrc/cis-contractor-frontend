@@ -18,12 +18,15 @@ package controllers.verify
 
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
 import models.NormalMode
+import models.verify.VerificationBatchStatus
 import pages.verify.NewestVerificationBatchResponsePage
 import pages.verify.UnverifiedSubcontractorsPage
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.VerificationService
+import services.SubmissionStatusCheckResult
+import services.CheckLatestSubmissionStatusService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
 import javax.inject.Inject
@@ -75,6 +78,21 @@ class NewestVerificationBatchController @Inject() (
         }
     }
 
+  private def checkSubmissionStatus(
+    response: models.response.GetNewestVerificationBatchResponse
+  ): SubmissionStatusCheckResult = {
+    val status = response.verificationBatch.flatMap(_.status).flatMap { raw =>
+      val parsed = VerificationBatchStatus.from(raw)
+      if (parsed.isEmpty) {
+        logger.warn(
+          s"[NewestVerificationBatchController.onPageLoad] Unrecognised verification batch status: $raw"
+        )
+      }
+      parsed
+    }
+    CheckLatestSubmissionStatusService.check(status)
+  }
+
   private def routeFromResponse(
     response: models.response.GetNewestVerificationBatchResponse,
     unverified: Seq[models.Subcontractor]
@@ -86,14 +104,20 @@ class NewestVerificationBatchController @Inject() (
       case InactivityStatus.Inactive =>
         Redirect(controllers.verify.routes.InactiveSchemeWarningController.onPageLoad())
 
-      case InactivityStatus.Active if response.subcontractors.isEmpty =>
-        Redirect(controllers.verify.routes.NoSubcontractorsAddedController.onPageLoad())
-
-      case InactivityStatus.Active if unverified.isEmpty =>
-        Redirect(controllers.verify.routes.VerifyYourSubcontractorsYesNoController.onPageLoad)
-
       case InactivityStatus.Active =>
-        Redirect(controllers.verify.routes.SelectSubcontractorController.onPageLoad(NormalMode))
+        checkSubmissionStatus(response) match {
+          case SubmissionStatusCheckResult.ShowPendingVerificationWarning =>
+            Redirect(controllers.verify.routes.VerificationRequestInProgressController.onPageLoad())
+
+          case SubmissionStatusCheckResult.Continue if response.subcontractors.isEmpty =>
+            Redirect(controllers.verify.routes.NoSubcontractorsAddedController.onPageLoad())
+
+          case SubmissionStatusCheckResult.Continue if unverified.isEmpty =>
+            Redirect(controllers.verify.routes.VerifyYourSubcontractorsYesNoController.onPageLoad)
+
+          case SubmissionStatusCheckResult.Continue =>
+            Redirect(controllers.verify.routes.SelectSubcontractorController.onPageLoad(NormalMode))
+        }
     }
 
   def onPageLoad(): Action[AnyContent] =

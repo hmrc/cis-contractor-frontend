@@ -54,12 +54,19 @@ class NewestVerificationBatchControllerSpec extends SpecBase with MockitoSugar w
   private def newestBatchResponse(
     subcontractors: Seq[Subcontractor],
     submission: Option[Submission] = None,
-    monthlyReturn: Option[MonthlyReturn] = None
+    monthlyReturn: Option[MonthlyReturn] = None,
+    status: Option[String] = None
   ) =
     GetNewestVerificationBatchResponse(
       scheme = None,
       subcontractors = subcontractors,
-      verificationBatch = None,
+      verificationBatch = Some(
+        models.VerificationBatch(
+          verificationBatchId = 1L,
+          status = status,
+          verificationNumber = Some("VB123")
+        )
+      ),
       verifications = Seq.empty,
       submission = submission,
       monthlyReturn = monthlyReturn
@@ -94,7 +101,9 @@ class NewestVerificationBatchControllerSpec extends SpecBase with MockitoSugar w
 
       val application =
         applicationBuilder(userAnswers = Some(emptyUserAnswers))
-          .overrides(bind[VerificationService].toInstance(mockService))
+          .overrides(
+            bind[VerificationService].toInstance(mockService)
+          )
           .build()
 
       running(application) {
@@ -127,7 +136,9 @@ class NewestVerificationBatchControllerSpec extends SpecBase with MockitoSugar w
 
       val application =
         applicationBuilder(userAnswers = Some(emptyUserAnswers))
-          .overrides(bind[VerificationService].toInstance(mockService))
+          .overrides(
+            bind[VerificationService].toInstance(mockService)
+          )
           .build()
 
       running(application) {
@@ -169,13 +180,16 @@ class NewestVerificationBatchControllerSpec extends SpecBase with MockitoSugar w
 
       val application =
         applicationBuilder(userAnswers = Some(emptyUserAnswers))
-          .overrides(bind[VerificationService].toInstance(mockService))
+          .overrides(
+            bind[VerificationService].toInstance(mockService)
+          )
           .build()
 
       running(application) {
         val result = route(application, FakeRequest(GET, endpointUrl)).value
 
         status(result) mustBe SEE_OTHER
+
         redirectLocation(result).value mustBe
           controllers.verify.routes.SelectSubcontractorController
             .onPageLoad(NormalMode)
@@ -457,6 +471,85 @@ class NewestVerificationBatchControllerSpec extends SpecBase with MockitoSugar w
       }
     }
 
+    "must redirect to VerificationRequestInProgress when status is PENDING" in {
+      val mockService = mock[VerificationService]
+
+      val updatedAnswers =
+        emptyUserAnswers
+          .set(
+            NewestVerificationBatchResponsePage,
+            newestBatchResponse(
+              subcontractors = Seq(unverifiedSubcontractor),
+              submission = Some(activeSubmission),
+              monthlyReturn = Some(activeMonthlyReturn),
+              status = Some("PENDING")
+            )
+          )
+          .flatMap(_.set(UnverifiedSubcontractorsPage, Seq(unverifiedSubcontractor)))
+          .success
+          .value
+
+      when(mockService.refreshNewestVerificationBatch(any[UserAnswers])(any[HeaderCarrier]))
+        .thenReturn(Future.successful(updatedAnswers))
+
+      val application =
+        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          .overrides(
+            bind[VerificationService].toInstance(mockService)
+          )
+          .build()
+
+      running(application) {
+        val result = route(application, FakeRequest(GET, endpointUrl)).value
+
+        status(result) mustBe SEE_OTHER
+
+        redirectLocation(result).value mustBe
+          controllers.verify.routes.VerificationRequestInProgressController
+            .onPageLoad()
+            .url
+
+        verify(mockService).refreshNewestVerificationBatch(any[UserAnswers])(any[HeaderCarrier])
+        verifyNoMoreInteractions(mockService)
+      }
+    }
+
+    "must treat an unrecognised status as Continue (redirects based on subcontractors)" in {
+      val mockService = mock[VerificationService]
+
+      val updatedAnswers =
+        emptyUserAnswers
+          .set(
+            NewestVerificationBatchResponsePage,
+            newestBatchResponse(
+              Seq.empty,
+              submission = Some(activeSubmission),
+              monthlyReturn = Some(activeMonthlyReturn),
+              status = Some("WAT")
+            )
+          )
+          .success
+          .value
+
+      when(mockService.refreshNewestVerificationBatch(any[UserAnswers])(any[HeaderCarrier]))
+        .thenReturn(Future.successful(updatedAnswers))
+
+      val application =
+        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          .overrides(
+            bind[VerificationService].toInstance(mockService)
+          )
+          .build()
+
+      running(application) {
+        val result = route(application, FakeRequest(GET, endpointUrl)).value
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result).value mustBe
+          controllers.verify.routes.NoSubcontractorsAddedController.onPageLoad().url
+      }
+    }
+
     "must redirect to JourneyRecovery when NewestVerificationBatchResponsePage is missing" in {
       val mockService = mock[VerificationService]
 
@@ -465,7 +558,9 @@ class NewestVerificationBatchControllerSpec extends SpecBase with MockitoSugar w
 
       val application =
         applicationBuilder(userAnswers = Some(emptyUserAnswers))
-          .overrides(bind[VerificationService].toInstance(mockService))
+          .overrides(
+            bind[VerificationService].toInstance(mockService)
+          )
           .build()
 
       running(application) {
@@ -488,7 +583,9 @@ class NewestVerificationBatchControllerSpec extends SpecBase with MockitoSugar w
 
       val application =
         applicationBuilder(userAnswers = Some(emptyUserAnswers))
-          .overrides(bind[VerificationService].toInstance(mockService))
+          .overrides(
+            bind[VerificationService].toInstance(mockService)
+          )
           .build()
 
       running(application) {
@@ -508,7 +605,9 @@ class NewestVerificationBatchControllerSpec extends SpecBase with MockitoSugar w
 
       val application =
         applicationBuilder(userAnswers = None)
-          .overrides(bind[VerificationService].toInstance(mockService))
+          .overrides(
+            bind[VerificationService].toInstance(mockService)
+          )
           .build()
 
       running(application) {
