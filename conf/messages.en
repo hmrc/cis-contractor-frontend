@@ -944,6 +944,14 @@ verify.verifyCheckYourAnswers.heading                                   =  Check
 verify.verifyCheckYourAnswers.subHeading                                =  Subcontractors to verify
 verify.verifyCheckYourAnswers.confirm                                   =  Confirm and submit
 
+contractordetails.schemeName.title                                      = What is the contractor’s scheme name?
+contractordetails.schemeName.heading                                    = What is the contractor’s scheme name?
+contractordetails.schemeName.checkYourAnswersLabel                      = Scheme name
+contractordetails.schemeName.error.required                             = Enter a scheme name
+contractordetails.schemeName.error.length                               = The scheme name you entered contains too many characters
+contractordetails.schemeName.error.invalidCharacters                    = You have entered a scheme name in an incorrect format
+contractordetails.schemeName.change.hidden                              = scheme Name
+
 contractorDetails.contractorDetails.title                               = Contractor details
 contractorDetails.contractorDetails.heading                             = Contractor details
 contractorDetails.contractorDetails.accountsOfficeReference             = Accounts office reference: {0}
