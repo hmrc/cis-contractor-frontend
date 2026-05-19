@@ -171,7 +171,7 @@ class CreateVerificationBatchAndVerificationsControllerSpec extends SpecBase wit
 
         status(result) mustBe SEE_OTHER
         redirectLocation(result).value mustBe
-          controllers.verify.routes.ModifyVerificationBatchAndVerificationsController.onSubmit().url
+          controllers.verify.routes.ModifyVerificationBatchAndVerificationsController.modifyVerificationBatch().url
 
         verify(mockService, never())
           .createVerificationBatchAndVerifications(any[UserAnswers], any[Seq[Long]], any())(any())

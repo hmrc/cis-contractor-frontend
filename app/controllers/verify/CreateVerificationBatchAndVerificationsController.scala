@@ -85,7 +85,9 @@ class CreateVerificationBatchAndVerificationsController @Inject() (
 
             case Some(_) if hasCurrentBatch(request.userAnswers) =>
               Future.successful(
-                Redirect(controllers.verify.routes.ModifyVerificationBatchAndVerificationsController.onSubmit())
+                Redirect(
+                  controllers.verify.routes.ModifyVerificationBatchAndVerificationsController.modifyVerificationBatch()
+                )
               )
 
             case Some(_) =>

@@ -18,12 +18,12 @@ package controllers.verify
 
 import base.SpecBase
 import controllers.routes
-import models._
+import models.*
 import models.requests.{CreateVerifications, DeleteVerifications, ModifyVerificationsRequest}
 import models.response.GetCurrentVerificationBatchResponse
 import models.verify.SelectedSubcontractors
 import org.mockito.ArgumentCaptor
-import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{never, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import pages.verify.{CurrentVerificationBatchResponsePage, SelectSubcontractorPage, SelectSubcontractorsToReverifyPage}
@@ -108,7 +108,7 @@ class ModifyVerificationBatchAndVerificationsControllerSpec extends SpecBase wit
       )
     )
 
-  "ModifyVerificationBatchAndVerificationsController.onSubmit" - {
+  "ModifyVerificationBatchAndVerificationsController.modifyVerificationBatch" - {
 
     "must call service with correct ModifyVerificationsRequest (create + delete) and redirect to Index" in {
       val mockService = mock[VerificationService]
@@ -149,7 +149,7 @@ class ModifyVerificationBatchAndVerificationsControllerSpec extends SpecBase wit
 
       running(app) {
         val controller = app.injector.instanceOf[ModifyVerificationBatchAndVerificationsController]
-        val result     = controller.onSubmit()(FakeRequest(POST, "/test-only"))
+        val result     = controller.modifyVerificationBatch()(FakeRequest(POST, "/test-only"))
 
         status(result) mustBe SEE_OTHER
         redirectLocation(result).value mustBe routes.IndexController.onPageLoad().url
@@ -196,7 +196,7 @@ class ModifyVerificationBatchAndVerificationsControllerSpec extends SpecBase wit
 
       running(app) {
         val controller = app.injector.instanceOf[ModifyVerificationBatchAndVerificationsController]
-        val result     = controller.onSubmit()(FakeRequest(POST, "/test-only"))
+        val result     = controller.modifyVerificationBatch()(FakeRequest(POST, "/test-only"))
 
         status(result) mustBe SEE_OTHER
         redirectLocation(result).value mustBe routes.IndexController.onPageLoad().url
@@ -227,7 +227,7 @@ class ModifyVerificationBatchAndVerificationsControllerSpec extends SpecBase wit
 
       running(app) {
         val controller = app.injector.instanceOf[ModifyVerificationBatchAndVerificationsController]
-        val result     = controller.onSubmit()(FakeRequest(POST, "/test-only"))
+        val result     = controller.modifyVerificationBatch()(FakeRequest(POST, "/test-only"))
 
         status(result) mustBe SEE_OTHER
         redirectLocation(result).value mustBe routes.JourneyRecoveryController.onPageLoad().url
@@ -255,7 +255,7 @@ class ModifyVerificationBatchAndVerificationsControllerSpec extends SpecBase wit
 
       running(app) {
         val controller = app.injector.instanceOf[ModifyVerificationBatchAndVerificationsController]
-        val result     = controller.onSubmit()(FakeRequest(POST, "/test-only"))
+        val result     = controller.modifyVerificationBatch()(FakeRequest(POST, "/test-only"))
 
         status(result) mustBe SEE_OTHER
         redirectLocation(result).value mustBe routes.JourneyRecoveryController.onPageLoad().url
@@ -283,7 +283,7 @@ class ModifyVerificationBatchAndVerificationsControllerSpec extends SpecBase wit
 
       running(app) {
         val controller = app.injector.instanceOf[ModifyVerificationBatchAndVerificationsController]
-        val result     = controller.onSubmit()(FakeRequest(POST, "/test-only"))
+        val result     = controller.modifyVerificationBatch()(FakeRequest(POST, "/test-only"))
 
         status(result) mustBe SEE_OTHER
         redirectLocation(result).value mustBe routes.JourneyRecoveryController.onPageLoad().url
@@ -315,7 +315,7 @@ class ModifyVerificationBatchAndVerificationsControllerSpec extends SpecBase wit
 
       running(app) {
         val controller = app.injector.instanceOf[ModifyVerificationBatchAndVerificationsController]
-        val result     = controller.onSubmit()(FakeRequest(POST, "/test-only"))
+        val result     = controller.modifyVerificationBatch()(FakeRequest(POST, "/test-only"))
 
         status(result) mustBe SEE_OTHER
         redirectLocation(result).value mustBe routes.JourneyRecoveryController.onPageLoad().url
@@ -353,12 +353,62 @@ class ModifyVerificationBatchAndVerificationsControllerSpec extends SpecBase wit
 
       running(app) {
         val controller = app.injector.instanceOf[ModifyVerificationBatchAndVerificationsController]
-        val result     = controller.onSubmit()(FakeRequest(POST, "/test-only"))
+        val result     = controller.modifyVerificationBatch()(FakeRequest(POST, "/test-only"))
 
         status(result) mustBe SEE_OTHER
         redirectLocation(result).value mustBe routes.JourneyRecoveryController.onPageLoad().url
 
         verify(mockService, never()).modifyVerificationBatchAndVerifications(any(), any())(any())
+      }
+    }
+
+    "must default missing SelectSubcontractorPage to Seq.empty and use only SelectSubcontractorsToReverifyPage ids" in {
+      val mockService = mock[VerificationService]
+
+      val ua =
+        emptyUserAnswers
+          .set(CisIdQuery, instanceId)
+          .success
+          .value
+          .set(CurrentVerificationBatchResponsePage, currentBatch)
+          .success
+          .value
+          .set(
+            SelectSubcontractorsToReverifyPage,
+            Set(SelectedSubcontractors("20", "Name 20"))
+          )
+          .success
+          .value
+
+      when(
+        mockService.modifyVerificationBatchAndVerifications(any[UserAnswers], any[ModifyVerificationsRequest])(any())
+      ).thenReturn(Future.successful(ua))
+
+      val app =
+        applicationBuilder(userAnswers = Some(ua))
+          .overrides(bind[VerificationService].toInstance(mockService))
+          .build()
+
+      running(app) {
+        val controller = app.injector.instanceOf[ModifyVerificationBatchAndVerificationsController]
+        val result     = controller.modifyVerificationBatch()(FakeRequest(POST, "/test-only"))
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result).value mustBe routes.IndexController.onPageLoad().url
+
+        val reqCaptor = ArgumentCaptor.forClass(classOf[ModifyVerificationsRequest])
+        verify(mockService).modifyVerificationBatchAndVerifications(eqTo(ua), reqCaptor.capture())(any())
+
+        // selected = only 20 => selectedRefs = 2222
+        // existing = 1111,3333
+        // create = 2222
+        // delete = 1111,3333
+        reqCaptor.getValue mustBe ModifyVerificationsRequest(
+          instanceId = instanceId,
+          deleteVerifications = Some(DeleteVerifications(Seq(1111L, 3333L))),
+          createVerifications =
+            Some(CreateVerifications(verificationBatchResourceRef = 7777L, verificationResourceReferences = Seq(2222L)))
+        )
       }
     }
   }

@@ -22,7 +22,7 @@ import models.response.GetCurrentVerificationBatchResponse
 import pages.verify.{CurrentVerificationBatchResponsePage, SelectSubcontractorPage, SelectSubcontractorsToReverifyPage}
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import queries.CisIdQuery
 import services.VerificationService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -42,71 +42,68 @@ class ModifyVerificationBatchAndVerificationsController @Inject() (
     with I18nSupport
     with Logging {
 
-  def onSubmit(): Action[AnyContent] =
+  def modifyVerificationBatch(): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
+      runModifyLogic()
+    }
 
-      val verifyIdsRaw: Seq[String] =
-        request.userAnswers
-          .get(SelectSubcontractorPage)
-          .map(_.toSeq.map(_.id))
-          .getOrElse(Seq.empty)
+  private def runModifyLogic()(implicit request: models.requests.DataRequest[?]): Future[Result] = {
 
-      val reverifyIdsRaw: Seq[String] =
-        request.userAnswers
-          .get(SelectSubcontractorsToReverifyPage)
-          .map(_.toSeq.map(_.id))
-          .getOrElse(Seq.empty)
+    val verifyIdsRaw: Seq[String] =
+      request.userAnswers
+        .get(SelectSubcontractorPage)
+        .map(_.toSeq.map(_.id))
+        .getOrElse(Seq.empty)
 
-      val selectedIdsEither =
-        for {
-          verifyIds   <- parseIds("SelectSubcontractorPage", verifyIdsRaw)
-          reverifyIds <- parseIds("SelectSubcontractorsToReverifyPage", reverifyIdsRaw)
-        } yield (verifyIds ++ reverifyIds).distinct
+    val reverifyIdsRaw: Seq[String] =
+      request.userAnswers
+        .get(SelectSubcontractorsToReverifyPage)
+        .map(_.toSeq.map(_.id))
+        .getOrElse(Seq.empty)
 
-      selectedIdsEither match {
+    val selectedIdsEither =
+      for {
+        verifyIds   <- parseIds("SelectSubcontractorPage", verifyIdsRaw)
+        reverifyIds <- parseIds("SelectSubcontractorsToReverifyPage", reverifyIdsRaw)
+      } yield (verifyIds ++ reverifyIds).distinct
 
-        case Left(msg) =>
-          logger.error(s"[ModifyVerificationBatchAndVerificationsController.onSubmit] $msg")
-          Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+    selectedIdsEither match {
 
-        case Right(selectedSubcontractorIds) =>
-          val instanceIdF = instanceIdFromSession(request.userAnswers)
+      case Left(msg) =>
+        logger.error(s"[ModifyVerificationBatchAndVerificationsController] $msg")
+        Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
 
-          (for {
-            instanceId <- instanceIdF
+      case Right(selectedSubcontractorIds) =>
+        (for {
+          instanceId <- instanceIdFromSession(request.userAnswers)
+          current    <- currentBatchFromSession(request.userAnswers)
 
-            current <- currentBatchFromSession(request.userAnswers)
+          idToRef = current.subcontractors.flatMap(s => s.subbieResourceRef.map(ref => s.subcontractorId -> ref)).toMap
 
-            idToRef: Map[Long, Long] =
-              current.subcontractors.flatMap(s => s.subbieResourceRef.map(ref => s.subcontractorId -> ref)).toMap
+          selectedRefs <- selectedRefsFromIds(selectedSubcontractorIds, idToRef)
 
-            selectedRefs <- selectedRefsFromIds(selectedSubcontractorIds, idToRef)
+          existingRefs = current.verifications.flatMap(_.verificationResourceRef).distinct
 
-            existingRefs = current.verifications.flatMap(_.verificationResourceRef).distinct
+          createRefs = selectedRefs.filterNot(existingRefs.contains)
+          deleteRefs = existingRefs.filterNot(selectedRefs.contains)
 
-            //  if selected exists, formP missing(current batch) => Add (createRefs)
-            // if selected missing, formP exists(current batch) => Remove (deleteRefs)
-            createRefs = selectedRefs.filterNot(existingRefs.contains)
-            deleteRefs = existingRefs.filterNot(selectedRefs.contains)
-
-            modifyReq = buildModifyRequest(instanceId, current, createRefs, deleteRefs)
-            resultUa <-
-              if (createRefs.isEmpty && deleteRefs.isEmpty) {
-                Future.successful(())
-              } else {
-                val modifyReq = buildModifyRequest(instanceId, current, createRefs, deleteRefs)
-                verificationService.modifyVerificationBatchAndVerifications(request.userAnswers, modifyReq).map(_ => ())
-              }
-
-          } yield Redirect(controllers.routes.IndexController.onPageLoad())).recover { case t =>
+          _ <-
+            if (createRefs.isEmpty && deleteRefs.isEmpty) {
+              Future.successful(())
+            } else {
+              val modifyReq = buildModifyRequest(instanceId, current, createRefs, deleteRefs)
+              verificationService.modifyVerificationBatchAndVerifications(request.userAnswers, modifyReq).map(_ => ())
+            }
+        } yield Redirect(controllers.routes.IndexController.onPageLoad()))
+          .recover { case t =>
             logger.error(
-              "[ModifyVerificationBatchAndVerificationsController.onSubmit] Failed to modify verification batch/verifications",
+              "[ModifyVerificationBatchAndVerificationsController] Failed to modify verification batch/verifications",
               t
             )
             Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
           }
-      }
     }
+  }
 
   private def instanceIdFromSession(userAnswers: models.UserAnswers): Future[String] =
     userAnswers
@@ -114,17 +111,17 @@ class ModifyVerificationBatchAndVerificationsController @Inject() (
       .map(Future.successful)
       .getOrElse(Future.failed(new RuntimeException("InstanceIdQuery not found in session data")))
 
-  private def parseIds(label: String, ids: Iterable[String]): Either[String, Seq[Long]] = {
-    val parsed = ids.toSeq.distinct.map(_.trim).map(_.toLongOption)
-    if (parsed.forall(_.isDefined)) Right(parsed.flatten)
-    else Left(s"Invalid subcontractor id(s) found in $label")
-  }
-
   private def currentBatchFromSession(userAnswers: models.UserAnswers): Future[GetCurrentVerificationBatchResponse] =
     userAnswers
       .get(CurrentVerificationBatchResponsePage)
       .map(Future.successful)
       .getOrElse(Future.failed(new RuntimeException("CurrentVerificationBatchResponsePage not found in session data")))
+
+  private def parseIds(label: String, ids: Iterable[String]): Either[String, Seq[Long]] = {
+    val parsed = ids.toSeq.distinct.map(_.trim).map(_.toLongOption)
+    if (parsed.forall(_.isDefined)) Right(parsed.flatten)
+    else Left(s"Invalid subcontractor id(s) found in $label")
+  }
 
   private def selectedRefsFromIds(
     selectedSubcontractorIds: Seq[Long],
@@ -161,9 +158,7 @@ class ModifyVerificationBatchAndVerificationsController @Inject() (
       instanceId = instanceId,
       deleteVerifications = if (deleteRefs.nonEmpty) Some(DeleteVerifications(deleteRefs)) else None,
       createVerifications =
-        if (createRefs.nonEmpty)
-          Some(CreateVerifications(verificationBatchResourceRefOpt.get, createRefs))
-        else None
+        if (createRefs.nonEmpty) Some(CreateVerifications(verificationBatchResourceRefOpt.get, createRefs)) else None
     )
   }
 }
