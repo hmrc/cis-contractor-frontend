@@ -27,7 +27,7 @@
 
 @(form: Form[_], mode: Mode)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = title(form, messages("contractorDetails.enterContractorEmailAddress.title"))) {
+@layout(pageTitle = title(form, messages("contractordetails.enterContractorEmailAddress.title"))) {
 
 @formHelper(action = controllers.contractordetails.routes.EnterContractorEmailAddressController.onSubmit(mode)) {
 
@@ -38,7 +38,7 @@
         @govukInput(
             InputViewModel(
                 field = form("value"),
-                label = LabelViewModel(messages("contractorDetails.enterContractorEmailAddress.heading")).asPageHeading(Large)
+                label = LabelViewModel(messages("contractordetails.enterContractorEmailAddress.heading")).asPageHeading(Large)
             )
             .withWidth(Full)
             .withSpellcheck(false)

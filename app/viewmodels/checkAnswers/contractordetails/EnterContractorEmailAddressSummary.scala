@@ -30,11 +30,11 @@ object EnterContractorEmailAddressSummary {
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
     answers.get(EnterContractorEmailAddressPage).map { answer =>
       SummaryListRowViewModel(
-        key = "contractorDetails.enterContractorEmailAddress.checkYourAnswersLabel",
+        key = "contractordetails.enterContractorEmailAddress.checkYourAnswersLabel",
         value = ValueViewModel(HtmlFormat.escape(answer).toString),
         actions = Seq(
           ActionItemViewModel("site.change", routes.EnterContractorEmailAddressController.onPageLoad(CheckMode).url)
-            .withVisuallyHiddenText(messages("contractorDetails.enterContractorEmailAddress.change.hidden"))
+            .withVisuallyHiddenText(messages("contractordetails.enterContractorEmailAddress.change.hidden"))
             .withAttribute("id" -> "contractor-email-address")
         )
       )
