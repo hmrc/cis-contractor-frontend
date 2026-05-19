@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,18 +16,20 @@
 
 package viewmodels.checkAnswers.add
 
-import models.{CheckMode, UserAnswers}
+import controllers.add.routes
+import helpers.CyaEncodingSpecHelper
 import models.add.InternationalAddress
+import models.{CheckMode, UserAnswers}
 import org.scalatest.OptionValues.convertOptionToValuable
 import org.scalatest.TryValues.convertTryToSuccessOrFailure
-import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
+import org.scalatest.matchers.should.Matchers
 import pages.add.AddressOfSubcontractorPage
 import play.api.i18n.Messages
 import play.api.test.Helpers.stubMessages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 
-class AddressOfSubcontractorSummarySpec extends AnyWordSpec with Matchers {
+class AddressOfSubcontractorSummarySpec extends AnyWordSpec with Matchers with CyaEncodingSpecHelper {
 
   implicit val messages: Messages = stubMessages()
 
@@ -45,19 +47,22 @@ class AddressOfSubcontractorSummarySpec extends AnyWordSpec with Matchers {
       )
 
       val userAnswers =
-        UserAnswers("id").set(AddressOfSubcontractorPage, address).success.value
+        UserAnswers("id")
+          .set(AddressOfSubcontractorPage, address)
+          .success
+          .value
 
       val result = AddressOfSubcontractorSummary.row(userAnswers)
 
-      result mustBe defined
+      result shouldBe defined
 
       val row = result.value
 
-      row.key.content.asHtml.toString must include(
+      row.key.content.asHtml.toString should include(
         messages("addressOfSubcontractor.checkYourAnswersLabel")
       )
 
-      row.value.content mustBe HtmlContent(
+      row.value.content shouldBe HtmlContent(
         "10 Downing Street<br/>" +
           "Westminster<br/>" +
           "London<br/>" +
@@ -68,20 +73,51 @@ class AddressOfSubcontractorSummarySpec extends AnyWordSpec with Matchers {
 
       val action = row.actions.value.items.head
 
-      action.href mustBe
-        controllers.add.routes.AddressOfSubcontractorController
+      action.href shouldBe
+        routes.AddressOfSubcontractorController
           .onPageLoad(CheckMode)
           .url
 
-      action.visuallyHiddenText.value mustBe
+      action.visuallyHiddenText.value shouldBe
         messages("addressOfSubcontractor.change.hidden")
+
+      action.attributes should contain("id" -> "address-of-subcontractor")
     }
 
     "return None when AddressOfSubcontractorPage has no answer" in {
 
       val userAnswers = UserAnswers("id")
 
-      AddressOfSubcontractorSummary.row(userAnswers) mustBe None
+      AddressOfSubcontractorSummary.row(userAnswers) shouldBe None
+    }
+
+    "must render address safely without double encoding and preserve line breaks" in {
+
+      val address = InternationalAddress(
+        addressLine1 = "10 O'Reilly & Co",
+        addressLine2 = Some("Building & Sons"),
+        addressLine3 = "Main Street",
+        addressLine4 = Some("London"),
+        postalCode = "AB1 2CD",
+        country = "UK"
+      )
+
+      val answers =
+        UserAnswers("id")
+          .set(AddressOfSubcontractorPage, address)
+          .success
+          .value
+
+      val row = AddressOfSubcontractorSummary.row(answers).value
+
+      val html = extractHtml(row)
+
+      assertRaw(html, "10 O'Reilly & Co")
+      assertRaw(html, "Building & Sons")
+
+      assertHasBreaks(html)
+
+      assertNoDoubleEncoding(html)
     }
   }
 }

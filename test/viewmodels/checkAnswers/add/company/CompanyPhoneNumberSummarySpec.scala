@@ -17,6 +17,7 @@
 package viewmodels.checkAnswers.add.company
 
 import controllers.add.company.routes
+import helpers.CyaEncodingSpecHelper
 import models.{CheckMode, UserAnswers}
 import org.scalatest.OptionValues.convertOptionToValuable
 import org.scalatest.TryValues.convertTryToSuccessOrFailure
@@ -29,7 +30,7 @@ import play.api.test.Helpers.stubMessages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.*
 import viewmodels.checkAnswers.add.partnership.PartnershipPhoneNumberSummary
 
-class CompanyPhoneNumberSummarySpec extends AnyFreeSpec with Matchers {
+class CompanyPhoneNumberSummarySpec extends AnyFreeSpec with Matchers with CyaEncodingSpecHelper {
   implicit val messages: Messages = stubMessages()
 
   "CompanyPhoneNumberSummary.row" - {
@@ -70,6 +71,24 @@ class CompanyPhoneNumberSummarySpec extends AnyFreeSpec with Matchers {
     "must return None when the answer does not exist" in {
       val answers = UserAnswers("test-id")
       PartnershipPhoneNumberSummary.row(answers) shouldBe None
+    }
+
+    "must HTML-escape special characters correctly (single encoding only)" in {
+
+      val phone = "020 7946 0958 & ext'123"
+
+      val answers =
+        UserAnswers("id")
+          .set(CompanyPhoneNumberPage, phone)
+          .success
+          .value
+
+      val row = CompanyPhoneNumberSummary.row(answers).value
+
+      val html = extractHtml(row)
+
+      assertEscaped(html, "020 7946 0958 &amp; ext&#x27;123")
+      assertNoDoubleEncoding(html)
     }
   }
 

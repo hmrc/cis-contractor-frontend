@@ -16,6 +16,7 @@
 
 package viewmodels.checkAnswers.add.trust
 
+import helpers.CyaEncodingSpecHelper
 import models.{CheckMode, UserAnswers}
 import org.scalatest.OptionValues.convertOptionToValuable
 import org.scalatest.TryValues.convertTryToSuccessOrFailure
@@ -25,7 +26,7 @@ import pages.add.trust.TrustNamePage
 import play.api.i18n.Messages
 import play.api.test.Helpers.stubMessages
 
-class TrustNameSummarySpec extends AnyFreeSpec with Matchers {
+class TrustNameSummarySpec extends AnyFreeSpec with Matchers with CyaEncodingSpecHelper {
 
   implicit val messages: Messages = stubMessages()
 
@@ -59,6 +60,24 @@ class TrustNameSummarySpec extends AnyFreeSpec with Matchers {
 
     "must return None when the answer does not exist" in {
       TrustNameSummary.row(UserAnswers("test-id")) shouldBe None
+    }
+
+    "must HTML-escape special characters correctly (single encoding only)" in {
+
+      val name = "My Trust & Co 'Limited'"
+
+      val answers =
+        UserAnswers("id")
+          .set(TrustNamePage, name)
+          .success
+          .value
+
+      val row = TrustNameSummary.row(answers).value
+
+      val html = extractHtml(row)
+
+      assertEscaped(html, "My Trust &amp; Co &#x27;Limited&#x27;")
+      assertNoDoubleEncoding(html)
     }
   }
 }
