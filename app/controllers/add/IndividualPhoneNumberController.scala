@@ -17,11 +17,13 @@
 package controllers.add
 
 import controllers.actions.*
+import controllers.helpers.ContactGuard
 import forms.add.IndividualPhoneNumberFormProvider
 import models.Mode
+import models.contact.ContactOptions.Phone
 import models.requests.DataRequest
 import navigation.Navigator
-import pages.add.IndividualPhoneNumberPage
+import pages.add.{IndividualChooseContactDetailsPage, IndividualPhoneNumberPage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
@@ -45,7 +47,8 @@ class IndividualPhoneNumberController @Inject() (
   view: IndividualPhoneNumberView
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
-    with I18nSupport {
+    with I18nSupport
+    with ContactGuard {
 
   val form = formProvider()
 
@@ -55,13 +58,16 @@ class IndividualPhoneNumberController @Inject() (
   private def preparedForm(implicit request: DataRequest[?]) =
     request.userAnswers.get(IndividualPhoneNumberPage).fold(form)(form.fill)
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
-    subcontractorNameExtractor
-      .getSubcontractorName(request.userAnswers)
-      .fold(recoveryRedirect) { subcontractorName =>
+  def onPageLoad(mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData) { implicit request =>
+      requireContactChoice(
+        subcontractorNameExtractor.getSubcontractorName(request.userAnswers),
+        request.userAnswers.get(IndividualChooseContactDetailsPage),
+        Phone
+      ) { subcontractorName =>
         Ok(view(preparedForm, mode, subcontractorName))
       }
-  }
+    }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>

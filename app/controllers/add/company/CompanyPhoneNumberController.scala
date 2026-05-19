@@ -17,10 +17,12 @@
 package controllers.add.company
 
 import controllers.actions.*
+import controllers.helpers.ContactGuard
 import forms.add.company.CompanyPhoneNumberFormProvider
 import models.Mode
+import models.contact.ContactOptions.Phone
 import navigation.Navigator
-import pages.add.company.{CompanyNamePage, CompanyPhoneNumberPage}
+import pages.add.company.{CompanyContactOptionsPage, CompanyNamePage, CompanyPhoneNumberPage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
@@ -42,23 +44,25 @@ class CompanyPhoneNumberController @Inject() (
   view: CompanyPhoneNumberView
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
-    with I18nSupport {
+    with I18nSupport
+    with ContactGuard {
 
   val form = formProvider()
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
-    request.userAnswers
-      .get(CompanyNamePage)
-      .map { companyName =>
-        val preparedForm = request.userAnswers.get(CompanyPhoneNumberPage) match {
-          case None        => form
-          case Some(value) => form.fill(value)
-        }
+  def onPageLoad(mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData) { implicit request =>
+      requireContactChoice(
+        request.userAnswers.get(CompanyNamePage),
+        request.userAnswers.get(CompanyContactOptionsPage),
+        Phone
+      ) { companyName =>
+
+        val preparedForm =
+          request.userAnswers.get(CompanyPhoneNumberPage).fold(form)(form.fill)
 
         Ok(view(preparedForm, mode, companyName))
       }
-      .getOrElse(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
-  }
+    }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>

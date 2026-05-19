@@ -28,7 +28,8 @@
     suffixTextKey: String = emptyString,
     extraClasses: String = emptyString,
     bold: Boolean = false,
-    linkId: String = emptyString
+    linkId: String = emptyString,
+    newLineBeforeSuffixText:Boolean = false
 )(implicit messages: Messages)
 
 @defining {
@@ -42,6 +43,7 @@
     }
 
     @if(suffixTextKey.nonEmpty) {
+        @if(newLineBeforeSuffixText) {</br>}
         @{Html(messages(suffixTextKey))}
     }
 } { content =>

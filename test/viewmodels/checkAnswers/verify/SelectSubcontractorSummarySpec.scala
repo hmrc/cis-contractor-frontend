@@ -56,7 +56,8 @@ class SelectSubcontractorSummarySpec extends SpecBase with Matchers {
 
       valueHtml must include("Brody Martin")
       valueHtml must include("Alpha Plumbing")
-      valueHtml must include("<br>")
+      valueHtml must include("govuk-list--bullet")
+      valueHtml must not include "<br>"
 
       row.actions mustBe defined
 
@@ -94,6 +95,8 @@ class SelectSubcontractorSummarySpec extends SpecBase with Matchers {
 
       valueHtml must include("Delta Electrical")
       valueHtml must not include "<br>"
+      valueHtml must not include "govuk-list--bullet"
+
     }
 
     "must return None when no answer is present" in {

@@ -32,7 +32,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 import scala.concurrent.Future
 
 class CurrentVerificationBatchControllerSpec extends SpecBase with MockitoSugar {
-  private val endpointUrl = "/verify/current"
+  private val endpointUrl = "/subcontractor/verify/current"
 
   "CurrentVerificationBatchController" - {
 

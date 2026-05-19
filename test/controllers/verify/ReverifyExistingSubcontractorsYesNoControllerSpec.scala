@@ -73,6 +73,40 @@ class ReverifyExistingSubcontractorsYesNoControllerSpec extends SpecBase with Mo
       }
     }
 
+    "must redirect to SelectSubcontractorsToReverify on POST with true" in {
+
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, reverifyExistingSubcontractorsYesNoRoute)
+            .withFormUrlEncodedBody(("value", "true"))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual
+          controllers.verify.routes.SelectSubcontractorsToReverifyController.onPageLoad(NormalMode).url
+      }
+    }
+
+    "must redirect to ContractorEmailConfirmationNotStored on POST with false when no email is stored" in {
+
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, reverifyExistingSubcontractorsYesNoRoute)
+            .withFormUrlEncodedBody(("value", "false"))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual
+          controllers.verify.routes.ContractorEmailConfirmationNotStoredController.onPageLoad(NormalMode).url
+      }
+    }
+
     "must return a Bad Request and errors when invalid data is submitted" in {
 
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
