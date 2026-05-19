@@ -35,6 +35,7 @@ object EnterContractorEmailAddressSummary {
         actions = Seq(
           ActionItemViewModel("site.change", routes.EnterContractorEmailAddressController.onPageLoad(CheckMode).url)
             .withVisuallyHiddenText(messages("contractorDetails.enterContractorEmailAddress.change.hidden"))
+            .withAttribute("id" -> "contractor-email-address")
         )
       )
     }

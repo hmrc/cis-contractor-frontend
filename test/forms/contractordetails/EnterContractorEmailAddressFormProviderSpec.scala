@@ -14,18 +14,18 @@
  * limitations under the License.
  */
 
-package forms
+package forms.contractordetails
 
+import forms.Validation
 import forms.behaviours.StringFieldBehaviours
-import forms.contractordetails.EnterContractorEmailAddressFormProvider
 import org.scalacheck.Gen
 import play.api.data.FormError
 
 class EnterContractorEmailAddressFormProviderSpec extends StringFieldBehaviours {
 
-  val requiredKey = "contractorDetails.enterContractorEmailAddress.error.required"
-  val lengthKey   = "contractorDetails.enterContractorEmailAddress.error.length"
-  val invalidKey  = "contractorDetails.enterContractorEmailAddress.error.invalid"
+  val requiredKey = "contractordetails.enterContractorEmailAddress.error.required"
+  val lengthKey   = "contractordetails.enterContractorEmailAddress.error.length"
+  val invalidKey  = "contractordetails.enterContractorEmailAddress.error.invalid"
   val maxLength   = 256
 
   val form = new EnterContractorEmailAddressFormProvider()()

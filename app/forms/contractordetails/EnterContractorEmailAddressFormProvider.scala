@@ -26,12 +26,12 @@ class EnterContractorEmailAddressFormProvider @Inject() extends Mappings {
 
   def apply(): Form[String] =
     Form(
-      "value" -> text("contractorDetails.enterContractorEmailAddress.error.required")
+      "value" -> text("contractordetails.enterContractorEmailAddress.error.required")
         .transform(_.trim, identity)
         .verifying(
           firstError(
-            maxLength(256, "contractorDetails.enterContractorEmailAddress.error.length"),
-            regexp(Validation.emailRegex, "contractorDetails.enterContractorEmailAddress.error.invalid")
+            maxLength(256, "contractordetails.enterContractorEmailAddress.error.length"),
+            regexp(Validation.emailRegex, "contractordetails.enterContractorEmailAddress.error.invalid")
           )
         )
     )
