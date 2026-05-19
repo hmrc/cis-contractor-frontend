@@ -36,7 +36,7 @@ import scala.concurrent.Future
 
 class NewestVerificationBatchControllerSpec extends SpecBase with MockitoSugar with ModelGenerators {
 
-  private val endpointUrl = "/verify/newest"
+  private val endpointUrl = "/subcontractor/verify/newest"
 
   private val verifiedSubcontractor: Subcontractor =
     arbitrarySubcontractor.arbitrary.sample.value.copy(
