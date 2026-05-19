@@ -297,6 +297,11 @@ individualChooseContactDetails.error.required                            =  Sele
 individualChooseContactDetails.checkYourAnswersLabel                     =  Method of contact
 individualChooseContactDetails.change.hidden                             =  method of contact
 
+contractordetails.contractorDetailsIndex.title                          = Contractor details
+contractordetails.contractorDetailsIndex.heading                        = Contractor details
+contractordetails.contractorDetailsIndex.p1                             = Use this service to confirm or change the contractor's email or scheme name associated with this account.
+contractordetails.contractorDetailsIndex.p2                             = You will need the contractor Unique Tax Reference (UTR) to do this.
+
 contractordetails.schemeName.title                                       =  What is the contractor’s scheme name?
 contractordetails.schemeName.heading                                     =  What is the contractor’s scheme name?
 contractordetails.schemeName.checkYourAnswersLabel                       =  Scheme name
@@ -312,11 +317,6 @@ contractordetails.enterContractorEmailAddress.error.required            = Enter 
 contractordetails.enterContractorEmailAddress.error.length              = The email you entered contains too many characters
 contractordetails.enterContractorEmailAddress.error.invalid             = You have entered an email in an incorrect format
 contractordetails.enterContractorEmailAddress.change.hidden             = what is the contractor’s email?
-
-contractordetails.contractorDetailsIndex.title    = Contractor details
-contractordetails.contractorDetailsIndex.heading  = Contractor details
-contractordetails.contractorDetailsIndex.p1       = Use this service to confirm or change the contractor's email or scheme name associated with this account.
-contractordetails.contractorDetailsIndex.p2       = You will need the contractor Unique Tax Reference (UTR) to do this.
 
 # Partnership
 partnershipWorksReferenceNumberYesNo.title                           =  Does this partnership have a works reference number?

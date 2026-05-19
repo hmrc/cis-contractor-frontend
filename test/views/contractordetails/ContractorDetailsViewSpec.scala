@@ -31,19 +31,19 @@ class ContractorDetailsViewSpec extends SpecBase with Matchers {
   "ContractorDetailsView" - {
 
     "must display the correct title" in new Setup {
-      doc.title must include(messages("contractorDetails.contractorDetailsIndex.title"))
+      doc.title must include(messages("contractordetails.contractorDetailsIndex.title"))
     }
 
     "must display the correct heading" in new Setup {
-      doc.select("h1").text must include(messages("contractorDetails.contractorDetailsIndex.heading"))
+      doc.select("h1").text must include(messages("contractordetails.contractorDetailsIndex.heading"))
     }
 
     "must display paragraph 1" in new Setup {
-      doc.select("p").text must include(messages("contractorDetails.contractorDetailsIndex.p1"))
+      doc.select("p").text must include(messages("contractordetails.contractorDetailsIndex.p1"))
     }
 
     "must display paragraph 2" in new Setup {
-      doc.select("p").text must include(messages("contractorDetails.contractorDetailsIndex.p2"))
+      doc.select("p").text must include(messages("contractordetails.contractorDetailsIndex.p2"))
     }
 
     "must display the Continue button" in new Setup {
