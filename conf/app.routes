@@ -125,6 +125,11 @@ POST  /contractor-details/what-is-contractors-scheme-name         controllers.co
 GET   /contractor-details/change-what-is-contractors-scheme-name  controllers.contractordetails.SchemeNameController.onPageLoad(mode: Mode = CheckMode)
 POST  /contractor-details/change-what-is-contractors-scheme-name  controllers.contractordetails.SchemeNameController.onSubmit(mode: Mode = CheckMode)
 
+GET   /contractor-details/what-is-contractors-email                 controllers.contractordetails.EnterContractorEmailAddressController.onPageLoad(mode: Mode = NormalMode)
+POST  /contractor-details/what-is-contractors-email                 controllers.contractordetails.EnterContractorEmailAddressController.onSubmit(mode: Mode = NormalMode)
+GET   /contractor-details/change-what-is-contractors-email          controllers.contractordetails.EnterContractorEmailAddressController.onPageLoad(mode: Mode = CheckMode)
+POST  /contractor-details/change-what-is-contractors-email          controllers.contractordetails.EnterContractorEmailAddressController.onSubmit(mode: Mode = CheckMode)
+
 # Errors & Auth
 GET  /unauthorised/standard-user  controllers.UnauthorisedWrongRoleController.onPageLoad()
 
@@ -418,3 +423,4 @@ GET   /subcontractor/verify/verification-status/reverification-decision  control
 GET   /subcontractor/verify/verification-status/select-subcontractors    controllers.verify.VerificationStatusController.goToSelectSubcontractorsToReverify(mode: Mode = NormalMode)
 
 GET   /contractor-details/contractor-details-added  controllers.contractordetails.ContractorDetailsController.onPageLoad()
+
