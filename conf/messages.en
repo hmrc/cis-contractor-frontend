@@ -297,6 +297,14 @@ individualChooseContactDetails.error.required                            =  Sele
 individualChooseContactDetails.checkYourAnswersLabel                     =  Method of contact
 individualChooseContactDetails.change.hidden                             =  method of contact
 
+contractordetails.schemeName.title                                       =  What is the contractor’s scheme name?
+contractordetails.schemeName.heading                                     =  What is the contractor’s scheme name?
+contractordetails.schemeName.checkYourAnswersLabel                       =  Scheme name
+contractordetails.schemeName.error.required                              =  Enter a scheme name
+contractordetails.schemeName.error.length                                =  The scheme name you entered contains too many characters
+contractordetails.schemeName.error.invalidCharacters                     =  You have entered a scheme name in an incorrect format
+contractordetails.schemeName.change.hidden                               =  scheme Name
+
 # Partnership
 partnershipWorksReferenceNumberYesNo.title                           =  Does this partnership have a works reference number?
 partnershipWorksReferenceNumberYesNo.heading                         =  Does {0} have a works reference number?
