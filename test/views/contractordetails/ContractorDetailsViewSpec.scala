@@ -42,10 +42,6 @@ class ContractorDetailsViewSpec extends SpecBase with Matchers {
       doc.select("p").text must include(messages("contractordetails.contractorDetailsIndex.p1"))
     }
 
-    "must display paragraph 2" in new Setup {
-      doc.select("p").text must include(messages("contractordetails.contractorDetailsIndex.p2"))
-    }
-
     "must display the Continue button" in new Setup {
       doc.select("button").text must include(messages("site.continue"))
     }

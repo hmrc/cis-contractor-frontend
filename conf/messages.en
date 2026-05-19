@@ -299,8 +299,7 @@ individualChooseContactDetails.change.hidden                             =  meth
 
 contractordetails.contractorDetailsIndex.title                          = Contractor details
 contractordetails.contractorDetailsIndex.heading                        = Contractor details
-contractordetails.contractorDetailsIndex.p1                             = Use this service to confirm or change the contractor's email or scheme name associated with this account.
-contractordetails.contractorDetailsIndex.p2                             = You will need the contractor Unique Tax Reference (UTR) to do this.
+contractordetails.contractorDetailsIndex.p1                             = To use the Construction Industry Scheme service, you will need the contractor’s Unique Taxpayer Reference and scheme name.
 
 contractordetails.schemeName.title                                       =  What is the contractor’s scheme name?
 contractordetails.schemeName.heading                                     =  What is the contractor’s scheme name?
