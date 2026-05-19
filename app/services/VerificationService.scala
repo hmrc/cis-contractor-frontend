@@ -20,6 +20,7 @@ import connectors.ConstructionIndustrySchemeConnector
 import models.{Subcontractor, UserAnswers}
 import models.requests.CreateVerificationBatchAndVerificationsRequest
 import pages.verify.{CurrentVerificationBatchResponsePage, NewestVerificationBatchResponsePage, UnverifiedSubcontractorsPage}
+import models.requests.ModifyVerificationsRequest
 import queries.CisIdQuery
 import repositories.SessionRepository
 import uk.gov.hmrc.http.HeaderCarrier
@@ -121,5 +122,16 @@ class VerificationService @Inject() (
 
   private def isUnverified(sub: Subcontractor): Boolean =
     !sub.verified.contains("Y")
+
+  def modifyVerificationBatchAndVerifications(
+    userAnswers: UserAnswers,
+    request: ModifyVerificationsRequest
+  )(implicit hc: HeaderCarrier): Future[UserAnswers] =
+    for {
+      _            <- cisConnector.modifyVerificationBatch(request)
+      afterCurrent <- getCurrentVerificationBatch(userAnswers)
+      afterNewest  <- refreshNewestVerificationBatch(afterCurrent)
+      _            <- sessionRepository.set(afterNewest)
+    } yield afterNewest
 
 }

@@ -19,6 +19,7 @@ package connectors
 import models.requests.CreateAndUpdateSubcontractorPayload
 import models.requests.CreateAndUpdateSubcontractorPayload.*
 import models.requests.CreateVerificationBatchAndVerificationsRequest
+import models.requests.ModifyVerificationsRequest
 import models.response.CreateVerificationBatchAndVerificationsResponse
 import models.response.{CisTaxpayerResponse, GetCurrentVerificationBatchResponse, GetNewestVerificationBatchResponse, GetSubcontractorUTRsResponse}
 import play.api.Logging
@@ -153,6 +154,25 @@ class ConstructionIndustrySchemeConnector @Inject() (config: ServicesConfig, htt
           s"[ConstructionIndustrySchemeConnector][createVerificationBatchAndVerifications] instanceId=${request.instanceId} - created/updated batch and verifications"
         )
         response
+      }
+
+  def modifyVerificationBatch(
+    request: ModifyVerificationsRequest
+  )(implicit hc: HeaderCarrier): Future[Unit] =
+    http
+      .post(url"$cisBaseUrl/verification-batch/modify")
+      .withBody(Json.toJson(request))
+      .execute[HttpResponse]
+      .flatMap { resp =>
+        resp.status match {
+          case NO_CONTENT | OK =>
+            logger.info(
+              s"[ConstructionIndustrySchemeConnector][modifyVerificationBatch] instanceId=${request.instanceId} - modified batch/verifications"
+            )
+            Future.successful(())
+          case other           =>
+            Future.failed(new RuntimeException(s"Modify verification batch failed, returned $other"))
+        }
       }
 
 }
