@@ -37,10 +37,10 @@ class EnterContractorEmailAddressViewSpec extends AnyWordSpec with Matchers with
       val html: HtmlFormat.Appendable = view(form, NormalMode)
       val doc                         = org.jsoup.Jsoup.parse(html.toString())
 
-      doc.select("title").text() must include(messages("contractorDetails.enterContractorEmailAddress.title"))
+      doc.select("title").text() must include(messages("contractordetails.enterContractorEmailAddress.title"))
 
       val heading = doc.select("h1")
-      heading.text() mustBe messages("contractorDetails.enterContractorEmailAddress.heading")
+      heading.text() mustBe messages("contractordetails.enterContractorEmailAddress.heading")
 
       doc
         .select("form")
@@ -55,38 +55,38 @@ class EnterContractorEmailAddressViewSpec extends AnyWordSpec with Matchers with
 
     "display error summary and inline error when no email is entered" in new Setup {
       val errorForm: Form[String] =
-        form.withError("value", "contractorDetails.enterContractorEmailAddress.error.required")
+        form.withError("value", "contractordetails.enterContractorEmailAddress.error.required")
 
       val html = view(errorForm, NormalMode)
       val doc  = org.jsoup.Jsoup.parse(html.toString())
 
       val summary = doc.select(".govuk-error-summary")
       summary.text() must include(
-        messages("contractorDetails.enterContractorEmailAddress.error.required")
+        messages("contractordetails.enterContractorEmailAddress.error.required")
       )
 
       val linkHref = summary.select("a").attr("href")
       linkHref mustBe "#value"
 
       doc.select(".govuk-error-message").text() must include(
-        messages("contractorDetails.enterContractorEmailAddress.error.required")
+        messages("contractordetails.enterContractorEmailAddress.error.required")
       )
     }
 
     "display error summary and inline error when an invalid email is entered" in new Setup {
       val errorForm: Form[String] =
-        form.withError("value", "contractorDetails.enterContractorEmailAddress.error.invalid")
+        form.withError("value", "contractordetails.enterContractorEmailAddress.error.invalid")
 
       val html = view(errorForm, NormalMode)
       val doc  = org.jsoup.Jsoup.parse(html.toString())
 
       val summary = doc.select(".govuk-error-summary")
       summary.text() must include(
-        messages("contractorDetails.enterContractorEmailAddress.error.invalid")
+        messages("contractordetails.enterContractorEmailAddress.error.invalid")
       )
 
       doc.select(".govuk-error-message").text() must include(
-        messages("contractorDetails.enterContractorEmailAddress.error.invalid")
+        messages("contractordetails.enterContractorEmailAddress.error.invalid")
       )
     }
   }
