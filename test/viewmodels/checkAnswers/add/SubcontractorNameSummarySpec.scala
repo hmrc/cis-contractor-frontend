@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,64 +17,92 @@
 package viewmodels.checkAnswers.add
 
 import controllers.add.routes
+import helpers.CyaEncodingSpecHelper
 import models.add.SubcontractorName
 import models.{CheckMode, UserAnswers}
 import org.scalatest.OptionValues.convertOptionToValuable
 import org.scalatest.TryValues.convertTryToSuccessOrFailure
 import org.scalatest.freespec.AnyFreeSpec
-import org.scalatest.matchers.must.Matchers
-import org.scalatest.matchers.should.Matchers.{convertToStringShouldWrapperForVerb, should, shouldBe}
+import org.scalatest.matchers.should.Matchers
 import pages.add.SubcontractorNamePage
 import play.api.i18n.Messages
 import play.api.test.Helpers.stubMessages
-import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 
-class SubcontractorNameSummarySpec extends AnyFreeSpec with Matchers {
+class SubcontractorNameSummarySpec extends AnyFreeSpec with Matchers with CyaEncodingSpecHelper {
 
   implicit val messages: Messages = stubMessages()
 
   "SubcontractorNameSummary.row" - {
 
     "must return a SummaryListRow when the answer exists" in {
+
       val subcontractorName = SubcontractorName(
         firstName = "John",
         middleName = Some("F."),
         lastName = "Doe"
       )
 
-      val answers = UserAnswers("test-id")
-        .set(SubcontractorNamePage, subcontractorName)
-        .success
-        .value
+      val answers =
+        UserAnswers("test-id")
+          .set(SubcontractorNamePage, subcontractorName)
+          .success
+          .value
 
-      val maybeRow: Option[SummaryListRow] = SubcontractorNameSummary.row(answers)
-      maybeRow shouldBe defined
+      val row = SubcontractorNameSummary.row(answers).value
 
-      val row = maybeRow.value
+      row.key.content.asHtml.toString should include(
+        messages("subcontractorName.checkYourAnswersLabel")
+      )
 
-      val expectedKeyText = messages("subcontractorName.checkYourAnswersLabel")
-      row.key.content.asHtml.toString should include(expectedKeyText)
+      val expectedFullName =
+        Seq(Some("John"), Some("F."), Some("Doe")).flatten.mkString(" ")
 
-      val expectedFullName = Seq(Some("John"), Some("F."), Some("Doe")).flatten.mkString(" ")
       row.value.content.asHtml.toString should include(expectedFullName)
 
-      row.actions shouldBe defined
-      val actions = row.actions.value.items
-      actions should have size 1
+      row.actions.value.items should have size 1
 
-      val changeAction       = actions.head
-      val expectedChangeText = messages("site.change")
-      val expectedHref       = routes.SubcontractorNameController.onPageLoad(CheckMode).url
-      val expectedHiddenText = messages("subcontractorName.change.hidden")
+      val action = row.actions.value.items.head
 
-      changeAction.content.asHtml.toString    should include(expectedChangeText)
-      changeAction.href                     shouldBe expectedHref
-      changeAction.visuallyHiddenText.value shouldBe expectedHiddenText
+      action.href shouldBe
+        routes.SubcontractorNameController
+          .onPageLoad(CheckMode)
+          .url
+
+      action.content.asHtml.toString should include(messages("site.change"))
+
+      action.visuallyHiddenText.value shouldBe
+        messages("subcontractorName.change.hidden")
+
+      action.attributes should contain("id" -> "subcontractor-name")
     }
 
     "must return None when the answer does not exist" in {
+
       val answers = UserAnswers("test-id")
+
       SubcontractorNameSummary.row(answers) shouldBe None
+    }
+
+    "must HTML-escape special characters correctly (single encoding only)" in {
+
+      val subcontractorName = SubcontractorName(
+        firstName = "O'Reilly",
+        middleName = Some("A&B"),
+        lastName = "Smith & Co"
+      )
+
+      val answers =
+        UserAnswers("id")
+          .set(SubcontractorNamePage, subcontractorName)
+          .success
+          .value
+
+      val row = SubcontractorNameSummary.row(answers).value
+
+      val html = extractHtml(row)
+
+      assertEscaped(html, "O&#x27;Reilly A&amp;B Smith &amp; Co")
+      assertNoDoubleEncoding(html)
     }
   }
 }

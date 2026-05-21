@@ -17,6 +17,7 @@
 package viewmodels.checkAnswers.add.company
 
 import controllers.add.company.routes
+import helpers.CyaEncodingSpecHelper
 import models.{CheckMode, UserAnswers}
 import org.scalatest.OptionValues.convertOptionToValuable
 import org.scalatest.TryValues.convertTryToSuccessOrFailure
@@ -28,7 +29,7 @@ import play.api.i18n.Messages
 import play.api.test.Helpers.stubMessages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.*
 
-class CompanyMobileNumberSummarySpec extends AnyFreeSpec with Matchers {
+class CompanyMobileNumberSummarySpec extends AnyFreeSpec with Matchers with CyaEncodingSpecHelper {
   implicit val messages: Messages = stubMessages()
 
   "CompanyMobileNumberSummary.row" - {
@@ -74,6 +75,24 @@ class CompanyMobileNumberSummarySpec extends AnyFreeSpec with Matchers {
       val answers = UserAnswers("test-id")
 
       CompanyMobileNumberSummary.row(answers) shouldBe None
+    }
+
+    "must HTML-escape special characters correctly (single encoding only)" in {
+
+      val mobile = "07700 900000 & ext'123"
+
+      val answers =
+        UserAnswers("id")
+          .set(CompanyMobileNumberPage, mobile)
+          .success
+          .value
+
+      val row = CompanyMobileNumberSummary.row(answers).value
+
+      val html = extractHtml(row)
+
+      assertEscaped(html, "07700 900000 &amp; ext&#x27;123")
+      assertNoDoubleEncoding(html)
     }
   }
 }

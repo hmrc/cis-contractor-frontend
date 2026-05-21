@@ -16,11 +16,10 @@
 
 package viewmodels.checkAnswers.add
 
+import models.add.InternationalAddress
 import models.{CheckMode, UserAnswers}
 import pages.add.AddressOfSubcontractorPage
-import models.add.InternationalAddress
 import play.api.i18n.Messages
-import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
@@ -40,15 +39,14 @@ object AddressOfSubcontractorSummary {
         answer.country
       )
 
-      val escapedWithBreaks: String =
+      val addressHtml: String =
         lines
-          .filter(_.trim.nonEmpty) // remove empty or whitespace-only lines
-          .map(HtmlFormat.escape(_).toString)
+          .filter(_.trim.nonEmpty)
           .mkString("<br/>")
 
       SummaryListRowViewModel(
         key = "addressOfSubcontractor.checkYourAnswersLabel",
-        value = ValueViewModel(HtmlContent(escapedWithBreaks)),
+        value = ValueViewModel(HtmlContent(addressHtml)),
         actions = Seq(
           ActionItemViewModel(
             "site.change",

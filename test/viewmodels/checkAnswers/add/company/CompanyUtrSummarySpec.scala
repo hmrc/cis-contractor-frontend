@@ -17,6 +17,7 @@
 package viewmodels.checkAnswers.add.company
 
 import controllers.add.company.routes
+import helpers.CyaEncodingSpecHelper
 import models.{CheckMode, UserAnswers}
 import org.scalatest.OptionValues.convertOptionToValuable
 import org.scalatest.TryValues.convertTryToSuccessOrFailure
@@ -28,7 +29,7 @@ import play.api.i18n.Messages
 import play.api.test.Helpers.stubMessages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.*
 
-class CompanyUtrSummarySpec extends AnyFreeSpec with Matchers {
+class CompanyUtrSummarySpec extends AnyFreeSpec with Matchers with CyaEncodingSpecHelper {
   implicit val messages: Messages = stubMessages()
 
   "CompanyUtrSummary.row" - {

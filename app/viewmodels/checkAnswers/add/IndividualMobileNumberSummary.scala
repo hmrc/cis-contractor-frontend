@@ -19,7 +19,6 @@ package viewmodels.checkAnswers.add
 import models.{CheckMode, UserAnswers}
 import pages.add.IndividualMobileNumberPage
 import play.api.i18n.Messages
-import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
@@ -30,7 +29,7 @@ object IndividualMobileNumberSummary {
     answers.get(IndividualMobileNumberPage).map { answer =>
       SummaryListRowViewModel(
         key = "individualMobileNumber.checkYourAnswersLabel",
-        value = ValueViewModel(HtmlFormat.escape(answer).toString),
+        value = ValueViewModel(answer),
         actions = Seq(
           ActionItemViewModel(
             "site.change",

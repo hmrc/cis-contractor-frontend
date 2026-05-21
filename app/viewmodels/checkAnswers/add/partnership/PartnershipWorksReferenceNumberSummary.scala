@@ -20,7 +20,6 @@ import controllers.add.partnership.routes
 import models.{CheckMode, UserAnswers}
 import pages.add.partnership.PartnershipWorksReferenceNumberPage
 import play.api.i18n.Messages
-import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
@@ -31,7 +30,7 @@ object PartnershipWorksReferenceNumberSummary {
     answers.get(PartnershipWorksReferenceNumberPage).map { answer =>
       SummaryListRowViewModel(
         key = "partnershipWorksReferenceNumber.checkYourAnswersLabel",
-        value = ValueViewModel(HtmlFormat.escape(answer).toString),
+        value = ValueViewModel(answer),
         actions = Seq(
           ActionItemViewModel("site.change", routes.PartnershipWorksReferenceNumberController.onPageLoad(CheckMode).url)
             .withVisuallyHiddenText(messages("partnershipWorksReferenceNumber.change.hidden"))
