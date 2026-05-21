@@ -19,7 +19,6 @@ package viewmodels.checkAnswers.add.company
 import models.{CheckMode, UserAnswers}
 import pages.add.company.CompanyNamePage
 import play.api.i18n.Messages
-import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
@@ -30,7 +29,7 @@ object CompanyNameSummary {
     answers.get(CompanyNamePage).map { answer =>
       SummaryListRowViewModel(
         key = "companyName.checkYourAnswersLabel",
-        value = ValueViewModel(HtmlFormat.escape(answer).toString),
+        value = ValueViewModel(answer),
         actions = Seq(
           ActionItemViewModel(
             "site.change",

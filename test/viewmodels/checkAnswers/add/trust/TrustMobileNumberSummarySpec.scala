@@ -16,6 +16,7 @@
 
 package viewmodels.checkAnswers.add.trust
 
+import helpers.CyaEncodingSpecHelper
 import models.{CheckMode, UserAnswers}
 import org.scalatest.OptionValues.convertOptionToValuable
 import org.scalatest.TryValues.convertTryToSuccessOrFailure
@@ -25,7 +26,7 @@ import pages.add.trust.TrustMobileNumberPage
 import play.api.i18n.Messages
 import play.api.test.Helpers.stubMessages
 
-class TrustMobileNumberSummarySpec extends AnyFreeSpec with Matchers {
+class TrustMobileNumberSummarySpec extends AnyFreeSpec with Matchers with CyaEncodingSpecHelper {
   implicit val messages: Messages = stubMessages()
 
   "TrustMobileNumberSummary.row" - {
@@ -65,6 +66,24 @@ class TrustMobileNumberSummarySpec extends AnyFreeSpec with Matchers {
     "must return None when the answer does not exist" in {
       val answers = UserAnswers("test-id")
       TrustMobileNumberSummary.row(answers) shouldBe None
+    }
+
+    "must HTML-escape special characters correctly (single encoding only)" in {
+
+      val mobile = "07700 900000 & ext'45"
+
+      val answers =
+        UserAnswers("id")
+          .set(TrustMobileNumberPage, mobile)
+          .success
+          .value
+
+      val row = TrustMobileNumberSummary.row(answers).value
+
+      val html = extractHtml(row)
+
+      assertEscaped(html, "07700 900000 &amp; ext&#x27;45")
+      assertNoDoubleEncoding(html)
     }
   }
 }
