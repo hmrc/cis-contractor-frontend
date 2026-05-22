@@ -45,6 +45,9 @@ object TypeOfSubcontractor extends Enumerable.Implicits {
     )
   }
 
+  def fromString(s: String): Option[TypeOfSubcontractor] =
+    values.find(_.toString == s.trim.toLowerCase)
+
   implicit val enumerable: Enumerable[TypeOfSubcontractor] =
     Enumerable(values.map(v => v.toString -> v): _*)
 }
