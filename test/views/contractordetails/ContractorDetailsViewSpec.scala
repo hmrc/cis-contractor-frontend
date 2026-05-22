@@ -80,7 +80,7 @@ class ContractorDetailsViewSpec extends SpecBase {
 
     "must include visually hidden text for each change link" in new Setup {
       val html = view(contractorDetailsViewModel)
-      val doc = Jsoup.parse(html.body)
+      val doc  = Jsoup.parse(html.body)
 
       val hiddenTexts = doc.select(".govuk-visually-hidden").eachText()
 
