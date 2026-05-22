@@ -25,7 +25,7 @@ import play.api.test.Helpers.*
 
 class CheckVerificationBatchReadinessControllerSpec extends SpecBase {
 
-  private val normalModeUrl = "/verify/check-verification-batch-readiness"
+  private val normalModeUrl = "/subcontractor/verify/check-verification-batch-readiness"
 
   private def readyIndividual(id: Long): Subcontractor = Subcontractor(
     subcontractorId = id,

@@ -27,11 +27,12 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.mockito.MockitoSugar
-import play.api.http.Status.{INTERNAL_SERVER_ERROR, NO_CONTENT}
+import play.api.http.Status.{INTERNAL_SERVER_ERROR, NO_CONTENT, OK}
 import play.api.libs.json.{JsValue, Json}
 import uk.gov.hmrc.http.client.{HttpClientV2, RequestBuilder}
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
+import models.requests.ModifyVerificationsRequest
 
 import java.net.URL
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -252,5 +253,80 @@ class ConstructionIndustrySchemeConnectorSpec extends AnyWordSpec with Matchers 
     val bodyCaptor: ArgumentCaptor[JsValue] = ArgumentCaptor.forClass(classOf[JsValue])
     verify(rb).withBody(bodyCaptor.capture())(any(), any(), any())
     bodyCaptor.getValue mustBe Json.toJson(payload.asInstanceOf[TrustPayload])
+  }
+
+  "ConstructionIndustrySchemeConnector.modifyVerificationBatch" should {
+
+    "return Unit when CIS responds with NO_CONTENT (204)" in {
+      val config = mock[ServicesConfig]
+      val http   = mock[HttpClientV2]
+      val rb     = mock[RequestBuilder]
+
+      when(config.baseUrl("construction-industry-scheme")).thenReturn("http://cis-host")
+
+      when(http.post(any())(any())).thenReturn(rb)
+      when(rb.withBody(any[JsValue]())(any(), any(), any())).thenReturn(rb)
+      when(rb.execute[HttpResponse](any(), any())).thenReturn(Future.successful(HttpResponse(NO_CONTENT, "")))
+
+      val connector = new ConstructionIndustrySchemeConnector(config, http)
+
+      val req = ModifyVerificationsRequest(
+        instanceId = "INST-123",
+        deleteVerifications = None,
+        createVerifications = None
+      )
+
+      connector.modifyVerificationBatch(req).futureValue mustBe (())
+
+      val bodyCaptor: ArgumentCaptor[JsValue] = ArgumentCaptor.forClass(classOf[JsValue])
+      verify(rb).withBody(bodyCaptor.capture())(any(), any(), any())
+      bodyCaptor.getValue mustBe Json.toJson(req)
+    }
+
+    "return Unit when CIS responds with OK (200)" in {
+      val config = mock[ServicesConfig]
+      val http   = mock[HttpClientV2]
+      val rb     = mock[RequestBuilder]
+
+      when(config.baseUrl("construction-industry-scheme")).thenReturn("http://cis-host")
+
+      when(http.post(any())(any())).thenReturn(rb)
+      when(rb.withBody(any[JsValue]())(any(), any(), any())).thenReturn(rb)
+      when(rb.execute[HttpResponse](any(), any())).thenReturn(Future.successful(HttpResponse(OK, "")))
+
+      val connector = new ConstructionIndustrySchemeConnector(config, http)
+
+      val req = ModifyVerificationsRequest(
+        instanceId = "INST-123",
+        deleteVerifications = None,
+        createVerifications = None
+      )
+
+      connector.modifyVerificationBatch(req).futureValue mustBe (())
+    }
+
+    "fail when CIS responds with a non-200/204 status" in {
+      val config = mock[ServicesConfig]
+      val http   = mock[HttpClientV2]
+      val rb     = mock[RequestBuilder]
+
+      when(config.baseUrl("construction-industry-scheme")).thenReturn("http://cis-host")
+
+      when(http.post(any())(any())).thenReturn(rb)
+      when(rb.withBody(any[JsValue]())(any(), any(), any())).thenReturn(rb)
+      when(rb.execute[HttpResponse](any(), any()))
+        .thenReturn(Future.successful(HttpResponse(INTERNAL_SERVER_ERROR, "boom")))
+
+      val connector = new ConstructionIndustrySchemeConnector(config, http)
+
+      val req = ModifyVerificationsRequest(
+        instanceId = "INST-123",
+        deleteVerifications = None,
+        createVerifications = None
+      )
+
+      val ex = connector.modifyVerificationBatch(req).failed.futureValue
+      ex.getMessage mustBe s"Modify verification batch failed, returned $INTERNAL_SERVER_ERROR"
+    }
   }
 }

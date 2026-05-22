@@ -19,7 +19,6 @@ package viewmodels.checkAnswers.add.trust
 import models.{CheckMode, UserAnswers}
 import pages.add.trust.TrustMobileNumberPage
 import play.api.i18n.Messages
-import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
@@ -30,7 +29,7 @@ object TrustMobileNumberSummary {
     answers.get(TrustMobileNumberPage).map { answer =>
       SummaryListRowViewModel(
         key = "trustMobileNumber.checkYourAnswersLabel",
-        value = ValueViewModel(HtmlFormat.escape(answer).toString),
+        value = ValueViewModel(answer),
         actions = Seq(
           ActionItemViewModel(
             "site.change",
