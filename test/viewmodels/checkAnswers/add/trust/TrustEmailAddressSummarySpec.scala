@@ -17,6 +17,7 @@
 package viewmodels.checkAnswers.add.trust
 
 import controllers.add.trust.routes
+import helpers.CyaEncodingSpecHelper
 import models.{CheckMode, UserAnswers}
 import org.scalatest.OptionValues.convertOptionToValuable
 import org.scalatest.TryValues.convertTryToSuccessOrFailure
@@ -28,7 +29,7 @@ import play.api.test.Helpers.stubMessages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.*
 import org.scalatest.matchers.must.Matchers.must
 
-class TrustEmailAddressSummarySpec extends AnyFreeSpec with Matchers {
+class TrustEmailAddressSummarySpec extends AnyFreeSpec with Matchers with CyaEncodingSpecHelper {
 
   implicit val messages: Messages = stubMessages()
 
@@ -78,6 +79,24 @@ class TrustEmailAddressSummarySpec extends AnyFreeSpec with Matchers {
     "must return None when the answer does not exist" in {
       val answers = UserAnswers("test-id")
       TrustEmailAddressSummary.row(answers) shouldBe None
+    }
+
+    "must HTML-escape special characters correctly (single encoding only)" in {
+
+      val email = "trust+o'reilly&co@test.com"
+
+      val answers =
+        UserAnswers("id")
+          .set(TrustEmailAddressPage, email)
+          .success
+          .value
+
+      val row = TrustEmailAddressSummary.row(answers).value
+
+      val html = extractHtml(row)
+
+      assertEscaped(html, "trust+o&#x27;reilly&amp;co@test.com")
+      assertNoDoubleEncoding(html)
     }
   }
 }
