@@ -32,12 +32,12 @@
     if (value.trim.isEmpty) {
         SummaryListRowViewModel(
             key   = KeyViewModel(messages(label)),
-            value = ValueViewModel(messages("")),
+            value = ValueViewModel(""),
             actions = Seq(
-            ActionItemViewModel(
-                Text(messages("contractordetails.contractorDetails.table.link.addDetails")),
-                url
-                )
+                ActionItemViewModel(
+                    Text(messages("contractordetails.contractorDetails.table.link.addDetails")),
+                    url
+                ).withVisuallyHiddenText(messages(label))
             )
         )
     } else {
@@ -46,9 +46,9 @@
             value = ValueViewModel(value),
             actions = Seq(
                 ActionItemViewModel(
-                Text(messages("site.change")),
-                url
-                )
+                    Text(messages("site.change")),
+                    url
+                ).withVisuallyHiddenText(messages(label))
             )
         )
     }
