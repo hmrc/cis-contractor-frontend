@@ -327,7 +327,9 @@ contractordetails.contractorDetails.heading                             = Contra
 contractordetails.contractorDetails.accountsOfficeReference             = Accounts office reference: {0}
 contractordetails.contractorDetails.table.uniqueTaxpayerReference       = Unique Taxpayer Reference
 contractordetails.contractorDetails.table.schemeName                    = Scheme name
+contractordetails.contractorDetails.table.schemeName.hidden             = scheme name
 contractordetails.contractorDetails.table.email                         = Email
+contractordetails.contractorDetails.table.email.hidden                  = email
 contractordetails.contractorDetails.table.link.addDetails               = Add details
 contractordetails.contractorDetails.link                                = Return to CIS dashboard
 

@@ -28,7 +28,7 @@
 
 @(contractorDetailsViewModel: ContractorDetailsViewModel)(implicit request: Request[_], messages: Messages)
 
-@helperRow(label: String, value: String, url: String)(implicit messages: Messages) = @{
+@helperRow(label: String, value: String, url: String, hiddenText: String)(implicit messages: Messages) = @{
     if (value.trim.isEmpty) {
         SummaryListRowViewModel(
             key   = KeyViewModel(messages(label)),
@@ -37,7 +37,7 @@
                 ActionItemViewModel(
                     Text(messages("contractordetails.contractorDetails.table.link.addDetails")),
                     url
-                ).withVisuallyHiddenText(messages(label).toLowerCase)
+                ).withVisuallyHiddenText(messages(hiddenText))
             )
         )
     } else {
@@ -48,7 +48,7 @@
                 ActionItemViewModel(
                     Text(messages("site.change")),
                     url
-                ).withVisuallyHiddenText(messages(label).toLowerCase)
+                ).withVisuallyHiddenText(messages(hiddenText))
             )
         )
     }
@@ -60,11 +60,25 @@
     @h2(messages("contractordetails.contractorDetails.accountsOfficeReference", contractorDetailsViewModel.accountsOfficeReference))
 
     @govukSummaryList(
-        SummaryListViewModel(
-        Seq(
-            helperRow("contractordetails.contractorDetails.table.uniqueTaxpayerReference", contractorDetailsViewModel.uniqueTaxpayerReference, "#"),
-            helperRow("contractordetails.contractorDetails.table.schemeName", contractorDetailsViewModel.schemeName, "#"),
-            helperRow("contractordetails.contractorDetails.table.email", contractorDetailsViewModel.email, "#")
+        SummaryListViewModel(Seq(
+            helperRow(
+                "contractordetails.contractorDetails.table.uniqueTaxpayerReference",
+                contractorDetailsViewModel.uniqueTaxpayerReference,
+                "#",
+                "contractordetails.contractorDetails.table.uniqueTaxpayerReference"
+            ),
+            helperRow(
+                "contractordetails.contractorDetails.table.schemeName",
+                contractorDetailsViewModel.schemeName,
+                "#",
+                "contractordetails.contractorDetails.table.schemeName.hidden"
+            ),
+            helperRow(
+                "contractordetails.contractorDetails.table.email",
+                contractorDetailsViewModel.email,
+                "#",
+                "contractordetails.contractorDetails.table.email.hidden"
+                )
             )
         )
     )

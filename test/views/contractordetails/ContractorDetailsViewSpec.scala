@@ -77,6 +77,17 @@ class ContractorDetailsViewSpec extends SpecBase {
       val links: String = doc.select(".govuk-link").text
       links must include(messages("contractordetails.contractorDetails.table.link.addDetails"))
     }
+
+    "must include visually hidden text for each change link" in new Setup {
+      val html = view(contractorDetailsViewModel)
+      val doc = Jsoup.parse(html.body)
+
+      val hiddenTexts = doc.select(".govuk-visually-hidden").eachText()
+
+      hiddenTexts must contain(messages("contractordetails.contractorDetails.table.uniqueTaxpayerReference"))
+      hiddenTexts must contain(messages("contractordetails.contractorDetails.table.schemeName.hidden"))
+      hiddenTexts must contain(messages("contractordetails.contractorDetails.table.email.hidden"))
+    }
   }
 
   trait Setup {
