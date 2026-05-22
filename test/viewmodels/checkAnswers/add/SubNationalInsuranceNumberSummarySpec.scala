@@ -17,6 +17,7 @@
 package viewmodels.checkAnswers.add
 
 import controllers.add.routes
+import helpers.CyaEncodingSpecHelper
 import models.{CheckMode, UserAnswers}
 import org.scalatest.OptionValues.convertOptionToValuable
 import org.scalatest.TryValues.convertTryToSuccessOrFailure
@@ -27,7 +28,7 @@ import play.api.i18n.Messages
 import play.api.test.Helpers.stubMessages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.*
 
-class SubNationalInsuranceNumberSummarySpec extends AnyFreeSpec with Matchers {
+class SubNationalInsuranceNumberSummarySpec extends AnyFreeSpec with Matchers with CyaEncodingSpecHelper {
 
   implicit val messages: Messages = stubMessages()
 
@@ -68,6 +69,24 @@ class SubNationalInsuranceNumberSummarySpec extends AnyFreeSpec with Matchers {
     "must return None when the answer does not exist" in {
       val answers = UserAnswers("test-id")
       SubNationalInsuranceNumberSummary.row(answers) shouldBe None
+    }
+
+    "must HTML-escape special characters correctly (single encoding only)" in {
+
+      val nino = "AB123456C & Ref'01"
+
+      val answers =
+        UserAnswers("id")
+          .set(SubNationalInsuranceNumberPage, nino)
+          .success
+          .value
+
+      val row = SubNationalInsuranceNumberSummary.row(answers).value
+
+      val html = extractHtml(row)
+
+      assertEscaped(html, "AB123456C &amp; Ref&#x27;01")
+      assertNoDoubleEncoding(html)
     }
   }
 }

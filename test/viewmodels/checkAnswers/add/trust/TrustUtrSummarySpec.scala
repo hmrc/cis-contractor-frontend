@@ -17,6 +17,7 @@
 package viewmodels.checkAnswers.add.trust
 
 import controllers.add.trust.routes
+import helpers.CyaEncodingSpecHelper
 import models.{CheckMode, UserAnswers}
 import org.scalatest.OptionValues.convertOptionToValuable
 import org.scalatest.TryValues.convertTryToSuccessOrFailure
@@ -28,7 +29,7 @@ import play.api.i18n.Messages
 import play.api.test.Helpers.stubMessages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.*
 
-class TrustUtrSummarySpec extends AnyFreeSpec with Matchers {
+class TrustUtrSummarySpec extends AnyFreeSpec with Matchers with CyaEncodingSpecHelper {
 
   implicit val messages: Messages = stubMessages()
 
@@ -65,6 +66,24 @@ class TrustUtrSummarySpec extends AnyFreeSpec with Matchers {
 
     "must return None when the answer is not present" in {
       TrustUtrSummary.row(UserAnswers("test-id")) shouldBe None
+    }
+
+    "must HTML-escape special characters correctly (single encoding only)" in {
+
+      val utr = "1234567890 & Ref'01"
+
+      val answers =
+        UserAnswers("id")
+          .set(TrustUtrPage, utr)
+          .success
+          .value
+
+      val row = TrustUtrSummary.row(answers).value
+
+      val html = extractHtml(row)
+
+      assertEscaped(html, "1234567890 &amp; Ref&#x27;01")
+      assertNoDoubleEncoding(html)
     }
   }
 }

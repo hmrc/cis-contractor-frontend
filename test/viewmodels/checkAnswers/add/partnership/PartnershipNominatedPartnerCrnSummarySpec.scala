@@ -17,25 +17,28 @@
 package viewmodels.checkAnswers.add.partnership
 
 import controllers.add.partnership.routes
+import helpers.CyaEncodingSpecHelper
 import models.{CheckMode, UserAnswers}
 import org.scalatest.OptionValues
 import org.scalatest.TryValues.convertTryToSuccessOrFailure
 import org.scalatest.freespec.AnyFreeSpec
-import org.scalatest.matchers.must.Matchers
+import org.scalatest.matchers.should.Matchers
 import pages.add.partnership.PartnershipNominatedPartnerCrnPage
 import play.api.i18n.Messages
 import play.api.test.Helpers.stubMessages
-import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
-import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.*
-import org.scalatest.matchers.must.Matchers.must
 
-class PartnershipNominatedPartnerCrnSummarySpec extends AnyFreeSpec with Matchers with OptionValues {
+class PartnershipNominatedPartnerCrnSummarySpec
+    extends AnyFreeSpec
+    with Matchers
+    with OptionValues
+    with CyaEncodingSpecHelper {
 
   implicit val messages: Messages = stubMessages()
 
   "PartnershipNominatedPartnerCrnSummary.row" - {
 
     "must return a SummaryListRow when the answer exists" in {
+
       val ua =
         UserAnswers("test-id")
           .set(PartnershipNominatedPartnerCrnPage, "AC012345")
@@ -44,21 +47,52 @@ class PartnershipNominatedPartnerCrnSummarySpec extends AnyFreeSpec with Matcher
 
       val row = PartnershipNominatedPartnerCrnSummary.row(ua).value
 
-      row.key mustBe Key(Text(messages("partnershipNominatedPartnerCrn.checkYourAnswersLabel")))
-      row.value mustBe Value(Text("AC012345"))
+      row.key.content.asHtml.toString should include(
+        messages("partnershipNominatedPartnerCrn.checkYourAnswersLabel")
+      )
 
-      row.actions.value.items must have size 1
+      row.value.content.asHtml.toString should include("AC012345")
+
+      row.actions.value.items should have size 1
       val action = row.actions.value.items.head
 
-      action.href mustBe routes.PartnershipNominatedPartnerCrnController.onPageLoad(CheckMode).url
-      action.content mustBe Text(messages("site.change"))
-      action.visuallyHiddenText mustBe Some(messages("partnershipNominatedPartnerCrn.change.hidden"))
-      action.attributes must contain("id" -> "nominated-partner-crn")
+      action.href shouldBe
+        routes.PartnershipNominatedPartnerCrnController
+          .onPageLoad(CheckMode)
+          .url
+
+      action.content.asHtml.toString should include(messages("site.change"))
+
+      action.visuallyHiddenText.value shouldBe
+        messages("partnershipNominatedPartnerCrn.change.hidden")
+
+      action.attributes should contain("id" -> "nominated-partner-crn")
     }
 
     "must return None when the answer does not exist" in {
+
       val ua = UserAnswers("test-id")
-      PartnershipNominatedPartnerCrnSummary.row(ua) mustBe None
+
+      PartnershipNominatedPartnerCrnSummary.row(ua) shouldBe None
+    }
+
+    "must HTML-escape special characters correctly (single encoding only)" in {
+
+      val crn = "CRN & Co '123'"
+
+      val answers =
+        UserAnswers("id")
+          .set(PartnershipNominatedPartnerCrnPage, crn)
+          .success
+          .value
+
+      val row = PartnershipNominatedPartnerCrnSummary.row(answers).value
+
+      val html = extractHtml(row)
+
+      assertEscaped(html, "CRN &amp; Co &#x27;123&#x27;")
+
+      assertNoDoubleEncoding(html)
     }
   }
 }
