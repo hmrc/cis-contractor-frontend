@@ -17,7 +17,7 @@
 package controllers.verify
 
 import controllers.actions.*
-import models.{Mode, NormalMode, UserAnswers}
+import models.{CheckMode, Mode, NormalMode, UserAnswers}
 import models.verify.VerificationBatchReadiness
 import pages.verify.{NewestVerificationBatchResponsePage, SelectSubcontractorPage, VerificationBatchReadinessPage}
 import play.api.Logging
@@ -58,7 +58,7 @@ class CheckVerificationBatchReadinessController @Inject() (
           } yield {
             val redirect = mode match {
               case NormalMode => nextEmailConfirmationPage(ua)
-              case _          => controllers.verify.routes.VerifyCheckYourAnswersController.onPageLoad()
+              case CheckMode  => controllers.verify.routes.VerifyCheckYourAnswersController.onPageLoad()
             }
             Redirect(redirect)
           }
