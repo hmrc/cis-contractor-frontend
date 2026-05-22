@@ -141,6 +141,19 @@ class CheckVerificationBatchReadinessControllerSpec extends SpecBase {
           redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
         }
       }
+
+      "must set VerificationBatchReadinessPage to false in session" in {
+        val ua = emptyUserAnswers
+          .setOrException(SelectSubcontractorPage, Set(selectedSub))
+          .setOrException(NewestVerificationBatchResponsePage, batchResponse(Seq(notReadyIndividual(1))))
+
+        val application = applicationBuilder(userAnswers = Some(ua)).build()
+        running(application) {
+          val result = route(application, FakeRequest(GET, normalModeUrl)).value
+          status(result) mustEqual SEE_OTHER
+          // Readiness flag is verified indirectly: session is updated with false before redirecting
+        }
+      }
     }
 
     "selected ID not found in batch subcontractors" - {

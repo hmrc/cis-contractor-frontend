@@ -65,7 +65,10 @@ class CheckVerificationBatchReadinessController @Inject() (
 
         case Some(false) =>
           // TODO(DTR-4685): Route to VF-05 once that page is built; for now redirecting to Journey Recovery
-          Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+          for {
+            updatedAnswers <- Future.fromTry(ua.set(VerificationBatchReadinessPage, false))
+            _              <- sessionRepository.set(updatedAnswers)
+          } yield Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
 
         case None =>
           logger.error(
