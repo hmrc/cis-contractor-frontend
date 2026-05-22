@@ -37,7 +37,7 @@
                 ActionItemViewModel(
                     Text(messages("contractordetails.contractorDetails.table.link.addDetails")),
                     url
-                ).withVisuallyHiddenText(messages(label))
+                ).withVisuallyHiddenText(messages(label).toLowerCase)
             )
         )
     } else {
@@ -48,7 +48,7 @@
                 ActionItemViewModel(
                     Text(messages("site.change")),
                     url
-                ).withVisuallyHiddenText(messages(label))
+                ).withVisuallyHiddenText(messages(label).toLowerCase)
             )
         )
     }

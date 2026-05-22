@@ -325,7 +325,7 @@ contractordetails.contractorDetailsUpdated.p2.whatDidYouThink.suffix            
 contractordetails.contractorDetails.title                               = Contractor details
 contractordetails.contractorDetails.heading                             = Contractor details
 contractordetails.contractorDetails.accountsOfficeReference             = Accounts office reference: {0}
-contractordetails.contractorDetails.table.uniqueTaxpayerReference       = Unique taxpayer reference
+contractordetails.contractorDetails.table.uniqueTaxpayerReference       = Unique Taxpayer Reference
 contractordetails.contractorDetails.table.schemeName                    = Scheme name
 contractordetails.contractorDetails.table.email                         = Email
 contractordetails.contractorDetails.table.link.addDetails               = Add details
