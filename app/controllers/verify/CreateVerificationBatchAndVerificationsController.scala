@@ -84,7 +84,11 @@ class CreateVerificationBatchAndVerificationsController @Inject() (
               Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
 
             case Some(_) if hasCurrentBatch(request.userAnswers) =>
-              Future.successful(Ok("Current verification batch exists - modify flow to be implemented"))
+              Future.successful(
+                Redirect(
+                  controllers.verify.routes.ModifyVerificationBatchAndVerificationsController.modifyVerificationBatch()
+                )
+              )
 
             case Some(_) =>
               verificationService

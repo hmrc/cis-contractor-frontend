@@ -80,11 +80,14 @@ class VerificationStatusController @Inject() (
               .exists(d => isBetweenInclusive(d, start, today))
 
           logger.info(
-            s"[VerificationStatusController.goToSelectSubcontractorsToReverify] " +
-              s"subcontractorId=${sub.subcontractorId}, " +
-              s"reverifyRequired=$required, " +
-              s"isBetweenInclusive(verificationDate)=$betweenVerificationDate, " +
-              s"isBetweenInclusive(lastMonthlyReturnDate)=$betweenLastMonthlyReturnDate"
+            s"[VerificationStatusController.goToSelectSubcontractorsToReverify] \n" +
+              s"subcontractorId=${sub.subcontractorId}, \n" +
+              s"Start Date = $start \n" +
+              s"Verification Date = ${sub.verificationDate.map(_.toLocalDate)} \n" +
+              s"Last monthly Return Date = ${sub.lastMonthlyReturnDate.map(_.toLocalDate)} \n" +
+              s"Verification date between Today and Start date = $betweenVerificationDate, \n" +
+              s"Last Monthly return date is between Today and Start date = $betweenLastMonthlyReturnDate \n" +
+              s"Reverification required = $required"
           )
         }
       }

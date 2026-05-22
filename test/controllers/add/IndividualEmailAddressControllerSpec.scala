@@ -20,12 +20,13 @@ import base.SpecBase
 import controllers.routes
 import forms.add.IndividualEmailAddressFormProvider
 import models.add.SubcontractorName
+import models.contact.ContactOptions.Email
 import models.{NormalMode, UserAnswers}
 import navigation.Navigator
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.add.{IndividualEmailAddressPage, SubcontractorNamePage}
+import pages.add.{IndividualChooseContactDetailsPage, IndividualEmailAddressPage, SubcontractorNamePage}
 import play.api.data.Form
 import play.api.inject.bind
 import play.api.mvc.Call
@@ -53,11 +54,20 @@ class IndividualEmailAddressControllerSpec extends SpecBase with MockitoSugar {
   private def uaWithName: UserAnswers =
     emptyUserAnswers.set(SubcontractorNamePage, subContractorName).success.value
 
+  private def uaWithNameAndEmailChoice: UserAnswers =
+    buildAnswersWithContactChoice(
+      emptyUserAnswers,
+      SubcontractorNamePage,
+      subContractorName,
+      IndividualChooseContactDetailsPage,
+      Email
+    )
+
   "IndividualEmailAddress Controller" - {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(uaWithName)).build()
+      val application = applicationBuilder(userAnswers = Some(uaWithNameAndEmailChoice)).build()
 
       running(application) {
         val request = FakeRequest(GET, individualEmailAddressRoute)
@@ -76,7 +86,11 @@ class IndividualEmailAddressControllerSpec extends SpecBase with MockitoSugar {
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = uaWithName.set(IndividualEmailAddressPage, "abc@test.com").success.value
+      val userAnswers =
+        uaWithNameAndEmailChoice
+          .set(IndividualEmailAddressPage, "abc@test.com")
+          .success
+          .value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
@@ -92,6 +106,20 @@ class IndividualEmailAddressControllerSpec extends SpecBase with MockitoSugar {
           request,
           messages(application)
         ).toString
+      }
+    }
+
+    "must redirect to Journey Recovery for a GET when Email is not selected" in {
+
+      val application = applicationBuilder(userAnswers = Some(uaWithName)).build()
+
+      running(application) {
+        val request = FakeRequest(GET, individualEmailAddressRoute)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
       }
     }
 
@@ -143,6 +171,20 @@ class IndividualEmailAddressControllerSpec extends SpecBase with MockitoSugar {
           request,
           messages(application)
         ).toString
+      }
+    }
+
+    "must redirect to Journey Recovery when contact choice is missing" in {
+
+      val application = applicationBuilder(userAnswers = Some(uaWithName)).build()
+
+      running(application) {
+        val request = FakeRequest(GET, individualEmailAddressRoute)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
       }
     }
 

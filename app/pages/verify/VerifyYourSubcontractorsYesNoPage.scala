@@ -19,7 +19,7 @@ package pages.verify
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 
-case object VerifyYourSubcontractorsYesNoPage extends QuestionPage[Boolean] {
+case object VerifyYourSubcontractorsYesNoPage extends QuestionPage[Boolean] with VerifyJourney {
 
   override def path: JsPath = JsPath \ toString
 

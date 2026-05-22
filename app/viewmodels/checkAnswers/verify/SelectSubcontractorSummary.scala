@@ -20,7 +20,6 @@ import models.{CheckMode, SubcontractorViewModel, UserAnswers}
 import pages.verify.SelectSubcontractorPage
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
-import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
@@ -28,27 +27,21 @@ import viewmodels.implicits.*
 object SelectSubcontractorSummary {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(SelectSubcontractorPage).map { answers =>
-
-      val value = ValueViewModel(
-        HtmlContent(
-          answers
-            .map(sub => HtmlFormat.escape(sub.name).toString)
-            .mkString(",<br>")
-        )
-      )
-
-      SummaryListRowViewModel(
-        key = "verify.selectSubcontractor.checkYourAnswersLabel",
-        value = value,
-        actions = Seq(
-          ActionItemViewModel(
-            "site.change",
-            controllers.verify.routes.SelectSubcontractorController.onPageLoad(CheckMode).url
+    answers.get(SelectSubcontractorPage).flatMap { answers =>
+      val names = answers.map(sub => HtmlFormat.escape(sub.name).toString).toSeq
+      ValueViewModelHelper.makeGovukBulletList(names).map { value =>
+        SummaryListRowViewModel(
+          key = "verify.selectSubcontractor.checkYourAnswersLabel",
+          value = value,
+          actions = Seq(
+            ActionItemViewModel(
+              "site.change",
+              controllers.verify.routes.SelectSubcontractorController.onPageLoad(CheckMode).url
+            )
+              .withVisuallyHiddenText(messages("verify.selectSubcontractor.change.hidden"))
+              .withAttribute("id" -> "select-subcontractor")
           )
-            .withVisuallyHiddenText(messages("verify.selectSubcontractor.change.hidden"))
-            .withAttribute("id" -> "select-subcontractor")
         )
-      )
+      }
     }
 }

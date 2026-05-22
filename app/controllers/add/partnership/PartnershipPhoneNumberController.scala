@@ -17,10 +17,12 @@
 package controllers.add.partnership
 
 import controllers.actions.*
+import controllers.helpers.ContactGuard
 import forms.add.partnership.PartnershipPhoneNumberFormProvider
 import models.Mode
+import models.contact.ContactOptions.Phone
 import navigation.Navigator
-import pages.add.partnership.{PartnershipNamePage, PartnershipPhoneNumberPage}
+import pages.add.partnership.{PartnershipChooseContactDetailsPage, PartnershipNamePage, PartnershipPhoneNumberPage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
@@ -42,23 +44,25 @@ class PartnershipPhoneNumberController @Inject() (
   view: PartnershipPhoneNumberView
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
-    with I18nSupport {
+    with I18nSupport
+    with ContactGuard {
 
   val form = formProvider()
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
-    request.userAnswers
-      .get(PartnershipNamePage)
-      .map { partnershipName =>
-        val preparedForm = request.userAnswers.get(PartnershipPhoneNumberPage) match {
-          case None        => form
-          case Some(value) => form.fill(value)
-        }
+  def onPageLoad(mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData) { implicit request =>
+      requireContactChoice(
+        request.userAnswers.get(PartnershipNamePage),
+        request.userAnswers.get(PartnershipChooseContactDetailsPage),
+        Phone
+      ) { partnershipName =>
+
+        val preparedForm =
+          request.userAnswers.get(PartnershipPhoneNumberPage).fold(form)(form.fill)
 
         Ok(view(preparedForm, mode, partnershipName))
       }
-      .getOrElse(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
-  }
+    }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
