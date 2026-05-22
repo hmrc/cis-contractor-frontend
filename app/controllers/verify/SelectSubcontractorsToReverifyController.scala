@@ -70,10 +70,10 @@ class SelectSubcontractorsToReverifyController @Inject() (
     } else {
       val reverify = ReverificationRules.reverifyRequired(sub, currentDate)
 
-      val name = nameFor(sub).getOrElse("Unknown")
-      val utr  = sub.utr.filter(_.nonEmpty).getOrElse("Unknown")
+      val name = nameFor(sub).getOrElse("No name provided")
+      val utr  = sub.utr.filter(_.nonEmpty).getOrElse("No name provided")
 
-      val verifiedCol = if (reverify) "Yes" else "No"
+      val verifiedCol = if (reverify) "No" else "Yes"
 
       val verificationNumber =
         if (!reverify) {
@@ -126,11 +126,11 @@ class SelectSubcontractorsToReverifyController @Inject() (
       case Some(t) if t.equalsIgnoreCase("partnership")                            =>
         partnershipTrading.orElse(trading)
       case Some(t) if t.equalsIgnoreCase("company") || t.equalsIgnoreCase("trust") =>
-        trading.orElse(partnershipTrading)
+        trading
       case Some(_)                                                                 =>
         individualName.orElse(trading)
       case None                                                                    =>
-        Some("Unknown")
+        Some("No name provided")
     }
   }
 
