@@ -120,18 +120,6 @@ GET   /subcontractor/add/company/subcontractor-added      controllers.add.Subcon
 GET   /subcontractor/add/partnership/subcontractor-added  controllers.add.SubcontractorAddedController.partnershipSubcontractorAdded()
 GET   /subcontractor/add/trust/subcontractor-added        controllers.add.SubcontractorAddedController.trustSubcontractorAdded()
 
-GET   /contractor-details/what-is-contractors-scheme-name         controllers.contractordetails.SchemeNameController.onPageLoad(mode: Mode = NormalMode)
-POST  /contractor-details/what-is-contractors-scheme-name         controllers.contractordetails.SchemeNameController.onSubmit(mode: Mode = NormalMode)
-GET   /contractor-details/change-what-is-contractors-scheme-name  controllers.contractordetails.SchemeNameController.onPageLoad(mode: Mode = CheckMode)
-POST  /contractor-details/change-what-is-contractors-scheme-name  controllers.contractordetails.SchemeNameController.onSubmit(mode: Mode = CheckMode)
-
-GET   /contractor-details/what-is-contractors-email                 controllers.contractordetails.EnterContractorEmailAddressController.onPageLoad(mode: Mode = NormalMode)
-POST  /contractor-details/what-is-contractors-email                 controllers.contractordetails.EnterContractorEmailAddressController.onSubmit(mode: Mode = NormalMode)
-GET   /contractor-details/change-what-is-contractors-email          controllers.contractordetails.EnterContractorEmailAddressController.onPageLoad(mode: Mode = CheckMode)
-POST  /contractor-details/change-what-is-contractors-email          controllers.contractordetails.EnterContractorEmailAddressController.onSubmit(mode: Mode = CheckMode)
-
-GET   /contractor-details/contractor-details-updated                       controllers.contractordetails.ContractorDetailsUpdatedController.onPageLoad()
-
 # Errors & Auth
 GET  /unauthorised/standard-user  controllers.UnauthorisedWrongRoleController.onPageLoad()
 
@@ -385,8 +373,9 @@ GET   /subcontractor/verify/select-subcontractors-to-reverify         controller
 POST  /subcontractor/verify/select-subcontractors-to-reverify         controllers.verify.SelectSubcontractorsToReverifyController.onSubmit(mode: Mode = NormalMode, page: Int ?= 1)
 GET   /subcontractor/verify/change-select-subcontractors-to-reverify  controllers.verify.SelectSubcontractorsToReverifyController.onPageLoad(mode: Mode = CheckMode, page: Int ?= 1)
 POST  /subcontractor/verify/change-select-subcontractors-to-reverify  controllers.verify.SelectSubcontractorsToReverifyController.onSubmit(mode: Mode = CheckMode, page: Int ?= 1)
-GET   /subcontractor/verify/verification-batch/modify                controllers.verify.ModifyVerificationBatchAndVerificationsController.modifyVerificationBatch()
-POST  /subcontractor/verify/verification-batch/modify                controllers.verify.ModifyVerificationBatchAndVerificationsController.modifyVerificationBatch()
+
+GET   /subcontractor/verify/verification-batch/modify  controllers.verify.ModifyVerificationBatchAndVerificationsController.modifyVerificationBatch()
+POST  /subcontractor/verify/verification-batch/modify  controllers.verify.ModifyVerificationBatchAndVerificationsController.modifyVerificationBatch()
 
 GET   /subcontractor/verify/select-subcontractors-to-verify         controllers.verify.SelectSubcontractorController.onPageLoad(mode: Mode = NormalMode, page: Int ?= 1)
 POST  /subcontractor/verify/select-subcontractors-to-verify         controllers.verify.SelectSubcontractorController.onSubmit(mode: Mode = NormalMode, page: Int ?= 1)
@@ -425,3 +414,18 @@ POST  /subcontractor/verify/check-your-answers  controllers.verify.VerifyCheckYo
 
 GET   /subcontractor/verify/verification-status/reverification-decision  controllers.verify.VerificationStatusController.goToReverificationDecision(mode: Mode = NormalMode)
 GET   /subcontractor/verify/verification-status/select-subcontractors    controllers.verify.VerificationStatusController.goToSelectSubcontractorsToReverify(mode: Mode = NormalMode)
+GET   /verify/verification-status/reverification-decision                controllers.verify.VerificationStatusController.goToReverificationDecision(mode: Mode = NormalMode)
+GET   /verify/verification-status/select-subcontractors                  controllers.verify.VerificationStatusController.goToSelectSubcontractorsToReverify(mode: Mode = NormalMode)
+
+# Contractor Details
+GET   /contractor-details/what-is-contractors-scheme-name         controllers.contractordetails.SchemeNameController.onPageLoad(mode: Mode = NormalMode)
+POST  /contractor-details/what-is-contractors-scheme-name         controllers.contractordetails.SchemeNameController.onSubmit(mode: Mode = NormalMode)
+GET   /contractor-details/change-what-is-contractors-scheme-name  controllers.contractordetails.SchemeNameController.onPageLoad(mode: Mode = CheckMode)
+POST  /contractor-details/change-what-is-contractors-scheme-name  controllers.contractordetails.SchemeNameController.onSubmit(mode: Mode = CheckMode)
+
+GET   /contractor-details/what-is-contractors-email         controllers.contractordetails.EnterContractorEmailAddressController.onPageLoad(mode: Mode = NormalMode)
+POST  /contractor-details/what-is-contractors-email         controllers.contractordetails.EnterContractorEmailAddressController.onSubmit(mode: Mode = NormalMode)
+GET   /contractor-details/change-what-is-contractors-email  controllers.contractordetails.EnterContractorEmailAddressController.onPageLoad(mode: Mode = CheckMode)
+POST  /contractor-details/change-what-is-contractors-email  controllers.contractordetails.EnterContractorEmailAddressController.onSubmit(mode: Mode = CheckMode)
+
+GET   /contractor-details/contractor-details-updated  controllers.contractordetails.ContractorDetailsUpdatedController.onPageLoad()

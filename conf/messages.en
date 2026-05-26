@@ -297,30 +297,6 @@ individualChooseContactDetails.error.required                            =  Sele
 individualChooseContactDetails.checkYourAnswersLabel                     =  Method of contact
 individualChooseContactDetails.change.hidden                             =  method of contact
 
-contractordetails.schemeName.title                                       =  What is the contractor’s scheme name?
-contractordetails.schemeName.heading                                     =  What is the contractor’s scheme name?
-contractordetails.schemeName.checkYourAnswersLabel                       =  Scheme name
-contractordetails.schemeName.error.required                              =  Enter a scheme name
-contractordetails.schemeName.error.length                                =  The scheme name you entered contains too many characters
-contractordetails.schemeName.error.invalidCharacters                     =  You have entered a scheme name in an incorrect format
-contractordetails.schemeName.change.hidden                               =  scheme Name
-
-contractordetails.enterContractorEmailAddress.title                     = What is the contractor’s email?
-contractordetails.enterContractorEmailAddress.heading                   = What is the contractor’s email?
-contractordetails.enterContractorEmailAddress.checkYourAnswersLabel     = What is the contractor’s email?
-contractordetails.enterContractorEmailAddress.error.required            = Enter an email
-contractordetails.enterContractorEmailAddress.error.length              = The email you entered contains too many characters
-contractordetails.enterContractorEmailAddress.error.invalid             = You have entered an email in an incorrect format
-contractordetails.enterContractorEmailAddress.change.hidden             = what is the contractor’s email?
-
-contractordetails.contractorDetailsUpdated.title                                           =  Contractor Details Updated
-contractordetails.contractorDetailsUpdated.heading                                         =  Contractor Details Updated
-contractordetails.contractorDetailsUpdated.p1.details.prefix                               =  You have successfully changed the contractor details for {0}. You can
-contractordetails.contractorDetailsUpdated.p1.details.link                                 =  view the change on your contractor details
-contractordetails.contractorDetailsUpdated.returnToDashboard.link                          =  Return to CIS dashboard
-contractordetails.contractorDetailsUpdated.p2.whatDidYouThink.link                         =  What did you think of this service?
-contractordetails.contractorDetailsUpdated.p2.whatDidYouThink.suffix                       =  (takes 30 seconds)
-
 # Partnership
 partnershipWorksReferenceNumberYesNo.title                           =  Does this partnership have a works reference number?
 partnershipWorksReferenceNumberYesNo.heading                         =  Does {0} have a works reference number?
@@ -966,3 +942,26 @@ verify.verifyCheckYourAnswers.title                                     =  Check
 verify.verifyCheckYourAnswers.heading                                   =  Check your answers before submitting your verification request
 verify.verifyCheckYourAnswers.subHeading                                =  Subcontractors to verify
 verify.verifyCheckYourAnswers.confirm                                   =  Confirm and submit
+
+# Contractor Details
+contractordetails.schemeName.title                                    =  What is the contractor’s scheme name?
+contractordetails.schemeName.heading                                  =  What is the contractor’s scheme name?
+contractordetails.schemeName.checkYourAnswersLabel                    =  Scheme name
+contractordetails.schemeName.error.required                           =  Enter a scheme name
+contractordetails.schemeName.error.length                             =  The scheme name you entered contains too many characters
+contractordetails.schemeName.error.invalidCharacters                  =  You have entered a scheme name in an incorrect format
+contractordetails.schemeName.change.hidden                            =  scheme Name
+contractordetails.enterContractorEmailAddress.title                   =  What is the contractor’s email?
+contractordetails.enterContractorEmailAddress.heading                 =  What is the contractor’s email?
+contractordetails.enterContractorEmailAddress.checkYourAnswersLabel   =  What is the contractor’s email?
+contractordetails.enterContractorEmailAddress.error.required          =  Enter an email
+contractordetails.enterContractorEmailAddress.error.length            =  The email you entered contains too many characters
+contractordetails.enterContractorEmailAddress.error.invalid           =  You have entered an email in an incorrect format
+contractordetails.enterContractorEmailAddress.change.hidden           =  what is the contractor’s email?
+contractordetails.contractorDetailsUpdated.title                      =  Contractor Details Updated
+contractordetails.contractorDetailsUpdated.heading                    =  Contractor Details Updated
+contractordetails.contractorDetailsUpdated.p1.details.prefix          =  You have successfully changed the contractor details for {0}. You can
+contractordetails.contractorDetailsUpdated.p1.details.link            =  view the change on your contractor details
+contractordetails.contractorDetailsUpdated.returnToDashboard.link     =  Return to CIS dashboard
+contractordetails.contractorDetailsUpdated.p2.whatDidYouThink.link    =  What did you think of this service?
+contractordetails.contractorDetailsUpdated.p2.whatDidYouThink.suffix  =  (takes 30 seconds)
