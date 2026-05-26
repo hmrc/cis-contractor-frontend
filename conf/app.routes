@@ -418,6 +418,9 @@ GET   /verify/verification-status/reverification-decision                control
 GET   /verify/verification-status/select-subcontractors                  controllers.verify.VerificationStatusController.goToSelectSubcontractorsToReverify(mode: Mode = NormalMode)
 
 # Contractor Details
+GET   /contractor-details/introduction                              controllers.contractordetails.ContractorDetailsController.onPageLoad()
+POST  /contractor-details/introduction                              controllers.contractordetails.ContractorDetailsController.onSubmit()
+
 GET   /contractor-details/what-is-contractors-scheme-name         controllers.contractordetails.SchemeNameController.onPageLoad(mode: Mode = NormalMode)
 POST  /contractor-details/what-is-contractors-scheme-name         controllers.contractordetails.SchemeNameController.onSubmit(mode: Mode = NormalMode)
 GET   /contractor-details/change-what-is-contractors-scheme-name  controllers.contractordetails.SchemeNameController.onPageLoad(mode: Mode = CheckMode)
