@@ -38,9 +38,9 @@
 
 <div class="govuk-button-group">
     @govukButton(
-        ButtonViewModel(messages("site.continue")).asLink("#").withAttribute("id" -> "continue-button")
+        ButtonViewModel(messages("site.continue")).asLink(controllers.verify.routes.NewestVerificationBatchController.onPageLoad().url).withAttribute("id" -> "continue-button")
     )
-    @link(linkTextKey = "verify.inactiveSchemeWarning.cancel", linkUrl = "#", linkId = "cancel-link")
+    @link(linkTextKey = "verify.inactiveSchemeWarning.cancel", linkUrl = controllers.routes.IndexController.onPageLoad().url, linkId = "cancel-link")
 </div>
 
 }

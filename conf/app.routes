@@ -420,6 +420,8 @@ POST  /subcontractor/verify/check-your-answers  controllers.verify.VerifyCheckYo
 
 GET   /subcontractor/verify/verification-status/reverification-decision  controllers.verify.VerificationStatusController.goToReverificationDecision(mode: Mode = NormalMode)
 GET   /subcontractor/verify/verification-status/select-subcontractors    controllers.verify.VerificationStatusController.goToSelectSubcontractorsToReverify(mode: Mode = NormalMode)
+GET   /verify/verification-status/reverification-decision                controllers.verify.VerificationStatusController.goToReverificationDecision(mode: Mode = NormalMode)
+GET   /verify/verification-status/select-subcontractors                  controllers.verify.VerificationStatusController.goToSelectSubcontractorsToReverify(mode: Mode = NormalMode)
 
 # Contractor Details
 GET   /contractor-details/what-is-contractors-scheme-name         controllers.contractordetails.SchemeNameController.onPageLoad(mode: Mode = NormalMode)
