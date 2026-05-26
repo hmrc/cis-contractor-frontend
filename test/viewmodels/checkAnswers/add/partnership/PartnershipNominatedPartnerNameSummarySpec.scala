@@ -17,6 +17,7 @@
 package viewmodels.checkAnswers.add.partnership
 
 import controllers.add.partnership.routes
+import helpers.CyaEncodingSpecHelper
 import models.{CheckMode, UserAnswers}
 import org.scalatest.OptionValues.convertOptionToValuable
 import org.scalatest.TryValues.convertTryToSuccessOrFailure
@@ -28,7 +29,7 @@ import play.api.test.Helpers.stubMessages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.*
 import org.scalatest.matchers.must.Matchers.must
 
-class PartnershipNominatedPartnerNameSummarySpec extends AnyFreeSpec with Matchers {
+class PartnershipNominatedPartnerNameSummarySpec extends AnyFreeSpec with Matchers with CyaEncodingSpecHelper {
 
   implicit val messages: Messages = stubMessages()
 
@@ -71,6 +72,26 @@ class PartnershipNominatedPartnerNameSummarySpec extends AnyFreeSpec with Matche
       val answers = UserAnswers("test-id")
       PartnershipNominatedPartnerNameSummary.row(answers) shouldBe None
     }
+
+    "must HTML-escape special characters correctly (single encoding only)" in {
+
+      val name = "O'Reilly & Sons"
+
+      val answers =
+        UserAnswers("id")
+          .set(PartnershipNominatedPartnerNamePage, name)
+          .success
+          .value
+
+      val row = PartnershipNominatedPartnerNameSummary.row(answers).value
+
+      val html = extractHtml(row)
+
+      assertEscaped(html, "O&#x27;Reilly &amp; Sons")
+
+      assertNoDoubleEncoding(html)
+    }
+
   }
 
 }

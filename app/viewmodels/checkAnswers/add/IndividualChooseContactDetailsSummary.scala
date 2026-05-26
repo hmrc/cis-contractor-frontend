@@ -19,8 +19,6 @@ package viewmodels.checkAnswers.add
 import models.{CheckMode, UserAnswers}
 import pages.add.IndividualChooseContactDetailsPage
 import play.api.i18n.Messages
-import play.twirl.api.HtmlFormat
-import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import utils.Utils
 import viewmodels.govuk.summarylist.*
@@ -33,15 +31,10 @@ object IndividualChooseContactDetailsSummary {
       val cyaMsg = Utils.findFirstMessagesValue(
         Seq(s"individualChooseContactDetails.cya.$answer", s"individualChooseContactDetails.$answer")
       )
-      val value  = ValueViewModel(
-        HtmlContent(
-          HtmlFormat.escape(cyaMsg)
-        )
-      )
 
       SummaryListRowViewModel(
         key = "individualChooseContactDetails.checkYourAnswersLabel",
-        value = value,
+        value = ValueViewModel(cyaMsg),
         actions = Seq(
           ActionItemViewModel(
             "site.change",

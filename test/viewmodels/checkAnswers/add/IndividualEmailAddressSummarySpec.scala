@@ -17,6 +17,7 @@
 package viewmodels.checkAnswers.add
 
 import controllers.add.routes
+import helpers.CyaEncodingSpecHelper
 import models.{CheckMode, UserAnswers}
 import org.scalatest.OptionValues.convertOptionToValuable
 import org.scalatest.TryValues.convertTryToSuccessOrFailure
@@ -27,7 +28,7 @@ import play.api.i18n.Messages
 import play.api.test.Helpers.stubMessages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.*
 
-class IndividualEmailAddressSummarySpec extends AnyFreeSpec with Matchers {
+class IndividualEmailAddressSummarySpec extends AnyFreeSpec with Matchers with CyaEncodingSpecHelper {
 
   implicit val messages: Messages = stubMessages()
 
@@ -73,6 +74,24 @@ class IndividualEmailAddressSummarySpec extends AnyFreeSpec with Matchers {
       val answers = UserAnswers("test-id")
 
       IndividualEmailAddressSummary.row(answers) shouldBe None
+    }
+
+    "must HTML-escape special characters correctly (single encoding only)" in {
+
+      val email = "user+o'reilly&co@test.com"
+
+      val answers =
+        UserAnswers("id")
+          .set(IndividualEmailAddressPage, email)
+          .success
+          .value
+
+      val row = IndividualEmailAddressSummary.row(answers).value
+
+      val html = extractHtml(row)
+
+      assertEscaped(html, "user+o&#x27;reilly&amp;co@test.com")
+      assertNoDoubleEncoding(html)
     }
   }
 }

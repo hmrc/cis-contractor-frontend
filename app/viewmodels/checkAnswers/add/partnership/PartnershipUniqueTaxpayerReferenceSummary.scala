@@ -20,7 +20,6 @@ import controllers.add.partnership.routes
 import models.{CheckMode, UserAnswers}
 import pages.add.partnership.PartnershipUniqueTaxpayerReferencePage
 import play.api.i18n.Messages
-import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
@@ -31,7 +30,7 @@ object PartnershipUniqueTaxpayerReferenceSummary {
     answers.get(PartnershipUniqueTaxpayerReferencePage).map { answer =>
       SummaryListRowViewModel(
         key = "partnershipUniqueTaxpayerReference.checkYourAnswersLabel",
-        value = ValueViewModel(HtmlFormat.escape(answer).toString),
+        value = ValueViewModel(answer),
         actions = Seq(
           ActionItemViewModel(
             "site.change",

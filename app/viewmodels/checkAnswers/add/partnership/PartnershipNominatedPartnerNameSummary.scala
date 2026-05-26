@@ -19,7 +19,6 @@ package viewmodels.checkAnswers.add.partnership
 import models.{CheckMode, UserAnswers}
 import pages.add.partnership.PartnershipNominatedPartnerNamePage
 import play.api.i18n.Messages
-import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
@@ -30,7 +29,7 @@ object PartnershipNominatedPartnerNameSummary {
     answers.get(PartnershipNominatedPartnerNamePage).map { answer =>
       SummaryListRowViewModel(
         key = "partnershipNominatedPartnerName.checkYourAnswersLabel",
-        value = ValueViewModel(HtmlFormat.escape(answer).toString),
+        value = ValueViewModel(answer),
         actions = Seq(
           ActionItemViewModel(
             "site.change",
