@@ -131,7 +131,7 @@ class SelectSubcontractorsToReverifyControllerSpec extends SpecBase with Mockito
         val mockRepo = mock[SessionRepository]
         when(mockRepo.set(any())) thenReturn Future.successful(true)
 
-        // Sub 1: VERIFIED=Y, verificationDate missing => reverifyRequired=true => Verified column = Yes,
+        // Sub 1: VERIFIED=Y, verificationDate missing => reverifyRequired=true => Verified column = No,
         val subNeedsReverify =
           mkSub(
             id = 100L,
@@ -145,7 +145,7 @@ class SelectSubcontractorsToReverifyControllerSpec extends SpecBase with Mockito
             createDate = Some(LocalDateTime.of(2020, 5, 11, 0, 0))
           )
 
-        // Sub 2: VERIFIED=Y, verificationDate recent => reverifyRequired=false => Verified column =No,
+        // Sub 2: VERIFIED=Y, verificationDate recent => reverifyRequired=false => Verified column =Yes,
         val subNoReverify =
           mkSub(
             id = 200L,
@@ -192,8 +192,8 @@ class SelectSubcontractorsToReverifyControllerSpec extends SpecBase with Mockito
           body must include("1234567890")
           body must include("2904743750")
 
-          body must include(">Yes<")
           body must include(">No<")
+          body must include(">Yes<")
 
           body must include("V0001217702")
           body must include("Unknown")
@@ -404,7 +404,7 @@ class SelectSubcontractorsToReverifyControllerSpec extends SpecBase with Mockito
       }
     }
 
-    "must show name as Unknown when subcontractorType is missing" in {
+    "must show name as No name provided when subcontractorType is missing" in {
       val mockRepo = mock[SessionRepository]
       when(mockRepo.set(any())) thenReturn Future.successful(true)
 
@@ -441,8 +441,117 @@ class SelectSubcontractorsToReverifyControllerSpec extends SpecBase with Mockito
         status(result) mustBe OK
         val body = contentAsString(result)
 
-        body must include("Unknown")
+        body must include("No name provided")
         body must include("9999999999")
+      }
+    }
+
+    "must show empty utr when utr is missing" in {
+      val mockRepo = mock[SessionRepository]
+      when(mockRepo.set(any())) thenReturn Future.successful(true)
+
+      val sub =
+        mkSub(
+          id = 400L,
+          verified = Some("Y"),
+          tradingName = Some("No UTR Ltd"),
+          subcontractorType = Some("company"),
+          utr = None,
+          verificationDate = None,
+          createDate = Some(LocalDateTime.of(2024, 1, 1, 0, 0))
+        )
+
+      val ua =
+        emptyUserAnswers
+          .set(NewestVerificationBatchResponsePage, newestBatchResponse(Seq(sub)))
+          .success
+          .value
+
+      val app =
+        applicationBuilder(userAnswers = Some(ua))
+          .overrides(
+            bind[Clock].toInstance(fixedClock),
+            bind[SessionRepository].toInstance(mockRepo)
+          )
+          .build()
+
+      running(app) {
+        val result = route(app, FakeRequest(GET, url(1))).value
+        status(result) mustBe OK
+
+        val body = contentAsString(result)
+        body must include("No UTR Ltd")
+        body must not include "No name provided"
+      }
+    }
+
+    "must render the table rows sorted alphabetically by name" in {
+      val mockRepo = mock[SessionRepository]
+      when(mockRepo.set(any())) thenReturn Future.successful(true)
+
+      val zulu =
+        mkSub(
+          id = 300L,
+          verified = Some("Y"),
+          firstName = Some("Zoe"),
+          surname = Some("Zulu"),
+          subcontractorType = Some("individual"),
+          utr = Some("1111111111"),
+          verificationDate = None,
+          createDate = Some(LocalDateTime.of(2024, 1, 1, 0, 0))
+        )
+
+      val alpha =
+        mkSub(
+          id = 100L,
+          verified = Some("Y"),
+          firstName = Some("Amy"),
+          surname = Some("Alpha"),
+          subcontractorType = Some("individual"),
+          utr = Some("2222222222"),
+          verificationDate = None,
+          createDate = Some(LocalDateTime.of(2024, 1, 1, 0, 0))
+        )
+
+      val middle =
+        mkSub(
+          id = 200L,
+          verified = Some("Y"),
+          firstName = Some("mike"),
+          surname = Some("Middle"),
+          subcontractorType = Some("individual"),
+          utr = Some("3333333333"),
+          verificationDate = None,
+          createDate = Some(LocalDateTime.of(2024, 1, 1, 0, 0))
+        )
+
+      val ua =
+        emptyUserAnswers
+          .set(NewestVerificationBatchResponsePage, newestBatchResponse(Seq(zulu, alpha, middle)))
+          .success
+          .value
+
+      val app =
+        applicationBuilder(userAnswers = Some(ua))
+          .overrides(
+            bind[Clock].toInstance(fixedClock),
+            bind[SessionRepository].toInstance(mockRepo)
+          )
+          .build()
+
+      running(app) {
+        val result = route(app, FakeRequest(GET, url(1))).value
+
+        status(result) mustBe OK
+
+        val body = contentAsString(result)
+
+        val alphaName  = "Alpha, Amy"
+        val middleName = "Middle, mike"
+        val zuluName   = "Zulu, Zoe"
+
+        body.indexOf(alphaName)  must be < body.indexOf(middleName)
+        body.indexOf(middleName) must be < body.indexOf(zuluName)
       }
     }
   }

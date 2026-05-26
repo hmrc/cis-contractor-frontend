@@ -71,7 +71,7 @@ class SelectSubcontractorsToReverifyController @Inject() (
       val reverify = ReverificationRules.reverifyRequired(sub, currentDate)
 
       val name = nameFor(sub).getOrElse("No name provided")
-      val utr  = sub.utr.filter(_.nonEmpty).getOrElse("No name provided")
+      val utr  = sub.utr.filter(_.nonEmpty).getOrElse("")
 
       val verifiedCol = if (reverify) "No" else "Yes"
 
@@ -151,9 +151,11 @@ class SelectSubcontractorsToReverifyController @Inject() (
         case Left(result) => Future.successful(result)
 
         case Right(rows) =>
+          val sortedRows = rows.sortBy(_.name.toLowerCase(Locale.UK))
+
           val result =
             paginationToReverifyService.paginate(
-              allItems = rows,
+              allItems = sortedRows,
               currentPage = page,
               recordsPerPage = 6,
               baseUrl = controllers.verify.routes.SelectSubcontractorsToReverifyController.onPageLoad(mode).url
@@ -166,7 +168,7 @@ class SelectSubcontractorsToReverifyController @Inject() (
               .getOrElse(formProvider(requireSelection = false))
 
           for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(SubcontractorReverifyRowsPage, rows))
+            updatedAnswers <- Future.fromTry(request.userAnswers.set(SubcontractorReverifyRowsPage, sortedRows))
             _              <- sessionRepository.set(updatedAnswers)
           } yield Ok(
             view(preparedForm, mode, result.items, result.pagination, page, result.startIndex, result.totalCount)
@@ -178,7 +180,10 @@ class SelectSubcontractorsToReverifyController @Inject() (
     (identify andThen getData andThen requireData).async { implicit request =>
 
       val allRows: Seq[SubcontractorReverifyRow] =
-        request.userAnswers.get(SubcontractorReverifyRowsPage).getOrElse(Seq.empty)
+        request.userAnswers
+          .get(SubcontractorReverifyRowsPage)
+          .getOrElse(Seq.empty)
+          .sortBy(_.name.toLowerCase(Locale.UK))
 
       val result =
         paginationToReverifyService.paginate(
