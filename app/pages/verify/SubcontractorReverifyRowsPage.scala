@@ -14,20 +14,13 @@
  * limitations under the License.
  */
 
-package viewmodels.verify
+package pages.verify
 
-import play.api.libs.json.{Json, OFormat}
+import viewmodels.verify.SubcontractorReverifyRow
+import pages.QuestionPage
+import play.api.libs.json.JsPath
 
-case class SubcontractorReverifyRow(
-  id: String,
-  name: String,
-  utr: String,
-  verified: String,
-  verificationNumber: String,
-  taxTreatment: String,
-  dateAdded: String
-)
-
-object SubcontractorReverifyRow {
-  given OFormat[SubcontractorReverifyRow] = Json.format[SubcontractorReverifyRow]
+case object SubcontractorReverifyRowsPage extends QuestionPage[Seq[SubcontractorReverifyRow]] with VerifyJourney {
+  override def path: JsPath     = JsPath \ toString
+  override def toString: String = "subcontractorReverifyRows"
 }
