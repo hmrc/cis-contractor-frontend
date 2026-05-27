@@ -555,7 +555,6 @@ class SelectSubcontractorsToReverifyControllerSpec extends SpecBase with Mockito
       }
     }
 
-
     "must map taxTreatment to the correct display value when reverification is NOT required" in {
       val mockRepo = mock[SessionRepository]
       when(mockRepo.set(any())) thenReturn Future.successful(true)
