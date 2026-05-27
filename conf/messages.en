@@ -971,3 +971,15 @@ contractordetails.contractorDetailsUpdated.p1.details.link              =  view 
 contractordetails.contractorDetailsUpdated.returnToDashboard.link       =  Return to CIS dashboard
 contractordetails.contractorDetailsUpdated.p2.whatDidYouThink.link      =  What did you think of this service?
 contractordetails.contractorDetailsUpdated.p2.whatDidYouThink.suffix    =  (takes 30 seconds)
+
+contractordetails.contractorUtr.title                                   =  What is the contractor's unique taxpayer reference
+contractordetails.contractorUtr.heading                                 =  What is the contractor's Unique Taxpayer Reference (UTR)?
+contractordetails.contractorUtr.p1                                      =  You can find it in your Personal Tax Account, the HMRC app or on tax returns and other documents from HMRC. It might be called ‘reference’, ‘UTR’ or ‘official use’.
+contractordetails.contractorUtr.link                                    =  Get more help to find your UTR (opens in new tab)
+contractordetails.contractorUtr.label                                   =  What is your contractor's UTR?
+contractordetails.contractorUtr.hint                                    =  A UTR is a 10 digit number.
+contractordetails.contractorUtr.checkYourAnswersLabel                   =  What is the contractor's Unique Taxpayer Reference (UTR)?
+contractordetails.contractorUtr.change.hidden                           =  What is the contractor's Unique Taxpayer Reference (UTR)?
+contractordetails.contractorUtr.error.required                          =  Enter the contractor's 10-digit unique taxpayer reference
+contractordetails.contractorUtr.error.invalid                           =  You have entered a unique taxpayer reference in an incorrect format. A UTR contains 10-digits
+contractordetails.contractorUtr.error.length                            =  Enter a valid Unique Taxpayer Reference (UTR) using 10 numbers, like 1234567890
