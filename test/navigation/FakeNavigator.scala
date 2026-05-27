@@ -18,6 +18,7 @@ package navigation
 
 import models.{Mode, UserAnswers}
 import navigation.add.*
+import navigation.contractordetails.ContractorDetailsNavigator
 import navigation.verify.VerifyNavigator
 import pages.Page
 import play.api.mvc.Call
@@ -32,7 +33,8 @@ class FakeNavigator(desiredRoute: Call)
       new PartnershipNavigator(),
       new TrustNavigator(),
       new SharedNavigator(),
-      new VerifyNavigator()
+      new VerifyNavigator(),
+      new ContractorDetailsNavigator()
     ) {
 
   override def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers): Call =
