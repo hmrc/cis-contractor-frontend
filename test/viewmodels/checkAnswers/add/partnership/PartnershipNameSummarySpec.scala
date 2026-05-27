@@ -17,6 +17,7 @@
 package viewmodels.checkAnswers.add.partnership
 
 import controllers.add.partnership.routes
+import helpers.CyaEncodingSpecHelper
 import models.{CheckMode, UserAnswers}
 import org.scalatest.OptionValues.convertOptionToValuable
 import org.scalatest.TryValues.convertTryToSuccessOrFailure
@@ -27,7 +28,7 @@ import play.api.i18n.Messages
 import play.api.test.Helpers.stubMessages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.*
 
-class PartnershipNameSummarySpec extends AnyFreeSpec with Matchers {
+class PartnershipNameSummarySpec extends AnyFreeSpec with Matchers with CyaEncodingSpecHelper {
 
   implicit val messages: Messages = stubMessages()
 
@@ -67,6 +68,24 @@ class PartnershipNameSummarySpec extends AnyFreeSpec with Matchers {
     "must return None when the answer does not exist" in {
       val answers = UserAnswers("test-id")
       PartnershipNameSummary.row(answers) shouldBe None
+    }
+
+    "must HTML-escape special characters correctly (single encoding only)" in {
+
+      val name = "O'Reilly & Partners"
+
+      val answers =
+        UserAnswers("id")
+          .set(PartnershipNamePage, name)
+          .success
+          .value
+
+      val row = PartnershipNameSummary.row(answers).value
+
+      val html = extractHtml(row)
+
+      assertEscaped(html, "O&#x27;Reilly &amp; Partners")
+      assertNoDoubleEncoding(html)
     }
   }
 }

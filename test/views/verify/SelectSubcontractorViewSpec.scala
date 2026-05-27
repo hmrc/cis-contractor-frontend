@@ -17,7 +17,6 @@
 package views.verify
 
 import base.SpecBase
-import controllers.verify.SelectSubcontractorController
 import forms.verify.SelectSubcontractorFormProvider
 import models.{Mode, SubcontractorViewModel}
 import org.jsoup.Jsoup
@@ -92,7 +91,7 @@ class SelectSubcontractorViewSpec extends SpecBase with Matchers {
       val formWithError: Form[Set[String]] =
         form.bind(Map("value" -> ""))
 
-      val allItems                      = SubcontractorViewModel.checkboxItems(SelectSubcontractorController.subcontractors)
+      val allItems                      = SubcontractorViewModel.checkboxItems(subcontractorsVm)
       val page1Items: Seq[CheckboxItem] = allItems.slice(0, 6)
       val page2Items: Seq[CheckboxItem] = allItems.slice(6, 9)
 
@@ -252,8 +251,20 @@ class SelectSubcontractorViewSpec extends SpecBase with Matchers {
 
     val form: Form[Set[String]] = formProvider()
 
+    val subcontractorsVm: Seq[SubcontractorViewModel] = Seq(
+      SubcontractorViewModel("100", "Brody, Martin"),
+      SubcontractorViewModel("95", "Hooper Associates"),
+      SubcontractorViewModel("96", "Alpha Plumbing"),
+      SubcontractorViewModel("98", "Beta Builders"),
+      SubcontractorViewModel("97", "Gamma Construction"),
+      SubcontractorViewModel("99", "Delta Electrical"),
+      SubcontractorViewModel("101", "Epsilon Carpentry"),
+      SubcontractorViewModel("103", "Zeta Roofing"),
+      SubcontractorViewModel("102", "Eta Plastering")
+    )
+
     val checkboxItems: Seq[CheckboxItem] =
-      SubcontractorViewModel.checkboxItems(SelectSubcontractorController.subcontractors)
+      SubcontractorViewModel.checkboxItems(subcontractorsVm)
 
     val mode: Mode = models.NormalMode
   }

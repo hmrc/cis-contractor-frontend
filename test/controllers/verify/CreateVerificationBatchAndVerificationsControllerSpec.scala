@@ -146,7 +146,7 @@ class CreateVerificationBatchAndVerificationsControllerSpec extends SpecBase wit
       }
     }
 
-    "must return OK (placeholder) when current batch exists and not call service (todo: call modify controller later)" in {
+    "must redirect to ModifyVerificationBatchAndVerificationsController when current batch exists and not call service" in {
       val mockService = mock[VerificationService]
 
       val ua =
@@ -169,8 +169,9 @@ class CreateVerificationBatchAndVerificationsControllerSpec extends SpecBase wit
         val request = FakeRequest(POST, "/test-only")
         val result  = controller.onSubmit()(request)
 
-        status(result) mustBe OK
-        contentAsString(result) must include("Current verification batch exists")
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result).value mustBe
+          controllers.verify.routes.ModifyVerificationBatchAndVerificationsController.modifyVerificationBatch().url
 
         verify(mockService, never())
           .createVerificationBatchAndVerifications(any[UserAnswers], any[Seq[Long]], any())(any())

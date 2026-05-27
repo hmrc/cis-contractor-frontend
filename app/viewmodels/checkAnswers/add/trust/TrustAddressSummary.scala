@@ -19,7 +19,6 @@ package viewmodels.checkAnswers.add.trust
 import models.{CheckMode, UserAnswers}
 import pages.add.trust.TrustAddressPage
 import play.api.i18n.Messages
-import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
@@ -39,15 +38,14 @@ object TrustAddressSummary {
         answer.country
       )
 
-      val escapedWithBreaks: String =
+      val addressHtml: String =
         lines
           .filter(_.trim.nonEmpty)
-          .map(HtmlFormat.escape(_).toString)
           .mkString("<br/>")
 
       SummaryListRowViewModel(
         key = "trustAddress.checkYourAnswersLabel",
-        value = ValueViewModel(HtmlContent(escapedWithBreaks)),
+        value = ValueViewModel(HtmlContent(addressHtml)),
         actions = Seq(
           ActionItemViewModel(
             "site.change",

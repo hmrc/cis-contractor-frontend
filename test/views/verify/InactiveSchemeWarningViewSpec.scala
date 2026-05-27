@@ -84,13 +84,15 @@ class InactiveSchemeWarningViewSpec extends AnyWordSpec with Matchers with Guice
       continueButton.size() mustBe 1
       continueButton.text() mustBe
         messages("site.continue")
-      continueButton.attr("href") mustBe "#"
+      continueButton.attr("href") mustBe
+        controllers.verify.routes.NewestVerificationBatchController.onPageLoad().url
 
       val cancelLink = buttonGroup.select("a.govuk-link")
       cancelLink.size() mustBe 1
       cancelLink.text() mustBe
         messages("verify.inactiveSchemeWarning.cancel")
-      cancelLink.attr("href") mustBe "#"
+      cancelLink.attr("href") mustBe
+        controllers.routes.IndexController.onPageLoad().url
     }
   }
 }
