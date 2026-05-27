@@ -974,5 +974,4 @@ contractorDetails.contractorUtr.p1                                              
 contractorDetails.contractorUtr.checkYourAnswersLabel                                =  What is the contractor's Unique Taxpayer Reference (UTR)?
 contractorDetails.contractorUtr.change.hidden                                        =  What is the contractor's Unique Taxpayer Reference (UTR)?
 contractorDetails.contractorUtr.error.required                                       =  Enter the contractor's 10-digit unique taxpayer reference
-contractorDetails.contractorUtr.error.invalid                                        =  You have entered a unique taxpayer reference in an incorrect format. A UTR contains 10-digits
-contractorDetails.contractorUtr.error.length                                         =  Enter a valid Unique Taxpayer Reference (UTR) using 10 numbers, like 1234567890
+contractorDetails.contractorUtr.error.invalid                                        =  You have entered a unique taxpayer reference in an incorrect format. A UTR contains 10-digits. Enter a valid Unique Taxpayer Reference (UTR) using 10 numbers, like 1234567890
