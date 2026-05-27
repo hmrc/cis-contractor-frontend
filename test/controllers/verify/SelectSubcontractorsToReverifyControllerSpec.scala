@@ -554,5 +554,177 @@ class SelectSubcontractorsToReverifyControllerSpec extends SpecBase with Mockito
         body.indexOf(middleName) must be < body.indexOf(zuluName)
       }
     }
+
+
+    "must map taxTreatment to the correct display value when reverification is NOT required" in {
+      val mockRepo = mock[SessionRepository]
+      when(mockRepo.set(any())) thenReturn Future.successful(true)
+
+      def verifiedNoReverify(id: Long, tradingName: String, tax: Option[String]) =
+        mkSub(
+          id = id,
+          verified = Some("Y"),
+          tradingName = Some(tradingName),
+          subcontractorType = Some("company"),
+          utr = Some(s"$id$id$id$id$id$id$id$id$id$id"),
+          verificationNumber = Some(s"V$id"),
+          taxTreatment = tax,
+          verificationDate = Some(LocalDateTime.of(2025, 10, 1, 0, 0)),
+          createDate = Some(LocalDateTime.of(2025, 10, 1, 0, 0))
+        )
+
+      val ua =
+        emptyUserAnswers
+          .set(
+            NewestVerificationBatchResponsePage,
+            newestBatchResponse(
+              Seq(
+                verifiedNoReverify(1L, "Net Ltd", Some("net")),
+                verifiedNoReverify(2L, "Unmatched Ltd", Some("unmatched")),
+                verifiedNoReverify(3L, "Gross Ltd", Some("gross")),
+                verifiedNoReverify(4L, "Unknown Ltd", Some("something-else"))
+              )
+            )
+          )
+          .success
+          .value
+
+      val app =
+        applicationBuilder(userAnswers = Some(ua))
+          .overrides(
+            bind[Clock].toInstance(fixedClock),
+            bind[SessionRepository].toInstance(mockRepo)
+          )
+          .build()
+
+      running(app) {
+        val result = route(app, FakeRequest(GET, url(1))).value
+        status(result) mustBe OK
+
+        val body = contentAsString(result)
+
+        body must include("Standard rate")
+        body must include("Higher rate")
+        body must include("Gross")
+        body must include("Unknown")
+      }
+    }
+
+    "must use partnershipTradingName (or tradingName fallback) when subcontractorType is partnership" in {
+      val mockRepo = mock[SessionRepository]
+      when(mockRepo.set(any())) thenReturn Future.successful(true)
+
+      val partnershipWithPTN =
+        mkSub(
+          id = 500L,
+          verified = Some("Y"),
+          tradingName = Some("Trading Fallback"),
+          partnershipTradingName = Some("Partnership Trading Name"),
+          subcontractorType = Some("partnership"),
+          utr = Some("5555555555"),
+          verificationDate = None,
+          createDate = Some(LocalDateTime.of(2024, 1, 1, 0, 0))
+        )
+
+      val partnershipWithoutPTN =
+        mkSub(
+          id = 600L,
+          verified = Some("Y"),
+          tradingName = Some("Trading Only"),
+          partnershipTradingName = None,
+          subcontractorType = Some("partnership"),
+          utr = Some("6666666666"),
+          verificationDate = None,
+          createDate = Some(LocalDateTime.of(2024, 1, 1, 0, 0))
+        )
+
+      val ua =
+        emptyUserAnswers
+          .set(NewestVerificationBatchResponsePage, newestBatchResponse(Seq(partnershipWithPTN, partnershipWithoutPTN)))
+          .success
+          .value
+
+      val app =
+        applicationBuilder(userAnswers = Some(ua))
+          .overrides(
+            bind[Clock].toInstance(fixedClock),
+            bind[SessionRepository].toInstance(mockRepo)
+          )
+          .build()
+
+      running(app) {
+        val result = route(app, FakeRequest(GET, url(1))).value
+        status(result) mustBe OK
+
+        val body = contentAsString(result)
+
+        body must include("Partnership Trading Name")
+        body must include("Trading Only")
+      }
+    }
+
+    "must pre-populate the form (checked boxes) from SelectSubcontractorsToReverifyPage using ids" in {
+      val mockRepo = mock[SessionRepository]
+      when(mockRepo.set(any())) thenReturn Future.successful(true)
+
+      val a =
+        mkSub(
+          id = 700L,
+          verified = Some("Y"),
+          tradingName = Some("A Ltd"),
+          subcontractorType = Some("company"),
+          utr = Some("7007007007"),
+          verificationDate = None,
+          createDate = Some(LocalDateTime.of(2024, 1, 1, 0, 0))
+        )
+
+      val b =
+        mkSub(
+          id = 800L,
+          verified = Some("Y"),
+          tradingName = Some("B Ltd"),
+          subcontractorType = Some("company"),
+          utr = Some("8008008008"),
+          verificationDate = None,
+          createDate = Some(LocalDateTime.of(2024, 1, 1, 0, 0))
+        )
+
+      val ua =
+        emptyUserAnswers
+          .set(NewestVerificationBatchResponsePage, newestBatchResponse(Seq(a, b)))
+          .success
+          .value
+          .set(
+            SelectSubcontractorsToReverifyPage,
+            Set(
+              SelectedSubcontractors("700", "A Ltd")
+            )
+          )
+          .success
+          .value
+
+      val app =
+        applicationBuilder(userAnswers = Some(ua))
+          .overrides(
+            bind[Clock].toInstance(fixedClock),
+            bind[SessionRepository].toInstance(mockRepo)
+          )
+          .build()
+
+      running(app) {
+        val result = route(app, FakeRequest(GET, url(1))).value
+        status(result) mustBe OK
+
+        val body = contentAsString(result)
+
+        val doc = org.jsoup.Jsoup.parse(body)
+
+        val input700 =
+          doc.selectFirst("input[value=700]")
+
+        input700 must not be null
+        input700.hasAttr("checked") mustBe true
+      }
+    }
   }
 }
