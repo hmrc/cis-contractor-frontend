@@ -14,20 +14,21 @@
  * limitations under the License.
  */
 
-package viewmodels.verify
+package forms.contractordetails
 
-import play.api.libs.json.{Json, OFormat}
+import forms.mappings.Mappings
+import play.api.data.Form
 
-case class SubcontractorReverifyRow(
-  id: String,
-  name: String,
-  utr: String,
-  verified: String,
-  verificationNumber: String,
-  taxTreatment: String,
-  dateAdded: String
-)
+import javax.inject.Inject
 
-object SubcontractorReverifyRow {
-  given OFormat[SubcontractorReverifyRow] = Json.format[SubcontractorReverifyRow]
+class ContractorUtrFormProvider @Inject() extends Mappings {
+
+  def apply(): Form[String] =
+    Form(
+      "value" -> utr(
+        requiredKey = "contractorDetails.contractorUtr.error.required",
+        invalidKey = "contractorDetails.contractorUtr.error.invalid",
+        lengthKey = "contractorDetails.contractorUtr.error.invalid"
+      )
+    )
 }

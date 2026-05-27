@@ -14,20 +14,18 @@
  * limitations under the License.
  */
 
-package viewmodels.verify
+package navigation.contractordetails
 
-import play.api.libs.json.{Json, OFormat}
+import controllers.routes
+import models.{Mode, UserAnswers}
+import navigation.NavigatorForJourney
+import pages.Page
 
-case class SubcontractorReverifyRow(
-  id: String,
-  name: String,
-  utr: String,
-  verified: String,
-  verificationNumber: String,
-  taxTreatment: String,
-  dateAdded: String
-)
+import javax.inject.{Inject, Singleton}
 
-object SubcontractorReverifyRow {
-  given OFormat[SubcontractorReverifyRow] = Json.format[SubcontractorReverifyRow]
+@Singleton
+class ContractorDetailsNavigator @Inject() () extends NavigatorForJourney {
+
+  override def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers) =
+    routes.IndexController.onPageLoad()
 }

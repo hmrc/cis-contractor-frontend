@@ -432,3 +432,9 @@ GET   /contractor-details/change-what-is-contractors-email  controllers.contract
 POST  /contractor-details/change-what-is-contractors-email  controllers.contractordetails.EnterContractorEmailAddressController.onSubmit(mode: Mode = CheckMode)
 
 GET   /contractor-details/contractor-details-updated  controllers.contractordetails.ContractorDetailsUpdatedController.onPageLoad()
+
+GET   /contractor-details/what-is-contractors-utr         controllers.contractordetails.ContractorUtrController.onPageLoad(mode: Mode = NormalMode)
+POST  /contractor-details/what-is-contractors-utr         controllers.contractordetails.ContractorUtrController.onSubmit(mode: Mode = NormalMode)
+GET   /contractor-details/change-what-is-contractors-utr  controllers.contractordetails.ContractorUtrController.onPageLoad(mode: Mode = CheckMode)
+POST  /contractor-details/change-what-is-contractors-utr  controllers.contractordetails.ContractorUtrController.onSubmit(mode: Mode = CheckMode)
+
