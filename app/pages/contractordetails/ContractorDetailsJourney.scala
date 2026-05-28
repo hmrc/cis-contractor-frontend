@@ -14,20 +14,8 @@
  * limitations under the License.
  */
 
-package viewmodels.verify
+package pages.contractordetails
 
-import play.api.libs.json.{Json, OFormat}
+import pages.Page
 
-case class SubcontractorReverifyRow(
-  id: String,
-  name: String,
-  utr: String,
-  verified: String,
-  verificationNumber: String,
-  taxTreatment: String,
-  dateAdded: String
-)
-
-object SubcontractorReverifyRow {
-  given OFormat[SubcontractorReverifyRow] = Json.format[SubcontractorReverifyRow]
-}
+trait ContractorDetailsJourney extends Page

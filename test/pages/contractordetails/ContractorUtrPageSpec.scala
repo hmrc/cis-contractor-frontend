@@ -14,20 +14,18 @@
  * limitations under the License.
  */
 
-package viewmodels.verify
+package pages.contractordetails
 
-import play.api.libs.json.{Json, OFormat}
+import pages.behaviours.PageBehaviours
 
-case class SubcontractorReverifyRow(
-  id: String,
-  name: String,
-  utr: String,
-  verified: String,
-  verificationNumber: String,
-  taxTreatment: String,
-  dateAdded: String
-)
+class ContractorUtrPageSpec extends PageBehaviours {
 
-object SubcontractorReverifyRow {
-  given OFormat[SubcontractorReverifyRow] = Json.format[SubcontractorReverifyRow]
+  "ContractorUtrPage" - {
+
+    beRetrievable[String](ContractorUtrPage)
+
+    beSettable[String](ContractorUtrPage)
+
+    beRemovable[String](ContractorUtrPage)
+  }
 }
