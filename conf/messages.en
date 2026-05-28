@@ -944,9 +944,9 @@ verify.verifyCheckYourAnswers.subHeading                                =  Subco
 verify.verifyCheckYourAnswers.confirm                                   =  Confirm and submit
 
 # Contractor Details
-contractordetails.contractorDetailsIndex.title                          = Contractor details
-contractordetails.contractorDetailsIndex.heading                        = Contractor details
-contractordetails.contractorDetailsIndex.p1                             = To use the Construction Industry Scheme service, you will need the contractor’s Unique Taxpayer Reference and scheme name.
+contractordetails.contractorDetailsIndex.title                        =  Contractor details
+contractordetails.contractorDetailsIndex.heading                      =  Contractor details
+contractordetails.contractorDetailsIndex.p1                           =  To use the Construction Industry Scheme service, you will need the contractor’s Unique Taxpayer Reference and scheme name.
 contractordetails.schemeName.title                                    =  What is the contractor’s scheme name?
 contractordetails.schemeName.heading                                  =  What is the contractor’s scheme name?
 contractordetails.schemeName.checkYourAnswersLabel                    =  Scheme name

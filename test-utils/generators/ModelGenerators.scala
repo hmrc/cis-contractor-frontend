@@ -16,9 +16,9 @@
 
 package generators
 
-import models.{SubcontractorViewModel, *}
+import models.*
 import models.contact.ContactOptions
-import models.add.{InternationalAddress, TypeOfSubcontractor}
+import models.add.InternationalAddress
 import models.verify.ContractorEmailConfirmationStored
 import models.verify.SelectedSubcontractors
 import org.scalacheck.{Arbitrary, Gen}

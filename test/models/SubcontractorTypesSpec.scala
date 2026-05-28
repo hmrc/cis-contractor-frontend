@@ -16,7 +16,6 @@
 
 package models
 
-import models.add.TypeOfSubcontractor
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Gen
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks

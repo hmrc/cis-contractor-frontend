@@ -17,8 +17,8 @@
 package models.add.trust
 
 import base.SpecBase
-import models.RichJsObject
-import models.add.{InternationalAddress, TypeOfSubcontractor}
+import models.{RichJsObject, TypeOfSubcontractor}
+import models.add.InternationalAddress
 import models.contact.ContactOptions
 import models.contact.ContactOptions.*
 import models.{InvalidAnswer, MissingAnswer, UserAnswers}
