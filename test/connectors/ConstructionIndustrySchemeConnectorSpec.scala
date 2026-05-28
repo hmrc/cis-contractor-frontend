@@ -33,6 +33,8 @@ import uk.gov.hmrc.http.client.{HttpClientV2, RequestBuilder}
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import models.requests.ModifyVerificationsRequest
+import models.requests.{CreateSubmissionForVerificationRequest, VerificationToUpdate}
+import models.response.CreateSubmissionForVerificationResponse
 
 import java.net.URL
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -327,6 +329,54 @@ class ConstructionIndustrySchemeConnectorSpec extends AnyWordSpec with Matchers 
 
       val ex = connector.modifyVerificationBatch(req).failed.futureValue
       ex.getMessage mustBe s"Modify verification batch failed, returned $INTERNAL_SERVER_ERROR"
+    }
+  }
+
+  "ConstructionIndustrySchemeConnector.createSubmissionForVerification" should {
+
+    "POST /cis/verification/submission/create with the request body and return CreateSubmissionForVerificationResponse" in {
+      val config = mock[ServicesConfig]
+      val http   = mock[HttpClientV2]
+      val rb     = mock[RequestBuilder]
+
+      when(config.baseUrl("construction-industry-scheme")).thenReturn("http://cis-host")
+
+      when(http.post(any())(any())).thenReturn(rb)
+      when(rb.withBody(any[JsValue]())(any(), any(), any())).thenReturn(rb)
+
+      val expected = CreateSubmissionForVerificationResponse(submissionId = 12345L)
+
+      when(rb.execute[CreateSubmissionForVerificationResponse](any(), any()))
+        .thenReturn(Future.successful(expected))
+
+      val connector = new ConstructionIndustrySchemeConnector(config, http)
+
+      val req = CreateSubmissionForVerificationRequest(
+        instanceId = "INST-123",
+        verificationBatchId = 99L,
+        verificationBatchResourceRef = 7777L,
+        emailRecipient = "ops@example.com",
+        irMarkGenerated = None,
+        verifications = Seq(
+          VerificationToUpdate(
+            subcontractorName = "Unknown",
+            verificationResourceRef = 111L,
+            proceedVerification = "Y"
+          )
+        ),
+        agentId = None
+      )
+
+      val result = connector.createSubmissionForVerification(req).futureValue
+      result mustBe expected
+
+      val urlCaptor: ArgumentCaptor[URL] = ArgumentCaptor.forClass(classOf[URL])
+      verify(http).post(urlCaptor.capture())(any[HeaderCarrier])
+      urlCaptor.getValue.toString must include("/cis/verification/submission/create")
+
+      val bodyCaptor: ArgumentCaptor[JsValue] = ArgumentCaptor.forClass(classOf[JsValue])
+      verify(rb).withBody(bodyCaptor.capture())(any(), any(), any())
+      bodyCaptor.getValue mustBe Json.toJson(req)
     }
   }
 }

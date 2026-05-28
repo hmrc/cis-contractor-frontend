@@ -21,12 +21,19 @@ import models.verify.ValidatedVerify
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import services.VerificationService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.checkAnswers.verify.*
 import viewmodels.govuk.summarylist.*
 import views.html.verify.VerifyCheckYourAnswersView
+import models.requests.{CreateSubmissionForVerificationRequest, VerificationToUpdate}
+import queries.CisIdQuery
+import pages.verify.CurrentVerificationBatchResponsePage
+import pages.verify.EmailAddressPage
 
 import javax.inject.Inject
+import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class VerifyCheckYourAnswersController @Inject() (
   override val messagesApi: MessagesApi,
@@ -34,7 +41,8 @@ class VerifyCheckYourAnswersController @Inject() (
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   val controllerComponents: MessagesControllerComponents,
-  view: VerifyCheckYourAnswersView
+  view: VerifyCheckYourAnswersView,
+  verificationService: VerificationService
 ) extends FrontendBaseController
     with I18nSupport
     with Logging {
@@ -60,12 +68,57 @@ class VerifyCheckYourAnswersController @Inject() (
     }
   }
 
-  def onSubmit(): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
+  def onSubmit(): Action[AnyContent] = (identify andThen getData andThen requireData).async { implicit request =>
     ValidatedVerify.build(request.userAnswers) match {
-      case Right(_)    => Redirect(controllers.verify.routes.SubmissionSendingController.onPageLoad())
+      case Right(_) =>
+        buildSubmissionRequest(request.userAnswers) match {
+          case Left(_) =>
+            Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+
+          case Right(submissionReq) =>
+            verificationService
+              .createSubmissionForVerification(submissionReq)
+              .map(_ => Redirect(controllers.verify.routes.SubmissionSendingController.onPageLoad()))
+        }
+
       case Left(error) =>
         logger.error(s"[VerifyCheckYourAnswersController.onSubmit] Validation failed: $error")
-        Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+        Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
     }
   }
+
+  private def buildSubmissionRequest(ua: models.UserAnswers): Either[String, CreateSubmissionForVerificationRequest] =
+    for {
+      instanceId <- ua.get(CisIdQuery).toRight("CisIdQuery not found")
+      current    <- ua.get(CurrentVerificationBatchResponsePage).toRight("CurrentVerificationBatchResponsePage not found")
+
+      batchId  <- current.verificationBatch.map(_.verificationBatchId).toRight("verificationBatchId missing")
+      batchRef <-
+        current.verificationBatch.flatMap(_.verifBatchResourceRef).toRight("verificationBatchResourceRef missing")
+
+      email <- ua.get(EmailAddressPage).toRight("EmailAddressPage not found")
+    } yield {
+
+      val verifications: Seq[VerificationToUpdate] =
+        current.verifications.flatMap { v =>
+          v.verificationResourceRef.map { ref =>
+            VerificationToUpdate(
+              subcontractorName = "Unknown", // toDo
+              verificationResourceRef = ref,
+              proceedVerification = "Y" // ???
+            )
+          }
+        }
+
+      CreateSubmissionForVerificationRequest(
+        instanceId = instanceId,
+        verificationBatchId = batchId,
+        verificationBatchResourceRef = batchRef,
+        emailRecipient = email,
+        irMarkGenerated = None,
+        verifications = verifications,
+        agentId = None
+      )
+    }
+
 }
