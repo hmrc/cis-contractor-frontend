@@ -32,7 +32,7 @@ class ContractorDetailsController @Inject() (
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   val controllerComponents: MessagesControllerComponents,
-  view: ContractorDetailsView,
+  view: ContractorDetailsView
 )(implicit appConfig: FrontendAppConfig)
     extends FrontendBaseController
     with I18nSupport {
