@@ -305,8 +305,8 @@ partnershipWorksReferenceNumberYesNo.checkYourAnswersLabel           =  Add work
 partnershipWorksReferenceNumberYesNo.error.required                  =  Select whether this partnership has a works reference number
 partnershipWorksReferenceNumberYesNo.change.hidden                   =  add works reference number?
 
-partnershipName.title                                                =  What is the partnership name?
-partnershipName.heading                                              =  What is the partnership name?
+partnershipName.title                                                =  What is the name of the partnership?
+partnershipName.heading                                              =  What is the name of the partnership?
 partnershipName.hint                                                 =  This is the name of the partnership as registered with HM Revenue and Customs
 partnershipName.error.required                                       =  Enter the registered name of the partnership
 partnershipName.error.length                                         =  Partnership names must be 56 characters or less
