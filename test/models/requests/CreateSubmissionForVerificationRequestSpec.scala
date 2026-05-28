@@ -138,7 +138,7 @@ final class CreateSubmissionForVerificationRequestSpec extends AnyWordSpec with 
         verificationBatchId = 99L,
         verificationBatchResourceRef = 10L,
         emailRecipient = "ops@example.com",
-        irMarkGenerated =  Some("IR_MARK"),
+        irMarkGenerated = Some("IR_MARK"),
         verifications = Seq(
           VerificationToUpdate("ACME LTD", 111L, "Y"),
           VerificationToUpdate("BETA LTD", 222L, "N")
