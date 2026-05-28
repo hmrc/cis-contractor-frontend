@@ -44,6 +44,10 @@ class ContractorUtrViewSpec extends SpecBase with Matchers {
       doc.select("p").text must include(messages("contractordetails.contractorUtr.p1"))
     }
 
+    "must display find utr link" in new Setup {
+      doc.select("a").text must include(messages("contractordetails.contractorUtr.findUtr.link"))
+    }
+
     "must display a text input field" in new Setup {
       doc.select("input[name=value]").size mustBe 1
     }
