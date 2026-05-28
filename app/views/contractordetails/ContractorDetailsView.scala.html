@@ -15,6 +15,7 @@
  *@
 
 @import viewmodels.contractordetails.ContractorDetailsViewModel
+@import config.FrontendAppConfig
 
 @this(
     layout: templates.Layout,
@@ -23,10 +24,10 @@
     govukSummaryList: GovukSummaryList,
     h1: components.H1,
     h2: components.H2,
-    link: components.Link
+    link: components.Link,
 )
 
-@(contractorDetailsViewModel: ContractorDetailsViewModel)(implicit request: Request[_], messages: Messages)
+@(contractorDetailsViewModel: ContractorDetailsViewModel)(implicit request: Request[_], appConfig: FrontendAppConfig, messages: Messages)
 
 @helperRow(label: String, value: String, url: String, hiddenText: String)(implicit messages: Messages) = @{
     if (value.trim.isEmpty) {
@@ -88,5 +89,5 @@
         ButtonViewModel(messages("site.saveAndContinue"))
     )
 
-    @link("contractordetails.contractorDetails.link", "#")
+    @link("contractordetails.contractorDetails.link", appConfig.cisReturnDashboardUrl)
 }

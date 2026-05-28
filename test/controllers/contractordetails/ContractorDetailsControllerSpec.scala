@@ -55,6 +55,7 @@ class ContractorDetailsControllerSpec extends SpecBase {
           )
         )(
           request,
+          applicationConfig,
           messages(application)
         ).toString
       }
