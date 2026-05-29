@@ -24,12 +24,13 @@ import views.html.contractordetails.ContractorDetailsView
 
 class ContractorDetailsCheckAnswersControllerSpec extends SpecBase {
 
-  val contractorDetailsCheckAnswersViewModel: ContractorDetailsCheckAnswersViewModel = ContractorDetailsCheckAnswersViewModel(
-    accountsOfficeReference = "123 PA 87654321",
-    uniqueTaxpayerReference = "1234444555",
-    schemeName = "\tScheme 123",
-    email = "test@business.com"
-  )
+  val contractorDetailsCheckAnswersViewModel: ContractorDetailsCheckAnswersViewModel =
+    ContractorDetailsCheckAnswersViewModel(
+      accountsOfficeReference = "123 PA 87654321",
+      uniqueTaxpayerReference = "1234444555",
+      schemeName = "\tScheme 123",
+      email = "test@business.com"
+    )
 
   "ContractorDetails Controller" - {
 
@@ -39,7 +40,10 @@ class ContractorDetailsCheckAnswersControllerSpec extends SpecBase {
 
       running(application) {
         val request =
-          FakeRequest(GET, controllers.contractordetails.routes.ContractorDetailsCheckAnswersController.onPageLoad().url)
+          FakeRequest(
+            GET,
+            controllers.contractordetails.routes.ContractorDetailsCheckAnswersController.onPageLoad().url
+          )
 
         val result = route(application, request).value
 

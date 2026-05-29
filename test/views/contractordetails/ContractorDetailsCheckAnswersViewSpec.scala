@@ -45,7 +45,9 @@ class ContractorDetailsCheckAnswersViewSpec extends SpecBase {
         messages("contractordetails.contractorDetails.table.email")
       )
 
-      doc.select(".govuk-summary-list__value").text must include(contractorDetailsCheckAnswersViewModel.uniqueTaxpayerReference)
+      doc.select(".govuk-summary-list__value").text must include(
+        contractorDetailsCheckAnswersViewModel.uniqueTaxpayerReference
+      )
       doc.select(".govuk-summary-list__value").text must include(contractorDetailsCheckAnswersViewModel.schemeName.trim)
       doc.select(".govuk-summary-list__value").text must include(contractorDetailsCheckAnswersViewModel.email)
 
@@ -101,11 +103,12 @@ class ContractorDetailsCheckAnswersViewSpec extends SpecBase {
     val view: ContractorDetailsView =
       app.injector.instanceOf[ContractorDetailsView]
 
-    val contractorDetailsCheckAnswersViewModel: ContractorDetailsCheckAnswersViewModel = ContractorDetailsCheckAnswersViewModel(
-      accountsOfficeReference = "123 PA 87654321",
-      uniqueTaxpayerReference = "1234444555",
-      schemeName = "\tScheme 123",
-      email = "test@business.com"
-    )
+    val contractorDetailsCheckAnswersViewModel: ContractorDetailsCheckAnswersViewModel =
+      ContractorDetailsCheckAnswersViewModel(
+        accountsOfficeReference = "123 PA 87654321",
+        uniqueTaxpayerReference = "1234444555",
+        schemeName = "\tScheme 123",
+        email = "test@business.com"
+      )
   }
 }

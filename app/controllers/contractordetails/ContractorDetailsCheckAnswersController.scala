@@ -26,7 +26,7 @@ import views.html.contractordetails.ContractorDetailsView
 
 import javax.inject.Inject
 
-class ContractorDetailsCheckAnswersController @Inject()(
+class ContractorDetailsCheckAnswersController @Inject() (
   override val messagesApi: MessagesApi,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
