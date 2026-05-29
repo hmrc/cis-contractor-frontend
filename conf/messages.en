@@ -336,9 +336,9 @@ partnershipUniqueTaxpayerReference.error.duplicate                   =  You have
 partnershipUniqueTaxpayerReference.checkYourAnswersLabel             =  Partnership UTR
 partnershipUniqueTaxpayerReference.change.hidden                     =  partnership UTR
 
-partnershipHasUtrYesNo.title                                         =  Does this partnership have a Unique Taxpayer Reference (UTR)?
-partnershipHasUtrYesNo.heading                                       =  Does {0} have a Unique Taxpayer Reference (UTR)?
-partnershipHasUtrYesNo.hint                                          =  This is 10 numbers, like 1234567890. The UTR will be on tax returns and other letters about Self Assessment. It may also be called ‘tax reference’, or ‘UTR’
+partnershipHasUtrYesNo.title                                         =  Do you know the Unique Taxpayer Reference for {0}?
+partnershipHasUtrYesNo.heading                                       =  Do you know the Unique Taxpayer Reference for {0}?
+partnershipHasUtrYesNo.hint                                          =  This information will be used to verify the partnership as a subcontractor
 partnershipHasUtrYesNo.checkYourAnswersLabel                         =  Add UTR?
 partnershipHasUtrYesNo.error.required                                =  Select yes if the partnership has a Unique Taxpayer Reference (UTR)
 partnershipHasUtrYesNo.change.hidden                                 =  add UTR?
