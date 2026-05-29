@@ -20,7 +20,7 @@ import base.SpecBase
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import viewmodels.checkAnswers.contractordetails.ContractorDetailsCheckAnswersViewModel
-import views.html.contractordetails.ContractorDetailsView
+import views.html.contractordetails.ContractorDetailsCheckAnswersView
 
 class ContractorDetailsCheckAnswersControllerSpec extends SpecBase {
 
@@ -47,7 +47,7 @@ class ContractorDetailsCheckAnswersControllerSpec extends SpecBase {
 
         val result = route(application, request).value
 
-        val view = application.injector.instanceOf[ContractorDetailsView]
+        val view = application.injector.instanceOf[ContractorDetailsCheckAnswersView]
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(

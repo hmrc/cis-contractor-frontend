@@ -24,7 +24,7 @@ import play.api.mvc.Request
 import play.api.test.FakeRequest
 import play.twirl.api.HtmlFormat
 import viewmodels.checkAnswers.contractordetails.ContractorDetailsCheckAnswersViewModel
-import views.html.contractordetails.ContractorDetailsView
+import views.html.contractordetails.ContractorDetailsCheckAnswersView
 
 class ContractorDetailsCheckAnswersViewSpec extends SpecBase {
 
@@ -36,13 +36,13 @@ class ContractorDetailsCheckAnswersViewSpec extends SpecBase {
       val doc: Document = Jsoup.parse(html.body)
 
       doc.select(".govuk-summary-list__key").text must include(
-        messages("contractordetails.contractorDetails.table.uniqueTaxpayerReference")
+        messages("contractordetails.contractorDetailsCheckAnswers.table.uniqueTaxpayerReference")
       )
       doc.select(".govuk-summary-list__key").text must include(
-        messages("contractordetails.contractorDetails.table.schemeName")
+        messages("contractordetails.contractorDetailsCheckAnswers.table.schemeName")
       )
       doc.select(".govuk-summary-list__key").text must include(
-        messages("contractordetails.contractorDetails.table.email")
+        messages("contractordetails.contractorDetailsCheckAnswers.table.email")
       )
 
       doc.select(".govuk-summary-list__value").text must include(
@@ -53,7 +53,7 @@ class ContractorDetailsCheckAnswersViewSpec extends SpecBase {
 
       val links: String = doc.select(".govuk-link").text
       links must include(messages("site.change"))
-      links must include(messages("contractordetails.contractorDetails.link"))
+      links must include(messages("contractordetails.contractorDetailsCheckAnswers.link"))
     }
 
     "must show Add details links when values are empty" in new Setup {
@@ -63,13 +63,13 @@ class ContractorDetailsCheckAnswersViewSpec extends SpecBase {
       val doc: Document = Jsoup.parse(html.body)
 
       doc.select(".govuk-summary-list__key").text must include(
-        messages("contractordetails.contractorDetails.table.uniqueTaxpayerReference")
+        messages("contractordetails.contractorDetailsCheckAnswers.table.uniqueTaxpayerReference")
       )
       doc.select(".govuk-summary-list__key").text must include(
-        messages("contractordetails.contractorDetails.table.schemeName")
+        messages("contractordetails.contractorDetailsCheckAnswers.table.schemeName")
       )
       doc.select(".govuk-summary-list__key").text must include(
-        messages("contractordetails.contractorDetails.table.email")
+        messages("contractordetails.contractorDetailsCheckAnswers.table.email")
       )
 
       doc.select(".govuk-summary-list__value").eachText().forEach { value =>
@@ -77,7 +77,7 @@ class ContractorDetailsCheckAnswersViewSpec extends SpecBase {
       }
 
       val links: String = doc.select(".govuk-link").text
-      links must include(messages("contractordetails.contractorDetails.table.link.addDetails"))
+      links must include(messages("contractordetails.contractorDetailsCheckAnswers.table.link.addDetails"))
     }
 
     "must include visually hidden text for each change link" in new Setup {
@@ -86,9 +86,11 @@ class ContractorDetailsCheckAnswersViewSpec extends SpecBase {
 
       val hiddenTexts = doc.select(".govuk-visually-hidden").eachText()
 
-      hiddenTexts must contain(messages("contractordetails.contractorDetails.table.uniqueTaxpayerReference"))
-      hiddenTexts must contain(messages("contractordetails.contractorDetails.table.schemeName.hidden"))
-      hiddenTexts must contain(messages("contractordetails.contractorDetails.table.email.hidden"))
+      hiddenTexts must contain(
+        messages("contractordetails.contractorDetailsCheckAnswers.table.uniqueTaxpayerReference")
+      )
+      hiddenTexts must contain(messages("contractordetails.contractorDetailsCheckAnswers.table.schemeName.hidden"))
+      hiddenTexts must contain(messages("contractordetails.contractorDetailsCheckAnswers.table.email.hidden"))
     }
   }
 
@@ -100,8 +102,8 @@ class ContractorDetailsCheckAnswersViewSpec extends SpecBase {
         app.injector.instanceOf[play.api.i18n.MessagesApi]
       )
 
-    val view: ContractorDetailsView =
-      app.injector.instanceOf[ContractorDetailsView]
+    val view: ContractorDetailsCheckAnswersView =
+      app.injector.instanceOf[ContractorDetailsCheckAnswersView]
 
     val contractorDetailsCheckAnswersViewModel: ContractorDetailsCheckAnswersViewModel =
       ContractorDetailsCheckAnswersViewModel(

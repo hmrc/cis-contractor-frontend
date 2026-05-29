@@ -36,7 +36,7 @@
             value = ValueViewModel(""),
             actions = Seq(
                 ActionItemViewModel(
-                    Text(messages("contractordetails.contractorDetails.table.link.addDetails")),
+                    Text(messages("contractordetails.contractorDetailsCheckAnswers.table.link.addDetails")),
                     url
                 ).withVisuallyHiddenText(messages(hiddenText))
             )
@@ -55,30 +55,30 @@
     }
 }
 
-@layout(pageTitle = titleNoForm(messages("contractordetails.contractorDetails.title"))) {
+@layout(pageTitle = titleNoForm(messages("contractordetails.contractorDetailsCheckAnswers.title"))) {
 
-    @h1("contractordetails.contractorDetails.heading", classes = "govuk-heading-xl")
-    @h2(messages("contractordetails.contractorDetails.accountsOfficeReference", contractorDetailsViewModel.accountsOfficeReference))
+    @h1("contractordetails.contractorDetailsCheckAnswers.heading", classes = "govuk-heading-xl")
+    @h2(messages("contractordetails.contractorDetailsCheckAnswers.accountsOfficeReference", contractorDetailsViewModel.accountsOfficeReference))
 
     @govukSummaryList(
         SummaryListViewModel(Seq(
             helperRow(
-                "contractordetails.contractorDetails.table.uniqueTaxpayerReference",
+                "contractordetails.contractorDetailsCheckAnswers.table.uniqueTaxpayerReference",
                 contractorDetailsViewModel.uniqueTaxpayerReference,
                 "#",
-                "contractordetails.contractorDetails.table.uniqueTaxpayerReference"
+                "contractordetails.contractorDetailsCheckAnswers.table.uniqueTaxpayerReference"
             ),
             helperRow(
-                "contractordetails.contractorDetails.table.schemeName",
+                "contractordetails.contractorDetailsCheckAnswers.table.schemeName",
                 contractorDetailsViewModel.schemeName,
                 "#",
-                "contractordetails.contractorDetails.table.schemeName.hidden"
+                "contractordetails.contractorDetailsCheckAnswers.table.schemeName.hidden"
             ),
             helperRow(
-                "contractordetails.contractorDetails.table.email",
+                "contractordetails.contractorDetailsCheckAnswers.table.email",
                 contractorDetailsViewModel.email,
                 "#",
-                "contractordetails.contractorDetails.table.email.hidden"
+                "contractordetails.contractorDetailsCheckAnswers.table.email.hidden"
                 )
             )
         )
@@ -89,5 +89,5 @@
         ButtonViewModel(messages("site.saveAndContinue"))
     )
 
-    @link("contractordetails.contractorDetails.link", appConfig.cisReturnDashboardUrl)
+    @link("contractordetails.contractorDetailsCheckAnswers.link", appConfig.cisReturnDashboardUrl)
 }
