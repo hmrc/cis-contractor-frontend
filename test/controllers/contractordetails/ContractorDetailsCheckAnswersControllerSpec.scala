@@ -19,12 +19,12 @@ package controllers.contractordetails
 import base.SpecBase
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import viewmodels.contractordetails.ContractorDetailsViewModel
+import viewmodels.checkAnswers.contractordetails.ContractorDetailsCheckAnswersViewModel
 import views.html.contractordetails.ContractorDetailsView
 
-class ContractorDetailsControllerSpec extends SpecBase {
+class ContractorDetailsCheckAnswersControllerSpec extends SpecBase {
 
-  val contractorDetailsViewModel: ContractorDetailsViewModel = ContractorDetailsViewModel(
+  val contractorDetailsCheckAnswersViewModel: ContractorDetailsCheckAnswersViewModel = ContractorDetailsCheckAnswersViewModel(
     accountsOfficeReference = "123 PA 87654321",
     uniqueTaxpayerReference = "1234444555",
     schemeName = "\tScheme 123",
@@ -39,7 +39,7 @@ class ContractorDetailsControllerSpec extends SpecBase {
 
       running(application) {
         val request =
-          FakeRequest(GET, controllers.contractordetails.routes.ContractorDetailsController.onPageLoad().url)
+          FakeRequest(GET, controllers.contractordetails.routes.ContractorDetailsCheckAnswersController.onPageLoad().url)
 
         val result = route(application, request).value
 
@@ -47,11 +47,11 @@ class ContractorDetailsControllerSpec extends SpecBase {
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(
-          ContractorDetailsViewModel(
-            contractorDetailsViewModel.accountsOfficeReference,
-            contractorDetailsViewModel.uniqueTaxpayerReference,
-            contractorDetailsViewModel.schemeName,
-            contractorDetailsViewModel.email
+          ContractorDetailsCheckAnswersViewModel(
+            contractorDetailsCheckAnswersViewModel.accountsOfficeReference,
+            contractorDetailsCheckAnswersViewModel.uniqueTaxpayerReference,
+            contractorDetailsCheckAnswersViewModel.schemeName,
+            contractorDetailsCheckAnswersViewModel.email
           )
         )(
           request,

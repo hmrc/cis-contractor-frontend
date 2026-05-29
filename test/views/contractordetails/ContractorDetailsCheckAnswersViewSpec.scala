@@ -23,15 +23,15 @@ import play.api.i18n.Messages
 import play.api.mvc.Request
 import play.api.test.FakeRequest
 import play.twirl.api.HtmlFormat
-import viewmodels.contractordetails.ContractorDetailsViewModel
+import viewmodels.checkAnswers.contractordetails.ContractorDetailsCheckAnswersViewModel
 import views.html.contractordetails.ContractorDetailsView
 
-class ContractorDetailsViewSpec extends SpecBase {
+class ContractorDetailsCheckAnswersViewSpec extends SpecBase {
 
   "ContractorDetailsView" - {
 
     "must show Change links when values are provided" in new Setup {
-      val html: HtmlFormat.Appendable = view(contractorDetailsViewModel)
+      val html: HtmlFormat.Appendable = view(contractorDetailsCheckAnswersViewModel)
 
       val doc: Document = Jsoup.parse(html.body)
 
@@ -45,9 +45,9 @@ class ContractorDetailsViewSpec extends SpecBase {
         messages("contractordetails.contractorDetails.table.email")
       )
 
-      doc.select(".govuk-summary-list__value").text must include(contractorDetailsViewModel.uniqueTaxpayerReference)
-      doc.select(".govuk-summary-list__value").text must include(contractorDetailsViewModel.schemeName.trim)
-      doc.select(".govuk-summary-list__value").text must include(contractorDetailsViewModel.email)
+      doc.select(".govuk-summary-list__value").text must include(contractorDetailsCheckAnswersViewModel.uniqueTaxpayerReference)
+      doc.select(".govuk-summary-list__value").text must include(contractorDetailsCheckAnswersViewModel.schemeName.trim)
+      doc.select(".govuk-summary-list__value").text must include(contractorDetailsCheckAnswersViewModel.email)
 
       val links: String = doc.select(".govuk-link").text
       links must include(messages("site.change"))
@@ -56,7 +56,7 @@ class ContractorDetailsViewSpec extends SpecBase {
 
     "must show Add details links when values are empty" in new Setup {
       val html: HtmlFormat.Appendable =
-        view(contractorDetailsViewModel.copy(uniqueTaxpayerReference = "", schemeName = "", email = ""))
+        view(contractorDetailsCheckAnswersViewModel.copy(uniqueTaxpayerReference = "", schemeName = "", email = ""))
 
       val doc: Document = Jsoup.parse(html.body)
 
@@ -79,7 +79,7 @@ class ContractorDetailsViewSpec extends SpecBase {
     }
 
     "must include visually hidden text for each change link" in new Setup {
-      val html = view(contractorDetailsViewModel)
+      val html = view(contractorDetailsCheckAnswersViewModel)
       val doc  = Jsoup.parse(html.body)
 
       val hiddenTexts = doc.select(".govuk-visually-hidden").eachText()
@@ -101,7 +101,7 @@ class ContractorDetailsViewSpec extends SpecBase {
     val view: ContractorDetailsView =
       app.injector.instanceOf[ContractorDetailsView]
 
-    val contractorDetailsViewModel: ContractorDetailsViewModel = ContractorDetailsViewModel(
+    val contractorDetailsCheckAnswersViewModel: ContractorDetailsCheckAnswersViewModel = ContractorDetailsCheckAnswersViewModel(
       accountsOfficeReference = "123 PA 87654321",
       uniqueTaxpayerReference = "1234444555",
       schemeName = "\tScheme 123",

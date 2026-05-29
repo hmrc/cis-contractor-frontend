@@ -14,7 +14,7 @@
  * limitations under the License.
  *@
 
-@import viewmodels.contractordetails.ContractorDetailsViewModel
+@import viewmodels.checkAnswers.contractordetails.ContractorDetailsCheckAnswersViewModel
 @import config.FrontendAppConfig
 
 @this(
@@ -27,7 +27,7 @@
     link: components.Link,
 )
 
-@(contractorDetailsViewModel: ContractorDetailsViewModel)(implicit request: Request[_], appConfig: FrontendAppConfig, messages: Messages)
+@(contractorDetailsViewModel: ContractorDetailsCheckAnswersViewModel)(implicit request: Request[_], appConfig: FrontendAppConfig, messages: Messages)
 
 @helperRow(label: String, value: String, url: String, hiddenText: String)(implicit messages: Messages) = @{
     if (value.trim.isEmpty) {

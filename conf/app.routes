@@ -131,7 +131,7 @@ GET   /contractor-details/change-what-is-contractors-email          controllers.
 POST  /contractor-details/change-what-is-contractors-email          controllers.contractordetails.EnterContractorEmailAddressController.onSubmit(mode: Mode = CheckMode)
 
 GET   /contractor-details/contractor-details-updated                controllers.contractordetails.ContractorDetailsUpdatedController.onPageLoad()
-GET   /contractor-details/contractor-details-added                  controllers.contractordetails.ContractorDetailsController.onPageLoad()
+GET   /contractor-details/contractor-details-added                  controllers.contractordetails.ContractorDetailsCheckAnswersController.onPageLoad()
 
 # Errors & Auth
 GET  /unauthorised/standard-user  controllers.UnauthorisedWrongRoleController.onPageLoad()

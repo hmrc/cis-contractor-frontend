@@ -21,12 +21,12 @@ import controllers.actions.*
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import viewmodels.contractordetails.ContractorDetailsViewModel
+import viewmodels.checkAnswers.contractordetails.ContractorDetailsCheckAnswersViewModel
 import views.html.contractordetails.ContractorDetailsView
 
 import javax.inject.Inject
 
-class ContractorDetailsController @Inject() (
+class ContractorDetailsCheckAnswersController @Inject()(
   override val messagesApi: MessagesApi,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
@@ -38,7 +38,7 @@ class ContractorDetailsController @Inject() (
     with I18nSupport {
 
   def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
-    val contractorDetailsViewModel = ContractorDetailsViewModel(
+    val contractorDetailsViewModel = ContractorDetailsCheckAnswersViewModel(
       accountsOfficeReference = "123 PA 87654321",
       uniqueTaxpayerReference = "1234444555",
       schemeName = "\tScheme 123",
