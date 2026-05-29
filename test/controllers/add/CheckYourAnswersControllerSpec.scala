@@ -18,13 +18,13 @@ package controllers.add
 
 import base.SpecBase
 import controllers.routes
-import models.add.{InternationalAddress, SubcontractorName, TypeOfSubcontractor}
+import models.add.{InternationalAddress, SubcontractorName}
 import models.contact.ContactOptions
-import models.{CheckMode, UserAnswers}
+import models.{CheckMode, TypeOfSubcontractor, UserAnswers}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{never, verify, verifyNoMoreInteractions, when}
 import org.scalatestplus.mockito.MockitoSugar.mock
-import pages.add.{CheckYourAnswersSubmittedPage, *}
+import pages.add.*
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*

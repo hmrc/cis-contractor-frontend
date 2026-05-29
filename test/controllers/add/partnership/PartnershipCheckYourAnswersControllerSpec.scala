@@ -17,14 +17,14 @@
 package controllers.add.partnership
 
 import base.SpecBase
-import models.add.{InternationalAddress, TypeOfSubcontractor}
+import models.add.InternationalAddress
 import models.contact.ContactOptions
 import pages.add.TypeOfSubcontractorPage
 import pages.add.partnership.*
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import controllers.routes
-import models.UserAnswers
+import models.{TypeOfSubcontractor, UserAnswers}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{never, verify, verifyNoMoreInteractions, when}
 import org.scalatestplus.mockito.MockitoSugar.mock

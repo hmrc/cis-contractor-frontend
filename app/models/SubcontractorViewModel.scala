@@ -16,6 +16,7 @@
 
 package models
 
+import models.TypeOfSubcontractor.*
 import play.api.libs.json.{Json, OFormat}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.checkboxes.CheckboxItem
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
@@ -28,7 +29,7 @@ object SubcontractorViewModel {
   implicit val format: OFormat[SubcontractorViewModel] = Json.format[SubcontractorViewModel]
 
   def checkboxItems(subcontractors: Seq[SubcontractorViewModel]): Seq[CheckboxItem] =
-    subcontractors.sortBy(_.name).zipWithIndex.map { case (sub, index) =>
+    subcontractors.sortBy(_.name.toLowerCase).zipWithIndex.map { case (sub, index) =>
       CheckboxItemViewModel(
         content = Text(sub.name),
         fieldId = "value",
@@ -36,4 +37,60 @@ object SubcontractorViewModel {
         value = sub.id
       )
     }
+
+  def fromSubcontractors(
+    subcontractors: Seq[Subcontractor]
+  ): (Seq[String], Seq[SubcontractorViewModel]) =
+    subcontractors.partitionMap(fromSubcontractor)
+
+  private def fromSubcontractor(subcontractor: Subcontractor): Either[String, SubcontractorViewModel] =
+    for {
+      subcontractorType <- getSubcontractorType(subcontractor)
+      name              <- getSubcontractorName(subcontractor, subcontractorType)
+    } yield SubcontractorViewModel(
+      id = subcontractor.subcontractorId.toString,
+      name = name
+    )
+
+  private def getSubcontractorName(
+    subcontractor: Subcontractor,
+    subcontractorType: TypeOfSubcontractor
+  ): Either[String, String] = {
+
+    def nonBlank(field: Option[String]): Option[String] =
+      field.map(_.trim).filter(_.nonEmpty)
+
+    subcontractorType match {
+      case Individualorsoletrader =>
+        val soleTraderName: Option[String] =
+          for {
+            surname   <- nonBlank(subcontractor.surname)
+            firstName <- nonBlank(subcontractor.firstName)
+          } yield s"$surname, $firstName"
+
+        soleTraderName
+          .orElse(nonBlank(subcontractor.tradingName))
+          .toRight(s"Missing name for subcontractor id ${subcontractor.subcontractorId}")
+
+      case Limitedcompany =>
+        nonBlank(subcontractor.tradingName).toRight(
+          s"Missing tradingName for subcontractor id ${subcontractor.subcontractorId}"
+        )
+
+      case Partnership =>
+        nonBlank(subcontractor.partnershipTradingName).toRight(
+          s"Missing partnershipTradingName for subcontractor id ${subcontractor.subcontractorId}"
+        )
+
+      case Trust =>
+        nonBlank(subcontractor.tradingName).toRight(
+          s"Missing tradingName for subcontractor id ${subcontractor.subcontractorId}"
+        )
+    }
+  }
+
+  private def getSubcontractorType(subcontractor: Subcontractor): Either[String, TypeOfSubcontractor] =
+    subcontractor.subcontractorType
+      .flatMap(TypeOfSubcontractor.fromString)
+      .toRight(s"Unknown or missing subcontractor type for subcontractor id ${subcontractor.subcontractorId}")
 }

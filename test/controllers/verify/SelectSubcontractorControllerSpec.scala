@@ -18,13 +18,14 @@ package controllers.verify
 
 import base.SpecBase
 import forms.verify.SelectSubcontractorFormProvider
-import models.{NormalMode, SubcontractorViewModel, UserAnswers}
+import models.response.GetNewestVerificationBatchResponse
+import models.{NormalMode, Subcontractor, SubcontractorViewModel, UserAnswers, Verification}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{verify, when}
 import org.scalatestplus.mockito.MockitoSugar
-import pages.verify.SelectSubcontractorPage
+import pages.verify.{NewestVerificationBatchResponsePage, SelectSubcontractorPage, UnverifiedSubcontractorsPage}
 import play.api.data.Forms.*
 import play.api.data.Form
 import play.api.inject.bind
@@ -32,10 +33,10 @@ import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import repositories.SessionRepository
-import services.{PaginationService, SubcontractorSource}
+import services.PaginationService
 import views.html.verify.SelectSubcontractorView
-import javax.inject.Inject
 
+import javax.inject.Inject
 import scala.concurrent.Future
 
 class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
@@ -46,18 +47,74 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
   val form: Form[Set[String]] = formProvider()
   val paginationService       = new PaginationService()
 
-  private val allSubs          = SelectSubcontractorController.subcontractors
-  private val brodyMartin      = allSubs.head // first subcontractor, on page 1
-  private val epsilonCarpentry = allSubs(6) // seventh subcontractor, on page 2 (pageSize = 6)
-
   def url(page: Int = 1): String =
     controllers.verify.routes.SelectSubcontractorController.onPageLoad(NormalMode, page).url
+
+  private def generateSubcontractors(count: Int): Seq[Subcontractor] =
+    (1 to count).map { subcontractorId =>
+      Subcontractor(
+        subcontractorId = subcontractorId.toLong,
+        firstName = None,
+        secondName = None,
+        surname = None,
+        tradingName = Some("ABC Construction Ltd"),
+        partnershipTradingName = None,
+        verified = None,
+        verificationNumber = None,
+        taxTreatment = None,
+        verificationDate = None,
+        lastMonthlyReturnDate = None,
+        createDate = None,
+        subcontractorType = Some("company"),
+        subbieResourceRef = Some(9999L),
+        utr = None,
+        partnerUtr = None,
+        crn = None,
+        nino = None
+      )
+    }
+
+  private val subcontractorCount = 10
+
+  private val subcontractors: Seq[Subcontractor] = generateSubcontractors(subcontractorCount)
+
+  private val getNewestVerificationBatchResponse: GetNewestVerificationBatchResponse =
+    GetNewestVerificationBatchResponse(
+      scheme = None,
+      subcontractors = subcontractors,
+      verificationBatch = None,
+      verifications = Seq(
+        Verification(
+          verificationId = 10L,
+          matched = None,
+          verificationNumber = None,
+          taxTreatment = None,
+          verificationBatchId = None,
+          subcontractorId = None
+        )
+      ),
+      submission = None,
+      monthlyReturn = None
+    )
+
+  private def uaWithSubcontractors: UserAnswers =
+    emptyUserAnswers
+      .set(NewestVerificationBatchResponsePage, getNewestVerificationBatchResponse)
+      .success
+      .value
+      .set(UnverifiedSubcontractorsPage, subcontractors)
+      .success
+      .value
+
+  private val (_, allSubs)     = SubcontractorViewModel.fromSubcontractors(subcontractors)
+  private val brodyMartin      = allSubs.head // first subcontractor, on page 1
+  private val epsilonCarpentry = allSubs(6) // seventh subcontractor, on page 2 (pageSize = 6)
 
   "SelectSubcontractor Controller" - {
 
     "must return OK and correct view for GET (page 1)" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(uaWithSubcontractors)).build()
 
       running(application) {
         val request = FakeRequest(GET, url(1))
@@ -85,7 +142,7 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
       val userAnswers =
-        UserAnswers(userAnswersId)
+        uaWithSubcontractors
           .set(SelectSubcontractorPage, allSubs.toSet)
           .success
           .value
@@ -121,7 +178,7 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
       val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        applicationBuilder(userAnswers = Some(uaWithSubcontractors))
           .overrides(
             bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
             bind[SessionRepository].toInstance(mockSessionRepository)
@@ -142,7 +199,7 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(uaWithSubcontractors)).build()
 
       running(application) {
         val request =
@@ -172,9 +229,10 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
+    // todo even no page 2 still give ok
     "must support pagination (page 2)" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(uaWithSubcontractors)).build()
 
       running(application) {
         val request = FakeRequest(GET, url(2))
@@ -186,7 +244,7 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
 
     "must render the page for a GET when no existing data is found" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(uaWithSubcontractors)).build()
 
       val request = FakeRequest(GET, url(1))
       val result  = route(application, request).value
@@ -196,7 +254,7 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
 
     "must return BadRequest for POST when no existing data and form has errors" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(uaWithSubcontractors)).build()
 
       val request =
         FakeRequest(POST, url(1))
@@ -223,12 +281,33 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
 
     "must redirect to NoSubcontractorsAdded on GET when subcontractors list is empty" in {
 
-      val mockSubcontractorSource = mock[SubcontractorSource]
-      when(mockSubcontractorSource.get()) thenReturn Seq.empty
+      val getNewestVerificationBatchResponse: GetNewestVerificationBatchResponse =
+        GetNewestVerificationBatchResponse(
+          scheme = None,
+          subcontractors = Seq.empty[Subcontractor],
+          verificationBatch = None,
+          verifications = Seq(
+            Verification(
+              verificationId = 10L,
+              matched = None,
+              verificationNumber = None,
+              taxTreatment = None,
+              verificationBatchId = None,
+              subcontractorId = None
+            )
+          ),
+          submission = None,
+          monthlyReturn = None
+        )
+
+      def uaWithNoSubcontractors: UserAnswers =
+        emptyUserAnswers
+          .set(NewestVerificationBatchResponsePage, getNewestVerificationBatchResponse)
+          .success
+          .value
 
       val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
-          .overrides(bind[SubcontractorSource].toInstance(mockSubcontractorSource))
+        applicationBuilder(userAnswers = Some(uaWithNoSubcontractors))
           .build()
 
       running(application) {
@@ -238,6 +317,141 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual
           controllers.verify.routes.NoSubcontractorsAddedController.onPageLoad().url
+      }
+    }
+
+    "must redirect to VerifyYourSubcontractorsYesNo on GET when subcontractors list is not empty, unverifiedSubcontractors is empty" in {
+
+      val subcontractors: Seq[Subcontractor] = Seq.empty[Subcontractor]
+
+      def uaWithNoUnverifiedSubcontractors: UserAnswers =
+        uaWithSubcontractors
+          .set(UnverifiedSubcontractorsPage, subcontractors)
+          .success
+          .value
+
+      val application =
+        applicationBuilder(userAnswers = Some(uaWithNoUnverifiedSubcontractors))
+          .build()
+
+      running(application) {
+        val request = FakeRequest(GET, url(1))
+        val result  = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual
+          controllers.verify.routes.VerifyYourSubcontractorsYesNoController.onPageLoad.url
+      }
+    }
+
+    "must redirect to Journey Recovery on GET when NewestVerificationBatchResponse is not found" in {
+
+      val application =
+        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          .build()
+
+      running(application) {
+        val request = FakeRequest(GET, url(1))
+        val result  = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual
+          controllers.routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must redirect to Journey Recovery on GET when every unverified subcontractor has a missing or unknown type" in {
+
+      val invalidSubcontractors: Seq[Subcontractor] = generateSubcontractors(3).map(_.copy(subcontractorType = None))
+
+      val responseWithInvalid: GetNewestVerificationBatchResponse =
+        getNewestVerificationBatchResponse.copy(subcontractors = invalidSubcontractors)
+
+      def uaWithAllInvalid: UserAnswers =
+        emptyUserAnswers
+          .set(NewestVerificationBatchResponsePage, responseWithInvalid)
+          .success
+          .value
+          .set(UnverifiedSubcontractorsPage, invalidSubcontractors)
+          .success
+          .value
+
+      val application = applicationBuilder(userAnswers = Some(uaWithAllInvalid)).build()
+
+      running(application) {
+        val request = FakeRequest(GET, url(1))
+        val result  = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual
+          controllers.routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must render the page with only valid rows on GET when some unverified subcontractors have a missing type" in {
+
+      val validSubs   = generateSubcontractors(2)
+      val invalidSubs = generateSubcontractors(1).map(_.copy(subcontractorId = 99L, subcontractorType = None))
+      val mixed       = validSubs ++ invalidSubs
+
+      val responseWithMixed: GetNewestVerificationBatchResponse =
+        getNewestVerificationBatchResponse.copy(subcontractors = mixed)
+
+      def uaWithMixed: UserAnswers =
+        emptyUserAnswers
+          .set(NewestVerificationBatchResponsePage, responseWithMixed)
+          .success
+          .value
+          .set(UnverifiedSubcontractorsPage, mixed)
+          .success
+          .value
+
+      val application = applicationBuilder(userAnswers = Some(uaWithMixed)).build()
+
+      running(application) {
+        val request = FakeRequest(GET, url(1))
+        val result  = route(application, request).value
+
+        val (_, validViewModels) = SubcontractorViewModel.fromSubcontractors(mixed)
+        val view                 = application.injector.instanceOf[SelectSubcontractorView]
+        val items                = SubcontractorViewModel.checkboxItems(validViewModels)
+        val paginationResult     = paginationService.paginateCheckboxItems(items, 1)
+
+        status(result) mustEqual OK
+
+        contentAsString(result) mustEqual view(
+          form,
+          NormalMode,
+          paginationResult.paginatedData,
+          paginationResult.paginationViewModel,
+          1,
+          paginationResult.startIndex,
+          paginationResult.totalCount
+        )(request, messages(application)).toString
+
+        validViewModels.size mustEqual 2
+      }
+    }
+
+    "must redirect to Journey Recovery on GET when UnverifiedSubcontractors is not found" in {
+
+      def uaWithNoUnverifiedSubcontractors: UserAnswers =
+        emptyUserAnswers
+          .set(NewestVerificationBatchResponsePage, getNewestVerificationBatchResponse)
+          .success
+          .value
+
+      val application =
+        applicationBuilder(userAnswers = Some(uaWithNoUnverifiedSubcontractors))
+          .build()
+
+      running(application) {
+        val request = FakeRequest(GET, url(1))
+        val result  = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual
+          controllers.routes.JourneyRecoveryController.onPageLoad().url
       }
     }
 
@@ -264,13 +478,98 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must redirect to target page and save selections when gotoPage field is present" in {
+    "must redirect to Journey Recovery for a POST if UnverifiedSubcontractorsPage data is not found" in {
 
       val mockSessionRepository = mock[SessionRepository]
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
       val application =
         applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, url(1))
+            .withFormUrlEncodedBody("value[0]" -> allSubs.head.id)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual
+          controllers.routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must redirect to Journey Recovery for a POST if UnverifiedSubcontractors is empty" in {
+
+      val subcontractorCount = 0
+
+      def uaWithNoUnverifiedSubcontractor: UserAnswers =
+        emptyUserAnswers
+          .set(UnverifiedSubcontractorsPage, generateSubcontractors(subcontractorCount))
+          .success
+          .value
+
+      val mockSessionRepository = mock[SessionRepository]
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+      val application =
+        applicationBuilder(userAnswers = Some(uaWithNoUnverifiedSubcontractor))
+          .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, url(1))
+            .withFormUrlEncodedBody("value[0]" -> allSubs.head.id)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual
+          controllers.routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must redirect to Journey Recovery for a POST when every unverified subcontractor has a missing or unknown type" in {
+
+      val invalidSubcontractors: Seq[Subcontractor] = generateSubcontractors(3).map(_.copy(subcontractorType = None))
+
+      def uaWithNoUnverifiedSubcontractor: UserAnswers =
+        emptyUserAnswers
+          .set(UnverifiedSubcontractorsPage, invalidSubcontractors)
+          .success
+          .value
+
+      val mockSessionRepository = mock[SessionRepository]
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+      val application =
+        applicationBuilder(userAnswers = Some(uaWithNoUnverifiedSubcontractor))
+          .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, url(1))
+            .withFormUrlEncodedBody("value[0]" -> allSubs.head.id)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual
+          controllers.routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must redirect to target page and save selections when gotoPage field is present" in {
+
+      val mockSessionRepository = mock[SessionRepository]
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+      val application =
+        applicationBuilder(userAnswers = Some(uaWithSubcontractors))
           .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
           .build()
 
@@ -295,7 +594,7 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
       val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        applicationBuilder(userAnswers = Some(uaWithSubcontractors))
           .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
           .build()
 
@@ -322,7 +621,7 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
 
       val priorSelection: Set[SubcontractorViewModel] = Set(brodyMartin)
       val userAnswers                                 =
-        UserAnswers(userAnswersId)
+        uaWithSubcontractors
           .set(SelectSubcontractorPage, priorSelection)
           .success
           .value
@@ -351,7 +650,7 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
 
       val page1Selection: Set[SubcontractorViewModel] = Set(brodyMartin)
       val userAnswers                                 =
-        UserAnswers(userAnswersId)
+        uaWithSubcontractors
           .set(SelectSubcontractorPage, page1Selection)
           .success
           .value
@@ -383,7 +682,7 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
 
       val page1Selection: Set[SubcontractorViewModel] = Set(brodyMartin)
       val userAnswers                                 =
-        UserAnswers(userAnswersId)
+        uaWithSubcontractors
           .set(SelectSubcontractorPage, page1Selection)
           .success
           .value
@@ -433,7 +732,7 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
       val otherPageSelection: Set[SubcontractorViewModel] = Set(page2Subs.head)
 
       val userAnswers =
-        UserAnswers(userAnswersId)
+        uaWithSubcontractors
           .set(SelectSubcontractorPage, otherPageSelection)
           .success
           .value
@@ -479,7 +778,7 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
       val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        applicationBuilder(userAnswers = Some(uaWithSubcontractors))
           .overrides(
             bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
             bind[SessionRepository].toInstance(mockSessionRepository),

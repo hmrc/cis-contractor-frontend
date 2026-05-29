@@ -31,6 +31,7 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext
+import java.time.LocalDateTime
 
 class NewestVerificationBatchController @Inject() (
   override val messagesApi: MessagesApi,
@@ -44,6 +45,81 @@ class NewestVerificationBatchController @Inject() (
     with I18nSupport
     with Logging {
 
+  private sealed trait InactivityStatus
+  private object InactivityStatus {
+    case object Active extends InactivityStatus
+    case object Inactive extends InactivityStatus
+    case object MissingData extends InactivityStatus
+    val SixMonths: Long = 6
+  }
+
+  private def checkSchemeInactivity(response: models.response.GetNewestVerificationBatchResponse): InactivityStatus =
+    response.monthlyReturn match {
+      case None =>
+        // No monthly return submitted - scheme is active
+        InactivityStatus.Active
+
+      case Some(monthlyReturn) if !monthlyReturn.decNoMoreSubPayments.contains("Y") =>
+        InactivityStatus.Active
+
+      case Some(_) =>
+        response.submission match {
+          case None =>
+            InactivityStatus.MissingData
+
+          case Some(submission) =>
+            submission.submissionRequestDate match {
+              case Some(requestDate) =>
+                val sixMonthsLater = requestDate.plusMonths(InactivityStatus.SixMonths)
+                if (LocalDateTime.now().isBefore(sixMonthsLater)) InactivityStatus.Inactive else InactivityStatus.Active
+              case None              =>
+                InactivityStatus.MissingData
+            }
+        }
+    }
+
+  private def checkSubmissionStatus(
+    response: models.response.GetNewestVerificationBatchResponse
+  ): SubmissionStatusCheckResult = {
+    val status = response.verificationBatch.flatMap(_.status).flatMap { raw =>
+      val parsed = VerificationBatchStatus.from(raw)
+      if (parsed.isEmpty) {
+        logger.warn(
+          s"[NewestVerificationBatchController.onPageLoad] Unrecognised verification batch status: $raw"
+        )
+      }
+      parsed
+    }
+    CheckLatestSubmissionStatusService.check(status)
+  }
+
+  private def routeFromResponse(
+    response: models.response.GetNewestVerificationBatchResponse,
+    unverified: Seq[models.Subcontractor]
+  ): play.api.mvc.Result =
+    checkSchemeInactivity(response) match {
+      case InactivityStatus.MissingData =>
+        Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+
+      case InactivityStatus.Inactive =>
+        Redirect(controllers.verify.routes.InactiveSchemeWarningController.onPageLoad())
+
+      case InactivityStatus.Active =>
+        checkSubmissionStatus(response) match {
+          case SubmissionStatusCheckResult.ShowPendingVerificationWarning =>
+            Redirect(controllers.verify.routes.VerificationRequestInProgressController.onPageLoad())
+
+          case SubmissionStatusCheckResult.Continue if response.subcontractors.isEmpty =>
+            Redirect(controllers.verify.routes.NoSubcontractorsAddedController.onPageLoad())
+
+          case SubmissionStatusCheckResult.Continue if unverified.isEmpty =>
+            Redirect(controllers.verify.routes.VerifyYourSubcontractorsYesNoController.onPageLoad)
+
+          case SubmissionStatusCheckResult.Continue =>
+            Redirect(controllers.verify.routes.SelectSubcontractorController.onPageLoad(NormalMode))
+        }
+    }
+
   def onPageLoad(): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
       verificationBatchService
@@ -54,45 +130,8 @@ class NewestVerificationBatchController @Inject() (
           val unverified = updatedAnswers.get(UnverifiedSubcontractorsPage).getOrElse(Seq.empty)
 
           batch match {
-
-            case Some(response) =>
-              val status = response.verificationBatch.flatMap(_.status).flatMap { raw =>
-                val parsed = VerificationBatchStatus.from(raw)
-                if (parsed.isEmpty) {
-                  logger.warn(
-                    s"[NewestVerificationBatchController.onPageLoad] Unrecognised verification batch status: $raw"
-                  )
-                }
-                parsed
-              }
-
-              CheckLatestSubmissionStatusService.check(status) match {
-
-                case SubmissionStatusCheckResult.ShowPendingVerificationWarning =>
-                  Redirect(
-                    controllers.verify.routes.VerificationRequestInProgressController.onPageLoad()
-                  )
-
-                case SubmissionStatusCheckResult.Continue =>
-                  if (response.subcontractors.isEmpty) {
-                    Redirect(
-                      controllers.verify.routes.NoSubcontractorsAddedController.onPageLoad()
-                    )
-                  } else if (unverified.isEmpty) {
-                    Redirect(
-                      controllers.verify.routes.VerifyYourSubcontractorsYesNoController.onPageLoad
-                    )
-                  } else {
-                    Redirect(
-                      controllers.verify.routes.SelectSubcontractorController.onPageLoad(NormalMode)
-                    )
-                  }
-              }
-
-            case None =>
-              Redirect(
-                controllers.routes.JourneyRecoveryController.onPageLoad()
-              )
+            case None           => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+            case Some(response) => routeFromResponse(response, unverified)
           }
         }
         .recover { case t =>

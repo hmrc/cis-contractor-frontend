@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 
-package models.add
+package models
 
-import models.{Enumerable, WithName}
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.Aliases.Text
 import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.RadioItem
@@ -44,6 +43,9 @@ object TypeOfSubcontractor extends Enumerable.Implicits {
       id = Some(s"value_$index")
     )
   }
+
+  def fromString(s: String): Option[TypeOfSubcontractor] =
+    values.find(_.toString == s.trim.toLowerCase)
 
   implicit val enumerable: Enumerable[TypeOfSubcontractor] =
     Enumerable(values.map(v => v.toString -> v): _*)

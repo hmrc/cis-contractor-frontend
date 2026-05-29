@@ -18,8 +18,8 @@ package controllers.add.trust
 
 import base.SpecBase
 import controllers.routes
-import models.UserAnswers
-import models.add.{InternationalAddress, TypeOfSubcontractor}
+import models.{TypeOfSubcontractor, UserAnswers}
+import models.add.InternationalAddress
 import models.contact.ContactOptions
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{never, verify, verifyNoMoreInteractions, when}

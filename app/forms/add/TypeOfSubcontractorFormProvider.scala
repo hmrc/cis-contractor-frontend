@@ -17,7 +17,7 @@
 package forms.add
 
 import forms.mappings.Mappings
-import models.add.TypeOfSubcontractor
+import models.TypeOfSubcontractor
 import play.api.data.Form
 
 import javax.inject.Inject

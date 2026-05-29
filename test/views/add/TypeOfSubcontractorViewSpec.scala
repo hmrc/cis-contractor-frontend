@@ -17,8 +17,7 @@
 package views.add
 
 import forms.add.TypeOfSubcontractorFormProvider
-import models.NormalMode
-import models.add.TypeOfSubcontractor
+import models.{NormalMode, TypeOfSubcontractor}
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite

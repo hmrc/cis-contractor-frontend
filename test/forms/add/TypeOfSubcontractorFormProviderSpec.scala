@@ -17,7 +17,7 @@
 package forms.add
 
 import forms.behaviours.OptionFieldBehaviours
-import models.add.TypeOfSubcontractor
+import models.TypeOfSubcontractor
 import play.api.data.FormError
 
 class TypeOfSubcontractorFormProviderSpec extends OptionFieldBehaviours {

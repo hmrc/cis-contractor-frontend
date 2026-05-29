@@ -23,6 +23,7 @@ import pages.add.IndividualJourney
 import pages.add.company.CompanyJourney
 import pages.add.partnership.PartnershipJourney
 import pages.add.trust.TrustJourney
+import pages.contractordetails.ContractorDetailsJourney
 import pages.verify.VerifyJourney
 import play.api.mvc.Call
 
@@ -33,7 +34,8 @@ class Navigator @Inject() (
   partnershipNavigator: navigation.add.PartnershipNavigator,
   trustNavigator: navigation.add.TrustNavigator,
   sharedNavigator: navigation.add.SharedNavigator,
-  verifyNavigator: navigation.verify.VerifyNavigator
+  verifyNavigator: navigation.verify.VerifyNavigator,
+  contractorDetailsNavigator: navigation.contractordetails.ContractorDetailsNavigator
 ) {
 
   def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers): Call =
@@ -41,11 +43,12 @@ class Navigator @Inject() (
 
   private def navigatorFor(page: Page): NavigatorForJourney =
     page match {
-      case _: IndividualJourney  => individualNavigator
-      case _: CompanyJourney     => companyNavigator
-      case _: PartnershipJourney => partnershipNavigator
-      case _: TrustJourney       => trustNavigator
-      case _: VerifyJourney      => verifyNavigator
-      case _                     => sharedNavigator
+      case _: IndividualJourney        => individualNavigator
+      case _: CompanyJourney           => companyNavigator
+      case _: PartnershipJourney       => partnershipNavigator
+      case _: TrustJourney             => trustNavigator
+      case _: VerifyJourney            => verifyNavigator
+      case _: ContractorDetailsJourney => contractorDetailsNavigator
+      case _                           => sharedNavigator
     }
 }

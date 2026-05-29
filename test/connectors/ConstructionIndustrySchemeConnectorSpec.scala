@@ -16,7 +16,7 @@
 
 package connectors
 
-import models.add.TypeOfSubcontractor
+import models.TypeOfSubcontractor
 import models.requests.CreateAndUpdateSubcontractorPayload
 import models.requests.CreateAndUpdateSubcontractorPayload.*
 import models.response.{GetCurrentVerificationBatchResponse, GetNewestVerificationBatchResponse}
