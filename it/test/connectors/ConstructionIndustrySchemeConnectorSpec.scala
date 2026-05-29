@@ -18,7 +18,7 @@ package connectors
 
 import com.github.tomakehurst.wiremock.client.WireMock.{aResponse, get, post, stubFor, urlEqualTo, urlPathEqualTo}
 import itutil.ApplicationWithWiremock
-import models.add.TypeOfSubcontractor.Individualorsoletrader
+import models.TypeOfSubcontractor.Individualorsoletrader
 import models.requests.CreateAndUpdateSubcontractorPayload
 import models.requests.CreateVerificationBatchAndVerificationsRequest
 import models.response.CreateVerificationBatchAndVerificationsResponse

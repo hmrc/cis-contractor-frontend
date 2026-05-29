@@ -16,10 +16,10 @@
 
 package models.add.partnership
 
-import models.add.{InternationalAddress, TypeOfSubcontractor}
+import models.add.InternationalAddress
 import models.contact.ContactOptions
 import models.contact.ContactOptions.*
-import models.{InvalidAnswer, MissingAnswer, UserAnswers, Validation, ValidationError}
+import models.{InvalidAnswer, MissingAnswer, TypeOfSubcontractor, UserAnswers, Validation, ValidationError}
 import pages.QuestionPage
 import pages.add.TypeOfSubcontractorPage
 import pages.add.partnership.*

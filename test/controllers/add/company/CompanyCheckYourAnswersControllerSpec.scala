@@ -18,8 +18,8 @@ package controllers.add.company
 
 import base.SpecBase
 import controllers.routes
-import models.UserAnswers
-import models.add.{InternationalAddress, TypeOfSubcontractor}
+import models.{TypeOfSubcontractor, UserAnswers}
+import models.add.InternationalAddress
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{never, verify, verifyNoMoreInteractions, when}
 import org.scalatestplus.mockito.MockitoSugar.mock

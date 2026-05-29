@@ -17,8 +17,7 @@
 package viewmodels.checkAnswers.add
 
 import controllers.add.routes
-import models.add.TypeOfSubcontractor
-import models.{NormalMode, UserAnswers}
+import models.{NormalMode, TypeOfSubcontractor, UserAnswers}
 import org.scalatest.OptionValues.convertOptionToValuable
 import org.scalatest.TryValues.convertTryToSuccessOrFailure
 import org.scalatest.freespec.AnyFreeSpec

@@ -86,6 +86,7 @@ class VerifyCheckYourAnswersControllerSpec extends SpecBase {
             .setOrException(ReverifyExistingSubcontractorsYesNoPage, false)
             .setOrException(NewestVerificationBatchResponsePage, batchResponseWithEmail("agent@example.com"))
             .setOrException(ContractorEmailConfirmationStoredPage, CurrentEmail)
+            .setOrException(VerificationBatchReadinessPage, true)
 
           val application = applicationBuilder(userAnswers = Some(ua)).build()
           running(application) {
@@ -100,6 +101,7 @@ class VerifyCheckYourAnswersControllerSpec extends SpecBase {
             .setOrException(ReverifyExistingSubcontractorsYesNoPage, false)
             .setOrException(NewestVerificationBatchResponsePage, batchResponseWithEmail("agent@example.com"))
             .setOrException(ContractorEmailConfirmationStoredPage, CurrentEmail)
+            .setOrException(VerificationBatchReadinessPage, true)
 
           val application = applicationBuilder(userAnswers = Some(ua)).build()
           running(application) {
@@ -121,6 +123,7 @@ class VerifyCheckYourAnswersControllerSpec extends SpecBase {
             .setOrException(ReverifyExistingSubcontractorsYesNoPage, false)
             .setOrException(NewestVerificationBatchResponsePage, batchResponseWithEmail("agent@example.com"))
             .setOrException(ContractorEmailConfirmationStoredPage, CurrentEmail)
+            .setOrException(VerificationBatchReadinessPage, true)
 
           val application = applicationBuilder(userAnswers = Some(ua)).build()
           running(application) {
@@ -140,6 +143,7 @@ class VerifyCheckYourAnswersControllerSpec extends SpecBase {
             .setOrException(ReverifyExistingSubcontractorsYesNoPage, false)
             .setOrException(NewestVerificationBatchResponsePage, batchResponseWithEmail("agent@example.com"))
             .setOrException(ContractorEmailConfirmationStoredPage, CurrentEmail)
+            .setOrException(VerificationBatchReadinessPage, true)
 
           val application = applicationBuilder(userAnswers = Some(ua)).build()
           running(application) {
@@ -160,6 +164,7 @@ class VerifyCheckYourAnswersControllerSpec extends SpecBase {
             .setOrException(ReverifyExistingSubcontractorsYesNoPage, false)
             .setOrException(NewestVerificationBatchResponsePage, batchResponseWithEmail("agent@example.com"))
             .setOrException(ContractorEmailConfirmationStoredPage, CurrentEmail)
+            .setOrException(VerificationBatchReadinessPage, true)
 
           val application = applicationBuilder(userAnswers = Some(ua)).build()
           running(application) {
@@ -183,6 +188,7 @@ class VerifyCheckYourAnswersControllerSpec extends SpecBase {
             .setOrException(NewestVerificationBatchResponsePage, batchResponseWithEmail("scheme@example.com"))
             .setOrException(ContractorEmailConfirmationStoredPage, DifferentEmail)
             .setOrException(EmailAddressPage, "override@example.com")
+            .setOrException(VerificationBatchReadinessPage, true)
 
           val application = applicationBuilder(userAnswers = Some(ua)).build()
           running(application) {
@@ -212,6 +218,7 @@ class VerifyCheckYourAnswersControllerSpec extends SpecBase {
             .setOrException(ReverifyExistingSubcontractorsYesNoPage, false)
             .setOrException(NewestVerificationBatchResponsePage, batchResponseWithEmail("scheme@example.com"))
             .setOrException(ContractorEmailConfirmationStoredPage, DoNotSend)
+            .setOrException(VerificationBatchReadinessPage, true)
 
           val application = applicationBuilder(userAnswers = Some(ua)).build()
           running(application) {
@@ -241,6 +248,7 @@ class VerifyCheckYourAnswersControllerSpec extends SpecBase {
               batchResponseWithEmail("agent@example.com", Seq(aSubcontractor))
             )
             .setOrException(ContractorEmailConfirmationStoredPage, CurrentEmail)
+            .setOrException(VerificationBatchReadinessPage, true)
 
           val application = applicationBuilder(userAnswers = Some(ua)).build()
           running(application) {
@@ -275,6 +283,7 @@ class VerifyCheckYourAnswersControllerSpec extends SpecBase {
               batchResponseWithEmail("agent@example.com", Seq(aSubcontractor))
             )
             .setOrException(ContractorEmailConfirmationStoredPage, CurrentEmail)
+            .setOrException(VerificationBatchReadinessPage, true)
 
           val application = applicationBuilder(userAnswers = Some(ua)).build()
           running(application) {
@@ -296,6 +305,7 @@ class VerifyCheckYourAnswersControllerSpec extends SpecBase {
               batchResponseWithEmail("agent@example.com", Seq(aSubcontractor))
             )
             .setOrException(ContractorEmailConfirmationStoredPage, CurrentEmail)
+            .setOrException(VerificationBatchReadinessPage, true)
 
           val application = applicationBuilder(userAnswers = Some(ua)).build()
           running(application) {
@@ -318,6 +328,7 @@ class VerifyCheckYourAnswersControllerSpec extends SpecBase {
             .setOrException(ReverifyExistingSubcontractorsYesNoPage, false)
             .setOrException(NewestVerificationBatchResponsePage, batchResponseWithEmail("agent@example.com"))
             .setOrException(ContractorEmailConfirmationStoredPage, CurrentEmail)
+            .setOrException(VerificationBatchReadinessPage, true)
 
           val application = applicationBuilder(userAnswers = Some(ua)).build()
           running(application) {
@@ -334,6 +345,7 @@ class VerifyCheckYourAnswersControllerSpec extends SpecBase {
           .setOrException(SelectSubcontractorPage, Set(brodyMartin, hooperAndAssociates))
           .setOrException(NewestVerificationBatchResponsePage, batchResponseWithEmail("agent@example.com"))
           .setOrException(ContractorEmailConfirmationStoredPage, CurrentEmail)
+          .setOrException(VerificationBatchReadinessPage, true)
 
         val application = applicationBuilder(userAnswers = Some(ua)).build()
         running(application) {
@@ -372,6 +384,7 @@ class VerifyCheckYourAnswersControllerSpec extends SpecBase {
           .setOrException(SelectSubcontractorPage, Set(brodyMartin))
           .setOrException(ReverifyExistingSubcontractorsYesNoPage, false)
           .setOrException(ContractorEmailConfirmationStoredPage, DoNotSend)
+          .setOrException(VerificationBatchReadinessPage, true)
 
         val application = applicationBuilder(userAnswers = Some(ua)).build()
         running(application) {

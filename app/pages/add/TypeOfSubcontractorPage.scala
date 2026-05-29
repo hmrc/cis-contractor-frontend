@@ -16,9 +16,8 @@
 
 package pages.add
 
-import models.UserAnswers
-import models.add.TypeOfSubcontractor
-import models.add.TypeOfSubcontractor.*
+import models.{TypeOfSubcontractor, UserAnswers}
+import models.TypeOfSubcontractor.*
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 import utils.SubcontractorCleanup.*

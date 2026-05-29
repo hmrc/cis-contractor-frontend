@@ -16,7 +16,7 @@
 
 package models.requests
 
-import models.add.TypeOfSubcontractor
+import models.TypeOfSubcontractor
 import play.api.libs.json.{Json, OFormat}
 
 sealed trait CreateAndUpdateSubcontractorPayload {
