@@ -17,10 +17,10 @@
 package models.add.partnership
 
 import base.SpecBase
-import models.add.{InternationalAddress, TypeOfSubcontractor}
+import models.add.InternationalAddress
 import models.contact.ContactOptions
 import models.contact.ContactOptions.*
-import models.{InvalidAnswer, MissingAnswer}
+import models.{InvalidAnswer, MissingAnswer, TypeOfSubcontractor}
 import pages.add.TypeOfSubcontractorPage
 import pages.add.partnership.*
 import play.api.libs.json._

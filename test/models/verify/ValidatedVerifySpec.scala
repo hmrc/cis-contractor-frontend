@@ -59,6 +59,9 @@ class ValidatedVerifySpec extends SpecBase with Matchers {
       .set(ReverifyExistingSubcontractorsYesNoPage, false)
       .success
       .value
+      .set(VerificationBatchReadinessPage, true)
+      .success
+      .value
 
   private val minRequired =
     minRequiredLessEmail
@@ -182,6 +185,9 @@ class ValidatedVerifySpec extends SpecBase with Matchers {
         .set(ContractorEmailConfirmationStoredPage, ContractorEmailConfirmationStored.DoNotSend)
         .success
         .value
+        .set(VerificationBatchReadinessPage, true)
+        .success
+        .value
 
       ValidatedVerify.build(ua) mustBe Right(
         ValidatedVerify(
@@ -284,6 +290,13 @@ class ValidatedVerifySpec extends SpecBase with Matchers {
 
     "fail when neither email confirmation page is present" in {
       ValidatedVerify.build(minRequiredLessEmail) mustBe Left(MissingAnswer(ContractorEmailConfirmationStoredPage))
+    }
+
+    // ─── Failure: readiness flag ──────────────────────────────────────────────
+
+    "fail when VerificationBatchReadinessPage is absent" in {
+      val ua = minRequired.remove(VerificationBatchReadinessPage).success.value
+      ValidatedVerify.build(ua) mustBe Left(MissingAnswer(VerificationBatchReadinessPage))
     }
   }
 }

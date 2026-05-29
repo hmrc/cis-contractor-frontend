@@ -16,13 +16,18 @@
 
 package pages.verify
 
-import models.SubcontractorViewModel
+import models.{SubcontractorViewModel, UserAnswers}
 import pages.QuestionPage
 import play.api.libs.json.JsPath
+
+import scala.util.Try
 
 case object SelectSubcontractorPage extends QuestionPage[Set[SubcontractorViewModel]] with VerifyJourney {
 
   override def path: JsPath = JsPath \ toString
 
   override def toString: String = "selectSubcontractor"
+
+  override def cleanup(value: Option[Set[SubcontractorViewModel]], userAnswers: UserAnswers): Try[UserAnswers] =
+    userAnswers.remove(VerificationBatchReadinessPage)
 }

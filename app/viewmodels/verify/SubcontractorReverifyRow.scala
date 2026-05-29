@@ -16,6 +16,8 @@
 
 package viewmodels.verify
 
+import play.api.libs.json.{Json, OFormat}
+
 case class SubcontractorReverifyRow(
   id: String,
   name: String,
@@ -25,3 +27,7 @@ case class SubcontractorReverifyRow(
   taxTreatment: String,
   dateAdded: String
 )
+
+object SubcontractorReverifyRow {
+  given OFormat[SubcontractorReverifyRow] = Json.format[SubcontractorReverifyRow]
+}

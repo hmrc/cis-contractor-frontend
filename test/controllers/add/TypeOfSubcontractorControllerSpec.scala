@@ -18,8 +18,7 @@ package controllers.add
 
 import base.SpecBase
 import forms.add.TypeOfSubcontractorFormProvider
-import models.add.TypeOfSubcontractor
-import models.{NormalMode, UserAnswers}
+import models.{NormalMode, TypeOfSubcontractor, UserAnswers}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
