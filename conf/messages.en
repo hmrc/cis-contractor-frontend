@@ -297,6 +297,14 @@ individualChooseContactDetails.error.required                            =  Sele
 individualChooseContactDetails.checkYourAnswersLabel                     =  Method of contact
 individualChooseContactDetails.change.hidden                             =  method of contact
 
+contractorDetails.contractorUtr.title                                    =  What is the contractor’s unique taxpayer reference
+contractorDetails.contractorUtr.heading                                  =  What is the contractor’s Unique Taxpayer Reference (UTR)?
+contractorDetails.contractorUtr.p1                                       =  A UTR is a 10-digit number issued by HMRC to identify individuals or companies for tax purposes.
+contractorDetails.contractorUtr.checkYourAnswersLabel                    =  What is the contractor’s Unique Taxpayer Reference (UTR)?
+contractorDetails.contractorUtr.change.hidden                            =  What is the contractor’s Unique Taxpayer Reference (UTR)?
+contractorDetails.contractorUtr.error.required                           =  Enter the contractor’s 10-digit unique taxpayer reference
+contractorDetails.contractorUtr.error.invalid                            =  Enter a valid, 10-digit Unique Taxpayer Reference (UTR)
+
 # Partnership
 partnershipWorksReferenceNumberYesNo.title                           =  Does this partnership have a works reference number?
 partnershipWorksReferenceNumberYesNo.heading                         =  Does {0} have a works reference number?
@@ -968,10 +976,3 @@ contractordetails.contractorDetailsUpdated.p1.details.link            =  view th
 contractordetails.contractorDetailsUpdated.returnToDashboard.link     =  Return to CIS dashboard
 contractordetails.contractorDetailsUpdated.p2.whatDidYouThink.link    =  What did you think of this service?
 contractordetails.contractorDetailsUpdated.p2.whatDidYouThink.suffix  =  (takes 30 seconds)
-contractorDetails.contractorUtr.title                                 =  What is the contractor’s unique taxpayer reference
-contractorDetails.contractorUtr.heading                               =  What is the contractor’s Unique Taxpayer Reference (UTR)?
-contractorDetails.contractorUtr.p1                                    =  A UTR is a 10-digit number issued by HMRC to identify individuals or companies for tax purposes.
-contractorDetails.contractorUtr.checkYourAnswersLabel                 =  What is the contractor’s Unique Taxpayer Reference (UTR)?
-contractorDetails.contractorUtr.change.hidden                         =  What is the contractor’s Unique Taxpayer Reference (UTR)?
-contractorDetails.contractorUtr.error.required                        =  Enter the contractor’s 10-digit unique taxpayer reference
-contractorDetails.contractorUtr.error.invalid                         =  Enter a valid, 10-digit Unique Taxpayer Reference (UTR)
