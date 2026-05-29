@@ -36,7 +36,8 @@ class ValidatedVerifySpec extends SpecBase with Matchers {
       verificationBatch = None,
       verifications = Seq.empty,
       submission = None,
-      monthlyReturn = None
+      monthlyReturn = None,
+      monthlyReturnSubmission = None
     )
 
   private val batchResponseWithoutEmail: GetNewestVerificationBatchResponse =
@@ -46,7 +47,8 @@ class ValidatedVerifySpec extends SpecBase with Matchers {
       verificationBatch = None,
       verifications = Seq.empty,
       submission = None,
-      monthlyReturn = None
+      monthlyReturn = None,
+      monthlyReturnSubmission = None
     )
 
   private val minRequiredLessEmail =

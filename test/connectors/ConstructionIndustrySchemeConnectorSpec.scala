@@ -170,7 +170,8 @@ class ConstructionIndustrySchemeConnectorSpec extends AnyWordSpec with Matchers 
           verificationBatch = None,
           verifications = Nil,
           submission = None,
-          monthlyReturn = None
+          monthlyReturn = None,
+          monthlyReturnSubmission = None
         )
 
       when(rb.execute[GetNewestVerificationBatchResponse](any(), any()))

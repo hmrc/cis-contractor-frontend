@@ -38,7 +38,8 @@ class VerifyNavigatorSpec extends SpecBase {
       verificationBatch = None,
       verifications = Seq.empty,
       submission = None,
-      monthlyReturn = None
+      monthlyReturn = None,
+      monthlyReturnSubmission = None
     )
 
   private val batchResponseNoEmail: GetNewestVerificationBatchResponse =
@@ -48,7 +49,8 @@ class VerifyNavigatorSpec extends SpecBase {
       verificationBatch = None,
       verifications = Seq.empty,
       submission = None,
-      monthlyReturn = None
+      monthlyReturn = None,
+      monthlyReturnSubmission = None
     )
 
   "VerifyNavigator" - {

@@ -77,7 +77,8 @@ final class VerificationServiceSpec extends SpecBase with MockitoSugar with Mode
       verificationBatch = None,
       verifications = Nil,
       submission = None,
-      monthlyReturn = None
+      monthlyReturn = None,
+      monthlyReturnSubmission = None
     )
 
   "VerificationService.refreshNewestVerificationBatch" - {

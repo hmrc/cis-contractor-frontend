@@ -61,7 +61,8 @@ class ContractorEmailConfirmationStoredControllerSpec extends SpecBase with Mock
     verificationBatch = None,
     verifications = Seq.empty,
     submission = None,
-    monthlyReturn = None
+    monthlyReturn = None,
+    monthlyReturnSubmission = None
   )
 
   private def userAnswersWithEmail: UserAnswers =
