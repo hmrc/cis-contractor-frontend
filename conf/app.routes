@@ -443,4 +443,3 @@ GET   /contractor-details/what-is-contractors-utr         controllers.contractor
 POST  /contractor-details/what-is-contractors-utr         controllers.contractordetails.ContractorUtrController.onSubmit(mode: Mode = NormalMode)
 GET   /contractor-details/change-what-is-contractors-utr  controllers.contractordetails.ContractorUtrController.onPageLoad(mode: Mode = CheckMode)
 POST  /contractor-details/change-what-is-contractors-utr  controllers.contractordetails.ContractorUtrController.onSubmit(mode: Mode = CheckMode)
-

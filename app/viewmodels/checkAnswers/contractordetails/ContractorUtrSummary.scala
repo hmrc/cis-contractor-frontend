@@ -29,14 +29,14 @@ object ContractorUtrSummary {
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
     answers.get(ContractorUtrPage).map { answer =>
       SummaryListRowViewModel(
-        key = "contractorDetails.contractorUtr.checkYourAnswersLabel",
+        key = "contractordetails.contractorUtr.checkYourAnswersLabel",
         value = ValueViewModel(HtmlFormat.escape(answer).toString),
         actions = Seq(
           ActionItemViewModel(
             "site.change",
             controllers.contractordetails.routes.ContractorUtrController.onPageLoad(CheckMode).url
           )
-            .withVisuallyHiddenText(messages("contractorDetails.contractorUtr.change.hidden"))
+            .withVisuallyHiddenText(messages("contractordetails.contractorUtr.change.hidden"))
             .withAttribute("id" -> "contractor-utr")
         )
       )
