@@ -16,6 +16,7 @@
 
 package controllers.contractordetails
 
+import config.FrontendAppConfig
 import controllers.actions.*
 import forms.contractordetails.ContractorUtrFormProvider
 import models.Mode
@@ -40,7 +41,7 @@ class ContractorUtrController @Inject() (
   formProvider: ContractorUtrFormProvider,
   val controllerComponents: MessagesControllerComponents,
   view: ContractorUtrView
-)(implicit ec: ExecutionContext)
+)(implicit appConfig: FrontendAppConfig, ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport {
 

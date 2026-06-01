@@ -45,7 +45,7 @@ class ContractorUtrSummarySpec extends AnyFreeSpec with Matchers {
 
       val row = maybeRow.value
 
-      val expectedKeyText = messages("contractorDetails.contractorUtr.checkYourAnswersLabel")
+      val expectedKeyText = messages("contractordetails.contractorUtr.checkYourAnswersLabel")
       row.key.content.asHtml.toString should include(expectedKeyText)
 
       row.value.content.asHtml.toString should include("1234567890")
@@ -57,7 +57,7 @@ class ContractorUtrSummarySpec extends AnyFreeSpec with Matchers {
       val changeAction       = actions.head
       val expectedChangeText = messages("site.change")
       val expectedHref       = routes.ContractorUtrController.onPageLoad(CheckMode).url
-      val expectedHiddenText = messages("contractorDetails.contractorUtr.change.hidden")
+      val expectedHiddenText = messages("contractordetails.contractorUtr.change.hidden")
 
       changeAction.content.asHtml.toString should include(expectedChangeText)
       changeAction.href                  shouldBe expectedHref
