@@ -19,7 +19,6 @@ package viewmodels.checkAnswers.contractordetails
 import models.{CheckMode, UserAnswers}
 import pages.contractordetails.ContractorUtrPage
 import play.api.i18n.Messages
-import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
@@ -28,17 +27,30 @@ object ContractorUtrSummary {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
     answers.get(ContractorUtrPage).map { answer =>
-      SummaryListRowViewModel(
-        key = "contractorDetails.contractorUtr.checkYourAnswersLabel",
-        value = ValueViewModel(HtmlFormat.escape(answer).toString),
-        actions = Seq(
-          ActionItemViewModel(
-            "site.change",
-            controllers.contractordetails.routes.ContractorUtrController.onPageLoad(CheckMode).url
+      if (answer.trim.isEmpty) {
+        SummaryListRowViewModel(
+          key = messages("contractorDetails.contractorUtr.checkYourAnswersLabel"),
+          value = ValueViewModel(""),
+          actions = Seq(
+            ActionItemViewModel(
+              messages("contractordetails.contractorDetailsCheckAnswers.table.link.addDetails"),
+              controllers.contractordetails.routes.ContractorUtrController.onPageLoad(CheckMode).url
+            ).withVisuallyHiddenText(messages("contractordetails.schemeName.change.hidden"))
+              .withAttribute("id" -> "contractor-utr")
           )
-            .withVisuallyHiddenText(messages("contractorDetails.contractorUtr.change.hidden"))
-            .withAttribute("id" -> "contractor-utr")
         )
-      )
+      } else {
+        SummaryListRowViewModel(
+          key = messages("contractorDetails.contractorUtr.checkYourAnswersLabel"),
+          value = ValueViewModel(answer),
+          actions = Seq(
+            ActionItemViewModel(
+              messages("site.change"),
+              controllers.contractordetails.routes.ContractorUtrController.onPageLoad(CheckMode).url
+            ).withVisuallyHiddenText(messages("contractorDetails.contractorUtr.change.hidden"))
+              .withAttribute("id" -> "contractor-utr")
+          )
+        )
+      }
     }
 }

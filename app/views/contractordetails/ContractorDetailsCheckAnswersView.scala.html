@@ -27,67 +27,18 @@
     link: components.Link,
 )
 
-@(contractorDetailsViewModel: ContractorDetailsCheckAnswersViewModel)(implicit request: Request[_], appConfig: FrontendAppConfig, messages: Messages)
-
-@helperRow(label: String, value: String, url: String, hiddenText: String)(implicit messages: Messages) = @{
-    if (value.trim.isEmpty) {
-        SummaryListRowViewModel(
-            key   = KeyViewModel(messages(label)),
-            value = ValueViewModel(""),
-            actions = Seq(
-                ActionItemViewModel(
-                    Text(messages("contractordetails.contractorDetailsCheckAnswers.table.link.addDetails")),
-                    url
-                ).withVisuallyHiddenText(messages(hiddenText))
-            )
-        )
-    } else {
-        SummaryListRowViewModel(
-            key   = KeyViewModel(messages(label)),
-            value = ValueViewModel(value),
-            actions = Seq(
-                ActionItemViewModel(
-                    Text(messages("site.change")),
-                    url
-                ).withVisuallyHiddenText(messages(hiddenText))
-            )
-        )
-    }
-}
+@(contractorDetailsViewModel: ContractorDetailsCheckAnswersViewModel, summaryRows: Seq[SummaryListRow])(implicit request: Request[_], appConfig: FrontendAppConfig, messages: Messages)
 
 @layout(pageTitle = titleNoForm(messages("contractordetails.contractorDetailsCheckAnswers.title"))) {
 
     @h1("contractordetails.contractorDetailsCheckAnswers.heading", classes = "govuk-heading-xl")
     @h2(messages("contractordetails.contractorDetailsCheckAnswers.accountsOfficeReference", contractorDetailsViewModel.accountsOfficeReference))
 
-    @govukSummaryList(
-        SummaryListViewModel(Seq(
-            helperRow(
-                "contractordetails.contractorDetailsCheckAnswers.table.uniqueTaxpayerReference",
-                contractorDetailsViewModel.uniqueTaxpayerReference,
-                "#",
-                "contractordetails.contractorDetailsCheckAnswers.table.uniqueTaxpayerReference"
-            ),
-            helperRow(
-                "contractordetails.contractorDetailsCheckAnswers.table.schemeName",
-                contractorDetailsViewModel.schemeName,
-                "#",
-                "contractordetails.contractorDetailsCheckAnswers.table.schemeName.hidden"
-            ),
-            helperRow(
-                "contractordetails.contractorDetailsCheckAnswers.table.email",
-                contractorDetailsViewModel.email,
-                "#",
-                "contractordetails.contractorDetailsCheckAnswers.table.email.hidden"
-                )
-            )
-        )
-    )
-
+    @govukSummaryList(SummaryListViewModel(summaryRows))
 
     @govukButton(
         ButtonViewModel(messages("site.saveAndContinue"))
     )
 
-    @link("contractordetails.contractorDetailsCheckAnswers.link", appConfig.cisReturnDashboardUrl)
+    @link("contractordetails.contractorDetailsCheckAnswers.returnToCisDashboard.link", appConfig.cisReturnDashboardUrl)
 }

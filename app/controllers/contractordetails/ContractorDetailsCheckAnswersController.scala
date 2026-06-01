@@ -21,7 +21,7 @@ import controllers.actions.*
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import viewmodels.checkAnswers.contractordetails.ContractorDetailsCheckAnswersViewModel
+import viewmodels.checkAnswers.contractordetails.*
 import views.html.contractordetails.ContractorDetailsCheckAnswersView
 
 import javax.inject.Inject
@@ -45,6 +45,12 @@ class ContractorDetailsCheckAnswersController @Inject() (
       email = "test@business.com"
     )
 
-    Ok(view(contractorDetailsViewModel))
+    val summaryRows = Seq(
+      ContractorUtrSummary.row(request.userAnswers),
+      SchemeNameSummary.row(request.userAnswers),
+      EnterContractorEmailAddressSummary.row(request.userAnswers)
+    ).flatten
+
+    Ok(view(contractorDetailsViewModel, summaryRows))
   }
 }

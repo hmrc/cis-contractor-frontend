@@ -20,23 +20,37 @@ import controllers.contractordetails.routes
 import models.{CheckMode, UserAnswers}
 import pages.contractordetails.EnterContractorEmailAddressPage
 import play.api.i18n.Messages
-import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
 
 object EnterContractorEmailAddressSummary {
-
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
     answers.get(EnterContractorEmailAddressPage).map { answer =>
-      SummaryListRowViewModel(
-        key = "contractordetails.enterContractorEmailAddress.checkYourAnswersLabel",
-        value = ValueViewModel(HtmlFormat.escape(answer).toString),
-        actions = Seq(
-          ActionItemViewModel("site.change", routes.EnterContractorEmailAddressController.onPageLoad(CheckMode).url)
-            .withVisuallyHiddenText(messages("contractordetails.enterContractorEmailAddress.change.hidden"))
-            .withAttribute("id" -> "contractor-email-address")
+      if (answer.trim.isEmpty) {
+        SummaryListRowViewModel(
+          key = messages("contractordetails.enterContractorEmailAddress.checkYourAnswersLabel"),
+          value = ValueViewModel(""),
+          actions = Seq(
+            ActionItemViewModel(
+              messages("contractordetails.contractorDetailsCheckAnswers.table.link.addDetails"),
+              routes.EnterContractorEmailAddressController.onPageLoad(CheckMode).url
+            ).withVisuallyHiddenText(messages("contractordetails.enterContractorEmailAddress.change.hidden"))
+              .withAttribute("id" -> "contractor-email-address")
+          )
         )
-      )
+      } else {
+        SummaryListRowViewModel(
+          key = messages("contractordetails.enterContractorEmailAddress.checkYourAnswersLabel"),
+          value = ValueViewModel(answer),
+          actions = Seq(
+            ActionItemViewModel(
+              messages("site.change"),
+              routes.EnterContractorEmailAddressController.onPageLoad(CheckMode).url
+            ).withVisuallyHiddenText(messages("contractordetails.enterContractorEmailAddress.change.hidden"))
+              .withAttribute("id" -> "contractor-email-address")
+          )
+        )
+      }
     }
 }

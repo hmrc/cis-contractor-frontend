@@ -957,7 +957,7 @@ contractordetails.schemeName.error.invalidCharacters                  =  You hav
 contractordetails.schemeName.change.hidden                            =  scheme Name
 contractordetails.enterContractorEmailAddress.title                   =  What is the contractor’s email?
 contractordetails.enterContractorEmailAddress.heading                 =  What is the contractor’s email?
-contractordetails.enterContractorEmailAddress.checkYourAnswersLabel   =  What is the contractor’s email?
+contractordetails.enterContractorEmailAddress.checkYourAnswersLabel   =  Email
 contractordetails.enterContractorEmailAddress.error.required          =  Enter an email
 contractordetails.enterContractorEmailAddress.error.length            =  The email you entered contains too many characters
 contractordetails.enterContractorEmailAddress.error.invalid           =  You have entered an email in an incorrect format
@@ -972,8 +972,8 @@ contractordetails.contractorDetailsUpdated.p2.whatDidYouThink.suffix  =  (takes 
 contractorDetails.contractorUtr.title                                 =  What is the contractor’s unique taxpayer reference
 contractorDetails.contractorUtr.heading                               =  What is the contractor’s Unique Taxpayer Reference (UTR)?
 contractorDetails.contractorUtr.p1                                    =  A UTR is a 10-digit number issued by HMRC to identify individuals or companies for tax purposes.
-contractorDetails.contractorUtr.checkYourAnswersLabel                 =  What is the contractor’s Unique Taxpayer Reference (UTR)?
-contractorDetails.contractorUtr.change.hidden                         =  What is the contractor’s Unique Taxpayer Reference (UTR)?
+contractorDetails.contractorUtr.checkYourAnswersLabel                 =  Unique taxpayer reference
+contractorDetails.contractorUtr.change.hidden                         =  Unique Taxpayer Reference
 contractorDetails.contractorUtr.error.required                        =  Enter the contractor’s 10-digit unique taxpayer reference
 contractorDetails.contractorUtr.error.invalid                         =  Enter a valid, 10-digit Unique Taxpayer Reference (UTR)
 
@@ -986,4 +986,4 @@ contractordetails.contractorDetailsCheckAnswers.table.schemeName.hidden         
 contractordetails.contractorDetailsCheckAnswers.table.email                         = Email
 contractordetails.contractorDetailsCheckAnswers.table.email.hidden                  = email
 contractordetails.contractorDetailsCheckAnswers.table.link.addDetails               = Add details
-contractordetails.contractorDetailsCheckAnswers.link                                = Return to CIS dashboard
+contractordetails.contractorDetailsCheckAnswers.returnToCisDashboard.link           = Return to CIS dashboard
