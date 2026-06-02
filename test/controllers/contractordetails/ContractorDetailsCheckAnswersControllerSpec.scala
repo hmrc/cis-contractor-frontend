@@ -34,9 +34,15 @@ class ContractorDetailsCheckAnswersControllerSpec extends SpecBase with MockitoS
 
       val userAnswers =
         emptyUserAnswers
-          .set(ContractorUtrPage, "1234567890").success.value
-          .set(SchemeNamePage, "Scheme ABC").success.value
-          .set(EnterContractorEmailAddressPage, "test@mail.com").success.value
+          .set(ContractorUtrPage, "1234567890")
+          .success
+          .value
+          .set(SchemeNamePage, "Scheme ABC")
+          .success
+          .value
+          .set(EnterContractorEmailAddressPage, "test@mail.com")
+          .success
+          .value
 
       val application = applicationBuilder(Some(userAnswers)).build()
 
@@ -48,7 +54,7 @@ class ContractorDetailsCheckAnswersControllerSpec extends SpecBase with MockitoS
         )
 
         val result = route(application, request).value
-        val body = contentAsString(result)
+        val body   = contentAsString(result)
 
         status(result) mustEqual OK
 
@@ -71,7 +77,7 @@ class ContractorDetailsCheckAnswersControllerSpec extends SpecBase with MockitoS
         )
 
         val result = route(application, request).value
-        val body = contentAsString(result)
+        val body   = contentAsString(result)
 
         status(result) mustEqual OK
 

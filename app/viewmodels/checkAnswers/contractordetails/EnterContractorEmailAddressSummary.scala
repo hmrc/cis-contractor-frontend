@@ -33,7 +33,9 @@ object EnterContractorEmailAddressSummary {
         value = ValueViewModel(if (isEmpty) "" else answer),
         actions = Seq(
           ActionItemViewModel(
-            messages(if (isEmpty) "contractordetails.contractorDetailsCheckAnswers.table.link.addDetails" else "site.change"),
+            messages(
+              if (isEmpty) "contractordetails.contractorDetailsCheckAnswers.table.link.addDetails" else "site.change"
+            ),
             routes.EnterContractorEmailAddressController.onPageLoad(CheckMode).url
           ).withVisuallyHiddenText(messages("contractordetails.enterContractorEmailAddress.change.hidden"))
             .withAttribute("id" -> "contractor-email-address")

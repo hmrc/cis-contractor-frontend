@@ -29,11 +29,13 @@ object ContractorUtrSummary {
     answers.get(ContractorUtrPage).map { answer =>
       val isEmpty = answer.trim.isEmpty
       SummaryListRowViewModel(
-        key     = messages("contractordetails.contractorUtr.checkYourAnswersLabel"),
-        value   = ValueViewModel(if (isEmpty) "" else answer),
+        key = messages("contractordetails.contractorUtr.checkYourAnswersLabel"),
+        value = ValueViewModel(if (isEmpty) "" else answer),
         actions = Seq(
           ActionItemViewModel(
-            messages(if (isEmpty) "contractordetails.contractorDetailsCheckAnswers.table.link.addDetails" else "site.change"),
+            messages(
+              if (isEmpty) "contractordetails.contractorDetailsCheckAnswers.table.link.addDetails" else "site.change"
+            ),
             controllers.contractordetails.routes.ContractorUtrController.onPageLoad(CheckMode).url
           ).withVisuallyHiddenText(messages("contractordetails.contractorUtr.change.hidden"))
             .withAttribute("id" -> "contractor-utr")

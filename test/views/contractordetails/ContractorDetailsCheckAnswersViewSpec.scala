@@ -62,7 +62,8 @@ class ContractorDetailsCheckAnswersViewSpec extends SpecBase {
 
       doc.select("h2").text must include(
         messages(
-          "contractordetails.contractorDetailsCheckAnswers.accountsOfficeReference", accountsOfficeReference
+          "contractordetails.contractorDetailsCheckAnswers.accountsOfficeReference",
+          accountsOfficeReference
         )
       )
 
@@ -142,7 +143,7 @@ class ContractorDetailsCheckAnswersViewSpec extends SpecBase {
         app.injector.instanceOf[play.api.i18n.MessagesApi]
       )
 
-    val accountsOfficeReference = "123 PA 87654321"
+    val accountsOfficeReference                 = "123 PA 87654321"
     val view: ContractorDetailsCheckAnswersView =
       app.injector.instanceOf[ContractorDetailsCheckAnswersView]
   }

@@ -32,7 +32,9 @@ object SchemeNameSummary {
         value = ValueViewModel(if (isEmpty) "" else answer),
         actions = Seq(
           ActionItemViewModel(
-            messages(if (isEmpty) "contractordetails.contractorDetailsCheckAnswers.table.link.addDetails" else "site.change"),
+            messages(
+              if (isEmpty) "contractordetails.contractorDetailsCheckAnswers.table.link.addDetails" else "site.change"
+            ),
             controllers.contractordetails.routes.SchemeNameController.onPageLoad(CheckMode).url
           ).withVisuallyHiddenText(messages("contractordetails.schemeName.change.hidden"))
             .withAttribute("id" -> "scheme-name")
