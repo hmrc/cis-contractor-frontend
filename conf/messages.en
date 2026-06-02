@@ -320,7 +320,7 @@ partnershipWorksReferenceNumber.hint                                 =  This is 
 partnershipWorksReferenceNumber.checkYourAnswersLabel                =  Works reference number
 partnershipWorksReferenceNumber.error.required                       =  Enter a works reference number
 partnershipWorksReferenceNumber.error.invalid                        =  Enter a valid works reference number
-partnershipWorksReferenceNumber.error.length                         =  Enter a works reference number less or equal to 20 characters
+partnershipWorksReferenceNumber.error.length                         =  Enter a works reference number, up to 20 characters
 partnershipWorksReferenceNumber.change.hidden                        =  works reference number
 
 partnershipUniqueTaxpayerReference.title                             =  Partnership Unique Taxpayer Reference (UTR)
