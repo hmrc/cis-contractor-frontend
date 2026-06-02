@@ -39,7 +39,8 @@ class VerificationStatusControllerSpec extends SpecBase {
       verificationBatch = None,
       verifications = Nil,
       submission = None,
-      monthlyReturn = None
+      monthlyReturn = None,
+      monthlyReturnSubmission = None
     )
 
   private def mkSub(id: Long, verified: Option[String]): Subcontractor =

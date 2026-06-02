@@ -61,7 +61,8 @@ class CheckVerificationBatchReadinessControllerSpec extends SpecBase {
       verificationBatch = None,
       verifications = Seq.empty,
       submission = None,
-      monthlyReturn = None
+      monthlyReturn = None,
+      monthlyReturnSubmission = None
     )
 
   private val selectedSub = SubcontractorViewModel("1", "Acme")
