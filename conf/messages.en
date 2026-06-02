@@ -336,7 +336,7 @@ partnershipUniqueTaxpayerReference.error.duplicate                   =  You have
 partnershipUniqueTaxpayerReference.checkYourAnswersLabel             =  Partnership UTR
 partnershipUniqueTaxpayerReference.change.hidden                     =  partnership UTR
 
-partnershipHasUtrYesNo.title                                         =  Do you know the Unique Taxpayer Reference for {0}?
+partnershipHasUtrYesNo.title                                         =  What is the subcontractor's Unique Taxpayer Reference?
 partnershipHasUtrYesNo.heading                                       =  Do you know the Unique Taxpayer Reference for {0}?
 partnershipHasUtrYesNo.hint                                          =  This information will be used to verify the partnership as a subcontractor
 partnershipHasUtrYesNo.checkYourAnswersLabel                         =  Add UTR?
