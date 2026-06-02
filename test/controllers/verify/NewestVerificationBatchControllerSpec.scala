@@ -19,7 +19,7 @@ package controllers.verify
 import base.SpecBase
 import controllers.routes
 import models.response.GetNewestVerificationBatchResponse
-import models.{MonthlyReturn, NormalMode, Subcontractor, Submission, UserAnswers}
+import models.{MonthlyReturn, MonthlyReturnSubmission, NormalMode, Subcontractor, Submission, UserAnswers}
 import generators.ModelGenerators
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{never, verify, verifyNoMoreInteractions, when}
@@ -55,6 +55,7 @@ class NewestVerificationBatchControllerSpec extends SpecBase with MockitoSugar w
     subcontractors: Seq[Subcontractor],
     submission: Option[Submission] = None,
     monthlyReturn: Option[MonthlyReturn] = None,
+    monthlyReturnSubmission: Option[MonthlyReturnSubmission] = None,
     status: Option[String] = None
   ) =
     GetNewestVerificationBatchResponse(
@@ -69,18 +70,15 @@ class NewestVerificationBatchControllerSpec extends SpecBase with MockitoSugar w
       ),
       verifications = Seq.empty,
       submission = submission,
-      monthlyReturn = monthlyReturn
+      monthlyReturn = monthlyReturn,
+      monthlyReturnSubmission = monthlyReturnSubmission
     )
 
   private val activeMonthlyReturn   = MonthlyReturn(monthlyReturnId = 1L, decNoMoreSubPayments = Some("N"))
   private val inactiveMonthlyReturn = MonthlyReturn(monthlyReturnId = 1L, decNoMoreSubPayments = Some("Y"))
 
-  private val activeSubmission = Submission(
-    submissionId = 1L,
-    activeObjectId = None,
-    submissionRequestDate = Some(LocalDateTime.of(2026, 1, 1, 0, 0)),
-    status = Some("ACCEPTED")
-  )
+  private val outsideSixMonthsDateTime = LocalDateTime.now().minusMonths(6).minusDays(1)
+  private val withinSixMonthsDateTime  = LocalDateTime.now().minusMonths(6).plusDays(1)
 
   "NewestVerificationBatchController" - {
 
@@ -91,7 +89,7 @@ class NewestVerificationBatchControllerSpec extends SpecBase with MockitoSugar w
         emptyUserAnswers
           .set(
             NewestVerificationBatchResponsePage,
-            newestBatchResponse(Seq.empty, Some(activeSubmission), Some(activeMonthlyReturn))
+            newestBatchResponse(subcontractors = Seq.empty, monthlyReturn = Some(activeMonthlyReturn))
           )
           .success
           .value
@@ -125,7 +123,7 @@ class NewestVerificationBatchControllerSpec extends SpecBase with MockitoSugar w
         emptyUserAnswers
           .set(
             NewestVerificationBatchResponsePage,
-            newestBatchResponse(Seq(verifiedSubcontractor), Some(activeSubmission), Some(activeMonthlyReturn))
+            newestBatchResponse(subcontractors = Seq(verifiedSubcontractor), monthlyReturn = Some(activeMonthlyReturn))
           )
           .flatMap(_.set(UnverifiedSubcontractorsPage, Seq.empty))
           .success
@@ -158,18 +156,11 @@ class NewestVerificationBatchControllerSpec extends SpecBase with MockitoSugar w
 
       val unverified = unverifiedSubcontractor
 
-      val submission = Submission(
-        submissionId = 1L,
-        activeObjectId = None,
-        submissionRequestDate = Some(LocalDateTime.of(2026, 1, 1, 0, 0)),
-        status = Some("ACCEPTED")
-      )
-
       val updatedAnswers =
         emptyUserAnswers
           .set(
             NewestVerificationBatchResponsePage,
-            newestBatchResponse(Seq(unverified), Some(submission), Some(activeMonthlyReturn))
+            newestBatchResponse(subcontractors = Seq(unverified), monthlyReturn = Some(activeMonthlyReturn))
           )
           .flatMap(_.set(UnverifiedSubcontractorsPage, Seq(unverified)))
           .success
@@ -203,18 +194,20 @@ class NewestVerificationBatchControllerSpec extends SpecBase with MockitoSugar w
     "must redirect to InactiveSchemeWarning when inactivity declared and within 6 months, even with no subcontractors" in {
       val mockService = mock[VerificationService]
 
-      val submission = Submission(
+      val monthlyReturnSubmission = MonthlyReturnSubmission(
         submissionId = 1L,
-        activeObjectId = None,
-        submissionRequestDate = Some(LocalDateTime.of(2026, 1, 1, 0, 0)),
-        status = Some("ACCEPTED")
+        submissionRequestDate = Some(withinSixMonthsDateTime)
       )
 
       val updatedAnswers =
         emptyUserAnswers
           .set(
             NewestVerificationBatchResponsePage,
-            newestBatchResponse(Seq.empty, Some(submission), Some(inactiveMonthlyReturn))
+            newestBatchResponse(
+              subcontractors = Seq.empty,
+              monthlyReturn = Some(inactiveMonthlyReturn),
+              monthlyReturnSubmission = Some(monthlyReturnSubmission)
+            )
           )
           .success
           .value
@@ -242,18 +235,20 @@ class NewestVerificationBatchControllerSpec extends SpecBase with MockitoSugar w
     "must redirect to InactiveSchemeWarning when inactivity declared and within 6 months, even when all subcontractors are verified" in {
       val mockService = mock[VerificationService]
 
-      val submission = Submission(
+      val monthlyReturnSubmission = MonthlyReturnSubmission(
         submissionId = 1L,
-        activeObjectId = None,
-        submissionRequestDate = Some(LocalDateTime.of(2026, 1, 1, 0, 0)),
-        status = Some("ACCEPTED")
+        submissionRequestDate = Some(withinSixMonthsDateTime)
       )
 
       val updatedAnswers =
         emptyUserAnswers
           .set(
             NewestVerificationBatchResponsePage,
-            newestBatchResponse(Seq(verifiedSubcontractor), Some(submission), Some(inactiveMonthlyReturn))
+            newestBatchResponse(
+              subcontractors = Seq(verifiedSubcontractor),
+              monthlyReturn = Some(inactiveMonthlyReturn),
+              monthlyReturnSubmission = Some(monthlyReturnSubmission)
+            )
           )
           .flatMap(_.set(UnverifiedSubcontractorsPage, Seq.empty))
           .success
@@ -282,18 +277,20 @@ class NewestVerificationBatchControllerSpec extends SpecBase with MockitoSugar w
     "must redirect to InactiveSchemeWarning when inactivity declared and within 6 months" in {
       val mockService = mock[VerificationService]
 
-      val submission = Submission(
+      val monthlyReturnSubmission = MonthlyReturnSubmission(
         submissionId = 1L,
-        activeObjectId = None,
-        submissionRequestDate = Some(LocalDateTime.of(2026, 1, 1, 0, 0)),
-        status = Some("ACCEPTED")
+        submissionRequestDate = Some(withinSixMonthsDateTime)
       )
 
       val updatedAnswers =
         emptyUserAnswers
           .set(
             NewestVerificationBatchResponsePage,
-            newestBatchResponse(Seq(unverifiedSubcontractor), Some(submission), Some(inactiveMonthlyReturn))
+            newestBatchResponse(
+              subcontractors = Seq(unverifiedSubcontractor),
+              monthlyReturn = Some(inactiveMonthlyReturn),
+              monthlyReturnSubmission = Some(monthlyReturnSubmission)
+            )
           )
           .flatMap(_.set(UnverifiedSubcontractorsPage, Seq(unverifiedSubcontractor)))
           .success
@@ -322,18 +319,20 @@ class NewestVerificationBatchControllerSpec extends SpecBase with MockitoSugar w
     "must redirect to SelectSubcontractor when inactivity declared but more than 6 months ago" in {
       val mockService = mock[VerificationService]
 
-      val submission = Submission(
+      val monthlyReturnSubmission = MonthlyReturnSubmission(
         submissionId = 1L,
-        activeObjectId = None,
-        submissionRequestDate = Some(LocalDateTime.of(2025, 10, 1, 0, 0)),
-        status = Some("ACCEPTED")
+        submissionRequestDate = Some(outsideSixMonthsDateTime)
       )
 
       val updatedAnswers =
         emptyUserAnswers
           .set(
             NewestVerificationBatchResponsePage,
-            newestBatchResponse(Seq(unverifiedSubcontractor), Some(submission), Some(inactiveMonthlyReturn))
+            newestBatchResponse(
+              subcontractors = Seq(unverifiedSubcontractor),
+              monthlyReturn = Some(inactiveMonthlyReturn),
+              monthlyReturnSubmission = Some(monthlyReturnSubmission)
+            )
           )
           .flatMap(_.set(UnverifiedSubcontractorsPage, Seq(unverifiedSubcontractor)))
           .success
@@ -364,18 +363,20 @@ class NewestVerificationBatchControllerSpec extends SpecBase with MockitoSugar w
     "must redirect to JourneyRecovery when inactivity declared but submissionRequestDate is missing" in {
       val mockService = mock[VerificationService]
 
-      val submissionWithNoDate = Submission(
+      val monthlyReturnSubmission = MonthlyReturnSubmission(
         submissionId = 1L,
-        activeObjectId = None,
-        submissionRequestDate = None,
-        status = Some("ACCEPTED")
+        submissionRequestDate = None
       )
 
       val updatedAnswers =
         emptyUserAnswers
           .set(
             NewestVerificationBatchResponsePage,
-            newestBatchResponse(Seq(unverifiedSubcontractor), Some(submissionWithNoDate), Some(inactiveMonthlyReturn))
+            newestBatchResponse(
+              subcontractors = Seq(unverifiedSubcontractor),
+              monthlyReturn = Some(inactiveMonthlyReturn),
+              monthlyReturnSubmission = Some(monthlyReturnSubmission)
+            )
           )
           .flatMap(_.set(UnverifiedSubcontractorsPage, Seq(unverifiedSubcontractor)))
           .success
@@ -434,7 +435,7 @@ class NewestVerificationBatchControllerSpec extends SpecBase with MockitoSugar w
       }
     }
 
-    "must redirect to JourneyRecovery when inactivity declared but submission is missing" in {
+    "must redirect to JourneyRecovery when inactivity declared but monthlyReturnSubmission is missing" in {
       val mockService = mock[VerificationService]
 
       val updatedAnswers =
@@ -443,8 +444,8 @@ class NewestVerificationBatchControllerSpec extends SpecBase with MockitoSugar w
             NewestVerificationBatchResponsePage,
             newestBatchResponse(
               Seq(unverifiedSubcontractor),
-              submission = None,
-              monthlyReturn = Some(inactiveMonthlyReturn)
+              monthlyReturn = Some(inactiveMonthlyReturn),
+              monthlyReturnSubmission = None
             )
           )
           .flatMap(_.set(UnverifiedSubcontractorsPage, Seq(unverifiedSubcontractor)))
@@ -480,7 +481,6 @@ class NewestVerificationBatchControllerSpec extends SpecBase with MockitoSugar w
             NewestVerificationBatchResponsePage,
             newestBatchResponse(
               subcontractors = Seq(unverifiedSubcontractor),
-              submission = Some(activeSubmission),
               monthlyReturn = Some(activeMonthlyReturn),
               status = Some("PENDING")
             )
@@ -523,7 +523,6 @@ class NewestVerificationBatchControllerSpec extends SpecBase with MockitoSugar w
             NewestVerificationBatchResponsePage,
             newestBatchResponse(
               Seq.empty,
-              submission = Some(activeSubmission),
               monthlyReturn = Some(activeMonthlyReturn),
               status = Some("WAT")
             )

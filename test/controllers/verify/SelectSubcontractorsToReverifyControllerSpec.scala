@@ -52,7 +52,8 @@ class SelectSubcontractorsToReverifyControllerSpec extends SpecBase with Mockito
       verificationBatch = None,
       verifications = Nil,
       submission = None,
-      monthlyReturn = None
+      monthlyReturn = None,
+      monthlyReturnSubmission = None
     )
 
   private def mkSub(

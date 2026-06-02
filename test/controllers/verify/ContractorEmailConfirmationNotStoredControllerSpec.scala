@@ -78,7 +78,8 @@ class ContractorEmailConfirmationNotStoredControllerSpec extends SpecBase with M
       verificationBatch = None,
       verifications = Nil,
       submission = None,
-      monthlyReturn = None
+      monthlyReturn = None,
+      monthlyReturnSubmission = None
     )
 
   "ContractorEmailConfirmationNotStored Controller" - {

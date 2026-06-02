@@ -31,7 +31,8 @@ class VerifyEmailResolverSpec extends SpecBase {
       verificationBatch = None,
       verifications = Seq.empty,
       submission = None,
-      monthlyReturn = None
+      monthlyReturn = None,
+      monthlyReturnSubmission = None
     )
 
   private val batchResponseNoEmail: GetNewestVerificationBatchResponse =
@@ -41,7 +42,8 @@ class VerifyEmailResolverSpec extends SpecBase {
       verificationBatch = None,
       verifications = Seq.empty,
       submission = None,
-      monthlyReturn = None
+      monthlyReturn = None,
+      monthlyReturnSubmission = None
     )
 
   "VerifyEmailResolver.resolvedEmail" - {
