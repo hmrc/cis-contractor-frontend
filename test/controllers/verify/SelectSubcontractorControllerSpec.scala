@@ -94,7 +94,8 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
         )
       ),
       submission = None,
-      monthlyReturn = None
+      monthlyReturn = None,
+      monthlyReturnSubmission = None
     )
 
   private def uaWithSubcontractors: UserAnswers =
@@ -297,7 +298,8 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
             )
           ),
           submission = None,
-          monthlyReturn = None
+          monthlyReturn = None,
+          monthlyReturnSubmission = None
         )
 
       def uaWithNoSubcontractors: UserAnswers =

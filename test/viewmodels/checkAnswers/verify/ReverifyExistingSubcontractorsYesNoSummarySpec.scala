@@ -60,7 +60,8 @@ class ReverifyExistingSubcontractorsYesNoSummarySpec extends AnyFreeSpec with Ma
       verificationBatch = None,
       verifications = Seq.empty,
       submission = None,
-      monthlyReturn = None
+      monthlyReturn = None,
+      monthlyReturnSubmission = None
     )
 
   private val emptyBatch: GetNewestVerificationBatchResponse =

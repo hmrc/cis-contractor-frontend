@@ -70,7 +70,8 @@ class VerifyCheckYourAnswersControllerSpec extends SpecBase {
       verificationBatch = None,
       verifications = Seq.empty,
       submission = None,
-      monthlyReturn = None
+      monthlyReturn = None,
+      monthlyReturnSubmission = None
     )
 
   "VerifyCheckYourAnswersController" - {
