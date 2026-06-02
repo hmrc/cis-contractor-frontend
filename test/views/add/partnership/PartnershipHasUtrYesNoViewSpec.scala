@@ -40,7 +40,7 @@ class PartnershipHasUtrYesNoViewSpec extends AnyWordSpec with Matchers with Guic
       val doc  = Jsoup.parse(html.toString())
 
       doc.select("title").text() must include(
-        messages("partnershipHasUtrYesNo.title", partnershipName)
+        messages("partnershipHasUtrYesNo.title")
       )
 
       val legend = doc.select("fieldset legend")
