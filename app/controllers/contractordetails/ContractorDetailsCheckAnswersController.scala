@@ -38,12 +38,7 @@ class ContractorDetailsCheckAnswersController @Inject() (
     with I18nSupport {
 
   def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
-    val contractorDetailsViewModel = ContractorDetailsCheckAnswersViewModel(
-      accountsOfficeReference = "123 PA 87654321",
-      uniqueTaxpayerReference = "1234444555",
-      schemeName = "\tScheme 123",
-      email = "test@business.com"
-    )
+    val accountsOfficeReference = "123 PA 87654321"
 
     val summaryRows = Seq(
       ContractorUtrSummary.row(request.userAnswers),
@@ -51,6 +46,6 @@ class ContractorDetailsCheckAnswersController @Inject() (
       EnterContractorEmailAddressSummary.row(request.userAnswers)
     ).flatten
 
-    Ok(view(contractorDetailsViewModel, summaryRows))
+    Ok(view(accountsOfficeReference, summaryRows))
   }
 }

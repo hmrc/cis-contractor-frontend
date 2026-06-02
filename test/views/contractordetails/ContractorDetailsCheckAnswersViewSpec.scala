@@ -23,7 +23,6 @@ import play.api.mvc.Request
 import play.api.test.FakeRequest
 import uk.gov.hmrc.govukfrontend.views.Aliases.*
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.Key
-import viewmodels.checkAnswers.contractordetails.ContractorDetailsCheckAnswersViewModel
 import views.html.contractordetails.ContractorDetailsCheckAnswersView
 
 class ContractorDetailsCheckAnswersViewSpec extends SpecBase {
@@ -56,15 +55,14 @@ class ContractorDetailsCheckAnswersViewSpec extends SpecBase {
         )
       )
 
-      val html = view(contractorDetailsCheckAnswersViewModel, summaryRows)
+      val html = view(accountsOfficeReference, summaryRows)
       val doc  = Jsoup.parse(html.body)
 
       doc.select("h1").text must include(messages("contractordetails.contractorDetailsCheckAnswers.heading"))
 
       doc.select("h2").text must include(
         messages(
-          "contractordetails.contractorDetailsCheckAnswers.accountsOfficeReference",
-          contractorDetailsCheckAnswersViewModel.accountsOfficeReference
+          "contractordetails.contractorDetailsCheckAnswers.accountsOfficeReference", accountsOfficeReference
         )
       )
 
@@ -102,7 +100,7 @@ class ContractorDetailsCheckAnswersViewSpec extends SpecBase {
         )
       )
 
-      val html = view(contractorDetailsCheckAnswersViewModel, summaryRows)
+      val html = view(accountsOfficeReference, summaryRows)
       val doc  = Jsoup.parse(html.body)
 
       doc.select(".govuk-summary-list__value").text mustBe ""
@@ -127,100 +125,13 @@ class ContractorDetailsCheckAnswersViewSpec extends SpecBase {
         )
       )
 
-      val html = view(contractorDetailsCheckAnswersViewModel, summaryRows)
+      val html = view(accountsOfficeReference, summaryRows)
       val doc  = Jsoup.parse(html.body)
 
       val hidden = doc.select(".govuk-visually-hidden").eachText()
 
       hidden must contain("Change Unique Taxpayer Reference")
     }
-
-    //    "must show Change links when values are provided" in new Setup {
-//      val html: HtmlFormat.Appendable = view(contractorDetailsCheckAnswersViewModel)
-//
-//      val doc: Document = Jsoup.parse(html.body)
-//
-//      doc.select(".govuk-summary-list__key").text must include(
-//        messages("contractordetails.contractorDetailsCheckAnswers.table.uniqueTaxpayerReference")
-//      )
-//      doc.select(".govuk-summary-list__key").text must include(
-//        messages("contractordetails.contractorDetailsCheckAnswers.table.schemeName")
-//      )
-//      doc.select(".govuk-summary-list__key").text must include(
-//        messages("contractordetails.contractorDetailsCheckAnswers.table.email")
-//      )
-//
-//      doc.select(".govuk-summary-list__value").text must include(
-//        contractorDetailsCheckAnswersViewModel.uniqueTaxpayerReference
-//      )
-//      doc.select(".govuk-summary-list__value").text must include(contractorDetailsCheckAnswersViewModel.schemeName.trim)
-//      doc.select(".govuk-summary-list__value").text must include(contractorDetailsCheckAnswersViewModel.email)
-//
-//      val links: String = doc.select(".govuk-link").text
-//      links must include(messages("site.change"))
-//      links must include(messages("contractordetails.contractorDetailsCheckAnswers.link"))
-//    }
-
-//    "must show Add details links when values are empty" in new Setup {
-//      val html: HtmlFormat.Appendable =
-//        view(contractorDetailsCheckAnswersViewModel.copy(uniqueTaxpayerReference = "", schemeName = "", email = ""))
-//
-//      val doc: Document = Jsoup.parse(html.body)
-//
-//      doc.select(".govuk-summary-list__key").text must include(
-//        messages("contractordetails.contractorDetailsCheckAnswers.table.uniqueTaxpayerReference")
-//      )
-//      doc.select(".govuk-summary-list__key").text must include(
-//        messages("contractordetails.contractorDetailsCheckAnswers.table.schemeName")
-//      )
-//      doc.select(".govuk-summary-list__key").text must include(
-//        messages("contractordetails.contractorDetailsCheckAnswers.table.email")
-//      )
-//
-//      doc.select(".govuk-summary-list__value").eachText().forEach { value =>
-//        value mustBe ""
-//      }
-//
-//      val links: String = doc.select(".govuk-link").text
-//      links must include(messages("contractordetails.contractorDetailsCheckAnswers.table.link.addDetails"))
-//    }
-
-//    "must include visually hidden text for each change link" in new Setup {
-//      val rows = Seq(
-//        SummaryListRow(
-//          key = Key(Text(messages("contractordetails.contractorDetailsCheckAnswers.table.uniqueTaxpayerReference"))),
-//          value = Value(Text(contractorDetailsCheckAnswersViewModel.uniqueTaxpayerReference)),
-//          actions = Some(Actions(items =
-//            Seq(ActionItem("#", messages("site.change"), Some(messages("contractordetails.contractorDetailsCheckAnswers.table.uniqueTaxpayerReference"))))
-//          ))
-//        ),
-//        SummaryListRow(
-//          key = Key(Text(messages("contractordetails.contractorDetailsCheckAnswers.table.schemeName"))),
-//          value = Value(Text(contractorDetailsCheckAnswersViewModel.schemeName.trim)),
-//          actions = Some(Actions(items =
-//            Seq(ActionItem("#", messages("site.change"), Some(messages("contractordetails.contractorDetailsCheckAnswers.table.schemeName.hidden"))))
-//          ))
-//        ),
-//        SummaryListRow(
-//          key = Key(Text(messages("contractordetails.contractorDetailsCheckAnswers.table.email"))),
-//          value = Value(Text(contractorDetailsCheckAnswersViewModel.email)),
-//          actions = Some(Actions(items =
-//            Seq(ActionItem("#", messages("site.change"), Some(messages("contractordetails.contractorDetailsCheckAnswers.table.email.hidden"))))
-//          ))
-//        )
-//      )
-//
-//      val html = view(contractorDetailsCheckAnswersViewModel, rows)
-//      val doc  = Jsoup.parse(html.body)
-//
-//      val hiddenTexts = doc.select(".govuk-visually-hidden").eachText()
-//
-//      hiddenTexts must contain(
-//        messages("contractordetails.contractorDetailsCheckAnswers.table.uniqueTaxpayerReference")
-//      )
-//      hiddenTexts must contain(messages("contractordetails.contractorDetailsCheckAnswers.table.schemeName.hidden"))
-//      hiddenTexts must contain(messages("contractordetails.contractorDetailsCheckAnswers.table.email.hidden"))
-//    }
   }
 
   trait Setup {
@@ -231,15 +142,8 @@ class ContractorDetailsCheckAnswersViewSpec extends SpecBase {
         app.injector.instanceOf[play.api.i18n.MessagesApi]
       )
 
+    val accountsOfficeReference = "123 PA 87654321"
     val view: ContractorDetailsCheckAnswersView =
       app.injector.instanceOf[ContractorDetailsCheckAnswersView]
-
-    val contractorDetailsCheckAnswersViewModel: ContractorDetailsCheckAnswersViewModel =
-      ContractorDetailsCheckAnswersViewModel(
-        accountsOfficeReference = "123 PA 87654321",
-        uniqueTaxpayerReference = "1234444555",
-        schemeName = "\tScheme 123",
-        email = "test@business.com"
-      )
   }
 }

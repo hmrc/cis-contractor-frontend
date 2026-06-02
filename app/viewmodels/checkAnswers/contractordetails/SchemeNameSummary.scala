@@ -26,29 +26,17 @@ import viewmodels.implicits.*
 object SchemeNameSummary {
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
     answers.get(SchemeNamePage).map { answer =>
-      if (answer.trim.isEmpty) {
-        SummaryListRowViewModel(
-          key = messages("contractordetails.schemeName.checkYourAnswersLabel"),
-          value = ValueViewModel(""),
-          actions = Seq(
-            ActionItemViewModel(
-              messages("contractordetails.contractorDetailsCheckAnswers.table.link.addDetails"),
-              controllers.contractordetails.routes.SchemeNameController.onPageLoad(CheckMode).url
-            ).withVisuallyHiddenText(messages("contractordetails.schemeName.change.hidden"))
-          )
+      val isEmpty = answer.trim.isEmpty
+      SummaryListRowViewModel(
+        key = messages("contractordetails.schemeName.checkYourAnswersLabel"),
+        value = ValueViewModel(if (isEmpty) "" else answer),
+        actions = Seq(
+          ActionItemViewModel(
+            messages(if (isEmpty) "contractordetails.contractorDetailsCheckAnswers.table.link.addDetails" else "site.change"),
+            controllers.contractordetails.routes.SchemeNameController.onPageLoad(CheckMode).url
+          ).withVisuallyHiddenText(messages("contractordetails.schemeName.change.hidden"))
+            .withAttribute("id" -> "scheme-name")
         )
-      } else {
-        SummaryListRowViewModel(
-          key = messages("contractordetails.schemeName.checkYourAnswersLabel"),
-          value = ValueViewModel(answer),
-          actions = Seq(
-            ActionItemViewModel(
-              messages("site.change"),
-              controllers.contractordetails.routes.SchemeNameController.onPageLoad(CheckMode).url
-            ).withVisuallyHiddenText(messages("contractordetails.schemeName.change.hidden"))
-              .withAttribute("id" -> "scheme-name")
-          )
-        )
-      }
+      )
     }
 }

@@ -14,25 +14,23 @@
  * limitations under the License.
  *@
 
-@import viewmodels.checkAnswers.contractordetails.ContractorDetailsCheckAnswersViewModel
 @import config.FrontendAppConfig
 
 @this(
     layout: templates.Layout,
     govukButton: GovukButton,
-    govukTable: GovukTable,
     govukSummaryList: GovukSummaryList,
     h1: components.H1,
     h2: components.H2,
     link: components.Link,
 )
 
-@(contractorDetailsViewModel: ContractorDetailsCheckAnswersViewModel, summaryRows: Seq[SummaryListRow])(implicit request: Request[_], appConfig: FrontendAppConfig, messages: Messages)
+@(accountsOfficeReference: String, summaryRows: Seq[SummaryListRow])(implicit request: Request[_], appConfig: FrontendAppConfig, messages: Messages)
 
 @layout(pageTitle = titleNoForm(messages("contractordetails.contractorDetailsCheckAnswers.title"))) {
 
     @h1("contractordetails.contractorDetailsCheckAnswers.heading", classes = "govuk-heading-xl")
-    @h2(messages("contractordetails.contractorDetailsCheckAnswers.accountsOfficeReference", contractorDetailsViewModel.accountsOfficeReference))
+    @h2(messages("contractordetails.contractorDetailsCheckAnswers.accountsOfficeReference", accountsOfficeReference))
 
     @govukSummaryList(SummaryListViewModel(summaryRows))
 

@@ -27,30 +27,17 @@ import viewmodels.implicits.*
 object EnterContractorEmailAddressSummary {
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
     answers.get(EnterContractorEmailAddressPage).map { answer =>
-      if (answer.trim.isEmpty) {
-        SummaryListRowViewModel(
-          key = messages("contractordetails.enterContractorEmailAddress.checkYourAnswersLabel"),
-          value = ValueViewModel(""),
-          actions = Seq(
-            ActionItemViewModel(
-              messages("contractordetails.contractorDetailsCheckAnswers.table.link.addDetails"),
-              routes.EnterContractorEmailAddressController.onPageLoad(CheckMode).url
-            ).withVisuallyHiddenText(messages("contractordetails.enterContractorEmailAddress.change.hidden"))
-              .withAttribute("id" -> "contractor-email-address")
-          )
+      val isEmpty = answer.trim.isEmpty
+      SummaryListRowViewModel(
+        key = messages("contractordetails.enterContractorEmailAddress.checkYourAnswersLabel"),
+        value = ValueViewModel(if (isEmpty) "" else answer),
+        actions = Seq(
+          ActionItemViewModel(
+            messages(if (isEmpty) "contractordetails.contractorDetailsCheckAnswers.table.link.addDetails" else "site.change"),
+            routes.EnterContractorEmailAddressController.onPageLoad(CheckMode).url
+          ).withVisuallyHiddenText(messages("contractordetails.enterContractorEmailAddress.change.hidden"))
+            .withAttribute("id" -> "contractor-email-address")
         )
-      } else {
-        SummaryListRowViewModel(
-          key = messages("contractordetails.enterContractorEmailAddress.checkYourAnswersLabel"),
-          value = ValueViewModel(answer),
-          actions = Seq(
-            ActionItemViewModel(
-              messages("site.change"),
-              routes.EnterContractorEmailAddressController.onPageLoad(CheckMode).url
-            ).withVisuallyHiddenText(messages("contractordetails.enterContractorEmailAddress.change.hidden"))
-              .withAttribute("id" -> "contractor-email-address")
-          )
-        )
-      }
+      )
     }
 }

@@ -27,30 +27,17 @@ object ContractorUtrSummary {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
     answers.get(ContractorUtrPage).map { answer =>
-      if (answer.trim.isEmpty) {
-        SummaryListRowViewModel(
-          key = messages("contractordetails.contractorUtr.checkYourAnswersLabel"),
-          value = ValueViewModel(""),
-          actions = Seq(
-            ActionItemViewModel(
-              messages("contractordetails.contractorDetailsCheckAnswers.table.link.addDetails"),
-              controllers.contractordetails.routes.ContractorUtrController.onPageLoad(CheckMode).url
-            ).withVisuallyHiddenText(messages("contractordetails.contractorUtr.change.hidden"))
-              .withAttribute("id" -> "contractor-utr")
-          )
+      val isEmpty = answer.trim.isEmpty
+      SummaryListRowViewModel(
+        key     = messages("contractordetails.contractorUtr.checkYourAnswersLabel"),
+        value   = ValueViewModel(if (isEmpty) "" else answer),
+        actions = Seq(
+          ActionItemViewModel(
+            messages(if (isEmpty) "contractordetails.contractorDetailsCheckAnswers.table.link.addDetails" else "site.change"),
+            controllers.contractordetails.routes.ContractorUtrController.onPageLoad(CheckMode).url
+          ).withVisuallyHiddenText(messages("contractordetails.contractorUtr.change.hidden"))
+            .withAttribute("id" -> "contractor-utr")
         )
-      } else {
-        SummaryListRowViewModel(
-          key = messages("contractordetails.contractorUtr.checkYourAnswersLabel"),
-          value = ValueViewModel(answer),
-          actions = Seq(
-            ActionItemViewModel(
-              messages("site.change"),
-              controllers.contractordetails.routes.ContractorUtrController.onPageLoad(CheckMode).url
-            ).withVisuallyHiddenText(messages("contractordetails.contractorUtr.change.hidden"))
-              .withAttribute("id" -> "contractor-utr")
-          )
-        )
-      }
+      )
     }
 }
