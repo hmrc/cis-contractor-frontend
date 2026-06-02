@@ -18,21 +18,35 @@ package services
 
 import models.UserAnswers
 import pages.verify.{LastGatewayMessagePage, PollIntervalPage}
+import play.api.Logging
 
 import java.time.Instant
 import javax.inject.Singleton
 
 @Singleton
-class PollAllowedService {
+class PollAllowedService extends Logging {
 
   def isPollAllowed(userAnswers: UserAnswers): Boolean = {
-    val result = for {
+    val result      = for {
       lastGatewayMillis <- userAnswers.get(LastGatewayMessagePage)
       intervalSeconds   <- userAnswers.get(PollIntervalPage)
     } yield {
-      val nextPollDateTime = Instant.ofEpochMilli(lastGatewayMillis).plusSeconds(intervalSeconds.toLong)
-      Instant.now().isAfter(nextPollDateTime)
+      val now              = Instant.now()
+      val lastGateway      = Instant.ofEpochMilli(lastGatewayMillis)
+      val nextPollDateTime = lastGateway.plusSeconds(intervalSeconds.toLong)
+      val allowed          = now.isAfter(nextPollDateTime)
+      logger.info(
+        s"[PollAllowedService] lastGateway=$lastGateway, intervalSeconds=$intervalSeconds, nextPollAt=$nextPollDateTime, now=$now, pollAllowed=$allowed"
+      )
+      allowed
     }
-    result.getOrElse(false)
+    val finalResult = result.getOrElse {
+      logger.warn(
+        s"[PollAllowedService] Missing session data — lastGatewayMillis=${userAnswers
+            .get(LastGatewayMessagePage)}, pollInterval=${userAnswers.get(PollIntervalPage)} — defaulting to false"
+      )
+      false
+    }
+    finalResult
   }
 }
