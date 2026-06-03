@@ -340,7 +340,7 @@ partnershipHasUtrYesNo.title                                         =  What is 
 partnershipHasUtrYesNo.heading                                       =  Do you know the Unique Taxpayer Reference for {0}?
 partnershipHasUtrYesNo.hint                                          =  This information will be used to verify the partnership as a subcontractor
 partnershipHasUtrYesNo.checkYourAnswersLabel                         =  Add UTR?
-partnershipHasUtrYesNo.error.required                                =  Select yes if the partnership has a Unique Taxpayer Reference (UTR)
+partnershipHasUtrYesNo.error.required                                =  Select whether this partnership has a Unique Taxpayer Reference (UTR)
 partnershipHasUtrYesNo.change.hidden                                 =  add UTR?
 
 partnershipAddress.title                                             =  What is the address for this partnership?
