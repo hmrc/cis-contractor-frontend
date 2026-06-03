@@ -16,27 +16,26 @@
 
 package utils
 
-import org.mockito.Mockito.when
+import com.typesafe.config.ConfigFactory
+import config.FrontendAppConfig
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-import config.FrontendAppConfig
-import org.scalatestplus.mockito.MockitoSugar
+import play.api.Configuration
 
 import java.time.LocalDateTime
 
-class SubmissionUtilsSpec extends AnyWordSpec with Matchers with MockitoSugar {
+class SubmissionUtilsSpec extends AnyWordSpec with Matchers {
+
+  private val appConfig       = new FrontendAppConfig(Configuration(ConfigFactory.load()))
+  private val submissionUtils = new SubmissionUtils(appConfig)
 
   "calculateTimeoutDateTime" should {
 
-    "add submissionPollTimeoutSeconds to the submittedAt time" in {
-      val mockConfig = mock[FrontendAppConfig]
-      when(mockConfig.submissionPollTimeoutSeconds).thenReturn(60)
-
-      val submissionUtils = new SubmissionUtils(mockConfig)
+    "add the configured submissionPollTimeoutSeconds to the submittedAt time" in {
       val submittedAt     = LocalDateTime.parse("2026-01-01T00:00:00")
       val timeoutDateTime = submissionUtils.calculateTimeoutDateTime(submittedAt)
 
-      timeoutDateTime shouldBe LocalDateTime.parse("2026-01-01T00:01:00")
+      timeoutDateTime shouldBe submittedAt.plusSeconds(appConfig.submissionPollTimeoutSeconds)
     }
   }
 
