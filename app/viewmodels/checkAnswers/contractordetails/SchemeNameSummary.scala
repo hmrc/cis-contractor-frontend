@@ -19,24 +19,24 @@ package viewmodels.checkAnswers.contractordetails
 import models.{CheckMode, UserAnswers}
 import pages.contractordetails.SchemeNamePage
 import play.api.i18n.Messages
-import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
 
 object SchemeNameSummary {
-
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
     answers.get(SchemeNamePage).map { answer =>
+      val isEmpty = answer.trim.isEmpty
       SummaryListRowViewModel(
-        key = "contractordetails.schemeName.checkYourAnswersLabel",
-        value = ValueViewModel(HtmlFormat.escape(answer).toString),
+        key = messages("contractordetails.schemeName.checkYourAnswersLabel"),
+        value = ValueViewModel(if (isEmpty) "" else answer),
         actions = Seq(
           ActionItemViewModel(
-            "site.change",
+            messages(
+              if (isEmpty) "contractordetails.contractorDetailsCheckAnswers.table.link.addDetails" else "site.change"
+            ),
             controllers.contractordetails.routes.SchemeNameController.onPageLoad(CheckMode).url
-          )
-            .withVisuallyHiddenText(messages("contractordetails.schemeName.change.hidden"))
+          ).withVisuallyHiddenText(messages("contractordetails.schemeName.change.hidden"))
             .withAttribute("id" -> "scheme-name")
         )
       )
