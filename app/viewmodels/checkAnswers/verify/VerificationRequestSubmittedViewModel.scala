@@ -19,6 +19,7 @@ import config.FrontendAppConfig
 import models.UserAnswers
 import pages.verify.*
 import queries.CisIdQuery
+import utils.VerifyEmailResolver.resolvedEmail
 
 import java.time.LocalDateTime
 
@@ -39,19 +40,54 @@ object VerificationRequestSubmittedViewModel {
   private def namesFrom[A](maybe: Option[Iterable[A]])(name: A => String): Seq[String] =
     maybe.fold(Seq.empty)(_.map(name).toSeq)
 
-  def fromUserAnswers(userAnswers: UserAnswers, appConfig: FrontendAppConfig): VerificationRequestSubmittedViewModel =
-    val cisId = userAnswers.get(CisIdQuery) match {
-      case Some(cisId) => cisId
-      case _           =>
+  def fromUserAnswers(
+                       userAnswers: UserAnswers,
+                       appConfig: FrontendAppConfig
+                     ): VerificationRequestSubmittedViewModel = {
+
+    val cisId = userAnswers
+      .get(CisIdQuery)
+      .getOrElse(
         throw new IllegalStateException("[VerificationRequestSubmittedViewModel] cisId missing from userAnswers")
-    }
+      )
+
+    val backendResponse =
+      userAnswers.get(NewestVerificationBatchResponsePage)
+
+    val newestBatch =
+      backendResponse.getOrElse(
+        throw new IllegalStateException(
+          "[VerificationRequestSubmittedViewModel] NewestVerificationBatchResponsePage missing"
+        )
+      )
+
+    val referenceNumber: String =
+      newestBatch.verificationBatch
+        .flatMap(_.verificationNumber)
+        .getOrElse(
+          throw new IllegalStateException(
+            "[VerificationRequestSubmittedViewModel] verificationNumber missing"
+          )
+        )
+
+    val submittedAt: LocalDateTime =
+      newestBatch.submission
+        .flatMap(_.submissionRequestDate)
+        .getOrElse(
+          throw new IllegalStateException(
+            "[VerificationRequestSubmittedViewModel] submissionRequestDate missing"
+          )
+        )
+
     VerificationRequestSubmittedViewModel(
       manageSubcontractorsUrl = s"${appConfig.manageSubcontractorsUrl}/$cisId",
-      // TODO: Replace below with actuals - 1. referenceNumber 2. submittedAt
-      referenceNumber = "Reference Number 12345",
-      submittedAt = LocalDateTime.now(),
-      subcontractorsToVerify = namesFrom(userAnswers.get(SelectSubcontractorPage))(_.name).sorted,
-      subcontractorsToReverify = namesFrom(userAnswers.get(SelectSubcontractorsToReverifyPage))(_.name).sorted,
-      confirmationEmail = userAnswers.get(EmailAddressPage)
+      referenceNumber = referenceNumber,
+      submittedAt = submittedAt,
+      subcontractorsToVerify =
+        namesFrom(userAnswers.get(SelectSubcontractorPage))(_.name).sorted,
+      subcontractorsToReverify =
+        namesFrom(userAnswers.get(SelectSubcontractorsToReverifyPage))(_.name).sorted,
+      confirmationEmail = resolvedEmail(userAnswers)
     )
+  }
 }

@@ -19,19 +19,46 @@ package viewmodels.checkAnswers.verify
 import base.SpecBase
 import models.UserAnswers
 import models.SubcontractorViewModel
-import org.scalatest.freespec.AnyFreeSpec
-import org.scalatest.matchers.should.Matchers
 import org.scalatest.TryValues.convertTryToSuccessOrFailure
-import org.scalatest.matchers.should.Matchers.shouldBe
-import pages.verify.{EmailAddressPage, SelectSubcontractorPage}
+import org.scalatest.matchers.should.Matchers._
+import pages.verify.SelectSubcontractorPage
+import models.{Submission, VerificationBatch}
+import models.response.GetNewestVerificationBatchResponse
+import pages.verify.NewestVerificationBatchResponsePage
 import queries.CisIdQuery
 
 import java.time.LocalDateTime
 
 class VerificationRequestSubmittedViewModelSpec extends SpecBase {
 
-  private val now   = LocalDateTime.of(2026, 4, 27, 10, 30)
-  private val cisId = "12345"
+  private val cisId: String = "123456789"
+
+  private val now: LocalDateTime = LocalDateTime.now()
+
+  private val verificationBatch =
+    VerificationBatch(
+      verificationBatchId = 1L,
+      status = Some("Submitted"),
+      verificationNumber = Some("VB00000001")
+    )
+
+  private val submission =
+    Submission(
+      submissionId = 1L,
+      activeObjectId = Some(1L),
+      submissionRequestDate = Some(now),
+      status = Some("Submitted")
+    )
+
+  private val newestBatchResponse =
+    GetNewestVerificationBatchResponse(
+      scheme = None,
+      subcontractors = Seq.empty,
+      verificationBatch = Some(verificationBatch),
+      verifications = Seq.empty,
+      submission = Some(submission),
+      monthlyReturn = None
+    )
 
   "VerificationRequestSubmittedViewModel" - {
 
@@ -123,72 +150,62 @@ class VerificationRequestSubmittedViewModelSpec extends SpecBase {
         vm.showReverify shouldBe false
       }
     }
-  }
 
-  "VerificationRequestSubmittedViewModel.fromUserAnswers" - {
+    "fromUserAnswers" - {
 
-    "must map subcontractorsToVerify from SelectSubcontractorPage" in {
+      "must map referenceNumber and submittedAt correctly" in {
 
-      val subcontractors =
-        Set(
-          SubcontractorViewModel(id = "ID1", name = "Brody, Martin"),
-          SubcontractorViewModel(id = "ID2", name = "Hooper And Associates")
+        val userAnswers =
+          UserAnswers("id")
+            .set(CisIdQuery, cisId).success.value
+            .set(NewestVerificationBatchResponsePage, newestBatchResponse).success.value
+
+        val vm =
+          VerificationRequestSubmittedViewModel.fromUserAnswers(userAnswers, applicationConfig)
+
+        vm.referenceNumber shouldBe "VB00000001"
+        vm.submittedAt shouldBe now
+      }
+
+      "must map subcontractors correctly" in {
+
+        val subcontractors =
+          Set(
+            SubcontractorViewModel("ID1", "Brody, Martin"),
+            SubcontractorViewModel("ID2", "Hooper And Associates")
+          )
+
+        val userAnswers =
+          UserAnswers("id")
+            .set(SelectSubcontractorPage, subcontractors).success.value
+            .set(CisIdQuery, cisId).success.value
+            .set(NewestVerificationBatchResponsePage, newestBatchResponse).success.value
+
+        val vm =
+          VerificationRequestSubmittedViewModel.fromUserAnswers(userAnswers, applicationConfig)
+
+        vm.subcontractorsToVerify shouldBe Seq("Brody, Martin", "Hooper And Associates")
+        vm.showVerify shouldBe true
+      }
+
+      "must throw when NewestVerificationBatchResponsePage is missing" in {
+
+        val exception =
+          intercept[IllegalStateException] {
+
+            VerificationRequestSubmittedViewModel.fromUserAnswers(
+              UserAnswers("id")
+                .set(CisIdQuery, cisId)
+                .success
+                .value,
+              applicationConfig
+            )
+          }
+
+        exception.getMessage should include(
+          "NewestVerificationBatchResponsePage missing"
         )
-
-      val userAnswers =
-        UserAnswers("id")
-          .set(SelectSubcontractorPage, subcontractors)
-          .success
-          .value
-          .set(CisIdQuery, cisId)
-          .success
-          .value
-
-      val vm =
-        VerificationRequestSubmittedViewModel.fromUserAnswers(userAnswers, applicationConfig)
-
-      vm.subcontractorsToVerify shouldBe
-        Seq("Brody, Martin", "Hooper And Associates")
-
-      vm.showVerify shouldBe true
-    }
-
-    "must map confirmationEmail from EmailAddressPage when present" in {
-
-      val userAnswers =
-        UserAnswers("id")
-          .set(EmailAddressPage, "test@testmail.com")
-          .success
-          .value
-          .set(CisIdQuery, cisId)
-          .success
-          .value
-
-      val vm =
-        VerificationRequestSubmittedViewModel.fromUserAnswers(userAnswers, applicationConfig)
-
-      vm.confirmationEmail        shouldBe Some("test@testmail.com")
-      vm.showEmail                shouldBe true
-      vm.subcontractorsToVerify   shouldBe Seq.empty
-      vm.showVerify               shouldBe false
-      vm.subcontractorsToReverify shouldBe Seq.empty
-      vm.showReverify             shouldBe false
-    }
-
-    "must return empty values when pages are absent" in {
-
-      val vm =
-        VerificationRequestSubmittedViewModel.fromUserAnswers(
-          UserAnswers("id").set(CisIdQuery, cisId).success.value,
-          applicationConfig
-        )
-
-      vm.subcontractorsToVerify   shouldBe Seq.empty
-      vm.subcontractorsToReverify shouldBe Seq.empty
-      vm.confirmationEmail        shouldBe None
-      vm.showVerify               shouldBe false
-      vm.showReverify             shouldBe false
-      vm.showEmail                shouldBe false
+      }
     }
   }
 }
