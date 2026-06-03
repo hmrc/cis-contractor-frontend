@@ -41,9 +41,9 @@ object VerificationRequestSubmittedViewModel {
     maybe.fold(Seq.empty)(_.map(name).toSeq)
 
   def fromUserAnswers(
-                       userAnswers: UserAnswers,
-                       appConfig: FrontendAppConfig
-                     ): VerificationRequestSubmittedViewModel = {
+    userAnswers: UserAnswers,
+    appConfig: FrontendAppConfig
+  ): VerificationRequestSubmittedViewModel = {
 
     val cisId = userAnswers
       .get(CisIdQuery)
@@ -83,10 +83,8 @@ object VerificationRequestSubmittedViewModel {
       manageSubcontractorsUrl = s"${appConfig.manageSubcontractorsUrl}/$cisId",
       referenceNumber = referenceNumber,
       submittedAt = submittedAt,
-      subcontractorsToVerify =
-        namesFrom(userAnswers.get(SelectSubcontractorPage))(_.name).sorted,
-      subcontractorsToReverify =
-        namesFrom(userAnswers.get(SelectSubcontractorsToReverifyPage))(_.name).sorted,
+      subcontractorsToVerify = namesFrom(userAnswers.get(SelectSubcontractorPage))(_.name).sorted,
+      subcontractorsToReverify = namesFrom(userAnswers.get(SelectSubcontractorsToReverifyPage))(_.name).sorted,
       confirmationEmail = resolvedEmail(userAnswers)
     )
   }

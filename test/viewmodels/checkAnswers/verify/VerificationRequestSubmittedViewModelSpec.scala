@@ -157,14 +157,18 @@ class VerificationRequestSubmittedViewModelSpec extends SpecBase {
 
         val userAnswers =
           UserAnswers("id")
-            .set(CisIdQuery, cisId).success.value
-            .set(NewestVerificationBatchResponsePage, newestBatchResponse).success.value
+            .set(CisIdQuery, cisId)
+            .success
+            .value
+            .set(NewestVerificationBatchResponsePage, newestBatchResponse)
+            .success
+            .value
 
         val vm =
           VerificationRequestSubmittedViewModel.fromUserAnswers(userAnswers, applicationConfig)
 
         vm.referenceNumber shouldBe "VB00000001"
-        vm.submittedAt shouldBe now
+        vm.submittedAt     shouldBe now
       }
 
       "must map subcontractors correctly" in {
@@ -177,15 +181,21 @@ class VerificationRequestSubmittedViewModelSpec extends SpecBase {
 
         val userAnswers =
           UserAnswers("id")
-            .set(SelectSubcontractorPage, subcontractors).success.value
-            .set(CisIdQuery, cisId).success.value
-            .set(NewestVerificationBatchResponsePage, newestBatchResponse).success.value
+            .set(SelectSubcontractorPage, subcontractors)
+            .success
+            .value
+            .set(CisIdQuery, cisId)
+            .success
+            .value
+            .set(NewestVerificationBatchResponsePage, newestBatchResponse)
+            .success
+            .value
 
         val vm =
           VerificationRequestSubmittedViewModel.fromUserAnswers(userAnswers, applicationConfig)
 
         vm.subcontractorsToVerify shouldBe Seq("Brody, Martin", "Hooper And Associates")
-        vm.showVerify shouldBe true
+        vm.showVerify             shouldBe true
       }
 
       "must throw when NewestVerificationBatchResponsePage is missing" in {
