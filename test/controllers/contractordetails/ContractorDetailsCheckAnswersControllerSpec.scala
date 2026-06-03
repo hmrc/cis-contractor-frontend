@@ -21,8 +21,6 @@ import org.scalatestplus.mockito.MockitoSugar
 import pages.contractordetails.{ContractorUtrPage, EnterContractorEmailAddressPage, SchemeNamePage}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import viewmodels.checkAnswers.contractordetails.*
-import views.html.contractordetails.ContractorDetailsCheckAnswersView
 
 class ContractorDetailsCheckAnswersControllerSpec extends SpecBase with MockitoSugar {
 

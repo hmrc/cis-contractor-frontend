@@ -959,7 +959,7 @@ contractordetails.schemeName.change.hidden                            =  scheme 
 
 contractordetails.enterContractorEmailAddress.title                   =  What is the contractor’s email address?
 contractordetails.enterContractorEmailAddress.heading                 =  What is the contractor’s email address?
-contractordetails.enterContractorEmailAddress.checkYourAnswersLabel   =  Email
+contractordetails.enterContractorEmailAddress.checkYourAnswersLabel   =  Email address
 contractordetails.enterContractorEmailAddress.error.required          =  Enter an email address
 contractordetails.enterContractorEmailAddress.error.length            =  The email address you entered contains too many characters
 contractordetails.enterContractorEmailAddress.error.invalid           =  You have entered an email address in an incorrect format
@@ -991,7 +991,7 @@ contractordetails.contractorDetailsCheckAnswers.accountsOfficeReference         
 contractordetails.contractorDetailsCheckAnswers.table.uniqueTaxpayerReference       = Unique Taxpayer Reference
 contractordetails.contractorDetailsCheckAnswers.table.schemeName                    = Scheme name
 contractordetails.contractorDetailsCheckAnswers.table.schemeName.hidden             = scheme name
-contractordetails.contractorDetailsCheckAnswers.table.email                         = Email
-contractordetails.contractorDetailsCheckAnswers.table.email.hidden                  = email
+contractordetails.contractorDetailsCheckAnswers.table.email                         = Email address
+contractordetails.contractorDetailsCheckAnswers.table.email.hidden                  = email address
 contractordetails.contractorDetailsCheckAnswers.table.link.addDetails               = Add details
 contractordetails.contractorDetailsCheckAnswers.returnToCisDashboard.link           = Return to CIS dashboard

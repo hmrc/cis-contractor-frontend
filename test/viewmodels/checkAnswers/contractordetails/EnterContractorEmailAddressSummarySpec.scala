@@ -73,5 +73,42 @@ class EnterContractorEmailAddressSummarySpec extends AnyFreeSpec with Matchers {
 
       EnterContractorEmailAddressSummary.row(answers) shouldBe None
     }
+    "must return a SummaryListRow with empty value and Add Details link when the answer is empty" in {
+
+      val answers =
+        UserAnswers("test-id")
+          .set(EnterContractorEmailAddressPage, "")
+          .success
+          .value
+
+      val maybeRow = EnterContractorEmailAddressSummary.row(answers)
+      maybeRow shouldBe defined
+
+      val row             = maybeRow.value
+      val expectedKeyText =
+        messages("contractordetails.enterContractorEmailAddress.checkYourAnswersLabel")
+      row.key.content.asHtml.toString should include(expectedKeyText)
+
+      row.value.content.asHtml.toString shouldBe ""
+
+      val actions = row.actions.value.items
+      actions should have size 1
+
+      val action = actions.head
+
+      val expectedAddDetailsText =
+        messages("contractordetails.contractorDetailsCheckAnswers.table.link.addDetails")
+
+      action.content.asHtml.toString should include(expectedAddDetailsText)
+
+      val expectedHref =
+        routes.EnterContractorEmailAddressController.onPageLoad(CheckMode).url
+      action.href shouldBe expectedHref
+
+      val expectedHiddenText =
+        messages("contractordetails.enterContractorEmailAddress.change.hidden")
+      action.visuallyHiddenText.value shouldBe expectedHiddenText
+    }
+
   }
 }
