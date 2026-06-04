@@ -27,26 +27,23 @@ import javax.inject.Singleton
 class PollAllowedService extends Logging {
 
   def isPollAllowed(userAnswers: UserAnswers): Boolean = {
-    val result      = for {
-      lastGatewayMillis <- userAnswers.get(LastGatewayMessagePage)
-      intervalSeconds   <- userAnswers.get(PollIntervalPage)
-    } yield {
-      val now              = Instant.now()
-      val lastGateway      = Instant.ofEpochMilli(lastGatewayMillis)
-      val nextPollDateTime = lastGateway.plusSeconds(intervalSeconds.toLong)
-      val allowed          = now.isAfter(nextPollDateTime)
-      logger.info(
-        s"[PollAllowedService] lastGateway=$lastGateway, intervalSeconds=$intervalSeconds, nextPollAt=$nextPollDateTime, now=$now, pollAllowed=$allowed"
-      )
-      allowed
+    val lastGatewayMillis = userAnswers.get(LastGatewayMessagePage)
+    val intervalSeconds   = userAnswers.get(PollIntervalPage)
+    (lastGatewayMillis, intervalSeconds) match {
+      case (Some(lastGatewayMillis), Some(intervalSeconds)) =>
+        val now              = Instant.now()
+        val lastGateway      = Instant.ofEpochMilli(lastGatewayMillis)
+        val nextPollDateTime = lastGateway.plusSeconds(intervalSeconds.toLong)
+        val allowed          = now.isAfter(nextPollDateTime)
+        logger.debug(
+          s"[PollAllowedService] lastGateway=$lastGateway, intervalSeconds=$intervalSeconds, nextPollAt=$nextPollDateTime, now=$now, pollAllowed=$allowed"
+        )
+        allowed
+      case _                                                =>
+        logger.warn(
+          s"[PollAllowedService] Missing session data — lastGatewayMillis=$lastGatewayMillis, pollInterval=$intervalSeconds — defaulting to false"
+        )
+        false
     }
-    val finalResult = result.getOrElse {
-      logger.warn(
-        s"[PollAllowedService] Missing session data — lastGatewayMillis=${userAnswers
-            .get(LastGatewayMessagePage)}, pollInterval=${userAnswers.get(PollIntervalPage)} — defaulting to false"
-      )
-      false
-    }
-    finalResult
   }
 }
