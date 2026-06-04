@@ -57,38 +57,32 @@ class SelectSubcontractorController @Inject() (
 
       getUnverifiedSubcontractorsOrRedirect(userAnswers) match {
         case Right(unverifiedSubcontractors) =>
-          val (errors, subcontractorsVm) =
+          val subcontractorsVm =
             SubcontractorViewModel.fromSubcontractors(unverifiedSubcontractors)
 
-          errors.foreach(logger.error(_))
+          val preparedForm =
+            userAnswers
+              .get(SelectSubcontractorPage)
+              .map(subs => form.fill(subs.map(_.id)))
+              .getOrElse(form)
 
-          if (subcontractorsVm.isEmpty) {
-            Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-          } else {
-            val preparedForm =
-              userAnswers
-                .get(SelectSubcontractorPage)
-                .map(subs => form.fill(subs.map(_.id)))
-                .getOrElse(form)
-
-            val result =
-              paginationService.paginateCheckboxItems(
-                SubcontractorViewModel.checkboxItems(subcontractorsVm),
-                page
-              )
-
-            Ok(
-              view(
-                preparedForm,
-                mode,
-                result.paginatedData,
-                result.paginationViewModel,
-                page,
-                result.startIndex,
-                result.totalCount
-              )
+          val result =
+            paginationService.paginateCheckboxItems(
+              SubcontractorViewModel.checkboxItems(subcontractorsVm),
+              page
             )
-          }
+
+          Ok(
+            view(
+              preparedForm,
+              mode,
+              result.paginatedData,
+              result.paginationViewModel,
+              page,
+              result.startIndex,
+              result.totalCount
+            )
+          )
 
         case Left(redirectResult) =>
           redirectResult
@@ -109,80 +103,74 @@ class SelectSubcontractorController @Inject() (
           Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
 
         case Some(unverifiedSubcontractors) =>
-          val (errors, subcontractorsVm) =
+          val subcontractorsVm =
             SubcontractorViewModel.fromSubcontractors(unverifiedSubcontractors)
 
-          errors.foreach(logger.error(_))
+          val allItems = SubcontractorViewModel.checkboxItems(subcontractorsVm)
 
-          if (subcontractorsVm.isEmpty) {
-            Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
-          } else {
-            val allItems = SubcontractorViewModel.checkboxItems(subcontractorsVm)
+          val result =
+            paginationService.paginateCheckboxItems(allItems, page)
 
-            val result =
-              paginationService.paginateCheckboxItems(allItems, page)
+          val currentPageIds: Set[String] =
+            result.paginatedData.map(_.value).toSet
 
-            val currentPageIds: Set[String] =
-              result.paginatedData.map(_.value).toSet
+          val otherPageValues: Set[SubcontractorViewModel] =
+            ua.get(SelectSubcontractorPage)
+              .getOrElse(Set.empty)
+              .filterNot(sub => currentPageIds.contains(sub.id))
 
-            val otherPageValues: Set[SubcontractorViewModel] =
-              ua.get(SelectSubcontractorPage)
-                .getOrElse(Set.empty)
-                .filterNot(sub => currentPageIds.contains(sub.id))
+          val boundForm = form.bindFromRequest()
 
-            val boundForm = form.bindFromRequest()
+          val currentSelectedValues: Set[SubcontractorViewModel] =
+            boundForm.value
+              .getOrElse(Set.empty)
+              .flatMap(id => subcontractorsVm.find(_.id == id))
 
-            val currentSelectedValues: Set[SubcontractorViewModel] =
-              boundForm.value
-                .getOrElse(Set.empty)
-                .flatMap(id => subcontractorsVm.find(_.id == id))
+          val mergedValues: Set[SubcontractorViewModel] = otherPageValues ++ currentSelectedValues
 
-            val mergedValues: Set[SubcontractorViewModel] = otherPageValues ++ currentSelectedValues
+          val gotoPage: Option[Int] =
+            request.body.asFormUrlEncoded
+              .flatMap(_.get("gotoPage"))
+              .flatMap(_.headOption)
+              .flatMap(_.toIntOption)
 
-            val gotoPage: Option[Int] =
-              request.body.asFormUrlEncoded
-                .flatMap(_.get("gotoPage"))
-                .flatMap(_.headOption)
-                .flatMap(_.toIntOption)
+          gotoPage match {
+            case Some(targetPage) =>
+              for {
+                updatedAnswers <- Future.fromTry(ua.set(SelectSubcontractorPage, mergedValues))
+                _              <- sessionRepository.set(updatedAnswers)
+              } yield Redirect(routes.SelectSubcontractorController.onPageLoad(mode, targetPage))
 
-            gotoPage match {
-              case Some(targetPage) =>
+            case None =>
+              if (mergedValues.nonEmpty) {
                 for {
                   updatedAnswers <- Future.fromTry(ua.set(SelectSubcontractorPage, mergedValues))
                   _              <- sessionRepository.set(updatedAnswers)
-                } yield Redirect(routes.SelectSubcontractorController.onPageLoad(mode, targetPage))
-
-              case None =>
-                if (mergedValues.nonEmpty) {
-                  for {
-                    updatedAnswers <- Future.fromTry(ua.set(SelectSubcontractorPage, mergedValues))
-                    _              <- sessionRepository.set(updatedAnswers)
-                  } yield Redirect(navigator.nextPage(SelectSubcontractorPage, mode, updatedAnswers))
-                } else {
-                  boundForm.fold(
-                    formWithErrors =>
-                      Future.successful(
-                        BadRequest(
-                          view(
-                            formWithErrors,
-                            mode,
-                            result.paginatedData,
-                            result.paginationViewModel,
-                            page,
-                            result.startIndex,
-                            result.totalCount
-                          )
+                } yield Redirect(navigator.nextPage(SelectSubcontractorPage, mode, updatedAnswers))
+              } else {
+                boundForm.fold(
+                  formWithErrors =>
+                    Future.successful(
+                      BadRequest(
+                        view(
+                          formWithErrors,
+                          mode,
+                          result.paginatedData,
+                          result.paginationViewModel,
+                          page,
+                          result.startIndex,
+                          result.totalCount
                         )
-                      ),
-                    ids =>
-                      val selected = ids.flatMap(id => subcontractorsVm.find(_.id == id)) ++ otherPageValues
-                      for {
-                        updatedAnswers <- Future.fromTry(ua.set(SelectSubcontractorPage, selected))
-                        _              <- sessionRepository.set(updatedAnswers)
-                      } yield Redirect(navigator.nextPage(SelectSubcontractorPage, mode, updatedAnswers))
-                  )
-                }
-            }
+                      )
+                    ),
+                  ids =>
+                    val selected = ids.flatMap(id => subcontractorsVm.find(_.id == id)) ++ otherPageValues
+                    for {
+                      updatedAnswers <- Future.fromTry(ua.set(SelectSubcontractorPage, selected))
+                      _              <- sessionRepository.set(updatedAnswers)
+                    } yield Redirect(navigator.nextPage(SelectSubcontractorPage, mode, updatedAnswers))
+                )
+              }
           }
       }
     }
@@ -207,5 +195,4 @@ class SelectSubcontractorController @Inject() (
             Left(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
         }
     }
-
 }
