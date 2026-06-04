@@ -198,6 +198,75 @@ class VerificationRequestSubmittedViewModelSpec extends SpecBase {
         vm.showVerify             shouldBe true
       }
 
+      "must throw when cisId is missing from userAnswers" in {
+
+        val exception = intercept[IllegalStateException] {
+          VerificationRequestSubmittedViewModel.fromUserAnswers(
+            UserAnswers("id")
+              .set(NewestVerificationBatchResponsePage, newestBatchResponse)
+              .success
+              .value,
+            applicationConfig
+          )
+        }
+
+        exception.getMessage should include(
+          "[VerificationRequestSubmittedViewModel] cisId missing from userAnswers"
+        )
+      }
+
+      "must throw when verificationNumber is missing" in {
+
+        val badBatch =
+          verificationBatch.copy(verificationNumber = None)
+
+        val badResponse =
+          newestBatchResponse.copy(verificationBatch = Some(badBatch))
+
+        val exception = intercept[IllegalStateException] {
+          VerificationRequestSubmittedViewModel.fromUserAnswers(
+            UserAnswers("id")
+              .set(CisIdQuery, cisId)
+              .success
+              .value
+              .set(NewestVerificationBatchResponsePage, badResponse)
+              .success
+              .value,
+            applicationConfig
+          )
+        }
+
+        exception.getMessage should include(
+          "[VerificationRequestSubmittedViewModel] verificationNumber missing"
+        )
+      }
+
+      "must throw when submissionRequestDate is missing" in {
+
+        val badSubmission =
+          submission.copy(submissionRequestDate = None)
+
+        val badResponse =
+          newestBatchResponse.copy(submission = Some(badSubmission))
+
+        val exception = intercept[IllegalStateException] {
+          VerificationRequestSubmittedViewModel.fromUserAnswers(
+            UserAnswers("id")
+              .set(CisIdQuery, cisId)
+              .success
+              .value
+              .set(NewestVerificationBatchResponsePage, badResponse)
+              .success
+              .value,
+            applicationConfig
+          )
+        }
+
+        exception.getMessage should include(
+          "[VerificationRequestSubmittedViewModel] submissionRequestDate missing"
+        )
+      }
+
       "must throw when NewestVerificationBatchResponsePage is missing" in {
 
         val exception =
