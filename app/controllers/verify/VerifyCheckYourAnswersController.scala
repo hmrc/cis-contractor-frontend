@@ -26,7 +26,6 @@ import viewmodels.checkAnswers.verify.*
 import viewmodels.govuk.summarylist.*
 import views.html.verify.VerifyCheckYourAnswersView
 
-
 import javax.inject.Inject
 import scala.concurrent.Future
 
@@ -36,7 +35,7 @@ class VerifyCheckYourAnswersController @Inject() (
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   val controllerComponents: MessagesControllerComponents,
-  view: VerifyCheckYourAnswersView,
+  view: VerifyCheckYourAnswersView
 ) extends FrontendBaseController
     with I18nSupport
     with Logging {

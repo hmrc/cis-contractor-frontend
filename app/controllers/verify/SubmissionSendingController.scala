@@ -32,15 +32,15 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class SubmissionSendingController @Inject() (
-                                              override val messagesApi: MessagesApi,
-                                              identify: IdentifierAction,
-                                              getData: DataRetrievalAction,
-                                              requireData: DataRequiredAction,
-                                              val controllerComponents: MessagesControllerComponents,
-                                              view: SubmissionSendingView,
-                                              verificationService: VerificationService
-                                            )(implicit ec: ExecutionContext)
-  extends FrontendBaseController
+  override val messagesApi: MessagesApi,
+  identify: IdentifierAction,
+  getData: DataRetrievalAction,
+  requireData: DataRequiredAction,
+  val controllerComponents: MessagesControllerComponents,
+  view: SubmissionSendingView,
+  verificationService: VerificationService
+)(implicit ec: ExecutionContext)
+    extends FrontendBaseController
     with I18nSupport
     with Logging {
 
@@ -49,7 +49,6 @@ class SubmissionSendingController @Inject() (
 
   def onPageLoad(): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
-
       ValidatedVerify.build(request.userAnswers) match {
         case Left(error) =>
           logger.error(s"[SubmissionSendingController] Validation failed: $error")
@@ -64,7 +63,7 @@ class SubmissionSendingController @Inject() (
             case Right(submissionReq) =>
               verificationService
                 .createSubmissionForVerification(submissionReq)
-                .map{_ =>
+                .map { _ =>
                   logger.info(
                     s"[VerifyCheckYourAnswersController] Successfully created submission for verification, redirecting to submission sending"
                   )
@@ -79,15 +78,16 @@ class SubmissionSendingController @Inject() (
     }
 
   private def buildSubmissionRequest(
-                                      ua: models.UserAnswers,
-                                      validated: ValidatedVerify
-                                    ): Either[String, CreateSubmissionForVerificationRequest] =
+    ua: models.UserAnswers,
+    validated: ValidatedVerify
+  ): Either[String, CreateSubmissionForVerificationRequest] =
     for {
       instanceId <- ua.get(CisIdQuery).toRight("CisIdQuery not found")
       current    <- ua.get(CurrentVerificationBatchResponsePage).toRight("CurrentVerificationBatchResponsePage not found")
 
       batchId  <- current.verificationBatch.map(_.verificationBatchId).toRight("verificationBatchId missing")
-      batchRef <- current.verificationBatch.flatMap(_.verifBatchResourceRef).toRight("verificationBatchResourceRef missing")
+      batchRef <-
+        current.verificationBatch.flatMap(_.verifBatchResourceRef).toRight("verificationBatchResourceRef missing")
 
       email <- validated.emailToUse.toRight("No email resolved for submission")
     } yield {
@@ -97,7 +97,7 @@ class SubmissionSendingController @Inject() (
           VerificationToUpdate(
             subcontractorName = "Unknown", // ??
             verificationResourceRef = ref,
-            proceedVerification = "Y"  // ??
+            proceedVerification = "Y" // ??
           )
         }
 

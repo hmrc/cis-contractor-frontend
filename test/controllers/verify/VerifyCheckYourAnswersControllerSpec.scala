@@ -75,7 +75,6 @@ class VerifyCheckYourAnswersControllerSpec extends SpecBase with MockitoSugar {
       monthlyReturn = None
     )
 
-
   "VerifyCheckYourAnswersController" - {
 
     "onPageLoad" - {
