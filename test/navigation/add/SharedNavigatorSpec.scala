@@ -18,8 +18,7 @@ package navigation.add
 
 import base.SpecBase
 import controllers.routes
-import models.add.TypeOfSubcontractor
-import models.{CheckMode, NormalMode, UserAnswers}
+import models.{CheckMode, NormalMode, TypeOfSubcontractor, UserAnswers}
 import pages.Page
 import pages.add.TypeOfSubcontractorPage
 

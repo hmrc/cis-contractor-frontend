@@ -18,7 +18,7 @@ package models.add
 
 import base.SpecBase
 import models.contact.ContactOptions
-import models.{InvalidAnswer, MissingAnswer}
+import models.{InvalidAnswer, MissingAnswer, TypeOfSubcontractor}
 import org.scalatest.Inside.inside
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers

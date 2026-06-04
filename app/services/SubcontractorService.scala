@@ -17,9 +17,8 @@
 package services
 
 import connectors.ConstructionIndustrySchemeConnector
-import models.UserAnswers
-import models.add.TypeOfSubcontractor.{Individualorsoletrader, Limitedcompany, Partnership, Trust}
-import models.add.TypeOfSubcontractor
+import models.{TypeOfSubcontractor, UserAnswers}
+import models.TypeOfSubcontractor.{Individualorsoletrader, Limitedcompany, Partnership, Trust}
 import models.contact.ContactOptions
 import models.requests.CreateAndUpdateSubcontractorPayload.{CompanyPayload, IndividualOrSoleTraderPayload, PartnershipPayload, TrustPayload}
 import pages.add.*

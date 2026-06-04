@@ -20,21 +20,24 @@ import controllers.contractordetails.routes
 import models.{CheckMode, UserAnswers}
 import pages.contractordetails.EnterContractorEmailAddressPage
 import play.api.i18n.Messages
-import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
 
 object EnterContractorEmailAddressSummary {
-
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
     answers.get(EnterContractorEmailAddressPage).map { answer =>
+      val isEmpty = answer.trim.isEmpty
       SummaryListRowViewModel(
-        key = "contractordetails.enterContractorEmailAddress.checkYourAnswersLabel",
-        value = ValueViewModel(HtmlFormat.escape(answer).toString),
+        key = messages("contractordetails.enterContractorEmailAddress.checkYourAnswersLabel"),
+        value = ValueViewModel(if (isEmpty) "" else answer),
         actions = Seq(
-          ActionItemViewModel("site.change", routes.EnterContractorEmailAddressController.onPageLoad(CheckMode).url)
-            .withVisuallyHiddenText(messages("contractordetails.enterContractorEmailAddress.change.hidden"))
+          ActionItemViewModel(
+            messages(
+              if (isEmpty) "contractordetails.contractorDetailsCheckAnswers.table.link.addDetails" else "site.change"
+            ),
+            routes.EnterContractorEmailAddressController.onPageLoad(CheckMode).url
+          ).withVisuallyHiddenText(messages("contractordetails.enterContractorEmailAddress.change.hidden"))
             .withAttribute("id" -> "contractor-email-address")
         )
       )

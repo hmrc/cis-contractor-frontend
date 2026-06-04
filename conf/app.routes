@@ -1,37 +1,41 @@
 # Routes
 
 # Infrastructure
-->    /hmrc-frontend  hmrcfrontend.Routes
+->   /subcontractor/hmrc-frontend                    hmrcfrontend.Routes
 
-GET   /subcontractor  controllers.IndexController.onPageLoad()
+GET  /subcontractor                                  controllers.IndexController.onPageLoad()
 
-GET   /subcontractor/assets/*file  controllers.Assets.versioned(path="/public", file: Asset)
+GET  /subcontractor/assets/*file                     controllers.Assets.versioned(path="/public", file: Asset)
 
-GET   /language/:lang  controllers.LanguageSwitchController.switchToLanguage(lang: String)
+GET  /language/:lang                                 controllers.LanguageSwitchController.switchToLanguage(lang: String)
 
-GET   /subcontractor/refresh-session  controllers.KeepAliveController.keepAlive()
+GET  /subcontractor/refresh-session                  controllers.KeepAliveController.keepAlive()
 
-GET   /subcontractor/there-is-a-problem  controllers.JourneyRecoveryController.onPageLoad(continueUrl: Option[RedirectUrl] ?= None)
+GET  /subcontractor/there-is-a-problem               controllers.JourneyRecoveryController.onPageLoad(continueUrl: Option[RedirectUrl] ?= None)
 
-GET   /subcontractor/account/sign-out-survey  controllers.auth.AuthController.signOut()
-GET   /subcontractor/account/sign-out         controllers.auth.AuthController.signOutNoSurvey()
+GET  /subcontractor/account/sign-out-survey          controllers.auth.AuthController.signOut()
+GET  /subcontractor/account/sign-out                 controllers.auth.AuthController.signOutNoSurvey()
 
-GET   /subcontractor/account/signed-out  controllers.auth.SignedOutController.onPageLoad()
+GET  /subcontractor/account/signed-out               controllers.auth.SignedOutController.onPageLoad()
 
-GET   /subcontractor/unauthorised  controllers.UnauthorisedController.onPageLoad()
+GET  /subcontractor/unauthorised                     controllers.UnauthorisedController.onPageLoad()
 
-GET   /subcontractor/unauthorised/organisation  controllers.UnauthorisedOrganisationAffinityController.onPageLoad()
+GET  /subcontractor/unauthorised/organisation        controllers.UnauthorisedOrganisationAffinityController.onPageLoad()
 
-GET   /subcontractor/unauthorised/individual  controllers.UnauthorisedIndividualAffinityController.onPageLoad()
+GET  /subcontractor/unauthorised/individual          controllers.UnauthorisedIndividualAffinityController.onPageLoad()
 
-GET   /subcontractor/unauthorised/agent  controllers.UnauthorisedAgentAffinityController.onPageLoad()
+GET  /subcontractor/unauthorised/agent               controllers.UnauthorisedAgentAffinityController.onPageLoad()
 
-GET   /subcontractor/page-not-found  controllers.PageNotFoundController.onPageLoad()
+GET  /subcontractor/page-not-found                   controllers.PageNotFoundController.onPageLoad()
 
-GET   /subcontractor/access-denied  controllers.AccessDeniedController.onPageLoad()
+GET  /subcontractor/access-denied                    controllers.AccessDeniedController.onPageLoad()
 
-GET   /subcontractor/system-error/there-is-a-problem  controllers.SystemErrorController.onPageLoad()
+GET  /subcontractor/system-error/there-is-a-problem  controllers.SystemErrorController.onPageLoad()
 
+# Errors & Auth
+GET  /unauthorised/standard-user  controllers.UnauthorisedWrongRoleController.onPageLoad()
+
+# Individual
 GET   /subcontractor/add/check-your-answers  controllers.add.CheckYourAnswersController.onPageLoad()
 POST  /subcontractor/add/check-your-answers  controllers.add.CheckYourAnswersController.onSubmit()
 
@@ -115,15 +119,11 @@ POST  /subcontractor/add/check-contact-details         controllers.add.Individua
 GET   /subcontractor/add/change-check-contact-details  controllers.add.IndividualChooseContactDetailsController.onPageLoad(mode: Mode = CheckMode)
 POST  /subcontractor/add/change-check-contact-details  controllers.add.IndividualChooseContactDetailsController.onSubmit(mode: Mode = CheckMode)
 
-GET   /subcontractor/add/individual/subcontractor-added   controllers.add.SubcontractorAddedController.individualSubcontractorAdded()
-GET   /subcontractor/add/company/subcontractor-added      controllers.add.SubcontractorAddedController.companySubcontractorAdded()
-GET   /subcontractor/add/partnership/subcontractor-added  controllers.add.SubcontractorAddedController.partnershipSubcontractorAdded()
-GET   /subcontractor/add/trust/subcontractor-added        controllers.add.SubcontractorAddedController.trustSubcontractorAdded()
-
-# Errors & Auth
-GET  /unauthorised/standard-user  controllers.UnauthorisedWrongRoleController.onPageLoad()
+GET   /subcontractor/add/individual/subcontractor-added  controllers.add.SubcontractorAddedController.individualSubcontractorAdded()
 
 # Company
+GET   /subcontractor/add/company/subcontractor-added  controllers.add.SubcontractorAddedController.companySubcontractorAdded()
+
 GET   /subcontractor/add/company/company-name         controllers.add.company.CompanyNameController.onPageLoad(mode: Mode = NormalMode)
 POST  /subcontractor/add/company/company-name         controllers.add.company.CompanyNameController.onSubmit(mode: Mode = NormalMode)
 GET   /subcontractor/add/company/change-company-name  controllers.add.company.CompanyNameController.onPageLoad(mode: Mode = CheckMode)
@@ -193,6 +193,8 @@ GET   /subcontractor/add/company/check-your-answers  controllers.add.company.Com
 POST  /subcontractor/add/company/check-your-answers  controllers.add.company.CompanyCheckYourAnswersController.onSubmit()
 
 # Partnership
+GET   /subcontractor/add/partnership/subcontractor-added  controllers.add.SubcontractorAddedController.partnershipSubcontractorAdded()
+
 GET   /subcontractor/add/partnership/partnership-name         controllers.add.partnership.PartnershipNameController.onPageLoad(mode: Mode = NormalMode)
 POST  /subcontractor/add/partnership/partnership-name         controllers.add.partnership.PartnershipNameController.onSubmit(mode: Mode = NormalMode)
 GET   /subcontractor/add/partnership/change-partnership-name  controllers.add.partnership.PartnershipNameController.onPageLoad(mode: Mode = CheckMode)
@@ -287,6 +289,8 @@ GET   /subcontractor/add/partnership/change-mobile-number  controllers.add.partn
 POST  /subcontractor/add/partnership/change-mobile-number  controllers.add.partnership.PartnershipMobileNumberController.onSubmit(mode: Mode = CheckMode)
 
 # Trust
+GET   /subcontractor/add/trust/subcontractor-added               controllers.add.SubcontractorAddedController.trustSubcontractorAdded()
+
 GET   /subcontractor/add/trust/trust-name                        controllers.add.trust.TrustNameController.onPageLoad(mode: Mode = NormalMode)
 POST  /subcontractor/add/trust/trust-name                        controllers.add.trust.TrustNameController.onSubmit(mode: Mode = NormalMode)
 GET   /subcontractor/add/trust/change-trust-name                 controllers.add.trust.TrustNameController.onPageLoad(mode: Mode = CheckMode)
@@ -358,6 +362,8 @@ GET   /subcontractor/verify/submitting-verification-request  controllers.verify.
 
 GET   /subcontractor/verify/no-subcontractors-added  controllers.verify.NoSubcontractorsAddedController.onPageLoad()
 
+GET   /subcontractor/verify/check-verification-batch-readiness  controllers.verify.CheckVerificationBatchReadinessController.checkVerificationBatchReadiness(mode: Mode = NormalMode)
+
 GET   /subcontractor/verify/newest  controllers.verify.NewestVerificationBatchController.onPageLoad()
 
 GET   /subcontractor/verify/current  controllers.verify.CurrentVerificationBatchController.onPageLoad()
@@ -418,23 +424,24 @@ GET   /verify/verification-status/reverification-decision                control
 GET   /verify/verification-status/select-subcontractors                  controllers.verify.VerificationStatusController.goToSelectSubcontractorsToReverify(mode: Mode = NormalMode)
 
 # Contractor Details
-GET   /contractor-details/introduction                              controllers.contractordetails.ContractorDetailsController.onPageLoad()
-POST  /contractor-details/introduction                              controllers.contractordetails.ContractorDetailsController.onSubmit()
+GET   /contractor-details/introduction  controllers.contractordetails.ContractorDetailsController.onPageLoad()
+POST  /contractor-details/introduction  controllers.contractordetails.ContractorDetailsController.onSubmit()
 
-GET   /contractor-details/what-is-contractors-scheme-name         controllers.contractordetails.SchemeNameController.onPageLoad(mode: Mode = NormalMode)
-POST  /contractor-details/what-is-contractors-scheme-name         controllers.contractordetails.SchemeNameController.onSubmit(mode: Mode = NormalMode)
-GET   /contractor-details/change-what-is-contractors-scheme-name  controllers.contractordetails.SchemeNameController.onPageLoad(mode: Mode = CheckMode)
-POST  /contractor-details/change-what-is-contractors-scheme-name  controllers.contractordetails.SchemeNameController.onSubmit(mode: Mode = CheckMode)
+GET   /contractor-details/enter-contractor-scheme-name   controllers.contractordetails.SchemeNameController.onPageLoad(mode: Mode = NormalMode)
+POST  /contractor-details/enter-contractor-scheme-name   controllers.contractordetails.SchemeNameController.onSubmit(mode: Mode = NormalMode)
+GET   /contractor-details/change-contractor-scheme-name  controllers.contractordetails.SchemeNameController.onPageLoad(mode: Mode = CheckMode)
+POST  /contractor-details/change-contractor-scheme-name  controllers.contractordetails.SchemeNameController.onSubmit(mode: Mode = CheckMode)
 
-GET   /contractor-details/what-is-contractors-email         controllers.contractordetails.EnterContractorEmailAddressController.onPageLoad(mode: Mode = NormalMode)
-POST  /contractor-details/what-is-contractors-email         controllers.contractordetails.EnterContractorEmailAddressController.onSubmit(mode: Mode = NormalMode)
-GET   /contractor-details/change-what-is-contractors-email  controllers.contractordetails.EnterContractorEmailAddressController.onPageLoad(mode: Mode = CheckMode)
-POST  /contractor-details/change-what-is-contractors-email  controllers.contractordetails.EnterContractorEmailAddressController.onSubmit(mode: Mode = CheckMode)
+GET   /contractor-details/enter-contractor-email-address   controllers.contractordetails.EnterContractorEmailAddressController.onPageLoad(mode: Mode = NormalMode)
+POST  /contractor-details/enter-contractor-email-address   controllers.contractordetails.EnterContractorEmailAddressController.onSubmit(mode: Mode = NormalMode)
+GET   /contractor-details/change-contractor-email-address  controllers.contractordetails.EnterContractorEmailAddressController.onPageLoad(mode: Mode = CheckMode)
+POST  /contractor-details/change-contractor-email-address  controllers.contractordetails.EnterContractorEmailAddressController.onSubmit(mode: Mode = CheckMode)
 
 GET   /contractor-details/contractor-details-updated  controllers.contractordetails.ContractorDetailsUpdatedController.onPageLoad()
 
-GET   /contractor-details/what-is-contractors-utr         controllers.contractordetails.ContractorUtrController.onPageLoad(mode: Mode = NormalMode)
-POST  /contractor-details/what-is-contractors-utr         controllers.contractordetails.ContractorUtrController.onSubmit(mode: Mode = NormalMode)
-GET   /contractor-details/change-what-is-contractors-utr  controllers.contractordetails.ContractorUtrController.onPageLoad(mode: Mode = CheckMode)
-POST  /contractor-details/change-what-is-contractors-utr  controllers.contractordetails.ContractorUtrController.onSubmit(mode: Mode = CheckMode)
+GET   /contractor-details/contractor-details-added  controllers.contractordetails.ContractorDetailsCheckAnswersController.onPageLoad()
 
+GET   /contractor-details/enter-contractor-utr   controllers.contractordetails.ContractorUtrController.onPageLoad(mode: Mode = NormalMode)
+POST  /contractor-details/enter-contractor-utr   controllers.contractordetails.ContractorUtrController.onSubmit(mode: Mode = NormalMode)
+GET   /contractor-details/change-contractor-utr  controllers.contractordetails.ContractorUtrController.onPageLoad(mode: Mode = CheckMode)
+POST  /contractor-details/change-contractor-utr  controllers.contractordetails.ContractorUtrController.onSubmit(mode: Mode = CheckMode)

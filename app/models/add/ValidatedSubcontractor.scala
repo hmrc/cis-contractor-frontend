@@ -18,7 +18,7 @@ package models.add
 
 import models.contact.ContactOptions
 import models.contact.ContactOptions.*
-import models.{InvalidAnswer, MissingAnswer, UserAnswers, Validation, ValidationError}
+import models.{InvalidAnswer, MissingAnswer, TypeOfSubcontractor, UserAnswers, Validation, ValidationError}
 import pages.QuestionPage
 import pages.add.*
 import play.api.libs.json.*

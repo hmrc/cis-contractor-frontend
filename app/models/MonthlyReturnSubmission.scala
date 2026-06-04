@@ -14,21 +14,16 @@
  * limitations under the License.
  */
 
-package models.response
+package models
 
 import play.api.libs.json.{Json, OFormat}
-import models.*
 
-final case class GetNewestVerificationBatchResponse(
-  scheme: Option[ContractorScheme],
-  subcontractors: Seq[Subcontractor],
-  verificationBatch: Option[VerificationBatch],
-  verifications: Seq[Verification],
-  submission: Option[Submission],
-  monthlyReturn: Option[MonthlyReturn],
-  monthlyReturnSubmission: Option[MonthlyReturnSubmission]
+import java.time.LocalDateTime
+
+final case class MonthlyReturnSubmission(
+  submissionId: Long,
+  submissionRequestDate: Option[LocalDateTime]
 )
 
-object GetNewestVerificationBatchResponse {
-  given format: OFormat[GetNewestVerificationBatchResponse] = Json.format[GetNewestVerificationBatchResponse]
-}
+object MonthlyReturnSubmission:
+  given format: OFormat[MonthlyReturnSubmission] = Json.format[MonthlyReturnSubmission]

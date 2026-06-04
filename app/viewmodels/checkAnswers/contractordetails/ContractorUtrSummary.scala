@@ -19,7 +19,6 @@ package viewmodels.checkAnswers.contractordetails
 import models.{CheckMode, UserAnswers}
 import pages.contractordetails.ContractorUtrPage
 import play.api.i18n.Messages
-import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
@@ -28,15 +27,17 @@ object ContractorUtrSummary {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
     answers.get(ContractorUtrPage).map { answer =>
+      val isEmpty = answer.trim.isEmpty
       SummaryListRowViewModel(
-        key = "contractorDetails.contractorUtr.checkYourAnswersLabel",
-        value = ValueViewModel(HtmlFormat.escape(answer).toString),
+        key = messages("contractordetails.contractorUtr.checkYourAnswersLabel"),
+        value = ValueViewModel(if (isEmpty) "" else answer),
         actions = Seq(
           ActionItemViewModel(
-            "site.change",
+            messages(
+              if (isEmpty) "contractordetails.contractorDetailsCheckAnswers.table.link.addDetails" else "site.change"
+            ),
             controllers.contractordetails.routes.ContractorUtrController.onPageLoad(CheckMode).url
-          )
-            .withVisuallyHiddenText(messages("contractorDetails.contractorUtr.change.hidden"))
+          ).withVisuallyHiddenText(messages("contractordetails.contractorUtr.change.hidden"))
             .withAttribute("id" -> "contractor-utr")
         )
       )

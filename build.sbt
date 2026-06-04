@@ -75,15 +75,18 @@ lazy val microservice = (project in file("."))
           primaryCol   = 0,
           secondaryCol = 0,
           dedupeKey    = cols => cols(0),
-          subkeyFn     = cols => {
-            val key      = cols(0)
-            val firstDot = key.indexOf('.')
-            if (firstDot < 0) key
-            else {
-              val prefix    = key.take(firstDot)
-              val secondDot = key.indexOf('.', firstDot + 1)
-              if (prefix == "verify" && secondDot >= 0) key.take(secondDot)
-              else prefix
+          subkeyFn     = {
+            val twoLevelPrefixes = Set("verify", "contractordetails")
+            cols => {
+              val key      = cols(0)
+              val firstDot = key.indexOf('.')
+              if (firstDot < 0) key
+              else {
+                val prefix    = key.take(firstDot)
+                val secondDot = key.indexOf('.', firstDot + 1)
+                if (twoLevelPrefixes.contains(prefix) && secondDot >= 0) key.take(secondDot)
+                else prefix
+              }
             }
           }
         )
@@ -125,18 +128,18 @@ lazy val appRoutesSections = Seq(
     primaryPrefixes = Seq("/there-is-a-problem", "/page-not-found", "/access-denied",
       "/account/", "/unauthorised", "/system-error/")),
   ColumnarSection("# Individual",
-    primaryPrefixes = Seq("/add/")),
+    primaryPrefixes = Seq("/subcontractor/add/")),
   ColumnarSection("# Company",
-    primaryPrefixes   = Seq("/add/company/"),
+    primaryPrefixes   = Seq("/subcontractor/add/company/"),
     secondaryPrefixes = Seq("controllers.add.company.")),
   ColumnarSection("# Partnership",
-    primaryPrefixes   = Seq("/add/partnership/"),
+    primaryPrefixes   = Seq("/subcontractor/add/partnership/"),
     secondaryPrefixes = Seq("controllers.add.partnership.")),
   ColumnarSection("# Trust",
-    primaryPrefixes   = Seq("/add/trust"),
+    primaryPrefixes   = Seq("/subcontractor/add/trust"),
     secondaryPrefixes = Seq("controllers.add.trust.")),
   ColumnarSection("# Verify",
-    primaryPrefixes   = Seq("/verify", "/verification"),
+    primaryPrefixes   = Seq("/subcontractor/verify", "/verification"),
     secondaryPrefixes = Seq("controllers.verify.", "controllers.verification.")),
   ColumnarSection("# Contractor Details",
     primaryPrefixes   = Seq("/contractor-details"),

@@ -14,21 +14,17 @@
  * limitations under the License.
  */
 
-package models.response
+package utils
 
-import play.api.libs.json.{Json, OFormat}
-import models.*
+import config.FrontendAppConfig
+import javax.inject.Inject
+import java.time.LocalDateTime
 
-final case class GetNewestVerificationBatchResponse(
-  scheme: Option[ContractorScheme],
-  subcontractors: Seq[Subcontractor],
-  verificationBatch: Option[VerificationBatch],
-  verifications: Seq[Verification],
-  submission: Option[Submission],
-  monthlyReturn: Option[MonthlyReturn],
-  monthlyReturnSubmission: Option[MonthlyReturnSubmission]
-)
+class SubmissionUtils @Inject() (appConfig: FrontendAppConfig) {
 
-object GetNewestVerificationBatchResponse {
-  given format: OFormat[GetNewestVerificationBatchResponse] = Json.format[GetNewestVerificationBatchResponse]
+  // F14 Submission timeout calculation
+  def calculateTimeoutDateTime(submittedAt: LocalDateTime): LocalDateTime =
+    val timeout = appConfig.submissionPollTimeoutSeconds
+    submittedAt.plusSeconds(timeout)
+
 }

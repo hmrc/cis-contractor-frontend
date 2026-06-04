@@ -89,6 +89,12 @@ final class GetNewestVerificationBatchResponseSpec extends AnyWordSpec with Matc
             monthlyReturnId = 777L,
             decNoMoreSubPayments = Some("N")
           )
+        ),
+        monthlyReturnSubmission = Some(
+          MonthlyReturnSubmission(
+            submissionId = 888L,
+            submissionRequestDate = Some(LocalDateTime.of(2026, 2, 12, 11, 59, 0))
+          )
         )
       )
 
@@ -163,7 +169,8 @@ final class GetNewestVerificationBatchResponseSpec extends AnyWordSpec with Matc
             monthlyReturnId = 777L,
             decNoMoreSubPayments = Some("N")
           )
-        )
+        ),
+        monthlyReturnSubmission = None
       )
 
       val json = Json.toJson(model)

@@ -63,12 +63,12 @@ class NewestVerificationBatchController @Inject() (
         InactivityStatus.Active
 
       case Some(_) =>
-        response.submission match {
+        response.monthlyReturnSubmission match {
           case None =>
             InactivityStatus.MissingData
 
-          case Some(submission) =>
-            submission.submissionRequestDate match {
+          case Some(monthlyReturnSubmission) =>
+            monthlyReturnSubmission.submissionRequestDate match {
               case Some(requestDate) =>
                 val sixMonthsLater = requestDate.plusMonths(InactivityStatus.SixMonths)
                 if (LocalDateTime.now().isBefore(sixMonthsLater)) InactivityStatus.Inactive else InactivityStatus.Active

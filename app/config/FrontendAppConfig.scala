@@ -43,6 +43,8 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
   lazy val hmrcOnlineServiceDeskUrl: String      = configuration.get[String]("urls.hmrcOnlineServiceDesk")
   lazy val cisGeneralEnquiries: String           = configuration.get[String]("urls.cisGeneralEnquiries")
   lazy val payeCisForAgentsOnlineService: String = configuration.get[String]("urls.payeCisForAgentsOnlineService")
+  lazy val cisReturnDashboardUrl: String         = configuration.get[String]("urls.cisReturnDashboard")
+  lazy val findUtr: String                       = configuration.get[String]("urls.findUtr")
 
   private val exitSurveyBaseUrl: String = configuration.get[Service]("microservice.services.feedback-frontend").baseUrl
   lazy val exitSurveyUrl: String        = s"$exitSurveyBaseUrl/feedback/cis-contractor-frontend"
@@ -59,6 +61,8 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
   lazy val countdown: Int = configuration.get[Int]("timeout-dialog.countdown")
 
   lazy val cacheTtl: Long = configuration.get[Int]("mongodb.timeToLiveInSeconds")
+
+  lazy val submissionPollTimeoutSeconds: Int = configuration.get[Int]("submission-poll-timeout-seconds")
 
   lazy val locationCanonicalList: Seq[(String, String)] = {
     val source     = Source.fromResource("location-autocomplete-canonical-list.json")

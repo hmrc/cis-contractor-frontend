@@ -40,7 +40,8 @@ class ContractorEmailConfirmationStoredSummarySpec extends AnyFreeSpec with Matc
       verificationBatch = None,
       verifications = Seq.empty,
       submission = None,
-      monthlyReturn = None
+      monthlyReturn = None,
+      monthlyReturnSubmission = None
     )
 
   "ContractorEmailConfirmationStoredSummary.row" - {

@@ -18,7 +18,8 @@ package services
 
 import base.SpecBase
 import connectors.ConstructionIndustrySchemeConnector
-import models.add.{InternationalAddress, SubcontractorName, TypeOfSubcontractor}
+import models.TypeOfSubcontractor
+import models.add.{InternationalAddress, SubcontractorName}
 import models.contact.ContactOptions
 import pages.add.company._
 import models.requests.CreateAndUpdateSubcontractorPayload

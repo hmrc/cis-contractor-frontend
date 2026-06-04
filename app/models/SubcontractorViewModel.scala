@@ -16,8 +16,7 @@
 
 package models
 
-import models.add.TypeOfSubcontractor
-import models.add.TypeOfSubcontractor.*
+import models.TypeOfSubcontractor.*
 import play.api.libs.json.{Json, OFormat}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.checkboxes.CheckboxItem
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text

@@ -72,7 +72,8 @@ class VerifyCheckYourAnswersControllerSpec extends SpecBase with MockitoSugar {
       verificationBatch = None,
       verifications = Seq.empty,
       submission = None,
-      monthlyReturn = None
+      monthlyReturn = None,
+      monthlyReturnSubmission = None
     )
 
   "VerifyCheckYourAnswersController" - {
@@ -88,6 +89,7 @@ class VerifyCheckYourAnswersControllerSpec extends SpecBase with MockitoSugar {
             .setOrException(ReverifyExistingSubcontractorsYesNoPage, false)
             .setOrException(NewestVerificationBatchResponsePage, batchResponseWithEmail("agent@example.com"))
             .setOrException(ContractorEmailConfirmationStoredPage, CurrentEmail)
+            .setOrException(VerificationBatchReadinessPage, true)
 
           val application = applicationBuilder(userAnswers = Some(ua)).build()
           running(application) {
@@ -102,6 +104,7 @@ class VerifyCheckYourAnswersControllerSpec extends SpecBase with MockitoSugar {
             .setOrException(ReverifyExistingSubcontractorsYesNoPage, false)
             .setOrException(NewestVerificationBatchResponsePage, batchResponseWithEmail("agent@example.com"))
             .setOrException(ContractorEmailConfirmationStoredPage, CurrentEmail)
+            .setOrException(VerificationBatchReadinessPage, true)
 
           val application = applicationBuilder(userAnswers = Some(ua)).build()
           running(application) {
@@ -123,6 +126,7 @@ class VerifyCheckYourAnswersControllerSpec extends SpecBase with MockitoSugar {
             .setOrException(ReverifyExistingSubcontractorsYesNoPage, false)
             .setOrException(NewestVerificationBatchResponsePage, batchResponseWithEmail("agent@example.com"))
             .setOrException(ContractorEmailConfirmationStoredPage, CurrentEmail)
+            .setOrException(VerificationBatchReadinessPage, true)
 
           val application = applicationBuilder(userAnswers = Some(ua)).build()
           running(application) {
@@ -142,6 +146,7 @@ class VerifyCheckYourAnswersControllerSpec extends SpecBase with MockitoSugar {
             .setOrException(ReverifyExistingSubcontractorsYesNoPage, false)
             .setOrException(NewestVerificationBatchResponsePage, batchResponseWithEmail("agent@example.com"))
             .setOrException(ContractorEmailConfirmationStoredPage, CurrentEmail)
+            .setOrException(VerificationBatchReadinessPage, true)
 
           val application = applicationBuilder(userAnswers = Some(ua)).build()
           running(application) {
@@ -162,6 +167,7 @@ class VerifyCheckYourAnswersControllerSpec extends SpecBase with MockitoSugar {
             .setOrException(ReverifyExistingSubcontractorsYesNoPage, false)
             .setOrException(NewestVerificationBatchResponsePage, batchResponseWithEmail("agent@example.com"))
             .setOrException(ContractorEmailConfirmationStoredPage, CurrentEmail)
+            .setOrException(VerificationBatchReadinessPage, true)
 
           val application = applicationBuilder(userAnswers = Some(ua)).build()
           running(application) {
@@ -185,6 +191,7 @@ class VerifyCheckYourAnswersControllerSpec extends SpecBase with MockitoSugar {
             .setOrException(NewestVerificationBatchResponsePage, batchResponseWithEmail("scheme@example.com"))
             .setOrException(ContractorEmailConfirmationStoredPage, DifferentEmail)
             .setOrException(EmailAddressPage, "override@example.com")
+            .setOrException(VerificationBatchReadinessPage, true)
 
           val application = applicationBuilder(userAnswers = Some(ua)).build()
           running(application) {
@@ -214,6 +221,7 @@ class VerifyCheckYourAnswersControllerSpec extends SpecBase with MockitoSugar {
             .setOrException(ReverifyExistingSubcontractorsYesNoPage, false)
             .setOrException(NewestVerificationBatchResponsePage, batchResponseWithEmail("scheme@example.com"))
             .setOrException(ContractorEmailConfirmationStoredPage, DoNotSend)
+            .setOrException(VerificationBatchReadinessPage, true)
 
           val application = applicationBuilder(userAnswers = Some(ua)).build()
           running(application) {
@@ -243,6 +251,7 @@ class VerifyCheckYourAnswersControllerSpec extends SpecBase with MockitoSugar {
               batchResponseWithEmail("agent@example.com", Seq(aSubcontractor))
             )
             .setOrException(ContractorEmailConfirmationStoredPage, CurrentEmail)
+            .setOrException(VerificationBatchReadinessPage, true)
 
           val application = applicationBuilder(userAnswers = Some(ua)).build()
           running(application) {
@@ -277,6 +286,7 @@ class VerifyCheckYourAnswersControllerSpec extends SpecBase with MockitoSugar {
               batchResponseWithEmail("agent@example.com", Seq(aSubcontractor))
             )
             .setOrException(ContractorEmailConfirmationStoredPage, CurrentEmail)
+            .setOrException(VerificationBatchReadinessPage, true)
 
           val application = applicationBuilder(userAnswers = Some(ua)).build()
           running(application) {
@@ -298,6 +308,7 @@ class VerifyCheckYourAnswersControllerSpec extends SpecBase with MockitoSugar {
               batchResponseWithEmail("agent@example.com", Seq(aSubcontractor))
             )
             .setOrException(ContractorEmailConfirmationStoredPage, CurrentEmail)
+            .setOrException(VerificationBatchReadinessPage, true)
 
           val application = applicationBuilder(userAnswers = Some(ua)).build()
           running(application) {
@@ -320,6 +331,7 @@ class VerifyCheckYourAnswersControllerSpec extends SpecBase with MockitoSugar {
             .setOrException(ReverifyExistingSubcontractorsYesNoPage, false)
             .setOrException(NewestVerificationBatchResponsePage, batchResponseWithEmail("agent@example.com"))
             .setOrException(ContractorEmailConfirmationStoredPage, CurrentEmail)
+            .setOrException(VerificationBatchReadinessPage, true)
 
           val application = applicationBuilder(userAnswers = Some(ua)).build()
           running(application) {
@@ -336,6 +348,7 @@ class VerifyCheckYourAnswersControllerSpec extends SpecBase with MockitoSugar {
           .setOrException(SelectSubcontractorPage, Set(brodyMartin, hooperAndAssociates))
           .setOrException(NewestVerificationBatchResponsePage, batchResponseWithEmail("agent@example.com"))
           .setOrException(ContractorEmailConfirmationStoredPage, CurrentEmail)
+          .setOrException(VerificationBatchReadinessPage, true)
 
         val application = applicationBuilder(userAnswers = Some(ua)).build()
         running(application) {
@@ -369,12 +382,12 @@ class VerifyCheckYourAnswersControllerSpec extends SpecBase with MockitoSugar {
 
     "onSubmit" - {
 
-      "must redirect to SubmissionSending when answers are valid" in {
-        val ua =
-          emptyUserAnswers
-            .setOrException(SelectSubcontractorPage, Set(SubcontractorViewModel("1", "Brody, Martin")))
-            .setOrException(ReverifyExistingSubcontractorsYesNoPage, false)
-            .setOrException(ContractorEmailConfirmationStoredPage, DoNotSend)
+      "must redirect to Submission Sending when answers are valid" in {
+        val ua = emptyUserAnswers
+          .setOrException(SelectSubcontractorPage, Set(brodyMartin))
+          .setOrException(ReverifyExistingSubcontractorsYesNoPage, false)
+          .setOrException(ContractorEmailConfirmationStoredPage, DoNotSend)
+          .setOrException(VerificationBatchReadinessPage, true)
 
         val application = applicationBuilder(userAnswers = Some(ua)).build()
 

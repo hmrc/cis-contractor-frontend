@@ -45,7 +45,7 @@ class ContractorUtrSummarySpec extends AnyFreeSpec with Matchers {
 
       val row = maybeRow.value
 
-      val expectedKeyText = messages("contractorDetails.contractorUtr.checkYourAnswersLabel")
+      val expectedKeyText = messages("contractordetails.contractorUtr.checkYourAnswersLabel")
       row.key.content.asHtml.toString should include(expectedKeyText)
 
       row.value.content.asHtml.toString should include("1234567890")
@@ -57,17 +57,48 @@ class ContractorUtrSummarySpec extends AnyFreeSpec with Matchers {
       val changeAction       = actions.head
       val expectedChangeText = messages("site.change")
       val expectedHref       = routes.ContractorUtrController.onPageLoad(CheckMode).url
-      val expectedHiddenText = messages("contractorDetails.contractorUtr.change.hidden")
+      val expectedHiddenText = messages("contractordetails.contractorUtr.change.hidden")
 
-      changeAction.content.asHtml.toString should include(expectedChangeText)
-      changeAction.href                  shouldBe expectedHref
-
+      changeAction.content.asHtml.toString    should include(expectedChangeText)
+      changeAction.href                     shouldBe expectedHref
       changeAction.visuallyHiddenText.value shouldBe expectedHiddenText
     }
 
     "must return None when the answer does not exist" in {
       val answers = UserAnswers("test-id")
       ContractorUtrSummary.row(answers) shouldBe None
+    }
+
+    "must return a SummaryListRow with empty value and Add Details link when the answer is empty" in {
+      val answers =
+        UserAnswers("test-id")
+          .set(ContractorUtrPage, "")
+          .success
+          .value
+
+      val maybeRow = ContractorUtrSummary.row(answers)
+      val row      = maybeRow.value
+
+      val expectedKeyText =
+        messages("contractordetails.contractorUtr.checkYourAnswersLabel")
+      row.key.content.asHtml.toString should include(expectedKeyText)
+
+      row.value.content.asHtml.toString shouldBe ""
+
+      val actions = row.actions.value.items
+      actions should have size 1
+
+      val action = actions.head
+
+      val expectedAddDetailsText = messages("contractordetails.contractorDetailsCheckAnswers.table.link.addDetails")
+
+      action.content.asHtml.toString should include(expectedAddDetailsText)
+
+      val expectedHref = routes.ContractorUtrController.onPageLoad(CheckMode).url
+      action.href shouldBe expectedHref
+
+      val expectedHiddenText = messages("contractordetails.contractorUtr.change.hidden")
+      action.visuallyHiddenText.value shouldBe expectedHiddenText
     }
   }
 }

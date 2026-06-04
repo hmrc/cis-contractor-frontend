@@ -36,7 +36,8 @@ class ValidatedVerifySpec extends SpecBase with Matchers {
       verificationBatch = None,
       verifications = Seq.empty,
       submission = None,
-      monthlyReturn = None
+      monthlyReturn = None,
+      monthlyReturnSubmission = None
     )
 
   private val batchResponseWithoutEmail: GetNewestVerificationBatchResponse =
@@ -46,7 +47,8 @@ class ValidatedVerifySpec extends SpecBase with Matchers {
       verificationBatch = None,
       verifications = Seq.empty,
       submission = None,
-      monthlyReturn = None
+      monthlyReturn = None,
+      monthlyReturnSubmission = None
     )
 
   private val minRequiredLessEmail =
@@ -55,6 +57,9 @@ class ValidatedVerifySpec extends SpecBase with Matchers {
       .success
       .value
       .set(ReverifyExistingSubcontractorsYesNoPage, false)
+      .success
+      .value
+      .set(VerificationBatchReadinessPage, true)
       .success
       .value
 
@@ -180,6 +185,9 @@ class ValidatedVerifySpec extends SpecBase with Matchers {
         .set(ContractorEmailConfirmationStoredPage, ContractorEmailConfirmationStored.DoNotSend)
         .success
         .value
+        .set(VerificationBatchReadinessPage, true)
+        .success
+        .value
 
       ValidatedVerify.build(ua) mustBe Right(
         ValidatedVerify(
@@ -282,6 +290,13 @@ class ValidatedVerifySpec extends SpecBase with Matchers {
 
     "fail when neither email confirmation page is present" in {
       ValidatedVerify.build(minRequiredLessEmail) mustBe Left(MissingAnswer(ContractorEmailConfirmationStoredPage))
+    }
+
+    // ─── Failure: readiness flag ──────────────────────────────────────────────
+
+    "fail when VerificationBatchReadinessPage is absent" in {
+      val ua = minRequired.remove(VerificationBatchReadinessPage).success.value
+      ValidatedVerify.build(ua) mustBe Left(MissingAnswer(VerificationBatchReadinessPage))
     }
   }
 }
