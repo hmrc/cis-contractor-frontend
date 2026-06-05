@@ -18,7 +18,6 @@ package controllers.verify
 
 import controllers.actions.*
 import models.requests.{CreateSubmissionForVerificationRequest, VerificationToUpdate}
-import models.verify.ValidatedVerify
 import pages.verify.CurrentVerificationBatchResponsePage
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -27,6 +26,7 @@ import queries.CisIdQuery
 import services.VerificationService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.verify.SubmissionSendingView
+import utils.VerifyEmailResolver
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -49,37 +49,24 @@ class SubmissionSendingController @Inject() (
 
   def onPageLoad(): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
-      ValidatedVerify.build(request.userAnswers) match {
-        case Left(error) =>
-          logger.error(s"[SubmissionSendingController] Validation failed: $error")
+      buildSubmissionRequest(request.userAnswers) match {
+        case Left(msg) =>
+          logger.error(s"[SubmissionSendingController.onPageLoad] Failed to build submission request: $msg")
           Future.successful(recovery)
 
-        case Right(validated) =>
-          buildSubmissionRequest(request.userAnswers, validated) match {
-            case Left(msg) =>
-              logger.error(s"[SubmissionSendingController] Failed to build submission request: $msg")
-              Future.successful(recovery)
-
-            case Right(submissionReq) =>
-              verificationService
-                .createSubmissionForVerification(submissionReq)
-                .map { _ =>
-                  logger.info(
-                    s"[VerifyCheckYourAnswersController] Successfully created submission for verification, redirecting to submission sending"
-                  )
-                  Ok(view())
-                }
-                .recover { case t =>
-                  logger.error("[SubmissionSendingController] Failed to create submission", t)
-                  recovery
-                }
-          }
+        case Right(submissionReq) =>
+          verificationService
+            .createSubmissionForVerification(submissionReq)
+            .map(_ => Ok(view()))
+            .recover { case t =>
+              logger.error("[SubmissionSendingController.onPageLoad] Failed to create submission", t)
+              recovery
+            }
       }
     }
 
   private def buildSubmissionRequest(
-    ua: models.UserAnswers,
-    validated: ValidatedVerify
+    ua: models.UserAnswers
   ): Either[String, CreateSubmissionForVerificationRequest] =
     for {
       instanceId <- ua.get(CisIdQuery).toRight("CisIdQuery not found")
@@ -89,7 +76,7 @@ class SubmissionSendingController @Inject() (
       batchRef <-
         current.verificationBatch.flatMap(_.verifBatchResourceRef).toRight("verificationBatchResourceRef missing")
 
-      email <- validated.emailToUse.toRight("No email resolved for submission")
+      email <- VerifyEmailResolver.resolvedEmail(ua).toRight("No email resolved for submission")
     } yield {
 
       val verifications: Seq[VerificationToUpdate] =

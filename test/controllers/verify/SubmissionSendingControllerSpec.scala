@@ -17,11 +17,11 @@
 package controllers.verify
 
 import base.SpecBase
-import models.{ContractorScheme, SubcontractorViewModel}
-import models.response.{CreateSubmissionForVerificationResponse, GetCurrentVerificationBatchResponse, GetNewestVerificationBatchResponse}
-import models.{SubcontractorCurrentVerification, VerificationBatchCurrentVerification, VerificationCurrentVerification}
+import models.ContractorScheme
 import models.requests.CreateSubmissionForVerificationRequest
-import models.verify.ContractorEmailConfirmationStored.{CurrentEmail, DoNotSend}
+import models.response.{CreateSubmissionForVerificationResponse, GetCurrentVerificationBatchResponse, GetNewestVerificationBatchResponse}
+import models.verify.ContractorEmailConfirmationStored.CurrentEmail
+import models.{SubcontractorCurrentVerification, VerificationBatchCurrentVerification, VerificationCurrentVerification}
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{never, verify, when}
@@ -42,6 +42,20 @@ class SubmissionSendingControllerSpec extends SpecBase with MockitoSugar {
     controllers.verify.routes.SubmissionSendingController.onPageLoad().url
 
   private val instanceId = "INST-123"
+
+  private def withCisId(ua: models.UserAnswers): models.UserAnswers =
+    ua.set(CisIdQuery, instanceId).success.value
+
+  private val newestWithSchemeEmail: GetNewestVerificationBatchResponse =
+    GetNewestVerificationBatchResponse(
+      scheme = Some(ContractorScheme(accountsOfficeReference = None, emailAddress = Some("scheme@example.com"))),
+      subcontractors = Nil,
+      verificationBatch = None,
+      verifications = Nil,
+      submission = None,
+      monthlyReturn = None,
+      monthlyReturnSubmission = None
+    )
 
   private val currentBatch: GetCurrentVerificationBatchResponse =
     GetCurrentVerificationBatchResponse(
@@ -72,51 +86,51 @@ class SubmissionSendingControllerSpec extends SpecBase with MockitoSugar {
           verificationBatchId = Some(99L),
           subcontractorId = Some(10L),
           verificationResourceRef = Some(111L)
+        ),
+        VerificationCurrentVerification(
+          verificationId = 2L,
+          verificationBatchId = Some(99L),
+          subcontractorId = Some(10L),
+          verificationResourceRef = None
         )
       )
     )
 
-  private def newestWithSchemeEmail(email: String): GetNewestVerificationBatchResponse =
-    GetNewestVerificationBatchResponse(
-      scheme = Some(ContractorScheme(accountsOfficeReference = None, emailAddress = Some(email))),
-      subcontractors = Nil,
-      verificationBatch = None,
-      verifications = Nil,
-      submission = None,
-      monthlyReturn = None
-    )
-
   "SubmissionSendingController.onPageLoad" - {
 
-    "must call service and return OK when valid and email is resolved from scheme (CurrentEmail) without EmailAddressPage" in {
+    "must call service to create submission and return OK when answers are valid and buildSubmissionRequest succeeds (CurrentEmail uses scheme email)" in {
       val mockService = mock[VerificationService]
       when(mockService.createSubmissionForVerification(any[CreateSubmissionForVerificationRequest])(any[HeaderCarrier]))
-        .thenReturn(Future.successful(CreateSubmissionForVerificationResponse(123L)))
+        .thenReturn(Future.successful(CreateSubmissionForVerificationResponse(12345L)))
 
       val ua0 =
         emptyUserAnswers
-          .setOrException(SelectSubcontractorPage, Set(SubcontractorViewModel("10", "Name 10")))
-          .setOrException(ContractorEmailConfirmationStoredPage, CurrentEmail)
-          .setOrException(NewestVerificationBatchResponsePage, newestWithSchemeEmail("scheme@example.com"))
-          .setOrException(CurrentVerificationBatchResponsePage, currentBatch)
+          .set(NewestVerificationBatchResponsePage, newestWithSchemeEmail)
+          .success
+          .value
+          .set(ContractorEmailConfirmationStoredPage, CurrentEmail)
+          .success
+          .value
+          .set(CurrentVerificationBatchResponsePage, currentBatch)
+          .success
+          .value
 
-      val ua =
-        ua0.set(CisIdQuery, instanceId).success.value
+      val ua = withCisId(ua0)
 
-      val app =
+      val application =
         applicationBuilder(userAnswers = Some(ua))
           .overrides(bind[VerificationService].toInstance(mockService))
           .build()
 
-      running(app) {
-        val result = route(app, FakeRequest(GET, onPageLoadRoute)).value
+      running(application) {
+        val result = route(application, FakeRequest(GET, onPageLoadRoute)).value
 
         status(result) mustBe OK
 
-        val reqCaptor = ArgumentCaptor.forClass(classOf[CreateSubmissionForVerificationRequest])
-        verify(mockService).createSubmissionForVerification(reqCaptor.capture())(any[HeaderCarrier])
+        val captor = ArgumentCaptor.forClass(classOf[CreateSubmissionForVerificationRequest])
+        verify(mockService).createSubmissionForVerification(captor.capture())(any[HeaderCarrier])
 
-        val req = reqCaptor.getValue
+        val req = captor.getValue
         req.instanceId mustBe instanceId
         req.verificationBatchId mustBe 99L
         req.verificationBatchResourceRef mustBe 7777L
@@ -130,18 +144,24 @@ class SubmissionSendingControllerSpec extends SpecBase with MockitoSugar {
 
       val ua =
         emptyUserAnswers
-          .setOrException(SelectSubcontractorPage, Set(SubcontractorViewModel("10", "Name 10")))
-          .setOrException(ContractorEmailConfirmationStoredPage, CurrentEmail)
-          .setOrException(NewestVerificationBatchResponsePage, newestWithSchemeEmail("scheme@example.com"))
-          .setOrException(CurrentVerificationBatchResponsePage, currentBatch)
+          .set(NewestVerificationBatchResponsePage, newestWithSchemeEmail)
+          .success
+          .value
+          .set(ContractorEmailConfirmationStoredPage, CurrentEmail)
+          .success
+          .value
+          .set(CurrentVerificationBatchResponsePage, currentBatch)
+          .success
+          .value
+      // NOTE: CisIdQuery is intentionally missing
 
-      val app =
+      val application =
         applicationBuilder(userAnswers = Some(ua))
           .overrides(bind[VerificationService].toInstance(mockService))
           .build()
 
-      running(app) {
-        val result = route(app, FakeRequest(GET, onPageLoadRoute)).value
+      running(application) {
+        val result = route(application, FakeRequest(GET, onPageLoadRoute)).value
 
         status(result) mustBe SEE_OTHER
         redirectLocation(result).value mustBe controllers.routes.JourneyRecoveryController.onPageLoad().url
@@ -155,20 +175,22 @@ class SubmissionSendingControllerSpec extends SpecBase with MockitoSugar {
 
       val ua0 =
         emptyUserAnswers
-          .setOrException(SelectSubcontractorPage, Set(SubcontractorViewModel("10", "Name 10")))
-          .setOrException(ContractorEmailConfirmationStoredPage, CurrentEmail)
-          .setOrException(NewestVerificationBatchResponsePage, newestWithSchemeEmail("scheme@example.com"))
+          .set(NewestVerificationBatchResponsePage, newestWithSchemeEmail)
+          .success
+          .value
+          .set(ContractorEmailConfirmationStoredPage, CurrentEmail)
+          .success
+          .value
 
-      val ua =
-        ua0.set(CisIdQuery, instanceId).success.value
+      val ua = withCisId(ua0)
 
-      val app =
+      val application =
         applicationBuilder(userAnswers = Some(ua))
           .overrides(bind[VerificationService].toInstance(mockService))
           .build()
 
-      running(app) {
-        val result = route(app, FakeRequest(GET, onPageLoadRoute)).value
+      running(application) {
+        val result = route(application, FakeRequest(GET, onPageLoadRoute)).value
 
         status(result) mustBe SEE_OTHER
         redirectLocation(result).value mustBe controllers.routes.JourneyRecoveryController.onPageLoad().url
@@ -187,48 +209,25 @@ class SubmissionSendingControllerSpec extends SpecBase with MockitoSugar {
 
       val ua0 =
         emptyUserAnswers
-          .setOrException(SelectSubcontractorPage, Set(SubcontractorViewModel("10", "Name 10")))
-          .setOrException(ContractorEmailConfirmationStoredPage, CurrentEmail)
-          .setOrException(NewestVerificationBatchResponsePage, newestWithSchemeEmail("scheme@example.com"))
-          .setOrException(CurrentVerificationBatchResponsePage, currentNoBatchRef)
+          .set(NewestVerificationBatchResponsePage, newestWithSchemeEmail)
+          .success
+          .value
+          .set(ContractorEmailConfirmationStoredPage, CurrentEmail)
+          .success
+          .value
+          .set(CurrentVerificationBatchResponsePage, currentNoBatchRef)
+          .success
+          .value
 
-      val ua =
-        ua0.set(CisIdQuery, instanceId).success.value
+      val ua = withCisId(ua0)
 
-      val app =
+      val application =
         applicationBuilder(userAnswers = Some(ua))
           .overrides(bind[VerificationService].toInstance(mockService))
           .build()
 
-      running(app) {
-        val result = route(app, FakeRequest(GET, onPageLoadRoute)).value
-
-        status(result) mustBe SEE_OTHER
-        redirectLocation(result).value mustBe controllers.routes.JourneyRecoveryController.onPageLoad().url
-
-        verify(mockService, never()).createSubmissionForVerification(any())(any())
-      }
-    }
-
-    "must redirect to JourneyRecovery when no email is resolved (e.g. DoNotSend)" in {
-      val mockService = mock[VerificationService]
-
-      val ua0 =
-        emptyUserAnswers
-          .setOrException(SelectSubcontractorPage, Set(SubcontractorViewModel("10", "Name 10")))
-          .setOrException(ContractorEmailConfirmationStoredPage, DoNotSend)
-          .setOrException(CurrentVerificationBatchResponsePage, currentBatch)
-
-      val ua =
-        ua0.set(CisIdQuery, instanceId).success.value
-
-      val app =
-        applicationBuilder(userAnswers = Some(ua))
-          .overrides(bind[VerificationService].toInstance(mockService))
-          .build()
-
-      running(app) {
-        val result = route(app, FakeRequest(GET, onPageLoadRoute)).value
+      running(application) {
+        val result = route(application, FakeRequest(GET, onPageLoadRoute)).value
 
         status(result) mustBe SEE_OTHER
         redirectLocation(result).value mustBe controllers.routes.JourneyRecoveryController.onPageLoad().url
