@@ -18,18 +18,55 @@ package controllers.verify
 
 import base.SpecBase
 import play.api.test.FakeRequest
+import models.{Submission, VerificationBatch}
+import models.response.GetNewestVerificationBatchResponse
+import pages.verify.NewestVerificationBatchResponsePage
 import play.api.test.Helpers.*
 import queries.CisIdQuery
+
+import java.time.LocalDateTime
 
 class VerificationRequestSubmittedControllerSpec extends SpecBase {
 
   private val cisId = "12345"
 
+  private val verificationBatch =
+    VerificationBatch(
+      verificationBatchId = 1L,
+      status = Some("Submitted"),
+      verificationNumber = Some("VB00000001")
+    )
+
+  private val submission =
+    Submission(
+      submissionId = 1L,
+      activeObjectId = Some(1L),
+      submissionRequestDate = Some(LocalDateTime.now()),
+      status = Some("Submitted")
+    )
+
+  private val newestBatchResponse =
+    GetNewestVerificationBatchResponse(
+      scheme = None,
+      subcontractors = Seq.empty,
+      verificationBatch = Some(verificationBatch),
+      verifications = Seq.empty,
+      submission = Some(submission),
+      monthlyReturn = None
+    )
+
   "VerificationRequestSubmitted Controller" - {
 
     "must return OK for a GET" in {
 
-      val ua = emptyUserAnswers.set(CisIdQuery, cisId).success.value
+      val ua =
+        emptyUserAnswers
+          .set(CisIdQuery, cisId)
+          .success
+          .value
+          .set(NewestVerificationBatchResponsePage, newestBatchResponse)
+          .success
+          .value
 
       val application =
         applicationBuilder(userAnswers = Some(ua)).build()
