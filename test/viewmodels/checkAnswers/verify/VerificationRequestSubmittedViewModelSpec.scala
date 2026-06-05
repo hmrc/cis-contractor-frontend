@@ -57,7 +57,8 @@ class VerificationRequestSubmittedViewModelSpec extends SpecBase {
       verificationBatch = Some(verificationBatch),
       verifications = Seq.empty,
       submission = Some(submission),
-      monthlyReturn = None
+      monthlyReturn = None,
+      monthlyReturnSubmission = None
     )
 
   "VerificationRequestSubmittedViewModel" - {
