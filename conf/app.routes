@@ -418,7 +418,7 @@ POST  /subcontractor/verify/verification-batch-create  controllers.verify.Create
 GET   /subcontractor/verify/check-your-answers  controllers.verify.VerifyCheckYourAnswersController.onPageLoad()
 POST  /subcontractor/verify/check-your-answers  controllers.verify.VerifyCheckYourAnswersController.onSubmit()
 
-// for testing purposes, will be deleted after
+# for testing purposes, will be deleted after
 GET  /subcontractor/verify/submission/create   controllers.verify.SubmissionSendingController.onPageLoad()
 GET /subcontractor/verify/verification-batch-create controllers.verify.CreateVerificationBatchAndVerificationsController.onSubmit()
 
