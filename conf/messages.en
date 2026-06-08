@@ -229,7 +229,7 @@ addressOfSubcontractor.error.addressLine4.length                         =  Ente
 
 subcontractorsUniqueTaxpayerReference.title                              =  Self Assessment Unique Taxpayer Reference (UTR)
 subcontractorsUniqueTaxpayerReference.heading                            =  Self Assessment Unique Taxpayer Reference (UTR)
-subcontractorsUniqueTaxpayerReference.p1                                 =  The UTR will be on tax returns and other documents from HMRC. It might be called ‘reference’, ‘UTR’, or ‘official use’.
+subcontractorsUniqueTaxpayerReference.p1                                 =  The UTR will be on tax returns and other documents from HMRC. It might be called ‘reference’, ‘UTR’ or ‘official use’.
 subcontractorsUniqueTaxpayerReference.linkText                           =  Get more help to find a UTR (opens in new tab)
 subcontractorsUniqueTaxpayerReference.label                              =  What is the Self Assessment UTR for {0}?
 subcontractorsUniqueTaxpayerReference.hint                               =  A UTR is a 10 digit number
@@ -326,7 +326,7 @@ partnershipWorksReferenceNumber.change.hidden                        =  works re
 
 partnershipUniqueTaxpayerReference.title                             =  Partnership Unique Taxpayer Reference (UTR)
 partnershipUniqueTaxpayerReference.heading                           =  Partnership Unique Taxpayer Reference (UTR)
-partnershipUniqueTaxpayerReference.paragraph                         =  The UTR will be on tax returns and other documents from HMRC. It might be called ‘reference’, ‘UTR’, or ‘official use’.
+partnershipUniqueTaxpayerReference.paragraph                         =  The UTR will be on tax returns and other documents from HMRC. It might be called ‘reference’, ‘UTR’ or ‘official use’.
 partnershipUniqueTaxpayerReference.linkText                          =  Get more help to find a UTR (opens in new tab)
 partnershipUniqueTaxpayerReference.heading2                          =  What is the UTR for {0}?
 partnershipUniqueTaxpayerReference.hint                              =  A UTR is a 10 digit number
@@ -444,7 +444,7 @@ partnershipNominatedPartnerUtrYesNo.change.hidden                    =  add UTR 
 
 partnershipNominatedPartnerUtr.title                                 =  Nominated partner Self Assessment Unique Taxpayer Reference (UTR)
 partnershipNominatedPartnerUtr.heading                               =  Self Assessment Unique Taxpayer Reference (UTR)
-partnershipNominatedPartnerUtr.paragraph                             =  The UTR will be on tax returns and other documents from HMRC. It might be called ‘reference’, ‘UTR’, or ‘official use’.
+partnershipNominatedPartnerUtr.paragraph                             =  The UTR will be on tax returns and other documents from HMRC. It might be called ‘reference’, ‘UTR’ or ‘official use’.
 partnershipNominatedPartnerUtr.linkText                              =  Get more help to find a UTR (opens in new tab)
 partnershipNominatedPartnerUtr.heading2                              =  What is the Self Assessment UTR for {0}?
 partnershipNominatedPartnerUtr.hint                                  =  A UTR is a 10 digit number
@@ -583,7 +583,7 @@ companyUtrYesNo.change.hidden                                    =  add UTR?
 
 companyUtr.title                                                 =  Corporation Tax Unique Taxpayer Reference (UTR)
 companyUtr.heading                                               =  Corporation Tax Unique Taxpayer Reference (UTR)
-companyUtr.p1                                                    =  The UTR will be on tax returns and other letters about Corporation Tax. It might be called ‘reference’, ‘UTR’, or ‘official use’.
+companyUtr.p1                                                    =  The UTR will be on tax returns and other letters about Corporation Tax. It might be called ‘reference’, ‘UTR’ or ‘official use’.
 companyUtr.label                                                 =  What is the Corporation Tax UTR for {0}?
 companyUtr.hint                                                  =  A Corporation Tax UTR is a 10 digit number
 companyUtr.error.required                                        =  Enter a valid Unique Taxpayer Reference (UTR)

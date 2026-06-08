@@ -38,7 +38,7 @@ case class VerificationRequestSubmittedViewModel(
 object VerificationRequestSubmittedViewModel {
 
   private def namesFrom[A](maybe: Option[Iterable[A]])(name: A => String): Seq[String] =
-    maybe.fold(Seq.empty)(_.map(name).toSeq)
+    maybe.fold(Seq.empty)(_.map(name).toSeq.sortBy(_.toLowerCase))
 
   def fromUserAnswers(
     userAnswers: UserAnswers,
@@ -83,8 +83,8 @@ object VerificationRequestSubmittedViewModel {
       manageSubcontractorsUrl = s"${appConfig.manageSubcontractorsUrl}/$cisId",
       referenceNumber = referenceNumber,
       submittedAt = submittedAt,
-      subcontractorsToVerify = namesFrom(userAnswers.get(SelectSubcontractorPage))(_.name).sorted,
-      subcontractorsToReverify = namesFrom(userAnswers.get(SelectSubcontractorsToReverifyPage))(_.name).sorted,
+      subcontractorsToVerify = namesFrom(userAnswers.get(SelectSubcontractorPage))(_.name),
+      subcontractorsToReverify = namesFrom(userAnswers.get(SelectSubcontractorsToReverifyPage))(_.name),
       confirmationEmail = resolvedEmail(userAnswers)
     )
   }
