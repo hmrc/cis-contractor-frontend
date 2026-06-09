@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package viewmodels.checkAnswers.verify
+package viewmodels.verify
 
 import base.SpecBase
 import models.UserAnswers
@@ -25,6 +25,8 @@ import pages.verify.SelectSubcontractorPage
 import models.{Submission, VerificationBatch}
 import models.response.GetNewestVerificationBatchResponse
 import pages.verify.NewestVerificationBatchResponsePage
+import org.scalatest.freespec.AnyFreeSpec
+import org.scalatest.matchers.should.Matchers
 import queries.CisIdQuery
 
 import java.time.LocalDateTime

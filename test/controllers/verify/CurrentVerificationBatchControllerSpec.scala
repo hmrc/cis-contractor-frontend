@@ -19,10 +19,12 @@ package controllers.verify
 import base.SpecBase
 import controllers.routes
 import models.UserAnswers
-import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{never, verify, verifyNoMoreInteractions, when}
 import org.scalatestplus.mockito.MockitoSugar
+import models.response.GetCurrentVerificationBatchResponse
+import pages.verify.CurrentVerificationBatchResponsePage
+import models.VerificationBatchCurrentVerification
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
@@ -36,7 +38,7 @@ class CurrentVerificationBatchControllerSpec extends SpecBase with MockitoSugar 
 
   "CurrentVerificationBatchController" - {
 
-    "must return OK with confirmation message when refreshCurrentVerificationBatch succeeds" in {
+    "must redirect to JourneyRecovery when CurrentVerificationBatchResponsePage is missing" in {
       val mockService = mock[VerificationService]
 
       when(mockService.getCurrentVerificationBatch(any[UserAnswers])(any[HeaderCarrier]))
@@ -51,15 +53,12 @@ class CurrentVerificationBatchControllerSpec extends SpecBase with MockitoSugar 
         val request = FakeRequest(GET, endpointUrl)
         val result  = route(application, request).value
 
-        status(result) mustEqual OK
-        contentAsString(result) mustBe "current verification batch saved to session"
+        status(result) mustEqual SEE_OTHER
 
-        val uaCaptor = ArgumentCaptor.forClass(classOf[UserAnswers])
-        verify(mockService).getCurrentVerificationBatch(uaCaptor.capture())(any[HeaderCarrier])
+        redirectLocation(result).value mustEqual
+          routes.JourneyRecoveryController.onPageLoad().url
 
-        uaCaptor.getValue.id mustBe emptyUserAnswers.id
-        uaCaptor.getValue.data mustBe emptyUserAnswers.data
-
+        verify(mockService).getCurrentVerificationBatch(any[UserAnswers])(any[HeaderCarrier])
         verifyNoMoreInteractions(mockService)
       }
     }
@@ -104,6 +103,85 @@ class CurrentVerificationBatchControllerSpec extends SpecBase with MockitoSugar 
 
         verify(mockService, never()).getCurrentVerificationBatch(any[UserAnswers])(any[HeaderCarrier])
         verifyNoMoreInteractions(mockService)
+      }
+    }
+
+    "must redirect to ModifyVerificationBatchAndVerificationsController when current batch exists" in {
+      val mockService = mock[VerificationService]
+
+      val response = GetCurrentVerificationBatchResponse(
+        subcontractors = Seq.empty,
+        verificationBatch = Some(
+          VerificationBatchCurrentVerification(
+            verificationBatchId = 1L,
+            verifBatchResourceRef = Some(123L)
+          )
+        ),
+        verifications = Seq.empty
+      )
+
+      val updatedAnswers =
+        emptyUserAnswers.setOrException(
+          CurrentVerificationBatchResponsePage,
+          response
+        )
+
+      when(mockService.getCurrentVerificationBatch(any[UserAnswers])(any[HeaderCarrier]))
+        .thenReturn(Future.successful(updatedAnswers))
+
+      val application =
+        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          .overrides(bind[VerificationService].toInstance(mockService))
+          .build()
+
+      running(application) {
+        val request = FakeRequest(GET, endpointUrl)
+        val result  = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(result).value mustEqual
+          controllers.verify.routes
+            .ModifyVerificationBatchAndVerificationsController
+            .modifyVerificationBatch()
+            .url
+      }
+    }
+
+    "must redirect to CreateVerificationBatchAndVerificationsController when no current batch exists" in {
+      val mockService = mock[VerificationService]
+
+      val response = GetCurrentVerificationBatchResponse(
+        verificationBatch = None,
+        verifications = Seq.empty,
+        subcontractors = Seq.empty
+      )
+
+      val updatedAnswers =
+        emptyUserAnswers.setOrException(
+          CurrentVerificationBatchResponsePage,
+          response
+        )
+
+      when(mockService.getCurrentVerificationBatch(any[UserAnswers])(any[HeaderCarrier]))
+        .thenReturn(Future.successful(updatedAnswers))
+
+      val application =
+        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          .overrides(bind[VerificationService].toInstance(mockService))
+          .build()
+
+      running(application) {
+        val request = FakeRequest(GET, endpointUrl)
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(result).value mustEqual
+          controllers.verify.routes
+            .CreateVerificationBatchAndVerificationsController
+            .onSubmit()
+            .url
       }
     }
   }

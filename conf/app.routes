@@ -392,6 +392,8 @@ GET   /subcontractor/verify/check-verification-batch-readiness  controllers.veri
 
 GET   /subcontractor/verify/newest  controllers.verify.NewestVerificationBatchController.onPageLoad()
 
+GET   /subcontractor/verify/inactive-scheme-warning/continue      controllers.verify.NewestVerificationBatchController.onContinue
+
 GET   /subcontractor/verify/current  controllers.verify.CurrentVerificationBatchController.onPageLoad()
 
 GET   /subcontractor/verify/verification-request-in-progress  controllers.verify.VerificationRequestInProgressController.onPageLoad()
