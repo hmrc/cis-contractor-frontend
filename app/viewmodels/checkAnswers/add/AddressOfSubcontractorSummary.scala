@@ -19,41 +19,18 @@ package viewmodels.checkAnswers.add
 import models.UserAnswers
 import pages.add.AddressOfSubcontractorPage
 import play.api.i18n.Messages
-import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
-import viewmodels.govuk.summarylist.*
-import viewmodels.implicits.*
 
 object AddressOfSubcontractorSummary {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    val changeRoute = controllers.add.routes.AddressOfSubcontractorController.redirectToAddressLookup(Some("change"))
     answers.get(AddressOfSubcontractorPage).map { answer =>
-
-      val lines: Seq[String] = Seq(
-        answer.addressLine1,
-        answer.addressLine2.getOrElse(""),
-        answer.addressLine3.getOrElse(""),
-        answer.addressLine4.getOrElse(""),
-        answer.postcode.getOrElse(""),
-        answer.country.flatMap(_.name).getOrElse("")
-      )
-
-      val addressHtml: String =
-        lines
-          .filter(_.trim.nonEmpty)
-          .mkString("<br/>")
-
-      SummaryListRowViewModel(
+      AddressSummaryRow.row(
+        address = answer,
         key = "addressOfSubcontractor.checkYourAnswersLabel",
-        value = ValueViewModel(HtmlContent(addressHtml)),
-        actions = Seq(
-          ActionItemViewModel(
-            "site.change",
-            changeRoute.url
-          ).withVisuallyHiddenText(messages("addressOfSubcontractor.change.hidden"))
-            .withAttribute("id" -> "address-of-subcontractor")
-        )
+        changeCall = controllers.add.routes.AddressOfSubcontractorController.redirectToAddressLookup(Some("change")),
+        hiddenTextKey = "addressOfSubcontractor.change.hidden",
+        id = "address-of-subcontractor"
       )
     }
 

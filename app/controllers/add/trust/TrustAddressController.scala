@@ -17,88 +17,48 @@
 package controllers.add.trust
 
 import controllers.actions.*
-import models.Mode
+import controllers.add.AddressLookupJourneyController
+import models.{Mode, UserAnswers}
+import models.address.Address
 import models.address.AddressLookupJourneyIdentifier.trustQuestionsAddress
-import models.address.MandatoryFieldsConfigModel
 import pages.add.trust.{TrustAddressPage, TrustNamePage}
-import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.i18n.MessagesApi
+import play.api.mvc.{Call, MessagesControllerComponents}
+import queries.Settable
 import repositories.SessionRepository
 import services.AddressLookupService
-import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
 import javax.inject.Inject
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
 
 class TrustAddressController @Inject() (
   override val messagesApi: MessagesApi,
-  sessionRepository: SessionRepository,
-  identify: IdentifierAction,
-  getData: DataRetrievalAction,
-  requireData: DataRequiredAction,
-  addressLookupService: AddressLookupService,
+  override protected val sessionRepository: SessionRepository,
+  override protected val identify: IdentifierAction,
+  override protected val getData: DataRetrievalAction,
+  override protected val requireData: DataRequiredAction,
+  override protected val addressLookupService: AddressLookupService,
   val controllerComponents: MessagesControllerComponents
-)(implicit ec: ExecutionContext)
-    extends FrontendBaseController
-    with I18nSupport {
+)(implicit override protected val executionContext: ExecutionContext)
+    extends AddressLookupJourneyController {
 
-  def redirectToAddressLookup(mode: Mode, changeRoute: Option[String] = None): Action[AnyContent] =
-    (identify andThen getData andThen requireData).async { implicit request =>
-      val journeyId     = trustQuestionsAddress
-      val addressConfig = MandatoryFieldsConfigModel(
-        addressLine1 = Some(true),
-        town = Some(true),
-        postcode = Some(true)
-      )
+  override protected def journeyId = trustQuestionsAddress
 
-      sessionRepository.get(request.userAnswers.id).flatMap {
-        case Some(_) =>
-          val callback = if (changeRoute.isDefined) {
-            controllers.add.trust.routes.TrustAddressController.addressLookupCallbackChange()
-          } else {
-            controllers.add.trust.routes.TrustAddressController.addressLookupCallback()
-          }
-          request.userAnswers.get(TrustNamePage) match {
-            case Some(trustName) =>
-              addressLookupService
-                .getJourneyUrl(
-                  journeyId,
-                  callback,
-                  optName = Some(trustName),
-                  mandatoryFieldsConfigModel = addressConfig
-                )
-                .map(Redirect)
-            case None            => Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
-          }
-        case None    =>
-          Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
-      }
-    }
+  override protected def addressPage: Settable[Address] = TrustAddressPage
 
-  def addressLookupCallback(id: String, mode: Mode): Action[AnyContent] =
-    (identify andThen getData andThen requireData).async { implicit request =>
-      for {
-        address <- addressLookupService.getAddressById(id)
-        updated <- addressLookupService.saveAddressDetails(address, TrustAddressPage)
-      } yield
-        if (updated) {
-          Redirect(controllers.add.trust.routes.TrustContactOptionsController.onPageLoad(mode))
-        } else {
-          Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-        }
-    }
+  override protected def subcontractorName(userAnswers: UserAnswers): Option[String] =
+    userAnswers.get(TrustNamePage)
 
-  def addressLookupCallbackChange(id: String, mode: Mode): Action[AnyContent] =
-    (identify andThen getData andThen requireData).async { implicit request =>
-      for {
-        address <- addressLookupService.getAddressById(id)
-        updated <- addressLookupService.saveAddressDetails(address, TrustAddressPage)
-      } yield
-        if (updated) {
-          Redirect(controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad())
-        } else {
-          Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-        }
-    }
+  override protected def standardCallback: Call =
+    routes.TrustAddressController.addressLookupCallback()
+
+  override protected def changeCallback: Call =
+    routes.TrustAddressController.addressLookupCallbackChange()
+
+  override protected def onCompletion(mode: Mode): Call =
+    routes.TrustContactOptionsController.onPageLoad(mode)
+
+  override protected def onChangeCompletion: Call =
+    routes.TrustCheckYourAnswersController.onPageLoad()
 
 }

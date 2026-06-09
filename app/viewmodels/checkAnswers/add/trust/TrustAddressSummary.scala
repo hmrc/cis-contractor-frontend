@@ -19,40 +19,19 @@ package viewmodels.checkAnswers.add.trust
 import models.UserAnswers
 import pages.add.trust.TrustAddressPage
 import play.api.i18n.Messages
-import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
-import viewmodels.govuk.summarylist.*
-import viewmodels.implicits.*
+import viewmodels.checkAnswers.add.AddressSummaryRow
 
 object TrustAddressSummary {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
     answers.get(TrustAddressPage).map { answer =>
-
-      val lines: Seq[String] = Seq(
-        answer.addressLine1,
-        answer.addressLine2.getOrElse(""),
-        answer.addressLine3.getOrElse(""),
-        answer.addressLine4.getOrElse(""),
-        answer.postcode.getOrElse(""),
-        answer.country.flatMap(_.name).getOrElse("")
-      )
-
-      val addressHtml: String =
-        lines
-          .filter(_.trim.nonEmpty)
-          .mkString("<br/>")
-
-      SummaryListRowViewModel(
+      AddressSummaryRow.row(
+        address = answer,
         key = "trustAddress.checkYourAnswersLabel",
-        value = ValueViewModel(HtmlContent(addressHtml)),
-        actions = Seq(
-          ActionItemViewModel(
-            "site.change",
-            controllers.add.trust.routes.TrustAddressController.redirectToAddressLookup(Some("change")).url
-          ).withVisuallyHiddenText(messages("trustAddress.change.hidden"))
-            .withAttribute("id" -> "address-of-trust")
-        )
+        changeCall = controllers.add.trust.routes.TrustAddressController.redirectToAddressLookup(Some("change")),
+        hiddenTextKey = "trustAddress.change.hidden",
+        id = "address-of-trust"
       )
     }
 }

@@ -17,88 +17,48 @@
 package controllers.add.partnership
 
 import controllers.actions.*
-import models.Mode
+import controllers.add.AddressLookupJourneyController
+import models.{Mode, UserAnswers}
+import models.address.Address
 import models.address.AddressLookupJourneyIdentifier.partnershipQuestionsAddress
-import models.address.MandatoryFieldsConfigModel
 import pages.add.partnership.{PartnershipAddressPage, PartnershipNamePage}
-import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.i18n.MessagesApi
+import play.api.mvc.{Call, MessagesControllerComponents}
+import queries.Settable
 import repositories.SessionRepository
 import services.AddressLookupService
-import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
 import javax.inject.Inject
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
 
 class PartnershipAddressController @Inject() (
   override val messagesApi: MessagesApi,
-  sessionRepository: SessionRepository,
-  identify: IdentifierAction,
-  getData: DataRetrievalAction,
-  requireData: DataRequiredAction,
-  addressLookupService: AddressLookupService,
+  override protected val sessionRepository: SessionRepository,
+  override protected val identify: IdentifierAction,
+  override protected val getData: DataRetrievalAction,
+  override protected val requireData: DataRequiredAction,
+  override protected val addressLookupService: AddressLookupService,
   val controllerComponents: MessagesControllerComponents
-)(implicit ec: ExecutionContext)
-    extends FrontendBaseController
-    with I18nSupport {
+)(implicit override protected val executionContext: ExecutionContext)
+    extends AddressLookupJourneyController {
 
-  def redirectToAddressLookup(mode: Mode, changeRoute: Option[String] = None): Action[AnyContent] =
-    (identify andThen getData andThen requireData).async { implicit request =>
-      val journeyId     = partnershipQuestionsAddress
-      val addressConfig = MandatoryFieldsConfigModel(
-        addressLine1 = Some(true),
-        town = Some(true),
-        postcode = Some(true)
-      )
+  override protected def journeyId = partnershipQuestionsAddress
 
-      sessionRepository.get(request.userAnswers.id).flatMap {
-        case Some(_) =>
-          val callback = if (changeRoute.isDefined) {
-            controllers.add.partnership.routes.PartnershipAddressController.addressLookupCallbackChange()
-          } else {
-            controllers.add.partnership.routes.PartnershipAddressController.addressLookupCallback()
-          }
-          request.userAnswers.get(PartnershipNamePage) match {
-            case Some(partnershipName) =>
-              addressLookupService
-                .getJourneyUrl(
-                  journeyId,
-                  callback,
-                  optName = Some(partnershipName),
-                  mandatoryFieldsConfigModel = addressConfig
-                )
-                .map(Redirect)
-            case None                  => Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
-          }
-        case None    =>
-          Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
-      }
-    }
+  override protected def addressPage: Settable[Address] = PartnershipAddressPage
 
-  def addressLookupCallback(id: String, mode: Mode): Action[AnyContent] =
-    (identify andThen getData andThen requireData).async { implicit request =>
-      for {
-        address <- addressLookupService.getAddressById(id)
-        updated <- addressLookupService.saveAddressDetails(address, PartnershipAddressPage)
-      } yield
-        if (updated) {
-          Redirect(controllers.add.partnership.routes.PartnershipChooseContactDetailsController.onPageLoad(mode))
-        } else {
-          Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-        }
-    }
+  override protected def subcontractorName(userAnswers: UserAnswers): Option[String] =
+    userAnswers.get(PartnershipNamePage)
 
-  def addressLookupCallbackChange(id: String, mode: Mode): Action[AnyContent] =
-    (identify andThen getData andThen requireData).async { implicit request =>
-      for {
-        address <- addressLookupService.getAddressById(id)
-        updated <- addressLookupService.saveAddressDetails(address, PartnershipAddressPage)
-      } yield
-        if (updated) {
-          Redirect(controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad())
-        } else {
-          Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-        }
-    }
+  override protected def standardCallback: Call =
+    routes.PartnershipAddressController.addressLookupCallback()
+
+  override protected def changeCallback: Call =
+    routes.PartnershipAddressController.addressLookupCallbackChange()
+
+  override protected def onCompletion(mode: Mode): Call =
+    routes.PartnershipChooseContactDetailsController.onPageLoad(mode)
+
+  override protected def onChangeCompletion: Call =
+    routes.PartnershipCheckYourAnswersController.onPageLoad()
 
 }

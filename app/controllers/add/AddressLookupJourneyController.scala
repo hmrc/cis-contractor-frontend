@@ -1,0 +1,108 @@
+/*
+ * Copyright 2026 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package controllers.add
+
+import controllers.actions.*
+import models.{Mode, UserAnswers}
+import models.address.{Address, AddressLookupJourneyIdentifier, MandatoryFieldsConfigModel}
+import models.requests.DataRequest
+import play.api.i18n.I18nSupport
+import play.api.mvc.{Action, AnyContent, Call, Result}
+import queries.Settable
+import repositories.SessionRepository
+import services.AddressLookupService
+import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+
+import scala.concurrent.{ExecutionContext, Future}
+
+/** Shared behaviour for the Address Lookup Frontend (ALF) journeys. Each subcontractor type
+  * (individual, company, partnership, trust) supplies only the values that differ between
+  * journeys; the redirect-to-ALF and callback handling is implemented once here.
+  */
+trait AddressLookupJourneyController extends FrontendBaseController with I18nSupport {
+
+  protected val sessionRepository: SessionRepository
+  protected val addressLookupService: AddressLookupService
+  protected val identify: IdentifierAction
+  protected val getData: DataRetrievalAction
+  protected val requireData: DataRequiredAction
+  protected implicit val executionContext: ExecutionContext
+
+  /** The ALF journey identifier for this subcontractor type. */
+  protected def journeyId: AddressLookupJourneyIdentifier.Value
+
+  /** The page the confirmed address is persisted to. */
+  protected def addressPage: Settable[Address]
+
+  /** The subcontractor/company/partnership/trust name shown in the ALF page headings. */
+  protected def subcontractorName(userAnswers: UserAnswers): Option[String]
+
+  /** Callback ALF returns to for the standard (non-change) flow. */
+  protected def standardCallback: Call
+
+  /** Callback ALF returns to when amending an existing answer. */
+  protected def changeCallback: Call
+
+  /** Where to go after the address is saved in the standard flow. */
+  protected def onCompletion(mode: Mode): Call
+
+  /** Where to go after the address is saved in the change flow. */
+  protected def onChangeCompletion: Call
+
+  private val mandatoryFields = MandatoryFieldsConfigModel(
+    addressLine1 = Some(true),
+    town = Some(true),
+    postcode = Some(true)
+  )
+
+  private val journeyRecovery: Call = controllers.routes.JourneyRecoveryController.onPageLoad()
+
+  def redirectToAddressLookup(mode: Mode, changeRoute: Option[String] = None): Action[AnyContent] =
+    (identify andThen getData andThen requireData).async { implicit request =>
+      sessionRepository.get(request.userAnswers.id).flatMap {
+        case Some(_) =>
+          val callback = if (changeRoute.isDefined) changeCallback else standardCallback
+          subcontractorName(request.userAnswers) match {
+            case Some(name) =>
+              addressLookupService
+                .getJourneyUrl(journeyId, callback, optName = Some(name), mandatoryFieldsConfigModel = mandatoryFields)
+                .map(Redirect)
+            case None       => Future.successful(Redirect(journeyRecovery))
+          }
+        case None    => Future.successful(Redirect(journeyRecovery))
+      }
+    }
+
+  def addressLookupCallback(id: String, mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData).async { implicit request =>
+      saveAddressAndRedirect(id, onCompletion(mode))
+    }
+
+  def addressLookupCallbackChange(id: String, mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData).async { implicit request =>
+      saveAddressAndRedirect(id, onChangeCompletion)
+    }
+
+  private def saveAddressAndRedirect(id: String, onSuccess: Call)(implicit
+    request: DataRequest[AnyContent]
+  ): Future[Result] =
+    for {
+      address <- addressLookupService.getAddressById(id)
+      updated <- addressLookupService.saveAddressDetails(address, addressPage)
+    } yield if (updated) Redirect(onSuccess) else Redirect(journeyRecovery)
+
+}
