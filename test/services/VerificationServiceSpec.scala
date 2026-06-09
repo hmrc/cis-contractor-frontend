@@ -26,6 +26,8 @@ import models.VerificationBatchCurrentVerification
 import models.VerificationCurrentVerification
 import models.response.CreateVerificationBatchAndVerificationsResponse
 import models.requests.CreateVerificationBatchAndVerificationsRequest
+import models.requests.{CreateSubmissionForVerificationRequest, VerificationToUpdate}
+import models.response.CreateSubmissionForVerificationResponse
 import models.requests.ModifyVerificationsRequest
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
@@ -599,6 +601,76 @@ final class VerificationServiceSpec extends SpecBase with MockitoSugar with Mode
       verify(mockConnector).modifyVerificationBatch(eqTo(req))(any[HeaderCarrier])
       verify(mockConnector, never()).getCurrentVerificationBatch(any[String])(any[HeaderCarrier])
       verify(mockConnector, never()).getNewestVerificationBatch(any[String])(any[HeaderCarrier])
+      verify(mockRepo, never()).set(any[UserAnswers])
+    }
+  }
+
+  "VerificationService.createSubmissionForVerification" - {
+
+    "must call connector and return CreateSubmissionForVerificationResponse" in {
+
+      val mockConnector = mock[ConstructionIndustrySchemeConnector]
+      val mockRepo      = mock[SessionRepository]
+      val service       = new VerificationService(mockConnector, mockRepo)
+
+      val req = CreateSubmissionForVerificationRequest(
+        instanceId = "INST-123",
+        verificationBatchId = 99L,
+        verificationBatchResourceRef = 7777L,
+        emailRecipient = "ops@example.com",
+        irMarkGenerated = None,
+        verifications = Seq(
+          VerificationToUpdate(
+            subcontractorName = "Unknown",
+            verificationResourceRef = 111L,
+            proceedVerification = "Y"
+          )
+        ),
+        agentId = None
+      )
+
+      val expected = CreateSubmissionForVerificationResponse(submissionId = 12345L)
+
+      when(mockConnector.createSubmissionForVerification(eqTo(req))(any[HeaderCarrier]))
+        .thenReturn(Future.successful(expected))
+
+      val result = service.createSubmissionForVerification(req).futureValue
+
+      result mustBe expected
+
+      verify(mockConnector).createSubmissionForVerification(eqTo(req))(any[HeaderCarrier])
+      verifyNoMoreInteractions(mockConnector)
+
+      // service method should not touch session repo
+      verify(mockRepo, never()).set(any[UserAnswers])
+    }
+
+    "must propagate connector failure" in {
+
+      val mockConnector = mock[ConstructionIndustrySchemeConnector]
+      val mockRepo      = mock[SessionRepository]
+      val service       = new VerificationService(mockConnector, mockRepo)
+
+      val req = CreateSubmissionForVerificationRequest(
+        instanceId = "INST-123",
+        verificationBatchId = 99L,
+        verificationBatchResourceRef = 7777L,
+        emailRecipient = "ops@example.com",
+        irMarkGenerated = None,
+        verifications = Seq(
+          VerificationToUpdate("Unknown", 111L, "Y")
+        ),
+        agentId = None
+      )
+
+      when(mockConnector.createSubmissionForVerification(eqTo(req))(any[HeaderCarrier]))
+        .thenReturn(Future.failed(new RuntimeException("boom")))
+
+      val ex = service.createSubmissionForVerification(req).failed.futureValue
+      ex.getMessage must include("boom")
+
+      verify(mockConnector).createSubmissionForVerification(eqTo(req))(any[HeaderCarrier])
+      verifyNoMoreInteractions(mockConnector)
       verify(mockRepo, never()).set(any[UserAnswers])
     }
   }
