@@ -228,7 +228,7 @@ class PartnershipNavigator @Inject() () extends NavigatorForJourney {
   private def navigatorFromPartnershipAddressYesNoPage(mode: Mode)(userAnswers: UserAnswers): Call =
     (userAnswers.get(PartnershipAddressYesNoPage), mode) match {
       case (Some(true), NormalMode) =>
-        controllers.add.partnership.routes.PartnershipAddressController.onPageLoad(NormalMode)
+        controllers.add.partnership.routes.PartnershipAddressController.redirectToAddressLookup()
 
       case (Some(false), NormalMode) =>
         controllers.add.partnership.routes.PartnershipChooseContactDetailsController.onPageLoad(NormalMode)
@@ -237,7 +237,9 @@ class PartnershipNavigator @Inject() () extends NavigatorForJourney {
         userAnswers
           .get(PartnershipAddressPage)
           .fold(
-            controllers.add.partnership.routes.PartnershipAddressController.onPageLoad(CheckMode)
+            controllers.add.partnership.routes.PartnershipAddressController.redirectToAddressLookup(
+              Some(CheckMode.toString)
+            )
           ) { _ =>
             controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
           }

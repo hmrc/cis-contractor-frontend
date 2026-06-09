@@ -233,10 +233,9 @@ POST  /subcontractor/add/partnership/check-address         controllers.add.partn
 GET   /subcontractor/add/partnership/change-check-address  controllers.add.partnership.PartnershipAddressYesNoController.onPageLoad(mode: Mode = CheckMode)
 POST  /subcontractor/add/partnership/change-check-address  controllers.add.partnership.PartnershipAddressYesNoController.onSubmit(mode: Mode = CheckMode)
 
-GET   /subcontractor/add/partnership/address         controllers.add.partnership.PartnershipAddressController.onPageLoad(mode: Mode = NormalMode)
-POST  /subcontractor/add/partnership/address         controllers.add.partnership.PartnershipAddressController.onSubmit(mode: Mode = NormalMode)
-GET   /subcontractor/add/partnership/change-address  controllers.add.partnership.PartnershipAddressController.onPageLoad(mode: Mode = CheckMode)
-POST  /subcontractor/add/partnership/change-address  controllers.add.partnership.PartnershipAddressController.onSubmit(mode: Mode = CheckMode)
+GET   /subcontractor/add/partnership/address                controllers.add.partnership.PartnershipAddressController.redirectToAddressLookup(mode: Mode = NormalMode, changeRoute: Option[String] ?= None)
+GET   /subcontractor/add/partnership/address-return         controllers.add.partnership.PartnershipAddressController.addressLookupCallback(id: String ?= "", mode: Mode = NormalMode)
+GET   /subcontractor/add/partnership/address-return/change  controllers.add.partnership.PartnershipAddressController.addressLookupCallbackChange(id: String ?= "", mode: Mode = NormalMode)
 
 GET   /subcontractor/add/partnership/nominated-partner         controllers.add.partnership.PartnershipNominatedPartnerNameController.onPageLoad(mode: Mode = NormalMode)
 POST  /subcontractor/add/partnership/nominated-partner         controllers.add.partnership.PartnershipNominatedPartnerNameController.onSubmit(mode: Mode = NormalMode)

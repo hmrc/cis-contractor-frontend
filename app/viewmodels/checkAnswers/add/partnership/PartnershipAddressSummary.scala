@@ -16,8 +16,7 @@
 
 package viewmodels.checkAnswers.add.partnership
 
-import models.add.InternationalAddress
-import models.{CheckMode, UserAnswers}
+import models.UserAnswers
 import pages.add.partnership.PartnershipAddressPage
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
@@ -33,10 +32,10 @@ object PartnershipAddressSummary {
       val lines: Seq[String] = Seq(
         answer.addressLine1,
         answer.addressLine2.getOrElse(""),
-        answer.addressLine3,
+        answer.addressLine3.getOrElse(""),
         answer.addressLine4.getOrElse(""),
-        answer.postalCode,
-        answer.country
+        answer.postcode.getOrElse(""),
+        answer.country.flatMap(_.name).getOrElse("")
       )
 
       val addressHtml: String =
@@ -50,7 +49,7 @@ object PartnershipAddressSummary {
         actions = Seq(
           ActionItemViewModel(
             "site.change",
-            controllers.add.partnership.routes.PartnershipAddressController.onPageLoad(CheckMode).url
+            controllers.add.partnership.routes.PartnershipAddressController.redirectToAddressLookup(Some("change")).url
           ).withVisuallyHiddenText(messages("partnershipAddress.change.hidden"))
             .withAttribute("id" -> "address-of-partnership")
         )
