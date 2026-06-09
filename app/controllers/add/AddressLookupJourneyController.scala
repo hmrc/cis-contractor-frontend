@@ -29,9 +29,9 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
 import scala.concurrent.{ExecutionContext, Future}
 
-/** Shared behaviour for the Address Lookup Frontend (ALF) journeys. Each subcontractor type
-  * (individual, company, partnership, trust) supplies only the values that differ between
-  * journeys; the redirect-to-ALF and callback handling is implemented once here.
+/** Shared behaviour for the Address Lookup Frontend (ALF) journeys. Each subcontractor type (individual, company,
+  * partnership, trust) supplies only the values that differ between journeys; the redirect-to-ALF and callback handling
+  * is implemented once here.
   */
 trait AddressLookupJourneyController extends FrontendBaseController with I18nSupport {
 

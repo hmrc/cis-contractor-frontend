@@ -24,9 +24,8 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
 
-/** Builds the Check Your Answers summary row for an ALF [[Address]], shared by every
-  * subcontractor type (individual, company, partnership, trust). Only the message key,
-  * change link, hidden text and row id differ between journeys.
+/** Builds the Check Your Answers summary row for an ALF [[Address]], shared by every subcontractor type (individual,
+  * company, partnership, trust). Only the message key, change link, hidden text and row id differ between journeys.
   */
 object AddressSummaryRow {
 
