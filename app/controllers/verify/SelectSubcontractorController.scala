@@ -22,7 +22,6 @@ import models.{Mode, Subcontractor, SubcontractorViewModel, UserAnswers}
 import navigation.Navigator
 import pages.verify.{NewestVerificationBatchResponsePage, SelectSubcontractorPage, UnverifiedSubcontractorsPage}
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.Logging
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import repositories.SessionRepository
 import services.PaginationService
@@ -45,8 +44,7 @@ class SelectSubcontractorController @Inject() (
   view: SelectSubcontractorView
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
-    with I18nSupport
-    with Logging {
+    with I18nSupport {
 
   private val form = formProvider()
 
