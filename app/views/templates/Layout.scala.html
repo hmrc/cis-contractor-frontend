@@ -27,7 +27,6 @@
    appConfig: FrontendAppConfig,
    hmrcTimeoutDialog: HmrcTimeoutDialog,
    hmrcReportTechnicalIssueHelper: HmrcReportTechnicalIssueHelper,
-   autocompleteJavascript : HmrcAccessibleAutocompleteJavascript,
    hmrcScripts: HmrcScripts,
    stylesheets: Stylesheets,
    alphaBanner: StandardAlphaBanner,
@@ -40,7 +39,6 @@
 
 @scripts = {
   @hmrcScripts()
-  @autocompleteJavascript()
   <script nonce="@CSPNonce">
     window.GOVUKFrontend.initAll();
   </script>

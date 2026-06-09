@@ -18,7 +18,6 @@ package generators
 
 import models.*
 import models.contact.ContactOptions
-import models.add.InternationalAddress
 import models.address.{Address, Country}
 import models.verify.ContractorEmailConfirmationStored
 import models.verify.SelectedSubcontractors
@@ -73,25 +72,6 @@ trait ModelGenerators {
         addressLine5 = addressLine5,
         postcode = postcode,
         country = Some(Country(None, Some(countryName)))
-      )
-    }
-
-  implicit lazy val arbitraryInternationalAddress: Arbitrary[InternationalAddress] =
-    Arbitrary {
-      for {
-        addressLine1 <- genNonEmptyAlphaStr
-        addressLine2 <- Gen.option(Gen.alphaStr)
-        addressLine3 <- genNonEmptyAlphaStr
-        addressLine4 <- Gen.option(Gen.alphaStr)
-        postalCode   <- genNonEmptyAlphaStr
-        country      <- genNonEmptyAlphaStr
-      } yield InternationalAddress(
-        addressLine1 = addressLine1,
-        addressLine2 = addressLine2,
-        addressLine3 = addressLine3,
-        addressLine4 = addressLine4,
-        postalCode = postalCode,
-        country = country
       )
     }
 
