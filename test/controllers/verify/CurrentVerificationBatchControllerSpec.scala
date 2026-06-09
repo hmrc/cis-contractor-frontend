@@ -141,8 +141,7 @@ class CurrentVerificationBatchControllerSpec extends SpecBase with MockitoSugar 
         status(result) mustEqual SEE_OTHER
 
         redirectLocation(result).value mustEqual
-          controllers.verify.routes
-            .ModifyVerificationBatchAndVerificationsController
+          controllers.verify.routes.ModifyVerificationBatchAndVerificationsController
             .modifyVerificationBatch()
             .url
       }
@@ -173,13 +172,12 @@ class CurrentVerificationBatchControllerSpec extends SpecBase with MockitoSugar 
 
       running(application) {
         val request = FakeRequest(GET, endpointUrl)
-        val result = route(application, request).value
+        val result  = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
 
         redirectLocation(result).value mustEqual
-          controllers.verify.routes
-            .CreateVerificationBatchAndVerificationsController
+          controllers.verify.routes.CreateVerificationBatchAndVerificationsController
             .onSubmit()
             .url
       }

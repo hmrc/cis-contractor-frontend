@@ -97,8 +97,12 @@ class CreateVerificationBatchAndVerificationsController @Inject() (
                   selectedSubcontractorIds = selectedIds,
                   actionIndicator = None
                 )
-                .map(_ => Redirect(controllers.verify.routes.CheckVerificationBatchReadinessController
-          .checkVerificationBatchReadiness()))
+                .map(_ =>
+                  Redirect(
+                    controllers.verify.routes.CheckVerificationBatchReadinessController
+                      .checkVerificationBatchReadiness()
+                  )
+                )
                 .recover { case t =>
                   logger.error(
                     "[CreateVerificationBatchAndVerificationsController.onSubmit] Failed to create verification batch/verifications",
