@@ -22,12 +22,14 @@ import models.verify.ContractorEmailConfirmationStored.{CurrentEmail, DifferentE
 import models.verify.SelectedSubcontractors
 import models.{ContractorScheme, Subcontractor, SubcontractorViewModel}
 import models.response.GetNewestVerificationBatchResponse
+
+import org.scalatestplus.mockito.MockitoSugar
 import org.jsoup.Jsoup
 import pages.verify._
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 
-class VerifyCheckYourAnswersControllerSpec extends SpecBase {
+class VerifyCheckYourAnswersControllerSpec extends SpecBase with MockitoSugar {
 
   private lazy val onPageLoadRoute = controllers.verify.routes.VerifyCheckYourAnswersController.onPageLoad().url
   private lazy val onSubmitRoute   = controllers.verify.routes.VerifyCheckYourAnswersController.onSubmit().url
@@ -388,23 +390,23 @@ class VerifyCheckYourAnswersControllerSpec extends SpecBase {
           .setOrException(VerificationBatchReadinessPage, true)
 
         val application = applicationBuilder(userAnswers = Some(ua)).build()
+
         running(application) {
           val result = route(application, FakeRequest(POST, onSubmitRoute)).value
 
-          status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual controllers.verify.routes.SubmissionSendingController
-            .onPageLoad()
-            .url
+          status(result) mustBe SEE_OTHER
+          redirectLocation(result).value mustBe controllers.verify.routes.SubmissionSendingController.onPageLoad().url
         }
       }
 
-      "must redirect to Journey Recovery when answers fail validation" in {
+      "must redirect to JourneyRecovery when answers fail validation" in {
         val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+
         running(application) {
           val result = route(application, FakeRequest(POST, onSubmitRoute)).value
 
-          status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+          status(result) mustBe SEE_OTHER
+          redirectLocation(result).value mustBe controllers.routes.JourneyRecoveryController.onPageLoad().url
         }
       }
     }

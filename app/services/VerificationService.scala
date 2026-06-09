@@ -19,6 +19,8 @@ package services
 import connectors.ConstructionIndustrySchemeConnector
 import models.{Subcontractor, UserAnswers}
 import models.requests.CreateVerificationBatchAndVerificationsRequest
+import models.requests.CreateSubmissionForVerificationRequest
+import models.response.CreateSubmissionForVerificationResponse
 import pages.verify.{CurrentVerificationBatchResponsePage, NewestVerificationBatchResponsePage, UnverifiedSubcontractorsPage}
 import models.requests.ModifyVerificationsRequest
 import queries.CisIdQuery
@@ -133,5 +135,10 @@ class VerificationService @Inject() (
       afterNewest  <- refreshNewestVerificationBatch(afterCurrent)
       _            <- sessionRepository.set(afterNewest)
     } yield afterNewest
+
+  def createSubmissionForVerification(
+    request: CreateSubmissionForVerificationRequest
+  )(implicit hc: HeaderCarrier): Future[CreateSubmissionForVerificationResponse] =
+    cisConnector.createSubmissionForVerification(request)
 
 }
