@@ -698,13 +698,13 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
 
       def baseCompanyAnswers = {
         val companyAddress =
-          InternationalAddress(
+          Address(
             addressLine1 = "c1",
             addressLine2 = Some("c2"),
-            addressLine3 = "London",
+            addressLine3 = Some("London"),
             addressLine4 = Some("Hackney"),
-            postalCode = "E1 6AN",
-            country = "United Kingdom"
+            postcode = Some("E1 6AN"),
+            country = Some(Country(Some("GB"), Some("United Kingdom")))
           )
 
         emptyUserAnswers

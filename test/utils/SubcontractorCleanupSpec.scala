@@ -147,7 +147,7 @@ class SubcontractorCleanupSpec extends SpecBase {
 
       val userAnswers =
         emptyUserAnswers
-          .set(CompanyAddressPage, address)
+          .set(CompanyAddressPage, subcontractorAddress)
           .success
           .value
           .set(CompanyAddressYesNoPage, true)
@@ -399,7 +399,7 @@ class SubcontractorCleanupSpec extends SpecBase {
           .set(WorksReferenceNumberYesNoPage, true)
           .success
           .value
-          .set(CompanyAddressPage, address)
+          .set(CompanyAddressPage, subcontractorAddress)
           .success
           .value
           .set(CompanyAddressYesNoPage, true)

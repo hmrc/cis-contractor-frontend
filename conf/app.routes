@@ -133,10 +133,9 @@ POST  /subcontractor/add/company/check-address         controllers.add.company.C
 GET   /subcontractor/add/company/change-check-address  controllers.add.company.CompanyAddressYesNoController.onPageLoad(mode: Mode = CheckMode)
 POST  /subcontractor/add/company/change-check-address  controllers.add.company.CompanyAddressYesNoController.onSubmit(mode: Mode = CheckMode)
 
-GET   /subcontractor/add/company/address         controllers.add.company.CompanyAddressController.onPageLoad(mode: Mode = NormalMode)
-POST  /subcontractor/add/company/address         controllers.add.company.CompanyAddressController.onSubmit(mode: Mode = NormalMode)
-GET   /subcontractor/add/company/change-address  controllers.add.company.CompanyAddressController.onPageLoad(mode: Mode = CheckMode)
-POST  /subcontractor/add/company/change-address  controllers.add.company.CompanyAddressController.onSubmit(mode: Mode = CheckMode)
+GET   /subcontractor/add/company/address                controllers.add.company.CompanyAddressController.redirectToAddressLookup(mode: Mode = NormalMode, changeRoute: Option[String] ?= None)
+GET   /subcontractor/add/company/address-return         controllers.add.company.CompanyAddressController.addressLookupCallback(id: String ?= "", mode: Mode = NormalMode)
+GET   /subcontractor/add/company/address-return/change  controllers.add.company.CompanyAddressController.addressLookupCallbackChange(id: String ?= "", mode: Mode = NormalMode)
 
 GET   /subcontractor/add/company/choose-contact-details         controllers.add.company.CompanyContactOptionsController.onPageLoad(mode: Mode = NormalMode)
 POST  /subcontractor/add/company/choose-contact-details         controllers.add.company.CompanyContactOptionsController.onSubmit(mode: Mode = NormalMode)

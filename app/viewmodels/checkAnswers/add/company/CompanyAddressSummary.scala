@@ -16,8 +16,7 @@
 
 package viewmodels.checkAnswers.add.company
 
-import models.add.InternationalAddress
-import models.{CheckMode, UserAnswers}
+import models.UserAnswers
 import pages.add.company.CompanyAddressPage
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
@@ -33,10 +32,10 @@ object CompanyAddressSummary {
       val lines: Seq[String] = Seq(
         answer.addressLine1,
         answer.addressLine2.getOrElse(""),
-        answer.addressLine3,
+        answer.addressLine3.getOrElse(""),
         answer.addressLine4.getOrElse(""),
-        answer.postalCode,
-        answer.country
+        answer.postcode.getOrElse(""),
+        answer.country.flatMap(_.name).getOrElse("")
       )
 
       val addressHtml: String =
@@ -50,7 +49,7 @@ object CompanyAddressSummary {
         actions = Seq(
           ActionItemViewModel(
             "site.change",
-            controllers.add.company.routes.CompanyAddressController.onPageLoad(CheckMode).url
+            controllers.add.company.routes.CompanyAddressController.redirectToAddressLookup(Some("change")).url
           )
             .withVisuallyHiddenText(messages("companyAddress.change.hidden"))
             .withAttribute("id" -> "address-of-company")
