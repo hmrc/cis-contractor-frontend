@@ -14,15 +14,17 @@
  * limitations under the License.
  */
 
-package pages.add
+package models.address
 
-import models.address.Address
-import pages.QuestionPage
-import play.api.libs.json.JsPath
+import play.api.libs.json.{Json, Writes}
 
-case object AddressOfSubcontractorPage extends QuestionPage[Address] with IndividualJourney {
+case class AddressLookupConfirmConfigModel(
+  showChangeLinkcontinueUrl: Option[Boolean] = None,
+  showSubHeadingAndInfo: Option[Boolean] = None,
+  showSearchAgainLink: Option[Boolean] = None,
+  showConfirmChangeText: Option[Boolean] = None
+)
 
-  override def path: JsPath = JsPath \ toString
-
-  override def toString: String = "addressOfSubcontractor"
+object AddressLookupConfirmConfigModel {
+  implicit val writes: Writes[AddressLookupConfirmConfigModel] = Json.writes[AddressLookupConfirmConfigModel]
 }

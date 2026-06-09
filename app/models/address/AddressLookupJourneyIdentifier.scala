@@ -14,15 +14,11 @@
  * limitations under the License.
  */
 
-package pages.add
+package models.address
 
-import models.address.Address
-import pages.QuestionPage
-import play.api.libs.json.JsPath
-
-case object AddressOfSubcontractorPage extends QuestionPage[Address] with IndividualJourney {
-
-  override def path: JsPath = JsPath \ toString
-
-  override def toString: String = "addressOfSubcontractor"
+object AddressLookupJourneyIdentifier extends Enumeration {
+  val companyQuestionsAddress: Value     = Value
+  val individualQuestionsAddress: Value  = Value
+  val partnershipQuestionsAddress: Value = Value
+  val trustQuestionsAddress: Value       = Value
 }

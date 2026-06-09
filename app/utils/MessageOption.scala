@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package pages.add
+package utils
 
-import models.address.Address
-import pages.QuestionPage
-import play.api.libs.json.JsPath
+import play.api.i18n.{Lang, MessagesApi}
 
-case object AddressOfSubcontractorPage extends QuestionPage[Address] with IndividualJourney {
+object MessageOption {
+  def apply(key: String, lang: Lang, params: String*)(implicit messagesApi: MessagesApi): Option[String] = {
+    val message       = messagesApi.translate(key, params.toSeq)(lang)
+    val keyNotDefined = message.exists(_.isEmpty)
 
-  override def path: JsPath = JsPath \ toString
-
-  override def toString: String = "addressOfSubcontractor"
+    if (keyNotDefined || message.isEmpty) None else message
+  }
 }

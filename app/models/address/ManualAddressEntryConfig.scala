@@ -14,15 +14,12 @@
  * limitations under the License.
  */
 
-package pages.add
+package models.address
 
-import models.address.Address
-import pages.QuestionPage
-import play.api.libs.json.JsPath
+import play.api.libs.json.{Json, Writes}
 
-case object AddressOfSubcontractorPage extends QuestionPage[Address] with IndividualJourney {
+case class ManualAddressEntryConfig(mandatoryFields: MandatoryFieldsConfigModel, showOrganisationName: Boolean)
 
-  override def path: JsPath = JsPath \ toString
-
-  override def toString: String = "addressOfSubcontractor"
+object ManualAddressEntryConfig {
+  implicit val writes: Writes[ManualAddressEntryConfig] = Json.writes[ManualAddressEntryConfig]
 }

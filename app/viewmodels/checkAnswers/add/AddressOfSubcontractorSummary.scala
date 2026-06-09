@@ -16,8 +16,7 @@
 
 package viewmodels.checkAnswers.add
 
-import models.add.InternationalAddress
-import models.{CheckMode, UserAnswers}
+import models.UserAnswers
 import pages.add.AddressOfSubcontractorPage
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
@@ -28,15 +27,16 @@ import viewmodels.implicits.*
 object AddressOfSubcontractorSummary {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
+    val changeRoute = controllers.add.routes.AddressOfSubcontractorController.redirectToAddressLookup(Some("change"))
     answers.get(AddressOfSubcontractorPage).map { answer =>
 
       val lines: Seq[String] = Seq(
         answer.addressLine1,
         answer.addressLine2.getOrElse(""),
-        answer.addressLine3,
+        answer.addressLine3.getOrElse(""),
         answer.addressLine4.getOrElse(""),
-        answer.postalCode,
-        answer.country
+        answer.postcode.getOrElse(""),
+        answer.country.flatMap(_.name).getOrElse("")
       )
 
       val addressHtml: String =
@@ -50,7 +50,7 @@ object AddressOfSubcontractorSummary {
         actions = Seq(
           ActionItemViewModel(
             "site.change",
-            controllers.add.routes.AddressOfSubcontractorController.onPageLoad(CheckMode).url
+            changeRoute.url
           ).withVisuallyHiddenText(messages("addressOfSubcontractor.change.hidden"))
             .withAttribute("id" -> "address-of-subcontractor")
         )

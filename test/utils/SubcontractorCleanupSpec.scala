@@ -52,6 +52,15 @@ class SubcontractorCleanupSpec extends SpecBase {
     country = "United Kingdom"
   )
 
+  val subcontractorAddress = models.address.Address(
+    addressLine1 = "value 1",
+    addressLine2 = Some("value 2"),
+    addressLine3 = Some("value 3"),
+    addressLine4 = Some("value 4"),
+    postcode = Some("NX1 1AA"),
+    country = Some(models.address.Country(Some("GB"), Some("United Kingdom")))
+  )
+
   val phoneNumber = "01234567"
 
   val subcontractorName = SubcontractorName(
@@ -66,7 +75,7 @@ class SubcontractorCleanupSpec extends SpecBase {
 
       val userAnswers =
         emptyUserAnswers
-          .set(AddressOfSubcontractorPage, address)
+          .set(AddressOfSubcontractorPage, subcontractorAddress)
           .success
           .value
           .set(IndividualChooseContactDetailsPage, ContactOptions.Email)
@@ -345,7 +354,7 @@ class SubcontractorCleanupSpec extends SpecBase {
           .set(TypeOfSubcontractorPage, TypeOfSubcontractor.Individualorsoletrader)
           .success
           .value
-          .set(AddressOfSubcontractorPage, address)
+          .set(AddressOfSubcontractorPage, subcontractorAddress)
           .success
           .value
           .set(IndividualChooseContactDetailsPage, ContactOptions.Email)

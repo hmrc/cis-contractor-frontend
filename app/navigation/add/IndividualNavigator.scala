@@ -108,12 +108,14 @@ class IndividualNavigator @Inject() () extends NavigatorForJourney {
   private def navigatorFromSubAddressYesNoPage(mode: Mode)(ua: UserAnswers): Call =
     (ua.get(SubAddressYesNoPage), mode) match {
       case (Some(true), NormalMode)  =>
-        controllers.add.routes.AddressOfSubcontractorController.onPageLoad(NormalMode)
+        controllers.add.routes.AddressOfSubcontractorController.redirectToAddressLookup()
       case (Some(false), NormalMode) =>
         controllers.add.routes.IndividualChooseContactDetailsController.onPageLoad(NormalMode)
       case (Some(true), CheckMode)   =>
         ua.get(AddressOfSubcontractorPage)
-          .fold(controllers.add.routes.AddressOfSubcontractorController.onPageLoad(CheckMode)) { _ =>
+          .fold(
+            controllers.add.routes.AddressOfSubcontractorController.redirectToAddressLookup(Some(CheckMode.toString))
+          ) { _ =>
             controllers.add.routes.CheckYourAnswersController.onPageLoad()
           }
       case (Some(false), CheckMode)  =>

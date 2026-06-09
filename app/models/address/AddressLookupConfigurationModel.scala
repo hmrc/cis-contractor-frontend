@@ -14,15 +14,16 @@
  * limitations under the License.
  */
 
-package pages.add
+package models.address
 
-import models.address.Address
-import pages.QuestionPage
-import play.api.libs.json.JsPath
+import play.api.libs.json.{Json, Writes}
 
-case object AddressOfSubcontractorPage extends QuestionPage[Address] with IndividualJourney {
+case class AddressLookupConfigurationModel(
+  version: Int,
+  options: AddressLookupOptionsModel,
+  labels: AddressMessageLanguageModel
+)
 
-  override def path: JsPath = JsPath \ toString
-
-  override def toString: String = "addressOfSubcontractor"
+object AddressLookupConfigurationModel {
+  implicit val writes: Writes[AddressLookupConfigurationModel] = Json.writes[AddressLookupConfigurationModel]
 }
