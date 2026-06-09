@@ -142,4 +142,45 @@ class NewestVerificationBatchController @Inject() (
           Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
         }
     }
+
+  def onContinue: Action[AnyContent] =
+      (identify andThen getData andThen requireData).async { implicit request =>
+
+        verificationBatchService
+          .refreshNewestVerificationBatch(request.userAnswers)
+          .map { updatedAnswers =>
+
+            val batch = updatedAnswers.get(NewestVerificationBatchResponsePage)
+            val unverified = updatedAnswers.get(UnverifiedSubcontractorsPage).getOrElse(Seq.empty)
+
+            batch match {
+              case None =>
+                Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+
+              case Some(response) =>
+                checkSubmissionStatus(response) match {
+
+                  case SubmissionStatusCheckResult.ShowPendingVerificationWarning =>
+                    Redirect(
+                      controllers.verify.routes.VerificationRequestInProgressController.onPageLoad()
+                    )
+
+                  case SubmissionStatusCheckResult.Continue if response.subcontractors.isEmpty =>
+                    Redirect(
+                      controllers.verify.routes.NoSubcontractorsAddedController.onPageLoad()
+                    )
+
+                  case SubmissionStatusCheckResult.Continue if unverified.isEmpty =>
+                    Redirect(
+                      controllers.verify.routes.VerifyYourSubcontractorsYesNoController.onPageLoad
+                    )
+
+                  case SubmissionStatusCheckResult.Continue =>
+                    Redirect(
+                      controllers.verify.routes.SelectSubcontractorController.onPageLoad(NormalMode)
+                    )
+                }
+            }
+          }
+      }
 }
