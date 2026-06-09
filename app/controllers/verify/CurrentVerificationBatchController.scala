@@ -45,29 +45,23 @@ class CurrentVerificationBatchController @Inject() (
       verificationBatchService
         .getCurrentVerificationBatch(request.userAnswers)
         .map { updatedAnswers =>
-
           updatedAnswers.get(CurrentVerificationBatchResponsePage) match {
 
             case Some(response)
-              if response.verificationBatch.nonEmpty ||
-                response.verifications.nonEmpty =>
-
+                if response.verificationBatch.nonEmpty ||
+                  response.verifications.nonEmpty =>
               Redirect(
-                controllers.verify.routes
-                  .ModifyVerificationBatchAndVerificationsController
+                controllers.verify.routes.ModifyVerificationBatchAndVerificationsController
                   .modifyVerificationBatch()
               )
 
             case Some(_) =>
-
               Redirect(
-                controllers.verify.routes
-                  .CreateVerificationBatchAndVerificationsController
+                controllers.verify.routes.CreateVerificationBatchAndVerificationsController
                   .onSubmit()
               )
 
             case None =>
-
               Redirect(
                 controllers.routes.JourneyRecoveryController.onPageLoad()
               )
