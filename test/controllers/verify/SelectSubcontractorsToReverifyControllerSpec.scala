@@ -485,7 +485,7 @@ class SelectSubcontractorsToReverifyControllerSpec extends SpecBase with Mockito
         val body = contentAsString(result)
 
         body must include("Doe")
-        body must not include ("Doe Trading")   // confirm surname wins over tradingName
+        body must not include "Doe Trading" // confirm surname wins over tradingName
         body must include("9999999999")
       }
     }
