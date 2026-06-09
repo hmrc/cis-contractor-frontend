@@ -16,18 +16,16 @@
 
 package controllers.add.trust
 
-import config.FrontendAppConfig
 import controllers.actions.*
-import forms.add.trust.TrustAddressFormProvider
 import models.Mode
-import navigation.Navigator
+import models.address.AddressLookupJourneyIdentifier.trustQuestionsAddress
+import models.address.MandatoryFieldsConfigModel
 import pages.add.trust.{TrustAddressPage, TrustNamePage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
+import services.AddressLookupService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import utils.CountryOptions
-import views.html.add.trust.TrustAddressView
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -35,51 +33,72 @@ import scala.concurrent.{ExecutionContext, Future}
 class TrustAddressController @Inject() (
   override val messagesApi: MessagesApi,
   sessionRepository: SessionRepository,
-  navigator: Navigator,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
-  formProvider: TrustAddressFormProvider,
-  countryOptions: CountryOptions,
-  val controllerComponents: MessagesControllerComponents,
-  view: TrustAddressView
-)(implicit ec: ExecutionContext, appConfig: FrontendAppConfig)
+  addressLookupService: AddressLookupService,
+  val controllerComponents: MessagesControllerComponents
+)(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport {
 
-  private val form = formProvider()
+  def redirectToAddressLookup(mode: Mode, changeRoute: Option[String] = None): Action[AnyContent] =
+    (identify andThen getData andThen requireData).async { implicit request =>
+      val journeyId     = trustQuestionsAddress
+      val addressConfig = MandatoryFieldsConfigModel(
+        addressLine1 = Some(true),
+        town = Some(true),
+        postcode = Some(true)
+      )
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
-    request.userAnswers
-      .get(TrustNamePage)
-      .map { trustName =>
-        val preparedForm = request.userAnswers.get(TrustAddressPage) match {
-          case None        => form
-          case Some(value) => form.fill(value)
-        }
-
-        Ok(view(preparedForm, mode, trustName, countryOptions.options()))
+      sessionRepository.get(request.userAnswers.id).flatMap {
+        case Some(_) =>
+          val callback = if (changeRoute.isDefined) {
+            controllers.add.trust.routes.TrustAddressController.addressLookupCallbackChange()
+          } else {
+            controllers.add.trust.routes.TrustAddressController.addressLookupCallback()
+          }
+          request.userAnswers.get(TrustNamePage) match {
+            case Some(trustName) =>
+              addressLookupService
+                .getJourneyUrl(
+                  journeyId,
+                  callback,
+                  optName = Some(trustName),
+                  mandatoryFieldsConfigModel = addressConfig
+                )
+                .map(Redirect)
+            case None            => Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+          }
+        case None    =>
+          Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
       }
-      .getOrElse(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
-  }
+    }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
-    implicit request =>
-      request.userAnswers
-        .get(TrustNamePage)
-        .map { trustName =>
-          form
-            .bindFromRequest()
-            .fold(
-              formWithErrors =>
-                Future.successful(BadRequest(view(formWithErrors, mode, trustName, countryOptions.options()))),
-              value =>
-                for {
-                  updatedAnswers <- Future.fromTry(request.userAnswers.set(TrustAddressPage, value))
-                  _              <- sessionRepository.set(updatedAnswers)
-                } yield Redirect(navigator.nextPage(TrustAddressPage, mode, updatedAnswers))
-            )
+  def addressLookupCallback(id: String, mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData).async { implicit request =>
+      for {
+        address <- addressLookupService.getAddressById(id)
+        updated <- addressLookupService.saveAddressDetails(address, TrustAddressPage)
+      } yield
+        if (updated) {
+          Redirect(controllers.add.trust.routes.TrustContactOptionsController.onPageLoad(mode))
+        } else {
+          Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
         }
-        .getOrElse(Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())))
-  }
+    }
+
+  def addressLookupCallbackChange(id: String, mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData).async { implicit request =>
+      for {
+        address <- addressLookupService.getAddressById(id)
+        updated <- addressLookupService.saveAddressDetails(address, TrustAddressPage)
+      } yield
+        if (updated) {
+          Redirect(controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad())
+        } else {
+          Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+        }
+    }
+
 }

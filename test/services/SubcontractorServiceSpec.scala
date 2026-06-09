@@ -19,7 +19,7 @@ package services
 import base.SpecBase
 import connectors.ConstructionIndustrySchemeConnector
 import models.TypeOfSubcontractor
-import models.add.{InternationalAddress, SubcontractorName}
+import models.add.SubcontractorName
 import models.address.{Address, Country}
 import models.contact.ContactOptions
 import pages.add.company._
@@ -932,13 +932,13 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
 
       def baseTrustAnswers = {
         val trustAddress =
-          InternationalAddress(
+          Address(
             addressLine1 = "t1",
             addressLine2 = Some("t2"),
-            addressLine3 = "London",
+            addressLine3 = Some("London"),
             addressLine4 = Some("Hackney"),
-            postalCode = "N1 5AP",
-            country = "United Kingdom"
+            postcode = Some("N1 5AP"),
+            country = Some(Country(Some("GB"), Some("United Kingdom")))
           )
 
         emptyUserAnswers

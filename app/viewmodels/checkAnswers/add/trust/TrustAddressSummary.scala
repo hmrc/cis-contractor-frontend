@@ -16,7 +16,7 @@
 
 package viewmodels.checkAnswers.add.trust
 
-import models.{CheckMode, UserAnswers}
+import models.UserAnswers
 import pages.add.trust.TrustAddressPage
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
@@ -32,10 +32,10 @@ object TrustAddressSummary {
       val lines: Seq[String] = Seq(
         answer.addressLine1,
         answer.addressLine2.getOrElse(""),
-        answer.addressLine3,
+        answer.addressLine3.getOrElse(""),
         answer.addressLine4.getOrElse(""),
-        answer.postalCode,
-        answer.country
+        answer.postcode.getOrElse(""),
+        answer.country.flatMap(_.name).getOrElse("")
       )
 
       val addressHtml: String =
@@ -49,7 +49,7 @@ object TrustAddressSummary {
         actions = Seq(
           ActionItemViewModel(
             "site.change",
-            controllers.add.trust.routes.TrustAddressController.onPageLoad(CheckMode).url
+            controllers.add.trust.routes.TrustAddressController.redirectToAddressLookup(Some("change")).url
           ).withVisuallyHiddenText(messages("trustAddress.change.hidden"))
             .withAttribute("id" -> "address-of-trust")
         )

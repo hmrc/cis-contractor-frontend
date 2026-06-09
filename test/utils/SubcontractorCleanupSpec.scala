@@ -43,15 +43,6 @@ class SubcontractorCleanupSpec extends SpecBase {
 
   val name = "John"
 
-  val address = InternationalAddress(
-    addressLine1 = "value 1",
-    addressLine2 = Some("value 2"),
-    addressLine3 = "value 3",
-    addressLine4 = Some("value 4"),
-    postalCode = "NX1 1AA",
-    country = "United Kingdom"
-  )
-
   val subcontractorAddress = models.address.Address(
     addressLine1 = "value 1",
     addressLine2 = Some("value 2"),
@@ -295,7 +286,7 @@ class SubcontractorCleanupSpec extends SpecBase {
 
       val userAnswers =
         emptyUserAnswers
-          .set(TrustAddressPage, address)
+          .set(TrustAddressPage, subcontractorAddress)
           .success
           .value
           .set(TrustAddressYesNoPage, true)
@@ -492,7 +483,7 @@ class SubcontractorCleanupSpec extends SpecBase {
           .set(PartnershipWorksReferenceNumberYesNoPage, true)
           .success
           .value
-          .set(TrustAddressPage, address)
+          .set(TrustAddressPage, subcontractorAddress)
           .success
           .value
           .set(TrustAddressYesNoPage, true)

@@ -89,12 +89,14 @@ class TrustNavigator @Inject() () extends NavigatorForJourney {
   private def navigatorFromTrustAddressYesNoPage(mode: Mode)(ua: UserAnswers): Call =
     (ua.get(TrustAddressYesNoPage), mode) match {
       case (Some(true), NormalMode)  =>
-        controllers.add.trust.routes.TrustAddressController.onPageLoad(NormalMode)
+        controllers.add.trust.routes.TrustAddressController.redirectToAddressLookup()
       case (Some(false), NormalMode) =>
         controllers.add.trust.routes.TrustContactOptionsController.onPageLoad(NormalMode)
       case (Some(true), CheckMode)   =>
         ua.get(TrustAddressPage)
-          .fold(controllers.add.trust.routes.TrustAddressController.onPageLoad(CheckMode)) { _ =>
+          .fold(
+            controllers.add.trust.routes.TrustAddressController.redirectToAddressLookup(Some(CheckMode.toString))
+          ) { _ =>
             controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
           }
       case (Some(false), CheckMode)  =>
