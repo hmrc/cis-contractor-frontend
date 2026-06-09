@@ -26,7 +26,11 @@ object ValueViewModelHelper {
     val valueHtml = names match {
       case Seq(single)                   => Some(single)
       case multiple if multiple.size > 1 =>
-        Some(multiple.sorted.mkString("<ul class=\"govuk-list govuk-list--bullet\"><li>", "</li><li>", "</li></ul>"))
+        Some(
+          multiple
+            .sortBy(_.toLowerCase)
+            .mkString("<ul class=\"govuk-list govuk-list--bullet\"><li>", "</li><li>", "</li></ul>")
+        )
       case _                             => None
     }
     valueHtml.map(v => ValueViewModel(HtmlContent(v)))

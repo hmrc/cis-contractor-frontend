@@ -29,7 +29,7 @@ object SelectSubcontractorsToReverifySummary {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
     answers.get(SelectSubcontractorsToReverifyPage).filter(_.nonEmpty).flatMap { selected =>
-      val names = selected.toSeq.sortBy(_.name).map(s => HtmlFormat.escape(s.name).toString)
+      val names = selected.toSeq.map(s => HtmlFormat.escape(s.name).toString)
       ValueViewModelHelper.makeGovukBulletList(names).map { value =>
         SummaryListRowViewModel(
           key = messages("verify.selectSubcontractorsToReverify.checkYourAnswersLabel"),
