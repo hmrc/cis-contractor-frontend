@@ -49,6 +49,8 @@ class VerifyNavigator @Inject() () extends NavigatorForJourney {
     case SelectSubcontractorsToReverifyPage       =>
       userAnswers => navigatorFromSelectSubcontractorsToReverifyPage(NormalMode)(userAnswers)
     case EmailAddressPage                         =>
+      _ => controllers.verify.routes.VerificationDeclarationController.onPageLoad()
+    case VerificationDeclarationPage              =>
       _ => controllers.verify.routes.VerifyCheckYourAnswersController.onPageLoad()
     case _                                        => _ => controllers.routes.JourneyRecoveryController.onPageLoad()
   }
@@ -65,6 +67,8 @@ class VerifyNavigator @Inject() () extends NavigatorForJourney {
     case SelectSubcontractorsToReverifyPage       =>
       userAnswers => navigatorFromSelectSubcontractorsToReverifyPage(CheckMode)(userAnswers)
     case EmailAddressPage                         =>
+      _ => controllers.verify.routes.VerificationDeclarationController.onPageLoad()
+    case VerificationDeclarationPage              =>
       _ => controllers.verify.routes.VerifyCheckYourAnswersController.onPageLoad()
     case _                                        => _ => controllers.routes.JourneyRecoveryController.onPageLoad()
   }
@@ -76,7 +80,7 @@ class VerifyNavigator @Inject() () extends NavigatorForJourney {
         controllers.verify.routes.EmailAddressController.onPageLoad(m)
 
       case (Some(false), _) =>
-        controllers.verify.routes.VerifyCheckYourAnswersController.onPageLoad()
+        controllers.verify.routes.VerificationDeclarationController.onPageLoad()
 
       case _ =>
         controllers.routes.JourneyRecoveryController.onPageLoad()
@@ -107,7 +111,7 @@ class VerifyNavigator @Inject() () extends NavigatorForJourney {
     val _ = ua
     mode match {
       case NormalMode =>
-        controllers.verify.routes.CheckVerificationBatchReadinessController.checkVerificationBatchReadiness()
+        controllers.verify.routes.CurrentVerificationBatchController.onPageLoad()
       case CheckMode  => controllers.verify.routes.VerifyCheckYourAnswersController.onPageLoad()
     }
   }
@@ -115,14 +119,14 @@ class VerifyNavigator @Inject() () extends NavigatorForJourney {
   private def navigatorFromContractorEmailConfirmationStoredPage(mode: Mode)(ua: UserAnswers): Call =
     (ua.get(ContractorEmailConfirmationStoredPage), mode) match {
 
-      case (Some(CurrentEmail), _) =>
-        controllers.verify.routes.VerifyCheckYourAnswersController.onPageLoad()
+      case (Some(CurrentEmail), m) =>
+        controllers.verify.routes.VerificationDeclarationController.onPageLoad()
 
       case (Some(DifferentEmail), m) =>
         controllers.verify.routes.EmailAddressController.onPageLoad(m)
 
-      case (Some(DoNotSend), _) =>
-        controllers.verify.routes.VerifyCheckYourAnswersController.onPageLoad()
+      case (Some(DoNotSend), m) =>
+        controllers.verify.routes.VerificationDeclarationController.onPageLoad()
 
       case _ =>
         controllers.routes.JourneyRecoveryController.onPageLoad()
