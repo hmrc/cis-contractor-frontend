@@ -20,7 +20,7 @@ import pages.behaviours.PageBehaviours
 
 class AddIndividualContactMethodsYesNoPageSpec extends PageBehaviours {
 
-  "SubAddressYesNoPage" - {
+  "AddIndividualContactMethodsYesNoPage" - {
 
     beRetrievable[Boolean](AddIndividualContactMethodsYesNoPage)
 
