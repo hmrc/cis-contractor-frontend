@@ -142,9 +142,9 @@ class VerifyNavigatorSpec extends SpecBase {
 
       "SelectSubcontractorsToReverifyPage" - {
 
-        "must go to CheckVerificationBatchReadinessController in NormalMode" in {
+        "must go to CurrentVerificationBatchController  in NormalMode" in {
           navigator.nextPage(SelectSubcontractorsToReverifyPage, NormalMode, emptyUserAnswers) mustBe
-            controllers.verify.routes.CheckVerificationBatchReadinessController.checkVerificationBatchReadiness()
+            controllers.verify.routes.CurrentVerificationBatchController.onPageLoad()
         }
       }
 

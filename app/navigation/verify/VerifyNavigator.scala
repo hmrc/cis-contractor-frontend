@@ -111,7 +111,7 @@ class VerifyNavigator @Inject() () extends NavigatorForJourney {
     val _ = ua
     mode match {
       case NormalMode =>
-        controllers.verify.routes.CheckVerificationBatchReadinessController.checkVerificationBatchReadiness()
+        controllers.verify.routes.CurrentVerificationBatchController.onPageLoad()
       case CheckMode  => controllers.verify.routes.VerifyCheckYourAnswersController.onPageLoad()
     }
   }
