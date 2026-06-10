@@ -32,7 +32,7 @@ import views.html.add.IndividualContactMethodOptionsView
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class IndividualContactMethodOptionsController @Inject()(
+class IndividualContactMethodOptionsController @Inject() (
   override val messagesApi: MessagesApi,
   sessionRepository: SessionRepository,
   navigator: Navigator,
