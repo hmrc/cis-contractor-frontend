@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,23 +18,15 @@ package pages.add
 
 import pages.behaviours.PageBehaviours
 
-class SubAddressYesNoPageSpec extends PageBehaviours {
+class AddIndividualContactMethodsYesNoPageSpec extends PageBehaviours {
 
   "SubAddressYesNoPage" - {
 
-    beRetrievable[Boolean](SubAddressYesNoPage)
+    beRetrievable[Boolean](AddIndividualContactMethodsYesNoPage)
 
-    beSettable[Boolean](SubAddressYesNoPage)
+    beSettable[Boolean](AddIndividualContactMethodsYesNoPage)
 
-    beRemovable[Boolean](SubAddressYesNoPage)
-
-    "cleanup: must remove TradingNameOfSubcontractor userAnswers when No is selected" in {
-      val userAnswers = emptyUserAnswers.set(TradingNameOfSubcontractorPage, "ABC").success.value
-
-      val updatedUserAnswers = userAnswers.set(SubTradingNameYesNoPage, false).success.value
-
-      updatedUserAnswers.get(TradingNameOfSubcontractorPage) mustBe None
-    }
-
+    beRemovable[Boolean](AddIndividualContactMethodsYesNoPage)
   }
+
 }
