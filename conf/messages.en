@@ -995,3 +995,12 @@ contractordetails.contractorDetailsCheckAnswers.table.email                    =
 contractordetails.contractorDetailsCheckAnswers.table.email.hidden             =  email address
 contractordetails.contractorDetailsCheckAnswers.table.link.addDetails          =  Add details
 contractordetails.contractorDetailsCheckAnswers.returnToCisDashboard.link      =  Return to CIS dashboard
+
+individualContactMethodOptions.title                                =  Which contact details do you want to add for {0}?
+individualContactMethodOptions.heading                              =  Which contact details do you want to add for this subcontractor?
+individualContactMethodOptions.hint                                 =  Contact details are only for your own records
+individualContactMethodOptions.email                                =  Email address
+individualContactMethodOptions.phone                                =  Phone number
+individualContactMethodOptions.mobile                               =  Mobile number
+individualContactMethodOptions.error.required                       =  Select the methods of contact you want to add for this subcontractor
+individualContactMethodOptions.change.hidden                        =  method of contact
