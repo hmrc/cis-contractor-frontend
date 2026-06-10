@@ -301,6 +301,8 @@ individualChooseContactDetails.change.hidden                             =  meth
 addIndividualContactMethodsYesNo.title                                   =  Do you want to add contact details for this subcontractor?
 addIndividualContactMethodsYesNo.heading                                 =  Do you want to add contact details for {0}?
 addIndividualContactMethodsYesNo.error.required                          =  Select yes if you want to add contact details for this subcontractor
+addIndividualContactMethodsYesNo.checkYourAnswersLabel                   =  Add contact details?
+addIndividualContactMethodsYesNo.change.hidden                           =  add contact details?
 
 # Partnership
 partnershipWorksReferenceNumberYesNo.title                           =  Is there a works reference number associated with this partnership?
