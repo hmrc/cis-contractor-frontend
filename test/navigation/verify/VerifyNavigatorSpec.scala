@@ -227,7 +227,6 @@ class VerifyNavigatorSpec extends SpecBase {
           navigator.nextPage(VerifyYourSubcontractorsYesNoPage, NormalMode, ua) mustBe
             controllers.routes.IndexController.onPageLoad()
         }
-
       }
 
       "ContractorEmailConfirmationStoredPage" - {
@@ -446,7 +445,6 @@ class VerifyNavigatorSpec extends SpecBase {
           navigator.nextPage(VerifyYourSubcontractorsYesNoPage, CheckMode, ua) mustBe
             controllers.verify.routes.NoSubcontractorsSelectedWarningController.onPageLoad()
         }
-
       }
 
       "ContractorEmailConfirmationStoredPage" - {
