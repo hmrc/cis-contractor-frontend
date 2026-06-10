@@ -38,7 +38,7 @@ class AddIndividualContactMethodsYesNoViewSpec extends AnyWordSpec with Matchers
       val subcontractorName = "Test Subcontractor"
 
       val html: HtmlFormat.Appendable = view(form, NormalMode, subcontractorName)
-      val doc: Document = org.jsoup.Jsoup.parse(html.toString())
+      val doc: Document               = org.jsoup.Jsoup.parse(html.toString())
       doc.select("title").text() must include(messages("addIndividualContactMethodsYesNo.title"))
 
       val legend: Elements = doc.select("fieldset legend")
@@ -67,7 +67,7 @@ class AddIndividualContactMethodsYesNoViewSpec extends AnyWordSpec with Matchers
         form.withError("value", "addIndividualContactMethodsYesNo.error.required")
 
       val html: HtmlFormat.Appendable = view(errorForm, NormalMode, subcontractorName)
-      val doc: Document = org.jsoup.Jsoup.parse(html.toString())
+      val doc: Document               = org.jsoup.Jsoup.parse(html.toString())
 
       val summary: Elements = doc.select(".govuk-error-summary")
       summary.text() must include(messages("addIndividualContactMethodsYesNo.error.required"))
@@ -75,16 +75,18 @@ class AddIndividualContactMethodsYesNoViewSpec extends AnyWordSpec with Matchers
       val linkHref: String = summary.select("a").attr("href")
       linkHref mustBe "#value_0"
 
-      doc.select(".govuk-error-message").text() must include(messages("addIndividualContactMethodsYesNo.error.required"))
+      doc.select(".govuk-error-message").text() must include(
+        messages("addIndividualContactMethodsYesNo.error.required")
+      )
     }
   }
 
   trait Setup {
-    val formProvider = new AddIndividualContactMethodsYesNoFormProvider()
+    val formProvider        = new AddIndividualContactMethodsYesNoFormProvider()
     val form: Form[Boolean] = formProvider()
 
     implicit val request: Request[_] = FakeRequest()
-    implicit val messages: Messages =
+    implicit val messages: Messages  =
       play.api.i18n.MessagesImpl(
         play.api.i18n.Lang.defaultLang,
         app.injector.instanceOf[play.api.i18n.MessagesApi]
