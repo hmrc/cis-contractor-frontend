@@ -288,6 +288,11 @@ POST  /subcontractor/add/partnership/mobile-number         controllers.add.partn
 GET   /subcontractor/add/partnership/change-mobile-number  controllers.add.partnership.PartnershipMobileNumberController.onPageLoad(mode: Mode = CheckMode)
 POST  /subcontractor/add/partnership/change-mobile-number  controllers.add.partnership.PartnershipMobileNumberController.onSubmit(mode: Mode = CheckMode)
 
+GET   /subcontractor/add/partnership/add-contact-details         controllers.add.partnership.AddPartnershipContactMethodsYesNoController.onPageLoad(mode: Mode = NormalMode)
+POST  /subcontractor/add/partnership/add-contact-details         controllers.add.partnership.AddPartnershipContactMethodsYesNoController.onSubmit(mode: Mode = NormalMode)
+GET   /subcontractor/add/partnership/change-add-contact-details  controllers.add.partnership.AddPartnershipContactMethodsYesNoController.onPageLoad(mode: Mode = CheckMode)
+POST  /subcontractor/add/partnership/change-add-contact-details  controllers.add.partnership.AddPartnershipContactMethodsYesNoController.onSubmit(mode: Mode = CheckMode)
+
 # Trust
 GET   /subcontractor/add/trust/subcontractor-added               controllers.add.SubcontractorAddedController.trustSubcontractorAdded()
 
@@ -418,9 +423,9 @@ POST  /subcontractor/verify/verification-batch-create  controllers.verify.Create
 GET   /subcontractor/verify/check-your-answers  controllers.verify.VerifyCheckYourAnswersController.onPageLoad()
 POST  /subcontractor/verify/check-your-answers  controllers.verify.VerifyCheckYourAnswersController.onSubmit()
 
-# for testing purposes, will be deleted after
-GET  /subcontractor/verify/submission/create   controllers.verify.SubmissionSendingController.onPageLoad()
-GET /subcontractor/verify/verification-batch-create controllers.verify.CreateVerificationBatchAndVerificationsController.onSubmit()
+GET   /subcontractor/verify/submission/create  controllers.verify.SubmissionSendingController.onPageLoad()
+
+GET   /subcontractor/verify/verification-batch-create  controllers.verify.CreateVerificationBatchAndVerificationsController.onSubmit()
 
 GET   /subcontractor/verify/verification-status/reverification-decision  controllers.verify.VerificationStatusController.goToReverificationDecision(mode: Mode = NormalMode)
 GET   /subcontractor/verify/verification-status/select-subcontractors    controllers.verify.VerificationStatusController.goToSelectSubcontractorsToReverify(mode: Mode = NormalMode)
