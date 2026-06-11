@@ -1004,3 +1004,4 @@ individualContactMethodOptions.phone                                =  Phone num
 individualContactMethodOptions.mobile                               =  Mobile number
 individualContactMethodOptions.error.required                       =  Select the methods of contact you want to add for this subcontractor
 individualContactMethodOptions.change.hidden                        =  method of contact
+individualContactMethodOptions.contractorUtr.checkYourAnswersLabel  =  Method of contact

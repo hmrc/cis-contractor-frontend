@@ -18,13 +18,30 @@ package models.add
 
 import models.contact.ContactOptions
 import play.api.i18n.Messages
+import uk.gov.hmrc.govukfrontend.views.viewmodels.checkboxes.CheckboxItem
 import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.RadioItem
+import viewmodels.govuk.checkbox.CheckboxItemViewModel
+import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
 
 type IndividualContactMethodOptions = ContactOptions
 
 object IndividualContactMethodOptions {
   val values: Seq[IndividualContactMethodOptions] = ContactOptions.values
 
-  def options(implicit messages: Messages): Seq[RadioItem] =
+  def options(implicit messages: Messages): Seq[RadioItem] = {
     ContactOptions.options("individualContactMethodOptions")
+  }
+
+  def checkboxItems(
+                     rows: Seq[IndividualContactMethodOptions],
+                     selected: Set[String]
+                   ): Seq[CheckboxItem] =
+    rows.zipWithIndex.map { case (row, index) =>
+      CheckboxItemViewModel(
+        content = Text(row.toString()),
+        fieldId = s"value-$index",
+        index = index,
+        value = "1"
+      )
+    }
 }

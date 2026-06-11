@@ -18,6 +18,7 @@ package controllers.add
 
 import controllers.actions.*
 import forms.add.IndividualContactMethodOptionsFormProvider
+import models.add.IndividualContactMethodOptions
 import models.Mode
 import models.requests.DataRequest
 import navigation.Navigator
@@ -25,9 +26,11 @@ import pages.add.IndividualContactMethodOptionsPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
+import uk.gov.hmrc.govukfrontend.views.viewmodels.checkboxes.CheckboxItem
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.SubcontractorNameExtractor
 import views.html.add.IndividualContactMethodOptionsView
+import services.PaginationService
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -42,23 +45,31 @@ class IndividualContactMethodOptionsController @Inject() (
   formProvider: IndividualContactMethodOptionsFormProvider,
   subcontractorNameExtractor: SubcontractorNameExtractor,
   val controllerComponents: MessagesControllerComponents,
-  view: IndividualContactMethodOptionsView
+  view: IndividualContactMethodOptionsView,
+  paginationService: PaginationService,
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport {
 
   val form = formProvider()
+  val contactMethodOptions = IndividualContactMethodOptions
 
   private def recoveryRedirect = Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
 
   private def preparedForm(implicit request: DataRequest[?]) =
     request.userAnswers.get(IndividualContactMethodOptionsPage).fold(form)(form.fill)
 
+  private def getCheckboxItems () = {
+      paginationService.paginateCheckboxItems(
+        IndividualContactMethodOptions.checkboxItems(contactMethodOptions)
+      )
+  }
+
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
     subcontractorNameExtractor
       .getSubcontractorName(request.userAnswers)
       .fold(recoveryRedirect) { subcontractorName =>
-        Ok(view(preparedForm, mode, subcontractorName))
+        Ok(view(preparedForm, mode, subcontractorName, getCheckboxItems()))
       }
   }
 
