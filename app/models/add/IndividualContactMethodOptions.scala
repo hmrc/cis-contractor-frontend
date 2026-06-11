@@ -28,14 +28,13 @@ type IndividualContactMethodOptions = ContactOptions
 object IndividualContactMethodOptions {
   val values: Seq[IndividualContactMethodOptions] = ContactOptions.values
 
-  def options(implicit messages: Messages): Seq[RadioItem] = {
+  def options(implicit messages: Messages): Seq[RadioItem] =
     ContactOptions.options("individualContactMethodOptions")
-  }
 
   def checkboxItems(
-                     rows: Seq[IndividualContactMethodOptions],
-                     selected: Set[String]
-                   ): Seq[CheckboxItem] =
+    rows: Seq[IndividualContactMethodOptions],
+    selected: Set[String]
+  ): Seq[CheckboxItem] =
     rows.zipWithIndex.map { case (row, index) =>
       CheckboxItemViewModel(
         content = Text(row.toString()),

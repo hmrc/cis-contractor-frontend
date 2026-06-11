@@ -46,12 +46,12 @@ class IndividualContactMethodOptionsController @Inject() (
   subcontractorNameExtractor: SubcontractorNameExtractor,
   val controllerComponents: MessagesControllerComponents,
   view: IndividualContactMethodOptionsView,
-  paginationService: PaginationService,
+  paginationService: PaginationService
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport {
 
-  val form = formProvider()
+  val form                 = formProvider()
   val contactMethodOptions = IndividualContactMethodOptions
 
   private def recoveryRedirect = Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
@@ -59,11 +59,10 @@ class IndividualContactMethodOptionsController @Inject() (
   private def preparedForm(implicit request: DataRequest[?]) =
     request.userAnswers.get(IndividualContactMethodOptionsPage).fold(form)(form.fill)
 
-  private def getCheckboxItems () = {
-      paginationService.paginateCheckboxItems(
-        IndividualContactMethodOptions.checkboxItems(contactMethodOptions)
-      )
-  }
+  private def getCheckboxItems() =
+    paginationService.paginateCheckboxItems(
+      IndividualContactMethodOptions.checkboxItems(contactMethodOptions)
+    )
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
     subcontractorNameExtractor
