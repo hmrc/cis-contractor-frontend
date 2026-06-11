@@ -39,6 +39,7 @@ object AddIndividualContactMethodsYesNoSummary {
             controllers.add.routes.AddIndividualContactMethodsYesNoController.onPageLoad(CheckMode).url
           )
             .withVisuallyHiddenText(messages("addIndividualContactMethodsYesNo.change.hidden"))
+            .withAttribute("id" -> "individual-contact-methods-yes-no")
         )
       )
     }

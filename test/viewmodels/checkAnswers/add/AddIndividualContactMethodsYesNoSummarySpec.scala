@@ -63,6 +63,7 @@ class AddIndividualContactMethodsYesNoSummarySpec extends AnyFreeSpec with Match
       changeAction.content.asHtml.toString    should include(expectedChangeText)
       changeAction.href                     shouldBe expectedHref
       changeAction.visuallyHiddenText.value shouldBe expectedHiddenText
+      changeAction.attributes                 should contain("id" -> "individual-contact-methods-yes-no")
     }
 
     "must return a SummaryListRow with 'No' when the answer is false" in {
