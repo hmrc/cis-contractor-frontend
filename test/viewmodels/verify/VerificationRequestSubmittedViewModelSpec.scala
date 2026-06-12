@@ -25,8 +25,6 @@ import pages.verify.SelectSubcontractorPage
 import models.{Submission, VerificationBatch}
 import models.response.GetNewestVerificationBatchResponse
 import pages.verify.NewestVerificationBatchResponsePage
-import org.scalatest.freespec.AnyFreeSpec
-import org.scalatest.matchers.should.Matchers
 import queries.CisIdQuery
 
 import java.time.LocalDateTime

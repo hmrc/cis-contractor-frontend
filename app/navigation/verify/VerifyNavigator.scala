@@ -171,13 +171,13 @@ class VerifyNavigator @Inject() () extends NavigatorForJourney {
   private def navigatorFromContractorEmailConfirmationStoredPage(mode: Mode)(ua: UserAnswers): Call =
     (ua.get(ContractorEmailConfirmationStoredPage), mode) match {
 
-      case (Some(CurrentEmail), m) =>
+      case (Some(CurrentEmail), _) =>
         controllers.verify.routes.VerificationDeclarationController.onPageLoad()
 
       case (Some(DifferentEmail), m) =>
         controllers.verify.routes.EmailAddressController.onPageLoad(m)
 
-      case (Some(DoNotSend), m) =>
+      case (Some(DoNotSend), _) =>
         controllers.verify.routes.VerificationDeclarationController.onPageLoad()
 
       case _ =>
