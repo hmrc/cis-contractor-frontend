@@ -16,21 +16,25 @@
 
 package controllers.verify
 
+import controllers.AgentClientChecks
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
 import models.NormalMode
+import models.UserAnswers
 import models.verify.VerificationBatchStatus
 import pages.verify.NewestVerificationBatchResponsePage
 import pages.verify.UnverifiedSubcontractorsPage
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import repositories.SessionRepository
+import services.CisManageService
 import services.VerificationService
 import services.SubmissionStatusCheckResult
 import services.CheckLatestSubmissionStatusService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
 import javax.inject.Inject
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 import java.time.LocalDateTime
 
 class NewestVerificationBatchController @Inject() (
@@ -39,10 +43,13 @@ class NewestVerificationBatchController @Inject() (
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   val controllerComponents: MessagesControllerComponents,
-  verificationBatchService: VerificationService
+  verificationBatchService: VerificationService,
+  override protected val cisManagerService: CisManageService,
+  override protected val sessionRepository: SessionRepository
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport
+    with AgentClientChecks
     with Logging {
 
   private sealed trait InactivityStatus
@@ -127,18 +134,25 @@ class NewestVerificationBatchController @Inject() (
     }
 
   def onPageLoad(): Action[AnyContent] =
-    (identify andThen getData andThen requireData).async { implicit request =>
-      verificationBatchService
-        .refreshNewestVerificationBatch(request.userAnswers)
-        .map { updatedAnswers =>
+    (identify andThen getData).async { implicit request =>
+      val userAnswers = request.userAnswers.getOrElse(UserAnswers(request.userId))
 
-          val batch      = updatedAnswers.get(NewestVerificationBatchResponsePage)
-          val unverified = updatedAnswers.get(UnverifiedSubcontractorsPage).getOrElse(Seq.empty)
+      withAgentClientChecks(request.userId, request.isAgent, userAnswers)
+        .flatMap {
+          case Left(redirect)        => Future.successful(redirect)
+          case Right(checkedAnswers) =>
+            verificationBatchService
+              .refreshNewestVerificationBatch(checkedAnswers)
+              .map { updatedAnswers =>
 
-          batch match {
-            case None           => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-            case Some(response) => routeFromResponse(response, unverified)
-          }
+                val batch      = updatedAnswers.get(NewestVerificationBatchResponsePage)
+                val unverified = updatedAnswers.get(UnverifiedSubcontractorsPage).getOrElse(Seq.empty)
+
+                batch match {
+                  case None           => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+                  case Some(response) => routeFromResponse(response, unverified)
+                }
+              }
         }
         .recover { case t =>
           logger.error(
