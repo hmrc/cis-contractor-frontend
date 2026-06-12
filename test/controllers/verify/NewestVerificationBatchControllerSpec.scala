@@ -21,14 +21,18 @@ import controllers.routes
 import models.response.GetNewestVerificationBatchResponse
 import models.{MonthlyReturn, MonthlyReturnSubmission, NormalMode, Subcontractor, Submission, UserAnswers}
 import generators.ModelGenerators
-import org.mockito.ArgumentMatchers.any
+import models.agent.AgentClientData
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{never, verify, verifyNoMoreInteractions, when}
 import org.scalatestplus.mockito.MockitoSugar
 import pages.verify.NewestVerificationBatchResponsePage
 import pages.verify.UnverifiedSubcontractorsPage
 import play.api.inject.bind
+import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
+import repositories.SessionRepository
+import services.CisManageService
 import services.VerificationService
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -80,6 +84,24 @@ class NewestVerificationBatchControllerSpec extends SpecBase with MockitoSugar w
   private val outsideSixMonthsDateTime = LocalDateTime.now().minusMonths(6).minusDays(1)
   private val withinSixMonthsDateTime  = LocalDateTime.now().minusMonths(6).plusDays(1)
 
+  // Builds the test application with the shared agent/client checks stubbed for the (default)
+  // non-agent path, so the request proceeds through to refreshNewestVerificationBatch.
+  private def appBuilder(mockService: VerificationService): GuiceApplicationBuilder = {
+    val mockCisManagerService = mock[CisManageService]
+    val mockSessionRepository = mock[SessionRepository]
+
+    when(mockCisManagerService.ensureCisIdInUserAnswers(any[UserAnswers])(any[HeaderCarrier]))
+      .thenReturn(Future.successful(emptyUserAnswers))
+    when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
+
+    applicationBuilder(userAnswers = Some(emptyUserAnswers))
+      .overrides(
+        bind[VerificationService].toInstance(mockService),
+        bind[CisManageService].toInstance(mockCisManagerService),
+        bind[SessionRepository].toInstance(mockSessionRepository)
+      )
+  }
+
   "NewestVerificationBatchController" - {
 
     "must redirect to NoSubcontractorsAdded when no subcontractors exist" in {
@@ -98,11 +120,7 @@ class NewestVerificationBatchControllerSpec extends SpecBase with MockitoSugar w
         .thenReturn(Future.successful(updatedAnswers))
 
       val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
-          .overrides(
-            bind[VerificationService].toInstance(mockService)
-          )
-          .build()
+        appBuilder(mockService).build()
 
       running(application) {
         val result = route(application, FakeRequest(GET, endpointUrl)).value
@@ -133,11 +151,7 @@ class NewestVerificationBatchControllerSpec extends SpecBase with MockitoSugar w
         .thenReturn(Future.successful(updatedAnswers))
 
       val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
-          .overrides(
-            bind[VerificationService].toInstance(mockService)
-          )
-          .build()
+        appBuilder(mockService).build()
 
       running(application) {
         val result = route(application, FakeRequest(GET, endpointUrl)).value
@@ -170,11 +184,7 @@ class NewestVerificationBatchControllerSpec extends SpecBase with MockitoSugar w
         .thenReturn(Future.successful(updatedAnswers))
 
       val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
-          .overrides(
-            bind[VerificationService].toInstance(mockService)
-          )
-          .build()
+        appBuilder(mockService).build()
 
       running(application) {
         val result = route(application, FakeRequest(GET, endpointUrl)).value
@@ -216,9 +226,7 @@ class NewestVerificationBatchControllerSpec extends SpecBase with MockitoSugar w
         .thenReturn(Future.successful(updatedAnswers))
 
       val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
-          .overrides(bind[VerificationService].toInstance(mockService))
-          .build()
+        appBuilder(mockService).build()
 
       running(application) {
         val result = route(application, FakeRequest(GET, endpointUrl)).value
@@ -258,9 +266,7 @@ class NewestVerificationBatchControllerSpec extends SpecBase with MockitoSugar w
         .thenReturn(Future.successful(updatedAnswers))
 
       val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
-          .overrides(bind[VerificationService].toInstance(mockService))
-          .build()
+        appBuilder(mockService).build()
 
       running(application) {
         val result = route(application, FakeRequest(GET, endpointUrl)).value
@@ -300,9 +306,7 @@ class NewestVerificationBatchControllerSpec extends SpecBase with MockitoSugar w
         .thenReturn(Future.successful(updatedAnswers))
 
       val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
-          .overrides(bind[VerificationService].toInstance(mockService))
-          .build()
+        appBuilder(mockService).build()
 
       running(application) {
         val result = route(application, FakeRequest(GET, endpointUrl)).value
@@ -342,9 +346,7 @@ class NewestVerificationBatchControllerSpec extends SpecBase with MockitoSugar w
         .thenReturn(Future.successful(updatedAnswers))
 
       val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
-          .overrides(bind[VerificationService].toInstance(mockService))
-          .build()
+        appBuilder(mockService).build()
 
       running(application) {
         val result = route(application, FakeRequest(GET, endpointUrl)).value
@@ -386,9 +388,7 @@ class NewestVerificationBatchControllerSpec extends SpecBase with MockitoSugar w
         .thenReturn(Future.successful(updatedAnswers))
 
       val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
-          .overrides(bind[VerificationService].toInstance(mockService))
-          .build()
+        appBuilder(mockService).build()
 
       running(application) {
         val result = route(application, FakeRequest(GET, endpointUrl)).value
@@ -419,9 +419,7 @@ class NewestVerificationBatchControllerSpec extends SpecBase with MockitoSugar w
         .thenReturn(Future.successful(updatedAnswers))
 
       val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
-          .overrides(bind[VerificationService].toInstance(mockService))
-          .build()
+        appBuilder(mockService).build()
 
       running(application) {
         val result = route(application, FakeRequest(GET, endpointUrl)).value
@@ -456,9 +454,7 @@ class NewestVerificationBatchControllerSpec extends SpecBase with MockitoSugar w
         .thenReturn(Future.successful(updatedAnswers))
 
       val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
-          .overrides(bind[VerificationService].toInstance(mockService))
-          .build()
+        appBuilder(mockService).build()
 
       running(application) {
         val result = route(application, FakeRequest(GET, endpointUrl)).value
@@ -493,11 +489,7 @@ class NewestVerificationBatchControllerSpec extends SpecBase with MockitoSugar w
         .thenReturn(Future.successful(updatedAnswers))
 
       val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
-          .overrides(
-            bind[VerificationService].toInstance(mockService)
-          )
-          .build()
+        appBuilder(mockService).build()
 
       running(application) {
         val result = route(application, FakeRequest(GET, endpointUrl)).value
@@ -534,11 +526,7 @@ class NewestVerificationBatchControllerSpec extends SpecBase with MockitoSugar w
         .thenReturn(Future.successful(updatedAnswers))
 
       val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
-          .overrides(
-            bind[VerificationService].toInstance(mockService)
-          )
-          .build()
+        appBuilder(mockService).build()
 
       running(application) {
         val result = route(application, FakeRequest(GET, endpointUrl)).value
@@ -556,11 +544,7 @@ class NewestVerificationBatchControllerSpec extends SpecBase with MockitoSugar w
         .thenReturn(Future.successful(emptyUserAnswers))
 
       val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
-          .overrides(
-            bind[VerificationService].toInstance(mockService)
-          )
-          .build()
+        appBuilder(mockService).build()
 
       running(application) {
         val result = route(application, FakeRequest(GET, endpointUrl)).value
@@ -581,15 +565,356 @@ class NewestVerificationBatchControllerSpec extends SpecBase with MockitoSugar w
         .thenReturn(Future.failed(new RuntimeException("boom")))
 
       val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
-          .overrides(
-            bind[VerificationService].toInstance(mockService)
-          )
-          .build()
+        appBuilder(mockService).build()
 
       running(application) {
         val request = FakeRequest(GET, endpointUrl)
         val result  = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+
+        verify(mockService).refreshNewestVerificationBatch(any[UserAnswers])(any[HeaderCarrier])
+        verifyNoMoreInteractions(mockService)
+      }
+    }
+
+    "must bootstrap user answers via the checks and proceed to refresh when no existing session data exists" in {
+      val mockService           = mock[VerificationService]
+      val mockCisManagerService = mock[CisManageService]
+      val mockSessionRepository = mock[SessionRepository]
+
+      when(mockCisManagerService.ensureCisIdInUserAnswers(any[UserAnswers])(any[HeaderCarrier]))
+        .thenReturn(Future.successful(emptyUserAnswers))
+      when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
+
+      val updatedAnswers =
+        emptyUserAnswers
+          .set(
+            NewestVerificationBatchResponsePage,
+            newestBatchResponse(subcontractors = Seq.empty, monthlyReturn = Some(activeMonthlyReturn))
+          )
+          .success
+          .value
+
+      when(mockService.refreshNewestVerificationBatch(any[UserAnswers])(any[HeaderCarrier]))
+        .thenReturn(Future.successful(updatedAnswers))
+
+      val application =
+        applicationBuilder(userAnswers = None)
+          .overrides(
+            bind[VerificationService].toInstance(mockService),
+            bind[CisManageService].toInstance(mockCisManagerService),
+            bind[SessionRepository].toInstance(mockSessionRepository)
+          )
+          .build()
+
+      running(application) {
+        val result = route(application, FakeRequest(GET, endpointUrl)).value
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result).value mustBe
+          controllers.verify.routes.NoSubcontractorsAddedController.onPageLoad().url
+
+        verify(mockCisManagerService).ensureCisIdInUserAnswers(any[UserAnswers])(any[HeaderCarrier])
+        verify(mockService).refreshNewestVerificationBatch(any[UserAnswers])(any[HeaderCarrier])
+        verifyNoMoreInteractions(mockService)
+      }
+    }
+
+    "must redirect to JourneyRecovery when the user is an agent with missing agent client data" in {
+      val mockService           = mock[VerificationService]
+      val mockCisManagerService = mock[CisManageService]
+
+      when(mockCisManagerService.getAgentClient(any[String])(any[HeaderCarrier]))
+        .thenReturn(Future.successful(None))
+
+      val application =
+        applicationBuilder(userAnswers = Some(emptyUserAnswers), isAgent = true)
+          .overrides(
+            bind[VerificationService].toInstance(mockService),
+            bind[CisManageService].toInstance(mockCisManagerService)
+          )
+          .build()
+
+      running(application) {
+        val result = route(application, FakeRequest(GET, endpointUrl)).value
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result).value mustBe routes.JourneyRecoveryController.onPageLoad().url
+
+        verify(mockService, never()).refreshNewestVerificationBatch(any[UserAnswers])(any[HeaderCarrier])
+        verifyNoMoreInteractions(mockService)
+      }
+    }
+
+    "must redirect to JourneyRecovery when the user is an agent that is not authorised for the client" in {
+      val mockService           = mock[VerificationService]
+      val mockCisManagerService = mock[CisManageService]
+
+      val ton = "taxOfficeNumber"
+      val tor = "taxOfficeReference"
+
+      when(mockCisManagerService.getAgentClient(any[String])(any[HeaderCarrier]))
+        .thenReturn(
+          Future.successful(
+            Some(
+              AgentClientData(
+                uniqueId = "unique-id",
+                taxOfficeNumber = ton,
+                taxOfficeReference = tor,
+                schemeName = None
+              )
+            )
+          )
+        )
+      when(mockCisManagerService.hasClient(eqTo(ton.trim), eqTo(tor.trim))(any[HeaderCarrier]))
+        .thenReturn(Future.successful(false))
+
+      val application =
+        applicationBuilder(userAnswers = Some(emptyUserAnswers), isAgent = true)
+          .overrides(
+            bind[VerificationService].toInstance(mockService),
+            bind[CisManageService].toInstance(mockCisManagerService)
+          )
+          .build()
+
+      running(application) {
+        val result = route(application, FakeRequest(GET, endpointUrl)).value
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result).value mustBe routes.JourneyRecoveryController.onPageLoad().url
+
+        verify(mockService, never()).refreshNewestVerificationBatch(any[UserAnswers])(any[HeaderCarrier])
+        verifyNoMoreInteractions(mockService)
+      }
+    }
+
+    "must proceed to refresh the newest verification batch when the user is an agent authorised for the client" in {
+      val mockService           = mock[VerificationService]
+      val mockCisManagerService = mock[CisManageService]
+      val mockSessionRepository = mock[SessionRepository]
+
+      val ton = "taxOfficeNumber"
+      val tor = "taxOfficeReference"
+
+      when(mockCisManagerService.getAgentClient(any[String])(any[HeaderCarrier]))
+        .thenReturn(
+          Future.successful(
+            Some(
+              AgentClientData(
+                uniqueId = "unique-id",
+                taxOfficeNumber = ton,
+                taxOfficeReference = tor,
+                schemeName = None
+              )
+            )
+          )
+        )
+      when(mockCisManagerService.hasClient(eqTo(ton.trim), eqTo(tor.trim))(any[HeaderCarrier]))
+        .thenReturn(Future.successful(true))
+      when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
+
+      val updatedAnswers =
+        emptyUserAnswers
+          .set(
+            NewestVerificationBatchResponsePage,
+            newestBatchResponse(subcontractors = Seq.empty, monthlyReturn = Some(activeMonthlyReturn))
+          )
+          .success
+          .value
+
+      when(mockService.refreshNewestVerificationBatch(any[UserAnswers])(any[HeaderCarrier]))
+        .thenReturn(Future.successful(updatedAnswers))
+
+      val application =
+        applicationBuilder(userAnswers = Some(emptyUserAnswers), isAgent = true)
+          .overrides(
+            bind[VerificationService].toInstance(mockService),
+            bind[CisManageService].toInstance(mockCisManagerService),
+            bind[SessionRepository].toInstance(mockSessionRepository)
+          )
+          .build()
+
+      running(application) {
+        val result = route(application, FakeRequest(GET, endpointUrl)).value
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result).value mustBe
+          controllers.verify.routes.NoSubcontractorsAddedController.onPageLoad().url
+
+        verify(mockService).refreshNewestVerificationBatch(any[UserAnswers])(any[HeaderCarrier])
+        verifyNoMoreInteractions(mockService)
+      }
+    }
+  }
+
+  "NewestVerificationBatchController.onContinue" - {
+
+    val continueUrl = "/subcontractor/verify/inactive-scheme-warning/continue"
+
+    "must redirect to NoSubcontractorsAdded when no subcontractors exist" in {
+      val mockService = mock[VerificationService]
+
+      val updatedAnswers =
+        emptyUserAnswers
+          .set(
+            NewestVerificationBatchResponsePage,
+            newestBatchResponse(subcontractors = Seq.empty, monthlyReturn = Some(activeMonthlyReturn))
+          )
+          .success
+          .value
+
+      when(mockService.refreshNewestVerificationBatch(any[UserAnswers])(any[HeaderCarrier]))
+        .thenReturn(Future.successful(updatedAnswers))
+
+      val application =
+        appBuilder(mockService).build()
+
+      running(application) {
+        val result = route(application, FakeRequest(GET, continueUrl)).value
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result).value mustBe
+          controllers.verify.routes.NoSubcontractorsAddedController.onPageLoad().url
+
+        verify(mockService).refreshNewestVerificationBatch(any[UserAnswers])(any[HeaderCarrier])
+        verifyNoMoreInteractions(mockService)
+      }
+    }
+
+    "must redirect to VerifyYourSubcontractorsYesNo when all subcontractors are verified" in {
+      val mockService = mock[VerificationService]
+
+      val updatedAnswers =
+        emptyUserAnswers
+          .set(
+            NewestVerificationBatchResponsePage,
+            newestBatchResponse(subcontractors = Seq(verifiedSubcontractor), monthlyReturn = Some(activeMonthlyReturn))
+          )
+          .flatMap(_.set(UnverifiedSubcontractorsPage, Seq.empty))
+          .success
+          .value
+
+      when(mockService.refreshNewestVerificationBatch(any[UserAnswers])(any[HeaderCarrier]))
+        .thenReturn(Future.successful(updatedAnswers))
+
+      val application =
+        appBuilder(mockService).build()
+
+      running(application) {
+        val result = route(application, FakeRequest(GET, continueUrl)).value
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result).value mustBe
+          controllers.verify.routes.VerifyYourSubcontractorsYesNoController.onPageLoad.url
+
+        verify(mockService).refreshNewestVerificationBatch(any[UserAnswers])(any[HeaderCarrier])
+        verifyNoMoreInteractions(mockService)
+      }
+    }
+
+    "must redirect to SelectSubcontractor when unverified subcontractors exist" in {
+      val mockService = mock[VerificationService]
+
+      val updatedAnswers =
+        emptyUserAnswers
+          .set(
+            NewestVerificationBatchResponsePage,
+            newestBatchResponse(
+              subcontractors = Seq(unverifiedSubcontractor),
+              monthlyReturn = Some(activeMonthlyReturn)
+            )
+          )
+          .flatMap(_.set(UnverifiedSubcontractorsPage, Seq(unverifiedSubcontractor)))
+          .success
+          .value
+
+      when(mockService.refreshNewestVerificationBatch(any[UserAnswers])(any[HeaderCarrier]))
+        .thenReturn(Future.successful(updatedAnswers))
+
+      val application =
+        appBuilder(mockService).build()
+
+      running(application) {
+        val result = route(application, FakeRequest(GET, continueUrl)).value
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result).value mustBe
+          controllers.verify.routes.SelectSubcontractorController.onPageLoad(NormalMode).url
+
+        verify(mockService).refreshNewestVerificationBatch(any[UserAnswers])(any[HeaderCarrier])
+        verifyNoMoreInteractions(mockService)
+      }
+    }
+
+    "must redirect to VerificationRequestInProgress when status is PENDING" in {
+      val mockService = mock[VerificationService]
+
+      val updatedAnswers =
+        emptyUserAnswers
+          .set(
+            NewestVerificationBatchResponsePage,
+            newestBatchResponse(
+              subcontractors = Seq(unverifiedSubcontractor),
+              monthlyReturn = Some(activeMonthlyReturn),
+              status = Some("PENDING")
+            )
+          )
+          .flatMap(_.set(UnverifiedSubcontractorsPage, Seq(unverifiedSubcontractor)))
+          .success
+          .value
+
+      when(mockService.refreshNewestVerificationBatch(any[UserAnswers])(any[HeaderCarrier]))
+        .thenReturn(Future.successful(updatedAnswers))
+
+      val application =
+        appBuilder(mockService).build()
+
+      running(application) {
+        val result = route(application, FakeRequest(GET, continueUrl)).value
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result).value mustBe
+          controllers.verify.routes.VerificationRequestInProgressController.onPageLoad().url
+
+        verify(mockService).refreshNewestVerificationBatch(any[UserAnswers])(any[HeaderCarrier])
+        verifyNoMoreInteractions(mockService)
+      }
+    }
+
+    "must redirect to JourneyRecovery when NewestVerificationBatchResponsePage is missing" in {
+      val mockService = mock[VerificationService]
+
+      when(mockService.refreshNewestVerificationBatch(any[UserAnswers])(any[HeaderCarrier]))
+        .thenReturn(Future.successful(emptyUserAnswers))
+
+      val application =
+        appBuilder(mockService).build()
+
+      running(application) {
+        val result = route(application, FakeRequest(GET, continueUrl)).value
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result).value mustBe
+          routes.JourneyRecoveryController.onPageLoad().url
+
+        verify(mockService).refreshNewestVerificationBatch(any[UserAnswers])(any[HeaderCarrier])
+        verifyNoMoreInteractions(mockService)
+      }
+    }
+
+    "must redirect to JourneyRecovery when refreshNewestVerificationBatch fails" in {
+      val mockService = mock[VerificationService]
+
+      when(mockService.refreshNewestVerificationBatch(any[UserAnswers])(any[HeaderCarrier]))
+        .thenReturn(Future.failed(new RuntimeException("boom")))
+
+      val application =
+        appBuilder(mockService).build()
+
+      running(application) {
+        val result = route(application, FakeRequest(GET, continueUrl)).value
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
@@ -604,14 +929,11 @@ class NewestVerificationBatchControllerSpec extends SpecBase with MockitoSugar w
 
       val application =
         applicationBuilder(userAnswers = None)
-          .overrides(
-            bind[VerificationService].toInstance(mockService)
-          )
+          .overrides(bind[VerificationService].toInstance(mockService))
           .build()
 
       running(application) {
-        val request = FakeRequest(GET, endpointUrl)
-        val result  = route(application, request).value
+        val result = route(application, FakeRequest(GET, continueUrl)).value
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url

@@ -178,7 +178,7 @@ class CreateVerificationBatchAndVerificationsControllerSpec extends SpecBase wit
       }
     }
 
-    "must call service with distinct combined ids when current batch is empty and then redirect to Index" in {
+    "must call service with distinct combined ids when current batch is empty and then redirect to CheckVerificationBatchReadiness" in {
       val mockService = mock[VerificationService]
 
       val ua =
@@ -222,7 +222,10 @@ class CreateVerificationBatchAndVerificationsControllerSpec extends SpecBase wit
         val result  = controller.onSubmit()(request)
 
         status(result) mustBe SEE_OTHER
-        redirectLocation(result).value mustBe routes.IndexController.onPageLoad().url
+        redirectLocation(result).value mustBe
+          controllers.verify.routes.CheckVerificationBatchReadinessController
+            .checkVerificationBatchReadiness()
+            .url
 
         val idsCaptor = ArgumentCaptor.forClass(classOf[Seq[Long]])
 
@@ -299,7 +302,10 @@ class CreateVerificationBatchAndVerificationsControllerSpec extends SpecBase wit
       val result  = controller.onSubmit()(request)
 
       status(result) mustBe SEE_OTHER
-      redirectLocation(result).value mustBe routes.IndexController.onPageLoad().url
+      redirectLocation(result).value mustBe
+        controllers.verify.routes.CheckVerificationBatchReadinessController
+          .checkVerificationBatchReadiness()
+          .url
 
       val idsCaptor = ArgumentCaptor.forClass(classOf[Seq[Long]])
       verify(mockService).createVerificationBatchAndVerifications(eqTo(ua), idsCaptor.capture(), eqTo(None))(any())
@@ -341,7 +347,10 @@ class CreateVerificationBatchAndVerificationsControllerSpec extends SpecBase wit
       val result  = controller.onSubmit()(request)
 
       status(result) mustBe SEE_OTHER
-      redirectLocation(result).value mustBe routes.IndexController.onPageLoad().url
+      redirectLocation(result).value mustBe
+        controllers.verify.routes.CheckVerificationBatchReadinessController
+          .checkVerificationBatchReadiness()
+          .url
 
       val idsCaptor = ArgumentCaptor.forClass(classOf[Seq[Long]])
       verify(mockService).createVerificationBatchAndVerifications(eqTo(ua), idsCaptor.capture(), eqTo(None))(any())

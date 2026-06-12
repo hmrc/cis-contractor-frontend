@@ -364,7 +364,8 @@ GET   /subcontractor/verify/no-subcontractors-added  controllers.verify.NoSubcon
 
 GET   /subcontractor/verify/check-verification-batch-readiness  controllers.verify.CheckVerificationBatchReadinessController.checkVerificationBatchReadiness(mode: Mode = NormalMode)
 
-GET   /subcontractor/verify/newest  controllers.verify.NewestVerificationBatchController.onPageLoad()
+GET   /subcontractor/verify/newest                            controllers.verify.NewestVerificationBatchController.onPageLoad()
+GET   /subcontractor/verify/inactive-scheme-warning/continue  controllers.verify.NewestVerificationBatchController.onContinue
 
 GET   /subcontractor/verify/current  controllers.verify.CurrentVerificationBatchController.onPageLoad()
 
@@ -418,9 +419,9 @@ POST  /subcontractor/verify/verification-batch-create  controllers.verify.Create
 GET   /subcontractor/verify/check-your-answers  controllers.verify.VerifyCheckYourAnswersController.onPageLoad()
 POST  /subcontractor/verify/check-your-answers  controllers.verify.VerifyCheckYourAnswersController.onSubmit()
 
-# for testing purposes, will be deleted after
-GET  /subcontractor/verify/submission/create   controllers.verify.SubmissionSendingController.onPageLoad()
-GET /subcontractor/verify/verification-batch-create controllers.verify.CreateVerificationBatchAndVerificationsController.onSubmit()
+GET   /subcontractor/verify/submission/create  controllers.verify.SubmissionSendingController.onPageLoad()
+
+GET   /subcontractor/verify/verification-batch-create  controllers.verify.CreateVerificationBatchAndVerificationsController.onSubmit()
 
 GET   /subcontractor/verify/verification-status/reverification-decision  controllers.verify.VerificationStatusController.goToReverificationDecision(mode: Mode = NormalMode)
 GET   /subcontractor/verify/verification-status/select-subcontractors    controllers.verify.VerificationStatusController.goToSelectSubcontractorsToReverify(mode: Mode = NormalMode)

@@ -94,7 +94,10 @@ class ModifyVerificationBatchAndVerificationsController @Inject() (
               val modifyReq = buildModifyRequest(instanceId, current, createRefs, deleteRefs)
               verificationService.modifyVerificationBatchAndVerifications(request.userAnswers, modifyReq).map(_ => ())
             }
-        } yield Redirect(controllers.routes.IndexController.onPageLoad()))
+        } yield Redirect(
+          controllers.verify.routes.CheckVerificationBatchReadinessController
+            .checkVerificationBatchReadiness()
+        ))
           .recover { case t =>
             logger.error(
               "[ModifyVerificationBatchAndVerificationsController] Failed to modify verification batch/verifications",
