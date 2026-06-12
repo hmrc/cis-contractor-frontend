@@ -442,7 +442,216 @@ class SelectSubcontractorsToReverifyControllerSpec extends SpecBase with Mockito
         status(result) mustBe OK
         val body = contentAsString(result)
 
-        body must include("No name provided")
+        body must include("no name provided")
+        body must include("9999999999")
+      }
+    }
+
+    "must show name as surname only when a Individualorsoletrader row whose surname is provided, firstName is blank" in {
+      val mockRepo = mock[SessionRepository]
+      when(mockRepo.set(any())) thenReturn Future.successful(true)
+
+      val sub =
+        mkSub(
+          id = 300L,
+          verified = Some("Y"),
+          firstName = Some(" "),
+          surname = Some("Doe"),
+          tradingName = Some("Doe Trading"),
+          subcontractorType = Some("soletrader"),
+          utr = Some("9999999999"),
+          verificationDate = None,
+          createDate = Some(LocalDateTime.of(2024, 1, 1, 0, 0))
+        )
+
+      val ua =
+        emptyUserAnswers
+          .set(NewestVerificationBatchResponsePage, newestBatchResponse(Seq(sub)))
+          .success
+          .value
+
+      val app =
+        applicationBuilder(userAnswers = Some(ua))
+          .overrides(
+            bind[Clock].toInstance(fixedClock),
+            bind[SessionRepository].toInstance(mockRepo)
+          )
+          .build()
+
+      running(app) {
+        val result = route(app, FakeRequest(GET, url(1))).value
+
+        status(result) mustBe OK
+        val body = contentAsString(result)
+
+        body must include("Doe")
+        body must not include "Doe Trading" // confirm surname wins over tradingName
+        body must include("9999999999")
+      }
+    }
+
+    "must show name as tradingName when a Individualorsoletrader row whose tradingName is provided, firstName and surname are blank" in {
+      val mockRepo = mock[SessionRepository]
+      when(mockRepo.set(any())) thenReturn Future.successful(true)
+
+      val sub =
+        mkSub(
+          id = 300L,
+          verified = Some("Y"),
+          firstName = Some(" "),
+          surname = Some(" "),
+          tradingName = Some("Doe Trading"),
+          subcontractorType = Some("soletrader"),
+          utr = Some("9999999999"),
+          verificationDate = None,
+          createDate = Some(LocalDateTime.of(2024, 1, 1, 0, 0))
+        )
+
+      val ua =
+        emptyUserAnswers
+          .set(NewestVerificationBatchResponsePage, newestBatchResponse(Seq(sub)))
+          .success
+          .value
+
+      val app =
+        applicationBuilder(userAnswers = Some(ua))
+          .overrides(
+            bind[Clock].toInstance(fixedClock),
+            bind[SessionRepository].toInstance(mockRepo)
+          )
+          .build()
+
+      running(app) {
+        val result = route(app, FakeRequest(GET, url(1))).value
+
+        status(result) mustBe OK
+        val body = contentAsString(result)
+
+        body must include("Doe Trading")
+        body must include("9999999999")
+      }
+    }
+
+    "must show name as tradingName when a Individualorsoletrader row whose tradingName and firstNare are provided, surname are blank" in {
+      val mockRepo = mock[SessionRepository]
+      when(mockRepo.set(any())) thenReturn Future.successful(true)
+
+      val sub =
+        mkSub(
+          id = 300L,
+          verified = Some("Y"),
+          firstName = Some("John"),
+          surname = Some(" "),
+          tradingName = Some("Doe Trading"),
+          subcontractorType = Some("soletrader"),
+          utr = Some("9999999999"),
+          verificationDate = None,
+          createDate = Some(LocalDateTime.of(2024, 1, 1, 0, 0))
+        )
+
+      val ua =
+        emptyUserAnswers
+          .set(NewestVerificationBatchResponsePage, newestBatchResponse(Seq(sub)))
+          .success
+          .value
+
+      val app =
+        applicationBuilder(userAnswers = Some(ua))
+          .overrides(
+            bind[Clock].toInstance(fixedClock),
+            bind[SessionRepository].toInstance(mockRepo)
+          )
+          .build()
+
+      running(app) {
+        val result = route(app, FakeRequest(GET, url(1))).value
+
+        status(result) mustBe OK
+        val body = contentAsString(result)
+
+        body must include("Doe Trading")
+        body must include("9999999999")
+      }
+    }
+
+    "must show name as partnershipTradingName when a Partnership row whose partnershipTradingName is provided" in {
+      val mockRepo = mock[SessionRepository]
+      when(mockRepo.set(any())) thenReturn Future.successful(true)
+
+      val sub =
+        mkSub(
+          id = 300L,
+          verified = Some("Y"),
+          partnershipTradingName = Some("ABC Partnership"),
+          tradingName = Some("Doe Trading"),
+          subcontractorType = Some("partnership"),
+          utr = Some("9999999999"),
+          verificationDate = None,
+          createDate = Some(LocalDateTime.of(2024, 1, 1, 0, 0))
+        )
+
+      val ua =
+        emptyUserAnswers
+          .set(NewestVerificationBatchResponsePage, newestBatchResponse(Seq(sub)))
+          .success
+          .value
+
+      val app =
+        applicationBuilder(userAnswers = Some(ua))
+          .overrides(
+            bind[Clock].toInstance(fixedClock),
+            bind[SessionRepository].toInstance(mockRepo)
+          )
+          .build()
+
+      running(app) {
+        val result = route(app, FakeRequest(GET, url(1))).value
+
+        status(result) mustBe OK
+        val body = contentAsString(result)
+
+        body must include("ABC Partnership")
+        body must include("9999999999")
+      }
+    }
+
+    "must show name as tradingName when a Partnership row whose partnershipTradingName is blank, tradingName is provided" in {
+      val mockRepo = mock[SessionRepository]
+      when(mockRepo.set(any())) thenReturn Future.successful(true)
+
+      val sub =
+        mkSub(
+          id = 300L,
+          verified = Some("Y"),
+          partnershipTradingName = Some("   "),
+          tradingName = Some("Doe Trading"),
+          subcontractorType = Some("partnership"),
+          utr = Some("9999999999"),
+          verificationDate = None,
+          createDate = Some(LocalDateTime.of(2024, 1, 1, 0, 0))
+        )
+
+      val ua =
+        emptyUserAnswers
+          .set(NewestVerificationBatchResponsePage, newestBatchResponse(Seq(sub)))
+          .success
+          .value
+
+      val app =
+        applicationBuilder(userAnswers = Some(ua))
+          .overrides(
+            bind[Clock].toInstance(fixedClock),
+            bind[SessionRepository].toInstance(mockRepo)
+          )
+          .build()
+
+      running(app) {
+        val result = route(app, FakeRequest(GET, url(1))).value
+
+        status(result) mustBe OK
+        val body = contentAsString(result)
+
+        body must include("Doe Trading")
         body must include("9999999999")
       }
     }

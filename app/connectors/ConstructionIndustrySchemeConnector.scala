@@ -29,6 +29,8 @@ import play.api.libs.ws.JsonBodyWritables.writeableOf_JsValue
 import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.http.{HeaderCarrier, HttpException, HttpReadsInstances, HttpResponse, StringContextOps}
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
+import models.requests.CreateSubmissionForVerificationRequest
+import models.response.CreateSubmissionForVerificationResponse
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
@@ -173,6 +175,20 @@ class ConstructionIndustrySchemeConnector @Inject() (config: ServicesConfig, htt
           case other           =>
             Future.failed(new RuntimeException(s"Modify verification batch failed, returned $other"))
         }
+      }
+
+  def createSubmissionForVerification(
+    request: CreateSubmissionForVerificationRequest
+  )(implicit hc: HeaderCarrier): Future[CreateSubmissionForVerificationResponse] =
+    http
+      .post(url"$cisBaseUrl/verification/submission/create")
+      .withBody(Json.toJson(request))
+      .execute[CreateSubmissionForVerificationResponse]
+      .map { response =>
+        logger.info(
+          s"[ConstructionIndustrySchemeConnector][createSubmissionForVerification] instanceId=${request.instanceId} - created submissionId=${response.submissionId}"
+        )
+        response
       }
 
 }

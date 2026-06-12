@@ -17,12 +17,19 @@
 package controllers.verify
 
 import controllers.actions.*
+import models.requests.{CreateSubmissionForVerificationRequest, VerificationToUpdate}
+import pages.verify.CurrentVerificationBatchResponsePage
+import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
+import queries.CisIdQuery
+import services.VerificationService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.verify.SubmissionSendingView
+import utils.VerifyEmailResolver
 
 import javax.inject.Inject
+import scala.concurrent.{ExecutionContext, Future}
 
 class SubmissionSendingController @Inject() (
   override val messagesApi: MessagesApi,
@@ -30,11 +37,65 @@ class SubmissionSendingController @Inject() (
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   val controllerComponents: MessagesControllerComponents,
-  view: SubmissionSendingView
-) extends FrontendBaseController
-    with I18nSupport {
+  view: SubmissionSendingView,
+  verificationService: VerificationService
+)(implicit ec: ExecutionContext)
+    extends FrontendBaseController
+    with I18nSupport
+    with Logging {
 
-  def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
-    Ok(view())
-  }
+  private def recovery: Result =
+    Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+
+  def onPageLoad(): Action[AnyContent] =
+    (identify andThen getData andThen requireData).async { implicit request =>
+      buildSubmissionRequest(request.userAnswers) match {
+        case Left(msg) =>
+          logger.error(s"[SubmissionSendingController.onPageLoad] Failed to build submission request: $msg")
+          Future.successful(recovery)
+
+        case Right(submissionReq) =>
+          verificationService
+            .createSubmissionForVerification(submissionReq)
+            .map(_ => Ok(view()))
+            .recover { case t =>
+              logger.error("[SubmissionSendingController.onPageLoad] Failed to create submission", t)
+              recovery
+            }
+      }
+    }
+
+  private def buildSubmissionRequest(
+    ua: models.UserAnswers
+  ): Either[String, CreateSubmissionForVerificationRequest] =
+    for {
+      instanceId <- ua.get(CisIdQuery).toRight("CisIdQuery not found")
+      current    <- ua.get(CurrentVerificationBatchResponsePage).toRight("CurrentVerificationBatchResponsePage not found")
+
+      batchId  <- current.verificationBatch.map(_.verificationBatchId).toRight("verificationBatchId missing")
+      batchRef <-
+        current.verificationBatch.flatMap(_.verifBatchResourceRef).toRight("verificationBatchResourceRef missing")
+
+      email <- VerifyEmailResolver.resolvedEmail(ua).toRight("No email resolved for submission")
+    } yield {
+
+      val verifications: Seq[VerificationToUpdate] =
+        current.verifications.flatMap(_.verificationResourceRef).map { ref =>
+          VerificationToUpdate(
+            subcontractorName = "Unknown", // ??
+            verificationResourceRef = ref,
+            proceedVerification = "Y" // ??
+          )
+        }
+
+      CreateSubmissionForVerificationRequest(
+        instanceId = instanceId,
+        verificationBatchId = batchId,
+        verificationBatchResourceRef = batchRef,
+        emailRecipient = email,
+        irMarkGenerated = None,
+        verifications = verifications,
+        agentId = None
+      )
+    }
 }

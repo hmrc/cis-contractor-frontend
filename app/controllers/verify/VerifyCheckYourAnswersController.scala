@@ -27,6 +27,7 @@ import viewmodels.govuk.summarylist.*
 import views.html.verify.VerifyCheckYourAnswersView
 
 import javax.inject.Inject
+import scala.concurrent.Future
 
 class VerifyCheckYourAnswersController @Inject() (
   override val messagesApi: MessagesApi,
@@ -60,12 +61,20 @@ class VerifyCheckYourAnswersController @Inject() (
     }
   }
 
-  def onSubmit(): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
-    ValidatedVerify.build(request.userAnswers) match {
-      case Right(_)    => Redirect(controllers.verify.routes.SubmissionSendingController.onPageLoad())
-      case Left(error) =>
-        logger.error(s"[VerifyCheckYourAnswersController.onSubmit] Validation failed: $error")
-        Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+  def onSubmit(): Action[AnyContent] =
+    (identify andThen getData andThen requireData).async { implicit request =>
+      ValidatedVerify.build(request.userAnswers) match {
+        case Right(_) =>
+          Future.successful(
+            Redirect(controllers.verify.routes.SubmissionSendingController.onPageLoad())
+          )
+
+        case Left(error) =>
+          logger.error(s"[VerifyCheckYourAnswersController.onSubmit] Validation failed: $error")
+          Future.successful(
+            Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+          )
+      }
     }
-  }
+
 }

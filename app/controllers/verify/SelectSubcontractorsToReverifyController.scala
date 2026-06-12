@@ -70,7 +70,7 @@ class SelectSubcontractorsToReverifyController @Inject() (
     } else {
       val reverify = ReverificationRules.reverifyRequired(sub, currentDate)
 
-      val name = nameFor(sub).getOrElse("No name provided")
+      val name = nameFor(sub).getOrElse("no name provided")
       val utr  = sub.utr.filter(_.nonEmpty).getOrElse("")
 
       val verifiedCol = if (reverify) "No" else "Yes"
@@ -116,10 +116,12 @@ class SelectSubcontractorsToReverifyController @Inject() (
     val trading            = sub.tradingName.map(_.trim).filter(_.nonEmpty)
     val partnershipTrading = sub.partnershipTradingName.map(_.trim).filter(_.nonEmpty)
 
-    val individualName =
-      (sur, first) match {
-        case (Some(s), Some(f)) => Some(s"$s, $f")
-        case _                  => None
+    val individualName: Option[String] =
+      sur.map { sur =>
+        first match {
+          case Some(first) => s"$sur, $first"
+          case None        => sur
+        }
       }
 
     sub.subcontractorType match {
@@ -130,7 +132,7 @@ class SelectSubcontractorsToReverifyController @Inject() (
       case Some(_)                                                                 =>
         individualName.orElse(trading)
       case None                                                                    =>
-        Some("No name provided")
+        Some("no name provided")
     }
   }
 
