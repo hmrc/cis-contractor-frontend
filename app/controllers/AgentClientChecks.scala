@@ -31,10 +31,9 @@ import scala.util.control.NonFatal
 
 /** Shared agent/client validation and setup performed by the journey entry points.
   *
-  * Returns `Left(redirect)` when the request cannot proceed (missing agent client data, the agent
-  * is not authorised for the client, or a downstream failure), otherwise `Right(updatedAnswers)`
-  * with the user answers updated by the relevant setup step. Each caller supplies its own
-  * continuation for the success case.
+  * Returns `Left(redirect)` when the request cannot proceed (missing agent client data, the agent is not authorised for
+  * the client, or a downstream failure), otherwise `Right(updatedAnswers)` with the user answers updated by the
+  * relevant setup step. Each caller supplies its own continuation for the success case.
   */
 trait AgentClientChecks extends Logging {
 
