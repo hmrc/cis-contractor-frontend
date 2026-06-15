@@ -17,22 +17,26 @@
 package services
 
 import connectors.ConstructionIndustrySchemeConnector
-import models.{Subcontractor, UserAnswers}
-import models.requests.CreateVerificationBatchAndVerificationsRequest
-import models.requests.CreateSubmissionForVerificationRequest
-import models.response.CreateSubmissionForVerificationResponse
-import pages.verify.{CurrentVerificationBatchResponsePage, NewestVerificationBatchResponsePage, UnverifiedSubcontractorsPage}
-import models.requests.ModifyVerificationsRequest
+import models.agent.AgentClientData
+import models.{EmployerReference, Subcontractor, UserAnswers}
+import models.requests.*
+import models.response.{ChrisPollResponse, ChrisSubmissionResponse, CreateSubmissionForVerificationResponse}
+import models.verify.*
+import pages.verify.*
+import play.api.mvc.AnyContent
 import queries.CisIdQuery
 import repositories.SessionRepository
 import uk.gov.hmrc.http.HeaderCarrier
 
+import java.time.{ZoneId, ZonedDateTime}
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class VerificationService @Inject() (
   cisConnector: ConstructionIndustrySchemeConnector,
+  cisManageService: CisManageService,
+  chrisVerificationRequestBuilder: ChrisVerificationRequestBuilder,
   sessionRepository: SessionRepository
 )(implicit ec: ExecutionContext) {
 
@@ -136,9 +140,119 @@ class VerificationService @Inject() (
       _            <- sessionRepository.set(afterNewest)
     } yield afterNewest
 
-  def createSubmissionForVerification(
+  def createSubmitAndPersistVerificationSubmission(implicit
+    request: DataRequest[AnyContent],
+    hc: HeaderCarrier
+  ): Future[ChrisSubmissionResponse] =
+    for {
+      latestUa      <- getCurrentVerificationBatch(request.userAnswers)
+      createRequest <- buildCreateSubmissionRequest(latestUa)
+      submissionId  <- createSubmissionForVerification(createRequest).map(_.submissionId)
+      response      <- submitVerificationToChris(submissionId, latestUa)
+      updatedUa     <- saveVerificationSubmissionDetailsToSession(latestUa, response)
+      _             <- updateSubmissionFromChrisSubmissionResponse(submissionId.toString, updatedUa, response)
+    } yield response
+
+  def pollAndUpdateStatus(
+    ua: UserAnswers,
+    submissionDetails: VerificationSubmissionDetails
+  )(implicit request: DataRequest[AnyContent], hc: HeaderCarrier): Future[ChrisPollResponse] = {
+    val pollUrl = required(submissionDetails.pollUrl, "Poll URL missing in submission details")
+
+    for {
+      response                <- cisConnector.getSubmissionStatus(pollUrl, submissionDetails.submissionId)
+      updatedSubmissionDetails =
+        VerificationSubmissionDetailsBuilder.updateFromPollResponse(submissionDetails, response)
+      _                       <- updateSubmissionFromChrisPollResponse(ua, updatedSubmissionDetails, response)
+    } yield response
+
+  }
+
+  private def createSubmissionForVerification(
     request: CreateSubmissionForVerificationRequest
   )(implicit hc: HeaderCarrier): Future[CreateSubmissionForVerificationResponse] =
     cisConnector.createSubmissionForVerification(request)
 
+  private def submitVerificationToChris(
+    submissionId: Long,
+    ua: UserAnswers
+  )(implicit request: DataRequest[AnyContent], hc: HeaderCarrier): Future[ChrisSubmissionResponse] =
+    for {
+      employerReference <- resolveEmployerReference(request.userId, request.isAgent, request.employerReference)
+      chrisRequest      <- chrisVerificationRequestBuilder.build(ua, request.isAgent, employerReference)
+      result            <- cisConnector.submitVerificationToChris(submissionId, chrisRequest)
+    } yield result
+
+  private def buildCreateSubmissionRequest(
+    ua: UserAnswers
+  ): Future[CreateSubmissionForVerificationRequest] =
+    CreateSubmissionForVerificationRequestBuilder
+      .build(ua)
+      .fold(
+        error => Future.failed(new RuntimeException(error)),
+        request => Future.successful(request)
+      )
+
+  private def resolveEmployerReference(
+    userId: String,
+    isAgent: Boolean,
+    employerReference: Option[EmployerReference]
+  )(implicit hc: HeaderCarrier): Future[EmployerReference] =
+    if (isAgent) {
+      cisManageService.getAgentClient(userId).flatMap {
+        case Some(data) => Future.successful(EmployerReference(data.taxOfficeNumber, data.taxOfficeReference))
+        case None       => Future.failed(new RuntimeException("Employer reference missing for agent user"))
+      }
+    } else {
+      employerReference match {
+        case Some(er) => Future.successful(er)
+        case None     => Future.failed(new RuntimeException("Employer reference missing for non-agent user"))
+      }
+    }
+
+  private def saveVerificationSubmissionDetailsToSession(
+    ua: UserAnswers,
+    response: ChrisSubmissionResponse
+  ): Future[UserAnswers] = {
+    val details = VerificationSubmissionDetailsBuilder.fromSubmissionResponse(response)
+
+    ua.set(VerificationSubmissionDetailsPage, details)
+      .fold(
+        error => Future.failed(error),
+        updatedUa => sessionRepository.set(updatedUa).map(_ => updatedUa)
+      )
+  }
+
+  private def updateSubmissionFromChrisSubmissionResponse(
+    submissionId: String,
+    ua: UserAnswers,
+    response: ChrisSubmissionResponse
+  )(implicit request: DataRequest[AnyContent], hc: HeaderCarrier): Future[Unit] = {
+    val ukNow = ZonedDateTime.now(ZoneId.of("Europe/London")).toLocalDateTime
+
+    UpdateVerificationSubmissionRequestBuilder
+      .fromChrisSubmissionResponse(ua, response, request.agentReference, ukNow)
+      .fold(
+        error => Future.failed(new RuntimeException(s"Failed to build update request: $error")),
+        updateReq => cisConnector.updateVerificationSubmission(submissionId, updateReq)
+      )
+  }
+
+  private def updateSubmissionFromChrisPollResponse(
+    ua: UserAnswers,
+    existingDetails: VerificationSubmissionDetails,
+    response: ChrisPollResponse
+  )(implicit request: DataRequest[AnyContent], hc: HeaderCarrier): Future[Unit] = {
+    val ukNow = ZonedDateTime.now(ZoneId.of("Europe/London")).toLocalDateTime
+
+    UpdateVerificationSubmissionRequestBuilder
+      .fromChrisPollResponse(ua, existingDetails, response, request.agentReference, ukNow)
+      .fold(
+        error => Future.failed(new RuntimeException(s"Failed to build update request: $error")),
+        updateReq => cisConnector.updateVerificationSubmission(existingDetails.submissionId, updateReq)
+      )
+  }
+
+  private def required[A](value: Option[A], errorMsg: String): A =
+    value.getOrElse(throw new RuntimeException(errorMsg))
 }
