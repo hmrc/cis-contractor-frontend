@@ -37,7 +37,7 @@ class IndexController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   override protected val sessionRepository: SessionRepository,
-  override protected val cisManagerService: CisManageService
+  override protected val cisManageService: CisManageService
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport

@@ -44,7 +44,7 @@ class NewestVerificationBatchController @Inject() (
   requireData: DataRequiredAction,
   val controllerComponents: MessagesControllerComponents,
   verificationBatchService: VerificationService,
-  override protected val cisManagerService: CisManageService,
+  override protected val cisManageService: CisManageService,
   override protected val sessionRepository: SessionRepository
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController

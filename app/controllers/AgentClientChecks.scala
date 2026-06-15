@@ -37,7 +37,7 @@ import scala.util.control.NonFatal
   */
 trait AgentClientChecks extends Logging {
 
-  protected def cisManagerService: CisManageService
+  protected def cisManageService: CisManageService
   protected def sessionRepository: SessionRepository
 
   protected def withAgentClientChecks(
@@ -47,7 +47,7 @@ trait AgentClientChecks extends Logging {
   )(implicit ec: ExecutionContext, hc: HeaderCarrier): Future[Either[Result, UserAnswers]] =
     if (!isAgent) {
       for {
-        updated <- cisManagerService.ensureCisIdInUserAnswers(userAnswers)
+        updated <- cisManageService.ensureCisIdInUserAnswers(userAnswers)
         _       <- sessionRepository.set(updated)
       } yield Right(updated)
     } else {
@@ -57,7 +57,7 @@ trait AgentClientChecks extends Logging {
           Future.successful(Left(recovery))
 
         case Some(AgentClientIdentifiers(uniqueId, ton, tor)) =>
-          cisManagerService
+          cisManageService
             .hasClient(ton.trim, tor.trim)
             .flatMap {
               case true  =>
@@ -77,7 +77,7 @@ trait AgentClientChecks extends Logging {
     ec: ExecutionContext,
     hc: HeaderCarrier
   ): Future[Option[AgentClientIdentifiers]] =
-    cisManagerService
+    cisManageService
       .getAgentClient(userId)
       .map(_.map { data =>
         AgentClientIdentifiers(data.uniqueId, data.taxOfficeNumber, data.taxOfficeReference)
