@@ -199,11 +199,11 @@ class SelectSubcontractorsToReverifyControllerSpec extends SpecBase with Mockito
           body must include("1234567890")
           body must include("2904743750")
 
-          body must include(messages("verify.selectSubcontractorsToReverify.verified.no"))
-          body must include(messages("verify.selectSubcontractorsToReverify.verified.yes"))
+          body must include(messages("site.no"))
+          body must include(messages("site.yes"))
 
           body must include("V0001217702")
-          body must include(messages("verify.selectSubcontractorsToReverify.verificationNumber.unknown"))
+          body must include(messages("site.unknown"))
 
           body must include(messages("verify.selectSubcontractorsToReverify.taxTreatment.gross"))
 
@@ -821,7 +821,7 @@ class SelectSubcontractorsToReverifyControllerSpec extends SpecBase with Mockito
         body must include(messages("verify.selectSubcontractorsToReverify.taxTreatment.net"))
         body must include(messages("verify.selectSubcontractorsToReverify.taxTreatment.unmatched"))
         body must include(messages("verify.selectSubcontractorsToReverify.taxTreatment.gross"))
-        body must include(messages("verify.selectSubcontractorsToReverify.taxTreatment.unknown"))
+        body must include(messages("site.unknown"))
       }
     }
 

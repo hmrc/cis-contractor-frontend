@@ -76,34 +76,34 @@ class SelectSubcontractorsToReverifyController @Inject() (
       val utr  = sub.utr.filter(_.nonEmpty).getOrElse("")
 
       val verifiedCol =
-        if (reverify) messages("verify.selectSubcontractorsToReverify.verified.no")
-        else messages("verify.selectSubcontractorsToReverify.verified.yes")
+        if (reverify) messages("site.no")
+        else messages("site.yes")
 
       val verificationNumber =
         if (!reverify) {
           sub.verificationNumber
             .filter(_.nonEmpty)
-            .getOrElse(messages("verify.selectSubcontractorsToReverify.verificationNumber.unknown"))
+            .getOrElse(messages("site.unknown"))
         } else {
-          messages("verify.selectSubcontractorsToReverify.verificationNumber.unknown")
+          messages("site.unknown")
         }
 
       val taxTreatment =
         if (reverify) {
-          messages("verify.selectSubcontractorsToReverify.taxTreatment.unknown")
+          messages("site.unknown")
         } else {
           sub.taxTreatment match {
             case Some("net")       => messages("verify.selectSubcontractorsToReverify.taxTreatment.net")
             case Some("unmatched") => messages("verify.selectSubcontractorsToReverify.taxTreatment.unmatched")
             case Some("gross")     => messages("verify.selectSubcontractorsToReverify.taxTreatment.gross")
-            case _                 => messages("verify.selectSubcontractorsToReverify.taxTreatment.unknown")
+            case _                 => messages("site.unknown")
           }
         }
 
       val dateAdded =
         sub.createDate
           .map(_.toLocalDate.format(dateFmt))
-          .getOrElse(messages("verify.selectSubcontractorsToReverify.dateAdded.unknown"))
+          .getOrElse(messages("site.unknown"))
 
       Some(
         SubcontractorReverifyRow(
