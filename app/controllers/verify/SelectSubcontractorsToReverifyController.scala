@@ -21,7 +21,7 @@ import forms.verify.SelectSubcontractorsToReverifyFormProvider
 import models.Mode
 import navigation.Navigator
 import pages.verify.SelectSubcontractorsToReverifyPage
-import play.api.i18n.{I18nSupport, MessagesApi}
+import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -64,38 +64,46 @@ class SelectSubcontractorsToReverifyController @Inject() (
   private def recovery =
     Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
 
-  private def toRow(sub: Subcontractor, currentDate: LocalDate): Option[SubcontractorReverifyRow] =
+  private def toRow(sub: Subcontractor, currentDate: LocalDate)(implicit
+    messages: Messages
+  ): Option[SubcontractorReverifyRow] =
     if (!sub.verified.contains("Y")) {
       None
     } else {
       val reverify = ReverificationRules.reverifyRequired(sub, currentDate)
 
-      val name = nameFor(sub).getOrElse("no name provided")
+      val name = nameFor(sub).getOrElse(messages("verify.noName"))
       val utr  = sub.utr.filter(_.nonEmpty).getOrElse("")
 
-      val verifiedCol = if (reverify) "No" else "Yes"
+      val verifiedCol =
+        if (reverify) messages("verify.selectSubcontractorsToReverify.verified.no")
+        else messages("verify.selectSubcontractorsToReverify.verified.yes")
 
       val verificationNumber =
         if (!reverify) {
-          sub.verificationNumber.filter(_.nonEmpty).getOrElse("Unknown")
+          sub.verificationNumber
+            .filter(_.nonEmpty)
+            .getOrElse(messages("verify.selectSubcontractorsToReverify.verificationNumber.unknown"))
         } else {
-          "Unknown"
+          messages("verify.selectSubcontractorsToReverify.verificationNumber.unknown")
         }
 
       val taxTreatment =
         if (reverify) {
-          "Unknown"
+          messages("verify.selectSubcontractorsToReverify.taxTreatment.unknown")
         } else {
           sub.taxTreatment match {
-            case Some("net")       => "Standard rate"
-            case Some("unmatched") => "Higher rate"
-            case Some("gross")     => "Gross"
-            case _                 => "Unknown"
+            case Some("net")       => messages("verify.selectSubcontractorsToReverify.taxTreatment.net")
+            case Some("unmatched") => messages("verify.selectSubcontractorsToReverify.taxTreatment.unmatched")
+            case Some("gross")     => messages("verify.selectSubcontractorsToReverify.taxTreatment.gross")
+            case _                 => messages("verify.selectSubcontractorsToReverify.taxTreatment.unknown")
           }
         }
 
       val dateAdded =
-        sub.createDate.map(_.toLocalDate.format(dateFmt)).getOrElse("Unknown")
+        sub.createDate
+          .map(_.toLocalDate.format(dateFmt))
+          .getOrElse(messages("verify.selectSubcontractorsToReverify.dateAdded.unknown"))
 
       Some(
         SubcontractorReverifyRow(
@@ -110,7 +118,7 @@ class SelectSubcontractorsToReverifyController @Inject() (
       )
     }
 
-  private def nameFor(sub: Subcontractor): Option[String] = {
+  private def nameFor(sub: Subcontractor)(implicit messages: Messages): Option[String] = {
     val first              = sub.firstName.map(_.trim).filter(_.nonEmpty)
     val sur                = sub.surname.map(_.trim).filter(_.nonEmpty)
     val trading            = sub.tradingName.map(_.trim).filter(_.nonEmpty)
@@ -132,7 +140,7 @@ class SelectSubcontractorsToReverifyController @Inject() (
       case Some(_)                                                                 =>
         individualName.orElse(trading)
       case None                                                                    =>
-        Some("no name provided")
+        Some(messages("verify.noName"))
     }
   }
 
