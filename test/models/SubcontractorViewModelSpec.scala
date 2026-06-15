@@ -58,7 +58,7 @@ class SubcontractorViewModelSpec extends SpecBase {
       nino = None
     )
 
-  private val NoName = "no name provided"
+  private val NoName = messages("verify.noName")
 
   "SubcontractorViewModel.checkboxItems" - {
     "map SubcontractorViewModel into CheckboxItemViewModel using id / name" in {
