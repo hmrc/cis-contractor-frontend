@@ -32,6 +32,7 @@ import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
+import play.api.i18n.Messages
 import repositories.SessionRepository
 import viewmodels.verify.SubcontractorReverifyRow
 
@@ -39,6 +40,11 @@ import java.time.{Clock, Instant, LocalDateTime, ZoneOffset}
 import scala.concurrent.Future
 
 class SelectSubcontractorsToReverifyControllerSpec extends SpecBase with MockitoSugar {
+
+  implicit val messages: Messages = play.api.i18n.MessagesImpl(
+    play.api.i18n.Lang.defaultLang,
+    app.injector.instanceOf[play.api.i18n.MessagesApi]
+  )
 
   def onwardRoute: Call = Call("GET", "/foo")
 
@@ -193,13 +199,13 @@ class SelectSubcontractorsToReverifyControllerSpec extends SpecBase with Mockito
           body must include("1234567890")
           body must include("2904743750")
 
-          body must include(">No<")
-          body must include(">Yes<")
+          body must include(messages("site.no"))
+          body must include(messages("site.yes"))
 
           body must include("V0001217702")
-          body must include("Unknown")
+          body must include(messages("site.unknown"))
 
-          body must include("Gross")
+          body must include(messages("verify.selectSubcontractorsToReverify.taxTreatment.gross"))
 
           body must include("11 May 2020")
           body must include("1 Oct 2025")
@@ -442,7 +448,7 @@ class SelectSubcontractorsToReverifyControllerSpec extends SpecBase with Mockito
         status(result) mustBe OK
         val body = contentAsString(result)
 
-        body must include("no name provided")
+        body must include(messages("verify.noName"))
         body must include("9999999999")
       }
     }
@@ -691,7 +697,7 @@ class SelectSubcontractorsToReverifyControllerSpec extends SpecBase with Mockito
 
         val body = contentAsString(result)
         body must include("No UTR Ltd")
-        body must not include "No name provided"
+        body must not include messages("verify.noName")
       }
     }
 
@@ -812,10 +818,10 @@ class SelectSubcontractorsToReverifyControllerSpec extends SpecBase with Mockito
 
         val body = contentAsString(result)
 
-        body must include("Standard rate")
-        body must include("Higher rate")
-        body must include("Gross")
-        body must include("Unknown")
+        body must include(messages("verify.selectSubcontractorsToReverify.taxTreatment.net"))
+        body must include(messages("verify.selectSubcontractorsToReverify.taxTreatment.unmatched"))
+        body must include(messages("verify.selectSubcontractorsToReverify.taxTreatment.gross"))
+        body must include(messages("site.unknown"))
       }
     }
 
