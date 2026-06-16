@@ -26,28 +26,28 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist._
 import viewmodels.implicits._
 
-object IndividualContactMethodOptionsSummary  {
+object IndividualContactMethodOptionsSummary {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(IndividualContactMethodOptionsPage).map {
-      answers =>
+    answers.get(IndividualContactMethodOptionsPage).map { answers =>
 
-        val value = ValueViewModel(
-          HtmlContent(
-            answers.map {
-              answer => HtmlFormat.escape(messages(s"individualContactMethodOptions.$answer")).toString
+      val value = ValueViewModel(
+        HtmlContent(
+          answers
+            .map { answer =>
+              HtmlFormat.escape(messages(s"individualContactMethodOptions.$answer")).toString
             }
             .mkString(",<br>")
-          )
         )
+      )
 
-        SummaryListRowViewModel(
-          key     = "individualContactMethodOptions.checkYourAnswersLabel",
-          value   = value,
-          actions = Seq(
-            ActionItemViewModel("site.change", routes.IndividualContactMethodOptionsController.onPageLoad(CheckMode).url)
-              .withVisuallyHiddenText(messages("individualContactMethodOptions.change.hidden"))
-          )
+      SummaryListRowViewModel(
+        key = "individualContactMethodOptions.checkYourAnswersLabel",
+        value = value,
+        actions = Seq(
+          ActionItemViewModel("site.change", routes.IndividualContactMethodOptionsController.onPageLoad(CheckMode).url)
+            .withVisuallyHiddenText(messages("individualContactMethodOptions.change.hidden"))
         )
+      )
     }
 }

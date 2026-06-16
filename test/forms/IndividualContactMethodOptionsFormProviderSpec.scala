@@ -10,13 +10,13 @@ class IndividualContactMethodOptionsFormProviderSpec extends CheckboxFieldBehavi
 
   ".value" - {
 
-    val fieldName = "value"
+    val fieldName   = "value"
     val requiredKey = "individualContactMethodOptions.error.required"
 
     behave like checkboxField[IndividualContactMethodOptions](
       form,
       fieldName,
-      validValues  = IndividualContactMethodOptions.values,
+      validValues = IndividualContactMethodOptions.values,
       invalidError = FormError(s"$fieldName[0]", "error.invalid")
     )
 

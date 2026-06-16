@@ -27,7 +27,7 @@ case object IndividualContactMethodOptionsPage extends QuestionPage[Set[Individu
 
   override def toString: String = "individualContactMethodOptions"
 
-  override def cleanup(value: Option[Set[IndividualContactMethodOptions]], userAnswers: UserAnswers):  Try[UserAnswers] =
+  override def cleanup(value: Option[Set[IndividualContactMethodOptions]], userAnswers: UserAnswers): Try[UserAnswers] =
     if value.contains(false) then {
       userAnswers.remove(IndividualContactMethodOptionsPage)
     } else {

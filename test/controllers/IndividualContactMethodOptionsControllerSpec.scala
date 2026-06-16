@@ -2,7 +2,7 @@ package controllers
 
 import base.SpecBase
 import forms.IndividualContactMethodOptionsFormProvider
-import models.{NormalMode, IndividualContactMethodOptions, UserAnswers}
+import models.{IndividualContactMethodOptions, NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
@@ -21,10 +21,11 @@ class IndividualContactMethodOptionsControllerSpec extends SpecBase with Mockito
 
   def onwardRoute = Call("GET", "/foo")
 
-  lazy val individualContactMethodOptionsRoute = routes.IndividualContactMethodOptionsController.onPageLoad(NormalMode).url
+  lazy val individualContactMethodOptionsRoute =
+    routes.IndividualContactMethodOptionsController.onPageLoad(NormalMode).url
 
   val formProvider = new IndividualContactMethodOptionsFormProvider()
-  val form = formProvider()
+  val form         = formProvider()
 
   "IndividualContactMethodOptions Controller" - {
 
@@ -47,7 +48,10 @@ class IndividualContactMethodOptionsControllerSpec extends SpecBase with Mockito
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = UserAnswers(userAnswersId).set(IndividualContactMethodOptionsPage, IndividualContactMethodOptions.values.toSet).success.value
+      val userAnswers = UserAnswers(userAnswersId)
+        .set(IndividualContactMethodOptionsPage, IndividualContactMethodOptions.values.toSet)
+        .success
+        .value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
@@ -59,7 +63,10 @@ class IndividualContactMethodOptionsControllerSpec extends SpecBase with Mockito
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(IndividualContactMethodOptions.values.toSet), NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill(IndividualContactMethodOptions.values.toSet), NormalMode)(
+          request,
+          messages(application)
+        ).toString
       }
     }
 

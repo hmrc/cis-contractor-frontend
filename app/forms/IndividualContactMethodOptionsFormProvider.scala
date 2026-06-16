@@ -27,6 +27,7 @@ class IndividualContactMethodOptionsFormProvider @Inject() extends Mappings {
 
   def apply(): Form[Set[IndividualContactMethodOptions]] =
     Form(
-      "value" -> set(enumerable[IndividualContactMethodOptions]("individualContactMethodOptions.error.required")).verifying(nonEmptySet("individualContactMethodOptions.error.required"))
+      "value" -> set(enumerable[IndividualContactMethodOptions]("individualContactMethodOptions.error.required"))
+        .verifying(nonEmptySet("individualContactMethodOptions.error.required"))
     )
 }

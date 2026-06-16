@@ -8,7 +8,12 @@ import org.scalatest.matchers.must.Matchers
 import org.scalatest.OptionValues
 import play.api.libs.json.{JsError, JsString, Json}
 
-class IndividualContactMethodOptionsSpec extends AnyFreeSpec with Matchers with ScalaCheckPropertyChecks with OptionValues with ModelGenerators {
+class IndividualContactMethodOptionsSpec
+    extends AnyFreeSpec
+    with Matchers
+    with ScalaCheckPropertyChecks
+    with OptionValues
+    with ModelGenerators {
 
   "IndividualContactMethodOptions" - {
 
@@ -16,10 +21,11 @@ class IndividualContactMethodOptionsSpec extends AnyFreeSpec with Matchers with 
 
       val gen = arbitrary[IndividualContactMethodOptions]
 
-      forAll(gen) {
-        individualContactMethodOptions =>
-
-          JsString(individualContactMethodOptions.toString).validate[IndividualContactMethodOptions].asOpt.value mustEqual individualContactMethodOptions
+      forAll(gen) { individualContactMethodOptions =>
+        JsString(individualContactMethodOptions.toString)
+          .validate[IndividualContactMethodOptions]
+          .asOpt
+          .value mustEqual individualContactMethodOptions
       }
     }
 
@@ -27,10 +33,8 @@ class IndividualContactMethodOptionsSpec extends AnyFreeSpec with Matchers with 
 
       val gen = arbitrary[String] suchThat (!IndividualContactMethodOptions.values.map(_.toString).contains(_))
 
-      forAll(gen) {
-        invalidValue =>
-
-          JsString(invalidValue).validate[IndividualContactMethodOptions] mustEqual JsError("error.invalid")
+      forAll(gen) { invalidValue =>
+        JsString(invalidValue).validate[IndividualContactMethodOptions] mustEqual JsError("error.invalid")
       }
     }
 
@@ -38,10 +42,8 @@ class IndividualContactMethodOptionsSpec extends AnyFreeSpec with Matchers with 
 
       val gen = arbitrary[IndividualContactMethodOptions]
 
-      forAll(gen) {
-        individualContactMethodOptions =>
-
-          Json.toJson(individualContactMethodOptions) mustEqual JsString(individualContactMethodOptions.toString)
+      forAll(gen) { individualContactMethodOptions =>
+        Json.toJson(individualContactMethodOptions) mustEqual JsString(individualContactMethodOptions.toString)
       }
     }
   }
