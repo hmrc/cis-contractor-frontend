@@ -24,7 +24,7 @@ import org.scalatest.matchers.must.Matchers
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import play.api.libs.json._
 
-class ContactMethodOptionsSpec extends AnyFreeSpec with Matchers with ScalaCheckPropertyChecks with OptionValues  {
+class ContactMethodOptionsSpec extends AnyFreeSpec with Matchers with ScalaCheckPropertyChecks with OptionValues {
   "ContactMethodOptions" - {
 
     "must deserialise valid values" in {
