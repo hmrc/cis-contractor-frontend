@@ -16,7 +16,6 @@
 
 package forms.add.partnership
 
-import forms.add.partnership.AddPartnershipContactMethodsYesNoFormProvider
 import forms.behaviours.BooleanFieldBehaviours
 import play.api.data.FormError
 

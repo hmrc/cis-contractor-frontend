@@ -384,17 +384,17 @@ addressLookup.trustQuestionsAddress.confirmPage.heading                      =  
 addressLookup.trustQuestionsAddress.confirmPage.changeLinkText               =  Edit this address
 addressLookup.trustQuestionsAddress.confirmPage.submitLabel                  =  Confirm address
 
-addPartnershipContactMethodsYesNo.title                                  =  Do you want to add contact details for this partnership?
-addPartnershipContactMethodsYesNo.heading                                =  Do you want to add contact details for {0}?
-addPartnershipContactMethodsYesNo.error.required                         =  Select yes if you want to add contact details for this partnership
-addPartnershipContactMethodsYesNo.checkYourAnswersLabel                  =  Add contact details?
-addPartnershipContactMethodsYesNo.change.hidden                          =  add contact details?
+addPartnershipContactMethodsYesNo.title                                      =  Do you want to add contact details for this partnership?
+addPartnershipContactMethodsYesNo.heading                                    =  Do you want to add contact details for {0}?
+addPartnershipContactMethodsYesNo.error.required                             =  Select yes if you want to add contact details for this partnership
+addPartnershipContactMethodsYesNo.checkYourAnswersLabel                      =  Add contact details?
+addPartnershipContactMethodsYesNo.change.hidden                              =  add contact details?
 
-addCompanyContactMethodsYesNo.title                                      =  Do you want to add contact details for this company?
-addCompanyContactMethodsYesNo.heading                                    =  Do you want to add contact details for {0}?
-addCompanyContactMethodsYesNo.error.required                             =  Select yes if you want to add contact details for this company
-addCompanyContactMethodsYesNo.checkYourAnswersLabel                      =  Add contact details?
-addCompanyContactMethodsYesNo.change.hidden                              =  add contact details?
+addCompanyContactMethodsYesNo.title                                          =  Do you want to add contact details for this company?
+addCompanyContactMethodsYesNo.heading                                        =  Do you want to add contact details for {0}?
+addCompanyContactMethodsYesNo.error.required                                 =  Select yes if you want to add contact details for this company
+addCompanyContactMethodsYesNo.checkYourAnswersLabel                          =  Add contact details?
+addCompanyContactMethodsYesNo.change.hidden                                  =  add contact details?
 
 # Partnership
 partnershipWorksReferenceNumberYesNo.title                  =  Is there a works reference number associated with this partnership?

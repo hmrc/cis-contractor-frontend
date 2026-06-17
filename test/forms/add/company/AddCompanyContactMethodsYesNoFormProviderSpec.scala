@@ -16,7 +16,6 @@
 
 package forms.add.company
 
-import forms.add.company.AddCompanyContactMethodsYesNoFormProvider
 import forms.behaviours.BooleanFieldBehaviours
 import play.api.data.FormError
 
