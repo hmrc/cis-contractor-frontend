@@ -18,7 +18,7 @@ package navigation.add
 
 import base.SpecBase
 import controllers.routes
-import models.add.InternationalAddress
+import models.address.Address
 import models.contact.ContactOptions
 import models.{CheckMode, NormalMode, UserAnswers}
 import pages.add.partnership.*
@@ -152,7 +152,7 @@ class PartnershipNavigatorSpec extends SpecBase {
       }
 
       "must go from PartnershipAddressPage to PartnershipChooseContactDetailsController in NormalMode" in {
-        val address = InternationalAddress("1 Test Street", None, "Town", None, "AA1 1AA", "GB")
+        val address = Address("1 Test Street", addressLine3 = Some("Town"), postcode = Some("AA1 1AA"))
 
         navigator.nextPage(
           PartnershipAddressPage,
@@ -161,12 +161,12 @@ class PartnershipNavigatorSpec extends SpecBase {
         ) mustBe controllers.add.partnership.routes.PartnershipChooseContactDetailsController.onPageLoad(NormalMode)
       }
 
-      "must go from PartnershipAddressYesNoPage to PartnershipAddressController when true in NormalMode" in {
+      "must go from PartnershipAddressYesNoPage to the address lookup on-ramp when true in NormalMode" in {
         navigator.nextPage(
           PartnershipAddressYesNoPage,
           NormalMode,
           emptyUserAnswers.setOrException(PartnershipAddressYesNoPage, true)
-        ) mustBe controllers.add.partnership.routes.PartnershipAddressController.onPageLoad(NormalMode)
+        ) mustBe controllers.add.partnership.routes.PartnershipAddressController.redirectToAddressLookup()
       }
 
       "must go from PartnershipAddressYesNoPage to PartnershipChooseContactDetailsController when false in NormalMode" in {
@@ -467,6 +467,34 @@ class PartnershipNavigatorSpec extends SpecBase {
           emptyUserAnswers
         ) mustBe controllers.routes.IndexController.onPageLoad()
       }
+
+      "must go from AddPartnershipContactMethodsYesNo" - {
+        "to AddPartnershipContactMethodsYesNoPage when answer is Yes" in {
+          navigator.nextPage(
+            AddPartnershipContactMethodsYesNoPage,
+            NormalMode,
+            emptyUserAnswers.setOrException(AddPartnershipContactMethodsYesNoPage, true)
+          ) mustBe controllers.add.partnership.routes.AddPartnershipContactMethodsYesNoController
+            .onPageLoad(NormalMode)
+        }
+
+        "to PartnershipHasUtrYesNo when answer is No" in {
+          navigator.nextPage(
+            AddPartnershipContactMethodsYesNoPage,
+            NormalMode,
+            emptyUserAnswers.setOrException(AddPartnershipContactMethodsYesNoPage, false)
+          ) mustBe controllers.add.partnership.routes.PartnershipHasUtrYesNoController
+            .onPageLoad(NormalMode)
+        }
+
+        "to JourneyRecoveryPage when answer is not present" in {
+          navigator.nextPage(
+            AddPartnershipContactMethodsYesNoPage,
+            NormalMode,
+            emptyUserAnswers
+          ) mustBe journeyRecovery
+        }
+      }
     }
 
     "in Check mode" - {
@@ -512,16 +540,18 @@ class PartnershipNavigatorSpec extends SpecBase {
         ) mustBe journeyRecovery
       }
 
-      "must go from PartnershipAddressYesNoPage to PartnershipAddressController when true and address not yet filled in CheckMode" in {
+      "must go from PartnershipAddressYesNoPage to the address lookup on-ramp when true and address not yet filled in CheckMode" in {
         navigator.nextPage(
           PartnershipAddressYesNoPage,
           CheckMode,
           emptyUserAnswers.setOrException(PartnershipAddressYesNoPage, true)
-        ) mustBe controllers.add.partnership.routes.PartnershipAddressController.onPageLoad(CheckMode)
+        ) mustBe controllers.add.partnership.routes.PartnershipAddressController.redirectToAddressLookup(
+          Some(CheckMode.toString)
+        )
       }
 
       "must go from PartnershipAddressYesNoPage to PartnershipCheckYourAnswers when true and address already filled in CheckMode" in {
-        val address = InternationalAddress("1 Test Street", None, "Town", None, "AA1 1AA", "GB")
+        val address = Address("1 Test Street", addressLine3 = Some("Town"), postcode = Some("AA1 1AA"))
         navigator.nextPage(
           PartnershipAddressYesNoPage,
           CheckMode,
@@ -996,6 +1026,36 @@ class PartnershipNavigatorSpec extends SpecBase {
             CheckMode,
             emptyUserAnswers
           ) mustBe routes.JourneyRecoveryController.onPageLoad()
+        }
+      }
+
+      "must go from AddPartnershipContactMethodsYesNo" - {
+        "to AddPartnershipContactMethodsYesNo page when answer is Yes" in {
+          val answers = emptyUserAnswers.set(AddPartnershipContactMethodsYesNoPage, true).success.value
+
+          navigator.nextPage(
+            AddPartnershipContactMethodsYesNoPage,
+            CheckMode,
+            answers
+          ) mustBe controllers.add.partnership.routes.AddPartnershipContactMethodsYesNoController.onPageLoad(CheckMode)
+        }
+
+        "to CYA when answer is No" in {
+          val answers = emptyUserAnswers.set(AddPartnershipContactMethodsYesNoPage, false).success.value
+
+          navigator.nextPage(
+            AddPartnershipContactMethodsYesNoPage,
+            CheckMode,
+            answers
+          ) mustBe controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
+        }
+
+        "to JourneyRecovery when answer is not present" in {
+          navigator.nextPage(
+            AddPartnershipContactMethodsYesNoPage,
+            CheckMode,
+            emptyUserAnswers
+          ) mustBe journeyRecovery
         }
       }
 

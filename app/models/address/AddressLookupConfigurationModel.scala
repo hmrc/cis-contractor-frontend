@@ -14,20 +14,16 @@
  * limitations under the License.
  */
 
-package models.add
+package models.address
 
-import play.api.libs.json.*
+import play.api.libs.json.{Json, Writes}
 
-case class InternationalAddress(
-  addressLine1: String,
-  addressLine2: Option[String],
-  addressLine3: String,
-  addressLine4: Option[String],
-  postalCode: String,
-  country: String
+case class AddressLookupConfigurationModel(
+  version: Int,
+  options: AddressLookupOptionsModel,
+  labels: AddressMessageLanguageModel
 )
 
-object InternationalAddress {
-
-  implicit val format: OFormat[InternationalAddress] = Json.format[InternationalAddress]
+object AddressLookupConfigurationModel {
+  implicit val writes: Writes[AddressLookupConfigurationModel] = Json.writes[AddressLookupConfigurationModel]
 }
