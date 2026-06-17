@@ -16,7 +16,7 @@
 
 package pages.add.company
 
-import models.add.InternationalAddress
+import models.address.{Address, Country}
 import pages.behaviours.PageBehaviours
 
 class CompanyAddressYesNoPageSpec extends PageBehaviours {
@@ -31,13 +31,13 @@ class CompanyAddressYesNoPageSpec extends PageBehaviours {
 
     "cleanup: must remove CompanyAddress userAnswers when No is selected" in {
 
-      val address = InternationalAddress(
+      val address = Address(
         addressLine1 = "line 1",
         addressLine2 = Some("line 2"),
-        addressLine3 = "line 3",
+        addressLine3 = Some("line 3"),
         addressLine4 = Some("line 4"),
-        postalCode = "NX1 1AA",
-        country = "United Kingdom"
+        postcode = Some("NX1 1AA"),
+        country = Some(Country(Some("GB"), Some("United Kingdom")))
       )
 
       val userAnswers = emptyUserAnswers.set(CompanyAddressPage, address).success.value

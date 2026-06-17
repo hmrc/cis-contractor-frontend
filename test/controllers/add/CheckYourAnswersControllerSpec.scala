@@ -18,7 +18,8 @@ package controllers.add
 
 import base.SpecBase
 import controllers.routes
-import models.add.{InternationalAddress, SubcontractorName}
+import models.add.SubcontractorName
+import models.address.{Address, Country}
 import models.contact.ContactOptions
 import models.{CheckMode, TypeOfSubcontractor, UserAnswers}
 import org.mockito.ArgumentMatchers.any
@@ -104,13 +105,13 @@ class CheckYourAnswersControllerSpec extends SpecBase {
     }
 
     "must return OK and the correct view for a GET when all optionals are present" in {
-      val address = InternationalAddress(
+      val address = Address(
         addressLine1 = "1 Test Street",
         addressLine2 = None,
-        addressLine3 = "Test Town",
+        addressLine3 = Some("Test Town"),
         addressLine4 = None,
-        postalCode = "TE1 1ST",
-        country = "GB"
+        postcode = Some("TE1 1ST"),
+        country = Some(Country(Some("GB"), Some("United Kingdom")))
       )
 
       val ua =
@@ -668,7 +669,16 @@ class CheckYourAnswersControllerSpec extends SpecBase {
 
       "must return OK when SubAddressYesNo changes from Yes to No and stale UTR values are cleaned up" in {
 
-        val address = InternationalAddress("1 Test Street", None, "City", None, "AA1 1AA", "GB")
+        val address =
+          Address(
+            "1 Test Street",
+            None,
+            Some("City"),
+            None,
+            None,
+            Some("AA1 1AA"),
+            Some(Country(Some("GB"), Some("United Kingdom")))
+          )
 
         val ua = minUa
           .set(IndividualChooseContactDetailsPage, ContactOptions.Email)
@@ -842,7 +852,16 @@ class CheckYourAnswersControllerSpec extends SpecBase {
       }
 
       "must redirect to Journey Recovery when AddressYesNo is false but address value is present (stale session)" in {
-        val address = InternationalAddress("1 Test Street", None, "City", None, "AA1 1AA", "GB")
+        val address =
+          Address(
+            "1 Test Street",
+            None,
+            Some("City"),
+            None,
+            None,
+            Some("AA1 1AA"),
+            Some(Country(Some("GB"), Some("United Kingdom")))
+          )
 
         val uaBase =
           minUa
