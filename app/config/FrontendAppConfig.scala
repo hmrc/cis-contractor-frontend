@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,20 +20,46 @@ import com.google.inject.{Inject, Singleton}
 import play.api.Configuration
 import play.api.i18n.Lang
 import play.api.mvc.RequestHeader
-import scala.io.Source
-import play.api.libs.json.Json
 
 @Singleton
 class FrontendAppConfig @Inject() (configuration: Configuration) {
 
-  lazy val host: String    = configuration.get[String]("host")
-  lazy val appName: String = configuration.get[String]("appName")
+  lazy val host: String       = configuration.get[String]("host")
+  lazy val appName: String    = configuration.get[String]("appName")
+  lazy val cisStubUrl: String = baseUrl("construction-industry-scheme-external-stub")
 
-  private lazy val contactHost                  = configuration.get[String]("contact-frontend.host")
-  private lazy val contactFormServiceIdentifier = configuration.get[String]("contact-frontend.serviceId")
+  private lazy val contactHost             = configuration.get[String]("contact-frontend.host")
+  val contactFormServiceIdentifier: String = configuration.get[String]("contact-frontend.serviceId")
 
   def feedbackUrl(implicit request: RequestHeader): String =
     s"$contactHost/contact/beta-feedback?service=$contactFormServiceIdentifier&backUrl=${host + request.uri}"
+
+  protected lazy val rootServices = "microservice.services"
+
+  protected lazy val defaultProtocol: String =
+    configuration
+      .getOptional[String](s"$rootServices.protocol")
+      .getOrElse("http")
+
+  private def throwConfigNotFoundError(key: String): Nothing =
+    throw new RuntimeException(s"Could not find config key '$key'")
+
+  def getConfString(confKey: String, defString: => String): String =
+    configuration
+      .getOptional[String](s"$rootServices.$confKey")
+      .getOrElse(defString)
+
+  def getConfInt(confKey: String, defInt: => Int): Int =
+    configuration
+      .getOptional[Int](s"$rootServices.$confKey")
+      .getOrElse(defInt)
+
+  def baseUrl(serviceName: String): String = {
+    val protocol = getConfString(s"$serviceName.protocol", defaultProtocol)
+    val host     = getConfString(s"$serviceName.host", throwConfigNotFoundError(s"$serviceName.host"))
+    val port     = getConfInt(s"$serviceName.port", throwConfigNotFoundError(s"$serviceName.port"))
+    s"$protocol://$host:$port"
+  }
 
   lazy val loginUrl: String                      = configuration.get[String]("urls.login")
   lazy val loginContinueUrl: String              = configuration.get[String]("urls.loginContinue")
@@ -62,18 +88,10 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
 
   lazy val cacheTtl: Long = configuration.get[Int]("mongodb.timeToLiveInSeconds")
 
+  lazy val addressLookupFrontendUrl: String = baseUrl("address-lookup-frontend")
+
+  def addressLookupRetrievalUrl(id: String): String = s"$addressLookupFrontendUrl/api/v2/confirmed?id=$id"
+  def addressLookupJourneyUrl: String               = s"$addressLookupFrontendUrl/api/v2/init"
+
   lazy val submissionPollTimeoutSeconds: Int = configuration.get[Int]("submission-poll-timeout-seconds")
-
-  lazy val locationCanonicalList: Seq[(String, String)] = {
-    val source     = Source.fromResource("location-autocomplete-canonical-list.json")
-    val jsonString =
-      try source.mkString
-      finally source.close()
-    val json       = Json.parse(jsonString)
-
-    json.as[Seq[Seq[String]]].map {
-      case Seq(name, code) => (name, code)
-      case other           => throw new RuntimeException(s"Unexpected format in JSON: $other")
-    }
-  }
 }

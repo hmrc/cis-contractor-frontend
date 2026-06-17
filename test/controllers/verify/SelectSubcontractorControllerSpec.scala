@@ -35,11 +35,17 @@ import play.api.test.Helpers.*
 import repositories.SessionRepository
 import services.PaginationService
 import views.html.verify.SelectSubcontractorView
+import play.api.i18n.Messages
 
 import javax.inject.Inject
 import scala.concurrent.Future
 
 class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
+
+  implicit val messages: Messages = play.api.i18n.MessagesImpl(
+    play.api.i18n.Lang.defaultLang,
+    app.injector.instanceOf[play.api.i18n.MessagesApi]
+  )
 
   def onwardRoute: Call = Call("GET", "/foo")
 
