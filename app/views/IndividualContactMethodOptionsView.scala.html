@@ -38,13 +38,11 @@
                 name   = "value",
                 legend = LegendViewModel(messages("individualContactMethodOptions.heading", "subcontractor")).asPageHeading(),
                 items  = IndividualContactMethodOptions.checkboxItems
-            ).withHint(Hint(
-                content = HtmlContent(messages("individualContactMethodOptions.hint"))
+            ).withHint(Hint(content = HtmlContent(messages("individualContactMethodOptions.hint"))
             )
         )
 
-        @govukButton(
-            ButtonViewModel(messages("site.continue"))
-        )
+        @govukButton(ButtonViewModel(messages("site.continue"))
     }
+}
 }
