@@ -467,6 +467,34 @@ class PartnershipNavigatorSpec extends SpecBase {
           emptyUserAnswers
         ) mustBe controllers.routes.IndexController.onPageLoad()
       }
+
+      "must go from AddPartnershipContactMethodsYesNo" - {
+        "to AddPartnershipContactMethodsYesNoPage when answer is Yes" in {
+          navigator.nextPage(
+            AddPartnershipContactMethodsYesNoPage,
+            NormalMode,
+            emptyUserAnswers.setOrException(AddPartnershipContactMethodsYesNoPage, true)
+          ) mustBe controllers.add.partnership.routes.AddPartnershipContactMethodsYesNoController
+            .onPageLoad(NormalMode)
+        }
+
+        "to PartnershipHasUtrYesNo when answer is No" in {
+          navigator.nextPage(
+            AddPartnershipContactMethodsYesNoPage,
+            NormalMode,
+            emptyUserAnswers.setOrException(AddPartnershipContactMethodsYesNoPage, false)
+          ) mustBe controllers.add.partnership.routes.PartnershipHasUtrYesNoController
+            .onPageLoad(NormalMode)
+        }
+
+        "to JourneyRecoveryPage when answer is not present" in {
+          navigator.nextPage(
+            AddPartnershipContactMethodsYesNoPage,
+            NormalMode,
+            emptyUserAnswers
+          ) mustBe journeyRecovery
+        }
+      }
     }
 
     "in Check mode" - {
@@ -996,6 +1024,36 @@ class PartnershipNavigatorSpec extends SpecBase {
             CheckMode,
             emptyUserAnswers
           ) mustBe routes.JourneyRecoveryController.onPageLoad()
+        }
+      }
+
+      "must go from AddPartnershipContactMethodsYesNo" - {
+        "to AddPartnershipContactMethodsYesNo page when answer is Yes" in {
+          val answers = emptyUserAnswers.set(AddPartnershipContactMethodsYesNoPage, true).success.value
+
+          navigator.nextPage(
+            AddPartnershipContactMethodsYesNoPage,
+            CheckMode,
+            answers
+          ) mustBe controllers.add.partnership.routes.AddPartnershipContactMethodsYesNoController.onPageLoad(CheckMode)
+        }
+
+        "to CYA when answer is No" in {
+          val answers = emptyUserAnswers.set(AddPartnershipContactMethodsYesNoPage, false).success.value
+
+          navigator.nextPage(
+            AddPartnershipContactMethodsYesNoPage,
+            CheckMode,
+            answers
+          ) mustBe controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
+        }
+
+        "to JourneyRecovery when answer is not present" in {
+          navigator.nextPage(
+            AddPartnershipContactMethodsYesNoPage,
+            CheckMode,
+            emptyUserAnswers
+          ) mustBe journeyRecovery
         }
       }
 

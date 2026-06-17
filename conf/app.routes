@@ -288,6 +288,11 @@ POST  /subcontractor/add/partnership/mobile-number         controllers.add.partn
 GET   /subcontractor/add/partnership/change-mobile-number  controllers.add.partnership.PartnershipMobileNumberController.onPageLoad(mode: Mode = CheckMode)
 POST  /subcontractor/add/partnership/change-mobile-number  controllers.add.partnership.PartnershipMobileNumberController.onSubmit(mode: Mode = CheckMode)
 
+GET   /subcontractor/add/partnership/add-contact-details         controllers.add.partnership.AddPartnershipContactMethodsYesNoController.onPageLoad(mode: Mode = NormalMode)
+POST  /subcontractor/add/partnership/add-contact-details         controllers.add.partnership.AddPartnershipContactMethodsYesNoController.onSubmit(mode: Mode = NormalMode)
+GET   /subcontractor/add/partnership/change-add-contact-details  controllers.add.partnership.AddPartnershipContactMethodsYesNoController.onPageLoad(mode: Mode = CheckMode)
+POST  /subcontractor/add/partnership/change-add-contact-details  controllers.add.partnership.AddPartnershipContactMethodsYesNoController.onSubmit(mode: Mode = CheckMode)
+
 # Trust
 GET   /subcontractor/add/trust/subcontractor-added               controllers.add.SubcontractorAddedController.trustSubcontractorAdded()
 
