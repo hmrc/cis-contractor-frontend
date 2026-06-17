@@ -41,14 +41,7 @@
                 name   = "value",
                 legend = LegendViewModel(messages("trustContactMethodOptions.heading", trustName)).asPageHeading(Large),
                 items  = TrustContactMethodOptions.checkboxItems
-            )
-            .copy(
-                hint = Some(
-                Hint(
-                content = HtmlContent(messages("trustContactMethodOptions.hint"))
-                )
-              )
-            )
+            ) .withHint(HintViewModel(messages("trustContactMethodOptions.hint")))
         )
 
         @govukButton(
