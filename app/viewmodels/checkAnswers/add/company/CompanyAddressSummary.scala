@@ -16,45 +16,22 @@
 
 package viewmodels.checkAnswers.add.company
 
-import models.add.InternationalAddress
-import models.{CheckMode, UserAnswers}
+import models.UserAnswers
 import pages.add.company.CompanyAddressPage
 import play.api.i18n.Messages
-import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
-import viewmodels.govuk.summarylist.*
-import viewmodels.implicits.*
+import viewmodels.checkAnswers.add.AddressSummaryRow
 
 object CompanyAddressSummary {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
     answers.get(CompanyAddressPage).map { answer =>
-
-      val lines: Seq[String] = Seq(
-        answer.addressLine1,
-        answer.addressLine2.getOrElse(""),
-        answer.addressLine3,
-        answer.addressLine4.getOrElse(""),
-        answer.postalCode,
-        answer.country
-      )
-
-      val addressHtml: String =
-        lines
-          .filter(_.trim.nonEmpty)
-          .mkString("<br/>")
-
-      SummaryListRowViewModel(
+      AddressSummaryRow.row(
+        address = answer,
         key = "companyAddress.checkYourAnswersLabel",
-        value = ValueViewModel(HtmlContent(addressHtml)),
-        actions = Seq(
-          ActionItemViewModel(
-            "site.change",
-            controllers.add.company.routes.CompanyAddressController.onPageLoad(CheckMode).url
-          )
-            .withVisuallyHiddenText(messages("companyAddress.change.hidden"))
-            .withAttribute("id" -> "address-of-company")
-        )
+        changeCall = controllers.add.company.routes.CompanyAddressController.redirectToAddressLookup(Some("change")),
+        hiddenTextKey = "companyAddress.change.hidden",
+        id = "address-of-company"
       )
     }
 }

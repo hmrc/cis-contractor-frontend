@@ -47,12 +47,12 @@ class CompanyNavigatorSpec extends SpecBase {
       }
 
       "must go from CompanyAddressYesNoPage" - {
-        "to CompanyAddress page when answer is Yes" in {
+        "to the address lookup on-ramp when answer is Yes" in {
           navigator.nextPage(
             CompanyAddressYesNoPage,
             NormalMode,
             emptyUserAnswers.setOrException(CompanyAddressYesNoPage, true)
-          ) mustBe controllers.add.company.routes.CompanyAddressController.onPageLoad(NormalMode)
+          ) mustBe controllers.add.company.routes.CompanyAddressController.redirectToAddressLookup()
         }
 
         "to CompanyContactOptions page when answer is No" in {
@@ -286,25 +286,27 @@ class CompanyNavigatorSpec extends SpecBase {
       }
 
       "must go from CompanyAddressYesNoPage" - {
-        "to CompanyAddress page when answer is Yes and CompanyAddressPage is not answered before" in {
+        "to the address lookup on-ramp when answer is Yes and CompanyAddressPage is not answered before" in {
           val answers = emptyUserAnswers.set(CompanyAddressYesNoPage, true).success.value
 
           navigator.nextPage(
             CompanyAddressYesNoPage,
             CheckMode,
             answers
-          ) mustBe controllers.add.company.routes.CompanyAddressController.onPageLoad(CheckMode)
+          ) mustBe controllers.add.company.routes.CompanyAddressController.redirectToAddressLookup(
+            Some(CheckMode.toString)
+          )
         }
 
         "to Company CYA when answer is Yes and CompanyAddressPage is answered before" in {
 
-          val address = models.add.InternationalAddress(
+          val address = models.address.Address(
             addressLine1 = "10 Example Street",
             addressLine2 = Some("Suite 2"),
-            addressLine3 = "Newcastle",
+            addressLine3 = Some("Newcastle"),
             addressLine4 = Some("Tyne & Wear"),
-            postalCode = "NE1 1AA",
-            country = "United Kingdom"
+            postcode = Some("NE1 1AA"),
+            country = Some(models.address.Country(Some("GB"), Some("United Kingdom")))
           )
 
           val answers =
