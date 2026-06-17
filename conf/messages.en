@@ -775,6 +775,16 @@ trustCheckYourAnswers.trailHeading                             =  Now add this s
 trustCheckYourAnswers.trailText                                =  By adding this subcontractor you are confirming that, to the best of your knowledge, the details you are providing are correct.
 trustCheckYourAnswers.continue                                 =  Accept and submit
 
+trustContactMethodOptions.title                                =  Which contact details do you want to add for this trust?
+trustContactMethodOptions.heading                              =  Which contact details do you want to add for {0}?
+trustContactMethodOptions.hint                                 =  Contact details are only for your own records
+trustContactMethodOptions.email                                =  Email address
+trustContactMethodOptions.phone                                =  Phone number
+trustContactMethodOptions.mobile                               =  Mobile number
+trustContactMethodOptions.error.required                       =  Select the methods of contact you want to add for this trust
+trustContactMethodOptions.checkYourAnswersLabel                =  Methods of contact
+trustContactMethodOptions.change.hidden                        =  methods of contact
+
 # Verify
 verify.submissionSending.title                                          =  Submitting your verification request
 verify.submissionSending.heading                                        =  Your verification request is being sent to HMRC
