@@ -57,12 +57,7 @@ case class Address(
           case (None, None) =>
             None
           case _            =>
-            Some(
-              Country(
-                code = country.code.map(_.trim).filterNot(_.isEmpty),
-                name = country.name.map(_.trim).filterNot(_.isEmpty)
-              )
-            )
+            Some(Country(code = optCode, name = optName))
         }
       },
       this.addressValidated

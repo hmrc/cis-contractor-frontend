@@ -19,6 +19,7 @@ package viewmodels.checkAnswers.add
 import models.address.Address
 import play.api.i18n.Messages
 import play.api.mvc.Call
+import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
@@ -40,7 +41,7 @@ object AddressSummaryRow {
         address.addressLine4.getOrElse(""),
         address.postcode.getOrElse(""),
         address.country.flatMap(_.name).getOrElse("")
-      ).filter(_.trim.nonEmpty).mkString("<br/>")
+      ).filter(_.trim.nonEmpty).map(line => HtmlFormat.escape(line).body).mkString("<br/>")
 
     SummaryListRowViewModel(
       key = key,

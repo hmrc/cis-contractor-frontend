@@ -139,19 +139,17 @@ class PartnershipAddressControllerSpec extends SpecBase with MockitoSugar {
         }
       }
 
-      "must redirect to Journey Recovery when no session data is found" in {
+      "must redirect to Journey Recovery when ALF is unavailable" in {
 
-        val mockSessionRepository    = mock[SessionRepository]
         val mockAddressLookupService = mock[AddressLookupService]
 
-        when(mockSessionRepository.get(any())) thenReturn Future.successful(None)
+        when(
+          mockAddressLookupService.getJourneyUrl(any(), any(), any(), any(), any())(any(), any(), any())
+        ) thenReturn Future.failed(new RuntimeException("ALF unavailable"))
 
         val application =
           applicationBuilder(userAnswers = Some(userAnswersWithName))
-            .overrides(
-              bind[SessionRepository].toInstance(mockSessionRepository),
-              bind[AddressLookupService].toInstance(mockAddressLookupService)
-            )
+            .overrides(bind[AddressLookupService].toInstance(mockAddressLookupService))
             .build()
 
         running(application) {

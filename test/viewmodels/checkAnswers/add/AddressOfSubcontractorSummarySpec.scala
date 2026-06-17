@@ -164,8 +164,8 @@ class AddressOfSubcontractorSummarySpec extends AnyWordSpec with Matchers with C
 
       val html = extractHtml(row)
 
-      assertRaw(html, "10 O'Reilly & Co")
-      assertRaw(html, "Building & Sons")
+      assertRaw(html, "10 O&#x27;Reilly &amp; Co")
+      assertRaw(html, "Building &amp; Sons")
 
       assertHasBreaks(html)
 

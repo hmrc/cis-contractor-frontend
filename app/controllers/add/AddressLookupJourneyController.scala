@@ -73,17 +73,14 @@ trait AddressLookupJourneyController extends FrontendBaseController with I18nSup
 
   def redirectToAddressLookup(mode: Mode, changeRoute: Option[String] = None): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
-      sessionRepository.get(request.userAnswers.id).flatMap {
-        case Some(_) =>
-          val callback = if (changeRoute.isDefined) changeCallback else standardCallback
-          subcontractorName(request.userAnswers) match {
-            case Some(name) =>
-              addressLookupService
-                .getJourneyUrl(journeyId, callback, optName = Some(name), mandatoryFieldsConfigModel = mandatoryFields)
-                .map(Redirect)
-            case None       => Future.successful(Redirect(journeyRecovery))
-          }
-        case None    => Future.successful(Redirect(journeyRecovery))
+      val callback = if (changeRoute.isDefined) changeCallback else standardCallback
+      subcontractorName(request.userAnswers) match {
+        case Some(name) =>
+          addressLookupService
+            .getJourneyUrl(journeyId, callback, optName = Some(name), mandatoryFieldsConfigModel = mandatoryFields)
+            .map(Redirect)
+            .recover { case _ => Redirect(journeyRecovery) }
+        case None       => Future.successful(Redirect(journeyRecovery))
       }
     }
 
@@ -100,9 +97,10 @@ trait AddressLookupJourneyController extends FrontendBaseController with I18nSup
   private def saveAddressAndRedirect(id: String, onSuccess: Call)(implicit
     request: DataRequest[AnyContent]
   ): Future[Result] =
-    for {
+    (for {
       address <- addressLookupService.getAddressById(id)
       updated <- addressLookupService.saveAddressDetails(address, addressPage)
-    } yield if (updated) Redirect(onSuccess) else Redirect(journeyRecovery)
+    } yield if (updated) Redirect(onSuccess) else Redirect(journeyRecovery))
+      .recover { case _ => Redirect(journeyRecovery) }
 
 }
