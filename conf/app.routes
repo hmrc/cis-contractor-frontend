@@ -364,6 +364,11 @@ POST  /subcontractor/add/trust/change-trust-works-reference      controllers.add
 GET   /subcontractor/add/trust/check-your-answers                controllers.add.trust.TrustCheckYourAnswersController.onPageLoad()
 POST  /subcontractor/add/trust/check-your-answers                controllers.add.trust.TrustCheckYourAnswersController.onSubmit()
 
+GET   /subcontractor/add/trust/select-contact-details            controllers.add.trust.TrustContactMethodOptionsController.onPageLoad(mode: Mode = NormalMode)
+POST  /subcontractor/add/trust/select-contact-details            controllers.add.trust.TrustContactMethodOptionsController.onSubmit(mode: Mode = NormalMode)
+GET   /subcontractor/add/trust/change-select-contact-details     controllers.add.trust.TrustContactMethodOptionsController.onPageLoad(mode: Mode = CheckMode)
+POST  /subcontractor/add/trust/change-select-contact-details     controllers.add.trust.TrustContactMethodOptionsController.onSubmit(mode: Mode = CheckMode)
+
 # Verify
 GET   /subcontractor/verify/confirmation-email-not-stored         controllers.verify.ContractorEmailConfirmationNotStoredController.onPageLoad(mode: Mode = NormalMode)
 POST  /subcontractor/verify/confirmation-email-not-stored         controllers.verify.ContractorEmailConfirmationNotStoredController.onSubmit(mode: Mode = NormalMode)
