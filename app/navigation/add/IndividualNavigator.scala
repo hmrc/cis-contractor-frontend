@@ -226,7 +226,7 @@ class IndividualNavigator @Inject() () extends NavigatorForJourney {
   private def navigatorFromAddIndividualContactMethodsYesNoPage(mode: Mode)(ua: UserAnswers): Call =
     (ua.get(AddIndividualContactMethodsYesNoPage), mode) match {
 
-      case (Some(true), mode) =>
+      case (Some(true), _) =>
         controllers.add.routes.AddIndividualContactMethodsYesNoController.onPageLoad(mode)
 
       case (Some(false), NormalMode) =>

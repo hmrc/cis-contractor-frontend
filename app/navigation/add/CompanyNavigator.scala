@@ -202,7 +202,7 @@ class CompanyNavigator @Inject() () extends NavigatorForJourney {
 
   private def navigatorFromAddCompanyContactMethodsYesNoPage(mode: Mode)(userAnswers: UserAnswers): Call =
     (userAnswers.get(AddCompanyContactMethodsYesNoPage), mode) match {
-      case (Some(true), mode) =>
+      case (Some(true), _) =>
         controllers.add.company.routes.AddCompanyContactMethodsYesNoController.onPageLoad(mode)
 
       case (Some(false), NormalMode) =>

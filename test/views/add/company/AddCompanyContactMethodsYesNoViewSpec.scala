@@ -35,14 +35,14 @@ class AddCompanyContactMethodsYesNoViewSpec extends AnyWordSpec with Matchers wi
 
     "render the page with title, heading, radios and submit button" in new Setup {
 
-      val partnershipName = "Test Subcontractor"
+      val companyName = "Test Company"
 
-      val html: HtmlFormat.Appendable = view(form, NormalMode, partnershipName)
+      val html: HtmlFormat.Appendable = view(form, NormalMode, companyName)
       val doc: Document               = org.jsoup.Jsoup.parse(html.toString())
       doc.select("title").text() must include(messages("addCompanyContactMethodsYesNo.title"))
 
       val legend: Elements = doc.select("fieldset legend")
-      legend.text() mustBe messages("addCompanyContactMethodsYesNo.heading", partnershipName)
+      legend.text() mustBe messages("addCompanyContactMethodsYesNo.heading", companyName)
       legend.hasClass("govuk-fieldset__legend--l") mustBe true
 
       val radioButtons: Elements = doc.select(".govuk-radios__label")
@@ -63,12 +63,12 @@ class AddCompanyContactMethodsYesNoViewSpec extends AnyWordSpec with Matchers wi
 
     "display error summary and inline error when no option is selected" in new Setup {
 
-      val partnershipName = "Test Subcontractor"
+      val companyName = "Test Company"
 
       val errorForm: Form[Boolean] =
         form.withError("value", "addCompanyContactMethodsYesNo.error.required")
 
-      val html: HtmlFormat.Appendable = view(errorForm, NormalMode, partnershipName)
+      val html: HtmlFormat.Appendable = view(errorForm, NormalMode, companyName)
       val doc: Document               = org.jsoup.Jsoup.parse(html.toString())
 
       val summary: Elements = doc.select(".govuk-error-summary")
