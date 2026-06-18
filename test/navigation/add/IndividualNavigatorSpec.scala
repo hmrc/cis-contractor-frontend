@@ -85,7 +85,7 @@ class IndividualNavigatorSpec extends SpecBase {
           SubAddressYesNoPage,
           NormalMode,
           emptyUserAnswers.setOrException(SubAddressYesNoPage, true)
-        ) mustBe controllers.add.routes.AddressOfSubcontractorController.redirectToAddressLookup()
+        ) mustBe controllers.add.routes.AddressOfSubcontractorController.onPageLoad(NormalMode)
       }
 
       "must go from a SubAddressYesNoPage to IndividualChooseContactDetailsPage when false" in {
@@ -335,8 +335,7 @@ class IndividualNavigatorSpec extends SpecBase {
           SubAddressYesNoPage,
           CheckMode,
           emptyUserAnswers.setOrException(SubAddressYesNoPage, true)
-        ) mustBe controllers.add.routes.AddressOfSubcontractorController
-          .redirectToAddressLookup(Some(CheckMode.toString))
+        ) mustBe controllers.add.routes.AddressOfSubcontractorController.onPageLoad(CheckMode)
       }
 
       "must go from a SubAddressYesNoPage to CYA page when false" in {
@@ -676,13 +675,13 @@ class IndividualNavigatorSpec extends SpecBase {
       }
 
       "must go from SubAddressYesNoPage to CYA when true and AddressOfSubcontractorPage is already answered" in {
-        val addressSample = models.address.Address(
+        val addressSample = models.add.InternationalAddress(
           addressLine1 = "10 Example Street",
           addressLine2 = Some("Suite 2"),
-          addressLine3 = Some("Newcastle"),
+          addressLine3 = "Newcastle",
           addressLine4 = Some("Tyne & Wear"),
-          postcode = Some("NE1 1AA"),
-          country = Some(models.address.Country(Some("GB"), Some("United Kingdom")))
+          postalCode = "NE1 1AA",
+          country = "United Kingdom"
         )
 
         val ua     =
