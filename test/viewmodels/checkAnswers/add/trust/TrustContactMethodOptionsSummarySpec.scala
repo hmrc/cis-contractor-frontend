@@ -32,7 +32,6 @@ class TrustContactMethodOptionsSummarySpec extends SpecBase with Matchers {
         "trustContactMethodOptions.email"                 -> "Email address",
         "trustContactMethodOptions.phone"                 -> "Phone number",
         "trustContactMethodOptions.mobile"                -> "Mobile number",
-        "trustContactMethodOptions.noDetails"             -> "No details",
         "trustContactMethodOptions.change.hidden"         -> "method of contact",
         "site.change"                                     -> "Change"
       )
@@ -106,24 +105,5 @@ class TrustContactMethodOptionsSummarySpec extends SpecBase with Matchers {
       valueHtml must not include "<br>"
       valueHtml must not include "govuk-list--bullet"
     }
-
-//    "must return None when noDetails is selected" in {
-//
-//      val answers: UserAnswers =
-//        emptyUserAnswers
-//          .set(TrustContactMethodOptionsPage, Set(ContactMethodOptions.NoDetails))
-//          .success
-//          .value
-//
-//      val result = TrustContactMethodOptionsSummary.row(answers)
-//
-//      result mustBe defined
-//
-//      val valueHtml = result.value.value.content.asHtml.toString
-//
-//      valueHtml must include("None")
-//      valueHtml must not include "<br>"
-//      valueHtml must not include "govuk-list--bullet"
-//    }
   }
 }

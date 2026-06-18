@@ -28,9 +28,11 @@ import viewmodels.implicits.*
 object TrustContactMethodOptionsSummary {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(TrustContactMethodOptionsPage).flatMap { answers =>
+    answers.get(TrustContactMethodOptionsPage).flatMap { selectedMethods =>
       val options =
-        answers.map(answer => HtmlFormat.escape(messages(s"trustContactMethodOptions.$answer")).toString).toSeq
+        selectedMethods
+          .map(selectedMethod => HtmlFormat.escape(messages(s"trustContactMethodOptions.$selectedMethod")).toString)
+          .toSeq
       ValueViewModelHelper.makeGovukBulletList(options).map { value =>
         SummaryListRowViewModel(
           key = "trustContactMethodOptions.checkYourAnswersLabel",

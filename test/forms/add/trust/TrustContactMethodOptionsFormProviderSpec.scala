@@ -24,8 +24,6 @@ class TrustContactMethodOptionsFormProviderSpec extends CheckboxFieldBehaviours 
 
   val form = new TrustContactMethodOptionsFormProvider()()
 
-  val exclusiveKey = "trustContactMethodOptions.error.exclusive"
-
   ".value" - {
 
     val fieldName   = "value"
