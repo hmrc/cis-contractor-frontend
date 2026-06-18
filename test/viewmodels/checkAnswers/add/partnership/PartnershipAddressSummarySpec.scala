@@ -18,8 +18,8 @@ package viewmodels.checkAnswers.add.partnership
 
 import helpers.CyaEncodingSpecHelper
 import controllers.add.partnership.routes
-import models.UserAnswers
-import models.address.{Address, Country}
+import models.add.InternationalAddress
+import models.{CheckMode, UserAnswers}
 import org.scalatest.OptionValues.convertOptionToValuable
 import org.scalatest.TryValues.convertTryToSuccessOrFailure
 import org.scalatest.wordspec.AnyWordSpec
@@ -37,13 +37,13 @@ class PartnershipAddressSummarySpec extends AnyWordSpec with Matchers with CyaEn
 
     "return a SummaryListRow when PartnershipAddressPage has an answer" in {
 
-      val address = Address(
+      val address = InternationalAddress(
         addressLine1 = "10 Downing Street",
         addressLine2 = Some("Westminster"),
-        addressLine3 = Some("London"),
+        addressLine3 = "London",
         addressLine4 = Some("Greater London"),
-        postcode = Some("SW1A 2AA"),
-        country = Some(Country(Some("GB"), Some("United Kingdom")))
+        postalCode = "SW1A 2AA",
+        country = "United Kingdom"
       )
 
       val userAnswers =
@@ -75,7 +75,7 @@ class PartnershipAddressSummarySpec extends AnyWordSpec with Matchers with CyaEn
 
       action.href shouldBe
         routes.PartnershipAddressController
-          .redirectToAddressLookup(Some("change"))
+          .onPageLoad(CheckMode)
           .url
 
       action.visuallyHiddenText.value shouldBe
@@ -93,13 +93,13 @@ class PartnershipAddressSummarySpec extends AnyWordSpec with Matchers with CyaEn
 
     "must render address safely without double encoding and preserve line breaks" in {
 
-      val address = Address(
+      val address = InternationalAddress(
         addressLine1 = "10 O'Reilly & Co",
         addressLine2 = Some("Building & Sons"),
-        addressLine3 = Some("Main Street"),
+        addressLine3 = "Main Street",
         addressLine4 = Some("London"),
-        postcode = Some("AB1 2CD"),
-        country = Some(Country(Some("GB"), Some("UK")))
+        postalCode = "AB1 2CD",
+        country = "UK"
       )
 
       val answers =
@@ -112,8 +112,8 @@ class PartnershipAddressSummarySpec extends AnyWordSpec with Matchers with CyaEn
 
       val html = extractHtml(row)
 
-      assertRaw(html, "10 O&#x27;Reilly &amp; Co")
-      assertRaw(html, "Building &amp; Sons")
+      assertRaw(html, "10 O'Reilly & Co")
+      assertRaw(html, "Building & Sons")
 
       assertHasBreaks(html)
 

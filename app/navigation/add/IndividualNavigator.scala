@@ -109,16 +109,21 @@ class IndividualNavigator @Inject() () extends NavigatorForJourney {
     }
 
   private def navigatorFromSubAddressYesNoPage(mode: Mode)(ua: UserAnswers): Call =
-    addressLookupYesNoRoute(
-      mode,
-      ua.get(SubAddressYesNoPage),
-      ua.get(AddressOfSubcontractorPage).isDefined,
-      onYes = controllers.add.routes.AddressOfSubcontractorController.redirectToAddressLookup(),
-      onYesChange =
-        controllers.add.routes.AddressOfSubcontractorController.redirectToAddressLookup(Some(CheckMode.toString)),
-      onNo = controllers.add.routes.IndividualChooseContactDetailsController.onPageLoad(NormalMode),
-      checkYourAnswers = controllers.add.routes.CheckYourAnswersController.onPageLoad()
-    )
+    (ua.get(SubAddressYesNoPage), mode) match {
+      case (Some(true), NormalMode)  =>
+        controllers.add.routes.AddressOfSubcontractorController.onPageLoad(NormalMode)
+      case (Some(false), NormalMode) =>
+        controllers.add.routes.IndividualChooseContactDetailsController.onPageLoad(NormalMode)
+      case (Some(true), CheckMode)   =>
+        ua.get(AddressOfSubcontractorPage)
+          .fold(controllers.add.routes.AddressOfSubcontractorController.onPageLoad(CheckMode)) { _ =>
+            controllers.add.routes.CheckYourAnswersController.onPageLoad()
+          }
+      case (Some(false), CheckMode)  =>
+        controllers.add.routes.CheckYourAnswersController.onPageLoad()
+      case _                         =>
+        routes.JourneyRecoveryController.onPageLoad()
+    }
 
   private def navigatorFromNationalInsuranceNumberYesNoPage(mode: Mode)(ua: UserAnswers): Call =
     (ua.get(NationalInsuranceNumberYesNoPage), mode) match {

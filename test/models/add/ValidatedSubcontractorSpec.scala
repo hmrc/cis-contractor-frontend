@@ -17,7 +17,6 @@
 package models.add
 
 import base.SpecBase
-import models.address.{Address, Country}
 import models.contact.ContactOptions
 import models.{InvalidAnswer, MissingAnswer, TypeOfSubcontractor}
 import org.scalatest.Inside.inside
@@ -29,13 +28,13 @@ import models.RichJsObject
 
 class ValidatedSubcontractorSpec extends SpecBase with Matchers {
 
-  private val address = Address(
+  private val address = InternationalAddress(
     addressLine1 = "10 Downing Street",
     addressLine2 = Some("Westminster"),
-    addressLine3 = Some("London"),
+    addressLine3 = "London",
     addressLine4 = Some("Greater London"),
-    postcode = Some("SW1A 2AA"),
-    country = Some(Country(Some("GB"), Some("United Kingdom")))
+    postalCode = "SW1A 2AA",
+    country = "United Kingdom"
   )
 
   private val subcontractorName = SubcontractorName("firstname", Some("middle name"), "lastname")
