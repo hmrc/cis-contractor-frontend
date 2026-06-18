@@ -16,16 +16,19 @@
 
 package controllers
 
-import controllers.actions._
+import controllers.actions.*
 import forms.IndividualContactMethodOptionsFormProvider
+
 import javax.inject.Inject
 import models.Mode
 import navigation.Navigator
 import pages.IndividualContactMethodOptionsPage
+import pages.add.SubcontractorNamePage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import utils.SubcontractorNameExtractor
 import views.html.IndividualContactMethodOptionsView
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -39,7 +42,8 @@ class IndividualContactMethodOptionsController @Inject() (
   requireData: DataRequiredAction,
   formProvider: IndividualContactMethodOptionsFormProvider,
   val controllerComponents: MessagesControllerComponents,
-  view: IndividualContactMethodOptionsView
+  view: IndividualContactMethodOptionsView,
+  subcontractorNameExtractor: SubcontractorNameExtractor,
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport {
@@ -48,20 +52,38 @@ class IndividualContactMethodOptionsController @Inject() (
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
 
-    val preparedForm = request.userAnswers.get(IndividualContactMethodOptionsPage) match {
-      case None        => form
-      case Some(value) => form.fill(value)
-    }
+//    val preparedForm = request.userAnswers
+//      .get(IndividualContactMethodOptionsPage) match {
+//      case None        => form
+//      case Some(value) => form.fill(value)
+//    }
+//
+//    Ok(view(preparedForm, mode))
 
-    Ok(view(preparedForm, mode))
+    val subcontractorName = subcontractorNameExtractor.getSubcontractorName(request.userAnswers)
+
+    request.userAnswers
+      .get(IndividualContactMethodOptionsPage)
+      .map { individualContactMethodOptions =>
+        val preparedForm = request.userAnswers.get(IndividualContactMethodOptionsPage) match {
+          case None => form
+          case Some(value) => form.fill(value)
+        }
+
+        Ok(view(preparedForm, mode, subcontractorName))
+      }
+      .getOrElse(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
-    implicit request =>
+implicit request =>
+      val subcontractorName = subcontractorNameExtractor.getSubcontractorName(request.userAnswers)
+      
       form
         .bindFromRequest()
         .fold(
-          formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
+          formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, subcontractorName))),
           value =>
             for {
               updatedAnswers <- Future.fromTry(request.userAnswers.set(IndividualContactMethodOptionsPage, value))
