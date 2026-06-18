@@ -107,7 +107,7 @@ class CompanyAddressYesNoControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual controllers.add.company.routes.CompanyAddressController
-          .redirectToAddressLookup()
+          .onPageLoad(NormalMode)
           .url
       }
     }

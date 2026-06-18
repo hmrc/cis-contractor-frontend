@@ -47,12 +47,12 @@ class CompanyNavigatorSpec extends SpecBase {
       }
 
       "must go from CompanyAddressYesNoPage" - {
-        "to the address lookup on-ramp when answer is Yes" in {
+        "to CompanyAddress page when answer is Yes" in {
           navigator.nextPage(
             CompanyAddressYesNoPage,
             NormalMode,
             emptyUserAnswers.setOrException(CompanyAddressYesNoPage, true)
-          ) mustBe controllers.add.company.routes.CompanyAddressController.redirectToAddressLookup()
+          ) mustBe controllers.add.company.routes.CompanyAddressController.onPageLoad(NormalMode)
         }
 
         "to CompanyContactOptions page when answer is No" in {
@@ -286,27 +286,25 @@ class CompanyNavigatorSpec extends SpecBase {
       }
 
       "must go from CompanyAddressYesNoPage" - {
-        "to the address lookup on-ramp when answer is Yes and CompanyAddressPage is not answered before" in {
+        "to CompanyAddress page when answer is Yes and CompanyAddressPage is not answered before" in {
           val answers = emptyUserAnswers.set(CompanyAddressYesNoPage, true).success.value
 
           navigator.nextPage(
             CompanyAddressYesNoPage,
             CheckMode,
             answers
-          ) mustBe controllers.add.company.routes.CompanyAddressController.redirectToAddressLookup(
-            Some(CheckMode.toString)
-          )
+          ) mustBe controllers.add.company.routes.CompanyAddressController.onPageLoad(CheckMode)
         }
 
         "to Company CYA when answer is Yes and CompanyAddressPage is answered before" in {
 
-          val address = models.address.Address(
+          val address = models.add.InternationalAddress(
             addressLine1 = "10 Example Street",
             addressLine2 = Some("Suite 2"),
-            addressLine3 = Some("Newcastle"),
+            addressLine3 = "Newcastle",
             addressLine4 = Some("Tyne & Wear"),
-            postcode = Some("NE1 1AA"),
-            country = Some(models.address.Country(Some("GB"), Some("United Kingdom")))
+            postalCode = "NE1 1AA",
+            country = "United Kingdom"
           )
 
           val answers =

@@ -18,7 +18,7 @@ package generators
 
 import models.*
 import models.contact.{ContactMethodOptions, ContactOptions}
-import models.address.{Address, Country}
+import models.add.InternationalAddress
 import models.verify.ContractorEmailConfirmationStored
 import models.verify.SelectedSubcontractors
 import org.scalacheck.{Arbitrary, Gen}
@@ -59,24 +59,22 @@ trait ModelGenerators {
       } yield SubcontractorViewModel(id, name)
     }
 
-  implicit lazy val arbitraryAddress: Arbitrary[Address] =
+  implicit lazy val arbitraryInternationalAddress: Arbitrary[InternationalAddress] =
     Arbitrary {
       for {
         addressLine1 <- genNonEmptyAlphaStr
         addressLine2 <- Gen.option(Gen.alphaStr)
-        addressLine3 <- Gen.option(Gen.alphaStr)
+        addressLine3 <- genNonEmptyAlphaStr
         addressLine4 <- Gen.option(Gen.alphaStr)
-        addressLine5 <- Gen.option(Gen.alphaStr)
-        postcode     <- Gen.option(genNonEmptyAlphaNumStr)
-        countryName  <- genNonEmptyAlphaStr
-      } yield Address(
+        postalCode   <- genNonEmptyAlphaStr
+        country      <- genNonEmptyAlphaStr
+      } yield InternationalAddress(
         addressLine1 = addressLine1,
         addressLine2 = addressLine2,
         addressLine3 = addressLine3,
         addressLine4 = addressLine4,
-        addressLine5 = addressLine5,
-        postcode = postcode,
-        country = Some(Country(None, Some(countryName)))
+        postalCode = postalCode,
+        country = country
       )
     }
 

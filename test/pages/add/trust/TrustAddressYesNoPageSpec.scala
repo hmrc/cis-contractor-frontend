@@ -16,7 +16,7 @@
 
 package pages.add.trust
 
-import models.address.{Address, Country}
+import models.add.InternationalAddress
 import pages.behaviours.PageBehaviours
 
 class TrustAddressYesNoPageSpec extends PageBehaviours {
@@ -31,13 +31,13 @@ class TrustAddressYesNoPageSpec extends PageBehaviours {
 
     "cleanup: must remove TrustAddress userAnswers when No is selected" in {
 
-      val address = Address(
+      val address = InternationalAddress(
         addressLine1 = "line 1",
         addressLine2 = Some("line 2"),
-        addressLine3 = Some("line 3"),
+        addressLine3 = "line 3",
         addressLine4 = Some("line 4"),
-        postcode = Some("NX1 1AA"),
-        country = Some(Country(Some("GB"), Some("United Kingdom")))
+        postalCode = "NX1 1AA",
+        country = "United Kingdom"
       )
 
       val userAnswers = emptyUserAnswers.set(TrustAddressPage, address).success.value

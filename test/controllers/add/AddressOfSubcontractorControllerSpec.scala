@@ -18,319 +18,305 @@ package controllers.add
 
 import base.SpecBase
 import controllers.routes
-import models.NormalMode
-import models.add.SubcontractorName
-import models.address.{Address, Country}
+import forms.add.AddressOfSubcontractorFormProvider
+import models.add.{InternationalAddress, SubcontractorName}
+import utils.CountryOptions
+import models.{NormalMode, UserAnswers}
 import org.mockito.ArgumentCaptor
+import navigation.Navigator
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.{never, verify, when}
+import org.mockito.Mockito.{times, verify}
+import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
+import pages.add.{AddressOfSubcontractorPage, SubcontractorNamePage}
 import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import pages.add.SubcontractorNamePage
 import repositories.SessionRepository
-import services.AddressLookupService
+import views.html.add.AddressOfSubcontractorView
+import config.FrontendAppConfig
 
 import scala.concurrent.Future
 
 class AddressOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
 
-  private val lookupUrl         = "/address-lookup-on-ramp"
-  private val subcontractorName = "John Smith"
+  private val formProvider = new AddressOfSubcontractorFormProvider()
+  private val form         = formProvider()
 
-  private val userAnswersWithName =
-    emptyUserAnswers
-      .set(SubcontractorNamePage, SubcontractorName(firstName = "John", middleName = None, lastName = "Smith"))
-      .success
-      .value
+  private lazy val routeLoad =
+    controllers.add.routes.AddressOfSubcontractorController.onPageLoad(NormalMode).url
 
-  private val testAddress = Address(
-    addressLine1 = "line 1",
-    addressLine2 = Some("line 2"),
-    addressLine3 = Some("line 3"),
-    addressLine4 = Some("line 4"),
-    postcode = Some("NX1 1AA"),
-    country = Some(Country(Some("GB"), Some("United Kingdom")))
-  )
+  private lazy val routeSubmit =
+    controllers.add.routes.AddressOfSubcontractorController.onSubmit(NormalMode).url
 
-  private lazy val redirectRoute =
-    controllers.add.routes.AddressOfSubcontractorController.redirectToAddressLookup().url
+  private val subcontractorName = SubcontractorName("John", Some("Paul"), "Smith")
 
-  private lazy val redirectChangeRoute =
-    controllers.add.routes.AddressOfSubcontractorController.redirectToAddressLookup(Some("change")).url
+  private val name = "John Smith"
 
-  private lazy val callbackRoute =
-    controllers.add.routes.AddressOfSubcontractorController.addressLookupCallback("addr-id").url
-
-  private lazy val callbackChangeRoute =
-    controllers.add.routes.AddressOfSubcontractorController.addressLookupCallbackChange("addr-id").url
+  private def uaWithName: UserAnswers =
+    emptyUserAnswers.set(SubcontractorNamePage, subcontractorName).success.value
 
   "AddressOfSubcontractor Controller" - {
 
-    "redirectToAddressLookup" - {
+    "must return OK and the correct view for a GET when subcontractor name is present and no previous answer" in {
 
-      "must redirect to the address lookup on-ramp using the standard callback when session data exists and no changeRoute is provided" in {
+      val application = applicationBuilder(userAnswers = Some(uaWithName)).build()
 
-        val mockSessionRepository    = mock[SessionRepository]
-        val mockAddressLookupService = mock[AddressLookupService]
+      running(application) {
+        val request                               = FakeRequest(GET, routeLoad)
+        val result                                = route(application, request).value
+        val countryOptions                        = application.injector.instanceOf[CountryOptions]
+        val appConfig                             = application.injector.instanceOf[FrontendAppConfig]
+        val view                                  = application.injector.instanceOf[AddressOfSubcontractorView]
+        implicit val msgs: play.api.i18n.Messages = messages(application)
 
-        when(mockSessionRepository.get(any())) thenReturn Future.successful(Some(userAnswersWithName))
-        when(
-          mockAddressLookupService.getJourneyUrl(any(), any(), any(), any(), any())(any(), any(), any())
-        ) thenReturn Future.successful(Call("GET", lookupUrl))
-
-        val application =
-          applicationBuilder(userAnswers = Some(userAnswersWithName))
-            .overrides(
-              bind[SessionRepository].toInstance(mockSessionRepository),
-              bind[AddressLookupService].toInstance(mockAddressLookupService)
-            )
-            .build()
-
-        running(application) {
-          val request = FakeRequest(GET, redirectRoute)
-          val result  = route(application, request).value
-
-          status(result) mustBe SEE_OTHER
-          redirectLocation(result).value mustBe lookupUrl
-
-          val callbackCaptor = ArgumentCaptor.forClass(classOf[Call])
-          val optNameCaptor  = ArgumentCaptor.forClass(classOf[Option[String]])
-          verify(mockAddressLookupService)
-            .getJourneyUrl(any(), callbackCaptor.capture(), any(), optNameCaptor.capture(), any())(any(), any(), any())
-
-          callbackCaptor.getValue.url mustBe
-            controllers.add.routes.AddressOfSubcontractorController.addressLookupCallback().url
-          optNameCaptor.getValue mustBe Some(subcontractorName)
-        }
-      }
-
-      "must redirect to the address lookup on-ramp using the change callback when a changeRoute is provided" in {
-
-        val mockSessionRepository    = mock[SessionRepository]
-        val mockAddressLookupService = mock[AddressLookupService]
-
-        when(mockSessionRepository.get(any())) thenReturn Future.successful(Some(userAnswersWithName))
-        when(
-          mockAddressLookupService.getJourneyUrl(any(), any(), any(), any(), any())(any(), any(), any())
-        ) thenReturn Future.successful(Call("GET", lookupUrl))
-
-        val application =
-          applicationBuilder(userAnswers = Some(userAnswersWithName))
-            .overrides(
-              bind[SessionRepository].toInstance(mockSessionRepository),
-              bind[AddressLookupService].toInstance(mockAddressLookupService)
-            )
-            .build()
-
-        running(application) {
-          val request = FakeRequest(GET, redirectChangeRoute)
-          val result  = route(application, request).value
-
-          status(result) mustBe SEE_OTHER
-          redirectLocation(result).value mustBe lookupUrl
-
-          val callbackCaptor = ArgumentCaptor.forClass(classOf[Call])
-          val optNameCaptor  = ArgumentCaptor.forClass(classOf[Option[String]])
-          verify(mockAddressLookupService)
-            .getJourneyUrl(any(), callbackCaptor.capture(), any(), optNameCaptor.capture(), any())(any(), any(), any())
-
-          callbackCaptor.getValue.url mustBe
-            controllers.add.routes.AddressOfSubcontractorController.addressLookupCallbackChange().url
-          optNameCaptor.getValue mustBe Some(subcontractorName)
-        }
-      }
-
-      "must redirect to Journey Recovery when no session data is found" in {
-
-        val mockSessionRepository    = mock[SessionRepository]
-        val mockAddressLookupService = mock[AddressLookupService]
-
-        when(mockSessionRepository.get(any())) thenReturn Future.successful(None)
-
-        val application =
-          applicationBuilder(userAnswers = Some(emptyUserAnswers))
-            .overrides(
-              bind[SessionRepository].toInstance(mockSessionRepository),
-              bind[AddressLookupService].toInstance(mockAddressLookupService)
-            )
-            .build()
-
-        running(application) {
-          val request = FakeRequest(GET, redirectRoute)
-          val result  = route(application, request).value
-
-          status(result) mustBe SEE_OTHER
-          redirectLocation(result).value mustBe routes.JourneyRecoveryController.onPageLoad().url
-        }
-      }
-
-      "must redirect to Journey Recovery when no user answers exist" in {
-
-        val application = applicationBuilder(userAnswers = None).build()
-
-        running(application) {
-          val request = FakeRequest(GET, redirectRoute)
-          val result  = route(application, request).value
-
-          status(result) mustBe SEE_OTHER
-          redirectLocation(result).value mustBe routes.JourneyRecoveryController.onPageLoad().url
-        }
-      }
-
-      "must redirect to Journey Recovery when no subcontractor name can be resolved" in {
-
-        val mockSessionRepository    = mock[SessionRepository]
-        val mockAddressLookupService = mock[AddressLookupService]
-
-        when(mockSessionRepository.get(any())) thenReturn Future.successful(Some(emptyUserAnswers))
-
-        val application =
-          applicationBuilder(userAnswers = Some(emptyUserAnswers))
-            .overrides(
-              bind[SessionRepository].toInstance(mockSessionRepository),
-              bind[AddressLookupService].toInstance(mockAddressLookupService)
-            )
-            .build()
-
-        running(application) {
-          val request = FakeRequest(GET, redirectRoute)
-          val result  = route(application, request).value
-
-          status(result) mustBe SEE_OTHER
-          redirectLocation(result).value mustBe routes.JourneyRecoveryController.onPageLoad().url
-
-          verify(mockAddressLookupService, never)
-            .getJourneyUrl(any(), any(), any(), any(), any())(any(), any(), any())
-        }
+        status(result) mustBe OK
+        contentType(result) mustBe Some("text/html")
+        charset(result) mustBe Some("utf-8")
+        contentAsString(result) mustBe view(form, NormalMode, name, countryOptions.options())(
+          request,
+          appConfig
+        ).toString
       }
     }
 
-    "addressLookupCallback" - {
+    "must populate the view correctly on a GET when the question has previously been answered and subcontractor name is present" in {
 
-      "must retrieve and persist the address then redirect to Individual Choose Contact Details when the save succeeds" in {
+      val expected = InternationalAddress(
+        addressLine1 = "line 1",
+        addressLine2 = Some("line 2"),
+        addressLine3 = "line 3",
+        addressLine4 = Some("line 4"),
+        postalCode = "NX1 1AA",
+        country = "United Kingdom"
+      )
 
-        val mockAddressLookupService = mock[AddressLookupService]
+      val ua = uaWithName
+        .set(AddressOfSubcontractorPage, expected)
+        .success
+        .value
 
-        when(mockAddressLookupService.getAddressById(any())(any())) thenReturn Future.successful(testAddress)
-        when(mockAddressLookupService.saveAddressDetails(any(), any())(any(), any())) thenReturn Future.successful(true)
+      val application = applicationBuilder(userAnswers = Some(ua)).build()
 
-        val application =
-          applicationBuilder(userAnswers = Some(emptyUserAnswers))
-            .overrides(bind[AddressLookupService].toInstance(mockAddressLookupService))
-            .build()
+      running(application) {
+        val request                               = FakeRequest(GET, routeLoad)
+        val view                                  = application.injector.instanceOf[AddressOfSubcontractorView]
+        val countryOptions                        = application.injector.instanceOf[CountryOptions]
+        val appConfig                             = application.injector.instanceOf[FrontendAppConfig]
+        implicit val msgs: play.api.i18n.Messages = messages(application)
+        val result                                = route(application, request).value
 
-        running(application) {
-          val request = FakeRequest(GET, callbackRoute)
-          val result  = route(application, request).value
+        status(result) mustBe OK
 
-          status(result) mustBe SEE_OTHER
-          redirectLocation(result).value mustBe
-            controllers.add.routes.IndividualChooseContactDetailsController.onPageLoad(NormalMode).url
-
-          val idCaptor = ArgumentCaptor.forClass(classOf[String])
-          verify(mockAddressLookupService).getAddressById(idCaptor.capture())(any())
-          idCaptor.getValue mustBe "addr-id"
-        }
-      }
-
-      "must redirect to Journey Recovery when the address could not be saved" in {
-
-        val mockAddressLookupService = mock[AddressLookupService]
-
-        when(mockAddressLookupService.getAddressById(any())(any())) thenReturn Future.successful(testAddress)
-        when(mockAddressLookupService.saveAddressDetails(any(), any())(any(), any())) thenReturn Future.successful(
-          false
+        val expected = InternationalAddress(
+          addressLine1 = "line 1",
+          addressLine2 = Some("line 2"),
+          addressLine3 = "line 3",
+          addressLine4 = Some("line 4"),
+          postalCode = "NX1 1AA",
+          country = "United Kingdom"
         )
 
-        val application =
-          applicationBuilder(userAnswers = Some(emptyUserAnswers))
-            .overrides(bind[AddressLookupService].toInstance(mockAddressLookupService))
-            .build()
-
-        running(application) {
-          val request = FakeRequest(GET, callbackRoute)
-          val result  = route(application, request).value
-
-          status(result) mustBe SEE_OTHER
-          redirectLocation(result).value mustBe routes.JourneyRecoveryController.onPageLoad().url
-        }
-      }
-
-      "must redirect to Journey Recovery when no user answers exist" in {
-
-        val application = applicationBuilder(userAnswers = None).build()
-
-        running(application) {
-          val request = FakeRequest(GET, callbackRoute)
-          val result  = route(application, request).value
-
-          status(result) mustBe SEE_OTHER
-          redirectLocation(result).value mustBe routes.JourneyRecoveryController.onPageLoad().url
-        }
+        contentType(result) mustBe Some("text/html")
+        charset(result) mustBe Some("utf-8")
+        contentAsString(result) mustBe view(form.fill(expected), NormalMode, name, countryOptions.options())(
+          request,
+          appConfig
+        ).toString
       }
     }
 
-    "addressLookupCallbackChange" - {
+    "must redirect to Journey Recovery for a GET when subcontractor name is missing (userAnswers present)" in {
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
-      "must retrieve and persist the address then redirect to Check Your Answers when the save succeeds" in {
+      running(application) {
+        val request = FakeRequest(GET, routeLoad)
+        val result  = route(application, request).value
 
-        val mockAddressLookupService = mock[AddressLookupService]
-
-        when(mockAddressLookupService.getAddressById(any())(any())) thenReturn Future.successful(testAddress)
-        when(mockAddressLookupService.saveAddressDetails(any(), any())(any(), any())) thenReturn Future.successful(true)
-
-        val application =
-          applicationBuilder(userAnswers = Some(emptyUserAnswers))
-            .overrides(bind[AddressLookupService].toInstance(mockAddressLookupService))
-            .build()
-
-        running(application) {
-          val request = FakeRequest(GET, callbackChangeRoute)
-          val result  = route(application, request).value
-
-          status(result) mustBe SEE_OTHER
-          redirectLocation(result).value mustBe
-            controllers.add.routes.CheckYourAnswersController.onPageLoad().url
-        }
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result).value mustBe routes.JourneyRecoveryController.onPageLoad().url
       }
+    }
 
-      "must redirect to Journey Recovery when the address could not be saved" in {
+    "must redirect to the next page when valid data is submitted (and persist the address) when subcontractor name is present" in {
 
-        val mockAddressLookupService = mock[AddressLookupService]
+      val mockSessionRepository = mock[SessionRepository]
 
-        when(mockAddressLookupService.getAddressById(any())(any())) thenReturn Future.successful(testAddress)
-        when(mockAddressLookupService.saveAddressDetails(any(), any())(any(), any())) thenReturn Future.successful(
-          false
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+      val mockNavigator = mock[Navigator]
+      when(mockNavigator.nextPage(any(), any(), any()))
+        .thenReturn(Call("GET", "/dummy-next"))
+
+      val application =
+        applicationBuilder(userAnswers = Some(uaWithName))
+          .overrides(
+            bind[SessionRepository].toInstance(mockSessionRepository),
+            bind[Navigator].toInstance(mockNavigator)
+          )
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, routeSubmit)
+            .withFormUrlEncodedBody(
+              "addressLine1" -> "value 1",
+              "addressLine2" -> "value 2",
+              "addressLine3" -> "value 3",
+              "addressLine4" -> "value 4",
+              "postalCode"   -> "NX1 1AA",
+              "country"      -> "United Kingdom"
+            )
+
+        val result = route(application, request).value
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result).value mustBe "/dummy-next"
+
+        val uaCaptor = ArgumentCaptor.forClass(classOf[UserAnswers])
+        verify(mockSessionRepository, times(1)).set(uaCaptor.capture())
+
+        val saved = uaCaptor.getValue.get(AddressOfSubcontractorPage).value
+        saved.addressLine1 mustBe "value 1"
+        saved.addressLine2 mustBe Some("value 2")
+        saved.addressLine3 mustBe "value 3"
+        saved.addressLine4 mustBe Some("value 4")
+        saved.postalCode mustBe "NX1 1AA"
+        saved.country mustBe "United Kingdom"
+      }
+    }
+
+    "must return a Bad Request and errors when invalid data is submitted" in {
+
+      val application = applicationBuilder(userAnswers = Some(uaWithName)).build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, routeSubmit)
+            .withFormUrlEncodedBody(
+              "addressLine1" -> "",
+              "addressLine2" -> "value 2",
+              "addressLine3" -> "value 3",
+              "postalCode"   -> "NX1 1AA",
+              "country"      -> "United Kingdom"
+            )
+
+        val boundForm = form.bind(
+          Map(
+            "addressLine1" -> "",
+            "addressLine2" -> "value 2",
+            "addressLine3" -> "value 3",
+            "postalCode"   -> "NX1 1AA",
+            "country"      -> "United Kingdom"
+          )
         )
 
-        val application =
-          applicationBuilder(userAnswers = Some(emptyUserAnswers))
-            .overrides(bind[AddressLookupService].toInstance(mockAddressLookupService))
-            .build()
+        val view                                  = application.injector.instanceOf[AddressOfSubcontractorView]
+        val countryOptions                        = application.injector.instanceOf[CountryOptions]
+        val appConfig                             = application.injector.instanceOf[FrontendAppConfig]
+        implicit val msgs: play.api.i18n.Messages = messages(application)
+        val result                                = route(application, request).value
 
-        running(application) {
-          val request = FakeRequest(GET, callbackChangeRoute)
-          val result  = route(application, request).value
-
-          status(result) mustBe SEE_OTHER
-          redirectLocation(result).value mustBe routes.JourneyRecoveryController.onPageLoad().url
-        }
+        status(result) mustBe BAD_REQUEST
+        contentAsString(result) mustBe view(boundForm, NormalMode, name, countryOptions.options())(
+          request,
+          appConfig
+        ).toString
       }
+    }
 
-      "must redirect to Journey Recovery when no user answers exist" in {
+    "must redirect to Journey Recovery for a GET if no existing data is found" in {
 
-        val application = applicationBuilder(userAnswers = None).build()
+      val application = applicationBuilder(userAnswers = None).build()
 
-        running(application) {
-          val request = FakeRequest(GET, callbackChangeRoute)
-          val result  = route(application, request).value
+      running(application) {
+        val request = FakeRequest(GET, routeLoad)
 
-          status(result) mustBe SEE_OTHER
-          redirectLocation(result).value mustBe routes.JourneyRecoveryController.onPageLoad().url
+        val result = route(application, request).value
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result).value mustBe routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must redirect to Journey Recovery for a POST when subcontractor name is missing (userAnswers present)" in {
+      val mockSessionRepository = mock[SessionRepository]
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+      val application =
+        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, routeSubmit)
+            .withFormUrlEncodedBody(
+              "addressLine1" -> "value 1",
+              "addressLine3" -> "value 3",
+              "postalCode"   -> "NX1 1AA",
+              "country"      -> "United Kingdom"
+            )
+
+        val result = route(application, request).value
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result).value mustBe routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must redirect to Journey Recovery for a POST if no existing data is found" in {
+      val application = applicationBuilder(userAnswers = None).build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, routeSubmit)
+            .withFormUrlEncodedBody(
+              "addressLine1" -> "value 1",
+              "addressLine3" -> "value 3",
+              "postalCode"   -> "NX1 1AA",
+              "country"      -> "United Kingdom"
+            )
+
+        val result = route(application, request).value
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result).value mustBe routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must surface an error (throw) if the repository write fails after valid submission" in {
+      val mockSessionRepository = mock[SessionRepository]
+      when(mockSessionRepository.set(any())) thenReturn Future.failed(new RuntimeException("db down"))
+
+      val mockNavigator = mock[Navigator]
+      when(mockNavigator.nextPage(any(), any(), any()))
+        .thenReturn(Call("GET", "/dummy-next"))
+
+      val application =
+        applicationBuilder(userAnswers = Some(uaWithName))
+          .overrides(
+            bind[SessionRepository].toInstance(mockSessionRepository),
+            bind[Navigator].toInstance(mockNavigator)
+          )
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, routeSubmit)
+            .withFormUrlEncodedBody(
+              "addressLine1" -> "value 1",
+              "addressLine3" -> "value 3",
+              "postalCode"   -> "NX1 1AA",
+              "country"      -> "United Kingdom"
+            )
+
+        val thrown = intercept[RuntimeException] {
+          await(route(application, request).value)
         }
+
+        thrown.getMessage mustBe "db down"
       }
     }
   }

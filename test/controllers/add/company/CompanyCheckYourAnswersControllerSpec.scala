@@ -19,7 +19,7 @@ package controllers.add.company
 import base.SpecBase
 import controllers.routes
 import models.{TypeOfSubcontractor, UserAnswers}
-import models.address.{Address, Country}
+import models.add.InternationalAddress
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{never, verify, verifyNoMoreInteractions, when}
 import org.scalatestplus.mockito.MockitoSugar.mock
@@ -102,13 +102,13 @@ class CompanyCheckYourAnswersControllerSpec extends SpecBase {
     }
 
     "must return OK and the correct view for a GET when all optionals are present" in {
-      val address = Address(
+      val address = InternationalAddress(
         addressLine1 = "1 Test Street",
         addressLine2 = None,
-        addressLine3 = Some("Test Town"),
+        addressLine3 = "Test Town",
         addressLine4 = None,
-        postcode = Some("TE1 1ST"),
-        country = Some(Country(Some("GB"), Some("GB")))
+        postalCode = "TE1 1ST",
+        country = "GB"
       )
 
       val ua =
@@ -574,12 +574,7 @@ class CompanyCheckYourAnswersControllerSpec extends SpecBase {
 
     "must return OK when CompanyAddressYesNoPage changes from Yes to No and stale UTR values are cleaned up" in {
 
-      val address = Address(
-        addressLine1 = "1 Test Street",
-        addressLine3 = Some("City"),
-        postcode = Some("AA1 1AA"),
-        country = Some(Country(Some("GB"), Some("GB")))
-      )
+      val address = InternationalAddress("1 Test Street", None, "City", None, "AA1 1AA", "GB")
 
       val ua = minUa
         .set(CompanyContactOptionsPage, ContactOptions.Email)
@@ -697,12 +692,7 @@ class CompanyCheckYourAnswersControllerSpec extends SpecBase {
     }
 
     "must redirect to Journey Recovery when AddressYesNo is false but address value is present (stale session)" in {
-      val address = Address(
-        addressLine1 = "1 Test Street",
-        addressLine3 = Some("City"),
-        postcode = Some("AA1 1AA"),
-        country = Some(Country(Some("GB"), Some("GB")))
-      )
+      val address = InternationalAddress("1 Test Street", None, "City", None, "AA1 1AA", "GB")
 
       val uaBase =
         minUa
