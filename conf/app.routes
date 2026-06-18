@@ -197,6 +197,11 @@ POST  /subcontractor/add/company/change-company-works-reference  controllers.add
 GET   /subcontractor/add/company/check-your-answers  controllers.add.company.CompanyCheckYourAnswersController.onPageLoad()
 POST  /subcontractor/add/company/check-your-answers  controllers.add.company.CompanyCheckYourAnswersController.onSubmit()
 
+GET   /subcontractor/add/company/add-contact-details         controllers.add.company.AddCompanyContactMethodsYesNoController.onPageLoad(mode: Mode = NormalMode)
+POST  /subcontractor/add/company/add-contact-details         controllers.add.company.AddCompanyContactMethodsYesNoController.onSubmit(mode: Mode = NormalMode)
+GET   /subcontractor/add/company/change-add-contact-details  controllers.add.company.AddCompanyContactMethodsYesNoController.onPageLoad(mode: Mode = CheckMode)
+POST  /subcontractor/add/company/change-add-contact-details  controllers.add.company.AddCompanyContactMethodsYesNoController.onSubmit(mode: Mode = CheckMode)
+
 # Partnership
 GET   /subcontractor/add/partnership/subcontractor-added  controllers.add.SubcontractorAddedController.partnershipSubcontractorAdded()
 

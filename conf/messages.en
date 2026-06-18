@@ -305,6 +305,12 @@ addPartnershipContactMethodsYesNo.error.required                         =  Sele
 addPartnershipContactMethodsYesNo.checkYourAnswersLabel                  =  Add contact details?
 addPartnershipContactMethodsYesNo.change.hidden                          =  add contact details?
 
+addCompanyContactMethodsYesNo.title                                      =  Do you want to add contact details for this company?
+addCompanyContactMethodsYesNo.heading                                    =  Do you want to add contact details for {0}?
+addCompanyContactMethodsYesNo.error.required                             =  Select yes if you want to add contact details for this company
+addCompanyContactMethodsYesNo.checkYourAnswersLabel                      =  Add contact details?
+addCompanyContactMethodsYesNo.change.hidden                              =  add contact details?
+
 addIndividualContactMethodsYesNo.title                                   =  Do you want to add contact details for this subcontractor?
 addIndividualContactMethodsYesNo.heading                                 =  Do you want to add contact details for {0}?
 addIndividualContactMethodsYesNo.error.required                          =  Select yes if you want to add contact details for this subcontractor

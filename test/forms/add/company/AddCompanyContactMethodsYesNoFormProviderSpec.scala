@@ -14,17 +14,17 @@
  * limitations under the License.
  */
 
-package forms.add.partnership
+package forms.add.company
 
 import forms.behaviours.BooleanFieldBehaviours
 import play.api.data.FormError
 
-class AddPartnershipContactMethodsYesNoFormProviderSpec extends BooleanFieldBehaviours {
+class AddCompanyContactMethodsYesNoFormProviderSpec extends BooleanFieldBehaviours {
 
-  val requiredKey = "addPartnershipContactMethodsYesNo.error.required"
+  val requiredKey = "addCompanyContactMethodsYesNo.error.required"
   val invalidKey  = "error.boolean"
 
-  val form = new AddPartnershipContactMethodsYesNoFormProvider()()
+  val form = new AddCompanyContactMethodsYesNoFormProvider()()
 
   ".value" - {
 
