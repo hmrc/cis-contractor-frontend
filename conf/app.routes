@@ -121,6 +121,11 @@ POST  /subcontractor/add/change-check-contact-details  controllers.add.Individua
 
 GET   /subcontractor/add/individual/subcontractor-added  controllers.add.SubcontractorAddedController.individualSubcontractorAdded()
 
+GET   /subcontractor/add/add-contact-details         controllers.add.AddIndividualContactMethodsYesNoController.onPageLoad(mode: Mode = NormalMode)
+POST  /subcontractor/add/add-contact-details         controllers.add.AddIndividualContactMethodsYesNoController.onSubmit(mode: Mode = NormalMode)
+GET   /subcontractor/add/change-add-contact-details  controllers.add.AddIndividualContactMethodsYesNoController.onPageLoad(mode: Mode = CheckMode)
+POST  /subcontractor/add/change-add-contact-details  controllers.add.AddIndividualContactMethodsYesNoController.onSubmit(mode: Mode = CheckMode)
+
 # Company
 GET   /subcontractor/add/company/subcontractor-added  controllers.add.SubcontractorAddedController.companySubcontractorAdded()
 
