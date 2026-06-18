@@ -16,13 +16,20 @@
 
 package utils
 
-import play.api.i18n.{Lang, MessagesApi}
+import config.FrontendAppConfig
+import javax.inject.{Inject, Singleton}
 
-object MessageOption {
-  def apply(key: String, lang: Lang, params: String*)(implicit messagesApi: MessagesApi): Option[String] = {
-    val message       = messagesApi.translate(key, params.toSeq)(lang)
-    val keyNotDefined = message.exists(_.isEmpty)
+@Singleton
+class CountryOptions @Inject() (config: FrontendAppConfig) {
 
-    if (keyNotDefined || message.isEmpty) None else message
-  }
+  def options(): Seq[InputOption] =
+    config.locationCanonicalList.map { case (name, _) =>
+      InputOption(value = name, label = name)
+    }
+
+  def getCountryNameFromCode(code: String): String =
+    options()
+      .find(_.value == code)
+      .map(_.label)
+      .getOrElse(code)
 }

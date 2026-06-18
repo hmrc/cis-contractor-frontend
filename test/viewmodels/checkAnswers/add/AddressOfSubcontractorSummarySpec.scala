@@ -18,8 +18,8 @@ package viewmodels.checkAnswers.add
 
 import controllers.add.routes
 import helpers.CyaEncodingSpecHelper
-import models.address.{Address, Country}
-import models.UserAnswers
+import models.add.InternationalAddress
+import models.{CheckMode, UserAnswers}
 import org.scalatest.OptionValues.convertOptionToValuable
 import org.scalatest.TryValues.convertTryToSuccessOrFailure
 import org.scalatest.wordspec.AnyWordSpec
@@ -37,13 +37,13 @@ class AddressOfSubcontractorSummarySpec extends AnyWordSpec with Matchers with C
 
     "return a SummaryListRow when AddressOfSubcontractorPage has an answer" in {
 
-      val address = Address(
+      val address = InternationalAddress(
         addressLine1 = "10 Downing Street",
         addressLine2 = Some("Westminster"),
-        addressLine3 = Some("London"),
+        addressLine3 = "London",
         addressLine4 = Some("Greater London"),
-        postcode = Some("SW1A 2AA"),
-        country = Some(Country(Some("GB"), Some("United Kingdom")))
+        postalCode = "SW1A 2AA",
+        country = "United Kingdom"
       )
 
       val userAnswers =
@@ -75,7 +75,7 @@ class AddressOfSubcontractorSummarySpec extends AnyWordSpec with Matchers with C
 
       action.href shouldBe
         routes.AddressOfSubcontractorController
-          .redirectToAddressLookup(Some("change"))
+          .onPageLoad(CheckMode)
           .url
 
       action.visuallyHiddenText.value shouldBe
@@ -91,67 +91,15 @@ class AddressOfSubcontractorSummarySpec extends AnyWordSpec with Matchers with C
       AddressOfSubcontractorSummary.row(userAnswers) shouldBe None
     }
 
-    "render the address without a country line when country is None" in {
-
-      val address = Address(
-        addressLine1 = "10 Downing Street",
-        addressLine2 = Some("Westminster"),
-        addressLine3 = Some("London"),
-        addressLine4 = None,
-        postcode = Some("SW1A 2AA"),
-        country = None
-      )
-
-      val userAnswers =
-        UserAnswers("id")
-          .set(AddressOfSubcontractorPage, address)
-          .success
-          .value
-
-      val row = AddressOfSubcontractorSummary.row(userAnswers).value
-
-      row.value.content shouldBe HtmlContent(
-        "10 Downing Street<br/>" +
-          "Westminster<br/>" +
-          "London<br/>" +
-          "SW1A 2AA"
-      )
-    }
-
-    "render the address without a country line when the country name is None" in {
-
-      val address = Address(
-        addressLine1 = "10 Downing Street",
-        addressLine2 = None,
-        addressLine3 = None,
-        addressLine4 = None,
-        postcode = Some("SW1A 2AA"),
-        country = Some(Country(code = Some("GB"), name = None))
-      )
-
-      val userAnswers =
-        UserAnswers("id")
-          .set(AddressOfSubcontractorPage, address)
-          .success
-          .value
-
-      val row = AddressOfSubcontractorSummary.row(userAnswers).value
-
-      row.value.content shouldBe HtmlContent(
-        "10 Downing Street<br/>" +
-          "SW1A 2AA"
-      )
-    }
-
     "must render address safely without double encoding and preserve line breaks" in {
 
-      val address = Address(
+      val address = InternationalAddress(
         addressLine1 = "10 O'Reilly & Co",
         addressLine2 = Some("Building & Sons"),
-        addressLine3 = Some("Main Street"),
+        addressLine3 = "Main Street",
         addressLine4 = Some("London"),
-        postcode = Some("AB1 2CD"),
-        country = Some(Country(Some("GB"), Some("UK")))
+        postalCode = "AB1 2CD",
+        country = "UK"
       )
 
       val answers =
@@ -164,8 +112,8 @@ class AddressOfSubcontractorSummarySpec extends AnyWordSpec with Matchers with C
 
       val html = extractHtml(row)
 
-      assertRaw(html, "10 O&#x27;Reilly &amp; Co")
-      assertRaw(html, "Building &amp; Sons")
+      assertRaw(html, "10 O'Reilly & Co")
+      assertRaw(html, "Building & Sons")
 
       assertHasBreaks(html)
 

@@ -108,7 +108,7 @@ class SubAddressYesNoControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual controllers.add.routes.AddressOfSubcontractorController
-          .redirectToAddressLookup()
+          .onPageLoad(NormalMode)
           .url
       }
     }

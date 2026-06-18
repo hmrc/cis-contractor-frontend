@@ -32,7 +32,7 @@
 package models.add.company
 
 import base.SpecBase
-import models.address.Address
+import models.add.InternationalAddress
 import models.contact.ContactOptions
 import models.contact.ContactOptions.*
 import models.{InvalidAnswer, MissingAnswer, TypeOfSubcontractor, UserAnswers}
@@ -205,7 +205,7 @@ class ValidatedCompanySpec extends SpecBase with Matchers {
       }
 
       "fail when AddressYesNo is false but CompanyAddressPage is still present (stale session)" in {
-        val address = Address("1", addressLine3 = Some("City"), postcode = Some("AA1 1AA"))
+        val address = InternationalAddress("1", None, "City", None, "AA1 1AA", "GB")
         val ua      = withStaleValue(minRequired, CompanyAddressPage, address)
 
         ValidatedCompany.build(ua) mustBe Left(InvalidAnswer(CompanyAddressPage))

@@ -16,49 +16,70 @@
 
 package controllers.add.trust
 
+import config.FrontendAppConfig
 import controllers.actions.*
-import controllers.add.AddressLookupJourneyController
-import models.{Mode, UserAnswers}
-import models.address.Address
-import models.address.AddressLookupJourneyIdentifier.trustQuestionsAddress
+import forms.add.trust.TrustAddressFormProvider
+import models.Mode
+import navigation.Navigator
 import pages.add.trust.{TrustAddressPage, TrustNamePage}
-import play.api.i18n.MessagesApi
-import play.api.mvc.{Call, MessagesControllerComponents}
-import queries.Settable
+import play.api.i18n.{I18nSupport, MessagesApi}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
-import services.AddressLookupService
+import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import utils.CountryOptions
+import views.html.add.trust.TrustAddressView
 
 import javax.inject.Inject
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 class TrustAddressController @Inject() (
   override val messagesApi: MessagesApi,
-  override protected val sessionRepository: SessionRepository,
-  override protected val identify: IdentifierAction,
-  override protected val getData: DataRetrievalAction,
-  override protected val requireData: DataRequiredAction,
-  override protected val addressLookupService: AddressLookupService,
-  val controllerComponents: MessagesControllerComponents
-)(implicit override protected val executionContext: ExecutionContext)
-    extends AddressLookupJourneyController {
+  sessionRepository: SessionRepository,
+  navigator: Navigator,
+  identify: IdentifierAction,
+  getData: DataRetrievalAction,
+  requireData: DataRequiredAction,
+  formProvider: TrustAddressFormProvider,
+  countryOptions: CountryOptions,
+  val controllerComponents: MessagesControllerComponents,
+  view: TrustAddressView
+)(implicit ec: ExecutionContext, appConfig: FrontendAppConfig)
+    extends FrontendBaseController
+    with I18nSupport {
 
-  override protected def journeyId = trustQuestionsAddress
+  private val form = formProvider()
 
-  override protected def addressPage: Settable[Address] = TrustAddressPage
+  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
+    request.userAnswers
+      .get(TrustNamePage)
+      .map { trustName =>
+        val preparedForm = request.userAnswers.get(TrustAddressPage) match {
+          case None        => form
+          case Some(value) => form.fill(value)
+        }
 
-  override protected def subcontractorName(userAnswers: UserAnswers): Option[String] =
-    userAnswers.get(TrustNamePage)
+        Ok(view(preparedForm, mode, trustName, countryOptions.options()))
+      }
+      .getOrElse(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+  }
 
-  override protected def standardCallback: Call =
-    routes.TrustAddressController.addressLookupCallback()
-
-  override protected def changeCallback: Call =
-    routes.TrustAddressController.addressLookupCallbackChange()
-
-  override protected def onCompletion(mode: Mode): Call =
-    routes.TrustContactOptionsController.onPageLoad(mode)
-
-  override protected def onChangeCompletion: Call =
-    routes.TrustCheckYourAnswersController.onPageLoad()
-
+  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
+    implicit request =>
+      request.userAnswers
+        .get(TrustNamePage)
+        .map { trustName =>
+          form
+            .bindFromRequest()
+            .fold(
+              formWithErrors =>
+                Future.successful(BadRequest(view(formWithErrors, mode, trustName, countryOptions.options()))),
+              value =>
+                for {
+                  updatedAnswers <- Future.fromTry(request.userAnswers.set(TrustAddressPage, value))
+                  _              <- sessionRepository.set(updatedAnswers)
+                } yield Redirect(navigator.nextPage(TrustAddressPage, mode, updatedAnswers))
+            )
+        }
+        .getOrElse(Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())))
+  }
 }

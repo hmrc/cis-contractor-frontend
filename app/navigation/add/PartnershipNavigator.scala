@@ -230,16 +230,28 @@ class PartnershipNavigator @Inject() () extends NavigatorForJourney {
     }
 
   private def navigatorFromPartnershipAddressYesNoPage(mode: Mode)(userAnswers: UserAnswers): Call =
-    addressLookupYesNoRoute(
-      mode,
-      userAnswers.get(PartnershipAddressYesNoPage),
-      userAnswers.get(PartnershipAddressPage).isDefined,
-      onYes = controllers.add.partnership.routes.PartnershipAddressController.redirectToAddressLookup(),
-      onYesChange = controllers.add.partnership.routes.PartnershipAddressController
-        .redirectToAddressLookup(Some(CheckMode.toString)),
-      onNo = controllers.add.partnership.routes.PartnershipChooseContactDetailsController.onPageLoad(NormalMode),
-      checkYourAnswers = controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
-    )
+    (userAnswers.get(PartnershipAddressYesNoPage), mode) match {
+      case (Some(true), NormalMode) =>
+        controllers.add.partnership.routes.PartnershipAddressController.onPageLoad(NormalMode)
+
+      case (Some(false), NormalMode) =>
+        controllers.add.partnership.routes.PartnershipChooseContactDetailsController.onPageLoad(NormalMode)
+
+      case (Some(true), CheckMode) =>
+        userAnswers
+          .get(PartnershipAddressPage)
+          .fold(
+            controllers.add.partnership.routes.PartnershipAddressController.onPageLoad(CheckMode)
+          ) { _ =>
+            controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
+          }
+
+      case (Some(false), CheckMode) =>
+        controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
+
+      case (None, _) =>
+        routes.JourneyRecoveryController.onPageLoad()
+    }
 
   private def navigatorFromPartnershipNominatedPartnerNinoYesNoPage(mode: Mode)(userAnswers: UserAnswers): Call =
     (userAnswers.get(PartnershipNominatedPartnerNinoYesNoPage), mode) match {
