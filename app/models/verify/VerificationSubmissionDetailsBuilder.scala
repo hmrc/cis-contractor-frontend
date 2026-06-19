@@ -18,10 +18,13 @@ package models.verify
 
 import models.response.{ChrisPollResponse, ChrisSubmissionResponse}
 
-import java.time.LocalDateTime
+import java.time.ZonedDateTime.now
+import java.time.{LocalDateTime, ZoneId}
 import scala.util.Try
 
 object VerificationSubmissionDetailsBuilder {
+  private val ukZone = ZoneId.of("Europe/London")
+
   def fromSubmissionResponse(response: ChrisSubmissionResponse): VerificationSubmissionDetails =
     VerificationSubmissionDetails(
       submissionId = response.submissionId,
@@ -33,9 +36,9 @@ object VerificationSubmissionDetailsBuilder {
       pollIntervalSeconds = response.responseEndPoint.map(_.pollIntervalSeconds),
       submittedAt = response.gatewayTimestamp
         .flatMap(timestamp => Try(LocalDateTime.parse(timestamp)).toOption)
-        .getOrElse(LocalDateTime.now()),
+        .getOrElse(now(ukZone).toLocalDateTime),
       lastMessageDate = None,
-      timedOut = false
+      timedOut = false // TODO: to be updated in 60s timeout ticket
     )
 
   def updateFromPollResponse(
