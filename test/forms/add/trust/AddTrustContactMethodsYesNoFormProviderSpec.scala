@@ -16,7 +16,6 @@
 
 package forms.add.trust
 
-import forms.add.trust.AddTrustContactMethodsYesNoFormProvider
 import forms.behaviours.BooleanFieldBehaviours
 import play.api.data.FormError
 
