@@ -201,22 +201,6 @@ class ConstructionIndustrySchemeConnector @Inject() (config: ServicesConfig, htt
       .withBody(Json.toJson(request))
       .execute[ChrisSubmissionResponse]
 
-  def updateVerificationSubmission(
-    submissionId: String,
-    request: UpdateVerificationSubmissionRequest
-  )(implicit hc: HeaderCarrier): Future[Unit] =
-    http
-      .post(url"$cisBaseUrl/verification/submission/update")
-      .withBody(Json.toJson(request))
-      .execute[HttpResponse]
-      .flatMap { resp =>
-        if (resp.status / 100 == 2) {
-          Future.unit
-        } else {
-          Future.failed(UpstreamErrorResponse(resp.body, resp.status, resp.status))
-        }
-      }
-
   def getSubmissionStatus(
     pollUrl: String,
     submissionId: String

@@ -26,7 +26,7 @@ import models.verify.{ChrisVerificationRequestBuilder, SubmissionStatus, Verific
 import models.verify.ContractorEmailConfirmationStored.DifferentEmail
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
-import org.mockito.Mockito.{never, verify, verifyNoMoreInteractions, when}
+import org.mockito.Mockito.{never, times, verify, verifyNoMoreInteractions, when}
 import org.scalatest.RecoverMethods.recoverToExceptionIf
 import org.scalatestplus.mockito.MockitoSugar
 import pages.QuestionPage
@@ -630,7 +630,7 @@ final class VerificationServiceSpec extends SpecBase with MockitoSugar with Mode
 
   "VerificationService.createSubmitAndPersistVerificationSubmission" - {
 
-    "must create, submit, save details and update submission" in {
+    "must create, submit and save details" in {
       val mockConnector      = mock[ConstructionIndustrySchemeConnector]
       val mockRepo           = mock[SessionRepository]
       val mockRequestBuilder = mock[ChrisVerificationRequestBuilder]
@@ -708,25 +708,16 @@ final class VerificationServiceSpec extends SpecBase with MockitoSugar with Mode
 
       when(
         mockConnector.createSubmissionForVerification(any[CreateSubmissionForVerificationRequest])(any[HeaderCarrier])
-      )
-        .thenReturn(Future.successful(CreateSubmissionForVerificationResponse(13602L)))
+      ).thenReturn(Future.successful(CreateSubmissionForVerificationResponse(13602L)))
 
       when(
         mockRequestBuilder.build(any[UserAnswers], eqTo(false), eqTo(EmployerReference("123", "AB456")))(
           any[HeaderCarrier]
         )
-      )
-        .thenReturn(Future.successful(chrisRequest))
+      ).thenReturn(Future.successful(chrisRequest))
 
       when(mockConnector.submitVerificationToChris(eqTo(13602L), eqTo(chrisRequest))(any[HeaderCarrier]))
         .thenReturn(Future.successful(chrisResponse))
-
-      when(
-        mockConnector.updateVerificationSubmission(eqTo("13602"), any[UpdateVerificationSubmissionRequest])(
-          any[HeaderCarrier]
-        )
-      )
-        .thenReturn(Future.successful(()))
 
       when(mockRepo.set(any[UserAnswers]))
         .thenReturn(Future.successful(true))
@@ -740,47 +731,16 @@ final class VerificationServiceSpec extends SpecBase with MockitoSugar with Mode
         any[HeaderCarrier]
       )
       verify(mockConnector).submitVerificationToChris(eqTo(13602L), eqTo(chrisRequest))(any[HeaderCarrier])
-      verify(mockConnector).updateVerificationSubmission(eqTo("13602"), any[UpdateVerificationSubmissionRequest])(
-        any[HeaderCarrier]
-      )
+      verify(mockRepo, times(2)).set(any[UserAnswers])
     }
   }
 
-  "VerificationService.pollAndUpdateStatus" - {
+  "VerificationService.pollStatus" - {
 
-    "must poll ChRIS and update submission" in {
+    "must poll ChRIS and return response" in {
       val mockConnector = mock[ConstructionIndustrySchemeConnector]
       val mockRepo      = mock[SessionRepository]
       val service       = buildService(mockConnector, mockRepo)
-
-      val currentBatch =
-        GetCurrentVerificationBatchResponse(
-          subcontractors = Seq.empty,
-          verificationBatch = Some(
-            VerificationBatchCurrentVerification(
-              verificationBatchId = 999L,
-              verifBatchResourceRef = Some(7777L)
-            )
-          ),
-          verifications = Seq.empty
-        )
-
-      val ua =
-        emptyUserAnswers
-          .set(CisIdQuery, instanceId)
-          .success
-          .value
-          .set(CurrentVerificationBatchResponsePage, currentBatch)
-          .success
-          .value
-
-      implicit val request: DataRequest[AnyContent] =
-        DataRequest(
-          request = FakeRequest(),
-          userId = "user-id",
-          userAnswers = ua,
-          employerReference = Some(EmployerReference("123", "AB456"))
-        )
 
       val details =
         VerificationSubmissionDetails(
@@ -811,23 +771,40 @@ final class VerificationServiceSpec extends SpecBase with MockitoSugar with Mode
       when(mockConnector.getSubmissionStatus(eqTo("http://localhost/poll"), eqTo("13602"))(any[HeaderCarrier]))
         .thenReturn(Future.successful(pollResponse))
 
-      when(
-        mockConnector.updateVerificationSubmission(eqTo("13602"), any[UpdateVerificationSubmissionRequest])(
-          any[HeaderCarrier]
-        )
-      )
-        .thenReturn(Future.successful(()))
-
       val result =
-        service.pollAndUpdateStatus(ua, details).futureValue
+        service.pollStatus(emptyUserAnswers, details).futureValue
 
       result mustBe pollResponse
 
       verify(mockConnector).getSubmissionStatus(eqTo("http://localhost/poll"), eqTo("13602"))(any[HeaderCarrier])
-      verify(mockConnector).updateVerificationSubmission(eqTo("13602"), any[UpdateVerificationSubmissionRequest])(
-        any[HeaderCarrier]
-      )
       verify(mockRepo, never()).set(any[UserAnswers])
+    }
+
+    "must fail when pollUrl is missing" in {
+      val mockConnector = mock[ConstructionIndustrySchemeConnector]
+      val mockRepo      = mock[SessionRepository]
+      val service       = buildService(mockConnector, mockRepo)
+
+      val details =
+        VerificationSubmissionDetails(
+          submissionId = "13602",
+          status = "ACCEPTED",
+          hmrcMarkGenerated = "hmrc-mark",
+          hmrcMarkGgis = None,
+          correlationId = Some("corr-id"),
+          pollUrl = None,
+          pollIntervalSeconds = Some(5),
+          submittedAt = LocalDateTime.parse("2026-06-15T03:30:52"),
+          lastMessageDate = None,
+          timedOut = false
+        )
+
+      val ex =
+        service.pollStatus(emptyUserAnswers, details).failed.futureValue
+
+      ex.getMessage mustBe "Poll URL missing in submission details"
+
+      verify(mockConnector, never()).getSubmissionStatus(any[String], any[String])(any[HeaderCarrier])
     }
   }
 }

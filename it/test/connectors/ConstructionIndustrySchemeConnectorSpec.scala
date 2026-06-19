@@ -501,54 +501,6 @@ class ConstructionIndustrySchemeConnectorSpec
     }
   }
 
-  "updateVerificationSubmission" should {
-
-    "successfully update verification submission when BE returns 200" in {
-      val requestModel = UpdateVerificationSubmissionRequest(
-        instanceId = "1",
-        verificationBatchId = 1001L,
-        verificationBatchResourceRef = 2001L,
-        submittableStatus = "SUBMITTED",
-        hmrcMarkGenerated = "hmrc-mark",
-        hmrcMarkGgis = Some("ggis-mark"),
-        emailRecipient = Some("test@test.com"),
-        submissionRequestDate = Some(LocalDateTime.parse("2026-06-15T03:30:52")),
-        acceptedTime = Some("2026-06-15T03:30:53")
-      )
-
-      stubFor(
-        post(urlPathEqualTo("/cis/verification/submission/update"))
-          .willReturn(aResponse().withStatus(OK).withBody(""))
-      )
-
-      val result =
-        connector.updateVerificationSubmission("13602", requestModel).futureValue
-
-      result mustBe()
-    }
-
-    "propagate upstream error on non-2xx" in {
-      val requestModel = UpdateVerificationSubmissionRequest(
-        instanceId = "1",
-        verificationBatchId = 1001L,
-        verificationBatchResourceRef = 2001L,
-        submittableStatus = "SUBMITTED",
-        hmrcMarkGenerated = "hmrc-mark"
-      )
-
-      stubFor(
-        post(urlPathEqualTo("/cis/verification/submission/update"))
-          .willReturn(aResponse().withStatus(INTERNAL_SERVER_ERROR).withBody("boom"))
-      )
-
-      val ex =
-        connector.updateVerificationSubmission("13602", requestModel).failed.futureValue
-
-      ex mustBe a[UpstreamErrorResponse]
-      ex.getMessage mustBe "boom"
-    }
-  }
-
   "getSubmissionStatus" should {
 
     "successfully get verification submission status when BE returns 200" in {

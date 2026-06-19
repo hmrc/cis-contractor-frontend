@@ -28,7 +28,6 @@ import queries.CisIdQuery
 import repositories.SessionRepository
 import uk.gov.hmrc.http.HeaderCarrier
 
-import java.time.{ZoneId, ZonedDateTime}
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -150,23 +149,16 @@ class VerificationService @Inject() (
       submissionId  <- createSubmissionForVerification(createRequest).map(_.submissionId)
       response      <- submitVerificationToChris(submissionId, latestUa)
       updatedUa     <- saveVerificationSubmissionDetailsToSession(latestUa, response)
-      _             <- updateSubmissionFromChrisSubmissionResponse(submissionId.toString, updatedUa, response)
     } yield response
 
-  def pollAndUpdateStatus(
+  def pollStatus(
     ua: UserAnswers,
     submissionDetails: VerificationSubmissionDetails
-  )(implicit request: DataRequest[AnyContent], hc: HeaderCarrier): Future[ChrisPollResponse] = {
-    val pollUrl = required(submissionDetails.pollUrl, "Poll URL missing in submission details")
-
+  )(implicit hc: HeaderCarrier): Future[ChrisPollResponse] =
     for {
-      response                <- cisConnector.getSubmissionStatus(pollUrl, submissionDetails.submissionId)
-      updatedSubmissionDetails =
-        VerificationSubmissionDetailsBuilder.updateFromPollResponse(submissionDetails, response)
-      _                       <- updateSubmissionFromChrisPollResponse(ua, updatedSubmissionDetails, response)
+      pollUrl  <- required(submissionDetails.pollUrl, "Poll URL missing in submission details")
+      response <- cisConnector.getSubmissionStatus(pollUrl, submissionDetails.submissionId)
     } yield response
-
-  }
 
   private def createSubmissionForVerification(
     request: CreateSubmissionForVerificationRequest
@@ -223,36 +215,9 @@ class VerificationService @Inject() (
       )
   }
 
-  private def updateSubmissionFromChrisSubmissionResponse(
-    submissionId: String,
-    ua: UserAnswers,
-    response: ChrisSubmissionResponse
-  )(implicit request: DataRequest[AnyContent], hc: HeaderCarrier): Future[Unit] = {
-    val ukNow = ZonedDateTime.now(ZoneId.of("Europe/London")).toLocalDateTime
-
-    UpdateVerificationSubmissionRequestBuilder
-      .fromChrisSubmissionResponse(ua, response, request.agentReference, ukNow)
-      .fold(
-        error => Future.failed(new RuntimeException(s"Failed to build update request: $error")),
-        updateReq => cisConnector.updateVerificationSubmission(submissionId, updateReq)
-      )
-  }
-
-  private def updateSubmissionFromChrisPollResponse(
-    ua: UserAnswers,
-    existingDetails: VerificationSubmissionDetails,
-    response: ChrisPollResponse
-  )(implicit request: DataRequest[AnyContent], hc: HeaderCarrier): Future[Unit] = {
-    val ukNow = ZonedDateTime.now(ZoneId.of("Europe/London")).toLocalDateTime
-
-    UpdateVerificationSubmissionRequestBuilder
-      .fromChrisPollResponse(ua, existingDetails, response, request.agentReference, ukNow)
-      .fold(
-        error => Future.failed(new RuntimeException(s"Failed to build update request: $error")),
-        updateReq => cisConnector.updateVerificationSubmission(existingDetails.submissionId, updateReq)
-      )
-  }
-
-  private def required[A](value: Option[A], errorMsg: String): A =
-    value.getOrElse(throw new RuntimeException(errorMsg))
+  private def required[A](value: Option[A], errorMsg: String): Future[A] =
+    value match {
+      case Some(v) => Future.successful(v)
+      case None    => Future.failed(new RuntimeException(errorMsg))
+    }
 }
