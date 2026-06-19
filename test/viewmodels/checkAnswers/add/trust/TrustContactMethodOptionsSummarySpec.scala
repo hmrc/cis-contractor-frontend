@@ -105,5 +105,9 @@ class TrustContactMethodOptionsSummarySpec extends SpecBase with Matchers {
       valueHtml must not include "<br>"
       valueHtml must not include "govuk-list--bullet"
     }
+
+    "return None when the answer is not set" in {
+      TrustUtrYesNoSummary.row(emptyUserAnswers) mustBe None
+    }
   }
 }
