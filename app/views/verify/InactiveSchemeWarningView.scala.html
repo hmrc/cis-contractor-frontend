@@ -25,7 +25,7 @@
         link: Link
     )
 
-@()(implicit request: Request[_], messages: Messages)
+@(manageSubcontractorsUrl: String)(implicit request: Request[_], messages: Messages)
 
     @layout(pageTitle = titleNoForm(messages("verify.inactiveSchemeWarning.title"))) {
 
@@ -40,7 +40,11 @@
     @govukButton(
         ButtonViewModel(messages("site.continue")).asLink(controllers.verify.routes.NewestVerificationBatchController.onContinue.url).withAttribute("id" -> "continue-button")
     )
-    @link(linkTextKey = "verify.inactiveSchemeWarning.cancel", linkUrl = controllers.routes.IndexController.onPageLoad().url, linkId = "cancel-link")
+    @link(
+    linkTextKey = "verify.inactiveSchemeWarning.cancel",
+    linkUrl = manageSubcontractorsUrl,
+    linkId = "cancel-link"
+    )
 </div>
 
 }

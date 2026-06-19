@@ -16,8 +16,10 @@
 
 package controllers.verify
 
+import config.FrontendAppConfig
 import controllers.actions.*
 import play.api.i18n.{I18nSupport, MessagesApi}
+import queries.CisIdQuery
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.verify.InactiveSchemeWarningView
@@ -31,10 +33,19 @@ class InactiveSchemeWarningController @Inject() (
   requireData: DataRequiredAction,
   val controllerComponents: MessagesControllerComponents,
   view: InactiveSchemeWarningView
-) extends FrontendBaseController
+) (implicit appConfig: FrontendAppConfig) extends FrontendBaseController
     with I18nSupport {
 
   def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
-    Ok(view())
+    request.userAnswers.get(CisIdQuery) match {
+      case Some(cisId) =>
+        val manageSubcontractorsUrl =
+          s"${appConfig.manageSubcontractorsUrl}/$cisId"
+
+        Ok(view(manageSubcontractorsUrl))
+
+      case None =>
+        Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+    }
   }
 }

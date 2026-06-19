@@ -19,6 +19,7 @@ package controllers.verify
 import base.SpecBase
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
+import queries.CisIdQuery
 import views.html.verify.InactiveSchemeWarningView
 
 class InactiveSchemeWarningControllerSpec extends SpecBase {
@@ -27,17 +28,38 @@ class InactiveSchemeWarningControllerSpec extends SpecBase {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val cisId = "test-cis-id"
+
+      val userAnswers =
+        emptyUserAnswers.set(CisIdQuery, cisId).success.value
+
+      val application =
+        applicationBuilder(userAnswers = Some(userAnswers)).build()
 
       running(application) {
-        val request = FakeRequest(GET, controllers.verify.routes.InactiveSchemeWarningController.onPageLoad().url)
 
-        val result = route(application, request).value
+        val request =
+          FakeRequest(
+            GET,
+            controllers.verify.routes.InactiveSchemeWarningController.onPageLoad().url
+          )
 
-        val view = application.injector.instanceOf[InactiveSchemeWarningView]
+        val result =
+          route(application, request).value
+
+        val view =
+          application.injector.instanceOf[InactiveSchemeWarningView]
+
+        val appConfig =
+          application.injector.instanceOf[config.FrontendAppConfig]
+
+        val manageSubcontractorsUrl =
+          s"${appConfig.manageSubcontractorsUrl}/$cisId"
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view()(request, messages(application)).toString
+
+        contentAsString(result) mustEqual
+          view(manageSubcontractorsUrl)(request, messages(application)).toString
       }
     }
   }
