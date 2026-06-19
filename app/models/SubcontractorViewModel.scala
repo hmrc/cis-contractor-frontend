@@ -18,6 +18,7 @@ package models
 
 import models.TypeOfSubcontractor.*
 import play.api.libs.json.{Json, OFormat}
+import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.checkboxes.CheckboxItem
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
 import viewmodels.govuk.checkbox.CheckboxItemViewModel
@@ -40,14 +41,16 @@ object SubcontractorViewModel {
 
   def fromSubcontractors(
     subcontractors: Seq[Subcontractor]
-  ): (Seq[String], Seq[SubcontractorViewModel]) =
-    subcontractors.partitionMap(fromSubcontractor)
+  )(implicit messages: Messages): Seq[SubcontractorViewModel] =
+    subcontractors.map(fromSubcontractor)
 
-  private def fromSubcontractor(subcontractor: Subcontractor): Either[String, SubcontractorViewModel] =
-    for {
-      subcontractorType <- getSubcontractorType(subcontractor)
-      name              <- getSubcontractorName(subcontractor, subcontractorType)
-    } yield SubcontractorViewModel(
+  private def fromSubcontractor(subcontractor: Subcontractor)(implicit messages: Messages): SubcontractorViewModel =
+    val NoName = messages("verify.noName")
+    val name   = getSubcontractorType(subcontractor)
+      .flatMap(subcontractorType => getSubcontractorName(subcontractor, subcontractorType))
+      .getOrElse(NoName)
+
+    SubcontractorViewModel(
       id = subcontractor.subcontractorId.toString,
       name = name
     )
@@ -55,7 +58,7 @@ object SubcontractorViewModel {
   private def getSubcontractorName(
     subcontractor: Subcontractor,
     subcontractorType: TypeOfSubcontractor
-  ): Either[String, String] = {
+  ): Option[String] = {
 
     def nonBlank(field: Option[String]): Option[String] =
       field.map(_.trim).filter(_.nonEmpty)
@@ -63,34 +66,29 @@ object SubcontractorViewModel {
     subcontractorType match {
       case Individualorsoletrader =>
         val soleTraderName: Option[String] =
-          for {
-            surname   <- nonBlank(subcontractor.surname)
-            firstName <- nonBlank(subcontractor.firstName)
-          } yield s"$surname, $firstName"
+          nonBlank(subcontractor.surname).map { surname =>
+            nonBlank(subcontractor.firstName) match {
+              case Some(firstName) => s"$surname, $firstName"
+              case None            => surname
+            }
+          }
 
         soleTraderName
           .orElse(nonBlank(subcontractor.tradingName))
-          .toRight(s"Missing name for subcontractor id ${subcontractor.subcontractorId}")
 
       case Limitedcompany =>
-        nonBlank(subcontractor.tradingName).toRight(
-          s"Missing tradingName for subcontractor id ${subcontractor.subcontractorId}"
-        )
+        nonBlank(subcontractor.tradingName)
 
       case Partnership =>
-        nonBlank(subcontractor.partnershipTradingName).toRight(
-          s"Missing partnershipTradingName for subcontractor id ${subcontractor.subcontractorId}"
-        )
+        nonBlank(subcontractor.partnershipTradingName)
+          .orElse(nonBlank(subcontractor.tradingName))
 
       case Trust =>
-        nonBlank(subcontractor.tradingName).toRight(
-          s"Missing tradingName for subcontractor id ${subcontractor.subcontractorId}"
-        )
+        nonBlank(subcontractor.tradingName)
     }
   }
 
-  private def getSubcontractorType(subcontractor: Subcontractor): Either[String, TypeOfSubcontractor] =
+  private def getSubcontractorType(subcontractor: Subcontractor): Option[TypeOfSubcontractor] =
     subcontractor.subcontractorType
       .flatMap(TypeOfSubcontractor.fromString)
-      .toRight(s"Unknown or missing subcontractor type for subcontractor id ${subcontractor.subcontractorId}")
 }

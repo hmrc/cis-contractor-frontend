@@ -121,6 +121,11 @@ POST  /subcontractor/add/change-check-contact-details  controllers.add.Individua
 
 GET   /subcontractor/add/individual/subcontractor-added  controllers.add.SubcontractorAddedController.individualSubcontractorAdded()
 
+GET   /subcontractor/add/add-contact-details         controllers.add.AddIndividualContactMethodsYesNoController.onPageLoad(mode: Mode = NormalMode)
+POST  /subcontractor/add/add-contact-details         controllers.add.AddIndividualContactMethodsYesNoController.onSubmit(mode: Mode = NormalMode)
+GET   /subcontractor/add/change-add-contact-details  controllers.add.AddIndividualContactMethodsYesNoController.onPageLoad(mode: Mode = CheckMode)
+POST  /subcontractor/add/change-add-contact-details  controllers.add.AddIndividualContactMethodsYesNoController.onSubmit(mode: Mode = CheckMode)
+
 # Company
 GET   /subcontractor/add/company/subcontractor-added  controllers.add.SubcontractorAddedController.companySubcontractorAdded()
 
@@ -191,6 +196,11 @@ POST  /subcontractor/add/company/change-company-works-reference  controllers.add
 
 GET   /subcontractor/add/company/check-your-answers  controllers.add.company.CompanyCheckYourAnswersController.onPageLoad()
 POST  /subcontractor/add/company/check-your-answers  controllers.add.company.CompanyCheckYourAnswersController.onSubmit()
+
+GET   /subcontractor/add/company/add-contact-details         controllers.add.company.AddCompanyContactMethodsYesNoController.onPageLoad(mode: Mode = NormalMode)
+POST  /subcontractor/add/company/add-contact-details         controllers.add.company.AddCompanyContactMethodsYesNoController.onSubmit(mode: Mode = NormalMode)
+GET   /subcontractor/add/company/change-add-contact-details  controllers.add.company.AddCompanyContactMethodsYesNoController.onPageLoad(mode: Mode = CheckMode)
+POST  /subcontractor/add/company/change-add-contact-details  controllers.add.company.AddCompanyContactMethodsYesNoController.onSubmit(mode: Mode = CheckMode)
 
 # Partnership
 GET   /subcontractor/add/partnership/subcontractor-added  controllers.add.SubcontractorAddedController.partnershipSubcontractorAdded()
@@ -288,6 +298,11 @@ POST  /subcontractor/add/partnership/mobile-number         controllers.add.partn
 GET   /subcontractor/add/partnership/change-mobile-number  controllers.add.partnership.PartnershipMobileNumberController.onPageLoad(mode: Mode = CheckMode)
 POST  /subcontractor/add/partnership/change-mobile-number  controllers.add.partnership.PartnershipMobileNumberController.onSubmit(mode: Mode = CheckMode)
 
+GET   /subcontractor/add/partnership/add-contact-details         controllers.add.partnership.AddPartnershipContactMethodsYesNoController.onPageLoad(mode: Mode = NormalMode)
+POST  /subcontractor/add/partnership/add-contact-details         controllers.add.partnership.AddPartnershipContactMethodsYesNoController.onSubmit(mode: Mode = NormalMode)
+GET   /subcontractor/add/partnership/change-add-contact-details  controllers.add.partnership.AddPartnershipContactMethodsYesNoController.onPageLoad(mode: Mode = CheckMode)
+POST  /subcontractor/add/partnership/change-add-contact-details  controllers.add.partnership.AddPartnershipContactMethodsYesNoController.onSubmit(mode: Mode = CheckMode)
+
 # Trust
 GET   /subcontractor/add/trust/subcontractor-added               controllers.add.SubcontractorAddedController.trustSubcontractorAdded()
 
@@ -348,6 +363,11 @@ POST  /subcontractor/add/trust/change-trust-works-reference      controllers.add
 
 GET   /subcontractor/add/trust/check-your-answers                controllers.add.trust.TrustCheckYourAnswersController.onPageLoad()
 POST  /subcontractor/add/trust/check-your-answers                controllers.add.trust.TrustCheckYourAnswersController.onSubmit()
+
+GET   /subcontractor/add/trust/select-contact-details            controllers.add.trust.TrustContactMethodOptionsController.onPageLoad(mode: Mode = NormalMode)
+POST  /subcontractor/add/trust/select-contact-details            controllers.add.trust.TrustContactMethodOptionsController.onSubmit(mode: Mode = NormalMode)
+GET   /subcontractor/add/trust/change-select-contact-details     controllers.add.trust.TrustContactMethodOptionsController.onPageLoad(mode: Mode = CheckMode)
+POST  /subcontractor/add/trust/change-select-contact-details     controllers.add.trust.TrustContactMethodOptionsController.onSubmit(mode: Mode = CheckMode)
 
 # Verify
 GET   /subcontractor/verify/confirmation-email-not-stored         controllers.verify.ContractorEmailConfirmationNotStoredController.onPageLoad(mode: Mode = NormalMode)
@@ -419,9 +439,9 @@ POST  /subcontractor/verify/verification-batch-create  controllers.verify.Create
 GET   /subcontractor/verify/check-your-answers  controllers.verify.VerifyCheckYourAnswersController.onPageLoad()
 POST  /subcontractor/verify/check-your-answers  controllers.verify.VerifyCheckYourAnswersController.onSubmit()
 
-# for testing purposes, will be deleted after
-GET  /subcontractor/verify/submission/create   controllers.verify.SubmissionSendingController.onPageLoad()
-GET /subcontractor/verify/verification-batch-create controllers.verify.CreateVerificationBatchAndVerificationsController.onSubmit()
+GET   /subcontractor/verify/submission/create  controllers.verify.SubmissionSendingController.onPageLoad()
+
+GET   /subcontractor/verify/verification-batch-create  controllers.verify.CreateVerificationBatchAndVerificationsController.onSubmit()
 
 GET   /subcontractor/verify/verification-status/reverification-decision  controllers.verify.VerificationStatusController.goToReverificationDecision(mode: Mode = NormalMode)
 GET   /subcontractor/verify/verification-status/select-subcontractors    controllers.verify.VerificationStatusController.goToSelectSubcontractorsToReverify(mode: Mode = NormalMode)

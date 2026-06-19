@@ -12,6 +12,7 @@ site.startAgain                      =  Start again
 site.signIn                          =  Sign in
 site.govuk                           =  GOV.UK
 site.saveAndContinue                 =  Save and continue
+site.unknown                         =  Unknown
 
 date.day                             =  Day
 date.month                           =  Month
@@ -297,6 +298,24 @@ individualChooseContactDetails.cya.noDetails                             =  None
 individualChooseContactDetails.error.required                            =  Select whether you want to add contact details for this subcontractor
 individualChooseContactDetails.checkYourAnswersLabel                     =  Method of contact
 individualChooseContactDetails.change.hidden                             =  method of contact
+
+addPartnershipContactMethodsYesNo.title                                  =  Do you want to add contact details for this partnership?
+addPartnershipContactMethodsYesNo.heading                                =  Do you want to add contact details for {0}?
+addPartnershipContactMethodsYesNo.error.required                         =  Select yes if you want to add contact details for this partnership
+addPartnershipContactMethodsYesNo.checkYourAnswersLabel                  =  Add contact details?
+addPartnershipContactMethodsYesNo.change.hidden                          =  add contact details?
+
+addCompanyContactMethodsYesNo.title                                      =  Do you want to add contact details for this company?
+addCompanyContactMethodsYesNo.heading                                    =  Do you want to add contact details for {0}?
+addCompanyContactMethodsYesNo.error.required                             =  Select yes if you want to add contact details for this company
+addCompanyContactMethodsYesNo.checkYourAnswersLabel                      =  Add contact details?
+addCompanyContactMethodsYesNo.change.hidden                              =  add contact details?
+
+addIndividualContactMethodsYesNo.title                                   =  Do you want to add contact details for this subcontractor?
+addIndividualContactMethodsYesNo.heading                                 =  Do you want to add contact details for {0}?
+addIndividualContactMethodsYesNo.error.required                          =  Select yes if you want to add contact details for this subcontractor
+addIndividualContactMethodsYesNo.checkYourAnswersLabel                   =  Add contact details?
+addIndividualContactMethodsYesNo.change.hidden                           =  add contact details?
 
 # Partnership
 partnershipWorksReferenceNumberYesNo.title                           =  Is there a works reference number associated with this partnership?
@@ -775,6 +794,16 @@ trustCheckYourAnswers.trailHeading                             =  Now add this s
 trustCheckYourAnswers.trailText                                =  By adding this subcontractor you are confirming that, to the best of your knowledge, the details you are providing are correct.
 trustCheckYourAnswers.continue                                 =  Accept and submit
 
+trustContactMethodOptions.title                                =  Which contact details do you want to add for this trust?
+trustContactMethodOptions.heading                              =  Which contact details do you want to add for {0}?
+trustContactMethodOptions.hint                                 =  Contact details are only for your own records
+trustContactMethodOptions.email                                =  Email address
+trustContactMethodOptions.phone                                =  Phone number
+trustContactMethodOptions.mobile                               =  Mobile number
+trustContactMethodOptions.error.required                       =  Select the methods of contact you want to add for this trust
+trustContactMethodOptions.checkYourAnswersLabel                =  Methods of contact
+trustContactMethodOptions.change.hidden                        =  methods of contact
+
 # Verify
 verify.submissionSending.title                                          =  Submitting your verification request
 verify.submissionSending.heading                                        =  Your verification request is being sent to HMRC
@@ -848,6 +877,9 @@ verify.selectSubcontractorsToReverify.verified                          =  Verif
 verify.selectSubcontractorsToReverify.verificationNumber                =  Verification number
 verify.selectSubcontractorsToReverify.taxTreatment                      =  Tax treatment
 verify.selectSubcontractorsToReverify.dateAdded                         =  Date added
+verify.selectSubcontractorsToReverify.taxTreatment.net                  =  Standard rate
+verify.selectSubcontractorsToReverify.taxTreatment.unmatched            =  Higher rate
+verify.selectSubcontractorsToReverify.taxTreatment.gross                =  Gross
 
 verify.selectSubcontractor.title                                        =  Which subcontractors do you want to verify?
 verify.selectSubcontractor.heading                                      =  Which subcontractors do you want to verify?
@@ -943,6 +975,8 @@ verify.verifyCheckYourAnswers.title                                     =  Check
 verify.verifyCheckYourAnswers.heading                                   =  Check your answers before submitting your verification request
 verify.verifyCheckYourAnswers.subHeading                                =  Subcontractors to verify
 verify.verifyCheckYourAnswers.confirm                                   =  Confirm and submit
+
+verify.noName                                                           =  No name provided
 
 # Contractor Details
 contractordetails.contractorDetailsIndex.title                                 =  Contractor details

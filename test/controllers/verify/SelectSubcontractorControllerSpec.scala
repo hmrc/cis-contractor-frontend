@@ -35,11 +35,17 @@ import play.api.test.Helpers.*
 import repositories.SessionRepository
 import services.PaginationService
 import views.html.verify.SelectSubcontractorView
+import play.api.i18n.Messages
 
 import javax.inject.Inject
 import scala.concurrent.Future
 
 class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
+
+  implicit val messages: Messages = play.api.i18n.MessagesImpl(
+    play.api.i18n.Lang.defaultLang,
+    app.injector.instanceOf[play.api.i18n.MessagesApi]
+  )
 
   def onwardRoute: Call = Call("GET", "/foo")
 
@@ -107,7 +113,7 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
       .success
       .value
 
-  private val (_, allSubs)     = SubcontractorViewModel.fromSubcontractors(subcontractors)
+  private val allSubs          = SubcontractorViewModel.fromSubcontractors(subcontractors)
   private val brodyMartin      = allSubs.head // first subcontractor, on page 1
   private val epsilonCarpentry = allSubs(6) // seventh subcontractor, on page 2 (pageSize = 6)
 
@@ -230,7 +236,6 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    // todo even no page 2 still give ok
     "must support pagination (page 2)" in {
 
       val application = applicationBuilder(userAnswers = Some(uaWithSubcontractors)).build()
@@ -362,79 +367,6 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must redirect to Journey Recovery on GET when every unverified subcontractor has a missing or unknown type" in {
-
-      val invalidSubcontractors: Seq[Subcontractor] = generateSubcontractors(3).map(_.copy(subcontractorType = None))
-
-      val responseWithInvalid: GetNewestVerificationBatchResponse =
-        getNewestVerificationBatchResponse.copy(subcontractors = invalidSubcontractors)
-
-      def uaWithAllInvalid: UserAnswers =
-        emptyUserAnswers
-          .set(NewestVerificationBatchResponsePage, responseWithInvalid)
-          .success
-          .value
-          .set(UnverifiedSubcontractorsPage, invalidSubcontractors)
-          .success
-          .value
-
-      val application = applicationBuilder(userAnswers = Some(uaWithAllInvalid)).build()
-
-      running(application) {
-        val request = FakeRequest(GET, url(1))
-        val result  = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual
-          controllers.routes.JourneyRecoveryController.onPageLoad().url
-      }
-    }
-
-    "must render the page with only valid rows on GET when some unverified subcontractors have a missing type" in {
-
-      val validSubs   = generateSubcontractors(2)
-      val invalidSubs = generateSubcontractors(1).map(_.copy(subcontractorId = 99L, subcontractorType = None))
-      val mixed       = validSubs ++ invalidSubs
-
-      val responseWithMixed: GetNewestVerificationBatchResponse =
-        getNewestVerificationBatchResponse.copy(subcontractors = mixed)
-
-      def uaWithMixed: UserAnswers =
-        emptyUserAnswers
-          .set(NewestVerificationBatchResponsePage, responseWithMixed)
-          .success
-          .value
-          .set(UnverifiedSubcontractorsPage, mixed)
-          .success
-          .value
-
-      val application = applicationBuilder(userAnswers = Some(uaWithMixed)).build()
-
-      running(application) {
-        val request = FakeRequest(GET, url(1))
-        val result  = route(application, request).value
-
-        val (_, validViewModels) = SubcontractorViewModel.fromSubcontractors(mixed)
-        val view                 = application.injector.instanceOf[SelectSubcontractorView]
-        val items                = SubcontractorViewModel.checkboxItems(validViewModels)
-        val paginationResult     = paginationService.paginateCheckboxItems(items, 1)
-
-        status(result) mustEqual OK
-
-        contentAsString(result) mustEqual view(
-          form,
-          NormalMode,
-          paginationResult.paginatedData,
-          paginationResult.paginationViewModel,
-          1,
-          paginationResult.startIndex,
-          paginationResult.totalCount
-        )(request, messages(application)).toString
-
-        validViewModels.size mustEqual 2
-      }
-    }
-
     "must redirect to Journey Recovery on GET when UnverifiedSubcontractors is not found" in {
 
       def uaWithNoUnverifiedSubcontractors: UserAnswers =
@@ -510,37 +442,6 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
       def uaWithNoUnverifiedSubcontractor: UserAnswers =
         emptyUserAnswers
           .set(UnverifiedSubcontractorsPage, generateSubcontractors(subcontractorCount))
-          .success
-          .value
-
-      val mockSessionRepository = mock[SessionRepository]
-      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
-
-      val application =
-        applicationBuilder(userAnswers = Some(uaWithNoUnverifiedSubcontractor))
-          .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
-          .build()
-
-      running(application) {
-        val request =
-          FakeRequest(POST, url(1))
-            .withFormUrlEncodedBody("value[0]" -> allSubs.head.id)
-
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual
-          controllers.routes.JourneyRecoveryController.onPageLoad().url
-      }
-    }
-
-    "must redirect to Journey Recovery for a POST when every unverified subcontractor has a missing or unknown type" in {
-
-      val invalidSubcontractors: Seq[Subcontractor] = generateSubcontractors(3).map(_.copy(subcontractorType = None))
-
-      def uaWithNoUnverifiedSubcontractor: UserAnswers =
-        emptyUserAnswers
-          .set(UnverifiedSubcontractorsPage, invalidSubcontractors)
           .success
           .value
 

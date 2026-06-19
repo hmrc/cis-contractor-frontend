@@ -58,6 +58,8 @@ class SubcontractorViewModelSpec extends SpecBase {
       nino = None
     )
 
+  private val NoName = messages("verify.noName")
+
   "SubcontractorViewModel.checkboxItems" - {
     "map SubcontractorViewModel into CheckboxItemViewModel using id / name" in {
       val subcontractors = Seq(
@@ -97,7 +99,7 @@ class SubcontractorViewModelSpec extends SpecBase {
           subcontractorId = 10L,
           firstName = Some("John"),
           surname = Some("Smith"),
-          tradingName = None,
+          tradingName = Some("ABC Property Services"),
           subcontractorType = Some("soletrader")
         ),
         subcontractor(
@@ -113,6 +115,7 @@ class SubcontractorViewModelSpec extends SpecBase {
         subcontractor(
           subcontractorId = 40L,
           partnershipTradingName = Some("ABC Partnership"),
+          tradingName = Some("ABC Property Services"),
           subcontractorType = Some("partnership")
         ),
         subcontractor(
@@ -122,9 +125,8 @@ class SubcontractorViewModelSpec extends SpecBase {
         )
       )
 
-      val (errors, viewModels) = SubcontractorViewModel.fromSubcontractors(subcontractors)
+      val viewModels = SubcontractorViewModel.fromSubcontractors(subcontractors)
 
-      errors     shouldBe empty
       viewModels shouldBe Seq(
         SubcontractorViewModel(id = "10", name = "Smith, John"),
         SubcontractorViewModel(id = "20", name = "ABC Property Services"),
@@ -134,7 +136,7 @@ class SubcontractorViewModelSpec extends SpecBase {
       )
     }
 
-    "drop the row and return an error when subcontractorType is None" in {
+    "map subcontractors into view models with name equal to 'no name provided' when subcontractorType is None" in {
       val subcontractors = List(
         subcontractor(
           subcontractorId = 10L,
@@ -145,14 +147,14 @@ class SubcontractorViewModelSpec extends SpecBase {
         )
       )
 
-      val (errors, viewModels) = SubcontractorViewModel.fromSubcontractors(subcontractors)
+      val viewModels = SubcontractorViewModel.fromSubcontractors(subcontractors)
 
-      viewModels shouldBe empty
-      errors       should have size 1
-      errors.head  should include("subcontractor id 10")
+      viewModels shouldBe Seq(
+        SubcontractorViewModel(id = "10", name = NoName)
+      )
     }
 
-    "drop the row and return an error when subcontractorType is not recognised" in {
+    "map subcontractors into view models with name equal to 'no name provided' when subcontractorType is not recognised" in {
       val subcontractors = List(
         subcontractor(
           subcontractorId = 10L,
@@ -163,42 +165,14 @@ class SubcontractorViewModelSpec extends SpecBase {
         )
       )
 
-      val (errors, viewModels) = SubcontractorViewModel.fromSubcontractors(subcontractors)
-
-      viewModels shouldBe empty
-      errors       should have size 1
-      errors.head  should include("subcontractor id 10")
-    }
-
-    "keep valid rows and drop invalid rows, returning both errors and view models" in {
-      val subcontractors = Seq(
-        subcontractor(
-          subcontractorId = 10L,
-          tradingName = Some("ABC Construction Ltd"),
-          subcontractorType = Some("company")
-        ),
-        subcontractor(
-          subcontractorId = 20L,
-          subcontractorType = None
-        ),
-        subcontractor(
-          subcontractorId = 30L,
-          partnershipTradingName = Some("ABC Partnership"),
-          subcontractorType = Some("partnership")
-        )
-      )
-
-      val (errors, viewModels) = SubcontractorViewModel.fromSubcontractors(subcontractors)
+      val viewModels = SubcontractorViewModel.fromSubcontractors(subcontractors)
 
       viewModels shouldBe Seq(
-        SubcontractorViewModel(id = "10", name = "ABC Construction Ltd"),
-        SubcontractorViewModel(id = "30", name = "ABC Partnership")
+        SubcontractorViewModel(id = "10", name = NoName)
       )
-      errors       should have size 1
-      errors.head  should include("subcontractor id 20")
     }
 
-    "drop a Individualorsoletrader row whose firstName and surname is blank" in {
+    "map subcontractors into view models with name equal to 'no name provided' when a Individualorsoletrader row whose firstName, surname is blank" in {
       val subcontractors = List(
         subcontractor(
           subcontractorId = 10L,
@@ -208,14 +182,12 @@ class SubcontractorViewModelSpec extends SpecBase {
         )
       )
 
-      val (errors, viewModels) = SubcontractorViewModel.fromSubcontractors(subcontractors)
+      val viewModels = SubcontractorViewModel.fromSubcontractors(subcontractors)
 
-      viewModels shouldBe empty
-      errors       should have size 1
-      errors.head  should include("Missing name")
+      viewModels shouldBe Seq(SubcontractorViewModel(id = "10", name = NoName))
     }
 
-    "drop a Individualorsoletrader row whose tradingName is blank" in {
+    "map subcontractors into view models with name equal to 'no name provided' when a Individualorsoletrader row whose tradingName is blank" in {
       val subcontractors = List(
         subcontractor(
           subcontractorId = 10L,
@@ -224,14 +196,60 @@ class SubcontractorViewModelSpec extends SpecBase {
         )
       )
 
-      val (errors, viewModels) = SubcontractorViewModel.fromSubcontractors(subcontractors)
+      val viewModels = SubcontractorViewModel.fromSubcontractors(subcontractors)
 
-      viewModels shouldBe empty
-      errors       should have size 1
-      errors.head  should include("Missing name")
+      viewModels shouldBe Seq(SubcontractorViewModel(id = "10", name = NoName))
     }
 
-    "drop a Limitedcompany row whose tradingName is blank" in {
+    "map subcontractors into view models with name equal to surname only when a Individualorsoletrader row whose surname is provided, firstName is blank" in {
+      val subcontractors = List(
+        subcontractor(
+          subcontractorId = 10L,
+          firstName = Some("   "),
+          surname = Some("Smith"),
+          tradingName = Some("ABC Property Services"),
+          subcontractorType = Some("soletrader")
+        )
+      )
+
+      val viewModels = SubcontractorViewModel.fromSubcontractors(subcontractors)
+
+      viewModels shouldBe Seq(SubcontractorViewModel(id = "10", name = "Smith"))
+    }
+
+    "map subcontractors into view models with name equal to tradingName when a Individualorsoletrader row whose tradingName is provided, firstName and surname are blank" in {
+      val subcontractors = List(
+        subcontractor(
+          subcontractorId = 10L,
+          firstName = Some("   "),
+          surname = Some("   "),
+          tradingName = Some("ABC Property Services"),
+          subcontractorType = Some("soletrader")
+        )
+      )
+
+      val viewModels = SubcontractorViewModel.fromSubcontractors(subcontractors)
+
+      viewModels shouldBe Seq(SubcontractorViewModel(id = "10", name = "ABC Property Services"))
+    }
+
+    "map subcontractors into view models with name equal to tradingName when a Individualorsoletrader row whose tradingName and firstNare are provided, surname are blank" in {
+      val subcontractors = List(
+        subcontractor(
+          subcontractorId = 10L,
+          firstName = Some("John"),
+          surname = Some("   "),
+          tradingName = Some("ABC Property Services"),
+          subcontractorType = Some("soletrader")
+        )
+      )
+
+      val viewModels = SubcontractorViewModel.fromSubcontractors(subcontractors)
+
+      viewModels shouldBe Seq(SubcontractorViewModel(id = "10", name = "ABC Property Services"))
+    }
+
+    "map subcontractors into view models with name equal to 'no name provided' when a Limitedcompany row whose tradingName is blank" in {
       val subcontractors = List(
         subcontractor(
           subcontractorId = 10L,
@@ -240,14 +258,12 @@ class SubcontractorViewModelSpec extends SpecBase {
         )
       )
 
-      val (errors, viewModels) = SubcontractorViewModel.fromSubcontractors(subcontractors)
+      val viewModels = SubcontractorViewModel.fromSubcontractors(subcontractors)
 
-      viewModels shouldBe empty
-      errors       should have size 1
-      errors.head  should include("Missing tradingName")
+      viewModels shouldBe Seq(SubcontractorViewModel(id = "10", name = NoName))
     }
 
-    "drop a Partnership row whose partnershipTradingName is blank" in {
+    "map subcontractors into view models with name equal to 'no name provided' when a Partnership row whose partnershipTradingName is blank" in {
       val subcontractors = List(
         subcontractor(
           subcontractorId = 10L,
@@ -256,14 +272,41 @@ class SubcontractorViewModelSpec extends SpecBase {
         )
       )
 
-      val (errors, viewModels) = SubcontractorViewModel.fromSubcontractors(subcontractors)
+      val viewModels = SubcontractorViewModel.fromSubcontractors(subcontractors)
 
-      viewModels shouldBe empty
-      errors       should have size 1
-      errors.head  should include("Missing partnershipTradingName")
+      viewModels shouldBe Seq(SubcontractorViewModel(id = "10", name = NoName))
     }
 
-    "drop a Trust row whose tradingName is blank" in {
+    "map subcontractors into view models with name equal to 'no name provided' when a Partnership row whose tradingName is blank" in {
+      val subcontractors = List(
+        subcontractor(
+          subcontractorId = 10L,
+          tradingName = Some("   "),
+          subcontractorType = Some("partnership")
+        )
+      )
+
+      val viewModels = SubcontractorViewModel.fromSubcontractors(subcontractors)
+
+      viewModels shouldBe Seq(SubcontractorViewModel(id = "10", name = NoName))
+    }
+
+    "map subcontractors into view models with name equal to tradingName when a Partnership row whose partnershipTradingName is blank, tradingName is provided" in {
+      val subcontractors = List(
+        subcontractor(
+          subcontractorId = 10L,
+          partnershipTradingName = Some("   "),
+          tradingName = Some("ABC Property Services"),
+          subcontractorType = Some("partnership")
+        )
+      )
+
+      val viewModels = SubcontractorViewModel.fromSubcontractors(subcontractors)
+
+      viewModels shouldBe Seq(SubcontractorViewModel(id = "10", name = "ABC Property Services"))
+    }
+
+    "map subcontractors into view models with name equal to 'no name provided' when a Trust row whose tradingName is blank" in {
       val subcontractors = List(
         subcontractor(
           subcontractorId = 10L,
@@ -272,11 +315,9 @@ class SubcontractorViewModelSpec extends SpecBase {
         )
       )
 
-      val (errors, viewModels) = SubcontractorViewModel.fromSubcontractors(subcontractors)
+      val viewModels = SubcontractorViewModel.fromSubcontractors(subcontractors)
 
-      viewModels shouldBe empty
-      errors       should have size 1
-      errors.head  should include("Missing tradingName")
+      viewModels shouldBe Seq(SubcontractorViewModel(id = "10", name = NoName))
     }
 
   }
