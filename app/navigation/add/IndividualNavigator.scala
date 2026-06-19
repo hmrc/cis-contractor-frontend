@@ -62,23 +62,26 @@ class IndividualNavigator @Inject() () extends NavigatorForJourney {
       userAnswers => navigatorFromIndividualChooseContactDetailsPage(NormalMode)(userAnswers)
     case IndividualEmailAddressPage                =>
       _ => controllers.add.routes.UniqueTaxpayerReferenceYesNoController.onPageLoad(NormalMode)
+    case AddIndividualContactMethodsYesNoPage      =>
+      userAnswers => navigatorFromAddIndividualContactMethodsYesNoPage(NormalMode)(userAnswers)
     case _                                         => _ => routes.IndexController.onPageLoad()
   }
 
   private val checkRouteMap: Page => UserAnswers => Call = {
-    case SubTradingNameYesNoPage            => navigatorFromSubTradingNameYesNoPage(CheckMode)(_)
-    case SubAddressYesNoPage                => navigatorFromSubAddressYesNoPage(CheckMode)(_)
-    case NationalInsuranceNumberYesNoPage   => navigatorFromNationalInsuranceNumberYesNoPage(CheckMode)(_)
-    case UniqueTaxpayerReferenceYesNoPage   => navigatorFromUniqueTaxpayerReferenceYesNoPage(CheckMode)(_)
-    case WorksReferenceNumberYesNoPage      => navigatorFromWorksReferenceNumberYesNoPage(CheckMode)(_)
-    case IndividualChooseContactDetailsPage => navigatorFromIndividualChooseContactDetailsPage(CheckMode)(_)
-    case IndividualMobileNumberPage         =>
+    case SubTradingNameYesNoPage              => navigatorFromSubTradingNameYesNoPage(CheckMode)(_)
+    case SubAddressYesNoPage                  => navigatorFromSubAddressYesNoPage(CheckMode)(_)
+    case NationalInsuranceNumberYesNoPage     => navigatorFromNationalInsuranceNumberYesNoPage(CheckMode)(_)
+    case UniqueTaxpayerReferenceYesNoPage     => navigatorFromUniqueTaxpayerReferenceYesNoPage(CheckMode)(_)
+    case WorksReferenceNumberYesNoPage        => navigatorFromWorksReferenceNumberYesNoPage(CheckMode)(_)
+    case IndividualChooseContactDetailsPage   => navigatorFromIndividualChooseContactDetailsPage(CheckMode)(_)
+    case IndividualMobileNumberPage           =>
       _ => controllers.add.routes.CheckYourAnswersController.onPageLoad()
-    case IndividualPhoneNumberPage          =>
+    case IndividualPhoneNumberPage            =>
       _ => controllers.add.routes.CheckYourAnswersController.onPageLoad()
-    case IndividualEmailAddressPage         =>
+    case IndividualEmailAddressPage           =>
       _ => controllers.add.routes.CheckYourAnswersController.onPageLoad()
-    case _                                  => _ => controllers.add.routes.CheckYourAnswersController.onPageLoad()
+    case AddIndividualContactMethodsYesNoPage => navigatorFromAddIndividualContactMethodsYesNoPage(CheckMode)(_)
+    case _                                    => _ => controllers.add.routes.CheckYourAnswersController.onPageLoad()
   }
 
   private def navigatorFromSubTradingNameYesNoPage(mode: Mode)(ua: UserAnswers): Call =
@@ -213,5 +216,21 @@ class IndividualNavigator @Inject() () extends NavigatorForJourney {
       case (Some(_), _) =>
         controllers.add.routes.UniqueTaxpayerReferenceYesNoController.onPageLoad(mode)
       case _            => routes.JourneyRecoveryController.onPageLoad()
+    }
+
+  private def navigatorFromAddIndividualContactMethodsYesNoPage(mode: Mode)(ua: UserAnswers): Call =
+    (ua.get(AddIndividualContactMethodsYesNoPage), mode) match {
+
+      case (Some(true), _) =>
+        controllers.add.routes.AddIndividualContactMethodsYesNoController.onPageLoad(mode)
+
+      case (Some(false), NormalMode) =>
+        controllers.add.routes.UniqueTaxpayerReferenceYesNoController.onPageLoad(NormalMode)
+
+      case (Some(false), CheckMode) =>
+        controllers.add.routes.CheckYourAnswersController.onPageLoad()
+
+      case _ =>
+        routes.JourneyRecoveryController.onPageLoad()
     }
 }

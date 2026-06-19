@@ -262,6 +262,34 @@ class CompanyNavigatorSpec extends SpecBase {
           UserAnswers("id")
         ) mustBe CompanyCYA
       }
+
+      "must go from AddCompanyContactMethodsYesNo" - {
+        "to AddCompanyContactMethodsYesNoPage when answer is Yes" in {
+          navigator.nextPage(
+            AddCompanyContactMethodsYesNoPage,
+            NormalMode,
+            emptyUserAnswers.setOrException(AddCompanyContactMethodsYesNoPage, true)
+          ) mustBe controllers.add.company.routes.AddCompanyContactMethodsYesNoController
+            .onPageLoad(NormalMode)
+        }
+
+        "to CompanyUtrYesNo when answer is No" in {
+          navigator.nextPage(
+            AddCompanyContactMethodsYesNoPage,
+            NormalMode,
+            emptyUserAnswers.setOrException(AddCompanyContactMethodsYesNoPage, false)
+          ) mustBe controllers.add.company.routes.CompanyUtrYesNoController
+            .onPageLoad(NormalMode)
+        }
+
+        "to JourneyRecoveryPage when answer is not present" in {
+          navigator.nextPage(
+            AddCompanyContactMethodsYesNoPage,
+            NormalMode,
+            emptyUserAnswers
+          ) mustBe journeyRecovery
+        }
+      }
     }
 
     "in Check mode" - {
@@ -634,6 +662,37 @@ class CompanyNavigatorSpec extends SpecBase {
           CheckMode,
           emptyUserAnswers
         ) mustBe CompanyCYA
+      }
+
+      "must go from AddCompanyContactMethodsYesNo" - {
+        "to AddCompanyContactMethodsYesNo page when answer is Yes" in {
+          val answers = emptyUserAnswers.set(AddCompanyContactMethodsYesNoPage, true).success.value
+
+          navigator.nextPage(
+            AddCompanyContactMethodsYesNoPage,
+            CheckMode,
+            answers
+          ) mustBe controllers.add.company.routes.AddCompanyContactMethodsYesNoController
+            .onPageLoad(CheckMode)
+        }
+
+        "to CYA when answer is No" in {
+          val answers = emptyUserAnswers.set(AddCompanyContactMethodsYesNoPage, false).success.value
+
+          navigator.nextPage(
+            AddCompanyContactMethodsYesNoPage,
+            CheckMode,
+            answers
+          ) mustBe CompanyCYA
+        }
+
+        "to JourneyRecovery when answer is not present" in {
+          navigator.nextPage(
+            AddCompanyContactMethodsYesNoPage,
+            CheckMode,
+            emptyUserAnswers
+          ) mustBe journeyRecovery
+        }
       }
     }
   }

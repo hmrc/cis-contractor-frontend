@@ -72,6 +72,8 @@ class PartnershipNavigator @Inject() () extends NavigatorForJourney {
       _ => controllers.add.partnership.routes.PartnershipNominatedPartnerNinoYesNoController.onPageLoad(NormalMode)
     case PartnershipNominatedPartnerUtrYesNoPage  =>
       userAnswers => navigatorFromPartnershipNominatedPartnerUtrYesNoPage(NormalMode)(userAnswers)
+    case AddPartnershipContactMethodsYesNoPage    =>
+      userAnswers => navigatorFromAddPartnershipContactMethodsYesNoPage(NormalMode)(userAnswers)
     case _                                        => _ => routes.IndexController.onPageLoad()
   }
 
@@ -106,6 +108,8 @@ class PartnershipNavigator @Inject() () extends NavigatorForJourney {
       _ => controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
     case PartnershipUniqueTaxpayerReferencePage   =>
       _ => controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
+    case AddPartnershipContactMethodsYesNoPage    =>
+      userAnswers => navigatorFromAddPartnershipContactMethodsYesNoPage(CheckMode)(userAnswers)
     case _                                        => _ => controllers.add.routes.CheckYourAnswersController.onPageLoad()
   }
 
@@ -292,5 +296,21 @@ class PartnershipNavigator @Inject() () extends NavigatorForJourney {
       case (Some(NoDetails), CheckMode)  =>
         controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
       case _                             => routes.JourneyRecoveryController.onPageLoad()
+    }
+
+  private def navigatorFromAddPartnershipContactMethodsYesNoPage(mode: Mode)(userAnswers: UserAnswers): Call =
+    (userAnswers.get(AddPartnershipContactMethodsYesNoPage), mode) match {
+
+      case (Some(true), _) =>
+        controllers.add.partnership.routes.AddPartnershipContactMethodsYesNoController.onPageLoad(mode)
+
+      case (Some(false), NormalMode) =>
+        controllers.add.partnership.routes.PartnershipHasUtrYesNoController.onPageLoad(NormalMode)
+
+      case (Some(false), CheckMode) =>
+        controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
+
+      case _ =>
+        routes.JourneyRecoveryController.onPageLoad()
     }
 }

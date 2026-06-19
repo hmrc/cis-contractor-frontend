@@ -291,6 +291,33 @@ class IndividualNavigatorSpec extends SpecBase {
         }
       }
 
+      "must go from AddIndividualContactMethodsYesNo" - {
+        "to AddIndividualContactMethodsYesNoPage when answer is Yes" in {
+          navigator.nextPage(
+            AddIndividualContactMethodsYesNoPage,
+            NormalMode,
+            emptyUserAnswers.setOrException(AddIndividualContactMethodsYesNoPage, true)
+          ) mustBe controllers.add.routes.AddIndividualContactMethodsYesNoController
+            .onPageLoad(NormalMode)
+        }
+
+        "to UniqueTaxpayerReferenceYesNo when answer is No" in {
+          navigator.nextPage(
+            AddIndividualContactMethodsYesNoPage,
+            NormalMode,
+            emptyUserAnswers.setOrException(AddIndividualContactMethodsYesNoPage, false)
+          ) mustBe controllers.add.routes.UniqueTaxpayerReferenceYesNoController
+            .onPageLoad(NormalMode)
+        }
+
+        "to JourneyRecoveryPage when answer is not present" in {
+          navigator.nextPage(
+            AddIndividualContactMethodsYesNoPage,
+            NormalMode,
+            emptyUserAnswers
+          ) mustBe journeyRecovery
+        }
+      }
     }
 
     "in Check mode" - {
@@ -618,7 +645,7 @@ class IndividualNavigatorSpec extends SpecBase {
           ) mustBe controllers.add.routes.CheckYourAnswersController.onPageLoad()
         }
 
-        "to CYA when answer is not present" in {
+        "to JourneyRecovery when answer is not present" in {
           navigator.nextPage(
             IndividualChooseContactDetailsPage,
             CheckMode,
@@ -651,6 +678,36 @@ class IndividualNavigatorSpec extends SpecBase {
         ) mustBe controllers.add.routes.CheckYourAnswersController.onPageLoad()
       }
 
+      "must go from AddIndividualContactMethodsYesNo" - {
+        "to AddIndividualContactMethodsYesNo page when answer is Yes" in {
+          val answers = emptyUserAnswers.set(AddIndividualContactMethodsYesNoPage, true).success.value
+
+          navigator.nextPage(
+            AddIndividualContactMethodsYesNoPage,
+            CheckMode,
+            answers
+          ) mustBe controllers.add.routes.AddIndividualContactMethodsYesNoController
+            .onPageLoad(CheckMode)
+        }
+
+        "to CYA when answer is No" in {
+          val answers = emptyUserAnswers.set(AddIndividualContactMethodsYesNoPage, false).success.value
+
+          navigator.nextPage(
+            AddIndividualContactMethodsYesNoPage,
+            CheckMode,
+            answers
+          ) mustBe controllers.add.routes.CheckYourAnswersController.onPageLoad()
+        }
+
+        "to JourneyRecovery when answer is not present" in {
+          navigator.nextPage(
+            AddIndividualContactMethodsYesNoPage,
+            CheckMode,
+            emptyUserAnswers
+          ) mustBe journeyRecovery
+        }
+      }
     }
 
     "navigatorFromSubTradingNameYesNoPage in NormalMode" - {

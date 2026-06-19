@@ -17,7 +17,8 @@
 package generators
 
 import models.*
-import models.contact.ContactOptions
+
+import models.contact.{ContactMethodOptions, ContactOptions}
 import models.address.{Address, Country}
 import models.verify.ContractorEmailConfirmationStored
 import models.verify.SelectedSubcontractors
@@ -27,6 +28,11 @@ import play.api.libs.json.Json
 import java.time.{Instant, LocalDateTime, ZoneOffset}
 
 trait ModelGenerators {
+
+  implicit lazy val arbitraryContactMethodOptions: Arbitrary[ContactMethodOptions] =
+    Arbitrary {
+      Gen.oneOf(ContactMethodOptions.values)
+    }
 
   implicit lazy val arbitrarySelectSubcontractorsToReverify: Arbitrary[Set[SelectedSubcontractors]] =
     Arbitrary {
