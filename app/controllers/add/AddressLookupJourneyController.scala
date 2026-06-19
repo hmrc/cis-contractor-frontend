@@ -69,7 +69,7 @@ trait AddressLookupJourneyController extends FrontendBaseController with I18nSup
     postcode = Some(true)
   )
 
-  private val journeyRecovery: Call = controllers.routes.JourneyRecoveryController.onPageLoad()
+  private def journeyRecovery: Call = controllers.routes.JourneyRecoveryController.onPageLoad()
 
   def redirectToAddressLookup(mode: Mode, changeRoute: Option[String] = None): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>

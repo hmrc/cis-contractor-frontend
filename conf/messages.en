@@ -1,63 +1,67 @@
 # Infrastructure
-service.name                         =  Construction Industry Scheme
+service.name                              =  Construction Industry Scheme
 
-site.back                            =  Back
-site.remove                          =  Remove
-site.change                          =  Change
-site.no                              =  No
-site.yes                             =  Yes
-site.continue                        =  Continue
-site.start                           =  Start now
-site.startAgain                      =  Start again
-site.signIn                          =  Sign in
-site.govuk                           =  GOV.UK
-site.saveAndContinue                 =  Save and continue
-site.unknown                         =  Unknown
+site.back                                 =  Back
+site.remove                               =  Remove
+site.change                               =  Change
+site.no                                   =  No
+site.yes                                  =  Yes
+site.continue                             =  Continue
+site.start                                =  Start now
+site.startAgain                           =  Start again
+site.signIn                               =  Sign in
+site.govuk                                =  GOV.UK
+site.saveAndContinue                      =  Save and continue
+site.unknown                              =  Unknown
 
-date.day                             =  Day
-date.month                           =  Month
-date.year                            =  Year
-date.error.day                       =  day
-date.error.month                     =  month
-date.error.year                      =  year
+date.day                                  =  Day
+date.month                                =  Month
+date.year                                 =  Year
+date.error.day                            =  day
+date.error.month                          =  month
+date.error.year                           =  year
 
-error.boolean                        =  Please give an answer
+error.boolean                             =  Please give an answer
 
-timeout.title                        =  You’re about to be signed out
-timeout.message                      =  For security reasons, you will be signed out of this service in
-timeout.keepAlive                    =  Stay signed in
-timeout.signOut                      =  Sign out
+timeout.title                             =  You’re about to be signed out
+timeout.message                           =  For security reasons, you will be signed out of this service in
+timeout.keepAlive                         =  Stay signed in
+timeout.signOut                           =  Sign out
 
-error.title.prefix                   =  Error:
-error.prefix                         =  Error
-error.summary.title                  =  There is a problem
+error.title.prefix                        =  Error:
+error.prefix                              =  Error
+error.summary.title                       =  There is a problem
 
-index.title                          =  Construction Industry Scheme
-index.heading                        =  Construction Industry Scheme
-index.guidance                       =  Welcome to cis-contractor-frontend. Please see the README file for a guide to getting started.
+index.title                               =  Construction Industry Scheme
+index.heading                             =  Construction Industry Scheme
+index.guidance                            =  Welcome to cis-contractor-frontend. Please see the README file for a guide to getting started.
 
-checkYourAnswers.title               =  Check your answers
-checkYourAnswers.heading             =  Check your answers before adding this individual
+checkYourAnswers.title                    =  Check your answers
+checkYourAnswers.heading                  =  Check your answers before adding this individual
 
-journeyRecovery.continue.title       =  Sorry, there is a problem with the service
-journeyRecovery.continue.heading     =  Sorry, there is a problem with the service
-journeyRecovery.continue.guidance    =  [Add content to explain how to proceed.]
-journeyRecovery.startAgain.title     =  Sorry, there is a problem with the service
-journeyRecovery.startAgain.heading   =  Sorry, there is a problem with the service
-journeyRecovery.startAgain.guidance  =  [Add content to explain why the user needs to start again.]
+journeyRecovery.continue.title            =  Sorry, there is a problem with this service
+journeyRecovery.continue.heading          =  Sorry, there is a problem with this service
+journeyRecovery.continue.guidance.p1      =  There is problem with this service. You can return to
+journeyRecovery.continue.guidance.link    =  Construction Industry Scheme
+journeyRecovery.continue.guidance.p2      =  or try again later.
+journeyRecovery.startAgain.title          =  Sorry, there is a problem with this service
+journeyRecovery.startAgain.heading        =  Sorry, there is a problem with this service
+journeyRecovery.startAgain.guidance.p1    =  There is problem with this service. You can return to
+journeyRecovery.startAgain.guidance.link  =  Construction Industry Scheme
+journeyRecovery.startAgain.guidance.p2    =  or try again later.
 
-signedOut.title                      =  For your security, we signed you out
-signedOut.heading                    =  For your security, we signed you out
-signedOut.guidance                   =  We did not save your answers.
+signedOut.title                           =  For your security, we signed you out
+signedOut.heading                         =  For your security, we signed you out
+signedOut.guidance                        =  We did not save your answers.
 
-checkYourAnswers.heading.sub.h2      =  Subcontractor details
-checkYourAnswers.heading.h2          =  Now add this subcontractor
-checkYourAnswers.p1                  =  By adding this subcontractor you are confirming that, to the best of your knowledge, the details you are providing are correct.
-checkYourAnswers.addSubcontractor    =  Accept and submit
+checkYourAnswers.heading.sub.h2           =  Subcontractor details
+checkYourAnswers.heading.h2               =  Now add this subcontractor
+checkYourAnswers.p1                       =  By adding this subcontractor you are confirming that, to the best of your knowledge, the details you are providing are correct.
+checkYourAnswers.addSubcontractor         =  Accept and submit
 
-site.pagination.previous             =  Previous
-site.pagination.next                 =  Next
-site.pagination.landmark             =  Pagination
+site.pagination.previous                  =  Previous
+site.pagination.next                      =  Next
+site.pagination.landmark                  =  Pagination
 
 # Errors & Auth
 pageNotFound.title                       =  Page not found

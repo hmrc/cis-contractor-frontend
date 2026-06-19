@@ -230,6 +230,28 @@ class TrustAddressControllerSpec extends SpecBase with MockitoSugar {
         }
       }
 
+      "must redirect to Journey Recovery when ALF is unavailable" in {
+
+        val mockAddressLookupService = mock[AddressLookupService]
+
+        when(mockAddressLookupService.getAddressById(any())(any())) thenReturn Future.failed(
+          new RuntimeException("ALF unavailable")
+        )
+
+        val application =
+          applicationBuilder(userAnswers = Some(userAnswersWithName))
+            .overrides(bind[AddressLookupService].toInstance(mockAddressLookupService))
+            .build()
+
+        running(application) {
+          val request = FakeRequest(GET, callbackRoute)
+          val result  = route(application, request).value
+
+          status(result) mustBe SEE_OTHER
+          redirectLocation(result).value mustBe routes.JourneyRecoveryController.onPageLoad().url
+        }
+      }
+
       "must redirect to Journey Recovery when the address could not be saved" in {
 
         val mockAddressLookupService = mock[AddressLookupService]
@@ -288,6 +310,28 @@ class TrustAddressControllerSpec extends SpecBase with MockitoSugar {
           status(result) mustBe SEE_OTHER
           redirectLocation(result).value mustBe
             controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad().url
+        }
+      }
+
+      "must redirect to Journey Recovery when ALF is unavailable" in {
+
+        val mockAddressLookupService = mock[AddressLookupService]
+
+        when(mockAddressLookupService.getAddressById(any())(any())) thenReturn Future.failed(
+          new RuntimeException("ALF unavailable")
+        )
+
+        val application =
+          applicationBuilder(userAnswers = Some(userAnswersWithName))
+            .overrides(bind[AddressLookupService].toInstance(mockAddressLookupService))
+            .build()
+
+        running(application) {
+          val request = FakeRequest(GET, callbackChangeRoute)
+          val result  = route(application, request).value
+
+          status(result) mustBe SEE_OTHER
+          redirectLocation(result).value mustBe routes.JourneyRecoveryController.onPageLoad().url
         }
       }
 

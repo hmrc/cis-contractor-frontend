@@ -180,6 +180,28 @@ class AddressOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
         }
       }
 
+      "must redirect to Journey Recovery when ALF is unavailable" in {
+
+        val mockAddressLookupService = mock[AddressLookupService]
+
+        when(
+          mockAddressLookupService.getJourneyUrl(any(), any(), any(), any(), any())(any(), any(), any())
+        ) thenReturn Future.failed(new RuntimeException("ALF unavailable"))
+
+        val application =
+          applicationBuilder(userAnswers = Some(userAnswersWithName))
+            .overrides(bind[AddressLookupService].toInstance(mockAddressLookupService))
+            .build()
+
+        running(application) {
+          val request = FakeRequest(GET, redirectRoute)
+          val result  = route(application, request).value
+
+          status(result) mustBe SEE_OTHER
+          redirectLocation(result).value mustBe routes.JourneyRecoveryController.onPageLoad().url
+        }
+      }
+
       "must redirect to Journey Recovery when no subcontractor name can be resolved" in {
 
         val mockSessionRepository    = mock[SessionRepository]
@@ -233,6 +255,28 @@ class AddressOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
           val idCaptor = ArgumentCaptor.forClass(classOf[String])
           verify(mockAddressLookupService).getAddressById(idCaptor.capture())(any())
           idCaptor.getValue mustBe "addr-id"
+        }
+      }
+
+      "must redirect to Journey Recovery when ALF is unavailable" in {
+
+        val mockAddressLookupService = mock[AddressLookupService]
+
+        when(mockAddressLookupService.getAddressById(any())(any())) thenReturn Future.failed(
+          new RuntimeException("ALF unavailable")
+        )
+
+        val application =
+          applicationBuilder(userAnswers = Some(emptyUserAnswers))
+            .overrides(bind[AddressLookupService].toInstance(mockAddressLookupService))
+            .build()
+
+        running(application) {
+          val request = FakeRequest(GET, callbackRoute)
+          val result  = route(application, request).value
+
+          status(result) mustBe SEE_OTHER
+          redirectLocation(result).value mustBe routes.JourneyRecoveryController.onPageLoad().url
         }
       }
 
@@ -294,6 +338,28 @@ class AddressOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
           status(result) mustBe SEE_OTHER
           redirectLocation(result).value mustBe
             controllers.add.routes.CheckYourAnswersController.onPageLoad().url
+        }
+      }
+
+      "must redirect to Journey Recovery when ALF is unavailable" in {
+
+        val mockAddressLookupService = mock[AddressLookupService]
+
+        when(mockAddressLookupService.getAddressById(any())(any())) thenReturn Future.failed(
+          new RuntimeException("ALF unavailable")
+        )
+
+        val application =
+          applicationBuilder(userAnswers = Some(emptyUserAnswers))
+            .overrides(bind[AddressLookupService].toInstance(mockAddressLookupService))
+            .build()
+
+        running(application) {
+          val request = FakeRequest(GET, callbackChangeRoute)
+          val result  = route(application, request).value
+
+          status(result) mustBe SEE_OTHER
+          redirectLocation(result).value mustBe routes.JourneyRecoveryController.onPageLoad().url
         }
       }
 
