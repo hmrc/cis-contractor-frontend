@@ -20,7 +20,7 @@ import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierA
 import models.{Mode, NormalMode}
 import pages.verify.NewestVerificationBatchResponsePage
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import rules.verify.ReverificationRules
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import play.api.Logging
@@ -37,9 +37,6 @@ class VerificationStatusController @Inject() (
     with I18nSupport
     with Logging {
 
-  private def recovery: Result =
-    Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-
   private def hasVerifiedSubcontractors(implicit request: models.requests.DataRequest[?]): Boolean =
     request.userAnswers
       .get(NewestVerificationBatchResponsePage)
@@ -50,7 +47,7 @@ class VerificationStatusController @Inject() (
       if (hasVerifiedSubcontractors) {
         Redirect(controllers.verify.routes.ReverifyExistingSubcontractorsYesNoController.onPageLoad(mode))
       } else {
-        recovery
+        Redirect(controllers.verify.routes.ContractorEmailConfirmationStoredController.onPageLoad(mode))
       }
     }
 
@@ -96,7 +93,7 @@ class VerificationStatusController @Inject() (
       if (hasVerifiedSubcontractors) {
         Redirect(controllers.verify.routes.SelectSubcontractorsToReverifyController.onPageLoad(mode))
       } else {
-        recovery
+        Redirect(controllers.verify.routes.ContractorEmailConfirmationStoredController.onPageLoad(mode))
       }
     }
 }
