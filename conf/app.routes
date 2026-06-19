@@ -480,7 +480,7 @@ POST  /contractor-details/enter-contractor-utr   controllers.contractordetails.C
 GET   /contractor-details/change-contractor-utr  controllers.contractordetails.ContractorUtrController.onPageLoad(mode: Mode = CheckMode)
 POST  /contractor-details/change-contractor-utr  controllers.contractordetails.ContractorUtrController.onSubmit(mode: Mode = CheckMode)
 
-GET        /construction-industry-scheme/subcontractor/add/select-contact-details                       controllers.IndividualContactMethodOptionsController.onPageLoad(mode: Mode = NormalMode)
-POST       /construction-industry-scheme/subcontractor/add/select-contact-details                        controllers.IndividualContactMethodOptionsController.onSubmit(mode: Mode = NormalMode)
-GET        /change-construction-industry-scheme/subcontractor/add/select-contact-details                 controllers.IndividualContactMethodOptionsController.onPageLoad(mode: Mode = CheckMode)
-POST       /change-construction-industry-scheme/subcontractor/add/select-contact-details                 controllers.IndividualContactMethodOptionsController.onSubmit(mode: Mode = CheckMode)
+GET        /subcontractor/add/select-contact-details                       controllers.IndividualContactMethodOptionsController.onPageLoad(mode: Mode = NormalMode)
+POST       /subcontractor/add/select-contact-details                        controllers.IndividualContactMethodOptionsController.onSubmit(mode: Mode = NormalMode)
+GET        /subcontractor/add/select-contact-details                 controllers.IndividualContactMethodOptionsController.onPageLoad(mode: Mode = CheckMode)
+POST       /subcontractor/add/select-contact-details                 controllers.IndividualContactMethodOptionsController.onSubmit(mode: Mode = CheckMode)

@@ -27,10 +27,12 @@ object IndividualContactMethodOptions extends Enumerable.Implicits {
 
   case object Emailaddress extends WithName("emailAddress") with IndividualContactMethodOptions
   case object Phonenumber extends WithName("phoneNumber") with IndividualContactMethodOptions
+  case object Mobilenumber extends WithName("mobileNumber") with IndividualContactMethodOptions
 
   val values: Seq[IndividualContactMethodOptions] = Seq(
     Emailaddress,
-    Phonenumber
+    Phonenumber,
+    Mobilenumber
   )
 
   def checkboxItems(implicit messages: Messages): Seq[CheckboxItem] =

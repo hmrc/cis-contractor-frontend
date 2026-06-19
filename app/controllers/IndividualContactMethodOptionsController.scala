@@ -21,9 +21,9 @@ import forms.IndividualContactMethodOptionsFormProvider
 
 import javax.inject.Inject
 import models.Mode
+import models.requests.DataRequest
 import navigation.Navigator
 import pages.IndividualContactMethodOptionsPage
-import pages.add.SubcontractorNamePage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
@@ -50,45 +50,38 @@ class IndividualContactMethodOptionsController @Inject() (
 
   val form = formProvider()
 
+  private def recoveryRedirect =
+    Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+
+  private def preparedForm(implicit request: DataRequest[?]) =
+    request.userAnswers.get(IndividualContactMethodOptionsPage).fold(form)(form.fill)
+
+
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
 
-//    val preparedForm = request.userAnswers
-//      .get(IndividualContactMethodOptionsPage) match {
-//      case None        => form
-//      case Some(value) => form.fill(value)
-//    }
-//
-//    Ok(view(preparedForm, mode))
-
-    val subcontractorName = subcontractorNameExtractor.getSubcontractorName(request.userAnswers)
-
-    request.userAnswers
-      .get(IndividualContactMethodOptionsPage)
-      .map { individualContactMethodOptions =>
-        val preparedForm = request.userAnswers.get(IndividualContactMethodOptionsPage) match {
-          case None => form
-          case Some(value) => form.fill(value)
-        }
-
+    subcontractorNameExtractor
+      .getSubcontractorName(request.userAnswers)
+      .fold(recoveryRedirect) { subcontractorName =>
         Ok(view(preparedForm, mode, subcontractorName))
       }
-      .getOrElse(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
 
   }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
-implicit request =>
-      val subcontractorName = subcontractorNameExtractor.getSubcontractorName(request.userAnswers)
-      
-      form
-        .bindFromRequest()
-        .fold(
-          formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, subcontractorName))),
-          value =>
-            for {
-              updatedAnswers <- Future.fromTry(request.userAnswers.set(IndividualContactMethodOptionsPage, value))
-              _              <- sessionRepository.set(updatedAnswers)
-            } yield Redirect(navigator.nextPage(IndividualContactMethodOptionsPage, mode, updatedAnswers))
-        )
-  }
+  def onSubmit(mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData).async { implicit request =>
+      subcontractorNameExtractor
+        .getSubcontractorName(request.userAnswers)
+        .fold(Future.successful(recoveryRedirect)) { subcontractorName =>
+          form
+            .bindFromRequest()
+            .fold(
+              formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, subcontractorName))),
+              value =>
+                for {
+                  updatedAnswers <- Future.fromTry(request.userAnswers.set(IndividualContactMethodOptionsPage, value))
+                  _ <- sessionRepository.set(updatedAnswers)
+                } yield Redirect(navigator.nextPage(IndividualContactMethodOptionsPage, mode, updatedAnswers))
+            )
+        }
+    }
 }

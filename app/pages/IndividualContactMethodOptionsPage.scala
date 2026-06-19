@@ -18,8 +18,7 @@ package pages
 
 import models.{IndividualContactMethodOptions, UserAnswers}
 import play.api.libs.json.JsPath
-
-import scala.util.{Success, Try}
+import scala.util.Try
 
 case object IndividualContactMethodOptionsPage extends QuestionPage[Set[IndividualContactMethodOptions]] {
 
