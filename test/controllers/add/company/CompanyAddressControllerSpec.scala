@@ -208,7 +208,7 @@ class CompanyAddressControllerSpec extends SpecBase with MockitoSugar {
 
         val mockAddressLookupService = mock[AddressLookupService]
 
-        when(mockAddressLookupService.getAddressById(any())(any())) thenReturn Future.successful(testAddress)
+        when(mockAddressLookupService.getAddressById(any())(any(), any())) thenReturn Future.successful(testAddress)
         when(mockAddressLookupService.saveAddressDetails(any(), any())(any(), any())) thenReturn Future.successful(true)
 
         val application =
@@ -225,7 +225,7 @@ class CompanyAddressControllerSpec extends SpecBase with MockitoSugar {
             controllers.add.company.routes.CompanyContactOptionsController.onPageLoad(NormalMode).url
 
           val idCaptor = ArgumentCaptor.forClass(classOf[String])
-          verify(mockAddressLookupService).getAddressById(idCaptor.capture())(any())
+          verify(mockAddressLookupService).getAddressById(idCaptor.capture())(any(), any())
           idCaptor.getValue mustBe "addr-id"
         }
       }
@@ -234,7 +234,7 @@ class CompanyAddressControllerSpec extends SpecBase with MockitoSugar {
 
         val mockAddressLookupService = mock[AddressLookupService]
 
-        when(mockAddressLookupService.getAddressById(any())(any())) thenReturn Future.failed(
+        when(mockAddressLookupService.getAddressById(any())(any(), any())) thenReturn Future.failed(
           new RuntimeException("ALF unavailable")
         )
 
@@ -256,7 +256,7 @@ class CompanyAddressControllerSpec extends SpecBase with MockitoSugar {
 
         val mockAddressLookupService = mock[AddressLookupService]
 
-        when(mockAddressLookupService.getAddressById(any())(any())) thenReturn Future.successful(testAddress)
+        when(mockAddressLookupService.getAddressById(any())(any(), any())) thenReturn Future.successful(testAddress)
         when(mockAddressLookupService.saveAddressDetails(any(), any())(any(), any())) thenReturn Future.successful(
           false
         )
@@ -295,7 +295,7 @@ class CompanyAddressControllerSpec extends SpecBase with MockitoSugar {
 
         val mockAddressLookupService = mock[AddressLookupService]
 
-        when(mockAddressLookupService.getAddressById(any())(any())) thenReturn Future.successful(testAddress)
+        when(mockAddressLookupService.getAddressById(any())(any(), any())) thenReturn Future.successful(testAddress)
         when(mockAddressLookupService.saveAddressDetails(any(), any())(any(), any())) thenReturn Future.successful(true)
 
         val application =
@@ -317,7 +317,7 @@ class CompanyAddressControllerSpec extends SpecBase with MockitoSugar {
 
         val mockAddressLookupService = mock[AddressLookupService]
 
-        when(mockAddressLookupService.getAddressById(any())(any())) thenReturn Future.failed(
+        when(mockAddressLookupService.getAddressById(any())(any(), any())) thenReturn Future.failed(
           new RuntimeException("ALF unavailable")
         )
 
@@ -339,7 +339,7 @@ class CompanyAddressControllerSpec extends SpecBase with MockitoSugar {
 
         val mockAddressLookupService = mock[AddressLookupService]
 
-        when(mockAddressLookupService.getAddressById(any())(any())) thenReturn Future.successful(testAddress)
+        when(mockAddressLookupService.getAddressById(any())(any(), any())) thenReturn Future.successful(testAddress)
         when(mockAddressLookupService.saveAddressDetails(any(), any())(any(), any())) thenReturn Future.successful(
           false
         )

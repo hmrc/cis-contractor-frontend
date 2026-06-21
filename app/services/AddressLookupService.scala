@@ -36,7 +36,8 @@ class AddressLookupService @Inject() (
   sessionRepository: SessionRepository
 ) extends LoggingUtil {
 
-  def getAddressById(id: String)(implicit hc: HeaderCarrier): Future[Address] = addressLookupConnector.getAddress(id)
+  def getAddressById(id: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Address] =
+    addressLookupConnector.getAddress(id).map(_.normalise())
 
   def getJourneyUrl(
     journeyId: AddressLookupJourneyIdentifier.Value,

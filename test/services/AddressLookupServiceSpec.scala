@@ -72,6 +72,26 @@ class AddressLookupServiceSpec extends SpecBase with MockitoSugar {
         service.getAddressById(testId).futureValue mustBe testAddress
       }
 
+      "must normalise (trim) the address returned by the connector" in {
+        val (service, connector, _, _) = newService()
+        val untrimmedAddress           = Address(
+          addressLine1 = "  10 Downing Street  ",
+          addressLine2 = Some("  Westminster  "),
+          addressLine3 = Some("   "),
+          postcode = Some("  SW1A 2AA  "),
+          country = Some(Country(Some("  GB  "), Some("  United Kingdom  ")))
+        )
+        when(connector.getAddress(eqTo(testId))(any())).thenReturn(Future.successful(untrimmedAddress))
+
+        service.getAddressById(testId).futureValue mustBe Address(
+          addressLine1 = "10 Downing Street",
+          addressLine2 = Some("Westminster"),
+          addressLine3 = None,
+          postcode = Some("SW1A 2AA"),
+          country = Some(Country(Some("GB"), Some("United Kingdom")))
+        )
+      }
+
       "must propagate a failure from the connector" in {
         val (service, connector, _, _) = newService()
         when(connector.getAddress(eqTo(testId))(any())).thenReturn(Future.failed(new RuntimeException("boom")))
