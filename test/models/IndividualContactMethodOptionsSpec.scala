@@ -37,7 +37,10 @@ class IndividualContactMethodOptionsSpec
       val gen = Gen.oneOf(IndividualContactMethodOptions.values.toSeq)
 
       forAll(gen) { individualContactMethodOptions =>
-        JsString(individualContactMethodOptions.toString).validate[IndividualContactMethodOptions].asOpt.value mustEqual individualContactMethodOptions
+        JsString(individualContactMethodOptions.toString)
+          .validate[IndividualContactMethodOptions]
+          .asOpt
+          .value mustEqual individualContactMethodOptions
       }
     }
 

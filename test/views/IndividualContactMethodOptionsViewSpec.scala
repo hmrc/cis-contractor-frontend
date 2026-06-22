@@ -87,7 +87,7 @@ class IndividualContactMethodOptionsViewSpec extends AnyWordSpec with Matchers w
   }
 
   trait Setup {
-    val formProvider                               = new IndividualContactMethodOptionsFormProvider()
+    val formProvider                                    = new IndividualContactMethodOptionsFormProvider()
     val form: Form[Set[IndividualContactMethodOptions]] = formProvider()
 
     implicit val request: Request[_] = FakeRequest()

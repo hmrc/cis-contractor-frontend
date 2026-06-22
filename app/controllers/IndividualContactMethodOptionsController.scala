@@ -43,7 +43,7 @@ class IndividualContactMethodOptionsController @Inject() (
   formProvider: IndividualContactMethodOptionsFormProvider,
   val controllerComponents: MessagesControllerComponents,
   view: IndividualContactMethodOptionsView,
-  subcontractorNameExtractor: SubcontractorNameExtractor,
+  subcontractorNameExtractor: SubcontractorNameExtractor
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport {
@@ -56,9 +56,7 @@ class IndividualContactMethodOptionsController @Inject() (
   private def preparedForm(implicit request: DataRequest[?]) =
     request.userAnswers.get(IndividualContactMethodOptionsPage).fold(form)(form.fill)
 
-
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
-
     subcontractorNameExtractor
       .getSubcontractorName(request.userAnswers)
       .fold(recoveryRedirect) { subcontractorName =>
@@ -79,7 +77,7 @@ class IndividualContactMethodOptionsController @Inject() (
               value =>
                 for {
                   updatedAnswers <- Future.fromTry(request.userAnswers.set(IndividualContactMethodOptionsPage, value))
-                  _ <- sessionRepository.set(updatedAnswers)
+                  _              <- sessionRepository.set(updatedAnswers)
                 } yield Redirect(navigator.nextPage(IndividualContactMethodOptionsPage, mode, updatedAnswers))
             )
         }

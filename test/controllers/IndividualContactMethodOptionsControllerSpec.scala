@@ -38,7 +38,7 @@ class IndividualContactMethodOptionsControllerSpec extends SpecBase with Mockito
     controllers.routes.IndividualContactMethodOptionsController.onPageLoad(NormalMode).url
 
   private val formProvider = new IndividualContactMethodOptionsFormProvider()
-  private val form = formProvider()
+  private val form         = formProvider()
 
   private val subcontractorName = SubcontractorName("John", Some("Paul"), "Smith")
 
@@ -178,7 +178,7 @@ class IndividualContactMethodOptionsControllerSpec extends SpecBase with Mockito
           FakeRequest(POST, individualContactMethodOptionsRoute)
             .withFormUrlEncodedBody()
 
-        val form = new IndividualContactMethodOptionsFormProvider()()
+        val form      = new IndividualContactMethodOptionsFormProvider()()
         val boundForm = form.bind(Map.empty)
 
         val view = application.injector.instanceOf[IndividualContactMethodOptionsView]
