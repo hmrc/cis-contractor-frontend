@@ -28,11 +28,11 @@ class TrustContactMethodOptionsSummarySpec extends SpecBase with Matchers {
   implicit val messages: Messages = new DefaultMessagesApi(
     Map(
       "en" -> Map(
-        "trustContactMethodOptions.checkYourAnswersLabel" -> "Method of contact",
+        "trustContactMethodOptions.checkYourAnswersLabel" -> "Methods of contact",
         "trustContactMethodOptions.email"                 -> "Email address",
         "trustContactMethodOptions.phone"                 -> "Phone number",
         "trustContactMethodOptions.mobile"                -> "Mobile number",
-        "trustContactMethodOptions.change.hidden"         -> "method of contact",
+        "trustContactMethodOptions.change.hidden"         -> "methods of contact",
         "site.change"                                     -> "Change"
       )
     )
