@@ -18,16 +18,15 @@ package controllers.verify
 
 import base.SpecBase
 import controllers.routes
-import models.{NormalMode, Subcontractor, UserAnswers}
+import models.{NormalMode, Subcontractor, SubcontractorViewModel, TypeOfSubcontractor, UserAnswers}
 import models.response.GetNewestVerificationBatchResponse
 import models.verify.SelectedSubcontractors
 import navigation.{FakeNavigator, Navigator}
-
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{never, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
-import pages.verify._
+import pages.verify.*
 import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
@@ -125,7 +124,7 @@ class SelectSubcontractorsToReverifyControllerSpec extends SpecBase with Mockito
             .build()
 
         running(app) {
-          val result = route(app, FakeRequest(GET, url(1))).value
+          val result = route(app, FakeRequest(GET, url())).value
 
           status(result) mustBe SEE_OTHER
           redirectLocation(result).value mustBe routes.JourneyRecoveryController.onPageLoad().url
@@ -146,7 +145,7 @@ class SelectSubcontractorsToReverifyControllerSpec extends SpecBase with Mockito
             firstName = Some("Martin"),
             surname = Some("Brody"),
             tradingName = Some("Some Trading"),
-            subcontractorType = Some("individual"),
+            subcontractorType = Some(TypeOfSubcontractor.Individualorsoletrader.toString),
             utr = Some("1234567890"),
             verificationDate = None,
             createDate = Some(LocalDateTime.of(2020, 5, 11, 0, 0))
@@ -158,7 +157,7 @@ class SelectSubcontractorsToReverifyControllerSpec extends SpecBase with Mockito
             id = 200L,
             verified = Some("Y"),
             tradingName = Some("Hammond House"),
-            subcontractorType = Some("company"),
+            subcontractorType = Some(TypeOfSubcontractor.Limitedcompany.toString),
             utr = Some("2904743750"),
             verificationNumber = Some("V0001217702"),
             taxTreatment = Some("gross"),
@@ -181,7 +180,7 @@ class SelectSubcontractorsToReverifyControllerSpec extends SpecBase with Mockito
             .build()
 
         running(app) {
-          val result = route(app, FakeRequest(GET, url(1))).value
+          val result = route(app, FakeRequest(GET, url())).value
 
           status(result) mustBe OK
 
@@ -238,7 +237,7 @@ class SelectSubcontractorsToReverifyControllerSpec extends SpecBase with Mockito
             .build()
 
         running(app) {
-          val result = route(app, FakeRequest(GET, url(1))).value
+          val result = route(app, FakeRequest(GET, url())).value
 
           status(result) mustBe OK
 
@@ -370,7 +369,7 @@ class SelectSubcontractorsToReverifyControllerSpec extends SpecBase with Mockito
 
         running(app) {
           val request =
-            FakeRequest(POST, url(1))
+            FakeRequest(POST, url())
               .withFormUrlEncodedBody(
                 "value[0]" -> "100",
                 "gotoPage" -> "2"
@@ -398,7 +397,7 @@ class SelectSubcontractorsToReverifyControllerSpec extends SpecBase with Mockito
 
         running(app) {
           val request =
-            FakeRequest(POST, url(1))
+            FakeRequest(POST, url())
               .withFormUrlEncodedBody("value[0]" -> "100")
 
           val result = route(app, request).value
@@ -443,7 +442,7 @@ class SelectSubcontractorsToReverifyControllerSpec extends SpecBase with Mockito
           .build()
 
       running(app) {
-        val result = route(app, FakeRequest(GET, url(1))).value
+        val result = route(app, FakeRequest(GET, url())).value
 
         status(result) mustBe OK
         val body = contentAsString(result)
@@ -485,7 +484,7 @@ class SelectSubcontractorsToReverifyControllerSpec extends SpecBase with Mockito
           .build()
 
       running(app) {
-        val result = route(app, FakeRequest(GET, url(1))).value
+        val result = route(app, FakeRequest(GET, url())).value
 
         status(result) mustBe OK
         val body = contentAsString(result)
@@ -528,7 +527,7 @@ class SelectSubcontractorsToReverifyControllerSpec extends SpecBase with Mockito
           .build()
 
       running(app) {
-        val result = route(app, FakeRequest(GET, url(1))).value
+        val result = route(app, FakeRequest(GET, url())).value
 
         status(result) mustBe OK
         val body = contentAsString(result)
@@ -570,7 +569,7 @@ class SelectSubcontractorsToReverifyControllerSpec extends SpecBase with Mockito
           .build()
 
       running(app) {
-        val result = route(app, FakeRequest(GET, url(1))).value
+        val result = route(app, FakeRequest(GET, url())).value
 
         status(result) mustBe OK
         val body = contentAsString(result)
@@ -611,7 +610,7 @@ class SelectSubcontractorsToReverifyControllerSpec extends SpecBase with Mockito
           .build()
 
       running(app) {
-        val result = route(app, FakeRequest(GET, url(1))).value
+        val result = route(app, FakeRequest(GET, url())).value
 
         status(result) mustBe OK
         val body = contentAsString(result)
@@ -652,7 +651,7 @@ class SelectSubcontractorsToReverifyControllerSpec extends SpecBase with Mockito
           .build()
 
       running(app) {
-        val result = route(app, FakeRequest(GET, url(1))).value
+        val result = route(app, FakeRequest(GET, url())).value
 
         status(result) mustBe OK
         val body = contentAsString(result)
@@ -692,7 +691,7 @@ class SelectSubcontractorsToReverifyControllerSpec extends SpecBase with Mockito
           .build()
 
       running(app) {
-        val result = route(app, FakeRequest(GET, url(1))).value
+        val result = route(app, FakeRequest(GET, url())).value
         status(result) mustBe OK
 
         val body = contentAsString(result)
@@ -711,7 +710,7 @@ class SelectSubcontractorsToReverifyControllerSpec extends SpecBase with Mockito
           verified = Some("Y"),
           firstName = Some("Zoe"),
           surname = Some("Zulu"),
-          subcontractorType = Some("individual"),
+          subcontractorType = Some(TypeOfSubcontractor.Individualorsoletrader.toString),
           utr = Some("1111111111"),
           verificationDate = None,
           createDate = Some(LocalDateTime.of(2024, 1, 1, 0, 0))
@@ -723,7 +722,7 @@ class SelectSubcontractorsToReverifyControllerSpec extends SpecBase with Mockito
           verified = Some("Y"),
           firstName = Some("Amy"),
           surname = Some("Alpha"),
-          subcontractorType = Some("individual"),
+          subcontractorType = Some(TypeOfSubcontractor.Individualorsoletrader.toString),
           utr = Some("2222222222"),
           verificationDate = None,
           createDate = Some(LocalDateTime.of(2024, 1, 1, 0, 0))
@@ -735,7 +734,7 @@ class SelectSubcontractorsToReverifyControllerSpec extends SpecBase with Mockito
           verified = Some("Y"),
           firstName = Some("mike"),
           surname = Some("Middle"),
-          subcontractorType = Some("individual"),
+          subcontractorType = Some(TypeOfSubcontractor.Individualorsoletrader.toString),
           utr = Some("3333333333"),
           verificationDate = None,
           createDate = Some(LocalDateTime.of(2024, 1, 1, 0, 0))
@@ -756,7 +755,7 @@ class SelectSubcontractorsToReverifyControllerSpec extends SpecBase with Mockito
           .build()
 
       running(app) {
-        val result = route(app, FakeRequest(GET, url(1))).value
+        val result = route(app, FakeRequest(GET, url())).value
 
         status(result) mustBe OK
 
@@ -813,7 +812,7 @@ class SelectSubcontractorsToReverifyControllerSpec extends SpecBase with Mockito
           .build()
 
       running(app) {
-        val result = route(app, FakeRequest(GET, url(1))).value
+        val result = route(app, FakeRequest(GET, url())).value
         status(result) mustBe OK
 
         val body = contentAsString(result)
@@ -868,7 +867,7 @@ class SelectSubcontractorsToReverifyControllerSpec extends SpecBase with Mockito
           .build()
 
       running(app) {
-        val result = route(app, FakeRequest(GET, url(1))).value
+        val result = route(app, FakeRequest(GET, url())).value
         status(result) mustBe OK
 
         val body = contentAsString(result)
@@ -927,7 +926,7 @@ class SelectSubcontractorsToReverifyControllerSpec extends SpecBase with Mockito
           .build()
 
       running(app) {
-        val result = route(app, FakeRequest(GET, url(1))).value
+        val result = route(app, FakeRequest(GET, url())).value
         status(result) mustBe OK
 
         val body = contentAsString(result)
@@ -939,6 +938,227 @@ class SelectSubcontractorsToReverifyControllerSpec extends SpecBase with Mockito
 
         input700 must not be null
         input700.hasAttr("checked") mustBe true
+      }
+    }
+
+    "must only render and persist rows for subcontractors that are already verified" in {
+      val mockRepo = mock[SessionRepository]
+      when(mockRepo.set(any())) thenReturn Future.successful(true)
+
+      val verifiedSub =
+        mkSub(
+          id = 100L,
+          verified = Some("Y"),
+          tradingName = Some("Verified Ltd"),
+          subcontractorType = Some("company"),
+          utr = Some("1111111111"),
+          verificationDate = None,
+          createDate = Some(LocalDateTime.of(2024, 1, 1, 0, 0))
+        )
+
+      val unverifiedSub =
+        mkSub(
+          id = 200L,
+          verified = Some("N"),
+          tradingName = Some("Unverified Ltd"),
+          subcontractorType = Some("company"),
+          utr = Some("2222222222"),
+          verificationDate = None,
+          createDate = Some(LocalDateTime.of(2024, 1, 1, 0, 0))
+        )
+
+      val ua =
+        emptyUserAnswers
+          .set(NewestVerificationBatchResponsePage, newestBatchResponse(Seq(verifiedSub, unverifiedSub)))
+          .success
+          .value
+
+      val app =
+        applicationBuilder(userAnswers = Some(ua))
+          .overrides(
+            bind[Clock].toInstance(fixedClock),
+            bind[SessionRepository].toInstance(mockRepo)
+          )
+          .build()
+
+      running(app) {
+        val result = route(app, FakeRequest(GET, url())).value
+
+        status(result) mustBe OK
+
+        val uaCaptor = ArgumentCaptor.forClass(classOf[UserAnswers])
+        verify(mockRepo).set(uaCaptor.capture())
+
+        val savedRows = uaCaptor.getValue.get(SubcontractorReverifyRowsPage).value
+        savedRows.map(_.id) mustBe Seq("100")
+
+        val body = contentAsString(result)
+        body must include("Verified Ltd")
+        body must not include "Unverified Ltd"
+      }
+    }
+
+    "must return BadRequest when rows exist, selection is required and no checkbox is selected" in {
+      val mockRepo = mock[SessionRepository]
+      when(mockRepo.set(any())) thenReturn Future.successful(true)
+
+      val rows: Seq[SubcontractorReverifyRow] =
+        Seq(
+          SubcontractorReverifyRow(
+            id = "100",
+            name = "Brody, Martin",
+            utr = "1234567890",
+            verified = "Yes",
+            verificationNumber = "Unknown",
+            taxTreatment = "Unknown",
+            dateAdded = "11 May 2020"
+          )
+        )
+
+      val ua =
+        emptyUserAnswers
+          .set(SubcontractorReverifyRowsPage, rows)
+          .success
+          .value
+          .set(UnverifiedSubcontractorsPage, Seq.empty)
+          .success
+          .value
+          .set(SelectSubcontractorPage, Set.empty[SubcontractorViewModel])
+          .success
+          .value
+
+      val app =
+        applicationBuilder(userAnswers = Some(ua))
+          .overrides(
+            bind[Clock].toInstance(fixedClock),
+            bind[SessionRepository].toInstance(mockRepo)
+          )
+          .build()
+
+      running(app) {
+        val request =
+          FakeRequest(POST, postUrl)
+            .withFormUrlEncodedBody()
+
+        val result = route(app, request).value
+
+        status(result) mustBe BAD_REQUEST
+        verify(mockRepo, never()).set(any())
+
+        val body = contentAsString(result)
+        body must include(messages("verify.selectSubcontractorsToReverify.error.required"))
+      }
+    }
+
+    "must allow empty submission when UnverifiedSubcontractorsPage is non-empty" in {
+      val mockRepo = mock[SessionRepository]
+      when(mockRepo.set(any())) thenReturn Future.successful(true)
+
+      val rows: Seq[SubcontractorReverifyRow] =
+        Seq(
+          SubcontractorReverifyRow(
+            id = "100",
+            name = "Brody, Martin",
+            utr = "1234567890",
+            verified = "Yes",
+            verificationNumber = "Unknown",
+            taxTreatment = "Unknown",
+            dateAdded = "11 May 2020"
+          )
+        )
+
+      val unverified =
+        Seq(
+          mkSub(
+            id = 999L,
+            verified = Some("N"),
+            tradingName = Some("Pending Verification Ltd"),
+            subcontractorType = Some("company")
+          )
+        )
+
+      val ua =
+        emptyUserAnswers
+          .set(SubcontractorReverifyRowsPage, rows)
+          .success
+          .value
+          .set(UnverifiedSubcontractorsPage, unverified)
+          .success
+          .value
+
+      val app =
+        applicationBuilder(userAnswers = Some(ua))
+          .overrides(
+            bind[SessionRepository].toInstance(mockRepo),
+            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
+            bind[Clock].toInstance(fixedClock)
+          )
+          .build()
+
+      running(app) {
+        val request =
+          FakeRequest(POST, postUrl)
+            .withFormUrlEncodedBody()
+
+        val result = route(app, request).value
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result).value mustBe onwardRoute.url
+
+        val uaCaptor = ArgumentCaptor.forClass(classOf[UserAnswers])
+        verify(mockRepo).set(uaCaptor.capture())
+        uaCaptor.getValue.get(SelectSubcontractorsToReverifyPage).value mustBe Set.empty
+      }
+    }
+
+    "must allow empty submission when SelectSubcontractorPage already contains selections" in {
+      val mockRepo = mock[SessionRepository]
+      when(mockRepo.set(any())) thenReturn Future.successful(true)
+
+      val rows: Seq[SubcontractorReverifyRow] =
+        Seq(
+          SubcontractorReverifyRow(
+            id = "100",
+            name = "Brody, Martin",
+            utr = "1234567890",
+            verified = "Yes",
+            verificationNumber = "Unknown",
+            taxTreatment = "Unknown",
+            dateAdded = "11 May 2020"
+          )
+        )
+
+      val ua =
+        emptyUserAnswers
+          .set(SubcontractorReverifyRowsPage, rows)
+          .success
+          .value
+          .set(SelectSubcontractorPage, Set(SubcontractorViewModel("1", "Earlier Selected Sub")))
+          .success
+          .value
+
+      val app =
+        applicationBuilder(userAnswers = Some(ua))
+          .overrides(
+            bind[SessionRepository].toInstance(mockRepo),
+            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
+            bind[Clock].toInstance(fixedClock)
+          )
+          .build()
+
+      running(app) {
+        val request =
+          FakeRequest(POST, postUrl)
+            .withFormUrlEncodedBody()
+
+        val result = route(app, request).value
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result).value mustBe onwardRoute.url
+
+        val uaCaptor = ArgumentCaptor.forClass(classOf[UserAnswers])
+        verify(mockRepo).set(uaCaptor.capture())
+        uaCaptor.getValue.get(SelectSubcontractorsToReverifyPage).value mustBe Set.empty
       }
     }
   }

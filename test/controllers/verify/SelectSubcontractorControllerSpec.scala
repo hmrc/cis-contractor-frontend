@@ -124,7 +124,7 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
       val application = applicationBuilder(userAnswers = Some(uaWithSubcontractors)).build()
 
       running(application) {
-        val request = FakeRequest(GET, url(1))
+        val request = FakeRequest(GET, url())
         val result  = route(application, request).value
 
         val view = application.injector.instanceOf[SelectSubcontractorView]
@@ -157,7 +157,7 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
       running(application) {
-        val request = FakeRequest(GET, url(1))
+        val request = FakeRequest(GET, url())
         val result  = route(application, request).value
 
         val view = application.injector.instanceOf[SelectSubcontractorView]
@@ -194,7 +194,7 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, url(1))
+          FakeRequest(POST, url())
             .withFormUrlEncodedBody("value[0]" -> allSubs.head.id)
 
         val result = route(application, request).value
@@ -204,16 +204,14 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must return a Bad Request and errors when invalid data is submitted" in {
+    "must return BadRequest with inline error when selection is mandatory and no values are selected" in {
 
       val application = applicationBuilder(userAnswers = Some(uaWithSubcontractors)).build()
 
       running(application) {
         val request =
-          FakeRequest(POST, url(1))
-            .withFormUrlEncodedBody("value" -> "")
-
-        val boundForm = form.bind(Map("value" -> ""))
+          FakeRequest(POST, url())
+            .withFormUrlEncodedBody()
 
         val view = application.injector.instanceOf[SelectSubcontractorView]
 
@@ -222,10 +220,15 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
 
         val result = route(application, request).value
 
+        val expectedForm =
+          form
+            .fill(Set.empty[String])
+            .withError("value", "verify.selectSubcontractor.error.required")
+
         status(result) mustEqual BAD_REQUEST
 
         contentAsString(result) mustEqual view(
-          boundForm,
+          expectedForm,
           NormalMode,
           paginationResult.paginatedData,
           paginationResult.paginationViewModel,
@@ -252,7 +255,7 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
 
       val application = applicationBuilder(userAnswers = Some(uaWithSubcontractors)).build()
 
-      val request = FakeRequest(GET, url(1))
+      val request = FakeRequest(GET, url())
       val result  = route(application, request).value
 
       status(result) mustBe OK
@@ -263,7 +266,7 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
       val application = applicationBuilder(userAnswers = Some(uaWithSubcontractors)).build()
 
       val request =
-        FakeRequest(POST, url(1))
+        FakeRequest(POST, url())
           .withFormUrlEncodedBody("value" -> "")
 
       val result = route(application, request).value
@@ -276,7 +279,7 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
       val application = applicationBuilder(userAnswers = None).build()
 
       running(application) {
-        val request = FakeRequest(GET, url(1))
+        val request = FakeRequest(GET, url())
         val result  = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
@@ -318,7 +321,7 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
           .build()
 
       running(application) {
-        val request = FakeRequest(GET, url(1))
+        val request = FakeRequest(GET, url())
         val result  = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
@@ -342,7 +345,7 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
           .build()
 
       running(application) {
-        val request = FakeRequest(GET, url(1))
+        val request = FakeRequest(GET, url())
         val result  = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
@@ -358,7 +361,7 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
           .build()
 
       running(application) {
-        val request = FakeRequest(GET, url(1))
+        val request = FakeRequest(GET, url())
         val result  = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
@@ -380,7 +383,7 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
           .build()
 
       running(application) {
-        val request = FakeRequest(GET, url(1))
+        val request = FakeRequest(GET, url())
         val result  = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
@@ -401,7 +404,7 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, url(1))
+          FakeRequest(POST, url())
             .withFormUrlEncodedBody("value[0]" -> allSubs.head.id)
 
         val result = route(application, request).value
@@ -424,7 +427,7 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, url(1))
+          FakeRequest(POST, url())
             .withFormUrlEncodedBody("value[0]" -> allSubs.head.id)
 
         val result = route(application, request).value
@@ -455,7 +458,7 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, url(1))
+          FakeRequest(POST, url())
             .withFormUrlEncodedBody("value[0]" -> allSubs.head.id)
 
         val result = route(application, request).value
@@ -478,7 +481,7 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, url(1))
+          FakeRequest(POST, url())
             .withFormUrlEncodedBody(
               "value[0]" -> allSubs.head.id,
               "gotoPage" -> "2"
@@ -503,7 +506,7 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, url(1))
+          FakeRequest(POST, url())
             .withFormUrlEncodedBody("gotoPage" -> "2")
 
         val result = route(application, request).value
@@ -536,7 +539,7 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, url(1))
+          FakeRequest(POST, url())
             .withFormUrlEncodedBody("gotoPage" -> "2")
 
         val result = route(application, request).value
@@ -654,7 +657,7 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
           page1Subs.diff(otherPageSelection).head
 
         val request =
-          FakeRequest(POST, url(1))
+          FakeRequest(POST, url())
             .withFormUrlEncodedBody("value[0]" -> newSelectionOnPage1.id)
 
         val result = route(appWithAnswers, request).value
@@ -670,18 +673,38 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must hit fold success branch when form binds but submitted ids match no known subcontractor" in {
+    "must redirect when form binds but submitted ids match no known subcontractor and selection is not mandatory" in {
 
       class TestSelectSubcontractorFormProvider @Inject() () extends SelectSubcontractorFormProvider {
         override def apply(): Form[Set[String]] =
           Form(single("value" -> ignored(Set("non-existent-id"))))
       }
 
+      val subcontractorsWithVerifiedInBatch =
+        subcontractors.updated(
+          0,
+          subcontractors.head.copy(verified = Some("Y"))
+        )
+
+      val responseWithVerified =
+        getNewestVerificationBatchResponse.copy(
+          subcontractors = subcontractorsWithVerifiedInBatch
+        )
+
+      val userAnswers =
+        emptyUserAnswers
+          .set(NewestVerificationBatchResponsePage, responseWithVerified)
+          .success
+          .value
+          .set(UnverifiedSubcontractorsPage, subcontractors)
+          .success
+          .value
+
       val mockSessionRepository = mock[SessionRepository]
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
       val application =
-        applicationBuilder(userAnswers = Some(uaWithSubcontractors))
+        applicationBuilder(userAnswers = Some(userAnswers))
           .overrides(
             bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
             bind[SessionRepository].toInstance(mockSessionRepository),
@@ -690,7 +713,7 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
           .build()
 
       running(application) {
-        val request = FakeRequest(POST, url(1)).withFormUrlEncodedBody()
+        val request = FakeRequest(POST, url()).withFormUrlEncodedBody()
 
         val result = route(application, request).value
 
@@ -701,6 +724,49 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
         verify(mockSessionRepository).set(captor.capture())
 
         captor.getValue.get(SelectSubcontractorPage).value mustEqual Set.empty[SubcontractorViewModel]
+      }
+    }
+
+    "must allow empty submission when verified subcontractors exist" in {
+
+      val subcontractorsWithVerified =
+        subcontractors.updated(0, subcontractors.head.copy(verified = Some("Y")))
+
+      val responseWithVerified =
+        getNewestVerificationBatchResponse.copy(
+          subcontractors = subcontractorsWithVerified
+        )
+
+      val ua =
+        emptyUserAnswers
+          .set(NewestVerificationBatchResponsePage, responseWithVerified)
+          .success
+          .value
+          .set(UnverifiedSubcontractorsPage, subcontractorsWithVerified)
+          .success
+          .value
+
+      val mockSessionRepository = mock[SessionRepository]
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+      val application =
+        applicationBuilder(userAnswers = Some(ua))
+          .overrides(
+            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
+            bind[SessionRepository].toInstance(mockSessionRepository)
+          )
+          .build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(POST, url())
+            .withFormUrlEncodedBody()
+
+        val result = route(application, request).value
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result).value mustBe onwardRoute.url
       }
     }
   }
