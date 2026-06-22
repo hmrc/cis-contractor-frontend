@@ -18,16 +18,16 @@ package controllers
 
 import base.SpecBase
 import forms.IndividualContactMethodOptionsFormProvider
+import models.add.SubcontractorName
 import models.{IndividualContactMethodOptions, NormalMode, UserAnswers}
-import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
 import pages.IndividualContactMethodOptionsPage
+import pages.add.SubcontractorNamePage
 import play.api.inject.bind
-import play.api.mvc.Call
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import repositories.SessionRepository
 import views.html.IndividualContactMethodOptionsView
 
@@ -40,10 +40,12 @@ class IndividualContactMethodOptionsControllerSpec extends SpecBase with Mockito
   private val formProvider = new IndividualContactMethodOptionsFormProvider()
   private val form = formProvider()
 
-  private val subcontractorName = "Test Subcontractor"
+  private val subcontractorName = SubcontractorName("John", Some("Paul"), "Smith")
+
+  private val name = "John Smith"
 
   private def uaWithName: UserAnswers =
-    emptyUserAnswers.set(IndividualContactMethodOptionsPage, subcontractorName).success.value
+    emptyUserAnswers.set(SubcontractorNamePage, subcontractorName).success.value
 
   "IndividualContactMethodOptions Controller" - {
 
@@ -60,7 +62,7 @@ class IndividualContactMethodOptionsControllerSpec extends SpecBase with Mockito
 
         status(result) mustEqual OK
 
-        contentAsString(result) mustEqual view(form, NormalMode, subcontractorName)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode, name)(request, messages(application)).toString
       }
     }
 
@@ -82,7 +84,7 @@ class IndividualContactMethodOptionsControllerSpec extends SpecBase with Mockito
         contentAsString(result) mustEqual view(
           form.fill(IndividualContactMethodOptions.values.toSet),
           NormalMode,
-          subcontractorName
+          name
         )(request, messages(application)).toString
       }
     }
@@ -130,7 +132,7 @@ class IndividualContactMethodOptionsControllerSpec extends SpecBase with Mockito
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode, subcontractorName)(
+        contentAsString(result) mustEqual view(boundForm, NormalMode, name)(
           request,
           messages(application)
         ).toString
@@ -184,7 +186,7 @@ class IndividualContactMethodOptionsControllerSpec extends SpecBase with Mockito
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode, subcontractorName)(
+        contentAsString(result) mustEqual view(boundForm, NormalMode, name)(
           request,
           messages(application)
         ).toString

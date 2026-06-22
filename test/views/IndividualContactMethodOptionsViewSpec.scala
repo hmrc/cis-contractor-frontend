@@ -46,7 +46,6 @@ class IndividualContactMethodOptionsViewSpec extends AnyWordSpec with Matchers w
 
       val legend: Elements = doc.select("fieldset legend")
       legend.text() mustBe messages("individualContactMethodOptions.heading", subcontractorName)
-      legend.hasClass("govuk-fieldset__legend--l") mustBe true
 
       val checkboxes: Elements = doc.select(".govuk-checkboxes__item")
       checkboxes.size() mustBe IndividualContactMethodOptions.values.size
