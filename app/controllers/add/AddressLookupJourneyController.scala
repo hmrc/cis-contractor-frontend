@@ -17,6 +17,7 @@
 package controllers.add
 
 import controllers.actions.*
+import forms.mappings.Constants.MaxLength35
 import models.{Mode, UserAnswers}
 import models.address.{Address, AddressLookupJourneyIdentifier, MandatoryFieldsConfigModel}
 import models.requests.DataRequest
@@ -77,7 +78,16 @@ trait AddressLookupJourneyController extends FrontendBaseController with I18nSup
       subcontractorName(request.userAnswers) match {
         case Some(name) =>
           addressLookupService
-            .getJourneyUrl(journeyId, callback, optName = Some(name), mandatoryFieldsConfigModel = mandatoryFields)
+            .getJourneyUrl(
+              journeyId,
+              callback,
+              optName = Some(name),
+              mandatoryFieldsConfigModel = mandatoryFields,
+              line1MaxLength = Some(MaxLength35),
+              line2MaxLength = Some(MaxLength35),
+              line3MaxLength = Some(MaxLength35),
+              townMaxLength = Some(MaxLength35)
+            )
             .map(Redirect)
             .recover { case _ => Redirect(journeyRecovery) }
         case None       => Future.successful(Redirect(journeyRecovery))

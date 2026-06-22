@@ -44,10 +44,24 @@ class AddressLookupService @Inject() (
     continueUrl: Call,
     useUkMode: Boolean = false,
     optName: Option[String] = None,
-    mandatoryFieldsConfigModel: MandatoryFieldsConfigModel
+    mandatoryFieldsConfigModel: MandatoryFieldsConfigModel,
+    line1MaxLength: Option[Int] = None,
+    line2MaxLength: Option[Int] = None,
+    line3MaxLength: Option[Int] = None,
+    townMaxLength: Option[Int] = None
   )(implicit hc: HeaderCarrier, request: Request[_], executionContext: ExecutionContext): Future[Call] =
     addressLookupConnector.getOnRampUrl(
-      alfConfig(journeyId, continueUrl, useUkMode, optName, mandatoryFieldsConfigModel = mandatoryFieldsConfigModel)
+      alfConfig(
+        journeyId,
+        continueUrl,
+        useUkMode,
+        optName,
+        mandatoryFieldsConfigModel = mandatoryFieldsConfigModel,
+        line1MaxLength = line1MaxLength,
+        line2MaxLength = line2MaxLength,
+        line3MaxLength = line3MaxLength,
+        townMaxLength = townMaxLength
+      )
     )
 
   def saveAddressDetails(address: Address, page: Settable[Address])(implicit

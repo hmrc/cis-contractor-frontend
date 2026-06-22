@@ -78,7 +78,8 @@ class AddressOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
 
         when(mockSessionRepository.get(any())) thenReturn Future.successful(Some(userAnswersWithName))
         when(
-          mockAddressLookupService.getJourneyUrl(any(), any(), any(), any(), any())(any(), any(), any())
+          mockAddressLookupService
+            .getJourneyUrl(any(), any(), any(), any(), any(), any(), any(), any(), any())(any(), any(), any())
         ) thenReturn Future.successful(Call("GET", lookupUrl))
 
         val application =
@@ -99,7 +100,17 @@ class AddressOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
           val callbackCaptor = ArgumentCaptor.forClass(classOf[Call])
           val optNameCaptor  = ArgumentCaptor.forClass(classOf[Option[String]])
           verify(mockAddressLookupService)
-            .getJourneyUrl(any(), callbackCaptor.capture(), any(), optNameCaptor.capture(), any())(any(), any(), any())
+            .getJourneyUrl(
+              any(),
+              callbackCaptor.capture(),
+              any(),
+              optNameCaptor.capture(),
+              any(),
+              any(),
+              any(),
+              any(),
+              any()
+            )(any(), any(), any())
 
           callbackCaptor.getValue.url mustBe
             controllers.add.routes.AddressOfSubcontractorController.addressLookupCallback().url
@@ -114,7 +125,8 @@ class AddressOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
 
         when(mockSessionRepository.get(any())) thenReturn Future.successful(Some(userAnswersWithName))
         when(
-          mockAddressLookupService.getJourneyUrl(any(), any(), any(), any(), any())(any(), any(), any())
+          mockAddressLookupService
+            .getJourneyUrl(any(), any(), any(), any(), any(), any(), any(), any(), any())(any(), any(), any())
         ) thenReturn Future.successful(Call("GET", lookupUrl))
 
         val application =
@@ -135,7 +147,17 @@ class AddressOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
           val callbackCaptor = ArgumentCaptor.forClass(classOf[Call])
           val optNameCaptor  = ArgumentCaptor.forClass(classOf[Option[String]])
           verify(mockAddressLookupService)
-            .getJourneyUrl(any(), callbackCaptor.capture(), any(), optNameCaptor.capture(), any())(any(), any(), any())
+            .getJourneyUrl(
+              any(),
+              callbackCaptor.capture(),
+              any(),
+              optNameCaptor.capture(),
+              any(),
+              any(),
+              any(),
+              any(),
+              any()
+            )(any(), any(), any())
 
           callbackCaptor.getValue.url mustBe
             controllers.add.routes.AddressOfSubcontractorController.addressLookupCallbackChange().url
@@ -185,7 +207,8 @@ class AddressOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
         val mockAddressLookupService = mock[AddressLookupService]
 
         when(
-          mockAddressLookupService.getJourneyUrl(any(), any(), any(), any(), any())(any(), any(), any())
+          mockAddressLookupService
+            .getJourneyUrl(any(), any(), any(), any(), any(), any(), any(), any(), any())(any(), any(), any())
         ) thenReturn Future.failed(new RuntimeException("ALF unavailable"))
 
         val application =
@@ -225,7 +248,7 @@ class AddressOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
           redirectLocation(result).value mustBe routes.JourneyRecoveryController.onPageLoad().url
 
           verify(mockAddressLookupService, never)
-            .getJourneyUrl(any(), any(), any(), any(), any())(any(), any(), any())
+            .getJourneyUrl(any(), any(), any(), any(), any(), any(), any(), any(), any())(any(), any(), any())
         }
       }
     }

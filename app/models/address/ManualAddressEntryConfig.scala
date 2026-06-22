@@ -18,7 +18,14 @@ package models.address
 
 import play.api.libs.json.{Json, Writes}
 
-case class ManualAddressEntryConfig(mandatoryFields: MandatoryFieldsConfigModel, showOrganisationName: Boolean)
+case class ManualAddressEntryConfig(
+  line1MaxLength: Option[Int] = None,
+  line2MaxLength: Option[Int] = None,
+  line3MaxLength: Option[Int] = None,
+  townMaxLength: Option[Int] = None,
+  mandatoryFields: MandatoryFieldsConfigModel,
+  showOrganisationName: Boolean
+)
 
 object ManualAddressEntryConfig {
   implicit val writes: Writes[ManualAddressEntryConfig] = Json.writes[ManualAddressEntryConfig]

@@ -106,7 +106,19 @@ class AddressLookupServiceSpec extends SpecBase with MockitoSugar {
         val (service, connector, alfConfig, _)           = newService()
         val builtConfig: AddressLookupConfigurationModel = AddressLookupConstants.testAlfConfig
 
-        when(alfConfig.apply(eqTo(individualQuestionsAddress), eqTo(testCall), any(), any(), any())(any()))
+        when(
+          alfConfig.apply(
+            eqTo(individualQuestionsAddress),
+            eqTo(testCall),
+            any(),
+            any(),
+            any(),
+            any(),
+            any(),
+            any(),
+            any()
+          )(any())
+        )
           .thenReturn(builtConfig)
         when(connector.getOnRampUrl(eqTo(builtConfig))(any(), any())).thenReturn(Future.successful(testCall))
 

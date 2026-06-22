@@ -29,7 +29,11 @@ class AddressLookupConfiguration @Inject() (implicit appConfig: FrontendAppConfi
     continueRoute: Call,
     useUkMode: Boolean,
     optName: Option[String] = None,
-    mandatoryFieldsConfigModel: MandatoryFieldsConfigModel
+    mandatoryFieldsConfigModel: MandatoryFieldsConfigModel,
+    line1MaxLength: Option[Int] = None,
+    line2MaxLength: Option[Int] = None,
+    line3MaxLength: Option[Int] = None,
+    townMaxLength: Option[Int] = None
   )(implicit rh: RequestHeader): AddressLookupConfigurationModel = {
     val english = Lang("en")
     val welsh   = Lang("cy")
@@ -56,6 +60,10 @@ class AddressLookupConfiguration @Inject() (implicit appConfig: FrontendAppConfi
           showConfirmChangeText = Some(false)
         ),
         manualAddressEntryConfig = ManualAddressEntryConfig(
+          line1MaxLength = line1MaxLength,
+          line2MaxLength = line2MaxLength,
+          line3MaxLength = line3MaxLength,
+          townMaxLength = townMaxLength,
           mandatoryFields = mandatoryFieldsConfigModel,
           showOrganisationName = false
         ),
