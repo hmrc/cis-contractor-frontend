@@ -1029,3 +1029,11 @@ contractordetails.contractorDetailsCheckAnswers.table.email                    =
 contractordetails.contractorDetailsCheckAnswers.table.email.hidden             =  email address
 contractordetails.contractorDetailsCheckAnswers.table.link.addDetails          =  Add details
 contractordetails.contractorDetailsCheckAnswers.returnToCisDashboard.link      =  Return to CIS dashboard
+
+contractordetails.addEmailAddressYesNo.title                                   =  Do you want to enter the contractor’s email address?
+contractordetails.addEmailAddressYesNo.heading                                 =  Do you want to enter the contractor’s email address?
+contractordetails.addEmailAddressYesNo.error.required                          =  Select yes to enter the contractor’s email address
+
+contractordetails.addSchemeNameYesNo.title                                     =  Do you want to enter the contractor’s scheme name?
+contractordetails.addSchemeNameYesNo.heading                                   =  Do you want to enter the contractor’s scheme name?
+contractordetails.addSchemeNameYesNo.error.required                            =  Select yes to enter the contractor’s scheme name
