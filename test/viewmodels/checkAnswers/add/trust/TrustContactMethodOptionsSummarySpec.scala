@@ -107,7 +107,7 @@ class TrustContactMethodOptionsSummarySpec extends SpecBase with Matchers {
     }
 
     "return None when the answer is not set" in {
-      TrustUtrYesNoSummary.row(emptyUserAnswers) mustBe None
+      TrustContactMethodOptionsSummary.row(emptyUserAnswers) mustBe None
     }
   }
 }
