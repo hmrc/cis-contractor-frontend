@@ -19,7 +19,7 @@ package navigation.add
 import base.SpecBase
 import controllers.routes
 import models.address.Address
-import models.contact.ContactOptions
+import models.contact.{ContactMethodOptions, ContactOptions}
 import models.{CheckMode, NormalMode, UserAnswers}
 import org.scalactic.Prettifier.default
 import pages.Page
@@ -232,6 +232,35 @@ class TrustNavigatorSpec extends SpecBase {
           emptyUserAnswers
         ) mustBe journeyRecovery
       }
+
+      "must go from AddTrustContactMethodsYesNo" - {
+        "to TrustContactMethodOptions Page when answer is Yes" in {
+          navigator.nextPage(
+            AddTrustContactMethodsYesNoPage,
+            NormalMode,
+            emptyUserAnswers.setOrException(AddTrustContactMethodsYesNoPage, true)
+          ) mustBe controllers.add.trust.routes.TrustContactMethodOptionsController
+            .onPageLoad(NormalMode)
+        }
+
+        "to TrustUtrYesNo when answer is No" in {
+          navigator.nextPage(
+            AddTrustContactMethodsYesNoPage,
+            NormalMode,
+            emptyUserAnswers.setOrException(AddTrustContactMethodsYesNoPage, false)
+          ) mustBe controllers.add.trust.routes.TrustUtrYesNoController
+            .onPageLoad(NormalMode)
+        }
+
+        "to JourneyRecoveryPage when answer is not present" in {
+          navigator.nextPage(
+            AddTrustContactMethodsYesNoPage,
+            NormalMode,
+            emptyUserAnswers
+          ) mustBe journeyRecovery
+        }
+      }
+
     }
 
     "in Check mode" - {
@@ -499,6 +528,48 @@ class TrustNavigatorSpec extends SpecBase {
         "to TrustCheckYourAnswers when answer is not present" in {
           navigator.nextPage(
             TrustContactOptionsPage,
+            CheckMode,
+            emptyUserAnswers
+          ) mustBe journeyRecovery
+        }
+      }
+
+      "must go from AddTrustContactMethodsYesNo" - {
+        "to CYA when answer is Yes and TrustContactMethodOptions already answered" in {
+          val answers = emptyUserAnswers
+            .setOrException(AddTrustContactMethodsYesNoPage, true)
+            .setOrException(TrustContactMethodOptionsPage, Set(ContactMethodOptions.Email, ContactMethodOptions.Phone))
+
+          navigator.nextPage(
+            AddTrustContactMethodsYesNoPage,
+            CheckMode,
+            answers
+          ) mustBe controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
+        }
+
+        "to TrustContactMethodOptions page when answer is Yes and TrustContactMethodOptions not yet answered" in {
+          val answers = emptyUserAnswers.setOrException(AddTrustContactMethodsYesNoPage, true)
+
+          navigator.nextPage(
+            AddTrustContactMethodsYesNoPage,
+            CheckMode,
+            answers
+          ) mustBe controllers.add.trust.routes.TrustContactMethodOptionsController.onPageLoad(CheckMode)
+        }
+
+        "to CYA when answer is No" in {
+          val answers = emptyUserAnswers.set(AddTrustContactMethodsYesNoPage, false).success.value
+
+          navigator.nextPage(
+            AddTrustContactMethodsYesNoPage,
+            CheckMode,
+            answers
+          ) mustBe controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
+        }
+
+        "to JourneyRecovery when answer is not present" in {
+          navigator.nextPage(
+            AddTrustContactMethodsYesNoPage,
             CheckMode,
             emptyUserAnswers
           ) mustBe journeyRecovery
