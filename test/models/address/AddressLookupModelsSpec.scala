@@ -460,13 +460,13 @@ class AddressLookupModelsSpec extends AnyFreeSpec with Matchers with EitherValue
     val completeMessages = CountryPickerMessagesModel(
       title = Some("Select country"),
       heading = Some("Select country"),
-      countryLabel = ""
+      countryLabel = Some("")
     )
 
     val minimalMessages = CountryPickerMessagesModel(
       title = None,
       heading = None,
-      countryLabel = ""
+      countryLabel = Some("")
     )
 
     ".writes" - {
@@ -881,7 +881,7 @@ class AddressLookupModelsSpec extends AnyFreeSpec with Matchers with EitherValue
     val countryPickerMessages = CountryPickerMessagesModel(
       title = Some("Select country"),
       heading = Some("Select country"),
-      countryLabel = ""
+      countryLabel = Some("")
     )
 
     val internationalMessages = InternationalAddressMessagesModel(
@@ -1077,7 +1077,7 @@ class AddressLookupModelsSpec extends AnyFreeSpec with Matchers with EitherValue
     val countryPickerMessages = CountryPickerMessagesModel(
       title = Some("Select country"),
       heading = Some("Select country"),
-      countryLabel = ""
+      countryLabel = Some("")
     )
 
     val internationalMessages = InternationalAddressMessagesModel(

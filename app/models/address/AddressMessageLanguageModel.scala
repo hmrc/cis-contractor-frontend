@@ -74,7 +74,7 @@ object LookupPageMessagesModel {
   }
 }
 
-case class CountryPickerMessagesModel(title: Option[String], heading: Option[String], countryLabel: String)
+case class CountryPickerMessagesModel(title: Option[String], heading: Option[String], countryLabel: Option[String])
 
 object CountryPickerMessagesModel {
   implicit val writes: Writes[CountryPickerMessagesModel] = Json.writes[CountryPickerMessagesModel]
@@ -85,7 +85,7 @@ object CountryPickerMessagesModel {
     CountryPickerMessagesModel(
       title = MessageOption(s"addressLookup.$journeyId.countryPicker.title", lang, optName.toSeq: _*),
       heading = MessageOption(s"addressLookup.$journeyId.countryPicker.heading", lang, optName.toSeq: _*),
-      countryLabel = ""
+      countryLabel = MessageOption(s"addressLookup.$journeyId.countryPicker.countryLabel", lang)
     )
 }
 
