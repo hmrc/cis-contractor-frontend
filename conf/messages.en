@@ -299,18 +299,6 @@ individualChooseContactDetails.error.required                            =  Sele
 individualChooseContactDetails.checkYourAnswersLabel                     =  Method of contact
 individualChooseContactDetails.change.hidden                             =  method of contact
 
-addPartnershipContactMethodsYesNo.title                                  =  Do you want to add contact details for this partnership?
-addPartnershipContactMethodsYesNo.heading                                =  Do you want to add contact details for {0}?
-addPartnershipContactMethodsYesNo.error.required                         =  Select yes if you want to add contact details for this partnership
-addPartnershipContactMethodsYesNo.checkYourAnswersLabel                  =  Add contact details?
-addPartnershipContactMethodsYesNo.change.hidden                          =  add contact details?
-
-addCompanyContactMethodsYesNo.title                                      =  Do you want to add contact details for this company?
-addCompanyContactMethodsYesNo.heading                                    =  Do you want to add contact details for {0}?
-addCompanyContactMethodsYesNo.error.required                             =  Select yes if you want to add contact details for this company
-addCompanyContactMethodsYesNo.checkYourAnswersLabel                      =  Add contact details?
-addCompanyContactMethodsYesNo.change.hidden                              =  add contact details?
-
 addIndividualContactMethodsYesNo.title                                   =  Do you want to add contact details for this subcontractor?
 addIndividualContactMethodsYesNo.heading                                 =  Do you want to add contact details for {0}?
 addIndividualContactMethodsYesNo.error.required                          =  Select yes if you want to add contact details for this subcontractor
@@ -318,6 +306,12 @@ addIndividualContactMethodsYesNo.checkYourAnswersLabel                   =  Add 
 addIndividualContactMethodsYesNo.change.hidden                           =  add contact details?
 
 # Partnership
+addPartnershipContactMethodsYesNo.title                              =  Do you want to add contact details for this partnership?
+addPartnershipContactMethodsYesNo.heading                            =  Do you want to add contact details for {0}?
+addPartnershipContactMethodsYesNo.error.required                     =  Select yes if you want to add contact details for this partnership
+addPartnershipContactMethodsYesNo.checkYourAnswersLabel              =  Add contact details?
+addPartnershipContactMethodsYesNo.change.hidden                      =  add contact details?
+
 partnershipWorksReferenceNumberYesNo.title                           =  Is there a works reference number associated with this partnership?
 partnershipWorksReferenceNumberYesNo.heading                         =  Is there a works reference number associated with {0}?
 partnershipWorksReferenceNumberYesNo.hint                            =  This is the reference number used to identify a subcontractor’s work or project. It can contain letters or numbers.
@@ -508,6 +502,12 @@ partnershipMobileNumber.checkYourAnswersLabel                        =  Mobile n
 partnershipMobileNumber.change.hidden                                =  mobile number
 
 # Company
+addCompanyContactMethodsYesNo.title                              =  Do you want to add contact details for this company?
+addCompanyContactMethodsYesNo.heading                            =  Do you want to add contact details for {0}?
+addCompanyContactMethodsYesNo.error.required                     =  Select yes if you want to add contact details for this company
+addCompanyContactMethodsYesNo.checkYourAnswersLabel              =  Add contact details?
+addCompanyContactMethodsYesNo.change.hidden                      =  add contact details?
+
 companyName.title                                                =  What is the name of the company?
 companyName.heading                                              =  What is the name of the company?
 companyName.hint                                                 =  This will be the name as registered with Companies House
@@ -666,6 +666,12 @@ companyAdded.helpAndSupport.p1                                   =  If you need 
 companyAdded.helpAndSupport.p1.link                              =  guidance is available on GOV.UK
 
 # Trust
+addTrustContactMethodsYesNo.title                              =  Do you want to add contact details for this trust?
+addTrustContactMethodsYesNo.heading                            =  Do you want to add contact details for {0}?
+addTrustContactMethodsYesNo.error.required                     =  Select yes if you want to add contact details for this trust
+addTrustContactMethodsYesNo.checkYourAnswersLabel              =  Add contact details?
+addTrustContactMethodsYesNo.change.hidden                      =  add contact details?
+
 trustName.title                                                =  What is the name of the trust?
 trustName.heading                                              =  What is the name of the trust?
 trustName.hint                                                 =  This will be the name as registered with HMRC
