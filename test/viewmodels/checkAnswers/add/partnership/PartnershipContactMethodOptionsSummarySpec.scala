@@ -105,4 +105,8 @@ class PartnershipContactMethodOptionsSummarySpec extends SpecBase with Matchers 
       valueHtml must not include "govuk-list--bullet"
     }
   }
+
+  "return None when the answer is not set" in {
+    PartnershipContactMethodOptionsSummary.row(emptyUserAnswers) mustBe None
+  }
 }
