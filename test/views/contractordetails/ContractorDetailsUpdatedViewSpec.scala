@@ -42,6 +42,8 @@ class ContractorDetailsUpdatedViewSpec extends SpecBase with Matchers {
         messages("contractordetails.contractorDetailsUpdated.p1.details.prefix")
       )
 
+      doc.select(s"a[href=${applicationConfig.viewChangeToContractorDetails}]").size mustBe 1
+
       doc.select("a").text must include(messages("contractordetails.contractorDetailsUpdated.p1.details.link"))
 
       doc.select("a").text must include(messages("contractordetails.contractorDetailsUpdated.returnToDashboard.link"))
