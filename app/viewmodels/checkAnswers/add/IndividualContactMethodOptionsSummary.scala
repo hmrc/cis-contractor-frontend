@@ -31,7 +31,9 @@ object IndividualContactMethodOptionsSummary {
     answers.get(IndividualContactMethodOptionsPage).flatMap { selectedMethods =>
       val options =
         selectedMethods
-          .map(selectedMethod => HtmlFormat.escape(messages(s"individualContactMethodOptions.$selectedMethod")).toString)
+          .map(selectedMethod =>
+            HtmlFormat.escape(messages(s"individualContactMethodOptions.$selectedMethod")).toString
+          )
           .toSeq
       ValueViewModelHelper.makeGovukBulletList(options).map { value =>
         SummaryListRowViewModel(
