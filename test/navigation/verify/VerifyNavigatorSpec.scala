@@ -184,7 +184,7 @@ class VerifyNavigatorSpec extends SpecBase {
             controllers.verify.routes.CheckVerificationBatchReadinessController.checkVerificationBatchReadiness()
         }
 
-        "must go to VerificationNotSubmittedWarningController when answer is false and no selections exist (NormalMode)" in {
+        "must go to NoSubcontractorsSelectedWarningController when answer is false and no selections exist (NormalMode)" in {
 
           val ua =
             emptyUserAnswers
@@ -193,7 +193,7 @@ class VerifyNavigatorSpec extends SpecBase {
               .value
 
           navigator.nextPage(ReverifyExistingSubcontractorsYesNoPage, NormalMode, ua) mustBe
-            controllers.verify.routes.VerificationNotSubmittedWarningController.onPageLoad()
+            controllers.verify.routes.NoSubcontractorsSelectedWarningController.onPageLoad()
         }
       }
 
@@ -289,13 +289,13 @@ class VerifyNavigatorSpec extends SpecBase {
             controllers.verify.routes.CheckVerificationBatchReadinessController.checkVerificationBatchReadiness()
         }
 
-        "must go to VerificationNotSubmittedWarningController when no selections exist (NormalMode)" in {
+        "must go to NoSubcontractorsSelectedWarningController when no selections exist (NormalMode)" in {
 
           navigator.nextPage(
             SelectSubcontractorsToReverifyPage,
             NormalMode,
             emptyUserAnswers
-          ) mustBe controllers.verify.routes.VerificationNotSubmittedWarningController.onPageLoad()
+          ) mustBe controllers.verify.routes.NoSubcontractorsSelectedWarningController.onPageLoad()
         }
       }
 
@@ -375,7 +375,7 @@ class VerifyNavigatorSpec extends SpecBase {
             controllers.verify.routes.VerifyCheckYourAnswersController.onPageLoad()
         }
 
-        "must go to VerificationNotSubmittedWarningController when answer is false and no selections exist (CheckMode)" in {
+        "must go to NoSubcontractorsSelectedWarningController when answer is false and no selections exist (CheckMode)" in {
 
           val ua =
             emptyUserAnswers
@@ -384,7 +384,7 @@ class VerifyNavigatorSpec extends SpecBase {
               .value
 
           navigator.nextPage(ReverifyExistingSubcontractorsYesNoPage, CheckMode, ua) mustBe
-            controllers.verify.routes.VerificationNotSubmittedWarningController.onPageLoad()
+            controllers.verify.routes.NoSubcontractorsSelectedWarningController.onPageLoad()
         }
       }
 
@@ -402,7 +402,7 @@ class VerifyNavigatorSpec extends SpecBase {
             controllers.verify.routes.SelectSubcontractorsToReverifyController.onPageLoad(CheckMode)
         }
 
-        "must go to VerificationNotSubmittedWarningController when answer is false in CheckMode" in {
+        "must go to NoSubcontractorsSelectedWarningController when answer is false in CheckMode" in {
 
           val ua =
             emptyUserAnswers
@@ -411,7 +411,7 @@ class VerifyNavigatorSpec extends SpecBase {
               .value
 
           navigator.nextPage(VerifyYourSubcontractorsYesNoPage, CheckMode, ua) mustBe
-            controllers.verify.routes.VerificationNotSubmittedWarningController.onPageLoad()
+            controllers.verify.routes.NoSubcontractorsSelectedWarningController.onPageLoad()
         }
 
       }
@@ -480,13 +480,13 @@ class VerifyNavigatorSpec extends SpecBase {
             controllers.verify.routes.VerifyCheckYourAnswersController.onPageLoad()
         }
 
-        "must go to VerificationNotSubmittedWarningController when no selections exist (CheckMode)" in {
+        "must go to NoSubcontractorsSelectedWarningController when no selections exist (CheckMode)" in {
 
           navigator.nextPage(
             SelectSubcontractorsToReverifyPage,
             CheckMode,
             emptyUserAnswers
-          ) mustBe controllers.verify.routes.VerificationNotSubmittedWarningController.onPageLoad()
+          ) mustBe controllers.verify.routes.NoSubcontractorsSelectedWarningController.onPageLoad()
         }
       }
 

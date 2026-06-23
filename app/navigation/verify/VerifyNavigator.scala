@@ -114,14 +114,14 @@ class VerifyNavigator @Inject() () extends NavigatorForJourney {
 
       case (Some(false), NormalMode) =>
         if (ua.get(SelectSubcontractorPage).forall(_.isEmpty)) {
-          controllers.verify.routes.VerificationNotSubmittedWarningController.onPageLoad()
+          controllers.verify.routes.NoSubcontractorsSelectedWarningController.onPageLoad()
         } else {
           controllers.verify.routes.CheckVerificationBatchReadinessController.checkVerificationBatchReadiness()
         }
 
       case (Some(false), CheckMode) =>
         if (ua.get(SelectSubcontractorPage).forall(_.isEmpty)) {
-          controllers.verify.routes.VerificationNotSubmittedWarningController.onPageLoad()
+          controllers.verify.routes.NoSubcontractorsSelectedWarningController.onPageLoad()
         } else {
           controllers.verify.routes.VerifyCheckYourAnswersController.onPageLoad()
         }
@@ -140,7 +140,7 @@ class VerifyNavigator @Inject() () extends NavigatorForJourney {
         controllers.routes.IndexController.onPageLoad()
 
       case (Some(false), CheckMode) =>
-        controllers.verify.routes.VerificationNotSubmittedWarningController.onPageLoad()
+        controllers.verify.routes.NoSubcontractorsSelectedWarningController.onPageLoad()
 
       case _ =>
         controllers.routes.JourneyRecoveryController.onPageLoad()
@@ -160,7 +160,7 @@ class VerifyNavigator @Inject() () extends NavigatorForJourney {
           controllers.verify.routes.VerifyCheckYourAnswersController.onPageLoad()
       }
     } else {
-      controllers.verify.routes.VerificationNotSubmittedWarningController.onPageLoad()
+      controllers.verify.routes.NoSubcontractorsSelectedWarningController.onPageLoad()
     }
   }
 
