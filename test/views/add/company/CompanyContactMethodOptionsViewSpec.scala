@@ -48,6 +48,8 @@ class CompanyContactMethodOptionsViewSpec extends AnyWordSpec with Matchers with
       legend.text() mustBe messages("companyContactMethodOptions.heading", companyName)
       legend.hasClass("govuk-fieldset__legend--l") mustBe true
 
+      doc.select(".govuk-hint").text() mustBe messages("companyContactMethodOptions.hint")
+
       val checkboxes: Elements = doc.select(".govuk-checkboxes__item")
       checkboxes.size() mustBe CompanyContactMethodOptions.values.size
 

@@ -27,11 +27,11 @@ class CompanyContactMethodOptionsSummarySpec extends SpecBase with Matchers {
   implicit val messages: Messages = new DefaultMessagesApi(
     Map(
       "en" -> Map(
-        "companyContactMethodOptions.checkYourAnswersLabel" -> "Method of contact",
+        "companyContactMethodOptions.checkYourAnswersLabel" -> "Methods of contact",
         "companyContactMethodOptions.email"                 -> "Email address",
         "companyContactMethodOptions.phone"                 -> "Phone number",
         "companyContactMethodOptions.mobile"                -> "Mobile number",
-        "companyContactMethodOptions.change.hidden"         -> "method of contact",
+        "companyContactMethodOptions.change.hidden"         -> "methods of contact",
         "site.change"                                       -> "Change"
       )
     )
