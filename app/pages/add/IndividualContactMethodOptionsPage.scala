@@ -39,11 +39,12 @@ case object IndividualContactMethodOptionsPage extends QuestionPage[Set[Individu
         super.cleanup(value, userAnswers)
     }
 
-  private def removeIfNotSelected(selectedAnswers: Set[IndividualContactMethodOptions],
-                                  answer: IndividualContactMethodOptions,
-                                  page: QuestionPage[String],
-                                  userAnswers: UserAnswers
-                                 ): Try[UserAnswers] =
+  private def removeIfNotSelected(
+    selectedAnswers: Set[IndividualContactMethodOptions],
+    answer: IndividualContactMethodOptions,
+    page: QuestionPage[String],
+    userAnswers: UserAnswers
+  ): Try[UserAnswers] =
     if (selectedAnswers.contains(answer)) {
       Success(userAnswers)
     } else {

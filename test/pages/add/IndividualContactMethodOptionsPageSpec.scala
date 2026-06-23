@@ -34,9 +34,15 @@ class IndividualContactMethodOptionsPageSpec extends PageBehaviours {
     "cleanup" - {
 
       val userAnswers = emptyUserAnswers
-        .set(IndividualEmailAddressPage, "old@email.com").success.value
-        .set(IndividualPhoneNumberPage, "01234567890").success.value
-        .set(IndividualMobileNumberPage, "07700900982").success.value
+        .set(IndividualEmailAddressPage, "old@email.com")
+        .success
+        .value
+        .set(IndividualPhoneNumberPage, "01234567890")
+        .success
+        .value
+        .set(IndividualMobileNumberPage, "07700900982")
+        .success
+        .value
 
       "must remove IndividualPhoneNumberPage and IndividualMobileNumberPage when only Email is selected" in {
         val updated = userAnswers.set(IndividualContactMethodOptionsPage, Set(Emailaddress)).success.value
