@@ -501,6 +501,16 @@ partnershipMobileNumber.error.invalid                                =  Enter a 
 partnershipMobileNumber.checkYourAnswersLabel                        =  Mobile number
 partnershipMobileNumber.change.hidden                                =  mobile number
 
+partnershipContactMethodOptions.title                                =  Which contact details do you want to add for this partnership?
+partnershipContactMethodOptions.heading                              =  Which contact details do you want to add for {0}?
+partnershipContactMethodOptions.hint                                 =  Contact details are only for your own records
+partnershipContactMethodOptions.email                                =  Email address
+partnershipContactMethodOptions.phone                                =  Phone number
+partnershipContactMethodOptions.mobile                               =  Mobile number
+partnershipContactMethodOptions.error.required                       =  Select the methods of contact you want to add for this partnership
+partnershipContactMethodOptions.checkYourAnswersLabel                =  Methods of contact
+partnershipContactMethodOptions.change.hidden                        =  methods of contact
+
 # Company
 addCompanyContactMethodsYesNo.title                              =  Do you want to add contact details for this company?
 addCompanyContactMethodsYesNo.heading                            =  Do you want to add contact details for {0}?

@@ -14,50 +14,49 @@
  * limitations under the License.
  */
 
-package viewmodels.checkAnswers.add.trust
+package viewmodels.checkAnswers.add.partnership
 
 import base.SpecBase
 import models.contact.ContactMethodOptions
 import models.{CheckMode, UserAnswers}
 import org.scalatest.matchers.must.Matchers
-import pages.add.trust.TrustContactMethodOptionsPage
+import pages.add.partnership.PartnershipContactMethodOptionsPage
 import play.api.i18n.{DefaultMessagesApi, Lang, Messages}
 
-class TrustContactMethodOptionsSummarySpec extends SpecBase with Matchers {
-
+class PartnershipContactMethodOptionsSummarySpec extends SpecBase with Matchers {
   implicit val messages: Messages = new DefaultMessagesApi(
     Map(
       "en" -> Map(
-        "trustContactMethodOptions.checkYourAnswersLabel" -> "Methods of contact",
-        "trustContactMethodOptions.email"                 -> "Email address",
-        "trustContactMethodOptions.phone"                 -> "Phone number",
-        "trustContactMethodOptions.mobile"                -> "Mobile number",
-        "trustContactMethodOptions.change.hidden"         -> "methods of contact",
-        "site.change"                                     -> "Change"
+        "partnershipContactMethodOptions.checkYourAnswersLabel" -> "Method of contact",
+        "partnershipContactMethodOptions.email"                 -> "Email address",
+        "partnershipContactMethodOptions.phone"                 -> "Phone number",
+        "partnershipContactMethodOptions.mobile"                -> "Mobile number",
+        "partnershipContactMethodOptions.change.hidden"         -> "method of contact",
+        "site.change"                                           -> "Change"
       )
     )
   ).preferred(Seq(Lang("en")))
 
-  "TrustContactMethodOptionsSummary.row" - {
+  "PartnershipContactMethodOptionsSummary.row" - {
 
     "must return a row with multiple selected options" in {
 
       val answers: UserAnswers =
         UserAnswers("test-id")
           .set(
-            TrustContactMethodOptionsPage,
+            PartnershipContactMethodOptionsPage,
             Set(ContactMethodOptions.Email, ContactMethodOptions.Phone, ContactMethodOptions.Mobile)
           )
           .success
           .value
 
-      val result = TrustContactMethodOptionsSummary.row(answers)
+      val result = PartnershipContactMethodOptionsSummary.row(answers)
 
       result mustBe defined
 
       val row = result.value
 
-      row.key.content.asHtml.toString must include(messages("trustContactMethodOptions.checkYourAnswersLabel"))
+      row.key.content.asHtml.toString must include(messages("partnershipContactMethodOptions.checkYourAnswersLabel"))
 
       val valueHtml = row.value.content.asHtml.toString
 
@@ -74,28 +73,28 @@ class TrustContactMethodOptionsSummarySpec extends SpecBase with Matchers {
 
       val action = actions.head
 
-      action.href mustBe controllers.add.trust.routes.TrustContactMethodOptionsController
+      action.href mustBe controllers.add.partnership.routes.PartnershipContactMethodOptionsController
         .onPageLoad(CheckMode)
         .url
 
       action.content.asHtml.toString must include(messages("site.change"))
 
       action.visuallyHiddenText mustBe Some(
-        messages("trustContactMethodOptions.change.hidden")
+        messages("partnershipContactMethodOptions.change.hidden")
       )
 
-      action.attributes must contain("id" -> "trust-contact-methods")
+      action.attributes must contain("id" -> "partnership-contact-methods")
     }
 
     "must return a row with a single selected option" in {
 
       val answers: UserAnswers =
         emptyUserAnswers
-          .set(TrustContactMethodOptionsPage, Set(ContactMethodOptions.Email))
+          .set(PartnershipContactMethodOptionsPage, Set(ContactMethodOptions.Email))
           .success
           .value
 
-      val result = TrustContactMethodOptionsSummary.row(answers)
+      val result = PartnershipContactMethodOptionsSummary.row(answers)
 
       result mustBe defined
 
@@ -105,9 +104,9 @@ class TrustContactMethodOptionsSummarySpec extends SpecBase with Matchers {
       valueHtml must not include "<br>"
       valueHtml must not include "govuk-list--bullet"
     }
+  }
 
-    "return None when the answer is not set" in {
-      TrustContactMethodOptionsSummary.row(emptyUserAnswers) mustBe None
-    }
+  "return None when the answer is not set" in {
+    PartnershipContactMethodOptionsSummary.row(emptyUserAnswers) mustBe None
   }
 }

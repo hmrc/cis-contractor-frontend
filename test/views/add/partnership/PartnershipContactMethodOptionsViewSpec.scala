@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package views.add.trust
+package views.add.partnership
 
-import forms.add.trust.TrustContactMethodOptionsFormProvider
+import forms.add.partnership.PartnershipContactMethodOptionsFormProvider
 import models.NormalMode
-import models.add.trust.TrustContactMethodOptions
+import models.add.partnership.PartnershipContactMethodOptions
 import org.jsoup.nodes.Document
 import org.jsoup.select.Elements
 import org.scalatest.matchers.must.Matchers
@@ -29,36 +29,38 @@ import play.api.i18n.Messages
 import play.api.mvc.Request
 import play.api.test.FakeRequest
 import play.twirl.api.HtmlFormat
-import views.html.add.trust.TrustContactMethodOptionsView
+import views.html.add.partnership.PartnershipContactMethodOptionsView
 
 import java.util
 
-class TrustContactMethodOptionsViewSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite {
-  "TrustContactMethodOptionsView" should {
+class PartnershipContactMethodOptionsViewSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite {
+  "PartnershipContactMethodOptionsView" should {
 
     "render the page with title, heading, radios and submit button" in new Setup {
 
-      val subcontractorName = "Test Subcontractor"
+      val partnershipName = "Test Name"
 
-      val html: HtmlFormat.Appendable = view(form, NormalMode, subcontractorName)
+      val html: HtmlFormat.Appendable = view(form, NormalMode, partnershipName)
       val doc: Document               = org.jsoup.Jsoup.parse(html.toString())
-      doc.select("title").text() must include(messages("trustContactMethodOptions.title"))
+      doc.select("title").text() must include(messages("partnershipContactMethodOptions.title"))
 
       val legend: Elements = doc.select("fieldset legend")
-      legend.text() mustBe messages("trustContactMethodOptions.heading", subcontractorName)
+      legend.text() mustBe messages("partnershipContactMethodOptions.heading", partnershipName)
       legend.hasClass("govuk-fieldset__legend--l") mustBe true
 
-      doc.select(".govuk-hint").text() mustBe messages("trustContactMethodOptions.hint")
+      doc.select(".govuk-hint").text() mustBe messages("partnershipContactMethodOptions.hint")
 
       val checkboxes: Elements = doc.select(".govuk-checkboxes__item")
-      checkboxes.size() mustBe TrustContactMethodOptions.values.size
+      checkboxes.size() mustBe PartnershipContactMethodOptions.values.size
 
       val labels: util.List[String] = doc.select(".govuk-checkboxes__label").eachText()
-      labels must contain(messages("trustContactMethodOptions.email"))
-      labels must contain(messages("trustContactMethodOptions.phone"))
-      labels must contain(messages("trustContactMethodOptions.mobile"))
+      labels must contain(messages("partnershipContactMethodOptions.email"))
+      labels must contain(messages("partnershipContactMethodOptions.phone"))
+      labels must contain(messages("partnershipContactMethodOptions.mobile"))
 
-      doc.select("form").attr("action") mustBe controllers.add.trust.routes.TrustContactMethodOptionsController
+      doc
+        .select("form")
+        .attr("action") mustBe controllers.add.partnership.routes.PartnershipContactMethodOptionsController
         .onSubmit(NormalMode)
         .url
 
@@ -69,29 +71,29 @@ class TrustContactMethodOptionsViewSpec extends AnyWordSpec with Matchers with G
 
     "display error summary and inline error when no option is selected" in new Setup {
 
-      val subcontractorName = "Test Subcontractor"
+      val partnershipName = "Test Subcontractor"
 
-      val errorForm: Form[Set[TrustContactMethodOptions]] =
-        form.withError("value", "trustContactMethodOptions.error.required")
+      val errorForm: Form[Set[PartnershipContactMethodOptions]] =
+        form.withError("value", "partnershipContactMethodOptions.error.required")
 
-      val html: HtmlFormat.Appendable = view(errorForm, NormalMode, subcontractorName)
+      val html: HtmlFormat.Appendable = view(errorForm, NormalMode, partnershipName)
       val doc: Document               = org.jsoup.Jsoup.parse(html.toString())
 
       val summary: Elements = doc.select(".govuk-error-summary")
-      summary.text() must include(messages("trustContactMethodOptions.error.required"))
+      summary.text() must include(messages("partnershipContactMethodOptions.error.required"))
 
       val linkHref: String = summary.select("a").attr("href")
       linkHref mustBe "#value_0"
 
       doc.select(".govuk-error-message").text() must include(
-        messages("trustContactMethodOptions.error.required")
+        messages("partnershipContactMethodOptions.error.required")
       )
     }
   }
 
   trait Setup {
-    val formProvider                               = new TrustContactMethodOptionsFormProvider()
-    val form: Form[Set[TrustContactMethodOptions]] = formProvider()
+    val formProvider                                     = new PartnershipContactMethodOptionsFormProvider()
+    val form: Form[Set[PartnershipContactMethodOptions]] = formProvider()
 
     implicit val request: Request[_] = FakeRequest()
     implicit val messages: Messages  =
@@ -100,6 +102,6 @@ class TrustContactMethodOptionsViewSpec extends AnyWordSpec with Matchers with G
         app.injector.instanceOf[play.api.i18n.MessagesApi]
       )
 
-    val view: TrustContactMethodOptionsView = app.injector.instanceOf[TrustContactMethodOptionsView]
+    val view: PartnershipContactMethodOptionsView = app.injector.instanceOf[PartnershipContactMethodOptionsView]
   }
 }
