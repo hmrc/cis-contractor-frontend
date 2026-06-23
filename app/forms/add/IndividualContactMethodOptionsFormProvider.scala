@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package forms
-
-import javax.inject.Inject
+package forms.add
 
 import forms.mappings.Mappings
+import models.add.IndividualContactMethodOptions
 import play.api.data.Form
 import play.api.data.Forms.set
-import models.IndividualContactMethodOptions
+
+import javax.inject.Inject
 
 class IndividualContactMethodOptionsFormProvider @Inject() extends Mappings {
 

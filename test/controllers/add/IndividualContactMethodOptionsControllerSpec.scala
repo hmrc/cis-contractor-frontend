@@ -14,28 +14,28 @@
  * limitations under the License.
  */
 
-package controllers
+package controllers.add
 
 import base.SpecBase
-import forms.IndividualContactMethodOptionsFormProvider
-import models.add.SubcontractorName
-import models.{IndividualContactMethodOptions, NormalMode, UserAnswers}
+import controllers.routes
+import forms.add.IndividualContactMethodOptionsFormProvider
+import models.add.{IndividualContactMethodOptions, SubcontractorName}
+import models.{NormalMode, UserAnswers}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.IndividualContactMethodOptionsPage
-import pages.add.SubcontractorNamePage
+import pages.add.{IndividualContactMethodOptionsPage, SubcontractorNamePage}
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import repositories.SessionRepository
-import views.html.IndividualContactMethodOptionsView
+import views.html.add.IndividualContactMethodOptionsView
 
 import scala.concurrent.Future
 
 class IndividualContactMethodOptionsControllerSpec extends SpecBase with MockitoSugar {
   private lazy val individualContactMethodOptionsRoute =
-    controllers.routes.IndividualContactMethodOptionsController.onPageLoad(NormalMode).url
+    controllers.add.routes.IndividualContactMethodOptionsController.onPageLoad(NormalMode).url
 
   private val formProvider = new IndividualContactMethodOptionsFormProvider()
   private val form         = formProvider()

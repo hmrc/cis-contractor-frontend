@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package forms
+package forms.add
 
 import forms.behaviours.CheckboxFieldBehaviours
-import models.IndividualContactMethodOptions
+import models.add.IndividualContactMethodOptions
 import play.api.data.FormError
 
 class IndividualContactMethodOptionsFormProviderSpec extends CheckboxFieldBehaviours {

@@ -14,23 +14,22 @@
  * limitations under the License.
  */
 
-package controllers
+package controllers.add
 
 import controllers.actions.*
-import forms.IndividualContactMethodOptionsFormProvider
-
-import javax.inject.Inject
+import forms.add.IndividualContactMethodOptionsFormProvider
 import models.Mode
 import models.requests.DataRequest
 import navigation.Navigator
-import pages.IndividualContactMethodOptionsPage
+import pages.add.IndividualContactMethodOptionsPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.SubcontractorNameExtractor
-import views.html.IndividualContactMethodOptionsView
+import views.html.add.IndividualContactMethodOptionsView
 
+import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class IndividualContactMethodOptionsController @Inject() (

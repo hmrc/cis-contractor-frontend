@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package views
+package views.add
 
-import forms.IndividualContactMethodOptionsFormProvider
+import forms.add.IndividualContactMethodOptionsFormProvider
 import models.NormalMode
-import models.IndividualContactMethodOptions
+import models.add.IndividualContactMethodOptions
 import org.jsoup.nodes.Document
 import org.jsoup.select.Elements
 import org.scalatest.matchers.must.Matchers
@@ -29,7 +29,7 @@ import play.api.i18n.Messages
 import play.api.mvc.Request
 import play.api.test.FakeRequest
 import play.twirl.api.HtmlFormat
-import views.html.IndividualContactMethodOptionsView
+import views.html.add.IndividualContactMethodOptionsView
 
 import java.util
 
@@ -46,6 +46,9 @@ class IndividualContactMethodOptionsViewSpec extends AnyWordSpec with Matchers w
 
       val legend: Elements = doc.select("fieldset legend")
       legend.text() mustBe messages("individualContactMethodOptions.heading", subcontractorName)
+      legend.hasClass("govuk-fieldset__legend--l") mustBe true
+
+      doc.select(".govuk-hint").text() mustBe messages("individualContactMethodOptions.hint")
 
       val checkboxes: Elements = doc.select(".govuk-checkboxes__item")
       checkboxes.size() mustBe IndividualContactMethodOptions.values.size
@@ -55,7 +58,7 @@ class IndividualContactMethodOptionsViewSpec extends AnyWordSpec with Matchers w
       labels must contain(messages("individualContactMethodOptions.phoneNumber"))
       labels must contain(messages("individualContactMethodOptions.mobileNumber"))
 
-      doc.select("form").attr("action") mustBe controllers.routes.IndividualContactMethodOptionsController
+      doc.select("form").attr("action") mustBe controllers.add.routes.IndividualContactMethodOptionsController
         .onSubmit(NormalMode)
         .url
 

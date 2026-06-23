@@ -14,39 +14,34 @@
  * limitations under the License.
  */
 
-package viewmodels.checkAnswers
+package viewmodels.checkAnswers.add
 
-import controllers.routes
 import models.{CheckMode, UserAnswers}
-import pages.IndividualContactMethodOptionsPage
+import pages.add.IndividualChooseContactDetailsPage
 import play.api.i18n.Messages
-import play.twirl.api.HtmlFormat
-import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
-import viewmodels.govuk.summarylist._
-import viewmodels.implicits._
+import utils.Utils
+import viewmodels.govuk.summarylist.*
+import viewmodels.implicits.*
+import viewmodels.checkAnswers.verify.ValueViewModelHelper
 
 object IndividualContactMethodOptionsSummary {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(IndividualContactMethodOptionsPage).map { answers =>
-
-      val value = ValueViewModel(
-        HtmlContent(
-          answers
-            .map { answer =>
-              HtmlFormat.escape(messages(s"individualContactMethodOptions.$answer")).toString
-            }
-            .mkString(",<br>")
-        )
+    answers.get(IndividualChooseContactDetailsPage).map { answer =>
+      val cyaMsg = Utils.findFirstMessagesValue(
+        Seq(s"individualContactMethodOptions.cya.$answer", s"individualChooseContactDetails.$answer")
       )
 
       SummaryListRowViewModel(
-        key = "individualContactMethodOptions.checkYourAnswersLabel",
-        value = value,
+        key = "individualChooseContactDetails.checkYourAnswersLabel",
+        value = ValueViewModel(cyaMsg),
         actions = Seq(
-          ActionItemViewModel("site.change", routes.IndividualContactMethodOptionsController.onPageLoad(CheckMode).url)
-            .withVisuallyHiddenText(messages("individualContactMethodOptions.change.hidden"))
+          ActionItemViewModel(
+            "site.change",
+            controllers.add.routes.IndividualChooseContactDetailsController.onPageLoad(CheckMode).url
+          )
+            .withVisuallyHiddenText(messages("individualChooseContactDetails.change.hidden"))
         )
       )
     }
