@@ -1054,4 +1054,4 @@ individualContactMethodOptions.mobileNumber = Mobile number
 individualContactMethodOptions.checkYourAnswersLabel = Methods of contact
 individualContactMethodOptions.hint = Contact details are only for your own records
 individualContactMethodOptions.error.required = Select the methods of contact you want to add for this subcontractor
-individualContactMethodOptions.change.hidden = method of contact
+individualContactMethodOptions.change.hidden = methods of contact
