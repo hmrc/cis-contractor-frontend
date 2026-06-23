@@ -20,7 +20,7 @@ import javax.inject.{Inject, Singleton}
 import navigation.NavigatorForJourney
 import controllers.routes
 import models.contact.ContactOptions.{Email, Mobile, NoDetails, Phone}
-import models.{CheckMode, Mode, NormalMode, UserAnswers}
+import models.{AmendMode, CheckMode, Mode, NormalMode, UserAnswers}
 import pages.Page
 import pages.add.*
 import play.api.mvc.Call
@@ -33,6 +33,13 @@ class IndividualNavigator @Inject() () extends NavigatorForJourney {
       normalRoutes(page)(userAnswers)
     case CheckMode  =>
       checkRouteMap(page)(userAnswers)
+    case AmendMode  =>
+      amendRouteMap(page)(userAnswers)
+  }
+
+  private def cyaRoute(mode: Mode): Call = mode match {
+    case AmendMode => controllers.amend.routes.AmendIndividualCheckYourAnswersController.onPageLoad()
+    case _         => controllers.add.routes.CheckYourAnswersController.onPageLoad()
   }
 
   private val normalRoutes: Page => UserAnswers => Call = {
@@ -84,6 +91,23 @@ class IndividualNavigator @Inject() () extends NavigatorForJourney {
     case _                                    => _ => controllers.add.routes.CheckYourAnswersController.onPageLoad()
   }
 
+  private val amendRouteMap: Page => UserAnswers => Call = {
+    case SubTradingNameYesNoPage              => navigatorFromSubTradingNameYesNoPage(AmendMode)(_)
+    case SubAddressYesNoPage                  => navigatorFromSubAddressYesNoPage(AmendMode)(_)
+    case NationalInsuranceNumberYesNoPage     => navigatorFromNationalInsuranceNumberYesNoPage(AmendMode)(_)
+    case UniqueTaxpayerReferenceYesNoPage     => navigatorFromUniqueTaxpayerReferenceYesNoPage(AmendMode)(_)
+    case WorksReferenceNumberYesNoPage        => navigatorFromWorksReferenceNumberYesNoPage(AmendMode)(_)
+    case IndividualChooseContactDetailsPage   => navigatorFromIndividualChooseContactDetailsPage(AmendMode)(_)
+    case IndividualMobileNumberPage           =>
+      _ => controllers.amend.routes.AmendIndividualCheckYourAnswersController.onPageLoad()
+    case IndividualPhoneNumberPage            =>
+      _ => controllers.amend.routes.AmendIndividualCheckYourAnswersController.onPageLoad()
+    case IndividualEmailAddressPage           =>
+      _ => controllers.amend.routes.AmendIndividualCheckYourAnswersController.onPageLoad()
+    case AddIndividualContactMethodsYesNoPage => navigatorFromAddIndividualContactMethodsYesNoPage(AmendMode)(_)
+    case _                                    => _ => controllers.amend.routes.AmendIndividualCheckYourAnswersController.onPageLoad()
+  }
+
   private def navigatorFromSubTradingNameYesNoPage(mode: Mode)(ua: UserAnswers): Call =
     (ua.get(SubTradingNameYesNoPage), mode) match {
       case (Some(true), NormalMode) =>
@@ -92,16 +116,16 @@ class IndividualNavigator @Inject() () extends NavigatorForJourney {
       case (Some(false), NormalMode) =>
         controllers.add.routes.SubcontractorNameController.onPageLoad(NormalMode)
 
-      case (Some(false), CheckMode) =>
+      case (Some(false), CheckMode | AmendMode) =>
         ua.get(SubcontractorNamePage) match {
-          case None    => controllers.add.routes.SubcontractorNameController.onPageLoad(CheckMode)
-          case Some(_) => controllers.add.routes.CheckYourAnswersController.onPageLoad()
+          case None    => controllers.add.routes.SubcontractorNameController.onPageLoad(mode)
+          case Some(_) => cyaRoute(mode)
         }
 
-      case (Some(true), CheckMode) =>
+      case (Some(true), CheckMode | AmendMode) =>
         ua.get(TradingNameOfSubcontractorPage) match {
-          case None    => controllers.add.routes.TradingNameOfSubcontractorController.onPageLoad(CheckMode)
-          case Some(_) => controllers.add.routes.CheckYourAnswersController.onPageLoad()
+          case None    => controllers.add.routes.TradingNameOfSubcontractorController.onPageLoad(mode)
+          case Some(_) => cyaRoute(mode)
         }
 
       case _ =>
@@ -110,36 +134,36 @@ class IndividualNavigator @Inject() () extends NavigatorForJourney {
 
   private def navigatorFromSubAddressYesNoPage(mode: Mode)(ua: UserAnswers): Call =
     (ua.get(SubAddressYesNoPage), mode) match {
-      case (Some(true), NormalMode)  =>
+      case (Some(true), NormalMode)           =>
         controllers.add.routes.AddressOfSubcontractorController.onPageLoad(NormalMode)
-      case (Some(false), NormalMode) =>
+      case (Some(false), NormalMode)          =>
         controllers.add.routes.IndividualChooseContactDetailsController.onPageLoad(NormalMode)
-      case (Some(true), CheckMode)   =>
+      case (Some(true), CheckMode | AmendMode) =>
         ua.get(AddressOfSubcontractorPage)
-          .fold(controllers.add.routes.AddressOfSubcontractorController.onPageLoad(CheckMode)) { _ =>
-            controllers.add.routes.CheckYourAnswersController.onPageLoad()
+          .fold(controllers.add.routes.AddressOfSubcontractorController.onPageLoad(mode)) { _ =>
+            cyaRoute(mode)
           }
-      case (Some(false), CheckMode)  =>
-        controllers.add.routes.CheckYourAnswersController.onPageLoad()
-      case _                         =>
+      case (Some(false), CheckMode | AmendMode) =>
+        cyaRoute(mode)
+      case _                                   =>
         routes.JourneyRecoveryController.onPageLoad()
     }
 
   private def navigatorFromNationalInsuranceNumberYesNoPage(mode: Mode)(ua: UserAnswers): Call =
     (ua.get(NationalInsuranceNumberYesNoPage), mode) match {
 
-      case (Some(true), NormalMode)  =>
+      case (Some(true), NormalMode)            =>
         controllers.add.routes.SubNationalInsuranceNumberController.onPageLoad(NormalMode)
-      case (Some(false), NormalMode) =>
+      case (Some(false), NormalMode)           =>
         controllers.add.routes.WorksReferenceNumberYesNoController.onPageLoad(NormalMode)
-      case (Some(true), CheckMode)   =>
+      case (Some(true), CheckMode | AmendMode) =>
         ua.get(SubNationalInsuranceNumberPage)
-          .fold(controllers.add.routes.SubNationalInsuranceNumberController.onPageLoad(CheckMode)) { _ =>
-            controllers.add.routes.CheckYourAnswersController.onPageLoad()
+          .fold(controllers.add.routes.SubNationalInsuranceNumberController.onPageLoad(mode)) { _ =>
+            cyaRoute(mode)
           }
-      case (Some(false), CheckMode)  =>
-        controllers.add.routes.CheckYourAnswersController.onPageLoad()
-      case _                         =>
+      case (Some(false), CheckMode | AmendMode) =>
+        cyaRoute(mode)
+      case _                                   =>
         routes.JourneyRecoveryController.onPageLoad()
     }
 
@@ -151,14 +175,14 @@ class IndividualNavigator @Inject() () extends NavigatorForJourney {
       case (Some(false), NormalMode) =>
         controllers.add.routes.NationalInsuranceNumberYesNoController.onPageLoad(NormalMode)
 
-      case (Some(true), CheckMode) =>
+      case (Some(true), CheckMode | AmendMode) =>
         ua.get(SubcontractorsUniqueTaxpayerReferencePage)
-          .fold(controllers.add.routes.SubcontractorsUniqueTaxpayerReferenceController.onPageLoad(CheckMode)) { _ =>
-            controllers.add.routes.CheckYourAnswersController.onPageLoad()
+          .fold(controllers.add.routes.SubcontractorsUniqueTaxpayerReferenceController.onPageLoad(mode)) { _ =>
+            cyaRoute(mode)
           }
 
-      case (Some(false), CheckMode) =>
-        controllers.add.routes.CheckYourAnswersController.onPageLoad()
+      case (Some(false), CheckMode | AmendMode) =>
+        cyaRoute(mode)
 
       case _ =>
         routes.JourneyRecoveryController.onPageLoad()
@@ -172,14 +196,15 @@ class IndividualNavigator @Inject() () extends NavigatorForJourney {
 
       case (Some(false), NormalMode) =>
         controllers.add.routes.CheckYourAnswersController.onPageLoad()
-      case (Some(true), CheckMode)   =>
+
+      case (Some(true), CheckMode | AmendMode) =>
         ua.get(WorksReferenceNumberPage)
-          .fold(controllers.add.routes.WorksReferenceNumberController.onPageLoad(CheckMode)) { _ =>
-            controllers.add.routes.CheckYourAnswersController.onPageLoad()
+          .fold(controllers.add.routes.WorksReferenceNumberController.onPageLoad(mode)) { _ =>
+            cyaRoute(mode)
           }
 
-      case (Some(false), CheckMode) =>
-        controllers.add.routes.CheckYourAnswersController.onPageLoad()
+      case (Some(false), CheckMode | AmendMode) =>
+        cyaRoute(mode)
 
       case _ =>
         routes.JourneyRecoveryController.onPageLoad()
@@ -190,33 +215,33 @@ class IndividualNavigator @Inject() () extends NavigatorForJourney {
 
       case (Some(Email), NormalMode) =>
         controllers.add.routes.IndividualEmailAddressController.onPageLoad(NormalMode)
-      case (Some(Email), CheckMode)  =>
+      case (Some(Email), CheckMode | AmendMode) =>
         userAnswers
           .get(IndividualEmailAddressPage)
-          .fold(controllers.add.routes.IndividualEmailAddressController.onPageLoad(CheckMode)) { _ =>
-            controllers.add.routes.CheckYourAnswersController.onPageLoad()
+          .fold(controllers.add.routes.IndividualEmailAddressController.onPageLoad(mode)) { _ =>
+            cyaRoute(mode)
           }
 
       case (Some(Phone), NormalMode) =>
         controllers.add.routes.IndividualPhoneNumberController.onPageLoad(NormalMode)
-      case (Some(Phone), CheckMode)  =>
+      case (Some(Phone), CheckMode | AmendMode) =>
         userAnswers
           .get(IndividualPhoneNumberPage)
-          .fold(controllers.add.routes.IndividualPhoneNumberController.onPageLoad(CheckMode)) { _ =>
-            controllers.add.routes.CheckYourAnswersController.onPageLoad()
+          .fold(controllers.add.routes.IndividualPhoneNumberController.onPageLoad(mode)) { _ =>
+            cyaRoute(mode)
           }
 
       case (Some(Mobile), NormalMode) =>
         controllers.add.routes.IndividualMobileNumberController.onPageLoad(NormalMode)
-      case (Some(Mobile), CheckMode)  =>
+      case (Some(Mobile), CheckMode | AmendMode) =>
         userAnswers
           .get(IndividualMobileNumberPage)
-          .fold(controllers.add.routes.IndividualMobileNumberController.onPageLoad(CheckMode)) { _ =>
-            controllers.add.routes.CheckYourAnswersController.onPageLoad()
+          .fold(controllers.add.routes.IndividualMobileNumberController.onPageLoad(mode)) { _ =>
+            cyaRoute(mode)
           }
 
-      case (Some(NoDetails), CheckMode) =>
-        controllers.add.routes.CheckYourAnswersController.onPageLoad()
+      case (Some(NoDetails), CheckMode | AmendMode) =>
+        cyaRoute(mode)
 
       case (Some(_), _) =>
         controllers.add.routes.UniqueTaxpayerReferenceYesNoController.onPageLoad(mode)
@@ -234,6 +259,9 @@ class IndividualNavigator @Inject() () extends NavigatorForJourney {
 
       case (Some(false), CheckMode) =>
         controllers.add.routes.CheckYourAnswersController.onPageLoad()
+
+      case (Some(false), AmendMode) =>
+        controllers.amend.routes.AmendIndividualCheckYourAnswersController.onPageLoad()
 
       case _ =>
         routes.JourneyRecoveryController.onPageLoad()

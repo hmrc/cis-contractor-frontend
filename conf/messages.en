@@ -7,6 +7,8 @@ site.change                          =  Change
 site.no                              =  No
 site.yes                             =  Yes
 site.continue                        =  Continue
+site.update                          =  Update
+site.none                            =  None
 site.start                           =  Start now
 site.startAgain                      =  Start again
 site.signIn                          =  Sign in
@@ -54,6 +56,24 @@ checkYourAnswers.heading.sub.h2      =  Subcontractor details
 checkYourAnswers.heading.h2          =  Now add this subcontractor
 checkYourAnswers.p1                  =  By adding this subcontractor you are confirming that, to the best of your knowledge, the details you are providing are correct.
 checkYourAnswers.addSubcontractor    =  Accept and submit
+
+amendIndividualCheckYourAnswers.title             =  Amend subcontractor details
+amendIndividualCheckYourAnswers.heading.sub.h2    =  Subcontractor details
+amendIndividualCheckYourAnswers.confirm.h2        =  Confirm changes
+amendIndividualCheckYourAnswers.confirm.p1        =  By changing this subcontractor''s details you are confirming that, to the best of your knowledge, the details you are providing are correct.
+amendIndividualCheckYourAnswers.acceptAndSubmit   =  Accept and submit
+amendIndividualCheckYourAnswers.cancelChanges     =  Cancel changes
+
+individualAmended.panel.heading              =  Subcontractor details updated
+individualAmended.p1                         =  You have updated the subcontractor details for {0}.
+individualAmended.updatesMade.h2             =  Updates made
+individualAmended.table.field                =
+individualAmended.table.previous             =  Previous
+individualAmended.table.updated              =  Updated
+individualAmended.backToSubcontractors       =  Back to your subcontractors
+individualAmended.beforeYouGo.h2             =  Before you go
+individualAmended.beforeYouGo.p1             =  Your feedback helps us make our service better.
+individualAmended.beforeYouGo.link           =  Take a short survey to share your feedback on this service.
 
 site.pagination.previous             =  Previous
 site.pagination.next                 =  Next
@@ -188,6 +208,7 @@ subNationalInsuranceNumber.error.required                                =  Ente
 subNationalInsuranceNumber.error.length                                  =  Enter a valid National Insurance number
 subNationalInsuranceNumber.error.invalidCharacters                       =  Enter a valid National Insurance number
 subNationalInsuranceNumber.change.hidden                                 =  National Insurance number
+subNationalInsuranceNumber.remove.hidden                                 =  National Insurance number
 
 worksReferenceNumber.title                                               =  What is the works reference number associated with this subcontractor?
 worksReferenceNumber.heading                                             =  What is the works reference number associated with {0}?
@@ -197,6 +218,7 @@ worksReferenceNumber.error.required                                      =  Ente
 worksReferenceNumber.error.invalid                                       =  Enter a valid works reference number
 worksReferenceNumber.error.length                                        =  Enter a works reference number, up to 20 characters
 worksReferenceNumber.change.hidden                                       =  works reference number
+worksReferenceNumber.remove.hidden                                       =  works reference number
 
 addressOfSubcontractor.title                                             =  What is the address for this subcontractor?
 addressOfSubcontractor.heading                                           =  What is the address for {0}?
@@ -227,6 +249,8 @@ addressOfSubcontractor.error.postalCode.length                           =  Ente
 addressOfSubcontractor.error.postalCode.invalid                          =  Enter a postal code in the correct format
 addressOfSubcontractor.error.addressLine3.length                         =  Enter a town or city using 35 characters or less
 addressOfSubcontractor.error.addressLine4.length                         =  Enter a county using 35 characters or less
+addressOfSubcontractor.change.hidden                                     =  address
+addressOfSubcontractor.remove.hidden                                     =  address
 
 subcontractorsUniqueTaxpayerReference.title                              =  Self Assessment Unique Taxpayer Reference (UTR)
 subcontractorsUniqueTaxpayerReference.heading                            =  Self Assessment Unique Taxpayer Reference (UTR)
@@ -240,6 +264,7 @@ subcontractorsUniqueTaxpayerReference.error.invalid                      =  Ente
 subcontractorsUniqueTaxpayerReference.error.length                       =  Enter a valid Unique Taxpayer Reference (UTR) using 10 numbers, like 1234567890
 subcontractorsUniqueTaxpayerReference.error.duplicate                    =  You have already used this Unique Taxpayer Reference (UTR) for an existing subcontractor
 subcontractorsUniqueTaxpayerReference.change.hidden                      =  UTR
+subcontractorsUniqueTaxpayerReference.remove.hidden                      =  UTR
 
 subcontractorAdded.title                                                 =  {0} subcontractor added
 subcontractorAdded.heading                                               =  Subcontractor added

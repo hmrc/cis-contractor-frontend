@@ -32,17 +32,18 @@
             @govukErrorSummary(ErrorSummaryViewModel(form, errorLinkOverrides = Map("value" -> "value_0")))
         }
 
-        @govukRadios(
-            RadiosViewModel.yesNo(
+        @govukRadios({
+            val radios = RadiosViewModel.yesNo(
                 field = form("value"),
                 legend = LegendViewModel(messages("nationalInsuranceNumberYesNo.heading", name))
                     .asPageHeading()
                     .withCssClass("govuk-fieldset__legend--l")
-            ).withHint(HintViewModel(messages("nationalInsuranceNumberYesNo.hint")))
-        )
+            )
+            if(mode != models.AmendMode) radios.withHint(HintViewModel(messages("nationalInsuranceNumberYesNo.hint"))) else radios
+        })
 
         @govukButton(
-            ButtonViewModel(messages("site.continue"))
+            ButtonViewModel(messages(if(mode == models.AmendMode) "site.update" else "site.continue"))
         )
     }
 }

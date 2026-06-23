@@ -49,21 +49,19 @@
             isNewTab = true
         )
 
-        @govukInput(
-            InputViewModel(
+        @govukInput({
+            val input = InputViewModel(
                 field = form("value"),
                 label = LabelViewModel(messages("subcontractorsUniqueTaxpayerReference.label", name)).withSize(Medium)
             )
             .withWidth(Fixed10)
-            .withHint(Hint(
-                content = Messages("subcontractorsUniqueTaxpayerReference.hint"))
-            )
             .withSpellcheck(false)
             .withAutocomplete("off")
-        )
+            if(mode != models.AmendMode) input.withHint(Hint(content = Messages("subcontractorsUniqueTaxpayerReference.hint"))) else input
+        })
 
         @govukButton(
-            ButtonViewModel(messages("site.continue"))
+            ButtonViewModel(messages(if(mode == models.AmendMode) "site.update" else "site.continue"))
         )
     }
 }

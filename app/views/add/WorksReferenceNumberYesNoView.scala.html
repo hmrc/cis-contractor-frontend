@@ -37,15 +37,16 @@
             @govukErrorSummary(ErrorSummaryViewModel(form, errorLinkOverrides = Map("value" -> "value_0")))
         }
 
-        @govukRadios(
-            RadiosViewModel.yesNo(
+        @govukRadios({
+            val radios = RadiosViewModel.yesNo(
                 field = form("value"),
                 legend = LegendViewModel(messages("worksReferenceNumberYesNo.heading", name)).asPageHeading(Large)
-            ).withHint(HintViewModel(messages("worksReferenceNumberYesNo.hint")))
-        )
+            )
+            if(mode != models.AmendMode) radios.withHint(HintViewModel(messages("worksReferenceNumberYesNo.hint"))) else radios
+        })
 
         @govukButton(
-            ButtonViewModel(messages("site.continue"))
+            ButtonViewModel(messages(if(mode == models.AmendMode) "site.update" else "site.continue"))
         )
     }
 }

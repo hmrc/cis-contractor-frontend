@@ -126,6 +126,69 @@ POST  /subcontractor/add/add-contact-details         controllers.add.AddIndividu
 GET   /subcontractor/add/change-add-contact-details  controllers.add.AddIndividualContactMethodsYesNoController.onPageLoad(mode: Mode = CheckMode)
 POST  /subcontractor/add/change-add-contact-details  controllers.add.AddIndividualContactMethodsYesNoController.onSubmit(mode: Mode = CheckMode)
 
+# Individual Amend
+GET   /subcontractor/amend/individual                                    controllers.amend.AmendIndividualController.onPageLoad()
+
+GET   /subcontractor/amend/check-your-answers                            controllers.amend.AmendIndividualCheckYourAnswersController.onPageLoad()
+POST  /subcontractor/amend/check-your-answers                            controllers.amend.AmendIndividualCheckYourAnswersController.onSubmit()
+GET   /subcontractor/amend/cancel                                        controllers.amend.AmendIndividualCheckYourAnswersController.onCancel()
+
+GET   /subcontractor/amend/individual/updated                            controllers.amend.IndividualAmendedController.onPageLoad()
+
+GET   /subcontractor/amend/check-trading-name                            controllers.add.SubTradingNameYesNoController.onPageLoad(mode: Mode = AmendMode)
+POST  /subcontractor/amend/check-trading-name                            controllers.add.SubTradingNameYesNoController.onSubmit(mode: Mode = AmendMode)
+
+GET   /subcontractor/amend/trading-name                                  controllers.add.TradingNameOfSubcontractorController.onPageLoad(mode: Mode = AmendMode)
+POST  /subcontractor/amend/trading-name                                  controllers.add.TradingNameOfSubcontractorController.onSubmit(mode: Mode = AmendMode)
+
+GET   /subcontractor/amend/name                                          controllers.add.SubcontractorNameController.onPageLoad(mode: Mode = AmendMode)
+POST  /subcontractor/amend/name                                          controllers.add.SubcontractorNameController.onSubmit(mode: Mode = AmendMode)
+
+GET   /subcontractor/amend/check-address                                 controllers.add.SubAddressYesNoController.onPageLoad(mode: Mode = AmendMode)
+POST  /subcontractor/amend/check-address                                 controllers.add.SubAddressYesNoController.onSubmit(mode: Mode = AmendMode)
+
+GET   /subcontractor/amend/address                                       controllers.add.AddressOfSubcontractorController.onPageLoad(mode: Mode = AmendMode)
+POST  /subcontractor/amend/address                                       controllers.add.AddressOfSubcontractorController.onSubmit(mode: Mode = AmendMode)
+
+GET   /subcontractor/amend/check-contact-details                         controllers.add.IndividualChooseContactDetailsController.onPageLoad(mode: Mode = AmendMode)
+POST  /subcontractor/amend/check-contact-details                         controllers.add.IndividualChooseContactDetailsController.onSubmit(mode: Mode = AmendMode)
+
+GET   /subcontractor/amend/email-address                                 controllers.add.IndividualEmailAddressController.onPageLoad(mode: Mode = AmendMode)
+POST  /subcontractor/amend/email-address                                 controllers.add.IndividualEmailAddressController.onSubmit(mode: Mode = AmendMode)
+
+GET   /subcontractor/amend/phone-number                                  controllers.add.IndividualPhoneNumberController.onPageLoad(mode: Mode = AmendMode)
+POST  /subcontractor/amend/phone-number                                  controllers.add.IndividualPhoneNumberController.onSubmit(mode: Mode = AmendMode)
+
+GET   /subcontractor/amend/mobile-number                                 controllers.add.IndividualMobileNumberController.onPageLoad(mode: Mode = AmendMode)
+POST  /subcontractor/amend/mobile-number                                 controllers.add.IndividualMobileNumberController.onSubmit(mode: Mode = AmendMode)
+
+GET   /subcontractor/amend/add-contact-details                           controllers.add.AddIndividualContactMethodsYesNoController.onPageLoad(mode: Mode = AmendMode)
+POST  /subcontractor/amend/add-contact-details                           controllers.add.AddIndividualContactMethodsYesNoController.onSubmit(mode: Mode = AmendMode)
+
+GET   /subcontractor/amend/check-unique-taxpayer-reference               controllers.add.UniqueTaxpayerReferenceYesNoController.onPageLoad(mode: Mode = AmendMode)
+POST  /subcontractor/amend/check-unique-taxpayer-reference               controllers.add.UniqueTaxpayerReferenceYesNoController.onSubmit(mode: Mode = AmendMode)
+
+GET   /subcontractor/amend/unique-taxpayer-reference                     controllers.add.SubcontractorsUniqueTaxpayerReferenceController.onPageLoad(mode: Mode = AmendMode)
+POST  /subcontractor/amend/unique-taxpayer-reference                     controllers.add.SubcontractorsUniqueTaxpayerReferenceController.onSubmit(mode: Mode = AmendMode)
+
+GET   /subcontractor/amend/check-national-insurance-number               controllers.add.NationalInsuranceNumberYesNoController.onPageLoad(mode: Mode = AmendMode)
+POST  /subcontractor/amend/check-national-insurance-number               controllers.add.NationalInsuranceNumberYesNoController.onSubmit(mode: Mode = AmendMode)
+
+GET   /subcontractor/amend/national-insurance-number                     controllers.add.SubNationalInsuranceNumberController.onPageLoad(mode: Mode = AmendMode)
+POST  /subcontractor/amend/national-insurance-number                     controllers.add.SubNationalInsuranceNumberController.onSubmit(mode: Mode = AmendMode)
+
+GET   /subcontractor/amend/check-works-reference-number                  controllers.add.WorksReferenceNumberYesNoController.onPageLoad(mode: Mode = AmendMode)
+POST  /subcontractor/amend/check-works-reference-number                  controllers.add.WorksReferenceNumberYesNoController.onSubmit(mode: Mode = AmendMode)
+
+GET   /subcontractor/amend/works-reference-number                        controllers.add.WorksReferenceNumberController.onPageLoad(mode: Mode = AmendMode)
+POST  /subcontractor/amend/works-reference-number                        controllers.add.WorksReferenceNumberController.onSubmit(mode: Mode = AmendMode)
+
+GET   /subcontractor/amend/remove/trading-name                           controllers.amend.RemoveIndividualTradingNameController.onPageLoad()
+GET   /subcontractor/amend/remove/address                                controllers.amend.RemoveIndividualAddressController.onPageLoad()
+GET   /subcontractor/amend/remove/unique-taxpayer-reference              controllers.amend.RemoveIndividualUtrController.onPageLoad()
+GET   /subcontractor/amend/remove/national-insurance-number              controllers.amend.RemoveIndividualNinoController.onPageLoad()
+GET   /subcontractor/amend/remove/works-reference-number                 controllers.amend.RemoveIndividualWorksReferenceController.onPageLoad()
+
 # Company
 GET   /subcontractor/add/company/subcontractor-added  controllers.add.SubcontractorAddedController.companySubcontractorAdded()
 

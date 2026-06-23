@@ -35,20 +35,20 @@
             @govukErrorSummary(ErrorSummaryViewModel(form))
         }
 
-        @govukInput(
-            InputViewModel(
+        @govukInput({
+            val input = InputViewModel(
                 field = form("value"),
                 label = LabelViewModel(messages("individualMobileNumber.heading", name)).asPageHeading(Large)
             )
-            .withHint(HintViewModel(messages("individualMobileNumber.hint")))
             .withWidth(Full)
             .withInputType("tel")
             .withSpellcheck(false)
             .withAutocomplete("tel")
-        )
+            if(mode != models.AmendMode) input.withHint(HintViewModel(messages("individualMobileNumber.hint"))) else input
+        })
 
         @govukButton(
-            ButtonViewModel(messages("site.continue"))
+            ButtonViewModel(messages(if(mode == models.AmendMode) "site.update" else "site.continue"))
         )
     }
 }

@@ -35,19 +35,19 @@
             @govukErrorSummary(ErrorSummaryViewModel(form))
         }
 
-        @govukInput(
-            InputViewModel(
+        @govukInput({
+            val input = InputViewModel(
                 field = form("value"),
                 label = LabelViewModel(messages("individualEmailAddress.heading", subcontractorName)).asPageHeading(Large)
-                )
-                .withHint(HintViewModel(messages("individualEmailAddress.hintText")))
-                .withWidth(Full)
-                .withSpellcheck(false)
-                .asEmail()
-        )
+            )
+            .withWidth(Full)
+            .withSpellcheck(false)
+            .asEmail()
+            if(mode != models.AmendMode) input.withHint(HintViewModel(messages("individualEmailAddress.hintText"))) else input
+        })
 
         @govukButton(
-            ButtonViewModel(messages("site.continue"))
+            ButtonViewModel(messages(if(mode == models.AmendMode) "site.update" else "site.continue"))
         )
     }
 }

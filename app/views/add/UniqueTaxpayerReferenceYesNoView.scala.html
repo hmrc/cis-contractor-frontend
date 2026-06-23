@@ -34,16 +34,16 @@
             @govukErrorSummary(ErrorSummaryViewModel(form, errorLinkOverrides = Map("value" -> "value_0")))
         }
 
-        @govukRadios(
-            RadiosViewModel.yesNo(
+        @govukRadios({
+            val radios = RadiosViewModel.yesNo(
                 field = form("value"),
-                legend = LegendViewModel(messages("uniqueTaxpayerReferenceYesNo.heading", name))
-                    .asPageHeading(Large)
-            ).withHint(HintViewModel(messages("uniqueTaxpayerReferenceYesNo.hint")))
-        )
+                legend = LegendViewModel(messages("uniqueTaxpayerReferenceYesNo.heading", name)).asPageHeading(Large)
+            )
+            if(mode != models.AmendMode) radios.withHint(HintViewModel(messages("uniqueTaxpayerReferenceYesNo.hint"))) else radios
+        })
 
         @govukButton(
-            ButtonViewModel(messages("site.continue"))
+            ButtonViewModel(messages(if(mode == models.AmendMode) "site.update" else "site.continue"))
         )
     }
 }
