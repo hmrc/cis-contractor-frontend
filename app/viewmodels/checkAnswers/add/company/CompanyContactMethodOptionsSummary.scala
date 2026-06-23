@@ -21,6 +21,7 @@ import models.{CheckMode, UserAnswers}
 import pages.add.company.CompanyContactMethodOptionsPage
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
+import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.checkAnswers.verify.ValueViewModelHelper
 import viewmodels.govuk.summarylist.*
@@ -29,24 +30,24 @@ import viewmodels.implicits.*
 object CompanyContactMethodOptionsSummary {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(CompanyContactMethodOptionsPage).flatMap { selectedMethods =>
+    answers.get(CompanyContactMethodOptionsPage).map { selectedMethods =>
       val options =
-        ContactMethodOptions.values
-          .filter(selectedMethods.contains)
-          .map(selectedMethod => HtmlFormat.escape(messages(s"companyContactMethodOptions.$selectedMethod")).toString)
-      ValueViewModelHelper.makeGovukBulletList(options).map { value =>
-        SummaryListRowViewModel(
-          key = "companyContactMethodOptions.checkYourAnswersLabel",
-          value = value,
-          actions = Seq(
-            ActionItemViewModel(
-              "site.change",
-              controllers.add.company.routes.CompanyContactMethodOptionsController.onPageLoad(CheckMode).url
-            )
-              .withVisuallyHiddenText(messages("companyContactMethodOptions.change.hidden"))
-              .withAttribute("id" -> "company-contact-methods")
+        ContactMethodOptions
+          .ordered(selectedMethods)
+          .map(m => HtmlFormat.escape(messages(s"companyContactMethodOptions.$m")).toString)
+      SummaryListRowViewModel(
+        key = "companyContactMethodOptions.checkYourAnswersLabel",
+        value = ValueViewModelHelper
+          .makeGovukBulletList(options)
+          .getOrElse(ValueViewModel(HtmlContent(""))),
+        actions = Seq(
+          ActionItemViewModel(
+            "site.change",
+            controllers.add.company.routes.CompanyContactMethodOptionsController.onPageLoad(CheckMode).url
           )
+            .withVisuallyHiddenText(messages("companyContactMethodOptions.change.hidden"))
+            .withAttribute("id" -> "company-contact-methods")
         )
-      }
+      )
     }
 }

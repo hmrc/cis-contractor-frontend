@@ -21,6 +21,7 @@ import models.{CheckMode, UserAnswers}
 import pages.add.partnership.PartnershipContactMethodOptionsPage
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
+import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.checkAnswers.verify.ValueViewModelHelper
 import viewmodels.govuk.summarylist.*
@@ -29,26 +30,24 @@ import viewmodels.implicits.*
 object PartnershipContactMethodOptionsSummary {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(PartnershipContactMethodOptionsPage).flatMap { selectedMethods =>
+    answers.get(PartnershipContactMethodOptionsPage).map { selectedMethods =>
       val options =
-        ContactMethodOptions.values
-          .filter(selectedMethods.contains)
-          .map(selectedMethod =>
-            HtmlFormat.escape(messages(s"partnershipContactMethodOptions.$selectedMethod")).toString
+        ContactMethodOptions
+          .ordered(selectedMethods)
+          .map(m => HtmlFormat.escape(messages(s"partnershipContactMethodOptions.$m")).toString)
+      SummaryListRowViewModel(
+        key = "partnershipContactMethodOptions.checkYourAnswersLabel",
+        value = ValueViewModelHelper
+          .makeGovukBulletList(options)
+          .getOrElse(ValueViewModel(HtmlContent(""))),
+        actions = Seq(
+          ActionItemViewModel(
+            "site.change",
+            controllers.add.partnership.routes.PartnershipContactMethodOptionsController.onPageLoad(CheckMode).url
           )
-      ValueViewModelHelper.makeGovukBulletList(options).map { value =>
-        SummaryListRowViewModel(
-          key = "partnershipContactMethodOptions.checkYourAnswersLabel",
-          value = value,
-          actions = Seq(
-            ActionItemViewModel(
-              "site.change",
-              controllers.add.partnership.routes.PartnershipContactMethodOptionsController.onPageLoad(CheckMode).url
-            )
-              .withVisuallyHiddenText(messages("partnershipContactMethodOptions.change.hidden"))
-              .withAttribute("id" -> "partnership-contact-methods")
-          )
+            .withVisuallyHiddenText(messages("partnershipContactMethodOptions.change.hidden"))
+            .withAttribute("id" -> "partnership-contact-methods")
         )
-      }
+      )
     }
 }
