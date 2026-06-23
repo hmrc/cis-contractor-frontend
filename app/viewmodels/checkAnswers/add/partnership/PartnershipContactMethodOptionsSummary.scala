@@ -16,6 +16,7 @@
 
 package viewmodels.checkAnswers.add.partnership
 
+import models.contact.ContactMethodOptions
 import models.{CheckMode, UserAnswers}
 import pages.add.partnership.PartnershipContactMethodOptionsPage
 import play.api.i18n.Messages
@@ -30,11 +31,11 @@ object PartnershipContactMethodOptionsSummary {
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
     answers.get(PartnershipContactMethodOptionsPage).flatMap { selectedMethods =>
       val options =
-        selectedMethods
+        ContactMethodOptions.values
+          .filter(selectedMethods.contains)
           .map(selectedMethod =>
             HtmlFormat.escape(messages(s"partnershipContactMethodOptions.$selectedMethod")).toString
           )
-          .toSeq
       ValueViewModelHelper.makeGovukBulletList(options).map { value =>
         SummaryListRowViewModel(
           key = "partnershipContactMethodOptions.checkYourAnswersLabel",

@@ -16,6 +16,7 @@
 
 package viewmodels.checkAnswers.add.trust
 
+import models.contact.ContactMethodOptions
 import models.{CheckMode, UserAnswers}
 import pages.add.trust.TrustContactMethodOptionsPage
 import play.api.i18n.Messages
@@ -30,9 +31,9 @@ object TrustContactMethodOptionsSummary {
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
     answers.get(TrustContactMethodOptionsPage).flatMap { selectedMethods =>
       val options =
-        selectedMethods
+        ContactMethodOptions.values
+          .filter(selectedMethods.contains)
           .map(selectedMethod => HtmlFormat.escape(messages(s"trustContactMethodOptions.$selectedMethod")).toString)
-          .toSeq
       ValueViewModelHelper.makeGovukBulletList(options).map { value =>
         SummaryListRowViewModel(
           key = "trustContactMethodOptions.checkYourAnswersLabel",
