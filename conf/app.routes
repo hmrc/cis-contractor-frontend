@@ -308,6 +308,11 @@ POST  /subcontractor/add/partnership/add-contact-details         controllers.add
 GET   /subcontractor/add/partnership/change-add-contact-details  controllers.add.partnership.AddPartnershipContactMethodsYesNoController.onPageLoad(mode: Mode = CheckMode)
 POST  /subcontractor/add/partnership/change-add-contact-details  controllers.add.partnership.AddPartnershipContactMethodsYesNoController.onSubmit(mode: Mode = CheckMode)
 
+GET   /subcontractor/add/partnership/select-contact-details         controllers.add.partnership.PartnershipContactMethodOptionsController.onPageLoad(mode: Mode = NormalMode)
+POST  /subcontractor/add/partnership/select-contact-details         controllers.add.partnership.PartnershipContactMethodOptionsController.onSubmit(mode: Mode = NormalMode)
+GET   /subcontractor/add/partnership/change-select-contact-details  controllers.add.partnership.PartnershipContactMethodOptionsController.onPageLoad(mode: Mode = CheckMode)
+POST  /subcontractor/add/partnership/change-select-contact-details  controllers.add.partnership.PartnershipContactMethodOptionsController.onSubmit(mode: Mode = CheckMode)
+
 # Trust
 GET   /subcontractor/add/trust/subcontractor-added               controllers.add.SubcontractorAddedController.trustSubcontractorAdded()
 
