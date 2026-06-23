@@ -17,10 +17,10 @@
 package viewmodels.checkAnswers.add
 
 import models.{CheckMode, UserAnswers}
-import pages.add.IndividualChooseContactDetailsPage
+import pages.add.IndividualContactMethodOptionsPage
 import play.api.i18n.Messages
+import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
-import utils.Utils
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
 import viewmodels.checkAnswers.verify.ValueViewModelHelper
@@ -28,21 +28,24 @@ import viewmodels.checkAnswers.verify.ValueViewModelHelper
 object IndividualContactMethodOptionsSummary {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(IndividualChooseContactDetailsPage).map { answer =>
-      val cyaMsg = Utils.findFirstMessagesValue(
-        Seq(s"individualContactMethodOptions.cya.$answer", s"individualChooseContactDetails.$answer")
-      )
-
-      SummaryListRowViewModel(
-        key = "individualChooseContactDetails.checkYourAnswersLabel",
-        value = ValueViewModel(cyaMsg),
-        actions = Seq(
-          ActionItemViewModel(
-            "site.change",
-            controllers.add.routes.IndividualChooseContactDetailsController.onPageLoad(CheckMode).url
+    answers.get(IndividualContactMethodOptionsPage).flatMap { selectedMethods =>
+      val options =
+        selectedMethods
+          .map(selectedMethod => HtmlFormat.escape(messages(s"individualContactMethodOptions.$selectedMethod")).toString)
+          .toSeq
+      ValueViewModelHelper.makeGovukBulletList(options).map { value =>
+        SummaryListRowViewModel(
+          key = "individualContactMethodOptions.checkYourAnswersLabel",
+          value = value,
+          actions = Seq(
+            ActionItemViewModel(
+              "site.change",
+              controllers.add.routes.IndividualContactMethodOptionsController.onPageLoad(CheckMode).url
+            )
+              .withVisuallyHiddenText(messages("individualContactMethodOptions.change.hidden"))
+              .withAttribute("id" -> "individual-contact-method-options")
           )
-            .withVisuallyHiddenText(messages("individualChooseContactDetails.change.hidden"))
         )
-      )
+      }
     }
 }
