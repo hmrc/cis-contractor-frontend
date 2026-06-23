@@ -1000,7 +1000,7 @@ contractordetails.enterContractorEmailAddress.error.invalid                    =
 contractordetails.enterContractorEmailAddress.change.hidden                    =  email address
 
 contractordetails.contractorDetailsUpdated.title                               =  Contractor Details Updated
-contractordetails.contractorDetailsUpdated.heading                             =  Contractor Details Updated
+contractordetails.contractorDetailsUpdated.heading                             =  Contractor details updated
 contractordetails.contractorDetailsUpdated.p1.details.prefix                   =  You have successfully changed the contractor details. You can
 contractordetails.contractorDetailsUpdated.p1.details.link                     =  view the change on your contractor details
 contractordetails.contractorDetailsUpdated.returnToDashboard.link              =  Return to CIS dashboard
