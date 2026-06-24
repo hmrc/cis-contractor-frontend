@@ -63,7 +63,9 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
 
   lazy val cacheTtl: Long = configuration.get[Int]("mongodb.timeToLiveInSeconds")
 
-  lazy val submissionPollTimeoutSeconds: Int = configuration.get[Int]("submission-poll-timeout-seconds")
+  lazy val submissionPollTimeoutSeconds: Int         = configuration.get[Int]("submission-poll-timeout-seconds")
+  lazy val submissionPollDefaultIntervalSeconds: Int =
+    configuration.get[Int]("submission-poll-default-interval-seconds")
 
   lazy val locationCanonicalList: Seq[(String, String)] = {
     val source     = Source.fromResource("location-autocomplete-canonical-list.json")
