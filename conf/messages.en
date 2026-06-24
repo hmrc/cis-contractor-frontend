@@ -13,6 +13,7 @@ site.signIn                          =  Sign in
 site.govuk                           =  GOV.UK
 site.saveAndContinue                 =  Save and continue
 site.unknown                         =  Unknown
+site.update                          =  Update
 
 date.day                             =  Day
 date.month                           =  Month

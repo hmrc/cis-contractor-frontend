@@ -20,7 +20,7 @@ import base.SpecBase
 import controllers.routes
 import models.add.SubcontractorName
 import models.contact.ContactOptions
-import models.{CheckMode, NormalMode, UserAnswers}
+import models.{AmendMode, CheckMode, NormalMode, UserAnswers}
 import pages.Page
 import pages.add.*
 
@@ -706,6 +706,90 @@ class IndividualNavigatorSpec extends SpecBase {
             emptyUserAnswers
           ) mustBe journeyRecovery
         }
+      }
+    }
+
+    "in Amend mode" - {
+
+      "must go from a page that doesn't exist in the amend route map to Amend CYA" in {
+
+        case object UnknownPage extends Page
+
+        navigator.nextPage(
+          UnknownPage,
+          AmendMode,
+          UserAnswers("id")
+        ) mustBe controllers.amend.routes.AmendIndividualCheckYourAnswersController.onPageLoad()
+      }
+
+      "must go to SubcontractorNameController when answer is No and name is missing" in {
+        val ua =
+          emptyUserAnswers
+            .set(SubTradingNameYesNoPage, false)
+            .success
+            .value
+
+        navigator.nextPage(
+          SubTradingNameYesNoPage,
+          AmendMode,
+          ua
+        ) mustBe controllers.add.routes.SubcontractorNameController.onPageLoad(AmendMode)
+      }
+
+      "must go to Amend CYA when answer is No and subcontractor name already exists" in {
+        val ua =
+          emptyUserAnswers
+            .set(SubTradingNameYesNoPage, false)
+            .success
+            .value
+            .set(SubcontractorNamePage, SubcontractorName("Jane", None, "Doe"))
+            .success
+            .value
+
+        navigator.nextPage(
+          SubTradingNameYesNoPage,
+          AmendMode,
+          ua
+        ) mustBe controllers.amend.routes.AmendIndividualCheckYourAnswersController.onPageLoad()
+      }
+
+      "must go to TradingNameOfSubcontractorController when answer is Yes and trading name is missing" in {
+        val ua =
+          emptyUserAnswers
+            .set(SubTradingNameYesNoPage, true)
+            .success
+            .value
+
+        navigator.nextPage(
+          SubTradingNameYesNoPage,
+          AmendMode,
+          ua
+        ) mustBe controllers.add.routes.TradingNameOfSubcontractorController.onPageLoad(AmendMode)
+      }
+
+      "must go to Amend CYA when answer is Yes and trading name already exists" in {
+        val ua =
+          emptyUserAnswers
+            .set(SubTradingNameYesNoPage, true)
+            .success
+            .value
+            .set(TradingNameOfSubcontractorPage, "ACME Construction")
+            .success
+            .value
+
+        navigator.nextPage(
+          SubTradingNameYesNoPage,
+          AmendMode,
+          ua
+        ) mustBe controllers.amend.routes.AmendIndividualCheckYourAnswersController.onPageLoad()
+      }
+
+      "must route to JourneyRecovery when SubTradingNameYesNoPage answer is missing" in {
+        navigator.nextPage(
+          SubTradingNameYesNoPage,
+          AmendMode,
+          emptyUserAnswers
+        ) mustBe journeyRecovery
       }
     }
 

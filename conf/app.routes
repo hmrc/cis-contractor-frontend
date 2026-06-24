@@ -38,6 +38,8 @@ GET  /unauthorised/standard-user  controllers.UnauthorisedWrongRoleController.on
 # Individual
 GET   /subcontractor/add/check-your-answers  controllers.add.CheckYourAnswersController.onPageLoad()
 POST  /subcontractor/add/check-your-answers  controllers.add.CheckYourAnswersController.onSubmit()
+GET   /subcontractor/amend/check-your-answers  controllers.amend.AmendIndividualCheckYourAnswersController.onPageLoad()
+POST  /subcontractor/amend/check-your-answers  controllers.amend.AmendIndividualCheckYourAnswersController.onSubmit()
 
 GET   /subcontractor/add/type-of-subcontractor         controllers.add.TypeOfSubcontractorController.onPageLoad(mode: Mode = NormalMode)
 POST  /subcontractor/add/type-of-subcontractor         controllers.add.TypeOfSubcontractorController.onSubmit(mode: Mode = NormalMode)
@@ -48,16 +50,22 @@ GET   /subcontractor/add/check-trading-name         controllers.add.SubTradingNa
 POST  /subcontractor/add/check-trading-name         controllers.add.SubTradingNameYesNoController.onSubmit(mode: Mode = NormalMode)
 GET   /subcontractor/add/change-check-trading-name  controllers.add.SubTradingNameYesNoController.onPageLoad(mode: Mode = CheckMode)
 POST  /subcontractor/add/change-check-trading-name  controllers.add.SubTradingNameYesNoController.onSubmit(mode: Mode = CheckMode)
+GET   /subcontractor/amend/check-trading-name       controllers.add.SubTradingNameYesNoController.onPageLoad(mode: Mode = AmendMode)
+POST  /subcontractor/amend/check-trading-name       controllers.add.SubTradingNameYesNoController.onSubmit(mode: Mode = AmendMode)
 
 GET   /subcontractor/add/trading-name         controllers.add.TradingNameOfSubcontractorController.onPageLoad(mode: Mode = NormalMode)
 POST  /subcontractor/add/trading-name         controllers.add.TradingNameOfSubcontractorController.onSubmit(mode: Mode = NormalMode)
 GET   /subcontractor/add/change-trading-name  controllers.add.TradingNameOfSubcontractorController.onPageLoad(mode: Mode = CheckMode)
 POST  /subcontractor/add/change-trading-name  controllers.add.TradingNameOfSubcontractorController.onSubmit(mode: Mode = CheckMode)
+GET   /subcontractor/amend/trading-name       controllers.add.TradingNameOfSubcontractorController.onPageLoad(mode: Mode = AmendMode)
+POST  /subcontractor/amend/trading-name       controllers.add.TradingNameOfSubcontractorController.onSubmit(mode: Mode = AmendMode)
 
 GET   /subcontractor/add/name         controllers.add.SubcontractorNameController.onPageLoad(mode: Mode = NormalMode)
 POST  /subcontractor/add/name         controllers.add.SubcontractorNameController.onSubmit(mode: Mode = NormalMode)
 GET   /subcontractor/add/change-name  controllers.add.SubcontractorNameController.onPageLoad(mode: Mode = CheckMode)
 POST  /subcontractor/add/change-name  controllers.add.SubcontractorNameController.onSubmit(mode: Mode = CheckMode)
+GET   /subcontractor/amend/name         controllers.add.SubcontractorNameController.onPageLoad(mode: Mode = AmendMode)
+POST  /subcontractor/amend/name         controllers.add.SubcontractorNameController.onSubmit(mode: Mode = AmendMode)
 
 GET   /subcontractor/add/check-address         controllers.add.SubAddressYesNoController.onPageLoad(mode: Mode = NormalMode)
 POST  /subcontractor/add/check-address         controllers.add.SubAddressYesNoController.onSubmit(mode: Mode = NormalMode)
