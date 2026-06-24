@@ -16,10 +16,11 @@
 
 package pages.contractordetails
 
-import base.SpecBase
+//import base.SpecBase
+import pages.behaviours.PageBehaviours
 import play.api.libs.json.JsPath
 
-class AddSchemeNameYesNoPageSpec extends SpecBase {
+class AddSchemeNameYesNoPageSpec extends PageBehaviours {
 
   "AddSchemeNameYesNoPage" - {
     "have the correct path" in {
@@ -29,5 +30,11 @@ class AddSchemeNameYesNoPageSpec extends SpecBase {
     "have the correct toString" in {
       AddSchemeNameYesNoPage.toString mustBe "addSchemeNameYesNo"
     }
+
+    beRetrievable[Boolean](AddSchemeNameYesNoPage)
+
+    beSettable[Boolean](AddSchemeNameYesNoPage)
+
+    beRemovable[Boolean](AddSchemeNameYesNoPage)
   }
 }

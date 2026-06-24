@@ -17,9 +17,10 @@
 package pages.contractordetails
 
 import base.SpecBase
+import pages.behaviours.PageBehaviours
 import play.api.libs.json.JsPath
 
-class AddEmailAddressYesNoPageSpec extends SpecBase {
+class AddEmailAddressYesNoPageSpec extends PageBehaviours {
 
   "AddEmailAddressYesNoPage" - {
     "have the correct path" in {
@@ -29,5 +30,11 @@ class AddEmailAddressYesNoPageSpec extends SpecBase {
     "have the correct toString" in {
       AddEmailAddressYesNoPage.toString mustBe "addEmailAddressYesNo"
     }
+
+    beRetrievable[Boolean](AddEmailAddressYesNoPage)
+
+    beSettable[Boolean](AddEmailAddressYesNoPage)
+
+    beRemovable[Boolean](AddEmailAddressYesNoPage)
   }
 }
