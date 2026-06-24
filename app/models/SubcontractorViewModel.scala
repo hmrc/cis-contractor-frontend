@@ -18,6 +18,7 @@ package models
 
 import models.TypeOfSubcontractor.*
 import play.api.libs.json.{Json, OFormat}
+import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.checkboxes.CheckboxItem
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
 import viewmodels.govuk.checkbox.CheckboxItemViewModel
@@ -40,14 +41,13 @@ object SubcontractorViewModel {
 
   def fromSubcontractors(
     subcontractors: Seq[Subcontractor]
-  ): Seq[SubcontractorViewModel] =
+  )(implicit messages: Messages): Seq[SubcontractorViewModel] =
     subcontractors.map(fromSubcontractor)
 
-  private val NoName = "no name provided"
-
-  private def fromSubcontractor(subcontractor: Subcontractor): SubcontractorViewModel =
-    val name = getSubcontractorType(subcontractor)
-      .map(subcontractorType => getSubcontractorName(subcontractor, subcontractorType).getOrElse(NoName))
+  private def fromSubcontractor(subcontractor: Subcontractor)(implicit messages: Messages): SubcontractorViewModel =
+    val NoName = messages("verify.noName")
+    val name   = getSubcontractorType(subcontractor)
+      .flatMap(subcontractorType => getSubcontractorName(subcontractor, subcontractorType))
       .getOrElse(NoName)
 
     SubcontractorViewModel(

@@ -37,59 +37,62 @@ class CompanyNavigator @Inject() () extends NavigatorForJourney {
   }
 
   private val normalRoutes: Page => UserAnswers => Call = {
-    case CompanyNamePage                => _ => controllers.add.company.routes.CompanyAddressYesNoController.onPageLoad(NormalMode)
-    case CompanyAddressYesNoPage        =>
+    case CompanyNamePage                   => _ => controllers.add.company.routes.CompanyAddressYesNoController.onPageLoad(NormalMode)
+    case CompanyAddressYesNoPage           =>
       userAnswers => navigatorFromCompanyAddressYesNoPage(NormalMode)(userAnswers)
-    case CompanyAddressPage             =>
+    case CompanyAddressPage                =>
       _ => controllers.add.company.routes.CompanyContactOptionsController.onPageLoad(NormalMode)
-    case CompanyContactOptionsPage      =>
+    case CompanyContactOptionsPage         =>
       userAnswers => navigatorFromCompanyContactOptionsPage(NormalMode)(userAnswers)
-    case CompanyEmailAddressPage        =>
+    case CompanyEmailAddressPage           =>
       _ => controllers.add.company.routes.CompanyUtrYesNoController.onPageLoad(NormalMode)
-    case CompanyPhoneNumberPage         =>
+    case CompanyPhoneNumberPage            =>
       _ => controllers.add.company.routes.CompanyUtrYesNoController.onPageLoad(NormalMode)
-    case CompanyMobileNumberPage        =>
+    case CompanyMobileNumberPage           =>
       _ => controllers.add.company.routes.CompanyUtrYesNoController.onPageLoad(NormalMode)
-    case CompanyUtrYesNoPage            =>
+    case CompanyUtrYesNoPage               =>
       userAnswers => navigatorFromCompanyUtrYesNoPage(NormalMode)(userAnswers)
-    case CompanyUtrPage                 =>
+    case CompanyUtrPage                    =>
       _ => controllers.add.company.routes.CompanyCrnYesNoController.onPageLoad(NormalMode)
-    case CompanyCrnYesNoPage            =>
+    case CompanyCrnYesNoPage               =>
       userAnswers => navigatorFromCompanyCrnYesNoPage(NormalMode)(userAnswers)
-    case CompanyCrnPage                 =>
+    case CompanyCrnPage                    =>
       _ => controllers.add.company.routes.CompanyWorksReferenceYesNoController.onPageLoad(NormalMode)
-    case CompanyWorksReferenceYesNoPage =>
+    case CompanyWorksReferenceYesNoPage    =>
       userAnswers => navigatorFromCompanyWorksReferenceYesNoPage(NormalMode)(userAnswers)
-    case CompanyWorksReferencePage      =>
+    case CompanyWorksReferencePage         =>
       _ => controllers.add.company.routes.CompanyCheckYourAnswersController.onPageLoad()
-    case _                              => _ => routes.IndexController.onPageLoad()
+    case AddCompanyContactMethodsYesNoPage =>
+      userAnswers => navigatorFromAddCompanyContactMethodsYesNoPage(NormalMode)(userAnswers)
+    case _                                 => _ => routes.IndexController.onPageLoad()
   }
 
   private val checkRouteMap: Page => UserAnswers => Call = {
-    case CompanyNamePage                =>
+    case CompanyNamePage                   =>
       _ => controllers.add.company.routes.CompanyCheckYourAnswersController.onPageLoad()
-    case CompanyAddressYesNoPage        => navigatorFromCompanyAddressYesNoPage(CheckMode)(_)
-    case CompanyAddressPage             =>
+    case CompanyAddressYesNoPage           => navigatorFromCompanyAddressYesNoPage(CheckMode)(_)
+    case CompanyAddressPage                =>
       _ => controllers.add.company.routes.CompanyCheckYourAnswersController.onPageLoad()
-    case CompanyContactOptionsPage      => navigatorFromCompanyContactOptionsPage(CheckMode)(_)
-    case CompanyEmailAddressPage        =>
+    case CompanyContactOptionsPage         => navigatorFromCompanyContactOptionsPage(CheckMode)(_)
+    case CompanyEmailAddressPage           =>
       _ => controllers.add.company.routes.CompanyCheckYourAnswersController.onPageLoad()
-    case CompanyPhoneNumberPage         =>
+    case CompanyPhoneNumberPage            =>
       _ => controllers.add.company.routes.CompanyCheckYourAnswersController.onPageLoad()
-    case CompanyMobileNumberPage        =>
+    case CompanyMobileNumberPage           =>
       _ => controllers.add.company.routes.CompanyCheckYourAnswersController.onPageLoad()
-    case CompanyUtrYesNoPage            =>
+    case CompanyUtrYesNoPage               =>
       userAnswers => navigatorFromCompanyUtrYesNoPage(CheckMode)(userAnswers)
-    case CompanyUtrPage                 =>
+    case CompanyUtrPage                    =>
       _ => controllers.add.company.routes.CompanyCheckYourAnswersController.onPageLoad()
-    case CompanyCrnYesNoPage            => navigatorFromCompanyCrnYesNoPage(CheckMode)(_)
-    case CompanyCrnPage                 =>
+    case CompanyCrnYesNoPage               => navigatorFromCompanyCrnYesNoPage(CheckMode)(_)
+    case CompanyCrnPage                    =>
       _ => controllers.add.company.routes.CompanyCheckYourAnswersController.onPageLoad()
-    case CompanyWorksReferenceYesNoPage =>
+    case CompanyWorksReferenceYesNoPage    =>
       userAnswers => navigatorFromCompanyWorksReferenceYesNoPage(CheckMode)(userAnswers)
-    case CompanyWorksReferencePage      =>
+    case CompanyWorksReferencePage         =>
       _ => controllers.add.company.routes.CompanyCheckYourAnswersController.onPageLoad()
-    case _                              => _ => controllers.add.routes.CheckYourAnswersController.onPageLoad()
+    case AddCompanyContactMethodsYesNoPage => navigatorFromAddCompanyContactMethodsYesNoPage(CheckMode)(_)
+    case _                                 => _ => controllers.add.routes.CheckYourAnswersController.onPageLoad()
   }
 
   private def navigatorFromCompanyContactOptionsPage(mode: Mode)(userAnswers: UserAnswers): Call =
@@ -194,6 +197,21 @@ class CompanyNavigator @Inject() () extends NavigatorForJourney {
       case (Some(false), CheckMode)  =>
         controllers.add.company.routes.CompanyCheckYourAnswersController.onPageLoad()
       case _                         =>
+        routes.JourneyRecoveryController.onPageLoad()
+    }
+
+  private def navigatorFromAddCompanyContactMethodsYesNoPage(mode: Mode)(userAnswers: UserAnswers): Call =
+    (userAnswers.get(AddCompanyContactMethodsYesNoPage), mode) match {
+      case (Some(true), _) =>
+        controllers.add.company.routes.AddCompanyContactMethodsYesNoController.onPageLoad(mode)
+
+      case (Some(false), NormalMode) =>
+        controllers.add.company.routes.CompanyUtrYesNoController.onPageLoad(NormalMode)
+
+      case (Some(false), CheckMode) =>
+        controllers.add.company.routes.CompanyCheckYourAnswersController.onPageLoad()
+
+      case _ =>
         routes.JourneyRecoveryController.onPageLoad()
     }
 }
