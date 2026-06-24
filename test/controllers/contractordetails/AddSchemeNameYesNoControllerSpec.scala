@@ -41,7 +41,7 @@ class AddSchemeNameYesNoControllerSpec extends SpecBase with MockitoSugar {
   val form         = formProvider()
 
   lazy val addSchemeNameYesNoRoute =
-    controllers.contractordetails.routes.AddSchemeNameYesNoController.onPageLoad().url
+    controllers.contractordetails.routes.AddSchemeNameYesNoController.onPageLoad(NormalMode).url
 
   "AddSchemeNameYesNo Controller" - {
 

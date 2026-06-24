@@ -28,7 +28,7 @@
 
 @layout(pageTitle = title(form, messages("contractordetails.addEmailAddressYesNo.title"))) {
 
-    @formHelper(action = controllers.contractordetails.routes.AddEmailAddressYesNoController.onSubmit(), Symbol("autoComplete") -> "off") {
+    @formHelper(action = controllers.contractordetails.routes.AddEmailAddressYesNoController.onSubmit(mode), Symbol("autoComplete") -> "off") {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form, errorLinkOverrides = Map("value" -> "value_0")))

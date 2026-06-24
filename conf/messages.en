@@ -1033,7 +1033,11 @@ contractordetails.contractorDetailsCheckAnswers.returnToCisDashboard.link      =
 contractordetails.addEmailAddressYesNo.title                                   =  Do you want to enter the contractor’s email address?
 contractordetails.addEmailAddressYesNo.heading                                 =  Do you want to enter the contractor’s email address?
 contractordetails.addEmailAddressYesNo.error.required                          =  Select yes to enter the contractor’s email address
+contractordetails.addEmailAddressYesNo.checkYourAnswersLabel                   =  Add email address
+contractordetails.addEmailAddressYesNo.change.hidden                           =  add email address
 
 contractordetails.addSchemeNameYesNo.title                                     =  Do you want to enter the contractor’s scheme name?
 contractordetails.addSchemeNameYesNo.heading                                   =  Do you want to enter the contractor’s scheme name?
 contractordetails.addSchemeNameYesNo.error.required                            =  Select yes to enter the contractor’s scheme name
+contractordetails.addSchemeNameYesNo.checkYourAnswersLabel                     =  Add scheme name
+contractordetails.addSchemeNameYesNo.change.hidden                             =  add scheme name
