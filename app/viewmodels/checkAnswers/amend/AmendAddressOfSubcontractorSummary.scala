@@ -16,7 +16,8 @@
 
 package viewmodels.checkAnswers.amend
 
-import models.{AmendMode, UserAnswers}
+import models.UserAnswers
+import models.address.Address
 import pages.add.AddressOfSubcontractorPage
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
@@ -28,22 +29,13 @@ object AmendAddressOfSubcontractorSummary {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
     answers.get(AddressOfSubcontractorPage).map { answer =>
-      val addressHtml = Seq(
-        answer.addressLine1,
-        answer.addressLine2.getOrElse(""),
-        answer.addressLine3,
-        answer.addressLine4.getOrElse(""),
-        answer.postalCode,
-        answer.country
-      ).filter(_.trim.nonEmpty).mkString("<br/>")
-
       SummaryListRowViewModel(
         key = "addressOfSubcontractor.checkYourAnswersLabel",
-        value = ValueViewModel(HtmlContent(addressHtml)),
+        value = ValueViewModel(HtmlContent(Address.toHtml(answer).body)),
         actions = Seq(
           ActionItemViewModel(
             "site.change",
-            controllers.add.routes.AddressOfSubcontractorController.onPageLoad(AmendMode).url
+            controllers.add.routes.AddressOfSubcontractorController.redirectToAmendAddressLookup().url
           )
             .withVisuallyHiddenText(messages("addressOfSubcontractor.change.hidden"))
             .withAttribute("id" -> "address-of-subcontractor"),

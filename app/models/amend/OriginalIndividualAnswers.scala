@@ -16,7 +16,8 @@
 
 package models.amend
 
-import models.add.{InternationalAddress, SubcontractorName}
+import models.add.SubcontractorName
+import models.address.Address
 import models.contact.ContactOptions
 import play.api.libs.json.{Json, OFormat}
 
@@ -24,7 +25,7 @@ case class OriginalIndividualAnswers(
   usesTradingName: Option[Boolean],
   tradingName: Option[String],
   subcontractorName: Option[SubcontractorName],
-  address: Option[InternationalAddress],
+  address: Option[Address],
   contactMethod: Option[ContactOptions],
   contactValue: Option[String],
   utr: Option[String],

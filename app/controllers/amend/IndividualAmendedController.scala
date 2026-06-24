@@ -45,13 +45,13 @@ class IndividualAmendedController @Inject() (
     val ua = request.userAnswers
 
     ua.get(OriginalIndividualAnswersQuery) match {
-      case None          =>
+      case None =>
         logger.error("[IndividualAmendedController.onPageLoad] OriginalIndividualAnswersQuery missing from session")
         Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
 
       case Some(original) =>
         ua.get(CisIdQuery) match {
-          case None        =>
+          case None =>
             logger.error("[IndividualAmendedController.onPageLoad] CisIdQuery missing from session")
             Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
 

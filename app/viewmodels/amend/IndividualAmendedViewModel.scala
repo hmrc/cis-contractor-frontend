@@ -17,7 +17,8 @@
 package viewmodels.amend
 
 import models.UserAnswers
-import models.add.{InternationalAddress, SubcontractorName}
+import models.add.SubcontractorName
+import models.address.Address
 import models.amend.OriginalIndividualAnswers
 import models.contact.ContactOptions
 import models.contact.ContactOptions.*
@@ -28,7 +29,9 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.table.TableRow
 
 object IndividualAmendedViewModel {
 
-  def rows(original: OriginalIndividualAnswers, current: UserAnswers)(implicit messages: Messages): Seq[Seq[TableRow]] = {
+  def rows(original: OriginalIndividualAnswers, current: UserAnswers)(implicit
+    messages: Messages
+  ): Seq[Seq[TableRow]] = {
     val currentUsesTradingName = current.get(SubTradingNameYesNoPage)
     val currentTradingName     = current.get(TradingNameOfSubcontractorPage)
     val currentName            = current.get(SubcontractorNamePage)
@@ -83,10 +86,11 @@ object IndividualAmendedViewModel {
     val currentDisplay  = currentNameDisplay(currentUsesTradingName, currentTradingName, currentName)
     if (originalDisplay == currentDisplay) None
     else {
-      val label = if (currentUsesTradingName.contains(true))
-        messages("tradingNameOfSubcontractor.checkYourAnswersLabel")
-      else
-        messages("subcontractorName.checkYourAnswersLabel")
+      val label =
+        if (currentUsesTradingName.contains(true))
+          messages("tradingNameOfSubcontractor.checkYourAnswersLabel")
+        else
+          messages("subcontractorName.checkYourAnswersLabel")
       Some(row(label, originalDisplay.getOrElse("—"), currentDisplay.getOrElse("—")))
     }
   }
@@ -109,40 +113,35 @@ object IndividualAmendedViewModel {
     Seq(Some(n.firstName), n.middleName, Some(n.lastName)).flatten.mkString(" ")
 
   private def addressRow(
-    originalAddress: Option[InternationalAddress],
-    currentAddress: Option[InternationalAddress]
-  )(implicit messages: Messages): Option[Seq[TableRow]] = {
+    originalAddress: Option[Address],
+    currentAddress: Option[Address]
+  )(implicit messages: Messages): Option[Seq[TableRow]] =
     if (originalAddress == currentAddress) None
     else
-      Some(row(
-        messages("addressOfSubcontractor.checkYourAnswersLabel"),
-        originalAddress.map(formatAddress).getOrElse(messages("site.none")),
-        currentAddress.map(formatAddress).getOrElse(messages("site.none"))
-      ))
-  }
+      Some(
+        row(
+          messages("addressOfSubcontractor.checkYourAnswersLabel"),
+          originalAddress.map(formatAddress).getOrElse(messages("site.none")),
+          currentAddress.map(formatAddress).getOrElse(messages("site.none"))
+        )
+      )
 
-  private def formatAddress(a: InternationalAddress): String =
-    Seq(
-      Some(a.addressLine1),
-      a.addressLine2,
-      Some(a.addressLine3),
-      a.addressLine4,
-      Some(a.postalCode),
-      Some(a.country)
-    ).flatten.filter(_.trim.nonEmpty).mkString(", ")
+  private def formatAddress(a: Address): String =
+    Address.normalisedSeq(a).mkString(", ")
 
   private def contactMethodRow(
     originalMethod: Option[ContactOptions],
     currentMethod: Option[ContactOptions]
-  )(implicit messages: Messages): Option[Seq[TableRow]] = {
+  )(implicit messages: Messages): Option[Seq[TableRow]] =
     if (originalMethod == currentMethod) None
     else
-      Some(row(
-        messages("individualChooseContactDetails.checkYourAnswersLabel"),
-        displayContactMethod(originalMethod),
-        displayContactMethod(currentMethod)
-      ))
-  }
+      Some(
+        row(
+          messages("individualChooseContactDetails.checkYourAnswersLabel"),
+          displayContactMethod(originalMethod),
+          displayContactMethod(currentMethod)
+        )
+      )
 
   private def displayContactMethod(method: Option[ContactOptions])(implicit messages: Messages): String =
     method match {
@@ -168,7 +167,7 @@ object IndividualAmendedViewModel {
           case _            => ""
         }
         Some(row(label, originalValue.getOrElse("—"), currentValue.getOrElse("—")))
-      case _ => None
+      case _                                                                         => None
     }
   }
 

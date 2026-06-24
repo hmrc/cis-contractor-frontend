@@ -16,17 +16,17 @@
 
 package pages.add.company
 
-import models.add.InternationalAddress
+import models.address.Address
 import pages.behaviours.PageBehaviours
 
 class CompanyAddressPageSpec extends PageBehaviours {
 
   "CompanyAddressPage" - {
 
-    beRetrievable[InternationalAddress](CompanyAddressPage)
+    beRetrievable[Address](CompanyAddressPage)
 
-    beSettable[InternationalAddress](CompanyAddressPage)
+    beSettable[Address](CompanyAddressPage)
 
-    beRemovable[InternationalAddress](CompanyAddressPage)
+    beRemovable[Address](CompanyAddressPage)
   }
 }

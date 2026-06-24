@@ -19,6 +19,8 @@ package queries
 import models.amend.OriginalIndividualAnswers
 import play.api.libs.json.JsPath
 
-case object OriginalIndividualAnswersQuery extends Gettable[OriginalIndividualAnswers] with Settable[OriginalIndividualAnswers] {
+case object OriginalIndividualAnswersQuery
+    extends Gettable[OriginalIndividualAnswers]
+    with Settable[OriginalIndividualAnswers] {
   override def path: JsPath = JsPath \ "originalIndividualAnswers"
 }

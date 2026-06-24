@@ -16,72 +16,49 @@
 
 package controllers.add.partnership
 
-import config.FrontendAppConfig
 import controllers.actions.*
-import forms.add.partnership.PartnershipAddressFormProvider
-import models.Mode
-import models.add.InternationalAddress
-import navigation.Navigator
+import controllers.add.AddressLookupJourneyController
+import models.{Mode, UserAnswers}
+import models.address.Address
+import models.address.AddressLookupJourneyIdentifier.partnershipQuestionsAddress
 import pages.add.partnership.{PartnershipAddressPage, PartnershipNamePage}
-import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.i18n.MessagesApi
+import play.api.mvc.{Call, MessagesControllerComponents}
+import queries.Settable
 import repositories.SessionRepository
-import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.add.partnership.PartnershipAddressView
-import utils.CountryOptions
+import services.AddressLookupService
 
 import javax.inject.Inject
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
 
 class PartnershipAddressController @Inject() (
   override val messagesApi: MessagesApi,
-  sessionRepository: SessionRepository,
-  navigator: Navigator,
-  identify: IdentifierAction,
-  getData: DataRetrievalAction,
-  requireData: DataRequiredAction,
-  formProvider: PartnershipAddressFormProvider,
-  countryOptions: CountryOptions,
-  val controllerComponents: MessagesControllerComponents,
-  view: PartnershipAddressView
-)(implicit ec: ExecutionContext, appConfig: FrontendAppConfig)
-    extends FrontendBaseController
-    with I18nSupport {
+  override protected val sessionRepository: SessionRepository,
+  override protected val identify: IdentifierAction,
+  override protected val getData: DataRetrievalAction,
+  override protected val requireData: DataRequiredAction,
+  override protected val addressLookupService: AddressLookupService,
+  val controllerComponents: MessagesControllerComponents
+)(implicit override protected val executionContext: ExecutionContext)
+    extends AddressLookupJourneyController {
 
-  private val form = formProvider()
+  override protected def journeyId = partnershipQuestionsAddress
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
-    request.userAnswers
-      .get(PartnershipNamePage)
-      .map { partnershipName =>
-        val preparedForm = request.userAnswers.get(PartnershipAddressPage) match {
-          case None        => form
-          case Some(value) => form.fill(value)
-        }
+  override protected def addressPage: Settable[Address] = PartnershipAddressPage
 
-        Ok(view(preparedForm, mode, partnershipName, countryOptions.options()))
-      }
-      .getOrElse(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
-  }
+  override protected def subcontractorName(userAnswers: UserAnswers): Option[String] =
+    userAnswers.get(PartnershipNamePage)
 
-  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
-    implicit request =>
-      request.userAnswers
-        .get(PartnershipNamePage)
-        .map { partnershipName =>
-          form
-            .bindFromRequest()
-            .fold(
-              formWithErrors =>
-                Future.successful(BadRequest(view(formWithErrors, mode, partnershipName, countryOptions.options()))),
-              value =>
-                for {
-                  updatedAnswers <-
-                    Future.fromTry(request.userAnswers.set(PartnershipAddressPage, value))
-                  _              <- sessionRepository.set(updatedAnswers)
-                } yield Redirect(navigator.nextPage(PartnershipAddressPage, mode, updatedAnswers))
-            )
-        }
-        .getOrElse(Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())))
-  }
+  override protected def standardCallback: Call =
+    routes.PartnershipAddressController.addressLookupCallback()
+
+  override protected def changeCallback: Call =
+    routes.PartnershipAddressController.addressLookupCallbackChange()
+
+  override protected def onCompletion(mode: Mode): Call =
+    routes.PartnershipChooseContactDetailsController.onPageLoad(mode)
+
+  override protected def onChangeCompletion(isAmend: Boolean): Call =
+    routes.PartnershipCheckYourAnswersController.onPageLoad()
+
 }

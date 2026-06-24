@@ -14,22 +14,16 @@
  * limitations under the License.
  */
 
-package utils
+package models.address
 
-import config.FrontendAppConfig
-import javax.inject.{Inject, Singleton}
+import play.api.libs.json.{Json, Writes}
 
-@Singleton
-class CountryOptions @Inject() (config: FrontendAppConfig) {
+case class AddressLookupConfigurationModel(
+  version: Int,
+  options: AddressLookupOptionsModel,
+  labels: AddressMessageLanguageModel
+)
 
-  def options(): Seq[InputOption] =
-    config.locationCanonicalList.map { case (name, _) =>
-      InputOption(value = name, label = name)
-    }
-
-  def getCountryNameFromCode(code: String): String =
-    options()
-      .find(_.value == code)
-      .map(_.label)
-      .getOrElse(code)
+object AddressLookupConfigurationModel {
+  implicit val writes: Writes[AddressLookupConfigurationModel] = Json.writes[AddressLookupConfigurationModel]
 }

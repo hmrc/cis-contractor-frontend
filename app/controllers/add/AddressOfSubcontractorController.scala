@@ -16,72 +16,60 @@
 
 package controllers.add
 
-import config.FrontendAppConfig
 import controllers.actions.*
-import forms.add.AddressOfSubcontractorFormProvider
-import models.Mode
-import models.requests.DataRequest
-import navigation.Navigator
+import models.{Mode, UserAnswers}
+import models.address.Address
+import models.address.AddressLookupJourneyIdentifier.individualQuestionsAddress
 import pages.add.AddressOfSubcontractorPage
-import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.i18n.MessagesApi
+import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
+import queries.{AddressLookupAmendReturnQuery, Settable}
 import repositories.SessionRepository
-import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import utils.{CountryOptions, SubcontractorNameExtractor}
-import views.html.add.AddressOfSubcontractorView
+import services.AddressLookupService
+import utils.SubcontractorNameExtractor
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class AddressOfSubcontractorController @Inject() (
   override val messagesApi: MessagesApi,
-  sessionRepository: SessionRepository,
-  navigator: Navigator,
-  identify: IdentifierAction,
-  getData: DataRetrievalAction,
-  requireData: DataRequiredAction,
+  override protected val sessionRepository: SessionRepository,
+  override protected val identify: IdentifierAction,
+  override protected val getData: DataRetrievalAction,
+  override protected val requireData: DataRequiredAction,
+  override protected val addressLookupService: AddressLookupService,
   subcontractorNameExtractor: SubcontractorNameExtractor,
-  formProvider: AddressOfSubcontractorFormProvider,
-  countryOptions: CountryOptions,
-  val controllerComponents: MessagesControllerComponents,
-  view: AddressOfSubcontractorView
-)(implicit ec: ExecutionContext, appConfig: FrontendAppConfig)
-    extends FrontendBaseController
-    with I18nSupport {
+  val controllerComponents: MessagesControllerComponents
+)(implicit override protected val executionContext: ExecutionContext)
+    extends AddressLookupJourneyController {
 
-  private val form = formProvider()
+  override protected def journeyId = individualQuestionsAddress
 
-  private def recoveryRedirect =
-    Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+  override protected def addressPage: Settable[Address] = AddressOfSubcontractorPage
 
-  private def preparedForm(implicit request: DataRequest[?]) =
-    request.userAnswers.get(AddressOfSubcontractorPage).fold(form)(form.fill)
+  override protected def subcontractorName(userAnswers: UserAnswers): Option[String] =
+    subcontractorNameExtractor.getSubcontractorName(userAnswers)
 
-  def onPageLoad(mode: Mode): Action[AnyContent] =
-    (identify andThen getData andThen requireData) { implicit request =>
-      subcontractorNameExtractor
-        .getSubcontractorName(request.userAnswers)
-        .fold(recoveryRedirect) { subcontractorName =>
-          Ok(view(preparedForm, mode, subcontractorName, countryOptions.options()))
-        }
-    }
+  override protected def standardCallback: Call =
+    routes.AddressOfSubcontractorController.addressLookupCallback()
 
-  def onSubmit(mode: Mode): Action[AnyContent] =
+  override protected def changeCallback: Call =
+    routes.AddressOfSubcontractorController.addressLookupCallbackChange()
+
+  override protected def onCompletion(mode: Mode): Call =
+    routes.IndividualChooseContactDetailsController.onPageLoad(mode)
+
+  override protected def onChangeCompletion(isAmend: Boolean): Call =
+    if (isAmend) controllers.amend.routes.AmendIndividualCheckYourAnswersController.onPageLoad()
+    else routes.CheckYourAnswersController.onPageLoad()
+
+  def redirectToAmendAddressLookup(): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
-      subcontractorNameExtractor
-        .getSubcontractorName(request.userAnswers)
-        .fold(Future.successful(recoveryRedirect)) { subcontractorName =>
-          form
-            .bindFromRequest()
-            .fold(
-              formWithErrors =>
-                Future.successful(BadRequest(view(formWithErrors, mode, subcontractorName, countryOptions.options()))),
-              value =>
-                for {
-                  updatedAnswers <- Future.fromTry(request.userAnswers.set(AddressOfSubcontractorPage, value))
-                  _              <- sessionRepository.set(updatedAnswers)
-                } yield Redirect(navigator.nextPage(AddressOfSubcontractorPage, mode, updatedAnswers))
-            )
-        }
+      (for {
+        ua <- Future.fromTry(request.userAnswers.set(AddressLookupAmendReturnQuery, true))
+        _  <- sessionRepository.set(ua)
+      } yield Redirect(routes.AddressOfSubcontractorController.redirectToAddressLookup(Some("change"))))
+        .recover { case _ => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()) }
     }
+
 }
