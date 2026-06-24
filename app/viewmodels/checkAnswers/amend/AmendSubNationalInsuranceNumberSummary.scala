@@ -36,13 +36,7 @@ object AmendSubNationalInsuranceNumberSummary {
             controllers.add.routes.SubNationalInsuranceNumberController.onPageLoad(AmendMode).url
           )
             .withVisuallyHiddenText(messages("subNationalInsuranceNumber.change.hidden"))
-            .withAttribute("id" -> "sub-national-insurance-number"),
-          ActionItemViewModel(
-            "site.remove",
-            controllers.amend.routes.RemoveIndividualNinoController.onPageLoad().url
-          )
-            .withVisuallyHiddenText(messages("subNationalInsuranceNumber.remove.hidden"))
-            .withAttribute("id" -> "remove-sub-national-insurance-number")
+            .withAttribute("id" -> "sub-national-insurance-number")
         )
       )
     }

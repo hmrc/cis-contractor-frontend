@@ -36,13 +36,7 @@ object AmendSubcontractorsUniqueTaxpayerReferenceSummary {
             controllers.add.routes.SubcontractorsUniqueTaxpayerReferenceController.onPageLoad(AmendMode).url
           )
             .withVisuallyHiddenText(messages("subcontractorsUniqueTaxpayerReference.change.hidden"))
-            .withAttribute("id" -> "subcontractors-unique-taxpayer-reference"),
-          ActionItemViewModel(
-            "site.remove",
-            controllers.amend.routes.RemoveIndividualUtrController.onPageLoad().url
-          )
-            .withVisuallyHiddenText(messages("subcontractorsUniqueTaxpayerReference.remove.hidden"))
-            .withAttribute("id" -> "remove-subcontractors-unique-taxpayer-reference")
+            .withAttribute("id" -> "subcontractors-unique-taxpayer-reference")
         )
       )
     }

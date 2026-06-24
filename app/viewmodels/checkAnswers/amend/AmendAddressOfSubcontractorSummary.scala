@@ -38,13 +38,7 @@ object AmendAddressOfSubcontractorSummary {
             controllers.add.routes.AddressOfSubcontractorController.redirectToAmendAddressLookup().url
           )
             .withVisuallyHiddenText(messages("addressOfSubcontractor.change.hidden"))
-            .withAttribute("id" -> "address-of-subcontractor"),
-          ActionItemViewModel(
-            "site.remove",
-            controllers.amend.routes.RemoveIndividualAddressController.onPageLoad().url
-          )
-            .withVisuallyHiddenText(messages("addressOfSubcontractor.remove.hidden"))
-            .withAttribute("id" -> "remove-address-of-subcontractor")
+            .withAttribute("id" -> "address-of-subcontractor")
         )
       )
     }

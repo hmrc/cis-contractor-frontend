@@ -90,16 +90,6 @@ POST  /subcontractor/amend/check-works-reference-number  controllers.add.WorksRe
 GET   /subcontractor/amend/works-reference-number  controllers.add.WorksReferenceNumberController.onPageLoad(mode: Mode = AmendMode)
 POST  /subcontractor/amend/works-reference-number  controllers.add.WorksReferenceNumberController.onSubmit(mode: Mode = AmendMode)
 
-GET   /subcontractor/amend/remove/trading-name  controllers.amend.RemoveIndividualTradingNameController.onPageLoad()
-
-GET   /subcontractor/amend/remove/address  controllers.amend.RemoveIndividualAddressController.onPageLoad()
-
-GET   /subcontractor/amend/remove/unique-taxpayer-reference  controllers.amend.RemoveIndividualUtrController.onPageLoad()
-
-GET   /subcontractor/amend/remove/national-insurance-number  controllers.amend.RemoveIndividualNinoController.onPageLoad()
-
-GET   /subcontractor/amend/remove/works-reference-number  controllers.amend.RemoveIndividualWorksReferenceController.onPageLoad()
-
 # Errors & Auth
 GET  /unauthorised/standard-user  controllers.UnauthorisedWrongRoleController.onPageLoad()
 

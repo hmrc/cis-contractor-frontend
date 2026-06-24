@@ -36,13 +36,7 @@ object AmendWorksReferenceNumberSummary {
             controllers.add.routes.WorksReferenceNumberController.onPageLoad(AmendMode).url
           )
             .withVisuallyHiddenText(messages("worksReferenceNumber.change.hidden"))
-            .withAttribute("id" -> "works-reference-number"),
-          ActionItemViewModel(
-            "site.remove",
-            controllers.amend.routes.RemoveIndividualWorksReferenceController.onPageLoad().url
-          )
-            .withVisuallyHiddenText(messages("worksReferenceNumber.remove.hidden"))
-            .withAttribute("id" -> "remove-works-reference-number")
+            .withAttribute("id" -> "works-reference-number")
         )
       )
     }
