@@ -18,9 +18,9 @@ package queries
 
 import play.api.libs.json.JsPath
 
-/** Session flag set before redirecting to ALF in the amend change-address flow.
-  * Read by [[controllers.add.AddressLookupJourneyController.addressLookupCallbackChange]] to return the user to the
-  * amend CYA instead of the add CYA.
+/** Session flag set before redirecting to ALF in the amend change-address flow. Read by
+  * [[controllers.add.AddressLookupJourneyController.addressLookupCallbackChange]] to return the user to the amend CYA
+  * instead of the add CYA.
   */
 case object AddressLookupAmendReturnQuery extends Gettable[Boolean] with Settable[Boolean] {
   override def path: JsPath = JsPath \ "addressLookupAmendReturn"
