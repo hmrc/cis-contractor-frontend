@@ -15,11 +15,12 @@
  */
 
 package viewmodels.checkAnswers.add
-
+import models.contact.ContactMethodOptions
 import models.{CheckMode, UserAnswers}
 import pages.add.IndividualContactMethodOptionsPage
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
+import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
@@ -28,26 +29,25 @@ import viewmodels.checkAnswers.verify.ValueViewModelHelper
 object IndividualContactMethodOptionsSummary {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(IndividualContactMethodOptionsPage).flatMap { selectedMethods =>
+    answers.get(IndividualContactMethodOptionsPage).map { selectedMethods =>
       val options =
-        selectedMethods
-          .map(selectedMethod =>
-            HtmlFormat.escape(messages(s"individualContactMethodOptions.$selectedMethod")).toString
+        ContactMethodOptions
+          .values
+          //.ordered(selectedMethods)
+          .map(m => HtmlFormat.escape(messages(s"individualContactMethodOptions.$m")).toString)
+      SummaryListRowViewModel(
+        key = "individualContactMethodOptions.checkYourAnswersLabel",
+        value = ValueViewModelHelper
+          .makeGovukBulletList(options)
+          .getOrElse(ValueViewModel(HtmlContent(""))),
+        actions = Seq(
+          ActionItemViewModel(
+            "site.change",
+            controllers.add.routes.IndividualContactMethodOptionsController.onPageLoad(CheckMode).url
           )
-          .toSeq
-      ValueViewModelHelper.makeGovukBulletList(options).map { value =>
-        SummaryListRowViewModel(
-          key = "individualContactMethodOptions.checkYourAnswersLabel",
-          value = value,
-          actions = Seq(
-            ActionItemViewModel(
-              "site.change",
-              controllers.add.routes.IndividualContactMethodOptionsController.onPageLoad(CheckMode).url
-            )
-              .withVisuallyHiddenText(messages("individualContactMethodOptions.change.hidden"))
-              .withAttribute("id" -> "individual-contact-method-options")
-          )
+            .withVisuallyHiddenText(messages("individualContactMethodOptions.change.hidden"))
+            .withAttribute("id" -> "individual-contact-method-options")
         )
-      }
+      )
     }
 }

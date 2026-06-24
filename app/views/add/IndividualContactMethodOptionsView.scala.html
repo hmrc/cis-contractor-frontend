@@ -39,7 +39,7 @@
             CheckboxesViewModel(
                 form   = form,
                 name   = "value",
-                legend = LegendViewModel(messages("individualContactMethodOptions.heading", subcontractorName)).asPageHeading().asPageHeading(Large),
+                legend = LegendViewModel(messages("individualContactMethodOptions.heading", subcontractorName)).asPageHeading(Large),
                 items  = IndividualContactMethodOptions.checkboxItems
             ).withHint(HintViewModel(messages("individualContactMethodOptions.hint")))
         )

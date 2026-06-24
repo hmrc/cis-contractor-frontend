@@ -17,7 +17,7 @@
 package pages
 
 import models.add.IndividualContactMethodOptions
-import models.add.IndividualContactMethodOptions.{Emailaddress, Mobilenumber, Phonenumber}
+//import models.add.IndividualContactMethodOptions.{Emailaddress, Mobilenumber, Phonenumber}
 import pages.add.{IndividualContactMethodOptionsPage, IndividualEmailAddressPage, IndividualMobileNumberPage, IndividualPhoneNumberPage}
 import pages.behaviours.PageBehaviours
 

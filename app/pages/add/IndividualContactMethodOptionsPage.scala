@@ -19,11 +19,12 @@ package pages.add
 import models.UserAnswers
 import pages.QuestionPage
 import play.api.libs.json.JsPath
-import models.add.IndividualContactMethodOptions.{Emailaddress, Mobilenumber, Phonenumber}
 import models.add.IndividualContactMethodOptions
+import models.contact.ContactMethodOptions.{Email, Mobile, Phone}
+
 import scala.util.{Success, Try}
 
-case object IndividualContactMethodOptionsPage extends QuestionPage[Set[IndividualContactMethodOptions]] {
+case object IndividualContactMethodOptionsPage extends QuestionPage[Set[IndividualContactMethodOptions]] with IndividualJourney {
 
   override def path: JsPath = JsPath \ toString
 
@@ -32,9 +33,9 @@ case object IndividualContactMethodOptionsPage extends QuestionPage[Set[Individu
   override def cleanup(value: Option[Set[IndividualContactMethodOptions]], userAnswers: UserAnswers): Try[UserAnswers] =
     value match {
       case Some(selectedAnswers) =>
-        removeIfNotSelected(selectedAnswers, Emailaddress, IndividualEmailAddressPage, userAnswers)
-          .flatMap(removeIfNotSelected(selectedAnswers, Phonenumber, IndividualPhoneNumberPage, _))
-          .flatMap(removeIfNotSelected(selectedAnswers, Mobilenumber, IndividualMobileNumberPage, _))
+        removeIfNotSelected(selectedAnswers, Email, IndividualEmailAddressPage, userAnswers)
+          .flatMap(removeIfNotSelected(selectedAnswers, Phone, IndividualPhoneNumberPage, _))
+          .flatMap(removeIfNotSelected(selectedAnswers, Mobile, IndividualMobileNumberPage, _))
       case _                     =>
         super.cleanup(value, userAnswers)
     }

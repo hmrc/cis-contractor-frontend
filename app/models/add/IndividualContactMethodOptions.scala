@@ -16,36 +16,15 @@
 
 package models.add
 
-import models.{Enumerable, WithName}
+import models.contact.ContactMethodOptions
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.checkboxes.CheckboxItem
-import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
-import viewmodels.govuk.checkbox.*
 
-sealed trait IndividualContactMethodOptions
+type IndividualContactMethodOptions = ContactMethodOptions
 
-object IndividualContactMethodOptions extends Enumerable.Implicits {
-
-  case object Emailaddress extends WithName("emailAddress") with IndividualContactMethodOptions
-  case object Phonenumber extends WithName("phoneNumber") with IndividualContactMethodOptions
-  case object Mobilenumber extends WithName("mobileNumber") with IndividualContactMethodOptions
-
-  val values: Seq[IndividualContactMethodOptions] = Seq(
-    Emailaddress,
-    Phonenumber,
-    Mobilenumber
-  )
+object IndividualContactMethodOptions {
+  val values: Seq[IndividualContactMethodOptions] = ContactMethodOptions.values
 
   def checkboxItems(implicit messages: Messages): Seq[CheckboxItem] =
-    values.zipWithIndex.map { case (value, index) =>
-      CheckboxItemViewModel(
-        content = Text(messages(s"individualContactMethodOptions.${value.toString}")),
-        fieldId = "value",
-        index = index,
-        value = value.toString
-      )
-    }
-
-  implicit val enumerable: Enumerable[IndividualContactMethodOptions] =
-    Enumerable(values.map(v => v.toString -> v): _*)
+    ContactMethodOptions.checkboxItems("individualContactMethodOptions")
 }
