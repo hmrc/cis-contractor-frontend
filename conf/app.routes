@@ -36,6 +36,12 @@ GET  /subcontractor/system-error/there-is-a-problem  controllers.SystemErrorCont
 GET  /unauthorised/standard-user  controllers.UnauthorisedWrongRoleController.onPageLoad()
 
 # Individual
+GET   /subcontractor/amend/individual  controllers.amend.AmendIndividualController.onPageLoad()
+
+GET   /subcontractor/amend/check-your-answers  controllers.amend.AmendIndividualCheckYourAnswersController.onPageLoad()
+POST  /subcontractor/amend/check-your-answers  controllers.amend.AmendIndividualCheckYourAnswersController.onSubmit()
+GET   /subcontractor/amend/cancel              controllers.amend.AmendIndividualCheckYourAnswersController.onCancel()
+
 GET   /subcontractor/add/check-your-answers  controllers.add.CheckYourAnswersController.onPageLoad()
 POST  /subcontractor/add/check-your-answers  controllers.add.CheckYourAnswersController.onSubmit()
 
@@ -53,6 +59,8 @@ GET   /subcontractor/add/trading-name         controllers.add.TradingNameOfSubco
 POST  /subcontractor/add/trading-name         controllers.add.TradingNameOfSubcontractorController.onSubmit(mode: Mode = NormalMode)
 GET   /subcontractor/add/change-trading-name  controllers.add.TradingNameOfSubcontractorController.onPageLoad(mode: Mode = CheckMode)
 POST  /subcontractor/add/change-trading-name  controllers.add.TradingNameOfSubcontractorController.onSubmit(mode: Mode = CheckMode)
+GET   /subcontractor/amend/trading-name       controllers.add.TradingNameOfSubcontractorController.onPageLoad(mode: Mode = AmendMode)
+POST  /subcontractor/amend/trading-name       controllers.add.TradingNameOfSubcontractorController.onSubmit(mode: Mode = AmendMode)
 
 GET   /subcontractor/add/name         controllers.add.SubcontractorNameController.onPageLoad(mode: Mode = NormalMode)
 POST  /subcontractor/add/name         controllers.add.SubcontractorNameController.onSubmit(mode: Mode = NormalMode)
