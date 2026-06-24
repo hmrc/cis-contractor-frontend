@@ -24,7 +24,9 @@ import models.contact.ContactMethodOptions.{Email, Mobile, Phone}
 
 import scala.util.{Success, Try}
 
-case object IndividualContactMethodOptionsPage extends QuestionPage[Set[IndividualContactMethodOptions]] with IndividualJourney {
+case object IndividualContactMethodOptionsPage
+    extends QuestionPage[Set[IndividualContactMethodOptions]]
+    with IndividualJourney {
 
   override def path: JsPath = JsPath \ toString
 

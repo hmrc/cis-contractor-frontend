@@ -31,9 +31,8 @@ object IndividualContactMethodOptionsSummary {
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
     answers.get(IndividualContactMethodOptionsPage).map { selectedMethods =>
       val options =
-        ContactMethodOptions
-          .values
-          //.ordered(selectedMethods)
+        ContactMethodOptions.values
+          // .ordered(selectedMethods)
           .map(m => HtmlFormat.escape(messages(s"individualContactMethodOptions.$m")).toString)
       SummaryListRowViewModel(
         key = "individualContactMethodOptions.checkYourAnswersLabel",
