@@ -129,7 +129,7 @@ class ReverifyExistingSubcontractorsYesNoControllerSpec extends SpecBase with Mo
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual
-          controllers.verify.routes.VerificationNotSubmittedWarningController.onPageLoad().url
+          controllers.verify.routes.NoSubcontractorsSelectedWarningController.onPageLoad().url
       }
     }
 
