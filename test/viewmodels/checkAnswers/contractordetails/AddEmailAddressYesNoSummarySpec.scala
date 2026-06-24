@@ -55,13 +55,13 @@ class AddEmailAddressYesNoSummarySpec extends AnyFreeSpec with Matchers {
       val actions = row.actions.value.items
       actions should have size 1
 
-      val changeAction = actions.head
+      val changeAction       = actions.head
       val expectedChangeText = messages("site.change")
-      val expectedHref = controllers.contractordetails.routes.AddEmailAddressYesNoController.onPageLoad(CheckMode).url
+      val expectedHref       = controllers.contractordetails.routes.AddEmailAddressYesNoController.onPageLoad(CheckMode).url
       val expectedHiddenText = messages("contractordetails.addEmailAddressYesNo.change.hidden")
 
-      changeAction.content.asHtml.toString should include(expectedChangeText)
-      changeAction.href shouldBe expectedHref
+      changeAction.content.asHtml.toString    should include(expectedChangeText)
+      changeAction.href                     shouldBe expectedHref
       changeAction.visuallyHiddenText.value shouldBe expectedHiddenText
     }
 
@@ -74,7 +74,7 @@ class AddEmailAddressYesNoSummarySpec extends AnyFreeSpec with Matchers {
       val maybeRow: Option[SummaryListRow] = AddEmailAddressYesNoSummary.row(answers)
       maybeRow shouldBe defined
 
-      val row = maybeRow.value
+      val row           = maybeRow.value
       val expectedValue = messages("site.no")
       row.value.content.asHtml.toString should include(expectedValue)
     }
