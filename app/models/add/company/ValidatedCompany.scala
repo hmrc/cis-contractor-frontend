@@ -16,7 +16,7 @@
 
 package models.add.company
 
-import models.add.InternationalAddress
+import models.address.Address
 import models.contact.ContactOptions
 import models.contact.ContactOptions.*
 import models.{InvalidAnswer, MissingAnswer, TypeOfSubcontractor, UserAnswers, Validation, ValidationError}
@@ -27,7 +27,7 @@ import play.api.libs.json.Reads
 
 final case class ValidatedCompany(
   companyName: String,
-  companyAddress: Option[InternationalAddress],
+  companyAddress: Option[Address],
   companyContactDetails: ContactOptions,
   companyEmail: Option[String],
   companyPhone: Option[String],

@@ -43,13 +43,13 @@ class SubcontractorCleanupSpec extends SpecBase {
 
   val name = "John"
 
-  val address = InternationalAddress(
+  val subcontractorAddress = models.address.Address(
     addressLine1 = "value 1",
     addressLine2 = Some("value 2"),
-    addressLine3 = "value 3",
+    addressLine3 = Some("value 3"),
     addressLine4 = Some("value 4"),
-    postalCode = "NX1 1AA",
-    country = "United Kingdom"
+    postcode = Some("NX1 1AA"),
+    country = Some(models.address.Country(Some("GB"), Some("United Kingdom")))
   )
 
   val phoneNumber = "01234567"
@@ -66,7 +66,7 @@ class SubcontractorCleanupSpec extends SpecBase {
 
       val userAnswers =
         emptyUserAnswers
-          .set(AddressOfSubcontractorPage, address)
+          .set(AddressOfSubcontractorPage, subcontractorAddress)
           .success
           .value
           .set(IndividualChooseContactDetailsPage, ContactOptions.Email)
@@ -138,7 +138,7 @@ class SubcontractorCleanupSpec extends SpecBase {
 
       val userAnswers =
         emptyUserAnswers
-          .set(CompanyAddressPage, address)
+          .set(CompanyAddressPage, subcontractorAddress)
           .success
           .value
           .set(CompanyAddressYesNoPage, true)
@@ -202,7 +202,7 @@ class SubcontractorCleanupSpec extends SpecBase {
 
       val userAnswers =
         emptyUserAnswers
-          .set(PartnershipAddressPage, address)
+          .set(PartnershipAddressPage, subcontractorAddress)
           .success
           .value
           .set(PartnershipAddressYesNoPage, true)
@@ -286,7 +286,7 @@ class SubcontractorCleanupSpec extends SpecBase {
 
       val userAnswers =
         emptyUserAnswers
-          .set(TrustAddressPage, address)
+          .set(TrustAddressPage, subcontractorAddress)
           .success
           .value
           .set(TrustAddressYesNoPage, true)
@@ -345,7 +345,7 @@ class SubcontractorCleanupSpec extends SpecBase {
           .set(TypeOfSubcontractorPage, TypeOfSubcontractor.Individualorsoletrader)
           .success
           .value
-          .set(AddressOfSubcontractorPage, address)
+          .set(AddressOfSubcontractorPage, subcontractorAddress)
           .success
           .value
           .set(IndividualChooseContactDetailsPage, ContactOptions.Email)
@@ -390,7 +390,7 @@ class SubcontractorCleanupSpec extends SpecBase {
           .set(WorksReferenceNumberYesNoPage, true)
           .success
           .value
-          .set(CompanyAddressPage, address)
+          .set(CompanyAddressPage, subcontractorAddress)
           .success
           .value
           .set(CompanyAddressYesNoPage, true)
@@ -429,7 +429,7 @@ class SubcontractorCleanupSpec extends SpecBase {
           .set(CompanyWorksReferenceYesNoPage, true)
           .success
           .value
-          .set(PartnershipAddressPage, address)
+          .set(PartnershipAddressPage, subcontractorAddress)
           .success
           .value
           .set(PartnershipAddressYesNoPage, true)
@@ -483,7 +483,7 @@ class SubcontractorCleanupSpec extends SpecBase {
           .set(PartnershipWorksReferenceNumberYesNoPage, true)
           .success
           .value
-          .set(TrustAddressPage, address)
+          .set(TrustAddressPage, subcontractorAddress)
           .success
           .value
           .set(TrustAddressYesNoPage, true)
