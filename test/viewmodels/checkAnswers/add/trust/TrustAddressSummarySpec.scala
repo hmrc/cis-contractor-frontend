@@ -18,8 +18,8 @@ package viewmodels.checkAnswers.add.trust
 
 import controllers.add.trust.routes
 import helpers.CyaEncodingSpecHelper
-import models.add.InternationalAddress
-import models.{CheckMode, UserAnswers}
+import models.UserAnswers
+import models.address.{Address, Country}
 import org.scalatest.OptionValues.convertOptionToValuable
 import org.scalatest.TryValues.convertTryToSuccessOrFailure
 import org.scalatest.wordspec.AnyWordSpec
@@ -37,13 +37,13 @@ class TrustAddressSummarySpec extends AnyWordSpec with Matchers with CyaEncoding
 
     "return a SummaryListRow when TrustAddressPage has an answer" in {
 
-      val address = InternationalAddress(
+      val address = Address(
         addressLine1 = "10 Downing Street",
         addressLine2 = Some("Westminster"),
-        addressLine3 = "London",
+        addressLine3 = Some("London"),
         addressLine4 = Some("Greater London"),
-        postalCode = "SW1A 2AA",
-        country = "United Kingdom"
+        postcode = Some("SW1A 2AA"),
+        country = Some(Country(Some("GB"), Some("United Kingdom")))
       )
 
       val userAnswers =
@@ -75,7 +75,7 @@ class TrustAddressSummarySpec extends AnyWordSpec with Matchers with CyaEncoding
 
       action.href shouldBe
         routes.TrustAddressController
-          .onPageLoad(CheckMode)
+          .redirectToAddressLookup(Some("change"))
           .url
 
       action.visuallyHiddenText.value shouldBe
@@ -93,13 +93,13 @@ class TrustAddressSummarySpec extends AnyWordSpec with Matchers with CyaEncoding
 
     "must render address safely without double encoding and preserve line breaks" in {
 
-      val address = InternationalAddress(
+      val address = Address(
         addressLine1 = "10 O'Reilly & Co",
         addressLine2 = Some("Building & Sons"),
-        addressLine3 = "Main Street",
+        addressLine3 = Some("Main Street"),
         addressLine4 = Some("London"),
-        postalCode = "AB1 2CD",
-        country = "UK"
+        postcode = Some("AB1 2CD"),
+        country = Some(Country(Some("GB"), Some("UK")))
       )
 
       val answers =
@@ -112,8 +112,8 @@ class TrustAddressSummarySpec extends AnyWordSpec with Matchers with CyaEncoding
 
       val html = extractHtml(row)
 
-      assertRaw(html, "10 O'Reilly & Co")
-      assertRaw(html, "Building & Sons")
+      assertRaw(html, "10 O&#x27;Reilly &amp; Co")
+      assertRaw(html, "Building &amp; Sons")
 
       assertHasBreaks(html)
 

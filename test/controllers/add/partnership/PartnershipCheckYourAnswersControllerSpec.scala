@@ -17,7 +17,7 @@
 package controllers.add.partnership
 
 import base.SpecBase
-import models.add.InternationalAddress
+import models.address.{Address, Country}
 import models.contact.ContactOptions
 import pages.add.TypeOfSubcontractorPage
 import pages.add.partnership.*
@@ -100,13 +100,13 @@ class PartnershipCheckYourAnswersControllerSpec extends SpecBase {
 
     "must return OK and the correct view for a GET when all partnership optionals are present" in {
 
-      val address = InternationalAddress(
+      val address = Address(
         addressLine1 = "1 Test Street",
         addressLine2 = None,
-        addressLine3 = "Test Town",
+        addressLine3 = Some("Test Town"),
         addressLine4 = None,
-        postalCode = "TE1 1ST",
-        country = "GB"
+        postcode = Some("TE1 1ST"),
+        country = Some(Country(Some("GB"), Some("GB")))
       )
 
       val ua = minUa
@@ -487,13 +487,13 @@ class PartnershipCheckYourAnswersControllerSpec extends SpecBase {
       }
 
       "must return OK when Address YesNo changes from Yes to No and stale address is cleaned up" in {
-        val address = InternationalAddress(
+        val address = Address(
           addressLine1 = "1 Test Street",
           addressLine2 = None,
-          addressLine3 = "Test Town",
+          addressLine3 = Some("Test Town"),
           addressLine4 = None,
-          postalCode = "TE1 1ST",
-          country = "GB"
+          postcode = Some("TE1 1ST"),
+          country = Some(Country(Some("GB"), Some("GB")))
         )
 
         val ua = minUa
@@ -578,13 +578,13 @@ class PartnershipCheckYourAnswersControllerSpec extends SpecBase {
 
     "must redirect to Journey Recovery when AddressYesNo is false but address value is still present (stale session)" in {
 
-      val address = InternationalAddress(
+      val address = Address(
         addressLine1 = "1 Test Street",
         addressLine2 = None,
-        addressLine3 = "Test Town",
+        addressLine3 = Some("Test Town"),
         addressLine4 = None,
-        postalCode = "TE1 1ST",
-        country = "GB"
+        postcode = Some("TE1 1ST"),
+        country = Some(Country(Some("GB"), Some("GB")))
       )
 
       val uaBase =

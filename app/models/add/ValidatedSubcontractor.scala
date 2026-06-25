@@ -16,6 +16,7 @@
 
 package models.add
 
+import models.address.Address
 import models.contact.ContactOptions
 import models.contact.ContactOptions.*
 import models.{InvalidAnswer, MissingAnswer, TypeOfSubcontractor, UserAnswers, Validation, ValidationError}
@@ -26,7 +27,7 @@ import play.api.libs.json.*
 final case class ValidatedSubcontractor(
   tradingName: Option[String],
   subcontractorName: Option[SubcontractorName],
-  address: Option[InternationalAddress],
+  address: Option[Address],
   individualContactDetails: ContactOptions,
   individualEmail: Option[String],
   individualPhone: Option[String],
