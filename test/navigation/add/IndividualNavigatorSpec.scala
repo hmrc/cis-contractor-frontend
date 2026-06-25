@@ -20,7 +20,7 @@ import base.SpecBase
 import controllers.routes
 import models.add.SubcontractorName
 import models.contact.ContactOptions
-import models.{CheckMode, NormalMode, UserAnswers}
+import models.{AmendMode, CheckMode, NormalMode, UserAnswers}
 import pages.Page
 import pages.add.*
 
@@ -706,6 +706,31 @@ class IndividualNavigatorSpec extends SpecBase {
             emptyUserAnswers
           ) mustBe journeyRecovery
         }
+      }
+    }
+
+    "in Amend mode" - {
+      "must go from SubTradingNameYesNoPage to TradingNameOfSubcontractorController when true" in {
+        navigator.nextPage(
+          SubTradingNameYesNoPage,
+          AmendMode,
+          emptyUserAnswers.setOrException(SubTradingNameYesNoPage, true)
+        ) mustBe controllers.add.routes.TradingNameOfSubcontractorController.onPageLoad(AmendMode)
+      }
+      "must go from SubTradingNameYesNoPage to SubcontractorNamePage when false" in {
+        navigator.nextPage(
+          SubTradingNameYesNoPage,
+          CheckMode,
+          emptyUserAnswers.setOrException(SubTradingNameYesNoPage, false)
+        ) mustBe controllers.add.routes.SubcontractorNameController.onPageLoad(AmendMode)
+      }
+
+      "must go from SubTradingNameYesNoPage to journey recovery page when incomplete info provided" in {
+        navigator.nextPage(
+          SubTradingNameYesNoPage,
+          CheckMode,
+          emptyUserAnswers
+        ) mustBe journeyRecovery
       }
     }
 
