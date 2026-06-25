@@ -153,4 +153,9 @@ trait ModelGenerators {
     Gen
       .choose(0L, System.currentTimeMillis())
       .map(ms => LocalDateTime.ofEpochSecond(ms / 1000, 0, ZoneOffset.UTC))
+
+  implicit lazy val arbitraryIndividualContactMethodOptions: Arbitrary[models.add.IndividualContactMethodOptions] =
+    Arbitrary {
+      Gen.oneOf(models.add.IndividualContactMethodOptions.values)
+    }
 }

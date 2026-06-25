@@ -1066,3 +1066,13 @@ contractordetails.contractorDetailsCheckAnswers.table.email                    =
 contractordetails.contractorDetailsCheckAnswers.table.email.hidden             =  email address
 contractordetails.contractorDetailsCheckAnswers.table.link.addDetails          =  Add details
 contractordetails.contractorDetailsCheckAnswers.returnToCisDashboard.link      =  Return to CIS dashboard
+
+individualContactMethodOptions.title = Which contact details do you want to add for this subcontractor?
+individualContactMethodOptions.heading = Which contact details do you want to add for {0}?
+individualContactMethodOptions.emailAddress = Email address
+individualContactMethodOptions.phoneNumber = Phone number
+individualContactMethodOptions.mobileNumber = Mobile number
+individualContactMethodOptions.checkYourAnswersLabel = Methods of contact
+individualContactMethodOptions.hint = Contact details are only for your own records
+individualContactMethodOptions.error.required = Select the methods of contact you want to add for this subcontractor
+individualContactMethodOptions.change.hidden = methods of contact
