@@ -17,7 +17,7 @@
 package views.add
 
 import forms.add.SubTradingNameYesNoFormProvider
-import models.NormalMode
+import models.{AmendMode, NormalMode}
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
@@ -56,6 +56,14 @@ class SubTradingNameYesNoViewSpec extends AnyWordSpec with Matchers with GuiceOn
       doc.select("form").attr("autocomplete") mustBe "off"
 
       doc.select(".govuk-button").text() mustBe messages("site.continue")
+    }
+
+    "render the page with title and update button in amend mode" in new Setup {
+      val html: HtmlFormat.Appendable = view(form, AmendMode)
+      val doc = org.jsoup.Jsoup.parse(html.toString())
+      doc.select("title").text() must include(messages("subTradingNameYesNo.title"))
+
+      doc.select(".govuk-button").text() mustBe messages("site.update")
     }
 
     "display error summary and inline error when no option is selected" in new Setup {
