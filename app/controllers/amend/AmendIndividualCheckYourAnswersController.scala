@@ -38,8 +38,7 @@ class AmendIndividualCheckYourAnswersController @Inject() (
     Redirect(controllers.routes.IndexController.onPageLoad())
   }
 
-  def onSubmit(): Action[AnyContent] = (identify andThen getData andThen requireData).async {
-    implicit request =>
-      Future.successful(Redirect(controllers.routes.IndexController.onPageLoad()))
+  def onSubmit(): Action[AnyContent] = (identify andThen getData andThen requireData).async { implicit request =>
+    Future.successful(Redirect(controllers.routes.IndexController.onPageLoad()))
   }
 }

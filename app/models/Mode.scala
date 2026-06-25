@@ -30,7 +30,7 @@ object Mode {
     override def to(value: Mode): String = value match {
       case NormalMode => "NormalMode"
       case CheckMode  => "CheckMode"
-      case AmendMode => "AmendMode"
+      case AmendMode  => "AmendMode"
     }
   }
 }

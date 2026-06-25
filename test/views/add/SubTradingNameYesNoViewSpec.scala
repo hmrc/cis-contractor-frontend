@@ -60,7 +60,7 @@ class SubTradingNameYesNoViewSpec extends AnyWordSpec with Matchers with GuiceOn
 
     "render the page with title and update button in amend mode" in new Setup {
       val html: HtmlFormat.Appendable = view(form, AmendMode)
-      val doc = org.jsoup.Jsoup.parse(html.toString())
+      val doc                         = org.jsoup.Jsoup.parse(html.toString())
       doc.select("title").text() must include(messages("subTradingNameYesNo.title"))
 
       doc.select(".govuk-button").text() mustBe messages("site.update")
