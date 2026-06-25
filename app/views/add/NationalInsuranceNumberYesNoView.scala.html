@@ -38,7 +38,7 @@
                 legend = LegendViewModel(messages("nationalInsuranceNumberYesNo.heading", name))
                     .asPageHeading()
                     .withCssClass("govuk-fieldset__legend--l")
-            ).withHint(HintViewModel(messages("nationalInsuranceNumberYesNo.hint")))
+            ).withHint(HintViewModel(messages(if(mode == models.AmendMode) "site.update" else "nationalInsuranceNumberYesNo.hint")))
         )
 
         @govukButton(

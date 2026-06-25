@@ -35,6 +35,11 @@ class IndividualNavigator @Inject() () extends NavigatorForJourney {
       checkRouteMap(page)(userAnswers)
   }
 
+  private def cyaRoute(mode: Mode): Call = mode match {
+    case AmendMode => controllers.amend.routes.AmendIndividualCheckYourAnswersController.onPageLoad()
+    case _         => controllers.add.routes.CheckYourAnswersController.onPageLoad()
+  }
+
   private val normalRoutes: Page => UserAnswers => Call = {
     case SubTradingNameYesNoPage                   => userAnswers => navigatorFromSubTradingNameYesNoPage(NormalMode)(userAnswers)
     case TradingNameOfSubcontractorPage            => _ => controllers.add.routes.SubAddressYesNoController.onPageLoad(NormalMode)
@@ -84,6 +89,11 @@ class IndividualNavigator @Inject() () extends NavigatorForJourney {
     case _                                    => _ => controllers.add.routes.CheckYourAnswersController.onPageLoad()
   }
 
+  private val amendRouteMap: Page => UserAnswers => Call = {
+    case NationalInsuranceNumberYesNoPage     => navigatorFromNationalInsuranceNumberYesNoPage(AmendMode)(_)
+    case _                                    => _ => controllers.amend.routes.AmendIndividualCheckYourAnswersController.onPageLoad()
+  }
+
   private def navigatorFromSubTradingNameYesNoPage(mode: Mode)(ua: UserAnswers): Call =
     (ua.get(SubTradingNameYesNoPage), mode) match {
       case (Some(true), NormalMode) =>
@@ -127,13 +137,13 @@ class IndividualNavigator @Inject() () extends NavigatorForJourney {
         controllers.add.routes.SubNationalInsuranceNumberController.onPageLoad(NormalMode)
       case (Some(false), NormalMode) =>
         controllers.add.routes.WorksReferenceNumberYesNoController.onPageLoad(NormalMode)
-      case (Some(true), CheckMode)   =>
+      case (Some(true), CheckMode | AmendMode)   =>
         ua.get(SubNationalInsuranceNumberPage)
-          .fold(controllers.add.routes.SubNationalInsuranceNumberController.onPageLoad(CheckMode)) { _ =>
-            controllers.add.routes.CheckYourAnswersController.onPageLoad()
+          .fold(controllers.add.routes.SubNationalInsuranceNumberController.onPageLoad(mode)) { _ =>
+            cyaRoute(mode)
           }
-      case (Some(false), CheckMode)  =>
-        controllers.add.routes.CheckYourAnswersController.onPageLoad()
+      case (Some(false), CheckMode | AmendMode)  =>
+        cyaRoute(mode)
       case _                         =>
         routes.JourneyRecoveryController.onPageLoad()
     }

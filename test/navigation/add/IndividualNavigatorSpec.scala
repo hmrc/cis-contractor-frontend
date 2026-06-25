@@ -710,6 +710,41 @@ class IndividualNavigatorSpec extends SpecBase {
       }
     }
 
+    "in Amend mode" - {
+
+      "must go from SubNationalInsuranceNumberPage to CYA in AmendMode" in {
+        navigator.nextPage(
+          SubNationalInsuranceNumberPage,
+          AmendMode,
+          UserAnswers("id")
+        ) mustBe CYA
+      }
+
+      "must go from a NationalInsuranceNumberYesNoPage to next page when true" in {
+        navigator.nextPage(
+          NationalInsuranceNumberYesNoPage,
+          AmendMode,
+          emptyUserAnswers.setOrException(NationalInsuranceNumberYesNoPage, true)
+        ) mustBe controllers.add.routes.SubNationalInsuranceNumberController.onPageLoad(AmendMode)
+      }
+
+      "must go from a NationalInsuranceNumberYesNoPage to CYA page when false" in {
+        navigator.nextPage(
+          NationalInsuranceNumberYesNoPage,
+          AmendMode,
+          emptyUserAnswers.setOrException(NationalInsuranceNumberYesNoPage, false)
+        ) mustBe CYA
+      }
+
+      "must go from a NationalInsuranceNumberYesNoPage to journey recovery page when incomplete info provided" in {
+        navigator.nextPage(
+          NationalInsuranceNumberYesNoPage,
+          AmendMode,
+          emptyUserAnswers
+        ) mustBe journeyRecovery
+      }
+    }
+
     "navigatorFromSubTradingNameYesNoPage in NormalMode" - {
 
       "must go to TradingNameOfSubcontractorController when answer is Yes" in {
