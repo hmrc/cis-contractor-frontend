@@ -84,6 +84,11 @@ class IndividualNavigator @Inject() () extends NavigatorForJourney {
     case _                                    => _ => controllers.add.routes.CheckYourAnswersController.onPageLoad()
   }
 
+  private val amendRouteMap: Page => UserAnswers => Call = {
+    case SubAddressYesNoPage                  => navigatorFromSubAddressYesNoPage(AmendMode)(_)
+    case _                                    => _ => controllers.amend.routes.AmendIndividualCheckYourAnswersController.onPageLoad()
+  }
+
   private def navigatorFromSubTradingNameYesNoPage(mode: Mode)(ua: UserAnswers): Call =
     (ua.get(SubTradingNameYesNoPage), mode) match {
       case (Some(true), NormalMode) =>
@@ -109,16 +114,28 @@ class IndividualNavigator @Inject() () extends NavigatorForJourney {
     }
 
   private def navigatorFromSubAddressYesNoPage(mode: Mode)(ua: UserAnswers): Call =
-    addressLookupYesNoRoute(
-      mode,
-      ua.get(SubAddressYesNoPage),
-      ua.get(AddressOfSubcontractorPage).isDefined,
-      onYes = controllers.add.routes.AddressOfSubcontractorController.redirectToAddressLookup(),
-      onYesChange =
-        controllers.add.routes.AddressOfSubcontractorController.redirectToAddressLookup(Some(CheckMode.toString)),
-      onNo = controllers.add.routes.IndividualChooseContactDetailsController.onPageLoad(NormalMode),
-      checkYourAnswers = controllers.add.routes.CheckYourAnswersController.onPageLoad()
-    )
+    mode match {
+      case AmendMode =>
+        ua.get(SubAddressYesNoPage) match {
+          case Some(true) =>
+            controllers.add.routes.AddressOfSubcontractorController.redirectToAmendAddressLookup()
+          case Some(false) =>
+            controllers.amend.routes.AmendIndividualCheckYourAnswersController.onPageLoad()
+          case None =>
+            controllers.routes.JourneyRecoveryController.onPageLoad()
+        }
+      case _ =>
+        addressLookupYesNoRoute(
+          mode,
+          ua.get(SubAddressYesNoPage),
+          ua.get(AddressOfSubcontractorPage).isDefined,
+          onYes = controllers.add.routes.AddressOfSubcontractorController.redirectToAddressLookup(),
+          onYesChange =
+            controllers.add.routes.AddressOfSubcontractorController.redirectToAddressLookup(Some(CheckMode.toString)),
+          onNo = controllers.add.routes.IndividualChooseContactDetailsController.onPageLoad(NormalMode),
+          checkYourAnswers = controllers.add.routes.CheckYourAnswersController.onPageLoad()
+        )
+    }
 
   private def navigatorFromNationalInsuranceNumberYesNoPage(mode: Mode)(ua: UserAnswers): Call =
     (ua.get(NationalInsuranceNumberYesNoPage), mode) match {

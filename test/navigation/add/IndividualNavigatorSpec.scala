@@ -710,6 +710,34 @@ class IndividualNavigatorSpec extends SpecBase {
       }
     }
 
+    "in Amend mode" - {
+
+      "must go from a SubAddressYesNoPage to next page when true" in {
+        navigator.nextPage(
+          SubAddressYesNoPage,
+          AmendMode,
+          emptyUserAnswers.setOrException(SubAddressYesNoPage, true)
+        ) mustBe controllers.add.routes.AddressOfSubcontractorController
+          .redirectToAddressLookup(Some(AmendMode.toString))
+      }
+
+      "must go from a SubAddressYesNoPage to CYA page when false" in {
+        navigator.nextPage(
+          SubAddressYesNoPage,
+          AmendMode,
+          emptyUserAnswers.setOrException(SubAddressYesNoPage, false)
+        ) mustBe CYA
+      }
+
+      "must go from a SubAddressYesNoPage to journey recovery page when incomplete info provided" in {
+        navigator.nextPage(
+          SubAddressYesNoPage,
+          AmendMode,
+          emptyUserAnswers
+        ) mustBe journeyRecovery
+      }
+    }
+
     "navigatorFromSubTradingNameYesNoPage in NormalMode" - {
 
       "must go to TradingNameOfSubcontractorController when answer is Yes" in {
