@@ -84,6 +84,12 @@ class IndividualNavigator @Inject() () extends NavigatorForJourney {
     case _                                    => _ => controllers.add.routes.CheckYourAnswersController.onPageLoad()
   }
 
+  private val amendRouteMap: Page => UserAnswers => Call = {
+    case IndividualPhoneNumberPage            =>
+      _ => controllers.amend.routes.AmendIndividualCheckYourAnswersController.onPageLoad()
+    case _                                    => _ => controllers.amend.routes.AmendIndividualCheckYourAnswersController.onPageLoad()
+  }
+
   private def navigatorFromSubTradingNameYesNoPage(mode: Mode)(ua: UserAnswers): Call =
     (ua.get(SubTradingNameYesNoPage), mode) match {
       case (Some(true), NormalMode) =>
