@@ -40,12 +40,6 @@ GET  /subcontractor/individual-address-return/change  controllers.add.AddressOfS
 GET  /unauthorised/standard-user  controllers.UnauthorisedWrongRoleController.onPageLoad()
 
 # Individual
-GET   /subcontractor/amend/individual  controllers.amend.AmendIndividualController.onPageLoad()
-
-GET   /subcontractor/amend/check-your-answers  controllers.amend.AmendIndividualCheckYourAnswersController.onPageLoad()
-POST  /subcontractor/amend/check-your-answers  controllers.amend.AmendIndividualCheckYourAnswersController.onSubmit()
-GET   /subcontractor/amend/cancel              controllers.amend.AmendIndividualCheckYourAnswersController.onCancel()
-
 GET   /subcontractor/add/check-your-answers  controllers.add.CheckYourAnswersController.onPageLoad()
 POST  /subcontractor/add/check-your-answers  controllers.add.CheckYourAnswersController.onSubmit()
 

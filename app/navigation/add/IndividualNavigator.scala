@@ -38,7 +38,7 @@ class IndividualNavigator @Inject() () extends NavigatorForJourney {
   }
 
   private def cyaRoute(mode: Mode): Call = mode match {
-    case AmendMode => controllers.amend.routes.AmendIndividualCheckYourAnswersController.onPageLoad()
+    // case AmendMode => controllers.amend.routes.AmendIndividualCheckYourAnswersController.onPageLoad()
     case _         => controllers.add.routes.CheckYourAnswersController.onPageLoad()
   }
 

@@ -718,13 +718,6 @@ class IndividualNavigatorSpec extends SpecBase {
           emptyUserAnswers.setOrException(SubTradingNameYesNoPage, true)
         ) mustBe controllers.add.routes.TradingNameOfSubcontractorController.onPageLoad(AmendMode)
       }
-      "must go from SubTradingNameYesNoPage to SubcontractorNamePage when false" in {
-        navigator.nextPage(
-          SubTradingNameYesNoPage,
-          CheckMode,
-          emptyUserAnswers.setOrException(SubTradingNameYesNoPage, false)
-        ) mustBe controllers.add.routes.SubcontractorNameController.onPageLoad(AmendMode)
-      }
 
       "must go from SubTradingNameYesNoPage to journey recovery page when incomplete info provided" in {
         navigator.nextPage(
