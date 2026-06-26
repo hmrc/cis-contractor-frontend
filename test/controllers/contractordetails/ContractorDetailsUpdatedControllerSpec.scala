@@ -39,7 +39,6 @@ class ContractorDetailsUpdatedControllerSpec extends SpecBase {
         status(result) mustEqual OK
         contentAsString(result) mustEqual view()(
           request,
-          applicationConfig,
           messages(application)
         ).toString
       }
