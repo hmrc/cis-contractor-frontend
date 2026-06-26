@@ -390,7 +390,10 @@ GET   /subcontractor/verify/no-subcontractors-added  controllers.verify.NoSubcon
 
 GET   /subcontractor/verify/check-verification-batch-readiness  controllers.verify.CheckVerificationBatchReadinessController.checkVerificationBatchReadiness(mode: Mode = NormalMode)
 
-GET   /subcontractor/verify/newest  controllers.verify.NewestVerificationBatchController.onPageLoad()
+GET   /subcontractor/verify/check-verification-batch-readiness/check-mode  controllers.verify.CheckVerificationBatchReadinessController.checkVerificationBatchReadinessInCheckMode()
+
+GET   /subcontractor/verify/newest                            controllers.verify.NewestVerificationBatchController.onPageLoad()
+GET   /subcontractor/verify/inactive-scheme-warning/continue  controllers.verify.NewestVerificationBatchController.onContinue
 
 GET   /subcontractor/verify/current  controllers.verify.CurrentVerificationBatchController.onPageLoad()
 

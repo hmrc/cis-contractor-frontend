@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package viewmodels.checkAnswers.verify
+package viewmodels.verify
 
 import base.SpecBase
 import models.UserAnswers
