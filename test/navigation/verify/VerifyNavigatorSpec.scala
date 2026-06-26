@@ -29,7 +29,7 @@ class VerifyNavigatorSpec extends SpecBase {
   private val navigator = new VerifyNavigator()
 
   private lazy val journeyRecovery = routes.JourneyRecoveryController.onPageLoad()
-  private lazy val cya = controllers.verify.routes.VerifyCheckYourAnswersController.onPageLoad()
+  private lazy val cya             = controllers.verify.routes.VerifyCheckYourAnswersController.onPageLoad()
 
   "VerifyNavigator" - {
 
