@@ -722,6 +722,16 @@ companyAdded.helpAndSupport.h2                       =  Help and support
 companyAdded.helpAndSupport.p1                       =  If you need help with the Construction Industry Scheme (CIS) and what it means for you,
 companyAdded.helpAndSupport.p1.link                  =  guidance is available on GOV.UK
 
+companyContactMethodOptions.title                                =  Which contact details do you want to add for this company?
+companyContactMethodOptions.heading                              =  Which contact details do you want to add for {0}?
+companyContactMethodOptions.hint                                 =  Contact details are only for your own records
+companyContactMethodOptions.email                                =  Email address
+companyContactMethodOptions.phone                                =  Phone number
+companyContactMethodOptions.mobile                               =  Mobile number
+companyContactMethodOptions.error.required                       =  Select the methods of contact you want to add for this company
+companyContactMethodOptions.checkYourAnswersLabel                =  Methods of contact
+companyContactMethodOptions.change.hidden                        =  methods of contact
+
 # Trust
 addTrustContactMethodsYesNo.title                  =  Do you want to add contact details for this trust?
 addTrustContactMethodsYesNo.heading                =  Do you want to add contact details for {0}?
