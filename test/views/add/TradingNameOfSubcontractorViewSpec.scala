@@ -17,7 +17,7 @@
 package views.add
 
 import forms.add.TradingNameOfSubcontractorFormProvider
-import models.{AmendMode,NormalMode}
+import models.{AmendMode, NormalMode}
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
