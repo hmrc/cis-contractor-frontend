@@ -51,7 +51,7 @@ class TradingNameOfSubcontractorViewSpec extends AnyWordSpec with Matchers with 
     }
 
     "render the page with title, heading, input and submit button for amend journey" in new Setup {
-      val html: HtmlFormat.Appendable = view(form, NormalMode)
+      val html: HtmlFormat.Appendable = view(form, AmendMode)
       val doc                         = org.jsoup.Jsoup.parse(html.toString())
 
       doc.select("title").text() must include(messages("tradingNameOfSubcontractor.title"))
@@ -60,7 +60,7 @@ class TradingNameOfSubcontractorViewSpec extends AnyWordSpec with Matchers with 
       heading.text() mustBe messages("tradingNameOfSubcontractor.heading")
 
       doc.select("form").attr("action") mustBe controllers.add.routes.TradingNameOfSubcontractorController
-        .onSubmit(NormalMode)
+        .onSubmit(AmendMode)
         .url
 
       doc.select("input[name=value]").size() mustBe 1
