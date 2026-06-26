@@ -41,6 +41,9 @@ class CheckVerificationBatchReadinessController @Inject() (
     with I18nSupport
     with Logging {
 
+  def checkVerificationBatchReadinessInCheckMode(): Action[AnyContent] =
+    checkVerificationBatchReadiness(CheckMode)
+
   def checkVerificationBatchReadiness(mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
       val ua = request.userAnswers

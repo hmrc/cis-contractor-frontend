@@ -371,7 +371,7 @@ class VerifyNavigatorSpec extends SpecBase {
 
         "must go to CheckVerificationBatchReadinessController in CheckMode" in {
           navigator.nextPage(SelectSubcontractorPage, CheckMode, emptyUserAnswers) mustBe
-            controllers.verify.routes.CheckVerificationBatchReadinessController.checkVerificationBatchReadiness()
+            controllers.verify.routes.CheckVerificationBatchReadinessController.checkVerificationBatchReadinessInCheckMode()
         }
       }
 
@@ -459,7 +459,7 @@ class VerifyNavigatorSpec extends SpecBase {
             ContractorEmailConfirmationStoredPage,
             CheckMode,
             ua
-          ) mustBe controllers.verify.routes.VerificationDeclarationController.onPageLoad()
+          ) mustBe cya
         }
 
         "must go to EmailAddressController in CheckMode when answer is DifferentEmail" in {
@@ -481,7 +481,7 @@ class VerifyNavigatorSpec extends SpecBase {
             ContractorEmailConfirmationStoredPage,
             CheckMode,
             ua
-          ) mustBe controllers.verify.routes.VerificationDeclarationController.onPageLoad()
+          ) mustBe cya
         }
 
         "must go to JourneyRecovery when answer is not present" in {
@@ -538,7 +538,7 @@ class VerifyNavigatorSpec extends SpecBase {
           EmailAddressPage,
           CheckMode,
           ua
-        ) mustBe controllers.verify.routes.VerificationDeclarationController.onPageLoad()
+        ) mustBe cya
       }
 
       "must go to VerifyCheckYourAnswers from VerificationDeclarationPage in CheckMode" in {
