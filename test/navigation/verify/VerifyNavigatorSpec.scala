@@ -206,7 +206,8 @@ class VerifyNavigatorSpec extends SpecBase {
 
         "must go to CheckVerificationBatchReadinessController in CheckMode" in {
           navigator.nextPage(SelectSubcontractorPage, CheckMode, emptyUserAnswers) mustBe
-            controllers.verify.routes.CheckVerificationBatchReadinessController.checkVerificationBatchReadinessInCheckMode()
+            controllers.verify.routes.CheckVerificationBatchReadinessController
+              .checkVerificationBatchReadinessInCheckMode()
         }
       }
 
