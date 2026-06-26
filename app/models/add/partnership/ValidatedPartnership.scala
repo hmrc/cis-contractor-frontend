@@ -16,7 +16,7 @@
 
 package models.add.partnership
 
-import models.add.InternationalAddress
+import models.address.Address
 import models.contact.ContactOptions
 import models.contact.ContactOptions.*
 import models.{InvalidAnswer, MissingAnswer, TypeOfSubcontractor, UserAnswers, Validation, ValidationError}
@@ -27,7 +27,7 @@ import play.api.libs.json.*
 
 final case class ValidatedPartnership(
   partnershipName: String,
-  partnershipAddress: Option[InternationalAddress],
+  partnershipAddress: Option[Address],
   partnershipContactDetails: ContactOptions,
   partnershipEmail: Option[String],
   partnershipPhone: Option[String],

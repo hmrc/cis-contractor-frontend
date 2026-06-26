@@ -38,7 +38,10 @@ case class Subcontractor(
   partnerUtr: Option[String],
   crn: Option[String],
   nino: Option[String]
-)
+) {
+  def isVerified: Boolean =
+    verified.exists(_.equalsIgnoreCase("Y"))
+}
 
 object Subcontractor:
   given format: OFormat[Subcontractor] = Json.format[Subcontractor]

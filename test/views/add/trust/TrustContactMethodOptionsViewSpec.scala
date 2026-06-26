@@ -48,6 +48,8 @@ class TrustContactMethodOptionsViewSpec extends AnyWordSpec with Matchers with G
       legend.text() mustBe messages("trustContactMethodOptions.heading", subcontractorName)
       legend.hasClass("govuk-fieldset__legend--l") mustBe true
 
+      doc.select(".govuk-hint").text() mustBe messages("trustContactMethodOptions.hint")
+
       val checkboxes: Elements = doc.select(".govuk-checkboxes__item")
       checkboxes.size() mustBe TrustContactMethodOptions.values.size
 

@@ -18,8 +18,8 @@ package navigation.add
 
 import base.SpecBase
 import controllers.routes
-import models.add.InternationalAddress
-import models.contact.ContactOptions
+import models.address.Address
+import models.contact.{ContactMethodOptions, ContactOptions}
 import models.{CheckMode, NormalMode, UserAnswers}
 import org.scalactic.Prettifier.default
 import pages.Page
@@ -53,12 +53,12 @@ class TrustNavigatorSpec extends SpecBase {
           controllers.add.trust.routes.TrustAddressYesNoController.onPageLoad(NormalMode)
       }
 
-      "must go from a TrustAddressYesNoPage to TrustAddressPage when true" in {
+      "must go from a TrustAddressYesNoPage to the address lookup on-ramp when true" in {
         navigator.nextPage(
           TrustAddressYesNoPage,
           NormalMode,
           emptyUserAnswers.setOrException(TrustAddressYesNoPage, true)
-        ) mustBe controllers.add.trust.routes.TrustAddressController.onPageLoad(NormalMode)
+        ) mustBe controllers.add.trust.routes.TrustAddressController.redirectToAddressLookup()
       }
 
       "must go from a TrustAddressYesNoPage to TrustContactOptionsController when false" in {
@@ -232,6 +232,35 @@ class TrustNavigatorSpec extends SpecBase {
           emptyUserAnswers
         ) mustBe journeyRecovery
       }
+
+      "must go from AddTrustContactMethodsYesNo" - {
+        "to TrustContactMethodOptions Page when answer is Yes" in {
+          navigator.nextPage(
+            AddTrustContactMethodsYesNoPage,
+            NormalMode,
+            emptyUserAnswers.setOrException(AddTrustContactMethodsYesNoPage, true)
+          ) mustBe controllers.add.trust.routes.TrustContactMethodOptionsController
+            .onPageLoad(NormalMode)
+        }
+
+        "to TrustUtrYesNo when answer is No" in {
+          navigator.nextPage(
+            AddTrustContactMethodsYesNoPage,
+            NormalMode,
+            emptyUserAnswers.setOrException(AddTrustContactMethodsYesNoPage, false)
+          ) mustBe controllers.add.trust.routes.TrustUtrYesNoController
+            .onPageLoad(NormalMode)
+        }
+
+        "to JourneyRecoveryPage when answer is not present" in {
+          navigator.nextPage(
+            AddTrustContactMethodsYesNoPage,
+            NormalMode,
+            emptyUserAnswers
+          ) mustBe journeyRecovery
+        }
+      }
+
     }
 
     "in Check mode" - {
@@ -248,18 +277,18 @@ class TrustNavigatorSpec extends SpecBase {
           controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
       }
 
-      "must go from a TrustAddressYesNoPage to TrustAddressController when true and address not yet answered" in {
+      "must go from a TrustAddressYesNoPage to the address lookup on-ramp when true and address not yet answered" in {
         navigator.nextPage(
           TrustAddressYesNoPage,
           CheckMode,
           emptyUserAnswers.setOrException(TrustAddressYesNoPage, true)
-        ) mustBe controllers.add.trust.routes.TrustAddressController.onPageLoad(CheckMode)
+        ) mustBe controllers.add.trust.routes.TrustAddressController.redirectToAddressLookup(Some(CheckMode.toString))
       }
 
       "must go from a TrustAddressYesNoPage to TrustCheckYourAnswers when true and address already answered" in {
         val ua = emptyUserAnswers
           .setOrException(TrustAddressYesNoPage, true)
-          .setOrException(TrustAddressPage, InternationalAddress("line1", None, "line3", None, "AA1 1AA", "GB"))
+          .setOrException(TrustAddressPage, Address("line1", addressLine3 = Some("line3"), postcode = Some("AA1 1AA")))
         navigator.nextPage(TrustAddressYesNoPage, CheckMode, ua) mustBe trustCYA
       }
 
@@ -499,6 +528,48 @@ class TrustNavigatorSpec extends SpecBase {
         "to TrustCheckYourAnswers when answer is not present" in {
           navigator.nextPage(
             TrustContactOptionsPage,
+            CheckMode,
+            emptyUserAnswers
+          ) mustBe journeyRecovery
+        }
+      }
+
+      "must go from AddTrustContactMethodsYesNo" - {
+        "to CYA when answer is Yes and TrustContactMethodOptions already answered" in {
+          val answers = emptyUserAnswers
+            .setOrException(AddTrustContactMethodsYesNoPage, true)
+            .setOrException(TrustContactMethodOptionsPage, Set(ContactMethodOptions.Email, ContactMethodOptions.Phone))
+
+          navigator.nextPage(
+            AddTrustContactMethodsYesNoPage,
+            CheckMode,
+            answers
+          ) mustBe controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
+        }
+
+        "to TrustContactMethodOptions page when answer is Yes and TrustContactMethodOptions not yet answered" in {
+          val answers = emptyUserAnswers.setOrException(AddTrustContactMethodsYesNoPage, true)
+
+          navigator.nextPage(
+            AddTrustContactMethodsYesNoPage,
+            CheckMode,
+            answers
+          ) mustBe controllers.add.trust.routes.TrustContactMethodOptionsController.onPageLoad(CheckMode)
+        }
+
+        "to CYA when answer is No" in {
+          val answers = emptyUserAnswers.set(AddTrustContactMethodsYesNoPage, false).success.value
+
+          navigator.nextPage(
+            AddTrustContactMethodsYesNoPage,
+            CheckMode,
+            answers
+          ) mustBe controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
+        }
+
+        "to JourneyRecovery when answer is not present" in {
+          navigator.nextPage(
+            AddTrustContactMethodsYesNoPage,
             CheckMode,
             emptyUserAnswers
           ) mustBe journeyRecovery
