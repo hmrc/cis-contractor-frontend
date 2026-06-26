@@ -20,7 +20,7 @@ import javax.inject.{Inject, Singleton}
 import navigation.NavigatorForJourney
 import controllers.routes
 import models.contact.ContactOptions.{Email, Mobile, NoDetails, Phone}
-import models.{CheckMode, Mode, NormalMode, UserAnswers}
+import models.{AmendMode,CheckMode, Mode, NormalMode, UserAnswers}
 import pages.Page
 import pages.add.*
 import play.api.mvc.Call
@@ -33,6 +33,13 @@ class IndividualNavigator @Inject() () extends NavigatorForJourney {
       normalRoutes(page)(userAnswers)
     case CheckMode  =>
       checkRouteMap(page)(userAnswers)
+    case AmendMode  =>
+      amendRouteMap(page)(userAnswers)
+  }
+
+  private def cyaRoute(mode: Mode): Call = mode match {
+    // case AmendMode => controllers.amend.routes.AmendIndividualCheckYourAnswersController.onPageLoad()
+    case _ => controllers.add.routes.CheckYourAnswersController.onPageLoad()
   }
 
   private val normalRoutes: Page => UserAnswers => Call = {
@@ -85,8 +92,8 @@ class IndividualNavigator @Inject() () extends NavigatorForJourney {
   }
 
   private val amendRouteMap: Page => UserAnswers => Call = {
-    case SubAddressYesNoPage                  => navigatorFromSubAddressYesNoPage(AmendMode)(_)
-    case _                                    => _ => controllers.amend.routes.AmendIndividualCheckYourAnswersController.onPageLoad()
+    case SubAddressYesNoPage => navigatorFromSubAddressYesNoPage(AmendMode)(_)
+    case _                   => _ => controllers.add.routes.CheckYourAnswersController.onPageLoad()
   }
 
   private def navigatorFromSubTradingNameYesNoPage(mode: Mode)(ua: UserAnswers): Call =
@@ -117,14 +124,15 @@ class IndividualNavigator @Inject() () extends NavigatorForJourney {
     mode match {
       case AmendMode =>
         ua.get(SubAddressYesNoPage) match {
-          case Some(true) =>
-            controllers.add.routes.AddressOfSubcontractorController.redirectToAmendAddressLookup()
+          case Some(true)  =>
+            //controllers.add.routes.AddressOfSubcontractorController.redirectToAmendAddressLookup()
+            cyaRoute(mode)
           case Some(false) =>
-            controllers.amend.routes.AmendIndividualCheckYourAnswersController.onPageLoad()
-          case None =>
+            cyaRoute(mode)
+          case None        =>
             controllers.routes.JourneyRecoveryController.onPageLoad()
         }
-      case _ =>
+      case _         =>
         addressLookupYesNoRoute(
           mode,
           ua.get(SubAddressYesNoPage),
