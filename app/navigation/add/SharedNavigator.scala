@@ -18,7 +18,7 @@ package navigation.add
 
 import controllers.routes
 import models.TypeOfSubcontractor.{Individualorsoletrader, Limitedcompany, Partnership, Trust}
-import models.{CheckMode, Mode, NormalMode, UserAnswers}
+import models.{AmendMode, CheckMode, Mode, NormalMode, UserAnswers}
 import navigation.NavigatorForJourney
 import pages.Page
 import pages.add.TypeOfSubcontractorPage
@@ -34,6 +34,8 @@ class SharedNavigator @Inject() () extends NavigatorForJourney {
       normalRoutes(page)(userAnswers)
     case CheckMode  =>
       checkRouteMap(page)(userAnswers)
+    case AmendMode  =>
+      routes.JourneyRecoveryController.onPageLoad()
   }
 
   private val normalRoutes: Page => UserAnswers => Call = {
@@ -57,7 +59,7 @@ class SharedNavigator @Inject() () extends NavigatorForJourney {
       case (Some(Trust), NormalMode)                  =>
         controllers.add.trust.routes.TrustNameController.onPageLoad(NormalMode)
       case (None, _)                                  => routes.JourneyRecoveryController.onPageLoad()
-      case (_, CheckMode)                             => controllers.add.routes.CheckYourAnswersController.onPageLoad()
+      case (_, CheckMode | AmendMode)                 => controllers.add.routes.CheckYourAnswersController.onPageLoad()
     }
 
 }

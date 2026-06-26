@@ -19,7 +19,7 @@ package navigation.add
 import base.SpecBase
 import controllers.routes
 import models.contact.ContactOptions
-import models.{CheckMode, NormalMode, UserAnswers}
+import models.{AmendMode, CheckMode, NormalMode, UserAnswers}
 import pages.Page
 import pages.add.company.*
 
@@ -289,6 +289,18 @@ class CompanyNavigatorSpec extends SpecBase {
             emptyUserAnswers
           ) mustBe journeyRecovery
         }
+      }
+    }
+
+    "in Amend mode" - {
+
+      "must go from any page to JourneyRecovery" in {
+        case object UnknownPage extends Page
+        navigator.nextPage(UnknownPage, AmendMode, UserAnswers("id")) mustBe journeyRecovery
+      }
+
+      "must go from CompanyNamePage to JourneyRecovery" in {
+        navigator.nextPage(CompanyNamePage, AmendMode, emptyUserAnswers) mustBe journeyRecovery
       }
     }
 
