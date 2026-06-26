@@ -50,6 +50,24 @@ class TradingNameOfSubcontractorViewSpec extends AnyWordSpec with Matchers with 
       doc.select(".govuk-button").text() mustBe messages("site.continue")
     }
 
+    "render the page with title, heading, input and submit button for amend journey" in new Setup {
+      val html: HtmlFormat.Appendable = view(form, NormalMode)
+      val doc                         = org.jsoup.Jsoup.parse(html.toString())
+
+      doc.select("title").text() must include(messages("tradingNameOfSubcontractor.title"))
+
+      val heading = doc.select("label.govuk-label")
+      heading.text() mustBe messages("tradingNameOfSubcontractor.heading")
+
+      doc.select("form").attr("action") mustBe controllers.add.routes.TradingNameOfSubcontractorController
+        .onSubmit(NormalMode)
+        .url
+
+      doc.select("input[name=value]").size() mustBe 1
+
+      doc.select(".govuk-button").text() mustBe messages("site.update")
+    }
+
     "display error summary and inline error when no name is entered" in new Setup {
       val errorForm: Form[String] =
         form.withError("value", "tradingNameOfSubcontractor.error.required")
