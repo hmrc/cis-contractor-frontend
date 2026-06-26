@@ -33,7 +33,7 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
 
 // TODO: replace demo data with real backend fetch
-class AmendIndividualController @Inject()(
+class AmendIndividualController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
@@ -92,7 +92,9 @@ class AmendIndividualController @Inject()(
       ua =>
         sessionRepository
           .set(ua)
-          .map(_ => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())) // TODO - redirect to [Amend Individual] Subcontractor details DTR-6497
+          .map(_ =>
+            Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+          ) // TODO - redirect to [Amend Individual] Subcontractor details DTR-6497
     )
   }
 }
