@@ -18,11 +18,11 @@ package controllers.verify
 
 import controllers.actions.*
 import forms.verify.SelectSubcontractorsToReverifyFormProvider
-import models.Mode
+import models.{Mode, Subcontractor, TypeOfSubcontractor, UserAnswers}
 import navigation.Navigator
 import pages.verify.SelectSubcontractorsToReverifyPage
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
+import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents, Result}
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.verify.SelectSubcontractorsToReverifyView
@@ -31,10 +31,10 @@ import models.verify.SelectedSubcontractors
 import pages.verify.UnverifiedSubcontractorsPage
 import pages.verify.SelectSubcontractorPage
 import services.PaginationToReverifyService
-import models.Subcontractor
 import models.requests.DataRequest
 import models.verify.*
 import pages.verify.*
+import play.api.data.Form
 import rules.verify.ReverificationRules
 
 import java.time.{Clock, LocalDate}
@@ -67,7 +67,7 @@ class SelectSubcontractorsToReverifyController @Inject() (
   private def toRow(sub: Subcontractor, currentDate: LocalDate)(implicit
     messages: Messages
   ): Option[SubcontractorReverifyRow] =
-    if (!sub.verified.contains("Y")) {
+    if (!sub.isVerified) {
       None
     } else {
       val reverify = ReverificationRules.reverifyRequired(sub, currentDate)
@@ -132,16 +132,19 @@ class SelectSubcontractorsToReverifyController @Inject() (
         }
       }
 
-    sub.subcontractorType match {
-      case Some(t) if t.equalsIgnoreCase("partnership")                            =>
-        partnershipTrading.orElse(trading)
-      case Some(t) if t.equalsIgnoreCase("company") || t.equalsIgnoreCase("trust") =>
-        trading
-      case Some(_)                                                                 =>
-        individualName.orElse(trading)
-      case None                                                                    =>
-        Some(messages("verify.noName"))
-    }
+    sub.subcontractorType
+      .flatMap(TypeOfSubcontractor.fromString)
+      .map {
+        case TypeOfSubcontractor.Partnership =>
+          partnershipTrading.orElse(trading)
+
+        case TypeOfSubcontractor.Limitedcompany | TypeOfSubcontractor.Trust =>
+          trading
+
+        case TypeOfSubcontractor.Individualorsoletrader =>
+          individualName.orElse(trading)
+      }
+      .getOrElse(Some(messages("verify.noName")))
   }
 
   private def buildRowsFromSession(implicit request: DataRequest[?]): Either[Result, Seq[SubcontractorReverifyRow]] = {
@@ -167,8 +170,7 @@ class SelectSubcontractorsToReverifyController @Inject() (
             paginationToReverifyService.paginate(
               allItems = sortedRows,
               currentPage = page,
-              recordsPerPage = 6,
-              baseUrl = controllers.verify.routes.SelectSubcontractorsToReverifyController.onPageLoad(mode).url
+              baseUrl = routes.SelectSubcontractorsToReverifyController.onPageLoad(mode).url
             )
 
           val preparedForm =
@@ -199,7 +201,6 @@ class SelectSubcontractorsToReverifyController @Inject() (
         paginationToReverifyService.paginate(
           allItems = allRows,
           currentPage = page,
-          recordsPerPage = 6,
           baseUrl = routes.SelectSubcontractorsToReverifyController.onPageLoad(mode).url
         )
 
@@ -209,10 +210,10 @@ class SelectSubcontractorsToReverifyController @Inject() (
       val hasSelectedUnverifiedEarlier: Boolean =
         request.userAnswers.get(SelectSubcontractorPage).exists(_.nonEmpty)
 
-      val requireSelection: Boolean =
-        !hasUnverified && !hasSelectedUnverifiedEarlier
+      val requireSelection: Boolean = !hasSelectedUnverifiedEarlier && !hasUnverified
 
-      val boundForm = formProvider(requireSelection).bindFromRequest()
+      val boundForm =
+        formProvider(requireSelection).bindFromRequest()
 
       val selectedIdsThisPage: Set[String] =
         boundForm.value.getOrElse(Set.empty[String])
@@ -229,13 +230,13 @@ class SelectSubcontractorsToReverifyController @Inject() (
         existingSelections.filterNot(sub => currentPageIds.contains(sub.id))
 
       val currentSelections: Set[SelectedSubcontractors] =
-        selectedIdsThisPage.flatMap(id => allRows.find(_.id == id).map(r => SelectedSubcontractors(r.id, r.name)))
+        allRows
+          .filter(row => selectedIdsThisPage.contains(row.id))
+          .map(row => SelectedSubcontractors(row.id, row.name))
+          .toSet
 
       val mergedSelections: Set[SelectedSubcontractors] =
         previousSelections ++ currentSelections
-
-      val hasAnyReverifySelection: Boolean =
-        mergedSelections.nonEmpty
 
       val gotoPage: Option[Int] =
         request.body.asFormUrlEncoded
@@ -243,61 +244,44 @@ class SelectSubcontractorsToReverifyController @Inject() (
           .flatMap(_.headOption)
           .flatMap(_.toIntOption)
 
-      gotoPage match {
-
-        case Some(targetPage) =>
-          for {
-            updatedAnswers <- Future.fromTry(
-                                request.userAnswers.set(SelectSubcontractorsToReverifyPage, mergedSelections)
-                              )
-            _              <- sessionRepository.set(updatedAnswers)
-          } yield Redirect(
-            routes.SelectSubcontractorsToReverifyController.onPageLoad(mode, targetPage)
+      def renderForm(formWithErrors: Form[Set[String]]): Result =
+        BadRequest(
+          view(
+            formWithErrors,
+            mode,
+            result.items,
+            result.pagination,
+            page,
+            result.startIndex,
+            result.totalCount
           )
+        )
+
+      def saveSelectionsAndRedirect(redirectTo: UserAnswers => Call): Future[Result] =
+        for {
+          updatedAnswers <- Future.fromTry(
+                              request.userAnswers.set(
+                                SelectSubcontractorsToReverifyPage,
+                                mergedSelections
+                              )
+                            )
+          _              <- sessionRepository.set(updatedAnswers)
+        } yield Redirect(redirectTo(updatedAnswers))
+
+      gotoPage match {
+        case Some(targetPage) =>
+          saveSelectionsAndRedirect { _ =>
+            routes.SelectSubcontractorsToReverifyController.onPageLoad(mode, targetPage)
+          }
 
         case None =>
-          if (hasUnverified && !hasSelectedUnverifiedEarlier && !hasAnyReverifySelection) {
-            Future.successful(
-              Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-            )
-
-          } else if (hasUnverified && hasSelectedUnverifiedEarlier && !hasAnyReverifySelection) {
-            for {
-              updatedAnswers <- Future.fromTry(
-                                  request.userAnswers.set(SelectSubcontractorsToReverifyPage, mergedSelections)
-                                )
-              _              <- sessionRepository.set(updatedAnswers)
-            } yield Redirect(
-              navigator.nextPage(SelectSubcontractorsToReverifyPage, mode, updatedAnswers)
-            )
-
-          } else {
-            boundForm.fold(
-              formWithErrors =>
-                Future.successful(
-                  BadRequest(
-                    view(
-                      formWithErrors,
-                      mode,
-                      result.items,
-                      result.pagination,
-                      page,
-                      result.startIndex,
-                      result.totalCount
-                    )
-                  )
-                ),
-              _ =>
-                for {
-                  updatedAnswers <- Future.fromTry(
-                                      request.userAnswers.set(SelectSubcontractorsToReverifyPage, mergedSelections)
-                                    )
-                  _              <- sessionRepository.set(updatedAnswers)
-                } yield Redirect(
-                  navigator.nextPage(SelectSubcontractorsToReverifyPage, mode, updatedAnswers)
-                )
-            )
-          }
+          boundForm.fold(
+            formWithErrors => Future.successful(renderForm(formWithErrors)),
+            _ =>
+              saveSelectionsAndRedirect { updatedAnswers =>
+                navigator.nextPage(SelectSubcontractorsToReverifyPage, mode, updatedAnswers)
+              }
+          )
       }
     }
 }

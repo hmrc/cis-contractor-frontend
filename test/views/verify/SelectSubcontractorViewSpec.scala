@@ -68,7 +68,9 @@ class SelectSubcontractorViewSpec extends SpecBase with Matchers {
     "must render error summary when form has errors" in new Setup {
 
       val formWithError: Form[Set[String]] =
-        form.bind(Map("value" -> ""))
+        form
+          .fill(Set.empty[String])
+          .withError("value", "verify.selectSubcontractor.error.required")
 
       val html: HtmlFormat.Appendable = view(
         formWithError,
@@ -89,7 +91,9 @@ class SelectSubcontractorViewSpec extends SpecBase with Matchers {
     "must render error summary link targeting the first checkbox on the current page" in new Setup {
 
       val formWithError: Form[Set[String]] =
-        form.bind(Map("value" -> ""))
+        form
+          .fill(Set.empty[String])
+          .withError("value", "verify.selectSubcontractor.error.required")
 
       val allItems                      = SubcontractorViewModel.checkboxItems(subcontractorsVm)
       val page1Items: Seq[CheckboxItem] = allItems.slice(0, 6)

@@ -19,9 +19,9 @@ package controllers.verify
 import base.SpecBase
 import controllers.routes
 import forms.verify.ReverifyExistingSubcontractorsYesNoFormProvider
-import models.{NormalMode, UserAnswers}
+import models.{NormalMode, SubcontractorViewModel, UserAnswers}
 import org.scalatestplus.mockito.MockitoSugar
-import pages.verify.ReverifyExistingSubcontractorsYesNoPage
+import pages.verify.{ReverifyExistingSubcontractorsYesNoPage, SelectSubcontractorPage}
 import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
@@ -90,7 +90,33 @@ class ReverifyExistingSubcontractorsYesNoControllerSpec extends SpecBase with Mo
       }
     }
 
-    "must redirect to CheckVerificationBatchReadiness on POST with false" in {
+    "must redirect to CheckVerificationBatchReadiness on POST with false when selections exist" in {
+
+      val userAnswers =
+        emptyUserAnswers
+          .set(
+            SelectSubcontractorPage,
+            Set(SubcontractorViewModel("1", "Test Subcontractor"))
+          )
+          .success
+          .value
+
+      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, reverifyExistingSubcontractorsYesNoRoute)
+            .withFormUrlEncodedBody(("value", "false"))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual
+          controllers.verify.routes.CheckVerificationBatchReadinessController.checkVerificationBatchReadiness().url
+      }
+    }
+
+    "must redirect to VerificationNotSubmittedWarning on POST with false and no selections exist" in {
 
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
@@ -103,7 +129,7 @@ class ReverifyExistingSubcontractorsYesNoControllerSpec extends SpecBase with Mo
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual
-          controllers.verify.routes.CheckVerificationBatchReadinessController.checkVerificationBatchReadiness().url
+          controllers.verify.routes.NoSubcontractorsSelectedWarningController.onPageLoad().url
       }
     }
 

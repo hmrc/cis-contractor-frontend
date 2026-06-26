@@ -19,7 +19,7 @@ package controllers.add.trust
 import base.SpecBase
 import controllers.routes
 import models.{TypeOfSubcontractor, UserAnswers}
-import models.add.InternationalAddress
+import models.address.{Address, Country}
 import models.contact.ContactOptions
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{never, verify, verifyNoMoreInteractions, when}
@@ -85,13 +85,13 @@ class TrustCheckYourAnswersControllerSpec extends SpecBase {
 
     "must return OK and the correct view for a GET when all trust optionals are present" in {
 
-      val address = InternationalAddress(
+      val address = Address(
         addressLine1 = "1 Trust Street",
         addressLine2 = None,
-        addressLine3 = "Trust Town",
+        addressLine3 = Some("Trust Town"),
         addressLine4 = None,
-        postalCode = "TR1 1ST",
-        country = "GB"
+        postcode = Some("TR1 1ST"),
+        country = Some(Country(Some("GB"), Some("GB")))
       )
 
       val ua = minUa
@@ -344,13 +344,13 @@ class TrustCheckYourAnswersControllerSpec extends SpecBase {
     "YesNo page cleanup" - {
 
       "must return OK when Address YesNo changes from Yes to No and stale address is cleaned up" in {
-        val address = InternationalAddress(
+        val address = Address(
           addressLine1 = "1 Trust Street",
           addressLine2 = None,
-          addressLine3 = "Trust Town",
+          addressLine3 = Some("Trust Town"),
           addressLine4 = None,
-          postalCode = "TR1 1ST",
-          country = "GB"
+          postcode = Some("TR1 1ST"),
+          country = Some(Country(Some("GB"), Some("GB")))
         )
 
         val ua = minUa
@@ -483,13 +483,13 @@ class TrustCheckYourAnswersControllerSpec extends SpecBase {
 
     "must redirect to Journey Recovery when AddressYesNo is false but address value is still present (stale session)" in {
 
-      val address = InternationalAddress(
+      val address = Address(
         addressLine1 = "1 Trust Street",
         addressLine2 = None,
-        addressLine3 = "Trust Town",
+        addressLine3 = Some("Trust Town"),
         addressLine4 = None,
-        postalCode = "TR1 1ST",
-        country = "GB"
+        postcode = Some("TR1 1ST"),
+        country = Some(Country(Some("GB"), Some("GB")))
       )
 
       val uaBase =
