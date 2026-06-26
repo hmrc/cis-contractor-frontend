@@ -29,7 +29,7 @@ class VerifyNavigatorSpec extends SpecBase {
   private val navigator = new VerifyNavigator()
 
   private lazy val journeyRecovery = routes.JourneyRecoveryController.onPageLoad()
-  private lazy val cya             = controllers.verify.routes.VerifyCheckYourAnswersController.onPageLoad()
+  private lazy val cya = controllers.verify.routes.VerifyCheckYourAnswersController.onPageLoad()
 
   "VerifyNavigator" - {
 
@@ -450,7 +450,7 @@ class VerifyNavigatorSpec extends SpecBase {
 
       "ContractorEmailConfirmationStoredPage" - {
 
-        "must go to VerifyCheckYourAnswersController when answer is CurrentEmail" in {
+        "must go to VerificationDeclarationController when answer is CurrentEmail" in {
           val ua = emptyUserAnswers.setOrException(
             ContractorEmailConfirmationStoredPage,
             ContractorEmailConfirmationStored.CurrentEmail
@@ -472,7 +472,7 @@ class VerifyNavigatorSpec extends SpecBase {
             controllers.verify.routes.EmailAddressController.onPageLoad(CheckMode)
         }
 
-        "must go to VerifyCheckYourAnswersController when answer is DoNotSend" in {
+        "must go to VerificationDeclarationController when answer is DoNotSend" in {
           val ua = emptyUserAnswers.setOrException(
             ContractorEmailConfirmationStoredPage,
             ContractorEmailConfirmationStored.DoNotSend
@@ -507,47 +507,23 @@ class VerifyNavigatorSpec extends SpecBase {
             controllers.verify.routes.VerifyCheckYourAnswersController.onPageLoad()
         }
 
-        "must go to VerifyCheckYourAnswersController when selections exist in SelectSubcontractorsToReverifyPage (CheckMode)" in {
-
-          val ua =
-            emptyUserAnswers
-              .set(
-                SelectSubcontractorsToReverifyPage,
-                Set(SelectedSubcontractors("2", "Reverify Subcontractor"))
-              )
-              .success
-              .value
-
-          navigator.nextPage(SelectSubcontractorsToReverifyPage, CheckMode, ua) mustBe
-            controllers.verify.routes.VerifyCheckYourAnswersController.onPageLoad()
-        }
-
-        "must go to NoSubcontractorsSelectedWarningController when no selections exist (CheckMode)" in {
+        "must go to VerificationDeclarationController from EmailAddressPage in CheckMode" in {
+          val ua = emptyUserAnswers.setOrException(EmailAddressPage, "test@test.com")
 
           navigator.nextPage(
-            SelectSubcontractorsToReverifyPage,
+            EmailAddressPage,
+            CheckMode,
+            ua
+          ) mustBe cya
+        }
+
+        "must go to VerifyCheckYourAnswers from VerificationDeclarationPage in CheckMode" in {
+          navigator.nextPage(
+            VerificationDeclarationPage,
             CheckMode,
             emptyUserAnswers
-          ) mustBe controllers.verify.routes.NoSubcontractorsSelectedWarningController.onPageLoad()
+          ) mustBe cya
         }
-      }
-
-      "must go to VerifyCheckYourAnswersController from EmailAddressPage in CheckMode" in {
-        val ua = emptyUserAnswers.setOrException(EmailAddressPage, "test@test.com")
-
-        navigator.nextPage(
-          EmailAddressPage,
-          CheckMode,
-          ua
-        ) mustBe cya
-      }
-
-      "must go to VerifyCheckYourAnswers from VerificationDeclarationPage in CheckMode" in {
-        navigator.nextPage(
-          VerificationDeclarationPage,
-          CheckMode,
-          emptyUserAnswers
-        ) mustBe cya
       }
     }
   }
