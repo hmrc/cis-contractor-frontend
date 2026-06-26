@@ -348,14 +348,14 @@ class VerifyNavigatorSpec extends SpecBase {
             controllers.verify.routes.EmailAddressController.onPageLoad(CheckMode)
         }
 
-        "must go to VerificationDeclarationController when answer is false" in {
+        "must go to VerifyCheckYourAnswersController when answer is false" in {
           val ua = emptyUserAnswers.setOrException(ContractorEmailConfirmationNotStoredPage, false)
 
           navigator.nextPage(
             ContractorEmailConfirmationNotStoredPage,
             CheckMode,
             ua
-          ) mustBe controllers.verify.routes.VerificationDeclarationController.onPageLoad()
+          ) mustBe cya
         }
 
         "must go to JourneyRecovery when answer is not present" in {
@@ -450,7 +450,7 @@ class VerifyNavigatorSpec extends SpecBase {
 
       "ContractorEmailConfirmationStoredPage" - {
 
-        "must go to VerificationDeclarationController when answer is CurrentEmail" in {
+        "must go to VerifyCheckYourAnswersController when answer is CurrentEmail" in {
           val ua = emptyUserAnswers.setOrException(
             ContractorEmailConfirmationStoredPage,
             ContractorEmailConfirmationStored.CurrentEmail
@@ -472,7 +472,7 @@ class VerifyNavigatorSpec extends SpecBase {
             controllers.verify.routes.EmailAddressController.onPageLoad(CheckMode)
         }
 
-        "must go to VerificationDeclarationController when answer is DoNotSend" in {
+        "must go to VerifyCheckYourAnswersController when answer is DoNotSend" in {
           val ua = emptyUserAnswers.setOrException(
             ContractorEmailConfirmationStoredPage,
             ContractorEmailConfirmationStored.DoNotSend
@@ -532,7 +532,7 @@ class VerifyNavigatorSpec extends SpecBase {
         }
       }
 
-      "must go to VerificationDeclarationController from EmailAddressPage in CheckMode" in {
+      "must go to VerifyCheckYourAnswersController from EmailAddressPage in CheckMode" in {
         val ua = emptyUserAnswers.setOrException(EmailAddressPage, "test@test.com")
 
         navigator.nextPage(
