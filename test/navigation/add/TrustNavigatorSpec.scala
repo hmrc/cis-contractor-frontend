@@ -20,7 +20,7 @@ import base.SpecBase
 import controllers.routes
 import models.address.Address
 import models.contact.{ContactMethodOptions, ContactOptions}
-import models.{CheckMode, NormalMode, UserAnswers}
+import models.{AmendMode, CheckMode, NormalMode, UserAnswers}
 import org.scalactic.Prettifier.default
 import pages.Page
 import pages.add.trust.*
@@ -261,6 +261,18 @@ class TrustNavigatorSpec extends SpecBase {
         }
       }
 
+    }
+
+    "in Amend mode" - {
+
+      "must go from any page to JourneyRecovery" in {
+        case object UnknownPage extends Page
+        navigator.nextPage(UnknownPage, AmendMode, UserAnswers("id")) mustBe journeyRecovery
+      }
+
+      "must go from TrustNamePage to JourneyRecovery" in {
+        navigator.nextPage(TrustNamePage, AmendMode, UserAnswers("id")) mustBe journeyRecovery
+      }
     }
 
     "in Check mode" - {
