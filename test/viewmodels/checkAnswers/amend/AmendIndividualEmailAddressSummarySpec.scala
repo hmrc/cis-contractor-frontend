@@ -60,15 +60,15 @@ class AmendIndividualEmailAddressSummarySpec extends AnyFreeSpec with Matchers w
       val changeAction = actions.head
 
       val expectedChangeText = messages("site.change")
-      val expectedHref =
+      val expectedHref       =
         routes.IndividualEmailAddressController
           .onPageLoad(AmendMode)
           .url
       val expectedHiddenText =
         messages("individualEmailAddress.change.hidden")
 
-      changeAction.content.asHtml.toString should include(expectedChangeText)
-      changeAction.href shouldBe expectedHref
+      changeAction.content.asHtml.toString    should include(expectedChangeText)
+      changeAction.href                     shouldBe expectedHref
       changeAction.visuallyHiddenText.value shouldBe expectedHiddenText
     }
 
