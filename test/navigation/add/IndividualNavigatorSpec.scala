@@ -322,7 +322,7 @@ class IndividualNavigatorSpec extends SpecBase {
 
     "in Amend mode" - {
 
-         // TODO: change this to 'Amend' from "Add" when screen available
+      // TODO: change this to 'Amend' from "Add" when screen available
 //      "must go from a page that doesn't exist in the edit route map to CheckYourAnswers" in {
 //
 //        case object UnknownPage extends Page
