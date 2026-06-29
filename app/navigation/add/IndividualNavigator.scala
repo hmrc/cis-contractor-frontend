@@ -88,14 +88,14 @@ class IndividualNavigator @Inject() () extends NavigatorForJourney {
 
   private val amendRouteMap: Page => UserAnswers => Call = {
     case UniqueTaxpayerReferenceYesNoPage => navigatorFromUniqueTaxpayerReferenceYesNoPage(AmendMode)(_)
-    case _ => _ => cyaRoute(AmendMode)
+    case _                                => _ => cyaRoute(AmendMode)
   }
 
   private def cyaRoute(mode: Mode): Call = mode match {
     case AmendMode =>
       routes.JourneyRecoveryController
         .onPageLoad() // TODO: redirect to AmendIndividualCheckYourAnswersController when it's implemented
-    case _ =>
+    case _         =>
       controllers.add.routes.CheckYourAnswersController.onPageLoad()
   }
 

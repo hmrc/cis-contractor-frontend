@@ -72,7 +72,7 @@ class UniqueTaxpayerReferenceYesNoViewSpec extends AnyWordSpec with Matchers wit
       val subcontractorName = "Test SubContractor"
 
       val html: HtmlFormat.Appendable = view(form, AmendMode, subcontractorName)
-      val doc: Document = Jsoup.parse(html.toString())
+      val doc: Document               = Jsoup.parse(html.toString())
 
       doc.select("title").text() must include(messages("uniqueTaxpayerReferenceYesNo.title"))
 
