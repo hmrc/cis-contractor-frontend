@@ -19,9 +19,9 @@ package models.verify
 import connectors.ConstructionIndustrySchemeConnector
 import models.{EmployerReference, UserAnswers, VerificationCurrentVerification}
 import models.requests.{ChrisVerificationRequest, VerificationDetails}
-import pages.verify.EmailAddressPage
 import queries.CisIdQuery
 import uk.gov.hmrc.http.HeaderCarrier
+import utils.VerifyEmailResolver
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -41,14 +41,8 @@ class ChrisVerificationRequestBuilder @Inject() (
       "CisIdQuery not found in session data"
     )
 
-    val emailFut = requireFromSession(
-      ua.get(EmailAddressPage),
-      "EmailAddressPage not found in session data"
-    )
-
     for {
       cisId                       <- cisIdFut
-      email                       <- emailFut
       scheme                      <- cisConnector.getScheme(cisId)
       currentVerificationBatch    <- cisConnector.getCurrentVerificationBatch(cisId)
       utr                          = requireValue(scheme.utr, "UTR not found in scheme data")
@@ -65,7 +59,7 @@ class ChrisVerificationRequestBuilder @Inject() (
       contractorAORef = aoRef,
       verificationBatchId = verificationBatch.verificationBatchId.toString,
       verificationBatchResourceRef = verificationBatchResourceRef.toString,
-      emailRecipient = Some(email),
+      emailRecipient = VerifyEmailResolver.resolvedEmail(ua),
       subcontractors = currentVerificationBatch.subcontractors,
       verifications = currentVerificationBatch.verifications.map(toVerificationDetails)
     )

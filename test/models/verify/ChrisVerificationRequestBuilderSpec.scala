@@ -24,7 +24,8 @@ import org.mockito.Mockito.when
 import models.response.*
 import models.requests.*
 import models.*
-import pages.verify.EmailAddressPage
+import models.verify.ContractorEmailConfirmationStored.DifferentEmail
+import pages.verify.{ContractorEmailConfirmationStoredPage, EmailAddressPage}
 import queries.CisIdQuery
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -43,6 +44,9 @@ class ChrisVerificationRequestBuilderSpec extends SpecBase with MockitoSugar {
       val ua =
         emptyUserAnswers
           .set(CisIdQuery, "1")
+          .success
+          .value
+          .set(ContractorEmailConfirmationStoredPage, DifferentEmail)
           .success
           .value
           .set(EmailAddressPage, "test@test.com")
