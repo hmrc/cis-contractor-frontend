@@ -139,15 +139,11 @@ GET   /subcontractor/add/check-works-reference-number         controllers.add.Wo
 POST  /subcontractor/add/check-works-reference-number         controllers.add.WorksReferenceNumberYesNoController.onSubmit(mode: Mode = NormalMode)
 GET   /subcontractor/add/change-check-works-reference-number  controllers.add.WorksReferenceNumberYesNoController.onPageLoad(mode: Mode = CheckMode)
 POST  /subcontractor/add/change-check-works-reference-number  controllers.add.WorksReferenceNumberYesNoController.onSubmit(mode: Mode = CheckMode)
-GET   /subcontractor/amend/check-works-reference-number       controllers.add.WorksReferenceNumberYesNoController.onPageLoad(mode: Mode = AmendMode)
-POST  /subcontractor/amend/check-works-reference-number       controllers.add.WorksReferenceNumberYesNoController.onSubmit(mode: Mode = AmendMode)
 
 GET   /subcontractor/add/works-reference-number         controllers.add.WorksReferenceNumberController.onPageLoad(mode: Mode = NormalMode)
 POST  /subcontractor/add/works-reference-number         controllers.add.WorksReferenceNumberController.onSubmit(mode: Mode = NormalMode)
 GET   /subcontractor/add/change-works-reference-number  controllers.add.WorksReferenceNumberController.onPageLoad(mode: Mode = CheckMode)
 POST  /subcontractor/add/change-works-reference-number  controllers.add.WorksReferenceNumberController.onSubmit(mode: Mode = CheckMode)
-GET   /subcontractor/amend/works-reference-number       controllers.add.WorksReferenceNumberController.onPageLoad(mode: Mode = AmendMode)
-POST  /subcontractor/amend/works-reference-number       controllers.add.WorksReferenceNumberController.onSubmit(mode: Mode = AmendMode)
 
 GET   /subcontractor/add/mobile-number         controllers.add.IndividualMobileNumberController.onPageLoad(mode: Mode = NormalMode)
 POST  /subcontractor/add/mobile-number         controllers.add.IndividualMobileNumberController.onSubmit(mode: Mode = NormalMode)
