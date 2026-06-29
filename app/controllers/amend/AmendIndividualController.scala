@@ -87,9 +87,11 @@ class AmendIndividualController @Inject() (
   } yield ua
 
   def onPageLoad(): Action[AnyContent] = (identify andThen getData andThen requireData).async { implicit request =>
+    println("\n\n on page load\n\n\n"+request.userAnswers)
     populateUserAnswers(request.userAnswers).fold(
       _ => Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())),
       ua =>
+        println("\n\n\n ua: "+ua)
         sessionRepository
           .set(ua)
           .map(_ =>

@@ -19,7 +19,7 @@ package views.add
 import forms.add.WorksReferenceNumberYesNoFormProvider
 import views.html.add.WorksReferenceNumberYesNoView
 import org.scalatest.matchers.must.Matchers
-import models.NormalMode
+import models.{AmendMode, NormalMode}
 import org.jsoup.nodes.Document
 import org.jsoup.select.Elements
 import org.scalatest.wordspec.AnyWordSpec
@@ -59,6 +59,16 @@ class WorksReferenceNumberYesNoViewSpec extends AnyWordSpec with Matchers with G
       doc.select("form").attr("autocomplete") mustBe "off"
 
       doc.select(".govuk-button").text() mustBe messages("site.continue")
+    }
+
+    "render the page with title and update button in AmendMode" in new Setup {
+      val subcontractorName = "Test Subcontractor"
+
+      val html: HtmlFormat.Appendable = view(form, AmendMode, subcontractorName)
+      val doc: Document = org.jsoup.Jsoup.parse(html.body)
+      doc.select("title").text() must include(messages("worksReferenceNumberYesNo.title"))
+
+      doc.select(".govuk-button").text() mustBe messages("site.update")
     }
 
     "display error summary and inline error when no option is selected" in new Setup {
