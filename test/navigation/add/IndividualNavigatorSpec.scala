@@ -322,17 +322,15 @@ class IndividualNavigatorSpec extends SpecBase {
 
     "in Amend mode" - {
 
-      // TODO: change this to 'Amend' from "Add" when screen available
-//      "must go from a page that doesn't exist in the edit route map to CheckYourAnswers" in {
-//
-//        case object UnknownPage extends Page
-//        navigator.nextPage(
-//          UnknownPage,
-//          AmendMode,
-//          UserAnswers("id")
-//        ) mustBe controllers.add.routes.CheckYourAnswersController
-//          .onPageLoad()
-//      }
+      "must go from a page that doesn't exist in the edit route map to CheckYourAnswers" in {
+
+        case object UnknownPage extends Page
+        navigator.nextPage(
+          UnknownPage,
+          AmendMode,
+          UserAnswers("id")
+        ) mustBe journeyRecovery
+      }
 
       // TODO: uncomment this for when Address page is available for the amend journey
       //      "must go from a SubAddressYesNoPage to next page when true" in {
@@ -349,7 +347,7 @@ class IndividualNavigatorSpec extends SpecBase {
           SubAddressYesNoPage,
           AmendMode,
           emptyUserAnswers.setOrException(SubAddressYesNoPage, false)
-        ) mustBe CYA
+        ) mustBe journeyRecovery //TODO: change this to CYA when available
       }
 
       "must go from a SubAddressYesNoPage to journey recovery page when incomplete info provided" in {

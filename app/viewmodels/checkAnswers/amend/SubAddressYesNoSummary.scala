@@ -1,5 +1,5 @@
 /*
- * Copyright 2026 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,25 +17,26 @@
 package viewmodels.checkAnswers.amend
 
 import models.{AmendMode, UserAnswers}
-import pages.add.IndividualPhoneNumberPage
+import pages.add.SubAddressYesNoPage
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
 
-object IndividualPhoneNumberSummary {
+object SubAddressYesNoSummary {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(IndividualPhoneNumberPage).map { answer =>
+    answers.get(SubAddressYesNoPage).map { answer =>
+
+      val value = if (answer) "site.yes" else "site.no"
+
       SummaryListRowViewModel(
-        key = "individualPhoneNumber.checkYourAnswersLabel",
-        value = ValueViewModel(answer),
+        key = "subAddressYesNo.checkYourAnswersLabel",
+        value = ValueViewModel(value),
         actions = Seq(
-          ActionItemViewModel(
-            "site.change",
-            controllers.add.routes.IndividualPhoneNumberController.onPageLoad(AmendMode).url
-          )
-            .withVisuallyHiddenText(messages("individualPhoneNumber.change.hidden"))
+          ActionItemViewModel("site.change", controllers.add.routes.SubAddressYesNoController.onPageLoad(AmendMode).url)
+            .withVisuallyHiddenText(messages("subAddressYesNo.change.hidden"))
+            .withAttribute("id" -> "sub-address-yes-no")
         )
       )
     }
