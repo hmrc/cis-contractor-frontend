@@ -330,6 +330,14 @@ class IndividualNavigatorSpec extends SpecBase {
       "must go from SubTradingNameYesNoPage to JourneyRecovery" in {
         navigator.nextPage(SubTradingNameYesNoPage, AmendMode, emptyUserAnswers) mustBe journeyRecovery
       }
+
+      "must go from a WorksReferenceNumberPage to journey recovery page" in {
+        navigator.nextPage(
+          WorksReferenceNumberPage,
+          AmendMode,
+          UserAnswers("id")
+        ) mustBe journeyRecovery // TODO: this needs to be redirected to amend individual cya page, AmendIndividualCheckYourAnswersController when it's implemented
+      }
     }
 
     "in Check mode" - {
