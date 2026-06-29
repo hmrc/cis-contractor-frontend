@@ -322,10 +322,10 @@ class IndividualNavigatorSpec extends SpecBase {
 
     "in Amend mode" - {
 
-//      "must go from any page to JourneyRecovery" in {
-//        case object UnknownPage extends Page
-//        navigator.nextPage(UnknownPage, AmendMode, UserAnswers("id")) mustBe journeyRecovery
-//      }
+      "must go from any page to JourneyRecovery" in {
+        case object UnknownPage extends Page
+        navigator.nextPage(UnknownPage, AmendMode, UserAnswers("id")) mustBe journeyRecovery
+      }
 
       // TODO: update the CYA page when available
 //      "to IndividualPhoneNumberPage when PhoneNumber is selected" in {
