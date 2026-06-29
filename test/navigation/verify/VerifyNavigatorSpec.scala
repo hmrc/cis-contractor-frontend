@@ -19,7 +19,7 @@ package navigation.verify
 import base.SpecBase
 import controllers.routes
 import models.response.GetNewestVerificationBatchResponse
-import models.{CheckMode, NormalMode, Subcontractor, SubcontractorViewModel, UserAnswers}
+import models.{AmendMode, CheckMode, NormalMode, Subcontractor, SubcontractorViewModel, UserAnswers}
 import models.verify.{ContractorEmailConfirmationStored, SelectedSubcontractors}
 import pages.Page
 import pages.verify.*
@@ -329,6 +329,18 @@ class VerifyNavigatorSpec extends SpecBase {
           NormalMode,
           emptyUserAnswers
         ) mustBe cya
+      }
+    }
+
+    "in Amend mode" - {
+
+      "must go from any page to JourneyRecovery" in {
+        case object UnknownPage extends Page
+        navigator.nextPage(UnknownPage, AmendMode, UserAnswers("id")) mustBe journeyRecovery
+      }
+
+      "must go from SelectSubcontractorPage to JourneyRecovery" in {
+        navigator.nextPage(SelectSubcontractorPage, AmendMode, emptyUserAnswers) mustBe journeyRecovery
       }
     }
 
