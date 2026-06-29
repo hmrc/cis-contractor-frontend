@@ -20,7 +20,7 @@ import javax.inject.{Inject, Singleton}
 import navigation.NavigatorForJourney
 import controllers.routes
 import models.contact.ContactOptions.{Email, Mobile, NoDetails, Phone}
-import models.{CheckMode, Mode, NormalMode, UserAnswers}
+import models.{AmendMode,CheckMode, Mode, NormalMode, UserAnswers}
 import pages.Page
 import pages.add.*
 import play.api.mvc.Call
@@ -33,6 +33,8 @@ class IndividualNavigator @Inject() () extends NavigatorForJourney {
       normalRoutes(page)(userAnswers)
     case CheckMode  =>
       checkRouteMap(page)(userAnswers)
+    case AmendMode =>
+      amendRouteMap(page)(userAnswers)
   }
 
   private val normalRoutes: Page => UserAnswers => Call = {
@@ -82,6 +84,14 @@ class IndividualNavigator @Inject() () extends NavigatorForJourney {
       _ => controllers.add.routes.CheckYourAnswersController.onPageLoad()
     case AddIndividualContactMethodsYesNoPage => navigatorFromAddIndividualContactMethodsYesNoPage(CheckMode)(_)
     case _                                    => _ => controllers.add.routes.CheckYourAnswersController.onPageLoad()
+  }
+
+  private val amendRouteMap: Page => UserAnswers => Call = {
+//    case IndividualEmailAddressPage =>
+//      _ => controllers.amend.routes.AmendIndividualCheckYourAnswersController.onPageLoad()
+    case IndividualEmailAddressPage =>
+      _ => controllers.add.routes.CheckYourAnswersController.onPageLoad()
+    case _ => _ => controllers.add.routes.CheckYourAnswersController.onPageLoad()
   }
 
   private def navigatorFromSubTradingNameYesNoPage(mode: Mode)(ua: UserAnswers): Call =

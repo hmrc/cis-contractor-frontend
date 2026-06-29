@@ -20,7 +20,7 @@ import base.SpecBase
 import controllers.routes
 import models.add.SubcontractorName
 import models.contact.ContactOptions
-import models.{CheckMode, NormalMode, UserAnswers}
+import models.{AmendMode, CheckMode, NormalMode, UserAnswers}
 import pages.Page
 import pages.add.*
 
@@ -707,6 +707,28 @@ class IndividualNavigatorSpec extends SpecBase {
             emptyUserAnswers
           ) mustBe journeyRecovery
         }
+      }
+    }
+
+    "in Amend mode" - {
+
+      "must go from IndividualEmailAddressPage to CheckYourAnswersController" in {
+        navigator.nextPage(
+          IndividualEmailAddressPage,
+          AmendMode,
+          emptyUserAnswers.setOrException(
+            IndividualEmailAddressPage,
+            "test@test.com"
+          )
+        ) mustBe controllers.add.routes.CheckYourAnswersController.onPageLoad()
+      }
+
+      "must go from IndividualEmailAddressPage to journey recovery page when incomplete info provided" in {
+        navigator.nextPage(
+          IndividualEmailAddressPage,
+          AmendMode,
+          emptyUserAnswers
+        ) mustBe journeyRecovery
       }
     }
 
