@@ -7,6 +7,7 @@ site.change                               =  Change
 site.no                                   =  No
 site.yes                                  =  Yes
 site.continue                             =  Continue
+site.amend                                =  Amend
 site.start                                =  Start now
 site.startAgain                           =  Start again
 site.signIn                               =  Sign in
@@ -574,15 +575,15 @@ partnershipMobileNumber.error.invalid                       =  Enter a valid mob
 partnershipMobileNumber.checkYourAnswersLabel               =  Mobile number
 partnershipMobileNumber.change.hidden                       =  mobile number
 
-partnershipContactMethodOptions.title                                =  Which contact details do you want to add for this partnership?
-partnershipContactMethodOptions.heading                              =  Which contact details do you want to add for {0}?
-partnershipContactMethodOptions.hint                                 =  Contact details are only for your own records
-partnershipContactMethodOptions.email                                =  Email address
-partnershipContactMethodOptions.phone                                =  Phone number
-partnershipContactMethodOptions.mobile                               =  Mobile number
-partnershipContactMethodOptions.error.required                       =  Select the methods of contact you want to add for this partnership
-partnershipContactMethodOptions.checkYourAnswersLabel                =  Methods of contact
-partnershipContactMethodOptions.change.hidden                        =  methods of contact
+partnershipContactMethodOptions.title                       =  Which contact details do you want to add for this partnership?
+partnershipContactMethodOptions.heading                     =  Which contact details do you want to add for {0}?
+partnershipContactMethodOptions.hint                        =  Contact details are only for your own records
+partnershipContactMethodOptions.email                       =  Email address
+partnershipContactMethodOptions.phone                       =  Phone number
+partnershipContactMethodOptions.mobile                      =  Mobile number
+partnershipContactMethodOptions.error.required              =  Select the methods of contact you want to add for this partnership
+partnershipContactMethodOptions.checkYourAnswersLabel       =  Methods of contact
+partnershipContactMethodOptions.change.hidden               =  methods of contact
 
 # Company
 addCompanyContactMethodsYesNo.title                  =  Do you want to add contact details for this company?
