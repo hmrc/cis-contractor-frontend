@@ -18,7 +18,7 @@ package navigation.add
 
 import controllers.routes
 import models.contact.ContactOptions.{Email, Mobile, NoDetails, Phone}
-import models.{CheckMode, Mode, NormalMode, UserAnswers}
+import models.{AmendMode, CheckMode, Mode, NormalMode, UserAnswers}
 import navigation.NavigatorForJourney
 import pages.Page
 import pages.add.partnership.*
@@ -34,6 +34,8 @@ class PartnershipNavigator @Inject() () extends NavigatorForJourney {
       normalRoutes(page)(userAnswers)
     case CheckMode  =>
       checkRouteMap(page)(userAnswers)
+    case AmendMode  =>
+      routes.JourneyRecoveryController.onPageLoad()
   }
 
   private val normalRoutes: Page => UserAnswers => Call = {
@@ -118,7 +120,7 @@ class PartnershipNavigator @Inject() () extends NavigatorForJourney {
       case (Some(_), NormalMode) =>
         controllers.add.partnership.routes.PartnershipNominatedPartnerCrnYesNoController.onPageLoad(NormalMode)
 
-      case (Some(_), CheckMode) =>
+      case (Some(_), CheckMode | AmendMode) =>
         controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
 
       case (None, _) =>
@@ -130,7 +132,7 @@ class PartnershipNavigator @Inject() () extends NavigatorForJourney {
       case (Some(_), NormalMode) =>
         controllers.add.partnership.routes.PartnershipWorksReferenceNumberYesNoController.onPageLoad(NormalMode)
 
-      case (Some(_), CheckMode) =>
+      case (Some(_), CheckMode | AmendMode) =>
         controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
 
       case (None, _) =>
@@ -189,7 +191,7 @@ class PartnershipNavigator @Inject() () extends NavigatorForJourney {
       case (Some(false), NormalMode) =>
         controllers.add.partnership.routes.PartnershipNominatedPartnerNinoYesNoController.onPageLoad(NormalMode)
 
-      case (Some(true), CheckMode) =>
+      case (Some(true), CheckMode | AmendMode) =>
         userAnswers
           .get(PartnershipNominatedPartnerUtrPage)
           .fold(
@@ -198,7 +200,7 @@ class PartnershipNavigator @Inject() () extends NavigatorForJourney {
             controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
           }
 
-      case (Some(false), CheckMode) =>
+      case (Some(false), CheckMode | AmendMode) =>
         controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
 
       case (None, _) =>
@@ -213,7 +215,7 @@ class PartnershipNavigator @Inject() () extends NavigatorForJourney {
       case (Some(false), NormalMode) =>
         controllers.add.partnership.routes.PartnershipWorksReferenceNumberYesNoController.onPageLoad(NormalMode)
 
-      case (Some(true), CheckMode) =>
+      case (Some(true), CheckMode | AmendMode) =>
         userAnswers
           .get(PartnershipNominatedPartnerCrnPage)
           .fold(
@@ -222,7 +224,7 @@ class PartnershipNavigator @Inject() () extends NavigatorForJourney {
             controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
           }
 
-      case (Some(false), CheckMode) =>
+      case (Some(false), CheckMode | AmendMode) =>
         controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
 
       case (None, _) =>
@@ -249,7 +251,7 @@ class PartnershipNavigator @Inject() () extends NavigatorForJourney {
       case (Some(false), NormalMode) =>
         controllers.add.partnership.routes.PartnershipNominatedPartnerCrnYesNoController.onPageLoad(NormalMode)
 
-      case (Some(true), CheckMode) =>
+      case (Some(true), CheckMode | AmendMode) =>
         userAnswers
           .get(PartnershipNominatedPartnerNinoPage)
           .fold(
@@ -258,7 +260,7 @@ class PartnershipNavigator @Inject() () extends NavigatorForJourney {
             controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
           }
 
-      case (Some(false), CheckMode) =>
+      case (Some(false), CheckMode | AmendMode) =>
         controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
 
       case (None, _) =>
