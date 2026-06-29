@@ -43,7 +43,10 @@
         )
 
         @govukButton(
-            ButtonViewModel(messages("site.continue"))
+            ButtonViewModel(
+                if (mode == AmendMode) messages("site.update")
+                else messages("site.continue")
+            )
         )
     }
 }
