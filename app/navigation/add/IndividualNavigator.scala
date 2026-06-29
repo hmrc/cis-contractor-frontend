@@ -88,13 +88,14 @@ class IndividualNavigator @Inject() () extends NavigatorForJourney {
 
   private val amendRouteMap: Page => UserAnswers => Call = {
     case WorksReferenceNumberYesNoPage => navigatorFromWorksReferenceNumberYesNoPage(AmendMode)(_)
-    case _ => _ => cyaRoute(AmendMode)
+    case _                             => _ => cyaRoute(AmendMode)
   }
 
   private def cyaRoute(mode: Mode): Call = mode match {
     case AmendMode =>
-      routes.JourneyRecoveryController.onPageLoad() //TODO: redirect to AmendIndividualCheckYourAnswersController when it's implemented
-    case _ =>
+      routes.JourneyRecoveryController
+        .onPageLoad() // TODO: redirect to AmendIndividualCheckYourAnswersController when it's implemented
+    case _         =>
       controllers.add.routes.CheckYourAnswersController.onPageLoad()
   }
 
@@ -181,8 +182,8 @@ class IndividualNavigator @Inject() () extends NavigatorForJourney {
 
       case (Some(false), NormalMode) =>
         controllers.add.routes.CheckYourAnswersController.onPageLoad()
-        
-      case (Some(true), CheckMode | AmendMode)   =>
+
+      case (Some(true), CheckMode | AmendMode) =>
         ua.get(WorksReferenceNumberPage)
           .fold(controllers.add.routes.WorksReferenceNumberController.onPageLoad(mode)) { _ =>
             cyaRoute(mode)

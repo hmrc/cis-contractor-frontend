@@ -65,7 +65,7 @@ class WorksReferenceNumberYesNoViewSpec extends AnyWordSpec with Matchers with G
       val subcontractorName = "Test Subcontractor"
 
       val html: HtmlFormat.Appendable = view(form, AmendMode, subcontractorName)
-      val doc: Document = org.jsoup.Jsoup.parse(html.body)
+      val doc: Document               = org.jsoup.Jsoup.parse(html.body)
       doc.select("title").text() must include(messages("worksReferenceNumberYesNo.title"))
 
       doc.select(".govuk-button").text() mustBe messages("site.update")
