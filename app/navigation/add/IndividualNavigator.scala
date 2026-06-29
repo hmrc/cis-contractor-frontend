@@ -20,7 +20,7 @@ import javax.inject.{Inject, Singleton}
 import navigation.NavigatorForJourney
 import controllers.routes
 import models.contact.ContactOptions.{Email, Mobile, NoDetails, Phone}
-import models.{AmendMode,CheckMode, Mode, NormalMode, UserAnswers}
+import models.{AmendMode, CheckMode, Mode, NormalMode, UserAnswers}
 import pages.Page
 import pages.add.*
 import play.api.mvc.Call

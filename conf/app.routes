@@ -1,40 +1,84 @@
 # Routes
 
 # Infrastructure
-->   /subcontractor/hmrc-frontend  hmrcfrontend.Routes
+->    /subcontractor/hmrc-frontend  hmrcfrontend.Routes
 
-GET  /subcontractor  controllers.IndexController.onPageLoad()
+GET   /subcontractor  controllers.IndexController.onPageLoad()
 
-GET  /subcontractor/assets/*file  controllers.Assets.versioned(path="/public", file: Asset)
+GET   /subcontractor/assets/*file  controllers.Assets.versioned(path="/public", file: Asset)
 
-GET  /language/:lang  controllers.LanguageSwitchController.switchToLanguage(lang: String)
+GET   /language/:lang  controllers.LanguageSwitchController.switchToLanguage(lang: String)
 
-GET  /subcontractor/refresh-session  controllers.KeepAliveController.keepAlive()
+GET   /subcontractor/refresh-session  controllers.KeepAliveController.keepAlive()
 
-GET  /subcontractor/there-is-a-problem  controllers.JourneyRecoveryController.onPageLoad(continueUrl: Option[RedirectUrl] ?= None)
+GET   /subcontractor/there-is-a-problem  controllers.JourneyRecoveryController.onPageLoad(continueUrl: Option[RedirectUrl] ?= None)
 
-GET  /subcontractor/account/sign-out-survey  controllers.auth.AuthController.signOut()
-GET  /subcontractor/account/sign-out         controllers.auth.AuthController.signOutNoSurvey()
+GET   /subcontractor/account/sign-out-survey  controllers.auth.AuthController.signOut()
+GET   /subcontractor/account/sign-out         controllers.auth.AuthController.signOutNoSurvey()
 
-GET  /subcontractor/account/signed-out  controllers.auth.SignedOutController.onPageLoad()
+GET   /subcontractor/account/signed-out  controllers.auth.SignedOutController.onPageLoad()
 
-GET  /subcontractor/unauthorised  controllers.UnauthorisedController.onPageLoad()
+GET   /subcontractor/unauthorised  controllers.UnauthorisedController.onPageLoad()
 
-GET  /subcontractor/unauthorised/organisation  controllers.UnauthorisedOrganisationAffinityController.onPageLoad()
+GET   /subcontractor/unauthorised/organisation  controllers.UnauthorisedOrganisationAffinityController.onPageLoad()
 
-GET  /subcontractor/unauthorised/individual  controllers.UnauthorisedIndividualAffinityController.onPageLoad()
+GET   /subcontractor/unauthorised/individual  controllers.UnauthorisedIndividualAffinityController.onPageLoad()
 
-GET  /subcontractor/unauthorised/agent  controllers.UnauthorisedAgentAffinityController.onPageLoad()
+GET   /subcontractor/unauthorised/agent  controllers.UnauthorisedAgentAffinityController.onPageLoad()
 
-GET  /subcontractor/page-not-found  controllers.PageNotFoundController.onPageLoad()
+GET   /subcontractor/page-not-found  controllers.PageNotFoundController.onPageLoad()
 
-GET  /subcontractor/access-denied  controllers.AccessDeniedController.onPageLoad()
+GET   /subcontractor/access-denied  controllers.AccessDeniedController.onPageLoad()
 
-GET  /subcontractor/system-error/there-is-a-problem  controllers.SystemErrorController.onPageLoad()
+GET   /subcontractor/system-error/there-is-a-problem  controllers.SystemErrorController.onPageLoad()
 
-GET  /subcontractor/individual-address-lookup         controllers.add.AddressOfSubcontractorController.redirectToAddressLookup(mode: Mode = NormalMode, changeRoute: Option[String] ?= None)
-GET  /subcontractor/individual-address-return         controllers.add.AddressOfSubcontractorController.addressLookupCallback(id: String ?= "", mode: Mode = NormalMode)
-GET  /subcontractor/individual-address-return/change  controllers.add.AddressOfSubcontractorController.addressLookupCallbackChange(id: String ?= "", mode: Mode = NormalMode)
+GET   /subcontractor/individual-address-lookup         controllers.add.AddressOfSubcontractorController.redirectToAddressLookup(mode: Mode = NormalMode, changeRoute: Option[String] ?= None)
+GET   /subcontractor/individual-address-return         controllers.add.AddressOfSubcontractorController.addressLookupCallback(id: String ?= "", mode: Mode = NormalMode)
+GET   /subcontractor/individual-address-return/change  controllers.add.AddressOfSubcontractorController.addressLookupCallbackChange(id: String ?= "", mode: Mode = NormalMode)
+
+GET   /subcontractor/amend/individual  controllers.amend.AmendIndividualController.onPageLoad()
+
+GET   /subcontractor/amend/check-trading-name  controllers.add.SubTradingNameYesNoController.onPageLoad(mode: Mode = AmendMode)
+POST  /subcontractor/amend/check-trading-name  controllers.add.SubTradingNameYesNoController.onSubmit(mode: Mode = AmendMode)
+
+GET   /subcontractor/amend/trading-name  controllers.add.TradingNameOfSubcontractorController.onPageLoad(mode: Mode = AmendMode)
+POST  /subcontractor/amend/trading-name  controllers.add.TradingNameOfSubcontractorController.onSubmit(mode: Mode = AmendMode)
+
+GET   /subcontractor/amend/name  controllers.add.SubcontractorNameController.onPageLoad(mode: Mode = AmendMode)
+POST  /subcontractor/amend/name  controllers.add.SubcontractorNameController.onSubmit(mode: Mode = AmendMode)
+
+GET   /subcontractor/amend/check-contact-details  controllers.add.IndividualChooseContactDetailsController.onPageLoad(mode: Mode = AmendMode)
+POST  /subcontractor/amend/check-contact-details  controllers.add.IndividualChooseContactDetailsController.onSubmit(mode: Mode = AmendMode)
+
+GET   /subcontractor/amend/email-address  controllers.add.IndividualEmailAddressController.onPageLoad(mode: Mode = AmendMode)
+POST  /subcontractor/amend/email-address  controllers.add.IndividualEmailAddressController.onSubmit(mode: Mode = AmendMode)
+
+GET   /subcontractor/amend/phone-number  controllers.add.IndividualPhoneNumberController.onPageLoad(mode: Mode = AmendMode)
+POST  /subcontractor/amend/phone-number  controllers.add.IndividualPhoneNumberController.onSubmit(mode: Mode = AmendMode)
+
+GET   /subcontractor/amend/mobile-number  controllers.add.IndividualMobileNumberController.onPageLoad(mode: Mode = AmendMode)
+POST  /subcontractor/amend/mobile-number  controllers.add.IndividualMobileNumberController.onSubmit(mode: Mode = AmendMode)
+
+GET   /subcontractor/amend/add-contact-details  controllers.add.AddIndividualContactMethodsYesNoController.onPageLoad(mode: Mode = AmendMode)
+POST  /subcontractor/amend/add-contact-details  controllers.add.AddIndividualContactMethodsYesNoController.onSubmit(mode: Mode = AmendMode)
+
+GET   /subcontractor/amend/check-unique-taxpayer-reference  controllers.add.UniqueTaxpayerReferenceYesNoController.onPageLoad(mode: Mode = AmendMode)
+POST  /subcontractor/amend/check-unique-taxpayer-reference  controllers.add.UniqueTaxpayerReferenceYesNoController.onSubmit(mode: Mode = AmendMode)
+
+GET   /subcontractor/amend/unique-taxpayer-reference  controllers.add.SubcontractorsUniqueTaxpayerReferenceController.onPageLoad(mode: Mode = AmendMode)
+POST  /subcontractor/amend/unique-taxpayer-reference  controllers.add.SubcontractorsUniqueTaxpayerReferenceController.onSubmit(mode: Mode = AmendMode)
+
+GET   /subcontractor/amend/check-national-insurance-number  controllers.add.NationalInsuranceNumberYesNoController.onPageLoad(mode: Mode = AmendMode)
+POST  /subcontractor/amend/check-national-insurance-number  controllers.add.NationalInsuranceNumberYesNoController.onSubmit(mode: Mode = AmendMode)
+
+GET   /subcontractor/amend/national-insurance-number  controllers.add.SubNationalInsuranceNumberController.onPageLoad(mode: Mode = AmendMode)
+POST  /subcontractor/amend/national-insurance-number  controllers.add.SubNationalInsuranceNumberController.onSubmit(mode: Mode = AmendMode)
+
+GET   /subcontractor/amend/check-works-reference-number  controllers.add.WorksReferenceNumberYesNoController.onPageLoad(mode: Mode = AmendMode)
+POST  /subcontractor/amend/check-works-reference-number  controllers.add.WorksReferenceNumberYesNoController.onSubmit(mode: Mode = AmendMode)
+
+GET   /subcontractor/amend/works-reference-number  controllers.add.WorksReferenceNumberController.onPageLoad(mode: Mode = AmendMode)
+POST  /subcontractor/amend/works-reference-number  controllers.add.WorksReferenceNumberController.onSubmit(mode: Mode = AmendMode)
 
 # Errors & Auth
 GET  /unauthorised/standard-user  controllers.UnauthorisedWrongRoleController.onPageLoad()

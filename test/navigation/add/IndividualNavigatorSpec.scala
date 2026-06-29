@@ -20,7 +20,7 @@ import base.SpecBase
 import controllers.routes
 import models.add.SubcontractorName
 import models.contact.ContactOptions
-import models.{AmendMode,CheckMode, NormalMode, UserAnswers}
+import models.{AmendMode, CheckMode, NormalMode, UserAnswers}
 import pages.Page
 import pages.add.*
 
@@ -317,6 +317,47 @@ class IndividualNavigatorSpec extends SpecBase {
             emptyUserAnswers
           ) mustBe journeyRecovery
         }
+      }
+    }
+
+    "in Amend mode" - {
+
+         // TODO: change this to 'Amend' from "Add" when screen available
+//      "must go from a page that doesn't exist in the edit route map to CheckYourAnswers" in {
+//
+//        case object UnknownPage extends Page
+//        navigator.nextPage(
+//          UnknownPage,
+//          AmendMode,
+//          UserAnswers("id")
+//        ) mustBe controllers.add.routes.CheckYourAnswersController
+//          .onPageLoad()
+//      }
+
+      // TODO: uncomment this for when Address page is available for the amend journey
+      //      "must go from a SubAddressYesNoPage to next page when true" in {
+      //        navigator.nextPage(
+      //          SubAddressYesNoPage,
+      //          AmendMode,
+      //          emptyUserAnswers.setOrException(SubAddressYesNoPage, true)
+      //        ) mustBe controllers.add.routes.AddressOfSubcontractorController
+      //          .redirectToAddressLookup(Some(AmendMode.toString))
+      //      }
+
+      "must go from a SubAddressYesNoPage to CYA page when false" in {
+        navigator.nextPage(
+          SubAddressYesNoPage,
+          AmendMode,
+          emptyUserAnswers.setOrException(SubAddressYesNoPage, false)
+        ) mustBe CYA
+      }
+
+      "must go from a SubAddressYesNoPage to journey recovery page when incomplete info provided" in {
+        navigator.nextPage(
+          SubAddressYesNoPage,
+          AmendMode,
+          emptyUserAnswers
+        ) mustBe journeyRecovery
       }
     }
 
@@ -707,34 +748,6 @@ class IndividualNavigatorSpec extends SpecBase {
             emptyUserAnswers
           ) mustBe journeyRecovery
         }
-      }
-    }
-
-    "in Amend mode" - {
-
-//      "must go from a SubAddressYesNoPage to next page when true" in {
-//        navigator.nextPage(
-//          SubAddressYesNoPage,
-//          AmendMode,
-//          emptyUserAnswers.setOrException(SubAddressYesNoPage, true)
-//        ) mustBe controllers.add.routes.AddressOfSubcontractorController
-//          .redirectToAddressLookup(Some(AmendMode.toString))
-//      }
-
-      "must go from a SubAddressYesNoPage to CYA page when false" in {
-        navigator.nextPage(
-          SubAddressYesNoPage,
-          AmendMode,
-          emptyUserAnswers.setOrException(SubAddressYesNoPage, false)
-        ) mustBe CYA
-      }
-
-      "must go from a SubAddressYesNoPage to journey recovery page when incomplete info provided" in {
-        navigator.nextPage(
-          SubAddressYesNoPage,
-          AmendMode,
-          emptyUserAnswers
-        ) mustBe journeyRecovery
       }
     }
 
