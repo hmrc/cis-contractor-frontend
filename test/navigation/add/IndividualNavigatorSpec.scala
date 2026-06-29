@@ -320,6 +320,13 @@ class IndividualNavigatorSpec extends SpecBase {
       }
     }
 
+    "in Amend mode" - {
+
+      "must go from SubTradingNameYesNoPage to JourneyRecovery" in {
+        navigator.nextPage(SubTradingNameYesNoPage, AmendMode, emptyUserAnswers) mustBe journeyRecovery
+      }
+    }
+
     "in Check mode" - {
 
       "must go from a page that doesn't exist in the edit route map to CheckYourAnswers" in {

@@ -20,7 +20,7 @@ import base.SpecBase
 import controllers.routes
 import models.address.Address
 import models.contact.ContactOptions
-import models.{CheckMode, NormalMode, UserAnswers}
+import models.{AmendMode, CheckMode, NormalMode, UserAnswers}
 import pages.add.partnership.*
 import pages.Page
 import pages.QuestionPage
@@ -494,6 +494,18 @@ class PartnershipNavigatorSpec extends SpecBase {
             emptyUserAnswers
           ) mustBe journeyRecovery
         }
+      }
+    }
+
+    "in Amend mode" - {
+
+      "must go from any page to JourneyRecovery" in {
+        case object UnknownPage extends Page
+        navigator.nextPage(UnknownPage, AmendMode, UserAnswers("id")) mustBe journeyRecovery
+      }
+
+      "must go from PartnershipNamePage to JourneyRecovery" in {
+        navigator.nextPage(PartnershipNamePage, AmendMode, emptyUserAnswers) mustBe journeyRecovery
       }
     }
 
