@@ -724,7 +724,7 @@ class IndividualNavigatorSpec extends SpecBase {
 
     "in Amend mode" - {
 
-      "must go from IndividualEmailAddressPage to CheckYourAnswersController" in {
+      "must go from IndividualEmailAddressPage to CheckYourAnswersController when email is present" in {
         navigator.nextPage(
           IndividualEmailAddressPage,
           AmendMode,
@@ -735,12 +735,12 @@ class IndividualNavigatorSpec extends SpecBase {
         ) mustBe controllers.add.routes.CheckYourAnswersController.onPageLoad()
       }
 
-      "must go from IndividualEmailAddressPage to journey recovery page when incomplete info provided" in {
+      "must go from IndividualEmailAddressPage to CheckYourAnswersController when email is missing" in {
         navigator.nextPage(
           IndividualEmailAddressPage,
           AmendMode,
           emptyUserAnswers
-        ) mustBe journeyRecovery
+        ) mustBe controllers.add.routes.CheckYourAnswersController.onPageLoad()
       }
     }
 
