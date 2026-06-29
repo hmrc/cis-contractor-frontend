@@ -32,7 +32,7 @@ class TradingNameOfSubcontractorSummarySpec extends AnyFreeSpec with Matchers wi
 
   implicit val messages: Messages = stubMessages()
 
-  "TradingNNameOfSubcontractorSummary.row" - {
+  "TradingNameOfSubcontractorSummary.row" - {
 
     "must return a SummaryListRow when the answer exists" in {
       val answers =
