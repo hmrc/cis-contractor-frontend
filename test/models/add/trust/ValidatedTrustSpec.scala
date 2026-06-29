@@ -18,7 +18,7 @@ package models.add.trust
 
 import base.SpecBase
 import models.{RichJsObject, TypeOfSubcontractor}
-import models.add.InternationalAddress
+import models.address.Address
 import models.contact.ContactOptions
 import models.contact.ContactOptions.*
 import models.{InvalidAnswer, MissingAnswer, UserAnswers}
@@ -198,14 +198,14 @@ class ValidatedTrustSpec extends SpecBase with Matchers {
       }
 
       "fail when TrustAddressYesNo is false but address value is still present (stale session)" in {
-        val address = InternationalAddress("1", None, "City", None, "AA1 1AA", "GB")
+        val address = Address("1", addressLine3 = Some("City"), postcode = Some("AA1 1AA"))
         val ua      = withStaleValue(minRequired, TrustAddressPage, address)
 
         ValidatedTrust.build(ua) mustBe Left(InvalidAnswer(TrustAddressPage))
       }
 
       "build when TrustAddressYesNo is true and address is present" in {
-        val address = InternationalAddress("1", None, "City", None, "AA1 1AA", "GB")
+        val address = Address("1", addressLine3 = Some("City"), postcode = Some("AA1 1AA"))
 
         val ua =
           minRequired
