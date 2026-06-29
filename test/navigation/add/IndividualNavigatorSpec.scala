@@ -347,7 +347,7 @@ class IndividualNavigatorSpec extends SpecBase {
           SubAddressYesNoPage,
           AmendMode,
           emptyUserAnswers.setOrException(SubAddressYesNoPage, false)
-        ) mustBe journeyRecovery //TODO: change this to CYA when available
+        ) mustBe journeyRecovery // TODO: change this to CYA when available
       }
 
       "must go from a SubAddressYesNoPage to journey recovery page when incomplete info provided" in {
