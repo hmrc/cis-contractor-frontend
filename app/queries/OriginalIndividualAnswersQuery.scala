@@ -14,23 +14,13 @@
  * limitations under the License.
  */
 
-package models
+package queries
 
-import play.api.mvc.JavascriptLiteral
+import models.amend.OriginalIndividualAnswers
+import play.api.libs.json.JsPath
 
-sealed trait Mode
-
-case object CheckMode extends Mode
-case object NormalMode extends Mode
-case object AmendMode extends Mode
-
-object Mode {
-
-  implicit val jsLiteral: JavascriptLiteral[Mode] = new JavascriptLiteral[Mode] {
-    override def to(value: Mode): String = value match {
-      case NormalMode => "NormalMode"
-      case CheckMode  => "CheckMode"
-      case AmendMode  => "AmendMode"
-    }
-  }
+case object OriginalIndividualAnswersQuery
+    extends Gettable[OriginalIndividualAnswers]
+    with Settable[OriginalIndividualAnswers] {
+  override def path: JsPath = JsPath \ "originalIndividualAnswers"
 }
