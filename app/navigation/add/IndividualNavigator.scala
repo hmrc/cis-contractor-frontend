@@ -94,7 +94,7 @@ class IndividualNavigator @Inject() () extends NavigatorForJourney {
   private def cyaRoute(mode: Mode): Call = mode match {
     case AmendMode =>
       routes.JourneyRecoveryController
-        .onPageLoad() // TODO: redirect to AmendIndividualCheckYourAnswersController when it's implemented
+        .onPageLoad() // TODO: redirect to amend cya page - AmendIndividualCheckYourAnswersController when it's implemented
     case _         =>
       controllers.add.routes.CheckYourAnswersController.onPageLoad()
   }
