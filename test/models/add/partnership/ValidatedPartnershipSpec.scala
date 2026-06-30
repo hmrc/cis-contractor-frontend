@@ -18,8 +18,7 @@ package models.add.partnership
 
 import base.SpecBase
 import models.address.Address
-import models.contact.{ContactMethodOptions, ContactOptions}
-import models.contact.ContactOptions.*
+import models.contact.ContactMethodOptions
 import models.{InvalidAnswer, MissingAnswer, TypeOfSubcontractor}
 import pages.add.TypeOfSubcontractorPage
 import pages.add.partnership.*

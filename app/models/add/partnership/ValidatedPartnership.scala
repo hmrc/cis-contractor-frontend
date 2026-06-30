@@ -48,9 +48,24 @@ object ValidatedPartnership extends Validation {
       partnershipAddress              <- getOptionalPageValue(answers, PartnershipAddressPage, PartnershipAddressYesNoPage)
       partnershipContactMethodOptions <-
         getOptionalPageValue(answers, PartnershipContactMethodOptionsPage, AddPartnershipContactMethodsYesNoPage)
-      partnershipEmail                <- getContactPageValue(answers, PartnershipEmailAddressPage, partnershipContactMethodOptions)
-      partnershipPhone                <- getContactPageValue(answers, PartnershipPhoneNumberPage, partnershipContactMethodOptions)
-      partnershipMobile               <- getContactPageValue(answers, PartnershipMobileNumberPage, partnershipContactMethodOptions)
+      partnershipEmail                <- getContactPageValue(
+                                           answers,
+                                           partnershipContactMethodOptions,
+                                           PartnershipEmailAddressPage,
+                                           ContactMethodOptions.Email
+                                         )
+      partnershipPhone                <- getContactPageValue(
+                                           answers,
+                                           partnershipContactMethodOptions,
+                                           PartnershipPhoneNumberPage,
+                                           ContactMethodOptions.Phone
+                                         )
+      partnershipMobile               <- getContactPageValue(
+                                           answers,
+                                           partnershipContactMethodOptions,
+                                           PartnershipMobileNumberPage,
+                                           ContactMethodOptions.Mobile
+                                         )
       partnershipUtr                  <-
         getOptionalPageValue(answers, PartnershipUniqueTaxpayerReferencePage, PartnershipHasUtrYesNoPage)
       partnershipNominatedPartnerName <- getPageValue(answers, PartnershipNominatedPartnerNamePage)
@@ -83,48 +98,27 @@ object ValidatedPartnership extends Validation {
       case TypeOfSubcontractor.Partnership => Right(())
       case _                               => Left(InvalidAnswer(TypeOfSubcontractorPage))
     }
-
-  private def expectedContactMethodForAnswerPage(questionPage: QuestionPage[_]): Option[ContactMethodOptions] =
-    questionPage match {
-      case PartnershipEmailAddressPage => Some(ContactMethodOptions.Email)
-      case PartnershipPhoneNumberPage  => Some(ContactMethodOptions.Phone)
-      case PartnershipMobileNumberPage => Some(ContactMethodOptions.Mobile)
-      case _                           => None
-    }
-
+  
   private def getContactPageValue[A](
     userAnswers: UserAnswers,
+    contactMethodOptions: Option[Set[ContactMethodOptions]],
     questionPage: QuestionPage[A],
-    contactMethodOptions: Option[Set[ContactMethodOptions]]
+    expectedContactMethod: ContactMethodOptions
   )(implicit reads: Reads[A]): Either[ValidationError, Option[A]] = {
-
-    val expectedContactMethod: Option[ContactMethodOptions] =
-      expectedContactMethodForAnswerPage(questionPage)
 
     val answer: Option[A] = userAnswers.get(questionPage)
 
     contactMethodOptions match {
 
-      case Some(selectedContactMethod) if expectedContactMethod.exists(selectedContactMethod.contains) =>
+      case Some(selectedContactMethod) if selectedContactMethod.contains(expectedContactMethod) =>
         answer
           .toRight(MissingAnswer(questionPage))
           .map(Some(_))
 
-      case Some(_) if expectedContactMethod.isDefined =>
+      case _ =>
         answer.fold[Either[ValidationError, Option[A]]](
           Right(None)
         )(_ => Left(InvalidAnswer(questionPage)))
-
-      case Some(_) =>
-        Right(None)
-
-      case None if expectedContactMethod.isDefined =>
-        answer.fold[Either[ValidationError, Option[A]]](
-          Right(None)
-        )(_ => Left(InvalidAnswer(questionPage)))
-
-      case None =>
-        Right(None)
     }
   }
 
