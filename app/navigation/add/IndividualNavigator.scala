@@ -20,7 +20,7 @@ import javax.inject.{Inject, Singleton}
 import navigation.NavigatorForJourney
 import controllers.routes
 import models.contact.ContactOptions.{Email, Mobile, NoDetails, Phone}
-import models.{CheckMode, Mode, NormalMode, UserAnswers}
+import models.{AmendMode, CheckMode, Mode, NormalMode, UserAnswers}
 import pages.Page
 import pages.add.*
 import play.api.mvc.Call
@@ -33,6 +33,8 @@ class IndividualNavigator @Inject() () extends NavigatorForJourney {
       normalRoutes(page)(userAnswers)
     case CheckMode  =>
       checkRouteMap(page)(userAnswers)
+    case AmendMode  =>
+      routes.JourneyRecoveryController.onPageLoad()
   }
 
   private val normalRoutes: Page => UserAnswers => Call = {
@@ -109,21 +111,16 @@ class IndividualNavigator @Inject() () extends NavigatorForJourney {
     }
 
   private def navigatorFromSubAddressYesNoPage(mode: Mode)(ua: UserAnswers): Call =
-    (ua.get(SubAddressYesNoPage), mode) match {
-      case (Some(true), NormalMode)  =>
-        controllers.add.routes.AddressOfSubcontractorController.onPageLoad(NormalMode)
-      case (Some(false), NormalMode) =>
-        controllers.add.routes.IndividualChooseContactDetailsController.onPageLoad(NormalMode)
-      case (Some(true), CheckMode)   =>
-        ua.get(AddressOfSubcontractorPage)
-          .fold(controllers.add.routes.AddressOfSubcontractorController.onPageLoad(CheckMode)) { _ =>
-            controllers.add.routes.CheckYourAnswersController.onPageLoad()
-          }
-      case (Some(false), CheckMode)  =>
-        controllers.add.routes.CheckYourAnswersController.onPageLoad()
-      case _                         =>
-        routes.JourneyRecoveryController.onPageLoad()
-    }
+    addressLookupYesNoRoute(
+      mode,
+      ua.get(SubAddressYesNoPage),
+      ua.get(AddressOfSubcontractorPage).isDefined,
+      onYes = controllers.add.routes.AddressOfSubcontractorController.redirectToAddressLookup(),
+      onYesChange =
+        controllers.add.routes.AddressOfSubcontractorController.redirectToAddressLookup(Some(CheckMode.toString)),
+      onNo = controllers.add.routes.IndividualChooseContactDetailsController.onPageLoad(NormalMode),
+      checkYourAnswers = controllers.add.routes.CheckYourAnswersController.onPageLoad()
+    )
 
   private def navigatorFromNationalInsuranceNumberYesNoPage(mode: Mode)(ua: UserAnswers): Call =
     (ua.get(NationalInsuranceNumberYesNoPage), mode) match {

@@ -16,7 +16,7 @@
 
 package models.add.trust
 
-import models.add.InternationalAddress
+import models.address.Address
 import models.contact.ContactOptions
 import models.contact.ContactOptions.{Email, Mobile, NoDetails, Phone}
 import models.{InvalidAnswer, MissingAnswer, TypeOfSubcontractor, UserAnswers, Validation, ValidationError}
@@ -27,7 +27,7 @@ import play.api.libs.json.Reads
 
 final case class ValidatedTrust(
   trustName: String,
-  trustAddress: Option[InternationalAddress],
+  trustAddress: Option[Address],
   trustContactDetails: TrustContactOptions,
   trustEmail: Option[String],
   trustPhone: Option[String],
