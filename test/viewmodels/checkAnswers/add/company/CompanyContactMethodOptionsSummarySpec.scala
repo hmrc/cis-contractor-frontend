@@ -14,49 +14,49 @@
  * limitations under the License.
  */
 
-package viewmodels.checkAnswers.add.partnership
+package viewmodels.checkAnswers.add.company
 
 import base.SpecBase
 import models.contact.ContactMethodOptions
 import models.{CheckMode, UserAnswers}
 import org.scalatest.matchers.must.Matchers
-import pages.add.partnership.PartnershipContactMethodOptionsPage
+import pages.add.company.CompanyContactMethodOptionsPage
 import play.api.i18n.{DefaultMessagesApi, Lang, Messages}
 
-class PartnershipContactMethodOptionsSummarySpec extends SpecBase with Matchers {
+class CompanyContactMethodOptionsSummarySpec extends SpecBase with Matchers {
   implicit val messages: Messages = new DefaultMessagesApi(
     Map(
       "en" -> Map(
-        "partnershipContactMethodOptions.checkYourAnswersLabel" -> "Methods of contact",
-        "partnershipContactMethodOptions.email"                 -> "Email address",
-        "partnershipContactMethodOptions.phone"                 -> "Phone number",
-        "partnershipContactMethodOptions.mobile"                -> "Mobile number",
-        "partnershipContactMethodOptions.change.hidden"         -> "methods of contact",
-        "site.change"                                           -> "Change"
+        "companyContactMethodOptions.checkYourAnswersLabel" -> "Methods of contact",
+        "companyContactMethodOptions.email"                 -> "Email address",
+        "companyContactMethodOptions.phone"                 -> "Phone number",
+        "companyContactMethodOptions.mobile"                -> "Mobile number",
+        "companyContactMethodOptions.change.hidden"         -> "methods of contact",
+        "site.change"                                       -> "Change"
       )
     )
   ).preferred(Seq(Lang("en")))
 
-  "PartnershipContactMethodOptionsSummary.row" - {
+  "CompanyContactMethodOptionsSummary.row" - {
 
     "must return a row with multiple selected options" in {
 
       val answers: UserAnswers =
         UserAnswers("test-id")
           .set(
-            PartnershipContactMethodOptionsPage,
+            CompanyContactMethodOptionsPage,
             Set(ContactMethodOptions.Email, ContactMethodOptions.Phone, ContactMethodOptions.Mobile)
           )
           .success
           .value
 
-      val result = PartnershipContactMethodOptionsSummary.row(answers)
+      val result = CompanyContactMethodOptionsSummary.row(answers)
 
       result mustBe defined
 
       val row = result.value
 
-      row.key.content.asHtml.toString must include(messages("partnershipContactMethodOptions.checkYourAnswersLabel"))
+      row.key.content.asHtml.toString must include(messages("companyContactMethodOptions.checkYourAnswersLabel"))
 
       val valueHtml = row.value.content.asHtml.toString
 
@@ -73,28 +73,28 @@ class PartnershipContactMethodOptionsSummarySpec extends SpecBase with Matchers 
 
       val action = actions.head
 
-      action.href mustBe controllers.add.partnership.routes.PartnershipContactMethodOptionsController
+      action.href mustBe controllers.add.company.routes.CompanyContactMethodOptionsController
         .onPageLoad(CheckMode)
         .url
 
       action.content.asHtml.toString must include(messages("site.change"))
 
       action.visuallyHiddenText mustBe Some(
-        messages("partnershipContactMethodOptions.change.hidden")
+        messages("companyContactMethodOptions.change.hidden")
       )
 
-      action.attributes must contain("id" -> "partnership-contact-methods")
+      action.attributes must contain("id" -> "company-contact-methods")
     }
 
     "must return a row with a single selected option" in {
 
       val answers: UserAnswers =
         emptyUserAnswers
-          .set(PartnershipContactMethodOptionsPage, Set(ContactMethodOptions.Email))
+          .set(CompanyContactMethodOptionsPage, Set(ContactMethodOptions.Email))
           .success
           .value
 
-      val result = PartnershipContactMethodOptionsSummary.row(answers)
+      val result = CompanyContactMethodOptionsSummary.row(answers)
 
       result mustBe defined
 
@@ -104,9 +104,10 @@ class PartnershipContactMethodOptionsSummarySpec extends SpecBase with Matchers 
       valueHtml must not include "<br>"
       valueHtml must not include "govuk-list--bullet"
     }
-  }
 
-  "return None when the answer is not set" in {
-    PartnershipContactMethodOptionsSummary.row(emptyUserAnswers) mustBe None
+    "must return None when the answer does not exist" in {
+      val answers = UserAnswers("test-id")
+      CompanyContactMethodOptionsSummary.row(answers) mustBe None
+    }
   }
 }
