@@ -36,7 +36,7 @@ import services.CisManageService
 import services.VerificationService
 import uk.gov.hmrc.http.HeaderCarrier
 
-import java.time.LocalDateTime
+import java.time.{Clock, LocalDateTime, ZoneOffset}
 import scala.concurrent.Future
 
 class NewestVerificationBatchControllerSpec extends SpecBase with MockitoSugar with ModelGenerators {
@@ -81,8 +81,14 @@ class NewestVerificationBatchControllerSpec extends SpecBase with MockitoSugar w
   private val activeMonthlyReturn   = MonthlyReturn(monthlyReturnId = 1L, decNoMoreSubPayments = Some("N"))
   private val inactiveMonthlyReturn = MonthlyReturn(monthlyReturnId = 1L, decNoMoreSubPayments = Some("Y"))
 
-  private val outsideSixMonthsDateTime = LocalDateTime.now().minusMonths(6).minusDays(1)
-  private val withinSixMonthsDateTime  = LocalDateTime.now().minusMonths(6).plusDays(1)
+  private val fixedNow = LocalDateTime.of(2026, 6, 30, 12, 0)
+
+  private val fixedClock: Clock = Clock.fixed(fixedNow.toInstant(ZoneOffset.UTC), ZoneOffset.UTC)
+
+  private val withinSixMonthsDateTime = fixedNow.minusMonths(6).plusDays(1)
+  private val outsideSixMonthsDateTime = fixedNow.minusMonths(6).minusDays(1)
+
+
 
   // Builds the test application with the shared agent/client checks stubbed for the (default)
   // non-agent path, so the request proceeds through to refreshNewestVerificationBatch.
@@ -98,7 +104,8 @@ class NewestVerificationBatchControllerSpec extends SpecBase with MockitoSugar w
       .overrides(
         bind[VerificationService].toInstance(mockService),
         bind[CisManageService].toInstance(mockCisManagerService),
-        bind[SessionRepository].toInstance(mockSessionRepository)
+        bind[SessionRepository].toInstance(mockSessionRepository),
+        bind[Clock].toInstance(fixedClock)
       )
   }
 

@@ -35,7 +35,7 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
-import java.time.LocalDateTime
+import java.time.{Clock, LocalDateTime}
 
 class NewestVerificationBatchController @Inject() (
   override val messagesApi: MessagesApi,
@@ -44,6 +44,7 @@ class NewestVerificationBatchController @Inject() (
   requireData: DataRequiredAction,
   val controllerComponents: MessagesControllerComponents,
   verificationBatchService: VerificationService,
+  clock: Clock,
   override protected val cisManageService: CisManageService,
   override protected val sessionRepository: SessionRepository
 )(implicit ec: ExecutionContext)
@@ -78,7 +79,8 @@ class NewestVerificationBatchController @Inject() (
             monthlyReturnSubmission.submissionRequestDate match {
               case Some(requestDate) =>
                 val sixMonthsLater = requestDate.plusMonths(InactivityStatus.SixMonths)
-                if (LocalDateTime.now().isBefore(sixMonthsLater)) InactivityStatus.Inactive else InactivityStatus.Active
+                val now            = LocalDateTime.now(clock)
+                if (!now.isAfter(sixMonthsLater)) InactivityStatus.Inactive else InactivityStatus.Active
               case None              =>
                 InactivityStatus.MissingData
             }
