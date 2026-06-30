@@ -712,26 +712,98 @@ class IndividualNavigatorSpec extends SpecBase {
 
     "in Amend mode" - {
 
-      "in Amend mode" - {
+      "must go from any page to JourneyRecovery" in {
+        case object UnknownPage extends Page
+        navigator.nextPage(UnknownPage, AmendMode, UserAnswers("id")) mustBe journeyRecovery
+      }
 
-        "must go from IndividualEmailAddressPage to CheckYourAnswersController" in {
-          navigator.nextPage(
-            IndividualEmailAddressPage,
-            AmendMode,
-            emptyUserAnswers.setOrException(
-              IndividualEmailAddressPage,
-              "test@test.com"
-            )
-          ) mustBe controllers.add.routes.CheckYourAnswersController.onPageLoad()
-        }
+      "must go from SubTradingNameYesNoPage to SubcontractorNameController when answer is No and name is missing" in {
+        val ua =
+          emptyUserAnswers
+            .set(SubTradingNameYesNoPage, false)
+            .success
+            .value
 
-        "must go from IndividualEmailAddressPage to CheckYourAnswersController regardless of answers" in {
-          navigator.nextPage(
+        navigator.nextPage(
+          SubTradingNameYesNoPage,
+          AmendMode,
+          ua
+        ) mustBe controllers.add.routes.SubcontractorNameController.onPageLoad(AmendMode)
+      }
+
+      "must go from SubTradingNameYesNoPage to Amend CYA when answer is No and subcontractor name already exists" in {
+        val ua =
+          emptyUserAnswers
+            .set(SubTradingNameYesNoPage, false)
+            .success
+            .value
+            .set(SubcontractorNamePage, SubcontractorName("Jane", None, "Doe"))
+            .success
+            .value
+
+        navigator.nextPage(
+          SubTradingNameYesNoPage,
+          AmendMode,
+          ua
+        ) mustBe journeyRecovery // TODO: this needs to be redirected to amend cya page when it's implemented
+      }
+
+      "must go from SubTradingNameYesNoPage to TradingNameOfSubcontractorController when answer is Yes and trading name is missing" in {
+        val ua =
+          emptyUserAnswers
+            .set(SubTradingNameYesNoPage, true)
+            .success
+            .value
+
+        navigator.nextPage(
+          SubTradingNameYesNoPage,
+          AmendMode,
+          ua
+        ) mustBe controllers.add.routes.TradingNameOfSubcontractorController.onPageLoad(AmendMode)
+      }
+
+      "must go from SubTradingNameYesNoPage to Amend CYA when answer is Yes and trading name already exists" in {
+        val ua =
+          emptyUserAnswers
+            .set(SubTradingNameYesNoPage, true)
+            .success
+            .value
+            .set(TradingNameOfSubcontractorPage, "ACME Construction")
+            .success
+            .value
+
+        navigator.nextPage(
+          SubTradingNameYesNoPage,
+          AmendMode,
+          ua
+        ) mustBe journeyRecovery // TODO: this needs to be redirected to amend cya page when it's implemented
+      }
+
+      "must go from SubTradingNameYesNoPage to JourneyRecovery when SubTradingNameYesNoPage answer is missing" in {
+        navigator.nextPage(
+          SubTradingNameYesNoPage,
+          AmendMode,
+          emptyUserAnswers
+        ) mustBe journeyRecovery
+      }
+
+      "must go from IndividualEmailAddressPage to CheckYourAnswersController" in {
+        navigator.nextPage(
+          IndividualEmailAddressPage,
+          AmendMode,
+          emptyUserAnswers.setOrException(
             IndividualEmailAddressPage,
-            AmendMode,
-            emptyUserAnswers
-          ) mustBe controllers.add.routes.CheckYourAnswersController.onPageLoad()
-        }
+            "test@test.com"
+          )
+        ) mustBe controllers.add.routes.CheckYourAnswersController.onPageLoad()
+      }
+
+      "must go from IndividualEmailAddressPage to CheckYourAnswersController regardless of answers" in {
+        navigator.nextPage(
+          IndividualEmailAddressPage,
+          AmendMode,
+          emptyUserAnswers
+        ) mustBe controllers.add.routes.CheckYourAnswersController.onPageLoad()
       }
     }
 
