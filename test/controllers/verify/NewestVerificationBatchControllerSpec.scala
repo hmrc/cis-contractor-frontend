@@ -81,10 +81,8 @@ class NewestVerificationBatchControllerSpec extends SpecBase with MockitoSugar w
 
   private val fixedClock: Clock = Clock.fixed(fixedNow.toInstant(ZoneOffset.UTC), ZoneOffset.UTC)
 
-  private val withinSixMonthsDateTime = fixedNow.minusMonths(6).plusDays(1)
+  private val withinSixMonthsDateTime  = fixedNow.minusMonths(6).plusDays(1)
   private val outsideSixMonthsDateTime = fixedNow.minusMonths(6).minusDays(1)
-
-
 
   "NewestVerificationBatchController" - {
 
@@ -106,7 +104,7 @@ class NewestVerificationBatchControllerSpec extends SpecBase with MockitoSugar w
       val application =
         applicationBuilder(userAnswers = Some(emptyUserAnswers))
           .overrides(
-            bind[VerificationService].toInstance(mockService) ,
+            bind[VerificationService].toInstance(mockService),
             bind[Clock].toInstance(fixedClock)
           )
           .build()
@@ -408,9 +406,7 @@ class NewestVerificationBatchControllerSpec extends SpecBase with MockitoSugar w
 
       val application =
         applicationBuilder(userAnswers = Some(emptyUserAnswers))
-          .overrides(
-            bind[VerificationService].toInstance(mockService),
-            bind[Clock].toInstance(fixedClock))
+          .overrides(bind[VerificationService].toInstance(mockService), bind[Clock].toInstance(fixedClock))
           .build()
 
       running(application) {
