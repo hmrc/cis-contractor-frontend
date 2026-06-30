@@ -17,7 +17,7 @@
 package views.add
 
 import forms.add.NationalInsuranceNumberYesNoFormProvider
-import models.NormalMode
+import models.{AmendMode,NormalMode}
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.jsoup.select.Elements
@@ -65,6 +65,36 @@ class NationalInsuranceNumberYesNoViewSpec extends AnyWordSpec with Matchers wit
       doc.select("form").attr("autocomplete") mustBe "off"
 
       doc.select(".govuk-button").text() mustBe messages("site.continue")
+    }
+
+    "render the page with title, heading, hint, yes/no radios and update button in AmendMode" in new Setup {
+
+      val subcontractorName = "Test Subcontractor"
+
+      val html: HtmlFormat.Appendable = view(form, AmendMode, subcontractorName)
+      val doc: Document               = Jsoup.parse(html.toString())
+
+      doc.select("title").text() must include(messages("nationalInsuranceNumberYesNo.title"))
+
+      val legend: Elements = doc.select("fieldset legend")
+      legend.text() mustBe messages("nationalInsuranceNumberYesNo.heading", subcontractorName)
+      legend.hasClass("govuk-fieldset__legend--l") mustBe true
+
+      doc.select(".govuk-hint").text() mustBe messages("nationalInsuranceNumberYesNo.hint")
+
+      val radios: Elements = doc.select(".govuk-radios__input")
+      radios.size() mustBe 2
+
+      val labels: util.List[String] = doc.select(".govuk-radios__label").eachText()
+      labels must contain("Yes")
+      labels must contain("No")
+
+      doc.select("form").attr("action") mustBe
+        controllers.add.routes.NationalInsuranceNumberYesNoController.onSubmit(AmendMode).url
+
+      doc.select("form").attr("autocomplete") mustBe "off"
+
+      doc.select(".govuk-button").text() mustBe messages("site.update")
     }
 
     "display error summary and inline error when no option is selected" in new Setup {
