@@ -56,7 +56,7 @@ class PartnershipAddressController @Inject() (
     routes.PartnershipAddressController.addressLookupCallbackChange()
 
   override protected def onCompletion(mode: Mode): Call =
-    routes.PartnershipChooseContactDetailsController.onPageLoad(mode)
+    routes.AddPartnershipContactMethodsYesNoController.onPageLoad(mode)
 
   override protected def onChangeCompletion: Call =
     routes.PartnershipCheckYourAnswersController.onPageLoad()
