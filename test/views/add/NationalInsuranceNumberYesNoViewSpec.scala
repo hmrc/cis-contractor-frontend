@@ -17,7 +17,7 @@
 package views.add
 
 import forms.add.NationalInsuranceNumberYesNoFormProvider
-import models.{AmendMode,NormalMode}
+import models.{AmendMode, NormalMode}
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.jsoup.select.Elements

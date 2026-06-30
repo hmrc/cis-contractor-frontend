@@ -327,7 +327,7 @@ class IndividualNavigatorSpec extends SpecBase {
         navigator.nextPage(UnknownPage, AmendMode, UserAnswers("id")) mustBe journeyRecovery
       }
 
-      //TODO: when available to AmendMode
+      // TODO: when available to AmendMode
 //        "must go from a NationalInsuranceNumberYesNoPage to next page when true" in {
 //          navigator.nextPage(
 //            NationalInsuranceNumberYesNoPage,
@@ -336,22 +336,22 @@ class IndividualNavigatorSpec extends SpecBase {
 //          ) mustBe controllers.add.routes.SubNationalInsuranceNumberController.onPageLoad(AmendMode)
 //        }
 
-        "must go from a NationalInsuranceNumberYesNoPage to CYA page when false" in {
-          navigator.nextPage(
-            NationalInsuranceNumberYesNoPage,
-            AmendMode,
-            emptyUserAnswers.setOrException(NationalInsuranceNumberYesNoPage, false)
-          ) mustBe journeyRecovery  //TODO - change to CYA when wiring complete
-        }
-
-        "must go from a NationalInsuranceNumberYesNoPage to journey recovery page when incomplete info provided" in {
-          navigator.nextPage(
-            NationalInsuranceNumberYesNoPage,
-            AmendMode,
-            emptyUserAnswers
-          ) mustBe journeyRecovery
-        }
+      "must go from a NationalInsuranceNumberYesNoPage to CYA page when false" in {
+        navigator.nextPage(
+          NationalInsuranceNumberYesNoPage,
+          AmendMode,
+          emptyUserAnswers.setOrException(NationalInsuranceNumberYesNoPage, false)
+        ) mustBe journeyRecovery // TODO - change to CYA when wiring complete
       }
+
+      "must go from a NationalInsuranceNumberYesNoPage to journey recovery page when incomplete info provided" in {
+        navigator.nextPage(
+          NationalInsuranceNumberYesNoPage,
+          AmendMode,
+          emptyUserAnswers
+        ) mustBe journeyRecovery
+      }
+    }
 
     "in Check mode" - {
 
