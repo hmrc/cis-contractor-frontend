@@ -712,26 +712,39 @@ class IndividualNavigatorSpec extends SpecBase {
 
     "in Amend mode" - {
 
-      "in Amend mode" - {
+      "must go from any page to JourneyRecovery" in {
+        case object UnknownPage extends Page
+        navigator.nextPage(UnknownPage, AmendMode, UserAnswers("id")) mustBe journeyRecovery
+      }
 
-        "must go from IndividualEmailAddressPage to CheckYourAnswersController" in {
-          navigator.nextPage(
+      "must go from IndividualEmailAddressPage to CheckYourAnswersController" in {
+        navigator.nextPage(
+          IndividualEmailAddressPage,
+          AmendMode,
+          emptyUserAnswers.setOrException(
             IndividualEmailAddressPage,
-            AmendMode,
-            emptyUserAnswers.setOrException(
-              IndividualEmailAddressPage,
-              "test@test.com"
-            )
-          ) mustBe controllers.add.routes.CheckYourAnswersController.onPageLoad()
-        }
+            "test@test.com"
+          )
+        ) mustBe controllers.add.routes.CheckYourAnswersController.onPageLoad()
+      }
 
-        "must go from IndividualEmailAddressPage to CheckYourAnswersController regardless of answers" in {
-          navigator.nextPage(
-            IndividualEmailAddressPage,
-            AmendMode,
-            emptyUserAnswers
-          ) mustBe controllers.add.routes.CheckYourAnswersController.onPageLoad()
-        }
+      "must go from IndividualEmailAddressPage to CheckYourAnswersController regardless of answers" in {
+        navigator.nextPage(
+          IndividualEmailAddressPage,
+          AmendMode,
+          emptyUserAnswers
+        ) mustBe controllers.add.routes.CheckYourAnswersController.onPageLoad()
+      }
+
+      "must go from SubcontractorNamePage to Amend CYA" in {
+        navigator.nextPage(
+          SubcontractorNamePage,
+          AmendMode,
+          emptyUserAnswers.setOrException(
+            SubcontractorNamePage,
+            SubcontractorName(firstName = "Jane", middleName = None, lastName = "Doe")
+          )
+        ) mustBe journeyRecovery // TODO: this needs to be redirected to amend cya page when it's implemented
       }
     }
 
