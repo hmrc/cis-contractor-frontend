@@ -32,7 +32,7 @@ object AmendIndividualMobileNumberSummary {
         value = ValueViewModel(answer),
         actions = Seq(
           ActionItemViewModel(
-            "site.change",
+            "site.update",
             controllers.add.routes.IndividualMobileNumberController.onPageLoad(AmendMode).url
           )
             .withVisuallyHiddenText(messages("individualMobileNumber.change.hidden"))
