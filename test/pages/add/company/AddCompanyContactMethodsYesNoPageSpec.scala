@@ -16,6 +16,7 @@
 
 package pages.add.company
 
+import models.contact.ContactMethodOptions
 import pages.behaviours.PageBehaviours
 
 class AddCompanyContactMethodsYesNoPageSpec extends PageBehaviours {
@@ -38,12 +39,16 @@ class AddCompanyContactMethodsYesNoPageSpec extends PageBehaviours {
         .set(CompanyMobileNumberPage, "01234567890")
         .success
         .value
+        .set(CompanyContactMethodOptionsPage, Set(ContactMethodOptions.Email, ContactMethodOptions.Phone))
+        .success
+        .value
 
       val updatedUserAnswers = userAnswers.set(AddCompanyContactMethodsYesNoPage, false).success.value
 
       updatedUserAnswers.get(CompanyEmailAddressPage) mustBe None
       updatedUserAnswers.get(CompanyPhoneNumberPage) mustBe None
       updatedUserAnswers.get(CompanyMobileNumberPage) mustBe None
+      updatedUserAnswers.get(CompanyContactMethodOptionsPage) mustBe None
     }
   }
 }
