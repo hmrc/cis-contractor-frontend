@@ -34,7 +34,7 @@ class IndividualNavigator @Inject() () extends NavigatorForJourney {
     case CheckMode  =>
       checkRouteMap(page)(userAnswers)
     case AmendMode  =>
-      routes.JourneyRecoveryController.onPageLoad()
+      amendRouteMap(page)(userAnswers)
   }
 
   private val normalRoutes: Page => UserAnswers => Call = {
@@ -84,6 +84,14 @@ class IndividualNavigator @Inject() () extends NavigatorForJourney {
       _ => controllers.add.routes.CheckYourAnswersController.onPageLoad()
     case AddIndividualContactMethodsYesNoPage => navigatorFromAddIndividualContactMethodsYesNoPage(CheckMode)(_)
     case _                                    => _ => controllers.add.routes.CheckYourAnswersController.onPageLoad()
+  }
+
+  private val amendRouteMap: Page => UserAnswers => Call = {
+//    case IndividualEmailAddressPage =>
+//      _ => controllers.amend.routes.AmendIndividualCheckYourAnswersController.onPageLoad()
+    case IndividualEmailAddressPage =>
+      _ => controllers.add.routes.CheckYourAnswersController.onPageLoad()
+    case _                          => _ => controllers.add.routes.CheckYourAnswersController.onPageLoad()
   }
 
   private def navigatorFromSubTradingNameYesNoPage(mode: Mode)(ua: UserAnswers): Call =
