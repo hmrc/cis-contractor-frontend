@@ -20,6 +20,8 @@ import com.google.inject.{Inject, Singleton}
 import play.api.Configuration
 import play.api.i18n.Lang
 import play.api.mvc.RequestHeader
+import scala.io.Source
+import play.api.libs.json.Json
 
 @Singleton
 class FrontendAppConfig @Inject() (configuration: Configuration) {
