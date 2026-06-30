@@ -918,16 +918,10 @@ class NewestVerificationBatchControllerSpec extends SpecBase with MockitoSugar w
         .thenReturn(Future.failed(new RuntimeException("boom")))
 
       val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
-          .overrides(
-            bind[VerificationService].toInstance(mockService),
-            bind[Clock].toInstance(fixedClock)
-          )
-          .build()
+        appBuilder(mockService).build()
 
       running(application) {
-        val request = FakeRequest(GET, endpointUrl)
-        val result  = route(application, request).value
+        val result = route(application, FakeRequest(GET, continueUrl)).value
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
