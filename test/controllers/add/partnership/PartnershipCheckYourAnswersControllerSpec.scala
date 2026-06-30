@@ -18,7 +18,7 @@ package controllers.add.partnership
 
 import base.SpecBase
 import models.address.{Address, Country}
-import models.contact.ContactOptions
+import models.contact.{ContactMethodOptions, ContactOptions}
 import pages.add.TypeOfSubcontractorPage
 import pages.add.partnership.*
 import play.api.test.FakeRequest
@@ -33,8 +33,9 @@ import play.api.inject.bind
 import repositories.SessionRepository
 import services.SubcontractorService
 import uk.gov.hmrc.http.HeaderCarrier
+
 import scala.concurrent.Future
-import play.api.libs.json._
+import play.api.libs.json.*
 
 class PartnershipCheckYourAnswersControllerSpec extends SpecBase {
 
@@ -46,6 +47,9 @@ class PartnershipCheckYourAnswersControllerSpec extends SpecBase {
     .success
     .value
     .set(PartnershipAddressYesNoPage, false)
+    .success
+    .value
+    .set(AddPartnershipContactMethodsYesNoPage, false)
     .success
     .value
     .set(PartnershipHasUtrYesNoPage, false)
@@ -77,15 +81,7 @@ class PartnershipCheckYourAnswersControllerSpec extends SpecBase {
 
     "must return OK and the correct view for a GET when partnership optionals are not present" in {
 
-      val ua = minUa
-        .set(PartnershipChooseContactDetailsPage, ContactOptions.Email)
-        .success
-        .value
-        .set(PartnershipEmailAddressPage, "one@two.three")
-        .success
-        .value
-
-      val application = applicationBuilder(userAnswers = Some(ua)).build()
+      val application = applicationBuilder(userAnswers = Some(minUa)).build()
 
       running(application) {
         val request =
@@ -110,10 +106,22 @@ class PartnershipCheckYourAnswersControllerSpec extends SpecBase {
       )
 
       val ua = minUa
-        .set(PartnershipChooseContactDetailsPage, ContactOptions.Email)
+        .set(AddPartnershipContactMethodsYesNoPage, true)
+        .success
+        .value
+        .set(
+          PartnershipContactMethodOptionsPage,
+          Set(ContactMethodOptions.Email, ContactMethodOptions.Phone, ContactMethodOptions.Mobile)
+        )
         .success
         .value
         .set(PartnershipEmailAddressPage, "one@two.three")
+        .success
+        .value
+        .set(PartnershipPhoneNumberPage, "11111111")
+        .success
+        .value
+        .set(PartnershipMobileNumberPage, "22222222")
         .success
         .value
         .set(PartnershipAddressYesNoPage, true)
@@ -163,7 +171,12 @@ class PartnershipCheckYourAnswersControllerSpec extends SpecBase {
         status(result) mustEqual OK
         contentAsString(result) must include("Test Partnership")
         contentAsString(result) must include("Test Nominated Partner")
+        contentAsString(result) must include("Email address")
+        contentAsString(result) must include("Phone number")
+        contentAsString(result) must include("Mobile number")
         contentAsString(result) must include("one@two.three")
+        contentAsString(result) must include("11111111")
+        contentAsString(result) must include("22222222")
         contentAsString(result) must include("1234567890")
         contentAsString(result) must include("AB123456C")
         contentAsString(result) must include("12345678")
@@ -173,68 +186,15 @@ class PartnershipCheckYourAnswersControllerSpec extends SpecBase {
 
     "contact option validation" - {
 
-      "must return OK when Phone is selected and a phone number is present" in {
-        val ua = minUa
-          .set(PartnershipChooseContactDetailsPage, ContactOptions.Phone)
-          .success
-          .value
-          .set(PartnershipPhoneNumberPage, "01234567890")
-          .success
-          .value
-
-        val application = applicationBuilder(userAnswers = Some(ua)).build()
-
-        running(application) {
-          val request =
-            FakeRequest(GET, controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad().url)
-          val result  = route(application, request).value
-
-          status(result) mustEqual OK
-          contentAsString(result) must include("01234567890")
-        }
-      }
-
-      "must return OK when Mobile is selected and a mobile number is present" in {
-        val ua = minUa
-          .set(PartnershipChooseContactDetailsPage, ContactOptions.Mobile)
-          .success
-          .value
-          .set(PartnershipMobileNumberPage, "07123456789")
-          .success
-          .value
-
-        val application = applicationBuilder(userAnswers = Some(ua)).build()
-
-        running(application) {
-          val request =
-            FakeRequest(GET, controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad().url)
-          val result  = route(application, request).value
-
-          status(result) mustEqual OK
-          contentAsString(result) must include("07123456789")
-        }
-      }
-
-      "must return OK when NoDetails is selected and no contact details are present" in {
-        val ua = minUa
-          .set(PartnershipChooseContactDetailsPage, ContactOptions.NoDetails)
-          .success
-          .value
-
-        val application = applicationBuilder(userAnswers = Some(ua)).build()
-
-        running(application) {
-          val request =
-            FakeRequest(GET, controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad().url)
-          val result  = route(application, request).value
-
-          status(result) mustEqual OK
-        }
-      }
-
       "must redirect to Journey Recovery when Email is selected but the email address is missing" in {
         val ua = minUa
-          .set(PartnershipChooseContactDetailsPage, ContactOptions.Email)
+          .set(AddPartnershipContactMethodsYesNoPage, true)
+          .success
+          .value
+          .set(
+            PartnershipContactMethodOptionsPage,
+            Set(ContactMethodOptions.Email)
+          )
           .success
           .value
         // PartnershipEmailAddressPage deliberately omitted
@@ -253,7 +213,13 @@ class PartnershipCheckYourAnswersControllerSpec extends SpecBase {
 
       "must redirect to Journey Recovery when Phone is selected but the phone number is missing" in {
         val ua = minUa
-          .set(PartnershipChooseContactDetailsPage, ContactOptions.Phone)
+          .set(AddPartnershipContactMethodsYesNoPage, true)
+          .success
+          .value
+          .set(
+            PartnershipContactMethodOptionsPage,
+            Set(ContactMethodOptions.Phone)
+          )
           .success
           .value
         // PartnershipPhoneNumberPage deliberately omitted
@@ -272,7 +238,13 @@ class PartnershipCheckYourAnswersControllerSpec extends SpecBase {
 
       "must redirect to Journey Recovery when Mobile is selected but the mobile number is missing" in {
         val ua = minUa
-          .set(PartnershipChooseContactDetailsPage, ContactOptions.Mobile)
+          .set(AddPartnershipContactMethodsYesNoPage, true)
+          .success
+          .value
+          .set(
+            PartnershipContactMethodOptionsPage,
+            Set(ContactMethodOptions.Mobile)
+          )
           .success
           .value
         // PartnershipMobileNumberPage deliberately omitted
@@ -289,9 +261,9 @@ class PartnershipCheckYourAnswersControllerSpec extends SpecBase {
         }
       }
 
-      "must redirect to Journey Recovery when NoDetails is selected but stale contact data remains in the session" in {
+      "must redirect to Journey Recovery when AddPartnershipContactMethodsYesNoPage is false but stale contact data remains in the session" in {
         val ua = minUa
-          .set(PartnershipChooseContactDetailsPage, ContactOptions.NoDetails)
+          .set(AddPartnershipContactMethodsYesNoPage, false)
           .success
           .value
           .set(PartnershipEmailAddressPage, "stale@email.com")
@@ -318,13 +290,22 @@ class PartnershipCheckYourAnswersControllerSpec extends SpecBase {
 
       "must return OK when switching from Email to Phone and stale email is cleaned up" in {
         val ua = minUa
-          .set(PartnershipChooseContactDetailsPage, ContactOptions.Email)
+          .set(AddPartnershipContactMethodsYesNoPage, true)
+          .success
+          .value
+          .set(
+            PartnershipContactMethodOptionsPage,
+            Set(ContactMethodOptions.Email)
+          )
           .success
           .value
           .set(PartnershipEmailAddressPage, "old@email.com")
           .success
           .value
-          .set(PartnershipChooseContactDetailsPage, ContactOptions.Phone)
+          .set(
+            PartnershipContactMethodOptionsPage,
+            Set(ContactMethodOptions.Phone)
+          )
           .success
           .value // cleanup removes email
           .set(PartnershipPhoneNumberPage, "01234567890")
@@ -339,19 +320,30 @@ class PartnershipCheckYourAnswersControllerSpec extends SpecBase {
           val result  = route(application, request).value
 
           status(result) mustEqual OK
+
+          contentAsString(result) mustNot include("old@email.com")
           contentAsString(result) must include("01234567890")
         }
       }
 
       "must return OK when switching from Phone to Mobile and stale phone number is cleaned up" in {
         val ua = minUa
-          .set(PartnershipChooseContactDetailsPage, ContactOptions.Phone)
+          .set(AddPartnershipContactMethodsYesNoPage, true)
+          .success
+          .value
+          .set(
+            PartnershipContactMethodOptionsPage,
+            Set(ContactMethodOptions.Phone)
+          )
           .success
           .value
           .set(PartnershipPhoneNumberPage, "01234567890")
           .success
           .value
-          .set(PartnershipChooseContactDetailsPage, ContactOptions.Mobile)
+          .set(
+            PartnershipContactMethodOptionsPage,
+            Set(ContactMethodOptions.Mobile)
+          )
           .success
           .value // cleanup removes phone
           .set(PartnershipMobileNumberPage, "07123456789")
@@ -366,19 +358,26 @@ class PartnershipCheckYourAnswersControllerSpec extends SpecBase {
           val result  = route(application, request).value
 
           status(result) mustEqual OK
+          contentAsString(result) mustNot include("01234567890")
           contentAsString(result) must include("07123456789")
         }
       }
 
-      "must return OK when switching from Email to NoDetails and stale email is cleaned up" in {
+      "must return OK when switching from Email to AddPartnershipContactMethodsYesNoPage false and stale email is cleaned up" in {
         val ua = minUa
-          .set(PartnershipChooseContactDetailsPage, ContactOptions.Email)
+          .set(AddPartnershipContactMethodsYesNoPage, true)
+          .success
+          .value
+          .set(
+            PartnershipContactMethodOptionsPage,
+            Set(ContactMethodOptions.Email)
+          )
           .success
           .value
           .set(PartnershipEmailAddressPage, "old@email.com")
           .success
           .value
-          .set(PartnershipChooseContactDetailsPage, ContactOptions.NoDetails)
+          .set(AddPartnershipContactMethodsYesNoPage, false)
           .success
           .value // cleanup removes email
 
@@ -390,6 +389,7 @@ class PartnershipCheckYourAnswersControllerSpec extends SpecBase {
           val result  = route(application, request).value
 
           status(result) mustEqual OK
+          contentAsString(result) mustNot include("old@email.com")
         }
       }
     }
@@ -401,12 +401,6 @@ class PartnershipCheckYourAnswersControllerSpec extends SpecBase {
 
       "must return OK when CRN YesNo changes from Yes to No and stale CRN value is cleaned up" in {
         val ua = minUa
-          .set(PartnershipChooseContactDetailsPage, ContactOptions.Email)
-          .success
-          .value
-          .set(PartnershipEmailAddressPage, "one@two.three")
-          .success
-          .value
           .set(PartnershipNominatedPartnerCrnYesNoPage, true)
           .success
           .value
@@ -430,12 +424,6 @@ class PartnershipCheckYourAnswersControllerSpec extends SpecBase {
 
       "must return OK when Nino YesNo changes from Yes to No and stale Nino value is cleaned up" in {
         val ua = minUa
-          .set(PartnershipChooseContactDetailsPage, ContactOptions.Email)
-          .success
-          .value
-          .set(PartnershipEmailAddressPage, "one@two.three")
-          .success
-          .value
           .set(PartnershipNominatedPartnerNinoYesNoPage, true)
           .success
           .value
@@ -459,12 +447,6 @@ class PartnershipCheckYourAnswersControllerSpec extends SpecBase {
 
       "must return OK when HasUtr YesNo changes from Yes to No and stale UTR values are cleaned up" in {
         val ua = minUa
-          .set(PartnershipChooseContactDetailsPage, ContactOptions.Email)
-          .success
-          .value
-          .set(PartnershipEmailAddressPage, "one@two.three")
-          .success
-          .value
           .set(PartnershipHasUtrYesNoPage, true)
           .success
           .value
@@ -497,12 +479,6 @@ class PartnershipCheckYourAnswersControllerSpec extends SpecBase {
         )
 
         val ua = minUa
-          .set(PartnershipChooseContactDetailsPage, ContactOptions.Email)
-          .success
-          .value
-          .set(PartnershipEmailAddressPage, "one@two.three")
-          .success
-          .value
           .set(PartnershipAddressYesNoPage, true)
           .success
           .value
@@ -528,12 +504,6 @@ class PartnershipCheckYourAnswersControllerSpec extends SpecBase {
     "must redirect to Journey Recovery for a GET if the subcontractor type is not Partnership" in {
       val ua = minUa
         .set(TypeOfSubcontractorPage, TypeOfSubcontractor.Individualorsoletrader)
-        .success
-        .value
-        .set(PartnershipChooseContactDetailsPage, ContactOptions.Email)
-        .success
-        .value
-        .set(PartnershipEmailAddressPage, "one@two.three")
         .success
         .value
 
@@ -589,12 +559,6 @@ class PartnershipCheckYourAnswersControllerSpec extends SpecBase {
 
       val uaBase =
         minUa
-          .set(PartnershipChooseContactDetailsPage, ContactOptions.Email)
-          .success
-          .value
-          .set(PartnershipEmailAddressPage, "one@two.three")
-          .success
-          .value
           .set(PartnershipAddressYesNoPage, false)
           .success
           .value
@@ -617,12 +581,6 @@ class PartnershipCheckYourAnswersControllerSpec extends SpecBase {
 
       val uaBase =
         minUa
-          .set(PartnershipChooseContactDetailsPage, ContactOptions.Email)
-          .success
-          .value
-          .set(PartnershipEmailAddressPage, "one@two.three")
-          .success
-          .value
           .set(PartnershipHasUtrYesNoPage, false)
           .success
           .value
@@ -645,12 +603,6 @@ class PartnershipCheckYourAnswersControllerSpec extends SpecBase {
 
       val uaBase =
         minUa
-          .set(PartnershipChooseContactDetailsPage, ContactOptions.Email)
-          .success
-          .value
-          .set(PartnershipEmailAddressPage, "one@two.three")
-          .success
-          .value
           .set(PartnershipNominatedPartnerNinoYesNoPage, false)
           .success
           .value
@@ -673,12 +625,6 @@ class PartnershipCheckYourAnswersControllerSpec extends SpecBase {
 
       val uaBase =
         minUa
-          .set(PartnershipChooseContactDetailsPage, ContactOptions.Email)
-          .success
-          .value
-          .set(PartnershipEmailAddressPage, "one@two.three")
-          .success
-          .value
           .set(PartnershipNominatedPartnerCrnYesNoPage, false)
           .success
           .value
@@ -701,12 +647,6 @@ class PartnershipCheckYourAnswersControllerSpec extends SpecBase {
 
       val uaBase =
         minUa
-          .set(PartnershipChooseContactDetailsPage, ContactOptions.Email)
-          .success
-          .value
-          .set(PartnershipEmailAddressPage, "one@two.three")
-          .success
-          .value
           .set(PartnershipWorksReferenceNumberYesNoPage, false)
           .success
           .value

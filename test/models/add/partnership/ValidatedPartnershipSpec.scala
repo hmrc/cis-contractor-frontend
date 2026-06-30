@@ -18,12 +18,12 @@ package models.add.partnership
 
 import base.SpecBase
 import models.address.Address
-import models.contact.ContactOptions
+import models.contact.{ContactMethodOptions, ContactOptions}
 import models.contact.ContactOptions.*
 import models.{InvalidAnswer, MissingAnswer, TypeOfSubcontractor}
 import pages.add.TypeOfSubcontractorPage
 import pages.add.partnership.*
-import play.api.libs.json._
+import play.api.libs.json.*
 import org.scalatest.matchers.must.Matchers
 import models.RichJsObject
 
@@ -40,7 +40,7 @@ class ValidatedPartnershipSpec extends SpecBase with Matchers {
       .set(PartnershipAddressYesNoPage, false)
       .success
       .value
-      .set(PartnershipChooseContactDetailsPage, ContactOptions.NoDetails)
+      .set(AddPartnershipContactMethodsYesNoPage, false)
       .success
       .value
       .set(PartnershipHasUtrYesNoPage, false)
@@ -97,10 +97,23 @@ class ValidatedPartnershipSpec extends SpecBase with Matchers {
       ValidatedPartnership.build(ua) mustBe Left(MissingAnswer(PartnershipNamePage))
     }
 
-    "require email address when contact option is Email" in {
+    "require PartnershipContactMethodOptions when AddPartnershipContactMethodsYesNo is true" in {
       val ua =
         minRequired
-          .set(PartnershipChooseContactDetailsPage, ContactOptions.Email)
+          .set(AddPartnershipContactMethodsYesNoPage, true)
+          .success
+          .value
+
+      ValidatedPartnership.build(ua) mustBe Left(InvalidAnswer(PartnershipContactMethodOptionsPage))
+    }
+
+    "require email address when Email is selected in PartnershipContactMethodOptions" in {
+      val ua =
+        minRequired
+          .set(AddPartnershipContactMethodsYesNoPage, true)
+          .success
+          .value
+          .set(PartnershipContactMethodOptionsPage, Set(ContactMethodOptions.Email))
           .success
           .value
 
@@ -110,7 +123,10 @@ class ValidatedPartnershipSpec extends SpecBase with Matchers {
     "build when contact option is Email and email address is present" in {
       val ua =
         minRequired
-          .set(PartnershipChooseContactDetailsPage, ContactOptions.Email)
+          .set(AddPartnershipContactMethodsYesNoPage, true)
+          .success
+          .value
+          .set(PartnershipContactMethodOptionsPage, Set(ContactMethodOptions.Email))
           .success
           .value
           .set(PartnershipEmailAddressPage, "a@b.com")
@@ -120,7 +136,13 @@ class ValidatedPartnershipSpec extends SpecBase with Matchers {
       ValidatedPartnership.build(ua) mustBe a[Right[?, ?]]
     }
 
-    "fail when contact option is NoDetails but stale email exists" in {
+    "fail when AddPartnershipContactMethodsYesNo is false but stale PartnershipContactMethodOptions exists" in {
+      val ua = withStaleValue(minRequired, PartnershipContactMethodOptionsPage, Set(ContactMethodOptions.Email))
+
+      ValidatedPartnership.build(ua) mustBe Left(InvalidAnswer(PartnershipContactMethodOptionsPage))
+    }
+
+    "fail when AddPartnershipContactMethodsYesNo is false but stale email exists" in {
       val ua = withStaleValue(minRequired, PartnershipEmailAddressPage, "stale@x.com")
 
       ValidatedPartnership.build(ua) mustBe Left(InvalidAnswer(PartnershipEmailAddressPage))

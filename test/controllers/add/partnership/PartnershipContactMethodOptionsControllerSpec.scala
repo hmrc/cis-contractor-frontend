@@ -115,8 +115,8 @@ class PartnershipContactMethodOptionsControllerSpec extends SpecBase with Mockit
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.routes.IndexController
-          .onPageLoad()
+        redirectLocation(result).value mustEqual controllers.add.partnership.routes.PartnershipEmailAddressController
+          .onPageLoad(NormalMode)
           .url
       }
     }

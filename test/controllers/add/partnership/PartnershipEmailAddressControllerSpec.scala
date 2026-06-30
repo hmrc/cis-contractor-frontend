@@ -19,16 +19,14 @@ package controllers.add.partnership
 import base.SpecBase
 import controllers.routes
 import forms.add.partnership.PartnershipEmailAddressFormProvider
-import models.contact.ContactOptions.{Email, Phone}
+import models.contact.ContactMethodOptions
 import models.{NormalMode, UserAnswers}
-import navigation.Navigator
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.add.partnership.{PartnershipChooseContactDetailsPage, PartnershipEmailAddressPage, PartnershipNamePage}
+import pages.add.partnership.{PartnershipContactMethodOptionsPage, PartnershipEmailAddressPage, PartnershipNamePage}
 import play.api.data.Form
 import play.api.inject.bind
-import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import repositories.SessionRepository
@@ -37,8 +35,6 @@ import views.html.add.partnership.PartnershipEmailAddressView
 import scala.concurrent.Future
 
 class PartnershipEmailAddressControllerSpec extends SpecBase with MockitoSugar {
-
-  def onwardRoute: Call = Call("GET", "/foo")
 
   val formProvider       = new PartnershipEmailAddressFormProvider()
   val form: Form[String] = formProvider()
@@ -51,24 +47,6 @@ class PartnershipEmailAddressControllerSpec extends SpecBase with MockitoSugar {
       .success
       .value
 
-  private def uaWithNameAndEmailChoice: UserAnswers =
-    buildAnswersWithContactChoice(
-      emptyUserAnswers,
-      PartnershipNamePage,
-      partnershipName,
-      PartnershipChooseContactDetailsPage,
-      Email
-    )
-
-  private def uaWithNameAndPhoneChoice: UserAnswers =
-    buildAnswersWithContactChoice(
-      emptyUserAnswers,
-      PartnershipNamePage,
-      partnershipName,
-      PartnershipChooseContactDetailsPage,
-      Phone
-    )
-
   lazy val partnershipEmailAddressRoute: String =
     controllers.add.partnership.routes.PartnershipEmailAddressController.onPageLoad(NormalMode).url
 
@@ -76,7 +54,7 @@ class PartnershipEmailAddressControllerSpec extends SpecBase with MockitoSugar {
 
     "must return OK and the correct view for a GET when Email is selected" in {
 
-      val application = applicationBuilder(userAnswers = Some(uaWithNameAndEmailChoice)).build()
+      val application = applicationBuilder(userAnswers = Some(uaWithName)).build()
 
       running(application) {
         val request = FakeRequest(GET, partnershipEmailAddressRoute)
@@ -96,7 +74,7 @@ class PartnershipEmailAddressControllerSpec extends SpecBase with MockitoSugar {
     "must populate the view correctly on a GET when previously answered" in {
 
       val userAnswers =
-        uaWithNameAndEmailChoice
+        uaWithName
           .set(PartnershipEmailAddressPage, "answer@test.com")
           .success
           .value
@@ -118,46 +96,20 @@ class PartnershipEmailAddressControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must redirect to Journey Recovery for a GET when wrong contact option is selected" in {
-
-      val application = applicationBuilder(userAnswers = Some(uaWithNameAndPhoneChoice)).build()
-
-      running(application) {
-        val request = FakeRequest(GET, partnershipEmailAddressRoute)
-
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
-      }
-    }
-
-    "must redirect to Journey Recovery when contact choice is missing" in {
-
-      val application = applicationBuilder(userAnswers = Some(uaWithName)).build()
-
-      running(application) {
-        val request = FakeRequest(GET, partnershipEmailAddressRoute)
-
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
-      }
-    }
-
     "must redirect to the next page when valid data is submitted" in {
 
+      val userAnswers = uaWithName
+        .set(PartnershipContactMethodOptionsPage, Set(ContactMethodOptions.Email))
+        .success
+        .value
+
       val mockSessionRepository = mock[SessionRepository]
-      val mockNavigator         = mock[Navigator]
 
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
-      when(mockNavigator.nextPage(any(), any(), any())).thenReturn(onwardRoute)
 
       val application =
-        applicationBuilder(userAnswers = Some(uaWithName))
+        applicationBuilder(userAnswers = Some(userAnswers))
           .overrides(
-            bind[Navigator].toInstance(mockNavigator),
             bind[SessionRepository].toInstance(mockSessionRepository)
           )
           .build()
@@ -170,7 +122,9 @@ class PartnershipEmailAddressControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual onwardRoute.url
+        redirectLocation(result).value mustEqual controllers.add.partnership.routes.PartnershipHasUtrYesNoController
+          .onPageLoad(NormalMode)
+          .url
       }
     }
 
@@ -255,6 +209,31 @@ class PartnershipEmailAddressControllerSpec extends SpecBase with MockitoSugar {
         val request =
           FakeRequest(POST, partnershipEmailAddressRoute)
             .withFormUrlEncodedBody("value" -> "test@example.com")
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must redirect to Journey Recovery when contact choice is missing" in {
+
+      val mockSessionRepository = mock[SessionRepository]
+
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+      val application =
+        applicationBuilder(userAnswers = Some(uaWithName))
+          .overrides(
+            bind[SessionRepository].toInstance(mockSessionRepository)
+          )
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, partnershipEmailAddressRoute)
+            .withFormUrlEncodedBody(("value", "test@example.com"))
 
         val result = route(application, request).value
 

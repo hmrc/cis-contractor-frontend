@@ -17,7 +17,7 @@
 package models.add.partnership
 
 import models.address.Address
-import models.contact.ContactOptions
+import models.contact.{ContactMethodOptions, ContactOptions}
 import models.contact.ContactOptions.*
 import models.{InvalidAnswer, MissingAnswer, TypeOfSubcontractor, UserAnswers, Validation, ValidationError}
 import pages.QuestionPage
@@ -28,7 +28,7 @@ import play.api.libs.json.*
 final case class ValidatedPartnership(
   partnershipName: String,
   partnershipAddress: Option[Address],
-  partnershipContactDetails: ContactOptions,
+  partnershipContactMethodOptions: Option[Set[PartnershipContactMethodOptions]],
   partnershipEmail: Option[String],
   partnershipPhone: Option[String],
   partnershipMobile: Option[String],
@@ -46,10 +46,11 @@ object ValidatedPartnership extends Validation {
       _                               <- validateType(answers)
       partnershipName                 <- getPageValue(answers, PartnershipNamePage)
       partnershipAddress              <- getOptionalPageValue(answers, PartnershipAddressPage, PartnershipAddressYesNoPage)
-      partnershipContactDetails       <- getPageValue(answers, PartnershipChooseContactDetailsPage)
-      partnershipEmail                <- getContactPageValue(answers, PartnershipEmailAddressPage, partnershipContactDetails)
-      partnershipPhone                <- getContactPageValue(answers, PartnershipPhoneNumberPage, partnershipContactDetails)
-      partnershipMobile               <- getContactPageValue(answers, PartnershipMobileNumberPage, partnershipContactDetails)
+      partnershipContactMethodOptions <-
+        getOptionalPageValue(answers, PartnershipContactMethodOptionsPage, AddPartnershipContactMethodsYesNoPage)
+      partnershipEmail                <- getContactPageValue(answers, PartnershipEmailAddressPage, partnershipContactMethodOptions)
+      partnershipPhone                <- getContactPageValue(answers, PartnershipPhoneNumberPage, partnershipContactMethodOptions)
+      partnershipMobile               <- getContactPageValue(answers, PartnershipMobileNumberPage, partnershipContactMethodOptions)
       partnershipUtr                  <-
         getOptionalPageValue(answers, PartnershipUniqueTaxpayerReferencePage, PartnershipHasUtrYesNoPage)
       partnershipNominatedPartnerName <- getPageValue(answers, PartnershipNominatedPartnerNamePage)
@@ -65,7 +66,7 @@ object ValidatedPartnership extends Validation {
     } yield ValidatedPartnership(
       partnershipName,
       partnershipAddress,
-      partnershipContactDetails,
+      partnershipContactMethodOptions,
       partnershipEmail,
       partnershipPhone,
       partnershipMobile,
@@ -83,26 +84,47 @@ object ValidatedPartnership extends Validation {
       case _                               => Left(InvalidAnswer(TypeOfSubcontractorPage))
     }
 
-  private def getContactPageValue[A](
-    answers: UserAnswers,
-    questionPage: QuestionPage[A],
-    contactOptions: ContactOptions
-  )(implicit reads: Reads[A]): Either[ValidationError, Option[A]] = {
-    val expectedPage: Option[QuestionPage[_]] = contactOptions match {
-      case Email     => Some(PartnershipEmailAddressPage)
-      case Phone     => Some(PartnershipPhoneNumberPage)
-      case Mobile    => Some(PartnershipMobileNumberPage)
-      case NoDetails => None
+  private def expectedContactMethodForAnswerPage(questionPage: QuestionPage[_]): Option[ContactMethodOptions] =
+    questionPage match {
+      case PartnershipEmailAddressPage => Some(ContactMethodOptions.Email)
+      case PartnershipPhoneNumberPage  => Some(ContactMethodOptions.Phone)
+      case PartnershipMobileNumberPage => Some(ContactMethodOptions.Mobile)
+      case _                           => None
     }
 
-    if (expectedPage.contains(questionPage)) {
-      answers.get(questionPage).toRight(MissingAnswer(questionPage)).map(Some(_))
-    } else if (expectedPage.isDefined) {
-      Right(None)
-    } else {
-      answers
-        .get(questionPage)
-        .fold(Right(None): Either[ValidationError, Option[A]])(_ => Left(InvalidAnswer(questionPage)))
+  private def getContactPageValue[A](
+    userAnswers: UserAnswers,
+    questionPage: QuestionPage[A],
+    contactMethodOptions: Option[Set[ContactMethodOptions]]
+  )(implicit reads: Reads[A]): Either[ValidationError, Option[A]] = {
+
+    val expectedContactMethod: Option[ContactMethodOptions] =
+      expectedContactMethodForAnswerPage(questionPage)
+
+    val answer: Option[A] = userAnswers.get(questionPage)
+
+    contactMethodOptions match {
+
+      case Some(selectedContactMethod) if expectedContactMethod.exists(selectedContactMethod.contains) =>
+        answer
+          .toRight(MissingAnswer(questionPage))
+          .map(Some(_))
+
+      case Some(_) if expectedContactMethod.isDefined =>
+        answer.fold[Either[ValidationError, Option[A]]](
+          Right(None)
+        )(_ => Left(InvalidAnswer(questionPage)))
+
+      case Some(_) =>
+        Right(None)
+
+      case None if expectedContactMethod.isDefined =>
+        answer.fold[Either[ValidationError, Option[A]]](
+          Right(None)
+        )(_ => Left(InvalidAnswer(questionPage)))
+
+      case None =>
+        Right(None)
     }
   }
 
