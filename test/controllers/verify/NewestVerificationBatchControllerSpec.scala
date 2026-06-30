@@ -78,7 +78,7 @@ class NewestVerificationBatchControllerSpec extends SpecBase with MockitoSugar w
   private val inactiveMonthlyReturn = MonthlyReturn(monthlyReturnId = 1L, decNoMoreSubPayments = Some("Y"))
 
   private val outsideSixMonthsDateTime = LocalDateTime.now().minusMonths(6).minusDays(1)
-  private val withinSixMonthsDateTime  = LocalDateTime.now().minusMonths(6).plusDays(1)
+  private val withinSixMonthsDateTime  = LocalDateTime.now().minusMonths(6).plusDays(2)
 
   "NewestVerificationBatchController" - {
 
