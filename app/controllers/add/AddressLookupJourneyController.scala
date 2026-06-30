@@ -62,7 +62,7 @@ trait AddressLookupJourneyController extends FrontendBaseController with I18nSup
   protected def onCompletion(mode: Mode): Call
 
   /** Where to go after the address is saved in the change flow. */
-  protected def onChangeCompletion: Call
+  protected def onChangeCompletion(isAmend: Boolean): Call
 
   private val mandatoryFields = MandatoryFieldsConfigModel(
     addressLine1 = Some(true),
@@ -101,6 +101,9 @@ trait AddressLookupJourneyController extends FrontendBaseController with I18nSup
 
   def addressLookupCallbackChange(id: String, mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
+      request.userAnswers
+        .get(AddressLookupAmendReturnQuery)
+        .getOrElse(false)
       saveAddressAndRedirect(id, onChangeCompletion)
     }
 

@@ -22,7 +22,7 @@ import models.address.Address
 import models.address.AddressLookupJourneyIdentifier.individualQuestionsAddress
 import pages.add.AddressOfSubcontractorPage
 import play.api.i18n.MessagesApi
-import play.api.mvc.{Call, MessagesControllerComponents}
+import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
 import queries.Settable
 import repositories.SessionRepository
 import services.AddressLookupService
@@ -59,7 +59,9 @@ class AddressOfSubcontractorController @Inject() (
   override protected def onCompletion(mode: Mode): Call =
     routes.IndividualChooseContactDetailsController.onPageLoad(mode)
 
-  override protected def onChangeCompletion: Call =
-    routes.CheckYourAnswersController.onPageLoad()
+  override protected def onChangeCompletion(isAmend: Boolean): Call =
+    if isAmend then routes.AmendIndividualCheckYourAnswersController.onPageLoad()
+    else routes.CheckYourAnswersController.onPageLoad()
 
+  def redirectToAmendAddressLookup(): Action[AnyContent]
 }

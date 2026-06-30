@@ -58,7 +58,7 @@ class PartnershipAddressController @Inject() (
   override protected def onCompletion(mode: Mode): Call =
     routes.PartnershipChooseContactDetailsController.onPageLoad(mode)
 
-  override protected def onChangeCompletion: Call =
+  override protected def onChangeCompletion(isAmend: Boolean): Call =
     routes.PartnershipCheckYourAnswersController.onPageLoad()
 
 }
