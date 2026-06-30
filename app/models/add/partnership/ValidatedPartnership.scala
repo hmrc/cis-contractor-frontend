@@ -19,8 +19,7 @@ package models.add.partnership
 import models.address.Address
 import models.contact.{ContactMethodOptions, ContactOptions}
 import models.contact.ContactOptions.*
-import models.{InvalidAnswer, MissingAnswer, TypeOfSubcontractor, UserAnswers, Validation, ValidationError}
-import pages.QuestionPage
+import models.{InvalidAnswer, TypeOfSubcontractor, UserAnswers, Validation, ValidationError}
 import pages.add.TypeOfSubcontractorPage
 import pages.add.partnership.*
 import play.api.libs.json.*
@@ -98,28 +97,5 @@ object ValidatedPartnership extends Validation {
       case TypeOfSubcontractor.Partnership => Right(())
       case _                               => Left(InvalidAnswer(TypeOfSubcontractorPage))
     }
-  
-  private def getContactPageValue[A](
-    userAnswers: UserAnswers,
-    contactMethodOptions: Option[Set[ContactMethodOptions]],
-    questionPage: QuestionPage[A],
-    expectedContactMethod: ContactMethodOptions
-  )(implicit reads: Reads[A]): Either[ValidationError, Option[A]] = {
-
-    val answer: Option[A] = userAnswers.get(questionPage)
-
-    contactMethodOptions match {
-
-      case Some(selectedContactMethod) if selectedContactMethod.contains(expectedContactMethod) =>
-        answer
-          .toRight(MissingAnswer(questionPage))
-          .map(Some(_))
-
-      case _ =>
-        answer.fold[Either[ValidationError, Option[A]]](
-          Right(None)
-        )(_ => Left(InvalidAnswer(questionPage)))
-    }
-  }
 
 }
