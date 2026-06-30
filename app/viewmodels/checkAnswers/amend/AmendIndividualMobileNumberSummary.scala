@@ -36,6 +36,7 @@ object AmendIndividualMobileNumberSummary {
             controllers.add.routes.IndividualMobileNumberController.onPageLoad(AmendMode).url
           )
             .withVisuallyHiddenText(messages("individualMobileNumber.change.hidden"))
+            .withAttribute("id" -> "individual-mobile-number")
         )
       )
     }

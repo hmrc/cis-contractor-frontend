@@ -330,6 +330,14 @@ class IndividualNavigatorSpec extends SpecBase {
       "must go from SubTradingNameYesNoPage to JourneyRecovery" in {
         navigator.nextPage(SubTradingNameYesNoPage, AmendMode, emptyUserAnswers) mustBe journeyRecovery
       }
+
+      "must go from IndividualMobileNumberPage to JourneyRecovery" in {
+        navigator.nextPage(
+          IndividualMobileNumberPage,
+          AmendMode,
+          UserAnswers("id")
+        ) mustBe journeyRecovery
+      }
     }
 
     "in Check mode" - {
