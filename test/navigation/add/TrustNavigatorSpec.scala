@@ -18,9 +18,9 @@ package navigation.add
 
 import base.SpecBase
 import controllers.routes
-import models.add.InternationalAddress
+import models.address.Address
 import models.contact.{ContactMethodOptions, ContactOptions}
-import models.{CheckMode, NormalMode, UserAnswers}
+import models.{AmendMode, CheckMode, NormalMode, UserAnswers}
 import org.scalactic.Prettifier.default
 import pages.Page
 import pages.add.trust.*
@@ -53,12 +53,12 @@ class TrustNavigatorSpec extends SpecBase {
           controllers.add.trust.routes.TrustAddressYesNoController.onPageLoad(NormalMode)
       }
 
-      "must go from a TrustAddressYesNoPage to TrustAddressPage when true" in {
+      "must go from a TrustAddressYesNoPage to the address lookup on-ramp when true" in {
         navigator.nextPage(
           TrustAddressYesNoPage,
           NormalMode,
           emptyUserAnswers.setOrException(TrustAddressYesNoPage, true)
-        ) mustBe controllers.add.trust.routes.TrustAddressController.onPageLoad(NormalMode)
+        ) mustBe controllers.add.trust.routes.TrustAddressController.redirectToAddressLookup()
       }
 
       "must go from a TrustAddressYesNoPage to TrustContactOptionsController when false" in {
@@ -263,6 +263,18 @@ class TrustNavigatorSpec extends SpecBase {
 
     }
 
+    "in Amend mode" - {
+
+      "must go from any page to JourneyRecovery" in {
+        case object UnknownPage extends Page
+        navigator.nextPage(UnknownPage, AmendMode, UserAnswers("id")) mustBe journeyRecovery
+      }
+
+      "must go from TrustNamePage to JourneyRecovery" in {
+        navigator.nextPage(TrustNamePage, AmendMode, UserAnswers("id")) mustBe journeyRecovery
+      }
+    }
+
     "in Check mode" - {
 
       "must go from TrustEmailAddressPage to TrustCheckYourAnswers in CheckMode" in {
@@ -277,18 +289,18 @@ class TrustNavigatorSpec extends SpecBase {
           controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
       }
 
-      "must go from a TrustAddressYesNoPage to TrustAddressController when true and address not yet answered" in {
+      "must go from a TrustAddressYesNoPage to the address lookup on-ramp when true and address not yet answered" in {
         navigator.nextPage(
           TrustAddressYesNoPage,
           CheckMode,
           emptyUserAnswers.setOrException(TrustAddressYesNoPage, true)
-        ) mustBe controllers.add.trust.routes.TrustAddressController.onPageLoad(CheckMode)
+        ) mustBe controllers.add.trust.routes.TrustAddressController.redirectToAddressLookup(Some(CheckMode.toString))
       }
 
       "must go from a TrustAddressYesNoPage to TrustCheckYourAnswers when true and address already answered" in {
         val ua = emptyUserAnswers
           .setOrException(TrustAddressYesNoPage, true)
-          .setOrException(TrustAddressPage, InternationalAddress("line1", None, "line3", None, "AA1 1AA", "GB"))
+          .setOrException(TrustAddressPage, Address("line1", addressLine3 = Some("line3"), postcode = Some("AA1 1AA")))
         navigator.nextPage(TrustAddressYesNoPage, CheckMode, ua) mustBe trustCYA
       }
 

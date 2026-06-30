@@ -24,7 +24,7 @@
     link: Link
 )
 
-@(contractorName: String)(implicit request: Request[_], messages: Messages)
+@()(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = titleNoForm(messages("contractordetails.contractorDetailsUpdated.title")), showBackLink = false, showSignOut = false) {
 
@@ -36,9 +36,9 @@
 
     @link(
         linkTextKey = "contractordetails.contractorDetailsUpdated.p1.details.link",
-        linkUrl = "#",
+        linkUrl = controllers.contractordetails.routes.ContractorDetailsCheckAnswersController.onPageLoad().url,
         hasFullStop = true,
-        prefixTextKey = messages("contractordetails.contractorDetailsUpdated.p1.details.prefix", contractorName)
+        prefixTextKey = messages("contractordetails.contractorDetailsUpdated.p1.details.prefix")
     )
 
     @link(

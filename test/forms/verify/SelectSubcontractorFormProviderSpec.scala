@@ -24,8 +24,7 @@ class SelectSubcontractorFormProviderSpec extends CheckboxFieldBehaviours {
 
   ".value" - {
 
-    val fieldName   = "value"
-    val requiredKey = "verify.selectSubcontractor.error.required"
+    val fieldName = "value"
 
     "bind a submitted checkbox ID successfully" in {
       val result = form.bind(Map(s"$fieldName[0]" -> "brodyMartin"))
@@ -34,11 +33,26 @@ class SelectSubcontractorFormProviderSpec extends CheckboxFieldBehaviours {
     }
 
     "bind multiple submitted checkbox IDs successfully" in {
-      val result = form.bind(Map(s"$fieldName[0]" -> "brodyMartin", s"$fieldName[1]" -> "alphaPlumbing"))
+      val result = form.bind(
+        Map(
+          s"$fieldName[0]" -> "brodyMartin",
+          s"$fieldName[1]" -> "alphaPlumbing"
+        )
+      )
       result.errors mustBe empty
       result.get mustEqual Set("brodyMartin", "alphaPlumbing")
     }
 
-    behave like mandatoryCheckboxField(form, fieldName, requiredKey)
+    "bind to an empty set when no values are submitted" in {
+      val result = form.bind(Map.empty[String, String])
+      result.errors mustBe empty
+      result.get mustEqual Set.empty[String]
+    }
+
+    "bind to an empty set when value is submitted as empty" in {
+      val result = form.bind(Map(fieldName -> ""))
+      result.errors mustBe empty
+      result.get mustEqual Set.empty[String]
+    }
   }
 }

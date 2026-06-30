@@ -31,7 +31,7 @@ class NoSubcontractorsSelectedWarningControllerSpec extends SpecBase with Matche
   private val manageSubcontractorsBase = applicationConfig.manageSubcontractorsUrl
   private val expectedManageUrl        = s"$manageSubcontractorsBase/$cisId"
 
-  private val expectedSelectSubcontractorsToReverifyUrl = "/subcontractor/verify/select-subcontractors-to-reverify"
+  private val expectedSelectSubcontractorsToReverifyUrl = "/subcontractor/verify/select-subcontractors-to-verify"
 
   "NoSubcontractorsSelectedWarningController" - {
 

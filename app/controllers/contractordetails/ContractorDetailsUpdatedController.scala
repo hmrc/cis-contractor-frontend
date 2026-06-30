@@ -16,7 +16,8 @@
 
 package controllers.contractordetails
 
-import controllers.actions._
+import controllers.actions.*
+
 import javax.inject.Inject
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -34,8 +35,6 @@ class ContractorDetailsUpdatedController @Inject() (
     with I18nSupport {
 
   def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
-    val contractorName: String = "Test Contractor"
-
-    Ok(view(contractorName))
+    Ok(view())
   }
 }

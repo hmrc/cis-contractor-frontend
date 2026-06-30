@@ -18,7 +18,7 @@ package navigation.add
 
 import base.SpecBase
 import controllers.routes
-import models.{CheckMode, NormalMode, TypeOfSubcontractor, UserAnswers}
+import models.{AmendMode, CheckMode, NormalMode, TypeOfSubcontractor, UserAnswers}
 import pages.Page
 import pages.add.TypeOfSubcontractorPage
 
@@ -78,6 +78,18 @@ class SharedNavigatorSpec extends SpecBase {
         ) mustBe journeyRecovery
       }
 
+    }
+
+    "in Amend mode" - {
+
+      "must go from any page to JourneyRecovery" in {
+        case object UnknownPage extends Page
+        navigator.nextPage(UnknownPage, AmendMode, UserAnswers("id")) mustBe journeyRecovery
+      }
+
+      "must go from TypeOfSubcontractorPage to JourneyRecovery" in {
+        navigator.nextPage(TypeOfSubcontractorPage, AmendMode, emptyUserAnswers) mustBe journeyRecovery
+      }
     }
 
     "in Check mode" - {
