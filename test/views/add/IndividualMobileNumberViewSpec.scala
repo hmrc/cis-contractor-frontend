@@ -81,7 +81,7 @@ class IndividualMobileNumberViewSpec extends AnyWordSpec with Matchers with Guic
 
       doc.select("input[name=value]").size() mustBe 1
 
-      doc.select(".govuk-button").text() mustBe messages("site.amend")
+      doc.select(".govuk-button").text() mustBe messages("site.update")
     }
 
     "display error summary and inline error when no name is entered" in new Setup {

@@ -47,10 +47,8 @@
             .withAutocomplete("tel")
         )
 
-        @if(mode == AmendMode) {
-            @govukButton(ButtonViewModel(messages("site.amend")))
-        } else {
-            @govukButton(ButtonViewModel(messages("site.continue")))
-        }
+        @govukButton(
+            ButtonViewModel(messages(if(mode == models.AmendMode) "site.update" else "site.continue"))
+        )
     }
 }
