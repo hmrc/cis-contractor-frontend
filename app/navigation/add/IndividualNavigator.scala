@@ -34,7 +34,7 @@ class IndividualNavigator @Inject() () extends NavigatorForJourney {
     case CheckMode  =>
       checkRouteMap(page)(userAnswers)
     case AmendMode  =>
-      routes.JourneyRecoveryController.onPageLoad()
+      amendRouteMap(page)(userAnswers)
   }
 
   private val normalRoutes: Page => UserAnswers => Call = {
@@ -84,6 +84,19 @@ class IndividualNavigator @Inject() () extends NavigatorForJourney {
       _ => controllers.add.routes.CheckYourAnswersController.onPageLoad()
     case AddIndividualContactMethodsYesNoPage => navigatorFromAddIndividualContactMethodsYesNoPage(CheckMode)(_)
     case _                                    => _ => controllers.add.routes.CheckYourAnswersController.onPageLoad()
+  }
+
+  private val amendRouteMap: Page => UserAnswers => Call = {
+    case WorksReferenceNumberYesNoPage => navigatorFromWorksReferenceNumberYesNoPage(AmendMode)(_)
+    case _ => _ => cyaRoute(AmendMode)
+  }
+
+  private def cyaRoute(mode: Mode): Call = mode match {
+    case AmendMode =>
+      routes.JourneyRecoveryController
+        .onPageLoad() // TODO: redirect to amend cya page - AmendIndividualCheckYourAnswersController when it's implemented
+    case _ =>
+      controllers.add.routes.CheckYourAnswersController.onPageLoad()
   }
 
   private def navigatorFromSubTradingNameYesNoPage(mode: Mode)(ua: UserAnswers): Call =
@@ -169,14 +182,14 @@ class IndividualNavigator @Inject() () extends NavigatorForJourney {
 
       case (Some(false), NormalMode) =>
         controllers.add.routes.CheckYourAnswersController.onPageLoad()
-      case (Some(true), CheckMode)   =>
+      case (Some(true), CheckMode | AmendMode)   =>
         ua.get(WorksReferenceNumberPage)
-          .fold(controllers.add.routes.WorksReferenceNumberController.onPageLoad(CheckMode)) { _ =>
-            controllers.add.routes.CheckYourAnswersController.onPageLoad()
+          .fold(controllers.add.routes.WorksReferenceNumberController.onPageLoad(mode)) { _ =>
+            cyaRoute(mode)
           }
 
-      case (Some(false), CheckMode) =>
-        controllers.add.routes.CheckYourAnswersController.onPageLoad()
+      case (Some(false), CheckMode | AmendMode) =>
+        cyaRoute(mode)
 
       case _ =>
         routes.JourneyRecoveryController.onPageLoad()
