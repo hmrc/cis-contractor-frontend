@@ -331,6 +331,25 @@ class IndividualNavigatorSpec extends SpecBase {
         navigator.nextPage(SubTradingNameYesNoPage, AmendMode, emptyUserAnswers) mustBe journeyRecovery
       }
 
+      "must go from IndividualEmailAddressPage to CheckYourAnswersController" in {
+        navigator.nextPage(
+          IndividualEmailAddressPage,
+          AmendMode,
+          emptyUserAnswers.setOrException(
+            IndividualEmailAddressPage,
+            "test@test.com"
+          )
+        ) mustBe controllers.add.routes.CheckYourAnswersController.onPageLoad()
+      }
+
+      "must go from IndividualEmailAddressPage to CheckYourAnswersController regardless of answers" in {
+        navigator.nextPage(
+          IndividualEmailAddressPage,
+          AmendMode,
+          emptyUserAnswers
+        ) mustBe controllers.add.routes.CheckYourAnswersController.onPageLoad()
+      }
+
       "must go from WorksReferenceNumberYesNoPage to WorksReferenceNumberPage when true and no work reference number exists" in {
         val ua =
           emptyUserAnswers.setOrException(WorksReferenceNumberYesNoPage, true)
@@ -772,6 +791,8 @@ class IndividualNavigatorSpec extends SpecBase {
         }
       }
     }
+
+    "in Amend mode" - {}
 
     "navigatorFromSubTradingNameYesNoPage in NormalMode" - {
 
