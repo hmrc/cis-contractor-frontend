@@ -89,7 +89,7 @@ class IndividualNavigator @Inject() () extends NavigatorForJourney {
   private val amendRouteMap: Page => UserAnswers => Call = {
 //    case IndividualEmailAddressPage =>
 //      _ => controllers.amend.routes.AmendIndividualCheckYourAnswersController.onPageLoad()
-    case IndividualEmailAddressPage =>
+    case IndividualEmailAddressPage    =>
       _ => controllers.add.routes.CheckYourAnswersController.onPageLoad()
     case WorksReferenceNumberYesNoPage => navigatorFromWorksReferenceNumberYesNoPage(AmendMode)(_)
     case _                             => _ => cyaRoute(AmendMode)
