@@ -32,7 +32,7 @@ import play.api.test.Helpers.*
 import services.VerificationService
 import uk.gov.hmrc.http.HeaderCarrier
 
-import java.time.LocalDateTime
+import java.time.{Clock, LocalDateTime, ZoneOffset}
 import scala.concurrent.Future
 
 class NewestVerificationBatchControllerSpec extends SpecBase with MockitoSugar with ModelGenerators {
@@ -77,8 +77,12 @@ class NewestVerificationBatchControllerSpec extends SpecBase with MockitoSugar w
   private val activeMonthlyReturn   = MonthlyReturn(monthlyReturnId = 1L, decNoMoreSubPayments = Some("N"))
   private val inactiveMonthlyReturn = MonthlyReturn(monthlyReturnId = 1L, decNoMoreSubPayments = Some("Y"))
 
-  private val outsideSixMonthsDateTime = LocalDateTime.now().minusMonths(6).minusDays(1)
-  private val withinSixMonthsDateTime  = LocalDateTime.now().minusMonths(6).plusDays(1)
+  private val fixedNow = LocalDateTime.of(2026, 6, 30, 12, 0)
+
+  private val fixedClock: Clock = Clock.fixed(fixedNow.toInstant(ZoneOffset.UTC), ZoneOffset.UTC)
+
+  private val withinSixMonthsDateTime  = fixedNow.minusMonths(6).plusDays(1)
+  private val outsideSixMonthsDateTime = fixedNow.minusMonths(6).minusDays(1)
 
   "NewestVerificationBatchController" - {
 
@@ -100,7 +104,8 @@ class NewestVerificationBatchControllerSpec extends SpecBase with MockitoSugar w
       val application =
         applicationBuilder(userAnswers = Some(emptyUserAnswers))
           .overrides(
-            bind[VerificationService].toInstance(mockService)
+            bind[VerificationService].toInstance(mockService),
+            bind[Clock].toInstance(fixedClock)
           )
           .build()
 
@@ -135,7 +140,8 @@ class NewestVerificationBatchControllerSpec extends SpecBase with MockitoSugar w
       val application =
         applicationBuilder(userAnswers = Some(emptyUserAnswers))
           .overrides(
-            bind[VerificationService].toInstance(mockService)
+            bind[VerificationService].toInstance(mockService),
+            bind[Clock].toInstance(fixedClock)
           )
           .build()
 
@@ -172,7 +178,8 @@ class NewestVerificationBatchControllerSpec extends SpecBase with MockitoSugar w
       val application =
         applicationBuilder(userAnswers = Some(emptyUserAnswers))
           .overrides(
-            bind[VerificationService].toInstance(mockService)
+            bind[VerificationService].toInstance(mockService),
+            bind[Clock].toInstance(fixedClock)
           )
           .build()
 
@@ -217,7 +224,10 @@ class NewestVerificationBatchControllerSpec extends SpecBase with MockitoSugar w
 
       val application =
         applicationBuilder(userAnswers = Some(emptyUserAnswers))
-          .overrides(bind[VerificationService].toInstance(mockService))
+          .overrides(
+            bind[VerificationService].toInstance(mockService),
+            bind[Clock].toInstance(fixedClock)
+          )
           .build()
 
       running(application) {
@@ -259,7 +269,10 @@ class NewestVerificationBatchControllerSpec extends SpecBase with MockitoSugar w
 
       val application =
         applicationBuilder(userAnswers = Some(emptyUserAnswers))
-          .overrides(bind[VerificationService].toInstance(mockService))
+          .overrides(
+            bind[VerificationService].toInstance(mockService),
+            bind[Clock].toInstance(fixedClock)
+          )
           .build()
 
       running(application) {
@@ -301,7 +314,10 @@ class NewestVerificationBatchControllerSpec extends SpecBase with MockitoSugar w
 
       val application =
         applicationBuilder(userAnswers = Some(emptyUserAnswers))
-          .overrides(bind[VerificationService].toInstance(mockService))
+          .overrides(
+            bind[VerificationService].toInstance(mockService),
+            bind[Clock].toInstance(fixedClock)
+          )
           .build()
 
       running(application) {
@@ -343,7 +359,10 @@ class NewestVerificationBatchControllerSpec extends SpecBase with MockitoSugar w
 
       val application =
         applicationBuilder(userAnswers = Some(emptyUserAnswers))
-          .overrides(bind[VerificationService].toInstance(mockService))
+          .overrides(
+            bind[VerificationService].toInstance(mockService),
+            bind[Clock].toInstance(fixedClock)
+          )
           .build()
 
       running(application) {
@@ -387,7 +406,7 @@ class NewestVerificationBatchControllerSpec extends SpecBase with MockitoSugar w
 
       val application =
         applicationBuilder(userAnswers = Some(emptyUserAnswers))
-          .overrides(bind[VerificationService].toInstance(mockService))
+          .overrides(bind[VerificationService].toInstance(mockService), bind[Clock].toInstance(fixedClock))
           .build()
 
       running(application) {
@@ -420,7 +439,10 @@ class NewestVerificationBatchControllerSpec extends SpecBase with MockitoSugar w
 
       val application =
         applicationBuilder(userAnswers = Some(emptyUserAnswers))
-          .overrides(bind[VerificationService].toInstance(mockService))
+          .overrides(
+            bind[VerificationService].toInstance(mockService),
+            bind[Clock].toInstance(fixedClock)
+          )
           .build()
 
       running(application) {
@@ -457,7 +479,10 @@ class NewestVerificationBatchControllerSpec extends SpecBase with MockitoSugar w
 
       val application =
         applicationBuilder(userAnswers = Some(emptyUserAnswers))
-          .overrides(bind[VerificationService].toInstance(mockService))
+          .overrides(
+            bind[VerificationService].toInstance(mockService),
+            bind[Clock].toInstance(fixedClock)
+          )
           .build()
 
       running(application) {
@@ -495,7 +520,8 @@ class NewestVerificationBatchControllerSpec extends SpecBase with MockitoSugar w
       val application =
         applicationBuilder(userAnswers = Some(emptyUserAnswers))
           .overrides(
-            bind[VerificationService].toInstance(mockService)
+            bind[VerificationService].toInstance(mockService),
+            bind[Clock].toInstance(fixedClock)
           )
           .build()
 
@@ -536,7 +562,8 @@ class NewestVerificationBatchControllerSpec extends SpecBase with MockitoSugar w
       val application =
         applicationBuilder(userAnswers = Some(emptyUserAnswers))
           .overrides(
-            bind[VerificationService].toInstance(mockService)
+            bind[VerificationService].toInstance(mockService),
+            bind[Clock].toInstance(fixedClock)
           )
           .build()
 
@@ -558,7 +585,8 @@ class NewestVerificationBatchControllerSpec extends SpecBase with MockitoSugar w
       val application =
         applicationBuilder(userAnswers = Some(emptyUserAnswers))
           .overrides(
-            bind[VerificationService].toInstance(mockService)
+            bind[VerificationService].toInstance(mockService),
+            bind[Clock].toInstance(fixedClock)
           )
           .build()
 
@@ -583,7 +611,8 @@ class NewestVerificationBatchControllerSpec extends SpecBase with MockitoSugar w
       val application =
         applicationBuilder(userAnswers = Some(emptyUserAnswers))
           .overrides(
-            bind[VerificationService].toInstance(mockService)
+            bind[VerificationService].toInstance(mockService),
+            bind[Clock].toInstance(fixedClock)
           )
           .build()
 
@@ -605,7 +634,8 @@ class NewestVerificationBatchControllerSpec extends SpecBase with MockitoSugar w
       val application =
         applicationBuilder(userAnswers = None)
           .overrides(
-            bind[VerificationService].toInstance(mockService)
+            bind[VerificationService].toInstance(mockService),
+            bind[Clock].toInstance(fixedClock)
           )
           .build()
 
