@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ sealed trait Mode
 
 case object CheckMode extends Mode
 case object NormalMode extends Mode
+case object AmendMode extends Mode
 
 object Mode {
 
@@ -29,6 +30,7 @@ object Mode {
     override def to(value: Mode): String = value match {
       case NormalMode => "NormalMode"
       case CheckMode  => "CheckMode"
+      case AmendMode  => "AmendMode"
     }
   }
 }

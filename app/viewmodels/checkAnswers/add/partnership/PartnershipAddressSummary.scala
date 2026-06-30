@@ -16,44 +16,23 @@
 
 package viewmodels.checkAnswers.add.partnership
 
-import models.add.InternationalAddress
-import models.{CheckMode, UserAnswers}
+import models.UserAnswers
 import pages.add.partnership.PartnershipAddressPage
 import play.api.i18n.Messages
-import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
-import viewmodels.govuk.summarylist.*
-import viewmodels.implicits.*
+import viewmodels.checkAnswers.add.AddressSummaryRow
 
 object PartnershipAddressSummary {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
     answers.get(PartnershipAddressPage).map { answer =>
-
-      val lines: Seq[String] = Seq(
-        answer.addressLine1,
-        answer.addressLine2.getOrElse(""),
-        answer.addressLine3,
-        answer.addressLine4.getOrElse(""),
-        answer.postalCode,
-        answer.country
-      )
-
-      val addressHtml: String =
-        lines
-          .filter(_.trim.nonEmpty)
-          .mkString("<br/>")
-
-      SummaryListRowViewModel(
+      AddressSummaryRow.row(
+        address = answer,
         key = "partnershipAddress.checkYourAnswersLabel",
-        value = ValueViewModel(HtmlContent(addressHtml)),
-        actions = Seq(
-          ActionItemViewModel(
-            "site.change",
-            controllers.add.partnership.routes.PartnershipAddressController.onPageLoad(CheckMode).url
-          ).withVisuallyHiddenText(messages("partnershipAddress.change.hidden"))
-            .withAttribute("id" -> "address-of-partnership")
-        )
+        changeCall =
+          controllers.add.partnership.routes.PartnershipAddressController.redirectToAddressLookup(Some("change")),
+        hiddenTextKey = "partnershipAddress.change.hidden",
+        id = "address-of-partnership"
       )
     }
 
