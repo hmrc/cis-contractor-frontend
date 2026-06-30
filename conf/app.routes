@@ -526,3 +526,7 @@ GET   /contractor-details/enter-contractor-utr   controllers.contractordetails.C
 POST  /contractor-details/enter-contractor-utr   controllers.contractordetails.ContractorUtrController.onSubmit(mode: Mode = NormalMode)
 GET   /contractor-details/change-contractor-utr  controllers.contractordetails.ContractorUtrController.onPageLoad(mode: Mode = CheckMode)
 POST  /contractor-details/change-contractor-utr  controllers.contractordetails.ContractorUtrController.onSubmit(mode: Mode = CheckMode)
+
+# Individual Amend
+GET   /subcontractor/amend/email-address          controllers.add.IndividualEmailAddressController.onPageLoad(mode: Mode = AmendMode)
+POST  /subcontractor/amend/email-address          controllers.add.IndividualEmailAddressController.onSubmit(mode: Mode = AmendMode)
