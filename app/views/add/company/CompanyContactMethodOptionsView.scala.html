@@ -1,5 +1,5 @@
 @*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,33 +14,34 @@
  * limitations under the License.
  *@
 
+@import models.add.company.CompanyContactMethodOptions
 @import viewmodels.LegendSize.Large
 
 @this(
     layout: templates.Layout,
     formHelper: FormWithCSRF,
     govukErrorSummary: GovukErrorSummary,
-    govukRadios: GovukRadios,
+    govukCheckboxes: GovukCheckboxes,
     govukButton: GovukButton
 )
 
-@(form: Form[_], mode: Mode, name: String)(implicit request: Request[_], messages: Messages)
+@(form: Form[_], mode: Mode,  name: String)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = title(form, messages("subAddressYesNo.title"))) {
+@layout(pageTitle = title(form, messages("companyContactMethodOptions.title"))) {
 
-    @formHelper(action = controllers.add.routes.SubAddressYesNoController.onSubmit(mode), Symbol("autoComplete") -> "off") {
+    @formHelper(action = controllers.add.company.routes.CompanyContactMethodOptionsController.onSubmit(mode), Symbol("autoComplete") -> "off") {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form, errorLinkOverrides = Map("value" -> "value_0")))
         }
 
-        @govukRadios(
-            RadiosViewModel.yesNo(
-                field = form("value"),
-                legend = LegendViewModel(messages("subAddressYesNo.heading", name)).asPageHeading(Large)
-            ).withHint(Hint(
-                content = Messages("subAddressYesNo.hint"))
-            )
+        @govukCheckboxes(
+            CheckboxesViewModel(
+                form   = form,
+                name   = "value",
+                legend = LegendViewModel(messages("companyContactMethodOptions.heading", name)).asPageHeading(Large),
+                items  = CompanyContactMethodOptions.checkboxItems
+            ).withHint(HintViewModel(messages("companyContactMethodOptions.hint")))
         )
 
         @govukButton(
