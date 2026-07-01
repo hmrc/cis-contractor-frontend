@@ -34,6 +34,7 @@ case object AddCompanyContactMethodsYesNoPage extends QuestionPage[Boolean] with
         .remove(CompanyEmailAddressPage)
         .flatMap(_.remove(CompanyPhoneNumberPage))
         .flatMap(_.remove(CompanyMobileNumberPage))
+        .flatMap(_.remove(CompanyContactMethodOptionsPage))
     } else {
       super.cleanup(value, userAnswers)
     }
