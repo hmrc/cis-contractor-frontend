@@ -32,6 +32,8 @@ object ContactMethodOptions extends Enumerable.Implicits {
 
   val values: Seq[ContactMethodOptions] = Seq(Email, Phone, Mobile)
 
+  def ordered(selected: Set[ContactMethodOptions]): Seq[ContactMethodOptions] = values.filter(selected.contains)
+
   /** Provide a message prefix so callers can use different i18n keys */
   def checkboxItems(messagePrefix: String)(implicit messages: Messages): Seq[CheckboxItem] =
     values.zipWithIndex.map { case (value, index) =>

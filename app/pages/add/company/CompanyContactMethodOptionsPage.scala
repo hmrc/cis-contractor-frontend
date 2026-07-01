@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package pages.add.partnership
+package pages.add.company
 
 import models.UserAnswers
-import models.add.partnership.PartnershipContactMethodOptions
+import models.add.company.CompanyContactMethodOptions
 import models.contact.ContactMethodOptions.{Email, Mobile, Phone}
 import pages.QuestionPage
 import pages.add.ContactMethodOptionsCleanup
@@ -25,25 +25,25 @@ import play.api.libs.json.JsPath
 
 import scala.util.Try
 
-case object PartnershipContactMethodOptionsPage
-    extends QuestionPage[Set[PartnershipContactMethodOptions]]
-    with PartnershipJourney
+case object CompanyContactMethodOptionsPage
+    extends QuestionPage[Set[CompanyContactMethodOptions]]
+    with CompanyJourney
     with ContactMethodOptionsCleanup {
 
   override def path: JsPath = JsPath \ toString
 
-  override def toString: String = "partnershipContactMethodOptions"
+  override def toString: String = "companyContactMethodOptions"
 
   override def cleanup(
-    value: Option[Set[PartnershipContactMethodOptions]],
+    value: Option[Set[CompanyContactMethodOptions]],
     userAnswers: UserAnswers
   ): Try[UserAnswers] =
     value match {
 
       case Some(selectedAnswers) =>
-        removeIfNotSelected(selectedAnswers, Email, PartnershipEmailAddressPage, userAnswers)
-          .flatMap(removeIfNotSelected(selectedAnswers, Phone, PartnershipPhoneNumberPage, _))
-          .flatMap(removeIfNotSelected(selectedAnswers, Mobile, PartnershipMobileNumberPage, _))
+        removeIfNotSelected(selectedAnswers, Email, CompanyEmailAddressPage, userAnswers)
+          .flatMap(removeIfNotSelected(selectedAnswers, Phone, CompanyPhoneNumberPage, _))
+          .flatMap(removeIfNotSelected(selectedAnswers, Mobile, CompanyMobileNumberPage, _))
 
       case _ => super.cleanup(value, userAnswers)
     }
