@@ -523,6 +523,17 @@ POST  /contractor-details/enter-contractor-utr   controllers.contractordetails.C
 GET   /contractor-details/change-contractor-utr  controllers.contractordetails.ContractorUtrController.onPageLoad(mode: Mode = CheckMode)
 POST  /contractor-details/change-contractor-utr  controllers.contractordetails.ContractorUtrController.onSubmit(mode: Mode = CheckMode)
 
+GET   /contractor-details/add-contractor-email-address         controllers.contractordetails.AddEmailAddressYesNoController.onPageLoad(mode: Mode = NormalMode)
+POST  /contractor-details/add-contractor-email-address         controllers.contractordetails.AddEmailAddressYesNoController.onSubmit(mode: Mode = NormalMode)
+GET   /contractor-details/change-add-contractor-email-address  controllers.contractordetails.AddEmailAddressYesNoController.onPageLoad(mode: Mode = CheckMode)
+POST  /contractor-details/change-add-contractor-email-address  controllers.contractordetails.AddEmailAddressYesNoController.onSubmit(mode: Mode = CheckMode)
+
+GET   /contractor-details/add-contractor-scheme-name         controllers.contractordetails.AddSchemeNameYesNoController.onPageLoad(mode: Mode = NormalMode)
+POST  /contractor-details/add-contractor-scheme-name         controllers.contractordetails.AddSchemeNameYesNoController.onSubmit(mode: Mode = NormalMode)
+GET   /contractor-details/change-add-contractor-scheme-name  controllers.contractordetails.AddSchemeNameYesNoController.onPageLoad(mode: Mode = CheckMode)
+POST  /contractor-details/change-add-contractor-scheme-name  controllers.contractordetails.AddSchemeNameYesNoController.onSubmit(mode: Mode = CheckMode)
+
 # Individual Amend
 GET   /subcontractor/amend/email-address          controllers.add.IndividualEmailAddressController.onPageLoad(mode: Mode = AmendMode)
 POST  /subcontractor/amend/email-address          controllers.add.IndividualEmailAddressController.onSubmit(mode: Mode = AmendMode)
+
