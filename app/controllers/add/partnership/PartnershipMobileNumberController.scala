@@ -86,38 +86,4 @@ class PartnershipMobileNumberController @Inject() (
           )
         )
   }
-
-//  def onPageLoad(mode: Mode): Action[AnyContent] =
-//    (identify andThen getData andThen requireData) { implicit request =>
-//      requireContactChoice(
-//        request.userAnswers.get(PartnershipNamePage),
-//        request.userAnswers.get(PartnershipChooseContactDetailsPage),
-//        Mobile
-//      ) { partnershipName =>
-//
-//        val preparedForm =
-//          request.userAnswers.get(PartnershipMobileNumberPage).fold(form)(form.fill)
-//
-//        Ok(view(preparedForm, mode, partnershipName))
-//      }
-//    }
-//
-//  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
-//    implicit request =>
-//      request.userAnswers
-//        .get(PartnershipNamePage)
-//        .map { partnershipName =>
-//          form
-//            .bindFromRequest()
-//            .fold(
-//              formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, partnershipName))),
-//              value =>
-//                for {
-//                  updatedAnswers <- Future.fromTry(request.userAnswers.set(PartnershipMobileNumberPage, value))
-//                  _              <- sessionRepository.set(updatedAnswers)
-//                } yield Redirect(navigator.nextPage(PartnershipMobileNumberPage, mode, updatedAnswers))
-//            )
-//        }
-//        .getOrElse(Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())))
-//  }
 }

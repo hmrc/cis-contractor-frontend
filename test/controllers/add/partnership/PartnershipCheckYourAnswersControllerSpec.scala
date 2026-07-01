@@ -71,12 +71,6 @@ class PartnershipCheckYourAnswersControllerSpec extends SpecBase {
     .success
     .value
 
-  private val validUaForSubmit =
-    minUa
-      .set(PartnershipChooseContactDetailsPage, ContactOptions.NoDetails)
-      .success
-      .value
-
   "PartnershipCheckYourAnswers Controller" - {
 
     "must return OK and the correct view for a GET when partnership optionals are not present" in {
@@ -676,7 +670,7 @@ class PartnershipCheckYourAnswersControllerSpec extends SpecBase {
         .thenReturn(Future.successful(true))
 
       val application =
-        applicationBuilder(userAnswers = Some(validUaForSubmit))
+        applicationBuilder(userAnswers = Some(minUa))
           .overrides(
             bind[SubcontractorService].toInstance(mockSubcontractorService),
             bind[SessionRepository].toInstance(mockSessionRepository)
@@ -702,7 +696,7 @@ class PartnershipCheckYourAnswersControllerSpec extends SpecBase {
 
   "must redirect to Journey Recovery and not resubmit when already submitted flag is set" in {
     val submittedUa =
-      validUaForSubmit.set(CheckYourAnswersSubmittedPage, true).success.value
+      minUa.set(CheckYourAnswersSubmittedPage, true).success.value
 
     val mockSubcontractorService = mock[SubcontractorService]
     val mockSessionRepository    = mock[SessionRepository]
@@ -750,7 +744,7 @@ class PartnershipCheckYourAnswersControllerSpec extends SpecBase {
       .thenReturn(Future.failed(new RuntimeException("boom")))
 
     val application =
-      applicationBuilder(userAnswers = Some(validUaForSubmit))
+      applicationBuilder(userAnswers = Some(minUa))
         .overrides(
           bind[SubcontractorService].toInstance(mockSubcontractorService),
           bind[SessionRepository].toInstance(mockSessionRepository)
