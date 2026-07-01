@@ -739,6 +739,31 @@ class IndividualNavigatorSpec extends SpecBase {
       }
     }
 
+    "in Amend mode" - {
+
+      "in Amend mode" - {
+
+        "must go from IndividualEmailAddressPage to CheckYourAnswersController" in {
+          navigator.nextPage(
+            IndividualEmailAddressPage,
+            AmendMode,
+            emptyUserAnswers.setOrException(
+              IndividualEmailAddressPage,
+              "test@test.com"
+            )
+          ) mustBe controllers.add.routes.CheckYourAnswersController.onPageLoad()
+        }
+
+        "must go from IndividualEmailAddressPage to CheckYourAnswersController regardless of answers" in {
+          navigator.nextPage(
+            IndividualEmailAddressPage,
+            AmendMode,
+            emptyUserAnswers
+          ) mustBe controllers.add.routes.CheckYourAnswersController.onPageLoad()
+        }
+      }
+    }
+
     "navigatorFromSubTradingNameYesNoPage in NormalMode" - {
 
       "must go to TradingNameOfSubcontractorController when answer is Yes" in {

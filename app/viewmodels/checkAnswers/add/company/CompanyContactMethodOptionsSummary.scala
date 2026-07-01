@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package viewmodels.checkAnswers.add.trust
+package viewmodels.checkAnswers.add.company
 
 import models.contact.ContactMethodOptions
 import models.{CheckMode, UserAnswers}
-import pages.add.trust.TrustContactMethodOptionsPage
+import pages.add.company.CompanyContactMethodOptionsPage
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
@@ -27,26 +27,26 @@ import viewmodels.checkAnswers.verify.ValueViewModelHelper
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
 
-object TrustContactMethodOptionsSummary {
+object CompanyContactMethodOptionsSummary {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(TrustContactMethodOptionsPage).map { selectedMethods =>
+    answers.get(CompanyContactMethodOptionsPage).map { selectedMethods =>
       val options =
         ContactMethodOptions
           .ordered(selectedMethods)
-          .map(m => HtmlFormat.escape(messages(s"trustContactMethodOptions.$m")).toString)
+          .map(m => HtmlFormat.escape(messages(s"companyContactMethodOptions.$m")).toString)
       SummaryListRowViewModel(
-        key = "trustContactMethodOptions.checkYourAnswersLabel",
+        key = "companyContactMethodOptions.checkYourAnswersLabel",
         value = ValueViewModelHelper
           .makeGovukBulletList(options)
           .getOrElse(ValueViewModel(HtmlContent(""))),
         actions = Seq(
           ActionItemViewModel(
             "site.change",
-            controllers.add.trust.routes.TrustContactMethodOptionsController.onPageLoad(CheckMode).url
+            controllers.add.company.routes.CompanyContactMethodOptionsController.onPageLoad(CheckMode).url
           )
-            .withVisuallyHiddenText(messages("trustContactMethodOptions.change.hidden"))
-            .withAttribute("id" -> "trust-contact-methods")
+            .withVisuallyHiddenText(messages("companyContactMethodOptions.change.hidden"))
+            .withAttribute("id" -> "company-contact-methods")
         )
       )
     }
