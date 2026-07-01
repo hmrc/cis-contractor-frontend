@@ -42,7 +42,9 @@ class ContractorDetailsCheckAnswersController @Inject() (
 
     val summaryRows = Seq(
       ContractorUtrSummary.row(request.userAnswers),
+      AddSchemeNameYesNoSummary.row(request.userAnswers),
       SchemeNameSummary.row(request.userAnswers),
+      AddEmailAddressYesNoSummary.row(request.userAnswers),
       EnterContractorEmailAddressSummary.row(request.userAnswers)
     ).flatten
 
