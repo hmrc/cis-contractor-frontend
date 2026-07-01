@@ -320,6 +320,35 @@ class IndividualNavigatorSpec extends SpecBase {
       }
     }
 
+    "in Amend mode" - {
+
+      "must go from a page that doesn't exist in the edit route map to CheckYourAnswers" in {
+
+        case object UnknownPage extends Page
+        navigator.nextPage(
+          UnknownPage,
+          AmendMode,
+          UserAnswers("id")
+        ) mustBe journeyRecovery // TODO: when CYA page available
+      }
+
+      "must go from SubTradingNameYesNoPage to TradingNameOfSubcontractorController when true" in {
+        navigator.nextPage(
+          SubTradingNameYesNoPage,
+          AmendMode,
+          emptyUserAnswers.setOrException(SubTradingNameYesNoPage, true)
+        ) mustBe controllers.add.routes.TradingNameOfSubcontractorController.onPageLoad(AmendMode)
+      }
+
+      "must go from SubTradingNameYesNoPage to journey recovery page when incomplete info provided" in {
+        navigator.nextPage(
+          SubTradingNameYesNoPage,
+          AmendMode,
+          emptyUserAnswers
+        ) mustBe journeyRecovery // TODO: when CYA page available
+      }
+    }
+
     "in Check mode" - {
 
       "must go from a page that doesn't exist in the edit route map to CheckYourAnswers" in {
