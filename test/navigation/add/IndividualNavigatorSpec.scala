@@ -347,6 +347,24 @@ class IndividualNavigatorSpec extends SpecBase {
           emptyUserAnswers
         ) mustBe journeyRecovery // TODO: when CYA page available
       }
+      "must go from IndividualEmailAddressPage to CheckYourAnswersController" in {
+        navigator.nextPage(
+          IndividualEmailAddressPage,
+          AmendMode,
+          emptyUserAnswers.setOrException(
+            IndividualEmailAddressPage,
+            "test@test.com"
+          )
+        ) mustBe controllers.add.routes.CheckYourAnswersController.onPageLoad()
+      }
+
+      "must go from IndividualEmailAddressPage to CheckYourAnswersController regardless of answers" in {
+        navigator.nextPage(
+          IndividualEmailAddressPage,
+          AmendMode,
+          emptyUserAnswers
+        ) mustBe controllers.add.routes.CheckYourAnswersController.onPageLoad()
+      }
 
       "must go from WorksReferenceNumberYesNoPage to WorksReferenceNumberPage when true and no work reference number exists" in {
         val ua =
@@ -397,25 +415,6 @@ class IndividualNavigatorSpec extends SpecBase {
           AmendMode,
           UserAnswers("id")
         ) mustBe journeyRecovery // TODO: this needs to be redirected to amend individual cya page, AmendIndividualCheckYourAnswersController when it's implemented
-      }
-
-      "must go from IndividualEmailAddressPage to CheckYourAnswersController" in {
-        navigator.nextPage(
-          IndividualEmailAddressPage,
-          AmendMode,
-          emptyUserAnswers.setOrException(
-            IndividualEmailAddressPage,
-            "test@test.com"
-          )
-        ) mustBe controllers.add.routes.CheckYourAnswersController.onPageLoad()
-      }
-
-      "must go from IndividualEmailAddressPage to CheckYourAnswersController regardless of answers" in {
-        navigator.nextPage(
-          IndividualEmailAddressPage,
-          AmendMode,
-          emptyUserAnswers
-        ) mustBe controllers.add.routes.CheckYourAnswersController.onPageLoad()
       }
     }
 
