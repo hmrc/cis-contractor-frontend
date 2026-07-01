@@ -16,7 +16,6 @@
 
 @import views.html.components._
 @import viewmodels.LegendSize.Large
-@import models.AmendMode
 
 @this(
     layout: templates.Layout,
@@ -46,10 +45,7 @@
         )
 
         @govukButton(
-            ButtonViewModel(
-                if (mode == AmendMode) messages("site.update")
-                else messages("site.continue")
-            )
+            ButtonViewModel(messages("site.continue"))
         )
     }
 }
