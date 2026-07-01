@@ -71,9 +71,6 @@ POST  /subcontractor/amend/check-national-insurance-number  controllers.add.Nati
 GET   /subcontractor/amend/national-insurance-number  controllers.add.SubNationalInsuranceNumberController.onPageLoad(mode: Mode = AmendMode)
 POST  /subcontractor/amend/national-insurance-number  controllers.add.SubNationalInsuranceNumberController.onSubmit(mode: Mode = AmendMode)
 
-GET   /subcontractor/amend/check-works-reference-number  controllers.add.WorksReferenceNumberYesNoController.onPageLoad(mode: Mode = AmendMode)
-POST  /subcontractor/amend/check-works-reference-number  controllers.add.WorksReferenceNumberYesNoController.onSubmit(mode: Mode = AmendMode)
-
 # Errors & Auth
 GET  /unauthorised/standard-user  controllers.UnauthorisedWrongRoleController.onPageLoad()
 
@@ -132,6 +129,8 @@ GET   /subcontractor/add/check-works-reference-number         controllers.add.Wo
 POST  /subcontractor/add/check-works-reference-number         controllers.add.WorksReferenceNumberYesNoController.onSubmit(mode: Mode = NormalMode)
 GET   /subcontractor/add/change-check-works-reference-number  controllers.add.WorksReferenceNumberYesNoController.onPageLoad(mode: Mode = CheckMode)
 POST  /subcontractor/add/change-check-works-reference-number  controllers.add.WorksReferenceNumberYesNoController.onSubmit(mode: Mode = CheckMode)
+GET   /subcontractor/amend/check-works-reference-number       controllers.add.WorksReferenceNumberYesNoController.onPageLoad(mode: Mode = AmendMode)
+POST  /subcontractor/amend/check-works-reference-number       controllers.add.WorksReferenceNumberYesNoController.onSubmit(mode: Mode = AmendMode)
 
 GET   /subcontractor/add/works-reference-number         controllers.add.WorksReferenceNumberController.onPageLoad(mode: Mode = NormalMode)
 POST  /subcontractor/add/works-reference-number         controllers.add.WorksReferenceNumberController.onSubmit(mode: Mode = NormalMode)
