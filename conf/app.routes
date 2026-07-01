@@ -56,9 +56,6 @@ POST  /subcontractor/amend/email-address  controllers.add.IndividualEmailAddress
 GET   /subcontractor/amend/mobile-number  controllers.add.IndividualMobileNumberController.onPageLoad(mode: Mode = AmendMode)
 POST  /subcontractor/amend/mobile-number  controllers.add.IndividualMobileNumberController.onSubmit(mode: Mode = AmendMode)
 
-GET   /subcontractor/amend/add-contact-details  controllers.add.AddIndividualContactMethodsYesNoController.onPageLoad(mode: Mode = AmendMode)
-POST  /subcontractor/amend/add-contact-details  controllers.add.AddIndividualContactMethodsYesNoController.onSubmit(mode: Mode = AmendMode)
-
 GET   /subcontractor/amend/check-unique-taxpayer-reference  controllers.add.UniqueTaxpayerReferenceYesNoController.onPageLoad(mode: Mode = AmendMode)
 POST  /subcontractor/amend/check-unique-taxpayer-reference  controllers.add.UniqueTaxpayerReferenceYesNoController.onSubmit(mode: Mode = AmendMode)
 
@@ -167,6 +164,8 @@ GET   /subcontractor/add/add-contact-details         controllers.add.AddIndividu
 POST  /subcontractor/add/add-contact-details         controllers.add.AddIndividualContactMethodsYesNoController.onSubmit(mode: Mode = NormalMode)
 GET   /subcontractor/add/change-add-contact-details  controllers.add.AddIndividualContactMethodsYesNoController.onPageLoad(mode: Mode = CheckMode)
 POST  /subcontractor/add/change-add-contact-details  controllers.add.AddIndividualContactMethodsYesNoController.onSubmit(mode: Mode = CheckMode)
+GET   /subcontractor/amend/add-contact-details       controllers.add.AddIndividualContactMethodsYesNoController.onPageLoad(mode: Mode = AmendMode)
+POST  /subcontractor/amend/add-contact-details       controllers.add.AddIndividualContactMethodsYesNoController.onSubmit(mode: Mode = AmendMode)
 
 # Company
 GET   /subcontractor/add/company/subcontractor-added  controllers.add.SubcontractorAddedController.companySubcontractorAdded()
