@@ -340,31 +340,6 @@ class IndividualNavigatorSpec extends SpecBase {
         ) mustBe controllers.add.routes.TradingNameOfSubcontractorController.onPageLoad(AmendMode)
       }
 
-      // TODO: update the CYA page when available
-//      "to IndividualPhoneNumberPage when PhoneNumber is selected" in {
-//        navigator.nextPage(
-//          IndividualChooseContactDetailsPage,
-//          AmendMode,
-//          emptyUserAnswers.setOrException(
-//            IndividualChooseContactDetailsPage,
-//            ContactOptions.Phone
-//          )
-//        ) mustBe controllers.add.routes.AmendIndividualCheckYourAnswersController.onPageLoad()
-//      }
-
-      // TODO: for when the CYA is available for the amend journey
-//      "to CYA page when Phone option is not changed in AmendMode" in {
-//        val answers =
-//          emptyUserAnswers
-//            .setOrException(IndividualChooseContactDetailsPage, ContactOptions.Phone)
-//            .setOrException(IndividualPhoneNumberPage, "0987654321")
-//
-//        navigator.nextPage(
-//          IndividualChooseContactDetailsPage,
-//          AmendMode,
-//          answers
-//        ) mustBe controllers.add.routes.AmendIndividualCheckYourAnswersController.onPageLoad()
-//      }
       "must go from SubTradingNameYesNoPage to journey recovery page when incomplete info provided" in {
         navigator.nextPage(
           SubTradingNameYesNoPage,
