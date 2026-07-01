@@ -16,8 +16,9 @@
 
 package navigation.verify
 
+import controllers.routes
 import jakarta.inject.Singleton
-import models.{CheckMode, Mode, NormalMode, UserAnswers}
+import models.{AmendMode, CheckMode, Mode, NormalMode, UserAnswers}
 import navigation.NavigatorForJourney
 import pages.Page
 import pages.verify.*
@@ -34,6 +35,8 @@ class VerifyNavigator @Inject() () extends NavigatorForJourney {
       normalRoutes(page)(userAnswers)
     case CheckMode  =>
       checkRouteMap(page)(userAnswers)
+    case AmendMode  =>
+      routes.JourneyRecoveryController.onPageLoad()
   }
 
   private def normalRoutes: Page => UserAnswers => Call = {
@@ -103,6 +106,7 @@ class VerifyNavigator @Inject() () extends NavigatorForJourney {
 
       case CheckMode =>
         controllers.verify.routes.CheckVerificationBatchReadinessController.checkVerificationBatchReadiness()
+      case AmendMode => controllers.routes.JourneyRecoveryController.onPageLoad()
     }
   }
 
@@ -158,6 +162,7 @@ class VerifyNavigator @Inject() () extends NavigatorForJourney {
           controllers.verify.routes.CheckVerificationBatchReadinessController.checkVerificationBatchReadiness()
         case CheckMode  =>
           controllers.verify.routes.VerifyCheckYourAnswersController.onPageLoad()
+        case AmendMode  => controllers.routes.JourneyRecoveryController.onPageLoad()
       }
     } else {
       controllers.verify.routes.NoSubcontractorsSelectedWarningController.onPageLoad()

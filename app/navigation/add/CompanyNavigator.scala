@@ -18,7 +18,7 @@ package navigation.add
 
 import controllers.routes
 import models.contact.ContactOptions.{Email, Mobile, NoDetails, Phone}
-import models.{CheckMode, Mode, NormalMode, UserAnswers}
+import models.{AmendMode, CheckMode, Mode, NormalMode, UserAnswers}
 import navigation.NavigatorForJourney
 import pages.Page
 import pages.add.company.*
@@ -34,6 +34,8 @@ class CompanyNavigator @Inject() () extends NavigatorForJourney {
       normalRoutes(page)(userAnswers)
     case CheckMode  =>
       checkRouteMap(page)(userAnswers)
+    case AmendMode  =>
+      routes.JourneyRecoveryController.onPageLoad()
   }
 
   private val normalRoutes: Page => UserAnswers => Call = {

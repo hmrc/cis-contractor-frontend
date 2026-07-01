@@ -20,7 +20,7 @@ import base.SpecBase
 import controllers.routes
 import models.add.SubcontractorName
 import models.contact.ContactOptions
-import models.{CheckMode, NormalMode, UserAnswers}
+import models.{AmendMode, CheckMode, NormalMode, UserAnswers}
 import pages.Page
 import pages.add.*
 
@@ -317,6 +317,53 @@ class IndividualNavigatorSpec extends SpecBase {
             emptyUserAnswers
           ) mustBe journeyRecovery
         }
+      }
+    }
+
+    "in Amend mode" - {
+
+      "must go from a page that doesn't exist in the edit route map to CheckYourAnswers" in {
+
+        case object UnknownPage extends Page
+        navigator.nextPage(
+          UnknownPage,
+          AmendMode,
+          UserAnswers("id")
+        ) mustBe journeyRecovery // TODO: when CYA page available
+      }
+
+      "must go from SubTradingNameYesNoPage to TradingNameOfSubcontractorController when true" in {
+        navigator.nextPage(
+          SubTradingNameYesNoPage,
+          AmendMode,
+          emptyUserAnswers.setOrException(SubTradingNameYesNoPage, true)
+        ) mustBe controllers.add.routes.TradingNameOfSubcontractorController.onPageLoad(AmendMode)
+      }
+
+      "must go from SubTradingNameYesNoPage to journey recovery page when incomplete info provided" in {
+        navigator.nextPage(
+          SubTradingNameYesNoPage,
+          AmendMode,
+          emptyUserAnswers
+        ) mustBe journeyRecovery // TODO: when CYA page available
+      }
+      "must go from IndividualEmailAddressPage to CheckYourAnswersController" in {
+        navigator.nextPage(
+          IndividualEmailAddressPage,
+          AmendMode,
+          emptyUserAnswers.setOrException(
+            IndividualEmailAddressPage,
+            "test@test.com"
+          )
+        ) mustBe controllers.add.routes.CheckYourAnswersController.onPageLoad()
+      }
+
+      "must go from IndividualEmailAddressPage to CheckYourAnswersController regardless of answers" in {
+        navigator.nextPage(
+          IndividualEmailAddressPage,
+          AmendMode,
+          emptyUserAnswers
+        ) mustBe controllers.add.routes.CheckYourAnswersController.onPageLoad()
       }
     }
 
