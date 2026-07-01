@@ -174,6 +174,8 @@ GET   /subcontractor/add/company/company-name         controllers.add.company.Co
 POST  /subcontractor/add/company/company-name         controllers.add.company.CompanyNameController.onSubmit(mode: Mode = NormalMode)
 GET   /subcontractor/add/company/change-company-name  controllers.add.company.CompanyNameController.onPageLoad(mode: Mode = CheckMode)
 POST  /subcontractor/add/company/change-company-name  controllers.add.company.CompanyNameController.onSubmit(mode: Mode = CheckMode)
+GET   /subcontractor/amend/company/company-name       controllers.add.company.CompanyNameController.onPageLoad(mode: Mode = AmendMode)
+POST  /subcontractor/amend/company/company-name       controllers.add.company.CompanyNameController.onSubmit(mode: Mode = AmendMode)
 
 GET   /subcontractor/add/company/check-address         controllers.add.company.CompanyAddressYesNoController.onPageLoad(mode: Mode = NormalMode)
 POST  /subcontractor/add/company/check-address         controllers.add.company.CompanyAddressYesNoController.onSubmit(mode: Mode = NormalMode)
