@@ -22,11 +22,12 @@ import play.api.libs.json.JsPath
 import models.add.IndividualContactMethodOptions
 import models.contact.ContactMethodOptions.{Email, Mobile, Phone}
 
-import scala.util.{Success, Try}
+import scala.util.Try
 
 case object IndividualContactMethodOptionsPage
     extends QuestionPage[Set[IndividualContactMethodOptions]]
-    with IndividualJourney {
+    with IndividualJourney
+    with ContactMethodOptionsCleanup {
 
   override def path: JsPath = JsPath \ toString
 
@@ -42,16 +43,16 @@ case object IndividualContactMethodOptionsPage
         super.cleanup(value, userAnswers)
     }
 
-  private def removeIfNotSelected(
-    selectedAnswers: Set[IndividualContactMethodOptions],
-    answer: IndividualContactMethodOptions,
-    page: QuestionPage[String],
-    userAnswers: UserAnswers
-  ): Try[UserAnswers] =
-    if (selectedAnswers.contains(answer)) {
-      Success(userAnswers)
-    } else {
-      userAnswers.remove(page)
-    }
+//  private def removeIfNotSelected(
+//    selectedAnswers: Set[IndividualContactMethodOptions],
+//    answer: IndividualContactMethodOptions,
+//    page: QuestionPage[String],
+//    userAnswers: UserAnswers
+//  ): Try[UserAnswers] =
+//    if (selectedAnswers.contains(answer)) {
+//      Success(userAnswers)
+//    } else {
+//      userAnswers.remove(page)
+//    }
 
 }

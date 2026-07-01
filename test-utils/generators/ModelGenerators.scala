@@ -29,10 +29,10 @@ import java.time.{Instant, LocalDateTime, ZoneOffset}
 
 trait ModelGenerators {
 
-  implicit lazy val arbitraryContactMethodOptions: Arbitrary[ContactMethodOptions] =
-    Arbitrary {
-      Gen.oneOf(ContactMethodOptions.values)
-    }
+//  implicit lazy val arbitraryContactMethodOptions: Arbitrary[ContactMethodOptions] =
+//    Arbitrary {
+//      Gen.oneOf(ContactMethodOptions.values)
+//    }
 
   implicit lazy val arbitrarySelectSubcontractorsToReverify: Arbitrary[Set[SelectedSubcontractors]] =
     Arbitrary {

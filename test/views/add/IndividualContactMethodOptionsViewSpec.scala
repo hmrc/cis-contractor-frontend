@@ -54,9 +54,9 @@ class IndividualContactMethodOptionsViewSpec extends AnyWordSpec with Matchers w
       checkboxes.size() mustBe IndividualContactMethodOptions.values.size
 
       val labels: util.List[String] = doc.select(".govuk-checkboxes__label").eachText()
-      labels must contain(messages("individualContactMethodOptions.emailAddress"))
-      labels must contain(messages("individualContactMethodOptions.phoneNumber"))
-      labels must contain(messages("individualContactMethodOptions.mobileNumber"))
+      labels must contain(messages("individualContactMethodOptions.email"))
+      labels must contain(messages("individualContactMethodOptions.phone"))
+      labels must contain(messages("individualContactMethodOptions.mobile"))
 
       doc.select("form").attr("action") mustBe controllers.add.routes.IndividualContactMethodOptionsController
         .onSubmit(NormalMode)
