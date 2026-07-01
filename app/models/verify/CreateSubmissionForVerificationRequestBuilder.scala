@@ -33,9 +33,8 @@ object CreateSubmissionForVerificationRequestBuilder {
       batchId  <- current.verificationBatch.map(_.verificationBatchId).toRight("verificationBatchId missing")
       batchRef <-
         current.verificationBatch.flatMap(_.verifBatchResourceRef).toRight("verificationBatchResourceRef missing")
-
-      email <- VerifyEmailResolver.resolvedEmail(ua).toRight("No email resolved for submission")
     } yield {
+      val email: Option[String] = VerifyEmailResolver.resolvedEmail(ua)
 
       val verifications: Seq[VerificationToUpdate] =
         current.verifications.flatMap(_.verificationResourceRef).map { ref =>

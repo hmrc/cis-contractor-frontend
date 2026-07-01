@@ -73,7 +73,7 @@ class CreateSubmissionForVerificationRequestBuilderSpec extends SpecBase {
         instanceId = "1",
         verificationBatchId = 1001L,
         verificationBatchResourceRef = 2001L,
-        emailRecipient = "test@test.com",
+        emailRecipient = Some("test@test.com"),
         irMarkGenerated = None,
         verifications = Seq(
           VerificationToUpdate(
