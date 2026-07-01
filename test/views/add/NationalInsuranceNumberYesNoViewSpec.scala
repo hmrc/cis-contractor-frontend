@@ -94,7 +94,7 @@ class NationalInsuranceNumberYesNoViewSpec extends AnyWordSpec with Matchers wit
 
       doc.select("form").attr("autocomplete") mustBe "off"
 
-      doc.select(".govuk-button").text() mustBe messages("site.update")
+      doc.select(".govuk-button").text() mustBe messages("site.continue")
     }
 
     "display error summary and inline error when no option is selected" in new Setup {
