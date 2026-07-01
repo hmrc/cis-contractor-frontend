@@ -111,16 +111,16 @@ class IndividualNavigator @Inject() () extends NavigatorForJourney {
       case (Some(false), NormalMode) =>
         controllers.add.routes.SubcontractorNameController.onPageLoad(NormalMode)
 
-      case (Some(false), CheckMode) =>
+      case (Some(false), CheckMode | AmendMode) =>
         ua.get(SubcontractorNamePage) match {
-          case None    => controllers.add.routes.SubcontractorNameController.onPageLoad(CheckMode)
-          case Some(_) => controllers.add.routes.CheckYourAnswersController.onPageLoad()
+          case None    => controllers.add.routes.SubcontractorNameController.onPageLoad(mode)
+          case Some(_) => cyaRoute(mode)
         }
 
-      case (Some(true), CheckMode) =>
+      case (Some(true), CheckMode | AmendMode) =>
         ua.get(TradingNameOfSubcontractorPage) match {
-          case None    => controllers.add.routes.TradingNameOfSubcontractorController.onPageLoad(CheckMode)
-          case Some(_) => controllers.add.routes.CheckYourAnswersController.onPageLoad()
+          case None    => controllers.add.routes.TradingNameOfSubcontractorController.onPageLoad(mode)
+          case Some(_) => cyaRoute(mode)
         }
 
       case _ =>
