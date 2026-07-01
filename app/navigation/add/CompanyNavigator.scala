@@ -35,7 +35,14 @@ class CompanyNavigator @Inject() () extends NavigatorForJourney {
     case CheckMode  =>
       checkRouteMap(page)(userAnswers)
     case AmendMode  =>
-      routes.JourneyRecoveryController.onPageLoad()
+      amendRouteMap(page)(userAnswers)
+  }
+
+  private def cyaRoute(mode: Mode): Call = mode match {
+    case AmendMode =>
+      routes.JourneyRecoveryController
+        .onPageLoad() // TODO route to controllers.amend.routes.AmendCompanyCheckYourAnswersController.onPageLoad() when AmendIndividualCheckYourAnswersController added.
+    case _         => controllers.add.company.routes.CompanyCheckYourAnswersController.onPageLoad()
   }
 
   private val normalRoutes: Page => UserAnswers => Call = {
@@ -67,6 +74,11 @@ class CompanyNavigator @Inject() () extends NavigatorForJourney {
     case AddCompanyContactMethodsYesNoPage =>
       userAnswers => navigatorFromAddCompanyContactMethodsYesNoPage(NormalMode)(userAnswers)
     case _                                 => _ => routes.IndexController.onPageLoad()
+  }
+
+  private val amendRouteMap: Page => UserAnswers => Call = {
+    case CompanyPhoneNumberPage => _ => cyaRoute(AmendMode)
+    case _                      => _ => cyaRoute(AmendMode)
   }
 
   private val checkRouteMap: Page => UserAnswers => Call = {

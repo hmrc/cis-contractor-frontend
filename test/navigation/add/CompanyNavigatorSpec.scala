@@ -28,6 +28,9 @@ class CompanyNavigatorSpec extends SpecBase {
   val navigator                    = new CompanyNavigator
   private lazy val journeyRecovery = routes.JourneyRecoveryController.onPageLoad()
   private lazy val CompanyCYA      = controllers.add.company.routes.CompanyCheckYourAnswersController.onPageLoad()
+  private lazy val CompanyAmendCYA =
+    routes.JourneyRecoveryController
+      .onPageLoad() // TODO when available controllers.add.company.routes.AmendCompanyCheckYourAnswersController.onPageLoad()
 
   "CompanyNavigator" - {
 
@@ -301,6 +304,14 @@ class CompanyNavigatorSpec extends SpecBase {
 
       "must go from CompanyNamePage to JourneyRecovery" in {
         navigator.nextPage(CompanyNamePage, AmendMode, emptyUserAnswers) mustBe journeyRecovery
+      }
+
+      "must go from a CompanyPhoneNumberPage to Company CYA in CheckMode" in {
+        navigator.nextPage(
+          CompanyPhoneNumberPage,
+          AmendMode,
+          emptyUserAnswers
+        ) mustBe CompanyAmendCYA
       }
     }
 

@@ -17,7 +17,7 @@
 package views.add.company
 
 import forms.add.company.CompanyPhoneNumberFormProvider
-import models.NormalMode
+import models.{AmendMode,NormalMode}
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
@@ -58,6 +58,32 @@ class CompanyPhoneNumberViewSpec extends AnyWordSpec with Matchers with GuiceOne
       doc.select(".govuk-button").text() mustBe messages("site.continue")
     }
 
+    "render the page with title, heading, input and update button from Amend journey" in new Setup {
+
+      val companyName = "Test Company"
+
+      val html: HtmlFormat.Appendable = view(form, AmendMode, companyName)
+      val doc                         = org.jsoup.Jsoup.parse(html.toString())
+
+      doc.select("title").text() must include(messages("companyPhoneNumber.title"))
+
+      val heading = doc.select("h1")
+      heading.text() mustBe messages("companyPhoneNumber.heading", companyName)
+
+      val hint = doc.select(".govuk-hint")
+      hint.text() mustBe messages("companyPhoneNumber.hint")
+
+      doc
+        .select("form")
+        .attr("action") mustBe controllers.add.company.routes.CompanyPhoneNumberController
+        .onSubmit(AmendMode)
+        .url
+
+      doc.select("input[name=value]").size() mustBe 1
+
+      doc.select(".govuk-button").text() mustBe messages("site.update")
+    }
+
     "display error summary and inline error when no name is entered" in new Setup {
 
       val companyName = "Test Company"
@@ -66,6 +92,25 @@ class CompanyPhoneNumberViewSpec extends AnyWordSpec with Matchers with GuiceOne
         form.withError("value", "companyPhoneNumber.error.required")
 
       val html = view(errorForm, NormalMode, companyName)
+      val doc  = org.jsoup.Jsoup.parse(html.toString())
+
+      val summary = doc.select(".govuk-error-summary")
+      summary.text() must include(messages("companyPhoneNumber.error.required"))
+
+      val linkHref = summary.select("a").attr("href")
+      linkHref mustBe "#value"
+
+      doc.select(".govuk-error-message").text() must include(messages("companyPhoneNumber.error.required"))
+    }
+
+    "display error summary and inline error when no name is entered from Amend journey" in new Setup {
+
+      val companyName = "Test Company"
+
+      val errorForm: Form[String] =
+        form.withError("value", "companyPhoneNumber.error.required")
+
+      val html = view(errorForm, AmendMode, companyName)
       val doc  = org.jsoup.Jsoup.parse(html.toString())
 
       val summary = doc.select(".govuk-error-summary")
