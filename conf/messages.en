@@ -1065,16 +1065,16 @@ contractordetails.contractorDetailsCheckAnswers.table.schemeName.hidden        =
 contractordetails.contractorDetailsCheckAnswers.table.email                    =  Email
 contractordetails.contractorDetailsCheckAnswers.table.email.hidden             =  email
 contractordetails.contractorDetailsCheckAnswers.table.link.addDetails          =  Add details
-contractordetails.contractorDetailsCheckAnswers.returnToCisDashboard.link      =  Return to CIS dashboard
+contractordetails.contractorDetailsCheckAnswers.returnToCisDashboard.link      =  Return to CIS account
 
 contractordetails.addEmailAddressYesNo.title                                   =  Do you want to enter the contractor’s email address?
 contractordetails.addEmailAddressYesNo.heading                                 =  Do you want to enter the contractor’s email address?
 contractordetails.addEmailAddressYesNo.error.required                          =  Select yes to enter the contractor’s email address
-contractordetails.addEmailAddressYesNo.checkYourAnswersLabel                   =  Add email address
-contractordetails.addEmailAddressYesNo.change.hidden                           =  add email address
+contractordetails.addEmailAddressYesNo.checkYourAnswersLabel                   =  Add email address?
+contractordetails.addEmailAddressYesNo.change.hidden                           =  add email address?
 
 contractordetails.addSchemeNameYesNo.title                                     =  Do you want to enter the contractor’s scheme name?
 contractordetails.addSchemeNameYesNo.heading                                   =  Do you want to enter the contractor’s scheme name?
 contractordetails.addSchemeNameYesNo.error.required                            =  Select yes to enter the contractor’s scheme name
-contractordetails.addSchemeNameYesNo.checkYourAnswersLabel                     =  Add scheme name
-contractordetails.addSchemeNameYesNo.change.hidden                             =  add scheme name
+contractordetails.addSchemeNameYesNo.checkYourAnswersLabel                     =  Add scheme name?
+contractordetails.addSchemeNameYesNo.change.hidden                             =  add scheme name?
