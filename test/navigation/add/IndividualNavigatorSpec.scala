@@ -438,6 +438,49 @@ class IndividualNavigatorSpec extends SpecBase {
           emptyUserAnswers
         ) mustBe journeyRecovery // TODO: when CYA page available
       }
+
+      "must go from UniqueTaxpayerReferenceYesNoPage to SubcontractorsUniqueTaxpayerReferencePage when true and no utr exists" in {
+        val ua =
+          emptyUserAnswers.setOrException(UniqueTaxpayerReferenceYesNoPage, true)
+
+        navigator.nextPage(
+          UniqueTaxpayerReferenceYesNoPage,
+          AmendMode,
+          ua
+        ) mustBe controllers.add.routes.SubcontractorsUniqueTaxpayerReferenceController.onPageLoad(AmendMode)
+      }
+
+      "must go from UniqueTaxpayerReferenceYesNoPage to JourneyRecovery when true and utr already exists" in {
+        val ua =
+          emptyUserAnswers
+            .setOrException(UniqueTaxpayerReferenceYesNoPage, true)
+            .setOrException(SubcontractorsUniqueTaxpayerReferencePage, "utr-1")
+
+        navigator.nextPage(
+          UniqueTaxpayerReferenceYesNoPage,
+          AmendMode,
+          ua
+        ) mustBe journeyRecovery // TODO: when CYA page available
+      }
+
+      "must go from UniqueTaxpayerReferenceYesNoPage to JourneyRecovery when false" in {
+        val ua =
+          emptyUserAnswers.setOrException(UniqueTaxpayerReferenceYesNoPage, false)
+
+        navigator.nextPage(
+          UniqueTaxpayerReferenceYesNoPage,
+          AmendMode,
+          ua
+        ) mustBe journeyRecovery // TODO: when CYA page available
+      }
+
+      "must go from UniqueTaxpayerReferenceYesNoPage to JourneyRecovery when answer is missing" in {
+        navigator.nextPage(
+          UniqueTaxpayerReferenceYesNoPage,
+          AmendMode,
+          emptyUserAnswers
+        ) mustBe journeyRecovery
+      }
     }
 
     "in Check mode" - {
