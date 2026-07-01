@@ -530,3 +530,8 @@ POST  /contractor-details/change-contractor-utr  controllers.contractordetails.C
 # Individual Amend
 GET   /subcontractor/amend/email-address          controllers.add.IndividualEmailAddressController.onPageLoad(mode: Mode = AmendMode)
 POST  /subcontractor/amend/email-address          controllers.add.IndividualEmailAddressController.onSubmit(mode: Mode = AmendMode)
+
+GET        /removeSchemeNameYesNo                        controllers.RemoveSchemeNameYesNoController.onPageLoad(mode: Mode = NormalMode)
+POST       /removeSchemeNameYesNo                        controllers.RemoveSchemeNameYesNoController.onSubmit(mode: Mode = NormalMode)
+GET        /changeRemoveSchemeNameYesNo                  controllers.RemoveSchemeNameYesNoController.onPageLoad(mode: Mode = CheckMode)
+POST       /changeRemoveSchemeNameYesNo                  controllers.RemoveSchemeNameYesNoController.onSubmit(mode: Mode = CheckMode)

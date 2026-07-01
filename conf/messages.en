@@ -1077,3 +1077,9 @@ contractordetails.contractorDetailsCheckAnswers.table.email                    =
 contractordetails.contractorDetailsCheckAnswers.table.email.hidden             =  email address
 contractordetails.contractorDetailsCheckAnswers.table.link.addDetails          =  Add details
 contractordetails.contractorDetailsCheckAnswers.returnToCisDashboard.link      =  Return to CIS dashboard
+
+removeSchemeNameYesNo.title = removeSchemeNameYesNo
+removeSchemeNameYesNo.heading = removeSchemeNameYesNo
+removeSchemeNameYesNo.checkYourAnswersLabel = removeSchemeNameYesNo
+removeSchemeNameYesNo.error.required = Select yes if removeSchemeNameYesNo
+removeSchemeNameYesNo.change.hidden = RemoveSchemeNameYesNo
