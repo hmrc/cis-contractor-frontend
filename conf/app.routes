@@ -59,9 +59,6 @@ POST  /subcontractor/amend/mobile-number  controllers.add.IndividualMobileNumber
 GET   /subcontractor/amend/add-contact-details  controllers.add.AddIndividualContactMethodsYesNoController.onPageLoad(mode: Mode = AmendMode)
 POST  /subcontractor/amend/add-contact-details  controllers.add.AddIndividualContactMethodsYesNoController.onSubmit(mode: Mode = AmendMode)
 
-GET   /subcontractor/amend/check-unique-taxpayer-reference  controllers.add.UniqueTaxpayerReferenceYesNoController.onPageLoad(mode: Mode = AmendMode)
-POST  /subcontractor/amend/check-unique-taxpayer-reference  controllers.add.UniqueTaxpayerReferenceYesNoController.onSubmit(mode: Mode = AmendMode)
-
 GET   /subcontractor/amend/unique-taxpayer-reference  controllers.add.SubcontractorsUniqueTaxpayerReferenceController.onPageLoad(mode: Mode = AmendMode)
 POST  /subcontractor/amend/unique-taxpayer-reference  controllers.add.SubcontractorsUniqueTaxpayerReferenceController.onSubmit(mode: Mode = AmendMode)
 
@@ -119,6 +116,8 @@ GET   /subcontractor/add/check-unique-taxpayer-reference         controllers.add
 POST  /subcontractor/add/check-unique-taxpayer-reference         controllers.add.UniqueTaxpayerReferenceYesNoController.onSubmit(mode: Mode = NormalMode)
 GET   /subcontractor/add/change-check-unique-taxpayer-reference  controllers.add.UniqueTaxpayerReferenceYesNoController.onPageLoad(mode: Mode = CheckMode)
 POST  /subcontractor/add/change-check-unique-taxpayer-reference  controllers.add.UniqueTaxpayerReferenceYesNoController.onSubmit(mode: Mode = CheckMode)
+GET   /subcontractor/amend/check-unique-taxpayer-reference       controllers.add.UniqueTaxpayerReferenceYesNoController.onPageLoad(mode: Mode = AmendMode)
+POST  /subcontractor/amend/check-unique-taxpayer-reference       controllers.add.UniqueTaxpayerReferenceYesNoController.onSubmit(mode: Mode = AmendMode)
 
 GET   /subcontractor/add/unique-taxpayer-reference         controllers.add.SubcontractorsUniqueTaxpayerReferenceController.onPageLoad(mode: Mode = NormalMode)
 POST  /subcontractor/add/unique-taxpayer-reference         controllers.add.SubcontractorsUniqueTaxpayerReferenceController.onSubmit(mode: Mode = NormalMode)
