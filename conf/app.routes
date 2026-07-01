@@ -485,6 +485,8 @@ GET   /subcontractor/verify/verification-not-submitted-warning  controllers.veri
 
 GET   /subcontractor/verify/no-subcontractors-selected-warning  controllers.verify.NoSubcontractorsSelectedWarningController.onPageLoad()
 
+GET   /subcontractor/verify/no-subcontractors-selected-warning/cancel   controllers.verify.NoSubcontractorsSelectedWarningController.onCancel()
+
 GET   /subcontractor/verify/verification-request-submitted  controllers.verify.VerificationRequestSubmittedController.onPageLoad()
 
 GET   /subcontractor/verify/verification-sent-not-received-warning  controllers.verify.VerifySendErrorController.onPageLoad()

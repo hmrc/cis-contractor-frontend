@@ -49,20 +49,24 @@ class SubmissionSendingController @Inject() (
 
   def onPageLoad(): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
-      buildSubmissionRequest(request.userAnswers) match {
-        case Left(msg) =>
-          logger.error(s"[SubmissionSendingController.onPageLoad] Failed to build submission request: $msg")
-          Future.successful(recovery)
+      verificationService
+        .getCurrentVerificationBatch(request.userAnswers)
+        .flatMap { updatedAnswers =>
+          buildSubmissionRequest(updatedAnswers) match {
+            case Left(msg) =>
+              logger.error(s"[SubmissionSendingController.onPageLoad] Failed to build submission request: $msg")
+              Future.successful(recovery)
 
-        case Right(submissionReq) =>
-          verificationService
-            .createSubmissionForVerification(submissionReq)
-            .map(_ => Ok(view()))
-            .recover { case t =>
-              logger.error("[SubmissionSendingController.onPageLoad] Failed to create submission", t)
-              recovery
-            }
-      }
+            case Right(submissionReq) =>
+              verificationService
+                .createSubmissionForVerification(submissionReq)
+                .map(_ => Ok(view()))
+          }
+        }
+        .recover { case t =>
+          logger.error("[SubmissionSendingController.onPageLoad] Failed to create submission", t)
+          recovery
+        }
     }
 
   private def buildSubmissionRequest(
@@ -76,7 +80,7 @@ class SubmissionSendingController @Inject() (
       batchRef <-
         current.verificationBatch.flatMap(_.verifBatchResourceRef).toRight("verificationBatchResourceRef missing")
 
-      email <- VerifyEmailResolver.resolvedEmail(ua).toRight("No email resolved for submission")
+      email = VerifyEmailResolver.resolvedEmail(ua).getOrElse("")
     } yield {
 
       val verifications: Seq[VerificationToUpdate] =

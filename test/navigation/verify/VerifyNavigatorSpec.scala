@@ -433,6 +433,24 @@ class VerifyNavigatorSpec extends SpecBase {
         }
       }
 
+      "must go to VerificationDeclarationController from EmailAddressPage in CheckMode" in {
+        val ua = emptyUserAnswers.setOrException(EmailAddressPage, "test@test.com")
+
+        navigator.nextPage(
+          EmailAddressPage,
+          CheckMode,
+          ua
+        ) mustBe cya
+      }
+
+      "must go to VerifyCheckYourAnswers from VerificationDeclarationPage in CheckMode" in {
+        navigator.nextPage(
+          VerificationDeclarationPage,
+          CheckMode,
+          emptyUserAnswers
+        ) mustBe cya
+      }
+
       "VerifyYourSubcontractorsYesNoPage" - {
 
         "must go to SelectSubcontractorsToReverifyController when answer is true in CheckMode" in {
@@ -462,7 +480,7 @@ class VerifyNavigatorSpec extends SpecBase {
 
       "ContractorEmailConfirmationStoredPage" - {
 
-        "must go to VerificationDeclarationController when answer is CurrentEmail" in {
+        "must go to VerifyCheckYourAnswersController when answer is CurrentEmail" in {
           val ua = emptyUserAnswers.setOrException(
             ContractorEmailConfirmationStoredPage,
             ContractorEmailConfirmationStored.CurrentEmail
@@ -484,7 +502,7 @@ class VerifyNavigatorSpec extends SpecBase {
             controllers.verify.routes.EmailAddressController.onPageLoad(CheckMode)
         }
 
-        "must go to VerificationDeclarationController when answer is DoNotSend" in {
+        "must go to VerifyCheckYourAnswersController when answer is DoNotSend" in {
           val ua = emptyUserAnswers.setOrException(
             ContractorEmailConfirmationStoredPage,
             ContractorEmailConfirmationStored.DoNotSend
@@ -517,24 +535,6 @@ class VerifyNavigatorSpec extends SpecBase {
 
           navigator.nextPage(SelectSubcontractorsToReverifyPage, CheckMode, ua) mustBe
             controllers.verify.routes.VerifyCheckYourAnswersController.onPageLoad()
-        }
-
-        "must go to VerificationDeclarationController from EmailAddressPage in CheckMode" in {
-          val ua = emptyUserAnswers.setOrException(EmailAddressPage, "test@test.com")
-
-          navigator.nextPage(
-            EmailAddressPage,
-            CheckMode,
-            ua
-          ) mustBe cya
-        }
-
-        "must go to VerifyCheckYourAnswers from VerificationDeclarationPage in CheckMode" in {
-          navigator.nextPage(
-            VerificationDeclarationPage,
-            CheckMode,
-            emptyUserAnswers
-          ) mustBe cya
         }
       }
     }

@@ -206,7 +206,7 @@ class NewestVerificationBatchControllerSpec extends SpecBase with MockitoSugar w
       }
     }
 
-    "must redirect to InactiveSchemeWarning when inactivity declared and within 6 months, even with no subcontractors" in {
+    "must redirect to NoSubcontractorsAdded when inactivity declared within 6 months and no subcontractors exist" in {
       val mockService = mock[VerificationService]
 
       val monthlyReturnSubmission = MonthlyReturnSubmission(
@@ -238,7 +238,7 @@ class NewestVerificationBatchControllerSpec extends SpecBase with MockitoSugar w
 
         status(result) mustBe SEE_OTHER
         redirectLocation(result).value mustBe
-          controllers.verify.routes.InactiveSchemeWarningController.onPageLoad().url
+          controllers.verify.routes.NoSubcontractorsAddedController.onPageLoad().url
 
         verify(mockService).refreshNewestVerificationBatch(any[UserAnswers])(any[HeaderCarrier])
         verifyNoMoreInteractions(mockService)
@@ -278,7 +278,7 @@ class NewestVerificationBatchControllerSpec extends SpecBase with MockitoSugar w
 
         status(result) mustBe SEE_OTHER
         redirectLocation(result).value mustBe
-          controllers.verify.routes.InactiveSchemeWarningController.onPageLoad().url
+          controllers.verify.routes.VerifyYourSubcontractorsYesNoController.onPageLoad.url
 
         verify(mockService).refreshNewestVerificationBatch(any[UserAnswers])(any[HeaderCarrier])
         verifyNoMoreInteractions(mockService)
@@ -318,7 +318,7 @@ class NewestVerificationBatchControllerSpec extends SpecBase with MockitoSugar w
 
         status(result) mustBe SEE_OTHER
         redirectLocation(result).value mustBe
-          controllers.verify.routes.InactiveSchemeWarningController.onPageLoad().url
+          controllers.verify.routes.SelectSubcontractorController.onPageLoad(NormalMode).url
 
         verify(mockService).refreshNewestVerificationBatch(any[UserAnswers])(any[HeaderCarrier])
         verifyNoMoreInteractions(mockService)
@@ -358,9 +358,7 @@ class NewestVerificationBatchControllerSpec extends SpecBase with MockitoSugar w
 
         status(result) mustBe SEE_OTHER
         redirectLocation(result).value mustBe
-          controllers.verify.routes.SelectSubcontractorController
-            .onPageLoad(NormalMode)
-            .url
+          controllers.verify.routes.InactiveSchemeWarningController.onPageLoad().url
 
         verify(mockService).refreshNewestVerificationBatch(any[UserAnswers])(any[HeaderCarrier])
         verifyNoMoreInteractions(mockService)

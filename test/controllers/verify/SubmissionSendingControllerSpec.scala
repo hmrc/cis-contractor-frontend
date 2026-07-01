@@ -99,10 +99,6 @@ class SubmissionSendingControllerSpec extends SpecBase with MockitoSugar {
   "SubmissionSendingController.onPageLoad" - {
 
     "must call service to create submission and return OK when answers are valid and buildSubmissionRequest succeeds (CurrentEmail uses scheme email)" in {
-      val mockService = mock[VerificationService]
-      when(mockService.createSubmissionForVerification(any[CreateSubmissionForVerificationRequest])(any[HeaderCarrier]))
-        .thenReturn(Future.successful(CreateSubmissionForVerificationResponse(12345L)))
-
       val ua0 =
         emptyUserAnswers
           .set(NewestVerificationBatchResponsePage, newestWithSchemeEmail)
@@ -117,6 +113,14 @@ class SubmissionSendingControllerSpec extends SpecBase with MockitoSugar {
 
       val ua = withCisId(ua0)
 
+      val mockService = mock[VerificationService]
+
+      when(mockService.getCurrentVerificationBatch(any[models.UserAnswers])(any[HeaderCarrier]))
+        .thenReturn(Future.successful(ua))
+
+      when(mockService.createSubmissionForVerification(any[CreateSubmissionForVerificationRequest])(any[HeaderCarrier]))
+        .thenReturn(Future.successful(CreateSubmissionForVerificationResponse(12345L)))
+
       val application =
         applicationBuilder(userAnswers = Some(ua))
           .overrides(bind[VerificationService].toInstance(mockService))
@@ -126,6 +130,8 @@ class SubmissionSendingControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, FakeRequest(GET, onPageLoadRoute)).value
 
         status(result) mustBe OK
+
+        verify(mockService).getCurrentVerificationBatch(any[models.UserAnswers])(any[HeaderCarrier])
 
         val captor = ArgumentCaptor.forClass(classOf[CreateSubmissionForVerificationRequest])
         verify(mockService).createSubmissionForVerification(captor.capture())(any[HeaderCarrier])
@@ -140,8 +146,6 @@ class SubmissionSendingControllerSpec extends SpecBase with MockitoSugar {
     }
 
     "must redirect to JourneyRecovery when CisIdQuery is missing (buildSubmissionRequest fails)" in {
-      val mockService = mock[VerificationService]
-
       val ua =
         emptyUserAnswers
           .set(NewestVerificationBatchResponsePage, newestWithSchemeEmail)
@@ -155,6 +159,11 @@ class SubmissionSendingControllerSpec extends SpecBase with MockitoSugar {
           .value
       // NOTE: CisIdQuery is intentionally missing
 
+      val mockService = mock[VerificationService]
+
+      when(mockService.getCurrentVerificationBatch(any[models.UserAnswers])(any[HeaderCarrier]))
+        .thenReturn(Future.successful(ua))
+
       val application =
         applicationBuilder(userAnswers = Some(ua))
           .overrides(bind[VerificationService].toInstance(mockService))
@@ -166,13 +175,12 @@ class SubmissionSendingControllerSpec extends SpecBase with MockitoSugar {
         status(result) mustBe SEE_OTHER
         redirectLocation(result).value mustBe controllers.routes.JourneyRecoveryController.onPageLoad().url
 
+        verify(mockService).getCurrentVerificationBatch(any[models.UserAnswers])(any[HeaderCarrier])
         verify(mockService, never()).createSubmissionForVerification(any())(any())
       }
     }
 
     "must redirect to JourneyRecovery when CurrentVerificationBatchResponsePage is missing (buildSubmissionRequest fails)" in {
-      val mockService = mock[VerificationService]
-
       val ua0 =
         emptyUserAnswers
           .set(NewestVerificationBatchResponsePage, newestWithSchemeEmail)
@@ -184,6 +192,11 @@ class SubmissionSendingControllerSpec extends SpecBase with MockitoSugar {
 
       val ua = withCisId(ua0)
 
+      val mockService = mock[VerificationService]
+
+      when(mockService.getCurrentVerificationBatch(any[models.UserAnswers])(any[HeaderCarrier]))
+        .thenReturn(Future.successful(ua))
+
       val application =
         applicationBuilder(userAnswers = Some(ua))
           .overrides(bind[VerificationService].toInstance(mockService))
@@ -195,13 +208,12 @@ class SubmissionSendingControllerSpec extends SpecBase with MockitoSugar {
         status(result) mustBe SEE_OTHER
         redirectLocation(result).value mustBe controllers.routes.JourneyRecoveryController.onPageLoad().url
 
+        verify(mockService).getCurrentVerificationBatch(any[models.UserAnswers])(any[HeaderCarrier])
         verify(mockService, never()).createSubmissionForVerification(any())(any())
       }
     }
 
     "must redirect to JourneyRecovery when verificationBatchResourceRef is missing" in {
-      val mockService = mock[VerificationService]
-
       val currentNoBatchRef =
         currentBatch.copy(
           verificationBatch = currentBatch.verificationBatch.map(_.copy(verifBatchResourceRef = None))
@@ -221,6 +233,11 @@ class SubmissionSendingControllerSpec extends SpecBase with MockitoSugar {
 
       val ua = withCisId(ua0)
 
+      val mockService = mock[VerificationService]
+
+      when(mockService.getCurrentVerificationBatch(any[models.UserAnswers])(any[HeaderCarrier]))
+        .thenReturn(Future.successful(ua))
+
       val application =
         applicationBuilder(userAnswers = Some(ua))
           .overrides(bind[VerificationService].toInstance(mockService))
@@ -232,6 +249,7 @@ class SubmissionSendingControllerSpec extends SpecBase with MockitoSugar {
         status(result) mustBe SEE_OTHER
         redirectLocation(result).value mustBe controllers.routes.JourneyRecoveryController.onPageLoad().url
 
+        verify(mockService).getCurrentVerificationBatch(any[models.UserAnswers])(any[HeaderCarrier])
         verify(mockService, never()).createSubmissionForVerification(any())(any())
       }
     }

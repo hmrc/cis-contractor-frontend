@@ -80,7 +80,7 @@ class NewestVerificationBatchController @Inject() (
               case Some(requestDate) =>
                 val sixMonthsLater = requestDate.plusMonths(InactivityStatus.SixMonths)
                 val now            = LocalDateTime.now(clock)
-                if (!now.isAfter(sixMonthsLater)) InactivityStatus.Inactive else InactivityStatus.Active
+                if (!now.isAfter(sixMonthsLater)) InactivityStatus.Active else InactivityStatus.Inactive
               case None              =>
                 InactivityStatus.MissingData
             }
@@ -176,7 +176,7 @@ class NewestVerificationBatchController @Inject() (
 
           batch match {
             case None           => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-            case Some(response) => routeFromSubmissionStatus(response, unverified)
+            case Some(response) => routeFromResponse(response, unverified)
           }
         }
         .recover { case t =>
