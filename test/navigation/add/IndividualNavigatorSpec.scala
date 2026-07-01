@@ -93,7 +93,7 @@ class IndividualNavigatorSpec extends SpecBase {
           SubAddressYesNoPage,
           NormalMode,
           emptyUserAnswers.setOrException(SubAddressYesNoPage, false)
-        ) mustBe controllers.add.routes.IndividualChooseContactDetailsController.onPageLoad(NormalMode)
+        ) mustBe controllers.add.routes.IndividualContactMethodOptionsController.onPageLoad(NormalMode)
       }
 
       "must go from a SubAddressYesNoPage to journey recovery when incomplete info provided" in {
@@ -109,7 +109,7 @@ class IndividualNavigatorSpec extends SpecBase {
           AddressOfSubcontractorPage,
           NormalMode,
           UserAnswers("id")
-        ) mustBe controllers.add.routes.IndividualChooseContactDetailsController.onPageLoad(NormalMode)
+        ) mustBe controllers.add.routes.IndividualContactMethodOptionsController.onPageLoad(NormalMode)
       }
 
       "must go from a NationalInsuranceNumberYesNoPage to SubNationalInsuranceNumberPage when true" in {

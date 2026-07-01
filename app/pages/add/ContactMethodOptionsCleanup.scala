@@ -24,11 +24,11 @@ import scala.util.{Success, Try}
 
 trait ContactMethodOptionsCleanup {
   protected def removeIfNotSelected(
-                                     selectedAnswers: Set[ContactMethodOptions],
-                                     answer: ContactMethodOptions,
-                                     page: QuestionPage[String],
-                                     userAnswers: UserAnswers
-                                   ): Try[UserAnswers] =
+    selectedAnswers: Set[ContactMethodOptions],
+    answer: ContactMethodOptions,
+    page: QuestionPage[String],
+    userAnswers: UserAnswers
+  ): Try[UserAnswers] =
     if (selectedAnswers.contains(answer)) Success(userAnswers)
     else userAnswers.remove(page)
 }

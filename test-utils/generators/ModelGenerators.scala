@@ -18,7 +18,7 @@ package generators
 
 import models.*
 
-import models.contact.{ContactMethodOptions, ContactOptions}
+import models.contact.ContactOptions
 import models.address.{Address, Country}
 import models.verify.ContractorEmailConfirmationStored
 import models.verify.SelectedSubcontractors

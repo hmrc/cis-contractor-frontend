@@ -1069,9 +1069,9 @@ contractordetails.contractorDetailsCheckAnswers.returnToCisDashboard.link      =
 
 individualContactMethodOptions.title = Which contact details do you want to add for this subcontractor?
 individualContactMethodOptions.heading = Which contact details do you want to add for {0}?
-individualContactMethodOptions.emailAddress = Email address
-individualContactMethodOptions.phoneNumber = Phone number
-individualContactMethodOptions.mobileNumber = Mobile number
+individualContactMethodOptions.email = Email address
+individualContactMethodOptions.phone = Phone number
+individualContactMethodOptions.mobile = Mobile number
 individualContactMethodOptions.checkYourAnswersLabel = Methods of contact
 individualContactMethodOptions.hint = Contact details are only for your own records
 individualContactMethodOptions.error.required = Select the methods of contact you want to add for this subcontractor

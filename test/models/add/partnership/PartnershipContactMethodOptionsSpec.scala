@@ -42,9 +42,8 @@ class PartnershipContactMethodOptionsSpec
 
     "must deserialise valid values" in {
 
-      //val gen = arbitrary[PartnershipContactMethodOptions]
+      // val gen = arbitrary[PartnershipContactMethodOptions]
       val gen = Gen.oneOf(PartnershipContactMethodOptions.values.toSeq)
-
 
       forAll(gen) { partnershipContactMethodOptions =>
         JsString(partnershipContactMethodOptions.toString)
@@ -65,7 +64,7 @@ class PartnershipContactMethodOptionsSpec
 
     "must serialise" in {
 
-      //val gen = arbitrary[PartnershipContactMethodOptions]
+      // val gen = arbitrary[PartnershipContactMethodOptions]
       val gen = Gen.oneOf(PartnershipContactMethodOptions.values.toSeq)
 
       forAll(gen) { partnershipContactMethodOptions =>

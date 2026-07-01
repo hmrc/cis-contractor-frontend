@@ -43,7 +43,7 @@ class IndividualNavigator @Inject() () extends NavigatorForJourney {
     case SubcontractorNamePage                     => _ => controllers.add.routes.SubAddressYesNoController.onPageLoad(NormalMode)
     case SubAddressYesNoPage                       => userAnswers => navigatorFromSubAddressYesNoPage(NormalMode)(userAnswers)
     case AddressOfSubcontractorPage                =>
-      _ => controllers.add.routes.IndividualChooseContactDetailsController.onPageLoad(NormalMode)
+      _ => controllers.add.routes.IndividualContactMethodOptionsController.onPageLoad(NormalMode)
     case UniqueTaxpayerReferenceYesNoPage          =>
       userAnswers => navigatorFromUniqueTaxpayerReferenceYesNoPage(NormalMode)(userAnswers)
     case SubcontractorsUniqueTaxpayerReferencePage =>
@@ -118,7 +118,7 @@ class IndividualNavigator @Inject() () extends NavigatorForJourney {
       onYes = controllers.add.routes.AddressOfSubcontractorController.redirectToAddressLookup(),
       onYesChange =
         controllers.add.routes.AddressOfSubcontractorController.redirectToAddressLookup(Some(CheckMode.toString)),
-      onNo = controllers.add.routes.IndividualChooseContactDetailsController.onPageLoad(NormalMode),
+      onNo = controllers.add.routes.IndividualContactMethodOptionsController.onPageLoad(NormalMode),
       checkYourAnswers = controllers.add.routes.CheckYourAnswersController.onPageLoad()
     )
 

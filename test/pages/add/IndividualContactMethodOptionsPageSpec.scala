@@ -60,7 +60,8 @@ class IndividualContactMethodOptionsPageSpec extends PageBehaviours {
       }
 
       "must remove IndividualEmailAddressPage and IndividualPhoneNumberPage when only Mobile is selected" in {
-        val updated = userAnswers.set(IndividualContactMethodOptionsPage, Set(ContactMethodOptions.Mobile)).success.value
+        val updated =
+          userAnswers.set(IndividualContactMethodOptionsPage, Set(ContactMethodOptions.Mobile)).success.value
 
         updated.get(IndividualEmailAddressPage) mustBe None
         updated.get(IndividualPhoneNumberPage) mustBe None
@@ -69,7 +70,10 @@ class IndividualContactMethodOptionsPageSpec extends PageBehaviours {
 
       "must remove IndividualMobileNumberPage when Email and Phone are selected" in {
         val updated =
-          userAnswers.set(IndividualContactMethodOptionsPage, Set(ContactMethodOptions.Email, ContactMethodOptions.Phone)).success.value
+          userAnswers
+            .set(IndividualContactMethodOptionsPage, Set(ContactMethodOptions.Email, ContactMethodOptions.Phone))
+            .success
+            .value
 
         updated.get(IndividualEmailAddressPage) mustBe Some("old@email.com")
         updated.get(IndividualPhoneNumberPage) mustBe Some("01234567890")
@@ -78,7 +82,10 @@ class IndividualContactMethodOptionsPageSpec extends PageBehaviours {
 
       "must remove IndividualPhoneNumberPage when Email and Mobile are selected" in {
         val updated =
-          userAnswers.set(IndividualContactMethodOptionsPage, Set(ContactMethodOptions.Email, ContactMethodOptions.Mobile)).success.value
+          userAnswers
+            .set(IndividualContactMethodOptionsPage, Set(ContactMethodOptions.Email, ContactMethodOptions.Mobile))
+            .success
+            .value
 
         updated.get(IndividualEmailAddressPage) mustBe Some("old@email.com")
         updated.get(IndividualPhoneNumberPage) mustBe None
@@ -87,7 +94,10 @@ class IndividualContactMethodOptionsPageSpec extends PageBehaviours {
 
       "must remove IndividualEmailAddressPage when Phone and Mobile are selected" in {
         val updated =
-          userAnswers.set(IndividualContactMethodOptionsPage, Set(ContactMethodOptions.Phone, ContactMethodOptions.Mobile)).success.value
+          userAnswers
+            .set(IndividualContactMethodOptionsPage, Set(ContactMethodOptions.Phone, ContactMethodOptions.Mobile))
+            .success
+            .value
 
         updated.get(IndividualEmailAddressPage) mustBe None
         updated.get(IndividualPhoneNumberPage) mustBe Some("01234567890")
@@ -97,7 +107,10 @@ class IndividualContactMethodOptionsPageSpec extends PageBehaviours {
       "must keep all contact pages when all three methods are selected" in {
         val updated =
           userAnswers
-            .set(IndividualContactMethodOptionsPage, Set(ContactMethodOptions.Email, ContactMethodOptions.Phone, ContactMethodOptions.Mobile))
+            .set(
+              IndividualContactMethodOptionsPage,
+              Set(ContactMethodOptions.Email, ContactMethodOptions.Phone, ContactMethodOptions.Mobile)
+            )
             .success
             .value
 
