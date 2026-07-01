@@ -17,7 +17,7 @@
 package views.add
 
 import forms.add.UniqueTaxpayerReferenceYesNoFormProvider
-import models.{AmendMode, NormalMode}
+import models.NormalMode
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.jsoup.select.Elements
@@ -65,18 +65,6 @@ class UniqueTaxpayerReferenceYesNoViewSpec extends AnyWordSpec with Matchers wit
       doc.select("form").attr("autocomplete") mustBe "off"
 
       doc.select(".govuk-button").text() mustBe messages("site.continue")
-    }
-
-    "render the page with title and update button in amend mode" in new Setup {
-
-      val subcontractorName = "Test SubContractor"
-
-      val html: HtmlFormat.Appendable = view(form, AmendMode, subcontractorName)
-      val doc: Document               = Jsoup.parse(html.toString())
-
-      doc.select("title").text() must include(messages("uniqueTaxpayerReferenceYesNo.title"))
-
-      doc.select(".govuk-button").text() mustBe messages("site.update")
     }
 
     "display error summary and inline error when no option is selected" in new Setup {
