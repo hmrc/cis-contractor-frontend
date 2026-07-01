@@ -37,6 +37,13 @@ class IndividualNavigator @Inject() () extends NavigatorForJourney {
       amendRouteMap(page)(userAnswers)
   }
 
+  private def cyaRoute(mode: Mode): Call = mode match {
+    case AmendMode =>
+      routes.JourneyRecoveryController
+        .onPageLoad() // TODO route to controllers.amend.routes.AmendIndividualCheckYourAnswersController.onPageLoad() when AmendIndividualCheckYourAnswersController added.
+    case _         => controllers.add.routes.CheckYourAnswersController.onPageLoad()
+  }
+
   private val normalRoutes: Page => UserAnswers => Call = {
     case SubTradingNameYesNoPage                   => userAnswers => navigatorFromSubTradingNameYesNoPage(NormalMode)(userAnswers)
     case TradingNameOfSubcontractorPage            => _ => controllers.add.routes.SubAddressYesNoController.onPageLoad(NormalMode)
@@ -87,20 +94,11 @@ class IndividualNavigator @Inject() () extends NavigatorForJourney {
   }
 
   private val amendRouteMap: Page => UserAnswers => Call = {
-//    case IndividualEmailAddressPage =>
-//      _ => controllers.amend.routes.AmendIndividualCheckYourAnswersController.onPageLoad()
+    case SubTradingNameYesNoPage       => navigatorFromSubTradingNameYesNoPage(AmendMode)(_)
+    case WorksReferenceNumberYesNoPage => navigatorFromWorksReferenceNumberYesNoPage(AmendMode)(_)
     case IndividualEmailAddressPage    =>
       _ => controllers.add.routes.CheckYourAnswersController.onPageLoad()
-    case WorksReferenceNumberYesNoPage => navigatorFromWorksReferenceNumberYesNoPage(AmendMode)(_)
     case _                             => _ => cyaRoute(AmendMode)
-  }
-
-  private def cyaRoute(mode: Mode): Call = mode match {
-    case AmendMode =>
-      routes.JourneyRecoveryController
-        .onPageLoad() // TODO: redirect to amend cya page - AmendIndividualCheckYourAnswersController when it's implemented
-    case _         =>
-      controllers.add.routes.CheckYourAnswersController.onPageLoad()
   }
 
   private def navigatorFromSubTradingNameYesNoPage(mode: Mode)(ua: UserAnswers): Call =

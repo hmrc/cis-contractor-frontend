@@ -322,32 +322,30 @@ class IndividualNavigatorSpec extends SpecBase {
 
     "in Amend mode" - {
 
-      "must go from any page to JourneyRecovery" in {
+      "must go from a page that doesn't exist in the edit route map to CheckYourAnswers" in {
+
         case object UnknownPage extends Page
-        navigator.nextPage(UnknownPage, AmendMode, UserAnswers("id")) mustBe journeyRecovery
-      }
-
-      "must go from SubTradingNameYesNoPage to JourneyRecovery" in {
-        navigator.nextPage(SubTradingNameYesNoPage, AmendMode, emptyUserAnswers) mustBe journeyRecovery
-      }
-
-      "must go from IndividualEmailAddressPage to CheckYourAnswersController" in {
         navigator.nextPage(
-          IndividualEmailAddressPage,
+          UnknownPage,
           AmendMode,
-          emptyUserAnswers.setOrException(
-            IndividualEmailAddressPage,
-            "test@test.com"
-          )
-        ) mustBe controllers.add.routes.CheckYourAnswersController.onPageLoad()
+          UserAnswers("id")
+        ) mustBe journeyRecovery // TODO: when CYA page available
       }
 
-      "must go from IndividualEmailAddressPage to CheckYourAnswersController regardless of answers" in {
+      "must go from SubTradingNameYesNoPage to TradingNameOfSubcontractorController when true" in {
         navigator.nextPage(
-          IndividualEmailAddressPage,
+          SubTradingNameYesNoPage,
+          AmendMode,
+          emptyUserAnswers.setOrException(SubTradingNameYesNoPage, true)
+        ) mustBe controllers.add.routes.TradingNameOfSubcontractorController.onPageLoad(AmendMode)
+      }
+
+      "must go from SubTradingNameYesNoPage to journey recovery page when incomplete info provided" in {
+        navigator.nextPage(
+          SubTradingNameYesNoPage,
           AmendMode,
           emptyUserAnswers
-        ) mustBe controllers.add.routes.CheckYourAnswersController.onPageLoad()
+        ) mustBe journeyRecovery // TODO: when CYA page available
       }
 
       "must go from WorksReferenceNumberYesNoPage to WorksReferenceNumberPage when true and no work reference number exists" in {
@@ -382,7 +380,7 @@ class IndividualNavigatorSpec extends SpecBase {
           WorksReferenceNumberYesNoPage,
           AmendMode,
           ua
-        ) mustBe journeyRecovery
+        ) mustBe journeyRecovery // TODO: this needs to be redirected to amend individual cya page, AmendIndividualCheckYourAnswersController when it's implemented
       }
 
       "must go from WorksReferenceNumberYesNoPage to JourneyRecovery when answer is missing" in {
@@ -399,6 +397,25 @@ class IndividualNavigatorSpec extends SpecBase {
           AmendMode,
           UserAnswers("id")
         ) mustBe journeyRecovery // TODO: this needs to be redirected to amend individual cya page, AmendIndividualCheckYourAnswersController when it's implemented
+      }
+
+      "must go from IndividualEmailAddressPage to CheckYourAnswersController" in {
+        navigator.nextPage(
+          IndividualEmailAddressPage,
+          AmendMode,
+          emptyUserAnswers.setOrException(
+            IndividualEmailAddressPage,
+            "test@test.com"
+          )
+        ) mustBe controllers.add.routes.CheckYourAnswersController.onPageLoad()
+      }
+
+      "must go from IndividualEmailAddressPage to CheckYourAnswersController regardless of answers" in {
+        navigator.nextPage(
+          IndividualEmailAddressPage,
+          AmendMode,
+          emptyUserAnswers
+        ) mustBe controllers.add.routes.CheckYourAnswersController.onPageLoad()
       }
     }
 
@@ -791,8 +808,6 @@ class IndividualNavigatorSpec extends SpecBase {
         }
       }
     }
-
-    "in Amend mode" - {}
 
     "navigatorFromSubTradingNameYesNoPage in NormalMode" - {
 
