@@ -34,7 +34,14 @@ class IndividualNavigator @Inject() () extends NavigatorForJourney {
     case CheckMode  =>
       checkRouteMap(page)(userAnswers)
     case AmendMode  =>
-      routes.JourneyRecoveryController.onPageLoad()
+      amendRouteMap(page)(userAnswers)
+  }
+
+  private def cyaRoute(mode: Mode): Call = mode match {
+    case AmendMode =>
+      routes.JourneyRecoveryController
+        .onPageLoad() // TODO route to controllers.amend.routes.AmendIndividualCheckYourAnswersController.onPageLoad() when AmendIndividualCheckYourAnswersController added.
+    case _         => controllers.add.routes.CheckYourAnswersController.onPageLoad()
   }
 
   private val normalRoutes: Page => UserAnswers => Call = {
@@ -86,6 +93,13 @@ class IndividualNavigator @Inject() () extends NavigatorForJourney {
     case _                                    => _ => controllers.add.routes.CheckYourAnswersController.onPageLoad()
   }
 
+  private val amendRouteMap: Page => UserAnswers => Call = {
+    case SubTradingNameYesNoPage    => navigatorFromSubTradingNameYesNoPage(AmendMode)(_)
+    case IndividualEmailAddressPage =>
+      _ => controllers.add.routes.CheckYourAnswersController.onPageLoad()
+    case _                          => _ => cyaRoute(AmendMode)
+  }
+
   private def navigatorFromSubTradingNameYesNoPage(mode: Mode)(ua: UserAnswers): Call =
     (ua.get(SubTradingNameYesNoPage), mode) match {
       case (Some(true), NormalMode) =>
@@ -94,16 +108,16 @@ class IndividualNavigator @Inject() () extends NavigatorForJourney {
       case (Some(false), NormalMode) =>
         controllers.add.routes.SubcontractorNameController.onPageLoad(NormalMode)
 
-      case (Some(false), CheckMode) =>
+      case (Some(false), CheckMode | AmendMode) =>
         ua.get(SubcontractorNamePage) match {
-          case None    => controllers.add.routes.SubcontractorNameController.onPageLoad(CheckMode)
-          case Some(_) => controllers.add.routes.CheckYourAnswersController.onPageLoad()
+          case None    => controllers.add.routes.SubcontractorNameController.onPageLoad(mode)
+          case Some(_) => cyaRoute(mode)
         }
 
-      case (Some(true), CheckMode) =>
+      case (Some(true), CheckMode | AmendMode) =>
         ua.get(TradingNameOfSubcontractorPage) match {
-          case None    => controllers.add.routes.TradingNameOfSubcontractorController.onPageLoad(CheckMode)
-          case Some(_) => controllers.add.routes.CheckYourAnswersController.onPageLoad()
+          case None    => controllers.add.routes.TradingNameOfSubcontractorController.onPageLoad(mode)
+          case Some(_) => cyaRoute(mode)
         }
 
       case _ =>
