@@ -1078,8 +1078,8 @@ contractordetails.contractorDetailsCheckAnswers.table.email.hidden             =
 contractordetails.contractorDetailsCheckAnswers.table.link.addDetails          =  Add details
 contractordetails.contractorDetailsCheckAnswers.returnToCisDashboard.link      =  Return to CIS dashboard
 
-removeSchemeNameYesNo.title = removeSchemeNameYesNo
-removeSchemeNameYesNo.heading = removeSchemeNameYesNo
-removeSchemeNameYesNo.checkYourAnswersLabel = removeSchemeNameYesNo
-removeSchemeNameYesNo.error.required = Select yes if removeSchemeNameYesNo
-removeSchemeNameYesNo.change.hidden = RemoveSchemeNameYesNo
+contractordetails.removeSchemeNameYesNo.title = Are you sure you want to remove the contractor’s scheme name?
+contractordetails.removeSchemeNameYesNo.heading = Are you sure you want to remove the contractor’s scheme name?
+contractordetails.removeSchemeNameYesNo.checkYourAnswersLabel = Remove scheme name
+contractordetails.removeSchemeNameYesNo.error.required = Select yes to remove the contractor’s scheme name
+contractordetails.removeSchemeNameYesNo.change.hidden = Remove scheme name

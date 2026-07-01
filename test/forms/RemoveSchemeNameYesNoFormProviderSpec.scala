@@ -1,6 +1,7 @@
 package forms
 
 import forms.behaviours.BooleanFieldBehaviours
+import forms.contractordetails.RemoveSchemeNameYesNoFormProvider
 import play.api.data.FormError
 
 class RemoveSchemeNameYesNoFormProviderSpec extends BooleanFieldBehaviours {
