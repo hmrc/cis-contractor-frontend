@@ -347,6 +347,24 @@ class IndividualNavigatorSpec extends SpecBase {
           emptyUserAnswers
         ) mustBe journeyRecovery // TODO: when CYA page available
       }
+      "must go from IndividualEmailAddressPage to CheckYourAnswersController" in {
+        navigator.nextPage(
+          IndividualEmailAddressPage,
+          AmendMode,
+          emptyUserAnswers.setOrException(
+            IndividualEmailAddressPage,
+            "test@test.com"
+          )
+        ) mustBe controllers.add.routes.CheckYourAnswersController.onPageLoad()
+      }
+
+      "must go from IndividualEmailAddressPage to CheckYourAnswersController regardless of answers" in {
+        navigator.nextPage(
+          IndividualEmailAddressPage,
+          AmendMode,
+          emptyUserAnswers
+        ) mustBe controllers.add.routes.CheckYourAnswersController.onPageLoad()
+      }
     }
 
     "in Check mode" - {
@@ -735,31 +753,6 @@ class IndividualNavigatorSpec extends SpecBase {
             CheckMode,
             emptyUserAnswers
           ) mustBe journeyRecovery
-        }
-      }
-    }
-
-    "in Amend mode" - {
-
-      "in Amend mode" - {
-
-        "must go from IndividualEmailAddressPage to CheckYourAnswersController" in {
-          navigator.nextPage(
-            IndividualEmailAddressPage,
-            AmendMode,
-            emptyUserAnswers.setOrException(
-              IndividualEmailAddressPage,
-              "test@test.com"
-            )
-          ) mustBe controllers.add.routes.CheckYourAnswersController.onPageLoad()
-        }
-
-        "must go from IndividualEmailAddressPage to CheckYourAnswersController regardless of answers" in {
-          navigator.nextPage(
-            IndividualEmailAddressPage,
-            AmendMode,
-            emptyUserAnswers
-          ) mustBe controllers.add.routes.CheckYourAnswersController.onPageLoad()
         }
       }
     }

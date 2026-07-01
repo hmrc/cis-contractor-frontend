@@ -95,6 +95,8 @@ class IndividualNavigator @Inject() () extends NavigatorForJourney {
 
   private val amendRouteMap: Page => UserAnswers => Call = {
     case SubTradingNameYesNoPage    => navigatorFromSubTradingNameYesNoPage(AmendMode)(_)
+    case IndividualPhoneNumberPage  =>
+      _ => cyaRoute(AmendMode)
     case IndividualEmailAddressPage =>
       _ => controllers.add.routes.CheckYourAnswersController.onPageLoad()
     case _                          => _ => cyaRoute(AmendMode)
@@ -243,8 +245,8 @@ class IndividualNavigator @Inject() () extends NavigatorForJourney {
       case (Some(false), NormalMode) =>
         controllers.add.routes.UniqueTaxpayerReferenceYesNoController.onPageLoad(NormalMode)
 
-      case (Some(false), CheckMode) =>
-        controllers.add.routes.CheckYourAnswersController.onPageLoad()
+      case (Some(false), CheckMode | AmendMode) =>
+        cyaRoute(mode)
 
       case _ =>
         routes.JourneyRecoveryController.onPageLoad()

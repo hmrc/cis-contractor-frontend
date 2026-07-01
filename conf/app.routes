@@ -53,9 +53,6 @@ POST  /subcontractor/amend/check-contact-details  controllers.add.IndividualChoo
 GET   /subcontractor/amend/email-address  controllers.add.IndividualEmailAddressController.onPageLoad(mode: Mode = AmendMode)
 POST  /subcontractor/amend/email-address  controllers.add.IndividualEmailAddressController.onSubmit(mode: Mode = AmendMode)
 
-GET   /subcontractor/amend/phone-number  controllers.add.IndividualPhoneNumberController.onPageLoad(mode: Mode = AmendMode)
-POST  /subcontractor/amend/phone-number  controllers.add.IndividualPhoneNumberController.onSubmit(mode: Mode = AmendMode)
-
 GET   /subcontractor/amend/mobile-number  controllers.add.IndividualMobileNumberController.onPageLoad(mode: Mode = AmendMode)
 POST  /subcontractor/amend/mobile-number  controllers.add.IndividualMobileNumberController.onSubmit(mode: Mode = AmendMode)
 
@@ -153,6 +150,8 @@ GET   /subcontractor/add/phone-number         controllers.add.IndividualPhoneNum
 POST  /subcontractor/add/phone-number         controllers.add.IndividualPhoneNumberController.onSubmit(mode: Mode = NormalMode)
 GET   /subcontractor/add/change-phone-number  controllers.add.IndividualPhoneNumberController.onPageLoad(mode: Mode = CheckMode)
 POST  /subcontractor/add/change-phone-number  controllers.add.IndividualPhoneNumberController.onSubmit(mode: Mode = CheckMode)
+GET   /subcontractor/amend/phone-number       controllers.add.IndividualPhoneNumberController.onPageLoad(mode: Mode = AmendMode)
+POST  /subcontractor/amend/phone-number       controllers.add.IndividualPhoneNumberController.onSubmit(mode: Mode = AmendMode)
 
 GET   /subcontractor/add/email-address         controllers.add.IndividualEmailAddressController.onPageLoad(mode: Mode = NormalMode)
 POST  /subcontractor/add/email-address         controllers.add.IndividualEmailAddressController.onSubmit(mode: Mode = NormalMode)
