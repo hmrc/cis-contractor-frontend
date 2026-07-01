@@ -94,17 +94,17 @@ class IndividualNavigator @Inject() () extends NavigatorForJourney {
   }
 
   private val amendRouteMap: Page => UserAnswers => Call = {
-    case SubTradingNameYesNoPage          => navigatorFromSubTradingNameYesNoPage(AmendMode)(_)
-    case UniqueTaxpayerReferenceYesNoPage => navigatorFromUniqueTaxpayerReferenceYesNoPage(AmendMode)(_)
-    case WorksReferenceNumberYesNoPage    => navigatorFromWorksReferenceNumberYesNoPage(AmendMode)(_)
-    case IndividualPhoneNumberPage        =>
+    case SubTradingNameYesNoPage              => navigatorFromSubTradingNameYesNoPage(AmendMode)(_)
+    case UniqueTaxpayerReferenceYesNoPage     => navigatorFromUniqueTaxpayerReferenceYesNoPage(AmendMode)(_)
+    case WorksReferenceNumberYesNoPage        => navigatorFromWorksReferenceNumberYesNoPage(AmendMode)(_)
+    case IndividualPhoneNumberPage            =>
       _ => cyaRoute(AmendMode)
-    case IndividualEmailAddressPage       =>
+    case IndividualEmailAddressPage           =>
       _ => controllers.add.routes.CheckYourAnswersController.onPageLoad()
-    case IndividualMobileNumberPage       =>
+    case IndividualMobileNumberPage           =>
       _ => cyaRoute(AmendMode)
     case AddIndividualContactMethodsYesNoPage => navigatorFromAddIndividualContactMethodsYesNoPage(AmendMode)(_)
-    case _                                => _ => cyaRoute(AmendMode)
+    case _                                    => _ => cyaRoute(AmendMode)
   }
 
   private def navigatorFromSubTradingNameYesNoPage(mode: Mode)(ua: UserAnswers): Call =
