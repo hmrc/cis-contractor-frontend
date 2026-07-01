@@ -16,6 +16,7 @@
 
 @import viewmodels.InputWidth._
 @import viewmodels.LabelSize.Large
+@import models.AmendMode
 
 @this(
     layout: templates.Layout,
@@ -49,7 +50,10 @@
         )
 
         @govukButton(
-            ButtonViewModel(messages("site.continue"))
+            ButtonViewModel(
+                if (mode == AmendMode) messages("site.update")
+                else messages("site.continue")
+            )
         )
     }
 }
