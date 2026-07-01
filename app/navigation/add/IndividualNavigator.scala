@@ -100,6 +100,8 @@ class IndividualNavigator @Inject() () extends NavigatorForJourney {
       _ => cyaRoute(AmendMode)
     case IndividualEmailAddressPage    =>
       _ => controllers.add.routes.CheckYourAnswersController.onPageLoad()
+    case IndividualMobileNumberPage    =>
+      _ => cyaRoute(AmendMode)
     case _                             => _ => cyaRoute(AmendMode)
   }
 

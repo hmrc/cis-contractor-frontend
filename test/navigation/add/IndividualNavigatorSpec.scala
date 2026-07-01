@@ -409,6 +409,14 @@ class IndividualNavigatorSpec extends SpecBase {
           emptyUserAnswers
         ) mustBe controllers.add.routes.CheckYourAnswersController.onPageLoad()
       }
+
+      "must go from IndividualMobileNumberPage to CheckYourAnswersController" in {
+        navigator.nextPage(
+          IndividualMobileNumberPage,
+          AmendMode,
+          emptyUserAnswers
+        ) mustBe journeyRecovery // TODO: when CYA page available
+      }
     }
 
     "in Check mode" - {
