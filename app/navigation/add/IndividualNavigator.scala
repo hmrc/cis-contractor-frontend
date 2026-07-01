@@ -37,6 +37,13 @@ class IndividualNavigator @Inject() () extends NavigatorForJourney {
       amendRouteMap(page)(userAnswers)
   }
 
+  private def cyaRoute(mode: Mode): Call = mode match {
+    case AmendMode =>
+      routes.JourneyRecoveryController
+        .onPageLoad() // TODO route to controllers.amend.routes.AmendIndividualCheckYourAnswersController.onPageLoad() when AmendIndividualCheckYourAnswersController added.
+    case _         => controllers.add.routes.CheckYourAnswersController.onPageLoad()
+  }
+
   private val normalRoutes: Page => UserAnswers => Call = {
     case SubTradingNameYesNoPage                   => userAnswers => navigatorFromSubTradingNameYesNoPage(NormalMode)(userAnswers)
     case TradingNameOfSubcontractorPage            => _ => controllers.add.routes.SubAddressYesNoController.onPageLoad(NormalMode)
@@ -87,20 +94,13 @@ class IndividualNavigator @Inject() () extends NavigatorForJourney {
   }
 
   private val amendRouteMap: Page => UserAnswers => Call = {
-//    case IndividualEmailAddressPage =>
-//      _ => controllers.amend.routes.AmendIndividualCheckYourAnswersController.onPageLoad()
-    case IndividualEmailAddressPage =>
+    case SubTradingNameYesNoPage       => navigatorFromSubTradingNameYesNoPage(AmendMode)(_)
+    case WorksReferenceNumberYesNoPage => navigatorFromWorksReferenceNumberYesNoPage(AmendMode)(_)
+    case IndividualPhoneNumberPage     =>
+      _ => cyaRoute(AmendMode)
+    case IndividualEmailAddressPage    =>
       _ => controllers.add.routes.CheckYourAnswersController.onPageLoad()
-    case SubTradingNameYesNoPage    => navigatorFromSubTradingNameYesNoPage(AmendMode)(_)
-    case _                          => _ => cyaRoute(AmendMode)
-  }
-
-  private def cyaRoute(mode: Mode): Call = mode match {
-    case AmendMode =>
-      routes.JourneyRecoveryController
-        .onPageLoad() // TODO: redirect to amend cya page - AmendIndividualCheckYourAnswersController when it's implemented
-    case _         =>
-      controllers.add.routes.CheckYourAnswersController.onPageLoad()
+    case _                             => _ => cyaRoute(AmendMode)
   }
 
   private def navigatorFromSubTradingNameYesNoPage(mode: Mode)(ua: UserAnswers): Call =
@@ -186,14 +186,15 @@ class IndividualNavigator @Inject() () extends NavigatorForJourney {
 
       case (Some(false), NormalMode) =>
         controllers.add.routes.CheckYourAnswersController.onPageLoad()
-      case (Some(true), CheckMode)   =>
+
+      case (Some(true), CheckMode | AmendMode) =>
         ua.get(WorksReferenceNumberPage)
-          .fold(controllers.add.routes.WorksReferenceNumberController.onPageLoad(CheckMode)) { _ =>
-            controllers.add.routes.CheckYourAnswersController.onPageLoad()
+          .fold(controllers.add.routes.WorksReferenceNumberController.onPageLoad(mode)) { _ =>
+            cyaRoute(mode)
           }
 
-      case (Some(false), CheckMode) =>
-        controllers.add.routes.CheckYourAnswersController.onPageLoad()
+      case (Some(false), CheckMode | AmendMode) =>
+        cyaRoute(mode)
 
       case _ =>
         routes.JourneyRecoveryController.onPageLoad()
@@ -246,8 +247,8 @@ class IndividualNavigator @Inject() () extends NavigatorForJourney {
       case (Some(false), NormalMode) =>
         controllers.add.routes.UniqueTaxpayerReferenceYesNoController.onPageLoad(NormalMode)
 
-      case (Some(false), CheckMode) =>
-        controllers.add.routes.CheckYourAnswersController.onPageLoad()
+      case (Some(false), CheckMode | AmendMode) =>
+        cyaRoute(mode)
 
       case _ =>
         routes.JourneyRecoveryController.onPageLoad()
