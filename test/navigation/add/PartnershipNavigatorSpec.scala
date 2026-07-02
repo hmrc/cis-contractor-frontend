@@ -345,6 +345,18 @@ class PartnershipNavigatorSpec extends SpecBase {
           ) mustBe journeyRecovery
         }
 
+        "to JourneyRecoveryPage when Email is not in the selected PartnershipContactMethodOptions" in {
+          navigator.nextPage(
+            PartnershipEmailAddressPage,
+            NormalMode,
+            emptyUserAnswers
+              .setOrException(
+                PartnershipContactMethodOptionsPage,
+                Set(ContactMethodOptions.Phone, ContactMethodOptions.Mobile)
+              )
+          ) mustBe journeyRecovery
+        }
+
       }
 
       "must go from PartnershipPhoneNumberPage" - {
@@ -381,6 +393,18 @@ class PartnershipNavigatorSpec extends SpecBase {
             UserAnswers("id")
           ) mustBe journeyRecovery
         }
+
+        "to JourneyRecoveryPage when Phone is not in the selected PartnershipContactMethodOptions" in {
+          navigator.nextPage(
+            PartnershipPhoneNumberPage,
+            NormalMode,
+            emptyUserAnswers
+              .setOrException(
+                PartnershipContactMethodOptionsPage,
+                Set(ContactMethodOptions.Email, ContactMethodOptions.Mobile)
+              )
+          ) mustBe journeyRecovery
+        }
       }
 
       "must go from PartnershipMobileNumberPage" - {
@@ -402,6 +426,18 @@ class PartnershipNavigatorSpec extends SpecBase {
             PartnershipMobileNumberPage,
             NormalMode,
             UserAnswers("id")
+          ) mustBe journeyRecovery
+        }
+
+        "to JourneyRecoveryPage when Mobile is not in the selected PartnershipContactMethodOptions" in {
+          navigator.nextPage(
+            PartnershipMobileNumberPage,
+            NormalMode,
+            emptyUserAnswers
+              .setOrException(
+                PartnershipContactMethodOptionsPage,
+                Set(ContactMethodOptions.Email, ContactMethodOptions.Phone)
+              )
           ) mustBe journeyRecovery
         }
       }
@@ -1092,6 +1128,22 @@ class PartnershipNavigatorSpec extends SpecBase {
           ) mustBe controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
         }
 
+        "to CYA when only Mobile is selected and Mobile answer exists" in {
+          val answers = emptyUserAnswers
+            .set(PartnershipContactMethodOptionsPage, Set(ContactMethodOptions.Mobile))
+            .success
+            .value
+            .set(PartnershipMobileNumberPage, "01234567890")
+            .success
+            .value
+
+          navigator.nextPage(
+            PartnershipContactMethodOptionsPage,
+            CheckMode,
+            answers
+          ) mustBe controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
+        }
+
         "to PartnershipPhoneNumberPage when Email and Phone are selected and Email answer exists, Phone answer not exists" in {
           val answers = emptyUserAnswers
             .set(PartnershipContactMethodOptionsPage, Set(ContactMethodOptions.Email, ContactMethodOptions.Phone))
@@ -1191,6 +1243,18 @@ class PartnershipNavigatorSpec extends SpecBase {
             UserAnswers("id")
           ) mustBe journeyRecovery
         }
+
+        "to JourneyRecovery when Email is not in the selected PartnershipContactMethodOptions" in {
+          navigator.nextPage(
+            PartnershipEmailAddressPage,
+            CheckMode,
+            emptyUserAnswers
+              .setOrException(
+                PartnershipContactMethodOptionsPage,
+                Set(ContactMethodOptions.Phone, ContactMethodOptions.Mobile)
+              )
+          ) mustBe journeyRecovery
+        }
       }
 
       "must go from PartnershipPhoneNumberPage" - {
@@ -1231,6 +1295,18 @@ class PartnershipNavigatorSpec extends SpecBase {
             UserAnswers("id")
           ) mustBe journeyRecovery
         }
+
+        "to JourneyRecovery when Phone is not in the selected PartnershipContactMethodOptions" in {
+          navigator.nextPage(
+            PartnershipPhoneNumberPage,
+            CheckMode,
+            emptyUserAnswers
+              .setOrException(
+                PartnershipContactMethodOptionsPage,
+                Set(ContactMethodOptions.Email, ContactMethodOptions.Mobile)
+              )
+          ) mustBe journeyRecovery
+        }
       }
 
       "must go from PartnershipMobileNumberPage" - {
@@ -1255,6 +1331,18 @@ class PartnershipNavigatorSpec extends SpecBase {
             PartnershipMobileNumberPage,
             CheckMode,
             UserAnswers("id")
+          ) mustBe journeyRecovery
+        }
+
+        "to JourneyRecovery when Mobile is not in the selected PartnershipContactMethodOptions" in {
+          navigator.nextPage(
+            PartnershipMobileNumberPage,
+            CheckMode,
+            emptyUserAnswers
+              .setOrException(
+                PartnershipContactMethodOptionsPage,
+                Set(ContactMethodOptions.Email, ContactMethodOptions.Phone)
+              )
           ) mustBe journeyRecovery
         }
       }
