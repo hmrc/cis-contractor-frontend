@@ -14,14 +14,17 @@
  * limitations under the License.
  */
 
-package pages.contractordetails
+package forms.contractordetails
 
-import pages.QuestionPage
-import play.api.libs.json.JsPath
+import forms.mappings.Mappings
+import play.api.data.Form
 
-case object EnterContractorEmailAddressPage extends QuestionPage[String] with ContractorDetailsJourney {
+import javax.inject.Inject
 
-  override def path: JsPath = JsPath \ "contractordetails" \ toString
+class AddEmailAddressYesNoFormProvider @Inject() extends Mappings {
 
-  override def toString: String = "enterContractorEmailAddress"
+  def apply(): Form[Boolean] =
+    Form(
+      "value" -> boolean("contractordetails.addEmailAddressYesNo.error.required")
+    )
 }
