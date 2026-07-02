@@ -322,19 +322,101 @@ class IndividualNavigatorSpec extends SpecBase {
 
     "in Amend mode" - {
 
-      "must go from any page to JourneyRecovery" in {
+      "must go from a page that doesn't exist in the edit route map to CheckYourAnswers" in {
+
         case object UnknownPage extends Page
-        navigator.nextPage(UnknownPage, AmendMode, UserAnswers("id")) mustBe journeyRecovery
+        navigator.nextPage(
+          UnknownPage,
+          AmendMode,
+          UserAnswers("id")
+        ) mustBe journeyRecovery // TODO: when CYA page available
       }
 
-      // TODO: when available to AmendMode
-//        "must go from a NationalInsuranceNumberYesNoPage to next page when true" in {
-//          navigator.nextPage(
-//            NationalInsuranceNumberYesNoPage,
-//            AmendMode,
-//            emptyUserAnswers.setOrException(NationalInsuranceNumberYesNoPage, true)
-//          ) mustBe controllers.add.routes.SubNationalInsuranceNumberController.onPageLoad(AmendMode)
-//        }
+      "must go from SubTradingNameYesNoPage to TradingNameOfSubcontractorController when true" in {
+        navigator.nextPage(
+          SubTradingNameYesNoPage,
+          AmendMode,
+          emptyUserAnswers.setOrException(SubTradingNameYesNoPage, true)
+        ) mustBe controllers.add.routes.TradingNameOfSubcontractorController.onPageLoad(AmendMode)
+      }
+
+      "must go from SubTradingNameYesNoPage to journey recovery page when incomplete info provided" in {
+        navigator.nextPage(
+          SubTradingNameYesNoPage,
+          AmendMode,
+          emptyUserAnswers
+        ) mustBe journeyRecovery // TODO: when CYA page available
+      }
+
+      "must go from WorksReferenceNumberYesNoPage to WorksReferenceNumberPage when true and no work reference number exists" in {
+        val ua =
+          emptyUserAnswers.setOrException(WorksReferenceNumberYesNoPage, true)
+
+        navigator.nextPage(
+          WorksReferenceNumberYesNoPage,
+          AmendMode,
+          ua
+        ) mustBe controllers.add.routes.WorksReferenceNumberController.onPageLoad(AmendMode)
+      }
+
+      "must go from WorksReferenceNumberYesNoPage to amend CYA page when true and work reference number already exists" in {
+        val ua =
+          emptyUserAnswers
+            .setOrException(WorksReferenceNumberYesNoPage, true)
+            .setOrException(WorksReferenceNumberPage, "wrn-1")
+
+        navigator.nextPage(
+          WorksReferenceNumberYesNoPage,
+          AmendMode,
+          ua
+        ) mustBe journeyRecovery // TODO: redirect to amend cya page when implemented
+      }
+
+      "must go from WorksReferenceNumberYesNoPage to amend CYA page when false" in {
+        val ua =
+          emptyUserAnswers.setOrException(WorksReferenceNumberYesNoPage, false)
+
+        navigator.nextPage(
+          WorksReferenceNumberYesNoPage,
+          AmendMode,
+          ua
+        ) mustBe journeyRecovery // TODO: redirect to amend cya page when implemented
+      }
+
+      "must go from WorksReferenceNumberYesNoPage to JourneyRecovery when answer is missing" in {
+        navigator.nextPage(
+          WorksReferenceNumberYesNoPage,
+          AmendMode,
+          emptyUserAnswers
+        ) mustBe journeyRecovery
+      }
+
+      "must go from IndividualEmailAddressPage to CheckYourAnswersController" in {
+        navigator.nextPage(
+          IndividualEmailAddressPage,
+          AmendMode,
+          emptyUserAnswers.setOrException(
+            IndividualEmailAddressPage,
+            "test@test.com"
+          )
+        ) mustBe controllers.add.routes.CheckYourAnswersController.onPageLoad()
+      }
+
+      "must go from IndividualEmailAddressPage to CheckYourAnswersController regardless of answers" in {
+        navigator.nextPage(
+          IndividualEmailAddressPage,
+          AmendMode,
+          emptyUserAnswers
+        ) mustBe controllers.add.routes.CheckYourAnswersController.onPageLoad()
+      }
+
+      "must go from IndividualMobileNumberPage to CheckYourAnswersController" in {
+        navigator.nextPage(
+          IndividualMobileNumberPage,
+          AmendMode,
+          emptyUserAnswers
+        ) mustBe journeyRecovery // TODO: when CYA page available
+      }
 
       "must go from a NationalInsuranceNumberYesNoPage to CYA page when false" in {
         navigator.nextPage(
@@ -347,6 +429,49 @@ class IndividualNavigatorSpec extends SpecBase {
       "must go from a NationalInsuranceNumberYesNoPage to journey recovery page when incomplete info provided" in {
         navigator.nextPage(
           NationalInsuranceNumberYesNoPage,
+          AmendMode,
+          emptyUserAnswers
+        ) mustBe journeyRecovery
+
+      }
+      "must go from UniqueTaxpayerReferenceYesNoPage to SubcontractorsUniqueTaxpayerReferencePage when true and no utr exists" in {
+        val ua =
+          emptyUserAnswers.setOrException(UniqueTaxpayerReferenceYesNoPage, true)
+
+        navigator.nextPage(
+          UniqueTaxpayerReferenceYesNoPage,
+          AmendMode,
+          ua
+        ) mustBe controllers.add.routes.SubcontractorsUniqueTaxpayerReferenceController.onPageLoad(AmendMode)
+      }
+
+      "must go from UniqueTaxpayerReferenceYesNoPage to JourneyRecovery when true and utr already exists" in {
+        val ua =
+          emptyUserAnswers
+            .setOrException(UniqueTaxpayerReferenceYesNoPage, true)
+            .setOrException(SubcontractorsUniqueTaxpayerReferencePage, "utr-1")
+
+        navigator.nextPage(
+          UniqueTaxpayerReferenceYesNoPage,
+          AmendMode,
+          ua
+        ) mustBe journeyRecovery // TODO: when CYA page available
+      }
+
+      "must go from UniqueTaxpayerReferenceYesNoPage to JourneyRecovery when false" in {
+        val ua =
+          emptyUserAnswers.setOrException(UniqueTaxpayerReferenceYesNoPage, false)
+
+        navigator.nextPage(
+          UniqueTaxpayerReferenceYesNoPage,
+          AmendMode,
+          ua
+        ) mustBe journeyRecovery // TODO: when CYA page available
+      }
+
+      "must go from UniqueTaxpayerReferenceYesNoPage to JourneyRecovery when answer is missing" in {
+        navigator.nextPage(
+          UniqueTaxpayerReferenceYesNoPage,
           AmendMode,
           emptyUserAnswers
         ) mustBe journeyRecovery
@@ -764,71 +889,70 @@ class IndividualNavigatorSpec extends SpecBase {
         navigator.nextPage(SubTradingNameYesNoPage, NormalMode, emptyUserAnswers) mustBe
           routes.JourneyRecoveryController.onPageLoad()
       }
+    }
 
-      "must go from SubAddressYesNoPage to CYA when true and AddressOfSubcontractorPage is already answered" in {
-        val addressSample = models.address.Address(
-          addressLine1 = "10 Example Street",
-          addressLine2 = Some("Suite 2"),
-          addressLine3 = Some("Newcastle"),
-          addressLine4 = Some("Tyne & Wear"),
-          postcode = Some("NE1 1AA"),
-          country = Some(models.address.Country(Some("GB"), Some("United Kingdom")))
-        )
+    "must go from SubAddressYesNoPage to CYA when true and AddressOfSubcontractorPage is already answered" in {
+      val addressSample = models.address.Address(
+        addressLine1 = "10 Example Street",
+        addressLine2 = Some("Suite 2"),
+        addressLine3 = Some("Newcastle"),
+        addressLine4 = Some("Tyne & Wear"),
+        postcode = Some("NE1 1AA"),
+        country = Some(models.address.Country(Some("GB"), Some("United Kingdom")))
+      )
 
-        val ua     =
-          emptyUserAnswers
-            .set(SubAddressYesNoPage, true)
-            .success
-            .value
-            .set(AddressOfSubcontractorPage, addressSample)
-            .success
-            .value
-        val result = navigator.nextPage(SubAddressYesNoPage, CheckMode, ua)
-        result mustBe CYA
-      }
+      val ua     =
+        emptyUserAnswers
+          .set(SubAddressYesNoPage, true)
+          .success
+          .value
+          .set(AddressOfSubcontractorPage, addressSample)
+          .success
+          .value
+      val result = navigator.nextPage(SubAddressYesNoPage, CheckMode, ua)
+      result mustBe CYA
+    }
 
-      "must go from NationalInsuranceNumberYesNoPage to CYA when true and SubNationalInsuranceNumberPage is already answered" in {
-        val ua =
-          emptyUserAnswers
-            .set(NationalInsuranceNumberYesNoPage, true)
-            .success
-            .value
-            .set(SubNationalInsuranceNumberPage, "AB123456C")
-            .success
-            .value // sample valid NINO
+    "must go from NationalInsuranceNumberYesNoPage to CYA when true and SubNationalInsuranceNumberPage is already answered" in {
+      val ua =
+        emptyUserAnswers
+          .set(NationalInsuranceNumberYesNoPage, true)
+          .success
+          .value
+          .set(SubNationalInsuranceNumberPage, "AB123456C")
+          .success
+          .value // sample valid NINO
 
-        val result = navigator.nextPage(NationalInsuranceNumberYesNoPage, CheckMode, ua)
-        result mustBe CYA
-      }
+      val result = navigator.nextPage(NationalInsuranceNumberYesNoPage, CheckMode, ua)
+      result mustBe CYA
+    }
 
-      "must go from UniqueTaxpayerReferenceYesNoPage to CYA when true and SubcontractorsUniqueTaxpayerReferencePage is already answered" in {
-        val ua =
-          emptyUserAnswers
-            .set(UniqueTaxpayerReferenceYesNoPage, true)
-            .success
-            .value
-            .set(SubcontractorsUniqueTaxpayerReferencePage, "1234567890")
-            .success
-            .value
+    "must go from UniqueTaxpayerReferenceYesNoPage to CYA when true and SubcontractorsUniqueTaxpayerReferencePage is already answered" in {
+      val ua =
+        emptyUserAnswers
+          .set(UniqueTaxpayerReferenceYesNoPage, true)
+          .success
+          .value
+          .set(SubcontractorsUniqueTaxpayerReferencePage, "1234567890")
+          .success
+          .value
 
-        val result = navigator.nextPage(UniqueTaxpayerReferenceYesNoPage, CheckMode, ua)
-        result mustBe CYA
-      }
+      val result = navigator.nextPage(UniqueTaxpayerReferenceYesNoPage, CheckMode, ua)
+      result mustBe CYA
+    }
 
-      "must go from WorksReferenceNumberYesNoPage to CYA when true and WorksReferenceNumberPage is already answered" in {
-        val ua =
-          emptyUserAnswers
-            .set(WorksReferenceNumberYesNoPage, true)
-            .success
-            .value
-            .set(WorksReferenceNumberPage, "WRN-001")
-            .success
-            .value // sample WRN
+    "must go from WorksReferenceNumberYesNoPage to CYA when true and WorksReferenceNumberPage is already answered" in {
+      val ua =
+        emptyUserAnswers
+          .set(WorksReferenceNumberYesNoPage, true)
+          .success
+          .value
+          .set(WorksReferenceNumberPage, "WRN-001")
+          .success
+          .value // sample WRN
 
-        val result = navigator.nextPage(WorksReferenceNumberYesNoPage, CheckMode, ua)
-        result mustBe CYA
-      }
-
+      val result = navigator.nextPage(WorksReferenceNumberYesNoPage, CheckMode, ua)
+      result mustBe CYA
     }
 
   }

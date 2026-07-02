@@ -18,16 +18,17 @@ package pages.add.partnership
 
 import models.UserAnswers
 import models.add.partnership.PartnershipContactMethodOptions
-import models.contact.ContactMethodOptions
 import models.contact.ContactMethodOptions.{Email, Mobile, Phone}
 import pages.QuestionPage
+import pages.add.ContactMethodOptionsCleanup
 import play.api.libs.json.JsPath
 
-import scala.util.{Success, Try}
+import scala.util.Try
 
 case object PartnershipContactMethodOptionsPage
     extends QuestionPage[Set[PartnershipContactMethodOptions]]
-    with PartnershipJourney {
+    with PartnershipJourney
+    with ContactMethodOptionsCleanup {
 
   override def path: JsPath = JsPath \ toString
 
@@ -45,17 +46,5 @@ case object PartnershipContactMethodOptionsPage
           .flatMap(removeIfNotSelected(selectedAnswers, Mobile, PartnershipMobileNumberPage, _))
 
       case _ => super.cleanup(value, userAnswers)
-    }
-
-  private def removeIfNotSelected(
-    selectedAnswer: Set[PartnershipContactMethodOptions],
-    answer: ContactMethodOptions,
-    page: QuestionPage[String],
-    userAnswers: UserAnswers
-  ): Try[UserAnswers] =
-    if (selectedAnswer.contains(answer)) {
-      Success(userAnswers)
-    } else {
-      userAnswers.remove(page)
     }
 }
