@@ -36,7 +36,7 @@ object RemoveDetailYesNoSummary {
         actions = Seq(
           ActionItemViewModel(
             "site.change",
-            controllers.contractordetails.routes.RemoveDetailYesNoController.onPageLoad(CheckMode).url
+            controllers.contractordetails.routes.RemoveDetailYesNoController.onPageLoad(contractorDetail="Scheme", CheckMode).url
           )
             .withVisuallyHiddenText(messages("contractordetails.removeDetailYesNo.change.hidden"))
             .withAttribute("id" -> "remove-detail-yes-no")

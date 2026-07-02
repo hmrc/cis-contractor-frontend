@@ -44,24 +44,40 @@ class RemoveDetailYesNoController @Inject() (
     extends FrontendBaseController
     with I18nSupport {
 
-  val form = formProvider()
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
+  def onPageLoad(contractorDetail:String, mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
 
-    val preparedForm = request.userAnswers.get(RemoveDetailYesNoPage) match {
-      case None        => form
-      case Some(value) => form.fill(value)
+//    contractorDetail match {
+//      case "email" | "scheme-name" =>
+//        val preparedForm = request.userAnswers.get(RemoveDetailYesNoPage) match {
+//          case None => form
+//          case Some(value) => form.fill(value)
+//        }
+//        Ok(view(contractorDetail, preparedForm, mode))
+//      case _ => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+//    }
+    if (contractorDetail == "email" || contractorDetail == "scheme-name"){
+
+      val form = formProvider(contractorDetail: String)
+      val preparedForm = request.userAnswers.get(RemoveDetailYesNoPage) match {
+        case None => form
+        case Some(value) => form.fill(value)
+      }
+      Ok(view(contractorDetail, preparedForm, mode))
+    } else {
+      Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
     }
-
-    Ok(view(preparedForm, mode))
+    
   }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
+  def onSubmit(contractorDetail:String ,mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
+
+      val form = formProvider(contractorDetail:String)
       form
         .bindFromRequest()
         .fold(
-          formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
+          formWithErrors => Future.successful(BadRequest(view(contractorDetail, formWithErrors, mode))),
           value =>
             for {
               updatedAnswers <- Future.fromTry(request.userAnswers.set(RemoveDetailYesNoPage, value))

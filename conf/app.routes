@@ -538,7 +538,7 @@ POST  /contractor-details/add-contractor-scheme-name         controllers.contrac
 GET   /contractor-details/change-add-contractor-scheme-name  controllers.contractordetails.AddSchemeNameYesNoController.onPageLoad(mode: Mode = CheckMode)
 POST  /contractor-details/change-add-contractor-scheme-name  controllers.contractordetails.AddSchemeNameYesNoController.onSubmit(mode: Mode = CheckMode)
 
-GET   /contractor-details/remove-contractor-scheme-name         controllers.contractordetails.RemoveDetailYesNoController.onPageLoad(mode: Mode = NormalMode)
-POST  /contractor-details/remove-contractor-scheme-name         controllers.contractordetails.RemoveDetailYesNoController.onSubmit(mode: Mode = NormalMode)
-GET   /contractor-details/change-remove-contractor-scheme-name  controllers.contractordetails.RemoveDetailYesNoController.onPageLoad(mode: Mode = CheckMode)
-POST  /contractor-details/change-remove-contractor-scheme-name  controllers.contractordetails.RemoveDetailYesNoController.onSubmit(mode: Mode = CheckMode)
+GET   /contractor-details/remove-contractor-detail/:contractorDetail         controllers.contractordetails.RemoveDetailYesNoController.onPageLoad(contractorDetail: String, mode: Mode = NormalMode)
+POST  /contractor-details/remove-contractor-detail/:contractorDetail         controllers.contractordetails.RemoveDetailYesNoController.onSubmit(contractorDetail: String, mode: Mode = NormalMode)
+GET   /contractor-details/change-remove-contractor-detail/:contractorDetail  controllers.contractordetails.RemoveDetailYesNoController.onPageLoad(contractorDetail: String, mode: Mode = CheckMode)
+POST  /contractor-details/change-remove-contractor-detail/:contractorDetail  controllers.contractordetails.RemoveDetailYesNoController.onSubmit(contractorDetail: String, mode: Mode = CheckMode)

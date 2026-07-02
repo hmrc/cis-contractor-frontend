@@ -1090,8 +1090,8 @@ contractordetails.addSchemeNameYesNo.error.required                            =
 contractordetails.addSchemeNameYesNo.checkYourAnswersLabel                     =  Add scheme name?
 contractordetails.addSchemeNameYesNo.change.hidden                             =  add scheme name?
 
-contractordetails.removeDetailYesNo.title                                      =  Are you sure you want to remove the contractor’s scheme name?
-contractordetails.removeDetailYesNo.heading                                    =  Are you sure you want to remove the contractor’s scheme name?
-contractordetails.removeDetailYesNo.checkYourAnswersLabel                      =  Remove scheme name
-contractordetails.removeDetailYesNo.error.required                             =  Select yes to remove the contractor’s scheme name
-contractordetails.removeDetailYesNo.change.hidden                              =  Remove scheme name
+contractordetails.removeDetailYesNo.title                                      =  Are you sure you want to remove the contractor’s {0}?
+contractordetails.removeDetailYesNo.heading                                    =  Are you sure you want to remove the contractor’s {0}?
+contractordetails.removeDetailYesNo.checkYourAnswersLabel                      =  Remove {0}
+contractordetails.removeDetailYesNo.error.required                             =  Select yes to remove the contractor’s {0}
+contractordetails.removeDetailYesNo.change.hidden                              =  Remove {0}
