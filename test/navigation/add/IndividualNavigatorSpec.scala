@@ -418,6 +418,22 @@ class IndividualNavigatorSpec extends SpecBase {
         ) mustBe journeyRecovery // TODO: when CYA page available
       }
 
+      "must go from a NationalInsuranceNumberYesNoPage to CYA page when false" in {
+        navigator.nextPage(
+          NationalInsuranceNumberYesNoPage,
+          AmendMode,
+          emptyUserAnswers.setOrException(NationalInsuranceNumberYesNoPage, false)
+        ) mustBe journeyRecovery // TODO - change to CYA when wiring complete
+      }
+
+      "must go from a NationalInsuranceNumberYesNoPage to journey recovery page when incomplete info provided" in {
+        navigator.nextPage(
+          NationalInsuranceNumberYesNoPage,
+          AmendMode,
+          emptyUserAnswers
+        ) mustBe journeyRecovery
+
+      }
       "must go from UniqueTaxpayerReferenceYesNoPage to SubcontractorsUniqueTaxpayerReferencePage when true and no utr exists" in {
         val ua =
           emptyUserAnswers.setOrException(UniqueTaxpayerReferenceYesNoPage, true)
@@ -873,71 +889,70 @@ class IndividualNavigatorSpec extends SpecBase {
         navigator.nextPage(SubTradingNameYesNoPage, NormalMode, emptyUserAnswers) mustBe
           routes.JourneyRecoveryController.onPageLoad()
       }
+    }
 
-      "must go from SubAddressYesNoPage to CYA when true and AddressOfSubcontractorPage is already answered" in {
-        val addressSample = models.address.Address(
-          addressLine1 = "10 Example Street",
-          addressLine2 = Some("Suite 2"),
-          addressLine3 = Some("Newcastle"),
-          addressLine4 = Some("Tyne & Wear"),
-          postcode = Some("NE1 1AA"),
-          country = Some(models.address.Country(Some("GB"), Some("United Kingdom")))
-        )
+    "must go from SubAddressYesNoPage to CYA when true and AddressOfSubcontractorPage is already answered" in {
+      val addressSample = models.address.Address(
+        addressLine1 = "10 Example Street",
+        addressLine2 = Some("Suite 2"),
+        addressLine3 = Some("Newcastle"),
+        addressLine4 = Some("Tyne & Wear"),
+        postcode = Some("NE1 1AA"),
+        country = Some(models.address.Country(Some("GB"), Some("United Kingdom")))
+      )
 
-        val ua     =
-          emptyUserAnswers
-            .set(SubAddressYesNoPage, true)
-            .success
-            .value
-            .set(AddressOfSubcontractorPage, addressSample)
-            .success
-            .value
-        val result = navigator.nextPage(SubAddressYesNoPage, CheckMode, ua)
-        result mustBe CYA
-      }
+      val ua     =
+        emptyUserAnswers
+          .set(SubAddressYesNoPage, true)
+          .success
+          .value
+          .set(AddressOfSubcontractorPage, addressSample)
+          .success
+          .value
+      val result = navigator.nextPage(SubAddressYesNoPage, CheckMode, ua)
+      result mustBe CYA
+    }
 
-      "must go from NationalInsuranceNumberYesNoPage to CYA when true and SubNationalInsuranceNumberPage is already answered" in {
-        val ua =
-          emptyUserAnswers
-            .set(NationalInsuranceNumberYesNoPage, true)
-            .success
-            .value
-            .set(SubNationalInsuranceNumberPage, "AB123456C")
-            .success
-            .value // sample valid NINO
+    "must go from NationalInsuranceNumberYesNoPage to CYA when true and SubNationalInsuranceNumberPage is already answered" in {
+      val ua =
+        emptyUserAnswers
+          .set(NationalInsuranceNumberYesNoPage, true)
+          .success
+          .value
+          .set(SubNationalInsuranceNumberPage, "AB123456C")
+          .success
+          .value // sample valid NINO
 
-        val result = navigator.nextPage(NationalInsuranceNumberYesNoPage, CheckMode, ua)
-        result mustBe CYA
-      }
+      val result = navigator.nextPage(NationalInsuranceNumberYesNoPage, CheckMode, ua)
+      result mustBe CYA
+    }
 
-      "must go from UniqueTaxpayerReferenceYesNoPage to CYA when true and SubcontractorsUniqueTaxpayerReferencePage is already answered" in {
-        val ua =
-          emptyUserAnswers
-            .set(UniqueTaxpayerReferenceYesNoPage, true)
-            .success
-            .value
-            .set(SubcontractorsUniqueTaxpayerReferencePage, "1234567890")
-            .success
-            .value
+    "must go from UniqueTaxpayerReferenceYesNoPage to CYA when true and SubcontractorsUniqueTaxpayerReferencePage is already answered" in {
+      val ua =
+        emptyUserAnswers
+          .set(UniqueTaxpayerReferenceYesNoPage, true)
+          .success
+          .value
+          .set(SubcontractorsUniqueTaxpayerReferencePage, "1234567890")
+          .success
+          .value
 
-        val result = navigator.nextPage(UniqueTaxpayerReferenceYesNoPage, CheckMode, ua)
-        result mustBe CYA
-      }
+      val result = navigator.nextPage(UniqueTaxpayerReferenceYesNoPage, CheckMode, ua)
+      result mustBe CYA
+    }
 
-      "must go from WorksReferenceNumberYesNoPage to CYA when true and WorksReferenceNumberPage is already answered" in {
-        val ua =
-          emptyUserAnswers
-            .set(WorksReferenceNumberYesNoPage, true)
-            .success
-            .value
-            .set(WorksReferenceNumberPage, "WRN-001")
-            .success
-            .value // sample WRN
+    "must go from WorksReferenceNumberYesNoPage to CYA when true and WorksReferenceNumberPage is already answered" in {
+      val ua =
+        emptyUserAnswers
+          .set(WorksReferenceNumberYesNoPage, true)
+          .success
+          .value
+          .set(WorksReferenceNumberPage, "WRN-001")
+          .success
+          .value // sample WRN
 
-        val result = navigator.nextPage(WorksReferenceNumberYesNoPage, CheckMode, ua)
-        result mustBe CYA
-      }
-
+      val result = navigator.nextPage(WorksReferenceNumberYesNoPage, CheckMode, ua)
+      result mustBe CYA
     }
 
   }

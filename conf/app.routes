@@ -62,12 +62,6 @@ POST  /subcontractor/amend/add-contact-details  controllers.add.AddIndividualCon
 GET   /subcontractor/amend/unique-taxpayer-reference  controllers.add.SubcontractorsUniqueTaxpayerReferenceController.onPageLoad(mode: Mode = AmendMode)
 POST  /subcontractor/amend/unique-taxpayer-reference  controllers.add.SubcontractorsUniqueTaxpayerReferenceController.onSubmit(mode: Mode = AmendMode)
 
-GET   /subcontractor/amend/check-national-insurance-number  controllers.add.NationalInsuranceNumberYesNoController.onPageLoad(mode: Mode = AmendMode)
-POST  /subcontractor/amend/check-national-insurance-number  controllers.add.NationalInsuranceNumberYesNoController.onSubmit(mode: Mode = AmendMode)
-
-GET   /subcontractor/amend/national-insurance-number  controllers.add.SubNationalInsuranceNumberController.onPageLoad(mode: Mode = AmendMode)
-POST  /subcontractor/amend/national-insurance-number  controllers.add.SubNationalInsuranceNumberController.onSubmit(mode: Mode = AmendMode)
-
 GET   /subcontractor/amend/trading-name  controllers.add.TradingNameOfSubcontractorController.onPageLoad(mode: Mode = AmendMode)
 POST  /subcontractor/amend/trading-name  controllers.add.TradingNameOfSubcontractorController.onSubmit(mode: Mode = AmendMode)
 
@@ -82,6 +76,12 @@ POST  /subcontractor/amend/works-reference-number  controllers.add.WorksReferenc
 
 GET   /subcontractor/amend/phone-number  controllers.add.IndividualPhoneNumberController.onPageLoad(mode: Mode = AmendMode)
 POST  /subcontractor/amend/phone-number  controllers.add.IndividualPhoneNumberController.onSubmit(mode: Mode = AmendMode)
+
+GET   /subcontractor/amend/check-national-insurance-number  controllers.add.NationalInsuranceNumberYesNoController.onPageLoad(mode: Mode = AmendMode)
+POST  /subcontractor/amend/check-national-insurance-number  controllers.add.NationalInsuranceNumberYesNoController.onSubmit(mode: Mode = AmendMode)
+
+GET   /subcontractor/amend/national-insurance-number  controllers.add.SubNationalInsuranceNumberController.onPageLoad(mode: Mode = AmendMode)
+POST  /subcontractor/amend/national-insurance-number  controllers.add.SubNationalInsuranceNumberController.onSubmit(mode: Mode = AmendMode)
 
 # Errors & Auth
 GET  /unauthorised/standard-user  controllers.UnauthorisedWrongRoleController.onPageLoad()
