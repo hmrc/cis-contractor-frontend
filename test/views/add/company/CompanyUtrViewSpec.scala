@@ -17,7 +17,7 @@
 package views.add.company
 
 import forms.add.company.CompanyUtrFormProvider
-import models.NormalMode
+import models.{AmendMode,NormalMode}
 import org.jsoup.nodes.Document
 import org.jsoup.select.Elements
 import org.scalatest.matchers.must.Matchers
@@ -62,6 +62,36 @@ class CompanyUtrViewSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSu
       doc.select("input[name=value]").size() mustBe 1
 
       doc.select(".govuk-button").text() mustBe messages("site.continue")
+    }
+
+    "render the page with title, heading, input and update button for Amend journey" in new Setup {
+
+      val companyName = "Test Company"
+
+      val html: HtmlFormat.Appendable = view(form, AmendMode, companyName)
+      val doc: Document               = org.jsoup.Jsoup.parse(html.toString())
+
+      doc.select("title").text() must include(messages("companyUtr.title"))
+
+      val heading: Elements = doc.select("h1")
+      heading.text() mustBe messages("companyUtr.heading")
+
+      doc.select("p").text must include(messages("companyUtr.p1"))
+
+      doc.select("label[for=value]").text() mustBe messages("companyUtr.label", companyName)
+
+      val hint: Elements = doc.select(".govuk-hint")
+      hint.text() mustBe messages("companyUtr.hint")
+
+      doc
+        .select("form")
+        .attr("action") mustBe controllers.add.company.routes.CompanyUtrController
+        .onSubmit(AmendMode)
+        .url
+
+      doc.select("input[name=value]").size() mustBe 1
+
+      doc.select(".govuk-button").text() mustBe messages("site.update")
     }
 
     "display error summary and inline error when no utr is entered" in new Setup {

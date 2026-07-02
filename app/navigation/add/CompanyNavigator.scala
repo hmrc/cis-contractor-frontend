@@ -35,7 +35,14 @@ class CompanyNavigator @Inject() () extends NavigatorForJourney {
     case CheckMode  =>
       checkRouteMap(page)(userAnswers)
     case AmendMode  =>
-      routes.JourneyRecoveryController.onPageLoad()
+      amendRouteMap(page)(userAnswers)
+  }
+
+  private def cyaRoute(mode: Mode): Call = mode match {
+    case AmendMode =>
+      routes.JourneyRecoveryController
+        .onPageLoad() // TODO route to controllers.add.company.routes.AmendCompanyCheckYourAnswersController.onPageLoad() when AmendCompanyCheckYourAnswersController added.
+    case _         => controllers.add.company.routes.CompanyCheckYourAnswersController.onPageLoad()
   }
 
   private val normalRoutes: Page => UserAnswers => Call = {
@@ -67,6 +74,11 @@ class CompanyNavigator @Inject() () extends NavigatorForJourney {
     case AddCompanyContactMethodsYesNoPage =>
       userAnswers => navigatorFromAddCompanyContactMethodsYesNoPage(NormalMode)(userAnswers)
     case _                                 => _ => routes.IndexController.onPageLoad()
+  }
+
+  private val amendRouteMap: Page => UserAnswers => Call = {
+    case CompanyUtrPage => _ => cyaRoute(AmendMode)
+    case _              => _ => cyaRoute(AmendMode)
   }
 
   private val checkRouteMap: Page => UserAnswers => Call = {
@@ -144,19 +156,19 @@ class CompanyNavigator @Inject() () extends NavigatorForJourney {
 
   private def navigatorFromCompanyUtrYesNoPage(mode: Mode)(userAnswers: UserAnswers): Call =
     (userAnswers.get(CompanyUtrYesNoPage), mode) match {
-      case (Some(true), NormalMode)  =>
+      case (Some(true), NormalMode)             =>
         controllers.add.company.routes.CompanyUtrController.onPageLoad(NormalMode)
-      case (Some(false), NormalMode) =>
+      case (Some(false), NormalMode)            =>
         controllers.add.company.routes.CompanyCrnYesNoController.onPageLoad(NormalMode)
-      case (Some(true), CheckMode)   =>
+      case (Some(true), CheckMode | AmendMode)  =>
         userAnswers
           .get(CompanyUtrPage)
           .fold(controllers.add.company.routes.CompanyUtrController.onPageLoad(CheckMode)) { _ =>
-            controllers.add.company.routes.CompanyCheckYourAnswersController.onPageLoad()
+            cyaRoute(mode)
           }
-      case (Some(false), CheckMode)  =>
-        controllers.add.company.routes.CompanyCheckYourAnswersController.onPageLoad()
-      case _                         =>
+      case (Some(false), CheckMode | AmendMode) =>
+        cyaRoute(mode)
+      case _                                    =>
         routes.JourneyRecoveryController.onPageLoad()
     }
 
