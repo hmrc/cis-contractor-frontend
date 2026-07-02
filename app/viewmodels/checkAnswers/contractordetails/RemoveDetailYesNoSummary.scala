@@ -25,6 +25,8 @@ import viewmodels.implicits.*
 
 object RemoveDetailYesNoSummary {
 
+  val contractorDetail = "scheme-name"
+
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
     answers.get(RemoveDetailYesNoPage).map { answer =>
 
@@ -36,7 +38,9 @@ object RemoveDetailYesNoSummary {
         actions = Seq(
           ActionItemViewModel(
             "site.change",
-            controllers.contractordetails.routes.RemoveDetailYesNoController.onPageLoad(contractorDetail="Scheme", CheckMode).url
+            controllers.contractordetails.routes.RemoveDetailYesNoController
+              .onPageLoad(contractorDetail, CheckMode)
+              .url
           )
             .withVisuallyHiddenText(messages("contractordetails.removeDetailYesNo.change.hidden"))
             .withAttribute("id" -> "remove-detail-yes-no")

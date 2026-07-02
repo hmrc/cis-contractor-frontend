@@ -44,36 +44,26 @@ class RemoveDetailYesNoController @Inject() (
     extends FrontendBaseController
     with I18nSupport {
 
+  def onPageLoad(contractorDetail: String, mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData) { implicit request =>
+      if (contractorDetail == "email" || contractorDetail == "scheme-name") {
 
-  def onPageLoad(contractorDetail:String, mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
+        val form         = formProvider(contractorDetail: String)
+        val preparedForm = request.userAnswers.get(RemoveDetailYesNoPage) match {
+          case None        => form
+          case Some(value) => form.fill(value)
+        }
+        Ok(view(contractorDetail, preparedForm, mode))
+      } else {
+        Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+      }
 
-//    contractorDetail match {
-//      case "email" | "scheme-name" =>
-//        val preparedForm = request.userAnswers.get(RemoveDetailYesNoPage) match {
-//          case None => form
-//          case Some(value) => form.fill(value)
-//        }
-//        Ok(view(contractorDetail, preparedForm, mode))
-//      case _ => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-//    }
-    if (contractorDetail == "email" || contractorDetail == "scheme-name"){
+    }
+
+  def onSubmit(contractorDetail: String, mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData).async { implicit request =>
 
       val form = formProvider(contractorDetail: String)
-      val preparedForm = request.userAnswers.get(RemoveDetailYesNoPage) match {
-        case None => form
-        case Some(value) => form.fill(value)
-      }
-      Ok(view(contractorDetail, preparedForm, mode))
-    } else {
-      Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-    }
-    
-  }
-
-  def onSubmit(contractorDetail:String ,mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
-    implicit request =>
-
-      val form = formProvider(contractorDetail:String)
       form
         .bindFromRequest()
         .fold(
@@ -84,5 +74,5 @@ class RemoveDetailYesNoController @Inject() (
               _              <- sessionRepository.set(updatedAnswers)
             } yield Redirect(navigator.nextPage(RemoveDetailYesNoPage, mode, updatedAnswers))
         )
-  }
+    }
 }
