@@ -77,6 +77,12 @@ POST  /subcontractor/amend/check-works-reference-number  controllers.add.WorksRe
 GET   /subcontractor/amend/works-reference-number  controllers.add.WorksReferenceNumberController.onPageLoad(mode: Mode = AmendMode)
 POST  /subcontractor/amend/works-reference-number  controllers.add.WorksReferenceNumberController.onSubmit(mode: Mode = AmendMode)
 
+GET   /subcontractor/amend/trading-name  controllers.add.TradingNameOfSubcontractorController.onPageLoad(mode: Mode = AmendMode)
+POST  /subcontractor/amend/trading-name  controllers.add.TradingNameOfSubcontractorController.onSubmit(mode: Mode = AmendMode)
+
+GET   /subcontractor/amend/phone-number  controllers.add.IndividualPhoneNumberController.onPageLoad(mode: Mode = AmendMode)
+POST  /subcontractor/amend/phone-number  controllers.add.IndividualPhoneNumberController.onSubmit(mode: Mode = AmendMode)
+
 # Errors & Auth
 GET  /unauthorised/standard-user  controllers.UnauthorisedWrongRoleController.onPageLoad()
 
@@ -98,8 +104,6 @@ GET   /subcontractor/add/trading-name         controllers.add.TradingNameOfSubco
 POST  /subcontractor/add/trading-name         controllers.add.TradingNameOfSubcontractorController.onSubmit(mode: Mode = NormalMode)
 GET   /subcontractor/add/change-trading-name  controllers.add.TradingNameOfSubcontractorController.onPageLoad(mode: Mode = CheckMode)
 POST  /subcontractor/add/change-trading-name  controllers.add.TradingNameOfSubcontractorController.onSubmit(mode: Mode = CheckMode)
-GET   /subcontractor/amend/trading-name       controllers.add.TradingNameOfSubcontractorController.onPageLoad(mode: Mode = AmendMode)
-POST  /subcontractor/amend/trading-name       controllers.add.TradingNameOfSubcontractorController.onSubmit(mode: Mode = AmendMode)
 
 GET   /subcontractor/add/name         controllers.add.SubcontractorNameController.onPageLoad(mode: Mode = NormalMode)
 POST  /subcontractor/add/name         controllers.add.SubcontractorNameController.onSubmit(mode: Mode = NormalMode)
@@ -150,8 +154,6 @@ GET   /subcontractor/add/phone-number         controllers.add.IndividualPhoneNum
 POST  /subcontractor/add/phone-number         controllers.add.IndividualPhoneNumberController.onSubmit(mode: Mode = NormalMode)
 GET   /subcontractor/add/change-phone-number  controllers.add.IndividualPhoneNumberController.onPageLoad(mode: Mode = CheckMode)
 POST  /subcontractor/add/change-phone-number  controllers.add.IndividualPhoneNumberController.onSubmit(mode: Mode = CheckMode)
-GET   /subcontractor/amend/phone-number       controllers.add.IndividualPhoneNumberController.onPageLoad(mode: Mode = AmendMode)
-POST  /subcontractor/amend/phone-number       controllers.add.IndividualPhoneNumberController.onSubmit(mode: Mode = AmendMode)
 
 GET   /subcontractor/add/email-address         controllers.add.IndividualEmailAddressController.onPageLoad(mode: Mode = NormalMode)
 POST  /subcontractor/add/email-address         controllers.add.IndividualEmailAddressController.onSubmit(mode: Mode = NormalMode)
@@ -520,7 +522,3 @@ GET   /contractor-details/enter-contractor-utr   controllers.contractordetails.C
 POST  /contractor-details/enter-contractor-utr   controllers.contractordetails.ContractorUtrController.onSubmit(mode: Mode = NormalMode)
 GET   /contractor-details/change-contractor-utr  controllers.contractordetails.ContractorUtrController.onPageLoad(mode: Mode = CheckMode)
 POST  /contractor-details/change-contractor-utr  controllers.contractordetails.ContractorUtrController.onSubmit(mode: Mode = CheckMode)
-
-# Individual Amend
-GET   /subcontractor/amend/email-address          controllers.add.IndividualEmailAddressController.onPageLoad(mode: Mode = AmendMode)
-POST  /subcontractor/amend/email-address          controllers.add.IndividualEmailAddressController.onSubmit(mode: Mode = AmendMode)

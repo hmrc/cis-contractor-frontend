@@ -18,7 +18,7 @@ package controllers.add.partnership
 
 import base.SpecBase
 import models.address.{Address, Country}
-import models.contact.{ContactMethodOptions, ContactOptions}
+import models.contact.ContactMethodOptions
 import pages.add.TypeOfSubcontractorPage
 import pages.add.partnership.*
 import play.api.test.FakeRequest
@@ -180,6 +180,87 @@ class PartnershipCheckYourAnswersControllerSpec extends SpecBase {
 
     "contact option validation" - {
 
+      "must return OK when Email is selected and a email is present" in {
+        val ua = minUa
+          .set(AddPartnershipContactMethodsYesNoPage, true)
+          .success
+          .value
+          .set(
+            PartnershipContactMethodOptionsPage,
+            Set(ContactMethodOptions.Email)
+          )
+          .success
+          .value
+          .set(PartnershipEmailAddressPage, "one@two.three")
+          .success
+          .value
+
+        val application = applicationBuilder(userAnswers = Some(ua)).build()
+
+        running(application) {
+          val request =
+            FakeRequest(GET, controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad().url)
+          val result  = route(application, request).value
+
+          status(result) mustEqual OK
+          contentAsString(result) must include("one@two.three")
+        }
+      }
+
+      "must return OK when Phone is selected and a phone number is present" in {
+        val ua = minUa
+          .set(AddPartnershipContactMethodsYesNoPage, true)
+          .success
+          .value
+          .set(
+            PartnershipContactMethodOptionsPage,
+            Set(ContactMethodOptions.Phone)
+          )
+          .success
+          .value
+          .set(PartnershipPhoneNumberPage, "01234567890")
+          .success
+          .value
+
+        val application = applicationBuilder(userAnswers = Some(ua)).build()
+
+        running(application) {
+          val request =
+            FakeRequest(GET, controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad().url)
+          val result  = route(application, request).value
+
+          status(result) mustEqual OK
+          contentAsString(result) must include("01234567890")
+        }
+      }
+
+      "must return OK when Mobile is selected and a mobile number is present" in {
+        val ua = minUa
+          .set(AddPartnershipContactMethodsYesNoPage, true)
+          .success
+          .value
+          .set(
+            PartnershipContactMethodOptionsPage,
+            Set(ContactMethodOptions.Mobile)
+          )
+          .success
+          .value
+          .set(PartnershipMobileNumberPage, "07123456789")
+          .success
+          .value
+
+        val application = applicationBuilder(userAnswers = Some(ua)).build()
+
+        running(application) {
+          val request =
+            FakeRequest(GET, controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad().url)
+          val result  = route(application, request).value
+
+          status(result) mustEqual OK
+          contentAsString(result) must include("07123456789")
+        }
+      }
+
       "must redirect to Journey Recovery when Email is selected but the email address is missing" in {
         val ua = minUa
           .set(AddPartnershipContactMethodsYesNoPage, true)
@@ -261,6 +342,24 @@ class PartnershipCheckYourAnswersControllerSpec extends SpecBase {
           .success
           .value
           .set(PartnershipEmailAddressPage, "stale@email.com")
+          .success
+          .value
+
+        val application = applicationBuilder(userAnswers = Some(ua)).build()
+
+        running(application) {
+          val request =
+            FakeRequest(GET, controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad().url)
+          val result  = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value must include("/there-is-a-problem")
+        }
+      }
+
+      "must redirect to Journey Recovery when AddPartnershipContactMethodsYesNoPage is true but PartnershipContactMethodOptionsPage answer is missing" in {
+        val ua = minUa
+          .set(AddPartnershipContactMethodsYesNoPage, true)
           .success
           .value
 

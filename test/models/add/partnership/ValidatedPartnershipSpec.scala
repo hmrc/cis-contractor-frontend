@@ -73,7 +73,7 @@ class ValidatedPartnershipSpec extends SpecBase with Matchers {
 
   "ValidatedPartnership.build" - {
 
-    "build successfully with minimum required answers (NoDetails + all optionals No)" in {
+    "build successfully with minimum required answers (all optionals No)" in {
       ValidatedPartnership.build(minRequired) mustBe a[Right[?, ?]]
     }
 
@@ -119,6 +119,45 @@ class ValidatedPartnershipSpec extends SpecBase with Matchers {
       ValidatedPartnership.build(ua) mustBe Left(MissingAnswer(PartnershipEmailAddressPage))
     }
 
+    "require email address when Email and Phone are selected in PartnershipContactMethodOptions" in {
+      val ua =
+        minRequired
+          .set(AddPartnershipContactMethodsYesNoPage, true)
+          .success
+          .value
+          .set(PartnershipContactMethodOptionsPage, Set(ContactMethodOptions.Email, ContactMethodOptions.Phone))
+          .success
+          .value
+
+      ValidatedPartnership.build(ua) mustBe Left(MissingAnswer(PartnershipEmailAddressPage))
+    }
+
+    "require phone number when Phone and Mobile are selected in PartnershipContactMethodOptions" in {
+      val ua =
+        minRequired
+          .set(AddPartnershipContactMethodsYesNoPage, true)
+          .success
+          .value
+          .set(PartnershipContactMethodOptionsPage, Set(ContactMethodOptions.Phone, ContactMethodOptions.Mobile))
+          .success
+          .value
+
+      ValidatedPartnership.build(ua) mustBe Left(MissingAnswer(PartnershipPhoneNumberPage))
+    }
+
+    "require mobile number when Mobile is selected in PartnershipContactMethodOptions" in {
+      val ua =
+        minRequired
+          .set(AddPartnershipContactMethodsYesNoPage, true)
+          .success
+          .value
+          .set(PartnershipContactMethodOptionsPage, Set(ContactMethodOptions.Mobile))
+          .success
+          .value
+
+      ValidatedPartnership.build(ua) mustBe Left(MissingAnswer(PartnershipMobileNumberPage))
+    }
+
     "build when contact option is Email and email address is present" in {
       val ua =
         minRequired
@@ -129,6 +168,31 @@ class ValidatedPartnershipSpec extends SpecBase with Matchers {
           .success
           .value
           .set(PartnershipEmailAddressPage, "a@b.com")
+          .success
+          .value
+
+      ValidatedPartnership.build(ua) mustBe a[Right[?, ?]]
+    }
+
+    "build when contact option is Email, Phone and Mobile are selected, email address, phone number and mobile number are present" in {
+      val ua =
+        minRequired
+          .set(AddPartnershipContactMethodsYesNoPage, true)
+          .success
+          .value
+          .set(
+            PartnershipContactMethodOptionsPage,
+            Set(ContactMethodOptions.Email, ContactMethodOptions.Phone, ContactMethodOptions.Mobile)
+          )
+          .success
+          .value
+          .set(PartnershipEmailAddressPage, "a@b.com")
+          .success
+          .value
+          .set(PartnershipPhoneNumberPage, "123456789")
+          .success
+          .value
+          .set(PartnershipMobileNumberPage, "987654321")
           .success
           .value
 
