@@ -24,22 +24,24 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
 
-object RemoveSchemeNameYesNoSummary  {
+object RemoveSchemeNameYesNoSummary {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(RemoveSchemeNameYesNoPage).map {
-      answer =>
+    answers.get(RemoveSchemeNameYesNoPage).map { answer =>
 
-        val value = if (answer) "site.yes" else "site.no"
+      val value = if (answer) "site.yes" else "site.no"
 
-        SummaryListRowViewModel(
-          key     = "contractordetails.removeSchemeNameYesNo.checkYourAnswersLabel",
-          value   = ValueViewModel(value),
-          actions = Seq(
-            ActionItemViewModel("site.change", controllers.contractordetails.routes.RemoveSchemeNameYesNoController.onPageLoad(CheckMode).url)
-              .withVisuallyHiddenText(messages("contractordetails.removeSchemeNameYesNo.change.hidden"))
-              .withAttribute("id" -> "remove-scheme-name-yes-no")
+      SummaryListRowViewModel(
+        key = "contractordetails.removeSchemeNameYesNo.checkYourAnswersLabel",
+        value = ValueViewModel(value),
+        actions = Seq(
+          ActionItemViewModel(
+            "site.change",
+            controllers.contractordetails.routes.RemoveSchemeNameYesNoController.onPageLoad(CheckMode).url
           )
+            .withVisuallyHiddenText(messages("contractordetails.removeSchemeNameYesNo.change.hidden"))
+            .withAttribute("id" -> "remove-scheme-name-yes-no")
         )
+      )
     }
 }

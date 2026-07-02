@@ -22,7 +22,7 @@ class RemoveSchemeNameYesNoControllerSpec extends SpecBase with MockitoSugar {
   def onwardRoute = Call("GET", "/foo")
 
   val formProvider = new RemoveSchemeNameYesNoFormProvider()
-  val form = formProvider()
+  val form         = formProvider()
 
   lazy val removeSchemeNameYesNoRoute = routes.RemoveSchemeNameYesNoController.onPageLoad(NormalMode).url
 
