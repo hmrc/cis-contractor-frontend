@@ -624,6 +624,9 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
 
         val userAnswers =
           basePartnershipAnswers
+            .set(AddPartnershipContactMethodsYesNoPage, true)
+            .success
+            .value
             .remove(AddPartnershipContactMethodsYesNoPage)
             .success
             .value

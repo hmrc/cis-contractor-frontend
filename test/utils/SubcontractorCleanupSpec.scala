@@ -358,6 +358,18 @@ class SubcontractorCleanupSpec extends SpecBase {
 
   ".removeAllSubcontractor" - {
 
+    "remove the legacy partnershipChooseContactDetails key from pre-migration sessions" in {
+
+      val userAnswers = UserAnswers(
+        userAnswersId,
+        data = Json.obj("partnershipChooseContactDetails" -> "someValue")
+      )
+
+      val result = removeAllSubcontractor(userAnswers).success.value
+
+      (result.data \ "partnershipChooseContactDetails").toOption mustBe None
+    }
+
     "remove all subcontractor related journey answers" in {
 
       val userAnswers =
