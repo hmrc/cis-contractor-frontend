@@ -38,7 +38,7 @@ object PartnershipContactMethodOptionsSummary {
       SummaryListRowViewModel(
         key = "partnershipContactMethodOptions.checkYourAnswersLabel",
         value = ValueViewModelHelper
-          .makeGovukBulletList(options)
+          .makeGovukBulletList(options, false)
           .getOrElse(ValueViewModel(HtmlContent(""))),
         actions = Seq(
           ActionItemViewModel(
