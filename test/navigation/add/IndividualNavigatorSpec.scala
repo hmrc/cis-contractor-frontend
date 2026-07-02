@@ -452,7 +452,7 @@ class IndividualNavigatorSpec extends SpecBase {
           )
         ) mustBe journeyRecovery // TODO: this needs to be redirected to amend cya page when it's implemented
       }
-      
+
       "must go from UniqueTaxpayerReferenceYesNoPage to SubcontractorsUniqueTaxpayerReferencePage when true and no utr exists" in {
         val ua =
           emptyUserAnswers.setOrException(UniqueTaxpayerReferenceYesNoPage, true)
