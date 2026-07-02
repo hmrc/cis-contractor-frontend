@@ -20,8 +20,9 @@ import controllers.actions.*
 import controllers.helpers.ContactGuard
 import forms.add.partnership.PartnershipEmailAddressFormProvider
 import models.Mode
+import models.contact.ContactMethodOptions
 import navigation.Navigator
-import pages.add.partnership.{PartnershipEmailAddressPage, PartnershipNamePage}
+import pages.add.partnership.{PartnershipContactMethodOptionsPage, PartnershipEmailAddressPage, PartnershipNamePage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
@@ -49,40 +50,35 @@ class PartnershipEmailAddressController @Inject() (
   val form = formProvider()
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
-    request.userAnswers
-      .get(PartnershipNamePage)
-      .map { partnershipName =>
-        val preparedForm = request.userAnswers.get(PartnershipEmailAddressPage) match {
-          case None        => form
-          case Some(value) => form.fill(value)
-        }
-        Ok(view(preparedForm, mode, partnershipName))
+    requireContactMethodInSet(
+      request.userAnswers.get(PartnershipNamePage),
+      request.userAnswers.get(PartnershipContactMethodOptionsPage),
+      ContactMethodOptions.Email
+    ) { partnershipName =>
+      val preparedForm = request.userAnswers.get(PartnershipEmailAddressPage) match {
+        case None        => form
+        case Some(value) => form.fill(value)
       }
-      .getOrElse(
-        Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-      )
+      Ok(view(preparedForm, mode, partnershipName))
+    }
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
-      request.userAnswers
-        .get(PartnershipNamePage)
-        .map { partnershipName =>
-          form
-            .bindFromRequest()
-            .fold(
-              formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, partnershipName))),
-              value =>
-                for {
-                  updatedAnswers <- Future.fromTry(request.userAnswers.set(PartnershipEmailAddressPage, value))
-                  _              <- sessionRepository.set(updatedAnswers)
-                } yield Redirect(navigator.nextPage(PartnershipEmailAddressPage, mode, updatedAnswers))
-            )
-        }
-        .getOrElse(
-          Future.successful(
-            Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-          )
-        )
+      (for {
+        partnershipName <- request.userAnswers.get(PartnershipNamePage)
+        contactMethods  <- request.userAnswers.get(PartnershipContactMethodOptionsPage)
+        if contactMethods.contains(ContactMethodOptions.Email)
+      } yield form
+        .bindFromRequest()
+        .fold(
+          formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, partnershipName))),
+          value =>
+            for {
+              updatedAnswers <- Future.fromTry(request.userAnswers.set(PartnershipEmailAddressPage, value))
+              _              <- sessionRepository.set(updatedAnswers)
+            } yield Redirect(navigator.nextPage(PartnershipEmailAddressPage, mode, updatedAnswers))
+        ))
+        .getOrElse(Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())))
   }
 }

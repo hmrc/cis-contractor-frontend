@@ -20,8 +20,9 @@ import controllers.actions.*
 import controllers.helpers.ContactGuard
 import forms.add.partnership.PartnershipMobileNumberFormProvider
 import models.Mode
+import models.contact.ContactMethodOptions
 import navigation.Navigator
-import pages.add.partnership.{PartnershipMobileNumberPage, PartnershipNamePage}
+import pages.add.partnership.{PartnershipContactMethodOptionsPage, PartnershipMobileNumberPage, PartnershipNamePage}
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -50,40 +51,35 @@ class PartnershipMobileNumberController @Inject() (
   val form: Form[String] = formProvider()
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
-    request.userAnswers
-      .get(PartnershipNamePage)
-      .map { partnershipName =>
-        val preparedForm = request.userAnswers.get(PartnershipMobileNumberPage) match {
-          case None        => form
-          case Some(value) => form.fill(value)
-        }
-        Ok(view(preparedForm, mode, partnershipName))
+    requireContactMethodInSet(
+      request.userAnswers.get(PartnershipNamePage),
+      request.userAnswers.get(PartnershipContactMethodOptionsPage),
+      ContactMethodOptions.Mobile
+    ) { partnershipName =>
+      val preparedForm = request.userAnswers.get(PartnershipMobileNumberPage) match {
+        case None        => form
+        case Some(value) => form.fill(value)
       }
-      .getOrElse(
-        Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-      )
+      Ok(view(preparedForm, mode, partnershipName))
+    }
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
-      request.userAnswers
-        .get(PartnershipNamePage)
-        .map { partnershipName =>
-          form
-            .bindFromRequest()
-            .fold(
-              formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, partnershipName))),
-              value =>
-                for {
-                  updatedAnswers <- Future.fromTry(request.userAnswers.set(PartnershipMobileNumberPage, value))
-                  _              <- sessionRepository.set(updatedAnswers)
-                } yield Redirect(navigator.nextPage(PartnershipMobileNumberPage, mode, updatedAnswers))
-            )
-        }
-        .getOrElse(
-          Future.successful(
-            Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-          )
-        )
+      (for {
+        partnershipName <- request.userAnswers.get(PartnershipNamePage)
+        contactMethods  <- request.userAnswers.get(PartnershipContactMethodOptionsPage)
+        if contactMethods.contains(ContactMethodOptions.Mobile)
+      } yield form
+        .bindFromRequest()
+        .fold(
+          formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, partnershipName))),
+          value =>
+            for {
+              updatedAnswers <- Future.fromTry(request.userAnswers.set(PartnershipMobileNumberPage, value))
+              _              <- sessionRepository.set(updatedAnswers)
+            } yield Redirect(navigator.nextPage(PartnershipMobileNumberPage, mode, updatedAnswers))
+        ))
+        .getOrElse(Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())))
   }
 }

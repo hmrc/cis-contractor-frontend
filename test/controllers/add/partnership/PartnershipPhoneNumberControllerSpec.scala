@@ -49,11 +49,17 @@ class PartnershipPhoneNumberControllerSpec extends SpecBase with MockitoSugar {
       .success
       .value
 
+  private def uaWithNameAndPhone: UserAnswers =
+    uaWithName
+      .set(PartnershipContactMethodOptionsPage, Set(ContactMethodOptions.Phone))
+      .success
+      .value
+
   "PartnershipPhoneNumberController" - {
 
     "must return OK and the correct view for a GET when Phone is selected" in {
 
-      val application = applicationBuilder(userAnswers = Some(uaWithName)).build()
+      val application = applicationBuilder(userAnswers = Some(uaWithNameAndPhone)).build()
 
       running(application) {
         val request = FakeRequest(GET, partnershipPhoneNumberRoute)
@@ -73,7 +79,7 @@ class PartnershipPhoneNumberControllerSpec extends SpecBase with MockitoSugar {
     "must populate the view correctly on a GET when previously answered" in {
 
       val userAnswers =
-        uaWithName
+        uaWithNameAndPhone
           .set(PartnershipPhoneNumberPage, "0123456789")
           .success
           .value
@@ -128,7 +134,7 @@ class PartnershipPhoneNumberControllerSpec extends SpecBase with MockitoSugar {
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
-      val application = applicationBuilder(userAnswers = Some(uaWithName)).build()
+      val application = applicationBuilder(userAnswers = Some(uaWithNameAndPhone)).build()
 
       running(application) {
         val request =

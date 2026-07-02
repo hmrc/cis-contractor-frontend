@@ -47,6 +47,12 @@ class PartnershipEmailAddressControllerSpec extends SpecBase with MockitoSugar {
       .success
       .value
 
+  private def uaWithNameAndEmail: UserAnswers =
+    uaWithName
+      .set(PartnershipContactMethodOptionsPage, Set(ContactMethodOptions.Email))
+      .success
+      .value
+
   lazy val partnershipEmailAddressRoute: String =
     controllers.add.partnership.routes.PartnershipEmailAddressController.onPageLoad(NormalMode).url
 
@@ -54,7 +60,7 @@ class PartnershipEmailAddressControllerSpec extends SpecBase with MockitoSugar {
 
     "must return OK and the correct view for a GET when Email is selected" in {
 
-      val application = applicationBuilder(userAnswers = Some(uaWithName)).build()
+      val application = applicationBuilder(userAnswers = Some(uaWithNameAndEmail)).build()
 
       running(application) {
         val request = FakeRequest(GET, partnershipEmailAddressRoute)
@@ -74,7 +80,7 @@ class PartnershipEmailAddressControllerSpec extends SpecBase with MockitoSugar {
     "must populate the view correctly on a GET when previously answered" in {
 
       val userAnswers =
-        uaWithName
+        uaWithNameAndEmail
           .set(PartnershipEmailAddressPage, "answer@test.com")
           .success
           .value
@@ -130,7 +136,7 @@ class PartnershipEmailAddressControllerSpec extends SpecBase with MockitoSugar {
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
-      val application = applicationBuilder(userAnswers = Some(uaWithName)).build()
+      val application = applicationBuilder(userAnswers = Some(uaWithNameAndEmail)).build()
 
       running(application) {
         val request =
