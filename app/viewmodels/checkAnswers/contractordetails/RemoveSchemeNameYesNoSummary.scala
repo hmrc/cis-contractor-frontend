@@ -38,6 +38,7 @@ object RemoveSchemeNameYesNoSummary  {
           actions = Seq(
             ActionItemViewModel("site.change", controllers.contractordetails.routes.RemoveSchemeNameYesNoController.onPageLoad(CheckMode).url)
               .withVisuallyHiddenText(messages("contractordetails.removeSchemeNameYesNo.change.hidden"))
+              .withAttribute("id" -> "remove-scheme-name-yes-no")
           )
         )
     }
