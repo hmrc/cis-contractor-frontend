@@ -30,8 +30,8 @@ class RemoveDetailYesNoViewSpec extends SpecBase {
   "RemoveDetailYesNoView" - {
     "must render the page with the correct html elements" in new Setup {
       val doc: Document = Jsoup.parse(html.toString)
-      doc.title             must include(messages("contractordetails.removeDetailYesNo.title"))
-      doc.select("h1").text must include(messages("contractordetails.removeDetailYesNo.heading"))
+      doc.title             must include(messages("contractordetails.removeDetailYesNo.title", contractorDetail))
+      doc.select("h1").text must include(messages("contractordetails.removeDetailYesNo.heading", contractorDetail))
 
       doc.getElementsByClass("govuk-button").text must include(
         messages("site.continue")
@@ -48,7 +48,7 @@ class RemoveDetailYesNoViewSpec extends SpecBase {
 
     "must pre-populate the form when user has previously answered 'true'" in new Setup {
       val filledForm    = form.fill(true)
-      val filledHtml    = view(filledForm, NormalMode)
+      val filledHtml    = view(contractorDetail, filledForm, NormalMode)
       val doc: Document = Jsoup.parse(filledHtml.toString)
 
       doc.select("input[value=true]").hasAttr("checked") mustBe true
@@ -57,7 +57,7 @@ class RemoveDetailYesNoViewSpec extends SpecBase {
 
     "must pre-populate the form when user has previously answered 'false'" in new Setup {
       val filledForm    = form.fill(false)
-      val filledHtml    = view(filledForm, NormalMode)
+      val filledHtml    = view(contractorDetail, filledForm, NormalMode)
       val doc: Document = Jsoup.parse(filledHtml.toString)
 
       doc.select("input[value=true]").hasAttr("checked") mustBe false
@@ -66,16 +66,17 @@ class RemoveDetailYesNoViewSpec extends SpecBase {
   }
 
   trait Setup {
+    val contractorDetail                          = "scheme-name"
     val app                                       = applicationBuilder().build()
     val view                                      = app.injector.instanceOf[RemoveDetailYesNoView]
     val formProvider                              = new RemoveDetailYesNoFormProvider()
-    val form                                      = formProvider()
+    val form                                      = formProvider(contractorDetail)
     implicit val request: play.api.mvc.Request[_] = FakeRequest()
     implicit val messages: Messages               = play.api.i18n.MessagesImpl(
       play.api.i18n.Lang.defaultLang,
       app.injector.instanceOf[play.api.i18n.MessagesApi]
     )
 
-    val html = view(form, NormalMode)
+    val html = view(contractorDetail, form, NormalMode)
   }
 }

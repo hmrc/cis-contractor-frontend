@@ -30,6 +30,7 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 class RemoveDetailYesNoSummarySpec extends AnyFreeSpec with Matchers {
 
   implicit val messages: Messages = stubMessages()
+  val contractorDetail            = "scheme-name"
 
   "RemoveDetailYesNoSummary.row" - {
 
@@ -57,7 +58,8 @@ class RemoveDetailYesNoSummarySpec extends AnyFreeSpec with Matchers {
 
       val changeAction       = actions.head
       val expectedChangeText = messages("site.change")
-      val expectedHref       = controllers.contractordetails.routes.RemoveDetailYesNoController.onPageLoad(CheckMode).url
+      val expectedHref       =
+        controllers.contractordetails.routes.RemoveDetailYesNoController.onPageLoad(contractorDetail, CheckMode).url
       val expectedHiddenText = messages("contractordetails.removeDetailYesNo.change.hidden")
 
       changeAction.content.asHtml.toString    should include(expectedChangeText)

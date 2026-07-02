@@ -37,10 +37,12 @@ class RemoveDetailYesNoControllerSpec extends SpecBase with MockitoSugar {
 
   def onwardRoute = Call("GET", "/foo")
 
-  val formProvider = new RemoveDetailYesNoFormProvider()
-  val form         = formProvider()
+  val contractorDetail = "scheme-name"
 
-  lazy val removeDetailYesNoRoute = routes.RemoveDetailYesNoController.onPageLoad(NormalMode).url
+  val formProvider = new RemoveDetailYesNoFormProvider()
+  val form         = formProvider(contractorDetail)
+
+  lazy val removeDetailYesNoRoute = routes.RemoveDetailYesNoController.onPageLoad(contractorDetail, NormalMode).url
 
   "removeDetailYesNo Controller" - {
 
@@ -56,7 +58,10 @@ class RemoveDetailYesNoControllerSpec extends SpecBase with MockitoSugar {
         val view = application.injector.instanceOf[RemoveDetailYesNoView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(contractorDetail, form, NormalMode)(
+          request,
+          messages(application)
+        ).toString
       }
     }
 
@@ -74,7 +79,10 @@ class RemoveDetailYesNoControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(true), NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(contractorDetail, form.fill(true), NormalMode)(
+          request,
+          messages(application)
+        ).toString
       }
     }
 
@@ -120,7 +128,10 @@ class RemoveDetailYesNoControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(contractorDetail, boundForm, NormalMode)(
+          request,
+          messages(application)
+        ).toString
       }
     }
 
