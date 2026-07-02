@@ -43,8 +43,6 @@ class PartnershipNavigator @Inject() () extends NavigatorForJourney {
       _ => controllers.add.partnership.routes.PartnershipAddressYesNoController.onPageLoad(NormalMode)
     case PartnershipAddressYesNoPage              =>
       userAnswers => navigatorFromPartnershipAddressYesNoPage(NormalMode)(userAnswers)
-    case PartnershipAddressPage                   =>
-      _ => controllers.add.partnership.routes.AddPartnershipContactMethodsYesNoController.onPageLoad(NormalMode)
     case AddPartnershipContactMethodsYesNoPage    =>
       userAnswers => navigatorFromAddPartnershipContactMethodsYesNoPage(NormalMode)(userAnswers)
     case PartnershipContactMethodOptionsPage      =>
@@ -87,8 +85,6 @@ class PartnershipNavigator @Inject() () extends NavigatorForJourney {
       _ => controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
     case PartnershipAddressYesNoPage              =>
       userAnswers => navigatorFromPartnershipAddressYesNoPage(CheckMode)(userAnswers)
-    case PartnershipAddressPage                   =>
-      _ => controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
     case AddPartnershipContactMethodsYesNoPage    =>
       userAnswers => navigatorFromAddPartnershipContactMethodsYesNoPage(CheckMode)(userAnswers)
     case PartnershipContactMethodOptionsPage      =>

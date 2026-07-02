@@ -102,14 +102,6 @@ class PartnershipNavigatorSpec extends SpecBase {
         ) mustBe partnershipCYA
       }
 
-      "must go from a PartnershipAddressPage to AddPartnershipContactMethodsYesNoController in NormalMode" in {
-        navigator.nextPage(
-          PartnershipAddressPage,
-          NormalMode,
-          UserAnswers("id")
-        ) mustBe controllers.add.partnership.routes.AddPartnershipContactMethodsYesNoController.onPageLoad(NormalMode)
-      }
-
       "must go from a PartnershipWorksReferenceNumberYesNoPage to PartnershipWorksReferenceNumber page when true" in {
         navigator.nextPage(
           PartnershipWorksReferenceNumberYesNoPage,
@@ -149,16 +141,6 @@ class PartnershipNavigatorSpec extends SpecBase {
           NormalMode,
           emptyUserAnswers.setOrException(PartnershipUniqueTaxpayerReferencePage, "5860920998")
         ) mustBe controllers.add.partnership.routes.PartnershipNominatedPartnerNameController.onPageLoad(NormalMode)
-      }
-
-      "must go from PartnershipAddressPage to AddPartnershipContactMethodsYesNoPage in NormalMode" in {
-        val address = Address("1 Test Street", addressLine3 = Some("Town"), postcode = Some("AA1 1AA"))
-
-        navigator.nextPage(
-          PartnershipAddressPage,
-          NormalMode,
-          emptyUserAnswers.setOrException(PartnershipAddressPage, address)
-        ) mustBe controllers.add.partnership.routes.AddPartnershipContactMethodsYesNoController.onPageLoad(NormalMode)
       }
 
       "must go from PartnershipAddressYesNoPage to the address lookup on-ramp when true in NormalMode" in {
@@ -670,14 +652,6 @@ class PartnershipNavigatorSpec extends SpecBase {
           CheckMode,
           emptyUserAnswers
         ) mustBe journeyRecovery
-      }
-
-      "must go from a PartnershipAddressPage to PartnershipCheckYourAnswers in CheckMode" in {
-        navigator.nextPage(
-          PartnershipAddressPage,
-          CheckMode,
-          emptyUserAnswers
-        ) mustBe controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
       }
 
       "must go to PartnershipCheckYourAnswersController when answer is false in CheckMode" in {
