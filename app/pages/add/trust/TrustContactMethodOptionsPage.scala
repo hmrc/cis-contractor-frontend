@@ -18,14 +18,17 @@ package pages.add.trust
 
 import models.UserAnswers
 import models.add.trust.TrustContactMethodOptions
-import models.contact.ContactMethodOptions
 import models.contact.ContactMethodOptions.{Email, Mobile, Phone}
 import pages.QuestionPage
+import pages.add.ContactMethodOptionsCleanup
 import play.api.libs.json.JsPath
 
-import scala.util.{Success, Try}
+import scala.util.Try
 
-case object TrustContactMethodOptionsPage extends QuestionPage[Set[TrustContactMethodOptions]] with TrustJourney {
+case object TrustContactMethodOptionsPage
+    extends QuestionPage[Set[TrustContactMethodOptions]]
+    with TrustJourney
+    with ContactMethodOptionsCleanup {
 
   override def path: JsPath = JsPath \ toString
 
@@ -40,17 +43,5 @@ case object TrustContactMethodOptionsPage extends QuestionPage[Set[TrustContactM
           .flatMap(removeIfNotSelected(selectedAnswers, Mobile, TrustMobileNumberPage, _))
 
       case _ => super.cleanup(value, userAnswers)
-    }
-
-  private def removeIfNotSelected(
-    selectedAnswer: Set[TrustContactMethodOptions],
-    answer: ContactMethodOptions,
-    page: QuestionPage[String],
-    userAnswers: UserAnswers
-  ): Try[UserAnswers] =
-    if (selectedAnswer.contains(answer)) {
-      Success(userAnswers)
-    } else {
-      userAnswers.remove(page)
     }
 }
