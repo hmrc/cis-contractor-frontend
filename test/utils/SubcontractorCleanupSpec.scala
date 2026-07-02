@@ -19,9 +19,8 @@ package utils
 import base.SpecBase
 import models.add.*
 import models.contact.{ContactMethodOptions, ContactOptions}
-import models.{TypeOfSubcontractor, UserAnswers}
+import models.TypeOfSubcontractor
 import org.scalatest.freespec.AnyFreeSpec
-import play.api.libs.json.Json
 import utils.SubcontractorCleanup.*
 import pages.add.*
 import pages.add.partnership.*
@@ -199,18 +198,6 @@ class SubcontractorCleanupSpec extends SpecBase {
 
   ".removePartnershipSubcontractor" - {
 
-    "remove the legacy partnershipChooseContactDetails key from pre-migration sessions" in {
-
-      val userAnswers = UserAnswers(
-        userAnswersId,
-        data = Json.obj("partnershipChooseContactDetails" -> "someValue")
-      )
-
-      val result = removePartnershipSubcontractor(userAnswers).success.value
-
-      (result.data \ "partnershipChooseContactDetails").toOption mustBe None
-    }
-
     "remove all PartnershipSubcontractor journey answers" in {
 
       val userAnswers =
@@ -357,18 +344,6 @@ class SubcontractorCleanupSpec extends SpecBase {
   }
 
   ".removeAllSubcontractor" - {
-
-    "remove the legacy partnershipChooseContactDetails key from pre-migration sessions" in {
-
-      val userAnswers = UserAnswers(
-        userAnswersId,
-        data = Json.obj("partnershipChooseContactDetails" -> "someValue")
-      )
-
-      val result = removeAllSubcontractor(userAnswers).success.value
-
-      (result.data \ "partnershipChooseContactDetails").toOption mustBe None
-    }
 
     "remove all subcontractor related journey answers" in {
 
