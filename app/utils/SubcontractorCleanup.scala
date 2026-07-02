@@ -21,10 +21,16 @@ import pages.add.*
 import pages.add.partnership.*
 import pages.add.company.*
 import pages.add.trust.*
+import play.api.libs.json.JsPath
+import queries.Settable
 
 import scala.util.Try
 
 object SubcontractorCleanup {
+
+  private object LegacyPartnershipChooseContactDetailsKey extends Settable[String] {
+    override def path: JsPath = JsPath \ "partnershipChooseContactDetails"
+  }
 
   def removeIndividualSoleTraderSubcontractor(userAnswers: UserAnswers): Try[UserAnswers] =
     userAnswers
@@ -62,7 +68,8 @@ object SubcontractorCleanup {
 
   def removePartnershipSubcontractor(userAnswers: UserAnswers): Try[UserAnswers] =
     userAnswers
-      .remove(PartnershipAddressPage)
+      .remove(LegacyPartnershipChooseContactDetailsKey)
+      .flatMap(_.remove(PartnershipAddressPage))
       .flatMap(_.remove(PartnershipAddressYesNoPage))
       .flatMap(_.remove(AddPartnershipContactMethodsYesNoPage))
       .flatMap(_.remove(PartnershipContactMethodOptionsPage))
