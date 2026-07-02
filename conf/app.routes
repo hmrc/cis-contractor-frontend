@@ -62,12 +62,6 @@ POST  /subcontractor/amend/add-contact-details  controllers.add.AddIndividualCon
 GET   /subcontractor/amend/unique-taxpayer-reference  controllers.add.SubcontractorsUniqueTaxpayerReferenceController.onPageLoad(mode: Mode = AmendMode)
 POST  /subcontractor/amend/unique-taxpayer-reference  controllers.add.SubcontractorsUniqueTaxpayerReferenceController.onSubmit(mode: Mode = AmendMode)
 
-GET   /subcontractor/amend/check-national-insurance-number  controllers.add.NationalInsuranceNumberYesNoController.onPageLoad(mode: Mode = AmendMode)
-POST  /subcontractor/amend/check-national-insurance-number  controllers.add.NationalInsuranceNumberYesNoController.onSubmit(mode: Mode = AmendMode)
-
-GET   /subcontractor/amend/national-insurance-number  controllers.add.SubNationalInsuranceNumberController.onPageLoad(mode: Mode = AmendMode)
-POST  /subcontractor/amend/national-insurance-number  controllers.add.SubNationalInsuranceNumberController.onSubmit(mode: Mode = AmendMode)
-
 # Errors & Auth
 GET  /unauthorised/standard-user  controllers.UnauthorisedWrongRoleController.onPageLoad()
 
@@ -106,11 +100,15 @@ GET   /subcontractor/add/check-national-insurance-number         controllers.add
 POST  /subcontractor/add/check-national-insurance-number         controllers.add.NationalInsuranceNumberYesNoController.onSubmit(mode: Mode = NormalMode)
 GET   /subcontractor/add/change-check-national-insurance-number  controllers.add.NationalInsuranceNumberYesNoController.onPageLoad(mode: Mode = CheckMode)
 POST  /subcontractor/add/change-check-national-insurance-number  controllers.add.NationalInsuranceNumberYesNoController.onSubmit(mode: Mode = CheckMode)
+GET   /subcontractor/amend/check-national-insurance-number       controllers.add.NationalInsuranceNumberYesNoController.onPageLoad(mode: Mode = AmendMode)
+POST  /subcontractor/amend/check-national-insurance-number       controllers.add.NationalInsuranceNumberYesNoController.onSubmit(mode: Mode = AmendMode)
 
 GET   /subcontractor/add/national-insurance-number         controllers.add.SubNationalInsuranceNumberController.onPageLoad(mode: Mode = NormalMode)
 POST  /subcontractor/add/national-insurance-number         controllers.add.SubNationalInsuranceNumberController.onSubmit(mode: Mode = NormalMode)
 GET   /subcontractor/add/change-national-insurance-number  controllers.add.SubNationalInsuranceNumberController.onPageLoad(mode: Mode = CheckMode)
 POST  /subcontractor/add/change-national-insurance-number  controllers.add.SubNationalInsuranceNumberController.onSubmit(mode: Mode = CheckMode)
+GET   /subcontractor/amend/national-insurance-number       controllers.add.SubNationalInsuranceNumberController.onPageLoad(mode: Mode = AmendMode)
+POST  /subcontractor/amend/national-insurance-number       controllers.add.SubNationalInsuranceNumberController.onSubmit(mode: Mode = AmendMode)
 
 GET   /subcontractor/add/check-unique-taxpayer-reference         controllers.add.UniqueTaxpayerReferenceYesNoController.onPageLoad(mode: Mode = NormalMode)
 POST  /subcontractor/add/check-unique-taxpayer-reference         controllers.add.UniqueTaxpayerReferenceYesNoController.onSubmit(mode: Mode = NormalMode)
@@ -525,6 +523,17 @@ POST  /contractor-details/enter-contractor-utr   controllers.contractordetails.C
 GET   /contractor-details/change-contractor-utr  controllers.contractordetails.ContractorUtrController.onPageLoad(mode: Mode = CheckMode)
 POST  /contractor-details/change-contractor-utr  controllers.contractordetails.ContractorUtrController.onSubmit(mode: Mode = CheckMode)
 
+GET   /contractor-details/add-contractor-email-address         controllers.contractordetails.AddEmailAddressYesNoController.onPageLoad(mode: Mode = NormalMode)
+POST  /contractor-details/add-contractor-email-address         controllers.contractordetails.AddEmailAddressYesNoController.onSubmit(mode: Mode = NormalMode)
+GET   /contractor-details/change-add-contractor-email-address  controllers.contractordetails.AddEmailAddressYesNoController.onPageLoad(mode: Mode = CheckMode)
+POST  /contractor-details/change-add-contractor-email-address  controllers.contractordetails.AddEmailAddressYesNoController.onSubmit(mode: Mode = CheckMode)
+
+GET   /contractor-details/add-contractor-scheme-name         controllers.contractordetails.AddSchemeNameYesNoController.onPageLoad(mode: Mode = NormalMode)
+POST  /contractor-details/add-contractor-scheme-name         controllers.contractordetails.AddSchemeNameYesNoController.onSubmit(mode: Mode = NormalMode)
+GET   /contractor-details/change-add-contractor-scheme-name  controllers.contractordetails.AddSchemeNameYesNoController.onPageLoad(mode: Mode = CheckMode)
+POST  /contractor-details/change-add-contractor-scheme-name  controllers.contractordetails.AddSchemeNameYesNoController.onSubmit(mode: Mode = CheckMode)
+
 # Individual Amend
 GET   /subcontractor/amend/email-address          controllers.add.IndividualEmailAddressController.onPageLoad(mode: Mode = AmendMode)
 POST  /subcontractor/amend/email-address          controllers.add.IndividualEmailAddressController.onSubmit(mode: Mode = AmendMode)
+
