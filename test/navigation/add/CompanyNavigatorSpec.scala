@@ -28,7 +28,9 @@ class CompanyNavigatorSpec extends SpecBase {
   val navigator                    = new CompanyNavigator
   private lazy val journeyRecovery = routes.JourneyRecoveryController.onPageLoad()
   private lazy val CompanyCYA      = controllers.add.company.routes.CompanyCheckYourAnswersController.onPageLoad()
-  private lazy val CompanyAmendCYA = routes.JourneyRecoveryController.onPageLoad()  //TODO replace when available controllers.add.company.routes.AmendCompanyCheckYourAnswersController.onPageLoad()
+  private lazy val CompanyAmendCYA =
+    routes.JourneyRecoveryController
+      .onPageLoad() // TODO replace when available controllers.add.company.routes.AmendCompanyCheckYourAnswersController.onPageLoad()
 
   "CompanyNavigator" - {
 
@@ -312,7 +314,7 @@ class CompanyNavigatorSpec extends SpecBase {
             CompanyUtrYesNoPage,
             AmendMode,
             answers
-          ) mustBe journeyRecovery //TODO when available  controllers.add.company.routes.CompanyUtrController.onPageLoad(CheckMode)
+          ) mustBe journeyRecovery // TODO when available  controllers.add.company.routes.CompanyUtrController.onPageLoad(CheckMode)
         }
 
         "to Company CYA when answer is Yes and CompanyUtrPage is answered before" in {

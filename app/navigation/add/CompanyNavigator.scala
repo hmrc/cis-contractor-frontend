@@ -78,9 +78,9 @@ class CompanyNavigator @Inject() () extends NavigatorForJourney {
   }
 
   private val amendRouteMap: Page => UserAnswers => Call = {
-    case CompanyUtrYesNoPage               =>
+    case CompanyUtrYesNoPage =>
       userAnswers => navigatorFromCompanyUtrYesNoPage(AmendMode)(userAnswers)
-    case _                                 => _ => cyaRoute(AmendMode)
+    case _                   => _ => cyaRoute(AmendMode)
   }
 
   private val checkRouteMap: Page => UserAnswers => Call = {
@@ -158,19 +158,19 @@ class CompanyNavigator @Inject() () extends NavigatorForJourney {
 
   private def navigatorFromCompanyUtrYesNoPage(mode: Mode)(userAnswers: UserAnswers): Call =
     (userAnswers.get(CompanyUtrYesNoPage), mode) match {
-      case (Some(true), NormalMode)  =>
+      case (Some(true), NormalMode)             =>
         controllers.add.company.routes.CompanyUtrController.onPageLoad(NormalMode)
-      case (Some(false), NormalMode) =>
+      case (Some(false), NormalMode)            =>
         controllers.add.company.routes.CompanyCrnYesNoController.onPageLoad(NormalMode)
-      case (Some(true), CheckMode)   =>
+      case (Some(true), CheckMode)              =>
         userAnswers
           .get(CompanyUtrPage)
           .fold(controllers.add.company.routes.CompanyUtrController.onPageLoad(CheckMode)) { _ =>
             cyaRoute(CheckMode)
           }
-      case (Some(false), CheckMode | AmendMode)  =>
+      case (Some(false), CheckMode | AmendMode) =>
         cyaRoute(mode)
-      case _                         =>
+      case _                                    =>
         routes.JourneyRecoveryController.onPageLoad()
     }
 
