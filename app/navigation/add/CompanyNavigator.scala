@@ -35,7 +35,15 @@ class CompanyNavigator @Inject() () extends NavigatorForJourney {
     case CheckMode  =>
       checkRouteMap(page)(userAnswers)
     case AmendMode  =>
-      routes.JourneyRecoveryController.onPageLoad()
+      amendRouteMap(page)(userAnswers)
+  }
+
+  private def cyaRoute(mode: Mode): Call = mode match {
+    case AmendMode =>
+      routes.JourneyRecoveryController
+        .onPageLoad() // TODO route to controllers.amend.company.routes.AmendCompanyCheckYourAnswersController.onPageLoad() when AmendCompanyCheckYourAnswersController added.
+    case _         => controllers.add.company.routes.CompanyCheckYourAnswersController.onPageLoad()
+
   }
 
   private val normalRoutes: Page => UserAnswers => Call = {
@@ -67,6 +75,12 @@ class CompanyNavigator @Inject() () extends NavigatorForJourney {
     case AddCompanyContactMethodsYesNoPage =>
       userAnswers => navigatorFromAddCompanyContactMethodsYesNoPage(NormalMode)(userAnswers)
     case _                                 => _ => routes.IndexController.onPageLoad()
+  }
+
+  private val amendRouteMap: Page => UserAnswers => Call = {
+    case CompanyUtrYesNoPage               =>
+      userAnswers => navigatorFromCompanyUtrYesNoPage(AmendMode)(userAnswers)
+    case _                                 => _ => cyaRoute(AmendMode)
   }
 
   private val checkRouteMap: Page => UserAnswers => Call = {
@@ -152,10 +166,10 @@ class CompanyNavigator @Inject() () extends NavigatorForJourney {
         userAnswers
           .get(CompanyUtrPage)
           .fold(controllers.add.company.routes.CompanyUtrController.onPageLoad(CheckMode)) { _ =>
-            controllers.add.company.routes.CompanyCheckYourAnswersController.onPageLoad()
+            cyaRoute(CheckMode)
           }
-      case (Some(false), CheckMode)  =>
-        controllers.add.company.routes.CompanyCheckYourAnswersController.onPageLoad()
+      case (Some(false), CheckMode | AmendMode)  =>
+        cyaRoute(mode)
       case _                         =>
         routes.JourneyRecoveryController.onPageLoad()
     }
