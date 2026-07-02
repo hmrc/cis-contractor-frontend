@@ -17,7 +17,7 @@
 package views.add.company
 
 import forms.add.company.CompanyUtrFormProvider
-import models.{AmendMode,NormalMode}
+import models.{AmendMode, NormalMode}
 import org.jsoup.nodes.Document
 import org.jsoup.select.Elements
 import org.scalatest.matchers.must.Matchers
