@@ -14,14 +14,17 @@
  * limitations under the License.
  */
 
-package pages.contractordetails
+package forms.contractordetails
 
-import pages.QuestionPage
-import play.api.libs.json.JsPath
+import forms.mappings.Mappings
+import play.api.data.Form
 
-case object RemoveSchemeNameYesNoPage extends QuestionPage[Boolean] {
+import javax.inject.Inject
 
-  override def path: JsPath = JsPath \ toString
+class RemoveDetailYesNoFormProvider @Inject() extends Mappings {
 
-  override def toString: String = "removeSchemeNameYesNo"
+  def apply(): Form[Boolean] =
+    Form(
+      "value" -> boolean("contractordetails.removeDetailYesNo.error.required")
+    )
 }

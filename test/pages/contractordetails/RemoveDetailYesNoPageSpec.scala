@@ -14,17 +14,20 @@
  * limitations under the License.
  */
 
-package forms.contractordetails
+package pages.contractordetails
 
-import forms.mappings.Mappings
-import play.api.data.Form
+import pages.behaviours.PageBehaviours
+import play.api.libs.json.JsPath
 
-import javax.inject.Inject
+class RemoveDetailYesNoPageSpec extends PageBehaviours {
 
-class RemoveSchemeNameYesNoFormProvider @Inject() extends Mappings {
+  "RemoveDetailYesNoPage" - {
+    "have the correct path" in {
+      RemoveDetailYesNoPage.path mustBe (JsPath \ "contractordetails" \ "removeDetailYesNo")
+    }
 
-  def apply(): Form[Boolean] =
-    Form(
-      "value" -> boolean("contractordetails.removeSchemeNameYesNo.error.required")
-    )
+    "have the correct toString" in {
+      RemoveDetailYesNoPage.toString mustBe "removeDetailYesNo"
+    }
+  }
 }

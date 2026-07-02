@@ -17,29 +17,29 @@
 package controllers.contractordetails
 
 import controllers.actions.*
-import forms.contractordetails.RemoveSchemeNameYesNoFormProvider
+import forms.contractordetails.RemoveDetailYesNoFormProvider
 import models.Mode
 import navigation.Navigator
-import pages.contractordetails.RemoveSchemeNameYesNoPage
+import pages.contractordetails.RemoveDetailYesNoPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.contractordetails.RemoveSchemeNameYesNoView
+import views.html.contractordetails.RemoveDetailYesNoView
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class RemoveSchemeNameYesNoController @Inject() (
+class RemoveDetailYesNoController @Inject() (
   override val messagesApi: MessagesApi,
   sessionRepository: SessionRepository,
   navigator: Navigator,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
-  formProvider: RemoveSchemeNameYesNoFormProvider,
+  formProvider: RemoveDetailYesNoFormProvider,
   val controllerComponents: MessagesControllerComponents,
-  view: RemoveSchemeNameYesNoView
+  view: RemoveDetailYesNoView
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport {
@@ -48,7 +48,7 @@ class RemoveSchemeNameYesNoController @Inject() (
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
 
-    val preparedForm = request.userAnswers.get(RemoveSchemeNameYesNoPage) match {
+    val preparedForm = request.userAnswers.get(RemoveDetailYesNoPage) match {
       case None        => form
       case Some(value) => form.fill(value)
     }
@@ -64,9 +64,9 @@ class RemoveSchemeNameYesNoController @Inject() (
           formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
           value =>
             for {
-              updatedAnswers <- Future.fromTry(request.userAnswers.set(RemoveSchemeNameYesNoPage, value))
+              updatedAnswers <- Future.fromTry(request.userAnswers.set(RemoveDetailYesNoPage, value))
               _              <- sessionRepository.set(updatedAnswers)
-            } yield Redirect(navigator.nextPage(RemoveSchemeNameYesNoPage, mode, updatedAnswers))
+            } yield Redirect(navigator.nextPage(RemoveDetailYesNoPage, mode, updatedAnswers))
         )
   }
 }

@@ -16,31 +16,30 @@
 
 package viewmodels.checkAnswers.contractordetails
 
-import controllers.routes
 import models.{CheckMode, UserAnswers}
-import pages.contractordetails.RemoveSchemeNameYesNoPage
+import pages.contractordetails.RemoveDetailYesNoPage
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
 
-object RemoveSchemeNameYesNoSummary {
+object RemoveDetailYesNoSummary {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(RemoveSchemeNameYesNoPage).map { answer =>
+    answers.get(RemoveDetailYesNoPage).map { answer =>
 
       val value = if (answer) "site.yes" else "site.no"
 
       SummaryListRowViewModel(
-        key = "contractordetails.removeSchemeNameYesNo.checkYourAnswersLabel",
+        key = "contractordetails.removeDetailYesNo.checkYourAnswersLabel",
         value = ValueViewModel(value),
         actions = Seq(
           ActionItemViewModel(
             "site.change",
-            controllers.contractordetails.routes.RemoveSchemeNameYesNoController.onPageLoad(CheckMode).url
+            controllers.contractordetails.routes.RemoveDetailYesNoController.onPageLoad(CheckMode).url
           )
-            .withVisuallyHiddenText(messages("contractordetails.removeSchemeNameYesNo.change.hidden"))
-            .withAttribute("id" -> "remove-scheme-name-yes-no")
+            .withVisuallyHiddenText(messages("contractordetails.removeDetailYesNo.change.hidden"))
+            .withAttribute("id" -> "remove-detail-yes-no")
         )
       )
     }

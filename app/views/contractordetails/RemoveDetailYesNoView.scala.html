@@ -26,9 +26,9 @@
 
 @(form: Form[_], mode: Mode)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = title(form, messages("contractordetails.removeSchemeNameYesNo.title"))) {
+@layout(pageTitle = title(form, messages("contractordetails.removeDetailYesNo.title"))) {
 
-    @formHelper(action = controllers.contractordetails.routes.RemoveSchemeNameYesNoController.onSubmit(mode), Symbol("autoComplete") -> "off") {
+    @formHelper(action = controllers.contractordetails.routes.RemoveDetailYesNoController.onSubmit(mode), Symbol("autoComplete") -> "off") {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form))
@@ -37,7 +37,7 @@
         @govukRadios(
             RadiosViewModel.yesNo(
                 field = form("value"),
-                legend = LegendViewModel(messages("contractordetails.removeSchemeNameYesNo.heading")).asPageHeading(Large)
+                legend = LegendViewModel(messages("contractordetails.removeDetailYesNo.heading")).asPageHeading(Large)
             )
         )
 
