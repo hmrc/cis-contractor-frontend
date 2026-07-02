@@ -418,6 +418,41 @@ class IndividualNavigatorSpec extends SpecBase {
         ) mustBe journeyRecovery // TODO: when CYA page available
       }
 
+      "must go from a NationalInsuranceNumberYesNoPage to CYA page when false" in {
+        navigator.nextPage(
+          NationalInsuranceNumberYesNoPage,
+          AmendMode,
+          emptyUserAnswers.setOrException(NationalInsuranceNumberYesNoPage, false)
+        ) mustBe journeyRecovery // TODO - change to CYA when wiring complete
+      }
+
+      "must go from a NationalInsuranceNumberYesNoPage to journey recovery page when incomplete info provided" in {
+        navigator.nextPage(
+          NationalInsuranceNumberYesNoPage,
+          AmendMode,
+          emptyUserAnswers
+        ) mustBe journeyRecovery
+      }
+
+      "must go from a NationalInsuranceNumberYesNoPage to next page when true" in {
+        navigator.nextPage(
+          NationalInsuranceNumberYesNoPage,
+          AmendMode,
+          emptyUserAnswers.setOrException(NationalInsuranceNumberYesNoPage, true)
+        ) mustBe controllers.add.routes.SubNationalInsuranceNumberController.onPageLoad(AmendMode)
+      }
+
+      "must go from SubNationalInsuranceNumberPage to Amend CYA" in {
+        navigator.nextPage(
+          SubNationalInsuranceNumberPage,
+          AmendMode,
+          emptyUserAnswers.setOrException(
+            SubNationalInsuranceNumberPage,
+            "AB123456C"
+          )
+        ) mustBe journeyRecovery // TODO: this needs to be redirected to amend cya page when it's implemented
+      }
+
       "must go from UniqueTaxpayerReferenceYesNoPage to SubcontractorsUniqueTaxpayerReferencePage when true and no utr exists" in {
         val ua =
           emptyUserAnswers.setOrException(UniqueTaxpayerReferenceYesNoPage, true)
