@@ -1057,10 +1057,22 @@ contractordetails.contractorUtr.error.length                                   =
 contractordetails.contractorDetailsCheckAnswers.title                          =  Contractor details
 contractordetails.contractorDetailsCheckAnswers.heading                        =  Contractor details
 contractordetails.contractorDetailsCheckAnswers.accountsOfficeReference        =  Accounts office reference: {0}
-contractordetails.contractorDetailsCheckAnswers.table.uniqueTaxpayerReference  =  Unique Taxpayer Reference
+contractordetails.contractorDetailsCheckAnswers.table.uniqueTaxpayerReference  =  Unique taxpayer reference
 contractordetails.contractorDetailsCheckAnswers.table.schemeName               =  Scheme name
 contractordetails.contractorDetailsCheckAnswers.table.schemeName.hidden        =  scheme name
-contractordetails.contractorDetailsCheckAnswers.table.email                    =  Email address
-contractordetails.contractorDetailsCheckAnswers.table.email.hidden             =  email address
+contractordetails.contractorDetailsCheckAnswers.table.email                    =  Email
+contractordetails.contractorDetailsCheckAnswers.table.email.hidden             =  email
 contractordetails.contractorDetailsCheckAnswers.table.link.addDetails          =  Add details
-contractordetails.contractorDetailsCheckAnswers.returnToCisDashboard.link      =  Return to CIS dashboard
+contractordetails.contractorDetailsCheckAnswers.returnToCisDashboard.link      =  Return to CIS account
+
+contractordetails.addEmailAddressYesNo.title                                   =  Do you want to enter the contractor’s email address?
+contractordetails.addEmailAddressYesNo.heading                                 =  Do you want to enter the contractor’s email address?
+contractordetails.addEmailAddressYesNo.error.required                          =  Select yes to enter the contractor’s email address
+contractordetails.addEmailAddressYesNo.checkYourAnswersLabel                   =  Add email address?
+contractordetails.addEmailAddressYesNo.change.hidden                           =  add email address?
+
+contractordetails.addSchemeNameYesNo.title                                     =  Do you want to enter the contractor’s scheme name?
+contractordetails.addSchemeNameYesNo.heading                                   =  Do you want to enter the contractor’s scheme name?
+contractordetails.addSchemeNameYesNo.error.required                            =  Select yes to enter the contractor’s scheme name
+contractordetails.addSchemeNameYesNo.checkYourAnswersLabel                     =  Add scheme name?
+contractordetails.addSchemeNameYesNo.change.hidden                             =  add scheme name?
