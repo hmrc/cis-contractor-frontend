@@ -24,7 +24,7 @@ class SchemeNamePageSpec extends SpecBase {
   "SchemeNamePage" - {
 
     "have the correct path" in {
-      SchemeNamePage.path mustBe (JsPath \ "schemeName")
+      SchemeNamePage.path mustBe (JsPath \ "contractordetails" \ "schemeName")
     }
 
     "have the correct toString" in {
