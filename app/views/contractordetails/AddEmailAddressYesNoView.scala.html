@@ -14,41 +14,35 @@
  * limitations under the License.
  *@
 
-@import viewmodels.InputWidth._
-@import viewmodels.LabelSize.Large
+@import viewmodels.LegendSize.Large
 
 @this(
     layout: templates.Layout,
     formHelper: FormWithCSRF,
     govukErrorSummary: GovukErrorSummary,
-    govukInput: GovukInput,
+    govukRadios: GovukRadios,
     govukButton: GovukButton
 )
 
-@(form: Form[_], mode: Mode, name: String)(implicit request: Request[_], messages: Messages)
+@(form: Form[_], mode: Mode)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = title(form, messages("individualMobileNumber.title"))) {
+@layout(pageTitle = title(form, messages("contractordetails.addEmailAddressYesNo.title"))) {
 
-    @formHelper(action = controllers.add.routes.IndividualMobileNumberController.onSubmit(mode)) {
+    @formHelper(action = controllers.contractordetails.routes.AddEmailAddressYesNoController.onSubmit(mode), Symbol("autoComplete") -> "off") {
 
         @if(form.errors.nonEmpty) {
-            @govukErrorSummary(ErrorSummaryViewModel(form))
+            @govukErrorSummary(ErrorSummaryViewModel(form, errorLinkOverrides = Map("value" -> "value_0")))
         }
 
-        @govukInput(
-            InputViewModel(
+        @govukRadios(
+            RadiosViewModel.yesNo(
                 field = form("value"),
-                label = LabelViewModel(messages("individualMobileNumber.heading", name)).asPageHeading(Large)
+                legend = LegendViewModel(messages("contractordetails.addEmailAddressYesNo.heading")).asPageHeading(Large)
             )
-            .withHint(HintViewModel(messages("individualMobileNumber.hint")))
-            .withWidth(Full)
-            .withInputType("tel")
-            .withSpellcheck(false)
-            .withAutocomplete("tel")
         )
 
         @govukButton(
-            ButtonViewModel(messages(if(mode == models.AmendMode) "site.update" else "site.continue"))
+            ButtonViewModel(messages("site.continue"))
         )
     }
 }

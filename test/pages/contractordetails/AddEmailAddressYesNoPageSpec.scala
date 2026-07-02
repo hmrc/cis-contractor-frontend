@@ -16,12 +16,24 @@
 
 package pages.contractordetails
 
-import pages.QuestionPage
+import pages.behaviours.PageBehaviours
 import play.api.libs.json.JsPath
 
-case object EnterContractorEmailAddressPage extends QuestionPage[String] with ContractorDetailsJourney {
+class AddEmailAddressYesNoPageSpec extends PageBehaviours {
 
-  override def path: JsPath = JsPath \ "contractordetails" \ toString
+  "AddEmailAddressYesNoPage" - {
+    "have the correct path" in {
+      AddEmailAddressYesNoPage.path mustBe (JsPath \ "contractordetails" \ "addEmailAddressYesNo")
+    }
 
-  override def toString: String = "enterContractorEmailAddress"
+    "have the correct toString" in {
+      AddEmailAddressYesNoPage.toString mustBe "addEmailAddressYesNo"
+    }
+
+    beRetrievable[Boolean](AddEmailAddressYesNoPage)
+
+    beSettable[Boolean](AddEmailAddressYesNoPage)
+
+    beRemovable[Boolean](AddEmailAddressYesNoPage)
+  }
 }

@@ -17,11 +17,10 @@
 package views.add
 
 import forms.add.WorksReferenceNumberYesNoFormProvider
-import views.html.add.WorksReferenceNumberYesNoView
-import org.scalatest.matchers.must.Matchers
 import models.NormalMode
 import org.jsoup.nodes.Document
 import org.jsoup.select.Elements
+import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.data.Form
@@ -29,6 +28,7 @@ import play.api.i18n.Messages
 import play.api.mvc.Request
 import play.api.test.FakeRequest
 import play.twirl.api.HtmlFormat
+import views.html.add.WorksReferenceNumberYesNoView
 
 class WorksReferenceNumberYesNoViewSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite {
 
