@@ -20,7 +20,7 @@ import controllers.routes
 import models.contact.ContactMethodOptions
 import models.{AmendMode, CheckMode, Mode, NormalMode, UserAnswers}
 import navigation.NavigatorForJourney
-import pages.Page
+import pages.{Page, QuestionPage}
 import pages.add.partnership.*
 import play.api.mvc.Call
 
@@ -287,37 +287,28 @@ class PartnershipNavigator @Inject() () extends NavigatorForJourney {
   private def nextSelectedContactMethodPageAfter(
     current: Option[ContactMethodOptions]
   )(userAnswers: UserAnswers): Call =
-    selectedContactMethodsInOrder(userAnswers)
-      .filter(_.nonEmpty)
-      .fold(routes.JourneyRecoveryController.onPageLoad()) { selectedContactMethods =>
-        current match {
-
-          case Some(currentContactMethod) if !selectedContactMethods.contains(currentContactMethod) =>
-            routes.JourneyRecoveryController.onPageLoad()
-
-          case _ =>
-            val nextContactMethod: Option[ContactMethodOptions] =
-              current match {
-                case None =>
-                  selectedContactMethods.headOption
-
-                case Some(currentContactMethod) =>
-                  val currentIndex = selectedContactMethods.indexWhere(_ == currentContactMethod)
-                  selectedContactMethods.drop(currentIndex + 1).headOption
-
-              }
-
-            nextContactMethod.fold {
-              controllers.add.partnership.routes.PartnershipHasUtrYesNoController.onPageLoad(NormalMode)
-            } { contactMethod =>
-              contactMethodPageCall(contactMethod, NormalMode)
-            }
-        }
-      }
+    navigateFromContactMethodPage(current, userAnswers) { remaining =>
+      remaining.headOption.fold {
+        controllers.add.partnership.routes.PartnershipHasUtrYesNoController.onPageLoad(NormalMode)
+      }(contactMethodPageCall(_, NormalMode))
+    }
 
   private def nextMissingSelectedContactMethodPageAfter(
     current: Option[ContactMethodOptions]
   )(userAnswers: UserAnswers): Call =
+    navigateFromContactMethodPage(current, userAnswers) { remaining =>
+      remaining
+        .find(isMissingAnswer(_)(userAnswers))
+        .map(contactMethodPageCall(_, CheckMode))
+        .getOrElse(
+          controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
+        )
+    }
+
+  private def navigateFromContactMethodPage(
+    current: Option[ContactMethodOptions],
+    userAnswers: UserAnswers
+  )(terminalStep: Seq[ContactMethodOptions] => Call): Call =
     selectedContactMethodsInOrder(userAnswers)
       .filter(_.nonEmpty)
       .fold(routes.JourneyRecoveryController.onPageLoad()) { selectedContactMethods =>
@@ -326,23 +317,17 @@ class PartnershipNavigator @Inject() () extends NavigatorForJourney {
             routes.JourneyRecoveryController.onPageLoad()
 
           case _ =>
-            val remainingContactMethods: Seq[ContactMethodOptions] =
+            val remaining: Seq[ContactMethodOptions] =
               current match {
                 case None =>
                   selectedContactMethods
 
                 case Some(currentContactMethod) =>
-                  val currentIndex: Int = selectedContactMethods.indexWhere(_ == currentContactMethod)
-
+                  val currentIndex = selectedContactMethods.indexWhere(_ == currentContactMethod)
                   selectedContactMethods.drop(currentIndex + 1)
               }
 
-            remainingContactMethods
-              .find(contactMethod => isMissingAnswer(contactMethod)(userAnswers))
-              .map(contactMethod => contactMethodPageCall(contactMethod, CheckMode))
-              .getOrElse(
-                controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
-              )
+            terminalStep(remaining)
         }
       }
 
@@ -361,10 +346,13 @@ class PartnershipNavigator @Inject() () extends NavigatorForJourney {
         controllers.add.partnership.routes.PartnershipMobileNumberController.onPageLoad(mode)
     }
 
-  private def isMissingAnswer(contactMethod: ContactMethodOptions)(userAnswers: UserAnswers): Boolean =
+  private def contactMethodPage(contactMethod: ContactMethodOptions): QuestionPage[String] =
     contactMethod match {
-      case ContactMethodOptions.Email  => userAnswers.get(PartnershipEmailAddressPage).isEmpty
-      case ContactMethodOptions.Phone  => userAnswers.get(PartnershipPhoneNumberPage).isEmpty
-      case ContactMethodOptions.Mobile => userAnswers.get(PartnershipMobileNumberPage).isEmpty
+      case ContactMethodOptions.Email  => PartnershipEmailAddressPage
+      case ContactMethodOptions.Phone  => PartnershipPhoneNumberPage
+      case ContactMethodOptions.Mobile => PartnershipMobileNumberPage
     }
+
+  private def isMissingAnswer(contactMethod: ContactMethodOptions)(userAnswers: UserAnswers): Boolean =
+    userAnswers.get(contactMethodPage(contactMethod)).isEmpty
 }
