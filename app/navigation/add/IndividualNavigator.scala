@@ -137,8 +137,9 @@ class IndividualNavigator @Inject() () extends NavigatorForJourney {
       case AmendMode =>
         ua.get(SubAddressYesNoPage) match {
           case Some(true)  =>
-            // controllers.add.routes.AddressOfSubcontractorController.redirectToAmendAddressLookup()
-            cyaRoute(mode)
+            cyaRoute(
+              mode
+            ) // TODO when available  controllers.add.routes.AddressOfSubcontractorController.redirectToAmendAddressLookup()
           case Some(false) =>
             cyaRoute(mode)
           case None        =>
