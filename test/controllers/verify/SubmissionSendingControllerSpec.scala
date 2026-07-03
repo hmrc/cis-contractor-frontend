@@ -133,7 +133,7 @@ class SubmissionSendingControllerSpec extends SpecBase with MockitoSugar {
           .value
 
       when(
-        mockService.pollStatus(
+        mockService.pollStatusAndPersist(
           any[UserAnswers],
           any[VerificationSubmissionDetails]
         )(any[HeaderCarrier])
@@ -175,7 +175,7 @@ class SubmissionSendingControllerSpec extends SpecBase with MockitoSugar {
           .value
 
       when(
-        mockService.pollStatus(
+        mockService.pollStatusAndPersist(
           any[UserAnswers],
           any[VerificationSubmissionDetails]
         )(any[HeaderCarrier])
@@ -223,7 +223,7 @@ class SubmissionSendingControllerSpec extends SpecBase with MockitoSugar {
         redirectLocation(result).value mustBe
           controllers.routes.JourneyRecoveryController.onPageLoad().url
 
-        verify(mockService, never()).pollStatus(
+        verify(mockService, never()).pollStatusAndPersist(
           any[UserAnswers],
           any[VerificationSubmissionDetails]
         )(any[HeaderCarrier])

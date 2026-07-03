@@ -19,6 +19,7 @@ package models.verify
 import connectors.ConstructionIndustrySchemeConnector
 import models.{EmployerReference, UserAnswers, VerificationCurrentVerification}
 import models.requests.{ChrisVerificationRequest, VerificationDetails}
+import pages.verify.CurrentVerificationBatchResponsePage
 import queries.CisIdQuery
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.VerifyEmailResolver
@@ -44,7 +45,10 @@ class ChrisVerificationRequestBuilder @Inject() (
     for {
       cisId                       <- cisIdFut
       scheme                      <- cisConnector.getScheme(cisId)
-      currentVerificationBatch    <- cisConnector.getCurrentVerificationBatch(cisId)
+      currentVerificationBatch    <- requireFromSession(
+                                       ua.get(CurrentVerificationBatchResponsePage),
+                                       "CurrentVerificationBatchResponsePage not found in session data"
+                                     )
       utr                          = requireValue(scheme.utr, "UTR not found in scheme data")
       verificationBatch            = requireValue(currentVerificationBatch.verificationBatch, "Verification batch not found")
       verificationBatchResourceRef =

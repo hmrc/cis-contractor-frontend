@@ -76,7 +76,7 @@ class SubmissionSendingController @Inject() (
             submissionDetails.pollIntervalSeconds.getOrElse(appConfig.submissionPollDefaultIntervalSeconds)
 
           verificationService
-            .pollStatus(request.userAnswers, submissionDetails)
+            .pollStatusAndPersist(request.userAnswers, submissionDetails)
             .map(response => redirectForPollSubmissionStatus(response.status, pollInterval))
             .recover { case ex =>
               logger.error("[SubmissionSendingController.onPollAndRedirect] Verification poll failed", ex)
@@ -91,8 +91,6 @@ class SubmissionSendingController @Inject() (
         Redirect(controllers.verify.routes.SubmissionSendingController.onPollAndRedirect)
       case FATAL_ERROR                         =>
         Redirect(controllers.verify.routes.VerificationNotSubmittedWarningController.onPageLoad())
-      case SEND_ERROR                          =>
-        Redirect(controllers.verify.routes.VerifySendErrorController.onPageLoad())
       case _                                   =>
         recovery
     }

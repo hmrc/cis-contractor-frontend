@@ -735,7 +735,7 @@ final class VerificationServiceSpec extends SpecBase with MockitoSugar with Mode
     }
   }
 
-  "VerificationService.pollStatus" - {
+  "VerificationService.pollStatusAndPersist" - {
 
     "must poll ChRIS and return response" in {
       val mockConnector = mock[ConstructionIndustrySchemeConnector]
@@ -771,13 +771,15 @@ final class VerificationServiceSpec extends SpecBase with MockitoSugar with Mode
       when(mockConnector.getSubmissionStatus(eqTo("http://localhost/poll"), eqTo("13602"))(any[HeaderCarrier]))
         .thenReturn(Future.successful(pollResponse))
 
+      when(mockRepo.set(any[UserAnswers]))
+        .thenReturn(Future.successful(true))
+
       val result =
-        service.pollStatus(emptyUserAnswers, details).futureValue
+        service.pollStatusAndPersist(emptyUserAnswers, details).futureValue
 
       result mustBe pollResponse
 
       verify(mockConnector).getSubmissionStatus(eqTo("http://localhost/poll"), eqTo("13602"))(any[HeaderCarrier])
-      verify(mockRepo, never()).set(any[UserAnswers])
     }
 
     "must fail when pollUrl is missing" in {
@@ -800,7 +802,7 @@ final class VerificationServiceSpec extends SpecBase with MockitoSugar with Mode
         )
 
       val ex =
-        service.pollStatus(emptyUserAnswers, details).failed.futureValue
+        service.pollStatusAndPersist(emptyUserAnswers, details).failed.futureValue
 
       ex.getMessage mustBe "Poll URL missing in submission details"
 

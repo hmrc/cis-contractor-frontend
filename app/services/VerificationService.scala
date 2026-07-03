@@ -151,13 +151,15 @@ class VerificationService @Inject() (
       updatedUa     <- saveVerificationSubmissionDetailsToSession(latestUa, response)
     } yield response
 
-  def pollStatus(
+  def pollStatusAndPersist(
     ua: UserAnswers,
     submissionDetails: VerificationSubmissionDetails
   )(implicit hc: HeaderCarrier): Future[ChrisPollResponse] =
     for {
-      pollUrl  <- required(submissionDetails.pollUrl, "Poll URL missing in submission details")
-      response <- cisConnector.getSubmissionStatus(pollUrl, submissionDetails.submissionId)
+      pollUrl       <- required(submissionDetails.pollUrl, "Poll URL missing in submission details")
+      response      <- cisConnector.getSubmissionStatus(pollUrl, submissionDetails.submissionId)
+      updatedDetails = VerificationSubmissionDetailsBuilder.updateFromPollResponse(submissionDetails, response)
+      updatedUa     <- saveVerificationPollDetailsToSession(ua, updatedDetails)
     } yield response
 
   private def createSubmissionForVerification(
@@ -214,6 +216,16 @@ class VerificationService @Inject() (
         updatedUa => sessionRepository.set(updatedUa).map(_ => updatedUa)
       )
   }
+
+  private def saveVerificationPollDetailsToSession(
+    ua: UserAnswers,
+    details: VerificationSubmissionDetails
+  ): Future[UserAnswers] =
+    ua.set(VerificationSubmissionDetailsPage, details)
+      .fold(
+        error => Future.failed(error),
+        updatedUa => sessionRepository.set(updatedUa).map(_ => updatedUa)
+      )
 
   private def required[A](value: Option[A], errorMsg: String): Future[A] =
     value match {

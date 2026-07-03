@@ -25,7 +25,7 @@ import models.response.*
 import models.requests.*
 import models.*
 import models.verify.ContractorEmailConfirmationStored.DifferentEmail
-import pages.verify.{ContractorEmailConfirmationStoredPage, EmailAddressPage}
+import pages.verify.{ContractorEmailConfirmationStoredPage, CurrentVerificationBatchResponsePage, EmailAddressPage}
 import queries.CisIdQuery
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -41,34 +41,6 @@ class ChrisVerificationRequestBuilderSpec extends SpecBase with MockitoSugar {
   "ChrisVerificationRequestBuilder" - {
 
     "must build a ChrisVerificationRequest" in {
-      val ua =
-        emptyUserAnswers
-          .set(CisIdQuery, "1")
-          .success
-          .value
-          .set(ContractorEmailConfirmationStoredPage, DifferentEmail)
-          .success
-          .value
-          .set(EmailAddressPage, "test@test.com")
-          .success
-          .value
-
-      when(mockConnector.getScheme(any())(any()))
-        .thenReturn(
-          Future.successful(
-            Scheme(
-              schemeId = 1,
-              instanceId = "1",
-              accountsOfficeReference = "AO123",
-              taxOfficeNumber = "123",
-              taxOfficeReference = "AB456",
-              utr = Some("1234567890"),
-              name = Some("Test Contractor"),
-              emailAddress = Some("test@test.com")
-            )
-          )
-        )
-
       val subcontractor =
         SubcontractorCurrentVerification(
           subcontractorId = 10L,
@@ -92,25 +64,52 @@ class ChrisVerificationRequestBuilderSpec extends SpecBase with MockitoSugar {
           worksReferenceNumber = None
         )
 
-      when(mockConnector.getCurrentVerificationBatch(any())(any()))
+      val currentVerificationBatchResponse =
+        GetCurrentVerificationBatchResponse(
+          subcontractors = Seq(subcontractor),
+          verificationBatch = Some(
+            VerificationBatchCurrentVerification(
+              verificationBatchId = 1001L,
+              verifBatchResourceRef = Some(2001L)
+            )
+          ),
+          verifications = Seq(
+            VerificationCurrentVerification(
+              verificationId = 3001L,
+              verificationBatchId = Some(1001L),
+              subcontractorId = Some(10L),
+              verificationResourceRef = Some(4001L)
+            )
+          )
+        )
+
+      val ua =
+        emptyUserAnswers
+          .set(CisIdQuery, "1")
+          .success
+          .value
+          .set(ContractorEmailConfirmationStoredPage, DifferentEmail)
+          .success
+          .value
+          .set(EmailAddressPage, "test@test.com")
+          .success
+          .value
+          .set(CurrentVerificationBatchResponsePage, currentVerificationBatchResponse)
+          .success
+          .value
+
+      when(mockConnector.getScheme(any())(any()))
         .thenReturn(
           Future.successful(
-            GetCurrentVerificationBatchResponse(
-              subcontractors = Seq(subcontractor),
-              verificationBatch = Some(
-                VerificationBatchCurrentVerification(
-                  verificationBatchId = 1001L,
-                  verifBatchResourceRef = Some(2001L)
-                )
-              ),
-              verifications = Seq(
-                VerificationCurrentVerification(
-                  verificationId = 3001L,
-                  verificationBatchId = Some(1001L),
-                  subcontractorId = Some(10L),
-                  verificationResourceRef = Some(4001L)
-                )
-              )
+            Scheme(
+              schemeId = 1,
+              instanceId = "1",
+              accountsOfficeReference = "AO123",
+              taxOfficeNumber = "123",
+              taxOfficeReference = "AB456",
+              utr = Some("1234567890"),
+              name = Some("Test Contractor"),
+              emailAddress = Some("test@test.com")
             )
           )
         )
