@@ -495,6 +495,14 @@ class IndividualNavigatorSpec extends SpecBase {
           emptyUserAnswers
         ) mustBe journeyRecovery
       }
+
+      "must go from a SubcontractorsUniqueTaxpayerReferencePage to journey recovery page" in {
+        navigator.nextPage(
+          SubcontractorsUniqueTaxpayerReferencePage,
+          AmendMode,
+          UserAnswers("id")
+        ) mustBe journeyRecovery // TODO: this needs to be redirected to amend individual cya page, AmendIndividualCheckYourAnswersController when it's implemented
+      }
     }
 
     "in Check mode" - {
