@@ -16,12 +16,36 @@
 
 package pages.contractordetails
 
+import models.UserAnswers
 import pages.QuestionPage
 import play.api.libs.json.JsPath
+
+import scala.util.Try
 
 case object RemoveDetailYesNoPage extends QuestionPage[Boolean] {
 
   override def path: JsPath = JsPath \ "contractordetails" \ toString
 
   override def toString: String = "removeDetailYesNo"
+
+  // not sure where contractorDetail should be imported from if anywhere
+
+//  override def cleanup(value: Option[Boolean], userAnswers: UserAnswers): Try[UserAnswers] = {
+//    contractorDetail match {
+//      case "email" =>
+//        if value.contains(false) then {
+//          userAnswers
+//            .remove(EnterContractorEmailAddressPage)
+//        } else {
+//          super.cleanup(value, userAnswers)
+//        }
+//      case "scheme-name" =>
+//        if value.contains(false) then {
+//          userAnswers
+//            .remove(SchemeNamePage)
+//        } else {
+//          super.cleanup(value, userAnswers)
+//        }
+//    }
+//  }
 }

@@ -29,5 +29,27 @@ class RemoveDetailYesNoPageSpec extends PageBehaviours {
     "have the correct toString" in {
       RemoveDetailYesNoPage.toString mustBe "removeDetailYesNo"
     }
+
+//    "contractorDetail is set to 'email'" in {
+//      contractorDetail match {
+//        case "email" =>
+//          beRetrievable[String](EnterContractorEmailAddressPage)
+//
+//          beSettable[String](EnterContractorEmailAddressPage)
+//
+//          beRemovable[String](EnterContractorEmailAddressPage)
+//      }
+//    }
+//
+//    "contractorDetail is set to 'scheme-name'" in {
+//      contractorDetail match {
+//        case "scheme-name" =>
+//          beRetrievable[String](SchemeNamePage)
+//
+//          beSettable[String](SchemeNamePage)
+//
+//          beRemovable[String](SchemeNamePage)
+//      }
+//    }
   }
 }

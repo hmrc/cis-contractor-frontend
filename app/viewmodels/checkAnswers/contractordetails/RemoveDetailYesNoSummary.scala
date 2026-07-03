@@ -25,7 +25,7 @@ import viewmodels.implicits.*
 
 object RemoveDetailYesNoSummary {
 
-  val contractorDetail = "scheme-name"
+  val contractorDetail = "scheme-name" // not sure how to resolve this being hard coded
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
     answers.get(RemoveDetailYesNoPage).map { answer =>
