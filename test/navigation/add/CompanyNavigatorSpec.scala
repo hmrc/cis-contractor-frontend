@@ -335,7 +335,7 @@ class CompanyNavigatorSpec extends SpecBase {
           ) mustBe CompanyAmendCYA
         }
 
-        "to Company CYA when answer is No" in {
+        "to Company CYA when CompanyWorksReferencePage answer is No" in {
           val answers = emptyUserAnswers.set(CompanyWorksReferenceYesNoPage, false).success.value
 
           navigator.nextPage(
@@ -345,7 +345,7 @@ class CompanyNavigatorSpec extends SpecBase {
           ) mustBe CompanyAmendCYA
         }
 
-        "to JourneyRecoveryPage when answer is not present" in {
+        "to JourneyRecoveryPage when CompanyWorksReferencePage answer is not present" in {
           navigator.nextPage(
             CompanyWorksReferenceYesNoPage,
             AmendMode,
