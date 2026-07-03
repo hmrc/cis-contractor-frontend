@@ -617,7 +617,7 @@ final class VerificationServiceSpec extends SpecBase with MockitoSugar with Mode
         instanceId = "INST-123",
         verificationBatchId = 99L,
         verificationBatchResourceRef = 7777L,
-        emailRecipient = "ops@example.com",
+        emailRecipient = Some("ops@example.com"),
         irMarkGenerated = None,
         verifications = Seq(
           VerificationToUpdate(
@@ -655,7 +655,7 @@ final class VerificationServiceSpec extends SpecBase with MockitoSugar with Mode
         instanceId = "INST-123",
         verificationBatchId = 99L,
         verificationBatchResourceRef = 7777L,
-        emailRecipient = "ops@example.com",
+        emailRecipient = Some("ops@example.com"),
         irMarkGenerated = None,
         verifications = Seq(
           VerificationToUpdate("Unknown", 111L, "Y")

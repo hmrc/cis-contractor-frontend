@@ -57,7 +57,7 @@ final class CreateSubmissionForVerificationRequestSpec extends AnyWordSpec with 
       out.instanceId mustBe "abc-123"
       out.verificationBatchId mustBe 99L
       out.verificationBatchResourceRef mustBe 10L
-      out.emailRecipient mustBe "ops@example.com"
+      out.emailRecipient mustBe Some("ops@example.com")
       out.irMarkGenerated mustBe Some("IR_MARK")
       out.agentId mustBe Some("agent-123")
 
@@ -100,7 +100,7 @@ final class CreateSubmissionForVerificationRequestSpec extends AnyWordSpec with 
         instanceId = "abc-123",
         verificationBatchId = 99L,
         verificationBatchResourceRef = 10L,
-        emailRecipient = "ops@example.com",
+        emailRecipient = Some("ops@example.com"),
         irMarkGenerated = Some("IR_MARK"),
         verifications = Seq(
           VerificationToUpdate(
@@ -117,7 +117,7 @@ final class CreateSubmissionForVerificationRequestSpec extends AnyWordSpec with 
       (jsonWithAgent \ "instanceId").as[String] mustBe "abc-123"
       (jsonWithAgent \ "verificationBatchId").as[Long] mustBe 99L
       (jsonWithAgent \ "verificationBatchResourceRef").as[Long] mustBe 10L
-      (jsonWithAgent \ "emailRecipient").as[String] mustBe "ops@example.com"
+      (jsonWithAgent \ "emailRecipient").asOpt[String] mustBe Some("ops@example.com")
       (jsonWithAgent \ "irMarkGenerated").as[String] mustBe "IR_MARK"
       (jsonWithAgent \ "agentId").as[String] mustBe "agent-123"
 
@@ -132,12 +132,27 @@ final class CreateSubmissionForVerificationRequestSpec extends AnyWordSpec with 
       (jsonWithoutAgent \ "agentId").toOption mustBe None
     }
 
+    "omit emailRecipient from JSON when None (opt-out)" in {
+      val model = CreateSubmissionForVerificationRequest(
+        instanceId = "abc-123",
+        verificationBatchId = 99L,
+        verificationBatchResourceRef = 10L,
+        emailRecipient = None,
+        verifications = Seq.empty,
+        agentId = None
+      )
+
+      val json = Json.toJson(model)
+      (json \ "emailRecipient").toOption mustBe None
+      json.validate[CreateSubmissionForVerificationRequest].get.emailRecipient mustBe None
+    }
+
     "round-trip (model -> json -> model) without losing data" in {
       val model = CreateSubmissionForVerificationRequest(
         instanceId = "abc-123",
         verificationBatchId = 99L,
         verificationBatchResourceRef = 10L,
-        emailRecipient = "ops@example.com",
+        emailRecipient = Some("ops@example.com"),
         irMarkGenerated = Some("IR_MARK"),
         verifications = Seq(
           VerificationToUpdate("ACME LTD", 111L, "Y"),

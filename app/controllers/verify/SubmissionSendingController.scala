@@ -80,7 +80,7 @@ class SubmissionSendingController @Inject() (
       batchRef <-
         current.verificationBatch.flatMap(_.verifBatchResourceRef).toRight("verificationBatchResourceRef missing")
 
-      email = VerifyEmailResolver.resolvedEmail(ua).getOrElse("")
+      email = VerifyEmailResolver.resolvedEmail(ua)
     } yield {
 
       val verifications: Seq[VerificationToUpdate] =

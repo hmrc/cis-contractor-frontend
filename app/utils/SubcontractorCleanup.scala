@@ -111,6 +111,8 @@ object SubcontractorCleanup {
       .flatMap(_.remove(ContractorEmailConfirmationStoredPage))
       .flatMap(_.remove(ContractorEmailConfirmationNotStoredPage))
       .flatMap(_.remove(EmailAddressPage))
+      .flatMap(_.remove(VerifyYourSubcontractorsYesNoPage))
+      .flatMap(_.remove(VerificationDeclarationPage))
       .flatMap(_.remove(CurrentVerificationBatchResponsePage))
       .flatMap(_.remove(NewestVerificationBatchResponsePage))
       .flatMap(_.remove(VerificationBatchReadinessPage))

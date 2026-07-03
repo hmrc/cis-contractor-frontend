@@ -140,7 +140,7 @@ class SubmissionSendingControllerSpec extends SpecBase with MockitoSugar {
         req.instanceId mustBe instanceId
         req.verificationBatchId mustBe 99L
         req.verificationBatchResourceRef mustBe 7777L
-        req.emailRecipient mustBe "scheme@example.com"
+        req.emailRecipient mustBe Some("scheme@example.com")
         req.verifications.map(_.verificationResourceRef) mustBe Seq(111L)
       }
     }

@@ -112,6 +112,59 @@ class ValidatedVerifySpec extends SpecBase with Matchers {
       )
     }
 
+    "build successfully when only subcontractors to reverify are selected" in {
+      val ua =
+        emptyUserAnswers
+          .set(ReverifyExistingSubcontractorsYesNoPage, true)
+          .success
+          .value
+          .set(SelectSubcontractorsToReverifyPage, Set(grantAlan))
+          .success
+          .value
+          .set(ContractorEmailConfirmationStoredPage, DoNotSend)
+          .success
+          .value
+          .set(VerificationBatchReadinessPage, true)
+          .success
+          .value
+
+      ValidatedVerify.build(ua) mustBe Right(
+        ValidatedVerify(
+          selectedSubcontractors = Set.empty,
+          subcontractorsToReverify = Some(Set(grantAlan)),
+          emailToUse = None
+        )
+      )
+    }
+
+    "build successfully when only subcontractors to reverify are selected and CurrentEmail is used" in {
+      val ua =
+        emptyUserAnswers
+          .set(ReverifyExistingSubcontractorsYesNoPage, true)
+          .success
+          .value
+          .set(SelectSubcontractorsToReverifyPage, Set(grantAlan))
+          .success
+          .value
+          .set(NewestVerificationBatchResponsePage, batchResponseWithEmail("scheme@example.com"))
+          .success
+          .value
+          .set(ContractorEmailConfirmationStoredPage, CurrentEmail)
+          .success
+          .value
+          .set(VerificationBatchReadinessPage, true)
+          .success
+          .value
+
+      ValidatedVerify.build(ua) mustBe Right(
+        ValidatedVerify(
+          selectedSubcontractors = Set.empty,
+          subcontractorsToReverify = Some(Set(grantAlan)),
+          emailToUse = Some("scheme@example.com")
+        )
+      )
+    }
+
     "resolve emailToUse from scheme address when ContractorEmailConfirmationStored is CurrentEmail" in {
       val ua =
         minRequired
@@ -200,8 +253,8 @@ class ValidatedVerifySpec extends SpecBase with Matchers {
 
     // ─── Failure: missing required pages ─────────────────────────────────────
 
-    "fail when SelectSubcontractorPage is missing" in {
-      ValidatedVerify.build(emptyUserAnswers) mustBe Left(MissingAnswer(SelectSubcontractorPage))
+    "fail when no subcontractors are selected for verify or reverify" in {
+      ValidatedVerify.build(emptyUserAnswers) mustBe Left(InvalidAnswer(SelectSubcontractorPage))
     }
 
     "fail when reverify=true but SelectSubcontractorsToReverifyPage is absent" in {

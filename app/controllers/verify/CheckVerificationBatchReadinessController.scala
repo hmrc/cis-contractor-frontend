@@ -19,7 +19,7 @@ package controllers.verify
 import controllers.actions.*
 import models.{AmendMode, CheckMode, Mode, NormalMode, UserAnswers}
 import models.verify.VerificationBatchReadiness
-import pages.verify.{NewestVerificationBatchResponsePage, SelectSubcontractorPage, VerificationBatchReadinessPage}
+import pages.verify.{NewestVerificationBatchResponsePage, SelectSubcontractorPage, SelectSubcontractorsToReverifyPage, VerificationBatchReadinessPage}
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
@@ -48,10 +48,35 @@ class CheckVerificationBatchReadinessController @Inject() (
     (identify andThen getData andThen requireData).async { implicit request =>
       val ua = request.userAnswers
 
-      val batchReadyOpt = for {
-        selectedSubs  <- ua.get(SelectSubcontractorPage)
-        batchResponse <- ua.get(NewestVerificationBatchResponsePage)
-      } yield VerificationBatchReadiness.isBatchReady(selectedSubs.map(_.id), batchResponse.subcontractors)
+      val selectedUnverifiedIds: Set[String] =
+        ua.get(SelectSubcontractorPage)
+          .getOrElse(Set.empty)
+          .map(_.id)
+
+      val selectedReverifyIds: Set[String] =
+        ua.get(SelectSubcontractorsToReverifyPage)
+          .getOrElse(Set.empty)
+          .map(_.id)
+
+      val selectedIds: Set[String] =
+        selectedUnverifiedIds ++ selectedReverifyIds
+
+      val isReverifyOnly =
+        selectedUnverifiedIds.isEmpty && selectedReverifyIds.nonEmpty
+
+      val batchReadyOpt =
+        ua.get(NewestVerificationBatchResponsePage)
+          .filter(_ => selectedIds.nonEmpty)
+          .map { batchResponse =>
+            if (isReverifyOnly) {
+              val batchSubcontractorIds =
+                batchResponse.subcontractors.map(_.subcontractorId.toString).toSet
+
+              selectedReverifyIds.subsetOf(batchSubcontractorIds)
+            } else {
+              VerificationBatchReadiness.isBatchReady(selectedIds, batchResponse.subcontractors)
+            }
+          }
 
       batchReadyOpt match {
         case Some(true) =>
@@ -60,10 +85,16 @@ class CheckVerificationBatchReadinessController @Inject() (
             _              <- sessionRepository.set(updatedAnswers)
           } yield {
             val redirect = mode match {
-              case NormalMode => nextEmailConfirmationPage(ua)
-              case CheckMode  => controllers.verify.routes.VerifyCheckYourAnswersController.onPageLoad()
-              case AmendMode  => controllers.routes.JourneyRecoveryController.onPageLoad()
+              case NormalMode =>
+                nextEmailConfirmationPage(updatedAnswers)
+
+              case CheckMode =>
+                controllers.verify.routes.VerifyCheckYourAnswersController.onPageLoad()
+
+              case AmendMode =>
+                controllers.routes.JourneyRecoveryController.onPageLoad()
             }
+
             Redirect(redirect)
           }
 
@@ -76,7 +107,7 @@ class CheckVerificationBatchReadinessController @Inject() (
 
         case None =>
           logger.error(
-            "[CheckVerificationBatchReadinessController.checkVerificationBatchReadiness] Missing required session data"
+            "[CheckVerificationBatchReadinessController.checkVerificationBatchReadiness] Missing selected subcontractors or verification batch response"
           )
           Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
       }
