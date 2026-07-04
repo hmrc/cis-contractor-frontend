@@ -1,0 +1,71 @@
+@*
+ * Copyright 2026 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.table._
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.content._
+@import views.html.components._
+
+@this(
+  layout: templates.Layout,
+  govukPanel: GovukPanel,
+  govukTable: GovukTable,
+  h2: H2,
+  paragraph: Paragraph,
+  link: Link
+)
+
+@(rows: Seq[Seq[TableRow]], subcontractorName: String, manageYourSubcontractorsUrl: String)(implicit request: Request[_], messages: Messages)
+
+@layout(
+  pageTitle = titleNoForm(messages("individualAmended.panel.heading")),
+  showBackLink = false
+) {
+
+  @govukPanel(Panel(
+    title = messages("individualAmended.panel.heading")
+  ))
+
+  @paragraph(messages("individualAmended.p1", subcontractorName))
+
+  @h2("individualAmended.updatesMade.h2")
+
+  @govukTable(Table(
+    head = Some(Seq(
+      HeadCell(Text(messages("individualAmended.table.hdr.details"))),
+      HeadCell(Text(messages("individualAmended.table.hdr.previous"))),
+      HeadCell(Text(messages("individualAmended.table.hdr.updated")))
+    )),
+    rows = rows
+  ))
+
+  <p class="govuk-body">
+    @messages("individualAmended.backTo")
+    <a href="@manageYourSubcontractorsUrl" target="_blank" rel="noopener noreferrer" class="govuk-link">
+        @messages("individualAmended.yourSubcontractors")
+    </a>
+  </p>
+
+  @h2("individualAmended.beforeYouGo.h2")
+
+  @paragraph(messages("individualAmended.beforeYouGo.p1"))
+
+  <p class="govuk-body">
+    <a href="#" target="_blank" rel="noopener noreferrer" class="govuk-link">
+        @messages("individualAmended.beforeYouGo.takeAShortSurvey")
+    </a>
+    @messages("individualAmended.beforeYouGo.shareFeedback")
+  </p>
+}

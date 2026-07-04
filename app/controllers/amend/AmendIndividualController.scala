@@ -44,7 +44,16 @@ class AmendIndividualController @Inject() (
 
   private val individualAddress = Address(
     addressLine1 = "12 Harbor View Road",
-    addressLine2 = Some("Amity Island"),
+    addressLine2 = Some("amity island"),
+    addressLine3 = Some("Bodmin"),
+    addressLine4 = Some("Cornwall"),
+    postcode = Some("PL31 2HL"),
+    country = Some(Country(code = None, name = Some("England")))
+  )
+
+  private val individualAddress1 = Address(
+    addressLine1 = "12 Harbor View Road",
+    addressLine2 = Some("blue island"),
     addressLine3 = Some("Bodmin"),
     addressLine4 = Some("Cornwall"),
     postcode = Some("PL31 2HL"),
@@ -58,14 +67,17 @@ class AmendIndividualController @Inject() (
   )
 
   private val individualOriginal = OriginalIndividualAnswers(
-    usesTradingName = Some(false),
+    usesTradingName = None,
     tradingName = None,
-    subcontractorName = Some(individualName),
-    address = Some(individualAddress),
+    subcontractorName = None,
+    address = Some(individualAddress1),
     contactMethod = Some(NoDetails),
     contactValue = None,
-    utr = Some("3992651526"),
+    utrYesNo = Some(false),
+    utr = None,
+    ninoYesNo = Some(true),
     nino = Some("QQ123456C"),
+    worksReferenceYesNo = Some(true),
     worksReference = Some("XLS345-MM")
   )
 
@@ -77,8 +89,8 @@ class AmendIndividualController @Inject() (
     ua <- ua.set(AddressOfSubcontractorPage, individualAddress)
     ua <- ua.set(IndividualChooseContactDetailsPage, NoDetails)
     ua <- ua.set(UniqueTaxpayerReferenceYesNoPage, true)
-    ua <- ua.set(SubcontractorsUniqueTaxpayerReferencePage, "3992651526")
-    ua <- ua.set(NationalInsuranceNumberYesNoPage, true)
+    ua <- ua.set(SubcontractorsUniqueTaxpayerReferencePage, "3992651576")
+    ua <- ua.set(NationalInsuranceNumberYesNoPage, false)
     ua <- ua.set(SubNationalInsuranceNumberPage, "QQ123456C")
     ua <- ua.set(WorksReferenceNumberYesNoPage, true)
     ua <- ua.set(WorksReferenceNumberPage, "XLS345-MM")

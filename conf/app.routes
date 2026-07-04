@@ -50,9 +50,6 @@ POST  /subcontractor/amend/check-address  controllers.add.SubAddressYesNoControl
 GET   /subcontractor/amend/check-contact-details  controllers.add.IndividualChooseContactDetailsController.onPageLoad(mode: Mode = AmendMode)
 POST  /subcontractor/amend/check-contact-details  controllers.add.IndividualChooseContactDetailsController.onSubmit(mode: Mode = AmendMode)
 
-GET   /subcontractor/amend/email-address  controllers.add.IndividualEmailAddressController.onPageLoad(mode: Mode = AmendMode)
-POST  /subcontractor/amend/email-address  controllers.add.IndividualEmailAddressController.onSubmit(mode: Mode = AmendMode)
-
 GET   /subcontractor/amend/mobile-number  controllers.add.IndividualMobileNumberController.onPageLoad(mode: Mode = AmendMode)
 POST  /subcontractor/amend/mobile-number  controllers.add.IndividualMobileNumberController.onSubmit(mode: Mode = AmendMode)
 
@@ -152,6 +149,8 @@ GET   /subcontractor/add/email-address         controllers.add.IndividualEmailAd
 POST  /subcontractor/add/email-address         controllers.add.IndividualEmailAddressController.onSubmit(mode: Mode = NormalMode)
 GET   /subcontractor/add/change-email-address  controllers.add.IndividualEmailAddressController.onPageLoad(mode: Mode = CheckMode)
 POST  /subcontractor/add/change-email-address  controllers.add.IndividualEmailAddressController.onSubmit(mode: Mode = CheckMode)
+GET   /subcontractor/amend/email-address       controllers.add.IndividualEmailAddressController.onPageLoad(mode: Mode = AmendMode)
+POST  /subcontractor/amend/email-address       controllers.add.IndividualEmailAddressController.onSubmit(mode: Mode = AmendMode)
 
 GET   /subcontractor/add/check-contact-details         controllers.add.IndividualChooseContactDetailsController.onPageLoad(mode: Mode = NormalMode)
 POST  /subcontractor/add/check-contact-details         controllers.add.IndividualChooseContactDetailsController.onSubmit(mode: Mode = NormalMode)
@@ -164,6 +163,8 @@ GET   /subcontractor/add/add-contact-details         controllers.add.AddIndividu
 POST  /subcontractor/add/add-contact-details         controllers.add.AddIndividualContactMethodsYesNoController.onSubmit(mode: Mode = NormalMode)
 GET   /subcontractor/add/change-add-contact-details  controllers.add.AddIndividualContactMethodsYesNoController.onPageLoad(mode: Mode = CheckMode)
 POST  /subcontractor/add/change-add-contact-details  controllers.add.AddIndividualContactMethodsYesNoController.onSubmit(mode: Mode = CheckMode)
+
+GET   /subcontractor/amend/individual/subcontractor-details-updated         controllers.amend.IndividualAmendedController.onPageLoad()
 
 # Company
 GET   /subcontractor/add/company/subcontractor-added  controllers.add.SubcontractorAddedController.companySubcontractorAdded()
@@ -531,7 +532,4 @@ POST  /contractor-details/add-contractor-scheme-name         controllers.contrac
 GET   /contractor-details/change-add-contractor-scheme-name  controllers.contractordetails.AddSchemeNameYesNoController.onPageLoad(mode: Mode = CheckMode)
 POST  /contractor-details/change-add-contractor-scheme-name  controllers.contractordetails.AddSchemeNameYesNoController.onSubmit(mode: Mode = CheckMode)
 
-# Individual Amend
-GET   /subcontractor/amend/email-address          controllers.add.IndividualEmailAddressController.onPageLoad(mode: Mode = AmendMode)
-POST  /subcontractor/amend/email-address          controllers.add.IndividualEmailAddressController.onSubmit(mode: Mode = AmendMode)
 

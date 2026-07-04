@@ -308,6 +308,27 @@ individualChooseContactDetails.error.required                                =  
 individualChooseContactDetails.checkYourAnswersLabel                         =  Method of contact
 individualChooseContactDetails.change.hidden                                 =  method of contact
 
+amendIndividualCheckYourAnswers.title                                        =  Amend subcontractor details
+amendIndividualCheckYourAnswers.heading.sub.h2                               =  Subcontractor details
+amendIndividualCheckYourAnswers.confirm.h2                                   =  Confirm changes
+amendIndividualCheckYourAnswers.confirm.p1                                   =  By changing this subcontractor''s details you are confirming that, to the best of your knowledge, the details you are providing are correct.
+amendIndividualCheckYourAnswers.acceptAndSubmit                              =  Accept and submit
+amendIndividualCheckYourAnswers.cancelChanges                                =  Cancel changes
+
+individualAmended.panel.heading                                              =  Subcontractor details updated
+individualAmended.p1                                                         =  You have updated the subcontractor details for {0}.
+individualAmended.updatesMade.h2                                             =  Updates made
+individualAmended.table.hdr.previous                                         =  Previous
+individualAmended.table.hdr.updated                                          =  Updated
+individualAmended.table.hdr.details                                          =  Details
+individualAmended.backTo                                                     =  Back to
+individualAmended.yourSubcontractors                                         =  Your subcontractors
+individualAmended.beforeYouGo.h2                                             =  Before you go
+individualAmended.beforeYouGo.p1                                             =  Your feedback helps us make our service better.
+individualAmended.beforeYouGo.takeAShortSurvey                               =  Take a short survey
+individualAmended.beforeYouGo.shareFeedback                                  =  to share your feedback on this service.
+individualAmended.table.content.none                                         =  None provided
+
 addressLookup.companyQuestionsAddress.lookupPage.title                       =  Find the address for this company
 addressLookup.companyQuestionsAddress.lookupPage.heading                     =  Find the address for {0}
 addressLookup.companyQuestionsAddress.lookupPage.filterLabel                 =  Property name or number (optional)
@@ -1089,3 +1110,4 @@ contractordetails.addSchemeNameYesNo.heading                                   =
 contractordetails.addSchemeNameYesNo.error.required                            =  Select yes to enter the contractor’s scheme name
 contractordetails.addSchemeNameYesNo.checkYourAnswersLabel                     =  Add scheme name?
 contractordetails.addSchemeNameYesNo.change.hidden                             =  add scheme name?
+

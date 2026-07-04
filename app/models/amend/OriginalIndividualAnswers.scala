@@ -28,8 +28,11 @@ case class OriginalIndividualAnswers(
   address: Option[Address],
   contactMethod: Option[ContactOptions],
   contactValue: Option[String],
+  utrYesNo: Option[Boolean],
   utr: Option[String],
+  ninoYesNo: Option[Boolean],
   nino: Option[String],
+  worksReferenceYesNo: Option[Boolean],
   worksReference: Option[String]
 )
 
