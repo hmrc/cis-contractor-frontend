@@ -166,6 +166,8 @@ GET   /subcontractor/add/change-add-contact-details  controllers.add.AddIndividu
 POST  /subcontractor/add/change-add-contact-details  controllers.add.AddIndividualContactMethodsYesNoController.onSubmit(mode: Mode = CheckMode)
 
 # Company
+GET   /subcontractor/amend/company  controllers.amend.AmendCompanyController.onPageLoad()
+
 GET   /subcontractor/add/company/subcontractor-added  controllers.add.SubcontractorAddedController.companySubcontractorAdded()
 
 GET   /subcontractor/add/company/company-name         controllers.add.company.CompanyNameController.onPageLoad(mode: Mode = NormalMode)
