@@ -18,8 +18,6 @@ package controllers.amend.company
 
 import base.SpecBase
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
-import controllers.amend.FailingPopulateAmendCompanyController
-import controllers.amend.company.AmendCompanyController
 import controllers.routes
 import models.UserAnswers
 import models.address.{Address, Country}
@@ -63,7 +61,7 @@ class FailingPopulateAmendCompanyController @Inject() (
 class AmendCompanyControllerSpec extends SpecBase with MockitoSugar {
 
   private lazy val amendCompanyRoute =
-    controllers.amend.routes.AmendCompanyController.onPageLoad().url
+    controllers.amend.company.routes.AmendCompanyController.onPageLoad().url
   private val companyName            = "test company"
   private val emailAddress           = "test@example.com"
   private val utr                    = "7777777777"
@@ -82,7 +80,7 @@ class AmendCompanyControllerSpec extends SpecBase with MockitoSugar {
     OriginalCompanyAnswers(
       companyName = Some(companyName),
       address = Some(expectedAddress),
-      contactMethods = Email,
+      companyContactMethod = Email,
       email = Some(emailAddress),
       phone = None,
       mobile = None,
@@ -142,7 +140,7 @@ class AmendCompanyControllerSpec extends SpecBase with MockitoSugar {
           savedAnswers.get(CompanyAddressYesNoPage).value mustBe true
           savedAnswers.get(CompanyAddressPage).value mustBe expectedAddress
 
-          savedAnswers.get(CompanyContactMethodOptionsPage).value mustBe Email
+          savedAnswers.get(CompanyContactOptionsPage).value mustBe Email
           savedAnswers.get(CompanyEmailAddressPage).value mustBe emailAddress
 
           savedAnswers.get(CompanyUtrYesNoPage).value mustBe true
