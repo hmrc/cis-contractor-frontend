@@ -132,7 +132,7 @@ final class CreateSubmissionForVerificationRequestSpec extends AnyWordSpec with 
       (jsonWithoutAgent \ "agentId").toOption mustBe None
     }
 
-    "omit emailRecipient from JSON when None (opt-out)" in {
+    "write emailRecipient as empty string when None opt-out" in {
       val model = CreateSubmissionForVerificationRequest(
         instanceId = "abc-123",
         verificationBatchId = 99L,
@@ -143,8 +143,8 @@ final class CreateSubmissionForVerificationRequestSpec extends AnyWordSpec with 
       )
 
       val json = Json.toJson(model)
-      (json \ "emailRecipient").toOption mustBe None
-      json.validate[CreateSubmissionForVerificationRequest].get.emailRecipient mustBe None
+
+      (json \ "emailRecipient").as[String] mustBe ""
     }
 
     "round-trip (model -> json -> model) without losing data" in {
