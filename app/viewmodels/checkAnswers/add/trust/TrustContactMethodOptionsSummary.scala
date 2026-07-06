@@ -38,7 +38,7 @@ object TrustContactMethodOptionsSummary {
       SummaryListRowViewModel(
         key = "trustContactMethodOptions.checkYourAnswersLabel",
         value = ValueViewModelHelper
-          .makeGovukBulletList(options)
+          .makeGovukBulletList(options, false)
           .getOrElse(ValueViewModel(HtmlContent(""))),
         actions = Seq(
           ActionItemViewModel(

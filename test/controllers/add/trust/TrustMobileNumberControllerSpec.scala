@@ -19,15 +19,13 @@ package controllers.add.trust
 import base.SpecBase
 import controllers.routes
 import forms.add.trust.TrustMobileNumberFormProvider
-import models.contact.ContactOptions.Mobile
+import models.contact.ContactMethodOptions
 import models.{NormalMode, UserAnswers}
-import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.add.trust.{TrustContactOptionsPage, TrustMobileNumberPage, TrustNamePage}
+import pages.add.trust.{TrustContactMethodOptionsPage, TrustMobileNumberPage, TrustNamePage}
 import play.api.inject.bind
-import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import repositories.SessionRepository
@@ -36,8 +34,6 @@ import views.html.add.trust.TrustMobileNumberView
 import scala.concurrent.Future
 
 class TrustMobileNumberControllerSpec extends SpecBase with MockitoSugar {
-
-  def onwardRoute = Call("GET", "/foo")
 
   val formProvider = new TrustMobileNumberFormProvider()
   val form         = formProvider()
@@ -54,13 +50,10 @@ class TrustMobileNumberControllerSpec extends SpecBase with MockitoSugar {
       .value
 
   private def uaWithNameAndMobileChoice: UserAnswers =
-    buildAnswersWithContactChoice(
-      emptyUserAnswers,
-      TrustNamePage,
-      trustName,
-      TrustContactOptionsPage,
-      Mobile
-    )
+    uaWithName
+      .set(TrustContactMethodOptionsPage, Set(ContactMethodOptions.Mobile))
+      .success
+      .value
 
   "TrustMobileNumberController" - {
 
@@ -108,20 +101,6 @@ class TrustMobileNumberControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must redirect to Journey Recovery for a GET when Mobile is not selected" in {
-
-      val application = applicationBuilder(userAnswers = Some(uaWithName)).build()
-
-      running(application) {
-        val request = FakeRequest(GET, trustMobileNumberRoute)
-
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
-      }
-    }
-
     "must redirect to the next page when valid data is submitted" in {
 
       val mockSessionRepository = mock[SessionRepository]
@@ -129,9 +108,8 @@ class TrustMobileNumberControllerSpec extends SpecBase with MockitoSugar {
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
       val application =
-        applicationBuilder(userAnswers = Some(uaWithName))
+        applicationBuilder(userAnswers = Some(uaWithNameAndMobileChoice))
           .overrides(
-            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
             bind[SessionRepository].toInstance(mockSessionRepository)
           )
           .build()
@@ -144,13 +122,15 @@ class TrustMobileNumberControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual onwardRoute.url
+        redirectLocation(result).value mustEqual controllers.add.trust.routes.TrustUtrYesNoController
+          .onPageLoad(NormalMode)
+          .url
       }
     }
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
-      val application = applicationBuilder(userAnswers = Some(uaWithName)).build()
+      val application = applicationBuilder(userAnswers = Some(uaWithNameAndMobileChoice)).build()
 
       running(application) {
         val request =
@@ -201,7 +181,7 @@ class TrustMobileNumberControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must redirect to Journey Recovery when trust name is missing" in {
+    "must redirect to Journey Recovery for a GET when trust name is missing" in {
 
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
@@ -229,6 +209,96 @@ class TrustMobileNumberControllerSpec extends SpecBase with MockitoSugar {
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual
           controllers.routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must redirect to Journey Recovery for a GET when TrustContactMethodOptions is missing" in {
+
+      val application = applicationBuilder(userAnswers = Some(uaWithName)).build()
+
+      running(application) {
+        val request = FakeRequest(GET, trustMobileNumberRoute)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must redirect to Journey Recovery for a GET when Mobile is not in TrustContactMethodOptions" in {
+
+      val userAnswers =
+        uaWithName
+          .set(TrustContactMethodOptionsPage, Set(ContactMethodOptions.Phone))
+          .success
+          .value
+
+      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
+
+      running(application) {
+        val request = FakeRequest(GET, trustMobileNumberRoute)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must redirect to Journey Recovery for a POST when TrustContactMethodOptions is missing" in {
+
+      val mockSessionRepository = mock[SessionRepository]
+
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+      val application =
+        applicationBuilder(userAnswers = Some(uaWithName))
+          .overrides(
+            bind[SessionRepository].toInstance(mockSessionRepository)
+          )
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, trustMobileNumberRoute)
+            .withFormUrlEncodedBody(("value", "12345678"))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must redirect to Journey Recovery for a POST when Mobile is not in TrustContactMethodOptions" in {
+
+      val userAnswers =
+        uaWithName
+          .set(TrustContactMethodOptionsPage, Set(ContactMethodOptions.Phone))
+          .success
+          .value
+
+      val mockSessionRepository = mock[SessionRepository]
+
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+      val application =
+        applicationBuilder(userAnswers = Some(userAnswers))
+          .overrides(
+            bind[SessionRepository].toInstance(mockSessionRepository)
+          )
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, trustMobileNumberRoute)
+            .withFormUrlEncodedBody(("value", "12345678"))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
       }
     }
   }

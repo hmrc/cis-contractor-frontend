@@ -56,7 +56,7 @@ class TrustAddressController @Inject() (
     routes.TrustAddressController.addressLookupCallbackChange()
 
   override protected def onCompletion(mode: Mode): Call =
-    routes.TrustContactOptionsController.onPageLoad(mode)
+    routes.AddTrustContactMethodsYesNoController.onPageLoad(mode)
 
   override protected def onChangeCompletion: Call =
     routes.TrustCheckYourAnswersController.onPageLoad()

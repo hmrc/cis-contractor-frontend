@@ -18,7 +18,7 @@ package utils
 
 import base.SpecBase
 import models.add.*
-import models.contact.ContactOptions
+import models.contact.{ContactMethodOptions, ContactOptions}
 import models.TypeOfSubcontractor
 import org.scalatest.freespec.AnyFreeSpec
 import utils.SubcontractorCleanup.*
@@ -292,7 +292,13 @@ class SubcontractorCleanupSpec extends SpecBase {
           .set(TrustAddressYesNoPage, true)
           .success
           .value
-          .set(TrustContactOptionsPage, ContactOptions.Email)
+          .set(AddTrustContactMethodsYesNoPage, true)
+          .success
+          .value
+          .set(
+            TrustContactMethodOptionsPage,
+            Set(ContactMethodOptions.Email, ContactMethodOptions.Phone, ContactMethodOptions.Mobile)
+          )
           .success
           .value
           .set(TrustEmailAddressPage, email)
@@ -324,7 +330,8 @@ class SubcontractorCleanupSpec extends SpecBase {
 
       result.get(TrustAddressPage) mustBe None
       result.get(TrustAddressYesNoPage) mustBe None
-      result.get(TrustContactOptionsPage) mustBe None
+      result.get(AddTrustContactMethodsYesNoPage) mustBe None
+      result.get(TrustContactMethodOptionsPage) mustBe None
       result.get(TrustEmailAddressPage) mustBe None
       result.get(TrustMobileNumberPage) mustBe None
       result.get(TrustNamePage) mustBe None
@@ -489,7 +496,13 @@ class SubcontractorCleanupSpec extends SpecBase {
           .set(TrustAddressYesNoPage, true)
           .success
           .value
-          .set(TrustContactOptionsPage, ContactOptions.Email)
+          .set(AddTrustContactMethodsYesNoPage, true)
+          .success
+          .value
+          .set(
+            TrustContactMethodOptionsPage,
+            Set(ContactMethodOptions.Email, ContactMethodOptions.Phone, ContactMethodOptions.Mobile)
+          )
           .success
           .value
           .set(TrustEmailAddressPage, email)
@@ -572,7 +585,8 @@ class SubcontractorCleanupSpec extends SpecBase {
 
       result.get(TrustAddressPage) mustBe None
       result.get(TrustAddressYesNoPage) mustBe None
-      result.get(TrustContactOptionsPage) mustBe None
+      result.get(AddTrustContactMethodsYesNoPage) mustBe None
+      result.get(TrustContactMethodOptionsPage) mustBe None
       result.get(TrustEmailAddressPage) mustBe None
       result.get(TrustMobileNumberPage) mustBe None
       result.get(TrustNamePage) mustBe None

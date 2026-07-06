@@ -109,8 +109,8 @@ class TrustContactMethodOptionsControllerSpec extends SpecBase with MockitoSugar
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.routes.IndexController
-          .onPageLoad()
+        redirectLocation(result).value mustEqual controllers.add.trust.routes.TrustEmailAddressController
+          .onPageLoad(NormalMode)
           .url
       }
     }
