@@ -47,7 +47,7 @@ class PartnershipEmailAddressControllerSpec extends SpecBase with MockitoSugar {
       .success
       .value
 
-  private def uaWithNameAndEmail: UserAnswers =
+  private def uaWithNameAndEmailOption: UserAnswers =
     uaWithName
       .set(PartnershipContactMethodOptionsPage, Set(ContactMethodOptions.Email))
       .success
@@ -60,7 +60,7 @@ class PartnershipEmailAddressControllerSpec extends SpecBase with MockitoSugar {
 
     "must return OK and the correct view for a GET when Email is selected" in {
 
-      val application = applicationBuilder(userAnswers = Some(uaWithNameAndEmail)).build()
+      val application = applicationBuilder(userAnswers = Some(uaWithNameAndEmailOption)).build()
 
       running(application) {
         val request = FakeRequest(GET, partnershipEmailAddressRoute)
@@ -80,7 +80,7 @@ class PartnershipEmailAddressControllerSpec extends SpecBase with MockitoSugar {
     "must populate the view correctly on a GET when previously answered" in {
 
       val userAnswers =
-        uaWithNameAndEmail
+        uaWithNameAndEmailOption
           .set(PartnershipEmailAddressPage, "answer@test.com")
           .success
           .value
@@ -136,7 +136,7 @@ class PartnershipEmailAddressControllerSpec extends SpecBase with MockitoSugar {
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
-      val application = applicationBuilder(userAnswers = Some(uaWithNameAndEmail)).build()
+      val application = applicationBuilder(userAnswers = Some(uaWithNameAndEmailOption)).build()
 
       running(application) {
         val request =
@@ -187,12 +187,34 @@ class PartnershipEmailAddressControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must redirect to Journey Recovery when partnership name is missing" in {
+    "must redirect to Journey Recovery for a GET when partnership name is missing" in {
 
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
       running(application) {
         val request = FakeRequest(GET, partnershipEmailAddressRoute)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must redirect to Journey Recovery for a POST when partnership name is missing (userAnswers present)" in {
+
+      val mockSessionRepository = mock[SessionRepository]
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+      val application =
+        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, partnershipEmailAddressRoute)
+            .withFormUrlEncodedBody("value" -> "test@example.com")
 
         val result = route(application, request).value
 
@@ -235,20 +257,23 @@ class PartnershipEmailAddressControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must redirect to Journey Recovery for a POST when partnership name is missing (userAnswers present)" in {
+    "must redirect to Journey Recovery when for a Post when PartnershipContactMethodOptions is missing" in {
 
       val mockSessionRepository = mock[SessionRepository]
+
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
       val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
-          .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
+        applicationBuilder(userAnswers = Some(uaWithName))
+          .overrides(
+            bind[SessionRepository].toInstance(mockSessionRepository)
+          )
           .build()
 
       running(application) {
         val request =
           FakeRequest(POST, partnershipEmailAddressRoute)
-            .withFormUrlEncodedBody("value" -> "test@example.com")
+            .withFormUrlEncodedBody(("value", "test@example.com"))
 
         val result = route(application, request).value
 
@@ -257,14 +282,20 @@ class PartnershipEmailAddressControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must redirect to Journey Recovery when contact choice is missing" in {
+    "must redirect to Journey Recovery for a POST when Email is not in PartnershipContactMethodOptions" in {
+
+      val userAnswers =
+        uaWithName
+          .set(PartnershipContactMethodOptionsPage, Set(ContactMethodOptions.Phone))
+          .success
+          .value
 
       val mockSessionRepository = mock[SessionRepository]
 
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
       val application =
-        applicationBuilder(userAnswers = Some(uaWithName))
+        applicationBuilder(userAnswers = Some(userAnswers))
           .overrides(
             bind[SessionRepository].toInstance(mockSessionRepository)
           )
