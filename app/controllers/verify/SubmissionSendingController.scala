@@ -26,7 +26,7 @@ import queries.CisIdQuery
 import services.VerificationService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.verify.SubmissionSendingView
-import utils.VerifyEmailResolver
+import models.verify.ValidatedVerify
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -73,22 +73,32 @@ class SubmissionSendingController @Inject() (
     ua: models.UserAnswers
   ): Either[String, CreateSubmissionForVerificationRequest] =
     for {
+      validated <- ValidatedVerify
+                     .build(ua)
+                     .left
+                     .map(error => s"ValidatedVerify failed: $error")
+
       instanceId <- ua.get(CisIdQuery).toRight("CisIdQuery not found")
-      current    <- ua.get(CurrentVerificationBatchResponsePage).toRight("CurrentVerificationBatchResponsePage not found")
 
-      batchId  <- current.verificationBatch.map(_.verificationBatchId).toRight("verificationBatchId missing")
-      batchRef <-
-        current.verificationBatch.flatMap(_.verifBatchResourceRef).toRight("verificationBatchResourceRef missing")
+      current <- ua
+                   .get(CurrentVerificationBatchResponsePage)
+                   .toRight("CurrentVerificationBatchResponsePage not found")
 
-      email = VerifyEmailResolver.resolvedEmail(ua)
+      batchId <- current.verificationBatch
+                   .map(_.verificationBatchId)
+                   .toRight("verificationBatchId missing")
+
+      batchRef <- current.verificationBatch
+                    .flatMap(_.verifBatchResourceRef)
+                    .toRight("verificationBatchResourceRef missing")
     } yield {
 
       val verifications: Seq[VerificationToUpdate] =
         current.verifications.flatMap(_.verificationResourceRef).map { ref =>
           VerificationToUpdate(
-            subcontractorName = "Unknown", // ??
+            subcontractorName = "Unknown",
             verificationResourceRef = ref,
-            proceedVerification = "Y" // ??
+            proceedVerification = "Y"
           )
         }
 
@@ -96,7 +106,7 @@ class SubmissionSendingController @Inject() (
         instanceId = instanceId,
         verificationBatchId = batchId,
         verificationBatchResourceRef = batchRef,
-        emailRecipient = email,
+        emailRecipient = validated.emailToUse,
         irMarkGenerated = None,
         verifications = verifications,
         agentId = None

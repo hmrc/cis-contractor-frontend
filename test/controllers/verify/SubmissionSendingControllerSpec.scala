@@ -21,7 +21,7 @@ import models.ContractorScheme
 import models.requests.CreateSubmissionForVerificationRequest
 import models.response.{CreateSubmissionForVerificationResponse, GetCurrentVerificationBatchResponse, GetNewestVerificationBatchResponse}
 import models.verify.ContractorEmailConfirmationStored.CurrentEmail
-import models.{SubcontractorCurrentVerification, VerificationBatchCurrentVerification, VerificationCurrentVerification}
+import models.{SubcontractorCurrentVerification, SubcontractorViewModel, VerificationBatchCurrentVerification, VerificationCurrentVerification}
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{never, verify, when}
@@ -29,7 +29,7 @@ import org.scalatestplus.mockito.MockitoSugar
 import pages.verify._
 import play.api.inject.bind
 import play.api.test.FakeRequest
-import play.api.test.Helpers.*
+import play.api.test.Helpers._
 import queries.CisIdQuery
 import services.VerificationService
 import uk.gov.hmrc.http.HeaderCarrier
@@ -48,7 +48,12 @@ class SubmissionSendingControllerSpec extends SpecBase with MockitoSugar {
 
   private val newestWithSchemeEmail: GetNewestVerificationBatchResponse =
     GetNewestVerificationBatchResponse(
-      scheme = Some(ContractorScheme(accountsOfficeReference = None, emailAddress = Some("scheme@example.com"))),
+      scheme = Some(
+        ContractorScheme(
+          accountsOfficeReference = None,
+          emailAddress = Some("scheme@example.com")
+        )
+      ),
       subcontractors = Nil,
       verificationBatch = None,
       verifications = Nil,
@@ -96,17 +101,32 @@ class SubmissionSendingControllerSpec extends SpecBase with MockitoSugar {
       )
     )
 
+  private val selectedSubcontractor: SubcontractorViewModel =
+    SubcontractorViewModel(
+      id = "10",
+      name = "Test Subcontractor"
+    )
+
+  private def validJourneyAnswers: models.UserAnswers =
+    emptyUserAnswers
+      .set(NewestVerificationBatchResponsePage, newestWithSchemeEmail)
+      .success
+      .value
+      .set(ContractorEmailConfirmationStoredPage, CurrentEmail)
+      .success
+      .value
+      .set(SelectSubcontractorPage, Set(selectedSubcontractor))
+      .success
+      .value
+      .set(VerificationBatchReadinessPage, true)
+      .success
+      .value
+
   "SubmissionSendingController.onPageLoad" - {
 
-    "must call service to create submission and return OK when answers are valid and buildSubmissionRequest succeeds (CurrentEmail uses scheme email)" in {
+    "must call service to create submission and return OK when answers are valid and buildSubmissionRequest succeeds CurrentEmail uses scheme email" in {
       val ua0 =
-        emptyUserAnswers
-          .set(NewestVerificationBatchResponsePage, newestWithSchemeEmail)
-          .success
-          .value
-          .set(ContractorEmailConfirmationStoredPage, CurrentEmail)
-          .success
-          .value
+        validJourneyAnswers
           .set(CurrentVerificationBatchResponsePage, currentBatch)
           .success
           .value
@@ -137,6 +157,7 @@ class SubmissionSendingControllerSpec extends SpecBase with MockitoSugar {
         verify(mockService).createSubmissionForVerification(captor.capture())(any[HeaderCarrier])
 
         val req = captor.getValue
+
         req.instanceId mustBe instanceId
         req.verificationBatchId mustBe 99L
         req.verificationBatchResourceRef mustBe 7777L
@@ -145,19 +166,12 @@ class SubmissionSendingControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must redirect to JourneyRecovery when CisIdQuery is missing (buildSubmissionRequest fails)" in {
+    "must redirect to JourneyRecovery when CisIdQuery is missing buildSubmissionRequest fails" in {
       val ua =
-        emptyUserAnswers
-          .set(NewestVerificationBatchResponsePage, newestWithSchemeEmail)
-          .success
-          .value
-          .set(ContractorEmailConfirmationStoredPage, CurrentEmail)
-          .success
-          .value
+        validJourneyAnswers
           .set(CurrentVerificationBatchResponsePage, currentBatch)
           .success
           .value
-      // NOTE: CisIdQuery is intentionally missing
 
       val mockService = mock[VerificationService]
 
@@ -180,17 +194,8 @@ class SubmissionSendingControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must redirect to JourneyRecovery when CurrentVerificationBatchResponsePage is missing (buildSubmissionRequest fails)" in {
-      val ua0 =
-        emptyUserAnswers
-          .set(NewestVerificationBatchResponsePage, newestWithSchemeEmail)
-          .success
-          .value
-          .set(ContractorEmailConfirmationStoredPage, CurrentEmail)
-          .success
-          .value
-
-      val ua = withCisId(ua0)
+    "must redirect to JourneyRecovery when CurrentVerificationBatchResponsePage is missing buildSubmissionRequest fails" in {
+      val ua = withCisId(validJourneyAnswers)
 
       val mockService = mock[VerificationService]
 
@@ -220,13 +225,7 @@ class SubmissionSendingControllerSpec extends SpecBase with MockitoSugar {
         )
 
       val ua0 =
-        emptyUserAnswers
-          .set(NewestVerificationBatchResponsePage, newestWithSchemeEmail)
-          .success
-          .value
-          .set(ContractorEmailConfirmationStoredPage, CurrentEmail)
-          .success
-          .value
+        validJourneyAnswers
           .set(CurrentVerificationBatchResponsePage, currentNoBatchRef)
           .success
           .value
