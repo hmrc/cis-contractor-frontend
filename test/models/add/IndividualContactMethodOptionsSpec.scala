@@ -26,7 +26,7 @@ import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import play.api.libs.json.{JsError, JsString, Json}
 
 class IndividualContactMethodOptionsSpec
-  extends AnyFreeSpec
+    extends AnyFreeSpec
     with Matchers
     with ScalaCheckPropertyChecks
     with OptionValues
