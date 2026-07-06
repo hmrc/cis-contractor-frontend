@@ -208,7 +208,13 @@ class SubcontractorCleanupSpec extends SpecBase {
           .set(PartnershipAddressYesNoPage, true)
           .success
           .value
-          .set(PartnershipChooseContactDetailsPage, ContactOptions.Email)
+          .set(AddPartnershipContactMethodsYesNoPage, true)
+          .success
+          .value
+          .set(
+            PartnershipContactMethodOptionsPage,
+            Set(ContactMethodOptions.Email, ContactMethodOptions.Phone, ContactMethodOptions.Mobile)
+          )
           .success
           .value
           .set(PartnershipEmailAddressPage, email)
@@ -261,7 +267,8 @@ class SubcontractorCleanupSpec extends SpecBase {
 
       result.get(PartnershipAddressPage) mustBe None
       result.get(PartnershipAddressYesNoPage) mustBe None
-      result.get(PartnershipChooseContactDetailsPage) mustBe None
+      result.get(AddPartnershipContactMethodsYesNoPage) mustBe None
+      result.get(PartnershipContactMethodOptionsPage) mustBe None
       result.get(PartnershipEmailAddressPage) mustBe None
       result.get(PartnershipHasUtrYesNoPage) mustBe None
       result.get(PartnershipMobileNumberPage) mustBe None
@@ -442,7 +449,13 @@ class SubcontractorCleanupSpec extends SpecBase {
           .set(PartnershipAddressYesNoPage, true)
           .success
           .value
-          .set(PartnershipChooseContactDetailsPage, ContactOptions.Email)
+          .set(AddPartnershipContactMethodsYesNoPage, true)
+          .success
+          .value
+          .set(
+            PartnershipContactMethodOptionsPage,
+            Set(ContactMethodOptions.Email, ContactMethodOptions.Phone, ContactMethodOptions.Mobile)
+          )
           .success
           .value
           .set(PartnershipEmailAddressPage, email)
@@ -566,7 +579,8 @@ class SubcontractorCleanupSpec extends SpecBase {
 
       result.get(PartnershipAddressPage) mustBe None
       result.get(PartnershipAddressYesNoPage) mustBe None
-      result.get(PartnershipChooseContactDetailsPage) mustBe None
+      result.get(AddPartnershipContactMethodsYesNoPage) mustBe None
+      result.get(PartnershipContactMethodOptionsPage) mustBe None
       result.get(PartnershipEmailAddressPage) mustBe None
       result.get(PartnershipHasUtrYesNoPage) mustBe None
       result.get(PartnershipMobileNumberPage) mustBe None

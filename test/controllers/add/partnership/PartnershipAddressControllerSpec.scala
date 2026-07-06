@@ -227,7 +227,7 @@ class PartnershipAddressControllerSpec extends SpecBase with MockitoSugar {
 
     "addressLookupCallback" - {
 
-      "must retrieve and persist the address then redirect to Partnership Choose Contact Details when the save succeeds" in {
+      "must retrieve and persist the address then redirect to AddPartnershipContactMethodsYesNo when the save succeeds" in {
 
         val mockAddressLookupService = mock[AddressLookupService]
 
@@ -245,7 +245,7 @@ class PartnershipAddressControllerSpec extends SpecBase with MockitoSugar {
 
           status(result) mustBe SEE_OTHER
           redirectLocation(result).value mustBe
-            controllers.add.partnership.routes.PartnershipChooseContactDetailsController.onPageLoad(NormalMode).url
+            controllers.add.partnership.routes.AddPartnershipContactMethodsYesNoController.onPageLoad(NormalMode).url
 
           val idCaptor = ArgumentCaptor.forClass(classOf[String])
           verify(mockAddressLookupService).getAddressById(idCaptor.capture())(any(), any())

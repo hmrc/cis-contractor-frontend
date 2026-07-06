@@ -432,7 +432,10 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
 
         val userAnswers =
           basePartnershipAnswers
-            .set(PartnershipChooseContactDetailsPage, ContactOptions.Email)
+            .set(AddPartnershipContactMethodsYesNoPage, true)
+            .success
+            .value
+            .set(PartnershipContactMethodOptionsPage, Set(ContactMethodOptions.Email))
             .success
             .value
             .set(PartnershipEmailAddressPage, "p@example.com")
@@ -476,7 +479,10 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
 
         val userAnswers =
           basePartnershipAnswers
-            .set(PartnershipChooseContactDetailsPage, ContactOptions.Phone)
+            .set(AddPartnershipContactMethodsYesNoPage, true)
+            .success
+            .value
+            .set(PartnershipContactMethodOptionsPage, Set(ContactMethodOptions.Phone))
             .success
             .value
             .set(PartnershipPhoneNumberPage, "02071234567")
@@ -520,7 +526,10 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
 
         val userAnswers =
           basePartnershipAnswers
-            .set(PartnershipChooseContactDetailsPage, ContactOptions.Mobile)
+            .set(AddPartnershipContactMethodsYesNoPage, true)
+            .success
+            .value
+            .set(PartnershipContactMethodOptionsPage, Set(ContactMethodOptions.Mobile))
             .success
             .value
             .set(PartnershipMobileNumberPage, "07123456789")
@@ -564,7 +573,7 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
 
         val userAnswers =
           basePartnershipAnswers
-            .set(PartnershipChooseContactDetailsPage, ContactOptions.NoDetails)
+            .set(AddPartnershipContactMethodsYesNoPage, false)
             .success
             .value
 
@@ -615,7 +624,10 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
 
         val userAnswers =
           basePartnershipAnswers
-            .remove(PartnershipChooseContactDetailsPage)
+            .set(AddPartnershipContactMethodsYesNoPage, true)
+            .success
+            .value
+            .remove(AddPartnershipContactMethodsYesNoPage)
             .success
             .value
 
