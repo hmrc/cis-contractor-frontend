@@ -16,6 +16,7 @@
 
 package models
 
+import models.contact.ContactMethodOptions
 import pages.QuestionPage
 import play.api.libs.json.Reads
 
@@ -51,6 +52,29 @@ trait Validation {
       Right(None)
     } else {
       getOptionalPageValue(answers, questionPage, yesNoPage)
+    }
+  }
+
+  def getContactPageValue[A](
+    userAnswers: UserAnswers,
+    contactMethodOptions: Option[Set[ContactMethodOptions]],
+    questionPage: QuestionPage[A],
+    expectedContactMethod: ContactMethodOptions
+  )(implicit reads: Reads[A]): Either[ValidationError, Option[A]] = {
+
+    val answer: Option[A] = userAnswers.get(questionPage)
+
+    contactMethodOptions match {
+
+      case Some(selectedContactMethod) if selectedContactMethod.contains(expectedContactMethod) =>
+        answer
+          .toRight(MissingAnswer(questionPage))
+          .map(Some(_))
+
+      case _ =>
+        answer.fold[Either[ValidationError, Option[A]]](
+          Right(None)
+        )(_ => Left(InvalidAnswer(questionPage)))
     }
   }
 }

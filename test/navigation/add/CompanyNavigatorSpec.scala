@@ -318,6 +318,14 @@ class CompanyNavigatorSpec extends SpecBase {
             .setOrException(CompanyEmailAddressPage, "old@email.com")
         ) mustBe CompanyAmendCYA
       }
+
+      "must go from CompanyMobileNumberPage to Company CYA in AmendMode" in {
+        navigator.nextPage(
+          CompanyMobileNumberPage,
+          AmendMode,
+          emptyUserAnswers
+        ) mustBe CompanyAmendCYA
+      }
     }
 
     "in Check mode" - {

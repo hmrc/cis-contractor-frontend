@@ -87,7 +87,7 @@ class AddPartnershipContactMethodsYesNoControllerSpec extends SpecBase with Mock
       }
     }
 
-    "must redirect to the AddPartnershipContactMethodsYesNo page when valid data with value Yes is submitted" in {
+    "must redirect to the PartnershipContactMethodOptions page when valid data with value Yes is submitted" in {
 
       val mockSessionRepository = mock[SessionRepository]
 
@@ -110,7 +110,7 @@ class AddPartnershipContactMethodsYesNoControllerSpec extends SpecBase with Mock
         status(result) mustEqual SEE_OTHER
         redirectLocation(
           result
-        ).value mustEqual controllers.add.partnership.routes.AddPartnershipContactMethodsYesNoController
+        ).value mustEqual controllers.add.partnership.routes.PartnershipContactMethodOptionsController
           .onPageLoad(NormalMode)
           .url
       }
