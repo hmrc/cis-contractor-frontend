@@ -1018,8 +1018,20 @@ class PartnershipNavigatorSpec extends SpecBase {
       }
 
       "must go from AddPartnershipContactMethodsYesNo" - {
-        "to PartnershipContactMethodOptions page when answer is Yes" in {
-          val answers = emptyUserAnswers.set(AddPartnershipContactMethodsYesNoPage, true).success.value
+        "to CYA when answer is Yes and PartnershipContactMethodOptions already answered" in {
+          val answers = emptyUserAnswers
+            .setOrException(AddPartnershipContactMethodsYesNoPage, true)
+            .setOrException(PartnershipContactMethodOptionsPage, Set(ContactMethodOptions.Email, ContactMethodOptions.Phone))
+
+          navigator.nextPage(
+            AddPartnershipContactMethodsYesNoPage,
+            CheckMode,
+            answers
+          ) mustBe controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
+        }
+
+        "to PartnershipContactMethodOptions page when answer is Yes and PartnershipContactMethodOptions not yet answered" in {
+          val answers = emptyUserAnswers.setOrException(AddPartnershipContactMethodsYesNoPage, true)
 
           navigator.nextPage(
             AddPartnershipContactMethodsYesNoPage,
