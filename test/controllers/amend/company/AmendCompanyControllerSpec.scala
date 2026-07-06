@@ -14,15 +14,17 @@
  * limitations under the License.
  */
 
-package controllers.amend
+package controllers.amend.company
 
 import base.SpecBase
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
+import controllers.amend.FailingPopulateAmendCompanyController
+import controllers.amend.company.AmendCompanyController
 import controllers.routes
 import models.UserAnswers
 import models.address.{Address, Country}
-import models.amend.OriginalCompanyAnswers
-import models.contact.ContactMethodOptions.Email
+import models.amend.company.OriginalCompanyAnswers
+import models.contact.ContactOptions.Email
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{never, times, verify, when}
@@ -80,7 +82,7 @@ class AmendCompanyControllerSpec extends SpecBase with MockitoSugar {
     OriginalCompanyAnswers(
       companyName = Some(companyName),
       address = Some(expectedAddress),
-      contactMethods = Set(Email),
+      contactMethods = Email,
       email = Some(emailAddress),
       phone = None,
       mobile = None,
@@ -140,7 +142,7 @@ class AmendCompanyControllerSpec extends SpecBase with MockitoSugar {
           savedAnswers.get(CompanyAddressYesNoPage).value mustBe true
           savedAnswers.get(CompanyAddressPage).value mustBe expectedAddress
 
-          savedAnswers.get(CompanyContactMethodOptionsPage).value mustBe Set(Email)
+          savedAnswers.get(CompanyContactMethodOptionsPage).value mustBe Email
           savedAnswers.get(CompanyEmailAddressPage).value mustBe emailAddress
 
           savedAnswers.get(CompanyUtrYesNoPage).value mustBe true

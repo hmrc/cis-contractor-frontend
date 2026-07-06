@@ -16,9 +16,9 @@
 
 package queries
 
-import models.amend.OriginalCompanyAnswers
+import models.amend.company.OriginalCompanyAnswers
 import play.api.libs.json.JsPath
 
 case object OriginalCompanyAnswersQuery extends Gettable[OriginalCompanyAnswers] with Settable[OriginalCompanyAnswers] {
-  override def path: JsPath = JsPath \ "OriginalCompanyAnswers"
+  override def path: JsPath = JsPath \ "originalCompanyAnswers"
 }

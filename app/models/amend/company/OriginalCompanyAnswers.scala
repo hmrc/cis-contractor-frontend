@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 
-package models.amend
+package models.amend.company
 
-import models.add.company.CompanyContactMethodOptions
+import models.add.company.CompanyContactOptions
 import models.address.Address
 import play.api.libs.json.{Json, OFormat}
 
 case class OriginalCompanyAnswers(
   companyName: Option[String],
   address: Option[Address],
-  contactMethods: Set[CompanyContactMethodOptions],
+  companyContactMethod: CompanyContactOptions,
   email: Option[String],
   phone: Option[String],
   mobile: Option[String],

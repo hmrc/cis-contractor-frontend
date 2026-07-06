@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package controllers.amend
+package controllers.amend.company
 
 import controllers.actions.*
 import models.UserAnswers
 import models.address.{Address, Country}
-import models.amend.OriginalCompanyAnswers
-import models.contact.ContactMethodOptions.Email
+import models.amend.company.OriginalCompanyAnswers
+import models.contact.ContactOptions.Email
 import pages.add.*
 import pages.add.company.*
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -58,7 +58,7 @@ class AmendCompanyController @Inject() (
   private val companyOriginal                                          = OriginalCompanyAnswers(
     companyName = Some(companyName),
     address = Some(companyAddress),
-    contactMethods = Set(Email),
+    companyContactMethod = Email,
     email = Some(emailAddress),
     phone = None,
     mobile = None,
@@ -70,7 +70,7 @@ class AmendCompanyController @Inject() (
     ua <- ua.set(CompanyNamePage, companyName)
     ua <- ua.set(CompanyAddressYesNoPage, true)
     ua <- ua.set(CompanyAddressPage, companyAddress)
-    ua <- ua.set(CompanyContactMethodOptionsPage, Set(Email))
+    ua <- ua.set(CompanyContactOptionsPage, Email)
     ua <- ua.set(CompanyEmailAddressPage, emailAddress)
     ua <- ua.set(CompanyUtrYesNoPage, true)
     ua <- ua.set(CompanyUtrPage, utr)
