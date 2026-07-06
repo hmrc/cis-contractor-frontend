@@ -40,19 +40,19 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Try}
 
 class FailingPopulateAmendCompanyController @Inject() (
-                                                        identify: IdentifierAction,
-                                                        getData: DataRetrievalAction,
-                                                        requireData: DataRequiredAction,
-                                                        sessionRepository: SessionRepository,
-                                                        override val controllerComponents: MessagesControllerComponents
-                                                      )(implicit ec: ExecutionContext)
-  extends AmendCompanyController(
-    identify,
-    getData,
-    requireData,
-    sessionRepository,
-    controllerComponents
-  ) {
+  identify: IdentifierAction,
+  getData: DataRetrievalAction,
+  requireData: DataRequiredAction,
+  sessionRepository: SessionRepository,
+  override val controllerComponents: MessagesControllerComponents
+)(implicit ec: ExecutionContext)
+    extends AmendCompanyController(
+      identify,
+      getData,
+      requireData,
+      sessionRepository,
+      controllerComponents
+    ) {
 
   override protected def populateUserAnswers(ua: UserAnswers): Try[UserAnswers] =
     Failure(new RuntimeException("intentional population failure"))
@@ -221,4 +221,3 @@ class AmendCompanyControllerSpec extends SpecBase with MockitoSugar {
     }
   }
 }
-

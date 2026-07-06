@@ -55,7 +55,7 @@ class AmendCompanyController @Inject() (
     country = Some(Country(code = None, name = Some("England")))
   )
 
-  private val companyOriginal = OriginalCompanyAnswers(
+  private val companyOriginal                                          = OriginalCompanyAnswers(
     companyName = Some(companyName),
     address = Some(companyAddress),
     contactMethods = Set(Email),
