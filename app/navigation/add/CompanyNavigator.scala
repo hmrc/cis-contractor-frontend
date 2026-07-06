@@ -80,6 +80,7 @@ class CompanyNavigator @Inject() () extends NavigatorForJourney {
   private val amendRouteMap: Page => UserAnswers => Call = {
     case CompanyEmailAddressPage => _ => cyaRoute(AmendMode)
     case CompanyMobileNumberPage => _ => cyaRoute(AmendMode)
+    case CompanyAddressYesNoPage => navigatorFromCompanyAddressYesNoPage(AmendMode)(_)
     case _                       => _ => cyaRoute(AmendMode)
   }
 
@@ -145,16 +146,30 @@ class CompanyNavigator @Inject() () extends NavigatorForJourney {
     }
 
   private def navigatorFromCompanyAddressYesNoPage(mode: Mode)(userAnswers: UserAnswers): Call =
-    addressLookupYesNoRoute(
-      mode,
-      userAnswers.get(CompanyAddressYesNoPage),
-      userAnswers.get(CompanyAddressPage).isDefined,
-      onYes = controllers.add.company.routes.CompanyAddressController.redirectToAddressLookup(),
-      onYesChange =
-        controllers.add.company.routes.CompanyAddressController.redirectToAddressLookup(Some(CheckMode.toString)),
-      onNo = controllers.add.company.routes.CompanyContactOptionsController.onPageLoad(NormalMode),
-      checkYourAnswers = controllers.add.company.routes.CompanyCheckYourAnswersController.onPageLoad()
-    )
+    mode match {
+      case AmendMode =>
+        userAnswers.get(CompanyAddressYesNoPage) match {
+          case Some(true)  =>
+            cyaRoute(
+              mode
+            ) // TODO: controllers.add.company.routes.CompanyAddressController.redirectToAmendAddressLookup() when availabe
+          case Some(false) =>
+            cyaRoute(mode)
+          case None        =>
+            controllers.routes.JourneyRecoveryController.onPageLoad()
+        }
+      case _         =>
+        addressLookupYesNoRoute(
+          mode,
+          userAnswers.get(CompanyAddressYesNoPage),
+          userAnswers.get(CompanyAddressPage).isDefined,
+          onYes = controllers.add.company.routes.CompanyAddressController.redirectToAddressLookup(),
+          onYesChange =
+            controllers.add.company.routes.CompanyAddressController.redirectToAddressLookup(Some(CheckMode.toString)),
+          onNo = controllers.add.company.routes.CompanyContactOptionsController.onPageLoad(NormalMode),
+          checkYourAnswers = controllers.add.company.routes.CompanyCheckYourAnswersController.onPageLoad()
+        )
+    }
 
   private def navigatorFromCompanyUtrYesNoPage(mode: Mode)(userAnswers: UserAnswers): Call =
     (userAnswers.get(CompanyUtrYesNoPage), mode) match {

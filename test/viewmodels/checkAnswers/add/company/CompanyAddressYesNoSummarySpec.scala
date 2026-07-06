@@ -17,7 +17,7 @@
 package viewmodels.checkAnswers.add.company
 
 import base.SpecBase
-import models.{CheckMode, UserAnswers}
+import models.{AmendMode, CheckMode, UserAnswers}
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import pages.add.company.CompanyAddressYesNoPage
 import play.api.i18n.{Lang, Messages, MessagesImpl}
@@ -60,6 +60,34 @@ class CompanyAddressYesNoSummarySpec extends SpecBase with GuiceOneAppPerSuite {
       action.attributes must contain("id" -> "add-company-address")
     }
 
+    "return a row with key, value = yes, and change action when the answer is true in Amend journey" in {
+      val ua: UserAnswers =
+        emptyUserAnswers
+          .set(CompanyAddressYesNoPage, true)
+          .success
+          .value
+
+      val maybeRow = CompanyAddressYesNoSummary.row(ua, AmendMode)
+      maybeRow must not be empty
+
+      val row: SummaryListRow = maybeRow.value
+
+      row.key mustBe Key(content = Text(messages("companyAddressYesNo.checkYourAnswersLabel")))
+      row.value mustBe Value(content = Text(messages("site.yes")))
+
+      row.actions must not be empty
+      val actions: Actions = row.actions.value
+      actions.items must have size 1
+
+      val action: ActionItem = actions.items.head
+      action.href mustBe controllers.add.company.routes.CompanyAddressYesNoController
+        .onPageLoad(AmendMode)
+        .url
+      action.content mustBe Text(messages("site.change"))
+      action.visuallyHiddenText mustBe Some(messages("companyAddressYesNo.change.hidden"))
+      action.attributes must contain("id" -> "add-company-address")
+    }
+
     "return a row with key, value = no, and change action when the answer is false" in {
       val ua: UserAnswers =
         emptyUserAnswers
@@ -82,6 +110,33 @@ class CompanyAddressYesNoSummarySpec extends SpecBase with GuiceOneAppPerSuite {
       val action: ActionItem = actions.items.head
       action.href mustBe controllers.add.company.routes.CompanyAddressYesNoController
         .onPageLoad(CheckMode)
+        .url
+      action.content mustBe Text(messages("site.change"))
+      action.visuallyHiddenText mustBe Some(messages("companyAddressYesNo.change.hidden"))
+    }
+
+    "return a row with key, value = no, and change action when the answer is false in Amend journey" in {
+      val ua: UserAnswers =
+        emptyUserAnswers
+          .set(CompanyAddressYesNoPage, false)
+          .success
+          .value
+
+      val maybeRow = CompanyAddressYesNoSummary.row(ua, AmendMode)
+      maybeRow must not be empty
+
+      val row: SummaryListRow = maybeRow.value
+
+      row.key mustBe Key(content = Text(messages("companyAddressYesNo.checkYourAnswersLabel")))
+      row.value mustBe Value(content = Text(messages("site.no")))
+
+      row.actions must not be empty
+      val actions: Actions = row.actions.value
+      actions.items must have size 1
+
+      val action: ActionItem = actions.items.head
+      action.href mustBe controllers.add.company.routes.CompanyAddressYesNoController
+        .onPageLoad(AmendMode)
         .url
       action.content mustBe Text(messages("site.change"))
       action.visuallyHiddenText mustBe Some(messages("companyAddressYesNo.change.hidden"))

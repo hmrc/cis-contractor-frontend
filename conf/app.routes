@@ -183,6 +183,9 @@ GET   /subcontractor/add/company/check-address         controllers.add.company.C
 POST  /subcontractor/add/company/check-address         controllers.add.company.CompanyAddressYesNoController.onSubmit(mode: Mode = NormalMode)
 GET   /subcontractor/add/company/change-check-address  controllers.add.company.CompanyAddressYesNoController.onPageLoad(mode: Mode = CheckMode)
 POST  /subcontractor/add/company/change-check-address  controllers.add.company.CompanyAddressYesNoController.onSubmit(mode: Mode = CheckMode)
+GET   /subcontractor/amend/company/check-address       controllers.add.company.CompanyAddressYesNoController.onPageLoad(mode: Mode = AmendMode)
+POST  /subcontractor/amend/company/check-address       controllers.add.company.CompanyAddressYesNoController.onSubmit(mode: Mode = AmendMode)
+
 
 GET   /subcontractor/add/company/address                controllers.add.company.CompanyAddressController.redirectToAddressLookup(mode: Mode = NormalMode, changeRoute: Option[String] ?= None)
 GET   /subcontractor/add/company/address-return         controllers.add.company.CompanyAddressController.addressLookupCallback(id: String ?= "", mode: Mode = NormalMode)
