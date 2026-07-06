@@ -273,11 +273,13 @@ class PartnershipNavigator @Inject() () extends NavigatorForJourney {
       case (Some(false), NormalMode) =>
         controllers.add.partnership.routes.PartnershipHasUtrYesNoController.onPageLoad(NormalMode)
 
-    case (Some(true), CheckMode) =>
-      userAnswers.get(PartnershipContactMethodOptionsPage)
-        .fold(controllers.add.partnership.routes.PartnershipContactMethodOptionsController.onPageLoad(CheckMode)) { _ =>
-          controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
-        }
+      case (Some(true), CheckMode) =>
+        userAnswers
+          .get(PartnershipContactMethodOptionsPage)
+          .fold(controllers.add.partnership.routes.PartnershipContactMethodOptionsController.onPageLoad(CheckMode)) {
+            _ =>
+              controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
+          }
 
       case (Some(false), CheckMode) =>
         controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()

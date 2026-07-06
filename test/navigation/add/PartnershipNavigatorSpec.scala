@@ -1021,7 +1021,10 @@ class PartnershipNavigatorSpec extends SpecBase {
         "to CYA when answer is Yes and PartnershipContactMethodOptions already answered" in {
           val answers = emptyUserAnswers
             .setOrException(AddPartnershipContactMethodsYesNoPage, true)
-            .setOrException(PartnershipContactMethodOptionsPage, Set(ContactMethodOptions.Email, ContactMethodOptions.Phone))
+            .setOrException(
+              PartnershipContactMethodOptionsPage,
+              Set(ContactMethodOptions.Email, ContactMethodOptions.Phone)
+            )
 
           navigator.nextPage(
             AddPartnershipContactMethodsYesNoPage,
