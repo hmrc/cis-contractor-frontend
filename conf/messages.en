@@ -7,6 +7,7 @@ site.change                               =  Change
 site.no                                   =  No
 site.yes                                  =  Yes
 site.continue                             =  Continue
+site.update                               =  Update
 site.start                                =  Start now
 site.startAgain                           =  Start again
 site.signIn                               =  Sign in
@@ -238,7 +239,7 @@ addressLookup.individualQuestionsAddress.countryPicker.countryLabel          =  
 
 subcontractorsUniqueTaxpayerReference.title                                  =  Self Assessment Unique Taxpayer Reference (UTR)
 subcontractorsUniqueTaxpayerReference.heading                                =  Self Assessment Unique Taxpayer Reference (UTR)
-subcontractorsUniqueTaxpayerReference.p1                                     =  The UTR will be on tax returns and other documents from HMRC. It might be called ‘reference’, ‘UTR’, or ‘official use’.
+subcontractorsUniqueTaxpayerReference.p1                                     =  The UTR will be on tax returns and other documents from HMRC. It might be called ‘reference’, ‘UTR’ or ‘official use’.
 subcontractorsUniqueTaxpayerReference.linkText                               =  Get more help to find a UTR (opens in new tab)
 subcontractorsUniqueTaxpayerReference.label                                  =  What is the Self Assessment UTR for {0}?
 subcontractorsUniqueTaxpayerReference.hint                                   =  A UTR is a 10 digit number
@@ -722,6 +723,16 @@ companyAdded.helpAndSupport.h2                       =  Help and support
 companyAdded.helpAndSupport.p1                       =  If you need help with the Construction Industry Scheme (CIS) and what it means for you,
 companyAdded.helpAndSupport.p1.link                  =  guidance is available on GOV.UK
 
+companyContactMethodOptions.title                                =  Which contact details do you want to add for this company?
+companyContactMethodOptions.heading                              =  Which contact details do you want to add for {0}?
+companyContactMethodOptions.hint                                 =  Contact details are only for your own records
+companyContactMethodOptions.email                                =  Email address
+companyContactMethodOptions.phone                                =  Phone number
+companyContactMethodOptions.mobile                               =  Mobile number
+companyContactMethodOptions.error.required                       =  Select the methods of contact you want to add for this company
+companyContactMethodOptions.checkYourAnswersLabel                =  Methods of contact
+companyContactMethodOptions.change.hidden                        =  methods of contact
+
 # Trust
 addTrustContactMethodsYesNo.title                  =  Do you want to add contact details for this trust?
 addTrustContactMethodsYesNo.heading                =  Do you want to add contact details for {0}?
@@ -1059,10 +1070,22 @@ contractordetails.contractorUtr.error.length                                   =
 contractordetails.contractorDetailsCheckAnswers.title                          =  Contractor details
 contractordetails.contractorDetailsCheckAnswers.heading                        =  Contractor details
 contractordetails.contractorDetailsCheckAnswers.accountsOfficeReference        =  Accounts office reference: {0}
-contractordetails.contractorDetailsCheckAnswers.table.uniqueTaxpayerReference  =  Unique Taxpayer Reference
+contractordetails.contractorDetailsCheckAnswers.table.uniqueTaxpayerReference  =  Unique taxpayer reference
 contractordetails.contractorDetailsCheckAnswers.table.schemeName               =  Scheme name
 contractordetails.contractorDetailsCheckAnswers.table.schemeName.hidden        =  scheme name
-contractordetails.contractorDetailsCheckAnswers.table.email                    =  Email address
-contractordetails.contractorDetailsCheckAnswers.table.email.hidden             =  email address
+contractordetails.contractorDetailsCheckAnswers.table.email                    =  Email
+contractordetails.contractorDetailsCheckAnswers.table.email.hidden             =  email
 contractordetails.contractorDetailsCheckAnswers.table.link.addDetails          =  Add details
-contractordetails.contractorDetailsCheckAnswers.returnToCisDashboard.link      =  Return to CIS dashboard
+contractordetails.contractorDetailsCheckAnswers.returnToCisDashboard.link      =  Return to CIS account
+
+contractordetails.addEmailAddressYesNo.title                                   =  Do you want to enter the contractor’s email address?
+contractordetails.addEmailAddressYesNo.heading                                 =  Do you want to enter the contractor’s email address?
+contractordetails.addEmailAddressYesNo.error.required                          =  Select yes to enter the contractor’s email address
+contractordetails.addEmailAddressYesNo.checkYourAnswersLabel                   =  Add email address?
+contractordetails.addEmailAddressYesNo.change.hidden                           =  add email address?
+
+contractordetails.addSchemeNameYesNo.title                                     =  Do you want to enter the contractor’s scheme name?
+contractordetails.addSchemeNameYesNo.heading                                   =  Do you want to enter the contractor’s scheme name?
+contractordetails.addSchemeNameYesNo.error.required                            =  Select yes to enter the contractor’s scheme name
+contractordetails.addSchemeNameYesNo.checkYourAnswersLabel                     =  Add scheme name?
+contractordetails.addSchemeNameYesNo.change.hidden                             =  add scheme name?
