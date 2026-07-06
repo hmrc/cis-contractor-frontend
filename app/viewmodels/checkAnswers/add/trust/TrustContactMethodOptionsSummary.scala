@@ -46,7 +46,7 @@ object TrustContactMethodOptionsSummary {
             controllers.add.trust.routes.TrustContactMethodOptionsController.onPageLoad(CheckMode).url
           )
             .withVisuallyHiddenText(messages("trustContactMethodOptions.change.hidden"))
-            .withAttribute("id" -> "trust-contact-methods")
+            .withAttribute("id" -> "trust-methods-of-contact")
         )
       )
     }
