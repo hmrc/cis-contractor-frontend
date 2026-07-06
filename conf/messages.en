@@ -239,7 +239,7 @@ addressLookup.individualQuestionsAddress.countryPicker.countryLabel          =  
 
 subcontractorsUniqueTaxpayerReference.title                                  =  Self Assessment Unique Taxpayer Reference (UTR)
 subcontractorsUniqueTaxpayerReference.heading                                =  Self Assessment Unique Taxpayer Reference (UTR)
-subcontractorsUniqueTaxpayerReference.p1                                     =  The UTR will be on tax returns and other documents from HMRC. It might be called ‘reference’, ‘UTR’, or ‘official use’.
+subcontractorsUniqueTaxpayerReference.p1                                     =  The UTR will be on tax returns and other documents from HMRC. It might be called ‘reference’, ‘UTR’ or ‘official use’.
 subcontractorsUniqueTaxpayerReference.linkText                               =  Get more help to find a UTR (opens in new tab)
 subcontractorsUniqueTaxpayerReference.label                                  =  What is the Self Assessment UTR for {0}?
 subcontractorsUniqueTaxpayerReference.hint                                   =  A UTR is a 10 digit number

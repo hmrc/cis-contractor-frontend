@@ -14,29 +14,29 @@
  * limitations under the License.
  */
 
-package viewmodels.checkAnswers.add.company
+package viewmodels.checkAnswers.amend
 
-import models.{CheckMode, Mode, UserAnswers}
-import pages.add.company.CompanyEmailAddressPage
+import models.{AmendMode, UserAnswers}
+import pages.add.SubcontractorsUniqueTaxpayerReferencePage
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
 
-object CompanyEmailAddressSummary {
+object AmendSubcontractorsUniqueTaxpayerReferenceSummary {
 
-  def row(answers: UserAnswers, mode: Mode = CheckMode)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(CompanyEmailAddressPage).map { answer =>
+  def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
+    answers.get(SubcontractorsUniqueTaxpayerReferencePage).map { answer =>
       SummaryListRowViewModel(
-        key = "companyEmailAddress.checkYourAnswersLabel",
+        key = "subcontractorsUniqueTaxpayerReference.checkYourAnswersLabel",
         value = ValueViewModel(answer),
         actions = Seq(
           ActionItemViewModel(
             "site.change",
-            controllers.add.company.routes.CompanyEmailAddressController.onPageLoad(mode).url
+            controllers.add.routes.SubcontractorsUniqueTaxpayerReferenceController.onPageLoad(AmendMode).url
           )
-            .withVisuallyHiddenText(messages("companyEmailAddress.change.hidden"))
-            .withAttribute("id" -> "company-email-address")
+            .withVisuallyHiddenText(messages("subcontractorsUniqueTaxpayerReference.change.hidden"))
+            .withAttribute("id" -> "subcontractors-unique-taxpayer-reference")
         )
       )
     }
