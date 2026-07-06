@@ -62,7 +62,7 @@ class AddPartnershipContactMethodsYesNoSummarySpec extends AnyFreeSpec with Matc
       changeAction.content.asHtml.toString    should include(expectedChangeText)
       changeAction.href                     shouldBe expectedHref
       changeAction.visuallyHiddenText.value shouldBe expectedHiddenText
-      changeAction.attributes                 should contain("id" -> "partnership-contact-methods-yes-no")
+      changeAction.attributes                 should contain("id" -> "add-partnership-contact-details")
     }
 
     "must return a SummaryListRow with 'No' when the answer is false" in {
