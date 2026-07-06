@@ -306,6 +306,27 @@ class CompanyNavigatorSpec extends SpecBase {
         navigator.nextPage(CompanyNamePage, AmendMode, emptyUserAnswers) mustBe journeyRecovery
       }
 
+      "to Amend Company CYA page when EmailAddress is selected and CompanyEmailAddressPage is answered" in {
+        navigator.nextPage(
+          CompanyContactOptionsPage,
+          AmendMode,
+          emptyUserAnswers
+            .setOrException(
+              CompanyContactOptionsPage,
+              ContactOptions.Email
+            )
+            .setOrException(CompanyEmailAddressPage, "old@email.com")
+        ) mustBe CompanyAmendCYA
+      }
+
+      "must go from CompanyMobileNumberPage to Company CYA in AmendMode" in {
+        navigator.nextPage(
+          CompanyMobileNumberPage,
+          AmendMode,
+          emptyUserAnswers
+        ) mustBe CompanyAmendCYA
+      }
+
       "must go from CompanyWorksReferencePage to CompanyCheckYourAnswerPage in AmendMode" in {
         navigator.nextPage(
           CompanyWorksReferencePage,
