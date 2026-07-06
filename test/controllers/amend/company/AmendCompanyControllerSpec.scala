@@ -34,6 +34,8 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import queries.{CisIdQuery, OriginalCompanyAnswersQuery}
 import repositories.SessionRepository
+import models.TypeOfSubcontractor.Limitedcompany
+import pages.add.TypeOfSubcontractorPage
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -136,6 +138,7 @@ class AmendCompanyControllerSpec extends SpecBase with MockitoSugar {
 
           val savedAnswers = captor.getValue
 
+          savedAnswers.get(TypeOfSubcontractorPage).value mustEqual Limitedcompany
           savedAnswers.get(CompanyNamePage).value mustBe companyName
           savedAnswers.get(CompanyAddressYesNoPage).value mustBe true
           savedAnswers.get(CompanyAddressPage).value mustBe expectedAddress

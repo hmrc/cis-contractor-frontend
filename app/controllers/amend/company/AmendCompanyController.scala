@@ -31,6 +31,7 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
+import models.TypeOfSubcontractor.Limitedcompany
 
 // TODO: replace demo data with real backend fetch
 class AmendCompanyController @Inject() (
@@ -67,6 +68,7 @@ class AmendCompanyController @Inject() (
     worksReference = Some(worksReference)
   )
   protected def populateUserAnswers(ua: UserAnswers): Try[UserAnswers] = for {
+    ua <- ua.set(TypeOfSubcontractorPage, Limitedcompany)
     ua <- ua.set(CompanyNamePage, companyName)
     ua <- ua.set(CompanyAddressYesNoPage, true)
     ua <- ua.set(CompanyAddressPage, companyAddress)
