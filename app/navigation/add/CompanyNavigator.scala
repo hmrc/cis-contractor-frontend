@@ -41,8 +41,9 @@ class CompanyNavigator @Inject() () extends NavigatorForJourney {
   private def cyaRoute(mode: Mode): Call = mode match {
     case AmendMode =>
       routes.JourneyRecoveryController
-        .onPageLoad() // TODO route to controllers.amend.routes.AmendIndividualCheckYourAnswersController.onPageLoad() when AmendIndividualCheckYourAnswersController added.
-    case _         => controllers.add.routes.CheckYourAnswersController.onPageLoad()
+        .onPageLoad() // TODO route to controllers.amend.company.routes.AmendCompanyCheckYourAnswersController.onPageLoad() when AmendCompanyCheckYourAnswersController added.
+    case _         =>
+      controllers.add.company.routes.CompanyCheckYourAnswersController.onPageLoad()
   }
 
   private val normalRoutes: Page => UserAnswers => Call = {
@@ -77,6 +78,8 @@ class CompanyNavigator @Inject() () extends NavigatorForJourney {
   }
 
   private val amendRouteMap: Page => UserAnswers => Call = {
+    case CompanyEmailAddressPage => _ => cyaRoute(AmendMode)
+    case CompanyMobileNumberPage => _ => cyaRoute(AmendMode)
     case CompanyAddressYesNoPage => navigatorFromCompanyAddressYesNoPage(AmendMode)(_)
     case _                       => _ => cyaRoute(AmendMode)
   }
@@ -147,8 +150,9 @@ class CompanyNavigator @Inject() () extends NavigatorForJourney {
       case AmendMode =>
         userAnswers.get(CompanyAddressYesNoPage) match {
           case Some(true)  =>
-            // TODO: controllers.add.company.routes.CompanyAddressController.redirectToAmendAddressLookup() when availabe
-            cyaRoute(mode)
+            cyaRoute(
+              mode
+            ) // TODO: controllers.add.company.routes.CompanyAddressController.redirectToAmendAddressLookup() when availabe
           case Some(false) =>
             cyaRoute(mode)
           case None        =>
