@@ -425,7 +425,7 @@ class IndividualNavigatorSpec extends SpecBase {
         ) mustBe journeyRecovery // TODO: change this to CYA when available
       }
 
-      "must go from SubAddressYesNoPage to AmendCYA when true and AddressOfSubcontractorPage is already answered" in {
+      "must go from SubAddressYesNoPage to journeyRecovery when true and AddressOfSubcontractorPage is already answered" in {
         val addressSample = models.address.Address(
           addressLine1 = "10 Example Street",
           addressLine2 = Some("Suite 2"),
