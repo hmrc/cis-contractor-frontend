@@ -50,22 +50,14 @@ object IndividualAmendedViewModel {
       addressRow(original.address, currentAddress),
       contactMethodRow(original.contactMethod, currentContactMethod),
       contactValueRow(original.contactMethod, original.contactValue, currentContactMethod, currentContactValue),
-      yesNoRow(
-        messages("uniqueTaxpayerReferenceYesNo.checkYourAnswersLabel"),
-        original.utrYesNo,
-        currentUtrYesNo
-      ),
+      yesNoRow(messages("uniqueTaxpayerReferenceYesNo.checkYourAnswersLabel"), original.utrYesNo, currentUtrYesNo),
       fieldRow(
         messages("subcontractorsUniqueTaxpayerReference.checkYourAnswersLabel"),
         original.utr,
         currentUtr,
         missing = none
       ),
-      yesNoRow(
-        messages("nationalInsuranceNumberYesNo.checkYourAnswersLabel"),
-        original.ninoYesNo,
-        currentNinoYesNo
-      ),
+      yesNoRow(messages("nationalInsuranceNumberYesNo.checkYourAnswersLabel"), original.ninoYesNo, currentNinoYesNo),
       fieldRow(
         messages("subNationalInsuranceNumber.checkYourAnswersLabel"),
         original.nino,
@@ -95,21 +87,22 @@ object IndividualAmendedViewModel {
     }
 
   private def nameRow(
-                       original: OriginalIndividualAnswers,
-                       currentUsesTradingName: Option[Boolean],
-                       currentTradingName: Option[String],
-                       currentName: Option[SubcontractorName]
-                     )(implicit messages: Messages): Option[Seq[TableRow]] = {
+    original: OriginalIndividualAnswers,
+    currentUsesTradingName: Option[Boolean],
+    currentTradingName: Option[String],
+    currentName: Option[SubcontractorName]
+  )(implicit messages: Messages): Option[Seq[TableRow]] = {
 
     val originalDisplay = originalNameDisplay(original)
     val currentDisplay  = currentNameDisplay(currentUsesTradingName, currentTradingName, currentName)
 
     val label =
       messages(
-        if (currentUsesTradingName.contains(true))
+        if (currentUsesTradingName.contains(true)) {
           "tradingNameOfSubcontractor.checkYourAnswersLabel"
-        else
+        } else {
           "subcontractorName.checkYourAnswersLabel"
+        }
       )
 
     Option.when(originalDisplay != currentDisplay) {
@@ -153,7 +146,15 @@ object IndividualAmendedViewModel {
     }
 
   private def formatAddress(a: Address): String =
-    Address.normalisedSeq(a).mkString(", ")
+    Seq(
+      Some(a.addressLine1),
+      a.addressLine2,
+      a.addressLine3,
+      a.addressLine4,
+      a.addressLine5,
+      a.postcode,
+      a.country.flatMap(_.name)
+    ).flatten.mkString(", ")
 
   private def contactMethodRow(
     originalMethod: Option[ContactOptions],

@@ -30,16 +30,16 @@ import views.html.amend.IndividualAmendedView
 import javax.inject.Inject
 
 class IndividualAmendedController @Inject() (
-                                              override val messagesApi: MessagesApi,
-                                              identify: IdentifierAction,
-                                              getData: DataRetrievalAction,
-                                              requireData: DataRequiredAction,
-                                              val controllerComponents: MessagesControllerComponents,
-                                              view: IndividualAmendedView,
-                                              appConfig: FrontendAppConfig
-                                            ) extends FrontendBaseController
-  with I18nSupport
-  with Logging {
+  override val messagesApi: MessagesApi,
+  identify: IdentifierAction,
+  getData: DataRetrievalAction,
+  requireData: DataRequiredAction,
+  val controllerComponents: MessagesControllerComponents,
+  view: IndividualAmendedView,
+  appConfig: FrontendAppConfig
+) extends FrontendBaseController
+    with I18nSupport
+    with Logging {
 
   def onPageLoad(): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
     val ua = request.userAnswers
@@ -56,7 +56,7 @@ class IndividualAmendedController @Inject() (
             Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
 
           case Some(cisId) =>
-            val tableRows            = IndividualAmendedViewModel.rows(original, ua)
+            val tableRows                = IndividualAmendedViewModel.rows(original, ua)
             val manageYourSubcontractors = appConfig.manageYourSubcontractorsUrl(cisId)
             Ok(view(tableRows, displayName(ua), manageYourSubcontractors))
         }
@@ -65,7 +65,7 @@ class IndividualAmendedController @Inject() (
 
   private def displayName(ua: models.UserAnswers): String =
     ua.get(SubcontractorNamePage)
-      .map(n => s"${n.lastName}, ${n.firstName}")
+      .map(n => s"${n.firstName} ${n.lastName}")
       .orElse(ua.get(TradingNameOfSubcontractorPage))
       .getOrElse("")
 }

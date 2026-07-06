@@ -76,8 +76,11 @@ class AmendIndividualControllerSpec extends SpecBase with MockitoSugar {
     address = Some(expectedAddress),
     contactMethod = Some(NoDetails),
     contactValue = None,
+    utrYesNo = Some(true),
     utr = Some("3992651526"),
+    ninoYesNo = Some(true),
     nino = Some("QQ123456C"),
+    worksReferenceYesNo = Some(true),
     worksReference = Some("XLS345-MM")
   )
 

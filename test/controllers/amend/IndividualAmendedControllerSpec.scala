@@ -23,7 +23,7 @@ import models.address.{Address, Country}
 import models.amend.OriginalIndividualAnswers
 import models.contact.ContactOptions.NoDetails
 import org.jsoup.Jsoup
-import pages.add.{SubcontractorNamePage, TradingNameOfSubcontractorPage}
+import pages.add.*
 import play.api.i18n.Messages
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
@@ -47,7 +47,7 @@ class IndividualAmendedControllerSpec extends SpecBase {
       country = Some(Country(code = None, name = Some("England")))
     )
 
-  private val original =
+  private val original                =
     OriginalIndividualAnswers(
       usesTradingName = Some(false),
       tradingName = None,
@@ -55,10 +55,51 @@ class IndividualAmendedControllerSpec extends SpecBase {
       address = Some(address),
       contactMethod = Some(NoDetails),
       contactValue = None,
+      utrYesNo = Some(true),
       utr = Some("3992651526"),
+      ninoYesNo = Some(true),
       nino = Some("QQ123456C"),
+      worksReferenceYesNo = Some(true),
       worksReference = Some("XLS345-MM")
     )
+  private val answersMatchingOriginal =
+    emptyUserAnswers
+      .set(OriginalIndividualAnswersQuery, original)
+      .success
+      .value
+      .set(CisIdQuery, "1")
+      .success
+      .value
+      .set(SubTradingNameYesNoPage, false)
+      .success
+      .value
+      .set(SubcontractorNamePage, subcontractorName)
+      .success
+      .value
+      .set(AddressOfSubcontractorPage, address)
+      .success
+      .value
+      .set(IndividualChooseContactDetailsPage, NoDetails)
+      .success
+      .value
+      .set(UniqueTaxpayerReferenceYesNoPage, true)
+      .success
+      .value
+      .set(SubcontractorsUniqueTaxpayerReferencePage, "3992651526")
+      .success
+      .value
+      .set(NationalInsuranceNumberYesNoPage, true)
+      .success
+      .value
+      .set(SubNationalInsuranceNumberPage, "QQ123456C")
+      .success
+      .value
+      .set(WorksReferenceNumberYesNoPage, true)
+      .success
+      .value
+      .set(WorksReferenceNumberPage, "XLS345-MM")
+      .success
+      .value
 
   "IndividualAmendedController" - {
 
@@ -66,37 +107,34 @@ class IndividualAmendedControllerSpec extends SpecBase {
 
       "must return OK when all required answers exist" in {
 
-        val answers =
-          emptyUserAnswers
-            .set(OriginalIndividualAnswersQuery, original).success.value
-            .set(CisIdQuery, "1").success.value
-            .set(SubcontractorNamePage, subcontractorName).success.value
-
         val application =
-          applicationBuilder(userAnswers = Some(answers)).build()
+          applicationBuilder(userAnswers = Some(answersMatchingOriginal)).build()
 
         running(application) {
+
           implicit val msgs: Messages = messages(application)
+
           val request = FakeRequest(GET, individualAmendedRoute)
-          val result = route(application, request).value
+          val result  = route(application, request).value
 
           status(result) mustEqual OK
+
           val doc = Jsoup.parse(contentAsString(result))
 
           doc.title() must include(msgs("individualAmended.panel.heading"))
-          val rows = doc.select("tbody tr")
-          rows.size() mustBe 3
+          doc.text()  must include("Brody, Martin")
 
-          val subRow = rows.get(0)
-          subRow.select("td").get(0).text() mustBe "Brody, Martin"
+          doc.select("tbody tr").size() mustBe 0
         }
       }
 
       "must redirect to JourneyRecovery when OriginalIndividualAnswersQuery is missing" in {
 
         val answers =
-          emptyUserAnswers
-            .set(CisIdQuery, "1").success.value
+          answersMatchingOriginal
+            .remove(OriginalIndividualAnswersQuery)
+            .success
+            .value
 
         val application =
           applicationBuilder(userAnswers = Some(answers)).build()
@@ -104,7 +142,7 @@ class IndividualAmendedControllerSpec extends SpecBase {
         running(application) {
 
           val request = FakeRequest(GET, individualAmendedRoute)
-          val result = route(application, request).value
+          val result  = route(application, request).value
 
           status(result) mustEqual SEE_OTHER
           redirectLocation(result).value mustEqual
@@ -115,8 +153,10 @@ class IndividualAmendedControllerSpec extends SpecBase {
       "must redirect to JourneyRecovery when CisIdQuery is missing" in {
 
         val answers =
-          emptyUserAnswers
-            .set(OriginalIndividualAnswersQuery, original).success.value
+          answersMatchingOriginal
+            .remove(CisIdQuery)
+            .success
+            .value
 
         val application =
           applicationBuilder(userAnswers = Some(answers)).build()
@@ -124,7 +164,7 @@ class IndividualAmendedControllerSpec extends SpecBase {
         running(application) {
 
           val request = FakeRequest(GET, individualAmendedRoute)
-          val result = route(application, request).value
+          val result  = route(application, request).value
 
           status(result) mustEqual SEE_OTHER
           redirectLocation(result).value mustEqual
@@ -135,10 +175,16 @@ class IndividualAmendedControllerSpec extends SpecBase {
       "must display the subcontractor name" in {
 
         val answers =
-          emptyUserAnswers
-            .set(OriginalIndividualAnswersQuery, original).success.value
-            .set(CisIdQuery, "1").success.value
-            .set(SubcontractorNamePage, subcontractorName).success.value
+          answersMatchingOriginal
+            .set(OriginalIndividualAnswersQuery, original)
+            .success
+            .value
+            .set(CisIdQuery, "1")
+            .success
+            .value
+            .set(SubcontractorNamePage, subcontractorName)
+            .success
+            .value
 
         val application =
           applicationBuilder(userAnswers = Some(answers)).build()
@@ -146,7 +192,7 @@ class IndividualAmendedControllerSpec extends SpecBase {
         running(application) {
 
           val request = FakeRequest(GET, individualAmendedRoute)
-          val result = route(application, request).value
+          val result  = route(application, request).value
 
           val doc = Jsoup.parse(contentAsString(result))
 
@@ -157,10 +203,16 @@ class IndividualAmendedControllerSpec extends SpecBase {
       "must display the trading name when a subcontractor name is not present" in {
 
         val answers =
-          emptyUserAnswers
-            .set(OriginalIndividualAnswersQuery, original).success.value
-            .set(CisIdQuery, "1").success.value
-            .set(TradingNameOfSubcontractorPage, "ABC Roofing").success.value
+          answersMatchingOriginal
+            .remove(SubcontractorNamePage)
+            .success
+            .value
+            .set(SubTradingNameYesNoPage, true)
+            .success
+            .value
+            .set(TradingNameOfSubcontractorPage, "ABC Roofing")
+            .success
+            .value
 
         val application =
           applicationBuilder(userAnswers = Some(answers)).build()
@@ -168,7 +220,7 @@ class IndividualAmendedControllerSpec extends SpecBase {
         running(application) {
 
           val request = FakeRequest(GET, individualAmendedRoute)
-          val result = route(application, request).value
+          val result  = route(application, request).value
 
           val doc = Jsoup.parse(contentAsString(result))
 
