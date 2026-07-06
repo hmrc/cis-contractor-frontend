@@ -83,7 +83,7 @@ class PartnershipContactMethodOptionsSummarySpec extends SpecBase with Matchers 
         messages("partnershipContactMethodOptions.change.hidden")
       )
 
-      action.attributes must contain("id" -> "partnership-contact-methods")
+      action.attributes must contain("id" -> "partnership-methods-of-contact")
     }
 
     "must return a row with a single selected option" in {

@@ -17,12 +17,9 @@
 package controllers.add.partnership
 
 import controllers.actions.*
-import models.UserAnswers
 import models.add.partnership.ValidatedPartnership
-import models.contact.ContactOptions.*
-import pages.add.partnership.PartnershipChooseContactDetailsPage
 import play.api.Logging
-import play.api.i18n.{I18nSupport, Messages, MessagesApi}
+import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
 import services.SubcontractorService
@@ -51,14 +48,6 @@ class PartnershipCheckYourAnswersController @Inject() (
     with I18nSupport
     with Logging {
 
-  private def contactDetailsPage(ua: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    ua.get(PartnershipChooseContactDetailsPage).flatMap {
-      case Email  => PartnershipEmailAddressSummary.row(ua)
-      case Phone  => PartnershipPhoneNumberSummary.row(ua)
-      case Mobile => PartnershipMobileNumberSummary.row(ua)
-      case _      => None
-    }
-
   def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
     val ua = request.userAnswers
     ValidatedPartnership.build(ua) match {
@@ -69,8 +58,11 @@ class PartnershipCheckYourAnswersController @Inject() (
             PartnershipNameSummary.row(ua),
             PartnershipAddressYesNoSummary.row(ua),
             PartnershipAddressSummary.row(ua),
-            PartnershipChooseContactDetailsSummary.row(ua),
-            contactDetailsPage(ua),
+            AddPartnershipContactMethodsYesNoSummary.row(ua),
+            PartnershipContactMethodOptionsSummary.row(ua),
+            PartnershipEmailAddressSummary.row(ua),
+            PartnershipPhoneNumberSummary.row(ua),
+            PartnershipMobileNumberSummary.row(ua),
             PartnershipHasUtrYesNoSummary.row(ua),
             PartnershipUniqueTaxpayerReferenceSummary.row(ua),
             PartnershipNominatedPartnerNameSummary.row(ua),
