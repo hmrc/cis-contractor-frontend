@@ -80,6 +80,7 @@ class CompanyNavigator @Inject() () extends NavigatorForJourney {
   private val amendRouteMap: Page => UserAnswers => Call = {
     case CompanyEmailAddressPage => _ => cyaRoute(AmendMode)
     case CompanyMobileNumberPage => _ => cyaRoute(AmendMode)
+    case CompanyCrnPage          => _ => cyaRoute(AmendMode)
     case _                       => _ => cyaRoute(AmendMode)
   }
 
@@ -176,19 +177,19 @@ class CompanyNavigator @Inject() () extends NavigatorForJourney {
 
   private def navigatorFromCompanyCrnYesNoPage(mode: Mode)(userAnswers: UserAnswers): Call =
     (userAnswers.get(CompanyCrnYesNoPage), mode) match {
-      case (Some(true), NormalMode)  =>
+      case (Some(true), NormalMode)             =>
         controllers.add.company.routes.CompanyCrnController.onPageLoad(NormalMode)
-      case (Some(false), NormalMode) =>
+      case (Some(false), NormalMode)            =>
         controllers.add.company.routes.CompanyWorksReferenceYesNoController.onPageLoad(NormalMode)
-      case (Some(true), CheckMode)   =>
+      case (Some(true), CheckMode | AmendMode)  =>
         userAnswers
           .get(CompanyCrnPage)
-          .fold(controllers.add.company.routes.CompanyCrnController.onPageLoad(CheckMode)) { _ =>
-            controllers.add.company.routes.CompanyCheckYourAnswersController.onPageLoad()
+          .fold(controllers.add.company.routes.CompanyCrnController.onPageLoad(mode)) { _ =>
+            cyaRoute(mode)
           }
-      case (Some(false), CheckMode)  =>
-        controllers.add.company.routes.CompanyCheckYourAnswersController.onPageLoad()
-      case _                         =>
+      case (Some(false), CheckMode | AmendMode) =>
+        cyaRoute(mode)
+      case _                                    =>
         routes.JourneyRecoveryController.onPageLoad()
     }
 

@@ -326,6 +326,15 @@ class CompanyNavigatorSpec extends SpecBase {
           emptyUserAnswers
         ) mustBe CompanyAmendCYA
       }
+
+      "must go from a CompanyCrnPage to Company CYA in AmendMode" in {
+        navigator.nextPage(
+          CompanyCrnPage,
+          AmendMode,
+          emptyUserAnswers
+        ) mustBe CompanyAmendCYA
+      }
+
     }
 
     "in Check mode" - {

@@ -227,6 +227,8 @@ GET   /subcontractor/add/company/company-registration-number         controllers
 POST  /subcontractor/add/company/company-registration-number         controllers.add.company.CompanyCrnController.onSubmit(mode: Mode = NormalMode)
 GET   /subcontractor/add/company/change-company-registration-number  controllers.add.company.CompanyCrnController.onPageLoad(mode: Mode = CheckMode)
 POST  /subcontractor/add/company/change-company-registration-number  controllers.add.company.CompanyCrnController.onSubmit(mode: Mode = CheckMode)
+GET   /subcontractor/amend/company/company-registration-number       controllers.add.company.CompanyCrnController.onPageLoad(mode: Mode = AmendMode)
+POST  /subcontractor/amend/company/company-registration-number       controllers.add.company.CompanyCrnController.onSubmit(mode: Mode = AmendMode)
 
 GET   /subcontractor/add/company/company-has-works-reference         controllers.add.company.CompanyWorksReferenceYesNoController.onPageLoad(mode: Mode = NormalMode)
 POST  /subcontractor/add/company/company-has-works-reference         controllers.add.company.CompanyWorksReferenceYesNoController.onSubmit(mode: Mode = NormalMode)
