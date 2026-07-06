@@ -17,7 +17,7 @@
 package models.add.partnership
 
 import models.address.Address
-import models.contact.{ContactMethodOptions, ContactOptions}
+import models.contact.ContactMethodOptions
 import models.contact.ContactOptions.*
 import models.{InvalidAnswer, TypeOfSubcontractor, UserAnswers, Validation, ValidationError}
 import pages.add.TypeOfSubcontractorPage
