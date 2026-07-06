@@ -16,6 +16,7 @@
 
 package pages.add
 
+import models.contact.ContactMethodOptions
 import pages.behaviours.PageBehaviours
 
 class AddIndividualContactMethodsYesNoPageSpec extends PageBehaviours {
@@ -39,12 +40,16 @@ class AddIndividualContactMethodsYesNoPageSpec extends PageBehaviours {
         .set(IndividualMobileNumberPage, "01234567890")
         .success
         .value
+        .set(IndividualContactMethodOptionsPage, Set(ContactMethodOptions.Email, ContactMethodOptions.Phone))
+        .success
+        .value
 
       val updatedUserAnswers = userAnswers.set(AddIndividualContactMethodsYesNoPage, false).success.value
 
       updatedUserAnswers.get(IndividualEmailAddressPage) mustBe None
       updatedUserAnswers.get(IndividualPhoneNumberPage) mustBe None
       updatedUserAnswers.get(IndividualMobileNumberPage) mustBe None
+      updatedUserAnswers.get(IndividualContactMethodOptionsPage) mustBe None
     }
   }
 }

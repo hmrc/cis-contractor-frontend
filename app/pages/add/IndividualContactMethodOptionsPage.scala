@@ -42,17 +42,4 @@ case object IndividualContactMethodOptionsPage
       case _                     =>
         super.cleanup(value, userAnswers)
     }
-
-//  private def removeIfNotSelected(
-//    selectedAnswers: Set[IndividualContactMethodOptions],
-//    answer: IndividualContactMethodOptions,
-//    page: QuestionPage[String],
-//    userAnswers: UserAnswers
-//  ): Try[UserAnswers] =
-//    if (selectedAnswers.contains(answer)) {
-//      Success(userAnswers)
-//    } else {
-//      userAnswers.remove(page)
-//    }
-
 }

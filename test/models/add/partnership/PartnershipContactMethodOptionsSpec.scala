@@ -16,16 +16,9 @@
 
 package models.add.partnership
 
-//import generators.ModelGenerators
-//import models.add.partnership.PartnershipContactMethodOptions
-//import org.scalacheck.Arbitrary.arbitrary
-//import org.scalatest.OptionValues
-//import org.scalatest.freespec.AnyFreeSpec
-//import org.scalatest.matchers.must.Matchers
-//import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
-//import play.api.libs.json.{JsError, JsString, Json}
+import generators.ModelGenerators
+import models.add.partnership.PartnershipContactMethodOptions
 import org.scalacheck.Arbitrary.arbitrary
-import org.scalacheck.Gen
 import org.scalatest.OptionValues
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
@@ -36,15 +29,14 @@ class PartnershipContactMethodOptionsSpec
     extends AnyFreeSpec
     with Matchers
     with ScalaCheckPropertyChecks
-    with OptionValues {
+    with OptionValues
+    with ModelGenerators {
 
   "PartnershipContactMethodOptions" - {
 
     "must deserialise valid values" in {
 
-      // val gen = arbitrary[PartnershipContactMethodOptions]
-      val gen = Gen.oneOf(PartnershipContactMethodOptions.values.toSeq)
-
+      val gen = arbitrary[PartnershipContactMethodOptions]
       forAll(gen) { partnershipContactMethodOptions =>
         JsString(partnershipContactMethodOptions.toString)
           .validate[PartnershipContactMethodOptions]
@@ -64,8 +56,7 @@ class PartnershipContactMethodOptionsSpec
 
     "must serialise" in {
 
-      // val gen = arbitrary[PartnershipContactMethodOptions]
-      val gen = Gen.oneOf(PartnershipContactMethodOptions.values.toSeq)
+      val gen = arbitrary[PartnershipContactMethodOptions]
 
       forAll(gen) { partnershipContactMethodOptions =>
         Json.toJson(partnershipContactMethodOptions) mustEqual JsString(partnershipContactMethodOptions.toString)

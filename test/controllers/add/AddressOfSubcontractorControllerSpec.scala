@@ -273,7 +273,7 @@ class AddressOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
 
           status(result) mustBe SEE_OTHER
           redirectLocation(result).value mustBe
-            controllers.add.routes.IndividualChooseContactDetailsController.onPageLoad(NormalMode).url
+            controllers.add.routes.IndividualContactMethodOptionsController.onPageLoad(NormalMode).url
 
           val idCaptor = ArgumentCaptor.forClass(classOf[String])
           verify(mockAddressLookupService).getAddressById(idCaptor.capture())(any(), any())

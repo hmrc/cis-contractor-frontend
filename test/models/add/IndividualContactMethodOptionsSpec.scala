@@ -16,8 +16,9 @@
 
 package models.add
 
+import generators.ModelGenerators
+import models.add.IndividualContactMethodOptions
 import org.scalacheck.Arbitrary.arbitrary
-import org.scalacheck.Gen
 import org.scalatest.OptionValues
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
@@ -25,16 +26,17 @@ import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import play.api.libs.json.{JsError, JsString, Json}
 
 class IndividualContactMethodOptionsSpec
-    extends AnyFreeSpec
+  extends AnyFreeSpec
     with Matchers
     with ScalaCheckPropertyChecks
-    with OptionValues {
+    with OptionValues
+    with ModelGenerators {
 
   "IndividualContactMethodOptions" - {
 
     "must deserialise valid values" in {
 
-      val gen = Gen.oneOf(IndividualContactMethodOptions.values.toSeq)
+      val gen = arbitrary[IndividualContactMethodOptions]
 
       forAll(gen) { individualContactMethodOptions =>
         JsString(individualContactMethodOptions.toString)
@@ -55,7 +57,7 @@ class IndividualContactMethodOptionsSpec
 
     "must serialise" in {
 
-      val gen = Gen.oneOf(IndividualContactMethodOptions.values.toSeq)
+      val gen = arbitrary[IndividualContactMethodOptions]
 
       forAll(gen) { individualContactMethodOptions =>
         Json.toJson(individualContactMethodOptions) mustEqual JsString(individualContactMethodOptions.toString)

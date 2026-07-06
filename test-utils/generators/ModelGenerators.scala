@@ -18,7 +18,7 @@ package generators
 
 import models.*
 
-import models.contact.ContactOptions
+import models.contact.{ContactOptions,ContactMethodOptions}
 import models.address.{Address, Country}
 import models.verify.ContractorEmailConfirmationStored
 import models.verify.SelectedSubcontractors
@@ -29,10 +29,10 @@ import java.time.{Instant, LocalDateTime, ZoneOffset}
 
 trait ModelGenerators {
 
-//  implicit lazy val arbitraryContactMethodOptions: Arbitrary[ContactMethodOptions] =
-//    Arbitrary {
-//      Gen.oneOf(ContactMethodOptions.values)
-//    }
+  implicit lazy val arbitraryContactMethodOptions: Arbitrary[ContactMethodOptions] =
+    Arbitrary {
+      Gen.oneOf(ContactMethodOptions.values)
+    }
 
   implicit lazy val arbitrarySelectSubcontractorsToReverify: Arbitrary[Set[SelectedSubcontractors]] =
     Arbitrary {
@@ -154,8 +154,4 @@ trait ModelGenerators {
       .choose(0L, System.currentTimeMillis())
       .map(ms => LocalDateTime.ofEpochSecond(ms / 1000, 0, ZoneOffset.UTC))
 
-  implicit lazy val arbitraryIndividualContactMethodOptions: Arbitrary[models.add.IndividualContactMethodOptions] =
-    Arbitrary {
-      Gen.oneOf(models.add.IndividualContactMethodOptions.values)
-    }
 }

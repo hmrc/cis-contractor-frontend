@@ -15,6 +15,7 @@
  */
 
 package viewmodels.checkAnswers.add
+
 import models.contact.ContactMethodOptions
 import models.{CheckMode, UserAnswers}
 import pages.add.IndividualContactMethodOptionsPage
@@ -31,8 +32,8 @@ object IndividualContactMethodOptionsSummary {
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
     answers.get(IndividualContactMethodOptionsPage).map { selectedMethods =>
       val options =
-        ContactMethodOptions.values
-          // .ordered(selectedMethods)
+        ContactMethodOptions
+          .ordered(selectedMethods)
           .map(m => HtmlFormat.escape(messages(s"individualContactMethodOptions.$m")).toString)
       SummaryListRowViewModel(
         key = "individualContactMethodOptions.checkYourAnswersLabel",
