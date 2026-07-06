@@ -16,10 +16,8 @@
 
 package models.amend
 
-import models.add.SubcontractorName
 import models.add.company.CompanyContactMethodOptions
 import models.address.Address
-import models.contact.ContactOptions
 import play.api.libs.json.{Json, OFormat}
 
 case class OriginalCompanyAnswers(

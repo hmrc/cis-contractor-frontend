@@ -27,11 +27,11 @@ import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{never, times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
-import pages.add.company._
+import pages.add.company.*
 import play.api.inject.bind
 import play.api.mvc.MessagesControllerComponents
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import queries.{CisIdQuery, OriginalCompanyAnswersQuery}
 import repositories.SessionRepository
 
@@ -62,8 +62,12 @@ class AmendCompanyControllerSpec extends SpecBase with MockitoSugar {
 
   private lazy val amendCompanyRoute =
     controllers.amend.routes.AmendCompanyController.onPageLoad().url
-
-  private val expectedAddress = Address(
+  private val companyName            = "test company"
+  private val emailAddress           = "test@example.com"
+  private val utr                    = "7777777777"
+  private val crn                    = "AC012345"
+  private val worksReference         = "XLS345-MM"
+  private val expectedAddress        = Address(
     addressLine1 = "12 Harbor View Road",
     addressLine2 = Some("Amity Island"),
     addressLine3 = Some("Bodmin"),
@@ -74,15 +78,15 @@ class AmendCompanyControllerSpec extends SpecBase with MockitoSugar {
 
   private val expectedOriginal =
     OriginalCompanyAnswers(
-      companyName = Some("test company"),
+      companyName = Some(companyName),
       address = Some(expectedAddress),
       contactMethods = Set(Email),
-      email = Some("s@s.com"),
+      email = Some(emailAddress),
       phone = None,
       mobile = None,
-      utr = Some("7777777777"),
-      crn = Some("AC012345"),
-      worksReference = Some("XLS345-MM")
+      utr = Some(utr),
+      crn = Some(crn),
+      worksReference = Some(worksReference)
     )
 
   "AmendCompanyController" - {
@@ -132,21 +136,21 @@ class AmendCompanyControllerSpec extends SpecBase with MockitoSugar {
 
           val savedAnswers = captor.getValue
 
-          savedAnswers.get(CompanyNamePage).value mustBe "test company"
+          savedAnswers.get(CompanyNamePage).value mustBe companyName
           savedAnswers.get(CompanyAddressYesNoPage).value mustBe true
           savedAnswers.get(CompanyAddressPage).value mustBe expectedAddress
 
           savedAnswers.get(CompanyContactMethodOptionsPage).value mustBe Set(Email)
-          savedAnswers.get(CompanyEmailAddressPage).value mustBe "test@example.com"
+          savedAnswers.get(CompanyEmailAddressPage).value mustBe emailAddress
 
           savedAnswers.get(CompanyUtrYesNoPage).value mustBe true
-          savedAnswers.get(CompanyUtrPage).value mustBe "7777777777"
+          savedAnswers.get(CompanyUtrPage).value mustBe utr
 
           savedAnswers.get(CompanyCrnYesNoPage).value mustBe true
-          savedAnswers.get(CompanyCrnPage).value mustBe "AC012345"
+          savedAnswers.get(CompanyCrnPage).value mustBe crn
 
           savedAnswers.get(CompanyWorksReferenceYesNoPage).value mustBe true
-          savedAnswers.get(CompanyWorksReferencePage).value mustBe "XLS345-MM"
+          savedAnswers.get(CompanyWorksReferencePage).value mustBe worksReference
 
           savedAnswers.get(CisIdQuery).value mustBe "1"
           savedAnswers.get(OriginalCompanyAnswersQuery).value mustBe expectedOriginal
