@@ -46,7 +46,7 @@ class TrustEmailAddressControllerSpec extends SpecBase with MockitoSugar {
       .success
       .value
 
-  private def uaWithNameAndEmailChoice: UserAnswers =
+  private def uaWithNameAndEmailOption: UserAnswers =
     uaWithName
       .set(TrustContactMethodOptionsPage, Set(ContactMethodOptions.Email))
       .success
@@ -59,7 +59,7 @@ class TrustEmailAddressControllerSpec extends SpecBase with MockitoSugar {
 
     "must return OK and the correct view for a GET when Email is selected" in {
 
-      val application = applicationBuilder(userAnswers = Some(uaWithNameAndEmailChoice)).build()
+      val application = applicationBuilder(userAnswers = Some(uaWithNameAndEmailOption)).build()
 
       running(application) {
         val request = FakeRequest(GET, trustEmailAddressRoute)
@@ -79,7 +79,7 @@ class TrustEmailAddressControllerSpec extends SpecBase with MockitoSugar {
     "must populate the view correctly on a GET when previously answered" in {
 
       val userAnswers =
-        uaWithNameAndEmailChoice
+        uaWithNameAndEmailOption
           .set(TrustEmailAddressPage, "test@example.com")
           .success
           .value
@@ -108,7 +108,7 @@ class TrustEmailAddressControllerSpec extends SpecBase with MockitoSugar {
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
       val application =
-        applicationBuilder(userAnswers = Some(uaWithNameAndEmailChoice))
+        applicationBuilder(userAnswers = Some(uaWithNameAndEmailOption))
           .overrides(
             bind[SessionRepository].toInstance(mockSessionRepository)
           )
@@ -130,7 +130,7 @@ class TrustEmailAddressControllerSpec extends SpecBase with MockitoSugar {
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
-      val application = applicationBuilder(userAnswers = Some(uaWithNameAndEmailChoice)).build()
+      val application = applicationBuilder(userAnswers = Some(uaWithNameAndEmailOption)).build()
 
       running(application) {
         val request =

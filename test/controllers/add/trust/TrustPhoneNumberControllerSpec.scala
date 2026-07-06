@@ -49,7 +49,7 @@ class TrustPhoneNumberControllerSpec extends SpecBase with MockitoSugar {
       .success
       .value
 
-  private def uaWithNameAndPhoneChoice: UserAnswers =
+  private def uaWithNameAndPhoneOption: UserAnswers =
     uaWithName
       .set(TrustContactMethodOptionsPage, Set(ContactMethodOptions.Phone))
       .success
@@ -59,7 +59,7 @@ class TrustPhoneNumberControllerSpec extends SpecBase with MockitoSugar {
 
     "must return OK and the correct view for a GET when Phone is selected" in {
 
-      val application = applicationBuilder(userAnswers = Some(uaWithNameAndPhoneChoice)).build()
+      val application = applicationBuilder(userAnswers = Some(uaWithNameAndPhoneOption)).build()
 
       running(application) {
         val request = FakeRequest(GET, trustPhoneNumberRoute)
@@ -79,7 +79,7 @@ class TrustPhoneNumberControllerSpec extends SpecBase with MockitoSugar {
     "must populate the view correctly on a GET when previously answered" in {
 
       val userAnswers =
-        uaWithNameAndPhoneChoice
+        uaWithNameAndPhoneOption
           .set(TrustPhoneNumberPage, "0123456723")
           .success
           .value
@@ -108,7 +108,7 @@ class TrustPhoneNumberControllerSpec extends SpecBase with MockitoSugar {
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
       val application =
-        applicationBuilder(userAnswers = Some(uaWithNameAndPhoneChoice))
+        applicationBuilder(userAnswers = Some(uaWithNameAndPhoneOption))
           .overrides(
             bind[SessionRepository].toInstance(mockSessionRepository)
           )
@@ -130,7 +130,7 @@ class TrustPhoneNumberControllerSpec extends SpecBase with MockitoSugar {
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
-      val application = applicationBuilder(userAnswers = Some(uaWithNameAndPhoneChoice)).build()
+      val application = applicationBuilder(userAnswers = Some(uaWithNameAndPhoneOption)).build()
 
       running(application) {
         val request =

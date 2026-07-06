@@ -49,7 +49,7 @@ class TrustMobileNumberControllerSpec extends SpecBase with MockitoSugar {
       .success
       .value
 
-  private def uaWithNameAndMobileChoice: UserAnswers =
+  private def uaWithNameAndMobileOption: UserAnswers =
     uaWithName
       .set(TrustContactMethodOptionsPage, Set(ContactMethodOptions.Mobile))
       .success
@@ -59,7 +59,7 @@ class TrustMobileNumberControllerSpec extends SpecBase with MockitoSugar {
 
     "must return OK and the correct view for a GET when Mobile is selected" in {
 
-      val application = applicationBuilder(userAnswers = Some(uaWithNameAndMobileChoice)).build()
+      val application = applicationBuilder(userAnswers = Some(uaWithNameAndMobileOption)).build()
 
       running(application) {
         val request = FakeRequest(GET, trustMobileNumberRoute)
@@ -79,7 +79,7 @@ class TrustMobileNumberControllerSpec extends SpecBase with MockitoSugar {
     "must populate the view correctly on a GET when previously answered" in {
 
       val userAnswers =
-        uaWithNameAndMobileChoice
+        uaWithNameAndMobileOption
           .set(TrustMobileNumberPage, "07700 900 982")
           .success
           .value
@@ -108,7 +108,7 @@ class TrustMobileNumberControllerSpec extends SpecBase with MockitoSugar {
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
       val application =
-        applicationBuilder(userAnswers = Some(uaWithNameAndMobileChoice))
+        applicationBuilder(userAnswers = Some(uaWithNameAndMobileOption))
           .overrides(
             bind[SessionRepository].toInstance(mockSessionRepository)
           )
@@ -130,7 +130,7 @@ class TrustMobileNumberControllerSpec extends SpecBase with MockitoSugar {
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
-      val application = applicationBuilder(userAnswers = Some(uaWithNameAndMobileChoice)).build()
+      val application = applicationBuilder(userAnswers = Some(uaWithNameAndMobileOption)).build()
 
       running(application) {
         val request =
