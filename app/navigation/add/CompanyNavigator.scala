@@ -42,7 +42,8 @@ class CompanyNavigator @Inject() () extends NavigatorForJourney {
     case AmendMode =>
       routes.JourneyRecoveryController
         .onPageLoad() // TODO route to controllers.amend.company.routes.AmendCompanyCheckYourAnswersController.onPageLoad() when AmendCompanyCheckYourAnswersController added.
-    case _         => controllers.add.routes.CheckYourAnswersController.onPageLoad()
+    case _         =>
+      controllers.add.company.routes.CompanyCheckYourAnswersController.onPageLoad()
   }
 
   private val normalRoutes: Page => UserAnswers => Call = {
@@ -77,6 +78,7 @@ class CompanyNavigator @Inject() () extends NavigatorForJourney {
   }
 
   private val amendRouteMap: Page => UserAnswers => Call = {
+    case CompanyEmailAddressPage => _ => cyaRoute(AmendMode)
     case CompanyMobileNumberPage => _ => cyaRoute(AmendMode)
     case _                       => _ => cyaRoute(AmendMode)
   }
