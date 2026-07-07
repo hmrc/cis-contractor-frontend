@@ -1092,6 +1092,9 @@ contractordetails.addSchemeNameYesNo.change.hidden                             =
 
 contractordetails.removeDetailYesNo.title                                      =  Are you sure you want to remove the contractor’s {0}?
 contractordetails.removeDetailYesNo.heading                                    =  Are you sure you want to remove the contractor’s {0}?
+contractordetails.removeDetailYesNo.detail.email                               =  email
+contractordetails.removeDetailYesNo.detail.schemeName                          =  scheme name
 contractordetails.removeDetailYesNo.checkYourAnswersLabel                      =  Remove {0}
-contractordetails.removeDetailYesNo.error.required                             =  Select yes to remove the contractor’s {0}
+contractordetails.removeDetailYesNo.error.required.email                       =  Select yes to remove the contractor’s email
+contractordetails.removeDetailYesNo.error.required.scheme                      =  Select yes to remove the contractor’s scheme name
 contractordetails.removeDetailYesNo.change.hidden                              =  Remove {0}

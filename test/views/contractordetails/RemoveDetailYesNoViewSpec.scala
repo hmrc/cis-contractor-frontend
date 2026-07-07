@@ -27,56 +27,66 @@ import views.html.contractordetails.RemoveDetailYesNoView
 
 class RemoveDetailYesNoViewSpec extends SpecBase {
 
-  "RemoveDetailYesNoView" - {
-    "must render the page with the correct html elements" in new Setup {
-      val doc: Document = Jsoup.parse(html.toString)
-      doc.title             must include(messages("contractordetails.removeDetailYesNo.title", contractorDetail))
-      doc.select("h1").text must include(messages("contractordetails.removeDetailYesNo.heading", contractorDetail))
+  Seq(
+    ("email", "contractordetails.removeDetailYesNo.detail.email"),
+    ("scheme-name", "contractordetails.removeDetailYesNo.detail.schemeName")
+  ).foreach { case (contractorDetail, detailKey) =>
+    s"when contractorDetail is '$contractorDetail'" - {
 
-      doc.getElementsByClass("govuk-button").text must include(
-        messages("site.continue")
-      )
+      "RemoveDetailYesNoView" - {
+        "must render the page with the correct html elements" in new Setup {
+          val doc: Document = Jsoup.parse(html.toString)
+          doc.title             must include(messages("contractordetails.removeDetailYesNo.title", messages(detailKey)))
+          doc.select("h1").text must include(
+            messages("contractordetails.removeDetailYesNo.heading", messages(detailKey))
+          )
+
+          doc.getElementsByClass("govuk-button").text must include(
+            messages("site.continue")
+          )
+        }
+
+        "must render radio buttons with correct values" in new Setup {
+          val doc: Document = Jsoup.parse(html.toString)
+
+          doc.select("input[type=radio][value=true]").size() mustBe 1
+          doc.select("input[type=radio][value=false]").size() mustBe 1
+
+        }
+
+        "must pre-populate the form when user has previously answered 'true'" in new Setup {
+          val filledForm    = form.fill(true)
+          val filledHtml    = view(contractorDetail, filledForm, NormalMode)
+          val doc: Document = Jsoup.parse(filledHtml.toString)
+
+          doc.select("input[value=true]").hasAttr("checked") mustBe true
+          doc.select("input[value=false]").hasAttr("checked") mustBe false
+        }
+
+        "must pre-populate the form when user has previously answered 'false'" in new Setup {
+          val filledForm    = form.fill(false)
+          val filledHtml    = view(contractorDetail, filledForm, NormalMode)
+          val doc: Document = Jsoup.parse(filledHtml.toString)
+
+          doc.select("input[value=true]").hasAttr("checked") mustBe false
+          doc.select("input[value=false]").hasAttr("checked") mustBe true
+        }
+      }
+
+      trait Setup {
+        val app                                       = applicationBuilder().build()
+        val view                                      = app.injector.instanceOf[RemoveDetailYesNoView]
+        val formProvider                              = new RemoveDetailYesNoFormProvider()
+        val form                                      = formProvider(contractorDetail)
+        implicit val request: play.api.mvc.Request[_] = FakeRequest()
+        implicit val messages: Messages               = play.api.i18n.MessagesImpl(
+          play.api.i18n.Lang.defaultLang,
+          app.injector.instanceOf[play.api.i18n.MessagesApi]
+        )
+
+        val html = view(contractorDetail, form, NormalMode)
+      }
     }
 
-    "must render radio buttons with correct values" in new Setup {
-      val doc: Document = Jsoup.parse(html.toString)
-
-      doc.select("input[type=radio][value=true]").size() mustBe 1
-      doc.select("input[type=radio][value=false]").size() mustBe 1
-
-    }
-
-    "must pre-populate the form when user has previously answered 'true'" in new Setup {
-      val filledForm    = form.fill(true)
-      val filledHtml    = view(contractorDetail, filledForm, NormalMode)
-      val doc: Document = Jsoup.parse(filledHtml.toString)
-
-      doc.select("input[value=true]").hasAttr("checked") mustBe true
-      doc.select("input[value=false]").hasAttr("checked") mustBe false
-    }
-
-    "must pre-populate the form when user has previously answered 'false'" in new Setup {
-      val filledForm    = form.fill(false)
-      val filledHtml    = view(contractorDetail, filledForm, NormalMode)
-      val doc: Document = Jsoup.parse(filledHtml.toString)
-
-      doc.select("input[value=true]").hasAttr("checked") mustBe false
-      doc.select("input[value=false]").hasAttr("checked") mustBe true
-    }
-  }
-
-  trait Setup {
-    val contractorDetail                          = "scheme-name"
-    val app                                       = applicationBuilder().build()
-    val view                                      = app.injector.instanceOf[RemoveDetailYesNoView]
-    val formProvider                              = new RemoveDetailYesNoFormProvider()
-    val form                                      = formProvider(contractorDetail)
-    implicit val request: play.api.mvc.Request[_] = FakeRequest()
-    implicit val messages: Messages               = play.api.i18n.MessagesImpl(
-      play.api.i18n.Lang.defaultLang,
-      app.injector.instanceOf[play.api.i18n.MessagesApi]
-    )
-
-    val html = view(contractorDetail, form, NormalMode)
   }
 }

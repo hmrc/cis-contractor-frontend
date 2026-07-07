@@ -24,10 +24,19 @@ import javax.inject.Inject
 class RemoveDetailYesNoFormProvider @Inject() extends Mappings {
 
   def apply(contractorDetail: String): Form[Boolean] =
-    Form(
-      "value" -> boolean(
-        requiredKey = "contractordetails.removeDetailYesNo.error.required",
-        args = Seq(contractorDetail)
-      )
-    )
+    contractorDetail match {
+      case "email"       =>
+        Form(
+          "value" -> boolean(
+            requiredKey = "contractordetails.removeDetailYesNo.error.required.email"
+          )
+        )
+      case "scheme-name" =>
+        Form(
+          "value" -> boolean(
+            requiredKey = "contractordetails.removeDetailYesNo.error.required.scheme"
+          )
+        )
+    }
+
 }

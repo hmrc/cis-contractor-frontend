@@ -21,26 +21,31 @@ import play.api.data.FormError
 
 class RemoveDetailYesNoFormProviderSpec extends BooleanFieldBehaviours {
 
-  val requiredKey      = "contractordetails.removeDetailYesNo.error.required"
-  val invalidKey       = "error.boolean"
-  val contractorDetail = "scheme-name"
+  Seq(
+    ("email", "contractordetails.removeDetailYesNo.error.required.email"),
+    ("scheme-name", "contractordetails.removeDetailYesNo.error.required.scheme")
+  ).foreach { case (contractorDetail, requiredKey) =>
+    s"when contractorDetail is '$contractorDetail'" - {
 
-  val form = new RemoveDetailYesNoFormProvider()(contractorDetail)
+      val invalidKey = "error.boolean"
+      val form       = new RemoveDetailYesNoFormProvider()(contractorDetail)
 
-  ".value" - {
+      ".value" - {
 
-    val fieldName = "value"
+        val fieldName = "value"
 
-    behave like booleanField(
-      form,
-      fieldName,
-      invalidError = FormError(fieldName, invalidKey, args = Seq(contractorDetail))
-    )
+        behave like booleanField(
+          form,
+          fieldName,
+          invalidError = FormError(fieldName, invalidKey)
+        )
 
-    behave like mandatoryField(
-      form,
-      fieldName,
-      requiredError = FormError(fieldName, requiredKey, args = Seq(contractorDetail))
-    )
+        behave like mandatoryField(
+          form,
+          fieldName,
+          requiredError = FormError(fieldName, requiredKey)
+        )
+      }
+    }
   }
 }
