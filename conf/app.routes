@@ -106,8 +106,6 @@ GET   /subcontractor/add/name         controllers.add.SubcontractorNameControlle
 POST  /subcontractor/add/name         controllers.add.SubcontractorNameController.onSubmit(mode: Mode = NormalMode)
 GET   /subcontractor/add/change-name  controllers.add.SubcontractorNameController.onPageLoad(mode: Mode = CheckMode)
 POST  /subcontractor/add/change-name  controllers.add.SubcontractorNameController.onSubmit(mode: Mode = CheckMode)
-GET   /subcontractor/amend/name       controllers.add.SubcontractorNameController.onPageLoad(mode: Mode = AmendMode)
-POST  /subcontractor/amend/name       controllers.add.SubcontractorNameController.onSubmit(mode: Mode = AmendMode)
 
 GET   /subcontractor/add/check-address         controllers.add.SubAddressYesNoController.onPageLoad(mode: Mode = NormalMode)
 POST  /subcontractor/add/check-address         controllers.add.SubAddressYesNoController.onSubmit(mode: Mode = NormalMode)
