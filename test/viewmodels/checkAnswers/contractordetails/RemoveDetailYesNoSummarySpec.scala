@@ -30,60 +30,67 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 class RemoveDetailYesNoSummarySpec extends AnyFreeSpec with Matchers {
 
   implicit val messages: Messages = stubMessages()
-  val contractorDetail            = "scheme-name"
 
-  "RemoveDetailYesNoSummary.row" - {
+  Seq(
+    ("email", "email"),
+    ("scheme-name", "scheme-name")
+  ).foreach { case (contractorDetail, urlSuffix) =>
+    s"when contractorDetail is '$contractorDetail'" - {
 
-    "must return a SummaryListRow with 'Yes' when the answer is true" in {
-      val answers = UserAnswers("test-id")
-        .set(RemoveDetailYesNoPage, true)
-        .success
-        .value
+      "RemoveDetailYesNoSummary.row" - {
 
-      val maybeRow: Option[SummaryListRow] = RemoveDetailYesNoSummary.row(answers)
-      maybeRow shouldBe defined
+        "must return a SummaryListRow with 'Yes' when the answer is true" in {
+          val answers = UserAnswers("test-id")
+            .set(RemoveDetailYesNoPage, true)
+            .success
+            .value
 
-      val row =
-        maybeRow.value
+          val maybeRow: Option[SummaryListRow] = RemoveDetailYesNoSummary.row(answers, contractorDetail)
+          maybeRow shouldBe defined
 
-      val expectedKeyText = messages("contractordetails.removeDetailYesNo.checkYourAnswersLabel")
-      row.key.content.asHtml.toString should include(expectedKeyText)
+          val row =
+            maybeRow.value
 
-      val expectedValue = messages("site.yes")
-      row.value.content.asHtml.toString should include(expectedValue)
+          val expectedKeyText = messages("contractordetails.removeDetailYesNo.checkYourAnswersLabel")
+          row.key.content.asHtml.toString should include(expectedKeyText)
 
-      row.actions shouldBe defined
-      val actions = row.actions.value.items
-      actions should have size 1
+          val expectedValue = messages("site.yes")
+          row.value.content.asHtml.toString should include(expectedValue)
 
-      val changeAction       = actions.head
-      val expectedChangeText = messages("site.change")
-      val expectedHref       =
-        controllers.contractordetails.routes.RemoveDetailYesNoController.onPageLoad(contractorDetail, CheckMode).url
-      val expectedHiddenText = messages("contractordetails.removeDetailYesNo.change.hidden")
+          row.actions shouldBe defined
+          val actions = row.actions.value.items
+          actions should have size 1
 
-      changeAction.content.asHtml.toString    should include(expectedChangeText)
-      changeAction.href                     shouldBe expectedHref
-      changeAction.visuallyHiddenText.value shouldBe expectedHiddenText
-    }
+          val changeAction = actions.head
+          val expectedChangeText = messages("site.change")
+          val expectedHref =
+            controllers.contractordetails.routes.RemoveDetailYesNoController.onPageLoad(urlSuffix, CheckMode).url
+          val expectedHiddenText = messages("contractordetails.removeDetailYesNo.change.hidden")
 
-    "must return a SummaryListRow with 'No' when the answer is false" in {
-      val answers = UserAnswers("test-id")
-        .set(RemoveDetailYesNoPage, false)
-        .success
-        .value
+          changeAction.content.asHtml.toString should include(expectedChangeText)
+          changeAction.href shouldBe expectedHref
+          changeAction.visuallyHiddenText.value shouldBe expectedHiddenText
+        }
 
-      val maybeRow: Option[SummaryListRow] = RemoveDetailYesNoSummary.row(answers)
-      maybeRow shouldBe defined
+        "must return a SummaryListRow with 'No' when the answer is false" in {
+          val answers = UserAnswers("test-id")
+            .set(RemoveDetailYesNoPage, false)
+            .success
+            .value
 
-      val row           = maybeRow.value
-      val expectedValue = messages("site.no")
-      row.value.content.asHtml.toString should include(expectedValue)
-    }
+          val maybeRow: Option[SummaryListRow] = RemoveDetailYesNoSummary.row(answers, contractorDetail)
+          maybeRow shouldBe defined
 
-    "must return None when the answer does not exist" in {
-      val answers = UserAnswers("test-id")
-      RemoveDetailYesNoSummary.row(answers) shouldBe None
+          val row = maybeRow.value
+          val expectedValue = messages("site.no")
+          row.value.content.asHtml.toString should include(expectedValue)
+        }
+
+        "must return None when the answer does not exist" in {
+          val answers = UserAnswers("test-id")
+          RemoveDetailYesNoSummary.row(answers, contractorDetail) shouldBe None
+        }
+      }
     }
   }
 }
