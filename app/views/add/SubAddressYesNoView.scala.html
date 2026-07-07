@@ -34,14 +34,24 @@
             @govukErrorSummary(ErrorSummaryViewModel(form, errorLinkOverrides = Map("value" -> "value_0")))
         }
 
-        @govukRadios(
-            RadiosViewModel.yesNo(
-                field = form("value"),
-                legend = LegendViewModel(messages("subAddressYesNo.heading", name)).asPageHeading(Large)
+        @if(mode == models.AmendMode) {
+            @govukRadios(
+                RadiosViewModel.yesNo(
+                    field = form("value"),
+                    legend = LegendViewModel(messages("subAddressYesNo.heading", name)).asPageHeading(Large)
+                )
+            )
+        } else {
+            @govukRadios(
+                RadiosViewModel.yesNo(
+                    field = form("value"),
+                    legend = LegendViewModel(messages("subAddressYesNo.heading", name)).asPageHeading(Large)
             ).withHint(Hint(
                 content = Messages("subAddressYesNo.hint"))
+                )
             )
-        )
+        }
+
 
         @govukButton(
             ButtonViewModel(messages("site.continue"))

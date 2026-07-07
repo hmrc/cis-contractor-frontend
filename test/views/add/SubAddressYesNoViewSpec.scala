@@ -76,7 +76,7 @@ class SubAddressYesNoViewSpec extends AnyWordSpec with Matchers with GuiceOneApp
       legend.hasClass("govuk-fieldset__legend--l") mustBe true
 
       val hint: Elements = doc.select("fieldset .govuk-hint")
-      hint.text() mustBe messages("subAddressYesNo.hint")
+      hint.text() mustBe(empty)
 
       val radioButtons: Elements = doc.select(".govuk-radios__label")
       radioButtons.size() mustBe 2
