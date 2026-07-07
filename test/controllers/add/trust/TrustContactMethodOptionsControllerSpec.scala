@@ -175,9 +175,15 @@ class TrustContactMethodOptionsControllerSpec extends SpecBase with MockitoSugar
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
       val userAnswers = uaWithName
-        .set(TrustContactMethodOptionsPage, Set(ContactMethodOptions.Email, ContactMethodOptions.Phone)).success.value
-        .set(TrustEmailAddressPage, "test@example.com").success.value
-        .set(TrustPhoneNumberPage, "01234567890").success.value
+        .set(TrustContactMethodOptionsPage, Set(ContactMethodOptions.Email, ContactMethodOptions.Phone))
+        .success
+        .value
+        .set(TrustEmailAddressPage, "test@example.com")
+        .success
+        .value
+        .set(TrustPhoneNumberPage, "01234567890")
+        .success
+        .value
 
       val application =
         applicationBuilder(userAnswers = Some(userAnswers))
@@ -207,7 +213,9 @@ class TrustContactMethodOptionsControllerSpec extends SpecBase with MockitoSugar
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
       val userAnswers = uaWithName
-        .set(TrustContactMethodOptionsPage, Set(ContactMethodOptions.Email, ContactMethodOptions.Phone)).success.value
+        .set(TrustContactMethodOptionsPage, Set(ContactMethodOptions.Email, ContactMethodOptions.Phone))
+        .success
+        .value
 
       val application =
         applicationBuilder(userAnswers = Some(userAnswers))
@@ -237,8 +245,12 @@ class TrustContactMethodOptionsControllerSpec extends SpecBase with MockitoSugar
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
       val userAnswers = uaWithName
-        .set(TrustContactMethodOptionsPage, Set(ContactMethodOptions.Email, ContactMethodOptions.Mobile)).success.value
-        .set(TrustEmailAddressPage, "test@example.com").success.value
+        .set(TrustContactMethodOptionsPage, Set(ContactMethodOptions.Email, ContactMethodOptions.Mobile))
+        .success
+        .value
+        .set(TrustEmailAddressPage, "test@example.com")
+        .success
+        .value
 
       val application =
         applicationBuilder(userAnswers = Some(userAnswers))
