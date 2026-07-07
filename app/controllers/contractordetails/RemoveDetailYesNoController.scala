@@ -49,7 +49,7 @@ class RemoveDetailYesNoController @Inject() (
       if (contractorDetail == "email" || contractorDetail == "scheme-name") {
 
         val form         = formProvider(contractorDetail: String)
-        val preparedForm = request.userAnswers.get(RemoveDetailYesNoPage) match {
+        val preparedForm = request.userAnswers.get(RemoveDetailYesNoPage(contractorDetail)) match {
           case None        => form
           case Some(value) => form.fill(value)
         }
@@ -70,9 +70,9 @@ class RemoveDetailYesNoController @Inject() (
           formWithErrors => Future.successful(BadRequest(view(contractorDetail, formWithErrors, mode))),
           value =>
             for {
-              updatedAnswers <- Future.fromTry(request.userAnswers.set(RemoveDetailYesNoPage, value))
+              updatedAnswers <- Future.fromTry(request.userAnswers.set(RemoveDetailYesNoPage(contractorDetail), value))
               _              <- sessionRepository.set(updatedAnswers)
-            } yield Redirect(navigator.nextPage(RemoveDetailYesNoPage, mode, updatedAnswers))
+            } yield Redirect(navigator.nextPage(RemoveDetailYesNoPage(contractorDetail), mode, updatedAnswers))
         )
     }
 }

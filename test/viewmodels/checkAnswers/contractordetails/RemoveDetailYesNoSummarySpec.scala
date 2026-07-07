@@ -41,7 +41,7 @@ class RemoveDetailYesNoSummarySpec extends AnyFreeSpec with Matchers {
 
         "must return a SummaryListRow with 'Yes' when the answer is true" in {
           val answers = UserAnswers("test-id")
-            .set(RemoveDetailYesNoPage, true)
+            .set(RemoveDetailYesNoPage(contractorDetail), true)
             .success
             .value
 
@@ -74,7 +74,7 @@ class RemoveDetailYesNoSummarySpec extends AnyFreeSpec with Matchers {
 
         "must return a SummaryListRow with 'No' when the answer is false" in {
           val answers = UserAnswers("test-id")
-            .set(RemoveDetailYesNoPage, false)
+            .set(RemoveDetailYesNoPage(contractorDetail), false)
             .success
             .value
 

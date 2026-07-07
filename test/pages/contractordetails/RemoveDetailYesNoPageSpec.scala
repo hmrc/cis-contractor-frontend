@@ -22,34 +22,30 @@ import play.api.libs.json.JsPath
 class RemoveDetailYesNoPageSpec extends PageBehaviours {
 
   "RemoveDetailYesNoPage" - {
-    "have the correct path" in {
-      RemoveDetailYesNoPage.path mustBe (JsPath \ "contractordetails" \ "removeDetailYesNo")
-    }
 
-    "have the correct toString" in {
-      RemoveDetailYesNoPage.toString mustBe "removeDetailYesNo"
-    }
+    Seq(
+      ("email", EnterContractorEmailAddressPage, AddEmailAddressYesNoPage),
+      ("scheme-name", SchemeNamePage, AddSchemeNameYesNoPage)
+    ).foreach { case (contractorDetail, selectedDetailPage, screenerPage) =>
+      s"when contractorDetail is '$contractorDetail'" - {
 
-//    "contractorDetail is set to 'email'" in {
-//      contractorDetail match {
-//        case "email" =>
-//          beRetrievable[String](EnterContractorEmailAddressPage)
-//
-//          beSettable[String](EnterContractorEmailAddressPage)
-//
-//          beRemovable[String](EnterContractorEmailAddressPage)
-//      }
-//    }
-//
-//    "contractorDetail is set to 'scheme-name'" in {
-//      contractorDetail match {
-//        case "scheme-name" =>
-//          beRetrievable[String](SchemeNamePage)
-//
-//          beSettable[String](SchemeNamePage)
-//
-//          beRemovable[String](SchemeNamePage)
-//      }
-//    }
+        "have the correct path" in {
+          RemoveDetailYesNoPage(contractorDetail).path mustBe (JsPath \ "contractordetails" \ "removeDetailYesNo")
+        }
+
+        "have the correct toString" in {
+          RemoveDetailYesNoPage(contractorDetail).toString mustBe "removeDetailYesNo"
+        }
+
+        beRetrievable[String](selectedDetailPage)
+        beRetrievable[Boolean](screenerPage)
+
+        beSettable[String](selectedDetailPage)
+        beSettable[Boolean](screenerPage)
+
+        beRemovable[String](selectedDetailPage)
+
+      }
+    }
   }
 }
