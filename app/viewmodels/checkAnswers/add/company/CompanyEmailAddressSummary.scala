@@ -16,7 +16,7 @@
 
 package viewmodels.checkAnswers.add.company
 
-import models.{CheckMode, UserAnswers}
+import models.{CheckMode, Mode, UserAnswers}
 import pages.add.company.CompanyEmailAddressPage
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
@@ -25,7 +25,7 @@ import viewmodels.implicits.*
 
 object CompanyEmailAddressSummary {
 
-  def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
+  def row(answers: UserAnswers, mode: Mode = CheckMode)(implicit messages: Messages): Option[SummaryListRow] =
     answers.get(CompanyEmailAddressPage).map { answer =>
       SummaryListRowViewModel(
         key = "companyEmailAddress.checkYourAnswersLabel",
@@ -33,7 +33,7 @@ object CompanyEmailAddressSummary {
         actions = Seq(
           ActionItemViewModel(
             "site.change",
-            controllers.add.company.routes.CompanyEmailAddressController.onPageLoad(CheckMode).url
+            controllers.add.company.routes.CompanyEmailAddressController.onPageLoad(mode).url
           )
             .withVisuallyHiddenText(messages("companyEmailAddress.change.hidden"))
             .withAttribute("id" -> "company-email-address")

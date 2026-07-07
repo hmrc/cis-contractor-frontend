@@ -18,7 +18,6 @@ package views.add.company
 
 import forms.add.company.CompanyNameFormProvider
 import models.{AmendMode, NormalMode}
-import org.jsoup.Jsoup
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
