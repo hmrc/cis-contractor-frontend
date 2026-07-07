@@ -37,13 +37,16 @@ class RemoveDetailYesNoPageSpec extends PageBehaviours {
           RemoveDetailYesNoPage(contractorDetail).toString mustBe "removeDetailYesNo"
         }
 
-        beRetrievable[String](selectedDetailPage)
-        beRetrievable[Boolean](screenerPage)
+        s"remove '$selectedDetailPage'" - {
+          beRetrievable[String](selectedDetailPage)
+          beSettable[String](selectedDetailPage)
+          beRemovable[String](selectedDetailPage)
+        }
 
-        beSettable[String](selectedDetailPage)
-        beSettable[Boolean](screenerPage)
-
-        beRemovable[String](selectedDetailPage)
+        s"set '$screenerPage' to false" - {
+          beRetrievable[Boolean](screenerPage)
+          beSettable[Boolean](screenerPage)
+        }
 
       }
     }
