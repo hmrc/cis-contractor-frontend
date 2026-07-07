@@ -30,13 +30,13 @@ case class RemoveDetailYesNoPage(contractorDetail: String) extends QuestionPage[
 
   override def cleanup(value: Option[Boolean], userAnswers: UserAnswers): Try[UserAnswers] =
     contractorDetail match {
-      case "email" if value.contains(true) =>
+      case "email" if value.contains(true)       =>
         userAnswers.remove(EnterContractorEmailAddressPage)
         userAnswers.set(AddEmailAddressYesNoPage, false)
       case "scheme-name" if value.contains(true) =>
         userAnswers.remove(SchemeNamePage)
         userAnswers.set(AddSchemeNameYesNoPage, false)
-  
+
       case _ =>
         super.cleanup(value, userAnswers)
     }
