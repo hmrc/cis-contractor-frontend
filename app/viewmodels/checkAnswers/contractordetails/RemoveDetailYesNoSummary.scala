@@ -25,7 +25,7 @@ import viewmodels.implicits.*
 
 object RemoveDetailYesNoSummary {
 
-  def row(answers: UserAnswers, contractorDetail:String)(implicit messages: Messages): Option[SummaryListRow] =
+  def row(answers: UserAnswers, contractorDetail: String)(implicit messages: Messages): Option[SummaryListRow] =
     answers.get(RemoveDetailYesNoPage).map { answer =>
 
       val value = if (answer) "site.yes" else "site.no"
