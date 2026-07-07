@@ -14,18 +14,11 @@
  * limitations under the License.
  */
 
-package forms.add.partnership
+package queries
 
-import forms.mappings.Mappings
-import models.add.partnership.PartnershipChooseContactDetails
-import play.api.data.Form
+import models.amend.company.OriginalCompanyAnswers
+import play.api.libs.json.JsPath
 
-import javax.inject.Inject
-
-class PartnershipChooseContactDetailsFormProvider @Inject() extends Mappings {
-
-  def apply(): Form[PartnershipChooseContactDetails] =
-    Form(
-      "value" -> enumerable[PartnershipChooseContactDetails]("partnershipChooseContactDetails.error.required")
-    )
+case object OriginalCompanyAnswersQuery extends Gettable[OriginalCompanyAnswers] with Settable[OriginalCompanyAnswers] {
+  override def path: JsPath = JsPath \ "originalCompanyAnswers"
 }

@@ -38,7 +38,7 @@ object PartnershipContactMethodOptionsSummary {
       SummaryListRowViewModel(
         key = "partnershipContactMethodOptions.checkYourAnswersLabel",
         value = ValueViewModelHelper
-          .makeGovukBulletList(options)
+          .makeGovukBulletList(options, false)
           .getOrElse(ValueViewModel(HtmlContent(""))),
         actions = Seq(
           ActionItemViewModel(
@@ -46,7 +46,7 @@ object PartnershipContactMethodOptionsSummary {
             controllers.add.partnership.routes.PartnershipContactMethodOptionsController.onPageLoad(CheckMode).url
           )
             .withVisuallyHiddenText(messages("partnershipContactMethodOptions.change.hidden"))
-            .withAttribute("id" -> "partnership-contact-methods")
+            .withAttribute("id" -> "partnership-methods-of-contact")
         )
       )
     }

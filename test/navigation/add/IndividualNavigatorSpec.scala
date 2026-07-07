@@ -323,7 +323,6 @@ class IndividualNavigatorSpec extends SpecBase {
     "in Amend mode" - {
 
       "must go from a page that doesn't exist in the edit route map to CheckYourAnswers" in {
-
         case object UnknownPage extends Page
         navigator.nextPage(
           UnknownPage,
@@ -418,6 +417,43 @@ class IndividualNavigatorSpec extends SpecBase {
         ) mustBe journeyRecovery // TODO: when CYA page available
       }
 
+      "must go from a SubAddressYesNoPage to CYA page when false" in {
+        navigator.nextPage(
+          SubAddressYesNoPage,
+          AmendMode,
+          emptyUserAnswers.setOrException(SubAddressYesNoPage, false)
+        ) mustBe journeyRecovery // TODO: change this to CYA when available
+      }
+
+      "must go from SubAddressYesNoPage to journeyRecovery when true and AddressOfSubcontractorPage is already answered" in {
+        val addressSample = models.address.Address(
+          addressLine1 = "10 Example Street",
+          addressLine2 = Some("Suite 2"),
+          addressLine3 = Some("Newcastle"),
+          addressLine4 = Some("Tyne & Wear"),
+          postcode = Some("NE1 1AA"),
+          country = Some(models.address.Country(Some("GB"), Some("United Kingdom")))
+        )
+
+        val ua     =
+          emptyUserAnswers
+            .set(SubAddressYesNoPage, true)
+            .success
+            .value
+            .set(AddressOfSubcontractorPage, addressSample)
+            .success
+            .value
+        val result = navigator.nextPage(SubAddressYesNoPage, AmendMode, ua)
+        result mustBe journeyRecovery // TODO: change this to CYA when available
+      }
+
+      "must go from a SubAddressYesNoPage to journey recovery page when incomplete info provided" in {
+        navigator.nextPage(
+          SubAddressYesNoPage,
+          AmendMode,
+          emptyUserAnswers
+        ) mustBe journeyRecovery
+      }
       "must go from a NationalInsuranceNumberYesNoPage to CYA page when false" in {
         navigator.nextPage(
           NationalInsuranceNumberYesNoPage,
@@ -494,6 +530,14 @@ class IndividualNavigatorSpec extends SpecBase {
           AmendMode,
           emptyUserAnswers
         ) mustBe journeyRecovery
+      }
+
+      "must go from a SubcontractorsUniqueTaxpayerReferencePage to journey recovery page" in {
+        navigator.nextPage(
+          SubcontractorsUniqueTaxpayerReferencePage,
+          AmendMode,
+          UserAnswers("id")
+        ) mustBe journeyRecovery // TODO: this needs to be redirected to amend individual cya page, AmendIndividualCheckYourAnswersController when it's implemented
       }
     }
 
