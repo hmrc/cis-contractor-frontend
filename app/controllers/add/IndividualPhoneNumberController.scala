@@ -17,7 +17,7 @@
 package controllers.add
 
 import controllers.actions.*
-import controllers.helpers.ContactGuard
+import controllers.helpers.{ContactGuard, SaveAnswerHelper}
 import forms.add.IndividualPhoneNumberFormProvider
 import models.Mode
 import models.contact.ContactOptions.Phone
@@ -80,9 +80,13 @@ class IndividualPhoneNumberController @Inject() (
               formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, subcontractorName))),
               value =>
                 for {
-                  updatedAnswers <- Future.fromTry(request.userAnswers.set(IndividualPhoneNumberPage, value))
+                  updatedAnswers <-
+                    Future
+                      .fromTry(SaveAnswerHelper.saveAnswer(request.userAnswers, IndividualPhoneNumberPage, value, mode))
                   _              <- sessionRepository.set(updatedAnswers)
-                } yield Redirect(navigator.nextPage(IndividualPhoneNumberPage, mode, updatedAnswers))
+                } yield Redirect(
+                  navigator.nextPage(IndividualPhoneNumberPage, mode, updatedAnswers)
+                )
             )
         }
   }

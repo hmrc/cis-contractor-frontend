@@ -22,7 +22,9 @@ import models.address.Address
 import models.amend.OriginalIndividualAnswers
 import models.contact.ContactOptions
 import models.contact.ContactOptions.*
+import pages.QuestionPage
 import pages.add.*
+import pages.amend.AmendedPagesPage
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
 import uk.gov.hmrc.govukfrontend.views.viewmodels.table.TableRow
@@ -32,6 +34,7 @@ object IndividualAmendedViewModel {
   def rows(original: OriginalIndividualAnswers, current: UserAnswers)(implicit
     messages: Messages
   ): Seq[Seq[TableRow]] = {
+
     val currentUsesTradingName = current.get(SubTradingNameYesNoPage)
     val currentTradingName     = current.get(TradingNameOfSubcontractorPage)
     val currentName            = current.get(SubcontractorNamePage)
@@ -46,34 +49,60 @@ object IndividualAmendedViewModel {
     val currentWorksRef        = current.get(WorksReferenceNumberPage)
 
     Seq(
-      nameRow(original, currentUsesTradingName, currentTradingName, currentName),
-      addressRow(original.address, currentAddress),
-      contactMethodRow(original.contactMethod, currentContactMethod),
-      contactValueRow(original.contactMethod, original.contactValue, currentContactMethod, currentContactValue),
-      yesNoRow(messages("uniqueTaxpayerReferenceYesNo.checkYourAnswersLabel"), original.utrYesNo, currentUtrYesNo),
+      nameRow(original, currentUsesTradingName, currentTradingName, currentName, current),
+      addressRow(original.address, currentAddress, current),
+      contactMethodRow(original.contactMethod, currentContactMethod, current),
+      contactValueRow(
+        original.contactMethod,
+        original.contactValue,
+        currentContactMethod,
+        currentContactValue,
+        current
+      ),
+      yesNoRow(
+        UniqueTaxpayerReferenceYesNoPage,
+        messages("uniqueTaxpayerReferenceYesNo.checkYourAnswersLabel"),
+        original.utrYesNo,
+        currentUtrYesNo,
+        current
+      ),
       fieldRow(
+        SubcontractorsUniqueTaxpayerReferencePage,
         messages("subcontractorsUniqueTaxpayerReference.checkYourAnswersLabel"),
         original.utr,
         currentUtr,
-        missing = none
+        none,
+        current
       ),
-      yesNoRow(messages("nationalInsuranceNumberYesNo.checkYourAnswersLabel"), original.ninoYesNo, currentNinoYesNo),
+      yesNoRow(
+        NationalInsuranceNumberYesNoPage,
+        messages("nationalInsuranceNumberYesNo.checkYourAnswersLabel"),
+        original.ninoYesNo,
+        currentNinoYesNo,
+        current
+      ),
       fieldRow(
+        SubNationalInsuranceNumberPage,
         messages("subNationalInsuranceNumber.checkYourAnswersLabel"),
         original.nino,
         currentNino,
-        missing = none
+        none,
+        current
       ),
       yesNoRow(
+        WorksReferenceNumberYesNoPage,
         messages("worksReferenceNumberYesNo.checkYourAnswersLabel"),
         original.worksReferenceYesNo,
-        currentWorksRefYesNo
+        currentWorksRefYesNo,
+        current
       ),
       fieldRow(
+        WorksReferenceNumberPage,
         messages("worksReferenceNumber.checkYourAnswersLabel"),
         original.worksReference,
         currentWorksRef,
-        missing = none
+        none,
+        current
       )
     ).flatten
   }
@@ -90,7 +119,8 @@ object IndividualAmendedViewModel {
     original: OriginalIndividualAnswers,
     currentUsesTradingName: Option[Boolean],
     currentTradingName: Option[String],
-    currentName: Option[SubcontractorName]
+    currentName: Option[SubcontractorName],
+    current: UserAnswers
   )(implicit messages: Messages): Option[Seq[TableRow]] = {
 
     val originalDisplay = originalNameDisplay(original)
@@ -105,7 +135,12 @@ object IndividualAmendedViewModel {
         }
       )
 
-    Option.when(originalDisplay != currentDisplay) {
+    val amended =
+      wasAmended(current, SubTradingNameYesNoPage) ||
+        wasAmended(current, TradingNameOfSubcontractorPage) ||
+        wasAmended(current, SubcontractorNamePage)
+
+    Option.when(amended) {
       row(
         label,
         originalDisplay.getOrElse(none),
@@ -135,9 +170,10 @@ object IndividualAmendedViewModel {
 
   private def addressRow(
     originalAddress: Option[Address],
-    currentAddress: Option[Address]
+    currentAddress: Option[Address],
+    current: UserAnswers
   )(implicit messages: Messages): Option[Seq[TableRow]] =
-    Option.when(originalAddress != currentAddress) {
+    Option.when(wasAmended(current, AddressOfSubcontractorPage)) {
       row(
         messages("addressOfSubcontractor.checkYourAnswersLabel"),
         originalAddress.map(formatAddress).getOrElse(none),
@@ -158,9 +194,10 @@ object IndividualAmendedViewModel {
 
   private def contactMethodRow(
     originalMethod: Option[ContactOptions],
-    currentMethod: Option[ContactOptions]
+    currentMethod: Option[ContactOptions],
+    current: UserAnswers
   )(implicit messages: Messages): Option[Seq[TableRow]] =
-    Option.when(originalMethod != currentMethod) {
+    Option.when(wasAmended(current, IndividualChooseContactDetailsPage)) {
       row(
         messages("individualChooseContactDetails.checkYourAnswersLabel"),
         displayContactMethod(originalMethod),
@@ -180,29 +217,51 @@ object IndividualAmendedViewModel {
     originalMethod: Option[ContactOptions],
     originalValue: Option[String],
     currentMethod: Option[ContactOptions],
-    currentValue: Option[String]
+    currentValue: Option[String],
+    current: UserAnswers
   )(implicit messages: Messages): Option[Seq[TableRow]] = {
-    val effectiveMethod = currentMethod.orElse(originalMethod)
-    effectiveMethod match {
-      case Some(Email) | Some(Phone) | Some(Mobile) if originalValue != currentValue =>
-        val label = effectiveMethod match {
-          case Some(Email)  => messages("individualEmailAddress.checkYourAnswersLabel")
-          case Some(Phone)  => messages("individualPhoneNumber.checkYourAnswersLabel")
-          case Some(Mobile) => messages("individualMobileNumber.checkYourAnswersLabel")
-          case _            => ""
-        }
-        Some(row(label, originalValue.getOrElse("—"), currentValue.getOrElse("—")))
-      case _                                                                         => None
+
+    val contactDetails = currentMethod.orElse(originalMethod).map {
+      case Email  =>
+        (
+          messages("individualEmailAddress.checkYourAnswersLabel"),
+          IndividualEmailAddressPage
+        )
+      case Phone  =>
+        (
+          messages("individualPhoneNumber.checkYourAnswersLabel"),
+          IndividualPhoneNumberPage
+        )
+      case Mobile =>
+        (
+          messages("individualMobileNumber.checkYourAnswersLabel"),
+          IndividualMobileNumberPage
+        )
+    }
+
+    contactDetails.flatMap { case (label, page) =>
+      Option.when(
+        wasAmended(current, IndividualChooseContactDetailsPage) ||
+          wasAmended(current, page)
+      ) {
+        row(
+          label,
+          originalValue.getOrElse(none),
+          currentValue.getOrElse(none)
+        )
+      }
     }
   }
 
   private def yesNoRow(
+    page: QuestionPage[_],
     label: String,
     original: Option[Boolean],
-    current: Option[Boolean]
+    currentVal: Option[Boolean],
+    current: UserAnswers
   )(implicit messages: Messages): Option[Seq[TableRow]] =
-    Option.when(original != current) {
-      row(label, displayYesNo(original), displayYesNo(current))
+    Option.when(wasAmended(current, page)) {
+      row(label, displayYesNo(original), displayYesNo(currentVal))
     }
 
   private def displayYesNo(answer: Option[Boolean])(implicit messages: Messages): String =
@@ -213,13 +272,15 @@ object IndividualAmendedViewModel {
     }
 
   private def fieldRow(
+    page: QuestionPage[_],
     label: String,
     original: Option[String],
-    current: Option[String],
-    missing: String
+    currentVal: Option[String],
+    missing: String,
+    current: UserAnswers
   ): Option[Seq[TableRow]] =
-    Option.when(original != current) {
-      row(label, original.getOrElse(missing), current.getOrElse(missing))
+    Option.when(original != currentVal) {
+      row(label, original.getOrElse(missing), currentVal.getOrElse(missing))
     }
 
   private def row(label: String, previous: String, updated: String): Seq[TableRow] =
@@ -227,4 +288,13 @@ object IndividualAmendedViewModel {
 
   private def none(implicit messages: Messages): String =
     messages("individualAmended.table.content.none")
+
+  private def wasAmended(
+    current: UserAnswers,
+    page: QuestionPage[_]
+  ): Boolean =
+    current
+      .get(AmendedPagesPage)
+      .getOrElse(Set.empty)
+      .contains(page.toString)
 }
