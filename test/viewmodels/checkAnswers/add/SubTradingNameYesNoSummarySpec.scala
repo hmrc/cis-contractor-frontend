@@ -41,8 +41,7 @@ class SubTradingNameYesNoSummarySpec extends AnyFreeSpec with Matchers {
       val maybeRow: Option[SummaryListRow] = SubTradingNameYesNoSummary.row(answers)
       maybeRow shouldBe defined
 
-      val row =
-        maybeRow.value
+      val row = maybeRow.value
 
       val expectedKeyText = messages("subTradingNameYesNo.checkYourAnswersLabel")
       row.key.content.asHtml.toString should include(expectedKeyText)
