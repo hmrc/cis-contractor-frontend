@@ -47,7 +47,7 @@ class CompanyCrnFormProviderSpec extends StringFieldBehaviours {
     "12AB3456",
     "AC 123456 A",
     "12 34 56 78 A",
-    "A 12345678 ",
+    "A 12345678 "
   )
 
   val form = new CompanyCrnFormProvider()()
