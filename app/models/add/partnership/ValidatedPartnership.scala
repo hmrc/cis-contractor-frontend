@@ -17,10 +17,9 @@
 package models.add.partnership
 
 import models.address.Address
-import models.contact.ContactOptions
+import models.contact.ContactMethodOptions
 import models.contact.ContactOptions.*
-import models.{InvalidAnswer, MissingAnswer, TypeOfSubcontractor, UserAnswers, Validation, ValidationError}
-import pages.QuestionPage
+import models.{InvalidAnswer, TypeOfSubcontractor, UserAnswers, Validation, ValidationError}
 import pages.add.TypeOfSubcontractorPage
 import pages.add.partnership.*
 import play.api.libs.json.*
@@ -28,7 +27,7 @@ import play.api.libs.json.*
 final case class ValidatedPartnership(
   partnershipName: String,
   partnershipAddress: Option[Address],
-  partnershipContactDetails: ContactOptions,
+  partnershipContactMethodOptions: Option[Set[PartnershipContactMethodOptions]],
   partnershipEmail: Option[String],
   partnershipPhone: Option[String],
   partnershipMobile: Option[String],
@@ -46,10 +45,26 @@ object ValidatedPartnership extends Validation {
       _                               <- validateType(answers)
       partnershipName                 <- getPageValue(answers, PartnershipNamePage)
       partnershipAddress              <- getOptionalPageValue(answers, PartnershipAddressPage, PartnershipAddressYesNoPage)
-      partnershipContactDetails       <- getPageValue(answers, PartnershipChooseContactDetailsPage)
-      partnershipEmail                <- getContactPageValue(answers, PartnershipEmailAddressPage, partnershipContactDetails)
-      partnershipPhone                <- getContactPageValue(answers, PartnershipPhoneNumberPage, partnershipContactDetails)
-      partnershipMobile               <- getContactPageValue(answers, PartnershipMobileNumberPage, partnershipContactDetails)
+      partnershipContactMethodOptions <-
+        getOptionalPageValue(answers, PartnershipContactMethodOptionsPage, AddPartnershipContactMethodsYesNoPage)
+      partnershipEmail                <- getContactPageValue(
+                                           answers,
+                                           partnershipContactMethodOptions,
+                                           PartnershipEmailAddressPage,
+                                           ContactMethodOptions.Email
+                                         )
+      partnershipPhone                <- getContactPageValue(
+                                           answers,
+                                           partnershipContactMethodOptions,
+                                           PartnershipPhoneNumberPage,
+                                           ContactMethodOptions.Phone
+                                         )
+      partnershipMobile               <- getContactPageValue(
+                                           answers,
+                                           partnershipContactMethodOptions,
+                                           PartnershipMobileNumberPage,
+                                           ContactMethodOptions.Mobile
+                                         )
       partnershipUtr                  <-
         getOptionalPageValue(answers, PartnershipUniqueTaxpayerReferencePage, PartnershipHasUtrYesNoPage)
       partnershipNominatedPartnerName <- getPageValue(answers, PartnershipNominatedPartnerNamePage)
@@ -65,7 +80,7 @@ object ValidatedPartnership extends Validation {
     } yield ValidatedPartnership(
       partnershipName,
       partnershipAddress,
-      partnershipContactDetails,
+      partnershipContactMethodOptions,
       partnershipEmail,
       partnershipPhone,
       partnershipMobile,
@@ -82,28 +97,5 @@ object ValidatedPartnership extends Validation {
       case TypeOfSubcontractor.Partnership => Right(())
       case _                               => Left(InvalidAnswer(TypeOfSubcontractorPage))
     }
-
-  private def getContactPageValue[A](
-    answers: UserAnswers,
-    questionPage: QuestionPage[A],
-    contactOptions: ContactOptions
-  )(implicit reads: Reads[A]): Either[ValidationError, Option[A]] = {
-    val expectedPage: Option[QuestionPage[_]] = contactOptions match {
-      case Email     => Some(PartnershipEmailAddressPage)
-      case Phone     => Some(PartnershipPhoneNumberPage)
-      case Mobile    => Some(PartnershipMobileNumberPage)
-      case NoDetails => None
-    }
-
-    if (expectedPage.contains(questionPage)) {
-      answers.get(questionPage).toRight(MissingAnswer(questionPage)).map(Some(_))
-    } else if (expectedPage.isDefined) {
-      Right(None)
-    } else {
-      answers
-        .get(questionPage)
-        .fold(Right(None): Either[ValidationError, Option[A]])(_ => Left(InvalidAnswer(questionPage)))
-    }
-  }
 
 }
