@@ -17,7 +17,7 @@
 package views.add.company
 
 import forms.add.company.CompanyAddressYesNoFormProvider
-import models.{AmendMode,NormalMode}
+import models.{AmendMode, NormalMode}
 import org.jsoup.nodes.Document
 import org.jsoup.select.Elements
 import org.jsoup.Jsoup
@@ -84,7 +84,7 @@ class CompanyAddressYesNoViewSpec extends AnyWordSpec with Matchers with GuiceOn
       legend.hasClass("govuk-fieldset__legend--l") mustBe true
 
       val hint: Elements = doc.select("fieldset .govuk-hint")
-      hint.text() mustBe(empty)
+      hint.text() mustBe empty
 
       val radios = doc.select(".govuk-radios__input")
       radios.size() mustBe 2
