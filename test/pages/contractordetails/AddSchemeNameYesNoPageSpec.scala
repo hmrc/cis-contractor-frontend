@@ -14,19 +14,26 @@
  * limitations under the License.
  */
 
-package pages.add.partnership
+package pages.contractordetails
 
-import models.add.partnership.PartnershipChooseContactDetails
 import pages.behaviours.PageBehaviours
+import play.api.libs.json.JsPath
 
-class PartnershipChooseContactDetailsPageSpec extends PageBehaviours {
+class AddSchemeNameYesNoPageSpec extends PageBehaviours {
 
-  "PartnershipChooseContactDetailsPage" - {
+  "AddSchemeNameYesNoPage" - {
+    "have the correct path" in {
+      AddSchemeNameYesNoPage.path mustBe (JsPath \ "contractordetails" \ "addSchemeNameYesNo")
+    }
 
-    beRetrievable[PartnershipChooseContactDetails](PartnershipChooseContactDetailsPage)
+    "have the correct toString" in {
+      AddSchemeNameYesNoPage.toString mustBe "addSchemeNameYesNo"
+    }
 
-    beSettable[PartnershipChooseContactDetails](PartnershipChooseContactDetailsPage)
+    beRetrievable[Boolean](AddSchemeNameYesNoPage)
 
-    beRemovable[PartnershipChooseContactDetails](PartnershipChooseContactDetailsPage)
+    beSettable[Boolean](AddSchemeNameYesNoPage)
+
+    beRemovable[Boolean](AddSchemeNameYesNoPage)
   }
 }

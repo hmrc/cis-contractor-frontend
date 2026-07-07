@@ -14,34 +14,32 @@
  * limitations under the License.
  */
 
-package viewmodels.checkAnswers.add.partnership
+package viewmodels.checkAnswers.contractordetails
 
-import controllers.add.partnership.routes
 import models.{CheckMode, UserAnswers}
-import pages.add.partnership.PartnershipChooseContactDetailsPage
+import pages.contractordetails.AddSchemeNameYesNoPage
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
-import utils.Utils
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
 
-object PartnershipChooseContactDetailsSummary {
+object AddSchemeNameYesNoSummary {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(PartnershipChooseContactDetailsPage).map { answer =>
-      val cyaMsg = Utils.findFirstMessagesValue(
-        Seq(s"partnershipChooseContactDetails.cya.$answer", s"partnershipChooseContactDetails.$answer")
-      )
+    answers.get(AddSchemeNameYesNoPage).map { answer =>
+
+      val value = if (answer) "site.yes" else "site.no"
+
       SummaryListRowViewModel(
-        key = "partnershipChooseContactDetails.checkYourAnswersLabel",
-        value = ValueViewModel(cyaMsg),
+        key = "contractordetails.addSchemeNameYesNo.checkYourAnswersLabel",
+        value = ValueViewModel(value),
         actions = Seq(
           ActionItemViewModel(
             "site.change",
-            routes.PartnershipChooseContactDetailsController.onPageLoad(CheckMode).url
+            controllers.contractordetails.routes.AddSchemeNameYesNoController.onPageLoad(CheckMode).url
           )
-            .withVisuallyHiddenText(messages("partnershipChooseContactDetails.change.hidden"))
-            .withAttribute("id" -> "partnership-method-of-contact")
+            .withVisuallyHiddenText(messages("contractordetails.addSchemeNameYesNo.change.hidden"))
+            .withAttribute("id" -> "add-scheme-name-yes-no")
         )
       )
     }

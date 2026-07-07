@@ -14,36 +14,31 @@
  * limitations under the License.
  *@
 
-@import viewmodels.InputWidth._
-@import views.html.components._
-@import models.add.partnership.PartnershipChooseContactDetails
+@import viewmodels.LegendSize.Large
 
 @this(
     layout: templates.Layout,
     formHelper: FormWithCSRF,
     govukErrorSummary: GovukErrorSummary,
-    heading: H1,
-    paragraph: Paragraph,
     govukRadios: GovukRadios,
     govukButton: GovukButton
 )
 
-@(form: Form[_], mode: Mode, partnershipName: String)(implicit request: Request[_], messages: Messages)
+@(form: Form[_], mode: Mode)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = title(form, messages("partnershipChooseContactDetails.title"))) {
+@layout(pageTitle = title(form, messages("contractordetails.addEmailAddressYesNo.title"))) {
 
-    @formHelper(action = controllers.add.partnership.routes.PartnershipChooseContactDetailsController.onSubmit(mode), Symbol("autoComplete") -> "off") {
+    @formHelper(action = controllers.contractordetails.routes.AddEmailAddressYesNoController.onSubmit(mode), Symbol("autoComplete") -> "off") {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form, errorLinkOverrides = Map("value" -> "value_0")))
         }
 
         @govukRadios(
-            RadiosViewModel(
-                field  = form("value"),
-                legend = LegendViewModel(messages("partnershipChooseContactDetails.heading", partnershipName)).asPageHeading().withCssClass("govuk-fieldset__legend--l"),
-                items  = PartnershipChooseContactDetails.options
-            ).withHint(HintViewModel(messages("partnershipChooseContactDetails.hint")))
+            RadiosViewModel.yesNo(
+                field = form("value"),
+                legend = LegendViewModel(messages("contractordetails.addEmailAddressYesNo.heading")).asPageHeading(Large)
+            )
         )
 
         @govukButton(

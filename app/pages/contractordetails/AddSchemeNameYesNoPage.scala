@@ -14,18 +14,25 @@
  * limitations under the License.
  */
 
-package forms.add.partnership
+package pages.contractordetails
 
-import forms.mappings.Mappings
-import models.add.partnership.PartnershipChooseContactDetails
-import play.api.data.Form
+import models.UserAnswers
+import pages.QuestionPage
+import play.api.libs.json.JsPath
 
-import javax.inject.Inject
+import scala.util.Try
 
-class PartnershipChooseContactDetailsFormProvider @Inject() extends Mappings {
+case object AddSchemeNameYesNoPage extends QuestionPage[Boolean] with ContractorDetailsJourney {
 
-  def apply(): Form[PartnershipChooseContactDetails] =
-    Form(
-      "value" -> enumerable[PartnershipChooseContactDetails]("partnershipChooseContactDetails.error.required")
-    )
+  override def path: JsPath = JsPath \ "contractordetails" \ toString
+
+  override def toString: String = "addSchemeNameYesNo"
+
+  override def cleanup(value: Option[Boolean], userAnswers: UserAnswers): Try[UserAnswers] =
+    if value.contains(false) then {
+      userAnswers
+        .remove(SchemeNamePage)
+    } else {
+      super.cleanup(value, userAnswers)
+    }
 }

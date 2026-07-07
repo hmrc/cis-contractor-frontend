@@ -14,26 +14,26 @@
  * limitations under the License.
  */
 
-package forms.add.partnership
+package forms.contractordetails
 
-import forms.behaviours.OptionFieldBehaviours
-import models.add.partnership.PartnershipChooseContactDetails
+import forms.behaviours.BooleanFieldBehaviours
 import play.api.data.FormError
 
-class PartnershipChooseContactDetailsFormProviderSpec extends OptionFieldBehaviours {
+class AddSchemeNameYesNoFormProviderSpec extends BooleanFieldBehaviours {
 
-  val form = new PartnershipChooseContactDetailsFormProvider()()
+  val requiredKey = "contractordetails.addSchemeNameYesNo.error.required"
+  val invalidKey  = "error.boolean"
+
+  val form = new AddSchemeNameYesNoFormProvider()()
 
   ".value" - {
 
-    val fieldName   = "value"
-    val requiredKey = "partnershipChooseContactDetails.error.required"
+    val fieldName = "value"
 
-    behave like optionsField[PartnershipChooseContactDetails](
+    behave like booleanField(
       form,
       fieldName,
-      validValues = PartnershipChooseContactDetails.values,
-      invalidError = FormError(fieldName, "error.invalid")
+      invalidError = FormError(fieldName, invalidKey)
     )
 
     behave like mandatoryField(

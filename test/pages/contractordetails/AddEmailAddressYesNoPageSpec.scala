@@ -14,18 +14,26 @@
  * limitations under the License.
  */
 
-package models.add.partnership
+package pages.contractordetails
 
-import models.contact.ContactOptions
-import play.api.i18n.Messages
-import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.RadioItem
+import pages.behaviours.PageBehaviours
+import play.api.libs.json.JsPath
 
-type PartnershipChooseContactDetails = ContactOptions
+class AddEmailAddressYesNoPageSpec extends PageBehaviours {
 
-object PartnershipChooseContactDetails {
-  val values: Seq[PartnershipChooseContactDetails] = ContactOptions.values
+  "AddEmailAddressYesNoPage" - {
+    "have the correct path" in {
+      AddEmailAddressYesNoPage.path mustBe (JsPath \ "contractordetails" \ "addEmailAddressYesNo")
+    }
 
-  def options(implicit messages: Messages): Seq[RadioItem] =
-    ContactOptions.options("partnershipChooseContactDetails")
+    "have the correct toString" in {
+      AddEmailAddressYesNoPage.toString mustBe "addEmailAddressYesNo"
+    }
 
+    beRetrievable[Boolean](AddEmailAddressYesNoPage)
+
+    beSettable[Boolean](AddEmailAddressYesNoPage)
+
+    beRemovable[Boolean](AddEmailAddressYesNoPage)
+  }
 }
