@@ -29,22 +29,25 @@ class CompanyCrnFormProviderSpec extends StringFieldBehaviours {
   val companyRegNumberRegex: String = Validation.companyRegNumberRegex
 
   val validCrn: Seq[String] = Seq(
-    "AC012345",
-    "ac012345",
-    "AC 012 345",
+    "AC1",
+    "AC123456",
+    "ac123456",
     "ZZ999999",
+    "1",
     "00000001",
-    "12345678",
-    "12 34 56 78",
-    "  12345678  "
+    "12345678"
   )
 
   val invalidCrn: Seq[String] = Seq(
+    "AC1234567",
+    "ABC123456",
+    "123456789",
     "AC01-234",
     "AC01£345",
     "12AB3456",
-    "12  AB  3456",
-    "  12AB3456  "
+    "AC 123456 A",
+    "12 34 56 78 A",
+    "A 12345678 ",
   )
 
   val form = new CompanyCrnFormProvider()()
@@ -99,14 +102,13 @@ class CompanyCrnFormProviderSpec extends StringFieldBehaviours {
       }
     }
 
-    "must display error when too short (less than 8 chars ignoring spaces)" in {
+    "must display error when chars are more or less than 2" in {
       val tooShortCrn = Seq(
-        "0",
-        "0123456",
+        "A123",
         "AB",
-        "A B 01234",
-        "12   34 ",
-        "  1234  "
+        " 1234A ",
+        "AB123 A",
+        "  A1234"
       )
 
       tooShortCrn.foreach { crn =>

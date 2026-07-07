@@ -35,7 +35,8 @@ class PartnershipNominatedPartnerCrnFormProviderSpec extends AnyFreeSpec with Ma
         "00000001",
         "12345678",
         "12 34 56 78",
-        "  12345678  "
+        "  12345678  ",
+        "  123  "
       )
 
       valid.foreach { v =>
@@ -66,14 +67,13 @@ class PartnershipNominatedPartnerCrnFormProviderSpec extends AnyFreeSpec with Ma
       }
     }
 
-    "error when too short (less than 8 chars ignoring spaces)" in {
+    "must display error when chars are more or less than 2" in {
       val tooShort = Seq(
-        "0",
-        "0123456",
+        "A123",
         "AB",
-        "A B 01234",
-        "12   34 ",
-        "  1234  "
+        " 1234A ",
+        "AB123 A",
+        "  A1234"
       )
 
       tooShort.foreach { v =>
