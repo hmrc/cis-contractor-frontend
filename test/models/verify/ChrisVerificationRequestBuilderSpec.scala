@@ -44,7 +44,7 @@ class ChrisVerificationRequestBuilderSpec extends SpecBase with MockitoSugar {
       val subcontractor =
         SubcontractorCurrentVerification(
           subcontractorId = 10L,
-          subbieResourceRef = Some(20L),
+          subbieResourceRef = Some(4001L),
           firstName = Some("Test"),
           secondName = None,
           surname = Some("Subcontractor"),

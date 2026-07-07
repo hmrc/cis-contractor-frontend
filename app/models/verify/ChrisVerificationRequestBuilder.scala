@@ -54,6 +54,9 @@ class ChrisVerificationRequestBuilder @Inject() (
       verificationBatchResourceRef =
         requireValue(verificationBatch.verifBatchResourceRef, "Verification batch resource ref not found")
       aoRef                        = scheme.accountsOfficeReference
+      verificationRefs             = currentVerificationBatch.verifications.flatMap(_.verificationResourceRef).toSet
+      currentBatchSubcontractors   =
+        currentVerificationBatch.subcontractors.filter(_.subbieResourceRef.exists(verificationRefs))
     } yield ChrisVerificationRequest(
       instanceId = cisId,
       isAgent = isAgent,
@@ -64,7 +67,7 @@ class ChrisVerificationRequestBuilder @Inject() (
       verificationBatchId = verificationBatch.verificationBatchId.toString,
       verificationBatchResourceRef = verificationBatchResourceRef.toString,
       emailRecipient = VerifyEmailResolver.resolvedEmail(ua),
-      subcontractors = currentVerificationBatch.subcontractors,
+      subcontractors = currentBatchSubcontractors,
       verifications = currentVerificationBatch.verifications.map(toVerificationDetails)
     )
   }
