@@ -227,14 +227,21 @@ class CompanyNavigator @Inject() () extends NavigatorForJourney {
 
   private def navigatorFromAddCompanyContactMethodsYesNoPage(mode: Mode)(userAnswers: UserAnswers): Call =
     (userAnswers.get(AddCompanyContactMethodsYesNoPage), mode) match {
-      case (Some(true), _) =>
+      case (Some(true), NormalMode) =>
         controllers.add.company.routes.AddCompanyContactMethodsYesNoController.onPageLoad(mode)
 
       case (Some(false), NormalMode) =>
         controllers.add.company.routes.CompanyUtrYesNoController.onPageLoad(NormalMode)
 
-      case (Some(false), CheckMode) =>
-        controllers.add.company.routes.CompanyCheckYourAnswersController.onPageLoad()
+      case (Some(true), CheckMode | AmendMode) =>
+        userAnswers
+          .get(CompanyContactMethodOptionsPage)
+          .fold(controllers.add.company.routes.AddCompanyContactMethodsYesNoController.onPageLoad(mode)) { _ =>
+            cyaRoute(mode)
+          }
+
+      case (Some(false), CheckMode | AmendMode) =>
+        cyaRoute(mode)
 
       case _ =>
         routes.JourneyRecoveryController.onPageLoad()
