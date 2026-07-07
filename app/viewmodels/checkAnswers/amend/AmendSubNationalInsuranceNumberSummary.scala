@@ -14,29 +14,29 @@
  * limitations under the License.
  */
 
-package viewmodels.checkAnswers.add
+package viewmodels.checkAnswers.amend
 
-import models.{CheckMode, Mode, UserAnswers}
-import pages.add.SubAddressYesNoPage
+import models.{AmendMode, UserAnswers}
+import pages.add.SubNationalInsuranceNumberPage
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
 
-object SubAddressYesNoSummary {
+object AmendSubNationalInsuranceNumberSummary {
 
-  def row(answers: UserAnswers, mode: Mode = CheckMode)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(SubAddressYesNoPage).map { answer =>
-
-      val value = if (answer) "site.yes" else "site.no"
-
+  def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
+    answers.get(SubNationalInsuranceNumberPage).map { answer =>
       SummaryListRowViewModel(
-        key = "subAddressYesNo.checkYourAnswersLabel",
-        value = ValueViewModel(value),
+        key = "subNationalInsuranceNumber.checkYourAnswersLabel",
+        value = ValueViewModel(answer),
         actions = Seq(
-          ActionItemViewModel("site.change", controllers.add.routes.SubAddressYesNoController.onPageLoad(mode).url)
-            .withVisuallyHiddenText(messages("subAddressYesNo.change.hidden"))
-            .withAttribute("id" -> "sub-address-yes-no")
+          ActionItemViewModel(
+            "site.change",
+            controllers.add.routes.SubNationalInsuranceNumberController.onPageLoad(AmendMode).url
+          )
+            .withVisuallyHiddenText(messages("subNationalInsuranceNumber.change.hidden"))
+            .withAttribute("id" -> "sub-national-insurance-number")
         )
       )
     }

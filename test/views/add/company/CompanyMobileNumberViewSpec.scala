@@ -17,7 +17,7 @@
 package views.add.company
 
 import forms.add.company.CompanyMobileNumberFormProvider
-import models.NormalMode
+import models.{AmendMode, NormalMode}
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.matchers.should.Matchers.should
 import org.scalatest.wordspec.AnyWordSpec
@@ -50,6 +50,25 @@ class CompanyMobileNumberViewSpec extends AnyWordSpec with Matchers with GuiceOn
       doc.select("input[name=value]").size() mustBe 1
 
       doc.select(".govuk-button").text() mustBe messages("site.continue")
+    }
+
+    "render the page with title, heading, input and update button in Amend journey" in new Setup {
+      val companyName                 = "Test Company"
+      val html: HtmlFormat.Appendable = view(form, AmendMode, companyName)
+      val doc                         = org.jsoup.Jsoup.parse(html.toString())
+
+      doc.select("title").text() must include(messages("companyMobileNumber.title"))
+
+      val heading = doc.select("label.govuk-label")
+      heading.text() mustBe messages("companyMobileNumber.heading", companyName)
+
+      doc.select("form").attr("action") mustBe controllers.add.company.routes.CompanyMobileNumberController
+        .onSubmit(AmendMode)
+        .url
+
+      doc.select("input[name=value]").size() mustBe 1
+
+      doc.select(".govuk-button").text() mustBe messages("site.update")
     }
 
     "display error summary and inline error when no name is entered" in new Setup {

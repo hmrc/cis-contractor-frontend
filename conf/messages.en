@@ -239,7 +239,7 @@ addressLookup.individualQuestionsAddress.countryPicker.countryLabel          =  
 
 subcontractorsUniqueTaxpayerReference.title                                  =  Self Assessment Unique Taxpayer Reference (UTR)
 subcontractorsUniqueTaxpayerReference.heading                                =  Self Assessment Unique Taxpayer Reference (UTR)
-subcontractorsUniqueTaxpayerReference.p1                                     =  The UTR will be on tax returns and other documents from HMRC. It might be called ‘reference’, ‘UTR’, or ‘official use’.
+subcontractorsUniqueTaxpayerReference.p1                                     =  The UTR will be on tax returns and other documents from HMRC. It might be called ‘reference’, ‘UTR’ or ‘official use’.
 subcontractorsUniqueTaxpayerReference.linkText                               =  Get more help to find a UTR (opens in new tab)
 subcontractorsUniqueTaxpayerReference.label                                  =  What is the Self Assessment UTR for {0}?
 subcontractorsUniqueTaxpayerReference.hint                                   =  A UTR is a 10 digit number
@@ -476,19 +476,6 @@ partnershipAddressYesNo.checkYourAnswersLabel               =  Add partnership a
 partnershipAddressYesNo.error.required                      =  Select whether you want to add an address for this partnership
 partnershipAddressYesNo.change.hidden                       =  add partnership address?
 
-partnershipChooseContactDetails.title                       =  What are the contact details for this partnership?
-partnershipChooseContactDetails.heading                     =  What are the contact details for {0}?
-partnershipChooseContactDetails.hint                        =  Choose which method of contact you would like to add for this subcontractor. Contact details are only for your own records.
-partnershipChooseContactDetails.email                       =  Email address
-partnershipChooseContactDetails.phone                       =  Phone number
-partnershipChooseContactDetails.mobile                      =  Mobile number
-partnershipChooseContactDetails.noDetails                   =  Do not add any contact details for this subcontractor
-partnershipChooseContactDetails.cya.noDetails               =  None
-partnershipChooseContactDetails.or                          =  or
-partnershipChooseContactDetails.checkYourAnswersLabel       =  Method of contact
-partnershipChooseContactDetails.error.required              =  Select which contact details you want to add for this partnership
-partnershipChooseContactDetails.change.hidden               =  method of contact
-
 partnershipNominatedPartnerNinoYesNo.title                  =  Do you know the National Insurance number for this nominated partner?
 partnershipNominatedPartnerNinoYesNo.heading                =  Do you know the National Insurance number for {0}?
 partnershipNominatedPartnerNinoYesNo.hint                   =  This information will be used to verify them as a subcontractor
@@ -723,15 +710,15 @@ companyAdded.helpAndSupport.h2                       =  Help and support
 companyAdded.helpAndSupport.p1                       =  If you need help with the Construction Industry Scheme (CIS) and what it means for you,
 companyAdded.helpAndSupport.p1.link                  =  guidance is available on GOV.UK
 
-companyContactMethodOptions.title                                =  Which contact details do you want to add for this company?
-companyContactMethodOptions.heading                              =  Which contact details do you want to add for {0}?
-companyContactMethodOptions.hint                                 =  Contact details are only for your own records
-companyContactMethodOptions.email                                =  Email address
-companyContactMethodOptions.phone                                =  Phone number
-companyContactMethodOptions.mobile                               =  Mobile number
-companyContactMethodOptions.error.required                       =  Select the methods of contact you want to add for this company
-companyContactMethodOptions.checkYourAnswersLabel                =  Methods of contact
-companyContactMethodOptions.change.hidden                        =  methods of contact
+companyContactMethodOptions.title                    =  Which contact details do you want to add for this company?
+companyContactMethodOptions.heading                  =  Which contact details do you want to add for {0}?
+companyContactMethodOptions.hint                     =  Contact details are only for your own records
+companyContactMethodOptions.email                    =  Email address
+companyContactMethodOptions.phone                    =  Phone number
+companyContactMethodOptions.mobile                   =  Mobile number
+companyContactMethodOptions.error.required           =  Select the methods of contact you want to add for this company
+companyContactMethodOptions.checkYourAnswersLabel    =  Methods of contact
+companyContactMethodOptions.change.hidden            =  methods of contact
 
 # Trust
 addTrustContactMethodsYesNo.title                  =  Do you want to add contact details for this trust?

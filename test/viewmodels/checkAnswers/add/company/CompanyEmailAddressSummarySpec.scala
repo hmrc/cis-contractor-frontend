@@ -18,7 +18,7 @@ package viewmodels.checkAnswers.add.company
 
 import controllers.add.company.routes
 import helpers.CyaEncodingSpecHelper
-import models.{CheckMode, UserAnswers}
+import models.{AmendMode, CheckMode, UserAnswers}
 import org.scalatest.OptionValues.convertOptionToValuable
 import org.scalatest.TryValues.convertTryToSuccessOrFailure
 import org.scalatest.freespec.AnyFreeSpec
@@ -62,6 +62,42 @@ class CompanyEmailAddressSummarySpec extends AnyFreeSpec with Matchers with CyaE
       val expectedChangeText = messages("site.change")
       val expectedHref       = routes.CompanyEmailAddressController
         .onPageLoad(CheckMode)
+        .url
+      val expectedHiddenText = messages("companyEmailAddress.change.hidden")
+
+      changeAction.content.asHtml.toString    should include(expectedChangeText)
+      changeAction.href                     shouldBe expectedHref
+      changeAction.visuallyHiddenText.value shouldBe expectedHiddenText
+      changeAction.attributes                   must contain("id" -> "company-email-address")
+    }
+
+    "must return a SummaryListRow when the answer exists in Amend journey" in {
+
+      val answers =
+        UserAnswers("test-id")
+          .set(CompanyEmailAddressPage, "test@example.com")
+          .success
+          .value
+
+      val maybeRow = CompanyEmailAddressSummary.row(answers, AmendMode)
+
+      maybeRow shouldBe defined
+
+      val row = maybeRow.value
+
+      val expectedKeyText = messages("companyEmailAddress.checkYourAnswersLabel")
+      row.key.content.asHtml.toString should include(expectedKeyText)
+
+      row.value.content.asHtml.toString should include("test@example.com")
+
+      row.actions shouldBe defined
+      val actions = row.actions.value.items
+      actions should have size 1
+
+      val changeAction       = actions.head
+      val expectedChangeText = messages("site.change")
+      val expectedHref       = routes.CompanyEmailAddressController
+        .onPageLoad(AmendMode)
         .url
       val expectedHiddenText = messages("companyEmailAddress.change.hidden")
 

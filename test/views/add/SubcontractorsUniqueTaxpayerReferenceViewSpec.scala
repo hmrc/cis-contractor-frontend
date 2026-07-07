@@ -17,7 +17,7 @@
 package views.add
 
 import forms.add.UtrFormProvider
-import models.NormalMode
+import models.{AmendMode, NormalMode}
 import org.jsoup.nodes.Document
 import org.jsoup.select.Elements
 import org.scalatest.matchers.must.Matchers
@@ -64,6 +64,18 @@ class SubcontractorsUniqueTaxpayerReferenceViewSpec extends AnyWordSpec with Mat
       doc.select("input[name=value]").size() mustBe 1
 
       doc.select(".govuk-button").text() mustBe messages("site.continue")
+    }
+
+    "render the page with title and update button in amend mode" in new Setup {
+
+      val subcontractorName = "Test Subcontractor"
+
+      val html: HtmlFormat.Appendable = view(form, AmendMode, subcontractorName)
+      val doc: Document               = org.jsoup.Jsoup.parse(html.toString())
+
+      doc.select("title").text() must include(messages("subcontractorsUniqueTaxpayerReference.title"))
+
+      doc.select(".govuk-button").text() mustBe messages("site.update")
     }
 
     "display error summary and inline error when no name is entered" in new Setup {

@@ -17,7 +17,7 @@
 package views.add.company
 
 import forms.add.company.CompanyEmailAddressFormProvider
-import models.NormalMode
+import models.{AmendMode, NormalMode}
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.matchers.should.Matchers.should
 import org.scalatest.wordspec.AnyWordSpec
@@ -52,12 +52,48 @@ class CompanyEmailAddressViewSpec extends AnyWordSpec with Matchers with GuiceOn
       doc.select(".govuk-button").text() mustBe messages("site.continue")
     }
 
+    "render the page with title, heading, input and update button for Amend journey" in new Setup {
+      val companyName                 = "Test Company"
+      val html: HtmlFormat.Appendable = view(form, AmendMode, companyName)
+      val doc                         = org.jsoup.Jsoup.parse(html.toString())
+
+      doc.select("title").text() must include(messages("companyEmailAddress.title"))
+
+      val heading = doc.select("label.govuk-label")
+      heading.text() mustBe messages("companyEmailAddress.heading", companyName)
+
+      doc.select("form").attr("action") mustBe controllers.add.company.routes.CompanyEmailAddressController
+        .onSubmit(AmendMode)
+        .url
+
+      doc.select("input[name=value]").size() mustBe 1
+
+      doc.select(".govuk-button").text() mustBe messages("site.update")
+    }
+
     "display error summary and inline error when no name is entered" in new Setup {
       val errorForm: Form[String] =
         form.withError("value", "companyEmailAddress.error.required")
 
       val companyName = "Test Company"
       val html        = view(errorForm, NormalMode, companyName)
+      val doc         = org.jsoup.Jsoup.parse(html.toString())
+
+      val summary = doc.select(".govuk-error-summary")
+      summary.text() must include(messages("companyEmailAddress.error.required"))
+
+      val linkHref = summary.select("a").attr("href")
+      linkHref mustBe "#value"
+
+      doc.select(".govuk-error-message").text() must include(messages("companyEmailAddress.error.required"))
+    }
+
+    "display error summary and inline error when no name is entered for Amend journey" in new Setup {
+      val errorForm: Form[String] =
+        form.withError("value", "companyEmailAddress.error.required")
+
+      val companyName = "Test Company"
+      val html        = view(errorForm, AmendMode, companyName)
       val doc         = org.jsoup.Jsoup.parse(html.toString())
 
       val summary = doc.select(".govuk-error-summary")
