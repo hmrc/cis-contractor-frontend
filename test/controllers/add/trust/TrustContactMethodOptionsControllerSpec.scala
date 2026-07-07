@@ -20,11 +20,12 @@ import base.SpecBase
 import controllers.routes
 import forms.add.trust.TrustContactMethodOptionsFormProvider
 import models.add.trust.TrustContactMethodOptions
-import models.{NormalMode, UserAnswers}
+import models.contact.ContactMethodOptions
+import models.{CheckMode, NormalMode, UserAnswers}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.add.trust.{TrustContactMethodOptionsPage, TrustNamePage}
+import pages.add.trust.{TrustContactMethodOptionsPage, TrustEmailAddressPage, TrustMobileNumberPage, TrustNamePage, TrustPhoneNumberPage}
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
@@ -165,6 +166,99 @@ class TrustContactMethodOptionsControllerSpec extends SpecBase with MockitoSugar
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must redirect to CYA in CheckMode when all selected contact methods already have answers" in {
+
+      val mockSessionRepository = mock[SessionRepository]
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+      val userAnswers = uaWithName
+        .set(TrustContactMethodOptionsPage, Set(ContactMethodOptions.Email, ContactMethodOptions.Phone)).success.value
+        .set(TrustEmailAddressPage, "test@example.com").success.value
+        .set(TrustPhoneNumberPage, "01234567890").success.value
+
+      val application =
+        applicationBuilder(userAnswers = Some(userAnswers))
+          .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, controllers.add.trust.routes.TrustContactMethodOptionsController.onPageLoad(CheckMode).url)
+            .withFormUrlEncodedBody(
+              ("value[0]", ContactMethodOptions.Email.toString),
+              ("value[1]", ContactMethodOptions.Phone.toString)
+            )
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.add.trust.routes.TrustCheckYourAnswersController
+          .onPageLoad()
+          .url
+      }
+    }
+
+    "must redirect to the first missing contact method page in CheckMode when the first selected method has no answer" in {
+
+      val mockSessionRepository = mock[SessionRepository]
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+      val userAnswers = uaWithName
+        .set(TrustContactMethodOptionsPage, Set(ContactMethodOptions.Email, ContactMethodOptions.Phone)).success.value
+
+      val application =
+        applicationBuilder(userAnswers = Some(userAnswers))
+          .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, controllers.add.trust.routes.TrustContactMethodOptionsController.onPageLoad(CheckMode).url)
+            .withFormUrlEncodedBody(
+              ("value[0]", ContactMethodOptions.Email.toString),
+              ("value[1]", ContactMethodOptions.Phone.toString)
+            )
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.add.trust.routes.TrustEmailAddressController
+          .onPageLoad(CheckMode)
+          .url
+      }
+    }
+
+    "must redirect to the next missing contact method page in CheckMode when the first method is answered but a later one is not" in {
+
+      val mockSessionRepository = mock[SessionRepository]
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+      val userAnswers = uaWithName
+        .set(TrustContactMethodOptionsPage, Set(ContactMethodOptions.Email, ContactMethodOptions.Mobile)).success.value
+        .set(TrustEmailAddressPage, "test@example.com").success.value
+
+      val application =
+        applicationBuilder(userAnswers = Some(userAnswers))
+          .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, controllers.add.trust.routes.TrustContactMethodOptionsController.onPageLoad(CheckMode).url)
+            .withFormUrlEncodedBody(
+              ("value[0]", ContactMethodOptions.Email.toString),
+              ("value[1]", ContactMethodOptions.Mobile.toString)
+            )
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.add.trust.routes.TrustMobileNumberController
+          .onPageLoad(CheckMode)
+          .url
       }
     }
 
