@@ -43,48 +43,38 @@ class ModifyVerificationBatchAndVerificationsControllerSpec extends SpecBase wit
 
   private val instanceId = "INST-123"
 
+  private def currentSubcontractor(
+    id: Long,
+    ref: Option[Long]
+  ): SubcontractorCurrentVerification =
+    SubcontractorCurrentVerification(
+      subcontractorId = id,
+      subbieResourceRef = ref,
+      firstName = None,
+      secondName = None,
+      surname = None,
+      tradingName = None,
+      utr = None,
+      nino = None,
+      crn = None,
+      partnerUtr = None,
+      partnershipTradingName = None,
+      subcontractorType = None,
+      addressLine1 = None,
+      addressLine2 = None,
+      addressLine3 = None,
+      addressLine4 = None,
+      country = None,
+      postcode = None,
+      worksReferenceNumber = None
+    )
+
   private val currentBatch: GetCurrentVerificationBatchResponse =
     GetCurrentVerificationBatchResponse(
       subcontractors = Seq(
-        SubcontractorCurrentVerification(
-          subcontractorId = 10L,
-          subbieResourceRef = Some(1111L),
-          firstName = None,
-          secondName = None,
-          surname = None,
-          tradingName = None,
-          utr = None,
-          nino = None,
-          crn = None,
-          partnerUtr = None,
-          partnershipTradingName = None
-        ),
-        SubcontractorCurrentVerification(
-          subcontractorId = 20L,
-          subbieResourceRef = Some(2222L),
-          firstName = None,
-          secondName = None,
-          surname = None,
-          tradingName = None,
-          utr = None,
-          nino = None,
-          crn = None,
-          partnerUtr = None,
-          partnershipTradingName = None
-        ),
-        SubcontractorCurrentVerification(
-          subcontractorId = 30L,
-          subbieResourceRef = Some(3333L),
-          firstName = None,
-          secondName = None,
-          surname = None,
-          tradingName = None,
-          utr = None,
-          nino = None,
-          crn = None,
-          partnerUtr = None,
-          partnershipTradingName = None
-        )
+        currentSubcontractor(10L, Some(1111L)),
+        currentSubcontractor(20L, Some(2222L)),
+        currentSubcontractor(30L, Some(3333L))
       ),
       verificationBatch = Some(
         VerificationBatchCurrentVerification(
