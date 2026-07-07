@@ -24,7 +24,7 @@ import models.contact.ContactOptions
 import models.contact.ContactOptions.*
 import pages.QuestionPage
 import pages.add.*
-import pages.amend.AmendedPagesPage
+import pages.add.AmendedPagesPage
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
 import uk.gov.hmrc.govukfrontend.views.viewmodels.table.TableRow
