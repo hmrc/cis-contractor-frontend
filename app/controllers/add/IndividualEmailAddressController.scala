@@ -20,10 +20,9 @@ import controllers.actions.*
 import controllers.helpers.ContactGuard
 import forms.add.IndividualEmailAddressFormProvider
 import models.Mode
-import models.contact.ContactOptions.Email
+import models.contact.ContactMethodOptions
 import navigation.Navigator
-import models.requests.DataRequest
-import pages.add.{IndividualChooseContactDetailsPage, IndividualEmailAddressPage}
+import pages.add.{IndividualContactMethodOptionsPage, IndividualEmailAddressPage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
@@ -55,25 +54,28 @@ class IndividualEmailAddressController @Inject() (
   private def recoveryRedirect =
     Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
 
-  private def preparedForm(implicit request: DataRequest[?]) =
-    request.userAnswers.get(IndividualEmailAddressPage).fold(form)(form.fill)
-
   def onPageLoad(mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData) { implicit request =>
-      requireContactChoice(
+      requireContactMethodInSet(
         subcontractorNameExtractor.getSubcontractorName(request.userAnswers),
-        request.userAnswers.get(IndividualChooseContactDetailsPage),
-        Email
+        request.userAnswers.get(IndividualContactMethodOptionsPage),
+        ContactMethodOptions.Email
       ) { subcontractorName =>
+        val preparedForm = request.userAnswers.get(IndividualEmailAddressPage) match {
+          case None        => form
+          case Some(value) => form.fill(value)
+        }
         Ok(view(preparedForm, mode, subcontractorName))
       }
     }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
-      subcontractorNameExtractor
-        .getSubcontractorName(request.userAnswers)
-        .fold(Future.successful(recoveryRedirect)) { subcontractorName =>
+      (for {
+        subcontractorName <- subcontractorNameExtractor.getSubcontractorName(request.userAnswers)
+        contactMethods  <- request.userAnswers.get(IndividualContactMethodOptionsPage)
+        if contactMethods.contains(ContactMethodOptions.Email)
+      } yield
           form
             .bindFromRequest()
             .fold(
@@ -83,7 +85,7 @@ class IndividualEmailAddressController @Inject() (
                   updatedAnswers <- Future.fromTry(request.userAnswers.set(IndividualEmailAddressPage, value))
                   _              <- sessionRepository.set(updatedAnswers)
                 } yield Redirect(navigator.nextPage(IndividualEmailAddressPage, mode, updatedAnswers))
-            )
-        }
+            ))
+        .getOrElse(Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())))
   }
 }
