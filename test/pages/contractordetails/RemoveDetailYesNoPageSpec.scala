@@ -32,11 +32,11 @@ class RemoveDetailYesNoPageSpec extends PageBehaviours {
         "have the correct path" in {
           RemoveDetailYesNoPage(
             contractorDetail
-          ).path mustBe (JsPath \ "contractordetails" \ s"removeDetailYesNo/'$contractorDetail'")
+          ).path mustBe (JsPath \ "contractordetails" \ s"removeDetailYesNo-'$contractorDetail'")
         }
 
         "have the correct toString" in {
-          RemoveDetailYesNoPage(contractorDetail).toString mustBe s"removeDetailYesNo/'$contractorDetail'"
+          RemoveDetailYesNoPage(contractorDetail).toString mustBe s"removeDetailYesNo-'$contractorDetail'"
         }
 
         s"'$selectedDetailPage'" - {

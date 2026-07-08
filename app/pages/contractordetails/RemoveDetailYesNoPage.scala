@@ -24,7 +24,7 @@ case class RemoveDetailYesNoPage(contractorDetail: String) extends QuestionPage[
 
   override def path: JsPath = JsPath \ "contractordetails" \ toString
 
-  override def toString: String = s"removeDetailYesNo/'$contractorDetail'"
+  override def toString: String = s"removeDetailYesNo-'$contractorDetail'"
 
   override def cleanup(value: Option[Boolean], userAnswers: UserAnswers) =
     contractorDetail match {
