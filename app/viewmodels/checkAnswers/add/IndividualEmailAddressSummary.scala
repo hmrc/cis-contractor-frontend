@@ -16,7 +16,7 @@
 
 package viewmodels.checkAnswers.add
 
-import models.{CheckMode, UserAnswers}
+import models.{CheckMode, UserAnswers, Mode}
 import pages.add.IndividualEmailAddressPage
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
@@ -25,7 +25,7 @@ import viewmodels.implicits.*
 
 object IndividualEmailAddressSummary {
 
-  def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
+  def row(answers: UserAnswers, mode: Mode = CheckMode)(implicit messages: Messages): Option[SummaryListRow] =
     answers.get(IndividualEmailAddressPage).map { answer =>
       SummaryListRowViewModel(
         key = "individualEmailAddress.checkYourAnswersLabel",
@@ -33,7 +33,7 @@ object IndividualEmailAddressSummary {
         actions = Seq(
           ActionItemViewModel(
             "site.change",
-            controllers.add.routes.IndividualEmailAddressController.onPageLoad(CheckMode).url
+            controllers.add.routes.IndividualEmailAddressController.onPageLoad(mode).url
           )
             .withVisuallyHiddenText(messages("individualEmailAddress.change.hidden"))
         )

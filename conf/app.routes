@@ -80,6 +80,10 @@ POST  /subcontractor/amend/check-national-insurance-number  controllers.add.Nati
 GET   /subcontractor/amend/national-insurance-number  controllers.add.SubNationalInsuranceNumberController.onPageLoad(mode: Mode = AmendMode)
 POST  /subcontractor/amend/national-insurance-number  controllers.add.SubNationalInsuranceNumberController.onSubmit(mode: Mode = AmendMode)
 
+GET   /subcontractor/amend/check-your-answers  controllers.amend.AmendIndividualCheckYourAnswersController.onPageLoad()
+POST  /subcontractor/amend/check-your-answers  controllers.amend.AmendIndividualCheckYourAnswersController.onSubmit()
+GET   /subcontractor/amend/cancel              controllers.amend.AmendIndividualCheckYourAnswersController.onCancel()
+
 # Errors & Auth
 GET  /unauthorised/standard-user  controllers.UnauthorisedWrongRoleController.onPageLoad()
 

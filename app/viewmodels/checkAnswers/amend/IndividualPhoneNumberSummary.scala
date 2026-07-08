@@ -16,7 +16,7 @@
 
 package viewmodels.checkAnswers.amend
 
-import models.{AmendMode, UserAnswers}
+import models.{AmendMode, CheckMode, UserAnswers, Mode}
 import pages.add.IndividualPhoneNumberPage
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
@@ -25,7 +25,7 @@ import viewmodels.implicits.*
 
 object IndividualPhoneNumberSummary {
 
-  def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
+  def row(answers: UserAnswers, mode: Mode = CheckMode)(implicit messages: Messages): Option[SummaryListRow] =
     answers.get(IndividualPhoneNumberPage).map { answer =>
       SummaryListRowViewModel(
         key = "individualPhoneNumber.checkYourAnswersLabel",
@@ -33,7 +33,7 @@ object IndividualPhoneNumberSummary {
         actions = Seq(
           ActionItemViewModel(
             "site.change",
-            controllers.add.routes.IndividualPhoneNumberController.onPageLoad(AmendMode).url
+            controllers.add.routes.IndividualPhoneNumberController.onPageLoad(mode).url
           )
             .withVisuallyHiddenText(messages("individualPhoneNumber.change.hidden"))
             .withAttribute("id" -> "individual-phone-number")

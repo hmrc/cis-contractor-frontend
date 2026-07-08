@@ -16,7 +16,7 @@
 
 package viewmodels.checkAnswers.amend
 
-import models.{AmendMode, UserAnswers}
+import models.{AmendMode, CheckMode, Mode, UserAnswers}
 import pages.add.NationalInsuranceNumberYesNoPage
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
@@ -25,7 +25,7 @@ import viewmodels.implicits.*
 
 object NationalInsuranceNumberYesNoSummary {
 
-  def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
+  def row(answers: UserAnswers, mode: Mode = CheckMode)(implicit messages: Messages): Option[SummaryListRow] =
     answers.get(NationalInsuranceNumberYesNoPage).map { answer =>
 
       val value = if (answer) "site.yes" else "site.no"
@@ -36,7 +36,7 @@ object NationalInsuranceNumberYesNoSummary {
         actions = Seq(
           ActionItemViewModel(
             "site.change",
-            controllers.add.routes.NationalInsuranceNumberYesNoController.onPageLoad(AmendMode).url
+            controllers.add.routes.NationalInsuranceNumberYesNoController.onPageLoad(mode).url
           )
             .withVisuallyHiddenText(messages("nationalInsuranceNumberYesNo.change.hidden"))
             .withAttribute("id" -> "national-insurance-number-yes-no")

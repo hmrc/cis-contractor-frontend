@@ -16,7 +16,7 @@
 
 package viewmodels.checkAnswers.add
 
-import models.{CheckMode, UserAnswers}
+import models.{CheckMode, Mode, UserAnswers}
 import pages.add.SubcontractorsUniqueTaxpayerReferencePage
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
@@ -25,19 +25,28 @@ import viewmodels.implicits.*
 
 object SubcontractorsUniqueTaxpayerReferenceSummary {
 
-  def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
+  def row(answers: UserAnswers, mode: Mode = CheckMode, showActions: Boolean = true)(implicit
+    messages: Messages
+  ): Option[SummaryListRow] =
     answers.get(SubcontractorsUniqueTaxpayerReferencePage).map { answer =>
+      val value   = ValueViewModel(answer)
+      val actions =
+        if (showActions) {
+          Seq(
+            ActionItemViewModel(
+              "site.change",
+              controllers.add.routes.SubcontractorsUniqueTaxpayerReferenceController.onPageLoad(mode).url
+            )
+              .withVisuallyHiddenText(messages("subcontractorsUniqueTaxpayerReference.change.hidden"))
+              .withAttribute("id" -> "subcontractors-unique-taxpayer-reference")
+          )
+        } else {
+          Seq.empty
+        }
       SummaryListRowViewModel(
         key = "subcontractorsUniqueTaxpayerReference.checkYourAnswersLabel",
-        value = ValueViewModel(answer),
-        actions = Seq(
-          ActionItemViewModel(
-            "site.change",
-            controllers.add.routes.SubcontractorsUniqueTaxpayerReferenceController.onPageLoad(CheckMode).url
-          )
-            .withVisuallyHiddenText(messages("subcontractorsUniqueTaxpayerReference.change.hidden"))
-            .withAttribute("id" -> "subcontractors-unique-taxpayer-reference")
-        )
+        value = value,
+        actions = actions
       )
     }
 }

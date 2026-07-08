@@ -24,7 +24,7 @@ import models.amend.OriginalIndividualAnswers
 import models.contact.ContactOptions.NoDetails
 import pages.add.*
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import queries.{CisIdQuery, OriginalIndividualAnswersQuery}
+import queries.{CisIdQuery, OriginalIndividualAnswersQuery, SubContractorVerifiedQuery}
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
@@ -83,6 +83,7 @@ class AmendIndividualController @Inject() (
     ua <- ua.set(WorksReferenceNumberYesNoPage, true)
     ua <- ua.set(WorksReferenceNumberPage, "XLS345-MM")
     ua <- ua.set(CisIdQuery, "1")
+    ua <- ua.set(SubContractorVerifiedQuery, true)
     ua <- ua.set(OriginalIndividualAnswersQuery, individualOriginal)
   } yield ua
 

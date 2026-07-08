@@ -16,7 +16,7 @@
 
 package viewmodels.checkAnswers.add
 
-import models.{CheckMode, UserAnswers}
+import models.{CheckMode, UserAnswers, Mode}
 import pages.add.WorksReferenceNumberYesNoPage
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
@@ -25,7 +25,7 @@ import viewmodels.implicits.*
 
 object WorksReferenceNumberYesNoSummary {
 
-  def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
+  def row(answers: UserAnswers, mode: Mode = CheckMode)(implicit messages: Messages): Option[SummaryListRow] =
     answers.get(WorksReferenceNumberYesNoPage).map { answer =>
 
       val value = if (answer) "site.yes" else "site.no"
@@ -36,7 +36,7 @@ object WorksReferenceNumberYesNoSummary {
         actions = Seq(
           ActionItemViewModel(
             "site.change",
-            controllers.add.routes.WorksReferenceNumberYesNoController.onPageLoad(CheckMode).url
+            controllers.add.routes.WorksReferenceNumberYesNoController.onPageLoad(mode).url
           )
             .withVisuallyHiddenText(messages("worksReferenceNumberYesNo.change.hidden"))
             .withAttribute("id" -> "works-reference-number-yes-no")

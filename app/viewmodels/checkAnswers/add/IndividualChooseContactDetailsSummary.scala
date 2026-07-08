@@ -16,7 +16,7 @@
 
 package viewmodels.checkAnswers.add
 
-import models.{CheckMode, UserAnswers}
+import models.{CheckMode, UserAnswers, Mode}
 import pages.add.IndividualChooseContactDetailsPage
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
@@ -26,7 +26,7 @@ import viewmodels.implicits.*
 
 object IndividualChooseContactDetailsSummary {
 
-  def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
+  def row(answers: UserAnswers, mode: Mode = CheckMode)(implicit messages: Messages): Option[SummaryListRow] =
     answers.get(IndividualChooseContactDetailsPage).map { answer =>
       val cyaMsg = Utils.findFirstMessagesValue(
         Seq(s"individualChooseContactDetails.cya.$answer", s"individualChooseContactDetails.$answer")
@@ -38,7 +38,7 @@ object IndividualChooseContactDetailsSummary {
         actions = Seq(
           ActionItemViewModel(
             "site.change",
-            controllers.add.routes.IndividualChooseContactDetailsController.onPageLoad(CheckMode).url
+            controllers.add.routes.IndividualChooseContactDetailsController.onPageLoad(mode).url
           )
             .withVisuallyHiddenText(messages("individualChooseContactDetails.change.hidden"))
         )
