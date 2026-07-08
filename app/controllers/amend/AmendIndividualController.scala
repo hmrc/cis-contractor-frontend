@@ -83,6 +83,7 @@ class AmendIndividualController @Inject() (
     ua <- ua.set(WorksReferenceNumberYesNoPage, true)
     ua <- ua.set(WorksReferenceNumberPage, "XLS345-MM")
     ua <- ua.set(CisIdQuery, "1")
+    ua <- ua.set(AddIndividualContactMethodsYesNoPage, false)
     ua <- ua.set(OriginalIndividualAnswersQuery, individualOriginal)
   } yield ua
 
