@@ -20,22 +20,23 @@ import models.UserAnswers
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 
-import scala.util.Try
-
 case class RemoveDetailYesNoPage(contractorDetail: String) extends QuestionPage[Boolean] {
 
   override def path: JsPath = JsPath \ "contractordetails" \ toString
 
   override def toString: String = "removeDetailYesNo"
 
-  override def cleanup(value: Option[Boolean], userAnswers: UserAnswers): Try[UserAnswers] =
+  override def cleanup(value: Option[Boolean], userAnswers: UserAnswers) =
     contractorDetail match {
-      case "email" if value.contains(true)       =>
-        userAnswers.remove(EnterContractorEmailAddressPage)
-        userAnswers.set(AddEmailAddressYesNoPage, false)
+      case "email" if value.contains(true) =>
+        userAnswers
+          .remove(EnterContractorEmailAddressPage)
+          .flatMap(_.set(AddEmailAddressYesNoPage, false))
+
       case "scheme-name" if value.contains(true) =>
-        userAnswers.remove(SchemeNamePage)
-        userAnswers.set(AddSchemeNameYesNoPage, false)
+        userAnswers
+          .remove(SchemeNamePage)
+          .flatMap(_.set(AddSchemeNameYesNoPage, false))
 
       case _ =>
         super.cleanup(value, userAnswers)
