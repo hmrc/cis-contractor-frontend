@@ -331,20 +331,74 @@ class IndividualNavigatorSpec extends SpecBase {
         ) mustBe journeyRecovery // TODO: when CYA page available
       }
 
-      "must go from SubTradingNameYesNoPage to TradingNameOfSubcontractorController when true" in {
+      "must go from SubTradingNameYesNoPage to SubcontractorNameController when answer is No and name is missing" in {
+        val ua =
+          emptyUserAnswers
+            .set(SubTradingNameYesNoPage, false)
+            .success
+            .value
+
         navigator.nextPage(
           SubTradingNameYesNoPage,
           AmendMode,
-          emptyUserAnswers.setOrException(SubTradingNameYesNoPage, true)
+          ua
+        ) mustBe controllers.add.routes.SubcontractorNameController.onPageLoad(AmendMode)
+      }
+
+      "must go from SubTradingNameYesNoPage to Amend CYA when answer is No and subcontractor name already exists" in {
+        val ua =
+          emptyUserAnswers
+            .set(SubTradingNameYesNoPage, false)
+            .success
+            .value
+            .set(SubcontractorNamePage, SubcontractorName("Jane", None, "Doe"))
+            .success
+            .value
+
+        navigator.nextPage(
+          SubTradingNameYesNoPage,
+          AmendMode,
+          ua
+        ) mustBe journeyRecovery // TODO: this needs to be redirected to amend cya page when it's implemented
+      }
+
+      "must go from SubTradingNameYesNoPage to TradingNameOfSubcontractorController when answer is Yes and trading name is missing" in {
+        val ua =
+          emptyUserAnswers
+            .set(SubTradingNameYesNoPage, true)
+            .success
+            .value
+
+        navigator.nextPage(
+          SubTradingNameYesNoPage,
+          AmendMode,
+          ua
         ) mustBe controllers.add.routes.TradingNameOfSubcontractorController.onPageLoad(AmendMode)
       }
 
-      "must go from SubTradingNameYesNoPage to journey recovery page when incomplete info provided" in {
+      "must go from SubTradingNameYesNoPage to Amend CYA when answer is Yes and trading name already exists" in {
+        val ua =
+          emptyUserAnswers
+            .set(SubTradingNameYesNoPage, true)
+            .success
+            .value
+            .set(TradingNameOfSubcontractorPage, "ACME Construction")
+            .success
+            .value
+
+        navigator.nextPage(
+          SubTradingNameYesNoPage,
+          AmendMode,
+          ua
+        ) mustBe journeyRecovery // TODO: this needs to be redirected to amend cya page when it's implemented
+      }
+
+      "must go from SubTradingNameYesNoPage to JourneyRecovery when SubTradingNameYesNoPage answer is missing" in {
         navigator.nextPage(
           SubTradingNameYesNoPage,
           AmendMode,
           emptyUserAnswers
-        ) mustBe journeyRecovery // TODO: when CYA page available
+        ) mustBe journeyRecovery
       }
 
       "must go from WorksReferenceNumberYesNoPage to WorksReferenceNumberPage when true and no work reference number exists" in {
