@@ -21,6 +21,15 @@ import play.api.data.FormError
 
 class RemoveDetailYesNoFormProviderSpec extends BooleanFieldBehaviours {
 
+  "when contractorDetail is not 'email' or 'scheme-name'" - {
+
+    "throw an IllegalArgumentException" in {
+      an[IllegalArgumentException] mustBe thrownBy {
+        new RemoveDetailYesNoFormProvider()("invalid")
+      }
+    }
+  }
+
   Seq(
     ("email", "contractordetails.removeDetailYesNo.error.required.email"),
     ("scheme-name", "contractordetails.removeDetailYesNo.error.required.scheme")
