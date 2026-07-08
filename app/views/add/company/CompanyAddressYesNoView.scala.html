@@ -32,22 +32,17 @@
             @govukErrorSummary(ErrorSummaryViewModel(form, errorLinkOverrides = Map("value" -> "value_0")))
         }
 
-        @if(mode == models.AmendMode) {
-            @govukRadios(
-                RadiosViewModel.yesNo(
-                    field = form("value"),
-                    legend = LegendViewModel(messages("companyAddressYesNo.heading", name)).asPageHeading().withCssClass("govuk-fieldset__legend--l")
-                )
-                )
-        } else {
-            @govukRadios(
-                RadiosViewModel.yesNo(
-                    field = form("value"),
-                    legend = LegendViewModel(messages("companyAddressYesNo.heading", name)).asPageHeading().withCssClass("govuk-fieldset__legend--l")
-                    ).withHint(Hint(content = Messages("companyAddressYesNo.hint"))
-                )
+        @defining(
+            RadiosViewModel.yesNo(
+                field = form("value"),
+                legend = LegendViewModel(messages("companyAddressYesNo.heading", name)).asPageHeading().withCssClass("govuk-fieldset__legend--l")
             )
-        }
+        ) { radios =>
+            @govukRadios(
+                if(mode == models.AmendMode) radios
+                else radios.withHint(Hint(content = Messages("companyAddressYesNo.hint")))
+                )
+            }
 
 
         @govukButton(
