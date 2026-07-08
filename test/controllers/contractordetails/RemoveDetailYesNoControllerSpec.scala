@@ -35,134 +35,164 @@ import scala.concurrent.Future
 
 class RemoveDetailYesNoControllerSpec extends SpecBase with MockitoSugar {
 
-  def onwardRoute = Call("GET", "/foo")
-
-  val contractorDetail = "scheme-name"
-
+  def onwardRoute  = Call("GET", "/foo")
   val formProvider = new RemoveDetailYesNoFormProvider()
-  val form         = formProvider(contractorDetail)
 
-  lazy val removeDetailYesNoRoute = routes.RemoveDetailYesNoController.onPageLoad(contractorDetail, NormalMode).url
+  "when contractorDetail is neither 'email' or 'scheme-name'" - {
 
-  "removeDetailYesNo Controller" - {
-
-    "must return OK and the correct view for a GET" in {
-
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
-
-      running(application) {
-        val request = FakeRequest(GET, removeDetailYesNoRoute)
-
-        val result = route(application, request).value
-
-        val view = application.injector.instanceOf[RemoveDetailYesNoView]
-
-        status(result) mustEqual OK
-        contentAsString(result) mustEqual view(contractorDetail, form, NormalMode)(
-          request,
-          messages(application)
-        ).toString
-      }
-    }
-
-    "must populate the view correctly on a GET when the question has previously been answered" in {
-
-      val userAnswers = UserAnswers(userAnswersId).set(RemoveDetailYesNoPage(contractorDetail), true).success.value
-
-      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
-
-      running(application) {
-        val request = FakeRequest(GET, removeDetailYesNoRoute)
-
-        val view = application.injector.instanceOf[RemoveDetailYesNoView]
-
-        val result = route(application, request).value
-
-        status(result) mustEqual OK
-        contentAsString(result) mustEqual view(contractorDetail, form.fill(true), NormalMode)(
-          request,
-          messages(application)
-        ).toString
-      }
-    }
-
-    "must redirect to the next page when valid data is submitted" in {
-
-      val mockSessionRepository = mock[SessionRepository]
-
-      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+    "must redirect to Journey Recovery" in {
 
       val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
-          .overrides(
-            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
-            bind[SessionRepository].toInstance(mockSessionRepository)
-          )
-          .build()
+        applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
       running(application) {
+
         val request =
-          FakeRequest(POST, removeDetailYesNoRoute)
-            .withFormUrlEncodedBody(("value", "true"))
+          FakeRequest(GET, routes.RemoveDetailYesNoController.onPageLoad("invalid", NormalMode).url)
 
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual onwardRoute.url
+        redirectLocation(result).value mustEqual
+          controllers.routes.JourneyRecoveryController.onPageLoad().url
       }
     }
 
-    "must return a Bad Request and errors when invalid data is submitted" in {
-
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
-
-      running(application) {
-        val request =
-          FakeRequest(POST, removeDetailYesNoRoute)
-            .withFormUrlEncodedBody(("value", ""))
-
-        val boundForm = form.bind(Map("value" -> ""))
-
-        val view = application.injector.instanceOf[RemoveDetailYesNoView]
-
-        val result = route(application, request).value
-
-        status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(contractorDetail, boundForm, NormalMode)(
-          request,
-          messages(application)
-        ).toString
-      }
-    }
-
-    "must redirect to Journey Recovery for a GET if no existing data is found" in {
-
-      val application = applicationBuilder(userAnswers = None).build()
-
-      running(application) {
-        val request = FakeRequest(GET, removeDetailYesNoRoute)
-
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
-      }
-    }
-
-    "must redirect to Journey Recovery for a POST if no existing data is found" in {
-
-      val application = applicationBuilder(userAnswers = None).build()
-
-      running(application) {
-        val request =
-          FakeRequest(POST, removeDetailYesNoRoute)
-            .withFormUrlEncodedBody(("value", "true"))
-
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
-      }
-    }
   }
+
+  Seq(
+    ("email", "email"),
+    ("scheme-name", "scheme-name")
+  ).foreach { case (contractorDetail, selectedDetail) =>
+    s"when contractorDetail is '$contractorDetail'" - {
+      val form = formProvider(selectedDetail)
+
+      lazy val removeDetailYesNoRoute = routes.RemoveDetailYesNoController.onPageLoad(selectedDetail, NormalMode).url
+
+      "removeDetailYesNo Controller" - {
+
+        "must return OK and the correct view for a GET" in {
+
+          val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+
+          running(application) {
+            val request = FakeRequest(GET, removeDetailYesNoRoute)
+
+            val result = route(application, request).value
+
+            val view = application.injector.instanceOf[RemoveDetailYesNoView]
+
+            status(result) mustEqual OK
+            contentAsString(result) mustEqual view(selectedDetail, form, NormalMode)(
+              request,
+              messages(application)
+            ).toString
+          }
+        }
+
+        "must populate the view correctly on a GET when the question has previously been answered" in {
+
+          val userAnswers = UserAnswers(userAnswersId).set(RemoveDetailYesNoPage(selectedDetail), true).success.value
+
+          val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
+
+          running(application) {
+            val request = FakeRequest(GET, removeDetailYesNoRoute)
+
+            val view = application.injector.instanceOf[RemoveDetailYesNoView]
+
+            val result = route(application, request).value
+
+            status(result) mustEqual OK
+            contentAsString(result) mustEqual view(selectedDetail, form.fill(true), NormalMode)(
+              request,
+              messages(application)
+            ).toString
+          }
+        }
+
+        "must redirect to the next page when valid data is submitted" in {
+
+          val mockSessionRepository = mock[SessionRepository]
+
+          when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+          val application =
+            applicationBuilder(userAnswers = Some(emptyUserAnswers))
+              .overrides(
+                bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
+                bind[SessionRepository].toInstance(mockSessionRepository)
+              )
+              .build()
+
+          running(application) {
+            val request =
+              FakeRequest(POST, removeDetailYesNoRoute)
+                .withFormUrlEncodedBody(("value", "true"))
+
+            val result = route(application, request).value
+
+            status(result) mustEqual SEE_OTHER
+            redirectLocation(result).value mustEqual onwardRoute.url
+          }
+        }
+
+        "must return a Bad Request and errors when invalid data is submitted" in {
+
+          val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+
+          running(application) {
+            val request =
+              FakeRequest(POST, removeDetailYesNoRoute)
+                .withFormUrlEncodedBody(("value", ""))
+
+            val boundForm = form.bind(Map("value" -> ""))
+
+            val view = application.injector.instanceOf[RemoveDetailYesNoView]
+
+            val result = route(application, request).value
+
+            status(result) mustEqual BAD_REQUEST
+            contentAsString(result) mustEqual view(selectedDetail, boundForm, NormalMode)(
+              request,
+              messages(application)
+            ).toString
+          }
+        }
+
+        "must redirect to Journey Recovery for a GET if no existing data is found" in {
+
+          val application = applicationBuilder(userAnswers = None).build()
+
+          running(application) {
+            val request = FakeRequest(GET, removeDetailYesNoRoute)
+
+            val result = route(application, request).value
+
+            status(result) mustEqual SEE_OTHER
+            redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+          }
+        }
+
+        "must redirect to Journey Recovery for a POST if no existing data is found" in {
+
+          val application = applicationBuilder(userAnswers = None).build()
+
+          running(application) {
+            val request =
+              FakeRequest(POST, removeDetailYesNoRoute)
+                .withFormUrlEncodedBody(("value", "true"))
+
+            val result = route(application, request).value
+
+            status(result) mustEqual SEE_OTHER
+            redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+          }
+        }
+
+      }
+    }
+
+  }
+
 }
