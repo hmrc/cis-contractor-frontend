@@ -16,13 +16,13 @@
 
 package connectors
 
-import com.github.tomakehurst.wiremock.client.WireMock.{aResponse, get, post, stubFor, urlEqualTo, urlPathEqualTo}
+import com.github.tomakehurst.wiremock.client.WireMock.{aResponse, equalTo, get, post, stubFor, urlEqualTo, urlPathEqualTo}
 import itutil.ApplicationWithWiremock
 import models.TypeOfSubcontractor.Individualorsoletrader
-import models.requests.CreateAndUpdateSubcontractorPayload
-import models.requests.CreateVerificationBatchAndVerificationsRequest
-import models.response.CreateVerificationBatchAndVerificationsResponse
+import models.requests.*
 import models.requests.CreateAndUpdateSubcontractorPayload.IndividualOrSoleTraderPayload
+import models.response.*
+import models.verify.SubmissionStatus
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.matchers.should.Matchers.shouldBe
@@ -30,6 +30,8 @@ import org.scalatest.wordspec.AnyWordSpec
 import play.api.http.Status.{FORBIDDEN, INTERNAL_SERVER_ERROR, NOT_FOUND, NO_CONTENT, OK}
 import play.api.libs.json.{JsValue, Json}
 import uk.gov.hmrc.http.{HeaderCarrier, HttpException, UpstreamErrorResponse}
+
+import java.time.LocalDateTime
 
 class ConstructionIndustrySchemeConnectorSpec
     extends AnyWordSpec
@@ -365,6 +367,189 @@ class ConstructionIndustrySchemeConnectorSpec
       )
 
       val ex = connector.createVerificationBatchAndVerifications(requestModel).failed.futureValue
+      ex.getMessage must include("returned 500")
+    }
+  }
+
+  "getScheme" should {
+
+    "successfully get scheme when BE returns 200" in {
+      val responseJson =
+        """
+          |{
+          |  "schemeId": 1,
+          |  "instanceId": "1",
+          |  "accountsOfficeReference": "AO123",
+          |  "taxOfficeNumber": "123",
+          |  "taxOfficeReference": "AB456",
+          |  "utr": "1234567890",
+          |  "name": "Test Contractor",
+          |  "emailAddress": "test@test.com"
+          |}
+          |""".stripMargin
+
+      stubFor(
+        get(urlPathEqualTo("/cis/scheme/1"))
+          .willReturn(
+            aResponse()
+              .withStatus(OK)
+              .withHeader("Content-Type", "application/json")
+              .withBody(responseJson)
+          )
+      )
+
+      val result = connector.getScheme("1").futureValue
+
+      result.instanceId mustBe "1"
+      result.accountsOfficeReference mustBe "AO123"
+      result.utr mustBe Some("1234567890")
+    }
+
+    "propagate upstream error on non-2xx" in {
+      stubFor(
+        get(urlPathEqualTo("/cis/scheme/1"))
+          .willReturn(aResponse().withStatus(INTERNAL_SERVER_ERROR).withBody("boom"))
+      )
+
+      val ex = connector.getScheme("1").failed.futureValue
+      ex.getMessage must include("returned 500")
+    }
+  }
+
+  "submitVerificationToChris" should {
+
+    "successfully submit verification to ChRIS when BE returns 200" in {
+      val requestModel = ChrisVerificationRequest(
+        instanceId = "1",
+        isAgent = false,
+        clientTaxOfficeNumber = "123",
+        clientTaxOfficeRef = "AB456",
+        contractorUTR = "1234567890",
+        contractorAORef = "AO123",
+        verificationBatchId = "1001",
+        verificationBatchResourceRef = "2001",
+        emailRecipient = Some("test@test.com"),
+        subcontractors = Seq.empty,
+        verifications = Seq(
+          VerificationDetails(
+            subcontractorName = "Test Subcontractor",
+            verificationResourceRef = "4001",
+            proceedVerification = true
+          )
+        )
+      )
+
+      val responseJson =
+        """
+          |{
+          |  "submissionId": "13602",
+          |  "status": "ACCEPTED",
+          |  "hmrcMarkGenerated": "hmrc-mark",
+          |  "correlationId": "corr-id",
+          |  "responseEndPoint": {
+          |    "url": "http://localhost/poll",
+          |    "pollIntervalSeconds": 5
+          |  },
+          |  "gatewayTimestamp": "2026-06-15T03:30:52",
+          |  "acceptedTime": "2026-06-15T03:30:53"
+          |}
+          |""".stripMargin
+
+      stubFor(
+        post(urlPathEqualTo("/cis/submissions/13602/submit-verification-to-chris"))
+          .willReturn(
+            aResponse()
+              .withStatus(OK)
+              .withHeader("Content-Type", "application/json")
+              .withBody(responseJson)
+          )
+      )
+
+      val result =
+        connector.submitVerificationToChris(13602L, requestModel).futureValue
+
+      result.submissionId mustBe "13602"
+      result.status mustBe "ACCEPTED"
+      result.hmrcMarkGenerated mustBe "hmrc-mark"
+      result.responseEndPoint.map(_.pollIntervalSeconds) mustBe Some(5)
+    }
+
+    "propagate upstream error on non-2xx" in {
+      val requestModel = ChrisVerificationRequest(
+        instanceId = "1",
+        isAgent = false,
+        clientTaxOfficeNumber = "123",
+        clientTaxOfficeRef = "AB456",
+        contractorUTR = "1234567890",
+        contractorAORef = "AO123",
+        verificationBatchId = "1001",
+        verificationBatchResourceRef = "2001",
+        emailRecipient = None,
+        subcontractors = Seq.empty,
+        verifications = Seq.empty
+      )
+
+      stubFor(
+        post(urlPathEqualTo("/cis/submissions/13602/submit-verification-to-chris"))
+          .willReturn(aResponse().withStatus(INTERNAL_SERVER_ERROR).withBody("boom"))
+      )
+
+      val ex =
+        connector.submitVerificationToChris(13602L, requestModel).failed.futureValue
+
+      ex.getMessage must include("returned 500")
+    }
+  }
+
+  "getSubmissionStatus" should {
+
+    "successfully get verification submission status when BE returns 200" in {
+      val responseJson =
+        """
+          |{
+          |  "status": "SUBMITTED",
+          |  "correlationId": "corr-id",
+          |  "pollUrl": null,
+          |  "pollInterval": null,
+          |  "error": null,
+          |  "irMarkReceived": "ggis-mark",
+          |  "lastMessageDate": "2026-06-15T03:30:54",
+          |  "acceptedTime": "2026-06-15T03:30:55",
+          |  "govTalkErrorStatus": null
+          |}
+          |""".stripMargin
+
+      stubFor(
+        get(urlPathEqualTo("/cis/submissions/verification/poll"))
+          .withQueryParam("submissionId", equalTo("13602"))
+          .withQueryParam("pollUrl", equalTo("http://localhost/poll"))
+          .willReturn(
+            aResponse()
+              .withStatus(OK)
+              .withHeader("Content-Type", "application/json")
+              .withBody(responseJson)
+          )
+      )
+
+      val result =
+        connector.getSubmissionStatus("http://localhost/poll", "13602").futureValue
+
+      result.status mustBe SubmissionStatus.SUBMITTED
+      result.correlationId mustBe "corr-id"
+      result.irMarkReceived mustBe Some("ggis-mark")
+    }
+
+    "propagate upstream error on non-2xx" in {
+      stubFor(
+        get(urlPathEqualTo("/cis/submissions/verification/poll"))
+          .withQueryParam("submissionId", equalTo("13602"))
+          .withQueryParam("pollUrl", equalTo("http://localhost/poll"))
+          .willReturn(aResponse().withStatus(INTERNAL_SERVER_ERROR).withBody("boom"))
+      )
+
+      val ex =
+        connector.getSubmissionStatus("http://localhost/poll", "13602").failed.futureValue
+
       ex.getMessage must include("returned 500")
     }
   }
