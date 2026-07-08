@@ -37,39 +37,57 @@ class RemoveDetailYesNoControllerSpec extends SpecBase with MockitoSugar {
 
   def onwardRoute  = Call("GET", "/contractor-details/contractor-details-added")
   val formProvider = new RemoveDetailYesNoFormProvider()
+  "removeDetailYesNo Controller" - {
 
-  "when contractorDetail is neither 'email' or 'scheme-name'" - {
+    "when contractorDetail is neither 'email' or 'scheme-name'" - {
 
-    "must redirect to Journey Recovery" in {
+      "must redirect to Journey Recovery on GET" in {
 
-      val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+        val application =
+          applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
-      running(application) {
+        running(application) {
 
-        val request =
-          FakeRequest(GET, routes.RemoveDetailYesNoController.onPageLoad("invalid").url)
+          val request =
+            FakeRequest(GET, routes.RemoveDetailYesNoController.onPageLoad("invalid").url)
 
-        val result = route(application, request).value
+          val result = route(application, request).value
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual
-          controllers.routes.JourneyRecoveryController.onPageLoad().url
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual
+            controllers.routes.JourneyRecoveryController.onPageLoad().url
+        }
       }
+
+      "must redirect to Journey Recovery on POST" in {
+
+        val application =
+          applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+
+        running(application) {
+
+          val request =
+            FakeRequest(POST, routes.RemoveDetailYesNoController.onSubmit("invalid").url)
+              .withFormUrlEncodedBody(("value", "true"))
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual
+            controllers.routes.JourneyRecoveryController.onPageLoad().url
+        }
+      }
+
     }
 
-  }
+    Seq(
+      ("email", "email"),
+      ("scheme-name", "scheme-name")
+    ).foreach { case (contractorDetail, selectedDetail) =>
+      s"when contractorDetail is '$contractorDetail'" - {
+        val form = formProvider(selectedDetail)
 
-  Seq(
-    ("email", "email"),
-    ("scheme-name", "scheme-name")
-  ).foreach { case (contractorDetail, selectedDetail) =>
-    s"when contractorDetail is '$contractorDetail'" - {
-      val form = formProvider(selectedDetail)
-
-      lazy val removeDetailYesNoRoute = routes.RemoveDetailYesNoController.onPageLoad(selectedDetail).url
-
-      "removeDetailYesNo Controller" - {
+        lazy val removeDetailYesNoRoute = routes.RemoveDetailYesNoController.onPageLoad(selectedDetail).url
 
         "must return OK and the correct view for a GET" in {
 

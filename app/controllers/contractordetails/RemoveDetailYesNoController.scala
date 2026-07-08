@@ -20,7 +20,7 @@ import controllers.actions.*
 import forms.contractordetails.RemoveDetailYesNoFormProvider
 import pages.contractordetails.RemoveDetailYesNoPage
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.contractordetails.RemoveDetailYesNoView
@@ -41,37 +41,40 @@ class RemoveDetailYesNoController @Inject() (
     extends FrontendBaseController
     with I18nSupport {
 
+  private val validDetails = Set("email", "scheme-name")
+
+  private def withValidDetail(contractorDetail: String)(action: => Future[Result]): Future[Result] =
+    if (!validDetails.contains(contractorDetail)) {
+      Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+    } else {
+      action
+    }
+
   def onPageLoad(contractorDetail: String): Action[AnyContent] =
-    (identify andThen getData andThen requireData) { implicit request =>
-      if (contractorDetail == "email" || contractorDetail == "scheme-name") {
-
+    (identify andThen getData andThen requireData).async { implicit request =>
+      withValidDetail(contractorDetail) {
         val form         = formProvider(contractorDetail)
-        val preparedForm = request.userAnswers.get(RemoveDetailYesNoPage(contractorDetail)) match {
-          case None        => form
-          case Some(value) => form.fill(value)
-        }
-        Ok(view(contractorDetail, preparedForm))
-      } else {
-        Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+        val preparedForm = request.userAnswers.get(RemoveDetailYesNoPage(contractorDetail)).fold(form)(form.fill)
+        Future.successful(Ok(view(contractorDetail, preparedForm)))
       }
-
     }
 
   def onSubmit(contractorDetail: String): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
-
-      val form = formProvider(contractorDetail)
-      form
-        .bindFromRequest()
-        .fold(
-          formWithErrors => Future.successful(BadRequest(view(contractorDetail, formWithErrors))),
-          value =>
-            for {
-              updatedAnswers <- Future.fromTry(request.userAnswers.set(RemoveDetailYesNoPage(contractorDetail), value))
-              _              <- sessionRepository.set(updatedAnswers)
-            } yield Redirect(
-              controllers.contractordetails.routes.ContractorDetailsCheckAnswersController.onPageLoad().url
-            )
-        )
+      withValidDetail(contractorDetail) {
+        formProvider(contractorDetail)
+          .bindFromRequest()
+          .fold(
+            formWithErrors => Future.successful(BadRequest(view(contractorDetail, formWithErrors))),
+            value =>
+              for {
+                updatedAnswers <-
+                  Future.fromTry(request.userAnswers.set(RemoveDetailYesNoPage(contractorDetail), value))
+                _              <- sessionRepository.set(updatedAnswers)
+              } yield Redirect(
+                controllers.contractordetails.routes.ContractorDetailsCheckAnswersController.onPageLoad().url
+              )
+          )
+      }
     }
 }
