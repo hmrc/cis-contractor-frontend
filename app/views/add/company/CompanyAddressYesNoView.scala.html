@@ -32,13 +32,18 @@
             @govukErrorSummary(ErrorSummaryViewModel(form, errorLinkOverrides = Map("value" -> "value_0")))
         }
 
-        @govukRadios(
+        @defining(
             RadiosViewModel.yesNo(
                 field = form("value"),
                 legend = LegendViewModel(messages("companyAddressYesNo.heading", name)).asPageHeading().withCssClass("govuk-fieldset__legend--l")
-            ).withHint(Hint(content = Messages("companyAddressYesNo.hint"))
-)
-        )
+            )
+        ) { radios =>
+            @govukRadios(
+                if(mode == models.AmendMode) radios
+                else radios.withHint(Hint(content = Messages("companyAddressYesNo.hint")))
+                )
+            }
+
 
         @govukButton(
             ButtonViewModel(messages("site.continue"))

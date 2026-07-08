@@ -14,19 +14,23 @@
  * limitations under the License.
  */
 
-package pages.add.partnership
+package models.response
 
-import models.add.partnership.PartnershipChooseContactDetails
-import pages.behaviours.PageBehaviours
+import models.verify.{GovTalkErrorStatus, SubmissionStatus}
+import play.api.libs.json.{JsValue, Json, OFormat}
 
-class PartnershipChooseContactDetailsPageSpec extends PageBehaviours {
+case class ChrisPollResponse(
+  status: SubmissionStatus,
+  correlationId: String,
+  pollUrl: Option[String],
+  pollInterval: Option[Int],
+  error: Option[JsValue],
+  irMarkReceived: Option[String],
+  lastMessageDate: Option[String],
+  acceptedTime: Option[String],
+  govTalkErrorStatus: Option[GovTalkErrorStatus] = None
+)
 
-  "PartnershipChooseContactDetailsPage" - {
-
-    beRetrievable[PartnershipChooseContactDetails](PartnershipChooseContactDetailsPage)
-
-    beSettable[PartnershipChooseContactDetails](PartnershipChooseContactDetailsPage)
-
-    beRemovable[PartnershipChooseContactDetails](PartnershipChooseContactDetailsPage)
-  }
+object ChrisPollResponse {
+  implicit val format: OFormat[ChrisPollResponse] = Json.format[ChrisPollResponse]
 }

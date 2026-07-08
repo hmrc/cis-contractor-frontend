@@ -17,23 +17,22 @@
 package controllers.verify
 
 import base.SpecBase
-import models.ContractorScheme
-import models.requests.CreateSubmissionForVerificationRequest
-import models.response.{CreateSubmissionForVerificationResponse, GetCurrentVerificationBatchResponse, GetNewestVerificationBatchResponse}
-import models.verify.ContractorEmailConfirmationStored.CurrentEmail
-import models.{SubcontractorCurrentVerification, VerificationBatchCurrentVerification, VerificationCurrentVerification}
-import org.mockito.ArgumentCaptor
+import models.UserAnswers
+import models.requests.DataRequest
+import models.response.*
+import models.verify.{SubmissionStatus, VerificationSubmissionDetails}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{never, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
-import pages.verify._
+import pages.verify.*
 import play.api.inject.bind
+import play.api.mvc.AnyContent
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import queries.CisIdQuery
 import services.VerificationService
 import uk.gov.hmrc.http.HeaderCarrier
 
+import java.time.LocalDateTime
 import scala.concurrent.Future
 
 class SubmissionSendingControllerSpec extends SpecBase with MockitoSugar {
@@ -41,185 +40,117 @@ class SubmissionSendingControllerSpec extends SpecBase with MockitoSugar {
   private lazy val onPageLoadRoute =
     controllers.verify.routes.SubmissionSendingController.onPageLoad().url
 
-  private val instanceId = "INST-123"
+  private lazy val onPollRoute =
+    controllers.verify.routes.SubmissionSendingController.onPollAndRedirect.url
 
-  private def withCisId(ua: models.UserAnswers): models.UserAnswers =
-    ua.set(CisIdQuery, instanceId).success.value
-
-  private val newestWithSchemeEmail: GetNewestVerificationBatchResponse =
-    GetNewestVerificationBatchResponse(
-      scheme = Some(ContractorScheme(accountsOfficeReference = None, emailAddress = Some("scheme@example.com"))),
-      subcontractors = Nil,
-      verificationBatch = None,
-      verifications = Nil,
-      submission = None,
-      monthlyReturn = None,
-      monthlyReturnSubmission = None
-    )
-
-  private val currentBatch: GetCurrentVerificationBatchResponse =
-    GetCurrentVerificationBatchResponse(
-      subcontractors = Seq(
-        SubcontractorCurrentVerification(
-          subcontractorId = 10L,
-          subbieResourceRef = Some(1111L),
-          firstName = None,
-          secondName = None,
-          surname = None,
-          tradingName = None,
-          utr = None,
-          nino = None,
-          crn = None,
-          partnerUtr = None,
-          partnershipTradingName = None
-        )
-      ),
-      verificationBatch = Some(
-        VerificationBatchCurrentVerification(
-          verificationBatchId = 99L,
-          verifBatchResourceRef = Some(7777L)
-        )
-      ),
-      verifications = Seq(
-        VerificationCurrentVerification(
-          verificationId = 1L,
-          verificationBatchId = Some(99L),
-          subcontractorId = Some(10L),
-          verificationResourceRef = Some(111L)
-        ),
-        VerificationCurrentVerification(
-          verificationId = 2L,
-          verificationBatchId = Some(99L),
-          subcontractorId = Some(10L),
-          verificationResourceRef = None
-        )
-      )
+  private val submissionDetails =
+    VerificationSubmissionDetails(
+      submissionId = "13602",
+      status = "ACCEPTED",
+      hmrcMarkGenerated = "hmrc-mark",
+      hmrcMarkGgis = None,
+      correlationId = Some("corr-id"),
+      pollUrl = Some("http://localhost/poll"),
+      pollIntervalSeconds = Some(5),
+      submittedAt = LocalDateTime.parse("2026-06-15T03:30:52"),
+      lastMessageDate = None,
+      timedOut = false
     )
 
   "SubmissionSendingController.onPageLoad" - {
 
-    "must call service to create submission and return OK when answers are valid and buildSubmissionRequest succeeds (CurrentEmail uses scheme email)" in {
+    "must redirect to poll page when initial submission returns ACCEPTED" in {
       val mockService = mock[VerificationService]
-      when(mockService.createSubmissionForVerification(any[CreateSubmissionForVerificationRequest])(any[HeaderCarrier]))
-        .thenReturn(Future.successful(CreateSubmissionForVerificationResponse(12345L)))
 
-      val ua0 =
-        emptyUserAnswers
-          .set(NewestVerificationBatchResponsePage, newestWithSchemeEmail)
-          .success
-          .value
-          .set(ContractorEmailConfirmationStoredPage, CurrentEmail)
-          .success
-          .value
-          .set(CurrentVerificationBatchResponsePage, currentBatch)
-          .success
-          .value
-
-      val ua = withCisId(ua0)
+      when(
+        mockService.createSubmitAndPersistVerificationSubmission(
+          any[DataRequest[AnyContent]],
+          any[HeaderCarrier]
+        )
+      ).thenReturn(
+        Future.successful(
+          ChrisSubmissionResponse(
+            submissionId = "13602",
+            status = "ACCEPTED",
+            hmrcMarkGenerated = "hmrc-mark"
+          )
+        )
+      )
 
       val application =
-        applicationBuilder(userAnswers = Some(ua))
+        applicationBuilder(userAnswers = Some(emptyUserAnswers))
           .overrides(bind[VerificationService].toInstance(mockService))
           .build()
 
       running(application) {
         val result = route(application, FakeRequest(GET, onPageLoadRoute)).value
 
-        status(result) mustBe OK
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result).value mustBe
+          controllers.verify.routes.SubmissionSendingController.onPollAndRedirect.url
 
-        val captor = ArgumentCaptor.forClass(classOf[CreateSubmissionForVerificationRequest])
-        verify(mockService).createSubmissionForVerification(captor.capture())(any[HeaderCarrier])
-
-        val req = captor.getValue
-        req.instanceId mustBe instanceId
-        req.verificationBatchId mustBe 99L
-        req.verificationBatchResourceRef mustBe 7777L
-        req.emailRecipient mustBe "scheme@example.com"
-        req.verifications.map(_.verificationResourceRef) mustBe Seq(111L)
+        verify(mockService).createSubmitAndPersistVerificationSubmission(
+          any[DataRequest[AnyContent]],
+          any[HeaderCarrier]
+        )
       }
     }
 
-    "must redirect to JourneyRecovery when CisIdQuery is missing (buildSubmissionRequest fails)" in {
+    "must redirect to recovery when service fails" in {
+      val mockService = mock[VerificationService]
+
+      when(
+        mockService.createSubmitAndPersistVerificationSubmission(
+          any[DataRequest[AnyContent]],
+          any[HeaderCarrier]
+        )
+      ).thenReturn(Future.failed(new RuntimeException("boom")))
+
+      val application =
+        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          .overrides(bind[VerificationService].toInstance(mockService))
+          .build()
+
+      running(application) {
+        val result = route(application, FakeRequest(GET, onPageLoadRoute)).value
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result).value mustBe
+          controllers.routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+  }
+
+  "SubmissionSendingController.onPollAndRedirect" - {
+
+    "must render polling page with Refresh header when poll returns ACCEPTED" in {
       val mockService = mock[VerificationService]
 
       val ua =
         emptyUserAnswers
-          .set(NewestVerificationBatchResponsePage, newestWithSchemeEmail)
-          .success
-          .value
-          .set(ContractorEmailConfirmationStoredPage, CurrentEmail)
-          .success
-          .value
-          .set(CurrentVerificationBatchResponsePage, currentBatch)
-          .success
-          .value
-      // NOTE: CisIdQuery is intentionally missing
-
-      val application =
-        applicationBuilder(userAnswers = Some(ua))
-          .overrides(bind[VerificationService].toInstance(mockService))
-          .build()
-
-      running(application) {
-        val result = route(application, FakeRequest(GET, onPageLoadRoute)).value
-
-        status(result) mustBe SEE_OTHER
-        redirectLocation(result).value mustBe controllers.routes.JourneyRecoveryController.onPageLoad().url
-
-        verify(mockService, never()).createSubmissionForVerification(any())(any())
-      }
-    }
-
-    "must redirect to JourneyRecovery when CurrentVerificationBatchResponsePage is missing (buildSubmissionRequest fails)" in {
-      val mockService = mock[VerificationService]
-
-      val ua0 =
-        emptyUserAnswers
-          .set(NewestVerificationBatchResponsePage, newestWithSchemeEmail)
-          .success
-          .value
-          .set(ContractorEmailConfirmationStoredPage, CurrentEmail)
+          .set(VerificationSubmissionDetailsPage, submissionDetails)
           .success
           .value
 
-      val ua = withCisId(ua0)
-
-      val application =
-        applicationBuilder(userAnswers = Some(ua))
-          .overrides(bind[VerificationService].toInstance(mockService))
-          .build()
-
-      running(application) {
-        val result = route(application, FakeRequest(GET, onPageLoadRoute)).value
-
-        status(result) mustBe SEE_OTHER
-        redirectLocation(result).value mustBe controllers.routes.JourneyRecoveryController.onPageLoad().url
-
-        verify(mockService, never()).createSubmissionForVerification(any())(any())
-      }
-    }
-
-    "must redirect to JourneyRecovery when verificationBatchResourceRef is missing" in {
-      val mockService = mock[VerificationService]
-
-      val currentNoBatchRef =
-        currentBatch.copy(
-          verificationBatch = currentBatch.verificationBatch.map(_.copy(verifBatchResourceRef = None))
+      when(
+        mockService.pollStatusAndPersist(
+          any[UserAnswers],
+          any[VerificationSubmissionDetails]
+        )(any[HeaderCarrier])
+      ).thenReturn(
+        Future.successful(
+          ChrisPollResponse(
+            status = SubmissionStatus.ACCEPTED,
+            correlationId = "corr-id",
+            pollUrl = None,
+            pollInterval = None,
+            error = None,
+            irMarkReceived = None,
+            lastMessageDate = None,
+            acceptedTime = None
+          )
         )
-
-      val ua0 =
-        emptyUserAnswers
-          .set(NewestVerificationBatchResponsePage, newestWithSchemeEmail)
-          .success
-          .value
-          .set(ContractorEmailConfirmationStoredPage, CurrentEmail)
-          .success
-          .value
-          .set(CurrentVerificationBatchResponsePage, currentNoBatchRef)
-          .success
-          .value
-
-      val ua = withCisId(ua0)
+      )
 
       val application =
         applicationBuilder(userAnswers = Some(ua))
@@ -227,12 +158,75 @@ class SubmissionSendingControllerSpec extends SpecBase with MockitoSugar {
           .build()
 
       running(application) {
-        val result = route(application, FakeRequest(GET, onPageLoadRoute)).value
+        val result = route(application, FakeRequest(GET, onPollRoute)).value
+
+        status(result) mustBe OK
+        headers(result).get("Refresh").value mustBe "5"
+      }
+    }
+
+    "must redirect to submitted page when poll returns SUBMITTED" in {
+      val mockService = mock[VerificationService]
+
+      val ua =
+        emptyUserAnswers
+          .set(VerificationSubmissionDetailsPage, submissionDetails)
+          .success
+          .value
+
+      when(
+        mockService.pollStatusAndPersist(
+          any[UserAnswers],
+          any[VerificationSubmissionDetails]
+        )(any[HeaderCarrier])
+      ).thenReturn(
+        Future.successful(
+          ChrisPollResponse(
+            status = SubmissionStatus.SUBMITTED,
+            correlationId = "corr-id",
+            pollUrl = None,
+            pollInterval = None,
+            error = None,
+            irMarkReceived = None,
+            lastMessageDate = None,
+            acceptedTime = None
+          )
+        )
+      )
+
+      val application =
+        applicationBuilder(userAnswers = Some(ua))
+          .overrides(bind[VerificationService].toInstance(mockService))
+          .build()
+
+      running(application) {
+        val result = route(application, FakeRequest(GET, onPollRoute)).value
 
         status(result) mustBe SEE_OTHER
-        redirectLocation(result).value mustBe controllers.routes.JourneyRecoveryController.onPageLoad().url
+        redirectLocation(result).value mustBe
+          controllers.verify.routes.VerificationRequestSubmittedController.onPageLoad().url
+      }
+    }
 
-        verify(mockService, never()).createSubmissionForVerification(any())(any())
+    "must redirect to recovery when VerificationSubmissionDetailsPage is missing" in {
+      val mockService = mock[VerificationService]
+
+      val application =
+        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          .overrides(bind[VerificationService].toInstance(mockService))
+          .build()
+
+      running(application) {
+        val result = route(application, FakeRequest(GET, onPollRoute)).value
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result).value mustBe
+          controllers.routes.JourneyRecoveryController.onPageLoad().url
+
+        verify(mockService, never()).pollStatusAndPersist(
+          any[UserAnswers],
+          any[VerificationSubmissionDetails]
+        )(any[HeaderCarrier])
       }
     }
   }
