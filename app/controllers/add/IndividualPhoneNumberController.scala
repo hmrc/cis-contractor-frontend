@@ -20,7 +20,6 @@ import controllers.actions.*
 import controllers.helpers.ContactGuard
 import forms.add.IndividualPhoneNumberFormProvider
 import models.Mode
-import models.contact.ContactOptions.Phone
 import models.contact.ContactMethodOptions
 import navigation.Navigator
 import pages.add.{IndividualContactMethodOptionsPage, IndividualPhoneNumberPage}
@@ -52,9 +51,6 @@ class IndividualPhoneNumberController @Inject() (
 
   val form = formProvider()
 
-  private def recoveryRedirect =
-    Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-
   def onPageLoad(mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData) { implicit request =>
       requireContactMethodInSet(
@@ -62,7 +58,7 @@ class IndividualPhoneNumberController @Inject() (
         request.userAnswers.get(IndividualContactMethodOptionsPage),
         ContactMethodOptions.Phone
       ) { subcontractorName =>
-        val preparedForm = request.userAnswers.get(IndividualPhoneNumberAddressPage) match {
+        val preparedForm = request.userAnswers.get(IndividualPhoneNumberPage) match {
           case None        => form
           case Some(value) => form.fill(value)
         }
@@ -75,7 +71,7 @@ class IndividualPhoneNumberController @Inject() (
       (for {
         subcontractorName <- subcontractorNameExtractor.getSubcontractorName(request.userAnswers)
         contactMethods  <- request.userAnswers.get(IndividualContactMethodOptionsPage)
-        if contactMethods.contains(ContactMethodOptions.Email)
+        if contactMethods.contains(ContactMethodOptions.Phone)
       } yield form
             .bindFromRequest()
             .fold(

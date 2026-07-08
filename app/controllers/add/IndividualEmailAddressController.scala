@@ -51,9 +51,6 @@ class IndividualEmailAddressController @Inject() (
 
   private val form = formProvider()
 
-  private def recoveryRedirect =
-    Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-
   def onPageLoad(mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData) { implicit request =>
       requireContactMethodInSet(

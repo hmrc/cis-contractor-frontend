@@ -20,7 +20,6 @@ import models.UserAnswers
 import models.add.IndividualContactMethodOptions
 import models.contact.ContactMethodOptions.{Email, Mobile, Phone}
 import pages.QuestionPage
-import pages.add.ContactMethodOptionsCleanup
 import play.api.libs.json.JsPath
 
 import scala.util.Try
