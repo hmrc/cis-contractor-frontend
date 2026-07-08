@@ -39,7 +39,7 @@ object AddTrustContactMethodsYesNoSummary {
             controllers.add.trust.routes.AddTrustContactMethodsYesNoController.onPageLoad(CheckMode).url
           )
             .withVisuallyHiddenText(messages("addTrustContactMethodsYesNo.change.hidden"))
-            .withAttribute("id" -> "trust-contact-methods-yes-no")
+            .withAttribute("id" -> "add-trust-contact-details")
         )
       )
     }
