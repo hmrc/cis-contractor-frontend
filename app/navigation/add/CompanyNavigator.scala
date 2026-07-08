@@ -77,6 +77,7 @@ class CompanyNavigator @Inject() () extends NavigatorForJourney {
   }
 
   private val amendRouteMap: Page => UserAnswers => Call = {
+    case CompanyNamePage         => _ => cyaRoute(AmendMode)
     case CompanyEmailAddressPage => _ => cyaRoute(AmendMode)
     case CompanyMobileNumberPage => _ => cyaRoute(AmendMode)
     case CompanyAddressYesNoPage => navigatorFromCompanyAddressYesNoPage(AmendMode)(_)
