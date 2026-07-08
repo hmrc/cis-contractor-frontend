@@ -28,6 +28,9 @@ class CompanyNavigatorSpec extends SpecBase {
   val navigator                    = new CompanyNavigator
   private lazy val journeyRecovery = routes.JourneyRecoveryController.onPageLoad()
   private lazy val CompanyCYA      = controllers.add.company.routes.CompanyCheckYourAnswersController.onPageLoad()
+  private lazy val CompanyAmendCYA =
+    routes.JourneyRecoveryController
+      .onPageLoad() // TODO: when available controllers.add.company.routes.AmendCompanyCheckYourAnswersController.onPageLoad()
 
   "CompanyNavigator" - {
 
@@ -299,8 +302,95 @@ class CompanyNavigatorSpec extends SpecBase {
         navigator.nextPage(UnknownPage, AmendMode, UserAnswers("id")) mustBe journeyRecovery
       }
 
-      "must go from CompanyNamePage to JourneyRecovery" in {
-        navigator.nextPage(CompanyNamePage, AmendMode, emptyUserAnswers) mustBe journeyRecovery
+      "must go from CompanyNamePage to AmendCYA" in {
+        navigator.nextPage(CompanyNamePage, AmendMode, emptyUserAnswers) mustBe CompanyAmendCYA
+      }
+
+      "to Amend Company CYA page when EmailAddress is selected and CompanyEmailAddressPage is answered" in {
+        navigator.nextPage(
+          CompanyContactOptionsPage,
+          AmendMode,
+          emptyUserAnswers
+            .setOrException(
+              CompanyContactOptionsPage,
+              ContactOptions.Email
+            )
+            .setOrException(CompanyEmailAddressPage, "old@email.com")
+        ) mustBe CompanyAmendCYA
+      }
+
+      "must go from CompanyMobileNumberPage to Company CYA in AmendMode" in {
+        navigator.nextPage(
+          CompanyMobileNumberPage,
+          AmendMode,
+          emptyUserAnswers
+        ) mustBe CompanyAmendCYA
+      }
+
+      "must go from CompanyNamePage to CompanyCheckYourAnswers in AmendMode" in {
+        navigator.nextPage(
+          CompanyNamePage,
+          AmendMode,
+          emptyUserAnswers
+        ) mustBe CompanyAmendCYA
+      }
+
+      "must go from CompanyAddressYesNoPage" - {
+        "to the address lookup on-ramp when answer is Yes and CompanyAddressPage is not answered before" in {
+          val answers = emptyUserAnswers.set(CompanyAddressYesNoPage, true).success.value
+
+          navigator.nextPage(
+            CompanyAddressYesNoPage,
+            AmendMode,
+            answers
+          ) mustBe CompanyAmendCYA
+
+        }
+
+        "to Company CYA when answer is Yes and CompanyAddressPage is answered before" in {
+
+          val address = models.address.Address(
+            addressLine1 = "10 Example Street",
+            addressLine2 = Some("Suite 2"),
+            addressLine3 = Some("Newcastle"),
+            addressLine4 = Some("Tyne & Wear"),
+            postcode = Some("NE1 1AA"),
+            country = Some(models.address.Country(Some("GB"), Some("United Kingdom")))
+          )
+
+          val answers =
+            emptyUserAnswers
+              .set(CompanyAddressPage, address)
+              .success
+              .value
+              .set(CompanyAddressYesNoPage, true)
+              .success
+              .value
+
+          navigator.nextPage(
+            CompanyAddressYesNoPage,
+            AmendMode,
+            answers
+          ) mustBe CompanyAmendCYA
+        }
+
+        "to Company CYA when answer is No" in {
+          val answers = emptyUserAnswers.set(CompanyAddressYesNoPage, false).success.value
+
+          navigator.nextPage(
+            CompanyAddressYesNoPage,
+            AmendMode,
+            answers
+          ) mustBe CompanyAmendCYA
+        }
+
+        "to JourneyRecoveryPage when answer is not present" in {
+          navigator.nextPage(
+            CompanyAddressYesNoPage,
+            AmendMode,
+            emptyUserAnswers
+          ) mustBe routes.JourneyRecoveryController.onPageLoad()
+        }
       }
     }
 

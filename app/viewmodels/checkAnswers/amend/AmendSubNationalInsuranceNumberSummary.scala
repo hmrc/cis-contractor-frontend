@@ -1,5 +1,5 @@
 /*
- * Copyright 2026 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,31 +14,29 @@
  * limitations under the License.
  */
 
-package viewmodels.checkAnswers.add.trust
+package viewmodels.checkAnswers.amend
 
-import models.{CheckMode, UserAnswers}
-import pages.add.trust.TrustContactOptionsPage
+import models.{AmendMode, UserAnswers}
+import pages.add.SubNationalInsuranceNumberPage
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
-import utils.Utils
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
 
-object TrustContactOptionsSummary {
+object AmendSubNationalInsuranceNumberSummary {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(TrustContactOptionsPage).map { answer =>
-      val cyaMsg = Utils.findFirstMessagesValue(Seq(s"trustContactOptions.cya.$answer", s"trustContactOptions.$answer"))
+    answers.get(SubNationalInsuranceNumberPage).map { answer =>
       SummaryListRowViewModel(
-        key = "trustContactOptions.checkYourAnswersLabel",
-        value = ValueViewModel(cyaMsg),
+        key = "subNationalInsuranceNumber.checkYourAnswersLabel",
+        value = ValueViewModel(answer),
         actions = Seq(
           ActionItemViewModel(
             "site.change",
-            controllers.add.trust.routes.TrustContactOptionsController.onPageLoad(CheckMode).url
+            controllers.add.routes.SubNationalInsuranceNumberController.onPageLoad(AmendMode).url
           )
-            .withVisuallyHiddenText(messages("trustContactOptions.change.hidden"))
-            .withAttribute("id" -> "trust-contact-details")
+            .withVisuallyHiddenText(messages("subNationalInsuranceNumber.change.hidden"))
+            .withAttribute("id" -> "sub-national-insurance-number")
         )
       )
     }
