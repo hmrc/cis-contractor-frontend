@@ -18,7 +18,7 @@ package controllers.contractordetails
 
 import base.SpecBase
 import forms.contractordetails.RemoveDetailYesNoFormProvider
-import models.{NormalMode, UserAnswers}
+import models.UserAnswers
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
@@ -35,7 +35,7 @@ import scala.concurrent.Future
 
 class RemoveDetailYesNoControllerSpec extends SpecBase with MockitoSugar {
 
-  def onwardRoute  = Call("GET", "/foo")
+  def onwardRoute  = Call("GET", "/contractor-details/contractor-details-added")
   val formProvider = new RemoveDetailYesNoFormProvider()
 
   "when contractorDetail is neither 'email' or 'scheme-name'" - {
@@ -48,7 +48,7 @@ class RemoveDetailYesNoControllerSpec extends SpecBase with MockitoSugar {
       running(application) {
 
         val request =
-          FakeRequest(GET, routes.RemoveDetailYesNoController.onPageLoad("invalid", NormalMode).url)
+          FakeRequest(GET, routes.RemoveDetailYesNoController.onPageLoad("invalid").url)
 
         val result = route(application, request).value
 
@@ -67,7 +67,7 @@ class RemoveDetailYesNoControllerSpec extends SpecBase with MockitoSugar {
     s"when contractorDetail is '$contractorDetail'" - {
       val form = formProvider(selectedDetail)
 
-      lazy val removeDetailYesNoRoute = routes.RemoveDetailYesNoController.onPageLoad(selectedDetail, NormalMode).url
+      lazy val removeDetailYesNoRoute = routes.RemoveDetailYesNoController.onPageLoad(selectedDetail).url
 
       "removeDetailYesNo Controller" - {
 
@@ -83,7 +83,7 @@ class RemoveDetailYesNoControllerSpec extends SpecBase with MockitoSugar {
             val view = application.injector.instanceOf[RemoveDetailYesNoView]
 
             status(result) mustEqual OK
-            contentAsString(result) mustEqual view(selectedDetail, form, NormalMode)(
+            contentAsString(result) mustEqual view(selectedDetail, form)(
               request,
               messages(application)
             ).toString
@@ -104,7 +104,7 @@ class RemoveDetailYesNoControllerSpec extends SpecBase with MockitoSugar {
             val result = route(application, request).value
 
             status(result) mustEqual OK
-            contentAsString(result) mustEqual view(selectedDetail, form.fill(true), NormalMode)(
+            contentAsString(result) mustEqual view(selectedDetail, form.fill(true))(
               request,
               messages(application)
             ).toString
@@ -153,7 +153,7 @@ class RemoveDetailYesNoControllerSpec extends SpecBase with MockitoSugar {
             val result = route(application, request).value
 
             status(result) mustEqual BAD_REQUEST
-            contentAsString(result) mustEqual view(selectedDetail, boundForm, NormalMode)(
+            contentAsString(result) mustEqual view(selectedDetail, boundForm)(
               request,
               messages(application)
             ).toString

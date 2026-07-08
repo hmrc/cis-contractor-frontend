@@ -24,7 +24,7 @@
     govukButton: GovukButton
 )
 
-@(contractorDetail:String, form: Form[_], mode: Mode)(implicit request: Request[_], messages: Messages)
+@(contractorDetail:String, form: Form[_])(implicit request: Request[_], messages: Messages)
 
 @defining(contractorDetail match {
     case "email"       => messages("contractordetails.removeDetailYesNo.detail.email")
@@ -33,7 +33,7 @@
 
     @layout(pageTitle = title(form, messages("contractordetails.removeDetailYesNo.title", selectedContractorDetail))) {
 
-        @formHelper(action = controllers.contractordetails.routes.RemoveDetailYesNoController.onSubmit(contractorDetail, mode), Symbol("autoComplete") -> "off") {
+        @formHelper(action = controllers.contractordetails.routes.RemoveDetailYesNoController.onSubmit(contractorDetail), Symbol("autoComplete") -> "off") {
 
             @if(form.errors.nonEmpty) {
                 @govukErrorSummary(ErrorSummaryViewModel(form, errorLinkOverrides = Map("value" -> "value_0")))

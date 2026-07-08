@@ -18,8 +18,6 @@ package controllers.contractordetails
 
 import controllers.actions.*
 import forms.contractordetails.RemoveDetailYesNoFormProvider
-import models.Mode
-import navigation.Navigator
 import pages.contractordetails.RemoveDetailYesNoPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -33,7 +31,6 @@ import scala.concurrent.{ExecutionContext, Future}
 class RemoveDetailYesNoController @Inject() (
   override val messagesApi: MessagesApi,
   sessionRepository: SessionRepository,
-  navigator: Navigator,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
@@ -44,7 +41,7 @@ class RemoveDetailYesNoController @Inject() (
     extends FrontendBaseController
     with I18nSupport {
 
-  def onPageLoad(contractorDetail: String, mode: Mode): Action[AnyContent] =
+  def onPageLoad(contractorDetail: String): Action[AnyContent] =
     (identify andThen getData andThen requireData) { implicit request =>
       if (contractorDetail == "email" || contractorDetail == "scheme-name") {
 
@@ -53,26 +50,28 @@ class RemoveDetailYesNoController @Inject() (
           case None        => form
           case Some(value) => form.fill(value)
         }
-        Ok(view(contractorDetail, preparedForm, mode))
+        Ok(view(contractorDetail, preparedForm))
       } else {
         Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
       }
 
     }
 
-  def onSubmit(contractorDetail: String, mode: Mode): Action[AnyContent] =
+  def onSubmit(contractorDetail: String): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
 
       val form = formProvider(contractorDetail)
       form
         .bindFromRequest()
         .fold(
-          formWithErrors => Future.successful(BadRequest(view(contractorDetail, formWithErrors, mode))),
+          formWithErrors => Future.successful(BadRequest(view(contractorDetail, formWithErrors))),
           value =>
             for {
               updatedAnswers <- Future.fromTry(request.userAnswers.set(RemoveDetailYesNoPage(contractorDetail), value))
               _              <- sessionRepository.set(updatedAnswers)
-            } yield Redirect(navigator.nextPage(RemoveDetailYesNoPage(contractorDetail), mode, updatedAnswers))
+            } yield Redirect(
+              controllers.contractordetails.routes.ContractorDetailsCheckAnswersController.onPageLoad().url
+            )
         )
     }
 }
