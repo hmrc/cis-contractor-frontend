@@ -83,8 +83,6 @@ POST  /subcontractor/amend/national-insurance-number  controllers.add.SubNationa
 GET   /subcontractor/amend/check-address  controllers.add.SubAddressYesNoController.onPageLoad(mode: Mode = AmendMode)
 POST  /subcontractor/amend/check-address  controllers.add.SubAddressYesNoController.onSubmit(mode: Mode = AmendMode)
 
-GET   /subcontractor/amend/company  controllers.amend.company.AmendCompanyController.onPageLoad()
-
 # Errors & Auth
 GET  /unauthorised/standard-user  controllers.UnauthorisedWrongRoleController.onPageLoad()
 
@@ -175,12 +173,16 @@ GET   /subcontractor/add/change-add-contact-details  controllers.add.AddIndividu
 POST  /subcontractor/add/change-add-contact-details  controllers.add.AddIndividualContactMethodsYesNoController.onSubmit(mode: Mode = CheckMode)
 
 # Company
+GET   /subcontractor/amend/company  controllers.amend.company.AmendCompanyController.onPageLoad()
+
 GET   /subcontractor/add/company/subcontractor-added  controllers.add.SubcontractorAddedController.companySubcontractorAdded()
 
 GET   /subcontractor/add/company/company-name         controllers.add.company.CompanyNameController.onPageLoad(mode: Mode = NormalMode)
 POST  /subcontractor/add/company/company-name         controllers.add.company.CompanyNameController.onSubmit(mode: Mode = NormalMode)
 GET   /subcontractor/add/company/change-company-name  controllers.add.company.CompanyNameController.onPageLoad(mode: Mode = CheckMode)
 POST  /subcontractor/add/company/change-company-name  controllers.add.company.CompanyNameController.onSubmit(mode: Mode = CheckMode)
+GET   /subcontractor/amend/company/company-name       controllers.add.company.CompanyNameController.onPageLoad(mode: Mode = AmendMode)
+POST  /subcontractor/amend/company/company-name       controllers.add.company.CompanyNameController.onSubmit(mode: Mode = AmendMode)
 
 GET   /subcontractor/add/company/check-address         controllers.add.company.CompanyAddressYesNoController.onPageLoad(mode: Mode = NormalMode)
 POST  /subcontractor/add/company/check-address         controllers.add.company.CompanyAddressYesNoController.onSubmit(mode: Mode = NormalMode)
@@ -377,11 +379,6 @@ GET   /subcontractor/add/trust/address                controllers.add.trust.Trus
 GET   /subcontractor/add/trust/address-return         controllers.add.trust.TrustAddressController.addressLookupCallback(id: String ?= "", mode: Mode = NormalMode)
 GET   /subcontractor/add/trust/address-return/change  controllers.add.trust.TrustAddressController.addressLookupCallbackChange(id: String ?= "", mode: Mode = NormalMode)
 
-GET   /subcontractor/add/trust/choose-contact-details         controllers.add.trust.TrustContactOptionsController.onPageLoad(mode: Mode = NormalMode)
-POST  /subcontractor/add/trust/choose-contact-details         controllers.add.trust.TrustContactOptionsController.onSubmit(mode: Mode = NormalMode)
-GET   /subcontractor/add/trust/change-choose-contact-details  controllers.add.trust.TrustContactOptionsController.onPageLoad(mode: Mode = CheckMode)
-POST  /subcontractor/add/trust/change-choose-contact-details  controllers.add.trust.TrustContactOptionsController.onSubmit(mode: Mode = CheckMode)
-
 GET   /subcontractor/add/trust/email-address         controllers.add.trust.TrustEmailAddressController.onPageLoad(mode: Mode = NormalMode)
 POST  /subcontractor/add/trust/email-address         controllers.add.trust.TrustEmailAddressController.onSubmit(mode: Mode = NormalMode)
 GET   /subcontractor/add/trust/change-email-address  controllers.add.trust.TrustEmailAddressController.onPageLoad(mode: Mode = CheckMode)
@@ -440,6 +437,7 @@ GET   /subcontractor/verify/verification-declaration  controllers.verify.Verific
 POST  /subcontractor/verify/verification-declaration  controllers.verify.VerificationDeclarationController.onSubmit(mode: Mode = NormalMode)
 
 GET   /subcontractor/verify/submitting-verification-request  controllers.verify.SubmissionSendingController.onPageLoad()
+GET   /subcontractor/verify/polling                          controllers.verify.SubmissionSendingController.onPollAndRedirect
 
 GET   /subcontractor/verify/no-subcontractors-added  controllers.verify.NoSubcontractorsAddedController.onPageLoad()
 
