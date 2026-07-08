@@ -87,7 +87,8 @@ object SubcontractorCleanup {
     userAnswers
       .remove(TrustAddressPage)
       .flatMap(_.remove(TrustAddressYesNoPage))
-      .flatMap(_.remove(TrustContactOptionsPage))
+      .flatMap(_.remove(AddTrustContactMethodsYesNoPage))
+      .flatMap(_.remove(TrustContactMethodOptionsPage))
       .flatMap(_.remove(TrustEmailAddressPage))
       .flatMap(_.remove(TrustMobileNumberPage))
       .flatMap(_.remove(TrustNamePage))

@@ -19,8 +19,7 @@ package models.add.trust
 import base.SpecBase
 import models.{RichJsObject, TypeOfSubcontractor}
 import models.address.Address
-import models.contact.ContactOptions
-import models.contact.ContactOptions.*
+import models.contact.ContactMethodOptions
 import models.{InvalidAnswer, MissingAnswer, UserAnswers}
 import org.scalatest.matchers.must.Matchers
 import pages.add.TypeOfSubcontractorPage
@@ -40,7 +39,7 @@ class ValidatedTrustSpec extends SpecBase with Matchers {
       .set(TrustAddressYesNoPage, false)
       .success
       .value
-      .set(TrustContactOptionsPage, ContactOptions.NoDetails)
+      .set(AddTrustContactMethodsYesNoPage, false)
       .success
       .value
       .set(TrustUtrYesNoPage, false)
@@ -62,7 +61,7 @@ class ValidatedTrustSpec extends SpecBase with Matchers {
 
   "ValidatedTrust.build" - {
 
-    "build successfully with minimum required answers (NoDetails + all optionals No)" in {
+    "build successfully with minimum required answers (all optionals No)" in {
       ValidatedTrust.build(minRequired) mustBe a[Right[?, ?]]
     }
 
@@ -85,7 +84,7 @@ class ValidatedTrustSpec extends SpecBase with Matchers {
           .set(TrustAddressYesNoPage, false)
           .success
           .value
-          .set(TrustContactOptionsPage, ContactOptions.NoDetails)
+          .set(AddTrustContactMethodsYesNoPage, false)
           .success
           .value
           .set(TrustUtrYesNoPage, false)
@@ -100,20 +99,75 @@ class ValidatedTrustSpec extends SpecBase with Matchers {
 
     "contact option validation" - {
 
-      "require email address when contact option is Email" in {
+      "require TrustContactMethodOptions when AddTrustContactMethodsYesNo is true" in {
         val ua =
           minRequired
-            .set(TrustContactOptionsPage, ContactOptions.Email)
+            .set(AddTrustContactMethodsYesNoPage, true)
+            .success
+            .value
+
+        ValidatedTrust.build(ua) mustBe Left(InvalidAnswer(TrustContactMethodOptionsPage))
+      }
+
+      "require email address when Email is selected in TrustContactMethodOptions" in {
+        val ua =
+          minRequired
+            .set(AddTrustContactMethodsYesNoPage, true)
+            .success
+            .value
+            .set(TrustContactMethodOptionsPage, Set(ContactMethodOptions.Email))
             .success
             .value
 
         ValidatedTrust.build(ua) mustBe Left(MissingAnswer(TrustEmailAddressPage))
       }
 
+      "require email address when Email and Phone are selected in TrustContactMethodOptions" in {
+        val ua =
+          minRequired
+            .set(AddTrustContactMethodsYesNoPage, true)
+            .success
+            .value
+            .set(TrustContactMethodOptionsPage, Set(ContactMethodOptions.Email, ContactMethodOptions.Phone))
+            .success
+            .value
+
+        ValidatedTrust.build(ua) mustBe Left(MissingAnswer(TrustEmailAddressPage))
+      }
+
+      "require phone number when Phone and Mobile are selected in TrustContactMethodOptions" in {
+        val ua =
+          minRequired
+            .set(AddTrustContactMethodsYesNoPage, true)
+            .success
+            .value
+            .set(TrustContactMethodOptionsPage, Set(ContactMethodOptions.Phone, ContactMethodOptions.Mobile))
+            .success
+            .value
+
+        ValidatedTrust.build(ua) mustBe Left(MissingAnswer(TrustPhoneNumberPage))
+      }
+
+      "require mobile number when Mobile is selected in TrustContactMethodOptions" in {
+        val ua =
+          minRequired
+            .set(AddTrustContactMethodsYesNoPage, true)
+            .success
+            .value
+            .set(TrustContactMethodOptionsPage, Set(ContactMethodOptions.Mobile))
+            .success
+            .value
+
+        ValidatedTrust.build(ua) mustBe Left(MissingAnswer(TrustMobileNumberPage))
+      }
+
       "build when contact option is Email and email address is present" in {
         val ua =
           minRequired
-            .set(TrustContactOptionsPage, ContactOptions.Email)
+            .set(AddTrustContactMethodsYesNoPage, true)
+            .success
+            .value
+            .set(TrustContactMethodOptionsPage, Set(ContactMethodOptions.Email))
             .success
             .value
             .set(TrustEmailAddressPage, "a@b.com")
@@ -123,65 +177,61 @@ class ValidatedTrustSpec extends SpecBase with Matchers {
         ValidatedTrust.build(ua) mustBe a[Right[?, ?]]
       }
 
-      "require phone number when contact option is Phone" in {
-        val ua =
-          minRequired
-            .set(TrustContactOptionsPage, ContactOptions.Phone)
-            .success
-            .value
-
-        ValidatedTrust.build(ua) mustBe Left(MissingAnswer(TrustPhoneNumberPage))
-      }
-
       "build when contact option is Phone and phone number is present" in {
         val ua =
           minRequired
-            .set(TrustContactOptionsPage, ContactOptions.Phone)
+            .set(AddTrustContactMethodsYesNoPage, true)
             .success
             .value
-            .set(TrustPhoneNumberPage, "01234567890")
+            .set(TrustContactMethodOptionsPage, Set(ContactMethodOptions.Phone))
+            .success
+            .value
+            .set(TrustPhoneNumberPage, "123456789")
             .success
             .value
 
         ValidatedTrust.build(ua) mustBe a[Right[?, ?]]
-      }
-
-      "require mobile number when contact option is Mobile" in {
-        val ua =
-          minRequired
-            .set(TrustContactOptionsPage, ContactOptions.Mobile)
-            .success
-            .value
-
-        ValidatedTrust.build(ua) mustBe Left(MissingAnswer(TrustMobileNumberPage))
       }
 
       "build when contact option is Mobile and mobile number is present" in {
         val ua =
           minRequired
-            .set(TrustContactOptionsPage, ContactOptions.Mobile)
+            .set(AddTrustContactMethodsYesNoPage, true)
             .success
             .value
-            .set(TrustMobileNumberPage, "07123456789")
+            .set(TrustContactMethodOptionsPage, Set(ContactMethodOptions.Mobile))
+            .success
+            .value
+            .set(TrustMobileNumberPage, "987654321")
             .success
             .value
 
         ValidatedTrust.build(ua) mustBe a[Right[?, ?]]
       }
 
-      "fail when contact option is NoDetails but stale email exists" in {
-        val ua = withStaleValue(minRequired, TrustEmailAddressPage, "stale@x.com")
-        ValidatedTrust.build(ua) mustBe Left(InvalidAnswer(TrustEmailAddressPage))
-      }
+      "build when contact option are Email, Phone and Mobile and email address, phone number and mobile number are present" in {
+        val ua =
+          minRequired
+            .set(AddTrustContactMethodsYesNoPage, true)
+            .success
+            .value
+            .set(
+              TrustContactMethodOptionsPage,
+              Set(ContactMethodOptions.Email, ContactMethodOptions.Phone, ContactMethodOptions.Mobile)
+            )
+            .success
+            .value
+            .set(TrustEmailAddressPage, "a@b.com")
+            .success
+            .value
+            .set(TrustPhoneNumberPage, "123456789")
+            .success
+            .value
+            .set(TrustMobileNumberPage, "987654321")
+            .success
+            .value
 
-      "fail when contact option is NoDetails but stale phone exists" in {
-        val ua = withStaleValue(minRequired, TrustPhoneNumberPage, "01234567890")
-        ValidatedTrust.build(ua) mustBe Left(InvalidAnswer(TrustPhoneNumberPage))
-      }
-
-      "fail when contact option is NoDetails but stale mobile exists" in {
-        val ua = withStaleValue(minRequired, TrustMobileNumberPage, "07123456789")
-        ValidatedTrust.build(ua) mustBe Left(InvalidAnswer(TrustMobileNumberPage))
+        ValidatedTrust.build(ua) mustBe a[Right[?, ?]]
       }
     }
 

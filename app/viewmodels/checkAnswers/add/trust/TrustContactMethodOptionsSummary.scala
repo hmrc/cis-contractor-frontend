@@ -38,7 +38,7 @@ object TrustContactMethodOptionsSummary {
       SummaryListRowViewModel(
         key = "trustContactMethodOptions.checkYourAnswersLabel",
         value = ValueViewModelHelper
-          .makeGovukBulletList(options)
+          .makeGovukBulletList(options, false)
           .getOrElse(ValueViewModel(HtmlContent(""))),
         actions = Seq(
           ActionItemViewModel(
@@ -46,7 +46,7 @@ object TrustContactMethodOptionsSummary {
             controllers.add.trust.routes.TrustContactMethodOptionsController.onPageLoad(CheckMode).url
           )
             .withVisuallyHiddenText(messages("trustContactMethodOptions.change.hidden"))
-            .withAttribute("id" -> "trust-contact-methods")
+            .withAttribute("id" -> "trust-methods-of-contact")
         )
       )
     }

@@ -53,9 +53,6 @@ POST  /subcontractor/amend/email-address  controllers.add.IndividualEmailAddress
 GET   /subcontractor/amend/mobile-number  controllers.add.IndividualMobileNumberController.onPageLoad(mode: Mode = AmendMode)
 POST  /subcontractor/amend/mobile-number  controllers.add.IndividualMobileNumberController.onSubmit(mode: Mode = AmendMode)
 
-GET   /subcontractor/amend/add-contact-details  controllers.add.AddIndividualContactMethodsYesNoController.onPageLoad(mode: Mode = AmendMode)
-POST  /subcontractor/amend/add-contact-details  controllers.add.AddIndividualContactMethodsYesNoController.onSubmit(mode: Mode = AmendMode)
-
 GET   /subcontractor/amend/unique-taxpayer-reference  controllers.add.SubcontractorsUniqueTaxpayerReferenceController.onPageLoad(mode: Mode = AmendMode)
 POST  /subcontractor/amend/unique-taxpayer-reference  controllers.add.SubcontractorsUniqueTaxpayerReferenceController.onSubmit(mode: Mode = AmendMode)
 
@@ -82,8 +79,6 @@ POST  /subcontractor/amend/national-insurance-number  controllers.add.SubNationa
 
 GET   /subcontractor/amend/check-address  controllers.add.SubAddressYesNoController.onPageLoad(mode: Mode = AmendMode)
 POST  /subcontractor/amend/check-address  controllers.add.SubAddressYesNoController.onSubmit(mode: Mode = AmendMode)
-
-GET   /subcontractor/amend/company  controllers.amend.company.AmendCompanyController.onPageLoad()
 
 # Errors & Auth
 GET  /unauthorised/standard-user  controllers.UnauthorisedWrongRoleController.onPageLoad()
@@ -173,8 +168,12 @@ GET   /subcontractor/add/add-contact-details         controllers.add.AddIndividu
 POST  /subcontractor/add/add-contact-details         controllers.add.AddIndividualContactMethodsYesNoController.onSubmit(mode: Mode = NormalMode)
 GET   /subcontractor/add/change-add-contact-details  controllers.add.AddIndividualContactMethodsYesNoController.onPageLoad(mode: Mode = CheckMode)
 POST  /subcontractor/add/change-add-contact-details  controllers.add.AddIndividualContactMethodsYesNoController.onSubmit(mode: Mode = CheckMode)
+GET   /subcontractor/amend/add-contact-details       controllers.add.AddIndividualContactMethodsYesNoController.onPageLoad(mode: Mode = AmendMode)
+POST  /subcontractor/amend/add-contact-details       controllers.add.AddIndividualContactMethodsYesNoController.onSubmit(mode: Mode = AmendMode)
 
 # Company
+GET   /subcontractor/amend/company  controllers.amend.company.AmendCompanyController.onPageLoad()
+
 GET   /subcontractor/add/company/subcontractor-added  controllers.add.SubcontractorAddedController.companySubcontractorAdded()
 
 GET   /subcontractor/add/company/company-name         controllers.add.company.CompanyNameController.onPageLoad(mode: Mode = NormalMode)
@@ -378,11 +377,6 @@ POST  /subcontractor/add/trust/change-check-address  controllers.add.trust.Trust
 GET   /subcontractor/add/trust/address                controllers.add.trust.TrustAddressController.redirectToAddressLookup(mode: Mode = NormalMode, changeRoute: Option[String] ?= None)
 GET   /subcontractor/add/trust/address-return         controllers.add.trust.TrustAddressController.addressLookupCallback(id: String ?= "", mode: Mode = NormalMode)
 GET   /subcontractor/add/trust/address-return/change  controllers.add.trust.TrustAddressController.addressLookupCallbackChange(id: String ?= "", mode: Mode = NormalMode)
-
-GET   /subcontractor/add/trust/choose-contact-details         controllers.add.trust.TrustContactOptionsController.onPageLoad(mode: Mode = NormalMode)
-POST  /subcontractor/add/trust/choose-contact-details         controllers.add.trust.TrustContactOptionsController.onSubmit(mode: Mode = NormalMode)
-GET   /subcontractor/add/trust/change-choose-contact-details  controllers.add.trust.TrustContactOptionsController.onPageLoad(mode: Mode = CheckMode)
-POST  /subcontractor/add/trust/change-choose-contact-details  controllers.add.trust.TrustContactOptionsController.onSubmit(mode: Mode = CheckMode)
 
 GET   /subcontractor/add/trust/email-address         controllers.add.trust.TrustEmailAddressController.onPageLoad(mode: Mode = NormalMode)
 POST  /subcontractor/add/trust/email-address         controllers.add.trust.TrustEmailAddressController.onSubmit(mode: Mode = NormalMode)

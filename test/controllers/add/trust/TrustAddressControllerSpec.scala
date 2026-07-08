@@ -227,7 +227,7 @@ class TrustAddressControllerSpec extends SpecBase with MockitoSugar {
 
     "addressLookupCallback" - {
 
-      "must retrieve and persist the address then redirect to Trust Contact Options when the save succeeds" in {
+      "must retrieve and persist the address then redirect to AddTrustContactMethodsYesNo page when the save succeeds" in {
 
         val mockAddressLookupService = mock[AddressLookupService]
 
@@ -245,7 +245,7 @@ class TrustAddressControllerSpec extends SpecBase with MockitoSugar {
 
           status(result) mustBe SEE_OTHER
           redirectLocation(result).value mustBe
-            controllers.add.trust.routes.TrustContactOptionsController.onPageLoad(NormalMode).url
+            controllers.add.trust.routes.AddTrustContactMethodsYesNoController.onPageLoad(NormalMode).url
 
           val idCaptor = ArgumentCaptor.forClass(classOf[String])
           verify(mockAddressLookupService).getAddressById(idCaptor.capture())(any(), any())
