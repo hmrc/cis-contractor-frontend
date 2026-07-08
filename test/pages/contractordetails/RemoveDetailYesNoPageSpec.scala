@@ -24,9 +24,9 @@ class RemoveDetailYesNoPageSpec extends PageBehaviours {
   "RemoveDetailYesNoPage" - {
 
     Seq(
-      ("email", EnterContractorEmailAddressPage, AddEmailAddressYesNoPage),
-      ("scheme-name", SchemeNamePage, AddSchemeNameYesNoPage)
-    ).foreach { case (contractorDetail, selectedDetailPage, screenerPage) =>
+      ("email", EnterContractorEmailAddressPage, AddEmailAddressYesNoPage, "email@test.com"),
+      ("scheme-name", SchemeNamePage, AddSchemeNameYesNoPage, "Scheme123")
+    ).foreach { case (contractorDetail, selectedDetailPage, screenerPage, dummyDetail) =>
       s"when contractorDetail is '$contractorDetail'" - {
 
         "have the correct path" in {
@@ -48,6 +48,37 @@ class RemoveDetailYesNoPageSpec extends PageBehaviours {
           beSettable[Boolean](screenerPage)
         }
 
+        s"cleanup: must remove '$selectedDetailPage' userAnswers and set '$screenerPage' to No when Yes is selected" in {
+          val userAnswers = emptyUserAnswers
+            .set(selectedDetailPage, dummyDetail)
+            .success
+            .value
+            .set(screenerPage, true)
+            .success
+            .value
+
+          val updatedUserAnswers =
+            userAnswers.set(RemoveDetailYesNoPage(contractorDetail), true).success.value
+
+          updatedUserAnswers.get(selectedDetailPage) mustBe None
+          updatedUserAnswers.get(screenerPage) mustBe Some(false)
+        }
+
+        s"cleanup: must retain '$selectedDetailPage' userAnswers and keep '$screenerPage' as Yes when No is selected" in {
+          val userAnswers = emptyUserAnswers
+            .set(selectedDetailPage, dummyDetail)
+            .success
+            .value
+            .set(screenerPage, true)
+            .success
+            .value
+
+          val updatedUserAnswers =
+            userAnswers.set(RemoveDetailYesNoPage(contractorDetail), false).success.value
+
+          updatedUserAnswers.get(selectedDetailPage) mustBe Some(dummyDetail)
+          updatedUserAnswers.get(screenerPage) mustBe Some(true)
+        }
       }
     }
   }
