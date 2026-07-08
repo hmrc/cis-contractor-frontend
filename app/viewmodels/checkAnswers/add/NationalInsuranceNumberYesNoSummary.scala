@@ -36,7 +36,7 @@ object NationalInsuranceNumberYesNoSummary {
         actions = Seq(
           ActionItemViewModel(
             "site.change",
-            controllers.add.routes.NationalInsuranceNumberYesNoController.onPageLoad(CheckMode).url
+            controllers.add.routes.NationalInsuranceNumberYesNoController.onPageLoad(mode).url
           )
             .withVisuallyHiddenText(messages("nationalInsuranceNumberYesNo.change.hidden"))
             .withAttribute("id" -> "national-insurance-number-yes-no")

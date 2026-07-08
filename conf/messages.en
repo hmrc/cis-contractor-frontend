@@ -1076,3 +1076,11 @@ contractordetails.addSchemeNameYesNo.heading                                   =
 contractordetails.addSchemeNameYesNo.error.required                            =  Select yes to enter the contractor’s scheme name
 contractordetails.addSchemeNameYesNo.checkYourAnswersLabel                     =  Add scheme name?
 contractordetails.addSchemeNameYesNo.change.hidden                             =  add scheme name?
+
+amendIndividualCheckYourAnswers.title = Subcontractor information
+amendIndividualCheckYourAnswers.heading.subcontractorInformation.h2    = Subcontractor information
+amendIndividualCheckYourAnswers.heading.moreDetails.h2    = More details
+amendIndividualCheckYourAnswers.confirm.h2 = Confirm changes
+amendIndividualCheckYourAnswers.confirm.p1 = By changing this subcontractor’s details you are confirming that, to the best of your knowledge, the details you are providing are correct.
+amendIndividualCheckYourAnswers.confirm = Confirm
+amendIndividualCheckYourAnswers.cancelChanges = Cancel changes

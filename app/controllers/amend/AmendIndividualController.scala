@@ -21,12 +21,13 @@ import models.TypeOfSubcontractor.Individualorsoletrader
 import models.add.SubcontractorName
 import models.address.{Address, Country}
 import models.amend.OriginalIndividualAnswers
-import models.contact.ContactOptions.NoDetails
+import models.contact.ContactOptions.{Email, NoDetails}
 import pages.add.*
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import queries.{CisIdQuery, OriginalIndividualAnswersQuery, SubContractorVerifiedQuery}
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import viewmodels.checkAnswers.add.AddIndividualContactMethodsYesNoSummary
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -75,7 +76,9 @@ class AmendIndividualController @Inject() (
     ua <- ua.set(SubcontractorNamePage, individualName)
     ua <- ua.set(SubAddressYesNoPage, true)
     ua <- ua.set(AddressOfSubcontractorPage, individualAddress)
-    ua <- ua.set(IndividualChooseContactDetailsPage, NoDetails)
+    ua <- ua.set(AddIndividualContactMethodsYesNoPage, true)
+    ua <- ua.set(IndividualChooseContactDetailsPage, Email)
+    ua <- ua.set(IndividualEmailAddressPage, "s@s.com")
     ua <- ua.set(UniqueTaxpayerReferenceYesNoPage, true)
     ua <- ua.set(SubcontractorsUniqueTaxpayerReferencePage, "3992651526")
     ua <- ua.set(NationalInsuranceNumberYesNoPage, true)
