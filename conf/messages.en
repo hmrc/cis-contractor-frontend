@@ -1069,4 +1069,4 @@ contractordetails.removeDetailYesNo.heading                                    =
 contractordetails.removeDetailYesNo.detail.email                               =  email
 contractordetails.removeDetailYesNo.detail.schemeName                          =  scheme name
 contractordetails.removeDetailYesNo.error.required.email                       =  Select yes to remove the contractor’s email
-contractordetails.removeDetailYesNo.error.required.scheme                      =  Select yes to remove the contractor’s scheme name
+contractordetails.removeDetailYesNo.error.required.schemeName                  =  Select yes to remove the contractor’s scheme name

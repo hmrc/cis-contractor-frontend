@@ -32,7 +32,7 @@ class RemoveDetailYesNoFormProviderSpec extends BooleanFieldBehaviours {
 
   Seq(
     ("email", "contractordetails.removeDetailYesNo.error.required.email"),
-    ("scheme-name", "contractordetails.removeDetailYesNo.error.required.scheme")
+    ("scheme-name", "contractordetails.removeDetailYesNo.error.required.schemeName")
   ).foreach { case (contractorDetail, requiredKey) =>
     s"when contractorDetail is '$contractorDetail'" - {
 

@@ -34,7 +34,7 @@ class RemoveDetailYesNoFormProvider @Inject() extends Mappings {
       case "scheme-name" =>
         Form(
           "value" -> boolean(
-            requiredKey = "contractordetails.removeDetailYesNo.error.required.scheme"
+            requiredKey = "contractordetails.removeDetailYesNo.error.required.schemeName"
           )
         )
       case other         =>
