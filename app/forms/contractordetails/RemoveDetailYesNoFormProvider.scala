@@ -37,6 +37,8 @@ class RemoveDetailYesNoFormProvider @Inject() extends Mappings {
             requiredKey = "contractordetails.removeDetailYesNo.error.required.scheme"
           )
         )
+      case other         =>
+        throw new IllegalArgumentException(s"Unknown contractorDetail: $other")
     }
 
 }
