@@ -80,6 +80,11 @@ POST  /subcontractor/amend/check-national-insurance-number  controllers.add.Nati
 GET   /subcontractor/amend/national-insurance-number  controllers.add.SubNationalInsuranceNumberController.onPageLoad(mode: Mode = AmendMode)
 POST  /subcontractor/amend/national-insurance-number  controllers.add.SubNationalInsuranceNumberController.onSubmit(mode: Mode = AmendMode)
 
+GET   /subcontractor/amend/check-address  controllers.add.SubAddressYesNoController.onPageLoad(mode: Mode = AmendMode)
+POST  /subcontractor/amend/check-address  controllers.add.SubAddressYesNoController.onSubmit(mode: Mode = AmendMode)
+
+GET   /subcontractor/amend/company  controllers.amend.company.AmendCompanyController.onPageLoad()
+
 # Errors & Auth
 GET  /unauthorised/standard-user  controllers.UnauthorisedWrongRoleController.onPageLoad()
 
@@ -111,8 +116,6 @@ GET   /subcontractor/add/check-address         controllers.add.SubAddressYesNoCo
 POST  /subcontractor/add/check-address         controllers.add.SubAddressYesNoController.onSubmit(mode: Mode = NormalMode)
 GET   /subcontractor/add/change-check-address  controllers.add.SubAddressYesNoController.onPageLoad(mode: Mode = CheckMode)
 POST  /subcontractor/add/change-check-address  controllers.add.SubAddressYesNoController.onSubmit(mode: Mode = CheckMode)
-GET   /subcontractor/amend/check-address       controllers.add.SubAddressYesNoController.onPageLoad(mode: Mode = AmendMode)
-POST  /subcontractor/amend/check-address       controllers.add.SubAddressYesNoController.onSubmit(mode: Mode = AmendMode)
 
 GET   /subcontractor/add/check-national-insurance-number         controllers.add.NationalInsuranceNumberYesNoController.onPageLoad(mode: Mode = NormalMode)
 POST  /subcontractor/add/check-national-insurance-number         controllers.add.NationalInsuranceNumberYesNoController.onSubmit(mode: Mode = NormalMode)
@@ -172,8 +175,6 @@ GET   /subcontractor/add/change-add-contact-details  controllers.add.AddIndividu
 POST  /subcontractor/add/change-add-contact-details  controllers.add.AddIndividualContactMethodsYesNoController.onSubmit(mode: Mode = CheckMode)
 
 # Company
-GET   /subcontractor/amend/company  controllers.amend.company.AmendCompanyController.onPageLoad()
-
 GET   /subcontractor/add/company/subcontractor-added  controllers.add.SubcontractorAddedController.companySubcontractorAdded()
 
 GET   /subcontractor/add/company/company-name         controllers.add.company.CompanyNameController.onPageLoad(mode: Mode = NormalMode)
@@ -187,7 +188,6 @@ GET   /subcontractor/add/company/change-check-address  controllers.add.company.C
 POST  /subcontractor/add/company/change-check-address  controllers.add.company.CompanyAddressYesNoController.onSubmit(mode: Mode = CheckMode)
 GET   /subcontractor/amend/company/check-address       controllers.add.company.CompanyAddressYesNoController.onPageLoad(mode: Mode = AmendMode)
 POST  /subcontractor/amend/company/check-address       controllers.add.company.CompanyAddressYesNoController.onSubmit(mode: Mode = AmendMode)
-
 
 GET   /subcontractor/add/company/address                controllers.add.company.CompanyAddressController.redirectToAddressLookup(mode: Mode = NormalMode, changeRoute: Option[String] ?= None)
 GET   /subcontractor/add/company/address-return         controllers.add.company.CompanyAddressController.addressLookupCallback(id: String ?= "", mode: Mode = NormalMode)
@@ -205,7 +205,6 @@ POST  /subcontractor/add/company/change-email-address  controllers.add.company.C
 GET   /subcontractor/amend/company/email-address       controllers.add.company.CompanyEmailAddressController.onPageLoad(mode: Mode = AmendMode)
 POST  /subcontractor/amend/company/email-address       controllers.add.company.CompanyEmailAddressController.onSubmit(mode: Mode = AmendMode)
 
-
 GET   /subcontractor/add/company/phone-number         controllers.add.company.CompanyPhoneNumberController.onPageLoad(mode: Mode = NormalMode)
 POST  /subcontractor/add/company/phone-number         controllers.add.company.CompanyPhoneNumberController.onSubmit(mode: Mode = NormalMode)
 GET   /subcontractor/add/company/change-phone-number  controllers.add.company.CompanyPhoneNumberController.onPageLoad(mode: Mode = CheckMode)
@@ -217,7 +216,6 @@ GET   /subcontractor/add/company/change-mobile-number  controllers.add.company.C
 POST  /subcontractor/add/company/change-mobile-number  controllers.add.company.CompanyMobileNumberController.onSubmit(mode: Mode = CheckMode)
 GET   /subcontractor/amend/company/mobile-number       controllers.add.company.CompanyMobileNumberController.onPageLoad(mode: Mode = AmendMode)
 POST  /subcontractor/amend/company/mobile-number       controllers.add.company.CompanyMobileNumberController.onSubmit(mode: Mode = AmendMode)
-
 
 GET   /subcontractor/add/company/company-has-utr         controllers.add.company.CompanyUtrYesNoController.onPageLoad(mode: Mode = NormalMode)
 POST  /subcontractor/add/company/company-has-utr         controllers.add.company.CompanyUtrYesNoController.onSubmit(mode: Mode = NormalMode)

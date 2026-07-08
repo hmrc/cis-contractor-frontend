@@ -48,7 +48,7 @@ class RemoveDetailYesNoController @Inject() (
     (identify andThen getData andThen requireData) { implicit request =>
       if (contractorDetail == "email" || contractorDetail == "scheme-name") {
 
-        val form         = formProvider(contractorDetail: String)
+        val form         = formProvider(contractorDetail)
         val preparedForm = request.userAnswers.get(RemoveDetailYesNoPage(contractorDetail)) match {
           case None        => form
           case Some(value) => form.fill(value)
@@ -63,7 +63,7 @@ class RemoveDetailYesNoController @Inject() (
   def onSubmit(contractorDetail: String, mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
 
-      val form = formProvider(contractorDetail: String)
+      val form = formProvider(contractorDetail)
       form
         .bindFromRequest()
         .fold(
