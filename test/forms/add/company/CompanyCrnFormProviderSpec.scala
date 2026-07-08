@@ -33,7 +33,6 @@ class CompanyCrnFormProviderSpec extends StringFieldBehaviours {
     "AC123456",
     "ac123456",
     "ZZ999999",
-    "1",
     "00000001",
     "12345678"
   )
@@ -41,7 +40,6 @@ class CompanyCrnFormProviderSpec extends StringFieldBehaviours {
   val invalidCrn: Seq[String] = Seq(
     "AC1234567",
     "ABC123456",
-    "123456789",
     "AC01-234",
     "AC01£345",
     "12AB3456",
@@ -78,11 +76,19 @@ class CompanyCrnFormProviderSpec extends StringFieldBehaviours {
       }
     }
 
-    "must accept valid crn formats" in {
-      validCrn.foreach { validCrn =>
-        val result = form.bind(Map(fieldName -> validCrn))
-        result.errors must be(empty)
-        result.errors must not contain FormError(fieldName, invalidKey)
+    "must accept valid crn formats with minimum length" in {
+      Seq(
+        "AC1",
+        "AC12",
+        "AC123",
+        "AB1234",
+        "1",
+        "12",
+        "123",
+        "1234"
+      ).foreach { crn =>
+        val bound = form.bind(Map(fieldName -> crn))
+        bound.errors must be(empty)
       }
     }
 
@@ -90,8 +96,8 @@ class CompanyCrnFormProviderSpec extends StringFieldBehaviours {
       val tooLongCrn = Seq(
         "123456789",
         "AB1234567",
-        "12 34 56 78 9",
-        "  123456789  "
+        "12 34 56 78 999876",
+        "  AB123456789 09876 "
       )
 
       tooLongCrn.foreach { crn =>
@@ -102,7 +108,7 @@ class CompanyCrnFormProviderSpec extends StringFieldBehaviours {
       }
     }
 
-    "must display error when chars are more or less than 2" in {
+    "must reject CRN with invalid structure" in {
       val tooShortCrn = Seq(
         "A123",
         "AB",

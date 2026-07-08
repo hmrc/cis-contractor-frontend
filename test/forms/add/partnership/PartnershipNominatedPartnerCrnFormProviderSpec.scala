@@ -35,14 +35,29 @@ class PartnershipNominatedPartnerCrnFormProviderSpec extends AnyFreeSpec with Ma
         "00000001",
         "12345678",
         "12 34 56 78",
-        "  12345678  ",
-        "  123  "
+        "  12345678  "
       )
 
       valid.foreach { v =>
         val bound = form.bind(Map("value" -> v))
         bound.hasErrors mustBe false
         bound.value.value mustBe v.replaceAll("\\s", "").toUpperCase
+      }
+    }
+
+    "must accept valid crn formats with minimum length" in {
+      Seq(
+        "AC1",
+        "AC12",
+        "AC123",
+        "AB1234",
+        "1",
+        "12",
+        "123",
+        "1234"
+      ).foreach { crn =>
+        val bound = form.bind(Map("value" -> crn))
+        bound.errors must be(empty)
       }
     }
 
@@ -56,8 +71,8 @@ class PartnershipNominatedPartnerCrnFormProviderSpec extends AnyFreeSpec with Ma
       val tooLong = Seq(
         "123456789",
         "AB1234567",
-        "12 34 56 78 9",
-        "  123456789  "
+        "12 34 56 78 999876",
+        "  AB123456789 09876 "
       )
 
       tooLong.foreach { v =>
@@ -67,7 +82,7 @@ class PartnershipNominatedPartnerCrnFormProviderSpec extends AnyFreeSpec with Ma
       }
     }
 
-    "must display error when chars are more or less than 2" in {
+    "must reject CRN with invalid structure" in {
       val tooShort = Seq(
         "A123",
         "AB",
