@@ -62,7 +62,7 @@ class AddCompanyContactMethodsYesNoSummarySpec extends AnyFreeSpec with Matchers
       changeAction.content.asHtml.toString    should include(expectedChangeText)
       changeAction.href                     shouldBe expectedHref
       changeAction.visuallyHiddenText.value shouldBe expectedHiddenText
-      changeAction.attributes                 should contain("id" -> "company-contact-methods-yes-no")
+      changeAction.attributes                 should contain("id" -> "add-company-contact-details")
     }
 
     "must return a SummaryListRow with 'No' when the answer is false" in {

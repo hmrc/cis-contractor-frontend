@@ -39,7 +39,7 @@ object AddCompanyContactMethodsYesNoSummary {
             controllers.add.company.routes.AddCompanyContactMethodsYesNoController.onPageLoad(CheckMode).url
           )
             .withVisuallyHiddenText(messages("addCompanyContactMethodsYesNo.change.hidden"))
-            .withAttribute("id" -> "company-contact-methods-yes-no")
+            .withAttribute("id" -> "add-company-contact-details")
         )
       )
     }

@@ -198,7 +198,10 @@ class PartnershipContactMethodOptionsControllerSpec extends SpecBase with Mockit
 
       running(application) {
         val request =
-          FakeRequest(POST, controllers.add.partnership.routes.PartnershipContactMethodOptionsController.onPageLoad(CheckMode).url)
+          FakeRequest(
+            POST,
+            controllers.add.partnership.routes.PartnershipContactMethodOptionsController.onPageLoad(CheckMode).url
+          )
             .withFormUrlEncodedBody(
               ("value[0]", ContactMethodOptions.Email.toString),
               ("value[1]", ContactMethodOptions.Phone.toString)
@@ -207,7 +210,9 @@ class PartnershipContactMethodOptionsControllerSpec extends SpecBase with Mockit
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.add.partnership.routes.PartnershipCheckYourAnswersController
+        redirectLocation(
+          result
+        ).value mustEqual controllers.add.partnership.routes.PartnershipCheckYourAnswersController
           .onPageLoad()
           .url
       }
@@ -230,7 +235,10 @@ class PartnershipContactMethodOptionsControllerSpec extends SpecBase with Mockit
 
       running(application) {
         val request =
-          FakeRequest(POST, controllers.add.partnership.routes.PartnershipContactMethodOptionsController.onPageLoad(CheckMode).url)
+          FakeRequest(
+            POST,
+            controllers.add.partnership.routes.PartnershipContactMethodOptionsController.onPageLoad(CheckMode).url
+          )
             .withFormUrlEncodedBody(
               ("value[0]", ContactMethodOptions.Email.toString),
               ("value[1]", ContactMethodOptions.Phone.toString)
@@ -265,7 +273,10 @@ class PartnershipContactMethodOptionsControllerSpec extends SpecBase with Mockit
 
       running(application) {
         val request =
-          FakeRequest(POST, controllers.add.partnership.routes.PartnershipContactMethodOptionsController.onPageLoad(CheckMode).url)
+          FakeRequest(
+            POST,
+            controllers.add.partnership.routes.PartnershipContactMethodOptionsController.onPageLoad(CheckMode).url
+          )
             .withFormUrlEncodedBody(
               ("value[0]", ContactMethodOptions.Email.toString),
               ("value[1]", ContactMethodOptions.Mobile.toString)
