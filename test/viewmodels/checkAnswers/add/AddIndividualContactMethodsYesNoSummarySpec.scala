@@ -88,15 +88,15 @@ class AddIndividualContactMethodsYesNoSummarySpec extends AnyFreeSpec with Match
       val actions = row.actions.value.items
       actions should have size 1
 
-      val changeAction = actions.head
+      val changeAction       = actions.head
       val expectedChangeText = messages("site.change")
-      val expectedHref = routes.AddIndividualContactMethodsYesNoController.onPageLoad(AmendMode).url
+      val expectedHref       = routes.AddIndividualContactMethodsYesNoController.onPageLoad(AmendMode).url
       val expectedHiddenText = messages("addIndividualContactMethodsYesNo.change.hidden")
 
-      changeAction.content.asHtml.toString should include(expectedChangeText)
-      changeAction.href shouldBe expectedHref
+      changeAction.content.asHtml.toString    should include(expectedChangeText)
+      changeAction.href                     shouldBe expectedHref
       changeAction.visuallyHiddenText.value shouldBe expectedHiddenText
-      changeAction.attributes should contain("id" -> "individual-contact-methods-yes-no")
+      changeAction.attributes                 should contain("id" -> "individual-contact-methods-yes-no")
     }
 
     "must return a SummaryListRow with 'No' when the answer is false" in {
