@@ -17,7 +17,7 @@
 package views.add.company
 
 import forms.add.company.CompanyCrnFormProvider
-import models.NormalMode
+import models.{AmendMode, NormalMode}
 import org.jsoup.nodes.Document
 import org.jsoup.select.Elements
 import org.scalatest.matchers.must.Matchers
@@ -57,6 +57,32 @@ class CompanyCrnViewSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSu
       doc.select("input[name=value]").size() mustBe 1
 
       doc.select(".govuk-button").text() mustBe messages("site.continue")
+    }
+
+    "render the page with title, heading, input and update button for Amend journey" in new Setup {
+
+      val companyName = "Test Company"
+
+      val html: HtmlFormat.Appendable = view(form, AmendMode, companyName)
+      val doc: Document               = org.jsoup.Jsoup.parse(html.toString())
+
+      doc.select("title").text() must include(messages("companyCrn.title"))
+
+      val heading: Elements = doc.select("h1")
+      heading.text() mustBe messages("companyCrn.heading", companyName)
+
+      val hint: Elements = doc.select(".govuk-hint")
+      hint.text() mustBe messages("companyCrn.hint")
+
+      doc
+        .select("form")
+        .attr("action") mustBe controllers.add.company.routes.CompanyCrnController
+        .onSubmit(AmendMode)
+        .url
+
+      doc.select("input[name=value]").size() mustBe 1
+
+      doc.select(".govuk-button").text() mustBe messages("site.update")
     }
 
     "display error summary and inline error when no utr is entered" in new Setup {

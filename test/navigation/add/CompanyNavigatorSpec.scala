@@ -327,6 +327,14 @@ class CompanyNavigatorSpec extends SpecBase {
         ) mustBe CompanyAmendCYA
       }
 
+      "must go from a CompanyCrnPage to Company CYA in AmendMode" in {
+        navigator.nextPage(
+          CompanyCrnPage,
+          AmendMode,
+          emptyUserAnswers
+        ) mustBe CompanyAmendCYA
+      }
+
       "must go from CompanyCrnYesNoPage" - {
         "to CompanyCrnPage when answer is Yes and CompanyCrnPage is not answered before" in {
           val answers = emptyUserAnswers.setOrException(CompanyCrnYesNoPage, true)
