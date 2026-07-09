@@ -31,7 +31,9 @@ class IndividualNavigatorSpec extends SpecBase {
   val navigator                    = new IndividualNavigator
   private lazy val journeyRecovery = routes.JourneyRecoveryController.onPageLoad()
   private lazy val CYA             = controllers.add.routes.CheckYourAnswersController.onPageLoad()
-  private lazy val AmendCYA        = routes.JourneyRecoveryController.onPageLoad() //TODO when available controllers.add.routes.AmendCheckYourAnswersController.onPageLoad()
+  private lazy val AmendCYA        =
+    routes.JourneyRecoveryController
+      .onPageLoad() // TODO when available controllers.add.routes.AmendCheckYourAnswersController.onPageLoad()
 
   "IndividualNavigator" - {
 
