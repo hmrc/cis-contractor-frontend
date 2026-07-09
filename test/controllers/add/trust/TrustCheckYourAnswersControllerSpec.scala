@@ -20,7 +20,7 @@ import base.SpecBase
 import controllers.routes
 import models.{TypeOfSubcontractor, UserAnswers}
 import models.address.{Address, Country}
-import models.contact.ContactOptions
+import models.contact.ContactMethodOptions
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{never, verify, verifyNoMoreInteractions, when}
 import org.scalatestplus.mockito.MockitoSugar.mock
@@ -50,7 +50,7 @@ class TrustCheckYourAnswersControllerSpec extends SpecBase {
       .set(TrustAddressYesNoPage, false)
       .success
       .value
-      .set(TrustContactOptionsPage, ContactOptions.NoDetails)
+      .set(AddTrustContactMethodsYesNoPage, false)
       .success
       .value
       .set(TrustUtrYesNoPage, false)
@@ -64,15 +64,7 @@ class TrustCheckYourAnswersControllerSpec extends SpecBase {
 
     "must return OK and the correct view for a GET when trust optionals are not present" in {
 
-      val ua = minUa
-        .set(TrustContactOptionsPage, ContactOptions.Email)
-        .success
-        .value
-        .set(TrustEmailAddressPage, "one@two.three")
-        .success
-        .value
-
-      val application = applicationBuilder(userAnswers = Some(ua)).build()
+      val application = applicationBuilder(userAnswers = Some(minUa)).build()
 
       running(application) {
         val request = FakeRequest(GET, controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad().url)
@@ -95,10 +87,22 @@ class TrustCheckYourAnswersControllerSpec extends SpecBase {
       )
 
       val ua = minUa
-        .set(TrustContactOptionsPage, ContactOptions.Email)
+        .set(AddTrustContactMethodsYesNoPage, true)
+        .success
+        .value
+        .set(
+          TrustContactMethodOptionsPage,
+          Set(ContactMethodOptions.Email, ContactMethodOptions.Phone, ContactMethodOptions.Mobile)
+        )
         .success
         .value
         .set(TrustEmailAddressPage, "one@two.three")
+        .success
+        .value
+        .set(TrustPhoneNumberPage, "11111111")
+        .success
+        .value
+        .set(TrustMobileNumberPage, "22222222")
         .success
         .value
         .set(TrustAddressYesNoPage, true)
@@ -128,7 +132,12 @@ class TrustCheckYourAnswersControllerSpec extends SpecBase {
 
         status(result) mustEqual OK
         contentAsString(result) must include("Test Trust")
+        contentAsString(result) must include("Email address")
+        contentAsString(result) must include("Phone number")
+        contentAsString(result) must include("Mobile number")
         contentAsString(result) must include("one@two.three")
+        contentAsString(result) must include("11111111")
+        contentAsString(result) must include("22222222")
         contentAsString(result) must include("1234567890")
         contentAsString(result) must include("WRN-001")
       }
@@ -136,9 +145,41 @@ class TrustCheckYourAnswersControllerSpec extends SpecBase {
 
     "contact option validation" - {
 
+      "must return OK when Email is selected and an email is present" in {
+        val ua = minUa
+          .set(AddTrustContactMethodsYesNoPage, true)
+          .success
+          .value
+          .set(
+            TrustContactMethodOptionsPage,
+            Set(ContactMethodOptions.Email)
+          )
+          .success
+          .value
+          .set(TrustEmailAddressPage, "one@two.three")
+          .success
+          .value
+
+        val application = applicationBuilder(userAnswers = Some(ua)).build()
+
+        running(application) {
+          val request = FakeRequest(GET, controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad().url)
+          val result  = route(application, request).value
+
+          status(result) mustEqual OK
+          contentAsString(result) must include("one@two.three")
+        }
+      }
+
       "must return OK when Phone is selected and a phone number is present" in {
         val ua = minUa
-          .set(TrustContactOptionsPage, ContactOptions.Phone)
+          .set(AddTrustContactMethodsYesNoPage, true)
+          .success
+          .value
+          .set(
+            TrustContactMethodOptionsPage,
+            Set(ContactMethodOptions.Phone)
+          )
           .success
           .value
           .set(TrustPhoneNumberPage, "01234567890")
@@ -158,7 +199,13 @@ class TrustCheckYourAnswersControllerSpec extends SpecBase {
 
       "must return OK when Mobile is selected and a mobile number is present" in {
         val ua = minUa
-          .set(TrustContactOptionsPage, ContactOptions.Mobile)
+          .set(AddTrustContactMethodsYesNoPage, true)
+          .success
+          .value
+          .set(
+            TrustContactMethodOptionsPage,
+            Set(ContactMethodOptions.Mobile)
+          )
           .success
           .value
           .set(TrustMobileNumberPage, "07123456789")
@@ -176,22 +223,15 @@ class TrustCheckYourAnswersControllerSpec extends SpecBase {
         }
       }
 
-      "must return OK when NoDetails is selected and no contact details are present" in {
-        val ua = minUa
-
-        val application = applicationBuilder(userAnswers = Some(ua)).build()
-
-        running(application) {
-          val request = FakeRequest(GET, controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad().url)
-          val result  = route(application, request).value
-
-          status(result) mustEqual OK
-        }
-      }
-
       "must redirect to Journey Recovery when Email is selected but the email address is missing" in {
         val ua = minUa
-          .set(TrustContactOptionsPage, ContactOptions.Email)
+          .set(AddTrustContactMethodsYesNoPage, true)
+          .success
+          .value
+          .set(
+            TrustContactMethodOptionsPage,
+            Set(ContactMethodOptions.Email)
+          )
           .success
           .value
         // TrustEmailAddressPage deliberately omitted
@@ -209,7 +249,13 @@ class TrustCheckYourAnswersControllerSpec extends SpecBase {
 
       "must redirect to Journey Recovery when Phone is selected but the phone number is missing" in {
         val ua = minUa
-          .set(TrustContactOptionsPage, ContactOptions.Phone)
+          .set(AddTrustContactMethodsYesNoPage, true)
+          .success
+          .value
+          .set(
+            TrustContactMethodOptionsPage,
+            Set(ContactMethodOptions.Phone)
+          )
           .success
           .value
         // TrustPhoneNumberPage deliberately omitted
@@ -227,7 +273,13 @@ class TrustCheckYourAnswersControllerSpec extends SpecBase {
 
       "must redirect to Journey Recovery when Mobile is selected but the mobile number is missing" in {
         val ua = minUa
-          .set(TrustContactOptionsPage, ContactOptions.Mobile)
+          .set(AddTrustContactMethodsYesNoPage, true)
+          .success
+          .value
+          .set(
+            TrustContactMethodOptionsPage,
+            Set(ContactMethodOptions.Mobile)
+          )
           .success
           .value
         // TrustMobileNumberPage deliberately omitted
@@ -243,9 +295,9 @@ class TrustCheckYourAnswersControllerSpec extends SpecBase {
         }
       }
 
-      "must redirect to Journey Recovery when NoDetails is selected but stale contact data remains in the session" in {
+      "must redirect to Journey Recovery when AddTrustContactMethodsYesNoPage is false but stale contact data remains in the session" in {
         val ua = minUa
-          .set(TrustContactOptionsPage, ContactOptions.NoDetails)
+          .set(AddTrustContactMethodsYesNoPage, false)
           .success
           .value
           .set(TrustEmailAddressPage, "stale@email.com")
@@ -255,7 +307,26 @@ class TrustCheckYourAnswersControllerSpec extends SpecBase {
         val application = applicationBuilder(userAnswers = Some(ua)).build()
 
         running(application) {
-          val request = FakeRequest(GET, controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad().url)
+          val request =
+            FakeRequest(GET, controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad().url)
+          val result  = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value must include("/there-is-a-problem")
+        }
+      }
+
+      "must redirect to Journey Recovery when AddTrustContactMethodsYesNoPage is true but TrustContactMethodOptionsPage answer is missing" in {
+        val ua = minUa
+          .set(AddTrustContactMethodsYesNoPage, true)
+          .success
+          .value
+
+        val application = applicationBuilder(userAnswers = Some(ua)).build()
+
+        running(application) {
+          val request =
+            FakeRequest(GET, controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad().url)
           val result  = route(application, request).value
 
           status(result) mustEqual SEE_OTHER
@@ -268,13 +339,16 @@ class TrustCheckYourAnswersControllerSpec extends SpecBase {
 
       "must return OK when switching from Email to Phone and stale email is cleaned up" in {
         val ua = minUa
-          .set(TrustContactOptionsPage, ContactOptions.Email)
+          .set(AddTrustContactMethodsYesNoPage, true)
+          .success
+          .value
+          .set(TrustContactMethodOptionsPage, Set(ContactMethodOptions.Email))
           .success
           .value
           .set(TrustEmailAddressPage, "old@email.com")
           .success
           .value
-          .set(TrustContactOptionsPage, ContactOptions.Phone)
+          .set(TrustContactMethodOptionsPage, Set(ContactMethodOptions.Phone))
           .success
           .value // cleanup removes email
           .set(TrustPhoneNumberPage, "01234567890")
@@ -288,19 +362,23 @@ class TrustCheckYourAnswersControllerSpec extends SpecBase {
           val result  = route(application, request).value
 
           status(result) mustEqual OK
+          contentAsString(result) mustNot include("old@email.com")
           contentAsString(result) must include("01234567890")
         }
       }
 
       "must return OK when switching from Phone to Mobile and stale phone number is cleaned up" in {
         val ua = minUa
-          .set(TrustContactOptionsPage, ContactOptions.Phone)
+          .set(AddTrustContactMethodsYesNoPage, true)
+          .success
+          .value
+          .set(TrustContactMethodOptionsPage, Set(ContactMethodOptions.Phone))
           .success
           .value
           .set(TrustPhoneNumberPage, "01234567890")
           .success
           .value
-          .set(TrustContactOptionsPage, ContactOptions.Mobile)
+          .set(TrustContactMethodOptionsPage, Set(ContactMethodOptions.Mobile))
           .success
           .value // cleanup removes phone
           .set(TrustMobileNumberPage, "07123456789")
@@ -314,19 +392,23 @@ class TrustCheckYourAnswersControllerSpec extends SpecBase {
           val result  = route(application, request).value
 
           status(result) mustEqual OK
+          contentAsString(result) mustNot include("01234567890")
           contentAsString(result) must include("07123456789")
         }
       }
 
-      "must return OK when switching from Email to NoDetails and stale email is cleaned up" in {
+      "must return OK when switching from Email to to AddTrustContactMethodsYesNoPage false and stale email is cleaned up" in {
         val ua = minUa
-          .set(TrustContactOptionsPage, ContactOptions.Email)
+          .set(AddTrustContactMethodsYesNoPage, true)
+          .success
+          .value
+          .set(TrustContactMethodOptionsPage, Set(ContactMethodOptions.Email))
           .success
           .value
           .set(TrustEmailAddressPage, "old@email.com")
           .success
           .value
-          .set(TrustContactOptionsPage, ContactOptions.NoDetails)
+          .set(AddTrustContactMethodsYesNoPage, false)
           .success
           .value // cleanup removes email
 
@@ -337,6 +419,7 @@ class TrustCheckYourAnswersControllerSpec extends SpecBase {
           val result  = route(application, request).value
 
           status(result) mustEqual OK
+          contentAsString(result) mustNot include("old@email.com")
         }
       }
     }

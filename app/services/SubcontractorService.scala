@@ -82,23 +82,11 @@ class SubcontractorService @Inject() (
 
   private case class ContactDetails(email: Option[String], phone: Option[String], mobile: Option[String])
 
-  private def partnershipContactDetailsFromUserAnswers(userAnswers: UserAnswers): ContactDetails =
-    userAnswers.get(PartnershipChooseContactDetailsPage) match {
-      case Some(ContactOptions.Email)     => ContactDetails(userAnswers.get(PartnershipEmailAddressPage), None, None)
-      case Some(ContactOptions.Phone)     => ContactDetails(None, userAnswers.get(PartnershipPhoneNumberPage), None)
-      case Some(ContactOptions.Mobile)    => ContactDetails(None, None, userAnswers.get(PartnershipMobileNumberPage))
-      case Some(ContactOptions.NoDetails) => ContactDetails(None, None, None)
-      case _                              => ContactDetails(None, None, None)
-    }
-
   private def partnershipPayloadFromUserAnswers(
     cisId: String,
     subcontractorType: TypeOfSubcontractor,
     userAnswers: UserAnswers
-  ): PartnershipPayload = {
-
-    val contactDetails = partnershipContactDetailsFromUserAnswers(userAnswers)
-
+  ): PartnershipPayload =
     PartnershipPayload(
       cisId = cisId,
       subcontractorType = subcontractorType,
@@ -114,12 +102,11 @@ class SubcontractorService @Inject() (
       county = userAnswers.get(PartnershipAddressPage).flatMap(_.addressLine4),
       postcode = userAnswers.get(PartnershipAddressPage).flatMap(_.postcode),
       country = userAnswers.get(PartnershipAddressPage).flatMap(_.country).flatMap(_.name),
-      emailAddress = contactDetails.email,
-      phoneNumber = contactDetails.phone,
-      mobilePhoneNumber = contactDetails.mobile,
+      emailAddress = userAnswers.get(PartnershipEmailAddressPage),
+      phoneNumber = userAnswers.get(PartnershipPhoneNumberPage),
+      mobilePhoneNumber = userAnswers.get(PartnershipMobileNumberPage),
       worksReferenceNumber = userAnswers.get(PartnershipWorksReferenceNumberPage)
     )
-  }
 
   private def individualContactDetailsFromUserAnswers(userAnswers: UserAnswers): ContactDetails =
     userAnswers.get(IndividualChooseContactDetailsPage) match {
@@ -195,22 +182,11 @@ class SubcontractorService @Inject() (
     )
   }
 
-  private def trustContactDetailsFromUserAnswers(userAnswers: UserAnswers): ContactDetails =
-    userAnswers.get(TrustContactOptionsPage) match {
-      case Some(ContactOptions.Email)     => ContactDetails(userAnswers.get(TrustEmailAddressPage), None, None)
-      case Some(ContactOptions.Phone)     => ContactDetails(None, userAnswers.get(TrustPhoneNumberPage), None)
-      case Some(ContactOptions.Mobile)    => ContactDetails(None, None, userAnswers.get(TrustMobileNumberPage))
-      case Some(ContactOptions.NoDetails) => ContactDetails(None, None, None)
-      case _                              => ContactDetails(None, None, None)
-    }
-
   private def trustPayloadFromUserAnswers(
     cisId: String,
     subcontractorType: TypeOfSubcontractor,
     userAnswers: UserAnswers
-  ): TrustPayload = {
-    val contactDetails = trustContactDetailsFromUserAnswers(userAnswers)
-
+  ): TrustPayload =
     TrustPayload(
       cisId = cisId,
       subcontractorType = subcontractorType,
@@ -222,10 +198,9 @@ class SubcontractorService @Inject() (
       county = userAnswers.get(TrustAddressPage).flatMap(_.addressLine4),
       postcode = userAnswers.get(TrustAddressPage).flatMap(_.postcode),
       country = userAnswers.get(TrustAddressPage).flatMap(_.country).flatMap(_.name),
-      emailAddress = contactDetails.email,
-      phoneNumber = contactDetails.phone,
-      mobilePhoneNumber = contactDetails.mobile,
+      emailAddress = userAnswers.get(TrustEmailAddressPage),
+      phoneNumber = userAnswers.get(TrustPhoneNumberPage),
+      mobilePhoneNumber = userAnswers.get(TrustMobileNumberPage),
       worksReferenceNumber = userAnswers.get(TrustWorksReferencePage)
     )
-  }
 }

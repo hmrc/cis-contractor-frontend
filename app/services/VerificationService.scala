@@ -17,12 +17,13 @@
 package services
 
 import connectors.ConstructionIndustrySchemeConnector
-import models.{Subcontractor, UserAnswers}
-import models.requests.CreateVerificationBatchAndVerificationsRequest
-import models.requests.CreateSubmissionForVerificationRequest
-import models.response.CreateSubmissionForVerificationResponse
-import pages.verify.{CurrentVerificationBatchResponsePage, NewestVerificationBatchResponsePage, UnverifiedSubcontractorsPage}
-import models.requests.ModifyVerificationsRequest
+import models.agent.AgentClientData
+import models.{EmployerReference, Subcontractor, UserAnswers}
+import models.requests.*
+import models.response.{ChrisPollResponse, ChrisSubmissionResponse, CreateSubmissionForVerificationResponse}
+import models.verify.*
+import pages.verify.*
+import play.api.mvc.AnyContent
 import queries.CisIdQuery
 import repositories.SessionRepository
 import uk.gov.hmrc.http.HeaderCarrier
@@ -33,6 +34,8 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class VerificationService @Inject() (
   cisConnector: ConstructionIndustrySchemeConnector,
+  cisManageService: CisManageService,
+  chrisVerificationRequestBuilder: ChrisVerificationRequestBuilder,
   sessionRepository: SessionRepository
 )(implicit ec: ExecutionContext) {
 
@@ -136,9 +139,97 @@ class VerificationService @Inject() (
       _            <- sessionRepository.set(afterNewest)
     } yield afterNewest
 
-  def createSubmissionForVerification(
+  def createSubmitAndPersistVerificationSubmission(implicit
+    request: DataRequest[AnyContent],
+    hc: HeaderCarrier
+  ): Future[ChrisSubmissionResponse] =
+    for {
+      latestUa      <- getCurrentVerificationBatch(request.userAnswers)
+      createRequest <- buildCreateSubmissionRequest(latestUa)
+      submissionId  <- createSubmissionForVerification(createRequest).map(_.submissionId)
+      response      <- submitVerificationToChris(submissionId, latestUa)
+      updatedUa     <- saveVerificationSubmissionDetailsToSession(latestUa, response)
+    } yield response
+
+  def pollStatusAndPersist(
+    ua: UserAnswers,
+    submissionDetails: VerificationSubmissionDetails
+  )(implicit hc: HeaderCarrier): Future[ChrisPollResponse] =
+    for {
+      pollUrl       <- required(submissionDetails.pollUrl, "Poll URL missing in submission details")
+      response      <- cisConnector.getSubmissionStatus(pollUrl, submissionDetails.submissionId)
+      updatedDetails = VerificationSubmissionDetailsBuilder.updateFromPollResponse(submissionDetails, response)
+      updatedUa     <- saveVerificationPollDetailsToSession(ua, updatedDetails)
+    } yield response
+
+  private def createSubmissionForVerification(
     request: CreateSubmissionForVerificationRequest
   )(implicit hc: HeaderCarrier): Future[CreateSubmissionForVerificationResponse] =
     cisConnector.createSubmissionForVerification(request)
 
+  private def submitVerificationToChris(
+    submissionId: Long,
+    ua: UserAnswers
+  )(implicit request: DataRequest[AnyContent], hc: HeaderCarrier): Future[ChrisSubmissionResponse] =
+    for {
+      employerReference <- resolveEmployerReference(request.userId, request.isAgent, request.employerReference)
+      chrisRequest      <- chrisVerificationRequestBuilder.build(ua, request.isAgent, employerReference)
+      result            <- cisConnector.submitVerificationToChris(submissionId, chrisRequest)
+    } yield result
+
+  private def buildCreateSubmissionRequest(
+    ua: UserAnswers
+  ): Future[CreateSubmissionForVerificationRequest] =
+    CreateSubmissionForVerificationRequestBuilder
+      .build(ua)
+      .fold(
+        error => Future.failed(new RuntimeException(error)),
+        request => Future.successful(request)
+      )
+
+  private def resolveEmployerReference(
+    userId: String,
+    isAgent: Boolean,
+    employerReference: Option[EmployerReference]
+  )(implicit hc: HeaderCarrier): Future[EmployerReference] =
+    if (isAgent) {
+      cisManageService.getAgentClient(userId).flatMap {
+        case Some(data) => Future.successful(EmployerReference(data.taxOfficeNumber, data.taxOfficeReference))
+        case None       => Future.failed(new RuntimeException("Employer reference missing for agent user"))
+      }
+    } else {
+      employerReference match {
+        case Some(er) => Future.successful(er)
+        case None     => Future.failed(new RuntimeException("Employer reference missing for non-agent user"))
+      }
+    }
+
+  private def saveVerificationSubmissionDetailsToSession(
+    ua: UserAnswers,
+    response: ChrisSubmissionResponse
+  ): Future[UserAnswers] = {
+    val details = VerificationSubmissionDetailsBuilder.fromSubmissionResponse(response)
+
+    ua.set(VerificationSubmissionDetailsPage, details)
+      .fold(
+        error => Future.failed(error),
+        updatedUa => sessionRepository.set(updatedUa).map(_ => updatedUa)
+      )
+  }
+
+  private def saveVerificationPollDetailsToSession(
+    ua: UserAnswers,
+    details: VerificationSubmissionDetails
+  ): Future[UserAnswers] =
+    ua.set(VerificationSubmissionDetailsPage, details)
+      .fold(
+        error => Future.failed(error),
+        updatedUa => sessionRepository.set(updatedUa).map(_ => updatedUa)
+      )
+
+  private def required[A](value: Option[A], errorMsg: String): Future[A] =
+    value match {
+      case Some(v) => Future.successful(v)
+      case None    => Future.failed(new RuntimeException(errorMsg))
+    }
 }

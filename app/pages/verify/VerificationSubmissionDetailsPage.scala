@@ -14,18 +14,15 @@
  * limitations under the License.
  */
 
-package forms.add.trust
+package pages.verify
 
-import forms.mappings.Mappings
-import models.add.trust.TrustContactOptions
-import play.api.data.Form
+import models.verify.VerificationSubmissionDetails
+import pages.QuestionPage
+import play.api.libs.json.JsPath
 
-import javax.inject.Inject
+case object VerificationSubmissionDetailsPage extends QuestionPage[VerificationSubmissionDetails] {
 
-class TrustContactOptionsFormProvider @Inject() extends Mappings {
+  override def path: JsPath = JsPath \ toString
 
-  def apply(): Form[TrustContactOptions] =
-    Form(
-      "value" -> enumerable[TrustContactOptions]("trustContactOptions.error.required")
-    )
+  override def toString: String = "verificationSubmissionDetails"
 }

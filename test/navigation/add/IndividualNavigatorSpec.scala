@@ -323,7 +323,6 @@ class IndividualNavigatorSpec extends SpecBase {
     "in Amend mode" - {
 
       "must go from a page that doesn't exist in the edit route map to CheckYourAnswers" in {
-
         case object UnknownPage extends Page
         navigator.nextPage(
           UnknownPage,
@@ -332,20 +331,85 @@ class IndividualNavigatorSpec extends SpecBase {
         ) mustBe journeyRecovery // TODO: when CYA page available
       }
 
-      "must go from SubTradingNameYesNoPage to TradingNameOfSubcontractorController when true" in {
+      "must go from SubTradingNameYesNoPage to SubcontractorNameController when answer is No and name is missing" in {
+        val ua =
+          emptyUserAnswers
+            .set(SubTradingNameYesNoPage, false)
+            .success
+            .value
+
         navigator.nextPage(
           SubTradingNameYesNoPage,
           AmendMode,
-          emptyUserAnswers.setOrException(SubTradingNameYesNoPage, true)
+          ua
+        ) mustBe controllers.add.routes.SubcontractorNameController.onPageLoad(AmendMode)
+      }
+
+      "must go from SubTradingNameYesNoPage to Amend CYA when answer is No and subcontractor name already exists" in {
+        val ua =
+          emptyUserAnswers
+            .set(SubTradingNameYesNoPage, false)
+            .success
+            .value
+            .set(SubcontractorNamePage, SubcontractorName("Jane", None, "Doe"))
+            .success
+            .value
+
+        navigator.nextPage(
+          SubTradingNameYesNoPage,
+          AmendMode,
+          ua
+        ) mustBe journeyRecovery // TODO: this needs to be redirected to amend cya page when it's implemented
+      }
+
+      "must go from SubTradingNameYesNoPage to TradingNameOfSubcontractorController when answer is Yes and trading name is missing" in {
+        val ua =
+          emptyUserAnswers
+            .set(SubTradingNameYesNoPage, true)
+            .success
+            .value
+
+        navigator.nextPage(
+          SubTradingNameYesNoPage,
+          AmendMode,
+          ua
         ) mustBe controllers.add.routes.TradingNameOfSubcontractorController.onPageLoad(AmendMode)
       }
 
-      "must go from SubTradingNameYesNoPage to journey recovery page when incomplete info provided" in {
+      "must go from SubTradingNameYesNoPage to Amend CYA when answer is Yes and trading name already exists" in {
+        val ua =
+          emptyUserAnswers
+            .set(SubTradingNameYesNoPage, true)
+            .success
+            .value
+            .set(TradingNameOfSubcontractorPage, "ACME Construction")
+            .success
+            .value
+
+        navigator.nextPage(
+          SubTradingNameYesNoPage,
+          AmendMode,
+          ua
+        ) mustBe journeyRecovery // TODO: this needs to be redirected to amend cya page when it's implemented
+      }
+
+      "must go from SubTradingNameYesNoPage to JourneyRecovery when SubTradingNameYesNoPage answer is missing" in {
         navigator.nextPage(
           SubTradingNameYesNoPage,
           AmendMode,
           emptyUserAnswers
-        ) mustBe journeyRecovery // TODO: when CYA page available
+        ) mustBe journeyRecovery
+      }
+
+      "must go from SubcontractorNamePage to Amend CYA" in {
+        navigator.nextPage(
+          SubcontractorNamePage,
+          AmendMode,
+          emptyUserAnswers.setOrException(
+            SubcontractorNamePage,
+            SubcontractorName(firstName = "Jane", middleName = None, lastName = "Doe")
+          )
+        ) mustBe journeyRecovery // TODO: this needs to be redirected to amend cya page when it's implemented
       }
 
       "must go from WorksReferenceNumberYesNoPage to WorksReferenceNumberPage when true and no work reference number exists" in {
@@ -391,6 +455,27 @@ class IndividualNavigatorSpec extends SpecBase {
         ) mustBe journeyRecovery
       }
 
+      "must go from AddIndividualContactMethodsYesNoPage to amend CYA when answer is No" in {
+        val answers = emptyUserAnswers.set(AddIndividualContactMethodsYesNoPage, false).success.value
+
+        navigator.nextPage(
+          AddIndividualContactMethodsYesNoPage,
+          AmendMode,
+          answers
+        ) mustBe journeyRecovery
+      }
+
+      "must go from AddIndividualContactMethodsYesNoPage to AddIndividualContactMethodsYesNoController when answer is Yes" in {
+        val answers = emptyUserAnswers.set(AddIndividualContactMethodsYesNoPage, true).success.value
+
+        navigator.nextPage(
+          AddIndividualContactMethodsYesNoPage,
+          AmendMode,
+          answers
+        ) mustBe controllers.add.routes.AddIndividualContactMethodsYesNoController
+          .onPageLoad(AmendMode) // TODO: this needs to redirected to new check box page once its implemented
+      }
+
       "must go from IndividualEmailAddressPage to CheckYourAnswersController" in {
         navigator.nextPage(
           IndividualEmailAddressPage,
@@ -418,6 +503,43 @@ class IndividualNavigatorSpec extends SpecBase {
         ) mustBe journeyRecovery // TODO: when CYA page available
       }
 
+      "must go from a SubAddressYesNoPage to CYA page when false" in {
+        navigator.nextPage(
+          SubAddressYesNoPage,
+          AmendMode,
+          emptyUserAnswers.setOrException(SubAddressYesNoPage, false)
+        ) mustBe journeyRecovery // TODO: change this to CYA when available
+      }
+
+      "must go from SubAddressYesNoPage to journeyRecovery when true and AddressOfSubcontractorPage is already answered" in {
+        val addressSample = models.address.Address(
+          addressLine1 = "10 Example Street",
+          addressLine2 = Some("Suite 2"),
+          addressLine3 = Some("Newcastle"),
+          addressLine4 = Some("Tyne & Wear"),
+          postcode = Some("NE1 1AA"),
+          country = Some(models.address.Country(Some("GB"), Some("United Kingdom")))
+        )
+
+        val ua     =
+          emptyUserAnswers
+            .set(SubAddressYesNoPage, true)
+            .success
+            .value
+            .set(AddressOfSubcontractorPage, addressSample)
+            .success
+            .value
+        val result = navigator.nextPage(SubAddressYesNoPage, AmendMode, ua)
+        result mustBe journeyRecovery // TODO: change this to CYA when available
+      }
+
+      "must go from a SubAddressYesNoPage to journey recovery page when incomplete info provided" in {
+        navigator.nextPage(
+          SubAddressYesNoPage,
+          AmendMode,
+          emptyUserAnswers
+        ) mustBe journeyRecovery
+      }
       "must go from a NationalInsuranceNumberYesNoPage to CYA page when false" in {
         navigator.nextPage(
           NationalInsuranceNumberYesNoPage,
