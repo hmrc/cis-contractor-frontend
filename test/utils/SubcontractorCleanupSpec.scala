@@ -18,7 +18,7 @@ package utils
 
 import base.SpecBase
 import models.add.*
-import models.contact.ContactOptions
+import models.contact.{ContactMethodOptions, ContactOptions}
 import models.TypeOfSubcontractor
 import org.scalatest.freespec.AnyFreeSpec
 import utils.SubcontractorCleanup.*
@@ -208,7 +208,13 @@ class SubcontractorCleanupSpec extends SpecBase {
           .set(PartnershipAddressYesNoPage, true)
           .success
           .value
-          .set(PartnershipChooseContactDetailsPage, ContactOptions.Email)
+          .set(AddPartnershipContactMethodsYesNoPage, true)
+          .success
+          .value
+          .set(
+            PartnershipContactMethodOptionsPage,
+            Set(ContactMethodOptions.Email, ContactMethodOptions.Phone, ContactMethodOptions.Mobile)
+          )
           .success
           .value
           .set(PartnershipEmailAddressPage, email)
@@ -261,7 +267,8 @@ class SubcontractorCleanupSpec extends SpecBase {
 
       result.get(PartnershipAddressPage) mustBe None
       result.get(PartnershipAddressYesNoPage) mustBe None
-      result.get(PartnershipChooseContactDetailsPage) mustBe None
+      result.get(AddPartnershipContactMethodsYesNoPage) mustBe None
+      result.get(PartnershipContactMethodOptionsPage) mustBe None
       result.get(PartnershipEmailAddressPage) mustBe None
       result.get(PartnershipHasUtrYesNoPage) mustBe None
       result.get(PartnershipMobileNumberPage) mustBe None
@@ -292,7 +299,13 @@ class SubcontractorCleanupSpec extends SpecBase {
           .set(TrustAddressYesNoPage, true)
           .success
           .value
-          .set(TrustContactOptionsPage, ContactOptions.Email)
+          .set(AddTrustContactMethodsYesNoPage, true)
+          .success
+          .value
+          .set(
+            TrustContactMethodOptionsPage,
+            Set(ContactMethodOptions.Email, ContactMethodOptions.Phone, ContactMethodOptions.Mobile)
+          )
           .success
           .value
           .set(TrustEmailAddressPage, email)
@@ -324,7 +337,8 @@ class SubcontractorCleanupSpec extends SpecBase {
 
       result.get(TrustAddressPage) mustBe None
       result.get(TrustAddressYesNoPage) mustBe None
-      result.get(TrustContactOptionsPage) mustBe None
+      result.get(AddTrustContactMethodsYesNoPage) mustBe None
+      result.get(TrustContactMethodOptionsPage) mustBe None
       result.get(TrustEmailAddressPage) mustBe None
       result.get(TrustMobileNumberPage) mustBe None
       result.get(TrustNamePage) mustBe None
@@ -435,7 +449,13 @@ class SubcontractorCleanupSpec extends SpecBase {
           .set(PartnershipAddressYesNoPage, true)
           .success
           .value
-          .set(PartnershipChooseContactDetailsPage, ContactOptions.Email)
+          .set(AddPartnershipContactMethodsYesNoPage, true)
+          .success
+          .value
+          .set(
+            PartnershipContactMethodOptionsPage,
+            Set(ContactMethodOptions.Email, ContactMethodOptions.Phone, ContactMethodOptions.Mobile)
+          )
           .success
           .value
           .set(PartnershipEmailAddressPage, email)
@@ -489,7 +509,13 @@ class SubcontractorCleanupSpec extends SpecBase {
           .set(TrustAddressYesNoPage, true)
           .success
           .value
-          .set(TrustContactOptionsPage, ContactOptions.Email)
+          .set(AddTrustContactMethodsYesNoPage, true)
+          .success
+          .value
+          .set(
+            TrustContactMethodOptionsPage,
+            Set(ContactMethodOptions.Email, ContactMethodOptions.Phone, ContactMethodOptions.Mobile)
+          )
           .success
           .value
           .set(TrustEmailAddressPage, email)
@@ -553,7 +579,8 @@ class SubcontractorCleanupSpec extends SpecBase {
 
       result.get(PartnershipAddressPage) mustBe None
       result.get(PartnershipAddressYesNoPage) mustBe None
-      result.get(PartnershipChooseContactDetailsPage) mustBe None
+      result.get(AddPartnershipContactMethodsYesNoPage) mustBe None
+      result.get(PartnershipContactMethodOptionsPage) mustBe None
       result.get(PartnershipEmailAddressPage) mustBe None
       result.get(PartnershipHasUtrYesNoPage) mustBe None
       result.get(PartnershipMobileNumberPage) mustBe None
@@ -572,7 +599,8 @@ class SubcontractorCleanupSpec extends SpecBase {
 
       result.get(TrustAddressPage) mustBe None
       result.get(TrustAddressYesNoPage) mustBe None
-      result.get(TrustContactOptionsPage) mustBe None
+      result.get(AddTrustContactMethodsYesNoPage) mustBe None
+      result.get(TrustContactMethodOptionsPage) mustBe None
       result.get(TrustEmailAddressPage) mustBe None
       result.get(TrustMobileNumberPage) mustBe None
       result.get(TrustNamePage) mustBe None

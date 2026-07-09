@@ -14,18 +14,25 @@
  * limitations under the License.
  */
 
-package forms.add.partnership
+package models.verify
 
-import forms.mappings.Mappings
-import models.add.partnership.PartnershipChooseContactDetails
-import play.api.data.Form
+import play.api.libs.json.{Json, OFormat}
 
-import javax.inject.Inject
+import java.time.LocalDateTime
 
-class PartnershipChooseContactDetailsFormProvider @Inject() extends Mappings {
+case class VerificationSubmissionDetails(
+  submissionId: String,
+  status: String,
+  hmrcMarkGenerated: String,
+  hmrcMarkGgis: Option[String],
+  correlationId: Option[String],
+  pollUrl: Option[String],
+  pollIntervalSeconds: Option[Int],
+  submittedAt: LocalDateTime,
+  lastMessageDate: Option[LocalDateTime],
+  timedOut: Boolean
+)
 
-  def apply(): Form[PartnershipChooseContactDetails] =
-    Form(
-      "value" -> enumerable[PartnershipChooseContactDetails]("partnershipChooseContactDetails.error.required")
-    )
+object VerificationSubmissionDetails {
+  given format: OFormat[VerificationSubmissionDetails] = Json.format[VerificationSubmissionDetails]
 }
