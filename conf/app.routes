@@ -263,6 +263,8 @@ GET   /subcontractor/add/company/change-select-contact-details  controllers.add.
 POST  /subcontractor/add/company/change-select-contact-details  controllers.add.company.CompanyContactMethodOptionsController.onSubmit(mode: Mode = CheckMode)
 
 # Partnership
+GET   /subcontractor/amend/partnership  controllers.amend.partnership.AmendPartnershipController.onPageLoad()
+
 GET   /subcontractor/add/partnership/subcontractor-added  controllers.add.SubcontractorAddedController.partnershipSubcontractorAdded()
 
 GET   /subcontractor/add/partnership/partnership-name         controllers.add.partnership.PartnershipNameController.onPageLoad(mode: Mode = NormalMode)
