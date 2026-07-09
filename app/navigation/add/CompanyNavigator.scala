@@ -202,7 +202,7 @@ class CompanyNavigator @Inject() () extends NavigatorForJourney {
       case (Some(true), CheckMode | AmendMode) =>
         userAnswers
           .get(CompanyContactMethodOptionsPage)
-          .fold(controllers.add.company.routes.AddCompanyContactMethodsYesNoController.onPageLoad(mode)) { _ =>
+          .fold(controllers.add.company.routes.CompanyContactMethodOptionsController.onPageLoad(mode)) { _ =>
             cyaRoute(mode)
           }
 
