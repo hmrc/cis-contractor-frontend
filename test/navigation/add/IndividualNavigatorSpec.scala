@@ -109,15 +109,6 @@ class IndividualNavigatorSpec extends SpecBase {
         ) mustBe journeyRecovery
       }
 
-      // TODO
-      "must go from a AddressOfSubcontractorPage to AddIndividualContactMethodsYesNoController" in {
-        navigator.nextPage(
-          AddressOfSubcontractorPage,
-          NormalMode,
-          UserAnswers("id")
-        ) mustBe controllers.add.routes.AddIndividualContactMethodsYesNoController.onPageLoad(NormalMode)
-      }
-
       "must go from a NationalInsuranceNumberYesNoPage to SubNationalInsuranceNumberPage when true" in {
         navigator.nextPage(
           NationalInsuranceNumberYesNoPage,
@@ -497,6 +488,27 @@ class IndividualNavigatorSpec extends SpecBase {
           AmendMode,
           emptyUserAnswers
         ) mustBe journeyRecovery
+      }
+
+      "must go from AddIndividualContactMethodsYesNoPage to amend CYA when answer is No" in {
+        val answers = emptyUserAnswers.set(AddIndividualContactMethodsYesNoPage, false).success.value
+
+        navigator.nextPage(
+          AddIndividualContactMethodsYesNoPage,
+          AmendMode,
+          answers
+        ) mustBe journeyRecovery
+      }
+
+      "must go from AddIndividualContactMethodsYesNoPage to AddIndividualContactMethodsYesNoController when answer is Yes" in {
+        val answers = emptyUserAnswers.set(AddIndividualContactMethodsYesNoPage, true).success.value
+
+        navigator.nextPage(
+          AddIndividualContactMethodsYesNoPage,
+          AmendMode,
+          answers
+        ) mustBe controllers.add.routes.IndividualContactMethodOptionsController
+          .onPageLoad(AmendMode)
       }
 
       "must go from IndividualEmailAddressPage to CheckYourAnswersController" in {

@@ -84,29 +84,33 @@ class IndividualNavigator @Inject() () extends NavigatorForJourney {
     case AddIndividualContactMethodsYesNoPage =>
       userAnswers => navigatorFromAddIndividualContactMethodsYesNoPage(CheckMode)(userAnswers)
     case IndividualContactMethodOptionsPage   =>
-      userAnswers => nextMissingSelectedContactMethodPageAfter(current = None)(userAnswers)
+      userAnswers => nextMissingSelectedContactMethodPageAfter(current = None, CheckMode)(userAnswers)
     case IndividualEmailAddressPage           =>
-      userAnswers => nextMissingSelectedContactMethodPageAfter(current = Some(ContactMethodOptions.Email))(userAnswers)
+      userAnswers =>
+        nextMissingSelectedContactMethodPageAfter(current = Some(ContactMethodOptions.Email), CheckMode)(userAnswers)
     case IndividualPhoneNumberPage            =>
-      userAnswers => nextMissingSelectedContactMethodPageAfter(current = Some(ContactMethodOptions.Phone))(userAnswers)
+      userAnswers =>
+        nextMissingSelectedContactMethodPageAfter(current = Some(ContactMethodOptions.Phone), CheckMode)(userAnswers)
     case IndividualMobileNumberPage           =>
-      userAnswers => nextMissingSelectedContactMethodPageAfter(current = Some(ContactMethodOptions.Mobile))(userAnswers)
+      userAnswers =>
+        nextMissingSelectedContactMethodPageAfter(current = Some(ContactMethodOptions.Mobile), CheckMode)(userAnswers)
     case _                                    => _ => controllers.add.routes.CheckYourAnswersController.onPageLoad()
   }
 
   private val amendRouteMap: Page => UserAnswers => Call = {
-    case SubTradingNameYesNoPage          => navigatorFromSubTradingNameYesNoPage(AmendMode)(_)
-    case SubAddressYesNoPage              => navigatorFromSubAddressYesNoPage(AmendMode)(_)
-    case UniqueTaxpayerReferenceYesNoPage => navigatorFromUniqueTaxpayerReferenceYesNoPage(AmendMode)(_)
-    case WorksReferenceNumberYesNoPage    => navigatorFromWorksReferenceNumberYesNoPage(AmendMode)(_)
-    case NationalInsuranceNumberYesNoPage => navigatorFromNationalInsuranceNumberYesNoPage(AmendMode)(_)
-    case IndividualPhoneNumberPage        =>
+    case SubTradingNameYesNoPage              => navigatorFromSubTradingNameYesNoPage(AmendMode)(_)
+    case SubAddressYesNoPage                  => navigatorFromSubAddressYesNoPage(AmendMode)(_)
+    case UniqueTaxpayerReferenceYesNoPage     => navigatorFromUniqueTaxpayerReferenceYesNoPage(AmendMode)(_)
+    case WorksReferenceNumberYesNoPage        => navigatorFromWorksReferenceNumberYesNoPage(AmendMode)(_)
+    case NationalInsuranceNumberYesNoPage     => navigatorFromNationalInsuranceNumberYesNoPage(AmendMode)(_)
+    case IndividualPhoneNumberPage            =>
       _ => cyaRoute(AmendMode)
-    case IndividualEmailAddressPage       =>
+    case IndividualEmailAddressPage           =>
       _ => controllers.add.routes.CheckYourAnswersController.onPageLoad()
-    case IndividualMobileNumberPage       =>
+    case IndividualMobileNumberPage           =>
       _ => cyaRoute(AmendMode)
-    case _                                => _ => cyaRoute(AmendMode)
+    case AddIndividualContactMethodsYesNoPage => navigatorFromAddIndividualContactMethodsYesNoPage(AmendMode)(_)
+    case _                                    => _ => cyaRoute(AmendMode)
   }
 
   private def navigatorFromSubTradingNameYesNoPage(mode: Mode)(ua: UserAnswers): Call =
@@ -229,38 +233,40 @@ class IndividualNavigator @Inject() () extends NavigatorForJourney {
       case (Some(false), NormalMode) =>
         controllers.add.routes.UniqueTaxpayerReferenceYesNoController.onPageLoad(NormalMode)
 
-      case (Some(true), CheckMode) =>
+      case (Some(true), CheckMode | AmendMode) =>
         ua
           .get(IndividualContactMethodOptionsPage)
-          .fold(controllers.add.routes.IndividualContactMethodOptionsController.onPageLoad(CheckMode)) { _ =>
-            controllers.add.routes.CheckYourAnswersController.onPageLoad()
+          .fold(controllers.add.routes.IndividualContactMethodOptionsController.onPageLoad(mode)) { _ =>
+            cyaRoute(mode)
           }
 
-      case (Some(false), CheckMode) =>
-        controllers.add.routes.CheckYourAnswersController.onPageLoad()
+      case (Some(false), CheckMode | AmendMode) =>
+        cyaRoute(mode)
 
       case _ =>
         routes.JourneyRecoveryController.onPageLoad()
     }
 
   private def nextSelectedContactMethodPageAfter(
-    current: Option[ContactMethodOptions]
+    current: Option[ContactMethodOptions],
+    mode: Mode = NormalMode
   )(userAnswers: UserAnswers): Call =
     navigateFromContactMethodPage(current, userAnswers) { remaining =>
       remaining.headOption.fold {
-        controllers.add.routes.UniqueTaxpayerReferenceYesNoController.onPageLoad(NormalMode)
-      }(contactMethodPageCall(_, NormalMode))
+        controllers.add.routes.UniqueTaxpayerReferenceYesNoController.onPageLoad(mode)
+      }(contactMethodPageCall(_, mode))
     }
 
   private def nextMissingSelectedContactMethodPageAfter(
-    current: Option[ContactMethodOptions]
+    current: Option[ContactMethodOptions],
+    mode: Mode = NormalMode
   )(userAnswers: UserAnswers): Call =
     navigateFromContactMethodPage(current, userAnswers) { remaining =>
       remaining
         .find(isMissingAnswer(_)(userAnswers))
-        .map(contactMethodPageCall(_, CheckMode))
+        .map(contactMethodPageCall(_, mode))
         .getOrElse(
-          controllers.add.routes.CheckYourAnswersController.onPageLoad()
+          cyaRoute(mode)
         )
     }
 
