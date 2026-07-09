@@ -210,6 +210,9 @@ GET   /subcontractor/add/company/phone-number         controllers.add.company.Co
 POST  /subcontractor/add/company/phone-number         controllers.add.company.CompanyPhoneNumberController.onSubmit(mode: Mode = NormalMode)
 GET   /subcontractor/add/company/change-phone-number  controllers.add.company.CompanyPhoneNumberController.onPageLoad(mode: Mode = CheckMode)
 POST  /subcontractor/add/company/change-phone-number  controllers.add.company.CompanyPhoneNumberController.onSubmit(mode: Mode = CheckMode)
+GET   /subcontractor/amend/company/phone-number       controllers.add.company.CompanyPhoneNumberController.onPageLoad(mode: Mode = AmendMode)
+POST  /subcontractor/amend/company/phone-number       controllers.add.company.CompanyPhoneNumberController.onSubmit(mode: Mode = AmendMode)
+
 
 GET   /subcontractor/add/company/mobile-number         controllers.add.company.CompanyMobileNumberController.onPageLoad(mode: Mode = NormalMode)
 POST  /subcontractor/add/company/mobile-number         controllers.add.company.CompanyMobileNumberController.onSubmit(mode: Mode = NormalMode)

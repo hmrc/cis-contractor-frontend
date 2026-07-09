@@ -41,7 +41,7 @@ class CompanyNavigator @Inject() () extends NavigatorForJourney {
   private def cyaRoute(mode: Mode): Call = mode match {
     case AmendMode =>
       routes.JourneyRecoveryController
-        .onPageLoad() // TODO route to controllers.amend.company.routes.AmendCompanyCheckYourAnswersController.onPageLoad() when AmendCompanyCheckYourAnswersController added.
+        .onPageLoad() // TODO route to controllers.amend.routes.AmendCompanyCheckYourAnswersController.onPageLoad() when AmendIndividualCheckYourAnswersController added.
     case _         => controllers.add.company.routes.CompanyCheckYourAnswersController.onPageLoad()
   }
 
@@ -80,6 +80,7 @@ class CompanyNavigator @Inject() () extends NavigatorForJourney {
     case CompanyNamePage         => _ => cyaRoute(AmendMode)
     case CompanyEmailAddressPage => _ => cyaRoute(AmendMode)
     case CompanyMobileNumberPage => _ => cyaRoute(AmendMode)
+    case CompanyPhoneNumberPage  => _ => cyaRoute(AmendMode)
     case CompanyAddressYesNoPage => navigatorFromCompanyAddressYesNoPage(AmendMode)(_)
     case CompanyUtrYesNoPage     =>
       userAnswers => navigatorFromCompanyUtrYesNoPage(AmendMode)(userAnswers)
