@@ -94,18 +94,19 @@ class IndividualNavigator @Inject() () extends NavigatorForJourney {
   }
 
   private val amendRouteMap: Page => UserAnswers => Call = {
-    case SubTradingNameYesNoPage          => navigatorFromSubTradingNameYesNoPage(AmendMode)(_)
-    case SubAddressYesNoPage              => navigatorFromSubAddressYesNoPage(AmendMode)(_)
-    case UniqueTaxpayerReferenceYesNoPage => navigatorFromUniqueTaxpayerReferenceYesNoPage(AmendMode)(_)
-    case WorksReferenceNumberYesNoPage    => navigatorFromWorksReferenceNumberYesNoPage(AmendMode)(_)
-    case NationalInsuranceNumberYesNoPage => navigatorFromNationalInsuranceNumberYesNoPage(AmendMode)(_)
-    case IndividualPhoneNumberPage        =>
+    case SubTradingNameYesNoPage              => navigatorFromSubTradingNameYesNoPage(AmendMode)(_)
+    case SubAddressYesNoPage                  => navigatorFromSubAddressYesNoPage(AmendMode)(_)
+    case UniqueTaxpayerReferenceYesNoPage     => navigatorFromUniqueTaxpayerReferenceYesNoPage(AmendMode)(_)
+    case WorksReferenceNumberYesNoPage        => navigatorFromWorksReferenceNumberYesNoPage(AmendMode)(_)
+    case NationalInsuranceNumberYesNoPage     => navigatorFromNationalInsuranceNumberYesNoPage(AmendMode)(_)
+    case IndividualPhoneNumberPage            =>
       _ => cyaRoute(AmendMode)
-    case IndividualEmailAddressPage       =>
+    case IndividualEmailAddressPage           =>
       _ => controllers.add.routes.CheckYourAnswersController.onPageLoad()
-    case IndividualMobileNumberPage       =>
+    case IndividualMobileNumberPage           =>
       _ => cyaRoute(AmendMode)
-    case _                                => _ => cyaRoute(AmendMode)
+    case AddIndividualContactMethodsYesNoPage => navigatorFromAddIndividualContactMethodsYesNoPage(AmendMode)(_)
+    case _                                    => _ => cyaRoute(AmendMode)
   }
 
   private def navigatorFromSubTradingNameYesNoPage(mode: Mode)(ua: UserAnswers): Call =
@@ -261,6 +262,7 @@ class IndividualNavigator @Inject() () extends NavigatorForJourney {
     (ua.get(AddIndividualContactMethodsYesNoPage), mode) match {
 
       case (Some(true), _) =>
+        // TODO: it will be redirected to contact method checkbox page once that is implemented
         controllers.add.routes.AddIndividualContactMethodsYesNoController.onPageLoad(mode)
 
       case (Some(false), NormalMode) =>
