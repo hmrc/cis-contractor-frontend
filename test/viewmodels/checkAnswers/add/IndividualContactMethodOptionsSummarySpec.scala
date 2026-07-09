@@ -32,7 +32,7 @@ class IndividualContactMethodOptionsSummarySpec extends SpecBase with Matchers {
         "individualContactMethodOptions.phone"                 -> "Phone number",
         "individualContactMethodOptions.mobile"                -> "Mobile number",
         "individualContactMethodOptions.change.hidden"         -> "methods of contact",
-        "site.change"                                           -> "Change"
+        "site.change"                                          -> "Change"
       )
     )
   ).preferred(Seq(Lang("en")))
