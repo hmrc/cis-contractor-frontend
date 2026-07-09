@@ -14,17 +14,23 @@
  * limitations under the License.
  */
 
-package models.add.trust
+package pages.verify
 
-import models.contact.ContactOptions
-import play.api.i18n.Messages
-import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.RadioItem
+import base.SpecBase
+import play.api.libs.json.JsPath
 
-type TrustContactOptions = ContactOptions
+class VerificationSubmissionDetailsPageSpec extends SpecBase {
 
-object TrustContactOptions {
-  val values: Seq[TrustContactOptions] = ContactOptions.values
+  "VerificationSubmissionDetailsPage" - {
 
-  def options(implicit messages: Messages): Seq[RadioItem] =
-    ContactOptions.options("trustContactOptions")
+    "must have correct path" in {
+      VerificationSubmissionDetailsPage.path mustBe
+        JsPath \ "verificationSubmissionDetails"
+    }
+
+    "must have correct toString" in {
+      VerificationSubmissionDetailsPage.toString mustBe
+        "verificationSubmissionDetails"
+    }
+  }
 }

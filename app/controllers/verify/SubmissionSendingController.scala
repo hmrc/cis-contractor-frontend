@@ -16,17 +16,20 @@
 
 package controllers.verify
 
+import config.FrontendAppConfig
 import controllers.actions.*
-import models.requests.{CreateSubmissionForVerificationRequest, VerificationToUpdate}
-import pages.verify.CurrentVerificationBatchResponsePage
+import models.requests.DataRequest
+import models.verify.SubmissionStatus
+import models.verify.SubmissionStatus.*
+import pages.verify.VerificationSubmissionDetailsPage
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
-import queries.CisIdQuery
 import services.VerificationService
+import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.verify.SubmissionSendingView
-import models.verify.ValidatedVerify
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -37,6 +40,7 @@ class SubmissionSendingController @Inject() (
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   val controllerComponents: MessagesControllerComponents,
+  appConfig: FrontendAppConfig,
   view: SubmissionSendingView,
   verificationService: VerificationService
 )(implicit ec: ExecutionContext)
@@ -47,69 +51,69 @@ class SubmissionSendingController @Inject() (
   private def recovery: Result =
     Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
 
-  def onPageLoad(): Action[AnyContent] =
+  def onPageLoad: Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
-      verificationService
-        .getCurrentVerificationBatch(request.userAnswers)
-        .flatMap { updatedAnswers =>
-          buildSubmissionRequest(updatedAnswers) match {
-            case Left(msg) =>
-              logger.error(s"[SubmissionSendingController.onPageLoad] Failed to build submission request: $msg")
-              Future.successful(recovery)
+      implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
-            case Right(submissionReq) =>
-              verificationService
-                .createSubmissionForVerification(submissionReq)
-                .map(_ => Ok(view()))
-          }
-        }
-        .recover { case t =>
-          logger.error("[SubmissionSendingController.onPageLoad] Failed to create submission", t)
+      verificationService.createSubmitAndPersistVerificationSubmission
+        .map(response => redirectForInitialSubmissionStatus(response.status))
+        .recover { case ex =>
+          logger.error("[SubmissionSendingController.onPageLoad] Failed to create submission", ex)
           recovery
         }
     }
 
-  private def buildSubmissionRequest(
-    ua: models.UserAnswers
-  ): Either[String, CreateSubmissionForVerificationRequest] =
-    for {
-      validated <- ValidatedVerify
-                     .build(ua)
-                     .left
-                     .map(error => s"ValidatedVerify failed: $error")
+  def onPollAndRedirect: Action[AnyContent] =
+    (identify andThen getData andThen requireData).async { implicit request =>
+      implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
-      instanceId <- ua.get(CisIdQuery).toRight("CisIdQuery not found")
+      request.userAnswers.get(VerificationSubmissionDetailsPage) match {
+        case None =>
+          Future.successful(recovery)
 
-      current <- ua
-                   .get(CurrentVerificationBatchResponsePage)
-                   .toRight("CurrentVerificationBatchResponsePage not found")
+        case Some(submissionDetails) =>
+          val pollInterval =
+            submissionDetails.pollIntervalSeconds.getOrElse(appConfig.submissionPollDefaultIntervalSeconds)
 
-      batchId <- current.verificationBatch
-                   .map(_.verificationBatchId)
-                   .toRight("verificationBatchId missing")
+          verificationService
+            .pollStatusAndPersist(request.userAnswers, submissionDetails)
+            .map(response => redirectForPollSubmissionStatus(response.status, pollInterval))
+            .recover { case ex =>
+              logger.error("[SubmissionSendingController.onPollAndRedirect] Verification poll failed", ex)
+              recovery
+            }
+      }
+    }
 
-      batchRef <- current.verificationBatch
-                    .flatMap(_.verifBatchResourceRef)
-                    .toRight("verificationBatchResourceRef missing")
-    } yield {
+  private def redirectForInitialSubmissionStatus(status: String): Result =
+    SubmissionStatus.fromString(status) match {
+      case PENDING | SubmissionStatus.ACCEPTED =>
+        Redirect(controllers.verify.routes.SubmissionSendingController.onPollAndRedirect)
+      case FATAL_ERROR                         =>
+        Redirect(controllers.verify.routes.VerificationNotSubmittedWarningController.onPageLoad())
+      case _                                   =>
+        recovery
+    }
 
-      val verifications: Seq[VerificationToUpdate] =
-        current.verifications.flatMap(_.verificationResourceRef).map { ref =>
-          VerificationToUpdate(
-            subcontractorName = "Unknown",
-            verificationResourceRef = ref,
-            proceedVerification = "Y"
-          )
-        }
-
-      CreateSubmissionForVerificationRequest(
-        instanceId = instanceId,
-        verificationBatchId = batchId,
-        verificationBatchResourceRef = batchRef,
-        emailRecipient = validated.emailToUse,
-        irMarkGenerated = None,
-        verifications = verifications,
-        agentId = None
-      )
+  private def redirectForPollSubmissionStatus(status: SubmissionStatus, pollInterval: Int)(implicit
+    request: DataRequest[_]
+  ): Result =
+    status match {
+      case PENDING | SubmissionStatus.ACCEPTED =>
+        Ok(view()).withHeaders("Refresh" -> pollInterval.toString)
+      case SUBMITTED                           =>
+        Redirect(controllers.verify.routes.VerificationRequestSubmittedController.onPageLoad())
+      case SUBMITTED_NO_RECEIPT                => // TODO: matching screen not found
+        recovery
+      case DEPARTMENTAL_ERROR                  =>
+        Redirect(controllers.verify.routes.VerifyDepartmentalErrorController.onPageLoad())
+      case FATAL_ERROR                         =>
+        Redirect(controllers.verify.routes.VerificationNotSubmittedWarningController.onPageLoad())
+      case SEND_ERROR                          =>
+        Redirect(controllers.verify.routes.VerifySendErrorController.onPageLoad())
+      case TIMED_OUT                           =>
+        Redirect(controllers.verify.routes.VerificationRequestInProgressController.onPageLoad())
+      case _                                   =>
+        recovery
     }
 }

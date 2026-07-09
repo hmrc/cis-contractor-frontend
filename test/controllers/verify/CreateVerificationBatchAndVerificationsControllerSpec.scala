@@ -21,19 +21,21 @@ import controllers.routes
 import models.UserAnswers
 import models.response.GetCurrentVerificationBatchResponse
 import models.{SubcontractorCurrentVerification, SubcontractorViewModel, VerificationBatchCurrentVerification, VerificationCurrentVerification}
-import models.verify.SelectedSubcontractors
+import models.verify.{ChrisVerificationRequestBuilder, SelectedSubcontractors}
 import org.mockito.ArgumentCaptor
-import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{never, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import pages.verify.{CurrentVerificationBatchResponsePage, SelectSubcontractorPage, SelectSubcontractorsToReverifyPage}
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import services.VerificationService
+import services.{CisManageService, VerificationService}
 import connectors.ConstructionIndustrySchemeConnector
+
 import scala.concurrent.Future
 import repositories.SessionRepository
+
 import scala.concurrent.ExecutionContext
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -63,7 +65,15 @@ class CreateVerificationBatchAndVerificationsControllerSpec extends SpecBase wit
           nino = None,
           crn = None,
           partnerUtr = None,
-          partnershipTradingName = None
+          partnershipTradingName = None,
+          subcontractorType = None,
+          addressLine1 = None,
+          addressLine2 = None,
+          addressLine3 = None,
+          addressLine4 = None,
+          country = None,
+          postcode = None,
+          worksReferenceNumber = None
         )
       ),
       verificationBatch = Some(
@@ -360,9 +370,11 @@ class CreateVerificationBatchAndVerificationsControllerSpec extends SpecBase wit
   }
 
   "must fail when CisIdQuery is missing (InstanceIdQuery not found in session data) and not call connector nor repo" in {
-    val mockConnector = mock[ConstructionIndustrySchemeConnector]
-    val mockRepo      = mock[SessionRepository]
-    val service       = new VerificationService(mockConnector, mockRepo)
+    val mockConnector        = mock[ConstructionIndustrySchemeConnector]
+    val mockCisManageService = mock[CisManageService]
+    val mockBuilder          = mock[ChrisVerificationRequestBuilder]
+    val mockRepo             = mock[SessionRepository]
+    val service              = new VerificationService(mockConnector, mockCisManageService, mockBuilder, mockRepo)
 
     val currentBatchResponse =
       GetCurrentVerificationBatchResponse(

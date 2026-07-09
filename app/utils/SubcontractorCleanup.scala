@@ -65,7 +65,8 @@ object SubcontractorCleanup {
     userAnswers
       .remove(PartnershipAddressPage)
       .flatMap(_.remove(PartnershipAddressYesNoPage))
-      .flatMap(_.remove(PartnershipChooseContactDetailsPage))
+      .flatMap(_.remove(AddPartnershipContactMethodsYesNoPage))
+      .flatMap(_.remove(PartnershipContactMethodOptionsPage))
       .flatMap(_.remove(PartnershipEmailAddressPage))
       .flatMap(_.remove(PartnershipHasUtrYesNoPage))
       .flatMap(_.remove(PartnershipMobileNumberPage))
@@ -86,7 +87,8 @@ object SubcontractorCleanup {
     userAnswers
       .remove(TrustAddressPage)
       .flatMap(_.remove(TrustAddressYesNoPage))
-      .flatMap(_.remove(TrustContactOptionsPage))
+      .flatMap(_.remove(AddTrustContactMethodsYesNoPage))
+      .flatMap(_.remove(TrustContactMethodOptionsPage))
       .flatMap(_.remove(TrustEmailAddressPage))
       .flatMap(_.remove(TrustMobileNumberPage))
       .flatMap(_.remove(TrustNamePage))
