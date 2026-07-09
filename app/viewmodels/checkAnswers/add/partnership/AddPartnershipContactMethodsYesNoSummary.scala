@@ -39,7 +39,7 @@ object AddPartnershipContactMethodsYesNoSummary {
             controllers.add.partnership.routes.AddPartnershipContactMethodsYesNoController.onPageLoad(CheckMode).url
           )
             .withVisuallyHiddenText(messages("addPartnershipContactMethodsYesNo.change.hidden"))
-            .withAttribute("id" -> "partnership-contact-methods-yes-no")
+            .withAttribute("id" -> "add-partnership-contact-details")
         )
       )
     }

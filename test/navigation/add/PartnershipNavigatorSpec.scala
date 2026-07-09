@@ -19,7 +19,7 @@ package navigation.add
 import base.SpecBase
 import controllers.routes
 import models.address.Address
-import models.contact.ContactOptions
+import models.contact.ContactMethodOptions
 import models.{AmendMode, CheckMode, NormalMode, UserAnswers}
 import pages.add.partnership.*
 import pages.Page
@@ -102,14 +102,6 @@ class PartnershipNavigatorSpec extends SpecBase {
         ) mustBe partnershipCYA
       }
 
-      "must go from a PartnershipAddressPage to PartnershipChooseContactDetailsController in NormalMode" in {
-        navigator.nextPage(
-          PartnershipAddressPage,
-          NormalMode,
-          UserAnswers("id")
-        ) mustBe controllers.add.partnership.routes.PartnershipChooseContactDetailsController.onPageLoad(NormalMode)
-      }
-
       "must go from a PartnershipWorksReferenceNumberYesNoPage to PartnershipWorksReferenceNumber page when true" in {
         navigator.nextPage(
           PartnershipWorksReferenceNumberYesNoPage,
@@ -151,16 +143,6 @@ class PartnershipNavigatorSpec extends SpecBase {
         ) mustBe controllers.add.partnership.routes.PartnershipNominatedPartnerNameController.onPageLoad(NormalMode)
       }
 
-      "must go from PartnershipAddressPage to PartnershipChooseContactDetailsController in NormalMode" in {
-        val address = Address("1 Test Street", addressLine3 = Some("Town"), postcode = Some("AA1 1AA"))
-
-        navigator.nextPage(
-          PartnershipAddressPage,
-          NormalMode,
-          emptyUserAnswers.setOrException(PartnershipAddressPage, address)
-        ) mustBe controllers.add.partnership.routes.PartnershipChooseContactDetailsController.onPageLoad(NormalMode)
-      }
-
       "must go from PartnershipAddressYesNoPage to the address lookup on-ramp when true in NormalMode" in {
         navigator.nextPage(
           PartnershipAddressYesNoPage,
@@ -169,12 +151,12 @@ class PartnershipNavigatorSpec extends SpecBase {
         ) mustBe controllers.add.partnership.routes.PartnershipAddressController.redirectToAddressLookup()
       }
 
-      "must go from PartnershipAddressYesNoPage to PartnershipChooseContactDetailsController when false in NormalMode" in {
+      "must go from PartnershipAddressYesNoPage to AddPartnershipContactMethodsYesNo Page when false in NormalMode" in {
         navigator.nextPage(
           PartnershipAddressYesNoPage,
           NormalMode,
           emptyUserAnswers.setOrException(PartnershipAddressYesNoPage, false)
-        ) mustBe controllers.add.partnership.routes.PartnershipChooseContactDetailsController.onPageLoad(NormalMode)
+        ) mustBe controllers.add.partnership.routes.AddPartnershipContactMethodsYesNoController.onPageLoad(NormalMode)
       }
 
       "must go from PartnershipAddressYesNoPage to JourneyRecovery when no answer in NormalMode" in {
@@ -252,68 +234,6 @@ class PartnershipNavigatorSpec extends SpecBase {
         }
       }
 
-      "must go from a PartnershipEmailAddressPage to PartnershipHasUtrYesNoController" in {
-        navigator.nextPage(
-          PartnershipEmailAddressPage,
-          NormalMode,
-          UserAnswers("id")
-        ) mustBe controllers.add.partnership.routes.PartnershipHasUtrYesNoController.onPageLoad(NormalMode)
-      }
-
-      "must go from PartnershipChooseContactDetailsPage" - {
-        "to itself when Email is selected" in {
-          navigator.nextPage(
-            PartnershipChooseContactDetailsPage,
-            NormalMode,
-            emptyUserAnswers.setOrException(
-              PartnershipChooseContactDetailsPage,
-              ContactOptions.Email
-            )
-          ) mustBe controllers.add.partnership.routes.PartnershipEmailAddressController.onPageLoad(NormalMode)
-        }
-
-        "to itself when Phone is selected" in {
-          navigator.nextPage(
-            PartnershipChooseContactDetailsPage,
-            NormalMode,
-            emptyUserAnswers.setOrException(
-              PartnershipChooseContactDetailsPage,
-              ContactOptions.Phone
-            )
-          ) mustBe controllers.add.partnership.routes.PartnershipPhoneNumberController.onPageLoad(NormalMode)
-        }
-
-        "to itself when Mobile is selected" in {
-          navigator.nextPage(
-            PartnershipChooseContactDetailsPage,
-            NormalMode,
-            emptyUserAnswers.setOrException(
-              PartnershipChooseContactDetailsPage,
-              ContactOptions.Mobile
-            )
-          ) mustBe controllers.add.partnership.routes.PartnershipMobileNumberController.onPageLoad(NormalMode)
-        }
-
-        "to PartnershipHasUtrYesNoPage when NoDetails is selected" in {
-          navigator.nextPage(
-            PartnershipChooseContactDetailsPage,
-            NormalMode,
-            emptyUserAnswers.setOrException(
-              PartnershipChooseContactDetailsPage,
-              ContactOptions.NoDetails
-            )
-          ) mustBe controllers.add.partnership.routes.PartnershipHasUtrYesNoController.onPageLoad(NormalMode)
-        }
-
-        "to JourneyRecoveryPage when answer is not present" in {
-          navigator.nextPage(
-            PartnershipChooseContactDetailsPage,
-            NormalMode,
-            emptyUserAnswers
-          ) mustBe journeyRecovery
-        }
-      }
-
       "PartnershipHasUtrYesNoPage in NormalMode" - {
 
         "must go to PartnershipUniqueTaxpayerReferenceController when answer is true" in {
@@ -377,20 +297,149 @@ class PartnershipNavigatorSpec extends SpecBase {
           .onPageLoad(NormalMode)
       }
 
-      "must go from a PartnershipPhoneNumberPage to next Page" in {
-        navigator.nextPage(
-          PartnershipPhoneNumberPage,
-          NormalMode,
-          UserAnswers("id")
-        ) mustBe controllers.add.partnership.routes.PartnershipHasUtrYesNoController.onPageLoad(NormalMode)
+      "must go from PartnershipEmailAddressPage" - {
+        "to PartnershipPhoneNumberPage when Phone is selected in PartnershipContactMethodOptions" in {
+          navigator.nextPage(
+            PartnershipEmailAddressPage,
+            NormalMode,
+            emptyUserAnswers
+              .setOrException(
+                PartnershipContactMethodOptionsPage,
+                Set(ContactMethodOptions.Email, ContactMethodOptions.Phone, ContactMethodOptions.Mobile)
+              )
+          ) mustBe controllers.add.partnership.routes.PartnershipPhoneNumberController
+            .onPageLoad(NormalMode)
+        }
+
+        "to PartnershipMobileNumberPage when Mobile is selected in PartnershipContactMethodOptions" in {
+          navigator.nextPage(
+            PartnershipEmailAddressPage,
+            NormalMode,
+            emptyUserAnswers
+              .setOrException(
+                PartnershipContactMethodOptionsPage,
+                Set(ContactMethodOptions.Email, ContactMethodOptions.Mobile)
+              )
+          ) mustBe controllers.add.partnership.routes.PartnershipMobileNumberController
+            .onPageLoad(NormalMode)
+        }
+
+        "to PartnershipHasUtrYesNo Page when only Email is selected in PartnershipContactMethodOptions" in {
+          navigator.nextPage(
+            PartnershipEmailAddressPage,
+            NormalMode,
+            emptyUserAnswers
+              .setOrException(
+                PartnershipContactMethodOptionsPage,
+                Set(ContactMethodOptions.Email)
+              )
+          ) mustBe controllers.add.partnership.routes.PartnershipHasUtrYesNoController
+            .onPageLoad(NormalMode)
+        }
+
+        "to JourneyRecoveryPage Page when PartnershipContactMethodOptions answer is not present" in {
+          navigator.nextPage(
+            PartnershipEmailAddressPage,
+            NormalMode,
+            UserAnswers("id")
+          ) mustBe journeyRecovery
+        }
+
+        "to JourneyRecoveryPage when Email is not in the selected PartnershipContactMethodOptions" in {
+          navigator.nextPage(
+            PartnershipEmailAddressPage,
+            NormalMode,
+            emptyUserAnswers
+              .setOrException(
+                PartnershipContactMethodOptionsPage,
+                Set(ContactMethodOptions.Phone, ContactMethodOptions.Mobile)
+              )
+          ) mustBe journeyRecovery
+        }
+
       }
 
-      "must go from a PartnershipMobileNumberPage to next Page" in {
-        navigator.nextPage(
-          PartnershipMobileNumberPage,
-          NormalMode,
-          UserAnswers("id")
-        ) mustBe controllers.add.partnership.routes.PartnershipHasUtrYesNoController.onPageLoad(NormalMode)
+      "must go from PartnershipPhoneNumberPage" - {
+        "to PartnershipMobileNumberPage when Mobile is selected in PartnershipContactMethodOptions" in {
+          navigator.nextPage(
+            PartnershipPhoneNumberPage,
+            NormalMode,
+            emptyUserAnswers
+              .setOrException(
+                PartnershipContactMethodOptionsPage,
+                Set(ContactMethodOptions.Email, ContactMethodOptions.Phone, ContactMethodOptions.Mobile)
+              )
+          ) mustBe controllers.add.partnership.routes.PartnershipMobileNumberController
+            .onPageLoad(NormalMode)
+        }
+
+        "to PartnershipHasUtrYesNo Page when Mobile is not selected in PartnershipContactMethodOptions" in {
+          navigator.nextPage(
+            PartnershipPhoneNumberPage,
+            NormalMode,
+            emptyUserAnswers
+              .setOrException(
+                PartnershipContactMethodOptionsPage,
+                Set(ContactMethodOptions.Email, ContactMethodOptions.Phone)
+              )
+          ) mustBe controllers.add.partnership.routes.PartnershipHasUtrYesNoController
+            .onPageLoad(NormalMode)
+        }
+
+        "to JourneyRecoveryPage Page when PartnershipContactMethodOptions answer is not present" in {
+          navigator.nextPage(
+            PartnershipPhoneNumberPage,
+            NormalMode,
+            UserAnswers("id")
+          ) mustBe journeyRecovery
+        }
+
+        "to JourneyRecoveryPage when Phone is not in the selected PartnershipContactMethodOptions" in {
+          navigator.nextPage(
+            PartnershipPhoneNumberPage,
+            NormalMode,
+            emptyUserAnswers
+              .setOrException(
+                PartnershipContactMethodOptionsPage,
+                Set(ContactMethodOptions.Email, ContactMethodOptions.Mobile)
+              )
+          ) mustBe journeyRecovery
+        }
+      }
+
+      "must go from PartnershipMobileNumberPage" - {
+        "to PartnershipHasUtrYesNo Page when PartnershipContactMethodOptions is present" in {
+          navigator.nextPage(
+            PartnershipMobileNumberPage,
+            NormalMode,
+            emptyUserAnswers
+              .setOrException(
+                PartnershipContactMethodOptionsPage,
+                Set(ContactMethodOptions.Email, ContactMethodOptions.Phone, ContactMethodOptions.Mobile)
+              )
+          ) mustBe controllers.add.partnership.routes.PartnershipHasUtrYesNoController
+            .onPageLoad(NormalMode)
+        }
+
+        "to JourneyRecoveryPage Page when PartnershipContactMethodOptions answer is not present" in {
+          navigator.nextPage(
+            PartnershipMobileNumberPage,
+            NormalMode,
+            UserAnswers("id")
+          ) mustBe journeyRecovery
+        }
+
+        "to JourneyRecoveryPage when Mobile is not in the selected PartnershipContactMethodOptions" in {
+          navigator.nextPage(
+            PartnershipMobileNumberPage,
+            NormalMode,
+            emptyUserAnswers
+              .setOrException(
+                PartnershipContactMethodOptionsPage,
+                Set(ContactMethodOptions.Email, ContactMethodOptions.Phone)
+              )
+          ) mustBe journeyRecovery
+        }
       }
 
       "must go from PartnershipNominatedPartnerNinoPage to PartnershipNominatedPartnerCrnYesNoController in NormalMode" in {
@@ -469,12 +518,12 @@ class PartnershipNavigatorSpec extends SpecBase {
       }
 
       "must go from AddPartnershipContactMethodsYesNo" - {
-        "to AddPartnershipContactMethodsYesNoPage when answer is Yes" in {
+        "to PartnershipContactMethodOptionsPage when answer is Yes" in {
           navigator.nextPage(
             AddPartnershipContactMethodsYesNoPage,
             NormalMode,
             emptyUserAnswers.setOrException(AddPartnershipContactMethodsYesNoPage, true)
-          ) mustBe controllers.add.partnership.routes.AddPartnershipContactMethodsYesNoController
+          ) mustBe controllers.add.partnership.routes.PartnershipContactMethodOptionsController
             .onPageLoad(NormalMode)
         }
 
@@ -495,6 +544,50 @@ class PartnershipNavigatorSpec extends SpecBase {
           ) mustBe journeyRecovery
         }
       }
+
+      "must go from PartnershipContactMethodOptions" - {
+        "to PartnershipEmailAddress when Email is selected" in {
+          navigator.nextPage(
+            PartnershipContactMethodOptionsPage,
+            NormalMode,
+            emptyUserAnswers.setOrException(
+              PartnershipContactMethodOptionsPage,
+              Set(ContactMethodOptions.Email, ContactMethodOptions.Phone, ContactMethodOptions.Mobile)
+            )
+          ) mustBe controllers.add.partnership.routes.PartnershipEmailAddressController
+            .onPageLoad(NormalMode)
+        }
+
+        "to PartnershipPhoneNumberPage when Phone is selected (Email is not selected)" in {
+          navigator.nextPage(
+            PartnershipContactMethodOptionsPage,
+            NormalMode,
+            emptyUserAnswers.setOrException(
+              PartnershipContactMethodOptionsPage,
+              Set(ContactMethodOptions.Phone, ContactMethodOptions.Mobile)
+            )
+          ) mustBe controllers.add.partnership.routes.PartnershipPhoneNumberController
+            .onPageLoad(NormalMode)
+        }
+
+        "to PartnershipMobileNumberPage when Mobile is selected (Email and Phone are not selected)" in {
+          navigator.nextPage(
+            PartnershipContactMethodOptionsPage,
+            NormalMode,
+            emptyUserAnswers.setOrException(PartnershipContactMethodOptionsPage, Set(ContactMethodOptions.Mobile))
+          ) mustBe controllers.add.partnership.routes.PartnershipMobileNumberController
+            .onPageLoad(NormalMode)
+        }
+
+        "to JourneyRecoveryPage when PartnershipContactMethodOptions answer is not present" in {
+          navigator.nextPage(
+            PartnershipContactMethodOptionsPage,
+            NormalMode,
+            UserAnswers("id")
+          ) mustBe journeyRecovery
+        }
+      }
+
     }
 
     "in Amend mode" - {
@@ -597,14 +690,6 @@ class PartnershipNavigatorSpec extends SpecBase {
         ) mustBe journeyRecovery
       }
 
-      "must go from a PartnershipAddressPage to PartnershipCheckYourAnswers in CheckMode" in {
-        navigator.nextPage(
-          PartnershipAddressPage,
-          CheckMode,
-          emptyUserAnswers
-        ) mustBe controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
-      }
-
       "must go to PartnershipCheckYourAnswersController when answer is false in CheckMode" in {
         val answers =
           emptyUserAnswers
@@ -614,99 +699,6 @@ class PartnershipNavigatorSpec extends SpecBase {
 
         navigator.nextPage(
           PartnershipHasUtrYesNoPage,
-          CheckMode,
-          answers
-        ) mustBe controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
-      }
-
-      "must go from PartnershipChooseContactDetailsPage" - {
-        "to itself when Email is selected" in {
-          navigator.nextPage(
-            PartnershipChooseContactDetailsPage,
-            CheckMode,
-            emptyUserAnswers.setOrException(
-              PartnershipChooseContactDetailsPage,
-              ContactOptions.Email
-            )
-          ) mustBe controllers.add.partnership.routes.PartnershipEmailAddressController.onPageLoad(CheckMode)
-        }
-
-        "to itself when Phone is selected" in {
-          navigator.nextPage(
-            PartnershipChooseContactDetailsPage,
-            CheckMode,
-            emptyUserAnswers.setOrException(
-              PartnershipChooseContactDetailsPage,
-              ContactOptions.Phone
-            )
-          ) mustBe controllers.add.partnership.routes.PartnershipPhoneNumberController.onPageLoad(CheckMode)
-        }
-
-        "to itself when Mobile is selected" in {
-          navigator.nextPage(
-            PartnershipChooseContactDetailsPage,
-            CheckMode,
-            emptyUserAnswers.setOrException(
-              PartnershipChooseContactDetailsPage,
-              ContactOptions.Mobile
-            )
-          ) mustBe controllers.add.partnership.routes.PartnershipMobileNumberController.onPageLoad(CheckMode)
-        }
-
-        "to PartnershipCheckYourAnswersController when NoDetails is selected in CheckMode" in {
-          navigator.nextPage(
-            PartnershipChooseContactDetailsPage,
-            CheckMode,
-            emptyUserAnswers.setOrException(
-              PartnershipChooseContactDetailsPage,
-              ContactOptions.NoDetails
-            )
-          ) mustBe controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
-        }
-
-        "to JourneyRecovery when answer is not present" in {
-          navigator.nextPage(
-            PartnershipChooseContactDetailsPage,
-            CheckMode,
-            emptyUserAnswers
-          ) mustBe journeyRecovery
-        }
-      }
-
-      "to PartnershipCheckYourAnswersController when Email is selected in CheckMode and email address already exists" in {
-        val answers =
-          emptyUserAnswers
-            .setOrException(PartnershipChooseContactDetailsPage, ContactOptions.Email)
-            .setOrException(PartnershipEmailAddressPage, "test@test.com")
-
-        navigator.nextPage(
-          PartnershipChooseContactDetailsPage,
-          CheckMode,
-          answers
-        ) mustBe controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
-      }
-
-      "to PartnershipCheckYourAnswersController when Phone is selected in CheckMode and phone number already exists" in {
-        val answers =
-          emptyUserAnswers
-            .setOrException(PartnershipChooseContactDetailsPage, ContactOptions.Phone)
-            .setOrException(PartnershipPhoneNumberPage, "01234567890")
-
-        navigator.nextPage(
-          PartnershipChooseContactDetailsPage,
-          CheckMode,
-          answers
-        ) mustBe controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
-      }
-
-      "to PartnershipCheckYourAnswersController when Mobile is selected in CheckMode and mobile number already exists" in {
-        val answers =
-          emptyUserAnswers
-            .setOrException(PartnershipChooseContactDetailsPage, ContactOptions.Mobile)
-            .setOrException(PartnershipMobileNumberPage, "07123456789")
-
-        navigator.nextPage(
-          PartnershipChooseContactDetailsPage,
           CheckMode,
           answers
         ) mustBe controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
@@ -789,14 +781,6 @@ class PartnershipNavigatorSpec extends SpecBase {
             emptyUserAnswers
           ) mustBe routes.JourneyRecoveryController.onPageLoad()
         }
-      }
-
-      "must go from PartnershipEmailAddressPage to PartnershipCheckYourAnswers in CheckMode" in {
-        navigator.nextPage(
-          PartnershipEmailAddressPage,
-          CheckMode,
-          emptyUserAnswers
-        ) mustBe controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
       }
 
       "must go from a PartnershipNominatedPartnerUtrYesNoPage to next page when true" in {
@@ -939,14 +923,6 @@ class PartnershipNavigatorSpec extends SpecBase {
         ) mustBe controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
       }
 
-      "must go from a PartnershipMobileNumberPage to PartnershipCheckYourAnswersController in CheckMode" in {
-        navigator.nextPage(
-          PartnershipMobileNumberPage,
-          CheckMode,
-          emptyUserAnswers
-        ) mustBe controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
-      }
-
       "PartnershipNominatedPartnerNinoPage in CheckMode" - {
         "must go from PartnershipNominatedPartnerNinoPage to PartnershipCheckYourAnswersController in CheckMode" in {
           val answersWithNino =
@@ -1042,14 +1018,29 @@ class PartnershipNavigatorSpec extends SpecBase {
       }
 
       "must go from AddPartnershipContactMethodsYesNo" - {
-        "to AddPartnershipContactMethodsYesNo page when answer is Yes" in {
-          val answers = emptyUserAnswers.set(AddPartnershipContactMethodsYesNoPage, true).success.value
+        "to CYA when answer is Yes and PartnershipContactMethodOptions already answered" in {
+          val answers = emptyUserAnswers
+            .setOrException(AddPartnershipContactMethodsYesNoPage, true)
+            .setOrException(
+              PartnershipContactMethodOptionsPage,
+              Set(ContactMethodOptions.Email, ContactMethodOptions.Phone)
+            )
 
           navigator.nextPage(
             AddPartnershipContactMethodsYesNoPage,
             CheckMode,
             answers
-          ) mustBe controllers.add.partnership.routes.AddPartnershipContactMethodsYesNoController.onPageLoad(CheckMode)
+          ) mustBe controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
+        }
+
+        "to PartnershipContactMethodOptions page when answer is Yes and PartnershipContactMethodOptions not yet answered" in {
+          val answers = emptyUserAnswers.setOrException(AddPartnershipContactMethodsYesNoPage, true)
+
+          navigator.nextPage(
+            AddPartnershipContactMethodsYesNoPage,
+            CheckMode,
+            answers
+          ) mustBe controllers.add.partnership.routes.PartnershipContactMethodOptionsController.onPageLoad(CheckMode)
         }
 
         "to CYA when answer is No" in {
@@ -1071,12 +1062,304 @@ class PartnershipNavigatorSpec extends SpecBase {
         }
       }
 
-      "must go from a PartnershipPhoneNumberPage to CYA" in {
-        navigator.nextPage(
-          PartnershipPhoneNumberPage,
-          CheckMode,
-          UserAnswers("id")
-        ) mustBe partnershipCYA
+      "must go from PartnershipContactMethodOptions" - {
+        "to PartnershipEmailAddressPage when Email is selected and Email answer not exist" in {
+          val answers = emptyUserAnswers
+            .set(
+              PartnershipContactMethodOptionsPage,
+              Set(ContactMethodOptions.Email)
+            )
+            .success
+            .value
+
+          navigator.nextPage(
+            PartnershipContactMethodOptionsPage,
+            CheckMode,
+            answers
+          ) mustBe controllers.add.partnership.routes.PartnershipEmailAddressController.onPageLoad(CheckMode)
+        }
+
+        "to PartnershipEmailAddressPage when Email, Phone and Mobile are selected and no Email answer not exist" in {
+          val answers = emptyUserAnswers
+            .set(
+              PartnershipContactMethodOptionsPage,
+              Set(ContactMethodOptions.Email, ContactMethodOptions.Phone, ContactMethodOptions.Mobile)
+            )
+            .success
+            .value
+
+          navigator.nextPage(
+            PartnershipContactMethodOptionsPage,
+            CheckMode,
+            answers
+          ) mustBe controllers.add.partnership.routes.PartnershipEmailAddressController.onPageLoad(CheckMode)
+        }
+
+        "to CYA when only Email is selected and Email answer exists" in {
+          val answers = emptyUserAnswers
+            .set(PartnershipContactMethodOptionsPage, Set(ContactMethodOptions.Email))
+            .success
+            .value
+            .set(PartnershipEmailAddressPage, "test@test.com")
+            .success
+            .value
+
+          navigator.nextPage(
+            PartnershipContactMethodOptionsPage,
+            CheckMode,
+            answers
+          ) mustBe controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
+        }
+
+        "to PartnershipPhoneNumberPage when Phone is selected (Email is not selected) and Phone answer not exists" in {
+          val answers = emptyUserAnswers
+            .set(
+              PartnershipContactMethodOptionsPage,
+              Set(ContactMethodOptions.Phone)
+            )
+            .success
+            .value
+
+          navigator.nextPage(
+            PartnershipContactMethodOptionsPage,
+            CheckMode,
+            answers
+          ) mustBe controllers.add.partnership.routes.PartnershipPhoneNumberController.onPageLoad(CheckMode)
+        }
+
+        "to CYA when only Phone is selected and Phone answer exists" in {
+          val answers = emptyUserAnswers
+            .set(PartnershipContactMethodOptionsPage, Set(ContactMethodOptions.Phone))
+            .success
+            .value
+            .set(PartnershipPhoneNumberPage, "01234567890")
+            .success
+            .value
+
+          navigator.nextPage(
+            PartnershipContactMethodOptionsPage,
+            CheckMode,
+            answers
+          ) mustBe controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
+        }
+
+        "to CYA when only Mobile is selected and Mobile answer exists" in {
+          val answers = emptyUserAnswers
+            .set(PartnershipContactMethodOptionsPage, Set(ContactMethodOptions.Mobile))
+            .success
+            .value
+            .set(PartnershipMobileNumberPage, "01234567890")
+            .success
+            .value
+
+          navigator.nextPage(
+            PartnershipContactMethodOptionsPage,
+            CheckMode,
+            answers
+          ) mustBe controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
+        }
+
+        "to PartnershipPhoneNumberPage when Email and Phone are selected and Email answer exists, Phone answer not exists" in {
+          val answers = emptyUserAnswers
+            .set(PartnershipContactMethodOptionsPage, Set(ContactMethodOptions.Email, ContactMethodOptions.Phone))
+            .success
+            .value
+            .set(PartnershipEmailAddressPage, "test@test.com")
+            .success
+            .value
+
+          navigator.nextPage(
+            PartnershipContactMethodOptionsPage,
+            CheckMode,
+            answers
+          ) mustBe controllers.add.partnership.routes.PartnershipPhoneNumberController.onPageLoad(CheckMode)
+        }
+
+        "to PartnershipMobileNumberPage when Email, Phone and Mobile are selected and Email and Phone answer exists, Mobile answer not exists" in {
+          val answers = emptyUserAnswers
+            .set(
+              PartnershipContactMethodOptionsPage,
+              Set(ContactMethodOptions.Email, ContactMethodOptions.Phone, ContactMethodOptions.Mobile)
+            )
+            .success
+            .value
+            .set(PartnershipEmailAddressPage, "test@test.com")
+            .success
+            .value
+            .set(PartnershipPhoneNumberPage, "01234567890")
+            .success
+            .value
+
+          navigator.nextPage(
+            PartnershipContactMethodOptionsPage,
+            CheckMode,
+            answers
+          ) mustBe controllers.add.partnership.routes.PartnershipMobileNumberController.onPageLoad(CheckMode)
+        }
+
+        "to JourneyRecovery when answer is not present" in {
+          navigator.nextPage(
+            PartnershipContactMethodOptionsPage,
+            CheckMode,
+            emptyUserAnswers
+          ) mustBe journeyRecovery
+        }
+      }
+
+      "must go from PartnershipEmailAddressPage" - {
+
+        "to PartnershipCheckYourAnswers when no missing ContactMethodOptions answer" in {
+          navigator.nextPage(
+            PartnershipEmailAddressPage,
+            CheckMode,
+            emptyUserAnswers
+              .setOrException(
+                PartnershipContactMethodOptionsPage,
+                Set(ContactMethodOptions.Email, ContactMethodOptions.Phone, ContactMethodOptions.Mobile)
+              )
+              .setOrException(PartnershipEmailAddressPage, "test@test.com")
+              .setOrException(PartnershipPhoneNumberPage, "1234567")
+              .setOrException(PartnershipMobileNumberPage, "1234567")
+          ) mustBe controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
+        }
+
+        "to PartnershipPhoneNumberPage when PartnershipPhoneNumber is missing from ContactMethodOptions answer" in {
+          navigator.nextPage(
+            PartnershipEmailAddressPage,
+            CheckMode,
+            emptyUserAnswers
+              .setOrException(
+                PartnershipContactMethodOptionsPage,
+                Set(ContactMethodOptions.Email, ContactMethodOptions.Phone, ContactMethodOptions.Mobile)
+              )
+              .setOrException(PartnershipEmailAddressPage, "test@test.com")
+              .setOrException(PartnershipMobileNumberPage, "1234567")
+          ) mustBe controllers.add.partnership.routes.PartnershipPhoneNumberController.onPageLoad(CheckMode)
+        }
+
+        "to PartnershipMobileNumberPage when PartnershipMobileNumber is missing from ContactMethodOptions answer" in {
+          navigator.nextPage(
+            PartnershipEmailAddressPage,
+            CheckMode,
+            emptyUserAnswers
+              .setOrException(
+                PartnershipContactMethodOptionsPage,
+                Set(ContactMethodOptions.Email, ContactMethodOptions.Phone, ContactMethodOptions.Mobile)
+              )
+              .setOrException(PartnershipEmailAddressPage, "test@test.com")
+              .setOrException(PartnershipPhoneNumberPage, "1234567")
+          ) mustBe controllers.add.partnership.routes.PartnershipMobileNumberController.onPageLoad(CheckMode)
+        }
+
+        "to JourneyRecovery when PartnershipContactMethodOptions answer is not present" in {
+          navigator.nextPage(
+            PartnershipEmailAddressPage,
+            CheckMode,
+            UserAnswers("id")
+          ) mustBe journeyRecovery
+        }
+
+        "to JourneyRecovery when Email is not in the selected PartnershipContactMethodOptions" in {
+          navigator.nextPage(
+            PartnershipEmailAddressPage,
+            CheckMode,
+            emptyUserAnswers
+              .setOrException(
+                PartnershipContactMethodOptionsPage,
+                Set(ContactMethodOptions.Phone, ContactMethodOptions.Mobile)
+              )
+          ) mustBe journeyRecovery
+        }
+      }
+
+      "must go from PartnershipPhoneNumberPage" - {
+
+        "to PartnershipCheckYourAnswers when no missing ContactMethodOptions answer" in {
+          navigator.nextPage(
+            PartnershipPhoneNumberPage,
+            CheckMode,
+            emptyUserAnswers
+              .setOrException(
+                PartnershipContactMethodOptionsPage,
+                Set(ContactMethodOptions.Email, ContactMethodOptions.Phone, ContactMethodOptions.Mobile)
+              )
+              .setOrException(PartnershipEmailAddressPage, "test@test.com")
+              .setOrException(PartnershipPhoneNumberPage, "1234567")
+              .setOrException(PartnershipMobileNumberPage, "1234567")
+          ) mustBe controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
+        }
+
+        "to PartnershipMobileNumberPage when PartnershipMobileNumber is missing from ContactMethodOptions answer" in {
+          navigator.nextPage(
+            PartnershipPhoneNumberPage,
+            CheckMode,
+            emptyUserAnswers
+              .setOrException(
+                PartnershipContactMethodOptionsPage,
+                Set(ContactMethodOptions.Email, ContactMethodOptions.Phone, ContactMethodOptions.Mobile)
+              )
+              .setOrException(PartnershipEmailAddressPage, "test@test.com")
+              .setOrException(PartnershipPhoneNumberPage, "1234567")
+          ) mustBe controllers.add.partnership.routes.PartnershipMobileNumberController.onPageLoad(CheckMode)
+        }
+
+        "to JourneyRecovery when PartnershipContactMethodOptions answer is not present" in {
+          navigator.nextPage(
+            PartnershipPhoneNumberPage,
+            CheckMode,
+            UserAnswers("id")
+          ) mustBe journeyRecovery
+        }
+
+        "to JourneyRecovery when Phone is not in the selected PartnershipContactMethodOptions" in {
+          navigator.nextPage(
+            PartnershipPhoneNumberPage,
+            CheckMode,
+            emptyUserAnswers
+              .setOrException(
+                PartnershipContactMethodOptionsPage,
+                Set(ContactMethodOptions.Email, ContactMethodOptions.Mobile)
+              )
+          ) mustBe journeyRecovery
+        }
+      }
+
+      "must go from PartnershipMobileNumberPage" - {
+
+        "to PartnershipCheckYourAnswers" in {
+          navigator.nextPage(
+            PartnershipMobileNumberPage,
+            CheckMode,
+            emptyUserAnswers
+              .setOrException(
+                PartnershipContactMethodOptionsPage,
+                Set(ContactMethodOptions.Email, ContactMethodOptions.Phone, ContactMethodOptions.Mobile)
+              )
+              .setOrException(PartnershipEmailAddressPage, "test@test.com")
+              .setOrException(PartnershipPhoneNumberPage, "1234567")
+              .setOrException(PartnershipMobileNumberPage, "1234567")
+          ) mustBe controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
+        }
+
+        "to JourneyRecovery when PartnershipContactMethodOptions answer is not present" in {
+          navigator.nextPage(
+            PartnershipMobileNumberPage,
+            CheckMode,
+            UserAnswers("id")
+          ) mustBe journeyRecovery
+        }
+
+        "to JourneyRecovery when Mobile is not in the selected PartnershipContactMethodOptions" in {
+          navigator.nextPage(
+            PartnershipMobileNumberPage,
+            CheckMode,
+            emptyUserAnswers
+              .setOrException(
+                PartnershipContactMethodOptionsPage,
+                Set(ContactMethodOptions.Email, ContactMethodOptions.Phone)
+              )
+          ) mustBe journeyRecovery
+        }
       }
 
       "must go to CheckYourAnswersController for an unknown page in CheckMode (default case _)" in {

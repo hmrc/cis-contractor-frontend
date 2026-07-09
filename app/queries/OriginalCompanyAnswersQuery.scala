@@ -14,19 +14,11 @@
  * limitations under the License.
  */
 
-package pages.add.partnership
+package queries
 
-import models.add.partnership.PartnershipChooseContactDetails
-import pages.behaviours.PageBehaviours
+import models.amend.company.OriginalCompanyAnswers
+import play.api.libs.json.JsPath
 
-class PartnershipChooseContactDetailsPageSpec extends PageBehaviours {
-
-  "PartnershipChooseContactDetailsPage" - {
-
-    beRetrievable[PartnershipChooseContactDetails](PartnershipChooseContactDetailsPage)
-
-    beSettable[PartnershipChooseContactDetails](PartnershipChooseContactDetailsPage)
-
-    beRemovable[PartnershipChooseContactDetails](PartnershipChooseContactDetailsPage)
-  }
+case object OriginalCompanyAnswersQuery extends Gettable[OriginalCompanyAnswers] with Settable[OriginalCompanyAnswers] {
+  override def path: JsPath = JsPath \ "originalCompanyAnswers"
 }
