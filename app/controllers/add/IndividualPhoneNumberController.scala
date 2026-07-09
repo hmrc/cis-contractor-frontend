@@ -70,18 +70,18 @@ class IndividualPhoneNumberController @Inject() (
     implicit request =>
       (for {
         subcontractorName <- subcontractorNameExtractor.getSubcontractorName(request.userAnswers)
-        contactMethods  <- request.userAnswers.get(IndividualContactMethodOptionsPage)
+        contactMethods    <- request.userAnswers.get(IndividualContactMethodOptionsPage)
         if contactMethods.contains(ContactMethodOptions.Phone)
       } yield form
-            .bindFromRequest()
-            .fold(
-              formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, subcontractorName))),
-              value =>
-                for {
-                  updatedAnswers <- Future.fromTry(request.userAnswers.set(IndividualPhoneNumberPage, value))
-                  _              <- sessionRepository.set(updatedAnswers)
-                } yield Redirect(navigator.nextPage(IndividualPhoneNumberPage, mode, updatedAnswers))
-            ))
+        .bindFromRequest()
+        .fold(
+          formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, subcontractorName))),
+          value =>
+            for {
+              updatedAnswers <- Future.fromTry(request.userAnswers.set(IndividualPhoneNumberPage, value))
+              _              <- sessionRepository.set(updatedAnswers)
+            } yield Redirect(navigator.nextPage(IndividualPhoneNumberPage, mode, updatedAnswers))
+        ))
         .getOrElse(Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())))
   }
 }

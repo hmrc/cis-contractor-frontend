@@ -48,7 +48,8 @@ class IndividualNavigator @Inject() () extends NavigatorForJourney {
     case SubTradingNameYesNoPage                   => userAnswers => navigatorFromSubTradingNameYesNoPage(NormalMode)(userAnswers)
     case TradingNameOfSubcontractorPage            => _ => controllers.add.routes.SubAddressYesNoController.onPageLoad(NormalMode)
     case SubcontractorNamePage                     => _ => controllers.add.routes.SubAddressYesNoController.onPageLoad(NormalMode)
-    case SubAddressYesNoPage                       => userAnswers => navigatorFromSubAddressYesNoPage(NormalMode)(userAnswers)
+    case SubAddressYesNoPage                       =>
+      userAnswers => navigatorFromSubAddressYesNoPage(NormalMode)(userAnswers)
 //    case AddressOfSubcontractorPage                =>
 //      _ => controllers.add.routes.AddIndividualContactMethodsYesNoController.onPageLoad(NormalMode)
     case UniqueTaxpayerReferenceYesNoPage          =>
@@ -70,9 +71,9 @@ class IndividualNavigator @Inject() () extends NavigatorForJourney {
     case IndividualMobileNumberPage                =>
       userAnswers => nextSelectedContactMethodPageAfter(current = Some(ContactMethodOptions.Mobile))(userAnswers)
     case IndividualPhoneNumberPage                 =>
-      userAnswers => nextSelectedContactMethodPageAfter(current = Some(ContactMethodOptions.Mobile))(userAnswers)
+      userAnswers => nextSelectedContactMethodPageAfter(current = Some(ContactMethodOptions.Phone))(userAnswers)
     case IndividualEmailAddressPage                =>
-      userAnswers => nextSelectedContactMethodPageAfter(current = Some(ContactMethodOptions.Mobile))(userAnswers)
+      userAnswers => nextSelectedContactMethodPageAfter(current = Some(ContactMethodOptions.Email))(userAnswers)
     case _                                         => _ => routes.IndexController.onPageLoad()
   }
 

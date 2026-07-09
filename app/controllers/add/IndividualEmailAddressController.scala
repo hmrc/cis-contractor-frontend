@@ -70,19 +70,18 @@ class IndividualEmailAddressController @Inject() (
     implicit request =>
       (for {
         subcontractorName <- subcontractorNameExtractor.getSubcontractorName(request.userAnswers)
-        contactMethods  <- request.userAnswers.get(IndividualContactMethodOptionsPage)
+        contactMethods    <- request.userAnswers.get(IndividualContactMethodOptionsPage)
         if contactMethods.contains(ContactMethodOptions.Email)
-      } yield
-          form
-            .bindFromRequest()
-            .fold(
-              formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, subcontractorName))),
-              value =>
-                for {
-                  updatedAnswers <- Future.fromTry(request.userAnswers.set(IndividualEmailAddressPage, value))
-                  _              <- sessionRepository.set(updatedAnswers)
-                } yield Redirect(navigator.nextPage(IndividualEmailAddressPage, mode, updatedAnswers))
-            ))
+      } yield form
+        .bindFromRequest()
+        .fold(
+          formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, subcontractorName))),
+          value =>
+            for {
+              updatedAnswers <- Future.fromTry(request.userAnswers.set(IndividualEmailAddressPage, value))
+              _              <- sessionRepository.set(updatedAnswers)
+            } yield Redirect(navigator.nextPage(IndividualEmailAddressPage, mode, updatedAnswers))
+        ))
         .getOrElse(Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())))
   }
 }

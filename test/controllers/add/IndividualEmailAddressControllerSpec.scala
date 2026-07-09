@@ -19,14 +19,13 @@ package controllers.add
 import base.SpecBase
 import controllers.routes
 import forms.add.IndividualEmailAddressFormProvider
+import models.contact.ContactMethodOptions
 import models.add.SubcontractorName
-import models.contact.ContactOptions.Email
 import models.{NormalMode, UserAnswers}
-import navigation.Navigator
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.add.{IndividualChooseContactDetailsPage, IndividualEmailAddressPage, SubcontractorNamePage}
+import pages.add.{IndividualContactMethodOptionsPage, IndividualEmailAddressPage, SubcontractorNamePage}
 import play.api.data.Form
 import play.api.inject.bind
 import play.api.mvc.Call
@@ -55,13 +54,10 @@ class IndividualEmailAddressControllerSpec extends SpecBase with MockitoSugar {
     emptyUserAnswers.set(SubcontractorNamePage, subContractorName).success.value
 
   private def uaWithNameAndEmailChoice: UserAnswers =
-    buildAnswersWithContactChoice(
-      emptyUserAnswers,
-      SubcontractorNamePage,
-      subContractorName,
-      IndividualChooseContactDetailsPage,
-      Email
-    )
+    uaWithName
+      .set(IndividualContactMethodOptionsPage, Set(ContactMethodOptions.Email))
+      .success
+      .value
 
   "IndividualEmailAddress Controller" - {
 
@@ -126,15 +122,17 @@ class IndividualEmailAddressControllerSpec extends SpecBase with MockitoSugar {
     "must redirect to the next page when valid data is submitted" in {
 
       val mockSessionRepository = mock[SessionRepository]
-      val mockNavigator         = mock[Navigator]
 
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
-      when(mockNavigator.nextPage(any(), any(), any())).thenReturn(onwardRoute)
+
+      val userAnswers = uaWithName
+        .set(IndividualContactMethodOptionsPage, Set(ContactMethodOptions.Email))
+        .success
+        .value
 
       val application =
-        applicationBuilder(userAnswers = Some(uaWithName))
+        applicationBuilder(userAnswers = Some(userAnswers))
           .overrides(
-            bind[Navigator].toInstance(mockNavigator),
             bind[SessionRepository].toInstance(mockSessionRepository)
           )
           .build()
@@ -147,13 +145,15 @@ class IndividualEmailAddressControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual onwardRoute.url
+        redirectLocation(result).value mustEqual controllers.add.routes.UniqueTaxpayerReferenceYesNoController
+          .onPageLoad(NormalMode)
+          .url
       }
     }
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
-      val application = applicationBuilder(userAnswers = Some(uaWithName)).build()
+      val application = applicationBuilder(userAnswers = Some(uaWithNameAndEmailChoice)).build()
 
       running(application) {
         val request =

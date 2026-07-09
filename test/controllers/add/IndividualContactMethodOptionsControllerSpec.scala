@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,102 +18,85 @@ package controllers.add
 
 import base.SpecBase
 import controllers.routes
-import forms.add.SubAddressYesNoFormProvider
-import models.add.SubcontractorName
+import forms.add.IndividualContactMethodOptionsFormProvider
+import models.add.{IndividualContactMethodOptions, SubcontractorName}
 import models.{NormalMode, UserAnswers}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.add.{SubAddressYesNoPage, SubcontractorNamePage}
+import pages.add.{IndividualContactMethodOptionsPage, SubcontractorNamePage}
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import repositories.SessionRepository
-import views.html.add.SubAddressYesNoView
+import views.html.add.IndividualContactMethodOptionsView
 
 import scala.concurrent.Future
 
-class SubAddressYesNoControllerSpec extends SpecBase with MockitoSugar {
+class IndividualContactMethodOptionsControllerSpec extends SpecBase with MockitoSugar {
 
-  private val formProvider = new SubAddressYesNoFormProvider()
+  private lazy val individualContactMethodOptionsRoute =
+    controllers.add.routes.IndividualContactMethodOptionsController.onPageLoad(NormalMode).url
+
+  private val formProvider = new IndividualContactMethodOptionsFormProvider()
   private val form         = formProvider()
 
-  private lazy val subAddressYesNoRoute = controllers.add.routes.SubAddressYesNoController.onPageLoad(NormalMode).url
-
-  private val subcontractorName = SubcontractorName("John", Some("Paul"), "Smith")
+  private val subcontractName = SubcontractorName("John", Some("Paul"), "Smith")
 
   private val name = "John Smith"
 
   private def uaWithName: UserAnswers =
-    emptyUserAnswers.set(SubcontractorNamePage, subcontractorName).success.value
+    emptyUserAnswers
+      .set(SubcontractorNamePage, subcontractName)
+      .success
+      .value
 
-  "SubAddressYesNo Controller" - {
+  "IndividualContactMethodOptions Controller" - {
 
     "must return OK and the correct view for a GET" in {
 
       val application = applicationBuilder(userAnswers = Some(uaWithName)).build()
 
       running(application) {
-        val request = FakeRequest(GET, subAddressYesNoRoute)
+        val request = FakeRequest(GET, individualContactMethodOptionsRoute)
 
         val result = route(application, request).value
 
-        val view = application.injector.instanceOf[SubAddressYesNoView]
+        val view = application.injector.instanceOf[IndividualContactMethodOptionsView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode, name)(request, messages(application)).toString
-      }
-    }
 
-    "must populate the view correctly on a GET when the question has previously been answered" in {
-
-      val userAnswers = uaWithName.set(SubAddressYesNoPage, true).success.value
-
-      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
-
-      running(application) {
-        val request = FakeRequest(GET, subAddressYesNoRoute)
-
-        val view = application.injector.instanceOf[SubAddressYesNoView]
-
-        val result = route(application, request).value
-
-        status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(true), NormalMode, name)(
+        contentAsString(result) mustEqual view(form, NormalMode, name)(
           request,
           messages(application)
         ).toString
       }
     }
 
-    "must redirect to the AddressOfSubcontractor page when valid data with value Yes is submitted" in {
+    "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val mockSessionRepository = mock[SessionRepository]
+      val userAnswers =
+        uaWithName.set(IndividualContactMethodOptionsPage, IndividualContactMethodOptions.values.toSet).success.value
 
-      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
-
-      val application =
-        applicationBuilder(userAnswers = Some(uaWithName))
-          .overrides(
-            bind[SessionRepository].toInstance(mockSessionRepository)
-          )
-          .build()
+      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
       running(application) {
-        val request =
-          FakeRequest(POST, subAddressYesNoRoute)
-            .withFormUrlEncodedBody(("value", "true"))
+        val request = FakeRequest(GET, individualContactMethodOptionsRoute)
+
+        val view = application.injector.instanceOf[IndividualContactMethodOptionsView]
 
         val result = route(application, request).value
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.add.routes.AddressOfSubcontractorController
-          .redirectToAddressLookup()
-          .url
+        status(result) mustEqual OK
+        contentAsString(result) mustEqual view(
+          form.fill(IndividualContactMethodOptions.values.toSet),
+          NormalMode,
+          name
+        )(request, messages(application)).toString
       }
     }
 
-    "must redirect to the IndividualChooseContactDetailsPage page when valid data with value No is submitted" in {
+    "must redirect to the next page when valid data is submitted" in {
 
       val mockSessionRepository = mock[SessionRepository]
 
@@ -128,13 +111,13 @@ class SubAddressYesNoControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, subAddressYesNoRoute)
-            .withFormUrlEncodedBody(("value", "false"))
+          FakeRequest(POST, individualContactMethodOptionsRoute)
+            .withFormUrlEncodedBody(("value[0]", IndividualContactMethodOptions.values.head.toString))
 
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.add.routes.AddIndividualContactMethodsYesNoController
+        redirectLocation(result).value mustEqual controllers.add.routes.IndividualEmailAddressController
           .onPageLoad(NormalMode)
           .url
       }
@@ -146,12 +129,12 @@ class SubAddressYesNoControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, subAddressYesNoRoute)
-            .withFormUrlEncodedBody(("value", ""))
+          FakeRequest(POST, individualContactMethodOptionsRoute)
+            .withFormUrlEncodedBody(("value", "invalid value"))
 
-        val boundForm = form.bind(Map("value" -> ""))
+        val boundForm = form.bind(Map("value" -> "invalid value"))
 
-        val view = application.injector.instanceOf[SubAddressYesNoView]
+        val view = application.injector.instanceOf[IndividualContactMethodOptionsView]
 
         val result = route(application, request).value
 
@@ -168,7 +151,7 @@ class SubAddressYesNoControllerSpec extends SpecBase with MockitoSugar {
       val application = applicationBuilder(userAnswers = None).build()
 
       running(application) {
-        val request = FakeRequest(GET, subAddressYesNoRoute)
+        val request = FakeRequest(GET, individualContactMethodOptionsRoute)
 
         val result = route(application, request).value
 
@@ -183,8 +166,8 @@ class SubAddressYesNoControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, subAddressYesNoRoute)
-            .withFormUrlEncodedBody(("value", "true"))
+          FakeRequest(POST, individualContactMethodOptionsRoute)
+            .withFormUrlEncodedBody(("value[0]", IndividualContactMethodOptions.values.head.toString))
 
         val result = route(application, request).value
 
@@ -199,13 +182,13 @@ class SubAddressYesNoControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, subAddressYesNoRoute)
+          FakeRequest(POST, individualContactMethodOptionsRoute)
             .withFormUrlEncodedBody()
 
-        val form      = new SubAddressYesNoFormProvider()()
+        val form      = new IndividualContactMethodOptionsFormProvider()()
         val boundForm = form.bind(Map.empty)
 
-        val view = application.injector.instanceOf[SubAddressYesNoView]
+        val view = application.injector.instanceOf[IndividualContactMethodOptionsView]
 
         val result = route(application, request).value
 
@@ -215,7 +198,7 @@ class SubAddressYesNoControllerSpec extends SpecBase with MockitoSugar {
           messages(application)
         ).toString
 
-        contentAsString(result) must include(messages(application)("subAddressYesNo.error.required"))
+        contentAsString(result) must include(messages(application)("individualContactMethodOptions.error.required"))
       }
     }
 
@@ -225,7 +208,7 @@ class SubAddressYesNoControllerSpec extends SpecBase with MockitoSugar {
         applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
       running(application) {
-        val request = FakeRequest(GET, subAddressYesNoRoute)
+        val request = FakeRequest(GET, individualContactMethodOptionsRoute)
 
         val result = route(application, request).value
 
@@ -246,7 +229,7 @@ class SubAddressYesNoControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, subAddressYesNoRoute)
+          FakeRequest(POST, individualContactMethodOptionsRoute)
             .withFormUrlEncodedBody("value" -> "true")
 
         val result = route(application, request).value
