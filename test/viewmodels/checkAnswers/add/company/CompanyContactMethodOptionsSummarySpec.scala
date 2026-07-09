@@ -18,7 +18,7 @@ package viewmodels.checkAnswers.add.company
 
 import base.SpecBase
 import models.contact.ContactMethodOptions
-import models.{CheckMode, UserAnswers}
+import models.{AmendMode, CheckMode, UserAnswers}
 import org.scalatest.matchers.must.Matchers
 import pages.add.company.CompanyContactMethodOptionsPage
 import play.api.i18n.{DefaultMessagesApi, Lang, Messages}
@@ -75,6 +75,53 @@ class CompanyContactMethodOptionsSummarySpec extends SpecBase with Matchers {
 
       action.href mustBe controllers.add.company.routes.CompanyContactMethodOptionsController
         .onPageLoad(CheckMode)
+        .url
+
+      action.content.asHtml.toString must include(messages("site.change"))
+
+      action.visuallyHiddenText mustBe Some(
+        messages("companyContactMethodOptions.change.hidden")
+      )
+
+      action.attributes must contain("id" -> "company-contact-methods")
+    }
+
+    "must return a row with multiple selected options for Amend journey" in {
+
+      val answers: UserAnswers =
+        UserAnswers("test-id")
+          .set(
+            CompanyContactMethodOptionsPage,
+            Set(ContactMethodOptions.Email, ContactMethodOptions.Phone, ContactMethodOptions.Mobile)
+          )
+          .success
+          .value
+
+      val result = CompanyContactMethodOptionsSummary.row(answers, AmendMode)
+
+      result mustBe defined
+
+      val row = result.value
+
+      row.key.content.asHtml.toString must include(messages("companyContactMethodOptions.checkYourAnswersLabel"))
+
+      val valueHtml = row.value.content.asHtml.toString
+
+      valueHtml must include("Email address")
+      valueHtml must include("Phone number")
+      valueHtml must include("Mobile number")
+      valueHtml must not include "<br>"
+      valueHtml must include("govuk-list--bullet")
+
+      row.actions mustBe defined
+
+      val actions = row.actions.value.items
+      actions must have size 1
+
+      val action = actions.head
+
+      action.href mustBe controllers.add.company.routes.CompanyContactMethodOptionsController
+        .onPageLoad(AmendMode)
         .url
 
       action.content.asHtml.toString must include(messages("site.change"))

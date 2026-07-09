@@ -444,6 +444,27 @@ class IndividualNavigatorSpec extends SpecBase {
         ) mustBe journeyRecovery
       }
 
+      "must go from AddIndividualContactMethodsYesNoPage to amend CYA when answer is No" in {
+        val answers = emptyUserAnswers.set(AddIndividualContactMethodsYesNoPage, false).success.value
+
+        navigator.nextPage(
+          AddIndividualContactMethodsYesNoPage,
+          AmendMode,
+          answers
+        ) mustBe journeyRecovery
+      }
+
+      "must go from AddIndividualContactMethodsYesNoPage to AddIndividualContactMethodsYesNoController when answer is Yes" in {
+        val answers = emptyUserAnswers.set(AddIndividualContactMethodsYesNoPage, true).success.value
+
+        navigator.nextPage(
+          AddIndividualContactMethodsYesNoPage,
+          AmendMode,
+          answers
+        ) mustBe controllers.add.routes.AddIndividualContactMethodsYesNoController
+          .onPageLoad(AmendMode) // TODO: this needs to redirected to new check box page once its implemented
+      }
+
       "must go from IndividualEmailAddressPage to CheckYourAnswersController" in {
         navigator.nextPage(
           IndividualEmailAddressPage,
