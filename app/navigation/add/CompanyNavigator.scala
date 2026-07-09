@@ -83,6 +83,8 @@ class CompanyNavigator @Inject() () extends NavigatorForJourney {
     case CompanyCrnPage            => _ => cyaRoute(AmendMode)
     case CompanyPhoneNumberPage    => _ => cyaRoute(AmendMode)
     case CompanyAddressYesNoPage   => navigatorFromCompanyAddressYesNoPage(AmendMode)(_)
+    case CompanyCrnYesNoPage       =>
+      userAnswers => navigatorFromCompanyCrnYesNoPage(AmendMode)(userAnswers)
     case CompanyUtrYesNoPage       =>
       userAnswers => navigatorFromCompanyUtrYesNoPage(AmendMode)(userAnswers)
     case CompanyUtrPage            => _ => cyaRoute(AmendMode)

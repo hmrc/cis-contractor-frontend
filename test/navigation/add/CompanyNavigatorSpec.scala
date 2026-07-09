@@ -351,7 +351,7 @@ class CompanyNavigatorSpec extends SpecBase {
             CompanyCrnYesNoPage,
             AmendMode,
             answers
-          ) mustBe journeyRecovery // TODO when available controllers.add.company.routes.CompanyCrnController.onPageLoad(AmendMode)
+          ) mustBe controllers.add.company.routes.CompanyCrnController.onPageLoad(AmendMode)
         }
 
         "to Company CYA when answer is Yes and CompanyCrnPage is answered before" in {
