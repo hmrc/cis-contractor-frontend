@@ -50,8 +50,6 @@ class IndividualNavigator @Inject() () extends NavigatorForJourney {
     case SubcontractorNamePage                     => _ => controllers.add.routes.SubAddressYesNoController.onPageLoad(NormalMode)
     case SubAddressYesNoPage                       =>
       userAnswers => navigatorFromSubAddressYesNoPage(NormalMode)(userAnswers)
-//    case AddressOfSubcontractorPage                =>
-//      _ => controllers.add.routes.AddIndividualContactMethodsYesNoController.onPageLoad(NormalMode)
     case UniqueTaxpayerReferenceYesNoPage          =>
       userAnswers => navigatorFromUniqueTaxpayerReferenceYesNoPage(NormalMode)(userAnswers)
     case SubcontractorsUniqueTaxpayerReferencePage =>
