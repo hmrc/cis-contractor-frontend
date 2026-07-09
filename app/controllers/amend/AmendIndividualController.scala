@@ -75,7 +75,7 @@ class AmendIndividualController @Inject() (
     ua <- ua.set(SubcontractorNamePage, individualName)
     ua <- ua.set(SubAddressYesNoPage, true)
     ua <- ua.set(AddressOfSubcontractorPage, individualAddress)
-    ua <- ua.set(IndividualChooseContactDetailsPage, NoDetails)
+    ua <- ua.set(IndividualContactMethodOptionsPage, NoDetails)  //TODO - check with Surya
     ua <- ua.set(UniqueTaxpayerReferenceYesNoPage, true)
     ua <- ua.set(SubcontractorsUniqueTaxpayerReferencePage, "3992651526")
     ua <- ua.set(NationalInsuranceNumberYesNoPage, true)

@@ -18,6 +18,7 @@ package models.add
 
 import models.address.Address
 import models.contact.ContactOptions
+import models.contact.ContactMethodOptions
 import models.contact.ContactOptions.*
 import models.{InvalidAnswer, MissingAnswer, TypeOfSubcontractor, UserAnswers, Validation, ValidationError}
 import pages.QuestionPage
@@ -28,7 +29,8 @@ final case class ValidatedSubcontractor(
   tradingName: Option[String],
   subcontractorName: Option[SubcontractorName],
   address: Option[Address],
-  individualContactDetails: ContactOptions,
+  IndividualContactMethodOptions: Option[Set[IndividualContactMethodOptions]],
+  //individualContactDetails: ContactOptions,
   individualEmail: Option[String],
   individualPhone: Option[String],
   individualMobile: Option[String],
@@ -44,10 +46,13 @@ object ValidatedSubcontractor extends Validation {
       tradingName              <- getOptionalPageValue(answers, TradingNameOfSubcontractorPage, SubTradingNameYesNoPage)
       subcontractorName        <- getOptionalNamePage(answers)
       address                  <- getOptionalPageValue(answers, AddressOfSubcontractorPage, SubAddressYesNoPage)
-      individualContactDetails <- getPageValue(answers, IndividualChooseContactDetailsPage)
-      individualEmail          <- getContactPageValue(answers, IndividualEmailAddressPage, individualContactDetails)
-      individualPhone          <- getContactPageValue(answers, IndividualPhoneNumberPage, individualContactDetails)
-      individualMobile         <- getContactPageValue(answers, IndividualMobileNumberPage, individualContactDetails)
+      //individualContactDetails <- getPageValue(answers, IndividualChooseContactDetailsPage)
+      individualContactMethodOptions <-
+        getOptionalPageValue(answers, IndividualContactMethodOptionsPage, AddIndividualContactMethodsYesNoPage)
+
+      individualEmail          <- getContactPageValue(answers, individualContactMethodOptions,IndividualEmailAddressPage, ContactMethodOptions.Email)
+      individualPhone          <- getContactPageValue(answers, individualContactMethodOptions,IndividualPhoneNumberPage, ContactMethodOptions.Phone)
+      individualMobile         <- getContactPageValue(answers, individualContactMethodOptions,IndividualMobileNumberPage, ContactMethodOptions.Mobile)
       utr                      <- getOptionalPageValue(answers, SubcontractorsUniqueTaxpayerReferencePage, UniqueTaxpayerReferenceYesNoPage)
       nino                     <- getOptionalPageValue(answers, SubNationalInsuranceNumberPage, NationalInsuranceNumberYesNoPage)
       workReference            <- getOptionalPageValue(answers, WorksReferenceNumberPage, WorksReferenceNumberYesNoPage)
@@ -55,7 +60,7 @@ object ValidatedSubcontractor extends Validation {
       tradingName,
       subcontractorName,
       address,
-      individualContactDetails,
+      individualContactMethodOptions,
       individualEmail,
       individualPhone,
       individualMobile,

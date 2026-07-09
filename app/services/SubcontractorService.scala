@@ -108,22 +108,11 @@ class SubcontractorService @Inject() (
       worksReferenceNumber = userAnswers.get(PartnershipWorksReferenceNumberPage)
     )
 
-  private def individualContactDetailsFromUserAnswers(userAnswers: UserAnswers): ContactDetails =
-    userAnswers.get(IndividualChooseContactDetailsPage) match {
-      case Some(ContactOptions.Email)     => ContactDetails(userAnswers.get(IndividualEmailAddressPage), None, None)
-      case Some(ContactOptions.Phone)     => ContactDetails(None, userAnswers.get(IndividualPhoneNumberPage), None)
-      case Some(ContactOptions.Mobile)    => ContactDetails(None, None, userAnswers.get(IndividualMobileNumberPage))
-      case Some(ContactOptions.NoDetails) => ContactDetails(None, None, None)
-      case _                              => ContactDetails(None, None, None)
-    }
-
   private def individualOrSoleTraderPayloadFromUserAnswers(
     cisId: String,
     subcontractorType: TypeOfSubcontractor,
     userAnswers: UserAnswers
   ): IndividualOrSoleTraderPayload = {
-
-    val contactDetails = individualContactDetailsFromUserAnswers(userAnswers)
 
     IndividualOrSoleTraderPayload(
       cisId = cisId,
@@ -138,12 +127,12 @@ class SubcontractorService @Inject() (
       county = userAnswers.get(AddressOfSubcontractorPage).flatMap(_.addressLine4),
       postcode = userAnswers.get(AddressOfSubcontractorPage).flatMap(_.postcode),
       country = userAnswers.get(AddressOfSubcontractorPage).flatMap(_.country).flatMap(_.name),
-      emailAddress = contactDetails.email,
-      phoneNumber = contactDetails.phone,
-      mobilePhoneNumber = contactDetails.mobile,
       nino = userAnswers.get(SubNationalInsuranceNumberPage),
       utr = userAnswers.get(SubcontractorsUniqueTaxpayerReferencePage),
-      worksReferenceNumber = userAnswers.get(WorksReferenceNumberPage)
+      worksReferenceNumber = userAnswers.get(WorksReferenceNumberPage),
+      emailAddress = userAnswers.get(IndividualEmailAddressPage),
+      phoneNumber = userAnswers.get(IndividualPhoneNumberPage),
+      mobilePhoneNumber = userAnswers.get(IndividualMobileNumberPage)
     )
   }
 
