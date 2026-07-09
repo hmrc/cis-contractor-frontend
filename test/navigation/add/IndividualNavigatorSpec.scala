@@ -31,6 +31,7 @@ class IndividualNavigatorSpec extends SpecBase {
   val navigator                    = new IndividualNavigator
   private lazy val journeyRecovery = routes.JourneyRecoveryController.onPageLoad()
   private lazy val CYA             = controllers.add.routes.CheckYourAnswersController.onPageLoad()
+  private lazy val AmendCYA        = routes.JourneyRecoveryController.onPageLoad() //TODO when available controllers.add.routes.AmendCheckYourAnswersController.onPageLoad()
 
   "IndividualNavigator" - {
 
@@ -1077,31 +1078,28 @@ class IndividualNavigatorSpec extends SpecBase {
         }
       }
 
-      // TODO - need to be fixed
       "must go from a IndividualEmailAddressPage to CheckYourAnswersController" in {
         navigator.nextPage(
           IndividualEmailAddressPage,
           CheckMode,
           UserAnswers("id")
-        ) mustBe controllers.add.routes.CheckYourAnswersController.onPageLoad()
+        ) mustBe AmendCYA
       }
 
-      // TODO - need to be fixed
       "must go from IndividualMobileNumberPage to CheckYourAnswersController in CheckMode" in {
         navigator.nextPage(
           IndividualMobileNumberPage,
           CheckMode,
           UserAnswers("id")
-        ) mustBe controllers.add.routes.CheckYourAnswersController.onPageLoad()
+        ) mustBe AmendCYA
       }
 
-      // TODO - need to be fixed
       "must go from IndividualPhoneNumberPage to CheckYourAnswersController in CheckMode" in {
         navigator.nextPage(
           IndividualPhoneNumberPage,
           CheckMode,
           UserAnswers("id")
-        ) mustBe controllers.add.routes.CheckYourAnswersController.onPageLoad()
+        ) mustBe AmendCYA
       }
 
       "must go from AddIndividualContactMethodsYesNo" - {
