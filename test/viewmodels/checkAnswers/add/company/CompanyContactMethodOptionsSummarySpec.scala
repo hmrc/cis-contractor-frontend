@@ -97,7 +97,7 @@ class CompanyContactMethodOptionsSummarySpec extends SpecBase with Matchers {
           .success
           .value
 
-      val result = CompanyContactMethodOptionsSummary.row(answers,AmendMode)
+      val result = CompanyContactMethodOptionsSummary.row(answers, AmendMode)
 
       result mustBe defined
 
