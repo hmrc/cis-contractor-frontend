@@ -327,6 +327,53 @@ class CompanyNavigatorSpec extends SpecBase {
         ) mustBe CompanyAmendCYA
       }
 
+      "must go from CompanyCrnYesNoPage" - {
+        "to CompanyCrnPage when answer is Yes and CompanyCrnPage is not answered before" in {
+          val answers = emptyUserAnswers.setOrException(CompanyCrnYesNoPage, true)
+
+          navigator.nextPage(
+            CompanyCrnYesNoPage,
+            AmendMode,
+            answers
+          ) mustBe journeyRecovery // TODO when available controllers.add.company.routes.CompanyCrnController.onPageLoad(AmendMode)
+        }
+
+        "to Company CYA when answer is Yes and CompanyCrnPage is answered before" in {
+          val answers =
+            emptyUserAnswers
+              .set(CompanyCrnPage, "AC012345")
+              .success
+              .value
+              .set(CompanyCrnYesNoPage, true)
+              .success
+              .value
+
+          navigator.nextPage(
+            CompanyCrnYesNoPage,
+            AmendMode,
+            answers
+          ) mustBe CompanyAmendCYA
+        }
+
+        "to Company CYA when answer is No" in {
+          val answers = emptyUserAnswers.set(CompanyCrnYesNoPage, false).success.value
+
+          navigator.nextPage(
+            CompanyCrnYesNoPage,
+            AmendMode,
+            answers
+          ) mustBe CompanyAmendCYA
+        }
+
+        "to JourneyRecoveryPage when answer is not present" in {
+          navigator.nextPage(
+            CompanyCrnYesNoPage,
+            AmendMode,
+            emptyUserAnswers
+          ) mustBe routes.JourneyRecoveryController.onPageLoad()
+        }
+      }
+
       "must go from CompanyNamePage to CompanyCheckYourAnswers in AmendMode" in {
         navigator.nextPage(
           CompanyNamePage,
