@@ -14,18 +14,11 @@
  * limitations under the License.
  */
 
-package models.add.partnership
+package queries
 
-import models.contact.ContactOptions
-import play.api.i18n.Messages
-import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.RadioItem
+import models.amend.company.OriginalCompanyAnswers
+import play.api.libs.json.JsPath
 
-type PartnershipChooseContactDetails = ContactOptions
-
-object PartnershipChooseContactDetails {
-  val values: Seq[PartnershipChooseContactDetails] = ContactOptions.values
-
-  def options(implicit messages: Messages): Seq[RadioItem] =
-    ContactOptions.options("partnershipChooseContactDetails")
-
+case object OriginalCompanyAnswersQuery extends Gettable[OriginalCompanyAnswers] with Settable[OriginalCompanyAnswers] {
+  override def path: JsPath = JsPath \ "originalCompanyAnswers"
 }

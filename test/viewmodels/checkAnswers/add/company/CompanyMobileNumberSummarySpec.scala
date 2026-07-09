@@ -18,7 +18,7 @@ package viewmodels.checkAnswers.add.company
 
 import controllers.add.company.routes
 import helpers.CyaEncodingSpecHelper
-import models.{CheckMode, UserAnswers}
+import models.{AmendMode, CheckMode, UserAnswers}
 import org.scalatest.OptionValues.convertOptionToValuable
 import org.scalatest.TryValues.convertTryToSuccessOrFailure
 import org.scalatest.freespec.AnyFreeSpec
@@ -61,6 +61,42 @@ class CompanyMobileNumberSummarySpec extends AnyFreeSpec with Matchers with CyaE
       val expectedChangeText = messages("site.change")
       val expectedHref       = routes.CompanyMobileNumberController
         .onPageLoad(CheckMode)
+        .url
+      val expectedHiddenText = messages("companyMobileNumber.change.hidden")
+
+      changeAction.content.asHtml.toString    should include(expectedChangeText)
+      changeAction.href                     shouldBe expectedHref
+      changeAction.visuallyHiddenText.value shouldBe expectedHiddenText
+      changeAction.attributes                   must contain("id" -> "company-mobile-number")
+    }
+
+    "must return a SummaryListRow when the answer exists in Amend journey" in {
+
+      val answers =
+        UserAnswers("test-id")
+          .set(CompanyMobileNumberPage, "07700 900 982")
+          .success
+          .value
+
+      val maybeRow = CompanyMobileNumberSummary.row(answers, AmendMode)
+
+      maybeRow shouldBe defined
+
+      val row = maybeRow.value
+
+      val expectedKeyText = messages("companyMobileNumber.checkYourAnswersLabel")
+      row.key.content.asHtml.toString should include(expectedKeyText)
+
+      row.value.content.asHtml.toString should include("07700 900 982")
+
+      row.actions shouldBe defined
+      val actions = row.actions.value.items
+      actions should have size 1
+
+      val changeAction       = actions.head
+      val expectedChangeText = messages("site.change")
+      val expectedHref       = routes.CompanyMobileNumberController
+        .onPageLoad(AmendMode)
         .url
       val expectedHiddenText = messages("companyMobileNumber.change.hidden")
 

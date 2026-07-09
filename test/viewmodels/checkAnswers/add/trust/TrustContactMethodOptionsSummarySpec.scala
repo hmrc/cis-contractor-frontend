@@ -84,7 +84,7 @@ class TrustContactMethodOptionsSummarySpec extends SpecBase with Matchers {
         messages("trustContactMethodOptions.change.hidden")
       )
 
-      action.attributes must contain("id" -> "trust-contact-methods")
+      action.attributes must contain("id" -> "trust-methods-of-contact")
     }
 
     "must return a row with a single selected option" in {
