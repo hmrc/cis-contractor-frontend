@@ -16,7 +16,7 @@
 
 package viewmodels.checkAnswers.add.company
 
-import models.{CheckMode, UserAnswers}
+import models.{CheckMode, Mode, UserAnswers}
 import pages.add.company.AddCompanyContactMethodsYesNoPage
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
@@ -25,7 +25,7 @@ import viewmodels.implicits.*
 
 object AddCompanyContactMethodsYesNoSummary {
 
-  def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
+  def row(answers: UserAnswers, mode: Mode = CheckMode)(implicit messages: Messages): Option[SummaryListRow] =
     answers.get(AddCompanyContactMethodsYesNoPage).map { answer =>
 
       val value = if (answer) "site.yes" else "site.no"
@@ -36,7 +36,7 @@ object AddCompanyContactMethodsYesNoSummary {
         actions = Seq(
           ActionItemViewModel(
             "site.change",
-            controllers.add.company.routes.AddCompanyContactMethodsYesNoController.onPageLoad(CheckMode).url
+            controllers.add.company.routes.AddCompanyContactMethodsYesNoController.onPageLoad(mode).url
           )
             .withVisuallyHiddenText(messages("addCompanyContactMethodsYesNo.change.hidden"))
             .withAttribute("id" -> "add-company-contact-details")

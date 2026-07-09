@@ -17,7 +17,7 @@
 package viewmodels.checkAnswers.add.company
 
 import models.contact.ContactMethodOptions
-import models.{CheckMode, UserAnswers}
+import models.{CheckMode, Mode, UserAnswers}
 import pages.add.company.CompanyContactMethodOptionsPage
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
@@ -29,7 +29,7 @@ import viewmodels.implicits.*
 
 object CompanyContactMethodOptionsSummary {
 
-  def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
+  def row(answers: UserAnswers, mode: Mode = CheckMode)(implicit messages: Messages): Option[SummaryListRow] =
     answers.get(CompanyContactMethodOptionsPage).map { selectedMethods =>
       val options =
         ContactMethodOptions
@@ -43,7 +43,7 @@ object CompanyContactMethodOptionsSummary {
         actions = Seq(
           ActionItemViewModel(
             "site.change",
-            controllers.add.company.routes.CompanyContactMethodOptionsController.onPageLoad(CheckMode).url
+            controllers.add.company.routes.CompanyContactMethodOptionsController.onPageLoad(mode).url
           )
             .withVisuallyHiddenText(messages("companyContactMethodOptions.change.hidden"))
             .withAttribute("id" -> "company-methods-of-contact")

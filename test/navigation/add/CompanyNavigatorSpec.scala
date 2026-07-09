@@ -543,6 +543,36 @@ class CompanyNavigatorSpec extends SpecBase {
           emptyUserAnswers
         ) mustBe CompanyAmendCYA
       }
+
+      "must go from AddCompanyContactMethodsYesNo" - {
+        "to AddCompanyContactMethodsYesNo page when answer is Yes" in {
+          val answers = emptyUserAnswers.set(AddCompanyContactMethodsYesNoPage, true).success.value
+
+          navigator.nextPage(
+            AddCompanyContactMethodsYesNoPage,
+            AmendMode,
+            answers
+          ) mustBe journeyRecovery // TODO when available controllers.add.company.routes.CompanyContactMethodOptionsController.onPageLoad(AmendMode)
+        }
+
+        "to CYA when answer is No" in {
+          val answers = emptyUserAnswers.set(AddCompanyContactMethodsYesNoPage, false).success.value
+
+          navigator.nextPage(
+            AddCompanyContactMethodsYesNoPage,
+            AmendMode,
+            answers
+          ) mustBe CompanyAmendCYA
+        }
+
+        "to JourneyRecovery when answer is not present" in {
+          navigator.nextPage(
+            AddCompanyContactMethodsYesNoPage,
+            AmendMode,
+            emptyUserAnswers
+          ) mustBe journeyRecovery
+        }
+      }
     }
 
     "in Check mode" - {

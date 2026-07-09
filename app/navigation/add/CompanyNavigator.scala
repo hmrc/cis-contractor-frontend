@@ -199,15 +199,15 @@ class CompanyNavigator @Inject() () extends NavigatorForJourney {
       case (Some(false), NormalMode) =>
         controllers.add.company.routes.CompanyUtrYesNoController.onPageLoad(NormalMode)
 
-      case (Some(true), CheckMode) =>
+      case (Some(true), CheckMode | AmendMode) =>
         userAnswers
           .get(CompanyContactMethodOptionsPage)
-          .fold(controllers.add.company.routes.CompanyContactMethodOptionsController.onPageLoad(CheckMode)) { _ =>
-            controllers.add.company.routes.CompanyCheckYourAnswersController.onPageLoad()
+          .fold(controllers.add.company.routes.AddCompanyContactMethodsYesNoController.onPageLoad(mode)) { _ =>
+            cyaRoute(mode)
           }
 
-      case (Some(false), CheckMode) =>
-        controllers.add.company.routes.CompanyCheckYourAnswersController.onPageLoad()
+      case (Some(false), CheckMode | AmendMode) =>
+        cyaRoute(mode)
 
       case _ =>
         routes.JourneyRecoveryController.onPageLoad()
