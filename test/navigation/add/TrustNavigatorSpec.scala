@@ -379,6 +379,57 @@ class TrustNavigatorSpec extends SpecBase {
       "must go from TrustNamePage to JourneyRecovery" in {
         navigator.nextPage(TrustNamePage, AmendMode, UserAnswers("id")) mustBe journeyRecovery
       }
+
+      "must go from TrustWorksReferenceYesNoPage to TrustWorksReferenceController when true and no work reference number exists" in {
+        val ua =
+          emptyUserAnswers.setOrException(TrustWorksReferenceYesNoPage, true)
+
+        navigator.nextPage(
+          TrustWorksReferenceYesNoPage,
+          AmendMode,
+          ua
+        ) mustBe controllers.add.trust.routes.TrustWorksReferenceController.onPageLoad(AmendMode)
+      }
+
+      "must go from WorksReferenceNumberYesNoPage to amend CYA page when true and work reference number already exists" in {
+        val ua =
+          emptyUserAnswers
+            .setOrException(TrustWorksReferenceYesNoPage, true)
+            .setOrException(TrustWorksReferencePage, "wrn-1")
+
+        navigator.nextPage(
+          TrustWorksReferenceYesNoPage,
+          AmendMode,
+          ua
+        ) mustBe journeyRecovery // TODO: redirect to amend cya page when implemented
+      }
+
+      "must go from WorksReferenceNumberYesNoPage to amend CYA page when false" in {
+        val ua =
+          emptyUserAnswers.setOrException(TrustWorksReferenceYesNoPage, false)
+
+        navigator.nextPage(
+          TrustWorksReferenceYesNoPage,
+          AmendMode,
+          ua
+        ) mustBe journeyRecovery // TODO: redirect to amend trust cya page when implemented
+      }
+
+      "must go from WorksReferenceNumberYesNoPage to JourneyRecovery when answer is missing" in {
+        navigator.nextPage(
+          TrustWorksReferenceYesNoPage,
+          AmendMode,
+          emptyUserAnswers
+        ) mustBe journeyRecovery
+      }
+
+      "must go from TrustWorksReferencePage to journey recovery page" in {
+        navigator.nextPage(
+          TrustWorksReferencePage,
+          AmendMode,
+          UserAnswers("id")
+        ) mustBe journeyRecovery // TODO: this needs to be redirected to amend trust cya page, when it's implemented
+      }
     }
 
     "in Check mode" - {

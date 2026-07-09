@@ -18,7 +18,7 @@ package viewmodels.checkAnswers.add.trust
 
 import controllers.add.trust.routes
 import helpers.CyaEncodingSpecHelper
-import models.{CheckMode, UserAnswers}
+import models.{AmendMode, CheckMode, UserAnswers}
 import org.scalatest.OptionValues.convertOptionToValuable
 import org.scalatest.TryValues.convertTryToSuccessOrFailure
 import org.scalatest.freespec.AnyFreeSpec
@@ -65,6 +65,41 @@ class TrustWorksReferenceSummarySpec extends AnyFreeSpec with Matchers with CyaE
 
       changeAction.content.asHtml.toString    should include(expectedChangeText)
       changeAction.href                     shouldBe expectedHref
+      changeAction.visuallyHiddenText.value shouldBe expectedHiddenText
+    }
+
+    "must return a SummaryListRow when the answer exists in AmendMode" in {
+
+      val answers =
+        UserAnswers("test-id")
+          .set(TrustWorksReferencePage, "WR-001")
+          .success
+          .value
+
+      val maybeRow = TrustWorksReferenceSummary.row(answers, AmendMode)
+
+      maybeRow shouldBe defined
+
+      val row = maybeRow.value
+
+      val expectedKeyText = messages("trustWorksReference.checkYourAnswersLabel")
+      row.key.content.asHtml.toString should include(expectedKeyText)
+
+      row.value.content.asHtml.toString should include("WR-001")
+
+      row.actions shouldBe defined
+      val actions = row.actions.value.items
+      actions should have size 1
+
+      val changeAction = actions.head
+      val expectedChangeText = messages("site.change")
+      val expectedHref = routes.TrustWorksReferenceController
+        .onPageLoad(AmendMode)
+        .url
+      val expectedHiddenText = messages("trustWorksReference.change.hidden")
+
+      changeAction.content.asHtml.toString should include(expectedChangeText)
+      changeAction.href shouldBe expectedHref
       changeAction.visuallyHiddenText.value shouldBe expectedHiddenText
     }
 
