@@ -18,7 +18,7 @@ package navigation.add
 
 import base.SpecBase
 import controllers.routes
-import models.contact.{ContactMethodOptions, ContactOptions}
+import models.contact.ContactMethodOptions
 import models.{AmendMode, CheckMode, NormalMode, UserAnswers}
 import pages.Page
 import pages.add.company.*
@@ -407,16 +407,11 @@ class CompanyNavigatorSpec extends SpecBase {
         navigator.nextPage(CompanyNamePage, AmendMode, emptyUserAnswers) mustBe CompanyAmendCYA
       }
 
-      "to Amend Company CYA page when EmailAddress is selected and CompanyEmailAddressPage is answered" in {
+      "must go from CompanyEmailAddressPage to Company CYA in AmendMode" in {
         navigator.nextPage(
-          CompanyContactOptionsPage,
+          CompanyEmailAddressPage,
           AmendMode,
           emptyUserAnswers
-            .setOrException(
-              CompanyContactOptionsPage,
-              ContactOptions.Email
-            )
-            .setOrException(CompanyEmailAddressPage, "old@email.com")
         ) mustBe CompanyAmendCYA
       }
 

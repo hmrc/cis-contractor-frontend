@@ -195,11 +195,6 @@ GET   /subcontractor/add/company/address                controllers.add.company.
 GET   /subcontractor/add/company/address-return         controllers.add.company.CompanyAddressController.addressLookupCallback(id: String ?= "", mode: Mode = NormalMode)
 GET   /subcontractor/add/company/address-return/change  controllers.add.company.CompanyAddressController.addressLookupCallbackChange(id: String ?= "", mode: Mode = NormalMode)
 
-GET   /subcontractor/add/company/choose-contact-details         controllers.add.company.CompanyContactOptionsController.onPageLoad(mode: Mode = NormalMode)
-POST  /subcontractor/add/company/choose-contact-details         controllers.add.company.CompanyContactOptionsController.onSubmit(mode: Mode = NormalMode)
-GET   /subcontractor/add/company/change-choose-contact-details  controllers.add.company.CompanyContactOptionsController.onPageLoad(mode: Mode = CheckMode)
-POST  /subcontractor/add/company/change-choose-contact-details  controllers.add.company.CompanyContactOptionsController.onSubmit(mode: Mode = CheckMode)
-
 GET   /subcontractor/add/company/email-address         controllers.add.company.CompanyEmailAddressController.onPageLoad(mode: Mode = NormalMode)
 POST  /subcontractor/add/company/email-address         controllers.add.company.CompanyEmailAddressController.onSubmit(mode: Mode = NormalMode)
 GET   /subcontractor/add/company/change-email-address  controllers.add.company.CompanyEmailAddressController.onPageLoad(mode: Mode = CheckMode)
