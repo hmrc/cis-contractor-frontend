@@ -54,9 +54,9 @@ class TrustWorksReferenceViewSpec extends AnyWordSpec with Matchers with GuiceOn
     }
 
     "render the page with title and update button in AmendMode" in new Setup {
-      val trustName = "Test Trust"
+      val trustName                   = "Test Trust"
       val html: HtmlFormat.Appendable = view(form, AmendMode, trustName)
-      val doc: Document = org.jsoup.Jsoup.parse(html.toString())
+      val doc: Document               = org.jsoup.Jsoup.parse(html.toString())
 
       doc.select("title").text() must include(messages("trustWorksReference.title"))
 

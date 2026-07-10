@@ -41,7 +41,7 @@ class TrustNavigator @Inject() () extends NavigatorForJourney {
   private def cyaRoute(mode: Mode): Call = mode match {
     case AmendMode =>
       routes.JourneyRecoveryController.onPageLoad() // TODO route to Amend Trust CYA page when it's implemented
-    case _ => controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
+    case _         => controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
   }
 
   private val normalRoutes: Page => UserAnswers => Call = {
@@ -87,7 +87,7 @@ class TrustNavigator @Inject() () extends NavigatorForJourney {
 
   private val amendRouteMap: Page => UserAnswers => Call = {
     case TrustWorksReferenceYesNoPage => navigatorFromTrustWorksReferenceYesNoPage(AmendMode)(_)
-    case _ => _ => cyaRoute(AmendMode)
+    case _                            => _ => cyaRoute(AmendMode)
   }
 
   private def navigatorFromTrustUtrYesNoPage(mode: Mode)(ua: UserAnswers): Call =
@@ -121,18 +121,18 @@ class TrustNavigator @Inject() () extends NavigatorForJourney {
 
   private def navigatorFromTrustWorksReferenceYesNoPage(mode: Mode)(ua: UserAnswers): Call =
     (ua.get(TrustWorksReferenceYesNoPage), mode) match {
-      case (Some(true), NormalMode)  =>
+      case (Some(true), NormalMode)             =>
         controllers.add.trust.routes.TrustWorksReferenceController.onPageLoad(NormalMode)
-      case (Some(false), NormalMode) =>
+      case (Some(false), NormalMode)            =>
         controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
-      case (Some(true), CheckMode | AmendMode)   =>
+      case (Some(true), CheckMode | AmendMode)  =>
         ua.get(TrustWorksReferencePage)
           .fold(controllers.add.trust.routes.TrustWorksReferenceController.onPageLoad(mode)) { _ =>
             cyaRoute(mode)
           }
-      case (Some(false), CheckMode | AmendMode)  =>
+      case (Some(false), CheckMode | AmendMode) =>
         cyaRoute(mode)
-      case _                         =>
+      case _                                    =>
         routes.JourneyRecoveryController.onPageLoad()
     }
 

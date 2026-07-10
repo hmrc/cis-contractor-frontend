@@ -87,13 +87,13 @@ class TrustWorksReferenceYesNoSummarySpec extends AnyFreeSpec with Matchers {
       val actions = row.actions.value.items
       actions should have size 1
 
-      val changeAction = actions.head
+      val changeAction       = actions.head
       val expectedChangeText = messages("site.change")
-      val expectedHref = routes.TrustWorksReferenceYesNoController.onPageLoad(AmendMode).url
+      val expectedHref       = routes.TrustWorksReferenceYesNoController.onPageLoad(AmendMode).url
       val expectedHiddenText = messages("trustWorksReferenceYesNo.change.hidden")
 
-      changeAction.content.asHtml.toString should include(expectedChangeText)
-      changeAction.href shouldBe expectedHref
+      changeAction.content.asHtml.toString    should include(expectedChangeText)
+      changeAction.href                     shouldBe expectedHref
       changeAction.visuallyHiddenText.value shouldBe expectedHiddenText
     }
 
