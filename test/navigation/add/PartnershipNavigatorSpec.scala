@@ -643,6 +643,13 @@ class PartnershipNavigatorSpec extends SpecBase {
           emptyUserAnswers
         ) mustBe journeyRecovery
       }
+      "must go from a PartnershipWorksReferenceNumberPage to PartnershipCheckYourAnswers page in AmendMode" in {
+        navigator.nextPage(
+          PartnershipWorksReferenceNumberPage,
+          AmendMode,
+          emptyUserAnswers.setOrException(PartnershipUniqueTaxpayerReferencePage, "UTR-123")
+        ) mustBe partnershipAmendCYA
+      }
     }
 
     "in Check mode" - {
