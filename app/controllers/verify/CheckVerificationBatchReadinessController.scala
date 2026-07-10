@@ -44,6 +44,66 @@ class CheckVerificationBatchReadinessController @Inject() (
   def checkVerificationBatchReadinessInCheckMode(): Action[AnyContent] =
     checkVerificationBatchReadiness(CheckMode)
 
+  def checkVerificationBatchReadinessBeforeDeclaration(): Action[AnyContent] =
+    checkVerificationBatchReadinessAfterBatchUpdate()
+
+  private def checkVerificationBatchReadinessAfterBatchUpdate(): Action[AnyContent] =
+    (identify andThen getData andThen requireData).async { implicit request =>
+      val ua = request.userAnswers
+
+      val selectedUnverifiedIds: Set[String] =
+        ua.get(SelectSubcontractorPage)
+          .getOrElse(Set.empty)
+          .map(_.id)
+
+      val selectedReverifyIds: Set[String] =
+        ua.get(SelectSubcontractorsToReverifyPage)
+          .getOrElse(Set.empty)
+          .map(_.id)
+
+      val selectedIds: Set[String] =
+        selectedUnverifiedIds ++ selectedReverifyIds
+
+      val isReverifyOnly =
+        selectedUnverifiedIds.isEmpty && selectedReverifyIds.nonEmpty
+
+      val batchReadyOpt =
+        ua.get(NewestVerificationBatchResponsePage)
+          .filter(_ => selectedIds.nonEmpty)
+          .map { batchResponse =>
+            if (isReverifyOnly) {
+              val batchSubcontractorIds =
+                batchResponse.subcontractors.map(_.subcontractorId.toString).toSet
+
+              selectedReverifyIds.subsetOf(batchSubcontractorIds)
+            } else {
+              VerificationBatchReadiness.isBatchReady(selectedIds, batchResponse.subcontractors)
+            }
+          }
+
+      batchReadyOpt match {
+        case Some(true) =>
+          for {
+            updatedAnswers <- Future.fromTry(ua.set(VerificationBatchReadinessPage, true))
+            _              <- sessionRepository.set(updatedAnswers)
+          } yield Redirect(
+            controllers.verify.routes.VerificationDeclarationController.onPageLoad()
+          )
+
+        case Some(false) =>
+          for {
+            updatedAnswers <- Future.fromTry(ua.set(VerificationBatchReadinessPage, false))
+            _              <- sessionRepository.set(updatedAnswers)
+          } yield Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+
+        case None =>
+          logger.error(
+            "[CheckVerificationBatchReadinessController.checkVerificationBatchReadinessBeforeDeclaration] Missing selected subcontractors or verification batch response"
+          )
+          Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+      }
+    }
+
   def checkVerificationBatchReadiness(mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
       val ua = request.userAnswers

@@ -100,7 +100,7 @@ class ModifyVerificationBatchAndVerificationsControllerSpec extends SpecBase wit
 
   "ModifyVerificationBatchAndVerificationsController.modifyVerificationBatch" - {
 
-    "must call service with correct ModifyVerificationsRequest (create + delete) and redirect to CheckVerificationBatchReadiness" in {
+    "must call service with correct ModifyVerificationsRequest (create + delete) and redirect to readiness check before declaration" in {
       val mockService = mock[VerificationService]
 
       // selected: 10, 20 => refs 1111,2222
@@ -144,7 +144,7 @@ class ModifyVerificationBatchAndVerificationsControllerSpec extends SpecBase wit
         status(result) mustBe SEE_OTHER
         redirectLocation(result).value mustBe
           controllers.verify.routes.CheckVerificationBatchReadinessController
-            .checkVerificationBatchReadiness()
+            .checkVerificationBatchReadinessBeforeDeclaration()
             .url
 
         val reqCaptor = ArgumentCaptor.forClass(classOf[ModifyVerificationsRequest])
@@ -159,7 +159,7 @@ class ModifyVerificationBatchAndVerificationsControllerSpec extends SpecBase wit
       }
     }
 
-    "must not call service when no changes required and redirect to CheckVerificationBatchReadiness" in {
+    "must not call service when no changes required and redirect to readiness check before declaration" in {
       val mockService = mock[VerificationService]
 
       // selected: 10,30 => refs 1111,3333
@@ -194,7 +194,7 @@ class ModifyVerificationBatchAndVerificationsControllerSpec extends SpecBase wit
         status(result) mustBe SEE_OTHER
         redirectLocation(result).value mustBe
           controllers.verify.routes.CheckVerificationBatchReadinessController
-            .checkVerificationBatchReadiness()
+            .checkVerificationBatchReadinessBeforeDeclaration()
             .url
 
         verify(mockService, never()).modifyVerificationBatchAndVerifications(any(), any())(any())
@@ -392,7 +392,7 @@ class ModifyVerificationBatchAndVerificationsControllerSpec extends SpecBase wit
         status(result) mustBe SEE_OTHER
         redirectLocation(result).value mustBe
           controllers.verify.routes.CheckVerificationBatchReadinessController
-            .checkVerificationBatchReadiness()
+            .checkVerificationBatchReadinessBeforeDeclaration()
             .url
 
         val reqCaptor = ArgumentCaptor.forClass(classOf[ModifyVerificationsRequest])

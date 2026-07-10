@@ -106,14 +106,6 @@ class SubmissionSendingControllerSpec extends SpecBase with MockitoSugar {
         )
       ).thenReturn(Future.failed(new RuntimeException("boom")))
 
-      val mockService = mock[VerificationService]
-
-      when(mockService.getCurrentVerificationBatch(any[models.UserAnswers])(any[HeaderCarrier]))
-        .thenReturn(Future.successful(ua))
-
-      when(mockService.createSubmissionForVerification(any[CreateSubmissionForVerificationRequest])(any[HeaderCarrier]))
-        .thenReturn(Future.successful(CreateSubmissionForVerificationResponse(12345L)))
-
       val application =
         applicationBuilder(userAnswers = Some(emptyUserAnswers))
           .overrides(bind[VerificationService].toInstance(mockService))

@@ -31,6 +31,9 @@ class VerifyNavigatorSpec extends SpecBase {
   private lazy val journeyRecovery = routes.JourneyRecoveryController.onPageLoad()
   private lazy val cya             = controllers.verify.routes.VerifyCheckYourAnswersController.onPageLoad()
 
+  private lazy val createVerificationBatch =
+    controllers.verify.routes.CreateVerificationBatchAndVerificationsController.onSubmit()
+
   "VerifyNavigator" - {
 
     "in Normal mode" - {
@@ -231,7 +234,7 @@ class VerifyNavigatorSpec extends SpecBase {
 
       "ContractorEmailConfirmationStoredPage" - {
 
-        "must go to VerificationDeclarationController when answer is CurrentEmail" in {
+        "must go to CreateVerificationBatchAndVerificationsController when answer is CurrentEmail" in {
           val ua = emptyUserAnswers.setOrException(
             ContractorEmailConfirmationStoredPage,
             ContractorEmailConfirmationStored.CurrentEmail
@@ -241,7 +244,7 @@ class VerifyNavigatorSpec extends SpecBase {
             ContractorEmailConfirmationStoredPage,
             NormalMode,
             ua
-          ) mustBe controllers.verify.routes.VerificationDeclarationController.onPageLoad()
+          ) mustBe createVerificationBatch
         }
 
         "must go to EmailAddressController when answer is DifferentEmail" in {
@@ -253,7 +256,7 @@ class VerifyNavigatorSpec extends SpecBase {
             controllers.verify.routes.EmailAddressController.onPageLoad(NormalMode)
         }
 
-        "must go to VerificationDeclarationController when answer is DoNotSend" in {
+        "must go to CreateVerificationBatchAndVerificationsController when answer is DoNotSend" in {
           val ua = emptyUserAnswers.setOrException(
             ContractorEmailConfirmationStoredPage,
             ContractorEmailConfirmationStored.DoNotSend
@@ -263,7 +266,7 @@ class VerifyNavigatorSpec extends SpecBase {
             ContractorEmailConfirmationStoredPage,
             NormalMode,
             ua
-          ) mustBe controllers.verify.routes.VerificationDeclarationController.onPageLoad()
+          ) mustBe createVerificationBatch
         }
 
         "must go to JourneyRecovery when answer is not present" in {
@@ -313,14 +316,14 @@ class VerifyNavigatorSpec extends SpecBase {
         }
       }
 
-      "must go to VerificationDeclarationController from EmailAddressPage in NormalMode" in {
+      "must go to CreateVerificationBatchAndVerificationsController from EmailAddressPage in NormalMode" in {
         val ua = emptyUserAnswers.setOrException(EmailAddressPage, "test@test.com")
 
         navigator.nextPage(
           EmailAddressPage,
           NormalMode,
           ua
-        ) mustBe controllers.verify.routes.VerificationDeclarationController.onPageLoad()
+        ) mustBe createVerificationBatch
       }
 
       "must go to VerifyCheckYourAnswers from VerificationDeclarationPage in NormalMode" in {
@@ -467,7 +470,7 @@ class VerifyNavigatorSpec extends SpecBase {
         }
       }
 
-      "must go to VerificationDeclarationController from EmailAddressPage in CheckMode" in {
+      "must go to VerifyCheckYourAnswers from EmailAddressPage in CheckMode" in {
         val ua = emptyUserAnswers.setOrException(EmailAddressPage, "test@test.com")
 
         navigator.nextPage(

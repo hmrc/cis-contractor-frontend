@@ -457,6 +457,8 @@ GET   /subcontractor/verify/check-verification-batch-readiness  controllers.veri
 
 GET   /subcontractor/verify/check-verification-batch-readiness/check-mode  controllers.verify.CheckVerificationBatchReadinessController.checkVerificationBatchReadinessInCheckMode()
 
+GET   /verify/check-verification-batch-readiness-before-declaration   controllers.verify.CheckVerificationBatchReadinessController.checkVerificationBatchReadinessBeforeDeclaration()
+
 GET   /subcontractor/verify/newest                            controllers.verify.NewestVerificationBatchController.onPageLoad()
 GET   /subcontractor/verify/inactive-scheme-warning/continue  controllers.verify.NewestVerificationBatchController.onContinue
 
