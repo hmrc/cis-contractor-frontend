@@ -18,7 +18,7 @@ package models.add
 
 import base.SpecBase
 import models.address.{Address, Country}
-import models.contact.ContactOptions
+import models.contact.ContactMethodOptions
 import models.{InvalidAnswer, MissingAnswer, TypeOfSubcontractor}
 import org.scalatest.Inside.inside
 import org.scalatest.freespec.AnyFreeSpec
@@ -54,7 +54,7 @@ class ValidatedSubcontractorSpec extends SpecBase with Matchers {
       .set(SubAddressYesNoPage, false)
       .success
       .value
-      .set(IndividualChooseContactDetailsPage, ContactOptions.NoDetails)
+      .set(AddIndividualContactMethodsYesNoPage, false)
       .success
       .value
       .set(UniqueTaxpayerReferenceYesNoPage, false)
@@ -117,7 +117,7 @@ class ValidatedSubcontractorSpec extends SpecBase with Matchers {
             .set(WorksReferenceNumberPage, "WRN-001")
             .success
             .value
-            .set(IndividualChooseContactDetailsPage, ContactOptions.Email)
+            .set(IndividualContactMethodOptionsPage, Set(ContactMethodOptions.Email))
             .success
             .value
             .set(IndividualEmailAddressPage, "abc@test.com")
@@ -131,7 +131,7 @@ class ValidatedSubcontractorSpec extends SpecBase with Matchers {
             tradingName = Some("ABC Ltd"),
             subcontractorName = None,
             address = Some(address),
-            individualContactDetails = ContactOptions.Email,
+            //           individualContactDetails = ContactMethodOptions.Email, // TODO - need to fix
             individualEmail = Some("abc@test.com"),
             individualPhone = None,
             individualMobile = None,
@@ -161,7 +161,7 @@ class ValidatedSubcontractorSpec extends SpecBase with Matchers {
             .set(AddressOfSubcontractorPage, address)
             .success
             .value
-            .set(IndividualChooseContactDetailsPage, ContactOptions.Phone)
+            .set(IndividualContactMethodOptionsPage, Set(ContactMethodOptions.Phone))
             .success
             .value
             .set(IndividualPhoneNumberPage, "098765433452")
@@ -229,7 +229,8 @@ class ValidatedSubcontractorSpec extends SpecBase with Matchers {
             .set(WorksReferenceNumberYesNoPage, false)
             .success
             .value
-            .set(IndividualChooseContactDetailsPage, ContactOptions.NoDetails)
+//            .set(IndividualContactMethodOptionsPage, ContactOptions.NoDetails)
+            .set(AddIndividualContactMethodsYesNoPage, true)
             .success
             .value
 
@@ -267,9 +268,12 @@ class ValidatedSubcontractorSpec extends SpecBase with Matchers {
             .set(SubAddressYesNoPage, false)
             .success
             .value
-            .set(IndividualChooseContactDetailsPage, ContactOptions.NoDetails)
+            .set(AddIndividualContactMethodsYesNoPage, true)
             .success
             .value
+//            .set(IndividualContactMethodOptionsPage, ContactOptions.NoDetails)
+//            .success
+//            .value
             .set(NationalInsuranceNumberYesNoPage, false)
             .success
             .value
@@ -287,7 +291,7 @@ class ValidatedSubcontractorSpec extends SpecBase with Matchers {
             tradingName = None,
             subcontractorName = Some(subcontractorName),
             address = None,
-            individualContactDetails = ContactOptions.NoDetails,
+            individualContactDetails = false,
             individualEmail = None,
             individualPhone = None,
             individualMobile = None,
@@ -301,7 +305,10 @@ class ValidatedSubcontractorSpec extends SpecBase with Matchers {
       "build when contact option is Email and email address is present" in {
         val ua =
           minRequired
-            .set(IndividualChooseContactDetailsPage, ContactOptions.Email)
+            .set(AddIndividualContactMethodsYesNoPage, true)
+            .success
+            .value
+            .set(IndividualContactMethodOptionsPage, Set(ContactMethodOptions.Email))
             .success
             .value
             .set(IndividualEmailAddressPage, "a@b.com")
@@ -314,7 +321,10 @@ class ValidatedSubcontractorSpec extends SpecBase with Matchers {
       "build when contact option is phone and phone is present" in {
         val ua =
           minRequired
-            .set(IndividualChooseContactDetailsPage, ContactOptions.Phone)
+            .set(AddIndividualContactMethodsYesNoPage, true)
+            .success
+            .value
+            .set(IndividualContactMethodOptionsPage, Set(ContactMethodOptions.Phone))
             .success
             .value
             .set(IndividualPhoneNumberPage, "098765433452")
@@ -327,7 +337,10 @@ class ValidatedSubcontractorSpec extends SpecBase with Matchers {
       "build when contact option is mobile and mobile is present" in {
         val ua =
           minRequired
-            .set(IndividualChooseContactDetailsPage, ContactOptions.Mobile)
+            .set(AddIndividualContactMethodsYesNoPage, true)
+            .success
+            .value
+            .set(IndividualContactMethodOptionsPage, Set(ContactMethodOptions.Mobile))
             .success
             .value
             .set(IndividualMobileNumberPage, "098765433452")
@@ -711,7 +724,10 @@ class ValidatedSubcontractorSpec extends SpecBase with Matchers {
       "require email address when contact option is Email" in {
         val ua =
           minRequired
-            .set(IndividualChooseContactDetailsPage, ContactOptions.Email)
+            .set(AddIndividualContactMethodsYesNoPage, true)
+            .success
+            .value
+            .set(IndividualContactMethodOptionsPage, Set(ContactMethodOptions.Email))
             .success
             .value
 
@@ -727,7 +743,10 @@ class ValidatedSubcontractorSpec extends SpecBase with Matchers {
       "require phone number when contact option is phone" in {
         val ua =
           minRequired
-            .set(IndividualChooseContactDetailsPage, ContactOptions.Phone)
+            .set(AddIndividualContactMethodsYesNoPage, true)
+            .success
+            .value
+            .set(IndividualContactMethodOptionsPage, Set(ContactMethodOptions.Phone))
             .success
             .value
 
@@ -743,7 +762,10 @@ class ValidatedSubcontractorSpec extends SpecBase with Matchers {
       "require mobile number when contact option is mobile" in {
         val ua =
           minRequired
-            .set(IndividualChooseContactDetailsPage, ContactOptions.Mobile)
+            .set(AddIndividualContactMethodsYesNoPage, true)
+            .success
+            .value
+            .set(IndividualContactMethodOptionsPage, Set(ContactMethodOptions.Mobile))
             .success
             .value
 

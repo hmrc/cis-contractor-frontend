@@ -36,7 +36,7 @@ import com.google.inject.Inject
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
 import models.UserAnswers
 import models.add.ValidatedSubcontractor
-import models.contact.ContactOptions.{Email, Mobile, Phone}
+import models.contact.ContactMethodOptions
 import pages.add.CheckYourAnswersSubmittedPage
 import play.api.Logging
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
@@ -85,13 +85,11 @@ class CheckYourAnswersController @Inject() (
             TradingNameOfSubcontractorSummary.row(ua),
             SubAddressYesNoSummary.row(ua),
             AddressOfSubcontractorSummary.row(ua),
-            //IndividualChooseContactDetailsSummary.row(ua),
             AddIndividualContactMethodsYesNoSummary.row(ua),
             IndividualContactMethodOptionsSummary.row(ua),
             IndividualEmailAddressSummary.row(ua),
             IndividualPhoneNumberSummary.row(ua),
             IndividualMobileNumberSummary.row(ua),
-            // contactDetailsPage(ua),
             UniqueTaxpayerReferenceYesNoSummary.row(ua),
             SubcontractorsUniqueTaxpayerReferenceSummary.row(ua),
             NationalInsuranceNumberYesNoSummary.row(ua),

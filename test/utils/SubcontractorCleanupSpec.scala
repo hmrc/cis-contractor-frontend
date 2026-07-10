@@ -69,7 +69,10 @@ class SubcontractorCleanupSpec extends SpecBase {
           .set(AddressOfSubcontractorPage, subcontractorAddress)
           .success
           .value
-          .set(IndividualChooseContactDetailsPage, ContactOptions.Email)
+          .set(
+            IndividualContactMethodOptionsPage,
+            Set(ContactMethodOptions.Email, ContactMethodOptions.Phone, ContactMethodOptions.Mobile)
+          )
           .success
           .value
           .set(IndividualEmailAddressPage, email)
@@ -115,7 +118,8 @@ class SubcontractorCleanupSpec extends SpecBase {
       val result = removeIndividualSoleTraderSubcontractor(userAnswers).success.value
 
       result.get(AddressOfSubcontractorPage) mustBe None
-      result.get(IndividualChooseContactDetailsPage) mustBe None
+      result.get(AddIndividualContactMethodsYesNoPage) mustBe None
+      result.get(IndividualContactMethodOptionsPage) mustBe None
       result.get(IndividualEmailAddressPage) mustBe None
       result.get(IndividualMobileNumberPage) mustBe None
       result.get(IndividualPhoneNumberPage) mustBe None
@@ -362,7 +366,10 @@ class SubcontractorCleanupSpec extends SpecBase {
           .set(AddressOfSubcontractorPage, subcontractorAddress)
           .success
           .value
-          .set(IndividualChooseContactDetailsPage, ContactOptions.Email)
+          .set(
+            IndividualContactMethodOptionsPage,
+            Set(ContactMethodOptions.Email, ContactMethodOptions.Phone, ContactMethodOptions.Mobile)
+          )
           .success
           .value
           .set(IndividualEmailAddressPage, email)
@@ -548,7 +555,8 @@ class SubcontractorCleanupSpec extends SpecBase {
       result.get(TypeOfSubcontractorPage) mustBe None
 
       result.get(AddressOfSubcontractorPage) mustBe None
-      result.get(IndividualChooseContactDetailsPage) mustBe None
+      result.get(AddIndividualContactMethodsYesNoPage) mustBe None
+      result.get(IndividualContactMethodOptionsPage) mustBe None
       result.get(IndividualEmailAddressPage) mustBe None
       result.get(IndividualMobileNumberPage) mustBe None
       result.get(IndividualPhoneNumberPage) mustBe None

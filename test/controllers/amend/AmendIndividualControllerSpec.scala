@@ -128,7 +128,7 @@ class AmendIndividualControllerSpec extends SpecBase with MockitoSugar {
           savedAnswers.get(SubcontractorNamePage).value mustEqual expectedName
           savedAnswers.get(SubAddressYesNoPage).value mustEqual true
           savedAnswers.get(AddressOfSubcontractorPage).value mustEqual expectedAddress
-          savedAnswers.get(IndividualChooseContactDetailsPage).value mustEqual NoDetails
+          savedAnswers.get(IndividualContactMethodOptionsPage).value mustEqual NoDetails
           savedAnswers.get(UniqueTaxpayerReferenceYesNoPage).value mustEqual true
           savedAnswers.get(SubcontractorsUniqueTaxpayerReferencePage).value mustEqual "3992651526"
           savedAnswers.get(NationalInsuranceNumberYesNoPage).value mustEqual true

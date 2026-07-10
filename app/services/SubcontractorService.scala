@@ -112,8 +112,7 @@ class SubcontractorService @Inject() (
     cisId: String,
     subcontractorType: TypeOfSubcontractor,
     userAnswers: UserAnswers
-  ): IndividualOrSoleTraderPayload = {
-
+  ): IndividualOrSoleTraderPayload =
     IndividualOrSoleTraderPayload(
       cisId = cisId,
       subcontractorType = subcontractorType,
@@ -134,7 +133,6 @@ class SubcontractorService @Inject() (
       phoneNumber = userAnswers.get(IndividualPhoneNumberPage),
       mobilePhoneNumber = userAnswers.get(IndividualMobileNumberPage)
     )
-  }
 
   private def companyContactDetailsFromUserAnswers(userAnswers: UserAnswers): ContactDetails =
     userAnswers.get(CompanyContactOptionsPage) match {

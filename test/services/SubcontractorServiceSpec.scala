@@ -20,8 +20,9 @@ import base.SpecBase
 import connectors.ConstructionIndustrySchemeConnector
 import models.TypeOfSubcontractor
 import models.add.SubcontractorName
+import models.contact.ContactMethodOptions
 import models.address.{Address, Country}
-import models.contact.{ContactMethodOptions, ContactOptions}
+import models.contact.ContactOptions
 import pages.add.company._
 import models.requests.CreateAndUpdateSubcontractorPayload
 import models.requests.CreateAndUpdateSubcontractorPayload.{CompanyPayload, IndividualOrSoleTraderPayload, PartnershipPayload, TrustPayload}
@@ -70,6 +71,9 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
           .set(AddressOfSubcontractorPage, individualAddress)
           .success
           .value
+          .set(AddIndividualContactMethodsYesNoPage, false)
+          .success
+          .value
           .set(SubNationalInsuranceNumberPage, "AC012345")
           .success
           .value
@@ -90,7 +94,7 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
             .set(TradingNameOfSubcontractorPage, "trading name")
             .success
             .value
-            .set(IndividualChooseContactDetailsPage, ContactOptions.Email)
+            .set(IndividualContactMethodOptionsPage, Set(ContactMethodOptions.Email))
             .success
             .value
             .set(IndividualEmailAddressPage, "i@example.com")
@@ -134,7 +138,7 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
             .set(SubcontractorNamePage, SubcontractorName("firstname", Some("middle name"), "lastname"))
             .success
             .value
-            .set(IndividualChooseContactDetailsPage, ContactOptions.Email)
+            .set(IndividualContactMethodOptionsPage, Set(ContactMethodOptions.Email))
             .success
             .value
             .set(IndividualEmailAddressPage, "i@example.com")
@@ -180,7 +184,7 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
             .set(TradingNameOfSubcontractorPage, "trading name")
             .success
             .value
-            .set(IndividualChooseContactDetailsPage, ContactOptions.Email)
+            .set(IndividualContactMethodOptionsPage, Set(ContactMethodOptions.Email))
             .success
             .value
             .set(IndividualEmailAddressPage, "i@example.com")
@@ -224,7 +228,7 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
             .set(TradingNameOfSubcontractorPage, "trading name")
             .success
             .value
-            .set(IndividualChooseContactDetailsPage, ContactOptions.Phone)
+            .set(IndividualContactMethodOptionsPage, Set(ContactMethodOptions.Phone))
             .success
             .value
             .set(IndividualPhoneNumberPage, "02071234567")
@@ -268,7 +272,7 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
             .set(TradingNameOfSubcontractorPage, "trading name")
             .success
             .value
-            .set(IndividualChooseContactDetailsPage, ContactOptions.Mobile)
+            .set(IndividualContactMethodOptionsPage, Set(ContactMethodOptions.Mobile))
             .success
             .value
             .set(IndividualMobileNumberPage, "07123456789")
@@ -312,7 +316,8 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
             .set(TradingNameOfSubcontractorPage, "trading name")
             .success
             .value
-            .set(IndividualChooseContactDetailsPage, ContactOptions.NoDetails)
+            .set(AddIndividualContactMethodsYesNoPage, false)
+//            .set(IndividualContactMethodOptionsPage, ContactOptions.NoDetails)
             .success
             .value
 
@@ -353,7 +358,7 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
             .set(TradingNameOfSubcontractorPage, "trading name")
             .success
             .value
-            .set(IndividualChooseContactDetailsPage, ContactOptions.NoDetails)
+            .set(IndividualContactMethodOptionsPage, Set(ContactMethodOptions.Email))
             .success
             .value
 

@@ -30,7 +30,7 @@ final case class ValidatedSubcontractor(
   subcontractorName: Option[SubcontractorName],
   address: Option[Address],
   IndividualContactMethodOptions: Option[Set[IndividualContactMethodOptions]],
-  //individualContactDetails: ContactOptions,
+  // individualContactDetails: ContactOptions,
   individualEmail: Option[String],
   individualPhone: Option[String],
   individualMobile: Option[String],
@@ -42,20 +42,35 @@ final case class ValidatedSubcontractor(
 object ValidatedSubcontractor extends Validation {
   def build(answers: UserAnswers): Either[ValidationError, ValidatedSubcontractor] =
     for {
-      typeOfSubcontractor      <- validateType(answers)
-      tradingName              <- getOptionalPageValue(answers, TradingNameOfSubcontractorPage, SubTradingNameYesNoPage)
-      subcontractorName        <- getOptionalNamePage(answers)
-      address                  <- getOptionalPageValue(answers, AddressOfSubcontractorPage, SubAddressYesNoPage)
-      //individualContactDetails <- getPageValue(answers, IndividualChooseContactDetailsPage)
+      typeOfSubcontractor            <- validateType(answers)
+      tradingName                    <- getOptionalPageValue(answers, TradingNameOfSubcontractorPage, SubTradingNameYesNoPage)
+      subcontractorName              <- getOptionalNamePage(answers)
+      address                        <- getOptionalPageValue(answers, AddressOfSubcontractorPage, SubAddressYesNoPage)
+      // individualContactDetails <- getPageValue(answers, IndividualChooseContactDetailsPage)
       individualContactMethodOptions <-
         getOptionalPageValue(answers, IndividualContactMethodOptionsPage, AddIndividualContactMethodsYesNoPage)
 
-      individualEmail          <- getContactPageValue(answers, individualContactMethodOptions,IndividualEmailAddressPage, ContactMethodOptions.Email)
-      individualPhone          <- getContactPageValue(answers, individualContactMethodOptions,IndividualPhoneNumberPage, ContactMethodOptions.Phone)
-      individualMobile         <- getContactPageValue(answers, individualContactMethodOptions,IndividualMobileNumberPage, ContactMethodOptions.Mobile)
-      utr                      <- getOptionalPageValue(answers, SubcontractorsUniqueTaxpayerReferencePage, UniqueTaxpayerReferenceYesNoPage)
-      nino                     <- getOptionalPageValue(answers, SubNationalInsuranceNumberPage, NationalInsuranceNumberYesNoPage)
-      workReference            <- getOptionalPageValue(answers, WorksReferenceNumberPage, WorksReferenceNumberYesNoPage)
+      individualEmail  <- getContactPageValue(
+                            answers,
+                            individualContactMethodOptions,
+                            IndividualEmailAddressPage,
+                            ContactMethodOptions.Email
+                          )
+      individualPhone  <- getContactPageValue(
+                            answers,
+                            individualContactMethodOptions,
+                            IndividualPhoneNumberPage,
+                            ContactMethodOptions.Phone
+                          )
+      individualMobile <- getContactPageValue(
+                            answers,
+                            individualContactMethodOptions,
+                            IndividualMobileNumberPage,
+                            ContactMethodOptions.Mobile
+                          )
+      utr              <- getOptionalPageValue(answers, SubcontractorsUniqueTaxpayerReferencePage, UniqueTaxpayerReferenceYesNoPage)
+      nino             <- getOptionalPageValue(answers, SubNationalInsuranceNumberPage, NationalInsuranceNumberYesNoPage)
+      workReference    <- getOptionalPageValue(answers, WorksReferenceNumberPage, WorksReferenceNumberYesNoPage)
     } yield ValidatedSubcontractor(
       tradingName,
       subcontractorName,
