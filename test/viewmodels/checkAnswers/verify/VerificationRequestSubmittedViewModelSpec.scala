@@ -70,6 +70,7 @@ class VerificationRequestSubmittedViewModelSpec extends SpecBase {
         val vm =
           VerificationRequestSubmittedViewModel(
             manageSubcontractorsUrl = s"${applicationConfig.manageSubcontractorsUrl}/$cisId",
+            verificationHistoryUrl = applicationConfig.verificationHistoryUrl,
             referenceNumber = "REF123",
             submittedAt = now,
             subcontractorsToVerify = Seq("Sub A"),
@@ -77,6 +78,7 @@ class VerificationRequestSubmittedViewModelSpec extends SpecBase {
           )
 
         vm.showEmail shouldBe true
+        vm.verificationHistoryUrl shouldBe applicationConfig.verificationHistoryUrl
       }
 
       "must return false when confirmationEmail is not defined" in {
@@ -84,6 +86,7 @@ class VerificationRequestSubmittedViewModelSpec extends SpecBase {
         val vm =
           VerificationRequestSubmittedViewModel(
             manageSubcontractorsUrl = s"${applicationConfig.manageSubcontractorsUrl}/$cisId",
+            verificationHistoryUrl = applicationConfig.verificationHistoryUrl,
             referenceNumber = "REF123",
             submittedAt = now,
             subcontractorsToVerify = Seq("Sub A"),
@@ -91,6 +94,7 @@ class VerificationRequestSubmittedViewModelSpec extends SpecBase {
           )
 
         vm.showEmail shouldBe false
+        vm.verificationHistoryUrl shouldBe applicationConfig.verificationHistoryUrl
       }
     }
 
@@ -101,6 +105,7 @@ class VerificationRequestSubmittedViewModelSpec extends SpecBase {
         val vm =
           VerificationRequestSubmittedViewModel(
             manageSubcontractorsUrl = s"${applicationConfig.manageSubcontractorsUrl}/$cisId",
+            verificationHistoryUrl = applicationConfig.verificationHistoryUrl,
             referenceNumber = "REF123",
             submittedAt = now,
             subcontractorsToVerify = Seq("Sub A")
@@ -114,6 +119,7 @@ class VerificationRequestSubmittedViewModelSpec extends SpecBase {
         val vm =
           VerificationRequestSubmittedViewModel(
             manageSubcontractorsUrl = s"${applicationConfig.manageSubcontractorsUrl}/$cisId",
+            verificationHistoryUrl = applicationConfig.verificationHistoryUrl,
             referenceNumber = "REF123",
             submittedAt = now
           )
@@ -129,6 +135,7 @@ class VerificationRequestSubmittedViewModelSpec extends SpecBase {
         val vm =
           VerificationRequestSubmittedViewModel(
             manageSubcontractorsUrl = s"${applicationConfig.manageSubcontractorsUrl}/$cisId",
+            verificationHistoryUrl = applicationConfig.verificationHistoryUrl,
             referenceNumber = "REF123",
             submittedAt = now,
             subcontractorsToVerify = Seq("Sub A"),
@@ -143,6 +150,7 @@ class VerificationRequestSubmittedViewModelSpec extends SpecBase {
         val vm =
           VerificationRequestSubmittedViewModel(
             manageSubcontractorsUrl = s"${applicationConfig.manageSubcontractorsUrl}/$cisId",
+            verificationHistoryUrl = applicationConfig.verificationHistoryUrl,
             referenceNumber = "REF123",
             submittedAt = now,
             subcontractorsToVerify = Seq("Sub A")
@@ -170,6 +178,7 @@ class VerificationRequestSubmittedViewModelSpec extends SpecBase {
 
         vm.referenceNumber shouldBe "VB00000001"
         vm.submittedAt     shouldBe now
+        vm.verificationHistoryUrl  shouldBe applicationConfig.verificationHistoryUrl
       }
 
       "must map subcontractors correctly" in {
