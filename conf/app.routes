@@ -391,6 +391,9 @@ GET   /subcontractor/add/partnership/change-select-contact-details  controllers.
 POST  /subcontractor/add/partnership/change-select-contact-details  controllers.add.partnership.PartnershipContactMethodOptionsController.onSubmit(mode: Mode = CheckMode)
 
 # Trust
+
+GET   /subcontractor/amend/trust  controllers.amend.trust.AmendTrustController.onPageLoad()
+
 GET   /subcontractor/add/trust/subcontractor-added  controllers.add.SubcontractorAddedController.trustSubcontractorAdded()
 
 GET   /subcontractor/add/trust/trust-name         controllers.add.trust.TrustNameController.onPageLoad(mode: Mode = NormalMode)
