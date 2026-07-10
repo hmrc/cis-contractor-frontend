@@ -17,7 +17,7 @@
 package views.add
 
 import forms.add.SubAddressYesNoFormProvider
-import models.NormalMode
+import models.{AmendMode, NormalMode}
 import org.jsoup.nodes.Document
 import org.jsoup.select.Elements
 import org.scalatest.matchers.must.Matchers
@@ -56,6 +56,35 @@ class SubAddressYesNoViewSpec extends AnyWordSpec with Matchers with GuiceOneApp
 
       doc.select("form").attr("action") mustBe controllers.add.routes.SubAddressYesNoController
         .onSubmit(NormalMode)
+        .url
+
+      doc.select("form").attr("autocomplete") mustBe "off"
+
+      doc.select(".govuk-button").text() mustBe messages("site.continue")
+    }
+
+    "render the page with title, heading, radios and submit button for Amend journey" in new Setup {
+
+      val subcontractorName = "Test Subcontractor"
+
+      val html: HtmlFormat.Appendable = view(form, AmendMode, subcontractorName)
+      val doc: Document               = org.jsoup.Jsoup.parse(html.toString())
+      doc.select("title").text() must include(messages("subAddressYesNo.title"))
+
+      val legend: Elements = doc.select("fieldset legend")
+      legend.text() mustBe messages("subAddressYesNo.heading", subcontractorName)
+      legend.hasClass("govuk-fieldset__legend--l") mustBe true
+
+      val hint: Elements = doc.select("fieldset .govuk-hint")
+      hint.text() mustBe empty
+
+      val radioButtons: Elements = doc.select(".govuk-radios__label")
+      radioButtons.size() mustBe 2
+      radioButtons.get(0).text mustBe "Yes"
+      radioButtons.get(1).text mustBe "No"
+
+      doc.select("form").attr("action") mustBe controllers.add.routes.SubAddressYesNoController
+        .onSubmit(AmendMode)
         .url
 
       doc.select("form").attr("autocomplete") mustBe "off"

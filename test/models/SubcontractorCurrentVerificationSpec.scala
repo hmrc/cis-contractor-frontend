@@ -26,14 +26,22 @@ class SubcontractorCurrentVerificationSpec extends SpecBase {
         subcontractorId = 1L,
         subbieResourceRef = Some(10L),
         firstName = Some("John"),
-        surname = Some("Smith"),
         secondName = None,
+        surname = Some("Smith"),
         tradingName = Some("ACME"),
         utr = Some("1111111111"),
         nino = Some("AA123456A"),
         crn = Some("AC012345"),
         partnerUtr = Some("5860920998"),
-        partnershipTradingName = Some("ACME trading")
+        partnershipTradingName = Some("ACME trading"),
+        subcontractorType = Some("Individual"),
+        addressLine1 = Some("1 Test Street"),
+        addressLine2 = None,
+        addressLine3 = None,
+        addressLine4 = None,
+        country = Some("GB"),
+        postcode = Some("AA1 1AA"),
+        worksReferenceNumber = Some("WRN123")
       )
       val json           = Json.toJson(subcontractors)
 
@@ -85,14 +93,22 @@ class SubcontractorCurrentVerificationSpec extends SpecBase {
         subcontractorId = 1L,
         subbieResourceRef = Some(10L),
         firstName = Some("John"),
-        surname = Some("Smith"),
         secondName = None,
+        surname = Some("Smith"),
         tradingName = Some("ACME"),
         utr = Some("1111111111"),
         nino = Some("AA123456A"),
         crn = Some("AC012345"),
         partnerUtr = Some("5860920998"),
-        partnershipTradingName = Some("ACME trading")
+        partnershipTradingName = Some("ACME trading"),
+        subcontractorType = Some("Individual"),
+        addressLine1 = Some("1 Test Street"),
+        addressLine2 = None,
+        addressLine3 = None,
+        addressLine4 = None,
+        country = Some("GB"),
+        postcode = Some("AA1 1AA"),
+        worksReferenceNumber = Some("WRN123")
       )
       val json           = Json.toJson(subcontractors)
       val result         = json.as[SubcontractorCurrentVerification]

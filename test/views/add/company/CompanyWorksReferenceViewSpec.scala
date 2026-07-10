@@ -17,7 +17,7 @@
 package views.add.company
 
 import forms.add.company.CompanyWorksReferenceFormProvider
-import models.NormalMode
+import models.{AmendMode, NormalMode}
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.matchers.should.Matchers.should
 import org.scalatest.wordspec.AnyWordSpec
@@ -50,6 +50,25 @@ class CompanyWorksReferenceViewSpec extends AnyWordSpec with Matchers with Guice
       doc.select("input[name=value]").size() mustBe 1
 
       doc.select(".govuk-button").text() mustBe messages("site.continue")
+    }
+
+    "render the page with title, heading, input and update button for Amend journey" in new Setup {
+      val companyName                 = "Test Company"
+      val html: HtmlFormat.Appendable = view(form, AmendMode, companyName)
+      val doc                         = org.jsoup.Jsoup.parse(html.toString())
+
+      doc.select("title").text() must include(messages("companyWorksReference.title"))
+
+      val heading = doc.select("label.govuk-label")
+      heading.text() mustBe messages("companyWorksReference.heading", companyName)
+
+      doc.select("form").attr("action") mustBe controllers.add.company.routes.CompanyWorksReferenceController
+        .onSubmit(AmendMode)
+        .url
+
+      doc.select("input[name=value]").size() mustBe 1
+
+      doc.select(".govuk-button").text() mustBe messages("site.update")
     }
 
     "display error summary and inline error when no name is entered" in new Setup {

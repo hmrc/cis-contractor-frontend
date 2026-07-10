@@ -18,7 +18,7 @@ package controllers.helpers
 
 import play.api.mvc.Result
 import controllers.routes
-import models.contact.ContactOptions
+import models.contact.{ContactMethodOptions, ContactOptions}
 import play.api.mvc.Results.Redirect
 
 trait ContactGuard {
@@ -32,6 +32,20 @@ trait ContactGuard {
       n  <- name
       cc <- contactChoice
       if cc == expected
+    } yield onSuccess(n))
+      .getOrElse(
+        Redirect(routes.JourneyRecoveryController.onPageLoad())
+      )
+
+  def requireContactMethodInSet[A](
+    name: Option[A],
+    contactMethods: Option[Set[ContactMethodOptions]],
+    expected: ContactMethodOptions
+  )(onSuccess: A => Result): Result =
+    (for {
+      n       <- name
+      methods <- contactMethods
+      if methods.contains(expected)
     } yield onSuccess(n))
       .getOrElse(
         Redirect(routes.JourneyRecoveryController.onPageLoad())

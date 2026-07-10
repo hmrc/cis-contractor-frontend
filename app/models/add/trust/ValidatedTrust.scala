@@ -17,10 +17,8 @@
 package models.add.trust
 
 import models.address.Address
-import models.contact.ContactOptions
-import models.contact.ContactOptions.{Email, Mobile, NoDetails, Phone}
-import models.{InvalidAnswer, MissingAnswer, TypeOfSubcontractor, UserAnswers, Validation, ValidationError}
-import pages.QuestionPage
+import models.contact.ContactMethodOptions
+import models.{InvalidAnswer, TypeOfSubcontractor, UserAnswers, Validation, ValidationError}
 import pages.add.TypeOfSubcontractorPage
 import pages.add.trust.*
 import play.api.libs.json.Reads
@@ -28,7 +26,7 @@ import play.api.libs.json.Reads
 final case class ValidatedTrust(
   trustName: String,
   trustAddress: Option[Address],
-  trustContactDetails: TrustContactOptions,
+  trustContactMethodOptions: Option[Set[TrustContactMethodOptions]],
   trustEmail: Option[String],
   trustPhone: Option[String],
   trustMobile: Option[String],
@@ -46,11 +44,15 @@ object ValidatedTrust extends Validation {
 
       trustAddress <- getOptionalPageValue(answers, TrustAddressPage, TrustAddressYesNoPage)
 
-      trustContactDetails <- getPageValue(answers, TrustContactOptionsPage)
+      trustContactMethodOptions <-
+        getOptionalPageValue(answers, TrustContactMethodOptionsPage, AddTrustContactMethodsYesNoPage)
 
-      trustEmail  <- getContactPageValue(answers, TrustEmailAddressPage, trustContactDetails)
-      trustPhone  <- getContactPageValue(answers, TrustPhoneNumberPage, trustContactDetails)
-      trustMobile <- getContactPageValue(answers, TrustMobileNumberPage, trustContactDetails)
+      trustEmail  <-
+        getContactPageValue(answers, trustContactMethodOptions, TrustEmailAddressPage, ContactMethodOptions.Email)
+      trustPhone  <-
+        getContactPageValue(answers, trustContactMethodOptions, TrustPhoneNumberPage, ContactMethodOptions.Phone)
+      trustMobile <-
+        getContactPageValue(answers, trustContactMethodOptions, TrustMobileNumberPage, ContactMethodOptions.Mobile)
 
       trustUtr <- getOptionalPageValue(answers, TrustUtrPage, TrustUtrYesNoPage)
 
@@ -59,7 +61,7 @@ object ValidatedTrust extends Validation {
     } yield ValidatedTrust(
       trustName = trustName,
       trustAddress = trustAddress,
-      trustContactDetails = trustContactDetails,
+      trustContactMethodOptions = trustContactMethodOptions,
       trustEmail = trustEmail,
       trustPhone = trustPhone,
       trustMobile = trustMobile,
@@ -72,28 +74,4 @@ object ValidatedTrust extends Validation {
       case TypeOfSubcontractor.Trust => Right(())
       case _                         => Left(InvalidAnswer(TypeOfSubcontractorPage))
     }
-
-  private def getContactPageValue[A](
-    answers: UserAnswers,
-    questionPage: QuestionPage[A],
-    contactOptions: TrustContactOptions
-  )(implicit reads: Reads[A]): Either[ValidationError, Option[A]] = {
-
-    val expectedPage: Option[QuestionPage[_]] = contactOptions match {
-      case Email     => Some(TrustEmailAddressPage)
-      case Phone     => Some(TrustPhoneNumberPage)
-      case Mobile    => Some(TrustMobileNumberPage)
-      case NoDetails => None
-    }
-
-    if (expectedPage.contains(questionPage)) {
-      answers.get(questionPage).toRight(MissingAnswer(questionPage)).map(Some(_))
-    } else if (expectedPage.isDefined) {
-      Right(None)
-    } else {
-      answers
-        .get(questionPage)
-        .fold(Right(None): Either[ValidationError, Option[A]])(_ => Left(InvalidAnswer(questionPage)))
-    }
-  }
 }
