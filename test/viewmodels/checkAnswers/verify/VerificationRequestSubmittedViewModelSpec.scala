@@ -77,7 +77,7 @@ class VerificationRequestSubmittedViewModelSpec extends SpecBase {
             confirmationEmail = Some("test@test.com")
           )
 
-        vm.showEmail shouldBe true
+        vm.showEmail              shouldBe true
         vm.verificationHistoryUrl shouldBe applicationConfig.verificationHistoryUrl
       }
 
@@ -93,7 +93,7 @@ class VerificationRequestSubmittedViewModelSpec extends SpecBase {
             confirmationEmail = None
           )
 
-        vm.showEmail shouldBe false
+        vm.showEmail              shouldBe false
         vm.verificationHistoryUrl shouldBe applicationConfig.verificationHistoryUrl
       }
     }
@@ -176,9 +176,9 @@ class VerificationRequestSubmittedViewModelSpec extends SpecBase {
         val vm =
           VerificationRequestSubmittedViewModel.fromUserAnswers(userAnswers, applicationConfig)
 
-        vm.referenceNumber shouldBe "VB00000001"
-        vm.submittedAt     shouldBe now
-        vm.verificationHistoryUrl  shouldBe applicationConfig.verificationHistoryUrl
+        vm.referenceNumber        shouldBe "VB00000001"
+        vm.submittedAt            shouldBe now
+        vm.verificationHistoryUrl shouldBe applicationConfig.verificationHistoryUrl
       }
 
       "must map subcontractors correctly" in {
