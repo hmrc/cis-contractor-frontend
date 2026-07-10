@@ -30,6 +30,7 @@ class TrustNavigatorSpec extends SpecBase {
   val navigator                    = new TrustNavigator
   private lazy val journeyRecovery = routes.JourneyRecoveryController.onPageLoad()
   private lazy val trustCYA        = controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
+  private lazy val trustAmendCYA   = journeyRecovery // TODO: redirect to amend cya page when implemented
 
   "TrustNavigator" - {
 
@@ -391,7 +392,7 @@ class TrustNavigatorSpec extends SpecBase {
         ) mustBe controllers.add.trust.routes.TrustWorksReferenceController.onPageLoad(AmendMode)
       }
 
-      "must go from WorksReferenceNumberYesNoPage to journey recovery page when true and work reference number already exists" in {
+      "must go from WorksReferenceNumberYesNoPage to amend cya page when true and work reference number already exists" in {
         val ua =
           emptyUserAnswers
             .setOrException(TrustWorksReferenceYesNoPage, true)
@@ -401,10 +402,10 @@ class TrustNavigatorSpec extends SpecBase {
           TrustWorksReferenceYesNoPage,
           AmendMode,
           ua
-        ) mustBe journeyRecovery // TODO: redirect to amend cya page when implemented
+        ) mustBe trustAmendCYA
       }
 
-      "must go from WorksReferenceNumberYesNoPage to journey recovery page when false" in {
+      "must go from WorksReferenceNumberYesNoPage to amend cya page when false" in {
         val ua =
           emptyUserAnswers.setOrException(TrustWorksReferenceYesNoPage, false)
 
@@ -412,7 +413,7 @@ class TrustNavigatorSpec extends SpecBase {
           TrustWorksReferenceYesNoPage,
           AmendMode,
           ua
-        ) mustBe journeyRecovery // TODO: redirect to amend trust cya page when implemented
+        ) mustBe trustAmendCYA
       }
 
       "must go from WorksReferenceNumberYesNoPage to JourneyRecovery when answer is missing" in {
@@ -423,12 +424,12 @@ class TrustNavigatorSpec extends SpecBase {
         ) mustBe journeyRecovery
       }
 
-      "must go from TrustWorksReferencePage to journey recovery page" in {
+      "must go from TrustWorksReferencePage to amend cya page" in {
         navigator.nextPage(
           TrustWorksReferencePage,
           AmendMode,
           UserAnswers("id")
-        ) mustBe journeyRecovery // TODO: this needs to be redirected to amend trust cya page, when it's implemented
+        ) mustBe trustAmendCYA
       }
     }
 
