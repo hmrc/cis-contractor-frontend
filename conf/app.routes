@@ -302,6 +302,9 @@ GET   /subcontractor/add/partnership/partnership-has-works-reference         con
 POST  /subcontractor/add/partnership/partnership-has-works-reference         controllers.add.partnership.PartnershipWorksReferenceNumberYesNoController.onSubmit(mode: Mode = NormalMode)
 GET   /subcontractor/add/partnership/change-partnership-has-works-reference  controllers.add.partnership.PartnershipWorksReferenceNumberYesNoController.onPageLoad(mode: Mode = CheckMode)
 POST  /subcontractor/add/partnership/change-partnership-has-works-reference  controllers.add.partnership.PartnershipWorksReferenceNumberYesNoController.onSubmit(mode: Mode = CheckMode)
+GET   /subcontractor/amend/partnership/partnership-has-works-reference       controllers.add.partnership.PartnershipWorksReferenceNumberYesNoController.onPageLoad(mode: Mode = AmendMode)
+POST  /subcontractor/amend/partnership/partnership-has-works-reference       controllers.add.partnership.PartnershipWorksReferenceNumberYesNoController.onSubmit(mode: Mode = AmendMode)
+
 
 GET   /subcontractor/add/partnership/nominated-partner-national-insurance-number         controllers.add.partnership.PartnershipNominatedPartnerNinoController.onPageLoad(mode: Mode = NormalMode)
 POST  /subcontractor/add/partnership/nominated-partner-national-insurance-number         controllers.add.partnership.PartnershipNominatedPartnerNinoController.onSubmit(mode: Mode = NormalMode)
@@ -312,6 +315,9 @@ GET   /subcontractor/add/partnership/partnership-works-reference         control
 POST  /subcontractor/add/partnership/partnership-works-reference         controllers.add.partnership.PartnershipWorksReferenceNumberController.onSubmit(mode: Mode = NormalMode)
 GET   /subcontractor/add/partnership/change-partnership-works-reference  controllers.add.partnership.PartnershipWorksReferenceNumberController.onPageLoad(mode: Mode = CheckMode)
 POST  /subcontractor/add/partnership/change-partnership-works-reference  controllers.add.partnership.PartnershipWorksReferenceNumberController.onSubmit(mode: Mode = CheckMode)
+GET   /subcontractor/amend/partnership/partnership-works-reference       controllers.add.partnership.PartnershipWorksReferenceNumberController.onPageLoad(mode: Mode = AmendMode)
+POST  /subcontractor/amend/partnership/partnership-works-reference       controllers.add.partnership.PartnershipWorksReferenceNumberController.onSubmit(mode: Mode = AmendMode)
+
 
 GET   /subcontractor/add/partnership/check-address         controllers.add.partnership.PartnershipAddressYesNoController.onPageLoad(mode: Mode = NormalMode)
 POST  /subcontractor/add/partnership/check-address         controllers.add.partnership.PartnershipAddressYesNoController.onSubmit(mode: Mode = NormalMode)
