@@ -673,6 +673,23 @@ class PartnershipNavigatorSpec extends SpecBase {
           ) mustBe partnershipAmendCYA
         }
 
+        "must go from PartnershipNominatedPartnerCrnYesNoPage to Amend CYA when answer is true in AmendMode and CRN already exists" in {
+          val answers =
+            emptyUserAnswers
+              .set(PartnershipNominatedPartnerCrnYesNoPage, true)
+              .success
+              .value
+              .set(PartnershipNominatedPartnerCrnPage, "12345678")
+              .success
+              .value
+
+          navigator.nextPage(
+            PartnershipNominatedPartnerCrnYesNoPage,
+            AmendMode,
+            answers
+          ) mustBe partnershipAmendCYA
+        }
+
         "to JourneyRecoveryPage when answer is not present" in {
           navigator.nextPage(
             PartnershipNominatedPartnerCrnYesNoPage,
