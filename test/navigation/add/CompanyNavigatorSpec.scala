@@ -548,6 +548,54 @@ class CompanyNavigatorSpec extends SpecBase {
           emptyUserAnswers
         ) mustBe CompanyAmendCYA
       }
+
+      "must go from CompanyWorksReferenceYesNo" - {
+        "to CompanyWorksReferencePage when answer is Yes and CompanyWorksReferencePage is not answered before" in {
+          val answers = emptyUserAnswers.set(CompanyWorksReferenceYesNoPage, true).success.value
+
+          navigator.nextPage(
+            CompanyWorksReferenceYesNoPage,
+            AmendMode,
+            answers
+          ) mustBe controllers.add.company.routes.CompanyWorksReferenceController
+            .onPageLoad(AmendMode)
+        }
+
+        "to Company CYA when answer is Yes and CompanyWorksReferencePage is answered before" in {
+          val answers =
+            emptyUserAnswers
+              .set(CompanyWorksReferencePage, "WR-001")
+              .success
+              .value
+              .set(CompanyWorksReferenceYesNoPage, true)
+              .success
+              .value
+
+          navigator.nextPage(
+            CompanyWorksReferenceYesNoPage,
+            AmendMode,
+            answers
+          ) mustBe CompanyAmendCYA
+        }
+
+        "to Company CYA when CompanyWorksReferencePage answer is No" in {
+          val answers = emptyUserAnswers.set(CompanyWorksReferenceYesNoPage, false).success.value
+
+          navigator.nextPage(
+            CompanyWorksReferenceYesNoPage,
+            AmendMode,
+            answers
+          ) mustBe CompanyAmendCYA
+        }
+
+        "to JourneyRecoveryPage when CompanyWorksReferencePage answer is not present" in {
+          navigator.nextPage(
+            CompanyWorksReferenceYesNoPage,
+            AmendMode,
+            emptyUserAnswers
+          ) mustBe routes.JourneyRecoveryController.onPageLoad()
+        }
+      }
     }
 
     "in Check mode" - {

@@ -253,6 +253,8 @@ GET   /subcontractor/add/company/company-has-works-reference         controllers
 POST  /subcontractor/add/company/company-has-works-reference         controllers.add.company.CompanyWorksReferenceYesNoController.onSubmit(mode: Mode = NormalMode)
 GET   /subcontractor/add/company/change-company-has-works-reference  controllers.add.company.CompanyWorksReferenceYesNoController.onPageLoad(mode: Mode = CheckMode)
 POST  /subcontractor/add/company/change-company-has-works-reference  controllers.add.company.CompanyWorksReferenceYesNoController.onSubmit(mode: Mode = CheckMode)
+GET   /subcontractor/amend/company/company-has-works-reference       controllers.add.company.CompanyWorksReferenceYesNoController.onPageLoad(mode: Mode = AmendMode)
+POST  /subcontractor/amend/company/company-has-works-reference       controllers.add.company.CompanyWorksReferenceYesNoController.onSubmit(mode: Mode = AmendMode)
 
 GET   /subcontractor/add/company/company-works-reference         controllers.add.company.CompanyWorksReferenceController.onPageLoad(mode: Mode = NormalMode)
 POST  /subcontractor/add/company/company-works-reference         controllers.add.company.CompanyWorksReferenceController.onSubmit(mode: Mode = NormalMode)
