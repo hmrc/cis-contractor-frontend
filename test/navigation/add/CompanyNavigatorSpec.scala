@@ -30,7 +30,7 @@ class CompanyNavigatorSpec extends SpecBase {
   private lazy val CompanyCYA      = controllers.add.company.routes.CompanyCheckYourAnswersController.onPageLoad()
   private lazy val CompanyAmendCYA =
     routes.JourneyRecoveryController
-      .onPageLoad() // TODO when available   controllers.add.company.routes.AmendCompanyCheckYourAnswersController.onPageLoad()
+      .onPageLoad() // TODO when available controllers.add.company.routes.AmendCompanyCheckYourAnswersController.onPageLoad()
 
   "CompanyNavigator" - {
 
@@ -327,6 +327,14 @@ class CompanyNavigatorSpec extends SpecBase {
         ) mustBe CompanyAmendCYA
       }
 
+      "must go from CompanyWorksReferencePage to CompanyCheckYourAnswerPage in AmendMode" in {
+        navigator.nextPage(
+          CompanyWorksReferencePage,
+          AmendMode,
+          emptyUserAnswers
+        ) mustBe CompanyAmendCYA
+      }
+
       "must go from a CompanyCrnPage to Company CYA in AmendMode" in {
         navigator.nextPage(
           CompanyCrnPage,
@@ -343,7 +351,7 @@ class CompanyNavigatorSpec extends SpecBase {
             CompanyCrnYesNoPage,
             AmendMode,
             answers
-          ) mustBe journeyRecovery // TODO when available controllers.add.company.routes.CompanyCrnController.onPageLoad(AmendMode)
+          ) mustBe controllers.add.company.routes.CompanyCrnController.onPageLoad(AmendMode)
         }
 
         "to Company CYA when answer is Yes and CompanyCrnPage is answered before" in {
