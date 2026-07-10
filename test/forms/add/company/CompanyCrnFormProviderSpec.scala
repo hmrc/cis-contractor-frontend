@@ -19,6 +19,7 @@ package forms.add.company
 import forms.Validation
 import forms.behaviours.StringFieldBehaviours
 import play.api.data.FormError
+import forms.mappings.Constants
 
 class CompanyCrnFormProviderSpec extends StringFieldBehaviours {
 
@@ -38,14 +39,12 @@ class CompanyCrnFormProviderSpec extends StringFieldBehaviours {
   )
 
   val invalidCrn: Seq[String] = Seq(
-    "AC1234567",
-    "ABC123456",
-    "AC01-234",
-    "AC01£345",
-    "12AB3456",
-    "AC 123456 A",
-    "12 34 56 78 A",
-    "A 12345678 "
+    "A",
+    "AB",
+    "ABC",
+    "£AB123",
+    "1A",
+    "`¬¬AB12C"
   )
 
   val form = new CompanyCrnFormProvider()()
@@ -103,7 +102,7 @@ class CompanyCrnFormProviderSpec extends StringFieldBehaviours {
       tooLongCrn.foreach { crn =>
         val result = form.bind(Map(fieldName -> crn))
         result.errors must contain(
-          FormError(fieldName, invalidKey, Seq(companyRegNumberRegex))
+          FormError(fieldName, lengthKey, Seq(Constants.MaxLength8))
         )
       }
     }
