@@ -650,6 +650,62 @@ class PartnershipNavigatorSpec extends SpecBase {
           emptyUserAnswers.setOrException(PartnershipUniqueTaxpayerReferencePage, "UTR-123")
         ) mustBe partnershipAmendCYA
       }
+
+      "must go from PartnershipNominatedPartnerCrnYesNo" - {
+        "to next page when answer is Yes" in {
+          val answers = UserAnswers(userAnswersId).set(PartnershipNominatedPartnerCrnYesNoPage, true).success.value
+
+          navigator.nextPage(
+            PartnershipNominatedPartnerCrnYesNoPage,
+            AmendMode,
+            answers
+          ) mustBe controllers.add.partnership.routes.PartnershipNominatedPartnerCrnController
+            .onPageLoad(AmendMode)
+        }
+
+        "to PartnershipCheckYourAnswers when answer is No" in {
+          val answers = UserAnswers(userAnswersId).set(PartnershipNominatedPartnerCrnYesNoPage, false).success.value
+
+          navigator.nextPage(
+            PartnershipNominatedPartnerCrnYesNoPage,
+            AmendMode,
+            answers
+          ) mustBe partnershipAmendCYA
+        }
+
+        "to JourneyRecoveryPage when answer is not present" in {
+          navigator.nextPage(
+            PartnershipNominatedPartnerCrnYesNoPage,
+            AmendMode,
+            emptyUserAnswers
+          ) mustBe routes.JourneyRecoveryController.onPageLoad()
+        }
+      }
+
+      "PartnershipNominatedPartnerCrnPage in AmendMode" - {
+        "must go from PartnershipNominatedPartnerCrnPage to PartnershipCheckYourAnswersController when CRN exists in AmendMode" in {
+
+          val answers =
+            emptyUserAnswers
+              .set(PartnershipNominatedPartnerCrnPage, "12345678")
+              .success
+              .value
+
+          navigator.nextPage(
+            PartnershipNominatedPartnerCrnPage,
+            AmendMode,
+            answers
+          ) mustBe partnershipAmendCYA
+        }
+
+        "must go to JourneyRecovery when answer is missing" in {
+          navigator.nextPage(
+            PartnershipNominatedPartnerCrnPage,
+            AmendMode,
+            emptyUserAnswers
+          ) mustBe routes.JourneyRecoveryController.onPageLoad()
+        }
+      }
     }
 
     "in Check mode" - {

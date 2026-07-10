@@ -346,11 +346,17 @@ GET   /subcontractor/add/partnership/nominated-partner-company-registration-numb
 POST  /subcontractor/add/partnership/nominated-partner-company-registration-number         controllers.add.partnership.PartnershipNominatedPartnerCrnController.onSubmit(mode: Mode = NormalMode)
 GET   /subcontractor/add/partnership/change-nominated-partner-company-registration-number  controllers.add.partnership.PartnershipNominatedPartnerCrnController.onPageLoad(mode: Mode = CheckMode)
 POST  /subcontractor/add/partnership/change-nominated-partner-company-registration-number  controllers.add.partnership.PartnershipNominatedPartnerCrnController.onSubmit(mode: Mode = CheckMode)
+GET   /subcontractor/amend/partnership/nominated-partner-company-registration-number       controllers.add.partnership.PartnershipNominatedPartnerCrnController.onPageLoad(mode: Mode = AmendMode)
+POST  /subcontractor/amend/partnership/nominated-partner-company-registration-number       controllers.add.partnership.PartnershipNominatedPartnerCrnController.onSubmit(mode: Mode = AmendMode)
+
 
 GET   /subcontractor/add/partnership/nominated-partner-has-company-registration-number         controllers.add.partnership.PartnershipNominatedPartnerCrnYesNoController.onPageLoad(mode: Mode = NormalMode)
 POST  /subcontractor/add/partnership/nominated-partner-has-company-registration-number         controllers.add.partnership.PartnershipNominatedPartnerCrnYesNoController.onSubmit(mode: Mode = NormalMode)
 GET   /subcontractor/add/partnership/change-nominated-partner-has-company-registration-number  controllers.add.partnership.PartnershipNominatedPartnerCrnYesNoController.onPageLoad(mode: Mode = CheckMode)
 POST  /subcontractor/add/partnership/change-nominated-partner-has-company-registration-number  controllers.add.partnership.PartnershipNominatedPartnerCrnYesNoController.onSubmit(mode: Mode = CheckMode)
+GET   /subcontractor/amend/partnership/nominated-partner-has-company-registration-number         controllers.add.partnership.PartnershipNominatedPartnerCrnYesNoController.onPageLoad(mode: Mode = AmendMode)
+POST  /subcontractor/amend/partnership/nominated-partner-has-company-registration-number         controllers.add.partnership.PartnershipNominatedPartnerCrnYesNoController.onSubmit(mode: Mode = AmendMode)
+
 
 GET   /subcontractor/add/partnership/nominated-partner-utr         controllers.add.partnership.PartnershipNominatedPartnerUtrController.onPageLoad(mode: Mode = NormalMode)
 POST  /subcontractor/add/partnership/nominated-partner-utr         controllers.add.partnership.PartnershipNominatedPartnerUtrController.onSubmit(mode: Mode = NormalMode)
