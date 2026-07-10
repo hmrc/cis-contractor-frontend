@@ -391,7 +391,7 @@ class TrustNavigatorSpec extends SpecBase {
         ) mustBe controllers.add.trust.routes.TrustWorksReferenceController.onPageLoad(AmendMode)
       }
 
-      "must go from WorksReferenceNumberYesNoPage to amend CYA page when true and work reference number already exists" in {
+      "must go from WorksReferenceNumberYesNoPage to journey recovery page when true and work reference number already exists" in {
         val ua =
           emptyUserAnswers
             .setOrException(TrustWorksReferenceYesNoPage, true)
@@ -404,7 +404,7 @@ class TrustNavigatorSpec extends SpecBase {
         ) mustBe journeyRecovery // TODO: redirect to amend cya page when implemented
       }
 
-      "must go from WorksReferenceNumberYesNoPage to amend CYA page when false" in {
+      "must go from WorksReferenceNumberYesNoPage to journey recovery page when false" in {
         val ua =
           emptyUserAnswers.setOrException(TrustWorksReferenceYesNoPage, false)
 
