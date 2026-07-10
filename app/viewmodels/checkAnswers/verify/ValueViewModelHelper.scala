@@ -22,13 +22,20 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist._
 import viewmodels.govuk.summarylist.*
 
 object ValueViewModelHelper {
-  def makeGovukBulletList(names: Seq[String]): Option[Value] = {
-    val valueHtml = names match {
+  def makeGovukBulletList(values: Seq[String], shouldSort: Boolean = true): Option[Value] = {
+
+    def sortIfNeeded(values: Seq[String]): Seq[String] =
+      if (shouldSort) {
+        values.sortBy(_.toLowerCase)
+      } else {
+        values
+      }
+
+    val valueHtml = values match {
       case Seq(single)                   => Some(single)
       case multiple if multiple.size > 1 =>
         Some(
-          multiple
-            .sortBy(_.toLowerCase)
+          sortIfNeeded(multiple)
             .mkString("<ul class=\"govuk-list govuk-list--bullet\"><li>", "</li><li>", "</li></ul>")
         )
       case _                             => None

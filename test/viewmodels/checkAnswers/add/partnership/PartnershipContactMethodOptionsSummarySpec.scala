@@ -27,11 +27,11 @@ class PartnershipContactMethodOptionsSummarySpec extends SpecBase with Matchers 
   implicit val messages: Messages = new DefaultMessagesApi(
     Map(
       "en" -> Map(
-        "partnershipContactMethodOptions.checkYourAnswersLabel" -> "Method of contact",
+        "partnershipContactMethodOptions.checkYourAnswersLabel" -> "Methods of contact",
         "partnershipContactMethodOptions.email"                 -> "Email address",
         "partnershipContactMethodOptions.phone"                 -> "Phone number",
         "partnershipContactMethodOptions.mobile"                -> "Mobile number",
-        "partnershipContactMethodOptions.change.hidden"         -> "method of contact",
+        "partnershipContactMethodOptions.change.hidden"         -> "methods of contact",
         "site.change"                                           -> "Change"
       )
     )
@@ -83,7 +83,7 @@ class PartnershipContactMethodOptionsSummarySpec extends SpecBase with Matchers 
         messages("partnershipContactMethodOptions.change.hidden")
       )
 
-      action.attributes must contain("id" -> "partnership-contact-methods")
+      action.attributes must contain("id" -> "partnership-methods-of-contact")
     }
 
     "must return a row with a single selected option" in {

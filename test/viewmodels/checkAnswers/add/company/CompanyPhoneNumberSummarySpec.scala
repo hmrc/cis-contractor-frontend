@@ -18,7 +18,7 @@ package viewmodels.checkAnswers.add.company
 
 import controllers.add.company.routes
 import helpers.CyaEncodingSpecHelper
-import models.{CheckMode, UserAnswers}
+import models.{AmendMode, CheckMode, UserAnswers}
 import org.scalatest.OptionValues.convertOptionToValuable
 import org.scalatest.TryValues.convertTryToSuccessOrFailure
 import org.scalatest.freespec.AnyFreeSpec
@@ -59,6 +59,39 @@ class CompanyPhoneNumberSummarySpec extends AnyFreeSpec with Matchers with CyaEn
       val changeAction       = actions.head
       val expectedChangeText = messages("site.change")
       val expectedHref       = routes.CompanyPhoneNumberController.onPageLoad(CheckMode).url
+      val expectedHiddenText = messages("companyPhoneNumber.change.hidden")
+
+      changeAction.content.asHtml.toString should include(expectedChangeText)
+      changeAction.href                  shouldBe expectedHref
+
+      changeAction.visuallyHiddenText.value shouldBe expectedHiddenText
+      changeAction.attributes                   must contain("id" -> "company-phone-number")
+    }
+
+    "must return a SummaryListRow when the answer exists for Amend journey" in {
+      val answers =
+        UserAnswers("test-id")
+          .set(CompanyPhoneNumberPage, "0123456789")
+          .success
+          .value
+
+      val maybeRow = CompanyPhoneNumberSummary.row(answers, AmendMode)
+      maybeRow shouldBe defined
+
+      val row = maybeRow.value
+
+      val expectedKeyText = messages("companyPhoneNumber.checkYourAnswersLabel")
+      row.key.content.asHtml.toString should include(expectedKeyText)
+
+      row.value.content.asHtml.toString should include("0123456789")
+
+      row.actions shouldBe defined
+      val actions = row.actions.value.items
+      actions should have size 1
+
+      val changeAction       = actions.head
+      val expectedChangeText = messages("site.change")
+      val expectedHref       = routes.CompanyPhoneNumberController.onPageLoad(AmendMode).url
       val expectedHiddenText = messages("companyPhoneNumber.change.hidden")
 
       changeAction.content.asHtml.toString should include(expectedChangeText)
