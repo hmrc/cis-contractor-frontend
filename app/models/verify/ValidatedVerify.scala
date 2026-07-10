@@ -39,14 +39,6 @@ object ValidatedVerify extends Validation {
                                     ReverifyExistingSubcontractorsYesNoPage
                                   )
 
-      _ <- subcontractorsToReverify match {
-             case Some(s) if s.isEmpty =>
-               Left(InvalidAnswer(SelectSubcontractorsToReverifyPage))
-
-             case _ =>
-               Right(())
-           }
-
       _ <- Either.cond(
              selectedSubcontractors.nonEmpty || subcontractorsToReverify.exists(_.nonEmpty),
              (),

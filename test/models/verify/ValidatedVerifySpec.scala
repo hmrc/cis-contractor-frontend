@@ -282,7 +282,26 @@ class ValidatedVerifySpec extends SpecBase with Matchers {
       ValidatedVerify.build(ua) mustBe Left(InvalidAnswer(SelectSubcontractorPage))
     }
 
-    "fail when reverify=true but subcontractorsToReverify is an empty set" in {
+    "fail when reverify=true but subcontractorsToReverify is empty and no selectedSubcontractors are present" in {
+      val ua =
+        emptyUserAnswers
+          .set(ReverifyExistingSubcontractorsYesNoPage, true)
+          .success
+          .value
+          .set(SelectSubcontractorsToReverifyPage, Set.empty[SelectedSubcontractors])
+          .success
+          .value
+          .set(ContractorEmailConfirmationStoredPage, DoNotSend)
+          .success
+          .value
+          .set(VerificationBatchReadinessPage, true)
+          .success
+          .value
+
+      ValidatedVerify.build(ua) mustBe Left(InvalidAnswer(SelectSubcontractorPage))
+    }
+
+    "build successfully when reverify=true but subcontractorsToReverify is empty and selectedSubcontractors are present" in {
       val ua =
         minRequired
           .set(ReverifyExistingSubcontractorsYesNoPage, true)
@@ -292,7 +311,13 @@ class ValidatedVerifySpec extends SpecBase with Matchers {
           .success
           .value
 
-      ValidatedVerify.build(ua) mustBe Left(InvalidAnswer(SelectSubcontractorsToReverifyPage))
+      ValidatedVerify.build(ua) mustBe Right(
+        ValidatedVerify(
+          selectedSubcontractors = Set(brodyMartin),
+          subcontractorsToReverify = Some(Set.empty),
+          emailToUse = None
+        )
+      )
     }
 
     // ─── Failure: stale session data ─────────────────────────────────────────
