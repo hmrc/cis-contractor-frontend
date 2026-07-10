@@ -16,7 +16,7 @@
 
 package viewmodels.checkAnswers.add.partnership
 
-import models.{CheckMode, UserAnswers}
+import models.{CheckMode, Mode, UserAnswers}
 import pages.add.partnership.PartnershipNominatedPartnerCrnYesNoPage
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
@@ -25,7 +25,7 @@ import viewmodels.implicits.*
 
 object PartnershipNominatedPartnerCrnYesNoSummary {
 
-  def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
+  def row(answers: UserAnswers, mode: Mode = CheckMode)(implicit messages: Messages): Option[SummaryListRow] =
     answers.get(PartnershipNominatedPartnerCrnYesNoPage).map { answer =>
 
       val value = if (answer) "site.yes" else "site.no"
@@ -36,7 +36,7 @@ object PartnershipNominatedPartnerCrnYesNoSummary {
         actions = Seq(
           ActionItemViewModel(
             "site.change",
-            controllers.add.partnership.routes.PartnershipNominatedPartnerCrnYesNoController.onPageLoad(CheckMode).url
+            controllers.add.partnership.routes.PartnershipNominatedPartnerCrnYesNoController.onPageLoad(mode).url
           )
             .withVisuallyHiddenText(messages("partnershipNominatedPartnerCrnYesNo.change.hidden"))
             .withAttribute("id" -> "add-nominated-partner-crn")

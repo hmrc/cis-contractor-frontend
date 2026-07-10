@@ -38,12 +38,13 @@ class PartnershipNavigator @Inject() () extends NavigatorForJourney {
       amendRouteMap(page)(userAnswers)
   }
 
-  private def cyaRoute(mode: Mode): Call                = mode match {
+  private def cyaRoute(mode: Mode): Call = mode match {
     case AmendMode =>
       routes.JourneyRecoveryController
         .onPageLoad() // TODO route to controllers.amend.routes.AmendPartnershipCheckYourAnswersController.onPageLoad() when AmendIndividualCheckYourAnswersController added.
     case _         => controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
   }
+
   private val normalRoutes: Page => UserAnswers => Call = {
     case PartnershipNamePage                      =>
       _ => controllers.add.partnership.routes.PartnershipAddressYesNoController.onPageLoad(NormalMode)
@@ -87,6 +88,8 @@ class PartnershipNavigator @Inject() () extends NavigatorForJourney {
     case PartnershipWorksReferenceNumberYesNoPage => navigatorFromPartnershipWorksReferenceNumberYesNoPage(AmendMode)(_)
     case PartnershipWorksReferenceNumberPage      =>
       _ => cyaRoute(AmendMode)
+    case PartnershipNominatedPartnerCrnYesNoPage  => navigatorFromPartnershipNominatedPartnerCrnYesNoPage(AmendMode)(_)
+    case PartnershipNominatedPartnerCrnPage       => navigatorFromPartnershipNominatedPartnerCrnPage(AmendMode)(_)
     case _                                        => _ => cyaRoute(AmendMode)
   }
 
@@ -143,7 +146,7 @@ class PartnershipNavigator @Inject() () extends NavigatorForJourney {
         controllers.add.partnership.routes.PartnershipWorksReferenceNumberYesNoController.onPageLoad(NormalMode)
 
       case (Some(_), CheckMode | AmendMode) =>
-        controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
+        cyaRoute(mode)
 
       case (None, _) =>
         routes.JourneyRecoveryController.onPageLoad()
@@ -229,13 +232,13 @@ class PartnershipNavigator @Inject() () extends NavigatorForJourney {
         userAnswers
           .get(PartnershipNominatedPartnerCrnPage)
           .fold(
-            controllers.add.partnership.routes.PartnershipNominatedPartnerCrnController.onPageLoad(CheckMode)
+            controllers.add.partnership.routes.PartnershipNominatedPartnerCrnController.onPageLoad(mode)
           ) { _ =>
-            controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
+            cyaRoute(mode)
           }
 
       case (Some(false), CheckMode | AmendMode) =>
-        controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
+        cyaRoute(mode)
 
       case (None, _) =>
         routes.JourneyRecoveryController.onPageLoad()
