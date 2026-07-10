@@ -174,9 +174,6 @@ class PartnershipNavigator @Inject() () extends NavigatorForJourney {
   private def navigatorFromPartnershipWorksReferenceNumberYesNoPage(mode: Mode)(ua: UserAnswers): Call =
     (ua.get(PartnershipWorksReferenceNumberYesNoPage), mode) match {
 
-//      case (Some(true), CheckMode | AmendMode) if ua.get(PartnershipWorksReferenceNumberPage).isDefined =>
-//        cyaRoute(mode)
-
       case (Some(true), CheckMode | AmendMode) =>
         ua.get(PartnershipWorksReferenceNumberPage)
           .fold(controllers.add.partnership.routes.PartnershipWorksReferenceNumberController.onPageLoad(mode)) { _ =>
