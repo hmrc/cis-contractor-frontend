@@ -118,7 +118,7 @@ class AmendIndividualCheckYourAnswersController @Inject() (
     nameRows ++
       Seq(
         SubAddressYesNoSummary.row(ua, AmendMode),
-        AddressOfSubcontractorSummary.row(ua),
+        AddressOfSubcontractorSummary.row(ua, AmendMode),
         AddIndividualContactMethodsYesNoSummary.row(ua, AmendMode),
         IndividualChooseContactDetailsSummary.row(ua, AmendMode),
         contactDetailsRow(ua)

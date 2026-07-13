@@ -27,7 +27,9 @@ import queries.Settable
 import repositories.SessionRepository
 import services.AddressLookupService
 import utils.SubcontractorNameExtractor
-
+import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
+import queries.{AddressLookupAmendReturnQuery, Settable}
+import scala.concurrent.{ExecutionContext, Future}
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 
@@ -59,7 +61,16 @@ class AddressOfSubcontractorController @Inject() (
   override protected def onCompletion(mode: Mode): Call =
     routes.IndividualChooseContactDetailsController.onPageLoad(mode)
 
-  override protected def onChangeCompletion: Call =
-    routes.CheckYourAnswersController.onPageLoad()
-
+  override protected def onChangeCompletion(isAmend: Boolean): Call =
+    if (isAmend) controllers.amend.routes.AmendIndividualCheckYourAnswersController.onPageLoad()
+    else routes.CheckYourAnswersController.onPageLoad()
+    
+  def redirectToAmendAddressLookup(): Action[AnyContent] =
+    (identify andThen getData andThen requireData).async { implicit request =>
+      (for {
+        ua <- Future.fromTry(request.userAnswers.set(AddressLookupAmendReturnQuery, true))
+        _ <- sessionRepository.set(ua)
+      } yield Redirect(routes.AddressOfSubcontractorController.redirectToAddressLookup(Some("change"))))
+        .recover { case _ => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()) }
+    }
 }

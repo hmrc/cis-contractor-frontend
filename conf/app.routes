@@ -84,6 +84,8 @@ GET   /subcontractor/amend/subcontractor-information  controllers.amend.AmendInd
 POST  /subcontractor/amend/subcontractor-information  controllers.amend.AmendIndividualCheckYourAnswersController.onSubmit()
 GET   /subcontractor/amend/cancel              controllers.amend.AmendIndividualCheckYourAnswersController.onCancel()
 
+GET /subcontractor/amend/address-change        controllers.add.AddressOfSubcontractorController.redirectToAmendAddressLookup()
+
 # Errors & Auth
 GET  /unauthorised/standard-user  controllers.UnauthorisedWrongRoleController.onPageLoad()
 

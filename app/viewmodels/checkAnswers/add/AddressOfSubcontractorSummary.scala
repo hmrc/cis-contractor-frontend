@@ -16,19 +16,25 @@
 
 package viewmodels.checkAnswers.add
 
-import models.UserAnswers
+import models.{AmendMode, CheckMode, UserAnswers, Mode}
 import pages.add.AddressOfSubcontractorPage
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 
 object AddressOfSubcontractorSummary {
 
-  def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
+  def row(answers: UserAnswers, mode: Mode = CheckMode)(implicit messages: Messages): Option[SummaryListRow] =
     answers.get(AddressOfSubcontractorPage).map { answer =>
       AddressSummaryRow.row(
         address = answer,
         key = "addressOfSubcontractor.checkYourAnswersLabel",
-        changeCall = controllers.add.routes.AddressOfSubcontractorController.redirectToAddressLookup(Some("change")),
+        changeCall = {
+          if(mode == AmendMode) {
+            controllers.add.routes.AddressOfSubcontractorController.redirectToAmendAddressLookup()
+          } else {
+            controllers.add.routes.AddressOfSubcontractorController.redirectToAddressLookup(Some("change"))
+          }
+        },
         hiddenTextKey = "addressOfSubcontractor.change.hidden",
         id = "address-of-subcontractor"
       )

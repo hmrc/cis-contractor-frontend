@@ -58,7 +58,7 @@ class TrustAddressController @Inject() (
   override protected def onCompletion(mode: Mode): Call =
     routes.TrustContactOptionsController.onPageLoad(mode)
 
-  override protected def onChangeCompletion: Call =
+  override protected def onChangeCompletion(isAmend: Boolean): Call =
     routes.TrustCheckYourAnswersController.onPageLoad()
 
 }
