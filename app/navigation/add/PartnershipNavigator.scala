@@ -162,7 +162,7 @@ class PartnershipNavigator @Inject() () extends NavigatorForJourney {
   private def navigatorFromPartnershipHasUtrYesNoPage(mode: Mode)(ua: UserAnswers): Call =
     (ua.get(PartnershipHasUtrYesNoPage), mode) match {
 
-      case (Some(true), CheckMode | AmendMode) if ua.get(PartnershipUniqueTaxpayerReferencePage).isDefined =>
+      case (Some(true), CheckMode) if ua.get(PartnershipUniqueTaxpayerReferencePage).isDefined =>
         cyaRoute(mode)
 
       case (Some(true), CheckMode | AmendMode) =>

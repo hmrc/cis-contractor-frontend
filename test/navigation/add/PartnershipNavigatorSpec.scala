@@ -748,23 +748,6 @@ class PartnershipNavigatorSpec extends SpecBase {
           answers
         ) mustBe partnershipAmendCYA
       }
-
-      "must go to PartnershipCheckYourAnswersController when answer is true in Amendode and UTR is already provided" in {
-        val answers =
-          emptyUserAnswers
-            .set(PartnershipHasUtrYesNoPage, true)
-            .success
-            .value
-            .set(PartnershipUniqueTaxpayerReferencePage, "1234567890")
-            .success
-            .value
-
-        navigator.nextPage(
-          PartnershipHasUtrYesNoPage,
-          AmendMode,
-          answers
-        ) mustBe partnershipAmendCYA
-      }
     }
 
     "in Check mode" - {
