@@ -30,42 +30,42 @@
 @(rows: Seq[Seq[TableRow]], subcontractorName: String, manageYourSubcontractorsUrl: String)(implicit request: Request[_], messages: Messages)
 
 @layout(
-  pageTitle = titleNoForm(messages("individualAmended.panel.heading")),
+  pageTitle = titleNoForm(messages("amended.panel.heading")),
   showBackLink = false
 ) {
 
   @govukPanel(Panel(
-    title = messages("individualAmended.panel.heading")
+    title = messages("amended.panel.heading")
   ))
 
-  @paragraph(messages("individualAmended.p1", subcontractorName))
+  @paragraph(messages("amended.p1", subcontractorName))
 
-  @h2("individualAmended.updatesMade.h2")
+  @h2("amended.updatesMade.h2")
 
   @govukTable(Table(
     head = Some(Seq(
-      HeadCell(Text(messages("individualAmended.table.hdr.details"))),
-      HeadCell(Text(messages("individualAmended.table.hdr.previous"))),
-      HeadCell(Text(messages("individualAmended.table.hdr.updated")))
+      HeadCell(Text(messages("amended.table.hdr.details"))),
+      HeadCell(Text(messages("amended.table.hdr.previous"))),
+      HeadCell(Text(messages("amended.table.hdr.updated")))
     )),
     rows = rows
   ))
 
   <p class="govuk-body">
-    @messages("individualAmended.backTo")
+    @messages("amended.backTo")
     <a href="@manageYourSubcontractorsUrl" target="_blank" rel="noopener noreferrer" class="govuk-link">
-        @messages("individualAmended.yourSubcontractors")
+        @messages("amended.yourSubcontractors")
     </a>
   </p>
 
-  @h2("individualAmended.beforeYouGo.h2")
+  @h2("amended.beforeYouGo.h2")
 
-  @paragraph(messages("individualAmended.beforeYouGo.p1"))
+  @paragraph(messages("amended.beforeYouGo.p1"))
 
   <p class="govuk-body">
     <a href="#" target="_blank" rel="noopener noreferrer" class="govuk-link">
-        @messages("individualAmended.beforeYouGo.takeAShortSurvey")
+        @messages("amended.beforeYouGo.takeAShortSurvey")
     </a>
-    @messages("individualAmended.beforeYouGo.shareFeedback")
+    @messages("amended.beforeYouGo.shareFeedback")
   </p>
 }

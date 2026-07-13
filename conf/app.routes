@@ -171,7 +171,7 @@ POST  /subcontractor/add/add-contact-details         controllers.add.AddIndividu
 GET   /subcontractor/add/change-add-contact-details  controllers.add.AddIndividualContactMethodsYesNoController.onPageLoad(mode: Mode = CheckMode)
 POST  /subcontractor/add/change-add-contact-details  controllers.add.AddIndividualContactMethodsYesNoController.onSubmit(mode: Mode = CheckMode)
 
-GET   /subcontractor/amend/individual/subcontractor-details-updated         controllers.amend.IndividualAmendedController.onPageLoad()
+GET   /subcontractor/amend/individual/subcontractor-details-updated         controllers.amend.AmendedController.individualOnPageLoad()
 
 # Company
 GET   /subcontractor/amend/company  controllers.amend.company.AmendCompanyController.onPageLoad()

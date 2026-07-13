@@ -42,39 +42,79 @@ object IndividualAmendedViewModel {
       worksReferenceRows(original, current)
 
   private def tradingNameRows(
-    original: OriginalIndividualAnswers,
-    current: UserAnswers
-  )(implicit messages: Messages): Seq[Seq[TableRow]] =
-    Seq(
-      tradingNameYesNoRow(original, current),
-      nameRow(original, current)
-    ).flatten
+                               original: OriginalIndividualAnswers,
+                               current: UserAnswers
+                             )(implicit messages: Messages): Seq[Seq[TableRow]] = {
+
+    val originalUsesTrading = original.usesTradingName.contains(true)
+    val currentUsesTrading = current.get(SubTradingNameYesNoPage).contains(true)
+
+    val yesNoRows =
+      Seq(
+        tradingNameYesNoRow(original, current)
+      ).flatten
+
+    val nameRows =
+      if (originalUsesTrading == currentUsesTrading) {
+        Seq(nameRow(original, current)).flatten
+      } else if (originalUsesTrading) {
+        Seq(
+          row(
+            messages("tradingNameOfSubcontractor.checkYourAnswersLabel"),
+            original.tradingName.getOrElse(missingValue),
+            missingValue
+          ),
+          row(
+            messages("subcontractorName.checkYourAnswersLabel"),
+            missingValue,
+            current.get(SubcontractorNamePage).map(formatName).getOrElse(missingValue)
+          )
+        )
+      } else {
+        Seq(
+          row(
+            messages("subcontractorName.checkYourAnswersLabel"),
+            original.subcontractorName.map(formatName).getOrElse(missingValue),
+            missingValue
+          ),
+          row(
+            messages("tradingNameOfSubcontractor.checkYourAnswersLabel"),
+            missingValue,
+            current.get(TradingNameOfSubcontractorPage).getOrElse(missingValue)
+          )
+        )
+      }
+
+    yesNoRows ++ nameRows
+  }
+
 
   private def nameRow(
-    original: OriginalIndividualAnswers,
-    current: UserAnswers
-  )(implicit messages: Messages): Option[Seq[TableRow]] = {
+                       original: OriginalIndividualAnswers,
+                       current: UserAnswers
+                     )(implicit messages: Messages): Option[Seq[TableRow]] = {
+
     val currentUsesTradingName = current.get(SubTradingNameYesNoPage)
     val currentTradingName     = current.get(TradingNameOfSubcontractorPage)
     val currentName            = current.get(SubcontractorNamePage)
 
-    val amended =
-      wasAmended(current, SubTradingNameYesNoPage) ||
-        wasAmended(current, TradingNameOfSubcontractorPage) ||
+    Option.when(
+      wasAmended(current, TradingNameOfSubcontractorPage) ||
         wasAmended(current, SubcontractorNamePage)
-
-    Option.when(amended) {
-      val usesTradingName = currentUsesTradingName.contains(true)
+    ) {
       row(
-        label = messages(
-          if (usesTradingName) {
-            "tradingNameOfSubcontractor.checkYourAnswersLabel"
-          } else {
-            "subcontractorName.checkYourAnswersLabel"
-          }
-        ),
+        label =
+          if (currentUsesTradingName.contains(true))
+            messages("tradingNameOfSubcontractor.checkYourAnswersLabel")
+          else
+            messages("subcontractorName.checkYourAnswersLabel"),
         previous = originalNameDisplay(original).getOrElse(missingValue),
-        updated = currentNameDisplay(currentUsesTradingName, currentTradingName, currentName).getOrElse(missingValue)
+        updated =
+          currentNameDisplay(
+            currentUsesTradingName,
+            currentTradingName,
+            currentName
+          ).getOrElse(missingValue)
       )
     }
   }
@@ -134,7 +174,7 @@ object IndividualAmendedViewModel {
   )(implicit messages: Messages): Seq[Seq[TableRow]] =
     Seq(
       contactMethodRow(original, current),
-      contactValueRow(original, current)
+      contactValueRows(original, current)
     ).flatten
 
   private def contactMethodRow(
@@ -149,34 +189,57 @@ object IndividualAmendedViewModel {
       )
     }
 
-  private def contactValueRow(
-    original: OriginalIndividualAnswers,
-    current: UserAnswers
-  )(implicit messages: Messages): Option[Seq[TableRow]] = {
+  private def contactValueRows(
+                                original: OriginalIndividualAnswers,
+                                current: UserAnswers
+                              )(implicit messages: Messages): Seq[Seq[TableRow]] = {
 
-    val currentContactMethod = current.get(IndividualChooseContactDetailsPage)
-    val currentContactValue  = contactValueFromAnswers(currentContactMethod, current)
+    val originalMethod = original.contactMethod
+    val currentMethod  = current.get(IndividualChooseContactDetailsPage)
 
-    val labelMethod =
-      currentContactMethod match {
-        case Some(NoDetails) => original.contactMethod
-        case method          => method.orElse(original.contactMethod)
-      }
+    val currentValue = contactValueFromAnswers(currentMethod, current)
 
-    labelMethod
-      .flatMap(contactDetails)
-      .flatMap { case (label, page) =>
-        Option.when(
-          wasAmended(current, IndividualChooseContactDetailsPage) ||
-            wasAmended(current, page)
-        ) {
-          row(
-            label,
-            original.contactValue.getOrElse(missingValue),
-            currentContactValue.getOrElse(missingValue)
-          )
+    (originalMethod, currentMethod) match {
+      case (Some(oldMethod), Some(newMethod)) if oldMethod == newMethod && oldMethod != NoDetails =>
+
+        contactDetails(oldMethod).toSeq.flatMap { case (label, page) =>
+          Option.when(
+            wasAmended(current, IndividualChooseContactDetailsPage) ||
+              wasAmended(current, page) ||
+              original.contactValue != currentValue
+          ) {
+            row(
+              label,
+              original.contactValue.getOrElse(missingValue),
+              currentValue.getOrElse(missingValue)
+            )
+          }
         }
-      }
+      case _ =>
+        Seq(
+          originalMethod
+            .filter(_ != NoDetails)
+            .flatMap(contactDetails)
+            .map { case (label, _) =>
+              row(
+                label,
+                original.contactValue.getOrElse(missingValue),
+                missingValue
+              )
+            },
+
+          currentMethod
+            .filter(_ != NoDetails)
+            .flatMap(contactDetails)
+            .map { case (label, _) =>
+              row(
+                label,
+                missingValue,
+                currentValue.getOrElse(missingValue)
+              )
+            }
+        ).flatten
+    }
   }
 
   private def contactDetails(

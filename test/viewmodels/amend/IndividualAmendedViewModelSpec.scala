@@ -331,7 +331,7 @@ class IndividualAmendedViewModelSpec extends SpecBase {
       row(2).content mustBe Text("new@test.com")
     }
 
-    "must return contact method and phone number rows when changing from email to phone" in {
+    "must return contact method, email and phone rows when changing from email to phone" in {
       val answers =
         answersMatchingOriginal
           .set(IndividualChooseContactDetailsPage, ContactOptions.Phone)
@@ -340,25 +340,36 @@ class IndividualAmendedViewModelSpec extends SpecBase {
           .set(IndividualPhoneNumberPage, "01131234567")
           .success
           .value
-          .set(AmendedPagesPage,
-            Set(IndividualChooseContactDetailsPage, IndividualPhoneNumberPage)).success
+          .set(
+            AmendedPagesPage,
+            Set(
+              IndividualChooseContactDetailsPage,
+              IndividualPhoneNumberPage
+            )
+          )
+          .success
           .value
 
       val result =
         IndividualAmendedViewModel.rows(original, answers)
 
-      result must have size 2
+      result must have size 3
 
-      val methodRow = result.head
-      val valueRow  = result(1)
+      val methodRow = result(0)
+      val oldRow    = result(1)
+      val newRow    = result(2)
 
       methodRow.head.content mustBe Text(msgs("individualChooseContactDetails.checkYourAnswersLabel"))
       methodRow(1).content mustBe Text(msgs("individualChooseContactDetails.email"))
       methodRow(2).content mustBe Text(msgs("individualChooseContactDetails.phone"))
 
-      valueRow.head.content mustBe Text(msgs("individualPhoneNumber.checkYourAnswersLabel"))
-      valueRow(1).content mustBe Text("john@test.com")
-      valueRow(2).content mustBe Text("01131234567")
+      oldRow.head.content mustBe Text(msgs("individualEmailAddress.checkYourAnswersLabel"))
+      oldRow(1).content mustBe Text("john@test.com")
+      oldRow(2).content mustBe Text(msgs("individualAmended.table.content.none"))
+
+      newRow.head.content mustBe Text(msgs("individualPhoneNumber.checkYourAnswersLabel"))
+      newRow(1).content mustBe Text(msgs("individualAmended.table.content.none"))
+      newRow(2).content mustBe Text("01131234567")
     }
 
     "must display none when changing from email to no details" in {
@@ -381,15 +392,15 @@ class IndividualAmendedViewModelSpec extends SpecBase {
       result must have size 2
 
       val methodRow = result.head
-      val valueRow = result(1)
+      val removedValueRow  = result(1)
 
       methodRow.head.content mustBe Text(msgs("individualChooseContactDetails.checkYourAnswersLabel"))
       methodRow(1).content mustBe Text(msgs("individualChooseContactDetails.email"))
       methodRow(2).content mustBe Text(msgs("individualChooseContactDetails.noDetails"))
 
-      valueRow.head.content mustBe Text(msgs("individualEmailAddress.checkYourAnswersLabel"))
-      valueRow(1).content mustBe Text("john@test.com")
-      valueRow(2).content mustBe Text(msgs("individualAmended.table.content.none"))
+      removedValueRow .head.content mustBe Text(msgs("individualEmailAddress.checkYourAnswersLabel"))
+      removedValueRow (1).content mustBe Text("john@test.com")
+      removedValueRow (2).content mustBe Text(msgs("individualAmended.table.content.none"))
     }
 
     "must display email address when changing from no details to email" in {
@@ -417,11 +428,11 @@ class IndividualAmendedViewModelSpec extends SpecBase {
 
       result must have size 2
 
-      val valueRow = result(1)
+      val addedValueRow = result(1)
 
-      valueRow.head.content mustBe Text(msgs("individualEmailAddress.checkYourAnswersLabel"))
-      valueRow(1).content mustBe Text(msgs("individualAmended.table.content.none"))
-      valueRow(2).content mustBe Text("new@test.com")
+      addedValueRow .head.content mustBe Text(msgs("individualEmailAddress.checkYourAnswersLabel"))
+      addedValueRow (1).content mustBe Text(msgs("individualAmended.table.content.none"))
+      addedValueRow (2).content mustBe Text("new@test.com")
     }
 
     "must return a phone number row when the original contact method is phone and the phone number changes" in {
@@ -458,6 +469,64 @@ class IndividualAmendedViewModelSpec extends SpecBase {
       row.head.content mustBe Text(msgs("individualPhoneNumber.checkYourAnswersLabel"))
       row(1).content mustBe Text("01131234567")
       row(2).content mustBe Text("07700900123")
+    }
+
+    "must return phone and mobile rows when changing from phone to mobile" in {
+      val originalPhone =
+        original.copy(
+          contactMethod = Some(ContactOptions.Phone),
+          contactValue = Some("01131234567")
+        )
+
+      val answers =
+        answersMatchingOriginal
+          .remove(IndividualEmailAddressPage)
+          .success
+          .value
+          .set(IndividualChooseContactDetailsPage, ContactOptions.Phone)
+          .success
+          .value
+          .set(IndividualPhoneNumberPage, "01131234567")
+          .success
+          .value
+          .set(IndividualChooseContactDetailsPage, ContactOptions.Mobile)
+          .success
+          .value
+          .remove(IndividualPhoneNumberPage)
+          .success
+          .value
+          .set(IndividualMobileNumberPage, "07700900123")
+          .success
+          .value
+          .set(
+            AmendedPagesPage,
+            Set(
+              IndividualChooseContactDetailsPage,
+              IndividualMobileNumberPage
+            )
+          )
+          .success
+          .value
+
+      val result =
+        IndividualAmendedViewModel.rows(originalPhone, answers)
+
+      result must have size 3
+
+      val methodRow = result(0)
+      val phoneRow = result(1)
+      val mobileRow = result(2)
+
+      methodRow(1).content mustBe Text(msgs("individualChooseContactDetails.phone"))
+      methodRow(2).content mustBe Text(msgs("individualChooseContactDetails.mobile"))
+
+      phoneRow.head.content mustBe Text(msgs("individualPhoneNumber.checkYourAnswersLabel"))
+      phoneRow(1).content mustBe Text("01131234567")
+      phoneRow(2).content mustBe Text(msgs("individualAmended.table.content.none"))
+
+      mobileRow.head.content mustBe Text(msgs("individualMobileNumber.checkYourAnswersLabel"))
+      mobileRow(1).content mustBe Text(msgs("individualAmended.table.content.none"))
+      mobileRow(2).content mustBe Text("07700900123")
     }
 
     "must return a UTR row when the UTR changes" in {

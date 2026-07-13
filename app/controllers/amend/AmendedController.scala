@@ -17,19 +17,21 @@
 package controllers.amend
 
 import config.FrontendAppConfig
-import controllers.actions.*
+import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
+import controllers.routes
+import models.UserAnswers
+import models.requests.DataRequest
 import pages.add.{SubcontractorNamePage, TradingNameOfSubcontractorPage}
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import queries.{CisIdQuery, OriginalIndividualAnswersQuery}
+import play.api.libs.json.Reads
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import viewmodels.amend.IndividualAmendedViewModel
 import views.html.amend.AmendedView
 
 import javax.inject.Inject
 
-class IndividualAmendedController @Inject() (
+class AmendedController @Inject() (
   override val messagesApi: MessagesApi,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
@@ -41,29 +43,50 @@ class IndividualAmendedController @Inject() (
     with I18nSupport
     with Logging {
 
-  def onPageLoad(): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
+  import queries.*
+  import viewmodels.amend.*
+
+  def individualOnPageLoad(): Action[AnyContent] =
+    (identify andThen getData andThen requireData) { implicit request =>
+      withOriginalAnswers(OriginalIndividualAnswersQuery) { (original, cisId) =>
+        Ok(
+          view(
+            IndividualAmendedViewModel.rows(original, request.userAnswers),
+            individualDisplayName(request.userAnswers),
+            appConfig.manageYourSubcontractorsUrl(cisId)
+          )
+        )
+      }
+    }
+
+  private def withOriginalAnswers[A: Reads](
+    query: Gettable[A]
+  )(
+    block: (A, String) => Result
+  )(implicit request: DataRequest[AnyContent]): Result = {
+
     val ua = request.userAnswers
 
-    ua.get(OriginalIndividualAnswersQuery) match {
+    ua.get(query) match {
+
       case None =>
-        logger.error("[IndividualAmendedController.onPageLoad] OriginalIndividualAnswersQuery missing from session")
-        Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+        logger.error(s"[AmendedController] Missing ${query.toString}")
+        Redirect(routes.JourneyRecoveryController.onPageLoad())
 
       case Some(original) =>
         ua.get(CisIdQuery) match {
+
           case None =>
-            logger.error("[IndividualAmendedController.onPageLoad] CisIdQuery missing from session")
-            Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+            logger.error("[AmendedController] Missing CisIdQuery")
+            Redirect(routes.JourneyRecoveryController.onPageLoad())
 
           case Some(cisId) =>
-            val tableRows                = IndividualAmendedViewModel.rows(original, ua)
-            val manageYourSubcontractors = appConfig.manageYourSubcontractorsUrl(cisId)
-            Ok(view(tableRows, displayName(ua), manageYourSubcontractors))
+            block(original, cisId)
         }
     }
   }
 
-  private def displayName(ua: models.UserAnswers): String =
+  private def individualDisplayName(ua: UserAnswers): String =
     ua.get(SubcontractorNamePage)
       .map(n => s"${n.firstName} ${n.lastName}")
       .orElse(ua.get(TradingNameOfSubcontractorPage))
