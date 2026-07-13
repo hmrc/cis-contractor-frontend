@@ -19,6 +19,7 @@ package views.add.trust
 import forms.add.trust.TrustUtrFormProvider
 import models.{AmendMode, NormalMode}
 import org.jsoup.nodes.Document
+import org.jsoup.select.Elements
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.matchers.should.Matchers.should
 import org.scalatest.wordspec.AnyWordSpec
@@ -41,10 +42,19 @@ class TrustUtrViewSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuit
 
       doc.select("title").text() must include(messages("trustUtr.title"))
 
-      val heading = doc.select("label.govuk-label")
-      heading.text() mustBe messages("trustUtr.heading", trustName)
+      val heading: Elements = doc.select("h1")
+      heading.text() mustBe messages("trustUtr.heading")
 
-      doc.select("form").attr("action") mustBe controllers.add.trust.routes.TrustUtrController
+      doc.select("p").text must include(messages("trustUtr.p1"))
+
+      doc.select("label[for=value]").text() mustBe messages("trustUtr.label", trustName)
+
+      val hint: Elements = doc.select(".govuk-hint")
+      hint.text() mustBe messages("trustUtr.hint")
+
+      doc
+        .select("form")
+        .attr("action") mustBe controllers.add.trust.routes.TrustUtrController
         .onSubmit(NormalMode)
         .url
 
