@@ -723,6 +723,48 @@ class PartnershipNavigatorSpec extends SpecBase {
           ) mustBe routes.JourneyRecoveryController.onPageLoad()
         }
       }
+
+      "must go from a PartnershipUniqueTaxpayerReference to PartnershipCheckYourAnswers page in AmendMode" in {
+        navigator.nextPage(
+          PartnershipUniqueTaxpayerReferencePage,
+          AmendMode,
+          emptyUserAnswers.setOrException(PartnershipUniqueTaxpayerReferencePage, "5860920998")
+        ) mustBe partnershipAmendCYA
+      }
+
+      "must go from PartnershipNominatedPartnerUtrYesNoPage to AmendCYA when answer is true in AmendkMode and UTR is already provided" in {
+        val answers =
+          emptyUserAnswers
+            .set(PartnershipNominatedPartnerUtrYesNoPage, true)
+            .success
+            .value
+            .set(PartnershipNominatedPartnerUtrPage, "1234567890")
+            .success
+            .value
+
+        navigator.nextPage(
+          PartnershipNominatedPartnerUtrYesNoPage,
+          AmendMode,
+          answers
+        ) mustBe partnershipAmendCYA
+      }
+
+      "must go to PartnershipCheckYourAnswersController when answer is true in Amendode and UTR is already provided" in {
+        val answers =
+          emptyUserAnswers
+            .set(PartnershipHasUtrYesNoPage, true)
+            .success
+            .value
+            .set(PartnershipUniqueTaxpayerReferencePage, "1234567890")
+            .success
+            .value
+
+        navigator.nextPage(
+          PartnershipHasUtrYesNoPage,
+          AmendMode,
+          answers
+        ) mustBe partnershipAmendCYA
+      }
     }
 
     "in Check mode" - {
