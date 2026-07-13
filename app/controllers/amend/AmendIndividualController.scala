@@ -21,7 +21,7 @@ import models.TypeOfSubcontractor.Individualorsoletrader
 import models.add.SubcontractorName
 import models.address.{Address, Country}
 import models.amend.OriginalIndividualAnswers
-import models.contact.ContactOptions.NoDetails
+import models.contact.ContactOptions.*
 import pages.add.*
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import queries.{CisIdQuery, OriginalIndividualAnswersQuery}
@@ -61,6 +61,7 @@ class AmendIndividualController @Inject() (
     usesTradingName = Some(false),
     tradingName = None,
     subcontractorName = Some(individualName),
+    addressYesNo = Some(true),
     address = Some(individualAddress),
     contactMethod = Some(NoDetails),
     contactValue = None,
@@ -86,6 +87,7 @@ class AmendIndividualController @Inject() (
     ua <- ua.set(WorksReferenceNumberYesNoPage, true)
     ua <- ua.set(WorksReferenceNumberPage, "XLS345-MM")
     ua <- ua.set(CisIdQuery, "1")
+    ua <- ua.set(AmendedPagesPage, Set(IndividualChooseContactDetailsPage, IndividualPhoneNumberPage))
     ua <- ua.set(OriginalIndividualAnswersQuery, individualOriginal)
   } yield ua
 

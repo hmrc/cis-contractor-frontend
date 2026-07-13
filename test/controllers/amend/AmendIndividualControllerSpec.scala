@@ -73,6 +73,7 @@ class AmendIndividualControllerSpec extends SpecBase with MockitoSugar {
     usesTradingName = Some(false),
     tradingName = None,
     subcontractorName = Some(expectedName),
+    addressYesNo = Some(true),
     address = Some(expectedAddress),
     contactMethod = Some(NoDetails),
     contactValue = None,

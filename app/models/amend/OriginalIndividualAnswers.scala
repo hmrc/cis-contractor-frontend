@@ -25,6 +25,7 @@ case class OriginalIndividualAnswers(
   usesTradingName: Option[Boolean],
   tradingName: Option[String],
   subcontractorName: Option[SubcontractorName],
+  addressYesNo: Option[Boolean],
   address: Option[Address],
   contactMethod: Option[ContactOptions],
   contactValue: Option[String],

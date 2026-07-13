@@ -52,6 +52,7 @@ class IndividualAmendedControllerSpec extends SpecBase {
       usesTradingName = Some(false),
       tradingName = None,
       subcontractorName = Some(subcontractorName),
+      addressYesNo = Some(true),
       address = Some(address),
       contactMethod = Some(NoDetails),
       contactValue = None,
@@ -74,6 +75,9 @@ class IndividualAmendedControllerSpec extends SpecBase {
       .success
       .value
       .set(SubcontractorNamePage, subcontractorName)
+      .success
+      .value
+      .set(SubAddressYesNoPage, true)
       .success
       .value
       .set(AddressOfSubcontractorPage, address)
@@ -122,7 +126,7 @@ class IndividualAmendedControllerSpec extends SpecBase {
           val doc = Jsoup.parse(contentAsString(result))
 
           doc.title() must include(msgs("individualAmended.panel.heading"))
-          doc.text()  must include("Brody, Martin")
+          doc.text()  must include("Martin Brody")
 
           doc.select("tbody tr").size() mustBe 0
         }
@@ -196,7 +200,7 @@ class IndividualAmendedControllerSpec extends SpecBase {
 
           val doc = Jsoup.parse(contentAsString(result))
 
-          doc.text() must include("Brody, Martin")
+          doc.text() must include("Martin Brody")
         }
       }
 
