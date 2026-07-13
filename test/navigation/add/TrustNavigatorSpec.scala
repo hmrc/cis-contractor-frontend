@@ -381,6 +381,48 @@ class TrustNavigatorSpec extends SpecBase {
         navigator.nextPage(TrustNamePage, AmendMode, UserAnswers("id")) mustBe journeyRecovery
       }
 
+      "must go from TrustAddressYesNoPage" - {
+
+        "to the amend address lookup journey when the answer is Yes" in {
+
+          val answers =
+            emptyUserAnswers
+              .set(TrustAddressYesNoPage, true)
+              .success
+              .value
+
+          navigator.nextPage(
+            TrustAddressYesNoPage,
+            AmendMode,
+            answers
+          ) mustBe
+            controllers.add.trust.routes.TrustAddressController.redirectToAmendAddressLookup()
+        }
+
+        "to amend cya page when the answer is No" in {
+
+          val answers =
+            emptyUserAnswers
+              .set(TrustAddressYesNoPage, false)
+              .success
+              .value
+
+          navigator.nextPage(
+            TrustAddressYesNoPage,
+            AmendMode,
+            answers
+          ) mustBe trustAmendCYA
+        }
+
+        "to Journey Recovery when the answer is not present" in {
+          navigator.nextPage(
+            TrustAddressYesNoPage,
+            AmendMode,
+            emptyUserAnswers
+          ) mustBe
+            controllers.routes.JourneyRecoveryController.onPageLoad()
+        }
+      }
       "must go from TrustWorksReferenceYesNoPage to TrustWorksReferenceController when true and no work reference number exists" in {
         val ua =
           emptyUserAnswers.setOrException(TrustWorksReferenceYesNoPage, true)

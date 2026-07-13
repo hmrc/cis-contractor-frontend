@@ -58,7 +58,7 @@ class CompanyAddressController @Inject() (
   override protected def onCompletion(mode: Mode): Call =
     routes.CompanyContactOptionsController.onPageLoad(mode)
 
-  override protected def onChangeCompletion: Call =
+  override protected def onChangeCompletion(isAmend: Boolean): Call =
     routes.CompanyCheckYourAnswersController.onPageLoad()
 
 }

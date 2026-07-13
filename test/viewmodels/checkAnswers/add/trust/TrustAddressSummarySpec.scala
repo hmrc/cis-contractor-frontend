@@ -18,7 +18,7 @@ package viewmodels.checkAnswers.add.trust
 
 import controllers.add.trust.routes
 import helpers.CyaEncodingSpecHelper
-import models.UserAnswers
+import models.{AmendMode, UserAnswers}
 import models.address.{Address, Country}
 import org.scalatest.OptionValues.convertOptionToValuable
 import org.scalatest.TryValues.convertTryToSuccessOrFailure
@@ -76,6 +76,54 @@ class TrustAddressSummarySpec extends AnyWordSpec with Matchers with CyaEncoding
       action.href shouldBe
         routes.TrustAddressController
           .redirectToAddressLookup(Some("change"))
+          .url
+
+      action.visuallyHiddenText.value shouldBe
+        messages("trustAddress.change.hidden")
+
+      action.attributes should contain("id" -> "address-of-trust")
+    }
+
+    "return a SummaryListRow when TrustAddressPage has an answer in AmendMode" in {
+
+      val address = Address(
+        addressLine1 = "10 Downing Street",
+        addressLine2 = Some("Westminster"),
+        addressLine3 = Some("London"),
+        addressLine4 = Some("Greater London"),
+        postcode = Some("SW1A 2AA"),
+        country = Some(Country(Some("GB"), Some("United Kingdom")))
+      )
+
+      val userAnswers =
+        UserAnswers("id")
+          .set(TrustAddressPage, address)
+          .success
+          .value
+
+      val result = TrustAddressSummary.row(userAnswers, AmendMode)
+
+      result shouldBe defined
+
+      val row = result.value
+
+      row.key.content.asHtml.toString should include(
+        messages("trustAddress.checkYourAnswersLabel")
+      )
+
+      row.value.content shouldBe HtmlContent(
+        "10 Downing Street<br/>" +
+          "Westminster<br/>" +
+          "London<br/>" +
+          "Greater London<br/>" +
+          "SW1A 2AA<br/>" +
+          "United Kingdom"
+      )
+
+      val action = row.actions.value.items.head
+
+      action.href shouldBe
+        controllers.add.trust.routes.TrustAddressController.redirectToAmendAddressLookup()
           .url
 
       action.visuallyHiddenText.value shouldBe
