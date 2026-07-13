@@ -88,6 +88,20 @@ class AddressLookupModelsSpec extends AnyFreeSpec with Matchers with EitherValue
     }
   }
 
+  val testMaxLengthErrorMessage =
+    MaxLengthErrorMessage(
+      addressLine1 = "Address line 1 max length error",
+      addressLine2 = "Address line 2 max length error",
+      addressLine3 = "Address line 3 max length error",
+      town = "Town max length error"
+    )
+
+  val testMaxLengthErrorMessagesModel =
+    MaxLengthErrorMessagesModel(
+      en = Some(testMaxLengthErrorMessage),
+      cy = Some(testMaxLengthErrorMessage)
+    )
+
   "AddressLookupSelectConfigModel" - {
 
     val completeConfig = AddressLookupSelectConfigModel(
@@ -158,6 +172,10 @@ class AddressLookupModelsSpec extends AnyFreeSpec with Matchers with EitherValue
     val selectConfig             = AddressLookupSelectConfigModel(showSearchAgainLink = Some(true))
     val confirmConfig            = AddressLookupConfirmConfigModel(showChangeLinkcontinueUrl = Some(true))
     val manualAddressEntryConfig = ManualAddressEntryConfig(
+      line1MaxLength = Some(35),
+      line2MaxLength = Some(35),
+      line3MaxLength = Some(35),
+      townMaxLength = Some(35),
       mandatoryFields = MandatoryFieldsConfigModel(
         addressLine1 = Some(true),
         addressLine2 = Some(true),
@@ -165,10 +183,10 @@ class AddressLookupModelsSpec extends AnyFreeSpec with Matchers with EitherValue
         town = Some(true),
         postcode = Some(true)
       ),
+      maxLengthErrorMessages = testMaxLengthErrorMessagesModel,
       showOrganisationName = false
     )
-
-    val completeOptions = AddressLookupOptionsModel(
+    val completeOptions          = AddressLookupOptionsModel(
       continueUrl = "/continue",
       signOutHref = Some("/sign-out"),
       phaseFeedbackLink = Some("/feedback"),
@@ -191,6 +209,7 @@ class AddressLookupModelsSpec extends AnyFreeSpec with Matchers with EitherValue
       confirmPageConfig = AddressLookupConfirmConfigModel(),
       manualAddressEntryConfig = ManualAddressEntryConfig(
         mandatoryFields = MandatoryFieldsConfigModel(),
+        maxLengthErrorMessages = testMaxLengthErrorMessagesModel,
         showOrganisationName = false
       ),
       pageHeadingStyle = "govuk-heading-l"
@@ -230,6 +249,10 @@ class AddressLookupModelsSpec extends AnyFreeSpec with Matchers with EitherValue
 
         (json \ "selectPageConfig" \ "showSearchAgainLink").asOpt[Boolean] mustBe Some(true)
         (json \ "confirmPageConfig" \ "showChangeLinkcontinueUrl").asOpt[Boolean] mustBe Some(true)
+        (json \ "manualAddressEntryConfig" \ "line1MaxLength").asOpt[Int] mustBe Some(35)
+
+        (json \ "manualAddressEntryConfig" \ "maxLengthErrorMessages" \ "en" \ "addressLine1")
+          .asOpt[String] mustBe Some("Address line 1 max length error")
       }
 
       "must produce valid JSON structure" in {
