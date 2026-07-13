@@ -64,6 +64,35 @@ class TrustUtrSummarySpec extends AnyFreeSpec with Matchers with CyaEncodingSpec
       changeAction.attributes                   must contain("id" -> "trust-utr")
     }
 
+    "must return a SummaryListRow when the answer is present in AmendMode" in {
+      val utr = "1234567890"
+      val answers = UserAnswers("test-id").set(TrustUtrPage, utr).success.value
+
+      val maybeRow: Option[SummaryListRow] = TrustUtrSummary.row(answers, AmendMode)
+      maybeRow shouldBe defined
+
+      val row = maybeRow.value
+
+      val expectedKeyText = messages("trustUtr.checkYourAnswersLabel")
+      row.key.content.asHtml.toString should include(expectedKeyText)
+
+      row.value.content.asHtml.toString should include(utr)
+
+      row.actions shouldBe defined
+      val actions = row.actions.value.items
+      actions should have size 1
+
+      val changeAction = actions.head
+      val expectedChangeText = messages("site.change")
+      val expectedHref = routes.TrustUtrController.onPageLoad(AmendMode).url
+      val expectedHiddenText = messages("trustUtr.change.hidden")
+
+      changeAction.content.asHtml.toString should include(expectedChangeText)
+      changeAction.href shouldBe expectedHref
+      changeAction.visuallyHiddenText.value shouldBe expectedHiddenText
+      changeAction.attributes must contain("id" -> "trust-utr")
+    }
+
     "must return None when the answer is not present" in {
       TrustUtrSummary.row(UserAnswers("test-id")) shouldBe None
     }
