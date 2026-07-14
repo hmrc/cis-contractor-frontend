@@ -17,7 +17,7 @@
 package viewmodels.checkAnswers.add.trust
 
 import helpers.CyaEncodingSpecHelper
-import models.{CheckMode, UserAnswers}
+import models.{AmendMode, CheckMode, UserAnswers}
 import org.scalatest.OptionValues.convertOptionToValuable
 import org.scalatest.TryValues.convertTryToSuccessOrFailure
 import org.scalatest.freespec.AnyFreeSpec
@@ -59,6 +59,38 @@ class TrustMobileNumberSummarySpec extends AnyFreeSpec with Matchers with CyaEnc
 
       changeAction.content.asHtml.toString should include(expectedChangeText)
       changeAction.href                  shouldBe expectedHref
+
+      changeAction.visuallyHiddenText.value shouldBe expectedHiddenText
+    }
+
+    "must return a Summary List Row when the answer exists in AmendMode" in {
+      val answers =
+        UserAnswers("test-id")
+          .set(TrustMobileNumberPage, "0987456231")
+          .success
+          .value
+
+      val maybeRow = TrustMobileNumberSummary.row(answers, AmendMode)
+      maybeRow shouldBe defined
+
+      val row = maybeRow.value
+
+      val expectedKeyText = messages("trustMobileNumber.checkYourAnswersLabel")
+      row.key.content.asHtml.toString should include(expectedKeyText)
+
+      row.value.content.asHtml.toString should include("0987456231")
+
+      row.actions shouldBe defined
+      val actions = row.actions.value.items
+      actions should have size 1
+
+      val changeAction = actions.head
+      val expectedChangeText = messages("site.change")
+      val expectedHref = controllers.add.trust.routes.TrustMobileNumberController.onPageLoad(AmendMode).url
+      val expectedHiddenText = messages("trustMobileNumber.change.hidden")
+
+      changeAction.content.asHtml.toString should include(expectedChangeText)
+      changeAction.href shouldBe expectedHref
 
       changeAction.visuallyHiddenText.value shouldBe expectedHiddenText
     }
