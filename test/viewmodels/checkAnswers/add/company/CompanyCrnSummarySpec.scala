@@ -18,7 +18,7 @@ package viewmodels.checkAnswers.add.company
 
 import controllers.add.company.routes
 import helpers.CyaEncodingSpecHelper
-import models.{CheckMode, UserAnswers}
+import models.{AmendMode, CheckMode, UserAnswers}
 import org.scalatest.OptionValues.convertOptionToValuable
 import org.scalatest.TryValues.convertTryToSuccessOrFailure
 import org.scalatest.freespec.AnyFreeSpec
@@ -58,6 +58,39 @@ class CompanyCrnSummarySpec extends AnyFreeSpec with Matchers with CyaEncodingSp
       val changeAction       = actions.head
       val expectedChangeText = messages("site.change")
       val expectedHref       = routes.CompanyCrnController.onPageLoad(CheckMode).url
+      val expectedHiddenText = messages("companyCrn.change.hidden")
+
+      changeAction.content.asHtml.toString should include(expectedChangeText)
+      changeAction.href                  shouldBe expectedHref
+
+      changeAction.visuallyHiddenText.value shouldBe expectedHiddenText
+      changeAction.attributes                   must contain("id" -> "company-crn")
+    }
+
+    "must return a SummaryListRow when the answer exists for Amend journey" in {
+      val answers =
+        UserAnswers("test-id")
+          .set(CompanyCrnPage, "AC012345")
+          .success
+          .value
+
+      val maybeRow = CompanyCrnSummary.row(answers, AmendMode)
+      maybeRow shouldBe defined
+
+      val row = maybeRow.value
+
+      val expectedKeyText = messages("companyCrn.checkYourAnswersLabel")
+      row.key.content.asHtml.toString should include(expectedKeyText)
+
+      row.value.content.asHtml.toString should include("AC012345")
+
+      row.actions shouldBe defined
+      val actions = row.actions.value.items
+      actions should have size 1
+
+      val changeAction       = actions.head
+      val expectedChangeText = messages("site.change")
+      val expectedHref       = routes.CompanyCrnController.onPageLoad(AmendMode).url
       val expectedHiddenText = messages("companyCrn.change.hidden")
 
       changeAction.content.asHtml.toString should include(expectedChangeText)

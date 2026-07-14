@@ -28,10 +28,12 @@ import play.api.libs.json.JsPath
 
 class PartnershipNavigatorSpec extends SpecBase {
 
-  val navigator                    = new PartnershipNavigator
-  private lazy val journeyRecovery = routes.JourneyRecoveryController.onPageLoad()
-  private lazy val partnershipCYA  =
+  val navigator                        = new PartnershipNavigator
+  private lazy val journeyRecovery     = routes.JourneyRecoveryController.onPageLoad()
+  private lazy val partnershipCYA      =
     controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
+  private lazy val partnershipAmendCYA = routes.JourneyRecoveryController
+    .onPageLoad() // TODO when available   controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
 
   "PartnershipNavigator" - {
 
@@ -599,6 +601,127 @@ class PartnershipNavigatorSpec extends SpecBase {
 
       "must go from PartnershipNamePage to JourneyRecovery" in {
         navigator.nextPage(PartnershipNamePage, AmendMode, emptyUserAnswers) mustBe journeyRecovery
+      }
+
+      "must go from a PartnershipWorksReferenceNumberYesNoPage to next page when true" in {
+        navigator.nextPage(
+          PartnershipWorksReferenceNumberYesNoPage,
+          AmendMode,
+          emptyUserAnswers.setOrException(PartnershipWorksReferenceNumberYesNoPage, true)
+        ) mustBe controllers.add.partnership.routes.PartnershipWorksReferenceNumberController.onPageLoad(AmendMode)
+      }
+
+      "must go from PartnershipWorksReferenceNumberYesNoPage to CYA when answer is true in AmendMode and works reference number already exists" in {
+        val answers =
+          emptyUserAnswers
+            .set(PartnershipWorksReferenceNumberYesNoPage, true)
+            .success
+            .value
+            .set(PartnershipWorksReferenceNumberPage, "WRN-12345")
+            .success
+            .value
+
+        navigator.nextPage(
+          PartnershipWorksReferenceNumberYesNoPage,
+          AmendMode,
+          answers
+        ) mustBe partnershipAmendCYA
+      }
+
+      "must go from a PartnershipWorksReferenceNumberYesNoPage to PartnershipCheckYourAnswers page when false" in {
+        navigator.nextPage(
+          PartnershipWorksReferenceNumberYesNoPage,
+          AmendMode,
+          emptyUserAnswers.setOrException(PartnershipWorksReferenceNumberYesNoPage, false)
+        ) mustBe partnershipAmendCYA
+      }
+
+      "must go from a PartnershipWorksReferenceNumberYesNoPage to journey recovery page when incomplete info provided" in {
+        navigator.nextPage(
+          PartnershipWorksReferenceNumberYesNoPage,
+          AmendMode,
+          emptyUserAnswers
+        ) mustBe journeyRecovery
+      }
+      "must go from a PartnershipWorksReferenceNumberPage to PartnershipCheckYourAnswers page in AmendMode" in {
+        navigator.nextPage(
+          PartnershipWorksReferenceNumberPage,
+          AmendMode,
+          emptyUserAnswers.setOrException(PartnershipUniqueTaxpayerReferencePage, "UTR-123")
+        ) mustBe partnershipAmendCYA
+      }
+
+      "must go from PartnershipNominatedPartnerCrnYesNo" - {
+        "to next page when answer is Yes" in {
+          val answers = UserAnswers(userAnswersId).set(PartnershipNominatedPartnerCrnYesNoPage, true).success.value
+
+          navigator.nextPage(
+            PartnershipNominatedPartnerCrnYesNoPage,
+            AmendMode,
+            answers
+          ) mustBe controllers.add.partnership.routes.PartnershipNominatedPartnerCrnController
+            .onPageLoad(AmendMode)
+        }
+
+        "to PartnershipCheckYourAnswers when answer is No" in {
+          val answers = UserAnswers(userAnswersId).set(PartnershipNominatedPartnerCrnYesNoPage, false).success.value
+
+          navigator.nextPage(
+            PartnershipNominatedPartnerCrnYesNoPage,
+            AmendMode,
+            answers
+          ) mustBe partnershipAmendCYA
+        }
+
+        "must go from PartnershipNominatedPartnerCrnYesNoPage to Amend CYA when answer is true in AmendMode and CRN already exists" in {
+          val answers =
+            emptyUserAnswers
+              .set(PartnershipNominatedPartnerCrnYesNoPage, true)
+              .success
+              .value
+              .set(PartnershipNominatedPartnerCrnPage, "12345678")
+              .success
+              .value
+
+          navigator.nextPage(
+            PartnershipNominatedPartnerCrnYesNoPage,
+            AmendMode,
+            answers
+          ) mustBe partnershipAmendCYA
+        }
+
+        "to JourneyRecoveryPage when answer is not present" in {
+          navigator.nextPage(
+            PartnershipNominatedPartnerCrnYesNoPage,
+            AmendMode,
+            emptyUserAnswers
+          ) mustBe routes.JourneyRecoveryController.onPageLoad()
+        }
+      }
+
+      "PartnershipNominatedPartnerCrnPage in AmendMode" - {
+        "must go from PartnershipNominatedPartnerCrnPage to PartnershipCheckYourAnswersController when CRN exists in AmendMode" in {
+
+          val answers =
+            emptyUserAnswers
+              .set(PartnershipNominatedPartnerCrnPage, "12345678")
+              .success
+              .value
+
+          navigator.nextPage(
+            PartnershipNominatedPartnerCrnPage,
+            AmendMode,
+            answers
+          ) mustBe partnershipAmendCYA
+        }
+
+        "must go to JourneyRecovery when answer is missing" in {
+          navigator.nextPage(
+            PartnershipNominatedPartnerCrnPage,
+            AmendMode,
+            emptyUserAnswers
+          ) mustBe routes.JourneyRecoveryController.onPageLoad()
+        }
       }
     }
 

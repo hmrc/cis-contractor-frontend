@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package views.add.company
+package views.add.partnership
 
-import forms.add.company.CompanyWorksReferenceFormProvider
+import forms.add.partnership.PartnershipWorksReferenceNumberFormProvider
 import models.{AmendMode, NormalMode}
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.matchers.should.Matchers.should
@@ -27,23 +27,25 @@ import play.api.i18n.Messages
 import play.api.mvc.Request
 import play.api.test.FakeRequest
 import play.twirl.api.HtmlFormat
-import views.html.add.company.CompanyWorksReferenceView
+import views.html.add.partnership.PartnershipWorksReferenceNumberView
 
-class CompanyWorksReferenceViewSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite {
+class PartnershipWorksReferenceNumberViewSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite {
 
-  "CompanyWorksReferenceView" should {
+  "PartnershipWorksReferenceNumberView" should {
 
     "render the page with title, heading, input and submit button" in new Setup {
-      val companyName                 = "Test Company"
-      val html: HtmlFormat.Appendable = view(form, NormalMode, companyName)
+      val partnershipName             = "Test Partnership"
+      val html: HtmlFormat.Appendable = view(form, NormalMode, partnershipName)
       val doc                         = org.jsoup.Jsoup.parse(html.toString())
 
-      doc.select("title").text() must include(messages("companyWorksReference.title"))
+      doc.select("title").text() must include(messages("partnershipWorksReferenceNumber.title"))
 
       val heading = doc.select("label.govuk-label")
-      heading.text() mustBe messages("companyWorksReference.heading", companyName)
+      heading.text() mustBe messages("partnershipWorksReferenceNumber.heading", partnershipName)
 
-      doc.select("form").attr("action") mustBe controllers.add.company.routes.CompanyWorksReferenceController
+      doc
+        .select("form")
+        .attr("action") mustBe controllers.add.partnership.routes.PartnershipWorksReferenceNumberController
         .onSubmit(NormalMode)
         .url
 
@@ -52,17 +54,19 @@ class CompanyWorksReferenceViewSpec extends AnyWordSpec with Matchers with Guice
       doc.select(".govuk-button").text() mustBe messages("site.continue")
     }
 
-    "render the page with title, heading, input and update button for Amend journey" in new Setup {
-      val companyName                 = "Test Company"
-      val html: HtmlFormat.Appendable = view(form, AmendMode, companyName)
+    "render the page with title, heading, input and update button in Amend journey" in new Setup {
+      val partnershipName             = "Test Partnership"
+      val html: HtmlFormat.Appendable = view(form, AmendMode, partnershipName)
       val doc                         = org.jsoup.Jsoup.parse(html.toString())
 
-      doc.select("title").text() must include(messages("companyWorksReference.title"))
+      doc.select("title").text() must include(messages("partnershipWorksReferenceNumber.title"))
 
       val heading = doc.select("label.govuk-label")
-      heading.text() mustBe messages("companyWorksReference.heading", companyName)
+      heading.text() mustBe messages("partnershipWorksReferenceNumber.heading", partnershipName)
 
-      doc.select("form").attr("action") mustBe controllers.add.company.routes.CompanyWorksReferenceController
+      doc
+        .select("form")
+        .attr("action") mustBe controllers.add.partnership.routes.PartnershipWorksReferenceNumberController
         .onSubmit(AmendMode)
         .url
 
@@ -73,24 +77,24 @@ class CompanyWorksReferenceViewSpec extends AnyWordSpec with Matchers with Guice
 
     "display error summary and inline error when no name is entered" in new Setup {
       val errorForm: Form[String] =
-        form.withError("value", "companyWorksReference.error.required")
+        form.withError("value", "partnershipWorksReferenceNumber.error.required")
 
-      val companyName = "Test Company"
-      val html        = view(errorForm, NormalMode, companyName)
-      val doc         = org.jsoup.Jsoup.parse(html.toString())
+      val partnershipName = "Test Partnership"
+      val html            = view(errorForm, NormalMode, partnershipName)
+      val doc             = org.jsoup.Jsoup.parse(html.toString())
 
       val summary = doc.select(".govuk-error-summary")
-      summary.text() must include(messages("companyWorksReference.error.required"))
+      summary.text() must include(messages("partnershipWorksReferenceNumber.error.required"))
 
       val linkHref = summary.select("a").attr("href")
       linkHref mustBe "#value"
 
-      doc.select(".govuk-error-message").text() must include(messages("companyWorksReference.error.required"))
+      doc.select(".govuk-error-message").text() must include(messages("partnershipWorksReferenceNumber.error.required"))
     }
   }
 
   trait Setup {
-    val formProvider       = new CompanyWorksReferenceFormProvider()
+    val formProvider       = new PartnershipWorksReferenceNumberFormProvider()
     val form: Form[String] = formProvider()
 
     implicit val request: Request[_] = FakeRequest()
@@ -100,7 +104,7 @@ class CompanyWorksReferenceViewSpec extends AnyWordSpec with Matchers with Guice
         app.injector.instanceOf[play.api.i18n.MessagesApi]
       )
 
-    val view: CompanyWorksReferenceView = app.injector.instanceOf[CompanyWorksReferenceView]
+    val view: PartnershipWorksReferenceNumberView = app.injector.instanceOf[PartnershipWorksReferenceNumberView]
   }
 
 }
