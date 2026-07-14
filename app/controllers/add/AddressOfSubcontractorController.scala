@@ -61,9 +61,9 @@ class AddressOfSubcontractorController @Inject() (
 
   override protected def onChangeCompletion(isAmend: Boolean): Call =
     if isAmend then
-      routes.AmendIndividualCheckYourAnswersController
+      controllers.routes.JourneyRecoveryController
         .onPageLoad() // TODO - redirect to AmendIndividualCheckYourAnswersController once AmendIndividualCheckYourAnswers is added
-    else routes.CheckYourAnswersController.onPageLoad()
+    else controllers.add.routes.CheckYourAnswersController.onPageLoad()
 
-  def redirectToAmendAddressLookup(): Action[AnyContent]
+  override protected def redirectToAmendAddressLookup(): Action[AnyContent]
 }
