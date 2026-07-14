@@ -16,7 +16,7 @@
 
 package viewmodels.checkAnswers.add.trust
 
-import models.{CheckMode, UserAnswers}
+import models.{CheckMode, UserAnswers, Mode}
 import pages.add.trust.TrustPhoneNumberPage
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
@@ -25,7 +25,7 @@ import viewmodels.implicits.*
 
 object TrustPhoneNumberSummary {
 
-  def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
+  def row(answers: UserAnswers, mode: Mode = CheckMode)(implicit messages: Messages): Option[SummaryListRow] =
     answers.get(TrustPhoneNumberPage).map { answer =>
       SummaryListRowViewModel(
         key = "trustPhoneNumber.checkYourAnswersLabel",
@@ -33,7 +33,7 @@ object TrustPhoneNumberSummary {
         actions = Seq(
           ActionItemViewModel(
             "site.change",
-            controllers.add.trust.routes.TrustPhoneNumberController.onPageLoad(CheckMode).url
+            controllers.add.trust.routes.TrustPhoneNumberController.onPageLoad(mode).url
           )
             .withVisuallyHiddenText(messages("trustPhoneNumber.change.hidden"))
             .withAttribute("id" -> "trust-phone-number")

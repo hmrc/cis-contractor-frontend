@@ -16,7 +16,7 @@
 
 package viewmodels.checkAnswers.add.trust
 
-import models.{CheckMode, UserAnswers}
+import models.{CheckMode, UserAnswers, Mode}
 import pages.add.trust.AddTrustContactMethodsYesNoPage
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
@@ -25,7 +25,7 @@ import viewmodels.implicits.*
 
 object AddTrustContactMethodsYesNoSummary {
 
-  def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
+  def row(answers: UserAnswers, mode: Mode = CheckMode)(implicit messages: Messages): Option[SummaryListRow] =
     answers.get(AddTrustContactMethodsYesNoPage).map { answer =>
 
       val value = if (answer) "site.yes" else "site.no"
