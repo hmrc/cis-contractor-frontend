@@ -35,6 +35,7 @@ GET   /subcontractor/system-error/there-is-a-problem  controllers.SystemErrorCon
 GET   /subcontractor/individual-address-lookup         controllers.add.AddressOfSubcontractorController.redirectToAddressLookup(mode: Mode = NormalMode, changeRoute: Option[String] ?= None)
 GET   /subcontractor/individual-address-return         controllers.add.AddressOfSubcontractorController.addressLookupCallback(id: String ?= "", mode: Mode = NormalMode)
 GET   /subcontractor/individual-address-return/change  controllers.add.AddressOfSubcontractorController.addressLookupCallbackChange(id: String ?= "", mode: Mode = NormalMode)
+GET   /subcontractor/amend/address-change              controllers.add.AddressOfSubcontractorController.redirectToAmendAddressLookup()
 
 GET   /subcontractor/amend/individual  controllers.amend.AmendIndividualController.onPageLoad()
 
