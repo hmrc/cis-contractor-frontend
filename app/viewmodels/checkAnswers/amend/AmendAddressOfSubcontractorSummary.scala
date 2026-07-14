@@ -19,14 +19,14 @@ package viewmodels.checkAnswers.amend
 import models.UserAnswers
 import pages.add.AddressOfSubcontractorPage
 import play.api.i18n.Messages
-import viewmodels.govuk.summarylist.*
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
+import viewmodels.checkAnswers.add.AddressSummaryRow
 
 object AmendAddressOfSubcontractorSummary {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
     answers.get(AddressOfSubcontractorPage).map { answer =>
-      SummaryListRowViewModel.row(
+      AddressSummaryRow.row(
         address = answer,
         key = "addressOfSubcontractor.checkYourAnswersLabel",
         changeCall = controllers.add.routes.AddressOfSubcontractorController.redirectToAmendAddressLookup().url,
