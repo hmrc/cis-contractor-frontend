@@ -87,9 +87,9 @@ class TrustNavigator @Inject() () extends NavigatorForJourney {
 
   private val amendRouteMap: Page => UserAnswers => Call = {
     case AddTrustContactMethodsYesNoPage => navigatorFromAddTrustContactMethodsYesNoPage(AmendMode)(_)
-    case TrustWorksReferenceYesNoPage => navigatorFromTrustWorksReferenceYesNoPage(AmendMode)(_)
-    case TrustUtrYesNoPage            => navigatorFromTrustUtrYesNoPage(AmendMode)(_)
-    case _                            => _ => cyaRoute(AmendMode)
+    case TrustWorksReferenceYesNoPage    => navigatorFromTrustWorksReferenceYesNoPage(AmendMode)(_)
+    case TrustUtrYesNoPage               => navigatorFromTrustUtrYesNoPage(AmendMode)(_)
+    case _                               => _ => cyaRoute(AmendMode)
   }
 
   private def navigatorFromTrustUtrYesNoPage(mode: Mode)(ua: UserAnswers): Call =
