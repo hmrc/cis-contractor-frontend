@@ -84,13 +84,13 @@ class TrustMobileNumberSummarySpec extends AnyFreeSpec with Matchers with CyaEnc
       val actions = row.actions.value.items
       actions should have size 1
 
-      val changeAction = actions.head
+      val changeAction       = actions.head
       val expectedChangeText = messages("site.change")
-      val expectedHref = controllers.add.trust.routes.TrustMobileNumberController.onPageLoad(AmendMode).url
+      val expectedHref       = controllers.add.trust.routes.TrustMobileNumberController.onPageLoad(AmendMode).url
       val expectedHiddenText = messages("trustMobileNumber.change.hidden")
 
       changeAction.content.asHtml.toString should include(expectedChangeText)
-      changeAction.href shouldBe expectedHref
+      changeAction.href                  shouldBe expectedHref
 
       changeAction.visuallyHiddenText.value shouldBe expectedHiddenText
     }

@@ -23,7 +23,7 @@ import models.TypeOfSubcontractor.Trust
 import models.UserAnswers
 import models.address.{Address, Country}
 import models.amend.trust.OriginalTrustAnswers
-import models.contact.ContactMethodOptions.{Email, Phone, Mobile}
+import models.contact.ContactMethodOptions.{Email, Mobile, Phone}
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{never, times, verify, when}

@@ -17,7 +17,7 @@
 package viewmodels.checkAnswers.add.trust
 
 import models.contact.ContactMethodOptions
-import models.{CheckMode, UserAnswers, Mode}
+import models.{CheckMode, Mode, UserAnswers}
 import pages.add.trust.TrustContactMethodOptionsPage
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat

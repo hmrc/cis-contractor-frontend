@@ -17,7 +17,7 @@
 package views.add.trust
 
 import forms.add.trust.TrustEmailAddressFormProvider
-import models.{NormalMode, AmendMode}
+import models.{AmendMode, NormalMode}
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.matchers.should.Matchers.should
 import org.scalatest.wordspec.AnyWordSpec
@@ -53,9 +53,9 @@ class TrustEmailAddressViewSpec extends AnyWordSpec with Matchers with GuiceOneA
     }
 
     "render the page with title and update button in AmendMode" in new Setup {
-      val trustName = "Test Trust"
+      val trustName                   = "Test Trust"
       val html: HtmlFormat.Appendable = view(form, AmendMode, trustName)
-      val doc = org.jsoup.Jsoup.parse(html.toString())
+      val doc                         = org.jsoup.Jsoup.parse(html.toString())
 
       doc.select("title").text() must include(messages("trustEmailAddress.title"))
 

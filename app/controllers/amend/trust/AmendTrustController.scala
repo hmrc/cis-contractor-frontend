@@ -21,7 +21,7 @@ import models.TypeOfSubcontractor.Trust
 import models.UserAnswers
 import models.address.{Address, Country}
 import models.amend.trust.OriginalTrustAnswers
-import models.contact.ContactMethodOptions.{Email, Phone, Mobile}
+import models.contact.ContactMethodOptions.{Email, Mobile, Phone}
 import pages.add.*
 import pages.add.trust.*
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -47,7 +47,7 @@ class AmendTrustController @Inject() (
   private val utr            = "1123456789"
   private val worksReference = "XLS345-MM"
   private val phoneNumber    = "1234567890"
-  private val mobileNumber    = "6454543667"
+  private val mobileNumber   = "6454543667"
   private val trustAddress   = Address(
     addressLine1 = "12 Harbor View Road",
     addressLine2 = Some("Amity Island"),

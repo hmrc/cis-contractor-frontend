@@ -17,7 +17,7 @@
 package views.add.trust
 
 import forms.add.trust.TrustPhoneNumberFormProvider
-import models.{NormalMode, AmendMode}
+import models.{AmendMode, NormalMode}
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
@@ -63,7 +63,7 @@ class TrustPhoneNumberViewSpec extends AnyWordSpec with Matchers with GuiceOneAp
       val trustName = "Test Trust"
 
       val html: HtmlFormat.Appendable = view(form, AmendMode, trustName)
-      val doc = org.jsoup.Jsoup.parse(html.toString())
+      val doc                         = org.jsoup.Jsoup.parse(html.toString())
 
       doc.select("title").text() must include(messages("trustPhoneNumber.title"))
 
