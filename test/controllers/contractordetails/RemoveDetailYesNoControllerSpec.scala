@@ -39,7 +39,7 @@ class RemoveDetailYesNoControllerSpec extends SpecBase with MockitoSugar {
   val formProvider = new RemoveDetailYesNoFormProvider()
   "removeDetailYesNo Controller" - {
 
-    "when contractorDetail is neither 'email' or 'scheme-name'" - {
+    "when contractorDetail is neither 'email-address' or 'scheme-name'" - {
 
       "must redirect to Journey Recovery on GET" in {
 
@@ -81,7 +81,7 @@ class RemoveDetailYesNoControllerSpec extends SpecBase with MockitoSugar {
     }
 
     Seq(
-      ("email", "email"),
+      ("email-address", "email-address"),
       ("scheme-name", "scheme-name")
     ).foreach { case (contractorDetail, selectedDetail) =>
       s"when contractorDetail is '$contractorDetail'" - {

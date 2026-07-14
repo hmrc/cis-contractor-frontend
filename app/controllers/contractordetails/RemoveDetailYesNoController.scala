@@ -41,7 +41,7 @@ class RemoveDetailYesNoController @Inject() (
     extends FrontendBaseController
     with I18nSupport {
 
-  private val validDetails = Set("email", "scheme-name")
+  private val validDetails = Set("email-address", "scheme-name")
 
   private def withValidDetail(contractorDetail: String)(action: => Future[Result]): Future[Result] =
     if (!validDetails.contains(contractorDetail)) {

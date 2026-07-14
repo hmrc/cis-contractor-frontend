@@ -25,19 +25,19 @@ class RemoveDetailYesNoFormProvider @Inject() extends Mappings {
 
   def apply(contractorDetail: String): Form[Boolean] =
     contractorDetail match {
-      case "email"       =>
+      case "email-address" =>
         Form(
           "value" -> boolean(
             requiredKey = "contractordetails.removeDetailYesNo.error.required.email"
           )
         )
-      case "scheme-name" =>
+      case "scheme-name"   =>
         Form(
           "value" -> boolean(
             requiredKey = "contractordetails.removeDetailYesNo.error.required.schemeName"
           )
         )
-      case other         =>
+      case other           =>
         throw new IllegalArgumentException(s"Unknown contractorDetail: $other")
     }
 

@@ -24,7 +24,7 @@ class RemoveDetailYesNoPageSpec extends PageBehaviours {
   "RemoveDetailYesNoPage" - {
 
     Seq(
-      ("email", EnterContractorEmailAddressPage, AddEmailAddressYesNoPage, "email@test.com"),
+      ("email-address", EnterContractorEmailAddressPage, AddEmailAddressYesNoPage, "email@test.com"),
       ("scheme-name", SchemeNamePage, AddSchemeNameYesNoPage, "Scheme123")
     ).foreach { case (contractorDetail, selectedDetailPage, screenerPage, dummyDetail) =>
       s"when contractorDetail is '$contractorDetail'" - {

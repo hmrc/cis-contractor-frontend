@@ -27,7 +27,7 @@
 @(contractorDetail:String, form: Form[_])(implicit request: Request[_], messages: Messages)
 
 @defining(contractorDetail match {
-    case "email"       => messages("contractordetails.removeDetailYesNo.detail.email")
+    case "email-address"       => messages("contractordetails.removeDetailYesNo.detail.email")
     case "scheme-name" => messages("contractordetails.removeDetailYesNo.detail.schemeName")
     }) { selectedContractorDetail =>
 

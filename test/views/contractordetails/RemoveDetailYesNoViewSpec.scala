@@ -27,7 +27,7 @@ import views.html.contractordetails.RemoveDetailYesNoView
 class RemoveDetailYesNoViewSpec extends SpecBase {
 
   Seq(
-    ("email", "contractordetails.removeDetailYesNo.detail.email"),
+    ("email-address", "contractordetails.removeDetailYesNo.detail.email"),
     ("scheme-name", "contractordetails.removeDetailYesNo.detail.schemeName")
   ).foreach { case (contractorDetail, detailKey) =>
     s"when contractorDetail is '$contractorDetail'" - {
