@@ -233,7 +233,7 @@ class IndividualNavigator @Inject() () extends NavigatorForJourney {
       case (Some(false), NormalMode) =>
         controllers.add.routes.UniqueTaxpayerReferenceYesNoController.onPageLoad(NormalMode)
 
-      case (Some(true), CheckMode | AmendMode) =>
+      case (Some(true), CheckMode ) =>
         ua
           .get(IndividualContactMethodOptionsPage)
           .fold(controllers.add.routes.IndividualContactMethodOptionsController.onPageLoad(mode)) { _ =>

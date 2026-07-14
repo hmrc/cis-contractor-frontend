@@ -77,11 +77,11 @@ class CheckYourAnswersControllerSpec extends SpecBase {
       .success
       .value
 
-//  private val validUaForSubmit: UserAnswers =
-//    minUa
-//      .set(AddIndividualContactMethodsYesNoPage, false)
-//      .success
-//      .value
+  private val validUaForSubmit: UserAnswers =
+    minUa
+      .set(AddIndividualContactMethodsYesNoPage, false)
+      .success
+      .value
 
   private lazy val CYARoute = controllers.add.routes.CheckYourAnswersController.onPageLoad().url
 
@@ -104,7 +104,6 @@ class CheckYourAnswersControllerSpec extends SpecBase {
 
     "must return OK and the correct view for a GET when all optionals are present" in {
 
-      // TODO - fix unit test
       val address = Address(
         addressLine1 = "1 Test Street",
         addressLine2 = None,
@@ -176,7 +175,7 @@ class CheckYourAnswersControllerSpec extends SpecBase {
         content must include("Subcontractor trading name")
         content must include("Add subcontractor address?")
         content must include("Address")
-        content must include("Method of contact")
+        content must include("Methods of contact")
         content must include("Email address")
         content must include("Add UTR?")
         content must include("UTR")
@@ -186,7 +185,6 @@ class CheckYourAnswersControllerSpec extends SpecBase {
         content must include("Works reference number")
 
         content                 must include("ABC Ltd")
-        contentAsString(result) must include("Email address")
         contentAsString(result) must include("Phone number")
         contentAsString(result) must include("Mobile number")
         contentAsString(result) must include("one@two.three")
@@ -643,7 +641,7 @@ class CheckYourAnswersControllerSpec extends SpecBase {
         val application = applicationBuilder(userAnswers = Some(ua)).build()
         running(application) {
           val request =
-            FakeRequest(GET, CYARoute)
+            FakeRequest(GET, controllers.add.routes.CheckYourAnswersController.onPageLoad().url)
           val result  = route(application, request).value
 
           status(result) mustEqual OK
