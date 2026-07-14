@@ -16,8 +16,6 @@
 
 package models.amend.trust
 
-import base.SpecBase
-import models.add.trust.TrustContactMethodOptions
 import models.address.{Address, Country}
 import models.contact.ContactMethodOptions
 import org.scalatest.matchers.should.Matchers
