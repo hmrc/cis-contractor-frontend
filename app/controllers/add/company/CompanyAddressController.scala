@@ -23,13 +23,13 @@ import models.address.Address
 import models.address.AddressLookupJourneyIdentifier.companyQuestionsAddress
 import pages.add.company.{CompanyAddressPage, CompanyNamePage}
 import play.api.i18n.MessagesApi
-import play.api.mvc.{Call, MessagesControllerComponents}
-import queries.Settable
+import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
+import queries.{AddressLookupAmendReturnQuery, Settable}
 import repositories.SessionRepository
 import services.AddressLookupService
 
 import javax.inject.Inject
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 class CompanyAddressController @Inject() (
   override val messagesApi: MessagesApi,
@@ -58,7 +58,21 @@ class CompanyAddressController @Inject() (
   override protected def onCompletion(mode: Mode): Call =
     routes.CompanyContactOptionsController.onPageLoad(mode)
 
-  override protected def onChangeCompletion: Call =
-    routes.CompanyCheckYourAnswersController.onPageLoad()
+  override protected def onChangeCompletion(isAmend: Boolean): Call =
+    if (isAmend) {
+      controllers.routes.JourneyRecoveryController.onPageLoad()
+    } // TODO: redirect to amend cya page
+    else {
+      routes.CompanyCheckYourAnswersController.onPageLoad()
+    }
+
+  def redirectToAmendAddressLookup(): Action[AnyContent] =
+    (identify andThen getData andThen requireData).async { implicit request =>
+      (for {
+        ua <- Future.fromTry(request.userAnswers.set(AddressLookupAmendReturnQuery, true))
+        _  <- sessionRepository.set(ua)
+      } yield Redirect(routes.CompanyAddressController.redirectToAddressLookup(Some("change"))))
+        .recover { case _ => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()) }
+    }
 
 }
