@@ -17,7 +17,7 @@
 package viewmodels.checkAnswers.add.partnership
 
 import controllers.add.partnership.routes
-import models.{CheckMode, UserAnswers}
+import models.{AmendMode, CheckMode, UserAnswers}
 import org.scalatest.OptionValues
 import org.scalatest.TryValues
 import org.scalatest.freespec.AnyFreeSpec
@@ -51,6 +51,27 @@ class PartnershipNominatedPartnerNinoSummarySpec extends AnyFreeSpec with Matche
       val action = row.actions.value.items.head
 
       action.href mustBe routes.PartnershipNominatedPartnerNinoController.onPageLoad(CheckMode).url
+      action.content mustBe Text(messages("site.change"))
+      action.visuallyHiddenText mustBe Some(messages("partnershipNominatedPartnerNino.change.hidden"))
+      action.attributes must contain("id" -> "nominated-partner-nino")
+    }
+
+    "must return a SummaryListRow when the answer exists for Amend journey" in {
+      val ua =
+        UserAnswers("test-id")
+          .set(PartnershipNominatedPartnerNinoPage, "QQ123456C")
+          .success
+          .value
+
+      val row = PartnershipNominatedPartnerNinoSummary.row(ua, AmendMode).value
+
+      row.key mustBe Key(Text(messages("partnershipNominatedPartnerNino.checkYourAnswersLabel")))
+      row.value mustBe Value(Text("QQ123456C"))
+
+      row.actions.value.items must have size 1
+      val action = row.actions.value.items.head
+
+      action.href mustBe routes.PartnershipNominatedPartnerNinoController.onPageLoad(AmendMode).url
       action.content mustBe Text(messages("site.change"))
       action.visuallyHiddenText mustBe Some(messages("partnershipNominatedPartnerNino.change.hidden"))
       action.attributes must contain("id" -> "nominated-partner-nino")
