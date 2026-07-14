@@ -29,7 +29,7 @@ object AmendAddressOfSubcontractorSummary {
       AddressSummaryRow.row(
         address = answer,
         key = "addressOfSubcontractor.checkYourAnswersLabel",
-        changeCall = controllers.add.routes.AddressOfSubcontractorController.redirectToAmendAddressLookup().url,
+        changeCall = controllers.add.routes.AddressOfSubcontractorController.redirectToAmendAddressLookup(),
         hiddenTextKey = "addressOfSubcontractor.change.hidden",
         id = "address-of-subcontractor"
       )
