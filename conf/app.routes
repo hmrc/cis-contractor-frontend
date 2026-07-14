@@ -77,6 +77,14 @@ POST  /subcontractor/amend/national-insurance-number  controllers.add.SubNationa
 GET   /subcontractor/amend/check-address  controllers.add.SubAddressYesNoController.onPageLoad(mode: Mode = AmendMode)
 POST  /subcontractor/amend/check-address  controllers.add.SubAddressYesNoController.onSubmit(mode: Mode = AmendMode)
 
+GET   /subcontractor/amend/add-contact-details  controllers.add.AddIndividualContactMethodsYesNoController.onPageLoad(mode: Mode = AmendMode)
+POST  /subcontractor/amend/add-contact-details  controllers.add.AddIndividualContactMethodsYesNoController.onSubmit(mode: Mode = AmendMode)
+
+GET   /subcontractor/amend/select-contact-details  controllers.add.IndividualContactMethodOptionsController.onPageLoad(mode: Mode = AmendMode)
+POST  /subcontractor/amend/select-contact-details  controllers.add.IndividualContactMethodOptionsController.onSubmit(mode: Mode = AmendMode)
+
+GET   /subcontractor/amend/company  controllers.amend.company.AmendCompanyController.onPageLoad()
+
 # Errors & Auth
 GET  /unauthorised/standard-user  controllers.UnauthorisedWrongRoleController.onPageLoad()
 
@@ -160,20 +168,13 @@ GET   /subcontractor/add/add-contact-details         controllers.add.AddIndividu
 POST  /subcontractor/add/add-contact-details         controllers.add.AddIndividualContactMethodsYesNoController.onSubmit(mode: Mode = NormalMode)
 GET   /subcontractor/add/change-add-contact-details  controllers.add.AddIndividualContactMethodsYesNoController.onPageLoad(mode: Mode = CheckMode)
 POST  /subcontractor/add/change-add-contact-details  controllers.add.AddIndividualContactMethodsYesNoController.onSubmit(mode: Mode = CheckMode)
-GET   /subcontractor/amend/add-contact-details       controllers.add.AddIndividualContactMethodsYesNoController.onPageLoad(mode: Mode = AmendMode)
-POST  /subcontractor/amend/add-contact-details       controllers.add.AddIndividualContactMethodsYesNoController.onSubmit(mode: Mode = AmendMode)
 
 GET   /subcontractor/add/select-contact-details         controllers.add.IndividualContactMethodOptionsController.onPageLoad(mode: Mode = NormalMode)
 POST  /subcontractor/add/select-contact-details         controllers.add.IndividualContactMethodOptionsController.onSubmit(mode: Mode = NormalMode)
 GET   /subcontractor/add/change-select-contact-details  controllers.add.IndividualContactMethodOptionsController.onPageLoad(mode: Mode = CheckMode)
 POST  /subcontractor/add/change-select-contact-details  controllers.add.IndividualContactMethodOptionsController.onSubmit(mode: Mode = CheckMode)
-GET   /subcontractor/amend/select-contact-details       controllers.add.IndividualContactMethodOptionsController.onPageLoad(mode: Mode = AmendMode)
-POST  /subcontractor/amend/select-contact-details       controllers.add.IndividualContactMethodOptionsController.onSubmit(mode: Mode = AmendMode)
-
 
 # Company
-GET   /subcontractor/amend/company  controllers.amend.company.AmendCompanyController.onPageLoad()
-
 GET   /subcontractor/add/company/subcontractor-added  controllers.add.SubcontractorAddedController.companySubcontractorAdded()
 
 GET   /subcontractor/add/company/company-name         controllers.add.company.CompanyNameController.onPageLoad(mode: Mode = NormalMode)
@@ -212,7 +213,6 @@ GET   /subcontractor/add/company/change-phone-number  controllers.add.company.Co
 POST  /subcontractor/add/company/change-phone-number  controllers.add.company.CompanyPhoneNumberController.onSubmit(mode: Mode = CheckMode)
 GET   /subcontractor/amend/company/phone-number       controllers.add.company.CompanyPhoneNumberController.onPageLoad(mode: Mode = AmendMode)
 POST  /subcontractor/amend/company/phone-number       controllers.add.company.CompanyPhoneNumberController.onSubmit(mode: Mode = AmendMode)
-
 
 GET   /subcontractor/add/company/mobile-number         controllers.add.company.CompanyMobileNumberController.onPageLoad(mode: Mode = NormalMode)
 POST  /subcontractor/add/company/mobile-number         controllers.add.company.CompanyMobileNumberController.onSubmit(mode: Mode = NormalMode)
@@ -265,14 +265,12 @@ POST  /subcontractor/add/company/change-add-contact-details  controllers.add.com
 GET   /subcontractor/amend/company/add-contact-details       controllers.add.company.AddCompanyContactMethodsYesNoController.onPageLoad(mode: Mode = AmendMode)
 POST  /subcontractor/amend/company/add-contact-details       controllers.add.company.AddCompanyContactMethodsYesNoController.onSubmit(mode: Mode = AmendMode)
 
-
 GET   /subcontractor/add/company/select-contact-details         controllers.add.company.CompanyContactMethodOptionsController.onPageLoad(mode: Mode = NormalMode)
 POST  /subcontractor/add/company/select-contact-details         controllers.add.company.CompanyContactMethodOptionsController.onSubmit(mode: Mode = NormalMode)
 GET   /subcontractor/add/company/change-select-contact-details  controllers.add.company.CompanyContactMethodOptionsController.onPageLoad(mode: Mode = CheckMode)
 POST  /subcontractor/add/company/change-select-contact-details  controllers.add.company.CompanyContactMethodOptionsController.onSubmit(mode: Mode = CheckMode)
 GET   /subcontractor/amend/company/select-contact-details       controllers.add.company.CompanyContactMethodOptionsController.onPageLoad(mode: Mode = AmendMode)
 POST  /subcontractor/amend/company/select-contact-details       controllers.add.company.CompanyContactMethodOptionsController.onSubmit(mode: Mode = AmendMode)
-
 
 # Partnership
 GET   /subcontractor/add/partnership/subcontractor-added  controllers.add.SubcontractorAddedController.partnershipSubcontractorAdded()

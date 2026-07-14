@@ -405,6 +405,16 @@ addIndividualContactMethodsYesNo.error.required                              =  
 addIndividualContactMethodsYesNo.checkYourAnswersLabel                       =  Add contact details?
 addIndividualContactMethodsYesNo.change.hidden                               =  add contact details?
 
+individualContactMethodOptions.title                                         =  Which contact details do you want to add for this subcontractor?
+individualContactMethodOptions.heading                                       =  Which contact details do you want to add for {0}?
+individualContactMethodOptions.email                                         =  Email address
+individualContactMethodOptions.phone                                         =  Phone number
+individualContactMethodOptions.mobile                                        =  Mobile number
+individualContactMethodOptions.checkYourAnswersLabel                         =  Methods of contact
+individualContactMethodOptions.hint                                          =  Contact details are only for your own records
+individualContactMethodOptions.error.required                                =  Select the methods of contact you want to add for this subcontractor
+individualContactMethodOptions.change.hidden                                 =  methods of contact
+
 # Partnership
 addPartnershipContactMethodsYesNo.title                     =  Do you want to add contact details for this partnership?
 addPartnershipContactMethodsYesNo.heading                   =  Do you want to add contact details for {0}?
@@ -1063,13 +1073,3 @@ contractordetails.addSchemeNameYesNo.heading                                   =
 contractordetails.addSchemeNameYesNo.error.required                            =  Select yes to enter the contractor’s scheme name
 contractordetails.addSchemeNameYesNo.checkYourAnswersLabel                     =  Add scheme name?
 contractordetails.addSchemeNameYesNo.change.hidden                             =  add scheme name?
-
-individualContactMethodOptions.title = Which contact details do you want to add for this subcontractor?
-individualContactMethodOptions.heading = Which contact details do you want to add for {0}?
-individualContactMethodOptions.email = Email address
-individualContactMethodOptions.phone = Phone number
-individualContactMethodOptions.mobile = Mobile number
-individualContactMethodOptions.checkYourAnswersLabel = Methods of contact
-individualContactMethodOptions.hint = Contact details are only for your own records
-individualContactMethodOptions.error.required = Select the methods of contact you want to add for this subcontractor
-individualContactMethodOptions.change.hidden = methods of contact

@@ -24,7 +24,7 @@ import models.UserAnswers
 import models.add.SubcontractorName
 import models.address.{Address, Country}
 import models.amend.OriginalIndividualAnswers
-import models.contact.ContactOptions.NoDetails
+import models.contact.ContactMethodOptions
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{never, times, verify, when}
@@ -69,13 +69,17 @@ class AmendIndividualControllerSpec extends SpecBase with MockitoSugar {
     country = Some(Country(code = None, name = Some("England")))
   )
 
+  private val emailAddress = "test@example.com"
+
   private val expectedOriginal = OriginalIndividualAnswers(
     usesTradingName = Some(false),
     tradingName = None,
     subcontractorName = Some(expectedName),
     address = Some(expectedAddress),
-    contactMethod = Some(NoDetails),
-    contactValue = None,
+    individualContactMethod = Some(Set(ContactMethodOptions.Email)),
+    email = Some(emailAddress),
+    phone = None,
+    mobile = None,
     utr = Some("3992651526"),
     nino = Some("QQ123456C"),
     worksReference = Some("XLS345-MM")
@@ -128,7 +132,9 @@ class AmendIndividualControllerSpec extends SpecBase with MockitoSugar {
           savedAnswers.get(SubcontractorNamePage).value mustEqual expectedName
           savedAnswers.get(SubAddressYesNoPage).value mustEqual true
           savedAnswers.get(AddressOfSubcontractorPage).value mustEqual expectedAddress
-          savedAnswers.get(IndividualContactMethodOptionsPage).value mustEqual NoDetails
+          savedAnswers.get(AddIndividualContactMethodsYesNoPage).value mustBe true
+          savedAnswers.get(IndividualContactMethodOptionsPage).value mustBe Set(ContactMethodOptions.Email)
+          savedAnswers.get(IndividualEmailAddressPage).value mustBe emailAddress
           savedAnswers.get(UniqueTaxpayerReferenceYesNoPage).value mustEqual true
           savedAnswers.get(SubcontractorsUniqueTaxpayerReferencePage).value mustEqual "3992651526"
           savedAnswers.get(NationalInsuranceNumberYesNoPage).value mustEqual true

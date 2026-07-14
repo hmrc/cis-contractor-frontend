@@ -34,12 +34,10 @@ package controllers.add
 
 import com.google.inject.Inject
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
-import models.UserAnswers
 import models.add.ValidatedSubcontractor
-import models.contact.ContactMethodOptions
 import pages.add.CheckYourAnswersSubmittedPage
 import play.api.Logging
-import play.api.i18n.{I18nSupport, Messages, MessagesApi}
+import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
 import services.SubcontractorService
@@ -64,14 +62,6 @@ class CheckYourAnswersController @Inject() (
     extends FrontendBaseController
     with I18nSupport
     with Logging {
-
-//  private def contactDetailsPage(ua: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-//    ua.get(IndividualChooseContactDetailsPage).flatMap {
-//      case Email  => IndividualEmailAddressSummary.row(ua)
-//      case Phone  => IndividualPhoneNumberSummary.row(ua)
-//      case Mobile => IndividualMobileNumberSummary.row(ua)
-//      case _      => None
-//    }
 
   def onPageLoad(): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
     val ua = request.userAnswers

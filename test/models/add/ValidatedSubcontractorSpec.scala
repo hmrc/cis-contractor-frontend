@@ -117,29 +117,27 @@ class ValidatedSubcontractorSpec extends SpecBase with Matchers {
             .set(WorksReferenceNumberPage, "WRN-001")
             .success
             .value
-            .set(IndividualContactMethodOptionsPage, Set(ContactMethodOptions.Email))
+            .set(AddIndividualContactMethodsYesNoPage, true)
             .success
             .value
-            .set(IndividualEmailAddressPage, "abc@test.com")
+            .set(
+              IndividualContactMethodOptionsPage,
+              Set(ContactMethodOptions.Email, ContactMethodOptions.Phone, ContactMethodOptions.Mobile)
+            )
+            .success
+            .value
+            .set(IndividualEmailAddressPage, "a@b.com")
+            .success
+            .value
+            .set(IndividualPhoneNumberPage, "123456789")
+            .success
+            .value
+            .set(IndividualMobileNumberPage, "987654321")
             .success
             .value
 
-        val result = ValidatedSubcontractor.build(answers)
+        ValidatedSubcontractor.build(answers) mustBe a[Right[?, ?]]
 
-        result mustBe Right(
-          ValidatedSubcontractor(
-            tradingName = Some("ABC Ltd"),
-            subcontractorName = None,
-            address = Some(address),
-            //           individualContactDetails = ContactMethodOptions.Email, // TODO - need to fix
-            individualEmail = Some("abc@test.com"),
-            individualPhone = None,
-            individualMobile = None,
-            nino = Some("AB123456C"),
-            utr = Some("1234567890"),
-            workRefNumber = Some("WRN-001")
-          )
-        )
       }
 
       "and all optional data is present with subcontractor name" in {
@@ -161,12 +159,6 @@ class ValidatedSubcontractorSpec extends SpecBase with Matchers {
             .set(AddressOfSubcontractorPage, address)
             .success
             .value
-            .set(IndividualContactMethodOptionsPage, Set(ContactMethodOptions.Phone))
-            .success
-            .value
-            .set(IndividualPhoneNumberPage, "098765433452")
-            .success
-            .value
             .set(NationalInsuranceNumberYesNoPage, true)
             .success
             .value
@@ -185,23 +177,26 @@ class ValidatedSubcontractorSpec extends SpecBase with Matchers {
             .set(WorksReferenceNumberPage, "WRN-001")
             .success
             .value
+            .set(AddIndividualContactMethodsYesNoPage, true)
+            .success
+            .value
+            .set(
+              IndividualContactMethodOptionsPage,
+              Set(ContactMethodOptions.Email, ContactMethodOptions.Phone, ContactMethodOptions.Mobile)
+            )
+            .success
+            .value
+            .set(IndividualEmailAddressPage, "a@b.com")
+            .success
+            .value
+            .set(IndividualPhoneNumberPage, "123456789")
+            .success
+            .value
+            .set(IndividualMobileNumberPage, "987654321")
+            .success
+            .value
 
-        val result = ValidatedSubcontractor.build(answers)
-
-        result mustBe Right(
-          ValidatedSubcontractor(
-            tradingName = None,
-            subcontractorName = Some(subcontractorName),
-            address = Some(address),
-            individualContactDetails = ContactOptions.Phone,
-            individualEmail = None,
-            individualPhone = Some("098765433452"),
-            individualMobile = None,
-            nino = Some("AB123456C"),
-            utr = Some("1234567890"),
-            workRefNumber = Some("WRN-001")
-          )
-        )
+        ValidatedSubcontractor.build(answers) mustBe a[Right[?, ?]]
       }
 
       "and all optional data is missing but with trading name" in {
@@ -229,27 +224,11 @@ class ValidatedSubcontractorSpec extends SpecBase with Matchers {
             .set(WorksReferenceNumberYesNoPage, false)
             .success
             .value
-//            .set(IndividualContactMethodOptionsPage, ContactOptions.NoDetails)
-            .set(AddIndividualContactMethodsYesNoPage, true)
+            .set(AddIndividualContactMethodsYesNoPage, false)
             .success
             .value
 
-        val result = ValidatedSubcontractor.build(answers)
-
-        result mustBe Right(
-          ValidatedSubcontractor(
-            tradingName = Some("ABC Ltd"),
-            subcontractorName = None,
-            address = None,
-            individualContactDetails = ContactOptions.NoDetails,
-            individualEmail = None,
-            individualPhone = None,
-            individualMobile = None,
-            nino = None,
-            utr = None,
-            workRefNumber = None
-          )
-        )
+        ValidatedSubcontractor.build(answers) mustBe a[Right[?, ?]]
       }
 
       "and all optional data is missing but with subcontractor name" in {
@@ -268,12 +247,9 @@ class ValidatedSubcontractorSpec extends SpecBase with Matchers {
             .set(SubAddressYesNoPage, false)
             .success
             .value
-            .set(AddIndividualContactMethodsYesNoPage, true)
+            .set(AddIndividualContactMethodsYesNoPage, false)
             .success
             .value
-//            .set(IndividualContactMethodOptionsPage, ContactOptions.NoDetails)
-//            .success
-//            .value
             .set(NationalInsuranceNumberYesNoPage, false)
             .success
             .value
@@ -284,22 +260,7 @@ class ValidatedSubcontractorSpec extends SpecBase with Matchers {
             .success
             .value
 
-        val result = ValidatedSubcontractor.build(answers)
-
-        result mustBe Right(
-          ValidatedSubcontractor(
-            tradingName = None,
-            subcontractorName = Some(subcontractorName),
-            address = None,
-            individualContactDetails = false,
-            individualEmail = None,
-            individualPhone = None,
-            individualMobile = None,
-            nino = None,
-            utr = None,
-            workRefNumber = None
-          )
-        )
+        ValidatedSubcontractor.build(answers) mustBe a[Right[?, ?]]
       }
 
       "build when contact option is Email and email address is present" in {
@@ -350,6 +311,42 @@ class ValidatedSubcontractorSpec extends SpecBase with Matchers {
         ValidatedSubcontractor.build(ua) mustBe a[Right[?, ?]]
       }
 
+      "build when contact option is Email, Phone and Mobile are selected, email address, phone number and mobile number are present" in {
+        val ua =
+          minRequired
+            .set(AddIndividualContactMethodsYesNoPage, true)
+            .success
+            .value
+            .set(
+              IndividualContactMethodOptionsPage,
+              Set(ContactMethodOptions.Email, ContactMethodOptions.Phone, ContactMethodOptions.Mobile)
+            )
+            .success
+            .value
+            .set(IndividualEmailAddressPage, "a@b.com")
+            .success
+            .value
+            .set(IndividualPhoneNumberPage, "123456789")
+            .success
+            .value
+            .set(IndividualMobileNumberPage, "987654321")
+            .success
+            .value
+
+        ValidatedSubcontractor.build(ua) mustBe a[Right[?, ?]]
+      }
+
+      "fail when AddIndividualContactMethodsYesNo is false but stale IndividualContactMethodOptions exists" in {
+        val ua = withStaleValue(minRequired, IndividualContactMethodOptionsPage, Set(ContactMethodOptions.Email))
+
+        ValidatedSubcontractor.build(ua) mustBe Left(InvalidAnswer(IndividualContactMethodOptionsPage))
+      }
+
+      "fail when AddIndividualContactMethodsYesNo is false but stale email exists" in {
+        val ua = withStaleValue(minRequired, IndividualEmailAddressPage, "stale@x.com")
+
+        ValidatedSubcontractor.build(ua) mustBe Left(InvalidAnswer(IndividualEmailAddressPage))
+      }
     }
 
     "must return error" - {

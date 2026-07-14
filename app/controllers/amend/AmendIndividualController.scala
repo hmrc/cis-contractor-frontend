@@ -21,7 +21,7 @@ import models.TypeOfSubcontractor.Individualorsoletrader
 import models.add.SubcontractorName
 import models.address.{Address, Country}
 import models.amend.OriginalIndividualAnswers
-import models.contact.ContactOptions.NoDetails
+import models.contact.ContactMethodOptions
 import pages.add.*
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import queries.{CisIdQuery, OriginalIndividualAnswersQuery}
@@ -42,6 +42,7 @@ class AmendIndividualController @Inject() (
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController {
 
+  private val emailAddress      = "test@example.com"
   private val individualAddress = Address(
     addressLine1 = "12 Harbor View Road",
     addressLine2 = Some("Amity Island"),
@@ -62,8 +63,10 @@ class AmendIndividualController @Inject() (
     tradingName = None,
     subcontractorName = Some(individualName),
     address = Some(individualAddress),
-    contactMethod = Some(NoDetails),
-    contactValue = None,
+    individualContactMethod = Some(Set(ContactMethodOptions.Email)),
+    email = Some(emailAddress),
+    phone = None,
+    mobile = None,
     utr = Some("3992651526"),
     nino = Some("QQ123456C"),
     worksReference = Some("XLS345-MM")
@@ -75,7 +78,9 @@ class AmendIndividualController @Inject() (
     ua <- ua.set(SubcontractorNamePage, individualName)
     ua <- ua.set(SubAddressYesNoPage, true)
     ua <- ua.set(AddressOfSubcontractorPage, individualAddress)
-    // ua <- ua.set(IndividualContactMethodOptionsPage, NoDetails)  //TODO - check with Surya
+    ua <- ua.set(AddIndividualContactMethodsYesNoPage, true)
+    ua <- ua.set(IndividualContactMethodOptionsPage, Set(ContactMethodOptions.Email))
+    ua <- ua.set(IndividualEmailAddressPage, emailAddress)
     ua <- ua.set(UniqueTaxpayerReferenceYesNoPage, true)
     ua <- ua.set(SubcontractorsUniqueTaxpayerReferencePage, "3992651526")
     ua <- ua.set(NationalInsuranceNumberYesNoPage, true)
@@ -83,7 +88,6 @@ class AmendIndividualController @Inject() (
     ua <- ua.set(WorksReferenceNumberYesNoPage, true)
     ua <- ua.set(WorksReferenceNumberPage, "XLS345-MM")
     ua <- ua.set(CisIdQuery, "1")
-    ua <- ua.set(AddIndividualContactMethodsYesNoPage, false)
     ua <- ua.set(OriginalIndividualAnswersQuery, individualOriginal)
   } yield ua
 

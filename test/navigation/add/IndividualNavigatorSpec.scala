@@ -212,7 +212,6 @@ class IndividualNavigatorSpec extends SpecBase {
 
       "must go from IndividualEmailAddressPage" - {
 
-        // TODO - need to fix
         "to IndividualPhoneNumberPage when Phone is selected in IndividualContactMethodOptions" in {
           navigator.nextPage(
             IndividualEmailAddressPage,
@@ -226,7 +225,6 @@ class IndividualNavigatorSpec extends SpecBase {
             .onPageLoad(NormalMode)
         }
 
-        // TODO - need to fix
         "to IndividualMobileNumberPage when Mobile is selected in IndividualContactMethodOptions" in {
           navigator.nextPage(
             IndividualEmailAddressPage,
@@ -240,7 +238,6 @@ class IndividualNavigatorSpec extends SpecBase {
             .onPageLoad(NormalMode)
         }
 
-        // TODO - need to fix
         "to UniqueTaxpayerReferenceYesNoPage Page when only Email is selected in IndividualContactMethodOptions" in {
           navigator.nextPage(
             IndividualEmailAddressPage,
@@ -262,7 +259,6 @@ class IndividualNavigatorSpec extends SpecBase {
           ) mustBe journeyRecovery
         }
 
-        // TODO - need to fix
         "to JourneyRecoveryPage when Email is not in the selected IndividualContactMethodOptions" in {
           navigator.nextPage(
             IndividualEmailAddressPage,
@@ -278,7 +274,6 @@ class IndividualNavigatorSpec extends SpecBase {
       }
 
       "must go from IndividualPhoneNumberPage" - {
-        // TODO - need to fix
         "to IndividualMobileNumberPage when Mobile is selected in IndividualContactMethodOptions" in {
           navigator.nextPage(
             IndividualPhoneNumberPage,
@@ -292,7 +287,6 @@ class IndividualNavigatorSpec extends SpecBase {
             .onPageLoad(NormalMode)
         }
 
-        // TODO - need to fix
         "to UniqueTaxpayerReferenceYesNoController Page when Mobile is not selected in IndividualContactMethodOptions" in {
           navigator.nextPage(
             IndividualPhoneNumberPage,
@@ -314,7 +308,6 @@ class IndividualNavigatorSpec extends SpecBase {
           ) mustBe journeyRecovery
         }
 
-        // TODO - need to fix
         "to JourneyRecoveryPage when Phone is not in the selected IndividualContactMethodOptions" in {
           navigator.nextPage(
             IndividualPhoneNumberPage,
@@ -329,7 +322,6 @@ class IndividualNavigatorSpec extends SpecBase {
       }
 
       "must go from IndividualMobileNumberPage" - {
-        // TODO - need to fix
         "to IndividualHasUtrYesNo Page when PIndividualContactMethodOptions is present" in {
           navigator.nextPage(
             IndividualMobileNumberPage,
@@ -343,7 +335,6 @@ class IndividualNavigatorSpec extends SpecBase {
             .onPageLoad(NormalMode)
         }
 
-        // TODO - need to fix
         "to JourneyRecoveryPage Page when IndividualContactMethodOptions answer is not present" in {
           navigator.nextPage(
             IndividualMobileNumberPage,
