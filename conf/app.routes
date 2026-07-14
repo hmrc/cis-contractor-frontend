@@ -317,6 +317,8 @@ GET   /subcontractor/add/partnership/nominated-partner-national-insurance-number
 POST  /subcontractor/add/partnership/nominated-partner-national-insurance-number         controllers.add.partnership.PartnershipNominatedPartnerNinoController.onSubmit(mode: Mode = NormalMode)
 GET   /subcontractor/add/partnership/change-nominated-partner-national-insurance-number  controllers.add.partnership.PartnershipNominatedPartnerNinoController.onPageLoad(mode: Mode = CheckMode)
 POST  /subcontractor/add/partnership/change-nominated-partner-national-insurance-number  controllers.add.partnership.PartnershipNominatedPartnerNinoController.onSubmit(mode: Mode = CheckMode)
+GET   /subcontractor/amend/partnership/nominated-partner-national-insurance-number       controllers.add.partnership.PartnershipNominatedPartnerNinoController.onPageLoad(mode: Mode = AmendMode)
+POST  /subcontractor/amend/partnership/nominated-partner-national-insurance-number       controllers.add.partnership.PartnershipNominatedPartnerNinoController.onSubmit(mode: Mode = AmendMode)
 
 GET   /subcontractor/add/partnership/partnership-works-reference         controllers.add.partnership.PartnershipWorksReferenceNumberController.onPageLoad(mode: Mode = NormalMode)
 POST  /subcontractor/add/partnership/partnership-works-reference         controllers.add.partnership.PartnershipWorksReferenceNumberController.onSubmit(mode: Mode = NormalMode)
@@ -343,6 +345,8 @@ GET   /subcontractor/add/partnership/nominated-partner-has-national-insurance-nu
 POST  /subcontractor/add/partnership/nominated-partner-has-national-insurance-number         controllers.add.partnership.PartnershipNominatedPartnerNinoYesNoController.onSubmit(mode: Mode = NormalMode)
 GET   /subcontractor/add/partnership/change-nominated-partner-has-national-insurance-number  controllers.add.partnership.PartnershipNominatedPartnerNinoYesNoController.onPageLoad(mode: Mode = CheckMode)
 POST  /subcontractor/add/partnership/change-nominated-partner-has-national-insurance-number  controllers.add.partnership.PartnershipNominatedPartnerNinoYesNoController.onSubmit(mode: Mode = CheckMode)
+GET   /subcontractor/amend/partnership/nominated-partner-has-national-insurance-number       controllers.add.partnership.PartnershipNominatedPartnerNinoYesNoController.onPageLoad(mode: Mode = AmendMode)
+POST  /subcontractor/amend/partnership/nominated-partner-has-national-insurance-number       controllers.add.partnership.PartnershipNominatedPartnerNinoYesNoController.onSubmit(mode: Mode = AmendMode)
 
 GET   /subcontractor/add/partnership/nominated-partner-company-registration-number         controllers.add.partnership.PartnershipNominatedPartnerCrnController.onPageLoad(mode: Mode = NormalMode)
 POST  /subcontractor/add/partnership/nominated-partner-company-registration-number         controllers.add.partnership.PartnershipNominatedPartnerCrnController.onSubmit(mode: Mode = NormalMode)
@@ -436,11 +440,15 @@ GET   /subcontractor/add/trust/trust-has-utr         controllers.add.trust.Trust
 POST  /subcontractor/add/trust/trust-has-utr         controllers.add.trust.TrustUtrYesNoController.onSubmit(mode: Mode = NormalMode)
 GET   /subcontractor/add/trust/change-trust-has-utr  controllers.add.trust.TrustUtrYesNoController.onPageLoad(mode: Mode = CheckMode)
 POST  /subcontractor/add/trust/change-trust-has-utr  controllers.add.trust.TrustUtrYesNoController.onSubmit(mode: Mode = CheckMode)
+GET   /subcontractor/amend/trust/trust-has-utr       controllers.add.trust.TrustUtrYesNoController.onPageLoad(mode: Mode = AmendMode)
+POST  /subcontractor/amend/trust/trust-has-utr       controllers.add.trust.TrustUtrYesNoController.onSubmit(mode: Mode = AmendMode)
 
 GET   /subcontractor/add/trust/trust-utr         controllers.add.trust.TrustUtrController.onPageLoad(mode: Mode = NormalMode)
 POST  /subcontractor/add/trust/trust-utr         controllers.add.trust.TrustUtrController.onSubmit(mode: Mode = NormalMode)
 GET   /subcontractor/add/trust/change-trust-utr  controllers.add.trust.TrustUtrController.onPageLoad(mode: Mode = CheckMode)
 POST  /subcontractor/add/trust/change-trust-utr  controllers.add.trust.TrustUtrController.onSubmit(mode: Mode = CheckMode)
+GET   /subcontractor/amend/trust/trust-utr       controllers.add.trust.TrustUtrController.onPageLoad(mode: Mode = AmendMode)
+POST  /subcontractor/amend/trust/trust-utr       controllers.add.trust.TrustUtrController.onSubmit(mode: Mode = AmendMode)
 
 GET   /subcontractor/add/trust/trust-has-works-reference         controllers.add.trust.TrustWorksReferenceYesNoController.onPageLoad(mode: Mode = NormalMode)
 POST  /subcontractor/add/trust/trust-has-works-reference         controllers.add.trust.TrustWorksReferenceYesNoController.onSubmit(mode: Mode = NormalMode)
