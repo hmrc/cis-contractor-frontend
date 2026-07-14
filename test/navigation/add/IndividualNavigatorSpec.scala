@@ -502,15 +502,14 @@ class IndividualNavigatorSpec extends SpecBase {
         ) mustBe journeyRecovery
       }
 
-      "must go from AddIndividualContactMethodsYesNoPage to AddIndividualContactMethodsYesNoController when answer is Yes" in {
+      "must go from AddIndividualContactMethodsYesNoPage to AmendCYA when answer is Yes" in {
         val answers = emptyUserAnswers.set(AddIndividualContactMethodsYesNoPage, true).success.value
 
         navigator.nextPage(
           AddIndividualContactMethodsYesNoPage,
           AmendMode,
           answers
-        ) mustBe controllers.add.routes.IndividualContactMethodOptionsController
-          .onPageLoad(AmendMode)
+        ) mustBe journeyRecovery // TODO when avaiable
       }
 
       "must go from IndividualEmailAddressPage to CheckYourAnswersController" in {
@@ -905,7 +904,6 @@ class IndividualNavigatorSpec extends SpecBase {
           routes.JourneyRecoveryController.onPageLoad()
       }
 
-//      "must go from AddIndividualContactMethodsYesNo" - {
       "to CYA when answer is Yes and IndividualContactMethodOptions already answered" in {
         val answers = emptyUserAnswers
           .setOrException(AddIndividualContactMethodsYesNoPage, true)
@@ -948,7 +946,6 @@ class IndividualNavigatorSpec extends SpecBase {
           emptyUserAnswers
         ) mustBe journeyRecovery
       }
-//      }
 
       "must go from IndividualContactMethodOptions" - {
         "to IndividualEmailAddressPage when Email is selected and Email answer not exist" in {

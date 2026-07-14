@@ -20,8 +20,7 @@ import models.address.Address
 import models.contact.ContactOptions
 import models.contact.ContactMethodOptions
 import models.contact.ContactOptions.*
-import models.{InvalidAnswer, MissingAnswer, TypeOfSubcontractor, UserAnswers, Validation, ValidationError}
-import pages.QuestionPage
+import models.{InvalidAnswer, TypeOfSubcontractor, UserAnswers, Validation, ValidationError}
 import pages.add.*
 import play.api.libs.json.*
 
@@ -30,7 +29,6 @@ final case class ValidatedSubcontractor(
   subcontractorName: Option[SubcontractorName],
   address: Option[Address],
   IndividualContactMethodOptions: Option[Set[IndividualContactMethodOptions]],
-  // individualContactDetails: ContactOptions,
   individualEmail: Option[String],
   individualPhone: Option[String],
   individualMobile: Option[String],
@@ -46,7 +44,6 @@ object ValidatedSubcontractor extends Validation {
       tradingName                    <- getOptionalPageValue(answers, TradingNameOfSubcontractorPage, SubTradingNameYesNoPage)
       subcontractorName              <- getOptionalNamePage(answers)
       address                        <- getOptionalPageValue(answers, AddressOfSubcontractorPage, SubAddressYesNoPage)
-      // individualContactDetails <- getPageValue(answers, IndividualChooseContactDetailsPage)
       individualContactMethodOptions <-
         getOptionalPageValue(answers, IndividualContactMethodOptionsPage, AddIndividualContactMethodsYesNoPage)
 
@@ -100,28 +97,5 @@ object ValidatedSubcontractor extends Validation {
       case (None, Some(true))         => Right(None)
       case _                          => Left(InvalidAnswer(SubcontractorNamePage))
     }
-
-  private def getContactPageValue[A](
-    answers: UserAnswers,
-    questionPage: QuestionPage[A],
-    contactOptions: ContactOptions
-  )(implicit reads: Reads[A]): Either[ValidationError, Option[A]] = {
-    val expectedPage: Option[QuestionPage[_]] = contactOptions match {
-      case Email     => Some(IndividualEmailAddressPage)
-      case Phone     => Some(IndividualPhoneNumberPage)
-      case Mobile    => Some(IndividualMobileNumberPage)
-      case NoDetails => None
-    }
-
-    if (expectedPage.contains(questionPage)) {
-      answers.get(questionPage).toRight(MissingAnswer(questionPage)).map(Some(_))
-    } else if (expectedPage.isDefined) {
-      Right(None)
-    } else {
-      answers
-        .get(questionPage)
-        .fold(Right(None): Either[ValidationError, Option[A]])(_ => Left(InvalidAnswer(questionPage)))
-    }
-  }
 
 }
