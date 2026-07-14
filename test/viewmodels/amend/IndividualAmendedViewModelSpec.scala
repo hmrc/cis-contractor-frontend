@@ -71,8 +71,8 @@ class IndividualAmendedViewModelSpec extends SpecBase {
       .success
       .value
       .set(SubAddressYesNoPage, true)
-.success
-    .value
+      .success
+      .value
       .set(
         AddressOfSubcontractorPage,
         Address(
@@ -129,8 +129,8 @@ class IndividualAmendedViewModelSpec extends SpecBase {
           )
           .success
           .value
-          .set(AmendedPagesPage,
-            Set(SubcontractorNamePage)).success
+          .set(AmendedPagesPage, Set(SubcontractorNamePage))
+          .success
           .value
 
       val result =
@@ -160,10 +160,9 @@ class IndividualAmendedViewModelSpec extends SpecBase {
           .set(TradingNameOfSubcontractorPage, "XYZ Contractors")
           .success
           .value
-          .set(AmendedPagesPage,
-            Set(TradingNameOfSubcontractorPage)).success
+          .set(AmendedPagesPage, Set(TradingNameOfSubcontractorPage))
+          .success
           .value
-
 
       val result =
         IndividualAmendedViewModel.rows(originalTrading, answers)
@@ -185,8 +184,8 @@ class IndividualAmendedViewModelSpec extends SpecBase {
           .set(TradingNameOfSubcontractorPage, "ABC Contractors")
           .success
           .value
-          .set(AmendedPagesPage,
-            Set(TradingNameOfSubcontractorPage)).success
+          .set(AmendedPagesPage, Set(TradingNameOfSubcontractorPage))
+          .success
           .value
 
       val result =
@@ -219,8 +218,8 @@ class IndividualAmendedViewModelSpec extends SpecBase {
           )
           .success
           .value
-          .set(AmendedPagesPage,
-            Set(SubcontractorNamePage)).success
+          .set(AmendedPagesPage, Set(SubcontractorNamePage))
+          .success
           .value
 
       val result =
@@ -249,7 +248,7 @@ class IndividualAmendedViewModelSpec extends SpecBase {
 
       result must have size 2
 
-      val yesNoRow = result.head
+      val yesNoRow   = result.head
       val addressRow = result(1)
 
       yesNoRow.head.content mustBe Text(msgs("subAddressYesNo.checkYourAnswersLabel"))
@@ -294,8 +293,8 @@ class IndividualAmendedViewModelSpec extends SpecBase {
           .set(IndividualChooseContactDetailsPage, ContactOptions.Phone)
           .success
           .value
-          .set(AmendedPagesPage,
-            Set(IndividualChooseContactDetailsPage)).success
+          .set(AmendedPagesPage, Set(IndividualChooseContactDetailsPage))
+          .success
           .value
 
       val result =
@@ -317,8 +316,8 @@ class IndividualAmendedViewModelSpec extends SpecBase {
           .set(IndividualEmailAddressPage, "new@test.com")
           .success
           .value
-          .set(AmendedPagesPage,
-            Set(IndividualEmailAddressPage)).success
+          .set(AmendedPagesPage, Set(IndividualEmailAddressPage))
+          .success
           .value
 
       val result =
@@ -382,8 +381,8 @@ class IndividualAmendedViewModelSpec extends SpecBase {
           .remove(IndividualEmailAddressPage)
           .success
           .value
-          .set(AmendedPagesPage,
-            Set(IndividualEmailAddressPage, IndividualChooseContactDetailsPage)).success
+          .set(AmendedPagesPage, Set(IndividualEmailAddressPage, IndividualChooseContactDetailsPage))
+          .success
           .value
 
       val result =
@@ -391,16 +390,16 @@ class IndividualAmendedViewModelSpec extends SpecBase {
 
       result must have size 2
 
-      val methodRow = result.head
-      val removedValueRow  = result(1)
+      val methodRow       = result.head
+      val removedValueRow = result(1)
 
       methodRow.head.content mustBe Text(msgs("individualChooseContactDetails.checkYourAnswersLabel"))
       methodRow(1).content mustBe Text(msgs("individualChooseContactDetails.email"))
       methodRow(2).content mustBe Text(msgs("individualChooseContactDetails.noDetails"))
 
-      removedValueRow .head.content mustBe Text(msgs("individualEmailAddress.checkYourAnswersLabel"))
-      removedValueRow (1).content mustBe Text("john@test.com")
-      removedValueRow (2).content mustBe Text(msgs("individualAmended.table.content.none"))
+      removedValueRow.head.content mustBe Text(msgs("individualEmailAddress.checkYourAnswersLabel"))
+      removedValueRow(1).content mustBe Text("john@test.com")
+      removedValueRow(2).content mustBe Text(msgs("individualAmended.table.content.none"))
     }
 
     "must display email address when changing from no details to email" in {
@@ -419,8 +418,8 @@ class IndividualAmendedViewModelSpec extends SpecBase {
           .set(IndividualEmailAddressPage, "new@test.com")
           .success
           .value
-          .set(AmendedPagesPage,
-            Set(IndividualEmailAddressPage, IndividualChooseContactDetailsPage)).success
+          .set(AmendedPagesPage, Set(IndividualEmailAddressPage, IndividualChooseContactDetailsPage))
+          .success
           .value
 
       val result =
@@ -430,9 +429,9 @@ class IndividualAmendedViewModelSpec extends SpecBase {
 
       val addedValueRow = result(1)
 
-      addedValueRow .head.content mustBe Text(msgs("individualEmailAddress.checkYourAnswersLabel"))
-      addedValueRow (1).content mustBe Text(msgs("individualAmended.table.content.none"))
-      addedValueRow (2).content mustBe Text("new@test.com")
+      addedValueRow.head.content mustBe Text(msgs("individualEmailAddress.checkYourAnswersLabel"))
+      addedValueRow(1).content mustBe Text(msgs("individualAmended.table.content.none"))
+      addedValueRow(2).content mustBe Text("new@test.com")
     }
 
     "must return a phone number row when the original contact method is phone and the phone number changes" in {
@@ -457,8 +456,8 @@ class IndividualAmendedViewModelSpec extends SpecBase {
           .set(IndividualPhoneNumberPage, "07700900123")
           .success
           .value
-          .set(AmendedPagesPage,
-            Set(IndividualPhoneNumberPage)).success
+          .set(AmendedPagesPage, Set(IndividualPhoneNumberPage))
+          .success
           .value
 
       val result =
@@ -514,7 +513,7 @@ class IndividualAmendedViewModelSpec extends SpecBase {
       result must have size 3
 
       val methodRow = result(0)
-      val phoneRow = result(1)
+      val phoneRow  = result(1)
       val mobileRow = result(2)
 
       methodRow(1).content mustBe Text(msgs("individualChooseContactDetails.phone"))
@@ -536,8 +535,8 @@ class IndividualAmendedViewModelSpec extends SpecBase {
           .set(SubcontractorsUniqueTaxpayerReferencePage, "9999999999")
           .success
           .value
-          .set(AmendedPagesPage,
-            Set(SubcontractorsUniqueTaxpayerReferencePage)).success
+          .set(AmendedPagesPage, Set(SubcontractorsUniqueTaxpayerReferencePage))
+          .success
           .value
 
       val result =
@@ -557,8 +556,8 @@ class IndividualAmendedViewModelSpec extends SpecBase {
           .remove(SubcontractorsUniqueTaxpayerReferencePage)
           .success
           .value
-          .set(AmendedPagesPage,
-            Set(SubcontractorsUniqueTaxpayerReferencePage)).success
+          .set(AmendedPagesPage, Set(SubcontractorsUniqueTaxpayerReferencePage))
+          .success
           .value
 
       val result =
@@ -578,8 +577,8 @@ class IndividualAmendedViewModelSpec extends SpecBase {
           .set(SubNationalInsuranceNumberPage, "CD123456E")
           .success
           .value
-          .set(AmendedPagesPage,
-            Set(SubNationalInsuranceNumberPage)).success
+          .set(AmendedPagesPage, Set(SubNationalInsuranceNumberPage))
+          .success
           .value
 
       val result =
@@ -599,8 +598,8 @@ class IndividualAmendedViewModelSpec extends SpecBase {
           .remove(SubNationalInsuranceNumberPage)
           .success
           .value
-          .set(AmendedPagesPage,
-            Set(SubNationalInsuranceNumberPage)).success
+          .set(AmendedPagesPage, Set(SubNationalInsuranceNumberPage))
+          .success
           .value
 
       val result =
@@ -620,10 +619,7 @@ class IndividualAmendedViewModelSpec extends SpecBase {
           .set(WorksReferenceNumberPage, "WR999")
           .success
           .value
-    .set(AmendedPagesPage,
-        Set(WorksReferenceNumberPage)).success
-        .value
-      val result =
+      val result  =
         IndividualAmendedViewModel.rows(original, answers)
 
       val row = result.head
@@ -640,8 +636,8 @@ class IndividualAmendedViewModelSpec extends SpecBase {
           .remove(WorksReferenceNumberPage)
           .success
           .value
-          .set(AmendedPagesPage,
-            Set(WorksReferenceNumberPage)).success
+          .set(AmendedPagesPage, Set(WorksReferenceNumberPage))
+          .success
           .value
 
       val result =
@@ -661,8 +657,8 @@ class IndividualAmendedViewModelSpec extends SpecBase {
           .set(UniqueTaxpayerReferenceYesNoPage, false)
           .success
           .value
-          .set(AmendedPagesPage,
-            Set(UniqueTaxpayerReferenceYesNoPage)).success
+          .set(AmendedPagesPage, Set(UniqueTaxpayerReferenceYesNoPage))
+          .success
           .value
 
       val result =
@@ -689,8 +685,8 @@ class IndividualAmendedViewModelSpec extends SpecBase {
           .set(NationalInsuranceNumberYesNoPage, false)
           .success
           .value
-          .set(AmendedPagesPage,
-            Set(NationalInsuranceNumberYesNoPage)).success
+          .set(AmendedPagesPage, Set(NationalInsuranceNumberYesNoPage))
+          .success
           .value
 
       val result =
@@ -717,8 +713,8 @@ class IndividualAmendedViewModelSpec extends SpecBase {
           .set(WorksReferenceNumberYesNoPage, false)
           .success
           .value
-          .set(AmendedPagesPage,
-            Set(WorksReferenceNumberYesNoPage)).success
+          .set(AmendedPagesPage, Set(WorksReferenceNumberYesNoPage))
+          .success
           .value
 
       val result =

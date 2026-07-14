@@ -42,12 +42,12 @@ object IndividualAmendedViewModel {
       worksReferenceRows(original, current)
 
   private def tradingNameRows(
-                               original: OriginalIndividualAnswers,
-                               current: UserAnswers
-                             )(implicit messages: Messages): Seq[Seq[TableRow]] = {
+    original: OriginalIndividualAnswers,
+    current: UserAnswers
+  )(implicit messages: Messages): Seq[Seq[TableRow]] = {
 
     val originalUsesTrading = original.usesTradingName.contains(true)
-    val currentUsesTrading = current.get(SubTradingNameYesNoPage).contains(true)
+    val currentUsesTrading  = current.get(SubTradingNameYesNoPage).contains(true)
 
     val yesNoRows =
       Seq(
@@ -88,11 +88,10 @@ object IndividualAmendedViewModel {
     yesNoRows ++ nameRows
   }
 
-
   private def nameRow(
-                       original: OriginalIndividualAnswers,
-                       current: UserAnswers
-                     )(implicit messages: Messages): Option[Seq[TableRow]] = {
+    original: OriginalIndividualAnswers,
+    current: UserAnswers
+  )(implicit messages: Messages): Option[Seq[TableRow]] = {
 
     val currentUsesTradingName = current.get(SubTradingNameYesNoPage)
     val currentTradingName     = current.get(TradingNameOfSubcontractorPage)
@@ -109,12 +108,11 @@ object IndividualAmendedViewModel {
           else
             messages("subcontractorName.checkYourAnswersLabel"),
         previous = originalNameDisplay(original).getOrElse(missingValue),
-        updated =
-          currentNameDisplay(
-            currentUsesTradingName,
-            currentTradingName,
-            currentName
-          ).getOrElse(missingValue)
+        updated = currentNameDisplay(
+          currentUsesTradingName,
+          currentTradingName,
+          currentName
+        ).getOrElse(missingValue)
       )
     }
   }
@@ -190,9 +188,9 @@ object IndividualAmendedViewModel {
     }
 
   private def contactValueRows(
-                                original: OriginalIndividualAnswers,
-                                current: UserAnswers
-                              )(implicit messages: Messages): Seq[Seq[TableRow]] = {
+    original: OriginalIndividualAnswers,
+    current: UserAnswers
+  )(implicit messages: Messages): Seq[Seq[TableRow]] = {
 
     val originalMethod = original.contactMethod
     val currentMethod  = current.get(IndividualChooseContactDetailsPage)
@@ -201,7 +199,6 @@ object IndividualAmendedViewModel {
 
     (originalMethod, currentMethod) match {
       case (Some(oldMethod), Some(newMethod)) if oldMethod == newMethod && oldMethod != NoDetails =>
-
         contactDetails(oldMethod).toSeq.flatMap { case (label, page) =>
           Option.when(
             wasAmended(current, IndividualChooseContactDetailsPage) ||
@@ -215,7 +212,7 @@ object IndividualAmendedViewModel {
             )
           }
         }
-      case _ =>
+      case _                                                                                      =>
         Seq(
           originalMethod
             .filter(_ != NoDetails)
@@ -227,7 +224,6 @@ object IndividualAmendedViewModel {
                 missingValue
               )
             },
-
           currentMethod
             .filter(_ != NoDetails)
             .flatMap(contactDetails)
@@ -425,7 +421,11 @@ object IndividualAmendedViewModel {
     }
 
   private def row(label: String, previous: String, updated: String): Seq[TableRow] =
-    Seq(TableRow(content = Text(label), classes = "govuk-!-font-weight-bold"), TableRow(Text(previous)), TableRow(Text(updated)))
+    Seq(
+      TableRow(content = Text(label), classes = "govuk-!-font-weight-bold"),
+      TableRow(Text(previous)),
+      TableRow(Text(updated))
+    )
 
   private def missingValue(implicit messages: Messages): String =
     messages("individualAmended.table.content.none")
