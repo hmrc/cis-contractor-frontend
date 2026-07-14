@@ -32,6 +32,9 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import services.{CisManageService, VerificationService}
 import connectors.ConstructionIndustrySchemeConnector
+import utils.SubmissionUtils
+
+import java.time.Clock
 
 import scala.concurrent.Future
 import repositories.SessionRepository
@@ -365,7 +368,15 @@ class CreateVerificationBatchAndVerificationsControllerSpec extends SpecBase wit
     val mockCisManageService = mock[CisManageService]
     val mockBuilder          = mock[ChrisVerificationRequestBuilder]
     val mockRepo             = mock[SessionRepository]
-    val service              = new VerificationService(mockConnector, mockCisManageService, mockBuilder, mockRepo)
+    val service              =
+      new VerificationService(
+        mockConnector,
+        mockCisManageService,
+        mockBuilder,
+        mockRepo,
+        mock[SubmissionUtils],
+        Clock.systemUTC()
+      )
 
     val currentBatchResponse =
       GetCurrentVerificationBatchResponse(

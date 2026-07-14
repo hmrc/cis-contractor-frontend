@@ -22,7 +22,7 @@ import generators.ModelGenerators
 import models.*
 import models.response.*
 import models.requests.*
-import models.verify.{ChrisVerificationRequestBuilder, SubmissionStatus, VerificationSubmissionDetails}
+import models.verify.{ChrisVerificationRequestBuilder, GovTalkErrorStatus, SubmissionStatus, VerificationSubmissionDetails}
 import models.verify.ContractorEmailConfirmationStored.DifferentEmail
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
@@ -30,7 +30,7 @@ import org.mockito.Mockito.{never, times, verify, verifyNoMoreInteractions, when
 import org.scalatest.RecoverMethods.recoverToExceptionIf
 import org.scalatestplus.mockito.MockitoSugar
 import pages.QuestionPage
-import pages.verify.{ContractorEmailConfirmationStoredPage, CurrentVerificationBatchResponsePage, EmailAddressPage, NewestVerificationBatchResponsePage, UnverifiedSubcontractorsPage}
+import pages.verify.{ContractorEmailConfirmationStoredPage, CurrentVerificationBatchResponsePage, EmailAddressPage, NewestVerificationBatchResponsePage, UnverifiedSubcontractorsPage, VerificationSubmissionDetailsPage}
 import play.api.libs.json.{JsPath, Writes}
 import play.api.mvc.AnyContent
 import play.api.test.FakeRequest
@@ -38,7 +38,10 @@ import queries.CisIdQuery
 import repositories.SessionRepository
 import uk.gov.hmrc.http.HeaderCarrier
 
-import java.time.LocalDateTime
+import play.api.libs.json.Json
+import utils.SubmissionUtils
+
+import java.time.{Clock, Instant, LocalDateTime, ZoneId}
 import scala.concurrent.{ExecutionContext, Future}
 
 final class VerificationServiceSpec extends SpecBase with MockitoSugar with ModelGenerators {
@@ -81,17 +84,28 @@ final class VerificationServiceSpec extends SpecBase with MockitoSugar with Mode
       monthlyReturnSubmission = None
     )
 
+  private val ukZone          = ZoneId.of("Europe/London")
+  private val submissionUtils = new SubmissionUtils(applicationConfig)
+
+  // submittedAt used by the poll tests is 2026-06-15T03:30:52 London time (BST, UTC+1);
+  // the configured polling window is submission-poll-timeout-seconds = 60
+  private val withinWindowClock: Clock    = Clock.fixed(Instant.parse("2026-06-15T02:31:00Z"), ukZone)
+  private val exhaustedWindowClock: Clock = Clock.fixed(Instant.parse("2026-06-15T02:32:00Z"), ukZone)
+
   private def buildService(
     connector: ConstructionIndustrySchemeConnector,
     repo: SessionRepository,
     manageService: CisManageService = mock[CisManageService],
-    requestBuilder: ChrisVerificationRequestBuilder = mock[ChrisVerificationRequestBuilder]
+    requestBuilder: ChrisVerificationRequestBuilder = mock[ChrisVerificationRequestBuilder],
+    clock: Clock = withinWindowClock
   ): VerificationService =
     new VerificationService(
       connector,
       manageService,
       requestBuilder,
-      repo
+      repo,
+      submissionUtils,
+      clock
     )
 
   private def currentSubcontractor(
@@ -207,7 +221,7 @@ final class VerificationServiceSpec extends SpecBase with MockitoSugar with Mode
         manageService: CisManageService,
         requestBuilder: ChrisVerificationRequestBuilder
       )(implicit ec: ExecutionContext)
-          extends VerificationService(conn, manageService, requestBuilder, repo) {
+          extends VerificationService(conn, manageService, requestBuilder, repo, submissionUtils, withinWindowClock) {
 
         def refreshAndForceBadSet(ua: UserAnswers)(implicit hc: HeaderCarrier): Future[UserAnswers] =
           for {
@@ -342,7 +356,7 @@ final class VerificationServiceSpec extends SpecBase with MockitoSugar with Mode
         manageService: CisManageService,
         requestBuilder: ChrisVerificationRequestBuilder
       )(implicit ec: ExecutionContext)
-          extends VerificationService(conn, manageService, requestBuilder, repo) {
+          extends VerificationService(conn, manageService, requestBuilder, repo, submissionUtils, withinWindowClock) {
 
         def refreshAndForceBadSet(ua: UserAnswers)(implicit hc: HeaderCarrier): Future[UserAnswers] =
           for {
@@ -807,6 +821,113 @@ final class VerificationServiceSpec extends SpecBase with MockitoSugar with Mode
       ex.getMessage mustBe "Poll URL missing in submission details"
 
       verify(mockConnector, never()).getSubmissionStatus(any[String], any[String])(any[HeaderCarrier])
+    }
+  }
+
+  "VerificationService.pollStatusAndPersist polling window" - {
+
+    def acceptedDetails: VerificationSubmissionDetails =
+      VerificationSubmissionDetails(
+        submissionId = "13602",
+        status = "ACCEPTED",
+        hmrcMarkGenerated = "hmrc-mark",
+        hmrcMarkGgis = None,
+        correlationId = Some("corr-id"),
+        pollUrl = Some("http://localhost/poll"),
+        pollIntervalSeconds = Some(5),
+        submittedAt = LocalDateTime.parse("2026-06-15T03:30:52"),
+        lastMessageDate = None,
+        timedOut = false
+      )
+
+    def acceptedPollResponse: ChrisPollResponse =
+      ChrisPollResponse(
+        status = SubmissionStatus.ACCEPTED,
+        correlationId = "corr-id",
+        pollUrl = Some("http://localhost/poll"),
+        pollInterval = Some(5),
+        error = None,
+        irMarkReceived = None,
+        lastMessageDate = None,
+        acceptedTime = None
+      )
+
+    def poll(
+      pollResponse: ChrisPollResponse,
+      clock: Clock
+    ): (ChrisPollResponse, VerificationSubmissionDetails) = {
+      val mockConnector = mock[ConstructionIndustrySchemeConnector]
+      val mockRepo      = mock[SessionRepository]
+      val service       = buildService(mockConnector, mockRepo, clock = clock)
+
+      when(mockConnector.getSubmissionStatus(any[String], any[String])(any[HeaderCarrier]))
+        .thenReturn(Future.successful(pollResponse))
+      when(mockRepo.set(any[UserAnswers]))
+        .thenReturn(Future.successful(true))
+
+      val result = service.pollStatusAndPersist(emptyUserAnswers, acceptedDetails).futureValue
+
+      val uaCaptor: ArgumentCaptor[UserAnswers] = ArgumentCaptor.forClass(classOf[UserAnswers])
+      verify(mockRepo).set(uaCaptor.capture())
+      val persisted                             = uaCaptor.getValue.get(VerificationSubmissionDetailsPage).value
+
+      (result, persisted)
+    }
+
+    "must pass ACCEPTED through unchanged while the polling window is open" in {
+      val (result, persisted) = poll(acceptedPollResponse, withinWindowClock)
+
+      result.status mustBe SubmissionStatus.ACCEPTED
+      persisted.status mustBe "ACCEPTED"
+      persisted.timedOut mustBe false
+    }
+
+    "must return SEND_ERROR when the window is exhausted and the poll carried a timeOut error" in {
+      val response = acceptedPollResponse.copy(
+        error = Some(Json.obj("number" -> "500", "type" -> "timeOut", "text" -> "timeOut")),
+        govTalkErrorStatus = Some(GovTalkErrorStatus.ServerError(500))
+      )
+
+      val (result, persisted) = poll(response, exhaustedWindowClock)
+
+      result.status mustBe SubmissionStatus.SEND_ERROR
+      persisted.status mustBe "SEND_ERROR"
+      persisted.timedOut mustBe true
+    }
+
+    "must return SEND_ERROR when the window is exhausted and the poll got no response (connection refused)" in {
+      val response = acceptedPollResponse.copy(govTalkErrorStatus = Some(GovTalkErrorStatus.NoResponse))
+
+      val (result, persisted) = poll(response, exhaustedWindowClock)
+
+      result.status mustBe SubmissionStatus.SEND_ERROR
+      persisted.timedOut mustBe true
+    }
+
+    "must return TIMED_OUT when the window is exhausted but the poll was a clean still-pending response" in {
+      val (result, persisted) = poll(acceptedPollResponse, exhaustedWindowClock)
+
+      result.status mustBe SubmissionStatus.TIMED_OUT
+      persisted.status mustBe "TIMED_OUT"
+      persisted.timedOut mustBe true
+    }
+
+    "must pass a terminal status through unchanged even when the window is exhausted" in {
+      val response = acceptedPollResponse.copy(status = SubmissionStatus.SUBMITTED)
+
+      val (result, persisted) = poll(response, exhaustedWindowClock)
+
+      result.status mustBe SubmissionStatus.SUBMITTED
+      persisted.status mustBe "SUBMITTED"
+      persisted.timedOut mustBe false
+    }
+
+    "must pass DEPARTMENTAL_ERROR through unchanged when the window is exhausted" in {
+      val response = acceptedPollResponse.copy(status = SubmissionStatus.DEPARTMENTAL_ERROR)
+
+      val (result, _) = poll(response, exhaustedWindowClock)
+
+      result.status mustBe SubmissionStatus.DEPARTMENTAL_ERROR
     }
   }
 }
