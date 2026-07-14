@@ -71,7 +71,7 @@ class TrustAddressYesNoViewSpec extends AnyWordSpec with Matchers with GuiceOneA
       val trustName = "Test trustName"
 
       val html = view(form, AmendMode, trustName)
-      val doc = Jsoup.parse(html.toString())
+      val doc  = Jsoup.parse(html.toString())
 
       doc.select("title").text() must include(
         messages("trustAddressYesNo.title")

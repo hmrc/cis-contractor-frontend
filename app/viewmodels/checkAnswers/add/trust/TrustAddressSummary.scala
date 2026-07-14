@@ -16,7 +16,7 @@
 
 package viewmodels.checkAnswers.add.trust
 
-import models.{AmendMode, CheckMode, UserAnswers, Mode}
+import models.{AmendMode, CheckMode, Mode, UserAnswers}
 import pages.add.trust.TrustAddressPage
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
@@ -29,12 +29,11 @@ object TrustAddressSummary {
       AddressSummaryRow.row(
         address = answer,
         key = "trustAddress.checkYourAnswersLabel",
-        changeCall =
-          if(mode == AmendMode) {
-            controllers.add.trust.routes.TrustAddressController.redirectToAmendAddressLookup()
-          } else {
-            controllers.add.trust.routes.TrustAddressController.redirectToAddressLookup(Some("change"))
-          },
+        changeCall = if (mode == AmendMode) {
+          controllers.add.trust.routes.TrustAddressController.redirectToAmendAddressLookup()
+        } else {
+          controllers.add.trust.routes.TrustAddressController.redirectToAddressLookup(Some("change"))
+        },
         hiddenTextKey = "trustAddress.change.hidden",
         id = "address-of-trust"
       )

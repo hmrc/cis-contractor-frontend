@@ -402,7 +402,7 @@ class TrustAddressControllerSpec extends SpecBase with MockitoSugar {
       "must set AddressLookupAmendReturnQuery and redirect to the change address lookup journey" in {
 
         val mockSessionRepository = mock[SessionRepository]
-        val captor = ArgumentCaptor.forClass(classOf[UserAnswers])
+        val captor                = ArgumentCaptor.forClass(classOf[UserAnswers])
 
         when(mockSessionRepository.set(any()))
           .thenReturn(Future.successful(true))

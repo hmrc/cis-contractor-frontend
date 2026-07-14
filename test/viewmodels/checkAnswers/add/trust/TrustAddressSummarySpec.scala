@@ -123,8 +123,7 @@ class TrustAddressSummarySpec extends AnyWordSpec with Matchers with CyaEncoding
       val action = row.actions.value.items.head
 
       action.href shouldBe
-        controllers.add.trust.routes.TrustAddressController.redirectToAmendAddressLookup()
-          .url
+        controllers.add.trust.routes.TrustAddressController.redirectToAmendAddressLookup().url
 
       action.visuallyHiddenText.value shouldBe
         messages("trustAddress.change.hidden")
