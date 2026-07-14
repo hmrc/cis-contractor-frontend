@@ -401,6 +401,17 @@ class IndividualNavigatorSpec extends SpecBase {
         ) mustBe journeyRecovery
       }
 
+      "must go from SubcontractorNamePage to Amend CYA" in {
+        navigator.nextPage(
+          SubcontractorNamePage,
+          AmendMode,
+          emptyUserAnswers.setOrException(
+            SubcontractorNamePage,
+            SubcontractorName(firstName = "Jane", middleName = None, lastName = "Doe")
+          )
+        ) mustBe journeyRecovery // TODO: this needs to be redirected to amend cya page when it's implemented
+      }
+
       "must go from WorksReferenceNumberYesNoPage to WorksReferenceNumberPage when true and no work reference number exists" in {
         val ua =
           emptyUserAnswers.setOrException(WorksReferenceNumberYesNoPage, true)
@@ -442,6 +453,27 @@ class IndividualNavigatorSpec extends SpecBase {
           AmendMode,
           emptyUserAnswers
         ) mustBe journeyRecovery
+      }
+
+      "must go from AddIndividualContactMethodsYesNoPage to amend CYA when answer is No" in {
+        val answers = emptyUserAnswers.set(AddIndividualContactMethodsYesNoPage, false).success.value
+
+        navigator.nextPage(
+          AddIndividualContactMethodsYesNoPage,
+          AmendMode,
+          answers
+        ) mustBe journeyRecovery
+      }
+
+      "must go from AddIndividualContactMethodsYesNoPage to AddIndividualContactMethodsYesNoController when answer is Yes" in {
+        val answers = emptyUserAnswers.set(AddIndividualContactMethodsYesNoPage, true).success.value
+
+        navigator.nextPage(
+          AddIndividualContactMethodsYesNoPage,
+          AmendMode,
+          answers
+        ) mustBe controllers.add.routes.AddIndividualContactMethodsYesNoController
+          .onPageLoad(AmendMode) // TODO: this needs to redirected to new check box page once its implemented
       }
 
       "must go from IndividualEmailAddressPage to CheckYourAnswersController" in {
