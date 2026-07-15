@@ -317,7 +317,6 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
             .success
             .value
             .set(AddIndividualContactMethodsYesNoPage, false)
-//            .set(IndividualContactMethodOptionsPage, ContactOptions.NoDetails)
             .success
             .value
 

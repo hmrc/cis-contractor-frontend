@@ -84,16 +84,13 @@ class IndividualNavigator @Inject() () extends NavigatorForJourney {
     case AddIndividualContactMethodsYesNoPage =>
       userAnswers => navigatorFromAddIndividualContactMethodsYesNoPage(CheckMode)(userAnswers)
     case IndividualContactMethodOptionsPage   =>
-      userAnswers => nextMissingSelectedContactMethodPageAfter(current = None, CheckMode)(userAnswers)
+      userAnswers => nextMissingSelectedContactMethodPageAfter(current = None)(userAnswers)
     case IndividualEmailAddressPage           =>
-      userAnswers =>
-        nextMissingSelectedContactMethodPageAfter(current = Some(ContactMethodOptions.Email), CheckMode)(userAnswers)
+      userAnswers => nextMissingSelectedContactMethodPageAfter(current = Some(ContactMethodOptions.Email))(userAnswers)
     case IndividualPhoneNumberPage            =>
-      userAnswers =>
-        nextMissingSelectedContactMethodPageAfter(current = Some(ContactMethodOptions.Phone), CheckMode)(userAnswers)
+      userAnswers => nextMissingSelectedContactMethodPageAfter(current = Some(ContactMethodOptions.Phone))(userAnswers)
     case IndividualMobileNumberPage           =>
-      userAnswers =>
-        nextMissingSelectedContactMethodPageAfter(current = Some(ContactMethodOptions.Mobile), CheckMode)(userAnswers)
+      userAnswers => nextMissingSelectedContactMethodPageAfter(current = Some(ContactMethodOptions.Mobile))(userAnswers)
     case _                                    => _ => controllers.add.routes.CheckYourAnswersController.onPageLoad()
   }
 
@@ -248,25 +245,23 @@ class IndividualNavigator @Inject() () extends NavigatorForJourney {
     }
 
   private def nextSelectedContactMethodPageAfter(
-    current: Option[ContactMethodOptions],
-    mode: Mode = NormalMode
+    current: Option[ContactMethodOptions]
   )(userAnswers: UserAnswers): Call =
     navigateFromContactMethodPage(current, userAnswers) { remaining =>
       remaining.headOption.fold {
-        controllers.add.routes.UniqueTaxpayerReferenceYesNoController.onPageLoad(mode)
-      }(contactMethodPageCall(_, mode))
+        controllers.add.routes.UniqueTaxpayerReferenceYesNoController.onPageLoad(NormalMode)
+      }(contactMethodPageCall(_, NormalMode))
     }
 
   private def nextMissingSelectedContactMethodPageAfter(
-    current: Option[ContactMethodOptions],
-    mode: Mode = CheckMode
+    current: Option[ContactMethodOptions]
   )(userAnswers: UserAnswers): Call =
     navigateFromContactMethodPage(current, userAnswers) { remaining =>
       remaining
         .find(isMissingAnswer(_)(userAnswers))
-        .map(contactMethodPageCall(_, mode))
+        .map(contactMethodPageCall(_, CheckMode))
         .getOrElse(
-          cyaRoute(mode)
+          cyaRoute(CheckMode)
         )
     }
 
