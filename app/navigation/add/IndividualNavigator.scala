@@ -259,7 +259,7 @@ class IndividualNavigator @Inject() () extends NavigatorForJourney {
 
   private def nextMissingSelectedContactMethodPageAfter(
     current: Option[ContactMethodOptions],
-    mode: Mode = NormalMode
+    mode: Mode = CheckMode
   )(userAnswers: UserAnswers): Call =
     navigateFromContactMethodPage(current, userAnswers) { remaining =>
       remaining
