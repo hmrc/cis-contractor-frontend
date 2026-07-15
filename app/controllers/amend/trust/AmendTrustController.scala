@@ -24,6 +24,7 @@ import models.amend.trust.OriginalTrustAnswers
 import models.contact.ContactMethodOptions.{Email, Phone}
 import pages.add.*
 import pages.add.trust.*
+import pages.amend.AmendedPagesPage
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import queries.{CisIdQuery, OriginalTrustAnswersQuery}
 import repositories.SessionRepository
@@ -75,16 +76,14 @@ class AmendTrustController @Inject() (
     ua <- ua.set(TrustNamePage, trustName)
     ua <- ua.set(TrustAddressYesNoPage, true)
     ua <- ua.set(TrustAddressPage, trustAddress)
-    ua <- ua.set(AddTrustContactMethodsYesNoPage, true)
-    ua <- ua.set(TrustContactMethodOptionsPage, Set(Email, Phone))
-    ua <- ua.set(TrustEmailAddressPage, emailAddress)
-    ua <- ua.set(TrustPhoneNumberPage, phoneNumber)
+    ua <- ua.set(AddTrustContactMethodsYesNoPage, false)
     ua <- ua.set(TrustUtrYesNoPage, true)
     ua <- ua.set(TrustUtrPage, utr)
     ua <- ua.set(TrustWorksReferenceYesNoPage, true)
     ua <- ua.set(TrustWorksReferencePage, worksReference)
     ua <- ua.set(CisIdQuery, "1")
     ua <- ua.set(OriginalTrustAnswersQuery, trustOriginal)
+    ua <- ua.set(AmendedPagesPage, Set(AddTrustContactMethodsYesNoPage))
   } yield ua
 
   def onPageLoad(): Action[AnyContent] = (identify andThen getData andThen requireData).async { implicit request =>

@@ -34,6 +34,10 @@ import repositories.SessionRepository
 import views.html.add.trust.TrustWorksReferenceYesNoView
 
 import scala.concurrent.Future
+import models.AmendMode
+import org.mockito.ArgumentCaptor
+import org.mockito.Mockito.verify
+import pages.amend.AmendedPagesPage
 
 class TrustWorksReferenceYesNoControllerSpec extends SpecBase with MockitoSugar {
 
@@ -143,6 +147,81 @@ class TrustWorksReferenceYesNoControllerSpec extends SpecBase with MockitoSugar 
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual onwardRoute.url
+      }
+    }
+
+    "must add TrustWorksReferenceYesNoPage to AmendedPagesPage when submitted in AmendMode" in {
+      val mockSessionRepository = mock[SessionRepository]
+      val mockNavigator         = mock[Navigator]
+      val captor                = ArgumentCaptor.forClass(classOf[UserAnswers])
+
+      when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
+      when(mockNavigator.nextPage(any(), any(), any())).thenReturn(onwardRoute)
+
+      val application =
+        applicationBuilder(userAnswers = Some(uaWithName))
+          .overrides(
+            bind[Navigator].toInstance(mockNavigator),
+            bind[SessionRepository].toInstance(mockSessionRepository)
+          )
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(
+            POST,
+            controllers.add.trust.routes.TrustWorksReferenceYesNoController
+              .onSubmit(AmendMode)
+              .url
+          ).withFormUrlEncodedBody(
+            "value" -> "true"
+          )
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual onwardRoute.url
+        verify(mockSessionRepository).set(captor.capture())
+
+        val updatedAnswers = captor.getValue
+        updatedAnswers.get(TrustWorksReferenceYesNoPage) mustBe Some(true)
+        updatedAnswers
+          .get(AmendedPagesPage)
+          .value must contain(TrustWorksReferenceYesNoPage.toString)
+      }
+    }
+
+    "must not add the page to AmendedPagesPage when submitted in NormalMode" in {
+      val mockSessionRepository = mock[SessionRepository]
+      val mockNavigator         = mock[Navigator]
+      val captor                = ArgumentCaptor.forClass(classOf[UserAnswers])
+
+      when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
+      when(mockNavigator.nextPage(any(), any(), any())).thenReturn(onwardRoute)
+
+      val application =
+        applicationBuilder(userAnswers = Some(uaWithName))
+          .overrides(
+            bind[Navigator].toInstance(mockNavigator),
+            bind[SessionRepository].toInstance(mockSessionRepository)
+          )
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, trustWorksReferenceYesNoPostRoute)
+            .withFormUrlEncodedBody(
+              "value" -> "true"
+            )
+
+        val result = route(application, request).value
+        status(result) mustEqual SEE_OTHER
+        verify(mockSessionRepository).set(captor.capture())
+
+        val updatedAnswers = captor.getValue
+
+        updatedAnswers.get(TrustWorksReferenceYesNoPage) mustBe Some(true)
+        updatedAnswers.get(AmendedPagesPage) mustBe None
       }
     }
 

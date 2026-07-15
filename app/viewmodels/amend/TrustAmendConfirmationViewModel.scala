@@ -17,16 +17,13 @@
 package viewmodels.amend
 
 import models.UserAnswers
-import models.add.SubcontractorName
-import models.add.trust.TrustContactMethodOptions
 import models.address.Address
-import models.amend.OriginalIndividualAnswers
 import models.amend.trust.OriginalTrustAnswers
-import models.contact.{ContactMethodOptions, ContactOptions}
 import models.contact.ContactOptions.*
+import models.contact.{ContactMethodOptions, ContactOptions}
 import pages.QuestionPage
 import pages.add.*
-import pages.add.trust.{AddTrustContactMethodsYesNoPage, TrustAddressPage, TrustAddressYesNoPage, TrustContactMethodOptionsPage, TrustEmailAddressPage, TrustMobileNumberPage, TrustPhoneNumberPage, TrustUtrPage, TrustUtrYesNoPage, TrustWorksReferencePage, TrustWorksReferenceYesNoPage}
+import pages.add.trust.*
 import pages.amend.AmendedPagesPage
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
@@ -38,10 +35,29 @@ object TrustAmendConfirmationViewModel {
     original: OriginalTrustAnswers,
     current: UserAnswers
   )(implicit messages: Messages): Seq[Seq[TableRow]] =
-    addressRows(original, current) ++
+    nameRow(original, current) ++
+      addressRows(original, current) ++
       contactRows(original, current) ++
       utrRows(original, current) ++
       worksReferenceRows(original, current)
+
+  private def nameRow(
+    original: OriginalTrustAnswers,
+    current: UserAnswers
+  )(implicit messages: Messages): Seq[Seq[TableRow]] = {
+    val currentName = current.get(TrustNamePage)
+
+    Seq(
+      fieldRow(
+        TrustNamePage,
+        messages("trustName.checkYourAnswersLabel"),
+        original.trustName,
+        currentName,
+        missingValue,
+        current
+      )
+    ).flatten
+  }
 
   private def addressRows(
     original: OriginalTrustAnswers,
@@ -111,7 +127,7 @@ object TrustAmendConfirmationViewModel {
       },
       fieldRow(
         TrustEmailAddressPage,
-        messages("trustEmail.checkYourAnswersLabel"),
+        messages("trustEmailAddress.checkYourAnswersLabel"),
         original.email,
         currentEmail,
         missingValue,
@@ -119,7 +135,7 @@ object TrustAmendConfirmationViewModel {
       ),
       fieldRow(
         TrustPhoneNumberPage,
-        messages("trustPhone.checkYourAnswersLabel"),
+        messages("trustPhoneNumber.checkYourAnswersLabel"),
         original.phone,
         currentPhone,
         missingValue,
@@ -127,7 +143,7 @@ object TrustAmendConfirmationViewModel {
       ),
       fieldRow(
         TrustMobileNumberPage,
-        messages("trustMobile.checkYourAnswersLabel"),
+        messages("trustMobileNumber.checkYourAnswersLabel"),
         original.mobile,
         currentMobile,
         missingValue,
@@ -257,7 +273,7 @@ object TrustAmendConfirmationViewModel {
     )
 
   private def missingValue(implicit messages: Messages): String =
-    messages("individualAmended.table.content.none")
+    messages("amendConfirmation.table.content.none")
 
   private def wasAmended(
     current: UserAnswers,

@@ -23,6 +23,7 @@ import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
 
 import java.time.Instant
 import scala.util.{Failure, Success, Try}
+import pages.amend.AmendedPagesPage
 
 final case class UserAnswers(
   id: String,
@@ -53,6 +54,14 @@ final case class UserAnswers(
         page.cleanup(Some(value), updatedAnswers)
       }
     }
+
+  private def setPageAmended(page: Settable[_]): Try[UserAnswers] = {
+      val amendedPages = get(AmendedPagesPage).getOrElse(Set.empty) + page.toString
+      set(AmendedPagesPage, amendedPages)
+    }
+
+  def setAndAmend[A](page: Settable[A], value: A)(implicit writes: Writes[A]): Try[UserAnswers] =
+      set(page, value).flatMap(_.setPageAmended(page))
 
   def remove[A](page: Settable[A]): Try[UserAnswers] = {
 

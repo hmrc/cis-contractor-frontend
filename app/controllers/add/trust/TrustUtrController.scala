@@ -17,6 +17,7 @@
 package controllers.add.trust
 
 import controllers.actions.*
+import controllers.helpers.SaveAnswerHelper
 import forms.add.trust.TrustUtrFormProvider
 import models.Mode
 import navigation.Navigator
@@ -82,7 +83,10 @@ class TrustUtrController @Inject() (
                     Future.successful(BadRequest(view(errorForm, mode, trustName)))
                   case false =>
                     for {
-                      updatedAnswers <- Future.fromTry(request.userAnswers.set(TrustUtrPage, value))
+                      updatedAnswers <-
+                        Future.fromTry(
+                          SaveAnswerHelper.saveAnswer(request.userAnswers, TrustUtrPage, value, mode)
+                        )
                       _              <- sessionRepository.set(updatedAnswers)
                     } yield Redirect(navigator.nextPage(TrustUtrPage, mode, updatedAnswers))
                 }
