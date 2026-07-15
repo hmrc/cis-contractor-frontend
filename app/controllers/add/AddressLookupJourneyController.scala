@@ -105,7 +105,7 @@ trait AddressLookupJourneyController extends FrontendBaseController with I18nSup
       request.userAnswers
         .get(AddressLookupAmendReturnQuery)
         .getOrElse(false)
-      saveAddressAndRedirect(id, onChangeCompletion(true)) //TODO check where isAmend boolean value comes from
+      saveAddressAndRedirect(id, onChangeCompletion(true)) // TODO check where isAmend boolean value comes from
     }
 
   private def saveAddressAndRedirect(id: String, onSuccess: Call)(implicit
