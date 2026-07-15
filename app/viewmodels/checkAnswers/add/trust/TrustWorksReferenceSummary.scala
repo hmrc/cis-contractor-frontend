@@ -16,7 +16,7 @@
 
 package viewmodels.checkAnswers.add.trust
 
-import models.{CheckMode, UserAnswers}
+import models.{CheckMode, Mode, UserAnswers}
 import pages.add.trust.TrustWorksReferencePage
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
@@ -25,7 +25,7 @@ import viewmodels.implicits.*
 
 object TrustWorksReferenceSummary {
 
-  def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
+  def row(answers: UserAnswers, mode: Mode = CheckMode)(implicit messages: Messages): Option[SummaryListRow] =
     answers.get(TrustWorksReferencePage).map { answer =>
       SummaryListRowViewModel(
         key = "trustWorksReference.checkYourAnswersLabel",
@@ -33,7 +33,7 @@ object TrustWorksReferenceSummary {
         actions = Seq(
           ActionItemViewModel(
             "site.change",
-            controllers.add.trust.routes.TrustWorksReferenceController.onPageLoad(CheckMode).url
+            controllers.add.trust.routes.TrustWorksReferenceController.onPageLoad(mode).url
           )
             .withVisuallyHiddenText(messages("trustWorksReference.change.hidden"))
             .withAttribute("id" -> "trust-works-reference")

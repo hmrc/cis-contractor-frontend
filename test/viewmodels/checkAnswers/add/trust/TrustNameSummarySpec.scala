@@ -17,10 +17,11 @@
 package viewmodels.checkAnswers.add.trust
 
 import helpers.CyaEncodingSpecHelper
-import models.{CheckMode, UserAnswers}
+import models.{AmendMode, CheckMode, UserAnswers}
 import org.scalatest.OptionValues.convertOptionToValuable
 import org.scalatest.TryValues.convertTryToSuccessOrFailure
 import org.scalatest.freespec.AnyFreeSpec
+import org.scalatest.matchers.must.Matchers.must
 import org.scalatest.matchers.should.Matchers
 import pages.add.trust.TrustNamePage
 import play.api.i18n.Messages
@@ -56,6 +57,39 @@ class TrustNameSummarySpec extends AnyFreeSpec with Matchers with CyaEncodingSpe
       changeAction.content.asHtml.toString    should include(messages("site.change"))
       changeAction.href                     shouldBe controllers.add.trust.routes.TrustNameController.onPageLoad(CheckMode).url
       changeAction.visuallyHiddenText.value shouldBe messages("trustName.change.hidden")
+    }
+
+    "must return a SummaryListRow when the answer exists for Amend journey" in {
+      val answers =
+        UserAnswers("test-id")
+          .set(TrustNamePage, "AC012345")
+          .success
+          .value
+
+      val maybeRow = TrustNameSummary.row(answers, AmendMode)
+      maybeRow shouldBe defined
+
+      val row = maybeRow.value
+
+      val expectedKeyText = messages("trustName.checkYourAnswersLabel")
+      row.key.content.asHtml.toString should include(expectedKeyText)
+
+      row.value.content.asHtml.toString should include("AC012345")
+
+      row.actions shouldBe defined
+      val actions = row.actions.value.items
+      actions should have size 1
+
+      val changeAction       = actions.head
+      val expectedChangeText = messages("site.change")
+      val expectedHref       = controllers.add.trust.routes.TrustNameController.onPageLoad(AmendMode).url
+      val expectedHiddenText = messages("trustName.change.hidden")
+
+      changeAction.content.asHtml.toString should include(expectedChangeText)
+      changeAction.href                  shouldBe expectedHref
+
+      changeAction.visuallyHiddenText.value shouldBe expectedHiddenText
+      changeAction.attributes                   must contain("id" -> "trust-name")
     }
 
     "must return None when the answer does not exist" in {

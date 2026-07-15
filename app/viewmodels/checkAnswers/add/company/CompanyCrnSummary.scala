@@ -16,7 +16,7 @@
 
 package viewmodels.checkAnswers.add.company
 
-import models.{CheckMode, UserAnswers}
+import models.{CheckMode, Mode, UserAnswers}
 import pages.add.company.CompanyCrnPage
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
@@ -25,7 +25,7 @@ import viewmodels.implicits.*
 
 object CompanyCrnSummary {
 
-  def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
+  def row(answers: UserAnswers, mode: Mode = CheckMode)(implicit messages: Messages): Option[SummaryListRow] =
     answers.get(CompanyCrnPage).map { answer =>
       SummaryListRowViewModel(
         key = "companyCrn.checkYourAnswersLabel",
@@ -33,7 +33,7 @@ object CompanyCrnSummary {
         actions = Seq(
           ActionItemViewModel(
             "site.change",
-            controllers.add.company.routes.CompanyCrnController.onPageLoad(CheckMode).url
+            controllers.add.company.routes.CompanyCrnController.onPageLoad(mode).url
           )
             .withVisuallyHiddenText(messages("companyCrn.change.hidden"))
             .withAttribute("id" -> "company-crn")

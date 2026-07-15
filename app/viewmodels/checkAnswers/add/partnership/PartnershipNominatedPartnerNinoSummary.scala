@@ -17,7 +17,7 @@
 package viewmodels.checkAnswers.add.partnership
 
 import controllers.add.partnership.routes
-import models.{CheckMode, UserAnswers}
+import models.{CheckMode, Mode, UserAnswers}
 import pages.add.partnership.PartnershipNominatedPartnerNinoPage
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
@@ -26,7 +26,7 @@ import viewmodels.implicits._
 
 object PartnershipNominatedPartnerNinoSummary {
 
-  def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
+  def row(answers: UserAnswers, mode: Mode = CheckMode)(implicit messages: Messages): Option[SummaryListRow] =
     answers.get(PartnershipNominatedPartnerNinoPage).map { value =>
       SummaryListRowViewModel(
         key = "partnershipNominatedPartnerNino.checkYourAnswersLabel",
@@ -34,7 +34,7 @@ object PartnershipNominatedPartnerNinoSummary {
         actions = Seq(
           ActionItemViewModel(
             content = "site.change",
-            href = routes.PartnershipNominatedPartnerNinoController.onPageLoad(CheckMode).url
+            href = routes.PartnershipNominatedPartnerNinoController.onPageLoad(mode).url
           ).withVisuallyHiddenText(messages("partnershipNominatedPartnerNino.change.hidden"))
             .withAttribute("id" -> "nominated-partner-nino")
         )

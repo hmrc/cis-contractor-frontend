@@ -1050,3 +1050,10 @@ contractordetails.addSchemeNameYesNo.heading                                   =
 contractordetails.addSchemeNameYesNo.error.required                            =  Select yes to enter the contractor’s scheme name
 contractordetails.addSchemeNameYesNo.checkYourAnswersLabel                     =  Add scheme name?
 contractordetails.addSchemeNameYesNo.change.hidden                             =  add scheme name?
+
+contractordetails.removeDetailYesNo.title                                      =  Are you sure you want to remove the contractor’s {0}?
+contractordetails.removeDetailYesNo.heading                                    =  Are you sure you want to remove the contractor’s {0}?
+contractordetails.removeDetailYesNo.detail.email                               =  email address
+contractordetails.removeDetailYesNo.detail.schemeName                          =  scheme name
+contractordetails.removeDetailYesNo.error.required.email                       =  Select yes to remove the contractor’s email address
+contractordetails.removeDetailYesNo.error.required.schemeName                  =  Select yes to remove the contractor’s scheme name

@@ -423,6 +423,69 @@ class CompanyNavigatorSpec extends SpecBase {
         ) mustBe CompanyAmendCYA
       }
 
+      "must go from CompanyWorksReferencePage to CompanyCheckYourAnswerPage in AmendMode" in {
+        navigator.nextPage(
+          CompanyWorksReferencePage,
+          AmendMode,
+          emptyUserAnswers
+        ) mustBe CompanyAmendCYA
+      }
+
+      "must go from a CompanyCrnPage to Company CYA in AmendMode" in {
+        navigator.nextPage(
+          CompanyCrnPage,
+          AmendMode,
+          emptyUserAnswers
+        ) mustBe CompanyAmendCYA
+      }
+
+      "must go from CompanyCrnYesNoPage" - {
+        "to CompanyCrnPage when answer is Yes and CompanyCrnPage is not answered before" in {
+          val answers = emptyUserAnswers.setOrException(CompanyCrnYesNoPage, true)
+
+          navigator.nextPage(
+            CompanyCrnYesNoPage,
+            AmendMode,
+            answers
+          ) mustBe controllers.add.company.routes.CompanyCrnController.onPageLoad(AmendMode)
+        }
+
+        "to Company CYA when answer is Yes and CompanyCrnPage is answered before" in {
+          val answers =
+            emptyUserAnswers
+              .set(CompanyCrnPage, "AC012345")
+              .success
+              .value
+              .set(CompanyCrnYesNoPage, true)
+              .success
+              .value
+
+          navigator.nextPage(
+            CompanyCrnYesNoPage,
+            AmendMode,
+            answers
+          ) mustBe CompanyAmendCYA
+        }
+
+        "to Company CYA when answer is No" in {
+          val answers = emptyUserAnswers.set(CompanyCrnYesNoPage, false).success.value
+
+          navigator.nextPage(
+            CompanyCrnYesNoPage,
+            AmendMode,
+            answers
+          ) mustBe CompanyAmendCYA
+        }
+
+        "to JourneyRecoveryPage when answer is not present" in {
+          navigator.nextPage(
+            CompanyCrnYesNoPage,
+            AmendMode,
+            emptyUserAnswers
+          ) mustBe routes.JourneyRecoveryController.onPageLoad()
+        }
+      }
+
       "must go from CompanyNamePage to CompanyCheckYourAnswers in AmendMode" in {
         navigator.nextPage(
           CompanyNamePage,
@@ -571,6 +634,62 @@ class CompanyNavigatorSpec extends SpecBase {
             AmendMode,
             emptyUserAnswers
           ) mustBe journeyRecovery
+        }
+      }
+
+      "must go from CompanyUtrPage to CompanyCYA in AmendMode" in {
+        navigator.nextPage(
+          CompanyUtrPage,
+          AmendMode,
+          emptyUserAnswers
+        ) mustBe CompanyAmendCYA
+      }
+
+      "must go from CompanyWorksReferenceYesNo" - {
+        "to CompanyWorksReferencePage when answer is Yes and CompanyWorksReferencePage is not answered before" in {
+          val answers = emptyUserAnswers.set(CompanyWorksReferenceYesNoPage, true).success.value
+
+          navigator.nextPage(
+            CompanyWorksReferenceYesNoPage,
+            AmendMode,
+            answers
+          ) mustBe controllers.add.company.routes.CompanyWorksReferenceController
+            .onPageLoad(AmendMode)
+        }
+
+        "to Company CYA when answer is Yes and CompanyWorksReferencePage is answered before" in {
+          val answers =
+            emptyUserAnswers
+              .set(CompanyWorksReferencePage, "WR-001")
+              .success
+              .value
+              .set(CompanyWorksReferenceYesNoPage, true)
+              .success
+              .value
+
+          navigator.nextPage(
+            CompanyWorksReferenceYesNoPage,
+            AmendMode,
+            answers
+          ) mustBe CompanyAmendCYA
+        }
+
+        "to Company CYA when CompanyWorksReferencePage answer is No" in {
+          val answers = emptyUserAnswers.set(CompanyWorksReferenceYesNoPage, false).success.value
+
+          navigator.nextPage(
+            CompanyWorksReferenceYesNoPage,
+            AmendMode,
+            answers
+          ) mustBe CompanyAmendCYA
+        }
+
+        "to JourneyRecoveryPage when CompanyWorksReferencePage answer is not present" in {
+          navigator.nextPage(
+            CompanyWorksReferenceYesNoPage,
+            AmendMode,
+            emptyUserAnswers
+          ) mustBe routes.JourneyRecoveryController.onPageLoad()
         }
       }
     }
