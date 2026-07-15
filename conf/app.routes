@@ -88,6 +88,7 @@ GET   /subcontractor/amend/company  controllers.amend.company.AmendCompanyContro
 GET   /subcontractor/amend/partnership  controllers.amend.partnership.AmendPartnershipController.onPageLoad()
 
 GET   /subcontractor/amend/trust  controllers.amend.trust.AmendTrustController.onPageLoad()
+GET   /subcontractor/amend/trust/subcontractor-details-updated  controllers.amend.AmendConfirmationController.trustOnPageLoad()
 
 # Errors & Auth
 GET  /unauthorised/standard-user  controllers.UnauthorisedWrongRoleController.onPageLoad()
