@@ -18,7 +18,6 @@ package controllers.verify
 
 import controllers.actions.*
 import models.verify.ValidatedVerify
-import pages.verify.ReverifyExistingSubcontractorsYesNoPage
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -48,8 +47,7 @@ class VerifyCheckYourAnswersController @Inject() (
         val list = SummaryListViewModel(
           rows = Seq(
             SelectSubcontractorSummary.row(ua),
-            ua.get(ReverifyExistingSubcontractorsYesNoPage)
-              .flatMap(_ => ReverifyExistingSubcontractorsYesNoSummary.row(ua)),
+            ReverifyExistingSubcontractorsYesNoSummary.row(ua),
             SelectSubcontractorsToReverifySummary.row(ua),
             ContractorEmailConfirmationStoredSummary.row(ua),
             ContractorEmailConfirmationNotStoredSummary.row(ua),
