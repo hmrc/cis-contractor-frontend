@@ -18,7 +18,6 @@ package models.add.partnership
 
 import models.address.Address
 import models.contact.ContactMethodOptions
-import models.contact.ContactOptions.*
 import models.{InvalidAnswer, TypeOfSubcontractor, UserAnswers, Validation, ValidationError}
 import pages.add.TypeOfSubcontractorPage
 import pages.add.partnership.*
@@ -46,7 +45,16 @@ object ValidatedPartnership extends Validation {
       partnershipName                 <- getPageValue(answers, PartnershipNamePage)
       partnershipAddress              <- getOptionalPageValue(answers, PartnershipAddressPage, PartnershipAddressYesNoPage)
       partnershipContactMethodOptions <-
-        getOptionalPageValue(answers, PartnershipContactMethodOptionsPage, AddPartnershipContactMethodsYesNoPage)
+        getOptionalPageValue(answers, PartnershipContactMethodOptionsPage, AddPartnershipContactMethodsYesNoPage).flatMap {
+          case Some(methods) if methods.nonEmpty =>
+            Right(Some(methods))
+
+          case Some(_) =>
+            Left(InvalidAnswer(PartnershipContactMethodOptionsPage))
+
+          case None =>
+            Right(None)
+        }
       partnershipEmail                <- getContactPageValue(
                                            answers,
                                            partnershipContactMethodOptions,

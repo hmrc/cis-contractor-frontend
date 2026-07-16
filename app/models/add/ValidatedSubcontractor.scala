@@ -17,9 +17,7 @@
 package models.add
 
 import models.address.Address
-import models.contact.ContactOptions
 import models.contact.ContactMethodOptions
-import models.contact.ContactOptions.*
 import models.{InvalidAnswer, TypeOfSubcontractor, UserAnswers, Validation, ValidationError}
 import pages.add.*
 import play.api.libs.json.*
@@ -45,7 +43,16 @@ object ValidatedSubcontractor extends Validation {
       subcontractorName              <- getOptionalNamePage(answers)
       address                        <- getOptionalPageValue(answers, AddressOfSubcontractorPage, SubAddressYesNoPage)
       individualContactMethodOptions <-
-        getOptionalPageValue(answers, IndividualContactMethodOptionsPage, AddIndividualContactMethodsYesNoPage)
+        getOptionalPageValue(answers, IndividualContactMethodOptionsPage, AddIndividualContactMethodsYesNoPage).flatMap {
+          case Some(methods) if methods.nonEmpty =>
+            Right(Some(methods))
+
+          case Some(_) =>
+            Left(InvalidAnswer(IndividualContactMethodOptionsPage))
+
+          case None =>
+            Right(None)
+        }
 
       individualEmail  <- getContactPageValue(
                             answers,

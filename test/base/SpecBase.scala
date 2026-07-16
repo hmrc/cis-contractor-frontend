@@ -75,19 +75,4 @@ trait SpecBase
           bind[DataRetrievalAction].toInstance(new FakeDataRetrievalAction(userAnswers))
         ) ++ additionalBindings
       )
-
-  def buildAnswersWithContactChoice[A: Writes](
-    base: UserAnswers,
-    namePage: QuestionPage[A],
-    nameValue: A,
-    contactPage: QuestionPage[ContactOptions],
-    contactValue: ContactOptions
-  ): UserAnswers =
-    base
-      .set(namePage, nameValue)
-      .success
-      .value
-      .set(contactPage, contactValue)
-      .success
-      .value
 }
