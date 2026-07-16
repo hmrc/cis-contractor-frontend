@@ -27,6 +27,7 @@ import queries.Settable
 import repositories.SessionRepository
 import services.AddressLookupService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+
 import queries.AddressLookupAmendReturnQuery
 import scala.concurrent.{ExecutionContext, Future}
 
