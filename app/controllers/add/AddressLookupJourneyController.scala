@@ -62,9 +62,9 @@ trait AddressLookupJourneyController extends FrontendBaseController with I18nSup
   protected def onCompletion(mode: Mode): Call
 
   /** Where to go after the address is saved in the change flow.
-   * @param isAmend
-   *   true when the change originates from the amend journey, false for the add/check journey.
-   */
+    * @param isAmend
+    *   true when the change originates from the amend journey, false for the add/check journey.
+    */
   protected def onChangeCompletion(isAmend: Boolean): Call
 
   private val mandatoryFields = MandatoryFieldsConfigModel(

@@ -28,9 +28,9 @@ import viewmodels.implicits.*
 object TypeOfSubcontractorSummary {
 
   def row(
-           answers: UserAnswers,
-           showActions: Boolean = true
-         )(implicit messages: Messages): Option[SummaryListRow] =
+    answers: UserAnswers,
+    showActions: Boolean = true
+  )(implicit messages: Messages): Option[SummaryListRow] =
     answers.get(TypeOfSubcontractorPage).map { answer =>
 
       val value = ValueViewModel(

@@ -17,7 +17,7 @@
 package viewmodels.checkAnswers.add
 
 import models.add.SubcontractorName.format
-import models.{CheckMode, UserAnswers, Mode}
+import models.{CheckMode, Mode, UserAnswers}
 import pages.add.SubcontractorNamePage
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text

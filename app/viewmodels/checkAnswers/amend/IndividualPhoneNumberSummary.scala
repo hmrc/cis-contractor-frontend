@@ -16,7 +16,7 @@
 
 package viewmodels.checkAnswers.amend
 
-import models.{AmendMode, CheckMode, UserAnswers, Mode}
+import models.{AmendMode, CheckMode, Mode, UserAnswers}
 import pages.add.IndividualPhoneNumberPage
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
