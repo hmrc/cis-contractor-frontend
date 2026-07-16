@@ -144,7 +144,13 @@ class SubcontractorCleanupSpec extends SpecBase {
           .set(CompanyAddressYesNoPage, true)
           .success
           .value
-          .set(CompanyContactOptionsPage, ContactOptions.Email)
+          .set(AddCompanyContactMethodsYesNoPage, true)
+          .success
+          .value
+          .set(
+            CompanyContactMethodOptionsPage,
+            Set(ContactMethodOptions.Email, ContactMethodOptions.Phone, ContactMethodOptions.Mobile)
+          )
           .success
           .value
           .set(CompanyCrnPage, crn)
@@ -182,7 +188,8 @@ class SubcontractorCleanupSpec extends SpecBase {
 
       result.get(CompanyAddressPage) mustBe None
       result.get(CompanyAddressYesNoPage) mustBe None
-      result.get(CompanyContactOptionsPage) mustBe None
+      result.get(AddCompanyContactMethodsYesNoPage) mustBe None
+      result.get(CompanyContactMethodOptionsPage) mustBe None
       result.get(CompanyCrnPage) mustBe None
       result.get(CompanyCrnYesNoPage) mustBe None
       result.get(CompanyEmailAddressPage) mustBe None
@@ -410,7 +417,13 @@ class SubcontractorCleanupSpec extends SpecBase {
           .set(CompanyAddressYesNoPage, true)
           .success
           .value
-          .set(CompanyContactOptionsPage, ContactOptions.Email)
+          .set(AddCompanyContactMethodsYesNoPage, true)
+          .success
+          .value
+          .set(
+            CompanyContactMethodOptionsPage,
+            Set(ContactMethodOptions.Email, ContactMethodOptions.Phone, ContactMethodOptions.Mobile)
+          )
           .success
           .value
           .set(CompanyCrnPage, crn)
@@ -565,7 +578,8 @@ class SubcontractorCleanupSpec extends SpecBase {
 
       result.get(CompanyAddressPage) mustBe None
       result.get(CompanyAddressYesNoPage) mustBe None
-      result.get(CompanyContactOptionsPage) mustBe None
+      result.get(AddCompanyContactMethodsYesNoPage) mustBe None
+      result.get(CompanyContactMethodOptionsPage) mustBe None
       result.get(CompanyCrnPage) mustBe None
       result.get(CompanyCrnYesNoPage) mustBe None
       result.get(CompanyEmailAddressPage) mustBe None

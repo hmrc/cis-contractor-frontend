@@ -48,7 +48,8 @@ object SubcontractorCleanup {
     userAnswers
       .remove(CompanyAddressPage)
       .flatMap(_.remove(CompanyAddressYesNoPage))
-      .flatMap(_.remove(CompanyContactOptionsPage))
+      .flatMap(_.remove(AddCompanyContactMethodsYesNoPage))
+      .flatMap(_.remove(CompanyContactMethodOptionsPage))
       .flatMap(_.remove(CompanyCrnPage))
       .flatMap(_.remove(CompanyCrnYesNoPage))
       .flatMap(_.remove(CompanyEmailAddressPage))
