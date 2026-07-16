@@ -19,7 +19,6 @@ package services
 import connectors.ConstructionIndustrySchemeConnector
 import models.{TypeOfSubcontractor, UserAnswers}
 import models.TypeOfSubcontractor.{Individualorsoletrader, Limitedcompany, Partnership, Trust}
-import models.contact.ContactOptions
 import models.requests.CreateAndUpdateSubcontractorPayload.{CompanyPayload, IndividualOrSoleTraderPayload, PartnershipPayload, TrustPayload}
 import pages.add.*
 import pages.add.partnership.*
@@ -79,8 +78,6 @@ class SubcontractorService @Inject() (
       case Some(t) => Future.successful(t)
       case None    => Future.failed(new RuntimeException("TypeOfSubcontractorPage not found in session data"))
     }
-
-  private case class ContactDetails(email: Option[String], phone: Option[String], mobile: Option[String])
 
   private def partnershipPayloadFromUserAnswers(
     cisId: String,
