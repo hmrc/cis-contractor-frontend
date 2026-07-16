@@ -42,7 +42,7 @@
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(
-                ErrorSummaryViewModel(form, errorLinkOverrides = Map("value" -> "value-0"))
+                ErrorSummaryViewModel(form, errorLinkOverrides = Map("value" -> "value_0"))
             )
         }
 
@@ -84,7 +84,7 @@
                             )),
 
                             rows = rows.zipWithIndex.map { case (row, idx) =>
-                                val checkboxId = s"value-$idx"
+                                val checkboxId = s"value_$idx"
                                 val value = row.id
                                 val isChecked = selected.contains(row.id)
 

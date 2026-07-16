@@ -17,16 +17,23 @@
 package controllers.verify
 
 import base.SpecBase
-import play.api.test.FakeRequest
-import models.{Submission, VerificationBatch}
+import models.{Submission, UserAnswers, VerificationBatch}
 import models.response.GetNewestVerificationBatchResponse
+import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito.when
+import org.scalatestplus.mockito.MockitoSugar
 import pages.verify.NewestVerificationBatchResponsePage
+import play.api.inject.bind
+import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import queries.CisIdQuery
+import services.VerificationService
+import uk.gov.hmrc.http.HeaderCarrier
 
 import java.time.LocalDateTime
+import scala.concurrent.Future
 
-class VerificationRequestSubmittedControllerSpec extends SpecBase {
+class VerificationRequestSubmittedControllerSpec extends SpecBase with MockitoSugar {
 
   private val cisId = "12345"
 
@@ -69,8 +76,22 @@ class VerificationRequestSubmittedControllerSpec extends SpecBase {
           .success
           .value
 
+      val mockVerificationService =
+        mock[VerificationService]
+
+      when(
+        mockVerificationService.refreshNewestVerificationBatch(
+          any[UserAnswers]
+        )(any[HeaderCarrier])
+      ).thenReturn(Future.successful(ua))
+
       val application =
-        applicationBuilder(userAnswers = Some(ua)).build()
+        applicationBuilder(
+          userAnswers = Some(ua),
+          additionalBindings = Seq(
+            bind[VerificationService].toInstance(mockVerificationService)
+          )
+        ).build()
 
       running(application) {
 

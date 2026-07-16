@@ -20,6 +20,7 @@ import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierA
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import pages.verify.CurrentVerificationBatchResponsePage
 import services.VerificationService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
@@ -42,8 +43,28 @@ class CurrentVerificationBatchController @Inject() (
     (identify andThen getData andThen requireData).async { implicit request =>
       verificationBatchService
         .getCurrentVerificationBatch(request.userAnswers)
-        .map { _ =>
-          Ok("current verification batch saved to session")
+        .map { updatedAnswers =>
+          updatedAnswers.get(CurrentVerificationBatchResponsePage) match {
+
+            case Some(response)
+                if response.verificationBatch.nonEmpty ||
+                  response.verifications.nonEmpty =>
+              Redirect(
+                controllers.verify.routes.ModifyVerificationBatchAndVerificationsController
+                  .modifyVerificationBatch()
+              )
+
+            case Some(_) =>
+              Redirect(
+                controllers.verify.routes.CreateVerificationBatchAndVerificationsController
+                  .onSubmit()
+              )
+
+            case None =>
+              Redirect(
+                controllers.routes.JourneyRecoveryController.onPageLoad()
+              )
+          }
         }
         .recover { case t =>
           logger.error(
