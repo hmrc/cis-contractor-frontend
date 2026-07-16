@@ -23,6 +23,9 @@
 
 @layout(pageTitle = titleNoForm(messages("verify.submissionSending.title")), showBackLink = false, showSignOut = false, isFullWidth = true) {
 
+<meta http-equiv="refresh"
+      content="3;url=@controllers.verify.routes.VerificationRequestSubmittedController.onPageLoad().url">
+
     @loadingSpinner(h1Text = "verify.submissionSending.heading", paratext = "verify.submissionSending.paragraph")
 
 }

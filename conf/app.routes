@@ -493,7 +493,12 @@ GET   /subcontractor/verify/no-subcontractors-added  controllers.verify.NoSubcon
 
 GET   /subcontractor/verify/check-verification-batch-readiness  controllers.verify.CheckVerificationBatchReadinessController.checkVerificationBatchReadiness(mode: Mode = NormalMode)
 
-GET   /subcontractor/verify/newest  controllers.verify.NewestVerificationBatchController.onPageLoad()
+GET   /subcontractor/verify/check-verification-batch-readiness/check-mode  controllers.verify.CheckVerificationBatchReadinessController.checkVerificationBatchReadinessInCheckMode()
+
+GET   /verify/check-verification-batch-readiness-before-declaration   controllers.verify.CheckVerificationBatchReadinessController.checkVerificationBatchReadinessBeforeDeclaration()
+
+GET   /subcontractor/verify/newest                            controllers.verify.NewestVerificationBatchController.onPageLoad()
+GET   /subcontractor/verify/inactive-scheme-warning/continue  controllers.verify.NewestVerificationBatchController.onContinue
 
 GET   /subcontractor/verify/current  controllers.verify.CurrentVerificationBatchController.onPageLoad()
 
@@ -537,6 +542,8 @@ GET   /subcontractor/verify/inactive-scheme-warning  controllers.verify.Inactive
 GET   /subcontractor/verify/verification-not-submitted-warning  controllers.verify.VerificationNotSubmittedWarningController.onPageLoad()
 
 GET   /subcontractor/verify/no-subcontractors-selected-warning  controllers.verify.NoSubcontractorsSelectedWarningController.onPageLoad()
+
+GET   /subcontractor/verify/no-subcontractors-selected-warning/cancel   controllers.verify.NoSubcontractorsSelectedWarningController.onCancel()
 
 GET   /subcontractor/verify/verification-request-submitted  controllers.verify.VerificationRequestSubmittedController.onPageLoad()
 
