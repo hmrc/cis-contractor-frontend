@@ -86,10 +86,11 @@ class TrustNavigator @Inject() () extends NavigatorForJourney {
   }
 
   private val amendRouteMap: Page => UserAnswers => Call = {
-    case TrustAddressYesNoPage        => navigatorFromTrustAddressYesNoPage(AmendMode)(_)
-    case TrustWorksReferenceYesNoPage => navigatorFromTrustWorksReferenceYesNoPage(AmendMode)(_)
-    case TrustUtrYesNoPage            => navigatorFromTrustUtrYesNoPage(AmendMode)(_)
-    case _                            => _ => cyaRoute(AmendMode)
+    case TrustAddressYesNoPage           => navigatorFromTrustAddressYesNoPage(AmendMode)(_)
+    case AddTrustContactMethodsYesNoPage => navigatorFromAddTrustContactMethodsYesNoPage(AmendMode)(_)
+    case TrustWorksReferenceYesNoPage    => navigatorFromTrustWorksReferenceYesNoPage(AmendMode)(_)
+    case TrustUtrYesNoPage               => navigatorFromTrustUtrYesNoPage(AmendMode)(_)
+    case _                               => _ => cyaRoute(AmendMode)
   }
 
   private def navigatorFromTrustUtrYesNoPage(mode: Mode)(ua: UserAnswers): Call =
@@ -158,14 +159,14 @@ class TrustNavigator @Inject() () extends NavigatorForJourney {
       case (Some(false), NormalMode) =>
         controllers.add.trust.routes.TrustUtrYesNoController.onPageLoad(NormalMode)
 
-      case (Some(true), CheckMode) =>
+      case (Some(true), CheckMode | AmendMode) =>
         ua.get(TrustContactMethodOptionsPage)
-          .fold(controllers.add.trust.routes.TrustContactMethodOptionsController.onPageLoad(CheckMode)) { _ =>
-            controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
+          .fold(controllers.add.trust.routes.TrustContactMethodOptionsController.onPageLoad(mode)) { _ =>
+            cyaRoute(mode)
           }
 
-      case (Some(false), CheckMode) =>
-        controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
+      case (Some(false), CheckMode | AmendMode) =>
+        cyaRoute(mode)
 
       case _ =>
         routes.JourneyRecoveryController.onPageLoad()

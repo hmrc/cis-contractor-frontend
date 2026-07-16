@@ -17,13 +17,10 @@
 package controllers.add.company
 
 import controllers.actions.*
-import models.UserAnswers
 import models.add.company.ValidatedCompany
-import models.contact.ContactOptions.*
 import pages.add.CheckYourAnswersSubmittedPage
-import pages.add.company.CompanyContactOptionsPage
 import play.api.Logging
-import play.api.i18n.{I18nSupport, Messages, MessagesApi}
+import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
 import services.SubcontractorService
@@ -51,14 +48,6 @@ class CompanyCheckYourAnswersController @Inject() (
     with I18nSupport
     with Logging {
 
-  private def contactDetailsRow(ua: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    ua.get(CompanyContactOptionsPage).flatMap {
-      case Email  => CompanyEmailAddressSummary.row(ua)
-      case Phone  => CompanyPhoneNumberSummary.row(ua)
-      case Mobile => CompanyMobileNumberSummary.row(ua)
-      case _      => None
-    }
-
   def onPageLoad: Action[AnyContent] =
     (identify andThen getData andThen requireData) { implicit request =>
       val ua = request.userAnswers
@@ -71,8 +60,11 @@ class CompanyCheckYourAnswersController @Inject() (
               CompanyNameSummary.row(ua),
               CompanyAddressYesNoSummary.row(ua),
               CompanyAddressSummary.row(ua),
-              CompanyContactOptionsSummary.row(ua),
-              contactDetailsRow(ua),
+              AddCompanyContactMethodsYesNoSummary.row(ua),
+              CompanyContactMethodOptionsSummary.row(ua),
+              CompanyEmailAddressSummary.row(ua),
+              CompanyPhoneNumberSummary.row(ua),
+              CompanyMobileNumberSummary.row(ua),
               CompanyUtrYesNoSummary.row(ua),
               CompanyUtrSummary.row(ua),
               CompanyCrnYesNoSummary.row(ua),

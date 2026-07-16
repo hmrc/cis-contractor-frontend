@@ -22,7 +22,6 @@ import controllers.routes
 import models.UserAnswers
 import models.address.{Address, Country}
 import models.amend.company.OriginalCompanyAnswers
-import models.contact.ContactOptions.Email
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{never, times, verify, when}
@@ -35,6 +34,7 @@ import play.api.test.Helpers.*
 import queries.{CisIdQuery, OriginalCompanyAnswersQuery}
 import repositories.SessionRepository
 import models.TypeOfSubcontractor.Limitedcompany
+import models.contact.ContactMethodOptions
 import pages.add.TypeOfSubcontractorPage
 
 import javax.inject.Inject
@@ -82,7 +82,7 @@ class AmendCompanyControllerSpec extends SpecBase with MockitoSugar {
     OriginalCompanyAnswers(
       companyName = Some(companyName),
       address = Some(expectedAddress),
-      companyContactMethod = Email,
+      companyContactMethod = Some(Set(ContactMethodOptions.Email)),
       email = Some(emailAddress),
       phone = None,
       mobile = None,
@@ -143,7 +143,8 @@ class AmendCompanyControllerSpec extends SpecBase with MockitoSugar {
           savedAnswers.get(CompanyAddressYesNoPage).value mustBe true
           savedAnswers.get(CompanyAddressPage).value mustBe expectedAddress
 
-          savedAnswers.get(CompanyContactOptionsPage).value mustBe Email
+          savedAnswers.get(AddCompanyContactMethodsYesNoPage).value mustBe true
+          savedAnswers.get(CompanyContactMethodOptionsPage).value mustBe Set(ContactMethodOptions.Email)
           savedAnswers.get(CompanyEmailAddressPage).value mustBe emailAddress
 
           savedAnswers.get(CompanyUtrYesNoPage).value mustBe true

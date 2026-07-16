@@ -424,6 +424,48 @@ class TrustNavigatorSpec extends SpecBase {
         }
       }
 
+      "must go from AddTrustContactMethodsYesNo" - {
+        "to amend CYA when answer is Yes and TrustContactMethodOptions already answered" in {
+          val answers = emptyUserAnswers
+            .setOrException(AddTrustContactMethodsYesNoPage, true)
+            .setOrException(TrustContactMethodOptionsPage, Set(ContactMethodOptions.Email, ContactMethodOptions.Phone))
+
+          navigator.nextPage(
+            AddTrustContactMethodsYesNoPage,
+            AmendMode,
+            answers
+          ) mustBe trustAmendCYA
+        }
+
+        "to TrustContactMethodOptions page when answer is Yes and TrustContactMethodOptions not yet answered" in {
+          val answers = emptyUserAnswers.setOrException(AddTrustContactMethodsYesNoPage, true)
+
+          navigator.nextPage(
+            AddTrustContactMethodsYesNoPage,
+            AmendMode,
+            answers
+          ) mustBe controllers.add.trust.routes.TrustContactMethodOptionsController.onPageLoad(AmendMode)
+        }
+
+        "to amend CYA when answer is No" in {
+          val answers = emptyUserAnswers.set(AddTrustContactMethodsYesNoPage, false).success.value
+
+          navigator.nextPage(
+            AddTrustContactMethodsYesNoPage,
+            AmendMode,
+            answers
+          ) mustBe trustAmendCYA
+        }
+
+        "to JourneyRecovery when answer is not present" in {
+          navigator.nextPage(
+            AddTrustContactMethodsYesNoPage,
+            AmendMode,
+            emptyUserAnswers
+          ) mustBe journeyRecovery
+        }
+      }
+
       "must go from TrustUtrYesNoPage to TrustUtrController when answer is true and UTR not yet answered" in {
         val ua = UserAnswers("id").set(TrustUtrYesNoPage, true).success.value
         navigator.nextPage(TrustUtrYesNoPage, AmendMode, ua) mustBe
