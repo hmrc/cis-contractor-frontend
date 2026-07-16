@@ -50,7 +50,6 @@ class VerifyCheckYourAnswersController @Inject() (
             SelectSubcontractorSummary.row(ua),
             ua.get(ReverifyExistingSubcontractorsYesNoPage)
               .flatMap(_ => ReverifyExistingSubcontractorsYesNoSummary.row(ua)),
-            ReverifyExistingSubcontractorsYesNoSummary.row(ua),
             SelectSubcontractorsToReverifySummary.row(ua),
             ContractorEmailConfirmationStoredSummary.row(ua),
             ContractorEmailConfirmationNotStoredSummary.row(ua),
