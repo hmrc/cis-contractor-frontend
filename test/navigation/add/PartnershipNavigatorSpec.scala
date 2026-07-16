@@ -723,6 +723,84 @@ class PartnershipNavigatorSpec extends SpecBase {
           ) mustBe routes.JourneyRecoveryController.onPageLoad()
         }
       }
+
+      "must go from PartnershipNominatedPartnerNino" - {
+        "must go from PartnershipNominatedPartnerNinoYesNoPage to PartnershipNominatedPartnerNinoController when true in AmendMode" in {
+          navigator.nextPage(
+            PartnershipNominatedPartnerNinoYesNoPage,
+            AmendMode,
+            emptyUserAnswers.setOrException(PartnershipNominatedPartnerNinoYesNoPage, true)
+          ) mustBe controllers.add.partnership.routes.PartnershipNominatedPartnerNinoController.onPageLoad(AmendMode)
+        }
+
+        "must go from PartnershipNominatedPartnerNinoYesNoPage to PartnershipCheckYourAnswers when false in AmendMode" in {
+          navigator.nextPage(
+            PartnershipNominatedPartnerNinoYesNoPage,
+            AmendMode,
+            emptyUserAnswers.setOrException(PartnershipNominatedPartnerNinoYesNoPage, false)
+          ) mustBe partnershipAmendCYA
+        }
+
+        "must go from PartnershipNominatedPartnerNinoYesNoPage to JourneyRecovery when no answer in AmendMode" in {
+          navigator.nextPage(
+            PartnershipNominatedPartnerNinoYesNoPage,
+            AmendMode,
+            emptyUserAnswers
+          ) mustBe journeyRecovery
+        }
+        "must go from PartnershipNominatedPartnerNinoYesNoPage to PartnershipCheckYourAnswersController when answer is false in AmendMode" in {
+          val answers =
+            emptyUserAnswers
+              .set(PartnershipNominatedPartnerNinoYesNoPage, false)
+              .success
+              .value
+
+          navigator.nextPage(
+            PartnershipNominatedPartnerNinoYesNoPage,
+            AmendMode,
+            answers
+          ) mustBe partnershipAmendCYA
+        }
+
+        "must go from PartnershipNominatedPartnerNinoYesNoPage to PartnershipCheckYourAnswersController when answer is true in AmendMode and NINO is already provided" in {
+          val answers =
+            emptyUserAnswers
+              .set(PartnershipNominatedPartnerNinoYesNoPage, true)
+              .success
+              .value
+              .set(PartnershipNominatedPartnerNinoPage, "AA123456A")
+              .success
+              .value
+
+          navigator.nextPage(
+            PartnershipNominatedPartnerNinoYesNoPage,
+            AmendMode,
+            answers
+          ) mustBe partnershipAmendCYA
+        }
+
+        "must go from PartnershipNominatedPartnerNinoPage to PartnershipCheckYourAnswersController in AmendMode" in {
+          val answersWithNino =
+            emptyUserAnswers
+              .set(PartnershipNominatedPartnerNinoPage, "AA123456A")
+              .success
+              .value
+
+          navigator.nextPage(
+            PartnershipNominatedPartnerNinoPage,
+            AmendMode,
+            answersWithNino
+          ) mustBe partnershipAmendCYA
+        }
+
+        "to JourneyRecovery when answer is missing" in {
+          navigator.nextPage(
+            PartnershipNominatedPartnerNinoPage,
+            AmendMode,
+            emptyUserAnswers
+          ) mustBe routes.JourneyRecoveryController.onPageLoad()
+        }
+      }
     }
 
     "in Check mode" - {

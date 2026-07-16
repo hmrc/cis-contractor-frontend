@@ -21,7 +21,6 @@ import forms.mappings.Constants.MaxLength35
 import models.{Mode, UserAnswers}
 import models.address.{Address, AddressLookupJourneyIdentifier, MandatoryFieldsConfigModel}
 import models.requests.DataRequest
-import queries.AddressLookupAmendReturnQuery
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, Call, Result}
 import queries.Settable
@@ -29,6 +28,7 @@ import repositories.SessionRepository
 import services.AddressLookupService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
+import queries.AddressLookupAmendReturnQuery
 import scala.concurrent.{ExecutionContext, Future}
 
 /** Shared behaviour for the Address Lookup Frontend (ALF) journeys. Each subcontractor type (individual, company,
@@ -62,7 +62,10 @@ trait AddressLookupJourneyController extends FrontendBaseController with I18nSup
   /** Where to go after the address is saved in the standard flow. */
   protected def onCompletion(mode: Mode): Call
 
-  /** Where to go after the address is saved in the change flow. */
+  /** Where to go after the address is saved in the change flow.
+    * @param isAmend
+    *   true when the change originates from the amend journey, false for the add/check journey.
+    */
   protected def onChangeCompletion(isAmend: Boolean): Call
 
   private val mandatoryFields = MandatoryFieldsConfigModel(
@@ -102,10 +105,8 @@ trait AddressLookupJourneyController extends FrontendBaseController with I18nSup
 
   def addressLookupCallbackChange(id: String, mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
-      request.userAnswers
-        .get(AddressLookupAmendReturnQuery)
-        .getOrElse(false)
-      saveAddressAndRedirect(id, onChangeCompletion(true)) // TODO check where isAmend boolean value comes from
+      val isAmend = request.userAnswers.get(AddressLookupAmendReturnQuery).getOrElse(false)
+      saveAddressAndRedirect(id, onChangeCompletion(isAmend))
     }
 
   private def saveAddressAndRedirect(id: String, onSuccess: Call)(implicit

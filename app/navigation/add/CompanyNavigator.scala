@@ -160,9 +160,7 @@ class CompanyNavigator @Inject() () extends NavigatorForJourney {
       case AmendMode =>
         userAnswers.get(CompanyAddressYesNoPage) match {
           case Some(true)  =>
-            cyaRoute(
-              mode
-            ) // TODO: controllers.add.company.routes.CompanyAddressController.redirectToAmendAddressLookup() when availabe
+            controllers.add.company.routes.CompanyAddressController.redirectToAmendAddressLookup()
           case Some(false) =>
             cyaRoute(mode)
           case None        =>
