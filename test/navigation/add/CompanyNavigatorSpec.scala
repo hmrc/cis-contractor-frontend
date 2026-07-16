@@ -502,7 +502,8 @@ class CompanyNavigatorSpec extends SpecBase {
             CompanyAddressYesNoPage,
             AmendMode,
             answers
-          ) mustBe CompanyAmendCYA
+          ) mustBe controllers.add.company.routes.CompanyAddressController.redirectToAmendAddressLookup()
+          // CompanyAmendCYA
 
         }
 
@@ -530,7 +531,7 @@ class CompanyNavigatorSpec extends SpecBase {
             CompanyAddressYesNoPage,
             AmendMode,
             answers
-          ) mustBe CompanyAmendCYA
+          ) mustBe controllers.add.company.routes.CompanyAddressController.redirectToAmendAddressLookup()
         }
 
         "to Company CYA when answer is No" in {
