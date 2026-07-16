@@ -18,7 +18,7 @@ package viewmodels.checkAnswers.add.partnership
 
 import controllers.add.partnership.routes
 import helpers.CyaEncodingSpecHelper
-import models.{CheckMode, UserAnswers}
+import models.{AmendMode, CheckMode, UserAnswers}
 import org.scalatest.OptionValues.convertOptionToValuable
 import org.scalatest.TryValues.convertTryToSuccessOrFailure
 import org.scalatest.freespec.AnyFreeSpec
@@ -66,6 +66,47 @@ class PartnershipWorksReferenceNumberSummarySpec extends AnyFreeSpec with Matche
       val expectedHref       =
         routes.PartnershipWorksReferenceNumberController
           .onPageLoad(CheckMode)
+          .url
+      val expectedHiddenText =
+        messages("partnershipWorksReferenceNumber.change.hidden")
+
+      changeAction.content.asHtml.toString    should include(expectedChangeText)
+      changeAction.href                     shouldBe expectedHref
+      changeAction.visuallyHiddenText.value shouldBe expectedHiddenText
+      changeAction.attributes                   must contain("id" -> "partnership-works-reference-number")
+    }
+
+    "must return a SummaryListRow when the answer exists in Amend journey" in {
+
+      val answers =
+        UserAnswers("test-id")
+          .set(PartnershipWorksReferenceNumberPage, "ABC123456")
+          .success
+          .value
+
+      val maybeRow =
+        PartnershipWorksReferenceNumberSummary.row(answers, AmendMode)
+
+      maybeRow shouldBe defined
+
+      val row = maybeRow.value
+
+      val expectedKeyText =
+        messages("partnershipWorksReferenceNumber.checkYourAnswersLabel")
+
+      row.key.content.asHtml.toString should include(expectedKeyText)
+
+      row.value.content.asHtml.toString should include("ABC123456")
+
+      row.actions shouldBe defined
+      val actions = row.actions.value.items
+      actions should have size 1
+
+      val changeAction       = actions.head
+      val expectedChangeText = messages("site.change")
+      val expectedHref       =
+        routes.PartnershipWorksReferenceNumberController
+          .onPageLoad(AmendMode)
           .url
       val expectedHiddenText =
         messages("partnershipWorksReferenceNumber.change.hidden")

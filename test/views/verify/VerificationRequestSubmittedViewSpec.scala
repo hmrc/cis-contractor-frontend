@@ -70,7 +70,7 @@ class VerificationRequestSubmittedViewSpec extends SpecBase with GuiceOneAppPerS
       doc.select("p.govuk-body").text must include(email)
 
       val emailVerificationLink =
-        doc.select(s"a[href='#']")
+        doc.select(s"a[href='${appConfig.verificationHistoryUrl}']")
 
       emailVerificationLink.text must include(
         messages("verify.verificationRequestSubmitted.email.verification.link")
@@ -168,6 +168,7 @@ class VerificationRequestSubmittedViewSpec extends SpecBase with GuiceOneAppPerS
     val viewModel: VerificationRequestSubmittedViewModel =
       VerificationRequestSubmittedViewModel(
         manageSubcontractorsUrl = s"${applicationConfig.manageSubcontractorsUrl}/$cisId",
+        verificationHistoryUrl = applicationConfig.verificationHistoryUrl,
         referenceNumber = referenceNumber,
         submittedAt = submittedAt,
         subcontractorsToVerify = subcontractorsToVerify,

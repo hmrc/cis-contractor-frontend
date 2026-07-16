@@ -32,7 +32,7 @@ import play.api.test.Helpers.*
 import repositories.SessionRepository
 import services.SubcontractorService
 import uk.gov.hmrc.http.HeaderCarrier
-import models.contact.ContactOptions
+import models.contact.ContactMethodOptions
 
 import scala.concurrent.Future
 
@@ -63,6 +63,9 @@ class CompanyCheckYourAnswersControllerSpec extends SpecBase {
       .set(CompanyAddressYesNoPage, false)
       .success
       .value
+      .set(AddCompanyContactMethodsYesNoPage, false)
+      .success
+      .value
       .set(CompanyUtrYesNoPage, false)
       .success
       .value
@@ -73,22 +76,11 @@ class CompanyCheckYourAnswersControllerSpec extends SpecBase {
       .success
       .value
 
-  private val validUaForSubmit: UserAnswers =
-    minUa
-      .set(CompanyContactOptionsPage, ContactOptions.NoDetails)
-      .success
-      .value
-
   "CompanyCheckYourAnswers Controller" - {
 
     "must return OK and the correct view for a GET when optionals are not present" in {
-      val ua =
-        minUa
-          .set(CompanyContactOptionsPage, ContactOptions.NoDetails)
-          .success
-          .value
 
-      val application = applicationBuilder(userAnswers = Some(ua)).build()
+      val application = applicationBuilder(userAnswers = Some(minUa)).build()
 
       running(application) {
         val request =
@@ -113,10 +105,22 @@ class CompanyCheckYourAnswersControllerSpec extends SpecBase {
 
       val ua =
         minUa
-          .set(CompanyContactOptionsPage, ContactOptions.Email)
+          .set(AddCompanyContactMethodsYesNoPage, true)
+          .success
+          .value
+          .set(
+            CompanyContactMethodOptionsPage,
+            Set(ContactMethodOptions.Email, ContactMethodOptions.Phone, ContactMethodOptions.Mobile)
+          )
           .success
           .value
           .set(CompanyEmailAddressPage, "one@two.three")
+          .success
+          .value
+          .set(CompanyPhoneNumberPage, "11111111")
+          .success
+          .value
+          .set(CompanyMobileNumberPage, "22222222")
           .success
           .value
           .set(CompanyAddressYesNoPage, true)
@@ -154,12 +158,17 @@ class CompanyCheckYourAnswersControllerSpec extends SpecBase {
 
         status(result) mustEqual OK
         val content = contentAsString(result)
-        content must include("Test Company Ltd")
-        content must include("one@two.three")
-        content must include("1234567890")
-        content must include("AC012345")
-        content must include("WRN-001")
-        content must include("1 Test Street")
+        content                 must include("Test Company Ltd")
+        contentAsString(result) must include("Email address")
+        contentAsString(result) must include("Phone number")
+        contentAsString(result) must include("Mobile number")
+        contentAsString(result) must include("one@two.three")
+        contentAsString(result) must include("11111111")
+        contentAsString(result) must include("22222222")
+        content                 must include("1234567890")
+        content                 must include("AC012345")
+        content                 must include("WRN-001")
+        content                 must include("1 Test Street")
       }
     }
 
@@ -208,7 +217,7 @@ class CompanyCheckYourAnswersControllerSpec extends SpecBase {
         .thenReturn(Future.successful(true))
 
       val application =
-        applicationBuilder(userAnswers = Some(validUaForSubmit))
+        applicationBuilder(userAnswers = Some(minUa))
           .overrides(
             bind[SubcontractorService].toInstance(mockSubcontractorService),
             bind[SessionRepository].toInstance(mockSessionRepository)
@@ -234,7 +243,7 @@ class CompanyCheckYourAnswersControllerSpec extends SpecBase {
 
     "must redirect to Journey Recovery and not resubmit when already submitted flag is set" in {
       val submittedUa =
-        validUaForSubmit.set(CheckYourAnswersSubmittedPage, true).success.value
+        minUa.set(CheckYourAnswersSubmittedPage, true).success.value
 
       val mockSubcontractorService = mock[SubcontractorService]
       val mockSessionRepository    = mock[SessionRepository]
@@ -270,7 +279,7 @@ class CompanyCheckYourAnswersControllerSpec extends SpecBase {
         .thenReturn(Future.failed(new RuntimeException("boom")))
 
       val application =
-        applicationBuilder(userAnswers = Some(validUaForSubmit))
+        applicationBuilder(userAnswers = Some(minUa))
           .overrides(
             bind[SubcontractorService].toInstance(mockSubcontractorService),
             bind[SessionRepository].toInstance(mockSessionRepository)
@@ -342,9 +351,15 @@ class CompanyCheckYourAnswersControllerSpec extends SpecBase {
 
   "company contact option validation" - {
 
-    "must return OK when Email is selected and a mobile number is present" in {
+    "must return OK when Email is selected and an email is present" in {
       val ua = minUa
-        .set(CompanyContactOptionsPage, ContactOptions.Email)
+        .set(AddCompanyContactMethodsYesNoPage, true)
+        .success
+        .value
+        .set(
+          CompanyContactMethodOptionsPage,
+          Set(ContactMethodOptions.Email)
+        )
         .success
         .value
         .set(CompanyEmailAddressPage, "one@two.three")
@@ -365,7 +380,13 @@ class CompanyCheckYourAnswersControllerSpec extends SpecBase {
 
     "must return OK when Phone is selected and a phone number is present" in {
       val ua = minUa
-        .set(CompanyContactOptionsPage, ContactOptions.Phone)
+        .set(AddCompanyContactMethodsYesNoPage, true)
+        .success
+        .value
+        .set(
+          CompanyContactMethodOptionsPage,
+          Set(ContactMethodOptions.Phone)
+        )
         .success
         .value
         .set(CompanyPhoneNumberPage, "01234567890")
@@ -386,7 +407,13 @@ class CompanyCheckYourAnswersControllerSpec extends SpecBase {
 
     "must return OK when Mobile is selected and a mobile number is present" in {
       val ua = minUa
-        .set(CompanyContactOptionsPage, ContactOptions.Mobile)
+        .set(AddCompanyContactMethodsYesNoPage, true)
+        .success
+        .value
+        .set(
+          CompanyContactMethodOptionsPage,
+          Set(ContactMethodOptions.Mobile)
+        )
         .success
         .value
         .set(CompanyMobileNumberPage, "07123456789")
@@ -405,27 +432,16 @@ class CompanyCheckYourAnswersControllerSpec extends SpecBase {
       }
     }
 
-    "must return OK when NoDetails is selected and no contact details are present" in {
-      val ua = minUa
-        .set(CompanyContactOptionsPage, ContactOptions.NoDetails)
-        .success
-        .value
-
-      val application = applicationBuilder(userAnswers = Some(ua)).build()
-
-      running(application) {
-        val request =
-          FakeRequest(GET, controllers.add.company.routes.CompanyCheckYourAnswersController.onPageLoad().url)
-        val result  = route(application, request).value
-
-        status(result) mustEqual OK
-      }
-    }
-
     "must redirect to Journey Recovery when Email is selected but email address is missing" in {
       val ua =
         minUa
-          .set(CompanyContactOptionsPage, ContactOptions.Email)
+          .set(AddCompanyContactMethodsYesNoPage, true)
+          .success
+          .value
+          .set(
+            CompanyContactMethodOptionsPage,
+            Set(ContactMethodOptions.Email)
+          )
           .success
           .value
 
@@ -442,7 +458,13 @@ class CompanyCheckYourAnswersControllerSpec extends SpecBase {
     "must redirect to Journey Recovery when Phone is selected but phone number is missing" in {
       val ua =
         minUa
-          .set(CompanyContactOptionsPage, ContactOptions.Phone)
+          .set(AddCompanyContactMethodsYesNoPage, true)
+          .success
+          .value
+          .set(
+            CompanyContactMethodOptionsPage,
+            Set(ContactMethodOptions.Phone)
+          )
           .success
           .value
 
@@ -459,7 +481,13 @@ class CompanyCheckYourAnswersControllerSpec extends SpecBase {
     "must redirect to Journey Recovery when Mobile is selected but mobile number is missing" in {
       val ua =
         minUa
-          .set(CompanyContactOptionsPage, ContactOptions.Mobile)
+          .set(AddCompanyContactMethodsYesNoPage, true)
+          .success
+          .value
+          .set(
+            CompanyContactMethodOptionsPage,
+            Set(ContactMethodOptions.Mobile)
+          )
           .success
           .value
 
@@ -473,10 +501,10 @@ class CompanyCheckYourAnswersControllerSpec extends SpecBase {
       }
     }
 
-    "must redirect to Journey Recovery when NoDetails is selected but stale contact data exists" in {
+    "must redirect to Journey Recovery when AddCompanyContactMethodsYesNoPage is false but stale contact data remains in the session" in {
       val uaBase =
         minUa
-          .set(CompanyContactOptionsPage, ContactOptions.NoDetails)
+          .set(AddCompanyContactMethodsYesNoPage, false)
           .success
           .value
 
@@ -491,6 +519,24 @@ class CompanyCheckYourAnswersControllerSpec extends SpecBase {
         redirectLocation(result).value must include("/there-is-a-problem")
       }
     }
+
+    "must redirect to Journey Recovery when AddCompanyContactMethodsYesNoPage is true but CompanyContactMethodOptionsPage answer is missing" in {
+      val ua = minUa
+        .set(AddCompanyContactMethodsYesNoPage, true)
+        .success
+        .value
+
+      val application = applicationBuilder(userAnswers = Some(ua)).build()
+
+      running(application) {
+        val request =
+          FakeRequest(GET, controllers.add.company.routes.CompanyCheckYourAnswersController.onPageLoad().url)
+        val result  = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value must include("/there-is-a-problem")
+      }
+    }
   }
 
   "company contact option change cleanup" - {
@@ -498,13 +544,22 @@ class CompanyCheckYourAnswersControllerSpec extends SpecBase {
     "must return OK when switching from Email to Phone and stale email is cleaned up" in {
       val ua =
         minUa
-          .set(CompanyContactOptionsPage, ContactOptions.Email)
+          .set(AddCompanyContactMethodsYesNoPage, true)
+          .success
+          .value
+          .set(
+            CompanyContactMethodOptionsPage,
+            Set(ContactMethodOptions.Email)
+          )
           .success
           .value
           .set(CompanyEmailAddressPage, "old@email.com")
           .success
           .value
-          .set(CompanyContactOptionsPage, ContactOptions.Phone)
+          .set(
+            CompanyContactMethodOptionsPage,
+            Set(ContactMethodOptions.Phone)
+          )
           .success
           .value
           .set(CompanyPhoneNumberPage, "01234567890")
@@ -517,6 +572,7 @@ class CompanyCheckYourAnswersControllerSpec extends SpecBase {
           FakeRequest(GET, controllers.add.company.routes.CompanyCheckYourAnswersController.onPageLoad().url)
         val result  = route(application, request).value
         status(result) mustEqual OK
+        contentAsString(result) mustNot include("old@email.com")
         contentAsString(result) must include("01234567890")
       }
     }
@@ -524,13 +580,22 @@ class CompanyCheckYourAnswersControllerSpec extends SpecBase {
     "must return OK when switching from Phone to Mobile and stale phone is cleaned up" in {
       val ua =
         minUa
-          .set(CompanyContactOptionsPage, ContactOptions.Phone)
+          .set(AddCompanyContactMethodsYesNoPage, true)
+          .success
+          .value
+          .set(
+            CompanyContactMethodOptionsPage,
+            Set(ContactMethodOptions.Phone)
+          )
           .success
           .value
           .set(CompanyPhoneNumberPage, "01234567890")
           .success
           .value
-          .set(CompanyContactOptionsPage, ContactOptions.Mobile)
+          .set(
+            CompanyContactMethodOptionsPage,
+            Set(ContactMethodOptions.Mobile)
+          )
           .success
           .value
           .set(CompanyMobileNumberPage, "07123456789")
@@ -543,20 +608,27 @@ class CompanyCheckYourAnswersControllerSpec extends SpecBase {
           FakeRequest(GET, controllers.add.company.routes.CompanyCheckYourAnswersController.onPageLoad().url)
         val result  = route(application, request).value
         status(result) mustEqual OK
+        contentAsString(result) mustNot include("01234567890")
         contentAsString(result) must include("07123456789")
       }
     }
 
-    "must return OK when switching from Email to NoDetails and stale email is cleaned up" in {
+    "must return OK when switching from Email to to AddTrustContactMethodsYesNoPage false and stale email is cleaned up" in {
       val ua =
         minUa
-          .set(CompanyContactOptionsPage, ContactOptions.Email)
+          .set(AddCompanyContactMethodsYesNoPage, true)
+          .success
+          .value
+          .set(
+            CompanyContactMethodOptionsPage,
+            Set(ContactMethodOptions.Email)
+          )
           .success
           .value
           .set(CompanyEmailAddressPage, "old@email.com")
           .success
           .value
-          .set(CompanyContactOptionsPage, ContactOptions.NoDetails)
+          .set(AddCompanyContactMethodsYesNoPage, false)
           .success
           .value
 
@@ -566,6 +638,7 @@ class CompanyCheckYourAnswersControllerSpec extends SpecBase {
           FakeRequest(GET, controllers.add.company.routes.CompanyCheckYourAnswersController.onPageLoad().url)
         val result  = route(application, request).value
         status(result) mustEqual OK
+        contentAsString(result) mustNot include("old@email.com")
       }
     }
   }
@@ -582,12 +655,6 @@ class CompanyCheckYourAnswersControllerSpec extends SpecBase {
       )
 
       val ua = minUa
-        .set(CompanyContactOptionsPage, ContactOptions.Email)
-        .success
-        .value
-        .set(CompanyEmailAddressPage, "one@two.three")
-        .success
-        .value
         .set(CompanyAddressYesNoPage, true)
         .success
         .value
@@ -611,12 +678,6 @@ class CompanyCheckYourAnswersControllerSpec extends SpecBase {
 
     "must return OK when CompanyUtrYesNoPage changes from Yes to No and stale UTR values are cleaned up" in {
       val ua = minUa
-        .set(CompanyContactOptionsPage, ContactOptions.Email)
-        .success
-        .value
-        .set(CompanyEmailAddressPage, "one@two.three")
-        .success
-        .value
         .set(CompanyUtrYesNoPage, true)
         .success
         .value
@@ -640,12 +701,6 @@ class CompanyCheckYourAnswersControllerSpec extends SpecBase {
 
     "must return OK when CompanyCrnYesNoPage changes from Yes to No and stale Crn values are cleaned up" in {
       val ua = minUa
-        .set(CompanyContactOptionsPage, ContactOptions.Email)
-        .success
-        .value
-        .set(CompanyEmailAddressPage, "one@two.three")
-        .success
-        .value
         .set(CompanyCrnYesNoPage, true)
         .success
         .value
@@ -669,12 +724,6 @@ class CompanyCheckYourAnswersControllerSpec extends SpecBase {
 
     "must return OK when CompanyWorksReferenceYesNoPage changes from Yes to No and stale WorksReference values are cleaned up" in {
       val ua = minUa
-        .set(CompanyContactOptionsPage, ContactOptions.Email)
-        .success
-        .value
-        .set(CompanyEmailAddressPage, "one@two.three")
-        .success
-        .value
         .set(CompanyWorksReferenceYesNoPage, true)
         .success
         .value
@@ -706,9 +755,6 @@ class CompanyCheckYourAnswersControllerSpec extends SpecBase {
 
       val uaBase =
         minUa
-          .set(CompanyContactOptionsPage, ContactOptions.NoDetails)
-          .success
-          .value
           .set(CompanyAddressYesNoPage, false)
           .success
           .value
@@ -728,9 +774,6 @@ class CompanyCheckYourAnswersControllerSpec extends SpecBase {
     "must redirect to Journey Recovery when CompanyUtrYesNo is false but UTR value is present (stale session)" in {
       val uaBase =
         minUa
-          .set(CompanyContactOptionsPage, ContactOptions.NoDetails)
-          .success
-          .value
           .set(CompanyUtrYesNoPage, false)
           .success
           .value
@@ -750,9 +793,6 @@ class CompanyCheckYourAnswersControllerSpec extends SpecBase {
     "must redirect to Journey Recovery when CompanyCrnYesNo is false but CRN value is present (stale session)" in {
       val uaBase =
         minUa
-          .set(CompanyContactOptionsPage, ContactOptions.NoDetails)
-          .success
-          .value
           .set(CompanyCrnYesNoPage, false)
           .success
           .value
@@ -772,9 +812,6 @@ class CompanyCheckYourAnswersControllerSpec extends SpecBase {
     "must redirect to Journey Recovery when WorksReferenceYesNo is false but works ref is present (stale session)" in {
       val uaBase =
         minUa
-          .set(CompanyContactOptionsPage, ContactOptions.NoDetails)
-          .success
-          .value
           .set(CompanyWorksReferenceYesNoPage, false)
           .success
           .value

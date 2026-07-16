@@ -14,17 +14,11 @@
  * limitations under the License.
  */
 
-package models.add.company
+package queries
 
-import models.contact.ContactOptions
-import play.api.i18n.Messages
-import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.RadioItem
+import models.amend.trust.OriginalTrustAnswers
+import play.api.libs.json.JsPath
 
-type CompanyContactOptions = ContactOptions
-
-object CompanyContactOptions {
-  val values: Seq[CompanyContactOptions] = ContactOptions.values
-
-  def options(implicit messages: Messages): Seq[RadioItem] =
-    ContactOptions.options("companyContactOptions")
+case object OriginalTrustAnswersQuery extends Gettable[OriginalTrustAnswers] with Settable[OriginalTrustAnswers] {
+  override def path: JsPath = JsPath \ "originalTrustAnswersQuery"
 }

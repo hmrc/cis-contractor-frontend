@@ -30,6 +30,7 @@ class TrustNavigatorSpec extends SpecBase {
   val navigator                    = new TrustNavigator
   private lazy val journeyRecovery = routes.JourneyRecoveryController.onPageLoad()
   private lazy val trustCYA        = controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
+  private lazy val trustAmendCYA   = journeyRecovery // TODO: redirect to amend cya page when implemented
 
   "TrustNavigator" - {
 
@@ -378,6 +379,125 @@ class TrustNavigatorSpec extends SpecBase {
 
       "must go from TrustNamePage to JourneyRecovery" in {
         navigator.nextPage(TrustNamePage, AmendMode, UserAnswers("id")) mustBe journeyRecovery
+      }
+
+      "must go from AddTrustContactMethodsYesNo" - {
+        "to amend CYA when answer is Yes and TrustContactMethodOptions already answered" in {
+          val answers = emptyUserAnswers
+            .setOrException(AddTrustContactMethodsYesNoPage, true)
+            .setOrException(TrustContactMethodOptionsPage, Set(ContactMethodOptions.Email, ContactMethodOptions.Phone))
+
+          navigator.nextPage(
+            AddTrustContactMethodsYesNoPage,
+            AmendMode,
+            answers
+          ) mustBe trustAmendCYA
+        }
+
+        "to TrustContactMethodOptions page when answer is Yes and TrustContactMethodOptions not yet answered" in {
+          val answers = emptyUserAnswers.setOrException(AddTrustContactMethodsYesNoPage, true)
+
+          navigator.nextPage(
+            AddTrustContactMethodsYesNoPage,
+            AmendMode,
+            answers
+          ) mustBe controllers.add.trust.routes.TrustContactMethodOptionsController.onPageLoad(AmendMode)
+        }
+
+        "to amend CYA when answer is No" in {
+          val answers = emptyUserAnswers.set(AddTrustContactMethodsYesNoPage, false).success.value
+
+          navigator.nextPage(
+            AddTrustContactMethodsYesNoPage,
+            AmendMode,
+            answers
+          ) mustBe trustAmendCYA
+        }
+
+        "to JourneyRecovery when answer is not present" in {
+          navigator.nextPage(
+            AddTrustContactMethodsYesNoPage,
+            AmendMode,
+            emptyUserAnswers
+          ) mustBe journeyRecovery
+        }
+      }
+
+      "must go from TrustUtrYesNoPage to TrustUtrController when answer is true and UTR not yet answered" in {
+        val ua = UserAnswers("id").set(TrustUtrYesNoPage, true).success.value
+        navigator.nextPage(TrustUtrYesNoPage, AmendMode, ua) mustBe
+          controllers.add.trust.routes.TrustUtrController.onPageLoad(AmendMode)
+      }
+
+      "must go from TrustUtrYesNoPage to amend cya page when answer is true and UTR already answered" in {
+        val ua = emptyUserAnswers
+          .setOrException(TrustUtrYesNoPage, true)
+          .setOrException(TrustUtrPage, "1234567890")
+        navigator.nextPage(TrustUtrYesNoPage, AmendMode, ua) mustBe trustAmendCYA
+      }
+
+      "must go from TrustUtrYesNoPage to amend cya page when answered No" in {
+        val ua = emptyUserAnswers.set(TrustUtrYesNoPage, false).success.value
+        navigator.nextPage(TrustUtrYesNoPage, AmendMode, ua) mustBe trustAmendCYA
+      }
+
+      "must go from TrustUtrYesNoPage to JourneyRecovery when answer is not present" in {
+        navigator.nextPage(TrustUtrYesNoPage, AmendMode, emptyUserAnswers) mustBe journeyRecovery
+      }
+
+      "must go from TrustUtrPage to amend cya page" in {
+        navigator.nextPage(TrustUtrPage, AmendMode, emptyUserAnswers) mustBe trustAmendCYA
+      }
+
+      "must go from TrustWorksReferenceYesNoPage to TrustWorksReferenceController when true and no work reference number exists" in {
+        val ua =
+          emptyUserAnswers.setOrException(TrustWorksReferenceYesNoPage, true)
+
+        navigator.nextPage(
+          TrustWorksReferenceYesNoPage,
+          AmendMode,
+          ua
+        ) mustBe controllers.add.trust.routes.TrustWorksReferenceController.onPageLoad(AmendMode)
+      }
+
+      "must go from WorksReferenceNumberYesNoPage to amend cya page when true and work reference number already exists" in {
+        val ua =
+          emptyUserAnswers
+            .setOrException(TrustWorksReferenceYesNoPage, true)
+            .setOrException(TrustWorksReferencePage, "wrn-1")
+
+        navigator.nextPage(
+          TrustWorksReferenceYesNoPage,
+          AmendMode,
+          ua
+        ) mustBe trustAmendCYA
+      }
+
+      "must go from WorksReferenceNumberYesNoPage to amend cya page when false" in {
+        val ua =
+          emptyUserAnswers.setOrException(TrustWorksReferenceYesNoPage, false)
+
+        navigator.nextPage(
+          TrustWorksReferenceYesNoPage,
+          AmendMode,
+          ua
+        ) mustBe trustAmendCYA
+      }
+
+      "must go from WorksReferenceNumberYesNoPage to JourneyRecovery when answer is missing" in {
+        navigator.nextPage(
+          TrustWorksReferenceYesNoPage,
+          AmendMode,
+          emptyUserAnswers
+        ) mustBe journeyRecovery
+      }
+
+      "must go from TrustWorksReferencePage to amend cya page" in {
+        navigator.nextPage(
+          TrustWorksReferencePage,
+          AmendMode,
+          UserAnswers("id")
+        ) mustBe trustAmendCYA
       }
     }
 

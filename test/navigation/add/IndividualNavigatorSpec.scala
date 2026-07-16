@@ -401,6 +401,17 @@ class IndividualNavigatorSpec extends SpecBase {
         ) mustBe journeyRecovery
       }
 
+      "must go from SubcontractorNamePage to Amend CYA" in {
+        navigator.nextPage(
+          SubcontractorNamePage,
+          AmendMode,
+          emptyUserAnswers.setOrException(
+            SubcontractorNamePage,
+            SubcontractorName(firstName = "Jane", middleName = None, lastName = "Doe")
+          )
+        ) mustBe journeyRecovery // TODO: this needs to be redirected to amend cya page when it's implemented
+      }
+
       "must go from WorksReferenceNumberYesNoPage to WorksReferenceNumberPage when true and no work reference number exists" in {
         val ua =
           emptyUserAnswers.setOrException(WorksReferenceNumberYesNoPage, true)
