@@ -31,7 +31,7 @@ import utils.SubcontractorNameExtractor
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 
-class AddressOfSubcontractorController @Inject() (
+trait AddressOfSubcontractorController @Inject() (
   override val messagesApi: MessagesApi,
   override protected val sessionRepository: SessionRepository,
   override protected val identify: IdentifierAction,
@@ -65,5 +65,5 @@ class AddressOfSubcontractorController @Inject() (
         .onPageLoad() // TODO - redirect to AmendIndividualCheckYourAnswersController once AmendIndividualCheckYourAnswers is added
     else controllers.add.routes.CheckYourAnswersController.onPageLoad()
 
-  override protected def redirectToAmendAddressLookup(): Action[AnyContent]
+  def redirectToAmendAddressLookup(): Action[AnyContent]
 }
