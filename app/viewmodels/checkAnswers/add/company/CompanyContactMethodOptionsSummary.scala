@@ -38,7 +38,7 @@ object CompanyContactMethodOptionsSummary {
       SummaryListRowViewModel(
         key = "companyContactMethodOptions.checkYourAnswersLabel",
         value = ValueViewModelHelper
-          .makeGovukBulletList(options)
+          .makeGovukBulletList(options, false)
           .getOrElse(ValueViewModel(HtmlContent(""))),
         actions = Seq(
           ActionItemViewModel(
@@ -46,7 +46,7 @@ object CompanyContactMethodOptionsSummary {
             controllers.add.company.routes.CompanyContactMethodOptionsController.onPageLoad(mode).url
           )
             .withVisuallyHiddenText(messages("companyContactMethodOptions.change.hidden"))
-            .withAttribute("id" -> "company-contact-methods")
+            .withAttribute("id" -> "company-methods-of-contact")
         )
       )
     }

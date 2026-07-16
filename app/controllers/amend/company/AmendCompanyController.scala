@@ -20,7 +20,6 @@ import controllers.actions.*
 import models.UserAnswers
 import models.address.{Address, Country}
 import models.amend.company.OriginalCompanyAnswers
-import models.contact.ContactOptions.Email
 import pages.add.*
 import pages.add.company.*
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -32,6 +31,7 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
 import models.TypeOfSubcontractor.Limitedcompany
+import models.contact.ContactMethodOptions
 
 // TODO: replace demo data with real backend fetch
 class AmendCompanyController @Inject() (
@@ -59,7 +59,7 @@ class AmendCompanyController @Inject() (
   private val companyOriginal                                          = OriginalCompanyAnswers(
     companyName = Some(companyName),
     address = Some(companyAddress),
-    companyContactMethod = Email,
+    companyContactMethod = Some(Set(ContactMethodOptions.Email)),
     email = Some(emailAddress),
     phone = None,
     mobile = None,
@@ -72,7 +72,8 @@ class AmendCompanyController @Inject() (
     ua <- ua.set(CompanyNamePage, companyName)
     ua <- ua.set(CompanyAddressYesNoPage, true)
     ua <- ua.set(CompanyAddressPage, companyAddress)
-    ua <- ua.set(CompanyContactOptionsPage, Email)
+    ua <- ua.set(AddCompanyContactMethodsYesNoPage, true)
+    ua <- ua.set(CompanyContactMethodOptionsPage, Set(ContactMethodOptions.Email))
     ua <- ua.set(CompanyEmailAddressPage, emailAddress)
     ua <- ua.set(CompanyUtrYesNoPage, true)
     ua <- ua.set(CompanyUtrPage, utr)

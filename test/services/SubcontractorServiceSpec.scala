@@ -765,7 +765,10 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
 
         val userAnswers =
           baseCompanyAnswers
-            .set(CompanyContactOptionsPage, ContactOptions.Email)
+            .set(AddCompanyContactMethodsYesNoPage, true)
+            .success
+            .value
+            .set(CompanyContactMethodOptionsPage, Set(ContactMethodOptions.Email))
             .success
             .value
             .set(CompanyEmailAddressPage, "c@example.com")
@@ -806,7 +809,10 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
 
         val userAnswers =
           baseCompanyAnswers
-            .set(CompanyContactOptionsPage, ContactOptions.Phone)
+            .set(AddCompanyContactMethodsYesNoPage, true)
+            .success
+            .value
+            .set(CompanyContactMethodOptionsPage, Set(ContactMethodOptions.Phone))
             .success
             .value
             .set(CompanyPhoneNumberPage, "02071234567")
@@ -847,7 +853,10 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
 
         val userAnswers =
           baseCompanyAnswers
-            .set(CompanyContactOptionsPage, ContactOptions.Mobile)
+            .set(AddCompanyContactMethodsYesNoPage, true)
+            .success
+            .value
+            .set(CompanyContactMethodOptionsPage, Set(ContactMethodOptions.Mobile))
             .success
             .value
             .set(CompanyMobileNumberPage, "07123456789")
@@ -888,7 +897,7 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
 
         val userAnswers =
           baseCompanyAnswers
-            .set(CompanyContactOptionsPage, ContactOptions.NoDetails)
+            .set(AddCompanyContactMethodsYesNoPage, false)
             .success
             .value
 
@@ -920,7 +929,10 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
 
         val userAnswers =
           baseCompanyAnswers
-            .remove(CompanyContactOptionsPage)
+            .set(AddCompanyContactMethodsYesNoPage, true)
+            .success
+            .value
+            .remove(AddCompanyContactMethodsYesNoPage)
             .success
             .value
 
