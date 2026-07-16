@@ -31,7 +31,7 @@ import utils.SubcontractorNameExtractor
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 
-class AddressOfSubcontractorController @Inject() (
+abstract class AddressOfSubcontractorController @Inject() (
   override val messagesApi: MessagesApi,
   override protected val sessionRepository: SessionRepository,
   override protected val identify: IdentifierAction,
