@@ -19,11 +19,14 @@ package controllers.add.trust
 import base.SpecBase
 import controllers.routes
 import forms.add.trust.TrustUtrFormProvider
-import models.{NormalMode, UserAnswers}
+import models.{AmendMode, NormalMode, UserAnswers}
+import navigation.Navigator
+import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{verify, verifyNoMoreInteractions, when}
 import org.scalatestplus.mockito.MockitoSugar
 import pages.add.trust.{TrustNamePage, TrustUtrPage}
+import pages.amend.AmendedPagesPage
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
@@ -85,18 +88,26 @@ class TrustUtrControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must redirect to the next page when valid data is submitted" in {
-
+    "must redirect to the next page and not add the page in AmendedPagesPage when valid data is submitted in NormalMode" in {
       val validValue = "5860920998"
 
+      val mockSessionRepository   = mock[SessionRepository]
+      val mockNavigator           = mock[Navigator]
       val mockSubcontractorService = mock[SubcontractorService]
+      val captor = ArgumentCaptor.forClass(classOf[UserAnswers])
 
       when(mockSubcontractorService.isDuplicateUTR(any[UserAnswers], any[String])(any[HeaderCarrier]))
         .thenReturn(Future.successful(false))
+      when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
+
+      when(mockNavigator.nextPage(any(), any(), any()))
+        .thenReturn(controllers.add.trust.routes.TrustWorksReferenceYesNoController.onPageLoad(NormalMode))
 
       val application =
         applicationBuilder(userAnswers = Some(uaWithName))
           .overrides(
+            bind[Navigator].toInstance(mockNavigator),
+            bind[SessionRepository].toInstance(mockSessionRepository),
             bind[SubcontractorService].toInstance(mockSubcontractorService)
           )
           .build()
@@ -104,15 +115,74 @@ class TrustUtrControllerSpec extends SpecBase with MockitoSugar {
       running(application) {
         val request =
           FakeRequest(POST, trustUtrRoute)
-            .withFormUrlEncodedBody(("value", validValue))
+            .withFormUrlEncodedBody("value" -> validValue)
 
         val result = route(application, request).value
-
         status(result) mustEqual SEE_OTHER
-      }
+        verify(mockSessionRepository).set(captor.capture())
 
-      verify(mockSubcontractorService).isDuplicateUTR(any[UserAnswers], any[String])(any[HeaderCarrier])
-      verifyNoMoreInteractions(mockSubcontractorService)
+        val updatedAnswers = captor.getValue
+
+        updatedAnswers.get(TrustUtrPage) mustBe Some(validValue)
+        updatedAnswers.get(AmendedPagesPage) mustBe None
+
+        verify(mockSubcontractorService)
+          .isDuplicateUTR(any[UserAnswers], any[String])(any[HeaderCarrier])
+
+        verifyNoMoreInteractions(mockSubcontractorService)
+      }
+    }
+
+    "must add TrustUtrPage to AmendedPagesPage when submitted in AmendMode" in {
+      val validValue = "5860920998"
+
+      val mockSessionRepository = mock[SessionRepository]
+      val mockNavigator = mock[Navigator]
+      val mockSubcontractorService = mock[SubcontractorService]
+
+      val captor = ArgumentCaptor.forClass(classOf[UserAnswers])
+
+      when(mockSubcontractorService.isDuplicateUTR(any[UserAnswers], any[String])(any[HeaderCarrier]))
+        .thenReturn(Future.successful(false))
+
+      when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
+
+      when(mockNavigator.nextPage(any(), any(), any()))
+        .thenReturn(
+          controllers.add.trust.routes.TrustWorksReferenceYesNoController
+            .onPageLoad(AmendMode)
+        )
+
+      val application =
+        applicationBuilder(userAnswers = Some(uaWithName))
+          .overrides(
+            bind[Navigator].toInstance(mockNavigator),
+            bind[SessionRepository].toInstance(mockSessionRepository),
+            bind[SubcontractorService].toInstance(mockSubcontractorService)
+          )
+          .build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(
+            POST,
+            controllers.add.trust.routes.TrustUtrController
+              .onSubmit(AmendMode)
+              .url
+          ).withFormUrlEncodedBody(
+            "value" -> validValue
+          )
+
+        val result = route(application, request).value
+        status(result) mustEqual SEE_OTHER
+        verify(mockSessionRepository).set(captor.capture())
+
+        val updatedAnswers = captor.getValue
+        updatedAnswers.get(TrustUtrPage) mustBe Some(validValue)
+
+        updatedAnswers.get(AmendedPagesPage).value must contain(TrustUtrPage.toString)
+      }
     }
 
     "must return a Bad Request and show duplicate error when UTR already exists" in {

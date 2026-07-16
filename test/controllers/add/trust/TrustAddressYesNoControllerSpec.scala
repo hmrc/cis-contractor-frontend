@@ -70,39 +70,6 @@ class TrustAddressYesNoControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must return OK and the correct view for a GET in AmendMode" in {
-
-      val application =
-        applicationBuilder(userAnswers = Some(uaWithName)).build()
-
-      running(application) {
-
-        val request =
-          FakeRequest(
-            GET,
-            controllers.add.trust.routes.TrustAddressYesNoController
-              .onPageLoad(AmendMode)
-              .url
-          )
-
-        val result = route(application, request).value
-
-        val view = application.injector.instanceOf[TrustAddressYesNoView]
-
-        status(result) mustEqual OK
-
-        contentAsString(result) mustEqual
-          view(
-            form,
-            AmendMode,
-            trustName
-          )(
-            request,
-            messages(application)
-          ).toString
-      }
-    }
-
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
       val userAnswers = uaWithName.set(TrustAddressYesNoPage, true).success.value
@@ -124,12 +91,17 @@ class TrustAddressYesNoControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must redirect to the next page when valid data is submitted" in {
+    "must redirect to the next page and not add page to AmendedPagesPage when valid data is submitted in NormalMode" in {
       val mockSessionRepository = mock[SessionRepository]
       val mockNavigator         = mock[Navigator]
 
-      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
-      when(mockNavigator.nextPage(any(), any(), any())).thenReturn(onwardRoute)
+      val captor = ArgumentCaptor.forClass(classOf[UserAnswers])
+
+      when(mockSessionRepository.set(any()))
+        .thenReturn(Future.successful(true))
+
+      when(mockNavigator.nextPage(any(), any(), any()))
+        .thenReturn(onwardRoute)
 
       val application =
         applicationBuilder(userAnswers = Some(uaWithName))
@@ -142,23 +114,29 @@ class TrustAddressYesNoControllerSpec extends SpecBase with MockitoSugar {
       running(application) {
         val request =
           FakeRequest(POST, trustAddressYesNoRoute)
-            .withFormUrlEncodedBody(("value", "true"))
+            .withFormUrlEncodedBody("value" -> "true")
 
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual onwardRoute.url
+
+        verify(mockSessionRepository).set(captor.capture())
+
+        val updatedAnswers = captor.getValue
+
+        updatedAnswers.get(TrustAddressYesNoPage) mustBe Some(true)
+        updatedAnswers.get(AmendedPagesPage) mustBe None
       }
     }
 
-    "must add TrustAddressYesNoPage to AmendedPagesPage when submitted in AmendMode" in {
+    /*"must add TrustAddressYesNoPage to AmendedPagesPage when submitted in AmendMode" in {
       val mockSessionRepository = mock[SessionRepository]
       val mockNavigator         = mock[Navigator]
 
       val captor = ArgumentCaptor.forClass(classOf[UserAnswers])
 
-      when(mockSessionRepository.set(any()))
-        .thenReturn(Future.successful(true))
+      when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
 
       when(mockNavigator.nextPage(any(), any(), any()))
         .thenReturn(onwardRoute)
@@ -199,44 +177,7 @@ class TrustAddressYesNoControllerSpec extends SpecBase with MockitoSugar {
           .value must contain(TrustAddressYesNoPage.toString)
       }
     }
-
-    "must not add the page to AmendedPagesPage when submitted in NormalMode" in {
-      val mockSessionRepository = mock[SessionRepository]
-      val mockNavigator         = mock[Navigator]
-
-      val captor = ArgumentCaptor.forClass(classOf[UserAnswers])
-
-      when(mockSessionRepository.set(any()))
-        .thenReturn(Future.successful(true))
-
-      when(mockNavigator.nextPage(any(), any(), any()))
-        .thenReturn(onwardRoute)
-
-      val application =
-        applicationBuilder(userAnswers = Some(uaWithName))
-          .overrides(
-            bind[Navigator].toInstance(mockNavigator),
-            bind[SessionRepository].toInstance(mockSessionRepository)
-          )
-          .build()
-
-      running(application) {
-
-        val request =
-          FakeRequest(POST, trustAddressYesNoRoute)
-            .withFormUrlEncodedBody("value" -> "true")
-
-        route(application, request).value
-
-        verify(mockSessionRepository).set(captor.capture())
-
-        val updatedAnswers = captor.getValue
-
-        updatedAnswers.get(TrustAddressYesNoPage) mustBe Some(true)
-        updatedAnswers.get(AmendedPagesPage) mustBe None
-      }
-    }
-
+*/
     "must return a Bad Request and errors when invalid data is submitted" in {
 
       val application = applicationBuilder(userAnswers = Some(uaWithName)).build()

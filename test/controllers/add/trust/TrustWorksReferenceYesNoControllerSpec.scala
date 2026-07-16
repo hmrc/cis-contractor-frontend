@@ -19,12 +19,14 @@ package controllers.add.trust
 import base.SpecBase
 import controllers.routes
 import forms.add.trust.TrustWorksReferenceYesNoFormProvider
-import models.{NormalMode, UserAnswers}
-import navigation.{FakeNavigator, Navigator}
+import models.{AmendMode, NormalMode, UserAnswers}
+import navigation.Navigator
+import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.when
+import org.mockito.Mockito.{verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import pages.add.trust.{TrustNamePage, TrustWorksReferenceYesNoPage}
+import pages.amend.AmendedPagesPage
 import play.api.data.Form
 import play.api.inject.bind
 import play.api.mvc.Call
@@ -34,10 +36,6 @@ import repositories.SessionRepository
 import views.html.add.trust.TrustWorksReferenceYesNoView
 
 import scala.concurrent.Future
-import models.AmendMode
-import org.mockito.ArgumentCaptor
-import org.mockito.Mockito.verify
-import pages.amend.AmendedPagesPage
 
 class TrustWorksReferenceYesNoControllerSpec extends SpecBase with MockitoSugar {
 
@@ -96,16 +94,22 @@ class TrustWorksReferenceYesNoControllerSpec extends SpecBase with MockitoSugar 
       }
     }
 
-    "must redirect to the next page when valid data with value Yes is submitted" in {
-
+    "must redirect to the next page and not add page to AmendedPagesPage when valid data with value Yes is submitted in NormalMode" in {
       val mockSessionRepository = mock[SessionRepository]
+      val mockNavigator = mock[Navigator]
 
-      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+      val captor = ArgumentCaptor.forClass(classOf[UserAnswers])
+
+      when(mockSessionRepository.set(any()))
+        .thenReturn(Future.successful(true))
+
+      when(mockNavigator.nextPage(any(), any(), any()))
+        .thenReturn(onwardRoute)
 
       val application =
         applicationBuilder(userAnswers = Some(uaWithName))
           .overrides(
-            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
+            bind[Navigator].toInstance(mockNavigator),
             bind[SessionRepository].toInstance(mockSessionRepository)
           )
           .build()
@@ -113,12 +117,19 @@ class TrustWorksReferenceYesNoControllerSpec extends SpecBase with MockitoSugar 
       running(application) {
         val request =
           FakeRequest(POST, trustWorksReferenceYesNoPostRoute)
-            .withFormUrlEncodedBody(("value", "true"))
+            .withFormUrlEncodedBody("value" -> "true")
 
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual onwardRoute.url
+
+        verify(mockSessionRepository).set(captor.capture())
+
+        val updatedAnswers = captor.getValue
+
+        updatedAnswers.get(TrustWorksReferenceYesNoPage) mustBe Some(true)
+        updatedAnswers.get(AmendedPagesPage) mustBe None
       }
     }
 
@@ -188,40 +199,6 @@ class TrustWorksReferenceYesNoControllerSpec extends SpecBase with MockitoSugar 
         updatedAnswers
           .get(AmendedPagesPage)
           .value must contain(TrustWorksReferenceYesNoPage.toString)
-      }
-    }
-
-    "must not add the page to AmendedPagesPage when submitted in NormalMode" in {
-      val mockSessionRepository = mock[SessionRepository]
-      val mockNavigator         = mock[Navigator]
-      val captor                = ArgumentCaptor.forClass(classOf[UserAnswers])
-
-      when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
-      when(mockNavigator.nextPage(any(), any(), any())).thenReturn(onwardRoute)
-
-      val application =
-        applicationBuilder(userAnswers = Some(uaWithName))
-          .overrides(
-            bind[Navigator].toInstance(mockNavigator),
-            bind[SessionRepository].toInstance(mockSessionRepository)
-          )
-          .build()
-
-      running(application) {
-        val request =
-          FakeRequest(POST, trustWorksReferenceYesNoPostRoute)
-            .withFormUrlEncodedBody(
-              "value" -> "true"
-            )
-
-        val result = route(application, request).value
-        status(result) mustEqual SEE_OTHER
-        verify(mockSessionRepository).set(captor.capture())
-
-        val updatedAnswers = captor.getValue
-
-        updatedAnswers.get(TrustWorksReferenceYesNoPage) mustBe Some(true)
-        updatedAnswers.get(AmendedPagesPage) mustBe None
       }
     }
 
