@@ -16,32 +16,103 @@
 
 package views.add.partnership
 
-import base.SpecBase
+import forms.add.partnership.PartnershipEmailAddressFormProvider
+import models.{AmendMode, NormalMode}
+import org.scalatest.matchers.must.Matchers
+import org.scalatest.wordspec.AnyWordSpec
+import org.scalatestplus.play.guice.GuiceOneAppPerSuite
+import play.api.data.Form
+import play.api.i18n.Messages
+import play.api.mvc.Request
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.twirl.api.HtmlFormat
+import views.html.add.partnership.PartnershipEmailAddressView
 
-class PartnershipEmailAddressViewSpec extends SpecBase {
+class PartnershipEmailAddressViewSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite {
 
-  "PartnershipEmailAddressView" - {
+  "PartnershipEmailAddressView" should {
 
-    "must render the view with the correct title and heading" in {
+    "must render the view with the correct title, heading, input and submit button" in new Setup {
+      val partnershipName = "Test Name"
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val html: HtmlFormat.Appendable = view(form, NormalMode, partnershipName)
+      val doc                         = org.jsoup.Jsoup.parse(html.toString())
 
-      running(application) {
-        val view = application.injector.instanceOf[views.html.add.partnership.PartnershipEmailAddressView]
+      doc.select("title").text() must include(messages("partnershipEmailAddress.title"))
 
-        val html = view(
-          form = new forms.add.partnership.PartnershipEmailAddressFormProvider()(),
-          mode = models.NormalMode,
-          name = "Test Partnership"
-        )(
-          FakeRequest(),
-          messages(application)
-        ).toString()
+      val heading = doc.select("h1")
+      heading.text() mustBe messages("partnershipEmailAddress.heading", partnershipName)
 
-        html must include(messages(application)("partnershipEmailAddress.heading", "Test Partnership"))
-      }
+      val hint = doc.select(".govuk-hint")
+      hint.text() mustBe messages("partnershipEmailAddress.hint")
+
+      doc
+        .select("form")
+        .attr("action") mustBe controllers.add.partnership.routes.PartnershipEmailAddressController
+        .onSubmit(NormalMode)
+        .url
+
+      doc.select("input[name=value]").size() mustBe 1
+
+      doc.select(".govuk-button").text() mustBe messages("site.continue")
     }
+
+    "must render the view with the correct title, heading, input and update button in amend journey" in new Setup {
+      val partnershipName = "Test Name"
+
+      val html: HtmlFormat.Appendable = view(form, AmendMode, partnershipName)
+      val doc                         = org.jsoup.Jsoup.parse(html.toString())
+
+      doc.select("title").text() must include(messages("partnershipEmailAddress.title"))
+
+      val heading = doc.select("h1")
+      heading.text() mustBe messages("partnershipEmailAddress.heading", partnershipName)
+
+      val hint = doc.select(".govuk-hint")
+      hint.text() mustBe messages("partnershipEmailAddress.hint")
+
+      doc
+        .select("form")
+        .attr("action") mustBe controllers.add.partnership.routes.PartnershipEmailAddressController
+        .onSubmit(AmendMode)
+        .url
+
+      doc.select("input[name=value]").size() mustBe 1
+
+      doc.select(".govuk-button").text() mustBe messages("site.update")
+    }
+
+    "display error summary and inline error when no name is entered" in new Setup {
+
+      val partnershipName = "Test Name"
+
+      val errorForm: Form[String] =
+        form.withError("value", "partnershipEmailAddress.error.required")
+
+      val html = view(errorForm, NormalMode, partnershipName)
+      val doc  = org.jsoup.Jsoup.parse(html.toString())
+
+      val summary = doc.select(".govuk-error-summary")
+      summary.text() must include(messages("partnershipEmailAddress.error.required"))
+
+      val linkHref = summary.select("a").attr("href")
+      linkHref mustBe "#value"
+
+      doc.select(".govuk-error-message").text() must include(messages("partnershipEmailAddress.error.required"))
+    }
+  }
+
+  trait Setup {
+    val formProvider       = new PartnershipEmailAddressFormProvider()
+    val form: Form[String] = formProvider()
+
+    implicit val request: Request[_] = FakeRequest()
+    implicit val messages: Messages  =
+      play.api.i18n.MessagesImpl(
+        play.api.i18n.Lang.defaultLang,
+        app.injector.instanceOf[play.api.i18n.MessagesApi]
+      )
+
+    val view: PartnershipEmailAddressView = app.injector.instanceOf[PartnershipEmailAddressView]
   }
 }

@@ -18,7 +18,7 @@ package viewmodels.checkAnswers.add.partnership
 
 import controllers.add.partnership.routes
 import helpers.CyaEncodingSpecHelper
-import models.{CheckMode, UserAnswers}
+import models.{AmendMode, CheckMode, UserAnswers}
 import org.scalatest.OptionValues.convertOptionToValuable
 import org.scalatest.TryValues.convertTryToSuccessOrFailure
 import org.scalatest.freespec.AnyFreeSpec
@@ -66,6 +66,47 @@ class PartnershipEmailAddressSummarySpec extends AnyFreeSpec with Matchers with 
       val expectedHref       =
         routes.PartnershipEmailAddressController
           .onPageLoad(CheckMode)
+          .url
+      val expectedHiddenText =
+        messages("partnershipEmailAddress.change.hidden")
+
+      changeAction.content.asHtml.toString    should include(expectedChangeText)
+      changeAction.href                     shouldBe expectedHref
+      changeAction.visuallyHiddenText.value shouldBe expectedHiddenText
+      changeAction.attributes                   must contain("id" -> "partnership-email-address")
+    }
+
+    "must return a SummaryListRow when the answer exists for Amend journey" in {
+
+      val answers =
+        UserAnswers("test-id")
+          .set(PartnershipEmailAddressPage, "ABC123456")
+          .success
+          .value
+
+      val maybeRow =
+        PartnershipEmailAddressSummary.row(answers, AmendMode)
+
+      maybeRow shouldBe defined
+
+      val row = maybeRow.value
+
+      val expectedKeyText =
+        messages("partnershipEmailAddress.checkYourAnswersLabel")
+
+      row.key.content.asHtml.toString should include(expectedKeyText)
+
+      row.value.content.asHtml.toString should include("ABC123456")
+
+      row.actions shouldBe defined
+      val actions = row.actions.value.items
+      actions should have size 1
+
+      val changeAction       = actions.head
+      val expectedChangeText = messages("site.change")
+      val expectedHref       =
+        routes.PartnershipEmailAddressController
+          .onPageLoad(AmendMode)
           .url
       val expectedHiddenText =
         messages("partnershipEmailAddress.change.hidden")

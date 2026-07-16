@@ -801,6 +801,353 @@ class PartnershipNavigatorSpec extends SpecBase {
           ) mustBe routes.JourneyRecoveryController.onPageLoad()
         }
       }
+
+      "contact method options" - {
+        "must go from AddPartnershipContactMethodsYesNo" - {
+          "to CYA when answer is Yes and PartnershipContactMethodOptions already answered" in {
+            val answers = emptyUserAnswers
+              .setOrException(AddPartnershipContactMethodsYesNoPage, true)
+              .setOrException(
+                PartnershipContactMethodOptionsPage,
+                Set(ContactMethodOptions.Email, ContactMethodOptions.Phone)
+              )
+
+            navigator.nextPage(
+              AddPartnershipContactMethodsYesNoPage,
+              AmendMode,
+              answers
+            ) mustBe partnershipAmendCYA
+          }
+
+          "to PartnershipContactMethodOptions page when answer is Yes and PartnershipContactMethodOptions not yet answered" in {
+            val answers = emptyUserAnswers.setOrException(AddPartnershipContactMethodsYesNoPage, true)
+
+            navigator.nextPage(
+              AddPartnershipContactMethodsYesNoPage,
+              AmendMode,
+              answers
+            ) mustBe controllers.add.partnership.routes.PartnershipContactMethodOptionsController.onPageLoad(AmendMode)
+          }
+
+          "to CYA when answer is No" in {
+            val answers = emptyUserAnswers.set(AddPartnershipContactMethodsYesNoPage, false).success.value
+
+            navigator.nextPage(
+              AddPartnershipContactMethodsYesNoPage,
+              AmendMode,
+              answers
+            ) mustBe partnershipAmendCYA
+          }
+
+          "to JourneyRecovery when answer is not present" in {
+            navigator.nextPage(
+              AddPartnershipContactMethodsYesNoPage,
+              AmendMode,
+              emptyUserAnswers
+            ) mustBe journeyRecovery
+          }
+        }
+
+        "must go from PartnershipContactMethodOptions" - {
+          "to PartnershipEmailAddressPage when Email is selected and Email answer not exist" in {
+            val answers = emptyUserAnswers
+              .set(
+                PartnershipContactMethodOptionsPage,
+                Set(ContactMethodOptions.Email)
+              )
+              .success
+              .value
+
+            navigator.nextPage(
+              PartnershipContactMethodOptionsPage,
+              AmendMode,
+              answers
+            ) mustBe controllers.add.partnership.routes.PartnershipEmailAddressController.onPageLoad(AmendMode)
+          }
+
+          "to PartnershipEmailAddressPage when Email, Phone and Mobile are selected and no Email answer not exist" in {
+            val answers = emptyUserAnswers
+              .set(
+                PartnershipContactMethodOptionsPage,
+                Set(ContactMethodOptions.Email, ContactMethodOptions.Phone, ContactMethodOptions.Mobile)
+              )
+              .success
+              .value
+
+            navigator.nextPage(
+              PartnershipContactMethodOptionsPage,
+              AmendMode,
+              answers
+            ) mustBe controllers.add.partnership.routes.PartnershipEmailAddressController.onPageLoad(AmendMode)
+          }
+
+          "to CYA when only Email is selected and Email answer exists" in {
+            val answers = emptyUserAnswers
+              .set(PartnershipContactMethodOptionsPage, Set(ContactMethodOptions.Email))
+              .success
+              .value
+              .set(PartnershipEmailAddressPage, "test@test.com")
+              .success
+              .value
+
+            navigator.nextPage(
+              PartnershipContactMethodOptionsPage,
+              AmendMode,
+              answers
+            ) mustBe partnershipAmendCYA
+          }
+
+          "to PartnershipPhoneNumberPage when Phone is selected (Email is not selected) and Phone answer not exists" in {
+            val answers = emptyUserAnswers
+              .set(
+                PartnershipContactMethodOptionsPage,
+                Set(ContactMethodOptions.Phone)
+              )
+              .success
+              .value
+
+            navigator.nextPage(
+              PartnershipContactMethodOptionsPage,
+              AmendMode,
+              answers
+            ) mustBe controllers.add.partnership.routes.PartnershipPhoneNumberController.onPageLoad(AmendMode)
+          }
+
+          "to CYA when only Phone is selected and Phone answer exists" in {
+            val answers = emptyUserAnswers
+              .set(PartnershipContactMethodOptionsPage, Set(ContactMethodOptions.Phone))
+              .success
+              .value
+              .set(PartnershipPhoneNumberPage, "01234567890")
+              .success
+              .value
+
+            navigator.nextPage(
+              PartnershipContactMethodOptionsPage,
+              AmendMode,
+              answers
+            ) mustBe partnershipAmendCYA
+          }
+
+          "to CYA when only Mobile is selected and Mobile answer exists" in {
+            val answers = emptyUserAnswers
+              .set(PartnershipContactMethodOptionsPage, Set(ContactMethodOptions.Mobile))
+              .success
+              .value
+              .set(PartnershipMobileNumberPage, "01234567890")
+              .success
+              .value
+
+            navigator.nextPage(
+              PartnershipContactMethodOptionsPage,
+              AmendMode,
+              answers
+            ) mustBe partnershipAmendCYA
+          }
+
+          "to PartnershipPhoneNumberPage when Email and Phone are selected and Email answer exists, Phone answer not exists" in {
+            val answers = emptyUserAnswers
+              .set(PartnershipContactMethodOptionsPage, Set(ContactMethodOptions.Email, ContactMethodOptions.Phone))
+              .success
+              .value
+              .set(PartnershipEmailAddressPage, "test@test.com")
+              .success
+              .value
+
+            navigator.nextPage(
+              PartnershipContactMethodOptionsPage,
+              AmendMode,
+              answers
+            ) mustBe controllers.add.partnership.routes.PartnershipPhoneNumberController.onPageLoad(AmendMode)
+          }
+
+          "to PartnershipMobileNumberPage when Email, Phone and Mobile are selected and Email and Phone answer exists, Mobile answer not exists" in {
+            val answers = emptyUserAnswers
+              .set(
+                PartnershipContactMethodOptionsPage,
+                Set(ContactMethodOptions.Email, ContactMethodOptions.Phone, ContactMethodOptions.Mobile)
+              )
+              .success
+              .value
+              .set(PartnershipEmailAddressPage, "test@test.com")
+              .success
+              .value
+              .set(PartnershipPhoneNumberPage, "01234567890")
+              .success
+              .value
+
+            navigator.nextPage(
+              PartnershipContactMethodOptionsPage,
+              AmendMode,
+              answers
+            ) mustBe controllers.add.partnership.routes.PartnershipMobileNumberController.onPageLoad(AmendMode)
+          }
+
+          "to JourneyRecovery when answer is not present" in {
+            navigator.nextPage(
+              PartnershipContactMethodOptionsPage,
+              AmendMode,
+              emptyUserAnswers
+            ) mustBe journeyRecovery
+          }
+        }
+
+        "must go from PartnershipEmailAddressPage" - {
+
+          "to PartnershipCheckYourAnswers when no missing ContactMethodOptions answer" in {
+            navigator.nextPage(
+              PartnershipEmailAddressPage,
+              AmendMode,
+              emptyUserAnswers
+                .setOrException(
+                  PartnershipContactMethodOptionsPage,
+                  Set(ContactMethodOptions.Email, ContactMethodOptions.Phone, ContactMethodOptions.Mobile)
+                )
+                .setOrException(PartnershipEmailAddressPage, "test@test.com")
+                .setOrException(PartnershipPhoneNumberPage, "1234567")
+                .setOrException(PartnershipMobileNumberPage, "1234567")
+            ) mustBe partnershipAmendCYA
+          }
+
+          "to PartnershipPhoneNumberPage when PartnershipPhoneNumber is missing from ContactMethodOptions answer" in {
+            navigator.nextPage(
+              PartnershipEmailAddressPage,
+              AmendMode,
+              emptyUserAnswers
+                .setOrException(
+                  PartnershipContactMethodOptionsPage,
+                  Set(ContactMethodOptions.Email, ContactMethodOptions.Phone, ContactMethodOptions.Mobile)
+                )
+                .setOrException(PartnershipEmailAddressPage, "test@test.com")
+                .setOrException(PartnershipMobileNumberPage, "1234567")
+            ) mustBe controllers.add.partnership.routes.PartnershipPhoneNumberController.onPageLoad(AmendMode)
+          }
+
+          "to PartnershipMobileNumberPage when PartnershipMobileNumber is missing from ContactMethodOptions answer" in {
+            navigator.nextPage(
+              PartnershipEmailAddressPage,
+              AmendMode,
+              emptyUserAnswers
+                .setOrException(
+                  PartnershipContactMethodOptionsPage,
+                  Set(ContactMethodOptions.Email, ContactMethodOptions.Phone, ContactMethodOptions.Mobile)
+                )
+                .setOrException(PartnershipEmailAddressPage, "test@test.com")
+                .setOrException(PartnershipPhoneNumberPage, "1234567")
+            ) mustBe controllers.add.partnership.routes.PartnershipMobileNumberController.onPageLoad(AmendMode)
+          }
+
+          "to JourneyRecovery when PartnershipContactMethodOptions answer is not present" in {
+            navigator.nextPage(
+              PartnershipEmailAddressPage,
+              AmendMode,
+              UserAnswers("id")
+            ) mustBe journeyRecovery
+          }
+
+          "to JourneyRecovery when Email is not in the selected PartnershipContactMethodOptions" in {
+            navigator.nextPage(
+              PartnershipEmailAddressPage,
+              AmendMode,
+              emptyUserAnswers
+                .setOrException(
+                  PartnershipContactMethodOptionsPage,
+                  Set(ContactMethodOptions.Phone, ContactMethodOptions.Mobile)
+                )
+            ) mustBe journeyRecovery
+          }
+        }
+
+        "must go from PartnershipPhoneNumberPage" - {
+
+          "to PartnershipCheckYourAnswers when no missing ContactMethodOptions answer" in {
+            navigator.nextPage(
+              PartnershipPhoneNumberPage,
+              AmendMode,
+              emptyUserAnswers
+                .setOrException(
+                  PartnershipContactMethodOptionsPage,
+                  Set(ContactMethodOptions.Email, ContactMethodOptions.Phone, ContactMethodOptions.Mobile)
+                )
+                .setOrException(PartnershipEmailAddressPage, "test@test.com")
+                .setOrException(PartnershipPhoneNumberPage, "1234567")
+                .setOrException(PartnershipMobileNumberPage, "1234567")
+            ) mustBe partnershipAmendCYA
+          }
+
+          "to PartnershipMobileNumberPage when PartnershipMobileNumber is missing from ContactMethodOptions answer" in {
+            navigator.nextPage(
+              PartnershipPhoneNumberPage,
+              AmendMode,
+              emptyUserAnswers
+                .setOrException(
+                  PartnershipContactMethodOptionsPage,
+                  Set(ContactMethodOptions.Email, ContactMethodOptions.Phone, ContactMethodOptions.Mobile)
+                )
+                .setOrException(PartnershipEmailAddressPage, "test@test.com")
+                .setOrException(PartnershipPhoneNumberPage, "1234567")
+            ) mustBe controllers.add.partnership.routes.PartnershipMobileNumberController.onPageLoad(AmendMode)
+          }
+
+          "to JourneyRecovery when PartnershipContactMethodOptions answer is not present" in {
+            navigator.nextPage(
+              PartnershipPhoneNumberPage,
+              AmendMode,
+              UserAnswers("id")
+            ) mustBe journeyRecovery
+          }
+
+          "to JourneyRecovery when Phone is not in the selected PartnershipContactMethodOptions" in {
+            navigator.nextPage(
+              PartnershipPhoneNumberPage,
+              AmendMode,
+              emptyUserAnswers
+                .setOrException(
+                  PartnershipContactMethodOptionsPage,
+                  Set(ContactMethodOptions.Email, ContactMethodOptions.Mobile)
+                )
+            ) mustBe journeyRecovery
+          }
+        }
+
+        "must go from PartnershipMobileNumberPage" - {
+
+          "to PartnershipCheckYourAnswers" in {
+            navigator.nextPage(
+              PartnershipMobileNumberPage,
+              AmendMode,
+              emptyUserAnswers
+                .setOrException(
+                  PartnershipContactMethodOptionsPage,
+                  Set(ContactMethodOptions.Email, ContactMethodOptions.Phone, ContactMethodOptions.Mobile)
+                )
+                .setOrException(PartnershipEmailAddressPage, "test@test.com")
+                .setOrException(PartnershipPhoneNumberPage, "1234567")
+                .setOrException(PartnershipMobileNumberPage, "1234567")
+            ) mustBe partnershipAmendCYA
+          }
+
+          "to JourneyRecovery when PartnershipContactMethodOptions answer is not present" in {
+            navigator.nextPage(
+              PartnershipMobileNumberPage,
+              AmendMode,
+              UserAnswers("id")
+            ) mustBe journeyRecovery
+          }
+
+          "to JourneyRecovery when Mobile is not in the selected PartnershipContactMethodOptions" in {
+            navigator.nextPage(
+              PartnershipMobileNumberPage,
+              AmendMode,
+              emptyUserAnswers
+                .setOrException(
+                  PartnershipContactMethodOptionsPage,
+                  Set(ContactMethodOptions.Email, ContactMethodOptions.Phone)
+                )
+            ) mustBe journeyRecovery
+          }
+        }
+      }
     }
 
     "in Check mode" - {
