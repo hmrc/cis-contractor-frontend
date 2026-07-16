@@ -59,7 +59,7 @@ class AddressOfSubcontractorController @Inject() (
   override protected def onCompletion(mode: Mode): Call =
     routes.IndividualChooseContactDetailsController.onPageLoad(mode)
 
-  override protected def onChangeCompletion: Call =
+  override protected def onChangeCompletion(isAmend: Boolean): Call =
     routes.CheckYourAnswersController.onPageLoad()
 
 }

@@ -90,6 +90,9 @@ class PartnershipNavigator @Inject() () extends NavigatorForJourney {
       _ => cyaRoute(AmendMode)
     case PartnershipNominatedPartnerCrnYesNoPage  => navigatorFromPartnershipNominatedPartnerCrnYesNoPage(AmendMode)(_)
     case PartnershipNominatedPartnerCrnPage       => navigatorFromPartnershipNominatedPartnerCrnPage(AmendMode)(_)
+    case PartnershipNominatedPartnerNinoYesNoPage =>
+      userAnswers => navigatorFromPartnershipNominatedPartnerNinoYesNoPage(AmendMode)(userAnswers)
+    case PartnershipNominatedPartnerNinoPage      => navigatorFromPartnershipNominatedPartnerNinoPage(AmendMode)(_)
     case _                                        => _ => cyaRoute(AmendMode)
   }
 
@@ -134,7 +137,7 @@ class PartnershipNavigator @Inject() () extends NavigatorForJourney {
         controllers.add.partnership.routes.PartnershipNominatedPartnerCrnYesNoController.onPageLoad(NormalMode)
 
       case (Some(_), CheckMode | AmendMode) =>
-        controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
+        cyaRoute(mode)
 
       case (None, _) =>
         routes.JourneyRecoveryController.onPageLoad()
@@ -268,13 +271,13 @@ class PartnershipNavigator @Inject() () extends NavigatorForJourney {
         userAnswers
           .get(PartnershipNominatedPartnerNinoPage)
           .fold(
-            controllers.add.partnership.routes.PartnershipNominatedPartnerNinoController.onPageLoad(CheckMode)
+            controllers.add.partnership.routes.PartnershipNominatedPartnerNinoController.onPageLoad(mode)
           ) { _ =>
-            controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
+            cyaRoute(mode)
           }
 
       case (Some(false), CheckMode | AmendMode) =>
-        controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
+        cyaRoute(mode)
 
       case (None, _) =>
         routes.JourneyRecoveryController.onPageLoad()

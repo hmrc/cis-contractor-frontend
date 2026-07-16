@@ -97,7 +97,7 @@ class CreateVerificationBatchAndVerificationsControllerSpec extends SpecBase wit
 
   "CreateVerificationBatchAndVerificationsController.onSubmit" - {
 
-    "must redirect to JourneyRecovery when CurrentVerificationBatchResponsePage is missing and not call service" in {
+    "must get current verification batch when CurrentVerificationBatchResponsePage is missing and redirect to JourneyRecovery when service fails" in {
       val mockService = mock[VerificationService]
 
       val ua =
@@ -105,6 +105,9 @@ class CreateVerificationBatchAndVerificationsControllerSpec extends SpecBase wit
           .set(SelectSubcontractorPage, Set(SubcontractorViewModel("10", "Name 10")))
           .success
           .value
+
+      when(mockService.getCurrentVerificationBatch(any[UserAnswers])(any()))
+        .thenReturn(Future.failed(new RuntimeException("current batch failed")))
 
       val app =
         applicationBuilder(userAnswers = Some(ua))
@@ -119,6 +122,8 @@ class CreateVerificationBatchAndVerificationsControllerSpec extends SpecBase wit
 
         status(result) mustBe SEE_OTHER
         redirectLocation(result).value mustBe routes.JourneyRecoveryController.onPageLoad().url
+
+        verify(mockService).getCurrentVerificationBatch(eqTo(ua))(any())
 
         verify(mockService, never())
           .createVerificationBatchAndVerifications(any[UserAnswers], any[Seq[Long]], any())(any())
@@ -191,7 +196,7 @@ class CreateVerificationBatchAndVerificationsControllerSpec extends SpecBase wit
       }
     }
 
-    "must call service with distinct combined ids when current batch is empty and then redirect to Index" in {
+    "must call service with distinct combined ids when current batch is empty and then redirect to CheckVerificationBatchReadiness" in {
       val mockService = mock[VerificationService]
 
       val ua =
@@ -235,7 +240,10 @@ class CreateVerificationBatchAndVerificationsControllerSpec extends SpecBase wit
         val result  = controller.onSubmit()(request)
 
         status(result) mustBe SEE_OTHER
-        redirectLocation(result).value mustBe routes.IndexController.onPageLoad().url
+        redirectLocation(result).value mustBe
+          controllers.verify.routes.CheckVerificationBatchReadinessController
+            .checkVerificationBatchReadiness()
+            .url
 
         val idsCaptor = ArgumentCaptor.forClass(classOf[Seq[Long]])
 
@@ -312,7 +320,10 @@ class CreateVerificationBatchAndVerificationsControllerSpec extends SpecBase wit
       val result  = controller.onSubmit()(request)
 
       status(result) mustBe SEE_OTHER
-      redirectLocation(result).value mustBe routes.IndexController.onPageLoad().url
+      redirectLocation(result).value mustBe
+        controllers.verify.routes.CheckVerificationBatchReadinessController
+          .checkVerificationBatchReadiness()
+          .url
 
       val idsCaptor = ArgumentCaptor.forClass(classOf[Seq[Long]])
       verify(mockService).createVerificationBatchAndVerifications(eqTo(ua), idsCaptor.capture(), eqTo(None))(any())
@@ -354,7 +365,10 @@ class CreateVerificationBatchAndVerificationsControllerSpec extends SpecBase wit
       val result  = controller.onSubmit()(request)
 
       status(result) mustBe SEE_OTHER
-      redirectLocation(result).value mustBe routes.IndexController.onPageLoad().url
+      redirectLocation(result).value mustBe
+        controllers.verify.routes.CheckVerificationBatchReadinessController
+          .checkVerificationBatchReadiness()
+          .url
 
       val idsCaptor = ArgumentCaptor.forClass(classOf[Seq[Long]])
       verify(mockService).createVerificationBatchAndVerifications(eqTo(ua), idsCaptor.capture(), eqTo(None))(any())
