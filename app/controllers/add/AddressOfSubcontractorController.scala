@@ -61,7 +61,7 @@ class AddressOfSubcontractorController @Inject() (
 
   override protected def onChangeCompletion(isAmend: Boolean): Call =
     if isAmend then
-      routes.JourneyRecoveryController
+      controllers.routes.JourneyRecoveryController
         .onPageLoad() // TODO - redirect to AmendIndividualCheckYourAnswer
     routes.CheckYourAnswersController.onPageLoad()
 
