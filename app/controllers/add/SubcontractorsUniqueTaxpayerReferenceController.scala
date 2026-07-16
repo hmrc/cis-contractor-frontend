@@ -74,19 +74,17 @@ class SubcontractorsUniqueTaxpayerReferenceController @Inject() (
           form
             .bindFromRequest()
             .fold(
-              formWithErrors =>
-                Future.successful(BadRequest(view(formWithErrors, mode, subcontractorName))),
+              formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, subcontractorName))),
               value =>
-                val value1 = request.userAnswers.get(SubcontractorsUniqueTaxpayerReferencePage)
-                def saveAndContinue = {
+                val value1          = request.userAnswers.get(SubcontractorsUniqueTaxpayerReferencePage)
+                def saveAndContinue =
                   for {
                     updatedAnswers <-
                       Future.fromTry(request.userAnswers.set(SubcontractorsUniqueTaxpayerReferencePage, value))
-                    _ <- sessionRepository.set(updatedAnswers)
+                    _              <- sessionRepository.set(updatedAnswers)
                   } yield Redirect(
                     navigator.nextPage(SubcontractorsUniqueTaxpayerReferencePage, mode, updatedAnswers)
                   )
-                }
 
                 mode match {
                   case AmendMode if value1.contains(value) =>
