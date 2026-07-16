@@ -323,10 +323,13 @@ GET   /subcontractor/add/partnership/check-address         controllers.add.partn
 POST  /subcontractor/add/partnership/check-address         controllers.add.partnership.PartnershipAddressYesNoController.onSubmit(mode: Mode = NormalMode)
 GET   /subcontractor/add/partnership/change-check-address  controllers.add.partnership.PartnershipAddressYesNoController.onPageLoad(mode: Mode = CheckMode)
 POST  /subcontractor/add/partnership/change-check-address  controllers.add.partnership.PartnershipAddressYesNoController.onSubmit(mode: Mode = CheckMode)
+GET   /subcontractor/amend/partnership/check-address       controllers.add.partnership.PartnershipAddressYesNoController.onPageLoad(mode: Mode = AmendMode)
+POST  /subcontractor/amend/partnership/check-address       controllers.add.partnership.PartnershipAddressYesNoController.onSubmit(mode: Mode = AmendMode)
 
 GET   /subcontractor/add/partnership/address                controllers.add.partnership.PartnershipAddressController.redirectToAddressLookup(mode: Mode = NormalMode, changeRoute: Option[String] ?= None)
 GET   /subcontractor/add/partnership/address-return         controllers.add.partnership.PartnershipAddressController.addressLookupCallback(id: String ?= "", mode: Mode = NormalMode)
 GET   /subcontractor/add/partnership/address-return/change  controllers.add.partnership.PartnershipAddressController.addressLookupCallbackChange(id: String ?= "", mode: Mode = NormalMode)
+GET   /subcontractor/amend/partnership/address-change       controllers.add.partnership.PartnershipAddressController.redirectToAmendAddressLookup()
 
 GET   /subcontractor/add/partnership/nominated-partner         controllers.add.partnership.PartnershipNominatedPartnerNameController.onPageLoad(mode: Mode = NormalMode)
 POST  /subcontractor/add/partnership/nominated-partner         controllers.add.partnership.PartnershipNominatedPartnerNameController.onSubmit(mode: Mode = NormalMode)
@@ -363,6 +366,8 @@ GET   /subcontractor/add/partnership/email-address         controllers.add.partn
 POST  /subcontractor/add/partnership/email-address         controllers.add.partnership.PartnershipEmailAddressController.onSubmit(mode: Mode = NormalMode)
 GET   /subcontractor/add/partnership/change-email-address  controllers.add.partnership.PartnershipEmailAddressController.onPageLoad(mode: Mode = CheckMode)
 POST  /subcontractor/add/partnership/change-email-address  controllers.add.partnership.PartnershipEmailAddressController.onSubmit(mode: Mode = CheckMode)
+GET   /subcontractor/amend/partnership/email-address       controllers.add.partnership.PartnershipEmailAddressController.onPageLoad(mode: Mode = AmendMode)
+POST  /subcontractor/amend/partnership/email-address       controllers.add.partnership.PartnershipEmailAddressController.onSubmit(mode: Mode = AmendMode)
 
 GET   /subcontractor/add/partnership/nominated-partner-has-utr         controllers.add.partnership.PartnershipNominatedPartnerUtrYesNoController.onPageLoad(mode: Mode = NormalMode)
 POST  /subcontractor/add/partnership/nominated-partner-has-utr         controllers.add.partnership.PartnershipNominatedPartnerUtrYesNoController.onSubmit(mode: Mode = NormalMode)
@@ -422,8 +427,8 @@ GET   /subcontractor/add/trust/phone-number         controllers.add.trust.TrustP
 POST  /subcontractor/add/trust/phone-number         controllers.add.trust.TrustPhoneNumberController.onSubmit(mode: Mode = NormalMode)
 GET   /subcontractor/add/trust/change-phone-number  controllers.add.trust.TrustPhoneNumberController.onPageLoad(mode: Mode = CheckMode)
 POST  /subcontractor/add/trust/change-phone-number  controllers.add.trust.TrustPhoneNumberController.onSubmit(mode: Mode = CheckMode)
-GET   /subcontractor/amend/trust/phone-number         controllers.add.trust.TrustPhoneNumberController.onPageLoad(mode: Mode = AmendMode)
-POST  /subcontractor/amend/trust/phone-number         controllers.add.trust.TrustPhoneNumberController.onSubmit(mode: Mode = AmendMode)
+GET   /subcontractor/amend/trust/phone-number       controllers.add.trust.TrustPhoneNumberController.onPageLoad(mode: Mode = AmendMode)
+POST  /subcontractor/amend/trust/phone-number       controllers.add.trust.TrustPhoneNumberController.onSubmit(mode: Mode = AmendMode)
 
 GET   /subcontractor/add/trust/mobile-number         controllers.add.trust.TrustMobileNumberController.onPageLoad(mode: Mode = NormalMode)
 POST  /subcontractor/add/trust/mobile-number         controllers.add.trust.TrustMobileNumberController.onSubmit(mode: Mode = NormalMode)
@@ -467,15 +472,15 @@ GET   /subcontractor/add/trust/add-contact-details         controllers.add.trust
 POST  /subcontractor/add/trust/add-contact-details         controllers.add.trust.AddTrustContactMethodsYesNoController.onSubmit(mode: Mode = NormalMode)
 GET   /subcontractor/add/trust/change-add-contact-details  controllers.add.trust.AddTrustContactMethodsYesNoController.onPageLoad(mode: Mode = CheckMode)
 POST  /subcontractor/add/trust/change-add-contact-details  controllers.add.trust.AddTrustContactMethodsYesNoController.onSubmit(mode: Mode = CheckMode)
-GET   /subcontractor/amend/trust/add-contact-details         controllers.add.trust.AddTrustContactMethodsYesNoController.onPageLoad(mode: Mode = AmendMode)
-POST  /subcontractor/amend/trust/add-contact-details         controllers.add.trust.AddTrustContactMethodsYesNoController.onSubmit(mode: Mode = AmendMode)
+GET   /subcontractor/amend/trust/add-contact-details       controllers.add.trust.AddTrustContactMethodsYesNoController.onPageLoad(mode: Mode = AmendMode)
+POST  /subcontractor/amend/trust/add-contact-details       controllers.add.trust.AddTrustContactMethodsYesNoController.onSubmit(mode: Mode = AmendMode)
 
 GET   /subcontractor/add/trust/select-contact-details         controllers.add.trust.TrustContactMethodOptionsController.onPageLoad(mode: Mode = NormalMode)
 POST  /subcontractor/add/trust/select-contact-details         controllers.add.trust.TrustContactMethodOptionsController.onSubmit(mode: Mode = NormalMode)
 GET   /subcontractor/add/trust/change-select-contact-details  controllers.add.trust.TrustContactMethodOptionsController.onPageLoad(mode: Mode = CheckMode)
 POST  /subcontractor/add/trust/change-select-contact-details  controllers.add.trust.TrustContactMethodOptionsController.onSubmit(mode: Mode = CheckMode)
-GET   /subcontractor/amend/trust/select-contact-details         controllers.add.trust.TrustContactMethodOptionsController.onPageLoad(mode: Mode = AmendMode)
-POST  /subcontractor/amend/trust/select-contact-details         controllers.add.trust.TrustContactMethodOptionsController.onSubmit(mode: Mode = AmendMode)
+GET   /subcontractor/amend/trust/select-contact-details       controllers.add.trust.TrustContactMethodOptionsController.onPageLoad(mode: Mode = AmendMode)
+POST  /subcontractor/amend/trust/select-contact-details       controllers.add.trust.TrustContactMethodOptionsController.onSubmit(mode: Mode = AmendMode)
 
 # Verify
 GET   /subcontractor/verify/confirmation-email-not-stored         controllers.verify.ContractorEmailConfirmationNotStoredController.onPageLoad(mode: Mode = NormalMode)
@@ -491,11 +496,9 @@ GET   /subcontractor/verify/polling                          controllers.verify.
 
 GET   /subcontractor/verify/no-subcontractors-added  controllers.verify.NoSubcontractorsAddedController.onPageLoad()
 
-GET   /subcontractor/verify/check-verification-batch-readiness  controllers.verify.CheckVerificationBatchReadinessController.checkVerificationBatchReadiness(mode: Mode = NormalMode)
-
+GET   /subcontractor/verify/check-verification-batch-readiness             controllers.verify.CheckVerificationBatchReadinessController.checkVerificationBatchReadiness(mode: Mode = NormalMode)
 GET   /subcontractor/verify/check-verification-batch-readiness/check-mode  controllers.verify.CheckVerificationBatchReadinessController.checkVerificationBatchReadinessInCheckMode()
-
-GET   /verify/check-verification-batch-readiness-before-declaration   controllers.verify.CheckVerificationBatchReadinessController.checkVerificationBatchReadinessBeforeDeclaration()
+GET   /verify/check-verification-batch-readiness-before-declaration        controllers.verify.CheckVerificationBatchReadinessController.checkVerificationBatchReadinessBeforeDeclaration()
 
 GET   /subcontractor/verify/newest                            controllers.verify.NewestVerificationBatchController.onPageLoad()
 GET   /subcontractor/verify/inactive-scheme-warning/continue  controllers.verify.NewestVerificationBatchController.onContinue
@@ -541,9 +544,8 @@ GET   /subcontractor/verify/inactive-scheme-warning  controllers.verify.Inactive
 
 GET   /subcontractor/verify/verification-not-submitted-warning  controllers.verify.VerificationNotSubmittedWarningController.onPageLoad()
 
-GET   /subcontractor/verify/no-subcontractors-selected-warning  controllers.verify.NoSubcontractorsSelectedWarningController.onPageLoad()
-
-GET   /subcontractor/verify/no-subcontractors-selected-warning/cancel   controllers.verify.NoSubcontractorsSelectedWarningController.onCancel()
+GET   /subcontractor/verify/no-subcontractors-selected-warning         controllers.verify.NoSubcontractorsSelectedWarningController.onPageLoad()
+GET   /subcontractor/verify/no-subcontractors-selected-warning/cancel  controllers.verify.NoSubcontractorsSelectedWarningController.onCancel()
 
 GET   /subcontractor/verify/verification-request-submitted  controllers.verify.VerificationRequestSubmittedController.onPageLoad()
 
