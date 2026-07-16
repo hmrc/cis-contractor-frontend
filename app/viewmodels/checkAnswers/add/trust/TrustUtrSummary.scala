@@ -16,7 +16,7 @@
 
 package viewmodels.checkAnswers.add.trust
 
-import models.{CheckMode, UserAnswers}
+import models.{CheckMode, Mode, UserAnswers}
 import pages.add.trust.TrustUtrPage
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
@@ -25,13 +25,13 @@ import viewmodels.implicits.*
 
 object TrustUtrSummary {
 
-  def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
+  def row(answers: UserAnswers, mode: Mode = CheckMode)(implicit messages: Messages): Option[SummaryListRow] =
     answers.get(TrustUtrPage).map { answer =>
       SummaryListRowViewModel(
         key = "trustUtr.checkYourAnswersLabel",
         value = ValueViewModel(answer),
         actions = Seq(
-          ActionItemViewModel("site.change", controllers.add.trust.routes.TrustUtrController.onPageLoad(CheckMode).url)
+          ActionItemViewModel("site.change", controllers.add.trust.routes.TrustUtrController.onPageLoad(mode).url)
             .withVisuallyHiddenText(messages("trustUtr.change.hidden"))
             .withAttribute("id" -> "trust-utr")
         )

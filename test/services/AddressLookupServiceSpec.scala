@@ -32,6 +32,8 @@ import play.api.mvc.{Call, Request}
 import play.api.test.FakeRequest
 import repositories.SessionRepository
 import uk.gov.hmrc.http.HeaderCarrier
+import queries.AddressLookupAmendReturnQuery
+import models.UserAnswers
 
 import scala.concurrent.{ExecutionContext, Future}
 

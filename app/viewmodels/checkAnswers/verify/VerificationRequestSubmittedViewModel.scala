@@ -25,6 +25,7 @@ import java.time.LocalDateTime
 
 case class VerificationRequestSubmittedViewModel(
   manageSubcontractorsUrl: String,
+  verificationHistoryUrl: String,
   referenceNumber: String,
   submittedAt: LocalDateTime,
   subcontractorsToVerify: Seq[String] = Seq.empty,
@@ -81,6 +82,7 @@ object VerificationRequestSubmittedViewModel {
 
     VerificationRequestSubmittedViewModel(
       manageSubcontractorsUrl = s"${appConfig.manageSubcontractorsUrl}/$cisId",
+      verificationHistoryUrl = appConfig.verificationHistoryUrl,
       referenceNumber = referenceNumber,
       submittedAt = submittedAt,
       subcontractorsToVerify = namesFrom(userAnswers.get(SelectSubcontractorPage))(_.name),
