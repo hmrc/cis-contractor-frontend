@@ -21,7 +21,7 @@ import models.TypeOfSubcontractor.Trust
 import models.UserAnswers
 import models.address.{Address, Country}
 import models.amend.trust.OriginalTrustAnswers
-import models.contact.ContactMethodOptions.{Email, Phone}
+import models.contact.ContactMethodOptions.{Email, Mobile, Phone}
 import pages.add.*
 import pages.add.trust.*
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -47,6 +47,7 @@ class AmendTrustController @Inject() (
   private val utr            = "1123456789"
   private val worksReference = "XLS345-MM"
   private val phoneNumber    = "1234567890"
+  private val mobileNumber   = "6454543667"
   private val trustAddress   = Address(
     addressLine1 = "12 Harbor View Road",
     addressLine2 = Some("Amity Island"),
@@ -61,10 +62,10 @@ class AmendTrustController @Inject() (
     addressYesNo = Some(true),
     address = Some(trustAddress),
     trustContactMethodsYesNo = Some(true),
-    trustContactMethod = Set(Email, Phone),
+    trustContactMethod = Set(Email, Phone, Mobile),
     email = Some(emailAddress),
     phone = Some(phoneNumber),
-    mobile = None,
+    mobile = Some(mobileNumber),
     utrYesNo = Some(true),
     utr = Some(utr),
     worksReferenceYesNo = Some(true),
@@ -76,9 +77,10 @@ class AmendTrustController @Inject() (
     ua <- ua.set(TrustAddressYesNoPage, true)
     ua <- ua.set(TrustAddressPage, trustAddress)
     ua <- ua.set(AddTrustContactMethodsYesNoPage, true)
-    ua <- ua.set(TrustContactMethodOptionsPage, Set(Email, Phone))
+    ua <- ua.set(TrustContactMethodOptionsPage, Set(Email, Phone, Mobile))
     ua <- ua.set(TrustEmailAddressPage, emailAddress)
     ua <- ua.set(TrustPhoneNumberPage, phoneNumber)
+    ua <- ua.set(TrustMobileNumberPage, mobileNumber)
     ua <- ua.set(TrustUtrYesNoPage, true)
     ua <- ua.set(TrustUtrPage, utr)
     ua <- ua.set(TrustWorksReferenceYesNoPage, true)
