@@ -18,7 +18,7 @@ package controllers.add.trust
 
 import controllers.actions.*
 import forms.add.trust.TrustUtrFormProvider
-import models.Mode
+import models.{AmendMode, Mode}
 import navigation.Navigator
 import pages.add.trust.{TrustNamePage, TrustUtrPage}
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -71,20 +71,32 @@ class TrustUtrController @Inject() (
             .fold(
               formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, trustName))),
               value =>
-                subcontractorService.isDuplicateUTR(request.userAnswers, value).flatMap {
-                  case true  =>
-                    val errorForm = form
-                      .fill(value)
-                      .withError(
-                        key = "value",
-                        message = "trustUtr.error.duplicate"
-                      )
-                    Future.successful(BadRequest(view(errorForm, mode, trustName)))
-                  case false =>
-                    for {
-                      updatedAnswers <- Future.fromTry(request.userAnswers.set(TrustUtrPage, value))
-                      _              <- sessionRepository.set(updatedAnswers)
-                    } yield Redirect(navigator.nextPage(TrustUtrPage, mode, updatedAnswers))
+                val prevValue       = request.userAnswers.get(TrustUtrPage)
+                def saveAndContinue =
+                  for {
+                    updatedAnswers <-
+                      Future.fromTry(request.userAnswers.set(TrustUtrPage, value))
+                    _              <- sessionRepository.set(updatedAnswers)
+                  } yield Redirect(
+                    navigator.nextPage(TrustUtrPage, mode, updatedAnswers)
+                  )
+
+                mode match {
+                  case AmendMode if prevValue.contains(value) =>
+                    saveAndContinue
+                  case _                                      =>
+                    subcontractorService.isDuplicateUTR(request.userAnswers, value).flatMap {
+                      case true  =>
+                        val errorForm = form
+                          .fill(value)
+                          .withError(
+                            key = "value",
+                            message = "trustUtr.error.duplicate"
+                          )
+                        Future.successful(BadRequest(view(errorForm, mode, trustName)))
+                      case false =>
+                        saveAndContinue
+                    }
                 }
             )
         }

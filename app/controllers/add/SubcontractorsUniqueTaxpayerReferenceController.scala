@@ -76,7 +76,7 @@ class SubcontractorsUniqueTaxpayerReferenceController @Inject() (
             .fold(
               formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, subcontractorName))),
               value =>
-                val value1          = request.userAnswers.get(SubcontractorsUniqueTaxpayerReferencePage)
+                val prevValue       = request.userAnswers.get(SubcontractorsUniqueTaxpayerReferencePage)
                 def saveAndContinue =
                   for {
                     updatedAnswers <-
@@ -87,7 +87,7 @@ class SubcontractorsUniqueTaxpayerReferenceController @Inject() (
                   )
 
                 mode match {
-                  case AmendMode if value1.contains(value) =>
+                  case AmendMode if prevValue.contains(value) =>
                     saveAndContinue
 
                   case _ =>
