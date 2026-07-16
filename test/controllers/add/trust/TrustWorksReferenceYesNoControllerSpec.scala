@@ -96,7 +96,7 @@ class TrustWorksReferenceYesNoControllerSpec extends SpecBase with MockitoSugar 
 
     "must redirect to the next page and not add page to AmendedPagesPage when valid data with value Yes is submitted in NormalMode" in {
       val mockSessionRepository = mock[SessionRepository]
-      val mockNavigator = mock[Navigator]
+      val mockNavigator         = mock[Navigator]
 
       val captor = ArgumentCaptor.forClass(classOf[UserAnswers])
 

@@ -108,7 +108,7 @@ class TrustPhoneNumberControllerSpec extends SpecBase with MockitoSugar {
       val phoneNumber = "01632 960 001"
 
       val mockSessionRepository = mock[SessionRepository]
-      val mockNavigator = mock[Navigator]
+      val mockNavigator         = mock[Navigator]
 
       val captor = ArgumentCaptor.forClass(classOf[UserAnswers])
 
@@ -137,7 +137,8 @@ class TrustPhoneNumberControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual controllers.add.trust.routes.TrustUtrYesNoController
-          .onPageLoad(NormalMode).url
+          .onPageLoad(NormalMode)
+          .url
         verify(mockSessionRepository).set(captor.capture())
 
         val updatedAnswers = captor.getValue
@@ -147,7 +148,7 @@ class TrustPhoneNumberControllerSpec extends SpecBase with MockitoSugar {
     }
     "must add TrustPhoneNumberPage to AmendedPagesPage when submitted in AmendMode" in {
       val mockSessionRepository = mock[SessionRepository]
-      val mockNavigator = mock[Navigator]
+      val mockNavigator         = mock[Navigator]
 
       val captor = ArgumentCaptor.forClass(classOf[UserAnswers])
 

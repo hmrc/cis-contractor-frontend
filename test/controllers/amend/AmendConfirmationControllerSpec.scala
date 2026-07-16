@@ -68,7 +68,7 @@ class AmendConfirmationControllerSpec extends SpecBase {
       running(application) {
 
         val request = FakeRequest(GET, confirmationRoute)
-        val result = route(application, request).value
+        val result  = route(application, request).value
 
         val view = application.injector.instanceOf[AmendConfirmationView]
 
@@ -81,8 +81,7 @@ class AmendConfirmationControllerSpec extends SpecBase {
               userAnswersWithOriginal
             )(messages(application)),
             "ABC Trust",
-            application
-              .injector
+            application.injector
               .instanceOf[config.FrontendAppConfig]
               .manageYourSubcontractorsUrl("123456789")
           )(

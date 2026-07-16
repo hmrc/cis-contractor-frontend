@@ -80,7 +80,7 @@ class TrustPhoneNumberController @Inject() (
                 Future.fromTry(
                   SaveAnswerHelper.saveAnswer(request.userAnswers, TrustPhoneNumberPage, value, mode)
                 )
-              _ <- sessionRepository.set(updatedAnswers)
+              _              <- sessionRepository.set(updatedAnswers)
             } yield Redirect(navigator.nextPage(TrustPhoneNumberPage, mode, updatedAnswers))
         ))
         .getOrElse(Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())))

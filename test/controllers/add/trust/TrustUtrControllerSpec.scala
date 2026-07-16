@@ -91,10 +91,10 @@ class TrustUtrControllerSpec extends SpecBase with MockitoSugar {
     "must redirect to the next page and not add the page in AmendedPagesPage when valid data is submitted in NormalMode" in {
       val validValue = "5860920998"
 
-      val mockSessionRepository   = mock[SessionRepository]
-      val mockNavigator           = mock[Navigator]
+      val mockSessionRepository    = mock[SessionRepository]
+      val mockNavigator            = mock[Navigator]
       val mockSubcontractorService = mock[SubcontractorService]
-      val captor = ArgumentCaptor.forClass(classOf[UserAnswers])
+      val captor                   = ArgumentCaptor.forClass(classOf[UserAnswers])
 
       when(mockSubcontractorService.isDuplicateUTR(any[UserAnswers], any[String])(any[HeaderCarrier]))
         .thenReturn(Future.successful(false))
@@ -136,8 +136,8 @@ class TrustUtrControllerSpec extends SpecBase with MockitoSugar {
     "must add TrustUtrPage to AmendedPagesPage when submitted in AmendMode" in {
       val validValue = "5860920998"
 
-      val mockSessionRepository = mock[SessionRepository]
-      val mockNavigator = mock[Navigator]
+      val mockSessionRepository    = mock[SessionRepository]
+      val mockNavigator            = mock[Navigator]
       val mockSubcontractorService = mock[SubcontractorService]
 
       val captor = ArgumentCaptor.forClass(classOf[UserAnswers])

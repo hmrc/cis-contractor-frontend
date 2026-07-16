@@ -103,10 +103,10 @@ class TrustEmailAddressControllerSpec extends SpecBase with MockitoSugar {
         ).toString
       }
     }
-    
+
     "must redirect to the next page and not add page to AmendedPagesPage when valid data is submitted in NormalMode" in {
       val mockSessionRepository = mock[SessionRepository]
-      val mockNavigator = mock[Navigator]
+      val mockNavigator         = mock[Navigator]
 
       val captor = ArgumentCaptor.forClass(classOf[UserAnswers])
 
@@ -150,7 +150,7 @@ class TrustEmailAddressControllerSpec extends SpecBase with MockitoSugar {
 
     "must add TrustEmailAddressPage to AmendedPagesPage when submitted in AmendMode" in {
       val mockSessionRepository = mock[SessionRepository]
-      val mockNavigator = mock[Navigator]
+      val mockNavigator         = mock[Navigator]
 
       val captor = ArgumentCaptor.forClass(classOf[UserAnswers])
 
@@ -201,7 +201,7 @@ class TrustEmailAddressControllerSpec extends SpecBase with MockitoSugar {
           .value must contain(TrustEmailAddressPage.toString)
       }
     }
-    
+
     "must return a Bad Request and errors when invalid data is submitted" in {
 
       val application = applicationBuilder(userAnswers = Some(uaWithNameAndEmailOption)).build()

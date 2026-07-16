@@ -141,7 +141,7 @@ class TrustContactMethodOptionsControllerSpec extends SpecBase with MockitoSugar
 
     "must add TrustContactMethodOptionsPage to AmendedPagesPage when submitted in AmendMode" in {
       val mockSessionRepository = mock[SessionRepository]
-      val mockNavigator = mock[Navigator]
+      val mockNavigator         = mock[Navigator]
 
       val captor = ArgumentCaptor.forClass(classOf[UserAnswers])
 
@@ -173,7 +173,7 @@ class TrustContactMethodOptionsControllerSpec extends SpecBase with MockitoSugar
             "value[0]" -> ContactMethodOptions.Email.toString
           )
 
-        val result = route(application, request).value
+        val result         = route(application, request).value
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual
           controllers.add.trust.routes.TrustEmailAddressController.onPageLoad(AmendMode).url

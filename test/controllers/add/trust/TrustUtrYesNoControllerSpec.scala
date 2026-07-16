@@ -120,7 +120,7 @@ class TrustUtrYesNoControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request = FakeRequest(POST, routeSubmit).withFormUrlEncodedBody("value" -> "true")
-        val result = route(application, request).value
+        val result  = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual controllers.add.trust.routes.TrustUtrController
@@ -161,7 +161,7 @@ class TrustUtrYesNoControllerSpec extends SpecBase with MockitoSugar {
 
     "must add TrustUtrYesNoPage to AmendedPagesPage when submitted in AmendMode" in {
       val mockSessionRepository = mock[SessionRepository]
-      val mockNavigator = mock[Navigator]
+      val mockNavigator         = mock[Navigator]
 
       val captor = ArgumentCaptor.forClass(classOf[UserAnswers])
 
@@ -192,7 +192,7 @@ class TrustUtrYesNoControllerSpec extends SpecBase with MockitoSugar {
             "value" -> "true"
           )
 
-        val result = route(application, request).value
+        val result         = route(application, request).value
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual controllers.add.trust.routes.TrustUtrController
           .onPageLoad(AmendMode)

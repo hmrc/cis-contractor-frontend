@@ -177,7 +177,7 @@ class TrustAddressYesNoControllerSpec extends SpecBase with MockitoSugar {
           .value must contain(TrustAddressYesNoPage.toString)
       }
     }
-*/
+     */
     "must return a Bad Request and errors when invalid data is submitted" in {
 
       val application = applicationBuilder(userAnswers = Some(uaWithName)).build()

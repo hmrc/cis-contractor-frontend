@@ -89,47 +89,47 @@ class AddTrustContactMethodsYesNoControllerSpec extends SpecBase with MockitoSug
 
     "must redirect to the TrustContactMethodOptions Page and not add the page to AmendedPagesPage when" +
       " valid data with value Yes is submitted in NormalMode" in {
-      val mockSessionRepository = mock[SessionRepository]
-      val mockNavigator         = mock[Navigator]
+        val mockSessionRepository = mock[SessionRepository]
+        val mockNavigator         = mock[Navigator]
 
-      val captor = ArgumentCaptor.forClass(classOf[UserAnswers])
+        val captor = ArgumentCaptor.forClass(classOf[UserAnswers])
 
-      when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
+        when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
 
-      when(mockNavigator.nextPage(any(), any(), any()))
-        .thenReturn(
-          controllers.add.trust.routes.TrustContactMethodOptionsController
-            .onPageLoad(NormalMode)
-        )
-
-      val application =
-        applicationBuilder(userAnswers = Some(uaWithName))
-          .overrides(
-            bind[Navigator].toInstance(mockNavigator),
-            bind[SessionRepository].toInstance(mockSessionRepository)
+        when(mockNavigator.nextPage(any(), any(), any()))
+          .thenReturn(
+            controllers.add.trust.routes.TrustContactMethodOptionsController
+              .onPageLoad(NormalMode)
           )
-          .build()
 
-      running(application) {
+        val application =
+          applicationBuilder(userAnswers = Some(uaWithName))
+            .overrides(
+              bind[Navigator].toInstance(mockNavigator),
+              bind[SessionRepository].toInstance(mockSessionRepository)
+            )
+            .build()
 
-        val request = FakeRequest(POST, addTrustContactMethodsYesNoRoute)
+        running(application) {
+
+          val request = FakeRequest(POST, addTrustContactMethodsYesNoRoute)
             .withFormUrlEncodedBody("value" -> "true")
 
-        val result = route(application, request).value
+          val result = route(application, request).value
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual
-          controllers.add.trust.routes.TrustContactMethodOptionsController
-            .onPageLoad(NormalMode)
-            .url
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual
+            controllers.add.trust.routes.TrustContactMethodOptionsController
+              .onPageLoad(NormalMode)
+              .url
 
-        verify(mockSessionRepository).set(captor.capture())
-        val updatedAnswers = captor.getValue
+          verify(mockSessionRepository).set(captor.capture())
+          val updatedAnswers = captor.getValue
 
-        updatedAnswers.get(AddTrustContactMethodsYesNoPage) mustBe Some(true)
-        updatedAnswers.get(AmendedPagesPage) mustBe None
+          updatedAnswers.get(AddTrustContactMethodsYesNoPage) mustBe Some(true)
+          updatedAnswers.get(AmendedPagesPage) mustBe None
+        }
       }
-    }
 
     "must redirect to the TrustUtrYesNo page when valid data with value No is submitted" in {
 
@@ -160,8 +160,8 @@ class AddTrustContactMethodsYesNoControllerSpec extends SpecBase with MockitoSug
 
     "must add AddTrustContactMethodsYesNoPage to AmendedPagesPage when submitted in AmendMode" in {
       val mockSessionRepository = mock[SessionRepository]
-      val mockNavigator = mock[Navigator]
-      val captor = ArgumentCaptor.forClass(classOf[UserAnswers])
+      val mockNavigator         = mock[Navigator]
+      val captor                = ArgumentCaptor.forClass(classOf[UserAnswers])
 
       when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
       when(mockNavigator.nextPage(any(), any(), any()))
