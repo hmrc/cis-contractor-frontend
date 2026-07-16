@@ -28,6 +28,7 @@ import pages.add.AddressOfSubcontractorPage
 import play.api.i18n.Messages
 import play.api.test.Helpers.stubMessages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
+import viewmodels.checkAnswers.amend.AmendAddressOfSubcontractorSummary
 
 class AmendAddressOfSubcontractorSummarySpec extends AnyWordSpec with Matchers with CyaEncodingSpecHelper {
 
@@ -52,7 +53,7 @@ class AmendAddressOfSubcontractorSummarySpec extends AnyWordSpec with Matchers w
           .success
           .value
 
-      val result = AddressOfSubcontractorSummary.row(userAnswers)
+      val result = AmendAddressOfSubcontractorSummary.row(userAnswers)
 
       result shouldBe defined
 
@@ -88,7 +89,7 @@ class AmendAddressOfSubcontractorSummarySpec extends AnyWordSpec with Matchers w
 
       val userAnswers = UserAnswers("id")
 
-      AddressOfSubcontractorSummary.row(userAnswers) shouldBe None
+      AmendAddressOfSubcontractorSummary.row(userAnswers) shouldBe None
     }
 
     "render the address without a country line when country is None" in {
@@ -108,7 +109,7 @@ class AmendAddressOfSubcontractorSummarySpec extends AnyWordSpec with Matchers w
           .success
           .value
 
-      val row = AddressOfSubcontractorSummary.row(userAnswers).value
+      val row = AmendAddressOfSubcontractorSummary.row(userAnswers).value
 
       row.value.content shouldBe HtmlContent(
         "10 Downing Street<br/>" +
@@ -135,7 +136,7 @@ class AmendAddressOfSubcontractorSummarySpec extends AnyWordSpec with Matchers w
           .success
           .value
 
-      val row = AddressOfSubcontractorSummary.row(userAnswers).value
+      val row = AmendAddressOfSubcontractorSummary.row(userAnswers).value
 
       row.value.content shouldBe HtmlContent(
         "10 Downing Street<br/>" +
@@ -160,7 +161,7 @@ class AmendAddressOfSubcontractorSummarySpec extends AnyWordSpec with Matchers w
           .success
           .value
 
-      val row = AddressOfSubcontractorSummary.row(answers).value
+      val row = AmendAddressOfSubcontractorSummary.row(answers).value
 
       val html = extractHtml(row)
 
