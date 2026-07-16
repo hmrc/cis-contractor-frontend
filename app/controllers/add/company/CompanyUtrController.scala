@@ -18,6 +18,7 @@ package controllers.add.company
 
 import controllers.actions.*
 import forms.add.company.CompanyUtrFormProvider
+import models.requests.DataRequest
 import models.{AmendMode, Mode}
 import navigation.Navigator
 import pages.add.company.{CompanyNamePage, CompanyUtrPage}
@@ -48,6 +49,15 @@ class CompanyUtrController @Inject() (
 
   val form = formProvider()
 
+  private def saveAndContinue(mode: Mode, value: String)(implicit request: DataRequest[?]) =
+    for {
+      updatedAnswers <-
+        Future.fromTry(request.userAnswers.set(CompanyUtrPage, value))
+      _              <- sessionRepository.set(updatedAnswers)
+    } yield Redirect(
+      navigator.nextPage(CompanyUtrPage, mode, updatedAnswers)
+    )
+
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
     request.userAnswers
       .get(CompanyNamePage)
@@ -75,18 +85,9 @@ class CompanyUtrController @Inject() (
               value =>
                 val prevValue = request.userAnswers.get(CompanyUtrPage)
 
-                def saveAndContinue =
-                  for {
-                    updatedAnswers <-
-                      Future.fromTry(request.userAnswers.set(CompanyUtrPage, value))
-                    _              <- sessionRepository.set(updatedAnswers)
-                  } yield Redirect(
-                    navigator.nextPage(CompanyUtrPage, mode, updatedAnswers)
-                  )
-
                 mode match {
                   case AmendMode if prevValue.contains(value) =>
-                    saveAndContinue
+                    saveAndContinue(mode, value)
                   case _                                      =>
                     subcontractorService.isDuplicateUTR(request.userAnswers, value).flatMap {
                       case true  =>
@@ -100,7 +101,7 @@ class CompanyUtrController @Inject() (
                           BadRequest(view(errorForm, mode, companyName))
                         )
                       case false =>
-                        saveAndContinue
+                        saveAndContinue(mode, value)
                     }
                 }
             )

@@ -19,6 +19,7 @@ package controllers.add.partnership
 import controllers.actions.*
 import forms.add.partnership.PartnershipUtrFormProvider
 import models.{AmendMode, Mode}
+import models.requests.DataRequest
 import navigation.Navigator
 import pages.add.partnership.{PartnershipNamePage, PartnershipUniqueTaxpayerReferencePage}
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -48,6 +49,15 @@ class PartnershipUniqueTaxpayerReferenceController @Inject() (
 
   val form = formProvider()
 
+  private def saveAndContinue(mode: Mode, value: String)(implicit request: DataRequest[?]) =
+    for {
+      updatedAnswers <-
+        Future.fromTry(request.userAnswers.set(PartnershipUniqueTaxpayerReferencePage, value))
+      _              <- sessionRepository.set(updatedAnswers)
+    } yield Redirect(
+      navigator.nextPage(PartnershipUniqueTaxpayerReferencePage, mode, updatedAnswers)
+    )
+
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
     request.userAnswers
       .get(PartnershipNamePage)
@@ -73,17 +83,8 @@ class PartnershipUniqueTaxpayerReferenceController @Inject() (
               value =>
                 val prevValue = request.userAnswers.get(PartnershipUniqueTaxpayerReferencePage)
 
-                def saveAndContinue =
-                  for {
-                    updatedAnswers <-
-                      Future.fromTry(request.userAnswers.set(PartnershipUniqueTaxpayerReferencePage, value))
-                    _              <- sessionRepository.set(updatedAnswers)
-                  } yield Redirect(
-                    navigator.nextPage(PartnershipUniqueTaxpayerReferencePage, mode, updatedAnswers)
-                  )
-
                 mode match {
-                  case AmendMode if prevValue.contains(value) => saveAndContinue
+                  case AmendMode if prevValue.contains(value) => saveAndContinue(mode, value)
 
                   case _ =>
                     subcontractorService.isDuplicateUTR(request.userAnswers, value).flatMap {
@@ -98,7 +99,7 @@ class PartnershipUniqueTaxpayerReferenceController @Inject() (
                           BadRequest(view(errorForm, mode, name))
                         )
                       case false =>
-                        saveAndContinue
+                        saveAndContinue(mode, value)
                     }
                 }
             )

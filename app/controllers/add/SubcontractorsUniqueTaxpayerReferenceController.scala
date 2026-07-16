@@ -57,6 +57,15 @@ class SubcontractorsUniqueTaxpayerReferenceController @Inject() (
   private def preparedForm(implicit request: DataRequest[?]) =
     request.userAnswers.get(SubcontractorsUniqueTaxpayerReferencePage).fold(form)(form.fill)
 
+  private def saveAndContinue(mode: Mode, value: String)(implicit request: DataRequest[?]) =
+    for {
+      updatedAnswers <-
+        Future.fromTry(request.userAnswers.set(SubcontractorsUniqueTaxpayerReferencePage, value))
+      _              <- sessionRepository.set(updatedAnswers)
+    } yield Redirect(
+      navigator.nextPage(SubcontractorsUniqueTaxpayerReferencePage, mode, updatedAnswers)
+    )
+
   def onPageLoad(mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData) { implicit request =>
       subcontractorNameExtractor
@@ -76,19 +85,11 @@ class SubcontractorsUniqueTaxpayerReferenceController @Inject() (
             .fold(
               formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, subcontractorName))),
               value =>
-                val prevValue       = request.userAnswers.get(SubcontractorsUniqueTaxpayerReferencePage)
-                def saveAndContinue =
-                  for {
-                    updatedAnswers <-
-                      Future.fromTry(request.userAnswers.set(SubcontractorsUniqueTaxpayerReferencePage, value))
-                    _              <- sessionRepository.set(updatedAnswers)
-                  } yield Redirect(
-                    navigator.nextPage(SubcontractorsUniqueTaxpayerReferencePage, mode, updatedAnswers)
-                  )
+                val prevValue = request.userAnswers.get(SubcontractorsUniqueTaxpayerReferencePage)
 
                 mode match {
                   case AmendMode if prevValue.contains(value) =>
-                    saveAndContinue
+                    saveAndContinue(mode, value)
 
                   case _ =>
                     subcontractorService.isDuplicateUTR(request.userAnswers, value).flatMap {
@@ -105,7 +106,7 @@ class SubcontractorsUniqueTaxpayerReferenceController @Inject() (
                         )
 
                       case false =>
-                        saveAndContinue
+                        saveAndContinue(mode, value)
                     }
                 }
             )

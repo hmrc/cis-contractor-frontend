@@ -21,6 +21,7 @@ import controllers.routes
 import models.address.Address
 import models.contact.ContactMethodOptions
 import models.{AmendMode, CheckMode, NormalMode, UserAnswers}
+import org.scalatest.PrivateMethodTester
 import pages.add.partnership.*
 import pages.Page
 import pages.QuestionPage
@@ -803,6 +804,10 @@ class PartnershipNavigatorSpec extends SpecBase {
       }
 
       "Partnership UTR in aAmend journey" - {
+        "saveAndContinue" - {
+          //TODO - need unit tests for saveAndContinue private def
+        }
+
         "must go from a PartnershipUniqueTaxpayerReference to PartnershipCheckYourAnswers page in AmendMode" in {
           navigator.nextPage(
             PartnershipUniqueTaxpayerReferencePage,
@@ -819,7 +824,7 @@ class PartnershipNavigatorSpec extends SpecBase {
           ) mustBe controllers.add.partnership.routes.PartnershipUniqueTaxpayerReferenceController.onPageLoad(AmendMode)
         }
 
-        "must go to unique taxpayer reference controller when answer is true in AmendMode and UTR is already provided" in {
+        "must go to amend CYA when answer is true in AmendMode and UTR is already provided" in {
           val answers =
             emptyUserAnswers
               .set(PartnershipHasUtrYesNoPage, true)
@@ -833,7 +838,7 @@ class PartnershipNavigatorSpec extends SpecBase {
             PartnershipHasUtrYesNoPage,
             AmendMode,
             answers
-          ) mustBe controllers.add.partnership.routes.PartnershipUniqueTaxpayerReferenceController.onPageLoad(AmendMode)
+          ) mustBe partnershipAmendCYA
         }
 
         "must go to PartnershipCheckYourAnswersController when answer is false" in {
