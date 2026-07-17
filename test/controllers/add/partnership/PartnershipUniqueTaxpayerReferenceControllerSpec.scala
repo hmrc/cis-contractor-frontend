@@ -97,7 +97,7 @@ class PartnershipUniqueTaxpayerReferenceControllerSpec extends SpecBase with Moc
       }
     }
 
-    "must bind the form and redirect to JourneyRecovery Page on POST when valid UTR is submitted" in {
+    "must bind the form and redirect to PartnershipNominatedPartnerNameController Page on POST when valid UTR is submitted" in {
 
       val validValue = "5860920998"
 

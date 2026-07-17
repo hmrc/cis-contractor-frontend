@@ -21,7 +21,6 @@ import controllers.routes
 import models.address.Address
 import models.contact.ContactMethodOptions
 import models.{AmendMode, CheckMode, NormalMode, UserAnswers}
-import org.scalatest.PrivateMethodTester
 import pages.add.partnership.*
 import pages.Page
 import pages.QuestionPage
@@ -805,7 +804,7 @@ class PartnershipNavigatorSpec extends SpecBase {
 
       "Partnership UTR in aAmend journey" - {
         "saveAndContinue" - {
-          //TODO - need unit tests for saveAndContinue private def
+          // TODO - need unit tests for saveAndContinue private def
         }
 
         "must go from a PartnershipUniqueTaxpayerReference to PartnershipCheckYourAnswers page in AmendMode" in {

@@ -302,6 +302,31 @@ class SubcontractorsUniqueTaxpayerReferenceControllerSpec extends SpecBase with 
       }
     }
 
+    "must bind the form and redirect to JourneyRecovery Page on POST when valid UTR is submitted but is same as previous value in AmendMode" in {
+
+      val validValue = "5860920998"
+      val prevValue  = "5860920998"
+
+      val uaWithNameForAmend: UserAnswers =
+        uaWithName.set(SubcontractorsUniqueTaxpayerReferencePage, prevValue).success.value
+
+      val application =
+        applicationBuilder(userAnswers = Some(uaWithNameForAmend))
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, subcontractorsUniqueTaxpayerReferenceRouteAmend)
+            .withFormUrlEncodedBody(("value", validValue))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(result).value must include("/subcontractor/there-is-a-problem") // TODO when AmendCYA available
+      }
+    }
+
     "must redirect to Journey Recovery for a GET if no existing data is found" in {
 
       val application = applicationBuilder(userAnswers = None).build()
