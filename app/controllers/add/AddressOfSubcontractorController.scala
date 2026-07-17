@@ -63,7 +63,7 @@ class AddressOfSubcontractorController @Inject() (
     if isAmend then
       controllers.routes.JourneyRecoveryController
         .onPageLoad() // TODO - redirect to AmendIndividualCheckYourAnswer
-    routes.CheckYourAnswersController.onPageLoad()
+    else routes.CheckYourAnswersController.onPageLoad()
 
   def redirectToAmendAddressLookup(): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
