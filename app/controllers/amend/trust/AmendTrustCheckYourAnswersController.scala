@@ -35,7 +35,7 @@ import viewmodels.checkAnswers.add.*
 import viewmodels.govuk.summarylist.*
 import views.html.amend.AmendCheckYourAnswersView
 import queries.SubContractorVerifiedQuery
-import viewmodels.checkAnswers.add.trust.{TrustNameSummary, TrustUtrYesNoSummary}
+import viewmodels.checkAnswers.add.trust.{TrustAddressSummary, TrustContactMethodOptionsSummary, TrustMobileNumberSummary, TrustNameSummary, TrustPhoneNumberSummary, TrustUtrYesNoSummary, TrustWorksReferenceYesNoSummary}
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -60,6 +60,7 @@ class AmendTrustCheckYourAnswersController @Inject() (
     ValidatedTrust.build(ua) match {
       case Right(_) =>
         val isVerified = ua.get(SubContractorVerifiedQuery).contains(true)
+        val trustName = ua.get(TrustNamePage).getOrElse("")
 
         val subcontractorInformationList =
           SummaryListViewModel(rows = subcontractorInformationRows(ua, isVerified).flatten)
@@ -67,7 +68,7 @@ class AmendTrustCheckYourAnswersController @Inject() (
         val detailsList =
           SummaryListViewModel(rows = detailsRows(ua, isVerified).flatten)
 
-        Ok(view(subcontractorInformationList, detailsList, displayName(ua)))
+        Ok(view(subcontractorInformationList, detailsList, trustName))
 
       case Left(error) =>
         logger.error(s"[AmendIndividualCheckYourAnswersController.onPageLoad] Failed to load the page: $error")
@@ -119,28 +120,20 @@ class AmendTrustCheckYourAnswersController @Inject() (
 
     nameRows ++
       Seq(
-        SubAddressYesNoSummary.row(ua, AmendMode),
-        AddressOfSubcontractorSummary.row(ua, AmendMode),
-        AddIndividualContactMethodsYesNoSummary.row(ua, AmendMode),
-        IndividualContactMethodOptionsSummary.row(ua, AmendMode),
-        IndividualEmailAddressSummary.row(ua, AmendMode),
-        IndividualPhoneNumberSummary.row(ua, AmendMode),
-        IndividualMobileNumberSummary.row(ua, AmendMode)
+        TrustAddressYesNoSummary.row(ua, AmendMode),
+        TrustAddressSummary.row(ua, AmendMode),
+        AddTrustContactMethodsYesNoSummary.row(ua, AmendMode),
+        TrustContactMethodOptionsSummary.row(ua, AmendMode),
+        TrustEmailAddressSummary.row(ua, AmendMode),
+        TrustPhoneNumberSummary.row(ua, AmendMode),
+        TrustMobileNumberSummary.row(ua, AmendMode)
       ) ++
       utrRows ++
       Seq(
-        NationalInsuranceNumberYesNoSummary.row(ua, AmendMode),
-        SubNationalInsuranceNumberSummary.row(ua, AmendMode),
-        WorksReferenceNumberYesNoSummary.row(ua, AmendMode),
-        WorksReferenceNumberSummary.row(ua, AmendMode)
+        TrustWorksReferenceYesNoSummary.row(ua, AmendMode),
+        TrustWorksReferenceSummary.row(ua, AmendMode)
       )
   }
-
-  private def displayName(ua: UserAnswers): String =
-    ua.get(SubcontractorNamePage)
-      .map(n => s"${n.firstName} ${n.lastName}")
-      .orElse(ua.get(TradingNameOfSubcontractorPage))
-      .getOrElse("")
 
   def onSubmit(): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
