@@ -23,15 +23,15 @@ import models.address.AddressLookupJourneyIdentifier.individualQuestionsAddress
 import pages.add.AddressOfSubcontractorPage
 import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
-import queries.Settable
+import queries.{AddressLookupAmendReturnQuery, Settable}
 import repositories.SessionRepository
 import services.AddressLookupService
 import utils.SubcontractorNameExtractor
 
 import javax.inject.Inject
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
-abstract class AddressOfSubcontractorController @Inject() (
+class AddressOfSubcontractorController @Inject() (
   override val messagesApi: MessagesApi,
   override protected val sessionRepository: SessionRepository,
   override protected val identify: IdentifierAction,
@@ -65,5 +65,12 @@ abstract class AddressOfSubcontractorController @Inject() (
         .onPageLoad() // TODO - redirect to AmendIndividualCheckYourAnswer
     routes.CheckYourAnswersController.onPageLoad()
 
-  def redirectToAmendAddressLookup(): Action[AnyContent]
+  def redirectToAmendAddressLookup(): Action[AnyContent] =
+    (identify andThen getData andThen requireData).async { implicit request =>
+      (for {
+        ua <- Future.fromTry(request.userAnswers.set(AddressLookupAmendReturnQuery, true))
+        _  <- sessionRepository.set(ua)
+      } yield Redirect(routes.AddressOfSubcontractorController.redirectToAddressLookup(Some("change"))))
+        .recover { case _ => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()) }
+    }
 }
