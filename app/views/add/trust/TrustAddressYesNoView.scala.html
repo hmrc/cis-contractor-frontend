@@ -34,13 +34,17 @@
             @govukErrorSummary(ErrorSummaryViewModel(form, errorLinkOverrides = Map("value" -> "value_0")))
         }
 
-        @govukRadios(
+        @defining(
             RadiosViewModel.yesNo(
                 field = form("value"),
-                legend = LegendViewModel(messages("trustAddressYesNo.heading", name)).asPageHeading(Large)
-            ).withHint(Hint(content = Messages("trustAddressYesNo.hint"))
+                legend = LegendViewModel(messages("trustAddressYesNo.heading", name)).asPageHeading().withCssClass("govuk-fieldset__legend--l")
             )
-        )
+        ){ radios =>
+            @govukRadios(
+                if(mode == models.AmendMode) radios
+                else radios.withHint(Hint(content = Messages("trustAddressYesNo.hint")))
+            )
+        }
 
         @govukButton(
             ButtonViewModel(messages("site.continue"))
