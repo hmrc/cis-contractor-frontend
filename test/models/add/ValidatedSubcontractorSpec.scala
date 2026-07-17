@@ -775,5 +775,17 @@ class ValidatedSubcontractorSpec extends SpecBase with Matchers {
         ValidatedSubcontractor.build(ua) mustBe Left(InvalidAnswer(IndividualMobileNumberPage))
       }
     }
+    "fail when AddIndividualContactMethodsYesNo is true but IndividualContactMethodOptions is empty" in {
+      val ua =
+        minRequired
+          .set(AddIndividualContactMethodsYesNoPage, true)
+          .success
+          .value
+          .set(IndividualContactMethodOptionsPage, Set.empty)
+          .success
+          .value
+
+      ValidatedSubcontractor.build(ua) mustBe Left(InvalidAnswer(IndividualContactMethodOptionsPage))
+    }
   }
 }

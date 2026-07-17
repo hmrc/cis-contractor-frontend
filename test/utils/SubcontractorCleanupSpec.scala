@@ -18,7 +18,7 @@ package utils
 
 import base.SpecBase
 import models.add.*
-import models.contact.{ContactMethodOptions, ContactOptions}
+import models.contact.ContactMethodOptions
 import models.TypeOfSubcontractor
 import org.scalatest.freespec.AnyFreeSpec
 import utils.SubcontractorCleanup.*

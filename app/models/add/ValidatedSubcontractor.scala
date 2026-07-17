@@ -43,16 +43,17 @@ object ValidatedSubcontractor extends Validation {
       subcontractorName              <- getOptionalNamePage(answers)
       address                        <- getOptionalPageValue(answers, AddressOfSubcontractorPage, SubAddressYesNoPage)
       individualContactMethodOptions <-
-        getOptionalPageValue(answers, IndividualContactMethodOptionsPage, AddIndividualContactMethodsYesNoPage).flatMap {
-          case Some(methods) if methods.nonEmpty =>
-            Right(Some(methods))
+        getOptionalPageValue(answers, IndividualContactMethodOptionsPage, AddIndividualContactMethodsYesNoPage)
+          .flatMap {
+            case Some(methods) if methods.nonEmpty =>
+              Right(Some(methods))
 
-          case Some(_) =>
-            Left(InvalidAnswer(IndividualContactMethodOptionsPage))
+            case Some(_) =>
+              Left(InvalidAnswer(IndividualContactMethodOptionsPage))
 
-          case None =>
-            Right(None)
-        }
+            case None =>
+              Right(None)
+          }
 
       individualEmail  <- getContactPageValue(
                             answers,

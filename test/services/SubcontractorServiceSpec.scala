@@ -22,7 +22,6 @@ import models.TypeOfSubcontractor
 import models.add.SubcontractorName
 import models.contact.ContactMethodOptions
 import models.address.{Address, Country}
-import models.contact.ContactOptions
 import pages.add.company._
 import models.requests.CreateAndUpdateSubcontractorPayload
 import models.requests.CreateAndUpdateSubcontractorPayload.{CompanyPayload, IndividualOrSoleTraderPayload, PartnershipPayload, TrustPayload}

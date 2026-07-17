@@ -45,16 +45,17 @@ object ValidatedPartnership extends Validation {
       partnershipName                 <- getPageValue(answers, PartnershipNamePage)
       partnershipAddress              <- getOptionalPageValue(answers, PartnershipAddressPage, PartnershipAddressYesNoPage)
       partnershipContactMethodOptions <-
-        getOptionalPageValue(answers, PartnershipContactMethodOptionsPage, AddPartnershipContactMethodsYesNoPage).flatMap {
-          case Some(methods) if methods.nonEmpty =>
-            Right(Some(methods))
+        getOptionalPageValue(answers, PartnershipContactMethodOptionsPage, AddPartnershipContactMethodsYesNoPage)
+          .flatMap {
+            case Some(methods) if methods.nonEmpty =>
+              Right(Some(methods))
 
-          case Some(_) =>
-            Left(InvalidAnswer(PartnershipContactMethodOptionsPage))
+            case Some(_) =>
+              Left(InvalidAnswer(PartnershipContactMethodOptionsPage))
 
-          case None =>
-            Right(None)
-        }
+            case None =>
+              Right(None)
+          }
       partnershipEmail                <- getContactPageValue(
                                            answers,
                                            partnershipContactMethodOptions,

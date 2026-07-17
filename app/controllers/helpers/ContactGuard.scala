@@ -23,20 +23,6 @@ import play.api.mvc.Results.Redirect
 
 trait ContactGuard {
 
-//  def requireContactChoice[A](
-//    name: Option[A],
-//    contactChoice: Option[ContactOptions],
-//    expected: ContactOptions
-//  )(onSuccess: A => Result): Result =
-//    (for {
-//      n  <- name
-//      cc <- contactChoice
-//      if cc == expected
-//    } yield onSuccess(n))
-//      .getOrElse(
-//        Redirect(routes.JourneyRecoveryController.onPageLoad())
-//      )
-
   def requireContactMethodInSet[A](
     name: Option[A],
     contactMethods: Option[Set[ContactMethodOptions]],
