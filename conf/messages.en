@@ -1057,3 +1057,12 @@ contractordetails.removeDetailYesNo.detail.email                               =
 contractordetails.removeDetailYesNo.detail.schemeName                          =  scheme name
 contractordetails.removeDetailYesNo.error.required.email                       =  Select yes to remove the contractor’s email address
 contractordetails.removeDetailYesNo.error.required.schemeName                  =  Select yes to remove the contractor’s scheme name
+
+amendIndividualCheckYourAnswers.title = Subcontractor information
+amendIndividualCheckYourAnswers.heading.subcontractorInformation.h2    = Subcontractor information
+amendIndividualCheckYourAnswers.heading.moreDetails.h2    = More details
+amendIndividualCheckYourAnswers.confirm.h2 = Confirm changes
+amendIndividualCheckYourAnswers.confirm.p1 = By changing this subcontractor’s details you are confirming that, to the best of your knowledge, the details you are providing are correct.
+amendIndividualCheckYourAnswers.confirm = Confirm
+amendIndividualCheckYourAnswers.cancelChanges = Cancel changes
+

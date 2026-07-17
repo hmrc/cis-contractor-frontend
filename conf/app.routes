@@ -32,6 +32,10 @@ GET   /subcontractor/access-denied  controllers.AccessDeniedController.onPageLoa
 
 GET   /subcontractor/system-error/there-is-a-problem  controllers.SystemErrorController.onPageLoad()
 
+GET   /subcontractor/amend/subcontractor-information  controllers.amend.AmendIndividualCheckYourAnswersController.onPageLoad()
+POST  /subcontractor/amend/subcontractor-information  controllers.amend.AmendIndividualCheckYourAnswersController.onSubmit()
+GET   /subcontractor/amend/cancel              controllers.amend.AmendIndividualCheckYourAnswersController.onCancel()
+
 GET   /subcontractor/individual-address-lookup         controllers.add.AddressOfSubcontractorController.redirectToAddressLookup(mode: Mode = NormalMode, changeRoute: Option[String] ?= None)
 GET   /subcontractor/individual-address-return         controllers.add.AddressOfSubcontractorController.addressLookupCallback(id: String ?= "", mode: Mode = NormalMode)
 GET   /subcontractor/individual-address-return/change  controllers.add.AddressOfSubcontractorController.addressLookupCallbackChange(id: String ?= "", mode: Mode = NormalMode)
