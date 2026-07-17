@@ -18,7 +18,6 @@ package models
 
 import models.contact.ContactMethodOptions
 import pages.QuestionPage
-import pages.verify.VerifyYourSubcontractorsYesNoPage
 import play.api.libs.json.Reads
 
 trait Validation {
@@ -38,7 +37,7 @@ trait Validation {
   )(implicit reads: Reads[A]): Either[ValidationError, Option[A]] =
     (
       answers.get(questionPage),
-      answers.get(VerifyYourSubcontractorsYesNoPage).map(_ => answers.get(yesNoPage).getOrElse(true))
+      answers.get(yesNoPage)
     ) match {
       case (None, Some(false))       => Right(None)
       case (_, None)                 => Left(MissingAnswer(yesNoPage))
@@ -53,7 +52,7 @@ trait Validation {
   )(implicit reads: Reads[A]): Either[ValidationError, Option[A]] = {
     val pages = Seq(
       answers.get(questionPage),
-      answers.get(VerifyYourSubcontractorsYesNoPage).map(_ => answers.get(yesNoPage).getOrElse(true))
+      answers.get(yesNoPage)
     )
 
     if (pages.forall(_.isEmpty)) {

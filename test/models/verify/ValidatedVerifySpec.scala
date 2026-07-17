@@ -370,11 +370,139 @@ class ValidatedVerifySpec extends SpecBase with Matchers {
       ValidatedVerify.build(minRequiredLessEmail) mustBe Left(MissingAnswer(ContractorEmailConfirmationStoredPage))
     }
 
-    // ─── Failure: readiness flag ──────────────────────────────────────────────
+    // ─── check scenarios with VerifyYourSubcontractorsYesNoPage values ──────────────────────────────────────────────
 
     "fail when VerificationBatchReadinessPage is absent" in {
       val ua = minRequired.remove(VerificationBatchReadinessPage).success.value
       ValidatedVerify.build(ua) mustBe Left(MissingAnswer(VerificationBatchReadinessPage))
+    }
+
+    // ─── Failure: readiness flag ──────────────────────────────────────────────
+
+    "fail when ReverifyExistingSubcontractorsYesNoPage not selected and subcontractors to reverify are selected" in {
+      val ua =
+        emptyUserAnswers
+          .set(SelectSubcontractorsToReverifyPage, Set(grantAlan))
+          .success
+          .value
+          .set(ContractorEmailConfirmationStoredPage, DoNotSend)
+          .success
+          .value
+          .set(VerificationBatchReadinessPage, true)
+          .success
+          .value
+
+      ValidatedVerify.build(ua) mustBe Left(MissingAnswer(ReverifyExistingSubcontractorsYesNoPage))
+
+    }
+
+    "success when ReverifyExistingSubcontractorsYesNoPage value is none and VerifyYourSubcontractorsYesNoPage as true with subcontractors are selected" in {
+      val ua =
+        emptyUserAnswers
+          .set(VerifyYourSubcontractorsYesNoPage, true)
+          .success
+          .value
+          .set(SelectSubcontractorsToReverifyPage, Set(grantAlan))
+          .success
+          .value
+          .set(ContractorEmailConfirmationStoredPage, DoNotSend)
+          .success
+          .value
+          .set(VerificationBatchReadinessPage, true)
+          .success
+          .value
+
+      ValidatedVerify.build(ua) mustBe Right(
+        ValidatedVerify(
+          selectedSubcontractors = Set.empty,
+          subcontractorsToReverify = Some(Set(grantAlan)),
+          emailToUse = None
+        )
+      )
+    }
+
+    "not fail when optional VerifyYourSubcontractorsYesNoPage is missing" in {
+      val ua = emptyUserAnswers
+        .set(SelectSubcontractorPage, Set(brodyMartin))
+        .success
+        .value
+        .set(ContractorEmailConfirmationStoredPage, ContractorEmailConfirmationStored.DoNotSend)
+        .success
+        .value
+        .set(VerificationBatchReadinessPage, true)
+        .success
+        .value
+
+      ValidatedVerify.build(ua) mustBe Right(
+        ValidatedVerify(
+          selectedSubcontractors = Set(brodyMartin),
+          subcontractorsToReverify = None,
+          emailToUse = None
+        )
+      )
+    }
+
+    "fail when verify=true but SelectSubcontractorsToReverifyPage is absent" in {
+      val ua =
+        minRequired
+          .set(VerifyYourSubcontractorsYesNoPage, true)
+          .success
+          .value
+
+      ValidatedVerify.build(ua) mustBe Left(InvalidAnswer(SelectSubcontractorsToReverifyPage))
+    }
+
+    // ─── Failure: empty sets for VerifyYourSubcontractorsYesNoPage  ──────────────────────────────────────────────────
+
+    "fail when selectedSubcontractors is an empty set for verify" in {
+      val ua =
+        emptyUserAnswers
+          .set(SelectSubcontractorPage, Set.empty[SubcontractorViewModel])
+          .success
+          .value
+          .set(VerifyYourSubcontractorsYesNoPage, false)
+          .success
+          .value
+
+      ValidatedVerify.build(ua) mustBe Left(InvalidAnswer(SelectSubcontractorPage))
+    }
+
+    "fail when verify=true but subcontractorsToReverify is empty and no selectedSubcontractors are present" in {
+      val ua =
+        emptyUserAnswers
+          .set(VerifyYourSubcontractorsYesNoPage, true)
+          .success
+          .value
+          .set(SelectSubcontractorsToReverifyPage, Set.empty[SelectedSubcontractors])
+          .success
+          .value
+          .set(ContractorEmailConfirmationStoredPage, DoNotSend)
+          .success
+          .value
+          .set(VerificationBatchReadinessPage, true)
+          .success
+          .value
+
+      ValidatedVerify.build(ua) mustBe Left(InvalidAnswer(SelectSubcontractorPage))
+    }
+
+    "build successfully when verify=true but subcontractorsToReverify is empty and selectedSubcontractors are present" in {
+      val ua =
+        minRequired
+          .set(VerifyYourSubcontractorsYesNoPage, true)
+          .success
+          .value
+          .set(SelectSubcontractorsToReverifyPage, Set.empty[SelectedSubcontractors])
+          .success
+          .value
+
+      ValidatedVerify.build(ua) mustBe Right(
+        ValidatedVerify(
+          selectedSubcontractors = Set(brodyMartin),
+          subcontractorsToReverify = Some(Set.empty),
+          emailToUse = None
+        )
+      )
     }
   }
 }
