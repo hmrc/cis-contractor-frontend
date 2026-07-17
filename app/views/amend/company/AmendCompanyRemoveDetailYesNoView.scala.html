@@ -1,0 +1,57 @@
+@*
+ * Copyright 2026 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import viewmodels.LegendSize.Large
+
+@this(
+    layout: templates.Layout,
+    formHelper: FormWithCSRF,
+    govukErrorSummary: GovukErrorSummary,
+    govukRadios: GovukRadios,
+    govukButton: GovukButton
+)
+
+@(name: String, contractorDetail:String, form: Form[_])(implicit request: Request[_], messages: Messages)
+
+@defining(contractorDetail match {
+    case "address"                      => messages("amendCompanyRemoveDetailYesNo.detail.address")
+    case "contact-details"              => messages("amendCompanyRemoveDetailYesNo.detail.contact-details")
+    case "unique-taxpayer-reference"    => messages("amendCompanyRemoveDetailYesNo.detail.unique-taxpayer-reference")
+    case "company-registration-number"  => messages("amendCompanyRemoveDetailYesNo.detail.company-registration-number")
+    case "works-reference-number"       => messages("amendCompanyRemoveDetailYesNo.detail.works-reference-number")
+}) { selectedSubcontractorDetail =>
+
+    @layout(pageTitle = title(form, messages("amendCompanyRemoveDetailYesNo.title"))) {
+
+        @formHelper(action = controllers.amend.company.routes.AmendCompanyRemoveDetailYesNoController.onSubmit(contractorDetail), Symbol("autoComplete") -> "off") {
+
+            @if(form.errors.nonEmpty) {
+                @govukErrorSummary(ErrorSummaryViewModel(form, errorLinkOverrides = Map("value" -> "value_0")))
+            }
+
+            @govukRadios(
+                RadiosViewModel.yesNo(
+                    field = form("value"),
+                    legend = LegendViewModel(messages("amendCompanyRemoveDetailYesNo.heading", name, selectedSubcontractorDetail)).asPageHeading(Large)
+                )
+            )
+
+            @govukButton(
+                ButtonViewModel(messages("site.continue"))
+            )
+        }
+    }
+}
