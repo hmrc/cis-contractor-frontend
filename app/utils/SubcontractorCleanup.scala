@@ -21,6 +21,7 @@ import pages.add.*
 import pages.add.partnership.*
 import pages.add.company.*
 import pages.add.trust.*
+import pages.verify.*
 
 import scala.util.Try
 
@@ -104,5 +105,19 @@ object SubcontractorCleanup {
       .flatMap(removePartnershipSubcontractor)
       .flatMap(removeTrustSubcontractor)
       .flatMap(_.remove(TypeOfSubcontractorPage))
+
+  def removeVerifyJourney(userAnswers: UserAnswers): Try[UserAnswers] =
+    userAnswers
+      .remove(SelectSubcontractorPage)
+      .flatMap(_.remove(ReverifyExistingSubcontractorsYesNoPage))
+      .flatMap(_.remove(SelectSubcontractorsToReverifyPage))
+      .flatMap(_.remove(ContractorEmailConfirmationStoredPage))
+      .flatMap(_.remove(ContractorEmailConfirmationNotStoredPage))
+      .flatMap(_.remove(EmailAddressPage))
+      .flatMap(_.remove(VerifyYourSubcontractorsYesNoPage))
+      .flatMap(_.remove(VerificationDeclarationPage))
+      .flatMap(_.remove(CurrentVerificationBatchResponsePage))
+      .flatMap(_.remove(NewestVerificationBatchResponsePage))
+      .flatMap(_.remove(VerificationBatchReadinessPage))
 
 }

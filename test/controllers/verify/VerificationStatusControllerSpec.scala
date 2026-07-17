@@ -95,7 +95,7 @@ class VerificationStatusControllerSpec extends SpecBase {
       }
     }
 
-    "must redirect to JourneyRecovery when no verified subcontractors exist" in {
+    "must redirect to ContractorEmailConfirmationStored when no verified subcontractors exist" in {
       val ua =
         emptyUserAnswers
           .set(
@@ -118,11 +118,14 @@ class VerificationStatusControllerSpec extends SpecBase {
         val result     = controller.goToReverificationDecision()(request)
 
         status(result) mustBe SEE_OTHER
-        redirectLocation(result).value mustBe routes.JourneyRecoveryController.onPageLoad().url
+        redirectLocation(result).value mustBe
+          controllers.verify.routes.ContractorEmailConfirmationStoredController
+            .onPageLoad(NormalMode)
+            .url
       }
     }
 
-    "must redirect to JourneyRecovery when NewestVerificationBatchResponsePage is missing" in {
+    "must redirect to ContractorEmailConfirmationStored when NewestVerificationBatchResponsePage is missing" in {
       val app = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
       running(app) {
@@ -131,7 +134,10 @@ class VerificationStatusControllerSpec extends SpecBase {
         val result     = controller.goToReverificationDecision()(request)
 
         status(result) mustBe SEE_OTHER
-        redirectLocation(result).value mustBe routes.JourneyRecoveryController.onPageLoad().url
+        redirectLocation(result).value mustBe
+          controllers.verify.routes.ContractorEmailConfirmationStoredController
+            .onPageLoad(NormalMode)
+            .url
       }
     }
 
@@ -178,7 +184,7 @@ class VerificationStatusControllerSpec extends SpecBase {
       }
     }
 
-    "must redirect to JourneyRecovery when no verified subcontractors exist" in {
+    "must redirect to ContractorEmailConfirmationStored when no verified subcontractors exist" in {
       val ua =
         emptyUserAnswers
           .set(
@@ -200,11 +206,14 @@ class VerificationStatusControllerSpec extends SpecBase {
         val result     = controller.goToSelectSubcontractorsToReverify()(request)
 
         status(result) mustBe SEE_OTHER
-        redirectLocation(result).value mustBe routes.JourneyRecoveryController.onPageLoad().url
+        redirectLocation(result).value mustBe
+          controllers.verify.routes.ContractorEmailConfirmationStoredController
+            .onPageLoad(NormalMode)
+            .url
       }
     }
 
-    "must redirect to JourneyRecovery when NewestVerificationBatchResponsePage is missing" in {
+    "must redirect to ContractorEmailConfirmationStored when NewestVerificationBatchResponsePage is missing" in {
       val app = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
       running(app) {
@@ -213,7 +222,10 @@ class VerificationStatusControllerSpec extends SpecBase {
         val result     = controller.goToSelectSubcontractorsToReverify()(request)
 
         status(result) mustBe SEE_OTHER
-        redirectLocation(result).value mustBe routes.JourneyRecoveryController.onPageLoad().url
+        redirectLocation(result).value mustBe
+          controllers.verify.routes.ContractorEmailConfirmationStoredController
+            .onPageLoad(NormalMode)
+            .url
       }
     }
 

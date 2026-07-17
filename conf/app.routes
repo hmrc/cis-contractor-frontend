@@ -409,10 +409,13 @@ GET   /subcontractor/add/trust/check-address         controllers.add.trust.Trust
 POST  /subcontractor/add/trust/check-address         controllers.add.trust.TrustAddressYesNoController.onSubmit(mode: Mode = NormalMode)
 GET   /subcontractor/add/trust/change-check-address  controllers.add.trust.TrustAddressYesNoController.onPageLoad(mode: Mode = CheckMode)
 POST  /subcontractor/add/trust/change-check-address  controllers.add.trust.TrustAddressYesNoController.onSubmit(mode: Mode = CheckMode)
+GET   /subcontractor/amend/trust/check-address       controllers.add.trust.TrustAddressYesNoController.onPageLoad(mode: Mode = AmendMode)
+POST  /subcontractor/amend/trust/check-address       controllers.add.trust.TrustAddressYesNoController.onSubmit(mode: Mode = AmendMode)
 
 GET   /subcontractor/add/trust/address                controllers.add.trust.TrustAddressController.redirectToAddressLookup(mode: Mode = NormalMode, changeRoute: Option[String] ?= None)
 GET   /subcontractor/add/trust/address-return         controllers.add.trust.TrustAddressController.addressLookupCallback(id: String ?= "", mode: Mode = NormalMode)
 GET   /subcontractor/add/trust/address-return/change  controllers.add.trust.TrustAddressController.addressLookupCallbackChange(id: String ?= "", mode: Mode = NormalMode)
+GET   /subcontractor/amend/trust/address-change       controllers.add.trust.TrustAddressController.redirectToAmendAddressLookup()
 
 GET   /subcontractor/add/trust/email-address         controllers.add.trust.TrustEmailAddressController.onPageLoad(mode: Mode = NormalMode)
 POST  /subcontractor/add/trust/email-address         controllers.add.trust.TrustEmailAddressController.onSubmit(mode: Mode = NormalMode)
@@ -496,7 +499,12 @@ GET   /subcontractor/verify/no-subcontractors-added  controllers.verify.NoSubcon
 
 GET   /subcontractor/verify/check-verification-batch-readiness  controllers.verify.CheckVerificationBatchReadinessController.checkVerificationBatchReadiness(mode: Mode = NormalMode)
 
-GET   /subcontractor/verify/newest  controllers.verify.NewestVerificationBatchController.onPageLoad()
+GET   /subcontractor/verify/check-verification-batch-readiness/check-mode  controllers.verify.CheckVerificationBatchReadinessController.checkVerificationBatchReadinessInCheckMode()
+
+GET   /verify/check-verification-batch-readiness-before-declaration   controllers.verify.CheckVerificationBatchReadinessController.checkVerificationBatchReadinessBeforeDeclaration()
+
+GET   /subcontractor/verify/newest                            controllers.verify.NewestVerificationBatchController.onPageLoad()
+GET   /subcontractor/verify/inactive-scheme-warning/continue  controllers.verify.NewestVerificationBatchController.onContinue
 
 GET   /subcontractor/verify/current  controllers.verify.CurrentVerificationBatchController.onPageLoad()
 
@@ -540,6 +548,8 @@ GET   /subcontractor/verify/inactive-scheme-warning  controllers.verify.Inactive
 GET   /subcontractor/verify/verification-not-submitted-warning  controllers.verify.VerificationNotSubmittedWarningController.onPageLoad()
 
 GET   /subcontractor/verify/no-subcontractors-selected-warning  controllers.verify.NoSubcontractorsSelectedWarningController.onPageLoad()
+
+GET   /subcontractor/verify/no-subcontractors-selected-warning/cancel   controllers.verify.NoSubcontractorsSelectedWarningController.onCancel()
 
 GET   /subcontractor/verify/verification-request-submitted  controllers.verify.VerificationRequestSubmittedController.onPageLoad()
 

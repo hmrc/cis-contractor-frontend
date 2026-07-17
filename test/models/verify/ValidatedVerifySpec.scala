@@ -112,6 +112,59 @@ class ValidatedVerifySpec extends SpecBase with Matchers {
       )
     }
 
+    "build successfully when only subcontractors to reverify are selected" in {
+      val ua =
+        emptyUserAnswers
+          .set(ReverifyExistingSubcontractorsYesNoPage, true)
+          .success
+          .value
+          .set(SelectSubcontractorsToReverifyPage, Set(grantAlan))
+          .success
+          .value
+          .set(ContractorEmailConfirmationStoredPage, DoNotSend)
+          .success
+          .value
+          .set(VerificationBatchReadinessPage, true)
+          .success
+          .value
+
+      ValidatedVerify.build(ua) mustBe Right(
+        ValidatedVerify(
+          selectedSubcontractors = Set.empty,
+          subcontractorsToReverify = Some(Set(grantAlan)),
+          emailToUse = None
+        )
+      )
+    }
+
+    "build successfully when only subcontractors to reverify are selected and CurrentEmail is used" in {
+      val ua =
+        emptyUserAnswers
+          .set(ReverifyExistingSubcontractorsYesNoPage, true)
+          .success
+          .value
+          .set(SelectSubcontractorsToReverifyPage, Set(grantAlan))
+          .success
+          .value
+          .set(NewestVerificationBatchResponsePage, batchResponseWithEmail("scheme@example.com"))
+          .success
+          .value
+          .set(ContractorEmailConfirmationStoredPage, CurrentEmail)
+          .success
+          .value
+          .set(VerificationBatchReadinessPage, true)
+          .success
+          .value
+
+      ValidatedVerify.build(ua) mustBe Right(
+        ValidatedVerify(
+          selectedSubcontractors = Set.empty,
+          subcontractorsToReverify = Some(Set(grantAlan)),
+          emailToUse = Some("scheme@example.com")
+        )
+      )
+    }
+
     "resolve emailToUse from scheme address when ContractorEmailConfirmationStored is CurrentEmail" in {
       val ua =
         minRequired
@@ -200,8 +253,8 @@ class ValidatedVerifySpec extends SpecBase with Matchers {
 
     // ─── Failure: missing required pages ─────────────────────────────────────
 
-    "fail when SelectSubcontractorPage is missing" in {
-      ValidatedVerify.build(emptyUserAnswers) mustBe Left(MissingAnswer(SelectSubcontractorPage))
+    "fail when no subcontractors are selected for verify or reverify" in {
+      ValidatedVerify.build(emptyUserAnswers) mustBe Left(InvalidAnswer(SelectSubcontractorPage))
     }
 
     "fail when reverify=true but SelectSubcontractorsToReverifyPage is absent" in {
@@ -229,7 +282,26 @@ class ValidatedVerifySpec extends SpecBase with Matchers {
       ValidatedVerify.build(ua) mustBe Left(InvalidAnswer(SelectSubcontractorPage))
     }
 
-    "fail when reverify=true but subcontractorsToReverify is an empty set" in {
+    "fail when reverify=true but subcontractorsToReverify is empty and no selectedSubcontractors are present" in {
+      val ua =
+        emptyUserAnswers
+          .set(ReverifyExistingSubcontractorsYesNoPage, true)
+          .success
+          .value
+          .set(SelectSubcontractorsToReverifyPage, Set.empty[SelectedSubcontractors])
+          .success
+          .value
+          .set(ContractorEmailConfirmationStoredPage, DoNotSend)
+          .success
+          .value
+          .set(VerificationBatchReadinessPage, true)
+          .success
+          .value
+
+      ValidatedVerify.build(ua) mustBe Left(InvalidAnswer(SelectSubcontractorPage))
+    }
+
+    "build successfully when reverify=true but subcontractorsToReverify is empty and selectedSubcontractors are present" in {
       val ua =
         minRequired
           .set(ReverifyExistingSubcontractorsYesNoPage, true)
@@ -239,7 +311,13 @@ class ValidatedVerifySpec extends SpecBase with Matchers {
           .success
           .value
 
-      ValidatedVerify.build(ua) mustBe Left(InvalidAnswer(SelectSubcontractorsToReverifyPage))
+      ValidatedVerify.build(ua) mustBe Right(
+        ValidatedVerify(
+          selectedSubcontractors = Set(brodyMartin),
+          subcontractorsToReverify = Some(Set.empty),
+          emailToUse = None
+        )
+      )
     }
 
     // ─── Failure: stale session data ─────────────────────────────────────────

@@ -18,29 +18,51 @@ package controllers.verify
 
 import config.FrontendAppConfig
 import controllers.actions.*
+import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import viewmodels.checkAnswers.verify.VerificationRequestSubmittedViewModel
+import services.VerificationService
+import viewmodels.verify.VerificationRequestSubmittedViewModel
 import views.html.verify.VerificationRequestSubmittedView
 import javax.inject.Inject
+import scala.concurrent.ExecutionContext
 
 class VerificationRequestSubmittedController @Inject() (
   override val messagesApi: MessagesApi,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
+  verificationService: VerificationService,
   val controllerComponents: MessagesControllerComponents,
-  view: VerificationRequestSubmittedView
-)(implicit appConfig: FrontendAppConfig)
+  view: VerificationRequestSubmittedView,
+  appConfig: FrontendAppConfig
+)(implicit ec: ExecutionContext)
     extends FrontendBaseController
-    with I18nSupport {
+    with I18nSupport
+    with Logging {
 
   def onPageLoad(): Action[AnyContent] =
-    (identify andThen getData andThen requireData) { implicit request =>
-      val vm =
-        VerificationRequestSubmittedViewModel
-          .fromUserAnswers(request.userAnswers, appConfig)
-      Ok(view(vm))
+    (identify andThen getData andThen requireData).async { implicit request =>
+      verificationService
+        .refreshNewestVerificationBatch(request.userAnswers)
+        .map { updatedAnswers =>
+          val viewModel =
+            VerificationRequestSubmittedViewModel.fromUserAnswers(
+              updatedAnswers,
+              appConfig
+            )
+
+          given FrontendAppConfig = appConfig
+
+          Ok(view(viewModel))
+        }
+        .recover { case t =>
+          logger.error(
+            "[VerificationRequestSubmittedController.onPageLoad] Failed to refresh newest verification batch",
+            t
+          )
+          Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+        }
     }
 }

@@ -16,7 +16,7 @@
 
 package viewmodels.checkAnswers.add.trust
 
-import models.UserAnswers
+import models.{AmendMode, CheckMode, Mode, UserAnswers}
 import pages.add.trust.TrustAddressPage
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
@@ -24,12 +24,16 @@ import viewmodels.checkAnswers.add.AddressSummaryRow
 
 object TrustAddressSummary {
 
-  def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
+  def row(answers: UserAnswers, mode: Mode = CheckMode)(implicit messages: Messages): Option[SummaryListRow] =
     answers.get(TrustAddressPage).map { answer =>
       AddressSummaryRow.row(
         address = answer,
         key = "trustAddress.checkYourAnswersLabel",
-        changeCall = controllers.add.trust.routes.TrustAddressController.redirectToAddressLookup(Some("change")),
+        changeCall = if (mode == AmendMode) {
+          controllers.add.trust.routes.TrustAddressController.redirectToAmendAddressLookup()
+        } else {
+          controllers.add.trust.routes.TrustAddressController.redirectToAddressLookup(Some("change"))
+        },
         hiddenTextKey = "trustAddress.change.hidden",
         id = "address-of-trust"
       )

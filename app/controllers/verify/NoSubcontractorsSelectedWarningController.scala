@@ -22,32 +22,64 @@ import models.NormalMode
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import queries.CisIdQuery
+import repositories.SessionRepository
+import utils.SubcontractorCleanup
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.verify.NoSubcontractorsSelectedWarningView
 
 import javax.inject.Inject
+import scala.concurrent.{ExecutionContext, Future}
 
 class NoSubcontractorsSelectedWarningController @Inject() (
   override val messagesApi: MessagesApi,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
+  sessionRepository: SessionRepository,
   val controllerComponents: MessagesControllerComponents,
   view: NoSubcontractorsSelectedWarningView,
   appConfig: FrontendAppConfig
-) extends FrontendBaseController
+)(implicit ec: ExecutionContext)
+    extends FrontendBaseController
     with I18nSupport {
 
   def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
     val SelectSubcontractorsUrl =
       controllers.verify.routes.SelectSubcontractorController.onPageLoad(NormalMode).url
     request.userAnswers.get(CisIdQuery) match {
-      case Some(cisId) =>
-        val manageSubcontractorsUrl = s"${appConfig.manageSubcontractorsUrl}/$cisId"
-        Ok(view(manageSubcontractorsUrl, SelectSubcontractorsUrl))
+      case Some(_) =>
+        val cancelUrl =
+          controllers.verify.routes.NoSubcontractorsSelectedWarningController.onCancel().url
+
+        Ok(view(cancelUrl, SelectSubcontractorsUrl))
 
       case None =>
         Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
     }
   }
+
+  def onCancel(): Action[AnyContent] =
+    (identify andThen getData andThen requireData).async { implicit request =>
+      request.userAnswers.get(CisIdQuery) match {
+        case Some(cisId) =>
+          SubcontractorCleanup
+            .removeVerifyJourney(request.userAnswers)
+            .fold(
+              _ =>
+                Future.successful(
+                  Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+                ),
+              updatedAnswers =>
+                sessionRepository.set(updatedAnswers).map { _ =>
+                  Redirect(s"${appConfig.manageSubcontractorsUrl}/$cisId")
+                }
+            )
+
+        case None =>
+          Future.successful(
+            Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+          )
+      }
+    }
+
 }

@@ -117,7 +117,7 @@ final class CreateSubmissionForVerificationRequestSpec extends AnyWordSpec with 
       (jsonWithAgent \ "instanceId").as[String] mustBe "abc-123"
       (jsonWithAgent \ "verificationBatchId").as[Long] mustBe 99L
       (jsonWithAgent \ "verificationBatchResourceRef").as[Long] mustBe 10L
-      (jsonWithAgent \ "emailRecipient").as[String] mustBe "ops@example.com"
+      (jsonWithAgent \ "emailRecipient").asOpt[String] mustBe Some("ops@example.com")
       (jsonWithAgent \ "irMarkGenerated").as[String] mustBe "IR_MARK"
       (jsonWithAgent \ "agentId").as[String] mustBe "agent-123"
 
@@ -130,6 +130,21 @@ final class CreateSubmissionForVerificationRequestSpec extends AnyWordSpec with 
       val jsonWithoutAgent  = Json.toJson(modelWithoutAgent)
 
       (jsonWithoutAgent \ "agentId").toOption mustBe None
+    }
+
+    "write emailRecipient as empty string when None opt-out" in {
+      val model = CreateSubmissionForVerificationRequest(
+        instanceId = "abc-123",
+        verificationBatchId = 99L,
+        verificationBatchResourceRef = 10L,
+        emailRecipient = None,
+        verifications = Seq.empty,
+        agentId = None
+      )
+
+      val json = Json.toJson(model)
+
+      (json \ "emailRecipient").as[String] mustBe ""
     }
 
     "round-trip (model -> json -> model) without losing data" in {
