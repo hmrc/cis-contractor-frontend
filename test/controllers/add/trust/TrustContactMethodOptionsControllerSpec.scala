@@ -25,7 +25,7 @@ import models.{CheckMode, NormalMode, UserAnswers}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.add.trust.{TrustContactMethodOptionsPage, TrustEmailAddressPage, TrustMobileNumberPage, TrustNamePage, TrustPhoneNumberPage}
+import pages.add.trust.{TrustContactMethodOptionsPage, TrustEmailAddressPage, TrustNamePage, TrustPhoneNumberPage}
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*

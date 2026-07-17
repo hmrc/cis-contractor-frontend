@@ -17,7 +17,7 @@
 package viewmodels.checkAnswers.add.trust
 
 import base.SpecBase
-import models.{CheckMode, UserAnswers}
+import models.{AmendMode, CheckMode, UserAnswers}
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import pages.add.trust.TrustAddressYesNoPage
 import play.api.i18n.{Lang, Messages, MessagesImpl}
@@ -55,6 +55,34 @@ class TrustAddressYesNoSummarySpec extends SpecBase with GuiceOneAppPerSuite {
       val action: ActionItem = actions.items.head
       action.href mustBe controllers.add.trust.routes.TrustAddressYesNoController
         .onPageLoad(CheckMode)
+        .url
+      action.content mustBe Text(messages("site.change"))
+      action.visuallyHiddenText mustBe Some(messages("trustAddressYesNo.change.hidden"))
+      action.attributes must contain("id" -> "add-trust-address")
+    }
+
+    "return a row with key, value = yes, and change action when the answer is true in AmendMode" in {
+      val ua: UserAnswers =
+        emptyUserAnswers
+          .set(TrustAddressYesNoPage, true)
+          .success
+          .value
+
+      val maybeRow = TrustAddressYesNoSummary.row(ua, AmendMode)
+      maybeRow must not be empty
+
+      val row: SummaryListRow = maybeRow.value
+
+      row.key mustBe Key(content = Text(messages("trustAddressYesNo.checkYourAnswersLabel")))
+      row.value mustBe Value(content = Text(messages("site.yes")))
+
+      row.actions must not be empty
+      val actions: Actions = row.actions.value
+      actions.items must have size 1
+
+      val action: ActionItem = actions.items.head
+      action.href mustBe controllers.add.trust.routes.TrustAddressYesNoController
+        .onPageLoad(AmendMode)
         .url
       action.content mustBe Text(messages("site.change"))
       action.visuallyHiddenText mustBe Some(messages("trustAddressYesNo.change.hidden"))

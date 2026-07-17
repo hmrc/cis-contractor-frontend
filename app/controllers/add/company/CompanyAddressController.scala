@@ -56,7 +56,7 @@ class CompanyAddressController @Inject() (
     routes.CompanyAddressController.addressLookupCallbackChange()
 
   override protected def onCompletion(mode: Mode): Call =
-    routes.CompanyContactOptionsController.onPageLoad(mode)
+    routes.AddCompanyContactMethodsYesNoController.onPageLoad(mode)
 
   override protected def onChangeCompletion(isAmend: Boolean): Call =
     if (isAmend) {

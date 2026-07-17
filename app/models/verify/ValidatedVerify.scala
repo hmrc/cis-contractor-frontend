@@ -28,26 +28,32 @@ final case class ValidatedVerify(
 
 object ValidatedVerify extends Validation {
 
-  def build(answers: UserAnswers): Either[ValidationError, ValidatedVerify] =
+  def build(answers: UserAnswers): Either[ValidationError, ValidatedVerify] = {
+    val selectedSubcontractors: Set[SubcontractorViewModel] =
+      answers.get(SelectSubcontractorPage).getOrElse(Set.empty)
+
     for {
-      selectedSubcontractors   <- getPageValue(answers, SelectSubcontractorPage)
-      _                        <- Either.cond(selectedSubcontractors.nonEmpty, (), InvalidAnswer(SelectSubcontractorPage))
       subcontractorsToReverify <- getOptionalPageAndQuestionValue(
                                     answers,
                                     SelectSubcontractorsToReverifyPage,
                                     ReverifyExistingSubcontractorsYesNoPage
                                   )
-      emailToUse               <- resolveEmail(answers)
-      _                        <- subcontractorsToReverify match {
-                                    case Some(s) if s.isEmpty => Left(InvalidAnswer(SelectSubcontractorsToReverifyPage))
-                                    case _                    => Right(())
-                                  }
-      _                        <- Either.cond(
-                                    answers.get(VerificationBatchReadinessPage).contains(true),
-                                    (),
-                                    MissingAnswer(VerificationBatchReadinessPage)
-                                  )
+
+      _ <- Either.cond(
+             selectedSubcontractors.nonEmpty || subcontractorsToReverify.exists(_.nonEmpty),
+             (),
+             InvalidAnswer(SelectSubcontractorPage)
+           )
+
+      emailToUse <- resolveEmail(answers)
+
+      _ <- Either.cond(
+             answers.get(VerificationBatchReadinessPage).contains(true),
+             (),
+             MissingAnswer(VerificationBatchReadinessPage)
+           )
     } yield ValidatedVerify(selectedSubcontractors, subcontractorsToReverify, emailToUse)
+  }
 
   private def resolveEmail(answers: UserAnswers): Either[ValidationError, Option[String]] =
     answers.get(ContractorEmailConfirmationStoredPage) match {
