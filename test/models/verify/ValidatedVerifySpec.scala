@@ -81,8 +81,6 @@ class ValidatedVerifySpec extends SpecBase with Matchers {
 
   "ValidatedVerify.build" - {
 
-    // ─── Success cases ───────────────────────────────────────────────────────
-
     "build successfully with minimum required answers (reverify=false, DoNotSend)" in {
       ValidatedVerify.build(minRequired) mustBe Right(
         ValidatedVerify(
@@ -251,8 +249,6 @@ class ValidatedVerifySpec extends SpecBase with Matchers {
       )
     }
 
-    // ─── Failure: missing required pages ─────────────────────────────────────
-
     "fail when no subcontractors are selected for verify or reverify" in {
       ValidatedVerify.build(emptyUserAnswers) mustBe Left(InvalidAnswer(SelectSubcontractorPage))
     }
@@ -266,8 +262,6 @@ class ValidatedVerifySpec extends SpecBase with Matchers {
 
       ValidatedVerify.build(ua) mustBe Left(InvalidAnswer(SelectSubcontractorsToReverifyPage))
     }
-
-    // ─── Failure: empty sets ──────────────────────────────────────────────────
 
     "fail when selectedSubcontractors is an empty set" in {
       val ua =
@@ -320,15 +314,11 @@ class ValidatedVerifySpec extends SpecBase with Matchers {
       )
     }
 
-    // ─── Failure: stale session data ─────────────────────────────────────────
-
     "fail when reverify=false but subcontractors to reverify are still present (stale session)" in {
       val ua = withStaleValue(minRequired, SelectSubcontractorsToReverifyPage, Set(grantAlan))
 
       ValidatedVerify.build(ua) mustBe Left(InvalidAnswer(SelectSubcontractorsToReverifyPage))
     }
-
-    // ─── Failure: email pairing ───────────────────────────────────────────────
 
     "fail when CurrentEmail is selected but the scheme has no email address" in {
       val ua =
@@ -370,14 +360,10 @@ class ValidatedVerifySpec extends SpecBase with Matchers {
       ValidatedVerify.build(minRequiredLessEmail) mustBe Left(MissingAnswer(ContractorEmailConfirmationStoredPage))
     }
 
-    // ─── check scenarios with VerifyYourSubcontractorsYesNoPage values ──────────────────────────────────────────────
-
     "fail when VerificationBatchReadinessPage is absent" in {
       val ua = minRequired.remove(VerificationBatchReadinessPage).success.value
       ValidatedVerify.build(ua) mustBe Left(MissingAnswer(VerificationBatchReadinessPage))
     }
-
-    // ─── Failure: readiness flag ──────────────────────────────────────────────
 
     "fail when ReverifyExistingSubcontractorsYesNoPage not selected and subcontractors to reverify are selected" in {
       val ua =
@@ -451,8 +437,6 @@ class ValidatedVerifySpec extends SpecBase with Matchers {
 
       ValidatedVerify.build(ua) mustBe Left(InvalidAnswer(SelectSubcontractorsToReverifyPage))
     }
-
-    // ─── Failure: empty sets for VerifyYourSubcontractorsYesNoPage  ──────────────────────────────────────────────────
 
     "fail when selectedSubcontractors is an empty set for verify" in {
       val ua =
