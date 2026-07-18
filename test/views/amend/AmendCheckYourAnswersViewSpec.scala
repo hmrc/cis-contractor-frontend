@@ -30,10 +30,7 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist._
 import views.html.amend.AmendCheckYourAnswersView
 
-class AmendCheckYourAnswersViewSpec
-  extends AnyWordSpec
-    with Matchers
-    with GuiceOneAppPerSuite {
+class AmendCheckYourAnswersViewSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite {
 
   "AmendCheckYourAnswersView" should {
 

@@ -140,7 +140,7 @@ class TrustUtrSummarySpec extends AnyFreeSpec with Matchers with CyaEncodingSpec
 
       row.value.content.asHtml.toString should include(utr)
 
-      row.actions shouldBe defined
+      row.actions             shouldBe defined
       row.actions.value.items shouldBe empty
     }
   }

@@ -39,16 +39,16 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class AmendTrustCheckYourAnswersController @Inject() (
-                                                            override val messagesApi: MessagesApi,
-                                                            identify: IdentifierAction,
-                                                            getData: DataRetrievalAction,
-                                                            requireData: DataRequiredAction,
-                                                            val controllerComponents: MessagesControllerComponents,
-                                                            subcontractorService: SubcontractorService,
-                                                            sessionRepository: SessionRepository,
-                                                            view: AmendCheckYourAnswersView
-                                                          )(implicit ec: ExecutionContext)
-  extends FrontendBaseController
+  override val messagesApi: MessagesApi,
+  identify: IdentifierAction,
+  getData: DataRetrievalAction,
+  requireData: DataRequiredAction,
+  val controllerComponents: MessagesControllerComponents,
+  subcontractorService: SubcontractorService,
+  sessionRepository: SessionRepository,
+  view: AmendCheckYourAnswersView
+)(implicit ec: ExecutionContext)
+    extends FrontendBaseController
     with I18nSupport
     with Logging {
 
@@ -58,7 +58,7 @@ class AmendTrustCheckYourAnswersController @Inject() (
     ValidatedTrust.build(ua) match {
       case Right(_) =>
         val isVerified = ua.get(SubContractorVerifiedQuery).contains(true)
-        val trustName = ua.get(TrustNamePage).getOrElse("")
+        val trustName  = ua.get(TrustNamePage).getOrElse("")
 
         val subcontractorInformationList =
           SummaryListViewModel(rows = subcontractorInformationRows(ua, isVerified).flatten)
@@ -75,32 +75,33 @@ class AmendTrustCheckYourAnswersController @Inject() (
   }
 
   private def subcontractorInformationRows(
-                                            ua: UserAnswers,
-                                            isVerified: Boolean
-                                          )(implicit messages: Messages): Seq[Option[SummaryListRow]] = {
+    ua: UserAnswers,
+    isVerified: Boolean
+  )(implicit messages: Messages): Seq[Option[SummaryListRow]] =
     Seq(TypeOfSubcontractorSummary.row(ua, showActions = false)) ++
       (if (isVerified) {
-        val verificationNumber = ua.get(SubContractorVerificationNumberQuery).getOrElse("")
-        Seq(
-          TrustUtrSummary.row(
-            ua,
-            AmendMode,
-            showActions = false
-          ),
-          Some(SummaryListRowViewModel(
-            key = Key(content = Text(messages("amendCheckYourAnswers.verificationNumber.label"))),
-            value = Value(content = Text(verificationNumber))
-          ))
-        )
-      } else {
-        Seq.empty
-      })
-  }
+         val verificationNumber = ua.get(SubContractorVerificationNumberQuery).getOrElse("")
+         Seq(
+           TrustUtrSummary.row(
+             ua,
+             AmendMode,
+             showActions = false
+           ),
+           Some(
+             SummaryListRowViewModel(
+               key = Key(content = Text(messages("amendCheckYourAnswers.verificationNumber.label"))),
+               value = Value(content = Text(verificationNumber))
+             )
+           )
+         )
+       } else {
+         Seq.empty
+       })
 
   private def detailsRows(
-                           ua: UserAnswers,
-                           isVerified: Boolean
-                         )(implicit messages: Messages): Seq[Option[SummaryListRow]] = {
+    ua: UserAnswers,
+    isVerified: Boolean
+  )(implicit messages: Messages): Seq[Option[SummaryListRow]] = {
 
     val nameRows =
       if (isVerified) { Seq.empty }

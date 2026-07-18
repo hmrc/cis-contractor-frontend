@@ -42,17 +42,31 @@ import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.Future
 
-class AmendTrustCheckYourAnswersControllerSpec extends SpecBase with MockitoSugar{
+class AmendTrustCheckYourAnswersControllerSpec extends SpecBase with MockitoSugar {
 
   private val minUa =
     emptyUserAnswers
-      .set(TypeOfSubcontractorPage, TypeOfSubcontractor.Trust).success.value
-      .set(TrustNamePage, "Test Trust").success.value
-      .set(TrustAddressYesNoPage, false).success.value
-      .set(AddTrustContactMethodsYesNoPage, false).success.value
-      .set(TrustUtrYesNoPage, false).success.value
-      .set(TrustWorksReferenceYesNoPage, false).success.value
-      .set(SubContractorVerifiedQuery, false).success.value
+      .set(TypeOfSubcontractorPage, TypeOfSubcontractor.Trust)
+      .success
+      .value
+      .set(TrustNamePage, "Test Trust")
+      .success
+      .value
+      .set(TrustAddressYesNoPage, false)
+      .success
+      .value
+      .set(AddTrustContactMethodsYesNoPage, false)
+      .success
+      .value
+      .set(TrustUtrYesNoPage, false)
+      .success
+      .value
+      .set(TrustWorksReferenceYesNoPage, false)
+      .success
+      .value
+      .set(SubContractorVerifiedQuery, false)
+      .success
+      .value
 
   "AmendTrustCheckYourAnswersController" - {
 
@@ -63,8 +77,7 @@ class AmendTrustCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
 
       running(application) {
         val request =
-          FakeRequest(GET,
-            controllers.amend.trust.routes.AmendTrustCheckYourAnswersController.onPageLoad().url)
+          FakeRequest(GET, controllers.amend.trust.routes.AmendTrustCheckYourAnswersController.onPageLoad().url)
 
         val result = route(application, request).value
 
@@ -87,8 +100,7 @@ class AmendTrustCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
       running(application) {
 
         val request =
-          FakeRequest(GET,
-            controllers.amend.trust.routes.AmendTrustCheckYourAnswersController.onPageLoad().url)
+          FakeRequest(GET, controllers.amend.trust.routes.AmendTrustCheckYourAnswersController.onPageLoad().url)
 
         val result = route(application, request).value
 
@@ -101,7 +113,7 @@ class AmendTrustCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
     "must redirect back to amend CYA after successful submit" in {
 
       val mockSubcontractorService = mock[SubcontractorService]
-      val mockSessionRepository = mock[SessionRepository]
+      val mockSessionRepository    = mock[SessionRepository]
 
       when(mockSubcontractorService.createAndUpdateSubcontractor(any[UserAnswers])(any[HeaderCarrier]))
         .thenReturn(Future.successful(()))
@@ -117,8 +129,7 @@ class AmendTrustCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
       running(application) {
 
         val request =
-          FakeRequest(POST,
-            controllers.amend.trust.routes.AmendTrustCheckYourAnswersController.onSubmit().url)
+          FakeRequest(POST, controllers.amend.trust.routes.AmendTrustCheckYourAnswersController.onSubmit().url)
 
         val result = route(application, request).value
 
@@ -136,7 +147,7 @@ class AmendTrustCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
     "must redirect to Journey Recovery when the service fails" in {
 
       val mockSubcontractorService = mock[SubcontractorService]
-      val mockSessionRepository = mock[SessionRepository]
+      val mockSessionRepository    = mock[SessionRepository]
 
       when(mockSubcontractorService.createAndUpdateSubcontractor(any[UserAnswers])(any[HeaderCarrier]))
         .thenReturn(Future.failed(new RuntimeException("boom")))
@@ -152,8 +163,7 @@ class AmendTrustCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
       running(application) {
 
         val request =
-          FakeRequest(POST,
-            controllers.amend.trust.routes.AmendTrustCheckYourAnswersController.onSubmit().url)
+          FakeRequest(POST, controllers.amend.trust.routes.AmendTrustCheckYourAnswersController.onSubmit().url)
 
         val result = route(application, request).value
 
@@ -175,7 +185,7 @@ class AmendTrustCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
           .value
 
       val mockSubcontractorService = mock[SubcontractorService]
-      val mockSessionRepository = mock[SessionRepository]
+      val mockSessionRepository    = mock[SessionRepository]
 
       val application =
         applicationBuilder(userAnswers = Some(invalidUa))
@@ -188,8 +198,7 @@ class AmendTrustCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
       running(application) {
 
         val request =
-          FakeRequest(POST,
-            controllers.amend.trust.routes.AmendTrustCheckYourAnswersController.onSubmit().url)
+          FakeRequest(POST, controllers.amend.trust.routes.AmendTrustCheckYourAnswersController.onSubmit().url)
 
         val result = route(application, request).value
 
@@ -219,8 +228,7 @@ class AmendTrustCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
       running(application) {
 
         val request =
-          FakeRequest(GET,
-            controllers.amend.trust.routes.AmendTrustCheckYourAnswersController.onCancel().url)
+          FakeRequest(GET, controllers.amend.trust.routes.AmendTrustCheckYourAnswersController.onCancel().url)
 
         val result = route(application, request).value
 
