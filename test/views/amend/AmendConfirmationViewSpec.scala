@@ -86,7 +86,7 @@ class AmendConfirmationViewSpec extends AnyWordSpec with Matchers with GuiceOneA
 
     "render the survey link" in new Setup {
 
-      val html = view(rows, subcontractorName, manageYourSubcontractorsUrl)
+      val html          = view(rows, subcontractorName, manageYourSubcontractorsUrl)
       val doc: Document = Jsoup.parse(html.toString())
 
       val surveyLink: Element = doc.select("a[href='#']").last()
