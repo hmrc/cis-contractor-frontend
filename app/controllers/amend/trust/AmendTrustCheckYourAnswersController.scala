@@ -77,26 +77,30 @@ class AmendTrustCheckYourAnswersController @Inject() (
   private def subcontractorInformationRows(
     ua: UserAnswers,
     isVerified: Boolean
-  )(implicit messages: Messages): Seq[Option[SummaryListRow]] =
-    Seq(TypeOfSubcontractorSummary.row(ua, showActions = false)) ++
-      (if (isVerified) {
-         val verificationNumber = ua.get(SubContractorVerificationNumberQuery).getOrElse("")
-         Seq(
-           TrustUtrSummary.row(
-             ua,
-             AmendMode,
-             showActions = false
-           ),
-           Some(
-             SummaryListRowViewModel(
-               key = Key(content = Text(messages("amendCheckYourAnswers.verificationNumber.label"))),
-               value = Value(content = Text(verificationNumber))
-             )
-           )
-         )
-       } else {
-         Seq.empty
-       })
+  )(implicit messages: Messages): Seq[Option[SummaryListRow]] = {
+
+    val verificationRows =
+      Option
+        .when(isVerified) {
+          val verificationNumber =
+            ua.get(SubContractorVerificationNumberQuery).getOrElse("")
+
+          Seq(
+            TrustUtrSummary.row(ua, AmendMode, showActions = false),
+            Some(
+              SummaryListRowViewModel(
+                key = Key(Text(messages("amendCheckYourAnswers.verificationNumber.label"))),
+                value = Value(Text(verificationNumber))
+              )
+            )
+          )
+        }
+        .getOrElse(Nil)
+
+    Seq(
+      TypeOfSubcontractorSummary.row(ua, showActions = false)
+    ) ++ verificationRows
+  }
 
   private def detailsRows(
     ua: UserAnswers,
@@ -104,24 +108,21 @@ class AmendTrustCheckYourAnswersController @Inject() (
   )(implicit messages: Messages): Seq[Option[SummaryListRow]] = {
 
     val nameRows =
-      if (isVerified) { Seq.empty }
-      else {
-        Seq(
-          TrustNameSummary.row(ua, AmendMode)
+      Option
+        .when(!isVerified)(
+          Seq(TrustNameSummary.row(ua, AmendMode))
         )
-      }
+        .getOrElse(Nil)
 
     val utrRows =
-      if (isVerified) { Seq.empty }
-      else {
-        Seq(
-          TrustUtrYesNoSummary.row(ua, AmendMode),
-          TrustUtrSummary.row(
-            ua,
-            AmendMode
+      Option
+        .when(!isVerified)(
+          Seq(
+            TrustUtrYesNoSummary.row(ua, AmendMode),
+            TrustUtrSummary.row(ua, AmendMode)
           )
         )
-      }
+        .getOrElse(Nil)
 
     nameRows ++
       Seq(

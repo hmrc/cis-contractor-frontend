@@ -19,27 +19,19 @@ package controllers.amend.trust
 import base.SpecBase
 
 import controllers.routes
-
 import models.{TypeOfSubcontractor, UserAnswers}
-
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{never, verify, verifyNoMoreInteractions, when}
 import org.scalatestplus.mockito.MockitoSugar
-
 import pages.add.TypeOfSubcontractorPage
 import pages.add.trust._
-
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-
 import queries.SubContractorVerifiedQuery
-
 import repositories.SessionRepository
 import services.SubcontractorService
-
 import uk.gov.hmrc.http.HeaderCarrier
-
 import scala.concurrent.Future
 
 class AmendTrustCheckYourAnswersControllerSpec extends SpecBase with MockitoSugar {
