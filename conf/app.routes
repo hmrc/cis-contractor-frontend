@@ -32,10 +32,6 @@ GET   /subcontractor/access-denied  controllers.AccessDeniedController.onPageLoa
 
 GET   /subcontractor/system-error/there-is-a-problem  controllers.SystemErrorController.onPageLoad()
 
-GET   /subcontractor/amend/subcontractor-information  controllers.amend.AmendIndividualCheckYourAnswersController.onPageLoad()
-POST  /subcontractor/amend/subcontractor-information  controllers.amend.AmendIndividualCheckYourAnswersController.onSubmit()
-GET   /subcontractor/amend/cancel              controllers.amend.AmendIndividualCheckYourAnswersController.onCancel()
-
 GET   /subcontractor/individual-address-lookup         controllers.add.AddressOfSubcontractorController.redirectToAddressLookup(mode: Mode = NormalMode, changeRoute: Option[String] ?= None)
 GET   /subcontractor/individual-address-return         controllers.add.AddressOfSubcontractorController.addressLookupCallback(id: String ?= "", mode: Mode = NormalMode)
 GET   /subcontractor/individual-address-return/change  controllers.add.AddressOfSubcontractorController.addressLookupCallbackChange(id: String ?= "", mode: Mode = NormalMode)
@@ -398,6 +394,10 @@ POST  /subcontractor/add/partnership/change-select-contact-details  controllers.
 
 # Trust
 GET   /subcontractor/add/trust/subcontractor-added  controllers.add.SubcontractorAddedController.trustSubcontractorAdded()
+
+GET   /subcontractor/amend/trust/subcontractor-information  controllers.amend.trust.AmendTrustCheckYourAnswersController.onPageLoad()
+POST  /subcontractor/amend/trust/subcontractor-information  controllers.amend.trust.AmendTrustCheckYourAnswersController.onSubmit()
+GET   /subcontractor/amend/trust/cancel              controllers.amend.trust.AmendTrustCheckYourAnswersController.onCancel()
 
 GET   /subcontractor/add/trust/trust-name         controllers.add.trust.TrustNameController.onPageLoad(mode: Mode = NormalMode)
 POST  /subcontractor/add/trust/trust-name         controllers.add.trust.TrustNameController.onSubmit(mode: Mode = NormalMode)

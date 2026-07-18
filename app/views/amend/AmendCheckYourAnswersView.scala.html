@@ -29,28 +29,28 @@
 
 @(informationList: SummaryList, detailsList: SummaryList, subcontractorName: String)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = titleNoForm(messages("amendIndividualCheckYourAnswers.title"))) {
+@layout(pageTitle = titleNoForm(messages("amendCheckYourAnswers.title"))) {
 
-@formHelper(action = controllers.amend.routes.AmendIndividualCheckYourAnswersController.onSubmit(), Symbol("autoComplete") -> "off") {
+@formHelper(action = controllers.amend.trust.routes.AmendTrustCheckYourAnswersController.onSubmit(), Symbol("autoComplete") -> "off") {
         <h1 class="govuk-heading-l">@subcontractorName</h1>
-        @h2("amendIndividualCheckYourAnswers.heading.subcontractorInformation.h2")
+        @h2("amendCheckYourAnswers.heading.subcontractorInformation.h2")
 
         @govukSummaryList(informationList)
 
-        @h2("amendIndividualCheckYourAnswers.heading.moreDetails.h2")
+        @h2("amendCheckYourAnswers.heading.moreDetails.h2")
         @govukSummaryList(detailsList)
 
-        @h2("amendIndividualCheckYourAnswers.confirm.h2")
-        @p("amendIndividualCheckYourAnswers.confirm.p1")
+        @h2("amendCheckYourAnswers.confirm.h2")
+        @p("amendCheckYourAnswers.confirm.p1")
 
         <div class="govuk-button-group">
             @govukButton(
-            ButtonViewModel(messages("amendIndividualCheckYourAnswers.confirm"))
+                ButtonViewModel(messages("amendCheckYourAnswers.confirm"))
             )
 
             <a class="govuk-link"
-               href="@controllers.amend.routes.AmendIndividualCheckYourAnswersController.onCancel()">
-                @messages("amendIndividualCheckYourAnswers.cancelChanges")
+               href="@controllers.amend.trust.routes.AmendTrustCheckYourAnswersController.onCancel()">
+                @messages("amendCheckYourAnswers.cancelChanges")
             </a>
         </div>
     }

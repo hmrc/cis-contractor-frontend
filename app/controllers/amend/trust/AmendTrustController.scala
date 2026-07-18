@@ -25,7 +25,7 @@ import models.contact.ContactMethodOptions.{Email, Mobile, Phone}
 import pages.add.*
 import pages.add.trust.*
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import queries.{CisIdQuery, OriginalTrustAnswersQuery}
+import queries.{CisIdQuery, OriginalTrustAnswersQuery, SubContractorVerificationNumberQuery, SubContractorVerifiedQuery}
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
@@ -87,6 +87,8 @@ class AmendTrustController @Inject() (
     ua <- ua.set(TrustWorksReferencePage, worksReference)
     ua <- ua.set(CisIdQuery, "1")
     ua <- ua.set(OriginalTrustAnswersQuery, trustOriginal)
+    ua <- ua.set(SubContractorVerifiedQuery, false)
+    ua <- ua.set(SubContractorVerificationNumberQuery, "V0004528765")
   } yield ua
 
   def onPageLoad(): Action[AnyContent] = (identify andThen getData andThen requireData).async { implicit request =>

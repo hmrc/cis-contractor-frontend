@@ -14,28 +14,26 @@
  * limitations under the License.
  */
 
-package controllers.amend
+package controllers.amend.trust
 
 import controllers.actions.*
-import models.add.ValidatedSubcontractor
 import models.add.trust.ValidatedTrust
-import models.contact.ContactOptions.*
 import models.{AmendMode, UserAnswers}
 import pages.add.*
-import pages.add.trust.{TrustNamePage, TrustUtrYesNoPage}
+import pages.add.trust.TrustNamePage
 import play.api.Logging
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import queries.SubContractorVerifiedQuery
+import queries.{SubContractorVerificationNumberQuery, SubContractorVerifiedQuery}
 import repositories.SessionRepository
 import services.SubcontractorService
-import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
+import uk.gov.hmrc.govukfrontend.views.Aliases.{Text, Value}
+import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.{Key, SummaryListRow}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.checkAnswers.add.*
+import viewmodels.checkAnswers.add.trust.*
 import viewmodels.govuk.summarylist.*
 import views.html.amend.AmendCheckYourAnswersView
-import queries.SubContractorVerifiedQuery
-import viewmodels.checkAnswers.add.trust.{TrustAddressSummary, TrustContactMethodOptionsSummary, TrustMobileNumberSummary, TrustNameSummary, TrustPhoneNumberSummary, TrustUtrYesNoSummary, TrustWorksReferenceYesNoSummary}
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -71,7 +69,7 @@ class AmendTrustCheckYourAnswersController @Inject() (
         Ok(view(subcontractorInformationList, detailsList, trustName))
 
       case Left(error) =>
-        logger.error(s"[AmendIndividualCheckYourAnswersController.onPageLoad] Failed to load the page: $error")
+        logger.error(s"[AmendTrustCheckYourAnswersController.onPageLoad] Failed to load the page: $error")
         Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
     }
   }
@@ -79,19 +77,25 @@ class AmendTrustCheckYourAnswersController @Inject() (
   private def subcontractorInformationRows(
                                             ua: UserAnswers,
                                             isVerified: Boolean
-                                          )(implicit messages: Messages): Seq[Option[SummaryListRow]] =
+                                          )(implicit messages: Messages): Seq[Option[SummaryListRow]] = {
     Seq(TypeOfSubcontractorSummary.row(ua, showActions = false)) ++
       (if (isVerified) {
+        val verificationNumber = ua.get(SubContractorVerificationNumberQuery).getOrElse("")
         Seq(
           TrustUtrSummary.row(
             ua,
             AmendMode,
             showActions = false
-          )
+          ),
+          Some(SummaryListRowViewModel(
+            key = Key(content = Text(messages("amendCheckYourAnswers.verificationNumber.label"))),
+            value = Value(content = Text(verificationNumber))
+          ))
         )
       } else {
         Seq.empty
       })
+  }
 
   private def detailsRows(
                            ua: UserAnswers,
@@ -137,21 +141,21 @@ class AmendTrustCheckYourAnswersController @Inject() (
 
   def onSubmit(): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
-      ValidatedSubcontractor.build(request.userAnswers) match {
+      ValidatedTrust.build(request.userAnswers) match {
         case Right(_) =>
           subcontractorService
             .createAndUpdateSubcontractor(request.userAnswers)
-            .map(_ => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+            .map(_ => Redirect(controllers.amend.trust.routes.AmendTrustCheckYourAnswersController.onPageLoad()))
             .recover { case t =>
               logger.error(
-                "[AmendIndividualCheckYourAnswersController.onSubmit] Failed to update subcontractor",
+                "[AmendTrustCheckYourAnswersController.onSubmit] Failed to update subcontractor",
                 t
               )
               Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
             }
 
         case Left(error) =>
-          logger.error(s"[AmendIndividualCheckYourAnswersController.onSubmit] Validation failed: $error")
+          logger.error(s"[AmendTrustCheckYourAnswersController.onSubmit] Validation failed: $error")
           Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
       }
     }
