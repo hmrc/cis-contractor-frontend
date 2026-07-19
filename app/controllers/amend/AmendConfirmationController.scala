@@ -22,15 +22,14 @@ import controllers.routes
 import models.UserAnswers
 import models.requests.DataRequest
 import pages.add.trust.TrustNamePage
-import pages.add.{SubcontractorNamePage, TradingNameOfSubcontractorPage}
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.libs.json.Reads
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
-import queries.{CisIdQuery, Gettable, OriginalIndividualAnswersQuery, OriginalTrustAnswersQuery}
+import queries.{CisIdQuery, Gettable, OriginalTrustAnswersQuery}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.amend.AmendConfirmationView
 import viewmodels.amend.TrustAmendConfirmationViewModel
+import views.html.amend.AmendConfirmationView
 
 import javax.inject.Inject
 
@@ -70,14 +69,14 @@ class AmendConfirmationController @Inject() (
     ua.get(query) match {
 
       case None =>
-        logger.error(s"[AmendedController] Missing ${query.toString}")
+        logger.error(s"[AmendConfirmationController] Missing ${query.toString}")
         Redirect(routes.JourneyRecoveryController.onPageLoad())
 
       case Some(original) =>
         ua.get(CisIdQuery) match {
 
           case None =>
-            logger.error("[AmendedController] Missing CisIdQuery")
+            logger.error("[AmendConfirmationController] Missing CisIdQuery")
             Redirect(routes.JourneyRecoveryController.onPageLoad())
 
           case Some(cisId) =>

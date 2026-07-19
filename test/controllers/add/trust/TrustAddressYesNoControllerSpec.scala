@@ -130,7 +130,7 @@ class TrustAddressYesNoControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    /*"must add TrustAddressYesNoPage to AmendedPagesPage when submitted in AmendMode" in {
+    "must add TrustAddressYesNoPage to AmendedPagesPage when submitted in AmendMode" in {
       val mockSessionRepository = mock[SessionRepository]
       val mockNavigator         = mock[Navigator]
 
@@ -177,7 +177,7 @@ class TrustAddressYesNoControllerSpec extends SpecBase with MockitoSugar {
           .value must contain(TrustAddressYesNoPage.toString)
       }
     }
-     */
+
     "must return a Bad Request and errors when invalid data is submitted" in {
 
       val application = applicationBuilder(userAnswers = Some(uaWithName)).build()

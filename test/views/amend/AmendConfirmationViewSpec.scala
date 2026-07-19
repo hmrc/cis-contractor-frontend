@@ -16,7 +16,6 @@
 
 package views.amend
 
-import models.address.Address
 import org.jsoup.Jsoup
 import org.jsoup.nodes.{Document, Element}
 import org.jsoup.select.Elements

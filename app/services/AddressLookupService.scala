@@ -18,7 +18,6 @@ package services
 
 import config.AddressLookupConfiguration
 import connectors.AddressLookupConnector
-import controllers.helpers.SaveAnswerHelper
 import models.address.{Address, AddressLookupJourneyIdentifier, MandatoryFieldsConfigModel}
 import models.requests.DataRequest
 import play.api.mvc.{Call, Request}
