@@ -26,10 +26,11 @@ import viewmodels.amend.TrustAmendConfirmationViewModel
 import views.html.amend.AmendConfirmationView
 
 class AmendConfirmationControllerSpec extends SpecBase {
-
-  private val original =
+  private val cisId     = "123456789"
+  private val trustName = "ABC Trust"
+  private val original  =
     OriginalTrustAnswers(
-      trustName = Some("ABC Trust"),
+      trustName = Some(trustName),
       addressYesNo = None,
       address = None,
       trustContactMethodsYesNo = None,
@@ -48,10 +49,10 @@ class AmendConfirmationControllerSpec extends SpecBase {
       .set(OriginalTrustAnswersQuery, original)
       .success
       .value
-      .set(CisIdQuery, "123456789")
+      .set(CisIdQuery, cisId)
       .success
       .value
-      .set(TrustNamePage, "ABC Trust")
+      .set(TrustNamePage, trustName)
       .success
       .value
 
@@ -61,9 +62,7 @@ class AmendConfirmationControllerSpec extends SpecBase {
   "AmendConfirmationController" - {
 
     "must return OK and the correct view for a GET" in {
-
-      val application =
-        applicationBuilder(userAnswers = Some(userAnswersWithOriginal)).build()
+      val application = applicationBuilder(userAnswers = Some(userAnswersWithOriginal)).build()
 
       running(application) {
 
@@ -80,10 +79,10 @@ class AmendConfirmationControllerSpec extends SpecBase {
               original,
               userAnswersWithOriginal
             )(messages(application)),
-            "ABC Trust",
+            trustName,
             application.injector
               .instanceOf[config.FrontendAppConfig]
-              .manageYourSubcontractorsUrl("123456789")
+              .manageYourSubcontractorsUrl(cisId)
           )(
             request,
             messages(application)
@@ -95,10 +94,10 @@ class AmendConfirmationControllerSpec extends SpecBase {
 
       val userAnswers =
         emptyUserAnswers
-          .set(CisIdQuery, "123456789")
+          .set(CisIdQuery, cisId)
           .success
           .value
-          .set(TrustNamePage, "ABC Trust")
+          .set(TrustNamePage, trustName)
           .success
           .value
 
@@ -124,7 +123,7 @@ class AmendConfirmationControllerSpec extends SpecBase {
           .set(OriginalTrustAnswersQuery, original)
           .success
           .value
-          .set(TrustNamePage, "ABC Trust")
+          .set(TrustNamePage, trustName)
           .success
           .value
 

@@ -19,6 +19,7 @@ package controllers.helpers
 import base.SpecBase
 import models.{AmendMode, NormalMode}
 import pages.add.trust.TrustNamePage
+import pages.amend.AmendedPagesPage
 
 class SaveAnswerHelperSpec extends SpecBase {
 
@@ -38,10 +39,7 @@ class SaveAnswerHelperSpec extends SpecBase {
           .value
 
       result.get(TrustNamePage) mustBe Some("ABC Trust")
-
-      result
-        .get(pages.amend.AmendedPagesPage)
-        .value must contain(TrustNamePage.toString)
+      result.get(AmendedPagesPage).value must contain(TrustNamePage.toString)
     }
 
     "must set the answer without amending when in NormalMode" in {
@@ -58,8 +56,7 @@ class SaveAnswerHelperSpec extends SpecBase {
           .value
 
       result.get(TrustNamePage) mustBe Some("ABC Trust")
-
-      result.get(pages.amend.AmendedPagesPage) mustBe None
+      result.get(AmendedPagesPage) mustBe None
     }
   }
 }

@@ -22,7 +22,7 @@ import forms.add.trust.TrustContactMethodOptionsFormProvider
 import models.add.trust.TrustContactMethodOptions
 import models.contact.ContactMethodOptions
 import models.{AmendMode, CheckMode, NormalMode, UserAnswers}
-import navigation.Navigator
+import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{verify, when}
@@ -94,22 +94,14 @@ class TrustContactMethodOptionsControllerSpec extends SpecBase with MockitoSugar
 
     "must redirect to the next page and not add the page to AmendedPagesPage when valid data is submitted in NormalMode" in {
       val mockSessionRepository = mock[SessionRepository]
-      val mockNavigator         = mock[Navigator]
-
-      val captor = ArgumentCaptor.forClass(classOf[UserAnswers])
-
+      val captor                = ArgumentCaptor.forClass(classOf[UserAnswers])
+      val onwardRoute           = controllers.add.trust.routes.TrustEmailAddressController.onPageLoad(NormalMode)
       when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
-
-      when(mockNavigator.nextPage(any(), any(), any()))
-        .thenReturn(
-          controllers.add.trust.routes.TrustEmailAddressController
-            .onPageLoad(NormalMode)
-        )
 
       val application =
         applicationBuilder(userAnswers = Some(uaWithName))
           .overrides(
-            bind[Navigator].toInstance(mockNavigator),
+            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
             bind[SessionRepository].toInstance(mockSessionRepository)
           )
           .build()
@@ -125,10 +117,7 @@ class TrustContactMethodOptionsControllerSpec extends SpecBase with MockitoSugar
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual
-          controllers.add.trust.routes.TrustEmailAddressController
-            .onPageLoad(NormalMode)
-            .url
+        redirectLocation(result).value mustEqual onwardRoute.url
 
         verify(mockSessionRepository).set(captor.capture())
 
@@ -141,22 +130,15 @@ class TrustContactMethodOptionsControllerSpec extends SpecBase with MockitoSugar
 
     "must add TrustContactMethodOptionsPage to AmendedPagesPage when submitted in AmendMode" in {
       val mockSessionRepository = mock[SessionRepository]
-      val mockNavigator         = mock[Navigator]
-
-      val captor = ArgumentCaptor.forClass(classOf[UserAnswers])
+      val captor                = ArgumentCaptor.forClass(classOf[UserAnswers])
+      val onwardRoute           = controllers.add.trust.routes.TrustEmailAddressController.onPageLoad(AmendMode)
 
       when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
-
-      when(mockNavigator.nextPage(any(), any(), any()))
-        .thenReturn(
-          controllers.add.trust.routes.TrustEmailAddressController
-            .onPageLoad(AmendMode)
-        )
 
       val application =
         applicationBuilder(userAnswers = Some(uaWithName))
           .overrides(
-            bind[Navigator].toInstance(mockNavigator),
+            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
             bind[SessionRepository].toInstance(mockSessionRepository)
           )
           .build()
@@ -173,10 +155,10 @@ class TrustContactMethodOptionsControllerSpec extends SpecBase with MockitoSugar
             "value[0]" -> ContactMethodOptions.Email.toString
           )
 
-        val result         = route(application, request).value
+        val result = route(application, request).value
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual
-          controllers.add.trust.routes.TrustEmailAddressController.onPageLoad(AmendMode).url
+        redirectLocation(result).value mustEqual onwardRoute.url
+
         verify(mockSessionRepository).set(captor.capture())
         val updatedAnswers = captor.getValue
         updatedAnswers.get(TrustContactMethodOptionsPage) mustBe Some(Set(ContactMethodOptions.Email))

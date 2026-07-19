@@ -21,7 +21,7 @@ import controllers.routes
 import forms.add.trust.TrustMobileNumberFormProvider
 import models.contact.ContactMethodOptions
 import models.{AmendMode, NormalMode, UserAnswers}
-import navigation.Navigator
+import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{verify, when}
@@ -105,24 +105,17 @@ class TrustMobileNumberControllerSpec extends SpecBase with MockitoSugar {
     }
 
     "must redirect to the next page and not add page to AmendedPagesPage when valid data is submitted in NormalMode" in {
-      val mobileNumber = "07700 900 982"
-
+      val mobileNumber          = "07700 900 982"
+      val onwardRoute           = controllers.add.trust.routes.TrustUtrYesNoController.onPageLoad(NormalMode)
       val mockSessionRepository = mock[SessionRepository]
-      val mockNavigator         = mock[Navigator]
       val captor                = ArgumentCaptor.forClass(classOf[UserAnswers])
 
       when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
 
-      when(mockNavigator.nextPage(any(), any(), any()))
-        .thenReturn(
-          controllers.add.trust.routes.TrustUtrYesNoController
-            .onPageLoad(NormalMode)
-        )
-
       val application =
         applicationBuilder(userAnswers = Some(uaWithNameAndMobileOption))
           .overrides(
-            bind[Navigator].toInstance(mockNavigator),
+            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
             bind[SessionRepository].toInstance(mockSessionRepository)
           )
           .build()
@@ -136,10 +129,7 @@ class TrustMobileNumberControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual
-          controllers.add.trust.routes.TrustUtrYesNoController
-            .onPageLoad(NormalMode)
-            .url
+        redirectLocation(result).value mustEqual onwardRoute.url
 
         verify(mockSessionRepository).set(captor.capture())
 
@@ -151,24 +141,17 @@ class TrustMobileNumberControllerSpec extends SpecBase with MockitoSugar {
     }
 
     "must add TrustMobileNumberPage to AmendedPagesPage when submitted in AmendMode" in {
+      val mobileNumber          = "07700 900 982"
       val mockSessionRepository = mock[SessionRepository]
-      val mockNavigator         = mock[Navigator]
+      val onwardRoute           = controllers.add.trust.routes.TrustUtrYesNoController.onPageLoad(AmendMode)
+      val captor                = ArgumentCaptor.forClass(classOf[UserAnswers])
 
-      val captor = ArgumentCaptor.forClass(classOf[UserAnswers])
-
-      when(mockSessionRepository.set(any()))
-        .thenReturn(Future.successful(true))
-
-      when(mockNavigator.nextPage(any(), any(), any()))
-        .thenReturn(
-          controllers.add.trust.routes.TrustUtrYesNoController
-            .onPageLoad(AmendMode)
-        )
+      when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
 
       val application =
         applicationBuilder(userAnswers = Some(uaWithNameAndMobileOption))
           .overrides(
-            bind[Navigator].toInstance(mockNavigator),
+            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
             bind[SessionRepository].toInstance(mockSessionRepository)
           )
           .build()
@@ -182,20 +165,18 @@ class TrustMobileNumberControllerSpec extends SpecBase with MockitoSugar {
               .onSubmit(AmendMode)
               .url
           ).withFormUrlEncodedBody(
-            "value" -> "07700 900 982"
+            "value" -> mobileNumber
           )
 
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.add.trust.routes.TrustUtrYesNoController
-          .onPageLoad(AmendMode)
-          .url
+        redirectLocation(result).value mustEqual onwardRoute.url
         verify(mockSessionRepository).set(captor.capture())
 
         val updatedAnswers = captor.getValue
 
-        updatedAnswers.get(TrustMobileNumberPage) mustBe Some("07700 900 982")
+        updatedAnswers.get(TrustMobileNumberPage) mustBe Some(mobileNumber)
         updatedAnswers.get(AmendedPagesPage).value must contain(TrustMobileNumberPage.toString)
       }
     }

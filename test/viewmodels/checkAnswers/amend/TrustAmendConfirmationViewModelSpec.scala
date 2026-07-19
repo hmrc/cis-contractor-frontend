@@ -23,8 +23,8 @@ import models.contact.ContactMethodOptions
 import pages.add.trust.*
 import pages.amend.AmendedPagesPage
 import play.api.i18n.Messages
-import viewmodels.amend.TrustAmendConfirmationViewModel
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
+import viewmodels.amend.TrustAmendConfirmationViewModel
 
 class TrustAmendConfirmationViewModelSpec extends SpecBase {
 
@@ -125,6 +125,23 @@ class TrustAmendConfirmationViewModelSpec extends SpecBase {
       row(2).content mustBe Text("XYZ Trust")
     }
 
+    "must return a trust name row when the page is amended but the value is unchanged" in {
+      val answers =
+        answersMatchingOriginal
+          .set(AmendedPagesPage, Set(TrustNamePage.toString))
+          .success
+          .value
+
+      val result =
+        TrustAmendConfirmationViewModel.rows(original, answers)
+
+      val row = result.head
+
+      row.head.content mustBe Text(msgs("trustName.checkYourAnswersLabel"))
+      row(1).content mustBe Text("ABC Trust")
+      row(2).content mustBe Text("ABC Trust")
+    }
+
     "must return address yes/no and address rows when the address is removed" in {
 
       val answers =
@@ -179,6 +196,34 @@ class TrustAmendConfirmationViewModelSpec extends SpecBase {
       row(2).content mustBe Text("10 Test Street, Newcastle, SA1 1AA, England")
     }
 
+    "must display all populated address lines when an address changes" in {
+      val answers =
+        answersMatchingOriginal
+          .set(
+            TrustAddressPage,
+            Address(
+              addressLine1 = "10 Test Street",
+              addressLine2 = Some("Building A"),
+              addressLine3 = Some("Business Park"),
+              addressLine4 = Some("Leeds"),
+              addressLine5 = Some("West Yorkshire"),
+              postcode = Some("LS1 1AA"),
+              country = Some(Country(code = None, name = Some("England")))
+            )
+          )
+          .success
+          .value
+
+      val result =
+        TrustAmendConfirmationViewModel.rows(original, answers)
+
+      val row = result.head
+
+      row(2).content mustBe Text(
+        "10 Test Street, Building A, Business Park, Leeds, West Yorkshire, LS1 1AA, England"
+      )
+    }
+
     "must return contact rows when contact methods are removed" in {
 
       val answers =
@@ -208,7 +253,7 @@ class TrustAmendConfirmationViewModelSpec extends SpecBase {
 
       result must have size 3
 
-      val yesNoRow  = result(0)
+      val yesNoRow  = result.head
       val methodRow = result(1)
       val emailRow  = result(2)
 
@@ -223,6 +268,39 @@ class TrustAmendConfirmationViewModelSpec extends SpecBase {
       emailRow.head.content mustBe Text(msgs("trustEmailAddress.checkYourAnswersLabel"))
       emailRow(1).content mustBe Text("trust@test.com")
       emailRow(2).content mustBe Text(msgs("amendConfirmation.table.content.none"))
+    }
+
+    "must display contact methods in a consistent order regardless of selection order" in {
+      val answers =
+        answersMatchingOriginal
+          .set(
+            TrustContactMethodOptionsPage,
+            Set(
+              ContactMethodOptions.Phone,
+              ContactMethodOptions.Email
+            )
+          )
+          .success
+          .value
+          .set(
+            AmendedPagesPage,
+            Set(TrustContactMethodOptionsPage.toString)
+          )
+          .success
+          .value
+
+      val result =
+        TrustAmendConfirmationViewModel.rows(original, answers)
+
+      result must have size 1
+
+      val row = result.head
+
+      row.head.content mustBe Text(msgs("trustContactMethodOptions.checkYourAnswersLabel"))
+      row(1).content mustBe Text(msgs("trustContactMethodOptions.email"))
+      row(2).content mustBe Text(
+        s"${msgs("trustContactMethodOptions.email")}, ${msgs("trustContactMethodOptions.phone")}"
+      )
     }
 
     "must return contact method, email and phone rows when changing from email to phone" in {
@@ -257,7 +335,7 @@ class TrustAmendConfirmationViewModelSpec extends SpecBase {
 
       result must have size 3
 
-      val methodRow = result(0)
+      val methodRow = result.head
       val emailRow  = result(1)
       val phoneRow  = result(2)
 
@@ -436,7 +514,7 @@ class TrustAmendConfirmationViewModelSpec extends SpecBase {
 
       result must have size 2
 
-      val methodRow = result(0)
+      val methodRow = result.head
       val phoneRow  = result(1)
 
       methodRow.head.content mustBe Text(msgs("trustContactMethodOptions.checkYourAnswersLabel"))
@@ -469,27 +547,6 @@ class TrustAmendConfirmationViewModelSpec extends SpecBase {
       row.head.content mustBe Text(msgs("trustUtr.checkYourAnswersLabel"))
       row(1).content mustBe Text("1123456789")
       row(2).content mustBe Text("2000000000")
-    }
-
-    "must display none when the UTR is removed" in {
-
-      val answers =
-        answersMatchingOriginal
-          .remove(TrustUtrPage)
-          .success
-          .value
-          .set(AmendedPagesPage, Set(TrustUtrPage.toString))
-          .success
-          .value
-
-      val result =
-        TrustAmendConfirmationViewModel.rows(original, answers)
-
-      val row = result.head
-
-      row.head.content mustBe Text(msgs("trustUtr.checkYourAnswersLabel"))
-      row(1).content mustBe Text("1123456789")
-      row(2).content mustBe Text(msgs("amendConfirmation.table.content.none"))
     }
 
     "must return a works reference yes/no row when the answer changes" in {
@@ -564,6 +621,37 @@ class TrustAmendConfirmationViewModelSpec extends SpecBase {
       utrRow.head.content mustBe Text(msgs("trustUtr.checkYourAnswersLabel"))
       utrRow(1).content mustBe Text("1123456789")
       utrRow(2).content mustBe Text(msgs("amendConfirmation.table.content.none"))
+    }
+
+    "must return rows in the expected order when multiple sections change" in {
+      val answers =
+        answersMatchingOriginal
+          .set(TrustNamePage, "XYZ Trust")
+          .success
+          .value
+          .set(TrustUtrPage, "2000000000")
+          .success
+          .value
+          .set(
+            TrustAddressPage,
+            Address(
+              addressLine1 = "10 Test Street",
+              addressLine3 = Some("Newcastle"),
+              postcode = Some("SA1 1AA"),
+              country = Some(Country(code = None, name = Some("England")))
+            )
+          )
+          .success
+          .value
+
+      val result =
+        TrustAmendConfirmationViewModel.rows(original, answers)
+
+      result must have size 3
+
+      result(0).head.content mustBe Text(msgs("trustName.checkYourAnswersLabel"))
+      result(1).head.content mustBe Text(msgs("trustAddress.checkYourAnswersLabel"))
+      result(2).head.content mustBe Text(msgs("trustUtr.checkYourAnswersLabel"))
     }
   }
 }

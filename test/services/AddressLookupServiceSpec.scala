@@ -136,7 +136,7 @@ class AddressLookupServiceSpec extends SpecBase with MockitoSugar {
       implicit val dataRequest: DataRequest[_] =
         DataRequest(FakeRequest(), userAnswersId, emptyUserAnswers)
 
-      "must persist the address against the page, not mark it as amended, and return true when the save succeeds" in {
+      "must persist the address against the page, not add the page to AmendedPagesPage, and return true when the save succeeds" in {
         val (service, _, _, sessionRepository) = newService()
         val captor                             = ArgumentCaptor.forClass(classOf[UserAnswers])
 
@@ -160,7 +160,7 @@ class AddressLookupServiceSpec extends SpecBase with MockitoSugar {
         verify(sessionRepository).set(any())
       }
 
-      "must mark the page as amended when AddressLookupAmendReturnQuery is true" in {
+      "must add AddressOfSubcontractorPage to AmendedPagesPage when AddressLookupAmendReturnQuery is true" in {
         val (service, _, _, sessionRepository) = newService()
 
         when(sessionRepository.set(any())).thenReturn(Future.successful(true))

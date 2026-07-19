@@ -44,75 +44,53 @@ object TrustAmendConfirmationViewModel {
   private def nameRow(
     original: OriginalTrustAnswers,
     current: UserAnswers
-  )(implicit messages: Messages): Seq[Seq[TableRow]] = {
-    val currentName = current.get(TrustNamePage)
-
+  )(implicit messages: Messages): Seq[Seq[TableRow]] =
     Seq(
       fieldRow(
         TrustNamePage,
         messages("trustName.checkYourAnswersLabel"),
         original.trustName,
-        currentName,
-        missingValue,
         current
       )
     ).flatten
-  }
 
   private def addressRows(
     original: OriginalTrustAnswers,
     current: UserAnswers
-  )(implicit messages: Messages): Seq[Seq[TableRow]] =
-    Seq(
-      addressYesNoRow(original, current),
-      addressRow(original, current)
-    ).flatten
-
-  private def addressYesNoRow(
-    original: OriginalTrustAnswers,
-    current: UserAnswers
-  )(implicit messages: Messages): Option[Seq[TableRow]] =
-    yesNoRow(
-      TrustAddressYesNoPage,
-      messages("trustAddressYesNo.checkYourAnswersLabel"),
-      original.addressYesNo,
-      current.get(TrustAddressYesNoPage),
-      current
-    )
-
-  private def addressRow(
-    original: OriginalTrustAnswers,
-    current: UserAnswers
-  )(implicit messages: Messages): Option[Seq[TableRow]] =
+  )(implicit messages: Messages): Seq[Seq[TableRow]] = {
     val currentAddress = current.get(TrustAddressPage)
-    Option.when(
-      wasAmended(current, TrustAddressPage) ||
-        original.address != currentAddress
-    ) {
-      row(
-        messages("trustAddress.checkYourAnswersLabel"),
-        original.address.map(formatAddress).getOrElse(missingValue),
-        currentAddress.map(formatAddress).getOrElse(missingValue)
-      )
-    }
+
+    Seq(
+      yesNoRow(
+        TrustAddressYesNoPage,
+        messages("trustAddressYesNo.checkYourAnswersLabel"),
+        original.addressYesNo,
+        current
+      ),
+      Option.when(
+        wasAmended(current, TrustAddressPage) ||
+          original.address != currentAddress
+      ) {
+        row(
+          messages("trustAddress.checkYourAnswersLabel"),
+          original.address.map(formatAddress).getOrElse(missingValue),
+          currentAddress.map(formatAddress).getOrElse(missingValue)
+        )
+      }
+    ).flatten
+  }
 
   private def contactRows(
     original: OriginalTrustAnswers,
     current: UserAnswers
   )(implicit messages: Messages): Seq[Seq[TableRow]] = {
-
-    val currentContactYesNo = current.get(AddTrustContactMethodsYesNoPage)
-    val currentMethods      = current.get(TrustContactMethodOptionsPage).getOrElse(Set.empty)
-    val currentEmail        = current.get(TrustEmailAddressPage)
-    val currentPhone        = current.get(TrustPhoneNumberPage)
-    val currentMobile       = current.get(TrustMobileNumberPage)
+    val currentMethods = current.get(TrustContactMethodOptionsPage).getOrElse(Set.empty)
 
     Seq(
       yesNoRow(
         AddTrustContactMethodsYesNoPage,
         messages("addTrustContactMethodsYesNo.checkYourAnswersLabel"),
         original.trustContactMethodsYesNo,
-        currentContactYesNo,
         current
       ),
       Option.when(
@@ -129,24 +107,18 @@ object TrustAmendConfirmationViewModel {
         TrustEmailAddressPage,
         messages("trustEmailAddress.checkYourAnswersLabel"),
         original.email,
-        currentEmail,
-        missingValue,
         current
       ),
       fieldRow(
         TrustPhoneNumberPage,
         messages("trustPhoneNumber.checkYourAnswersLabel"),
         original.phone,
-        currentPhone,
-        missingValue,
         current
       ),
       fieldRow(
         TrustMobileNumberPage,
         messages("trustMobileNumber.checkYourAnswersLabel"),
         original.mobile,
-        currentMobile,
-        missingValue,
         current
       )
     ).flatten
@@ -173,52 +145,39 @@ object TrustAmendConfirmationViewModel {
 
   private def worksReferenceRows(original: OriginalTrustAnswers, current: UserAnswers)(implicit
     messages: Messages
-  ): Seq[Seq[TableRow]] = {
-    val currentWorksRefYesNo = current.get(TrustWorksReferenceYesNoPage)
-    val currentWorksRef      = current.get(TrustWorksReferencePage)
-
+  ): Seq[Seq[TableRow]] =
     Seq(
       yesNoRow(
         TrustWorksReferenceYesNoPage,
         messages("trustWorksReferenceYesNo.checkYourAnswersLabel"),
         original.worksReferenceYesNo,
-        currentWorksRefYesNo,
         current
       ),
       fieldRow(
         TrustWorksReferencePage,
         messages("trustWorksReference.checkYourAnswersLabel"),
         original.worksReference,
-        currentWorksRef,
-        missingValue,
         current
       )
     ).flatten
-  }
 
   private def utrRows(original: OriginalTrustAnswers, current: UserAnswers)(implicit
     messages: Messages
-  ): Seq[Seq[TableRow]] = {
-    val currentUtrYesNo = current.get(TrustUtrYesNoPage)
-    val currentUtr      = current.get(TrustUtrPage)
+  ): Seq[Seq[TableRow]] =
     Seq(
       yesNoRow(
         TrustUtrYesNoPage,
         messages("trustUtrYesNo.checkYourAnswersLabel"),
         original.utrYesNo,
-        currentUtrYesNo,
         current
       ),
       fieldRow(
         TrustUtrPage,
         messages("trustUtr.checkYourAnswersLabel"),
         original.utr,
-        currentUtr,
-        missingValue,
         current
       )
     ).flatten
-  }
 
   private def formatAddress(a: Address): String =
     List(
@@ -232,17 +191,20 @@ object TrustAmendConfirmationViewModel {
     ).flatten.mkString(", ")
 
   private def yesNoRow(
-    page: QuestionPage[_],
+    page: QuestionPage[Boolean],
     label: String,
     original: Option[Boolean],
-    currentVal: Option[Boolean],
     current: UserAnswers
-  )(implicit messages: Messages): Option[Seq[TableRow]] =
+  )(implicit messages: Messages): Option[Seq[TableRow]] = {
+
+    val currentVal = current.get(page)
+
     Option.when(
       wasAmended(current, page) || original != currentVal
     ) {
       row(label, displayYesNo(original), displayYesNo(currentVal))
     }
+  }
 
   private def displayYesNo(answer: Option[Boolean])(implicit messages: Messages): String =
     answer match {
@@ -252,18 +214,23 @@ object TrustAmendConfirmationViewModel {
     }
 
   private def fieldRow(
-    page: QuestionPage[_],
+    page: QuestionPage[String],
     label: String,
     original: Option[String],
-    currentVal: Option[String],
-    missing: String,
     current: UserAnswers
-  ): Option[Seq[TableRow]] =
+  )(implicit messages: Messages): Option[Seq[TableRow]] = {
+    val currentVal = current.get(page)
+
     Option.when(
       wasAmended(current, page) || original != currentVal
     ) {
-      row(label, original.getOrElse(missing), currentVal.getOrElse(missing))
+      row(
+        label,
+        original.getOrElse(missingValue),
+        currentVal.getOrElse(missingValue)
+      )
     }
+  }
 
   private def row(label: String, previous: String, updated: String): Seq[TableRow] =
     Seq(

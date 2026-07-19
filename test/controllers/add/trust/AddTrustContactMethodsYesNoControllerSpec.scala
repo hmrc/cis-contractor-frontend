@@ -20,7 +20,7 @@ import base.SpecBase
 import controllers.routes
 import forms.add.trust.AddTrustContactMethodsYesNoFormProvider
 import models.{AmendMode, NormalMode, UserAnswers}
-import navigation.Navigator
+import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{verify, when}
@@ -90,22 +90,16 @@ class AddTrustContactMethodsYesNoControllerSpec extends SpecBase with MockitoSug
     "must redirect to the TrustContactMethodOptions Page and not add the page to AmendedPagesPage when" +
       " valid data with value Yes is submitted in NormalMode" in {
         val mockSessionRepository = mock[SessionRepository]
-        val mockNavigator         = mock[Navigator]
-
-        val captor = ArgumentCaptor.forClass(classOf[UserAnswers])
+        val onwardRoute           = controllers.add.trust.routes.TrustContactMethodOptionsController
+          .onPageLoad(NormalMode)
+        val captor                = ArgumentCaptor.forClass(classOf[UserAnswers])
 
         when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
-
-        when(mockNavigator.nextPage(any(), any(), any()))
-          .thenReturn(
-            controllers.add.trust.routes.TrustContactMethodOptionsController
-              .onPageLoad(NormalMode)
-          )
 
         val application =
           applicationBuilder(userAnswers = Some(uaWithName))
             .overrides(
-              bind[Navigator].toInstance(mockNavigator),
+              bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
               bind[SessionRepository].toInstance(mockSessionRepository)
             )
             .build()
@@ -118,10 +112,7 @@ class AddTrustContactMethodsYesNoControllerSpec extends SpecBase with MockitoSug
           val result = route(application, request).value
 
           status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual
-            controllers.add.trust.routes.TrustContactMethodOptionsController
-              .onPageLoad(NormalMode)
-              .url
+          redirectLocation(result).value mustEqual onwardRoute.url
 
           verify(mockSessionRepository).set(captor.capture())
           val updatedAnswers = captor.getValue
@@ -132,7 +123,6 @@ class AddTrustContactMethodsYesNoControllerSpec extends SpecBase with MockitoSug
       }
 
     "must redirect to the TrustUtrYesNo page when valid data with value No is submitted" in {
-
       val mockSessionRepository = mock[SessionRepository]
 
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
@@ -160,17 +150,15 @@ class AddTrustContactMethodsYesNoControllerSpec extends SpecBase with MockitoSug
 
     "must add AddTrustContactMethodsYesNoPage to AmendedPagesPage when submitted in AmendMode" in {
       val mockSessionRepository = mock[SessionRepository]
-      val mockNavigator         = mock[Navigator]
       val captor                = ArgumentCaptor.forClass(classOf[UserAnswers])
+      val onwardRoute           = controllers.add.trust.routes.TrustContactMethodOptionsController.onPageLoad(AmendMode)
 
       when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
-      when(mockNavigator.nextPage(any(), any(), any()))
-        .thenReturn(controllers.add.trust.routes.TrustContactMethodOptionsController.onPageLoad(AmendMode))
 
       val application =
         applicationBuilder(userAnswers = Some(uaWithName))
           .overrides(
-            bind[Navigator].toInstance(mockNavigator),
+            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
             bind[SessionRepository].toInstance(mockSessionRepository)
           )
           .build()
@@ -189,9 +177,7 @@ class AddTrustContactMethodsYesNoControllerSpec extends SpecBase with MockitoSug
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.add.trust.routes.TrustContactMethodOptionsController
-          .onPageLoad(AmendMode)
-          .url
+        redirectLocation(result).value mustEqual onwardRoute.url
         verify(mockSessionRepository).set(captor.capture())
         val updatedAnswers = captor.getValue
 

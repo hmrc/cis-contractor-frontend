@@ -20,7 +20,7 @@ import base.SpecBase
 import controllers.routes
 import forms.add.trust.TrustWorksReferenceYesNoFormProvider
 import models.{AmendMode, NormalMode, UserAnswers}
-import navigation.Navigator
+import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{verify, when}
@@ -96,20 +96,14 @@ class TrustWorksReferenceYesNoControllerSpec extends SpecBase with MockitoSugar 
 
     "must redirect to the next page and not add page to AmendedPagesPage when valid data with value Yes is submitted in NormalMode" in {
       val mockSessionRepository = mock[SessionRepository]
-      val mockNavigator         = mock[Navigator]
+      val captor                = ArgumentCaptor.forClass(classOf[UserAnswers])
 
-      val captor = ArgumentCaptor.forClass(classOf[UserAnswers])
-
-      when(mockSessionRepository.set(any()))
-        .thenReturn(Future.successful(true))
-
-      when(mockNavigator.nextPage(any(), any(), any()))
-        .thenReturn(onwardRoute)
+      when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
 
       val application =
         applicationBuilder(userAnswers = Some(uaWithName))
           .overrides(
-            bind[Navigator].toInstance(mockNavigator),
+            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
             bind[SessionRepository].toInstance(mockSessionRepository)
           )
           .build()
@@ -163,16 +157,14 @@ class TrustWorksReferenceYesNoControllerSpec extends SpecBase with MockitoSugar 
 
     "must add TrustWorksReferenceYesNoPage to AmendedPagesPage when submitted in AmendMode" in {
       val mockSessionRepository = mock[SessionRepository]
-      val mockNavigator         = mock[Navigator]
       val captor                = ArgumentCaptor.forClass(classOf[UserAnswers])
 
       when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
-      when(mockNavigator.nextPage(any(), any(), any())).thenReturn(onwardRoute)
 
       val application =
         applicationBuilder(userAnswers = Some(uaWithName))
           .overrides(
-            bind[Navigator].toInstance(mockNavigator),
+            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
             bind[SessionRepository].toInstance(mockSessionRepository)
           )
           .build()
@@ -196,9 +188,7 @@ class TrustWorksReferenceYesNoControllerSpec extends SpecBase with MockitoSugar 
 
         val updatedAnswers = captor.getValue
         updatedAnswers.get(TrustWorksReferenceYesNoPage) mustBe Some(true)
-        updatedAnswers
-          .get(AmendedPagesPage)
-          .value must contain(TrustWorksReferenceYesNoPage.toString)
+        updatedAnswers.get(AmendedPagesPage).value must contain(TrustWorksReferenceYesNoPage.toString)
       }
     }
 

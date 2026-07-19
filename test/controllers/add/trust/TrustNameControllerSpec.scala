@@ -20,7 +20,7 @@ import base.SpecBase
 import controllers.routes
 import forms.add.trust.TrustNameFormProvider
 import models.{AmendMode, NormalMode, UserAnswers}
-import navigation.Navigator
+import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{verify, when}
@@ -81,19 +81,15 @@ class TrustNameControllerSpec extends SpecBase with MockitoSugar {
 
     "must redirect to TrustAddressYesNo page and not add page in AmendedPagesPage when valid data is submitted in NormalMode" in {
       val mockSessionRepository = mock[SessionRepository]
-      val mockNavigator         = mock[Navigator]
-
-      val captor = ArgumentCaptor.forClass(classOf[UserAnswers])
+      val onwardRoute           = controllers.add.trust.routes.TrustAddressYesNoController.onPageLoad(NormalMode)
+      val captor                = ArgumentCaptor.forClass(classOf[UserAnswers])
 
       when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
-
-      when(mockNavigator.nextPage(any(), any(), any()))
-        .thenReturn(controllers.add.trust.routes.TrustAddressYesNoController.onPageLoad(NormalMode))
 
       val application =
         applicationBuilder(userAnswers = Some(emptyUserAnswers))
           .overrides(
-            bind[Navigator].toInstance(mockNavigator),
+            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
             bind[SessionRepository].toInstance(mockSessionRepository)
           )
           .build()
@@ -105,9 +101,7 @@ class TrustNameControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.add.trust.routes.TrustAddressYesNoController
-          .onPageLoad(NormalMode)
-          .url
+        redirectLocation(result).value mustEqual onwardRoute.url
 
         verify(mockSessionRepository).set(captor.capture())
         val updatedAnswers = captor.getValue
@@ -119,23 +113,16 @@ class TrustNameControllerSpec extends SpecBase with MockitoSugar {
 
     "must add TrustNamePage to AmendedPagesPage when submitted in AmendMode" in {
       val mockSessionRepository = mock[SessionRepository]
-      val mockNavigator         = mock[Navigator]
-
-      val captor = ArgumentCaptor.forClass(classOf[UserAnswers])
+      val onwardRoute           = controllers.add.trust.routes.TrustAddressYesNoController.onPageLoad(AmendMode)
+      val captor                = ArgumentCaptor.forClass(classOf[UserAnswers])
 
       when(mockSessionRepository.set(any()))
         .thenReturn(Future.successful(true))
 
-      when(mockNavigator.nextPage(any(), any(), any()))
-        .thenReturn(
-          controllers.add.trust.routes.TrustAddressYesNoController
-            .onPageLoad(NormalMode) // TODO: this needs to be changed to AmendMode once done
-        )
-
       val application =
         applicationBuilder(userAnswers = Some(emptyUserAnswers))
           .overrides(
-            bind[Navigator].toInstance(mockNavigator),
+            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
             bind[SessionRepository].toInstance(mockSessionRepository)
           )
           .build()
@@ -155,9 +142,7 @@ class TrustNameControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.add.trust.routes.TrustAddressYesNoController
-          .onPageLoad(NormalMode)
-          .url
+        redirectLocation(result).value mustEqual onwardRoute.url
         verify(mockSessionRepository).set(captor.capture())
 
         val updatedAnswers = captor.getValue
