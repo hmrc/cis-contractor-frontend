@@ -52,8 +52,8 @@ class AmendCompanyRemoveDetailYesNoControllerSpec extends SpecBase with MockitoS
       ("unique-taxpayer-reference", "unique-taxpayer-reference"),
       ("company-registration-number", "company-registration-number"),
       ("works-reference-number", "works-reference-number")
-    ).foreach { case (contractorDetail, selectedDetail) =>
-      s"when contractorDetail is '$contractorDetail'" - {
+    ).foreach { case (subcontractorDetail, selectedDetail) =>
+      s"when subcontractorDetail is '$subcontractorDetail'" - {
         val form = formProvider()
 
         lazy val removeDetailYesNoRoute =
@@ -218,7 +218,7 @@ class AmendCompanyRemoveDetailYesNoControllerSpec extends SpecBase with MockitoS
       }
     }
 
-    "when contractorDetail is neither 'address', 'contact-details', 'unique-taxpayer-reference', 'company-registration-number' or 'works-reference-number'" - {
+    "when subcontractorDetail is neither 'address', 'contact-details', 'unique-taxpayer-reference', 'company-registration-number' or 'works-reference-number'" - {
 
       "must redirect to Journey Recovery on GET" in {
 

@@ -24,9 +24,9 @@
     govukButton: GovukButton
 )
 
-@(name: String, contractorDetail:String, form: Form[_])(implicit request: Request[_], messages: Messages)
+@(name: String, subcontractorDetail:String, form: Form[_])(implicit request: Request[_], messages: Messages)
 
-@defining(contractorDetail match {
+@defining(subcontractorDetail match {
     case "address"                      => messages("amendCompanyRemoveDetailYesNo.detail.address")
     case "contact-details"              => messages("amendCompanyRemoveDetailYesNo.detail.contact-details")
     case "unique-taxpayer-reference"    => messages("amendCompanyRemoveDetailYesNo.detail.unique-taxpayer-reference")
@@ -36,7 +36,7 @@
 
     @layout(pageTitle = title(form, messages("amendCompanyRemoveDetailYesNo.title"))) {
 
-        @formHelper(action = controllers.amend.company.routes.AmendCompanyRemoveDetailYesNoController.onSubmit(contractorDetail), Symbol("autoComplete") -> "off") {
+        @formHelper(action = controllers.amend.company.routes.AmendCompanyRemoveDetailYesNoController.onSubmit(subcontractorDetail), Symbol("autoComplete") -> "off") {
 
             @if(form.errors.nonEmpty) {
                 @govukErrorSummary(ErrorSummaryViewModel(form, errorLinkOverrides = Map("value" -> "value_0")))
