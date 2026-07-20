@@ -511,6 +511,17 @@ class IndividualNavigatorSpec extends SpecBase {
         ) mustBe journeyRecovery // TODO: change this to CYA when available
       }
 
+      "to the address lookup on-ramp when answer is Yes and AddressOfSubcontractorPage is not answered before" in {
+        val answers = emptyUserAnswers.set(SubAddressYesNoPage, true).success.value
+
+        navigator.nextPage(
+          SubAddressYesNoPage,
+          AmendMode,
+          answers
+        ) mustBe controllers.add.routes.AddressOfSubcontractorController.redirectToAmendAddressLookup()
+
+      }
+
       "must go from SubAddressYesNoPage to journeyRecovery when true and AddressOfSubcontractorPage is already answered" in {
         val addressSample = models.address.Address(
           addressLine1 = "10 Example Street",
@@ -530,7 +541,7 @@ class IndividualNavigatorSpec extends SpecBase {
             .success
             .value
         val result = navigator.nextPage(SubAddressYesNoPage, AmendMode, ua)
-        result mustBe journeyRecovery // TODO: change this to CYA when available
+        result mustBe controllers.add.routes.AddressOfSubcontractorController.redirectToAmendAddressLookup()
       }
 
       "must go from a SubAddressYesNoPage to journey recovery page when incomplete info provided" in {
