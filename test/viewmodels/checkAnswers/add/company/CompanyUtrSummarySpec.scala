@@ -100,6 +100,35 @@ class CompanyUtrSummarySpec extends AnyFreeSpec with Matchers with CyaEncodingSp
       changeAction.attributes                   must contain("id" -> "company-utr")
     }
 
+    "must not include actions when showActions is false" in {
+      val utr = "1234567890"
+
+      val answers =
+        UserAnswers("test-id")
+          .set(CompanyUtrPage, utr)
+          .success
+          .value
+
+      val maybeRow = CompanyUtrSummary.row(
+        answers,
+        mode = CheckMode,
+        showActions = false
+      )
+
+      maybeRow shouldBe defined
+
+      val row = maybeRow.value
+
+      row.key.content.asHtml.toString should include(
+        messages("companyUtr.checkYourAnswersLabel")
+      )
+
+      row.value.content.asHtml.toString should include(utr)
+
+      row.actions shouldBe defined
+      row.actions.value.items shouldBe empty
+    }
+
     "must return None when the answer does not exist" in {
       val answers = UserAnswers("test-id")
       CompanyUtrSummary.row(answers) shouldBe None

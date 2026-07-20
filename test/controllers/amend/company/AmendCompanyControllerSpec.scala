@@ -31,7 +31,7 @@ import play.api.inject.bind
 import play.api.mvc.MessagesControllerComponents
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import queries.{CisIdQuery, OriginalCompanyAnswersQuery}
+import queries.{CisIdQuery, OriginalCompanyAnswersQuery, SubContractorVerifiedQuery, SubContractorVerificationNumberQuery}
 import repositories.SessionRepository
 import models.TypeOfSubcontractor.Limitedcompany
 import models.contact.ContactMethodOptions
@@ -158,6 +158,9 @@ class AmendCompanyControllerSpec extends SpecBase with MockitoSugar {
 
           savedAnswers.get(CisIdQuery).value mustBe "1"
           savedAnswers.get(OriginalCompanyAnswersQuery).value mustBe expectedOriginal
+
+          savedAnswers.get(SubContractorVerifiedQuery).value mustBe false
+          savedAnswers.get(SubContractorVerificationNumberQuery).value mustBe "V0004528765"
         }
       }
 

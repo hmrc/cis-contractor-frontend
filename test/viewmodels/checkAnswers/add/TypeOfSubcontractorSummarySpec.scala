@@ -62,6 +62,32 @@ class TypeOfSubcontractorSummarySpec extends AnyFreeSpec with Matchers {
       changeAction.visuallyHiddenText.value shouldBe messages("typeOfSubcontractor.change.hidden")
     }
 
+    "must not include actions when showActions is false" in {
+      val answers =
+        UserAnswers("test-id")
+          .set(TypeOfSubcontractorPage, TypeOfSubcontractor.Limitedcompany)
+          .success
+          .value
+
+      val maybeRow =
+        TypeOfSubcontractorSummary.row(answers, showActions = false)
+
+      maybeRow shouldBe defined
+
+      val row = maybeRow.value
+
+      row.key.content.asHtml.toString should include(
+        messages("typeOfSubcontractor.checkYourAnswersLabel")
+      )
+
+      row.value.content.asHtml.toString should include(
+        messages("typeOfSubcontractor.company")
+      )
+
+      row.actions shouldBe defined
+      row.actions.value.items shouldBe empty
+    }
+
     "must return None when the answer does not exist" in {
       val answers = UserAnswers("test-id")
       TypeOfSubcontractorSummary.row(answers) shouldBe None

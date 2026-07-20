@@ -23,7 +23,7 @@ import models.amend.company.OriginalCompanyAnswers
 import pages.add.*
 import pages.add.company.*
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import queries.{CisIdQuery, OriginalCompanyAnswersQuery}
+import queries.{CisIdQuery, OriginalCompanyAnswersQuery, SubContractorVerifiedQuery, SubContractorVerificationNumberQuery}
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
@@ -83,6 +83,8 @@ class AmendCompanyController @Inject() (
     ua <- ua.set(CompanyWorksReferencePage, worksReference)
     ua <- ua.set(CisIdQuery, "1")
     ua <- ua.set(OriginalCompanyAnswersQuery, companyOriginal)
+    ua <- ua.set(SubContractorVerifiedQuery, false)
+    ua <- ua.set(SubContractorVerificationNumberQuery, "V0004528765")
   } yield ua
 
   def onPageLoad(): Action[AnyContent] = (identify andThen getData andThen requireData).async { implicit request =>
