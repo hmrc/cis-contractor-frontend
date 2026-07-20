@@ -53,9 +53,9 @@ class IndividualEmailAddressViewSpec extends AnyWordSpec with Matchers with Guic
     }
 
     "render the page with title, heading, input and update button for Amend journey" in new Setup {
-      val subContractorName = "John Smith"
-      val html: HtmlFormat.Appendable = view(form, NormalMode, subContractorName)
-      val doc = org.jsoup.Jsoup.parse(html.toString())
+      val subContractorName           = "John Smith"
+      val html: HtmlFormat.Appendable = view(form, AmendMode, subContractorName)
+      val doc                         = org.jsoup.Jsoup.parse(html.toString())
 
       doc.select("title").text() must include(messages("individualEmailAddress.title"))
 
