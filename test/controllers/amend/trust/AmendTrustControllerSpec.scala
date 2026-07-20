@@ -34,7 +34,7 @@ import play.api.inject.bind
 import play.api.mvc.MessagesControllerComponents
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import queries.{CisIdQuery, OriginalTrustAnswersQuery}
+import queries.{CisIdQuery, OriginalTrustAnswersQuery, SubContractorVerificationNumberQuery, SubContractorVerifiedQuery}
 import repositories.SessionRepository
 
 import javax.inject.Inject
@@ -166,6 +166,9 @@ class AmendTrustControllerSpec extends SpecBase with MockitoSugar {
 
           savedAnswers.get(CisIdQuery).value mustBe "1"
           savedAnswers.get(OriginalTrustAnswersQuery).value mustBe expectedOriginal
+
+          savedAnswers.get(SubContractorVerifiedQuery).value mustBe false
+          savedAnswers.get(SubContractorVerificationNumberQuery).value mustBe "V0004528765"
         }
       }
 

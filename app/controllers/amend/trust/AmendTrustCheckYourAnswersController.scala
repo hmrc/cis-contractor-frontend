@@ -34,7 +34,7 @@ import viewmodels.checkAnswers.add.*
 import viewmodels.checkAnswers.add.trust.*
 import viewmodels.govuk.summarylist.*
 import views.html.amend.AmendCheckYourAnswersView
-
+import controllers.routes
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -70,7 +70,7 @@ class AmendTrustCheckYourAnswersController @Inject() (
 
       case Left(error) =>
         logger.error(s"[AmendTrustCheckYourAnswersController.onPageLoad] Failed to load the page: $error")
-        Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+        Redirect(routes.JourneyRecoveryController.onPageLoad())
     }
   }
 
@@ -108,21 +108,21 @@ class AmendTrustCheckYourAnswersController @Inject() (
   )(implicit messages: Messages): Seq[Option[SummaryListRow]] = {
 
     val nameRows =
-      Option
-        .when(!isVerified)(
-          Seq(TrustNameSummary.row(ua, AmendMode))
-        )
-        .getOrElse(Nil)
+      if (isVerified) {
+        Nil
+      } else {
+        Seq(TrustNameSummary.row(ua, AmendMode))
+      }
 
     val utrRows =
-      Option
-        .when(!isVerified)(
-          Seq(
-            TrustUtrYesNoSummary.row(ua, AmendMode),
-            TrustUtrSummary.row(ua, AmendMode)
-          )
+      if (isVerified) {
+        Nil
+      } else {
+        Seq(
+          TrustUtrYesNoSummary.row(ua, AmendMode),
+          TrustUtrSummary.row(ua, AmendMode)
         )
-        .getOrElse(Nil)
+      }
 
     nameRows ++
       Seq(
@@ -153,18 +153,18 @@ class AmendTrustCheckYourAnswersController @Inject() (
                 "[AmendTrustCheckYourAnswersController.onSubmit] Failed to update subcontractor",
                 t
               )
-              Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+              Redirect(routes.JourneyRecoveryController.onPageLoad())
             }
 
         case Left(error) =>
           logger.error(s"[AmendTrustCheckYourAnswersController.onSubmit] Validation failed: $error")
-          Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+          Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
       }
     }
 
   def onCancel(): Action[AnyContent] = (identify andThen getData andThen requireData).async { implicit request =>
     sessionRepository
       .set(UserAnswers(request.userAnswers.id))
-      .map(_ => Redirect(controllers.routes.IndexController.onPageLoad()))
+      .map(_ => Redirect(routes.IndexController.onPageLoad()))
   }
 }
