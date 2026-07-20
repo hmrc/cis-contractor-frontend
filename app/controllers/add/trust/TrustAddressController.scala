@@ -18,18 +18,18 @@ package controllers.add.trust
 
 import controllers.actions.*
 import controllers.add.AddressLookupJourneyController
-import models.{Mode, UserAnswers}
 import models.address.Address
 import models.address.AddressLookupJourneyIdentifier.trustQuestionsAddress
+import models.{Mode, UserAnswers}
 import pages.add.trust.{TrustAddressPage, TrustNamePage}
 import play.api.i18n.MessagesApi
-import play.api.mvc.{Call, MessagesControllerComponents}
-import queries.Settable
+import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
+import queries.{AddressLookupAmendReturnQuery, Settable}
 import repositories.SessionRepository
 import services.AddressLookupService
 
 import javax.inject.Inject
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 class TrustAddressController @Inject() (
   override val messagesApi: MessagesApi,
@@ -59,6 +59,20 @@ class TrustAddressController @Inject() (
     routes.AddTrustContactMethodsYesNoController.onPageLoad(mode)
 
   override protected def onChangeCompletion(isAmend: Boolean): Call =
-    routes.TrustCheckYourAnswersController.onPageLoad()
+    if (isAmend) {
+      controllers.routes.JourneyRecoveryController.onPageLoad()
+    } // TODO: redirect to amend cya page
+    else {
+      routes.TrustCheckYourAnswersController.onPageLoad()
+    }
+
+  def redirectToAmendAddressLookup(): Action[AnyContent] =
+    (identify andThen getData andThen requireData).async { implicit request =>
+      (for {
+        ua <- Future.fromTry(request.userAnswers.set(AddressLookupAmendReturnQuery, true))
+        _  <- sessionRepository.set(ua)
+      } yield Redirect(routes.TrustAddressController.redirectToAddressLookup(Some("change"))))
+        .recover { case _ => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()) }
+    }
 
 }
