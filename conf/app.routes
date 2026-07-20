@@ -44,9 +44,6 @@ POST  /subcontractor/amend/check-trading-name  controllers.add.SubTradingNameYes
 GET   /subcontractor/amend/name  controllers.add.SubcontractorNameController.onPageLoad(mode: Mode = AmendMode)
 POST  /subcontractor/amend/name  controllers.add.SubcontractorNameController.onSubmit(mode: Mode = AmendMode)
 
-GET   /subcontractor/amend/check-contact-details  controllers.add.IndividualChooseContactDetailsController.onPageLoad(mode: Mode = AmendMode)
-POST  /subcontractor/amend/check-contact-details  controllers.add.IndividualChooseContactDetailsController.onSubmit(mode: Mode = AmendMode)
-
 GET   /subcontractor/amend/email-address  controllers.add.IndividualEmailAddressController.onPageLoad(mode: Mode = AmendMode)
 POST  /subcontractor/amend/email-address  controllers.add.IndividualEmailAddressController.onSubmit(mode: Mode = AmendMode)
 
@@ -82,6 +79,9 @@ POST  /subcontractor/amend/check-address  controllers.add.SubAddressYesNoControl
 
 GET   /subcontractor/amend/add-contact-details  controllers.add.AddIndividualContactMethodsYesNoController.onPageLoad(mode: Mode = AmendMode)
 POST  /subcontractor/amend/add-contact-details  controllers.add.AddIndividualContactMethodsYesNoController.onSubmit(mode: Mode = AmendMode)
+
+GET   /subcontractor/amend/select-contact-details  controllers.add.IndividualContactMethodOptionsController.onPageLoad(mode: Mode = AmendMode)
+POST  /subcontractor/amend/select-contact-details  controllers.add.IndividualContactMethodOptionsController.onSubmit(mode: Mode = AmendMode)
 
 GET   /subcontractor/amend/company  controllers.amend.company.AmendCompanyController.onPageLoad()
 
@@ -166,17 +166,17 @@ POST  /subcontractor/add/email-address         controllers.add.IndividualEmailAd
 GET   /subcontractor/add/change-email-address  controllers.add.IndividualEmailAddressController.onPageLoad(mode: Mode = CheckMode)
 POST  /subcontractor/add/change-email-address  controllers.add.IndividualEmailAddressController.onSubmit(mode: Mode = CheckMode)
 
-GET   /subcontractor/add/check-contact-details         controllers.add.IndividualChooseContactDetailsController.onPageLoad(mode: Mode = NormalMode)
-POST  /subcontractor/add/check-contact-details         controllers.add.IndividualChooseContactDetailsController.onSubmit(mode: Mode = NormalMode)
-GET   /subcontractor/add/change-check-contact-details  controllers.add.IndividualChooseContactDetailsController.onPageLoad(mode: Mode = CheckMode)
-POST  /subcontractor/add/change-check-contact-details  controllers.add.IndividualChooseContactDetailsController.onSubmit(mode: Mode = CheckMode)
-
 GET   /subcontractor/add/individual/subcontractor-added  controllers.add.SubcontractorAddedController.individualSubcontractorAdded()
 
 GET   /subcontractor/add/add-contact-details         controllers.add.AddIndividualContactMethodsYesNoController.onPageLoad(mode: Mode = NormalMode)
 POST  /subcontractor/add/add-contact-details         controllers.add.AddIndividualContactMethodsYesNoController.onSubmit(mode: Mode = NormalMode)
 GET   /subcontractor/add/change-add-contact-details  controllers.add.AddIndividualContactMethodsYesNoController.onPageLoad(mode: Mode = CheckMode)
 POST  /subcontractor/add/change-add-contact-details  controllers.add.AddIndividualContactMethodsYesNoController.onSubmit(mode: Mode = CheckMode)
+
+GET   /subcontractor/add/select-contact-details         controllers.add.IndividualContactMethodOptionsController.onPageLoad(mode: Mode = NormalMode)
+POST  /subcontractor/add/select-contact-details         controllers.add.IndividualContactMethodOptionsController.onSubmit(mode: Mode = NormalMode)
+GET   /subcontractor/add/change-select-contact-details  controllers.add.IndividualContactMethodOptionsController.onPageLoad(mode: Mode = CheckMode)
+POST  /subcontractor/add/change-select-contact-details  controllers.add.IndividualContactMethodOptionsController.onSubmit(mode: Mode = CheckMode)
 
 # Company
 GET   /subcontractor/add/company/subcontractor-added  controllers.add.SubcontractorAddedController.companySubcontractorAdded()
@@ -425,8 +425,8 @@ GET   /subcontractor/add/trust/phone-number         controllers.add.trust.TrustP
 POST  /subcontractor/add/trust/phone-number         controllers.add.trust.TrustPhoneNumberController.onSubmit(mode: Mode = NormalMode)
 GET   /subcontractor/add/trust/change-phone-number  controllers.add.trust.TrustPhoneNumberController.onPageLoad(mode: Mode = CheckMode)
 POST  /subcontractor/add/trust/change-phone-number  controllers.add.trust.TrustPhoneNumberController.onSubmit(mode: Mode = CheckMode)
-GET   /subcontractor/amend/trust/phone-number         controllers.add.trust.TrustPhoneNumberController.onPageLoad(mode: Mode = AmendMode)
-POST  /subcontractor/amend/trust/phone-number         controllers.add.trust.TrustPhoneNumberController.onSubmit(mode: Mode = AmendMode)
+GET   /subcontractor/amend/trust/phone-number       controllers.add.trust.TrustPhoneNumberController.onPageLoad(mode: Mode = AmendMode)
+POST  /subcontractor/amend/trust/phone-number       controllers.add.trust.TrustPhoneNumberController.onSubmit(mode: Mode = AmendMode)
 
 GET   /subcontractor/add/trust/mobile-number         controllers.add.trust.TrustMobileNumberController.onPageLoad(mode: Mode = NormalMode)
 POST  /subcontractor/add/trust/mobile-number         controllers.add.trust.TrustMobileNumberController.onSubmit(mode: Mode = NormalMode)
@@ -470,15 +470,15 @@ GET   /subcontractor/add/trust/add-contact-details         controllers.add.trust
 POST  /subcontractor/add/trust/add-contact-details         controllers.add.trust.AddTrustContactMethodsYesNoController.onSubmit(mode: Mode = NormalMode)
 GET   /subcontractor/add/trust/change-add-contact-details  controllers.add.trust.AddTrustContactMethodsYesNoController.onPageLoad(mode: Mode = CheckMode)
 POST  /subcontractor/add/trust/change-add-contact-details  controllers.add.trust.AddTrustContactMethodsYesNoController.onSubmit(mode: Mode = CheckMode)
-GET   /subcontractor/amend/trust/add-contact-details         controllers.add.trust.AddTrustContactMethodsYesNoController.onPageLoad(mode: Mode = AmendMode)
-POST  /subcontractor/amend/trust/add-contact-details         controllers.add.trust.AddTrustContactMethodsYesNoController.onSubmit(mode: Mode = AmendMode)
+GET   /subcontractor/amend/trust/add-contact-details       controllers.add.trust.AddTrustContactMethodsYesNoController.onPageLoad(mode: Mode = AmendMode)
+POST  /subcontractor/amend/trust/add-contact-details       controllers.add.trust.AddTrustContactMethodsYesNoController.onSubmit(mode: Mode = AmendMode)
 
 GET   /subcontractor/add/trust/select-contact-details         controllers.add.trust.TrustContactMethodOptionsController.onPageLoad(mode: Mode = NormalMode)
 POST  /subcontractor/add/trust/select-contact-details         controllers.add.trust.TrustContactMethodOptionsController.onSubmit(mode: Mode = NormalMode)
 GET   /subcontractor/add/trust/change-select-contact-details  controllers.add.trust.TrustContactMethodOptionsController.onPageLoad(mode: Mode = CheckMode)
 POST  /subcontractor/add/trust/change-select-contact-details  controllers.add.trust.TrustContactMethodOptionsController.onSubmit(mode: Mode = CheckMode)
-GET   /subcontractor/amend/trust/select-contact-details         controllers.add.trust.TrustContactMethodOptionsController.onPageLoad(mode: Mode = AmendMode)
-POST  /subcontractor/amend/trust/select-contact-details         controllers.add.trust.TrustContactMethodOptionsController.onSubmit(mode: Mode = AmendMode)
+GET   /subcontractor/amend/trust/select-contact-details       controllers.add.trust.TrustContactMethodOptionsController.onPageLoad(mode: Mode = AmendMode)
+POST  /subcontractor/amend/trust/select-contact-details       controllers.add.trust.TrustContactMethodOptionsController.onSubmit(mode: Mode = AmendMode)
 
 # Verify
 GET   /subcontractor/verify/confirmation-email-not-stored         controllers.verify.ContractorEmailConfirmationNotStoredController.onPageLoad(mode: Mode = NormalMode)

@@ -328,5 +328,18 @@ class ValidatedCompanySpec extends SpecBase with Matchers {
         ValidatedCompany.build(ua) mustBe Left(InvalidAnswer(CompanyWorksReferencePage))
       }
     }
+
+    "fail when AddCompanyContactMethodsYesNo is true but CompanyContactMethodOptions is empty" in {
+      val ua =
+        minRequired
+          .set(AddCompanyContactMethodsYesNoPage, true)
+          .success
+          .value
+          .set(CompanyContactMethodOptionsPage, Set.empty)
+          .success
+          .value
+
+      ValidatedCompany.build(ua) mustBe Left(InvalidAnswer(CompanyContactMethodOptionsPage))
+    }
   }
 }

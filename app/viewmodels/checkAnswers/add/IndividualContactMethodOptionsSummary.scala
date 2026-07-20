@@ -16,30 +16,37 @@
 
 package viewmodels.checkAnswers.add
 
+import models.contact.ContactMethodOptions
 import models.{CheckMode, Mode, UserAnswers}
-import pages.add.AddIndividualContactMethodsYesNoPage
+import pages.add.IndividualContactMethodOptionsPage
 import play.api.i18n.Messages
+import play.twirl.api.HtmlFormat
+import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
+import viewmodels.checkAnswers.verify.ValueViewModelHelper
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
 
-object AddIndividualContactMethodsYesNoSummary {
+object IndividualContactMethodOptionsSummary {
 
   def row(answers: UserAnswers, mode: Mode = CheckMode)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(AddIndividualContactMethodsYesNoPage).map { answer =>
-
-      val value = if (answer) "site.yes" else "site.no"
-
+    answers.get(IndividualContactMethodOptionsPage).map { selectedMethods =>
+      val options =
+        ContactMethodOptions
+          .ordered(selectedMethods)
+          .map(m => HtmlFormat.escape(messages(s"individualContactMethodOptions.$m")).toString)
       SummaryListRowViewModel(
-        key = "addIndividualContactMethodsYesNo.checkYourAnswersLabel",
-        value = ValueViewModel(value),
+        key = "individualContactMethodOptions.checkYourAnswersLabel",
+        value = ValueViewModelHelper
+          .makeGovukBulletList(options, false)
+          .getOrElse(ValueViewModel(HtmlContent(""))),
         actions = Seq(
           ActionItemViewModel(
             "site.change",
-            controllers.add.routes.AddIndividualContactMethodsYesNoController.onPageLoad(mode).url
+            controllers.add.routes.IndividualContactMethodOptionsController.onPageLoad(mode).url
           )
-            .withVisuallyHiddenText(messages("addIndividualContactMethodsYesNo.change.hidden"))
-            .withAttribute("id" -> "add-individual-contact-details")
+            .withVisuallyHiddenText(messages("individualContactMethodOptions.change.hidden"))
+            .withAttribute("id" -> "individual-methods-of-contact")
         )
       )
     }

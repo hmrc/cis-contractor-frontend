@@ -20,10 +20,9 @@ import controllers.actions.*
 import controllers.helpers.ContactGuard
 import forms.add.IndividualMobileNumberFormProvider
 import models.Mode
-import models.contact.ContactOptions.Mobile
-import models.requests.DataRequest
+import models.contact.ContactMethodOptions
 import navigation.Navigator
-import pages.add.{IndividualChooseContactDetailsPage, IndividualMobileNumberPage}
+import pages.add.{IndividualContactMethodOptionsPage, IndividualMobileNumberPage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
@@ -52,38 +51,37 @@ class IndividualMobileNumberController @Inject() (
 
   val form = formProvider()
 
-  private def recoveryRedirect =
-    Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-
-  private def preparedForm(implicit request: DataRequest[?]) =
-    request.userAnswers.get(IndividualMobileNumberPage).fold(form)(form.fill)
-
   def onPageLoad(mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData) { implicit request =>
-      requireContactChoice(
+      requireContactMethodInSet(
         subcontractorNameExtractor.getSubcontractorName(request.userAnswers),
-        request.userAnswers.get(IndividualChooseContactDetailsPage),
-        Mobile
+        request.userAnswers.get(IndividualContactMethodOptionsPage),
+        ContactMethodOptions.Mobile
       ) { subcontractorName =>
+        val preparedForm = request.userAnswers.get(IndividualMobileNumberPage) match {
+          case None        => form
+          case Some(value) => form.fill(value)
+        }
         Ok(view(preparedForm, mode, subcontractorName))
       }
     }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
-      subcontractorNameExtractor
-        .getSubcontractorName(request.userAnswers)
-        .fold(Future.successful(recoveryRedirect)) { subcontractorName =>
-          form
-            .bindFromRequest()
-            .fold(
-              formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, subcontractorName))),
-              value =>
-                for {
-                  updatedAnswers <- Future.fromTry(request.userAnswers.set(IndividualMobileNumberPage, value))
-                  _              <- sessionRepository.set(updatedAnswers)
-                } yield Redirect(navigator.nextPage(IndividualMobileNumberPage, mode, updatedAnswers))
-            )
-        }
+      (for {
+        subcontractorName <- subcontractorNameExtractor.getSubcontractorName(request.userAnswers)
+        contactMethods    <- request.userAnswers.get(IndividualContactMethodOptionsPage)
+        if contactMethods.contains(ContactMethodOptions.Mobile)
+      } yield form
+        .bindFromRequest()
+        .fold(
+          formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, subcontractorName))),
+          value =>
+            for {
+              updatedAnswers <- Future.fromTry(request.userAnswers.set(IndividualMobileNumberPage, value))
+              _              <- sessionRepository.set(updatedAnswers)
+            } yield Redirect(navigator.nextPage(IndividualMobileNumberPage, mode, updatedAnswers))
+        ))
+        .getOrElse(Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())))
   }
 }

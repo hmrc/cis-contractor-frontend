@@ -331,5 +331,18 @@ class ValidatedTrustSpec extends SpecBase with Matchers {
         ValidatedTrust.build(ua) mustBe a[Right[?, ?]]
       }
     }
+
+    "fail when AddTrustContactMethodsYesNo is true but TrustContactMethodOptions is empty" in {
+      val ua =
+        minRequired
+          .set(AddTrustContactMethodsYesNoPage, true)
+          .success
+          .value
+          .set(TrustContactMethodOptionsPage, Set.empty)
+          .success
+          .value
+
+      ValidatedTrust.build(ua) mustBe Left(InvalidAnswer(TrustContactMethodOptionsPage))
+    }
   }
 }
