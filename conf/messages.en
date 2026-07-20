@@ -405,6 +405,14 @@ addIndividualContactMethodsYesNo.error.required                              =  
 addIndividualContactMethodsYesNo.checkYourAnswersLabel                       =  Add contact details?
 addIndividualContactMethodsYesNo.change.hidden                               =  add contact details?
 
+amendTrustRemoveDetailYesNo.title                                            =  Are you sure you want to remove this information from this subcontractor?
+amendTrustRemoveDetailYesNo.heading                                          =  Are you sure you want to remove the {1} from {0}?
+amendTrustRemoveDetailYesNo.error.required                                   =  Select whether you want to remove this information from this subcontractor
+amendTrustRemoveDetailYesNo.detail.address                                   =  address
+amendTrustRemoveDetailYesNo.detail.contact-details                           =  contact details
+amendTrustRemoveDetailYesNo.detail.unique-taxpayer-reference                 =  Unique Taxpayer Reference
+amendTrustRemoveDetailYesNo.detail.works-reference-number                    =  works reference number
+
 # Partnership
 addPartnershipContactMethodsYesNo.title                     =  Do you want to add contact details for this partnership?
 addPartnershipContactMethodsYesNo.heading                   =  Do you want to add contact details for {0}?
