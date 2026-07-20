@@ -100,12 +100,23 @@ class IndividualNavigator @Inject() () extends NavigatorForJourney {
     case UniqueTaxpayerReferenceYesNoPage     => navigatorFromUniqueTaxpayerReferenceYesNoPage(AmendMode)(_)
     case WorksReferenceNumberYesNoPage        => navigatorFromWorksReferenceNumberYesNoPage(AmendMode)(_)
     case NationalInsuranceNumberYesNoPage     => navigatorFromNationalInsuranceNumberYesNoPage(AmendMode)(_)
-    case IndividualPhoneNumberPage            =>
-      _ => cyaRoute(AmendMode)
+    case IndividualContactMethodOptionsPage   =>
+      userAnswers => nextMissingSelectedContactMethodPageAfter(current = None, mode = AmendMode)(userAnswers)
     case IndividualEmailAddressPage           =>
-      _ => controllers.add.routes.CheckYourAnswersController.onPageLoad()
+      userAnswers =>
+        nextMissingSelectedContactMethodPageAfter(current = Some(ContactMethodOptions.Email), mode = AmendMode)(
+          userAnswers
+        )
+    case IndividualPhoneNumberPage            =>
+      userAnswers =>
+        nextMissingSelectedContactMethodPageAfter(current = Some(ContactMethodOptions.Phone), mode = AmendMode)(
+          userAnswers
+        )
     case IndividualMobileNumberPage           =>
-      _ => cyaRoute(AmendMode)
+      userAnswers =>
+        nextMissingSelectedContactMethodPageAfter(current = Some(ContactMethodOptions.Mobile), mode = AmendMode)(
+          userAnswers
+        )
     case AddIndividualContactMethodsYesNoPage => navigatorFromAddIndividualContactMethodsYesNoPage(AmendMode)(_)
     case _                                    => _ => cyaRoute(AmendMode)
   }
@@ -254,14 +265,15 @@ class IndividualNavigator @Inject() () extends NavigatorForJourney {
     }
 
   private def nextMissingSelectedContactMethodPageAfter(
-    current: Option[ContactMethodOptions]
+    current: Option[ContactMethodOptions],
+    mode: Mode = CheckMode
   )(userAnswers: UserAnswers): Call =
     navigateFromContactMethodPage(current, userAnswers) { remaining =>
       remaining
         .find(isMissingAnswer(_)(userAnswers))
-        .map(contactMethodPageCall(_, CheckMode))
+        .map(contactMethodPageCall(_, mode))
         .getOrElse(
-          cyaRoute(CheckMode)
+          cyaRoute(mode)
         )
     }
 

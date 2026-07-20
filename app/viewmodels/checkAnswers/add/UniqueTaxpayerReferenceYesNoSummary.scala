@@ -16,7 +16,7 @@
 
 package viewmodels.checkAnswers.add
 
-import models.{CheckMode, UserAnswers}
+import models.{CheckMode, Mode, UserAnswers}
 import pages.add.UniqueTaxpayerReferenceYesNoPage
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
@@ -25,7 +25,7 @@ import viewmodels.implicits.*
 
 object UniqueTaxpayerReferenceYesNoSummary {
 
-  def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
+  def row(answers: UserAnswers, mode: Mode = CheckMode)(implicit messages: Messages): Option[SummaryListRow] =
     answers.get(UniqueTaxpayerReferenceYesNoPage).map { answer =>
 
       val value = if (answer) "site.yes" else "site.no"
@@ -36,7 +36,7 @@ object UniqueTaxpayerReferenceYesNoSummary {
         actions = Seq(
           ActionItemViewModel(
             "site.change",
-            controllers.add.routes.UniqueTaxpayerReferenceYesNoController.onPageLoad(CheckMode).url
+            controllers.add.routes.UniqueTaxpayerReferenceYesNoController.onPageLoad(mode).url
           )
             .withVisuallyHiddenText(messages("uniqueTaxpayerReferenceYesNo.change.hidden"))
             .withAttribute("id" -> "unique-taxpayer-reference-yes-no")

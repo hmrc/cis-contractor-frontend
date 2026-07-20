@@ -18,7 +18,7 @@ package viewmodels.checkAnswers.add
 
 import controllers.add.routes
 import helpers.CyaEncodingSpecHelper
-import models.{CheckMode, UserAnswers}
+import models.{AmendMode, CheckMode, UserAnswers}
 import org.scalatest.OptionValues.convertOptionToValuable
 import org.scalatest.TryValues.convertTryToSuccessOrFailure
 import org.scalatest.freespec.AnyFreeSpec
@@ -57,6 +57,38 @@ class IndividualPhoneNumberSummarySpec extends AnyFreeSpec with Matchers with Cy
       val changeAction       = actions.head
       val expectedChangeText = messages("site.change")
       val expectedHref       = routes.IndividualPhoneNumberController.onPageLoad(CheckMode).url
+      val expectedHiddenText = messages("individualPhoneNumber.change.hidden")
+
+      changeAction.content.asHtml.toString should include(expectedChangeText)
+      changeAction.href                  shouldBe expectedHref
+
+      changeAction.visuallyHiddenText.value shouldBe expectedHiddenText
+    }
+
+    "must return a Summary List Row when the answer exists in AmendMode" in {
+      val answers =
+        UserAnswers("test-id")
+          .set(IndividualPhoneNumberPage, "0987456231")
+          .success
+          .value
+
+      val maybeRow = IndividualPhoneNumberSummary.row(answers, AmendMode)
+      maybeRow shouldBe defined
+
+      val row = maybeRow.value
+
+      val expectedKeyText = messages("individualPhoneNumber.checkYourAnswersLabel")
+      row.key.content.asHtml.toString should include(expectedKeyText)
+
+      row.value.content.asHtml.toString should include("0987456231")
+
+      row.actions shouldBe defined
+      val actions = row.actions.value.items
+      actions should have size 1
+
+      val changeAction       = actions.head
+      val expectedChangeText = messages("site.change")
+      val expectedHref       = routes.IndividualPhoneNumberController.onPageLoad(AmendMode).url
       val expectedHiddenText = messages("individualPhoneNumber.change.hidden")
 
       changeAction.content.asHtml.toString should include(expectedChangeText)
