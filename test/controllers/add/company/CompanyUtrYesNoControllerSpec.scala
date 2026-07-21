@@ -113,9 +113,9 @@ class CompanyUtrYesNoControllerSpec extends SpecBase with MockitoSugar {
     }
 
     "must redirect to the CompanyCrnYesNo page and not add page to AmendedPagesPage when valid data with value No is submitted in NormalMode" in {
-      val onwardRoute = controllers.add.company.routes.CompanyCrnController.onPageLoad(NormalMode)
+      val onwardRoute           = controllers.add.company.routes.CompanyCrnController.onPageLoad(NormalMode)
       val mockSessionRepository = mock[SessionRepository]
-      val captor = ArgumentCaptor.forClass(classOf[UserAnswers])
+      val captor                = ArgumentCaptor.forClass(classOf[UserAnswers])
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
       val application =
@@ -145,9 +145,9 @@ class CompanyUtrYesNoControllerSpec extends SpecBase with MockitoSugar {
     }
 
     "must add CompanyAddressYesNoPage to AmendedPagesPage when submitted in AmendMode" in {
-      val onwardRoute = controllers.add.company.routes.CompanyCrnYesNoController.onPageLoad(AmendMode)
+      val onwardRoute           = controllers.add.company.routes.CompanyCrnYesNoController.onPageLoad(AmendMode)
       val mockSessionRepository = mock[SessionRepository]
-      val captor = ArgumentCaptor.forClass(classOf[UserAnswers])
+      val captor                = ArgumentCaptor.forClass(classOf[UserAnswers])
 
       when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
 

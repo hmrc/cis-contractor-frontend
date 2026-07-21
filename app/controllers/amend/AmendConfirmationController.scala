@@ -33,16 +33,16 @@ import views.html.amend.AmendConfirmationView
 import javax.inject.Inject
 
 class AmendConfirmationController @Inject() (
-                                              override val messagesApi: MessagesApi,
-                                              identify: IdentifierAction,
-                                              getData: DataRetrievalAction,
-                                              requireData: DataRequiredAction,
-                                              val controllerComponents: MessagesControllerComponents,
-                                              view: AmendConfirmationView,
-                                              appConfig: FrontendAppConfig
-                                            ) extends FrontendBaseController
-  with I18nSupport
-  with Logging {
+  override val messagesApi: MessagesApi,
+  identify: IdentifierAction,
+  getData: DataRetrievalAction,
+  requireData: DataRequiredAction,
+  val controllerComponents: MessagesControllerComponents,
+  view: AmendConfirmationView,
+  appConfig: FrontendAppConfig
+) extends FrontendBaseController
+    with I18nSupport
+    with Logging {
 
   def companyOnPageLoad(): Action[AnyContent] =
     (identify andThen getData andThen requireData) { implicit request =>
@@ -58,10 +58,10 @@ class AmendConfirmationController @Inject() (
     }
 
   private def withOriginalAnswers[A: Reads](
-                                             query: Gettable[A]
-                                           )(
-                                             block: (A, String) => Result
-                                           )(implicit request: DataRequest[AnyContent]): Result = {
+    query: Gettable[A]
+  )(
+    block: (A, String) => Result
+  )(implicit request: DataRequest[AnyContent]): Result = {
 
     val ua = request.userAnswers
 

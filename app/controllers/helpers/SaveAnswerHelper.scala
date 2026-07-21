@@ -25,11 +25,11 @@ import scala.util.Try
 object SaveAnswerHelper {
 
   def saveAnswer[A](
-                     userAnswers: UserAnswers,
-                     page: Settable[A],
-                     value: A,
-                     mode: Mode
-                   )(implicit writes: Writes[A]): Try[UserAnswers] =
+    userAnswers: UserAnswers,
+    page: Settable[A],
+    value: A,
+    mode: Mode
+  )(implicit writes: Writes[A]): Try[UserAnswers] =
     if (mode == AmendMode) {
       userAnswers.setAndAmend(page, value)
     } else {

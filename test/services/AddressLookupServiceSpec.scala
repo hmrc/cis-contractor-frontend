@@ -59,10 +59,10 @@ class AddressLookupServiceSpec extends SpecBase with MockitoSugar {
     MandatoryFieldsConfigModel(addressLine1 = Some(true), town = Some(true), postcode = Some(true))
 
   private def newService(
-                          connector: AddressLookupConnector = mock[AddressLookupConnector],
-                          alfConfig: AddressLookupConfiguration = mock[AddressLookupConfiguration],
-                          sessionRepository: SessionRepository = mock[SessionRepository]
-                        ) = (new AddressLookupService(connector, alfConfig, sessionRepository), connector, alfConfig, sessionRepository)
+    connector: AddressLookupConnector = mock[AddressLookupConnector],
+    alfConfig: AddressLookupConfiguration = mock[AddressLookupConfiguration],
+    sessionRepository: SessionRepository = mock[SessionRepository]
+  ) = (new AddressLookupService(connector, alfConfig, sessionRepository), connector, alfConfig, sessionRepository)
 
   "AddressLookupService" - {
 

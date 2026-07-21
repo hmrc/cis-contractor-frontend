@@ -27,7 +27,7 @@ import viewmodels.amend.CompanyAmendConfirmationViewModel
 import views.html.amend.AmendConfirmationView
 
 class AmendConfirmationControllerSpec extends SpecBase {
-  private val cisId     = "123456789"
+  private val cisId       = "123456789"
   private val companyName = "ABC Company"
 
   private val original =
@@ -103,7 +103,7 @@ class AmendConfirmationControllerSpec extends SpecBase {
           .set(CompanyNamePage, companyName)
           .success
           .value
-          
+
       val application =
         applicationBuilder(userAnswers = Some(userAnswers)).build()
 

@@ -573,7 +573,7 @@ class CompanyAmendConfirmationViewModelSpec extends SpecBase {
       result must have size 2
 
       val yesNoRow = result.head
-      val crnRow = result(1)
+      val crnRow   = result(1)
 
       yesNoRow.head.content mustBe Text(msgs("companyCrnYesNo.checkYourAnswersLabel"))
       yesNoRow(1).content mustBe Text(msgs("site.yes"))
@@ -710,4 +710,3 @@ class CompanyAmendConfirmationViewModelSpec extends SpecBase {
     }
   }
 }
-

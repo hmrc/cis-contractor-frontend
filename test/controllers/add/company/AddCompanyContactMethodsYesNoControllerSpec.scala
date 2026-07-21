@@ -90,35 +90,35 @@ class AddCompanyContactMethodsYesNoControllerSpec extends SpecBase with MockitoS
     "must redirect to the CompanyContactMethodOptions page and not add the page to AmendedPagesPage when" +
       "valid data with value Yes is submitted in NormalMode" in {
 
-      val mockSessionRepository = mock[SessionRepository]
-      val onwardRoute = controllers.add.company.routes.CompanyContactMethodOptionsController.onPageLoad(NormalMode)
-      val captor                = ArgumentCaptor.forClass(classOf[UserAnswers])
-      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+        val mockSessionRepository = mock[SessionRepository]
+        val onwardRoute           = controllers.add.company.routes.CompanyContactMethodOptionsController.onPageLoad(NormalMode)
+        val captor                = ArgumentCaptor.forClass(classOf[UserAnswers])
+        when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
-      val application =
-        applicationBuilder(userAnswers = Some(uaWithName))
-          .overrides(
-            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
-            bind[SessionRepository].toInstance(mockSessionRepository)
-          )
-          .build()
+        val application =
+          applicationBuilder(userAnswers = Some(uaWithName))
+            .overrides(
+              bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
+              bind[SessionRepository].toInstance(mockSessionRepository)
+            )
+            .build()
 
-      running(application) {
-        val request =
-          FakeRequest(POST, addCompanyContactMethodsYesNoRoute)
-            .withFormUrlEncodedBody(("value", "true"))
+        running(application) {
+          val request =
+            FakeRequest(POST, addCompanyContactMethodsYesNoRoute)
+              .withFormUrlEncodedBody(("value", "true"))
 
-        val result = route(application, request).value
+          val result = route(application, request).value
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual onwardRoute.url
-        verify(mockSessionRepository).set(captor.capture())
-        val updatedAnswers = captor.getValue
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual onwardRoute.url
+          verify(mockSessionRepository).set(captor.capture())
+          val updatedAnswers = captor.getValue
 
-        updatedAnswers.get(AddCompanyContactMethodsYesNoPage) mustBe Some(true)
-        updatedAnswers.get(AmendedPagesPage) mustBe None
+          updatedAnswers.get(AddCompanyContactMethodsYesNoPage) mustBe Some(true)
+          updatedAnswers.get(AmendedPagesPage) mustBe None
+        }
       }
-    }
 
     "must redirect to the CompanyUtrYesNo page when valid data with value No is submitted" in {
 
@@ -149,8 +149,8 @@ class AddCompanyContactMethodsYesNoControllerSpec extends SpecBase with MockitoS
 
     "must add AddCompanyContactMethodsYesNoPage to AmendedPagesPage when submitted in AmendMode" in {
       val mockSessionRepository = mock[SessionRepository]
-      val captor = ArgumentCaptor.forClass(classOf[UserAnswers])
-      val onwardRoute = controllers.add.company.routes.CompanyContactMethodOptionsController.onPageLoad(AmendMode)
+      val captor                = ArgumentCaptor.forClass(classOf[UserAnswers])
+      val onwardRoute           = controllers.add.company.routes.CompanyContactMethodOptionsController.onPageLoad(AmendMode)
 
       when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
 

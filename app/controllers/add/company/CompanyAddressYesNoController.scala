@@ -73,7 +73,8 @@ class CompanyAddressYesNoController @Inject() (
               formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, companyName))),
               value =>
                 for {
-                  updatedAnswers <- Future.fromTry(
+                  updatedAnswers <-
+                    Future.fromTry(
                       SaveAnswerHelper.saveAnswer(request.userAnswers, CompanyAddressYesNoPage, value, mode)
                     )
                   _              <- sessionRepository.set(updatedAnswers)

@@ -94,8 +94,8 @@ class CompanyContactMethodOptionsControllerSpec extends SpecBase with MockitoSug
 
     "must redirect to the next page and not add the page to AmendedPagesPage when valid data is submitted in NormalMode" in {
       val mockSessionRepository = mock[SessionRepository]
-      val captor = ArgumentCaptor.forClass(classOf[UserAnswers])
-      val onwardRoute = controllers.add.company.routes.CompanyEmailAddressController.onPageLoad(NormalMode)
+      val captor                = ArgumentCaptor.forClass(classOf[UserAnswers])
+      val onwardRoute           = controllers.add.company.routes.CompanyEmailAddressController.onPageLoad(NormalMode)
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
       val application =
@@ -126,8 +126,8 @@ class CompanyContactMethodOptionsControllerSpec extends SpecBase with MockitoSug
 
     "must add TrustContactMethodOptionsPage to AmendedPagesPage when submitted in AmendMode" in {
       val mockSessionRepository = mock[SessionRepository]
-      val captor = ArgumentCaptor.forClass(classOf[UserAnswers])
-      val onwardRoute = controllers.add.company.routes.CompanyEmailAddressController.onPageLoad(AmendMode)
+      val captor                = ArgumentCaptor.forClass(classOf[UserAnswers])
+      val onwardRoute           = controllers.add.company.routes.CompanyEmailAddressController.onPageLoad(AmendMode)
 
       when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
 

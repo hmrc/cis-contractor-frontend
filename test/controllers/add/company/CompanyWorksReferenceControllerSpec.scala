@@ -89,8 +89,8 @@ class CompanyWorksReferenceControllerSpec extends SpecBase with MockitoSugar {
     }
 
     "must redirect to the company CYA page when valid data is submitted" in {
-      val captor = ArgumentCaptor.forClass(classOf[UserAnswers])
-      val onwardRoute = controllers.add.company.routes.CompanyCheckYourAnswersController.onPageLoad()
+      val captor                = ArgumentCaptor.forClass(classOf[UserAnswers])
+      val onwardRoute           = controllers.add.company.routes.CompanyCheckYourAnswersController.onPageLoad()
       val mockSessionRepository = mock[SessionRepository]
 
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
@@ -122,8 +122,8 @@ class CompanyWorksReferenceControllerSpec extends SpecBase with MockitoSugar {
     }
 
     "must add the page to AmendedPagesPage when valid data is submitted in AmendMode" in {
-      val captor = ArgumentCaptor.forClass(classOf[UserAnswers])
-      val onwardRoute = controllers.add.company.routes.CompanyCheckYourAnswersController.onPageLoad()
+      val captor                = ArgumentCaptor.forClass(classOf[UserAnswers])
+      val onwardRoute           = controllers.add.company.routes.CompanyCheckYourAnswersController.onPageLoad()
       val mockSessionRepository = mock[SessionRepository]
 
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)

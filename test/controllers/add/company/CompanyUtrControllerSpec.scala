@@ -89,12 +89,12 @@ class CompanyUtrControllerSpec extends SpecBase with MockitoSugar {
     }
 
     "must bind the form and redirect to CompanyCrnYesNoPage and not add the page in AmendedPagesPage on POST when valid UTR is submitted in NormalMode" in {
-      val validValue = "5860920998"
-      val onwardRoute = controllers.add.company.routes.CompanyCrnYesNoController.onPageLoad(NormalMode)
+      val validValue               = "5860920998"
+      val onwardRoute              = controllers.add.company.routes.CompanyCrnYesNoController.onPageLoad(NormalMode)
       val mockSessionRepository    = mock[SessionRepository]
       val mockSubcontractorService = mock[SubcontractorService]
-      val captor = ArgumentCaptor.forClass(classOf[UserAnswers])
-      
+      val captor                   = ArgumentCaptor.forClass(classOf[UserAnswers])
+
       when(mockSubcontractorService.isDuplicateUTR(any[UserAnswers], any[String])(any[HeaderCarrier]))
         .thenReturn(Future.successful(false))
       when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
@@ -132,9 +132,9 @@ class CompanyUtrControllerSpec extends SpecBase with MockitoSugar {
     }
 
     "must add CompanyUtrPage to AmendedPagesPage when submitted in AmendMode" in {
-      val validValue = "5860920998"
-      val onwardRoute = controllers.add.company.routes.CompanyCrnYesNoController.onPageLoad(AmendMode)
-      val mockSessionRepository = mock[SessionRepository]
+      val validValue               = "5860920998"
+      val onwardRoute              = controllers.add.company.routes.CompanyCrnYesNoController.onPageLoad(AmendMode)
+      val mockSessionRepository    = mock[SessionRepository]
       val mockSubcontractorService = mock[SubcontractorService]
 
       val captor = ArgumentCaptor.forClass(classOf[UserAnswers])

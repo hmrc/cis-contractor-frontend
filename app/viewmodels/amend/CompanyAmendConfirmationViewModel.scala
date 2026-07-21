@@ -31,9 +31,9 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.table.TableRow
 object CompanyAmendConfirmationViewModel {
 
   def rows(
-            original: OriginalCompanyAnswers,
-            current: UserAnswers
-          )(implicit messages: Messages): Seq[Seq[TableRow]] =
+    original: OriginalCompanyAnswers,
+    current: UserAnswers
+  )(implicit messages: Messages): Seq[Seq[TableRow]] =
     nameRow(original, current) ++
       addressRows(original, current) ++
       contactRows(original, current) ++
@@ -42,9 +42,9 @@ object CompanyAmendConfirmationViewModel {
       worksReferenceRows(original, current)
 
   private def nameRow(
-                       original: OriginalCompanyAnswers,
-                       current: UserAnswers
-                     )(implicit messages: Messages): Seq[Seq[TableRow]] =
+    original: OriginalCompanyAnswers,
+    current: UserAnswers
+  )(implicit messages: Messages): Seq[Seq[TableRow]] =
     Seq(
       fieldRow(
         CompanyNamePage,
@@ -55,9 +55,9 @@ object CompanyAmendConfirmationViewModel {
     ).flatten
 
   private def addressRows(
-                           original: OriginalCompanyAnswers,
-                           current: UserAnswers
-                         )(implicit messages: Messages): Seq[Seq[TableRow]] = {
+    original: OriginalCompanyAnswers,
+    current: UserAnswers
+  )(implicit messages: Messages): Seq[Seq[TableRow]] = {
     val currentAddress = current.get(CompanyAddressPage)
 
     Seq(
@@ -81,9 +81,9 @@ object CompanyAmendConfirmationViewModel {
   }
 
   private def contactRows(
-                           original: OriginalCompanyAnswers,
-                           current: UserAnswers
-                         )(implicit messages: Messages): Seq[Seq[TableRow]] = {
+    original: OriginalCompanyAnswers,
+    current: UserAnswers
+  )(implicit messages: Messages): Seq[Seq[TableRow]] = {
     val currentMethods = current.get(CompanyContactMethodOptionsPage).getOrElse(Set.empty)
 
     Seq(
@@ -125,8 +125,8 @@ object CompanyAmendConfirmationViewModel {
   }
 
   private def formatContactMethods(
-                                    methods: Set[ContactMethodOptions]
-                                  )(implicit messages: Messages): String =
+    methods: Set[ContactMethodOptions]
+  )(implicit messages: Messages): String =
     if (methods.isEmpty) {
       missingValue
     } else {
@@ -144,7 +144,7 @@ object CompanyAmendConfirmationViewModel {
     }
 
   private def worksReferenceRows(original: OriginalCompanyAnswers, current: UserAnswers)(implicit
-                                                                                       messages: Messages
+    messages: Messages
   ): Seq[Seq[TableRow]] =
     Seq(
       yesNoRow(
@@ -162,7 +162,7 @@ object CompanyAmendConfirmationViewModel {
     ).flatten
 
   private def utrRows(original: OriginalCompanyAnswers, current: UserAnswers)(implicit
-                                                                            messages: Messages
+    messages: Messages
   ): Seq[Seq[TableRow]] =
     Seq(
       yesNoRow(
@@ -180,7 +180,7 @@ object CompanyAmendConfirmationViewModel {
     ).flatten
 
   private def crnRows(original: OriginalCompanyAnswers, current: UserAnswers)(implicit
-                                                                              messages: Messages
+    messages: Messages
   ): Seq[Seq[TableRow]] =
     Seq(
       yesNoRow(
@@ -209,11 +209,11 @@ object CompanyAmendConfirmationViewModel {
     ).flatten.mkString(", ")
 
   private def yesNoRow(
-                        page: QuestionPage[Boolean],
-                        label: String,
-                        original: Option[Boolean],
-                        current: UserAnswers
-                      )(implicit messages: Messages): Option[Seq[TableRow]] = {
+    page: QuestionPage[Boolean],
+    label: String,
+    original: Option[Boolean],
+    current: UserAnswers
+  )(implicit messages: Messages): Option[Seq[TableRow]] = {
 
     val currentVal = current.get(page)
 
@@ -232,11 +232,11 @@ object CompanyAmendConfirmationViewModel {
     }
 
   private def fieldRow(
-                        page: QuestionPage[String],
-                        label: String,
-                        original: Option[String],
-                        current: UserAnswers
-                      )(implicit messages: Messages): Option[Seq[TableRow]] = {
+    page: QuestionPage[String],
+    label: String,
+    original: Option[String],
+    current: UserAnswers
+  )(implicit messages: Messages): Option[Seq[TableRow]] = {
     val currentVal = current.get(page)
 
     Option.when(
@@ -261,9 +261,9 @@ object CompanyAmendConfirmationViewModel {
     messages("amendConfirmation.table.content.none")
 
   private def wasAmended(
-                          current: UserAnswers,
-                          page: QuestionPage[_]
-                        ): Boolean =
+    current: UserAnswers,
+    page: QuestionPage[_]
+  ): Boolean =
     current
       .get(AmendedPagesPage)
       .getOrElse(Set.empty)
