@@ -18,7 +18,7 @@ package viewmodels.checkAnswers.add.partnership
 
 import controllers.add.partnership.routes
 import helpers.CyaEncodingSpecHelper
-import models.{CheckMode, UserAnswers}
+import models.{AmendMode, CheckMode, UserAnswers}
 import org.scalatest.OptionValues.convertOptionToValuable
 import org.scalatest.TryValues.convertTryToSuccessOrFailure
 import org.scalatest.freespec.AnyFreeSpec
@@ -59,6 +59,39 @@ class PartnershipNominatedPartnerNameSummarySpec extends AnyFreeSpec with Matche
       val changeAction       = actions.head
       val expectedChangeText = messages("site.change")
       val expectedHref       = routes.PartnershipNominatedPartnerNameController.onPageLoad(CheckMode).url
+      val expectedHiddenText = messages("partnershipNominatedPartnerName.change.hidden")
+
+      changeAction.content.asHtml.toString should include(expectedChangeText)
+      changeAction.href                  shouldBe expectedHref
+
+      changeAction.visuallyHiddenText.value shouldBe expectedHiddenText
+      changeAction.attributes                   must contain("id" -> "nominated-partner-name")
+    }
+
+    "must return a SummaryListRow when the answer exists in Amend journey" in {
+      val answers =
+        UserAnswers("test-id")
+          .set(PartnershipNominatedPartnerNamePage, "John Doe")
+          .success
+          .value
+
+      val maybeRow = PartnershipNominatedPartnerNameSummary.row(answers, AmendMode)
+      maybeRow shouldBe defined
+
+      val row = maybeRow.value
+
+      val expectedKeyText = messages("partnershipNominatedPartnerName.checkYourAnswersLabel")
+      row.key.content.asHtml.toString should include(expectedKeyText)
+
+      row.value.content.asHtml.toString should include("John Doe")
+
+      row.actions shouldBe defined
+      val actions = row.actions.value.items
+      actions should have size 1
+
+      val changeAction       = actions.head
+      val expectedChangeText = messages("site.change")
+      val expectedHref       = routes.PartnershipNominatedPartnerNameController.onPageLoad(AmendMode).url
       val expectedHiddenText = messages("partnershipNominatedPartnerName.change.hidden")
 
       changeAction.content.asHtml.toString should include(expectedChangeText)
