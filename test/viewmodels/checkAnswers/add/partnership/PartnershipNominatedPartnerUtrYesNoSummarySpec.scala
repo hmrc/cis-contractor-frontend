@@ -17,7 +17,7 @@
 package viewmodels.checkAnswers.add.partnership
 
 import controllers.add.partnership.routes
-import models.{CheckMode, UserAnswers}
+import models.{AmendMode, CheckMode, UserAnswers}
 import org.scalatest.OptionValues.convertOptionToValuable
 import org.scalatest.TryValues.convertTryToSuccessOrFailure
 import org.scalatest.freespec.AnyFreeSpec
@@ -59,6 +59,39 @@ class PartnershipNominatedPartnerUtrYesNoSummarySpec extends AnyFreeSpec with Ma
       val changeAction       = actions.head
       val expectedChangeText = messages("site.change")
       val expectedHref       = routes.PartnershipNominatedPartnerUtrYesNoController.onPageLoad(CheckMode).url
+      val expectedHiddenText = messages("partnershipNominatedPartnerUtrYesNo.change.hidden")
+
+      changeAction.content.asHtml.toString    should include(expectedChangeText)
+      changeAction.href                     shouldBe expectedHref
+      changeAction.visuallyHiddenText.value shouldBe expectedHiddenText
+      changeAction.attributes                   must contain("id" -> "add-nominated-partner-utr")
+    }
+
+    "must return a SummaryListRow with 'Yes' when the answer is true in Amend journey" in {
+      val answers = UserAnswers("test-id")
+        .set(PartnershipNominatedPartnerUtrYesNoPage, true)
+        .success
+        .value
+
+      val maybeRow: Option[SummaryListRow] = PartnershipNominatedPartnerUtrYesNoSummary.row(answers, AmendMode)
+      maybeRow shouldBe defined
+
+      val row =
+        maybeRow.value
+
+      val expectedKeyText = messages("partnershipNominatedPartnerUtrYesNo.checkYourAnswersLabel")
+      row.key.content.asHtml.toString should include(expectedKeyText)
+
+      val expectedValue = messages("site.yes")
+      row.value.content.asHtml.toString should include(expectedValue)
+
+      row.actions shouldBe defined
+      val actions = row.actions.value.items
+      actions should have size 1
+
+      val changeAction       = actions.head
+      val expectedChangeText = messages("site.change")
+      val expectedHref       = routes.PartnershipNominatedPartnerUtrYesNoController.onPageLoad(AmendMode).url
       val expectedHiddenText = messages("partnershipNominatedPartnerUtrYesNo.change.hidden")
 
       changeAction.content.asHtml.toString    should include(expectedChangeText)
