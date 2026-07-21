@@ -104,6 +104,8 @@ class PartnershipNavigator @Inject() () extends NavigatorForJourney {
       _ => cyaRoute(AmendMode)
     case PartnershipNominatedPartnerNamePage      =>
       _ => cyaRoute(AmendMode)
+    case PartnershipAddressYesNoPage              =>
+      userAnswers => navigatorFromPartnershipAddressYesNoPage(AmendMode)(userAnswers)
     case AddPartnershipContactMethodsYesNoPage    =>
       userAnswers => navigatorFromAddPartnershipContactMethodsYesNoPage(AmendMode)(userAnswers)
     case PartnershipContactMethodOptionsPage      =>
@@ -278,16 +280,28 @@ class PartnershipNavigator @Inject() () extends NavigatorForJourney {
     }
 
   private def navigatorFromPartnershipAddressYesNoPage(mode: Mode)(userAnswers: UserAnswers): Call =
-    addressLookupYesNoRoute(
-      mode,
-      userAnswers.get(PartnershipAddressYesNoPage),
-      userAnswers.get(PartnershipAddressPage).isDefined,
-      onYes = controllers.add.partnership.routes.PartnershipAddressController.redirectToAddressLookup(),
-      onYesChange = controllers.add.partnership.routes.PartnershipAddressController
-        .redirectToAddressLookup(Some(CheckMode.toString)),
-      onNo = controllers.add.partnership.routes.AddPartnershipContactMethodsYesNoController.onPageLoad(NormalMode),
-      checkYourAnswers = controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
-    )
+    mode match {
+      case AmendMode =>
+        userAnswers.get(PartnershipAddressYesNoPage) match {
+          case Some(true)  =>
+            controllers.add.partnership.routes.PartnershipAddressController.redirectToAmendAddressLookup()
+          case Some(false) =>
+            cyaRoute(mode)
+          case None        =>
+            controllers.routes.JourneyRecoveryController.onPageLoad()
+        }
+      case _         =>
+        addressLookupYesNoRoute(
+          mode,
+          userAnswers.get(PartnershipAddressYesNoPage),
+          userAnswers.get(PartnershipAddressPage).isDefined,
+          onYes = controllers.add.partnership.routes.PartnershipAddressController.redirectToAddressLookup(),
+          onYesChange = controllers.add.partnership.routes.PartnershipAddressController
+            .redirectToAddressLookup(Some(CheckMode.toString)),
+          onNo = controllers.add.partnership.routes.AddPartnershipContactMethodsYesNoController.onPageLoad(NormalMode),
+          checkYourAnswers = controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
+        )
+    }
 
   private def navigatorFromPartnershipNominatedPartnerNinoYesNoPage(mode: Mode)(userAnswers: UserAnswers): Call =
     (userAnswers.get(PartnershipNominatedPartnerNinoYesNoPage), mode) match {

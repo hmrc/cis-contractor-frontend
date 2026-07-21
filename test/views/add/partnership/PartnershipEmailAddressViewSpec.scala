@@ -30,9 +30,9 @@ import views.html.add.partnership.PartnershipEmailAddressView
 
 class PartnershipEmailAddressViewSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite {
 
-  "PartnershipEmailAddressView" should {
+  "PartnershipEmailAddressView" must {
 
-    "must render the view with the correct title, heading, input and submit button" in new Setup {
+    "render the view with the correct title, heading, input and submit button" in new Setup {
       val partnershipName = "Test Name"
 
       val html: HtmlFormat.Appendable = view(form, NormalMode, partnershipName)
@@ -57,7 +57,7 @@ class PartnershipEmailAddressViewSpec extends AnyWordSpec with Matchers with Gui
       doc.select(".govuk-button").text() mustBe messages("site.continue")
     }
 
-    "must render the view with the correct title, heading, input and update button in amend journey" in new Setup {
+    "render the view with the correct title, heading, input and update button in amend journey" in new Setup {
       val partnershipName = "Test Name"
 
       val html: HtmlFormat.Appendable = view(form, AmendMode, partnershipName)
