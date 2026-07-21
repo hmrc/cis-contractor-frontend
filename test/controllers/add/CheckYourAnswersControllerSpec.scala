@@ -20,7 +20,7 @@ import base.SpecBase
 import controllers.routes
 import models.add.SubcontractorName
 import models.address.{Address, Country}
-import models.contact.ContactOptions
+import models.contact.ContactMethodOptions
 import models.{CheckMode, TypeOfSubcontractor, UserAnswers}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{never, verify, verifyNoMoreInteractions, when}
@@ -64,6 +64,9 @@ class CheckYourAnswersControllerSpec extends SpecBase {
       .set(SubAddressYesNoPage, false)
       .success
       .value
+      .set(AddIndividualContactMethodsYesNoPage, false)
+      .success
+      .value
       .set(NationalInsuranceNumberYesNoPage, false)
       .success
       .value
@@ -74,24 +77,13 @@ class CheckYourAnswersControllerSpec extends SpecBase {
       .success
       .value
 
-  private val validUaForSubmit: UserAnswers =
-    minUa
-      .set(IndividualChooseContactDetailsPage, ContactOptions.NoDetails)
-      .success
-      .value
-
   private lazy val CYARoute = controllers.add.routes.CheckYourAnswersController.onPageLoad().url
 
   "Check Your Answers Controller" - {
 
     "must return OK and the correct view for a GET when optionals are not present" in {
-      val ua =
-        minUa
-          .set(IndividualChooseContactDetailsPage, ContactOptions.NoDetails)
-          .success
-          .value
 
-      val application = applicationBuilder(userAnswers = Some(ua)).build()
+      val application = applicationBuilder(userAnswers = Some(minUa)).build()
 
       running(application) {
         val request =
@@ -105,6 +97,7 @@ class CheckYourAnswersControllerSpec extends SpecBase {
     }
 
     "must return OK and the correct view for a GET when all optionals are present" in {
+
       val address = Address(
         addressLine1 = "1 Test Street",
         addressLine2 = None,
@@ -116,10 +109,22 @@ class CheckYourAnswersControllerSpec extends SpecBase {
 
       val ua =
         minUa
-          .set(IndividualChooseContactDetailsPage, ContactOptions.Email)
+          .set(AddIndividualContactMethodsYesNoPage, true)
+          .success
+          .value
+          .set(
+            IndividualContactMethodOptionsPage,
+            Set(ContactMethodOptions.Email, ContactMethodOptions.Phone, ContactMethodOptions.Mobile)
+          )
           .success
           .value
           .set(IndividualEmailAddressPage, "one@two.three")
+          .success
+          .value
+          .set(IndividualPhoneNumberPage, "11111111")
+          .success
+          .value
+          .set(IndividualMobileNumberPage, "22222222")
           .success
           .value
           .set(SubAddressYesNoPage, true)
@@ -164,7 +169,7 @@ class CheckYourAnswersControllerSpec extends SpecBase {
         content must include("Subcontractor trading name")
         content must include("Add subcontractor address?")
         content must include("Address")
-        content must include("Method of contact")
+        content must include("Methods of contact")
         content must include("Email address")
         content must include("Add UTR?")
         content must include("UTR")
@@ -173,16 +178,20 @@ class CheckYourAnswersControllerSpec extends SpecBase {
         content must include("Add works reference number?")
         content must include("Works reference number")
 
-        content must include("ABC Ltd")
-        content must include("one@two.three")
-        content must include("1234567890")
-        content must include("AB123456C")
-        content must include("WRN-001")
-        content must include("1 Test Street")
+        content                 must include("ABC Ltd")
+        contentAsString(result) must include("Phone number")
+        contentAsString(result) must include("Mobile number")
+        contentAsString(result) must include("one@two.three")
+        contentAsString(result) must include("11111111")
+        contentAsString(result) must include("22222222")
+        content                 must include("1234567890")
+        content                 must include("AB123456C")
+        content                 must include("WRN-001")
+        content                 must include("1 Test Street")
 
         content must include(controllers.add.routes.SubTradingNameYesNoController.onPageLoad(CheckMode).url)
         content must include(controllers.add.routes.SubAddressYesNoController.onPageLoad(CheckMode).url)
-        content must include(controllers.add.routes.IndividualChooseContactDetailsController.onPageLoad(CheckMode).url)
+        content must include(controllers.add.routes.IndividualContactMethodOptionsController.onPageLoad(CheckMode).url)
         content must include(controllers.add.routes.UniqueTaxpayerReferenceYesNoController.onPageLoad(CheckMode).url)
         content must include(controllers.add.routes.NationalInsuranceNumberYesNoController.onPageLoad(CheckMode).url)
         content must include(controllers.add.routes.WorksReferenceNumberYesNoController.onPageLoad(CheckMode).url)
@@ -234,7 +243,7 @@ class CheckYourAnswersControllerSpec extends SpecBase {
         .thenReturn(Future.successful(true))
 
       val application =
-        applicationBuilder(userAnswers = Some(validUaForSubmit))
+        applicationBuilder(userAnswers = Some(minUa))
           .overrides(
             bind[SubcontractorService].toInstance(mockSubcontractorService),
             bind[SessionRepository].toInstance(mockSessionRepository)
@@ -260,7 +269,10 @@ class CheckYourAnswersControllerSpec extends SpecBase {
 
     "must redirect to Journey Recovery and not resubmit when already submitted flag is set" in {
       val submittedUa =
-        validUaForSubmit.set(CheckYourAnswersSubmittedPage, true).success.value
+        minUa
+          .set(CheckYourAnswersSubmittedPage, true)
+          .success
+          .value
 
       val mockSubcontractorService = mock[SubcontractorService]
       val mockSessionRepository    = mock[SessionRepository]
@@ -296,7 +308,7 @@ class CheckYourAnswersControllerSpec extends SpecBase {
         .thenReturn(Future.failed(new RuntimeException("boom")))
 
       val application =
-        applicationBuilder(userAnswers = Some(validUaForSubmit))
+        applicationBuilder(userAnswers = Some(minUa))
           .overrides(
             bind[SubcontractorService].toInstance(mockSubcontractorService),
             bind[SessionRepository].toInstance(mockSessionRepository)
@@ -369,7 +381,10 @@ class CheckYourAnswersControllerSpec extends SpecBase {
 
       "must return OK when Email is selected and a email is present" in {
         val ua = minUa
-          .set(IndividualChooseContactDetailsPage, ContactOptions.Email)
+          .set(AddIndividualContactMethodsYesNoPage, true)
+          .success
+          .value
+          .set(IndividualContactMethodOptionsPage, Set(ContactMethodOptions.Email))
           .success
           .value
           .set(IndividualEmailAddressPage, "one@two.three")
@@ -390,7 +405,10 @@ class CheckYourAnswersControllerSpec extends SpecBase {
 
       "must return OK when Phone is selected and a phone number is present" in {
         val ua = minUa
-          .set(IndividualChooseContactDetailsPage, ContactOptions.Phone)
+          .set(AddIndividualContactMethodsYesNoPage, true)
+          .success
+          .value
+          .set(IndividualContactMethodOptionsPage, Set(ContactMethodOptions.Phone))
           .success
           .value
           .set(IndividualPhoneNumberPage, "01234567890")
@@ -411,7 +429,10 @@ class CheckYourAnswersControllerSpec extends SpecBase {
 
       "must return OK when Mobile is selected and a mobile number is present" in {
         val ua = minUa
-          .set(IndividualChooseContactDetailsPage, ContactOptions.Mobile)
+          .set(AddIndividualContactMethodsYesNoPage, true)
+          .success
+          .value
+          .set(IndividualContactMethodOptionsPage, Set(ContactMethodOptions.Mobile))
           .success
           .value
           .set(IndividualMobileNumberPage, "07123456789")
@@ -432,7 +453,7 @@ class CheckYourAnswersControllerSpec extends SpecBase {
 
       "must return OK when NoDetails is selected and no contact details are present" in {
         val ua = minUa
-          .set(IndividualChooseContactDetailsPage, ContactOptions.NoDetails)
+          .set(AddIndividualContactMethodsYesNoPage, false)
           .success
           .value
 
@@ -450,7 +471,13 @@ class CheckYourAnswersControllerSpec extends SpecBase {
       "must redirect to Journey Recovery when Email is selected but email address is missing" in {
         val ua =
           minUa
-            .set(IndividualChooseContactDetailsPage, ContactOptions.Email)
+            .set(AddIndividualContactMethodsYesNoPage, true)
+            .success
+            .value
+            .set(
+              IndividualContactMethodOptionsPage,
+              Set(ContactMethodOptions.Email)
+            )
             .success
             .value
 
@@ -467,7 +494,13 @@ class CheckYourAnswersControllerSpec extends SpecBase {
       "must redirect to Journey Recovery when Phone is selected but phone number is missing" in {
         val ua =
           minUa
-            .set(IndividualChooseContactDetailsPage, ContactOptions.Phone)
+            .set(AddIndividualContactMethodsYesNoPage, true)
+            .success
+            .value
+            .set(
+              IndividualContactMethodOptionsPage,
+              Set(ContactMethodOptions.Phone)
+            )
             .success
             .value
 
@@ -484,7 +517,13 @@ class CheckYourAnswersControllerSpec extends SpecBase {
       "must redirect to Journey Recovery when Mobile is selected but mobile number is missing" in {
         val ua =
           minUa
-            .set(IndividualChooseContactDetailsPage, ContactOptions.Mobile)
+            .set(AddIndividualContactMethodsYesNoPage, true)
+            .success
+            .value
+            .set(
+              IndividualContactMethodOptionsPage,
+              Set(ContactMethodOptions.Mobile)
+            )
             .success
             .value
 
@@ -498,14 +537,23 @@ class CheckYourAnswersControllerSpec extends SpecBase {
         }
       }
 
-      "must redirect to Journey Recovery when NoDetails is selected but stale contact data exists" in {
-        val uaBase =
-          minUa
-            .set(IndividualChooseContactDetailsPage, ContactOptions.NoDetails)
-            .success
-            .value
+      "must redirect to Journey Recovery when AddIndividualContactMethodsYesNoPage is false but stale contact data exists" in {
 
-        val ua = withStaleValue(uaBase, IndividualEmailAddressPage, "stale@email.com")
+        val ua = withStaleValue(minUa, IndividualEmailAddressPage, "stale@email.com")
+
+        val application = applicationBuilder(userAnswers = Some(ua)).build()
+        running(application) {
+          val request =
+            FakeRequest(GET, CYARoute)
+          val result  = route(application, request).value
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value must include("/there-is-a-problem")
+        }
+      }
+
+      "must redirect to Journey Recovery when AddIndividualContactMethodsYesNoPage is true but individualContactMethodsOptionsPage answer is missing" in {
+
+        val ua = minUa.set(AddIndividualContactMethodsYesNoPage, true).success.value
 
         val application = applicationBuilder(userAnswers = Some(ua)).build()
         running(application) {
@@ -523,15 +571,18 @@ class CheckYourAnswersControllerSpec extends SpecBase {
       "must return OK when switching from Email to Phone and stale email is cleaned up" in {
         val ua =
           minUa
-            .set(IndividualChooseContactDetailsPage, ContactOptions.Email)
+            .set(AddIndividualContactMethodsYesNoPage, true)
+            .success
+            .value
+            .set(IndividualContactMethodOptionsPage, Set(ContactMethodOptions.Email))
             .success
             .value
             .set(IndividualEmailAddressPage, "old@email.com")
             .success
             .value
-            .set(IndividualChooseContactDetailsPage, ContactOptions.Phone)
+            .set(IndividualContactMethodOptionsPage, Set(ContactMethodOptions.Phone))
             .success
-            .value
+            .value // cleanup removes email
             .set(IndividualPhoneNumberPage, "01234567890")
             .success
             .value
@@ -549,15 +600,18 @@ class CheckYourAnswersControllerSpec extends SpecBase {
       "must return OK when switching from Phone to Mobile and stale phone is cleaned up" in {
         val ua =
           minUa
-            .set(IndividualChooseContactDetailsPage, ContactOptions.Phone)
+            .set(AddIndividualContactMethodsYesNoPage, true)
+            .success
+            .value
+            .set(IndividualContactMethodOptionsPage, Set(ContactMethodOptions.Phone))
             .success
             .value
             .set(IndividualPhoneNumberPage, "01234567890")
             .success
             .value
-            .set(IndividualChooseContactDetailsPage, ContactOptions.Mobile)
+            .set(IndividualContactMethodOptionsPage, Set(ContactMethodOptions.Mobile))
             .success
-            .value
+            .value // cleanup removes phone
             .set(IndividualMobileNumberPage, "07123456789")
             .success
             .value
@@ -572,25 +626,31 @@ class CheckYourAnswersControllerSpec extends SpecBase {
         }
       }
 
-      "must return OK when switching from Email to NoDetails and stale email is cleaned up" in {
+      "must return OK when switching from Email to AddIndividualContactMethodsYesNoPage and stale email is cleaned up" in {
+
         val ua =
           minUa
-            .set(IndividualChooseContactDetailsPage, ContactOptions.Email)
+            .set(AddIndividualContactMethodsYesNoPage, true)
+            .success
+            .value
+            .set(IndividualContactMethodOptionsPage, Set(ContactMethodOptions.Email))
             .success
             .value
             .set(IndividualEmailAddressPage, "old@email.com")
             .success
             .value
-            .set(IndividualChooseContactDetailsPage, ContactOptions.NoDetails)
+            .set(AddIndividualContactMethodsYesNoPage, false)
             .success
-            .value
+            .value // cleanup removes email
 
         val application = applicationBuilder(userAnswers = Some(ua)).build()
         running(application) {
           val request =
-            FakeRequest(GET, CYARoute)
+            FakeRequest(GET, controllers.add.routes.CheckYourAnswersController.onPageLoad().url)
           val result  = route(application, request).value
+
           status(result) mustEqual OK
+          contentAsString(result) mustNot include("old@email.com")
         }
       }
     }
@@ -602,12 +662,6 @@ class CheckYourAnswersControllerSpec extends SpecBase {
         val name = SubcontractorName("John", Some("Paul"), "Smith")
 
         val ua = minUa
-          .set(IndividualChooseContactDetailsPage, ContactOptions.Email)
-          .success
-          .value
-          .set(IndividualEmailAddressPage, "one@two.three")
-          .success
-          .value
           .set(SubTradingNameYesNoPage, true)
           .success
           .value
@@ -637,12 +691,6 @@ class CheckYourAnswersControllerSpec extends SpecBase {
         val name = SubcontractorName("John", Some("Paul"), "Smith")
 
         val ua = minUa
-          .set(IndividualChooseContactDetailsPage, ContactOptions.Email)
-          .success
-          .value
-          .set(IndividualEmailAddressPage, "one@two.three")
-          .success
-          .value
           .set(SubTradingNameYesNoPage, false)
           .success
           .value
@@ -681,12 +729,6 @@ class CheckYourAnswersControllerSpec extends SpecBase {
           )
 
         val ua = minUa
-          .set(IndividualChooseContactDetailsPage, ContactOptions.Email)
-          .success
-          .value
-          .set(IndividualEmailAddressPage, "one@two.three")
-          .success
-          .value
           .set(SubAddressYesNoPage, true)
           .success
           .value
@@ -710,12 +752,6 @@ class CheckYourAnswersControllerSpec extends SpecBase {
 
       "must return OK when UniqueTaxpayerReferenceYesNo changes from Yes to No and stale UTR values are cleaned up" in {
         val ua = minUa
-          .set(IndividualChooseContactDetailsPage, ContactOptions.Email)
-          .success
-          .value
-          .set(IndividualEmailAddressPage, "one@two.three")
-          .success
-          .value
           .set(UniqueTaxpayerReferenceYesNoPage, true)
           .success
           .value
@@ -739,12 +775,6 @@ class CheckYourAnswersControllerSpec extends SpecBase {
 
       "must return OK when NationalInsuranceNumberYesNo changes from Yes to No and stale NationalInsuranceNumber values are cleaned up" in {
         val ua = minUa
-          .set(IndividualChooseContactDetailsPage, ContactOptions.Email)
-          .success
-          .value
-          .set(IndividualEmailAddressPage, "one@two.three")
-          .success
-          .value
           .set(NationalInsuranceNumberYesNoPage, true)
           .success
           .value
@@ -768,12 +798,6 @@ class CheckYourAnswersControllerSpec extends SpecBase {
 
       "must return OK when WorksReferenceNumberYesNo changes from Yes to No and stale WorksReference values are cleaned up" in {
         val ua = minUa
-          .set(IndividualChooseContactDetailsPage, ContactOptions.Email)
-          .success
-          .value
-          .set(IndividualEmailAddressPage, "one@two.three")
-          .success
-          .value
           .set(WorksReferenceNumberYesNoPage, true)
           .success
           .value
@@ -801,7 +825,7 @@ class CheckYourAnswersControllerSpec extends SpecBase {
 
         val uaBase =
           minUa
-            .set(IndividualChooseContactDetailsPage, ContactOptions.NoDetails)
+            .set(AddIndividualContactMethodsYesNoPage, false)
             .success
             .value
             .set(SubTradingNameYesNoPage, false)
@@ -829,7 +853,7 @@ class CheckYourAnswersControllerSpec extends SpecBase {
 
         val uaBase =
           minUa
-            .set(IndividualChooseContactDetailsPage, ContactOptions.NoDetails)
+            .set(AddIndividualContactMethodsYesNoPage, false)
             .success
             .value
             .set(SubTradingNameYesNoPage, true)
@@ -865,7 +889,7 @@ class CheckYourAnswersControllerSpec extends SpecBase {
 
         val uaBase =
           minUa
-            .set(IndividualChooseContactDetailsPage, ContactOptions.NoDetails)
+            .set(AddIndividualContactMethodsYesNoPage, false)
             .success
             .value
             .set(SubAddressYesNoPage, false)
@@ -887,7 +911,7 @@ class CheckYourAnswersControllerSpec extends SpecBase {
       "must redirect to Journey Recovery when UniqueTaxpayerReferenceYesNo is false but UTR value is present (stale session)" in {
         val uaBase =
           minUa
-            .set(IndividualChooseContactDetailsPage, ContactOptions.NoDetails)
+            .set(AddIndividualContactMethodsYesNoPage, false)
             .success
             .value
             .set(UniqueTaxpayerReferenceYesNoPage, false)
@@ -909,7 +933,7 @@ class CheckYourAnswersControllerSpec extends SpecBase {
       "must redirect to Journey Recovery when NationalInsuranceNumberYesNo is false but nino value is present (stale session)" in {
         val uaBase =
           minUa
-            .set(IndividualChooseContactDetailsPage, ContactOptions.NoDetails)
+            .set(AddIndividualContactMethodsYesNoPage, false)
             .success
             .value
             .set(NationalInsuranceNumberYesNoPage, false)
@@ -931,7 +955,7 @@ class CheckYourAnswersControllerSpec extends SpecBase {
       "must redirect to Journey Recovery when WorksReferenceYesNo is false but works ref is present (stale session)" in {
         val uaBase =
           minUa
-            .set(IndividualChooseContactDetailsPage, ContactOptions.NoDetails)
+            .set(AddIndividualContactMethodsYesNoPage, false)
             .success
             .value
             .set(WorksReferenceNumberYesNoPage, false)

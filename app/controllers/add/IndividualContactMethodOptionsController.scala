@@ -17,32 +17,32 @@
 package controllers.add
 
 import controllers.actions.*
-import forms.add.IndividualChooseContactDetailsFormProvider
+import forms.add.IndividualContactMethodOptionsFormProvider
 import models.Mode
 import models.requests.DataRequest
 import navigation.Navigator
-import pages.add.IndividualChooseContactDetailsPage
+import pages.add.IndividualContactMethodOptionsPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.add.IndividualChooseContactDetailsView
 import utils.SubcontractorNameExtractor
+import views.html.add.IndividualContactMethodOptionsView
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class IndividualChooseContactDetailsController @Inject() (
+class IndividualContactMethodOptionsController @Inject() (
   override val messagesApi: MessagesApi,
   sessionRepository: SessionRepository,
   navigator: Navigator,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
-  formProvider: IndividualChooseContactDetailsFormProvider,
-  subcontractorNameExtractor: SubcontractorNameExtractor,
+  formProvider: IndividualContactMethodOptionsFormProvider,
   val controllerComponents: MessagesControllerComponents,
-  view: IndividualChooseContactDetailsView
+  view: IndividualContactMethodOptionsView,
+  subcontractorNameExtractor: SubcontractorNameExtractor
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport {
@@ -52,7 +52,7 @@ class IndividualChooseContactDetailsController @Inject() (
   private def recoveryRedirect = Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
 
   private def preparedForm(implicit request: DataRequest[?]) =
-    request.userAnswers.get(IndividualChooseContactDetailsPage).fold(form)(form.fill)
+    request.userAnswers.get(IndividualContactMethodOptionsPage).fold(form)(form.fill)
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
     subcontractorNameExtractor
@@ -73,9 +73,9 @@ class IndividualChooseContactDetailsController @Inject() (
               formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, subcontractorName))),
               value =>
                 for {
-                  updatedAnswers <- Future.fromTry(request.userAnswers.set(IndividualChooseContactDetailsPage, value))
+                  updatedAnswers <- Future.fromTry(request.userAnswers.set(IndividualContactMethodOptionsPage, value))
                   _              <- sessionRepository.set(updatedAnswers)
-                } yield Redirect(navigator.nextPage(IndividualChooseContactDetailsPage, mode, updatedAnswers))
+                } yield Redirect(navigator.nextPage(IndividualContactMethodOptionsPage, mode, updatedAnswers))
             )
         }
   }

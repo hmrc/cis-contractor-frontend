@@ -43,7 +43,16 @@ object ValidatedCompany extends Validation {
       companyName                 <- getPageValue(answers, CompanyNamePage)
       companyAddress              <- getOptionalPageValue(answers, CompanyAddressPage, CompanyAddressYesNoPage)
       companyContactMethodOptions <-
-        getOptionalPageValue(answers, CompanyContactMethodOptionsPage, AddCompanyContactMethodsYesNoPage)
+        getOptionalPageValue(answers, CompanyContactMethodOptionsPage, AddCompanyContactMethodsYesNoPage).flatMap {
+          case Some(methods) if methods.nonEmpty =>
+            Right(Some(methods))
+
+          case Some(_) =>
+            Left(InvalidAnswer(CompanyContactMethodOptionsPage))
+
+          case None =>
+            Right(None)
+        }
 
       companyEmail  <-
         getContactPageValue(answers, companyContactMethodOptions, CompanyEmailAddressPage, ContactMethodOptions.Email)

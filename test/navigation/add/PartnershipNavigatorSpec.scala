@@ -801,6 +801,21 @@ class PartnershipNavigatorSpec extends SpecBase {
           ) mustBe routes.JourneyRecoveryController.onPageLoad()
         }
       }
+      "must go from a PartnershipNominatedPartnerNamePage to AmendPartnershipCheckYourAnswers in AmendMode" in {
+        navigator.nextPage(
+          PartnershipNominatedPartnerNamePage,
+          AmendMode,
+          UserAnswers("id")
+        ) mustBe partnershipAmendCYA
+      }
+
+      "must go from PartnershipNamePage to AmendPartnershipCheckYourAnswers in AmendMode" in {
+        navigator.nextPage(
+          PartnershipNamePage,
+          AmendMode,
+          emptyUserAnswers
+        ) mustBe partnershipAmendCYA
+      }
 
       "must go from PartnershipAddressYesNoPage" - {
         "to the address lookup on-ramp when answer is Yes and PartnershipAddressPage is not answered before" in {

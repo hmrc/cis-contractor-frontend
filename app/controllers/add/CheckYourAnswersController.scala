@@ -34,12 +34,10 @@ package controllers.add
 
 import com.google.inject.Inject
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
-import models.UserAnswers
 import models.add.ValidatedSubcontractor
-import models.contact.ContactOptions.{Email, Mobile, Phone}
-import pages.add.{CheckYourAnswersSubmittedPage, IndividualChooseContactDetailsPage}
+import pages.add.CheckYourAnswersSubmittedPage
 import play.api.Logging
-import play.api.i18n.{I18nSupport, Messages, MessagesApi}
+import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
 import services.SubcontractorService
@@ -65,14 +63,6 @@ class CheckYourAnswersController @Inject() (
     with I18nSupport
     with Logging {
 
-  private def contactDetailsPage(ua: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    ua.get(IndividualChooseContactDetailsPage).flatMap {
-      case Email  => IndividualEmailAddressSummary.row(ua)
-      case Phone  => IndividualPhoneNumberSummary.row(ua)
-      case Mobile => IndividualMobileNumberSummary.row(ua)
-      case _      => None
-    }
-
   def onPageLoad(): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
     val ua = request.userAnswers
     ValidatedSubcontractor.build(ua) match {
@@ -85,8 +75,11 @@ class CheckYourAnswersController @Inject() (
             TradingNameOfSubcontractorSummary.row(ua),
             SubAddressYesNoSummary.row(ua),
             AddressOfSubcontractorSummary.row(ua),
-            IndividualChooseContactDetailsSummary.row(ua),
-            contactDetailsPage(ua),
+            AddIndividualContactMethodsYesNoSummary.row(ua),
+            IndividualContactMethodOptionsSummary.row(ua),
+            IndividualEmailAddressSummary.row(ua),
+            IndividualPhoneNumberSummary.row(ua),
+            IndividualMobileNumberSummary.row(ua),
             UniqueTaxpayerReferenceYesNoSummary.row(ua),
             SubcontractorsUniqueTaxpayerReferenceSummary.row(ua),
             NationalInsuranceNumberYesNoSummary.row(ua),
