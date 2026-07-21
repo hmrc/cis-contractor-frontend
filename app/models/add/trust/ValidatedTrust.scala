@@ -45,7 +45,16 @@ object ValidatedTrust extends Validation {
       trustAddress <- getOptionalPageValue(answers, TrustAddressPage, TrustAddressYesNoPage)
 
       trustContactMethodOptions <-
-        getOptionalPageValue(answers, TrustContactMethodOptionsPage, AddTrustContactMethodsYesNoPage)
+        getOptionalPageValue(answers, TrustContactMethodOptionsPage, AddTrustContactMethodsYesNoPage).flatMap {
+          case Some(methods) if methods.nonEmpty =>
+            Right(Some(methods))
+
+          case Some(_) =>
+            Left(InvalidAnswer(TrustContactMethodOptionsPage))
+
+          case None =>
+            Right(None)
+        }
 
       trustEmail  <-
         getContactPageValue(answers, trustContactMethodOptions, TrustEmailAddressPage, ContactMethodOptions.Email)

@@ -20,16 +20,14 @@ import base.SpecBase
 import controllers.routes
 import forms.add.IndividualMobileNumberFormProvider
 import models.add.SubcontractorName
-import models.contact.ContactOptions.Mobile
+import models.contact.ContactMethodOptions
 import models.{NormalMode, UserAnswers}
-import navigation.Navigator
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.add.{IndividualChooseContactDetailsPage, IndividualMobileNumberPage, SubcontractorNamePage}
+import pages.add.{IndividualContactMethodOptionsPage, IndividualMobileNumberPage, SubcontractorNamePage}
 import play.api.data.Form
 import play.api.inject.bind
-import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import repositories.SessionRepository
@@ -38,8 +36,6 @@ import views.html.add.IndividualMobileNumberView
 import scala.concurrent.Future
 
 class IndividualMobileNumberControllerSpec extends SpecBase with MockitoSugar {
-
-  def onwardRoute: Call = Call("GET", "/foo")
 
   val formProvider       = new IndividualMobileNumberFormProvider()
   val form: Form[String] = formProvider()
@@ -55,13 +51,10 @@ class IndividualMobileNumberControllerSpec extends SpecBase with MockitoSugar {
     emptyUserAnswers.set(SubcontractorNamePage, subcontractorName).success.value
 
   private def uaWithNameAndMobileChoice: UserAnswers =
-    buildAnswersWithContactChoice(
-      emptyUserAnswers,
-      SubcontractorNamePage,
-      subcontractorName,
-      IndividualChooseContactDetailsPage,
-      Mobile
-    )
+    uaWithName
+      .set(IndividualContactMethodOptionsPage, Set(ContactMethodOptions.Mobile))
+      .success
+      .value
 
   "IndividualMobileNumber Controller" - {
 
@@ -126,15 +119,17 @@ class IndividualMobileNumberControllerSpec extends SpecBase with MockitoSugar {
     "must redirect to the next page when valid data is submitted" in {
 
       val mockSessionRepository = mock[SessionRepository]
-      val mockNavigator         = mock[Navigator]
 
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
-      when(mockNavigator.nextPage(any(), any(), any())).thenReturn(onwardRoute)
+
+      val userAnswers = uaWithName
+        .set(IndividualContactMethodOptionsPage, Set(ContactMethodOptions.Mobile))
+        .success
+        .value
 
       val application =
-        applicationBuilder(userAnswers = Some(uaWithName))
+        applicationBuilder(userAnswers = Some(userAnswers))
           .overrides(
-            bind[Navigator].toInstance(mockNavigator),
             bind[SessionRepository].toInstance(mockSessionRepository)
           )
           .build()
@@ -147,13 +142,15 @@ class IndividualMobileNumberControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual onwardRoute.url
+        redirectLocation(result).value mustEqual controllers.add.routes.UniqueTaxpayerReferenceYesNoController
+          .onPageLoad(NormalMode)
+          .url
       }
     }
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
-      val application = applicationBuilder(userAnswers = Some(uaWithName)).build()
+      val application = applicationBuilder(userAnswers = Some(uaWithNameAndMobileChoice)).build()
 
       running(application) {
         val request =

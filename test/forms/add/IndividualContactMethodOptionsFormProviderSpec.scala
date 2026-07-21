@@ -16,30 +16,30 @@
 
 package forms.add
 
-import forms.behaviours.OptionFieldBehaviours
-import models.add.IndividualChooseContactDetails
+import forms.behaviours.CheckboxFieldBehaviours
+import models.add.IndividualContactMethodOptions
 import play.api.data.FormError
 
-class IndividualChooseContactDetailsFormProviderSpec extends OptionFieldBehaviours {
+class IndividualContactMethodOptionsFormProviderSpec extends CheckboxFieldBehaviours {
 
-  val form = new IndividualChooseContactDetailsFormProvider()()
+  val form = new IndividualContactMethodOptionsFormProvider()()
 
   ".value" - {
 
     val fieldName   = "value"
-    val requiredKey = "individualChooseContactDetails.error.required"
+    val requiredKey = "individualContactMethodOptions.error.required"
 
-    behave like optionsField[IndividualChooseContactDetails](
+    behave like checkboxField[IndividualContactMethodOptions](
       form,
       fieldName,
-      validValues = IndividualChooseContactDetails.values,
-      invalidError = FormError(fieldName, "error.invalid")
+      validValues = IndividualContactMethodOptions.values,
+      invalidError = FormError(s"$fieldName[0]", "error.invalid")
     )
 
-    behave like mandatoryField(
+    behave like mandatoryCheckboxField(
       form,
       fieldName,
-      requiredError = FormError(fieldName, requiredKey)
+      requiredKey
     )
   }
 }

@@ -16,7 +16,7 @@
 
 package views.add.partnership
 
-import forms.add.partnership.PartnershipNominatedPartnerNameFormProvider
+import forms.add.partnership.PartnershipNameFormProvider
 import models.{AmendMode, NormalMode}
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
@@ -26,33 +26,30 @@ import play.api.i18n.Messages
 import play.api.mvc.Request
 import play.api.test.FakeRequest
 import play.twirl.api.HtmlFormat
-import views.html.add.partnership.PartnershipNominatedPartnerNameView
+import views.html.add.partnership.PartnershipNameView
 
-class PartnershipNominatedPartnerNameViewSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite {
+class PartnershipNameViewSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite {
 
-  "PartnershipNominatedPartnerNameView" should {
+  "PartnershipNameView" should {
 
     "render the page with title, heading, input and submit button" in new Setup {
 
       val partnershipName = "Test Partnership"
 
-      val html: HtmlFormat.Appendable = view(form, NormalMode, partnershipName)
+      val html: HtmlFormat.Appendable = view(form, NormalMode)
       val doc                         = org.jsoup.Jsoup.parse(html.toString())
 
-      doc.select("title").text() must include(messages("partnershipNominatedPartnerName.title"))
+      doc.select("title").text() must include(messages("partnershipName.title"))
 
       val heading = doc.select("h1")
-      heading.text() mustBe messages("partnershipNominatedPartnerName.heading", partnershipName)
+      heading.text() mustBe messages("partnershipName.heading")
 
       val hint = doc.select(".govuk-hint")
-      hint.text() mustBe messages("partnershipNominatedPartnerName.hint")
-
-      val label = doc.select("label.govuk-label")
-      label.text() mustBe messages("partnershipNominatedPartnerName.label")
+      hint.text() mustBe messages("partnershipName.hint")
 
       doc
         .select("form")
-        .attr("action") mustBe controllers.add.partnership.routes.PartnershipNominatedPartnerNameController
+        .attr("action") mustBe controllers.add.partnership.routes.PartnershipNameController
         .onSubmit(NormalMode)
         .url
 
@@ -65,23 +62,20 @@ class PartnershipNominatedPartnerNameViewSpec extends AnyWordSpec with Matchers 
 
       val partnershipName = "Test Partnership"
 
-      val html: HtmlFormat.Appendable = view(form, AmendMode, partnershipName)
+      val html: HtmlFormat.Appendable = view(form, AmendMode)
       val doc                         = org.jsoup.Jsoup.parse(html.toString())
 
-      doc.select("title").text() must include(messages("partnershipNominatedPartnerName.title"))
+      doc.select("title").text() must include(messages("partnershipName.title"))
 
       val heading = doc.select("h1")
-      heading.text() mustBe messages("partnershipNominatedPartnerName.heading", partnershipName)
+      heading.text() mustBe messages("partnershipName.heading")
 
       val hint = doc.select(".govuk-hint")
-      hint.text() mustBe messages("partnershipNominatedPartnerName.hint")
-
-      val label = doc.select("label.govuk-label")
-      label.text() mustBe messages("partnershipNominatedPartnerName.label")
+      hint.text() mustBe messages("partnershipName.hint")
 
       doc
         .select("form")
-        .attr("action") mustBe controllers.add.partnership.routes.PartnershipNominatedPartnerNameController
+        .attr("action") mustBe controllers.add.partnership.routes.PartnershipNameController
         .onSubmit(AmendMode)
         .url
 
@@ -95,23 +89,23 @@ class PartnershipNominatedPartnerNameViewSpec extends AnyWordSpec with Matchers 
       val partnershipName = "Test Partnership"
 
       val errorForm: Form[String] =
-        form.withError("value", "partnershipNominatedPartnerName.error.required")
+        form.withError("value", "partnershipName.error.required")
 
-      val html = view(errorForm, NormalMode, partnershipName)
+      val html = view(errorForm, NormalMode)
       val doc  = org.jsoup.Jsoup.parse(html.toString())
 
       val summary = doc.select(".govuk-error-summary")
-      summary.text() must include(messages("partnershipNominatedPartnerName.error.required"))
+      summary.text() must include(messages("partnershipName.error.required"))
 
       val linkHref = summary.select("a").attr("href")
       linkHref mustBe "#value"
 
-      doc.select(".govuk-error-message").text() must include(messages("partnershipNominatedPartnerName.error.required"))
+      doc.select(".govuk-error-message").text() must include(messages("partnershipName.error.required"))
     }
   }
 
   trait Setup {
-    val formProvider       = new PartnershipNominatedPartnerNameFormProvider()
+    val formProvider       = new PartnershipNameFormProvider()
     val form: Form[String] = formProvider()
 
     implicit val request: Request[_] = FakeRequest()
@@ -121,6 +115,6 @@ class PartnershipNominatedPartnerNameViewSpec extends AnyWordSpec with Matchers 
         app.injector.instanceOf[play.api.i18n.MessagesApi]
       )
 
-    val view: PartnershipNominatedPartnerNameView = app.injector.instanceOf[PartnershipNominatedPartnerNameView]
+    val view: PartnershipNameView = app.injector.instanceOf[PartnershipNameView]
   }
 }
