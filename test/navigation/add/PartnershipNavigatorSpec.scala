@@ -943,6 +943,64 @@ class PartnershipNavigatorSpec extends SpecBase {
           ) mustBe partnershipAmendCYA
         }
       }
+
+      "must go from PartnershipAddressYesNoPage" - {
+        "to the address lookup on-ramp when answer is Yes and PartnershipAddressPage is not answered before" in {
+          val answers = emptyUserAnswers.set(PartnershipAddressYesNoPage, true).success.value
+
+          navigator.nextPage(
+            PartnershipAddressYesNoPage,
+            AmendMode,
+            answers
+          ) mustBe controllers.add.partnership.routes.PartnershipAddressController.redirectToAmendAddressLookup()
+
+        }
+
+        "to Partnership CYA when answer is Yes and PartnershipAddressPage is answered before" in {
+
+          val address = models.address.Address(
+            addressLine1 = "10 Example Street",
+            addressLine2 = Some("Suite 2"),
+            addressLine3 = Some("Newcastle"),
+            addressLine4 = Some("Tyne & Wear"),
+            postcode = Some("NE1 1AA"),
+            country = Some(models.address.Country(Some("GB"), Some("United Kingdom")))
+          )
+
+          val answers =
+            emptyUserAnswers
+              .set(PartnershipAddressPage, address)
+              .success
+              .value
+              .set(PartnershipAddressYesNoPage, true)
+              .success
+              .value
+
+          navigator.nextPage(
+            PartnershipAddressYesNoPage,
+            AmendMode,
+            answers
+          ) mustBe controllers.add.partnership.routes.PartnershipAddressController.redirectToAmendAddressLookup()
+        }
+
+        "to Partnership CYA when answer is No" in {
+          val answers = emptyUserAnswers.set(PartnershipAddressYesNoPage, false).success.value
+
+          navigator.nextPage(
+            PartnershipAddressYesNoPage,
+            AmendMode,
+            answers
+          ) mustBe partnershipAmendCYA
+        }
+
+        "to JourneyRecoveryPage when answer is not present" in {
+          navigator.nextPage(
+            PartnershipAddressYesNoPage,
+            AmendMode,
+            emptyUserAnswers
+          ) mustBe routes.JourneyRecoveryController.onPageLoad()
+        }
+      }
     }
 
     "in Check mode" - {

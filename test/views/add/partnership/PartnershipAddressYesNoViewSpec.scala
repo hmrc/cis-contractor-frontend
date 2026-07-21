@@ -17,7 +17,7 @@
 package views.add.partnership
 
 import forms.add.partnership.PartnershipAddressYesNoFormProvider
-import models.NormalMode
+import models.{AmendMode, NormalMode}
 import org.jsoup.Jsoup
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
@@ -59,6 +59,39 @@ class PartnershipAddressYesNoViewSpec extends AnyWordSpec with Matchers with Gui
       doc.select("form").attr("action") mustBe
         controllers.add.partnership.routes.PartnershipAddressYesNoController
           .onSubmit(NormalMode)
+          .url
+      doc.select("form").attr("autocomplete") mustBe "off"
+
+      doc.select(".govuk-button").text() mustBe messages("site.continue")
+    }
+
+    "render the page with title, heading, no hint, yes/no radios and submit button for amend journey" in new Setup {
+
+      val partnershipName = "Test Partnership"
+
+      val html = view(form, AmendMode, partnershipName)
+      val doc  = Jsoup.parse(html.toString())
+
+      doc.select("title").text() must include(
+        messages("partnershipAddressYesNo.title")
+      )
+
+      val legend = doc.select("fieldset legend")
+      legend.text() mustBe messages("partnershipAddressYesNo.heading", partnershipName)
+      legend.hasClass("govuk-fieldset__legend--l") mustBe true
+
+      doc.select(".govuk-hint").text() mustBe empty
+
+      val radios = doc.select(".govuk-radios__input")
+      radios.size() mustBe 2
+
+      val labels = doc.select(".govuk-radios__label").eachText()
+      labels must contain("Yes")
+      labels must contain("No")
+
+      doc.select("form").attr("action") mustBe
+        controllers.add.partnership.routes.PartnershipAddressYesNoController
+          .onSubmit(AmendMode)
           .url
       doc.select("form").attr("autocomplete") mustBe "off"
 
