@@ -93,6 +93,10 @@ class PartnershipNavigator @Inject() () extends NavigatorForJourney {
     case PartnershipNominatedPartnerNinoYesNoPage =>
       userAnswers => navigatorFromPartnershipNominatedPartnerNinoYesNoPage(AmendMode)(userAnswers)
     case PartnershipNominatedPartnerNinoPage      => navigatorFromPartnershipNominatedPartnerNinoPage(AmendMode)(_)
+    case PartnershipNamePage                      =>
+      _ => cyaRoute(AmendMode)
+    case PartnershipNominatedPartnerNamePage      =>
+      _ => cyaRoute(AmendMode)
     case AddPartnershipContactMethodsYesNoPage    =>
       userAnswers => navigatorFromAddPartnershipContactMethodsYesNoPage(AmendMode)(userAnswers)
     case PartnershipContactMethodOptionsPage      =>
