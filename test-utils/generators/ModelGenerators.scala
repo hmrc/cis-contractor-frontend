@@ -18,7 +18,7 @@ package generators
 
 import models.*
 
-import models.contact.{ContactMethodOptions, ContactOptions}
+import models.contact.ContactMethodOptions
 import models.address.{Address, Country}
 import models.verify.ContractorEmailConfirmationStored
 import models.verify.SelectedSubcontractors
@@ -79,11 +79,6 @@ trait ModelGenerators {
         postcode = postcode,
         country = Some(Country(None, Some(countryName)))
       )
-    }
-
-  implicit lazy val arbitraryContactOptions: Arbitrary[ContactOptions] =
-    Arbitrary {
-      Gen.oneOf(ContactOptions.values)
     }
 
   implicit lazy val arbitrarySubcontractorTypes: Arbitrary[TypeOfSubcontractor] =

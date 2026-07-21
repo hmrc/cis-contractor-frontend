@@ -17,7 +17,7 @@
 package viewmodels.checkAnswers.add.partnership
 
 import base.SpecBase
-import models.{CheckMode, UserAnswers}
+import models.{AmendMode, CheckMode, UserAnswers}
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import pages.add.partnership.{PartnershipHasUtrYesNoPage, PartnershipNamePage}
 import play.api.i18n.{Lang, Messages, MessagesImpl}
@@ -60,6 +60,37 @@ class PartnershipHasUtrYesNoSummarySpec extends SpecBase with GuiceOneAppPerSuit
       val action: ActionItem = actions.items.head
       action.href mustBe controllers.add.partnership.routes.PartnershipHasUtrYesNoController
         .onPageLoad(CheckMode)
+        .url
+      action.content mustBe Text(messages("site.change"))
+      action.visuallyHiddenText mustBe Some(messages("partnershipHasUtrYesNo.change.hidden"))
+      action.attributes must contain("id" -> "add-partnership-utr")
+    }
+
+    "return a row with key (including partnership name), value = yes, and change action when the answer is true in Amend journey" in {
+      val ua: UserAnswers =
+        emptyUserAnswers
+          .set(PartnershipHasUtrYesNoPage, true)
+          .success
+          .value
+          .set(PartnershipNamePage, partnershipName)
+          .success
+          .value
+
+      val maybeRow = PartnershipHasUtrYesNoSummary.row(ua, AmendMode)
+      maybeRow must not be empty
+
+      val row: SummaryListRow = maybeRow.value
+
+      row.key mustBe Key(content = Text(messages("partnershipHasUtrYesNo.checkYourAnswersLabel", partnershipName)))
+      row.value mustBe Value(content = Text(messages("site.yes")))
+
+      row.actions must not be empty
+      val actions: Actions = row.actions.value
+      actions.items must have size 1
+
+      val action: ActionItem = actions.items.head
+      action.href mustBe controllers.add.partnership.routes.PartnershipHasUtrYesNoController
+        .onPageLoad(AmendMode)
         .url
       action.content mustBe Text(messages("site.change"))
       action.visuallyHiddenText mustBe Some(messages("partnershipHasUtrYesNo.change.hidden"))

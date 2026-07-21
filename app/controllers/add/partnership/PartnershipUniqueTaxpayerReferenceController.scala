@@ -18,7 +18,8 @@ package controllers.add.partnership
 
 import controllers.actions.*
 import forms.add.partnership.PartnershipUtrFormProvider
-import models.Mode
+import models.{AmendMode, Mode}
+import models.requests.DataRequest
 import navigation.Navigator
 import pages.add.partnership.{PartnershipNamePage, PartnershipUniqueTaxpayerReferencePage}
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -48,6 +49,15 @@ class PartnershipUniqueTaxpayerReferenceController @Inject() (
 
   val form = formProvider()
 
+  private def saveAndContinue(mode: Mode, value: String)(implicit request: DataRequest[?]) =
+    for {
+      updatedAnswers <-
+        Future.fromTry(request.userAnswers.set(PartnershipUniqueTaxpayerReferencePage, value))
+      _              <- sessionRepository.set(updatedAnswers)
+    } yield Redirect(
+      navigator.nextPage(PartnershipUniqueTaxpayerReferencePage, mode, updatedAnswers)
+    )
+
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
     request.userAnswers
       .get(PartnershipNamePage)
@@ -71,23 +81,26 @@ class PartnershipUniqueTaxpayerReferenceController @Inject() (
             .fold(
               formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, name))),
               value =>
-                subcontractorService.isDuplicateUTR(request.userAnswers, value).flatMap {
-                  case true  =>
-                    val errorForm = form
-                      .fill(value)
-                      .withError(
-                        key = "value",
-                        message = "partnershipUniqueTaxpayerReference.error.duplicate"
-                      )
-                    Future.successful(
-                      BadRequest(view(errorForm, mode, name))
-                    )
-                  case false =>
-                    for {
-                      updatedAnswers <-
-                        Future.fromTry(request.userAnswers.set(PartnershipUniqueTaxpayerReferencePage, value))
-                      _              <- sessionRepository.set(updatedAnswers)
-                    } yield Redirect(navigator.nextPage(PartnershipUniqueTaxpayerReferencePage, mode, updatedAnswers))
+                val prevValue = request.userAnswers.get(PartnershipUniqueTaxpayerReferencePage)
+
+                mode match {
+                  case AmendMode if prevValue.contains(value) => saveAndContinue(mode, value)
+
+                  case _ =>
+                    subcontractorService.isDuplicateUTR(request.userAnswers, value).flatMap {
+                      case true  =>
+                        val errorForm = form
+                          .fill(value)
+                          .withError(
+                            key = "value",
+                            message = "partnershipUniqueTaxpayerReference.error.duplicate"
+                          )
+                        Future.successful(
+                          BadRequest(view(errorForm, mode, name))
+                        )
+                      case false =>
+                        saveAndContinue(mode, value)
+                    }
                 }
             )
         }

@@ -17,15 +17,17 @@
 package forms.add
 
 import forms.mappings.Mappings
-import models.add.IndividualChooseContactDetails
+import models.add.IndividualContactMethodOptions
 import play.api.data.Form
+import play.api.data.Forms.set
 
 import javax.inject.Inject
 
-class IndividualChooseContactDetailsFormProvider @Inject() extends Mappings {
+class IndividualContactMethodOptionsFormProvider @Inject() extends Mappings {
 
-  def apply(): Form[IndividualChooseContactDetails] =
+  def apply(): Form[Set[IndividualContactMethodOptions]] =
     Form(
-      "value" -> enumerable[IndividualChooseContactDetails]("individualChooseContactDetails.error.required")
+      "value" -> set(enumerable[IndividualContactMethodOptions]("individualContactMethodOptions.error.required"))
+        .verifying(nonEmptySet("individualContactMethodOptions.error.required"))
     )
 }
