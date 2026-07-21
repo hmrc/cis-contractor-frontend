@@ -20,19 +20,19 @@ import base.SpecBase
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 
-class PartnershipNominatedPartnerUtrViewSpec extends SpecBase {
+class PartnershipUniqueTaxpayerReferenceViewSpec extends SpecBase {
 
-  "PartnershipNominatedPartnerUtrView" - {
+  "PartnershipUnqiueTaxpayerReferenceView" - {
 
     "must render the view with the correct title and heading" in {
 
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
       running(application) {
-        val view = application.injector.instanceOf[views.html.add.partnership.PartnershipNominatedPartnerUtrView]
+        val view = application.injector.instanceOf[views.html.add.partnership.PartnershipUniqueTaxpayerReferenceView]
 
         val html = view(
-          form = new forms.add.partnership.PartnershipNominatedPartnerUtrFormProvider()(),
+          form = new forms.add.partnership.PartnershipUtrFormProvider()(),
           mode = models.NormalMode,
           name = "Test Partnership"
         )(
@@ -40,7 +40,7 @@ class PartnershipNominatedPartnerUtrViewSpec extends SpecBase {
           messages(application)
         ).toString()
 
-        html must include(messages(application)("partnershipNominatedPartnerUtr.heading"))
+        html must include(messages(application)("partnershipUniqueTaxpayerReference.heading"))
       }
     }
 
@@ -49,10 +49,10 @@ class PartnershipNominatedPartnerUtrViewSpec extends SpecBase {
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
       running(application) {
-        val view = application.injector.instanceOf[views.html.add.partnership.PartnershipNominatedPartnerUtrView]
+        val view = application.injector.instanceOf[views.html.add.partnership.PartnershipUniqueTaxpayerReferenceView]
 
         val html = view(
-          form = new forms.add.partnership.PartnershipNominatedPartnerUtrFormProvider()(),
+          form = new forms.add.partnership.PartnershipUtrFormProvider()(),
           mode = models.AmendMode,
           name = "Test Partnership"
         )(
@@ -60,7 +60,7 @@ class PartnershipNominatedPartnerUtrViewSpec extends SpecBase {
           messages(application)
         ).toString()
 
-        html must include(messages(application)("partnershipNominatedPartnerUtr.heading"))
+        html must include(messages(application)("partnershipUniqueTaxpayerReference.heading"))
         html must include(messages(application)("site.update"))
       }
     }

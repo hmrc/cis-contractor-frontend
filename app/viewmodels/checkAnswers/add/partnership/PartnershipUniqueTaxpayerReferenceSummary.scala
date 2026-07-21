@@ -17,7 +17,7 @@
 package viewmodels.checkAnswers.add.partnership
 
 import controllers.add.partnership.routes
-import models.{CheckMode, UserAnswers}
+import models.{CheckMode, Mode, UserAnswers}
 import pages.add.partnership.PartnershipUniqueTaxpayerReferencePage
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
@@ -26,7 +26,7 @@ import viewmodels.implicits.*
 
 object PartnershipUniqueTaxpayerReferenceSummary {
 
-  def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
+  def row(answers: UserAnswers, mode: Mode = CheckMode)(implicit messages: Messages): Option[SummaryListRow] =
     answers.get(PartnershipUniqueTaxpayerReferencePage).map { answer =>
       SummaryListRowViewModel(
         key = "partnershipUniqueTaxpayerReference.checkYourAnswersLabel",
@@ -34,7 +34,7 @@ object PartnershipUniqueTaxpayerReferenceSummary {
         actions = Seq(
           ActionItemViewModel(
             "site.change",
-            routes.PartnershipUniqueTaxpayerReferenceController.onPageLoad(CheckMode).url
+            routes.PartnershipUniqueTaxpayerReferenceController.onPageLoad(mode).url
           )
             .withVisuallyHiddenText(messages("partnershipUniqueTaxpayerReference.change.hidden"))
             .withAttribute("id" -> "partnership-unique-taxpayer-reference")

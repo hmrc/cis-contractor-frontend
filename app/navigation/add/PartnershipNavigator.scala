@@ -90,6 +90,13 @@ class PartnershipNavigator @Inject() () extends NavigatorForJourney {
       _ => cyaRoute(AmendMode)
     case PartnershipNominatedPartnerCrnYesNoPage  => navigatorFromPartnershipNominatedPartnerCrnYesNoPage(AmendMode)(_)
     case PartnershipNominatedPartnerCrnPage       => navigatorFromPartnershipNominatedPartnerCrnPage(AmendMode)(_)
+    case PartnershipUniqueTaxpayerReferencePage   =>
+      _ => cyaRoute(AmendMode)
+    case PartnershipHasUtrYesNoPage               => navigatorFromPartnershipHasUtrYesNoPage(AmendMode)(_)
+    case PartnershipNominatedPartnerUtrYesNoPage  =>
+      userAnswers => navigatorFromPartnershipNominatedPartnerUtrYesNoPage(AmendMode)(userAnswers)
+    case PartnershipNominatedPartnerUtrPage       =>
+      _ => cyaRoute(AmendMode)
     case PartnershipNominatedPartnerNinoYesNoPage =>
       userAnswers => navigatorFromPartnershipNominatedPartnerNinoYesNoPage(AmendMode)(userAnswers)
     case PartnershipNominatedPartnerNinoPage      => navigatorFromPartnershipNominatedPartnerNinoPage(AmendMode)(_)
@@ -162,14 +169,14 @@ class PartnershipNavigator @Inject() () extends NavigatorForJourney {
   private def navigatorFromPartnershipHasUtrYesNoPage(mode: Mode)(ua: UserAnswers): Call =
     (ua.get(PartnershipHasUtrYesNoPage), mode) match {
 
-      case (Some(true), CheckMode) if ua.get(PartnershipUniqueTaxpayerReferencePage).isDefined =>
-        controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
+      case (Some(true), CheckMode | AmendMode) if ua.get(PartnershipUniqueTaxpayerReferencePage).isDefined =>
+        cyaRoute(mode)
 
-      case (Some(true), CheckMode) =>
-        controllers.add.partnership.routes.PartnershipUniqueTaxpayerReferenceController.onPageLoad(CheckMode)
+      case (Some(true), CheckMode | AmendMode) =>
+        controllers.add.partnership.routes.PartnershipUniqueTaxpayerReferenceController.onPageLoad(mode)
 
-      case (Some(false), CheckMode) =>
-        controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
+      case (Some(false), CheckMode | AmendMode) =>
+        cyaRoute(mode)
 
       case (Some(true), NormalMode) =>
         controllers.add.partnership.routes.PartnershipUniqueTaxpayerReferenceController.onPageLoad(NormalMode)
@@ -215,13 +222,13 @@ class PartnershipNavigator @Inject() () extends NavigatorForJourney {
         userAnswers
           .get(PartnershipNominatedPartnerUtrPage)
           .fold(
-            controllers.add.partnership.routes.PartnershipNominatedPartnerUtrController.onPageLoad(CheckMode)
+            controllers.add.partnership.routes.PartnershipNominatedPartnerUtrController.onPageLoad(mode)
           ) { _ =>
-            controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
+            cyaRoute(mode)
           }
 
       case (Some(false), CheckMode | AmendMode) =>
-        controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
+        cyaRoute(mode)
 
       case (None, _) =>
         routes.JourneyRecoveryController.onPageLoad()
