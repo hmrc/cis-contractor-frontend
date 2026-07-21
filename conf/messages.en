@@ -407,7 +407,7 @@ amendCompanyRemoveDetailYesNo.heading                                        =  
 amendCompanyRemoveDetailYesNo.error.required                                 =  Select whether you want to remove this information from this subcontractor
 amendCompanyRemoveDetailYesNo.detail.address                                 =  address
 amendCompanyRemoveDetailYesNo.detail.contact-details                         =  contact details
-amendCompanyRemoveDetailYesNo.detail.unique-taxpayer-reference               =  Unique Taxpayer Reference
+amendCompanyRemoveDetailYesNo.detail.unique-taxpayer-reference               =  UTR
 amendCompanyRemoveDetailYesNo.detail.company-registration-number             =  company registration number
 amendCompanyRemoveDetailYesNo.detail.works-reference-number                  =  works reference number
 
