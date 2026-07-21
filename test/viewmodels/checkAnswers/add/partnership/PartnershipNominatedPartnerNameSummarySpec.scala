@@ -33,7 +33,7 @@ class PartnershipNominatedPartnerNameSummarySpec extends AnyFreeSpec with Matche
 
   implicit val messages: Messages = stubMessages()
 
-  "TPartnershipNominatedPartnerNameSummary.row" - {
+  "PartnershipNominatedPartnerNameSummary.row" - {
 
     "must return a SummaryListRow when the answer exists" in {
       val answers =

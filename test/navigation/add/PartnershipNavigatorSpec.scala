@@ -817,6 +817,133 @@ class PartnershipNavigatorSpec extends SpecBase {
         ) mustBe partnershipAmendCYA
       }
 
+      "Partnership UTR in aAmend journey" - {
+        "saveAndContinue" - {
+          // TODO - need unit tests for saveAndContinue private def
+        }
+
+        "must go from a PartnershipUniqueTaxpayerReference to PartnershipCheckYourAnswers page in AmendMode" in {
+          navigator.nextPage(
+            PartnershipUniqueTaxpayerReferencePage,
+            AmendMode,
+            emptyUserAnswers.setOrException(PartnershipUniqueTaxpayerReferencePage, "5860920998")
+          ) mustBe partnershipAmendCYA
+        }
+
+        "must go to PartnershipUniqueTaxpayerReferenceController when answer is true" in {
+          navigator.nextPage(
+            PartnershipHasUtrYesNoPage,
+            AmendMode,
+            emptyUserAnswers.setOrException(PartnershipHasUtrYesNoPage, true)
+          ) mustBe controllers.add.partnership.routes.PartnershipUniqueTaxpayerReferenceController.onPageLoad(AmendMode)
+        }
+
+        "must go to amend CYA when answer is true in AmendMode and UTR is already provided" in {
+          val answers =
+            emptyUserAnswers
+              .set(PartnershipHasUtrYesNoPage, true)
+              .success
+              .value
+              .set(PartnershipUniqueTaxpayerReferencePage, "1234567890")
+              .success
+              .value
+
+          navigator.nextPage(
+            PartnershipHasUtrYesNoPage,
+            AmendMode,
+            answers
+          ) mustBe partnershipAmendCYA
+        }
+
+        "must go to PartnershipCheckYourAnswersController when answer is false" in {
+          navigator.nextPage(
+            PartnershipHasUtrYesNoPage,
+            AmendMode,
+            emptyUserAnswers.setOrException(PartnershipHasUtrYesNoPage, false)
+          ) mustBe partnershipAmendCYA
+        }
+
+        "must go to JourneyRecovery when answer is missing" in {
+          navigator.nextPage(
+            PartnershipHasUtrYesNoPage,
+            AmendMode,
+            emptyUserAnswers
+          ) mustBe journeyRecovery
+        }
+
+        "must go from PartnershipNominatedPartnerUtrYesNoPage to AmendCYA when answer is true in AmendkMode and UTR is already provided" in {
+          val answers =
+            emptyUserAnswers
+              .set(PartnershipNominatedPartnerUtrYesNoPage, true)
+              .success
+              .value
+              .set(PartnershipNominatedPartnerUtrPage, "1234567890")
+              .success
+              .value
+
+          navigator.nextPage(
+            PartnershipNominatedPartnerUtrYesNoPage,
+            AmendMode,
+            answers
+          ) mustBe partnershipAmendCYA
+        }
+
+        "must go from a PartnershipNominatedPartnerUtrYesNoPage to next page when true" in {
+          navigator.nextPage(
+            PartnershipNominatedPartnerUtrYesNoPage,
+            AmendMode,
+            emptyUserAnswers.setOrException(PartnershipNominatedPartnerUtrYesNoPage, true)
+          ) mustBe controllers.add.partnership.routes.PartnershipNominatedPartnerUtrController.onPageLoad(AmendMode)
+        }
+
+        "must go from a PartnershipNominatedPartnerUtrYesNoPage to Amend PartnershipCheckYourAnswers page when false" in {
+          navigator.nextPage(
+            PartnershipNominatedPartnerUtrYesNoPage,
+            AmendMode,
+            emptyUserAnswers.setOrException(PartnershipNominatedPartnerUtrYesNoPage, false)
+          ) mustBe partnershipAmendCYA
+        }
+
+        "must go from a PartnershipNominatedPartnerUtrYesNoPage to journey recovery page when incomplete info provided" in {
+          navigator.nextPage(
+            PartnershipNominatedPartnerUtrYesNoPage,
+            AmendMode,
+            emptyUserAnswers
+          ) mustBe journeyRecovery
+        }
+
+        "must go from PartnershipNominatedPartnerUtrYesNoPage to CYA when answer is false in AmendMode" in {
+          val answers =
+            emptyUserAnswers
+              .set(PartnershipNominatedPartnerUtrYesNoPage, false)
+              .success
+              .value
+
+          navigator.nextPage(
+            PartnershipNominatedPartnerUtrYesNoPage,
+            AmendMode,
+            answers
+          ) mustBe partnershipAmendCYA
+        }
+
+        "must go from PartnershipNominatedPartnerUtrYesNoPage to CYA when answer is true in AmendMode and UTR is already provided" in {
+          val answers =
+            emptyUserAnswers
+              .set(PartnershipNominatedPartnerUtrYesNoPage, true)
+              .success
+              .value
+              .set(PartnershipNominatedPartnerUtrPage, "1234567890")
+              .success
+              .value
+
+          navigator.nextPage(
+            PartnershipNominatedPartnerUtrYesNoPage,
+            AmendMode,
+            answers
+          ) mustBe partnershipAmendCYA
+        }
+      }
+
       "must go from PartnershipAddressYesNoPage" - {
         "to the address lookup on-ramp when answer is Yes and PartnershipAddressPage is not answered before" in {
           val answers = emptyUserAnswers.set(PartnershipAddressYesNoPage, true).success.value
