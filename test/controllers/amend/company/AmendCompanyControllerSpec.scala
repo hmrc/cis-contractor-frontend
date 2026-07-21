@@ -81,13 +81,18 @@ class AmendCompanyControllerSpec extends SpecBase with MockitoSugar {
   private val expectedOriginal =
     OriginalCompanyAnswers(
       companyName = Some(companyName),
+      addressYesNo = Some(true),
       address = Some(expectedAddress),
-      companyContactMethod = Some(Set(ContactMethodOptions.Email)),
+      companyContactMethodsYesNo = Some(true),
+      companyContactMethod = Set(ContactMethodOptions.Email),
       email = Some(emailAddress),
       phone = None,
       mobile = None,
+      utrYesNo = Some(true),
       utr = Some(utr),
+      crnYesNo = Some(true),
       crn = Some(crn),
+      worksReferenceYesNo = Some(true),
       worksReference = Some(worksReference)
     )
 

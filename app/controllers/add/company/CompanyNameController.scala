@@ -17,6 +17,7 @@
 package controllers.add.company
 
 import controllers.actions.*
+import controllers.helpers.SaveAnswerHelper
 import forms.add.company.CompanyNameFormProvider
 import models.Mode
 import navigation.Navigator
@@ -64,7 +65,10 @@ class CompanyNameController @Inject() (
           formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
           value =>
             for {
-              updatedAnswers <- Future.fromTry(request.userAnswers.set(CompanyNamePage, value))
+              updatedAnswers <-
+                Future.fromTry(
+                  SaveAnswerHelper.saveAnswer(request.userAnswers, CompanyNamePage, value, mode)
+                )
               _              <- sessionRepository.set(updatedAnswers)
             } yield Redirect(navigator.nextPage(CompanyNamePage, mode, updatedAnswers))
         )

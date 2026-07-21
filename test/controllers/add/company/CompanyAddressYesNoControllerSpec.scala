@@ -19,13 +19,17 @@ package controllers.add.company
 import base.SpecBase
 import controllers.routes
 import forms.add.company.CompanyAddressYesNoFormProvider
-import models.{NormalMode, UserAnswers}
+import models.{AmendMode, NormalMode, UserAnswers}
+import navigation.{FakeNavigator, Navigator}
+import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.when
+import org.mockito.Mockito.{verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import pages.add.company.{CompanyAddressYesNoPage, CompanyNamePage}
+import pages.amend.AmendedPagesPage
 import play.api.data.Form
 import play.api.inject.bind
+import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import repositories.SessionRepository
@@ -38,6 +42,7 @@ class CompanyAddressYesNoControllerSpec extends SpecBase with MockitoSugar {
   val formProvider        = new CompanyAddressYesNoFormProvider()
   val form: Form[Boolean] = formProvider()
 
+  def onwardRoute = Call("GET", "/foo")
   private val companyName = "Test Company"
 
   lazy val companyAddressYesNoRoute: String =
@@ -85,15 +90,17 @@ class CompanyAddressYesNoControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must redirect to the CompanyAddress page when valid data with value Yes is submitted" in {
+    "must redirect to the CompanyAddress page and not add page to AmendedPagesPage when" +
+      "valid data with value Yes is submitted in NormalMode" in {
 
       val mockSessionRepository = mock[SessionRepository]
-
+      val captor = ArgumentCaptor.forClass(classOf[UserAnswers])
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
       val application =
         applicationBuilder(userAnswers = Some(uaWithName))
           .overrides(
+            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
             bind[SessionRepository].toInstance(mockSessionRepository)
           )
           .build()
@@ -106,9 +113,56 @@ class CompanyAddressYesNoControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.add.company.routes.CompanyAddressController
-          .redirectToAddressLookup()
-          .url
+        redirectLocation(result).value mustEqual onwardRoute.url
+        verify(mockSessionRepository).set(captor.capture())
+
+        val updatedAnswers = captor.getValue
+
+        updatedAnswers.get(CompanyAddressYesNoPage) mustBe Some(true)
+        updatedAnswers.get(AmendedPagesPage) mustBe None
+      }
+    }
+
+    "must add CompanyAddressYesNoPage to AmendedPagesPage when submitted in AmendMode" in {
+      val mockSessionRepository = mock[SessionRepository]
+      val captor = ArgumentCaptor.forClass(classOf[UserAnswers])
+
+      when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
+
+      val application =
+        applicationBuilder(userAnswers = Some(uaWithName))
+          .overrides(
+            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
+            bind[SessionRepository].toInstance(mockSessionRepository)
+          )
+          .build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(
+            POST,
+            controllers.add.company.routes.CompanyAddressYesNoController
+              .onSubmit(AmendMode)
+              .url
+          ).withFormUrlEncodedBody(
+            "value" -> "true"
+          )
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual onwardRoute.url
+
+        verify(mockSessionRepository).set(captor.capture())
+
+        val updatedAnswers = captor.getValue
+
+        updatedAnswers.get(CompanyAddressYesNoPage) mustBe Some(true)
+
+        updatedAnswers
+          .get(AmendedPagesPage)
+          .value must contain(CompanyAddressYesNoPage.toString)
       }
     }
 

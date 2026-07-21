@@ -17,7 +17,7 @@
 package controllers.add.company
 
 import controllers.actions.*
-import controllers.helpers.ContactGuard
+import controllers.helpers.{ContactGuard, SaveAnswerHelper}
 import forms.add.company.CompanyPhoneNumberFormProvider
 import models.Mode
 import models.contact.ContactMethodOptions
@@ -76,7 +76,10 @@ class CompanyPhoneNumberController @Inject() (
           formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, companyName))),
           value =>
             for {
-              updatedAnswers <- Future.fromTry(request.userAnswers.set(CompanyPhoneNumberPage, value))
+              updatedAnswers <-
+                Future.fromTry(
+                  SaveAnswerHelper.saveAnswer(request.userAnswers, CompanyPhoneNumberPage, value, mode)
+                )
               _              <- sessionRepository.set(updatedAnswers)
             } yield Redirect(navigator.nextPage(CompanyPhoneNumberPage, mode, updatedAnswers))
         ))

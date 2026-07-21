@@ -17,6 +17,7 @@
 package controllers.add.company
 
 import controllers.actions.*
+import controllers.helpers.SaveAnswerHelper
 import forms.add.company.CompanyWorksReferenceYesNoFormProvider
 import models.Mode
 import navigation.Navigator
@@ -71,7 +72,10 @@ class CompanyWorksReferenceYesNoController @Inject() (
               formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, companyName))),
               value =>
                 for {
-                  updatedAnswers <- Future.fromTry(request.userAnswers.set(CompanyWorksReferenceYesNoPage, value))
+                  updatedAnswers <-
+                    Future.fromTry(
+                      SaveAnswerHelper.saveAnswer(request.userAnswers, CompanyWorksReferenceYesNoPage, value, mode)
+                    )
                   _              <- sessionRepository.set(updatedAnswers)
                 } yield Redirect(navigator.nextPage(CompanyWorksReferenceYesNoPage, mode, updatedAnswers))
             )

@@ -65,13 +65,22 @@ class AddressLookupService @Inject() (
     )
 
   def saveAddressDetails(address: Address, page: Settable[Address])(implicit
-    request: DataRequest[_],
-    ec: ExecutionContext
-  ): Future[Boolean] =
+                                                                    request: DataRequest[_],
+                                                                    ec: ExecutionContext
+  ): Future[Boolean] = {
+    val answers = request.userAnswers
+    val updatedAnswersTry =
+      if (answers.get(AddressLookupAmendReturnQuery).contains(true)) {
+        answers.setAndAmend(page, address)
+      } else {
+        answers.set(page, address)
+      }
+
     for {
-      updatedAnswers <- Future.fromTry(request.userAnswers.set(page, address))
+      updatedAnswers <- Future.fromTry(updatedAnswersTry)
       cleanedAnswers <- Future.fromTry(updatedAnswers.remove(AddressLookupAmendReturnQuery))
       result         <- sessionRepository.set(cleanedAnswers)
     } yield result
+  }
 
 }

@@ -63,6 +63,9 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
     s"$protocol://$host:$port"
   }
 
+  def manageYourSubcontractorsUrl(cisId: String): String =
+    s"$managefrontendBaseUrl/subcontractors/$cisId/your-subcontractors"
+    
   lazy val loginUrl: String                      = configuration.get[String]("urls.login")
   lazy val loginContinueUrl: String              = configuration.get[String]("urls.loginContinue")
   lazy val signOutUrl: String                    = configuration.get[String]("urls.signOut")

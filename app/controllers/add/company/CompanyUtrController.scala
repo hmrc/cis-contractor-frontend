@@ -17,6 +17,7 @@
 package controllers.add.company
 
 import controllers.actions.*
+import controllers.helpers.SaveAnswerHelper
 import forms.add.company.CompanyUtrFormProvider
 import models.Mode
 import navigation.Navigator
@@ -87,7 +88,9 @@ class CompanyUtrController @Inject() (
                   case false =>
                     for {
                       updatedAnswers <-
-                        Future.fromTry(request.userAnswers.set(CompanyUtrPage, value))
+                        Future.fromTry(
+                          SaveAnswerHelper.saveAnswer(request.userAnswers, CompanyUtrPage, value, mode)
+                        )
                       _              <- sessionRepository.set(updatedAnswers)
                     } yield Redirect(navigator.nextPage(CompanyUtrPage, mode, updatedAnswers))
                 }

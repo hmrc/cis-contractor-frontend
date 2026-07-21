@@ -19,11 +19,14 @@ package controllers.add.company
 import base.SpecBase
 import controllers.routes
 import forms.add.company.CompanyUtrFormProvider
-import models.{NormalMode, UserAnswers}
+import models.{AmendMode, NormalMode, UserAnswers}
+import navigation.{FakeNavigator, Navigator}
+import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{verify, verifyNoMoreInteractions, when}
 import org.scalatestplus.mockito.MockitoSugar
 import pages.add.company.{CompanyNamePage, CompanyUtrPage}
+import pages.amend.AmendedPagesPage
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
@@ -85,18 +88,22 @@ class CompanyUtrControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must bind the form and redirect to CompanyCrnYesNoPage on POST when valid UTR is submitted" in {
-
+    "must bind the form and redirect to CompanyCrnYesNoPage and not add the page in AmendedPagesPage on POST when valid UTR is submitted in NormalMode" in {
       val validValue = "5860920998"
-
+      val onwardRoute = controllers.add.company.routes.CompanyCrnYesNoController.onPageLoad(NormalMode)
+      val mockSessionRepository    = mock[SessionRepository]
       val mockSubcontractorService = mock[SubcontractorService]
-
+      val captor = ArgumentCaptor.forClass(classOf[UserAnswers])
+      
       when(mockSubcontractorService.isDuplicateUTR(any[UserAnswers], any[String])(any[HeaderCarrier]))
         .thenReturn(Future.successful(false))
+      when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
 
       val application =
         applicationBuilder(userAnswers = Some(uaWithName))
           .overrides(
+            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
+            bind[SessionRepository].toInstance(mockSessionRepository),
             bind[SubcontractorService].toInstance(mockSubcontractorService)
           )
           .build()
@@ -109,13 +116,65 @@ class CompanyUtrControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.add.company.routes.CompanyCrnYesNoController
-          .onPageLoad(NormalMode)
-          .url
-      }
+        redirectLocation(result).value mustEqual onwardRoute.url
+        verify(mockSessionRepository).set(captor.capture())
 
-      verify(mockSubcontractorService).isDuplicateUTR(any[UserAnswers], any[String])(any[HeaderCarrier])
-      verifyNoMoreInteractions(mockSubcontractorService)
+        val updatedAnswers = captor.getValue
+
+        updatedAnswers.get(CompanyUtrPage) mustBe Some(validValue)
+        updatedAnswers.get(AmendedPagesPage) mustBe None
+
+        verify(mockSubcontractorService)
+          .isDuplicateUTR(any[UserAnswers], any[String])(any[HeaderCarrier])
+
+        verifyNoMoreInteractions(mockSubcontractorService)
+      }
+    }
+
+    "must add CompanyUtrPage to AmendedPagesPage when submitted in AmendMode" in {
+      val validValue = "5860920998"
+      val onwardRoute = controllers.add.company.routes.CompanyCrnYesNoController.onPageLoad(AmendMode)
+      val mockSessionRepository = mock[SessionRepository]
+      val mockSubcontractorService = mock[SubcontractorService]
+
+      val captor = ArgumentCaptor.forClass(classOf[UserAnswers])
+
+      when(mockSubcontractorService.isDuplicateUTR(any[UserAnswers], any[String])(any[HeaderCarrier]))
+        .thenReturn(Future.successful(false))
+
+      when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
+
+      val application =
+        applicationBuilder(userAnswers = Some(uaWithName))
+          .overrides(
+            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
+            bind[SessionRepository].toInstance(mockSessionRepository),
+            bind[SubcontractorService].toInstance(mockSubcontractorService)
+          )
+          .build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(
+            POST,
+            controllers.add.company.routes.CompanyUtrController
+              .onSubmit(AmendMode)
+              .url
+          ).withFormUrlEncodedBody(
+            "value" -> validValue
+          )
+
+        val result = route(application, request).value
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual onwardRoute.url
+        verify(mockSessionRepository).set(captor.capture())
+
+        val updatedAnswers = captor.getValue
+        updatedAnswers.get(CompanyUtrPage) mustBe Some(validValue)
+
+        updatedAnswers.get(AmendedPagesPage).value must contain(CompanyUtrPage.toString)
+      }
     }
 
     "must return a Bad Request and show duplicate error when when utr already exists" in {

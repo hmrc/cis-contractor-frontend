@@ -17,9 +17,12 @@
 package controllers.amend.company
 
 import controllers.actions.*
+import models.TypeOfSubcontractor.Limitedcompany
 import models.UserAnswers
 import models.address.{Address, Country}
 import models.amend.company.OriginalCompanyAnswers
+import models.contact.ContactMethodOptions
+import models.contact.ContactMethodOptions.Email
 import pages.add.*
 import pages.add.company.*
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -30,8 +33,6 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
-import models.TypeOfSubcontractor.Limitedcompany
-import models.contact.ContactMethodOptions
 
 // TODO: replace demo data with real backend fetch
 class AmendCompanyController @Inject() (
@@ -58,13 +59,18 @@ class AmendCompanyController @Inject() (
 
   private val companyOriginal                                          = OriginalCompanyAnswers(
     companyName = Some(companyName),
+    addressYesNo = Some(true),
     address = Some(companyAddress),
-    companyContactMethod = Some(Set(ContactMethodOptions.Email)),
+    companyContactMethodsYesNo = Some(true),
+    companyContactMethod = Set(Email),
     email = Some(emailAddress),
     phone = None,
     mobile = None,
+    utrYesNo = Some(true),
     utr = Some(utr),
+    crnYesNo = Some(true),
     crn = Some(crn),
+    worksReferenceYesNo = Some(true),
     worksReference = Some(worksReference)
   )
   protected def populateUserAnswers(ua: UserAnswers): Try[UserAnswers] = for {
