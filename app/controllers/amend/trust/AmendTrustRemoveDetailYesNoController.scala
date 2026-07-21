@@ -18,7 +18,6 @@ package controllers.amend.trust
 
 import controllers.actions.*
 import forms.amend.trust.AmendTrustRemoveDetailYesNoFormProvider
-import navigation.Navigator
 import pages.add.trust.TrustNamePage
 import pages.amend.trust.AmendTrustRemoveDetailYesNoPage
 import play.api.i18n.{I18nSupport, MessagesApi}
