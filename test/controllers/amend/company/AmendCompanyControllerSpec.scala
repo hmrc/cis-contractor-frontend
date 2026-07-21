@@ -31,7 +31,7 @@ import play.api.inject.bind
 import play.api.mvc.MessagesControllerComponents
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import queries.{CisIdQuery, OriginalCompanyAnswersQuery, SubContractorVerifiedQuery, SubContractorVerificationNumberQuery}
+import queries.{CisIdQuery, OriginalCompanyAnswersQuery, SubContractorVerificationNumberQuery, SubContractorVerifiedQuery}
 import repositories.SessionRepository
 import models.TypeOfSubcontractor.Limitedcompany
 import models.contact.ContactMethodOptions

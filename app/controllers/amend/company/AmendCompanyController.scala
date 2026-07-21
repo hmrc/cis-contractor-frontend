@@ -23,7 +23,7 @@ import models.amend.company.OriginalCompanyAnswers
 import pages.add.*
 import pages.add.company.*
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import queries.{CisIdQuery, OriginalCompanyAnswersQuery, SubContractorVerifiedQuery, SubContractorVerificationNumberQuery}
+import queries.{CisIdQuery, OriginalCompanyAnswersQuery, SubContractorVerificationNumberQuery, SubContractorVerifiedQuery}
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 

@@ -40,16 +40,16 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class AmendCompanyCheckYourAnswersController @Inject() (
-                                                       override val messagesApi: MessagesApi,
-                                                       identify: IdentifierAction,
-                                                       getData: DataRetrievalAction,
-                                                       requireData: DataRequiredAction,
-                                                       val controllerComponents: MessagesControllerComponents,
-                                                       subcontractorService: SubcontractorService,
-                                                       sessionRepository: SessionRepository,
-                                                       view: AmendCheckYourAnswersView
-                                                     )(implicit ec: ExecutionContext)
-  extends FrontendBaseController
+  override val messagesApi: MessagesApi,
+  identify: IdentifierAction,
+  getData: DataRetrievalAction,
+  requireData: DataRequiredAction,
+  val controllerComponents: MessagesControllerComponents,
+  subcontractorService: SubcontractorService,
+  sessionRepository: SessionRepository,
+  view: AmendCheckYourAnswersView
+)(implicit ec: ExecutionContext)
+    extends FrontendBaseController
     with I18nSupport
     with Logging {
 
@@ -58,8 +58,8 @@ class AmendCompanyCheckYourAnswersController @Inject() (
 
     ValidatedCompany.build(ua) match {
       case Right(_) =>
-        val isVerified = ua.get(SubContractorVerifiedQuery).contains(true)
-        val companyName  = ua.get(CompanyNamePage).getOrElse("")
+        val isVerified  = ua.get(SubContractorVerifiedQuery).contains(true)
+        val companyName = ua.get(CompanyNamePage).getOrElse("")
 
         val subcontractorInformationList =
           SummaryListViewModel(rows = subcontractorInformationRows(ua, isVerified).flatten)
@@ -79,9 +79,9 @@ class AmendCompanyCheckYourAnswersController @Inject() (
   }
 
   private def subcontractorInformationRows(
-                                            ua: UserAnswers,
-                                            isVerified: Boolean
-                                          )(implicit messages: Messages): Seq[Option[SummaryListRow]] = {
+    ua: UserAnswers,
+    isVerified: Boolean
+  )(implicit messages: Messages): Seq[Option[SummaryListRow]] = {
 
     val verificationRows =
       Option
@@ -107,9 +107,9 @@ class AmendCompanyCheckYourAnswersController @Inject() (
   }
 
   private def detailsRows(
-                           ua: UserAnswers,
-                           isVerified: Boolean
-                         )(implicit messages: Messages): Seq[Option[SummaryListRow]] = {
+    ua: UserAnswers,
+    isVerified: Boolean
+  )(implicit messages: Messages): Seq[Option[SummaryListRow]] = {
 
     val nameRows =
       if (isVerified) {

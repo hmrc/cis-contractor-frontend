@@ -125,7 +125,7 @@ class CompanyUtrSummarySpec extends AnyFreeSpec with Matchers with CyaEncodingSp
 
       row.value.content.asHtml.toString should include(utr)
 
-      row.actions shouldBe defined
+      row.actions             shouldBe defined
       row.actions.value.items shouldBe empty
     }
 

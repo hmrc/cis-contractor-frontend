@@ -84,7 +84,7 @@ class TypeOfSubcontractorSummarySpec extends AnyFreeSpec with Matchers {
         messages("typeOfSubcontractor.company")
       )
 
-      row.actions shouldBe defined
+      row.actions             shouldBe defined
       row.actions.value.items shouldBe empty
     }
 
