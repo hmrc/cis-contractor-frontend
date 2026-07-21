@@ -32,6 +32,8 @@ import play.api.mvc.{Call, Request}
 import play.api.test.FakeRequest
 import repositories.SessionRepository
 import uk.gov.hmrc.http.HeaderCarrier
+import queries.AddressLookupAmendReturnQuery
+import models.UserAnswers
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -149,6 +151,36 @@ class AddressLookupServiceSpec extends SpecBase with MockitoSugar {
         when(sessionRepository.set(any())).thenReturn(Future.successful(false))
 
         service.saveAddressDetails(testAddress, AddressOfSubcontractorPage).futureValue mustBe false
+        verify(sessionRepository).set(any())
+      }
+
+      "must remove AddressLookupAmendReturnQuery when persisting the address" in {
+        val (service, _, _, sessionRepository) = newService()
+
+        val captor = ArgumentCaptor.forClass(classOf[UserAnswers])
+
+        when(sessionRepository.set(any())).thenReturn(Future.successful(true))
+
+        implicit val dataRequest: DataRequest[_] =
+          DataRequest(
+            FakeRequest(),
+            userAnswersId,
+            emptyUserAnswers
+              .set(AddressLookupAmendReturnQuery, true)
+              .success
+              .value
+          )
+
+        service
+          .saveAddressDetails(testAddress, AddressOfSubcontractorPage)
+          .futureValue mustBe true
+
+        verify(sessionRepository).set(captor.capture())
+
+        val savedAnswers = captor.getValue
+
+        savedAnswers.get(AddressOfSubcontractorPage) mustBe Some(testAddress)
+        savedAnswers.get(AddressLookupAmendReturnQuery) mustBe None
       }
     }
   }

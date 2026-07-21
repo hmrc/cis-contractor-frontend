@@ -14,18 +14,31 @@
  * limitations under the License.
  */
 
-package forms.add.company
+package forms.contractordetails
 
 import forms.mappings.Mappings
-import models.add.company.CompanyContactOptions
 import play.api.data.Form
 
 import javax.inject.Inject
 
-class CompanyContactOptionsFormProvider @Inject() extends Mappings {
+class RemoveDetailYesNoFormProvider @Inject() extends Mappings {
 
-  def apply(): Form[CompanyContactOptions] =
-    Form(
-      "value" -> enumerable[CompanyContactOptions]("companyContactOptions.error.required")
-    )
+  def apply(contractorDetail: String): Form[Boolean] =
+    contractorDetail match {
+      case "email-address" =>
+        Form(
+          "value" -> boolean(
+            requiredKey = "contractordetails.removeDetailYesNo.error.required.email"
+          )
+        )
+      case "scheme-name"   =>
+        Form(
+          "value" -> boolean(
+            requiredKey = "contractordetails.removeDetailYesNo.error.required.schemeName"
+          )
+        )
+      case other           =>
+        throw new IllegalArgumentException(s"Unknown contractorDetail: $other")
+    }
+
 }

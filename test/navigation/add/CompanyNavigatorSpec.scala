@@ -18,7 +18,7 @@ package navigation.add
 
 import base.SpecBase
 import controllers.routes
-import models.contact.ContactOptions
+import models.contact.ContactMethodOptions
 import models.{AmendMode, CheckMode, NormalMode, UserAnswers}
 import pages.Page
 import pages.add.company.*
@@ -58,12 +58,12 @@ class CompanyNavigatorSpec extends SpecBase {
           ) mustBe controllers.add.company.routes.CompanyAddressController.redirectToAddressLookup()
         }
 
-        "to CompanyContactOptions page when answer is No" in {
+        "to AddCompanyContactMethodsYesNo page when answer is No" in {
           navigator.nextPage(
             CompanyAddressYesNoPage,
             NormalMode,
             emptyUserAnswers.setOrException(CompanyAddressYesNoPage, false)
-          ) mustBe controllers.add.company.routes.CompanyContactOptionsController.onPageLoad(NormalMode)
+          ) mustBe controllers.add.company.routes.AddCompanyContactMethodsYesNoController.onPageLoad(NormalMode)
         }
 
         "to JourneyRecoveryPage when answer is not present" in {
@@ -75,90 +75,219 @@ class CompanyNavigatorSpec extends SpecBase {
         }
       }
 
-      "must go from a CompanyAddressPage to CompanyContactOptions" in {
-        navigator.nextPage(
-          CompanyAddressPage,
-          NormalMode,
-          UserAnswers("id")
-        ) mustBe controllers.add.company.routes.CompanyContactOptionsController.onPageLoad(NormalMode)
-      }
-
-      "must go from CompanyContactOptionsPage" - {
-        "to CompanyEmailAddressPage when EmailAddress is selected" in {
+      "must go from AddCompanyContactMethodsYesNo" - {
+        "to CompanyContactMethodOptionsPage when answer is Yes" in {
           navigator.nextPage(
-            CompanyContactOptionsPage,
+            AddCompanyContactMethodsYesNoPage,
             NormalMode,
-            emptyUserAnswers.setOrException(
-              CompanyContactOptionsPage,
-              ContactOptions.Email
-            )
-          ) mustBe controllers.add.company.routes.CompanyEmailAddressController.onPageLoad(NormalMode)
+            emptyUserAnswers.setOrException(AddCompanyContactMethodsYesNoPage, true)
+          ) mustBe controllers.add.company.routes.CompanyContactMethodOptionsController
+            .onPageLoad(NormalMode)
         }
 
-        "to CompanyPhoneNumberPage when PhoneNumber is selected" in {
+        "to CompanyUtrYesNo when answer is No" in {
           navigator.nextPage(
-            CompanyContactOptionsPage,
+            AddCompanyContactMethodsYesNoPage,
             NormalMode,
-            emptyUserAnswers.setOrException(
-              CompanyContactOptionsPage,
-              ContactOptions.Phone
-            )
-          ) mustBe controllers.add.company.routes.CompanyPhoneNumberController.onPageLoad(NormalMode)
-        }
-
-        "to CompanyMobileNumberPage when MobileNumber is selected" in {
-          navigator.nextPage(
-            CompanyContactOptionsPage,
-            NormalMode,
-            emptyUserAnswers.setOrException(
-              CompanyContactOptionsPage,
-              ContactOptions.Mobile
-            )
-          ) mustBe controllers.add.company.routes.CompanyMobileNumberController.onPageLoad(NormalMode)
-        }
-
-        "to CompanyUtrYesNoPage when NoDetails is selected" in {
-          navigator.nextPage(
-            CompanyContactOptionsPage,
-            NormalMode,
-            emptyUserAnswers.setOrException(
-              CompanyContactOptionsPage,
-              ContactOptions.NoDetails
-            )
-          ) mustBe controllers.add.company.routes.CompanyUtrYesNoController.onPageLoad(NormalMode)
+            emptyUserAnswers.setOrException(AddCompanyContactMethodsYesNoPage, false)
+          ) mustBe controllers.add.company.routes.CompanyUtrYesNoController
+            .onPageLoad(NormalMode)
         }
 
         "to JourneyRecoveryPage when answer is not present" in {
           navigator.nextPage(
-            CompanyContactOptionsPage,
+            AddCompanyContactMethodsYesNoPage,
             NormalMode,
             emptyUserAnswers
           ) mustBe journeyRecovery
         }
       }
 
-      "must go from CompanyEmailAddressPage to CompanyUtrYesNo in NormalMode" in {
-        navigator.nextPage(
-          CompanyEmailAddressPage,
-          NormalMode,
-          emptyUserAnswers
-        ) mustBe controllers.add.company.routes.CompanyUtrYesNoController.onPageLoad(NormalMode)
+      "must go from CompanyContactMethodOptions" - {
+        "to CompanyEmailAddress when Email is selected" in {
+          navigator.nextPage(
+            CompanyContactMethodOptionsPage,
+            NormalMode,
+            emptyUserAnswers.setOrException(
+              CompanyContactMethodOptionsPage,
+              Set(ContactMethodOptions.Email, ContactMethodOptions.Phone, ContactMethodOptions.Mobile)
+            )
+          ) mustBe controllers.add.company.routes.CompanyEmailAddressController
+            .onPageLoad(NormalMode)
+        }
+
+        "to CompanyPhoneNumberPage when Phone is selected (Email is not selected)" in {
+          navigator.nextPage(
+            CompanyContactMethodOptionsPage,
+            NormalMode,
+            emptyUserAnswers.setOrException(
+              CompanyContactMethodOptionsPage,
+              Set(ContactMethodOptions.Phone, ContactMethodOptions.Mobile)
+            )
+          ) mustBe controllers.add.company.routes.CompanyPhoneNumberController
+            .onPageLoad(NormalMode)
+        }
+
+        "to CompanyMobileNumberPage when Mobile is selected (Email and Phone are not selected)" in {
+          navigator.nextPage(
+            CompanyContactMethodOptionsPage,
+            NormalMode,
+            emptyUserAnswers.setOrException(CompanyContactMethodOptionsPage, Set(ContactMethodOptions.Mobile))
+          ) mustBe controllers.add.company.routes.CompanyMobileNumberController
+            .onPageLoad(NormalMode)
+        }
+
+        "to JourneyRecoveryPage when CompanyContactMethodOptions answer is not present" in {
+          navigator.nextPage(
+            CompanyContactMethodOptionsPage,
+            NormalMode,
+            UserAnswers("id")
+          ) mustBe journeyRecovery
+        }
       }
 
-      "must go from a CompanyPhoneNumberPage to CompanyUtrYesNo page" in {
-        navigator.nextPage(
-          CompanyPhoneNumberPage,
-          NormalMode,
-          UserAnswers("id")
-        ) mustBe controllers.add.company.routes.CompanyUtrYesNoController.onPageLoad(NormalMode)
+      "must go from CompanyEmailAddressPage" - {
+        "to CompanyPhoneNumberPage when Phone is selected in CompanyContactMethodOptions" in {
+          navigator.nextPage(
+            CompanyEmailAddressPage,
+            NormalMode,
+            emptyUserAnswers
+              .setOrException(
+                CompanyContactMethodOptionsPage,
+                Set(ContactMethodOptions.Email, ContactMethodOptions.Phone, ContactMethodOptions.Mobile)
+              )
+          ) mustBe controllers.add.company.routes.CompanyPhoneNumberController
+            .onPageLoad(NormalMode)
+        }
+
+        "to CompanyMobileNumberPage when Mobile is selected in CompanyContactMethodOptions" in {
+          navigator.nextPage(
+            CompanyEmailAddressPage,
+            NormalMode,
+            emptyUserAnswers
+              .setOrException(
+                CompanyContactMethodOptionsPage,
+                Set(ContactMethodOptions.Email, ContactMethodOptions.Mobile)
+              )
+          ) mustBe controllers.add.company.routes.CompanyMobileNumberController
+            .onPageLoad(NormalMode)
+        }
+
+        "to CompanyUtrYesNo Page when only Email is selected in CompanyContactMethodOptions" in {
+          navigator.nextPage(
+            CompanyEmailAddressPage,
+            NormalMode,
+            emptyUserAnswers
+              .setOrException(
+                CompanyContactMethodOptionsPage,
+                Set(ContactMethodOptions.Email)
+              )
+          ) mustBe controllers.add.company.routes.CompanyUtrYesNoController
+            .onPageLoad(NormalMode)
+        }
+
+        "to JourneyRecoveryPage Page when CompanyContactMethodOptions answer is not present" in {
+          navigator.nextPage(
+            CompanyEmailAddressPage,
+            NormalMode,
+            UserAnswers("id")
+          ) mustBe journeyRecovery
+        }
+
+        "to JourneyRecoveryPage when Email is not in the selected CompanyContactMethodOptions" in {
+          navigator.nextPage(
+            CompanyEmailAddressPage,
+            NormalMode,
+            emptyUserAnswers
+              .setOrException(
+                CompanyContactMethodOptionsPage,
+                Set(ContactMethodOptions.Phone, ContactMethodOptions.Mobile)
+              )
+          ) mustBe journeyRecovery
+        }
       }
 
-      "must go from a CompanyMobileNumberPage to CompanyUtrYesNo" in {
-        navigator.nextPage(
-          CompanyMobileNumberPage,
-          NormalMode,
-          UserAnswers("id")
-        ) mustBe controllers.add.company.routes.CompanyUtrYesNoController.onPageLoad(NormalMode)
+      "must go from CompanyPhoneNumberPage" - {
+        "to CompanyMobileNumberPage when Mobile is selected in CompanyContactMethodOptions" in {
+          navigator.nextPage(
+            CompanyPhoneNumberPage,
+            NormalMode,
+            emptyUserAnswers
+              .setOrException(
+                CompanyContactMethodOptionsPage,
+                Set(ContactMethodOptions.Email, ContactMethodOptions.Phone, ContactMethodOptions.Mobile)
+              )
+          ) mustBe controllers.add.company.routes.CompanyMobileNumberController
+            .onPageLoad(NormalMode)
+        }
+
+        "to CompanyUtrYesNo Page when Mobile is not selected in CompanyContactMethodOptions" in {
+          navigator.nextPage(
+            CompanyPhoneNumberPage,
+            NormalMode,
+            emptyUserAnswers
+              .setOrException(
+                CompanyContactMethodOptionsPage,
+                Set(ContactMethodOptions.Email, ContactMethodOptions.Phone)
+              )
+          ) mustBe controllers.add.company.routes.CompanyUtrYesNoController
+            .onPageLoad(NormalMode)
+        }
+
+        "to JourneyRecoveryPage Page when CompanyContactMethodOptions answer is not present" in {
+          navigator.nextPage(
+            CompanyPhoneNumberPage,
+            NormalMode,
+            UserAnswers("id")
+          ) mustBe journeyRecovery
+        }
+
+        "to JourneyRecoveryPage when Phone is not in the selected CompanyContactMethodOptions" in {
+          navigator.nextPage(
+            CompanyPhoneNumberPage,
+            NormalMode,
+            emptyUserAnswers
+              .setOrException(
+                CompanyContactMethodOptionsPage,
+                Set(ContactMethodOptions.Email, ContactMethodOptions.Mobile)
+              )
+          ) mustBe journeyRecovery
+        }
+      }
+
+      "must go from CompanyMobileNumberPage" - {
+        "to CompanyUtrYesNo Page when CompanyContactMethodOptions is present" in {
+          navigator.nextPage(
+            CompanyMobileNumberPage,
+            NormalMode,
+            emptyUserAnswers
+              .setOrException(
+                CompanyContactMethodOptionsPage,
+                Set(ContactMethodOptions.Email, ContactMethodOptions.Phone, ContactMethodOptions.Mobile)
+              )
+          ) mustBe controllers.add.company.routes.CompanyUtrYesNoController
+            .onPageLoad(NormalMode)
+        }
+
+        "to JourneyRecoveryPage Page when CompanyContactMethodOptions answer is not present" in {
+          navigator.nextPage(
+            CompanyMobileNumberPage,
+            NormalMode,
+            UserAnswers("id")
+          ) mustBe journeyRecovery
+        }
+
+        "to JourneyRecoveryPage when Mobile is not in the selected CompanyContactMethodOptions" in {
+          navigator.nextPage(
+            CompanyMobileNumberPage,
+            NormalMode,
+            emptyUserAnswers
+              .setOrException(
+                CompanyContactMethodOptionsPage,
+                Set(ContactMethodOptions.Email, ContactMethodOptions.Phone)
+              )
+          ) mustBe journeyRecovery
+        }
       }
 
       "must go from CompanyUtrYesNo" - {
@@ -265,34 +394,6 @@ class CompanyNavigatorSpec extends SpecBase {
           UserAnswers("id")
         ) mustBe CompanyCYA
       }
-
-      "must go from AddCompanyContactMethodsYesNo" - {
-        "to AddCompanyContactMethodsYesNoPage when answer is Yes" in {
-          navigator.nextPage(
-            AddCompanyContactMethodsYesNoPage,
-            NormalMode,
-            emptyUserAnswers.setOrException(AddCompanyContactMethodsYesNoPage, true)
-          ) mustBe controllers.add.company.routes.AddCompanyContactMethodsYesNoController
-            .onPageLoad(NormalMode)
-        }
-
-        "to CompanyUtrYesNo when answer is No" in {
-          navigator.nextPage(
-            AddCompanyContactMethodsYesNoPage,
-            NormalMode,
-            emptyUserAnswers.setOrException(AddCompanyContactMethodsYesNoPage, false)
-          ) mustBe controllers.add.company.routes.CompanyUtrYesNoController
-            .onPageLoad(NormalMode)
-        }
-
-        "to JourneyRecoveryPage when answer is not present" in {
-          navigator.nextPage(
-            AddCompanyContactMethodsYesNoPage,
-            NormalMode,
-            emptyUserAnswers
-          ) mustBe journeyRecovery
-        }
-      }
     }
 
     "in Amend mode" - {
@@ -306,16 +407,11 @@ class CompanyNavigatorSpec extends SpecBase {
         navigator.nextPage(CompanyNamePage, AmendMode, emptyUserAnswers) mustBe CompanyAmendCYA
       }
 
-      "to Amend Company CYA page when EmailAddress is selected and CompanyEmailAddressPage is answered" in {
+      "must go from CompanyEmailAddressPage to Company CYA in AmendMode" in {
         navigator.nextPage(
-          CompanyContactOptionsPage,
+          CompanyEmailAddressPage,
           AmendMode,
           emptyUserAnswers
-            .setOrException(
-              CompanyContactOptionsPage,
-              ContactOptions.Email
-            )
-            .setOrException(CompanyEmailAddressPage, "old@email.com")
         ) mustBe CompanyAmendCYA
       }
 
@@ -406,7 +502,8 @@ class CompanyNavigatorSpec extends SpecBase {
             CompanyAddressYesNoPage,
             AmendMode,
             answers
-          ) mustBe CompanyAmendCYA
+          ) mustBe controllers.add.company.routes.CompanyAddressController.redirectToAmendAddressLookup()
+          // CompanyAmendCYA
 
         }
 
@@ -434,7 +531,7 @@ class CompanyNavigatorSpec extends SpecBase {
             CompanyAddressYesNoPage,
             AmendMode,
             answers
-          ) mustBe CompanyAmendCYA
+          ) mustBe controllers.add.company.routes.CompanyAddressController.redirectToAmendAddressLookup()
         }
 
         "to Company CYA when answer is No" in {
@@ -678,129 +775,349 @@ class CompanyNavigatorSpec extends SpecBase {
         }
       }
 
-      "must go from CompanyAddressPage to Company CYA in CheckMode" in {
-        navigator.nextPage(
-          CompanyAddressPage,
-          CheckMode,
-          emptyUserAnswers
-        ) mustBe CompanyCYA
-      }
-
-      "must go from CompanyContactOptionsPage" - {
-        "to CompanyEmailAddress page when EmailAddress is selected and CompanyEmailAddressPage is not answered" in {
-          navigator.nextPage(
-            CompanyContactOptionsPage,
-            CheckMode,
-            emptyUserAnswers.setOrException(
-              CompanyContactOptionsPage,
-              ContactOptions.Email
+      "must go from AddCompanyContactMethodsYesNo" - {
+        "to CYA when answer is Yes and CompanyContactMethodOptions already answered" in {
+          val answers = emptyUserAnswers
+            .setOrException(AddCompanyContactMethodsYesNoPage, true)
+            .setOrException(
+              CompanyContactMethodOptionsPage,
+              Set(ContactMethodOptions.Email, ContactMethodOptions.Phone)
             )
-          ) mustBe controllers.add.company.routes.CompanyEmailAddressController.onPageLoad(CheckMode)
+
+          navigator.nextPage(
+            AddCompanyContactMethodsYesNoPage,
+            CheckMode,
+            answers
+          ) mustBe controllers.add.company.routes.CompanyCheckYourAnswersController.onPageLoad()
         }
 
-        "to Company CYA page when EmailAddress is selected and CompanyEmailAddressPage is answered" in {
+        "to CompanyContactMethodOptions page when answer is Yes and CompanyContactMethodOptions not yet answered" in {
+          val answers = emptyUserAnswers.setOrException(AddCompanyContactMethodsYesNoPage, true)
+
           navigator.nextPage(
-            CompanyContactOptionsPage,
+            AddCompanyContactMethodsYesNoPage,
             CheckMode,
-            emptyUserAnswers
-              .setOrException(
-                CompanyContactOptionsPage,
-                ContactOptions.Email
-              )
-              .setOrException(CompanyEmailAddressPage, "old@email.com")
+            answers
+          ) mustBe controllers.add.company.routes.CompanyContactMethodOptionsController.onPageLoad(CheckMode)
+        }
+
+        "to CYA when answer is No" in {
+          val answers = emptyUserAnswers.set(AddCompanyContactMethodsYesNoPage, false).success.value
+
+          navigator.nextPage(
+            AddCompanyContactMethodsYesNoPage,
+            CheckMode,
+            answers
           ) mustBe CompanyCYA
         }
 
-        "to CompanyPhoneNumberPage when PhoneNumber is selected and CompanyPhoneNumberPage is not answered" in {
+        "to JourneyRecovery when answer is not present" in {
           navigator.nextPage(
-            CompanyContactOptionsPage,
-            CheckMode,
-            emptyUserAnswers.setOrException(
-              CompanyContactOptionsPage,
-              ContactOptions.Phone
-            )
-          ) mustBe controllers.add.company.routes.CompanyPhoneNumberController.onPageLoad(CheckMode)
-        }
-
-        "to Company CYA when PhoneNumber is selected and CompanyPhoneNumberPage is answered" in {
-          navigator.nextPage(
-            CompanyContactOptionsPage,
-            CheckMode,
-            emptyUserAnswers
-              .setOrException(
-                CompanyContactOptionsPage,
-                ContactOptions.Phone
-              )
-              .setOrException(CompanyPhoneNumberPage, "0123456")
-          ) mustBe CompanyCYA
-        }
-
-        "to CompanyMobileNumberPage when MobileNumber is selected and CompanyMobileNumberPage is not answered" in {
-          navigator.nextPage(
-            CompanyContactOptionsPage,
-            CheckMode,
-            emptyUserAnswers.setOrException(
-              CompanyContactOptionsPage,
-              ContactOptions.Mobile
-            )
-          ) mustBe controllers.add.company.routes.CompanyMobileNumberController.onPageLoad(CheckMode)
-        }
-
-        "to CompanyMobileNumberPage when MobileNumber is selected and CompanyMobileNumberPage is answered" in {
-          navigator.nextPage(
-            CompanyContactOptionsPage,
-            CheckMode,
-            emptyUserAnswers
-              .setOrException(
-                CompanyContactOptionsPage,
-                ContactOptions.Mobile
-              )
-              .setOrException(CompanyMobileNumberPage, "0123456")
-          ) mustBe CompanyCYA
-        }
-
-        "to company CYA when NoDetails is selected" in {
-          navigator.nextPage(
-            CompanyContactOptionsPage,
-            CheckMode,
-            emptyUserAnswers.setOrException(
-              CompanyContactOptionsPage,
-              ContactOptions.NoDetails
-            )
-          ) mustBe CompanyCYA
-        }
-
-        "to CYA when answer is not present" in {
-          navigator.nextPage(
-            CompanyContactOptionsPage,
+            AddCompanyContactMethodsYesNoPage,
             CheckMode,
             emptyUserAnswers
           ) mustBe journeyRecovery
         }
       }
 
-      "must go from CompanyEmailAddressPage to Company CYA in CheckMode" in {
-        navigator.nextPage(
-          CompanyEmailAddressPage,
-          CheckMode,
-          emptyUserAnswers
-        ) mustBe CompanyCYA
+      "must go from CompanyContactMethodOptions" - {
+        "to CompanyEmailAddressPage when Email is selected and Email answer not exist" in {
+          val answers = emptyUserAnswers
+            .set(
+              CompanyContactMethodOptionsPage,
+              Set(ContactMethodOptions.Email)
+            )
+            .success
+            .value
+
+          navigator.nextPage(
+            CompanyContactMethodOptionsPage,
+            CheckMode,
+            answers
+          ) mustBe controllers.add.company.routes.CompanyEmailAddressController.onPageLoad(CheckMode)
+        }
+
+        "to CompanyEmailAddressPage when Email, Phone and Mobile are selected and no Email answer not exist" in {
+          val answers = emptyUserAnswers
+            .set(
+              CompanyContactMethodOptionsPage,
+              Set(ContactMethodOptions.Email, ContactMethodOptions.Phone, ContactMethodOptions.Mobile)
+            )
+            .success
+            .value
+
+          navigator.nextPage(
+            CompanyContactMethodOptionsPage,
+            CheckMode,
+            answers
+          ) mustBe controllers.add.company.routes.CompanyEmailAddressController.onPageLoad(CheckMode)
+        }
+
+        "to CYA when only Email is selected and Email answer exists" in {
+          val answers = emptyUserAnswers
+            .set(CompanyContactMethodOptionsPage, Set(ContactMethodOptions.Email))
+            .success
+            .value
+            .set(CompanyEmailAddressPage, "test@test.com")
+            .success
+            .value
+
+          navigator.nextPage(
+            CompanyContactMethodOptionsPage,
+            CheckMode,
+            answers
+          ) mustBe controllers.add.company.routes.CompanyCheckYourAnswersController.onPageLoad()
+        }
+
+        "to CompanyPhoneNumberPage when Phone is selected (Email is not selected) and Phone answer not exists" in {
+          val answers = emptyUserAnswers
+            .set(
+              CompanyContactMethodOptionsPage,
+              Set(ContactMethodOptions.Phone)
+            )
+            .success
+            .value
+
+          navigator.nextPage(
+            CompanyContactMethodOptionsPage,
+            CheckMode,
+            answers
+          ) mustBe controllers.add.company.routes.CompanyPhoneNumberController.onPageLoad(CheckMode)
+        }
+
+        "to CYA when only Phone is selected and Phone answer exists" in {
+          val answers = emptyUserAnswers
+            .set(CompanyContactMethodOptionsPage, Set(ContactMethodOptions.Phone))
+            .success
+            .value
+            .set(CompanyPhoneNumberPage, "01234567890")
+            .success
+            .value
+
+          navigator.nextPage(
+            CompanyContactMethodOptionsPage,
+            CheckMode,
+            answers
+          ) mustBe controllers.add.company.routes.CompanyCheckYourAnswersController.onPageLoad()
+        }
+
+        "to CYA when only Mobile is selected and Mobile answer exists" in {
+          val answers = emptyUserAnswers
+            .set(CompanyContactMethodOptionsPage, Set(ContactMethodOptions.Mobile))
+            .success
+            .value
+            .set(CompanyMobileNumberPage, "01234567890")
+            .success
+            .value
+
+          navigator.nextPage(
+            CompanyContactMethodOptionsPage,
+            CheckMode,
+            answers
+          ) mustBe controllers.add.company.routes.CompanyCheckYourAnswersController.onPageLoad()
+        }
+
+        "to CompanyPhoneNumberPage when Email and Phone are selected and Email answer exists, Phone answer not exists" in {
+          val answers = emptyUserAnswers
+            .set(CompanyContactMethodOptionsPage, Set(ContactMethodOptions.Email, ContactMethodOptions.Phone))
+            .success
+            .value
+            .set(CompanyEmailAddressPage, "test@test.com")
+            .success
+            .value
+
+          navigator.nextPage(
+            CompanyContactMethodOptionsPage,
+            CheckMode,
+            answers
+          ) mustBe controllers.add.company.routes.CompanyPhoneNumberController.onPageLoad(CheckMode)
+        }
+
+        "to CompanyMobileNumberPage when Email, Phone and Mobile are selected and Email and Phone answer exists, Mobile answer not exists" in {
+          val answers = emptyUserAnswers
+            .set(
+              CompanyContactMethodOptionsPage,
+              Set(ContactMethodOptions.Email, ContactMethodOptions.Phone, ContactMethodOptions.Mobile)
+            )
+            .success
+            .value
+            .set(CompanyEmailAddressPage, "test@test.com")
+            .success
+            .value
+            .set(CompanyPhoneNumberPage, "01234567890")
+            .success
+            .value
+
+          navigator.nextPage(
+            CompanyContactMethodOptionsPage,
+            CheckMode,
+            answers
+          ) mustBe controllers.add.company.routes.CompanyMobileNumberController.onPageLoad(CheckMode)
+        }
+
+        "to JourneyRecovery when answer is not present" in {
+          navigator.nextPage(
+            CompanyContactMethodOptionsPage,
+            CheckMode,
+            emptyUserAnswers
+          ) mustBe journeyRecovery
+        }
       }
 
-      "must go from a CompanyPhoneNumberPage to Company CYA in CheckMode" in {
-        navigator.nextPage(
-          CompanyPhoneNumberPage,
-          CheckMode,
-          emptyUserAnswers
-        ) mustBe CompanyCYA
+      "must go from CompanyEmailAddressPage" - {
+
+        "to CompanyCheckYourAnswers when no missing ContactMethodOptions answer" in {
+          navigator.nextPage(
+            CompanyEmailAddressPage,
+            CheckMode,
+            emptyUserAnswers
+              .setOrException(
+                CompanyContactMethodOptionsPage,
+                Set(ContactMethodOptions.Email, ContactMethodOptions.Phone, ContactMethodOptions.Mobile)
+              )
+              .setOrException(CompanyEmailAddressPage, "test@test.com")
+              .setOrException(CompanyPhoneNumberPage, "1234567")
+              .setOrException(CompanyMobileNumberPage, "1234567")
+          ) mustBe controllers.add.company.routes.CompanyCheckYourAnswersController.onPageLoad()
+        }
+
+        "to CompanyPhoneNumberPage when CompanyPhoneNumber is missing from ContactMethodOptions answer" in {
+          navigator.nextPage(
+            CompanyEmailAddressPage,
+            CheckMode,
+            emptyUserAnswers
+              .setOrException(
+                CompanyContactMethodOptionsPage,
+                Set(ContactMethodOptions.Email, ContactMethodOptions.Phone, ContactMethodOptions.Mobile)
+              )
+              .setOrException(CompanyEmailAddressPage, "test@test.com")
+              .setOrException(CompanyMobileNumberPage, "1234567")
+          ) mustBe controllers.add.company.routes.CompanyPhoneNumberController.onPageLoad(CheckMode)
+        }
+
+        "to CompanyMobileNumberPage when CompanyMobileNumber is missing from ContactMethodOptions answer" in {
+          navigator.nextPage(
+            CompanyEmailAddressPage,
+            CheckMode,
+            emptyUserAnswers
+              .setOrException(
+                CompanyContactMethodOptionsPage,
+                Set(ContactMethodOptions.Email, ContactMethodOptions.Phone, ContactMethodOptions.Mobile)
+              )
+              .setOrException(CompanyEmailAddressPage, "test@test.com")
+              .setOrException(CompanyPhoneNumberPage, "1234567")
+          ) mustBe controllers.add.company.routes.CompanyMobileNumberController.onPageLoad(CheckMode)
+        }
+
+        "to JourneyRecovery when CompanyContactMethodOptions answer is not present" in {
+          navigator.nextPage(
+            CompanyEmailAddressPage,
+            CheckMode,
+            UserAnswers("id")
+          ) mustBe journeyRecovery
+        }
+
+        "to JourneyRecovery when Email is not in the selected CompanyContactMethodOptions" in {
+          navigator.nextPage(
+            CompanyEmailAddressPage,
+            CheckMode,
+            emptyUserAnswers
+              .setOrException(
+                CompanyContactMethodOptionsPage,
+                Set(ContactMethodOptions.Phone, ContactMethodOptions.Mobile)
+              )
+          ) mustBe journeyRecovery
+        }
       }
 
-      "must go from CompanyMobileNumberPage to Company CYA in CheckMode" in {
-        navigator.nextPage(
-          CompanyMobileNumberPage,
-          CheckMode,
-          emptyUserAnswers
-        ) mustBe CompanyCYA
+      "must go from CompanyPhoneNumberPage" - {
+
+        "to CompanyCheckYourAnswers when no missing ContactMethodOptions answer" in {
+          navigator.nextPage(
+            CompanyPhoneNumberPage,
+            CheckMode,
+            emptyUserAnswers
+              .setOrException(
+                CompanyContactMethodOptionsPage,
+                Set(ContactMethodOptions.Email, ContactMethodOptions.Phone, ContactMethodOptions.Mobile)
+              )
+              .setOrException(CompanyEmailAddressPage, "test@test.com")
+              .setOrException(CompanyPhoneNumberPage, "1234567")
+              .setOrException(CompanyMobileNumberPage, "1234567")
+          ) mustBe controllers.add.company.routes.CompanyCheckYourAnswersController.onPageLoad()
+        }
+
+        "to CompanyMobileNumberPage when CompanyMobileNumber is missing from ContactMethodOptions answer" in {
+          navigator.nextPage(
+            CompanyPhoneNumberPage,
+            CheckMode,
+            emptyUserAnswers
+              .setOrException(
+                CompanyContactMethodOptionsPage,
+                Set(ContactMethodOptions.Email, ContactMethodOptions.Phone, ContactMethodOptions.Mobile)
+              )
+              .setOrException(CompanyEmailAddressPage, "test@test.com")
+              .setOrException(CompanyPhoneNumberPage, "1234567")
+          ) mustBe controllers.add.company.routes.CompanyMobileNumberController.onPageLoad(CheckMode)
+        }
+
+        "to JourneyRecovery when CompanyContactMethodOptions answer is not present" in {
+          navigator.nextPage(
+            CompanyPhoneNumberPage,
+            CheckMode,
+            UserAnswers("id")
+          ) mustBe journeyRecovery
+        }
+
+        "to JourneyRecovery when Phone is not in the selected CompanyContactMethodOptions" in {
+          navigator.nextPage(
+            CompanyPhoneNumberPage,
+            CheckMode,
+            emptyUserAnswers
+              .setOrException(
+                CompanyContactMethodOptionsPage,
+                Set(ContactMethodOptions.Email, ContactMethodOptions.Mobile)
+              )
+          ) mustBe journeyRecovery
+        }
+      }
+
+      "must go from CompanyMobileNumberPage" - {
+
+        "to CompanyCheckYourAnswers" in {
+          navigator.nextPage(
+            CompanyMobileNumberPage,
+            CheckMode,
+            emptyUserAnswers
+              .setOrException(
+                CompanyContactMethodOptionsPage,
+                Set(ContactMethodOptions.Email, ContactMethodOptions.Phone, ContactMethodOptions.Mobile)
+              )
+              .setOrException(CompanyEmailAddressPage, "test@test.com")
+              .setOrException(CompanyPhoneNumberPage, "1234567")
+              .setOrException(CompanyMobileNumberPage, "1234567")
+          ) mustBe controllers.add.company.routes.CompanyCheckYourAnswersController.onPageLoad()
+        }
+
+        "to JourneyRecovery when CompanyContactMethodOptions answer is not present" in {
+          navigator.nextPage(
+            CompanyMobileNumberPage,
+            CheckMode,
+            UserAnswers("id")
+          ) mustBe journeyRecovery
+        }
+
+        "to JourneyRecovery when Mobile is not in the selected CompanyContactMethodOptions" in {
+          navigator.nextPage(
+            CompanyMobileNumberPage,
+            CheckMode,
+            emptyUserAnswers
+              .setOrException(
+                CompanyContactMethodOptionsPage,
+                Set(ContactMethodOptions.Email, ContactMethodOptions.Phone)
+              )
+          ) mustBe journeyRecovery
+        }
       }
 
       "must go from CompanyUtrYesNo" - {
@@ -968,37 +1285,6 @@ class CompanyNavigatorSpec extends SpecBase {
           CheckMode,
           emptyUserAnswers
         ) mustBe CompanyCYA
-      }
-
-      "must go from AddCompanyContactMethodsYesNo" - {
-        "to AddCompanyContactMethodsYesNo page when answer is Yes" in {
-          val answers = emptyUserAnswers.set(AddCompanyContactMethodsYesNoPage, true).success.value
-
-          navigator.nextPage(
-            AddCompanyContactMethodsYesNoPage,
-            CheckMode,
-            answers
-          ) mustBe controllers.add.company.routes.AddCompanyContactMethodsYesNoController
-            .onPageLoad(CheckMode)
-        }
-
-        "to CYA when answer is No" in {
-          val answers = emptyUserAnswers.set(AddCompanyContactMethodsYesNoPage, false).success.value
-
-          navigator.nextPage(
-            AddCompanyContactMethodsYesNoPage,
-            CheckMode,
-            answers
-          ) mustBe CompanyCYA
-        }
-
-        "to JourneyRecovery when answer is not present" in {
-          navigator.nextPage(
-            AddCompanyContactMethodsYesNoPage,
-            CheckMode,
-            emptyUserAnswers
-          ) mustBe journeyRecovery
-        }
       }
     }
   }

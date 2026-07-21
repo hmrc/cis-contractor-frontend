@@ -86,9 +86,11 @@ class TrustNavigator @Inject() () extends NavigatorForJourney {
   }
 
   private val amendRouteMap: Page => UserAnswers => Call = {
-    case TrustWorksReferenceYesNoPage => navigatorFromTrustWorksReferenceYesNoPage(AmendMode)(_)
-    case TrustUtrYesNoPage            => navigatorFromTrustUtrYesNoPage(AmendMode)(_)
-    case _                            => _ => cyaRoute(AmendMode)
+    case TrustAddressYesNoPage           => navigatorFromTrustAddressYesNoPage(AmendMode)(_)
+    case AddTrustContactMethodsYesNoPage => navigatorFromAddTrustContactMethodsYesNoPage(AmendMode)(_)
+    case TrustWorksReferenceYesNoPage    => navigatorFromTrustWorksReferenceYesNoPage(AmendMode)(_)
+    case TrustUtrYesNoPage               => navigatorFromTrustUtrYesNoPage(AmendMode)(_)
+    case _                               => _ => cyaRoute(AmendMode)
   }
 
   private def navigatorFromTrustUtrYesNoPage(mode: Mode)(ua: UserAnswers): Call =
@@ -108,16 +110,28 @@ class TrustNavigator @Inject() () extends NavigatorForJourney {
     }
 
   private def navigatorFromTrustAddressYesNoPage(mode: Mode)(ua: UserAnswers): Call =
-    addressLookupYesNoRoute(
-      mode,
-      ua.get(TrustAddressYesNoPage),
-      ua.get(TrustAddressPage).isDefined,
-      onYes = controllers.add.trust.routes.TrustAddressController.redirectToAddressLookup(),
-      onYesChange =
-        controllers.add.trust.routes.TrustAddressController.redirectToAddressLookup(Some(CheckMode.toString)),
-      onNo = controllers.add.trust.routes.AddTrustContactMethodsYesNoController.onPageLoad(NormalMode),
-      checkYourAnswers = controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
-    )
+    mode match {
+      case AmendMode =>
+        ua.get(TrustAddressYesNoPage) match {
+          case Some(true)  =>
+            controllers.add.trust.routes.TrustAddressController.redirectToAmendAddressLookup()
+          case Some(false) =>
+            controllers.routes.JourneyRecoveryController.onPageLoad() // TODO redirect to amend CYA page
+          case None        =>
+            controllers.routes.JourneyRecoveryController.onPageLoad()
+        }
+      case _         =>
+        addressLookupYesNoRoute(
+          mode,
+          ua.get(TrustAddressYesNoPage),
+          ua.get(TrustAddressPage).isDefined,
+          onYes = controllers.add.trust.routes.TrustAddressController.redirectToAddressLookup(),
+          onYesChange =
+            controllers.add.trust.routes.TrustAddressController.redirectToAddressLookup(Some(CheckMode.toString)),
+          onNo = controllers.add.trust.routes.AddTrustContactMethodsYesNoController.onPageLoad(NormalMode),
+          checkYourAnswers = controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
+        )
+    }
 
   private def navigatorFromTrustWorksReferenceYesNoPage(mode: Mode)(ua: UserAnswers): Call =
     (ua.get(TrustWorksReferenceYesNoPage), mode) match {
@@ -145,14 +159,14 @@ class TrustNavigator @Inject() () extends NavigatorForJourney {
       case (Some(false), NormalMode) =>
         controllers.add.trust.routes.TrustUtrYesNoController.onPageLoad(NormalMode)
 
-      case (Some(true), CheckMode) =>
+      case (Some(true), CheckMode | AmendMode) =>
         ua.get(TrustContactMethodOptionsPage)
-          .fold(controllers.add.trust.routes.TrustContactMethodOptionsController.onPageLoad(CheckMode)) { _ =>
-            controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
+          .fold(controllers.add.trust.routes.TrustContactMethodOptionsController.onPageLoad(mode)) { _ =>
+            cyaRoute(mode)
           }
 
-      case (Some(false), CheckMode) =>
-        controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
+      case (Some(false), CheckMode | AmendMode) =>
+        cyaRoute(mode)
 
       case _ =>
         routes.JourneyRecoveryController.onPageLoad()

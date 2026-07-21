@@ -23,7 +23,7 @@ import models.TypeOfSubcontractor.Trust
 import models.UserAnswers
 import models.address.{Address, Country}
 import models.amend.trust.OriginalTrustAnswers
-import models.contact.ContactMethodOptions.{Email, Phone}
+import models.contact.ContactMethodOptions.{Email, Mobile, Phone}
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{never, times, verify, when}
@@ -67,6 +67,7 @@ class AmendTrustControllerSpec extends SpecBase with MockitoSugar {
   private val trustName            = "test trust"
   private val emailAddress         = "test@example.com"
   private val phoneNumber          = "1234567890"
+  private val mobileNumber         = "6454543667"
   private val utr                  = "1123456789"
   private val worksReference       = "XLS345-MM"
   private val expectedAddress      = Address(
@@ -84,10 +85,10 @@ class AmendTrustControllerSpec extends SpecBase with MockitoSugar {
       addressYesNo = Some(true),
       address = Some(expectedAddress),
       trustContactMethodsYesNo = Some(true),
-      trustContactMethod = Set(Email, Phone),
+      trustContactMethod = Set(Email, Phone, Mobile),
       email = Some(emailAddress),
       phone = Some(phoneNumber),
-      mobile = None,
+      mobile = Some(mobileNumber),
       utrYesNo = Some(true),
       utr = Some(utr),
       worksReferenceYesNo = Some(true),
@@ -151,10 +152,11 @@ class AmendTrustControllerSpec extends SpecBase with MockitoSugar {
           savedAnswers.get(TrustAddressPage).value mustBe expectedAddress
 
           savedAnswers.get(AddTrustContactMethodsYesNoPage).value mustBe true
-          savedAnswers.get(TrustContactMethodOptionsPage).value mustBe Set(Email, Phone)
+          savedAnswers.get(TrustContactMethodOptionsPage).value mustBe Set(Email, Phone, Mobile)
 
           savedAnswers.get(TrustEmailAddressPage).value mustBe emailAddress
           savedAnswers.get(TrustPhoneNumberPage).value mustBe phoneNumber
+          savedAnswers.get(TrustMobileNumberPage).value mustBe mobileNumber
 
           savedAnswers.get(TrustUtrYesNoPage).value mustBe true
           savedAnswers.get(TrustUtrPage).value mustBe utr
