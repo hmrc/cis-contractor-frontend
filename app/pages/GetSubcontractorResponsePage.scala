@@ -20,8 +20,7 @@ import models.response.GetSubcontractorResponse
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 
-case object GetSubcontractorResponsePage
-  extends QuestionPage[GetSubcontractorResponse] {
+case object GetSubcontractorResponsePage extends QuestionPage[GetSubcontractorResponse] {
 
   override def path: JsPath =
     JsPath \ toString

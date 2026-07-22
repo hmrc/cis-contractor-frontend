@@ -109,9 +109,9 @@ class GetSubcontractorResponseSpec extends AnyWordSpec with Matchers {
 
     "read JSON into a GetSubcontractorResponse" in {
       val json = Json.obj(
-        "scheme" -> Json.toJson(scheme),
+        "scheme"        -> Json.toJson(scheme),
         "subcontractor" -> Json.toJson(subcontractor),
-        "otherInfo" -> Json.arr(
+        "otherInfo"     -> Json.arr(
           Json.toJson(otherInfo)
         )
       )
@@ -121,9 +121,9 @@ class GetSubcontractorResponseSpec extends AnyWordSpec with Matchers {
 
     "read JSON when scheme and subcontractor are null" in {
       val json = Json.obj(
-        "scheme" -> Json.toJson(Option.empty[ContractorSchemeResponse]),
+        "scheme"        -> Json.toJson(Option.empty[ContractorSchemeResponse]),
         "subcontractor" -> Json.toJson(Option.empty[SubcontractorResponse]),
-        "otherInfo" -> Json.arr()
+        "otherInfo"     -> Json.arr()
       )
 
       json.validate[GetSubcontractorResponse] mustBe JsSuccess(

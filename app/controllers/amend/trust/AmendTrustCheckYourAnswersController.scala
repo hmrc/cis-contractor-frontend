@@ -27,7 +27,7 @@ class AmendTrustCheckYourAnswersController @Inject() (
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   val controllerComponents: MessagesControllerComponents
- ) extends FrontendBaseController {
+) extends FrontendBaseController {
 
   def onPageLoad(): Action[AnyContent] =
     (identify andThen getData andThen requireData) { _ =>
@@ -37,8 +37,7 @@ class AmendTrustCheckYourAnswersController @Inject() (
   def onSubmit(): Action[AnyContent] =
     (identify andThen getData andThen requireData) { _ =>
       Redirect(
-        controllers.amend.trust.routes
-          .AmendTrustCheckYourAnswersController
+        controllers.amend.trust.routes.AmendTrustCheckYourAnswersController
           .onPageLoad()
       )
     }

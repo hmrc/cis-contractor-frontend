@@ -23,14 +23,12 @@ import play.api.test.Helpers.*
 class AmendTrustCheckYourAnswersControllerSpec extends SpecBase {
 
   private lazy val onPageLoadRoute =
-    controllers.amend.trust.routes
-      .AmendTrustCheckYourAnswersController
+    controllers.amend.trust.routes.AmendTrustCheckYourAnswersController
       .onPageLoad()
       .url
 
   private lazy val onSubmitRoute =
-    controllers.amend.trust.routes
-      .AmendTrustCheckYourAnswersController
+    controllers.amend.trust.routes.AmendTrustCheckYourAnswersController
       .onSubmit()
       .url
 

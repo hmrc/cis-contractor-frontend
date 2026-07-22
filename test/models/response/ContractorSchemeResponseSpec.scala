@@ -70,22 +70,22 @@ class ContractorSchemeResponseSpec extends AnyWordSpec with Matchers {
 
     "read JSON into a ContractorSchemeResponse" in {
       val json = Json.obj(
-        "schemeId" -> 123,
-        "instanceId" -> "INST-123",
-        "accountsOfficeReference" -> "123PA00123456",
-        "taxOfficeNumber" -> "123",
-        "taxOfficeReference" -> "AB45678",
-        "utr" -> "1234567890",
-        "name" -> "Test Contractor",
-        "emailAddress" -> "contractor@example.com",
-        "displayWelcomePage" -> "Y",
-        "prePopCount" -> 10,
-        "prePopSuccessful" -> "Y",
-        "subcontractorCounter" -> 20,
+        "schemeId"                 -> 123,
+        "instanceId"               -> "INST-123",
+        "accountsOfficeReference"  -> "123PA00123456",
+        "taxOfficeNumber"          -> "123",
+        "taxOfficeReference"       -> "AB45678",
+        "utr"                      -> "1234567890",
+        "name"                     -> "Test Contractor",
+        "emailAddress"             -> "contractor@example.com",
+        "displayWelcomePage"       -> "Y",
+        "prePopCount"              -> 10,
+        "prePopSuccessful"         -> "Y",
+        "subcontractorCounter"     -> 20,
         "verificationBatchCounter" -> 5,
-        "createDate" -> createDate,
-        "lastUpdate" -> lastUpdate,
-        "version" -> 3
+        "createDate"               -> createDate,
+        "lastUpdate"               -> lastUpdate,
+        "version"                  -> 3
       )
 
       json.validate[ContractorSchemeResponse] mustBe JsSuccess(model)
@@ -93,11 +93,11 @@ class ContractorSchemeResponseSpec extends AnyWordSpec with Matchers {
 
     "read JSON when optional fields are missing" in {
       val json = Json.obj(
-        "schemeId" -> 123,
-        "instanceId" -> "INST-123",
+        "schemeId"                -> 123,
+        "instanceId"              -> "INST-123",
         "accountsOfficeReference" -> "123PA00123456",
-        "taxOfficeNumber" -> "123",
-        "taxOfficeReference" -> "AB45678"
+        "taxOfficeNumber"         -> "123",
+        "taxOfficeReference"      -> "AB45678"
       )
 
       val result = json.validate[ContractorSchemeResponse]

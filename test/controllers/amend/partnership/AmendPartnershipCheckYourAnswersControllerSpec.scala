@@ -23,14 +23,12 @@ import play.api.test.Helpers.*
 class AmendPartnershipCheckYourAnswersControllerSpec extends SpecBase {
 
   private lazy val onPageLoadRoute =
-    controllers.amend.partnership.routes
-      .AmendPartnershipCheckYourAnswersController
+    controllers.amend.partnership.routes.AmendPartnershipCheckYourAnswersController
       .onPageLoad()
       .url
 
   private lazy val onSubmitRoute =
-    controllers.amend.partnership.routes
-      .AmendPartnershipCheckYourAnswersController
+    controllers.amend.partnership.routes.AmendPartnershipCheckYourAnswersController
       .onSubmit()
       .url
 

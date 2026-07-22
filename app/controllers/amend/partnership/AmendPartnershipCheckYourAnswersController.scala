@@ -23,10 +23,10 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import javax.inject.Inject
 
 class AmendPartnershipCheckYourAnswersController @Inject() (
-   identify: IdentifierAction,
-   getData: DataRetrievalAction,
-   requireData: DataRequiredAction,
-   val controllerComponents: MessagesControllerComponents
+  identify: IdentifierAction,
+  getData: DataRetrievalAction,
+  requireData: DataRequiredAction,
+  val controllerComponents: MessagesControllerComponents
 ) extends FrontendBaseController {
 
   def onPageLoad(): Action[AnyContent] =
@@ -37,8 +37,7 @@ class AmendPartnershipCheckYourAnswersController @Inject() (
   def onSubmit(): Action[AnyContent] =
     (identify andThen getData andThen requireData) { _ =>
       Redirect(
-        controllers.amend.partnership.routes
-          .AmendPartnershipCheckYourAnswersController
+        controllers.amend.partnership.routes.AmendPartnershipCheckYourAnswersController
           .onPageLoad()
       )
     }

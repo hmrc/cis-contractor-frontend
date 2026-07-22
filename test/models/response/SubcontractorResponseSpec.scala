@@ -30,12 +30,12 @@ class SubcontractorResponseSpec extends AnyWordSpec with Matchers {
   private val lastReturnDate   = LocalDateTime.of(2026, 1, 20, 0, 0)
 
   private def subcontractor(
-                             subcontractorType: Option[String] = Some("soletrader"),
-                             firstName: Option[String] = Some("Martin"),
-                             surname: Option[String] = Some("Brody"),
-                             tradingName: Option[String] = Some("Brody Trading"),
-                             partnershipTradingName: Option[String] = None
-                           ): SubcontractorResponse =
+    subcontractorType: Option[String] = Some("soletrader"),
+    firstName: Option[String] = Some("Martin"),
+    surname: Option[String] = Some("Brody"),
+    tradingName: Option[String] = Some("Brody Trading"),
+    partnershipTradingName: Option[String] = None
+  ): SubcontractorResponse =
     SubcontractorResponse(
       subcontractorId = 1L,
       utr = Some("1234567890"),

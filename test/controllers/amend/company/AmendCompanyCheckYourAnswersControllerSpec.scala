@@ -23,14 +23,12 @@ import play.api.test.Helpers.*
 class AmendCompanyCheckYourAnswersControllerSpec extends SpecBase {
 
   private lazy val onPageLoadRoute =
-    controllers.amend.company.routes
-      .AmendCompanyCheckYourAnswersController
+    controllers.amend.company.routes.AmendCompanyCheckYourAnswersController
       .onPageLoad()
       .url
 
   private lazy val onSubmitRoute =
-    controllers.amend.company.routes
-      .AmendCompanyCheckYourAnswersController
+    controllers.amend.company.routes.AmendCompanyCheckYourAnswersController
       .onSubmit()
       .url
 

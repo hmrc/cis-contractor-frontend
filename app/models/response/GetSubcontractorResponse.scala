@@ -16,15 +16,13 @@
 
 package models.response
 
-
 import play.api.libs.json.{Json, OFormat}
 
-
 final case class GetSubcontractorResponse(
-                                           scheme: Option[ContractorSchemeResponse],
-                                           subcontractor: Option[SubcontractorResponse],
-                                           otherInfo: Seq[GetSubcontractorOtherInfo]
-                                         )
+  scheme: Option[ContractorSchemeResponse],
+  subcontractor: Option[SubcontractorResponse],
+  otherInfo: Seq[GetSubcontractorOtherInfo]
+)
 
 object GetSubcontractorResponse {
   given format: OFormat[GetSubcontractorResponse] =
@@ -32,8 +30,8 @@ object GetSubcontractorResponse {
 }
 
 final case class GetSubcontractorOtherInfo(
-                                            utr: String
-                                          )
+  utr: String
+)
 
 object GetSubcontractorOtherInfo {
   given format: OFormat[GetSubcontractorOtherInfo] =

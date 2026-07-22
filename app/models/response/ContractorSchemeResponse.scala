@@ -16,29 +16,27 @@
 
 package models.response
 
-
 import play.api.libs.json.{Json, OFormat}
 import java.time.Instant
 case class ContractorSchemeResponse(
-                             schemeId: Int,
-                             instanceId: String,
-                             accountsOfficeReference: String,
-                             taxOfficeNumber: String,
-                             taxOfficeReference: String,
-                             utr: Option[String] = None,
-                             name: Option[String] = None,
-                             emailAddress: Option[String] = None,
-                             displayWelcomePage: Option[String] = None,
-                             prePopCount: Option[Int] = None,
-                             prePopSuccessful: Option[String] = None,
-                             subcontractorCounter: Option[Int] = None,
-                             verificationBatchCounter: Option[Int] = None,
-                             createDate: Option[Instant] = None,
-                             lastUpdate: Option[Instant] = None,
-                             version: Option[Int] = None
-                           )
+  schemeId: Int,
+  instanceId: String,
+  accountsOfficeReference: String,
+  taxOfficeNumber: String,
+  taxOfficeReference: String,
+  utr: Option[String] = None,
+  name: Option[String] = None,
+  emailAddress: Option[String] = None,
+  displayWelcomePage: Option[String] = None,
+  prePopCount: Option[Int] = None,
+  prePopSuccessful: Option[String] = None,
+  subcontractorCounter: Option[Int] = None,
+  verificationBatchCounter: Option[Int] = None,
+  createDate: Option[Instant] = None,
+  lastUpdate: Option[Instant] = None,
+  version: Option[Int] = None
+)
 
 object ContractorSchemeResponse {
   given OFormat[ContractorSchemeResponse] = Json.format[ContractorSchemeResponse]
 }
-
