@@ -19,7 +19,7 @@ package connectors
 import models.TypeOfSubcontractor
 import models.requests.CreateAndUpdateSubcontractorPayload
 import models.requests.CreateAndUpdateSubcontractorPayload.*
-import models.response.{GetCurrentVerificationBatchResponse, GetNewestVerificationBatchResponse}
+import models.response.{GetCurrentVerificationBatchResponse, GetNewestVerificationBatchResponse, GetSubcontractorResponse}
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{verify, when}
@@ -378,6 +378,184 @@ class ConstructionIndustrySchemeConnectorSpec extends AnyWordSpec with Matchers 
       val bodyCaptor: ArgumentCaptor[JsValue] = ArgumentCaptor.forClass(classOf[JsValue])
       verify(rb).withBody(bodyCaptor.capture())(any(), any(), any())
       bodyCaptor.getValue mustBe Json.toJson(req)
+    }
+  }
+
+  "ConstructionIndustrySchemeConnector.getSubcontractor" should {
+
+    val cisId             = "INST-123"
+    val subbieResourceRef = 1001L
+
+    "GET the subcontractor using the cisId and subbieResourceRef and return the response" in {
+      val config = mock[ServicesConfig]
+      val http   = mock[HttpClientV2]
+      val rb     = mock[RequestBuilder]
+
+      when(
+        config.baseUrl("construction-industry-scheme")
+      ).thenReturn("http://cis-host")
+
+      when(http.get(any())(any()))
+        .thenReturn(rb)
+
+      val expected =
+        GetSubcontractorResponse(
+          scheme = None,
+          subcontractor = None,
+          otherInfo = Seq.empty
+        )
+
+      when(
+        rb.execute[GetSubcontractorResponse](any(), any())
+      ).thenReturn(
+        Future.successful(expected)
+      )
+
+      val connector =
+        new ConstructionIndustrySchemeConnector(config, http)
+
+      val result =
+        connector
+          .getSubcontractor(cisId, subbieResourceRef)
+          .futureValue
+
+      result mustBe expected
+
+      val urlCaptor =
+        ArgumentCaptor.forClass(classOf[URL])
+
+      verify(http)
+        .get(urlCaptor.capture())(any[HeaderCarrier])
+
+      urlCaptor.getValue.toString mustBe
+        "http://cis-host/cis/subcontractor/INST-123/1001"
+
+      verify(rb)
+        .execute[GetSubcontractorResponse](any(), any())
+    }
+
+    "return a response containing no subcontractor" in {
+      val config = mock[ServicesConfig]
+      val http   = mock[HttpClientV2]
+      val rb     = mock[RequestBuilder]
+
+      when(
+        config.baseUrl("construction-industry-scheme")
+      ).thenReturn("http://cis-host")
+
+      when(http.get(any())(any()))
+        .thenReturn(rb)
+
+      val expected =
+        GetSubcontractorResponse(
+          scheme = None,
+          subcontractor = None,
+          otherInfo = Seq.empty
+        )
+
+      when(
+        rb.execute[GetSubcontractorResponse](any(), any())
+      ).thenReturn(
+        Future.successful(expected)
+      )
+
+      val connector =
+        new ConstructionIndustrySchemeConnector(config, http)
+
+      val result =
+        connector
+          .getSubcontractor(cisId, subbieResourceRef)
+          .futureValue
+
+      result.subcontractor mustBe None
+      result.scheme mustBe None
+      result.otherInfo mustBe empty
+    }
+
+    "propagate a failed HTTP request" in {
+      val config = mock[ServicesConfig]
+      val http   = mock[HttpClientV2]
+      val rb     = mock[RequestBuilder]
+
+      when(
+        config.baseUrl("construction-industry-scheme")
+      ).thenReturn("http://cis-host")
+
+      when(http.get(any())(any()))
+        .thenReturn(rb)
+
+      when(
+        rb.execute[GetSubcontractorResponse](any(), any())
+      ).thenReturn(
+        Future.failed(
+          new RuntimeException("CIS request failed")
+        )
+      )
+
+      val connector =
+        new ConstructionIndustrySchemeConnector(config, http)
+
+      val exception =
+        connector
+          .getSubcontractor(cisId, subbieResourceRef)
+          .failed
+          .futureValue
+
+      exception.getMessage mustBe "CIS request failed"
+
+      val urlCaptor =
+        ArgumentCaptor.forClass(classOf[URL])
+
+      verify(http)
+        .get(urlCaptor.capture())(any[HeaderCarrier])
+
+      urlCaptor.getValue.toString mustBe
+        "http://cis-host/cis/subcontractor/INST-123/1001"
+    }
+
+    "include a different cisId and subbieResourceRef in the URL" in {
+      val config = mock[ServicesConfig]
+      val http   = mock[HttpClientV2]
+      val rb     = mock[RequestBuilder]
+
+      when(
+        config.baseUrl("construction-industry-scheme")
+      ).thenReturn("http://cis-host")
+
+      when(http.get(any())(any()))
+        .thenReturn(rb)
+
+      val expected =
+        GetSubcontractorResponse(
+          scheme = None,
+          subcontractor = None,
+          otherInfo = Seq.empty
+        )
+
+      when(
+        rb.execute[GetSubcontractorResponse](any(), any())
+      ).thenReturn(
+        Future.successful(expected)
+      )
+
+      val connector =
+        new ConstructionIndustrySchemeConnector(config, http)
+
+      connector
+        .getSubcontractor(
+          cisId = "CIS-999",
+          subbieResourceRef = 8888L
+        )
+        .futureValue
+
+      val urlCaptor =
+        ArgumentCaptor.forClass(classOf[URL])
+
+      verify(http)
+        .get(urlCaptor.capture())(any[HeaderCarrier])
+
+      urlCaptor.getValue.toString mustBe
+        "http://cis-host/cis/subcontractor/CIS-999/8888"
     }
   }
 }

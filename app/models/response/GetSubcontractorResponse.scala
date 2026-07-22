@@ -14,19 +14,26 @@
  * limitations under the License.
  */
 
-package pages.add
+package models.response
 
-import models.add.IndividualChooseContactDetails
-import pages.behaviours.PageBehaviours
+import play.api.libs.json.{Json, OFormat}
 
-class IndividualChooseContactDetailsPageSpec extends PageBehaviours {
+final case class GetSubcontractorResponse(
+  scheme: Option[ContractorSchemeResponse],
+  subcontractor: Option[SubcontractorResponse],
+  otherInfo: Seq[GetSubcontractorOtherInfo]
+)
 
-  "IndividualChooseContactDetailsPage" - {
+object GetSubcontractorResponse {
+  given format: OFormat[GetSubcontractorResponse] =
+    Json.format[GetSubcontractorResponse]
+}
 
-    beRetrievable[IndividualChooseContactDetails](IndividualChooseContactDetailsPage)
+final case class GetSubcontractorOtherInfo(
+  utr: String
+)
 
-    beSettable[IndividualChooseContactDetails](IndividualChooseContactDetailsPage)
-
-    beRemovable[IndividualChooseContactDetails](IndividualChooseContactDetailsPage)
-  }
+object GetSubcontractorOtherInfo {
+  given format: OFormat[GetSubcontractorOtherInfo] =
+    Json.format[GetSubcontractorOtherInfo]
 }

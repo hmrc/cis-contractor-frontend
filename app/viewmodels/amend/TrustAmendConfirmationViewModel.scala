@@ -19,8 +19,7 @@ package viewmodels.amend
 import models.UserAnswers
 import models.address.Address
 import models.amend.trust.OriginalTrustAnswers
-import models.contact.ContactOptions.*
-import models.contact.{ContactMethodOptions, ContactOptions}
+import models.contact.ContactMethodOptions
 import pages.QuestionPage
 import pages.add.*
 import pages.add.trust.*

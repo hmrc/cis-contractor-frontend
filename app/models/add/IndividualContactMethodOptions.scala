@@ -16,15 +16,15 @@
 
 package models.add
 
-import models.contact.ContactOptions
+import models.contact.ContactMethodOptions
 import play.api.i18n.Messages
-import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.RadioItem
+import uk.gov.hmrc.govukfrontend.views.viewmodels.checkboxes.CheckboxItem
 
-type IndividualChooseContactDetails = ContactOptions
+type IndividualContactMethodOptions = ContactMethodOptions
 
-object IndividualChooseContactDetails {
-  val values: Seq[IndividualChooseContactDetails] = ContactOptions.values
+object IndividualContactMethodOptions {
+  val values: Seq[IndividualContactMethodOptions] = ContactMethodOptions.values
 
-  def options(implicit messages: Messages): Seq[RadioItem] =
-    ContactOptions.options("individualChooseContactDetails")
+  def checkboxItems(implicit messages: Messages): Seq[CheckboxItem] =
+    ContactMethodOptions.checkboxItems("individualContactMethodOptions")
 }

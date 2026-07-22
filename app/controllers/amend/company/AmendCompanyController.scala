@@ -17,83 +17,159 @@
 package controllers.amend.company
 
 import controllers.actions.*
+import models.TypeOfSubcontractor.Limitedcompany
 import models.UserAnswers
 import models.address.{Address, Country}
 import models.amend.company.OriginalCompanyAnswers
+import models.contact.ContactMethodOptions
+import models.response.SubcontractorResponse
 import pages.add.*
 import pages.add.company.*
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.Logging
+import play.api.libs.json.Writes
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import queries.{CisIdQuery, OriginalCompanyAnswersQuery}
 import repositories.SessionRepository
+import services.SubcontractorService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
-import models.TypeOfSubcontractor.Limitedcompany
-import models.contact.ContactMethodOptions
 
-// TODO: replace demo data with real backend fetch
 class AmendCompanyController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
+  subcontractorService: SubcontractorService,
   sessionRepository: SessionRepository,
   val controllerComponents: MessagesControllerComponents
 )(implicit ec: ExecutionContext)
-    extends FrontendBaseController {
-  private val companyName    = "test company"
-  private val emailAddress   = "test@example.com"
-  private val utr            = "7777777777"
-  private val crn            = "AC012345"
-  private val worksReference = "XLS345-MM"
-  private val companyAddress = Address(
-    addressLine1 = "12 Harbor View Road",
-    addressLine2 = Some("Amity Island"),
-    addressLine3 = Some("Bodmin"),
-    addressLine4 = Some("Cornwall"),
-    postcode = Some("PL31 2HL"),
-    country = Some(Country(code = None, name = Some("England")))
-  )
+    extends FrontendBaseController
+    with Logging {
 
-  private val companyOriginal                                          = OriginalCompanyAnswers(
-    companyName = Some(companyName),
-    address = Some(companyAddress),
-    companyContactMethod = Some(Set(ContactMethodOptions.Email)),
-    email = Some(emailAddress),
-    phone = None,
-    mobile = None,
-    utr = Some(utr),
-    crn = Some(crn),
-    worksReference = Some(worksReference)
-  )
-  protected def populateUserAnswers(ua: UserAnswers): Try[UserAnswers] = for {
-    ua <- ua.set(TypeOfSubcontractorPage, Limitedcompany)
-    ua <- ua.set(CompanyNamePage, companyName)
-    ua <- ua.set(CompanyAddressYesNoPage, true)
-    ua <- ua.set(CompanyAddressPage, companyAddress)
-    ua <- ua.set(AddCompanyContactMethodsYesNoPage, true)
-    ua <- ua.set(CompanyContactMethodOptionsPage, Set(ContactMethodOptions.Email))
-    ua <- ua.set(CompanyEmailAddressPage, emailAddress)
-    ua <- ua.set(CompanyUtrYesNoPage, true)
-    ua <- ua.set(CompanyUtrPage, utr)
-    ua <- ua.set(CompanyCrnYesNoPage, true)
-    ua <- ua.set(CompanyCrnPage, crn)
-    ua <- ua.set(CompanyWorksReferenceYesNoPage, true)
-    ua <- ua.set(CompanyWorksReferencePage, worksReference)
-    ua <- ua.set(CisIdQuery, "1")
-    ua <- ua.set(OriginalCompanyAnswersQuery, companyOriginal)
-  } yield ua
+  private def recovery: Result =
+    Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
 
-  def onPageLoad(): Action[AnyContent] = (identify andThen getData andThen requireData).async { implicit request =>
-    populateUserAnswers(request.userAnswers).fold(
-      _ => Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())),
-      ua =>
-        sessionRepository
-          .set(ua)
-          .map(_ =>
-            Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-          ) // TODO - redirect to [Amend Company] Subcontractor details
-    )
+  def onPageLoad(
+    cisId: String,
+    subbieResourceRef: Long
+  ): Action[AnyContent] =
+    (identify andThen getData andThen requireData).async { implicit request =>
+      subcontractorService
+        .getSubcontractor(cisId, subbieResourceRef)
+        .flatMap { response =>
+          response.subcontractor match {
+            case None =>
+              logger.error(
+                s"[AmendCompanyController] No subcontractor returned for " +
+                  s"cisId=$cisId, subbieResourceRef=$subbieResourceRef"
+              )
+
+              Future.successful(recovery)
+
+            case Some(subcontractor) =>
+              populateUserAnswers(
+                request.userAnswers,
+                cisId,
+                subcontractor
+              ).fold(
+                _ => Future.successful(recovery),
+                updatedAnswers =>
+                  sessionRepository
+                    .set(updatedAnswers)
+                    .map(_ =>
+                      Redirect(
+                        controllers.amend.company.routes.AmendCompanyCheckYourAnswersController
+                          .onPageLoad()
+                      )
+                    )
+              )
+          }
+        }
+        .recover { case error =>
+          logger.error(
+            s"[AmendCompanyController] Failed to retrieve subcontractor. " +
+              s"cisId=$cisId, subbieResourceRef=$subbieResourceRef",
+            error
+          )
+          recovery
+        }
+    }
+
+  protected def populateUserAnswers(
+    userAnswers: UserAnswers,
+    cisId: String,
+    subcontractor: SubcontractorResponse
+  ): Try[UserAnswers] = {
+    val address = toAddress(subcontractor)
+    val methods = contactMethods(subcontractor)
+
+    val originalAnswers =
+      OriginalCompanyAnswers(
+        companyName = subcontractor.tradingName,
+        address = address,
+        companyContactMethod = Option.when(methods.nonEmpty)(methods),
+        email = subcontractor.emailAddress,
+        phone = subcontractor.phoneNumber,
+        mobile = subcontractor.mobilePhoneNumber,
+        crn = subcontractor.crn,
+        utr = subcontractor.utr,
+        worksReference = subcontractor.worksReferenceNumber
+      )
+
+    for {
+      updated <- userAnswers.set(TypeOfSubcontractorPage, Limitedcompany)
+      updated <- setOptional(updated, CompanyNamePage, subcontractor.tradingName)
+      updated <- updated.set(CompanyAddressYesNoPage, address.isDefined)
+      updated <- setOptional(updated, CompanyAddressPage, address)
+      updated <- updated.set(AddCompanyContactMethodsYesNoPage, methods.nonEmpty)
+      updated <- if (methods.nonEmpty) updated.set(CompanyContactMethodOptionsPage, methods) else Try(updated)
+      updated <- setOptional(updated, CompanyEmailAddressPage, subcontractor.emailAddress)
+      updated <- setOptional(updated, CompanyPhoneNumberPage, subcontractor.phoneNumber)
+      updated <- setOptional(updated, CompanyMobileNumberPage, subcontractor.mobilePhoneNumber)
+      updated <- updated.set(CompanyUtrYesNoPage, subcontractor.utr.isDefined)
+      updated <- setOptional(updated, CompanyUtrPage, subcontractor.utr)
+      updated <- updated.set(CompanyCrnYesNoPage, subcontractor.crn.isDefined)
+      updated <- setOptional(updated, CompanyCrnPage, subcontractor.crn)
+      updated <- updated.set(CompanyWorksReferenceYesNoPage, subcontractor.worksReferenceNumber.isDefined)
+      updated <- setOptional(updated, CompanyWorksReferencePage, subcontractor.worksReferenceNumber)
+      updated <- updated.set(CisIdQuery, cisId)
+      updated <- updated.set(OriginalCompanyAnswersQuery, originalAnswers)
+    } yield updated
   }
+
+  private def contactMethods(
+    subcontractor: SubcontractorResponse
+  ): Set[ContactMethodOptions] =
+    Set(
+      subcontractor.emailAddress.map(_ => ContactMethodOptions.Email),
+      subcontractor.phoneNumber.map(_ => ContactMethodOptions.Phone),
+      subcontractor.mobilePhoneNumber.map(_ => ContactMethodOptions.Mobile)
+    ).flatten
+
+  private def toAddress(subcontractor: SubcontractorResponse): Option[Address] =
+    subcontractor.addressLine1.map { line1 =>
+      Address(
+        addressLine1 = line1,
+        addressLine2 = subcontractor.addressLine2,
+        addressLine3 = subcontractor.addressLine3,
+        addressLine4 = subcontractor.addressLine4,
+        postcode = subcontractor.postcode,
+        country = subcontractor.country.map(name => Country(None, Some(name)))
+      )
+    }
+
+  private def setOptional[A: Writes](
+    userAnswers: UserAnswers,
+    page: pages.QuestionPage[A],
+    value: Option[A]
+  ): Try[UserAnswers] =
+    value match {
+      case Some(answer) =>
+        userAnswers.set(page, answer)
+
+      case None =>
+        Try(userAnswers)
+    }
 }

@@ -287,5 +287,18 @@ class ValidatedPartnershipSpec extends SpecBase with Matchers {
       val ua = withStaleValue(minRequired, PartnershipWorksReferenceNumberPage, "WRN-001")
       ValidatedPartnership.build(ua) mustBe Left(InvalidAnswer(PartnershipWorksReferenceNumberPage))
     }
+
+    "fail when AddPartnershipContactMethodsYesNo is true but PartnershipContactMethodOptions is empty" in {
+      val ua =
+        minRequired
+          .set(AddPartnershipContactMethodsYesNoPage, true)
+          .success
+          .value
+          .set(PartnershipContactMethodOptionsPage, Set.empty)
+          .success
+          .value
+
+      ValidatedPartnership.build(ua) mustBe Left(InvalidAnswer(PartnershipContactMethodOptionsPage))
+    }
   }
 }

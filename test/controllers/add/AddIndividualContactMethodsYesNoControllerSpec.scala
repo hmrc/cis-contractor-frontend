@@ -108,7 +108,7 @@ class AddIndividualContactMethodsYesNoControllerSpec extends SpecBase with Mocki
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.add.routes.AddIndividualContactMethodsYesNoController
+        redirectLocation(result).value mustEqual controllers.add.routes.IndividualContactMethodOptionsController
           .onPageLoad(NormalMode)
           .url
       }
