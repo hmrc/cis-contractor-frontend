@@ -35,6 +35,7 @@ GET   /subcontractor/system-error/there-is-a-problem  controllers.SystemErrorCon
 GET   /subcontractor/individual-address-lookup         controllers.add.AddressOfSubcontractorController.redirectToAddressLookup(mode: Mode = NormalMode, changeRoute: Option[String] ?= None)
 GET   /subcontractor/individual-address-return         controllers.add.AddressOfSubcontractorController.addressLookupCallback(id: String ?= "", mode: Mode = NormalMode)
 GET   /subcontractor/individual-address-return/change  controllers.add.AddressOfSubcontractorController.addressLookupCallbackChange(id: String ?= "", mode: Mode = NormalMode)
+GET   /subcontractor/amend/address-change              controllers.add.AddressOfSubcontractorController.redirectToAmendAddressLookup()
 
 GET   /subcontractor/amend/individual  controllers.amend.AmendIndividualController.onPageLoad()
 
@@ -120,6 +121,10 @@ GET   /subcontractor/add/check-address         controllers.add.SubAddressYesNoCo
 POST  /subcontractor/add/check-address         controllers.add.SubAddressYesNoController.onSubmit(mode: Mode = NormalMode)
 GET   /subcontractor/add/change-check-address  controllers.add.SubAddressYesNoController.onPageLoad(mode: Mode = CheckMode)
 POST  /subcontractor/add/change-check-address  controllers.add.SubAddressYesNoController.onSubmit(mode: Mode = CheckMode)
+
+GET   /subcontractor/add/address                controllers.add.AddressOfSubcontractorController.redirectToAddressLookup(mode: Mode = NormalMode, changeRoute: Option[String] ?= None)
+GET   /subcontractor/add/address-return         controllers.add.AddressOfSubcontractorController.addressLookupCallback(id: String ?= "", mode: Mode = NormalMode)
+GET   /subcontractor/add/address-return/change  controllers.add.AddressOfSubcontractorController.addressLookupCallbackChange(id: String ?= "", mode: Mode = NormalMode)
 
 GET   /subcontractor/add/check-national-insurance-number         controllers.add.NationalInsuranceNumberYesNoController.onPageLoad(mode: Mode = NormalMode)
 POST  /subcontractor/add/check-national-insurance-number         controllers.add.NationalInsuranceNumberYesNoController.onSubmit(mode: Mode = NormalMode)
