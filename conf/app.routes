@@ -390,6 +390,8 @@ GET   /subcontractor/add/partnership/phone-number         controllers.add.partne
 POST  /subcontractor/add/partnership/phone-number         controllers.add.partnership.PartnershipPhoneNumberController.onSubmit(mode: Mode = NormalMode)
 GET   /subcontractor/add/partnership/change-phone-number  controllers.add.partnership.PartnershipPhoneNumberController.onPageLoad(mode: Mode = CheckMode)
 POST  /subcontractor/add/partnership/change-phone-number  controllers.add.partnership.PartnershipPhoneNumberController.onSubmit(mode: Mode = CheckMode)
+GET   /subcontractor/amend/partnership/phone-number       controllers.add.partnership.PartnershipPhoneNumberController.onPageLoad(mode: Mode = AmendMode)
+POST  /subcontractor/amend/partnership/phone-number       controllers.add.partnership.PartnershipPhoneNumberController.onSubmit(mode: Mode = AmendMode)
 
 GET   /subcontractor/add/partnership/check-your-answers  controllers.add.partnership.PartnershipCheckYourAnswersController.onPageLoad()
 POST  /subcontractor/add/partnership/check-your-answers  controllers.add.partnership.PartnershipCheckYourAnswersController.onSubmit()
@@ -398,16 +400,22 @@ GET   /subcontractor/add/partnership/mobile-number         controllers.add.partn
 POST  /subcontractor/add/partnership/mobile-number         controllers.add.partnership.PartnershipMobileNumberController.onSubmit(mode: Mode = NormalMode)
 GET   /subcontractor/add/partnership/change-mobile-number  controllers.add.partnership.PartnershipMobileNumberController.onPageLoad(mode: Mode = CheckMode)
 POST  /subcontractor/add/partnership/change-mobile-number  controllers.add.partnership.PartnershipMobileNumberController.onSubmit(mode: Mode = CheckMode)
+GET   /subcontractor/amend/partnership/mobile-number       controllers.add.partnership.PartnershipMobileNumberController.onPageLoad(mode: Mode = AmendMode)
+POST  /subcontractor/amend/partnership/mobile-number       controllers.add.partnership.PartnershipMobileNumberController.onSubmit(mode: Mode = AmendMode)
 
 GET   /subcontractor/add/partnership/add-contact-details         controllers.add.partnership.AddPartnershipContactMethodsYesNoController.onPageLoad(mode: Mode = NormalMode)
 POST  /subcontractor/add/partnership/add-contact-details         controllers.add.partnership.AddPartnershipContactMethodsYesNoController.onSubmit(mode: Mode = NormalMode)
 GET   /subcontractor/add/partnership/change-add-contact-details  controllers.add.partnership.AddPartnershipContactMethodsYesNoController.onPageLoad(mode: Mode = CheckMode)
 POST  /subcontractor/add/partnership/change-add-contact-details  controllers.add.partnership.AddPartnershipContactMethodsYesNoController.onSubmit(mode: Mode = CheckMode)
+GET   /subcontractor/amend/partnership/add-contact-details       controllers.add.partnership.AddPartnershipContactMethodsYesNoController.onPageLoad(mode: Mode = AmendMode)
+POST  /subcontractor/amend/partnership/add-contact-details       controllers.add.partnership.AddPartnershipContactMethodsYesNoController.onSubmit(mode: Mode = AmendMode)
 
 GET   /subcontractor/add/partnership/select-contact-details         controllers.add.partnership.PartnershipContactMethodOptionsController.onPageLoad(mode: Mode = NormalMode)
 POST  /subcontractor/add/partnership/select-contact-details         controllers.add.partnership.PartnershipContactMethodOptionsController.onSubmit(mode: Mode = NormalMode)
 GET   /subcontractor/add/partnership/change-select-contact-details  controllers.add.partnership.PartnershipContactMethodOptionsController.onPageLoad(mode: Mode = CheckMode)
 POST  /subcontractor/add/partnership/change-select-contact-details  controllers.add.partnership.PartnershipContactMethodOptionsController.onSubmit(mode: Mode = CheckMode)
+GET   /subcontractor/amend/partnership/select-contact-details       controllers.add.partnership.PartnershipContactMethodOptionsController.onPageLoad(mode: Mode = AmendMode)
+POST  /subcontractor/amend/partnership/select-contact-details       controllers.add.partnership.PartnershipContactMethodOptionsController.onSubmit(mode: Mode = AmendMode)
 
 # Trust
 GET   /subcontractor/add/trust/subcontractor-added  controllers.add.SubcontractorAddedController.trustSubcontractorAdded()

@@ -106,6 +106,25 @@ class PartnershipNavigator @Inject() () extends NavigatorForJourney {
       _ => cyaRoute(AmendMode)
     case PartnershipAddressYesNoPage              =>
       userAnswers => navigatorFromPartnershipAddressYesNoPage(AmendMode)(userAnswers)
+    case AddPartnershipContactMethodsYesNoPage    =>
+      userAnswers => navigatorFromAddPartnershipContactMethodsYesNoPage(AmendMode)(userAnswers)
+    case PartnershipContactMethodOptionsPage      =>
+      userAnswers => nextMissingSelectedContactMethodPageAfter(current = None, AmendMode)(userAnswers)
+    case PartnershipEmailAddressPage              =>
+      userAnswers =>
+        nextMissingSelectedContactMethodPageAfter(current = Some(ContactMethodOptions.Email), mode = AmendMode)(
+          userAnswers
+        )
+    case PartnershipPhoneNumberPage               =>
+      userAnswers =>
+        nextMissingSelectedContactMethodPageAfter(current = Some(ContactMethodOptions.Phone), mode = AmendMode)(
+          userAnswers
+        )
+    case PartnershipMobileNumberPage              =>
+      userAnswers =>
+        nextMissingSelectedContactMethodPageAfter(current = Some(ContactMethodOptions.Mobile), mode = AmendMode)(
+          userAnswers
+        )
     case _                                        => _ => cyaRoute(AmendMode)
   }
 
@@ -312,21 +331,20 @@ class PartnershipNavigator @Inject() () extends NavigatorForJourney {
     (userAnswers.get(AddPartnershipContactMethodsYesNoPage), mode) match {
 
       case (Some(true), NormalMode) =>
-        controllers.add.partnership.routes.PartnershipContactMethodOptionsController.onPageLoad(mode)
+        controllers.add.partnership.routes.PartnershipContactMethodOptionsController.onPageLoad(NormalMode)
 
       case (Some(false), NormalMode) =>
         controllers.add.partnership.routes.PartnershipHasUtrYesNoController.onPageLoad(NormalMode)
 
-      case (Some(true), CheckMode) =>
+      case (Some(true), CheckMode | AmendMode) =>
         userAnswers
           .get(PartnershipContactMethodOptionsPage)
-          .fold(controllers.add.partnership.routes.PartnershipContactMethodOptionsController.onPageLoad(CheckMode)) {
-            _ =>
-              controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
+          .fold(controllers.add.partnership.routes.PartnershipContactMethodOptionsController.onPageLoad(mode)) { _ =>
+            cyaRoute(mode)
           }
 
       case (Some(false), CheckMode) =>
-        controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
+        cyaRoute(mode)
 
       case _ =>
         routes.JourneyRecoveryController.onPageLoad()
@@ -342,14 +360,15 @@ class PartnershipNavigator @Inject() () extends NavigatorForJourney {
     }
 
   private def nextMissingSelectedContactMethodPageAfter(
-    current: Option[ContactMethodOptions]
+    current: Option[ContactMethodOptions],
+    mode: Mode = CheckMode
   )(userAnswers: UserAnswers): Call =
     navigateFromContactMethodPage(current, userAnswers) { remaining =>
       remaining
         .find(isMissingAnswer(_)(userAnswers))
-        .map(contactMethodPageCall(_, CheckMode))
+        .map(contactMethodPageCall(_, mode))
         .getOrElse(
-          controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
+          cyaRoute(mode)
         )
     }
 

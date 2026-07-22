@@ -17,7 +17,7 @@
 package viewmodels.checkAnswers.add.partnership
 
 import models.contact.ContactMethodOptions
-import models.{CheckMode, UserAnswers}
+import models.{CheckMode, Mode, UserAnswers}
 import pages.add.partnership.PartnershipContactMethodOptionsPage
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
@@ -29,7 +29,7 @@ import viewmodels.implicits.*
 
 object PartnershipContactMethodOptionsSummary {
 
-  def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
+  def row(answers: UserAnswers, mode: Mode = CheckMode)(implicit messages: Messages): Option[SummaryListRow] =
     answers.get(PartnershipContactMethodOptionsPage).map { selectedMethods =>
       val options =
         ContactMethodOptions
@@ -43,7 +43,7 @@ object PartnershipContactMethodOptionsSummary {
         actions = Seq(
           ActionItemViewModel(
             "site.change",
-            controllers.add.partnership.routes.PartnershipContactMethodOptionsController.onPageLoad(CheckMode).url
+            controllers.add.partnership.routes.PartnershipContactMethodOptionsController.onPageLoad(mode).url
           )
             .withVisuallyHiddenText(messages("partnershipContactMethodOptions.change.hidden"))
             .withAttribute("id" -> "partnership-methods-of-contact")
