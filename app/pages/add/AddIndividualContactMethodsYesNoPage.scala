@@ -34,6 +34,7 @@ case object AddIndividualContactMethodsYesNoPage extends QuestionPage[Boolean] w
         .remove(IndividualEmailAddressPage)
         .flatMap(_.remove(IndividualPhoneNumberPage))
         .flatMap(_.remove(IndividualMobileNumberPage))
+        .flatMap(_.remove(IndividualContactMethodOptionsPage))
     } else {
       super.cleanup(value, userAnswers)
     }
