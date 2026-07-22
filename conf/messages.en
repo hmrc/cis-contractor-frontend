@@ -1063,3 +1063,15 @@ contractordetails.addSchemeNameYesNo.heading                                   =
 contractordetails.addSchemeNameYesNo.error.required                            =  Select yes to enter the contractor’s scheme name
 contractordetails.addSchemeNameYesNo.checkYourAnswersLabel                     =  Add scheme name?
 contractordetails.addSchemeNameYesNo.change.hidden                             =  add scheme name?
+
+amendPartnershipRemoveDetailYesNo.title                                            =  Are you sure you want to remove this information from this subcontractor?
+amendPartnershipRemoveDetailYesNo.heading                                          =  Are you sure you want to remove the {0} from {1}?
+amendPartnershipRemoveDetailYesNo.error.required                                   =  Select whether you want to remove this information from this subcontractor
+
+amendPartnershipRemoveDetailYesNo.detail.address                                   = address
+amendPartnershipRemoveDetailYesNo.detail.contactDetails                            = contact details
+amendPartnershipRemoveDetailYesNo.detail.utr                                       = UTR
+amendPartnershipRemoveDetailYesNo.detail.worksReferenceNumber                      = works reference number
+amendPartnershipRemoveDetailYesNo.detail.nominatedPartnerUtr                       = nominated partner's UTR
+amendPartnershipRemoveDetailYesNo.detail.nominatedPartnerNino                      = nominated partner's National Insurance number
+amendPartnershipRemoveDetailYesNo.detail.nominatedPartnerCompanyRegistrationNumber = nominated partner's company registration number

@@ -579,3 +579,6 @@ GET   /contractor-details/add-contractor-scheme-name         controllers.contrac
 POST  /contractor-details/add-contractor-scheme-name         controllers.contractordetails.AddSchemeNameYesNoController.onSubmit(mode: Mode = NormalMode)
 GET   /contractor-details/change-add-contractor-scheme-name  controllers.contractordetails.AddSchemeNameYesNoController.onPageLoad(mode: Mode = CheckMode)
 POST  /contractor-details/change-add-contractor-scheme-name  controllers.contractordetails.AddSchemeNameYesNoController.onSubmit(mode: Mode = CheckMode)
+
+GET   /subcontractor/amend/partnership/remove-subcontractor-information/:detail     controllers.amend.partnership.AmendPartnershipRemoveDetailYesNoController.onPageLoad(detail: String)
+POST  /subcontractor/amend/partnership/remove-subcontractor-information/:detail     controllers.amend.partnership.AmendPartnershipRemoveDetailYesNoController.onSubmit(detail: String)
