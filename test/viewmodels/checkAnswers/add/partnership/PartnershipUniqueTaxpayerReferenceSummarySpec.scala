@@ -18,7 +18,7 @@ package viewmodels.checkAnswers.add.partnership
 
 import controllers.add.partnership.routes
 import helpers.CyaEncodingSpecHelper
-import models.{CheckMode, UserAnswers}
+import models.{AmendMode, CheckMode, UserAnswers}
 import org.scalatest.OptionValues.convertOptionToValuable
 import org.scalatest.TryValues.convertTryToSuccessOrFailure
 import org.scalatest.freespec.AnyFreeSpec
@@ -58,6 +58,37 @@ class PartnershipUniqueTaxpayerReferenceSummarySpec extends AnyFreeSpec with Mat
       val changeAction       = actions.head
       val expectedChangeText = messages("site.change")
       val expectedHref       = routes.PartnershipUniqueTaxpayerReferenceController.onPageLoad(CheckMode).url
+      val expectedHiddenText = messages("partnershipUniqueTaxpayerReference.change.hidden")
+
+      changeAction.content.asHtml.toString    should include(expectedChangeText)
+      changeAction.href                     shouldBe expectedHref
+      changeAction.visuallyHiddenText.value shouldBe expectedHiddenText
+    }
+
+    "must return a SummaryListRow when the answer exists in AmendMode" in {
+      val answers =
+        UserAnswers("test-id")
+          .set(PartnershipUniqueTaxpayerReferencePage, "1234567890")
+          .success
+          .value
+
+      val maybeRow = PartnershipUniqueTaxpayerReferenceSummary.row(answers, AmendMode)
+      maybeRow shouldBe defined
+
+      val row = maybeRow.value
+
+      val expectedKeyText = messages("partnershipUniqueTaxpayerReference.checkYourAnswersLabel")
+      row.key.content.asHtml.toString should include(expectedKeyText)
+
+      row.value.content.asHtml.toString should include("1234567890")
+
+      row.actions shouldBe defined
+      val actions = row.actions.value.items
+      actions should have size 1
+
+      val changeAction       = actions.head
+      val expectedChangeText = messages("site.change")
+      val expectedHref       = routes.PartnershipUniqueTaxpayerReferenceController.onPageLoad(AmendMode).url
       val expectedHiddenText = messages("partnershipUniqueTaxpayerReference.change.hidden")
 
       changeAction.content.asHtml.toString    should include(expectedChangeText)
