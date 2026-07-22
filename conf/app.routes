@@ -588,6 +588,9 @@ GET   /subcontractor/verify/verification-status/select-subcontractors    control
 GET   /verify/verification-status/reverification-decision                controllers.verify.VerificationStatusController.goToReverificationDecision(mode: Mode = NormalMode)
 GET   /verify/verification-status/select-subcontractors                  controllers.verify.VerificationStatusController.goToSelectSubcontractorsToReverify(mode: Mode = NormalMode)
 
+GET   /subcontractor/amend/partnership/remove-subcontractor-information/:detail     controllers.amend.partnership.AmendPartnershipRemoveDetailYesNoController.onPageLoad(detail: String)
+POST  /subcontractor/amend/partnership/remove-subcontractor-information/:detail     controllers.amend.partnership.AmendPartnershipRemoveDetailYesNoController.onSubmit(detail: String)
+
 # Contractor Details
 GET   /contractor-details/introduction  controllers.contractordetails.ContractorDetailsController.onPageLoad()
 POST  /contractor-details/introduction  controllers.contractordetails.ContractorDetailsController.onSubmit()
