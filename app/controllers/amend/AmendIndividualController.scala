@@ -19,10 +19,10 @@ package controllers.amend
 import controllers.actions.*
 import models.TypeOfSubcontractor.Individualorsoletrader
 import models.UserAnswers
-import models.add.SubcontractorName
+import models.add.{IndividualContactMethodOptions, SubcontractorName}
 import models.address.{Address, Country}
 import models.amend.OriginalIndividualAnswers
-import models.contact.ContactOptions.NoDetails
+import models.contact.ContactMethodOptions
 import models.response.SubcontractorResponse
 import pages.add.*
 import play.api.Logging
@@ -108,6 +108,7 @@ class AmendIndividualController @Inject() (
     subcontractor: SubcontractorResponse
   ): Try[UserAnswers] = {
     val address = toAddress(subcontractor)
+    val methods = contactMethods(subcontractor)
 
     val name = for {
       firstName <- subcontractor.firstName
@@ -120,18 +121,19 @@ class AmendIndividualController @Inject() (
 
     val usesTradingName = subcontractor.tradingName.exists(_.trim.nonEmpty)
 
-    val originalAnswers =
-      OriginalIndividualAnswers(
-        usesTradingName = Some(usesTradingName),
-        tradingName = subcontractor.tradingName,
-        subcontractorName = name,
-        address = address,
-        contactMethod = Some(NoDetails),
-        contactValue = None,
-        utr = subcontractor.utr,
-        nino = subcontractor.nino,
-        worksReference = subcontractor.worksReferenceNumber
-      )
+    val originalAnswers = OriginalIndividualAnswers(
+      usesTradingName = Some(usesTradingName),
+      tradingName = subcontractor.tradingName,
+      subcontractorName = name,
+      address = address,
+      individualContactMethod = Option.when(methods.nonEmpty)(methods),
+      email = subcontractor.emailAddress,
+      phone = subcontractor.phoneNumber,
+      mobile = subcontractor.mobilePhoneNumber,
+      utr = subcontractor.utr,
+      nino = subcontractor.nino,
+      worksReference = subcontractor.worksReferenceNumber
+    )
 
     for {
       updated <- userAnswers.set(TypeOfSubcontractorPage, Individualorsoletrader)
@@ -140,8 +142,12 @@ class AmendIndividualController @Inject() (
       updated <- setOptional(updated, SubcontractorNamePage, name)
       updated <- updated.set(SubAddressYesNoPage, address.isDefined)
       updated <- setOptional(updated, AddressOfSubcontractorPage, address)
-      updated <- updated.set(IndividualChooseContactDetailsPage, NoDetails)
-      updated <- updated.set(AddIndividualContactMethodsYesNoPage, false)
+      updated <- updated.set(AddIndividualContactMethodsYesNoPage, methods.nonEmpty)
+      updated <- if (methods.nonEmpty) { updated.set(IndividualContactMethodOptionsPage, methods) }
+                 else { Try(updated) }
+      updated <- setOptional(updated, IndividualEmailAddressPage, subcontractor.emailAddress)
+      updated <- setOptional(updated, IndividualPhoneNumberPage, subcontractor.phoneNumber)
+      updated <- setOptional(updated, IndividualMobileNumberPage, subcontractor.mobilePhoneNumber)
       updated <- updated.set(UniqueTaxpayerReferenceYesNoPage, subcontractor.utr.isDefined)
       updated <- setOptional(updated, SubcontractorsUniqueTaxpayerReferencePage, subcontractor.utr)
       updated <- updated.set(NationalInsuranceNumberYesNoPage, subcontractor.nino.isDefined)
@@ -152,6 +158,12 @@ class AmendIndividualController @Inject() (
       updated <- updated.set(OriginalIndividualAnswersQuery, originalAnswers)
     } yield updated
   }
+
+  private def contactMethods(subcontractor: SubcontractorResponse): Set[IndividualContactMethodOptions] = Set(
+    subcontractor.emailAddress.map(_ => ContactMethodOptions.Email),
+    subcontractor.phoneNumber.map(_ => ContactMethodOptions.Phone),
+    subcontractor.mobilePhoneNumber.map(_ => ContactMethodOptions.Mobile)
+  ).flatten
 
   private def toAddress(subcontractor: SubcontractorResponse): Option[Address] =
     subcontractor.addressLine1.map { addressLine1 =>

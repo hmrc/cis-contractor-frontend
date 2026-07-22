@@ -23,7 +23,7 @@ import models.UserAnswers
 import models.add.SubcontractorName
 import models.address.{Address, Country}
 import models.amend.OriginalIndividualAnswers
-import models.contact.ContactOptions.NoDetails
+import models.contact.ContactMethodOptions.{Email, Mobile, Phone}
 import models.response.{GetSubcontractorResponse, SubcontractorResponse}
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
@@ -52,6 +52,10 @@ class AmendIndividualControllerSpec extends SpecBase with MockitoSugar {
     controllers.amend.routes.AmendIndividualController
       .onPageLoad(cisId, subbieResourceRef)
       .url
+
+  private val emailAddress = "martin@example.com"
+  private val phoneNumber  = "02071234567"
+  private val mobileNumber = "07123456789"
 
   private val expectedName =
     SubcontractorName(
@@ -95,9 +99,9 @@ class AmendIndividualControllerSpec extends SpecBase with MockitoSugar {
       addressLine4 = Some("Cornwall"),
       country = Some("England"),
       postcode = Some("PL31 2HL"),
-      emailAddress = None,
-      phoneNumber = None,
-      mobilePhoneNumber = None,
+      emailAddress = Some(emailAddress),
+      phoneNumber = Some(phoneNumber),
+      mobilePhoneNumber = Some(mobileNumber),
       worksReferenceNumber = Some("XLS345-MM"),
       createDate = None,
       lastUpdate = None,
@@ -127,36 +131,56 @@ class AmendIndividualControllerSpec extends SpecBase with MockitoSugar {
       tradingName = None,
       subcontractorName = Some(expectedName),
       address = Some(expectedAddress),
-      contactMethod = Some(NoDetails),
-      contactValue = None,
+      individualContactMethod = Some(Set(Email, Phone, Mobile)),
+      email = Some(emailAddress),
+      phone = Some(phoneNumber),
+      mobile = Some(mobileNumber),
       utr = Some("3992651526"),
       nino = Some("QQ123456C"),
       worksReference = Some("XLS345-MM")
     )
+
+  private def mockSuccessfulService(
+    mockService: SubcontractorService,
+    returnedResponse: GetSubcontractorResponse = response
+  ): Unit =
+    when(
+      mockService.getSubcontractor(
+        eqTo(cisId),
+        eqTo(subbieResourceRef)
+      )(any[HeaderCarrier])
+    ).thenReturn(Future.successful(returnedResponse))
+
+  private def mockSuccessfulRepository(
+    mockSessionRepository: SessionRepository
+  ): Unit =
+    when(
+      mockSessionRepository.set(any[UserAnswers])
+    ).thenReturn(Future.successful(true))
 
   "AmendIndividualController" - {
 
     "onPageLoad" - {
 
       "must retrieve the subcontractor, save populated answers and redirect to the individual details page" in {
-        val mockService           = mock[SubcontractorService]
-        val mockSessionRepository = mock[SessionRepository]
+        val mockService =
+          mock[SubcontractorService]
 
-        when(
-          mockService.getSubcontractor(
-            eqTo(cisId),
-            eqTo(subbieResourceRef)
-          )(any[HeaderCarrier])
-        ).thenReturn(Future.successful(response))
+        val mockSessionRepository =
+          mock[SessionRepository]
 
-        when(mockSessionRepository.set(any[UserAnswers]))
-          .thenReturn(Future.successful(true))
+        mockSuccessfulService(mockService)
+        mockSuccessfulRepository(mockSessionRepository)
 
         val application =
-          applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          applicationBuilder(
+            userAnswers = Some(emptyUserAnswers)
+          )
             .overrides(
-              bind[SubcontractorService].toInstance(mockService),
-              bind[SessionRepository].toInstance(mockSessionRepository)
+              bind[SubcontractorService]
+                .toInstance(mockService),
+              bind[SessionRepository]
+                .toInstance(mockSessionRepository)
             )
             .build()
 
@@ -185,27 +209,28 @@ class AmendIndividualControllerSpec extends SpecBase with MockitoSugar {
         }
       }
 
-      "must save user answers with the retrieved individual data" in {
-        val mockService           = mock[SubcontractorService]
-        val mockSessionRepository = mock[SessionRepository]
-        val captor                =
+      "must save all individual answers returned by the backend" in {
+        val mockService =
+          mock[SubcontractorService]
+
+        val mockSessionRepository =
+          mock[SessionRepository]
+
+        val captor =
           ArgumentCaptor.forClass(classOf[UserAnswers])
 
-        when(
-          mockService.getSubcontractor(
-            eqTo(cisId),
-            eqTo(subbieResourceRef)
-          )(any[HeaderCarrier])
-        ).thenReturn(Future.successful(response))
-
-        when(mockSessionRepository.set(any[UserAnswers]))
-          .thenReturn(Future.successful(true))
+        mockSuccessfulService(mockService)
+        mockSuccessfulRepository(mockSessionRepository)
 
         val application =
-          applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          applicationBuilder(
+            userAnswers = Some(emptyUserAnswers)
+          )
             .overrides(
-              bind[SubcontractorService].toInstance(mockService),
-              bind[SessionRepository].toInstance(mockSessionRepository)
+              bind[SubcontractorService]
+                .toInstance(mockService),
+              bind[SessionRepository]
+                .toInstance(mockSessionRepository)
             )
             .build()
 
@@ -215,9 +240,11 @@ class AmendIndividualControllerSpec extends SpecBase with MockitoSugar {
             FakeRequest(GET, amendIndividualRoute)
           ).value.futureValue
 
-          verify(mockSessionRepository).set(captor.capture())
+          verify(mockSessionRepository)
+            .set(captor.capture())
 
-          val savedAnswers = captor.getValue
+          val savedAnswers =
+            captor.getValue
 
           savedAnswers
             .get(TypeOfSubcontractorPage)
@@ -243,12 +270,24 @@ class AmendIndividualControllerSpec extends SpecBase with MockitoSugar {
             .value mustBe expectedAddress
 
           savedAnswers
-            .get(IndividualChooseContactDetailsPage)
-            .value mustBe NoDetails
+            .get(AddIndividualContactMethodsYesNoPage)
+            .value mustBe true
 
           savedAnswers
-            .get(AddIndividualContactMethodsYesNoPage)
-            .value mustBe false
+            .get(IndividualContactMethodOptionsPage)
+            .value mustBe Set(Email, Phone, Mobile)
+
+          savedAnswers
+            .get(IndividualEmailAddressPage)
+            .value mustBe emailAddress
+
+          savedAnswers
+            .get(IndividualPhoneNumberPage)
+            .value mustBe phoneNumber
+
+          savedAnswers
+            .get(IndividualMobileNumberPage)
+            .value mustBe mobileNumber
 
           savedAnswers
             .get(UniqueTaxpayerReferenceYesNoPage)
@@ -285,9 +324,13 @@ class AmendIndividualControllerSpec extends SpecBase with MockitoSugar {
       }
 
       "must populate trading-name answers when a trading name is returned" in {
-        val mockService           = mock[SubcontractorService]
-        val mockSessionRepository = mock[SessionRepository]
-        val captor                =
+        val mockService =
+          mock[SubcontractorService]
+
+        val mockSessionRepository =
+          mock[SessionRepository]
+
+        val captor =
           ArgumentCaptor.forClass(classOf[UserAnswers])
 
         val subcontractorWithTradingName =
@@ -295,26 +338,24 @@ class AmendIndividualControllerSpec extends SpecBase with MockitoSugar {
             tradingName = Some("Brody Construction")
           )
 
-        val responseWithTradingName =
+        mockSuccessfulService(
+          mockService,
           response.copy(
             subcontractor = Some(subcontractorWithTradingName)
           )
+        )
 
-        when(
-          mockService.getSubcontractor(
-            eqTo(cisId),
-            eqTo(subbieResourceRef)
-          )(any[HeaderCarrier])
-        ).thenReturn(Future.successful(responseWithTradingName))
-
-        when(mockSessionRepository.set(any[UserAnswers]))
-          .thenReturn(Future.successful(true))
+        mockSuccessfulRepository(mockSessionRepository)
 
         val application =
-          applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          applicationBuilder(
+            userAnswers = Some(emptyUserAnswers)
+          )
             .overrides(
-              bind[SubcontractorService].toInstance(mockService),
-              bind[SessionRepository].toInstance(mockSessionRepository)
+              bind[SubcontractorService]
+                .toInstance(mockService),
+              bind[SessionRepository]
+                .toInstance(mockSessionRepository)
             )
             .build()
 
@@ -324,9 +365,11 @@ class AmendIndividualControllerSpec extends SpecBase with MockitoSugar {
             FakeRequest(GET, amendIndividualRoute)
           ).value.futureValue
 
-          verify(mockSessionRepository).set(captor.capture())
+          verify(mockSessionRepository)
+            .set(captor.capture())
 
-          val savedAnswers = captor.getValue
+          val savedAnswers =
+            captor.getValue
 
           savedAnswers
             .get(SubTradingNameYesNoPage)
@@ -342,14 +385,322 @@ class AmendIndividualControllerSpec extends SpecBase with MockitoSugar {
               .value
 
           original.usesTradingName mustBe Some(true)
-          original.tradingName mustBe Some("Brody Construction")
+          original.tradingName mustBe
+            Some("Brody Construction")
+        }
+      }
+
+      "must set uses-trading-name to false when a trading name contains only whitespace" in {
+        val mockService =
+          mock[SubcontractorService]
+
+        val mockSessionRepository =
+          mock[SessionRepository]
+
+        val captor =
+          ArgumentCaptor.forClass(classOf[UserAnswers])
+
+        val subcontractorWithBlankTradingName =
+          subcontractor.copy(
+            tradingName = Some("   ")
+          )
+
+        mockSuccessfulService(
+          mockService,
+          response.copy(
+            subcontractor = Some(subcontractorWithBlankTradingName)
+          )
+        )
+
+        mockSuccessfulRepository(mockSessionRepository)
+
+        val application =
+          applicationBuilder(
+            userAnswers = Some(emptyUserAnswers)
+          )
+            .overrides(
+              bind[SubcontractorService]
+                .toInstance(mockService),
+              bind[SessionRepository]
+                .toInstance(mockSessionRepository)
+            )
+            .build()
+
+        running(application) {
+          route(
+            application,
+            FakeRequest(GET, amendIndividualRoute)
+          ).value.futureValue
+
+          verify(mockSessionRepository)
+            .set(captor.capture())
+
+          val savedAnswers =
+            captor.getValue
+
+          savedAnswers
+            .get(SubTradingNameYesNoPage)
+            .value mustBe false
+
+          savedAnswers
+            .get(TradingNameOfSubcontractorPage)
+            .value mustBe "   "
+
+          savedAnswers
+            .get(OriginalIndividualAnswersQuery)
+            .value
+            .usesTradingName mustBe Some(false)
+        }
+      }
+
+      "must populate only email contact details when only email is returned" in {
+        val mockService =
+          mock[SubcontractorService]
+
+        val mockSessionRepository =
+          mock[SessionRepository]
+
+        val captor =
+          ArgumentCaptor.forClass(classOf[UserAnswers])
+
+        val emailOnlySubcontractor =
+          subcontractor.copy(
+            phoneNumber = None,
+            mobilePhoneNumber = None
+          )
+
+        mockSuccessfulService(
+          mockService,
+          response.copy(
+            subcontractor = Some(emailOnlySubcontractor)
+          )
+        )
+
+        mockSuccessfulRepository(mockSessionRepository)
+
+        val application =
+          applicationBuilder(
+            userAnswers = Some(emptyUserAnswers)
+          )
+            .overrides(
+              bind[SubcontractorService]
+                .toInstance(mockService),
+              bind[SessionRepository]
+                .toInstance(mockSessionRepository)
+            )
+            .build()
+
+        running(application) {
+          route(
+            application,
+            FakeRequest(GET, amendIndividualRoute)
+          ).value.futureValue
+
+          verify(mockSessionRepository)
+            .set(captor.capture())
+
+          val savedAnswers =
+            captor.getValue
+
+          savedAnswers
+            .get(AddIndividualContactMethodsYesNoPage)
+            .value mustBe true
+
+          savedAnswers
+            .get(IndividualContactMethodOptionsPage)
+            .value mustBe Set(Email)
+
+          savedAnswers
+            .get(IndividualEmailAddressPage)
+            .value mustBe emailAddress
+
+          savedAnswers
+            .get(IndividualPhoneNumberPage) mustBe None
+
+          savedAnswers
+            .get(IndividualMobileNumberPage) mustBe None
+
+          val original =
+            savedAnswers
+              .get(OriginalIndividualAnswersQuery)
+              .value
+
+          original.individualContactMethod mustBe
+            Some(Set(Email))
+
+          original.email mustBe Some(emailAddress)
+          original.phone mustBe None
+          original.mobile mustBe None
+        }
+      }
+
+      "must populate phone and mobile contact details when email is absent" in {
+        val mockService =
+          mock[SubcontractorService]
+
+        val mockSessionRepository =
+          mock[SessionRepository]
+
+        val captor =
+          ArgumentCaptor.forClass(classOf[UserAnswers])
+
+        val phoneAndMobileSubcontractor =
+          subcontractor.copy(
+            emailAddress = None
+          )
+
+        mockSuccessfulService(
+          mockService,
+          response.copy(
+            subcontractor = Some(phoneAndMobileSubcontractor)
+          )
+        )
+
+        mockSuccessfulRepository(mockSessionRepository)
+
+        val application =
+          applicationBuilder(
+            userAnswers = Some(emptyUserAnswers)
+          )
+            .overrides(
+              bind[SubcontractorService]
+                .toInstance(mockService),
+              bind[SessionRepository]
+                .toInstance(mockSessionRepository)
+            )
+            .build()
+
+        running(application) {
+          route(
+            application,
+            FakeRequest(GET, amendIndividualRoute)
+          ).value.futureValue
+
+          verify(mockSessionRepository)
+            .set(captor.capture())
+
+          val savedAnswers =
+            captor.getValue
+
+          savedAnswers
+            .get(AddIndividualContactMethodsYesNoPage)
+            .value mustBe true
+
+          savedAnswers
+            .get(IndividualContactMethodOptionsPage)
+            .value mustBe Set(Phone, Mobile)
+
+          savedAnswers
+            .get(IndividualEmailAddressPage) mustBe None
+
+          savedAnswers
+            .get(IndividualPhoneNumberPage)
+            .value mustBe phoneNumber
+
+          savedAnswers
+            .get(IndividualMobileNumberPage)
+            .value mustBe mobileNumber
+
+          val original =
+            savedAnswers
+              .get(OriginalIndividualAnswersQuery)
+              .value
+
+          original.individualContactMethod mustBe
+            Some(Set(Phone, Mobile))
+
+          original.email mustBe None
+          original.phone mustBe Some(phoneNumber)
+          original.mobile mustBe Some(mobileNumber)
+        }
+      }
+
+      "must set contact-method answer to false and leave contact pages empty when no contact details are returned" in {
+        val mockService =
+          mock[SubcontractorService]
+
+        val mockSessionRepository =
+          mock[SessionRepository]
+
+        val captor =
+          ArgumentCaptor.forClass(classOf[UserAnswers])
+
+        val subcontractorWithoutContacts =
+          subcontractor.copy(
+            emailAddress = None,
+            phoneNumber = None,
+            mobilePhoneNumber = None
+          )
+
+        mockSuccessfulService(
+          mockService,
+          response.copy(
+            subcontractor = Some(subcontractorWithoutContacts)
+          )
+        )
+
+        mockSuccessfulRepository(mockSessionRepository)
+
+        val application =
+          applicationBuilder(
+            userAnswers = Some(emptyUserAnswers)
+          )
+            .overrides(
+              bind[SubcontractorService]
+                .toInstance(mockService),
+              bind[SessionRepository]
+                .toInstance(mockSessionRepository)
+            )
+            .build()
+
+        running(application) {
+          route(
+            application,
+            FakeRequest(GET, amendIndividualRoute)
+          ).value.futureValue
+
+          verify(mockSessionRepository)
+            .set(captor.capture())
+
+          val savedAnswers =
+            captor.getValue
+
+          savedAnswers
+            .get(AddIndividualContactMethodsYesNoPage)
+            .value mustBe false
+
+          savedAnswers
+            .get(IndividualContactMethodOptionsPage) mustBe None
+
+          savedAnswers
+            .get(IndividualEmailAddressPage) mustBe None
+
+          savedAnswers
+            .get(IndividualPhoneNumberPage) mustBe None
+
+          savedAnswers
+            .get(IndividualMobileNumberPage) mustBe None
+
+          val original =
+            savedAnswers
+              .get(OriginalIndividualAnswersQuery)
+              .value
+
+          original.individualContactMethod mustBe None
+          original.email mustBe None
+          original.phone mustBe None
+          original.mobile mustBe None
         }
       }
 
       "must set optional-answer pages to false and leave their value pages empty when values are absent" in {
-        val mockService           = mock[SubcontractorService]
-        val mockSessionRepository = mock[SessionRepository]
-        val captor                =
+        val mockService =
+          mock[SubcontractorService]
+
+        val mockSessionRepository =
+          mock[SessionRepository]
+
+        val captor =
           ArgumentCaptor.forClass(classOf[UserAnswers])
 
         val subcontractorWithMissingOptionalData =
@@ -365,26 +716,24 @@ class AmendIndividualControllerSpec extends SpecBase with MockitoSugar {
             postcode = None
           )
 
-        val responseWithMissingOptionalData =
+        mockSuccessfulService(
+          mockService,
           response.copy(
             subcontractor = Some(subcontractorWithMissingOptionalData)
           )
+        )
 
-        when(
-          mockService.getSubcontractor(
-            eqTo(cisId),
-            eqTo(subbieResourceRef)
-          )(any[HeaderCarrier])
-        ).thenReturn(Future.successful(responseWithMissingOptionalData))
-
-        when(mockSessionRepository.set(any[UserAnswers]))
-          .thenReturn(Future.successful(true))
+        mockSuccessfulRepository(mockSessionRepository)
 
         val application =
-          applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          applicationBuilder(
+            userAnswers = Some(emptyUserAnswers)
+          )
             .overrides(
-              bind[SubcontractorService].toInstance(mockService),
-              bind[SessionRepository].toInstance(mockSessionRepository)
+              bind[SubcontractorService]
+                .toInstance(mockService),
+              bind[SessionRepository]
+                .toInstance(mockSessionRepository)
             )
             .build()
 
@@ -394,9 +743,11 @@ class AmendIndividualControllerSpec extends SpecBase with MockitoSugar {
             FakeRequest(GET, amendIndividualRoute)
           ).value.futureValue
 
-          verify(mockSessionRepository).set(captor.capture())
+          verify(mockSessionRepository)
+            .set(captor.capture())
 
-          val savedAnswers = captor.getValue
+          val savedAnswers =
+            captor.getValue
 
           savedAnswers
             .get(SubAddressYesNoPage)
@@ -425,38 +776,41 @@ class AmendIndividualControllerSpec extends SpecBase with MockitoSugar {
 
           savedAnswers
             .get(WorksReferenceNumberPage) mustBe None
+
+          val original =
+            savedAnswers
+              .get(OriginalIndividualAnswersQuery)
+              .value
+
+          original.address mustBe None
+          original.utr mustBe None
+          original.nino mustBe None
+          original.worksReference mustBe None
         }
       }
 
-      "must not populate the name page when first name is missing" in {
-        val mockService           = mock[SubcontractorService]
-        val mockSessionRepository = mock[SessionRepository]
-        val captor                =
+      "must preserve the address fields returned by the backend" in {
+        val mockService =
+          mock[SubcontractorService]
+
+        val mockSessionRepository =
+          mock[SessionRepository]
+
+        val captor =
           ArgumentCaptor.forClass(classOf[UserAnswers])
 
-        val subcontractorWithoutFirstName =
-          subcontractor.copy(firstName = None)
-
-        val responseWithoutFirstName =
-          response.copy(
-            subcontractor = Some(subcontractorWithoutFirstName)
-          )
-
-        when(
-          mockService.getSubcontractor(
-            eqTo(cisId),
-            eqTo(subbieResourceRef)
-          )(any[HeaderCarrier])
-        ).thenReturn(Future.successful(responseWithoutFirstName))
-
-        when(mockSessionRepository.set(any[UserAnswers]))
-          .thenReturn(Future.successful(true))
+        mockSuccessfulService(mockService)
+        mockSuccessfulRepository(mockSessionRepository)
 
         val application =
-          applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          applicationBuilder(
+            userAnswers = Some(emptyUserAnswers)
+          )
             .overrides(
-              bind[SubcontractorService].toInstance(mockService),
-              bind[SessionRepository].toInstance(mockSessionRepository)
+              bind[SubcontractorService]
+                .toInstance(mockService),
+              bind[SessionRepository]
+                .toInstance(mockSessionRepository)
             )
             .build()
 
@@ -466,11 +820,86 @@ class AmendIndividualControllerSpec extends SpecBase with MockitoSugar {
             FakeRequest(GET, amendIndividualRoute)
           ).value.futureValue
 
-          verify(mockSessionRepository).set(captor.capture())
+          verify(mockSessionRepository)
+            .set(captor.capture())
 
-          val savedAnswers = captor.getValue
+          val address =
+            captor.getValue
+              .get(AddressOfSubcontractorPage)
+              .value
 
-          savedAnswers.get(SubcontractorNamePage) mustBe None
+          address.addressLine1 mustBe
+            "12 Harbor View Road"
+
+          address.addressLine2 mustBe
+            Some("Amity Island")
+
+          address.addressLine3 mustBe
+            Some("Bodmin")
+
+          address.addressLine4 mustBe
+            Some("Cornwall")
+
+          address.addressLine5 mustBe None
+          address.postcode mustBe Some("PL31 2HL")
+
+          address.country.value.code mustBe None
+
+          address.country.value.name mustBe
+            Some("England")
+        }
+      }
+
+      "must not populate the name page when first name is missing" in {
+        val mockService =
+          mock[SubcontractorService]
+
+        val mockSessionRepository =
+          mock[SessionRepository]
+
+        val captor =
+          ArgumentCaptor.forClass(classOf[UserAnswers])
+
+        val subcontractorWithoutFirstName =
+          subcontractor.copy(
+            firstName = None
+          )
+
+        mockSuccessfulService(
+          mockService,
+          response.copy(
+            subcontractor = Some(subcontractorWithoutFirstName)
+          )
+        )
+
+        mockSuccessfulRepository(mockSessionRepository)
+
+        val application =
+          applicationBuilder(
+            userAnswers = Some(emptyUserAnswers)
+          )
+            .overrides(
+              bind[SubcontractorService]
+                .toInstance(mockService),
+              bind[SessionRepository]
+                .toInstance(mockSessionRepository)
+            )
+            .build()
+
+        running(application) {
+          route(
+            application,
+            FakeRequest(GET, amendIndividualRoute)
+          ).value.futureValue
+
+          verify(mockSessionRepository)
+            .set(captor.capture())
+
+          val savedAnswers =
+            captor.getValue
+
+          savedAnswers
+            .get(SubcontractorNamePage) mustBe None
 
           savedAnswers
             .get(OriginalIndividualAnswersQuery)
@@ -480,34 +909,38 @@ class AmendIndividualControllerSpec extends SpecBase with MockitoSugar {
       }
 
       "must not populate the name page when surname is missing" in {
-        val mockService           = mock[SubcontractorService]
-        val mockSessionRepository = mock[SessionRepository]
-        val captor                =
+        val mockService =
+          mock[SubcontractorService]
+
+        val mockSessionRepository =
+          mock[SessionRepository]
+
+        val captor =
           ArgumentCaptor.forClass(classOf[UserAnswers])
 
         val subcontractorWithoutSurname =
-          subcontractor.copy(surname = None)
+          subcontractor.copy(
+            surname = None
+          )
 
-        val responseWithoutSurname =
+        mockSuccessfulService(
+          mockService,
           response.copy(
             subcontractor = Some(subcontractorWithoutSurname)
           )
+        )
 
-        when(
-          mockService.getSubcontractor(
-            eqTo(cisId),
-            eqTo(subbieResourceRef)
-          )(any[HeaderCarrier])
-        ).thenReturn(Future.successful(responseWithoutSurname))
-
-        when(mockSessionRepository.set(any[UserAnswers]))
-          .thenReturn(Future.successful(true))
+        mockSuccessfulRepository(mockSessionRepository)
 
         val application =
-          applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          applicationBuilder(
+            userAnswers = Some(emptyUserAnswers)
+          )
             .overrides(
-              bind[SubcontractorService].toInstance(mockService),
-              bind[SessionRepository].toInstance(mockSessionRepository)
+              bind[SubcontractorService]
+                .toInstance(mockService),
+              bind[SessionRepository]
+                .toInstance(mockSessionRepository)
             )
             .build()
 
@@ -517,11 +950,14 @@ class AmendIndividualControllerSpec extends SpecBase with MockitoSugar {
             FakeRequest(GET, amendIndividualRoute)
           ).value.futureValue
 
-          verify(mockSessionRepository).set(captor.capture())
+          verify(mockSessionRepository)
+            .set(captor.capture())
 
-          val savedAnswers = captor.getValue
+          val savedAnswers =
+            captor.getValue
 
-          savedAnswers.get(SubcontractorNamePage) mustBe None
+          savedAnswers
+            .get(SubcontractorNamePage) mustBe None
 
           savedAnswers
             .get(OriginalIndividualAnswersQuery)
@@ -530,25 +966,85 @@ class AmendIndividualControllerSpec extends SpecBase with MockitoSugar {
         }
       }
 
-      "must redirect to JourneyRecovery and not save when no subcontractor is returned" in {
-        val mockService           = mock[SubcontractorService]
-        val mockSessionRepository = mock[SessionRepository]
+      "must include the middle name when it is returned" in {
+        val mockService =
+          mock[SubcontractorService]
 
-        val responseWithoutSubcontractor =
-          response.copy(subcontractor = None)
+        val mockSessionRepository =
+          mock[SessionRepository]
 
-        when(
-          mockService.getSubcontractor(
-            eqTo(cisId),
-            eqTo(subbieResourceRef)
-          )(any[HeaderCarrier])
-        ).thenReturn(Future.successful(responseWithoutSubcontractor))
+        val captor =
+          ArgumentCaptor.forClass(classOf[UserAnswers])
+
+        val subcontractorWithMiddleName =
+          subcontractor.copy(
+            secondName = Some("James")
+          )
+
+        mockSuccessfulService(
+          mockService,
+          response.copy(
+            subcontractor = Some(subcontractorWithMiddleName)
+          )
+        )
+
+        mockSuccessfulRepository(mockSessionRepository)
 
         val application =
-          applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          applicationBuilder(
+            userAnswers = Some(emptyUserAnswers)
+          )
             .overrides(
-              bind[SubcontractorService].toInstance(mockService),
-              bind[SessionRepository].toInstance(mockSessionRepository)
+              bind[SubcontractorService]
+                .toInstance(mockService),
+              bind[SessionRepository]
+                .toInstance(mockSessionRepository)
+            )
+            .build()
+
+        running(application) {
+          route(
+            application,
+            FakeRequest(GET, amendIndividualRoute)
+          ).value.futureValue
+
+          verify(mockSessionRepository)
+            .set(captor.capture())
+
+          captor.getValue
+            .get(SubcontractorNamePage)
+            .value mustBe
+            SubcontractorName(
+              firstName = "Martin",
+              middleName = Some("James"),
+              lastName = "Brody"
+            )
+        }
+      }
+
+      "must redirect to JourneyRecovery and not save when no subcontractor is returned" in {
+        val mockService =
+          mock[SubcontractorService]
+
+        val mockSessionRepository =
+          mock[SessionRepository]
+
+        mockSuccessfulService(
+          mockService,
+          response.copy(
+            subcontractor = None
+          )
+        )
+
+        val application =
+          applicationBuilder(
+            userAnswers = Some(emptyUserAnswers)
+          )
+            .overrides(
+              bind[SubcontractorService]
+                .toInstance(mockService),
+              bind[SessionRepository]
+                .toInstance(mockSessionRepository)
             )
             .build()
 
@@ -572,8 +1068,11 @@ class AmendIndividualControllerSpec extends SpecBase with MockitoSugar {
       }
 
       "must redirect to JourneyRecovery when the service fails" in {
-        val mockService           = mock[SubcontractorService]
-        val mockSessionRepository = mock[SessionRepository]
+        val mockService =
+          mock[SubcontractorService]
+
+        val mockSessionRepository =
+          mock[SessionRepository]
 
         when(
           mockService.getSubcontractor(
@@ -581,14 +1080,20 @@ class AmendIndividualControllerSpec extends SpecBase with MockitoSugar {
             eqTo(subbieResourceRef)
           )(any[HeaderCarrier])
         ).thenReturn(
-          Future.failed(new RuntimeException("Backend unavailable"))
+          Future.failed(
+            new RuntimeException("Backend unavailable")
+          )
         )
 
         val application =
-          applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          applicationBuilder(
+            userAnswers = Some(emptyUserAnswers)
+          )
             .overrides(
-              bind[SubcontractorService].toInstance(mockService),
-              bind[SessionRepository].toInstance(mockSessionRepository)
+              bind[SubcontractorService]
+                .toInstance(mockService),
+              bind[SessionRepository]
+                .toInstance(mockSessionRepository)
             )
             .build()
 
@@ -612,26 +1117,31 @@ class AmendIndividualControllerSpec extends SpecBase with MockitoSugar {
       }
 
       "must redirect to JourneyRecovery when the session repository fails to save" in {
-        val mockService           = mock[SubcontractorService]
-        val mockSessionRepository = mock[SessionRepository]
+        val mockService =
+          mock[SubcontractorService]
+
+        val mockSessionRepository =
+          mock[SessionRepository]
+
+        mockSuccessfulService(mockService)
 
         when(
-          mockService.getSubcontractor(
-            eqTo(cisId),
-            eqTo(subbieResourceRef)
-          )(any[HeaderCarrier])
-        ).thenReturn(Future.successful(response))
-
-        when(mockSessionRepository.set(any[UserAnswers]))
-          .thenReturn(
-            Future.failed(new RuntimeException("DB unavailable"))
+          mockSessionRepository.set(any[UserAnswers])
+        ).thenReturn(
+          Future.failed(
+            new RuntimeException("DB unavailable")
           )
+        )
 
         val application =
-          applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          applicationBuilder(
+            userAnswers = Some(emptyUserAnswers)
+          )
             .overrides(
-              bind[SubcontractorService].toInstance(mockService),
-              bind[SessionRepository].toInstance(mockSessionRepository)
+              bind[SubcontractorService]
+                .toInstance(mockService),
+              bind[SessionRepository]
+                .toInstance(mockSessionRepository)
             )
             .build()
 
@@ -655,14 +1165,21 @@ class AmendIndividualControllerSpec extends SpecBase with MockitoSugar {
       }
 
       "must redirect to JourneyRecovery and not call the service when no user answers exist" in {
-        val mockService           = mock[SubcontractorService]
-        val mockSessionRepository = mock[SessionRepository]
+        val mockService =
+          mock[SubcontractorService]
+
+        val mockSessionRepository =
+          mock[SessionRepository]
 
         val application =
-          applicationBuilder(userAnswers = None)
+          applicationBuilder(
+            userAnswers = None
+          )
             .overrides(
-              bind[SubcontractorService].toInstance(mockService),
-              bind[SessionRepository].toInstance(mockSessionRepository)
+              bind[SubcontractorService]
+                .toInstance(mockService),
+              bind[SessionRepository]
+                .toInstance(mockSessionRepository)
             )
             .build()
 
@@ -692,23 +1209,27 @@ class AmendIndividualControllerSpec extends SpecBase with MockitoSugar {
       }
 
       "must redirect to JourneyRecovery and not save when populating user answers fails" in {
-        val mockService           = mock[SubcontractorService]
-        val mockSessionRepository = mock[SessionRepository]
+        val mockService =
+          mock[SubcontractorService]
 
-        when(
-          mockService.getSubcontractor(
-            eqTo(cisId),
-            eqTo(subbieResourceRef)
-          )(any[HeaderCarrier])
-        ).thenReturn(Future.successful(response))
+        val mockSessionRepository =
+          mock[SessionRepository]
+
+        mockSuccessfulService(mockService)
 
         val application =
-          applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          applicationBuilder(
+            userAnswers = Some(emptyUserAnswers)
+          )
             .overrides(
-              bind[SubcontractorService].toInstance(mockService),
-              bind[SessionRepository].toInstance(mockSessionRepository),
+              bind[SubcontractorService]
+                .toInstance(mockService),
+              bind[SessionRepository]
+                .toInstance(mockSessionRepository),
               bind[AmendIndividualController]
-                .to[FailingPopulateAmendIndividualController]
+                .to[
+                  FailingPopulateAmendIndividualController
+                ]
             )
             .build()
 
@@ -756,5 +1277,9 @@ class FailingPopulateAmendIndividualController @Inject() (
     cisId: String,
     subcontractor: SubcontractorResponse
   ): Try[UserAnswers] =
-    Failure(new RuntimeException("Unable to populate UserAnswers"))
+    Failure(
+      new RuntimeException(
+        "Unable to populate UserAnswers"
+      )
+    )
 }
