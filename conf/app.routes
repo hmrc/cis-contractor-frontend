@@ -89,6 +89,9 @@ GET   /subcontractor/amend/partnership  controllers.amend.partnership.AmendPartn
 
 GET   /subcontractor/amend/trust  controllers.amend.trust.AmendTrustController.onPageLoad()
 
+GET   /subcontractor/amend/company/remove-subcontractor-information/:subcontractorDetail  controllers.amend.company.AmendCompanyRemoveDetailYesNoController.onPageLoad(subcontractorDetail: String)
+POST  /subcontractor/amend/company/remove-subcontractor-information/:subcontractorDetail  controllers.amend.company.AmendCompanyRemoveDetailYesNoController.onSubmit(subcontractorDetail: String)
+
 # Errors & Auth
 GET  /unauthorised/standard-user  controllers.UnauthorisedWrongRoleController.onPageLoad()
 
