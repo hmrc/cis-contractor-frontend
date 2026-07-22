@@ -14,10 +14,26 @@
  * limitations under the License.
  */
 
-package queries
+package models.response
 
-import play.api.libs.json.JsPath
+import play.api.libs.json.{Json, OFormat}
 
-case object SubContractorVerificationNumberQuery extends Gettable[String] with Settable[String] {
-  override def path: JsPath = JsPath \ "subContractorVerificationNumber"
+final case class GetSubcontractorResponse(
+  scheme: Option[ContractorSchemeResponse],
+  subcontractor: Option[SubcontractorResponse],
+  otherInfo: Seq[GetSubcontractorOtherInfo]
+)
+
+object GetSubcontractorResponse {
+  given format: OFormat[GetSubcontractorResponse] =
+    Json.format[GetSubcontractorResponse]
+}
+
+final case class GetSubcontractorOtherInfo(
+  utr: String
+)
+
+object GetSubcontractorOtherInfo {
+  given format: OFormat[GetSubcontractorOtherInfo] =
+    Json.format[GetSubcontractorOtherInfo]
 }

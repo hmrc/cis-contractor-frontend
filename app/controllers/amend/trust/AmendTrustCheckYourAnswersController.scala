@@ -24,7 +24,7 @@ import pages.add.trust.TrustNamePage
 import play.api.Logging
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import queries.{SubContractorVerificationNumberQuery, SubContractorVerifiedQuery}
+import queries.OriginalTrustAnswersQuery
 import repositories.SessionRepository
 import services.SubcontractorService
 import uk.gov.hmrc.govukfrontend.views.Aliases.{Text, Value}
@@ -35,6 +35,7 @@ import viewmodels.checkAnswers.add.trust.*
 import viewmodels.govuk.summarylist.*
 import views.html.amend.AmendCheckYourAnswersView
 import controllers.routes
+
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -57,7 +58,7 @@ class AmendTrustCheckYourAnswersController @Inject() (
 
     ValidatedTrust.build(ua) match {
       case Right(_) =>
-        val isVerified = ua.get(SubContractorVerifiedQuery).contains(true)
+        val isVerified = ua.get(OriginalTrustAnswersQuery).flatMap(_.isVerified)
         val trustName  = ua.get(TrustNamePage).getOrElse("")
 
         val subcontractorInformationList =
@@ -75,15 +76,14 @@ class AmendTrustCheckYourAnswersController @Inject() (
   }
 
   private def subcontractorInformationRows(
-    ua: UserAnswers,
-    isVerified: Boolean
-  )(implicit messages: Messages): Seq[Option[SummaryListRow]] = {
+                                            ua: UserAnswers,
+                                            isVerified: Option[Boolean]
+                                          )(implicit messages: Messages): Seq[Option[SummaryListRow]] = {
 
     val verificationRows =
       Option
-        .when(isVerified) {
-          val verificationNumber =
-            ua.get(SubContractorVerificationNumberQuery).getOrElse("")
+        .when(isVerified.contains(true)) {
+          val verificationNumber = ua.get(OriginalTrustAnswersQuery).flatMap(_.verificationNumber).getOrElse("")
 
           Seq(
             TrustUtrSummary.row(ua, AmendMode, showActions = false),
@@ -103,19 +103,19 @@ class AmendTrustCheckYourAnswersController @Inject() (
   }
 
   private def detailsRows(
-    ua: UserAnswers,
-    isVerified: Boolean
-  )(implicit messages: Messages): Seq[Option[SummaryListRow]] = {
+                           ua: UserAnswers,
+                           isVerified: Option[Boolean]
+                         )(implicit messages: Messages): Seq[Option[SummaryListRow]] = {
 
     val nameRows =
-      if (isVerified) {
+      if (isVerified.contains(true)) {
         Nil
       } else {
         Seq(TrustNameSummary.row(ua, AmendMode))
       }
 
     val utrRows =
-      if (isVerified) {
+      if (isVerified.contains(true)) {
         Nil
       } else {
         Seq(

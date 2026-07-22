@@ -18,7 +18,7 @@ package controllers.helpers
 
 import base.SpecBase
 import controllers.routes
-import models.contact.ContactOptions.{Email, Phone}
+import models.contact.ContactMethodOptions
 import play.api.mvc.{Result, Results}
 import play.api.test.Helpers.*
 
@@ -31,15 +31,57 @@ class ContactGuardSpec extends SpecBase with ContactGuard with Results {
   private def successResult(name: String): Result =
     Ok(name)
 
-  "ContactGuard.requireContactChoice" - {
+  "ContactGuard.requireContactMethodInSet" - {
 
-    "must return success result when name and matching contact choice are present" in {
+    "must return success result when chosen Email option is present" in {
 
       val result =
-        requireContactChoice(
+        requireContactMethodInSet(
           name = Some(testName),
-          contactChoice = Some(Email),
-          expected = Email
+          contactMethods =
+            Some(Set(ContactMethodOptions.Email, ContactMethodOptions.Phone, ContactMethodOptions.Mobile)),
+          expected = ContactMethodOptions.Email
+        )(successResult)
+
+      status(Future.successful(result)) mustEqual OK
+      contentAsString(Future.successful(result)) mustEqual testName
+    }
+
+    "must return success result when chosen Phone option is present" in {
+
+      val result =
+        requireContactMethodInSet(
+          name = Some(testName),
+          contactMethods =
+            Some(Set(ContactMethodOptions.Email, ContactMethodOptions.Phone, ContactMethodOptions.Mobile)),
+          expected = ContactMethodOptions.Phone
+        )(successResult)
+
+      status(Future.successful(result)) mustEqual OK
+      contentAsString(Future.successful(result)) mustEqual testName
+    }
+
+    "must return success result when chosen Mobile option is present" in {
+
+      val result =
+        requireContactMethodInSet(
+          name = Some(testName),
+          contactMethods =
+            Some(Set(ContactMethodOptions.Email, ContactMethodOptions.Phone, ContactMethodOptions.Mobile)),
+          expected = ContactMethodOptions.Mobile
+        )(successResult)
+
+      status(Future.successful(result)) mustEqual OK
+      contentAsString(Future.successful(result)) mustEqual testName
+    }
+
+    "must return success result when name and email contact options are present" in {
+
+      val result =
+        requireContactMethodInSet(
+          name = Some(testName),
+          contactMethods = Some(Set(ContactMethodOptions.Email, ContactMethodOptions.Phone)),
+          expected = ContactMethodOptions.Email
         )(successResult)
 
       status(Future.successful(result)) mustEqual OK
@@ -49,10 +91,10 @@ class ContactGuardSpec extends SpecBase with ContactGuard with Results {
     "must redirect to Journey Recovery when name is missing" in {
 
       val result =
-        requireContactChoice(
+        requireContactMethodInSet(
           name = None,
-          contactChoice = Some(Email),
-          expected = Email
+          contactMethods = Some(Set(ContactMethodOptions.Phone)),
+          expected = ContactMethodOptions.Email
         )(successResult)
 
       status(Future.successful(result)) mustEqual SEE_OTHER
@@ -63,10 +105,10 @@ class ContactGuardSpec extends SpecBase with ContactGuard with Results {
     "must redirect to Journey Recovery when contact choice is missing" in {
 
       val result =
-        requireContactChoice(
+        requireContactMethodInSet(
           name = Some(testName),
-          contactChoice = None,
-          expected = Email
+          contactMethods = None,
+          expected = ContactMethodOptions.Email
         )(successResult)
 
       status(Future.successful(result)) mustEqual SEE_OTHER
@@ -77,10 +119,10 @@ class ContactGuardSpec extends SpecBase with ContactGuard with Results {
     "must redirect to Journey Recovery when contact choice does not match expected" in {
 
       val result =
-        requireContactChoice(
+        requireContactMethodInSet(
           name = Some(testName),
-          contactChoice = Some(Phone),
-          expected = Email
+          contactMethods = Some(Set(ContactMethodOptions.Phone)),
+          expected = ContactMethodOptions.Email
         )(successResult)
 
       status(Future.successful(result)) mustEqual SEE_OTHER

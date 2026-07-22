@@ -18,17 +18,22 @@ package navigation.add
 
 import base.SpecBase
 import controllers.routes
+import models.contact.ContactMethodOptions
 import models.add.SubcontractorName
-import models.contact.ContactOptions
 import models.{AmendMode, CheckMode, NormalMode, UserAnswers}
 import pages.Page
+import pages.QuestionPage
 import pages.add.*
+import play.api.libs.json.JsPath
 
 class IndividualNavigatorSpec extends SpecBase {
 
   val navigator                    = new IndividualNavigator
   private lazy val journeyRecovery = routes.JourneyRecoveryController.onPageLoad()
   private lazy val CYA             = controllers.add.routes.CheckYourAnswersController.onPageLoad()
+  private lazy val AmendCYA        =
+    routes.JourneyRecoveryController
+      .onPageLoad() // TODO when available controllers.add.routes.AmendCheckYourAnswersController.onPageLoad()
 
   "IndividualNavigator" - {
 
@@ -88,12 +93,12 @@ class IndividualNavigatorSpec extends SpecBase {
         ) mustBe controllers.add.routes.AddressOfSubcontractorController.redirectToAddressLookup()
       }
 
-      "must go from a SubAddressYesNoPage to IndividualChooseContactDetailsPage when false" in {
+      "must go from a SubAddressYesNoPage to AddIndividualContactMethodsYesNoController when false" in {
         navigator.nextPage(
           SubAddressYesNoPage,
           NormalMode,
           emptyUserAnswers.setOrException(SubAddressYesNoPage, false)
-        ) mustBe controllers.add.routes.IndividualChooseContactDetailsController.onPageLoad(NormalMode)
+        ) mustBe controllers.add.routes.AddIndividualContactMethodsYesNoController.onPageLoad(NormalMode)
       }
 
       "must go from a SubAddressYesNoPage to journey recovery when incomplete info provided" in {
@@ -102,14 +107,6 @@ class IndividualNavigatorSpec extends SpecBase {
           NormalMode,
           emptyUserAnswers
         ) mustBe journeyRecovery
-      }
-
-      "must go from a AddressOfSubcontractorPage to IndividualChooseContactDetailsPage" in {
-        navigator.nextPage(
-          AddressOfSubcontractorPage,
-          NormalMode,
-          UserAnswers("id")
-        ) mustBe controllers.add.routes.IndividualChooseContactDetailsController.onPageLoad(NormalMode)
       }
 
       "must go from a NationalInsuranceNumberYesNoPage to SubNationalInsuranceNumberPage when true" in {
@@ -213,108 +210,148 @@ class IndividualNavigatorSpec extends SpecBase {
         ) mustBe controllers.add.routes.CheckYourAnswersController.onPageLoad()
       }
 
-      "must go from IndividualMobileNumberPage to UniqueTaxpayerReferenceYesNoPage in NormalMode" in {
-        navigator.nextPage(
-          IndividualMobileNumberPage,
-          NormalMode,
-          UserAnswers("id")
-        ) mustBe controllers.add.routes.UniqueTaxpayerReferenceYesNoController.onPageLoad(NormalMode)
-      }
+      "must go from IndividualEmailAddressPage" - {
 
-      "must go from IndividualPhoneNumberPage to UniqueTaxpayerReferenceYesNoPage in NormalMode" in {
-        navigator.nextPage(
-          IndividualPhoneNumberPage,
-          NormalMode,
-          UserAnswers("id")
-        ) mustBe controllers.add.routes.UniqueTaxpayerReferenceYesNoController.onPageLoad(NormalMode)
-      }
-
-      "must go from a IndividualEmailAddressPage to IndividualEmailAddressPage" in {
-        navigator.nextPage(
-          IndividualEmailAddressPage,
-          NormalMode,
-          UserAnswers("id")
-        ) mustBe controllers.add.routes.UniqueTaxpayerReferenceYesNoController.onPageLoad(NormalMode)
-      }
-
-      "must go from IndividualChooseContactDetailsPage" - {
-        "to IndividualEmailAddressPage when EmailAddress is selected" in {
+        "to IndividualPhoneNumberPage when Phone is selected in IndividualContactMethodOptions" in {
           navigator.nextPage(
-            IndividualChooseContactDetailsPage,
-            NormalMode,
-            emptyUserAnswers.setOrException(
-              IndividualChooseContactDetailsPage,
-              ContactOptions.Email
-            )
-          ) mustBe controllers.add.routes.IndividualEmailAddressController.onPageLoad(NormalMode)
-        }
-
-        "to IndividualPhoneNumberPage when PhoneNumber is selected" in {
-          navigator.nextPage(
-            IndividualChooseContactDetailsPage,
-            NormalMode,
-            emptyUserAnswers.setOrException(
-              IndividualChooseContactDetailsPage,
-              ContactOptions.Phone
-            )
-          ) mustBe controllers.add.routes.IndividualPhoneNumberController.onPageLoad(NormalMode)
-        }
-
-        "to IndividualMobileNumberPage when MobileNumber is selected" in {
-          navigator.nextPage(
-            IndividualChooseContactDetailsPage,
-            NormalMode,
-            emptyUserAnswers.setOrException(
-              IndividualChooseContactDetailsPage,
-              ContactOptions.Mobile
-            )
-          ) mustBe controllers.add.routes.IndividualMobileNumberController.onPageLoad(NormalMode)
-        }
-
-        "to UniqueTaxpayerReferenceYesNoPage when NoDetails is selected" in {
-          navigator.nextPage(
-            IndividualChooseContactDetailsPage,
-            NormalMode,
-            emptyUserAnswers.setOrException(
-              IndividualChooseContactDetailsPage,
-              ContactOptions.NoDetails
-            )
-          ) mustBe controllers.add.routes.UniqueTaxpayerReferenceYesNoController.onPageLoad(NormalMode)
-        }
-
-        "to JourneyRecoveryPage when answer is not present" in {
-          navigator.nextPage(
-            IndividualChooseContactDetailsPage,
+            IndividualEmailAddressPage,
             NormalMode,
             emptyUserAnswers
-          ) mustBe journeyRecovery
-        }
-      }
-
-      "must go from AddIndividualContactMethodsYesNo" - {
-        "to AddIndividualContactMethodsYesNoPage when answer is Yes" in {
-          navigator.nextPage(
-            AddIndividualContactMethodsYesNoPage,
-            NormalMode,
-            emptyUserAnswers.setOrException(AddIndividualContactMethodsYesNoPage, true)
-          ) mustBe controllers.add.routes.AddIndividualContactMethodsYesNoController
+              .setOrException(
+                IndividualContactMethodOptionsPage,
+                Set(ContactMethodOptions.Email, ContactMethodOptions.Phone, ContactMethodOptions.Mobile)
+              )
+          ) mustBe controllers.add.routes.IndividualPhoneNumberController
             .onPageLoad(NormalMode)
         }
 
-        "to UniqueTaxpayerReferenceYesNo when answer is No" in {
+        "to IndividualMobileNumberPage when Mobile is selected in IndividualContactMethodOptions" in {
           navigator.nextPage(
-            AddIndividualContactMethodsYesNoPage,
+            IndividualEmailAddressPage,
             NormalMode,
-            emptyUserAnswers.setOrException(AddIndividualContactMethodsYesNoPage, false)
+            emptyUserAnswers
+              .setOrException(
+                IndividualContactMethodOptionsPage,
+                Set(ContactMethodOptions.Email, ContactMethodOptions.Mobile)
+              )
+          ) mustBe controllers.add.routes.IndividualMobileNumberController
+            .onPageLoad(NormalMode)
+        }
+
+        "to UniqueTaxpayerReferenceYesNoPage Page when only Email is selected in IndividualContactMethodOptions" in {
+          navigator.nextPage(
+            IndividualEmailAddressPage,
+            NormalMode,
+            emptyUserAnswers
+              .setOrException(
+                IndividualContactMethodOptionsPage,
+                Set(ContactMethodOptions.Email)
+              )
           ) mustBe controllers.add.routes.UniqueTaxpayerReferenceYesNoController
             .onPageLoad(NormalMode)
         }
 
-        "to JourneyRecoveryPage when answer is not present" in {
+        "to JourneyRecoveryPage Page when IndividualContactMethodOptions answer is not present" in {
           navigator.nextPage(
-            AddIndividualContactMethodsYesNoPage,
+            IndividualEmailAddressPage,
+            NormalMode,
+            UserAnswers("id")
+          ) mustBe journeyRecovery
+        }
+
+        "to JourneyRecoveryPage when Email is not in the selected IndividualContactMethodOptions" in {
+          navigator.nextPage(
+            IndividualEmailAddressPage,
             NormalMode,
             emptyUserAnswers
+              .setOrException(
+                IndividualContactMethodOptionsPage,
+                Set(ContactMethodOptions.Phone, ContactMethodOptions.Mobile)
+              )
+          ) mustBe journeyRecovery
+        }
+
+      }
+
+      "must go from IndividualPhoneNumberPage" - {
+        "to IndividualMobileNumberPage when Mobile is selected in IndividualContactMethodOptions" in {
+          navigator.nextPage(
+            IndividualPhoneNumberPage,
+            NormalMode,
+            emptyUserAnswers
+              .setOrException(
+                IndividualContactMethodOptionsPage,
+                Set(ContactMethodOptions.Email, ContactMethodOptions.Phone, ContactMethodOptions.Mobile)
+              )
+          ) mustBe controllers.add.routes.IndividualMobileNumberController
+            .onPageLoad(NormalMode)
+        }
+
+        "to UniqueTaxpayerReferenceYesNoController Page when Mobile is not selected in IndividualContactMethodOptions" in {
+          navigator.nextPage(
+            IndividualPhoneNumberPage,
+            NormalMode,
+            emptyUserAnswers
+              .setOrException(
+                IndividualContactMethodOptionsPage,
+                Set(ContactMethodOptions.Email, ContactMethodOptions.Phone)
+              )
+          ) mustBe controllers.add.routes.UniqueTaxpayerReferenceYesNoController
+            .onPageLoad(NormalMode)
+        }
+
+        "to JourneyRecoveryPage Page when IndividualContactMethodOptions answer is not present" in {
+          navigator.nextPage(
+            IndividualPhoneNumberPage,
+            NormalMode,
+            UserAnswers("id")
+          ) mustBe journeyRecovery
+        }
+
+        "to JourneyRecoveryPage when Phone is not in the selected IndividualContactMethodOptions" in {
+          navigator.nextPage(
+            IndividualPhoneNumberPage,
+            NormalMode,
+            emptyUserAnswers
+              .setOrException(
+                IndividualContactMethodOptionsPage,
+                Set(ContactMethodOptions.Email, ContactMethodOptions.Mobile)
+              )
+          ) mustBe journeyRecovery
+        }
+      }
+
+      "must go from IndividualMobileNumberPage" - {
+        "to IndividualHasUtrYesNo Page when PIndividualContactMethodOptions is present" in {
+          navigator.nextPage(
+            IndividualMobileNumberPage,
+            NormalMode,
+            emptyUserAnswers
+              .setOrException(
+                IndividualContactMethodOptionsPage,
+                Set(ContactMethodOptions.Email, ContactMethodOptions.Phone, ContactMethodOptions.Mobile)
+              )
+          ) mustBe controllers.add.routes.UniqueTaxpayerReferenceYesNoController
+            .onPageLoad(NormalMode)
+        }
+
+        "to JourneyRecoveryPage Page when IndividualContactMethodOptions answer is not present" in {
+          navigator.nextPage(
+            IndividualMobileNumberPage,
+            NormalMode,
+            UserAnswers("id")
+          ) mustBe journeyRecovery
+        }
+
+        "to JourneyRecoveryPage when Mobile is not in the selected IndividualContactMethodOptions" in {
+          navigator.nextPage(
+            IndividualMobileNumberPage,
+            NormalMode,
+            emptyUserAnswers
+              .setOrException(
+                IndividualContactMethodOptionsPage,
+                Set(ContactMethodOptions.Email, ContactMethodOptions.Phone)
+              )
           ) mustBe journeyRecovery
         }
       }
@@ -465,15 +502,29 @@ class IndividualNavigatorSpec extends SpecBase {
         ) mustBe journeyRecovery
       }
 
-      "must go from AddIndividualContactMethodsYesNoPage to AddIndividualContactMethodsYesNoController when answer is Yes" in {
-        val answers = emptyUserAnswers.set(AddIndividualContactMethodsYesNoPage, true).success.value
+      "to IndividualContactMethodOptions page when answer is Yes and IndividualContactMethodOptions not yet answered" in {
+        val answers = emptyUserAnswers.setOrException(AddIndividualContactMethodsYesNoPage, true)
 
         navigator.nextPage(
           AddIndividualContactMethodsYesNoPage,
           AmendMode,
           answers
-        ) mustBe controllers.add.routes.AddIndividualContactMethodsYesNoController
-          .onPageLoad(AmendMode) // TODO: this needs to redirected to new check box page once its implemented
+        ) mustBe controllers.add.routes.IndividualContactMethodOptionsController.onPageLoad(AmendMode)
+      }
+
+      "to amend CYA when answer is Yes and IndividualContactMethodOptions already answered" in {
+        val answers = emptyUserAnswers
+          .setOrException(AddIndividualContactMethodsYesNoPage, true)
+          .setOrException(
+            IndividualContactMethodOptionsPage,
+            Set(ContactMethodOptions.Email, ContactMethodOptions.Phone)
+          )
+
+        navigator.nextPage(
+          AddIndividualContactMethodsYesNoPage,
+          AmendMode,
+          answers
+        ) mustBe AmendCYA
       }
 
       "must go from IndividualEmailAddressPage to CheckYourAnswersController" in {
@@ -868,93 +919,187 @@ class IndividualNavigatorSpec extends SpecBase {
           routes.JourneyRecoveryController.onPageLoad()
       }
 
-      "must go from IndividualChooseContactDetailsPage" - {
-        "to IndividualEmailAddressPage when EmailAddress is selected" in {
-          navigator.nextPage(
-            IndividualChooseContactDetailsPage,
-            CheckMode,
-            emptyUserAnswers.setOrException(
-              IndividualChooseContactDetailsPage,
-              ContactOptions.Email
+      "to CYA when answer is Yes and IndividualContactMethodOptions already answered" in {
+        val answers = emptyUserAnswers
+          .setOrException(AddIndividualContactMethodsYesNoPage, true)
+          .setOrException(
+            IndividualContactMethodOptionsPage,
+            Set(ContactMethodOptions.Email, ContactMethodOptions.Phone)
+          )
+
+        navigator.nextPage(
+          AddIndividualContactMethodsYesNoPage,
+          CheckMode,
+          answers
+        ) mustBe controllers.add.routes.CheckYourAnswersController.onPageLoad()
+      }
+
+      "to IndividualContactMethodOptions page when answer is Yes and IndividualContactMethodOptions not yet answered" in {
+        val answers = emptyUserAnswers.setOrException(AddIndividualContactMethodsYesNoPage, true)
+
+        navigator.nextPage(
+          AddIndividualContactMethodsYesNoPage,
+          CheckMode,
+          answers
+        ) mustBe controllers.add.routes.IndividualContactMethodOptionsController.onPageLoad(CheckMode)
+      }
+
+      "to CYA when answer is No" in {
+        val answers = emptyUserAnswers.set(AddIndividualContactMethodsYesNoPage, false).success.value
+
+        navigator.nextPage(
+          AddIndividualContactMethodsYesNoPage,
+          CheckMode,
+          answers
+        ) mustBe controllers.add.routes.CheckYourAnswersController.onPageLoad()
+      }
+
+      "to JourneyRecovery when answer is not present" in {
+        navigator.nextPage(
+          AddIndividualContactMethodsYesNoPage,
+          CheckMode,
+          emptyUserAnswers
+        ) mustBe journeyRecovery
+      }
+
+      "must go from IndividualContactMethodOptions" - {
+        "to IndividualEmailAddressPage when Email is selected and Email answer not exist" in {
+          val answers = emptyUserAnswers
+            .set(
+              IndividualContactMethodOptionsPage,
+              Set(ContactMethodOptions.Email)
             )
+            .success
+            .value
+
+          navigator.nextPage(
+            IndividualContactMethodOptionsPage,
+            CheckMode,
+            answers
           ) mustBe controllers.add.routes.IndividualEmailAddressController.onPageLoad(CheckMode)
         }
 
-        "to CYA page when Email option is not changed in CheckMode" in {
-          val answers =
-            emptyUserAnswers
-              .setOrException(IndividualChooseContactDetailsPage, ContactOptions.Email)
-              .setOrException(IndividualEmailAddressPage, "test@test.com")
+        "to IndividualEmailAddressPage when Email, Phone and Mobile are selected and no Email answer not exist" in {
+          val answers = emptyUserAnswers
+            .set(
+              IndividualContactMethodOptionsPage,
+              Set(ContactMethodOptions.Email, ContactMethodOptions.Phone, ContactMethodOptions.Mobile)
+            )
+            .success
+            .value
 
           navigator.nextPage(
-            IndividualChooseContactDetailsPage,
+            IndividualContactMethodOptionsPage,
+            CheckMode,
+            answers
+          ) mustBe controllers.add.routes.IndividualEmailAddressController.onPageLoad(CheckMode)
+        }
+
+        "to CYA when only Email is selected and Email answer exists" in {
+          val answers = emptyUserAnswers
+            .set(IndividualContactMethodOptionsPage, Set(ContactMethodOptions.Email))
+            .success
+            .value
+            .set(IndividualEmailAddressPage, "test@test.com")
+            .success
+            .value
+
+          navigator.nextPage(
+            IndividualContactMethodOptionsPage,
             CheckMode,
             answers
           ) mustBe controllers.add.routes.CheckYourAnswersController.onPageLoad()
         }
 
-        "to IndividualPhoneNumberPage when PhoneNumber is selected" in {
-          navigator.nextPage(
-            IndividualChooseContactDetailsPage,
-            CheckMode,
-            emptyUserAnswers.setOrException(
-              IndividualChooseContactDetailsPage,
-              ContactOptions.Phone
+        "to IndividualPhoneNumberPage when Phone is selected (Email is not selected) and Phone answer not exists" in {
+          val answers = emptyUserAnswers
+            .set(
+              IndividualContactMethodOptionsPage,
+              Set(ContactMethodOptions.Phone)
             )
+            .success
+            .value
+
+          navigator.nextPage(
+            IndividualContactMethodOptionsPage,
+            CheckMode,
+            answers
           ) mustBe controllers.add.routes.IndividualPhoneNumberController.onPageLoad(CheckMode)
         }
 
-        "to CYA page when Phone option is not changed in CheckMode" in {
-          val answers =
-            emptyUserAnswers
-              .setOrException(IndividualChooseContactDetailsPage, ContactOptions.Phone)
-              .setOrException(IndividualPhoneNumberPage, "0987654321")
+        "to CYA when only Phone is selected and Phone answer exists" in {
+          val answers = emptyUserAnswers
+            .set(IndividualContactMethodOptionsPage, Set(ContactMethodOptions.Phone))
+            .success
+            .value
+            .set(IndividualPhoneNumberPage, "01234567890")
+            .success
+            .value
 
           navigator.nextPage(
-            IndividualChooseContactDetailsPage,
+            IndividualContactMethodOptionsPage,
             CheckMode,
             answers
           ) mustBe controllers.add.routes.CheckYourAnswersController.onPageLoad()
         }
 
-        "to IndividualMobileNumberPage when MobileNumber is selected" in {
+        "to CYA when only Mobile is selected and Mobile answer exists" in {
+          val answers = emptyUserAnswers
+            .set(IndividualContactMethodOptionsPage, Set(ContactMethodOptions.Mobile))
+            .success
+            .value
+            .set(IndividualMobileNumberPage, "01234567890")
+            .success
+            .value
+
           navigator.nextPage(
-            IndividualChooseContactDetailsPage,
+            IndividualContactMethodOptionsPage,
             CheckMode,
-            emptyUserAnswers.setOrException(
-              IndividualChooseContactDetailsPage,
-              ContactOptions.Mobile
+            answers
+          ) mustBe controllers.add.routes.CheckYourAnswersController.onPageLoad()
+        }
+
+        "to IndividualPhoneNumberPage when Email and Phone are selected and Email answer exists, Phone answer not exists" in {
+          val answers = emptyUserAnswers
+            .set(IndividualContactMethodOptionsPage, Set(ContactMethodOptions.Email, ContactMethodOptions.Phone))
+            .success
+            .value
+            .set(IndividualEmailAddressPage, "test@test.com")
+            .success
+            .value
+
+          navigator.nextPage(
+            IndividualContactMethodOptionsPage,
+            CheckMode,
+            answers
+          ) mustBe controllers.add.routes.IndividualPhoneNumberController.onPageLoad(CheckMode)
+        }
+
+        "to IndividualMobileNumberPage when Email, Phone and Mobile are selected and Email and Phone answer exists, Mobile answer not exists" in {
+          val answers = emptyUserAnswers
+            .set(
+              IndividualContactMethodOptionsPage,
+              Set(ContactMethodOptions.Email, ContactMethodOptions.Phone, ContactMethodOptions.Mobile)
             )
+            .success
+            .value
+            .set(IndividualEmailAddressPage, "test@test.com")
+            .success
+            .value
+            .set(IndividualPhoneNumberPage, "01234567890")
+            .success
+            .value
+
+          navigator.nextPage(
+            IndividualContactMethodOptionsPage,
+            CheckMode,
+            answers
           ) mustBe controllers.add.routes.IndividualMobileNumberController.onPageLoad(CheckMode)
-        }
-
-        "to CYA page when Mobile option is not changed in CheckMode" in {
-          val answers =
-            emptyUserAnswers
-              .setOrException(IndividualChooseContactDetailsPage, ContactOptions.Mobile)
-              .setOrException(IndividualMobileNumberPage, "0987654322")
-
-          navigator.nextPage(
-            IndividualChooseContactDetailsPage,
-            CheckMode,
-            answers
-          ) mustBe controllers.add.routes.CheckYourAnswersController.onPageLoad()
-        }
-
-        "to CheckYourAnswersPage when NoDetails is selected" in {
-          navigator.nextPage(
-            IndividualChooseContactDetailsPage,
-            CheckMode,
-            emptyUserAnswers.setOrException(
-              IndividualChooseContactDetailsPage,
-              ContactOptions.NoDetails
-            )
-          ) mustBe controllers.add.routes.CheckYourAnswersController.onPageLoad()
         }
 
         "to JourneyRecovery when answer is not present" in {
           navigator.nextPage(
-            IndividualChooseContactDetailsPage,
+            IndividualContactMethodOptionsPage,
             CheckMode,
             emptyUserAnswers
           ) mustBe journeyRecovery
@@ -966,7 +1111,7 @@ class IndividualNavigatorSpec extends SpecBase {
           IndividualEmailAddressPage,
           CheckMode,
           UserAnswers("id")
-        ) mustBe controllers.add.routes.CheckYourAnswersController.onPageLoad()
+        ) mustBe AmendCYA
       }
 
       "must go from IndividualMobileNumberPage to CheckYourAnswersController in CheckMode" in {
@@ -974,7 +1119,7 @@ class IndividualNavigatorSpec extends SpecBase {
           IndividualMobileNumberPage,
           CheckMode,
           UserAnswers("id")
-        ) mustBe controllers.add.routes.CheckYourAnswersController.onPageLoad()
+        ) mustBe AmendCYA
       }
 
       "must go from IndividualPhoneNumberPage to CheckYourAnswersController in CheckMode" in {
@@ -982,18 +1127,18 @@ class IndividualNavigatorSpec extends SpecBase {
           IndividualPhoneNumberPage,
           CheckMode,
           UserAnswers("id")
-        ) mustBe controllers.add.routes.CheckYourAnswersController.onPageLoad()
+        ) mustBe AmendCYA
       }
 
       "must go from AddIndividualContactMethodsYesNo" - {
-        "to AddIndividualContactMethodsYesNo page when answer is Yes" in {
+        "to IndividualContactMethodOptionsController page when answer is Yes" in {
           val answers = emptyUserAnswers.set(AddIndividualContactMethodsYesNoPage, true).success.value
 
           navigator.nextPage(
             AddIndividualContactMethodsYesNoPage,
             CheckMode,
             answers
-          ) mustBe controllers.add.routes.AddIndividualContactMethodsYesNoController
+          ) mustBe controllers.add.routes.IndividualContactMethodOptionsController
             .onPageLoad(CheckMode)
         }
 
@@ -1014,6 +1159,173 @@ class IndividualNavigatorSpec extends SpecBase {
             emptyUserAnswers
           ) mustBe journeyRecovery
         }
+      }
+      "must go from IndividualEmailAddressPage" - {
+
+        "to IndividualCheckYourAnswers when no missing ContactMethodOptions answer" in {
+          navigator.nextPage(
+            IndividualEmailAddressPage,
+            CheckMode,
+            emptyUserAnswers
+              .setOrException(
+                IndividualContactMethodOptionsPage,
+                Set(ContactMethodOptions.Email, ContactMethodOptions.Phone, ContactMethodOptions.Mobile)
+              )
+              .setOrException(IndividualEmailAddressPage, "test@test.com")
+              .setOrException(IndividualPhoneNumberPage, "1234567")
+              .setOrException(IndividualMobileNumberPage, "1234567")
+          ) mustBe controllers.add.routes.CheckYourAnswersController.onPageLoad()
+        }
+
+        "to IndividualPhoneNumberPage when IndividualPhoneNumber is missing from ContactMethodOptions answer" in {
+          navigator.nextPage(
+            IndividualEmailAddressPage,
+            CheckMode,
+            emptyUserAnswers
+              .setOrException(
+                IndividualContactMethodOptionsPage,
+                Set(ContactMethodOptions.Email, ContactMethodOptions.Phone, ContactMethodOptions.Mobile)
+              )
+              .setOrException(IndividualEmailAddressPage, "test@test.com")
+              .setOrException(IndividualMobileNumberPage, "1234567")
+          ) mustBe controllers.add.routes.IndividualPhoneNumberController.onPageLoad(CheckMode)
+        }
+
+        "to IndividualMobileNumberPage when IndividualMobileNumber is missing from ContactMethodOptions answer" in {
+          navigator.nextPage(
+            IndividualEmailAddressPage,
+            CheckMode,
+            emptyUserAnswers
+              .setOrException(
+                IndividualContactMethodOptionsPage,
+                Set(ContactMethodOptions.Email, ContactMethodOptions.Phone, ContactMethodOptions.Mobile)
+              )
+              .setOrException(IndividualEmailAddressPage, "test@test.com")
+              .setOrException(IndividualPhoneNumberPage, "1234567")
+          ) mustBe controllers.add.routes.IndividualMobileNumberController.onPageLoad(CheckMode)
+        }
+
+        "to JourneyRecovery when IndividualContactMethodOptions answer is not present" in {
+          navigator.nextPage(
+            IndividualEmailAddressPage,
+            CheckMode,
+            UserAnswers("id")
+          ) mustBe journeyRecovery
+        }
+
+        "to JourneyRecovery when Email is not in the selected IndividualContactMethodOptions" in {
+          navigator.nextPage(
+            IndividualEmailAddressPage,
+            CheckMode,
+            emptyUserAnswers
+              .setOrException(
+                IndividualContactMethodOptionsPage,
+                Set(ContactMethodOptions.Phone, ContactMethodOptions.Mobile)
+              )
+          ) mustBe journeyRecovery
+        }
+      }
+
+      "must go from IndividualPhoneNumberPage" - {
+
+        "to CheckYourAnswers when no missing ContactMethodOptions answer" in {
+          navigator.nextPage(
+            IndividualPhoneNumberPage,
+            CheckMode,
+            emptyUserAnswers
+              .setOrException(
+                IndividualContactMethodOptionsPage,
+                Set(ContactMethodOptions.Email, ContactMethodOptions.Phone, ContactMethodOptions.Mobile)
+              )
+              .setOrException(IndividualEmailAddressPage, "test@test.com")
+              .setOrException(IndividualPhoneNumberPage, "1234567")
+              .setOrException(IndividualMobileNumberPage, "1234567")
+          ) mustBe controllers.add.routes.CheckYourAnswersController.onPageLoad()
+        }
+
+        "to IndividualMobileNumberPage when IndividualMobileNumber is missing from ContactMethodOptions answer" in {
+          navigator.nextPage(
+            IndividualPhoneNumberPage,
+            CheckMode,
+            emptyUserAnswers
+              .setOrException(
+                IndividualContactMethodOptionsPage,
+                Set(ContactMethodOptions.Email, ContactMethodOptions.Phone, ContactMethodOptions.Mobile)
+              )
+              .setOrException(IndividualEmailAddressPage, "test@test.com")
+              .setOrException(IndividualPhoneNumberPage, "1234567")
+          ) mustBe controllers.add.routes.IndividualMobileNumberController.onPageLoad(CheckMode)
+        }
+
+        "to JourneyRecovery when IndividualContactMethodOptions answer is not present" in {
+          navigator.nextPage(
+            IndividualPhoneNumberPage,
+            CheckMode,
+            UserAnswers("id")
+          ) mustBe journeyRecovery
+        }
+
+        "to JourneyRecovery when Phone is not in the selected IndividualContactMethodOptions" in {
+          navigator.nextPage(
+            IndividualPhoneNumberPage,
+            CheckMode,
+            emptyUserAnswers
+              .setOrException(
+                IndividualContactMethodOptionsPage,
+                Set(ContactMethodOptions.Email, ContactMethodOptions.Mobile)
+              )
+          ) mustBe journeyRecovery
+        }
+      }
+
+      "must go from IndividualMobileNumberPage" - {
+
+        "to CheckYourAnswers" in {
+          navigator.nextPage(
+            IndividualMobileNumberPage,
+            CheckMode,
+            emptyUserAnswers
+              .setOrException(
+                IndividualContactMethodOptionsPage,
+                Set(ContactMethodOptions.Email, ContactMethodOptions.Phone, ContactMethodOptions.Mobile)
+              )
+              .setOrException(IndividualEmailAddressPage, "test@test.com")
+              .setOrException(IndividualPhoneNumberPage, "1234567")
+              .setOrException(IndividualMobileNumberPage, "1234567")
+          ) mustBe controllers.add.routes.CheckYourAnswersController.onPageLoad()
+        }
+
+        "to JourneyRecovery when IndividualContactMethodOptions answer is not present" in {
+          navigator.nextPage(
+            IndividualMobileNumberPage,
+            CheckMode,
+            UserAnswers("id")
+          ) mustBe journeyRecovery
+        }
+
+        "to JourneyRecovery when Mobile is not in the selected IndividualContactMethodOptions" in {
+          navigator.nextPage(
+            IndividualMobileNumberPage,
+            CheckMode,
+            emptyUserAnswers
+              .setOrException(
+                IndividualContactMethodOptionsPage,
+                Set(ContactMethodOptions.Email, ContactMethodOptions.Phone)
+              )
+          ) mustBe journeyRecovery
+        }
+      }
+
+      "must go to CheckYourAnswersController for an unknown page in CheckMode (default case _)" in {
+        case object UnknownPage extends QuestionPage[String] {
+          override def path: JsPath = JsPath \ "unknown-page"
+        }
+
+        navigator.nextPage(
+          UnknownPage,
+          CheckMode,
+          emptyUserAnswers
+        ) mustBe controllers.add.routes.CheckYourAnswersController.onPageLoad()
       }
     }
 

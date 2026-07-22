@@ -35,7 +35,10 @@ trait Validation {
     questionPage: QuestionPage[A],
     yesNoPage: QuestionPage[Boolean]
   )(implicit reads: Reads[A]): Either[ValidationError, Option[A]] =
-    (answers.get(questionPage), answers.get(yesNoPage)) match {
+    (
+      answers.get(questionPage),
+      answers.get(yesNoPage)
+    ) match {
       case (None, Some(false))       => Right(None)
       case (_, None)                 => Left(MissingAnswer(yesNoPage))
       case (Some(value), Some(true)) => Right(Some(value))
@@ -47,7 +50,11 @@ trait Validation {
     questionPage: QuestionPage[A],
     yesNoPage: QuestionPage[Boolean]
   )(implicit reads: Reads[A]): Either[ValidationError, Option[A]] = {
-    val pages = Seq(answers.get(questionPage), answers.get(yesNoPage))
+    val pages = Seq(
+      answers.get(questionPage),
+      answers.get(yesNoPage)
+    )
+
     if (pages.forall(_.isEmpty)) {
       Right(None)
     } else {
