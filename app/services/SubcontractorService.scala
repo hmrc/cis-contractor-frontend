@@ -21,6 +21,7 @@ import models.{TypeOfSubcontractor, UserAnswers}
 import models.TypeOfSubcontractor.{Individualorsoletrader, Limitedcompany, Partnership, Trust}
 import models.contact.ContactOptions
 import models.requests.CreateAndUpdateSubcontractorPayload.{CompanyPayload, IndividualOrSoleTraderPayload, PartnershipPayload, TrustPayload}
+import models.response.GetSubcontractorResponse
 import pages.add.*
 import pages.add.partnership.*
 import pages.add.company.*
@@ -191,4 +192,10 @@ class SubcontractorService @Inject() (
       mobilePhoneNumber = userAnswers.get(TrustMobileNumberPage),
       worksReferenceNumber = userAnswers.get(TrustWorksReferencePage)
     )
+
+  def getSubcontractor(
+    cisId: String,
+    subbieResourceRef: Long
+  )(implicit hc: HeaderCarrier): Future[GetSubcontractorResponse] =
+    cisConnector.getSubcontractor(cisId = cisId, subbieResourceRef = subbieResourceRef)
 }

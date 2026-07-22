@@ -18,84 +18,169 @@ package controllers.amend
 
 import controllers.actions.*
 import models.TypeOfSubcontractor.Individualorsoletrader
+import models.UserAnswers
 import models.add.SubcontractorName
 import models.address.{Address, Country}
 import models.amend.OriginalIndividualAnswers
 import models.contact.ContactOptions.NoDetails
+import models.response.SubcontractorResponse
 import pages.add.*
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.Logging
+import play.api.libs.json.Writes
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import queries.{CisIdQuery, OriginalIndividualAnswersQuery}
 import repositories.SessionRepository
+import services.SubcontractorService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
 
-// TODO: replace demo data with real backend fetch
 class AmendIndividualController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
+  subcontractorService: SubcontractorService,
   sessionRepository: SessionRepository,
   val controllerComponents: MessagesControllerComponents
 )(implicit ec: ExecutionContext)
-    extends FrontendBaseController {
+    extends FrontendBaseController
+    with Logging {
 
-  private val individualAddress = Address(
-    addressLine1 = "12 Harbor View Road",
-    addressLine2 = Some("Amity Island"),
-    addressLine3 = Some("Bodmin"),
-    addressLine4 = Some("Cornwall"),
-    postcode = Some("PL31 2HL"),
-    country = Some(Country(code = None, name = Some("England")))
-  )
+  private def recovery: Result =
+    Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
 
-  private val individualName = SubcontractorName(
-    firstName = "Martin",
-    middleName = None,
-    lastName = "Brody"
-  )
+  def onPageLoad(cisId: String, subbieResourceRef: Long): Action[AnyContent] =
+    (identify andThen getData andThen requireData).async { implicit request =>
+      subcontractorService
+        .getSubcontractor(cisId, subbieResourceRef)
+        .flatMap { response =>
+          response.subcontractor match {
+            case None =>
+              logger.error(
+                s"[AmendIndividualController] No subcontractor returned for " +
+                  s"cisId=$cisId, subbieResourceRef=$subbieResourceRef"
+              )
 
-  private val individualOriginal = OriginalIndividualAnswers(
-    usesTradingName = Some(false),
-    tradingName = None,
-    subcontractorName = Some(individualName),
-    address = Some(individualAddress),
-    contactMethod = Some(NoDetails),
-    contactValue = None,
-    utr = Some("3992651526"),
-    nino = Some("QQ123456C"),
-    worksReference = Some("XLS345-MM")
-  )
+              Future.successful(recovery)
 
-  protected def populateUserAnswers(ua: models.UserAnswers): Try[models.UserAnswers] = for {
-    ua <- ua.set(TypeOfSubcontractorPage, Individualorsoletrader)
-    ua <- ua.set(SubTradingNameYesNoPage, false)
-    ua <- ua.set(SubcontractorNamePage, individualName)
-    ua <- ua.set(SubAddressYesNoPage, true)
-    ua <- ua.set(AddressOfSubcontractorPage, individualAddress)
-    ua <- ua.set(IndividualChooseContactDetailsPage, NoDetails)
-    ua <- ua.set(UniqueTaxpayerReferenceYesNoPage, true)
-    ua <- ua.set(SubcontractorsUniqueTaxpayerReferencePage, "3992651526")
-    ua <- ua.set(NationalInsuranceNumberYesNoPage, true)
-    ua <- ua.set(SubNationalInsuranceNumberPage, "QQ123456C")
-    ua <- ua.set(WorksReferenceNumberYesNoPage, true)
-    ua <- ua.set(WorksReferenceNumberPage, "XLS345-MM")
-    ua <- ua.set(CisIdQuery, "1")
-    ua <- ua.set(AddIndividualContactMethodsYesNoPage, false)
-    ua <- ua.set(OriginalIndividualAnswersQuery, individualOriginal)
-  } yield ua
+            case Some(subcontractor) =>
+              populateUserAnswers(
+                request.userAnswers,
+                cisId,
+                subcontractor
+              ).fold(
+                error => {
+                  logger.error(
+                    "[AmendIndividualController] Failed to populate UserAnswers",
+                    error
+                  )
 
-  def onPageLoad(): Action[AnyContent] = (identify andThen getData andThen requireData).async { implicit request =>
-    populateUserAnswers(request.userAnswers).fold(
-      _ => Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())),
-      ua =>
-        sessionRepository
-          .set(ua)
-          .map(_ =>
-            Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-          ) // TODO - redirect to [Amend Individual] Subcontractor details DTR-6497
+                  Future.successful(recovery)
+                },
+                updatedAnswers =>
+                  sessionRepository
+                    .set(updatedAnswers)
+                    .map { _ =>
+                      Redirect(
+                        controllers.amend.routes.AmendIndividualCheckYourAnswersController
+                          .onPageLoad()
+                      )
+                    }
+              )
+          }
+        }
+        .recover { case error =>
+          logger.error(
+            s"[AmendIndividualController] Failed to retrieve subcontractor. " +
+              s"cisId=$cisId, subbieResourceRef=$subbieResourceRef",
+            error
+          )
+
+          recovery
+        }
+    }
+
+  protected def populateUserAnswers(
+    userAnswers: UserAnswers,
+    cisId: String,
+    subcontractor: SubcontractorResponse
+  ): Try[UserAnswers] = {
+    val address = toAddress(subcontractor)
+
+    val name = for {
+      firstName <- subcontractor.firstName
+      surname   <- subcontractor.surname
+    } yield SubcontractorName(
+      firstName = firstName,
+      middleName = subcontractor.secondName,
+      lastName = surname
     )
+
+    val usesTradingName = subcontractor.tradingName.exists(_.trim.nonEmpty)
+
+    val originalAnswers =
+      OriginalIndividualAnswers(
+        usesTradingName = Some(usesTradingName),
+        tradingName = subcontractor.tradingName,
+        subcontractorName = name,
+        address = address,
+        contactMethod = Some(NoDetails),
+        contactValue = None,
+        utr = subcontractor.utr,
+        nino = subcontractor.nino,
+        worksReference = subcontractor.worksReferenceNumber
+      )
+
+    for {
+      updated <- userAnswers.set(TypeOfSubcontractorPage, Individualorsoletrader)
+      updated <- updated.set(SubTradingNameYesNoPage, usesTradingName)
+      updated <- setOptional(updated, TradingNameOfSubcontractorPage, subcontractor.tradingName)
+      updated <- setOptional(updated, SubcontractorNamePage, name)
+      updated <- updated.set(SubAddressYesNoPage, address.isDefined)
+      updated <- setOptional(updated, AddressOfSubcontractorPage, address)
+      updated <- updated.set(IndividualChooseContactDetailsPage, NoDetails)
+      updated <- updated.set(AddIndividualContactMethodsYesNoPage, false)
+      updated <- updated.set(UniqueTaxpayerReferenceYesNoPage, subcontractor.utr.isDefined)
+      updated <- setOptional(updated, SubcontractorsUniqueTaxpayerReferencePage, subcontractor.utr)
+      updated <- updated.set(NationalInsuranceNumberYesNoPage, subcontractor.nino.isDefined)
+      updated <- setOptional(updated, SubNationalInsuranceNumberPage, subcontractor.nino)
+      updated <- updated.set(WorksReferenceNumberYesNoPage, subcontractor.worksReferenceNumber.isDefined)
+      updated <- setOptional(updated, WorksReferenceNumberPage, subcontractor.worksReferenceNumber)
+      updated <- updated.set(CisIdQuery, cisId)
+      updated <- updated.set(OriginalIndividualAnswersQuery, originalAnswers)
+    } yield updated
   }
+
+  private def toAddress(subcontractor: SubcontractorResponse): Option[Address] =
+    subcontractor.addressLine1.map { addressLine1 =>
+      Address(
+        addressLine1 = addressLine1,
+        addressLine2 = subcontractor.addressLine2,
+        addressLine3 = subcontractor.addressLine3,
+        addressLine4 = subcontractor.addressLine4,
+        addressLine5 = None,
+        postcode = subcontractor.postcode,
+        country = subcontractor.country.map { country =>
+          Country(
+            code = None,
+            name = Some(country)
+          )
+        }
+      )
+    }
+
+  private def setOptional[A: Writes](
+    userAnswers: UserAnswers,
+    page: pages.QuestionPage[A],
+    value: Option[A]
+  ): Try[UserAnswers] =
+    value match {
+      case Some(answer) =>
+        userAnswers.set(page, answer)
+
+      case None =>
+        Try(userAnswers)
+    }
 }

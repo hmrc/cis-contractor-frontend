@@ -208,4 +208,27 @@ class ConstructionIndustrySchemeConnector @Inject() (config: ServicesConfig, htt
     http
       .get(url"$cisBaseUrl/submissions/verification/poll?submissionId=$submissionId&pollUrl=$pollUrl")
       .execute[ChrisPollResponse]
+
+  def getSubcontractor(
+    cisId: String,
+    subbieResourceRef: Long
+  )(implicit hc: HeaderCarrier): Future[GetSubcontractorResponse] = {
+    logger.info(
+      s"[ConstructionIndustrySchemeConnector][getSubcontractor] " +
+        s"cisId=$cisId, subbieResourceRef=$subbieResourceRef"
+    )
+
+    http
+      .get(url"$cisBaseUrl/subcontractor/$cisId/$subbieResourceRef")
+      .execute[GetSubcontractorResponse]
+      .map { response =>
+        logger.info(
+          s"[ConstructionIndustrySchemeConnector][getSubcontractor] " +
+            s"Retrieved subcontractor for cisId=$cisId, subbieResourceRef=$subbieResourceRef"
+        )
+
+        response
+      }
+  }
+
 }
