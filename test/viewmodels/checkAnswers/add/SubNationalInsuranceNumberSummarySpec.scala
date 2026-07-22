@@ -18,7 +18,7 @@ package viewmodels.checkAnswers.add
 
 import controllers.add.routes
 import helpers.CyaEncodingSpecHelper
-import models.{CheckMode, UserAnswers}
+import models.{AmendMode, CheckMode, UserAnswers}
 import org.scalatest.OptionValues.convertOptionToValuable
 import org.scalatest.TryValues.convertTryToSuccessOrFailure
 import org.scalatest.freespec.AnyFreeSpec
@@ -58,6 +58,38 @@ class SubNationalInsuranceNumberSummarySpec extends AnyFreeSpec with Matchers wi
       val changeAction       = actions.head
       val expectedChangeText = messages("site.change")
       val expectedHref       = routes.SubNationalInsuranceNumberController.onPageLoad(CheckMode).url
+      val expectedHiddenText = messages("subNationalInsuranceNumber.change.hidden")
+
+      changeAction.content.asHtml.toString should include(expectedChangeText)
+      changeAction.href                  shouldBe expectedHref
+
+      changeAction.visuallyHiddenText.value shouldBe expectedHiddenText
+    }
+
+    "must return a SummaryListRow when the answer exists in amend journey" in {
+      val answers =
+        UserAnswers("test-id")
+          .set(SubNationalInsuranceNumberPage, "AA123456A")
+          .success
+          .value
+
+      val maybeRow = SubNationalInsuranceNumberSummary.row(answers, AmendMode)
+      maybeRow shouldBe defined
+
+      val row = maybeRow.value
+
+      val expectedKeyText = messages("subNationalInsuranceNumber.checkYourAnswersLabel")
+      row.key.content.asHtml.toString should include(expectedKeyText)
+
+      row.value.content.asHtml.toString should include("AA123456A")
+
+      row.actions shouldBe defined
+      val actions = row.actions.value.items
+      actions should have size 1
+
+      val changeAction       = actions.head
+      val expectedChangeText = messages("site.change")
+      val expectedHref       = routes.SubNationalInsuranceNumberController.onPageLoad(AmendMode).url
       val expectedHiddenText = messages("subNationalInsuranceNumber.change.hidden")
 
       changeAction.content.asHtml.toString should include(expectedChangeText)
