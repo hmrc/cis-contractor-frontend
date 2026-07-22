@@ -198,48 +198,46 @@ class AmendPartnershipRemoveDetailYesNoPageSpec extends PageBehaviours {
         PartnershipNominatedPartnerCrnYesNoPage,
         "12345678"
       )
-    ).foreach {
-      case (detail, detailPage, yesNoPage, dummyDetail) =>
+    ).foreach { case (detail, detailPage, yesNoPage, dummyDetail) =>
+      s"cleanup: must remove $detailPage and set $yesNoPage to No when Yes is selected" in {
 
-        s"cleanup: must remove $detailPage and set $yesNoPage to No when Yes is selected" in {
+        val userAnswers = emptyUserAnswers
+          .set(detailPage, dummyDetail)
+          .success
+          .value
+          .set(yesNoPage, true)
+          .success
+          .value
 
-          val userAnswers = emptyUserAnswers
-            .set(detailPage, dummyDetail)
-            .success
-            .value
-            .set(yesNoPage, true)
-            .success
-            .value
-
-          val updatedUserAnswers =
-            userAnswers
-              .set(AmendPartnershipRemoveDetailYesNoPage(detail), true)
-              .success
-              .value
-
-          updatedUserAnswers.get(detailPage) mustBe None
-          updatedUserAnswers.get(yesNoPage) mustBe Some(false)
-        }
-
-        s"cleanup: must retain $detailPage and keep $yesNoPage as Yes when No is selected" in {
-
-          val userAnswers = emptyUserAnswers
-            .set(detailPage, dummyDetail)
-            .success
-            .value
-            .set(yesNoPage, true)
+        val updatedUserAnswers =
+          userAnswers
+            .set(AmendPartnershipRemoveDetailYesNoPage(detail), true)
             .success
             .value
 
-          val updatedUserAnswers =
-            userAnswers
-              .set(AmendPartnershipRemoveDetailYesNoPage(detail), false)
-              .success
-              .value
+        updatedUserAnswers.get(detailPage) mustBe None
+        updatedUserAnswers.get(yesNoPage) mustBe Some(false)
+      }
 
-          updatedUserAnswers.get(detailPage) mustBe Some(dummyDetail)
-          updatedUserAnswers.get(yesNoPage) mustBe Some(true)
-        }
+      s"cleanup: must retain $detailPage and keep $yesNoPage as Yes when No is selected" in {
+
+        val userAnswers = emptyUserAnswers
+          .set(detailPage, dummyDetail)
+          .success
+          .value
+          .set(yesNoPage, true)
+          .success
+          .value
+
+        val updatedUserAnswers =
+          userAnswers
+            .set(AmendPartnershipRemoveDetailYesNoPage(detail), false)
+            .success
+            .value
+
+        updatedUserAnswers.get(detailPage) mustBe Some(dummyDetail)
+        updatedUserAnswers.get(yesNoPage) mustBe Some(true)
+      }
     }
   }
 }

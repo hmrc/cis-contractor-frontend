@@ -19,9 +19,7 @@ package forms.amend.partnership
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
-class AmendPartnershipRemoveDetailYesNoFormProviderSpec
-  extends AnyWordSpec
-    with Matchers {
+class AmendPartnershipRemoveDetailYesNoFormProviderSpec extends AnyWordSpec with Matchers {
 
   private val form =
     new AmendPartnershipRemoveDetailYesNoFormProvider()()
@@ -32,20 +30,20 @@ class AmendPartnershipRemoveDetailYesNoFormProviderSpec
       val result = form.bind(Map("value" -> "true"))
 
       result.errors shouldBe empty
-      result.value shouldBe Some(true)
+      result.value  shouldBe Some(true)
     }
 
     "bind false successfully" in {
       val result = form.bind(Map("value" -> "false"))
 
       result.errors shouldBe empty
-      result.value shouldBe Some(false)
+      result.value  shouldBe Some(false)
     }
 
     "return a required error when value is missing" in {
       val result = form.bind(Map.empty)
 
-      result.hasErrors shouldBe true
+      result.hasErrors           shouldBe true
       result.errors.map(_.message) should contain(
         "amendPartnershipRemoveDetailYesNo.error.required"
       )
@@ -54,7 +52,7 @@ class AmendPartnershipRemoveDetailYesNoFormProviderSpec
     "return a required error when value is empty" in {
       val result = form.bind(Map("value" -> ""))
 
-      result.hasErrors shouldBe true
+      result.hasErrors           shouldBe true
       result.errors.map(_.message) should contain(
         "amendPartnershipRemoveDetailYesNo.error.required"
       )

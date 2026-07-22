@@ -31,9 +31,7 @@ import views.html.amend.partnership.AmendPartnershipRemoveDetailYesNoView
 
 import scala.concurrent.Future
 
-class AmendPartnershipRemoveDetailYesNoControllerSpec
-  extends SpecBase
-    with MockitoSugar {
+class AmendPartnershipRemoveDetailYesNoControllerSpec extends SpecBase with MockitoSugar {
 
   val formProvider =
     new AmendPartnershipRemoveDetailYesNoFormProvider()
@@ -57,8 +55,8 @@ class AmendPartnershipRemoveDetailYesNoControllerSpec
       .value
 
   private def uaWithDetail(
-                            detail: String
-                          ): UserAnswers = {
+    detail: String
+  ): UserAnswers = {
 
     val userAnswers =
       detail match {
@@ -131,393 +129,382 @@ class AmendPartnershipRemoveDetailYesNoControllerSpec
         "nominated partner's company registration number",
         nominatedPartnerName
       )
-    ).foreach {
-      case (detail, detailTitle, detailName) =>
-
-        s"when detail is '$detail'" - {
-
-          val form = formProvider()
-
-          lazy val removeDetailYesNoRoute =
-            controllers.amend.partnership.routes
-              .AmendPartnershipRemoveDetailYesNoController
-              .onPageLoad(detail)
-              .url
-
-          "must return OK and the correct view for a GET" in {
-
-            val application =
-              applicationBuilder(
-                userAnswers = Some(uaWithDetail(detail))
-              ).build()
-
-            running(application) {
-
-              val request =
-                FakeRequest(GET, removeDetailYesNoRoute)
-
-              val result =
-                route(application, request).value
-
-              val view =
-                application.injector
-                  .instanceOf[AmendPartnershipRemoveDetailYesNoView]
-
-              status(result) mustEqual OK
-
-              contentAsString(result) mustEqual
-                view(
-                  form,
-                  detail,
-                  detailTitle,
-                  detailName
-                )(
-                  request,
-                  messages(application)
-                ).toString
-            }
-          }
-
-          "must redirect to the partnership Check Your Answers page when Yes is submitted" in {
-
-            val mockSessionRepository =
-              mock[SessionRepository]
-
-            when(mockSessionRepository.set(any()))
-              .thenReturn(Future.successful(true))
-
-            val application =
-              applicationBuilder(
-                userAnswers = Some(uaWithDetail(detail))
-              )
-                .overrides(
-                  bind[SessionRepository]
-                    .toInstance(mockSessionRepository)
-                )
-                .build()
-
-            running(application) {
-
-              val request =
-                FakeRequest(
-                  POST,
-                  controllers.amend.partnership.routes
-                    .AmendPartnershipRemoveDetailYesNoController
-                    .onSubmit(detail)
-                    .url
-                )
-                  .withFormUrlEncodedBody(
-                    ("value", "true")
-                  )
-
-              val result =
-                route(application, request).value
-
-              status(result) mustEqual SEE_OTHER
-
-              redirectLocation(result).value mustEqual
-                controllers.add.partnership.routes
-                  .PartnershipCheckYourAnswersController
-                  .onPageLoad()
-                  .url
-            }
-          }
-
-          "must redirect to the partnership Check Your Answers page when No is submitted" in {
-
-            val mockSessionRepository =
-              mock[SessionRepository]
-
-            when(mockSessionRepository.set(any()))
-              .thenReturn(Future.successful(true))
-
-            val application =
-              applicationBuilder(
-                userAnswers = Some(uaWithDetail(detail))
-              )
-                .overrides(
-                  bind[SessionRepository]
-                    .toInstance(mockSessionRepository)
-                )
-                .build()
-
-            running(application) {
-
-              val request =
-                FakeRequest(
-                  POST,
-                  controllers.amend.partnership.routes
-                    .AmendPartnershipRemoveDetailYesNoController
-                    .onSubmit(detail)
-                    .url
-                )
-                  .withFormUrlEncodedBody(
-                    ("value", "false")
-                  )
-
-              val result =
-                route(application, request).value
-
-              status(result) mustEqual SEE_OTHER
-
-              redirectLocation(result).value mustEqual
-                controllers.add.partnership.routes
-                  .PartnershipCheckYourAnswersController
-                  .onPageLoad()
-                  .url
-            }
-          }
-
-          "must return Bad Request with errors when invalid data is submitted" in {
-
-            val application =
-              applicationBuilder(
-                userAnswers = Some(uaWithDetail(detail))
-              ).build()
-
-            running(application) {
-
-              val request =
-                FakeRequest(
-                  POST,
-                  controllers.amend.partnership.routes
-                    .AmendPartnershipRemoveDetailYesNoController
-                    .onSubmit(detail)
-                    .url
-                )
-                  .withFormUrlEncodedBody(
-                    ("value", "")
-                  )
-
-              val boundForm =
-                form.bind(
-                  Map("value" -> "")
-                )
-
-              val view =
-                application.injector
-                  .instanceOf[AmendPartnershipRemoveDetailYesNoView]
-
-              val result =
-                route(application, request).value
-
-              status(result) mustEqual BAD_REQUEST
-
-              contentAsString(result) mustEqual
-                view(
-                  boundForm,
-                  detail,
-                  detailTitle,
-                  detailName
-                )(
-                  request,
-                  messages(application)
-                ).toString
-            }
-          }
-
-          "must redirect to Journey Recovery on GET when no existing UserAnswers are found" in {
-
-            val application =
-              applicationBuilder(
-                userAnswers = None
-              ).build()
-
-            running(application) {
-
-              val request =
-                FakeRequest(
-                  GET,
-                  removeDetailYesNoRoute
-                )
-
-              val result =
-                route(application, request).value
-
-              status(result) mustEqual SEE_OTHER
-
-              redirectLocation(result).value mustEqual
-                controllers.routes.JourneyRecoveryController
-                  .onPageLoad()
-                  .url
-            }
-          }
-
-          "must redirect to Journey Recovery on POST when no existing UserAnswers are found" in {
-
-            val application =
-              applicationBuilder(
-                userAnswers = None
-              ).build()
-
-            running(application) {
-
-              val request =
-                FakeRequest(
-                  POST,
-                  controllers.amend.partnership.routes
-                    .AmendPartnershipRemoveDetailYesNoController
-                    .onSubmit(detail)
-                    .url
-                )
-                  .withFormUrlEncodedBody(
-                    ("value", "true")
-                  )
-
-              val result =
-                route(application, request).value
-
-              status(result) mustEqual SEE_OTHER
-
-              redirectLocation(result).value mustEqual
-                controllers.routes.JourneyRecoveryController
-                  .onPageLoad()
-                  .url
-            }
-          }
-
-          "must redirect to Journey Recovery on GET when the partnership or nominated partner name is missing" in {
-
-            val application =
-              applicationBuilder(
-                userAnswers = Some(emptyUserAnswers)
-              ).build()
-
-            running(application) {
-
-              val request =
-                FakeRequest(
-                  GET,
-                  removeDetailYesNoRoute
-                )
-
-              val result =
-                route(application, request).value
-
-              status(result) mustEqual SEE_OTHER
-
-              redirectLocation(result).value mustEqual
-                controllers.routes.JourneyRecoveryController
-                  .onPageLoad()
-                  .url
-            }
-          }
-
-          "must redirect to Journey Recovery on POST when the partnership or nominated partner name is missing" in {
-
-            val application =
-              applicationBuilder(
-                userAnswers = Some(emptyUserAnswers)
-              ).build()
-
-            running(application) {
-
-              val request =
-                FakeRequest(
-                  POST,
-                  controllers.amend.partnership.routes
-                    .AmendPartnershipRemoveDetailYesNoController
-                    .onSubmit(detail)
-                    .url
-                )
-                  .withFormUrlEncodedBody(
-                    ("value", "true")
-                  )
-
-              val result =
-                route(application, request).value
-
-              status(result) mustEqual SEE_OTHER
-
-              redirectLocation(result).value mustEqual
-                controllers.routes.JourneyRecoveryController
-                  .onPageLoad()
-                  .url
-            }
-          }
-
-          "must redirect to Journey Recovery on GET when the requested detail is not present" in {
-
-            val userAnswers =
-              if (
-                detail == "nominated-partner-utr" ||
-                  detail == "nominated-partner-nino" ||
-                  detail == "nominated-partner-company-registration-number"
-              ) {
-                uaWithNominatedPartnerName
-              } else {
-                uaWithPartnershipName
-              }
-
-            val application =
-              applicationBuilder(
-                userAnswers = Some(userAnswers)
-              ).build()
-
-            running(application) {
-
-              val request =
-                FakeRequest(
-                  GET,
-                  removeDetailYesNoRoute
-                )
-
-              val result =
-                route(application, request).value
-
-              status(result) mustEqual SEE_OTHER
-
-              redirectLocation(result).value mustEqual
-                controllers.routes.JourneyRecoveryController
-                  .onPageLoad()
-                  .url
-            }
-          }
-
-          "must redirect to Journey Recovery on POST when the requested detail is not present" in {
-
-            val userAnswers =
-              if (
-                detail == "nominated-partner-utr" ||
-                  detail == "nominated-partner-nino" ||
-                  detail == "nominated-partner-company-registration-number"
-              ) {
-                uaWithNominatedPartnerName
-              } else {
-                uaWithPartnershipName
-              }
-
-            val application =
-              applicationBuilder(
-                userAnswers = Some(userAnswers)
-              ).build()
-
-            running(application) {
-
-              val request =
-                FakeRequest(
-                  POST,
-                  controllers.amend.partnership.routes
-                    .AmendPartnershipRemoveDetailYesNoController
-                    .onSubmit(detail)
-                    .url
-                )
-                  .withFormUrlEncodedBody(
-                    ("value", "true")
-                  )
-
-              val result =
-                route(application, request).value
-
-              status(result) mustEqual SEE_OTHER
-
-              redirectLocation(result).value mustEqual
-                controllers.routes.JourneyRecoveryController
-                  .onPageLoad()
-                  .url
-            }
+    ).foreach { case (detail, detailTitle, detailName) =>
+      s"when detail is '$detail'" - {
+
+        val form = formProvider()
+
+        lazy val removeDetailYesNoRoute =
+          controllers.amend.partnership.routes.AmendPartnershipRemoveDetailYesNoController
+            .onPageLoad(detail)
+            .url
+
+        "must return OK and the correct view for a GET" in {
+
+          val application =
+            applicationBuilder(
+              userAnswers = Some(uaWithDetail(detail))
+            ).build()
+
+          running(application) {
+
+            val request =
+              FakeRequest(GET, removeDetailYesNoRoute)
+
+            val result =
+              route(application, request).value
+
+            val view =
+              application.injector
+                .instanceOf[AmendPartnershipRemoveDetailYesNoView]
+
+            status(result) mustEqual OK
+
+            contentAsString(result) mustEqual
+              view(
+                form,
+                detail,
+                detailTitle,
+                detailName
+              )(
+                request,
+                messages(application)
+              ).toString
           }
         }
+
+        "must redirect to the partnership Check Your Answers page when Yes is submitted" in {
+
+          val mockSessionRepository =
+            mock[SessionRepository]
+
+          when(mockSessionRepository.set(any()))
+            .thenReturn(Future.successful(true))
+
+          val application =
+            applicationBuilder(
+              userAnswers = Some(uaWithDetail(detail))
+            )
+              .overrides(
+                bind[SessionRepository]
+                  .toInstance(mockSessionRepository)
+              )
+              .build()
+
+          running(application) {
+
+            val request =
+              FakeRequest(
+                POST,
+                controllers.amend.partnership.routes.AmendPartnershipRemoveDetailYesNoController
+                  .onSubmit(detail)
+                  .url
+              )
+                .withFormUrlEncodedBody(
+                  ("value", "true")
+                )
+
+            val result =
+              route(application, request).value
+
+            status(result) mustEqual SEE_OTHER
+
+            redirectLocation(result).value mustEqual
+              controllers.add.partnership.routes.PartnershipCheckYourAnswersController
+                .onPageLoad()
+                .url
+          }
+        }
+
+        "must redirect to the partnership Check Your Answers page when No is submitted" in {
+
+          val mockSessionRepository =
+            mock[SessionRepository]
+
+          when(mockSessionRepository.set(any()))
+            .thenReturn(Future.successful(true))
+
+          val application =
+            applicationBuilder(
+              userAnswers = Some(uaWithDetail(detail))
+            )
+              .overrides(
+                bind[SessionRepository]
+                  .toInstance(mockSessionRepository)
+              )
+              .build()
+
+          running(application) {
+
+            val request =
+              FakeRequest(
+                POST,
+                controllers.amend.partnership.routes.AmendPartnershipRemoveDetailYesNoController
+                  .onSubmit(detail)
+                  .url
+              )
+                .withFormUrlEncodedBody(
+                  ("value", "false")
+                )
+
+            val result =
+              route(application, request).value
+
+            status(result) mustEqual SEE_OTHER
+
+            redirectLocation(result).value mustEqual
+              controllers.add.partnership.routes.PartnershipCheckYourAnswersController
+                .onPageLoad()
+                .url
+          }
+        }
+
+        "must return Bad Request with errors when invalid data is submitted" in {
+
+          val application =
+            applicationBuilder(
+              userAnswers = Some(uaWithDetail(detail))
+            ).build()
+
+          running(application) {
+
+            val request =
+              FakeRequest(
+                POST,
+                controllers.amend.partnership.routes.AmendPartnershipRemoveDetailYesNoController
+                  .onSubmit(detail)
+                  .url
+              )
+                .withFormUrlEncodedBody(
+                  ("value", "")
+                )
+
+            val boundForm =
+              form.bind(
+                Map("value" -> "")
+              )
+
+            val view =
+              application.injector
+                .instanceOf[AmendPartnershipRemoveDetailYesNoView]
+
+            val result =
+              route(application, request).value
+
+            status(result) mustEqual BAD_REQUEST
+
+            contentAsString(result) mustEqual
+              view(
+                boundForm,
+                detail,
+                detailTitle,
+                detailName
+              )(
+                request,
+                messages(application)
+              ).toString
+          }
+        }
+
+        "must redirect to Journey Recovery on GET when no existing UserAnswers are found" in {
+
+          val application =
+            applicationBuilder(
+              userAnswers = None
+            ).build()
+
+          running(application) {
+
+            val request =
+              FakeRequest(
+                GET,
+                removeDetailYesNoRoute
+              )
+
+            val result =
+              route(application, request).value
+
+            status(result) mustEqual SEE_OTHER
+
+            redirectLocation(result).value mustEqual
+              controllers.routes.JourneyRecoveryController
+                .onPageLoad()
+                .url
+          }
+        }
+
+        "must redirect to Journey Recovery on POST when no existing UserAnswers are found" in {
+
+          val application =
+            applicationBuilder(
+              userAnswers = None
+            ).build()
+
+          running(application) {
+
+            val request =
+              FakeRequest(
+                POST,
+                controllers.amend.partnership.routes.AmendPartnershipRemoveDetailYesNoController
+                  .onSubmit(detail)
+                  .url
+              )
+                .withFormUrlEncodedBody(
+                  ("value", "true")
+                )
+
+            val result =
+              route(application, request).value
+
+            status(result) mustEqual SEE_OTHER
+
+            redirectLocation(result).value mustEqual
+              controllers.routes.JourneyRecoveryController
+                .onPageLoad()
+                .url
+          }
+        }
+
+        "must redirect to Journey Recovery on GET when the partnership or nominated partner name is missing" in {
+
+          val application =
+            applicationBuilder(
+              userAnswers = Some(emptyUserAnswers)
+            ).build()
+
+          running(application) {
+
+            val request =
+              FakeRequest(
+                GET,
+                removeDetailYesNoRoute
+              )
+
+            val result =
+              route(application, request).value
+
+            status(result) mustEqual SEE_OTHER
+
+            redirectLocation(result).value mustEqual
+              controllers.routes.JourneyRecoveryController
+                .onPageLoad()
+                .url
+          }
+        }
+
+        "must redirect to Journey Recovery on POST when the partnership or nominated partner name is missing" in {
+
+          val application =
+            applicationBuilder(
+              userAnswers = Some(emptyUserAnswers)
+            ).build()
+
+          running(application) {
+
+            val request =
+              FakeRequest(
+                POST,
+                controllers.amend.partnership.routes.AmendPartnershipRemoveDetailYesNoController
+                  .onSubmit(detail)
+                  .url
+              )
+                .withFormUrlEncodedBody(
+                  ("value", "true")
+                )
+
+            val result =
+              route(application, request).value
+
+            status(result) mustEqual SEE_OTHER
+
+            redirectLocation(result).value mustEqual
+              controllers.routes.JourneyRecoveryController
+                .onPageLoad()
+                .url
+          }
+        }
+
+        "must redirect to Journey Recovery on GET when the requested detail is not present" in {
+
+          val userAnswers =
+            if (
+              detail == "nominated-partner-utr" ||
+              detail == "nominated-partner-nino" ||
+              detail == "nominated-partner-company-registration-number"
+            ) {
+              uaWithNominatedPartnerName
+            } else {
+              uaWithPartnershipName
+            }
+
+          val application =
+            applicationBuilder(
+              userAnswers = Some(userAnswers)
+            ).build()
+
+          running(application) {
+
+            val request =
+              FakeRequest(
+                GET,
+                removeDetailYesNoRoute
+              )
+
+            val result =
+              route(application, request).value
+
+            status(result) mustEqual SEE_OTHER
+
+            redirectLocation(result).value mustEqual
+              controllers.routes.JourneyRecoveryController
+                .onPageLoad()
+                .url
+          }
+        }
+
+        "must redirect to Journey Recovery on POST when the requested detail is not present" in {
+
+          val userAnswers =
+            if (
+              detail == "nominated-partner-utr" ||
+              detail == "nominated-partner-nino" ||
+              detail == "nominated-partner-company-registration-number"
+            ) {
+              uaWithNominatedPartnerName
+            } else {
+              uaWithPartnershipName
+            }
+
+          val application =
+            applicationBuilder(
+              userAnswers = Some(userAnswers)
+            ).build()
+
+          running(application) {
+
+            val request =
+              FakeRequest(
+                POST,
+                controllers.amend.partnership.routes.AmendPartnershipRemoveDetailYesNoController
+                  .onSubmit(detail)
+                  .url
+              )
+                .withFormUrlEncodedBody(
+                  ("value", "true")
+                )
+
+            val result =
+              route(application, request).value
+
+            status(result) mustEqual SEE_OTHER
+
+            redirectLocation(result).value mustEqual
+              controllers.routes.JourneyRecoveryController
+                .onPageLoad()
+                .url
+          }
+        }
+      }
     }
 
     "when detail is invalid" - {
@@ -534,8 +521,7 @@ class AmendPartnershipRemoveDetailYesNoControllerSpec
           val request =
             FakeRequest(
               GET,
-              controllers.amend.partnership.routes
-                .AmendPartnershipRemoveDetailYesNoController
+              controllers.amend.partnership.routes.AmendPartnershipRemoveDetailYesNoController
                 .onPageLoad("invalid")
                 .url
             )
@@ -564,8 +550,7 @@ class AmendPartnershipRemoveDetailYesNoControllerSpec
           val request =
             FakeRequest(
               POST,
-              controllers.amend.partnership.routes
-                .AmendPartnershipRemoveDetailYesNoController
+              controllers.amend.partnership.routes.AmendPartnershipRemoveDetailYesNoController
                 .onSubmit("invalid")
                 .url
             )

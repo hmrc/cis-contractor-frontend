@@ -27,10 +27,7 @@ import play.api.mvc.Request
 import play.api.test.FakeRequest
 import views.html.amend.partnership.AmendPartnershipRemoveDetailYesNoView
 
-class AmendPartnershipRemoveDetailYesNoViewSpec
-  extends AnyWordSpec
-    with Matchers
-    with GuiceOneAppPerSuite {
+class AmendPartnershipRemoveDetailYesNoViewSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite {
 
   private val formProvider =
     new AmendPartnershipRemoveDetailYesNoFormProvider()
@@ -70,187 +67,181 @@ class AmendPartnershipRemoveDetailYesNoViewSpec
       "nominated partner's company registration number",
       "Juely"
     )
-  ).foreach {
-    case (detail, detailTitle, detailName) =>
+  ).foreach { case (detail, detailTitle, detailName) =>
+    s"AmendPartnershipRemoveDetailYesNoView when detail is '$detail'" should {
 
-      s"AmendPartnershipRemoveDetailYesNoView when detail is '$detail'" should {
+      "render the page with the correct browser title and heading" in {
 
-        "render the page with the correct browser title and heading" in {
-
-          val result =
-            view(
-              form,
-              detail,
-              detailTitle,
-              detailName
-            )
-
-          val document =
-            Jsoup.parse(result.body)
-
-          // Browser title is intentionally generic.
-          document.title() should include(
-            messages(
-              "amendPartnershipRemoveDetailYesNo.title"
-            )
+        val result =
+          view(
+            form,
+            detail,
+            detailTitle,
+            detailName
           )
 
-          // The dynamic detail and subcontractor name
-          // are displayed in the page heading.
-          val legend =
-            document.select("fieldset legend")
+        val document =
+          Jsoup.parse(result.body)
 
-          legend.text() should include(detailTitle)
-          legend.text() should include(detailName)
-
-          legend
-            .hasClass("govuk-fieldset__legend--l") shouldBe true
-        }
-
-        "render two yes/no radio buttons" in {
-
-          val result =
-            view(
-              form,
-              detail,
-              detailTitle,
-              detailName
-            )
-
-          val document =
-            Jsoup.parse(result.body)
-
-          val radios =
-            document.select("input[type=radio]")
-
-          radios.size() shouldBe 2
-
-          val labels =
-            document
-              .select(".govuk-radios__label")
-              .eachText()
-
-          labels should contain("Yes")
-          labels should contain("No")
-        }
-
-        "render the correct form action" in {
-
-          val result =
-            view(
-              form,
-              detail,
-              detailTitle,
-              detailName
-            )
-
-          val document =
-            Jsoup.parse(result.body)
-
-          document
-            .select("form")
-            .attr("action") shouldBe
-            controllers.amend.partnership.routes
-              .AmendPartnershipRemoveDetailYesNoController
-              .onSubmit(detail)
-              .url
-        }
-
-        "set autocomplete to off" in {
-
-          val result =
-            view(
-              form,
-              detail,
-              detailTitle,
-              detailName
-            )
-
-          val document =
-            Jsoup.parse(result.body)
-
-          document
-            .select("form")
-            .attr("autocomplete") shouldBe "off"
-        }
-
-        "render the continue button" in {
-
-          val result =
-            view(
-              form,
-              detail,
-              detailTitle,
-              detailName
-            )
-
-          val document =
-            Jsoup.parse(result.body)
-
-          document
-            .select(".govuk-button")
-            .text() shouldBe messages("site.continue")
-        }
-
-        "show the error summary and inline error when no option is selected" in {
-
-          val errorForm =
-            form
-              .bind(Map.empty[String, String])
-
-          val result =
-            view(
-              errorForm,
-              detail,
-              detailTitle,
-              detailName
-            )
-
-          val document =
-            Jsoup.parse(result.body)
-
-          document
-            .select(".govuk-error-summary")
-            .isEmpty shouldBe false
-
-          document
-            .select(".govuk-error-summary")
-            .text() should include(
-            messages(
-              "amendPartnershipRemoveDetailYesNo.error.required"
-            )
+        document.title() should include(
+          messages(
+            "amendPartnershipRemoveDetailYesNo.title"
           )
+        )
 
-          document
-            .select(".govuk-error-summary a")
-            .attr("href") shouldBe "#value_0"
+        val legend =
+          document.select("fieldset legend")
 
-          document
-            .select(".govuk-error-message")
-            .text() should include(
-            messages(
-              "amendPartnershipRemoveDetailYesNo.error.required"
-            )
-          )
-        }
+        legend.text() should include(detailTitle)
+        legend.text() should include(detailName)
 
-        "not show the error summary when the form has no errors" in {
-
-          val result =
-            view(
-              form,
-              detail,
-              detailTitle,
-              detailName
-            )
-
-          val document =
-            Jsoup.parse(result.body)
-
-          document
-            .select(".govuk-error-summary")
-            .isEmpty shouldBe true
-        }
+        legend
+          .hasClass("govuk-fieldset__legend--l") shouldBe true
       }
+
+      "render two yes/no radio buttons" in {
+
+        val result =
+          view(
+            form,
+            detail,
+            detailTitle,
+            detailName
+          )
+
+        val document =
+          Jsoup.parse(result.body)
+
+        val radios =
+          document.select("input[type=radio]")
+
+        radios.size() shouldBe 2
+
+        val labels =
+          document
+            .select(".govuk-radios__label")
+            .eachText()
+
+        labels should contain("Yes")
+        labels should contain("No")
+      }
+
+      "render the correct form action" in {
+
+        val result =
+          view(
+            form,
+            detail,
+            detailTitle,
+            detailName
+          )
+
+        val document =
+          Jsoup.parse(result.body)
+
+        document
+          .select("form")
+          .attr("action") shouldBe
+          controllers.amend.partnership.routes.AmendPartnershipRemoveDetailYesNoController
+            .onSubmit(detail)
+            .url
+      }
+
+      "set autocomplete to off" in {
+
+        val result =
+          view(
+            form,
+            detail,
+            detailTitle,
+            detailName
+          )
+
+        val document =
+          Jsoup.parse(result.body)
+
+        document
+          .select("form")
+          .attr("autocomplete") shouldBe "off"
+      }
+
+      "render the continue button" in {
+
+        val result =
+          view(
+            form,
+            detail,
+            detailTitle,
+            detailName
+          )
+
+        val document =
+          Jsoup.parse(result.body)
+
+        document
+          .select(".govuk-button")
+          .text() shouldBe messages("site.continue")
+      }
+
+      "show the error summary and inline error when no option is selected" in {
+
+        val errorForm =
+          form
+            .bind(Map.empty[String, String])
+
+        val result =
+          view(
+            errorForm,
+            detail,
+            detailTitle,
+            detailName
+          )
+
+        val document =
+          Jsoup.parse(result.body)
+
+        document
+          .select(".govuk-error-summary")
+          .isEmpty shouldBe false
+
+        document
+          .select(".govuk-error-summary")
+          .text() should include(
+          messages(
+            "amendPartnershipRemoveDetailYesNo.error.required"
+          )
+        )
+
+        document
+          .select(".govuk-error-summary a")
+          .attr("href") shouldBe "#value_0"
+
+        document
+          .select(".govuk-error-message")
+          .text() should include(
+          messages(
+            "amendPartnershipRemoveDetailYesNo.error.required"
+          )
+        )
+      }
+
+      "not show the error summary when the form has no errors" in {
+
+        val result =
+          view(
+            form,
+            detail,
+            detailTitle,
+            detailName
+          )
+
+        val document =
+          Jsoup.parse(result.body)
+
+        document
+          .select(".govuk-error-summary")
+          .isEmpty shouldBe true
+      }
+    }
   }
 }
