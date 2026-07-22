@@ -18,6 +18,7 @@ package controllers.amend.partnership
 
 import base.SpecBase
 import forms.amend.partnership.AmendPartnershipRemoveDetailYesNoFormProvider
+import models.amend.partnership.AmendPartnershipRemoveDetail
 import models.UserAnswers
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
@@ -110,26 +111,14 @@ class AmendPartnershipRemoveDetailYesNoControllerSpec extends SpecBase with Mock
   "AmendPartnershipRemoveDetailYesNo Controller" - {
 
     Seq(
-      ("address", "address", partnershipName),
-      ("contact-details", "contact details", partnershipName),
-      ("utr", "UTR", partnershipName),
-      ("works-reference-number", "works reference number", partnershipName),
-      (
-        "nominated-partner-utr",
-        "nominated partner's UTR",
-        nominatedPartnerName
-      ),
-      (
-        "nominated-partner-nino",
-        "nominated partner's National Insurance number",
-        nominatedPartnerName
-      ),
-      (
-        "nominated-partner-company-registration-number",
-        "nominated partner's company registration number",
-        nominatedPartnerName
-      )
-    ).foreach { case (detail, detailTitle, detailName) =>
+      ("address", partnershipName),
+      ("contact-details", partnershipName),
+      ("utr", partnershipName),
+      ("works-reference-number", partnershipName),
+      ("nominated-partner-utr", nominatedPartnerName),
+      ("nominated-partner-nino", nominatedPartnerName),
+      ("nominated-partner-company-registration-number", nominatedPartnerName)
+    ).foreach { case (detail, detailName) =>
       s"when detail is '$detail'" - {
 
         val form = formProvider()
@@ -157,6 +146,14 @@ class AmendPartnershipRemoveDetailYesNoControllerSpec extends SpecBase with Mock
             val view =
               application.injector
                 .instanceOf[AmendPartnershipRemoveDetailYesNoView]
+
+            val detailType =
+              AmendPartnershipRemoveDetail
+                .fromKey(detail)
+                .value
+
+            val detailTitle =
+              messages(application)(detailType.messageKey)
 
             status(result) mustEqual OK
 
@@ -287,6 +284,14 @@ class AmendPartnershipRemoveDetailYesNoControllerSpec extends SpecBase with Mock
             val view =
               application.injector
                 .instanceOf[AmendPartnershipRemoveDetailYesNoView]
+
+            val detailType =
+              AmendPartnershipRemoveDetail
+                .fromKey(detail)
+                .value
+
+            val detailTitle =
+              messages(application)(detailType.messageKey)
 
             val result =
               route(application, request).value
