@@ -16,7 +16,6 @@
 
 package viewmodels.checkAnswers.add.partnership
 
-import controllers.add.partnership.routes
 import models.{CheckMode, Mode, UserAnswers}
 import pages.add.partnership.PartnershipUniqueTaxpayerReferencePage
 import play.api.i18n.Messages
@@ -26,19 +25,28 @@ import viewmodels.implicits.*
 
 object PartnershipUniqueTaxpayerReferenceSummary {
 
-  def row(answers: UserAnswers, mode: Mode = CheckMode)(implicit messages: Messages): Option[SummaryListRow] =
+  def row(answers: UserAnswers, mode: Mode = CheckMode, showActions: Boolean = true)(implicit
+    messages: Messages
+  ): Option[SummaryListRow] =
     answers.get(PartnershipUniqueTaxpayerReferencePage).map { answer =>
+      val value   = ValueViewModel(answer)
+      val actions =
+        if (showActions) {
+          Seq(
+            ActionItemViewModel(
+              "site.change",
+              controllers.add.partnership.routes.PartnershipUniqueTaxpayerReferenceController.onPageLoad(mode).url
+            )
+              .withVisuallyHiddenText(messages("partnershipUniqueTaxpayerReference.change.hidden"))
+              .withAttribute("id" -> "partnership-unique-taxpayer-reference")
+          )
+        } else {
+          Seq.empty
+        }
       SummaryListRowViewModel(
         key = "partnershipUniqueTaxpayerReference.checkYourAnswersLabel",
-        value = ValueViewModel(answer),
-        actions = Seq(
-          ActionItemViewModel(
-            "site.change",
-            routes.PartnershipUniqueTaxpayerReferenceController.onPageLoad(mode).url
-          )
-            .withVisuallyHiddenText(messages("partnershipUniqueTaxpayerReference.change.hidden"))
-            .withAttribute("id" -> "partnership-unique-taxpayer-reference")
-        )
+        value = value,
+        actions = actions
       )
     }
 }

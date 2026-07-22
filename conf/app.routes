@@ -89,6 +89,10 @@ GET   /subcontractor/amend/partnership  controllers.amend.partnership.AmendPartn
 
 GET   /subcontractor/amend/trust  controllers.amend.trust.AmendTrustController.onPageLoad()
 
+GET   /subcontractor/amend/partnership/subcontractor-information  controllers.amend.partnership.AmendPartnershipCheckYourAnswersController.onPageLoad()
+POST  /subcontractor/amend/partnership/subcontractor-information  controllers.amend.partnership.AmendPartnershipCheckYourAnswersController.onSubmit()
+GET   /subcontractor/amend/partnership/cancel                     controllers.amend.partnership.AmendPartnershipCheckYourAnswersController.onCancel()
+
 # Errors & Auth
 GET  /unauthorised/standard-user  controllers.UnauthorisedWrongRoleController.onPageLoad()
 

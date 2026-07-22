@@ -25,7 +25,7 @@ import models.contact.ContactMethodOptions.Email
 import pages.add.*
 import pages.add.partnership.*
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import queries.{CisIdQuery, OriginalPartnershipAnswersQuery}
+import queries.{CisIdQuery, OriginalPartnershipAnswersQuery, SubContractorVerificationNumberQuery, SubContractorVerifiedQuery}
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
@@ -101,6 +101,8 @@ class AmendPartnershipController @Inject() (
     ua <- ua.set(PartnershipWorksReferenceNumberPage, worksReference)
     ua <- ua.set(CisIdQuery, "1")
     ua <- ua.set(OriginalPartnershipAnswersQuery, partnershipOriginal)
+    ua <- ua.set(SubContractorVerifiedQuery, false)
+    ua <- ua.set(SubContractorVerificationNumberQuery, "V0004528765")
   } yield ua
 
   def onPageLoad(): Action[AnyContent] = (identify andThen getData andThen requireData).async { implicit request =>
