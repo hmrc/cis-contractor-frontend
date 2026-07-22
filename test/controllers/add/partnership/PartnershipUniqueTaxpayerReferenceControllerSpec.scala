@@ -19,7 +19,7 @@ package controllers.add.partnership
 import base.SpecBase
 import controllers.routes
 import forms.add.partnership.PartnershipUtrFormProvider
-import models.{NormalMode, UserAnswers}
+import models.{AmendMode, NormalMode, UserAnswers}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{verify, verifyNoMoreInteractions, when}
 import org.scalatestplus.mockito.MockitoSugar
@@ -45,6 +45,9 @@ class PartnershipUniqueTaxpayerReferenceControllerSpec extends SpecBase with Moc
 
   lazy private val partnershipUniqueTaxpayerReferenceRoute =
     controllers.add.partnership.routes.PartnershipUniqueTaxpayerReferenceController.onPageLoad(NormalMode).url
+
+  lazy private val partnershipUniqueTaxpayerReferenceRouteAmend =
+    controllers.add.partnership.routes.PartnershipUniqueTaxpayerReferenceController.onPageLoad(AmendMode).url
 
   "PartnershipUniqueTaxpayerReferenceControllerSpec Controller" - {
 
@@ -94,7 +97,7 @@ class PartnershipUniqueTaxpayerReferenceControllerSpec extends SpecBase with Moc
       }
     }
 
-    "must bind the form and redirect to JourneyRecovery Page on POST when valid UTR is submitted" in {
+    "must bind the form and redirect to PartnershipNominatedPartnerNameController Page on POST when valid UTR is submitted" in {
 
       val validValue = "5860920998"
 
@@ -128,7 +131,6 @@ class PartnershipUniqueTaxpayerReferenceControllerSpec extends SpecBase with Moc
       verify(mockSubcontractorService).isDuplicateUTR(any[UserAnswers], any[String])(any[HeaderCarrier])
       verifyNoMoreInteractions(mockSubcontractorService)
     }
-
     "must return a Bad Request and show duplicate error when when utr already exists" in {
 
       val duplicatedUTR = "8888888888"
@@ -194,6 +196,138 @@ class PartnershipUniqueTaxpayerReferenceControllerSpec extends SpecBase with Moc
 
         status(result) mustEqual BAD_REQUEST
         contentAsString(result) mustEqual view(boundForm, NormalMode, partnershipName)(
+          request,
+          messages(application)
+        ).toString
+      }
+    }
+
+    "must bind the form and redirect to JourneyRecovery Page on POST when valid UTR is submitted in AmendMode" in {
+
+      val validValue = "5860920998"
+      val prevValue  = "5860920997"
+
+      val uaWithNameForAmend: UserAnswers =
+        uaWithName.set(PartnershipUniqueTaxpayerReferencePage, prevValue).success.value
+
+      val mockSubcontractorService = mock[SubcontractorService]
+
+      when(mockSubcontractorService.isDuplicateUTR(any[UserAnswers], any[String])(any[HeaderCarrier]))
+        .thenReturn(Future.successful(false))
+
+      val application =
+        applicationBuilder(userAnswers = Some(uaWithNameForAmend))
+          .overrides(
+            bind[SubcontractorService].toInstance(mockSubcontractorService)
+          )
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, partnershipUniqueTaxpayerReferenceRouteAmend)
+            .withFormUrlEncodedBody(("value", validValue))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(result).value must include("/subcontractor/there-is-a-problem") // TODO when AmendCYA available
+      }
+
+      verify(mockSubcontractorService).isDuplicateUTR(any[UserAnswers], any[String])(any[HeaderCarrier])
+      verifyNoMoreInteractions(mockSubcontractorService)
+    }
+
+    "must bind the form and redirect to JourneyRecovery Page on POST when valid UTR is submitted but is same as previous value in AmendMode" in {
+
+      val validValue = "5860920998"
+      val prevValue  = "5860920998"
+
+      val uaWithNameForAmend: UserAnswers =
+        uaWithName.set(PartnershipUniqueTaxpayerReferencePage, prevValue).success.value
+
+      val application =
+        applicationBuilder(userAnswers = Some(uaWithNameForAmend))
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, partnershipUniqueTaxpayerReferenceRouteAmend)
+            .withFormUrlEncodedBody(("value", validValue))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(result).value must include("/subcontractor/there-is-a-problem") // TODO when AmendCYA available
+      }
+    }
+
+    "must return a Bad Request and show duplicate error when when utr already exists in Amend journey" in {
+
+      val duplicatedUTR = "8888888888"
+
+      val mockSubcontractorService = mock[SubcontractorService]
+
+      when(mockSubcontractorService.isDuplicateUTR(any[UserAnswers], any[String])(any[HeaderCarrier]))
+        .thenReturn(Future.successful(true))
+
+      val application =
+        applicationBuilder(userAnswers = Some(uaWithName))
+          .overrides(
+            bind[SubcontractorService].toInstance(mockSubcontractorService)
+          )
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, partnershipUniqueTaxpayerReferenceRouteAmend)
+            .withFormUrlEncodedBody(
+              ("value", duplicatedUTR)
+            )
+
+        val boundForm = form
+          .bind(
+            Map(
+              ("value", duplicatedUTR)
+            )
+          )
+
+        val formWithDuplicateError =
+          boundForm.withError("value", "partnershipUniqueTaxpayerReference.error.duplicate")
+
+        val view = application.injector.instanceOf[PartnershipUniqueTaxpayerReferenceView]
+
+        val result = route(application, request).value
+
+        status(result) mustEqual BAD_REQUEST
+        contentAsString(result) mustEqual view(formWithDuplicateError, AmendMode, partnershipName)(
+          request,
+          messages(application)
+        ).toString
+      }
+
+      verify(mockSubcontractorService).isDuplicateUTR(any[UserAnswers], any[String])(any[HeaderCarrier])
+      verifyNoMoreInteractions(mockSubcontractorService)
+    }
+
+    "must return a Bad Request and errors when invalid data is submitted for Amend journey" in {
+
+      val application = applicationBuilder(userAnswers = Some(uaWithName)).build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, partnershipUniqueTaxpayerReferenceRouteAmend)
+            .withFormUrlEncodedBody(("value", ""))
+
+        val boundForm = form.bind(Map("value" -> ""))
+
+        val view = application.injector.instanceOf[PartnershipUniqueTaxpayerReferenceView]
+
+        val result = route(application, request).value
+
+        status(result) mustEqual BAD_REQUEST
+        contentAsString(result) mustEqual view(boundForm, AmendMode, partnershipName)(
           request,
           messages(application)
         ).toString

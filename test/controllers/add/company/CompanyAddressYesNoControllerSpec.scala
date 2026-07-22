@@ -112,7 +112,7 @@ class CompanyAddressYesNoControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must redirect to the CompanyContactOptions page when valid data with value No is submitted" in {
+    "must redirect to the AddCompanyContactMethodsYesNo page when valid data with value No is submitted" in {
 
       val mockSessionRepository = mock[SessionRepository]
 
@@ -133,7 +133,7 @@ class CompanyAddressYesNoControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.add.company.routes.CompanyContactOptionsController
+        redirectLocation(result).value mustEqual controllers.add.company.routes.AddCompanyContactMethodsYesNoController
           .onPageLoad(NormalMode)
           .url
       }

@@ -47,8 +47,10 @@ class InactiveSchemeWarningViewSpec extends AnyWordSpec with Matchers with Guice
 
     "render the page with correct title, heading, paragraphs, warning text and button group links" in {
 
+      val manageSubcontractorsUrl = "/manage-subcontractors/test"
+
       val html =
-        view()(
+        view(manageSubcontractorsUrl)(
           request,
           messages
         )
@@ -85,14 +87,14 @@ class InactiveSchemeWarningViewSpec extends AnyWordSpec with Matchers with Guice
       continueButton.text() mustBe
         messages("site.continue")
       continueButton.attr("href") mustBe
-        controllers.verify.routes.NewestVerificationBatchController.onPageLoad().url
+        controllers.verify.routes.NewestVerificationBatchController.onContinue.url
 
       val cancelLink = buttonGroup.select("a.govuk-link")
       cancelLink.size() mustBe 1
       cancelLink.text() mustBe
         messages("verify.inactiveSchemeWarning.cancel")
       cancelLink.attr("href") mustBe
-        controllers.routes.IndexController.onPageLoad().url
+        manageSubcontractorsUrl
     }
   }
 }

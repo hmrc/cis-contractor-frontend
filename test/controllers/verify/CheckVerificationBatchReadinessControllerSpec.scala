@@ -18,7 +18,7 @@ package controllers.verify
 
 import base.SpecBase
 import models.response.GetNewestVerificationBatchResponse
-import models.{AmendMode, CheckMode, ContractorScheme, NormalMode, Subcontractor, SubcontractorViewModel}
+import models.{AmendMode, ContractorScheme, NormalMode, Subcontractor, SubcontractorViewModel}
 import pages.verify.{NewestVerificationBatchResponsePage, SelectSubcontractorPage}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
@@ -208,18 +208,24 @@ class CheckVerificationBatchReadinessControllerSpec extends SpecBase {
 
     "CheckMode — batch ready" - {
 
-      "must redirect to VerifyCheckYourAnswers" in {
+      "must redirect to VerifyCheckYourAnswers when using checkVerificationBatchReadinessInCheckMode" in {
         val ua = emptyUserAnswers
           .setOrException(SelectSubcontractorPage, Set(selectedSub))
           .setOrException(
             NewestVerificationBatchResponsePage,
-            batchResponse(Seq(readyIndividual(1)), emailAddress = Some("agent@example.com"))
+            batchResponse(
+              Seq(readyIndividual(1)),
+              emailAddress = Some("agent@example.com")
+            )
           )
 
         val application = applicationBuilder(userAnswers = Some(ua)).build()
+
         running(application) {
           val controller = application.injector.instanceOf[CheckVerificationBatchReadinessController]
-          val result     = controller.checkVerificationBatchReadiness(CheckMode)(FakeRequest(GET, "/test-only"))
+
+          val result =
+            controller.checkVerificationBatchReadinessInCheckMode()(FakeRequest(GET, "/test-only"))
 
           status(result) mustEqual SEE_OTHER
           redirectLocation(result).value mustEqual

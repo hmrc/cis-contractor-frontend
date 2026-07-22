@@ -16,14 +16,14 @@
 
 package models.amend.company
 
-import models.add.company.CompanyContactOptions
+import models.add.company.CompanyContactMethodOptions
 import models.address.Address
 import play.api.libs.json.{Json, OFormat}
 
 case class OriginalCompanyAnswers(
   companyName: Option[String],
   address: Option[Address],
-  companyContactMethod: CompanyContactOptions,
+  companyContactMethod: Option[Set[CompanyContactMethodOptions]],
   email: Option[String],
   phone: Option[String],
   mobile: Option[String],

@@ -17,7 +17,7 @@
 package views.add.partnership
 
 import forms.add.partnership.PartnershipNominatedPartnerNinoFormProvider
-import models.NormalMode
+import models.{AmendMode, NormalMode}
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.jsoup.select.Elements
@@ -58,6 +58,31 @@ class PartnershipNominatedPartnerNinoViewSpec extends AnyWordSpec with Matchers 
       doc.select("input[name=value]").size() mustBe 1
 
       doc.select(".govuk-button").text() mustBe messages("site.continue")
+    }
+
+    "render the page with title, heading, hint, input and update button for Amend journey" in new Setup {
+      private val nominatedPartnerName = "Jane Doe"
+
+      val html: HtmlFormat.Appendable = view(form, AmendMode, nominatedPartnerName)
+      val doc: Document               = Jsoup.parse(html.toString())
+
+      doc.select("title").text() must include(
+        messages("partnershipNominatedPartnerNino.title", nominatedPartnerName)
+      )
+
+      val heading: Elements = doc.select("label.govuk-label")
+      heading.text() mustBe messages("partnershipNominatedPartnerNino.heading", nominatedPartnerName)
+
+      doc.select(".govuk-hint").text() must include(messages("partnershipNominatedPartnerNino.hint"))
+
+      doc.select("form").attr("action") mustBe
+        controllers.add.partnership.routes.PartnershipNominatedPartnerNinoController
+          .onSubmit(AmendMode)
+          .url
+
+      doc.select("input[name=value]").size() mustBe 1
+
+      doc.select(".govuk-button").text() mustBe messages("site.update")
     }
 
     "display error summary and inline error when the value is missing" in new Setup {

@@ -14,33 +14,34 @@
  * limitations under the License.
  *@
 
-@import models.add.company.CompanyContactOptions
+@import models.add.IndividualContactMethodOptions
 @import viewmodels.LegendSize.Large
 
 @this(
     layout: templates.Layout,
     formHelper: FormWithCSRF,
     govukErrorSummary: GovukErrorSummary,
-    govukRadios: GovukRadios,
+    govukCheckboxes: GovukCheckboxes,
     govukButton: GovukButton
 )
 
-@(form: Form[_], mode: Mode, companyName: String)(implicit request: Request[_], messages: Messages)
+@(form: Form[_], mode: Mode, name: String)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = title(form, messages("companyContactOptions.title"))) {
+@layout(pageTitle = title(form, messages("individualContactMethodOptions.title"))) {
 
-    @formHelper(action = controllers.add.company.routes.CompanyContactOptionsController.onSubmit(mode), Symbol("autoComplete") -> "off") {
+    @formHelper(action = controllers.add.routes.IndividualContactMethodOptionsController.onSubmit(mode), Symbol("autoComplete") -> "off") {
 
         @if(form.errors.nonEmpty) {
-            @govukErrorSummary(ErrorSummaryViewModel(form,  errorLinkOverrides = Map("value" -> "value_0")))
+            @govukErrorSummary(ErrorSummaryViewModel(form, errorLinkOverrides = Map("value" -> "value_0")))
         }
 
-        @govukRadios(
-            RadiosViewModel(
-                field  = form("value"),
-                legend = LegendViewModel(messages("companyContactOptions.heading", companyName)).asPageHeading(Large),
-                items  = CompanyContactOptions.options
-            ).withHint(HintViewModel(messages("companyContactOptions.hint")))
+        @govukCheckboxes(
+            CheckboxesViewModel(
+                form   = form,
+                name   = "value",
+                legend = LegendViewModel(messages("individualContactMethodOptions.heading", name)).asPageHeading(Large),
+                items  = IndividualContactMethodOptions.checkboxItems
+            ).withHint(HintViewModel(messages("individualContactMethodOptions.hint")))
         )
 
         @govukButton(

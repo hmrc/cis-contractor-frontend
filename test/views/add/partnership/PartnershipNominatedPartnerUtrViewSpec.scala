@@ -43,5 +43,26 @@ class PartnershipNominatedPartnerUtrViewSpec extends SpecBase {
         html must include(messages(application)("partnershipNominatedPartnerUtr.heading"))
       }
     }
+
+    "must render the view with the correct title and heading in Amend journey" in {
+
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+
+      running(application) {
+        val view = application.injector.instanceOf[views.html.add.partnership.PartnershipNominatedPartnerUtrView]
+
+        val html = view(
+          form = new forms.add.partnership.PartnershipNominatedPartnerUtrFormProvider()(),
+          mode = models.AmendMode,
+          name = "Test Partnership"
+        )(
+          FakeRequest(),
+          messages(application)
+        ).toString()
+
+        html must include(messages(application)("partnershipNominatedPartnerUtr.heading"))
+        html must include(messages(application)("site.update"))
+      }
+    }
   }
 }

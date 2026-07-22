@@ -14,32 +14,32 @@
  * limitations under the License.
  */
 
-package forms.add.company
+package forms.add
 
-import forms.behaviours.OptionFieldBehaviours
-import models.add.company.CompanyContactOptions
+import forms.behaviours.CheckboxFieldBehaviours
+import models.add.IndividualContactMethodOptions
 import play.api.data.FormError
 
-class CompanyContactOptionsFormProviderSpec extends OptionFieldBehaviours {
+class IndividualContactMethodOptionsFormProviderSpec extends CheckboxFieldBehaviours {
 
-  val form = new CompanyContactOptionsFormProvider()()
+  val form = new IndividualContactMethodOptionsFormProvider()()
 
   ".value" - {
 
     val fieldName   = "value"
-    val requiredKey = "companyContactOptions.error.required"
+    val requiredKey = "individualContactMethodOptions.error.required"
 
-    behave like optionsField[CompanyContactOptions](
+    behave like checkboxField[IndividualContactMethodOptions](
       form,
       fieldName,
-      validValues = CompanyContactOptions.values,
-      invalidError = FormError(fieldName, "error.invalid")
+      validValues = IndividualContactMethodOptions.values,
+      invalidError = FormError(s"$fieldName[0]", "error.invalid")
     )
 
-    behave like mandatoryField(
+    behave like mandatoryCheckboxField(
       form,
       fieldName,
-      requiredError = FormError(fieldName, requiredKey)
+      requiredKey
     )
   }
 }

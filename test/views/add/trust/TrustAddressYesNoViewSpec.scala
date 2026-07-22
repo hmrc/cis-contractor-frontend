@@ -17,8 +17,9 @@
 package views.add.trust
 
 import forms.add.trust.TrustAddressYesNoFormProvider
-import models.NormalMode
+import models.{AmendMode, NormalMode}
 import org.jsoup.Jsoup
+import org.jsoup.select.Elements
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
@@ -59,6 +60,40 @@ class TrustAddressYesNoViewSpec extends AnyWordSpec with Matchers with GuiceOneA
       doc.select("form").attr("action") mustBe
         controllers.add.trust.routes.TrustAddressYesNoController
           .onSubmit(NormalMode)
+          .url
+      doc.select("form").attr("autocomplete") mustBe "off"
+
+      doc.select(".govuk-button").text() mustBe messages("site.continue")
+    }
+
+    "render the page with title, heading, no hint, yes/no radios and submit button in AmendMode" in new Setup {
+
+      val trustName = "Test trustName"
+
+      val html = view(form, AmendMode, trustName)
+      val doc  = Jsoup.parse(html.toString())
+
+      doc.select("title").text() must include(
+        messages("trustAddressYesNo.title")
+      )
+
+      val legend = doc.select("fieldset legend")
+      legend.text() mustBe messages("trustAddressYesNo.heading", trustName)
+      legend.hasClass("govuk-fieldset__legend--l") mustBe true
+
+      val hint: Elements = doc.select("fieldset .govuk-hint")
+      hint.text() mustBe empty
+
+      val radios = doc.select(".govuk-radios__input")
+      radios.size() mustBe 2
+
+      val labels = doc.select(".govuk-radios__label").eachText()
+      labels must contain("Yes")
+      labels must contain("No")
+
+      doc.select("form").attr("action") mustBe
+        controllers.add.trust.routes.TrustAddressYesNoController
+          .onSubmit(AmendMode)
           .url
       doc.select("form").attr("autocomplete") mustBe "off"
 
