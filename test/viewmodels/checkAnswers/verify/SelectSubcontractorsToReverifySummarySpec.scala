@@ -24,7 +24,6 @@ import pages.verify.SelectSubcontractorsToReverifyPage
 import play.api.i18n.{Lang, Messages, MessagesImpl}
 import play.api.test.Helpers.stubMessagesApi
 import models.verify.SelectedSubcontractors
-import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist._
 
 class SelectSubcontractorsToReverifySummarySpec extends SpecBase with Matchers {
 
@@ -103,8 +102,15 @@ class SelectSubcontractorsToReverifySummarySpec extends SpecBase with Matchers {
       valueHtml must not include "<br>"
     }
 
-    "must return None when no subcontractors are selected" in {
-      SelectSubcontractorsToReverifySummary.row(emptyUserAnswers) mustBe None
+    "must return a row with 'None selected' when subcontractors verify list is none" in {
+      val result = SelectSubcontractorsToReverifySummary.row(emptyUserAnswers)
+
+      result mustBe defined
+
+      val valueHtml = result.value.value.content.asHtml.toString
+
+      valueHtml must include("None selected")
+      valueHtml must not include "<br>"
     }
   }
 }
