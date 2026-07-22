@@ -102,7 +102,7 @@ class SelectSubcontractorSummarySpec extends SpecBase with Matchers {
     "must return None when no answer is present" in {
       SelectSubcontractorSummary.row(emptyUserAnswers) mustBe None
     }
-    
+
     "must return a row with 'None selected' when subcontractors list is empty" in {
       val answers: UserAnswers =
         emptyUserAnswers
@@ -116,6 +116,7 @@ class SelectSubcontractorSummarySpec extends SpecBase with Matchers {
 
       val valueHtml = result.value.value.content.asHtml.toString
 
-      valueHtml must include("None selected")    }
+      valueHtml must include("None selected")
+    }
   }
 }
