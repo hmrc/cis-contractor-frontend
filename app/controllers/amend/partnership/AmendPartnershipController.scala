@@ -49,6 +49,8 @@ class AmendPartnershipController @Inject() (
     extends FrontendBaseController
     with Logging {
 
+  private val expectedSubcontractorType = "partnership"
+
   private def recovery: Result =
     Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
 
@@ -63,7 +65,15 @@ class AmendPartnershipController @Inject() (
                 s"[AmendPartnershipController] No subcontractor returned for " +
                   s"cisId=$cisId, subbieResourceRef=$subbieResourceRef"
               )
+              Future.successful(recovery)
 
+            case Some(subcontractor) if !isExpectedSubcontractorType(subcontractor, expectedSubcontractorType) =>
+              logger.error(
+                s"[AmendPartnershipController] Invalid subcontractor type. " +
+                  s"Expected=$expectedSubcontractorType, " +
+                  s"actual=${subcontractor.subcontractorType.getOrElse("missing")}, " +
+                  s"cisId=$cisId, subbieResourceRef=$subbieResourceRef"
+              )
               Future.successful(recovery)
 
             case Some(subcontractor) =>
@@ -78,7 +88,6 @@ class AmendPartnershipController @Inject() (
                       s"cisId=$cisId, subbieResourceRef=$subbieResourceRef",
                     error
                   )
-
                   Future.successful(recovery)
                 },
                 updatedAnswers =>

@@ -48,6 +48,8 @@ class AmendTrustController @Inject() (
     extends FrontendBaseController
     with Logging {
 
+  private val expectedSubcontractorType = "trust"
+
   private def recovery: Result =
     Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
 
@@ -62,7 +64,15 @@ class AmendTrustController @Inject() (
                 s"[AmendTrustController] No subcontractor returned for " +
                   s"cisId=$cisId, subbieResourceRef=$subbieResourceRef"
               )
+              Future.successful(recovery)
 
+            case Some(subcontractor) if !isExpectedSubcontractorType(subcontractor, expectedSubcontractorType) =>
+              logger.error(
+                s"[AmendTrustController] Invalid subcontractor type. " +
+                  s"Expected=$expectedSubcontractorType, " +
+                  s"actual=${subcontractor.subcontractorType.getOrElse("missing")}, " +
+                  s"cisId=$cisId, subbieResourceRef=$subbieResourceRef"
+              )
               Future.successful(recovery)
 
             case Some(subcontractor) =>
@@ -77,7 +87,6 @@ class AmendTrustController @Inject() (
                       s"cisId=$cisId, subbieResourceRef=$subbieResourceRef",
                     error
                   )
-
                   Future.successful(recovery)
                 },
                 updatedAnswers =>
@@ -98,7 +107,6 @@ class AmendTrustController @Inject() (
               s"cisId=$cisId, subbieResourceRef=$subbieResourceRef",
             error
           )
-
           recovery
         }
     }

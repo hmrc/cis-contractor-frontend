@@ -17,6 +17,7 @@
 package controllers.amend
 
 import models.UserAnswers
+import models.response.SubcontractorResponse
 import pages.QuestionPage
 import play.api.libs.json.Writes
 
@@ -28,4 +29,12 @@ object AmendControllerUtils {
     value.fold(Try(userAnswers)) { answer =>
       userAnswers.set(page, answer)
     }
+
+  def isExpectedSubcontractorType(
+    subcontractor: SubcontractorResponse,
+    expectedType: String
+  ): Boolean =
+    subcontractor.subcontractorType.exists(
+      _.trim.equalsIgnoreCase(expectedType)
+    )
 }

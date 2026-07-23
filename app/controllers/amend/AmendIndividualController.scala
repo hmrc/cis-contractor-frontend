@@ -48,6 +48,8 @@ class AmendIndividualController @Inject() (
     extends FrontendBaseController
     with Logging {
 
+  private val expectedSubcontractorType = "soletrader"
+
   private def recovery: Result =
     Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
 
@@ -62,7 +64,15 @@ class AmendIndividualController @Inject() (
                 s"[AmendIndividualController] No subcontractor returned for " +
                   s"cisId=$cisId, subbieResourceRef=$subbieResourceRef"
               )
+              Future.successful(recovery)
 
+            case Some(subcontractor) if !isExpectedSubcontractorType(subcontractor, expectedSubcontractorType) =>
+              logger.error(
+                s"[AmendIndividualController] Invalid subcontractor type. " +
+                  s"Expected=$expectedSubcontractorType, " +
+                  s"actual=${subcontractor.subcontractorType.getOrElse("missing")}, " +
+                  s"cisId=$cisId, subbieResourceRef=$subbieResourceRef"
+              )
               Future.successful(recovery)
 
             case Some(subcontractor) =>
@@ -72,11 +82,7 @@ class AmendIndividualController @Inject() (
                 subcontractor
               ).fold(
                 error => {
-                  logger.error(
-                    "[AmendIndividualController] Failed to populate UserAnswers",
-                    error
-                  )
-
+                  logger.error("[AmendIndividualController] Failed to populate UserAnswers", error)
                   Future.successful(recovery)
                 },
                 updatedAnswers =>
@@ -97,7 +103,6 @@ class AmendIndividualController @Inject() (
               s"cisId=$cisId, subbieResourceRef=$subbieResourceRef",
             error
           )
-
           recovery
         }
     }
