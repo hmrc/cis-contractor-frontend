@@ -27,7 +27,10 @@ import viewmodels.implicits.*
 
 object TypeOfSubcontractorSummary {
 
-  def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
+  def row(
+    answers: UserAnswers,
+    showActions: Boolean = true
+  )(implicit messages: Messages): Option[SummaryListRow] =
     answers.get(TypeOfSubcontractorPage).map { answer =>
 
       val value = ValueViewModel(
@@ -36,17 +39,24 @@ object TypeOfSubcontractorSummary {
         )
       )
 
+      val actions =
+        if (showActions) {
+          Seq(
+            ActionItemViewModel(
+              "site.change",
+              controllers.add.routes.TypeOfSubcontractorController.onPageLoad(NormalMode).url
+            )
+              .withVisuallyHiddenText(messages("typeOfSubcontractor.change.hidden"))
+              .withAttribute("id" -> "type-of-subcontractor")
+          )
+        } else {
+          Seq.empty
+        }
+
       SummaryListRowViewModel(
         key = "typeOfSubcontractor.checkYourAnswersLabel",
         value = value,
-        actions = Seq(
-          ActionItemViewModel(
-            "site.change",
-            controllers.add.routes.TypeOfSubcontractorController.onPageLoad(NormalMode).url
-          )
-            .withVisuallyHiddenText(messages("typeOfSubcontractor.change.hidden"))
-            .withAttribute("id" -> "type-of-subcontractor")
-        )
+        actions = actions
       )
     }
 }

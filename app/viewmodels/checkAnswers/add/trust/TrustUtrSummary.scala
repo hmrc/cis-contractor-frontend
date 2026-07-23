@@ -25,16 +25,28 @@ import viewmodels.implicits.*
 
 object TrustUtrSummary {
 
-  def row(answers: UserAnswers, mode: Mode = CheckMode)(implicit messages: Messages): Option[SummaryListRow] =
+  def row(answers: UserAnswers, mode: Mode = CheckMode, showActions: Boolean = true)(implicit
+    messages: Messages
+  ): Option[SummaryListRow] =
     answers.get(TrustUtrPage).map { answer =>
+      val value   = ValueViewModel(answer)
+      val actions =
+        if (showActions) {
+          Seq(
+            ActionItemViewModel(
+              "site.change",
+              controllers.add.trust.routes.TrustUtrController.onPageLoad(mode).url
+            )
+              .withVisuallyHiddenText(messages("trustUtr.change.hidden"))
+              .withAttribute("id" -> "trust-utr")
+          )
+        } else {
+          Seq.empty
+        }
       SummaryListRowViewModel(
         key = "trustUtr.checkYourAnswersLabel",
-        value = ValueViewModel(answer),
-        actions = Seq(
-          ActionItemViewModel("site.change", controllers.add.trust.routes.TrustUtrController.onPageLoad(mode).url)
-            .withVisuallyHiddenText(messages("trustUtr.change.hidden"))
-            .withAttribute("id" -> "trust-utr")
-        )
+        value = value,
+        actions = actions
       )
     }
 }
