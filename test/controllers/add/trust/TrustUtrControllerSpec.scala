@@ -20,10 +20,14 @@ import base.SpecBase
 import controllers.routes
 import forms.add.trust.TrustUtrFormProvider
 import models.{AmendMode, NormalMode, UserAnswers}
+import models.{AmendMode, NormalMode, UserAnswers}
+import navigation.{FakeNavigator, Navigator}
+import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{verify, verifyNoMoreInteractions, when}
 import org.scalatestplus.mockito.MockitoSugar
 import pages.add.trust.{TrustNamePage, TrustUtrPage}
+import pages.amend.AmendedPagesPage
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
@@ -87,34 +91,90 @@ class TrustUtrControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must redirect to the next page when valid data is submitted" in {
-
-      val validValue = "5860920998"
-
+    "must redirect to the next page and not add the page in AmendedPagesPage when valid data is submitted in NormalMode" in {
+      val validValue               = "5860920998"
+      val onwardRoute              = controllers.add.trust.routes.TrustWorksReferenceYesNoController.onPageLoad(NormalMode)
+      val mockSessionRepository    = mock[SessionRepository]
       val mockSubcontractorService = mock[SubcontractorService]
+      val captor                   = ArgumentCaptor.forClass(classOf[UserAnswers])
 
       when(mockSubcontractorService.isDuplicateUTR(any[UserAnswers], any[String])(any[HeaderCarrier]))
         .thenReturn(Future.successful(false))
+      when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
 
       val application =
         applicationBuilder(userAnswers = Some(uaWithName))
           .overrides(
+            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
+            bind[SessionRepository].toInstance(mockSessionRepository),
             bind[SubcontractorService].toInstance(mockSubcontractorService)
           )
           .build()
 
       running(application) {
-        val request =
-          FakeRequest(POST, trustUtrRoute)
-            .withFormUrlEncodedBody(("value", validValue))
+        val request = FakeRequest(POST, trustUtrRoute).withFormUrlEncodedBody("value" -> validValue)
 
         val result = route(application, request).value
-
         status(result) mustEqual SEE_OTHER
-      }
+        redirectLocation(result).value mustEqual onwardRoute.url
+        verify(mockSessionRepository).set(captor.capture())
 
-      verify(mockSubcontractorService).isDuplicateUTR(any[UserAnswers], any[String])(any[HeaderCarrier])
-      verifyNoMoreInteractions(mockSubcontractorService)
+        val updatedAnswers = captor.getValue
+
+        updatedAnswers.get(TrustUtrPage) mustBe Some(validValue)
+        updatedAnswers.get(AmendedPagesPage) mustBe None
+
+        verify(mockSubcontractorService)
+          .isDuplicateUTR(any[UserAnswers], any[String])(any[HeaderCarrier])
+
+        verifyNoMoreInteractions(mockSubcontractorService)
+      }
+    }
+
+    "must add TrustUtrPage to AmendedPagesPage when submitted in AmendMode" in {
+      val validValue               = "5860920998"
+      val onwardRoute              = controllers.add.trust.routes.TrustWorksReferenceYesNoController.onPageLoad(AmendMode)
+      val mockSessionRepository    = mock[SessionRepository]
+      val mockSubcontractorService = mock[SubcontractorService]
+
+      val captor = ArgumentCaptor.forClass(classOf[UserAnswers])
+
+      when(mockSubcontractorService.isDuplicateUTR(any[UserAnswers], any[String])(any[HeaderCarrier]))
+        .thenReturn(Future.successful(false))
+
+      when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
+
+      val application =
+        applicationBuilder(userAnswers = Some(uaWithName))
+          .overrides(
+            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
+            bind[SessionRepository].toInstance(mockSessionRepository),
+            bind[SubcontractorService].toInstance(mockSubcontractorService)
+          )
+          .build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(
+            POST,
+            controllers.add.trust.routes.TrustUtrController
+              .onSubmit(AmendMode)
+              .url
+          ).withFormUrlEncodedBody(
+            "value" -> validValue
+          )
+
+        val result = route(application, request).value
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual onwardRoute.url
+        verify(mockSessionRepository).set(captor.capture())
+
+        val updatedAnswers = captor.getValue
+        updatedAnswers.get(TrustUtrPage) mustBe Some(validValue)
+
+        updatedAnswers.get(AmendedPagesPage).value must contain(TrustUtrPage.toString)
+      }
     }
 
     "must redirect to the next page when valid data is submitted in Amend journey" in {

@@ -17,7 +17,7 @@
 package controllers.add.trust
 
 import controllers.actions.*
-import controllers.helpers.ContactGuard
+import controllers.helpers.{ContactGuard, SaveAnswerHelper}
 import forms.add.trust.TrustMobileNumberFormProvider
 import models.Mode
 import models.contact.ContactMethodOptions
@@ -76,7 +76,10 @@ class TrustMobileNumberController @Inject() (
           formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, trustName))),
           value =>
             for {
-              updatedAnswers <- Future.fromTry(request.userAnswers.set(TrustMobileNumberPage, value))
+              updatedAnswers <-
+                Future.fromTry(
+                  SaveAnswerHelper.saveAnswer(request.userAnswers, TrustMobileNumberPage, value, mode)
+                )
               _              <- sessionRepository.set(updatedAnswers)
             } yield Redirect(navigator.nextPage(TrustMobileNumberPage, mode, updatedAnswers))
         ))

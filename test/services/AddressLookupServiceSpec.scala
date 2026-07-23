@@ -34,6 +34,7 @@ import repositories.SessionRepository
 import uk.gov.hmrc.http.HeaderCarrier
 import queries.AddressLookupAmendReturnQuery
 import models.UserAnswers
+import pages.amend.AmendedPagesPage
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -135,15 +136,20 @@ class AddressLookupServiceSpec extends SpecBase with MockitoSugar {
       implicit val dataRequest: DataRequest[_] =
         DataRequest(FakeRequest(), userAnswersId, emptyUserAnswers)
 
-      "must persist the address against the page and return true when the save succeeds" in {
+      "must persist the address against the page, not add the page to AmendedPagesPage, and return true when the save succeeds" in {
         val (service, _, _, sessionRepository) = newService()
-        val captor                             = ArgumentCaptor.forClass(classOf[models.UserAnswers])
+        val captor                             = ArgumentCaptor.forClass(classOf[UserAnswers])
+
         when(sessionRepository.set(any())).thenReturn(Future.successful(true))
 
         service.saveAddressDetails(testAddress, AddressOfSubcontractorPage).futureValue mustBe true
 
         verify(sessionRepository).set(captor.capture())
-        captor.getValue.get(AddressOfSubcontractorPage) mustBe Some(testAddress)
+
+        val savedAnswers = captor.getValue
+
+        savedAnswers.get(AddressOfSubcontractorPage) mustBe Some(testAddress)
+        savedAnswers.get(AmendedPagesPage) mustBe None
       }
 
       "must return false when the repository fails to save" in {
@@ -152,6 +158,35 @@ class AddressLookupServiceSpec extends SpecBase with MockitoSugar {
 
         service.saveAddressDetails(testAddress, AddressOfSubcontractorPage).futureValue mustBe false
         verify(sessionRepository).set(any())
+      }
+
+      "must add AddressOfSubcontractorPage to AmendedPagesPage when AddressLookupAmendReturnQuery is true" in {
+        val (service, _, _, sessionRepository) = newService()
+
+        when(sessionRepository.set(any())).thenReturn(Future.successful(true))
+
+        implicit val dataRequest: DataRequest[_] =
+          DataRequest(
+            FakeRequest(),
+            userAnswersId,
+            emptyUserAnswers
+              .set(AddressLookupAmendReturnQuery, true)
+              .success
+              .value
+          )
+
+        val captor = ArgumentCaptor.forClass(classOf[UserAnswers])
+
+        service
+          .saveAddressDetails(testAddress, AddressOfSubcontractorPage)
+          .futureValue mustBe true
+
+        verify(sessionRepository).set(captor.capture())
+
+        val savedAnswers = captor.getValue
+
+        savedAnswers.get(AddressOfSubcontractorPage) mustBe Some(testAddress)
+        savedAnswers.get(AmendedPagesPage).value must contain(AddressOfSubcontractorPage.toString)
       }
 
       "must remove AddressLookupAmendReturnQuery when persisting the address" in {

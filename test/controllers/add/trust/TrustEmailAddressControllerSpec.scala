@@ -20,16 +20,19 @@ import base.SpecBase
 import controllers.routes
 import forms.add.trust.TrustEmailAddressFormProvider
 import models.contact.ContactMethodOptions
-import models.{NormalMode, UserAnswers}
+import models.{AmendMode, NormalMode, UserAnswers}
+import navigation.{FakeNavigator, Navigator}
+import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.when
+import org.mockito.Mockito.{verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import pages.add.trust.{TrustContactMethodOptionsPage, TrustEmailAddressPage, TrustNamePage}
+import pages.amend.AmendedPagesPage
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import repositories.SessionRepository
-import views.html.add.trust.TrustEmailAddressView
+import views.html.add.trust.*
 
 import scala.concurrent.Future
 
@@ -101,15 +104,17 @@ class TrustEmailAddressControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must redirect to the next page when valid data is submitted" in {
-
+    "must redirect to the next page and not add page to AmendedPagesPage when valid data is submitted in NormalMode" in {
       val mockSessionRepository = mock[SessionRepository]
+      val onwardRoute           = controllers.add.trust.routes.TrustUtrYesNoController.onPageLoad(NormalMode)
+      val captor                = ArgumentCaptor.forClass(classOf[UserAnswers])
 
-      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+      when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
 
       val application =
         applicationBuilder(userAnswers = Some(uaWithNameAndEmailOption))
           .overrides(
+            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
             bind[SessionRepository].toInstance(mockSessionRepository)
           )
           .build()
@@ -117,14 +122,60 @@ class TrustEmailAddressControllerSpec extends SpecBase with MockitoSugar {
       running(application) {
         val request =
           FakeRequest(POST, trustEmailAddressRoute)
-            .withFormUrlEncodedBody(("value", "test@example.com"))
+            .withFormUrlEncodedBody("value" -> "test@example.com")
 
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.add.trust.routes.TrustUtrYesNoController
-          .onPageLoad(NormalMode)
-          .url
+        redirectLocation(result).value mustEqual onwardRoute.url
+
+        verify(mockSessionRepository).set(captor.capture())
+
+        val updatedAnswers = captor.getValue
+
+        updatedAnswers.get(TrustEmailAddressPage) mustBe Some("test@example.com")
+        updatedAnswers.get(AmendedPagesPage) mustBe None
+      }
+    }
+
+    "must add TrustEmailAddressPage to AmendedPagesPage when submitted in AmendMode" in {
+      val mockSessionRepository = mock[SessionRepository]
+      val onwardRoute           = controllers.add.trust.routes.TrustUtrYesNoController.onPageLoad(AmendMode)
+      val captor                = ArgumentCaptor.forClass(classOf[UserAnswers])
+
+      when(mockSessionRepository.set(any()))
+        .thenReturn(Future.successful(true))
+
+      val application =
+        applicationBuilder(userAnswers = Some(uaWithNameAndEmailOption))
+          .overrides(
+            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
+            bind[SessionRepository].toInstance(mockSessionRepository)
+          )
+          .build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(
+            POST,
+            controllers.add.trust.routes.TrustEmailAddressController
+              .onSubmit(AmendMode)
+              .url
+          ).withFormUrlEncodedBody(
+            "value" -> "test@example.com"
+          )
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual onwardRoute.url
+        verify(mockSessionRepository).set(captor.capture())
+
+        val updatedAnswers = captor.getValue
+
+        updatedAnswers.get(TrustEmailAddressPage) mustBe Some("test@example.com")
+        updatedAnswers.get(AmendedPagesPage).value must contain(TrustEmailAddressPage.toString)
       }
     }
 

@@ -19,11 +19,14 @@ package controllers.add.trust
 import base.SpecBase
 import controllers.routes
 import forms.add.trust.TrustNameFormProvider
-import models.{NormalMode, UserAnswers}
+import models.{AmendMode, NormalMode, UserAnswers}
+import navigation.{FakeNavigator, Navigator}
+import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import pages.add.trust.TrustNamePage
+import pages.amend.AmendedPagesPage
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
@@ -76,29 +79,77 @@ class TrustNameControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must redirect to TrustAddressYesNo page when valid data is submitted" in {
+    "must redirect to TrustAddressYesNo page and not add page in AmendedPagesPage when valid data is submitted in NormalMode" in {
       val mockSessionRepository = mock[SessionRepository]
+      val onwardRoute           = controllers.add.trust.routes.TrustAddressYesNoController.onPageLoad(NormalMode)
+      val captor                = ArgumentCaptor.forClass(classOf[UserAnswers])
 
-      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+      when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
 
       val application =
         applicationBuilder(userAnswers = Some(emptyUserAnswers))
-          .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
+          .overrides(
+            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
+            bind[SessionRepository].toInstance(mockSessionRepository)
+          )
           .build()
 
       running(application) {
-        val request =
-          FakeRequest(POST, trustNameRoute)
-            .withFormUrlEncodedBody(("value", "My Trust"))
+
+        val request = FakeRequest(POST, trustNameRoute).withFormUrlEncodedBody("value" -> "My Trust")
 
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual
-          controllers.add.trust.routes.TrustAddressYesNoController.onPageLoad(NormalMode).url
-      }
+        redirectLocation(result).value mustEqual onwardRoute.url
 
-      verify(mockSessionRepository).set(any())
+        verify(mockSessionRepository).set(captor.capture())
+        val updatedAnswers = captor.getValue
+
+        updatedAnswers.get(TrustNamePage) mustBe Some("My Trust")
+        updatedAnswers.get(AmendedPagesPage) mustBe None
+      }
+    }
+
+    "must add TrustNamePage to AmendedPagesPage when submitted in AmendMode" in {
+      val mockSessionRepository = mock[SessionRepository]
+      val onwardRoute           = controllers.add.trust.routes.TrustAddressYesNoController.onPageLoad(AmendMode)
+      val captor                = ArgumentCaptor.forClass(classOf[UserAnswers])
+
+      when(mockSessionRepository.set(any()))
+        .thenReturn(Future.successful(true))
+
+      val application =
+        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          .overrides(
+            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
+            bind[SessionRepository].toInstance(mockSessionRepository)
+          )
+          .build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(
+            POST,
+            controllers.add.trust.routes.TrustNameController
+              .onSubmit(AmendMode)
+              .url
+          ).withFormUrlEncodedBody(
+            "value" -> "My Trust"
+          )
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual onwardRoute.url
+        verify(mockSessionRepository).set(captor.capture())
+
+        val updatedAnswers = captor.getValue
+
+        updatedAnswers.get(TrustNamePage) mustBe Some("My Trust")
+        updatedAnswers.get(AmendedPagesPage).value must contain(TrustNamePage.toString)
+      }
     }
 
     "must return a Bad Request and errors when invalid data is submitted" in {

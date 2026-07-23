@@ -17,6 +17,7 @@
 package controllers.add.trust
 
 import controllers.actions.*
+import controllers.helpers.SaveAnswerHelper
 import forms.add.trust.TrustUtrFormProvider
 import models.requests.DataRequest
 import models.{AmendMode, Mode}
@@ -52,7 +53,9 @@ class TrustUtrController @Inject() (
   private def saveAndContinue(mode: Mode, value: String)(implicit request: DataRequest[?]) =
     for {
       updatedAnswers <-
-        Future.fromTry(request.userAnswers.set(TrustUtrPage, value))
+        Future.fromTry(
+          SaveAnswerHelper.saveAnswer(request.userAnswers, TrustUtrPage, value, mode)
+        )
       _              <- sessionRepository.set(updatedAnswers)
     } yield Redirect(
       navigator.nextPage(TrustUtrPage, mode, updatedAnswers)

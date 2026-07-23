@@ -17,6 +17,7 @@
 package controllers.add.trust
 
 import controllers.actions.*
+import controllers.helpers.SaveAnswerHelper
 import forms.add.trust.TrustNameFormProvider
 import models.Mode
 import navigation.Navigator
@@ -64,7 +65,10 @@ class TrustNameController @Inject() (
           formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
           value =>
             for {
-              updatedAnswers <- Future.fromTry(request.userAnswers.set(TrustNamePage, value))
+              updatedAnswers <-
+                Future.fromTry(
+                  SaveAnswerHelper.saveAnswer(request.userAnswers, TrustNamePage, value, mode)
+                )
               _              <- sessionRepository.set(updatedAnswers)
             } yield Redirect(navigator.nextPage(TrustNamePage, mode, updatedAnswers))
         )
