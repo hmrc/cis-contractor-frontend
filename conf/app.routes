@@ -103,6 +103,9 @@ POST  /subcontractor/amend/company-information                   controllers.ame
 GET   /subcontractor/amend/trust-information                     controllers.amend.trust.AmendTrustCheckYourAnswersController.onPageLoad()
 POST  /subcontractor/amend/trust-information                     controllers.amend.trust.AmendTrustCheckYourAnswersController.onSubmit()
 
+GET   /subcontractor/amend/trust/remove-subcontractor-information/:subcontractorDetail  controllers.amend.trust.AmendTrustRemoveDetailYesNoController.onPageLoad(subcontractorDetail: String)
+POST  /subcontractor/amend/trust/remove-subcontractor-information/:subcontractorDetail  controllers.amend.trust.AmendTrustRemoveDetailYesNoController.onSubmit(subcontractorDetail: String)
+
 # Errors & Auth
 GET  /unauthorised/standard-user  controllers.UnauthorisedWrongRoleController.onPageLoad()
 
