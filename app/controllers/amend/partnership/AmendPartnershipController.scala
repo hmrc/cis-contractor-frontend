@@ -29,6 +29,7 @@ import play.api.Logging
 import play.api.libs.json.Writes
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import queries.{CisIdQuery, OriginalPartnershipAnswersQuery}
+import controllers.amend.AmendControllerUtils._
 import repositories.SessionRepository
 import services.SubcontractorService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -107,34 +108,21 @@ class AmendPartnershipController @Inject() (
     cisId: String,
     subcontractor: SubcontractorResponse
   ): Try[UserAnswers] = {
-    val address              = toAddress(subcontractor)
-    val methods              = contactMethods(subcontractor)
-    val nominatedPartnerName =
+    val address                    = toAddress(subcontractor)
+    val methods                    = contactMethods(subcontractor)
+    val nominatedPartnerName       =
       Seq(subcontractor.firstName, subcontractor.secondName, subcontractor.surname).flatten.mkString(" ").trim
+    val partnershipName            = subcontractor.partnershipTradingName.orElse(subcontractor.tradingName)
+    val nominatedPartnerNameOption = Option.when(nominatedPartnerName.nonEmpty)(nominatedPartnerName)
 
-    val originalAnswers =
-      OriginalPartnershipAnswers(
-        partnershipName = subcontractor.partnershipTradingName.orElse(subcontractor.tradingName),
-        addressYesNo = Some(address.isDefined),
-        address = address,
-        partnershipContactMethodsYesNo = Some(methods.nonEmpty),
-        partnershipContactMethodOptions = Option.when(methods.nonEmpty)(methods),
-        email = subcontractor.emailAddress,
-        phone = subcontractor.phoneNumber,
-        mobile = subcontractor.mobilePhoneNumber,
-        hasUtrYesNo = Some(subcontractor.utr.isDefined),
-        utr = subcontractor.utr,
-        nominatedPartnerName = Option.when(nominatedPartnerName.nonEmpty)(nominatedPartnerName),
-        nominatedPartnerUtrYesNo = Some(subcontractor.partnerUtr.isDefined),
-        nominatedPartnerUtr = subcontractor.partnerUtr,
-        nominatedPartnerNinoYesNo = Some(subcontractor.nino.isDefined),
-        nominatedPartnerNino = subcontractor.nino,
-        nominatedPartnerCrnYesNo = Some(subcontractor.crn.isDefined),
-        nominatedPartnerCrn = subcontractor.crn,
-        nominatedPartnerWorksReferenceYesNo = Some(subcontractor.worksReferenceNumber.isDefined),
-        nominatedPartnerWorksReference = subcontractor.worksReferenceNumber
-      )
-    val partnershipName = subcontractor.partnershipTradingName.orElse(subcontractor.tradingName)
+    val original = originalAnswers(
+      subcontractor = subcontractor,
+      address = address,
+      methods = methods,
+      partnershipName = partnershipName,
+      nominatedPartnerName = nominatedPartnerNameOption
+    )
+
     for {
       updated <- userAnswers.set(TypeOfSubcontractorPage, Partnership)
       updated <- setOptional(updated, PartnershipNamePage, partnershipName)
@@ -161,7 +149,7 @@ class AmendPartnershipController @Inject() (
       updated <- updated.set(PartnershipWorksReferenceNumberYesNoPage, subcontractor.worksReferenceNumber.isDefined)
       updated <- setOptional(updated, PartnershipWorksReferenceNumberPage, subcontractor.worksReferenceNumber)
       updated <- updated.set(CisIdQuery, cisId)
-      updated <- updated.set(OriginalPartnershipAnswersQuery, originalAnswers)
+      updated <- updated.set(OriginalPartnershipAnswersQuery, original)
     } yield updated
   }
 
@@ -186,16 +174,32 @@ class AmendPartnershipController @Inject() (
       )
     }
 
-  private def setOptional[A: Writes](
-    userAnswers: UserAnswers,
-    page: pages.QuestionPage[A],
-    value: Option[A]
-  ): Try[UserAnswers] =
-    value match {
-      case Some(answer) =>
-        userAnswers.set(page, answer)
-
-      case None =>
-        Try(userAnswers)
-    }
+  private def originalAnswers(
+    subcontractor: SubcontractorResponse,
+    address: Option[Address],
+    methods: Set[ContactMethodOptions],
+    partnershipName: Option[String],
+    nominatedPartnerName: Option[String]
+  ): OriginalPartnershipAnswers =
+    OriginalPartnershipAnswers(
+      partnershipName = partnershipName,
+      addressYesNo = Some(address.isDefined),
+      address = address,
+      partnershipContactMethodsYesNo = Some(methods.nonEmpty),
+      partnershipContactMethodOptions = Option.when(methods.nonEmpty)(methods),
+      email = subcontractor.emailAddress,
+      phone = subcontractor.phoneNumber,
+      mobile = subcontractor.mobilePhoneNumber,
+      hasUtrYesNo = Some(subcontractor.utr.isDefined),
+      utr = subcontractor.utr,
+      nominatedPartnerName = nominatedPartnerName,
+      nominatedPartnerUtrYesNo = Some(subcontractor.partnerUtr.isDefined),
+      nominatedPartnerUtr = subcontractor.partnerUtr,
+      nominatedPartnerNinoYesNo = Some(subcontractor.nino.isDefined),
+      nominatedPartnerNino = subcontractor.nino,
+      nominatedPartnerCrnYesNo = Some(subcontractor.crn.isDefined),
+      nominatedPartnerCrn = subcontractor.crn,
+      nominatedPartnerWorksReferenceYesNo = Some(subcontractor.worksReferenceNumber.isDefined),
+      nominatedPartnerWorksReference = subcontractor.worksReferenceNumber
+    )
 }

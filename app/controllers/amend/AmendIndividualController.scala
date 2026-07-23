@@ -26,7 +26,7 @@ import models.contact.ContactMethodOptions
 import models.response.SubcontractorResponse
 import pages.add.*
 import play.api.Logging
-import play.api.libs.json.Writes
+import controllers.amend.AmendControllerUtils._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import queries.{CisIdQuery, OriginalIndividualAnswersQuery}
 import repositories.SessionRepository
@@ -121,18 +121,12 @@ class AmendIndividualController @Inject() (
 
     val usesTradingName = subcontractor.tradingName.exists(_.trim.nonEmpty)
 
-    val originalAnswers = OriginalIndividualAnswers(
-      usesTradingName = Some(usesTradingName),
-      tradingName = subcontractor.tradingName,
-      subcontractorName = name,
+    val original = originalAnswers(
+      subcontractor = subcontractor,
       address = address,
-      individualContactMethod = Option.when(methods.nonEmpty)(methods),
-      email = subcontractor.emailAddress,
-      phone = subcontractor.phoneNumber,
-      mobile = subcontractor.mobilePhoneNumber,
-      utr = subcontractor.utr,
-      nino = subcontractor.nino,
-      worksReference = subcontractor.worksReferenceNumber
+      methods = methods,
+      name = name,
+      usesTradingName = usesTradingName
     )
 
     for {
@@ -155,7 +149,7 @@ class AmendIndividualController @Inject() (
       updated <- updated.set(WorksReferenceNumberYesNoPage, subcontractor.worksReferenceNumber.isDefined)
       updated <- setOptional(updated, WorksReferenceNumberPage, subcontractor.worksReferenceNumber)
       updated <- updated.set(CisIdQuery, cisId)
-      updated <- updated.set(OriginalIndividualAnswersQuery, originalAnswers)
+      updated <- updated.set(OriginalIndividualAnswersQuery, original)
     } yield updated
   }
 
@@ -183,16 +177,24 @@ class AmendIndividualController @Inject() (
       )
     }
 
-  private def setOptional[A: Writes](
-    userAnswers: UserAnswers,
-    page: pages.QuestionPage[A],
-    value: Option[A]
-  ): Try[UserAnswers] =
-    value match {
-      case Some(answer) =>
-        userAnswers.set(page, answer)
-
-      case None =>
-        Try(userAnswers)
-    }
+  private def originalAnswers(
+    subcontractor: SubcontractorResponse,
+    address: Option[Address],
+    methods: Set[IndividualContactMethodOptions],
+    name: Option[SubcontractorName],
+    usesTradingName: Boolean
+  ): OriginalIndividualAnswers =
+    OriginalIndividualAnswers(
+      usesTradingName = Some(usesTradingName),
+      tradingName = subcontractor.tradingName,
+      subcontractorName = name,
+      address = address,
+      individualContactMethod = Option.when(methods.nonEmpty)(methods),
+      email = subcontractor.emailAddress,
+      phone = subcontractor.phoneNumber,
+      mobile = subcontractor.mobilePhoneNumber,
+      utr = subcontractor.utr,
+      nino = subcontractor.nino,
+      worksReference = subcontractor.worksReferenceNumber
+    )
 }
