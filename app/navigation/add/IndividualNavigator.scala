@@ -118,15 +118,28 @@ class IndividualNavigator @Inject() () extends NavigatorForJourney {
       case (Some(false), NormalMode) =>
         controllers.add.routes.SubcontractorNameController.onPageLoad(NormalMode)
 
-      case (Some(false), CheckMode | AmendMode) =>
+      case (Some(false), CheckMode) =>
         ua.get(SubcontractorNamePage) match {
           case None    => controllers.add.routes.SubcontractorNameController.onPageLoad(mode)
           case Some(_) => cyaRoute(mode)
         }
 
-      case (Some(true), CheckMode | AmendMode) =>
+      case (Some(false), AmendMode) =>
+        ua.get(SubcontractorNamePage) match {
+          case None    => controllers.amend.routes.AmendIndividualRemoveDetailYesNoController.onPageLoad("trading-name")
+          case Some(_) => cyaRoute(mode)
+        }
+
+      case (Some(true), CheckMode) =>
         ua.get(TradingNameOfSubcontractorPage) match {
           case None    => controllers.add.routes.TradingNameOfSubcontractorController.onPageLoad(mode)
+          case Some(_) => cyaRoute(mode)
+        }
+
+      case (Some(true), AmendMode) =>
+        ua.get(TradingNameOfSubcontractorPage) match {
+          case None    =>
+            controllers.amend.routes.AmendIndividualRemoveDetailYesNoController.onPageLoad("subcontractor-name")
           case Some(_) => cyaRoute(mode)
         }
 

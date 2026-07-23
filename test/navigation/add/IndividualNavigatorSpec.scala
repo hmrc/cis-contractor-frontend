@@ -368,7 +368,7 @@ class IndividualNavigatorSpec extends SpecBase {
         ) mustBe journeyRecovery // TODO: when CYA page available
       }
 
-      "must go from SubTradingNameYesNoPage to SubcontractorNameController when answer is No and name is missing" in {
+      "must go from SubTradingNameYesNoPage to  AmendIndividualRemoveDetailYesNo Page (trading-name) when answer is No and name is missing" in {
         val ua =
           emptyUserAnswers
             .set(SubTradingNameYesNoPage, false)
@@ -379,7 +379,7 @@ class IndividualNavigatorSpec extends SpecBase {
           SubTradingNameYesNoPage,
           AmendMode,
           ua
-        ) mustBe controllers.add.routes.SubcontractorNameController.onPageLoad(AmendMode)
+        ) mustBe controllers.amend.routes.AmendIndividualRemoveDetailYesNoController.onPageLoad("trading-name")
       }
 
       "must go from SubTradingNameYesNoPage to Amend CYA when answer is No and subcontractor name already exists" in {
@@ -399,7 +399,7 @@ class IndividualNavigatorSpec extends SpecBase {
         ) mustBe journeyRecovery // TODO: this needs to be redirected to amend cya page when it's implemented
       }
 
-      "must go from SubTradingNameYesNoPage to TradingNameOfSubcontractorController when answer is Yes and trading name is missing" in {
+      "must go from SubTradingNameYesNoPage to AmendIndividualRemoveDetailYesNo Page (subcontractor-name) when answer is Yes and trading name is missing" in {
         val ua =
           emptyUserAnswers
             .set(SubTradingNameYesNoPage, true)
@@ -410,7 +410,7 @@ class IndividualNavigatorSpec extends SpecBase {
           SubTradingNameYesNoPage,
           AmendMode,
           ua
-        ) mustBe controllers.add.routes.TradingNameOfSubcontractorController.onPageLoad(AmendMode)
+        ) mustBe controllers.amend.routes.AmendIndividualRemoveDetailYesNoController.onPageLoad("subcontractor-name")
       }
 
       "must go from SubTradingNameYesNoPage to Amend CYA when answer is Yes and trading name already exists" in {

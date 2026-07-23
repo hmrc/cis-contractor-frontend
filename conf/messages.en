@@ -402,6 +402,17 @@ individualContactMethodOptions.hint                                          =  
 individualContactMethodOptions.error.required                                =  Select the methods of contact you want to add for this subcontractor
 individualContactMethodOptions.change.hidden                                 =  methods of contact
 
+amendIndividualRemoveDetailYesNo.title                                       =  Are you sure you want to remove this information from this subcontractor?
+amendIndividualRemoveDetailYesNo.heading                                     =  Are you sure you want to remove the {1} from {0}?
+amendIndividualRemoveDetailYesNo.error.required                              =  Select whether you want to remove this information from this subcontractor
+amendIndividualRemoveDetailYesNo.detail.trading-name                         =  trading name
+amendIndividualRemoveDetailYesNo.detail.subcontractor-name                   =  subcontractor name
+amendIndividualRemoveDetailYesNo.detail.address                              =  address
+amendIndividualRemoveDetailYesNo.detail.contact-details                      =  contact details
+amendIndividualRemoveDetailYesNo.detail.unique-taxpayer-reference            =  UTR
+amendIndividualRemoveDetailYesNo.detail.national-insurance-number            =  National Insurance number
+amendIndividualRemoveDetailYesNo.detail.works-reference-number               =  works reference number
+
 # Partnership
 addPartnershipContactMethodsYesNo.title                     =  Do you want to add contact details for this partnership?
 addPartnershipContactMethodsYesNo.heading                   =  Do you want to add contact details for {0}?

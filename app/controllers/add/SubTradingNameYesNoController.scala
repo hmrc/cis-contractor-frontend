@@ -18,9 +18,11 @@ package controllers.add
 
 import controllers.actions.*
 import forms.add.SubTradingNameYesNoFormProvider
-import models.Mode
+import models.{AmendMode, Mode}
 import navigation.Navigator
+import pages.QuestionPage
 import pages.add.SubTradingNameYesNoPage
+import pages.amend.SubTradingNameYesNoAmendPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
@@ -58,13 +60,20 @@ class SubTradingNameYesNoController @Inject() (
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
+
+      val pageToUpdate: QuestionPage[Boolean] =
+        mode match {
+          case AmendMode => SubTradingNameYesNoAmendPage
+          case _         => SubTradingNameYesNoPage
+        }
+
       form
         .bindFromRequest()
         .fold(
           formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
           value =>
             for {
-              updatedAnswers <- Future.fromTry(request.userAnswers.set(SubTradingNameYesNoPage, value))
+              updatedAnswers <- Future.fromTry(request.userAnswers.set(pageToUpdate, value))
               _              <- sessionRepository.set(updatedAnswers)
             } yield Redirect(navigator.nextPage(SubTradingNameYesNoPage, mode, updatedAnswers))
         )
