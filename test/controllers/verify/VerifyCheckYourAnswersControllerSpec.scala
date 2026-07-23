@@ -22,15 +22,14 @@ import models.verify.ContractorEmailConfirmationStored.{CurrentEmail, DifferentE
 import models.verify.SelectedSubcontractors
 import models.{ContractorScheme, Subcontractor, SubcontractorViewModel}
 import models.response.GetNewestVerificationBatchResponse
-
 import org.scalatestplus.mockito.MockitoSugar
 import org.jsoup.Jsoup
-import pages.verify._
+import pages.verify.*
+import play.api.i18n.{Messages, MessagesApi}
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 
 class VerifyCheckYourAnswersControllerSpec extends SpecBase with MockitoSugar {
-
   private lazy val onPageLoadRoute = controllers.verify.routes.VerifyCheckYourAnswersController.onPageLoad().url
   private lazy val onSubmitRoute   = controllers.verify.routes.VerifyCheckYourAnswersController.onSubmit().url
 
@@ -154,6 +153,54 @@ class VerifyCheckYourAnswersControllerSpec extends SpecBase with MockitoSugar {
             val doc    = Jsoup.parse(contentAsString(result))
 
             doc.select(".govuk-summary-list__row").size() mustBe 3
+          }
+        }
+
+        "must render the None Selected text inline in the reverify subcontractor row for none selected" in {
+          val ua = emptyUserAnswers
+            .setOrException(SelectSubcontractorPage, Set(brodyMartin))
+            .setOrException(ReverifyExistingSubcontractorsYesNoPage, true)
+            .setOrException(SelectSubcontractorsToReverifyPage, Set())
+            .setOrException(NewestVerificationBatchResponsePage, batchResponseWithEmail("agent@example.com"))
+            .setOrException(ContractorEmailConfirmationStoredPage, CurrentEmail)
+            .setOrException(VerificationBatchReadinessPage, true)
+
+          val application = applicationBuilder(userAnswers = Some(ua)).build()
+          running(application) {
+            val messagesApi                 = application.injector.instanceOf[MessagesApi]
+            implicit val messages: Messages = messagesApi.preferred(FakeRequest())
+            val result                      = route(application, FakeRequest(GET, onPageLoadRoute)).value
+            val doc                         = Jsoup.parse(contentAsString(result))
+            val allRows                     = doc.select(".govuk-summary-list__row")
+            val reverifyRow                 = allRows.get(2)
+            reverifyRow.select(".govuk-summary-list__value").text() must include(
+              messages("verify.selectSubcontractor.display.noneSelected")
+            )
+          }
+        }
+
+        "must render the None selected text inline in the verify subcontractor row for none selected " in {
+          val ua = emptyUserAnswers
+            .setOrException(SelectSubcontractorPage, Set())
+            .setOrException(ReverifyExistingSubcontractorsYesNoPage, true)
+            .setOrException(SelectSubcontractorsToReverifyPage, Set(grantAlan, ingenResearch))
+            .setOrException(NewestVerificationBatchResponsePage, batchResponseWithEmail("agent@example.com"))
+            .setOrException(ContractorEmailConfirmationStoredPage, CurrentEmail)
+            .setOrException(VerificationBatchReadinessPage, true)
+
+          val application = applicationBuilder(userAnswers = Some(ua)).build()
+          running(application) {
+            val messagesApi                 = application.injector.instanceOf[MessagesApi]
+            implicit val messages: Messages = messagesApi.preferred(FakeRequest())
+
+            val result = route(application, FakeRequest(GET, onPageLoadRoute)).value
+            val doc    = Jsoup.parse(contentAsString(result))
+
+            val allRows     = doc.select(".govuk-summary-list__row")
+            val reverifyRow = allRows.get(0)
+            reverifyRow.select(".govuk-summary-list__value").text() mustBe messages(
+              "verify.selectSubcontractor.display.noneSelected"
+            )
           }
         }
       }
