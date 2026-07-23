@@ -112,8 +112,7 @@ class SelectSubcontractorsToReverifySummarySpec extends SpecBase with Matchers {
 
       val answers: UserAnswers =
         emptyUserAnswers
-          .set(
-            SelectSubcontractorsToReverifyPage,Set())
+          .set(SelectSubcontractorsToReverifyPage, Set())
           .success
           .value
           .set(ReverifyExistingSubcontractorsYesNoPage, true)
@@ -134,8 +133,7 @@ class SelectSubcontractorsToReverifySummarySpec extends SpecBase with Matchers {
 
       val answers: UserAnswers =
         emptyUserAnswers
-          .set(
-            SelectSubcontractorsToReverifyPage, Set())
+          .set(SelectSubcontractorsToReverifyPage, Set())
           .success
           .value
           .set(ReverifyExistingSubcontractorsYesNoPage, false)

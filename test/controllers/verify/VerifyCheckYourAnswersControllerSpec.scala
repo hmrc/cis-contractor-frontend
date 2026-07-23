@@ -25,7 +25,7 @@ import models.response.GetNewestVerificationBatchResponse
 import org.scalatestplus.mockito.MockitoSugar
 import org.jsoup.Jsoup
 import pages.verify.*
-import play.api.i18n.{ Messages, MessagesApi}
+import play.api.i18n.{Messages, MessagesApi}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 
@@ -167,13 +167,15 @@ class VerifyCheckYourAnswersControllerSpec extends SpecBase with MockitoSugar {
 
           val application = applicationBuilder(userAnswers = Some(ua)).build()
           running(application) {
-            val messagesApi = application.injector.instanceOf[MessagesApi]
+            val messagesApi                 = application.injector.instanceOf[MessagesApi]
             implicit val messages: Messages = messagesApi.preferred(FakeRequest())
-            val result = route(application, FakeRequest(GET, onPageLoadRoute)).value
-            val doc    = Jsoup.parse(contentAsString(result))
-            val allRows     = doc.select(".govuk-summary-list__row")
-            val reverifyRow = allRows.get(2)
-            reverifyRow.select(".govuk-summary-list__value").text() must include(messages("verify.selectSubcontractor.display.noneSelected"))
+            val result                      = route(application, FakeRequest(GET, onPageLoadRoute)).value
+            val doc                         = Jsoup.parse(contentAsString(result))
+            val allRows                     = doc.select(".govuk-summary-list__row")
+            val reverifyRow                 = allRows.get(2)
+            reverifyRow.select(".govuk-summary-list__value").text() must include(
+              messages("verify.selectSubcontractor.display.noneSelected")
+            )
           }
         }
 
@@ -188,7 +190,7 @@ class VerifyCheckYourAnswersControllerSpec extends SpecBase with MockitoSugar {
 
           val application = applicationBuilder(userAnswers = Some(ua)).build()
           running(application) {
-            val messagesApi = application.injector.instanceOf[MessagesApi]
+            val messagesApi                 = application.injector.instanceOf[MessagesApi]
             implicit val messages: Messages = messagesApi.preferred(FakeRequest())
 
             val result = route(application, FakeRequest(GET, onPageLoadRoute)).value
@@ -196,7 +198,9 @@ class VerifyCheckYourAnswersControllerSpec extends SpecBase with MockitoSugar {
 
             val allRows     = doc.select(".govuk-summary-list__row")
             val reverifyRow = allRows.get(0)
-            reverifyRow.select(".govuk-summary-list__value").text() mustBe messages("verify.selectSubcontractor.display.noneSelected")
+            reverifyRow.select(".govuk-summary-list__value").text() mustBe messages(
+              "verify.selectSubcontractor.display.noneSelected"
+            )
           }
         }
       }
