@@ -894,6 +894,7 @@ verify.selectSubcontractor.checkYourAnswersLabel                        =  Subco
 verify.selectSubcontractor.showingResults                               =  Showing {0} to {1} of {2} results
 verify.selectSubcontractor.error.required                               =  Select at least one subcontractor to verify
 verify.selectSubcontractor.change.hidden                                =  subcontractors to verify
+verify.selectSubcontractor.display.noneSelected                         =  None selected
 
 verify.emailAddress.title                                               =  What email address should HMRC send this confirmation to?
 verify.emailAddress.heading                                             =  What email address should HMRC send this confirmation to?

@@ -22,15 +22,14 @@ import models.verify.ContractorEmailConfirmationStored.{CurrentEmail, DifferentE
 import models.verify.SelectedSubcontractors
 import models.{ContractorScheme, Subcontractor, SubcontractorViewModel}
 import models.response.GetNewestVerificationBatchResponse
-
 import org.scalatestplus.mockito.MockitoSugar
 import org.jsoup.Jsoup
-import pages.verify._
+import pages.verify.*
+import play.api.i18n.{ Messages, MessagesApi}
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 
 class VerifyCheckYourAnswersControllerSpec extends SpecBase with MockitoSugar {
-
   private lazy val onPageLoadRoute = controllers.verify.routes.VerifyCheckYourAnswersController.onPageLoad().url
   private lazy val onSubmitRoute   = controllers.verify.routes.VerifyCheckYourAnswersController.onSubmit().url
 
@@ -112,7 +111,7 @@ class VerifyCheckYourAnswersControllerSpec extends SpecBase with MockitoSugar {
             val doc    = Jsoup.parse(contentAsString(result))
 
             val rows = doc.select(".govuk-summary-list__row")
-            rows.size() mustBe 4
+            rows.size() mustBe 3
 
             val subRow = rows.get(0)
             subRow.select(".govuk-summary-list__value").text() mustBe "Brody, Martin"
@@ -134,7 +133,7 @@ class VerifyCheckYourAnswersControllerSpec extends SpecBase with MockitoSugar {
             val doc    = Jsoup.parse(contentAsString(result))
 
             val emailRows = doc.select(".govuk-summary-list__row")
-            val emailRow  = emailRows.get(3)
+            val emailRow  = emailRows.get(2)
             emailRow.select(".govuk-summary-list__value").text() must include("agent@example.com")
             emailRow.select(".govuk-summary-list__value strong").text() mustBe "agent@example.com"
           }
@@ -153,26 +152,28 @@ class VerifyCheckYourAnswersControllerSpec extends SpecBase with MockitoSugar {
             val result = route(application, FakeRequest(GET, onPageLoadRoute)).value
             val doc    = Jsoup.parse(contentAsString(result))
 
-            doc.select(".govuk-summary-list__row").size() mustBe 4
+            doc.select(".govuk-summary-list__row").size() mustBe 3
           }
         }
 
-        "must render the None selected text inline in the reverify subcontractor row for none selected" in {
+        "must render the None Selected text inline in the reverify subcontractor row for none selected" in {
           val ua = emptyUserAnswers
             .setOrException(SelectSubcontractorPage, Set(brodyMartin))
-            .setOrException(ReverifyExistingSubcontractorsYesNoPage, false)
+            .setOrException(ReverifyExistingSubcontractorsYesNoPage, true)
+            .setOrException(SelectSubcontractorsToReverifyPage, Set())
             .setOrException(NewestVerificationBatchResponsePage, batchResponseWithEmail("agent@example.com"))
             .setOrException(ContractorEmailConfirmationStoredPage, CurrentEmail)
             .setOrException(VerificationBatchReadinessPage, true)
 
           val application = applicationBuilder(userAnswers = Some(ua)).build()
           running(application) {
+            val messagesApi = application.injector.instanceOf[MessagesApi]
+            implicit val messages: Messages = messagesApi.preferred(FakeRequest())
             val result = route(application, FakeRequest(GET, onPageLoadRoute)).value
             val doc    = Jsoup.parse(contentAsString(result))
-
             val allRows     = doc.select(".govuk-summary-list__row")
             val reverifyRow = allRows.get(2)
-            reverifyRow.select(".govuk-summary-list__value").text() must include("None selected")
+            reverifyRow.select(".govuk-summary-list__value").text() must include(messages("verify.selectSubcontractor.display.noneSelected"))
           }
         }
 
@@ -187,12 +188,15 @@ class VerifyCheckYourAnswersControllerSpec extends SpecBase with MockitoSugar {
 
           val application = applicationBuilder(userAnswers = Some(ua)).build()
           running(application) {
+            val messagesApi = application.injector.instanceOf[MessagesApi]
+            implicit val messages: Messages = messagesApi.preferred(FakeRequest())
+
             val result = route(application, FakeRequest(GET, onPageLoadRoute)).value
             val doc    = Jsoup.parse(contentAsString(result))
 
             val allRows     = doc.select(".govuk-summary-list__row")
             val reverifyRow = allRows.get(0)
-            reverifyRow.select(".govuk-summary-list__value").text() must include("None selected")
+            reverifyRow.select(".govuk-summary-list__value").text() mustBe messages("verify.selectSubcontractor.display.noneSelected")
           }
         }
       }
@@ -238,14 +242,14 @@ class VerifyCheckYourAnswersControllerSpec extends SpecBase with MockitoSugar {
             val doc    = Jsoup.parse(contentAsString(result))
 
             val rows = doc.select(".govuk-summary-list__row")
-            rows.size() mustBe 5
+            rows.size() mustBe 4
 
-            val confirmRow = rows.get(3)
+            val confirmRow = rows.get(2)
             confirmRow.select(".govuk-summary-list__value").text() must include(
               messages(application)("verify.contractorEmailConfirmationStored.differentEmail")
             )
 
-            val emailRow = rows.get(4)
+            val emailRow = rows.get(3)
             emailRow.select(".govuk-summary-list__value").text() mustBe "override@example.com"
           }
         }
@@ -268,9 +272,9 @@ class VerifyCheckYourAnswersControllerSpec extends SpecBase with MockitoSugar {
             val doc    = Jsoup.parse(contentAsString(result))
 
             val rows = doc.select(".govuk-summary-list__row")
-            rows.size() mustBe 4
+            rows.size() mustBe 3
 
-            val confirmRow = rows.get(3)
+            val confirmRow = rows.get(2)
             confirmRow.select(".govuk-summary-list__value").text() mustBe
               messages(application)("verify.contractorEmailConfirmationStored.doNotSend")
           }
@@ -355,7 +359,7 @@ class VerifyCheckYourAnswersControllerSpec extends SpecBase with MockitoSugar {
             val doc    = Jsoup.parse(contentAsString(result))
 
             val rows = doc.select(".govuk-summary-list__row")
-            rows.size() mustBe 4
+            rows.size() mustBe 3
 
             rows.get(1).select(".govuk-summary-list__key").text() must include(
               messages(application)("verify.reverifyExistingSubcontractorsYesNo.checkYourAnswersLabel")
@@ -377,7 +381,7 @@ class VerifyCheckYourAnswersControllerSpec extends SpecBase with MockitoSugar {
             val result = route(application, FakeRequest(GET, onPageLoadRoute)).value
             val doc    = Jsoup.parse(contentAsString(result))
 
-            doc.select(".govuk-summary-list__row").size() mustBe 4
+            doc.select(".govuk-summary-list__row").size() mustBe 3
           }
         }
       }
@@ -394,7 +398,7 @@ class VerifyCheckYourAnswersControllerSpec extends SpecBase with MockitoSugar {
           val result = route(application, FakeRequest(GET, onPageLoadRoute)).value
           val doc    = Jsoup.parse(contentAsString(result))
 
-          doc.select(".govuk-summary-list__row").size() mustBe 3
+          doc.select(".govuk-summary-list__row").size() mustBe 2
         }
       }
 

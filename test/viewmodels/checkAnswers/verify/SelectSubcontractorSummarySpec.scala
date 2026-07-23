@@ -116,7 +116,7 @@ class SelectSubcontractorSummarySpec extends SpecBase with Matchers {
 
       val valueHtml = result.value.value.content.asHtml.toString
 
-      valueHtml must include("None selected")
+      valueHtml must include(messages("verify.selectSubcontractor.display.noneSelected"))
     }
   }
 }

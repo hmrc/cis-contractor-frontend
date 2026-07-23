@@ -27,7 +27,7 @@ import viewmodels.implicits.*
 object SelectSubcontractorSummary {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] = {
-    val selectEmptyReverify = List("None selected")
+    val selectEmptyReverify = List(messages("verify.selectSubcontractor.display.noneSelected"))
     answers.get(SelectSubcontractorPage).flatMap { answers =>
       val selectNames = answers.toSeq.map(sub => HtmlFormat.escape(sub.name).toString)
 

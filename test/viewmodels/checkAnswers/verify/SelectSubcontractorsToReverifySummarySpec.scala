@@ -18,9 +18,9 @@ package viewmodels.checkAnswers.verify
 
 import base.SpecBase
 import models.{CheckMode, UserAnswers}
-import org.scalatest.OptionValues._
+import org.scalatest.OptionValues.*
 import org.scalatest.matchers.must.Matchers
-import pages.verify.SelectSubcontractorsToReverifyPage
+import pages.verify.{ReverifyExistingSubcontractorsYesNoPage, SelectSubcontractorsToReverifyPage}
 import play.api.i18n.{Lang, Messages, MessagesImpl}
 import play.api.test.Helpers.stubMessagesApi
 import models.verify.SelectedSubcontractors
@@ -43,6 +43,9 @@ class SelectSubcontractorsToReverifySummarySpec extends SpecBase with Matchers {
               SelectedSubcontractors("Hammondhouse", "Hammond House")
             )
           )
+          .success
+          .value
+          .set(ReverifyExistingSubcontractorsYesNoPage, true)
           .success
           .value
 
@@ -91,6 +94,9 @@ class SelectSubcontractorsToReverifySummarySpec extends SpecBase with Matchers {
           )
           .success
           .value
+          .set(ReverifyExistingSubcontractorsYesNoPage, true)
+          .success
+          .value
 
       val result = SelectSubcontractorsToReverifySummary.row(answers)
 
@@ -102,15 +108,46 @@ class SelectSubcontractorsToReverifySummarySpec extends SpecBase with Matchers {
       valueHtml must not include "<br>"
     }
 
-    "must return a row with 'None selected' when subcontractors verify list is none" in {
-      val result = SelectSubcontractorsToReverifySummary.row(emptyUserAnswers)
+    "must return summary row with 'None selected' when subcontractors verify list is none and reverify yesno page is 'Yes'" in {
+
+      val answers: UserAnswers =
+        emptyUserAnswers
+          .set(
+            SelectSubcontractorsToReverifyPage,Set())
+          .success
+          .value
+          .set(ReverifyExistingSubcontractorsYesNoPage, true)
+          .success
+          .value
+
+      val result = SelectSubcontractorsToReverifySummary.row(answers)
 
       result mustBe defined
 
       val valueHtml = result.value.value.content.asHtml.toString
 
-      valueHtml must include("None selected")
+      valueHtml must include(messages("verify.selectSubcontractor.display.noneSelected"))
       valueHtml must not include "<br>"
+    }
+
+    "must return None when verify yesno page value as 'No' and none selected for selectSubContractorVerify page" in {
+
+      val answers: UserAnswers =
+        emptyUserAnswers
+          .set(
+            SelectSubcontractorsToReverifyPage, Set())
+          .success
+          .value
+          .set(ReverifyExistingSubcontractorsYesNoPage, false)
+          .success
+          .value
+
+      SelectSubcontractorsToReverifySummary.row(answers) mustBe None
+    }
+
+    "must return None when no answer is present" in {
+      SelectSubcontractorsToReverifySummary.row(emptyUserAnswers) mustBe None
+
     }
   }
 }
