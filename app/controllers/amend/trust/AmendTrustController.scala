@@ -21,83 +21,176 @@ import models.TypeOfSubcontractor.Trust
 import models.UserAnswers
 import models.address.{Address, Country}
 import models.amend.trust.OriginalTrustAnswers
-import models.contact.ContactMethodOptions.{Email, Mobile, Phone}
+import models.contact.ContactMethodOptions
+import models.response.SubcontractorResponse
 import pages.add.*
 import pages.add.trust.*
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.Logging
+import controllers.amend.AmendControllerUtils._
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import queries.{CisIdQuery, OriginalTrustAnswersQuery}
 import repositories.SessionRepository
+import services.SubcontractorService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
 
-// TODO: replace demo data with real backend fetch
 class AmendTrustController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
+  subcontractorService: SubcontractorService,
   sessionRepository: SessionRepository,
   val controllerComponents: MessagesControllerComponents
 )(implicit ec: ExecutionContext)
-    extends FrontendBaseController {
-  private val trustName      = "test trust"
-  private val emailAddress   = "test@example.com"
-  private val utr            = "1123456789"
-  private val worksReference = "XLS345-MM"
-  private val phoneNumber    = "1234567890"
-  private val mobileNumber   = "6454543667"
-  private val trustAddress   = Address(
-    addressLine1 = "12 Harbor View Road",
-    addressLine2 = Some("Amity Island"),
-    addressLine3 = Some("Bodmin"),
-    addressLine4 = Some("Cornwall"),
-    postcode = Some("PL31 2HL"),
-    country = Some(Country(code = None, name = Some("England")))
-  )
+    extends FrontendBaseController
+    with Logging {
 
-  private val trustOriginal                                            = OriginalTrustAnswers(
-    trustName = Some(trustName),
-    addressYesNo = Some(true),
-    address = Some(trustAddress),
-    trustContactMethodsYesNo = Some(true),
-    trustContactMethod = Set(Email, Phone, Mobile),
-    email = Some(emailAddress),
-    phone = Some(phoneNumber),
-    mobile = Some(mobileNumber),
-    utrYesNo = Some(true),
-    utr = Some(utr),
-    worksReferenceYesNo = Some(true),
-    worksReference = Some(worksReference)
-  )
-  protected def populateUserAnswers(ua: UserAnswers): Try[UserAnswers] = for {
-    ua <- ua.set(TypeOfSubcontractorPage, Trust)
-    ua <- ua.set(TrustNamePage, trustName)
-    ua <- ua.set(TrustAddressYesNoPage, true)
-    ua <- ua.set(TrustAddressPage, trustAddress)
-    ua <- ua.set(AddTrustContactMethodsYesNoPage, true)
-    ua <- ua.set(TrustContactMethodOptionsPage, Set(Email, Phone, Mobile))
-    ua <- ua.set(TrustEmailAddressPage, emailAddress)
-    ua <- ua.set(TrustPhoneNumberPage, phoneNumber)
-    ua <- ua.set(TrustMobileNumberPage, mobileNumber)
-    ua <- ua.set(TrustUtrYesNoPage, true)
-    ua <- ua.set(TrustUtrPage, utr)
-    ua <- ua.set(TrustWorksReferenceYesNoPage, true)
-    ua <- ua.set(TrustWorksReferencePage, worksReference)
-    ua <- ua.set(CisIdQuery, "1")
-    ua <- ua.set(OriginalTrustAnswersQuery, trustOriginal)
-  } yield ua
+  private val expectedSubcontractorType = "trust"
 
-  def onPageLoad(): Action[AnyContent] = (identify andThen getData andThen requireData).async { implicit request =>
-    populateUserAnswers(request.userAnswers).fold(
-      _ => Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())),
-      ua =>
-        sessionRepository
-          .set(ua)
-          .map(_ =>
-            Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-          ) // TODO - redirect to [Amend Trust] Subcontractor details
+  private def recovery: Result =
+    Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+
+  def onPageLoad(cisId: String, subbieResourceRef: Long): Action[AnyContent] =
+    (identify andThen getData andThen requireData).async { implicit request =>
+      subcontractorService
+        .getSubcontractor(cisId, subbieResourceRef)
+        .flatMap { response =>
+          response.subcontractor match {
+            case None =>
+              logger.error(
+                s"[AmendTrustController] No subcontractor returned for " +
+                  s"cisId=$cisId, subbieResourceRef=$subbieResourceRef"
+              )
+              Future.successful(recovery)
+
+            case Some(subcontractor) if !isExpectedSubcontractorType(subcontractor, expectedSubcontractorType) =>
+              logger.error(
+                s"[AmendTrustController] Invalid subcontractor type. " +
+                  s"Expected=$expectedSubcontractorType, " +
+                  s"actual=${subcontractor.subcontractorType.getOrElse("missing")}, " +
+                  s"cisId=$cisId, subbieResourceRef=$subbieResourceRef"
+              )
+              Future.successful(recovery)
+
+            case Some(subcontractor) =>
+              populateUserAnswers(
+                request.userAnswers,
+                cisId,
+                subcontractor
+              ).fold(
+                error => {
+                  logger.error(
+                    s"[AmendTrustController] Failed to populate UserAnswers for " +
+                      s"cisId=$cisId, subbieResourceRef=$subbieResourceRef",
+                    error
+                  )
+                  Future.successful(recovery)
+                },
+                updatedAnswers =>
+                  sessionRepository
+                    .set(updatedAnswers)
+                    .map { _ =>
+                      Redirect(
+                        controllers.amend.trust.routes.AmendTrustCheckYourAnswersController
+                          .onPageLoad()
+                      )
+                    }
+              )
+          }
+        }
+        .recover { case error =>
+          logger.error(
+            s"[AmendTrustController] Failed to retrieve subcontractor. " +
+              s"cisId=$cisId, subbieResourceRef=$subbieResourceRef",
+            error
+          )
+          recovery
+        }
+    }
+
+  protected def populateUserAnswers(
+    userAnswers: UserAnswers,
+    cisId: String,
+    subcontractor: SubcontractorResponse
+  ): Try[UserAnswers] = {
+    val address = toAddress(subcontractor)
+    val methods = contactMethods(subcontractor)
+
+    val trustName =
+      subcontractor.tradingName.orElse(
+        subcontractor.partnershipTradingName
+      )
+
+    val original = originalAnswers(
+      subcontractor = subcontractor,
+      address = address,
+      methods = methods,
+      trustName = trustName
     )
+
+    for {
+      updated <- userAnswers.set(TypeOfSubcontractorPage, Trust)
+      updated <- setOptional(updated, TrustNamePage, trustName)
+      updated <- updated.set(TrustAddressYesNoPage, address.isDefined)
+      updated <- setOptional(updated, TrustAddressPage, address)
+      updated <- updated.set(AddTrustContactMethodsYesNoPage, methods.nonEmpty)
+      updated <- if (methods.nonEmpty) updated.set(TrustContactMethodOptionsPage, methods) else Try(updated)
+      updated <- setOptional(updated, TrustEmailAddressPage, subcontractor.emailAddress)
+      updated <- setOptional(updated, TrustPhoneNumberPage, subcontractor.phoneNumber)
+      updated <- setOptional(updated, TrustMobileNumberPage, subcontractor.mobilePhoneNumber)
+      updated <- updated.set(TrustUtrYesNoPage, subcontractor.utr.isDefined)
+      updated <- setOptional(updated, TrustUtrPage, subcontractor.utr)
+      updated <- updated.set(TrustWorksReferenceYesNoPage, subcontractor.worksReferenceNumber.isDefined)
+      updated <- setOptional(updated, TrustWorksReferencePage, subcontractor.worksReferenceNumber)
+      updated <- updated.set(CisIdQuery, cisId)
+      updated <- updated.set(OriginalTrustAnswersQuery, original)
+    } yield updated
   }
+
+  private def contactMethods(
+    subcontractor: SubcontractorResponse
+  ): Set[ContactMethodOptions] =
+    Set(
+      subcontractor.emailAddress.map(_ => ContactMethodOptions.Email),
+      subcontractor.phoneNumber.map(_ => ContactMethodOptions.Phone),
+      subcontractor.mobilePhoneNumber.map(_ => ContactMethodOptions.Mobile)
+    ).flatten
+
+  private def toAddress(
+    subcontractor: SubcontractorResponse
+  ): Option[Address] =
+    subcontractor.addressLine1.map { line1 =>
+      Address(
+        addressLine1 = line1,
+        addressLine2 = subcontractor.addressLine2,
+        addressLine3 = subcontractor.addressLine3,
+        addressLine4 = subcontractor.addressLine4,
+        postcode = subcontractor.postcode,
+        country = subcontractor.country.map(name => Country(None, Some(name)))
+      )
+    }
+
+  private def originalAnswers(
+    subcontractor: SubcontractorResponse,
+    address: Option[Address],
+    methods: Set[ContactMethodOptions],
+    trustName: Option[String]
+  ): OriginalTrustAnswers =
+    OriginalTrustAnswers(
+      trustName = trustName,
+      addressYesNo = Some(address.isDefined),
+      address = address,
+      trustContactMethodsYesNo = Some(methods.nonEmpty),
+      trustContactMethod = methods,
+      email = subcontractor.emailAddress,
+      phone = subcontractor.phoneNumber,
+      mobile = subcontractor.mobilePhoneNumber,
+      utrYesNo = Some(subcontractor.utr.isDefined),
+      utr = subcontractor.utr,
+      worksReferenceYesNo = Some(subcontractor.worksReferenceNumber.isDefined),
+      worksReference = subcontractor.worksReferenceNumber
+    )
 }

@@ -21,97 +21,194 @@ import models.TypeOfSubcontractor.Partnership
 import models.UserAnswers
 import models.address.{Address, Country}
 import models.amend.partnership.OriginalPartnershipAnswers
-import models.contact.ContactMethodOptions.Email
+import models.contact.ContactMethodOptions
+import models.response.SubcontractorResponse
 import pages.add.*
 import pages.add.partnership.*
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.Logging
+import play.api.libs.json.Writes
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import queries.{CisIdQuery, OriginalPartnershipAnswersQuery}
+import controllers.amend.AmendControllerUtils._
 import repositories.SessionRepository
+import services.SubcontractorService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
 
-// TODO: replace demo data with real backend fetch
 class AmendPartnershipController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
+  subcontractorService: SubcontractorService,
   sessionRepository: SessionRepository,
   val controllerComponents: MessagesControllerComponents
 )(implicit ec: ExecutionContext)
-    extends FrontendBaseController {
-  private val partnershipName      = "test partnership"
-  private val emailAddress         = "test@example.com"
-  private val utr                  = "7777777777"
-  private val nominatedPartnerUtr  = "8777777777"
-  private val crn                  = "AC012345"
-  private val worksReference       = "XLS345-MM"
-  private val nominatedPartnerName = "test nominated partner"
-  private val nominatedPartnerNino = "QQ123456C"
-  private val partnershipAddress   = Address(
-    addressLine1 = "12 Harbor View Road",
-    addressLine2 = Some("Amity Island"),
-    addressLine3 = Some("Bodmin"),
-    addressLine4 = Some("Cornwall"),
-    postcode = Some("PL31 2HL"),
-    country = Some(Country(code = None, name = Some("England")))
-  )
+    extends FrontendBaseController
+    with Logging {
 
-  private val partnershipOriginal                                      = OriginalPartnershipAnswers(
-    partnershipName = Some(partnershipName),
-    addressYesNo = Some(true),
-    address = Some(partnershipAddress),
-    partnershipContactMethodsYesNo = Some(true),
-    partnershipContactMethodOptions = Some(Set(Email)),
-    email = Some(emailAddress),
-    phone = None,
-    mobile = None,
-    hasUtrYesNo = Some(true),
-    utr = Some(utr),
-    nominatedPartnerName = Some(nominatedPartnerName),
-    nominatedPartnerUtrYesNo = Some(false),
-    nominatedPartnerUtr = None,
-    nominatedPartnerNinoYesNo = Some(true),
-    nominatedPartnerNino = Some(nominatedPartnerNino),
-    nominatedPartnerCrnYesNo = Some(true),
-    nominatedPartnerCrn = Some(crn),
-    nominatedPartnerWorksReferenceYesNo = Some(true),
-    nominatedPartnerWorksReference = Some(worksReference)
-  )
-  protected def populateUserAnswers(ua: UserAnswers): Try[UserAnswers] = for {
-    ua <- ua.set(TypeOfSubcontractorPage, Partnership)
-    ua <- ua.set(PartnershipNamePage, partnershipName)
-    ua <- ua.set(PartnershipAddressYesNoPage, true)
-    ua <- ua.set(PartnershipAddressPage, partnershipAddress)
-    ua <- ua.set(AddPartnershipContactMethodsYesNoPage, true)
-    ua <- ua.set(PartnershipContactMethodOptionsPage, Set(Email))
-    ua <- ua.set(PartnershipEmailAddressPage, emailAddress)
-    ua <- ua.set(PartnershipHasUtrYesNoPage, true)
-    ua <- ua.set(PartnershipUniqueTaxpayerReferencePage, utr)
-    ua <- ua.set(PartnershipNominatedPartnerNamePage, nominatedPartnerName)
-    ua <- ua.set(PartnershipNominatedPartnerUtrYesNoPage, true)
-    ua <- ua.set(PartnershipNominatedPartnerUtrPage, nominatedPartnerUtr)
-    ua <- ua.set(PartnershipNominatedPartnerNinoYesNoPage, true)
-    ua <- ua.set(PartnershipNominatedPartnerNinoPage, nominatedPartnerNino)
-    ua <- ua.set(PartnershipNominatedPartnerCrnYesNoPage, true)
-    ua <- ua.set(PartnershipNominatedPartnerCrnPage, crn)
-    ua <- ua.set(PartnershipWorksReferenceNumberYesNoPage, true)
-    ua <- ua.set(PartnershipWorksReferenceNumberPage, worksReference)
-    ua <- ua.set(CisIdQuery, "1")
-    ua <- ua.set(OriginalPartnershipAnswersQuery, partnershipOriginal)
-  } yield ua
+  private val expectedSubcontractorType = "partnership"
 
-  def onPageLoad(): Action[AnyContent] = (identify andThen getData andThen requireData).async { implicit request =>
-    populateUserAnswers(request.userAnswers).fold(
-      _ => Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())),
-      ua =>
-        sessionRepository
-          .set(ua)
-          .map(_ =>
-            Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-          ) // TODO - redirect to [Amend Partnership] Subcontractor details
+  private def recovery: Result =
+    Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+
+  def onPageLoad(cisId: String, subbieResourceRef: Long): Action[AnyContent] =
+    (identify andThen getData andThen requireData).async { implicit request =>
+      subcontractorService
+        .getSubcontractor(cisId, subbieResourceRef)
+        .flatMap { response =>
+          response.subcontractor match {
+            case None =>
+              logger.error(
+                s"[AmendPartnershipController] No subcontractor returned for " +
+                  s"cisId=$cisId, subbieResourceRef=$subbieResourceRef"
+              )
+              Future.successful(recovery)
+
+            case Some(subcontractor) if !isExpectedSubcontractorType(subcontractor, expectedSubcontractorType) =>
+              logger.error(
+                s"[AmendPartnershipController] Invalid subcontractor type. " +
+                  s"Expected=$expectedSubcontractorType, " +
+                  s"actual=${subcontractor.subcontractorType.getOrElse("missing")}, " +
+                  s"cisId=$cisId, subbieResourceRef=$subbieResourceRef"
+              )
+              Future.successful(recovery)
+
+            case Some(subcontractor) =>
+              populateUserAnswers(
+                request.userAnswers,
+                cisId,
+                subcontractor
+              ).fold(
+                error => {
+                  logger.error(
+                    s"[AmendPartnershipController] Failed to populate UserAnswers for " +
+                      s"cisId=$cisId, subbieResourceRef=$subbieResourceRef",
+                    error
+                  )
+                  Future.successful(recovery)
+                },
+                updatedAnswers =>
+                  sessionRepository
+                    .set(updatedAnswers)
+                    .map { _ =>
+                      Redirect(
+                        controllers.amend.partnership.routes.AmendPartnershipCheckYourAnswersController
+                          .onPageLoad()
+                      )
+                    }
+              )
+          }
+        }
+        .recover { case error =>
+          logger.error(
+            s"[AmendPartnershipController] Failed to retrieve subcontractor. " +
+              s"cisId=$cisId, subbieResourceRef=$subbieResourceRef",
+            error
+          )
+          recovery
+        }
+    }
+
+  protected def populateUserAnswers(
+    userAnswers: UserAnswers,
+    cisId: String,
+    subcontractor: SubcontractorResponse
+  ): Try[UserAnswers] = {
+    val address                    = toAddress(subcontractor)
+    val methods                    = contactMethods(subcontractor)
+    val nominatedPartnerName       =
+      Seq(subcontractor.firstName, subcontractor.secondName, subcontractor.surname).flatten.mkString(" ").trim
+    val partnershipName            = subcontractor.partnershipTradingName.orElse(subcontractor.tradingName)
+    val nominatedPartnerNameOption = Option.when(nominatedPartnerName.nonEmpty)(nominatedPartnerName)
+
+    val original = originalAnswers(
+      subcontractor = subcontractor,
+      address = address,
+      methods = methods,
+      partnershipName = partnershipName,
+      nominatedPartnerName = nominatedPartnerNameOption
     )
+
+    for {
+      updated <- userAnswers.set(TypeOfSubcontractorPage, Partnership)
+      updated <- setOptional(updated, PartnershipNamePage, partnershipName)
+      updated <- updated.set(PartnershipAddressYesNoPage, address.isDefined)
+      updated <- setOptional(updated, PartnershipAddressPage, address)
+      updated <- updated.set(AddPartnershipContactMethodsYesNoPage, methods.nonEmpty)
+      updated <- if (methods.nonEmpty) updated.set(PartnershipContactMethodOptionsPage, methods) else Try(updated)
+      updated <- setOptional(updated, PartnershipEmailAddressPage, subcontractor.emailAddress)
+      updated <- setOptional(updated, PartnershipPhoneNumberPage, subcontractor.phoneNumber)
+      updated <- setOptional(updated, PartnershipMobileNumberPage, subcontractor.mobilePhoneNumber)
+      updated <- updated.set(PartnershipHasUtrYesNoPage, subcontractor.utr.isDefined)
+      updated <- setOptional(updated, PartnershipUniqueTaxpayerReferencePage, subcontractor.utr)
+      updated <- setOptional(
+                   updated,
+                   PartnershipNominatedPartnerNamePage,
+                   Option.when(nominatedPartnerName.nonEmpty)(nominatedPartnerName)
+                 )
+      updated <- updated.set(PartnershipNominatedPartnerUtrYesNoPage, subcontractor.partnerUtr.isDefined)
+      updated <- setOptional(updated, PartnershipNominatedPartnerUtrPage, subcontractor.partnerUtr)
+      updated <- updated.set(PartnershipNominatedPartnerNinoYesNoPage, subcontractor.nino.isDefined)
+      updated <- setOptional(updated, PartnershipNominatedPartnerNinoPage, subcontractor.nino)
+      updated <- updated.set(PartnershipNominatedPartnerCrnYesNoPage, subcontractor.crn.isDefined)
+      updated <- setOptional(updated, PartnershipNominatedPartnerCrnPage, subcontractor.crn)
+      updated <- updated.set(PartnershipWorksReferenceNumberYesNoPage, subcontractor.worksReferenceNumber.isDefined)
+      updated <- setOptional(updated, PartnershipWorksReferenceNumberPage, subcontractor.worksReferenceNumber)
+      updated <- updated.set(CisIdQuery, cisId)
+      updated <- updated.set(OriginalPartnershipAnswersQuery, original)
+    } yield updated
   }
+
+  private def contactMethods(
+    subcontractor: SubcontractorResponse
+  ): Set[ContactMethodOptions] =
+    Set(
+      subcontractor.emailAddress.map(_ => ContactMethodOptions.Email),
+      subcontractor.phoneNumber.map(_ => ContactMethodOptions.Phone),
+      subcontractor.mobilePhoneNumber.map(_ => ContactMethodOptions.Mobile)
+    ).flatten
+
+  private def toAddress(subcontractor: SubcontractorResponse): Option[Address] =
+    subcontractor.addressLine1.map { line1 =>
+      Address(
+        addressLine1 = line1,
+        addressLine2 = subcontractor.addressLine2,
+        addressLine3 = subcontractor.addressLine3,
+        addressLine4 = subcontractor.addressLine4,
+        postcode = subcontractor.postcode,
+        country = subcontractor.country.map(name => Country(None, Some(name)))
+      )
+    }
+
+  private def originalAnswers(
+    subcontractor: SubcontractorResponse,
+    address: Option[Address],
+    methods: Set[ContactMethodOptions],
+    partnershipName: Option[String],
+    nominatedPartnerName: Option[String]
+  ): OriginalPartnershipAnswers =
+    OriginalPartnershipAnswers(
+      partnershipName = partnershipName,
+      addressYesNo = Some(address.isDefined),
+      address = address,
+      partnershipContactMethodsYesNo = Some(methods.nonEmpty),
+      partnershipContactMethodOptions = Option.when(methods.nonEmpty)(methods),
+      email = subcontractor.emailAddress,
+      phone = subcontractor.phoneNumber,
+      mobile = subcontractor.mobilePhoneNumber,
+      hasUtrYesNo = Some(subcontractor.utr.isDefined),
+      utr = subcontractor.utr,
+      nominatedPartnerName = nominatedPartnerName,
+      nominatedPartnerUtrYesNo = Some(subcontractor.partnerUtr.isDefined),
+      nominatedPartnerUtr = subcontractor.partnerUtr,
+      nominatedPartnerNinoYesNo = Some(subcontractor.nino.isDefined),
+      nominatedPartnerNino = subcontractor.nino,
+      nominatedPartnerCrnYesNo = Some(subcontractor.crn.isDefined),
+      nominatedPartnerCrn = subcontractor.crn,
+      nominatedPartnerWorksReferenceYesNo = Some(subcontractor.worksReferenceNumber.isDefined),
+      nominatedPartnerWorksReference = subcontractor.worksReferenceNumber
+    )
 }
