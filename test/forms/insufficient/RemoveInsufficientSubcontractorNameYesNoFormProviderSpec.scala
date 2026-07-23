@@ -19,8 +19,7 @@ package forms.insufficient
 import forms.behaviours.BooleanFieldBehaviours
 import play.api.data.FormError
 
-class RemoveInsufficientSubcontractorNameYesNoFormProviderSpec
-  extends BooleanFieldBehaviours {
+class RemoveInsufficientSubcontractorNameYesNoFormProviderSpec extends BooleanFieldBehaviours {
 
   private val requiredKey =
     "removeInsufficientSubcontractorNameYesNo.error.required"

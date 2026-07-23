@@ -35,9 +35,7 @@ import views.html.insufficient.RemoveInsufficientSubcontractorNameYesNoView
 
 import scala.concurrent.Future
 
-class RemoveInsufficientSubcontractorNameYesNoControllerSpec
-  extends SpecBase
-    with MockitoSugar {
+class RemoveInsufficientSubcontractorNameYesNoControllerSpec extends SpecBase with MockitoSugar {
 
   private val formProvider =
     new RemoveInsufficientSubcontractorNameYesNoFormProvider()

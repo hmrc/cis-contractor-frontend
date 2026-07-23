@@ -36,10 +36,7 @@ import views.html.insufficient.RemoveInsufficientSubcontractorNameYesNoView
 
 import java.util
 
-class RemoveInsufficientSubcontractorNameYesNoViewSpec
-  extends AnyWordSpec
-    with Matchers
-    with GuiceOneAppPerSuite {
+class RemoveInsufficientSubcontractorNameYesNoViewSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite {
 
   "RemoveInsufficientSubcontractorNameYesNoView" should {
 

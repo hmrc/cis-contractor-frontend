@@ -33,19 +33,19 @@ import views.html.insufficient.RemoveInsufficientSubcontractorNameYesNoView
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class RemoveInsufficientSubcontractorNameYesNoController @Inject()(
-                                                                    override val messagesApi: MessagesApi,
-                                                                    sessionRepository: SessionRepository,
-                                                                    navigator: Navigator,
-                                                                    identify: IdentifierAction,
-                                                                    getData: DataRetrievalAction,
-                                                                    requireData: DataRequiredAction,
-                                                                    formProvider: RemoveInsufficientSubcontractorNameYesNoFormProvider,
-                                                                    subcontractorNameExtractor: SubcontractorNameExtractor,
-                                                                    val controllerComponents: MessagesControllerComponents,
-                                                                    view: RemoveInsufficientSubcontractorNameYesNoView
-                                                                  )(implicit ec: ExecutionContext)
-  extends FrontendBaseController
+class RemoveInsufficientSubcontractorNameYesNoController @Inject() (
+  override val messagesApi: MessagesApi,
+  sessionRepository: SessionRepository,
+  navigator: Navigator,
+  identify: IdentifierAction,
+  getData: DataRetrievalAction,
+  requireData: DataRequiredAction,
+  formProvider: RemoveInsufficientSubcontractorNameYesNoFormProvider,
+  subcontractorNameExtractor: SubcontractorNameExtractor,
+  val controllerComponents: MessagesControllerComponents,
+  view: RemoveInsufficientSubcontractorNameYesNoView
+)(implicit ec: ExecutionContext)
+    extends FrontendBaseController
     with I18nSupport {
 
   private val form: Form[Boolean] = formProvider()
@@ -60,7 +60,6 @@ class RemoveInsufficientSubcontractorNameYesNoController @Inject()(
 
   def onPageLoad(mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData) { implicit request =>
-
       subcontractorNameExtractor
         .getSubcontractorName(request.userAnswers)
         .fold(recoveryRedirect) { subcontractorName =>
@@ -76,11 +75,9 @@ class RemoveInsufficientSubcontractorNameYesNoController @Inject()(
 
   def onSubmit(mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
-
       subcontractorNameExtractor
         .getSubcontractorName(request.userAnswers)
         .fold(Future.successful(recoveryRedirect)) { subcontractorName =>
-
           form
             .bindFromRequest()
             .fold(
@@ -94,7 +91,6 @@ class RemoveInsufficientSubcontractorNameYesNoController @Inject()(
                     )
                   )
                 ),
-
               value =>
                 for {
                   updatedAnswers <-
