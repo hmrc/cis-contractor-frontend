@@ -623,3 +623,6 @@ POST  /contractor-details/change-add-contractor-scheme-name  controllers.contrac
 
 GET   /contractor-details/remove-contractor-detail/:contractorDetail  controllers.contractordetails.RemoveDetailYesNoController.onPageLoad(contractorDetail: String)
 POST  /contractor-details/remove-contractor-detail/:contractorDetail  controllers.contractordetails.RemoveDetailYesNoController.onSubmit(contractorDetail: String)
+
+GET   /subcontractor/remove-subcontractor-from-request     controllers.insufficient.RemoveInsufficientSubcontractorNameYesNoController.onPageLoad(mode: Mode = NormalMode)
+POST  /subcontractor/remove-subcontractor-from-request     controllers.insufficient.RemoveInsufficientSubcontractorNameYesNoController.onSubmit(mode: Mode = NormalMode)
