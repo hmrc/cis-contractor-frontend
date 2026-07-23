@@ -76,9 +76,9 @@ class AmendTrustCheckYourAnswersController @Inject() (
   }
 
   private def subcontractorInformationRows(
-                                            ua: UserAnswers,
-                                            isVerified: Option[Boolean]
-                                          )(implicit messages: Messages): Seq[Option[SummaryListRow]] = {
+    ua: UserAnswers,
+    isVerified: Option[Boolean]
+  )(implicit messages: Messages): Seq[Option[SummaryListRow]] = {
 
     val verificationRows =
       Option
@@ -103,9 +103,9 @@ class AmendTrustCheckYourAnswersController @Inject() (
   }
 
   private def detailsRows(
-                           ua: UserAnswers,
-                           isVerified: Option[Boolean]
-                         )(implicit messages: Messages): Seq[Option[SummaryListRow]] = {
+    ua: UserAnswers,
+    isVerified: Option[Boolean]
+  )(implicit messages: Messages): Seq[Option[SummaryListRow]] = {
 
     val nameRows =
       if (isVerified.contains(true)) {
