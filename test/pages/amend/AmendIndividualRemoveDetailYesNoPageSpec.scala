@@ -16,6 +16,7 @@
 
 package pages.amend
 
+import models.add.SubcontractorName
 import models.address.{Address, Country}
 import models.contact.ContactMethodOptions
 import pages.add.*
@@ -136,6 +137,42 @@ class AmendIndividualRemoveDetailYesNoPageSpec extends PageBehaviours {
       updatedUserAnswers.get(IndividualPhoneNumberPage) mustBe Some("01234567890")
       updatedUserAnswers.get(IndividualMobileNumberPage) mustBe Some("01234567890")
       updatedUserAnswers.get(AddIndividualContactMethodsYesNoPage) mustBe Some(true)
+    }
+
+    "cleanup: must remove SubcontractorNamePage userAnswers and set SubTradingNameYesNoPage to Yes when Yes is selected" in {
+      val subContractorName = SubcontractorName("John", Some("Paul"), "Smith")
+
+      val userAnswers = emptyUserAnswers
+        .set(SubcontractorNamePage, subContractorName)
+        .success
+        .value
+        .set(SubTradingNameYesNoPage, false)
+        .success
+        .value
+
+      val updatedUserAnswers =
+        userAnswers.set(AmendIndividualRemoveDetailYesNoPage("subcontractor-name"), true).success.value
+
+      updatedUserAnswers.get(SubcontractorNamePage) mustBe None
+      updatedUserAnswers.get(SubTradingNameYesNoPage) mustBe Some(true)
+    }
+
+    "cleanup: must  must retain SubcontractorNamePage userAnswers keep SubAddressYesNoPage as No when No is selected" in {
+      val subContractorName = SubcontractorName("John", Some("Paul"), "Smith")
+
+      val userAnswers = emptyUserAnswers
+        .set(SubcontractorNamePage, subContractorName)
+        .success
+        .value
+        .set(SubTradingNameYesNoPage, false)
+        .success
+        .value
+
+      val updatedUserAnswers =
+        userAnswers.set(AmendIndividualRemoveDetailYesNoPage("subcontractor-name"), false).success.value
+
+      updatedUserAnswers.get(SubcontractorNamePage) mustBe Some(subContractorName)
+      updatedUserAnswers.get(SubTradingNameYesNoPage) mustBe Some(false)
     }
 
     Seq(

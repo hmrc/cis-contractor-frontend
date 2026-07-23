@@ -18,6 +18,7 @@ package controllers.amend
 
 import controllers.actions.*
 import forms.amend.AmendIndividualRemoveDetailYesNoFormProvider
+import models.AmendMode
 import pages.amend.AmendIndividualRemoveDetailYesNoPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
@@ -44,6 +45,7 @@ class AmendIndividualRemoveDetailYesNoController @Inject() (
     with I18nSupport {
   private val validDetails = Set(
     "trading-name",
+    "subcontractor-name",
     "address",
     "contact-details",
     "unique-taxpayer-reference",
@@ -83,25 +85,31 @@ class AmendIndividualRemoveDetailYesNoController @Inject() (
                 formWithErrors =>
                   Future.successful(BadRequest(view(subcontractorName, subcontractorDetail, formWithErrors))),
                 value =>
-                  if (value) {
-                    for {
-                      updatedAnswers <-
-                        Future.fromTry(
-                          request.userAnswers
-                            .set(AmendIndividualRemoveDetailYesNoPage(subcontractorDetail), value)
-                            .flatMap(_.remove(AmendIndividualRemoveDetailYesNoPage(subcontractorDetail)))
-                        )
-                      _              <- sessionRepository.set(updatedAnswers)
-                    } yield Redirect(
-                      controllers.add.routes.CheckYourAnswersController.onPageLoad().url
-                    )
-                  } else {
-                    Future.successful(
-                      Redirect(
-                        controllers.add.routes.CheckYourAnswersController.onPageLoad().url
+                  for {
+                    updatedAnswers <-
+                      Future.fromTry(
+                        request.userAnswers
+                          .set(AmendIndividualRemoveDetailYesNoPage(subcontractorDetail), value)
+                          .flatMap(_.remove(AmendIndividualRemoveDetailYesNoPage(subcontractorDetail)))
                       )
-                    )
-                  }
+                    _              <- sessionRepository.set(updatedAnswers)
+                  } yield
+                    if (value && subcontractorDetail == "trading-name") {
+                      Redirect(
+                        controllers.add.routes.SubcontractorNameController.onPageLoad(AmendMode).url
+                      )
+                    } else if (value && subcontractorDetail == "subcontractor-name") {
+                      Redirect(
+                        controllers.add.routes.TradingNameOfSubcontractorController.onPageLoad(AmendMode).url
+                      )
+                    } else {
+                      Redirect(
+                        controllers.add.routes.CheckYourAnswersController
+                          .onPageLoad()
+                          .url
+                          // TODO route to controllers.amend.routes.AmendIndividualCheckYourAnswersController.onPageLoad() when AmendIndividualCheckYourAnswersController added.
+                      )
+                    }
               )
           }
         }

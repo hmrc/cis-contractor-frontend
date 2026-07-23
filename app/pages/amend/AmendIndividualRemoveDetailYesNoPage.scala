@@ -34,6 +34,19 @@ case class AmendIndividualRemoveDetailYesNoPage(subcontractorDetail: String) ext
           .remove(TradingNameOfSubcontractorPage)
           .flatMap(_.set(SubTradingNameYesNoPage, false))
 
+      case "trading-name" if value.contains(false) =>
+        userAnswers
+          .set(SubTradingNameYesNoPage, true)
+
+      case "subcontractor-name" if value.contains(true) =>
+        userAnswers
+          .remove(SubcontractorNamePage)
+          .flatMap(_.set(SubTradingNameYesNoPage, true))
+
+      case "subcontractor-name" if value.contains(false) =>
+        userAnswers
+          .set(SubTradingNameYesNoPage, false)
+
       case "address" if value.contains(true) =>
         userAnswers
           .remove(AddressOfSubcontractorPage)

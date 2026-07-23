@@ -33,6 +33,7 @@ class AmendIndividualRemoveDetailYesNoViewSpec extends AnyWordSpec with Matchers
 
   Seq(
     ("trading-name", "amendIndividualRemoveDetailYesNo.detail.trading-name"),
+    ("subcontractor-name", "amendIndividualRemoveDetailYesNo.detail.subcontractor-name"),
     ("address", "amendIndividualRemoveDetailYesNo.detail.address"),
     ("contact-details", "amendIndividualRemoveDetailYesNo.detail.contact-details"),
     ("unique-taxpayer-reference", "amendIndividualRemoveDetailYesNo.detail.unique-taxpayer-reference"),

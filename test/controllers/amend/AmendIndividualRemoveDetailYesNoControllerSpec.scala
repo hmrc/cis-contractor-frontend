@@ -18,7 +18,7 @@ package controllers.amend
 
 import base.SpecBase
 import forms.amend.AmendIndividualRemoveDetailYesNoFormProvider
-import models.UserAnswers
+import models.{AmendMode, UserAnswers}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
@@ -43,7 +43,6 @@ class AmendIndividualRemoveDetailYesNoControllerSpec extends SpecBase with Mocki
 
   "AmendIndividualRemoveDetailYesNo Controller" - {
     Seq(
-      ("trading-name", "trading-name"),
       ("address", "address"),
       ("contact-details", "contact-details"),
       ("unique-taxpayer-reference", "unique-taxpayer-reference"),
@@ -215,7 +214,337 @@ class AmendIndividualRemoveDetailYesNoControllerSpec extends SpecBase with Mocki
       }
     }
 
-    "when subcontractorDetail is neither 'address', 'contact-details', 'unique-taxpayer-reference' or 'works-reference-number'" - {
+    "when subcontractorDetail is subcontractor-name " - {
+      val form = formProvider()
+
+      val selectedDetail = "subcontractor-name"
+
+      lazy val removeDetailYesNoRoute =
+        controllers.amend.routes.AmendIndividualRemoveDetailYesNoController.onPageLoad(selectedDetail).url
+
+      "must return OK and the correct view for a GET" in {
+
+        val application = applicationBuilder(userAnswers = Some(uaWithName)).build()
+
+        running(application) {
+          val request = FakeRequest(GET, removeDetailYesNoRoute)
+
+          val result = route(application, request).value
+
+          val view = application.injector.instanceOf[AmendIndividualRemoveDetailYesNoView]
+
+          status(result) mustEqual OK
+          contentAsString(result) mustEqual view(subcontractorName, selectedDetail, form)(
+            request,
+            messages(application)
+          ).toString
+        }
+      }
+
+      "must redirect to the next page when valid data with value Yes is submitted" in {
+
+        val mockSessionRepository = mock[SessionRepository]
+
+        when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+        val application =
+          applicationBuilder(userAnswers = Some(uaWithName))
+            .overrides(
+              bind[SessionRepository].toInstance(mockSessionRepository)
+            )
+            .build()
+
+        running(application) {
+          val request =
+            FakeRequest(POST, removeDetailYesNoRoute)
+              .withFormUrlEncodedBody(("value", "true"))
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual controllers.add.routes.TradingNameOfSubcontractorController
+            .onPageLoad(AmendMode)
+            .url
+        }
+      }
+
+      "must redirect to the next page when valid data with value No is submitted" in {
+
+        val mockSessionRepository = mock[SessionRepository]
+
+        when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+        val application =
+          applicationBuilder(userAnswers = Some(uaWithName))
+            .overrides(
+              bind[SessionRepository].toInstance(mockSessionRepository)
+            )
+            .build()
+
+        running(application) {
+          val request =
+            FakeRequest(POST, removeDetailYesNoRoute)
+              .withFormUrlEncodedBody(("value", "false"))
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual controllers.add.routes.CheckYourAnswersController
+            .onPageLoad()
+            .url
+        }
+      }
+
+      "must return a Bad Request and errors when invalid data is submitted" in {
+
+        val application = applicationBuilder(userAnswers = Some(uaWithName)).build()
+
+        running(application) {
+          val request =
+            FakeRequest(POST, removeDetailYesNoRoute)
+              .withFormUrlEncodedBody(("value", ""))
+
+          val boundForm = form.bind(Map("value" -> ""))
+
+          val view = application.injector.instanceOf[AmendIndividualRemoveDetailYesNoView]
+
+          val result = route(application, request).value
+
+          status(result) mustEqual BAD_REQUEST
+          contentAsString(result) mustEqual view(subcontractorName, selectedDetail, boundForm)(
+            request,
+            messages(application)
+          ).toString
+        }
+      }
+
+      "must redirect to Journey Recovery for a GET if no existing data is found" in {
+
+        val application = applicationBuilder(userAnswers = None).build()
+
+        running(application) {
+          val request = FakeRequest(GET, removeDetailYesNoRoute)
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+        }
+      }
+
+      "must redirect to Journey Recovery for a POST if no existing data is found" in {
+
+        val application = applicationBuilder(userAnswers = None).build()
+
+        running(application) {
+          val request =
+            FakeRequest(POST, removeDetailYesNoRoute)
+              .withFormUrlEncodedBody(("value", "true"))
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+        }
+      }
+
+      "must redirect to JourneyRecovery if CompanyName is missing for a GET" in {
+
+        val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+
+        running(application) {
+          val request = FakeRequest(GET, removeDetailYesNoRoute)
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+        }
+      }
+
+      "must redirect to JourneyRecovery if CompanyName is missing for a POST" in {
+
+        val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+
+        running(application) {
+          val request =
+            FakeRequest(POST, removeDetailYesNoRoute)
+              .withFormUrlEncodedBody(("value", "true"))
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+        }
+      }
+    }
+
+    s"when subcontractorDetail is trading-name" - {
+      val form = formProvider()
+
+      val selectedDetail = "trading-name"
+
+      lazy val removeDetailYesNoRoute =
+        controllers.amend.routes.AmendIndividualRemoveDetailYesNoController.onPageLoad(selectedDetail).url
+
+      "must return OK and the correct view for a GET" in {
+
+        val application = applicationBuilder(userAnswers = Some(uaWithName)).build()
+
+        running(application) {
+          val request = FakeRequest(GET, removeDetailYesNoRoute)
+
+          val result = route(application, request).value
+
+          val view = application.injector.instanceOf[AmendIndividualRemoveDetailYesNoView]
+
+          status(result) mustEqual OK
+          contentAsString(result) mustEqual view(subcontractorName, selectedDetail, form)(
+            request,
+            messages(application)
+          ).toString
+        }
+      }
+
+      "must redirect to the next page when valid data with value Yes is submitted" in {
+
+        val mockSessionRepository = mock[SessionRepository]
+
+        when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+        val application =
+          applicationBuilder(userAnswers = Some(uaWithName))
+            .overrides(
+              bind[SessionRepository].toInstance(mockSessionRepository)
+            )
+            .build()
+
+        running(application) {
+          val request =
+            FakeRequest(POST, removeDetailYesNoRoute)
+              .withFormUrlEncodedBody(("value", "true"))
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual controllers.add.routes.SubcontractorNameController
+            .onPageLoad(AmendMode)
+            .url
+        }
+      }
+
+      "must redirect to the next page when valid data with value No is submitted" in {
+
+        val mockSessionRepository = mock[SessionRepository]
+
+        when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+        val application =
+          applicationBuilder(userAnswers = Some(uaWithName))
+            .overrides(
+              bind[SessionRepository].toInstance(mockSessionRepository)
+            )
+            .build()
+
+        running(application) {
+          val request =
+            FakeRequest(POST, removeDetailYesNoRoute)
+              .withFormUrlEncodedBody(("value", "false"))
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual controllers.add.routes.CheckYourAnswersController
+            .onPageLoad()
+            .url
+        }
+      }
+
+      "must return a Bad Request and errors when invalid data is submitted" in {
+
+        val application = applicationBuilder(userAnswers = Some(uaWithName)).build()
+
+        running(application) {
+          val request =
+            FakeRequest(POST, removeDetailYesNoRoute)
+              .withFormUrlEncodedBody(("value", ""))
+
+          val boundForm = form.bind(Map("value" -> ""))
+
+          val view = application.injector.instanceOf[AmendIndividualRemoveDetailYesNoView]
+
+          val result = route(application, request).value
+
+          status(result) mustEqual BAD_REQUEST
+          contentAsString(result) mustEqual view(subcontractorName, selectedDetail, boundForm)(
+            request,
+            messages(application)
+          ).toString
+        }
+      }
+
+      "must redirect to Journey Recovery for a GET if no existing data is found" in {
+
+        val application = applicationBuilder(userAnswers = None).build()
+
+        running(application) {
+          val request = FakeRequest(GET, removeDetailYesNoRoute)
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+        }
+      }
+
+      "must redirect to Journey Recovery for a POST if no existing data is found" in {
+
+        val application = applicationBuilder(userAnswers = None).build()
+
+        running(application) {
+          val request =
+            FakeRequest(POST, removeDetailYesNoRoute)
+              .withFormUrlEncodedBody(("value", "true"))
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+        }
+      }
+
+      "must redirect to JourneyRecovery if CompanyName is missing for a GET" in {
+
+        val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+
+        running(application) {
+          val request = FakeRequest(GET, removeDetailYesNoRoute)
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+        }
+      }
+
+      "must redirect to JourneyRecovery if CompanyName is missing for a POST" in {
+
+        val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+
+        running(application) {
+          val request =
+            FakeRequest(POST, removeDetailYesNoRoute)
+              .withFormUrlEncodedBody(("value", "true"))
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+        }
+      }
+    }
+
+    "when subcontractorDetail is neither 'subcontractor-name', 'trading-name', 'address', 'contact-details', 'unique-taxpayer-reference' or 'works-reference-number'" - {
 
       "must redirect to Journey Recovery on GET" in {
 
