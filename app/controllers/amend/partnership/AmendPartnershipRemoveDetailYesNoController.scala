@@ -21,6 +21,7 @@ import forms.amend.partnership.AmendPartnershipRemoveDetailYesNoFormProvider
 import models.UserAnswers
 import models.amend.partnership.AmendPartnershipRemoveDetail
 import pages.add.partnership.*
+import models.requests.DataRequest
 import pages.amend.partnership.AmendPartnershipRemoveDetailYesNoPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
@@ -45,6 +46,11 @@ class AmendPartnershipRemoveDetailYesNoController @Inject() (
     extends FrontendBaseController
     with I18nSupport
     with Logging {
+
+  private def journeyRecovery: Result =
+    Redirect(
+      controllers.routes.JourneyRecoveryController.onPageLoad()
+    )
 
   private def withValidDetail(
     detail: String
@@ -126,131 +132,104 @@ class AmendPartnershipRemoveDetailYesNoController @Inject() (
           .contains(true)
     }
 
-  def onPageLoad(
-    detail: String
-  ): Action[AnyContent] =
-    (identify andThen getData andThen requireData).async { implicit request =>
+  private def withDetailContext(
+                                   detail: String
+                                 )(
+                                   block: (String, String) => Future[Result]
+                                 )(implicit request: DataRequest[_]): Future[Result] =
       withValidDetail(detail) { detailType =>
+
         if (!detailIsPresent(detailType, request.userAnswers)) {
-
-          Future.successful(
-            Redirect(
-              controllers.routes.JourneyRecoveryController.onPageLoad()
-            )
-          )
-
+          Future.successful(journeyRecovery)
         } else {
 
           getDetailName(detailType, request.userAnswers) match {
 
             case Some(detailName) =>
-              val messages =
-                messagesApi.preferred(request)
-
-              val detailTitle =
-                messages(detailType.messageKey)
-
-              Future.successful(
-                Ok(
-                  view(
-                    formProvider(),
-                    detail,
-                    detailTitle,
-                    detailName
-                  )
-                )
+              block(
+                messagesApi.preferred(request)(detailType.messageKey),
+                detailName
               )
 
             case None =>
-              Future.successful(
-                Redirect(
-                  controllers.routes.JourneyRecoveryController.onPageLoad()
-                )
-              )
+              Future.successful(journeyRecovery)
           }
         }
       }
+
+  def onPageLoad(
+                  detail: String
+                ): Action[AnyContent] =
+    (identify andThen getData andThen requireData).async {
+      implicit request =>
+
+        withDetailContext(detail) {
+          (detailTitle, detailName) =>
+
+            Future.successful(
+              Ok(
+                view(
+                  formProvider(),
+                  detail,
+                  detailTitle,
+                  detailName
+                )
+              )
+            )
+        }
     }
 
   def onSubmit(
-    detail: String
-  ): Action[AnyContent] =
-    (identify andThen getData andThen requireData).async { implicit request =>
-      withValidDetail(detail) { detailType =>
-        if (!detailIsPresent(detailType, request.userAnswers)) {
+                detail: String
+              ): Action[AnyContent] =
+    (identify andThen getData andThen requireData).async {
+      implicit request =>
 
-          Future.successful(
-            Redirect(
-              controllers.routes.JourneyRecoveryController.onPageLoad()
-            )
-          )
+        withDetailContext(detail) {
+          (detailTitle, detailName) =>
 
-        } else {
-
-          getDetailName(detailType, request.userAnswers) match {
-
-            case Some(detailName) =>
-              val messages =
-                messagesApi.preferred(request)
-
-              val detailTitle =
-                messages(detailType.messageKey)
-
-              formProvider()
-                .bindFromRequest()
-                .fold(
-                  formWithErrors =>
-                    Future.successful(
-                      BadRequest(
-                        view(
-                          formWithErrors,
-                          detail,
-                          detailTitle,
-                          detailName
+            formProvider()
+              .bindFromRequest()
+              .fold(
+                formWithErrors =>
+                  Future.successful(
+                    BadRequest(
+                      view(
+                        formWithErrors,
+                        detail,
+                        detailTitle,
+                        detailName
+                      )
+                    )
+                  ),
+                value =>
+                  (for {
+                    updatedAnswers <-
+                      Future.fromTry(
+                        request.userAnswers.set(
+                          AmendPartnershipRemoveDetailYesNoPage(detail),
+                          value
                         )
                       )
-                    ),
-                  value => {
 
-                    val page =
-                      AmendPartnershipRemoveDetailYesNoPage(detail)
+                    _ <- sessionRepository.set(updatedAnswers)
 
-                    request.userAnswers.set(page, value) match {
+                  } yield Redirect(
+                    controllers.add.partnership.routes.PartnershipCheckYourAnswersController
+                      .onPageLoad()
+                  )).recover {
+                    case ex =>
+                      logger.error(
+                        s"Failed to save remove detail answer for '$detail'",
+                        ex
+                      )
 
-                      case scala.util.Success(updatedAnswers) =>
-                        sessionRepository
-                          .set(updatedAnswers)
-                          .map { _ =>
-                            Redirect(
-                              controllers.add.partnership.routes.PartnershipCheckYourAnswersController
-                                .onPageLoad()
-                            )
-                          }
-
-                      case scala.util.Failure(exception) =>
-                        logger.error(
-                          s"Failed to update user answers for remove detail '$detail'",
-                          exception
-                        )
-
-                        Future.successful(
-                          Redirect(
-                            controllers.routes.JourneyRecoveryController
-                              .onPageLoad()
-                          )
-                        )
-                    }
+                      Redirect(
+                        controllers.routes.JourneyRecoveryController
+                          .onPageLoad()
+                      )
                   }
-                )
-
-            case None =>
-              Future.successful(
-                Redirect(
-                  controllers.routes.JourneyRecoveryController.onPageLoad()
-                )
               )
-          }
         }
-      }
     }
 }

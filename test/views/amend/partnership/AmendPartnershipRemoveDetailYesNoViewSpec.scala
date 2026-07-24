@@ -19,6 +19,7 @@ package views.amend.partnership
 import forms.amend.partnership.AmendPartnershipRemoveDetailYesNoFormProvider
 import org.jsoup.Jsoup
 import org.scalatest.matchers.should.Matchers
+import models.amend.partnership.AmendPartnershipRemoveDetail
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.data.Form
@@ -48,24 +49,24 @@ class AmendPartnershipRemoveDetailYesNoViewSpec extends AnyWordSpec with Matcher
     app.injector.instanceOf[AmendPartnershipRemoveDetailYesNoView]
 
   Seq(
-    ("address", "address", "Martin Brody"),
-    ("contact-details", "contact details", "Martin Brody"),
-    ("utr", "UTR", "Martin Brody"),
-    ("works-reference-number", "works reference number", "Martin Brody"),
+    (AmendPartnershipRemoveDetail.Address.key, "address", "Test Person"),
+    (AmendPartnershipRemoveDetail.ContactDetails.key, "contact details", "Test Person"),
+    (AmendPartnershipRemoveDetail.Utr.key, "UTR", "Test Person"),
+    (AmendPartnershipRemoveDetail.WorksReferenceNumber.key, "works reference number", "Test Person"),
     (
-      "nominated-partner-utr",
+      AmendPartnershipRemoveDetail.NominatedPartnerUtr.key,
       "nominated partner's UTR",
-      "Juely"
+      "Test Person"
     ),
     (
-      "nominated-partner-nino",
+      AmendPartnershipRemoveDetail.NominatedPartnerNino.key,
       "nominated partner's National Insurance number",
-      "Juely"
+      "Test Person"
     ),
     (
-      "nominated-partner-company-registration-number",
+      AmendPartnershipRemoveDetail.NominatedPartnerCompanyRegistrationNumber.key,
       "nominated partner's company registration number",
-      "Juely"
+      "Test Person"
     )
   ).foreach { case (detail, detailTitle, detailName) =>
     s"AmendPartnershipRemoveDetailYesNoView when detail is '$detail'" should {
