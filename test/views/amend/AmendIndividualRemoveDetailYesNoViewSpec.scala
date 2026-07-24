@@ -17,6 +17,8 @@
 package views.amend
 
 import forms.amend.AmendIndividualRemoveDetailYesNoFormProvider
+import models.amend.AmendIndividualRemoveDetail
+import models.amend.AmendIndividualRemoveDetail.*
 import org.jsoup.Jsoup
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
@@ -32,18 +34,25 @@ class AmendIndividualRemoveDetailYesNoViewSpec extends AnyWordSpec with Matchers
   val subcontractorName = "Test Subcontractor"
 
   Seq(
-    ("trading-name", "amendIndividualRemoveDetailYesNo.detail.trading-name"),
-    ("subcontractor-name", "amendIndividualRemoveDetailYesNo.detail.subcontractor-name"),
-    ("address", "amendIndividualRemoveDetailYesNo.detail.address"),
-    ("contact-details", "amendIndividualRemoveDetailYesNo.detail.contact-details"),
-    ("unique-taxpayer-reference", "amendIndividualRemoveDetailYesNo.detail.unique-taxpayer-reference"),
-    ("national-insurance-number", "amendIndividualRemoveDetailYesNo.detail.national-insurance-number"),
-    ("works-reference-number", "amendIndividualRemoveDetailYesNo.detail.works-reference-number")
-  ).foreach { case (contractorDetail, detailKey) =>
+    ("trading-name", TradingName, "amendIndividualRemoveDetailYesNo.detail.trading-name"),
+    ("subcontractor-name", SubcontractorName, "amendIndividualRemoveDetailYesNo.detail.subcontractor-name"),
+    ("address", Address, "amendIndividualRemoveDetailYesNo.detail.address"),
+    ("contact-details", ContactDetails, "amendIndividualRemoveDetailYesNo.detail.contact-details"),
+    ("utr", Utr, "amendIndividualRemoveDetailYesNo.detail.utr"),
+    (
+      "national-insurance-number",
+      NationalInsuranceNumber,
+      "amendIndividualRemoveDetailYesNo.detail.national-insurance-number"
+    ),
+    ("works-reference-number", WorksReferenceNumber, "amendIndividualRemoveDetailYesNo.detail.works-reference-number")
+  ).foreach { case (contractorDetail, amendIndividualRemoveDetail, detailKey) =>
     s"AmendIndividualRemoveDetailYesNoView when contractorDetail is '$contractorDetail'" should {
 
       "render the page with title, heading, hint, yes/no radios and submit button" in new Setup {
-        val html = view(subcontractorName, contractorDetail, form)
+        val subcontractorDetailTitle: String =
+          messages(amendIndividualRemoveDetail.messageKey)
+
+        val html = view(subcontractorName, contractorDetail, subcontractorDetailTitle, form)
         val doc  = Jsoup.parse(html.toString())
 
         doc.select("title").text() must include(
@@ -73,11 +82,14 @@ class AmendIndividualRemoveDetailYesNoViewSpec extends AnyWordSpec with Matchers
 
       "display error summary and inline error when no option is selected" in new Setup {
 
+        val subcontractorDetailTitle: String =
+          messages(amendIndividualRemoveDetail.messageKey)
+
         val subcontractorName = "Test Subcontractor"
 
         val errorForm = form.withError("value", "amendIndividualRemoveDetailYesNo.error.required")
 
-        val html = view(subcontractorName, contractorDetail, errorForm)
+        val html = view(subcontractorName, contractorDetail, subcontractorDetailTitle, errorForm)
         val doc  = Jsoup.parse(html.toString())
 
         val summary = doc.select(".govuk-error-summary")

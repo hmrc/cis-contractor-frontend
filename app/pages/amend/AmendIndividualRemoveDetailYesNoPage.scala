@@ -60,7 +60,7 @@ case class AmendIndividualRemoveDetailYesNoPage(subcontractorDetail: String) ext
           .flatMap(_.remove(IndividualMobileNumberPage))
           .flatMap(_.set(AddIndividualContactMethodsYesNoPage, false))
 
-      case "unique-taxpayer-reference" if value.contains(true) =>
+      case "utr" if value.contains(true) =>
         userAnswers
           .remove(SubcontractorsUniqueTaxpayerReferencePage)
           .flatMap(_.set(UniqueTaxpayerReferenceYesNoPage, false))

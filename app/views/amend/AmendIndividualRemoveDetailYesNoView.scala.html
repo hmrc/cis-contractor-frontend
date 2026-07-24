@@ -24,17 +24,7 @@
     govukButton: GovukButton
 )
 
-@(name: String, subcontractorDetail:String, form: Form[_])(implicit request: Request[_], messages: Messages)
-
-@defining(subcontractorDetail match {
-case "trading-name"                 => messages("amendIndividualRemoveDetailYesNo.detail.trading-name")
-case "subcontractor-name"           => messages("amendIndividualRemoveDetailYesNo.detail.subcontractor-name")
-case "address"                      => messages("amendIndividualRemoveDetailYesNo.detail.address")
-case "contact-details"              => messages("amendIndividualRemoveDetailYesNo.detail.contact-details")
-case "unique-taxpayer-reference"    => messages("amendIndividualRemoveDetailYesNo.detail.unique-taxpayer-reference")
-case "national-insurance-number"    => messages("amendIndividualRemoveDetailYesNo.detail.national-insurance-number")
-case "works-reference-number"       => messages("amendIndividualRemoveDetailYesNo.detail.works-reference-number")
-}) { selectedSubcontractorDetail =>
+@(name: String, subcontractorDetail:String, subcontractorDetailTitle: String, form: Form[_])(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = title(form, messages("amendIndividualRemoveDetailYesNo.title"))) {
 
@@ -47,7 +37,7 @@ case "works-reference-number"       => messages("amendIndividualRemoveDetailYesN
             @govukRadios(
                 RadiosViewModel.yesNo(
                     field = form("value"),
-                    legend = LegendViewModel(messages("amendIndividualRemoveDetailYesNo.heading", name, selectedSubcontractorDetail)).asPageHeading(Large)
+                    legend = LegendViewModel(messages("amendIndividualRemoveDetailYesNo.heading", name, subcontractorDetailTitle)).asPageHeading(Large)
                 )
             )
 
@@ -55,5 +45,4 @@ case "works-reference-number"       => messages("amendIndividualRemoveDetailYesN
                 ButtonViewModel(messages("site.continue"))
             )
         }
-    }
 }

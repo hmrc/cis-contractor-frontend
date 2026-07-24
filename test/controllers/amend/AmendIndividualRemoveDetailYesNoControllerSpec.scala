@@ -18,11 +18,13 @@ package controllers.amend
 
 import base.SpecBase
 import forms.amend.AmendIndividualRemoveDetailYesNoFormProvider
+import models.add.SubcontractorName
+import models.amend.AmendIndividualRemoveDetail
 import models.{AmendMode, UserAnswers}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.add.TradingNameOfSubcontractorPage
+import pages.add.*
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
@@ -36,28 +38,101 @@ class AmendIndividualRemoveDetailYesNoControllerSpec extends SpecBase with Mocki
   val formProvider = new AmendIndividualRemoveDetailYesNoFormProvider()
   val form         = formProvider()
 
-  private val subcontractorName = "Test individual"
+  private val subcontractorTradingName = "Test individual"
 
-  private def uaWithName: UserAnswers =
-    emptyUserAnswers.set(TradingNameOfSubcontractorPage, subcontractorName).success.value
+  private def uaWithTradingName: UserAnswers =
+    emptyUserAnswers.set(TradingNameOfSubcontractorPage, subcontractorTradingName).success.value
+
+  private def uaWithTradingNameAndDetail(
+    detail: String
+  ): UserAnswers = {
+
+    val userAnswers =
+      detail match {
+
+        case "trading-name" =>
+          emptyUserAnswers
+            .set(SubTradingNameYesNoPage, false)
+            .success
+            .value
+            .set(TradingNameOfSubcontractorPage, subcontractorTradingName)
+            .success
+            .value
+
+        case "address" =>
+          uaWithTradingName
+            .set(SubAddressYesNoPage, true)
+            .success
+            .value
+
+        case "contact-details" =>
+          uaWithTradingName
+            .set(AddIndividualContactMethodsYesNoPage, true)
+            .success
+            .value
+
+        case "utr" =>
+          uaWithTradingName
+            .set(UniqueTaxpayerReferenceYesNoPage, true)
+            .success
+            .value
+
+        case "national-insurance-number" =>
+          uaWithTradingName
+            .set(NationalInsuranceNumberYesNoPage, true)
+            .success
+            .value
+
+        case "works-reference-number" =>
+          uaWithTradingName
+            .set(WorksReferenceNumberYesNoPage, true)
+            .success
+            .value
+      }
+
+    userAnswers
+  }
+
+  private def uaWithSubcontractorNameAndDetail: UserAnswers =
+    emptyUserAnswers
+      .set(SubTradingNameYesNoPage, true)
+      .success
+      .value
+      .set(SubcontractorNamePage, SubcontractorName("John", Some("Paul"), "Smith"))
+      .success
+      .value
+
+  private def uaWithSubcontractorName: UserAnswers =
+    emptyUserAnswers
+      .set(SubcontractorNamePage, SubcontractorName("John", Some("Paul"), "Smith"))
+      .success
+      .value
 
   "AmendIndividualRemoveDetailYesNo Controller" - {
     Seq(
       ("address", "address"),
       ("contact-details", "contact-details"),
-      ("unique-taxpayer-reference", "unique-taxpayer-reference"),
+      ("utr", "utr"),
       ("national-insurance-number", "national-insurance-number"),
       ("works-reference-number", "works-reference-number")
     ).foreach { case (subcontractorDetail, selectedDetail) =>
       s"when subcontractorDetail is '$subcontractorDetail'" - {
         val form = formProvider()
 
+        val detailType =
+          AmendIndividualRemoveDetail
+            .fromKey(selectedDetail)
+            .value
+
         lazy val removeDetailYesNoRoute =
           controllers.amend.routes.AmendIndividualRemoveDetailYesNoController.onPageLoad(selectedDetail).url
 
         "must return OK and the correct view for a GET" in {
 
-          val application = applicationBuilder(userAnswers = Some(uaWithName)).build()
+          val application = applicationBuilder(userAnswers = Some(uaWithTradingNameAndDetail(selectedDetail))).build()
+
+          val detailTitle =
+            messages(application)(detailType.messageKey)
 
           running(application) {
             val request = FakeRequest(GET, removeDetailYesNoRoute)
@@ -67,7 +142,7 @@ class AmendIndividualRemoveDetailYesNoControllerSpec extends SpecBase with Mocki
             val view = application.injector.instanceOf[AmendIndividualRemoveDetailYesNoView]
 
             status(result) mustEqual OK
-            contentAsString(result) mustEqual view(subcontractorName, selectedDetail, form)(
+            contentAsString(result) mustEqual view(subcontractorTradingName, selectedDetail, detailTitle, form)(
               request,
               messages(application)
             ).toString
@@ -81,7 +156,7 @@ class AmendIndividualRemoveDetailYesNoControllerSpec extends SpecBase with Mocki
           when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
           val application =
-            applicationBuilder(userAnswers = Some(uaWithName))
+            applicationBuilder(userAnswers = Some(uaWithTradingNameAndDetail(selectedDetail)))
               .overrides(
                 bind[SessionRepository].toInstance(mockSessionRepository)
               )
@@ -108,7 +183,7 @@ class AmendIndividualRemoveDetailYesNoControllerSpec extends SpecBase with Mocki
           when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
           val application =
-            applicationBuilder(userAnswers = Some(uaWithName))
+            applicationBuilder(userAnswers = Some(uaWithTradingNameAndDetail(selectedDetail)))
               .overrides(
                 bind[SessionRepository].toInstance(mockSessionRepository)
               )
@@ -130,7 +205,10 @@ class AmendIndividualRemoveDetailYesNoControllerSpec extends SpecBase with Mocki
 
         "must return a Bad Request and errors when invalid data is submitted" in {
 
-          val application = applicationBuilder(userAnswers = Some(uaWithName)).build()
+          val application = applicationBuilder(userAnswers = Some(uaWithTradingNameAndDetail(selectedDetail))).build()
+
+          val detailTitle =
+            messages(application)(detailType.messageKey)
 
           running(application) {
             val request =
@@ -144,7 +222,7 @@ class AmendIndividualRemoveDetailYesNoControllerSpec extends SpecBase with Mocki
             val result = route(application, request).value
 
             status(result) mustEqual BAD_REQUEST
-            contentAsString(result) mustEqual view(subcontractorName, selectedDetail, boundForm)(
+            contentAsString(result) mustEqual view(subcontractorTradingName, selectedDetail, detailTitle, boundForm)(
               request,
               messages(application)
             ).toString
@@ -181,7 +259,7 @@ class AmendIndividualRemoveDetailYesNoControllerSpec extends SpecBase with Mocki
           }
         }
 
-        "must redirect to JourneyRecovery if CompanyName is missing for a GET" in {
+        "must redirect to JourneyRecovery if subcontractorTradingName is missing for a GET" in {
 
           val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
@@ -195,7 +273,7 @@ class AmendIndividualRemoveDetailYesNoControllerSpec extends SpecBase with Mocki
           }
         }
 
-        "must redirect to JourneyRecovery if CompanyName is missing for a POST" in {
+        "must redirect to JourneyRecovery if subcontractorTradingName is missing for a POST" in {
 
           val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
@@ -211,20 +289,59 @@ class AmendIndividualRemoveDetailYesNoControllerSpec extends SpecBase with Mocki
           }
         }
 
+        "must redirect to Journey Recovery for a GET if no detail data is found" in {
+
+          val application = applicationBuilder(userAnswers = Some(uaWithTradingName)).build()
+
+          running(application) {
+            val request = FakeRequest(GET, removeDetailYesNoRoute)
+
+            val result = route(application, request).value
+
+            status(result) mustEqual SEE_OTHER
+            redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+          }
+        }
+
+        "must redirect to JourneyRecovery if detail data is missing for a POST" in {
+
+          val application = applicationBuilder(userAnswers = Some(uaWithTradingName)).build()
+
+          running(application) {
+            val request =
+              FakeRequest(POST, removeDetailYesNoRoute)
+                .withFormUrlEncodedBody(("value", "true"))
+
+            val result = route(application, request).value
+
+            status(result) mustEqual SEE_OTHER
+            redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+          }
+        }
       }
     }
 
     "when subcontractorDetail is subcontractor-name " - {
       val form = formProvider()
 
+      val subcontractorName = "John Smith"
+
       val selectedDetail = "subcontractor-name"
 
+      val detailType =
+        AmendIndividualRemoveDetail
+          .fromKey(selectedDetail)
+          .value
+
       lazy val removeDetailYesNoRoute =
-        controllers.amend.routes.AmendIndividualRemoveDetailYesNoController.onPageLoad(selectedDetail).url
+        controllers.amend.routes.AmendIndividualRemoveDetailYesNoController.onPageLoad("subcontractor-name").url
 
       "must return OK and the correct view for a GET" in {
 
-        val application = applicationBuilder(userAnswers = Some(uaWithName)).build()
+        val application = applicationBuilder(userAnswers = Some(uaWithSubcontractorNameAndDetail)).build()
+
+        val detailTitle =
+          messages(application)(detailType.messageKey)
 
         running(application) {
           val request = FakeRequest(GET, removeDetailYesNoRoute)
@@ -234,7 +351,7 @@ class AmendIndividualRemoveDetailYesNoControllerSpec extends SpecBase with Mocki
           val view = application.injector.instanceOf[AmendIndividualRemoveDetailYesNoView]
 
           status(result) mustEqual OK
-          contentAsString(result) mustEqual view(subcontractorName, selectedDetail, form)(
+          contentAsString(result) mustEqual view(subcontractorName, selectedDetail, detailTitle, form)(
             request,
             messages(application)
           ).toString
@@ -248,7 +365,7 @@ class AmendIndividualRemoveDetailYesNoControllerSpec extends SpecBase with Mocki
         when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
         val application =
-          applicationBuilder(userAnswers = Some(uaWithName))
+          applicationBuilder(userAnswers = Some(uaWithSubcontractorNameAndDetail))
             .overrides(
               bind[SessionRepository].toInstance(mockSessionRepository)
             )
@@ -275,7 +392,7 @@ class AmendIndividualRemoveDetailYesNoControllerSpec extends SpecBase with Mocki
         when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
         val application =
-          applicationBuilder(userAnswers = Some(uaWithName))
+          applicationBuilder(userAnswers = Some(uaWithSubcontractorNameAndDetail))
             .overrides(
               bind[SessionRepository].toInstance(mockSessionRepository)
             )
@@ -297,7 +414,10 @@ class AmendIndividualRemoveDetailYesNoControllerSpec extends SpecBase with Mocki
 
       "must return a Bad Request and errors when invalid data is submitted" in {
 
-        val application = applicationBuilder(userAnswers = Some(uaWithName)).build()
+        val application = applicationBuilder(userAnswers = Some(uaWithSubcontractorNameAndDetail)).build()
+
+        val detailTitle =
+          messages(application)(detailType.messageKey)
 
         running(application) {
           val request =
@@ -311,7 +431,7 @@ class AmendIndividualRemoveDetailYesNoControllerSpec extends SpecBase with Mocki
           val result = route(application, request).value
 
           status(result) mustEqual BAD_REQUEST
-          contentAsString(result) mustEqual view(subcontractorName, selectedDetail, boundForm)(
+          contentAsString(result) mustEqual view(subcontractorName, selectedDetail, detailTitle, boundForm)(
             request,
             messages(application)
           ).toString
@@ -348,7 +468,7 @@ class AmendIndividualRemoveDetailYesNoControllerSpec extends SpecBase with Mocki
         }
       }
 
-      "must redirect to JourneyRecovery if CompanyName is missing for a GET" in {
+      "must redirect to JourneyRecovery if subcontractorName is missing for a GET" in {
 
         val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
@@ -362,7 +482,7 @@ class AmendIndividualRemoveDetailYesNoControllerSpec extends SpecBase with Mocki
         }
       }
 
-      "must redirect to JourneyRecovery if CompanyName is missing for a POST" in {
+      "must redirect to JourneyRecovery if subcontractorName is missing for a POST" in {
 
         val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
@@ -377,9 +497,39 @@ class AmendIndividualRemoveDetailYesNoControllerSpec extends SpecBase with Mocki
           redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
         }
       }
+
+      "must redirect to JourneyRecovery if detail is missing for a GET" in {
+
+        val application = applicationBuilder(userAnswers = Some(uaWithSubcontractorName)).build()
+
+        running(application) {
+          val request = FakeRequest(GET, removeDetailYesNoRoute)
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+        }
+      }
+
+      "must redirect to JourneyRecovery if detail is missing for a POST" in {
+
+        val application = applicationBuilder(userAnswers = Some(uaWithSubcontractorName)).build()
+
+        running(application) {
+          val request =
+            FakeRequest(POST, removeDetailYesNoRoute)
+              .withFormUrlEncodedBody(("value", "true"))
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+        }
+      }
     }
 
-    s"when subcontractorDetail is trading-name" - {
+    "when subcontractorDetail is trading-name" - {
       val form = formProvider()
 
       val selectedDetail = "trading-name"
@@ -387,9 +537,17 @@ class AmendIndividualRemoveDetailYesNoControllerSpec extends SpecBase with Mocki
       lazy val removeDetailYesNoRoute =
         controllers.amend.routes.AmendIndividualRemoveDetailYesNoController.onPageLoad(selectedDetail).url
 
+      val detailType =
+        AmendIndividualRemoveDetail
+          .fromKey(selectedDetail)
+          .value
+
       "must return OK and the correct view for a GET" in {
 
-        val application = applicationBuilder(userAnswers = Some(uaWithName)).build()
+        val application = applicationBuilder(userAnswers = Some(uaWithTradingNameAndDetail(selectedDetail))).build()
+
+        val detailTitle =
+          messages(application)(detailType.messageKey)
 
         running(application) {
           val request = FakeRequest(GET, removeDetailYesNoRoute)
@@ -399,7 +557,7 @@ class AmendIndividualRemoveDetailYesNoControllerSpec extends SpecBase with Mocki
           val view = application.injector.instanceOf[AmendIndividualRemoveDetailYesNoView]
 
           status(result) mustEqual OK
-          contentAsString(result) mustEqual view(subcontractorName, selectedDetail, form)(
+          contentAsString(result) mustEqual view(subcontractorTradingName, selectedDetail, detailTitle, form)(
             request,
             messages(application)
           ).toString
@@ -413,7 +571,7 @@ class AmendIndividualRemoveDetailYesNoControllerSpec extends SpecBase with Mocki
         when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
         val application =
-          applicationBuilder(userAnswers = Some(uaWithName))
+          applicationBuilder(userAnswers = Some(uaWithTradingNameAndDetail(selectedDetail)))
             .overrides(
               bind[SessionRepository].toInstance(mockSessionRepository)
             )
@@ -440,7 +598,7 @@ class AmendIndividualRemoveDetailYesNoControllerSpec extends SpecBase with Mocki
         when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
         val application =
-          applicationBuilder(userAnswers = Some(uaWithName))
+          applicationBuilder(userAnswers = Some(uaWithTradingNameAndDetail(selectedDetail)))
             .overrides(
               bind[SessionRepository].toInstance(mockSessionRepository)
             )
@@ -462,7 +620,10 @@ class AmendIndividualRemoveDetailYesNoControllerSpec extends SpecBase with Mocki
 
       "must return a Bad Request and errors when invalid data is submitted" in {
 
-        val application = applicationBuilder(userAnswers = Some(uaWithName)).build()
+        val application = applicationBuilder(userAnswers = Some(uaWithTradingNameAndDetail(selectedDetail))).build()
+
+        val detailTitle =
+          messages(application)(detailType.messageKey)
 
         running(application) {
           val request =
@@ -476,7 +637,7 @@ class AmendIndividualRemoveDetailYesNoControllerSpec extends SpecBase with Mocki
           val result = route(application, request).value
 
           status(result) mustEqual BAD_REQUEST
-          contentAsString(result) mustEqual view(subcontractorName, selectedDetail, boundForm)(
+          contentAsString(result) mustEqual view(subcontractorTradingName, selectedDetail, detailTitle, boundForm)(
             request,
             messages(application)
           ).toString
@@ -513,7 +674,7 @@ class AmendIndividualRemoveDetailYesNoControllerSpec extends SpecBase with Mocki
         }
       }
 
-      "must redirect to JourneyRecovery if CompanyName is missing for a GET" in {
+      "must redirect to JourneyRecovery if subcontractorTradingName is missing for a GET" in {
 
         val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
@@ -527,7 +688,7 @@ class AmendIndividualRemoveDetailYesNoControllerSpec extends SpecBase with Mocki
         }
       }
 
-      "must redirect to JourneyRecovery if CompanyName is missing for a POST" in {
+      "must redirect to JourneyRecovery if subcontractorTradingName is missing for a POST" in {
 
         val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
@@ -542,13 +703,44 @@ class AmendIndividualRemoveDetailYesNoControllerSpec extends SpecBase with Mocki
           redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
         }
       }
+
+      "must redirect to JourneyRecovery if detail is missing for a GET" in {
+
+        val application = applicationBuilder(userAnswers = Some(uaWithTradingName)).build()
+
+        running(application) {
+          val request = FakeRequest(GET, removeDetailYesNoRoute)
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+        }
+      }
+
+      "must redirect to JourneyRecovery if detail is missing for a POST" in {
+
+        val application = applicationBuilder(userAnswers = Some(uaWithTradingName)).build()
+
+        running(application) {
+          val request =
+            FakeRequest(POST, removeDetailYesNoRoute)
+              .withFormUrlEncodedBody(("value", "true"))
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+        }
+      }
+
     }
 
     "when subcontractorDetail is neither 'subcontractor-name', 'trading-name', 'address', 'contact-details', 'unique-taxpayer-reference' or 'works-reference-number'" - {
 
       "must redirect to Journey Recovery on GET" in {
 
-        val application = applicationBuilder(userAnswers = Some(uaWithName)).build()
+        val application = applicationBuilder(userAnswers = Some(uaWithSubcontractorNameAndDetail)).build()
 
         running(application) {
 
@@ -569,7 +761,7 @@ class AmendIndividualRemoveDetailYesNoControllerSpec extends SpecBase with Mocki
       "must redirect to Journey Recovery on POST" in {
 
         val application =
-          applicationBuilder(userAnswers = Some(uaWithName)).build()
+          applicationBuilder(userAnswers = Some(uaWithSubcontractorNameAndDetail)).build()
 
         running(application) {
 

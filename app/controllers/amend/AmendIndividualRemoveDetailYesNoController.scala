@@ -18,7 +18,9 @@ package controllers.amend
 
 import controllers.actions.*
 import forms.amend.AmendIndividualRemoveDetailYesNoFormProvider
-import models.AmendMode
+import models.{AmendMode, UserAnswers}
+import models.amend.AmendIndividualRemoveDetail
+import pages.add.*
 import pages.amend.AmendIndividualRemoveDetailYesNoPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
@@ -43,34 +45,96 @@ class AmendIndividualRemoveDetailYesNoController @Inject() (
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport {
-  private val validDetails = Set(
-    "trading-name",
-    "subcontractor-name",
-    "address",
-    "contact-details",
-    "unique-taxpayer-reference",
-    "national-insurance-number",
-    "works-reference-number"
-  )
 
-  private def withValidDetail(subcontractorDetail: String)(action: => Future[Result]): Future[Result] =
-    if (!validDetails.contains(subcontractorDetail)) {
-      Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
-    } else {
-      action
+  private def withValidDetail(
+    detail: String
+  )(
+    action: AmendIndividualRemoveDetail => Future[Result]
+  ): Future[Result] =
+    AmendIndividualRemoveDetail.fromKey(detail) match {
+
+      case Some(detailType) =>
+        action(detailType)
+
+      case None =>
+        Future.successful(
+          Redirect(
+            controllers.routes.JourneyRecoveryController.onPageLoad()
+          )
+        )
     }
+
+  private def detailIsPresent(
+    detail: AmendIndividualRemoveDetail,
+    userAnswers: UserAnswers
+  ): Boolean =
+    detail match {
+
+      case AmendIndividualRemoveDetail.TradingName =>
+        userAnswers
+          .get(SubTradingNameYesNoPage)
+          .contains(false)
+
+      case AmendIndividualRemoveDetail.SubcontractorName =>
+        userAnswers
+          .get(SubTradingNameYesNoPage)
+          .contains(true)
+
+      case AmendIndividualRemoveDetail.Address =>
+        userAnswers
+          .get(SubAddressYesNoPage)
+          .contains(true)
+
+      case AmendIndividualRemoveDetail.ContactDetails =>
+        userAnswers
+          .get(AddIndividualContactMethodsYesNoPage)
+          .contains(true)
+
+      case AmendIndividualRemoveDetail.Utr =>
+        userAnswers
+          .get(UniqueTaxpayerReferenceYesNoPage)
+          .contains(true)
+
+      case AmendIndividualRemoveDetail.NationalInsuranceNumber =>
+        userAnswers
+          .get(NationalInsuranceNumberYesNoPage)
+          .contains(true)
+
+      case AmendIndividualRemoveDetail.WorksReferenceNumber =>
+        userAnswers
+          .get(WorksReferenceNumberYesNoPage)
+          .contains(true)
+    }
+
+  private def journeyRecovery: Result =
+    Redirect(
+      controllers.routes.JourneyRecoveryController.onPageLoad()
+    )
 
   def onPageLoad(subcontractorDetail: String): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
       subcontractorNameExtractor
         .getSubcontractorName(request.userAnswers)
         .map { subcontractorName =>
-          withValidDetail(subcontractorDetail) {
-            val form = formProvider()
-            Future.successful(Ok(view(subcontractorName, subcontractorDetail, form)))
+          withValidDetail(subcontractorDetail) { detailType =>
+            if (!detailIsPresent(detailType, request.userAnswers)) {
+
+              Future.successful(journeyRecovery)
+
+            } else {
+              val form = formProvider()
+
+              val messages =
+                messagesApi.preferred(request)
+
+              val subcontractorDetailTitle =
+                messages(detailType.messageKey)
+
+              Future.successful(Ok(view(subcontractorName, subcontractorDetail, subcontractorDetailTitle, form)))
+            }
           }
         }
-        .getOrElse(Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())))
+        .getOrElse(Future.successful(journeyRecovery))
     }
 
   def onSubmit(subcontractorDetail: String): Action[AnyContent] = (identify andThen getData andThen requireData).async {
@@ -78,41 +142,56 @@ class AmendIndividualRemoveDetailYesNoController @Inject() (
       subcontractorNameExtractor
         .getSubcontractorName(request.userAnswers)
         .map { subcontractorName =>
-          withValidDetail(subcontractorDetail) {
-            formProvider()
-              .bindFromRequest()
-              .fold(
-                formWithErrors =>
-                  Future.successful(BadRequest(view(subcontractorName, subcontractorDetail, formWithErrors))),
-                value =>
-                  for {
-                    updatedAnswers <-
-                      Future.fromTry(
-                        request.userAnswers
-                          .set(AmendIndividualRemoveDetailYesNoPage(subcontractorDetail), value)
-                          .flatMap(_.remove(AmendIndividualRemoveDetailYesNoPage(subcontractorDetail)))
-                      )
-                    _              <- sessionRepository.set(updatedAnswers)
-                  } yield
-                    if (value && subcontractorDetail == "trading-name") {
-                      Redirect(
-                        controllers.add.routes.SubcontractorNameController.onPageLoad(AmendMode).url
-                      )
-                    } else if (value && subcontractorDetail == "subcontractor-name") {
-                      Redirect(
-                        controllers.add.routes.TradingNameOfSubcontractorController.onPageLoad(AmendMode).url
-                      )
-                    } else {
-                      Redirect(
-                        controllers.add.routes.CheckYourAnswersController
-                          .onPageLoad()
-                          .url
-                          // TODO route to controllers.amend.routes.AmendIndividualCheckYourAnswersController.onPageLoad() when AmendIndividualCheckYourAnswersController added.
-                      )
-                    }
-              )
+          withValidDetail(subcontractorDetail) { detailType =>
+            if (!detailIsPresent(detailType, request.userAnswers)) {
+
+              Future.successful(journeyRecovery)
+
+            } else {
+              formProvider()
+                .bindFromRequest()
+                .fold(
+                  formWithErrors =>
+                    val messages =
+                      messagesApi.preferred(request)
+
+                    val subcontractorDetailTitle =
+                      messages(detailType.messageKey)
+
+                    Future.successful(
+                      BadRequest(view(subcontractorName, subcontractorDetail, subcontractorDetailTitle, formWithErrors))
+                    )
+                  ,
+                  value =>
+                    for {
+                      updatedAnswers <-
+                        Future.fromTry(
+                          request.userAnswers
+                            .set(AmendIndividualRemoveDetailYesNoPage(subcontractorDetail), value)
+                            .flatMap(_.remove(AmendIndividualRemoveDetailYesNoPage(subcontractorDetail)))
+                        )
+                      _              <- sessionRepository.set(updatedAnswers)
+                    } yield
+                      if (value && subcontractorDetail == "trading-name") {
+                        Redirect(
+                          controllers.add.routes.SubcontractorNameController.onPageLoad(AmendMode).url
+                        )
+                      } else if (value && subcontractorDetail == "subcontractor-name") {
+                        Redirect(
+                          controllers.add.routes.TradingNameOfSubcontractorController.onPageLoad(AmendMode).url
+                        )
+                      } else {
+                        Redirect(
+                          controllers.add.routes.CheckYourAnswersController
+                            .onPageLoad()
+                            .url
+                            // TODO route to controllers.amend.routes.AmendIndividualCheckYourAnswersController.onPageLoad() when AmendIndividualCheckYourAnswersController added.
+                        )
+                      }
+                )
+            }
           }
         }
-        .getOrElse(Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())))
+        .getOrElse(Future.successful(journeyRecovery))
   }
 }

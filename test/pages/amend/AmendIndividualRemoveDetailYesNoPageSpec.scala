@@ -178,7 +178,7 @@ class AmendIndividualRemoveDetailYesNoPageSpec extends PageBehaviours {
     Seq(
       ("trading-name", TradingNameOfSubcontractorPage, SubTradingNameYesNoPage, "Test name"),
       (
-        "unique-taxpayer-reference",
+        "utr",
         SubcontractorsUniqueTaxpayerReferencePage,
         UniqueTaxpayerReferenceYesNoPage,
         "7777777777"

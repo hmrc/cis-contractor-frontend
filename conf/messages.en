@@ -409,7 +409,7 @@ amendIndividualRemoveDetailYesNo.detail.trading-name                         =  
 amendIndividualRemoveDetailYesNo.detail.subcontractor-name                   =  subcontractor name
 amendIndividualRemoveDetailYesNo.detail.address                              =  address
 amendIndividualRemoveDetailYesNo.detail.contact-details                      =  contact details
-amendIndividualRemoveDetailYesNo.detail.unique-taxpayer-reference            =  UTR
+amendIndividualRemoveDetailYesNo.detail.utr                                  =  UTR
 amendIndividualRemoveDetailYesNo.detail.national-insurance-number            =  National Insurance number
 amendIndividualRemoveDetailYesNo.detail.works-reference-number               =  works reference number
 
