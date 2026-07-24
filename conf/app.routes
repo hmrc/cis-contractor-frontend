@@ -36,7 +36,7 @@ GET   /subcontractor/individual-address-lookup         controllers.add.AddressOf
 GET   /subcontractor/individual-address-return         controllers.add.AddressOfSubcontractorController.addressLookupCallback(id: String ?= "", mode: Mode = NormalMode)
 GET   /subcontractor/individual-address-return/change  controllers.add.AddressOfSubcontractorController.addressLookupCallbackChange(id: String ?= "", mode: Mode = NormalMode)
 
-GET   /subcontractor/amend/individual  controllers.amend.AmendIndividualController.onPageLoad()
+
 
 GET   /subcontractor/amend/check-trading-name  controllers.add.SubTradingNameYesNoController.onPageLoad(mode: Mode = AmendMode)
 POST  /subcontractor/amend/check-trading-name  controllers.add.SubTradingNameYesNoController.onSubmit(mode: Mode = AmendMode)
@@ -83,11 +83,25 @@ POST  /subcontractor/amend/add-contact-details  controllers.add.AddIndividualCon
 GET   /subcontractor/amend/select-contact-details  controllers.add.IndividualContactMethodOptionsController.onPageLoad(mode: Mode = AmendMode)
 POST  /subcontractor/amend/select-contact-details  controllers.add.IndividualContactMethodOptionsController.onSubmit(mode: Mode = AmendMode)
 
-GET   /subcontractor/amend/company  controllers.amend.company.AmendCompanyController.onPageLoad()
+GET  /subcontractor/amend/individual/:cisId/:subbieResourceRef    controllers.amend.AmendIndividualController.onPageLoad(cisId: String, subbieResourceRef: Long)
 
-GET   /subcontractor/amend/partnership  controllers.amend.partnership.AmendPartnershipController.onPageLoad()
+GET  /subcontractor/amend/partnership/:cisId/:subbieResourceRef   controllers.amend.partnership.AmendPartnershipController.onPageLoad(cisId: String, subbieResourceRef: Long)
 
-GET   /subcontractor/amend/trust  controllers.amend.trust.AmendTrustController.onPageLoad()
+GET  /subcontractor/amend/company/:cisId/:subbieResourceRef       controllers.amend.company.AmendCompanyController.onPageLoad(cisId: String, subbieResourceRef: Long)
+
+GET  /subcontractor/amend/trust/:cisId/:subbieResourceRef         controllers.amend.trust.AmendTrustController.onPageLoad(cisId: String, subbieResourceRef: Long)
+
+GET   /subcontractor/amend/subcontractor-information             controllers.amend.AmendIndividualCheckYourAnswersController.onPageLoad()
+POST  /subcontractor/amend/subcontractor-information             controllers.amend.AmendIndividualCheckYourAnswersController.onSubmit()
+
+GET   /subcontractor/amend/partnership-information               controllers.amend.partnership.AmendPartnershipCheckYourAnswersController.onPageLoad()
+POST  /subcontractor/amend/partnership-information               controllers.amend.partnership.AmendPartnershipCheckYourAnswersController.onSubmit()
+
+GET   /subcontractor/amend/company-information                   controllers.amend.company.AmendCompanyCheckYourAnswersController.onPageLoad()
+POST  /subcontractor/amend/company-information                   controllers.amend.company.AmendCompanyCheckYourAnswersController.onSubmit()
+
+GET   /subcontractor/amend/trust-information                     controllers.amend.trust.AmendTrustCheckYourAnswersController.onPageLoad()
+POST  /subcontractor/amend/trust-information                     controllers.amend.trust.AmendTrustCheckYourAnswersController.onSubmit()
 
 # Errors & Auth
 GET  /unauthorised/standard-user  controllers.UnauthorisedWrongRoleController.onPageLoad()
