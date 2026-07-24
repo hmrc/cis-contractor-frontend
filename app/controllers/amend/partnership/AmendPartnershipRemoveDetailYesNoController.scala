@@ -133,103 +133,93 @@ class AmendPartnershipRemoveDetailYesNoController @Inject() (
     }
 
   private def withDetailContext(
-                                   detail: String
-                                 )(
-                                   block: (String, String) => Future[Result]
-                                 )(implicit request: DataRequest[_]): Future[Result] =
-      withValidDetail(detail) { detailType =>
+    detail: String
+  )(
+    block: (String, String) => Future[Result]
+  )(implicit request: DataRequest[_]): Future[Result] =
+    withValidDetail(detail) { detailType =>
+      if (!detailIsPresent(detailType, request.userAnswers)) {
+        Future.successful(journeyRecovery)
+      } else {
 
-        if (!detailIsPresent(detailType, request.userAnswers)) {
-          Future.successful(journeyRecovery)
-        } else {
+        getDetailName(detailType, request.userAnswers) match {
 
-          getDetailName(detailType, request.userAnswers) match {
+          case Some(detailName) =>
+            block(
+              messagesApi.preferred(request)(detailType.messageKey),
+              detailName
+            )
 
-            case Some(detailName) =>
-              block(
-                messagesApi.preferred(request)(detailType.messageKey),
-                detailName
-              )
-
-            case None =>
-              Future.successful(journeyRecovery)
-          }
+          case None =>
+            Future.successful(journeyRecovery)
         }
       }
+    }
 
   def onPageLoad(
-                  detail: String
-                ): Action[AnyContent] =
-    (identify andThen getData andThen requireData).async {
-      implicit request =>
-
-        withDetailContext(detail) {
-          (detailTitle, detailName) =>
-
-            Future.successful(
-              Ok(
-                view(
-                  formProvider(),
-                  detail,
-                  detailTitle,
-                  detailName
-                )
-              )
+    detail: String
+  ): Action[AnyContent] =
+    (identify andThen getData andThen requireData).async { implicit request =>
+      withDetailContext(detail) { (detailTitle, detailName) =>
+        Future.successful(
+          Ok(
+            view(
+              formProvider(),
+              detail,
+              detailTitle,
+              detailName
             )
-        }
+          )
+        )
+      }
     }
 
   def onSubmit(
-                detail: String
-              ): Action[AnyContent] =
-    (identify andThen getData andThen requireData).async {
-      implicit request =>
-
-        withDetailContext(detail) {
-          (detailTitle, detailName) =>
-
-            formProvider()
-              .bindFromRequest()
-              .fold(
-                formWithErrors =>
-                  Future.successful(
-                    BadRequest(
-                      view(
-                        formWithErrors,
-                        detail,
-                        detailTitle,
-                        detailName
-                      )
+    detail: String
+  ): Action[AnyContent] =
+    (identify andThen getData andThen requireData).async { implicit request =>
+      withDetailContext(detail) { (detailTitle, detailName) =>
+        formProvider()
+          .bindFromRequest()
+          .fold(
+            formWithErrors =>
+              Future.successful(
+                BadRequest(
+                  view(
+                    formWithErrors,
+                    detail,
+                    detailTitle,
+                    detailName
+                  )
+                )
+              ),
+            value =>
+              (for {
+                updatedAnswers <-
+                  Future.fromTry(
+                    request.userAnswers.set(
+                      AmendPartnershipRemoveDetailYesNoPage(detail),
+                      value
                     )
-                  ),
-                value =>
-                  (for {
-                    updatedAnswers <-
-                      Future.fromTry(
-                        request.userAnswers.set(
-                          AmendPartnershipRemoveDetailYesNoPage(detail),
-                          value
-                        )
-                      )
+                  )
 
-                    _ <- sessionRepository.set(updatedAnswers)
+                _ <- sessionRepository.set(updatedAnswers)
 
-                  } yield Redirect(
-                    controllers.add.partnership.routes.PartnershipCheckYourAnswersController
-                      .onPageLoad()
-                  )).recover {
-                    case ex =>
-                      logger.error(
-                        s"Failed to save remove detail answer for '$detail'",
-                        ex
-                      )
+              } yield Redirect(
+                controllers.add.partnership.routes.PartnershipCheckYourAnswersController
+                  .onPageLoad()
+              )).recover { case ex =>
+                logger.error(
+                  s"Failed to save remove detail answer for '$detail'",
+                  ex
+                )
 
-                      Redirect(
-                        controllers.routes.JourneyRecoveryController
-                          .onPageLoad()
-                      )
-                  }
-              )
-        }
+                Redirect(
+                  controllers.routes.JourneyRecoveryController
+                    .onPageLoad()
+                )
+              }
+          )
+      }
     }
 }

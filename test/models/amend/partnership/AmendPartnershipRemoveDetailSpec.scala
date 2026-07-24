@@ -19,9 +19,7 @@ package models.amend.partnership
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
-class AmendPartnershipRemoveDetailSpec
-  extends AnyWordSpec
-    with Matchers {
+class AmendPartnershipRemoveDetailSpec extends AnyWordSpec with Matchers {
 
   "AmendPartnershipRemoveDetail" should {
 
@@ -75,13 +73,13 @@ class AmendPartnershipRemoveDetailSpec
 
     "identify nominated partner details correctly" in {
 
-      AmendPartnershipRemoveDetail.Address.isNominatedPartnerDetail shouldBe false
-      AmendPartnershipRemoveDetail.ContactDetails.isNominatedPartnerDetail shouldBe false
-      AmendPartnershipRemoveDetail.Utr.isNominatedPartnerDetail shouldBe false
+      AmendPartnershipRemoveDetail.Address.isNominatedPartnerDetail              shouldBe false
+      AmendPartnershipRemoveDetail.ContactDetails.isNominatedPartnerDetail       shouldBe false
+      AmendPartnershipRemoveDetail.Utr.isNominatedPartnerDetail                  shouldBe false
       AmendPartnershipRemoveDetail.WorksReferenceNumber.isNominatedPartnerDetail shouldBe false
 
-      AmendPartnershipRemoveDetail.NominatedPartnerUtr.isNominatedPartnerDetail shouldBe true
-      AmendPartnershipRemoveDetail.NominatedPartnerNino.isNominatedPartnerDetail shouldBe true
+      AmendPartnershipRemoveDetail.NominatedPartnerUtr.isNominatedPartnerDetail                       shouldBe true
+      AmendPartnershipRemoveDetail.NominatedPartnerNino.isNominatedPartnerDetail                      shouldBe true
       AmendPartnershipRemoveDetail.NominatedPartnerCompanyRegistrationNumber.isNominatedPartnerDetail shouldBe true
     }
 
