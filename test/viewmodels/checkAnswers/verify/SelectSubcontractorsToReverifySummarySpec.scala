@@ -76,7 +76,7 @@ class SelectSubcontractorsToReverifySummarySpec extends SpecBase with Matchers {
       action.content.asHtml.toString must include(messages("site.change"))
 
       action.visuallyHiddenText mustBe Some(
-        messages("verify.selectSubcontractorsToReverify.display.noneSelected")
+        messages("verify.selectSubcontractorsToReverify.change.hidden")
       )
 
       action.attributes must contain(

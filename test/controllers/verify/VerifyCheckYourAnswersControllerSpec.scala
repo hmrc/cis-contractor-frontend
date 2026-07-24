@@ -199,7 +199,7 @@ class VerifyCheckYourAnswersControllerSpec extends SpecBase with MockitoSugar {
             val allRows     = doc.select(".govuk-summary-list__row")
             val reverifyRow = allRows.get(0)
             reverifyRow.select(".govuk-summary-list__value").text() mustBe messages(
-              "verify.selectSubcontractor.display.noneSelected"
+              "verify.selectSubcontractorsToReverify.display.noneSelected"
             )
           }
         }
