@@ -26,7 +26,7 @@ import models.response.SubcontractorResponse
 import pages.add.*
 import pages.add.trust.*
 import play.api.Logging
-import play.api.libs.json.Writes
+import controllers.amend.AmendControllerUtils._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import queries.{CisIdQuery, OriginalTrustAnswersQuery}
 import repositories.SessionRepository
@@ -48,6 +48,8 @@ class AmendTrustController @Inject() (
     extends FrontendBaseController
     with Logging {
 
+  private val expectedSubcontractorType = "trust"
+
   private def recovery: Result =
     Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
 
@@ -62,7 +64,15 @@ class AmendTrustController @Inject() (
                 s"[AmendTrustController] No subcontractor returned for " +
                   s"cisId=$cisId, subbieResourceRef=$subbieResourceRef"
               )
+              Future.successful(recovery)
 
+            case Some(subcontractor) if !isExpectedSubcontractorType(subcontractor, expectedSubcontractorType) =>
+              logger.error(
+                s"[AmendTrustController] Invalid subcontractor type. " +
+                  s"Expected=$expectedSubcontractorType, " +
+                  s"actual=${subcontractor.subcontractorType.getOrElse("missing")}, " +
+                  s"cisId=$cisId, subbieResourceRef=$subbieResourceRef"
+              )
               Future.successful(recovery)
 
             case Some(subcontractor) =>
@@ -77,7 +87,6 @@ class AmendTrustController @Inject() (
                       s"cisId=$cisId, subbieResourceRef=$subbieResourceRef",
                     error
                   )
-
                   Future.successful(recovery)
                 },
                 updatedAnswers =>
@@ -98,7 +107,6 @@ class AmendTrustController @Inject() (
               s"cisId=$cisId, subbieResourceRef=$subbieResourceRef",
             error
           )
-
           recovery
         }
     }
@@ -116,21 +124,12 @@ class AmendTrustController @Inject() (
         subcontractor.partnershipTradingName
       )
 
-    val originalAnswers =
-      OriginalTrustAnswers(
-        trustName = trustName,
-        addressYesNo = Some(address.isDefined),
-        address = address,
-        trustContactMethodsYesNo = Some(methods.nonEmpty),
-        trustContactMethod = methods,
-        email = subcontractor.emailAddress,
-        phone = subcontractor.phoneNumber,
-        mobile = subcontractor.mobilePhoneNumber,
-        utrYesNo = Some(subcontractor.utr.isDefined),
-        utr = subcontractor.utr,
-        worksReferenceYesNo = Some(subcontractor.worksReferenceNumber.isDefined),
-        worksReference = subcontractor.worksReferenceNumber
-      )
+    val original = originalAnswers(
+      subcontractor = subcontractor,
+      address = address,
+      methods = methods,
+      trustName = trustName
+    )
 
     for {
       updated <- userAnswers.set(TypeOfSubcontractorPage, Trust)
@@ -147,7 +146,7 @@ class AmendTrustController @Inject() (
       updated <- updated.set(TrustWorksReferenceYesNoPage, subcontractor.worksReferenceNumber.isDefined)
       updated <- setOptional(updated, TrustWorksReferencePage, subcontractor.worksReferenceNumber)
       updated <- updated.set(CisIdQuery, cisId)
-      updated <- updated.set(OriginalTrustAnswersQuery, originalAnswers)
+      updated <- updated.set(OriginalTrustAnswersQuery, original)
     } yield updated
   }
 
@@ -174,16 +173,24 @@ class AmendTrustController @Inject() (
       )
     }
 
-  private def setOptional[A: Writes](
-    userAnswers: UserAnswers,
-    page: pages.QuestionPage[A],
-    value: Option[A]
-  ): Try[UserAnswers] =
-    value match {
-      case Some(answer) =>
-        userAnswers.set(page, answer)
-
-      case None =>
-        Try(userAnswers)
-    }
+  private def originalAnswers(
+    subcontractor: SubcontractorResponse,
+    address: Option[Address],
+    methods: Set[ContactMethodOptions],
+    trustName: Option[String]
+  ): OriginalTrustAnswers =
+    OriginalTrustAnswers(
+      trustName = trustName,
+      addressYesNo = Some(address.isDefined),
+      address = address,
+      trustContactMethodsYesNo = Some(methods.nonEmpty),
+      trustContactMethod = methods,
+      email = subcontractor.emailAddress,
+      phone = subcontractor.phoneNumber,
+      mobile = subcontractor.mobilePhoneNumber,
+      utrYesNo = Some(subcontractor.utr.isDefined),
+      utr = subcontractor.utr,
+      worksReferenceYesNo = Some(subcontractor.worksReferenceNumber.isDefined),
+      worksReference = subcontractor.worksReferenceNumber
+    )
 }

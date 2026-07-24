@@ -26,7 +26,7 @@ import models.response.SubcontractorResponse
 import pages.add.*
 import pages.add.company.*
 import play.api.Logging
-import play.api.libs.json.Writes
+import controllers.amend.AmendControllerUtils._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import queries.{CisIdQuery, OriginalCompanyAnswersQuery}
 import repositories.SessionRepository
@@ -48,6 +48,8 @@ class AmendCompanyController @Inject() (
     extends FrontendBaseController
     with Logging {
 
+  private val expectedSubcontractorType = "company"
+
   private def recovery: Result =
     Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
 
@@ -65,7 +67,15 @@ class AmendCompanyController @Inject() (
                 s"[AmendCompanyController] No subcontractor returned for " +
                   s"cisId=$cisId, subbieResourceRef=$subbieResourceRef"
               )
+              Future.successful(recovery)
 
+            case Some(subcontractor) if !isExpectedSubcontractorType(subcontractor, expectedSubcontractorType) =>
+              logger.error(
+                s"[AmendCompanyController] Invalid subcontractor type. " +
+                  s"Expected=$expectedSubcontractorType, " +
+                  s"actual=${subcontractor.subcontractorType.getOrElse("missing")}, " +
+                  s"cisId=$cisId, subbieResourceRef=$subbieResourceRef"
+              )
               Future.successful(recovery)
 
             case Some(subcontractor) =>
@@ -105,17 +115,11 @@ class AmendCompanyController @Inject() (
     val address = toAddress(subcontractor)
     val methods = contactMethods(subcontractor)
 
-    val originalAnswers =
-      OriginalCompanyAnswers(
-        companyName = subcontractor.tradingName,
+    val original =
+      originalAnswers(
+        subcontractor = subcontractor,
         address = address,
-        companyContactMethod = Option.when(methods.nonEmpty)(methods),
-        email = subcontractor.emailAddress,
-        phone = subcontractor.phoneNumber,
-        mobile = subcontractor.mobilePhoneNumber,
-        crn = subcontractor.crn,
-        utr = subcontractor.utr,
-        worksReference = subcontractor.worksReferenceNumber
+        methods = methods
       )
 
     for {
@@ -135,7 +139,7 @@ class AmendCompanyController @Inject() (
       updated <- updated.set(CompanyWorksReferenceYesNoPage, subcontractor.worksReferenceNumber.isDefined)
       updated <- setOptional(updated, CompanyWorksReferencePage, subcontractor.worksReferenceNumber)
       updated <- updated.set(CisIdQuery, cisId)
-      updated <- updated.set(OriginalCompanyAnswersQuery, originalAnswers)
+      updated <- updated.set(OriginalCompanyAnswersQuery, original)
     } yield updated
   }
 
@@ -160,16 +164,21 @@ class AmendCompanyController @Inject() (
       )
     }
 
-  private def setOptional[A: Writes](
-    userAnswers: UserAnswers,
-    page: pages.QuestionPage[A],
-    value: Option[A]
-  ): Try[UserAnswers] =
-    value match {
-      case Some(answer) =>
-        userAnswers.set(page, answer)
+  private def originalAnswers(
+    subcontractor: SubcontractorResponse,
+    address: Option[Address],
+    methods: Set[ContactMethodOptions]
+  ): OriginalCompanyAnswers =
+    OriginalCompanyAnswers(
+      companyName = subcontractor.tradingName,
+      address = address,
+      companyContactMethod = Option.when(methods.nonEmpty)(methods),
+      email = subcontractor.emailAddress,
+      phone = subcontractor.phoneNumber,
+      mobile = subcontractor.mobilePhoneNumber,
+      crn = subcontractor.crn,
+      utr = subcontractor.utr,
+      worksReference = subcontractor.worksReferenceNumber
+    )
 
-      case None =>
-        Try(userAnswers)
-    }
 }
