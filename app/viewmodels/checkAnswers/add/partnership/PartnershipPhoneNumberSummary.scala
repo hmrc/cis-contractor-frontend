@@ -16,7 +16,7 @@
 
 package viewmodels.checkAnswers.add.partnership
 
-import models.{CheckMode, UserAnswers}
+import models.{CheckMode, Mode, UserAnswers}
 import pages.add.partnership.PartnershipPhoneNumberPage
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
@@ -25,7 +25,7 @@ import viewmodels.implicits.*
 
 object PartnershipPhoneNumberSummary {
 
-  def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
+  def row(answers: UserAnswers, mode: Mode = CheckMode)(implicit messages: Messages): Option[SummaryListRow] =
     answers.get(PartnershipPhoneNumberPage).map { answer =>
       SummaryListRowViewModel(
         key = "partnershipPhoneNumber.checkYourAnswersLabel",
@@ -33,7 +33,7 @@ object PartnershipPhoneNumberSummary {
         actions = Seq(
           ActionItemViewModel(
             "site.change",
-            controllers.add.partnership.routes.PartnershipPhoneNumberController.onPageLoad(CheckMode).url
+            controllers.add.partnership.routes.PartnershipPhoneNumberController.onPageLoad(mode).url
           )
             .withVisuallyHiddenText(messages("partnershipPhoneNumber.change.hidden"))
             .withAttribute("id" -> "partnership-phone-number")

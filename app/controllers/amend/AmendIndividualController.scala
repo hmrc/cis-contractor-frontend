@@ -26,7 +26,7 @@ import models.contact.ContactMethodOptions
 import models.response.SubcontractorResponse
 import pages.add.*
 import play.api.Logging
-import play.api.libs.json.Writes
+import controllers.amend.AmendControllerUtils._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import queries.{CisIdQuery, OriginalIndividualAnswersQuery}
 import repositories.SessionRepository
@@ -48,6 +48,8 @@ class AmendIndividualController @Inject() (
     extends FrontendBaseController
     with Logging {
 
+  private val expectedSubcontractorType = "soletrader"
+
   private def recovery: Result =
     Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
 
@@ -62,7 +64,15 @@ class AmendIndividualController @Inject() (
                 s"[AmendIndividualController] No subcontractor returned for " +
                   s"cisId=$cisId, subbieResourceRef=$subbieResourceRef"
               )
+              Future.successful(recovery)
 
+            case Some(subcontractor) if !isExpectedSubcontractorType(subcontractor, expectedSubcontractorType) =>
+              logger.error(
+                s"[AmendIndividualController] Invalid subcontractor type. " +
+                  s"Expected=$expectedSubcontractorType, " +
+                  s"actual=${subcontractor.subcontractorType.getOrElse("missing")}, " +
+                  s"cisId=$cisId, subbieResourceRef=$subbieResourceRef"
+              )
               Future.successful(recovery)
 
             case Some(subcontractor) =>
@@ -72,11 +82,7 @@ class AmendIndividualController @Inject() (
                 subcontractor
               ).fold(
                 error => {
-                  logger.error(
-                    "[AmendIndividualController] Failed to populate UserAnswers",
-                    error
-                  )
-
+                  logger.error("[AmendIndividualController] Failed to populate UserAnswers", error)
                   Future.successful(recovery)
                 },
                 updatedAnswers =>
@@ -97,7 +103,6 @@ class AmendIndividualController @Inject() (
               s"cisId=$cisId, subbieResourceRef=$subbieResourceRef",
             error
           )
-
           recovery
         }
     }
@@ -121,18 +126,12 @@ class AmendIndividualController @Inject() (
 
     val usesTradingName = subcontractor.tradingName.exists(_.trim.nonEmpty)
 
-    val originalAnswers = OriginalIndividualAnswers(
-      usesTradingName = Some(usesTradingName),
-      tradingName = subcontractor.tradingName,
-      subcontractorName = name,
+    val original = originalAnswers(
+      subcontractor = subcontractor,
       address = address,
-      individualContactMethod = Option.when(methods.nonEmpty)(methods),
-      email = subcontractor.emailAddress,
-      phone = subcontractor.phoneNumber,
-      mobile = subcontractor.mobilePhoneNumber,
-      utr = subcontractor.utr,
-      nino = subcontractor.nino,
-      worksReference = subcontractor.worksReferenceNumber
+      methods = methods,
+      name = name,
+      usesTradingName = usesTradingName
     )
 
     for {
@@ -155,7 +154,7 @@ class AmendIndividualController @Inject() (
       updated <- updated.set(WorksReferenceNumberYesNoPage, subcontractor.worksReferenceNumber.isDefined)
       updated <- setOptional(updated, WorksReferenceNumberPage, subcontractor.worksReferenceNumber)
       updated <- updated.set(CisIdQuery, cisId)
-      updated <- updated.set(OriginalIndividualAnswersQuery, originalAnswers)
+      updated <- updated.set(OriginalIndividualAnswersQuery, original)
     } yield updated
   }
 
@@ -183,16 +182,24 @@ class AmendIndividualController @Inject() (
       )
     }
 
-  private def setOptional[A: Writes](
-    userAnswers: UserAnswers,
-    page: pages.QuestionPage[A],
-    value: Option[A]
-  ): Try[UserAnswers] =
-    value match {
-      case Some(answer) =>
-        userAnswers.set(page, answer)
-
-      case None =>
-        Try(userAnswers)
-    }
+  private def originalAnswers(
+    subcontractor: SubcontractorResponse,
+    address: Option[Address],
+    methods: Set[IndividualContactMethodOptions],
+    name: Option[SubcontractorName],
+    usesTradingName: Boolean
+  ): OriginalIndividualAnswers =
+    OriginalIndividualAnswers(
+      usesTradingName = Some(usesTradingName),
+      tradingName = subcontractor.tradingName,
+      subcontractorName = name,
+      address = address,
+      individualContactMethod = Option.when(methods.nonEmpty)(methods),
+      email = subcontractor.emailAddress,
+      phone = subcontractor.phoneNumber,
+      mobile = subcontractor.mobilePhoneNumber,
+      utr = subcontractor.utr,
+      nino = subcontractor.nino,
+      worksReference = subcontractor.worksReferenceNumber
+    )
 }
