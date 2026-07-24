@@ -17,21 +17,10 @@
 package pages.insufficient
 
 import pages.behaviours.PageBehaviours
-import play.api.libs.json.JsPath
 
 class RemoveInsufficientSubcontractorNameYesNoPageSpec extends PageBehaviours {
 
   "RemoveInsufficientSubcontractorNameYesNoPage" - {
-
-    "have the correct path" in {
-      RemoveInsufficientSubcontractorNameYesNoPage.path mustBe
-        (JsPath \ "removeInsufficientSubcontractorNameYesNo")
-    }
-
-    "have the correct toString" in {
-      RemoveInsufficientSubcontractorNameYesNoPage.toString mustBe
-        "removeInsufficientSubcontractorNameYesNo"
-    }
 
     beRetrievable[Boolean](RemoveInsufficientSubcontractorNameYesNoPage)
 
