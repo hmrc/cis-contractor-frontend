@@ -886,6 +886,7 @@ verify.selectSubcontractorsToReverify.dateAdded                         =  Date 
 verify.selectSubcontractorsToReverify.taxTreatment.net                  =  Standard rate
 verify.selectSubcontractorsToReverify.taxTreatment.unmatched            =  Higher rate
 verify.selectSubcontractorsToReverify.taxTreatment.gross                =  Gross
+verify.selectSubcontractorsToReverify.display.noneSelected              =  None selected
 
 verify.selectSubcontractor.title                                        =  Which subcontractors do you want to verify?
 verify.selectSubcontractor.heading                                      =  Which subcontractors do you want to verify?

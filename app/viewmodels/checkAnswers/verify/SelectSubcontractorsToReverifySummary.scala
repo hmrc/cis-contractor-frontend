@@ -28,7 +28,7 @@ import viewmodels.implicits.*
 object SelectSubcontractorsToReverifySummary {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] = {
-    val selectEmptyReverify = List(messages("verify.selectSubcontractor.display.noneSelected"))
+    val selectEmptyReverify = List(messages("verify.selectSubcontractorsToReverify.display.noneSelected"))
     answers
       .get(SelectSubcontractorsToReverifyPage)
       .filter(_ => answers.get(ReverifyExistingSubcontractorsYesNoPage).contains(true))
@@ -49,20 +49,5 @@ object SelectSubcontractorsToReverifySummary {
           )
         }
       }
-    /* .getOrElse(
-        ValueViewModelHelper.makeGovukBulletList(selectEmptyReverify).map { value =>
-          SummaryListRowViewModel(
-            key = messages("verify.selectSubcontractorsToReverify.checkYourAnswersLabel"),
-            value = value,
-            actions = Seq(
-              ActionItemViewModel(
-                content = Text(messages("site.change")),
-                href = controllers.verify.routes.SelectSubcontractorsToReverifyController.onPageLoad(CheckMode).url
-              ).withVisuallyHiddenText(messages("verify.selectSubcontractorsToReverify.change.hidden"))
-                .withAttribute("id", "select-subcontractors-to-reverify")
-            )
-          )
-        }
-      ) */
   }
 }

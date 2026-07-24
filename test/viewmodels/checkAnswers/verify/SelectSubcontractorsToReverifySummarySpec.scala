@@ -76,7 +76,7 @@ class SelectSubcontractorsToReverifySummarySpec extends SpecBase with Matchers {
       action.content.asHtml.toString must include(messages("site.change"))
 
       action.visuallyHiddenText mustBe Some(
-        messages("verify.selectSubcontractorsToReverify.change.hidden")
+        messages("verify.selectSubcontractorsToReverify.display.noneSelected")
       )
 
       action.attributes must contain(
@@ -125,7 +125,7 @@ class SelectSubcontractorsToReverifySummarySpec extends SpecBase with Matchers {
 
       val valueHtml = result.value.value.content.asHtml.toString
 
-      valueHtml must include(messages("verify.selectSubcontractor.display.noneSelected"))
+      valueHtml must include(messages("verify.selectSubcontractorsToReverify.display.noneSelected"))
       valueHtml must not include "<br>"
     }
 
