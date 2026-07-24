@@ -55,7 +55,7 @@ class CreateVerificationBatchAndVerificationsControllerSpec extends SpecBase wit
     GetCurrentVerificationBatchResponse(
       subcontractors = Seq(
         SubcontractorCurrentVerification(
-          subcontractorId = 10L,
+          subcontractorId = 1L,
           subbieResourceRef = Some(1111L),
           firstName = None,
           secondName = None,
@@ -73,7 +73,20 @@ class CreateVerificationBatchAndVerificationsControllerSpec extends SpecBase wit
           addressLine4 = None,
           country = None,
           postcode = None,
-          worksReferenceNumber = None
+          emailAddress = None,
+          phoneNumber = None,
+          mobilePhoneNumber = None,
+          worksReferenceNumber = None,
+          matched = None,
+          autoVerified = None,
+          verified = None,
+          verificationNumber = None,
+          taxTreatment = None,
+          verificationDate = None,
+          version = None,
+          updatedTaxTreatment = None,
+          lastMonthlyReturnDate = None,
+          pendingVerifications = None
         )
       ),
       verificationBatch = Some(
@@ -87,7 +100,13 @@ class CreateVerificationBatchAndVerificationsControllerSpec extends SpecBase wit
           verificationId = 1L,
           verificationBatchId = Some(999L),
           subcontractorId = Some(10L),
-          verificationResourceRef = Some(1111L)
+          verificationResourceRef = Some(1111L),
+          subcontractorName = None,
+          verificationNumber = None,
+          taxTreatment = None,
+          actionIndicator = None,
+          proceed = None,
+          matched = None
         )
       )
     )

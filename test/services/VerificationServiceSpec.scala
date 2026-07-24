@@ -99,25 +99,38 @@ final class VerificationServiceSpec extends SpecBase with MockitoSugar with Mode
     ref: Option[Long]
   ): SubcontractorCurrentVerification =
     SubcontractorCurrentVerification(
-      subcontractorId = id,
-      subbieResourceRef = ref,
-      firstName = None,
+      subcontractorId = 1L,
+      subbieResourceRef = Some(10L),
+      firstName = Some("John"),
       secondName = None,
-      surname = None,
-      tradingName = None,
-      utr = None,
-      nino = None,
-      crn = None,
-      partnerUtr = None,
-      partnershipTradingName = None,
-      subcontractorType = None,
-      addressLine1 = None,
+      surname = Some("Smith"),
+      tradingName = Some("ACME"),
+      utr = Some("1111111111"),
+      nino = Some("AA123456A"),
+      crn = Some("AC012345"),
+      partnerUtr = Some("5860920998"),
+      partnershipTradingName = Some("ACME trading"),
+      subcontractorType = Some("soletrader"),
+      addressLine1 = Some("1 Test Street"),
       addressLine2 = None,
       addressLine3 = None,
       addressLine4 = None,
-      country = None,
-      postcode = None,
-      worksReferenceNumber = None
+      country = Some("GB"),
+      postcode = Some("AA1 1AA"),
+      emailAddress = None,
+      phoneNumber = None,
+      mobilePhoneNumber = None,
+      worksReferenceNumber = Some("WRN123"),
+      matched = None,
+      autoVerified = None,
+      verified = None,
+      verificationNumber = None,
+      taxTreatment = None,
+      verificationDate = None,
+      version = None,
+      updatedTaxTreatment = None,
+      lastMonthlyReturnDate = None,
+      pendingVerifications = None
     )
 
   "VerificationService.refreshNewestVerificationBatch" - {
@@ -399,7 +412,13 @@ final class VerificationServiceSpec extends SpecBase with MockitoSugar with Mode
             verificationId = 1L,
             verificationBatchId = Some(999L),
             subcontractorId = Some(10L),
-            verificationResourceRef = Some(1111L)
+            verificationResourceRef = Some(1111L),
+            subcontractorName = None,
+            verificationNumber = None,
+            taxTreatment = None,
+            actionIndicator = None,
+            proceed = None,
+            matched = None
           )
         )
       )
@@ -650,7 +669,13 @@ final class VerificationServiceSpec extends SpecBase with MockitoSugar with Mode
               verificationId = 1L,
               verificationBatchId = Some(999L),
               subcontractorId = Some(10L),
-              verificationResourceRef = Some(1111L)
+              verificationResourceRef = Some(1111L),
+              subcontractorName = None,
+              verificationNumber = None,
+              taxTreatment = None,
+              actionIndicator = None,
+              proceed = None,
+              matched = None
             )
           )
         )

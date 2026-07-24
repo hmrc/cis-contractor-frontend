@@ -43,25 +43,38 @@ class ChrisVerificationRequestBuilderSpec extends SpecBase with MockitoSugar {
     "must build a ChrisVerificationRequest" in {
       val subcontractor =
         SubcontractorCurrentVerification(
-          subcontractorId = 10L,
-          subbieResourceRef = Some(4001L),
-          firstName = Some("Test"),
+          subcontractorId = 1L,
+          subbieResourceRef = Some(10L),
+          firstName = Some("John"),
           secondName = None,
-          surname = Some("Subcontractor"),
-          tradingName = None,
-          utr = Some("1234567890"),
-          nino = None,
-          crn = None,
-          partnerUtr = None,
-          partnershipTradingName = None,
-          subcontractorType = Some("Individual"),
-          addressLine1 = None,
+          surname = Some("Smith"),
+          tradingName = Some("ACME"),
+          utr = Some("1111111111"),
+          nino = Some("AA123456A"),
+          crn = Some("AC012345"),
+          partnerUtr = Some("5860920998"),
+          partnershipTradingName = Some("ACME trading"),
+          subcontractorType = Some("soletrader"),
+          addressLine1 = Some("1 Test Street"),
           addressLine2 = None,
           addressLine3 = None,
           addressLine4 = None,
-          country = None,
-          postcode = None,
-          worksReferenceNumber = None
+          country = Some("GB"),
+          postcode = Some("AA1 1AA"),
+          emailAddress = None,
+          phoneNumber = None,
+          mobilePhoneNumber = None,
+          worksReferenceNumber = Some("WRN123"),
+          matched = None,
+          autoVerified = None,
+          verified = None,
+          verificationNumber = None,
+          taxTreatment = None,
+          verificationDate = None,
+          version = None,
+          updatedTaxTreatment = None,
+          lastMonthlyReturnDate = None,
+          pendingVerifications = None
         )
 
       val currentVerificationBatchResponse =
@@ -75,10 +88,16 @@ class ChrisVerificationRequestBuilderSpec extends SpecBase with MockitoSugar {
           ),
           verifications = Seq(
             VerificationCurrentVerification(
-              verificationId = 3001L,
-              verificationBatchId = Some(1001L),
-              subcontractorId = Some(10L),
-              verificationResourceRef = Some(4001L)
+              verificationId = 1001L,
+              verificationBatchId = Some(99L),
+              subcontractorId = Some(1L),
+              verificationResourceRef = Some(1L),
+              subcontractorName = None,
+              verificationNumber = None,
+              taxTreatment = None,
+              actionIndicator = None,
+              proceed = None,
+              matched = None
             )
           )
         )

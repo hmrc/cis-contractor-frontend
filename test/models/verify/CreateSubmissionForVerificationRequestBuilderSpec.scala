@@ -40,10 +40,16 @@ class CreateSubmissionForVerificationRequestBuilderSpec extends SpecBase {
         ),
         verifications = Seq(
           VerificationCurrentVerification(
-            verificationId = 3001L,
-            verificationBatchId = Some(1001L),
-            subcontractorId = Some(10L),
-            verificationResourceRef = Some(4001L)
+            verificationId = 1001L,
+            verificationBatchId = Some(99L),
+            subcontractorId = Some(1L),
+            verificationResourceRef = Some(1L),
+            subcontractorName = None,
+            verificationNumber = None,
+            taxTreatment = None,
+            actionIndicator = None,
+            proceed = None,
+            matched = None
           )
         )
       )
