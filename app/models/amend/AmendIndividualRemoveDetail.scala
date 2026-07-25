@@ -28,7 +28,7 @@ object AmendIndividualRemoveDetail {
       "trading-name"
 
     override val messageKey: String =
-      "amendIndividualRemoveDetailYesNo.detail.trading-name"
+      "amendIndividualRemoveDetailYesNo.detail.tradingName"
   }
 
   case object SubcontractorName extends AmendIndividualRemoveDetail {
@@ -36,7 +36,7 @@ object AmendIndividualRemoveDetail {
       "subcontractor-name"
 
     override val messageKey: String =
-      "amendIndividualRemoveDetailYesNo.detail.subcontractor-name"
+      "amendIndividualRemoveDetailYesNo.detail.subcontractorName"
   }
 
   case object Address extends AmendIndividualRemoveDetail {
@@ -52,7 +52,7 @@ object AmendIndividualRemoveDetail {
       "contact-details"
 
     override val messageKey: String =
-      "amendIndividualRemoveDetailYesNo.detail.contact-details"
+      "amendIndividualRemoveDetailYesNo.detail.contactDetails"
 
   }
 
@@ -69,7 +69,7 @@ object AmendIndividualRemoveDetail {
       "national-insurance-number"
 
     override val messageKey: String =
-      "amendIndividualRemoveDetailYesNo.detail.national-insurance-number"
+      "amendIndividualRemoveDetailYesNo.detail.nationalInsuranceNumber"
   }
 
   case object WorksReferenceNumber extends AmendIndividualRemoveDetail {
@@ -77,7 +77,7 @@ object AmendIndividualRemoveDetail {
       "works-reference-number"
 
     override val messageKey: String =
-      "amendIndividualRemoveDetailYesNo.detail.works-reference-number"
+      "amendIndividualRemoveDetailYesNo.detail.worksReferenceNumber"
   }
 
   val values: Seq[AmendIndividualRemoveDetail] =

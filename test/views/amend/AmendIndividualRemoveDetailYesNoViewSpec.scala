@@ -34,17 +34,17 @@ class AmendIndividualRemoveDetailYesNoViewSpec extends AnyWordSpec with Matchers
   val subcontractorName = "Test Subcontractor"
 
   Seq(
-    ("trading-name", TradingName, "amendIndividualRemoveDetailYesNo.detail.trading-name"),
-    ("subcontractor-name", SubcontractorName, "amendIndividualRemoveDetailYesNo.detail.subcontractor-name"),
+    ("trading-name", TradingName, "amendIndividualRemoveDetailYesNo.detail.tradingName"),
+    ("subcontractor-name", SubcontractorName, "amendIndividualRemoveDetailYesNo.detail.subcontractorName"),
     ("address", Address, "amendIndividualRemoveDetailYesNo.detail.address"),
-    ("contact-details", ContactDetails, "amendIndividualRemoveDetailYesNo.detail.contact-details"),
+    ("contact-details", ContactDetails, "amendIndividualRemoveDetailYesNo.detail.contactDetails"),
     ("utr", Utr, "amendIndividualRemoveDetailYesNo.detail.utr"),
     (
       "national-insurance-number",
       NationalInsuranceNumber,
-      "amendIndividualRemoveDetailYesNo.detail.national-insurance-number"
+      "amendIndividualRemoveDetailYesNo.detail.nationalInsuranceNumber"
     ),
-    ("works-reference-number", WorksReferenceNumber, "amendIndividualRemoveDetailYesNo.detail.works-reference-number")
+    ("works-reference-number", WorksReferenceNumber, "amendIndividualRemoveDetailYesNo.detail.worksReferenceNumber")
   ).foreach { case (contractorDetail, amendIndividualRemoveDetail, detailKey) =>
     s"AmendIndividualRemoveDetailYesNoView when contractorDetail is '$contractorDetail'" should {
 

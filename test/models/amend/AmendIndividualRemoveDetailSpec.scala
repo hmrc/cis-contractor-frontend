@@ -49,25 +49,25 @@ class AmendIndividualRemoveDetailSpec extends AnyWordSpec with Matchers {
     "have the correct message keys" in {
 
       AmendIndividualRemoveDetail.TradingName.messageKey shouldBe
-        "amendIndividualRemoveDetailYesNo.detail.trading-name"
+        "amendIndividualRemoveDetailYesNo.detail.tradingName"
 
       AmendIndividualRemoveDetail.SubcontractorName.messageKey shouldBe
-        "amendIndividualRemoveDetailYesNo.detail.subcontractor-name"
+        "amendIndividualRemoveDetailYesNo.detail.subcontractorName"
 
       AmendIndividualRemoveDetail.Address.messageKey shouldBe
         "amendIndividualRemoveDetailYesNo.detail.address"
 
       AmendIndividualRemoveDetail.ContactDetails.messageKey shouldBe
-        "amendIndividualRemoveDetailYesNo.detail.contact-details"
+        "amendIndividualRemoveDetailYesNo.detail.contactDetails"
 
       AmendIndividualRemoveDetail.Utr.messageKey shouldBe
         "amendIndividualRemoveDetailYesNo.detail.utr"
 
       AmendIndividualRemoveDetail.NationalInsuranceNumber.messageKey shouldBe
-        "amendIndividualRemoveDetailYesNo.detail.national-insurance-number"
+        "amendIndividualRemoveDetailYesNo.detail.nationalInsuranceNumber"
 
       AmendIndividualRemoveDetail.WorksReferenceNumber.messageKey shouldBe
-        "amendIndividualRemoveDetailYesNo.detail.works-reference-number"
+        "amendIndividualRemoveDetailYesNo.detail.worksReferenceNumber"
     }
 
     "contain all supported detail types in values" in {
