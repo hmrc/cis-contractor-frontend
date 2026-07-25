@@ -20,6 +20,8 @@ import com.google.inject.{Inject, Singleton}
 import play.api.Configuration
 import play.api.i18n.Lang
 import play.api.mvc.RequestHeader
+import scala.io.Source
+import play.api.libs.json.Json
 
 @Singleton
 class FrontendAppConfig @Inject() (configuration: Configuration) {
@@ -61,19 +63,18 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
     s"$protocol://$host:$port"
   }
 
-  lazy val loginUrl: String                              = configuration.get[String]("urls.login")
-  lazy val loginContinueUrl: String                      = configuration.get[String]("urls.loginContinue")
-  lazy val signOutUrl: String                            = configuration.get[String]("urls.signOut")
-  lazy val govUkCISGuidanceUrl: String                   = configuration.get[String]("urls.govUkCISGuidance")
-  lazy val manageSubcontractorsUrl: String               = configuration.get[String]("urls.manageSubcontractors")
-  lazy val hmrcOnlineServiceDeskUrl: String              = configuration.get[String]("urls.hmrcOnlineServiceDesk")
-  lazy val cisGeneralEnquiries: String                   = configuration.get[String]("urls.cisGeneralEnquiries")
-  lazy val payeCisForAgentsOnlineService: String         = configuration.get[String]("urls.payeCisForAgentsOnlineService")
-  lazy val cisReturnDashboardUrl: String                 = configuration.get[String]("urls.cisReturnDashboard")
-  def manageYourSubcontractorsUrl(cisId: String): String =
-    s"${configuration.get[String]("urls.manageBaseUrl")}/subcontractors/$cisId/your-subcontractors"
-
-  lazy val findUtr: String = configuration.get[String]("urls.findUtr")
+  lazy val loginUrl: String                      = configuration.get[String]("urls.login")
+  lazy val loginContinueUrl: String              = configuration.get[String]("urls.loginContinue")
+  lazy val signOutUrl: String                    = configuration.get[String]("urls.signOut")
+  lazy val govUkCISGuidanceUrl: String           = configuration.get[String]("urls.govUkCISGuidance")
+  lazy val manageSubcontractorsUrl: String       = configuration.get[String]("urls.manageSubcontractors")
+  lazy val hmrcOnlineServiceDeskUrl: String      = configuration.get[String]("urls.hmrcOnlineServiceDesk")
+  lazy val cisGeneralEnquiries: String           = configuration.get[String]("urls.cisGeneralEnquiries")
+  lazy val payeCisForAgentsOnlineService: String = configuration.get[String]("urls.payeCisForAgentsOnlineService")
+  lazy val cisReturnDashboardUrl: String         = configuration.get[String]("urls.cisReturnDashboard")
+  lazy val findUtr: String                       = configuration.get[String]("urls.findUtr")
+  lazy val managefrontendBaseUrl: String         = configuration.get[String]("urls.manageFrontendBaseUrl")
+  lazy val verificationHistoryUrl: String        = s"$managefrontendBaseUrl/verification-history/retrieve"
 
   private val exitSurveyBaseUrl: String = configuration.get[Service]("microservice.services.feedback-frontend").baseUrl
   lazy val exitSurveyUrl: String        = s"$exitSurveyBaseUrl/feedback/cis-contractor-frontend"
@@ -96,5 +97,20 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
   def addressLookupRetrievalUrl(id: String): String = s"$addressLookupFrontendUrl/api/v2/confirmed?id=$id"
   def addressLookupJourneyUrl: String               = s"$addressLookupFrontendUrl/api/v2/init"
 
-  lazy val submissionPollTimeoutSeconds: Int = configuration.get[Int]("submission-poll-timeout-seconds")
+  lazy val submissionPollTimeoutSeconds: Int         = configuration.get[Int]("submission-poll-timeout-seconds")
+  lazy val submissionPollDefaultIntervalSeconds: Int =
+    configuration.get[Int]("submission-poll-default-interval-seconds")
+
+  lazy val locationCanonicalList: Seq[(String, String)] = {
+    val source     = Source.fromResource("location-autocomplete-canonical-list.json")
+    val jsonString =
+      try source.mkString
+      finally source.close()
+    val json       = Json.parse(jsonString)
+
+    json.as[Seq[Seq[String]]].map {
+      case Seq(name, code) => (name, code)
+      case other           => throw new RuntimeException(s"Unexpected format in JSON: $other")
+    }
+  }
 }

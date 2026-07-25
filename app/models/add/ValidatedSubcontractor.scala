@@ -17,10 +17,8 @@
 package models.add
 
 import models.address.Address
-import models.contact.ContactOptions
-import models.contact.ContactOptions.*
-import models.{InvalidAnswer, MissingAnswer, TypeOfSubcontractor, UserAnswers, Validation, ValidationError}
-import pages.QuestionPage
+import models.contact.ContactMethodOptions
+import models.{InvalidAnswer, TypeOfSubcontractor, UserAnswers, Validation, ValidationError}
 import pages.add.*
 import play.api.libs.json.*
 
@@ -28,7 +26,7 @@ final case class ValidatedSubcontractor(
   tradingName: Option[String],
   subcontractorName: Option[SubcontractorName],
   address: Option[Address],
-  individualContactDetails: ContactOptions,
+  IndividualContactMethodOptions: Option[Set[IndividualContactMethodOptions]],
   individualEmail: Option[String],
   individualPhone: Option[String],
   individualMobile: Option[String],
@@ -40,22 +38,49 @@ final case class ValidatedSubcontractor(
 object ValidatedSubcontractor extends Validation {
   def build(answers: UserAnswers): Either[ValidationError, ValidatedSubcontractor] =
     for {
-      typeOfSubcontractor      <- validateType(answers)
-      tradingName              <- getOptionalPageValue(answers, TradingNameOfSubcontractorPage, SubTradingNameYesNoPage)
-      subcontractorName        <- getOptionalNamePage(answers)
-      address                  <- getOptionalPageValue(answers, AddressOfSubcontractorPage, SubAddressYesNoPage)
-      individualContactDetails <- getPageValue(answers, IndividualChooseContactDetailsPage)
-      individualEmail          <- getContactPageValue(answers, IndividualEmailAddressPage, individualContactDetails)
-      individualPhone          <- getContactPageValue(answers, IndividualPhoneNumberPage, individualContactDetails)
-      individualMobile         <- getContactPageValue(answers, IndividualMobileNumberPage, individualContactDetails)
-      utr                      <- getOptionalPageValue(answers, SubcontractorsUniqueTaxpayerReferencePage, UniqueTaxpayerReferenceYesNoPage)
-      nino                     <- getOptionalPageValue(answers, SubNationalInsuranceNumberPage, NationalInsuranceNumberYesNoPage)
-      workReference            <- getOptionalPageValue(answers, WorksReferenceNumberPage, WorksReferenceNumberYesNoPage)
+      typeOfSubcontractor            <- validateType(answers)
+      tradingName                    <- getOptionalPageValue(answers, TradingNameOfSubcontractorPage, SubTradingNameYesNoPage)
+      subcontractorName              <- getOptionalNamePage(answers)
+      address                        <- getOptionalPageValue(answers, AddressOfSubcontractorPage, SubAddressYesNoPage)
+      individualContactMethodOptions <-
+        getOptionalPageValue(answers, IndividualContactMethodOptionsPage, AddIndividualContactMethodsYesNoPage)
+          .flatMap {
+            case Some(methods) if methods.nonEmpty =>
+              Right(Some(methods))
+
+            case Some(_) =>
+              Left(InvalidAnswer(IndividualContactMethodOptionsPage))
+
+            case None =>
+              Right(None)
+          }
+
+      individualEmail  <- getContactPageValue(
+                            answers,
+                            individualContactMethodOptions,
+                            IndividualEmailAddressPage,
+                            ContactMethodOptions.Email
+                          )
+      individualPhone  <- getContactPageValue(
+                            answers,
+                            individualContactMethodOptions,
+                            IndividualPhoneNumberPage,
+                            ContactMethodOptions.Phone
+                          )
+      individualMobile <- getContactPageValue(
+                            answers,
+                            individualContactMethodOptions,
+                            IndividualMobileNumberPage,
+                            ContactMethodOptions.Mobile
+                          )
+      utr              <- getOptionalPageValue(answers, SubcontractorsUniqueTaxpayerReferencePage, UniqueTaxpayerReferenceYesNoPage)
+      nino             <- getOptionalPageValue(answers, SubNationalInsuranceNumberPage, NationalInsuranceNumberYesNoPage)
+      workReference    <- getOptionalPageValue(answers, WorksReferenceNumberPage, WorksReferenceNumberYesNoPage)
     } yield ValidatedSubcontractor(
       tradingName,
       subcontractorName,
       address,
-      individualContactDetails,
+      individualContactMethodOptions,
       individualEmail,
       individualPhone,
       individualMobile,
@@ -80,28 +105,5 @@ object ValidatedSubcontractor extends Validation {
       case (None, Some(true))         => Right(None)
       case _                          => Left(InvalidAnswer(SubcontractorNamePage))
     }
-
-  private def getContactPageValue[A](
-    answers: UserAnswers,
-    questionPage: QuestionPage[A],
-    contactOptions: ContactOptions
-  )(implicit reads: Reads[A]): Either[ValidationError, Option[A]] = {
-    val expectedPage: Option[QuestionPage[_]] = contactOptions match {
-      case Email     => Some(IndividualEmailAddressPage)
-      case Phone     => Some(IndividualPhoneNumberPage)
-      case Mobile    => Some(IndividualMobileNumberPage)
-      case NoDetails => None
-    }
-
-    if (expectedPage.contains(questionPage)) {
-      answers.get(questionPage).toRight(MissingAnswer(questionPage)).map(Some(_))
-    } else if (expectedPage.isDefined) {
-      Right(None)
-    } else {
-      answers
-        .get(questionPage)
-        .fold(Right(None): Either[ValidationError, Option[A]])(_ => Left(InvalidAnswer(questionPage)))
-    }
-  }
 
 }

@@ -17,7 +17,7 @@
 package viewmodels.checkAnswers.add.trust
 
 import helpers.CyaEncodingSpecHelper
-import models.{CheckMode, UserAnswers}
+import models.{AmendMode, CheckMode, UserAnswers}
 import org.scalatest.OptionValues.convertOptionToValuable
 import org.scalatest.TryValues.convertTryToSuccessOrFailure
 import org.scalatest.freespec.AnyFreeSpec
@@ -55,6 +55,38 @@ class TrustPhoneNumberSummarySpec extends AnyFreeSpec with Matchers with CyaEnco
       val changeAction       = actions.head
       val expectedChangeText = messages("site.change")
       val expectedHref       = controllers.add.trust.routes.TrustPhoneNumberController.onPageLoad(CheckMode).url
+      val expectedHiddenText = messages("trustPhoneNumber.change.hidden")
+
+      changeAction.content.asHtml.toString should include(expectedChangeText)
+      changeAction.href                  shouldBe expectedHref
+
+      changeAction.visuallyHiddenText.value shouldBe expectedHiddenText
+    }
+
+    "must return a Summary List Row when the answer exists in AmendMode" in {
+      val answers =
+        UserAnswers("test-id")
+          .set(TrustPhoneNumberPage, "0987456231")
+          .success
+          .value
+
+      val maybeRow = TrustPhoneNumberSummary.row(answers, AmendMode)
+      maybeRow shouldBe defined
+
+      val row = maybeRow.value
+
+      val expectedKeyText = messages("trustPhoneNumber.checkYourAnswersLabel")
+      row.key.content.asHtml.toString should include(expectedKeyText)
+
+      row.value.content.asHtml.toString should include("0987456231")
+
+      row.actions shouldBe defined
+      val actions = row.actions.value.items
+      actions should have size 1
+
+      val changeAction       = actions.head
+      val expectedChangeText = messages("site.change")
+      val expectedHref       = controllers.add.trust.routes.TrustPhoneNumberController.onPageLoad(AmendMode).url
       val expectedHiddenText = messages("trustPhoneNumber.change.hidden")
 
       changeAction.content.asHtml.toString should include(expectedChangeText)

@@ -19,12 +19,12 @@ package controllers.add.company
 import base.SpecBase
 import controllers.routes
 import forms.add.company.CompanyEmailAddressFormProvider
-import models.contact.ContactOptions.Email
+import models.contact.ContactMethodOptions
 import models.{NormalMode, UserAnswers}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.add.company.{CompanyContactOptionsPage, CompanyEmailAddressPage, CompanyNamePage}
+import pages.add.company.{CompanyContactMethodOptionsPage, CompanyEmailAddressPage, CompanyNamePage}
 import play.api.data.Form
 import play.api.inject.bind
 import play.api.test.FakeRequest
@@ -50,20 +50,17 @@ class CompanyEmailAddressControllerSpec extends SpecBase with MockitoSugar {
       .success
       .value
 
-  private def uaWithNameAndEmailChoice: UserAnswers =
-    buildAnswersWithContactChoice(
-      emptyUserAnswers,
-      CompanyNamePage,
-      companyName,
-      CompanyContactOptionsPage,
-      Email
-    )
+  private def uaWithNameAndEmailOption: UserAnswers =
+    uaWithName
+      .set(CompanyContactMethodOptionsPage, Set(ContactMethodOptions.Email))
+      .success
+      .value
 
   "CompanyEmailAddressController" - {
 
     "must return OK and the correct view for a GET when Email is selected" in {
 
-      val application = applicationBuilder(userAnswers = Some(uaWithNameAndEmailChoice)).build()
+      val application = applicationBuilder(userAnswers = Some(uaWithNameAndEmailOption)).build()
 
       running(application) {
         val request = FakeRequest(GET, companyEmailAddressRoute)
@@ -83,7 +80,7 @@ class CompanyEmailAddressControllerSpec extends SpecBase with MockitoSugar {
     "must populate the view correctly on a GET when previously answered" in {
 
       val userAnswers =
-        uaWithNameAndEmailChoice
+        uaWithNameAndEmailOption
           .set(CompanyEmailAddressPage, "abc@test.com")
           .success
           .value
@@ -105,20 +102,6 @@ class CompanyEmailAddressControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must redirect to Journey Recovery when contact choice is missing" in {
-
-      val application = applicationBuilder(userAnswers = Some(uaWithName)).build()
-
-      running(application) {
-        val request = FakeRequest(GET, companyEmailAddressRoute)
-
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
-      }
-    }
-
     "must redirect to the CompanyUtrYesNo page when valid data is submitted" in {
 
       val mockSessionRepository = mock[SessionRepository]
@@ -126,7 +109,7 @@ class CompanyEmailAddressControllerSpec extends SpecBase with MockitoSugar {
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
       val application =
-        applicationBuilder(userAnswers = Some(uaWithName))
+        applicationBuilder(userAnswers = Some(uaWithNameAndEmailOption))
           .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
           .build()
 
@@ -146,7 +129,7 @@ class CompanyEmailAddressControllerSpec extends SpecBase with MockitoSugar {
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
-      val application = applicationBuilder(userAnswers = Some(uaWithName)).build()
+      val application = applicationBuilder(userAnswers = Some(uaWithNameAndEmailOption)).build()
 
       running(application) {
         val request =
@@ -197,7 +180,7 @@ class CompanyEmailAddressControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must redirect to Journey Recovery when company name is missing" in {
+    "must redirect to Journey Recovery for a GET when company name is missing" in {
 
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
@@ -225,6 +208,96 @@ class CompanyEmailAddressControllerSpec extends SpecBase with MockitoSugar {
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual
           controllers.routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must redirect to Journey Recovery for a GET when CompanyContactMethodOptions is missing" in {
+
+      val application = applicationBuilder(userAnswers = Some(uaWithName)).build()
+
+      running(application) {
+        val request = FakeRequest(GET, companyEmailAddressRoute)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must redirect to Journey Recovery for a GET when Email is not in CompanyContactMethodOptions" in {
+
+      val userAnswers =
+        uaWithName
+          .set(CompanyContactMethodOptionsPage, Set(ContactMethodOptions.Phone))
+          .success
+          .value
+
+      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
+
+      running(application) {
+        val request = FakeRequest(GET, companyEmailAddressRoute)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must redirect to Journey Recovery for a POST when CompanyContactMethodOptions is missing" in {
+
+      val mockSessionRepository = mock[SessionRepository]
+
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+      val application =
+        applicationBuilder(userAnswers = Some(uaWithName))
+          .overrides(
+            bind[SessionRepository].toInstance(mockSessionRepository)
+          )
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, companyEmailAddressRoute)
+            .withFormUrlEncodedBody(("value", "test@example.com"))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must redirect to Journey Recovery for a POST when Email is not in CompanyContactMethodOptions" in {
+
+      val userAnswers =
+        uaWithName
+          .set(CompanyContactMethodOptionsPage, Set(ContactMethodOptions.Phone))
+          .success
+          .value
+
+      val mockSessionRepository = mock[SessionRepository]
+
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+      val application =
+        applicationBuilder(userAnswers = Some(userAnswers))
+          .overrides(
+            bind[SessionRepository].toInstance(mockSessionRepository)
+          )
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, companyEmailAddressRoute)
+            .withFormUrlEncodedBody(("value", "test@example.com"))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
       }
     }
   }

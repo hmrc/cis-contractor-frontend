@@ -33,8 +33,8 @@ class CompanyCrnFormProvider @Inject() extends Mappings {
         .transform(s => normalised(s), identity)
         .verifying(
           firstError(
-            regexp(companyRegNumberRegex, "companyCrn.error.invalid"),
-            maxLength(Constants.MaxLength8, "companyCrn.error.length")
+            maxLength(Constants.MaxLength8, "companyCrn.error.length"),
+            regexp(companyRegNumberRegex, "companyCrn.error.invalid")
           )
         )
     )

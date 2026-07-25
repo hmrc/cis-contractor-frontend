@@ -18,7 +18,7 @@ package viewmodels.checkAnswers.add.company
 
 import helpers.CyaEncodingSpecHelper
 import controllers.add.company.routes
-import models.UserAnswers
+import models.{AmendMode, UserAnswers}
 import models.address.{Address, Country}
 import org.scalatest.OptionValues.convertOptionToValuable
 import org.scalatest.TryValues.convertTryToSuccessOrFailure
@@ -77,6 +77,53 @@ class CompanyAddressSummarySpec extends AnyWordSpec with Matchers with CyaEncodi
         routes.CompanyAddressController
           .redirectToAddressLookup(Some("change"))
           .url
+
+      action.visuallyHiddenText.value shouldBe
+        messages("companyAddress.change.hidden")
+
+      action.attributes should contain("id" -> "address-of-company")
+    }
+
+    "return a SummaryListRow when companyAddressPage has an answer in AmendMode" in {
+
+      val address = Address(
+        addressLine1 = "10 Downing Street",
+        addressLine2 = Some("Westminster"),
+        addressLine3 = Some("London"),
+        addressLine4 = Some("Greater London"),
+        postcode = Some("SW1A 2AA"),
+        country = Some(Country(Some("GB"), Some("United Kingdom")))
+      )
+
+      val userAnswers =
+        UserAnswers("id")
+          .set(CompanyAddressPage, address)
+          .success
+          .value
+
+      val result = CompanyAddressSummary.row(userAnswers, AmendMode)
+
+      result shouldBe defined
+
+      val row = result.value
+
+      row.key.content.asHtml.toString should include(
+        messages("companyAddress.checkYourAnswersLabel")
+      )
+
+      row.value.content shouldBe HtmlContent(
+        "10 Downing Street<br/>" +
+          "Westminster<br/>" +
+          "London<br/>" +
+          "Greater London<br/>" +
+          "SW1A 2AA<br/>" +
+          "United Kingdom"
+      )
+
+      val action = row.actions.value.items.head
+
+      action.href shouldBe
+        controllers.add.company.routes.CompanyAddressController.redirectToAmendAddressLookup().url
 
       action.visuallyHiddenText.value shouldBe
         messages("companyAddress.change.hidden")

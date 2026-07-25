@@ -21,19 +21,21 @@ import controllers.routes
 import models.UserAnswers
 import models.response.GetCurrentVerificationBatchResponse
 import models.{SubcontractorCurrentVerification, SubcontractorViewModel, VerificationBatchCurrentVerification, VerificationCurrentVerification}
-import models.verify.SelectedSubcontractors
+import models.verify.{ChrisVerificationRequestBuilder, SelectedSubcontractors}
 import org.mockito.ArgumentCaptor
-import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{never, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import pages.verify.{CurrentVerificationBatchResponsePage, SelectSubcontractorPage, SelectSubcontractorsToReverifyPage}
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import services.VerificationService
+import services.{CisManageService, VerificationService}
 import connectors.ConstructionIndustrySchemeConnector
+
 import scala.concurrent.Future
 import repositories.SessionRepository
+
 import scala.concurrent.ExecutionContext
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -63,7 +65,15 @@ class CreateVerificationBatchAndVerificationsControllerSpec extends SpecBase wit
           nino = None,
           crn = None,
           partnerUtr = None,
-          partnershipTradingName = None
+          partnershipTradingName = None,
+          subcontractorType = None,
+          addressLine1 = None,
+          addressLine2 = None,
+          addressLine3 = None,
+          addressLine4 = None,
+          country = None,
+          postcode = None,
+          worksReferenceNumber = None
         )
       ),
       verificationBatch = Some(
@@ -84,7 +94,7 @@ class CreateVerificationBatchAndVerificationsControllerSpec extends SpecBase wit
 
   "CreateVerificationBatchAndVerificationsController.onSubmit" - {
 
-    "must redirect to JourneyRecovery when CurrentVerificationBatchResponsePage is missing and not call service" in {
+    "must get current verification batch when CurrentVerificationBatchResponsePage is missing and redirect to JourneyRecovery when service fails" in {
       val mockService = mock[VerificationService]
 
       val ua =
@@ -92,6 +102,9 @@ class CreateVerificationBatchAndVerificationsControllerSpec extends SpecBase wit
           .set(SelectSubcontractorPage, Set(SubcontractorViewModel("10", "Name 10")))
           .success
           .value
+
+      when(mockService.getCurrentVerificationBatch(any[UserAnswers])(any()))
+        .thenReturn(Future.failed(new RuntimeException("current batch failed")))
 
       val app =
         applicationBuilder(userAnswers = Some(ua))
@@ -106,6 +119,8 @@ class CreateVerificationBatchAndVerificationsControllerSpec extends SpecBase wit
 
         status(result) mustBe SEE_OTHER
         redirectLocation(result).value mustBe routes.JourneyRecoveryController.onPageLoad().url
+
+        verify(mockService).getCurrentVerificationBatch(eqTo(ua))(any())
 
         verify(mockService, never())
           .createVerificationBatchAndVerifications(any[UserAnswers], any[Seq[Long]], any())(any())
@@ -178,7 +193,7 @@ class CreateVerificationBatchAndVerificationsControllerSpec extends SpecBase wit
       }
     }
 
-    "must call service with distinct combined ids when current batch is empty and then redirect to Index" in {
+    "must call service with distinct combined ids when current batch is empty and then redirect to CheckVerificationBatchReadiness" in {
       val mockService = mock[VerificationService]
 
       val ua =
@@ -222,7 +237,10 @@ class CreateVerificationBatchAndVerificationsControllerSpec extends SpecBase wit
         val result  = controller.onSubmit()(request)
 
         status(result) mustBe SEE_OTHER
-        redirectLocation(result).value mustBe routes.IndexController.onPageLoad().url
+        redirectLocation(result).value mustBe
+          controllers.verify.routes.CheckVerificationBatchReadinessController
+            .checkVerificationBatchReadiness()
+            .url
 
         val idsCaptor = ArgumentCaptor.forClass(classOf[Seq[Long]])
 
@@ -299,7 +317,10 @@ class CreateVerificationBatchAndVerificationsControllerSpec extends SpecBase wit
       val result  = controller.onSubmit()(request)
 
       status(result) mustBe SEE_OTHER
-      redirectLocation(result).value mustBe routes.IndexController.onPageLoad().url
+      redirectLocation(result).value mustBe
+        controllers.verify.routes.CheckVerificationBatchReadinessController
+          .checkVerificationBatchReadiness()
+          .url
 
       val idsCaptor = ArgumentCaptor.forClass(classOf[Seq[Long]])
       verify(mockService).createVerificationBatchAndVerifications(eqTo(ua), idsCaptor.capture(), eqTo(None))(any())
@@ -341,7 +362,10 @@ class CreateVerificationBatchAndVerificationsControllerSpec extends SpecBase wit
       val result  = controller.onSubmit()(request)
 
       status(result) mustBe SEE_OTHER
-      redirectLocation(result).value mustBe routes.IndexController.onPageLoad().url
+      redirectLocation(result).value mustBe
+        controllers.verify.routes.CheckVerificationBatchReadinessController
+          .checkVerificationBatchReadiness()
+          .url
 
       val idsCaptor = ArgumentCaptor.forClass(classOf[Seq[Long]])
       verify(mockService).createVerificationBatchAndVerifications(eqTo(ua), idsCaptor.capture(), eqTo(None))(any())
@@ -351,9 +375,11 @@ class CreateVerificationBatchAndVerificationsControllerSpec extends SpecBase wit
   }
 
   "must fail when CisIdQuery is missing (InstanceIdQuery not found in session data) and not call connector nor repo" in {
-    val mockConnector = mock[ConstructionIndustrySchemeConnector]
-    val mockRepo      = mock[SessionRepository]
-    val service       = new VerificationService(mockConnector, mockRepo)
+    val mockConnector        = mock[ConstructionIndustrySchemeConnector]
+    val mockCisManageService = mock[CisManageService]
+    val mockBuilder          = mock[ChrisVerificationRequestBuilder]
+    val mockRepo             = mock[SessionRepository]
+    val service              = new VerificationService(mockConnector, mockCisManageService, mockBuilder, mockRepo)
 
     val currentBatchResponse =
       GetCurrentVerificationBatchResponse(

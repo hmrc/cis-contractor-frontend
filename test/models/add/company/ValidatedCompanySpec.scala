@@ -14,27 +14,11 @@
  * limitations under the License.
  */
 
-/*
- * Copyright 2026 HM Revenue & Customs
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package models.add.company
 
 import base.SpecBase
 import models.address.Address
-import models.contact.ContactOptions
-import models.contact.ContactOptions.*
+import models.contact.ContactMethodOptions
 import models.{InvalidAnswer, MissingAnswer, TypeOfSubcontractor, UserAnswers}
 import models.RichJsObject
 import pages.QuestionPage
@@ -56,7 +40,7 @@ class ValidatedCompanySpec extends SpecBase with Matchers {
       .set(CompanyAddressYesNoPage, false)
       .success
       .value
-      .set(CompanyContactOptionsPage, ContactOptions.NoDetails)
+      .set(AddCompanyContactMethodsYesNoPage, false)
       .success
       .value
       .set(CompanyUtrYesNoPage, false)
@@ -81,7 +65,7 @@ class ValidatedCompanySpec extends SpecBase with Matchers {
 
   "ValidatedCompany.build" - {
 
-    "build successfully with minimum required answers (NoDetails + all optionals No)" in {
+    "build successfully with minimum required answers (all optionals No)" in {
       ValidatedCompany.build(minRequired) mustBe a[Right[?, ?]]
     }
 
@@ -107,10 +91,23 @@ class ValidatedCompanySpec extends SpecBase with Matchers {
 
     "contact option validation" - {
 
+      "require CompanyContactMethodOptions when AddCompanyContactMethodsYesNo is true" in {
+        val ua =
+          minRequired
+            .set(AddCompanyContactMethodsYesNoPage, true)
+            .success
+            .value
+
+        ValidatedCompany.build(ua) mustBe Left(InvalidAnswer(CompanyContactMethodOptionsPage))
+      }
+
       "require email address when contact option is Email" in {
         val ua =
           minRequired
-            .set(CompanyContactOptionsPage, ContactOptions.Email)
+            .set(AddCompanyContactMethodsYesNoPage, true)
+            .success
+            .value
+            .set(CompanyContactMethodOptionsPage, Set(ContactMethodOptions.Email))
             .success
             .value
 
@@ -120,7 +117,10 @@ class ValidatedCompanySpec extends SpecBase with Matchers {
       "build when contact option is Email and email address is present" in {
         val ua =
           minRequired
-            .set(CompanyContactOptionsPage, ContactOptions.Email)
+            .set(AddCompanyContactMethodsYesNoPage, true)
+            .success
+            .value
+            .set(CompanyContactMethodOptionsPage, Set(ContactMethodOptions.Email))
             .success
             .value
             .set(CompanyEmailAddressPage, "a@b.com")
@@ -133,7 +133,10 @@ class ValidatedCompanySpec extends SpecBase with Matchers {
       "require phone number when contact option is Phone" in {
         val ua =
           minRequired
-            .set(CompanyContactOptionsPage, ContactOptions.Phone)
+            .set(AddCompanyContactMethodsYesNoPage, true)
+            .success
+            .value
+            .set(CompanyContactMethodOptionsPage, Set(ContactMethodOptions.Phone))
             .success
             .value
 
@@ -143,7 +146,10 @@ class ValidatedCompanySpec extends SpecBase with Matchers {
       "build when contact option is Phone and phone number is present" in {
         val ua =
           minRequired
-            .set(CompanyContactOptionsPage, ContactOptions.Phone)
+            .set(AddCompanyContactMethodsYesNoPage, true)
+            .success
+            .value
+            .set(CompanyContactMethodOptionsPage, Set(ContactMethodOptions.Phone))
             .success
             .value
             .set(CompanyPhoneNumberPage, "02071234567")
@@ -156,7 +162,10 @@ class ValidatedCompanySpec extends SpecBase with Matchers {
       "require mobile number when contact option is Mobile" in {
         val ua =
           minRequired
-            .set(CompanyContactOptionsPage, ContactOptions.Mobile)
+            .set(AddCompanyContactMethodsYesNoPage, true)
+            .success
+            .value
+            .set(CompanyContactMethodOptionsPage, Set(ContactMethodOptions.Mobile))
             .success
             .value
 
@@ -166,7 +175,10 @@ class ValidatedCompanySpec extends SpecBase with Matchers {
       "build when contact option is Mobile and mobile number is present" in {
         val ua =
           minRequired
-            .set(CompanyContactOptionsPage, ContactOptions.Mobile)
+            .set(AddCompanyContactMethodsYesNoPage, true)
+            .success
+            .value
+            .set(CompanyContactMethodOptionsPage, Set(ContactMethodOptions.Mobile))
             .success
             .value
             .set(CompanyMobileNumberPage, "07123456789")
@@ -176,7 +188,58 @@ class ValidatedCompanySpec extends SpecBase with Matchers {
         ValidatedCompany.build(ua) mustBe a[Right[?, ?]]
       }
 
-      "fail when contact option is NoDetails but stale email exists" in {
+      "require email address when Email and Phone are selected in CompanyContactMethodOptions" in {
+        val ua =
+          minRequired
+            .set(AddCompanyContactMethodsYesNoPage, true)
+            .success
+            .value
+            .set(CompanyContactMethodOptionsPage, Set(ContactMethodOptions.Email, ContactMethodOptions.Phone))
+            .success
+            .value
+
+        ValidatedCompany.build(ua) mustBe Left(MissingAnswer(CompanyEmailAddressPage))
+      }
+
+      "require phone number when Phone and Mobile are selected in CompanyContactMethodOptions" in {
+        val ua =
+          minRequired
+            .set(AddCompanyContactMethodsYesNoPage, true)
+            .success
+            .value
+            .set(CompanyContactMethodOptionsPage, Set(ContactMethodOptions.Phone, ContactMethodOptions.Mobile))
+            .success
+            .value
+
+        ValidatedCompany.build(ua) mustBe Left(MissingAnswer(CompanyPhoneNumberPage))
+      }
+
+      "build when contact option are Email, Phone and Mobile and email address, phone number and mobile number are present" in {
+        val ua =
+          minRequired
+            .set(AddCompanyContactMethodsYesNoPage, true)
+            .success
+            .value
+            .set(
+              CompanyContactMethodOptionsPage,
+              Set(ContactMethodOptions.Email, ContactMethodOptions.Phone, ContactMethodOptions.Mobile)
+            )
+            .success
+            .value
+            .set(CompanyEmailAddressPage, "a@b.com")
+            .success
+            .value
+            .set(CompanyPhoneNumberPage, "123456789")
+            .success
+            .value
+            .set(CompanyMobileNumberPage, "987654321")
+            .success
+            .value
+
+        ValidatedCompany.build(ua) mustBe a[Right[?, ?]]
+      }
+
+      "fail when AddCompanyContactMethodsYesNo is false but stale email exists" in {
         val ua = withStaleValue(minRequired, CompanyEmailAddressPage, "stale@x.com")
         ValidatedCompany.build(ua) mustBe Left(InvalidAnswer(CompanyEmailAddressPage))
       }
@@ -264,6 +327,19 @@ class ValidatedCompanySpec extends SpecBase with Matchers {
         val ua = withStaleValue(minRequired, CompanyWorksReferencePage, "WRN-001")
         ValidatedCompany.build(ua) mustBe Left(InvalidAnswer(CompanyWorksReferencePage))
       }
+    }
+
+    "fail when AddCompanyContactMethodsYesNo is true but CompanyContactMethodOptions is empty" in {
+      val ua =
+        minRequired
+          .set(AddCompanyContactMethodsYesNoPage, true)
+          .success
+          .value
+          .set(CompanyContactMethodOptionsPage, Set.empty)
+          .success
+          .value
+
+      ValidatedCompany.build(ua) mustBe Left(InvalidAnswer(CompanyContactMethodOptionsPage))
     }
   }
 }

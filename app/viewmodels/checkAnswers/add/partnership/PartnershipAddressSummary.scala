@@ -16,7 +16,7 @@
 
 package viewmodels.checkAnswers.add.partnership
 
-import models.UserAnswers
+import models.{AmendMode, CheckMode, Mode, UserAnswers}
 import pages.add.partnership.PartnershipAddressPage
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
@@ -24,13 +24,16 @@ import viewmodels.checkAnswers.add.AddressSummaryRow
 
 object PartnershipAddressSummary {
 
-  def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
+  def row(answers: UserAnswers, mode: Mode = CheckMode)(implicit messages: Messages): Option[SummaryListRow] =
     answers.get(PartnershipAddressPage).map { answer =>
       AddressSummaryRow.row(
         address = answer,
         key = "partnershipAddress.checkYourAnswersLabel",
-        changeCall =
-          controllers.add.partnership.routes.PartnershipAddressController.redirectToAddressLookup(Some("change")),
+        changeCall = if (mode == AmendMode) {
+          controllers.add.partnership.routes.PartnershipAddressController.redirectToAmendAddressLookup()
+        } else {
+          controllers.add.partnership.routes.PartnershipAddressController.redirectToAddressLookup(Some("change"))
+        },
         hiddenTextKey = "partnershipAddress.change.hidden",
         id = "address-of-partnership"
       )

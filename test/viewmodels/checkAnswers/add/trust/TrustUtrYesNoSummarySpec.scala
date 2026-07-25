@@ -17,7 +17,7 @@
 package viewmodels.checkAnswers.add.trust
 
 import base.SpecBase
-import models.{CheckMode, UserAnswers}
+import models.{AmendMode, CheckMode, UserAnswers}
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import pages.add.trust.TrustUtrYesNoPage
 import play.api.i18n.{Lang, Messages, MessagesImpl}
@@ -50,6 +50,29 @@ class TrustUtrYesNoSummarySpec extends SpecBase with GuiceOneAppPerSuite {
       val action: ActionItem = actions.items.head
       action.href mustBe controllers.add.trust.routes.TrustUtrYesNoController
         .onPageLoad(CheckMode)
+        .url
+      action.content mustBe Text(messages("site.change"))
+      action.visuallyHiddenText mustBe Some(messages("trustUtrYesNo.change.hidden"))
+    }
+
+    "return a row with correct key, value = yes, and change action when the answer is true in AmendMode" in {
+      val ua: UserAnswers = emptyUserAnswers.set(TrustUtrYesNoPage, true).success.value
+
+      val maybeRow = TrustUtrYesNoSummary.row(ua, AmendMode)
+      maybeRow must not be empty
+
+      val row: SummaryListRow = maybeRow.value
+
+      row.key mustBe Key(content = Text(messages("trustUtrYesNo.checkYourAnswersLabel")))
+      row.value mustBe Value(content = Text(messages("site.yes")))
+
+      row.actions must not be empty
+      val actions: Actions = row.actions.value
+      actions.items must have size 1
+
+      val action: ActionItem = actions.items.head
+      action.href mustBe controllers.add.trust.routes.TrustUtrYesNoController
+        .onPageLoad(AmendMode)
         .url
       action.content mustBe Text(messages("site.change"))
       action.visuallyHiddenText mustBe Some(messages("trustUtrYesNo.change.hidden"))

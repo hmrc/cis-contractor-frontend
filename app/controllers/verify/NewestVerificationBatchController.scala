@@ -16,21 +16,25 @@
 
 package controllers.verify
 
+import controllers.AgentClientChecks
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
 import models.NormalMode
+import models.UserAnswers
 import models.verify.VerificationBatchStatus
 import pages.verify.NewestVerificationBatchResponsePage
 import pages.verify.UnverifiedSubcontractorsPage
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import repositories.SessionRepository
+import services.CisManageService
 import services.VerificationService
 import services.SubmissionStatusCheckResult
 import services.CheckLatestSubmissionStatusService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
 import javax.inject.Inject
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 import java.time.{Clock, LocalDateTime}
 
 class NewestVerificationBatchController @Inject() (
@@ -40,10 +44,13 @@ class NewestVerificationBatchController @Inject() (
   requireData: DataRequiredAction,
   val controllerComponents: MessagesControllerComponents,
   verificationBatchService: VerificationService,
-  clock: Clock
+  clock: Clock,
+  override protected val cisManageService: CisManageService,
+  override protected val sessionRepository: SessionRepository
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport
+    with AgentClientChecks
     with Logging {
 
   private sealed trait InactivityStatus
@@ -73,7 +80,7 @@ class NewestVerificationBatchController @Inject() (
               case Some(requestDate) =>
                 val sixMonthsLater = requestDate.plusMonths(InactivityStatus.SixMonths)
                 val now            = LocalDateTime.now(clock)
-                if (!now.isAfter(sixMonthsLater)) InactivityStatus.Inactive else InactivityStatus.Active
+                if (!now.isAfter(sixMonthsLater)) InactivityStatus.Active else InactivityStatus.Inactive
               case None              =>
                 InactivityStatus.MissingData
             }
@@ -107,22 +114,58 @@ class NewestVerificationBatchController @Inject() (
         Redirect(controllers.verify.routes.InactiveSchemeWarningController.onPageLoad())
 
       case InactivityStatus.Active =>
-        checkSubmissionStatus(response) match {
-          case SubmissionStatusCheckResult.ShowPendingVerificationWarning =>
-            Redirect(controllers.verify.routes.VerificationRequestInProgressController.onPageLoad())
+        routeFromSubmissionStatus(response, unverified)
+    }
 
-          case SubmissionStatusCheckResult.Continue if response.subcontractors.isEmpty =>
-            Redirect(controllers.verify.routes.NoSubcontractorsAddedController.onPageLoad())
+  private def routeFromSubmissionStatus(
+    response: models.response.GetNewestVerificationBatchResponse,
+    unverified: Seq[models.Subcontractor]
+  ): play.api.mvc.Result =
+    checkSubmissionStatus(response) match {
+      case SubmissionStatusCheckResult.ShowPendingVerificationWarning =>
+        Redirect(controllers.verify.routes.VerificationRequestInProgressController.onPageLoad())
 
-          case SubmissionStatusCheckResult.Continue if unverified.isEmpty =>
-            Redirect(controllers.verify.routes.VerifyYourSubcontractorsYesNoController.onPageLoad)
+      case SubmissionStatusCheckResult.Continue if response.subcontractors.isEmpty =>
+        Redirect(controllers.verify.routes.NoSubcontractorsAddedController.onPageLoad())
 
-          case SubmissionStatusCheckResult.Continue =>
-            Redirect(controllers.verify.routes.SelectSubcontractorController.onPageLoad(NormalMode))
-        }
+      case SubmissionStatusCheckResult.Continue if unverified.isEmpty =>
+        Redirect(controllers.verify.routes.VerifyYourSubcontractorsYesNoController.onPageLoad)
+
+      case SubmissionStatusCheckResult.Continue =>
+        Redirect(controllers.verify.routes.SelectSubcontractorController.onPageLoad(NormalMode))
     }
 
   def onPageLoad(): Action[AnyContent] =
+    (identify andThen getData).async { implicit request =>
+      val userAnswers = request.userAnswers.getOrElse(UserAnswers(request.userId))
+
+      withAgentClientChecks(request.userId, request.isAgent, userAnswers)
+        .flatMap {
+          case Left(redirect)        => Future.successful(redirect)
+          case Right(checkedAnswers) =>
+            verificationBatchService
+              .refreshNewestVerificationBatch(checkedAnswers)
+              .map { updatedAnswers =>
+
+                val batch      = updatedAnswers.get(NewestVerificationBatchResponsePage)
+                val unverified = updatedAnswers.get(UnverifiedSubcontractorsPage).getOrElse(Seq.empty)
+
+                batch match {
+                  case None           => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+                  case Some(response) => routeFromResponse(response, unverified)
+                }
+              }
+        }
+        .recover { case t =>
+          logger.error(
+            "[NewestVerificationBatchController.onPageLoad] Failed to refresh newest verification batch",
+            t
+          )
+          Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+        }
+    }
+
+  def onContinue: Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
       verificationBatchService
         .refreshNewestVerificationBatch(request.userAnswers)
@@ -138,7 +181,7 @@ class NewestVerificationBatchController @Inject() (
         }
         .recover { case t =>
           logger.error(
-            "[NewestVerificationBatchController.onPageLoad] Failed to refresh newest verification batch",
+            "[NewestVerificationBatchController.onContinue] Failed to refresh newest verification batch",
             t
           )
           Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())

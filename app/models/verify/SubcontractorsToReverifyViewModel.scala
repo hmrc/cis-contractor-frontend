@@ -30,7 +30,7 @@ object SubcontractorsToReverifyViewModel extends Enumeration {
     rows.zipWithIndex.map { case (row, index) =>
       CheckboxItemViewModel(
         content = Text(row.name),
-        fieldId = s"value-$index",
+        fieldId = s"value_$index",
         index = index,
         value = row.id
       )

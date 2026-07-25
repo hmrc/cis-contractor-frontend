@@ -39,7 +39,15 @@ class GetCurrentVerificationBatchResponseSpec extends AnyWordSpec with Matchers 
             nino = Some("AA123456A"),
             crn = Some("AC012345"),
             partnerUtr = Some("5860920998"),
-            partnershipTradingName = Some("ACME trading")
+            partnershipTradingName = Some("ACME trading"),
+            subcontractorType = Some("soletrader"),
+            addressLine1 = Some("1 Test Street"),
+            addressLine2 = None,
+            addressLine3 = None,
+            addressLine4 = None,
+            country = Some("GB"),
+            postcode = Some("AA1 1AA"),
+            worksReferenceNumber = Some("WRN123")
           )
         ),
         verificationBatch = Some(

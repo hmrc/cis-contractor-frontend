@@ -84,7 +84,7 @@ class AddCompanyContactMethodsYesNoControllerSpec extends SpecBase with MockitoS
       }
     }
 
-    "must redirect to the AddCompanyContactMethodsYesNo page when valid data with value Yes is submitted" in {
+    "must redirect to the CompanyContactMethodOptions page when valid data with value Yes is submitted" in {
 
       val mockSessionRepository = mock[SessionRepository]
 
@@ -105,7 +105,7 @@ class AddCompanyContactMethodsYesNoControllerSpec extends SpecBase with MockitoS
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.add.company.routes.AddCompanyContactMethodsYesNoController
+        redirectLocation(result).value mustEqual controllers.add.company.routes.CompanyContactMethodOptionsController
           .onPageLoad(NormalMode)
           .url
       }

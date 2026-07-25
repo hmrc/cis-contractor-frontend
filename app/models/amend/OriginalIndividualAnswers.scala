@@ -18,7 +18,7 @@ package models.amend
 
 import models.add.SubcontractorName
 import models.address.Address
-import models.contact.ContactOptions
+import models.add.IndividualContactMethodOptions
 import play.api.libs.json.{Json, OFormat}
 
 case class OriginalIndividualAnswers(
@@ -27,8 +27,10 @@ case class OriginalIndividualAnswers(
   subcontractorName: Option[SubcontractorName],
   addressYesNo: Option[Boolean],
   address: Option[Address],
-  contactMethod: Option[ContactOptions],
-  contactValue: Option[String],
+  individualContactMethod: Option[Set[IndividualContactMethodOptions]],
+  email: Option[String],
+  phone: Option[String],
+  mobile: Option[String],
   utrYesNo: Option[Boolean],
   utr: Option[String],
   ninoYesNo: Option[Boolean],

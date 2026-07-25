@@ -17,10 +17,8 @@
 package models.add.company
 
 import models.address.Address
-import models.contact.ContactOptions
-import models.contact.ContactOptions.*
-import models.{InvalidAnswer, MissingAnswer, TypeOfSubcontractor, UserAnswers, Validation, ValidationError}
-import pages.QuestionPage
+import models.contact.ContactMethodOptions
+import models.{InvalidAnswer, TypeOfSubcontractor, UserAnswers, Validation, ValidationError}
 import pages.add.TypeOfSubcontractorPage
 import pages.add.company.*
 import play.api.libs.json.Reads
@@ -28,7 +26,7 @@ import play.api.libs.json.Reads
 final case class ValidatedCompany(
   companyName: String,
   companyAddress: Option[Address],
-  companyContactDetails: ContactOptions,
+  companyContactMethodOptions: Option[Set[CompanyContactMethodOptions]],
   companyEmail: Option[String],
   companyPhone: Option[String],
   companyMobile: Option[String],
@@ -41,14 +39,27 @@ object ValidatedCompany extends Validation {
 
   def build(answers: UserAnswers): Either[ValidationError, ValidatedCompany] =
     for {
-      _                    <- validateType(answers)
-      companyName          <- getPageValue(answers, CompanyNamePage)
-      companyAddress       <- getOptionalPageValue(answers, CompanyAddressPage, CompanyAddressYesNoPage)
-      companyContactChoice <- getPageValue(answers, CompanyContactOptionsPage)
+      _                           <- validateType(answers)
+      companyName                 <- getPageValue(answers, CompanyNamePage)
+      companyAddress              <- getOptionalPageValue(answers, CompanyAddressPage, CompanyAddressYesNoPage)
+      companyContactMethodOptions <-
+        getOptionalPageValue(answers, CompanyContactMethodOptionsPage, AddCompanyContactMethodsYesNoPage).flatMap {
+          case Some(methods) if methods.nonEmpty =>
+            Right(Some(methods))
 
-      companyEmail  <- getContactPageValue(answers, CompanyEmailAddressPage, companyContactChoice)
-      companyPhone  <- getContactPageValue(answers, CompanyPhoneNumberPage, companyContactChoice)
-      companyMobile <- getContactPageValue(answers, CompanyMobileNumberPage, companyContactChoice)
+          case Some(_) =>
+            Left(InvalidAnswer(CompanyContactMethodOptionsPage))
+
+          case None =>
+            Right(None)
+        }
+
+      companyEmail  <-
+        getContactPageValue(answers, companyContactMethodOptions, CompanyEmailAddressPage, ContactMethodOptions.Email)
+      companyPhone  <-
+        getContactPageValue(answers, companyContactMethodOptions, CompanyPhoneNumberPage, ContactMethodOptions.Phone)
+      companyMobile <-
+        getContactPageValue(answers, companyContactMethodOptions, CompanyMobileNumberPage, ContactMethodOptions.Mobile)
 
       companyUtr <- getOptionalPageValue(answers, CompanyUtrPage, CompanyUtrYesNoPage)
       companyCrn <- getOptionalPageValue(answers, CompanyCrnPage, CompanyCrnYesNoPage)
@@ -59,7 +70,7 @@ object ValidatedCompany extends Validation {
     } yield ValidatedCompany(
       companyName = companyName,
       companyAddress = companyAddress,
-      companyContactDetails = companyContactChoice,
+      companyContactMethodOptions = companyContactMethodOptions,
       companyEmail = companyEmail,
       companyPhone = companyPhone,
       companyMobile = companyMobile,
@@ -73,29 +84,4 @@ object ValidatedCompany extends Validation {
       case TypeOfSubcontractor.Limitedcompany => Right(())
       case _                                  => Left(InvalidAnswer(TypeOfSubcontractorPage))
     }
-
-  private def getContactPageValue[A](
-    answers: UserAnswers,
-    questionPage: QuestionPage[A],
-    contactOptions: ContactOptions
-  )(implicit reads: Reads[A]): Either[ValidationError, Option[A]] = {
-
-    val expectedPage: Option[QuestionPage[_]] = contactOptions match {
-      case Email     => Some(CompanyEmailAddressPage)
-      case Phone     => Some(CompanyPhoneNumberPage)
-      case Mobile    => Some(CompanyMobileNumberPage)
-      case NoDetails => None
-    }
-
-    if (expectedPage.contains(questionPage)) {
-      answers.get(questionPage).toRight(MissingAnswer(questionPage)).map(Some(_))
-    } else if (expectedPage.isDefined) {
-
-      Right(None)
-    } else {
-      answers
-        .get(questionPage)
-        .fold(Right(None): Either[ValidationError, Option[A]])(_ => Left(InvalidAnswer(questionPage)))
-    }
-  }
 }

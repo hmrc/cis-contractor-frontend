@@ -19,18 +19,15 @@ package base
 import config.FrontendAppConfig
 import controllers.actions.*
 import models.UserAnswers
-import models.contact.ContactOptions
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.{OptionValues, TryValues}
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
-import pages.QuestionPage
 import play.api.Application
 import play.api.i18n.{Messages, MessagesApi}
 import play.api.inject.{Binding, bind}
 import play.api.inject.guice.GuiceApplicationBuilder
-import play.api.libs.json.Writes
 import play.api.mvc.PlayBodyParsers
 import play.api.test.FakeRequest
 import play.api.test.Helpers.stubControllerComponents
@@ -75,19 +72,4 @@ trait SpecBase
           bind[DataRetrievalAction].toInstance(new FakeDataRetrievalAction(userAnswers))
         ) ++ additionalBindings
       )
-
-  def buildAnswersWithContactChoice[A: Writes](
-    base: UserAnswers,
-    namePage: QuestionPage[A],
-    nameValue: A,
-    contactPage: QuestionPage[ContactOptions],
-    contactValue: ContactOptions
-  ): UserAnswers =
-    base
-      .set(namePage, nameValue)
-      .success
-      .value
-      .set(contactPage, contactValue)
-      .success
-      .value
 }

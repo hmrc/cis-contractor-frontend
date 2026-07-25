@@ -43,48 +43,38 @@ class ModifyVerificationBatchAndVerificationsControllerSpec extends SpecBase wit
 
   private val instanceId = "INST-123"
 
+  private def currentSubcontractor(
+    id: Long,
+    ref: Option[Long]
+  ): SubcontractorCurrentVerification =
+    SubcontractorCurrentVerification(
+      subcontractorId = id,
+      subbieResourceRef = ref,
+      firstName = None,
+      secondName = None,
+      surname = None,
+      tradingName = None,
+      utr = None,
+      nino = None,
+      crn = None,
+      partnerUtr = None,
+      partnershipTradingName = None,
+      subcontractorType = None,
+      addressLine1 = None,
+      addressLine2 = None,
+      addressLine3 = None,
+      addressLine4 = None,
+      country = None,
+      postcode = None,
+      worksReferenceNumber = None
+    )
+
   private val currentBatch: GetCurrentVerificationBatchResponse =
     GetCurrentVerificationBatchResponse(
       subcontractors = Seq(
-        SubcontractorCurrentVerification(
-          subcontractorId = 10L,
-          subbieResourceRef = Some(1111L),
-          firstName = None,
-          secondName = None,
-          surname = None,
-          tradingName = None,
-          utr = None,
-          nino = None,
-          crn = None,
-          partnerUtr = None,
-          partnershipTradingName = None
-        ),
-        SubcontractorCurrentVerification(
-          subcontractorId = 20L,
-          subbieResourceRef = Some(2222L),
-          firstName = None,
-          secondName = None,
-          surname = None,
-          tradingName = None,
-          utr = None,
-          nino = None,
-          crn = None,
-          partnerUtr = None,
-          partnershipTradingName = None
-        ),
-        SubcontractorCurrentVerification(
-          subcontractorId = 30L,
-          subbieResourceRef = Some(3333L),
-          firstName = None,
-          secondName = None,
-          surname = None,
-          tradingName = None,
-          utr = None,
-          nino = None,
-          crn = None,
-          partnerUtr = None,
-          partnershipTradingName = None
-        )
+        currentSubcontractor(10L, Some(1111L)),
+        currentSubcontractor(20L, Some(2222L)),
+        currentSubcontractor(30L, Some(3333L))
       ),
       verificationBatch = Some(
         VerificationBatchCurrentVerification(
@@ -110,7 +100,7 @@ class ModifyVerificationBatchAndVerificationsControllerSpec extends SpecBase wit
 
   "ModifyVerificationBatchAndVerificationsController.modifyVerificationBatch" - {
 
-    "must call service with correct ModifyVerificationsRequest (create + delete) and redirect to Index" in {
+    "must call service with correct ModifyVerificationsRequest (create + delete) and redirect to readiness check before declaration" in {
       val mockService = mock[VerificationService]
 
       // selected: 10, 20 => refs 1111,2222
@@ -152,7 +142,10 @@ class ModifyVerificationBatchAndVerificationsControllerSpec extends SpecBase wit
         val result     = controller.modifyVerificationBatch()(FakeRequest(POST, "/test-only"))
 
         status(result) mustBe SEE_OTHER
-        redirectLocation(result).value mustBe routes.IndexController.onPageLoad().url
+        redirectLocation(result).value mustBe
+          controllers.verify.routes.CheckVerificationBatchReadinessController
+            .checkVerificationBatchReadinessBeforeDeclaration()
+            .url
 
         val reqCaptor = ArgumentCaptor.forClass(classOf[ModifyVerificationsRequest])
         verify(mockService).modifyVerificationBatchAndVerifications(eqTo(ua), reqCaptor.capture())(any())
@@ -166,7 +159,7 @@ class ModifyVerificationBatchAndVerificationsControllerSpec extends SpecBase wit
       }
     }
 
-    "must not call service when no changes required and redirect to Index" in {
+    "must not call service when no changes required and redirect to readiness check before declaration" in {
       val mockService = mock[VerificationService]
 
       // selected: 10,30 => refs 1111,3333
@@ -199,7 +192,10 @@ class ModifyVerificationBatchAndVerificationsControllerSpec extends SpecBase wit
         val result     = controller.modifyVerificationBatch()(FakeRequest(POST, "/test-only"))
 
         status(result) mustBe SEE_OTHER
-        redirectLocation(result).value mustBe routes.IndexController.onPageLoad().url
+        redirectLocation(result).value mustBe
+          controllers.verify.routes.CheckVerificationBatchReadinessController
+            .checkVerificationBatchReadinessBeforeDeclaration()
+            .url
 
         verify(mockService, never()).modifyVerificationBatchAndVerifications(any(), any())(any())
       }
@@ -394,7 +390,10 @@ class ModifyVerificationBatchAndVerificationsControllerSpec extends SpecBase wit
         val result     = controller.modifyVerificationBatch()(FakeRequest(POST, "/test-only"))
 
         status(result) mustBe SEE_OTHER
-        redirectLocation(result).value mustBe routes.IndexController.onPageLoad().url
+        redirectLocation(result).value mustBe
+          controllers.verify.routes.CheckVerificationBatchReadinessController
+            .checkVerificationBatchReadinessBeforeDeclaration()
+            .url
 
         val reqCaptor = ArgumentCaptor.forClass(classOf[ModifyVerificationsRequest])
         verify(mockService).modifyVerificationBatchAndVerifications(eqTo(ua), reqCaptor.capture())(any())

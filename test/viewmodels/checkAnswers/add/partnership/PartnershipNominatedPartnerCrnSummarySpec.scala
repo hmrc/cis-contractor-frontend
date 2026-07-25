@@ -18,7 +18,7 @@ package viewmodels.checkAnswers.add.partnership
 
 import controllers.add.partnership.routes
 import helpers.CyaEncodingSpecHelper
-import models.{CheckMode, UserAnswers}
+import models.{AmendMode, CheckMode, UserAnswers}
 import org.scalatest.OptionValues
 import org.scalatest.TryValues.convertTryToSuccessOrFailure
 import org.scalatest.freespec.AnyFreeSpec
@@ -59,6 +59,38 @@ class PartnershipNominatedPartnerCrnSummarySpec
       action.href shouldBe
         routes.PartnershipNominatedPartnerCrnController
           .onPageLoad(CheckMode)
+          .url
+
+      action.content.asHtml.toString should include(messages("site.change"))
+
+      action.visuallyHiddenText.value shouldBe
+        messages("partnershipNominatedPartnerCrn.change.hidden")
+
+      action.attributes should contain("id" -> "nominated-partner-crn")
+    }
+
+    "must return a SummaryListRow when the answer exists for Amend journey" in {
+
+      val ua =
+        UserAnswers("test-id")
+          .set(PartnershipNominatedPartnerCrnPage, "AC012345")
+          .success
+          .value
+
+      val row = PartnershipNominatedPartnerCrnSummary.row(ua, AmendMode).value
+
+      row.key.content.asHtml.toString should include(
+        messages("partnershipNominatedPartnerCrn.checkYourAnswersLabel")
+      )
+
+      row.value.content.asHtml.toString should include("AC012345")
+
+      row.actions.value.items should have size 1
+      val action = row.actions.value.items.head
+
+      action.href shouldBe
+        routes.PartnershipNominatedPartnerCrnController
+          .onPageLoad(AmendMode)
           .url
 
       action.content.asHtml.toString should include(messages("site.change"))

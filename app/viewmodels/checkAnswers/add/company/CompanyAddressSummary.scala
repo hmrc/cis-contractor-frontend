@@ -16,7 +16,7 @@
 
 package viewmodels.checkAnswers.add.company
 
-import models.UserAnswers
+import models.{AmendMode, CheckMode, Mode, UserAnswers}
 import pages.add.company.CompanyAddressPage
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
@@ -24,12 +24,16 @@ import viewmodels.checkAnswers.add.AddressSummaryRow
 
 object CompanyAddressSummary {
 
-  def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
+  def row(answers: UserAnswers, mode: Mode = CheckMode)(implicit messages: Messages): Option[SummaryListRow] =
     answers.get(CompanyAddressPage).map { answer =>
       AddressSummaryRow.row(
         address = answer,
         key = "companyAddress.checkYourAnswersLabel",
-        changeCall = controllers.add.company.routes.CompanyAddressController.redirectToAddressLookup(Some("change")),
+        changeCall = if (mode == AmendMode) {
+          controllers.add.company.routes.CompanyAddressController.redirectToAmendAddressLookup()
+        } else {
+          controllers.add.company.routes.CompanyAddressController.redirectToAddressLookup(Some("change"))
+        },
         hiddenTextKey = "companyAddress.change.hidden",
         id = "address-of-company"
       )

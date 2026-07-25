@@ -16,7 +16,7 @@
 
 package models.requests
 
-import play.api.libs.json.{Json, OFormat}
+import play.api.libs.json.{Json, OFormat, OWrites}
 
 case class VerificationToUpdate(
   subcontractorName: String,
@@ -32,12 +32,34 @@ case class CreateSubmissionForVerificationRequest(
   instanceId: String,
   verificationBatchId: Long,
   verificationBatchResourceRef: Long,
-  emailRecipient: String,
+  emailRecipient: Option[String],
   irMarkGenerated: Option[String] = None,
   verifications: Seq[VerificationToUpdate],
   agentId: Option[String] = None
 )
 
 object CreateSubmissionForVerificationRequest {
-  given OFormat[CreateSubmissionForVerificationRequest] = Json.format[CreateSubmissionForVerificationRequest]
+
+  given OFormat[CreateSubmissionForVerificationRequest] = OFormat(
+    Json.reads[CreateSubmissionForVerificationRequest],
+    OWrites[CreateSubmissionForVerificationRequest] { request =>
+
+      val baseJson = Json.obj(
+        "instanceId"                   -> request.instanceId,
+        "verificationBatchId"          -> request.verificationBatchId,
+        "verificationBatchResourceRef" -> request.verificationBatchResourceRef,
+        "emailRecipient"               -> request.emailRecipient.getOrElse(""),
+        "verifications"                -> request.verifications
+      )
+
+      val withIrMark =
+        request.irMarkGenerated.fold(baseJson) { irMark =>
+          baseJson + ("irMarkGenerated" -> Json.toJson(irMark))
+        }
+
+      request.agentId.fold(withIrMark) { agentId =>
+        withIrMark + ("agentId" -> Json.toJson(agentId))
+      }
+    }
+  )
 }

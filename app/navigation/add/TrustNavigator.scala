@@ -17,10 +17,10 @@
 package navigation.add
 
 import controllers.routes
-import models.contact.ContactOptions.{Email, Mobile, NoDetails, Phone}
+import models.contact.ContactMethodOptions
 import models.{AmendMode, CheckMode, Mode, NormalMode, UserAnswers}
 import navigation.NavigatorForJourney
-import pages.Page
+import pages.{Page, QuestionPage}
 import pages.add.trust.*
 import play.api.mvc.Call
 
@@ -35,127 +35,119 @@ class TrustNavigator @Inject() () extends NavigatorForJourney {
     case CheckMode  =>
       checkRouteMap(page)(userAnswers)
     case AmendMode  =>
-      routes.JourneyRecoveryController.onPageLoad()
+      amendRouteMap(page)(userAnswers)
+  }
+
+  private def cyaRoute(mode: Mode): Call = mode match {
+    case AmendMode =>
+      routes.JourneyRecoveryController.onPageLoad() // TODO route to Amend Trust CYA page when it's implemented
+    case _         => controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
   }
 
   private val normalRoutes: Page => UserAnswers => Call = {
 
     case TrustNamePage                   => _ => controllers.add.trust.routes.TrustAddressYesNoController.onPageLoad(NormalMode)
-    case TrustEmailAddressPage           => _ => controllers.add.trust.routes.TrustUtrYesNoController.onPageLoad(NormalMode)
     case TrustAddressYesNoPage           => userAnswers => navigatorFromTrustAddressYesNoPage(NormalMode)(userAnswers)
-    case TrustAddressPage                => _ => controllers.add.trust.routes.TrustContactOptionsController.onPageLoad(NormalMode)
+    case AddTrustContactMethodsYesNoPage =>
+      userAnswers => navigatorFromAddTrustContactMethodsYesNoPage(NormalMode)(userAnswers)
+    case TrustContactMethodOptionsPage   =>
+      userAnswers => nextSelectedContactMethodPageAfter(current = None)(userAnswers)
+    case TrustEmailAddressPage           =>
+      userAnswers => nextSelectedContactMethodPageAfter(current = Some(ContactMethodOptions.Email))(userAnswers)
+    case TrustPhoneNumberPage            =>
+      userAnswers => nextSelectedContactMethodPageAfter(current = Some(ContactMethodOptions.Phone))(userAnswers)
+    case TrustMobileNumberPage           =>
+      userAnswers => nextSelectedContactMethodPageAfter(current = Some(ContactMethodOptions.Mobile))(userAnswers)
     case TrustUtrYesNoPage               => userAnswers => navigatorFromTrustUtrYesNoPage(NormalMode)(userAnswers)
     case TrustUtrPage                    => _ => controllers.add.trust.routes.TrustWorksReferenceYesNoController.onPageLoad(NormalMode)
-    case TrustPhoneNumberPage            => _ => controllers.add.trust.routes.TrustUtrYesNoController.onPageLoad(NormalMode)
-    case TrustMobileNumberPage           => _ => controllers.add.trust.routes.TrustUtrYesNoController.onPageLoad(NormalMode)
-    case TrustContactOptionsPage         => userAnswers => navigatorFromTrustContactOptionsPage(NormalMode)(userAnswers)
     case TrustWorksReferenceYesNoPage    =>
       userAnswers => navigatorFromTrustWorksReferenceYesNoPage(NormalMode)(userAnswers)
     case TrustWorksReferencePage         => _ => controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
-    case AddTrustContactMethodsYesNoPage =>
-      userAnswers => navigatorFromAddTrustContactMethodsYesNoPage(NormalMode)(userAnswers)
     case _                               => _ => routes.IndexController.onPageLoad()
   }
 
   private val checkRouteMap: Page => UserAnswers => Call = {
 
     case TrustNamePage                   => _ => controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
-    case TrustEmailAddressPage           => _ => controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
     case TrustAddressYesNoPage           => navigatorFromTrustAddressYesNoPage(CheckMode)(_)
-    case TrustAddressPage                => _ => controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
+    case AddTrustContactMethodsYesNoPage => navigatorFromAddTrustContactMethodsYesNoPage(CheckMode)(_)
+    case TrustContactMethodOptionsPage   => nextMissingSelectedContactMethodPageAfter(current = None)(_)
+    case TrustEmailAddressPage           =>
+      nextMissingSelectedContactMethodPageAfter(current = Some(ContactMethodOptions.Email))(_)
+    case TrustPhoneNumberPage            =>
+      nextMissingSelectedContactMethodPageAfter(current = Some(ContactMethodOptions.Phone))(_)
+    case TrustMobileNumberPage           =>
+      nextMissingSelectedContactMethodPageAfter(current = Some(ContactMethodOptions.Mobile))(_)
     case TrustUtrYesNoPage               => navigatorFromTrustUtrYesNoPage(CheckMode)(_)
     case TrustUtrPage                    => _ => controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
-    case TrustPhoneNumberPage            => _ => controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
-    case TrustMobileNumberPage           => _ => controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
-    case TrustContactOptionsPage         => navigatorFromTrustContactOptionsPage(CheckMode)(_)
     case TrustWorksReferenceYesNoPage    => navigatorFromTrustWorksReferenceYesNoPage(CheckMode)(_)
     case TrustWorksReferencePage         => _ => controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
-    case AddTrustContactMethodsYesNoPage => navigatorFromAddTrustContactMethodsYesNoPage(CheckMode)(_)
     case _                               => _ => controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
+  }
+
+  private val amendRouteMap: Page => UserAnswers => Call = {
+    case TrustAddressYesNoPage           => navigatorFromTrustAddressYesNoPage(AmendMode)(_)
+    case AddTrustContactMethodsYesNoPage => navigatorFromAddTrustContactMethodsYesNoPage(AmendMode)(_)
+    case TrustWorksReferenceYesNoPage    => navigatorFromTrustWorksReferenceYesNoPage(AmendMode)(_)
+    case TrustUtrYesNoPage               => navigatorFromTrustUtrYesNoPage(AmendMode)(_)
+    case _                               => _ => cyaRoute(AmendMode)
   }
 
   private def navigatorFromTrustUtrYesNoPage(mode: Mode)(ua: UserAnswers): Call =
     (ua.get(TrustUtrYesNoPage), mode) match {
-      case (Some(true), NormalMode)  => controllers.add.trust.routes.TrustUtrController.onPageLoad(mode)
-      case (Some(false), NormalMode) =>
+      case (Some(true), NormalMode)            => controllers.add.trust.routes.TrustUtrController.onPageLoad(mode)
+      case (Some(false), NormalMode)           =>
         controllers.add.trust.routes.TrustWorksReferenceYesNoController.onPageLoad(NormalMode)
-      case (Some(true), CheckMode)   =>
+      case (Some(true), CheckMode | AmendMode) =>
         ua.get(TrustUtrPage)
-          .fold(controllers.add.trust.routes.TrustUtrController.onPageLoad(CheckMode)) { _ =>
-            controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
+          .fold(controllers.add.trust.routes.TrustUtrController.onPageLoad(mode)) { _ =>
+            cyaRoute(mode)
           }
-      case (Some(false), CheckMode)  =>
-        controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
-
-      case _ =>
+      case (Some(false), CheckMode)            =>
+        cyaRoute(mode)
+      case _                                   =>
         routes.JourneyRecoveryController.onPageLoad()
     }
 
   private def navigatorFromTrustAddressYesNoPage(mode: Mode)(ua: UserAnswers): Call =
-    addressLookupYesNoRoute(
-      mode,
-      ua.get(TrustAddressYesNoPage),
-      ua.get(TrustAddressPage).isDefined,
-      onYes = controllers.add.trust.routes.TrustAddressController.redirectToAddressLookup(),
-      onYesChange =
-        controllers.add.trust.routes.TrustAddressController.redirectToAddressLookup(Some(CheckMode.toString)),
-      onNo = controllers.add.trust.routes.TrustContactOptionsController.onPageLoad(NormalMode),
-      checkYourAnswers = controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
-    )
+    mode match {
+      case AmendMode =>
+        ua.get(TrustAddressYesNoPage) match {
+          case Some(true)  =>
+            controllers.add.trust.routes.TrustAddressController.redirectToAmendAddressLookup()
+          case Some(false) =>
+            controllers.routes.JourneyRecoveryController.onPageLoad() // TODO redirect to amend CYA page
+          case None        =>
+            controllers.routes.JourneyRecoveryController.onPageLoad()
+        }
+      case _         =>
+        addressLookupYesNoRoute(
+          mode,
+          ua.get(TrustAddressYesNoPage),
+          ua.get(TrustAddressPage).isDefined,
+          onYes = controllers.add.trust.routes.TrustAddressController.redirectToAddressLookup(),
+          onYesChange =
+            controllers.add.trust.routes.TrustAddressController.redirectToAddressLookup(Some(CheckMode.toString)),
+          onNo = controllers.add.trust.routes.AddTrustContactMethodsYesNoController.onPageLoad(NormalMode),
+          checkYourAnswers = controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
+        )
+    }
 
   private def navigatorFromTrustWorksReferenceYesNoPage(mode: Mode)(ua: UserAnswers): Call =
     (ua.get(TrustWorksReferenceYesNoPage), mode) match {
-      case (Some(true), NormalMode)  =>
+      case (Some(true), NormalMode)             =>
         controllers.add.trust.routes.TrustWorksReferenceController.onPageLoad(NormalMode)
-      case (Some(false), NormalMode) =>
+      case (Some(false), NormalMode)            =>
         controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
-      case (Some(true), CheckMode)   =>
+      case (Some(true), CheckMode | AmendMode)  =>
         ua.get(TrustWorksReferencePage)
-          .fold(controllers.add.trust.routes.TrustWorksReferenceController.onPageLoad(CheckMode)) { _ =>
-            controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
+          .fold(controllers.add.trust.routes.TrustWorksReferenceController.onPageLoad(mode)) { _ =>
+            cyaRoute(mode)
           }
-      case (Some(false), CheckMode)  =>
-        controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
-      case _                         =>
+      case (Some(false), CheckMode | AmendMode) =>
+        cyaRoute(mode)
+      case _                                    =>
         routes.JourneyRecoveryController.onPageLoad()
-    }
-
-  private def navigatorFromTrustContactOptionsPage(mode: Mode)(userAnswers: UserAnswers): Call =
-    (userAnswers.get(TrustContactOptionsPage), mode) match {
-      case (Some(Email), NormalMode) =>
-        controllers.add.trust.routes.TrustEmailAddressController.onPageLoad(NormalMode)
-      case (Some(Email), CheckMode)  =>
-        userAnswers
-          .get(TrustEmailAddressPage)
-          .fold(controllers.add.trust.routes.TrustEmailAddressController.onPageLoad(CheckMode)) { _ =>
-            controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
-          }
-
-      case (Some(Phone), NormalMode) =>
-        controllers.add.trust.routes.TrustPhoneNumberController.onPageLoad(NormalMode)
-      case (Some(Phone), CheckMode)  =>
-        userAnswers
-          .get(TrustPhoneNumberPage)
-          .fold(controllers.add.trust.routes.TrustPhoneNumberController.onPageLoad(CheckMode)) { _ =>
-            controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
-          }
-
-      case (Some(Mobile), NormalMode) =>
-        controllers.add.trust.routes.TrustMobileNumberController.onPageLoad(NormalMode)
-      case (Some(Mobile), CheckMode)  =>
-        userAnswers
-          .get(TrustMobileNumberPage)
-          .fold(controllers.add.trust.routes.TrustMobileNumberController.onPageLoad(CheckMode)) { _ =>
-            controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
-          }
-
-      case (Some(NoDetails), CheckMode) =>
-        controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
-
-      case (Some(_), _) =>
-        controllers.add.trust.routes.TrustUtrYesNoController.onPageLoad(mode)
-
-      case _ => controllers.routes.JourneyRecoveryController.onPageLoad()
     }
 
   private def navigatorFromAddTrustContactMethodsYesNoPage(mode: Mode)(ua: UserAnswers): Call =
@@ -167,17 +159,89 @@ class TrustNavigator @Inject() () extends NavigatorForJourney {
       case (Some(false), NormalMode) =>
         controllers.add.trust.routes.TrustUtrYesNoController.onPageLoad(NormalMode)
 
-      case (Some(true), CheckMode) =>
+      case (Some(true), CheckMode | AmendMode) =>
         ua.get(TrustContactMethodOptionsPage)
-          .fold(controllers.add.trust.routes.TrustContactMethodOptionsController.onPageLoad(CheckMode)) { _ =>
-            controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
+          .fold(controllers.add.trust.routes.TrustContactMethodOptionsController.onPageLoad(mode)) { _ =>
+            cyaRoute(mode)
           }
 
-      case (Some(false), CheckMode) =>
-        controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
+      case (Some(false), CheckMode | AmendMode) =>
+        cyaRoute(mode)
 
       case _ =>
         routes.JourneyRecoveryController.onPageLoad()
     }
+
+  private def nextSelectedContactMethodPageAfter(
+    current: Option[ContactMethodOptions]
+  )(userAnswers: UserAnswers): Call =
+    navigateFromContactMethodPage(current, userAnswers) { remaining =>
+      remaining.headOption.fold {
+        controllers.add.trust.routes.TrustUtrYesNoController.onPageLoad(NormalMode)
+      }(contactMethodPageCall(_, NormalMode))
+    }
+
+  private def nextMissingSelectedContactMethodPageAfter(
+    current: Option[ContactMethodOptions]
+  )(userAnswers: UserAnswers): Call =
+    navigateFromContactMethodPage(current, userAnswers) { remaining =>
+      remaining
+        .find(isMissingAnswer(_)(userAnswers))
+        .map(contactMethodPageCall(_, CheckMode))
+        .getOrElse(
+          controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
+        )
+    }
+
+  private def navigateFromContactMethodPage(
+    current: Option[ContactMethodOptions],
+    userAnswers: UserAnswers
+  )(terminalStep: Seq[ContactMethodOptions] => Call): Call =
+    selectedContactMethodsInOrder(userAnswers)
+      .filter(_.nonEmpty)
+      .fold(routes.JourneyRecoveryController.onPageLoad()) { selectedContactMethods =>
+        current match {
+          case Some(currentContactMethod) if !selectedContactMethods.contains(currentContactMethod) =>
+            routes.JourneyRecoveryController.onPageLoad()
+
+          case _ =>
+            val remaining: Seq[ContactMethodOptions] =
+              current match {
+                case None =>
+                  selectedContactMethods
+
+                case Some(currentContactMethod) =>
+                  val currentIndex = selectedContactMethods.indexWhere(_ == currentContactMethod)
+                  selectedContactMethods.drop(currentIndex + 1)
+              }
+
+            terminalStep(remaining)
+        }
+      }
+
+  private def selectedContactMethodsInOrder(userAnswers: UserAnswers): Option[Seq[ContactMethodOptions]] =
+    userAnswers.get(TrustContactMethodOptionsPage).map {
+      ContactMethodOptions.ordered
+    }
+
+  private def contactMethodPageCall(contactMethod: ContactMethodOptions, mode: Mode): Call =
+    contactMethod match {
+      case ContactMethodOptions.Email  =>
+        controllers.add.trust.routes.TrustEmailAddressController.onPageLoad(mode)
+      case ContactMethodOptions.Phone  =>
+        controllers.add.trust.routes.TrustPhoneNumberController.onPageLoad(mode)
+      case ContactMethodOptions.Mobile =>
+        controllers.add.trust.routes.TrustMobileNumberController.onPageLoad(mode)
+    }
+
+  private def contactMethodPage(contactMethod: ContactMethodOptions): QuestionPage[String] =
+    contactMethod match {
+      case ContactMethodOptions.Email  => TrustEmailAddressPage
+      case ContactMethodOptions.Phone  => TrustPhoneNumberPage
+      case ContactMethodOptions.Mobile => TrustMobileNumberPage
+    }
+
+  private def isMissingAnswer(contactMethod: ContactMethodOptions)(userAnswers: UserAnswers): Boolean =
+    userAnswers.get(contactMethodPage(contactMethod)).isEmpty
 
 }

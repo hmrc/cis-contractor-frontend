@@ -16,21 +16,17 @@
 
 package connectors
 
-import models.requests.CreateAndUpdateSubcontractorPayload
+import models.Scheme
+import models.requests.*
 import models.requests.CreateAndUpdateSubcontractorPayload.*
-import models.requests.CreateVerificationBatchAndVerificationsRequest
-import models.requests.ModifyVerificationsRequest
-import models.response.CreateVerificationBatchAndVerificationsResponse
-import models.response.{CisTaxpayerResponse, GetCurrentVerificationBatchResponse, GetNewestVerificationBatchResponse, GetSubcontractorUTRsResponse}
+import models.response.*
 import play.api.Logging
 import play.api.http.Status.{NOT_FOUND, NO_CONTENT, OK}
 import play.api.libs.json.{JsValue, Json, OFormat}
 import play.api.libs.ws.JsonBodyWritables.writeableOf_JsValue
 import uk.gov.hmrc.http.client.HttpClientV2
-import uk.gov.hmrc.http.{HeaderCarrier, HttpException, HttpReadsInstances, HttpResponse, StringContextOps}
+import uk.gov.hmrc.http.*
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
-import models.requests.CreateSubmissionForVerificationRequest
-import models.response.CreateSubmissionForVerificationResponse
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
@@ -190,5 +186,49 @@ class ConstructionIndustrySchemeConnector @Inject() (config: ServicesConfig, htt
         )
         response
       }
+
+  def getScheme(instanceId: String)(implicit hc: HeaderCarrier): Future[Scheme] =
+    http
+      .get(url"$cisBaseUrl/scheme/$instanceId")
+      .execute[Scheme]
+
+  def submitVerificationToChris(
+    submissionId: Long,
+    request: ChrisVerificationRequest
+  )(implicit hc: HeaderCarrier): Future[ChrisSubmissionResponse] =
+    http
+      .post(url"$cisBaseUrl/submissions/$submissionId/submit-verification-to-chris")
+      .withBody(Json.toJson(request))
+      .execute[ChrisSubmissionResponse]
+
+  def getSubmissionStatus(
+    pollUrl: String,
+    submissionId: String
+  )(implicit hc: HeaderCarrier): Future[ChrisPollResponse] =
+    http
+      .get(url"$cisBaseUrl/submissions/verification/poll?submissionId=$submissionId&pollUrl=$pollUrl")
+      .execute[ChrisPollResponse]
+
+  def getSubcontractor(
+    cisId: String,
+    subbieResourceRef: Long
+  )(implicit hc: HeaderCarrier): Future[GetSubcontractorResponse] = {
+    logger.info(
+      s"[ConstructionIndustrySchemeConnector][getSubcontractor] " +
+        s"cisId=$cisId, subbieResourceRef=$subbieResourceRef"
+    )
+
+    http
+      .get(url"$cisBaseUrl/subcontractor/$cisId/$subbieResourceRef")
+      .execute[GetSubcontractorResponse]
+      .map { response =>
+        logger.info(
+          s"[ConstructionIndustrySchemeConnector][getSubcontractor] " +
+            s"Retrieved subcontractor for cisId=$cisId, subbieResourceRef=$subbieResourceRef"
+        )
+
+        response
+      }
+  }
 
 }

@@ -17,7 +17,7 @@
 package viewmodels.checkAnswers.add
 
 import models.add.SubcontractorName.format
-import models.{CheckMode, UserAnswers}
+import models.{CheckMode, Mode, UserAnswers}
 import pages.add.SubcontractorNamePage
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
@@ -27,7 +27,7 @@ import viewmodels.implicits.*
 
 object SubcontractorNameSummary {
 
-  def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
+  def row(answers: UserAnswers, mode: Mode = CheckMode)(implicit messages: Messages): Option[SummaryListRow] =
     answers.get(SubcontractorNamePage).map { answer =>
 
       val fullName = Seq(
@@ -42,7 +42,7 @@ object SubcontractorNameSummary {
         actions = Seq(
           ActionItemViewModel(
             "site.change",
-            controllers.add.routes.SubcontractorNameController.onPageLoad(CheckMode).url
+            controllers.add.routes.SubcontractorNameController.onPageLoad(mode).url
           ).withVisuallyHiddenText(messages("subcontractorName.change.hidden"))
             .withAttribute("id" -> "subcontractor-name")
         )

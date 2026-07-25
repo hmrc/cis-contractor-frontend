@@ -20,9 +20,9 @@ import controllers.actions.*
 import controllers.helpers.ContactGuard
 import forms.add.company.CompanyEmailAddressFormProvider
 import models.Mode
-import models.contact.ContactOptions.Email
+import models.contact.ContactMethodOptions
 import navigation.Navigator
-import pages.add.company.{CompanyContactOptionsPage, CompanyEmailAddressPage, CompanyNamePage}
+import pages.add.company.{CompanyContactMethodOptionsPage, CompanyEmailAddressPage, CompanyNamePage}
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -52,10 +52,10 @@ class CompanyEmailAddressController @Inject() (
 
   def onPageLoad(mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData) { implicit request =>
-      requireContactChoice(
+      requireContactMethodInSet(
         request.userAnswers.get(CompanyNamePage),
-        request.userAnswers.get(CompanyContactOptionsPage),
-        Email
+        request.userAnswers.get(CompanyContactMethodOptionsPage),
+        ContactMethodOptions.Email
       ) { companyName =>
         val preparedForm =
           request.userAnswers.get(CompanyEmailAddressPage).fold(form)(form.fill)
@@ -66,20 +66,20 @@ class CompanyEmailAddressController @Inject() (
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
-      request.userAnswers
-        .get(CompanyNamePage)
-        .map { companyName =>
-          form
-            .bindFromRequest()
-            .fold(
-              formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, companyName))),
-              value =>
-                for {
-                  updatedAnswers <- Future.fromTry(request.userAnswers.set(CompanyEmailAddressPage, value))
-                  _              <- sessionRepository.set(updatedAnswers)
-                } yield Redirect(navigator.nextPage(CompanyEmailAddressPage, mode, updatedAnswers))
-            )
-        }
+      (for {
+        companyName    <- request.userAnswers.get(CompanyNamePage)
+        contactMethods <- request.userAnswers.get(CompanyContactMethodOptionsPage)
+        if contactMethods.contains(ContactMethodOptions.Email)
+      } yield form
+        .bindFromRequest()
+        .fold(
+          formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, companyName))),
+          value =>
+            for {
+              updatedAnswers <- Future.fromTry(request.userAnswers.set(CompanyEmailAddressPage, value))
+              _              <- sessionRepository.set(updatedAnswers)
+            } yield Redirect(navigator.nextPage(CompanyEmailAddressPage, mode, updatedAnswers))
+        ))
         .getOrElse(Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())))
   }
 }
