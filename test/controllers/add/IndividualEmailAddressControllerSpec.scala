@@ -123,10 +123,10 @@ class IndividualEmailAddressControllerSpec extends SpecBase with MockitoSugar {
     }
 
     "must redirect to the next page and not add page to AmendedPagesPage when valid data is submitted in NormalMode" in {
-      val onwardRoute = controllers.add.routes.UniqueTaxpayerReferenceYesNoController
+      val onwardRoute           = controllers.add.routes.UniqueTaxpayerReferenceYesNoController
         .onPageLoad(NormalMode)
       val mockSessionRepository = mock[SessionRepository]
-      val captor = ArgumentCaptor.forClass(classOf[UserAnswers])
+      val captor                = ArgumentCaptor.forClass(classOf[UserAnswers])
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
       val userAnswers = uaWithName
@@ -164,7 +164,7 @@ class IndividualEmailAddressControllerSpec extends SpecBase with MockitoSugar {
       val mockSessionRepository = mock[SessionRepository]
       val onwardRoute           = controllers.add.trust.routes.TrustUtrYesNoController.onPageLoad(AmendMode)
       val captor                = ArgumentCaptor.forClass(classOf[UserAnswers])
-      val userAnswers = uaWithName
+      val userAnswers           = uaWithName
         .set(IndividualContactMethodOptionsPage, Set(ContactMethodOptions.Email))
         .success
         .value
@@ -203,7 +203,7 @@ class IndividualEmailAddressControllerSpec extends SpecBase with MockitoSugar {
         updatedAnswers.get(AmendedPagesPage).value must contain(IndividualEmailAddressPage.toString)
       }
     }
-    
+
     "must return a Bad Request and errors when invalid data is submitted" in {
 
       val application = applicationBuilder(userAnswers = Some(uaWithNameAndEmailChoice)).build()

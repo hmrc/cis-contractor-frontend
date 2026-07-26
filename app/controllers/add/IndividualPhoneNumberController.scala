@@ -78,9 +78,10 @@ class IndividualPhoneNumberController @Inject() (
           formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, subcontractorName))),
           value =>
             for {
-              updatedAnswers <- Future.fromTry(
-                SaveAnswerHelper.saveAnswer(request.userAnswers, IndividualPhoneNumberPage, value, mode)
-              )
+              updatedAnswers <-
+                Future.fromTry(
+                  SaveAnswerHelper.saveAnswer(request.userAnswers, IndividualPhoneNumberPage, value, mode)
+                )
               _              <- sessionRepository.set(updatedAnswers)
             } yield Redirect(navigator.nextPage(IndividualPhoneNumberPage, mode, updatedAnswers))
         ))

@@ -66,8 +66,8 @@ class SubTradingNameYesNoController @Inject() (
           value =>
             for {
               updatedAnswers <- Future.fromTry(
-                SaveAnswerHelper.saveAnswer(request.userAnswers, SubTradingNameYesNoPage, value, mode)
-              )
+                                  SaveAnswerHelper.saveAnswer(request.userAnswers, SubTradingNameYesNoPage, value, mode)
+                                )
               _              <- sessionRepository.set(updatedAnswers)
             } yield Redirect(navigator.nextPage(SubTradingNameYesNoPage, mode, updatedAnswers))
         )

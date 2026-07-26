@@ -120,9 +120,9 @@ class IndividualMobileNumberControllerSpec extends SpecBase with MockitoSugar {
     }
 
     "must redirect to the next page and not add page to AmendedPagesPage when valid data is submitted in NormalMode" in {
-      val onwardRoute = controllers.add.routes.UniqueTaxpayerReferenceYesNoController
+      val onwardRoute           = controllers.add.routes.UniqueTaxpayerReferenceYesNoController
         .onPageLoad(NormalMode)
-      val mobileNumber = "07123456789"
+      val mobileNumber          = "07123456789"
       val mockSessionRepository = mock[SessionRepository]
       val captor                = ArgumentCaptor.forClass(classOf[UserAnswers])
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
@@ -159,10 +159,10 @@ class IndividualMobileNumberControllerSpec extends SpecBase with MockitoSugar {
     }
 
     "must add IndividualMobileNumberPage to AmendedPagesPage when submitted in AmendMode" in {
-      val mobileNumber = "07700 900 982"
+      val mobileNumber          = "07700 900 982"
       val mockSessionRepository = mock[SessionRepository]
-      val onwardRoute = controllers.add.routes.UniqueTaxpayerReferenceYesNoController.onPageLoad(AmendMode)
-      val captor = ArgumentCaptor.forClass(classOf[UserAnswers])
+      val onwardRoute           = controllers.add.routes.UniqueTaxpayerReferenceYesNoController.onPageLoad(AmendMode)
+      val captor                = ArgumentCaptor.forClass(classOf[UserAnswers])
 
       when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
       val userAnswers = uaWithName

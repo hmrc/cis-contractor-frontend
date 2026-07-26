@@ -60,9 +60,10 @@ class SubcontractorsUniqueTaxpayerReferenceController @Inject() (
 
   private def saveAndContinue(mode: Mode, value: String)(implicit request: DataRequest[?]) =
     for {
-      updatedAnswers <- Future.fromTry(
-        SaveAnswerHelper.saveAnswer(request.userAnswers, SubcontractorsUniqueTaxpayerReferencePage, value, mode)
-      )
+      updatedAnswers <-
+        Future.fromTry(
+          SaveAnswerHelper.saveAnswer(request.userAnswers, SubcontractorsUniqueTaxpayerReferencePage, value, mode)
+        )
       _              <- sessionRepository.set(updatedAnswers)
     } yield Redirect(
       navigator.nextPage(SubcontractorsUniqueTaxpayerReferencePage, mode, updatedAnswers)

@@ -65,8 +65,8 @@ class AddressLookupService @Inject() (
     )
 
   def saveAddressDetails(address: Address, page: Settable[Address])(implicit
-                                                                    request: DataRequest[_],
-                                                                    ec: ExecutionContext
+    request: DataRequest[_],
+    ec: ExecutionContext
   ): Future[Boolean] = {
 
     val answers = request.userAnswers

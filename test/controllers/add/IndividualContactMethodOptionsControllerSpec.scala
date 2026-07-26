@@ -101,10 +101,10 @@ class IndividualContactMethodOptionsControllerSpec extends SpecBase with Mockito
     }
 
     "must redirect to the next page and not add the page to AmendedPagesPage when valid data is submitted in NormalMode" in {
-      val onwardRoute = controllers.add.routes.IndividualEmailAddressController
+      val onwardRoute           = controllers.add.routes.IndividualEmailAddressController
         .onPageLoad(NormalMode)
       val mockSessionRepository = mock[SessionRepository]
-      val captor = ArgumentCaptor.forClass(classOf[UserAnswers])
+      val captor                = ArgumentCaptor.forClass(classOf[UserAnswers])
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
       val application =
@@ -136,8 +136,8 @@ class IndividualContactMethodOptionsControllerSpec extends SpecBase with Mockito
 
     "must add IndividualContactMethodOptionsPage to AmendedPagesPage when submitted in AmendMode" in {
       val mockSessionRepository = mock[SessionRepository]
-      val captor = ArgumentCaptor.forClass(classOf[UserAnswers])
-      val onwardRoute = controllers.add.routes.IndividualEmailAddressController.onPageLoad(AmendMode)
+      val captor                = ArgumentCaptor.forClass(classOf[UserAnswers])
+      val onwardRoute           = controllers.add.routes.IndividualEmailAddressController.onPageLoad(AmendMode)
 
       when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
 

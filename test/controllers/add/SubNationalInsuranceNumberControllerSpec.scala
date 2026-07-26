@@ -91,14 +91,14 @@ class SubNationalInsuranceNumberControllerSpec extends SpecBase with MockitoSuga
     }
 
     "must redirect to the WorksReferenceNumberYesNo page and not add the page to AmendedPagesPage when valid data is submitted in NormalMode" in {
-      val userAnswers = uaWithName.set(SubNationalInsuranceNumberPage, "answer").success.value
-      val validValue = "AA123456A"
-      val onwardRoute = controllers.add.routes.WorksReferenceNumberYesNoController
+      val userAnswers           = uaWithName.set(SubNationalInsuranceNumberPage, "answer").success.value
+      val validValue            = "AA123456A"
+      val onwardRoute           = controllers.add.routes.WorksReferenceNumberYesNoController
         .onPageLoad(NormalMode)
       val mockSessionRepository = mock[SessionRepository]
-      val captor = ArgumentCaptor.forClass(classOf[UserAnswers])
+      val captor                = ArgumentCaptor.forClass(classOf[UserAnswers])
       when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
-      val application =
+      val application           =
         applicationBuilder(userAnswers = Some(userAnswers))
           .overrides(
             bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
@@ -125,9 +125,9 @@ class SubNationalInsuranceNumberControllerSpec extends SpecBase with MockitoSuga
     }
 
     "must add SubNationalInsuranceNumberPage to AmendedPagesPage when submitted in AmendMode" in {
-      val onwardRoute = Call("GET", "/foo")
+      val onwardRoute           = Call("GET", "/foo")
       val mockSessionRepository = mock[SessionRepository]
-      val captor = ArgumentCaptor.forClass(classOf[UserAnswers])
+      val captor                = ArgumentCaptor.forClass(classOf[UserAnswers])
 
       when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
 

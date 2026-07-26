@@ -165,61 +165,61 @@ object IndividualAmendedViewModel {
     }
 
   private def contactRows(
-                             original: OriginalIndividualAnswers,
-                             current: UserAnswers
-                           )(implicit messages: Messages): Seq[Seq[TableRow]] = {
-      val currentMethods = current.get(IndividualContactMethodOptionsPage).getOrElse(Set.empty)
+    original: OriginalIndividualAnswers,
+    current: UserAnswers
+  )(implicit messages: Messages): Seq[Seq[TableRow]] = {
+    val currentMethods = current.get(IndividualContactMethodOptionsPage).getOrElse(Set.empty)
 
-      Seq(
-        yesNoRow(
-          AddIndividualContactMethodsYesNoPage,
-          messages("addIndividualContactMethodsYesNo.checkYourAnswersLabel"),
-          original.individualContactMethodsYesNo,
-          current
-        ),
-        Option.when(
-          wasAmended(current, IndividualContactMethodOptionsPage) ||
-            original.individualContactMethod != currentMethods
-        ) {
-          row(
-            messages("individualContactMethodOptions.checkYourAnswersLabel"),
-            formatContactMethods(original.individualContactMethod),
-            formatContactMethods(currentMethods)
-          )
-        },
-        fieldRow(
-          IndividualEmailAddressPage,
-          messages("individualEmailAddress.checkYourAnswersLabel"),
-          original.email,
-          current
-        ),
-        fieldRow(
-          IndividualPhoneNumberPage,
-          messages("individualPhoneNumber.checkYourAnswersLabel"),
-          original.phone,
-          current
-        ),
-        fieldRow(
-          IndividualMobileNumberPage,
-          messages("individualMobileNumber.checkYourAnswersLabel"),
-          original.mobile,
-          current
+    Seq(
+      yesNoRow(
+        AddIndividualContactMethodsYesNoPage,
+        messages("addIndividualContactMethodsYesNo.checkYourAnswersLabel"),
+        original.individualContactMethodsYesNo,
+        current
+      ),
+      Option.when(
+        wasAmended(current, IndividualContactMethodOptionsPage) ||
+          original.individualContactMethod != currentMethods
+      ) {
+        row(
+          messages("individualContactMethodOptions.checkYourAnswersLabel"),
+          formatContactMethods(original.individualContactMethod),
+          formatContactMethods(currentMethods)
         )
-      ).flatten
-    }
+      },
+      fieldRow(
+        IndividualEmailAddressPage,
+        messages("individualEmailAddress.checkYourAnswersLabel"),
+        original.email,
+        current
+      ),
+      fieldRow(
+        IndividualPhoneNumberPage,
+        messages("individualPhoneNumber.checkYourAnswersLabel"),
+        original.phone,
+        current
+      ),
+      fieldRow(
+        IndividualMobileNumberPage,
+        messages("individualMobileNumber.checkYourAnswersLabel"),
+        original.mobile,
+        current
+      )
+    ).flatten
+  }
 
   private def formatContactMethods(
-                                    methods: Set[ContactMethodOptions]
-                                  )(implicit messages: Messages): String =
+    methods: Set[ContactMethodOptions]
+  )(implicit messages: Messages): String =
     if (methods.isEmpty) {
       missingValue
     } else {
       methods.toSeq
         .sortBy(_.toString)
         .map {
-          case ContactMethodOptions.Email =>
+          case ContactMethodOptions.Email  =>
             messages("trustContactMethodOptions.email")
-          case ContactMethodOptions.Phone =>
+          case ContactMethodOptions.Phone  =>
             messages("trustContactMethodOptions.phone")
           case ContactMethodOptions.Mobile =>
             messages("trustContactMethodOptions.mobile")
@@ -229,7 +229,7 @@ object IndividualAmendedViewModel {
 
   private def worksReferenceRows(original: OriginalIndividualAnswers, current: UserAnswers)(implicit
     messages: Messages
-  ): Seq[Seq[TableRow]] = {
+  ): Seq[Seq[TableRow]] =
     Seq(
       yesNoRow(
         WorksReferenceNumberYesNoPage,
@@ -244,11 +244,10 @@ object IndividualAmendedViewModel {
         current
       )
     ).flatten
-  }
 
   private def utrRows(original: OriginalIndividualAnswers, current: UserAnswers)(implicit
     messages: Messages
-  ): Seq[Seq[TableRow]] = {
+  ): Seq[Seq[TableRow]] =
     Seq(
       yesNoRow(
         UniqueTaxpayerReferenceYesNoPage,
@@ -263,11 +262,10 @@ object IndividualAmendedViewModel {
         current
       )
     ).flatten
-  }
 
   private def ninoRows(original: OriginalIndividualAnswers, current: UserAnswers)(implicit
     messages: Messages
-  ): Seq[Seq[TableRow]] = {
+  ): Seq[Seq[TableRow]] =
     Seq(
       yesNoRow(
         NationalInsuranceNumberYesNoPage,
@@ -282,7 +280,6 @@ object IndividualAmendedViewModel {
         current
       )
     ).flatten
-  }
 
   private def originalNameDisplay(original: OriginalIndividualAnswers): Option[String] =
     if (original.usesTradingName.contains(true)) {
@@ -317,11 +314,11 @@ object IndividualAmendedViewModel {
     ).flatten.mkString(", ")
 
   private def yesNoRow(
-                        page: QuestionPage[Boolean],
-                        label: String,
-                        original: Option[Boolean],
-                        current: UserAnswers
-                      )(implicit messages: Messages): Option[Seq[TableRow]] = {
+    page: QuestionPage[Boolean],
+    label: String,
+    original: Option[Boolean],
+    current: UserAnswers
+  )(implicit messages: Messages): Option[Seq[TableRow]] = {
 
     val currentVal = current.get(page)
 
@@ -340,11 +337,11 @@ object IndividualAmendedViewModel {
     }
 
   private def fieldRow(
-                        page: QuestionPage[String],
-                        label: String,
-                        original: Option[String],
-                        current: UserAnswers
-                      )(implicit messages: Messages): Option[Seq[TableRow]] = {
+    page: QuestionPage[String],
+    label: String,
+    original: Option[String],
+    current: UserAnswers
+  )(implicit messages: Messages): Option[Seq[TableRow]] = {
     val currentVal = current.get(page)
 
     Option.when(

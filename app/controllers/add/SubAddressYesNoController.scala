@@ -77,8 +77,8 @@ class SubAddressYesNoController @Inject() (
               value =>
                 for {
                   updatedAnswers <- Future.fromTry(
-                    SaveAnswerHelper.saveAnswer(request.userAnswers, SubAddressYesNoPage, value, mode)
-                  )
+                                      SaveAnswerHelper.saveAnswer(request.userAnswers, SubAddressYesNoPage, value, mode)
+                                    )
                   _              <- sessionRepository.set(updatedAnswers)
                 } yield Redirect(navigator.nextPage(SubAddressYesNoPage, mode, updatedAnswers))
             )

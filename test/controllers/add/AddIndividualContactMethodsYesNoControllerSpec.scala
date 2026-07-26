@@ -92,41 +92,41 @@ class AddIndividualContactMethodsYesNoControllerSpec extends SpecBase with Mocki
 
     "must redirect to the AddIndividualContactMethodsYesNo page and not add the page to AmendedPagesPage when" +
       "valid data with value Yes is submitted in NormalMode" in {
-      val onwardRoute = controllers.add.routes.IndividualContactMethodOptionsController
-        .onPageLoad(NormalMode)
-      val mockSessionRepository = mock[SessionRepository]
-      val captor = ArgumentCaptor.forClass(classOf[UserAnswers])
-      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+        val onwardRoute           = controllers.add.routes.IndividualContactMethodOptionsController
+          .onPageLoad(NormalMode)
+        val mockSessionRepository = mock[SessionRepository]
+        val captor                = ArgumentCaptor.forClass(classOf[UserAnswers])
+        when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
-      val application =
-        applicationBuilder(userAnswers = Some(uaWithName))
-          .overrides(
-            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
-            bind[SessionRepository].toInstance(mockSessionRepository)
-          )
-          .build()
+        val application =
+          applicationBuilder(userAnswers = Some(uaWithName))
+            .overrides(
+              bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
+              bind[SessionRepository].toInstance(mockSessionRepository)
+            )
+            .build()
 
-      running(application) {
-        val request =
-          FakeRequest(POST, addIndividualContactMethodsYesNoRoute)
-            .withFormUrlEncodedBody(("value", "true"))
+        running(application) {
+          val request =
+            FakeRequest(POST, addIndividualContactMethodsYesNoRoute)
+              .withFormUrlEncodedBody(("value", "true"))
 
-        val result = route(application, request).value
+          val result = route(application, request).value
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual onwardRoute.url
-        verify(mockSessionRepository).set(captor.capture())
-        val updatedAnswers = captor.getValue
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual onwardRoute.url
+          verify(mockSessionRepository).set(captor.capture())
+          val updatedAnswers = captor.getValue
 
-        updatedAnswers.get(AddIndividualContactMethodsYesNoPage) mustBe Some(true)
-        updatedAnswers.get(AmendedPagesPage) mustBe None
+          updatedAnswers.get(AddIndividualContactMethodsYesNoPage) mustBe Some(true)
+          updatedAnswers.get(AmendedPagesPage) mustBe None
+        }
       }
-    }
 
     "must add AddIndividualContactMethodsYesNoPage to AmendedPagesPage when submitted in AmendMode" in {
       val mockSessionRepository = mock[SessionRepository]
-      val captor = ArgumentCaptor.forClass(classOf[UserAnswers])
-      val onwardRoute = controllers.add.routes.IndividualContactMethodOptionsController.onPageLoad(AmendMode)
+      val captor                = ArgumentCaptor.forClass(classOf[UserAnswers])
+      val onwardRoute           = controllers.add.routes.IndividualContactMethodOptionsController.onPageLoad(AmendMode)
 
       when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
 

@@ -87,12 +87,12 @@ class SubcontractorNameControllerSpec extends SpecBase with MockitoSugar {
     }
 
     "must redirect to the SubAddressYesNo page and not add page in AmendedPagesPage when valid data is submitted in NormalMode" in {
-      val onwardRoute = controllers.add.routes.SubAddressYesNoController
+      val onwardRoute           = controllers.add.routes.SubAddressYesNoController
         .onPageLoad(NormalMode)
       val mockSessionRepository = mock[SessionRepository]
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
-      val captor = ArgumentCaptor.forClass(classOf[UserAnswers])
-      val application =
+      val captor                = ArgumentCaptor.forClass(classOf[UserAnswers])
+      val application           =
         applicationBuilder(userAnswers = Some(emptyUserAnswers))
           .overrides(
             bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
@@ -123,8 +123,8 @@ class SubcontractorNameControllerSpec extends SpecBase with MockitoSugar {
 
     "must add SubcontractorNamePage to AmendedPagesPage when submitted in AmendMode" in {
       val mockSessionRepository = mock[SessionRepository]
-      val onwardRoute = controllers.add.routes.SubAddressYesNoController.onPageLoad(AmendMode)
-      val captor = ArgumentCaptor.forClass(classOf[UserAnswers])
+      val onwardRoute           = controllers.add.routes.SubAddressYesNoController.onPageLoad(AmendMode)
+      val captor                = ArgumentCaptor.forClass(classOf[UserAnswers])
 
       when(mockSessionRepository.set(any()))
         .thenReturn(Future.successful(true))

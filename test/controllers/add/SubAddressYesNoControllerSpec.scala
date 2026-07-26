@@ -92,45 +92,45 @@ class SubAddressYesNoControllerSpec extends SpecBase with MockitoSugar {
 
     "must redirect to the AddressOfSubcontractor page and not add the page to AmendedPagesPage" +
       "when valid data with value Yes is submitted in NormalMode" in {
-      val onwardRoute = controllers.add.routes.AddressOfSubcontractorController
-        .redirectToAddressLookup()
-      val captor = ArgumentCaptor.forClass(classOf[UserAnswers])
+        val onwardRoute = controllers.add.routes.AddressOfSubcontractorController
+          .redirectToAddressLookup()
+        val captor      = ArgumentCaptor.forClass(classOf[UserAnswers])
 
-      val mockSessionRepository = mock[SessionRepository]
+        val mockSessionRepository = mock[SessionRepository]
 
-      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+        when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
-      val application =
-        applicationBuilder(userAnswers = Some(uaWithName))
-          .overrides(
-            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
-            bind[SessionRepository].toInstance(mockSessionRepository)
-          )
-          .build()
+        val application =
+          applicationBuilder(userAnswers = Some(uaWithName))
+            .overrides(
+              bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
+              bind[SessionRepository].toInstance(mockSessionRepository)
+            )
+            .build()
 
-      running(application) {
-        val request =
-          FakeRequest(POST, subAddressYesNoRoute)
-            .withFormUrlEncodedBody(("value", "true"))
+        running(application) {
+          val request =
+            FakeRequest(POST, subAddressYesNoRoute)
+              .withFormUrlEncodedBody(("value", "true"))
 
-        val result = route(application, request).value
+          val result = route(application, request).value
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual onwardRoute.url
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual onwardRoute.url
 
-        verify(mockSessionRepository).set(captor.capture())
+          verify(mockSessionRepository).set(captor.capture())
 
-        val updatedAnswers = captor.getValue
+          val updatedAnswers = captor.getValue
 
-        updatedAnswers.get(SubAddressYesNoPage) mustBe Some(true)
-        updatedAnswers.get(AmendedPagesPage) mustBe None
+          updatedAnswers.get(SubAddressYesNoPage) mustBe Some(true)
+          updatedAnswers.get(AmendedPagesPage) mustBe None
+        }
       }
-    }
 
     "must add SubAddressYesNoPage to AmendedPagesPage when submitted in AmendMode" in {
-      val onwardRoute = Call("GET", "/foo")
+      val onwardRoute           = Call("GET", "/foo")
       val mockSessionRepository = mock[SessionRepository]
-      val captor = ArgumentCaptor.forClass(classOf[UserAnswers])
+      val captor                = ArgumentCaptor.forClass(classOf[UserAnswers])
 
       when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
 

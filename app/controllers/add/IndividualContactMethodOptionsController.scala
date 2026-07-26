@@ -74,9 +74,10 @@ class IndividualContactMethodOptionsController @Inject() (
               formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, subcontractorName))),
               value =>
                 for {
-                  updatedAnswers <- Future.fromTry(
-                    SaveAnswerHelper.saveAnswer(request.userAnswers, IndividualContactMethodOptionsPage, value, mode)
-                  )
+                  updatedAnswers <-
+                    Future.fromTry(
+                      SaveAnswerHelper.saveAnswer(request.userAnswers, IndividualContactMethodOptionsPage, value, mode)
+                    )
                   _              <- sessionRepository.set(updatedAnswers)
                 } yield Redirect(navigator.nextPage(IndividualContactMethodOptionsPage, mode, updatedAnswers))
             )

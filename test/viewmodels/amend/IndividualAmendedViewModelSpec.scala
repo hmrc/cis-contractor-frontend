@@ -240,9 +240,9 @@ class IndividualAmendedViewModelSpec extends SpecBase {
 
       result must have size 3
 
-      val yesNoRow = result(0)
+      val yesNoRow   = result(0)
       val tradingRow = result(1)
-      val nameRow = result(2)
+      val nameRow    = result(2)
 
       yesNoRow.head.content mustBe Text(msgs("subTradingNameYesNo.checkYourAnswersLabel"))
       yesNoRow(1).content mustBe Text(msgs("site.yes"))

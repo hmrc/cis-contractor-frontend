@@ -92,45 +92,45 @@ class NationalInsuranceNumberYesNoControllerSpec extends SpecBase with MockitoSu
 
     "must redirect to the SubNationalInsuranceNumber page and not add the page to AmendedPagesPage" +
       "when valid data with value Yes is submitted in NormalMode" in {
-      val onwardRoute = controllers.add.routes.SubNationalInsuranceNumberController
-        .onPageLoad(NormalMode)
+        val onwardRoute = controllers.add.routes.SubNationalInsuranceNumberController
+          .onPageLoad(NormalMode)
 
-      val captor = ArgumentCaptor.forClass(classOf[UserAnswers])
-      val mockSessionRepository = mock[SessionRepository]
+        val captor                = ArgumentCaptor.forClass(classOf[UserAnswers])
+        val mockSessionRepository = mock[SessionRepository]
 
-      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+        when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
-      val application =
-        applicationBuilder(userAnswers = Some(uaWithName))
-          .overrides(
-            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
-            bind[SessionRepository].toInstance(mockSessionRepository)
-          )
-          .build()
+        val application =
+          applicationBuilder(userAnswers = Some(uaWithName))
+            .overrides(
+              bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
+              bind[SessionRepository].toInstance(mockSessionRepository)
+            )
+            .build()
 
-      running(application) {
-        val request =
-          FakeRequest(POST, nationalInsuranceNumberRoute)
-            .withFormUrlEncodedBody(("value", "true"))
+        running(application) {
+          val request =
+            FakeRequest(POST, nationalInsuranceNumberRoute)
+              .withFormUrlEncodedBody(("value", "true"))
 
-        val result = route(application, request).value
+          val result = route(application, request).value
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual onwardRoute.url
-        verify(mockSessionRepository).set(captor.capture())
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual onwardRoute.url
+          verify(mockSessionRepository).set(captor.capture())
 
-        val updatedAnswers = captor.getValue
+          val updatedAnswers = captor.getValue
 
-        updatedAnswers.get(NationalInsuranceNumberYesNoPage) mustBe Some(true)
-        updatedAnswers.get(AmendedPagesPage) mustBe None
+          updatedAnswers.get(NationalInsuranceNumberYesNoPage) mustBe Some(true)
+          updatedAnswers.get(AmendedPagesPage) mustBe None
+        }
       }
-    }
 
     "must add NationalInsuranceNumberYesNoPage to AmendedPagesPage when submitted in AmendMode" in {
-      val onwardRoute = controllers.add.routes.SubNationalInsuranceNumberController
+      val onwardRoute           = controllers.add.routes.SubNationalInsuranceNumberController
         .onPageLoad(AmendMode)
       val mockSessionRepository = mock[SessionRepository]
-      val captor = ArgumentCaptor.forClass(classOf[UserAnswers])
+      val captor                = ArgumentCaptor.forClass(classOf[UserAnswers])
 
       when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
 

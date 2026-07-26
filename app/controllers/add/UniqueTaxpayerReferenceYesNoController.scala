@@ -76,7 +76,8 @@ class UniqueTaxpayerReferenceYesNoController @Inject() (
               formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, subcontractorName))),
               value =>
                 for {
-                  updatedAnswers <- Future.fromTry(
+                  updatedAnswers <-
+                    Future.fromTry(
                       SaveAnswerHelper.saveAnswer(request.userAnswers, UniqueTaxpayerReferenceYesNoPage, value, mode)
                     )
                   _              <- sessionRepository.set(updatedAnswers)

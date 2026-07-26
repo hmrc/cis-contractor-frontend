@@ -76,9 +76,10 @@ class NationalInsuranceNumberYesNoController @Inject() (
               formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, subcontractorName))),
               value =>
                 for {
-                  updatedAnswers <- Future.fromTry(
-                    SaveAnswerHelper.saveAnswer(request.userAnswers, NationalInsuranceNumberYesNoPage, value, mode)
-                  )
+                  updatedAnswers <-
+                    Future.fromTry(
+                      SaveAnswerHelper.saveAnswer(request.userAnswers, NationalInsuranceNumberYesNoPage, value, mode)
+                    )
                   _              <- sessionRepository.set(updatedAnswers)
                 } yield Redirect(navigator.nextPage(NationalInsuranceNumberYesNoPage, mode, updatedAnswers))
             )

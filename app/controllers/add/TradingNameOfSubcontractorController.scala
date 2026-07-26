@@ -65,9 +65,10 @@ class TradingNameOfSubcontractorController @Inject() (
           formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
           value =>
             for {
-              updatedAnswers <- Future.fromTry(
-                SaveAnswerHelper.saveAnswer(request.userAnswers, TradingNameOfSubcontractorPage, value, mode)
-              )
+              updatedAnswers <-
+                Future.fromTry(
+                  SaveAnswerHelper.saveAnswer(request.userAnswers, TradingNameOfSubcontractorPage, value, mode)
+                )
               _              <- sessionRepository.set(updatedAnswers)
             } yield Redirect(
               navigator.nextPage(TradingNameOfSubcontractorPage, mode, updatedAnswers)

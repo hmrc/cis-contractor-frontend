@@ -32,7 +32,7 @@ import views.html.amend.AmendConfirmationView
 
 import javax.inject.Inject
 
-class AmendConfirmationController @Inject()(
+class AmendConfirmationController @Inject() (
   override val messagesApi: MessagesApi,
   identify: IdentifierAction,
   getData: DataRetrievalAction,

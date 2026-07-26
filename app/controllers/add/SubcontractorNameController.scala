@@ -67,8 +67,8 @@ class SubcontractorNameController @Inject() (
           value =>
             for {
               updatedAnswers <- Future.fromTry(
-                SaveAnswerHelper.saveAnswer(request.userAnswers, SubcontractorNamePage, value, mode)
-              )
+                                  SaveAnswerHelper.saveAnswer(request.userAnswers, SubcontractorNamePage, value, mode)
+                                )
               _              <- sessionRepository.set(updatedAnswers)
             } yield Redirect(
               navigator.nextPage(SubcontractorNamePage, mode, updatedAnswers)
