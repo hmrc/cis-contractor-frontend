@@ -17,6 +17,7 @@
 package views.amend.trust
 
 import forms.amend.trust.AmendTrustRemoveDetailYesNoFormProvider
+import models.amend.trust.AmendTrustRemoveDetail.*
 import org.jsoup.Jsoup
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
@@ -28,18 +29,22 @@ import play.api.test.FakeRequest
 import views.html.amend.trust.AmendTrustRemoveDetailYesNoView
 
 class AmendTrustRemoveDetailYesNoViewSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite {
+
   val trustName = "Test Trust"
 
   Seq(
-    ("address", "amendTrustRemoveDetailYesNo.detail.address"),
-    ("contact-details", "amendTrustRemoveDetailYesNo.detail.contact-details"),
-    ("unique-taxpayer-reference", "amendTrustRemoveDetailYesNo.detail.unique-taxpayer-reference"),
-    ("works-reference-number", "amendTrustRemoveDetailYesNo.detail.works-reference-number")
-  ).foreach { case (contractorDetail, detailKey) =>
+    ("address", Address, "amendTrustRemoveDetailYesNo.detail.address"),
+    ("contact-details", ContactDetails, "amendTrustRemoveDetailYesNo.detail.contactDetails"),
+    ("unique-taxpayer-reference", Utr, "amendTrustRemoveDetailYesNo.detail.utr"),
+    ("works-reference-number", WorksReferenceNumber, "amendTrustRemoveDetailYesNo.detail.worksReferenceNumber")
+  ).foreach { case (contractorDetail, amendTrustRemoveDetail, detailKey) =>
     s"AmendTrustRemoveDetailYesNoView when contractorDetail is '$contractorDetail'" should {
 
       "render the page with title, heading, hint, yes/no radios and submit button" in new Setup {
-        val html = view(trustName, contractorDetail, form)
+        val subcontractorDetailTitle: String =
+          messages(amendTrustRemoveDetail.messageKey)
+
+        val html = view(trustName, contractorDetail, subcontractorDetailTitle, form)
         val doc  = Jsoup.parse(html.toString())
 
         doc.select("title").text() must include(
@@ -68,11 +73,14 @@ class AmendTrustRemoveDetailYesNoViewSpec extends AnyWordSpec with Matchers with
 
       "display error summary and inline error when no option is selected" in new Setup {
 
+        val subcontractorDetailTitle: String =
+          messages(amendTrustRemoveDetail.messageKey)
+
         val trustName = "Test Trust"
 
         val errorForm = form.withError("value", "amendTrustRemoveDetailYesNo.error.required")
 
-        val html = view(trustName, contractorDetail, errorForm)
+        val html = view(trustName, contractorDetail, subcontractorDetailTitle, errorForm)
         val doc  = Jsoup.parse(html.toString())
 
         val summary = doc.select(".govuk-error-summary")

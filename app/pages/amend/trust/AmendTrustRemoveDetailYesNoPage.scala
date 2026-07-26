@@ -42,7 +42,7 @@ case class AmendTrustRemoveDetailYesNoPage(subcontractorDetail: String) extends 
           .flatMap(_.remove(TrustMobileNumberPage))
           .flatMap(_.set(AddTrustContactMethodsYesNoPage, false))
 
-      case "unique-taxpayer-reference" if value.contains(true) =>
+      case "utr" if value.contains(true) =>
         userAnswers
           .remove(TrustUtrPage)
           .flatMap(_.set(TrustUtrYesNoPage, false))

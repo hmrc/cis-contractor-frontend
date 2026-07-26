@@ -18,7 +18,9 @@ package controllers.amend.trust
 
 import controllers.actions.*
 import forms.amend.trust.AmendTrustRemoveDetailYesNoFormProvider
-import pages.add.trust.TrustNamePage
+import models.UserAnswers
+import models.amend.trust.AmendTrustRemoveDetail
+import pages.add.trust.*
 import pages.amend.trust.AmendTrustRemoveDetailYesNoPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
@@ -41,28 +43,77 @@ class AmendTrustRemoveDetailYesNoController @Inject() (
     extends FrontendBaseController
     with I18nSupport {
 
-  private val validDetails = Set(
-    "address",
-    "contact-details",
-    "unique-taxpayer-reference",
-    "works-reference-number"
-  )
+  private def withValidDetail(
+    detail: String
+  )(
+    action: AmendTrustRemoveDetail => Future[Result]
+  ): Future[Result] =
+    AmendTrustRemoveDetail.fromKey(detail) match {
 
-  private def withValidDetail(subcontractorDetail: String)(action: => Future[Result]): Future[Result] =
-    if (!validDetails.contains(subcontractorDetail)) {
-      Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
-    } else {
-      action
+      case Some(detailType) =>
+        action(detailType)
+
+      case None =>
+        Future.successful(
+          Redirect(
+            controllers.routes.JourneyRecoveryController.onPageLoad()
+          )
+        )
     }
+
+  private def detailIsPresent(
+    detail: AmendTrustRemoveDetail,
+    userAnswers: UserAnswers
+  ): Boolean =
+    detail match {
+
+      case AmendTrustRemoveDetail.Address =>
+        userAnswers
+          .get(TrustAddressYesNoPage)
+          .contains(true)
+
+      case AmendTrustRemoveDetail.ContactDetails =>
+        userAnswers
+          .get(AddTrustContactMethodsYesNoPage)
+          .contains(true)
+
+      case AmendTrustRemoveDetail.Utr =>
+        userAnswers
+          .get(TrustUtrYesNoPage)
+          .contains(true)
+
+      case AmendTrustRemoveDetail.WorksReferenceNumber =>
+        userAnswers
+          .get(TrustWorksReferenceYesNoPage)
+          .contains(true)
+    }
+
+  private def journeyRecovery: Result =
+    Redirect(
+      controllers.routes.JourneyRecoveryController.onPageLoad()
+    )
 
   def onPageLoad(subcontractorDetail: String): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
       request.userAnswers
         .get(TrustNamePage)
         .map { trustName =>
-          withValidDetail(subcontractorDetail) {
-            val form = formProvider()
-            Future.successful(Ok(view(trustName, subcontractorDetail, form)))
+          withValidDetail(subcontractorDetail) { detailType =>
+            if (!detailIsPresent(detailType, request.userAnswers)) {
+
+              Future.successful(journeyRecovery)
+
+            } else {
+              val form = formProvider()
+
+              val messages =
+                messagesApi.preferred(request)
+
+              val subcontractorDetailTitle =
+                messages(detailType.messageKey)
+
+              Future.successful(Ok(view(trustName, subcontractorDetail, subcontractorDetailTitle, form)))
+            }
           }
         }
         .getOrElse(Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())))
@@ -73,32 +124,48 @@ class AmendTrustRemoveDetailYesNoController @Inject() (
       request.userAnswers
         .get(TrustNamePage)
         .map { trustName =>
-          withValidDetail(subcontractorDetail) {
-            formProvider()
-              .bindFromRequest()
-              .fold(
-                formWithErrors => Future.successful(BadRequest(view(trustName, subcontractorDetail, formWithErrors))),
-                value =>
-                  if (value) {
-                    for {
-                      updatedAnswers <-
-                        Future.fromTry(
-                          request.userAnswers
-                            .set(AmendTrustRemoveDetailYesNoPage(subcontractorDetail), value)
-                            .flatMap(_.remove(AmendTrustRemoveDetailYesNoPage(subcontractorDetail)))
-                        )
-                      _              <- sessionRepository.set(updatedAnswers)
-                    } yield Redirect(
-                      controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad().url
-                    )
-                  } else {
+          withValidDetail(subcontractorDetail) { detailType =>
+            if (!detailIsPresent(detailType, request.userAnswers)) {
+
+              Future.successful(journeyRecovery)
+
+            } else {
+              formProvider()
+                .bindFromRequest()
+                .fold(
+                  formWithErrors =>
+                    val messages =
+                      messagesApi.preferred(request)
+
+                    val subcontractorDetailTitle =
+                      messages(detailType.messageKey)
+
                     Future.successful(
-                      Redirect(
+                      BadRequest(view(trustName, subcontractorDetail, subcontractorDetailTitle, formWithErrors))
+                    )
+                  ,
+                  value =>
+                    if (value) {
+                      for {
+                        updatedAnswers <-
+                          Future.fromTry(
+                            request.userAnswers
+                              .set(AmendTrustRemoveDetailYesNoPage(subcontractorDetail), value)
+                              .flatMap(_.remove(AmendTrustRemoveDetailYesNoPage(subcontractorDetail)))
+                          )
+                        _              <- sessionRepository.set(updatedAnswers)
+                      } yield Redirect(
                         controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad().url
                       )
-                    )
-                  }
-              )
+                    } else {
+                      Future.successful(
+                        Redirect(
+                          controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad().url
+                        )
+                      )
+                    }
+                )
+            }
           }
         }
         .getOrElse(Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())))

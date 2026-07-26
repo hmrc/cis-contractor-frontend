@@ -19,10 +19,11 @@ package controllers.amend.trust
 import base.SpecBase
 import forms.amend.trust.AmendTrustRemoveDetailYesNoFormProvider
 import models.UserAnswers
+import models.amend.trust.AmendTrustRemoveDetail
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.add.trust.TrustNamePage
+import pages.add.trust.*
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
@@ -41,22 +42,65 @@ class AmendTrustRemoveDetailYesNoControllerSpec extends SpecBase with MockitoSug
   private def uaWithName: UserAnswers =
     emptyUserAnswers.set(TrustNamePage, trustName).success.value
 
+  private def uaWithNameAndDetail(
+    detail: String
+  ): UserAnswers = {
+
+    val userAnswers =
+      detail match {
+
+        case "address" =>
+          uaWithName
+            .set(TrustAddressYesNoPage, true)
+            .success
+            .value
+
+        case "contact-details" =>
+          uaWithName
+            .set(AddTrustContactMethodsYesNoPage, true)
+            .success
+            .value
+
+        case "utr" =>
+          uaWithName
+            .set(TrustUtrYesNoPage, true)
+            .success
+            .value
+
+        case "works-reference-number" =>
+          uaWithName
+            .set(TrustWorksReferenceYesNoPage, true)
+            .success
+            .value
+      }
+
+    userAnswers
+  }
+
   "AmendTrustRemoveDetailYesNo Controller" - {
     Seq(
       ("address", "address"),
       ("contact-details", "contact-details"),
-      ("unique-taxpayer-reference", "unique-taxpayer-reference"),
+      ("unique-taxpayer-reference", "utr"),
       ("works-reference-number", "works-reference-number")
     ).foreach { case (subcontractorDetail, selectedDetail) =>
       s"when contractorDetail is '$subcontractorDetail'" - {
         val form = formProvider()
+
+        val detailType =
+          AmendTrustRemoveDetail
+            .fromKey(selectedDetail)
+            .value
 
         lazy val removeDetailYesNoRoute =
           controllers.amend.trust.routes.AmendTrustRemoveDetailYesNoController.onPageLoad(selectedDetail).url
 
         "must return OK and the correct view for a GET" in {
 
-          val application = applicationBuilder(userAnswers = Some(uaWithName)).build()
+          val application = applicationBuilder(userAnswers = Some(uaWithNameAndDetail(selectedDetail))).build()
+
+          val detailTitle =
+            messages(application)(detailType.messageKey)
 
           running(application) {
             val request = FakeRequest(GET, removeDetailYesNoRoute)
@@ -66,7 +110,7 @@ class AmendTrustRemoveDetailYesNoControllerSpec extends SpecBase with MockitoSug
             val view = application.injector.instanceOf[AmendTrustRemoveDetailYesNoView]
 
             status(result) mustEqual OK
-            contentAsString(result) mustEqual view(trustName, selectedDetail, form)(
+            contentAsString(result) mustEqual view(trustName, selectedDetail, detailTitle, form)(
               request,
               messages(application)
             ).toString
@@ -80,7 +124,7 @@ class AmendTrustRemoveDetailYesNoControllerSpec extends SpecBase with MockitoSug
           when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
           val application =
-            applicationBuilder(userAnswers = Some(uaWithName))
+            applicationBuilder(userAnswers = Some(uaWithNameAndDetail(selectedDetail)))
               .overrides(
                 bind[SessionRepository].toInstance(mockSessionRepository)
               )
@@ -107,7 +151,7 @@ class AmendTrustRemoveDetailYesNoControllerSpec extends SpecBase with MockitoSug
           when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
           val application =
-            applicationBuilder(userAnswers = Some(uaWithName))
+            applicationBuilder(userAnswers = Some(uaWithNameAndDetail(selectedDetail)))
               .overrides(
                 bind[SessionRepository].toInstance(mockSessionRepository)
               )
@@ -129,7 +173,10 @@ class AmendTrustRemoveDetailYesNoControllerSpec extends SpecBase with MockitoSug
 
         "must return a Bad Request and errors when invalid data is submitted" in {
 
-          val application = applicationBuilder(userAnswers = Some(uaWithName)).build()
+          val application = applicationBuilder(userAnswers = Some(uaWithNameAndDetail(selectedDetail))).build()
+
+          val detailTitle =
+            messages(application)(detailType.messageKey)
 
           running(application) {
             val request =
@@ -143,7 +190,7 @@ class AmendTrustRemoveDetailYesNoControllerSpec extends SpecBase with MockitoSug
             val result = route(application, request).value
 
             status(result) mustEqual BAD_REQUEST
-            contentAsString(result) mustEqual view(trustName, selectedDetail, boundForm)(
+            contentAsString(result) mustEqual view(trustName, selectedDetail, detailTitle, boundForm)(
               request,
               messages(application)
             ).toString
@@ -210,6 +257,35 @@ class AmendTrustRemoveDetailYesNoControllerSpec extends SpecBase with MockitoSug
           }
         }
 
+        "must redirect to Journey Recovery for a GET if no detail data is found" in {
+
+          val application = applicationBuilder(userAnswers = Some(uaWithName)).build()
+
+          running(application) {
+            val request = FakeRequest(GET, removeDetailYesNoRoute)
+
+            val result = route(application, request).value
+
+            status(result) mustEqual SEE_OTHER
+            redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+          }
+        }
+
+        "must redirect to JourneyRecovery if detail data is missing for a POST" in {
+
+          val application = applicationBuilder(userAnswers = Some(uaWithName)).build()
+
+          running(application) {
+            val request =
+              FakeRequest(POST, removeDetailYesNoRoute)
+                .withFormUrlEncodedBody(("value", "true"))
+
+            val result = route(application, request).value
+
+            status(result) mustEqual SEE_OTHER
+            redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+          }
+        }
       }
     }
 

@@ -138,7 +138,7 @@ class AmendTrustRemoveDetailYesNoPageSpec extends PageBehaviours {
     }
 
     Seq(
-      ("unique-taxpayer-reference", TrustUtrPage, TrustUtrYesNoPage, "7777777777"),
+      ("utr", TrustUtrPage, TrustUtrYesNoPage, "7777777777"),
       ("works-reference-number", TrustWorksReferencePage, TrustWorksReferenceYesNoPage, "WR-001")
     ).foreach { case (contractorDetail, selectedDetailPage, screenerPage, dummyDetail) =>
       s"when contractorDetail is '$contractorDetail'" - {

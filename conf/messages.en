@@ -406,9 +406,9 @@ amendTrustRemoveDetailYesNo.title                                            =  
 amendTrustRemoveDetailYesNo.heading                                          =  Are you sure you want to remove the {1} from {0}?
 amendTrustRemoveDetailYesNo.error.required                                   =  Select whether you want to remove this information from this subcontractor
 amendTrustRemoveDetailYesNo.detail.address                                   =  address
-amendTrustRemoveDetailYesNo.detail.contact-details                           =  contact details
-amendTrustRemoveDetailYesNo.detail.unique-taxpayer-reference                 =  UTR
-amendTrustRemoveDetailYesNo.detail.works-reference-number                    =  works reference number
+amendTrustRemoveDetailYesNo.detail.contactDetails                            =  contact details
+amendTrustRemoveDetailYesNo.detail.utr                                       =  UTR
+amendTrustRemoveDetailYesNo.detail.worksReferenceNumber                      =  works reference number
 
 # Partnership
 addPartnershipContactMethodsYesNo.title                     =  Do you want to add contact details for this partnership?
