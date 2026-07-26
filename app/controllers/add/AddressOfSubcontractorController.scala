@@ -59,7 +59,7 @@ class AddressOfSubcontractorController @Inject() (
     routes.AddressOfSubcontractorController.addressLookupCallbackChange()
 
   override protected def onCompletion(mode: Mode): Call =
-    routes.IndividualChooseContactDetailsController.onPageLoad(mode)
+    routes.AddIndividualContactMethodsYesNoController.onPageLoad(mode)
 
   override protected def onChangeCompletion(isAmend: Boolean): Call =
     if (isAmend) controllers.amend.routes.AmendIndividualCheckYourAnswersController.onPageLoad()

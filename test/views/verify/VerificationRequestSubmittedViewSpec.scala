@@ -23,7 +23,7 @@ import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.i18n.{Lang, Messages, MessagesApi, MessagesImpl}
 import play.api.mvc.Request
 import play.api.test.FakeRequest
-import viewmodels.checkAnswers.verify.VerificationRequestSubmittedViewModel
+import viewmodels.verify.VerificationRequestSubmittedViewModel
 import views.html.verify.VerificationRequestSubmittedView
 
 import java.time.LocalDateTime
@@ -70,7 +70,7 @@ class VerificationRequestSubmittedViewSpec extends SpecBase with GuiceOneAppPerS
       doc.select("p.govuk-body").text must include(email)
 
       val emailVerificationLink =
-        doc.select(s"a[href='#']")
+        doc.select(s"a[href='${appConfig.verificationHistoryUrl}']")
 
       emailVerificationLink.text must include(
         messages("verify.verificationRequestSubmitted.email.verification.link")
@@ -168,6 +168,7 @@ class VerificationRequestSubmittedViewSpec extends SpecBase with GuiceOneAppPerS
     val viewModel: VerificationRequestSubmittedViewModel =
       VerificationRequestSubmittedViewModel(
         manageSubcontractorsUrl = s"${applicationConfig.manageSubcontractorsUrl}/$cisId",
+        verificationHistoryUrl = applicationConfig.verificationHistoryUrl,
         referenceNumber = referenceNumber,
         submittedAt = submittedAt,
         subcontractorsToVerify = subcontractorsToVerify,

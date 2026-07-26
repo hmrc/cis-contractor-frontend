@@ -17,14 +17,13 @@
 package viewmodels.checkAnswers.add.partnership
 
 import base.SpecBase
-import models.{CheckMode, UserAnswers}
+import models.{AmendMode, CheckMode, UserAnswers}
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import pages.add.partnership.PartnershipAddressYesNoPage
 import play.api.i18n.{Lang, Messages, MessagesImpl}
 import play.api.test.Helpers.*
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.*
-import org.scalatest.matchers.must.Matchers.must
 
 class PartnershipAddressYesNoSummarySpec extends SpecBase with GuiceOneAppPerSuite {
 
@@ -55,6 +54,34 @@ class PartnershipAddressYesNoSummarySpec extends SpecBase with GuiceOneAppPerSui
       val action: ActionItem = actions.items.head
       action.href mustBe controllers.add.partnership.routes.PartnershipAddressYesNoController
         .onPageLoad(CheckMode)
+        .url
+      action.content mustBe Text(messages("site.change"))
+      action.visuallyHiddenText mustBe Some(messages("partnershipAddressYesNo.change.hidden"))
+      action.attributes must contain("id" -> "add-partnership-address")
+    }
+
+    "return a row with key, value = yes, and change action when the answer is true for Amend journey" in {
+      val ua: UserAnswers =
+        emptyUserAnswers
+          .set(PartnershipAddressYesNoPage, true)
+          .success
+          .value
+
+      val maybeRow = PartnershipAddressYesNoSummary.row(ua, AmendMode)
+      maybeRow must not be empty
+
+      val row: SummaryListRow = maybeRow.value
+
+      row.key mustBe Key(content = Text(messages("partnershipAddressYesNo.checkYourAnswersLabel")))
+      row.value mustBe Value(content = Text(messages("site.yes")))
+
+      row.actions must not be empty
+      val actions: Actions = row.actions.value
+      actions.items must have size 1
+
+      val action: ActionItem = actions.items.head
+      action.href mustBe controllers.add.partnership.routes.PartnershipAddressYesNoController
+        .onPageLoad(AmendMode)
         .url
       action.content mustBe Text(messages("site.change"))
       action.visuallyHiddenText mustBe Some(messages("partnershipAddressYesNo.change.hidden"))

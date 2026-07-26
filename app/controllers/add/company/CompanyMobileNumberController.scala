@@ -20,9 +20,9 @@ import controllers.actions.*
 import controllers.helpers.ContactGuard
 import forms.add.company.CompanyMobileNumberFormProvider
 import models.Mode
-import models.contact.ContactOptions.Mobile
+import models.contact.ContactMethodOptions
 import navigation.Navigator
-import pages.add.company.{CompanyContactOptionsPage, CompanyMobileNumberPage, CompanyNamePage}
+import pages.add.company.{CompanyContactMethodOptionsPage, CompanyMobileNumberPage, CompanyNamePage}
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -52,10 +52,10 @@ class CompanyMobileNumberController @Inject() (
 
   def onPageLoad(mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData) { implicit request =>
-      requireContactChoice(
+      requireContactMethodInSet(
         request.userAnswers.get(CompanyNamePage),
-        request.userAnswers.get(CompanyContactOptionsPage),
-        Mobile
+        request.userAnswers.get(CompanyContactMethodOptionsPage),
+        ContactMethodOptions.Mobile
       ) { companyName =>
 
         val preparedForm =
@@ -67,20 +67,20 @@ class CompanyMobileNumberController @Inject() (
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
-      request.userAnswers
-        .get(CompanyNamePage)
-        .map { companyName =>
-          form
-            .bindFromRequest()
-            .fold(
-              formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, companyName))),
-              value =>
-                for {
-                  updatedAnswers <- Future.fromTry(request.userAnswers.set(CompanyMobileNumberPage, value))
-                  _              <- sessionRepository.set(updatedAnswers)
-                } yield Redirect(navigator.nextPage(CompanyMobileNumberPage, mode, updatedAnswers))
-            )
-        }
+      (for {
+        companyName    <- request.userAnswers.get(CompanyNamePage)
+        contactMethods <- request.userAnswers.get(CompanyContactMethodOptionsPage)
+        if contactMethods.contains(ContactMethodOptions.Mobile)
+      } yield form
+        .bindFromRequest()
+        .fold(
+          formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, companyName))),
+          value =>
+            for {
+              updatedAnswers <- Future.fromTry(request.userAnswers.set(CompanyMobileNumberPage, value))
+              _              <- sessionRepository.set(updatedAnswers)
+            } yield Redirect(navigator.nextPage(CompanyMobileNumberPage, mode, updatedAnswers))
+        ))
         .getOrElse(Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())))
   }
 }

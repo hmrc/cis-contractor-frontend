@@ -19,7 +19,7 @@ package viewmodels.checkAnswers.add
 import controllers.add.routes
 import helpers.CyaEncodingSpecHelper
 import models.add.SubcontractorName
-import models.{CheckMode, UserAnswers}
+import models.{AmendMode, CheckMode, UserAnswers}
 import org.scalatest.OptionValues.convertOptionToValuable
 import org.scalatest.TryValues.convertTryToSuccessOrFailure
 import org.scalatest.freespec.AnyFreeSpec
@@ -66,6 +66,48 @@ class SubcontractorNameSummarySpec extends AnyFreeSpec with Matchers with CyaEnc
       action.href shouldBe
         routes.SubcontractorNameController
           .onPageLoad(CheckMode)
+          .url
+
+      action.content.asHtml.toString should include(messages("site.change"))
+
+      action.visuallyHiddenText.value shouldBe
+        messages("subcontractorName.change.hidden")
+
+      action.attributes should contain("id" -> "subcontractor-name")
+    }
+
+    "must return a SummaryListRow when the answer exists in AmendMode" in {
+
+      val subcontractorName = SubcontractorName(
+        firstName = "John",
+        middleName = Some("F."),
+        lastName = "Doe"
+      )
+
+      val answers =
+        UserAnswers("test-id")
+          .set(SubcontractorNamePage, subcontractorName)
+          .success
+          .value
+
+      val row = SubcontractorNameSummary.row(answers, AmendMode).value
+
+      row.key.content.asHtml.toString should include(
+        messages("subcontractorName.checkYourAnswersLabel")
+      )
+
+      val expectedFullName =
+        Seq(Some("John"), Some("F."), Some("Doe")).flatten.mkString(" ")
+
+      row.value.content.asHtml.toString should include(expectedFullName)
+
+      row.actions.value.items should have size 1
+
+      val action = row.actions.value.items.head
+
+      action.href shouldBe
+        routes.SubcontractorNameController
+          .onPageLoad(AmendMode)
           .url
 
       action.content.asHtml.toString should include(messages("site.change"))

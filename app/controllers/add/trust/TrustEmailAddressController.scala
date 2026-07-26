@@ -20,9 +20,9 @@ import controllers.actions.*
 import controllers.helpers.ContactGuard
 import forms.add.trust.TrustEmailAddressFormProvider
 import models.Mode
-import models.contact.ContactOptions.Email
+import models.contact.ContactMethodOptions
 import navigation.Navigator
-import pages.add.trust.{TrustContactOptionsPage, TrustEmailAddressPage, TrustNamePage}
+import pages.add.trust.{TrustContactMethodOptionsPage, TrustEmailAddressPage, TrustNamePage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
@@ -51,10 +51,10 @@ class TrustEmailAddressController @Inject() (
 
   def onPageLoad(mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData) { implicit request =>
-      requireContactChoice(
+      requireContactMethodInSet(
         request.userAnswers.get(TrustNamePage),
-        request.userAnswers.get(TrustContactOptionsPage),
-        Email
+        request.userAnswers.get(TrustContactMethodOptionsPage),
+        ContactMethodOptions.Email
       ) { trustName =>
 
         val preparedForm =
@@ -66,24 +66,20 @@ class TrustEmailAddressController @Inject() (
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
-      request.userAnswers
-        .get(TrustNamePage)
-        .map { trustName =>
-          form
-            .bindFromRequest()
-            .fold(
-              formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, trustName))),
-              value =>
-                for {
-                  updatedAnswers <- Future.fromTry(request.userAnswers.set(TrustEmailAddressPage, value))
-                  _              <- sessionRepository.set(updatedAnswers)
-                } yield Redirect(navigator.nextPage(TrustEmailAddressPage, mode, updatedAnswers))
-            )
-        }
-        .getOrElse(
-          Future.successful(
-            Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-          )
-        )
+      (for {
+        trustName      <- request.userAnswers.get(TrustNamePage)
+        contactMethods <- request.userAnswers.get(TrustContactMethodOptionsPage)
+        if contactMethods.contains(ContactMethodOptions.Email)
+      } yield form
+        .bindFromRequest()
+        .fold(
+          formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, trustName))),
+          value =>
+            for {
+              updatedAnswers <- Future.fromTry(request.userAnswers.set(TrustEmailAddressPage, value))
+              _              <- sessionRepository.set(updatedAnswers)
+            } yield Redirect(navigator.nextPage(TrustEmailAddressPage, mode, updatedAnswers))
+        ))
+        .getOrElse(Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())))
   }
 }

@@ -17,13 +17,10 @@
 package controllers.add.trust
 
 import controllers.actions.*
-import models.UserAnswers
 import models.add.trust.ValidatedTrust
-import models.contact.ContactOptions.*
 import pages.add.CheckYourAnswersSubmittedPage
-import pages.add.trust.TrustContactOptionsPage
 import play.api.Logging
-import play.api.i18n.{I18nSupport, Messages, MessagesApi}
+import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
 import services.SubcontractorService
@@ -51,14 +48,6 @@ class TrustCheckYourAnswersController @Inject() (
     with I18nSupport
     with Logging {
 
-  private def contactDetailsRow(ua: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    ua.get(TrustContactOptionsPage).flatMap {
-      case Email  => TrustEmailAddressSummary.row(ua)
-      case Phone  => TrustPhoneNumberSummary.row(ua)
-      case Mobile => TrustMobileNumberSummary.row(ua)
-      case _      => None
-    }
-
   def onPageLoad: Action[AnyContent] =
     (identify andThen getData andThen requireData) { implicit request =>
       val ua = request.userAnswers
@@ -71,8 +60,11 @@ class TrustCheckYourAnswersController @Inject() (
               TrustNameSummary.row(ua),
               TrustAddressYesNoSummary.row(ua),
               TrustAddressSummary.row(ua),
-              TrustContactOptionsSummary.row(ua),
-              contactDetailsRow(ua),
+              AddTrustContactMethodsYesNoSummary.row(ua),
+              TrustContactMethodOptionsSummary.row(ua),
+              TrustEmailAddressSummary.row(ua),
+              TrustPhoneNumberSummary.row(ua),
+              TrustMobileNumberSummary.row(ua),
               TrustUtrYesNoSummary.row(ua),
               TrustUtrSummary.row(ua),
               TrustWorksReferenceYesNoSummary.row(ua),

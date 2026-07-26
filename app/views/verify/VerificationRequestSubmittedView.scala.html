@@ -24,7 +24,7 @@
 @import viewmodels.govuk.summarylist.SummaryListViewModel
 
 @import views.html.components._
-@import viewmodels.checkAnswers.verify.VerificationRequestSubmittedViewModel
+@import viewmodels.verify.VerificationRequestSubmittedViewModel
 
 
 @this(
@@ -130,7 +130,7 @@
 
     @link(
         linkTextKey = "verify.verificationRequestSubmitted.email.verification.link",
-        linkUrl = "#", // TODO: Link to be updated later
+        linkUrl = vm.verificationHistoryUrl,
         hasFullStop = true,
         prefixTextKey = "verify.verificationRequestSubmitted.email.verification"
     )

@@ -17,7 +17,7 @@
 package viewmodels.checkAnswers.add.company
 
 import controllers.add.company.routes
-import models.{CheckMode, UserAnswers}
+import models.{AmendMode, CheckMode, UserAnswers}
 import org.scalatest.OptionValues.convertOptionToValuable
 import org.scalatest.TryValues.convertTryToSuccessOrFailure
 import org.scalatest.freespec.AnyFreeSpec
@@ -59,6 +59,39 @@ class CompanyWorksReferenceYesNoSummarySpec extends AnyFreeSpec with Matchers {
       val changeAction       = actions.head
       val expectedChangeText = messages("site.change")
       val expectedHref       = routes.CompanyWorksReferenceYesNoController.onPageLoad(CheckMode).url
+      val expectedHiddenText = messages("companyWorksReferenceYesNo.change.hidden")
+
+      changeAction.content.asHtml.toString    should include(expectedChangeText)
+      changeAction.href                     shouldBe expectedHref
+      changeAction.visuallyHiddenText.value shouldBe expectedHiddenText
+      changeAction.attributes                   must contain("id" -> "add-company-works-reference")
+    }
+
+    "must return a SummaryListRow with 'Yes' when the answer is true in Amend journey" in {
+      val answers = UserAnswers("test-id")
+        .set(CompanyWorksReferenceYesNoPage, true)
+        .success
+        .value
+
+      val maybeRow: Option[SummaryListRow] = CompanyWorksReferenceYesNoSummary.row(answers, AmendMode)
+      maybeRow shouldBe defined
+
+      val row =
+        maybeRow.value
+
+      val expectedKeyText = messages("companyWorksReferenceYesNo.checkYourAnswersLabel")
+      row.key.content.asHtml.toString should include(expectedKeyText)
+
+      val expectedValue = messages("site.yes")
+      row.value.content.asHtml.toString should include(expectedValue)
+
+      row.actions shouldBe defined
+      val actions = row.actions.value.items
+      actions should have size 1
+
+      val changeAction       = actions.head
+      val expectedChangeText = messages("site.change")
+      val expectedHref       = routes.CompanyWorksReferenceYesNoController.onPageLoad(AmendMode).url
       val expectedHiddenText = messages("companyWorksReferenceYesNo.change.hidden")
 
       changeAction.content.asHtml.toString    should include(expectedChangeText)

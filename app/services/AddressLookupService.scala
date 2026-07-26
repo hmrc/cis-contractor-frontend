@@ -21,7 +21,7 @@ import connectors.AddressLookupConnector
 import models.address.{Address, AddressLookupJourneyIdentifier, MandatoryFieldsConfigModel}
 import models.requests.DataRequest
 import play.api.mvc.{Call, Request}
-import queries.Settable
+import queries.{AddressLookupAmendReturnQuery, Settable}
 import repositories.SessionRepository
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.LoggingUtil
@@ -70,7 +70,8 @@ class AddressLookupService @Inject() (
   ): Future[Boolean] =
     for {
       updatedAnswers <- Future.fromTry(request.userAnswers.set(page, address))
-      result         <- sessionRepository.set(updatedAnswers)
+      cleanedAnswers <- Future.fromTry(updatedAnswers.remove(AddressLookupAmendReturnQuery))
+      result         <- sessionRepository.set(cleanedAnswers)
     } yield result
 
 }

@@ -55,11 +55,11 @@ class SubcontractorsToReverifyViewModelSpec extends SpecBase {
 
       result.size mustBe 2
 
-      result.head.id mustBe Some("value-0_0")
+      result.head.id mustBe Some("value_0_0")
       result.head.value mustBe "id-1"
       result.head.content mustBe Text("Brightwell Partners")
 
-      result(1).id mustBe Some("value-1_1")
+      result(1).id mustBe Some("value_1_1")
       result(1).value mustBe "id-2"
       result(1).content mustBe Text("Carterfields Ltd")
     }

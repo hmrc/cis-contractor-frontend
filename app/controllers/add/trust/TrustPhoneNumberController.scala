@@ -20,9 +20,9 @@ import controllers.actions.*
 import controllers.helpers.ContactGuard
 import forms.add.trust.TrustPhoneNumberFormProvider
 import models.Mode
-import models.contact.ContactOptions.Phone
+import models.contact.ContactMethodOptions
 import navigation.Navigator
-import pages.add.trust.{TrustContactOptionsPage, TrustNamePage, TrustPhoneNumberPage}
+import pages.add.trust.{TrustContactMethodOptionsPage, TrustNamePage, TrustPhoneNumberPage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
@@ -51,10 +51,10 @@ class TrustPhoneNumberController @Inject() (
 
   def onPageLoad(mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData) { implicit request =>
-      requireContactChoice(
+      requireContactMethodInSet(
         request.userAnswers.get(TrustNamePage),
-        request.userAnswers.get(TrustContactOptionsPage),
-        Phone
+        request.userAnswers.get(TrustContactMethodOptionsPage),
+        ContactMethodOptions.Phone
       ) { trustName =>
 
         val preparedForm =
@@ -66,20 +66,20 @@ class TrustPhoneNumberController @Inject() (
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
-      request.userAnswers
-        .get(TrustNamePage)
-        .map { trustName =>
-          form
-            .bindFromRequest()
-            .fold(
-              formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, trustName))),
-              value =>
-                for {
-                  updatedAnswers <- Future.fromTry(request.userAnswers.set(TrustPhoneNumberPage, value))
-                  _              <- sessionRepository.set(updatedAnswers)
-                } yield Redirect(navigator.nextPage(TrustPhoneNumberPage, mode, updatedAnswers))
-            )
-        }
+      (for {
+        trustName      <- request.userAnswers.get(TrustNamePage)
+        contactMethods <- request.userAnswers.get(TrustContactMethodOptionsPage)
+        if contactMethods.contains(ContactMethodOptions.Phone)
+      } yield form
+        .bindFromRequest()
+        .fold(
+          formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, trustName))),
+          value =>
+            for {
+              updatedAnswers <- Future.fromTry(request.userAnswers.set(TrustPhoneNumberPage, value))
+              _              <- sessionRepository.set(updatedAnswers)
+            } yield Redirect(navigator.nextPage(TrustPhoneNumberPage, mode, updatedAnswers))
+        ))
         .getOrElse(Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())))
   }
 }

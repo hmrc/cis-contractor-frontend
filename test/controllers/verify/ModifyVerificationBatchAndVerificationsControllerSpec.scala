@@ -100,7 +100,7 @@ class ModifyVerificationBatchAndVerificationsControllerSpec extends SpecBase wit
 
   "ModifyVerificationBatchAndVerificationsController.modifyVerificationBatch" - {
 
-    "must call service with correct ModifyVerificationsRequest (create + delete) and redirect to Index" in {
+    "must call service with correct ModifyVerificationsRequest (create + delete) and redirect to readiness check before declaration" in {
       val mockService = mock[VerificationService]
 
       // selected: 10, 20 => refs 1111,2222
@@ -142,7 +142,10 @@ class ModifyVerificationBatchAndVerificationsControllerSpec extends SpecBase wit
         val result     = controller.modifyVerificationBatch()(FakeRequest(POST, "/test-only"))
 
         status(result) mustBe SEE_OTHER
-        redirectLocation(result).value mustBe routes.IndexController.onPageLoad().url
+        redirectLocation(result).value mustBe
+          controllers.verify.routes.CheckVerificationBatchReadinessController
+            .checkVerificationBatchReadinessBeforeDeclaration()
+            .url
 
         val reqCaptor = ArgumentCaptor.forClass(classOf[ModifyVerificationsRequest])
         verify(mockService).modifyVerificationBatchAndVerifications(eqTo(ua), reqCaptor.capture())(any())
@@ -156,7 +159,7 @@ class ModifyVerificationBatchAndVerificationsControllerSpec extends SpecBase wit
       }
     }
 
-    "must not call service when no changes required and redirect to Index" in {
+    "must not call service when no changes required and redirect to readiness check before declaration" in {
       val mockService = mock[VerificationService]
 
       // selected: 10,30 => refs 1111,3333
@@ -189,7 +192,10 @@ class ModifyVerificationBatchAndVerificationsControllerSpec extends SpecBase wit
         val result     = controller.modifyVerificationBatch()(FakeRequest(POST, "/test-only"))
 
         status(result) mustBe SEE_OTHER
-        redirectLocation(result).value mustBe routes.IndexController.onPageLoad().url
+        redirectLocation(result).value mustBe
+          controllers.verify.routes.CheckVerificationBatchReadinessController
+            .checkVerificationBatchReadinessBeforeDeclaration()
+            .url
 
         verify(mockService, never()).modifyVerificationBatchAndVerifications(any(), any())(any())
       }
@@ -384,7 +390,10 @@ class ModifyVerificationBatchAndVerificationsControllerSpec extends SpecBase wit
         val result     = controller.modifyVerificationBatch()(FakeRequest(POST, "/test-only"))
 
         status(result) mustBe SEE_OTHER
-        redirectLocation(result).value mustBe routes.IndexController.onPageLoad().url
+        redirectLocation(result).value mustBe
+          controllers.verify.routes.CheckVerificationBatchReadinessController
+            .checkVerificationBatchReadinessBeforeDeclaration()
+            .url
 
         val reqCaptor = ArgumentCaptor.forClass(classOf[ModifyVerificationsRequest])
         verify(mockService).modifyVerificationBatchAndVerifications(eqTo(ua), reqCaptor.capture())(any())

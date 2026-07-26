@@ -27,9 +27,9 @@ import views.html.verify.NoSubcontractorsSelectedWarningView
 
 class NoSubcontractorsSelectedWarningControllerSpec extends SpecBase with Matchers {
 
-  private val cisId                    = "12345"
-  private val manageSubcontractorsBase = applicationConfig.manageSubcontractorsUrl
-  private val expectedManageUrl        = s"$manageSubcontractorsBase/$cisId"
+  private val cisId             = "12345"
+  private val expectedCancelUrl =
+    routes.NoSubcontractorsSelectedWarningController.onCancel().url
 
   private val expectedSelectSubcontractorsToReverifyUrl = "/subcontractor/verify/select-subcontractors-to-verify"
 
@@ -57,7 +57,33 @@ class NoSubcontractorsSelectedWarningControllerSpec extends SpecBase with Matche
 
         status(result) mustBe Status.OK
         contentAsString(result) mustBe
-          view(expectedManageUrl, expectedSelectSubcontractorsToReverifyUrl)(request, messages(application)).toString
+          view(expectedCancelUrl, expectedSelectSubcontractorsToReverifyUrl)(request, messages(application)).toString
+      }
+    }
+
+    "must clear verify journey data and redirect to manage subcontractors when Cancel is clicked" in {
+
+      val userAnswers =
+        UserAnswers(userAnswersId)
+          .set(CisIdQuery, cisId)
+          .success
+          .value
+
+      val application =
+        applicationBuilder(userAnswers = Some(userAnswers)).build()
+
+      running(application) {
+        val request =
+          FakeRequest(
+            GET,
+            routes.NoSubcontractorsSelectedWarningController.onCancel().url
+          )
+
+        val result = route(application, request).value
+
+        status(result) mustBe Status.SEE_OTHER
+        redirectLocation(result).value mustBe
+          s"${applicationConfig.manageSubcontractorsUrl}/$cisId"
       }
     }
 

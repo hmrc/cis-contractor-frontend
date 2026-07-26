@@ -17,7 +17,7 @@
 package views.add.partnership
 
 import forms.add.partnership.PartnershipNominatedPartnerCrnFormProvider
-import models.NormalMode
+import models.{AmendMode, NormalMode}
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.jsoup.select.Elements
@@ -60,6 +60,33 @@ class PartnershipNominatedPartnerCrnViewSpec extends AnyWordSpec with Matchers w
       doc.select("input[name=value]").size() mustBe 1
 
       doc.select(".govuk-button").text() mustBe messages("site.continue")
+    }
+
+    "render the page with title, heading, hint, input and update button for Amend journey" in new Setup {
+
+      val nominatedPartnerName = "Gary hmrc"
+
+      val html: HtmlFormat.Appendable = view(form, AmendMode, nominatedPartnerName)
+      val doc: Document               = Jsoup.parse(html.toString())
+
+      doc.select("title").text() must include(
+        messages("partnershipNominatedPartnerCrn.title", nominatedPartnerName)
+      )
+
+      val label: Elements = doc.select("label.govuk-label")
+      label.text() mustBe messages("partnershipNominatedPartnerCrn.heading", nominatedPartnerName)
+
+      doc.select(".govuk-hint").text() mustBe messages("partnershipNominatedPartnerCrn.hint")
+
+      doc
+        .select("form")
+        .attr("action") mustBe controllers.add.partnership.routes.PartnershipNominatedPartnerCrnController
+        .onSubmit(AmendMode)
+        .url
+
+      doc.select("input[name=value]").size() mustBe 1
+
+      doc.select(".govuk-button").text() mustBe messages("site.update")
     }
 
     "display error summary and inline error when no CRN is entered" in new Setup {

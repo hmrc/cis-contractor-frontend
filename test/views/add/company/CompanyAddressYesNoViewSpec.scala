@@ -17,7 +17,9 @@
 package views.add.company
 
 import forms.add.company.CompanyAddressYesNoFormProvider
-import models.NormalMode
+import models.{AmendMode, NormalMode}
+import org.jsoup.nodes.Document
+import org.jsoup.select.Elements
 import org.jsoup.Jsoup
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
@@ -26,6 +28,7 @@ import play.api.data.Form
 import play.api.i18n.{Lang, Messages, MessagesApi, MessagesImpl}
 import play.api.mvc.Request
 import play.api.test.FakeRequest
+import play.twirl.api.HtmlFormat
 import views.html.add.company.CompanyAddressYesNoView
 
 class CompanyAddressYesNoViewSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite {
@@ -59,6 +62,40 @@ class CompanyAddressYesNoViewSpec extends AnyWordSpec with Matchers with GuiceOn
       doc.select("form").attr("action") mustBe
         controllers.add.company.routes.CompanyAddressYesNoController
           .onSubmit(NormalMode)
+          .url
+      doc.select("form").attr("autocomplete") mustBe "off"
+
+      doc.select(".govuk-button").text() mustBe messages("site.continue")
+    }
+
+    "render the page with title, heading, hint, yes/no radios and submit button for amend journey" in new Setup {
+
+      val companyName = "Test Company"
+
+      val html: HtmlFormat.Appendable = view(form, AmendMode, companyName)
+      val doc: Document               = org.jsoup.Jsoup.parse(html.toString())
+
+      doc.select("title").text() must include(
+        messages("companyAddressYesNo.title")
+      )
+
+      val legend = doc.select("fieldset legend")
+      legend.text() mustBe messages("companyAddressYesNo.heading", companyName)
+      legend.hasClass("govuk-fieldset__legend--l") mustBe true
+
+      val hint: Elements = doc.select("fieldset .govuk-hint")
+      hint.text() mustBe empty
+
+      val radios = doc.select(".govuk-radios__input")
+      radios.size() mustBe 2
+
+      val labels = doc.select(".govuk-radios__label").eachText()
+      labels must contain("Yes")
+      labels must contain("No")
+
+      doc.select("form").attr("action") mustBe
+        controllers.add.company.routes.CompanyAddressYesNoController
+          .onSubmit(AmendMode)
           .url
       doc.select("form").attr("autocomplete") mustBe "off"
 

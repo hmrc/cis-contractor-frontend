@@ -35,7 +35,14 @@ class PartnershipNavigator @Inject() () extends NavigatorForJourney {
     case CheckMode  =>
       checkRouteMap(page)(userAnswers)
     case AmendMode  =>
-      routes.JourneyRecoveryController.onPageLoad()
+      amendRouteMap(page)(userAnswers)
+  }
+
+  private def cyaRoute(mode: Mode): Call = mode match {
+    case AmendMode =>
+      routes.JourneyRecoveryController
+        .onPageLoad() // TODO route to controllers.amend.routes.AmendPartnershipCheckYourAnswersController.onPageLoad() when AmendIndividualCheckYourAnswersController added.
+    case _         => controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
   }
 
   private val normalRoutes: Page => UserAnswers => Call = {
@@ -75,6 +82,50 @@ class PartnershipNavigator @Inject() () extends NavigatorForJourney {
     case PartnershipNominatedPartnerUtrYesNoPage  =>
       userAnswers => navigatorFromPartnershipNominatedPartnerUtrYesNoPage(NormalMode)(userAnswers)
     case _                                        => _ => routes.IndexController.onPageLoad()
+  }
+
+  private val amendRouteMap: Page => UserAnswers => Call = {
+    case PartnershipWorksReferenceNumberYesNoPage => navigatorFromPartnershipWorksReferenceNumberYesNoPage(AmendMode)(_)
+    case PartnershipWorksReferenceNumberPage      =>
+      _ => cyaRoute(AmendMode)
+    case PartnershipNominatedPartnerCrnYesNoPage  => navigatorFromPartnershipNominatedPartnerCrnYesNoPage(AmendMode)(_)
+    case PartnershipNominatedPartnerCrnPage       => navigatorFromPartnershipNominatedPartnerCrnPage(AmendMode)(_)
+    case PartnershipUniqueTaxpayerReferencePage   =>
+      _ => cyaRoute(AmendMode)
+    case PartnershipHasUtrYesNoPage               => navigatorFromPartnershipHasUtrYesNoPage(AmendMode)(_)
+    case PartnershipNominatedPartnerUtrYesNoPage  =>
+      userAnswers => navigatorFromPartnershipNominatedPartnerUtrYesNoPage(AmendMode)(userAnswers)
+    case PartnershipNominatedPartnerUtrPage       =>
+      _ => cyaRoute(AmendMode)
+    case PartnershipNominatedPartnerNinoYesNoPage =>
+      userAnswers => navigatorFromPartnershipNominatedPartnerNinoYesNoPage(AmendMode)(userAnswers)
+    case PartnershipNominatedPartnerNinoPage      => navigatorFromPartnershipNominatedPartnerNinoPage(AmendMode)(_)
+    case PartnershipNamePage                      =>
+      _ => cyaRoute(AmendMode)
+    case PartnershipNominatedPartnerNamePage      =>
+      _ => cyaRoute(AmendMode)
+    case PartnershipAddressYesNoPage              =>
+      userAnswers => navigatorFromPartnershipAddressYesNoPage(AmendMode)(userAnswers)
+    case AddPartnershipContactMethodsYesNoPage    =>
+      userAnswers => navigatorFromAddPartnershipContactMethodsYesNoPage(AmendMode)(userAnswers)
+    case PartnershipContactMethodOptionsPage      =>
+      userAnswers => nextMissingSelectedContactMethodPageAfter(current = None, AmendMode)(userAnswers)
+    case PartnershipEmailAddressPage              =>
+      userAnswers =>
+        nextMissingSelectedContactMethodPageAfter(current = Some(ContactMethodOptions.Email), mode = AmendMode)(
+          userAnswers
+        )
+    case PartnershipPhoneNumberPage               =>
+      userAnswers =>
+        nextMissingSelectedContactMethodPageAfter(current = Some(ContactMethodOptions.Phone), mode = AmendMode)(
+          userAnswers
+        )
+    case PartnershipMobileNumberPage              =>
+      userAnswers =>
+        nextMissingSelectedContactMethodPageAfter(current = Some(ContactMethodOptions.Mobile), mode = AmendMode)(
+          userAnswers
+        )
+    case _                                        => _ => cyaRoute(AmendMode)
   }
 
   private val checkRouteMap: Page => UserAnswers => Call = {
@@ -118,7 +169,7 @@ class PartnershipNavigator @Inject() () extends NavigatorForJourney {
         controllers.add.partnership.routes.PartnershipNominatedPartnerCrnYesNoController.onPageLoad(NormalMode)
 
       case (Some(_), CheckMode | AmendMode) =>
-        controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
+        cyaRoute(mode)
 
       case (None, _) =>
         routes.JourneyRecoveryController.onPageLoad()
@@ -130,7 +181,7 @@ class PartnershipNavigator @Inject() () extends NavigatorForJourney {
         controllers.add.partnership.routes.PartnershipWorksReferenceNumberYesNoController.onPageLoad(NormalMode)
 
       case (Some(_), CheckMode | AmendMode) =>
-        controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
+        cyaRoute(mode)
 
       case (None, _) =>
         routes.JourneyRecoveryController.onPageLoad()
@@ -139,14 +190,14 @@ class PartnershipNavigator @Inject() () extends NavigatorForJourney {
   private def navigatorFromPartnershipHasUtrYesNoPage(mode: Mode)(ua: UserAnswers): Call =
     (ua.get(PartnershipHasUtrYesNoPage), mode) match {
 
-      case (Some(true), CheckMode) if ua.get(PartnershipUniqueTaxpayerReferencePage).isDefined =>
-        controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
+      case (Some(true), CheckMode | AmendMode) if ua.get(PartnershipUniqueTaxpayerReferencePage).isDefined =>
+        cyaRoute(mode)
 
-      case (Some(true), CheckMode) =>
-        controllers.add.partnership.routes.PartnershipUniqueTaxpayerReferenceController.onPageLoad(CheckMode)
+      case (Some(true), CheckMode | AmendMode) =>
+        controllers.add.partnership.routes.PartnershipUniqueTaxpayerReferenceController.onPageLoad(mode)
 
-      case (Some(false), CheckMode) =>
-        controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
+      case (Some(false), CheckMode | AmendMode) =>
+        cyaRoute(mode)
 
       case (Some(true), NormalMode) =>
         controllers.add.partnership.routes.PartnershipUniqueTaxpayerReferenceController.onPageLoad(NormalMode)
@@ -161,14 +212,14 @@ class PartnershipNavigator @Inject() () extends NavigatorForJourney {
   private def navigatorFromPartnershipWorksReferenceNumberYesNoPage(mode: Mode)(ua: UserAnswers): Call =
     (ua.get(PartnershipWorksReferenceNumberYesNoPage), mode) match {
 
-      case (Some(true), CheckMode) if ua.get(PartnershipWorksReferenceNumberPage).isDefined =>
-        controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
+      case (Some(true), CheckMode | AmendMode) =>
+        ua.get(PartnershipWorksReferenceNumberPage)
+          .fold(controllers.add.partnership.routes.PartnershipWorksReferenceNumberController.onPageLoad(mode)) { _ =>
+            cyaRoute(mode)
+          }
 
-      case (Some(true), CheckMode) =>
-        controllers.add.partnership.routes.PartnershipWorksReferenceNumberController.onPageLoad(CheckMode)
-
-      case (Some(false), CheckMode) =>
-        controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
+      case (Some(false), CheckMode | AmendMode) =>
+        cyaRoute(mode)
 
       case (Some(true), NormalMode) =>
         controllers.add.partnership.routes.PartnershipWorksReferenceNumberController.onPageLoad(NormalMode)
@@ -192,13 +243,13 @@ class PartnershipNavigator @Inject() () extends NavigatorForJourney {
         userAnswers
           .get(PartnershipNominatedPartnerUtrPage)
           .fold(
-            controllers.add.partnership.routes.PartnershipNominatedPartnerUtrController.onPageLoad(CheckMode)
+            controllers.add.partnership.routes.PartnershipNominatedPartnerUtrController.onPageLoad(mode)
           ) { _ =>
-            controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
+            cyaRoute(mode)
           }
 
       case (Some(false), CheckMode | AmendMode) =>
-        controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
+        cyaRoute(mode)
 
       case (None, _) =>
         routes.JourneyRecoveryController.onPageLoad()
@@ -216,29 +267,41 @@ class PartnershipNavigator @Inject() () extends NavigatorForJourney {
         userAnswers
           .get(PartnershipNominatedPartnerCrnPage)
           .fold(
-            controllers.add.partnership.routes.PartnershipNominatedPartnerCrnController.onPageLoad(CheckMode)
+            controllers.add.partnership.routes.PartnershipNominatedPartnerCrnController.onPageLoad(mode)
           ) { _ =>
-            controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
+            cyaRoute(mode)
           }
 
       case (Some(false), CheckMode | AmendMode) =>
-        controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
+        cyaRoute(mode)
 
       case (None, _) =>
         routes.JourneyRecoveryController.onPageLoad()
     }
 
   private def navigatorFromPartnershipAddressYesNoPage(mode: Mode)(userAnswers: UserAnswers): Call =
-    addressLookupYesNoRoute(
-      mode,
-      userAnswers.get(PartnershipAddressYesNoPage),
-      userAnswers.get(PartnershipAddressPage).isDefined,
-      onYes = controllers.add.partnership.routes.PartnershipAddressController.redirectToAddressLookup(),
-      onYesChange = controllers.add.partnership.routes.PartnershipAddressController
-        .redirectToAddressLookup(Some(CheckMode.toString)),
-      onNo = controllers.add.partnership.routes.AddPartnershipContactMethodsYesNoController.onPageLoad(NormalMode),
-      checkYourAnswers = controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
-    )
+    mode match {
+      case AmendMode =>
+        userAnswers.get(PartnershipAddressYesNoPage) match {
+          case Some(true)  =>
+            controllers.add.partnership.routes.PartnershipAddressController.redirectToAmendAddressLookup()
+          case Some(false) =>
+            cyaRoute(mode)
+          case None        =>
+            controllers.routes.JourneyRecoveryController.onPageLoad()
+        }
+      case _         =>
+        addressLookupYesNoRoute(
+          mode,
+          userAnswers.get(PartnershipAddressYesNoPage),
+          userAnswers.get(PartnershipAddressPage).isDefined,
+          onYes = controllers.add.partnership.routes.PartnershipAddressController.redirectToAddressLookup(),
+          onYesChange = controllers.add.partnership.routes.PartnershipAddressController
+            .redirectToAddressLookup(Some(CheckMode.toString)),
+          onNo = controllers.add.partnership.routes.AddPartnershipContactMethodsYesNoController.onPageLoad(NormalMode),
+          checkYourAnswers = controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
+        )
+    }
 
   private def navigatorFromPartnershipNominatedPartnerNinoYesNoPage(mode: Mode)(userAnswers: UserAnswers): Call =
     (userAnswers.get(PartnershipNominatedPartnerNinoYesNoPage), mode) match {
@@ -252,13 +315,13 @@ class PartnershipNavigator @Inject() () extends NavigatorForJourney {
         userAnswers
           .get(PartnershipNominatedPartnerNinoPage)
           .fold(
-            controllers.add.partnership.routes.PartnershipNominatedPartnerNinoController.onPageLoad(CheckMode)
+            controllers.add.partnership.routes.PartnershipNominatedPartnerNinoController.onPageLoad(mode)
           ) { _ =>
-            controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
+            cyaRoute(mode)
           }
 
       case (Some(false), CheckMode | AmendMode) =>
-        controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
+        cyaRoute(mode)
 
       case (None, _) =>
         routes.JourneyRecoveryController.onPageLoad()
@@ -268,21 +331,20 @@ class PartnershipNavigator @Inject() () extends NavigatorForJourney {
     (userAnswers.get(AddPartnershipContactMethodsYesNoPage), mode) match {
 
       case (Some(true), NormalMode) =>
-        controllers.add.partnership.routes.PartnershipContactMethodOptionsController.onPageLoad(mode)
+        controllers.add.partnership.routes.PartnershipContactMethodOptionsController.onPageLoad(NormalMode)
 
       case (Some(false), NormalMode) =>
         controllers.add.partnership.routes.PartnershipHasUtrYesNoController.onPageLoad(NormalMode)
 
-      case (Some(true), CheckMode) =>
+      case (Some(true), CheckMode | AmendMode) =>
         userAnswers
           .get(PartnershipContactMethodOptionsPage)
-          .fold(controllers.add.partnership.routes.PartnershipContactMethodOptionsController.onPageLoad(CheckMode)) {
-            _ =>
-              controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
+          .fold(controllers.add.partnership.routes.PartnershipContactMethodOptionsController.onPageLoad(mode)) { _ =>
+            cyaRoute(mode)
           }
 
       case (Some(false), CheckMode) =>
-        controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
+        cyaRoute(mode)
 
       case _ =>
         routes.JourneyRecoveryController.onPageLoad()
@@ -298,14 +360,15 @@ class PartnershipNavigator @Inject() () extends NavigatorForJourney {
     }
 
   private def nextMissingSelectedContactMethodPageAfter(
-    current: Option[ContactMethodOptions]
+    current: Option[ContactMethodOptions],
+    mode: Mode = CheckMode
   )(userAnswers: UserAnswers): Call =
     navigateFromContactMethodPage(current, userAnswers) { remaining =>
       remaining
         .find(isMissingAnswer(_)(userAnswers))
-        .map(contactMethodPageCall(_, CheckMode))
+        .map(contactMethodPageCall(_, mode))
         .getOrElse(
-          controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
+          cyaRoute(mode)
         )
     }
 
