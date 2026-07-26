@@ -160,9 +160,9 @@ class IndividualEmailAddressControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must add TrustEmailAddressPage to AmendedPagesPage when submitted in AmendMode" in {
+    "must add IndividualEmailAddressPage to AmendedPagesPage when submitted in AmendMode" in {
       val mockSessionRepository = mock[SessionRepository]
-      val onwardRoute           = controllers.add.trust.routes.TrustUtrYesNoController.onPageLoad(AmendMode)
+      val onwardRoute           = controllers.add.routes.UniqueTaxpayerReferenceYesNoController.onPageLoad(AmendMode)
       val captor                = ArgumentCaptor.forClass(classOf[UserAnswers])
       val userAnswers           = uaWithName
         .set(IndividualContactMethodOptionsPage, Set(ContactMethodOptions.Email))

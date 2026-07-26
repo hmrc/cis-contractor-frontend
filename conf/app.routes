@@ -21,7 +21,6 @@ GET   /subcontractor/account/signed-out  controllers.auth.SignedOutController.on
 GET   /subcontractor/unauthorised  controllers.UnauthorisedController.onPageLoad()
 
 GET   /subcontractor/unauthorised/organisation  controllers.UnauthorisedOrganisationAffinityController.onPageLoad()
-GET   /subcontractor/unauthorised/organisation  controllers.UnauthorisedOrganisationAffinityController.onPageLoad()
 
 GET   /subcontractor/unauthorised/individual  controllers.UnauthorisedIndividualAffinityController.onPageLoad()
 
