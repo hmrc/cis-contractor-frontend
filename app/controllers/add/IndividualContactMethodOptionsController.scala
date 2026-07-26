@@ -17,6 +17,7 @@
 package controllers.add
 
 import controllers.actions.*
+import controllers.helpers.SaveAnswerHelper
 import forms.add.IndividualContactMethodOptionsFormProvider
 import models.Mode
 import models.requests.DataRequest
@@ -73,7 +74,9 @@ class IndividualContactMethodOptionsController @Inject() (
               formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, subcontractorName))),
               value =>
                 for {
-                  updatedAnswers <- Future.fromTry(request.userAnswers.set(IndividualContactMethodOptionsPage, value))
+                  updatedAnswers <- Future.fromTry(
+                    SaveAnswerHelper.saveAnswer(request.userAnswers, IndividualContactMethodOptionsPage, value, mode)
+                  )
                   _              <- sessionRepository.set(updatedAnswers)
                 } yield Redirect(navigator.nextPage(IndividualContactMethodOptionsPage, mode, updatedAnswers))
             )

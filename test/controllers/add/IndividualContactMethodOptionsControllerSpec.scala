@@ -21,11 +21,14 @@ import controllers.routes
 import forms.add.IndividualContactMethodOptionsFormProvider
 import models.add.{IndividualContactMethodOptions, SubcontractorName}
 import models.contact.ContactMethodOptions
-import models.{CheckMode, NormalMode, UserAnswers}
+import models.{AmendMode, CheckMode, NormalMode, UserAnswers}
+import navigation.{FakeNavigator, Navigator}
+import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.when
+import org.mockito.Mockito.{verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import pages.add.{IndividualContactMethodOptionsPage, IndividualEmailAddressPage, IndividualPhoneNumberPage, SubcontractorNamePage}
+import pages.amend.AmendedPagesPage
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
@@ -97,15 +100,17 @@ class IndividualContactMethodOptionsControllerSpec extends SpecBase with Mockito
       }
     }
 
-    "must redirect to the next page when valid data is submitted" in {
-
+    "must redirect to the next page and not add the page to AmendedPagesPage when valid data is submitted in NormalMode" in {
+      val onwardRoute = controllers.add.routes.IndividualEmailAddressController
+        .onPageLoad(NormalMode)
       val mockSessionRepository = mock[SessionRepository]
-
+      val captor = ArgumentCaptor.forClass(classOf[UserAnswers])
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
       val application =
         applicationBuilder(userAnswers = Some(uaWithName))
           .overrides(
+            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
             bind[SessionRepository].toInstance(mockSessionRepository)
           )
           .build()
@@ -118,9 +123,52 @@ class IndividualContactMethodOptionsControllerSpec extends SpecBase with Mockito
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.add.routes.IndividualEmailAddressController
-          .onPageLoad(NormalMode)
-          .url
+        redirectLocation(result).value mustEqual onwardRoute.url
+        verify(mockSessionRepository).set(captor.capture())
+
+        val updatedAnswers = captor.getValue
+
+        updatedAnswers.get(IndividualContactMethodOptionsPage) mustBe Some(Set(ContactMethodOptions.Email))
+        updatedAnswers.get(AmendedPagesPage) mustBe None
+
+      }
+    }
+
+    "must add IndividualContactMethodOptionsPage to AmendedPagesPage when submitted in AmendMode" in {
+      val mockSessionRepository = mock[SessionRepository]
+      val captor = ArgumentCaptor.forClass(classOf[UserAnswers])
+      val onwardRoute = controllers.add.routes.IndividualEmailAddressController.onPageLoad(AmendMode)
+
+      when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
+
+      val application =
+        applicationBuilder(userAnswers = Some(uaWithName))
+          .overrides(
+            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
+            bind[SessionRepository].toInstance(mockSessionRepository)
+          )
+          .build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(
+            POST,
+            controllers.add.routes.IndividualContactMethodOptionsController
+              .onPageLoad(AmendMode)
+              .url
+          ).withFormUrlEncodedBody(
+            "value[0]" -> ContactMethodOptions.Email.toString
+          )
+
+        val result = route(application, request).value
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual onwardRoute.url
+
+        verify(mockSessionRepository).set(captor.capture())
+        val updatedAnswers = captor.getValue
+        updatedAnswers.get(IndividualContactMethodOptionsPage) mustBe Some(Set(ContactMethodOptions.Email))
+        updatedAnswers.get(AmendedPagesPage).value must contain(IndividualContactMethodOptionsPage.toString)
       }
     }
 

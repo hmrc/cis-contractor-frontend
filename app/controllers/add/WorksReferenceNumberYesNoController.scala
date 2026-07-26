@@ -17,6 +17,7 @@
 package controllers.add
 
 import controllers.actions.*
+import controllers.helpers.SaveAnswerHelper
 import forms.add.WorksReferenceNumberYesNoFormProvider
 import models.Mode
 import models.requests.DataRequest
@@ -76,7 +77,10 @@ class WorksReferenceNumberYesNoController @Inject() (
               formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, subcontractorName))),
               value =>
                 for {
-                  updatedAnswers <- Future.fromTry(request.userAnswers.set(WorksReferenceNumberYesNoPage, value))
+                  updatedAnswers <-
+                    Future.fromTry(
+                      SaveAnswerHelper.saveAnswer(request.userAnswers, WorksReferenceNumberYesNoPage, value, mode)
+                    )
                   _              <- sessionRepository.set(updatedAnswers)
                 } yield Redirect(navigator.nextPage(WorksReferenceNumberYesNoPage, mode, updatedAnswers))
             )

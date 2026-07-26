@@ -17,6 +17,7 @@
 package controllers.add
 
 import controllers.actions.*
+import controllers.helpers.SaveAnswerHelper
 import forms.add.SubNationalInsuranceNumberFormProvider
 import models.Mode
 import models.requests.DataRequest
@@ -75,7 +76,9 @@ class SubNationalInsuranceNumberController @Inject() (
               formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, subcontractorName))),
               value =>
                 for {
-                  updatedAnswers <- Future.fromTry(request.userAnswers.set(SubNationalInsuranceNumberPage, value))
+                  updatedAnswers <- Future.fromTry(
+                    SaveAnswerHelper.saveAnswer(request.userAnswers, SubNationalInsuranceNumberPage, value, mode)
+                  )
                   _              <- sessionRepository.set(updatedAnswers)
                 } yield Redirect(navigator.nextPage(SubNationalInsuranceNumberPage, mode, updatedAnswers))
             )

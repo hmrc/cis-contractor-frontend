@@ -17,6 +17,7 @@
 package controllers.add
 
 import controllers.actions.*
+import controllers.helpers.SaveAnswerHelper
 import forms.add.SubAddressYesNoFormProvider
 import models.Mode
 import models.requests.DataRequest
@@ -75,7 +76,9 @@ class SubAddressYesNoController @Inject() (
               formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, subcontractorName))),
               value =>
                 for {
-                  updatedAnswers <- Future.fromTry(request.userAnswers.set(SubAddressYesNoPage, value))
+                  updatedAnswers <- Future.fromTry(
+                    SaveAnswerHelper.saveAnswer(request.userAnswers, SubAddressYesNoPage, value, mode)
+                  )
                   _              <- sessionRepository.set(updatedAnswers)
                 } yield Redirect(navigator.nextPage(SubAddressYesNoPage, mode, updatedAnswers))
             )

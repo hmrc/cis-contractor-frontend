@@ -17,6 +17,7 @@
 package controllers.add
 
 import controllers.actions.*
+import controllers.helpers.SaveAnswerHelper
 import forms.add.TradingNameOfSubcontractorFormProvider
 import models.Mode
 import navigation.Navigator
@@ -64,7 +65,9 @@ class TradingNameOfSubcontractorController @Inject() (
           formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
           value =>
             for {
-              updatedAnswers <- Future.fromTry(request.userAnswers.set(TradingNameOfSubcontractorPage, value))
+              updatedAnswers <- Future.fromTry(
+                SaveAnswerHelper.saveAnswer(request.userAnswers, TradingNameOfSubcontractorPage, value, mode)
+              )
               _              <- sessionRepository.set(updatedAnswers)
             } yield Redirect(
               navigator.nextPage(TradingNameOfSubcontractorPage, mode, updatedAnswers)

@@ -19,11 +19,14 @@ package controllers.add
 import base.SpecBase
 import controllers.routes
 import forms.add.TradingNameOfSubcontractorFormProvider
-import models.{NormalMode, UserAnswers}
+import models.{AmendMode, NormalMode, UserAnswers}
+import navigation.{FakeNavigator, Navigator}
+import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.when
+import org.mockito.Mockito.{verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import pages.add.TradingNameOfSubcontractorPage
+import pages.amend.AmendedPagesPage
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
@@ -78,8 +81,10 @@ class TradingNameOfSubcontractorControllerSpec extends SpecBase with MockitoSuga
     }
 
     "must redirect to the SubAddressYesNo page when valid data is submitted" in {
-
+      val onwardRoute           = controllers.add.routes.SubAddressYesNoController
+        .onPageLoad(NormalMode)
       val mockSessionRepository = mock[SessionRepository]
+      val captor                = ArgumentCaptor.forClass(classOf[UserAnswers])
 
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
@@ -98,9 +103,49 @@ class TradingNameOfSubcontractorControllerSpec extends SpecBase with MockitoSuga
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.add.routes.SubAddressYesNoController
-          .onPageLoad(NormalMode)
-          .url
+        redirectLocation(result).value mustEqual onwardRoute.url
+        verify(mockSessionRepository).set(captor.capture())
+
+        val updatedAnswers = captor.getValue
+        updatedAnswers.get(TradingNameOfSubcontractorPage) mustBe Some("answer")
+        updatedAnswers.get(AmendedPagesPage) mustBe None
+      }
+    }
+
+    "must add TradingNameOfSubcontractorPage to AmendedPagesPage when submitted in AmendMode" in {
+      val onwardRoute           = controllers.add.routes.SubAddressYesNoController
+        .onPageLoad(AmendMode)
+      val mockSessionRepository = mock[SessionRepository]
+      val captor                = ArgumentCaptor.forClass(classOf[UserAnswers])
+
+      when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
+
+      val application =
+        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          .overrides(
+            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
+            bind[SessionRepository].toInstance(mockSessionRepository)
+          )
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(
+            POST,
+            controllers.add.routes.TradingNameOfSubcontractorController.onPageLoad(AmendMode).url
+          ).withFormUrlEncodedBody(
+            "value" -> "answer"
+          )
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual onwardRoute.url
+        verify(mockSessionRepository).set(captor.capture())
+
+        val updatedAnswers = captor.getValue
+        updatedAnswers.get(TradingNameOfSubcontractorPage) mustBe Some("answer")
+        updatedAnswers.get(AmendedPagesPage).value must contain(TradingNameOfSubcontractorPage.toString)
       }
     }
 

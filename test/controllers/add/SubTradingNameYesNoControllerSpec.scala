@@ -19,11 +19,14 @@ package controllers.add
 import base.SpecBase
 import controllers.routes
 import forms.add.SubTradingNameYesNoFormProvider
-import models.{NormalMode, UserAnswers}
+import models.{AmendMode, NormalMode, UserAnswers}
+import navigation.{FakeNavigator, Navigator}
+import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.when
+import org.mockito.Mockito.{verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import pages.add.SubTradingNameYesNoPage
+import pages.amend.AmendedPagesPage
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
@@ -75,30 +78,74 @@ class SubTradingNameYesNoControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must redirect to TradingNameOfSubcontractor page when valid data with value Yes is submitted" in {
+    "must redirect to TradingNameOfSubcontractor page and not add page to AmendedPagesPage when" +
+      "valid data with value Yes is submitted in NormalMode" in {
+        val onwardRoute           = controllers.add.routes.TradingNameOfSubcontractorController
+          .onPageLoad(NormalMode)
+        val captor                = ArgumentCaptor.forClass(classOf[UserAnswers])
+        val mockSessionRepository = mock[SessionRepository]
 
+        when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+        val application =
+          applicationBuilder(userAnswers = Some(emptyUserAnswers))
+            .overrides(
+              bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
+              bind[SessionRepository].toInstance(mockSessionRepository)
+            )
+            .build()
+
+        running(application) {
+          val request =
+            FakeRequest(POST, subTradingNameYesNoRoute)
+              .withFormUrlEncodedBody(("value", "true"))
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual onwardRoute.url
+          verify(mockSessionRepository).set(captor.capture())
+          val updatedAnswers = captor.getValue
+
+          updatedAnswers.get(SubTradingNameYesNoPage) mustBe Some(true)
+          updatedAnswers.get(AmendedPagesPage) mustBe None
+        }
+      }
+
+    "must add NationalInsuranceNumberYesNoPage to AmendedPagesPage when submitted in AmendMode" in {
+      val onwardRoute           = controllers.add.routes.SubNationalInsuranceNumberController
+        .onPageLoad(AmendMode)
       val mockSessionRepository = mock[SessionRepository]
+      val captor                = ArgumentCaptor.forClass(classOf[UserAnswers])
 
-      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+      when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
 
       val application =
         applicationBuilder(userAnswers = Some(emptyUserAnswers))
           .overrides(
+            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
             bind[SessionRepository].toInstance(mockSessionRepository)
           )
           .build()
 
       running(application) {
         val request =
-          FakeRequest(POST, subTradingNameYesNoRoute)
-            .withFormUrlEncodedBody(("value", "true"))
+          FakeRequest(
+            POST,
+            controllers.add.routes.SubTradingNameYesNoController.onPageLoad(AmendMode).url
+          ).withFormUrlEncodedBody(
+            "value" -> "true"
+          )
 
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.add.routes.TradingNameOfSubcontractorController
-          .onPageLoad(NormalMode)
-          .url
+        redirectLocation(result).value mustEqual onwardRoute.url
+        verify(mockSessionRepository).set(captor.capture())
+
+        val updatedAnswers = captor.getValue
+        updatedAnswers.get(SubTradingNameYesNoPage) mustBe Some(true)
+        updatedAnswers.get(AmendedPagesPage).value must contain(SubTradingNameYesNoPage.toString)
       }
     }
 

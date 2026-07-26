@@ -17,6 +17,7 @@
 package controllers.add
 
 import controllers.actions.*
+import controllers.helpers.SaveAnswerHelper
 import forms.add.SubcontractorNameFormProvider
 import models.Mode
 import models.add.SubcontractorName.format
@@ -65,7 +66,9 @@ class SubcontractorNameController @Inject() (
           formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
           value =>
             for {
-              updatedAnswers <- Future.fromTry(request.userAnswers.set(SubcontractorNamePage, value))
+              updatedAnswers <- Future.fromTry(
+                SaveAnswerHelper.saveAnswer(request.userAnswers, SubcontractorNamePage, value, mode)
+              )
               _              <- sessionRepository.set(updatedAnswers)
             } yield Redirect(
               navigator.nextPage(SubcontractorNamePage, mode, updatedAnswers)

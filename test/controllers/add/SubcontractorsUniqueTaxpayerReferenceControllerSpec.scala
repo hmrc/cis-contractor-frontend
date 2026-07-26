@@ -21,13 +21,17 @@ import controllers.routes
 import forms.add.UtrFormProvider
 import models.add.SubcontractorName
 import models.{AmendMode, NormalMode, UserAnswers}
+import navigation.{FakeNavigator, Navigator}
+import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{verify, verifyNoMoreInteractions, when}
 import org.scalatestplus.mockito.MockitoSugar
 import pages.add.{SubcontractorNamePage, SubcontractorsUniqueTaxpayerReferencePage}
+import pages.amend.AmendedPagesPage
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
+import repositories.SessionRepository
 import services.SubcontractorService
 import uk.gov.hmrc.http.HeaderCarrier
 import views.html.add.SubcontractorsUniqueTaxpayerReferenceView
@@ -90,37 +94,92 @@ class SubcontractorsUniqueTaxpayerReferenceControllerSpec extends SpecBase with 
       }
     }
 
-    "must bind the form and redirect to NationalInsuranceNumberYesNo Page on POST when valid UTR is submitted" in {
+    "must bind the form and redirect to NationalInsuranceNumberYesNo Page and" +
+      " not add the page in AmendedPagesPage on POST when valid UTR is submitted in NormalMode" in {
+        val onwardRoute              = controllers.add.routes.NationalInsuranceNumberYesNoController
+          .onPageLoad(NormalMode)
+        val validValue               = "5860920998"
+        val captor                   = ArgumentCaptor.forClass(classOf[UserAnswers])
+        val mockSubcontractorService = mock[SubcontractorService]
+        val mockSessionRepository    = mock[SessionRepository]
+        when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
+        when(mockSubcontractorService.isDuplicateUTR(any[UserAnswers], any[String])(any[HeaderCarrier]))
+          .thenReturn(Future.successful(false))
 
-      val validValue = "5860920998"
+        val application =
+          applicationBuilder(userAnswers = Some(uaWithName))
+            .overrides(
+              bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
+              bind[SessionRepository].toInstance(mockSessionRepository),
+              bind[SubcontractorService].toInstance(mockSubcontractorService)
+            )
+            .build()
 
+        running(application) {
+          val request = FakeRequest(POST, subcontractorsUniqueTaxpayerReferenceRoute)
+            .withFormUrlEncodedBody(("value", validValue))
+
+          val result = route(application, request).value
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual onwardRoute.url
+          verify(mockSessionRepository).set(captor.capture())
+
+          val updatedAnswers = captor.getValue
+
+          updatedAnswers.get(SubcontractorsUniqueTaxpayerReferencePage) mustBe Some(validValue)
+          updatedAnswers.get(AmendedPagesPage) mustBe None
+
+          verify(mockSubcontractorService)
+            .isDuplicateUTR(any[UserAnswers], any[String])(any[HeaderCarrier])
+
+          verifyNoMoreInteractions(mockSubcontractorService)
+        }
+      }
+
+    "must add SubcontractorsUniqueTaxpayerReferencePage to AmendedPagesPage when submitted in AmendMode" in {
+      val validValue               = "5860920998"
+      val onwardRoute              = controllers.add.routes.NationalInsuranceNumberYesNoController.onPageLoad(AmendMode)
+      val mockSessionRepository    = mock[SessionRepository]
       val mockSubcontractorService = mock[SubcontractorService]
+
+      val captor = ArgumentCaptor.forClass(classOf[UserAnswers])
 
       when(mockSubcontractorService.isDuplicateUTR(any[UserAnswers], any[String])(any[HeaderCarrier]))
         .thenReturn(Future.successful(false))
 
+      when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
+
       val application =
         applicationBuilder(userAnswers = Some(uaWithName))
           .overrides(
+            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
+            bind[SessionRepository].toInstance(mockSessionRepository),
             bind[SubcontractorService].toInstance(mockSubcontractorService)
           )
           .build()
 
       running(application) {
+
         val request =
-          FakeRequest(POST, subcontractorsUniqueTaxpayerReferenceRoute)
-            .withFormUrlEncodedBody(("value", validValue))
+          FakeRequest(
+            POST,
+            controllers.add.routes.SubcontractorsUniqueTaxpayerReferenceController
+              .onSubmit(AmendMode)
+              .url
+          ).withFormUrlEncodedBody(
+            "value" -> validValue
+          )
 
         val result = route(application, request).value
-
         status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual onwardRoute.url
+        verify(mockSessionRepository).set(captor.capture())
 
-        redirectLocation(result).value mustEqual controllers.add.routes.NationalInsuranceNumberYesNoController
-          .onPageLoad(NormalMode)
-          .url
+        val updatedAnswers = captor.getValue
+        updatedAnswers.get(SubcontractorsUniqueTaxpayerReferencePage) mustBe Some(validValue)
+
+        updatedAnswers.get(AmendedPagesPage).value must contain(SubcontractorsUniqueTaxpayerReferencePage.toString)
       }
-      verify(mockSubcontractorService).isDuplicateUTR(any[UserAnswers], any[String])(any[HeaderCarrier])
-      verifyNoMoreInteractions(mockSubcontractorService)
     }
 
     "must bind the form and redirect to there-is-a-problem Page on POST when valid UTR is submitted for Amend journey" in {

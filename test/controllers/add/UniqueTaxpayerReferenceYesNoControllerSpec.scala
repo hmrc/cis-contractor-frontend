@@ -20,11 +20,14 @@ import base.SpecBase
 import controllers.routes
 import forms.add.UniqueTaxpayerReferenceYesNoFormProvider
 import models.add.SubcontractorName
-import models.{NormalMode, UserAnswers}
+import models.{AmendMode, NormalMode, UserAnswers}
+import navigation.{FakeNavigator, Navigator}
+import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.when
+import org.mockito.Mockito.{verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import pages.add.{SubcontractorNamePage, UniqueTaxpayerReferenceYesNoPage}
+import pages.amend.AmendedPagesPage
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
@@ -87,8 +90,11 @@ class UniqueTaxpayerReferenceYesNoControllerSpec extends SpecBase with MockitoSu
       }
     }
 
-    "must redirect to the SubcontractorsUniqueTaxpayerReference page when valid data with value Yes is submitted" in {
-
+    "must redirect to the SubcontractorsUniqueTaxpayerReference page and" +
+      "not add the pages to AmendedPagesPage when valid data with value Yes is submitted in NormalMode" in {
+      val onwardRoute = controllers.add.routes.SubcontractorsUniqueTaxpayerReferenceController
+        .onPageLoad(NormalMode)
+      val captor = ArgumentCaptor.forClass(classOf[UserAnswers])
       val mockSessionRepository = mock[SessionRepository]
 
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
@@ -96,6 +102,7 @@ class UniqueTaxpayerReferenceYesNoControllerSpec extends SpecBase with MockitoSu
       val application =
         applicationBuilder(userAnswers = Some(uaWithName))
           .overrides(
+            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
             bind[SessionRepository].toInstance(mockSessionRepository)
           )
           .build()
@@ -108,9 +115,48 @@ class UniqueTaxpayerReferenceYesNoControllerSpec extends SpecBase with MockitoSu
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.add.routes.SubcontractorsUniqueTaxpayerReferenceController
-          .onPageLoad(NormalMode)
-          .url
+        redirectLocation(result).value mustEqual onwardRoute.url
+        verify(mockSessionRepository).set(captor.capture())
+        val updatedAnswers = captor.getValue
+
+        updatedAnswers.get(UniqueTaxpayerReferenceYesNoPage) mustBe Some(true)
+        updatedAnswers.get(AmendedPagesPage) mustBe None
+      }
+    }
+
+    "must add UniqueTaxpayerReferenceYesNoPage to AmendedPagesPage when submitted in AmendMode" in {
+      val mockSessionRepository = mock[SessionRepository]
+      val captor = ArgumentCaptor.forClass(classOf[UserAnswers])
+      val onwardRoute = controllers.add.routes.SubcontractorsUniqueTaxpayerReferenceController.onPageLoad(AmendMode)
+      when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
+
+      val application =
+        applicationBuilder(userAnswers = Some(uaWithName))
+          .overrides(
+            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
+            bind[SessionRepository].toInstance(mockSessionRepository)
+          )
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(
+            POST,
+            controllers.add.routes.UniqueTaxpayerReferenceYesNoController
+              .onSubmit(AmendMode)
+              .url
+          ).withFormUrlEncodedBody(
+            "value" -> "true"
+          )
+
+        val result = route(application, request).value
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual onwardRoute.url
+
+        verify(mockSessionRepository).set(captor.capture())
+        val updatedAnswers = captor.getValue
+        updatedAnswers.get(UniqueTaxpayerReferenceYesNoPage) mustBe Some(true)
+        updatedAnswers.get(AmendedPagesPage).value must contain(UniqueTaxpayerReferenceYesNoPage.toString)
       }
     }
 

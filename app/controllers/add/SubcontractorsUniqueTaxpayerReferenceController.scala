@@ -17,6 +17,7 @@
 package controllers.add
 
 import controllers.actions.*
+import controllers.helpers.SaveAnswerHelper
 import forms.add.UtrFormProvider
 import models.{AmendMode, Mode}
 import models.requests.DataRequest
@@ -59,8 +60,9 @@ class SubcontractorsUniqueTaxpayerReferenceController @Inject() (
 
   private def saveAndContinue(mode: Mode, value: String)(implicit request: DataRequest[?]) =
     for {
-      updatedAnswers <-
-        Future.fromTry(request.userAnswers.set(SubcontractorsUniqueTaxpayerReferencePage, value))
+      updatedAnswers <- Future.fromTry(
+        SaveAnswerHelper.saveAnswer(request.userAnswers, SubcontractorsUniqueTaxpayerReferencePage, value, mode)
+      )
       _              <- sessionRepository.set(updatedAnswers)
     } yield Redirect(
       navigator.nextPage(SubcontractorsUniqueTaxpayerReferencePage, mode, updatedAnswers)

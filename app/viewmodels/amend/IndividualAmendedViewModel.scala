@@ -20,10 +20,10 @@ import models.UserAnswers
 import models.add.SubcontractorName
 import models.address.Address
 import models.amend.OriginalIndividualAnswers
-import models.contact.ContactOptions
-import models.contact.ContactOptions.*
+import models.contact.ContactMethodOptions
 import pages.QuestionPage
 import pages.add.*
+import pages.amend.AmendedPagesPage
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
 import uk.gov.hmrc.govukfrontend.views.viewmodels.table.TableRow
@@ -125,7 +125,6 @@ object IndividualAmendedViewModel {
       SubTradingNameYesNoPage,
       messages("subTradingNameYesNo.checkYourAnswersLabel"),
       original.usesTradingName,
-      current.get(SubTradingNameYesNoPage),
       current
     )
 
@@ -146,7 +145,6 @@ object IndividualAmendedViewModel {
       SubAddressYesNoPage,
       messages("subAddressYesNo.checkYourAnswersLabel"),
       original.addressYesNo,
-      current.get(SubAddressYesNoPage),
       current
     )
 
@@ -167,123 +165,82 @@ object IndividualAmendedViewModel {
     }
 
   private def contactRows(
-    original: OriginalIndividualAnswers,
-    current: UserAnswers
-  )(implicit messages: Messages): Seq[Seq[TableRow]] =
-    Seq(
-      contactMethodRow(original, current),
-      contactValueRows(original, current)
-    ).flatten
+                             original: OriginalIndividualAnswers,
+                             current: UserAnswers
+                           )(implicit messages: Messages): Seq[Seq[TableRow]] = {
+      val currentMethods = current.get(IndividualContactMethodOptionsPage).getOrElse(Set.empty)
 
-  private def contactMethodRow(
-    original: OriginalIndividualAnswers,
-    current: UserAnswers
-  )(implicit messages: Messages): Option[Seq[TableRow]] =
-    Option.when(wasAmended(current, IndividualChooseContactDetailsPage)) {
-      row(
-        label = messages("individualChooseContactDetails.checkYourAnswersLabel"),
-        previous = displayContactMethod(original.contactMethod),
-        updated = displayContactMethod(current.get(IndividualChooseContactDetailsPage))
-      )
+      Seq(
+        yesNoRow(
+          AddIndividualContactMethodsYesNoPage,
+          messages("addIndividualContactMethodsYesNo.checkYourAnswersLabel"),
+          original.individualContactMethodsYesNo,
+          current
+        ),
+        Option.when(
+          wasAmended(current, IndividualContactMethodOptionsPage) ||
+            original.individualContactMethod != currentMethods
+        ) {
+          row(
+            messages("individualContactMethodOptions.checkYourAnswersLabel"),
+            formatContactMethods(original.individualContactMethod),
+            formatContactMethods(currentMethods)
+          )
+        },
+        fieldRow(
+          IndividualEmailAddressPage,
+          messages("individualEmailAddress.checkYourAnswersLabel"),
+          original.email,
+          current
+        ),
+        fieldRow(
+          IndividualPhoneNumberPage,
+          messages("individualPhoneNumber.checkYourAnswersLabel"),
+          original.phone,
+          current
+        ),
+        fieldRow(
+          IndividualMobileNumberPage,
+          messages("individualMobileNumber.checkYourAnswersLabel"),
+          original.mobile,
+          current
+        )
+      ).flatten
     }
 
-  private def contactValueRows(
-    original: OriginalIndividualAnswers,
-    current: UserAnswers
-  )(implicit messages: Messages): Seq[Seq[TableRow]] = {
-
-    val originalMethod = original.contactMethod
-    val currentMethod  = current.get(IndividualChooseContactDetailsPage)
-
-    val currentValue = contactValueFromAnswers(currentMethod, current)
-
-    (originalMethod, currentMethod) match {
-      case (Some(oldMethod), Some(newMethod)) if oldMethod == newMethod && oldMethod != NoDetails =>
-        contactDetails(oldMethod).toSeq.flatMap { case (label, page) =>
-          Option.when(
-            wasAmended(current, IndividualChooseContactDetailsPage) ||
-              wasAmended(current, page) ||
-              original.contactValue != currentValue
-          ) {
-            row(
-              label,
-              original.contactValue.getOrElse(missingValue),
-              currentValue.getOrElse(missingValue)
-            )
-          }
+  private def formatContactMethods(
+                                    methods: Set[ContactMethodOptions]
+                                  )(implicit messages: Messages): String =
+    if (methods.isEmpty) {
+      missingValue
+    } else {
+      methods.toSeq
+        .sortBy(_.toString)
+        .map {
+          case ContactMethodOptions.Email =>
+            messages("trustContactMethodOptions.email")
+          case ContactMethodOptions.Phone =>
+            messages("trustContactMethodOptions.phone")
+          case ContactMethodOptions.Mobile =>
+            messages("trustContactMethodOptions.mobile")
         }
-      case _                                                                                      =>
-        Seq(
-          originalMethod
-            .filter(_ != NoDetails)
-            .flatMap(contactDetails)
-            .map { case (label, _) =>
-              row(
-                label,
-                original.contactValue.getOrElse(missingValue),
-                missingValue
-              )
-            },
-          currentMethod
-            .filter(_ != NoDetails)
-            .flatMap(contactDetails)
-            .map { case (label, _) =>
-              row(
-                label,
-                missingValue,
-                currentValue.getOrElse(missingValue)
-              )
-            }
-        ).flatten
-    }
-  }
-
-  private def contactDetails(
-    method: ContactOptions
-  )(implicit messages: Messages): Option[(String, QuestionPage[_])] =
-    method match {
-      case Email =>
-        Some(
-          messages("individualEmailAddress.checkYourAnswersLabel") ->
-            IndividualEmailAddressPage
-        )
-
-      case Phone =>
-        Some(
-          messages("individualPhoneNumber.checkYourAnswersLabel") ->
-            IndividualPhoneNumberPage
-        )
-
-      case Mobile =>
-        Some(
-          messages("individualMobileNumber.checkYourAnswersLabel") ->
-            IndividualMobileNumberPage
-        )
-
-      case NoDetails =>
-        None
+        .mkString(", ")
     }
 
   private def worksReferenceRows(original: OriginalIndividualAnswers, current: UserAnswers)(implicit
     messages: Messages
   ): Seq[Seq[TableRow]] = {
-    val currentWorksRefYesNo = current.get(WorksReferenceNumberYesNoPage)
-    val currentWorksRef      = current.get(WorksReferenceNumberPage)
-
     Seq(
       yesNoRow(
         WorksReferenceNumberYesNoPage,
         messages("worksReferenceNumberYesNo.checkYourAnswersLabel"),
         original.worksReferenceYesNo,
-        currentWorksRefYesNo,
         current
       ),
       fieldRow(
         WorksReferenceNumberPage,
         messages("worksReferenceNumber.checkYourAnswersLabel"),
         original.worksReference,
-        currentWorksRef,
-        missingValue,
         current
       )
     ).flatten
@@ -292,22 +249,17 @@ object IndividualAmendedViewModel {
   private def utrRows(original: OriginalIndividualAnswers, current: UserAnswers)(implicit
     messages: Messages
   ): Seq[Seq[TableRow]] = {
-    val currentUtrYesNo = current.get(UniqueTaxpayerReferenceYesNoPage)
-    val currentUtr      = current.get(SubcontractorsUniqueTaxpayerReferencePage)
     Seq(
       yesNoRow(
         UniqueTaxpayerReferenceYesNoPage,
         messages("uniqueTaxpayerReferenceYesNo.checkYourAnswersLabel"),
         original.utrYesNo,
-        currentUtrYesNo,
         current
       ),
       fieldRow(
         SubcontractorsUniqueTaxpayerReferencePage,
         messages("subcontractorsUniqueTaxpayerReference.checkYourAnswersLabel"),
         original.utr,
-        currentUtr,
-        missingValue,
         current
       )
     ).flatten
@@ -316,34 +268,21 @@ object IndividualAmendedViewModel {
   private def ninoRows(original: OriginalIndividualAnswers, current: UserAnswers)(implicit
     messages: Messages
   ): Seq[Seq[TableRow]] = {
-    val currentNinoYesNo = current.get(NationalInsuranceNumberYesNoPage)
-    val currentNino      = current.get(SubNationalInsuranceNumberPage)
     Seq(
       yesNoRow(
         NationalInsuranceNumberYesNoPage,
         messages("nationalInsuranceNumberYesNo.checkYourAnswersLabel"),
         original.ninoYesNo,
-        currentNinoYesNo,
         current
       ),
       fieldRow(
         SubNationalInsuranceNumberPage,
         messages("subNationalInsuranceNumber.checkYourAnswersLabel"),
         original.nino,
-        currentNino,
-        missingValue,
         current
       )
     ).flatten
   }
-
-  private def contactValueFromAnswers(method: Option[ContactOptions], ua: UserAnswers): Option[String] =
-    method match {
-      case Some(Email)  => ua.get(IndividualEmailAddressPage)
-      case Some(Phone)  => ua.get(IndividualPhoneNumberPage)
-      case Some(Mobile) => ua.get(IndividualMobileNumberPage)
-      case _            => None
-    }
 
   private def originalNameDisplay(original: OriginalIndividualAnswers): Option[String] =
     if (original.usesTradingName.contains(true)) {
@@ -377,27 +316,21 @@ object IndividualAmendedViewModel {
       a.country.flatMap(_.name)
     ).flatten.mkString(", ")
 
-  private def displayContactMethod(method: Option[ContactOptions])(implicit messages: Messages): String =
-    method match {
-      case Some(Email)     => messages("individualChooseContactDetails.email")
-      case Some(Phone)     => messages("individualChooseContactDetails.phone")
-      case Some(Mobile)    => messages("individualChooseContactDetails.mobile")
-      case Some(NoDetails) => messages("individualChooseContactDetails.noDetails")
-      case None            => messages("site.none")
-    }
-
   private def yesNoRow(
-    page: QuestionPage[_],
-    label: String,
-    original: Option[Boolean],
-    currentVal: Option[Boolean],
-    current: UserAnswers
-  )(implicit messages: Messages): Option[Seq[TableRow]] =
+                        page: QuestionPage[Boolean],
+                        label: String,
+                        original: Option[Boolean],
+                        current: UserAnswers
+                      )(implicit messages: Messages): Option[Seq[TableRow]] = {
+
+    val currentVal = current.get(page)
+
     Option.when(
       wasAmended(current, page) || original != currentVal
     ) {
       row(label, displayYesNo(original), displayYesNo(currentVal))
     }
+  }
 
   private def displayYesNo(answer: Option[Boolean])(implicit messages: Messages): String =
     answer match {
@@ -407,18 +340,23 @@ object IndividualAmendedViewModel {
     }
 
   private def fieldRow(
-    page: QuestionPage[_],
-    label: String,
-    original: Option[String],
-    currentVal: Option[String],
-    missing: String,
-    current: UserAnswers
-  ): Option[Seq[TableRow]] =
+                        page: QuestionPage[String],
+                        label: String,
+                        original: Option[String],
+                        current: UserAnswers
+                      )(implicit messages: Messages): Option[Seq[TableRow]] = {
+    val currentVal = current.get(page)
+
     Option.when(
       wasAmended(current, page) || original != currentVal
     ) {
-      row(label, original.getOrElse(missing), currentVal.getOrElse(missing))
+      row(
+        label,
+        original.getOrElse(missingValue),
+        currentVal.getOrElse(missingValue)
+      )
     }
+  }
 
   private def row(label: String, previous: String, updated: String): Seq[TableRow] =
     Seq(
@@ -428,7 +366,7 @@ object IndividualAmendedViewModel {
     )
 
   private def missingValue(implicit messages: Messages): String =
-    messages("individualAmended.table.content.none")
+    messages("amendConfirmation.table.content.none")
 
   private def wasAmended(
     current: UserAnswers,
