@@ -25,14 +25,21 @@ case class OriginalIndividualAnswers(
   usesTradingName: Option[Boolean],
   tradingName: Option[String],
   subcontractorName: Option[SubcontractorName],
+  addressYesNo: Option[Boolean],
   address: Option[Address],
-  individualContactMethod: Option[Set[IndividualContactMethodOptions]],
+  individualContactMethodsYesNo: Option[Boolean],
+  individualContactMethod: Set[IndividualContactMethodOptions],
   email: Option[String],
   phone: Option[String],
   mobile: Option[String],
+  utrYesNo: Option[Boolean],
   utr: Option[String],
+  ninoYesNo: Option[Boolean],
   nino: Option[String],
-  worksReference: Option[String]
+  worksReferenceYesNo: Option[Boolean],
+  worksReference: Option[String],
+  verificationNumber: Option[String],
+  isVerified: Option[Boolean]
 )
 
 object OriginalIndividualAnswers extends models.Enumerable.Implicits {

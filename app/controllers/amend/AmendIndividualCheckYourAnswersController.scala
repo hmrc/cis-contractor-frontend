@@ -18,20 +18,21 @@ package controllers.amend
 
 import controllers.actions.*
 import models.add.ValidatedSubcontractor
-import models.contact.ContactOptions.*
+import models.amend.OriginalIndividualAnswers
 import models.{AmendMode, UserAnswers}
 import pages.add.*
 import play.api.Logging
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import queries.SubContractorVerifiedQuery
+import queries.OriginalIndividualAnswersQuery
 import repositories.SessionRepository
 import services.SubcontractorService
+import uk.gov.hmrc.govukfrontend.views.Aliases.{Key, Text, Value}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.checkAnswers.add.*
 import viewmodels.govuk.summarylist.*
-import views.html.amend.AmendIndividualCheckYourAnswersView
+import views.html.amend.AmendCheckYourAnswersView
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -44,7 +45,7 @@ class AmendIndividualCheckYourAnswersController @Inject() (
   val controllerComponents: MessagesControllerComponents,
   subcontractorService: SubcontractorService,
   sessionRepository: SessionRepository,
-  view: AmendIndividualCheckYourAnswersView
+  view: AmendCheckYourAnswersView
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport
@@ -55,15 +56,25 @@ class AmendIndividualCheckYourAnswersController @Inject() (
 
     ValidatedSubcontractor.build(ua) match {
       case Right(_) =>
-        val isVerified = ua.get(SubContractorVerifiedQuery).contains(true)
+        val originalAnswers = ua.get(OriginalIndividualAnswersQuery)
+
+        val isVerified = originalAnswers.flatMap(_.isVerified)
 
         val subcontractorInformationList =
-          SummaryListViewModel(rows = subcontractorInformationRows(ua, isVerified).flatten)
+          SummaryListViewModel(rows = subcontractorInformationRows(ua, originalAnswers).flatten)
 
         val detailsList =
           SummaryListViewModel(rows = detailsRows(ua, isVerified).flatten)
 
-        Ok(view(subcontractorInformationList, detailsList, displayName(ua)))
+        Ok(
+          view(
+            subcontractorInformationList,
+            detailsList,
+            displayName(ua),
+            routes.AmendIndividualCheckYourAnswersController.onSubmit(),
+            routes.AmendIndividualCheckYourAnswersController.onCancel()
+          )
+        )
 
       case Left(error) =>
         logger.error(s"[AmendIndividualCheckYourAnswersController.onPageLoad] Failed to load the page: $error")
@@ -73,72 +84,91 @@ class AmendIndividualCheckYourAnswersController @Inject() (
 
   private def subcontractorInformationRows(
     ua: UserAnswers,
-    isVerified: Boolean
-  )(implicit messages: Messages): Seq[Option[SummaryListRow]] =
-    Seq(TypeOfSubcontractorSummary.row(ua, showActions = false)) ++
-      (if (isVerified) {
-         Seq(
-           SubcontractorsUniqueTaxpayerReferenceSummary.row(
-             ua,
-             AmendMode,
-             showActions = false
-           )
-         )
-       } else {
-         Seq.empty
-       })
+    originalAnswers: Option[OriginalIndividualAnswers]
+  )(implicit messages: Messages): Seq[Option[SummaryListRow]] = {
+
+    val verificationRows =
+      Option
+        .when(originalAnswers.flatMap(_.isVerified).contains(true)) {
+
+          val verificationNumber =
+            originalAnswers.flatMap(_.verificationNumber).getOrElse("")
+
+          Seq(
+            SubcontractorsUniqueTaxpayerReferenceSummary.row(
+              ua,
+              AmendMode,
+              showActions = false
+            ),
+            Some(
+              SummaryListRowViewModel(
+                key = Key(Text(messages("amendCheckYourAnswers.verificationNumber.label"))),
+                value = Value(Text(verificationNumber))
+              )
+            )
+          )
+        }
+        .getOrElse(Nil)
+
+    Seq(
+      TypeOfSubcontractorSummary.row(
+        ua,
+        showActions = false
+      )
+    ) ++ verificationRows
+  }
 
   private def detailsRows(
     ua: UserAnswers,
-    isVerified: Boolean
+    isVerified: Option[Boolean]
   )(implicit messages: Messages): Seq[Option[SummaryListRow]] = {
 
     val nameRows =
-      if (isVerified) { Seq.empty }
-      else {
-        Seq(
-          SubTradingNameYesNoSummary.row(ua, AmendMode),
-          SubcontractorNameSummary.row(ua, AmendMode),
-          TradingNameOfSubcontractorSummary.row(ua, AmendMode)
-        )
-      }
-
-    val utrRows =
-      if (isVerified) { Seq.empty }
-      else {
-        Seq(
-          UniqueTaxpayerReferenceYesNoSummary.row(ua, AmendMode),
-          SubcontractorsUniqueTaxpayerReferenceSummary.row(
-            ua,
-            AmendMode
+      Option
+        .when(!isVerified.contains(true)) {
+          Seq(
+            SubTradingNameYesNoSummary.row(ua, AmendMode),
+            SubcontractorNameSummary.row(ua, AmendMode),
+            TradingNameOfSubcontractorSummary.row(ua, AmendMode)
           )
-        )
-      }
+        }
+        .getOrElse(Nil)
 
-    nameRows ++
+    val addressRows    =
       Seq(
         SubAddressYesNoSummary.row(ua, AmendMode),
-        AddressOfSubcontractorSummary.row(ua, AmendMode),
+        AddressOfSubcontractorSummary.row(ua, AmendMode)
+      )
+    val utrRows        =
+      Option
+        .when(!isVerified.contains(true)) {
+          Seq(
+            UniqueTaxpayerReferenceYesNoSummary.row(ua, AmendMode),
+            SubcontractorsUniqueTaxpayerReferenceSummary.row(ua, AmendMode)
+          )
+        }
+        .getOrElse(Nil)
+    val contactRows    =
+      Seq(
         AddIndividualContactMethodsYesNoSummary.row(ua, AmendMode),
-        IndividualChooseContactDetailsSummary.row(ua, AmendMode),
-        contactDetailsRow(ua)
-      ) ++
-      utrRows ++
+        IndividualContactMethodOptionsSummary.row(ua, AmendMode),
+        IndividualEmailAddressSummary.row(ua, AmendMode),
+        IndividualPhoneNumberSummary.row(ua, AmendMode),
+        IndividualMobileNumberSummary.row(ua, AmendMode)
+      )
+    val additionalRows =
       Seq(
         NationalInsuranceNumberYesNoSummary.row(ua, AmendMode),
         SubNationalInsuranceNumberSummary.row(ua, AmendMode),
         WorksReferenceNumberYesNoSummary.row(ua, AmendMode),
         WorksReferenceNumberSummary.row(ua, AmendMode)
       )
+    nameRows ++
+      addressRows ++
+      contactRows ++
+      utrRows ++
+      additionalRows
   }
-
-  private def contactDetailsRow(ua: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    ua.get(IndividualChooseContactDetailsPage).flatMap {
-      case Email  => IndividualEmailAddressSummary.row(ua, AmendMode)
-      case Phone  => IndividualPhoneNumberSummary.row(ua, AmendMode)
-      case Mobile => IndividualMobileNumberSummary.row(ua, AmendMode)
-      case _      => None
-    }
 
   private def displayName(ua: UserAnswers): String =
     ua.get(SubcontractorNamePage)
@@ -152,7 +182,9 @@ class AmendIndividualCheckYourAnswersController @Inject() (
         case Right(_) =>
           subcontractorService
             .createAndUpdateSubcontractor(request.userAnswers)
-            .map(_ => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+            .map(_ =>
+              Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+            ) // TODO: Redirect to confirmation page
             .recover { case t =>
               logger.error(
                 "[AmendIndividualCheckYourAnswersController.onSubmit] Failed to update subcontractor",

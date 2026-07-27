@@ -17,21 +17,19 @@
 package controllers.add
 
 import controllers.actions.*
-import models.{Mode, UserAnswers}
 import models.address.Address
 import models.address.AddressLookupJourneyIdentifier.individualQuestionsAddress
+import models.{Mode, UserAnswers}
 import pages.add.AddressOfSubcontractorPage
 import play.api.i18n.MessagesApi
-import play.api.mvc.{Call, MessagesControllerComponents}
-import queries.Settable
+import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
+import queries.{AddressLookupAmendReturnQuery, Settable}
 import repositories.SessionRepository
 import services.AddressLookupService
 import utils.SubcontractorNameExtractor
-import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
-import queries.{AddressLookupAmendReturnQuery, Settable}
-import scala.concurrent.{ExecutionContext, Future}
+
 import javax.inject.Inject
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 class AddressOfSubcontractorController @Inject() (
   override val messagesApi: MessagesApi,

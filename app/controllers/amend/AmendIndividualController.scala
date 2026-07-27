@@ -193,13 +193,20 @@ class AmendIndividualController @Inject() (
       usesTradingName = Some(usesTradingName),
       tradingName = subcontractor.tradingName,
       subcontractorName = name,
+      addressYesNo = Some(address.isDefined),
       address = address,
-      individualContactMethod = Option.when(methods.nonEmpty)(methods),
+      individualContactMethodsYesNo = Some(methods.nonEmpty),
+      individualContactMethod = methods,
       email = subcontractor.emailAddress,
       phone = subcontractor.phoneNumber,
       mobile = subcontractor.mobilePhoneNumber,
+      utrYesNo = Some(subcontractor.utr.isDefined),
       utr = subcontractor.utr,
+      ninoYesNo = Some(subcontractor.nino.isDefined),
       nino = subcontractor.nino,
-      worksReference = subcontractor.worksReferenceNumber
+      worksReferenceYesNo = Some(subcontractor.worksReferenceNumber.isDefined),
+      worksReference = subcontractor.worksReferenceNumber,
+      verificationNumber = subcontractor.verificationNumber,
+      isVerified = subcontractor.verified.map(_.equalsIgnoreCase("Y"))
     )
 }

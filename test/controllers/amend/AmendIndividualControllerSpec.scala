@@ -130,14 +130,21 @@ class AmendIndividualControllerSpec extends SpecBase with MockitoSugar {
       usesTradingName = Some(false),
       tradingName = None,
       subcontractorName = Some(expectedName),
+      addressYesNo = Some(true),
       address = Some(expectedAddress),
-      individualContactMethod = Some(Set(Email, Phone, Mobile)),
+      individualContactMethodsYesNo = Some(true),
+      individualContactMethod = Set(Email, Phone, Mobile),
       email = Some(emailAddress),
       phone = Some(phoneNumber),
       mobile = Some(mobileNumber),
+      utrYesNo = Some(true),
       utr = Some("3992651526"),
+      ninoYesNo = Some(true),
       nino = Some("QQ123456C"),
-      worksReference = Some("XLS345-MM")
+      worksReferenceYesNo = Some(true),
+      worksReference = Some("XLS345-MM"),
+      verificationNumber = None,
+      isVerified = None
     )
 
   private def mockSuccessfulService(
@@ -526,7 +533,7 @@ class AmendIndividualControllerSpec extends SpecBase with MockitoSugar {
               .value
 
           original.individualContactMethod mustBe
-            Some(Set(Email))
+            Set(Email)
 
           original.email mustBe Some(emailAddress)
           original.phone mustBe None
@@ -607,7 +614,7 @@ class AmendIndividualControllerSpec extends SpecBase with MockitoSugar {
               .value
 
           original.individualContactMethod mustBe
-            Some(Set(Phone, Mobile))
+            Set(Phone, Mobile)
 
           original.email mustBe None
           original.phone mustBe Some(phoneNumber)
@@ -686,7 +693,8 @@ class AmendIndividualControllerSpec extends SpecBase with MockitoSugar {
               .get(OriginalIndividualAnswersQuery)
               .value
 
-          original.individualContactMethod mustBe None
+          original.individualContactMethodsYesNo mustBe Some(false)
+          original.individualContactMethod mustBe Set.empty
           original.email mustBe None
           original.phone mustBe None
           original.mobile mustBe None
