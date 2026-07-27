@@ -59,7 +59,7 @@ class AmendCompanyCheckYourAnswersController @Inject() (
 
     ValidatedCompany.build(ua) match {
       case Right(_) =>
-        val isVerified = ua.get(OriginalCompanyAnswersQuery).flatMap(_.isVerified)
+        val isVerified  = ua.get(OriginalCompanyAnswersQuery).flatMap(_.isVerified)
         val companyName = ua.get(CompanyNamePage).getOrElse("")
 
         val subcontractorInformationList =

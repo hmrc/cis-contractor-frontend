@@ -18,9 +18,9 @@ package controllers.amend.company
 
 import base.SpecBase
 import controllers.routes
-import models.add.company.CompanyContactMethodOptions
 import models.address.{Address, Country}
 import models.amend.company.OriginalCompanyAnswers
+import models.contact.ContactMethodOptions
 import models.{TypeOfSubcontractor, UserAnswers}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{never, verify, verifyNoMoreInteractions, when}
@@ -37,7 +37,6 @@ import services.SubcontractorService
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.Future
-import models.contact.ContactMethodOptions
 
 class AmendCompanyCheckYourAnswersControllerSpec extends SpecBase with MockitoSugar {
   private val address =
@@ -54,7 +53,7 @@ class AmendCompanyCheckYourAnswersControllerSpec extends SpecBase with MockitoSu
         )
       )
     )
-  private val minUa =
+  private val minUa   =
     emptyUserAnswers
       .set(TypeOfSubcontractorPage, TypeOfSubcontractor.Limitedcompany)
       .success
@@ -137,8 +136,8 @@ class AmendCompanyCheckYourAnswersControllerSpec extends SpecBase with MockitoSu
 
         page must include(msg("typeOfSubcontractor.checkYourAnswersLabel"))
         page must include(msg("companyName.checkYourAnswersLabel"))
-        page must include(msg("companyRegistrationNumberYesNo.checkYourAnswersLabel"))
-        page must include(msg("companyRegistrationNumber.checkYourAnswersLabel"))
+        page must include(msg("companyCrnYesNo.checkYourAnswersLabel"))
+        page must include(msg("companyCrn.checkYourAnswersLabel"))
         page must include(msg("companyWorksReferenceYesNo.checkYourAnswersLabel"))
         page must include(msg("companyWorksReference.checkYourAnswersLabel"))
         page must include(msg("companyAddressYesNo.checkYourAnswersLabel"))
@@ -161,13 +160,13 @@ class AmendCompanyCheckYourAnswersControllerSpec extends SpecBase with MockitoSu
         page must include("PL31 2HL")
         page must include("England")
 
-        page must not include ("VRN123456")
+        page must not include "VRN123456"
       }
     }
 
     "must render the correct summary for a verified company" in {
 
-      val verifiedUa =
+      val verifiedUa  =
         minUa
           .set(
             OriginalCompanyAnswersQuery,
