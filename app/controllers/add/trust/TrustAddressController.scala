@@ -61,8 +61,7 @@ class TrustAddressController @Inject() (
   override protected def onChangeCompletion(isAmend: Boolean): Call =
     if (isAmend) {
       controllers.amend.trust.routes.AmendTrustCheckYourAnswersController.onPageLoad()
-    }
-    else {
+    } else {
       routes.TrustCheckYourAnswersController.onPageLoad()
     }
 

@@ -102,17 +102,17 @@ class TrustNavigator @Inject() () extends NavigatorForJourney {
 
   private def navigatorFromTrustUtrYesNoPage(mode: Mode)(ua: UserAnswers): Call =
     (ua.get(TrustUtrYesNoPage), mode) match {
-      case (Some(true), NormalMode)            => controllers.add.trust.routes.TrustUtrController.onPageLoad(mode)
-      case (Some(false), NormalMode)           =>
+      case (Some(true), NormalMode)             => controllers.add.trust.routes.TrustUtrController.onPageLoad(mode)
+      case (Some(false), NormalMode)            =>
         controllers.add.trust.routes.TrustWorksReferenceYesNoController.onPageLoad(NormalMode)
-      case (Some(true), CheckMode | AmendMode) =>
+      case (Some(true), CheckMode | AmendMode)  =>
         ua.get(TrustUtrPage)
           .fold(controllers.add.trust.routes.TrustUtrController.onPageLoad(mode)) { _ =>
             cyaRoute(mode)
           }
-      case (Some(false), CheckMode | AmendMode)            =>
+      case (Some(false), CheckMode | AmendMode) =>
         cyaRoute(mode)
-      case _                                   =>
+      case _                                    =>
         routes.JourneyRecoveryController.onPageLoad()
     }
 
