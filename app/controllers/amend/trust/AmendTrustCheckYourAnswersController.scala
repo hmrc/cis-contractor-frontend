@@ -67,7 +67,10 @@ class AmendTrustCheckYourAnswersController @Inject() (
         val detailsList =
           SummaryListViewModel(rows = detailsRows(ua, isVerified).flatten)
 
-        Ok(view(subcontractorInformationList, detailsList, trustName))
+        val submitUrl = controllers.amend.trust.routes.AmendTrustCheckYourAnswersController.onSubmit()
+        val cancelUrl = controllers.amend.trust.routes.AmendTrustCheckYourAnswersController.onCancel()
+
+        Ok(view(subcontractorInformationList, detailsList, trustName, submitUrl, cancelUrl))
 
       case Left(error) =>
         logger.error(s"[AmendTrustCheckYourAnswersController.onPageLoad] Failed to load the page: $error")

@@ -23,12 +23,14 @@ import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.i18n.{Lang, Messages, MessagesApi, MessagesImpl}
-import play.api.mvc.Request
+import play.api.mvc.{Call, Request}
 import play.api.test.FakeRequest
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
-import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist._
+import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.*
 import views.html.amend.AmendCheckYourAnswersView
+
+import java.util
 
 class AmendCheckYourAnswersViewSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite {
 
@@ -37,7 +39,7 @@ class AmendCheckYourAnswersViewSpec extends AnyWordSpec with Matchers with Guice
     "render the page with headings, summary lists, buttons and cancel link" in new Setup {
 
       val html: HtmlFormat.Appendable =
-        view(informationList, detailsList, subcontractorName)
+        view(informationList, detailsList, subcontractorName, submitUrl, cancelUrl)
 
       val doc: Document =
         Jsoup.parse(html.toString())
@@ -47,7 +49,7 @@ class AmendCheckYourAnswersViewSpec extends AnyWordSpec with Matchers with Guice
       val h1: Elements = doc.select("h1")
       h1.text() mustBe subcontractorName
 
-      val h2s = doc.select("h2").eachText()
+      val h2s: util.List[String] = doc.select("h2").eachText()
 
       h2s must contain(messages("amendCheckYourAnswers.heading.subcontractorInformation.h2"))
       h2s must contain(messages("amendCheckYourAnswers.heading.moreDetails.h2"))
@@ -67,13 +69,14 @@ class AmendCheckYourAnswersViewSpec extends AnyWordSpec with Matchers with Guice
           .url
 
       doc.select("form").attr("autocomplete") mustBe "off"
+      val cancelLink: Elements = doc.select(".govuk-button-group a.govuk-link")
 
-      doc.select(".govuk-button").text() mustBe
-        messages("amendCheckYourAnswers.confirm")
+      cancelLink.attr("href") mustBe cancelUrl.url
+      cancelLink.text() mustBe messages("amendCheckYourAnswers.cancelChanges")
 
-      doc.select(".govuk-link").text() must include(
-        messages("amendCheckYourAnswers.cancelChanges")
-      )
+      doc
+        .select("form")
+        .attr("action") mustBe submitUrl.url
     }
   }
 
@@ -91,6 +94,12 @@ class AmendCheckYourAnswersViewSpec extends AnyWordSpec with Matchers with Guice
       app.injector.instanceOf[AmendCheckYourAnswersView]
 
     val subcontractorName = "Test Trust"
+
+    val submitUrl: Call =
+      controllers.amend.trust.routes.AmendTrustCheckYourAnswersController.onSubmit()
+
+    val cancelUrl: Call =
+      controllers.amend.trust.routes.AmendTrustCheckYourAnswersController.onCancel()
 
     val informationList: SummaryList =
       SummaryList(
