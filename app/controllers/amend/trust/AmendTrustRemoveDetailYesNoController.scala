@@ -150,8 +150,8 @@ class AmendTrustRemoveDetailYesNoController @Inject() (
                         updatedAnswers <-
                           Future.fromTry(
                             request.userAnswers
-                              .set(AmendTrustRemoveDetailYesNoPage(subcontractorDetail), value)
-                              .flatMap(_.remove(AmendTrustRemoveDetailYesNoPage(subcontractorDetail)))
+                              .set(AmendTrustRemoveDetailYesNoPage(detailType), value)
+                              .flatMap(_.remove(AmendTrustRemoveDetailYesNoPage(detailType)))
                           )
                         _              <- sessionRepository.set(updatedAnswers)
                       } yield Redirect(

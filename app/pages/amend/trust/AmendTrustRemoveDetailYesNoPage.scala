@@ -17,11 +17,13 @@
 package pages.amend.trust
 
 import models.UserAnswers
+import models.amend.trust.AmendTrustRemoveDetail
+import models.amend.trust.AmendTrustRemoveDetail.*
 import pages.QuestionPage
 import pages.add.trust.*
 import play.api.libs.json.JsPath
 
-case class AmendTrustRemoveDetailYesNoPage(subcontractorDetail: String) extends QuestionPage[Boolean] {
+case class AmendTrustRemoveDetailYesNoPage(subcontractorDetail: AmendTrustRemoveDetail) extends QuestionPage[Boolean] {
 
   override def path: JsPath = JsPath \ toString
 
@@ -29,12 +31,12 @@ case class AmendTrustRemoveDetailYesNoPage(subcontractorDetail: String) extends 
 
   override def cleanup(value: Option[Boolean], userAnswers: UserAnswers) =
     subcontractorDetail match {
-      case "address" if value.contains(true) =>
+      case Address if value.contains(true) =>
         userAnswers
           .remove(TrustAddressPage)
           .flatMap(_.set(TrustAddressYesNoPage, false))
 
-      case "contact-details" if value.contains(true) =>
+      case ContactDetails if value.contains(true) =>
         userAnswers
           .remove(TrustContactMethodOptionsPage)
           .flatMap(_.remove(TrustEmailAddressPage))
@@ -42,12 +44,12 @@ case class AmendTrustRemoveDetailYesNoPage(subcontractorDetail: String) extends 
           .flatMap(_.remove(TrustMobileNumberPage))
           .flatMap(_.set(AddTrustContactMethodsYesNoPage, false))
 
-      case "utr" if value.contains(true) =>
+      case Utr if value.contains(true) =>
         userAnswers
           .remove(TrustUtrPage)
           .flatMap(_.set(TrustUtrYesNoPage, false))
 
-      case "works-reference-number" if value.contains(true) =>
+      case WorksReferenceNumber if value.contains(true) =>
         userAnswers
           .remove(TrustWorksReferencePage)
           .flatMap(_.set(TrustWorksReferenceYesNoPage, false))

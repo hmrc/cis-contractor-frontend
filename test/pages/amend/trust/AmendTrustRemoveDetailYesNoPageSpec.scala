@@ -17,6 +17,7 @@
 package pages.amend.trust
 
 import models.address.{Address, Country}
+import models.amend.trust.AmendTrustRemoveDetail
 import models.contact.ContactMethodOptions
 import pages.add.trust.*
 import pages.behaviours.PageBehaviours
@@ -24,7 +25,7 @@ import pages.behaviours.PageBehaviours
 class AmendTrustRemoveDetailYesNoPageSpec extends PageBehaviours {
   "AmendTrustRemoveDetailYesNoPage" - {
 
-    val amendTrustRemoveDetailYesNoPage = AmendTrustRemoveDetailYesNoPage("address")
+    val amendTrustRemoveDetailYesNoPage = AmendTrustRemoveDetailYesNoPage(AmendTrustRemoveDetail.Address)
 
     beRetrievable[Boolean](amendTrustRemoveDetailYesNoPage)
 
@@ -51,7 +52,7 @@ class AmendTrustRemoveDetailYesNoPageSpec extends PageBehaviours {
         .value
 
       val updatedUserAnswers =
-        userAnswers.set(AmendTrustRemoveDetailYesNoPage("address"), true).success.value
+        userAnswers.set(AmendTrustRemoveDetailYesNoPage(AmendTrustRemoveDetail.Address), true).success.value
 
       updatedUserAnswers.get(TrustAddressPage) mustBe None
       updatedUserAnswers.get(TrustAddressYesNoPage) mustBe Some(false)
@@ -67,7 +68,7 @@ class AmendTrustRemoveDetailYesNoPageSpec extends PageBehaviours {
         .value
 
       val updatedUserAnswers =
-        userAnswers.set(AmendTrustRemoveDetailYesNoPage("address"), false).success.value
+        userAnswers.set(AmendTrustRemoveDetailYesNoPage(AmendTrustRemoveDetail.Address), false).success.value
 
       updatedUserAnswers.get(TrustAddressPage) mustBe Some(address)
       updatedUserAnswers.get(TrustAddressYesNoPage) mustBe Some(true)
@@ -95,7 +96,7 @@ class AmendTrustRemoveDetailYesNoPageSpec extends PageBehaviours {
         .value
 
       val updatedUserAnswers =
-        userAnswers.set(AmendTrustRemoveDetailYesNoPage("contact-details"), true).success.value
+        userAnswers.set(AmendTrustRemoveDetailYesNoPage(AmendTrustRemoveDetail.ContactDetails), true).success.value
 
       updatedUserAnswers.get(TrustContactMethodOptionsPage) mustBe None
       updatedUserAnswers.get(TrustEmailAddressPage) mustBe None
@@ -126,7 +127,7 @@ class AmendTrustRemoveDetailYesNoPageSpec extends PageBehaviours {
         .value
 
       val updatedUserAnswers =
-        userAnswers.set(AmendTrustRemoveDetailYesNoPage("contact-details"), false).success.value
+        userAnswers.set(AmendTrustRemoveDetailYesNoPage(AmendTrustRemoveDetail.ContactDetails), false).success.value
 
       updatedUserAnswers.get(TrustContactMethodOptionsPage) mustBe Some(
         Set(ContactMethodOptions.Email, ContactMethodOptions.Phone, ContactMethodOptions.Mobile)
@@ -138,9 +139,15 @@ class AmendTrustRemoveDetailYesNoPageSpec extends PageBehaviours {
     }
 
     Seq(
-      ("utr", TrustUtrPage, TrustUtrYesNoPage, "7777777777"),
-      ("works-reference-number", TrustWorksReferencePage, TrustWorksReferenceYesNoPage, "WR-001")
-    ).foreach { case (contractorDetail, selectedDetailPage, screenerPage, dummyDetail) =>
+      ("utr", TrustUtrPage, TrustUtrYesNoPage, AmendTrustRemoveDetail.Utr, "7777777777"),
+      (
+        "works-reference-number",
+        TrustWorksReferencePage,
+        TrustWorksReferenceYesNoPage,
+        AmendTrustRemoveDetail.WorksReferenceNumber,
+        "WR-001"
+      )
+    ).foreach { case (contractorDetail, selectedDetailPage, screenerPage, amendTrustRemoveDetail, dummyDetail) =>
       s"when contractorDetail is '$contractorDetail'" - {
 
         s"cleanup: must remove '$selectedDetailPage' userAnswers and set '$screenerPage' to No when Yes is selected" in {
@@ -153,7 +160,7 @@ class AmendTrustRemoveDetailYesNoPageSpec extends PageBehaviours {
             .value
 
           val updatedUserAnswers =
-            userAnswers.set(AmendTrustRemoveDetailYesNoPage(contractorDetail), true).success.value
+            userAnswers.set(AmendTrustRemoveDetailYesNoPage(amendTrustRemoveDetail), true).success.value
 
           updatedUserAnswers.get(selectedDetailPage) mustBe None
           updatedUserAnswers.get(screenerPage) mustBe Some(false)
@@ -169,7 +176,7 @@ class AmendTrustRemoveDetailYesNoPageSpec extends PageBehaviours {
             .value
 
           val updatedUserAnswers =
-            userAnswers.set(AmendTrustRemoveDetailYesNoPage(contractorDetail), false).success.value
+            userAnswers.set(AmendTrustRemoveDetailYesNoPage(amendTrustRemoveDetail), false).success.value
 
           updatedUserAnswers.get(selectedDetailPage) mustBe Some(dummyDetail)
           updatedUserAnswers.get(screenerPage) mustBe Some(true)
