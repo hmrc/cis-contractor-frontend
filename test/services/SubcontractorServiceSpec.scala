@@ -20,12 +20,12 @@ import base.SpecBase
 import connectors.ConstructionIndustrySchemeConnector
 import models.TypeOfSubcontractor
 import models.add.SubcontractorName
+import models.contact.ContactMethodOptions
 import models.address.{Address, Country}
-import models.contact.{ContactMethodOptions, ContactOptions}
 import pages.add.company._
 import models.requests.CreateAndUpdateSubcontractorPayload
 import models.requests.CreateAndUpdateSubcontractorPayload.{CompanyPayload, IndividualOrSoleTraderPayload, PartnershipPayload, TrustPayload}
-import models.response.GetSubcontractorUTRsResponse
+import models.response.{GetSubcontractorResponse, GetSubcontractorUTRsResponse}
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{times, verify, verifyNoMoreInteractions, when}
 import pages.add.*
@@ -70,6 +70,9 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
           .set(AddressOfSubcontractorPage, individualAddress)
           .success
           .value
+          .set(AddIndividualContactMethodsYesNoPage, false)
+          .success
+          .value
           .set(SubNationalInsuranceNumberPage, "AC012345")
           .success
           .value
@@ -90,7 +93,7 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
             .set(TradingNameOfSubcontractorPage, "trading name")
             .success
             .value
-            .set(IndividualChooseContactDetailsPage, ContactOptions.Email)
+            .set(IndividualContactMethodOptionsPage, Set(ContactMethodOptions.Email))
             .success
             .value
             .set(IndividualEmailAddressPage, "i@example.com")
@@ -134,7 +137,7 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
             .set(SubcontractorNamePage, SubcontractorName("firstname", Some("middle name"), "lastname"))
             .success
             .value
-            .set(IndividualChooseContactDetailsPage, ContactOptions.Email)
+            .set(IndividualContactMethodOptionsPage, Set(ContactMethodOptions.Email))
             .success
             .value
             .set(IndividualEmailAddressPage, "i@example.com")
@@ -180,7 +183,7 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
             .set(TradingNameOfSubcontractorPage, "trading name")
             .success
             .value
-            .set(IndividualChooseContactDetailsPage, ContactOptions.Email)
+            .set(IndividualContactMethodOptionsPage, Set(ContactMethodOptions.Email))
             .success
             .value
             .set(IndividualEmailAddressPage, "i@example.com")
@@ -224,7 +227,7 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
             .set(TradingNameOfSubcontractorPage, "trading name")
             .success
             .value
-            .set(IndividualChooseContactDetailsPage, ContactOptions.Phone)
+            .set(IndividualContactMethodOptionsPage, Set(ContactMethodOptions.Phone))
             .success
             .value
             .set(IndividualPhoneNumberPage, "02071234567")
@@ -268,7 +271,7 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
             .set(TradingNameOfSubcontractorPage, "trading name")
             .success
             .value
-            .set(IndividualChooseContactDetailsPage, ContactOptions.Mobile)
+            .set(IndividualContactMethodOptionsPage, Set(ContactMethodOptions.Mobile))
             .success
             .value
             .set(IndividualMobileNumberPage, "07123456789")
@@ -312,7 +315,7 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
             .set(TradingNameOfSubcontractorPage, "trading name")
             .success
             .value
-            .set(IndividualChooseContactDetailsPage, ContactOptions.NoDetails)
+            .set(AddIndividualContactMethodsYesNoPage, false)
             .success
             .value
 
@@ -353,7 +356,7 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
             .set(TradingNameOfSubcontractorPage, "trading name")
             .success
             .value
-            .set(IndividualChooseContactDetailsPage, ContactOptions.NoDetails)
+            .set(IndividualContactMethodOptionsPage, Set(ContactMethodOptions.Email))
             .success
             .value
 
@@ -1286,6 +1289,225 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
         exception.getMessage must include("error")
 
         verify(mockConnector).getSubcontractorUTRs(eqTo(cisId.toString))(any[HeaderCarrier])
+        verifyNoMoreInteractions(mockConnector)
+      }
+    }
+
+    "getSubcontractor" - {
+
+      val cisId             = "INST-123"
+      val subbieResourceRef = 1001L
+
+      val expectedResponse =
+        GetSubcontractorResponse(
+          scheme = None,
+          subcontractor = None,
+          otherInfo = Seq.empty
+        )
+
+      "should return the response from the connector" in {
+        val mockConnector =
+          mock[ConstructionIndustrySchemeConnector]
+
+        val service =
+          new SubcontractorService(mockConnector)
+
+        when(
+          mockConnector.getSubcontractor(
+            eqTo(cisId),
+            eqTo(subbieResourceRef)
+          )(any[HeaderCarrier])
+        ).thenReturn(
+          Future.successful(expectedResponse)
+        )
+
+        val result =
+          service
+            .getSubcontractor(cisId, subbieResourceRef)
+            .futureValue
+
+        result mustBe expectedResponse
+
+        verify(mockConnector, times(1))
+          .getSubcontractor(
+            eqTo(cisId),
+            eqTo(subbieResourceRef)
+          )(any[HeaderCarrier])
+
+        verifyNoMoreInteractions(mockConnector)
+      }
+
+      "should pass the supplied cisId and subbieResourceRef to the connector" in {
+        val mockConnector =
+          mock[ConstructionIndustrySchemeConnector]
+
+        val service =
+          new SubcontractorService(mockConnector)
+
+        when(
+          mockConnector.getSubcontractor(
+            any[String],
+            any[Long]
+          )(any[HeaderCarrier])
+        ).thenReturn(
+          Future.successful(expectedResponse)
+        )
+
+        service
+          .getSubcontractor(cisId, subbieResourceRef)
+          .futureValue
+
+        verify(mockConnector)
+          .getSubcontractor(
+            eqTo("INST-123"),
+            eqTo(1001L)
+          )(any[HeaderCarrier])
+
+        verifyNoMoreInteractions(mockConnector)
+      }
+
+      "should return a response containing a subcontractor" in {
+        val mockConnector =
+          mock[ConstructionIndustrySchemeConnector]
+
+        val service =
+          new SubcontractorService(mockConnector)
+
+        val subcontractor =
+          models.response.SubcontractorResponse(
+            subcontractorId = 1L,
+            utr = Some("1234567890"),
+            pageVisited = None,
+            partnerUtr = None,
+            crn = None,
+            firstName = Some("Martin"),
+            nino = Some("AA123456A"),
+            secondName = None,
+            surname = Some("Brody"),
+            partnershipTradingName = None,
+            tradingName = None,
+            subcontractorType = Some("soletrader"),
+            addressLine1 = None,
+            addressLine2 = None,
+            addressLine3 = None,
+            addressLine4 = None,
+            country = None,
+            postcode = None,
+            emailAddress = None,
+            phoneNumber = None,
+            mobilePhoneNumber = None,
+            worksReferenceNumber = None,
+            createDate = None,
+            lastUpdate = None,
+            subbieResourceRef = Some(subbieResourceRef),
+            matched = None,
+            autoVerified = None,
+            verified = None,
+            verificationNumber = None,
+            taxTreatment = None,
+            verificationDate = None,
+            version = None,
+            updatedTaxTreatment = None,
+            lastMonthlyReturnDate = None,
+            pendingVerifications = None
+          )
+
+        val response =
+          expectedResponse.copy(
+            subcontractor = Some(subcontractor)
+          )
+
+        when(
+          mockConnector.getSubcontractor(
+            eqTo(cisId),
+            eqTo(subbieResourceRef)
+          )(any[HeaderCarrier])
+        ).thenReturn(
+          Future.successful(response)
+        )
+
+        val result =
+          service
+            .getSubcontractor(cisId, subbieResourceRef)
+            .futureValue
+
+        result.subcontractor mustBe Some(subcontractor)
+
+        verify(mockConnector)
+          .getSubcontractor(
+            eqTo(cisId),
+            eqTo(subbieResourceRef)
+          )(any[HeaderCarrier])
+
+        verifyNoMoreInteractions(mockConnector)
+      }
+
+      "should return a response when no subcontractor is found" in {
+        val mockConnector =
+          mock[ConstructionIndustrySchemeConnector]
+
+        val service =
+          new SubcontractorService(mockConnector)
+
+        when(
+          mockConnector.getSubcontractor(
+            eqTo(cisId),
+            eqTo(subbieResourceRef)
+          )(any[HeaderCarrier])
+        ).thenReturn(
+          Future.successful(expectedResponse)
+        )
+
+        val result =
+          service
+            .getSubcontractor(cisId, subbieResourceRef)
+            .futureValue
+
+        result.subcontractor mustBe None
+        result.scheme mustBe None
+        result.otherInfo mustBe empty
+
+        verify(mockConnector)
+          .getSubcontractor(
+            eqTo(cisId),
+            eqTo(subbieResourceRef)
+          )(any[HeaderCarrier])
+
+        verifyNoMoreInteractions(mockConnector)
+      }
+
+      "should propagate an exception returned by the connector" in {
+        val mockConnector =
+          mock[ConstructionIndustrySchemeConnector]
+
+        val service =
+          new SubcontractorService(mockConnector)
+
+        when(
+          mockConnector.getSubcontractor(
+            eqTo(cisId),
+            eqTo(subbieResourceRef)
+          )(any[HeaderCarrier])
+        ).thenReturn(
+          Future.failed(
+            new RuntimeException("CIS service unavailable")
+          )
+        )
+
+        val exception =
+          service
+            .getSubcontractor(cisId, subbieResourceRef)
+            .failed
+            .futureValue
+
+        exception.getMessage mustBe "CIS service unavailable"
+
+        verify(mockConnector)
+          .getSubcontractor(
+            eqTo(cisId),
+            eqTo(subbieResourceRef)
+          )(any[HeaderCarrier])
+
         verifyNoMoreInteractions(mockConnector)
       }
     }

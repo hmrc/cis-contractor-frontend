@@ -17,7 +17,7 @@
 package views.add.partnership
 
 import forms.add.partnership.PartnershipPhoneNumberFormProvider
-import models.NormalMode
+import models.{AmendMode, NormalMode}
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
@@ -56,6 +56,32 @@ class PartnershipPhoneNumberViewSpec extends AnyWordSpec with Matchers with Guic
       doc.select("input[name=value]").size() mustBe 1
 
       doc.select(".govuk-button").text() mustBe messages("site.continue")
+    }
+
+    "render the page with title, heading, input and update button for Amend journey" in new Setup {
+
+      val partnershipName = "Test Partnership"
+
+      val html: HtmlFormat.Appendable = view(form, AmendMode, partnershipName)
+      val doc                         = org.jsoup.Jsoup.parse(html.toString())
+
+      doc.select("title").text() must include(messages("partnershipPhoneNumber.title"))
+
+      val heading = doc.select("h1")
+      heading.text() mustBe messages("partnershipPhoneNumber.heading", partnershipName)
+
+      val hint = doc.select(".govuk-hint")
+      hint.text() mustBe messages("partnershipPhoneNumber.hint")
+
+      doc
+        .select("form")
+        .attr("action") mustBe controllers.add.partnership.routes.PartnershipPhoneNumberController
+        .onSubmit(AmendMode)
+        .url
+
+      doc.select("input[name=value]").size() mustBe 1
+
+      doc.select(".govuk-button").text() mustBe messages("site.update")
     }
 
     "display error summary and inline error when no phone number is entered" in new Setup {

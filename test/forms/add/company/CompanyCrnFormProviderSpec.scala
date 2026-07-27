@@ -19,6 +19,7 @@ package forms.add.company
 import forms.Validation
 import forms.behaviours.StringFieldBehaviours
 import play.api.data.FormError
+import forms.mappings.Constants
 
 class CompanyCrnFormProviderSpec extends StringFieldBehaviours {
 
@@ -29,22 +30,21 @@ class CompanyCrnFormProviderSpec extends StringFieldBehaviours {
   val companyRegNumberRegex: String = Validation.companyRegNumberRegex
 
   val validCrn: Seq[String] = Seq(
-    "AC012345",
-    "ac012345",
-    "AC 012 345",
+    "AC1",
+    "AC123456",
+    "ac123456",
     "ZZ999999",
     "00000001",
-    "12345678",
-    "12 34 56 78",
-    "  12345678  "
+    "12345678"
   )
 
   val invalidCrn: Seq[String] = Seq(
-    "AC01-234",
-    "AC01£345",
-    "12AB3456",
-    "12  AB  3456",
-    "  12AB3456  "
+    "A",
+    "AB",
+    "ABC",
+    "£AB123",
+    "1A",
+    "`¬¬AB12C"
   )
 
   val form = new CompanyCrnFormProvider()()
@@ -75,11 +75,19 @@ class CompanyCrnFormProviderSpec extends StringFieldBehaviours {
       }
     }
 
-    "must accept valid crn formats" in {
-      validCrn.foreach { validCrn =>
-        val result = form.bind(Map(fieldName -> validCrn))
-        result.errors must be(empty)
-        result.errors must not contain FormError(fieldName, invalidKey)
+    "must accept valid crn formats with minimum length" in {
+      Seq(
+        "AC1",
+        "AC12",
+        "AC123",
+        "AB1234",
+        "1",
+        "12",
+        "123",
+        "1234"
+      ).foreach { crn =>
+        val bound = form.bind(Map(fieldName -> crn))
+        bound.errors must be(empty)
       }
     }
 
@@ -87,26 +95,25 @@ class CompanyCrnFormProviderSpec extends StringFieldBehaviours {
       val tooLongCrn = Seq(
         "123456789",
         "AB1234567",
-        "12 34 56 78 9",
-        "  123456789  "
+        "12 34 56 78 999876",
+        "  AB123456789 09876 "
       )
 
       tooLongCrn.foreach { crn =>
         val result = form.bind(Map(fieldName -> crn))
         result.errors must contain(
-          FormError(fieldName, invalidKey, Seq(companyRegNumberRegex))
+          FormError(fieldName, lengthKey, Seq(Constants.MaxLength8))
         )
       }
     }
 
-    "must display error when too short (less than 8 chars ignoring spaces)" in {
+    "must reject CRN with invalid structure" in {
       val tooShortCrn = Seq(
-        "0",
-        "0123456",
+        "A123",
         "AB",
-        "A B 01234",
-        "12   34 ",
-        "  1234  "
+        " 1234A ",
+        "AB123 A",
+        "  A1234"
       )
 
       tooShortCrn.foreach { crn =>

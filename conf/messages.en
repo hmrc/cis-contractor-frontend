@@ -295,19 +295,6 @@ individualEmailAddress.error.length                                          =  
 individualEmailAddress.error.invalid                                         =  Enter a valid email address in the correct format, like name@example.com
 individualEmailAddress.change.hidden                                         =  email Address
 
-individualChooseContactDetails.title                                         =  Do you want to add contact details?
-individualChooseContactDetails.heading                                       =  What are the contact details for {0}?
-individualChooseContactDetails.hint                                          =  Choose which method of contact you would like to add for this subcontractor. Contact details are only for your own records.
-individualChooseContactDetails.email                                         =  Email address
-individualChooseContactDetails.phone                                         =  Phone number
-individualChooseContactDetails.mobile                                        =  Mobile number
-individualChooseContactDetails.or                                            =  or
-individualChooseContactDetails.noDetails                                     =  Do not add any contact details for this subcontractor
-individualChooseContactDetails.cya.noDetails                                 =  None
-individualChooseContactDetails.error.required                                =  Select whether you want to add contact details for this subcontractor
-individualChooseContactDetails.checkYourAnswersLabel                         =  Method of contact
-individualChooseContactDetails.change.hidden                                 =  method of contact
-
 addressLookup.companyQuestionsAddress.lookupPage.title                       =  Find the address for this company
 addressLookup.companyQuestionsAddress.lookupPage.heading                     =  Find the address for {0}
 addressLookup.companyQuestionsAddress.lookupPage.filterLabel                 =  Property name or number (optional)
@@ -404,6 +391,16 @@ addIndividualContactMethodsYesNo.heading                                     =  
 addIndividualContactMethodsYesNo.error.required                              =  Select yes if you want to add contact details for this subcontractor
 addIndividualContactMethodsYesNo.checkYourAnswersLabel                       =  Add contact details?
 addIndividualContactMethodsYesNo.change.hidden                               =  add contact details?
+
+individualContactMethodOptions.title                                         =  Which contact details do you want to add for this subcontractor?
+individualContactMethodOptions.heading                                       =  Which contact details do you want to add for {0}?
+individualContactMethodOptions.email                                         =  Email address
+individualContactMethodOptions.phone                                         =  Phone number
+individualContactMethodOptions.mobile                                        =  Mobile number
+individualContactMethodOptions.checkYourAnswersLabel                         =  Methods of contact
+individualContactMethodOptions.hint                                          =  Contact details are only for your own records
+individualContactMethodOptions.error.required                                =  Select the methods of contact you want to add for this subcontractor
+individualContactMethodOptions.change.hidden                                 =  methods of contact
 
 # Partnership
 addPartnershipContactMethodsYesNo.title                     =  Do you want to add contact details for this partnership?

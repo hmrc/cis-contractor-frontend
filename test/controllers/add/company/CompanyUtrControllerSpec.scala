@@ -19,7 +19,7 @@ package controllers.add.company
 import base.SpecBase
 import controllers.routes
 import forms.add.company.CompanyUtrFormProvider
-import models.{NormalMode, UserAnswers}
+import models.{AmendMode, NormalMode, UserAnswers}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{verify, verifyNoMoreInteractions, when}
 import org.scalatestplus.mockito.MockitoSugar
@@ -42,6 +42,8 @@ class CompanyUtrControllerSpec extends SpecBase with MockitoSugar {
   private val companyName = "Test Company"
 
   private lazy val companyUtrRoute = controllers.add.company.routes.CompanyUtrController.onPageLoad(NormalMode).url
+
+  private lazy val companyUtrRouteAmend = controllers.add.company.routes.CompanyUtrController.onPageLoad(AmendMode).url
 
   private def uaWithName: UserAnswers =
     emptyUserAnswers.set(CompanyNamePage, companyName).success.value
@@ -118,6 +120,65 @@ class CompanyUtrControllerSpec extends SpecBase with MockitoSugar {
       verifyNoMoreInteractions(mockSubcontractorService)
     }
 
+    "must bind the form and redirect to there-is-a-problem Page on POST when valid UTR is submitted in Amend journey" in {
+
+      val validValue = "5860920998"
+      val prevValue  = "5860920997"
+
+      val uaWithNameForAmend: UserAnswers =
+        uaWithName.set(CompanyUtrPage, prevValue).success.value
+
+      val mockSubcontractorService = mock[SubcontractorService]
+
+      when(mockSubcontractorService.isDuplicateUTR(any[UserAnswers], any[String])(any[HeaderCarrier]))
+        .thenReturn(Future.successful(false))
+
+      val application =
+        applicationBuilder(userAnswers = Some(uaWithNameForAmend))
+          .overrides(
+            bind[SubcontractorService].toInstance(mockSubcontractorService)
+          )
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, companyUtrRouteAmend)
+            .withFormUrlEncodedBody(("value", validValue))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value must include("/subcontractor/there-is-a-problem")
+      }
+
+      verify(mockSubcontractorService).isDuplicateUTR(any[UserAnswers], any[String])(any[HeaderCarrier])
+      verifyNoMoreInteractions(mockSubcontractorService)
+    }
+
+    "must bind the form and redirect to there-is-a-problem Page on POST when valid UTR is submitted and same as previous value in Amend journey" in {
+
+      val validValue = "5860920998"
+      val prevValue  = "5860920998"
+
+      val uaWithNameForAmend: UserAnswers =
+        uaWithName.set(CompanyUtrPage, prevValue).success.value
+
+      val application =
+        applicationBuilder(userAnswers = Some(uaWithNameForAmend))
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, companyUtrRouteAmend)
+            .withFormUrlEncodedBody(("value", validValue))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value must include("/subcontractor/there-is-a-problem")
+      }
+    }
+
     "must return a Bad Request and show duplicate error when when utr already exists" in {
 
       val duplicatedUTR = "8888888888"
@@ -166,6 +227,54 @@ class CompanyUtrControllerSpec extends SpecBase with MockitoSugar {
       verifyNoMoreInteractions(mockSubcontractorService)
     }
 
+    "must return a Bad Request and show duplicate error when when utr already exists in Amend journey" in {
+
+      val duplicatedUTR = "8888888888"
+
+      val mockSubcontractorService = mock[SubcontractorService]
+
+      when(mockSubcontractorService.isDuplicateUTR(any[UserAnswers], any[String])(any[HeaderCarrier]))
+        .thenReturn(Future.successful(true))
+
+      val application =
+        applicationBuilder(userAnswers = Some(uaWithName))
+          .overrides(
+            bind[SubcontractorService].toInstance(mockSubcontractorService)
+          )
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, companyUtrRouteAmend)
+            .withFormUrlEncodedBody(
+              ("value", duplicatedUTR)
+            )
+
+        val boundForm = form
+          .bind(
+            Map(
+              ("value", duplicatedUTR)
+            )
+          )
+
+        val formWithDuplicateError =
+          boundForm.withError("value", "companyUtr.error.duplicate")
+
+        val view = application.injector.instanceOf[CompanyUtrView]
+
+        val result = route(application, request).value
+
+        status(result) mustEqual BAD_REQUEST
+        contentAsString(result) mustEqual view(formWithDuplicateError, AmendMode, companyName)(
+          request,
+          messages(application)
+        ).toString
+      }
+
+      verify(mockSubcontractorService).isDuplicateUTR(any[UserAnswers], any[String])(any[HeaderCarrier])
+      verifyNoMoreInteractions(mockSubcontractorService)
+    }
+
     "must return a Bad Request and errors when invalid data is submitted" in {
 
       val application = applicationBuilder(userAnswers = Some(uaWithName)).build()
@@ -183,6 +292,29 @@ class CompanyUtrControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustEqual BAD_REQUEST
         contentAsString(result) mustEqual view(boundForm, NormalMode, companyName)(
+          request,
+          messages(application)
+        ).toString
+      }
+    }
+
+    "must return a Bad Request and errors when invalid data is submitted in Amend journey" in {
+
+      val application = applicationBuilder(userAnswers = Some(uaWithName)).build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, companyUtrRouteAmend)
+            .withFormUrlEncodedBody(("value", ""))
+
+        val boundForm = form.bind(Map("value" -> ""))
+
+        val view = application.injector.instanceOf[CompanyUtrView]
+
+        val result = route(application, request).value
+
+        status(result) mustEqual BAD_REQUEST
+        contentAsString(result) mustEqual view(boundForm, AmendMode, companyName)(
           request,
           messages(application)
         ).toString
