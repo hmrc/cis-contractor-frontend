@@ -18,7 +18,7 @@ package viewmodels.checkAnswers.amend
 
 import controllers.add.routes
 import helpers.CyaEncodingSpecHelper
-import models.{AmendMode, UserAnswers}
+import models.{AmendMode, CheckMode, UserAnswers}
 import org.scalatest.OptionValues.convertOptionToValuable
 import org.scalatest.TryValues.convertTryToSuccessOrFailure
 import org.scalatest.freespec.AnyFreeSpec
