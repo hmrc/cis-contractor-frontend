@@ -897,6 +897,7 @@ verify.selectSubcontractorsToReverify.dateAdded                         =  Date 
 verify.selectSubcontractorsToReverify.taxTreatment.net                  =  Standard rate
 verify.selectSubcontractorsToReverify.taxTreatment.unmatched            =  Higher rate
 verify.selectSubcontractorsToReverify.taxTreatment.gross                =  Gross
+verify.selectSubcontractorsToReverify.display.noneSelected              =  None selected
 
 verify.selectSubcontractor.title                                        =  Which subcontractors do you want to verify?
 verify.selectSubcontractor.heading                                      =  Which subcontractors do you want to verify?
@@ -905,6 +906,7 @@ verify.selectSubcontractor.checkYourAnswersLabel                        =  Subco
 verify.selectSubcontractor.showingResults                               =  Showing {0} to {1} of {2} results
 verify.selectSubcontractor.error.required                               =  Select at least one subcontractor to verify
 verify.selectSubcontractor.change.hidden                                =  subcontractors to verify
+verify.selectSubcontractor.display.noneSelected                         =  None selected
 
 verify.emailAddress.title                                               =  What email address should HMRC send this confirmation to?
 verify.emailAddress.heading                                             =  What email address should HMRC send this confirmation to?
