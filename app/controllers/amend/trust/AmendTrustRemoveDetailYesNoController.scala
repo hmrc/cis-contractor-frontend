@@ -145,18 +145,17 @@ class AmendTrustRemoveDetailYesNoController @Inject() (
                     )
                   ,
                   value =>
-                 
-                      for {
-                        updatedAnswers <-
-                          Future.fromTry(
-                            request.userAnswers
-                              .set(AmendTrustRemoveDetailYesNoPage(detailType), value)
-                              .flatMap(_.remove(AmendTrustRemoveDetailYesNoPage(detailType)))
-                          )
-                        _              <- sessionRepository.set(updatedAnswers)
-                      } yield Redirect(
-                        controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad().url
-                      )
+                    for {
+                      updatedAnswers <-
+                        Future.fromTry(
+                          request.userAnswers
+                            .set(AmendTrustRemoveDetailYesNoPage(detailType), value)
+                            .flatMap(_.remove(AmendTrustRemoveDetailYesNoPage(detailType)))
+                        )
+                      _              <- sessionRepository.set(updatedAnswers)
+                    } yield Redirect(
+                      controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad().url
+                    )
                 )
             }
           }
