@@ -20,7 +20,6 @@ import base.SpecBase
 import controllers.routes
 import forms.add.trust.TrustUtrFormProvider
 import models.{AmendMode, NormalMode, UserAnswers}
-import models.{AmendMode, NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any

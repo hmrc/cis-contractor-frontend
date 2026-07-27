@@ -25,7 +25,7 @@ import queries.{CisIdQuery, OriginalTrustAnswersQuery}
 import viewmodels.amend.TrustAmendConfirmationViewModel
 import views.html.amend.AmendConfirmationView
 
-class AmendConfirmationControllerSpec extends SpecBase {
+class AmendTrustConfirmationControllerSpec extends SpecBase {
   private val cisId     = "123456789"
   private val trustName = "ABC Trust"
   private val original  =
@@ -57,9 +57,9 @@ class AmendConfirmationControllerSpec extends SpecBase {
       .value
 
   private lazy val confirmationRoute =
-    controllers.amend.routes.AmendConfirmationController.trustOnPageLoad().url
+    controllers.amend.trust.routes.AmendTrustConfirmationController.onPageLoad().url
 
-  "AmendConfirmationController" - {
+  "AmendTrustConfirmationController" - {
 
     "must return OK and the correct view for a GET" in {
       val application = applicationBuilder(userAnswers = Some(userAnswersWithOriginal)).build()

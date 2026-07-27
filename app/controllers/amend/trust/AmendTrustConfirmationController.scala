@@ -14,26 +14,25 @@
  * limitations under the License.
  */
 
-package controllers.amend
+package controllers.amend.trust
 
 import config.FrontendAppConfig
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
 import controllers.routes
 import models.UserAnswers
-import models.requests.DataRequest
 import pages.add.trust.TrustNamePage
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.libs.json.Reads
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
-import queries.{CisIdQuery, Gettable, OriginalTrustAnswersQuery}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import queries.{CisIdQuery, OriginalTrustAnswersQuery}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.amend.TrustAmendConfirmationViewModel
 import views.html.amend.AmendConfirmationView
 
 import javax.inject.Inject
 
-class AmendConfirmationController @Inject() (
+class AmendTrustConfirmationController @Inject() (
   override val messagesApi: MessagesApi,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
@@ -45,45 +44,35 @@ class AmendConfirmationController @Inject() (
     with I18nSupport
     with Logging {
 
-  def trustOnPageLoad(): Action[AnyContent] =
+  def onPageLoad(): Action[AnyContent] =
     (identify andThen getData andThen requireData) { implicit request =>
-      withOriginalAnswers(OriginalTrustAnswersQuery) { (original, cisId) =>
-        Ok(
-          view(
-            TrustAmendConfirmationViewModel.rows(original, request.userAnswers),
-            trustDisplayName(request.userAnswers),
-            appConfig.manageYourSubcontractorsUrl(cisId)
-          )
-        )
+
+      val ua = request.userAnswers
+
+      ua.get(OriginalTrustAnswersQuery) match {
+
+        case None =>
+          logger.error("[AmendTrustConfirmationController] Missing OriginalTrustAnswersQuery")
+          Redirect(routes.JourneyRecoveryController.onPageLoad())
+
+        case Some(originalTrustAnswers) =>
+          ua.get(CisIdQuery) match {
+
+            case None =>
+              logger.error("[AmendTrustConfirmationController] Missing CisIdQuery")
+              Redirect(routes.JourneyRecoveryController.onPageLoad())
+
+            case Some(cisId) =>
+              Ok(
+                view(
+                  TrustAmendConfirmationViewModel.rows(originalTrustAnswers, ua),
+                  trustDisplayName(ua),
+                  appConfig.manageYourSubcontractorsUrl(cisId)
+                )
+              )
+          }
       }
     }
-
-  private def withOriginalAnswers[A: Reads](
-    query: Gettable[A]
-  )(
-    block: (A, String) => Result
-  )(implicit request: DataRequest[AnyContent]): Result = {
-
-    val ua = request.userAnswers
-
-    ua.get(query) match {
-
-      case None =>
-        logger.error(s"[AmendConfirmationController] Missing ${query.toString}")
-        Redirect(routes.JourneyRecoveryController.onPageLoad())
-
-      case Some(original) =>
-        ua.get(CisIdQuery) match {
-
-          case None =>
-            logger.error("[AmendConfirmationController] Missing CisIdQuery")
-            Redirect(routes.JourneyRecoveryController.onPageLoad())
-
-          case Some(cisId) =>
-            block(original, cisId)
-        }
-    }
-  }
 
   private def trustDisplayName(ua: UserAnswers): String =
     ua.get(TrustNamePage).getOrElse("")
