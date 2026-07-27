@@ -116,7 +116,7 @@ class AmendTrustRemoveDetailYesNoController @Inject() (
             }
           }
         }
-        .getOrElse(Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())))
+        .getOrElse(Future.successful(journeyRecovery))
     }
 
   def onSubmit(subcontractorDetail: String): Action[AnyContent] = (identify andThen getData andThen requireData).async {
@@ -168,6 +168,6 @@ class AmendTrustRemoveDetailYesNoController @Inject() (
             }
           }
         }
-        .getOrElse(Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())))
+        .getOrElse(Future.successful(journeyRecovery))
   }
 }
