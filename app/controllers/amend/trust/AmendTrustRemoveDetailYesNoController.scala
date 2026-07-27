@@ -145,7 +145,7 @@ class AmendTrustRemoveDetailYesNoController @Inject() (
                     )
                   ,
                   value =>
-                    if (value) {
+                 
                       for {
                         updatedAnswers <-
                           Future.fromTry(
@@ -157,13 +157,6 @@ class AmendTrustRemoveDetailYesNoController @Inject() (
                       } yield Redirect(
                         controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad().url
                       )
-                    } else {
-                      Future.successful(
-                        Redirect(
-                          controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad().url
-                        )
-                      )
-                    }
                 )
             }
           }
