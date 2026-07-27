@@ -18,7 +18,9 @@ package controllers.amend.company
 
 import controllers.actions.*
 import forms.amend.company.AmendCompanyRemoveDetailYesNoFormProvider
-import pages.add.company.CompanyNamePage
+import models.UserAnswers
+import models.amend.company.AmendCompanyRemoveDetail
+import pages.add.company.*
 import pages.amend.company.AmendCompanyRemoveDetailYesNoPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
@@ -42,32 +44,85 @@ class AmendCompanyRemoveDetailYesNoController @Inject() (
     extends FrontendBaseController
     with I18nSupport {
 
-  private val validDetails = Set(
-    "address",
-    "contact-details",
-    "unique-taxpayer-reference",
-    "company-registration-number",
-    "works-reference-number"
-  )
+  private def withValidDetail(
+    detail: String
+  )(
+    action: AmendCompanyRemoveDetail => Future[Result]
+  ): Future[Result] =
+    AmendCompanyRemoveDetail.fromKey(detail) match {
 
-  private def withValidDetail(subcontractorDetail: String)(action: => Future[Result]): Future[Result] =
-    if (!validDetails.contains(subcontractorDetail)) {
-      Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
-    } else {
-      action
+      case Some(detailType) =>
+        action(detailType)
+
+      case None =>
+        Future.successful(
+          Redirect(
+            controllers.routes.JourneyRecoveryController.onPageLoad()
+          )
+        )
     }
+
+  private def detailIsPresent(
+    detail: AmendCompanyRemoveDetail,
+    userAnswers: UserAnswers
+  ): Boolean =
+    detail match {
+
+      case AmendCompanyRemoveDetail.Address =>
+        userAnswers
+          .get(CompanyAddressYesNoPage)
+          .contains(true)
+
+      case AmendCompanyRemoveDetail.ContactDetails =>
+        userAnswers
+          .get(AddCompanyContactMethodsYesNoPage)
+          .contains(true)
+
+      case AmendCompanyRemoveDetail.Utr =>
+        userAnswers
+          .get(CompanyUtrYesNoPage)
+          .contains(true)
+
+      case AmendCompanyRemoveDetail.CompanyRegistrationNumber =>
+        userAnswers
+          .get(CompanyCrnYesNoPage)
+          .contains(true)
+
+      case AmendCompanyRemoveDetail.WorksReferenceNumber =>
+        userAnswers
+          .get(CompanyWorksReferenceYesNoPage)
+          .contains(true)
+    }
+
+  private def journeyRecovery: Result =
+    Redirect(
+      controllers.routes.JourneyRecoveryController.onPageLoad()
+    )
 
   def onPageLoad(subcontractorDetail: String): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
       request.userAnswers
         .get(CompanyNamePage)
         .map { companyName =>
-          withValidDetail(subcontractorDetail) {
-            val form = formProvider()
-            Future.successful(Ok(view(companyName, subcontractorDetail, form)))
+          withValidDetail(subcontractorDetail) { detailType =>
+            if (!detailIsPresent(detailType, request.userAnswers)) {
+
+              Future.successful(journeyRecovery)
+
+            } else {
+              val form = formProvider()
+
+              val messages =
+                messagesApi.preferred(request)
+
+              val subcontractorDetailTitle =
+                messages(detailType.messageKey)
+
+              Future.successful(Ok(view(companyName, subcontractorDetail, subcontractorDetailTitle, form)))
+            }
           }
         }
-        .getOrElse(Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())))
+        .getOrElse(Future.successful(journeyRecovery))
     }
 
   def onSubmit(subcontractorDetail: String): Action[AnyContent] = (identify andThen getData andThen requireData).async {
@@ -75,34 +130,41 @@ class AmendCompanyRemoveDetailYesNoController @Inject() (
       request.userAnswers
         .get(CompanyNamePage)
         .map { companyName =>
-          withValidDetail(subcontractorDetail) {
-            formProvider()
-              .bindFromRequest()
-              .fold(
-                formWithErrors => Future.successful(BadRequest(view(companyName, subcontractorDetail, formWithErrors))),
-                value =>
-                  if (value) {
+          withValidDetail(subcontractorDetail) { detailType =>
+            if (!detailIsPresent(detailType, request.userAnswers)) {
+
+              Future.successful(journeyRecovery)
+
+            } else {
+              formProvider()
+                .bindFromRequest()
+                .fold(
+                  formWithErrors =>
+
+                    val messages = messagesApi.preferred(request)
+
+                    val subcontractorDetailTitle = messages(detailType.messageKey)
+
+                    Future.successful(
+                      BadRequest(view(companyName, subcontractorDetail, subcontractorDetailTitle, formWithErrors))
+                    )
+                  ,
+                  value =>
                     for {
                       updatedAnswers <-
                         Future.fromTry(
                           request.userAnswers
-                            .set(AmendCompanyRemoveDetailYesNoPage(subcontractorDetail), value)
-                            .flatMap(_.remove(AmendCompanyRemoveDetailYesNoPage(subcontractorDetail)))
+                            .set(AmendCompanyRemoveDetailYesNoPage(detailType), value)
+                            .flatMap(_.remove(AmendCompanyRemoveDetailYesNoPage(detailType)))
                         )
                       _              <- sessionRepository.set(updatedAnswers)
                     } yield Redirect(
                       controllers.add.company.routes.CompanyCheckYourAnswersController.onPageLoad().url
                     )
-                  } else {
-                    Future.successful(
-                      Redirect(
-                        controllers.add.company.routes.CompanyCheckYourAnswersController.onPageLoad().url
-                      )
-                    )
-                  }
-              )
+                )
+            }
           }
         }
-        .getOrElse(Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())))
+        .getOrElse(Future.successful(journeyRecovery))
   }
 }

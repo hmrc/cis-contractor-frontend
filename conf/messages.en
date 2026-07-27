@@ -406,10 +406,10 @@ amendCompanyRemoveDetailYesNo.title                                          =  
 amendCompanyRemoveDetailYesNo.heading                                        =  Are you sure you want to remove the {1} from {0}?
 amendCompanyRemoveDetailYesNo.error.required                                 =  Select whether you want to remove this information from this subcontractor
 amendCompanyRemoveDetailYesNo.detail.address                                 =  address
-amendCompanyRemoveDetailYesNo.detail.contact-details                         =  contact details
-amendCompanyRemoveDetailYesNo.detail.unique-taxpayer-reference               =  UTR
-amendCompanyRemoveDetailYesNo.detail.company-registration-number             =  company registration number
-amendCompanyRemoveDetailYesNo.detail.works-reference-number                  =  works reference number
+amendCompanyRemoveDetailYesNo.detail.contactDetails                          =  contact details
+amendCompanyRemoveDetailYesNo.detail.utr                                     =  UTR
+amendCompanyRemoveDetailYesNo.detail.companyRegistrationNumber               =  company registration number
+amendCompanyRemoveDetailYesNo.detail.worksReferenceNumber                    =  works reference number
 
 # Partnership
 addPartnershipContactMethodsYesNo.title                     =  Do you want to add contact details for this partnership?

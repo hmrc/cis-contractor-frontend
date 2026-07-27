@@ -17,11 +17,14 @@
 package pages.amend.company
 
 import models.UserAnswers
+import models.amend.company.AmendCompanyRemoveDetail
+import models.amend.company.AmendCompanyRemoveDetail.*
 import pages.QuestionPage
 import pages.add.company.*
 import play.api.libs.json.JsPath
 
-case class AmendCompanyRemoveDetailYesNoPage(subcontractorDetail: String) extends QuestionPage[Boolean] {
+case class AmendCompanyRemoveDetailYesNoPage(subcontractorDetail: AmendCompanyRemoveDetail)
+    extends QuestionPage[Boolean] {
 
   override def path: JsPath = JsPath \ toString
 
@@ -29,12 +32,12 @@ case class AmendCompanyRemoveDetailYesNoPage(subcontractorDetail: String) extend
 
   override def cleanup(value: Option[Boolean], userAnswers: UserAnswers) =
     subcontractorDetail match {
-      case "address" if value.contains(true) =>
+      case Address if value.contains(true) =>
         userAnswers
           .remove(CompanyAddressPage)
           .flatMap(_.set(CompanyAddressYesNoPage, false))
 
-      case "contact-details" if value.contains(true) =>
+      case ContactDetails if value.contains(true) =>
         userAnswers
           .remove(CompanyContactMethodOptionsPage)
           .flatMap(_.remove(CompanyEmailAddressPage))
@@ -42,17 +45,17 @@ case class AmendCompanyRemoveDetailYesNoPage(subcontractorDetail: String) extend
           .flatMap(_.remove(CompanyMobileNumberPage))
           .flatMap(_.set(AddCompanyContactMethodsYesNoPage, false))
 
-      case "unique-taxpayer-reference" if value.contains(true) =>
+      case Utr if value.contains(true) =>
         userAnswers
           .remove(CompanyUtrPage)
           .flatMap(_.set(CompanyUtrYesNoPage, false))
 
-      case "company-registration-number" if value.contains(true) =>
+      case CompanyRegistrationNumber if value.contains(true) =>
         userAnswers
           .remove(CompanyCrnPage)
           .flatMap(_.set(CompanyCrnYesNoPage, false))
 
-      case "works-reference-number" if value.contains(true) =>
+      case WorksReferenceNumber if value.contains(true) =>
         userAnswers
           .remove(CompanyWorksReferencePage)
           .flatMap(_.set(CompanyWorksReferenceYesNoPage, false))

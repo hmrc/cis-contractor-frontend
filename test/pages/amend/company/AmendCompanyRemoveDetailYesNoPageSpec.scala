@@ -17,6 +17,7 @@
 package pages.amend.company
 
 import models.address.{Address, Country}
+import models.amend.company.AmendCompanyRemoveDetail
 import models.contact.ContactMethodOptions
 import pages.add.company.*
 import pages.behaviours.PageBehaviours
@@ -25,7 +26,7 @@ class AmendCompanyRemoveDetailYesNoPageSpec extends PageBehaviours {
 
   "AmendCompanyRemoveDetailYesNoPage" - {
 
-    val amendCompanyRemoveDetailYesNoPage = AmendCompanyRemoveDetailYesNoPage("address")
+    val amendCompanyRemoveDetailYesNoPage = AmendCompanyRemoveDetailYesNoPage(AmendCompanyRemoveDetail.Address)
 
     beRetrievable[Boolean](amendCompanyRemoveDetailYesNoPage)
 
@@ -52,7 +53,7 @@ class AmendCompanyRemoveDetailYesNoPageSpec extends PageBehaviours {
         .value
 
       val updatedUserAnswers =
-        userAnswers.set(AmendCompanyRemoveDetailYesNoPage("address"), true).success.value
+        userAnswers.set(AmendCompanyRemoveDetailYesNoPage(AmendCompanyRemoveDetail.Address), true).success.value
 
       updatedUserAnswers.get(CompanyAddressPage) mustBe None
       updatedUserAnswers.get(CompanyAddressYesNoPage) mustBe Some(false)
@@ -68,7 +69,7 @@ class AmendCompanyRemoveDetailYesNoPageSpec extends PageBehaviours {
         .value
 
       val updatedUserAnswers =
-        userAnswers.set(AmendCompanyRemoveDetailYesNoPage("address"), false).success.value
+        userAnswers.set(AmendCompanyRemoveDetailYesNoPage(AmendCompanyRemoveDetail.Address), false).success.value
 
       updatedUserAnswers.get(CompanyAddressPage) mustBe Some(address)
       updatedUserAnswers.get(CompanyAddressYesNoPage) mustBe Some(true)
@@ -96,7 +97,7 @@ class AmendCompanyRemoveDetailYesNoPageSpec extends PageBehaviours {
         .value
 
       val updatedUserAnswers =
-        userAnswers.set(AmendCompanyRemoveDetailYesNoPage("contact-details"), true).success.value
+        userAnswers.set(AmendCompanyRemoveDetailYesNoPage(AmendCompanyRemoveDetail.ContactDetails), true).success.value
 
       updatedUserAnswers.get(CompanyContactMethodOptionsPage) mustBe None
       updatedUserAnswers.get(CompanyEmailAddressPage) mustBe None
@@ -127,7 +128,7 @@ class AmendCompanyRemoveDetailYesNoPageSpec extends PageBehaviours {
         .value
 
       val updatedUserAnswers =
-        userAnswers.set(AmendCompanyRemoveDetailYesNoPage("contact-details"), false).success.value
+        userAnswers.set(AmendCompanyRemoveDetailYesNoPage(AmendCompanyRemoveDetail.ContactDetails), false).success.value
 
       updatedUserAnswers.get(CompanyContactMethodOptionsPage) mustBe Some(
         Set(ContactMethodOptions.Email, ContactMethodOptions.Phone, ContactMethodOptions.Mobile)
@@ -139,10 +140,22 @@ class AmendCompanyRemoveDetailYesNoPageSpec extends PageBehaviours {
     }
 
     Seq(
-      ("unique-taxpayer-reference", CompanyUtrPage, CompanyUtrYesNoPage, "7777777777"),
-      ("company-registration-number", CompanyCrnPage, CompanyCrnYesNoPage, "1234567890"),
-      ("works-reference-number", CompanyWorksReferencePage, CompanyWorksReferenceYesNoPage, "WR-001")
-    ).foreach { case (contractorDetail, selectedDetailPage, screenerPage, dummyDetail) =>
+      ("unique-taxpayer-reference", CompanyUtrPage, CompanyUtrYesNoPage, AmendCompanyRemoveDetail.Utr, "7777777777"),
+      (
+        "company-registration-number",
+        CompanyCrnPage,
+        CompanyCrnYesNoPage,
+        AmendCompanyRemoveDetail.CompanyRegistrationNumber,
+        "1234567890"
+      ),
+      (
+        "works-reference-number",
+        CompanyWorksReferencePage,
+        CompanyWorksReferenceYesNoPage,
+        AmendCompanyRemoveDetail.WorksReferenceNumber,
+        "WR-001"
+      )
+    ).foreach { case (contractorDetail, selectedDetailPage, screenerPage, amendCompanyRemoveDetail, dummyDetail) =>
       s"when contractorDetail is '$contractorDetail'" - {
 
         s"cleanup: must remove '$selectedDetailPage' userAnswers and set '$screenerPage' to No when Yes is selected" in {
@@ -155,7 +168,7 @@ class AmendCompanyRemoveDetailYesNoPageSpec extends PageBehaviours {
             .value
 
           val updatedUserAnswers =
-            userAnswers.set(AmendCompanyRemoveDetailYesNoPage(contractorDetail), true).success.value
+            userAnswers.set(AmendCompanyRemoveDetailYesNoPage(amendCompanyRemoveDetail), true).success.value
 
           updatedUserAnswers.get(selectedDetailPage) mustBe None
           updatedUserAnswers.get(screenerPage) mustBe Some(false)
@@ -171,7 +184,7 @@ class AmendCompanyRemoveDetailYesNoPageSpec extends PageBehaviours {
             .value
 
           val updatedUserAnswers =
-            userAnswers.set(AmendCompanyRemoveDetailYesNoPage(contractorDetail), false).success.value
+            userAnswers.set(AmendCompanyRemoveDetailYesNoPage(amendCompanyRemoveDetail), false).success.value
 
           updatedUserAnswers.get(selectedDetailPage) mustBe Some(dummyDetail)
           updatedUserAnswers.get(screenerPage) mustBe Some(true)

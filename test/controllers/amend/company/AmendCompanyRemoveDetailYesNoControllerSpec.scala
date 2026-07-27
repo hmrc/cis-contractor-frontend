@@ -17,17 +17,14 @@
 package controllers.amend.company
 
 import base.SpecBase
-import controllers.routes
 import forms.amend.company.AmendCompanyRemoveDetailYesNoFormProvider
-import models.{NormalMode, UserAnswers}
-import navigation.{FakeNavigator, Navigator}
+import models.amend.company.AmendCompanyRemoveDetail
+import models.UserAnswers
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.add.company.CompanyNamePage
-import pages.amend.company.AmendCompanyRemoveDetailYesNoPage
+import pages.add.company.*
 import play.api.inject.bind
-import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import repositories.SessionRepository
@@ -44,24 +41,73 @@ class AmendCompanyRemoveDetailYesNoControllerSpec extends SpecBase with MockitoS
   private def uaWithName: UserAnswers =
     emptyUserAnswers.set(CompanyNamePage, companyName).success.value
 
+  private def uaWithNameAndDetail(
+    detail: String
+  ): UserAnswers = {
+
+    val userAnswers =
+      detail match {
+
+        case "address" =>
+          uaWithName
+            .set(CompanyAddressYesNoPage, true)
+            .success
+            .value
+
+        case "contact-details" =>
+          uaWithName
+            .set(AddCompanyContactMethodsYesNoPage, true)
+            .success
+            .value
+
+        case "utr" =>
+          uaWithName
+            .set(CompanyUtrYesNoPage, true)
+            .success
+            .value
+
+        case "company-registration-number" =>
+          uaWithName
+            .set(CompanyCrnYesNoPage, true)
+            .success
+            .value
+
+        case "works-reference-number" =>
+          uaWithName
+            .set(CompanyWorksReferenceYesNoPage, true)
+            .success
+            .value
+      }
+
+    userAnswers
+  }
+
   "AmendCompanyRemoveDetailYesNo Controller" - {
 
     Seq(
       ("address", "address"),
       ("contact-details", "contact-details"),
-      ("unique-taxpayer-reference", "unique-taxpayer-reference"),
+      ("unique-taxpayer-reference", "utr"),
       ("company-registration-number", "company-registration-number"),
       ("works-reference-number", "works-reference-number")
     ).foreach { case (subcontractorDetail, selectedDetail) =>
       s"when subcontractorDetail is '$subcontractorDetail'" - {
         val form = formProvider()
 
+        val detailType =
+          AmendCompanyRemoveDetail
+            .fromKey(selectedDetail)
+            .value
+
         lazy val removeDetailYesNoRoute =
           controllers.amend.company.routes.AmendCompanyRemoveDetailYesNoController.onPageLoad(selectedDetail).url
 
         "must return OK and the correct view for a GET" in {
 
-          val application = applicationBuilder(userAnswers = Some(uaWithName)).build()
+          val application = applicationBuilder(userAnswers = Some(uaWithNameAndDetail(selectedDetail))).build()
+
+          val detailTitle =
+            messages(application)(detailType.messageKey)
 
           running(application) {
             val request = FakeRequest(GET, removeDetailYesNoRoute)
@@ -71,7 +117,7 @@ class AmendCompanyRemoveDetailYesNoControllerSpec extends SpecBase with MockitoS
             val view = application.injector.instanceOf[AmendCompanyRemoveDetailYesNoView]
 
             status(result) mustEqual OK
-            contentAsString(result) mustEqual view(companyName, selectedDetail, form)(
+            contentAsString(result) mustEqual view(companyName, selectedDetail, detailTitle, form)(
               request,
               messages(application)
             ).toString
@@ -85,7 +131,7 @@ class AmendCompanyRemoveDetailYesNoControllerSpec extends SpecBase with MockitoS
           when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
           val application =
-            applicationBuilder(userAnswers = Some(uaWithName))
+            applicationBuilder(userAnswers = Some(uaWithNameAndDetail(selectedDetail)))
               .overrides(
                 bind[SessionRepository].toInstance(mockSessionRepository)
               )
@@ -112,7 +158,7 @@ class AmendCompanyRemoveDetailYesNoControllerSpec extends SpecBase with MockitoS
           when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
           val application =
-            applicationBuilder(userAnswers = Some(uaWithName))
+            applicationBuilder(userAnswers = Some(uaWithNameAndDetail(selectedDetail)))
               .overrides(
                 bind[SessionRepository].toInstance(mockSessionRepository)
               )
@@ -134,7 +180,10 @@ class AmendCompanyRemoveDetailYesNoControllerSpec extends SpecBase with MockitoS
 
         "must return a Bad Request and errors when invalid data is submitted" in {
 
-          val application = applicationBuilder(userAnswers = Some(uaWithName)).build()
+          val application = applicationBuilder(userAnswers = Some(uaWithNameAndDetail(selectedDetail))).build()
+
+          val detailTitle =
+            messages(application)(detailType.messageKey)
 
           running(application) {
             val request =
@@ -148,7 +197,7 @@ class AmendCompanyRemoveDetailYesNoControllerSpec extends SpecBase with MockitoS
             val result = route(application, request).value
 
             status(result) mustEqual BAD_REQUEST
-            contentAsString(result) mustEqual view(companyName, selectedDetail, boundForm)(
+            contentAsString(result) mustEqual view(companyName, selectedDetail, detailTitle, boundForm)(
               request,
               messages(application)
             ).toString
@@ -202,6 +251,36 @@ class AmendCompanyRemoveDetailYesNoControllerSpec extends SpecBase with MockitoS
         "must redirect to JourneyRecovery if CompanyName is missing for a POST" in {
 
           val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+
+          running(application) {
+            val request =
+              FakeRequest(POST, removeDetailYesNoRoute)
+                .withFormUrlEncodedBody(("value", "true"))
+
+            val result = route(application, request).value
+
+            status(result) mustEqual SEE_OTHER
+            redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+          }
+        }
+
+        "must redirect to Journey Recovery for a GET if no detail data is found" in {
+
+          val application = applicationBuilder(userAnswers = Some(uaWithName)).build()
+
+          running(application) {
+            val request = FakeRequest(GET, removeDetailYesNoRoute)
+
+            val result = route(application, request).value
+
+            status(result) mustEqual SEE_OTHER
+            redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+          }
+        }
+
+        "must redirect to JourneyRecovery if detail data is missing for a POST" in {
+
+          val application = applicationBuilder(userAnswers = Some(uaWithName)).build()
 
           running(application) {
             val request =

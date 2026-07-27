@@ -17,6 +17,7 @@
 package views.amend.company
 
 import forms.amend.company.AmendCompanyRemoveDetailYesNoFormProvider
+import models.amend.company.AmendCompanyRemoveDetail.*
 import org.jsoup.Jsoup
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
@@ -32,16 +33,23 @@ class AmendCompanyRemoveDetailYesNoViewSpec extends AnyWordSpec with Matchers wi
   val companyName = "Test Company"
 
   Seq(
-    ("address", "amendCompanyRemoveDetailYesNo.detail.address"),
-    ("contact-details", "amendCompanyRemoveDetailYesNo.detail.contact-details"),
-    ("unique-taxpayer-reference", "amendCompanyRemoveDetailYesNo.detail.unique-taxpayer-reference"),
-    ("company-registration-number", "amendCompanyRemoveDetailYesNo.detail.company-registration-number"),
-    ("works-reference-number", "amendCompanyRemoveDetailYesNo.detail.works-reference-number")
-  ).foreach { case (contractorDetail, detailKey) =>
+    ("address", Address, "amendCompanyRemoveDetailYesNo.detail.address"),
+    ("contact-details", ContactDetails, "amendCompanyRemoveDetailYesNo.detail.contactDetails"),
+    ("unique-taxpayer-reference", Utr, "amendCompanyRemoveDetailYesNo.detail.utr"),
+    (
+      "company-registration-number",
+      CompanyRegistrationNumber,
+      "amendCompanyRemoveDetailYesNo.detail.companyRegistrationNumber"
+    ),
+    ("works-reference-number", WorksReferenceNumber, "amendCompanyRemoveDetailYesNo.detail.worksReferenceNumber")
+  ).foreach { case (contractorDetail, amendCompanyRemoveDetail, detailKey) =>
     s"AmendCompanyRemoveDetailYesNoView when contractorDetail is '$contractorDetail'" should {
 
       "render the page with title, heading, hint, yes/no radios and submit button" in new Setup {
-        val html = view(companyName, contractorDetail, form)
+        val subcontractorDetailTitle: String =
+          messages(amendCompanyRemoveDetail.messageKey)
+
+        val html = view(companyName, contractorDetail, subcontractorDetailTitle, form)
         val doc  = Jsoup.parse(html.toString())
 
         doc.select("title").text() must include(
@@ -70,11 +78,14 @@ class AmendCompanyRemoveDetailYesNoViewSpec extends AnyWordSpec with Matchers wi
 
       "display error summary and inline error when no option is selected" in new Setup {
 
+        val subcontractorDetailTitle: String =
+          messages(amendCompanyRemoveDetail.messageKey)
+
         val companyName = "Test Company"
 
         val errorForm = form.withError("value", "amendCompanyRemoveDetailYesNo.error.required")
 
-        val html = view(companyName, contractorDetail, errorForm)
+        val html = view(companyName, contractorDetail, subcontractorDetailTitle, errorForm)
         val doc  = Jsoup.parse(html.toString())
 
         val summary = doc.select(".govuk-error-summary")

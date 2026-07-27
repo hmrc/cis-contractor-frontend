@@ -24,34 +24,25 @@
     govukButton: GovukButton
 )
 
-@(name: String, subcontractorDetail:String, form: Form[_])(implicit request: Request[_], messages: Messages)
+@(name: String, subcontractorDetail:String, subcontractorDetailTitle: String, form: Form[_])(implicit request: Request[_], messages: Messages)
 
-@defining(subcontractorDetail match {
-    case "address"                      => messages("amendCompanyRemoveDetailYesNo.detail.address")
-    case "contact-details"              => messages("amendCompanyRemoveDetailYesNo.detail.contact-details")
-    case "unique-taxpayer-reference"    => messages("amendCompanyRemoveDetailYesNo.detail.unique-taxpayer-reference")
-    case "company-registration-number"  => messages("amendCompanyRemoveDetailYesNo.detail.company-registration-number")
-    case "works-reference-number"       => messages("amendCompanyRemoveDetailYesNo.detail.works-reference-number")
-}) { selectedSubcontractorDetail =>
+@layout(pageTitle = title(form, messages("amendCompanyRemoveDetailYesNo.title"))) {
 
-    @layout(pageTitle = title(form, messages("amendCompanyRemoveDetailYesNo.title"))) {
+    @formHelper(action = controllers.amend.company.routes.AmendCompanyRemoveDetailYesNoController.onSubmit(subcontractorDetail), Symbol("autoComplete") -> "off") {
 
-        @formHelper(action = controllers.amend.company.routes.AmendCompanyRemoveDetailYesNoController.onSubmit(subcontractorDetail), Symbol("autoComplete") -> "off") {
-
-            @if(form.errors.nonEmpty) {
-                @govukErrorSummary(ErrorSummaryViewModel(form, errorLinkOverrides = Map("value" -> "value_0")))
-            }
-
-            @govukRadios(
-                RadiosViewModel.yesNo(
-                    field = form("value"),
-                    legend = LegendViewModel(messages("amendCompanyRemoveDetailYesNo.heading", name, selectedSubcontractorDetail)).asPageHeading(Large)
-                )
-            )
-
-            @govukButton(
-                ButtonViewModel(messages("site.continue"))
-            )
+        @if(form.errors.nonEmpty) {
+            @govukErrorSummary(ErrorSummaryViewModel(form, errorLinkOverrides = Map("value" -> "value_0")))
         }
+
+        @govukRadios(
+            RadiosViewModel.yesNo(
+                field = form("value"),
+                legend = LegendViewModel(messages("amendCompanyRemoveDetailYesNo.heading", name, subcontractorDetailTitle)).asPageHeading(Large)
+            )
+        )
+
+        @govukButton(
+            ButtonViewModel(messages("site.continue"))
+        )
     }
 }
