@@ -14,10 +14,14 @@
  * limitations under the License.
  */
 
-package queries
+package pages
 
+import models.response.GetSubcontractorResponse
+import pages.QuestionPage
 import play.api.libs.json.JsPath
 
-case object SubContractorVerifiedQuery extends Gettable[Boolean] with Settable[Boolean] {
-  override def path: JsPath = JsPath \ "subContractorVerified"
+case object GetSubcontractorResponsePage extends QuestionPage[GetSubcontractorResponse] {
+
+  override def path: JsPath =
+    JsPath \ toString
 }

@@ -31,6 +31,8 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import repositories.SessionRepository
 import services.AddressLookupService
+import models.UserAnswers
+import queries.AddressLookupAmendReturnQuery
 
 import scala.concurrent.Future
 
@@ -391,6 +393,103 @@ class PartnershipAddressControllerSpec extends SpecBase with MockitoSugar {
 
           status(result) mustBe SEE_OTHER
           redirectLocation(result).value mustBe routes.JourneyRecoveryController.onPageLoad().url
+        }
+      }
+    }
+
+    "redirectToAmendAddressLookup" - {
+
+      "must set AddressLookupAmendReturnQuery and redirect to the change address lookup journey" in {
+
+        val mockSessionRepository = mock[SessionRepository]
+        val captor                = ArgumentCaptor.forClass(classOf[UserAnswers])
+
+        when(mockSessionRepository.set(any()))
+          .thenReturn(Future.successful(true))
+
+        val application =
+          applicationBuilder(userAnswers = Some(userAnswersWithName))
+            .overrides(
+              bind[SessionRepository].toInstance(mockSessionRepository)
+            )
+            .build()
+
+        running(application) {
+
+          val request =
+            FakeRequest(
+              GET,
+              controllers.add.partnership.routes.PartnershipAddressController.redirectToAmendAddressLookup().url
+            )
+
+          val result = route(application, request).value
+
+          status(result) mustBe SEE_OTHER
+
+          redirectLocation(result).value mustBe
+            controllers.add.partnership.routes.PartnershipAddressController
+              .redirectToAddressLookup(Some("change"))
+              .url
+
+          verify(mockSessionRepository).set(captor.capture())
+
+          captor.getValue
+            .get(AddressLookupAmendReturnQuery)
+            .value mustBe true
+        }
+      }
+
+      "must redirect to Journey Recovery when saving fails" in {
+
+        val mockSessionRepository = mock[SessionRepository]
+
+        when(mockSessionRepository.set(any()))
+          .thenReturn(Future.failed(new RuntimeException("DB unavailable")))
+
+        val application =
+          applicationBuilder(userAnswers = Some(userAnswersWithName))
+            .overrides(
+              bind[SessionRepository].toInstance(mockSessionRepository)
+            )
+            .build()
+
+        running(application) {
+
+          val request =
+            FakeRequest(
+              GET,
+              controllers.add.partnership.routes.PartnershipAddressController.redirectToAmendAddressLookup().url
+            )
+
+          val result = route(application, request).value
+
+          status(result) mustBe SEE_OTHER
+
+          redirectLocation(result).value mustBe
+            controllers.routes.JourneyRecoveryController.onPageLoad().url
+        }
+      }
+
+      "must redirect to Journey Recovery when no user answers exist" in {
+
+        val application =
+          applicationBuilder(userAnswers = None)
+            .build()
+
+        running(application) {
+
+          val request =
+            FakeRequest(
+              GET,
+              controllers.add.partnership.routes.PartnershipAddressController.redirectToAmendAddressLookup().url
+            )
+
+          val result = route(application, request).value
+
+          status(result) mustBe SEE_OTHER
+
+          redirectLocation(result).value mustBe
+            controllers.routes.JourneyRecoveryController.onPageLoad().url
         }
       }
     }

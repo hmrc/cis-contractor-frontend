@@ -14,19 +14,17 @@
  * limitations under the License.
  */
 
-package pages.add
+package models.add
 
-import models.add.IndividualChooseContactDetails
-import pages.behaviours.PageBehaviours
+import models.contact.ContactMethodOptions
+import play.api.i18n.Messages
+import uk.gov.hmrc.govukfrontend.views.viewmodels.checkboxes.CheckboxItem
 
-class IndividualChooseContactDetailsPageSpec extends PageBehaviours {
+type IndividualContactMethodOptions = ContactMethodOptions
 
-  "IndividualChooseContactDetailsPage" - {
+object IndividualContactMethodOptions {
+  val values: Seq[IndividualContactMethodOptions] = ContactMethodOptions.values
 
-    beRetrievable[IndividualChooseContactDetails](IndividualChooseContactDetailsPage)
-
-    beSettable[IndividualChooseContactDetails](IndividualChooseContactDetailsPage)
-
-    beRemovable[IndividualChooseContactDetails](IndividualChooseContactDetailsPage)
-  }
+  def checkboxItems(implicit messages: Messages): Seq[CheckboxItem] =
+    ContactMethodOptions.checkboxItems("individualContactMethodOptions")
 }

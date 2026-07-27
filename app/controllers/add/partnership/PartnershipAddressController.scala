@@ -23,13 +23,13 @@ import models.address.Address
 import models.address.AddressLookupJourneyIdentifier.partnershipQuestionsAddress
 import pages.add.partnership.{PartnershipAddressPage, PartnershipNamePage}
 import play.api.i18n.MessagesApi
-import play.api.mvc.{Call, MessagesControllerComponents}
-import queries.Settable
+import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
+import queries.{AddressLookupAmendReturnQuery, Settable}
 import repositories.SessionRepository
 import services.AddressLookupService
 
 import javax.inject.Inject
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 class PartnershipAddressController @Inject() (
   override val messagesApi: MessagesApi,
@@ -59,6 +59,20 @@ class PartnershipAddressController @Inject() (
     routes.AddPartnershipContactMethodsYesNoController.onPageLoad(mode)
 
   override protected def onChangeCompletion(isAmend: Boolean): Call =
-    routes.PartnershipCheckYourAnswersController.onPageLoad()
+    if (isAmend) {
+      controllers.routes.JourneyRecoveryController.onPageLoad()
+    } // TODO: redirect to amend cya page
+    else {
+      routes.PartnershipCheckYourAnswersController.onPageLoad()
+    }
+
+  def redirectToAmendAddressLookup(): Action[AnyContent] =
+    (identify andThen getData andThen requireData).async { implicit request =>
+      (for {
+        ua <- Future.fromTry(request.userAnswers.set(AddressLookupAmendReturnQuery, true))
+        _  <- sessionRepository.set(ua)
+      } yield Redirect(routes.PartnershipAddressController.redirectToAddressLookup(Some("change"))))
+        .recover { case _ => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()) }
+    }
 
 }

@@ -16,7 +16,7 @@
 
 package viewmodels.checkAnswers.add.partnership
 
-import models.{CheckMode, UserAnswers}
+import models.{CheckMode, Mode, UserAnswers}
 import pages.add.partnership.{PartnershipHasUtrYesNoPage, PartnershipNamePage}
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.Aliases.Text
@@ -26,7 +26,7 @@ import viewmodels.implicits.*
 
 object PartnershipHasUtrYesNoSummary {
 
-  def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
+  def row(answers: UserAnswers, mode: Mode = CheckMode)(implicit messages: Messages): Option[SummaryListRow] =
     answers.get(PartnershipHasUtrYesNoPage).map { answer =>
       val partnershipName = answers
         .get(PartnershipNamePage)
@@ -43,7 +43,7 @@ object PartnershipHasUtrYesNoSummary {
           ActionItemViewModel(
             content = messages("site.change"),
             href = controllers.add.partnership.routes.PartnershipHasUtrYesNoController
-              .onPageLoad(CheckMode)
+              .onPageLoad(mode)
               .url
           ).withVisuallyHiddenText(
             messages("partnershipHasUtrYesNo.change.hidden")

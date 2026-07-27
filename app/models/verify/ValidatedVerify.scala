@@ -36,7 +36,10 @@ object ValidatedVerify extends Validation {
       subcontractorsToReverify <- getOptionalPageAndQuestionValue(
                                     answers,
                                     SelectSubcontractorsToReverifyPage,
-                                    ReverifyExistingSubcontractorsYesNoPage
+                                    answers
+                                      .get(VerifyYourSubcontractorsYesNoPage)
+                                      .map(_ => VerifyYourSubcontractorsYesNoPage)
+                                      .getOrElse(ReverifyExistingSubcontractorsYesNoPage)
                                   )
 
       _ <- Either.cond(

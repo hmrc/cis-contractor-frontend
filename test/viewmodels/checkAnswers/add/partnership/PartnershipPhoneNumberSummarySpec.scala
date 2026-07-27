@@ -18,7 +18,7 @@ package viewmodels.checkAnswers.add.partnership
 
 import controllers.add.partnership.routes
 import helpers.CyaEncodingSpecHelper
-import models.{CheckMode, UserAnswers}
+import models.{AmendMode, CheckMode, UserAnswers}
 import org.scalatest.OptionValues.convertOptionToValuable
 import org.scalatest.TryValues.convertTryToSuccessOrFailure
 import org.scalatest.freespec.AnyFreeSpec
@@ -67,9 +67,75 @@ class PartnershipPhoneNumberSummarySpec extends AnyFreeSpec with Matchers with C
       changeAction.attributes                   must contain("id" -> "partnership-phone-number")
     }
 
+    "must return a SummaryListRow when the answer exists for Amend journey" in {
+      val answers =
+        UserAnswers("test-id")
+          .set(PartnershipPhoneNumberPage, "0123456789")
+          .success
+          .value
+
+      val maybeRow = PartnershipPhoneNumberSummary.row(answers, AmendMode)
+      maybeRow shouldBe defined
+
+      val row = maybeRow.value
+
+      val expectedKeyText = messages("partnershipPhoneNumber.checkYourAnswersLabel")
+      row.key.content.asHtml.toString should include(expectedKeyText)
+
+      row.value.content.asHtml.toString should include("0123456789")
+
+      row.actions shouldBe defined
+      val actions = row.actions.value.items
+      actions should have size 1
+
+      val changeAction       = actions.head
+      val expectedChangeText = messages("site.change")
+      val expectedHref       = routes.PartnershipPhoneNumberController.onPageLoad(AmendMode).url
+      val expectedHiddenText = messages("partnershipPhoneNumber.change.hidden")
+
+      changeAction.content.asHtml.toString should include(expectedChangeText)
+      changeAction.href                  shouldBe expectedHref
+
+      changeAction.visuallyHiddenText.value shouldBe expectedHiddenText
+      changeAction.attributes                   must contain("id" -> "partnership-phone-number")
+    }
+
     "must return None when the answer does not exist" in {
       val answers = UserAnswers("test-id")
       PartnershipPhoneNumberSummary.row(answers) shouldBe None
+    }
+
+    "must return a SummaryListRow when the answer exists in Amend journey" in {
+      val answers =
+        UserAnswers("test-id")
+          .set(PartnershipPhoneNumberPage, "0123456789")
+          .success
+          .value
+
+      val maybeRow = PartnershipPhoneNumberSummary.row(answers, AmendMode)
+      maybeRow shouldBe defined
+
+      val row = maybeRow.value
+
+      val expectedKeyText = messages("partnershipPhoneNumber.checkYourAnswersLabel")
+      row.key.content.asHtml.toString should include(expectedKeyText)
+
+      row.value.content.asHtml.toString should include("0123456789")
+
+      row.actions shouldBe defined
+      val actions = row.actions.value.items
+      actions should have size 1
+
+      val changeAction       = actions.head
+      val expectedChangeText = messages("site.change")
+      val expectedHref       = routes.PartnershipPhoneNumberController.onPageLoad(AmendMode).url
+      val expectedHiddenText = messages("partnershipPhoneNumber.change.hidden")
+
+      changeAction.content.asHtml.toString should include(expectedChangeText)
+      changeAction.href                  shouldBe expectedHref
+
+      changeAction.visuallyHiddenText.value shouldBe expectedHiddenText
+      changeAction.attributes                   must contain("id" -> "partnership-phone-number")
     }
 
     "must HTML-escape special characters correctly (single encoding only)" in {
