@@ -167,8 +167,8 @@ class AmendIndividualRemoveDetailYesNoController @Inject() (
                       updatedAnswers <-
                         Future.fromTry(
                           request.userAnswers
-                            .set(AmendIndividualRemoveDetailYesNoPage(subcontractorDetail), value)
-                            .flatMap(_.remove(AmendIndividualRemoveDetailYesNoPage(subcontractorDetail)))
+                            .set(AmendIndividualRemoveDetailYesNoPage(detailType), value)
+                            .flatMap(_.remove(AmendIndividualRemoveDetailYesNoPage(detailType)))
                         )
                       _              <- sessionRepository.set(updatedAnswers)
                     } yield

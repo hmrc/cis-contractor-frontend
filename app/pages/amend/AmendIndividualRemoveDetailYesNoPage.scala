@@ -17,11 +17,14 @@
 package pages.amend
 
 import models.UserAnswers
+import models.amend.AmendIndividualRemoveDetail
+import models.amend.AmendIndividualRemoveDetail.*
 import pages.QuestionPage
 import pages.add.*
 import play.api.libs.json.JsPath
 
-case class AmendIndividualRemoveDetailYesNoPage(subcontractorDetail: String) extends QuestionPage[Boolean] {
+case class AmendIndividualRemoveDetailYesNoPage(subcontractorDetail: AmendIndividualRemoveDetail)
+    extends QuestionPage[Boolean] {
 
   override def path: JsPath = JsPath \ toString
 
@@ -29,30 +32,30 @@ case class AmendIndividualRemoveDetailYesNoPage(subcontractorDetail: String) ext
 
   override def cleanup(value: Option[Boolean], userAnswers: UserAnswers) =
     subcontractorDetail match {
-      case "trading-name" if value.contains(true) =>
+      case TradingName if value.contains(true) =>
         userAnswers
           .remove(TradingNameOfSubcontractorPage)
           .flatMap(_.set(SubTradingNameYesNoPage, false))
 
-      case "trading-name" if value.contains(false) =>
+      case TradingName if value.contains(false) =>
         userAnswers
           .set(SubTradingNameYesNoPage, true)
 
-      case "subcontractor-name" if value.contains(true) =>
+      case SubcontractorName if value.contains(true) =>
         userAnswers
           .remove(SubcontractorNamePage)
           .flatMap(_.set(SubTradingNameYesNoPage, true))
 
-      case "subcontractor-name" if value.contains(false) =>
+      case SubcontractorName if value.contains(false) =>
         userAnswers
           .set(SubTradingNameYesNoPage, false)
 
-      case "address" if value.contains(true) =>
+      case Address if value.contains(true) =>
         userAnswers
           .remove(AddressOfSubcontractorPage)
           .flatMap(_.set(SubAddressYesNoPage, false))
 
-      case "contact-details" if value.contains(true) =>
+      case ContactDetails if value.contains(true) =>
         userAnswers
           .remove(IndividualContactMethodOptionsPage)
           .flatMap(_.remove(IndividualEmailAddressPage))
@@ -60,17 +63,17 @@ case class AmendIndividualRemoveDetailYesNoPage(subcontractorDetail: String) ext
           .flatMap(_.remove(IndividualMobileNumberPage))
           .flatMap(_.set(AddIndividualContactMethodsYesNoPage, false))
 
-      case "utr" if value.contains(true) =>
+      case Utr if value.contains(true) =>
         userAnswers
           .remove(SubcontractorsUniqueTaxpayerReferencePage)
           .flatMap(_.set(UniqueTaxpayerReferenceYesNoPage, false))
 
-      case "national-insurance-number" if value.contains(true) =>
+      case NationalInsuranceNumber if value.contains(true) =>
         userAnswers
           .remove(SubNationalInsuranceNumberPage)
           .flatMap(_.set(NationalInsuranceNumberYesNoPage, false))
 
-      case "works-reference-number" if value.contains(true) =>
+      case WorksReferenceNumber if value.contains(true) =>
         userAnswers
           .remove(WorksReferenceNumberPage)
           .flatMap(_.set(WorksReferenceNumberYesNoPage, false))
