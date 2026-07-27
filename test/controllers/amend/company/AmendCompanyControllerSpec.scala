@@ -126,14 +126,21 @@ class AmendCompanyControllerSpec extends SpecBase with MockitoSugar {
   private val expectedOriginal =
     OriginalCompanyAnswers(
       companyName = Some(companyName),
+      addressYesNo = Some(true),
       address = Some(expectedAddress),
-      companyContactMethod = Some(Set(Email, Phone, Mobile)),
+      companyContactMethodsYesNo = Some(true),
+      companyContactMethod = Set(Email, Phone, Mobile),
       email = Some(emailAddress),
       phone = Some(phoneNumber),
       mobile = Some(mobileNumber),
+      crnYesNo = Some(true),
       crn = Some(crn),
+      utrYesNo = Some(true),
       utr = Some(utr),
-      worksReference = Some(worksReference)
+      worksReferenceYesNo = Some(true),
+      worksReference = Some(worksReference),
+      verificationNumber = Some("V1234567890"),
+      isVerified = Some(true)
     )
 
   "AmendCompanyController" - {
@@ -485,7 +492,8 @@ class AmendCompanyControllerSpec extends SpecBase with MockitoSugar {
               .get(OriginalCompanyAnswersQuery)
               .value
 
-          original.companyContactMethod mustBe None
+          original.companyContactMethodsYesNo mustBe Some(false)
+          original.companyContactMethod mustBe Set.empty
           original.email mustBe None
           original.phone mustBe None
           original.mobile mustBe None

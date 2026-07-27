@@ -17,68 +17,224 @@
 package controllers.amend.company
 
 import base.SpecBase
-
 import controllers.routes
+import models.add.company.CompanyContactMethodOptions
+import models.address.{Address, Country}
+import models.amend.company.OriginalCompanyAnswers
 import models.{TypeOfSubcontractor, UserAnswers}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{never, verify, verifyNoMoreInteractions, when}
 import org.scalatestplus.mockito.MockitoSugar
 import pages.add.TypeOfSubcontractorPage
-import pages.add.company._
+import pages.add.company.*
+import play.api.i18n.MessagesApi
 import play.api.inject.bind
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
-import queries.SubContractorVerifiedQuery
+import play.api.test.Helpers.*
+import queries.OriginalCompanyAnswersQuery
 import repositories.SessionRepository
 import services.SubcontractorService
 import uk.gov.hmrc.http.HeaderCarrier
+
 import scala.concurrent.Future
+import models.contact.ContactMethodOptions
 
 class AmendCompanyCheckYourAnswersControllerSpec extends SpecBase with MockitoSugar {
-
+  private val address =
+    Address(
+      addressLine1 = "12 Harbor View Road",
+      addressLine2 = Some("Amity Island"),
+      addressLine3 = Some("Bodmin"),
+      addressLine4 = Some("Cornwall"),
+      postcode = Some("PL31 2HL"),
+      country = Some(
+        Country(
+          code = None,
+          name = Some("England")
+        )
+      )
+    )
   private val minUa =
     emptyUserAnswers
       .set(TypeOfSubcontractorPage, TypeOfSubcontractor.Limitedcompany)
       .success
       .value
-      .set(CompanyNamePage, "Test Company")
+      .set(CompanyNamePage, "Test Company Ltd")
       .success
       .value
-      .set(CompanyAddressYesNoPage, false)
+      .set(CompanyAddressYesNoPage, true)
       .success
       .value
-      .set(AddCompanyContactMethodsYesNoPage, false)
+      .set(CompanyAddressPage, address)
       .success
       .value
-      .set(CompanyUtrYesNoPage, false)
+      .set(AddCompanyContactMethodsYesNoPage, true)
       .success
       .value
-      .set(CompanyWorksReferenceYesNoPage, false)
+      .set(CompanyContactMethodOptionsPage, Set(ContactMethodOptions.Email))
       .success
       .value
-      .set(SubContractorVerifiedQuery, false)
+      .set(CompanyEmailAddressPage, "test@test.com")
+      .success
+      .value
+      .set(CompanyUtrYesNoPage, true)
+      .success
+      .value
+      .set(CompanyUtrPage, "11111111")
+      .success
+      .value
+      .set(CompanyCrnYesNoPage, true)
+      .success
+      .value
+      .set(CompanyCrnPage, "12345678")
+      .success
+      .value
+      .set(CompanyWorksReferenceYesNoPage, true)
+      .success
+      .value
+      .set(CompanyWorksReferencePage, "WRN-1")
+      .success
+      .value
+      .set(
+        OriginalCompanyAnswersQuery,
+        OriginalCompanyAnswers(
+          companyName = Some("Test Company Ltd"),
+          addressYesNo = Some(true),
+          address = Some(address),
+          companyContactMethodsYesNo = Some(true),
+          companyContactMethod = Set(ContactMethodOptions.Email),
+          email = Some("test@test.com"),
+          phone = None,
+          mobile = None,
+          crnYesNo = Some(true),
+          crn = Some("12345678"),
+          utrYesNo = Some(true),
+          utr = Some("11111111"),
+          worksReferenceYesNo = Some(true),
+          worksReference = Some("WRN-1"),
+          verificationNumber = None,
+          isVerified = Some(false)
+        )
+      )
       .success
       .value
 
   "AmendCompanyCheckYourAnswersController" - {
 
-    "must return OK for GET when validation succeeds" in {
-
+    "must return OK and render the page with the correct summary list for GET when validation succeeds for unverified company" in {
       val application =
         applicationBuilder(userAnswers = Some(minUa)).build()
 
       running(application) {
         val request =
           FakeRequest(GET, controllers.amend.company.routes.AmendCompanyCheckYourAnswersController.onPageLoad().url)
-
-        val result = route(application, request).value
+        val msg     = app.injector.instanceOf[MessagesApi].preferred(request)
+        val result  = route(application, request).value
 
         status(result) mustEqual OK
-        val doc = contentAsString(result)
 
-        doc must include(controllers.amend.company.routes.AmendCompanyCheckYourAnswersController.onSubmit().url)
-        doc must include(controllers.amend.company.routes.AmendCompanyCheckYourAnswersController.onCancel().url)
-        doc must include("Test Company")
+        val page = contentAsString(result)
+
+        page must include(msg("typeOfSubcontractor.checkYourAnswersLabel"))
+        page must include(msg("companyName.checkYourAnswersLabel"))
+        page must include(msg("companyRegistrationNumberYesNo.checkYourAnswersLabel"))
+        page must include(msg("companyRegistrationNumber.checkYourAnswersLabel"))
+        page must include(msg("companyWorksReferenceYesNo.checkYourAnswersLabel"))
+        page must include(msg("companyWorksReference.checkYourAnswersLabel"))
+        page must include(msg("companyAddressYesNo.checkYourAnswersLabel"))
+        page must include(msg("companyAddress.checkYourAnswersLabel"))
+        page must include(msg("addCompanyContactMethodsYesNo.checkYourAnswersLabel"))
+        page must include(msg("companyContactMethodOptions.checkYourAnswersLabel"))
+        page must include(msg("companyEmailAddress.checkYourAnswersLabel"))
+
+        page must not include (msg("amendCheckYourAnswers.verificationNumber.label"))
+
+        page must include("Company")
+        page must include("Test Company Ltd")
+        page must include("12345678")
+        page must include("WRN-1")
+        page must include("test@test.com")
+        page must include("12 Harbor View Road")
+        page must include("Amity Island")
+        page must include("Bodmin")
+        page must include("Cornwall")
+        page must include("PL31 2HL")
+        page must include("England")
+
+        page must not include ("VRN123456")
+      }
+    }
+
+    "must render the correct summary for a verified company" in {
+
+      val verifiedUa =
+        minUa
+          .set(
+            OriginalCompanyAnswersQuery,
+            OriginalCompanyAnswers(
+              companyName = Some("Test Company Ltd"),
+              addressYesNo = Some(false),
+              address = None,
+              companyContactMethodsYesNo = Some(false),
+              companyContactMethod = Set.empty,
+              email = None,
+              phone = None,
+              mobile = None,
+              crnYesNo = Some(false),
+              crn = None,
+              utrYesNo = Some(false),
+              utr = None,
+              worksReferenceYesNo = Some(false),
+              worksReference = None,
+              verificationNumber = Some("VRN123456"),
+              isVerified = Some(true)
+            )
+          )
+          .success
+          .value
+      val application =
+        applicationBuilder(userAnswers = Some(verifiedUa)).build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(GET, controllers.amend.company.routes.AmendCompanyCheckYourAnswersController.onPageLoad().url)
+        val msg     = app.injector.instanceOf[MessagesApi].preferred(request)
+        val result  = route(application, request).value
+
+        status(result) mustEqual OK
+
+        val page = contentAsString(result)
+
+        page must include(msg("amendCheckYourAnswers.verificationNumber.label"))
+        page must include("VRN123456")
+
+        page must not include (msg("companyName.checkYourAnswersLabel"))
+        page must not include (msg("companyRegistrationNumberYesNo.checkYourAnswersLabel"))
+        page must not include (msg("companyRegistrationNumber.change.hidden"))
+
+        page must include(msg("typeOfSubcontractor.checkYourAnswersLabel"))
+        page must include("Company")
+
+        page must include(msg("companyAddressYesNo.checkYourAnswersLabel"))
+        page must include(msg("companyAddress.checkYourAnswersLabel"))
+        page must include(msg("site.yes"))
+        page must include("12 Harbor View Road")
+        page must include("Amity Island")
+        page must include("Bodmin")
+        page must include("Cornwall")
+        page must include("PL31 2HL")
+        page must include("England")
+
+        page must include(msg("addCompanyContactMethodsYesNo.checkYourAnswersLabel"))
+        page must include(msg("companyContactMethodOptions.checkYourAnswersLabel"))
+        page must include(msg("companyEmailAddress.checkYourAnswersLabel"))
+        page must include("test@test.com")
+
+        page must include(msg("companyWorksReferenceYesNo.checkYourAnswersLabel"))
+        page must include(msg("companyWorksReference.checkYourAnswersLabel"))
+        page must include(msg("site.no"))
+        page must include("WRN-1")
       }
     }
 

@@ -22,7 +22,7 @@ import pages.add.*
 import play.api.Logging
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import queries.{SubContractorVerificationNumberQuery, SubContractorVerifiedQuery}
+import queries.OriginalCompanyAnswersQuery
 import repositories.SessionRepository
 import services.SubcontractorService
 import uk.gov.hmrc.govukfrontend.views.Aliases.{Text, Value}
@@ -36,6 +36,7 @@ import controllers.routes
 import models.add.company.ValidatedCompany
 import pages.add.company.CompanyNamePage
 import viewmodels.checkAnswers.add.company.*
+
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -58,7 +59,7 @@ class AmendCompanyCheckYourAnswersController @Inject() (
 
     ValidatedCompany.build(ua) match {
       case Right(_) =>
-        val isVerified  = ua.get(SubContractorVerifiedQuery).contains(true)
+        val isVerified = ua.get(OriginalCompanyAnswersQuery).flatMap(_.isVerified)
         val companyName = ua.get(CompanyNamePage).getOrElse("")
 
         val subcontractorInformationList =
@@ -80,14 +81,13 @@ class AmendCompanyCheckYourAnswersController @Inject() (
 
   private def subcontractorInformationRows(
     ua: UserAnswers,
-    isVerified: Boolean
+    isVerified: Option[Boolean]
   )(implicit messages: Messages): Seq[Option[SummaryListRow]] = {
 
     val verificationRows =
       Option
-        .when(isVerified) {
-          val verificationNumber =
-            ua.get(SubContractorVerificationNumberQuery).getOrElse("")
+        .when(isVerified.contains(true)) {
+          val verificationNumber = ua.get(OriginalCompanyAnswersQuery).flatMap(_.verificationNumber).getOrElse("")
 
           Seq(
             CompanyUtrSummary.row(ua, AmendMode, showActions = false),
@@ -108,18 +108,18 @@ class AmendCompanyCheckYourAnswersController @Inject() (
 
   private def detailsRows(
     ua: UserAnswers,
-    isVerified: Boolean
+    isVerified: Option[Boolean]
   )(implicit messages: Messages): Seq[Option[SummaryListRow]] = {
 
     val nameRows =
-      if (isVerified) {
+      if (isVerified.contains(true)) {
         Nil
       } else {
         Seq(CompanyNameSummary.row(ua, AmendMode))
       }
 
     val utrRows =
-      if (isVerified) {
+      if (isVerified.contains(true)) {
         Nil
       } else {
         Seq(

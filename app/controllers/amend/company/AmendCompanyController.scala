@@ -171,14 +171,21 @@ class AmendCompanyController @Inject() (
   ): OriginalCompanyAnswers =
     OriginalCompanyAnswers(
       companyName = subcontractor.tradingName,
+      addressYesNo = Some(address.isDefined),
       address = address,
-      companyContactMethod = Option.when(methods.nonEmpty)(methods),
+      companyContactMethodsYesNo = Some(methods.nonEmpty),
+      companyContactMethod = methods,
       email = subcontractor.emailAddress,
       phone = subcontractor.phoneNumber,
       mobile = subcontractor.mobilePhoneNumber,
+      crnYesNo = Some(subcontractor.crn.isDefined),
       crn = subcontractor.crn,
+      utrYesNo = Some(subcontractor.utr.isDefined),
       utr = subcontractor.utr,
-      worksReference = subcontractor.worksReferenceNumber
+      worksReferenceYesNo = Some(subcontractor.worksReferenceNumber.isDefined),
+      worksReference = subcontractor.worksReferenceNumber,
+      verificationNumber = subcontractor.verificationNumber,
+      isVerified = subcontractor.verified.map(_.equalsIgnoreCase("Y"))
     )
 
 }
