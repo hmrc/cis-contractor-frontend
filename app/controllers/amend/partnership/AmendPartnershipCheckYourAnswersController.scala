@@ -24,7 +24,7 @@ import pages.add.partnership.PartnershipNamePage
 import play.api.Logging
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import queries.{SubContractorVerificationNumberQuery, SubContractorVerifiedQuery}
+import queries.OriginalPartnershipAnswersQuery
 import repositories.SessionRepository
 import services.SubcontractorService
 import uk.gov.hmrc.govukfrontend.views.Aliases.{Text, Value}
@@ -35,6 +35,7 @@ import viewmodels.checkAnswers.add.partnership.*
 import viewmodels.govuk.summarylist.*
 import views.html.amend.AmendCheckYourAnswersView
 import controllers.routes
+
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -57,7 +58,7 @@ class AmendPartnershipCheckYourAnswersController @Inject() (
 
     ValidatedPartnership.build(ua) match {
       case Right(_) =>
-        val isVerified      = ua.get(SubContractorVerifiedQuery).contains(true)
+        val isVerified      = ua.get(OriginalPartnershipAnswersQuery).flatMap(_.isVerified)
         val partnershipName = ua.get(PartnershipNamePage).getOrElse("")
 
         val subcontractorInformationList =
@@ -65,8 +66,10 @@ class AmendPartnershipCheckYourAnswersController @Inject() (
 
         val detailsList =
           SummaryListViewModel(rows = detailsRows(ua, isVerified).flatten)
+        val submitUrl   = controllers.amend.partnership.routes.AmendPartnershipCheckYourAnswersController.onSubmit()
+        val cancelUrl   = controllers.amend.partnership.routes.AmendPartnershipCheckYourAnswersController.onCancel()
 
-        Ok(view(subcontractorInformationList, detailsList, partnershipName))
+        Ok(view(subcontractorInformationList, detailsList, partnershipName, submitUrl, cancelUrl))
 
       case Left(error) =>
         logger.error(s"[AmendPartnershipCheckYourAnswersController.onPageLoad] Failed to load the page: $error")
@@ -76,14 +79,14 @@ class AmendPartnershipCheckYourAnswersController @Inject() (
 
   private def subcontractorInformationRows(
     ua: UserAnswers,
-    isVerified: Boolean
+    isVerified: Option[Boolean]
   )(implicit messages: Messages): Seq[Option[SummaryListRow]] = {
 
     val verificationRows =
       Option
-        .when(isVerified) {
+        .when(isVerified.contains(true)) {
           val verificationNumber =
-            ua.get(SubContractorVerificationNumberQuery).getOrElse("")
+            ua.get(OriginalPartnershipAnswersQuery).flatMap(_.verificationNumber).getOrElse("")
 
           Seq(
             PartnershipUniqueTaxpayerReferenceSummary.row(ua, AmendMode, showActions = false),
@@ -104,18 +107,18 @@ class AmendPartnershipCheckYourAnswersController @Inject() (
 
   private def detailsRows(
     ua: UserAnswers,
-    isVerified: Boolean
+    isVerified: Option[Boolean]
   )(implicit messages: Messages): Seq[Option[SummaryListRow]] = {
 
     val nameRows =
-      if (isVerified) {
+      if (isVerified.contains(true)) {
         Nil
       } else {
         Seq(PartnershipNameSummary.row(ua, AmendMode))
       }
 
     val utrRows =
-      if (isVerified) {
+      if (isVerified.contains(true)) {
         Nil
       } else {
         Seq(
@@ -136,6 +139,13 @@ class AmendPartnershipCheckYourAnswersController @Inject() (
       ) ++
       utrRows ++
       Seq(
+        PartnershipNominatedPartnerNameSummary.row(ua, AmendMode),
+        PartnershipNominatedPartnerCrnYesNoSummary.row(ua, AmendMode),
+        PartnershipNominatedPartnerCrnSummary.row(ua, AmendMode),
+        PartnershipNominatedPartnerNinoYesNoSummary.row(ua, AmendMode),
+        PartnershipNominatedPartnerNinoSummary.row(ua, AmendMode),
+        PartnershipNominatedPartnerUtrYesNoSummary.row(ua, AmendMode),
+        PartnershipNominatedPartnerUtrSummary.row(ua, AmendMode),
         PartnershipWorksReferenceNumberYesNoSummary.row(ua, AmendMode),
         PartnershipWorksReferenceNumberSummary.row(ua, AmendMode)
       )

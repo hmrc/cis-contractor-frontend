@@ -27,11 +27,11 @@
     formHelper: FormWithCSRF
 )
 
-@(informationList: SummaryList, detailsList: SummaryList, subcontractorName: String)(implicit request: Request[_], messages: Messages)
+@(informationList: SummaryList, detailsList: SummaryList, subcontractorName: String, submitUrl: Call, cancelUrl: Call)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = titleNoForm(messages("amendCheckYourAnswers.title"))) {
 
-    @formHelper(action = controllers.amend.partnership.routes.AmendPartnershipCheckYourAnswersController.onSubmit(), Symbol("autoComplete") -> "off") {
+    @formHelper(action = submitUrl, Symbol("autoComplete") -> "off") {
         <h1 class="govuk-heading-l">@subcontractorName</h1>
         @h2("amendCheckYourAnswers.heading.subcontractorInformation.h2")
 
@@ -49,7 +49,7 @@
             )
 
             <a class="govuk-link"
-                href="@controllers.amend.partnership.routes.AmendPartnershipCheckYourAnswersController.onCancel()">
+                href="@cancelUrl">
                 @messages("amendCheckYourAnswers.cancelChanges")
             </a>
         </div>
