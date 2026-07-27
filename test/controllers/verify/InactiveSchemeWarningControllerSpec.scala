@@ -20,18 +20,47 @@ import base.SpecBase
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import queries.CisIdQuery
+import models.MonthlyReturn
+import models.MonthlyReturnSubmission
+import models.response.GetNewestVerificationBatchResponse
+import pages.verify.NewestVerificationBatchResponsePage
 import views.html.verify.InactiveSchemeWarningView
+
+import java.time.LocalDateTime
 
 class InactiveSchemeWarningControllerSpec extends SpecBase {
 
   "InactiveSchemeWarning Controller" - {
 
-    "must return OK and the correct view for a GET" in {
+    "must return OK and the correct view for a GET when scheme is inactive" in {
 
       val cisId = "test-cis-id"
 
+      val inactiveResponse =
+        GetNewestVerificationBatchResponse(
+          scheme = None,
+          subcontractors = Seq.empty,
+          verificationBatch = None,
+          verifications = Seq.empty,
+          submission = None,
+          monthlyReturn = Some(
+            MonthlyReturn(
+              monthlyReturnId = 1L,
+              decNoMoreSubPayments = Some("Y")
+            )
+          ),
+          monthlyReturnSubmission = Some(
+            MonthlyReturnSubmission(
+              submissionId = 1L,
+              submissionRequestDate = Some(LocalDateTime.now())
+            )
+          )
+        )
+        
       val userAnswers =
-        emptyUserAnswers.set(CisIdQuery, cisId).success.value
+        emptyUserAnswers
+          .set(CisIdQuery, cisId).success.value
+          .set(NewestVerificationBatchResponsePage, inactiveResponse).success.value
 
       val application =
         applicationBuilder(userAnswers = Some(userAnswers)).build()

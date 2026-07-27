@@ -20,11 +20,14 @@ import config.FrontendAppConfig
 import controllers.actions.*
 import play.api.i18n.{I18nSupport, MessagesApi}
 import queries.CisIdQuery
+import models.response.GetNewestVerificationBatchResponse
+import pages.verify.NewestVerificationBatchResponsePage
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.verify.InactiveSchemeWarningView
 
 import javax.inject.Inject
+import java.time.LocalDateTime
 
 class InactiveSchemeWarningController @Inject() (
   override val messagesApi: MessagesApi,
@@ -38,15 +41,41 @@ class InactiveSchemeWarningController @Inject() (
     with I18nSupport {
 
   def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
-    request.userAnswers.get(CisIdQuery) match {
-      case Some(cisId) =>
-        val manageSubcontractorsUrl =
-          s"${appConfig.manageSubcontractorsUrl}/$cisId"
 
-        Ok(view(manageSubcontractorsUrl))
+    request.userAnswers.get(NewestVerificationBatchResponsePage) match {
 
-      case None =>
-        Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+      case Some(response) if isSchemeInactive(response) =>
+        request.userAnswers.get(CisIdQuery) match {
+
+          case Some(cisId) =>
+            val manageSubcontractorsUrl =
+              s"${appConfig.manageSubcontractorsUrl}/$cisId"
+
+            Ok(view(manageSubcontractorsUrl))
+
+          case None =>
+            Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+        }
+
+      case _ =>
+        Redirect(
+          controllers.routes.JourneyRecoveryController.onPageLoad()
+        )
     }
   }
+
+
+  private def isSchemeInactive(
+                                response: models.response.GetNewestVerificationBatchResponse
+                              ): Boolean =
+    response.monthlyReturn.exists(
+      _.decNoMoreSubPayments.contains("Y")
+    ) &&
+      response.monthlyReturnSubmission
+        .flatMap(_.submissionRequestDate)
+        .exists { submissionDate =>
+          LocalDateTime.now().isBefore(
+            submissionDate.plusMonths(6)
+          )
+        }
 }

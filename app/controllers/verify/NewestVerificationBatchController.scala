@@ -80,7 +80,7 @@ class NewestVerificationBatchController @Inject() (
               case Some(requestDate) =>
                 val sixMonthsLater = requestDate.plusMonths(InactivityStatus.SixMonths)
                 val now            = LocalDateTime.now(clock)
-                if (!now.isAfter(sixMonthsLater)) InactivityStatus.Active else InactivityStatus.Inactive
+                if (!now.isAfter(sixMonthsLater)) InactivityStatus.Inactive else InactivityStatus.Active
               case None              =>
                 InactivityStatus.MissingData
             }
