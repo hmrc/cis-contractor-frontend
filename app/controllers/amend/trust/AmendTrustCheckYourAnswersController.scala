@@ -35,6 +35,7 @@ import viewmodels.checkAnswers.add.trust.*
 import viewmodels.govuk.summarylist.*
 import views.html.amend.AmendCheckYourAnswersView
 import controllers.routes
+import pages.amend.ShowVerificationDetailsPage
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -58,7 +59,7 @@ class AmendTrustCheckYourAnswersController @Inject() (
 
     ValidatedTrust.build(ua) match {
       case Right(_) =>
-        val isVerified = ua.get(OriginalTrustAnswersQuery).flatMap(_.isVerified)
+        val isVerified = ua.get(ShowVerificationDetailsPage)
         val trustName  = ua.get(TrustNamePage).getOrElse("")
 
         val subcontractorInformationList =

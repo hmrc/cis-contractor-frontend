@@ -33,8 +33,7 @@ case class OriginalTrustAnswers(
   utr: Option[String],
   worksReferenceYesNo: Option[Boolean],
   worksReference: Option[String],
-  verificationNumber: Option[String],
-  isVerified: Option[Boolean]
+  verificationNumber: Option[String]
 )
 
 object OriginalTrustAnswers extends models.Enumerable.Implicits {

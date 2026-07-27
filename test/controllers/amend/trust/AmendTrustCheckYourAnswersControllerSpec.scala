@@ -37,6 +37,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.Future
 import models.contact.ContactMethodOptions
+import pages.amend.ShowVerificationDetailsPage
 
 class AmendTrustCheckYourAnswersControllerSpec extends SpecBase with MockitoSugar {
   private val address =
@@ -88,6 +89,9 @@ class AmendTrustCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
       .set(TrustWorksReferencePage, "WRN-1")
       .success
       .value
+      .set(ShowVerificationDetailsPage, false)
+      .success
+      .value
       .set(
         OriginalTrustAnswersQuery,
         OriginalTrustAnswers(
@@ -103,8 +107,7 @@ class AmendTrustCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
           utr = Some("11111111"),
           worksReferenceYesNo = Some(true),
           worksReference = Some("WRN-1"),
-          verificationNumber = None,
-          isVerified = Some(false)
+          verificationNumber = None
         )
       )
       .success
@@ -160,6 +163,9 @@ class AmendTrustCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
 
       val verifiedUa =
         minUa
+          .set(ShowVerificationDetailsPage, true)
+          .success
+          .value
           .set(
             OriginalTrustAnswersQuery,
             OriginalTrustAnswers(
@@ -175,8 +181,7 @@ class AmendTrustCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
               utr = None,
               worksReferenceYesNo = Some(false),
               worksReference = None,
-              verificationNumber = Some("VRN123456"),
-              isVerified = Some(true)
+              verificationNumber = Some("VRN123456")
             )
           )
           .success
