@@ -40,7 +40,7 @@ class TrustNavigator @Inject() () extends NavigatorForJourney {
 
   private def cyaRoute(mode: Mode): Call = mode match {
     case AmendMode =>
-      routes.JourneyRecoveryController.onPageLoad() // TODO route to Amend Trust CYA page when it's implemented
+      controllers.amend.trust.routes.AmendTrustCheckYourAnswersController.onPageLoad()
     case _         => controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
   }
 
@@ -88,6 +88,13 @@ class TrustNavigator @Inject() () extends NavigatorForJourney {
   private val amendRouteMap: Page => UserAnswers => Call = {
     case TrustAddressYesNoPage           => navigatorFromTrustAddressYesNoPage(AmendMode)(_)
     case AddTrustContactMethodsYesNoPage => navigatorFromAddTrustContactMethodsYesNoPage(AmendMode)(_)
+    case TrustContactMethodOptionsPage   => nextMissingSelectedContactMethodPageAfter(current = None, AmendMode)(_)
+    case TrustEmailAddressPage           =>
+      nextMissingSelectedContactMethodPageAfter(current = Some(ContactMethodOptions.Email), AmendMode)(_)
+    case TrustPhoneNumberPage            =>
+      nextMissingSelectedContactMethodPageAfter(current = Some(ContactMethodOptions.Phone), AmendMode)(_)
+    case TrustMobileNumberPage           =>
+      nextMissingSelectedContactMethodPageAfter(current = Some(ContactMethodOptions.Mobile), AmendMode)(_)
     case TrustWorksReferenceYesNoPage    => navigatorFromTrustWorksReferenceYesNoPage(AmendMode)(_)
     case TrustUtrYesNoPage               => navigatorFromTrustUtrYesNoPage(AmendMode)(_)
     case _                               => _ => cyaRoute(AmendMode)
@@ -103,7 +110,7 @@ class TrustNavigator @Inject() () extends NavigatorForJourney {
           .fold(controllers.add.trust.routes.TrustUtrController.onPageLoad(mode)) { _ =>
             cyaRoute(mode)
           }
-      case (Some(false), CheckMode)            =>
+      case (Some(false), CheckMode | AmendMode)            =>
         cyaRoute(mode)
       case _                                   =>
         routes.JourneyRecoveryController.onPageLoad()
@@ -116,7 +123,7 @@ class TrustNavigator @Inject() () extends NavigatorForJourney {
           case Some(true)  =>
             controllers.add.trust.routes.TrustAddressController.redirectToAmendAddressLookup()
           case Some(false) =>
-            controllers.routes.JourneyRecoveryController.onPageLoad() // TODO redirect to amend CYA page
+            cyaRoute(mode)
           case None        =>
             controllers.routes.JourneyRecoveryController.onPageLoad()
         }
@@ -182,14 +189,15 @@ class TrustNavigator @Inject() () extends NavigatorForJourney {
     }
 
   private def nextMissingSelectedContactMethodPageAfter(
-    current: Option[ContactMethodOptions]
+    current: Option[ContactMethodOptions],
+    mode: Mode = CheckMode
   )(userAnswers: UserAnswers): Call =
     navigateFromContactMethodPage(current, userAnswers) { remaining =>
       remaining
         .find(isMissingAnswer(_)(userAnswers))
-        .map(contactMethodPageCall(_, CheckMode))
+        .map(contactMethodPageCall(_, mode))
         .getOrElse(
-          controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
+          cyaRoute(mode)
         )
     }
 
