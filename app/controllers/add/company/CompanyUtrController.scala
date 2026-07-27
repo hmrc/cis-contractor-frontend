@@ -19,7 +19,8 @@ package controllers.add.company
 import controllers.actions.*
 import controllers.helpers.SaveAnswerHelper
 import forms.add.company.CompanyUtrFormProvider
-import models.Mode
+import models.requests.DataRequest
+import models.{AmendMode, Mode}
 import navigation.Navigator
 import pages.add.company.{CompanyNamePage, CompanyUtrPage}
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -49,6 +50,15 @@ class CompanyUtrController @Inject() (
 
   val form = formProvider()
 
+  private def saveAndContinue(mode: Mode, value: String)(implicit request: DataRequest[?]) =
+    for {
+      updatedAnswers <-
+        Future.fromTry(request.userAnswers.set(CompanyUtrPage, value))
+      _              <- sessionRepository.set(updatedAnswers)
+    } yield Redirect(
+      navigator.nextPage(CompanyUtrPage, mode, updatedAnswers)
+    )
+
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
     request.userAnswers
       .get(CompanyNamePage)
@@ -74,25 +84,26 @@ class CompanyUtrController @Inject() (
             .fold(
               formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, companyName))),
               value =>
-                subcontractorService.isDuplicateUTR(request.userAnswers, value).flatMap {
-                  case true  =>
-                    val errorForm = form
-                      .fill(value)
-                      .withError(
-                        key = "value",
-                        message = "companyUtr.error.duplicate"
-                      )
-                    Future.successful(
-                      BadRequest(view(errorForm, mode, companyName))
-                    )
-                  case false =>
-                    for {
-                      updatedAnswers <-
-                        Future.fromTry(
-                          SaveAnswerHelper.saveAnswer(request.userAnswers, CompanyUtrPage, value, mode)
+                val prevValue = request.userAnswers.get(CompanyUtrPage)
+
+                mode match {
+                  case AmendMode if prevValue.contains(value) =>
+                    saveAndContinue(mode, value)
+                  case _                                      =>
+                    subcontractorService.isDuplicateUTR(request.userAnswers, value).flatMap {
+                      case true  =>
+                        val errorForm = form
+                          .fill(value)
+                          .withError(
+                            key = "value",
+                            message = "companyUtr.error.duplicate"
+                          )
+                        Future.successful(
+                          BadRequest(view(errorForm, mode, companyName))
                         )
-                      _              <- sessionRepository.set(updatedAnswers)
-                    } yield Redirect(navigator.nextPage(CompanyUtrPage, mode, updatedAnswers))
+                      case false =>
+                        saveAndContinue(mode, value)
+                    }
                 }
             )
         }
