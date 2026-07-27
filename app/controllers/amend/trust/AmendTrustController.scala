@@ -26,7 +26,8 @@ import models.response.SubcontractorResponse
 import pages.add.*
 import pages.add.trust.*
 import play.api.Logging
-import controllers.amend.AmendControllerUtils._
+import controllers.amend.AmendControllerUtils.*
+import pages.amend.ShowVerificationDetailsPage
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import queries.{CisIdQuery, OriginalTrustAnswersQuery}
 import repositories.SessionRepository
@@ -76,11 +77,7 @@ class AmendTrustController @Inject() (
               Future.successful(recovery)
 
             case Some(subcontractor) =>
-              populateUserAnswers(
-                request.userAnswers,
-                cisId,
-                subcontractor
-              ).fold(
+              populateUserAnswers(request.userAnswers, cisId, subcontractor).fold(
                 error => {
                   logger.error(
                     s"[AmendTrustController] Failed to populate UserAnswers for " +
@@ -145,6 +142,7 @@ class AmendTrustController @Inject() (
       updated <- setOptional(updated, TrustUtrPage, subcontractor.utr)
       updated <- updated.set(TrustWorksReferenceYesNoPage, subcontractor.worksReferenceNumber.isDefined)
       updated <- setOptional(updated, TrustWorksReferencePage, subcontractor.worksReferenceNumber)
+      updated <- updated.set(ShowVerificationDetailsPage, shouldShowVerificationDetails(subcontractor))
       updated <- updated.set(CisIdQuery, cisId)
       updated <- updated.set(OriginalTrustAnswersQuery, original)
     } yield updated
