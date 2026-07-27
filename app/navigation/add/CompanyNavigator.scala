@@ -75,21 +75,26 @@ class CompanyNavigator @Inject() () extends NavigatorForJourney {
   }
 
   private val amendRouteMap: Page => UserAnswers => Call = {
-    case CompanyNamePage                => _ => cyaRoute(AmendMode)
-    case CompanyEmailAddressPage        => _ => cyaRoute(AmendMode)
-    case CompanyMobileNumberPage        => _ => cyaRoute(AmendMode)
-    case CompanyCrnPage                 => _ => cyaRoute(AmendMode)
-    case CompanyPhoneNumberPage         => _ => cyaRoute(AmendMode)
-    case CompanyAddressYesNoPage        => navigatorFromCompanyAddressYesNoPage(AmendMode)(_)
-    case CompanyCrnYesNoPage            =>
+    case CompanyNamePage                   => _ => cyaRoute(AmendMode)
+    case AddCompanyContactMethodsYesNoPage => navigatorFromAddCompanyContactMethodsYesNoPage(AmendMode)(_)
+    case CompanyContactMethodOptionsPage   => nextMissingSelectedContactMethodPageAfter(current = None, AmendMode)(_)
+    case CompanyEmailAddressPage           =>
+      nextMissingSelectedContactMethodPageAfter(current = Some(ContactMethodOptions.Email), AmendMode)(_)
+    case CompanyPhoneNumberPage            =>
+      nextMissingSelectedContactMethodPageAfter(current = Some(ContactMethodOptions.Phone), AmendMode)(_)
+    case CompanyMobileNumberPage           =>
+      nextMissingSelectedContactMethodPageAfter(current = Some(ContactMethodOptions.Mobile), AmendMode)(_)
+    case CompanyCrnPage                    => _ => cyaRoute(AmendMode)
+    case CompanyAddressYesNoPage           => navigatorFromCompanyAddressYesNoPage(AmendMode)(_)
+    case CompanyCrnYesNoPage               =>
       userAnswers => navigatorFromCompanyCrnYesNoPage(AmendMode)(userAnswers)
-    case CompanyUtrYesNoPage            =>
+    case CompanyUtrYesNoPage               =>
       userAnswers => navigatorFromCompanyUtrYesNoPage(AmendMode)(userAnswers)
-    case CompanyUtrPage                 => _ => cyaRoute(AmendMode)
-    case CompanyWorksReferenceYesNoPage =>
+    case CompanyUtrPage                    => _ => cyaRoute(AmendMode)
+    case CompanyWorksReferenceYesNoPage    =>
       userAnswers => navigatorFromCompanyWorksReferenceYesNoPage(AmendMode)(userAnswers)
-    case CompanyWorksReferencePage      => _ => cyaRoute(AmendMode)
-    case _                              => _ => cyaRoute(AmendMode)
+    case CompanyWorksReferencePage         => _ => cyaRoute(AmendMode)
+    case _                                 => _ => cyaRoute(AmendMode)
   }
 
   private val checkRouteMap: Page => UserAnswers => Call = {
@@ -228,14 +233,15 @@ class CompanyNavigator @Inject() () extends NavigatorForJourney {
     }
 
   private def nextMissingSelectedContactMethodPageAfter(
-    current: Option[ContactMethodOptions]
+    current: Option[ContactMethodOptions],
+    mode: Mode = CheckMode
   )(userAnswers: UserAnswers): Call =
     navigateFromContactMethodPage(current, userAnswers) { remaining =>
       remaining
         .find(isMissingAnswer(_)(userAnswers))
-        .map(contactMethodPageCall(_, CheckMode))
+        .map(contactMethodPageCall(_, mode))
         .getOrElse(
-          controllers.add.company.routes.CompanyCheckYourAnswersController.onPageLoad()
+          cyaRoute(mode)
         )
     }
 
