@@ -41,7 +41,6 @@ class InactiveSchemeWarningController @Inject() (
     with I18nSupport {
 
   def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
-
     request.userAnswers.get(NewestVerificationBatchResponsePage) match {
 
       case Some(response) if isSchemeInactive(response) =>
@@ -64,18 +63,19 @@ class InactiveSchemeWarningController @Inject() (
     }
   }
 
-
   private def isSchemeInactive(
-                                response: models.response.GetNewestVerificationBatchResponse
-                              ): Boolean =
+    response: models.response.GetNewestVerificationBatchResponse
+  ): Boolean =
     response.monthlyReturn.exists(
       _.decNoMoreSubPayments.contains("Y")
     ) &&
       response.monthlyReturnSubmission
         .flatMap(_.submissionRequestDate)
         .exists { submissionDate =>
-          LocalDateTime.now().isBefore(
-            submissionDate.plusMonths(6)
-          )
+          LocalDateTime
+            .now()
+            .isBefore(
+              submissionDate.plusMonths(6)
+            )
         }
 }

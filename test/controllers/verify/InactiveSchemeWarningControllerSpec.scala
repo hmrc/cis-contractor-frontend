@@ -56,11 +56,15 @@ class InactiveSchemeWarningControllerSpec extends SpecBase {
             )
           )
         )
-        
+
       val userAnswers =
         emptyUserAnswers
-          .set(CisIdQuery, cisId).success.value
-          .set(NewestVerificationBatchResponsePage, inactiveResponse).success.value
+          .set(CisIdQuery, cisId)
+          .success
+          .value
+          .set(NewestVerificationBatchResponsePage, inactiveResponse)
+          .success
+          .value
 
       val application =
         applicationBuilder(userAnswers = Some(userAnswers)).build()
