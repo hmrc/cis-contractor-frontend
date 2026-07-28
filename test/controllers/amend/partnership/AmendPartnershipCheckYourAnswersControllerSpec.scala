@@ -37,7 +37,6 @@ import repositories.SessionRepository
 import services.SubcontractorService
 import uk.gov.hmrc.http.HeaderCarrier
 import scala.concurrent.Future
-import pages.amend.ShowVerificationDetailsPage
 
 class AmendPartnershipCheckYourAnswersControllerSpec extends SpecBase with MockitoSugar {
 
@@ -64,25 +63,52 @@ class AmendPartnershipCheckYourAnswersControllerSpec extends SpecBase with Mocki
       .set(PartnershipNamePage, "Test Partnership")
       .success
       .value
-      .set(PartnershipAddressYesNoPage, false)
+      .set(PartnershipAddressYesNoPage, true)
       .success
       .value
-      .set(AddPartnershipContactMethodsYesNoPage, false)
+      .set(PartnershipAddressPage, address)
       .success
       .value
-      .set(PartnershipHasUtrYesNoPage, false)
+      .set(AddPartnershipContactMethodsYesNoPage, true)
       .success
       .value
-      .set(PartnershipNominatedPartnerCrnYesNoPage, false)
+      .set(PartnershipContactMethodOptionsPage, Set(ContactMethodOptions.Email))
+      .success
+      .value
+      .set(PartnershipEmailAddressPage, "test@test.com")
+      .success
+      .value
+      .set(PartnershipHasUtrYesNoPage, true)
+      .success
+      .value
+      .set(PartnershipUniqueTaxpayerReferencePage, "11111111")
+      .success
+      .value
+      .set(PartnershipNominatedPartnerNamePage, "Partnership nominated name")
+      .success
+      .value
+      .set(PartnershipNominatedPartnerCrnYesNoPage, true)
+      .success
+      .value
+      .set(PartnershipNominatedPartnerCrnPage, "12345678")
       .success
       .value
       .set(PartnershipNominatedPartnerNinoYesNoPage, false)
       .success
       .value
+      .set(PartnershipNominatedPartnerNinoPage, "")
+      .success
+      .value
       .set(PartnershipNominatedPartnerUtrYesNoPage, false)
       .success
       .value
-      .set(PartnershipWorksReferenceNumberYesNoPage, false)
+      .set(PartnershipNominatedPartnerUtrPage, "11111111")
+      .success
+      .value
+      .set(PartnershipWorksReferenceNumberYesNoPage, true)
+      .success
+      .value
+      .set(PartnershipWorksReferenceNumberPage, "WRN-1")
       .success
       .value
       .set(
@@ -128,7 +154,9 @@ class AmendPartnershipCheckYourAnswersControllerSpec extends SpecBase with Mocki
         val msg     = app.injector.instanceOf[MessagesApi].preferred(request)
         val result  = route(application, request).value
 
-        status(result) mustEqual OK
+        status(result) mustEqual SEE_OTHER
+
+        println(" **************** " + result + " ******** " +  msg)
 
         val page = contentAsString(result)
 

@@ -99,9 +99,9 @@ POST  /subcontractor/amend/company-information  controllers.amend.company.AmendC
 GET   /subcontractor/amend/trust-information  controllers.amend.trust.AmendTrustCheckYourAnswersController.onPageLoad()
 POST  /subcontractor/amend/trust-information  controllers.amend.trust.AmendTrustCheckYourAnswersController.onSubmit()
 
-GET   /subcontractor/amend/partnership/subcontractor-information  controllers.amend.partnership.AmendPartnershipCheckYourAnswersController.onPageLoad()
-POST  /subcontractor/amend/partnership/subcontractor-information  controllers.amend.partnership.AmendPartnershipCheckYourAnswersController.onSubmit()
-GET   /subcontractor/amend/partnership/cancel                     controllers.amend.partnership.AmendPartnershipCheckYourAnswersController.onCancel()
+GET   /subcontractor/amend/partnership/check-your-answers  controllers.amend.partnership.AmendPartnershipCheckYourAnswersController.onPageLoad()
+POST  /subcontractor/amend/partnership/check-your-answers  controllers.amend.partnership.AmendPartnershipCheckYourAnswersController.onSubmit()
+GET   /subcontractor/amend/partnership/cancel              controllers.amend.partnership.AmendPartnershipCheckYourAnswersController.onCancel()
 
 # Errors & Auth
 GET  /unauthorised/standard-user  controllers.UnauthorisedWrongRoleController.onPageLoad()

@@ -231,7 +231,9 @@ class PartnershipUniqueTaxpayerReferenceControllerSpec extends SpecBase with Moc
 
         status(result) mustEqual SEE_OTHER
 
-        redirectLocation(result).value mustEqual controllers.amend.partnership.routes.AmendPartnershipCheckYourAnswersController
+        redirectLocation(
+          result
+        ).value mustEqual controllers.amend.partnership.routes.AmendPartnershipCheckYourAnswersController
           .onPageLoad()
           .url
       }
@@ -261,7 +263,9 @@ class PartnershipUniqueTaxpayerReferenceControllerSpec extends SpecBase with Moc
 
         status(result) mustEqual SEE_OTHER
 
-        redirectLocation(result).value mustEqual controllers.amend.partnership.routes.AmendPartnershipCheckYourAnswersController
+        redirectLocation(
+          result
+        ).value mustEqual controllers.amend.partnership.routes.AmendPartnershipCheckYourAnswersController
           .onPageLoad()
           .url
       }
