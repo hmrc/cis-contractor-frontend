@@ -19,14 +19,11 @@ package controllers.add.company
 import base.SpecBase
 import controllers.routes
 import forms.add.company.AddCompanyContactMethodsYesNoFormProvider
-import models.{AmendMode, NormalMode, UserAnswers}
-import navigation.{FakeNavigator, Navigator}
-import org.mockito.ArgumentCaptor
+import models.{NormalMode, UserAnswers}
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.{verify, when}
+import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
 import pages.add.company.{AddCompanyContactMethodsYesNoPage, CompanyNamePage}
-import pages.amend.AmendedPagesPage
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
@@ -87,38 +84,32 @@ class AddCompanyContactMethodsYesNoControllerSpec extends SpecBase with MockitoS
       }
     }
 
-    "must redirect to the CompanyContactMethodOptions page and not add the page to AmendedPagesPage when" +
-      "valid data with value Yes is submitted in NormalMode" in {
+    "must redirect to the CompanyContactMethodOptions page when valid data with value Yes is submitted" in {
 
-        val mockSessionRepository = mock[SessionRepository]
-        val onwardRoute           = controllers.add.company.routes.CompanyContactMethodOptionsController.onPageLoad(NormalMode)
-        val captor                = ArgumentCaptor.forClass(classOf[UserAnswers])
-        when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+      val mockSessionRepository = mock[SessionRepository]
 
-        val application =
-          applicationBuilder(userAnswers = Some(uaWithName))
-            .overrides(
-              bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
-              bind[SessionRepository].toInstance(mockSessionRepository)
-            )
-            .build()
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
-        running(application) {
-          val request =
-            FakeRequest(POST, addCompanyContactMethodsYesNoRoute)
-              .withFormUrlEncodedBody(("value", "true"))
+      val application =
+        applicationBuilder(userAnswers = Some(uaWithName))
+          .overrides(
+            bind[SessionRepository].toInstance(mockSessionRepository)
+          )
+          .build()
 
-          val result = route(application, request).value
+      running(application) {
+        val request =
+          FakeRequest(POST, addCompanyContactMethodsYesNoRoute)
+            .withFormUrlEncodedBody(("value", "true"))
 
-          status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual onwardRoute.url
-          verify(mockSessionRepository).set(captor.capture())
-          val updatedAnswers = captor.getValue
+        val result = route(application, request).value
 
-          updatedAnswers.get(AddCompanyContactMethodsYesNoPage) mustBe Some(true)
-          updatedAnswers.get(AmendedPagesPage) mustBe None
-        }
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.add.company.routes.CompanyContactMethodOptionsController
+          .onPageLoad(NormalMode)
+          .url
       }
+    }
 
     "must redirect to the CompanyUtrYesNo page when valid data with value No is submitted" in {
 
@@ -144,47 +135,6 @@ class AddCompanyContactMethodsYesNoControllerSpec extends SpecBase with MockitoS
         redirectLocation(result).value mustEqual controllers.add.company.routes.CompanyUtrYesNoController
           .onPageLoad(NormalMode)
           .url
-      }
-    }
-
-    "must add AddCompanyContactMethodsYesNoPage to AmendedPagesPage when submitted in AmendMode" in {
-      val mockSessionRepository = mock[SessionRepository]
-      val captor                = ArgumentCaptor.forClass(classOf[UserAnswers])
-      val onwardRoute           = controllers.add.company.routes.CompanyContactMethodOptionsController.onPageLoad(AmendMode)
-
-      when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
-
-      val application =
-        applicationBuilder(userAnswers = Some(uaWithName))
-          .overrides(
-            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
-            bind[SessionRepository].toInstance(mockSessionRepository)
-          )
-          .build()
-
-      running(application) {
-        val request =
-          FakeRequest(
-            POST,
-            controllers.add.company.routes.AddCompanyContactMethodsYesNoController
-              .onSubmit(AmendMode)
-              .url
-          ).withFormUrlEncodedBody(
-            "value" -> "true"
-          )
-
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual onwardRoute.url
-        verify(mockSessionRepository).set(captor.capture())
-        val updatedAnswers = captor.getValue
-
-        updatedAnswers.get(AddCompanyContactMethodsYesNoPage) mustBe Some(true)
-
-        updatedAnswers
-          .get(AmendedPagesPage)
-          .value must contain(AddCompanyContactMethodsYesNoPage.toString)
       }
     }
 

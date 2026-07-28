@@ -17,7 +17,6 @@
 package controllers.add.company
 
 import controllers.actions.*
-import controllers.helpers.SaveAnswerHelper
 import forms.add.company.CompanyAddressYesNoFormProvider
 import models.Mode
 import navigation.Navigator
@@ -33,17 +32,17 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class CompanyAddressYesNoController @Inject() (
-  override val messagesApi: MessagesApi,
-  sessionRepository: SessionRepository,
-  navigator: Navigator,
-  identify: IdentifierAction,
-  getData: DataRetrievalAction,
-  requireData: DataRequiredAction,
-  formProvider: CompanyAddressYesNoFormProvider,
-  val controllerComponents: MessagesControllerComponents,
-  view: CompanyAddressYesNoView
-)(implicit ec: ExecutionContext)
-    extends FrontendBaseController
+                                                override val messagesApi: MessagesApi,
+                                                sessionRepository: SessionRepository,
+                                                navigator: Navigator,
+                                                identify: IdentifierAction,
+                                                getData: DataRetrievalAction,
+                                                requireData: DataRequiredAction,
+                                                formProvider: CompanyAddressYesNoFormProvider,
+                                                val controllerComponents: MessagesControllerComponents,
+                                                view: CompanyAddressYesNoView
+                                              )(implicit ec: ExecutionContext)
+  extends FrontendBaseController
     with I18nSupport {
 
   val form: Form[Boolean] = formProvider()
@@ -73,10 +72,7 @@ class CompanyAddressYesNoController @Inject() (
               formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, companyName))),
               value =>
                 for {
-                  updatedAnswers <-
-                    Future.fromTry(
-                      SaveAnswerHelper.saveAnswer(request.userAnswers, CompanyAddressYesNoPage, value, mode)
-                    )
+                  updatedAnswers <- Future.fromTry(request.userAnswers.set(CompanyAddressYesNoPage, value))
                   _              <- sessionRepository.set(updatedAnswers)
                 } yield Redirect(navigator.nextPage(CompanyAddressYesNoPage, mode, updatedAnswers))
             )

@@ -21,7 +21,6 @@ import models.address.{Address, Country}
 import models.amend.company.OriginalCompanyAnswers
 import models.contact.ContactMethodOptions
 import pages.add.company.*
-import pages.amend.AmendedPagesPage
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
 import viewmodels.amend.CompanyAmendConfirmationViewModel
@@ -122,9 +121,6 @@ class CompanyAmendConfirmationViewModelSpec extends SpecBase {
           .set(CompanyNamePage, "XYZ Company")
           .success
           .value
-          .set(AmendedPagesPage, Set(CompanyNamePage.toString))
-          .success
-          .value
 
       val result =
         CompanyAmendConfirmationViewModel.rows(original, answers)
@@ -134,23 +130,6 @@ class CompanyAmendConfirmationViewModelSpec extends SpecBase {
       row.head.content mustBe Text(msgs("companyName.checkYourAnswersLabel"))
       row(1).content mustBe Text("ABC Company")
       row(2).content mustBe Text("XYZ Company")
-    }
-
-    "must return a company name row when the page is amended but the value is unchanged" in {
-      val answers =
-        answersMatchingOriginal
-          .set(AmendedPagesPage, Set(CompanyNamePage.toString))
-          .success
-          .value
-
-      val result =
-        CompanyAmendConfirmationViewModel.rows(original, answers)
-
-      val row = result.head
-
-      row.head.content mustBe Text(msgs("companyName.checkYourAnswersLabel"))
-      row(1).content mustBe Text("ABC Company")
-      row(2).content mustBe Text("ABC Company")
     }
 
     "must return address yes/no and address rows when the address is removed" in {
@@ -246,16 +225,6 @@ class CompanyAmendConfirmationViewModelSpec extends SpecBase {
           .remove(CompanyEmailAddressPage)
           .success
           .value
-          .set(
-            AmendedPagesPage,
-            Set(
-              AddCompanyContactMethodsYesNoPage.toString,
-              CompanyContactMethodOptionsPage.toString,
-              CompanyEmailAddressPage.toString
-            )
-          )
-          .success
-          .value
 
       val result =
         CompanyAmendConfirmationViewModel.rows(original, answers)
@@ -291,12 +260,6 @@ class CompanyAmendConfirmationViewModelSpec extends SpecBase {
           )
           .success
           .value
-          .set(
-            AmendedPagesPage,
-            Set(CompanyContactMethodOptionsPage.toString)
-          )
-          .success
-          .value
 
       val result =
         CompanyAmendConfirmationViewModel.rows(original, answers)
@@ -326,16 +289,6 @@ class CompanyAmendConfirmationViewModelSpec extends SpecBase {
           .success
           .value
           .set(CompanyPhoneNumberPage, "01131234567")
-          .success
-          .value
-          .set(
-            AmendedPagesPage,
-            Set(
-              CompanyContactMethodOptionsPage.toString,
-              CompanyEmailAddressPage.toString,
-              CompanyPhoneNumberPage.toString
-            )
-          )
           .success
           .value
 
@@ -368,9 +321,6 @@ class CompanyAmendConfirmationViewModelSpec extends SpecBase {
           .set(CompanyEmailAddressPage, "new@test.com")
           .success
           .value
-          .set(AmendedPagesPage, Set(CompanyEmailAddressPage.toString))
-          .success
-          .value
 
       val result =
         CompanyAmendConfirmationViewModel.rows(original, answers)
@@ -387,9 +337,6 @@ class CompanyAmendConfirmationViewModelSpec extends SpecBase {
       val answers =
         answersMatchingOriginal
           .set(CompanyPhoneNumberPage, "01131234567")
-          .success
-          .value
-          .set(AmendedPagesPage, Set(CompanyPhoneNumberPage.toString))
           .success
           .value
 
@@ -423,9 +370,6 @@ class CompanyAmendConfirmationViewModelSpec extends SpecBase {
           .set(CompanyPhoneNumberPage, "07700900123")
           .success
           .value
-          .set(AmendedPagesPage, Set(CompanyPhoneNumberPage.toString))
-          .success
-          .value
 
       val result =
         CompanyAmendConfirmationViewModel.rows(originalPhone, answers)
@@ -442,9 +386,6 @@ class CompanyAmendConfirmationViewModelSpec extends SpecBase {
       val answers =
         answersMatchingOriginal
           .set(CompanyMobileNumberPage, "07700900123")
-          .success
-          .value
-          .set(AmendedPagesPage, Set(CompanyMobileNumberPage.toString))
           .success
           .value
 
@@ -477,9 +418,6 @@ class CompanyAmendConfirmationViewModelSpec extends SpecBase {
           .set(CompanyMobileNumberPage, "07700900456")
           .success
           .value
-          .set(AmendedPagesPage, Set(CompanyMobileNumberPage.toString))
-          .success
-          .value
 
       val result =
         CompanyAmendConfirmationViewModel.rows(originalMobile, answers)
@@ -505,15 +443,6 @@ class CompanyAmendConfirmationViewModelSpec extends SpecBase {
           .success
           .value
           .set(CompanyPhoneNumberPage, "01131234567")
-          .success
-          .value
-          .set(
-            AmendedPagesPage,
-            Set(
-              CompanyContactMethodOptionsPage.toString,
-              CompanyPhoneNumberPage.toString
-            )
-          )
           .success
           .value
 
@@ -543,9 +472,6 @@ class CompanyAmendConfirmationViewModelSpec extends SpecBase {
           .set(CompanyUtrPage, "2000000000")
           .success
           .value
-          .set(AmendedPagesPage, Set(CompanyUtrPage.toString))
-          .success
-          .value
 
       val result =
         CompanyAmendConfirmationViewModel.rows(original, answers)
@@ -561,9 +487,6 @@ class CompanyAmendConfirmationViewModelSpec extends SpecBase {
       val answers =
         answersMatchingOriginal
           .set(CompanyCrnYesNoPage, false)
-          .success
-          .value
-          .set(AmendedPagesPage, Set(CompanyCrnYesNoPage.toString))
           .success
           .value
 
@@ -590,9 +513,6 @@ class CompanyAmendConfirmationViewModelSpec extends SpecBase {
           .set(CompanyCrnPage, "12345678")
           .success
           .value
-          .set(AmendedPagesPage, Set(CompanyCrnPage.toString))
-          .success
-          .value
 
       val result =
         CompanyAmendConfirmationViewModel.rows(original, answers)
@@ -609,9 +529,6 @@ class CompanyAmendConfirmationViewModelSpec extends SpecBase {
       val answers =
         answersMatchingOriginal
           .set(CompanyWorksReferenceYesNoPage, false)
-          .success
-          .value
-          .set(AmendedPagesPage, Set(CompanyWorksReferenceYesNoPage.toString))
           .success
           .value
 
@@ -655,9 +572,6 @@ class CompanyAmendConfirmationViewModelSpec extends SpecBase {
       val answers =
         answersMatchingOriginal
           .set(CompanyUtrYesNoPage, false)
-          .success
-          .value
-          .set(AmendedPagesPage, Set(CompanyUtrYesNoPage.toString))
           .success
           .value
 

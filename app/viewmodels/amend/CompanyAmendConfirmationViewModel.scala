@@ -23,7 +23,6 @@ import models.contact.ContactMethodOptions
 import pages.QuestionPage
 import pages.add.*
 import pages.add.company.*
-import pages.amend.AmendedPagesPage
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
 import uk.gov.hmrc.govukfrontend.views.viewmodels.table.TableRow
@@ -68,7 +67,6 @@ object CompanyAmendConfirmationViewModel {
         current
       ),
       Option.when(
-        wasAmended(current, CompanyAddressPage) ||
           original.address != currentAddress
       ) {
         row(
@@ -94,7 +92,6 @@ object CompanyAmendConfirmationViewModel {
         current
       ),
       Option.when(
-        wasAmended(current, CompanyContactMethodOptionsPage) ||
           original.companyContactMethod != currentMethods
       ) {
         row(
@@ -217,8 +214,7 @@ object CompanyAmendConfirmationViewModel {
 
     val currentVal = current.get(page)
 
-    Option.when(
-      wasAmended(current, page) || original != currentVal
+    Option.when(original != currentVal
     ) {
       row(label, displayYesNo(original), displayYesNo(currentVal))
     }
@@ -239,8 +235,7 @@ object CompanyAmendConfirmationViewModel {
   )(implicit messages: Messages): Option[Seq[TableRow]] = {
     val currentVal = current.get(page)
 
-    Option.when(
-      wasAmended(current, page) || original != currentVal
+    Option.when(original != currentVal
     ) {
       row(
         label,
@@ -259,13 +254,4 @@ object CompanyAmendConfirmationViewModel {
 
   private def missingValue(implicit messages: Messages): String =
     messages("amendConfirmation.table.content.none")
-
-  private def wasAmended(
-    current: UserAnswers,
-    page: QuestionPage[_]
-  ): Boolean =
-    current
-      .get(AmendedPagesPage)
-      .getOrElse(Set.empty)
-      .contains(page.toString)
 }

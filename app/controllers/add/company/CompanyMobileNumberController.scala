@@ -17,7 +17,7 @@
 package controllers.add.company
 
 import controllers.actions.*
-import controllers.helpers.{ContactGuard, SaveAnswerHelper}
+import controllers.helpers.ContactGuard
 import forms.add.company.CompanyMobileNumberFormProvider
 import models.Mode
 import models.contact.ContactMethodOptions
@@ -34,17 +34,17 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class CompanyMobileNumberController @Inject() (
-  override val messagesApi: MessagesApi,
-  sessionRepository: SessionRepository,
-  navigator: Navigator,
-  identify: IdentifierAction,
-  getData: DataRetrievalAction,
-  requireData: DataRequiredAction,
-  formProvider: CompanyMobileNumberFormProvider,
-  val controllerComponents: MessagesControllerComponents,
-  view: CompanyMobileNumberView
-)(implicit ec: ExecutionContext)
-    extends FrontendBaseController
+                                                override val messagesApi: MessagesApi,
+                                                sessionRepository: SessionRepository,
+                                                navigator: Navigator,
+                                                identify: IdentifierAction,
+                                                getData: DataRetrievalAction,
+                                                requireData: DataRequiredAction,
+                                                formProvider: CompanyMobileNumberFormProvider,
+                                                val controllerComponents: MessagesControllerComponents,
+                                                view: CompanyMobileNumberView
+                                              )(implicit ec: ExecutionContext)
+  extends FrontendBaseController
     with I18nSupport
     with ContactGuard {
 
@@ -77,10 +77,7 @@ class CompanyMobileNumberController @Inject() (
           formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, companyName))),
           value =>
             for {
-              updatedAnswers <-
-                Future.fromTry(
-                  SaveAnswerHelper.saveAnswer(request.userAnswers, CompanyMobileNumberPage, value, mode)
-                )
+              updatedAnswers <- Future.fromTry(request.userAnswers.set(CompanyMobileNumberPage, value))
               _              <- sessionRepository.set(updatedAnswers)
             } yield Redirect(navigator.nextPage(CompanyMobileNumberPage, mode, updatedAnswers))
         ))

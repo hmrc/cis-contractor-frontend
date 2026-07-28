@@ -17,7 +17,6 @@
 package controllers.add.company
 
 import controllers.actions.*
-import controllers.helpers.SaveAnswerHelper
 import forms.add.company.CompanyCrnYesNoFormProvider
 import models.Mode
 import navigation.Navigator
@@ -32,17 +31,17 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class CompanyCrnYesNoController @Inject() (
-  override val messagesApi: MessagesApi,
-  sessionRepository: SessionRepository,
-  navigator: Navigator,
-  identify: IdentifierAction,
-  getData: DataRetrievalAction,
-  requireData: DataRequiredAction,
-  formProvider: CompanyCrnYesNoFormProvider,
-  val controllerComponents: MessagesControllerComponents,
-  view: CompanyCrnYesNoView
-)(implicit ec: ExecutionContext)
-    extends FrontendBaseController
+                                            override val messagesApi: MessagesApi,
+                                            sessionRepository: SessionRepository,
+                                            navigator: Navigator,
+                                            identify: IdentifierAction,
+                                            getData: DataRetrievalAction,
+                                            requireData: DataRequiredAction,
+                                            formProvider: CompanyCrnYesNoFormProvider,
+                                            val controllerComponents: MessagesControllerComponents,
+                                            view: CompanyCrnYesNoView
+                                          )(implicit ec: ExecutionContext)
+  extends FrontendBaseController
     with I18nSupport {
 
   val form = formProvider()
@@ -72,10 +71,7 @@ class CompanyCrnYesNoController @Inject() (
               formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, companyName))),
               value =>
                 for {
-                  updatedAnswers <-
-                    Future.fromTry(
-                      SaveAnswerHelper.saveAnswer(request.userAnswers, CompanyCrnYesNoPage, value, mode)
-                    )
+                  updatedAnswers <- Future.fromTry(request.userAnswers.set(CompanyCrnYesNoPage, value))
                   _              <- sessionRepository.set(updatedAnswers)
                 } yield Redirect(navigator.nextPage(CompanyCrnYesNoPage, mode, updatedAnswers))
             )

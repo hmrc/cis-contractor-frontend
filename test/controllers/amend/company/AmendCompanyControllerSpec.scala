@@ -490,7 +490,8 @@ class AmendCompanyControllerSpec extends SpecBase with MockitoSugar {
               .get(OriginalCompanyAnswersQuery)
               .value
 
-          original.companyContactMethod mustBe None
+          original.companyContactMethodsYesNo mustBe Some(false)
+          original.companyContactMethod mustBe Set.empty
           original.email mustBe None
           original.phone mustBe None
           original.mobile mustBe None

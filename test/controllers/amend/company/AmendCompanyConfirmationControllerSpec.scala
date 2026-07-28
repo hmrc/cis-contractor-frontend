@@ -61,7 +61,7 @@ class AmendCompanyConfirmationControllerSpec extends SpecBase {
       .value
 
   private lazy val confirmationRoute =
-    controllers.amend.routes.AmendConfirmationController.onPageLoad().url
+    controllers.amend.company.routes.AmendCompanyConfirmationController.onPageLoad().url
 
   "AmendConfirmationController" - {
 

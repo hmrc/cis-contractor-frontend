@@ -17,7 +17,7 @@
 package controllers.add.company
 
 import controllers.actions.*
-import controllers.helpers.{ContactGuard, SaveAnswerHelper}
+import controllers.helpers.ContactGuard
 import forms.add.company.CompanyEmailAddressFormProvider
 import models.Mode
 import models.contact.ContactMethodOptions
@@ -34,17 +34,17 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class CompanyEmailAddressController @Inject() (
-  override val messagesApi: MessagesApi,
-  sessionRepository: SessionRepository,
-  navigator: Navigator,
-  identify: IdentifierAction,
-  getData: DataRetrievalAction,
-  requireData: DataRequiredAction,
-  formProvider: CompanyEmailAddressFormProvider,
-  val controllerComponents: MessagesControllerComponents,
-  view: CompanyEmailAddressView
-)(implicit ec: ExecutionContext)
-    extends FrontendBaseController
+                                                override val messagesApi: MessagesApi,
+                                                sessionRepository: SessionRepository,
+                                                navigator: Navigator,
+                                                identify: IdentifierAction,
+                                                getData: DataRetrievalAction,
+                                                requireData: DataRequiredAction,
+                                                formProvider: CompanyEmailAddressFormProvider,
+                                                val controllerComponents: MessagesControllerComponents,
+                                                view: CompanyEmailAddressView
+                                              )(implicit ec: ExecutionContext)
+  extends FrontendBaseController
     with I18nSupport
     with ContactGuard {
 
@@ -76,10 +76,7 @@ class CompanyEmailAddressController @Inject() (
           formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, companyName))),
           value =>
             for {
-              updatedAnswers <-
-                Future.fromTry(
-                  SaveAnswerHelper.saveAnswer(request.userAnswers, CompanyEmailAddressPage, value, mode)
-                )
+              updatedAnswers <- Future.fromTry(request.userAnswers.set(CompanyEmailAddressPage, value))
               _              <- sessionRepository.set(updatedAnswers)
             } yield Redirect(navigator.nextPage(CompanyEmailAddressPage, mode, updatedAnswers))
         ))
