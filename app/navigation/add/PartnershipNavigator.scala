@@ -39,9 +39,7 @@ class PartnershipNavigator @Inject() () extends NavigatorForJourney {
   }
 
   private def cyaRoute(mode: Mode): Call = mode match {
-    case AmendMode =>
-      routes.JourneyRecoveryController
-        .onPageLoad() // TODO route to controllers.amend.routes.AmendPartnershipCheckYourAnswersController.onPageLoad() when AmendIndividualCheckYourAnswersController added.
+    case AmendMode => controllers.amend.partnership.routes.AmendPartnershipCheckYourAnswersController.onPageLoad()
     case _         => controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
   }
 

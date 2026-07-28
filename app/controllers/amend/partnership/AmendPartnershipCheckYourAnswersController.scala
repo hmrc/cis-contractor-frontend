@@ -35,6 +35,7 @@ import viewmodels.checkAnswers.add.partnership.*
 import viewmodels.govuk.summarylist.*
 import views.html.amend.AmendCheckYourAnswersView
 import controllers.routes
+import pages.amend.ShowVerificationDetailsPage
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}

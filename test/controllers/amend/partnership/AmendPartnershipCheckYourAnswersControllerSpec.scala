@@ -55,7 +55,7 @@ class AmendPartnershipCheckYourAnswersControllerSpec extends SpecBase with Mocki
       )
     )
 
-  private val minUa              =
+  private val minUa =
     emptyUserAnswers
       .set(TypeOfSubcontractorPage, TypeOfSubcontractor.Partnership)
       .success
@@ -317,7 +317,7 @@ class AmendPartnershipCheckYourAnswersControllerSpec extends SpecBase with Mocki
     "must redirect to Journey Recovery when the service fails" in {
 
       val mockSubcontractorService = mock[SubcontractorService]
-      val mockSessionRepository = mock[SessionRepository]
+      val mockSessionRepository    = mock[SessionRepository]
 
       when(mockSubcontractorService.createAndUpdateSubcontractor(any[UserAnswers])(any[HeaderCarrier]))
         .thenReturn(Future.failed(new RuntimeException("boom")))
@@ -333,7 +333,10 @@ class AmendPartnershipCheckYourAnswersControllerSpec extends SpecBase with Mocki
       running(application) {
 
         val request =
-          FakeRequest(POST, controllers.amend.partnership.routes.AmendPartnershipCheckYourAnswersController.onSubmit().url)
+          FakeRequest(
+            POST,
+            controllers.amend.partnership.routes.AmendPartnershipCheckYourAnswersController.onSubmit().url
+          )
 
         val result = route(application, request).value
 

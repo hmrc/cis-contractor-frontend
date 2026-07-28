@@ -25,6 +25,8 @@ import models.contact.ContactMethodOptions
 import models.response.SubcontractorResponse
 import pages.add.*
 import pages.add.partnership.*
+import controllers.amend.AmendControllerUtils.*
+import pages.amend.ShowVerificationDetailsPage
 import queries.{CisIdQuery, OriginalPartnershipAnswersQuery}
 import play.api.Logging
 import play.api.libs.json.Writes
@@ -151,6 +153,7 @@ class AmendPartnershipController @Inject() (
                  )
       updated <- updated.set(PartnershipNominatedPartnerUtrYesNoPage, subcontractor.partnerUtr.isDefined)
       updated <- setOptional(updated, PartnershipNominatedPartnerUtrPage, subcontractor.partnerUtr)
+      updated <- updated.set(ShowVerificationDetailsPage, shouldShowVerificationDetails(subcontractor))
       updated <- updated.set(PartnershipNominatedPartnerNinoYesNoPage, subcontractor.nino.isDefined)
       updated <- setOptional(updated, PartnershipNominatedPartnerNinoPage, subcontractor.nino)
       updated <- updated.set(PartnershipNominatedPartnerCrnYesNoPage, subcontractor.crn.isDefined)
