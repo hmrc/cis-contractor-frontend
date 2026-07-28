@@ -156,7 +156,7 @@ class AmendPartnershipCheckYourAnswersControllerSpec extends SpecBase with Mocki
 
         status(result) mustEqual SEE_OTHER
 
-        println(" **************** " + result + " ******** " +  msg)
+        println(" **************** " + result + " ******** " + msg)
 
         val page = contentAsString(result)
 
