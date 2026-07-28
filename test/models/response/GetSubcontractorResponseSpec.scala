@@ -83,7 +83,6 @@ class GetSubcontractorResponseSpec extends AnyWordSpec with Matchers {
       pendingVerifications = Some(1)
     )
 
-
   private val model =
     GetSubcontractorResponse(
       scheme = Some(scheme),
@@ -113,7 +112,7 @@ class GetSubcontractorResponseSpec extends AnyWordSpec with Matchers {
     "read JSON when scheme and subcontractor are null" in {
       val json = Json.obj(
         "scheme"        -> Json.toJson(Option.empty[ContractorSchemeResponse]),
-        "subcontractor" -> Json.toJson(Option.empty[SubcontractorResponse]),
+        "subcontractor" -> Json.toJson(Option.empty[SubcontractorResponse])
       )
 
       json.validate[GetSubcontractorResponse] mustBe JsSuccess(
