@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package controllers.amend
+package controllers.amend.company
 
 import base.SpecBase
 import config.FrontendAppConfig
@@ -26,7 +26,7 @@ import queries.{CisIdQuery, OriginalCompanyAnswersQuery}
 import viewmodels.amend.CompanyAmendConfirmationViewModel
 import views.html.amend.AmendConfirmationView
 
-class AmendConfirmationControllerSpec extends SpecBase {
+class AmendCompanyConfirmationControllerSpec extends SpecBase {
   private val cisId       = "123456789"
   private val companyName = "ABC Company"
 
@@ -61,7 +61,7 @@ class AmendConfirmationControllerSpec extends SpecBase {
       .value
 
   private lazy val confirmationRoute =
-    controllers.amend.routes.AmendConfirmationController.companyOnPageLoad().url
+    controllers.amend.routes.AmendConfirmationController.onPageLoad().url
 
   "AmendConfirmationController" - {
 
