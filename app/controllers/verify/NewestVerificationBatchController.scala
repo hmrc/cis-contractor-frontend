@@ -176,7 +176,7 @@ class NewestVerificationBatchController @Inject() (
 
           batch match {
             case None           => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-            case Some(response) => routeFromResponse(response, unverified)
+            case Some(response) => routeFromSubmissionStatus(response, unverified)
           }
         }
         .recover { case t =>
