@@ -21,7 +21,6 @@ import models.address.{Address, Country}
 import models.amend.trust.OriginalTrustAnswers
 import models.contact.ContactMethodOptions
 import pages.add.trust.*
-import pages.amend.AmendedPagesPage
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
 import viewmodels.amend.TrustAmendConfirmationViewModel
@@ -111,9 +110,6 @@ class TrustAmendConfirmationViewModelSpec extends SpecBase {
           .set(TrustNamePage, "XYZ Trust")
           .success
           .value
-          .set(AmendedPagesPage, Set(TrustNamePage.toString))
-          .success
-          .value
 
       val result =
         TrustAmendConfirmationViewModel.rows(original, answers)
@@ -123,23 +119,6 @@ class TrustAmendConfirmationViewModelSpec extends SpecBase {
       row.head.content mustBe Text(msgs("trustName.checkYourAnswersLabel"))
       row(1).content mustBe Text("ABC Trust")
       row(2).content mustBe Text("XYZ Trust")
-    }
-
-    "must return a trust name row when the page is amended but the value is unchanged" in {
-      val answers =
-        answersMatchingOriginal
-          .set(AmendedPagesPage, Set(TrustNamePage.toString))
-          .success
-          .value
-
-      val result =
-        TrustAmendConfirmationViewModel.rows(original, answers)
-
-      val row = result.head
-
-      row.head.content mustBe Text(msgs("trustName.checkYourAnswersLabel"))
-      row(1).content mustBe Text("ABC Trust")
-      row(2).content mustBe Text("ABC Trust")
     }
 
     "must return address yes/no and address rows when the address is removed" in {
@@ -237,16 +216,6 @@ class TrustAmendConfirmationViewModelSpec extends SpecBase {
           .remove(TrustEmailAddressPage)
           .success
           .value
-          .set(
-            AmendedPagesPage,
-            Set(
-              AddTrustContactMethodsYesNoPage.toString,
-              TrustContactMethodOptionsPage.toString,
-              TrustEmailAddressPage.toString
-            )
-          )
-          .success
-          .value
 
       val result =
         TrustAmendConfirmationViewModel.rows(original, answers)
@@ -282,12 +251,6 @@ class TrustAmendConfirmationViewModelSpec extends SpecBase {
           )
           .success
           .value
-          .set(
-            AmendedPagesPage,
-            Set(TrustContactMethodOptionsPage.toString)
-          )
-          .success
-          .value
 
       val result =
         TrustAmendConfirmationViewModel.rows(original, answers)
@@ -317,16 +280,6 @@ class TrustAmendConfirmationViewModelSpec extends SpecBase {
           .success
           .value
           .set(TrustPhoneNumberPage, "01131234567")
-          .success
-          .value
-          .set(
-            AmendedPagesPage,
-            Set(
-              TrustContactMethodOptionsPage.toString,
-              TrustEmailAddressPage.toString,
-              TrustPhoneNumberPage.toString
-            )
-          )
           .success
           .value
 
@@ -359,9 +312,6 @@ class TrustAmendConfirmationViewModelSpec extends SpecBase {
           .set(TrustEmailAddressPage, "new@test.com")
           .success
           .value
-          .set(AmendedPagesPage, Set(TrustEmailAddressPage.toString))
-          .success
-          .value
 
       val result =
         TrustAmendConfirmationViewModel.rows(original, answers)
@@ -378,9 +328,6 @@ class TrustAmendConfirmationViewModelSpec extends SpecBase {
       val answers =
         answersMatchingOriginal
           .set(TrustPhoneNumberPage, "01131234567")
-          .success
-          .value
-          .set(AmendedPagesPage, Set(TrustPhoneNumberPage.toString))
           .success
           .value
 
@@ -414,9 +361,6 @@ class TrustAmendConfirmationViewModelSpec extends SpecBase {
           .set(TrustPhoneNumberPage, "07700900123")
           .success
           .value
-          .set(AmendedPagesPage, Set(TrustPhoneNumberPage.toString))
-          .success
-          .value
 
       val result =
         TrustAmendConfirmationViewModel.rows(originalPhone, answers)
@@ -433,9 +377,6 @@ class TrustAmendConfirmationViewModelSpec extends SpecBase {
       val answers =
         answersMatchingOriginal
           .set(TrustMobileNumberPage, "07700900123")
-          .success
-          .value
-          .set(AmendedPagesPage, Set(TrustMobileNumberPage.toString))
           .success
           .value
 
@@ -469,9 +410,6 @@ class TrustAmendConfirmationViewModelSpec extends SpecBase {
           .set(TrustMobileNumberPage, "07700900456")
           .success
           .value
-          .set(AmendedPagesPage, Set(TrustMobileNumberPage.toString))
-          .success
-          .value
 
       val result =
         TrustAmendConfirmationViewModel.rows(originalMobile, answers)
@@ -497,15 +435,6 @@ class TrustAmendConfirmationViewModelSpec extends SpecBase {
           .success
           .value
           .set(TrustPhoneNumberPage, "01131234567")
-          .success
-          .value
-          .set(
-            AmendedPagesPage,
-            Set(
-              TrustContactMethodOptionsPage.toString,
-              TrustPhoneNumberPage.toString
-            )
-          )
           .success
           .value
 
@@ -535,9 +464,6 @@ class TrustAmendConfirmationViewModelSpec extends SpecBase {
           .set(TrustUtrPage, "2000000000")
           .success
           .value
-          .set(AmendedPagesPage, Set(TrustUtrPage.toString))
-          .success
-          .value
 
       val result =
         TrustAmendConfirmationViewModel.rows(original, answers)
@@ -554,9 +480,6 @@ class TrustAmendConfirmationViewModelSpec extends SpecBase {
       val answers =
         answersMatchingOriginal
           .set(TrustWorksReferenceYesNoPage, false)
-          .success
-          .value
-          .set(AmendedPagesPage, Set(TrustWorksReferenceYesNoPage.toString))
           .success
           .value
 
@@ -600,9 +523,6 @@ class TrustAmendConfirmationViewModelSpec extends SpecBase {
       val answers =
         answersMatchingOriginal
           .set(TrustUtrYesNoPage, false)
-          .success
-          .value
-          .set(AmendedPagesPage, Set(TrustUtrYesNoPage.toString))
           .success
           .value
 

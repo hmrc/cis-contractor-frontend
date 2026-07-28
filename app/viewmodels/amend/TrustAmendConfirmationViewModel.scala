@@ -23,7 +23,6 @@ import models.contact.ContactMethodOptions
 import pages.QuestionPage
 import pages.add.*
 import pages.add.trust.*
-import pages.amend.AmendedPagesPage
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
 import uk.gov.hmrc.govukfrontend.views.viewmodels.table.TableRow
@@ -67,7 +66,7 @@ object TrustAmendConfirmationViewModel {
         current
       ),
       Option.when(
-          original.address != currentAddress
+        original.address != currentAddress
       ) {
         row(
           messages("trustAddress.checkYourAnswersLabel"),
@@ -92,7 +91,7 @@ object TrustAmendConfirmationViewModel {
         current
       ),
       Option.when(
-          original.trustContactMethod != currentMethods
+        original.trustContactMethod != currentMethods
       ) {
         row(
           messages("trustContactMethodOptions.checkYourAnswersLabel"),
@@ -195,10 +194,7 @@ object TrustAmendConfirmationViewModel {
   )(implicit messages: Messages): Option[Seq[TableRow]] = {
 
     val currentVal = current.get(page)
-
-    Option.when(
-      wasAmended(current, page) || original != currentVal
-    ) {
+    Option.when(original != currentVal) {
       row(label, displayYesNo(original), displayYesNo(currentVal))
     }
   }
@@ -236,13 +232,4 @@ object TrustAmendConfirmationViewModel {
 
   private def missingValue(implicit messages: Messages): String =
     messages("amendConfirmation.table.content.none")
-
-  private def wasAmended(
-    current: UserAnswers,
-    page: QuestionPage[_]
-  ): Boolean =
-    current
-      .get(AmendedPagesPage)
-      .getOrElse(Set.empty)
-      .contains(page.toString)
 }

@@ -17,7 +17,6 @@
 package controllers.add.trust
 
 import controllers.actions.*
-import controllers.helpers.SaveAnswerHelper
 import forms.add.trust.TrustAddressYesNoFormProvider
 import models.Mode
 import navigation.Navigator
@@ -72,10 +71,7 @@ class TrustAddressYesNoController @Inject() (
               formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, trustName))),
               value =>
                 for {
-                  updatedAnswers <-
-                    Future.fromTry(
-                      SaveAnswerHelper.saveAnswer(request.userAnswers, TrustAddressYesNoPage, value, mode)
-                    )
+                  updatedAnswers <- Future.fromTry(request.userAnswers.set(TrustAddressYesNoPage, value))
                   _              <- sessionRepository.set(updatedAnswers)
                 } yield Redirect(navigator.nextPage(TrustAddressYesNoPage, mode, updatedAnswers))
             )

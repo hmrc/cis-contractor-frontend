@@ -17,7 +17,7 @@
 package controllers.add.trust
 
 import controllers.actions.*
-import controllers.helpers.{ContactGuard, SaveAnswerHelper}
+import controllers.helpers.ContactGuard
 import forms.add.trust.TrustEmailAddressFormProvider
 import models.Mode
 import models.contact.ContactMethodOptions
@@ -76,10 +76,7 @@ class TrustEmailAddressController @Inject() (
           formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, trustName))),
           value =>
             for {
-              updatedAnswers <-
-                Future.fromTry(
-                  SaveAnswerHelper.saveAnswer(request.userAnswers, TrustEmailAddressPage, value, mode)
-                )
+              updatedAnswers <- Future.fromTry(request.userAnswers.set(TrustEmailAddressPage, value))
               _              <- sessionRepository.set(updatedAnswers)
             } yield Redirect(navigator.nextPage(TrustEmailAddressPage, mode, updatedAnswers))
         ))

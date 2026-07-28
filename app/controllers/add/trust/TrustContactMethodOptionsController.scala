@@ -17,7 +17,6 @@
 package controllers.add.trust
 
 import controllers.actions.*
-import controllers.helpers.SaveAnswerHelper
 import forms.add.trust.TrustContactMethodOptionsFormProvider
 import models.Mode
 import navigation.Navigator
@@ -72,10 +71,7 @@ class TrustContactMethodOptionsController @Inject() (
               formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, trustName))),
               value =>
                 for {
-                  updatedAnswers <-
-                    Future.fromTry(
-                      SaveAnswerHelper.saveAnswer(request.userAnswers, TrustContactMethodOptionsPage, value, mode)
-                    )
+                  updatedAnswers <- Future.fromTry(request.userAnswers.set(TrustContactMethodOptionsPage, value))
                   _              <- sessionRepository.set(updatedAnswers)
                 } yield Redirect(navigator.nextPage(TrustContactMethodOptionsPage, mode, updatedAnswers))
             )

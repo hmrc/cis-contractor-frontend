@@ -103,7 +103,8 @@ POST  /subcontractor/amend/company-information                   controllers.ame
 GET   /subcontractor/amend/trust-information                     controllers.amend.trust.AmendTrustCheckYourAnswersController.onPageLoad()
 POST  /subcontractor/amend/trust-information                     controllers.amend.trust.AmendTrustCheckYourAnswersController.onSubmit()
 
-GET   /subcontractor/amend/trust/subcontractor-details-updated   controllers.amend.AmendConfirmationController.trustOnPageLoad()
+
+GET   /subcontractor/amend/trust/subcontractor-details-updated   controllers.amend.trust.AmendTrustConfirmationController.onPageLoad()
 
 # Errors & Auth
 GET  /unauthorised/standard-user  controllers.UnauthorisedWrongRoleController.onPageLoad()

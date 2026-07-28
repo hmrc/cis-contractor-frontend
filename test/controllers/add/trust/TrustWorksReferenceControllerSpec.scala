@@ -19,14 +19,12 @@ package controllers.add.trust
 import base.SpecBase
 import controllers.routes
 import forms.add.trust.TrustWorksReferenceFormProvider
-import models.{AmendMode, NormalMode, UserAnswers}
+import models.{NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
-import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.{verify, when}
+import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
 import pages.add.trust.{TrustNamePage, TrustWorksReferencePage}
-import pages.amend.AmendedPagesPage
 import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
@@ -91,10 +89,10 @@ class TrustWorksReferenceControllerSpec extends SpecBase with MockitoSugar {
     }
 
     "must redirect to the next page when valid data is submitted" in {
-      val mockSessionRepository = mock[SessionRepository]
-      val captor                = ArgumentCaptor.forClass(classOf[UserAnswers])
 
-      when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
+      val mockSessionRepository = mock[SessionRepository]
+
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
       val application =
         applicationBuilder(userAnswers = Some(uaWithName))
@@ -107,58 +105,12 @@ class TrustWorksReferenceControllerSpec extends SpecBase with MockitoSugar {
       running(application) {
         val request =
           FakeRequest(POST, trustWorksReferenceRoute)
-            .withFormUrlEncodedBody(
-              "value" -> "WR-001"
-            )
+            .withFormUrlEncodedBody(("value", "WR-001"))
 
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual onwardRoute.url
-
-        verify(mockSessionRepository).set(captor.capture())
-
-        val updatedAnswers = captor.getValue
-
-        updatedAnswers.get(TrustWorksReferencePage) mustBe Some("WR-001")
-        updatedAnswers.get(AmendedPagesPage) mustBe None
-      }
-    }
-
-    "must add TrustWorksReferencePage to AmendedPagesPage when submitted in AmendMode" in {
-      val mockSessionRepository = mock[SessionRepository]
-      val captor                = ArgumentCaptor.forClass(classOf[UserAnswers])
-
-      when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
-
-      val application =
-        applicationBuilder(userAnswers = Some(uaWithName))
-          .overrides(
-            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
-            bind[SessionRepository].toInstance(mockSessionRepository)
-          )
-          .build()
-
-      running(application) {
-        val request =
-          FakeRequest(
-            POST,
-            controllers.add.trust.routes.TrustWorksReferenceController
-              .onSubmit(AmendMode)
-              .url
-          ).withFormUrlEncodedBody(
-            "value" -> "WR-001"
-          )
-
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual onwardRoute.url
-        verify(mockSessionRepository).set(captor.capture())
-
-        val updatedAnswers = captor.getValue
-        updatedAnswers.get(TrustWorksReferencePage) mustBe Some("WR-001")
-        updatedAnswers.get(AmendedPagesPage).value must contain(TrustWorksReferencePage.toString)
       }
     }
 

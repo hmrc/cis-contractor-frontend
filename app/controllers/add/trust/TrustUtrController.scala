@@ -17,7 +17,6 @@
 package controllers.add.trust
 
 import controllers.actions.*
-import controllers.helpers.SaveAnswerHelper
 import forms.add.trust.TrustUtrFormProvider
 import models.requests.DataRequest
 import models.{AmendMode, Mode}
@@ -53,18 +52,23 @@ class TrustUtrController @Inject() (
   private def saveAndContinue(mode: Mode, value: String)(implicit request: DataRequest[?]) =
     for {
       updatedAnswers <-
-        Future.fromTry(
-          SaveAnswerHelper.saveAnswer(request.userAnswers, TrustUtrPage, value, mode)
-        )
+        Future.fromTry(request.userAnswers.set(TrustUtrPage, value))
       _              <- sessionRepository.set(updatedAnswers)
-    } yield Redirect(
-      navigator.nextPage(TrustUtrPage, mode, updatedAnswers)
-    )
+    } yield {
+      println("\n\n\n request.userAnswers: in redirect : "+request.userAnswers)
+      Redirect(
+        navigator.nextPage(TrustUtrPage, mode, updatedAnswers)
+      )
+
+    }
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
     request.userAnswers
       .get(TrustNamePage)
+
       .map { trustName =>
+        println("\n\n\n request.userAnswers : "+request.userAnswers)
+
         val preparedForm = request.userAnswers.get(TrustUtrPage) match {
           case None        => form
           case Some(value) => form.fill(value)

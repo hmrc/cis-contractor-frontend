@@ -100,21 +100,21 @@ trait AddressLookupJourneyController extends FrontendBaseController with I18nSup
 
   def addressLookupCallback(id: String, mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
-      saveAddressAndRedirect(id, onCompletion(mode), mode)
+      saveAddressAndRedirect(id, onCompletion(mode))
     }
 
   def addressLookupCallbackChange(id: String, mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
       val isAmend = request.userAnswers.get(AddressLookupAmendReturnQuery).getOrElse(false)
-      saveAddressAndRedirect(id, onChangeCompletion(isAmend), mode)
+      saveAddressAndRedirect(id, onChangeCompletion(isAmend))
     }
 
-  private def saveAddressAndRedirect(id: String, onSuccess: Call, mode: Mode)(implicit
+  private def saveAddressAndRedirect(id: String, onSuccess: Call)(implicit
     request: DataRequest[AnyContent]
   ): Future[Result] =
     (for {
       address <- addressLookupService.getAddressById(id)
-      updated <- addressLookupService.saveAddressDetails(address, addressPage, mode)
+      updated <- addressLookupService.saveAddressDetails(address, addressPage)
     } yield if (updated) Redirect(onSuccess) else Redirect(journeyRecovery))
       .recover { case _ => Redirect(journeyRecovery) }
 
