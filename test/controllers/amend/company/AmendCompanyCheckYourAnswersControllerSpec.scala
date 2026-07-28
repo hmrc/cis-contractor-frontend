@@ -27,6 +27,7 @@ import org.mockito.Mockito.{never, verify, verifyNoMoreInteractions, when}
 import org.scalatestplus.mockito.MockitoSugar
 import pages.add.TypeOfSubcontractorPage
 import pages.add.company.*
+import pages.amend.ShowVerificationDetailsPage
 import play.api.i18n.MessagesApi
 import play.api.inject.bind
 import play.api.test.FakeRequest
@@ -94,6 +95,9 @@ class AmendCompanyCheckYourAnswersControllerSpec extends SpecBase with MockitoSu
       .set(CompanyWorksReferencePage, "WRN-1")
       .success
       .value
+      .set(ShowVerificationDetailsPage, false)
+      .success
+      .value
       .set(
         OriginalCompanyAnswersQuery,
         OriginalCompanyAnswers(
@@ -111,8 +115,7 @@ class AmendCompanyCheckYourAnswersControllerSpec extends SpecBase with MockitoSu
           utr = Some("11111111"),
           worksReferenceYesNo = Some(true),
           worksReference = Some("WRN-1"),
-          verificationNumber = None,
-          isVerified = Some(false)
+          verificationNumber = None
         )
       )
       .success
@@ -168,6 +171,9 @@ class AmendCompanyCheckYourAnswersControllerSpec extends SpecBase with MockitoSu
 
       val verifiedUa  =
         minUa
+          .set(ShowVerificationDetailsPage, true)
+          .success
+          .value
           .set(
             OriginalCompanyAnswersQuery,
             OriginalCompanyAnswers(
@@ -185,8 +191,7 @@ class AmendCompanyCheckYourAnswersControllerSpec extends SpecBase with MockitoSu
               utr = None,
               worksReferenceYesNo = Some(false),
               worksReference = None,
-              verificationNumber = Some("VRN123456"),
-              isVerified = Some(true)
+              verificationNumber = Some("VRN123456")
             )
           )
           .success

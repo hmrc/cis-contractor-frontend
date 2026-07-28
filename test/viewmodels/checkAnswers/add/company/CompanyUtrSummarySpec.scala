@@ -120,7 +120,7 @@ class CompanyUtrSummarySpec extends AnyFreeSpec with Matchers with CyaEncodingSp
       val row = maybeRow.value
 
       row.key.content.asHtml.toString should include(
-        messages("companyUtr.checkYourAnswersLabel")
+        messages("companyUtr.verified.checkYourAnswersLabel")
       )
 
       row.value.content.asHtml.toString should include(utr)

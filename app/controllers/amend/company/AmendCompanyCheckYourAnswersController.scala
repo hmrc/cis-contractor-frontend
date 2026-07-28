@@ -17,8 +17,12 @@
 package controllers.amend.company
 
 import controllers.actions.*
+import controllers.routes
+import models.add.company.ValidatedCompany
 import models.{AmendMode, UserAnswers}
 import pages.add.*
+import pages.add.company.CompanyNamePage
+import pages.amend.ShowVerificationDetailsPage
 import play.api.Logging
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -32,10 +36,6 @@ import viewmodels.checkAnswers.add.*
 import viewmodels.checkAnswers.add.company.*
 import viewmodels.govuk.summarylist.*
 import views.html.amend.AmendCheckYourAnswersView
-import controllers.routes
-import models.add.company.ValidatedCompany
-import pages.add.company.CompanyNamePage
-import viewmodels.checkAnswers.add.company.*
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -59,7 +59,7 @@ class AmendCompanyCheckYourAnswersController @Inject() (
 
     ValidatedCompany.build(ua) match {
       case Right(_) =>
-        val isVerified  = ua.get(OriginalCompanyAnswersQuery).flatMap(_.isVerified)
+        val isVerified  = ua.get(ShowVerificationDetailsPage)
         val companyName = ua.get(CompanyNamePage).getOrElse("")
 
         val subcontractorInformationList =

@@ -98,9 +98,6 @@ POST  /subcontractor/amend/subcontractor-information             controllers.ame
 GET   /subcontractor/amend/partnership-information               controllers.amend.partnership.AmendPartnershipCheckYourAnswersController.onPageLoad()
 POST  /subcontractor/amend/partnership-information               controllers.amend.partnership.AmendPartnershipCheckYourAnswersController.onSubmit()
 
-GET   /subcontractor/amend/company-information                   controllers.amend.company.AmendCompanyCheckYourAnswersController.onPageLoad()
-POST  /subcontractor/amend/company-information                   controllers.amend.company.AmendCompanyCheckYourAnswersController.onSubmit()
-
 GET   /subcontractor/amend/trust-information                     controllers.amend.trust.AmendTrustCheckYourAnswersController.onPageLoad()
 POST  /subcontractor/amend/trust-information                     controllers.amend.trust.AmendTrustCheckYourAnswersController.onSubmit()
 

@@ -35,8 +35,7 @@ case class OriginalCompanyAnswers(
   utr: Option[String],
   worksReferenceYesNo: Option[Boolean],
   worksReference: Option[String],
-  verificationNumber: Option[String],
-  isVerified: Option[Boolean]
+  verificationNumber: Option[String]
 )
 
 object OriginalCompanyAnswers extends models.Enumerable.Implicits {
