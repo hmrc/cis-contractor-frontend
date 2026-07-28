@@ -40,8 +40,7 @@ case class OriginalPartnershipAnswers(
   nominatedPartnerCrn: Option[String],
   nominatedPartnerWorksReferenceYesNo: Option[Boolean],
   nominatedPartnerWorksReference: Option[String],
-  verificationNumber: Option[String],
-  isVerified: Option[Boolean]
+  verificationNumber: Option[String]
 )
 
 object OriginalPartnershipAnswers extends models.Enumerable.Implicits {

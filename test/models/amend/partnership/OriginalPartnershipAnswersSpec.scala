@@ -62,8 +62,7 @@ class OriginalPartnershipAnswersSpec extends AnyWordSpec with Matchers {
         nominatedPartnerCrn = Some("12345678"),
         nominatedPartnerWorksReferenceYesNo = Some(true),
         nominatedPartnerWorksReference = Some("123/AB456"),
-        verificationNumber = Some("VRN123"),
-        isVerified = Some(false)
+        verificationNumber = Some("VRN123")
       )
 
       Json.fromJson[OriginalPartnershipAnswers](Json.toJson(model)).get shouldBe model
@@ -91,8 +90,7 @@ class OriginalPartnershipAnswersSpec extends AnyWordSpec with Matchers {
         nominatedPartnerCrn = None,
         nominatedPartnerWorksReferenceYesNo = None,
         nominatedPartnerWorksReference = None,
-        verificationNumber = None,
-        isVerified = None
+        verificationNumber = None
       )
 
       Json.fromJson[OriginalPartnershipAnswers](Json.toJson(model)).get shouldBe model

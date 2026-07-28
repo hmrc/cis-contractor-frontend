@@ -231,7 +231,9 @@ class PartnershipUniqueTaxpayerReferenceControllerSpec extends SpecBase with Moc
 
         status(result) mustEqual SEE_OTHER
 
-        redirectLocation(result).value must include("/subcontractor/there-is-a-problem") // TODO when AmendCYA available
+        redirectLocation(result).value mustEqual controllers.amend.partnership.routes.AmendPartnershipCheckYourAnswersController
+          .onPageLoad()
+          .url
       }
 
       verify(mockSubcontractorService).isDuplicateUTR(any[UserAnswers], any[String])(any[HeaderCarrier])
@@ -259,7 +261,9 @@ class PartnershipUniqueTaxpayerReferenceControllerSpec extends SpecBase with Moc
 
         status(result) mustEqual SEE_OTHER
 
-        redirectLocation(result).value must include("/subcontractor/there-is-a-problem") // TODO when AmendCYA available
+        redirectLocation(result).value mustEqual controllers.amend.partnership.routes.AmendPartnershipCheckYourAnswersController
+          .onPageLoad()
+          .url
       }
     }
 

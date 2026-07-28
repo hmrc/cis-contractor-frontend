@@ -37,6 +37,7 @@ import repositories.SessionRepository
 import services.SubcontractorService
 import uk.gov.hmrc.http.HeaderCarrier
 import scala.concurrent.Future
+import pages.amend.ShowVerificationDetailsPage
 
 class AmendPartnershipCheckYourAnswersControllerSpec extends SpecBase with MockitoSugar {
 
@@ -106,8 +107,7 @@ class AmendPartnershipCheckYourAnswersControllerSpec extends SpecBase with Mocki
           nominatedPartnerCrn = Some("12345678"),
           nominatedPartnerWorksReferenceYesNo = Some(true),
           nominatedPartnerWorksReference = Some("WRN-1"),
-          verificationNumber = None,
-          isVerified = Some(false)
+          verificationNumber = None
         )
       )
       .success
@@ -195,8 +195,7 @@ class AmendPartnershipCheckYourAnswersControllerSpec extends SpecBase with Mocki
               nominatedPartnerNino = None,
               nominatedPartnerWorksReferenceYesNo = Some(false),
               nominatedPartnerWorksReference = None,
-              verificationNumber = Some("VRN123456"),
-              isVerified = Some(true)
+              verificationNumber = Some("VRN123456")
             )
           )
           .success

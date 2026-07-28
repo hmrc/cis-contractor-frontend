@@ -31,7 +31,6 @@ import queries.{CisIdQuery, OriginalPartnershipAnswersQuery}
 import play.api.Logging
 import play.api.libs.json.Writes
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
-import controllers.amend.AmendControllerUtils._
 import repositories.SessionRepository
 import services.SubcontractorService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -213,7 +212,6 @@ class AmendPartnershipController @Inject() (
       nominatedPartnerCrn = subcontractor.crn,
       nominatedPartnerWorksReferenceYesNo = Some(subcontractor.worksReferenceNumber.isDefined),
       nominatedPartnerWorksReference = subcontractor.worksReferenceNumber,
-      verificationNumber = subcontractor.verificationNumber,
-      isVerified = subcontractor.verified.map(_.equalsIgnoreCase("Y"))
+      verificationNumber = subcontractor.verificationNumber
     )
 }

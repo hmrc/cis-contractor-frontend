@@ -59,7 +59,7 @@ class AmendPartnershipCheckYourAnswersController @Inject() (
 
     ValidatedPartnership.build(ua) match {
       case Right(_) =>
-        val isVerified      = ua.get(OriginalPartnershipAnswersQuery).flatMap(_.isVerified)
+        val isVerified      = ua.get(ShowVerificationDetailsPage)
         val partnershipName = ua.get(PartnershipNamePage).getOrElse("")
 
         val subcontractorInformationList =

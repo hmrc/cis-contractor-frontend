@@ -594,13 +594,13 @@ class PartnershipNavigatorSpec extends SpecBase {
 
     "in Amend mode" - {
 
-      "must go from any page to JourneyRecovery" in {
+      "must go from any page to amend CYA" in {
         case object UnknownPage extends Page
-        navigator.nextPage(UnknownPage, AmendMode, UserAnswers("id")) mustBe journeyRecovery
+        navigator.nextPage(UnknownPage, AmendMode, UserAnswers("id")) mustBe partnershipAmendCYA
       }
 
-      "must go from PartnershipNamePage to JourneyRecovery" in {
-        navigator.nextPage(PartnershipNamePage, AmendMode, emptyUserAnswers) mustBe journeyRecovery
+      "must go from PartnershipNamePage to amend CYA" in {
+        navigator.nextPage(PartnershipNamePage, AmendMode, emptyUserAnswers) mustBe partnershipAmendCYA
       }
 
       "must go from a PartnershipWorksReferenceNumberYesNoPage to next page when true" in {
@@ -1026,14 +1026,14 @@ class PartnershipNavigatorSpec extends SpecBase {
             ) mustBe controllers.add.partnership.routes.PartnershipContactMethodOptionsController.onPageLoad(AmendMode)
           }
 
-          "to CYA when answer is No" in {
+          "to journey recovery when answer is No" in {
             val answers = emptyUserAnswers.set(AddPartnershipContactMethodsYesNoPage, false).success.value
 
             navigator.nextPage(
               AddPartnershipContactMethodsYesNoPage,
               AmendMode,
               answers
-            ) mustBe partnershipAmendCYA
+            ) mustBe journeyRecovery
           }
 
           "to JourneyRecovery when answer is not present" in {
