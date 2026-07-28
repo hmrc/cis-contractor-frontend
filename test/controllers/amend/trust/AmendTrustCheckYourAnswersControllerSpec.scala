@@ -211,7 +211,7 @@ class AmendTrustCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
         page must include(msg("typeOfSubcontractor.checkYourAnswersLabel"))
         page must include("Trust")
 
-        page must include(msg("trustUtr.checkYourAnswersLabel"))
+        page must include(msg("trustUtr.verified.checkYourAnswersLabel"))
         page must include("11111111")
         page must include(msg("trustAddressYesNo.checkYourAnswersLabel"))
         page must include(msg("trustAddress.checkYourAnswersLabel"))
