@@ -19,7 +19,6 @@ package controllers.amend.company
 import config.FrontendAppConfig
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
 import controllers.routes
-import models.requests.DataRequest
 import pages.add.company.CompanyNamePage
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -31,17 +30,17 @@ import views.html.amend.AmendConfirmationView
 
 import javax.inject.Inject
 
-class AmendCompanyConfirmationController @Inject()(
-                                                    override val messagesApi: MessagesApi,
-                                                    identify: IdentifierAction,
-                                                    getData: DataRetrievalAction,
-                                                    requireData: DataRequiredAction,
-                                                    val controllerComponents: MessagesControllerComponents,
-                                                    view: AmendConfirmationView,
-                                                    appConfig: FrontendAppConfig
-                                                  ) extends FrontendBaseController
-  with I18nSupport
-  with Logging {
+class AmendCompanyConfirmationController @Inject() (
+  override val messagesApi: MessagesApi,
+  identify: IdentifierAction,
+  getData: DataRetrievalAction,
+  requireData: DataRequiredAction,
+  val controllerComponents: MessagesControllerComponents,
+  view: AmendConfirmationView,
+  appConfig: FrontendAppConfig
+) extends FrontendBaseController
+    with I18nSupport
+    with Logging {
 
   def onPageLoad(): Action[AnyContent] =
     (identify andThen getData andThen requireData) { implicit request =>

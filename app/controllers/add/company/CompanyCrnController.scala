@@ -31,17 +31,17 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class CompanyCrnController @Inject() (
-                                       override val messagesApi: MessagesApi,
-                                       sessionRepository: SessionRepository,
-                                       navigator: Navigator,
-                                       identify: IdentifierAction,
-                                       getData: DataRetrievalAction,
-                                       requireData: DataRequiredAction,
-                                       formProvider: CompanyCrnFormProvider,
-                                       val controllerComponents: MessagesControllerComponents,
-                                       view: CompanyCrnView
-                                     )(implicit ec: ExecutionContext)
-  extends FrontendBaseController
+  override val messagesApi: MessagesApi,
+  sessionRepository: SessionRepository,
+  navigator: Navigator,
+  identify: IdentifierAction,
+  getData: DataRetrievalAction,
+  requireData: DataRequiredAction,
+  formProvider: CompanyCrnFormProvider,
+  val controllerComponents: MessagesControllerComponents,
+  view: CompanyCrnView
+)(implicit ec: ExecutionContext)
+    extends FrontendBaseController
     with I18nSupport {
 
   val form = formProvider()

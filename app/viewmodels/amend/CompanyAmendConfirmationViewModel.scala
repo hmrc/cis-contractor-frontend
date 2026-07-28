@@ -67,7 +67,7 @@ object CompanyAmendConfirmationViewModel {
         current
       ),
       Option.when(
-          original.address != currentAddress
+        original.address != currentAddress
       ) {
         row(
           messages("companyAddress.checkYourAnswersLabel"),
@@ -92,7 +92,7 @@ object CompanyAmendConfirmationViewModel {
         current
       ),
       Option.when(
-          original.companyContactMethod != currentMethods
+        original.companyContactMethod != currentMethods
       ) {
         row(
           messages("companyContactMethodOptions.checkYourAnswersLabel"),
@@ -214,8 +214,7 @@ object CompanyAmendConfirmationViewModel {
 
     val currentVal = current.get(page)
 
-    Option.when(original != currentVal
-    ) {
+    Option.when(original != currentVal) {
       row(label, displayYesNo(original), displayYesNo(currentVal))
     }
   }
@@ -235,8 +234,7 @@ object CompanyAmendConfirmationViewModel {
   )(implicit messages: Messages): Option[Seq[TableRow]] = {
     val currentVal = current.get(page)
 
-    Option.when(original != currentVal
-    ) {
+    Option.when(original != currentVal) {
       row(
         label,
         original.getOrElse(missingValue),
