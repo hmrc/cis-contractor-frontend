@@ -29,24 +29,27 @@ object TrustUtrSummary {
     messages: Messages
   ): Option[SummaryListRow] =
     answers.get(TrustUtrPage).map { answer =>
-      val value   = ValueViewModel(answer)
-      val actions =
-        if (showActions) {
-          Seq(
-            ActionItemViewModel(
-              "site.change",
-              controllers.add.trust.routes.TrustUtrController.onPageLoad(mode).url
-            )
-              .withVisuallyHiddenText(messages("trustUtr.change.hidden"))
-              .withAttribute("id" -> "trust-utr")
+      val value = ValueViewModel(answer)
+      if (showActions) {
+        val actions = Seq(
+          ActionItemViewModel(
+            "site.change",
+            controllers.add.trust.routes.TrustUtrController.onPageLoad(mode).url
           )
-        } else {
-          Seq.empty
-        }
-      SummaryListRowViewModel(
-        key = "trustUtr.checkYourAnswersLabel",
-        value = value,
-        actions = actions
-      )
+            .withVisuallyHiddenText(messages("trustUtr.change.hidden"))
+            .withAttribute("id" -> "trust-utr")
+        )
+        SummaryListRowViewModel(
+          key = "trustUtr.checkYourAnswersLabel",
+          value = value,
+          actions = actions
+        )
+      } else {
+        SummaryListRowViewModel(
+          key = "trustUtr.verified.checkYourAnswersLabel",
+          value = value,
+          actions = Seq.empty
+        )
+      }
     }
 }

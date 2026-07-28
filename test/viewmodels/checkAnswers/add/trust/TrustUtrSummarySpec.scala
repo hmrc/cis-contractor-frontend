@@ -115,7 +115,7 @@ class TrustUtrSummarySpec extends AnyFreeSpec with Matchers with CyaEncodingSpec
       assertNoDoubleEncoding(html)
     }
 
-    "must not include actions when showActions is false" in {
+    "must not include actions and change the label when showActions is false" in {
       val utr = "1234567890"
 
       val answers =
@@ -135,7 +135,7 @@ class TrustUtrSummarySpec extends AnyFreeSpec with Matchers with CyaEncodingSpec
       val row = maybeRow.value
 
       row.key.content.asHtml.toString should include(
-        messages("trustUtr.checkYourAnswersLabel")
+        messages("trustUtr.verified.checkYourAnswersLabel")
       )
 
       row.value.content.asHtml.toString should include(utr)

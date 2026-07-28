@@ -771,6 +771,7 @@ trustUtr.linkText                                  =  Get more help to find a UT
 trustUtr.label                                     =  What is the UTR for {0}?
 trustUtr.hint                                      =  A UTR is a 10 digit number
 trustUtr.checkYourAnswersLabel                     =  Trust UTR
+trustUtr.verified.checkYourAnswersLabel            =  UTR
 trustUtr.error.required                            =  Enter a valid Unique Taxpayer Reference (UTR)
 trustUtr.error.length                              =  Enter a valid Unique Taxpayer Reference (UTR)
 trustUtr.error.invalid                             =  Enter a valid Unique Taxpayer Reference (UTR)
