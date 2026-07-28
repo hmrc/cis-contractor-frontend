@@ -55,7 +55,7 @@ class TrustUtrController @Inject() (
         Future.fromTry(request.userAnswers.set(TrustUtrPage, value))
       _              <- sessionRepository.set(updatedAnswers)
     } yield {
-      println("\n\n\n request.userAnswers: in redirect : "+request.userAnswers)
+      println("\n\n\n request.userAnswers: in redirect : " + request.userAnswers)
       Redirect(
         navigator.nextPage(TrustUtrPage, mode, updatedAnswers)
       )
@@ -65,9 +65,8 @@ class TrustUtrController @Inject() (
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
     request.userAnswers
       .get(TrustNamePage)
-
       .map { trustName =>
-        println("\n\n\n request.userAnswers : "+request.userAnswers)
+        println("\n\n\n request.userAnswers : " + request.userAnswers)
 
         val preparedForm = request.userAnswers.get(TrustUtrPage) match {
           case None        => form

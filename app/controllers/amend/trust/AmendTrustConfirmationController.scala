@@ -20,30 +20,29 @@ import config.FrontendAppConfig
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
 import controllers.routes
 import models.UserAnswers
-import models.requests.DataRequest
 import pages.add.trust.TrustNamePage
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.libs.json.Reads
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
-import queries.{CisIdQuery, Gettable, OriginalTrustAnswersQuery}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import queries.{CisIdQuery, OriginalTrustAnswersQuery}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.amend.TrustAmendConfirmationViewModel
 import views.html.amend.AmendConfirmationView
 
 import javax.inject.Inject
 
-class AmendTrustConfirmationController @Inject()(
-                                                  override val messagesApi: MessagesApi,
-                                                  identify: IdentifierAction,
-                                                  getData: DataRetrievalAction,
-                                                  requireData: DataRequiredAction,
-                                                  val controllerComponents: MessagesControllerComponents,
-                                                  view: AmendConfirmationView,
-                                                  appConfig: FrontendAppConfig
-                                                ) extends FrontendBaseController
-  with I18nSupport
-  with Logging {
+class AmendTrustConfirmationController @Inject() (
+  override val messagesApi: MessagesApi,
+  identify: IdentifierAction,
+  getData: DataRetrievalAction,
+  requireData: DataRequiredAction,
+  val controllerComponents: MessagesControllerComponents,
+  view: AmendConfirmationView,
+  appConfig: FrontendAppConfig
+) extends FrontendBaseController
+    with I18nSupport
+    with Logging {
 
   def onPageLoad(): Action[AnyContent] =
     (identify andThen getData andThen requireData) { implicit request =>
