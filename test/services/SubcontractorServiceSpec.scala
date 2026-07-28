@@ -1301,8 +1301,7 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
       val expectedResponse =
         GetSubcontractorResponse(
           scheme = None,
-          subcontractor = None,
-          otherInfo = Seq.empty
+          subcontractor = None
         )
 
       "should return the response from the connector" in {
@@ -1465,7 +1464,6 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
 
         result.subcontractor mustBe None
         result.scheme mustBe None
-        result.otherInfo mustBe empty
 
         verify(mockConnector)
           .getSubcontractor(

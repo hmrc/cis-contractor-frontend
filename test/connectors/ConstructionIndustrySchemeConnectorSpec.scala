@@ -401,8 +401,7 @@ class ConstructionIndustrySchemeConnectorSpec extends AnyWordSpec with Matchers 
       val expected =
         GetSubcontractorResponse(
           scheme = None,
-          subcontractor = None,
-          otherInfo = Seq.empty
+          subcontractor = None
         )
 
       when(
@@ -449,8 +448,7 @@ class ConstructionIndustrySchemeConnectorSpec extends AnyWordSpec with Matchers 
       val expected =
         GetSubcontractorResponse(
           scheme = None,
-          subcontractor = None,
-          otherInfo = Seq.empty
+          subcontractor = None
         )
 
       when(
@@ -469,7 +467,6 @@ class ConstructionIndustrySchemeConnectorSpec extends AnyWordSpec with Matchers 
 
       result.subcontractor mustBe None
       result.scheme mustBe None
-      result.otherInfo mustBe empty
     }
 
     "propagate a failed HTTP request" in {
@@ -528,8 +525,7 @@ class ConstructionIndustrySchemeConnectorSpec extends AnyWordSpec with Matchers 
       val expected =
         GetSubcontractorResponse(
           scheme = None,
-          subcontractor = None,
-          otherInfo = Seq.empty
+          subcontractor = None
         )
 
       when(
