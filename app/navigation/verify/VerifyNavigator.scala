@@ -126,7 +126,7 @@ class VerifyNavigator @Inject() () extends NavigatorForJourney {
 
       case NormalMode =>
         if (!hasSubcontractorsToReverify) {
-            controllers.verify.routes.CurrentVerificationBatchController.onPageLoad()
+          controllers.verify.routes.CurrentVerificationBatchController.onPageLoad()
         } else {
           controllers.verify.routes.ReverifyExistingSubcontractorsYesNoController.onPageLoad(NormalMode)
         }
