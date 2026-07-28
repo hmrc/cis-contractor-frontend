@@ -18,7 +18,7 @@ package controllers.helpers
 
 import models.{AmendMode, Mode, UserAnswers}
 import play.api.libs.json.Writes
-import queries.Settable
+import queries.{AddressLookupAmendReturnQuery, Settable}
 
 import scala.util.Try
 
@@ -29,10 +29,13 @@ object SaveAnswerHelper {
     page: Settable[A],
     value: A,
     mode: Mode
-  )(implicit writes: Writes[A]): Try[UserAnswers] =
-    if (mode == AmendMode) {
+  )(implicit writes: Writes[A]): Try[UserAnswers] = {
+    val amend = mode == AmendMode || userAnswers.get(AddressLookupAmendReturnQuery).contains(true)
+
+    if (amend) {
       userAnswers.setAndAmend(page, value)
     } else {
       userAnswers.set(page, value)
     }
+  }
 }

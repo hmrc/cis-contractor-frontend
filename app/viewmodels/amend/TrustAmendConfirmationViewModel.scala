@@ -67,7 +67,6 @@ object TrustAmendConfirmationViewModel {
         current
       ),
       Option.when(
-        wasAmended(current, TrustAddressPage) ||
           original.address != currentAddress
       ) {
         row(
@@ -93,7 +92,6 @@ object TrustAmendConfirmationViewModel {
         current
       ),
       Option.when(
-        wasAmended(current, TrustContactMethodOptionsPage) ||
           original.trustContactMethod != currentMethods
       ) {
         row(
@@ -220,9 +218,7 @@ object TrustAmendConfirmationViewModel {
   )(implicit messages: Messages): Option[Seq[TableRow]] = {
     val currentVal = current.get(page)
 
-    Option.when(
-      wasAmended(current, page) || original != currentVal
-    ) {
+    Option.when(original != currentVal) {
       row(
         label,
         original.getOrElse(missingValue),

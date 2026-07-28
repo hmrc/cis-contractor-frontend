@@ -18,6 +18,8 @@ package services
 
 import config.AddressLookupConfiguration
 import connectors.AddressLookupConnector
+import controllers.helpers.SaveAnswerHelper
+import models.{AmendMode, Mode}
 import models.address.{Address, AddressLookupJourneyIdentifier, MandatoryFieldsConfigModel}
 import models.requests.DataRequest
 import play.api.mvc.{Call, Request}
@@ -64,22 +66,19 @@ class AddressLookupService @Inject() (
       )
     )
 
-  def saveAddressDetails(address: Address, page: Settable[Address])(implicit
+  def saveAddressDetails(address: Address, page: Settable[Address], mode: Mode)(implicit
     request: DataRequest[_],
     ec: ExecutionContext
   ): Future[Boolean] = {
 
     val answers = request.userAnswers
-
-    val updatedAnswersTry =
-      if (answers.get(AddressLookupAmendReturnQuery).contains(true)) {
-        answers.setAndAmend(page, address)
-      } else {
-        answers.set(page, address)
-      }
+    println("\n\n\n address mode: "+mode.toString)
+    val updatedMode = if(answers.get(AddressLookupAmendReturnQuery).contains(true)) AmendMode else mode
 
     for {
-      updatedAnswers <- Future.fromTry(updatedAnswersTry)
+      updatedAnswers <- Future.fromTry(
+          SaveAnswerHelper.saveAnswer(request.userAnswers, page, address, updatedMode)
+        )
       cleanedAnswers <- Future.fromTry(updatedAnswers.remove(AddressLookupAmendReturnQuery))
       result         <- sessionRepository.set(cleanedAnswers)
     } yield result

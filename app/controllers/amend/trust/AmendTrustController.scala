@@ -26,7 +26,8 @@ import models.response.SubcontractorResponse
 import pages.add.*
 import pages.add.trust.*
 import play.api.Logging
-import controllers.amend.AmendControllerUtils._
+import controllers.amend.AmendControllerUtils.*
+import pages.amend.AmendedPagesPage
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import queries.{CisIdQuery, OriginalTrustAnswersQuery}
 import repositories.SessionRepository
@@ -147,6 +148,7 @@ class AmendTrustController @Inject() (
       updated <- setOptional(updated, TrustWorksReferencePage, subcontractor.worksReferenceNumber)
       updated <- updated.set(CisIdQuery, cisId)
       updated <- updated.set(OriginalTrustAnswersQuery, original)
+      updated <- updated.set(AmendedPagesPage, Set.empty)
     } yield updated
   }
 
