@@ -83,16 +83,10 @@ class GetSubcontractorResponseSpec extends AnyWordSpec with Matchers {
       pendingVerifications = Some(1)
     )
 
-  private val otherInfo =
-    GetSubcontractorOtherInfo(
-      utr = "1111111111"
-    )
-
   private val model =
     GetSubcontractorResponse(
       scheme = Some(scheme),
-      subcontractor = Some(subcontractor),
-      otherInfo = Seq(otherInfo)
+      subcontractor = Some(subcontractor)
     )
 
   "GetSubcontractorResponse JSON format" should {
@@ -102,7 +96,6 @@ class GetSubcontractorResponseSpec extends AnyWordSpec with Matchers {
 
       (json \ "scheme").as[ContractorSchemeResponse] mustBe scheme
       (json \ "subcontractor").as[SubcontractorResponse] mustBe subcontractor
-      (json \ "otherInfo").as[Seq[GetSubcontractorOtherInfo]] mustBe Seq(otherInfo)
 
       (json \ "subcontractor" \ "displayName").as[String] mustBe "Martin Brody"
     }
@@ -110,10 +103,7 @@ class GetSubcontractorResponseSpec extends AnyWordSpec with Matchers {
     "read JSON into a GetSubcontractorResponse" in {
       val json = Json.obj(
         "scheme"        -> Json.toJson(scheme),
-        "subcontractor" -> Json.toJson(subcontractor),
-        "otherInfo"     -> Json.arr(
-          Json.toJson(otherInfo)
-        )
+        "subcontractor" -> Json.toJson(subcontractor)
       )
 
       json.validate[GetSubcontractorResponse] mustBe JsSuccess(model)
@@ -122,29 +112,13 @@ class GetSubcontractorResponseSpec extends AnyWordSpec with Matchers {
     "read JSON when scheme and subcontractor are null" in {
       val json = Json.obj(
         "scheme"        -> Json.toJson(Option.empty[ContractorSchemeResponse]),
-        "subcontractor" -> Json.toJson(Option.empty[SubcontractorResponse]),
-        "otherInfo"     -> Json.arr()
+        "subcontractor" -> Json.toJson(Option.empty[SubcontractorResponse])
       )
 
       json.validate[GetSubcontractorResponse] mustBe JsSuccess(
         GetSubcontractorResponse(
           scheme = None,
-          subcontractor = None,
-          otherInfo = Seq.empty
-        )
-      )
-    }
-
-    "read JSON when optional fields are missing" in {
-      val json = Json.obj(
-        "otherInfo" -> Json.arr()
-      )
-
-      json.validate[GetSubcontractorResponse] mustBe JsSuccess(
-        GetSubcontractorResponse(
-          scheme = None,
-          subcontractor = None,
-          otherInfo = Seq.empty
+          subcontractor = None
         )
       )
     }
@@ -156,13 +130,4 @@ class GetSubcontractorResponseSpec extends AnyWordSpec with Matchers {
     }
   }
 
-  "GetSubcontractorOtherInfo JSON format" should {
-
-    "write and read GetSubcontractorOtherInfo" in {
-      val json = Json.toJson(otherInfo)
-
-      (json \ "utr").as[String] mustBe "1111111111"
-      json.validate[GetSubcontractorOtherInfo] mustBe JsSuccess(otherInfo)
-    }
-  }
 }

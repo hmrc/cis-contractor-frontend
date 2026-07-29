@@ -37,18 +37,9 @@ class AmendCheckYourAnswersViewSpec extends AnyWordSpec with Matchers with Guice
   "AmendCheckYourAnswersView" should {
 
     "render the page with headings, summary lists, buttons and cancel link" in new Setup {
-      val submitCall: Call            =
-        controllers.amend.routes.AmendIndividualCheckYourAnswersController.onSubmit()
-      val cancelCall: Call            =
-        controllers.amend.routes.AmendIndividualCheckYourAnswersController.onCancel()
+
       val html: HtmlFormat.Appendable =
-        view(
-          informationList,
-          detailsList,
-          subcontractorName,
-          controllers.amend.routes.AmendIndividualCheckYourAnswersController.onSubmit(),
-          controllers.amend.routes.AmendIndividualCheckYourAnswersController.onCancel()
-        )
+        view(informationList, detailsList, subcontractorName, submitUrl, cancelUrl)
 
       val doc: Document =
         Jsoup.parse(html.toString())
@@ -70,18 +61,22 @@ class AmendCheckYourAnswersViewSpec extends AnyWordSpec with Matchers with Guice
 
       doc.select(".govuk-summary-list").size() mustBe 2
 
-      doc.select("form").attr("action") mustBe submitCall.url
+      doc
+        .select("form")
+        .attr("action") mustBe
+        controllers.amend.trust.routes.AmendTrustCheckYourAnswersController
+          .onSubmit()
+          .url
 
       doc.select("form").attr("autocomplete") mustBe "off"
+      val cancelLink: Elements = doc.select(".govuk-button-group a.govuk-link")
 
-      doc.select(".govuk-button").text() mustBe
-        messages("amendCheckYourAnswers.confirm")
-      val cancelLink: Elements =
-        doc.select(
-          s"a[href='${cancelCall.url}']"
-        )
-
+      cancelLink.attr("href") mustBe cancelUrl.url
       cancelLink.text() mustBe messages("amendCheckYourAnswers.cancelChanges")
+
+      doc
+        .select("form")
+        .attr("action") mustBe submitUrl.url
     }
   }
 
@@ -98,14 +93,20 @@ class AmendCheckYourAnswersViewSpec extends AnyWordSpec with Matchers with Guice
     val view: AmendCheckYourAnswersView =
       app.injector.instanceOf[AmendCheckYourAnswersView]
 
-    val subcontractorName = "Test Subcontractor"
+    val subcontractorName = "Test Trust"
+
+    val submitUrl: Call =
+      controllers.amend.trust.routes.AmendTrustCheckYourAnswersController.onSubmit()
+
+    val cancelUrl: Call =
+      controllers.amend.trust.routes.AmendTrustCheckYourAnswersController.onCancel()
 
     val informationList: SummaryList =
       SummaryList(
         rows = Seq(
           SummaryListRow(
             key = Key(Text("Type")),
-            value = Value(Text("Individual"))
+            value = Value(Text("Trust"))
           )
         )
       )

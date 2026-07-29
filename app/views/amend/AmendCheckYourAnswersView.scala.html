@@ -16,6 +16,7 @@
 
 @import views.html.components._
 @import config.FrontendAppConfig
+@import play.api.mvc.Call
 
 @this(
     layout: templates.Layout,
@@ -27,11 +28,11 @@
     formHelper: FormWithCSRF
 )
 
-@(informationList: SummaryList, detailsList: SummaryList, subcontractorName: String, submitCall: Call, cancelCall: Call)(implicit request: Request[_], messages: Messages)
+@(informationList: SummaryList, detailsList: SummaryList, subcontractorName: String, submitUrl: Call, cancelUrl: Call)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = titleNoForm(messages("amendCheckYourAnswers.title"))) {
 
-    @formHelper(action = submitCall, Symbol("autoComplete") -> "off") {
+@formHelper(action = submitUrl, Symbol("autoComplete") -> "off") {
         <h1 class="govuk-heading-l">@subcontractorName</h1>
         @h2("amendCheckYourAnswers.heading.subcontractorInformation.h2")
 
@@ -45,10 +46,10 @@
 
         <div class="govuk-button-group">
             @govukButton(
-            ButtonViewModel(messages("amendCheckYourAnswers.confirm"))
+                ButtonViewModel(messages("amendCheckYourAnswers.confirm"))
             )
 
-            <a class="govuk-link" href="@cancelCall">
+            <a class="govuk-link" href="@cancelUrl">
                 @messages("amendCheckYourAnswers.cancelChanges")
             </a>
         </div>

@@ -118,8 +118,7 @@ class AmendTrustControllerSpec extends SpecBase with MockitoSugar {
   private val response =
     GetSubcontractorResponse(
       scheme = None,
-      subcontractor = Some(subcontractor),
-      otherInfo = Seq.empty
+      subcontractor = Some(subcontractor)
     )
 
   private val expectedOriginal =
@@ -135,7 +134,8 @@ class AmendTrustControllerSpec extends SpecBase with MockitoSugar {
       utrYesNo = Some(true),
       utr = Some(utr),
       worksReferenceYesNo = Some(true),
-      worksReference = Some(worksReference)
+      worksReference = Some(worksReference),
+      verificationNumber = Some("V1234567890")
     )
 
   "AmendTrustController" - {
