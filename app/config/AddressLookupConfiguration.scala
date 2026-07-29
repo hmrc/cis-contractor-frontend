@@ -65,6 +65,12 @@ class AddressLookupConfiguration @Inject() (implicit appConfig: FrontendAppConfi
           line3MaxLength = line3MaxLength,
           townMaxLength = townMaxLength,
           mandatoryFields = mandatoryFieldsConfigModel,
+          maxLengthErrorMessages = MaxLengthErrorMessagesModel.forConfig(
+            line1MaxLength = line1MaxLength,
+            line2MaxLength = line2MaxLength,
+            line3MaxLength = line3MaxLength,
+            townMaxLength = townMaxLength
+          ),
           showOrganisationName = false
         ),
         pageHeadingStyle = "govuk-heading-l"
