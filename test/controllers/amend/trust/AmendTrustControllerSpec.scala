@@ -135,7 +135,8 @@ class AmendTrustControllerSpec extends SpecBase with MockitoSugar {
       utrYesNo = Some(true),
       utr = Some(utr),
       worksReferenceYesNo = Some(true),
-      worksReference = Some(worksReference)
+      worksReference = Some(worksReference),
+      verificationNumber = Some("V1234567890")
     )
 
   "AmendTrustController" - {
