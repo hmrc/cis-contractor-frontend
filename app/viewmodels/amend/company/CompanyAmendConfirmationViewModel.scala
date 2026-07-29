@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package viewmodels.amend
+package viewmodels.amend.company
 
 import models.UserAnswers
 import models.address.Address

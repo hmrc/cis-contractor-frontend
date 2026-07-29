@@ -21,9 +21,9 @@ import config.FrontendAppConfig
 import models.amend.company.OriginalCompanyAnswers
 import pages.add.company.CompanyNamePage
 import play.api.test.FakeRequest
-import play.api.test.Helpers.{route, *}
+import play.api.test.Helpers.*
 import queries.{CisIdQuery, OriginalCompanyAnswersQuery}
-import viewmodels.amend.CompanyAmendConfirmationViewModel
+import viewmodels.amend.company.CompanyAmendConfirmationViewModel
 import views.html.amend.AmendConfirmationView
 
 class AmendCompanyConfirmationControllerSpec extends SpecBase {
