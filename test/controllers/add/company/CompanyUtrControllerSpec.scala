@@ -120,7 +120,7 @@ class CompanyUtrControllerSpec extends SpecBase with MockitoSugar {
       verifyNoMoreInteractions(mockSubcontractorService)
     }
 
-    "must bind the form and redirect to there-is-a-problem Page on POST when valid UTR is submitted in Amend journey" in {
+    "must bind the form and redirect to amend cya Page on POST when valid UTR is submitted in Amend journey" in {
 
       val validValue = "5860920998"
       val prevValue  = "5860920997"
@@ -148,14 +148,14 @@ class CompanyUtrControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value must include("/subcontractor/there-is-a-problem")
+        redirectLocation(result).value mustEqual controllers.amend.company.routes.AmendCompanyCheckYourAnswersController.onPageLoad().url
       }
 
       verify(mockSubcontractorService).isDuplicateUTR(any[UserAnswers], any[String])(any[HeaderCarrier])
       verifyNoMoreInteractions(mockSubcontractorService)
     }
 
-    "must bind the form and redirect to there-is-a-problem Page on POST when valid UTR is submitted and same as previous value in Amend journey" in {
+    "must bind the form and redirect to amend cya Page on POST when valid UTR is submitted and same as previous value in Amend journey" in {
 
       val validValue = "5860920998"
       val prevValue  = "5860920998"
@@ -175,7 +175,7 @@ class CompanyUtrControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value must include("/subcontractor/there-is-a-problem")
+        redirectLocation(result).value mustEqual controllers.amend.company.routes.AmendCompanyCheckYourAnswersController.onPageLoad().url
       }
     }
 
