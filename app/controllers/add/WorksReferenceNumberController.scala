@@ -33,18 +33,18 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class WorksReferenceNumberController @Inject() (
-                                                 override val messagesApi: MessagesApi,
-                                                 sessionRepository: SessionRepository,
-                                                 navigator: Navigator,
-                                                 identify: IdentifierAction,
-                                                 getData: DataRetrievalAction,
-                                                 requireData: DataRequiredAction,
-                                                 formProvider: WorksReferenceNumberFormProvider,
-                                                 subcontractorNameExtractor: SubcontractorNameExtractor,
-                                                 val controllerComponents: MessagesControllerComponents,
-                                                 view: WorksReferenceNumberView
-                                               )(implicit ec: ExecutionContext)
-  extends FrontendBaseController
+  override val messagesApi: MessagesApi,
+  sessionRepository: SessionRepository,
+  navigator: Navigator,
+  identify: IdentifierAction,
+  getData: DataRetrievalAction,
+  requireData: DataRequiredAction,
+  formProvider: WorksReferenceNumberFormProvider,
+  subcontractorNameExtractor: SubcontractorNameExtractor,
+  val controllerComponents: MessagesControllerComponents,
+  view: WorksReferenceNumberView
+)(implicit ec: ExecutionContext)
+    extends FrontendBaseController
     with I18nSupport {
 
   private val form = formProvider()

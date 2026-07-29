@@ -34,18 +34,18 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class IndividualPhoneNumberController @Inject() (
-                                                  override val messagesApi: MessagesApi,
-                                                  sessionRepository: SessionRepository,
-                                                  navigator: Navigator,
-                                                  identify: IdentifierAction,
-                                                  getData: DataRetrievalAction,
-                                                  requireData: DataRequiredAction,
-                                                  formProvider: IndividualPhoneNumberFormProvider,
-                                                  subcontractorNameExtractor: SubcontractorNameExtractor,
-                                                  val controllerComponents: MessagesControllerComponents,
-                                                  view: IndividualPhoneNumberView
-                                                )(implicit ec: ExecutionContext)
-  extends FrontendBaseController
+  override val messagesApi: MessagesApi,
+  sessionRepository: SessionRepository,
+  navigator: Navigator,
+  identify: IdentifierAction,
+  getData: DataRetrievalAction,
+  requireData: DataRequiredAction,
+  formProvider: IndividualPhoneNumberFormProvider,
+  subcontractorNameExtractor: SubcontractorNameExtractor,
+  val controllerComponents: MessagesControllerComponents,
+  view: IndividualPhoneNumberView
+)(implicit ec: ExecutionContext)
+    extends FrontendBaseController
     with I18nSupport
     with ContactGuard {
 

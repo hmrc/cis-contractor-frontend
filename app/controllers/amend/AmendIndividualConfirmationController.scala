@@ -31,21 +31,20 @@ import views.html.amend.AmendConfirmationView
 
 import javax.inject.Inject
 
-class AmendIndividualConfirmationController @Inject()(
-                                                       override val messagesApi: MessagesApi,
-                                                       identify: IdentifierAction,
-                                                       getData: DataRetrievalAction,
-                                                       requireData: DataRequiredAction,
-                                                       val controllerComponents: MessagesControllerComponents,
-                                                       view: AmendConfirmationView,
-                                                       appConfig: FrontendAppConfig
-                                                     ) extends FrontendBaseController
-  with I18nSupport
-  with Logging {
+class AmendIndividualConfirmationController @Inject() (
+  override val messagesApi: MessagesApi,
+  identify: IdentifierAction,
+  getData: DataRetrievalAction,
+  requireData: DataRequiredAction,
+  val controllerComponents: MessagesControllerComponents,
+  view: AmendConfirmationView,
+  appConfig: FrontendAppConfig
+) extends FrontendBaseController
+    with I18nSupport
+    with Logging {
 
   def onPageLoad(): Action[AnyContent] =
     (identify andThen getData andThen requireData) { implicit request =>
-
       (
         request.userAnswers.get(OriginalIndividualAnswersQuery),
         request.userAnswers.get(CisIdQuery)

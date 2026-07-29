@@ -164,7 +164,7 @@ class IndividualAmendedViewModelSpec extends SpecBase {
           .set(TradingNameOfSubcontractorPage, "XYZ Contractors")
           .success
           .value
-          
+
       val result =
         IndividualAmendedViewModel.rows(originalTrading, answers)
 
