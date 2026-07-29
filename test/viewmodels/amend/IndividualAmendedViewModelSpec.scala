@@ -59,7 +59,8 @@ class IndividualAmendedViewModelSpec extends SpecBase {
       ninoYesNo = Some(true),
       nino = Some("AB123456C"),
       worksReferenceYesNo = Some(true),
-      worksReference = Some("WR123")
+      worksReference = Some("WR123"),
+      verificationNumber = None
     )
 
   private val answersMatchingOriginal =

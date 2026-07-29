@@ -322,9 +322,9 @@ class AmendIndividualCheckYourAnswersControllerSpec extends SpecBase with Mockit
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual
-          controllers.amend.routes.AmendIndividualCheckYourAnswersController
+          controllers.amend.routes.AmendIndividualConfirmationController
             .onPageLoad()
-            .url // TODO: redirect to confirmation page
+            .url
       }
 
       verify(mockSubcontractorService)

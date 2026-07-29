@@ -19,13 +19,12 @@ package controllers.amend
 import config.FrontendAppConfig
 import controllers.actions.*
 import controllers.routes
-import models.requests.DataRequest
 import pages.add.{SubcontractorNamePage, TradingNameOfSubcontractorPage}
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.libs.json.Reads
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
-import queries.{CisIdQuery, Gettable, OriginalIndividualAnswersQuery}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import queries.{CisIdQuery, OriginalIndividualAnswersQuery}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.amend.IndividualAmendedViewModel
 import views.html.amend.AmendConfirmationView

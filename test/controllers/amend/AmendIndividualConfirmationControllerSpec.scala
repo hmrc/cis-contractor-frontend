@@ -56,7 +56,8 @@ class AmendIndividualConfirmationControllerSpec extends SpecBase {
       ninoYesNo = None,
       nino = None,
       worksReferenceYesNo = None,
-      worksReference = None
+      worksReference = None,
+      verificationNumber = None
     )
 
   private def userAnswersWithOriginal =

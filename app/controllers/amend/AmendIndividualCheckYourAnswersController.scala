@@ -192,8 +192,8 @@ class AmendIndividualCheckYourAnswersController @Inject() (
                   .flatMap(updated => sessionRepository.set(updated).map(_ => ()))
                   .map(_ =>
                     Redirect(
-                      controllers.amend.routes.AmendIndividualCheckYourAnswersController.onPageLoad()
-                    ) // TODO: Redirect to confirmation page
+                      controllers.amend.routes.AmendIndividualConfirmationController.onPageLoad()
+                    )
                   )
               }
               .recover { case t =>
