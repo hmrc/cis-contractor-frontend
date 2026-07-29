@@ -53,7 +53,8 @@ class OriginalTrustAnswersSpec extends AnyWordSpec with Matchers {
         utrYesNo = Some(true),
         utr = Some("7777777777"),
         worksReferenceYesNo = Some(true),
-        worksReference = Some("XLS345-MM")
+        worksReference = Some("XLS345-MM"),
+        verificationNumber = Some("V100000")
       )
 
       Json.fromJson[OriginalTrustAnswers](Json.toJson(model)).get shouldBe model
@@ -73,7 +74,8 @@ class OriginalTrustAnswersSpec extends AnyWordSpec with Matchers {
         utrYesNo = None,
         utr = None,
         worksReferenceYesNo = None,
-        worksReference = None
+        worksReference = None,
+        verificationNumber = None
       )
 
       Json.fromJson[OriginalTrustAnswers](Json.toJson(model)).get shouldBe model
