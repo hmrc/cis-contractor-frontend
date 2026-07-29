@@ -64,8 +64,7 @@ class OriginalIndividualAnswersSpec extends AnyWordSpec with Matchers {
       nino = Some("AB123456C"),
       worksReferenceYesNo = Some(true),
       worksReference = Some("WRN123"),
-      verificationNumber = Some("VRN123"),
-      isVerified = Some(false)
+      verificationNumber = Some("VRN123")
     )
 
   "OriginalIndividualAnswers" should {

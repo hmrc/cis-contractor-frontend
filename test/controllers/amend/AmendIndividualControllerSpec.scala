@@ -143,8 +143,7 @@ class AmendIndividualControllerSpec extends SpecBase with MockitoSugar {
       nino = Some("QQ123456C"),
       worksReferenceYesNo = Some(true),
       worksReference = Some("XLS345-MM"),
-      verificationNumber = None,
-      isVerified = None
+      verificationNumber = None
     )
 
   private def mockSuccessfulService(
