@@ -20,20 +20,10 @@ import play.api.libs.json.{Json, OFormat}
 
 final case class GetSubcontractorResponse(
   scheme: Option[ContractorSchemeResponse],
-  subcontractor: Option[SubcontractorResponse],
-  otherInfo: Seq[GetSubcontractorOtherInfo]
+  subcontractor: Option[SubcontractorResponse]
 )
 
 object GetSubcontractorResponse {
   given format: OFormat[GetSubcontractorResponse] =
     Json.format[GetSubcontractorResponse]
-}
-
-final case class GetSubcontractorOtherInfo(
-  utr: String
-)
-
-object GetSubcontractorOtherInfo {
-  given format: OFormat[GetSubcontractorOtherInfo] =
-    Json.format[GetSubcontractorOtherInfo]
 }
