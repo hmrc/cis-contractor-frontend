@@ -17,7 +17,6 @@
 package controllers.add
 
 import controllers.actions.*
-import controllers.helpers.SaveAnswerHelper
 import forms.add.SubAddressYesNoFormProvider
 import models.Mode
 import models.requests.DataRequest
@@ -34,18 +33,18 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class SubAddressYesNoController @Inject() (
-  override val messagesApi: MessagesApi,
-  sessionRepository: SessionRepository,
-  navigator: Navigator,
-  identify: IdentifierAction,
-  getData: DataRetrievalAction,
-  requireData: DataRequiredAction,
-  formProvider: SubAddressYesNoFormProvider,
-  subcontractorNameExtractor: SubcontractorNameExtractor,
-  val controllerComponents: MessagesControllerComponents,
-  view: SubAddressYesNoView
-)(implicit ec: ExecutionContext)
-    extends FrontendBaseController
+                                            override val messagesApi: MessagesApi,
+                                            sessionRepository: SessionRepository,
+                                            navigator: Navigator,
+                                            identify: IdentifierAction,
+                                            getData: DataRetrievalAction,
+                                            requireData: DataRequiredAction,
+                                            formProvider: SubAddressYesNoFormProvider,
+                                            subcontractorNameExtractor: SubcontractorNameExtractor,
+                                            val controllerComponents: MessagesControllerComponents,
+                                            view: SubAddressYesNoView
+                                          )(implicit ec: ExecutionContext)
+  extends FrontendBaseController
     with I18nSupport {
 
   private val form = formProvider()
@@ -76,9 +75,7 @@ class SubAddressYesNoController @Inject() (
               formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, subcontractorName))),
               value =>
                 for {
-                  updatedAnswers <- Future.fromTry(
-                                      SaveAnswerHelper.saveAnswer(request.userAnswers, SubAddressYesNoPage, value, mode)
-                                    )
+                  updatedAnswers <- Future.fromTry(request.userAnswers.set(SubAddressYesNoPage, value))
                   _              <- sessionRepository.set(updatedAnswers)
                 } yield Redirect(navigator.nextPage(SubAddressYesNoPage, mode, updatedAnswers))
             )

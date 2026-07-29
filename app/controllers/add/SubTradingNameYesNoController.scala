@@ -17,7 +17,6 @@
 package controllers.add
 
 import controllers.actions.*
-import controllers.helpers.SaveAnswerHelper
 import forms.add.SubTradingNameYesNoFormProvider
 import models.Mode
 import navigation.Navigator
@@ -32,17 +31,17 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class SubTradingNameYesNoController @Inject() (
-  override val messagesApi: MessagesApi,
-  sessionRepository: SessionRepository,
-  navigator: Navigator,
-  identify: IdentifierAction,
-  getData: DataRetrievalAction,
-  requireData: DataRequiredAction,
-  formProvider: SubTradingNameYesNoFormProvider,
-  val controllerComponents: MessagesControllerComponents,
-  view: SubTradingNameYesNoView
-)(implicit ec: ExecutionContext)
-    extends FrontendBaseController
+                                                override val messagesApi: MessagesApi,
+                                                sessionRepository: SessionRepository,
+                                                navigator: Navigator,
+                                                identify: IdentifierAction,
+                                                getData: DataRetrievalAction,
+                                                requireData: DataRequiredAction,
+                                                formProvider: SubTradingNameYesNoFormProvider,
+                                                val controllerComponents: MessagesControllerComponents,
+                                                view: SubTradingNameYesNoView
+                                              )(implicit ec: ExecutionContext)
+  extends FrontendBaseController
     with I18nSupport {
 
   val form = formProvider()
@@ -65,9 +64,7 @@ class SubTradingNameYesNoController @Inject() (
           formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
           value =>
             for {
-              updatedAnswers <- Future.fromTry(
-                                  SaveAnswerHelper.saveAnswer(request.userAnswers, SubTradingNameYesNoPage, value, mode)
-                                )
+              updatedAnswers <- Future.fromTry(request.userAnswers.set(SubTradingNameYesNoPage, value))
               _              <- sessionRepository.set(updatedAnswers)
             } yield Redirect(navigator.nextPage(SubTradingNameYesNoPage, mode, updatedAnswers))
         )

@@ -26,7 +26,7 @@ import queries.{CisIdQuery, OriginalIndividualAnswersQuery}
 import viewmodels.amend.IndividualAmendedViewModel
 import views.html.amend.AmendConfirmationView
 
-class AmendConfirmationControllerSpec extends SpecBase {
+class AmendIndividualConfirmationControllerSpec extends SpecBase {
 
   private val cisId = "123456789"
 
@@ -72,9 +72,9 @@ class AmendConfirmationControllerSpec extends SpecBase {
       .value
 
   private lazy val confirmationRoute =
-    controllers.amend.routes.AmendConfirmationController.individualOnPageLoad().url
+    controllers.amend.routes.AmendIndividualConfirmationController.onPageLoad().url
 
-  "AmendConfirmationController" - {
+  "AmendIndividualConfirmationController" - {
 
     "must return OK and the correct view for a GET" in {
 

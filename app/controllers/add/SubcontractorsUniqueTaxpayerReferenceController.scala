@@ -17,7 +17,6 @@
 package controllers.add
 
 import controllers.actions.*
-import controllers.helpers.SaveAnswerHelper
 import forms.add.UtrFormProvider
 import models.{AmendMode, Mode}
 import models.requests.DataRequest
@@ -35,19 +34,19 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class SubcontractorsUniqueTaxpayerReferenceController @Inject() (
-  override val messagesApi: MessagesApi,
-  sessionRepository: SessionRepository,
-  navigator: Navigator,
-  identify: IdentifierAction,
-  getData: DataRetrievalAction,
-  requireData: DataRequiredAction,
-  formProvider: UtrFormProvider,
-  subcontractorService: SubcontractorService,
-  subcontractorNameExtractor: SubcontractorNameExtractor,
-  val controllerComponents: MessagesControllerComponents,
-  view: SubcontractorsUniqueTaxpayerReferenceView
-)(implicit ec: ExecutionContext)
-    extends FrontendBaseController
+                                                                  override val messagesApi: MessagesApi,
+                                                                  sessionRepository: SessionRepository,
+                                                                  navigator: Navigator,
+                                                                  identify: IdentifierAction,
+                                                                  getData: DataRetrievalAction,
+                                                                  requireData: DataRequiredAction,
+                                                                  formProvider: UtrFormProvider,
+                                                                  subcontractorService: SubcontractorService,
+                                                                  subcontractorNameExtractor: SubcontractorNameExtractor,
+                                                                  val controllerComponents: MessagesControllerComponents,
+                                                                  view: SubcontractorsUniqueTaxpayerReferenceView
+                                                                )(implicit ec: ExecutionContext)
+  extends FrontendBaseController
     with I18nSupport {
 
   private val form = formProvider()
@@ -61,9 +60,7 @@ class SubcontractorsUniqueTaxpayerReferenceController @Inject() (
   private def saveAndContinue(mode: Mode, value: String)(implicit request: DataRequest[?]) =
     for {
       updatedAnswers <-
-        Future.fromTry(
-          SaveAnswerHelper.saveAnswer(request.userAnswers, SubcontractorsUniqueTaxpayerReferencePage, value, mode)
-        )
+        Future.fromTry(request.userAnswers.set(SubcontractorsUniqueTaxpayerReferencePage, value))
       _              <- sessionRepository.set(updatedAnswers)
     } yield Redirect(
       navigator.nextPage(SubcontractorsUniqueTaxpayerReferencePage, mode, updatedAnswers)

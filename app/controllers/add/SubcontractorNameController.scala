@@ -17,7 +17,6 @@
 package controllers.add
 
 import controllers.actions.*
-import controllers.helpers.SaveAnswerHelper
 import forms.add.SubcontractorNameFormProvider
 import models.Mode
 import models.add.SubcontractorName.format
@@ -33,17 +32,17 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class SubcontractorNameController @Inject() (
-  override val messagesApi: MessagesApi,
-  sessionRepository: SessionRepository,
-  navigator: Navigator,
-  identify: IdentifierAction,
-  getData: DataRetrievalAction,
-  requireData: DataRequiredAction,
-  formProvider: SubcontractorNameFormProvider,
-  val controllerComponents: MessagesControllerComponents,
-  view: SubcontractorNameView
-)(implicit ec: ExecutionContext)
-    extends FrontendBaseController
+                                              override val messagesApi: MessagesApi,
+                                              sessionRepository: SessionRepository,
+                                              navigator: Navigator,
+                                              identify: IdentifierAction,
+                                              getData: DataRetrievalAction,
+                                              requireData: DataRequiredAction,
+                                              formProvider: SubcontractorNameFormProvider,
+                                              val controllerComponents: MessagesControllerComponents,
+                                              view: SubcontractorNameView
+                                            )(implicit ec: ExecutionContext)
+  extends FrontendBaseController
     with I18nSupport {
 
   private val form = formProvider()
@@ -66,9 +65,7 @@ class SubcontractorNameController @Inject() (
           formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
           value =>
             for {
-              updatedAnswers <- Future.fromTry(
-                                  SaveAnswerHelper.saveAnswer(request.userAnswers, SubcontractorNamePage, value, mode)
-                                )
+              updatedAnswers <- Future.fromTry(request.userAnswers.set(SubcontractorNamePage, value))
               _              <- sessionRepository.set(updatedAnswers)
             } yield Redirect(
               navigator.nextPage(SubcontractorNamePage, mode, updatedAnswers)

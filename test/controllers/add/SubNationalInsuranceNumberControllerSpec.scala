@@ -20,16 +20,12 @@ import base.SpecBase
 import controllers.routes
 import forms.add.SubNationalInsuranceNumberFormProvider
 import models.add.SubcontractorName
-import models.{AmendMode, NormalMode, UserAnswers}
-import navigation.{FakeNavigator, Navigator}
-import org.mockito.ArgumentCaptor
+import models.{NormalMode, UserAnswers}
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.{verify, when}
+import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
 import pages.add.{SubNationalInsuranceNumberPage, SubcontractorNamePage}
-import pages.amend.AmendedPagesPage
 import play.api.inject.bind
-import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import repositories.SessionRepository
@@ -90,20 +86,12 @@ class SubNationalInsuranceNumberControllerSpec extends SpecBase with MockitoSuga
       }
     }
 
-    "must redirect to the WorksReferenceNumberYesNo page and not add the page to AmendedPagesPage when valid data is submitted in NormalMode" in {
-      val userAnswers           = uaWithName.set(SubNationalInsuranceNumberPage, "answer").success.value
-      val validValue            = "AA123456A"
-      val onwardRoute           = controllers.add.routes.WorksReferenceNumberYesNoController
-        .onPageLoad(NormalMode)
-      val mockSessionRepository = mock[SessionRepository]
-      val captor                = ArgumentCaptor.forClass(classOf[UserAnswers])
-      when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
-      val application           =
-        applicationBuilder(userAnswers = Some(userAnswers))
-          .overrides(
-            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
-            bind[SessionRepository].toInstance(mockSessionRepository)
-          )
+    "must redirect to the WorksReferenceNumberYesNo page when valid data is submitted" in {
+
+      val validValue = "AA123456A"
+
+      val application =
+        applicationBuilder(userAnswers = Some(uaWithName))
           .build()
 
       running(application) {
@@ -114,51 +102,9 @@ class SubNationalInsuranceNumberControllerSpec extends SpecBase with MockitoSuga
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual onwardRoute.url
-        verify(mockSessionRepository).set(captor.capture())
-
-        val updatedAnswers = captor.getValue
-
-        updatedAnswers.get(SubNationalInsuranceNumberPage) mustBe Some(validValue)
-        updatedAnswers.get(AmendedPagesPage) mustBe None
-      }
-    }
-
-    "must add SubNationalInsuranceNumberPage to AmendedPagesPage when submitted in AmendMode" in {
-      val onwardRoute           = Call("GET", "/foo")
-      val mockSessionRepository = mock[SessionRepository]
-      val captor                = ArgumentCaptor.forClass(classOf[UserAnswers])
-
-      when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
-
-      val application =
-        applicationBuilder(userAnswers = Some(uaWithName))
-          .overrides(
-            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
-            bind[SessionRepository].toInstance(mockSessionRepository)
-          )
-          .build()
-
-      running(application) {
-        val request =
-          FakeRequest(
-            POST,
-            controllers.add.routes.SubNationalInsuranceNumberController
-              .onSubmit(AmendMode)
-              .url
-          ).withFormUrlEncodedBody(
-            "value" -> "AA123456A"
-          )
-
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual onwardRoute.url
-        verify(mockSessionRepository).set(captor.capture())
-
-        val updatedAnswers = captor.getValue
-        updatedAnswers.get(SubNationalInsuranceNumberPage) mustBe Some("AA123456A")
-        updatedAnswers.get(AmendedPagesPage).value must contain(SubNationalInsuranceNumberPage.toString)
+        redirectLocation(result).value mustEqual controllers.add.routes.WorksReferenceNumberYesNoController
+          .onPageLoad(NormalMode)
+          .url
       }
     }
 

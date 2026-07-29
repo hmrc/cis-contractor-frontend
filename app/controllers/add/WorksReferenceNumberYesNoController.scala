@@ -17,7 +17,6 @@
 package controllers.add
 
 import controllers.actions.*
-import controllers.helpers.SaveAnswerHelper
 import forms.add.WorksReferenceNumberYesNoFormProvider
 import models.Mode
 import models.requests.DataRequest
@@ -35,18 +34,18 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class WorksReferenceNumberYesNoController @Inject() (
-  override val messagesApi: MessagesApi,
-  sessionRepository: SessionRepository,
-  navigator: Navigator,
-  identify: IdentifierAction,
-  getData: DataRetrievalAction,
-  requireData: DataRequiredAction,
-  formProvider: WorksReferenceNumberYesNoFormProvider,
-  subcontractorNameExtractor: SubcontractorNameExtractor,
-  val controllerComponents: MessagesControllerComponents,
-  view: WorksReferenceNumberYesNoView
-)(implicit ec: ExecutionContext)
-    extends FrontendBaseController
+                                                      override val messagesApi: MessagesApi,
+                                                      sessionRepository: SessionRepository,
+                                                      navigator: Navigator,
+                                                      identify: IdentifierAction,
+                                                      getData: DataRetrievalAction,
+                                                      requireData: DataRequiredAction,
+                                                      formProvider: WorksReferenceNumberYesNoFormProvider,
+                                                      subcontractorNameExtractor: SubcontractorNameExtractor,
+                                                      val controllerComponents: MessagesControllerComponents,
+                                                      view: WorksReferenceNumberYesNoView
+                                                    )(implicit ec: ExecutionContext)
+  extends FrontendBaseController
     with I18nSupport {
 
   private val form: Form[Boolean] = formProvider()
@@ -77,10 +76,7 @@ class WorksReferenceNumberYesNoController @Inject() (
               formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, subcontractorName))),
               value =>
                 for {
-                  updatedAnswers <-
-                    Future.fromTry(
-                      SaveAnswerHelper.saveAnswer(request.userAnswers, WorksReferenceNumberYesNoPage, value, mode)
-                    )
+                  updatedAnswers <- Future.fromTry(request.userAnswers.set(WorksReferenceNumberYesNoPage, value))
                   _              <- sessionRepository.set(updatedAnswers)
                 } yield Redirect(navigator.nextPage(WorksReferenceNumberYesNoPage, mode, updatedAnswers))
             )

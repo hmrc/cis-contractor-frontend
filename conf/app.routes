@@ -36,8 +36,6 @@ GET   /subcontractor/individual-address-lookup         controllers.add.AddressOf
 GET   /subcontractor/individual-address-return         controllers.add.AddressOfSubcontractorController.addressLookupCallback(id: String ?= "", mode: Mode = NormalMode)
 GET   /subcontractor/individual-address-return/change  controllers.add.AddressOfSubcontractorController.addressLookupCallbackChange(id: String ?= "", mode: Mode = NormalMode)
 
-
-
 GET   /subcontractor/amend/check-trading-name  controllers.add.SubTradingNameYesNoController.onPageLoad(mode: Mode = AmendMode)
 POST  /subcontractor/amend/check-trading-name  controllers.add.SubTradingNameYesNoController.onSubmit(mode: Mode = AmendMode)
 
@@ -192,7 +190,7 @@ POST  /subcontractor/add/select-contact-details         controllers.add.Individu
 GET   /subcontractor/add/change-select-contact-details  controllers.add.IndividualContactMethodOptionsController.onPageLoad(mode: Mode = CheckMode)
 POST  /subcontractor/add/change-select-contact-details  controllers.add.IndividualContactMethodOptionsController.onSubmit(mode: Mode = CheckMode)
 
-GET   /subcontractor/amend/individual/subcontractor-details-updated         controllers.amend.AmendConfirmationController.individualOnPageLoad()
+GET   /subcontractor/amend/individual/subcontractor-details-updated         controllers.amend.AmendIndividualConfirmationController.onPageLoad()
 
 # Company
 GET   /subcontractor/add/company/subcontractor-added  controllers.add.SubcontractorAddedController.companySubcontractorAdded()

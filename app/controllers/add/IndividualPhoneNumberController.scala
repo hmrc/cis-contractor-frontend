@@ -17,7 +17,7 @@
 package controllers.add
 
 import controllers.actions.*
-import controllers.helpers.{ContactGuard, SaveAnswerHelper}
+import controllers.helpers.ContactGuard
 import forms.add.IndividualPhoneNumberFormProvider
 import models.Mode
 import models.contact.ContactMethodOptions
@@ -34,18 +34,18 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class IndividualPhoneNumberController @Inject() (
-  override val messagesApi: MessagesApi,
-  sessionRepository: SessionRepository,
-  navigator: Navigator,
-  identify: IdentifierAction,
-  getData: DataRetrievalAction,
-  requireData: DataRequiredAction,
-  formProvider: IndividualPhoneNumberFormProvider,
-  subcontractorNameExtractor: SubcontractorNameExtractor,
-  val controllerComponents: MessagesControllerComponents,
-  view: IndividualPhoneNumberView
-)(implicit ec: ExecutionContext)
-    extends FrontendBaseController
+                                                  override val messagesApi: MessagesApi,
+                                                  sessionRepository: SessionRepository,
+                                                  navigator: Navigator,
+                                                  identify: IdentifierAction,
+                                                  getData: DataRetrievalAction,
+                                                  requireData: DataRequiredAction,
+                                                  formProvider: IndividualPhoneNumberFormProvider,
+                                                  subcontractorNameExtractor: SubcontractorNameExtractor,
+                                                  val controllerComponents: MessagesControllerComponents,
+                                                  view: IndividualPhoneNumberView
+                                                )(implicit ec: ExecutionContext)
+  extends FrontendBaseController
     with I18nSupport
     with ContactGuard {
 
@@ -78,10 +78,7 @@ class IndividualPhoneNumberController @Inject() (
           formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, subcontractorName))),
           value =>
             for {
-              updatedAnswers <-
-                Future.fromTry(
-                  SaveAnswerHelper.saveAnswer(request.userAnswers, IndividualPhoneNumberPage, value, mode)
-                )
+              updatedAnswers <- Future.fromTry(request.userAnswers.set(IndividualPhoneNumberPage, value))
               _              <- sessionRepository.set(updatedAnswers)
             } yield Redirect(navigator.nextPage(IndividualPhoneNumberPage, mode, updatedAnswers))
         ))

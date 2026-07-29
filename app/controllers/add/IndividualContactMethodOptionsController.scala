@@ -17,7 +17,6 @@
 package controllers.add
 
 import controllers.actions.*
-import controllers.helpers.SaveAnswerHelper
 import forms.add.IndividualContactMethodOptionsFormProvider
 import models.Mode
 import models.requests.DataRequest
@@ -34,18 +33,18 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class IndividualContactMethodOptionsController @Inject() (
-  override val messagesApi: MessagesApi,
-  sessionRepository: SessionRepository,
-  navigator: Navigator,
-  identify: IdentifierAction,
-  getData: DataRetrievalAction,
-  requireData: DataRequiredAction,
-  formProvider: IndividualContactMethodOptionsFormProvider,
-  val controllerComponents: MessagesControllerComponents,
-  view: IndividualContactMethodOptionsView,
-  subcontractorNameExtractor: SubcontractorNameExtractor
-)(implicit ec: ExecutionContext)
-    extends FrontendBaseController
+                                                           override val messagesApi: MessagesApi,
+                                                           sessionRepository: SessionRepository,
+                                                           navigator: Navigator,
+                                                           identify: IdentifierAction,
+                                                           getData: DataRetrievalAction,
+                                                           requireData: DataRequiredAction,
+                                                           formProvider: IndividualContactMethodOptionsFormProvider,
+                                                           val controllerComponents: MessagesControllerComponents,
+                                                           view: IndividualContactMethodOptionsView,
+                                                           subcontractorNameExtractor: SubcontractorNameExtractor
+                                                         )(implicit ec: ExecutionContext)
+  extends FrontendBaseController
     with I18nSupport {
 
   val form = formProvider()
@@ -74,10 +73,7 @@ class IndividualContactMethodOptionsController @Inject() (
               formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, subcontractorName))),
               value =>
                 for {
-                  updatedAnswers <-
-                    Future.fromTry(
-                      SaveAnswerHelper.saveAnswer(request.userAnswers, IndividualContactMethodOptionsPage, value, mode)
-                    )
+                  updatedAnswers <- Future.fromTry(request.userAnswers.set(IndividualContactMethodOptionsPage, value))
                   _              <- sessionRepository.set(updatedAnswers)
                 } yield Redirect(navigator.nextPage(IndividualContactMethodOptionsPage, mode, updatedAnswers))
             )

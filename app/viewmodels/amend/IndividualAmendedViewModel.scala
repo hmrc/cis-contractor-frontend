@@ -23,7 +23,6 @@ import models.amend.OriginalIndividualAnswers
 import models.contact.ContactMethodOptions
 import pages.QuestionPage
 import pages.add.*
-import pages.amend.AmendedPagesPage
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
 import uk.gov.hmrc.govukfrontend.views.viewmodels.table.TableRow
@@ -98,8 +97,11 @@ object IndividualAmendedViewModel {
     val currentName            = current.get(SubcontractorNamePage)
 
     Option.when(
-      wasAmended(current, TradingNameOfSubcontractorPage) ||
-        wasAmended(current, SubcontractorNamePage)
+      originalNameDisplay(original) != currentNameDisplay(
+        currentUsesTradingName,
+        currentTradingName,
+        currentName
+      )
     ) {
       row(
         label =
@@ -154,8 +156,7 @@ object IndividualAmendedViewModel {
   )(implicit messages: Messages): Option[Seq[TableRow]] =
     val currentAddress = current.get(AddressOfSubcontractorPage)
     Option.when(
-      wasAmended(current, AddressOfSubcontractorPage) ||
-        original.address != currentAddress
+      original.address != currentAddress
     ) {
       row(
         messages("addressOfSubcontractor.checkYourAnswersLabel"),
@@ -178,8 +179,7 @@ object IndividualAmendedViewModel {
         current
       ),
       Option.when(
-        wasAmended(current, IndividualContactMethodOptionsPage) ||
-          original.individualContactMethod != currentMethods
+        original.individualContactMethod != currentMethods
       ) {
         row(
           messages("individualContactMethodOptions.checkYourAnswersLabel"),
@@ -322,9 +322,7 @@ object IndividualAmendedViewModel {
 
     val currentVal = current.get(page)
 
-    Option.when(
-      wasAmended(current, page) || original != currentVal
-    ) {
+    Option.when(original != currentVal) {
       row(label, displayYesNo(original), displayYesNo(currentVal))
     }
   }
@@ -344,9 +342,7 @@ object IndividualAmendedViewModel {
   )(implicit messages: Messages): Option[Seq[TableRow]] = {
     val currentVal = current.get(page)
 
-    Option.when(
-      wasAmended(current, page) || original != currentVal
-    ) {
+    Option.when(original != currentVal) {
       row(
         label,
         original.getOrElse(missingValue),
@@ -364,13 +360,4 @@ object IndividualAmendedViewModel {
 
   private def missingValue(implicit messages: Messages): String =
     messages("amendConfirmation.table.content.none")
-
-  private def wasAmended(
-    current: UserAnswers,
-    page: QuestionPage[_]
-  ): Boolean =
-    current
-      .get(AmendedPagesPage)
-      .getOrElse(Set.empty)
-      .contains(page.toString)
 }
