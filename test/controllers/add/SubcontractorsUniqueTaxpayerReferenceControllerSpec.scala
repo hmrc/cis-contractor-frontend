@@ -152,7 +152,9 @@ class SubcontractorsUniqueTaxpayerReferenceControllerSpec extends SpecBase with 
 
         status(result) mustEqual SEE_OTHER
 
-        redirectLocation(result).value mustEqual controllers.amend.routes.AmendIndividualCheckYourAnswersController.onPageLoad().url
+        redirectLocation(result).value mustEqual controllers.amend.routes.AmendIndividualCheckYourAnswersController
+          .onPageLoad()
+          .url
       }
       verify(mockSubcontractorService).isDuplicateUTR(any[UserAnswers], any[String])(any[HeaderCarrier])
       verifyNoMoreInteractions(mockSubcontractorService)
@@ -323,7 +325,9 @@ class SubcontractorsUniqueTaxpayerReferenceControllerSpec extends SpecBase with 
 
         status(result) mustEqual SEE_OTHER
 
-        redirectLocation(result).value mustEqual controllers.amend.routes.AmendIndividualCheckYourAnswersController.onPageLoad().url
+        redirectLocation(result).value mustEqual controllers.amend.routes.AmendIndividualCheckYourAnswersController
+          .onPageLoad()
+          .url
       }
     }
 
