@@ -21,6 +21,7 @@ import models.add.ValidatedSubcontractor
 import models.amend.OriginalIndividualAnswers
 import models.{AmendMode, UserAnswers}
 import pages.add.*
+import pages.amend.ShowVerificationDetailsPage
 import play.api.Logging
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -58,7 +59,7 @@ class AmendIndividualCheckYourAnswersController @Inject() (
       case Right(_) =>
         val originalAnswers = ua.get(OriginalIndividualAnswersQuery)
 
-        val isVerified = originalAnswers.flatMap(_.isVerified)
+        val isVerified = ua.get(ShowVerificationDetailsPage)
 
         val subcontractorInformationList =
           SummaryListViewModel(rows = subcontractorInformationRows(ua, originalAnswers).flatten)
@@ -89,7 +90,7 @@ class AmendIndividualCheckYourAnswersController @Inject() (
 
     val verificationRows =
       Option
-        .when(originalAnswers.flatMap(_.isVerified).contains(true)) {
+        .when(ua.get(ShowVerificationDetailsPage).contains(true)) {
 
           val verificationNumber =
             originalAnswers.flatMap(_.verificationNumber).getOrElse("")
@@ -183,7 +184,7 @@ class AmendIndividualCheckYourAnswersController @Inject() (
           subcontractorService
             .createAndUpdateSubcontractor(request.userAnswers)
             .map(_ =>
-              Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+              Redirect(controllers.amend.routes.AmendIndividualCheckYourAnswersController().onPageLoad())
             ) // TODO: Redirect to confirmation page
             .recover { case t =>
               logger.error(

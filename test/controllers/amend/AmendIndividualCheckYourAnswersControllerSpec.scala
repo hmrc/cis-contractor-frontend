@@ -38,6 +38,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.Future
 import models.contact.ContactMethodOptions
+import pages.amend.ShowVerificationDetailsPage
 
 class AmendIndividualCheckYourAnswersControllerSpec extends SpecBase with MockitoSugar {
   private val address =
@@ -102,6 +103,9 @@ class AmendIndividualCheckYourAnswersControllerSpec extends SpecBase with Mockit
       .set(WorksReferenceNumberPage, "WRN-1")
       .success
       .value
+      .set(ShowVerificationDetailsPage, false)
+      .success
+      .value
       .set(
         OriginalIndividualAnswersQuery,
         OriginalIndividualAnswers(
@@ -127,8 +131,7 @@ class AmendIndividualCheckYourAnswersControllerSpec extends SpecBase with Mockit
           nino = None,
           worksReferenceYesNo = Some(true),
           worksReference = Some("WRN-1"),
-          verificationNumber = None,
-          isVerified = Some(false)
+          verificationNumber = None
         )
       )
       .success
@@ -186,6 +189,9 @@ class AmendIndividualCheckYourAnswersControllerSpec extends SpecBase with Mockit
 
       val verifiedUa =
         minUa
+          .set(ShowVerificationDetailsPage, true)
+          .success
+          .value
           .set(
             OriginalIndividualAnswersQuery,
             OriginalIndividualAnswers(
@@ -211,8 +217,7 @@ class AmendIndividualCheckYourAnswersControllerSpec extends SpecBase with Mockit
               nino = None,
               worksReferenceYesNo = Some(false),
               worksReference = None,
-              verificationNumber = Some("VRN123456"),
-              isVerified = Some(true)
+              verificationNumber = Some("VRN123456")
             )
           )
           .success
