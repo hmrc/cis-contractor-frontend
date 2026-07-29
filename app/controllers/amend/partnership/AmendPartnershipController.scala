@@ -193,7 +193,7 @@ class AmendPartnershipController @Inject() (
       addressYesNo = Some(address.isDefined),
       address = address,
       partnershipContactMethodsYesNo = Some(methods.nonEmpty),
-      partnershipContactMethodOptions = Option.when(methods.nonEmpty)(methods),
+      partnershipContactMethodOptions = methods,
       email = subcontractor.emailAddress,
       phone = subcontractor.phoneNumber,
       mobile = subcontractor.mobilePhoneNumber,

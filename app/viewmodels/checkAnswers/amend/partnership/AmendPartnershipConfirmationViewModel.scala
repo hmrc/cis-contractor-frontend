@@ -30,22 +30,23 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.table.TableRow
 object AmendPartnershipConfirmationViewModel {
 
   def rows(
-            original: OriginalPartnershipAnswers,
-            current: UserAnswers
-          )(implicit messages: Messages): Seq[Seq[TableRow]] =
+    original: OriginalPartnershipAnswers,
+    current: UserAnswers
+  )(implicit messages: Messages): Seq[Seq[TableRow]] =
     nameRow(original, current) ++
       addressRows(original, current) ++
       contactRows(original, current) ++
       utrRows(original, current) ++
-      nominatedPartnersUtrRows(original, current) ++
-      nominatedPartnersCrnRows(original, current) ++
-      nominatedPartnersNinoRows(original, current) ++
+      nominatedPartnerNameRow(original, current) ++
+      nominatedPartnerUtrRows(original, current) ++
+      nominatedPartnerCrnRows(original, current) ++
+      nominatedPartnerNinoRows(original, current) ++
       worksReferenceRows(original, current)
 
   private def nameRow(
-                       original: OriginalPartnershipAnswers,
-                       current: UserAnswers
-                     )(implicit messages: Messages): Seq[Seq[TableRow]] =
+    original: OriginalPartnershipAnswers,
+    current: UserAnswers
+  )(implicit messages: Messages): Seq[Seq[TableRow]] =
     Seq(
       fieldRow(
         PartnershipNamePage,
@@ -55,10 +56,23 @@ object AmendPartnershipConfirmationViewModel {
       )
     ).flatten
 
+  private def nominatedPartnerNameRow(
+    original: OriginalPartnershipAnswers,
+    current: UserAnswers
+  )(implicit messages: Messages): Seq[Seq[TableRow]] =
+    Seq(
+      fieldRow(
+        PartnershipNominatedPartnerNamePage,
+        messages("partnershipNominatedPartnerName.checkYourAnswersLabel"),
+        original.nominatedPartnerName,
+        current
+      )
+    ).flatten
+
   private def addressRows(
-                           original: OriginalPartnershipAnswers,
-                           current: UserAnswers
-                         )(implicit messages: Messages): Seq[Seq[TableRow]] = {
+    original: OriginalPartnershipAnswers,
+    current: UserAnswers
+  )(implicit messages: Messages): Seq[Seq[TableRow]] = {
     val currentAddress = current.get(PartnershipAddressPage)
 
     Seq(
@@ -81,9 +95,9 @@ object AmendPartnershipConfirmationViewModel {
   }
 
   private def contactRows(
-                           original: OriginalPartnershipAnswers,
-                           current: UserAnswers
-                         )(implicit messages: Messages): Seq[Seq[TableRow]] = {
+    original: OriginalPartnershipAnswers,
+    current: UserAnswers
+  )(implicit messages: Messages): Seq[Seq[TableRow]] = {
     val currentMethods = current.get(PartnershipContactMethodOptionsPage).getOrElse(Set.empty)
 
     Seq(
@@ -124,8 +138,8 @@ object AmendPartnershipConfirmationViewModel {
   }
 
   private def formatContactMethods(
-                                    methods: Set[ContactMethodOptions]
-                                  )(implicit messages: Messages): String =
+    methods: Set[ContactMethodOptions]
+  )(implicit messages: Messages): String =
     if (methods.isEmpty) {
       missingValue
     } else {
@@ -143,25 +157,25 @@ object AmendPartnershipConfirmationViewModel {
     }
 
   private def worksReferenceRows(original: OriginalPartnershipAnswers, current: UserAnswers)(implicit
-                                                                                       messages: Messages
+    messages: Messages
   ): Seq[Seq[TableRow]] =
     Seq(
       yesNoRow(
         PartnershipWorksReferenceNumberYesNoPage,
-        messages("partnershipWorksReferenceYesNo.checkYourAnswersLabel"),
+        messages("partnershipWorksReferenceNumberYesNo.checkYourAnswersLabel"),
         original.nominatedPartnerWorksReferenceYesNo,
         current
       ),
       fieldRow(
         PartnershipWorksReferenceNumberPage,
-        messages("partnershipWorksReference.checkYourAnswersLabel"),
+        messages("partnershipWorksReferenceNumber.checkYourAnswersLabel"),
         original.nominatedPartnerWorksReference,
         current
       )
     ).flatten
 
   private def utrRows(original: OriginalPartnershipAnswers, current: UserAnswers)(implicit
-                                                                            messages: Messages
+    messages: Messages
   ): Seq[Seq[TableRow]] =
     Seq(
       yesNoRow(
@@ -179,25 +193,25 @@ object AmendPartnershipConfirmationViewModel {
     ).flatten
 
   private def nominatedPartnerUtrRows(original: OriginalPartnershipAnswers, current: UserAnswers)(implicit
-                                                                                    messages: Messages
-    ): Seq[Seq[TableRow]] =
-      Seq(
-        yesNoRow(
-          PartnershipNominatedPartnerUtrYesNoPage,
-          messages("partnershipNominatedPartnerUtrYesNo.checkYourAnswersLabel"),
-          original.nominatedPartnerUtrYesNo,
-          current
-        ),
-        fieldRow(
-          PartnershipNominatedPartnerUtrPage,
-          messages("partnershipNominatedPartnerUtr.checkYourAnswersLabel"),
-          original.nominatedPartnerUtr,
-          current
-        )
-      ).flatten
+    messages: Messages
+  ): Seq[Seq[TableRow]] =
+    Seq(
+      yesNoRow(
+        PartnershipNominatedPartnerUtrYesNoPage,
+        messages("partnershipNominatedPartnerUtrYesNo.checkYourAnswersLabel"),
+        original.nominatedPartnerUtrYesNo,
+        current
+      ),
+      fieldRow(
+        PartnershipNominatedPartnerUtrPage,
+        messages("partnershipNominatedPartnerUtr.checkYourAnswersLabel"),
+        original.nominatedPartnerUtr,
+        current
+      )
+    ).flatten
 
   private def nominatedPartnerCrnRows(original: OriginalPartnershipAnswers, current: UserAnswers)(implicit
-                                                                                                  messages: Messages
+    messages: Messages
   ): Seq[Seq[TableRow]] =
     Seq(
       yesNoRow(
@@ -215,22 +229,22 @@ object AmendPartnershipConfirmationViewModel {
     ).flatten
 
   private def nominatedPartnerNinoRows(original: OriginalPartnershipAnswers, current: UserAnswers)(implicit
-                                                                                                    messages: Messages
-    ): Seq[Seq[TableRow]] =
-      Seq(
-        yesNoRow(
-          PartnershipNominatedPartnerNinoYesNoPage,
-          messages("partnershipNominatedPartnerNinoYesNo.checkYourAnswersLabel"),
-          original.nominatedPartnerNinoYesNo,
-          current
-        ),
-        fieldRow(
-          PartnershipNominatedPartnerNinoPage,
-          messages("partnershipNominatedPartnerNino.checkYourAnswersLabel"),
-          original.nominatedPartnerNino,
-          current
-        )
-      ).flatten
+    messages: Messages
+  ): Seq[Seq[TableRow]] =
+    Seq(
+      yesNoRow(
+        PartnershipNominatedPartnerNinoYesNoPage,
+        messages("partnershipNominatedPartnerNinoYesNo.checkYourAnswersLabel"),
+        original.nominatedPartnerNinoYesNo,
+        current
+      ),
+      fieldRow(
+        PartnershipNominatedPartnerNinoPage,
+        messages("partnershipNominatedPartnerNino.checkYourAnswersLabel"),
+        original.nominatedPartnerNino,
+        current
+      )
+    ).flatten
 
   private def formatAddress(a: Address): String =
     List(
@@ -244,11 +258,11 @@ object AmendPartnershipConfirmationViewModel {
     ).flatten.mkString(", ")
 
   private def yesNoRow(
-                        page: QuestionPage[Boolean],
-                        label: String,
-                        original: Option[Boolean],
-                        current: UserAnswers
-                      )(implicit messages: Messages): Option[Seq[TableRow]] = {
+    page: QuestionPage[Boolean],
+    label: String,
+    original: Option[Boolean],
+    current: UserAnswers
+  )(implicit messages: Messages): Option[Seq[TableRow]] = {
 
     val currentVal = current.get(page)
     Option.when(original != currentVal) {
@@ -264,11 +278,11 @@ object AmendPartnershipConfirmationViewModel {
     }
 
   private def fieldRow(
-                        page: QuestionPage[String],
-                        label: String,
-                        original: Option[String],
-                        current: UserAnswers
-                      )(implicit messages: Messages): Option[Seq[TableRow]] = {
+    page: QuestionPage[String],
+    label: String,
+    original: Option[String],
+    current: UserAnswers
+  )(implicit messages: Messages): Option[Seq[TableRow]] = {
     val currentVal = current.get(page)
 
     Option.when(original != currentVal) {

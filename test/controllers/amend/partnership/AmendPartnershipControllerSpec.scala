@@ -121,7 +121,7 @@ class AmendPartnershipControllerSpec extends SpecBase with MockitoSugar {
       addressYesNo = Some(true),
       address = Some(expectedAddress),
       partnershipContactMethodsYesNo = Some(true),
-      partnershipContactMethodOptions = Some(Set(Email, Phone, Mobile)),
+      partnershipContactMethodOptions = Set(Email, Phone, Mobile),
       email = Some("partnership@example.com"),
       phone = Some("02070000000"),
       mobile = Some("07123456789"),
@@ -679,10 +679,16 @@ class AmendPartnershipControllerSpec extends SpecBase with MockitoSugar {
           savedAnswers
             .get(PartnershipMobileNumberPage) mustBe None
 
-          savedAnswers
-            .get(OriginalPartnershipAnswersQuery)
-            .value
-            .partnershipContactMethodOptions mustBe None
+          val original =
+            savedAnswers
+              .get(OriginalPartnershipAnswersQuery)
+              .value
+
+          original.partnershipContactMethodsYesNo mustBe Some(false)
+          original.partnershipContactMethodOptions mustBe Set.empty
+          original.email mustBe None
+          original.phone mustBe None
+          original.mobile mustBe None
         }
       }
 

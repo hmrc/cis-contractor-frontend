@@ -402,6 +402,20 @@ individualContactMethodOptions.hint                                          =  
 individualContactMethodOptions.error.required                                =  Select the methods of contact you want to add for this subcontractor
 individualContactMethodOptions.change.hidden                                 =  methods of contact
 
+amendConfirmation.panel.heading                                              =  Subcontractor details updated
+amendConfirmation.p1                                                         =  You have updated the subcontractor details for {0}.
+amendConfirmation.updatesMade.h2                                             =  Updates made
+amendConfirmation.table.hdr.previous                                         =  Previous
+amendConfirmation.table.hdr.updated                                          =  Updated
+amendConfirmation.table.hdr.details                                          =  Details
+amendConfirmation.backTo                                                     =  Back to
+amendConfirmation.yourSubcontractors                                         =  Your subcontractors
+amendConfirmation.beforeYouGo.h2                                             =  Before you go
+amendConfirmation.beforeYouGo.p1                                             =  Your feedback helps us make our service better.
+amendConfirmation.beforeYouGo.takeAShortSurvey                               =  Take a short survey
+amendConfirmation.beforeYouGo.shareFeedback                                  =  to share your feedback on this service.
+amendConfirmation.table.content.none                                         =  None provided
+
 # Partnership
 addPartnershipContactMethodsYesNo.title                     =  Do you want to add contact details for this partnership?
 addPartnershipContactMethodsYesNo.heading                   =  Do you want to add contact details for {0}?

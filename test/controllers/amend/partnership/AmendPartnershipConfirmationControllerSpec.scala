@@ -22,13 +22,13 @@ import pages.add.partnership.PartnershipNamePage
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import queries.{CisIdQuery, OriginalPartnershipAnswersQuery}
-import viewmodels.amend.partnership.PartnershipAmendConfirmationViewModel
+import viewmodels.checkAnswers.amend.partnership.AmendPartnershipConfirmationViewModel
 import views.html.amend.AmendConfirmationView
 
 class AmendPartnershipConfirmationControllerSpec extends SpecBase {
-  private val cisId     = "123456789"
+  private val cisId           = "123456789"
   private val partnershipName = "ABC Partnership"
-  private val original  =
+  private val original        =
     OriginalPartnershipAnswers(
       partnershipName = Some(partnershipName),
       addressYesNo = None,
@@ -38,15 +38,15 @@ class AmendPartnershipConfirmationControllerSpec extends SpecBase {
       email = None,
       phone = None,
       mobile = None,
-      utrYesNo = None,
+      hasUtrYesNo = None,
       utr = None,
-      nominatedPartnerName = none,
+      nominatedPartnerName = None,
+      nominatedPartnerUtrYesNo = None,
+      nominatedPartnerUtr = None,
       nominatedPartnerNinoYesNo = None,
       nominatedPartnerNino = None,
       nominatedPartnerCrnYesNo = None,
       nominatedPartnerCrn = None,
-      nominatedPartnerUtrYesNo = None,
-      nominatedPartnerUtr = None,
       nominatedPartnerWorksReferenceYesNo = None,
       nominatedPartnerWorksReference = None
     )
@@ -82,7 +82,7 @@ class AmendPartnershipConfirmationControllerSpec extends SpecBase {
 
         contentAsString(result) mustEqual
           view(
-            PartnershipAmendConfirmationViewModel.rows(
+            AmendPartnershipConfirmationViewModel.rows(
               original,
               userAnswersWithOriginal
             )(messages(application)),
@@ -130,7 +130,7 @@ class AmendPartnershipConfirmationControllerSpec extends SpecBase {
           .set(OriginalPartnershipAnswersQuery, original)
           .success
           .value
-          .set(PartnershipPartnershipNamePage, partnershippartnershipName)
+          .set(PartnershipNamePage, partnershipName)
           .success
           .value
 

@@ -25,7 +25,7 @@ case class OriginalPartnershipAnswers(
   addressYesNo: Option[Boolean],
   address: Option[Address],
   partnershipContactMethodsYesNo: Option[Boolean],
-  partnershipContactMethodOptions: Option[Set[PartnershipContactMethodOptions]],
+  partnershipContactMethodOptions: Set[PartnershipContactMethodOptions],
   email: Option[String],
   phone: Option[String],
   mobile: Option[String],

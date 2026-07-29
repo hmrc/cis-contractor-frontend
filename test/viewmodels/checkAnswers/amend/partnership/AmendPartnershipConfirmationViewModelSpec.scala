@@ -41,7 +41,7 @@ class AmendPartnershipConfirmationViewModelSpec extends SpecBase {
         )
       ),
       partnershipContactMethodsYesNo = Some(true),
-      partnershipContactMethod = Set(ContactMethodOptions.Email),
+      partnershipContactMethodOptions = Set(ContactMethodOptions.Email),
       email = Some("partnership@test.com"),
       phone = None,
       mobile = None,
@@ -51,7 +51,7 @@ class AmendPartnershipConfirmationViewModelSpec extends SpecBase {
       nominatedPartnerCrn = Some("87654321"),
       nominatedPartnerName = Some("nominated partner name"),
       nominatedPartnerUtrYesNo = Some(true),
-      nominatedPartnerUtr =Some(""),
+      nominatedPartnerUtr = Some("8888888888"),
       nominatedPartnerNinoYesNo = Some(true),
       nominatedPartnerNino = Some("AB123456"),
       nominatedPartnerWorksReferenceYesNo = Some(true),
@@ -107,13 +107,13 @@ class AmendPartnershipConfirmationViewModelSpec extends SpecBase {
       .set(PartnershipNominatedPartnerUtrYesNoPage, true)
       .success
       .value
-      .set(PartnershipNominatedPartnerUtrPage, "87654321")
+      .set(PartnershipNominatedPartnerUtrPage, "8888888888")
       .success
       .value
       .set(PartnershipNominatedPartnerNinoYesNoPage, true)
       .success
       .value
-      .set(PartnershipNominatedPartnerNinoPage, "87654321")
+      .set(PartnershipNominatedPartnerNinoPage, "AB123456")
       .success
       .value
       .set(PartnershipWorksReferenceNumberYesNoPage, true)
@@ -128,7 +128,7 @@ class AmendPartnershipConfirmationViewModelSpec extends SpecBase {
     "must return no rows when nothing has changed" in {
 
       val result =
-        PartnershipAmendConfirmationViewModel.rows(original, answersMatchingOriginal)
+        AmendPartnershipConfirmationViewModel.rows(original, answersMatchingOriginal)
 
       result mustBe empty
     }
@@ -142,7 +142,7 @@ class AmendPartnershipConfirmationViewModelSpec extends SpecBase {
           .value
 
       val result =
-        PartnershipAmendConfirmationViewModel.rows(original, answers)
+        AmendPartnershipConfirmationViewModel.rows(original, answers)
 
       val row = result.head
 
@@ -162,7 +162,7 @@ class AmendPartnershipConfirmationViewModelSpec extends SpecBase {
           .value
 
       val result =
-        PartnershipAmendConfirmationViewModel.rows(original, answers)
+        AmendPartnershipConfirmationViewModel.rows(original, answers)
 
       result must have size 2
 
@@ -194,7 +194,7 @@ class AmendPartnershipConfirmationViewModelSpec extends SpecBase {
           .value
 
       val result =
-        PartnershipAmendConfirmationViewModel.rows(original, answers)
+        AmendPartnershipConfirmationViewModel.rows(original, answers)
 
       val row = result.head
 
@@ -222,7 +222,7 @@ class AmendPartnershipConfirmationViewModelSpec extends SpecBase {
           .value
 
       val result =
-        PartnershipAmendConfirmationViewModel.rows(original, answers)
+        AmendPartnershipConfirmationViewModel.rows(original, answers)
 
       val row = result.head
 
@@ -246,7 +246,7 @@ class AmendPartnershipConfirmationViewModelSpec extends SpecBase {
           .value
 
       val result =
-        PartnershipAmendConfirmationViewModel.rows(original, answers)
+        AmendPartnershipConfirmationViewModel.rows(original, answers)
 
       result must have size 3
 
@@ -281,7 +281,7 @@ class AmendPartnershipConfirmationViewModelSpec extends SpecBase {
           .value
 
       val result =
-        PartnershipAmendConfirmationViewModel.rows(original, answers)
+        AmendPartnershipConfirmationViewModel.rows(original, answers)
 
       result must have size 1
 
@@ -312,7 +312,7 @@ class AmendPartnershipConfirmationViewModelSpec extends SpecBase {
           .value
 
       val result =
-        PartnershipAmendConfirmationViewModel.rows(original, answers)
+        AmendPartnershipConfirmationViewModel.rows(original, answers)
 
       result must have size 3
 
@@ -342,7 +342,7 @@ class AmendPartnershipConfirmationViewModelSpec extends SpecBase {
           .value
 
       val result =
-        PartnershipAmendConfirmationViewModel.rows(original, answers)
+        AmendPartnershipConfirmationViewModel.rows(original, answers)
 
       val row = result.head
 
@@ -360,7 +360,7 @@ class AmendPartnershipConfirmationViewModelSpec extends SpecBase {
           .value
 
       val result =
-        PartnershipAmendConfirmationViewModel.rows(original, answers)
+        AmendPartnershipConfirmationViewModel.rows(original, answers)
 
       val row = result.head
 
@@ -373,7 +373,7 @@ class AmendPartnershipConfirmationViewModelSpec extends SpecBase {
 
       val originalPhone =
         original.copy(
-          partnershipContactMethod = Set(ContactMethodOptions.Phone),
+          partnershipContactMethodOptions = Set(ContactMethodOptions.Phone),
           email = None,
           phone = Some("01131234567")
         )
@@ -391,7 +391,7 @@ class AmendPartnershipConfirmationViewModelSpec extends SpecBase {
           .value
 
       val result =
-        PartnershipAmendConfirmationViewModel.rows(originalPhone, answers)
+        AmendPartnershipConfirmationViewModel.rows(originalPhone, answers)
 
       val row = result.head
 
@@ -409,7 +409,7 @@ class AmendPartnershipConfirmationViewModelSpec extends SpecBase {
           .value
 
       val result =
-        PartnershipAmendConfirmationViewModel.rows(original, answers)
+        AmendPartnershipConfirmationViewModel.rows(original, answers)
 
       val row = result.head
 
@@ -421,7 +421,7 @@ class AmendPartnershipConfirmationViewModelSpec extends SpecBase {
     "must return a mobile row when the mobile number changes" in {
       val originalMobile =
         original.copy(
-          partnershipContactMethod = Set(ContactMethodOptions.Mobile),
+          partnershipContactMethodOptions = Set(ContactMethodOptions.Mobile),
           email = None,
           mobile = Some("07700900123")
         )
@@ -439,7 +439,7 @@ class AmendPartnershipConfirmationViewModelSpec extends SpecBase {
           .value
 
       val result =
-        PartnershipAmendConfirmationViewModel.rows(originalMobile, answers)
+        AmendPartnershipConfirmationViewModel.rows(originalMobile, answers)
 
       val row = result.head
 
@@ -466,7 +466,7 @@ class AmendPartnershipConfirmationViewModelSpec extends SpecBase {
           .value
 
       val result =
-        PartnershipAmendConfirmationViewModel.rows(original, answers)
+        AmendPartnershipConfirmationViewModel.rows(original, answers)
 
       result must have size 2
 
@@ -488,16 +488,16 @@ class AmendPartnershipConfirmationViewModelSpec extends SpecBase {
 
       val answers =
         answersMatchingOriginal
-          .set(PartnershipUtrPage, "2000000000")
+          .set(PartnershipUniqueTaxpayerReferencePage, "2000000000")
           .success
           .value
 
       val result =
-        PartnershipAmendConfirmationViewModel.rows(original, answers)
+        AmendPartnershipConfirmationViewModel.rows(original, answers)
 
       val row = result.head
 
-      row.head.content mustBe Text(msgs("partnershipUtr.checkYourAnswersLabel"))
+      row.head.content mustBe Text(msgs("partnershipUniqueTaxpayerReference.checkYourAnswersLabel"))
       row(1).content mustBe Text("1123456789")
       row(2).content mustBe Text("2000000000")
     }
@@ -505,23 +505,23 @@ class AmendPartnershipConfirmationViewModelSpec extends SpecBase {
     "must return a CRN yes/no row when the answer changes" in {
       val answers =
         answersMatchingOriginal
-          .set(PartnershipCrnYesNoPage, false)
+          .set(PartnershipNominatedPartnerCrnYesNoPage, false)
           .success
           .value
 
       val result =
-        PartnershipAmendConfirmationViewModel.rows(original, answers)
+        AmendPartnershipConfirmationViewModel.rows(original, answers)
 
       result must have size 2
 
       val yesNoRow = result.head
       val crnRow   = result(1)
 
-      yesNoRow.head.content mustBe Text(msgs("nominatedPartnerCrnYesNo.checkYourAnswersLabel"))
+      yesNoRow.head.content mustBe Text(msgs("partnershipNominatedPartnerCrnYesNo.checkYourAnswersLabel"))
       yesNoRow(1).content mustBe Text(msgs("site.yes"))
       yesNoRow(2).content mustBe Text(msgs("site.no"))
 
-      crnRow.head.content mustBe Text(msgs("nominatedPartnerCrn.checkYourAnswersLabel"))
+      crnRow.head.content mustBe Text(msgs("partnershipNominatedPartnerCrn.checkYourAnswersLabel"))
       crnRow(1).content mustBe Text("87654321")
       crnRow(2).content mustBe Text(msgs("amendConfirmation.table.content.none"))
     }
@@ -529,16 +529,16 @@ class AmendPartnershipConfirmationViewModelSpec extends SpecBase {
     "must return a CRN row when the CRN changes" in {
       val answers =
         answersMatchingOriginal
-          .set(PartnershipNominatedCrnPage, "12345678")
+          .set(PartnershipNominatedPartnerCrnPage, "12345678")
           .success
           .value
 
       val result =
-        PartnershipAmendConfirmationViewModel.rows(original, answers)
+        AmendPartnershipConfirmationViewModel.rows(original, answers)
 
       val row = result.head
 
-      row.head.content mustBe Text(msgs("nominatedPartnerCrn.checkYourAnswersLabel"))
+      row.head.content mustBe Text(msgs("partnershipNominatedPartnerCrn.checkYourAnswersLabel"))
       row(1).content mustBe Text("87654321")
       row(2).content mustBe Text("12345678")
     }
@@ -552,7 +552,7 @@ class AmendPartnershipConfirmationViewModelSpec extends SpecBase {
           .value
 
       val result =
-        PartnershipAmendConfirmationViewModel.rows(original, answers)
+        AmendPartnershipConfirmationViewModel.rows(original, answers)
 
       result must have size 2
 
@@ -577,7 +577,7 @@ class AmendPartnershipConfirmationViewModelSpec extends SpecBase {
           .value
 
       val result =
-        PartnershipAmendConfirmationViewModel.rows(original, answers)
+        AmendPartnershipConfirmationViewModel.rows(original, answers)
 
       val row = result.head
 
@@ -595,7 +595,7 @@ class AmendPartnershipConfirmationViewModelSpec extends SpecBase {
           .value
 
       val result =
-        PartnershipAmendConfirmationViewModel.rows(original, answers)
+        AmendPartnershipConfirmationViewModel.rows(original, answers)
 
       result must have size 2
 
@@ -606,7 +606,7 @@ class AmendPartnershipConfirmationViewModelSpec extends SpecBase {
       yesNoRow(1).content mustBe Text(msgs("site.yes"))
       yesNoRow(2).content mustBe Text(msgs("site.no"))
 
-      utrRow.head.content mustBe Text(msgs("partnershipUtr.checkYourAnswersLabel"))
+      utrRow.head.content mustBe Text(msgs("partnershipUniqueTaxpayerReference.checkYourAnswersLabel"))
       utrRow(1).content mustBe Text("1123456789")
       utrRow(2).content mustBe Text(msgs("amendConfirmation.table.content.none"))
     }
@@ -615,25 +615,25 @@ class AmendPartnershipConfirmationViewModelSpec extends SpecBase {
 
       val answers =
         answersMatchingOriginal
-          .set(PartnershipHasUtrYesNoPage, false)
+          .set(PartnershipNominatedPartnerUtrYesNoPage, false)
           .success
           .value
 
       val result =
-        PartnershipAmendConfirmationViewModel.rows(original, answers)
+        AmendPartnershipConfirmationViewModel.rows(original, answers)
 
       result must have size 2
 
-      val yesNoRow = result.head
-      val utrRow = result(1)
+      val yesNoRow        = result.head
+      val nominatedUtrRow = result(1)
 
-      yesNoRow.head.content mustBe Text(msgs("partnershipNominatedPartnersUtrYesNo.checkYourAnswersLabel"))
+      yesNoRow.head.content mustBe Text(msgs("partnershipNominatedPartnerUtrYesNo.checkYourAnswersLabel"))
       yesNoRow(1).content mustBe Text(msgs("site.yes"))
       yesNoRow(2).content mustBe Text(msgs("site.no"))
 
-      utrRow.head.content mustBe Text(msgs("partnershipUtr.checkYourAnswersLabel"))
-      utrRow(1).content mustBe Text("1123456789")
-      utrRow(2).content mustBe Text(msgs("amendConfirmation.table.content.none"))
+      nominatedUtrRow.head.content mustBe Text(msgs("partnershipNominatedPartnerUtr.checkYourAnswersLabel"))
+      nominatedUtrRow(1).content mustBe Text("8888888888")
+      nominatedUtrRow(2).content mustBe Text(msgs("amendConfirmation.table.content.none"))
     }
 
     "must return rows in the expected order when multiple sections change" in {
@@ -642,7 +642,7 @@ class AmendPartnershipConfirmationViewModelSpec extends SpecBase {
           .set(PartnershipNamePage, "XYZ Partnership")
           .success
           .value
-          .set(PartnershipUtrPage, "2000000000")
+          .set(PartnershipUniqueTaxpayerReferencePage, "2000000000")
           .success
           .value
           .set(
@@ -658,13 +658,13 @@ class AmendPartnershipConfirmationViewModelSpec extends SpecBase {
           .value
 
       val result =
-        PartnershipPartnershipAmendConfirmationViewModel.rows(original, answers)
+        AmendPartnershipConfirmationViewModel.rows(original, answers)
 
       result must have size 3
 
       result(0).head.content mustBe Text(msgs("partnershipName.checkYourAnswersLabel"))
       result(1).head.content mustBe Text(msgs("partnershipAddress.checkYourAnswersLabel"))
-      result(2).head.content mustBe Text(msgs("partnershippartnershipUtr.checkYourAnswersLabel"))
+      result(2).head.content mustBe Text(msgs("partnershipUniqueTaxpayerReference.checkYourAnswersLabel"))
     }
   }
 }

@@ -42,11 +42,9 @@ class OriginalPartnershipAnswersSpec extends AnyWordSpec with Matchers {
           )
         ),
         partnershipContactMethodsYesNo = Some(true),
-        partnershipContactMethodOptions = Some(
-          Set(
-            ContactMethodOptions.Email,
-            ContactMethodOptions.Phone
-          )
+        partnershipContactMethodOptions = Set(
+          ContactMethodOptions.Email,
+          ContactMethodOptions.Phone
         ),
         email = Some("test@test.com"),
         phone = Some("01234567890"),
@@ -74,7 +72,7 @@ class OriginalPartnershipAnswersSpec extends AnyWordSpec with Matchers {
         addressYesNo = None,
         address = None,
         partnershipContactMethodsYesNo = None,
-        partnershipContactMethodOptions = None,
+        partnershipContactMethodOptions = Set.empty,
         email = None,
         phone = None,
         mobile = None,
