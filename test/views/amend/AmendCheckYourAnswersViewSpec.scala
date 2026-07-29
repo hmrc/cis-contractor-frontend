@@ -30,11 +30,14 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.*
 import views.html.amend.AmendCheckYourAnswersView
 
+import java.util
+
 class AmendCheckYourAnswersViewSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite {
 
   "AmendCheckYourAnswersView" should {
 
     "render the page with headings, summary lists, buttons and cancel link" in new Setup {
+
       val html: HtmlFormat.Appendable =
         view(informationList, detailsList, subcontractorName, submitUrl, cancelUrl)
 
@@ -46,7 +49,7 @@ class AmendCheckYourAnswersViewSpec extends AnyWordSpec with Matchers with Guice
       val h1: Elements = doc.select("h1")
       h1.text() mustBe subcontractorName
 
-      val h2s = doc.select("h2").eachText()
+      val h2s: util.List[String] = doc.select("h2").eachText()
 
       h2s must contain(messages("amendCheckYourAnswers.heading.subcontractorInformation.h2"))
       h2s must contain(messages("amendCheckYourAnswers.heading.moreDetails.h2"))
@@ -61,7 +64,7 @@ class AmendCheckYourAnswersViewSpec extends AnyWordSpec with Matchers with Guice
       doc
         .select("form")
         .attr("action") mustBe
-        controllers.amend.company.routes.AmendCompanyCheckYourAnswersController
+        controllers.amend.trust.routes.AmendTrustCheckYourAnswersController
           .onSubmit()
           .url
 
@@ -90,20 +93,20 @@ class AmendCheckYourAnswersViewSpec extends AnyWordSpec with Matchers with Guice
     val view: AmendCheckYourAnswersView =
       app.injector.instanceOf[AmendCheckYourAnswersView]
 
-    val subcontractorName = "Test Company"
+    val subcontractorName = "Test Trust"
 
     val submitUrl: Call =
-      controllers.amend.company.routes.AmendCompanyCheckYourAnswersController.onSubmit()
+      controllers.amend.trust.routes.AmendTrustCheckYourAnswersController.onSubmit()
 
     val cancelUrl: Call =
-      controllers.amend.company.routes.AmendCompanyCheckYourAnswersController.onCancel()
+      controllers.amend.trust.routes.AmendTrustCheckYourAnswersController.onCancel()
 
     val informationList: SummaryList =
       SummaryList(
         rows = Seq(
           SummaryListRow(
             key = Key(Text("Type")),
-            value = Value(Text("LimitedCompany"))
+            value = Value(Text("Trust"))
           )
         )
       )

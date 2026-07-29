@@ -27,11 +27,12 @@
     govukButton: GovukButton,
     formHelper: FormWithCSRF
 )
+
 @(informationList: SummaryList, detailsList: SummaryList, subcontractorName: String, submitUrl: Call, cancelUrl: Call)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = titleNoForm(messages("amendCheckYourAnswers.title"))) {
 
-    @formHelper(action = submitUrl, Symbol("autoComplete") -> "off") {
+@formHelper(action = submitUrl, Symbol("autoComplete") -> "off") {
         <h1 class="govuk-heading-l">@subcontractorName</h1>
         @h2("amendCheckYourAnswers.heading.subcontractorInformation.h2")
 
