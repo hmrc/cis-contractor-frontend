@@ -189,6 +189,7 @@ class AmendTrustController @Inject() (
       utrYesNo = Some(subcontractor.utr.isDefined),
       utr = subcontractor.utr,
       worksReferenceYesNo = Some(subcontractor.worksReferenceNumber.isDefined),
-      worksReference = subcontractor.worksReferenceNumber
+      worksReference = subcontractor.worksReferenceNumber,
+      verificationNumber = subcontractor.verificationNumber
     )
 }

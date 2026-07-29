@@ -30,7 +30,7 @@ class TrustNavigatorSpec extends SpecBase {
   val navigator                    = new TrustNavigator
   private lazy val journeyRecovery = routes.JourneyRecoveryController.onPageLoad()
   private lazy val trustCYA        = controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
-  private lazy val trustAmendCYA   = journeyRecovery // TODO: redirect to amend cya page when implemented
+  private lazy val trustAmendCYA   = controllers.amend.trust.routes.AmendTrustCheckYourAnswersController.onPageLoad()
 
   "TrustNavigator" - {
 
@@ -372,13 +372,13 @@ class TrustNavigatorSpec extends SpecBase {
 
     "in Amend mode" - {
 
-      "must go from any page to JourneyRecovery" in {
+      "must go from any page to amend Cya Page" in {
         case object UnknownPage extends Page
-        navigator.nextPage(UnknownPage, AmendMode, UserAnswers("id")) mustBe journeyRecovery
+        navigator.nextPage(UnknownPage, AmendMode, UserAnswers("id")) mustBe trustAmendCYA
       }
 
-      "must go from TrustNamePage to JourneyRecovery" in {
-        navigator.nextPage(TrustNamePage, AmendMode, UserAnswers("id")) mustBe journeyRecovery
+      "must go from TrustNamePage to amend cya page" in {
+        navigator.nextPage(TrustNamePage, AmendMode, UserAnswers("id")) mustBe trustAmendCYA
       }
 
       "must go from TrustAddressYesNoPage" - {
@@ -424,45 +424,350 @@ class TrustNavigatorSpec extends SpecBase {
         }
       }
 
-      "must go from AddTrustContactMethodsYesNo" - {
-        "to amend CYA when answer is Yes and TrustContactMethodOptions already answered" in {
-          val answers = emptyUserAnswers
-            .setOrException(AddTrustContactMethodsYesNoPage, true)
-            .setOrException(TrustContactMethodOptionsPage, Set(ContactMethodOptions.Email, ContactMethodOptions.Phone))
+      "contact method options" - {
+        "must go from AddTrustContactMethodsYesNoPage" - {
+          "to CYA when answer is Yes and TrustContactMethodOptions already answered" in {
+            val answers = emptyUserAnswers
+              .setOrException(AddTrustContactMethodsYesNoPage, true)
+              .setOrException(
+                TrustContactMethodOptionsPage,
+                Set(ContactMethodOptions.Email, ContactMethodOptions.Phone)
+              )
 
-          navigator.nextPage(
-            AddTrustContactMethodsYesNoPage,
-            AmendMode,
-            answers
-          ) mustBe trustAmendCYA
+            navigator.nextPage(
+              AddTrustContactMethodsYesNoPage,
+              AmendMode,
+              answers
+            ) mustBe trustAmendCYA
+          }
+
+          "to TrustContactMethodOptions page when answer is Yes and TrustContactMethodOptions not yet answered" in {
+            val answers = emptyUserAnswers.setOrException(AddTrustContactMethodsYesNoPage, true)
+
+            navigator.nextPage(
+              AddTrustContactMethodsYesNoPage,
+              AmendMode,
+              answers
+            ) mustBe controllers.add.trust.routes.TrustContactMethodOptionsController.onPageLoad(AmendMode)
+          }
+
+          "to CYA when answer is No" in {
+            val answers = emptyUserAnswers.set(AddTrustContactMethodsYesNoPage, false).success.value
+
+            navigator.nextPage(
+              AddTrustContactMethodsYesNoPage,
+              AmendMode,
+              answers
+            ) mustBe trustAmendCYA
+          }
+
+          "to JourneyRecovery when answer is not present" in {
+            navigator.nextPage(
+              AddTrustContactMethodsYesNoPage,
+              AmendMode,
+              emptyUserAnswers
+            ) mustBe journeyRecovery
+          }
         }
 
-        "to TrustContactMethodOptions page when answer is Yes and TrustContactMethodOptions not yet answered" in {
-          val answers = emptyUserAnswers.setOrException(AddTrustContactMethodsYesNoPage, true)
+        "must go from TrustContactMethodOptions" - {
+          "to TrustEmailAddressPage when Email is selected and Email answer not exist" in {
+            val answers = emptyUserAnswers
+              .set(
+                TrustContactMethodOptionsPage,
+                Set(ContactMethodOptions.Email)
+              )
+              .success
+              .value
 
-          navigator.nextPage(
-            AddTrustContactMethodsYesNoPage,
-            AmendMode,
-            answers
-          ) mustBe controllers.add.trust.routes.TrustContactMethodOptionsController.onPageLoad(AmendMode)
+            navigator.nextPage(
+              TrustContactMethodOptionsPage,
+              AmendMode,
+              answers
+            ) mustBe controllers.add.trust.routes.TrustEmailAddressController.onPageLoad(AmendMode)
+          }
+
+          "to TrustEmailAddressPage when Email, Phone and Mobile are selected and no Email answer not exist" in {
+            val answers = emptyUserAnswers
+              .set(
+                TrustContactMethodOptionsPage,
+                Set(ContactMethodOptions.Email, ContactMethodOptions.Phone, ContactMethodOptions.Mobile)
+              )
+              .success
+              .value
+
+            navigator.nextPage(
+              TrustContactMethodOptionsPage,
+              AmendMode,
+              answers
+            ) mustBe controllers.add.trust.routes.TrustEmailAddressController.onPageLoad(AmendMode)
+          }
+
+          "to CYA when only Email is selected and Email answer exists" in {
+            val answers = emptyUserAnswers
+              .set(TrustContactMethodOptionsPage, Set(ContactMethodOptions.Email))
+              .success
+              .value
+              .set(TrustEmailAddressPage, "test@test.com")
+              .success
+              .value
+
+            navigator.nextPage(
+              TrustContactMethodOptionsPage,
+              AmendMode,
+              answers
+            ) mustBe trustAmendCYA
+          }
+
+          "to TrustPhoneNumberPage when Phone is selected (Email is not selected) and Phone answer not exists" in {
+            val answers = emptyUserAnswers
+              .set(
+                TrustContactMethodOptionsPage,
+                Set(ContactMethodOptions.Phone)
+              )
+              .success
+              .value
+
+            navigator.nextPage(
+              TrustContactMethodOptionsPage,
+              AmendMode,
+              answers
+            ) mustBe controllers.add.trust.routes.TrustPhoneNumberController.onPageLoad(AmendMode)
+          }
+
+          "to CYA when only Phone is selected and Phone answer exists" in {
+            val answers = emptyUserAnswers
+              .set(TrustContactMethodOptionsPage, Set(ContactMethodOptions.Phone))
+              .success
+              .value
+              .set(TrustPhoneNumberPage, "01234567890")
+              .success
+              .value
+
+            navigator.nextPage(
+              TrustContactMethodOptionsPage,
+              AmendMode,
+              answers
+            ) mustBe trustAmendCYA
+          }
+
+          "to CYA when only Mobile is selected and Mobile answer exists" in {
+            val answers = emptyUserAnswers
+              .set(TrustContactMethodOptionsPage, Set(ContactMethodOptions.Mobile))
+              .success
+              .value
+              .set(TrustMobileNumberPage, "01234567890")
+              .success
+              .value
+
+            navigator.nextPage(
+              TrustContactMethodOptionsPage,
+              AmendMode,
+              answers
+            ) mustBe trustAmendCYA
+          }
+
+          "to TrustPhoneNumberPage when Email and Phone are selected and Email answer exists, Phone answer not exists" in {
+            val answers = emptyUserAnswers
+              .set(TrustContactMethodOptionsPage, Set(ContactMethodOptions.Email, ContactMethodOptions.Phone))
+              .success
+              .value
+              .set(TrustEmailAddressPage, "test@test.com")
+              .success
+              .value
+
+            navigator.nextPage(
+              TrustContactMethodOptionsPage,
+              AmendMode,
+              answers
+            ) mustBe controllers.add.trust.routes.TrustPhoneNumberController.onPageLoad(AmendMode)
+          }
+
+          "to TrustMobileNumberPage when Email, Phone and Mobile are selected and Email and Phone answer exists, Mobile answer not exists" in {
+            val answers = emptyUserAnswers
+              .set(
+                TrustContactMethodOptionsPage,
+                Set(ContactMethodOptions.Email, ContactMethodOptions.Phone, ContactMethodOptions.Mobile)
+              )
+              .success
+              .value
+              .set(TrustEmailAddressPage, "test@test.com")
+              .success
+              .value
+              .set(TrustPhoneNumberPage, "01234567890")
+              .success
+              .value
+
+            navigator.nextPage(
+              TrustContactMethodOptionsPage,
+              AmendMode,
+              answers
+            ) mustBe controllers.add.trust.routes.TrustMobileNumberController.onPageLoad(AmendMode)
+          }
+
+          "to JourneyRecovery when answer is not present" in {
+            navigator.nextPage(
+              TrustContactMethodOptionsPage,
+              AmendMode,
+              emptyUserAnswers
+            ) mustBe journeyRecovery
+          }
         }
 
-        "to amend CYA when answer is No" in {
-          val answers = emptyUserAnswers.set(AddTrustContactMethodsYesNoPage, false).success.value
+        "must go from TrustEmailAddressPage" - {
 
-          navigator.nextPage(
-            AddTrustContactMethodsYesNoPage,
-            AmendMode,
-            answers
-          ) mustBe trustAmendCYA
+          "to TrustCheckYourAnswers when no missing ContactMethodOptions answer" in {
+            navigator.nextPage(
+              TrustContactMethodOptionsPage,
+              AmendMode,
+              emptyUserAnswers
+                .setOrException(
+                  TrustContactMethodOptionsPage,
+                  Set(ContactMethodOptions.Email, ContactMethodOptions.Phone, ContactMethodOptions.Mobile)
+                )
+                .setOrException(TrustEmailAddressPage, "test@test.com")
+                .setOrException(TrustPhoneNumberPage, "1234567")
+                .setOrException(TrustMobileNumberPage, "1234567")
+            ) mustBe trustAmendCYA
+          }
+
+          "to TrustPhoneNumberPage when TrustPhoneNumber is missing from ContactMethodOptions answer" in {
+            navigator.nextPage(
+              TrustEmailAddressPage,
+              AmendMode,
+              emptyUserAnswers
+                .setOrException(
+                  TrustContactMethodOptionsPage,
+                  Set(ContactMethodOptions.Email, ContactMethodOptions.Phone, ContactMethodOptions.Mobile)
+                )
+                .setOrException(TrustEmailAddressPage, "test@test.com")
+                .setOrException(TrustMobileNumberPage, "1234567")
+            ) mustBe controllers.add.trust.routes.TrustPhoneNumberController.onPageLoad(AmendMode)
+          }
+
+          "to TrustMobileNumberPage when TrustMobileNumber is missing from ContactMethodOptions answer" in {
+            navigator.nextPage(
+              TrustEmailAddressPage,
+              AmendMode,
+              emptyUserAnswers
+                .setOrException(
+                  TrustContactMethodOptionsPage,
+                  Set(ContactMethodOptions.Email, ContactMethodOptions.Phone, ContactMethodOptions.Mobile)
+                )
+                .setOrException(TrustEmailAddressPage, "test@test.com")
+                .setOrException(TrustPhoneNumberPage, "1234567")
+            ) mustBe controllers.add.trust.routes.TrustMobileNumberController.onPageLoad(AmendMode)
+          }
+
+          "to JourneyRecovery when TrustContactMethodOptions answer is not present" in {
+            navigator.nextPage(
+              TrustEmailAddressPage,
+              AmendMode,
+              UserAnswers("id")
+            ) mustBe journeyRecovery
+          }
+
+          "to JourneyRecovery when Email is not in the selected TrustContactMethodOptions" in {
+            navigator.nextPage(
+              TrustEmailAddressPage,
+              AmendMode,
+              emptyUserAnswers
+                .setOrException(
+                  TrustContactMethodOptionsPage,
+                  Set(ContactMethodOptions.Phone, ContactMethodOptions.Mobile)
+                )
+            ) mustBe journeyRecovery
+          }
         }
 
-        "to JourneyRecovery when answer is not present" in {
-          navigator.nextPage(
-            AddTrustContactMethodsYesNoPage,
-            AmendMode,
-            emptyUserAnswers
-          ) mustBe journeyRecovery
+        "must go from TrustPhoneNumberPage" - {
+
+          "to TrustCheckYourAnswers when no missing ContactMethodOptions answer" in {
+            navigator.nextPage(
+              TrustPhoneNumberPage,
+              AmendMode,
+              emptyUserAnswers
+                .setOrException(
+                  TrustContactMethodOptionsPage,
+                  Set(ContactMethodOptions.Email, ContactMethodOptions.Phone, ContactMethodOptions.Mobile)
+                )
+                .setOrException(TrustEmailAddressPage, "test@test.com")
+                .setOrException(TrustPhoneNumberPage, "1234567")
+                .setOrException(TrustMobileNumberPage, "1234567")
+            ) mustBe trustAmendCYA
+          }
+
+          "to TrustMobileNumberPage when TrustMobileNumber is missing from ContactMethodOptions answer" in {
+            navigator.nextPage(
+              TrustPhoneNumberPage,
+              AmendMode,
+              emptyUserAnswers
+                .setOrException(
+                  TrustContactMethodOptionsPage,
+                  Set(ContactMethodOptions.Email, ContactMethodOptions.Phone, ContactMethodOptions.Mobile)
+                )
+                .setOrException(TrustEmailAddressPage, "test@test.com")
+                .setOrException(TrustPhoneNumberPage, "1234567")
+            ) mustBe controllers.add.trust.routes.TrustMobileNumberController.onPageLoad(AmendMode)
+          }
+
+          "to JourneyRecovery when TrustContactMethodOptions answer is not present" in {
+            navigator.nextPage(
+              TrustPhoneNumberPage,
+              AmendMode,
+              UserAnswers("id")
+            ) mustBe journeyRecovery
+          }
+
+          "to JourneyRecovery when Phone is not in the selected TrustContactMethodOptions" in {
+            navigator.nextPage(
+              TrustPhoneNumberPage,
+              AmendMode,
+              emptyUserAnswers
+                .setOrException(
+                  TrustContactMethodOptionsPage,
+                  Set(ContactMethodOptions.Email, ContactMethodOptions.Mobile)
+                )
+            ) mustBe journeyRecovery
+          }
+        }
+
+        "must go from TrustMobileNumberPage" - {
+
+          "to TrustCheckYourAnswers" in {
+            navigator.nextPage(
+              TrustMobileNumberPage,
+              AmendMode,
+              emptyUserAnswers
+                .setOrException(
+                  TrustContactMethodOptionsPage,
+                  Set(ContactMethodOptions.Email, ContactMethodOptions.Phone, ContactMethodOptions.Mobile)
+                )
+                .setOrException(TrustEmailAddressPage, "test@test.com")
+                .setOrException(TrustPhoneNumberPage, "1234567")
+                .setOrException(TrustMobileNumberPage, "1234567")
+            ) mustBe trustAmendCYA
+          }
+
+          "to JourneyRecovery when TrustContactMethodOptions answer is not present" in {
+            navigator.nextPage(
+              TrustMobileNumberPage,
+              AmendMode,
+              UserAnswers("id")
+            ) mustBe journeyRecovery
+          }
+
+          "to JourneyRecovery when Mobile is not in the selected TrustContactMethodOptions" in {
+            navigator.nextPage(
+              TrustMobileNumberPage,
+              AmendMode,
+              emptyUserAnswers
+                .setOrException(
+                  TrustContactMethodOptionsPage,
+                  Set(ContactMethodOptions.Email, ContactMethodOptions.Phone)
+                )
+            ) mustBe journeyRecovery
+          }
         }
       }
 
