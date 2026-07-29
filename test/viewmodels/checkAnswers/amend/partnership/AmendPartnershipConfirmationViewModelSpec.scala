@@ -55,7 +55,8 @@ class AmendPartnershipConfirmationViewModelSpec extends SpecBase {
       nominatedPartnerNinoYesNo = Some(true),
       nominatedPartnerNino = Some("AB123456"),
       nominatedPartnerWorksReferenceYesNo = Some(true),
-      nominatedPartnerWorksReference = Some("WR123")
+      nominatedPartnerWorksReference = Some("WR123"),
+      verificationNumber = Some("V100000")
     )
 
   private val answersMatchingOriginal =

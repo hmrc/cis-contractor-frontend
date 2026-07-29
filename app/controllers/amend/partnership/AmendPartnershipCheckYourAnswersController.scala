@@ -49,8 +49,10 @@ class AmendPartnershipCheckYourAnswersController @Inject() (
   subcontractorService: SubcontractorService,
   sessionRepository: SessionRepository,
   view: AmendCheckYourAnswersView
-) (implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport
-  with Logging {
+)(implicit ec: ExecutionContext)
+    extends FrontendBaseController
+    with I18nSupport
+    with Logging {
 
   def onPageLoad(): Action[AnyContent] =
     (identify andThen getData andThen requireData) { implicit request =>
@@ -58,8 +60,8 @@ class AmendPartnershipCheckYourAnswersController @Inject() (
 
       ValidatedPartnership.build(ua) match {
         case Right(_) =>
-          val isVerified = ua.get(ShowVerificationDetailsPage)
-          val partnershipName  = ua.get(PartnershipNamePage).getOrElse("")
+          val isVerified      = ua.get(ShowVerificationDetailsPage)
+          val partnershipName = ua.get(PartnershipNamePage).getOrElse("")
 
           val subcontractorInformationList =
             SummaryListViewModel(rows = subcontractorInformationRows(ua, isVerified).flatten)
@@ -77,11 +79,11 @@ class AmendPartnershipCheckYourAnswersController @Inject() (
           Redirect(routes.JourneyRecoveryController.onPageLoad())
       }
     }
-    
+
   private def subcontractorInformationRows(
-                                            ua: UserAnswers,
-                                            isVerified: Option[Boolean]
-                                          )(implicit messages: Messages): Seq[Option[SummaryListRow]] = {
+    ua: UserAnswers,
+    isVerified: Option[Boolean]
+  )(implicit messages: Messages): Seq[Option[SummaryListRow]] = {
 
     val verificationRows =
       Option
@@ -106,9 +108,9 @@ class AmendPartnershipCheckYourAnswersController @Inject() (
   }
 
   private def detailsRows(
-                           ua: UserAnswers,
-                           isVerified: Option[Boolean]
-                         )(implicit messages: Messages): Seq[Option[SummaryListRow]] = {
+    ua: UserAnswers,
+    isVerified: Option[Boolean]
+  )(implicit messages: Messages): Seq[Option[SummaryListRow]] = {
 
     val nameRows =
       if (isVerified.contains(true)) {
@@ -150,14 +152,16 @@ class AmendPartnershipCheckYourAnswersController @Inject() (
         PartnershipWorksReferenceNumberSummary.row(ua, AmendMode)
       )
   }
-  
+
   def onSubmit(): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
       ValidatedPartnership.build(request.userAnswers) match {
         case Right(_) =>
           subcontractorService
             .createAndUpdateSubcontractor(request.userAnswers)
-            .map(_ => Redirect(controllers.amend.partnership.routes.AmendPartnershipCheckYourAnswersController.onPageLoad()))
+            .map(_ =>
+              Redirect(controllers.amend.partnership.routes.AmendPartnershipCheckYourAnswersController.onPageLoad())
+            )
             .recover { case t =>
               logger.error(
                 "[AmendPartnershipCheckYourAnswersController.onSubmit] Failed to update subcontractor",
@@ -172,9 +176,9 @@ class AmendPartnershipCheckYourAnswersController @Inject() (
       }
     }
 
-    def onCancel(): Action[AnyContent] = (identify andThen getData andThen requireData).async { implicit request =>
-      sessionRepository
-        .set(UserAnswers(request.userAnswers.id))
-        .map(_ => Redirect(routes.IndexController.onPageLoad()))
-    }
+  def onCancel(): Action[AnyContent] = (identify andThen getData andThen requireData).async { implicit request =>
+    sessionRepository
+      .set(UserAnswers(request.userAnswers.id))
+      .map(_ => Redirect(routes.IndexController.onPageLoad()))
+  }
 }

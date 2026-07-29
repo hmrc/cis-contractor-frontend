@@ -134,7 +134,8 @@ class AmendPartnershipControllerSpec extends SpecBase with MockitoSugar {
       nominatedPartnerCrnYesNo = Some(true),
       nominatedPartnerCrn = Some("AC012345"),
       nominatedPartnerWorksReferenceYesNo = Some(true),
-      nominatedPartnerWorksReference = Some("XLS345-MM")
+      nominatedPartnerWorksReference = Some("XLS345-MM"),
+      verificationNumber = Some("V100000")
     )
 
   "AmendPartnershipController" - {

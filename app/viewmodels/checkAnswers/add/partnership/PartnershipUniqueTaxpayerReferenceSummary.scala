@@ -26,7 +26,9 @@ import viewmodels.implicits.*
 
 object PartnershipUniqueTaxpayerReferenceSummary {
 
-  def row(answers: UserAnswers, mode: Mode = CheckMode, showActions: Boolean = true)(implicit messages: Messages): Option[SummaryListRow] =
+  def row(answers: UserAnswers, mode: Mode = CheckMode, showActions: Boolean = true)(implicit
+    messages: Messages
+  ): Option[SummaryListRow] =
     answers.get(PartnershipUniqueTaxpayerReferencePage).map { answer =>
       val value = ValueViewModel(answer)
       if (showActions) {
@@ -38,18 +40,18 @@ object PartnershipUniqueTaxpayerReferenceSummary {
             .withVisuallyHiddenText(messages("partnershipUniqueTaxpayerReference.change.hidden"))
             .withAttribute("id" -> "partnership-unique-taxpayer-reference")
         )
-          SummaryListRowViewModel(
+        SummaryListRowViewModel(
           key = "partnershipUniqueTaxpayerReference.checkYourAnswersLabel",
           value = value,
           actions = actions
         )
-    } else {
-    SummaryListRowViewModel(
-      key = "trustUtr.verified.checkYourAnswersLabel",
-      value = value,
-      actions = Seq.empty
-    )
-  }
-      
+      } else {
+        SummaryListRowViewModel(
+          key = "trustUtr.verified.checkYourAnswersLabel",
+          value = value,
+          actions = Seq.empty
+        )
+      }
+
     }
 }

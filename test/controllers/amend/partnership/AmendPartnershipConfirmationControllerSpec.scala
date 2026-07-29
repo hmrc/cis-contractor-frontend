@@ -48,7 +48,8 @@ class AmendPartnershipConfirmationControllerSpec extends SpecBase {
       nominatedPartnerCrnYesNo = None,
       nominatedPartnerCrn = None,
       nominatedPartnerWorksReferenceYesNo = None,
-      nominatedPartnerWorksReference = None
+      nominatedPartnerWorksReference = None,
+      verificationNumber = None
     )
 
   private def userAnswersWithOriginal =

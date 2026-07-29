@@ -207,6 +207,7 @@ class AmendPartnershipController @Inject() (
       nominatedPartnerCrnYesNo = Some(subcontractor.crn.isDefined),
       nominatedPartnerCrn = subcontractor.crn,
       nominatedPartnerWorksReferenceYesNo = Some(subcontractor.worksReferenceNumber.isDefined),
-      nominatedPartnerWorksReference = subcontractor.worksReferenceNumber
+      nominatedPartnerWorksReference = subcontractor.worksReferenceNumber,
+      verificationNumber = subcontractor.verificationNumber
     )
 }
