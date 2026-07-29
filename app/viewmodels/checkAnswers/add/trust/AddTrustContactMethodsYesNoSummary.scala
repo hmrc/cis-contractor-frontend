@@ -36,7 +36,7 @@ object AddTrustContactMethodsYesNoSummary {
         actions = Seq(
           ActionItemViewModel(
             "site.change",
-            controllers.add.trust.routes.AddTrustContactMethodsYesNoController.onPageLoad(CheckMode).url
+            controllers.add.trust.routes.AddTrustContactMethodsYesNoController.onPageLoad(mode).url
           )
             .withVisuallyHiddenText(messages("addTrustContactMethodsYesNo.change.hidden"))
             .withAttribute("id" -> "add-trust-contact-details")
