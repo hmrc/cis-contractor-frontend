@@ -82,8 +82,8 @@ POST  /subcontractor/amend/add-contact-details  controllers.add.AddIndividualCon
 GET   /subcontractor/amend/select-contact-details  controllers.add.IndividualContactMethodOptionsController.onPageLoad(mode: Mode = AmendMode)
 POST  /subcontractor/amend/select-contact-details  controllers.add.IndividualContactMethodOptionsController.onSubmit(mode: Mode = AmendMode)
 
-GET   /subcontractor/amend/trust/remove-subcontractor-information/:subcontractorDetail  controllers.amend.trust.AmendTrustRemoveDetailYesNoController.onPageLoad(subcontractorDetail: String)
-POST  /subcontractor/amend/trust/remove-subcontractor-information/:subcontractorDetail  controllers.amend.trust.AmendTrustRemoveDetailYesNoController.onSubmit(subcontractorDetail: String)
+GET   /subcontractor/amend/trust/remove/information/:subcontractorDetail  controllers.amend.trust.AmendTrustRemoveDetailYesNoController.onPageLoad(subcontractorDetail: String)
+POST  /subcontractor/amend/trust/remove/information/:subcontractorDetail  controllers.amend.trust.AmendTrustRemoveDetailYesNoController.onSubmit(subcontractorDetail: String)
 
 GET   /subcontractor/amend/individual/:cisId/:subbieResourceRef  controllers.amend.AmendIndividualController.onPageLoad(cisId: String, subbieResourceRef: Long)
 
@@ -101,6 +101,10 @@ POST  /subcontractor/amend/partnership-information  controllers.amend.partnershi
 
 GET   /subcontractor/amend/company-information  controllers.amend.company.AmendCompanyCheckYourAnswersController.onPageLoad()
 POST  /subcontractor/amend/company-information  controllers.amend.company.AmendCompanyCheckYourAnswersController.onSubmit()
+
+GET   /subcontractor/amend/trust/subcontractor-information  controllers.amend.trust.AmendTrustCheckYourAnswersController.onPageLoad()
+POST  /subcontractor/amend/trust/subcontractor-information  controllers.amend.trust.AmendTrustCheckYourAnswersController.onSubmit()
+GET   /subcontractor/amend/trust/cancel                     controllers.amend.trust.AmendTrustCheckYourAnswersController.onCancel()
 
 # Errors & Auth
 GET  /unauthorised/standard-user  controllers.UnauthorisedWrongRoleController.onPageLoad()
@@ -436,10 +440,6 @@ POST  /subcontractor/amend/partnership/select-contact-details       controllers.
 
 # Trust
 GET   /subcontractor/add/trust/subcontractor-added  controllers.add.SubcontractorAddedController.trustSubcontractorAdded()
-
-GET   /subcontractor/amend/trust/subcontractor-information  controllers.amend.trust.AmendTrustCheckYourAnswersController.onPageLoad()
-POST  /subcontractor/amend/trust/subcontractor-information  controllers.amend.trust.AmendTrustCheckYourAnswersController.onSubmit()
-GET   /subcontractor/amend/trust/cancel              controllers.amend.trust.AmendTrustCheckYourAnswersController.onCancel()
 
 GET   /subcontractor/add/trust/trust-name         controllers.add.trust.TrustNameController.onPageLoad(mode: Mode = NormalMode)
 POST  /subcontractor/add/trust/trust-name         controllers.add.trust.TrustNameController.onSubmit(mode: Mode = NormalMode)
