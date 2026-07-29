@@ -30,6 +30,7 @@ import org.mockito.Mockito.{never, times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import pages.add.TypeOfSubcontractorPage
 import pages.add.trust.*
+import pages.amend.ShowVerificationDetailsPage
 import play.api.inject.bind
 import play.api.mvc.MessagesControllerComponents
 import play.api.test.FakeRequest
@@ -1030,6 +1031,253 @@ class AmendTrustControllerSpec extends SpecBase with MockitoSugar {
 
           verify(mockSessionRepository, never())
             .set(any[UserAnswers])
+        }
+      }
+      "must redirect to JourneyRecovery and not save when the subcontractor is not a trust" in {
+        val mockService           = mock[SubcontractorService]
+        val mockSessionRepository = mock[SessionRepository]
+
+        val invalidSubcontractor =
+          subcontractor.copy(
+            subcontractorType = Some("partnership")
+          )
+
+        when(
+          mockService.getSubcontractor(
+            eqTo(cisId),
+            eqTo(subbieResourceRef)
+          )(any[HeaderCarrier])
+        ).thenReturn(
+          Future.successful(
+            response.copy(
+              subcontractor = Some(invalidSubcontractor)
+            )
+          )
+        )
+
+        val application =
+          applicationBuilder(userAnswers = Some(emptyUserAnswers))
+            .overrides(
+              bind[SubcontractorService].toInstance(mockService),
+              bind[SessionRepository].toInstance(mockSessionRepository)
+            )
+            .build()
+
+        running(application) {
+          val result =
+            route(
+              application,
+              FakeRequest(GET, amendTrustRoute)
+            ).value
+
+          status(result) mustBe SEE_OTHER
+
+          redirectLocation(result).value mustBe
+            controllers.routes.JourneyRecoveryController
+              .onPageLoad()
+              .url
+
+          verify(mockSessionRepository, never())
+            .set(any[UserAnswers])
+        }
+      }
+
+      "must redirect to JourneyRecovery and not save when the subcontractor type is missing" in {
+        val mockService           = mock[SubcontractorService]
+        val mockSessionRepository = mock[SessionRepository]
+
+        val invalidSubcontractor =
+          subcontractor.copy(
+            subcontractorType = None
+          )
+
+        when(
+          mockService.getSubcontractor(
+            eqTo(cisId),
+            eqTo(subbieResourceRef)
+          )(any[HeaderCarrier])
+        ).thenReturn(
+          Future.successful(
+            response.copy(
+              subcontractor = Some(invalidSubcontractor)
+            )
+          )
+        )
+
+        val application =
+          applicationBuilder(userAnswers = Some(emptyUserAnswers))
+            .overrides(
+              bind[SubcontractorService].toInstance(mockService),
+              bind[SessionRepository].toInstance(mockSessionRepository)
+            )
+            .build()
+
+        running(application) {
+          val result =
+            route(
+              application,
+              FakeRequest(GET, amendTrustRoute)
+            ).value
+
+          status(result) mustBe SEE_OTHER
+
+          redirectLocation(result).value mustBe
+            controllers.routes.JourneyRecoveryController
+              .onPageLoad()
+              .url
+
+          verify(mockSessionRepository, never())
+            .set(any[UserAnswers])
+        }
+      }
+
+      "must show verification details when the trust is verified" in {
+        val mockService           = mock[SubcontractorService]
+        val mockSessionRepository = mock[SessionRepository]
+        val captor                =
+          ArgumentCaptor.forClass(classOf[UserAnswers])
+
+        val verifiedTrust =
+          subcontractor.copy(
+            verified = Some("Y"),
+            pendingVerifications = Some(0)
+          )
+
+        when(
+          mockService.getSubcontractor(
+            eqTo(cisId),
+            eqTo(subbieResourceRef)
+          )(any[HeaderCarrier])
+        ).thenReturn(
+          Future.successful(
+            response.copy(
+              subcontractor = Some(verifiedTrust)
+            )
+          )
+        )
+
+        when(mockSessionRepository.set(any[UserAnswers]))
+          .thenReturn(Future.successful(true))
+
+        val application =
+          applicationBuilder(userAnswers = Some(emptyUserAnswers))
+            .overrides(
+              bind[SubcontractorService].toInstance(mockService),
+              bind[SessionRepository].toInstance(mockSessionRepository)
+            )
+            .build()
+
+        running(application) {
+          route(
+            application,
+            FakeRequest(GET, amendTrustRoute)
+          ).value.futureValue
+
+          verify(mockSessionRepository).set(captor.capture())
+
+          captor.getValue
+            .get(ShowVerificationDetailsPage)
+            .value mustBe true
+        }
+      }
+
+      "must show verification details when the trust is unverified but has a pending verification" in {
+        val mockService           = mock[SubcontractorService]
+        val mockSessionRepository = mock[SessionRepository]
+        val captor                =
+          ArgumentCaptor.forClass(classOf[UserAnswers])
+
+        val pendingTrust =
+          subcontractor.copy(
+            verified = Some("N"),
+            pendingVerifications = Some(1)
+          )
+
+        when(
+          mockService.getSubcontractor(
+            eqTo(cisId),
+            eqTo(subbieResourceRef)
+          )(any[HeaderCarrier])
+        ).thenReturn(
+          Future.successful(
+            response.copy(
+              subcontractor = Some(pendingTrust)
+            )
+          )
+        )
+
+        when(mockSessionRepository.set(any[UserAnswers]))
+          .thenReturn(Future.successful(true))
+
+        val application =
+          applicationBuilder(userAnswers = Some(emptyUserAnswers))
+            .overrides(
+              bind[SubcontractorService].toInstance(mockService),
+              bind[SessionRepository].toInstance(mockSessionRepository)
+            )
+            .build()
+
+        running(application) {
+          route(
+            application,
+            FakeRequest(GET, amendTrustRoute)
+          ).value.futureValue
+
+          verify(mockSessionRepository).set(captor.capture())
+
+          captor.getValue
+            .get(ShowVerificationDetailsPage)
+            .value mustBe true
+        }
+      }
+
+      "must hide verification details when the trust is unverified and has no pending verification" in {
+        val mockService           = mock[SubcontractorService]
+        val mockSessionRepository = mock[SessionRepository]
+        val captor                =
+          ArgumentCaptor.forClass(classOf[UserAnswers])
+
+        val unverifiedTrust =
+          subcontractor.copy(
+            verified = Some("N"),
+            pendingVerifications = Some(0)
+          )
+
+        when(
+          mockService.getSubcontractor(
+            eqTo(cisId),
+            eqTo(subbieResourceRef)
+          )(any[HeaderCarrier])
+        ).thenReturn(
+          Future.successful(
+            response.copy(
+              subcontractor = Some(unverifiedTrust)
+            )
+          )
+        )
+
+        when(mockSessionRepository.set(any[UserAnswers]))
+          .thenReturn(Future.successful(true))
+
+        val application =
+          applicationBuilder(userAnswers = Some(emptyUserAnswers))
+            .overrides(
+              bind[SubcontractorService].toInstance(mockService),
+              bind[SessionRepository].toInstance(mockSessionRepository)
+            )
+            .build()
+
+        running(application) {
+          route(
+            application,
+            FakeRequest(GET, amendTrustRoute)
+          ).value.futureValue
+
+          verify(mockSessionRepository).set(captor.capture())
+
+          captor.getValue
+            .get(ShowVerificationDetailsPage)
+            .value mustBe false
         }
       }
     }
