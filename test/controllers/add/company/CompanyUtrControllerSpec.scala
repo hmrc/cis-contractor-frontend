@@ -148,7 +148,9 @@ class CompanyUtrControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.amend.company.routes.AmendCompanyCheckYourAnswersController.onPageLoad().url
+        redirectLocation(result).value mustEqual controllers.amend.company.routes.AmendCompanyCheckYourAnswersController
+          .onPageLoad()
+          .url
       }
 
       verify(mockSubcontractorService).isDuplicateUTR(any[UserAnswers], any[String])(any[HeaderCarrier])
@@ -175,7 +177,9 @@ class CompanyUtrControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.amend.company.routes.AmendCompanyCheckYourAnswersController.onPageLoad().url
+        redirectLocation(result).value mustEqual controllers.amend.company.routes.AmendCompanyCheckYourAnswersController
+          .onPageLoad()
+          .url
       }
     }
 
