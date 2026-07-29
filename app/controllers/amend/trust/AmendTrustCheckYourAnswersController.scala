@@ -68,7 +68,7 @@ class AmendTrustCheckYourAnswersController @Inject() (
         val detailsList =
           SummaryListViewModel(rows = detailsRows(ua, isVerified).flatten)
 
-        val submitUrl = controllers.amend.trust.routes.AmendTrustCheckYourAnswersController.onSubmit()
+        val submitUrl = controllers.amend.trust.routes.AmendTrustConfirmationController.onPageLoad()
         val cancelUrl = controllers.amend.trust.routes.AmendTrustCheckYourAnswersController.onCancel()
 
         Ok(view(subcontractorInformationList, detailsList, trustName, submitUrl, cancelUrl))
@@ -151,7 +151,7 @@ class AmendTrustCheckYourAnswersController @Inject() (
         case Right(_) =>
           subcontractorService
             .createAndUpdateSubcontractor(request.userAnswers)
-            .map(_ => Redirect(controllers.amend.trust.routes.AmendTrustCheckYourAnswersController.onPageLoad()))
+            .map(_ => Redirect(controllers.amend.trust.routes.AmendTrustConfirmationController.onPageLoad()))
             .recover { case t =>
               logger.error(
                 "[AmendTrustCheckYourAnswersController.onSubmit] Failed to update subcontractor",

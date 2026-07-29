@@ -48,7 +48,8 @@ class TrustAmendConfirmationViewModelSpec extends SpecBase {
       utrYesNo = Some(true),
       utr = Some("1123456789"),
       worksReferenceYesNo = Some(true),
-      worksReference = Some("WR123")
+      worksReference = Some("WR123"),
+      verificationNumber = None
     )
 
   private val answersMatchingOriginal =

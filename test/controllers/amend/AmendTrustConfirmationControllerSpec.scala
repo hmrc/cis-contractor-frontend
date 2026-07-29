@@ -41,7 +41,8 @@ class AmendTrustConfirmationControllerSpec extends SpecBase {
       utrYesNo = None,
       utr = None,
       worksReferenceYesNo = None,
-      worksReference = None
+      worksReference = None,
+      verificationNumber = None
     )
 
   private def userAnswersWithOriginal =

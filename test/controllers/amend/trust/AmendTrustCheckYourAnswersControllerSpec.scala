@@ -284,7 +284,7 @@ class AmendTrustCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual
-          controllers.amend.trust.routes.AmendTrustCheckYourAnswersController.onPageLoad().url
+          controllers.amend.trust.routes.AmendTrustConfirmationController.onPageLoad().url
       }
 
       verify(mockSubcontractorService)
