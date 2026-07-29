@@ -51,7 +51,7 @@ class AmendPartnershipCheckYourAnswersControllerSpec extends SpecBase with Mocki
       .onSubmit()
       .url
 
-  private val address            =
+  private val address =
     Address(
       addressLine1 = "12 Harbor View Road",
       addressLine2 = Some("Amity Island"),
