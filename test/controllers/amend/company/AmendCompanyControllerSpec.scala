@@ -130,10 +130,10 @@ class AmendCompanyControllerSpec extends SpecBase with MockitoSugar {
       addressYesNo = Some(true),
       address = Some(expectedAddress),
       companyContactMethodsYesNo = Some(true),
-      companyContactMethod = Set(ContactMethodOptions.Email),
+      companyContactMethod = Set(ContactMethodOptions.Email, Phone, Mobile),
       email = Some(emailAddress),
-      phone = None,
-      mobile = None,
+      phone = Some(phoneNumber),
+      mobile = Some(mobileNumber),
       utrYesNo = Some(true),
       utr = Some(utr),
       crnYesNo = Some(true),
@@ -361,7 +361,7 @@ class AmendCompanyControllerSpec extends SpecBase with MockitoSugar {
           savedAnswers
             .get(OriginalCompanyAnswersQuery)
             .value
-            .companyContactMethod mustBe Some(Set(Email))
+            .companyContactMethod mustBe Set(Email)
         }
       }
 
