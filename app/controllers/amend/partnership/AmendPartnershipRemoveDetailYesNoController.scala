@@ -53,11 +53,11 @@ class AmendPartnershipRemoveDetailYesNoController @Inject() (
     )
 
   private def withValidDetail(
-    detail: String
+                               subcontractorDetail: String
   )(
     action: AmendPartnershipRemoveDetail => Future[Result]
   ): Future[Result] =
-    AmendPartnershipRemoveDetail.fromKey(detail) match {
+    AmendPartnershipRemoveDetail.fromKey(subcontractorDetail) match {
 
       case Some(detailType) =>
         action(detailType)
@@ -81,20 +81,20 @@ class AmendPartnershipRemoveDetailYesNoController @Inject() (
     userAnswers.get(PartnershipNominatedPartnerNamePage)
 
   private def getDetailName(
-    detail: AmendPartnershipRemoveDetail,
+                             subcontractorDetail: AmendPartnershipRemoveDetail,
     userAnswers: UserAnswers
   ): Option[String] =
-    if (detail.isNominatedPartnerDetail) {
+    if (subcontractorDetail.isNominatedPartnerDetail) {
       getNominatedPartnerName(userAnswers)
     } else {
       getPartnershipName(userAnswers)
     }
 
   private def detailIsPresent(
-    detail: AmendPartnershipRemoveDetail,
+                               subcontractorDetail: AmendPartnershipRemoveDetail,
     userAnswers: UserAnswers
   ): Boolean =
-    detail match {
+    subcontractorDetail match {
 
       case AmendPartnershipRemoveDetail.Address =>
         userAnswers
@@ -133,11 +133,11 @@ class AmendPartnershipRemoveDetailYesNoController @Inject() (
     }
 
   private def withDetailContext(
-    detail: String
+                                 subcontractorDetail: String
   )(
     block: (String, String) => Future[Result]
   )(implicit request: DataRequest[_]): Future[Result] =
-    withValidDetail(detail) { detailType =>
+    withValidDetail(subcontractorDetail) { detailType =>
       if (!detailIsPresent(detailType, request.userAnswers)) {
         Future.successful(journeyRecovery)
       } else {
@@ -157,15 +157,15 @@ class AmendPartnershipRemoveDetailYesNoController @Inject() (
     }
 
   def onPageLoad(
-    detail: String
+                  subcontractorDetail: String
   ): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
-      withDetailContext(detail) { (detailTitle, detailName) =>
+      withDetailContext(subcontractorDetail) { (detailTitle, detailName) =>
         Future.successful(
           Ok(
             view(
               formProvider(),
-              detail,
+              subcontractorDetail,
               detailTitle,
               detailName
             )
@@ -175,10 +175,10 @@ class AmendPartnershipRemoveDetailYesNoController @Inject() (
     }
 
   def onSubmit(
-    detail: String
+                subcontractorDetail: String
   ): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
-      withDetailContext(detail) { (detailTitle, detailName) =>
+      withDetailContext(subcontractorDetail) { (detailTitle, detailName) =>
         formProvider()
           .bindFromRequest()
           .fold(
@@ -187,7 +187,7 @@ class AmendPartnershipRemoveDetailYesNoController @Inject() (
                 BadRequest(
                   view(
                     formWithErrors,
-                    detail,
+                    subcontractorDetail,
                     detailTitle,
                     detailName
                   )
@@ -198,7 +198,7 @@ class AmendPartnershipRemoveDetailYesNoController @Inject() (
                 updatedAnswers <-
                   Future.fromTry(
                     request.userAnswers.set(
-                      AmendPartnershipRemoveDetailYesNoPage(detail),
+                      AmendPartnershipRemoveDetailYesNoPage(subcontractorDetail),
                       value
                     )
                   )
@@ -210,7 +210,7 @@ class AmendPartnershipRemoveDetailYesNoController @Inject() (
                   .onPageLoad()
               )).recover { case ex =>
                 logger.error(
-                  s"Failed to save remove detail answer for '$detail'",
+                  s"Failed to save remove subcontractorDetail answer for '$subcontractorDetail'",
                   ex
                 )
 
