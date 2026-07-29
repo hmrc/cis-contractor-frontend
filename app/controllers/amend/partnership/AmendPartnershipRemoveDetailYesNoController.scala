@@ -53,7 +53,7 @@ class AmendPartnershipRemoveDetailYesNoController @Inject() (
     )
 
   private def withValidDetail(
-                               subcontractorDetail: String
+    subcontractorDetail: String
   )(
     action: AmendPartnershipRemoveDetail => Future[Result]
   ): Future[Result] =
@@ -81,7 +81,7 @@ class AmendPartnershipRemoveDetailYesNoController @Inject() (
     userAnswers.get(PartnershipNominatedPartnerNamePage)
 
   private def getDetailName(
-                             subcontractorDetail: AmendPartnershipRemoveDetail,
+    subcontractorDetail: AmendPartnershipRemoveDetail,
     userAnswers: UserAnswers
   ): Option[String] =
     if (subcontractorDetail.isNominatedPartnerDetail) {
@@ -91,7 +91,7 @@ class AmendPartnershipRemoveDetailYesNoController @Inject() (
     }
 
   private def detailIsPresent(
-                               subcontractorDetail: AmendPartnershipRemoveDetail,
+    subcontractorDetail: AmendPartnershipRemoveDetail,
     userAnswers: UserAnswers
   ): Boolean =
     subcontractorDetail match {
@@ -133,7 +133,7 @@ class AmendPartnershipRemoveDetailYesNoController @Inject() (
     }
 
   private def withDetailContext(
-                                 subcontractorDetail: String
+    subcontractorDetail: String
   )(
     block: (String, String) => Future[Result]
   )(implicit request: DataRequest[_]): Future[Result] =
@@ -157,7 +157,7 @@ class AmendPartnershipRemoveDetailYesNoController @Inject() (
     }
 
   def onPageLoad(
-                  subcontractorDetail: String
+    subcontractorDetail: String
   ): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
       withDetailContext(subcontractorDetail) { (detailTitle, detailName) =>
@@ -175,7 +175,7 @@ class AmendPartnershipRemoveDetailYesNoController @Inject() (
     }
 
   def onSubmit(
-                subcontractorDetail: String
+    subcontractorDetail: String
   ): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
       withDetailContext(subcontractorDetail) { (detailTitle, detailName) =>
