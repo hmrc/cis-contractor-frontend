@@ -29,12 +29,13 @@ case class OriginalCompanyAnswers(
   email: Option[String],
   phone: Option[String],
   mobile: Option[String],
-  utrYesNo: Option[Boolean],
-  utr: Option[String],
   crnYesNo: Option[Boolean],
   crn: Option[String],
+  utrYesNo: Option[Boolean],
+  utr: Option[String],
   worksReferenceYesNo: Option[Boolean],
-  worksReference: Option[String]
+  worksReference: Option[String],
+  verificationNumber: Option[String]
 )
 
 object OriginalCompanyAnswers extends models.Enumerable.Implicits {

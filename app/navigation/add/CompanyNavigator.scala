@@ -39,9 +39,7 @@ class CompanyNavigator @Inject() () extends NavigatorForJourney {
   }
 
   private def cyaRoute(mode: Mode): Call = mode match {
-    case AmendMode =>
-      routes.JourneyRecoveryController
-        .onPageLoad() // TODO route to controllers.amend.company.routes.AmendCompanyCheckYourAnswersController.onPageLoad() when AmendCompanyCheckYourAnswersController added.
+    case AmendMode => controllers.amend.company.routes.AmendCompanyCheckYourAnswersController.onPageLoad()
     case _         => controllers.add.company.routes.CompanyCheckYourAnswersController.onPageLoad()
   }
 

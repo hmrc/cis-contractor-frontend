@@ -130,16 +130,17 @@ class AmendCompanyControllerSpec extends SpecBase with MockitoSugar {
       addressYesNo = Some(true),
       address = Some(expectedAddress),
       companyContactMethodsYesNo = Some(true),
-      companyContactMethod = Set(ContactMethodOptions.Email, Phone, Mobile),
+      companyContactMethod = Set(Email, Phone, Mobile),
       email = Some(emailAddress),
       phone = Some(phoneNumber),
       mobile = Some(mobileNumber),
-      utrYesNo = Some(true),
-      utr = Some(utr),
       crnYesNo = Some(true),
       crn = Some(crn),
+      utrYesNo = Some(true),
+      utr = Some(utr),
       worksReferenceYesNo = Some(true),
-      worksReference = Some(worksReference)
+      worksReference = Some(worksReference),
+      verificationNumber = Some("V1234567890")
     )
 
   "AmendCompanyController" - {
