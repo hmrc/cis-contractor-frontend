@@ -111,8 +111,7 @@ class AmendPartnershipControllerSpec extends SpecBase with MockitoSugar {
   private val response =
     GetSubcontractorResponse(
       scheme = None,
-      subcontractor = Some(subcontractor),
-      otherInfo = Seq.empty
+      subcontractor = Some(subcontractor)
     )
 
   private val expectedOriginal =
