@@ -21,7 +21,7 @@ import models.add.ValidatedSubcontractor
 import models.amend.OriginalIndividualAnswers
 import models.{AmendMode, UserAnswers}
 import pages.add.*
-import pages.amend.ShowVerificationDetailsPage
+import pages.amend.{AmendCheckYourAnswersSubmittedPage, ShowVerificationDetailsPage}
 import play.api.Logging
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -179,24 +179,34 @@ class AmendIndividualCheckYourAnswersController @Inject() (
 
   def onSubmit(): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
-      ValidatedSubcontractor.build(request.userAnswers) match {
-        case Right(_) =>
-          subcontractorService
-            .createAndUpdateSubcontractor(request.userAnswers)
-            .map(_ =>
-              Redirect(controllers.amend.routes.AmendIndividualCheckYourAnswersController.onPageLoad())
-            ) // TODO: Redirect to confirmation page
-            .recover { case t =>
-              logger.error(
-                "[AmendIndividualCheckYourAnswersController.onSubmit] Failed to update subcontractor",
-                t
-              )
-              Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-            }
-
-        case Left(error) =>
-          logger.error(s"[AmendIndividualCheckYourAnswersController.onSubmit] Validation failed: $error")
-          Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+      if (request.userAnswers.get(CheckYourAnswersSubmittedPage).contains(true)) {
+        Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+      } else {
+        ValidatedSubcontractor.build(request.userAnswers) match {
+          case Right(_)    =>
+            subcontractorService
+              .createAndUpdateSubcontractor(request.userAnswers)
+              .flatMap { _ =>
+                Future
+                  .fromTry(request.userAnswers.set(AmendCheckYourAnswersSubmittedPage, true))
+                  .flatMap(updated => sessionRepository.set(updated).map(_ => ()))
+                  .map(_ =>
+                    Redirect(
+                      controllers.amend.routes.AmendIndividualCheckYourAnswersController.onPageLoad()
+                    ) // TODO: Redirect to confirmation page
+                  )
+              }
+              .recover { case t =>
+                logger.error(
+                  "[AmendIndividualCheckYourAnswersController.onSubmit] Failed to update subcontractor",
+                  t
+                )
+                Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+              }
+          case Left(error) =>
+            logger.error(s"[AmendIndividualCheckYourAnswersController.onSubmit] Validation failed: $error")
+            Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+        }
       }
     }
 
