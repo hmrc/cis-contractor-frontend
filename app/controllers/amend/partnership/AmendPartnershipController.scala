@@ -29,7 +29,8 @@ import play.api.Logging
 import play.api.libs.json.Writes
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import queries.{CisIdQuery, OriginalPartnershipAnswersQuery}
-import controllers.amend.AmendControllerUtils._
+import controllers.amend.AmendControllerUtils.*
+import pages.amend.ShowVerificationDetailsPage
 import repositories.SessionRepository
 import services.SubcontractorService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -77,11 +78,7 @@ class AmendPartnershipController @Inject() (
               Future.successful(recovery)
 
             case Some(subcontractor) =>
-              populateUserAnswers(
-                request.userAnswers,
-                cisId,
-                subcontractor
-              ).fold(
+              populateUserAnswers(request.userAnswers, cisId, subcontractor).fold(
                 error => {
                   logger.error(
                     s"[AmendPartnershipController] Failed to populate UserAnswers for " +
@@ -151,6 +148,7 @@ class AmendPartnershipController @Inject() (
                  )
       updated <- updated.set(PartnershipNominatedPartnerUtrYesNoPage, subcontractor.partnerUtr.isDefined)
       updated <- setOptional(updated, PartnershipNominatedPartnerUtrPage, subcontractor.partnerUtr)
+      updated <- updated.set(ShowVerificationDetailsPage, shouldShowVerificationDetails(subcontractor))
       updated <- updated.set(PartnershipNominatedPartnerNinoYesNoPage, subcontractor.nino.isDefined)
       updated <- setOptional(updated, PartnershipNominatedPartnerNinoPage, subcontractor.nino)
       updated <- updated.set(PartnershipNominatedPartnerCrnYesNoPage, subcontractor.crn.isDefined)
