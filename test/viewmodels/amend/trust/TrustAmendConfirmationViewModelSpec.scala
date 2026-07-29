@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package viewmodels.checkAnswers.amend
+package viewmodels.amend.trust
 
 import base.SpecBase
 import models.address.{Address, Country}
@@ -23,7 +23,6 @@ import models.contact.ContactMethodOptions
 import pages.add.trust.*
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
-import viewmodels.amend.TrustAmendConfirmationViewModel
 
 class TrustAmendConfirmationViewModelSpec extends SpecBase {
 

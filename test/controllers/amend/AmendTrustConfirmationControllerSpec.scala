@@ -20,9 +20,9 @@ import base.SpecBase
 import models.amend.trust.OriginalTrustAnswers
 import pages.add.trust.TrustNamePage
 import play.api.test.FakeRequest
-import play.api.test.Helpers.{route, *}
+import play.api.test.Helpers.*
 import queries.{CisIdQuery, OriginalTrustAnswersQuery}
-import viewmodels.amend.TrustAmendConfirmationViewModel
+import viewmodels.amend.trust.TrustAmendConfirmationViewModel
 import views.html.amend.AmendConfirmationView
 
 class AmendTrustConfirmationControllerSpec extends SpecBase {

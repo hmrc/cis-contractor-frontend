@@ -27,7 +27,7 @@ import play.api.libs.json.Reads
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import queries.{CisIdQuery, OriginalTrustAnswersQuery}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import viewmodels.amend.TrustAmendConfirmationViewModel
+import viewmodels.amend.trust.TrustAmendConfirmationViewModel
 import views.html.amend.AmendConfirmationView
 
 import javax.inject.Inject
