@@ -45,7 +45,8 @@ class AmendCompanyConfirmationControllerSpec extends SpecBase {
       crnYesNo = None,
       crn = None,
       worksReferenceYesNo = None,
-      worksReference = None
+      worksReference = None,
+      verificationNumber = None
     )
 
   private def userAnswersWithOriginal =

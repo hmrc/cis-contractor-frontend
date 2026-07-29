@@ -291,7 +291,7 @@ class AmendCompanyCheckYourAnswersControllerSpec extends SpecBase with MockitoSu
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual
-          controllers.amend.company.routes.AmendCompanyCheckYourAnswersController.onPageLoad().url
+          controllers.amend.company.routes.AmendCompanyConfirmationController.onPageLoad().url
       }
 
       verify(mockSubcontractorService)

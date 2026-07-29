@@ -153,7 +153,7 @@ class AmendCompanyCheckYourAnswersController @Inject() (
         case Right(_) =>
           subcontractorService
             .createAndUpdateSubcontractor(request.userAnswers)
-            .map(_ => Redirect(controllers.amend.company.routes.AmendCompanyCheckYourAnswersController.onPageLoad()))
+            .map(_ => Redirect(controllers.amend.company.routes.AmendCompanyConfirmationController.onPageLoad()))
             .recover { case t =>
               logger.error(
                 "[AmendCompanyCheckYourAnswersController.onSubmit] Failed to update subcontractor",
