@@ -31,9 +31,7 @@ class IndividualNavigatorSpec extends SpecBase {
   val navigator                    = new IndividualNavigator
   private lazy val journeyRecovery = routes.JourneyRecoveryController.onPageLoad()
   private lazy val CYA             = controllers.add.routes.CheckYourAnswersController.onPageLoad()
-  private lazy val AmendCYA        =
-    routes.JourneyRecoveryController
-      .onPageLoad() // TODO when available controllers.add.routes.AmendCheckYourAnswersController.onPageLoad()
+  private lazy val AmendCYA        = controllers.amend.routes.AmendIndividualCheckYourAnswersController.onPageLoad()
 
   "IndividualNavigator" - {
 
@@ -365,7 +363,7 @@ class IndividualNavigatorSpec extends SpecBase {
           UnknownPage,
           AmendMode,
           UserAnswers("id")
-        ) mustBe journeyRecovery // TODO: when CYA page available
+        ) mustBe AmendCYA
       }
 
       "must go from SubTradingNameYesNoPage to SubcontractorNameController when answer is No and name is missing" in {
@@ -396,7 +394,7 @@ class IndividualNavigatorSpec extends SpecBase {
           SubTradingNameYesNoPage,
           AmendMode,
           ua
-        ) mustBe journeyRecovery // TODO: this needs to be redirected to amend cya page when it's implemented
+        ) mustBe AmendCYA
       }
 
       "must go from SubTradingNameYesNoPage to TradingNameOfSubcontractorController when answer is Yes and trading name is missing" in {
@@ -427,7 +425,7 @@ class IndividualNavigatorSpec extends SpecBase {
           SubTradingNameYesNoPage,
           AmendMode,
           ua
-        ) mustBe journeyRecovery // TODO: this needs to be redirected to amend cya page when it's implemented
+        ) mustBe AmendCYA
       }
 
       "must go from SubTradingNameYesNoPage to JourneyRecovery when SubTradingNameYesNoPage answer is missing" in {
@@ -446,7 +444,7 @@ class IndividualNavigatorSpec extends SpecBase {
             SubcontractorNamePage,
             SubcontractorName(firstName = "Jane", middleName = None, lastName = "Doe")
           )
-        ) mustBe journeyRecovery // TODO: this needs to be redirected to amend cya page when it's implemented
+        ) mustBe AmendCYA
       }
 
       "must go from WorksReferenceNumberYesNoPage to WorksReferenceNumberPage when true and no work reference number exists" in {
@@ -470,7 +468,7 @@ class IndividualNavigatorSpec extends SpecBase {
           WorksReferenceNumberYesNoPage,
           AmendMode,
           ua
-        ) mustBe journeyRecovery // TODO: redirect to amend cya page when implemented
+        ) mustBe AmendCYA
       }
 
       "must go from WorksReferenceNumberYesNoPage to amend CYA page when false" in {
@@ -481,7 +479,7 @@ class IndividualNavigatorSpec extends SpecBase {
           WorksReferenceNumberYesNoPage,
           AmendMode,
           ua
-        ) mustBe journeyRecovery // TODO: redirect to amend cya page when implemented
+        ) mustBe AmendCYA
       }
 
       "must go from WorksReferenceNumberYesNoPage to JourneyRecovery when answer is missing" in {
@@ -499,7 +497,7 @@ class IndividualNavigatorSpec extends SpecBase {
           AddIndividualContactMethodsYesNoPage,
           AmendMode,
           answers
-        ) mustBe journeyRecovery
+        ) mustBe AmendCYA
       }
 
       "to IndividualContactMethodOptions page when answer is Yes and IndividualContactMethodOptions not yet answered" in {
@@ -551,7 +549,7 @@ class IndividualNavigatorSpec extends SpecBase {
           IndividualMobileNumberPage,
           AmendMode,
           emptyUserAnswers
-        ) mustBe journeyRecovery // TODO: when CYA page available
+        ) mustBe AmendCYA
       }
 
       "to CYA when answer is No" in {
@@ -907,7 +905,7 @@ class IndividualNavigatorSpec extends SpecBase {
           SubAddressYesNoPage,
           AmendMode,
           emptyUserAnswers.setOrException(SubAddressYesNoPage, false)
-        ) mustBe journeyRecovery // TODO: change this to CYA when available
+        ) mustBe AmendCYA
       }
 
       "to the address lookup on-ramp when answer is Yes and AddressOfSubcontractorPage is not answered before" in {
@@ -955,7 +953,7 @@ class IndividualNavigatorSpec extends SpecBase {
           NationalInsuranceNumberYesNoPage,
           AmendMode,
           emptyUserAnswers.setOrException(NationalInsuranceNumberYesNoPage, false)
-        ) mustBe journeyRecovery // TODO - change to CYA when wiring complete
+        ) mustBe AmendCYA
       }
 
       "must go from a NationalInsuranceNumberYesNoPage to journey recovery page when incomplete info provided" in {
@@ -982,7 +980,7 @@ class IndividualNavigatorSpec extends SpecBase {
             SubNationalInsuranceNumberPage,
             "AB123456C"
           )
-        ) mustBe journeyRecovery // TODO: this needs to be redirected to amend cya page when it's implemented
+        ) mustBe AmendCYA
       }
 
       "must go from UniqueTaxpayerReferenceYesNoPage to SubcontractorsUniqueTaxpayerReferencePage when true and no utr exists" in {
@@ -1006,7 +1004,7 @@ class IndividualNavigatorSpec extends SpecBase {
           UniqueTaxpayerReferenceYesNoPage,
           AmendMode,
           ua
-        ) mustBe journeyRecovery // TODO: when CYA page available
+        ) mustBe AmendCYA
       }
 
       "must go from UniqueTaxpayerReferenceYesNoPage to JourneyRecovery when false" in {
@@ -1017,7 +1015,7 @@ class IndividualNavigatorSpec extends SpecBase {
           UniqueTaxpayerReferenceYesNoPage,
           AmendMode,
           ua
-        ) mustBe journeyRecovery // TODO: when CYA page available
+        ) mustBe AmendCYA
       }
 
       "must go from UniqueTaxpayerReferenceYesNoPage to JourneyRecovery when answer is missing" in {
@@ -1033,7 +1031,7 @@ class IndividualNavigatorSpec extends SpecBase {
           SubcontractorsUniqueTaxpayerReferencePage,
           AmendMode,
           UserAnswers("id")
-        ) mustBe journeyRecovery // TODO: this needs to be redirected to amend individual cya page, AmendIndividualCheckYourAnswersController when it's implemented
+        ) mustBe AmendCYA
       }
     }
 

@@ -204,7 +204,6 @@ class AmendIndividualController @Inject() (
       nino = subcontractor.nino,
       worksReferenceYesNo = Some(subcontractor.worksReferenceNumber.isDefined),
       worksReference = subcontractor.worksReferenceNumber,
-      verificationNumber = subcontractor.verificationNumber,
-      isVerified = subcontractor.verified.map(_.equalsIgnoreCase("Y"))
+      verificationNumber = subcontractor.verificationNumber
     )
 }

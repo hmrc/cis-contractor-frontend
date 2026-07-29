@@ -184,7 +184,7 @@ class AmendIndividualCheckYourAnswersController @Inject() (
           subcontractorService
             .createAndUpdateSubcontractor(request.userAnswers)
             .map(_ =>
-              Redirect(controllers.amend.routes.AmendIndividualCheckYourAnswersController().onPageLoad())
+              Redirect(controllers.amend.routes.AmendIndividualCheckYourAnswersController.onPageLoad())
             ) // TODO: Redirect to confirmation page
             .recover { case t =>
               logger.error(
