@@ -26,7 +26,8 @@ import models.contact.ContactMethodOptions
 import models.response.SubcontractorResponse
 import pages.add.*
 import play.api.Logging
-import controllers.amend.AmendControllerUtils._
+import controllers.amend.AmendControllerUtils.*
+import pages.amend.ShowVerificationDetailsPage
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import queries.{CisIdQuery, OriginalIndividualAnswersQuery}
 import repositories.SessionRepository
@@ -76,11 +77,7 @@ class AmendIndividualController @Inject() (
               Future.successful(recovery)
 
             case Some(subcontractor) =>
-              populateUserAnswers(
-                request.userAnswers,
-                cisId,
-                subcontractor
-              ).fold(
+              populateUserAnswers(request.userAnswers, cisId, subcontractor).fold(
                 error => {
                   logger.error("[AmendIndividualController] Failed to populate UserAnswers", error)
                   Future.successful(recovery)
@@ -153,6 +150,7 @@ class AmendIndividualController @Inject() (
       updated <- setOptional(updated, SubNationalInsuranceNumberPage, subcontractor.nino)
       updated <- updated.set(WorksReferenceNumberYesNoPage, subcontractor.worksReferenceNumber.isDefined)
       updated <- setOptional(updated, WorksReferenceNumberPage, subcontractor.worksReferenceNumber)
+      updated <- updated.set(ShowVerificationDetailsPage, shouldShowVerificationDetails(subcontractor))
       updated <- updated.set(CisIdQuery, cisId)
       updated <- updated.set(OriginalIndividualAnswersQuery, original)
     } yield updated
@@ -205,6 +203,7 @@ class AmendIndividualController @Inject() (
       ninoYesNo = Some(subcontractor.nino.isDefined),
       nino = subcontractor.nino,
       worksReferenceYesNo = Some(subcontractor.worksReferenceNumber.isDefined),
-      worksReference = subcontractor.worksReferenceNumber
+      worksReference = subcontractor.worksReferenceNumber,
+      verificationNumber = subcontractor.verificationNumber
     )
 }

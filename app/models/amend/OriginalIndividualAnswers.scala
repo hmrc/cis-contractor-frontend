@@ -37,7 +37,8 @@ case class OriginalIndividualAnswers(
   ninoYesNo: Option[Boolean],
   nino: Option[String],
   worksReferenceYesNo: Option[Boolean],
-  worksReference: Option[String]
+  worksReference: Option[String],
+  verificationNumber: Option[String]
 )
 
 object OriginalIndividualAnswers extends models.Enumerable.Implicits {

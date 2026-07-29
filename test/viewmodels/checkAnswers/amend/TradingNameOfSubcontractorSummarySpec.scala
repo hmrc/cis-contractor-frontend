@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,62 +13,3 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package viewmodels.checkAnswers.amend
-
-import controllers.add.routes
-import helpers.CyaEncodingSpecHelper
-import models.{AmendMode, UserAnswers}
-import org.scalatest.OptionValues.convertOptionToValuable
-import org.scalatest.TryValues.convertTryToSuccessOrFailure
-import org.scalatest.freespec.AnyFreeSpec
-import org.scalatest.matchers.should.Matchers
-import pages.add.TradingNameOfSubcontractorPage
-import play.api.i18n.Messages
-import play.api.test.Helpers.stubMessages
-import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.*
-
-class TradingNameOfSubcontractorSummarySpec extends AnyFreeSpec with Matchers with CyaEncodingSpecHelper {
-
-  implicit val messages: Messages = stubMessages()
-
-  "TradingNameOfSubcontractorSummary.row" - {
-
-    "must return a SummaryListRow when the answer exists" in {
-      val answers =
-        UserAnswers("test-id")
-          .set(TradingNameOfSubcontractorPage, "O'Reilly & Co <UK>")
-          .success
-          .value
-
-      val maybeRow = TradingNameOfSubcontractorSummary.row(answers)
-      maybeRow shouldBe defined
-
-      val row = maybeRow.value
-
-      val expectedKeyText = messages("tradingNameOfSubcontractor.checkYourAnswersLabel")
-      row.key.content.asHtml.toString should include(expectedKeyText)
-
-      row.value.content.asHtml.toString should include("O&#x27;Reilly &amp; Co &lt;UK&gt;")
-
-      row.actions shouldBe defined
-      val actions = row.actions.value.items
-      actions should have size 1
-
-      val changeAction       = actions.head
-      val expectedChangeText = messages("site.change")
-      val expectedHref       = routes.TradingNameOfSubcontractorController.onPageLoad(AmendMode).url
-      val expectedHiddenText = messages("tradingNameOfSubcontractor.change.hidden")
-
-      changeAction.content.asHtml.toString should include(expectedChangeText)
-      changeAction.href                  shouldBe expectedHref
-
-      changeAction.visuallyHiddenText.value shouldBe expectedHiddenText
-    }
-
-    "must return None when the answer does not exist" in {
-      val answers = UserAnswers("test-id")
-      TradingNameOfSubcontractorSummary.row(answers) shouldBe None
-    }
-  }
-}

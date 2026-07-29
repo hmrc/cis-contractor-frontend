@@ -18,7 +18,7 @@ package viewmodels.checkAnswers.add
 
 import controllers.add.routes
 import helpers.CyaEncodingSpecHelper
-import models.{CheckMode, UserAnswers}
+import models.{AmendMode, CheckMode, UserAnswers}
 import org.scalatest.OptionValues.convertOptionToValuable
 import org.scalatest.TryValues.convertTryToSuccessOrFailure
 import org.scalatest.freespec.AnyFreeSpec
@@ -67,6 +67,39 @@ class SubcontractorsUniqueTaxpayerReferenceSummarySpec extends AnyFreeSpec with 
       changeAction.visuallyHiddenText.value shouldBe expectedHiddenText
     }
 
+    "must return a SummaryListRow when the answer exists for amend journey" in {
+      val answers =
+        UserAnswers("test-id")
+          .set(SubcontractorsUniqueTaxpayerReferencePage, "1234567890")
+          .success
+          .value
+
+      val maybeRow = SubcontractorsUniqueTaxpayerReferenceSummary.row(answers, AmendMode)
+      maybeRow shouldBe defined
+
+      val row = maybeRow.value
+
+      val expectedKeyText = messages("subcontractorsUniqueTaxpayerReference.checkYourAnswersLabel")
+      row.key.content.asHtml.toString should include(expectedKeyText)
+
+      row.value.content.asHtml.toString should include("1234567890")
+
+      row.actions shouldBe defined
+      val actions = row.actions.value.items
+      actions should have size 1
+
+      val changeAction       = actions.head
+      val expectedChangeText = messages("site.change")
+      val expectedHref       =
+        routes.SubcontractorsUniqueTaxpayerReferenceController.onPageLoad(AmendMode).url
+      val expectedHiddenText = messages("subcontractorsUniqueTaxpayerReference.change.hidden")
+
+      changeAction.content.asHtml.toString should include(expectedChangeText)
+      changeAction.href                  shouldBe expectedHref
+
+      changeAction.visuallyHiddenText.value shouldBe expectedHiddenText
+    }
+
     "must return None when the answer does not exist" in {
       val answers = UserAnswers("test-id")
       SubcontractorsUniqueTaxpayerReferenceSummary.row(answers) shouldBe None
@@ -88,6 +121,35 @@ class SubcontractorsUniqueTaxpayerReferenceSummarySpec extends AnyFreeSpec with 
 
       assertEscaped(html, "1234567890 &amp; Ref&#x27;01")
       assertNoDoubleEncoding(html)
+    }
+
+    "must not include actions when showActions is false" in {
+      val utr = "1234567890"
+
+      val answers =
+        UserAnswers("test-id")
+          .set(SubcontractorsUniqueTaxpayerReferencePage, utr)
+          .success
+          .value
+
+      val maybeRow = SubcontractorsUniqueTaxpayerReferenceSummary.row(
+        answers,
+        mode = CheckMode,
+        showActions = false
+      )
+
+      maybeRow shouldBe defined
+
+      val row = maybeRow.value
+
+      row.key.content.asHtml.toString should include(
+        messages("subcontractorsUniqueTaxpayerReference.checkYourAnswersLabel")
+      )
+
+      row.value.content.asHtml.toString should include(utr)
+
+      row.actions             shouldBe defined
+      row.actions.value.items shouldBe empty
     }
   }
 }

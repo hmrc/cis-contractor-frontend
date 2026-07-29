@@ -18,7 +18,7 @@ package viewmodels.checkAnswers.add
 
 import controllers.add.routes
 import helpers.CyaEncodingSpecHelper
-import models.{CheckMode, UserAnswers}
+import models.{AmendMode, CheckMode, UserAnswers}
 import org.scalatest.OptionValues.convertOptionToValuable
 import org.scalatest.TryValues.convertTryToSuccessOrFailure
 import org.scalatest.freespec.AnyFreeSpec
@@ -59,6 +59,39 @@ class WorksReferenceNumberSummarySpec extends AnyFreeSpec with Matchers with Cya
       val expectedChangeText = messages("site.change")
       val expectedHref       =
         routes.WorksReferenceNumberController.onPageLoad(CheckMode).url
+      val expectedHiddenText = messages("worksReferenceNumber.change.hidden")
+
+      changeAction.content.asHtml.toString should include(expectedChangeText)
+      changeAction.href                  shouldBe expectedHref
+
+      changeAction.visuallyHiddenText.value shouldBe expectedHiddenText
+    }
+
+    "must return a SummaryListRow when the answer exists in amend journey" in {
+      val answers =
+        UserAnswers("test-id")
+          .set(WorksReferenceNumberPage, "1234567890")
+          .success
+          .value
+
+      val maybeRow = WorksReferenceNumberSummary.row(answers, AmendMode)
+      maybeRow shouldBe defined
+
+      val row = maybeRow.value
+
+      val expectedKeyText = messages("worksReferenceNumber.checkYourAnswersLabel")
+      row.key.content.asHtml.toString should include(expectedKeyText)
+
+      row.value.content.asHtml.toString should include("1234567890")
+
+      row.actions shouldBe defined
+      val actions = row.actions.value.items
+      actions should have size 1
+
+      val changeAction       = actions.head
+      val expectedChangeText = messages("site.change")
+      val expectedHref       =
+        routes.WorksReferenceNumberController.onPageLoad(AmendMode).url
       val expectedHiddenText = messages("worksReferenceNumber.change.hidden")
 
       changeAction.content.asHtml.toString should include(expectedChangeText)

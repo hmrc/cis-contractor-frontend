@@ -13,3 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+package pages.amend
+
+import pages.QuestionPage
+import play.api.libs.json.JsPath
+
+case object AmendCheckYourAnswersSubmittedPage extends QuestionPage[Boolean] {
+  override def path: JsPath     = JsPath \ toString
+  override def toString: String = "amendCheckYourAnswersSubmitted"
+}

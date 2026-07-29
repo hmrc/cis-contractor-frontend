@@ -17,7 +17,7 @@
 package viewmodels.checkAnswers.add.trust
 
 import controllers.add.trust.routes
-import models.{CheckMode, UserAnswers}
+import models.{AmendMode, CheckMode, UserAnswers}
 import org.scalatest.OptionValues.convertOptionToValuable
 import org.scalatest.TryValues.convertTryToSuccessOrFailure
 import org.scalatest.freespec.AnyFreeSpec
@@ -57,6 +57,39 @@ class AddTrustContactMethodsYesNoSummarySpec extends AnyFreeSpec with Matchers {
       val changeAction       = actions.head
       val expectedChangeText = messages("site.change")
       val expectedHref       = routes.AddTrustContactMethodsYesNoController.onPageLoad(CheckMode).url
+      val expectedHiddenText = messages("addTrustContactMethodsYesNo.change.hidden")
+
+      changeAction.content.asHtml.toString    should include(expectedChangeText)
+      changeAction.href                     shouldBe expectedHref
+      changeAction.visuallyHiddenText.value shouldBe expectedHiddenText
+      changeAction.attributes                 should contain("id" -> "add-trust-contact-details")
+    }
+
+    "must return a SummaryListRow with 'Yes' when the answer is true in AmendMode" in {
+      val answers = UserAnswers("test-id")
+        .set(AddTrustContactMethodsYesNoPage, true)
+        .success
+        .value
+
+      val maybeRow: Option[SummaryListRow] = AddTrustContactMethodsYesNoSummary.row(answers, AmendMode)
+      maybeRow shouldBe defined
+
+      val row =
+        maybeRow.value
+
+      val expectedKeyText = messages("addTrustContactMethodsYesNo.checkYourAnswersLabel")
+      row.key.content.asHtml.toString should include(expectedKeyText)
+
+      val expectedValue = messages("site.yes")
+      row.value.content.asHtml.toString should include(expectedValue)
+
+      row.actions shouldBe defined
+      val actions = row.actions.value.items
+      actions should have size 1
+
+      val changeAction       = actions.head
+      val expectedChangeText = messages("site.change")
+      val expectedHref       = routes.AddTrustContactMethodsYesNoController.onPageLoad(AmendMode).url
       val expectedHiddenText = messages("addTrustContactMethodsYesNo.change.hidden")
 
       changeAction.content.asHtml.toString    should include(expectedChangeText)
