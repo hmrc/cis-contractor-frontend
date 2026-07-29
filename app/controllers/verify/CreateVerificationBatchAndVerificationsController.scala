@@ -94,13 +94,13 @@ class CreateVerificationBatchAndVerificationsController @Inject() (
                 case None =>
                   Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
 
-//                case Some(_) if hasCurrentBatch(ua) =>
-//                  Future.successful(
-//                    Redirect(
-//                      controllers.verify.routes.ModifyVerificationBatchAndVerificationsController
-//                        .modifyVerificationBatch()
-//                    )
-//                  )
+                case Some(_) if hasCurrentBatch(ua) =>
+                  Future.successful(
+                    Redirect(
+                      controllers.verify.routes.ModifyVerificationBatchAndVerificationsController
+                        .modifyVerificationBatch()
+                    )
+                  )
 
                 case Some(_) =>
                   verificationService

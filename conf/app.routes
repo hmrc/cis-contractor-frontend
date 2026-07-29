@@ -585,8 +585,9 @@ GET   /subcontractor/verify/inactive-scheme-warning  controllers.verify.Inactive
 
 GET   /subcontractor/verify/verification-not-submitted-warning  controllers.verify.VerificationNotSubmittedWarningController.onPageLoad()
 
-GET   /subcontractor/verify/no-subcontractors-selected-warning         controllers.verify.NoSubcontractorsSelectedWarningController.onPageLoad()
-GET   /subcontractor/verify/no-subcontractors-selected-warning/cancel  controllers.verify.NoSubcontractorsSelectedWarningController.onCancel()
+GET /subcontractor/verify/no-subcontractors-selected-warning/check-mode controllers.verify.NoSubcontractorsSelectedWarningController.onPageLoadCheckMode()
+GET   /subcontractor/verify/no-subcontractors-selected-warning          controllers.verify.NoSubcontractorsSelectedWarningController.onPageLoad()
+GET   /subcontractor/verify/no-subcontractors-selected-warning/cancel   controllers.verify.NoSubcontractorsSelectedWarningController.onCancel()
 
 GET   /subcontractor/verify/verification-request-submitted  controllers.verify.VerificationRequestSubmittedController.onPageLoad()
 
