@@ -21,10 +21,11 @@ import forms.add.SubNationalInsuranceNumberFormProvider
 import models.Mode
 import models.requests.DataRequest
 import navigation.Navigator
-import pages.add.SubNationalInsuranceNumberPage
+import pages.add.{NationalInsuranceNumberYesNoPage, SubNationalInsuranceNumberPage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
+import services.YesOrNoPageGuardService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.SubcontractorNameExtractor
 import views.html.add.SubNationalInsuranceNumberView
@@ -42,6 +43,7 @@ class SubNationalInsuranceNumberController @Inject() (
   formProvider: SubNationalInsuranceNumberFormProvider,
   subcontractorNameExtractor: SubcontractorNameExtractor,
   val controllerComponents: MessagesControllerComponents,
+  yesOrNoPageGuardService: YesOrNoPageGuardService,
   view: SubNationalInsuranceNumberView
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
@@ -57,10 +59,15 @@ class SubNationalInsuranceNumberController @Inject() (
 
   def onPageLoad(mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData) { implicit request =>
+
+      val yesOrNoPage = NationalInsuranceNumberYesNoPage
+      val yesOrNoPageOption = request.userAnswers.get(NationalInsuranceNumberYesNoPage)
+
       subcontractorNameExtractor
         .getSubcontractorName(request.userAnswers)
         .fold(recoveryRedirect) { subcontractorName =>
-          Ok(view(preparedForm, mode, subcontractorName))
+          val result = Ok(view(preparedForm, mode, subcontractorName))
+          yesOrNoPageGuardService.yesOrNoPageRoute(result, yesOrNoPageOption, yesOrNoPage, mode)
         }
     }
 

@@ -24,7 +24,7 @@ import models.{NormalMode, UserAnswers}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.add.{SubcontractorNamePage, WorksReferenceNumberPage}
+import pages.add.{SubcontractorNamePage, WorksReferenceNumberPage, WorksReferenceNumberYesNoPage}
 import play.api.data.Form
 import play.api.inject.bind
 import play.api.test.FakeRequest
@@ -48,6 +48,7 @@ class WorksReferenceNumberControllerSpec extends SpecBase with MockitoSugar {
 
   private def uaWithName: UserAnswers =
     emptyUserAnswers.set(SubcontractorNamePage, subcontractorName).success.value
+    .set(WorksReferenceNumberYesNoPage, true).success.value
 
   "WorksReferenceNumber Controller" - {
 
@@ -85,6 +86,40 @@ class WorksReferenceNumberControllerSpec extends SpecBase with MockitoSugar {
           request,
           messages(application)
         ).toString
+      }
+    }
+
+    "must redirect to yesOrNo page when yesorno page has No for a GET" in {
+
+      val application = applicationBuilder(userAnswers = Some(uaWithName.set(WorksReferenceNumberYesNoPage, false)
+        .success
+        .value)).build()
+
+      running(application) {
+        val request = FakeRequest(GET, worksReferenceNumberRoute)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(result).value mustEqual controllers.add.routes.WorksReferenceNumberYesNoController.onPageLoad(NormalMode).url
+
+      }
+    }
+
+    "must redirect to journey recovery page when none for yesorno page for a GET" in {
+
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+
+      running(application) {
+        val request = FakeRequest(GET, worksReferenceNumberRoute)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+
       }
     }
 

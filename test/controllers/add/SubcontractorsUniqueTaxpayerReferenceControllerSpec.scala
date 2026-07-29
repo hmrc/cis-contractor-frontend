@@ -24,7 +24,7 @@ import models.{AmendMode, NormalMode, UserAnswers}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{verify, verifyNoMoreInteractions, when}
 import org.scalatestplus.mockito.MockitoSugar
-import pages.add.{SubcontractorNamePage, SubcontractorsUniqueTaxpayerReferencePage}
+import pages.add.{SubcontractorNamePage, SubcontractorsUniqueTaxpayerReferencePage, UniqueTaxpayerReferenceYesNoPage}
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
@@ -50,6 +50,7 @@ class SubcontractorsUniqueTaxpayerReferenceControllerSpec extends SpecBase with 
 
   private def uaWithName: UserAnswers =
     emptyUserAnswers.set(SubcontractorNamePage, subcontractorName).success.value
+      .set(UniqueTaxpayerReferenceYesNoPage,true).success.value
 
   "SubcontractorsUniqueTaxpayerReference Controller" - {
 
@@ -87,6 +88,40 @@ class SubcontractorsUniqueTaxpayerReferenceControllerSpec extends SpecBase with 
           request,
           messages(application)
         ).toString
+      }
+    }
+
+    "must redirect to yesOrNo page when yesorno page has No for a GET" in {
+
+      val application = applicationBuilder(userAnswers = Some(uaWithName.set(UniqueTaxpayerReferenceYesNoPage, false)
+        .success
+        .value)).build()
+
+      running(application) {
+        val request = FakeRequest(GET, subcontractorsUniqueTaxpayerReferenceRoute)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(result).value mustEqual controllers.add.routes.UniqueTaxpayerReferenceYesNoController.onPageLoad(NormalMode).url
+
+      }
+    }
+
+    "must redirect to journey recovery page when none for yesorno page for a GET" in {
+
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+
+      running(application) {
+        val request = FakeRequest(GET, subcontractorsUniqueTaxpayerReferenceRoute)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+
       }
     }
 

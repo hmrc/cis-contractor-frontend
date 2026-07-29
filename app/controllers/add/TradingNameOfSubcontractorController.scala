@@ -20,10 +20,12 @@ import controllers.actions.*
 import forms.add.TradingNameOfSubcontractorFormProvider
 import models.Mode
 import navigation.Navigator
-import pages.add.TradingNameOfSubcontractorPage
+import pages.QuestionPage
+import pages.add.{SubTradingNameYesNoPage, TradingNameOfSubcontractorPage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
+import services.YesOrNoPageGuardService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.add.TradingNameOfSubcontractorView
 
@@ -39,7 +41,8 @@ class TradingNameOfSubcontractorController @Inject() (
   requireData: DataRequiredAction,
   formProvider: TradingNameOfSubcontractorFormProvider,
   val controllerComponents: MessagesControllerComponents,
-  view: TradingNameOfSubcontractorView
+  view: TradingNameOfSubcontractorView,
+  yesOrNoPageGuardService: YesOrNoPageGuardService
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport {
@@ -48,12 +51,17 @@ class TradingNameOfSubcontractorController @Inject() (
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
 
+    val yesOrNoPage: QuestionPage[Boolean] = SubTradingNameYesNoPage
+    val yesOrNoPageOption = request.userAnswers.get(SubTradingNameYesNoPage)
+
     val preparedForm = request.userAnswers.get(TradingNameOfSubcontractorPage) match {
       case None        => form
       case Some(value) => form.fill(value)
     }
+    val result = Ok(view(preparedForm, mode))
 
-    Ok(view(preparedForm, mode))
+    yesOrNoPageGuardService.yesOrNoPageRoute(result, yesOrNoPageOption, yesOrNoPage, mode)
+
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] =
