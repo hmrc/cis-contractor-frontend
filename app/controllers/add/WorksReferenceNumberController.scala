@@ -59,14 +59,14 @@ class WorksReferenceNumberController @Inject() (
 
   def onPageLoad(mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData) { implicit request =>
-      
-      val yesOrNoPage = WorksReferenceNumberYesNoPage
+
+      val yesOrNoPage       = WorksReferenceNumberYesNoPage
       val yesOrNoPageOption = request.userAnswers.get(WorksReferenceNumberYesNoPage)
-      
+
       subcontractorNameExtractor
         .getSubcontractorName(request.userAnswers)
         .fold(recoveryRedirect) { subcontractorName =>
-         val result =  Ok(view(preparedForm, mode, subcontractorName))
+          val result = Ok(view(preparedForm, mode, subcontractorName))
           yesOrNoPageGuardService.yesOrNoPageRoute(result, yesOrNoPageOption, yesOrNoPage, mode)
         }
     }

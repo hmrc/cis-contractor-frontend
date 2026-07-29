@@ -49,8 +49,13 @@ class SubcontractorsUniqueTaxpayerReferenceControllerSpec extends SpecBase with 
   private val name = "John Smith"
 
   private def uaWithName: UserAnswers =
-    emptyUserAnswers.set(SubcontractorNamePage, subcontractorName).success.value
-      .set(UniqueTaxpayerReferenceYesNoPage,true).success.value
+    emptyUserAnswers
+      .set(SubcontractorNamePage, subcontractorName)
+      .success
+      .value
+      .set(UniqueTaxpayerReferenceYesNoPage, true)
+      .success
+      .value
 
   "SubcontractorsUniqueTaxpayerReference Controller" - {
 
@@ -93,9 +98,9 @@ class SubcontractorsUniqueTaxpayerReferenceControllerSpec extends SpecBase with 
 
     "must redirect to yesOrNo page when yesorno page has No for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(uaWithName.set(UniqueTaxpayerReferenceYesNoPage, false)
-        .success
-        .value)).build()
+      val application = applicationBuilder(userAnswers =
+        Some(uaWithName.set(UniqueTaxpayerReferenceYesNoPage, false).success.value)
+      ).build()
 
       running(application) {
         val request = FakeRequest(GET, subcontractorsUniqueTaxpayerReferenceRoute)
@@ -104,7 +109,9 @@ class SubcontractorsUniqueTaxpayerReferenceControllerSpec extends SpecBase with 
 
         status(result) mustEqual SEE_OTHER
 
-        redirectLocation(result).value mustEqual controllers.add.routes.UniqueTaxpayerReferenceYesNoController.onPageLoad(NormalMode).url
+        redirectLocation(result).value mustEqual controllers.add.routes.UniqueTaxpayerReferenceYesNoController
+          .onPageLoad(NormalMode)
+          .url
 
       }
     }

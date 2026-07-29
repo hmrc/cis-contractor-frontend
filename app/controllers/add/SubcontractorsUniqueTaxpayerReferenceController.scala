@@ -70,14 +70,14 @@ class SubcontractorsUniqueTaxpayerReferenceController @Inject() (
   def onPageLoad(mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData) { implicit request =>
 
-      val yesOrNoPage = UniqueTaxpayerReferenceYesNoPage
+      val yesOrNoPage       = UniqueTaxpayerReferenceYesNoPage
       val yesOrNoPageOption = request.userAnswers.get(UniqueTaxpayerReferenceYesNoPage)
-      
+
       subcontractorNameExtractor
         .getSubcontractorName(request.userAnswers)
         .fold(recoveryRedirect) { subcontractorName =>
           val result = Ok(view(preparedForm, mode, subcontractorName))
-          yesOrNoPageGuardService.yesOrNoPageRoute(result, yesOrNoPageOption, yesOrNoPage, mode) 
+          yesOrNoPageGuardService.yesOrNoPageRoute(result, yesOrNoPageOption, yesOrNoPage, mode)
         }
     }
 

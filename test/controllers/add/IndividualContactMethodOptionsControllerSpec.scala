@@ -79,9 +79,9 @@ class IndividualContactMethodOptionsControllerSpec extends SpecBase with Mockito
 
     "must redirect to yesOrNo page when yesorno page has No for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(uaWithName.set(AddIndividualContactMethodsYesNoPage, false)
-        .success
-        .value)).build()
+      val application = applicationBuilder(userAnswers =
+        Some(uaWithName.set(AddIndividualContactMethodsYesNoPage, false).success.value)
+      ).build()
 
       running(application) {
         val request = FakeRequest(GET, individualContactMethodOptionsRoute)
@@ -90,7 +90,9 @@ class IndividualContactMethodOptionsControllerSpec extends SpecBase with Mockito
 
         status(result) mustEqual SEE_OTHER
 
-        redirectLocation(result).value mustEqual controllers.add.routes.AddIndividualContactMethodsYesNoController.onPageLoad(NormalMode).url
+        redirectLocation(result).value mustEqual controllers.add.routes.AddIndividualContactMethodsYesNoController
+          .onPageLoad(NormalMode)
+          .url
 
       }
     }

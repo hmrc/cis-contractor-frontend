@@ -60,7 +60,7 @@ class SubNationalInsuranceNumberController @Inject() (
   def onPageLoad(mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData) { implicit request =>
 
-      val yesOrNoPage = NationalInsuranceNumberYesNoPage
+      val yesOrNoPage       = NationalInsuranceNumberYesNoPage
       val yesOrNoPageOption = request.userAnswers.get(NationalInsuranceNumberYesNoPage)
 
       subcontractorNameExtractor

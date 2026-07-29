@@ -52,13 +52,13 @@ class TradingNameOfSubcontractorController @Inject() (
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
 
     val yesOrNoPage: QuestionPage[Boolean] = SubTradingNameYesNoPage
-    val yesOrNoPageOption = request.userAnswers.get(SubTradingNameYesNoPage)
+    val yesOrNoPageOption                  = request.userAnswers.get(SubTradingNameYesNoPage)
 
     val preparedForm = request.userAnswers.get(TradingNameOfSubcontractorPage) match {
       case None        => form
       case Some(value) => form.fill(value)
     }
-    val result = Ok(view(preparedForm, mode))
+    val result       = Ok(view(preparedForm, mode))
 
     yesOrNoPageGuardService.yesOrNoPageRoute(result, yesOrNoPageOption, yesOrNoPage, mode)
 

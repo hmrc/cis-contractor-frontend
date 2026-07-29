@@ -26,19 +26,28 @@ import play.api.mvc
 import play.api.mvc.Results
 import play.api.test.Helpers.LOCATION
 
-
 class YesOrNoPageGuardServiceSpec extends SpecBase with MockitoSugar with ModelGenerators {
 
-  private val service = new YesOrNoPageGuardService()
+  private val service                   = new YesOrNoPageGuardService()
   val continueRoute: mvc.Results.Status = Results.Ok
 
   "yesOrNoPageRoute" - {
     val mode = NormalMode
 
-    val serviceTestData = Seq((SubTradingNameYesNoPage, controllers.add.routes.SubTradingNameYesNoController.onPageLoad(mode)),
-      (AddIndividualContactMethodsYesNoPage, controllers.add.routes.AddIndividualContactMethodsYesNoController.onPageLoad(mode)),
-      (UniqueTaxpayerReferenceYesNoPage, controllers.add.routes.UniqueTaxpayerReferenceYesNoController.onPageLoad(mode)),
-      (NationalInsuranceNumberYesNoPage, controllers.add.routes.NationalInsuranceNumberYesNoController.onPageLoad(mode)),
+    val serviceTestData = Seq(
+      (SubTradingNameYesNoPage, controllers.add.routes.SubTradingNameYesNoController.onPageLoad(mode)),
+      (
+        AddIndividualContactMethodsYesNoPage,
+        controllers.add.routes.AddIndividualContactMethodsYesNoController.onPageLoad(mode)
+      ),
+      (
+        UniqueTaxpayerReferenceYesNoPage,
+        controllers.add.routes.UniqueTaxpayerReferenceYesNoController.onPageLoad(mode)
+      ),
+      (
+        NationalInsuranceNumberYesNoPage,
+        controllers.add.routes.NationalInsuranceNumberYesNoController.onPageLoad(mode)
+      ),
       (WorksReferenceNumberYesNoPage, controllers.add.routes.WorksReferenceNumberYesNoController.onPageLoad(mode))
     )
 

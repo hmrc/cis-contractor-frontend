@@ -47,8 +47,13 @@ class WorksReferenceNumberControllerSpec extends SpecBase with MockitoSugar {
   private val name = "John Smith"
 
   private def uaWithName: UserAnswers =
-    emptyUserAnswers.set(SubcontractorNamePage, subcontractorName).success.value
-    .set(WorksReferenceNumberYesNoPage, true).success.value
+    emptyUserAnswers
+      .set(SubcontractorNamePage, subcontractorName)
+      .success
+      .value
+      .set(WorksReferenceNumberYesNoPage, true)
+      .success
+      .value
 
   "WorksReferenceNumber Controller" - {
 
@@ -91,9 +96,9 @@ class WorksReferenceNumberControllerSpec extends SpecBase with MockitoSugar {
 
     "must redirect to yesOrNo page when yesorno page has No for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(uaWithName.set(WorksReferenceNumberYesNoPage, false)
-        .success
-        .value)).build()
+      val application = applicationBuilder(userAnswers =
+        Some(uaWithName.set(WorksReferenceNumberYesNoPage, false).success.value)
+      ).build()
 
       running(application) {
         val request = FakeRequest(GET, worksReferenceNumberRoute)
@@ -102,7 +107,9 @@ class WorksReferenceNumberControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustEqual SEE_OTHER
 
-        redirectLocation(result).value mustEqual controllers.add.routes.WorksReferenceNumberYesNoController.onPageLoad(NormalMode).url
+        redirectLocation(result).value mustEqual controllers.add.routes.WorksReferenceNumberYesNoController
+          .onPageLoad(NormalMode)
+          .url
 
       }
     }

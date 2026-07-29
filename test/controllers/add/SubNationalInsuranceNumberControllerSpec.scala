@@ -47,12 +47,13 @@ class SubNationalInsuranceNumberControllerSpec extends SpecBase with MockitoSuga
   private def uaWithName: UserAnswers =
     emptyUserAnswers.set(SubcontractorNamePage, subcontractorName).success.value
 
-
   "SubNationalInsuranceNumber Controller" - {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(uaWithName.set(NationalInsuranceNumberYesNoPage, true).success.value)).build()
+      val application = applicationBuilder(userAnswers =
+        Some(uaWithName.set(NationalInsuranceNumberYesNoPage, true).success.value)
+      ).build()
 
       running(application) {
         val request = FakeRequest(GET, subNationalInsuranceNumberRoute)
@@ -68,8 +69,13 @@ class SubNationalInsuranceNumberControllerSpec extends SpecBase with MockitoSuga
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = uaWithName.set(SubNationalInsuranceNumberPage, "answer").success.value
-        .set(NationalInsuranceNumberYesNoPage, true).success.value
+      val userAnswers = uaWithName
+        .set(SubNationalInsuranceNumberPage, "answer")
+        .success
+        .value
+        .set(NationalInsuranceNumberYesNoPage, true)
+        .success
+        .value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
@@ -90,9 +96,9 @@ class SubNationalInsuranceNumberControllerSpec extends SpecBase with MockitoSuga
 
     "must redirect to yesOrNo page when yesorno page has No for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(uaWithName.set(NationalInsuranceNumberYesNoPage, false)
-        .success
-        .value)).build()
+      val application = applicationBuilder(userAnswers =
+        Some(uaWithName.set(NationalInsuranceNumberYesNoPage, false).success.value)
+      ).build()
 
       running(application) {
         val request = FakeRequest(GET, subNationalInsuranceNumberRoute)
@@ -101,7 +107,9 @@ class SubNationalInsuranceNumberControllerSpec extends SpecBase with MockitoSuga
 
         status(result) mustEqual SEE_OTHER
 
-        redirectLocation(result).value mustEqual controllers.add.routes.NationalInsuranceNumberYesNoController.onPageLoad(NormalMode).url
+        redirectLocation(result).value mustEqual controllers.add.routes.NationalInsuranceNumberYesNoController
+          .onPageLoad(NormalMode)
+          .url
 
       }
     }

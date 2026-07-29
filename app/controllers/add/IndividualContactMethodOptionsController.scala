@@ -55,12 +55,12 @@ class IndividualContactMethodOptionsController @Inject() (
 
   private def preparedForm(implicit request: DataRequest[?]) =
     request.userAnswers.get(IndividualContactMethodOptionsPage).fold(form)(form.fill)
-    
+
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
-    
-    val yesOrNoPage = AddIndividualContactMethodsYesNoPage
+
+    val yesOrNoPage       = AddIndividualContactMethodsYesNoPage
     val yesOrNoPageOption = request.userAnswers.get(AddIndividualContactMethodsYesNoPage)
-    
+
     subcontractorNameExtractor
       .getSubcontractorName(request.userAnswers)
       .fold(recoveryRedirect) { subcontractorName =>

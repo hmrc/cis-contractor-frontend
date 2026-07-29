@@ -25,26 +25,31 @@ import javax.inject.{Inject, Singleton}
 import play.api.mvc.{Call, Result}
 
 @Singleton
-class YesOrNoPageGuardService @Inject( ) extends LoggingUtil {
+class YesOrNoPageGuardService @Inject() extends LoggingUtil {
 
-  def yesOrNoPageRoute(continueRoute: Result, guardCheck: Option[Boolean], yesOrNoPage: QuestionPage[Boolean], mode: Mode): Result = {
+  def yesOrNoPageRoute(
+    continueRoute: Result,
+    guardCheck: Option[Boolean],
+    yesOrNoPage: QuestionPage[Boolean],
+    mode: Mode
+  ): Result =
     guardCheck match {
-      case Some(true) => continueRoute
+      case Some(true)  => continueRoute
       case Some(false) => Redirect(fetchRoute(yesOrNoPage, mode))
-      case _ => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+      case _           => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
 
     }
+
+  private def fetchRoute(page: QuestionPage[Boolean], mode: Mode): Call = page match {
+    case SubTradingNameYesNoPage              => controllers.add.routes.SubTradingNameYesNoController.onPageLoad(mode)
+    case AddIndividualContactMethodsYesNoPage =>
+      controllers.add.routes.AddIndividualContactMethodsYesNoController.onPageLoad(mode)
+    case UniqueTaxpayerReferenceYesNoPage     =>
+      controllers.add.routes.UniqueTaxpayerReferenceYesNoController.onPageLoad(mode)
+    case NationalInsuranceNumberYesNoPage     =>
+      controllers.add.routes.NationalInsuranceNumberYesNoController.onPageLoad(mode)
+    case WorksReferenceNumberYesNoPage        => controllers.add.routes.WorksReferenceNumberYesNoController.onPageLoad(mode)
+    case _                                    => controllers.routes.JourneyRecoveryController.onPageLoad()
   }
-
-    private def fetchRoute(
-                    page: QuestionPage[Boolean],
-                    mode: Mode): Call = page match {
-      case SubTradingNameYesNoPage => controllers.add.routes.SubTradingNameYesNoController.onPageLoad(mode)
-      case AddIndividualContactMethodsYesNoPage =>  controllers.add.routes.AddIndividualContactMethodsYesNoController.onPageLoad(mode)
-      case UniqueTaxpayerReferenceYesNoPage => controllers.add.routes.UniqueTaxpayerReferenceYesNoController.onPageLoad(mode)
-      case NationalInsuranceNumberYesNoPage => controllers.add.routes.NationalInsuranceNumberYesNoController.onPageLoad(mode)
-      case WorksReferenceNumberYesNoPage => controllers.add.routes.WorksReferenceNumberYesNoController.onPageLoad(mode)
-      case _ => controllers.routes.JourneyRecoveryController.onPageLoad()
-    }
 
 }
