@@ -20,10 +20,14 @@ import base.SpecBase
 import forms.amend.company.AmendCompanyRemoveDetailYesNoFormProvider
 import models.amend.company.AmendCompanyRemoveDetail
 import models.UserAnswers
+import models.address.Address
+import models.contact.ContactMethodOptions
+import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.when
+import org.mockito.Mockito.{verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import pages.add.company.*
+import pages.amend.company.AmendCompanyRemoveDetailYesNoPage
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
@@ -37,6 +41,7 @@ class AmendCompanyRemoveDetailYesNoControllerSpec extends SpecBase with MockitoS
   val formProvider = new AmendCompanyRemoveDetailYesNoFormProvider()
 
   private val companyName = "Test Company"
+  private val address = Address("line 1", postcode = Some("AA1 1AA"))
 
   private def uaWithName: UserAnswers =
     emptyUserAnswers.set(CompanyNamePage, companyName).success.value
@@ -50,30 +55,57 @@ class AmendCompanyRemoveDetailYesNoControllerSpec extends SpecBase with MockitoS
 
         case "address" =>
           uaWithName
+            .set(CompanyAddressPage, address)
+            .success
+            .value
             .set(CompanyAddressYesNoPage, true)
             .success
             .value
 
         case "contact-details" =>
           uaWithName
+            .set(
+              CompanyContactMethodOptionsPage,
+              Set(ContactMethodOptions.Email, ContactMethodOptions.Phone, ContactMethodOptions.Mobile)
+            )
+            .success
+            .value
+            .set(CompanyEmailAddressPage, "old@email.com")
+            .success
+            .value
+            .set(CompanyPhoneNumberPage, "01234567890")
+            .success
+            .value
+            .set(CompanyMobileNumberPage, "07123456789")
+            .success
+            .value
             .set(AddCompanyContactMethodsYesNoPage, true)
             .success
             .value
 
         case "utr" =>
           uaWithName
+            .set(CompanyUtrPage, "7777777777")
+            .success
+            .value
             .set(CompanyUtrYesNoPage, true)
             .success
             .value
 
         case "company-registration-number" =>
           uaWithName
+            .set(CompanyCrnPage, "AA1234567A")
+            .success
+            .value
             .set(CompanyCrnYesNoPage, true)
             .success
             .value
 
         case "works-reference-number" =>
           uaWithName
+            .set(CompanyWorksReferencePage, "WR-001")
+            .success
+            .value
             .set(CompanyWorksReferenceYesNoPage, true)
             .success
             .value
@@ -81,6 +113,66 @@ class AmendCompanyRemoveDetailYesNoControllerSpec extends SpecBase with MockitoS
 
     userAnswers
   }
+
+  private def assertDetailWasRemoved(
+                                      userAnswers: UserAnswers,
+                                      detail: AmendCompanyRemoveDetail
+                                    ): Unit =
+    detail match {
+      case AmendCompanyRemoveDetail.Address =>
+        userAnswers.get(CompanyAddressPage) mustBe None
+        userAnswers.get(CompanyAddressYesNoPage) mustBe Some(false)
+
+      case AmendCompanyRemoveDetail.ContactDetails =>
+        userAnswers.get(CompanyContactMethodOptionsPage) mustBe None
+        userAnswers.get(CompanyEmailAddressPage) mustBe None
+        userAnswers.get(CompanyPhoneNumberPage) mustBe None
+        userAnswers.get(CompanyMobileNumberPage) mustBe None
+        userAnswers.get(AddCompanyContactMethodsYesNoPage) mustBe Some(false)
+
+      case AmendCompanyRemoveDetail.Utr =>
+        userAnswers.get(CompanyUtrPage) mustBe None
+        userAnswers.get(CompanyUtrYesNoPage) mustBe Some(false)
+
+      case AmendCompanyRemoveDetail.CompanyRegistrationNumber =>
+        userAnswers.get(CompanyCrnPage) mustBe None
+        userAnswers.get(CompanyCrnYesNoPage) mustBe Some(false)
+
+      case AmendCompanyRemoveDetail.WorksReferenceNumber =>
+        userAnswers.get(CompanyWorksReferencePage) mustBe None
+        userAnswers.get(CompanyWorksReferenceYesNoPage) mustBe Some(false)
+    }
+
+  private def assertDetailWasRetained(
+                                       userAnswers: UserAnswers,
+                                       detail: AmendCompanyRemoveDetail
+                                     ): Unit =
+    detail match {
+      case AmendCompanyRemoveDetail.Address =>
+        userAnswers.get(CompanyAddressPage) mustBe Some(address)
+        userAnswers.get(CompanyAddressYesNoPage) mustBe Some(true)
+
+      case AmendCompanyRemoveDetail.ContactDetails =>
+        userAnswers.get(CompanyContactMethodOptionsPage) mustBe Some(
+          Set(ContactMethodOptions.Email, ContactMethodOptions.Phone, ContactMethodOptions.Mobile)
+        )
+        userAnswers.get(CompanyEmailAddressPage) mustBe Some("old@email.com")
+        userAnswers.get(CompanyPhoneNumberPage) mustBe Some("01234567890")
+        userAnswers.get(CompanyMobileNumberPage) mustBe Some("07123456789")
+        userAnswers.get(AddCompanyContactMethodsYesNoPage) mustBe Some(true)
+
+      case AmendCompanyRemoveDetail.Utr =>
+        userAnswers.get(CompanyUtrPage) mustBe Some("7777777777")
+        userAnswers.get(CompanyUtrYesNoPage) mustBe Some(true)
+
+      case AmendCompanyRemoveDetail.CompanyRegistrationNumber =>
+        userAnswers.get(CompanyCrnPage) mustBe Some("AA1234567A")
+        userAnswers.get(CompanyCrnYesNoPage) mustBe Some(true)
+
+      case AmendCompanyRemoveDetail.WorksReferenceNumber =>
+        userAnswers.get(CompanyWorksReferencePage) mustBe Some("WR-001")
+        userAnswers.get(CompanyWorksReferenceYesNoPage) mustBe Some(true)
+    }
 
   "AmendCompanyRemoveDetailYesNo Controller" - {
 
@@ -127,6 +219,7 @@ class AmendCompanyRemoveDetailYesNoControllerSpec extends SpecBase with MockitoS
         "must redirect to the next page when valid data with value Yes is submitted" in {
 
           val mockSessionRepository = mock[SessionRepository]
+          val captor = ArgumentCaptor.forClass(classOf[UserAnswers])
 
           when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
@@ -145,15 +238,22 @@ class AmendCompanyRemoveDetailYesNoControllerSpec extends SpecBase with MockitoS
             val result = route(application, request).value
 
             status(result) mustEqual SEE_OTHER
-            redirectLocation(result).value mustEqual controllers.add.company.routes.CompanyCheckYourAnswersController
+            redirectLocation(result).value mustEqual controllers.amend.company.routes.AmendCompanyCheckYourAnswersController
               .onPageLoad()
               .url
+
+            verify(mockSessionRepository).set(captor.capture())
+            val savedAnswers = captor.getValue
+
+            assertDetailWasRemoved(savedAnswers, detailType)
+            savedAnswers.get(AmendCompanyRemoveDetailYesNoPage(detailType)) mustBe None
           }
         }
 
         "must redirect to the next page when valid data with value No is submitted" in {
 
           val mockSessionRepository = mock[SessionRepository]
+          val captor                = ArgumentCaptor.forClass(classOf[UserAnswers])
 
           when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
@@ -172,9 +272,15 @@ class AmendCompanyRemoveDetailYesNoControllerSpec extends SpecBase with MockitoS
             val result = route(application, request).value
 
             status(result) mustEqual SEE_OTHER
-            redirectLocation(result).value mustEqual controllers.add.company.routes.CompanyCheckYourAnswersController
+            redirectLocation(result).value mustEqual controllers.amend.company.routes.AmendCompanyCheckYourAnswersController
               .onPageLoad()
               .url
+
+            verify(mockSessionRepository).set(captor.capture())
+            val savedAnswers = captor.getValue
+
+            assertDetailWasRetained(savedAnswers, detailType)
+            savedAnswers.get(AmendCompanyRemoveDetailYesNoPage(detailType)) mustBe None
           }
         }
 
