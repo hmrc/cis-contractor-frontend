@@ -14,16 +14,12 @@
  * limitations under the License.
  */
 
-package models.response
+package pages.amend
 
-import play.api.libs.json.{Json, OFormat}
+import pages.QuestionPage
+import play.api.libs.json.JsPath
 
-final case class GetSubcontractorResponse(
-  scheme: Option[ContractorSchemeResponse],
-  subcontractor: Option[SubcontractorResponse]
-)
-
-object GetSubcontractorResponse {
-  given format: OFormat[GetSubcontractorResponse] =
-    Json.format[GetSubcontractorResponse]
+case object AmendCheckYourAnswersSubmittedPage extends QuestionPage[Boolean] {
+  override def path: JsPath     = JsPath \ toString
+  override def toString: String = "amendCheckYourAnswersSubmitted"
 }
