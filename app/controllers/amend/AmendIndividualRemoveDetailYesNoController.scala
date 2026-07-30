@@ -182,10 +182,9 @@ class AmendIndividualRemoveDetailYesNoController @Inject() (
                         )
                       } else {
                         Redirect(
-                          controllers.add.routes.CheckYourAnswersController
+                          controllers.amend.routes.AmendIndividualCheckYourAnswersController
                             .onPageLoad()
                             .url
-                            // TODO route to controllers.amend.routes.AmendIndividualCheckYourAnswersController.onPageLoad() when AmendIndividualCheckYourAnswersController added.
                         )
                       }
                 )
