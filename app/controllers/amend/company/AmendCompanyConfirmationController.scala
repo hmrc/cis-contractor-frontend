@@ -26,7 +26,7 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import queries.{CisIdQuery, OriginalCompanyAnswersQuery}
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import utils.{DefaultSubcontractorCleanupService, SubcontractorCleanupService}
+import utils.DefaultSubcontractorCleanupService
 import viewmodels.amend.company.CompanyAmendConfirmationViewModel
 import views.html.amend.AmendConfirmationView
 
@@ -71,7 +71,7 @@ class AmendCompanyConfirmationController @Inject() (
               Future.successful(recoveryRedirect)
 
             case Some(cisId) =>
-              val tableRows = CompanyAmendConfirmationViewModel.rows(originalCompanyAnswers, ua)
+              val tableRows   = CompanyAmendConfirmationViewModel.rows(originalCompanyAnswers, ua)
               val companyName = ua.get(CompanyNamePage).getOrElse("")
               cleanupService.cleanAmend(ua) match {
 

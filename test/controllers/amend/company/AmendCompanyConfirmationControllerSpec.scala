@@ -21,7 +21,7 @@ import config.FrontendAppConfig
 import models.UserAnswers
 import models.amend.company.OriginalCompanyAnswers
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.{never, verify, when}
+import org.mockito.Mockito.{never, reset, verify, when}
 import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.mockito.MockitoSugar
 import pages.add.company.CompanyNamePage
@@ -33,14 +33,11 @@ import repositories.SessionRepository
 import utils.{DefaultSubcontractorCleanupService, SubcontractorCleanupService}
 import viewmodels.amend.company.CompanyAmendConfirmationViewModel
 import views.html.amend.AmendConfirmationView
-import org.mockito.Mockito.reset
+
 import scala.concurrent.Future
 import scala.util.{Failure, Success}
 
-class AmendCompanyConfirmationControllerSpec
-  extends SpecBase
-    with MockitoSugar
-    with BeforeAndAfterEach {
+class AmendCompanyConfirmationControllerSpec extends SpecBase with MockitoSugar with BeforeAndAfterEach {
 
   private val companyName = "Company Ltd"
   private val cisId       = "contractor-123"
@@ -77,9 +74,15 @@ class AmendCompanyConfirmationControllerSpec
 
   private val userAnswersWithOriginal =
     emptyUserAnswers
-      .set(OriginalCompanyAnswersQuery, original).success.value
-      .set(CisIdQuery, cisId).success.value
-      .set(CompanyNamePage, companyName).success.value
+      .set(OriginalCompanyAnswersQuery, original)
+      .success
+      .value
+      .set(CisIdQuery, cisId)
+      .success
+      .value
+      .set(CompanyNamePage, companyName)
+      .success
+      .value
 
   private lazy val confirmationRoute =
     controllers.amend.company.routes.AmendCompanyConfirmationController.onPageLoad().url
@@ -134,8 +137,12 @@ class AmendCompanyConfirmationControllerSpec
 
       val userAnswers =
         emptyUserAnswers
-          .set(CisIdQuery, cisId).success.value
-          .set(CompanyNamePage, companyName).success.value
+          .set(CisIdQuery, cisId)
+          .success
+          .value
+          .set(CompanyNamePage, companyName)
+          .success
+          .value
 
       val app = application(userAnswers)
 
@@ -155,8 +162,12 @@ class AmendCompanyConfirmationControllerSpec
 
       val userAnswers =
         emptyUserAnswers
-          .set(OriginalCompanyAnswersQuery, original).success.value
-          .set(CompanyNamePage, companyName).success.value
+          .set(OriginalCompanyAnswersQuery, original)
+          .success
+          .value
+          .set(CompanyNamePage, companyName)
+          .success
+          .value
 
       val app = application(userAnswers)
 

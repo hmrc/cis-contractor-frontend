@@ -128,12 +128,24 @@ class DefaultSubcontractorCleanupServiceSpec extends SpecBase {
 
         val userAnswers =
           emptyUserAnswers
-            .set(OriginalIndividualAnswersQuery, originalIndividual).success.value
-            .set(OriginalCompanyAnswersQuery, originalCompany).success.value
-            .set(OriginalPartnershipAnswersQuery, originalPartnership).success.value
-            .set(OriginalTrustAnswersQuery, originalTrust).success.value
-            .set(AmendCheckYourAnswersSubmittedPage, true).success.value
-            .set(CheckYourAnswersSubmittedPage, true).success.value
+            .set(OriginalIndividualAnswersQuery, originalIndividual)
+            .success
+            .value
+            .set(OriginalCompanyAnswersQuery, originalCompany)
+            .success
+            .value
+            .set(OriginalPartnershipAnswersQuery, originalPartnership)
+            .success
+            .value
+            .set(OriginalTrustAnswersQuery, originalTrust)
+            .success
+            .value
+            .set(AmendCheckYourAnswersSubmittedPage, true)
+            .success
+            .value
+            .set(CheckYourAnswersSubmittedPage, true)
+            .success
+            .value
 
         val result = service.cleanAmend(userAnswers).success.value
 
