@@ -608,6 +608,8 @@ GET   /subcontractor/verify/verification-status/select-subcontractors    control
 GET   /verify/verification-status/reverification-decision                controllers.verify.VerificationStatusController.goToReverificationDecision(mode: Mode = NormalMode)
 GET   /verify/verification-status/select-subcontractors                  controllers.verify.VerificationStatusController.goToSelectSubcontractorsToReverify(mode: Mode = NormalMode)
 
+GET   /subcontractor/verify/no-verification-results                       controllers.verify.NoVerificationResultsController.onPageLoad()
+
 # Contractor Details
 GET   /contractor-details/introduction  controllers.contractordetails.ContractorDetailsController.onPageLoad()
 POST  /contractor-details/introduction  controllers.contractordetails.ContractorDetailsController.onSubmit()
