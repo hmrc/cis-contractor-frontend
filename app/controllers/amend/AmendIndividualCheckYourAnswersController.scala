@@ -179,7 +179,7 @@ class AmendIndividualCheckYourAnswersController @Inject() (
 
   def onSubmit(): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
-      if (request.userAnswers.get(CheckYourAnswersSubmittedPage).contains(true)) {
+      if (request.userAnswers.get(AmendCheckYourAnswersSubmittedPage).contains(true)) {
         Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
       } else {
         ValidatedSubcontractor.build(request.userAnswers) match {
@@ -210,9 +210,17 @@ class AmendIndividualCheckYourAnswersController @Inject() (
       }
     }
 
-  def onCancel(): Action[AnyContent] = (identify andThen getData andThen requireData).async { implicit request =>
-    sessionRepository
-      .set(UserAnswers(request.userAnswers.id))
-      .map(_ => Redirect(controllers.routes.IndexController.onPageLoad()))
-  }
+  def onCancel(): Action[AnyContent] =
+    (identify andThen getData andThen requireData).async { implicit request =>
+      sessionRepository
+        .set(UserAnswers(request.userAnswers.id))
+        .map(_ => Redirect(controllers.routes.IndexController.onPageLoad()))
+        .recover { case t =>
+          logger.error(
+            s"[AmendIndividualCheckYourAnswersController.onCancel] Failed to clear user answers for session ${request.userAnswers.id}",
+            t
+          )
+          Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+        }
+    }
 }

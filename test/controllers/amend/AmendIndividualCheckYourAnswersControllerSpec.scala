@@ -338,7 +338,7 @@ class AmendIndividualCheckYourAnswersControllerSpec extends SpecBase with Mockit
     "must redirect to Journey Recovery when the check your answers page has already been submitted" in {
 
       val ua = minUa
-        .set(CheckYourAnswersSubmittedPage, true)
+        .set(AmendCheckYourAnswersSubmittedPage, true)
         .success
         .value
 
