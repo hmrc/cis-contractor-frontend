@@ -17,7 +17,7 @@
 package viewmodels.checkAnswers.add
 
 import controllers.add.routes
-import models.{CheckMode, UserAnswers}
+import models.{AmendMode, CheckMode, UserAnswers}
 import org.scalatest.OptionValues.convertOptionToValuable
 import org.scalatest.TryValues.convertTryToSuccessOrFailure
 import org.scalatest.freespec.AnyFreeSpec
@@ -59,6 +59,38 @@ class UniqueTaxpayerReferenceYesNoSummarySpec extends AnyFreeSpec with Matchers 
       val changeAction       = actions.head
       val expectedChangeText = messages("site.change")
       val expectedHref       = routes.UniqueTaxpayerReferenceYesNoController.onPageLoad(CheckMode).url
+      val expectedHiddenText = messages("uniqueTaxpayerReferenceYesNo.change.hidden")
+
+      changeAction.content.asHtml.toString    should include(expectedChangeText)
+      changeAction.href                     shouldBe expectedHref
+      changeAction.visuallyHiddenText.value shouldBe expectedHiddenText
+    }
+
+    "must return a SummaryListRow with 'Yes' when the answer is true in amend journey" in {
+      val answers = UserAnswers("test-id")
+        .set(UniqueTaxpayerReferenceYesNoPage, true)
+        .success
+        .value
+
+      val maybeRow: Option[SummaryListRow] = UniqueTaxpayerReferenceYesNoSummary.row(answers, AmendMode)
+      maybeRow shouldBe defined
+
+      val row =
+        maybeRow.value
+
+      val expectedKeyText = messages("uniqueTaxpayerReferenceYesNo.checkYourAnswersLabel")
+      row.key.content.asHtml.toString should include(expectedKeyText)
+
+      val expectedValue = messages("site.yes")
+      row.value.content.asHtml.toString should include(expectedValue)
+
+      row.actions shouldBe defined
+      val actions = row.actions.value.items
+      actions should have size 1
+
+      val changeAction       = actions.head
+      val expectedChangeText = messages("site.change")
+      val expectedHref       = routes.UniqueTaxpayerReferenceYesNoController.onPageLoad(AmendMode).url
       val expectedHiddenText = messages("uniqueTaxpayerReferenceYesNo.change.hidden")
 
       changeAction.content.asHtml.toString    should include(expectedChangeText)
