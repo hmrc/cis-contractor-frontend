@@ -29,8 +29,7 @@ class CompanyNavigatorSpec extends SpecBase {
   private lazy val journeyRecovery = routes.JourneyRecoveryController.onPageLoad()
   private lazy val CompanyCYA      = controllers.add.company.routes.CompanyCheckYourAnswersController.onPageLoad()
   private lazy val CompanyAmendCYA =
-    routes.JourneyRecoveryController
-      .onPageLoad() // TODO when available controllers.add.company.routes.AmendCompanyCheckYourAnswersController.onPageLoad()
+    controllers.amend.company.routes.AmendCompanyCheckYourAnswersController.onPageLoad()
 
   "CompanyNavigator" - {
 
@@ -400,7 +399,7 @@ class CompanyNavigatorSpec extends SpecBase {
 
       "must go from any page to JourneyRecovery" in {
         case object UnknownPage extends Page
-        navigator.nextPage(UnknownPage, AmendMode, UserAnswers("id")) mustBe journeyRecovery
+        navigator.nextPage(UnknownPage, AmendMode, UserAnswers("id")) mustBe CompanyAmendCYA
       }
 
       "must go from CompanyNamePage to AmendCYA" in {
@@ -408,18 +407,34 @@ class CompanyNavigatorSpec extends SpecBase {
       }
 
       "must go from CompanyEmailAddressPage to Company CYA in AmendMode" in {
+        val answers = emptyUserAnswers
+          .set(CompanyContactMethodOptionsPage, Set(ContactMethodOptions.Email))
+          .success
+          .value
+          .set(CompanyEmailAddressPage, "s@s.com")
+          .success
+          .value
+
         navigator.nextPage(
           CompanyEmailAddressPage,
           AmendMode,
-          emptyUserAnswers
+          answers
         ) mustBe CompanyAmendCYA
       }
 
       "must go from CompanyMobileNumberPage to Company CYA in AmendMode" in {
+        val userAnswers = emptyUserAnswers
+          .set(CompanyContactMethodOptionsPage, Set(ContactMethodOptions.Mobile))
+          .success
+          .value
+          .set(CompanyMobileNumberPage, "07123456789")
+          .success
+          .value
+
         navigator.nextPage(
           CompanyMobileNumberPage,
           AmendMode,
-          emptyUserAnswers
+          userAnswers
         ) mustBe CompanyAmendCYA
       }
 
@@ -600,11 +615,20 @@ class CompanyNavigatorSpec extends SpecBase {
         }
       }
 
-      "must go from a CompanyPhoneNumberPage to Company CYA in CheckMode" in {
+      "must go from a CompanyPhoneNumberPage to Company CYA in AmendMode" in {
+        val ua =
+          emptyUserAnswers
+            .set(CompanyContactMethodOptionsPage, Set(ContactMethodOptions.Phone))
+            .success
+            .value
+            .set(CompanyPhoneNumberPage, "07123456789")
+            .success
+            .value
+
         navigator.nextPage(
           CompanyPhoneNumberPage,
           AmendMode,
-          emptyUserAnswers
+          ua
         ) mustBe CompanyAmendCYA
       }
 
