@@ -24,7 +24,7 @@ import models.contact.ContactMethodOptions
 import models.{TypeOfSubcontractor, UserAnswers}
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.{never, verify, verifyNoInteractions, verifyNoMoreInteractions, when}
+import org.mockito.Mockito.*
 import org.scalatestplus.mockito.MockitoSugar
 import pages.add.TypeOfSubcontractorPage
 import pages.add.company.*
@@ -36,7 +36,6 @@ import play.api.test.Helpers.*
 import queries.OriginalCompanyAnswersQuery
 import repositories.SessionRepository
 import services.SubcontractorService
-import pages.amend.AmendCheckYourAnswersSubmittedPage
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.Future
