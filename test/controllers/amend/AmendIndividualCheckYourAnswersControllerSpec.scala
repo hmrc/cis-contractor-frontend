@@ -273,6 +273,71 @@ class AmendIndividualCheckYourAnswersControllerSpec extends SpecBase with Mockit
       }
     }
 
+    "must not render the verification number row when the individual is pending verification" in {
+
+      val verifiedUa =
+        minUa
+          .set(ShowVerificationDetailsPage, true)
+          .success
+          .value
+          .set(
+            OriginalIndividualAnswersQuery,
+            OriginalIndividualAnswers(
+              usesTradingName = Some(false),
+              subcontractorName = Some(
+                SubcontractorName(
+                  firstName = "John",
+                  middleName = None,
+                  lastName = "Smith"
+                )
+              ),
+              tradingName = None,
+              addressYesNo = Some(false),
+              address = None,
+              individualContactMethodsYesNo = Some(false),
+              individualContactMethod = Set.empty,
+              email = None,
+              phone = None,
+              mobile = None,
+              utrYesNo = Some(false),
+              utr = None,
+              ninoYesNo = Some(false),
+              nino = None,
+              worksReferenceYesNo = Some(false),
+              worksReference = None,
+              verificationNumber = None
+            )
+          )
+          .success
+          .value
+
+      val application =
+        applicationBuilder(userAnswers = Some(verifiedUa)).build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(
+            GET,
+            controllers.amend.routes.AmendIndividualCheckYourAnswersController.onPageLoad().url
+          )
+
+        val msg = application.injector.instanceOf[MessagesApi].preferred(request)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual OK
+
+        val page = contentAsString(result)
+
+        page must not include msg("amendCheckYourAnswers.verificationNumber.label")
+        page must not include "VRN123456"
+
+        page must include(msg("subcontractorsUniqueTaxpayerReference.checkYourAnswersLabel"))
+        page must include("11111111")
+      }
+    }
+
     "must redirect to Journey Recovery when validation fails" in {
 
       val invalidUa =

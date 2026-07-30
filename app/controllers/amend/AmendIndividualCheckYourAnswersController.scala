@@ -92,22 +92,25 @@ class AmendIndividualCheckYourAnswersController @Inject() (
       Option
         .when(ua.get(ShowVerificationDetailsPage).contains(true)) {
 
-          val verificationNumber =
-            originalAnswers.flatMap(_.verificationNumber).getOrElse("")
+          val verificationNumberOpt =
+            originalAnswers
+              .flatMap(_.verificationNumber)
+              .filter(_.trim.nonEmpty)
 
           Seq(
             SubcontractorsUniqueTaxpayerReferenceSummary.row(
               ua,
               AmendMode,
               showActions = false
-            ),
+            )
+          ) ++ verificationNumberOpt.map { verificationNumber =>
             Some(
               SummaryListRowViewModel(
                 key = Key(Text(messages("amendCheckYourAnswers.verificationNumber.label"))),
                 value = Value(Text(verificationNumber))
               )
             )
-          )
+          }
         }
         .getOrElse(Nil)
 
