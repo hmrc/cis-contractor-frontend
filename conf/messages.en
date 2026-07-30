@@ -1009,7 +1009,7 @@ contractordetails.contractorDetailsUpdated.title                               =
 contractordetails.contractorDetailsUpdated.heading                             =  Contractor details updated
 contractordetails.contractorDetailsUpdated.p1.details.prefix                   =  You have successfully changed the contractor details. You can
 contractordetails.contractorDetailsUpdated.p1.details.link                     =  view the change on your contractor details
-contractordetails.contractorDetailsUpdated.returnToDashboard.link              =  Return to CIS dashboard
+contractordetails.contractorDetailsUpdated.returnToDashboard.link              =  Return to manage your CIS account
 contractordetails.contractorDetailsUpdated.p2.whatDidYouThink.link             =  What did you think of this service?
 contractordetails.contractorDetailsUpdated.p2.whatDidYouThink.suffix           =  (takes 30 seconds)
 
@@ -1034,7 +1034,7 @@ contractordetails.contractorDetailsCheckAnswers.table.schemeName.hidden        =
 contractordetails.contractorDetailsCheckAnswers.table.email                    =  Email
 contractordetails.contractorDetailsCheckAnswers.table.email.hidden             =  email
 contractordetails.contractorDetailsCheckAnswers.table.link.addDetails          =  Add details
-contractordetails.contractorDetailsCheckAnswers.returnToCisDashboard.link      =  Return to CIS account
+contractordetails.contractorDetailsCheckAnswers.returnToCisDashboard.link      =  Return to manage your CIS account
 
 contractordetails.addEmailAddressYesNo.title                                   =  Do you want to enter the contractor’s email address?
 contractordetails.addEmailAddressYesNo.heading                                 =  Do you want to enter the contractor’s email address?
