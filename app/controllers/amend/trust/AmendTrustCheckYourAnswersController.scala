@@ -35,7 +35,7 @@ import viewmodels.checkAnswers.add.trust.*
 import viewmodels.govuk.summarylist.*
 import views.html.amend.AmendCheckYourAnswersView
 import controllers.routes
-import pages.amend.ShowVerificationDetailsPage
+import pages.amend.{AmendCheckYourAnswersSubmittedPage, ShowVerificationDetailsPage}
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -68,7 +68,7 @@ class AmendTrustCheckYourAnswersController @Inject() (
         val detailsList =
           SummaryListViewModel(rows = detailsRows(ua, isVerified).flatten)
 
-        val submitUrl = controllers.amend.trust.routes.AmendTrustConfirmationController.onPageLoad()
+        val submitUrl = controllers.amend.trust.routes.AmendTrustCheckYourAnswersController.onSubmit()
         val cancelUrl = controllers.amend.trust.routes.AmendTrustCheckYourAnswersController.onCancel()
 
         Ok(view(subcontractorInformationList, detailsList, trustName, submitUrl, cancelUrl))
@@ -147,28 +147,49 @@ class AmendTrustCheckYourAnswersController @Inject() (
 
   def onSubmit(): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
-      ValidatedTrust.build(request.userAnswers) match {
-        case Right(_) =>
-          subcontractorService
-            .createAndUpdateSubcontractor(request.userAnswers)
-            .map(_ => Redirect(controllers.amend.trust.routes.AmendTrustConfirmationController.onPageLoad()))
-            .recover { case t =>
-              logger.error(
-                "[AmendTrustCheckYourAnswersController.onSubmit] Failed to update subcontractor",
-                t
-              )
-              Redirect(routes.JourneyRecoveryController.onPageLoad())
-            }
+      if (request.userAnswers.get(AmendCheckYourAnswersSubmittedPage).contains(true)) {
+        Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+      } else {
+        ValidatedTrust.build(request.userAnswers) match {
+          case Right(_) =>
+            subcontractorService
+              .createAndUpdateSubcontractor(request.userAnswers)
+              .flatMap { _ =>
+                Future
+                  .fromTry(request.userAnswers.set(AmendCheckYourAnswersSubmittedPage, true))
+                  .flatMap(updated => sessionRepository.set(updated).map(_ => ()))
+                  .map(_ =>
+                    Redirect(
+                      controllers.amend.trust.routes.AmendTrustConfirmationController.onPageLoad()
+                    ) // TODO: Redirect to confirmation page
+                  )
+              }
+              .recover { case t =>
+                logger.error(
+                  "[AmendTrustCheckYourAnswersController.onSubmit] Failed to update subcontractor",
+                  t
+                )
+                Redirect(routes.JourneyRecoveryController.onPageLoad())
+              }
 
-        case Left(error) =>
-          logger.error(s"[AmendTrustCheckYourAnswersController.onSubmit] Validation failed: $error")
-          Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
+          case Left(error) =>
+            logger.error(s"[AmendTrustCheckYourAnswersController.onSubmit] Validation failed: $error")
+            Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
+        }
       }
     }
 
-  def onCancel(): Action[AnyContent] = (identify andThen getData andThen requireData).async { implicit request =>
-    sessionRepository
-      .set(UserAnswers(request.userAnswers.id))
-      .map(_ => Redirect(routes.IndexController.onPageLoad()))
-  }
+  def onCancel(): Action[AnyContent] =
+    (identify andThen getData andThen requireData).async { implicit request =>
+      sessionRepository
+        .set(UserAnswers(request.userAnswers.id))
+        .map(_ => Redirect(routes.IndexController.onPageLoad()))
+        .recover { case t =>
+          logger.error(
+            s"[AmendTrustCheckYourAnswersController.onCancel] Failed to clear user answers for session ${request.userAnswers.id}",
+            t
+          )
+          Redirect(routes.JourneyRecoveryController.onPageLoad())
+        }
+    }
 }

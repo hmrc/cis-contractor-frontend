@@ -22,7 +22,7 @@ import models.address.{Address, Country}
 import models.amend.trust.OriginalTrustAnswers
 import models.{TypeOfSubcontractor, UserAnswers}
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.{never, verify, verifyNoMoreInteractions, when}
+import org.mockito.Mockito.{never, verify, verifyNoInteractions, verifyNoMoreInteractions, when}
 import org.scalatestplus.mockito.MockitoSugar
 import pages.add.TypeOfSubcontractorPage
 import pages.add.trust.*
@@ -38,6 +38,8 @@ import uk.gov.hmrc.http.HeaderCarrier
 import scala.concurrent.Future
 import models.contact.ContactMethodOptions
 import pages.amend.ShowVerificationDetailsPage
+import org.mockito.ArgumentCaptor
+import pages.amend.AmendCheckYourAnswersSubmittedPage
 
 class AmendTrustCheckYourAnswersControllerSpec extends SpecBase with MockitoSugar {
   private val address =
@@ -263,9 +265,10 @@ class AmendTrustCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
 
       val mockSubcontractorService = mock[SubcontractorService]
       val mockSessionRepository    = mock[SessionRepository]
-
+      val captor                   = ArgumentCaptor.forClass(classOf[UserAnswers])
       when(mockSubcontractorService.createAndUpdateSubcontractor(any[UserAnswers])(any[HeaderCarrier]))
         .thenReturn(Future.successful(()))
+      when(mockSessionRepository.set(any[UserAnswers])).thenReturn(Future.successful(true))
 
       val application =
         applicationBuilder(userAnswers = Some(minUa))
@@ -289,8 +292,40 @@ class AmendTrustCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
 
       verify(mockSubcontractorService)
         .createAndUpdateSubcontractor(any[UserAnswers])(any[HeaderCarrier])
+      verify(mockSessionRepository).set(captor.capture())
 
+      captor.getValue.get(AmendCheckYourAnswersSubmittedPage) mustBe Some(true)
       verifyNoMoreInteractions(mockSubcontractorService)
+    }
+
+    "must redirect to Journey Recovery when the check your answers page has already been submitted" in {
+
+      val ua = minUa
+        .set(AmendCheckYourAnswersSubmittedPage, true)
+        .success
+        .value
+
+      val mockSubcontractorService = mock[SubcontractorService]
+
+      val application =
+        applicationBuilder(userAnswers = Some(ua))
+          .overrides(
+            bind[SubcontractorService].toInstance(mockSubcontractorService)
+          )
+          .build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(POST, controllers.amend.trust.routes.AmendTrustCheckYourAnswersController.onSubmit().url)
+
+        val result = route(application, request).value
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result).value mustBe
+          controllers.routes.JourneyRecoveryController.onPageLoad().url
+      }
+      verifyNoInteractions(mockSubcontractorService)
     }
 
     "must redirect to Journey Recovery when the service fails" in {
