@@ -210,9 +210,17 @@ class AmendIndividualCheckYourAnswersController @Inject() (
       }
     }
 
-  def onCancel(): Action[AnyContent] = (identify andThen getData andThen requireData).async { implicit request =>
-    sessionRepository
-      .set(UserAnswers(request.userAnswers.id))
-      .map(_ => Redirect(controllers.routes.IndexController.onPageLoad()))
-  }
+  def onCancel(): Action[AnyContent] =
+    (identify andThen getData andThen requireData).async { implicit request =>
+      sessionRepository
+        .set(UserAnswers(request.userAnswers.id))
+        .map(_ => Redirect(controllers.routes.IndexController.onPageLoad()))
+        .recover { case t =>
+          logger.error(
+            s"[AmendIndividualCheckYourAnswersController.onCancel] Failed to clear user answers for session ${request.userAnswers.id}",
+            t
+          )
+          Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+        }
+    }
 }
