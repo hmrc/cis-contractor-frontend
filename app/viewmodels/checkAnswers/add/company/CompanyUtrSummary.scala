@@ -25,12 +25,13 @@ import viewmodels.implicits.*
 
 object CompanyUtrSummary {
 
-  def row(answers: UserAnswers, mode: Mode = CheckMode)(implicit messages: Messages): Option[SummaryListRow] =
+  def row(answers: UserAnswers, mode: Mode = CheckMode, showActions: Boolean = true)(implicit
+    messages: Messages
+  ): Option[SummaryListRow] =
     answers.get(CompanyUtrPage).map { answer =>
-      SummaryListRowViewModel(
-        key = "companyUtr.checkYourAnswersLabel",
-        value = ValueViewModel(answer),
-        actions = Seq(
+      val value = ValueViewModel(answer)
+      if (showActions) {
+        val actions = Seq(
           ActionItemViewModel(
             "site.change",
             controllers.add.company.routes.CompanyUtrController.onPageLoad(mode).url
@@ -38,6 +39,17 @@ object CompanyUtrSummary {
             .withVisuallyHiddenText(messages("companyUtr.change.hidden"))
             .withAttribute("id" -> "company-utr")
         )
-      )
+        SummaryListRowViewModel(
+          key = "companyUtr.checkYourAnswersLabel",
+          value = value,
+          actions = actions
+        )
+      } else {
+        SummaryListRowViewModel(
+          key = "companyUtr.verified.checkYourAnswersLabel",
+          value = value,
+          actions = Seq.empty
+        )
+      }
     }
 }
