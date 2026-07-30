@@ -1,0 +1,112 @@
+@*
+ * Copyright 2026 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import config.FrontendAppConfig
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.table._
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.content._
+@import viewmodels.verify.{ReviewInsufficientInfoViewModel, MissingSubcontractorRow, ReadySubcontractorRow, LinkViewModel}
+@import views.html.components._
+
+@this(
+    layout: templates.Layout,
+    govukTable: GovukTable,
+    heading: H1,
+    paragraph: Paragraph,
+    link: Link
+)
+
+@(viewModel: ReviewInsufficientInfoViewModel)(implicit request: Request[_], appConfig: FrontendAppConfig, messages: Messages)
+
+@nameLink(vm: LinkViewModel, name: String) = {
+    <a class="govuk-link" href="@vm.url">@name</a>
+}
+
+@actionLink(textKey: String, vm: LinkViewModel) = {
+    <a class="govuk-link" href="@vm.url">@messages(textKey)<span class="govuk-visually-hidden"> @vm.hiddenText</span></a>
+}
+
+@missingActions(row: MissingSubcontractorRow) = {
+    @actionLink("verify.reviewInsufficientInfo.action.edit", row.editLink)<span aria-hidden="true"> | </span>@actionLink("verify.reviewInsufficientInfo.action.proceed", row.proceedLink)<span aria-hidden="true"> | </span>@actionLink("verify.reviewInsufficientInfo.action.remove", row.removeLink)
+}
+
+@layout(pageTitle = titleNoForm(messages("verify.reviewInsufficientInfo.title"))) {
+
+    @heading(messages("verify.reviewInsufficientInfo.heading"))
+
+    @paragraph(messages("verify.reviewInsufficientInfo.p1"))
+
+    <p class="govuk-body">@messages("verify.reviewInsufficientInfo.p2")</p>
+    <ul class="govuk-list govuk-list--bullet">
+        <li>@messages("verify.reviewInsufficientInfo.bullet1")</li>
+        <li>@messages("verify.reviewInsufficientInfo.bullet2")</li>
+        <li>@messages("verify.reviewInsufficientInfo.bullet3")</li>
+    </ul>
+
+    @link(
+        linkTextKey = "verify.reviewInsufficientInfo.whatYouNeed.link",
+        linkUrl = appConfig.subcontractorVerificationGuideUrl,
+        isNewTab = true
+    )
+
+    @if(viewModel.hasMissing) {
+        <h2 class="govuk-heading-m">@messages("verify.reviewInsufficientInfo.missing.subheading")</h2>
+
+        @govukTable(
+            Table(
+                head = Some(Seq(
+                    HeadCell(Text(messages("verify.reviewInsufficientInfo.name"))),
+                    HeadCell(Text(messages("verify.reviewInsufficientInfo.utr"))),
+                    HeadCell(Text(messages("verify.reviewInsufficientInfo.actions")))
+                )),
+                rows = viewModel.missing.map { row =>
+                    Seq(
+                        TableRow(HtmlContent(nameLink(row.nameLink, row.name))),
+                        TableRow(Text(row.utr)),
+                        TableRow(HtmlContent(missingActions(row)))
+                    )
+                },
+                attributes = Map("id" -> "missing-information-table")
+            )
+        )
+    }
+
+    @if(viewModel.hasReady) {
+        <h2 class="govuk-heading-m">@messages("verify.reviewInsufficientInfo.ready.subheading")</h2>
+
+        @govukTable(
+            Table(
+                head = Some(Seq(
+                    HeadCell(Text(messages("verify.reviewInsufficientInfo.name"))),
+                    HeadCell(Text(messages("verify.reviewInsufficientInfo.utr.full")))
+                )),
+                rows = viewModel.ready.map { row =>
+                    Seq(
+                        TableRow(HtmlContent(nameLink(row.nameLink, row.name))),
+                        TableRow(Text(row.utr))
+                    )
+                },
+                attributes = Map("id" -> "ready-table")
+            )
+        )
+    }
+
+    @if(viewModel.allReady) {
+        @* TODO: point Continue at the next step in the verify journey. *@
+        <a href="#" role="button" draggable="false" class="govuk-button" data-module="govuk-button">
+            @messages("site.continue")
+        </a>
+    }
+}

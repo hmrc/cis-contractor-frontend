@@ -887,6 +887,25 @@ verify.selectSubcontractorsToReverify.taxTreatment.unmatched            =  Highe
 verify.selectSubcontractorsToReverify.taxTreatment.gross                =  Gross
 verify.selectSubcontractorsToReverify.display.noneSelected              =  None selected
 
+verify.reviewInsufficientInfo.title                                     =  Cannot verify all subcontractors
+verify.reviewInsufficientInfo.heading                                   =  Cannot verify all subcontractors
+verify.reviewInsufficientInfo.p1                                        =  Some of the subcontractors in your verification request do not have all the information we need to verify them.
+verify.reviewInsufficientInfo.p2                                        =  To fix this, you can:
+verify.reviewInsufficientInfo.bullet1                                   =  edit their information and correct any of their details
+verify.reviewInsufficientInfo.bullet2                                   =  proceed with including them in this verification request without making any changes
+verify.reviewInsufficientInfo.bullet3                                   =  remove the subcontractor from this verification request
+verify.reviewInsufficientInfo.whatYouNeed.link                          =  What you''ll need to verify subcontractors (opens in new tab)
+verify.reviewInsufficientInfo.missing.subheading                        =  Subcontractors with missing information
+verify.reviewInsufficientInfo.ready.subheading                          =  Ready for verification
+verify.reviewInsufficientInfo.name                                      =  Name
+verify.reviewInsufficientInfo.utr                                       =  UTR
+verify.reviewInsufficientInfo.utr.full                                  =  Unique Taxpayer Reference
+verify.reviewInsufficientInfo.utr.noneProvided                          =  None provided
+verify.reviewInsufficientInfo.actions                                   =  Actions
+verify.reviewInsufficientInfo.action.edit                               =  Edit
+verify.reviewInsufficientInfo.action.proceed                            =  Proceed
+verify.reviewInsufficientInfo.action.remove                             =  Remove
+
 verify.selectSubcontractor.title                                        =  Which subcontractors do you want to verify?
 verify.selectSubcontractor.heading                                      =  Which subcontractors do you want to verify?
 verify.selectSubcontractor.hint                                         =  Select the unverified subcontractors you want to add to this verification request
