@@ -41,7 +41,7 @@ class AmendCompanyRemoveDetailYesNoControllerSpec extends SpecBase with MockitoS
   val formProvider = new AmendCompanyRemoveDetailYesNoFormProvider()
 
   private val companyName = "Test Company"
-  private val address = Address("line 1", postcode = Some("AA1 1AA"))
+  private val address     = Address("line 1", postcode = Some("AA1 1AA"))
 
   private def uaWithName: UserAnswers =
     emptyUserAnswers.set(CompanyNamePage, companyName).success.value
@@ -115,9 +115,9 @@ class AmendCompanyRemoveDetailYesNoControllerSpec extends SpecBase with MockitoS
   }
 
   private def assertDetailWasRemoved(
-                                      userAnswers: UserAnswers,
-                                      detail: AmendCompanyRemoveDetail
-                                    ): Unit =
+    userAnswers: UserAnswers,
+    detail: AmendCompanyRemoveDetail
+  ): Unit =
     detail match {
       case AmendCompanyRemoveDetail.Address =>
         userAnswers.get(CompanyAddressPage) mustBe None
@@ -144,9 +144,9 @@ class AmendCompanyRemoveDetailYesNoControllerSpec extends SpecBase with MockitoS
     }
 
   private def assertDetailWasRetained(
-                                       userAnswers: UserAnswers,
-                                       detail: AmendCompanyRemoveDetail
-                                     ): Unit =
+    userAnswers: UserAnswers,
+    detail: AmendCompanyRemoveDetail
+  ): Unit =
     detail match {
       case AmendCompanyRemoveDetail.Address =>
         userAnswers.get(CompanyAddressPage) mustBe Some(address)
@@ -219,7 +219,7 @@ class AmendCompanyRemoveDetailYesNoControllerSpec extends SpecBase with MockitoS
         "must redirect to the next page when valid data with value Yes is submitted" in {
 
           val mockSessionRepository = mock[SessionRepository]
-          val captor = ArgumentCaptor.forClass(classOf[UserAnswers])
+          val captor                = ArgumentCaptor.forClass(classOf[UserAnswers])
 
           when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
@@ -238,7 +238,9 @@ class AmendCompanyRemoveDetailYesNoControllerSpec extends SpecBase with MockitoS
             val result = route(application, request).value
 
             status(result) mustEqual SEE_OTHER
-            redirectLocation(result).value mustEqual controllers.amend.company.routes.AmendCompanyCheckYourAnswersController
+            redirectLocation(
+              result
+            ).value mustEqual controllers.amend.company.routes.AmendCompanyCheckYourAnswersController
               .onPageLoad()
               .url
 
@@ -272,7 +274,9 @@ class AmendCompanyRemoveDetailYesNoControllerSpec extends SpecBase with MockitoS
             val result = route(application, request).value
 
             status(result) mustEqual SEE_OTHER
-            redirectLocation(result).value mustEqual controllers.amend.company.routes.AmendCompanyCheckYourAnswersController
+            redirectLocation(
+              result
+            ).value mustEqual controllers.amend.company.routes.AmendCompanyCheckYourAnswersController
               .onPageLoad()
               .url
 
