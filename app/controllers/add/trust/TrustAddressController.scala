@@ -60,9 +60,8 @@ class TrustAddressController @Inject() (
 
   override protected def onChangeCompletion(isAmend: Boolean): Call =
     if (isAmend) {
-      controllers.routes.JourneyRecoveryController.onPageLoad()
-    } // TODO: redirect to amend cya page
-    else {
+      controllers.amend.trust.routes.AmendTrustCheckYourAnswersController.onPageLoad()
+    } else {
       routes.TrustCheckYourAnswersController.onPageLoad()
     }
 
