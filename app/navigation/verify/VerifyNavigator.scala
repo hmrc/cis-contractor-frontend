@@ -70,7 +70,7 @@ class VerifyNavigator @Inject() () extends NavigatorForJourney {
     case SelectSubcontractorsToReverifyPage       =>
       userAnswers => navigatorFromSelectSubcontractorsToReverifyPage(NormalMode)(userAnswers)
     case EmailAddressPage                         =>
-      _ => controllers.verify.routes.CreateVerificationBatchAndVerificationsController.onSubmit()
+      _ => controllers.verify.routes.VerifyCheckYourAnswersController.onPageLoad()
     case VerificationDeclarationPage              =>
       _ => controllers.verify.routes.VerifyCheckYourAnswersController.onPageLoad()
     case _                                        => _ => controllers.routes.JourneyRecoveryController.onPageLoad()
@@ -103,7 +103,7 @@ class VerifyNavigator @Inject() () extends NavigatorForJourney {
         controllers.verify.routes.EmailAddressController.onPageLoad(m)
 
       case (Some(false), NormalMode) =>
-        controllers.verify.routes.VerificationDeclarationController.onPageLoad()
+        controllers.verify.routes.VerifyCheckYourAnswersController.onPageLoad()
 
       case (Some(false), CheckMode) =>
         controllers.verify.routes.VerifyCheckYourAnswersController.onPageLoad()
@@ -126,17 +126,22 @@ class VerifyNavigator @Inject() () extends NavigatorForJourney {
 
       case NormalMode =>
         if (!hasSubcontractorsToReverify) {
-          controllers.verify.routes.CheckVerificationBatchReadinessController.checkVerificationBatchReadiness()
+          controllers.verify.routes.CurrentVerificationBatchController.onPageLoad()
         } else {
           controllers.verify.routes.ReverifyExistingSubcontractorsYesNoController.onPageLoad(NormalMode)
         }
 
       case CheckMode =>
-        if (hasSelections) {
+        val rebuildVerificationFromWarning =
+          ua.get(RebuildVerificationFromWarningPage).contains(true)
+
+        if (!hasSelections) {
+          controllers.verify.routes.NoSubcontractorsSelectedWarningController.onPageLoadCheckMode()
+        } else if (rebuildVerificationFromWarning) {
+          controllers.verify.routes.ReverifyExistingSubcontractorsYesNoController.onPageLoad(CheckMode)
+        } else {
           controllers.verify.routes.CheckVerificationBatchReadinessController
             .checkVerificationBatchReadinessInCheckMode()
-        } else {
-          controllers.verify.routes.NoSubcontractorsSelectedWarningController.onPageLoad()
         }
 
       case AmendMode =>
@@ -162,12 +167,12 @@ class VerifyNavigator @Inject() () extends NavigatorForJourney {
         if (ua.get(SelectSubcontractorPage).forall(_.isEmpty)) {
           controllers.verify.routes.NoSubcontractorsSelectedWarningController.onPageLoad()
         } else {
-          controllers.verify.routes.CheckVerificationBatchReadinessController.checkVerificationBatchReadiness()
+          controllers.verify.routes.CurrentVerificationBatchController.onPageLoad()
         }
 
       case (Some(false), CheckMode) =>
         if (ua.get(SelectSubcontractorPage).forall(_.isEmpty)) {
-          controllers.verify.routes.NoSubcontractorsSelectedWarningController.onPageLoad()
+          controllers.verify.routes.NoSubcontractorsSelectedWarningController.onPageLoadCheckMode()
         } else {
           controllers.verify.routes.CheckVerificationBatchReadinessController
             .checkVerificationBatchReadinessInCheckMode()
@@ -187,7 +192,7 @@ class VerifyNavigator @Inject() () extends NavigatorForJourney {
         controllers.routes.IndexController.onPageLoad()
 
       case (Some(false), CheckMode) =>
-        controllers.verify.routes.NoSubcontractorsSelectedWarningController.onPageLoad()
+        controllers.verify.routes.NoSubcontractorsSelectedWarningController.onPageLoadCheckMode()
 
       case _ =>
         controllers.routes.JourneyRecoveryController.onPageLoad()
@@ -202,7 +207,7 @@ class VerifyNavigator @Inject() () extends NavigatorForJourney {
     if (hasSelections) {
       mode match {
         case NormalMode =>
-          controllers.verify.routes.CheckVerificationBatchReadinessController.checkVerificationBatchReadiness()
+          controllers.verify.routes.CurrentVerificationBatchController.onPageLoad()
 
         case CheckMode =>
           controllers.verify.routes.CheckVerificationBatchReadinessController
@@ -212,7 +217,16 @@ class VerifyNavigator @Inject() () extends NavigatorForJourney {
           controllers.routes.JourneyRecoveryController.onPageLoad()
       }
     } else {
-      controllers.verify.routes.NoSubcontractorsSelectedWarningController.onPageLoad()
+      mode match {
+        case NormalMode =>
+          controllers.verify.routes.NoSubcontractorsSelectedWarningController.onPageLoad()
+
+        case CheckMode =>
+          controllers.verify.routes.NoSubcontractorsSelectedWarningController.onPageLoadCheckMode()
+
+        case AmendMode =>
+          controllers.routes.JourneyRecoveryController.onPageLoad()
+      }
     }
   }
 
@@ -220,7 +234,7 @@ class VerifyNavigator @Inject() () extends NavigatorForJourney {
     (ua.get(ContractorEmailConfirmationStoredPage), mode) match {
 
       case (Some(CurrentEmail), NormalMode) =>
-        controllers.verify.routes.CreateVerificationBatchAndVerificationsController.onSubmit()
+        controllers.verify.routes.VerifyCheckYourAnswersController.onPageLoad()
 
       case (Some(CurrentEmail), CheckMode) =>
         controllers.verify.routes.VerifyCheckYourAnswersController.onPageLoad()
@@ -229,7 +243,7 @@ class VerifyNavigator @Inject() () extends NavigatorForJourney {
         controllers.verify.routes.EmailAddressController.onPageLoad(m)
 
       case (Some(DoNotSend), NormalMode) =>
-        controllers.verify.routes.CreateVerificationBatchAndVerificationsController.onSubmit()
+        controllers.verify.routes.VerifyCheckYourAnswersController.onPageLoad()
 
       case (Some(DoNotSend), CheckMode) =>
         controllers.verify.routes.VerifyCheckYourAnswersController.onPageLoad()
