@@ -22,14 +22,20 @@ import play.api.libs.json.{Json, OFormat}
 
 case class OriginalCompanyAnswers(
   companyName: Option[String],
+  addressYesNo: Option[Boolean],
   address: Option[Address],
-  companyContactMethod: Option[Set[CompanyContactMethodOptions]],
+  companyContactMethodsYesNo: Option[Boolean],
+  companyContactMethod: Set[CompanyContactMethodOptions],
   email: Option[String],
   phone: Option[String],
   mobile: Option[String],
+  crnYesNo: Option[Boolean],
   crn: Option[String],
+  utrYesNo: Option[Boolean],
   utr: Option[String],
-  worksReference: Option[String]
+  worksReferenceYesNo: Option[Boolean],
+  worksReference: Option[String],
+  verificationNumber: Option[String]
 )
 
 object OriginalCompanyAnswers extends models.Enumerable.Implicits {
