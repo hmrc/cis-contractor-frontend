@@ -30,21 +30,23 @@ class NoVerificationResultsViewSpec extends SpecBase {
   "NoVerificationResultsView" - {
     "render the page with title, heading, paragraph and link" in new Setup {
       val html: HtmlFormat.Appendable = view()
-      val doc: Document = Jsoup.parse(html.body)
+      val doc: Document               = Jsoup.parse(html.body)
 
-      doc.select("title").text must include(messages("verify.noVerificationResults.title"))
-      doc.select("h1").text must include(messages("verify.noVerificationResults.heading"))
-      doc.select("p").text must include(messages("verify.noVerificationResults.p"))
-      doc.select("p").text must include(messages("verify.noVerificationResults.backTo"))
-      doc.select(".govuk-link").text must include(messages("verify.noVerificationResults.manageYourSubcontractors.link"))
+      doc.select("title").text       must include(messages("verify.noVerificationResults.title"))
+      doc.select("h1").text          must include(messages("verify.noVerificationResults.heading"))
+      doc.select("p").text           must include(messages("verify.noVerificationResults.p"))
+      doc.select("p").text           must include(messages("verify.noVerificationResults.backTo"))
+      doc.select(".govuk-link").text must include(
+        messages("verify.noVerificationResults.manageYourSubcontractors.link")
+      )
     }
   }
 
   trait Setup {
-    val app: Application = applicationBuilder().build()
-    val view: NoVerificationResultsView = app.injector.instanceOf[NoVerificationResultsView]
+    val app: Application                          = applicationBuilder().build()
+    val view: NoVerificationResultsView           = app.injector.instanceOf[NoVerificationResultsView]
     implicit val request: play.api.mvc.Request[_] = FakeRequest()
-    implicit val messages: Messages = play.api.i18n.MessagesImpl(
+    implicit val messages: Messages               = play.api.i18n.MessagesImpl(
       play.api.i18n.Lang.defaultLang,
       app.injector.instanceOf[play.api.i18n.MessagesApi]
     )
