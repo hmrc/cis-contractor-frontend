@@ -72,7 +72,13 @@ class ReviewInsufficientInfoSubcontractorsControllerSpec extends SpecBase {
     )
 
   private val missingSub =
-    mkSub(id = 1L, surname = Some("Brody"), firstName = Some("Martin"), subcontractorType = Some("soletrader"), utr = None)
+    mkSub(
+      id = 1L,
+      surname = Some("Brody"),
+      firstName = Some("Martin"),
+      subcontractorType = Some("soletrader"),
+      utr = None
+    )
 
   private val readySub =
     mkSub(id = 2L, tradingName = Some("Acme Ltd"), subcontractorType = Some("company"), utr = Some("1234567890"))

@@ -100,7 +100,13 @@ class ReviewInsufficientInfoServiceSpec extends SpecBase {
 
     "must split a mixed batch into missing and ready" in {
       val missing =
-        mkSub(id = 1L, surname = Some("Brody"), firstName = Some("Martin"), subcontractorType = Some("soletrader"), utr = None)
+        mkSub(
+          id = 1L,
+          surname = Some("Brody"),
+          firstName = Some("Martin"),
+          subcontractorType = Some("soletrader"),
+          utr = None
+        )
       val ready   =
         mkSub(id = 2L, tradingName = Some("Acme Ltd"), subcontractorType = Some("company"), utr = Some("1234567890"))
 
@@ -121,7 +127,13 @@ class ReviewInsufficientInfoServiceSpec extends SpecBase {
 
     "must render an individual's name as 'surname, firstName'" in {
       val sub =
-        mkSub(id = 1L, surname = Some("Brody"), firstName = Some("Martin"), subcontractorType = Some("soletrader"), utr = None)
+        mkSub(
+          id = 1L,
+          surname = Some("Brody"),
+          firstName = Some("Martin"),
+          subcontractorType = Some("soletrader"),
+          utr = None
+        )
 
       val vm = service.buildViewModel(batchOf(sub))
 
@@ -130,7 +142,14 @@ class ReviewInsufficientInfoServiceSpec extends SpecBase {
 
     "must fall back to trading name when individual name parts are blank" in {
       val sub =
-        mkSub(id = 1L, firstName = Some(" "), surname = Some(" "), tradingName = Some("Doe Trading"), subcontractorType = Some("soletrader"), utr = None)
+        mkSub(
+          id = 1L,
+          firstName = Some(" "),
+          surname = Some(" "),
+          tradingName = Some("Doe Trading"),
+          subcontractorType = Some("soletrader"),
+          utr = None
+        )
 
       val vm = service.buildViewModel(batchOf(sub))
 

@@ -35,7 +35,8 @@ class ReviewInsufficientInfoSubcontractorsController @Inject() (
   reviewInsufficientInfoService: ReviewInsufficientInfoService,
   val controllerComponents: MessagesControllerComponents,
   view: ReviewInsufficientInfoSubcontractorsView
-) (implicit appConfig: FrontendAppConfig) extends FrontendBaseController
+)(implicit appConfig: FrontendAppConfig)
+    extends FrontendBaseController
     with I18nSupport {
 
   def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>

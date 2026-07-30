@@ -27,8 +27,8 @@ import views.html.verify.ReviewInsufficientInfoSubcontractorsView
 
 class ReviewInsufficientInfoSubcontractorsViewSpec extends SpecBase {
 
-  private implicit val request: Request[?] = FakeRequest()
-  private implicit val messagesImpl: Messages =
+  private implicit val request: Request[?]                 = FakeRequest()
+  private implicit val messagesImpl: Messages              =
     app.injector.instanceOf[play.api.i18n.MessagesApi].preferred(FakeRequest())
   private implicit val appConfig: config.FrontendAppConfig =
     app.injector.instanceOf[config.FrontendAppConfig]
@@ -62,7 +62,7 @@ class ReviewInsufficientInfoSubcontractorsViewSpec extends SpecBase {
     "must render the heading, title and introductory content" in {
       val document = doc(ReviewInsufficientInfoViewModel(missing = Seq(missingRow), ready = Nil))
 
-      document.title must include(messagesImpl("verify.reviewInsufficientInfo.title"))
+      document.title     must include(messagesImpl("verify.reviewInsufficientInfo.title"))
       document.select("h1").text mustBe messagesImpl("verify.reviewInsufficientInfo.heading")
       document.body.text must include(messagesImpl("verify.reviewInsufficientInfo.p1"))
       document.body.text must include(messagesImpl("verify.reviewInsufficientInfo.p2"))
@@ -98,8 +98,8 @@ class ReviewInsufficientInfoSubcontractorsViewSpec extends SpecBase {
       table must not be null
 
       table.select("thead th").text must include(messagesImpl("verify.reviewInsufficientInfo.utr.full"))
-      table.text must include("Smith, John")
-      table.text must include("1234567890")
+      table.text                    must include("Smith, John")
+      table.text                    must include("1234567890")
     }
 
     "must not render the missing table when there are no missing subcontractors" in {
