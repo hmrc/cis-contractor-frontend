@@ -18,10 +18,14 @@ package controllers.amend.trust
 
 import base.SpecBase
 import forms.amend.trust.AmendTrustRemoveDetailYesNoFormProvider
+import models.address.Address
 import models.UserAnswers
 import models.amend.trust.AmendTrustRemoveDetail
+import models.contact.ContactMethodOptions
+import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.when
+import org.mockito.Mockito.{verify, when}
+import pages.amend.trust.AmendTrustRemoveDetailYesNoPage
 import org.scalatestplus.mockito.MockitoSugar
 import pages.add.trust.*
 import play.api.inject.bind
@@ -38,6 +42,7 @@ class AmendTrustRemoveDetailYesNoControllerSpec extends SpecBase with MockitoSug
   val form         = formProvider()
 
   private val trustName = "Test Trust"
+  private val address   = Address("line 1", postcode = Some("AA1 1AA"))
 
   private def uaWithName: UserAnswers =
     emptyUserAnswers.set(TrustNamePage, trustName).success.value
@@ -51,24 +56,48 @@ class AmendTrustRemoveDetailYesNoControllerSpec extends SpecBase with MockitoSug
 
         case "address" =>
           uaWithName
+            .set(TrustAddressPage, address)
+            .success
+            .value
             .set(TrustAddressYesNoPage, true)
             .success
             .value
 
         case "contact-details" =>
           uaWithName
+            .set(
+              TrustContactMethodOptionsPage,
+              Set(ContactMethodOptions.Email, ContactMethodOptions.Phone, ContactMethodOptions.Mobile)
+            )
+            .success
+            .value
+            .set(TrustEmailAddressPage, "old@email.com")
+            .success
+            .value
+            .set(TrustPhoneNumberPage, "01234567890")
+            .success
+            .value
+            .set(TrustMobileNumberPage, "07123456789")
+            .success
+            .value
             .set(AddTrustContactMethodsYesNoPage, true)
             .success
             .value
 
         case "utr" =>
           uaWithName
+            .set(TrustUtrPage, "7777777777")
+            .success
+            .value
             .set(TrustUtrYesNoPage, true)
             .success
             .value
 
         case "works-reference-number" =>
           uaWithName
+            .set(TrustWorksReferencePage, "WR-001")
+            .success
+            .value
             .set(TrustWorksReferenceYesNoPage, true)
             .success
             .value
@@ -76,6 +105,58 @@ class AmendTrustRemoveDetailYesNoControllerSpec extends SpecBase with MockitoSug
 
     userAnswers
   }
+
+  private def assertDetailWasRemoved(
+    userAnswers: UserAnswers,
+    detail: AmendTrustRemoveDetail
+  ): Unit =
+    detail match {
+      case AmendTrustRemoveDetail.Address =>
+        userAnswers.get(TrustAddressPage) mustBe None
+        userAnswers.get(TrustAddressYesNoPage) mustBe Some(false)
+
+      case AmendTrustRemoveDetail.ContactDetails =>
+        userAnswers.get(TrustContactMethodOptionsPage) mustBe None
+        userAnswers.get(TrustEmailAddressPage) mustBe None
+        userAnswers.get(TrustPhoneNumberPage) mustBe None
+        userAnswers.get(TrustMobileNumberPage) mustBe None
+        userAnswers.get(AddTrustContactMethodsYesNoPage) mustBe Some(false)
+
+      case AmendTrustRemoveDetail.Utr =>
+        userAnswers.get(TrustUtrPage) mustBe None
+        userAnswers.get(TrustUtrYesNoPage) mustBe Some(false)
+
+      case AmendTrustRemoveDetail.WorksReferenceNumber =>
+        userAnswers.get(TrustWorksReferencePage) mustBe None
+        userAnswers.get(TrustWorksReferenceYesNoPage) mustBe Some(false)
+    }
+
+  private def assertDetailWasRetained(
+    userAnswers: UserAnswers,
+    detail: AmendTrustRemoveDetail
+  ): Unit =
+    detail match {
+      case AmendTrustRemoveDetail.Address =>
+        userAnswers.get(TrustAddressPage) mustBe Some(address)
+        userAnswers.get(TrustAddressYesNoPage) mustBe Some(true)
+
+      case AmendTrustRemoveDetail.ContactDetails =>
+        userAnswers.get(TrustContactMethodOptionsPage) mustBe Some(
+          Set(ContactMethodOptions.Email, ContactMethodOptions.Phone, ContactMethodOptions.Mobile)
+        )
+        userAnswers.get(TrustEmailAddressPage) mustBe Some("old@email.com")
+        userAnswers.get(TrustPhoneNumberPage) mustBe Some("01234567890")
+        userAnswers.get(TrustMobileNumberPage) mustBe Some("07123456789")
+        userAnswers.get(AddTrustContactMethodsYesNoPage) mustBe Some(true)
+
+      case AmendTrustRemoveDetail.Utr =>
+        userAnswers.get(TrustUtrPage) mustBe Some("7777777777")
+        userAnswers.get(TrustUtrYesNoPage) mustBe Some(true)
+
+      case AmendTrustRemoveDetail.WorksReferenceNumber =>
+        userAnswers.get(TrustWorksReferencePage) mustBe Some("WR-001")
+        userAnswers.get(TrustWorksReferenceYesNoPage) mustBe Some(true)
+    }
 
   "AmendTrustRemoveDetailYesNo Controller" - {
     Seq(
@@ -120,6 +201,7 @@ class AmendTrustRemoveDetailYesNoControllerSpec extends SpecBase with MockitoSug
         "must redirect to the next page when valid data with value Yes is submitted" in {
 
           val mockSessionRepository = mock[SessionRepository]
+          val captor                = ArgumentCaptor.forClass(classOf[UserAnswers])
 
           when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
@@ -138,15 +220,22 @@ class AmendTrustRemoveDetailYesNoControllerSpec extends SpecBase with MockitoSug
             val result = route(application, request).value
 
             status(result) mustEqual SEE_OTHER
-            redirectLocation(result).value mustEqual controllers.add.trust.routes.TrustCheckYourAnswersController
+            redirectLocation(result).value mustEqual controllers.amend.trust.routes.AmendTrustCheckYourAnswersController
               .onPageLoad()
               .url
+
+            verify(mockSessionRepository).set(captor.capture())
+            val savedAnswers = captor.getValue
+
+            assertDetailWasRemoved(savedAnswers, detailType)
+            savedAnswers.get(AmendTrustRemoveDetailYesNoPage(detailType)) mustBe None
           }
         }
 
         "must redirect to the next page when valid data with value No is submitted" in {
 
           val mockSessionRepository = mock[SessionRepository]
+          val captor                = ArgumentCaptor.forClass(classOf[UserAnswers])
 
           when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
@@ -165,9 +254,15 @@ class AmendTrustRemoveDetailYesNoControllerSpec extends SpecBase with MockitoSug
             val result = route(application, request).value
 
             status(result) mustEqual SEE_OTHER
-            redirectLocation(result).value mustEqual controllers.add.trust.routes.TrustCheckYourAnswersController
+            redirectLocation(result).value mustEqual controllers.amend.trust.routes.AmendTrustCheckYourAnswersController
               .onPageLoad()
               .url
+
+            verify(mockSessionRepository).set(captor.capture())
+            val savedAnswers = captor.getValue
+
+            assertDetailWasRetained(savedAnswers, detailType)
+            savedAnswers.get(AmendTrustRemoveDetailYesNoPage(detailType)) mustBe None
           }
         }
 

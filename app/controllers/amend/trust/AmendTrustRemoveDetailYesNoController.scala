@@ -154,7 +154,7 @@ class AmendTrustRemoveDetailYesNoController @Inject() (
                         )
                       _              <- sessionRepository.set(updatedAnswers)
                     } yield Redirect(
-                      controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad().url
+                      controllers.amend.trust.routes.AmendTrustCheckYourAnswersController.onPageLoad().url
                     )
                 )
             }
