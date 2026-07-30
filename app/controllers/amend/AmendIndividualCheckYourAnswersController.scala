@@ -179,7 +179,7 @@ class AmendIndividualCheckYourAnswersController @Inject() (
 
   def onSubmit(): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
-      if (request.userAnswers.get(CheckYourAnswersSubmittedPage).contains(true)) {
+      if (request.userAnswers.get(AmendCheckYourAnswersSubmittedPage).contains(true)) {
         Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
       } else {
         ValidatedSubcontractor.build(request.userAnswers) match {
