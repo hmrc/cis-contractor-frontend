@@ -244,6 +244,61 @@ class AmendCompanyCheckYourAnswersControllerSpec extends SpecBase with MockitoSu
       }
     }
 
+    "must not render the verification number row when the company is pending verifications" in {
+
+      val verifiedUa =
+        minUa
+          .set(ShowVerificationDetailsPage, true)
+          .success
+          .value
+          .set(
+            OriginalCompanyAnswersQuery,
+            OriginalCompanyAnswers(
+              companyName = Some("Test Company Ltd"),
+              addressYesNo = Some(false),
+              address = None,
+              companyContactMethodsYesNo = Some(false),
+              companyContactMethod = Set.empty,
+              email = None,
+              phone = None,
+              mobile = None,
+              crnYesNo = Some(false),
+              crn = None,
+              utrYesNo = Some(false),
+              utr = None,
+              worksReferenceYesNo = Some(false),
+              worksReference = None,
+              verificationNumber = None
+            )
+          )
+          .success
+          .value
+
+      val application =
+        applicationBuilder(userAnswers = Some(verifiedUa)).build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(
+            GET,
+            controllers.amend.company.routes.AmendCompanyCheckYourAnswersController.onPageLoad().url
+          )
+
+        val msg = application.injector.instanceOf[MessagesApi].preferred(request)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual OK
+
+        val page = contentAsString(result)
+
+        page must not include msg("amendCheckYourAnswers.verificationNumber.label")
+        page must not include "VRN123456"
+        page must include(msg("companyUtr.verified.checkYourAnswersLabel"))
+      }
+    }
+
     "must redirect to Journey Recovery when validation fails" in {
 
       val invalidUa =

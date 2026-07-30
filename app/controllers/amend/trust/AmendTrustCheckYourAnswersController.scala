@@ -78,28 +78,31 @@ class AmendTrustCheckYourAnswersController @Inject() (
         Redirect(routes.JourneyRecoveryController.onPageLoad())
     }
   }
-
+  
   private def subcontractorInformationRows(
-    ua: UserAnswers,
-    isVerified: Option[Boolean]
-  )(implicit messages: Messages): Seq[Option[SummaryListRow]] = {
+                                            ua: UserAnswers,
+                                            isVerified: Option[Boolean]
+                                          )(implicit messages: Messages): Seq[Option[SummaryListRow]] = {
 
     val verificationRows =
-      Option
-        .when(isVerified.contains(true)) {
-          val verificationNumber = ua.get(OriginalTrustAnswersQuery).flatMap(_.verificationNumber).getOrElse("")
+      Option.when(isVerified.contains(true)) {
 
-          Seq(
-            TrustUtrSummary.row(ua, AmendMode, showActions = false),
-            Some(
-              SummaryListRowViewModel(
-                key = Key(Text(messages("amendCheckYourAnswers.verificationNumber.label"))),
-                value = Value(Text(verificationNumber))
-              )
+        val verificationNumberOpt =
+          ua.get(OriginalTrustAnswersQuery)
+            .flatMap(_.verificationNumber)
+            .filter(_.trim.nonEmpty)
+
+        Seq(
+          TrustUtrSummary.row(ua, AmendMode, showActions = false)
+        ) ++ verificationNumberOpt.map { verificationNumber =>
+          Some(
+            SummaryListRowViewModel(
+              key = Key(Text(messages("amendCheckYourAnswers.verificationNumber.label"))),
+              value = Value(Text(verificationNumber))
             )
           )
         }
-        .getOrElse(Nil)
+      }.getOrElse(Nil)
 
     Seq(
       TypeOfSubcontractorSummary.row(ua, showActions = false)

@@ -24,11 +24,15 @@ import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import queries.{CisIdQuery, OriginalCompanyAnswersQuery}
+import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import utils.{DefaultSubcontractorCleanupService, SubcontractorCleanupService}
 import viewmodels.amend.company.CompanyAmendConfirmationViewModel
 import views.html.amend.AmendConfirmationView
 
 import javax.inject.Inject
+import scala.concurrent.{ExecutionContext, Future}
+import scala.util.{Failure, Success}
 
 class AmendCompanyConfirmationController @Inject() (
   override val messagesApi: MessagesApi,
@@ -36,14 +40,20 @@ class AmendCompanyConfirmationController @Inject() (
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   val controllerComponents: MessagesControllerComponents,
+  cleanupService: DefaultSubcontractorCleanupService,
+  sessionRepository: SessionRepository,
   view: AmendConfirmationView,
   appConfig: FrontendAppConfig
-) extends FrontendBaseController
+)(implicit ec: ExecutionContext)
+    extends FrontendBaseController
     with I18nSupport
     with Logging {
 
   def onPageLoad(): Action[AnyContent] =
-    (identify andThen getData andThen requireData) { implicit request =>
+    (identify andThen getData andThen requireData).async { implicit request =>
+
+      val recoveryRedirect =
+        Redirect(routes.JourneyRecoveryController.onPageLoad())
 
       val ua = request.userAnswers
 
@@ -51,23 +61,37 @@ class AmendCompanyConfirmationController @Inject() (
 
         case None =>
           logger.error("[AmendCompanyConfirmationController] Missing OriginalCompanyAnswersQuery")
-          Redirect(routes.JourneyRecoveryController.onPageLoad())
+          Future.successful(recoveryRedirect)
 
         case Some(originalCompanyAnswers) =>
           ua.get(CisIdQuery) match {
 
             case None =>
               logger.error("[AmendCompanyConfirmationController] Missing CisIdQuery")
-              Redirect(routes.JourneyRecoveryController.onPageLoad())
+              Future.successful(recoveryRedirect)
 
             case Some(cisId) =>
-              Ok(
-                view(
-                  CompanyAmendConfirmationViewModel.rows(originalCompanyAnswers, ua),
-                  ua.get(CompanyNamePage).getOrElse(""),
-                  appConfig.manageYourSubcontractorsUrl(cisId)
-                )
-              )
+              val tableRows = CompanyAmendConfirmationViewModel.rows(originalCompanyAnswers, ua)
+              val companyName = ua.get(CompanyNamePage).getOrElse("")
+              cleanupService.cleanAmend(ua) match {
+
+                case Success(cleanedUa) =>
+                  sessionRepository.set(cleanedUa).map { _ =>
+                    Ok(
+                      view(
+                        tableRows,
+                        companyName,
+                        appConfig.manageYourSubcontractorsUrl(cisId)
+                      )
+                    )
+                  }
+                case Failure(exception) =>
+                  logger.warn(
+                    "[AmendCompanyConfirmationController] Failed to clean user answers",
+                    exception
+                  )
+                  Future.successful(recoveryRedirect)
+              }
           }
       }
     }

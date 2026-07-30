@@ -80,26 +80,29 @@ class AmendCompanyCheckYourAnswersController @Inject() (
   }
 
   private def subcontractorInformationRows(
-    ua: UserAnswers,
-    isVerified: Option[Boolean]
-  )(implicit messages: Messages): Seq[Option[SummaryListRow]] = {
+                                            ua: UserAnswers,
+                                            isVerified: Option[Boolean]
+                                          )(implicit messages: Messages): Seq[Option[SummaryListRow]] = {
 
     val verificationRows =
-      Option
-        .when(isVerified.contains(true)) {
-          val verificationNumber = ua.get(OriginalCompanyAnswersQuery).flatMap(_.verificationNumber).getOrElse("")
+      Option.when(isVerified.contains(true)) {
 
-          Seq(
-            CompanyUtrSummary.row(ua, AmendMode, showActions = false),
-            Some(
-              SummaryListRowViewModel(
-                key = Key(Text(messages("amendCheckYourAnswers.verificationNumber.label"))),
-                value = Value(Text(verificationNumber))
-              )
+        val verificationNumberOpt =
+          ua.get(OriginalCompanyAnswersQuery)
+            .flatMap(_.verificationNumber)
+            .filter(_.trim.nonEmpty)
+
+        Seq(
+          CompanyUtrSummary.row(ua, AmendMode, showActions = false)
+        ) ++ verificationNumberOpt.map { verificationNumber =>
+          Some(
+            SummaryListRowViewModel(
+              key = Key(Text(messages("amendCheckYourAnswers.verificationNumber.label"))),
+              value = Value(Text(verificationNumber))
             )
           )
         }
-        .getOrElse(Nil)
+      }.getOrElse(Nil)
 
     Seq(
       TypeOfSubcontractorSummary.row(ua, showActions = false)

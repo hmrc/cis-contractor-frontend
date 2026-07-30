@@ -19,16 +19,27 @@ package utils
 import jakarta.inject.Singleton
 import models.UserAnswers
 import pages.add.CheckYourAnswersSubmittedPage
+import pages.amend.AmendCheckYourAnswersSubmittedPage
+import queries.{OriginalCompanyAnswersQuery, OriginalIndividualAnswersQuery, OriginalPartnershipAnswersQuery, OriginalTrustAnswersQuery}
 import utils.SubcontractorCleanup.removeAllSubcontractor
 
 import scala.util.Try
 
 trait SubcontractorCleanupService {
   def clean(ua: UserAnswers): Try[UserAnswers]
+  def cleanAmend(ua: UserAnswers): Try[UserAnswers]
 }
 
 @Singleton
 class DefaultSubcontractorCleanupService extends SubcontractorCleanupService {
   override def clean(ua: UserAnswers): Try[UserAnswers] =
     removeAllSubcontractor(ua).flatMap(_.set(CheckYourAnswersSubmittedPage, false))
+
+  override def cleanAmend(ua: UserAnswers): Try[UserAnswers] =
+    removeAllSubcontractor(ua)
+      .flatMap(_.remove(OriginalIndividualAnswersQuery))
+      .flatMap(_.remove(OriginalCompanyAnswersQuery))
+      .flatMap(_.remove(OriginalPartnershipAnswersQuery))
+      .flatMap(_.remove(OriginalTrustAnswersQuery))
+      .flatMap(_.set(AmendCheckYourAnswersSubmittedPage, false))
 }
