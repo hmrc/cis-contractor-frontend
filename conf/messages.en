@@ -636,6 +636,7 @@ companyUtr.error.length                              =  Enter a valid Unique Tax
 companyUtr.error.invalid                             =  Enter a valid Unique Taxpayer Reference (UTR)
 companyUtr.error.duplicate                           =  You have already used this Unique Taxpayer Reference (UTR) for an existing subcontractor
 companyUtr.checkYourAnswersLabel                     =  Corporation Tax UTR
+companyUtr.verified.checkYourAnswersLabel            =  UTR
 companyUtr.change.hidden                             =  corporation Tax UTR
 
 companyCrnYesNo.title                                =  Does this company have a company registration number?
