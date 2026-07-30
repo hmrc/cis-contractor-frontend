@@ -22,7 +22,7 @@ import models.add.company.ValidatedCompany
 import models.{AmendMode, UserAnswers}
 import pages.add.*
 import pages.add.company.CompanyNamePage
-import pages.amend.ShowVerificationDetailsPage
+import pages.amend.{AmendCheckYourAnswersSubmittedPage, ShowVerificationDetailsPage}
 import play.api.Logging
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -150,27 +150,47 @@ class AmendCompanyCheckYourAnswersController @Inject() (
   def onSubmit(): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
       ValidatedCompany.build(request.userAnswers) match {
-        case Right(_) =>
-          subcontractorService
-            .createAndUpdateSubcontractor(request.userAnswers)
-            .map(_ => Redirect(controllers.amend.company.routes.AmendCompanyConfirmationController.onPageLoad()))
-            .recover { case t =>
-              logger.error(
-                "[AmendCompanyCheckYourAnswersController.onSubmit] Failed to update subcontractor",
-                t
-              )
-              Redirect(routes.JourneyRecoveryController.onPageLoad())
-            }
-
+        case Right(_)    =>
+          if (request.userAnswers.get(AmendCheckYourAnswersSubmittedPage).contains(true)) {
+            Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+          } else {
+            subcontractorService
+              .createAndUpdateSubcontractor(request.userAnswers)
+              .flatMap { _ =>
+                Future
+                  .fromTry(request.userAnswers.set(AmendCheckYourAnswersSubmittedPage, true))
+                  .flatMap(updated => sessionRepository.set(updated).map(_ => ()))
+                  .map(_ =>
+                    Redirect(
+                      controllers.amend.company.routes.AmendCompanyConfirmationController.onPageLoad()
+                    )
+                  )
+              }
+              .recover { case t =>
+                logger.error(
+                  "[AmendCompanyCheckYourAnswersController.onSubmit] Failed to update subcontractor",
+                  t
+                )
+                Redirect(routes.JourneyRecoveryController.onPageLoad())
+              }
+          }
         case Left(error) =>
           logger.error(s"[AmendCompanyCheckYourAnswersController.onSubmit] Validation failed: $error")
           Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
       }
     }
 
-  def onCancel(): Action[AnyContent] = (identify andThen getData andThen requireData).async { implicit request =>
-    sessionRepository
-      .set(UserAnswers(request.userAnswers.id))
-      .map(_ => Redirect(routes.IndexController.onPageLoad()))
-  }
+  def onCancel(): Action[AnyContent] =
+    (identify andThen getData andThen requireData).async { implicit request =>
+      sessionRepository
+        .set(UserAnswers(request.userAnswers.id))
+        .map(_ => Redirect(routes.IndexController.onPageLoad()))
+        .recover { case t =>
+          logger.error(
+            s"[AmendCompanyCheckYourAnswersController.onCancel] Failed to clear user answers for session ${request.userAnswers.id}",
+            t
+          )
+          Redirect(routes.JourneyRecoveryController.onPageLoad())
+        }
+    }
 }

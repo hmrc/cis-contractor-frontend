@@ -22,12 +22,13 @@ import models.address.{Address, Country}
 import models.amend.company.OriginalCompanyAnswers
 import models.contact.ContactMethodOptions
 import models.{TypeOfSubcontractor, UserAnswers}
+import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.{never, verify, verifyNoMoreInteractions, when}
+import org.mockito.Mockito.{never, verify, verifyNoInteractions, verifyNoMoreInteractions, when}
 import org.scalatestplus.mockito.MockitoSugar
 import pages.add.TypeOfSubcontractorPage
 import pages.add.company.*
-import pages.amend.ShowVerificationDetailsPage
+import pages.amend.{AmendCheckYourAnswersSubmittedPage, ShowVerificationDetailsPage}
 import play.api.i18n.MessagesApi
 import play.api.inject.bind
 import play.api.test.FakeRequest
@@ -35,6 +36,7 @@ import play.api.test.Helpers.*
 import queries.OriginalCompanyAnswersQuery
 import repositories.SessionRepository
 import services.SubcontractorService
+import pages.amend.AmendCheckYourAnswersSubmittedPage
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.Future
@@ -270,11 +272,11 @@ class AmendCompanyCheckYourAnswersControllerSpec extends SpecBase with MockitoSu
 
       val mockSubcontractorService = mock[SubcontractorService]
       val mockSessionRepository    = mock[SessionRepository]
-
+      val captor                   = ArgumentCaptor.forClass(classOf[UserAnswers])
       when(mockSubcontractorService.createAndUpdateSubcontractor(any[UserAnswers])(any[HeaderCarrier]))
         .thenReturn(Future.successful(()))
-
-      val application =
+      when(mockSessionRepository.set(any[UserAnswers])).thenReturn(Future.successful(true))
+      val application              =
         applicationBuilder(userAnswers = Some(minUa))
           .overrides(
             bind[SubcontractorService].toInstance(mockSubcontractorService),
@@ -297,7 +299,39 @@ class AmendCompanyCheckYourAnswersControllerSpec extends SpecBase with MockitoSu
       verify(mockSubcontractorService)
         .createAndUpdateSubcontractor(any[UserAnswers])(any[HeaderCarrier])
 
-      verifyNoMoreInteractions(mockSubcontractorService)
+      verify(mockSessionRepository).set(captor.capture())
+      captor.getValue.get(AmendCheckYourAnswersSubmittedPage) mustBe Some(true)
+      verifyNoMoreInteractions(mockSubcontractorService, mockSessionRepository)
+    }
+
+    "must redirect to Journey Recovery when the check your answers page has already been submitted" in {
+
+      val ua = minUa
+        .set(AmendCheckYourAnswersSubmittedPage, true)
+        .success
+        .value
+
+      val mockSubcontractorService = mock[SubcontractorService]
+
+      val application =
+        applicationBuilder(userAnswers = Some(ua))
+          .overrides(
+            bind[SubcontractorService].toInstance(mockSubcontractorService)
+          )
+          .build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(POST, controllers.amend.company.routes.AmendCompanyCheckYourAnswersController.onSubmit().url)
+
+        val result = route(application, request).value
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result).value mustBe
+          controllers.routes.JourneyRecoveryController.onPageLoad().url
+      }
+      verifyNoInteractions(mockSubcontractorService)
     }
 
     "must redirect to Journey Recovery when the service fails" in {
