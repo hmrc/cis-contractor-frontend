@@ -107,7 +107,7 @@ class ReviewInsufficientInfoSubcontractorsControllerSpec extends SpecBase {
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual
-          view(viewModel)(request, messages(application), appConfig).toString
+          view(viewModel)(request, appConfig, messages(application)).toString
       }
     }
 
