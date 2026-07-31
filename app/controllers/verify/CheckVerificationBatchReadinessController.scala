@@ -19,7 +19,7 @@ package controllers.verify
 import controllers.actions.*
 import models.{AmendMode, CheckMode, Mode, NormalMode, UserAnswers}
 import models.verify.VerificationBatchReadiness
-import pages.verify.{NewestVerificationBatchResponsePage, SelectSubcontractorPage, SelectSubcontractorsToReverifyPage, VerificationBatchReadinessPage}
+import pages.verify.{NewestVerificationBatchResponsePage, SelectSubcontractorPage, SelectSubcontractorsToReverifyPage, VerificationBatchReadinessPage, CurrentVerificationBatchResponsePage}
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
@@ -64,16 +64,19 @@ class CheckVerificationBatchReadinessController @Inject() (
       val isReverifyOnly =
         selectedUnverifiedIds.isEmpty && selectedReverifyIds.nonEmpty
 
+      val isUnverifiedOnly = selectedUnverifiedIds.nonEmpty && selectedReverifyIds.isEmpty
+
       val batchReadyOpt =
-        ua.get(NewestVerificationBatchResponsePage)
+        ua.get(CurrentVerificationBatchResponsePage)
           .filter(_ => selectedIds.nonEmpty)
           .map { batchResponse =>
             if (isReverifyOnly) {
-              val batchSubcontractorIds =
-                batchResponse.subcontractors.map(_.subcontractorId.toString).toSet
-
-              selectedReverifyIds.subsetOf(batchSubcontractorIds)
-            } else {
+              VerificationBatchReadiness.isBatchReady(selectedReverifyIds, batchResponse.subcontractors)
+            }
+            else if (isUnverifiedOnly) {
+              VerificationBatchReadiness.isBatchReady(selectedUnverifiedIds, batchResponse.subcontractors)
+            }
+            else {
               VerificationBatchReadiness.isBatchReady(selectedIds, batchResponse.subcontractors)
             }
           }

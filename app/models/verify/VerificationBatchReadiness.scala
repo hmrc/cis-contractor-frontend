@@ -16,19 +16,19 @@
 
 package models.verify
 
-import models.{Subcontractor, TypeOfSubcontractor}
+import models.{Subcontractor, SubcontractorCurrentVerification, TypeOfSubcontractor}
 import models.TypeOfSubcontractor.*
 
 object VerificationBatchReadiness {
 
   // TODO(DTR-4685): ID matching uses subcontractorId — confirm this remains correct once SubcontractorSource is replaced with real backend data
-  def isBatchReady(selectedIds: Set[String], allSubcontractors: Seq[Subcontractor]): Boolean =
+  def isBatchReady(selectedIds: Set[String], allSubcontractors: Seq[SubcontractorCurrentVerification]): Boolean =
     selectedIds.nonEmpty && {
       val selectedSubs = selectedIds.flatMap(id => allSubcontractors.find(_.subcontractorId.toString == id))
       selectedSubs.size == selectedIds.size && selectedSubs.forall(isSubcontractorReady)
     }
 
-  def isSubcontractorReady(sub: Subcontractor): Boolean =
+  def isSubcontractorReady(sub: SubcontractorCurrentVerification): Boolean =
     sub.subcontractorType.flatMap(TypeOfSubcontractor.enumerable.withName) match {
       case Some(Individualorsoletrader) => isIndividualReady(sub)
       case Some(Limitedcompany)         => isCompanyReady(sub)
@@ -39,7 +39,7 @@ object VerificationBatchReadiness {
 
   private def nonBlank(opt: Option[String]): Boolean = opt.exists(_.trim.nonEmpty)
 
-  private def isIndividualReady(sub: Subcontractor): Boolean = {
+  private def isIndividualReady(sub: SubcontractorCurrentVerification): Boolean = {
     val hasName =
       nonBlank(sub.tradingName) || (
         nonBlank(sub.firstName) && nonBlank(sub.surname)
@@ -48,13 +48,13 @@ object VerificationBatchReadiness {
     hasName && nonBlank(sub.utr)
   }
 
-  private def isCompanyReady(sub: Subcontractor): Boolean =
+  private def isCompanyReady(sub: SubcontractorCurrentVerification): Boolean =
     nonBlank(sub.tradingName) && nonBlank(sub.utr)
 
-  private def isTrustReady(sub: Subcontractor): Boolean =
+  private def isTrustReady(sub: SubcontractorCurrentVerification): Boolean =
     nonBlank(sub.tradingName) && nonBlank(sub.utr)
 
-  private def isPartnershipReady(sub: Subcontractor): Boolean = {
+  private def isPartnershipReady(sub: SubcontractorCurrentVerification): Boolean = {
     val hasPartnerIdentifier = nonBlank(sub.partnerUtr) || nonBlank(sub.nino) || nonBlank(sub.crn)
 
     hasPartnerIdentifier && nonBlank(sub.utr) && nonBlank(sub.partnershipTradingName)
