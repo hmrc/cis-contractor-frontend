@@ -76,7 +76,7 @@ class AmendConfirmationViewSpec extends AnyWordSpec with Matchers with GuiceOneA
 
       val backToParagraph: Element = bodyParagraphs.get(1)
       backToParagraph.text() mustBe
-        s"${messages("amendConfirmation.backTo")} ${messages("amendConfirmation.yourSubcontractors")}"
+        s"${messages("amendConfirmation.backTo")} ${messages("amendConfirmation.yourSubcontractors")} ."
 
       val beforeYouGoParagraph: Element = bodyParagraphs.get(2)
       beforeYouGoParagraph.text() mustBe
