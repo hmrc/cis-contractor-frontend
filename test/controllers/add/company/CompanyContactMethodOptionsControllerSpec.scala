@@ -25,7 +25,7 @@ import models.{CheckMode, NormalMode, UserAnswers}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.add.company.{CompanyContactMethodOptionsPage, CompanyEmailAddressPage, CompanyNamePage, CompanyPhoneNumberPage}
+import pages.add.company.{AddCompanyContactMethodsYesNoPage, CompanyContactMethodOptionsPage, CompanyEmailAddressPage, CompanyNamePage, CompanyPhoneNumberPage}
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
@@ -45,7 +45,13 @@ class CompanyContactMethodOptionsControllerSpec extends SpecBase with MockitoSug
   private val companyName = "Test Company"
 
   private def uaWithName: UserAnswers =
-    emptyUserAnswers.set(CompanyNamePage, companyName).success.value
+    emptyUserAnswers
+      .set(CompanyNamePage, companyName)
+      .success
+      .value
+      .set(AddCompanyContactMethodsYesNoPage, true)
+      .success
+      .value
 
   "CompanyContactMethodOptions Controller" - {
 
@@ -63,6 +69,42 @@ class CompanyContactMethodOptionsControllerSpec extends SpecBase with MockitoSug
         status(result) mustEqual OK
 
         contentAsString(result) mustEqual view(form, NormalMode, companyName)(request, messages(application)).toString
+      }
+    }
+
+    "must redirect to yesOrNo page when yesorno page has No for a GET" in {
+
+      val application = applicationBuilder(userAnswers =
+        Some(uaWithName.set(AddCompanyContactMethodsYesNoPage, false).success.value)
+      ).build()
+
+      running(application) {
+        val request = FakeRequest(GET, companyContactMethodOptionsRoute)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(result).value mustEqual controllers.add.company.routes.AddCompanyContactMethodsYesNoController
+          .onPageLoad(NormalMode)
+          .url
+
+      }
+    }
+
+    "must redirect to journey recovery page when none for yesorno page for a GET" in {
+
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+
+      running(application) {
+        val request = FakeRequest(GET, companyContactMethodOptionsRoute)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+
       }
     }
 

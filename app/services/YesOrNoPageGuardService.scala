@@ -18,6 +18,9 @@ package services
 import models.Mode
 import pages.QuestionPage
 import pages.add._
+import pages.add.company._
+import pages.add.partnership._
+import pages.add.trust._
 import play.api.mvc.Results.Redirect
 import utils.LoggingUtil
 
@@ -49,7 +52,35 @@ class YesOrNoPageGuardService @Inject() extends LoggingUtil {
     case NationalInsuranceNumberYesNoPage     =>
       controllers.add.routes.NationalInsuranceNumberYesNoController.onPageLoad(mode)
     case WorksReferenceNumberYesNoPage        => controllers.add.routes.WorksReferenceNumberYesNoController.onPageLoad(mode)
-    case _                                    => controllers.routes.JourneyRecoveryController.onPageLoad()
+
+    case AddCompanyContactMethodsYesNoPage =>
+      controllers.add.company.routes.AddCompanyContactMethodsYesNoController.onPageLoad(mode)
+    case CompanyUtrYesNoPage               =>
+      controllers.add.company.routes.CompanyUtrYesNoController.onPageLoad(mode)
+    case CompanyCrnYesNoPage               =>
+      controllers.add.company.routes.CompanyCrnYesNoController.onPageLoad(mode)
+    case CompanyWorksReferenceYesNoPage    =>
+      controllers.add.company.routes.CompanyWorksReferenceYesNoController.onPageLoad(mode)
+
+    case AddPartnershipContactMethodsYesNoPage    =>
+      controllers.add.partnership.routes.AddPartnershipContactMethodsYesNoController.onPageLoad(mode)
+    case PartnershipWorksReferenceNumberYesNoPage =>
+      controllers.add.partnership.routes.PartnershipWorksReferenceNumberYesNoController.onPageLoad(mode)
+    case PartnershipNominatedPartnerUtrYesNoPage  =>
+      controllers.add.partnership.routes.PartnershipNominatedPartnerUtrYesNoController.onPageLoad(mode)
+    case PartnershipNominatedPartnerNinoYesNoPage =>
+      controllers.add.partnership.routes.PartnershipNominatedPartnerNinoController.onPageLoad(mode)
+    case PartnershipNominatedPartnerCrnYesNoPage  =>
+      controllers.add.partnership.routes.PartnershipNominatedPartnerCrnYesNoController.onPageLoad(mode)
+    case PartnershipHasUtrYesNoPage               =>
+      controllers.add.partnership.routes.PartnershipHasUtrYesNoController.onPageLoad(mode)
+
+    case AddTrustContactMethodsYesNoPage =>
+      controllers.add.trust.routes.AddTrustContactMethodsYesNoController.onPageLoad(mode)
+    case TrustUtrYesNoPage               => controllers.add.trust.routes.TrustUtrYesNoController.onPageLoad(mode)
+    case TrustWorksReferenceYesNoPage    =>
+      controllers.add.trust.routes.TrustWorksReferenceYesNoController.onPageLoad(mode)
+    case _                               => controllers.routes.JourneyRecoveryController.onPageLoad()
   }
 
 }

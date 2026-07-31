@@ -23,7 +23,7 @@ import models.{AmendMode, NormalMode, UserAnswers}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{verify, verifyNoMoreInteractions, when}
 import org.scalatestplus.mockito.MockitoSugar
-import pages.add.company.{CompanyNamePage, CompanyUtrPage}
+import pages.add.company.{CompanyNamePage, CompanyUtrPage, CompanyUtrYesNoPage}
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
@@ -46,7 +46,13 @@ class CompanyUtrControllerSpec extends SpecBase with MockitoSugar {
   private lazy val companyUtrRouteAmend = controllers.add.company.routes.CompanyUtrController.onPageLoad(AmendMode).url
 
   private def uaWithName: UserAnswers =
-    emptyUserAnswers.set(CompanyNamePage, companyName).success.value
+    emptyUserAnswers
+      .set(CompanyNamePage, companyName)
+      .success
+      .value
+      .set(CompanyUtrYesNoPage, true)
+      .success
+      .value
 
   "CompanyUtr Controller" - {
 
@@ -63,6 +69,41 @@ class CompanyUtrControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(form, NormalMode, companyName)(request, messages(application)).toString
+      }
+    }
+
+    "must redirect to yesOrNo page when yesorno page has No for a GET" in {
+
+      val application =
+        applicationBuilder(userAnswers = Some(uaWithName.set(CompanyUtrYesNoPage, false).success.value)).build()
+
+      running(application) {
+        val request = FakeRequest(GET, companyUtrRoute)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(result).value mustEqual controllers.add.company.routes.CompanyUtrYesNoController
+          .onPageLoad(NormalMode)
+          .url
+
+      }
+    }
+
+    "must redirect to journey recovery page when none for yesorno page for a GET" in {
+
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+
+      running(application) {
+        val request = FakeRequest(GET, companyUtrRoute)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+
       }
     }
 

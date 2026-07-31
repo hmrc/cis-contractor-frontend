@@ -23,7 +23,7 @@ import models.{AmendMode, NormalMode, UserAnswers}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{verify, verifyNoMoreInteractions, when}
 import org.scalatestplus.mockito.MockitoSugar
-import pages.add.partnership.{PartnershipNamePage, PartnershipUniqueTaxpayerReferencePage}
+import pages.add.partnership.{PartnershipHasUtrYesNoPage, PartnershipNamePage, PartnershipUniqueTaxpayerReferencePage}
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
@@ -53,7 +53,13 @@ class PartnershipUniqueTaxpayerReferenceControllerSpec extends SpecBase with Moc
 
     "must return OK and the correct view for a GET" in {
       val userAnswers =
-        UserAnswers(userAnswersId).set(PartnershipNamePage, partnershipName).success.value
+        UserAnswers(userAnswersId)
+          .set(PartnershipNamePage, partnershipName)
+          .success
+          .value
+          .set(PartnershipHasUtrYesNoPage, true)
+          .success
+          .value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
@@ -79,6 +85,9 @@ class PartnershipUniqueTaxpayerReferenceControllerSpec extends SpecBase with Moc
         .flatMap(_.set(PartnershipNamePage, partnershipName))
         .success
         .value
+        .set(PartnershipHasUtrYesNoPage, true)
+        .success
+        .value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
@@ -94,6 +103,41 @@ class PartnershipUniqueTaxpayerReferenceControllerSpec extends SpecBase with Moc
           request,
           messages(application)
         ).toString
+      }
+    }
+
+    "must redirect to yesOrNo page when yesorno page has No for a GET" in {
+
+      val application =
+        applicationBuilder(userAnswers = Some(uaWithName.set(PartnershipHasUtrYesNoPage, false).success.value)).build()
+
+      running(application) {
+        val request = FakeRequest(GET, partnershipUniqueTaxpayerReferenceRoute)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(result).value mustEqual controllers.add.partnership.routes.PartnershipHasUtrYesNoController
+          .onPageLoad(NormalMode)
+          .url
+
+      }
+    }
+
+    "must redirect to journey recovery page when none for yesorno page for a GET" in {
+
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+
+      running(application) {
+        val request = FakeRequest(GET, partnershipUniqueTaxpayerReferenceRoute)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+
       }
     }
 

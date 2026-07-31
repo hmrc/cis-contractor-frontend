@@ -21,7 +21,7 @@ import controllers.routes
 import forms.add.partnership.PartnershipNominatedPartnerUtrFormProvider
 import models.{NormalMode, UserAnswers}
 import org.scalatestplus.mockito.MockitoSugar
-import pages.add.partnership.{PartnershipNominatedPartnerNamePage, PartnershipNominatedPartnerUtrPage}
+import pages.add.partnership.{PartnershipNominatedPartnerNamePage, PartnershipNominatedPartnerUtrPage, PartnershipNominatedPartnerUtrYesNoPage}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 
@@ -42,7 +42,13 @@ class PartnershipNominatedPartnerUtrControllerSpec extends SpecBase with Mockito
 
     "must return OK and the correct view for a GET" in {
       val userAnswers =
-        UserAnswers(userAnswersId).set(PartnershipNominatedPartnerNamePage, partnershipName).success.value
+        UserAnswers(userAnswersId)
+          .set(PartnershipNominatedPartnerNamePage, partnershipName)
+          .success
+          .value
+          .set(PartnershipNominatedPartnerUtrYesNoPage, true)
+          .success
+          .value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
@@ -61,11 +67,52 @@ class PartnershipNominatedPartnerUtrControllerSpec extends SpecBase with Mockito
       }
     }
 
+    "must redirect to yesOrNo page when yesorno page has No for a GET" in {
+
+      val application = applicationBuilder(userAnswers =
+        Some(uaWithName.set(PartnershipNominatedPartnerUtrYesNoPage, false).success.value)
+      ).build()
+
+      running(application) {
+        val request = FakeRequest(GET, nominatedPartnerUtrRoute)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(
+          result
+        ).value mustEqual controllers.add.partnership.routes.PartnershipNominatedPartnerUtrYesNoController
+          .onPageLoad(NormalMode)
+          .url
+
+      }
+    }
+
+    "must redirect to journey recovery page when none for yesorno page for a GET" in {
+
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+
+      running(application) {
+        val request = FakeRequest(GET, nominatedPartnerUtrRoute)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+
+      }
+    }
+
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
       val userAnswers = UserAnswers(userAnswersId)
         .set(PartnershipNominatedPartnerUtrPage, "answer")
         .flatMap(_.set(PartnershipNominatedPartnerNamePage, partnershipName))
+        .success
+        .value
+        .set(PartnershipNominatedPartnerUtrYesNoPage, true)
         .success
         .value
 

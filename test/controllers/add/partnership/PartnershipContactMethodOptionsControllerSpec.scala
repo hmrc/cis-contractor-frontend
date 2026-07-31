@@ -25,7 +25,7 @@ import models.{CheckMode, NormalMode, UserAnswers}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.add.partnership.{PartnershipContactMethodOptionsPage, PartnershipEmailAddressPage, PartnershipNamePage, PartnershipPhoneNumberPage}
+import pages.add.partnership.{AddPartnershipContactMethodsYesNoPage, PartnershipContactMethodOptionsPage, PartnershipEmailAddressPage, PartnershipNamePage, PartnershipPhoneNumberPage}
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
@@ -49,6 +49,9 @@ class PartnershipContactMethodOptionsControllerSpec extends SpecBase with Mockit
       .set(PartnershipNamePage, partnershipName)
       .success
       .value
+      .set(AddPartnershipContactMethodsYesNoPage, true)
+      .success
+      .value
 
   "PartnershipContactMethodOptions Controller" - {
 
@@ -69,6 +72,44 @@ class PartnershipContactMethodOptionsControllerSpec extends SpecBase with Mockit
           request,
           messages(application)
         ).toString
+      }
+    }
+
+    "must redirect to yesOrNo page when yesorno page has No for a GET" in {
+
+      val application = applicationBuilder(userAnswers =
+        Some(uaWithName.set(AddPartnershipContactMethodsYesNoPage, false).success.value)
+      ).build()
+
+      running(application) {
+        val request = FakeRequest(GET, partnershipContactMethodOptionsRoute)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(
+          result
+        ).value mustEqual controllers.add.partnership.routes.AddPartnershipContactMethodsYesNoController
+          .onPageLoad(NormalMode)
+          .url
+
+      }
+    }
+
+    "must redirect to journey recovery page when none for yesorno page for a GET" in {
+
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+
+      running(application) {
+        val request = FakeRequest(GET, partnershipContactMethodOptionsRoute)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+
       }
     }
 

@@ -25,7 +25,7 @@ import models.{CheckMode, NormalMode, UserAnswers}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.add.trust.{TrustContactMethodOptionsPage, TrustEmailAddressPage, TrustNamePage, TrustPhoneNumberPage}
+import pages.add.trust.{AddTrustContactMethodsYesNoPage, TrustContactMethodOptionsPage, TrustEmailAddressPage, TrustNamePage, TrustPhoneNumberPage}
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
@@ -45,7 +45,13 @@ class TrustContactMethodOptionsControllerSpec extends SpecBase with MockitoSugar
   private val trustName = "Test trustName"
 
   private def uaWithName: UserAnswers =
-    emptyUserAnswers.set(TrustNamePage, trustName).success.value
+    emptyUserAnswers
+      .set(TrustNamePage, trustName)
+      .success
+      .value
+      .set(AddTrustContactMethodsYesNoPage, true)
+      .success
+      .value
 
   "TrustContactMethodOptions Controller" - {
 
@@ -63,6 +69,42 @@ class TrustContactMethodOptionsControllerSpec extends SpecBase with MockitoSugar
         status(result) mustEqual OK
 
         contentAsString(result) mustEqual view(form, NormalMode, trustName)(request, messages(application)).toString
+      }
+    }
+
+    "must redirect to yesOrNo page when yesorno page has No for a GET" in {
+
+      val application = applicationBuilder(userAnswers =
+        Some(uaWithName.set(AddTrustContactMethodsYesNoPage, false).success.value)
+      ).build()
+
+      running(application) {
+        val request = FakeRequest(GET, trustContactMethodOptionsRoute)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(result).value mustEqual controllers.add.trust.routes.AddTrustContactMethodsYesNoController
+          .onPageLoad(NormalMode)
+          .url
+
+      }
+    }
+
+    "must redirect to journey recovery page when none for yesorno page for a GET" in {
+
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+
+      running(application) {
+        val request = FakeRequest(GET, trustContactMethodOptionsRoute)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+
       }
     }
 

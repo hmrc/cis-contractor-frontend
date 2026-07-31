@@ -20,7 +20,10 @@ import base.SpecBase
 import generators.ModelGenerators
 import models.NormalMode
 import org.scalatestplus.mockito.MockitoSugar
-import pages.add.{AddIndividualContactMethodsYesNoPage, NationalInsuranceNumberYesNoPage, SubTradingNameYesNoPage, UniqueTaxpayerReferenceYesNoPage, WorksReferenceNumberYesNoPage}
+import pages.add._
+import pages.add.company._
+import pages.add.partnership._
+import pages.add.trust._
 import play.api.http.Status.{OK, SEE_OTHER}
 import play.api.mvc
 import play.api.mvc.Results
@@ -48,7 +51,59 @@ class YesOrNoPageGuardServiceSpec extends SpecBase with MockitoSugar with ModelG
         NationalInsuranceNumberYesNoPage,
         controllers.add.routes.NationalInsuranceNumberYesNoController.onPageLoad(mode)
       ),
-      (WorksReferenceNumberYesNoPage, controllers.add.routes.WorksReferenceNumberYesNoController.onPageLoad(mode))
+      (WorksReferenceNumberYesNoPage, controllers.add.routes.WorksReferenceNumberYesNoController.onPageLoad(mode)),
+      (
+        AddCompanyContactMethodsYesNoPage,
+        controllers.add.company.routes.AddCompanyContactMethodsYesNoController.onPageLoad(mode)
+      ),
+      (
+        CompanyUtrYesNoPage,
+        controllers.add.company.routes.CompanyUtrYesNoController.onPageLoad(mode)
+      ),
+      (
+        CompanyCrnYesNoPage,
+        controllers.add.company.routes.CompanyCrnYesNoController.onPageLoad(mode)
+      ),
+      (
+        CompanyWorksReferenceYesNoPage,
+        controllers.add.company.routes.CompanyWorksReferenceYesNoController.onPageLoad(mode)
+      ),
+      (
+        AddPartnershipContactMethodsYesNoPage,
+        controllers.add.partnership.routes.AddPartnershipContactMethodsYesNoController.onPageLoad(mode)
+      ),
+      (
+        PartnershipWorksReferenceNumberYesNoPage,
+        controllers.add.partnership.routes.PartnershipWorksReferenceNumberYesNoController.onPageLoad(mode)
+      ),
+      (
+        PartnershipNominatedPartnerUtrYesNoPage,
+        controllers.add.partnership.routes.PartnershipNominatedPartnerUtrYesNoController.onPageLoad(mode)
+      ),
+      (
+        PartnershipNominatedPartnerNinoYesNoPage,
+        controllers.add.partnership.routes.PartnershipNominatedPartnerNinoController.onPageLoad(mode)
+      ),
+      (
+        PartnershipNominatedPartnerCrnYesNoPage,
+        controllers.add.partnership.routes.PartnershipNominatedPartnerCrnYesNoController.onPageLoad(mode)
+      ),
+      (
+        PartnershipHasUtrYesNoPage,
+        controllers.add.partnership.routes.PartnershipHasUtrYesNoController.onPageLoad(mode)
+      ),
+      (
+        AddTrustContactMethodsYesNoPage,
+        controllers.add.trust.routes.AddTrustContactMethodsYesNoController.onPageLoad(mode)
+      ),
+      (
+        TrustUtrYesNoPage,
+        controllers.add.trust.routes.TrustUtrYesNoController.onPageLoad(mode)
+      ),
+      (
+        TrustWorksReferenceYesNoPage,
+        controllers.add.trust.routes.TrustWorksReferenceYesNoController.onPageLoad(mode)
+      )
     )
 
     serviceTestData.foreach { case (page, expectedURL) =>
