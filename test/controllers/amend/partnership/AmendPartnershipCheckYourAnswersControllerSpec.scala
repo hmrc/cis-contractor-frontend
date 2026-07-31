@@ -41,16 +41,6 @@ import pages.amend.ShowVerificationDetailsPage
 
 class AmendPartnershipCheckYourAnswersControllerSpec extends SpecBase with MockitoSugar {
 
-  private lazy val onPageLoadRoute =
-    controllers.amend.partnership.routes.AmendPartnershipCheckYourAnswersController
-      .onPageLoad()
-      .url
-
-  private lazy val onSubmitRoute =
-    controllers.amend.partnership.routes.AmendPartnershipCheckYourAnswersController
-      .onSubmit()
-      .url
-
   private val address =
     Address(
       addressLine1 = "12 Harbor View Road",
@@ -104,13 +94,13 @@ class AmendPartnershipCheckYourAnswersControllerSpec extends SpecBase with Mocki
       .set(PartnershipNominatedPartnerCrnPage, "12345678")
       .success
       .value
-      .set(PartnershipNominatedPartnerNinoYesNoPage, false)
+      .set(PartnershipNominatedPartnerNinoYesNoPage, true)
       .success
       .value
-      .set(PartnershipNominatedPartnerNinoPage, "")
+      .set(PartnershipNominatedPartnerNinoPage, "AC123456")
       .success
       .value
-      .set(PartnershipNominatedPartnerUtrYesNoPage, false)
+      .set(PartnershipNominatedPartnerUtrYesNoPage, true)
       .success
       .value
       .set(PartnershipNominatedPartnerUtrPage, "11111111")
@@ -139,7 +129,7 @@ class AmendPartnershipCheckYourAnswersControllerSpec extends SpecBase with Mocki
           nominatedPartnerUtrYesNo = Some(true),
           nominatedPartnerUtr = Some("11111111"),
           nominatedPartnerNinoYesNo = Some(true),
-          nominatedPartnerNino = Some(""),
+          nominatedPartnerNino = Some("AC123456"),
           nominatedPartnerCrnYesNo = Some(true),
           nominatedPartnerCrn = Some("12345678"),
           nominatedPartnerWorksReferenceYesNo = Some(true),
@@ -167,42 +157,42 @@ class AmendPartnershipCheckYourAnswersControllerSpec extends SpecBase with Mocki
 
         status(result) mustEqual OK
 
-//        val page = contentAsString(result)
-//
-//        page must include(msg("typeOfSubcontractor.checkYourAnswersLabel"))
-//        page must include(msg("partnershipName.checkYourAnswersLabel"))
-//        page must include(msg("partnershipHasUtrYesNo.checkYourAnswersLabel"))
-//        page must include(msg("partnershipUtr.checkYourAnswersLabel"))
-//        page must include(msg("partnershipNominatedPartnerName.checkYourAnswersLabel"))
-//        page must include(msg("partnershipNominatedPartnerNinoYesNo.checkYourAnswersLabel"))
-//        page must include(msg("partnershipNominatedPartnerNino.checkYourAnswersLabel"))
-//        page must include(msg("partnershipNominatedPartnerCrnYesNo.checkYourAnswersLabel"))
-//        page must include(msg("partnershipNominatedPartnerCrn.checkYourAnswersLabel"))
-//        page must include(msg("partnershipNominatedPartnerUtrYesNo.checkYourAnswersLabel"))
-//        page must include(msg("partnershipNominatedPartnerUtr.checkYourAnswersLabel"))
-//        page must include(msg("partnershipWorksReferenceYesNo.checkYourAnswersLabel"))
-//        page must include(msg("partnershipWorksReference.checkYourAnswersLabel"))
-//        page must include(msg("partnershipAddressYesNo.checkYourAnswersLabel"))
-//        page must include(msg("partnershipAddress.checkYourAnswersLabel"))
-//        page must include(msg("addPartnershipContactMethodsYesNo.checkYourAnswersLabel"))
-//        page must include(msg("partnershipContactMethodOptions.checkYourAnswersLabel"))
-//        page must include(msg("partnershipEmailAddress.checkYourAnswersLabel"))
-//
-//        page must not include (msg("amendCheckYourAnswers.verificationNumber.label"))
-//
-//        page must include("Partnership")
-//        page must include("Test Partnership")
-//        page must include("12345678")
-//        page must include("WRN-1")
-//        page must include("test@test.com")
-//        page must include("12 Harbor View Road")
-//        page must include("Amity Island")
-//        page must include("Bodmin")
-//        page must include("Cornwall")
-//        page must include("PL31 2HL")
-//        page must include("England")
-//
-//        page must not include "VRN123456"
+        val page = contentAsString(result)
+
+        page must include(msg("typeOfSubcontractor.checkYourAnswersLabel"))
+        page must include(msg("partnershipName.checkYourAnswersLabel"))
+        page must include(msg("partnershipHasUtrYesNo.checkYourAnswersLabel"))
+        page must include(msg("partnershipUniqueTaxpayerReference.checkYourAnswersLabel"))
+        page must include(msg("partnershipNominatedPartnerName.checkYourAnswersLabel"))
+        page must include(msg("partnershipNominatedPartnerNinoYesNo.checkYourAnswersLabel"))
+        page must include(msg("partnershipNominatedPartnerNino.checkYourAnswersLabel"))
+        page must include(msg("partnershipNominatedPartnerCrnYesNo.checkYourAnswersLabel"))
+        page must include(msg("partnershipNominatedPartnerCrn.checkYourAnswersLabel"))
+        page must include(msg("partnershipNominatedPartnerUtrYesNo.checkYourAnswersLabel"))
+        page must include(msg("partnershipNominatedPartnerUtr.checkYourAnswersLabel"))
+        page must include(msg("partnershipWorksReferenceNumberYesNo.checkYourAnswersLabel"))
+        page must include(msg("partnershipWorksReferenceNumber.checkYourAnswersLabel"))
+        page must include(msg("partnershipAddressYesNo.checkYourAnswersLabel"))
+        page must include(msg("partnershipAddress.checkYourAnswersLabel"))
+        page must include(msg("addPartnershipContactMethodsYesNo.checkYourAnswersLabel"))
+        page must include(msg("partnershipContactMethodOptions.checkYourAnswersLabel"))
+        page must include(msg("partnershipEmailAddress.checkYourAnswersLabel"))
+
+        page must not include (msg("amendCheckYourAnswers.verificationNumber.label"))
+
+        page must include("Partnership")
+        page must include("Test Partnership")
+        page must include("12345678")
+        page must include("WRN-1")
+        page must include("test@test.com")
+        page must include("12 Harbor View Road")
+        page must include("Amity Island")
+        page must include("Bodmin")
+        page must include("Cornwall")
+        page must include("PL31 2HL")
+        page must include("England")
+
+        page must not include "VRN123456"
       }
     }
 
@@ -210,6 +200,9 @@ class AmendPartnershipCheckYourAnswersControllerSpec extends SpecBase with Mocki
 
       val verifiedUa  =
         minUa
+          .set(ShowVerificationDetailsPage, true)
+          .success
+          .value
           .set(
             OriginalPartnershipAnswersQuery,
             OriginalPartnershipAnswers(
@@ -252,37 +245,102 @@ class AmendPartnershipCheckYourAnswersControllerSpec extends SpecBase with Mocki
 
         status(result) mustEqual OK
 
-//        val page = contentAsString(result)
-//
-//        page must include(msg("amendCheckYourAnswers.verificationNumber.label"))
-//        page must include("VRN123456")
-//
-//        page must not include msg("partnershipName.checkYourAnswersLabel")
-//        page must not include msg("partnershipHasUtrNumberYesNo.checkYourAnswersLabel")
-//        page must not include msg("partnershipUtrNumber.change.hidden")
-//
-//        page must include(msg("typeOfSubcontractor.checkYourAnswersLabel"))
-//        page must include("Partnership")
-//
-//        page must include(msg("partnershipAddressYesNo.checkYourAnswersLabel"))
-//        page must include(msg("partnershipAddress.checkYourAnswersLabel"))
-//        page must include(msg("site.yes"))
-//        page must include("12 Harbor View Road")
-//        page must include("Amity Island")
-//        page must include("Bodmin")
-//        page must include("Cornwall")
-//        page must include("PL31 2HL")
-//        page must include("England")
-//
-//        page must include(msg("addPartnershipContactMethodsYesNo.checkYourAnswersLabel"))
-//        page must include(msg("partnershipContactMethodOptions.checkYourAnswersLabel"))
-//        page must include(msg("partnershipEmailAddress.checkYourAnswersLabel"))
-//        page must include("test@test.com")
-//
-//        page must include(msg("partnershipWorksReferenceYesNo.checkYourAnswersLabel"))
-//        page must include(msg("partnershipWorksReference.checkYourAnswersLabel"))
-//        page must include(msg("site.no"))
-//        page must include("WRN-1")
+        val page = contentAsString(result)
+
+        page must include(msg("amendCheckYourAnswers.verificationNumber.label"))
+        page must include("VRN123456")
+
+        page must not include msg("partnershipName.checkYourAnswersLabel")
+        page must not include msg("partnershipHasUtrNumberYesNo.checkYourAnswersLabel")
+        page must not include msg("partnershipUniqueTaxpayerReference.change.hidden")
+
+        page must include(msg("typeOfSubcontractor.checkYourAnswersLabel"))
+        page must include("Partnership")
+
+        page must include(msg("partnershipAddressYesNo.checkYourAnswersLabel"))
+        page must include(msg("partnershipAddress.checkYourAnswersLabel"))
+        page must include(msg("site.yes"))
+        page must include("12 Harbor View Road")
+        page must include("Amity Island")
+        page must include("Bodmin")
+        page must include("Cornwall")
+        page must include("PL31 2HL")
+        page must include("England")
+
+        page must include(msg("addPartnershipContactMethodsYesNo.checkYourAnswersLabel"))
+        page must include(msg("partnershipContactMethodOptions.checkYourAnswersLabel"))
+        page must include(msg("partnershipEmailAddress.checkYourAnswersLabel"))
+        page must include("test@test.com")
+
+        page must include(msg("partnershipNominatedPartnerUtrYesNo.checkYourAnswersLabel"))
+        page must include(msg("partnershipNominatedPartnerUtr.checkYourAnswersLabel"))
+        page must include(msg("partnershipNominatedPartnerCrnYesNo.checkYourAnswersLabel"))
+        page must include(msg("partnershipNominatedPartnerCrn.checkYourAnswersLabel"))
+        page must include(msg("partnershipNominatedPartnerNinoYesNo.checkYourAnswersLabel"))
+        page must include(msg("partnershipNominatedPartnerNino.checkYourAnswersLabel"))
+        page must include(msg("partnershipWorksReferenceNumberYesNo.checkYourAnswersLabel"))
+        page must include(msg("partnershipWorksReferenceNumber.checkYourAnswersLabel"))
+        page must include(msg("site.no"))
+        page must include("WRN-1")
+      }
+    }
+
+    "must not render the verification number row when the partnership is pending verifications" in {
+
+      val verifiedUa  =
+        minUa
+          .set(ShowVerificationDetailsPage, true)
+          .success
+          .value
+          .set(
+            OriginalPartnershipAnswersQuery,
+            OriginalPartnershipAnswers(
+              partnershipName = Some("Test Partnership"),
+              addressYesNo = Some(false),
+              address = None,
+              partnershipContactMethodsYesNo = Some(false),
+              partnershipContactMethodOptions = Set.empty,
+              email = None,
+              phone = None,
+              mobile = None,
+              hasUtrYesNo = Some(false),
+              utr = None,
+              nominatedPartnerName = None,
+              nominatedPartnerUtrYesNo = Some(false),
+              nominatedPartnerUtr = None,
+              nominatedPartnerCrnYesNo = Some(false),
+              nominatedPartnerCrn = None,
+              nominatedPartnerNinoYesNo = Some(false),
+              nominatedPartnerNino = None,
+              nominatedPartnerWorksReferenceYesNo = Some(false),
+              nominatedPartnerWorksReference = None,
+              verificationNumber = None
+            )
+          )
+          .success
+          .value
+      val application =
+        applicationBuilder(userAnswers = Some(verifiedUa)).build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(
+            GET,
+            controllers.amend.partnership.routes.AmendPartnershipCheckYourAnswersController.onPageLoad().url
+          )
+        val msg     = app.injector.instanceOf[MessagesApi].preferred(request)
+        val result  = route(application, request).value
+
+        status(result) mustEqual OK
+
+        val page = contentAsString(result)
+
+        page must not include msg("amendCheckYourAnswers.verificationNumber.label")
+        page must not include "VRN123456"
+
+        page must include(msg("partnershipUniqueTaxpayerReference.verified.checkYourAnswersLabel"))
+
       }
     }
 

@@ -35,7 +35,7 @@ import viewmodels.checkAnswers.add.*
 import viewmodels.checkAnswers.add.partnership.*
 import viewmodels.govuk.summarylist.*
 import views.html.amend.AmendCheckYourAnswersView
-import pages.amend.ShowVerificationDetailsPage
+import pages.amend.{AmendCheckYourAnswersSubmittedPage, ShowVerificationDetailsPage}
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -88,17 +88,19 @@ class AmendPartnershipCheckYourAnswersController @Inject() (
     val verificationRows =
       Option
         .when(isVerified.contains(true)) {
-          val verificationNumber = ua.get(OriginalPartnershipAnswersQuery).flatMap(_.verificationNumber).getOrElse("")
+          val verificationNumberOpt =
+            ua.get(OriginalPartnershipAnswersQuery).flatMap(_.verificationNumber).getOrElse("")
 
           Seq(
-            PartnershipUniqueTaxpayerReferenceSummary.row(ua, AmendMode, showActions = false),
+            PartnershipUniqueTaxpayerReferenceSummary.row(ua, AmendMode, showActions = false)
+          ) ++ verificationNumberOpt.map { verificationNumber =>
             Some(
               SummaryListRowViewModel(
                 key = Key(Text(messages("amendCheckYourAnswers.verificationNumber.label"))),
                 value = Value(Text(verificationNumber))
               )
             )
-          )
+          }
         }
         .getOrElse(Nil)
 
@@ -157,18 +159,22 @@ class AmendPartnershipCheckYourAnswersController @Inject() (
     (identify andThen getData andThen requireData).async { implicit request =>
       ValidatedPartnership.build(request.userAnswers) match {
         case Right(_) =>
-          subcontractorService
-            .createAndUpdateSubcontractor(request.userAnswers)
-            .map(_ =>
-              Redirect(controllers.amend.partnership.routes.AmendPartnershipCheckYourAnswersController.onPageLoad())
-            )
-            .recover { case t =>
-              logger.error(
-                "[AmendPartnershipCheckYourAnswersController.onSubmit] Failed to update subcontractor",
-                t
+          if (request.userAnswers.get(AmendCheckYourAnswersSubmittedPage).contains(true)) {
+            Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+          } else {
+            subcontractorService
+              .createAndUpdateSubcontractor(request.userAnswers)
+              .map(_ =>
+                Redirect(controllers.amend.partnership.routes.AmendPartnershipCheckYourAnswersController.onPageLoad())
               )
-              Redirect(routes.JourneyRecoveryController.onPageLoad())
-            }
+              .recover { case t =>
+                logger.error(
+                  "[AmendPartnershipCheckYourAnswersController.onSubmit] Failed to update subcontractor",
+                  t
+                )
+                Redirect(routes.JourneyRecoveryController.onPageLoad())
+              }
+          }
 
         case Left(error) =>
           logger.error(s"[AmendPartnershipCheckYourAnswersController.onSubmit] Validation failed: $error")
@@ -180,5 +186,12 @@ class AmendPartnershipCheckYourAnswersController @Inject() (
     sessionRepository
       .set(UserAnswers(request.userAnswers.id))
       .map(_ => Redirect(routes.IndexController.onPageLoad()))
+      .recover { case t =>
+        logger.error(
+          s"[AmendCompanyCheckYourAnswersController.onCancel] Failed to clear user answers for session ${request.userAnswers.id}",
+          t
+        )
+        Redirect(routes.JourneyRecoveryController.onPageLoad())
+      }
   }
 }

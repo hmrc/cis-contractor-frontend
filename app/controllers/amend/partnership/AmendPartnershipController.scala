@@ -155,6 +155,7 @@ class AmendPartnershipController @Inject() (
       updated <- setOptional(updated, PartnershipNominatedPartnerCrnPage, subcontractor.crn)
       updated <- updated.set(PartnershipWorksReferenceNumberYesNoPage, subcontractor.worksReferenceNumber.isDefined)
       updated <- setOptional(updated, PartnershipWorksReferenceNumberPage, subcontractor.worksReferenceNumber)
+      updated <- updated.set(ShowVerificationDetailsPage, shouldShowVerificationDetails(subcontractor))
       updated <- updated.set(CisIdQuery, cisId)
       updated <- updated.set(OriginalPartnershipAnswersQuery, original)
     } yield updated

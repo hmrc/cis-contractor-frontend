@@ -47,7 +47,7 @@ object PartnershipUniqueTaxpayerReferenceSummary {
         )
       } else {
         SummaryListRowViewModel(
-          key = "trustUtr.verified.checkYourAnswersLabel",
+          key = "partnershipUniqueTaxpayerReference.verified.checkYourAnswersLabel",
           value = value,
           actions = Seq.empty
         )

@@ -17,7 +17,6 @@
 package pages
 
 import models.response.GetSubcontractorResponse
-import pages.QuestionPage
 import play.api.libs.json.JsPath
 
 case object GetSubcontractorResponsePage extends QuestionPage[GetSubcontractorResponse] {
