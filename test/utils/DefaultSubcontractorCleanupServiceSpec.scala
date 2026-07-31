@@ -23,8 +23,8 @@ import models.amend.partnership.OriginalPartnershipAnswers
 import models.amend.trust.OriginalTrustAnswers
 import org.scalatest.TryValues.*
 import pages.add.CheckYourAnswersSubmittedPage
-import pages.amend.AmendCheckYourAnswersSubmittedPage
 import queries.{OriginalCompanyAnswersQuery, OriginalIndividualAnswersQuery, OriginalPartnershipAnswersQuery, OriginalTrustAnswersQuery}
+import pages.amend.{AmendCheckYourAnswersSubmittedPage, ShowVerificationDetailsPage}
 
 class DefaultSubcontractorCleanupServiceSpec extends SpecBase {
 
@@ -146,6 +146,9 @@ class DefaultSubcontractorCleanupServiceSpec extends SpecBase {
             .set(CheckYourAnswersSubmittedPage, true)
             .success
             .value
+            .set(ShowVerificationDetailsPage, true)
+            .success
+            .value
 
         val result = service.cleanAmend(userAnswers).success.value
 
@@ -157,6 +160,7 @@ class DefaultSubcontractorCleanupServiceSpec extends SpecBase {
         result.get(AmendCheckYourAnswersSubmittedPage) mustBe Some(false)
 
         result.get(CheckYourAnswersSubmittedPage) mustBe Some(true)
+        result.get(ShowVerificationDetailsPage) mustBe None
       }
 
       "must succeed when no original answers exist" in {
@@ -169,6 +173,7 @@ class DefaultSubcontractorCleanupServiceSpec extends SpecBase {
         result.get(OriginalCompanyAnswersQuery) mustBe None
         result.get(OriginalPartnershipAnswersQuery) mustBe None
         result.get(OriginalTrustAnswersQuery) mustBe None
+        result.get(ShowVerificationDetailsPage) mustBe None
         result.get(AmendCheckYourAnswersSubmittedPage) mustBe Some(false)
       }
     }

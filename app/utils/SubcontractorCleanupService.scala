@@ -19,7 +19,7 @@ package utils
 import jakarta.inject.Singleton
 import models.UserAnswers
 import pages.add.CheckYourAnswersSubmittedPage
-import pages.amend.AmendCheckYourAnswersSubmittedPage
+import pages.amend.{AmendCheckYourAnswersSubmittedPage, ShowVerificationDetailsPage}
 import queries.{OriginalCompanyAnswersQuery, OriginalIndividualAnswersQuery, OriginalPartnershipAnswersQuery, OriginalTrustAnswersQuery}
 import utils.SubcontractorCleanup.removeAllSubcontractor
 
@@ -41,5 +41,6 @@ class DefaultSubcontractorCleanupService extends SubcontractorCleanupService {
       .flatMap(_.remove(OriginalCompanyAnswersQuery))
       .flatMap(_.remove(OriginalPartnershipAnswersQuery))
       .flatMap(_.remove(OriginalTrustAnswersQuery))
+      .flatMap(_.remove(ShowVerificationDetailsPage))
       .flatMap(_.set(AmendCheckYourAnswersSubmittedPage, false))
 }
