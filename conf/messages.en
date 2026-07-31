@@ -1063,3 +1063,12 @@ amendCheckYourAnswers.confirm.p1 = By changing this subcontractor’s details yo
 amendCheckYourAnswers.confirm = Confirm
 amendCheckYourAnswers.cancelChanges = Cancel changes
 amendCheckYourAnswers.verificationNumber.label = Verification number
+
+verify.verificationResults.title = Verification results
+verify.verificationResults.heading = Verification results
+verify.verificationResults.paragraph = Here are the verification results from your most recent verification request.
+verify.verificationResults.name = Name
+verify.verificationResults.status = Verification status
+verify.verificationResults.taxTreatment = Tax treatment
+verify.verificationResults.verificationNumber = Verification number
+verify.reviewUnmatchedSubcontractors.button = Review unmatched subcontractors
