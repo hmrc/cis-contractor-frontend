@@ -89,7 +89,7 @@ class AmendPartnershipCheckYourAnswersController @Inject() (
       Option
         .when(isVerified.contains(true)) {
           val verificationNumberOpt =
-            ua.get(OriginalPartnershipAnswersQuery).flatMap(_.verificationNumber).getOrElse("")
+            ua.get(OriginalPartnershipAnswersQuery).flatMap(_.verificationNumber).filter(_.trim.nonEmpty)
 
           Seq(
             PartnershipUniqueTaxpayerReferenceSummary.row(ua, AmendMode, showActions = false)
