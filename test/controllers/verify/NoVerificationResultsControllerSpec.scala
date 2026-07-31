@@ -27,7 +27,7 @@ class NoVerificationResultsControllerSpec extends SpecBase {
   "NoVerificationResults Controller" - {
 
     "must return OK and the correct view for a GET" in {
-      val cisId = "1"
+      val cisId       = "1"
       val userAnswers = emptyUserAnswers.set(CisIdQuery, cisId).success.value
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 

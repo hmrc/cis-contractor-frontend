@@ -29,7 +29,7 @@ class NoVerificationResultsViewSpec extends SpecBase {
 
   "NoVerificationResultsView" - {
     "render the page with title, heading, paragraph and link" in new Setup {
-      val manageSubcontractorsUrl = "/manage-subcontractors/1"
+      val manageSubcontractorsUrl     = "/manage-subcontractors/1"
       val html: HtmlFormat.Appendable = view(manageSubcontractorsUrl)
       val doc: Document               = Jsoup.parse(html.body)
 
