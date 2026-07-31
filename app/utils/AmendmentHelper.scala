@@ -24,24 +24,23 @@ object AmendmentHelper {
 
   def companyHasChanges(userAnswers: UserAnswers): Boolean =
     userAnswers.get(OriginalCompanyAnswersQuery).exists { original =>
-
       Seq(
-        original.companyName -> userAnswers.get(CompanyNamePage),
-        original.addressYesNo -> userAnswers.get(CompanyAddressYesNoPage),
-        original.address -> userAnswers.get(CompanyAddressPage),
+        original.companyName                -> userAnswers.get(CompanyNamePage),
+        original.addressYesNo               -> userAnswers.get(CompanyAddressYesNoPage),
+        original.address                    -> userAnswers.get(CompanyAddressPage),
         original.companyContactMethodsYesNo -> userAnswers.get(AddCompanyContactMethodsYesNoPage),
-        original.companyContactMethod -> userAnswers.get(CompanyContactMethodOptionsPage).getOrElse(Set.empty),
-        original.email -> userAnswers.get(CompanyEmailAddressPage),
-        original.phone -> userAnswers.get(CompanyPhoneNumberPage),
-        original.mobile -> userAnswers.get(CompanyMobileNumberPage),
-        original.utrYesNo -> userAnswers.get(CompanyUtrYesNoPage),
-        original.utr -> userAnswers.get(CompanyUtrPage),
-        original.crnYesNo -> userAnswers.get(CompanyCrnYesNoPage),
-        original.crn -> userAnswers.get(CompanyCrnPage),
-        original.worksReferenceYesNo -> userAnswers.get(CompanyWorksReferenceYesNoPage),
-        original.worksReference -> userAnswers.get(CompanyWorksReferencePage)
-      ).exists {
-        case (originalValue, currentValue) => originalValue != currentValue
+        original.companyContactMethod       -> userAnswers.get(CompanyContactMethodOptionsPage).getOrElse(Set.empty),
+        original.email                      -> userAnswers.get(CompanyEmailAddressPage),
+        original.phone                      -> userAnswers.get(CompanyPhoneNumberPage),
+        original.mobile                     -> userAnswers.get(CompanyMobileNumberPage),
+        original.utrYesNo                   -> userAnswers.get(CompanyUtrYesNoPage),
+        original.utr                        -> userAnswers.get(CompanyUtrPage),
+        original.crnYesNo                   -> userAnswers.get(CompanyCrnYesNoPage),
+        original.crn                        -> userAnswers.get(CompanyCrnPage),
+        original.worksReferenceYesNo        -> userAnswers.get(CompanyWorksReferenceYesNoPage),
+        original.worksReference             -> userAnswers.get(CompanyWorksReferencePage)
+      ).exists { case (originalValue, currentValue) =>
+        originalValue != currentValue
       }
     }
 }

@@ -56,21 +56,51 @@ class AmendmentHelperSpec extends SpecBase {
 
   private val userAnswers =
     emptyUserAnswers
-      .set(OriginalCompanyAnswersQuery, original).success.value
-      .set(CompanyNamePage, "ABC Ltd").success.value
-      .set(CompanyAddressYesNoPage, true).success.value
-      .set(CompanyAddressPage, address).success.value
-      .set(AddCompanyContactMethodsYesNoPage, true).success.value
-      .set(CompanyContactMethodOptionsPage, Set(ContactMethodOptions.Email)).success.value
-      .set(CompanyEmailAddressPage, "test@test.com").success.value
-      .set(CompanyPhoneNumberPage, "0123456789").success.value
-      .set(CompanyMobileNumberPage, "07123456789").success.value
-      .set(CompanyUtrYesNoPage, true).success.value
-      .set(CompanyUtrPage, "1111111111").success.value
-      .set(CompanyCrnYesNoPage, true).success.value
-      .set(CompanyCrnPage, "12345678").success.value
-      .set(CompanyWorksReferenceYesNoPage, true).success.value
-      .set(CompanyWorksReferencePage, "WRN123").success.value
+      .set(OriginalCompanyAnswersQuery, original)
+      .success
+      .value
+      .set(CompanyNamePage, "ABC Ltd")
+      .success
+      .value
+      .set(CompanyAddressYesNoPage, true)
+      .success
+      .value
+      .set(CompanyAddressPage, address)
+      .success
+      .value
+      .set(AddCompanyContactMethodsYesNoPage, true)
+      .success
+      .value
+      .set(CompanyContactMethodOptionsPage, Set(ContactMethodOptions.Email))
+      .success
+      .value
+      .set(CompanyEmailAddressPage, "test@test.com")
+      .success
+      .value
+      .set(CompanyPhoneNumberPage, "0123456789")
+      .success
+      .value
+      .set(CompanyMobileNumberPage, "07123456789")
+      .success
+      .value
+      .set(CompanyUtrYesNoPage, true)
+      .success
+      .value
+      .set(CompanyUtrPage, "1111111111")
+      .success
+      .value
+      .set(CompanyCrnYesNoPage, true)
+      .success
+      .value
+      .set(CompanyCrnPage, "12345678")
+      .success
+      .value
+      .set(CompanyWorksReferenceYesNoPage, true)
+      .success
+      .value
+      .set(CompanyWorksReferencePage, "WRN123")
+      .success
+      .value
 
   "AmendmentHelper" - {
 

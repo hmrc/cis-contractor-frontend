@@ -392,7 +392,7 @@ class AmendCompanyCheckYourAnswersControllerSpec extends SpecBase with MockitoSu
 
     "must redirect to Manage Your Subcontractors when no changes have been made" in {
       val cisId = "cis-123"
-      val ua =
+      val ua    =
         minUa
           .set(CisIdQuery, cisId)
           .success
@@ -402,7 +402,7 @@ class AmendCompanyCheckYourAnswersControllerSpec extends SpecBase with MockitoSu
           .value
 
       val mockSubcontractorService = mock[SubcontractorService]
-      val mockSessionRepository = mock[SessionRepository]
+      val mockSessionRepository    = mock[SessionRepository]
       AmendmentHelper.companyHasChanges(ua) mustBe false
 
       val application =
@@ -505,7 +505,7 @@ class AmendCompanyCheckYourAnswersControllerSpec extends SpecBase with MockitoSu
 
     "must clear answers and redirect to Index on cancel" in {
 
-      val ua =
+      val ua                    =
         minUa
           .set(CisIdQuery, "cis-123")
           .success
