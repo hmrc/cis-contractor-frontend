@@ -16,11 +16,13 @@
 
 package controllers.verify
 
+import config.FrontendAppConfig
 import controllers.actions.*
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.verify.NoVerificationResultsView
+import queries.CisIdQuery
 
 import javax.inject.Inject
 
@@ -31,10 +33,16 @@ class NoVerificationResultsController @Inject() (
   requireData: DataRequiredAction,
   val controllerComponents: MessagesControllerComponents,
   view: NoVerificationResultsView
-) extends FrontendBaseController
+)(implicit appConfig: FrontendAppConfig)
+    extends FrontendBaseController
     with I18nSupport {
 
   def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
-    Ok(view())
+    request.userAnswers.get(CisIdQuery) match {
+      case Some(cisId) =>
+        val manageSubcontractorsUrl = s"${appConfig.manageSubcontractorsUrl}/$cisId"
+        Ok(view(manageSubcontractorsUrl))
+      case None        => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+    }
   }
 }

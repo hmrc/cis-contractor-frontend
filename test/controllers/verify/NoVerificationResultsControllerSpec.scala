@@ -19,6 +19,7 @@ package controllers.verify
 import base.SpecBase
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
+import queries.CisIdQuery
 import views.html.verify.NoVerificationResultsView
 
 class NoVerificationResultsControllerSpec extends SpecBase {
@@ -26,8 +27,12 @@ class NoVerificationResultsControllerSpec extends SpecBase {
   "NoVerificationResults Controller" - {
 
     "must return OK and the correct view for a GET" in {
+      val cisId = "1"
+      val userAnswers = emptyUserAnswers.set(CisIdQuery, cisId).success.value
+      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val manageSubcontractorsUrl =
+        s"${applicationConfig.manageSubcontractorsUrl}/$cisId"
 
       running(application) {
         val request = FakeRequest(GET, controllers.verify.routes.NoVerificationResultsController.onPageLoad().url)
@@ -37,7 +42,28 @@ class NoVerificationResultsControllerSpec extends SpecBase {
         val view = application.injector.instanceOf[NoVerificationResultsView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view()(request, messages(application)).toString
+        contentAsString(result) mustEqual view(manageSubcontractorsUrl)(request, messages(application)).toString
+      }
+    }
+
+    "must redirect to Journey Recovery when CisId is missing" in {
+
+      val application =
+        applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(
+            GET,
+            controllers.verify.routes.NoVerificationResultsController.onPageLoad().url
+          )
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual
+          controllers.routes.JourneyRecoveryController.onPageLoad().url
       }
     }
   }

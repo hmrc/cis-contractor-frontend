@@ -22,7 +22,7 @@
     link: components.Link
 )
 
-@()(implicit request: Request[_], messages: Messages)
+@(manageSubcontractorsUrl: String)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = titleNoForm(messages("verify.noVerificationResults.title"))) {
 
@@ -30,7 +30,7 @@
     @paragraph(messages("verify.noVerificationResults.p"))
     @link(
         linkTextKey = "verify.noVerificationResults.manageYourSubcontractors.link",
-        linkUrl = "#",
+        linkUrl = manageSubcontractorsUrl,
         hasFullStop = true,
         prefixTextKey = "verify.noVerificationResults.backTo"
     )
