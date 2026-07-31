@@ -18,7 +18,7 @@ package models.verify
 
 import base.SpecBase
 import models.response.{ChrisPollResponse, ChrisSubmissionResponse, ResponseEndPointDto}
-import models.verify.SubmissionStatus.SUBMITTED
+import models.verify.SubmissionStatus.{SEND_ERROR, SUBMITTED, TIMED_OUT}
 import play.api.libs.json.Json
 import java.time.LocalDateTime
 
@@ -94,6 +94,59 @@ class VerificationSubmissionDetailsBuilderSpec extends SpecBase {
       result.hmrcMarkGgis mustBe Some("new-ggis")
       result.submissionId mustBe "13602"
       result.hmrcMarkGenerated mustBe "hmrc-mark"
+      result.timedOut mustBe false
+    }
+
+    "must set timedOut when poll status is TIMED_OUT" in {
+      val result =
+        VerificationSubmissionDetailsBuilder.updateFromPollResponse(baseDetails, pollResponse(TIMED_OUT))
+
+      result.status mustBe "TIMED_OUT"
+      result.timedOut mustBe true
+    }
+
+    "must set timedOut when poll status is SEND_ERROR" in {
+      val result =
+        VerificationSubmissionDetailsBuilder.updateFromPollResponse(baseDetails, pollResponse(SEND_ERROR))
+
+      result.status mustBe "SEND_ERROR"
+      result.timedOut mustBe true
+    }
+
+    "must keep timedOut set once it has been set on a previous poll" in {
+      val result =
+        VerificationSubmissionDetailsBuilder.updateFromPollResponse(
+          baseDetails.copy(timedOut = true),
+          pollResponse(SUBMITTED)
+        )
+
+      result.status mustBe "SUBMITTED"
+      result.timedOut mustBe true
     }
   }
+
+  private val baseDetails = VerificationSubmissionDetails(
+    submissionId = "13602",
+    status = "ACCEPTED",
+    hmrcMarkGenerated = "hmrc-mark",
+    hmrcMarkGgis = None,
+    correlationId = Some("corr-id"),
+    pollUrl = Some("http://localhost/poll"),
+    pollIntervalSeconds = Some(5),
+    submittedAt = LocalDateTime.parse("2026-06-15T03:30:52"),
+    lastMessageDate = None,
+    timedOut = false
+  )
+
+  private def pollResponse(pollStatus: SubmissionStatus): ChrisPollResponse =
+    ChrisPollResponse(
+      status = pollStatus,
+      correlationId = "corr-id",
+      pollUrl = None,
+      pollInterval = None,
+      error = None,
+      irMarkReceived = None,
+      lastMessageDate = None,
+      acceptedTime = None
+    )
 }

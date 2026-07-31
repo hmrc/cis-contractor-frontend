@@ -38,7 +38,7 @@ object VerificationSubmissionDetailsBuilder {
         .flatMap(timestamp => Try(LocalDateTime.parse(timestamp)).toOption)
         .getOrElse(now(ukZone).toLocalDateTime),
       lastMessageDate = None,
-      timedOut = false // TODO: to be updated in 60s timeout ticket
+      timedOut = false
     )
 
   def updateFromPollResponse(
@@ -46,14 +46,18 @@ object VerificationSubmissionDetailsBuilder {
     response: ChrisPollResponse
   ): VerificationSubmissionDetails =
     existing.copy(
-      status = response.status.toString,
+      status = response.status.value,
       correlationId = Some(response.correlationId),
       pollUrl = response.pollUrl.orElse(existing.pollUrl),
       pollIntervalSeconds = response.pollInterval.orElse(existing.pollIntervalSeconds),
       lastMessageDate = response.lastMessageDate
         .flatMap(timestamp => Try(LocalDateTime.parse(timestamp)).toOption)
         .orElse(existing.lastMessageDate),
-      hmrcMarkGgis = response.irMarkReceived.orElse(existing.hmrcMarkGgis)
+      hmrcMarkGgis = response.irMarkReceived.orElse(existing.hmrcMarkGgis),
+      timedOut = existing.timedOut || (response.status match {
+        case SubmissionStatus.TIMED_OUT | SubmissionStatus.SEND_ERROR => true
+        case _                                                        => false
+      })
     )
 
 }
