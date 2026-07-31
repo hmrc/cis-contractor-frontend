@@ -28,8 +28,7 @@ import views.html.verify.ReviewInsufficientInfoSubcontractorsView
 
 class ReviewInsufficientInfoSubcontractorsControllerSpec extends SpecBase {
 
-  private val endpointUrl =
-    controllers.verify.routes.ReviewInsufficientInfoSubcontractorsController.onPageLoad().url
+  private val endpointUrl = "/subcontractor/verify/subcontractors-have-missing-information"
 
   private def mkSub(
     id: Long,
