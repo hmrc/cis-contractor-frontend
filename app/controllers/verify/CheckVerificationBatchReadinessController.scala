@@ -19,7 +19,7 @@ package controllers.verify
 import controllers.actions.*
 import models.{AmendMode, CheckMode, Mode, NormalMode, UserAnswers}
 import models.verify.VerificationBatchReadiness
-import pages.verify.{NewestVerificationBatchResponsePage, SelectSubcontractorPage, SelectSubcontractorsToReverifyPage, VerificationBatchReadinessPage, CurrentVerificationBatchResponsePage}
+import pages.verify.{CurrentVerificationBatchResponsePage, NewestVerificationBatchResponsePage, SelectSubcontractorPage, SelectSubcontractorsToReverifyPage, VerificationBatchReadinessPage}
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
@@ -72,11 +72,9 @@ class CheckVerificationBatchReadinessController @Inject() (
           .map { batchResponse =>
             if (isReverifyOnly) {
               VerificationBatchReadiness.isBatchReady(selectedReverifyIds, batchResponse.subcontractors)
-            }
-            else if (isUnverifiedOnly) {
+            } else if (isUnverifiedOnly) {
               VerificationBatchReadiness.isBatchReady(selectedUnverifiedIds, batchResponse.subcontractors)
-            }
-            else {
+            } else {
               VerificationBatchReadiness.isBatchReady(selectedIds, batchResponse.subcontractors)
             }
           }
