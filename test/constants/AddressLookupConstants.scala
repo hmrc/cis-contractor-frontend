@@ -91,6 +91,20 @@ object AddressLookupConstants {
     confirmPageLabels = testConfirmMessages
   )
 
+  val testMaxLengthErrorMessage =
+    MaxLengthErrorMessage(
+      addressLine1 = "Address line 1 max length error",
+      addressLine2 = "Address line 2 max length error",
+      addressLine3 = "Address line 3 max length error",
+      town = "Town max length error"
+    )
+
+  val testMaxLengthErrorMessagesModel =
+    MaxLengthErrorMessagesModel(
+      en = Some(testMaxLengthErrorMessage),
+      cy = Some(testMaxLengthErrorMessage)
+    )
+
   val testAlfConfig: AddressLookupConfigurationModel = AddressLookupConfigurationModel(
     version = 2,
     options = AddressLookupOptionsModel(
@@ -114,7 +128,12 @@ object AddressLookupConstants {
         showConfirmChangeText = Some(false)
       ),
       manualAddressEntryConfig = ManualAddressEntryConfig(
+        line1MaxLength = Some(35),
+        line2MaxLength = Some(35),
+        line3MaxLength = Some(35),
+        townMaxLength = Some(35),
         mandatoryFields = testMandatoryFieldsConfigModel,
+        maxLengthErrorMessages = testMaxLengthErrorMessagesModel,
         showOrganisationName = false
       ),
       pageHeadingStyle = "govuk-heading-l"
