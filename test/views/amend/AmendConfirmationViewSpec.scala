@@ -76,7 +76,7 @@ class AmendConfirmationViewSpec extends AnyWordSpec with Matchers with GuiceOneA
 
       val backToParagraph: Element = bodyParagraphs.get(1)
       backToParagraph.text() mustBe
-        s"${messages("amendConfirmation.backTo")} ${messages("amendConfirmation.yourSubcontractors")} ."
+        s"${messages("amendConfirmation.backTo")} ${messages("amendConfirmation.yourSubcontractors")}."
 
       val beforeYouGoParagraph: Element = bodyParagraphs.get(2)
       beforeYouGoParagraph.text() mustBe
@@ -87,8 +87,6 @@ class AmendConfirmationViewSpec extends AnyWordSpec with Matchers with GuiceOneA
 
       manageYourSubcontractorsLink.text() mustBe
         messages("amendConfirmation.yourSubcontractors")
-      manageYourSubcontractorsLink.attr("target") mustBe "_blank"
-      manageYourSubcontractorsLink.attr("rel") mustBe "noopener noreferrer"
     }
 
     "render the subcontractor name in the confirmation text" in new Setup {

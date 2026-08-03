@@ -70,7 +70,7 @@ class AmendCompanyConfirmationController @Inject() (
               logger.error("[AmendCompanyConfirmationController] Missing CisIdQuery")
               Future.successful(recoveryRedirect)
 
-            case Some(cisId) =>
+            case Some(_) =>
               val tableRows   = CompanyAmendConfirmationViewModel.rows(originalCompanyAnswers, ua)
               val companyName = ua.get(CompanyNamePage).getOrElse("")
               cleanupService.cleanAmend(ua) match {
@@ -81,7 +81,7 @@ class AmendCompanyConfirmationController @Inject() (
                       view(
                         tableRows,
                         companyName,
-                        appConfig.manageYourSubcontractorsUrl(cisId)
+                        appConfig.retrieveSubcontractorListUrl
                       )
                     )
                   }

@@ -125,7 +125,7 @@ class AmendCompanyConfirmationControllerSpec extends SpecBase with MockitoSugar 
             companyName,
             app.injector
               .instanceOf[FrontendAppConfig]
-              .manageYourSubcontractorsUrl(cisId)
+              .retrieveSubcontractorListUrl
           )(request, messages(app)).toString
 
         verify(mockCleanupService).cleanAmend(any())
