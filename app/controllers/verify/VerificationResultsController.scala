@@ -32,36 +32,36 @@ class VerificationResultsController @Inject() (
   requireData: DataRequiredAction,
   val controllerComponents: MessagesControllerComponents,
   view: VerificationResultsView
-) extends FrontendBaseController with I18nSupport {
+) extends FrontendBaseController
+    with I18nSupport {
 
-  def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData) {
-    implicit request =>
-      val verificationResults = Seq(
-        VerificationResultsViewModel(
-          "Brody, Martin",
-          "Unmatched",
-          "Higher rate",
-          "V0004528765/A"
-        ),
-        VerificationResultsViewModel(
-          "Hooper and Associates",
-          "Verified",
-          "Standard rate",
-          "V0004528765"
-        ),
-        VerificationResultsViewModel(
-          "Quint Transportation",
-          "Unmatched",
-          "Higher rate",
-          "V0004528765/B"
-        ),
-        VerificationResultsViewModel(
-          "The Kintner Group",
-          "Unmatched",
-          "Higher rate",
-          "V0004528765/C"
-        )
+  def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
+    val verificationResults = Seq(
+      VerificationResultsViewModel(
+        "Brody, Martin",
+        "Unmatched",
+        "Higher rate",
+        "V0004528765/A"
+      ),
+      VerificationResultsViewModel(
+        "Hooper and Associates",
+        "Verified",
+        "Standard rate",
+        "V0004528765"
+      ),
+      VerificationResultsViewModel(
+        "Quint Transportation",
+        "Unmatched",
+        "Higher rate",
+        "V0004528765/B"
+      ),
+      VerificationResultsViewModel(
+        "The Kintner Group",
+        "Unmatched",
+        "Higher rate",
+        "V0004528765/C"
       )
-      Ok(view(verificationResults))
+    )
+    Ok(view(verificationResults))
   }
 }

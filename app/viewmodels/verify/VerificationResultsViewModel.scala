@@ -16,7 +16,7 @@
 
 package viewmodels.verify
 
-case class VerificationResultsViewModel (
+case class VerificationResultsViewModel(
   name: String,
   verificationStatus: String,
   taxTreatment: String,
