@@ -206,8 +206,7 @@ class AmendPartnershipRemoveDetailYesNoController @Inject() (
                 _ <- sessionRepository.set(updatedAnswers)
 
               } yield Redirect(
-                controllers.add.partnership.routes.PartnershipCheckYourAnswersController
-                  .onPageLoad()
+                controllers.amend.partnership.routes.AmendPartnershipCheckYourAnswersController.onPageLoad()
               )).recover { case ex =>
                 logger.error(
                   s"Failed to save remove subcontractorDetail answer for '$subcontractorDetail'",

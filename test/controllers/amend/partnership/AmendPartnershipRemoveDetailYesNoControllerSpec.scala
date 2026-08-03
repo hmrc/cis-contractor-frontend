@@ -57,56 +57,99 @@ class AmendPartnershipRemoveDetailYesNoControllerSpec extends SpecBase with Mock
 
   private def uaWithDetail(
     detail: String
-  ): UserAnswers = {
+  ): UserAnswers =
+    detail match {
 
-    val userAnswers =
-      detail match {
+      case "address" =>
+        uaWithPartnershipName
+          .set(PartnershipAddressYesNoPage, true)
+          .success
+          .value
 
-        case "address" =>
-          uaWithPartnershipName
-            .set(PartnershipAddressYesNoPage, true)
-            .success
-            .value
+      case "contact-details" =>
+        uaWithPartnershipName
+          .set(AddPartnershipContactMethodsYesNoPage, true)
+          .success
+          .value
 
-        case "contact-details" =>
-          uaWithPartnershipName
-            .set(AddPartnershipContactMethodsYesNoPage, true)
-            .success
-            .value
+      case "utr" =>
+        uaWithPartnershipName
+          .set(PartnershipHasUtrYesNoPage, true)
+          .success
+          .value
 
-        case "utr" =>
-          uaWithPartnershipName
-            .set(PartnershipHasUtrYesNoPage, true)
-            .success
-            .value
+      case "works-reference-number" =>
+        uaWithPartnershipName
+          .set(PartnershipWorksReferenceNumberYesNoPage, true)
+          .success
+          .value
 
-        case "works-reference-number" =>
-          uaWithPartnershipName
-            .set(PartnershipWorksReferenceNumberYesNoPage, true)
-            .success
-            .value
+      case "nominated-partner-utr" =>
+        uaWithNominatedPartnerName
+          .set(PartnershipNominatedPartnerUtrYesNoPage, true)
+          .success
+          .value
 
-        case "nominated-partner-utr" =>
-          uaWithNominatedPartnerName
-            .set(PartnershipNominatedPartnerUtrYesNoPage, true)
-            .success
-            .value
+      case "nominated-partner-nino" =>
+        uaWithNominatedPartnerName
+          .set(PartnershipNominatedPartnerNinoYesNoPage, true)
+          .success
+          .value
 
-        case "nominated-partner-nino" =>
-          uaWithNominatedPartnerName
-            .set(PartnershipNominatedPartnerNinoYesNoPage, true)
-            .success
-            .value
+      case "nominated-partner-company-registration-number" =>
+        uaWithNominatedPartnerName
+          .set(PartnershipNominatedPartnerCrnYesNoPage, true)
+          .success
+          .value
+    }
 
-        case "nominated-partner-company-registration-number" =>
-          uaWithNominatedPartnerName
-            .set(PartnershipNominatedPartnerCrnYesNoPage, true)
-            .success
-            .value
-      }
+  private def uaWithDetailPresentButNameMissing(
+    detail: String
+  ): UserAnswers =
+    detail match {
 
-    userAnswers
-  }
+      case "address" =>
+        emptyUserAnswers
+          .set(PartnershipAddressYesNoPage, true)
+          .success
+          .value
+
+      case "contact-details" =>
+        emptyUserAnswers
+          .set(AddPartnershipContactMethodsYesNoPage, true)
+          .success
+          .value
+
+      case "utr" =>
+        emptyUserAnswers
+          .set(PartnershipHasUtrYesNoPage, true)
+          .success
+          .value
+
+      case "works-reference-number" =>
+        emptyUserAnswers
+          .set(PartnershipWorksReferenceNumberYesNoPage, true)
+          .success
+          .value
+
+      case "nominated-partner-utr" =>
+        emptyUserAnswers
+          .set(PartnershipNominatedPartnerUtrYesNoPage, true)
+          .success
+          .value
+
+      case "nominated-partner-nino" =>
+        emptyUserAnswers
+          .set(PartnershipNominatedPartnerNinoYesNoPage, true)
+          .success
+          .value
+
+      case "nominated-partner-company-registration-number" =>
+        emptyUserAnswers
+          .set(PartnershipNominatedPartnerCrnYesNoPage, true)
+          .success
+          .value
+    }
 
   "AmendPartnershipRemoveDetailYesNo Controller" - {
 
@@ -170,7 +213,7 @@ class AmendPartnershipRemoveDetailYesNoControllerSpec extends SpecBase with Mock
           }
         }
 
-        "must redirect to the partnership Check Your Answers page when Yes is submitted" in {
+        "must redirect to the amend partnership Check Your Answers page when Yes is submitted" in {
 
           val mockSessionRepository =
             mock[SessionRepository]
@@ -207,13 +250,13 @@ class AmendPartnershipRemoveDetailYesNoControllerSpec extends SpecBase with Mock
             status(result) mustEqual SEE_OTHER
 
             redirectLocation(result).value mustEqual
-              controllers.add.partnership.routes.PartnershipCheckYourAnswersController
+              controllers.amend.partnership.routes.AmendPartnershipCheckYourAnswersController
                 .onPageLoad()
                 .url
           }
         }
 
-        "must redirect to the partnership Check Your Answers page when No is submitted" in {
+        "must redirect to the amend partnership Check Your Answers page when No is submitted" in {
 
           val mockSessionRepository =
             mock[SessionRepository]
@@ -250,7 +293,7 @@ class AmendPartnershipRemoveDetailYesNoControllerSpec extends SpecBase with Mock
             status(result) mustEqual SEE_OTHER
 
             redirectLocation(result).value mustEqual
-              controllers.add.partnership.routes.PartnershipCheckYourAnswersController
+              controllers.amend.partnership.routes.AmendPartnershipCheckYourAnswersController
                 .onPageLoad()
                 .url
           }
@@ -374,7 +417,7 @@ class AmendPartnershipRemoveDetailYesNoControllerSpec extends SpecBase with Mock
 
           val application =
             applicationBuilder(
-              userAnswers = Some(emptyUserAnswers)
+              userAnswers = Some(uaWithDetailPresentButNameMissing(detail))
             ).build()
 
           running(application) {
@@ -401,7 +444,7 @@ class AmendPartnershipRemoveDetailYesNoControllerSpec extends SpecBase with Mock
 
           val application =
             applicationBuilder(
-              userAnswers = Some(emptyUserAnswers)
+              userAnswers = Some(uaWithDetailPresentButNameMissing(detail))
             ).build()
 
           running(application) {

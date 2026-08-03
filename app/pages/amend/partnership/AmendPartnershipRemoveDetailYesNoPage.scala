@@ -17,6 +17,8 @@
 package pages.amend.partnership
 
 import models.UserAnswers
+import models.amend.partnership.AmendPartnershipRemoveDetail
+import models.amend.partnership.AmendPartnershipRemoveDetail.*
 import pages.QuestionPage
 import pages.add.partnership.*
 import play.api.libs.json.JsPath
@@ -35,14 +37,14 @@ case class AmendPartnershipRemoveDetailYesNoPage(
     value: Option[Boolean],
     userAnswers: UserAnswers
   ) =
-    detail match {
+    AmendPartnershipRemoveDetail.fromKey(detail) match {
 
-      case "address" if value.contains(true) =>
+      case Some(Address) if value.contains(true) =>
         userAnswers
           .remove(PartnershipAddressPage)
           .flatMap(_.set(PartnershipAddressYesNoPage, false))
 
-      case "contact-details" if value.contains(true) =>
+      case Some(ContactDetails) if value.contains(true) =>
         userAnswers
           .remove(PartnershipContactMethodOptionsPage)
           .flatMap(_.remove(PartnershipEmailAddressPage))
@@ -50,27 +52,27 @@ case class AmendPartnershipRemoveDetailYesNoPage(
           .flatMap(_.remove(PartnershipMobileNumberPage))
           .flatMap(_.set(AddPartnershipContactMethodsYesNoPage, false))
 
-      case "utr" if value.contains(true) =>
+      case Some(Utr) if value.contains(true) =>
         userAnswers
           .remove(PartnershipUniqueTaxpayerReferencePage)
           .flatMap(_.set(PartnershipHasUtrYesNoPage, false))
 
-      case "works-reference-number" if value.contains(true) =>
+      case Some(WorksReferenceNumber) if value.contains(true) =>
         userAnswers
           .remove(PartnershipWorksReferenceNumberPage)
           .flatMap(_.set(PartnershipWorksReferenceNumberYesNoPage, false))
 
-      case "nominated-partner-utr" if value.contains(true) =>
+      case Some(NominatedPartnerUtr) if value.contains(true) =>
         userAnswers
           .remove(PartnershipNominatedPartnerUtrPage)
           .flatMap(_.set(PartnershipNominatedPartnerUtrYesNoPage, false))
 
-      case "nominated-partner-nino" if value.contains(true) =>
+      case Some(NominatedPartnerNino) if value.contains(true) =>
         userAnswers
           .remove(PartnershipNominatedPartnerNinoPage)
           .flatMap(_.set(PartnershipNominatedPartnerNinoYesNoPage, false))
 
-      case "nominated-partner-company-registration-number" if value.contains(true) =>
+      case Some(NominatedPartnerCompanyRegistrationNumber) if value.contains(true) =>
         userAnswers
           .remove(PartnershipNominatedPartnerCrnPage)
           .flatMap(_.set(PartnershipNominatedPartnerCrnYesNoPage, false))
