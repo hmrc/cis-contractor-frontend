@@ -71,8 +71,8 @@ class TrustUtrYesNoSummarySpec extends SpecBase with GuiceOneAppPerSuite {
       actions.items must have size 1
 
       val action: ActionItem = actions.items.head
-      action.href mustBe controllers.add.trust.routes.TrustUtrYesNoController
-        .onPageLoad(AmendMode)
+      action.href mustBe controllers.amend.trust.routes.AmendTrustRemoveDetailYesNoController
+        .onPageLoad("utr")
         .url
       action.content mustBe Text(messages("site.change"))
       action.visuallyHiddenText mustBe Some(messages("trustUtrYesNo.change.hidden"))

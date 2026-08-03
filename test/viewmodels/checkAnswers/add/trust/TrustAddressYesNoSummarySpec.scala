@@ -81,8 +81,8 @@ class TrustAddressYesNoSummarySpec extends SpecBase with GuiceOneAppPerSuite {
       actions.items must have size 1
 
       val action: ActionItem = actions.items.head
-      action.href mustBe controllers.add.trust.routes.TrustAddressYesNoController
-        .onPageLoad(AmendMode)
+      action.href mustBe controllers.amend.trust.routes.AmendTrustRemoveDetailYesNoController
+        .onPageLoad("address")
         .url
       action.content mustBe Text(messages("site.change"))
       action.visuallyHiddenText mustBe Some(messages("trustAddressYesNo.change.hidden"))
