@@ -61,22 +61,11 @@ class CheckVerificationBatchReadinessController @Inject() (
       val selectedIds: Set[String] =
         selectedUnverifiedIds ++ selectedReverifyIds
 
-      val isReverifyOnly =
-        selectedUnverifiedIds.isEmpty && selectedReverifyIds.nonEmpty
-
-      val isUnverifiedOnly = selectedUnverifiedIds.nonEmpty && selectedReverifyIds.isEmpty
-
       val batchReadyOpt =
         ua.get(CurrentVerificationBatchResponsePage)
           .filter(_ => selectedIds.nonEmpty)
           .map { batchResponse =>
-            if (isReverifyOnly) {
-              VerificationBatchReadiness.isBatchReady(selectedReverifyIds, batchResponse.subcontractors)
-            } else if (isUnverifiedOnly) {
-              VerificationBatchReadiness.isBatchReady(selectedUnverifiedIds, batchResponse.subcontractors)
-            } else {
-              VerificationBatchReadiness.isBatchReady(selectedIds, batchResponse.subcontractors)
-            }
+            VerificationBatchReadiness.isBatchReady(selectedIds, batchResponse.subcontractors)
           }
 
       batchReadyOpt match {

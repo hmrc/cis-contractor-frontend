@@ -16,7 +16,7 @@
 
 package models.verify
 
-import models.{Subcontractor, SubcontractorCurrentVerification, TypeOfSubcontractor}
+import models.{SubcontractorCurrentVerification, TypeOfSubcontractor}
 import models.TypeOfSubcontractor.*
 
 object VerificationBatchReadiness {
