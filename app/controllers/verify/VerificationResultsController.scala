@@ -36,7 +36,7 @@ class VerificationResultsController @Inject() (
 
   def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData) {
     implicit request =>
-      val data = Seq(
+      val verificationResults = Seq(
         VerificationResultsViewModel(
           "Brody, Martin",
           "Unmatched",
@@ -62,6 +62,6 @@ class VerificationResultsController @Inject() (
           "V0004528765/C"
         )
       )
-      Ok(view(data))
+      Ok(view(verificationResults))
   }
 }
