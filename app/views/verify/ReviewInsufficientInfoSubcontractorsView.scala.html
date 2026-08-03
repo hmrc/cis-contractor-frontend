@@ -19,41 +19,55 @@
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.content._
 @import viewmodels.verify.{ReviewInsufficientInfoViewModel, MissingSubcontractorRow, ReadySubcontractorRow, LinkViewModel}
 @import views.html.components._
+@import play.twirl.api.HtmlFormat
 
 @this(
     layout: templates.Layout,
     govukTable: GovukTable,
-    heading: H1,
+    govukButton: GovukButton,
+    h1: H1,
+    h2: H2,
     paragraph: Paragraph,
-    link: Link
+    link: Link,
+    bulletList: BulletList
 )
 
 @(viewModel: ReviewInsufficientInfoViewModel)(implicit request: Request[_], appConfig: FrontendAppConfig, messages: Messages)
 
 @nameLink(vm: LinkViewModel, name: String) = {
-    <a class="govuk-link" href="@vm.url">@name</a>
+        @link(
+            linkTextKey = HtmlFormat.escape(name).body,
+            linkUrl = vm.url, paragraphWrapped = false)
 }
 
 @actionLink(textKey: String, vm: LinkViewModel) = {
-    <a class="govuk-link" href="@vm.url">@messages(textKey)<span class="govuk-visually-hidden"> @vm.hiddenText</span></a>
+    @link(
+        linkTextKey = messages(textKey),
+        linkUrl = vm.url,
+        paragraphWrapped = false
+    )
 }
 
 @missingActions(row: MissingSubcontractorRow) = {
-    @actionLink("verify.reviewInsufficientInfo.action.edit", row.editLink)<span aria-hidden="true"> | </span>@actionLink("verify.reviewInsufficientInfo.action.proceed", row.proceedLink)<span aria-hidden="true"> | </span>@actionLink("verify.reviewInsufficientInfo.action.remove", row.removeLink)
+    @actionLink("verify.reviewInsufficientInfo.action.edit", row.editLink)
+    <span aria-hidden="true"> | </span>
+    @actionLink("verify.reviewInsufficientInfo.action.proceed", row.proceedLink)
+    <span aria-hidden="true"> | </span>
+    @actionLink("verify.reviewInsufficientInfo.action.remove", row.removeLink)
 }
 
 @layout(pageTitle = titleNoForm(messages("verify.reviewInsufficientInfo.title"))) {
 
-    @heading(messages("verify.reviewInsufficientInfo.heading"))
+    @h1(messages("verify.reviewInsufficientInfo.heading"))
 
     @paragraph(messages("verify.reviewInsufficientInfo.p1"))
 
-    <p class="govuk-body">@messages("verify.reviewInsufficientInfo.p2")</p>
-    <ul class="govuk-list govuk-list--bullet">
-        <li>@messages("verify.reviewInsufficientInfo.bullet1")</li>
-        <li>@messages("verify.reviewInsufficientInfo.bullet2")</li>
-        <li>@messages("verify.reviewInsufficientInfo.bullet3")</li>
-    </ul>
+    @paragraph(messages("verify.reviewInsufficientInfo.p2"))
+    @bulletList(Seq(
+        "verify.reviewInsufficientInfo.bullet1",
+        "verify.reviewInsufficientInfo.bullet2",
+        "verify.reviewInsufficientInfo.bullet3"
+    ))
 
     @link(
         linkTextKey = "verify.reviewInsufficientInfo.whatYouNeed.link",
@@ -62,7 +76,7 @@
     )
 
     @if(viewModel.hasMissing) {
-        <h2 class="govuk-heading-m">@messages("verify.reviewInsufficientInfo.missing.subheading")</h2>
+       @h2(messages("verify.reviewInsufficientInfo.missing.subheading"))
 
         @govukTable(
             Table(
@@ -84,7 +98,7 @@
     }
 
     @if(viewModel.hasReady) {
-        <h2 class="govuk-heading-m">@messages("verify.reviewInsufficientInfo.ready.subheading")</h2>
+        @h2(messages("verify.reviewInsufficientInfo.ready.subheading"))
 
         @govukTable(
             Table(
@@ -104,9 +118,8 @@
     }
 
     @if(viewModel.allReady) {
-        @* TODO: point Continue at the next step in the verify journey. *@
-        <a href="#" role="button" draggable="false" class="govuk-button" data-module="govuk-button">
-            @messages("site.continue")
-        </a>
+        @govukButton(Button(
+            content = Text(messages("site.continue")),
+        ))
     }
 }

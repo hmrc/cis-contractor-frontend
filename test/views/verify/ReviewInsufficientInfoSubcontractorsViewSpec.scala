@@ -116,10 +116,10 @@ class ReviewInsufficientInfoSubcontractorsViewSpec extends SpecBase {
 
     "must render a Continue button only when all subcontractors are ready" in {
       val allReady = doc(ReviewInsufficientInfoViewModel(missing = Nil, ready = Seq(readyRow)))
-      allReady.select("a.govuk-button").text must include(messagesImpl("site.continue"))
+      allReady.select(".govuk-button").text must include(messagesImpl("site.continue"))
 
       val stillMissing = doc(ReviewInsufficientInfoViewModel(missing = Seq(missingRow), ready = Seq(readyRow)))
-      stillMissing.select("a.govuk-button").size() mustBe 0
+      stillMissing.select(".govuk-button").size() mustBe 0
     }
   }
 }

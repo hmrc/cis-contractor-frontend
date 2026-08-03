@@ -42,7 +42,12 @@ class ReviewInsufficientInfoSubcontractorsController @Inject() (
   def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
     request.userAnswers.get(NewestVerificationBatchResponsePage) match {
       case Some(batch) =>
-        Ok(view(reviewInsufficientInfoService.buildViewModel(batch)))
+        val viewModel = reviewInsufficientInfoService.buildViewModel(batch)
+        if (viewModel.hasMissing || viewModel.hasReady) {
+          Ok(view(viewModel))
+        } else {
+          Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+        }
 
       case None =>
         Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())

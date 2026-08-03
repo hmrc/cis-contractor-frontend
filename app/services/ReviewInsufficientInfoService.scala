@@ -28,7 +28,7 @@ import javax.inject.{Inject, Singleton}
 class ReviewInsufficientInfoService @Inject() () {
 
   // TODO: replace with real destinations once Edit / Proceed / Remove / view-details actions are built.
-  private val DummyUrl = "#"
+  private val dummyUrl = "#"
 
   def buildViewModel(
     batch: GetNewestVerificationBatchResponse
@@ -46,11 +46,11 @@ class ReviewInsufficientInfoService @Inject() () {
     val name = displayName(sub)
     MissingSubcontractorRow(
       name = name,
-      nameLink = LinkViewModel(DummyUrl, name),
+      nameLink = LinkViewModel(dummyUrl, name),
       utr = utrDisplay(sub),
-      editLink = LinkViewModel(DummyUrl, name),
-      proceedLink = LinkViewModel(DummyUrl, name),
-      removeLink = LinkViewModel(DummyUrl, name)
+      editLink = LinkViewModel(dummyUrl, name),
+      proceedLink = LinkViewModel(dummyUrl, name),
+      removeLink = LinkViewModel(dummyUrl, name)
     )
   }
 
@@ -58,7 +58,7 @@ class ReviewInsufficientInfoService @Inject() () {
     val name = displayName(sub)
     ReadySubcontractorRow(
       name = name,
-      nameLink = LinkViewModel(DummyUrl, name),
+      nameLink = LinkViewModel(dummyUrl, name),
       utr = utrDisplay(sub)
     )
   }

@@ -28,7 +28,8 @@ import views.html.verify.ReviewInsufficientInfoSubcontractorsView
 
 class ReviewInsufficientInfoSubcontractorsControllerSpec extends SpecBase {
 
-  private val endpointUrl = "/subcontractor/verify/subcontractors-have-missing-information"
+  private lazy val endpointUrl =
+    controllers.verify.routes.ReviewInsufficientInfoSubcontractorsController.onPageLoad().url
 
   private def mkSub(
     id: Long,
@@ -137,6 +138,25 @@ class ReviewInsufficientInfoSubcontractorsControllerSpec extends SpecBase {
     "must redirect to Journey Recovery when NewestVerificationBatchResponsePage is missing" in {
 
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+
+      running(application) {
+        val request = FakeRequest(GET, endpointUrl)
+        val result  = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must redirect to Journey Recovery when the batch has no missing or ready subcontractors" in {
+
+      val userAnswers =
+        emptyUserAnswers
+          .set(NewestVerificationBatchResponsePage, batchOf())
+          .success
+          .value
+
+      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
       running(application) {
         val request = FakeRequest(GET, endpointUrl)
