@@ -611,6 +611,9 @@ GET   /subcontractor/verify/verification-status/select-subcontractors    control
 GET   /verify/verification-status/reverification-decision                controllers.verify.VerificationStatusController.goToReverificationDecision(mode: Mode = NormalMode)
 GET   /verify/verification-status/select-subcontractors                  controllers.verify.VerificationStatusController.goToSelectSubcontractorsToReverify(mode: Mode = NormalMode)
 
+GET   /subcontractor/amend/partnership/remove/information/:subcontractorDetail     controllers.amend.partnership.AmendPartnershipRemoveDetailYesNoController.onPageLoad(subcontractorDetail: String)
+POST  /subcontractor/amend/partnership/remove/information/:subcontractorDetail     controllers.amend.partnership.AmendPartnershipRemoveDetailYesNoController.onSubmit(subcontractorDetail: String)
+
 GET   /subcontractor/verify/no-verification-results                       controllers.verify.NoVerificationResultsController.onPageLoad()
 
 # Contractor Details
