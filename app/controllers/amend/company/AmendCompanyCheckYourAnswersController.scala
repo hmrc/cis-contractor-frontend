@@ -16,6 +16,7 @@
 
 package controllers.amend.company
 
+import config.FrontendAppConfig
 import controllers.actions.*
 import controllers.routes
 import models.add.company.ValidatedCompany
@@ -26,7 +27,7 @@ import pages.amend.{AmendCheckYourAnswersSubmittedPage, ShowVerificationDetailsP
 import play.api.Logging
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import queries.OriginalCompanyAnswersQuery
+import queries.{CisIdQuery, OriginalCompanyAnswersQuery}
 import repositories.SessionRepository
 import services.SubcontractorService
 import uk.gov.hmrc.govukfrontend.views.Aliases.{Text, Value}
@@ -36,6 +37,7 @@ import viewmodels.checkAnswers.add.*
 import viewmodels.checkAnswers.add.company.*
 import viewmodels.govuk.summarylist.*
 import views.html.amend.AmendCheckYourAnswersView
+import utils.AmendmentHelper
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -48,7 +50,8 @@ class AmendCompanyCheckYourAnswersController @Inject() (
   val controllerComponents: MessagesControllerComponents,
   subcontractorService: SubcontractorService,
   sessionRepository: SessionRepository,
-  view: AmendCheckYourAnswersView
+  view: AmendCheckYourAnswersView,
+  appConfig: FrontendAppConfig
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport
@@ -87,17 +90,22 @@ class AmendCompanyCheckYourAnswersController @Inject() (
     val verificationRows =
       Option
         .when(isVerified.contains(true)) {
-          val verificationNumber = ua.get(OriginalCompanyAnswersQuery).flatMap(_.verificationNumber).getOrElse("")
+
+          val verificationNumberOpt =
+            ua.get(OriginalCompanyAnswersQuery)
+              .flatMap(_.verificationNumber)
+              .filter(_.trim.nonEmpty)
 
           Seq(
-            CompanyUtrSummary.row(ua, AmendMode, showActions = false),
+            CompanyUtrSummary.row(ua, AmendMode, showActions = false)
+          ) ++ verificationNumberOpt.map { verificationNumber =>
             Some(
               SummaryListRowViewModel(
                 key = Key(Text(messages("amendCheckYourAnswers.verificationNumber.label"))),
                 value = Value(Text(verificationNumber))
               )
             )
-          )
+          }
         }
         .getOrElse(Nil)
 
@@ -150,47 +158,75 @@ class AmendCompanyCheckYourAnswersController @Inject() (
   def onSubmit(): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
       ValidatedCompany.build(request.userAnswers) match {
-        case Right(_)    =>
-          if (request.userAnswers.get(AmendCheckYourAnswersSubmittedPage).contains(true)) {
-            Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
-          } else {
-            subcontractorService
-              .createAndUpdateSubcontractor(request.userAnswers)
-              .flatMap { _ =>
-                Future
-                  .fromTry(request.userAnswers.set(AmendCheckYourAnswersSubmittedPage, true))
-                  .flatMap(updated => sessionRepository.set(updated).map(_ => ()))
-                  .map(_ =>
-                    Redirect(
-                      controllers.amend.company.routes.AmendCompanyCheckYourAnswersController.onPageLoad()
-                    ) // TODO: Redirect to confirmation page
-                  )
-              }
-              .recover { case t =>
-                logger.error(
-                  "[AmendCompanyCheckYourAnswersController.onSubmit] Failed to update subcontractor",
-                  t
-                )
-                Redirect(routes.JourneyRecoveryController.onPageLoad())
-              }
-          }
+
         case Left(error) =>
           logger.error(s"[AmendCompanyCheckYourAnswersController.onSubmit] Validation failed: $error")
           Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
+
+        case Right(_) if request.userAnswers.get(AmendCheckYourAnswersSubmittedPage).contains(true) =>
+          Future.successful(
+            Redirect(routes.JourneyRecoveryController.onPageLoad())
+          )
+
+        case Right(_) if !AmendmentHelper.companyHasChanges(request.userAnswers) =>
+          request.userAnswers.get(CisIdQuery) match {
+            case Some(cisId) =>
+              Future.successful(
+                Redirect(appConfig.manageYourSubcontractorsUrl(cisId))
+              )
+
+            case None =>
+              logger.error("[AmendCompanyCheckYourAnswersController.onSubmit] Missing CisIdQuery")
+              Future.successful(
+                Redirect(routes.JourneyRecoveryController.onPageLoad())
+              )
+          }
+
+        case Right(_) =>
+          subcontractorService
+            .createAndUpdateSubcontractor(request.userAnswers)
+            .flatMap { _ =>
+              Future
+                .fromTry(request.userAnswers.set(AmendCheckYourAnswersSubmittedPage, true))
+                .flatMap(updated => sessionRepository.set(updated).map(_ => ()))
+                .map { _ =>
+                  Redirect(
+                    controllers.amend.company.routes.AmendCompanyConfirmationController.onPageLoad()
+                  )
+                }
+            }
+            .recover { case t =>
+              logger.error(
+                "[AmendCompanyCheckYourAnswersController.onSubmit] Failed to update subcontractor",
+                t
+              )
+              Redirect(routes.JourneyRecoveryController.onPageLoad())
+            }
       }
     }
 
   def onCancel(): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
-      sessionRepository
-        .set(UserAnswers(request.userAnswers.id))
-        .map(_ => Redirect(routes.IndexController.onPageLoad()))
-        .recover { case t =>
+      request.userAnswers.get(CisIdQuery) match {
+        case Some(cisId) =>
+          sessionRepository
+            .set(UserAnswers(request.userAnswers.id))
+            .map(_ => Redirect(appConfig.manageYourSubcontractorsUrl(cisId)))
+            .recover { case t =>
+              logger.error(
+                s"[AmendCompanyCheckYourAnswersController.onCancel] Failed to clear user answers for session ${request.userAnswers.id}",
+                t
+              )
+              Redirect(routes.JourneyRecoveryController.onPageLoad())
+            }
+
+        case None =>
           logger.error(
-            s"[AmendCompanyCheckYourAnswersController.onCancel] Failed to clear user answers for session ${request.userAnswers.id}",
-            t
+            "[AmendCompanyCheckYourAnswersController.onCancel] Missing CisIdQuery"
           )
-          Redirect(routes.JourneyRecoveryController.onPageLoad())
-        }
+          Future.successful(
+            Redirect(routes.JourneyRecoveryController.onPageLoad())
+          )
+      }
     }
 }

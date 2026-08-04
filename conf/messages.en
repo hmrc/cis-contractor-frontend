@@ -395,14 +395,6 @@ individualContactMethodOptions.hint                                         =  C
 individualContactMethodOptions.error.required                               =  Select the methods of contact you want to add for this subcontractor
 individualContactMethodOptions.change.hidden                                =  methods of contact
 
-amendTrustRemoveDetailYesNo.title                                           =  Are you sure you want to remove this information from this subcontractor?
-amendTrustRemoveDetailYesNo.heading                                         =  Are you sure you want to remove the {1} from {0}?
-amendTrustRemoveDetailYesNo.error.required                                  =  Select whether you want to remove this information from this subcontractor
-amendTrustRemoveDetailYesNo.detail.address                                  =  address
-amendTrustRemoveDetailYesNo.detail.contactDetails                           =  contact details
-amendTrustRemoveDetailYesNo.detail.utr                                      =  UTR
-amendTrustRemoveDetailYesNo.detail.worksReferenceNumber                     =  works reference number
-
 amendCheckYourAnswers.title                                                 =  Subcontractor information
 amendCheckYourAnswers.heading.subcontractorInformation.h2                   =  Subcontractor information
 amendCheckYourAnswers.heading.moreDetails.h2                                =  More details
@@ -411,6 +403,28 @@ amendCheckYourAnswers.confirm.p1                                            =  B
 amendCheckYourAnswers.confirm                                               =  Confirm
 amendCheckYourAnswers.cancelChanges                                         =  Cancel changes
 amendCheckYourAnswers.verificationNumber.label                              =  Verification number
+
+amendConfirmation.panel.heading                                             =  Subcontractor details updated
+amendConfirmation.p1                                                        =  You have updated the subcontractor details for {0}.
+amendConfirmation.updatesMade.h2                                            =  Updates made
+amendConfirmation.table.hdr.previous                                        =  Previous
+amendConfirmation.table.hdr.updated                                         =  Updated
+amendConfirmation.table.hdr.details                                         =  Details
+amendConfirmation.backTo                                                    =  Back to
+amendConfirmation.yourSubcontractors                                        =  Your subcontractors
+amendConfirmation.beforeYouGo.h2                                            =  Before you go
+amendConfirmation.beforeYouGo.p1                                            =  Your feedback helps us make our service better.
+amendConfirmation.beforeYouGo.takeAShortSurvey                              =  Take a short survey
+amendConfirmation.beforeYouGo.shareFeedback                                 =  to share your feedback on this service.
+amendConfirmation.table.content.none                                        =  None provided
+
+amendTrustRemoveDetailYesNo.title                                           =  Are you sure you want to remove this information from this subcontractor?
+amendTrustRemoveDetailYesNo.heading                                         =  Are you sure you want to remove the {1} from {0}?
+amendTrustRemoveDetailYesNo.error.required                                  =  Select whether you want to remove this information from this subcontractor
+amendTrustRemoveDetailYesNo.detail.address                                  =  address
+amendTrustRemoveDetailYesNo.detail.contactDetails                           =  contact details
+amendTrustRemoveDetailYesNo.detail.utr                                      =  UTR
+amendTrustRemoveDetailYesNo.detail.worksReferenceNumber                     =  works reference number
 
 # Partnership
 addPartnershipContactMethodsYesNo.title                     =  Do you want to add contact details for this partnership?
