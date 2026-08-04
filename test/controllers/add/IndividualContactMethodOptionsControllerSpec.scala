@@ -99,8 +99,9 @@ class IndividualContactMethodOptionsControllerSpec extends SpecBase with Mockito
 
     "must redirect to journey recovery page when none for yesorno page for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers.set(SubcontractorNamePage,
-          subcontractName).success.value)).build()
+      val application = applicationBuilder(userAnswers =
+        Some(emptyUserAnswers.set(SubcontractorNamePage, subcontractName).success.value)
+      ).build()
 
       running(application) {
         val request = FakeRequest(GET, individualContactMethodOptionsRoute)

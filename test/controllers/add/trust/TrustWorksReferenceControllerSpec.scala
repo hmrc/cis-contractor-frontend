@@ -95,9 +95,9 @@ class TrustWorksReferenceControllerSpec extends SpecBase with MockitoSugar {
 
     "must redirect to journey recovery page when none for yesorno page for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers.set(TrustNamePage, trustName)
-        .success.value)).build()
-      
+      val application =
+        applicationBuilder(userAnswers = Some(emptyUserAnswers.set(TrustNamePage, trustName).success.value)).build()
+
       running(application) {
         val request = FakeRequest(GET, trustWorksReferenceRoute)
 
