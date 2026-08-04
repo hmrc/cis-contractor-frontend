@@ -62,12 +62,12 @@ class AmendTrustConfirmationController @Inject() (
               logger.error("[AmendTrustConfirmationController] Missing CisIdQuery")
               Redirect(routes.JourneyRecoveryController.onPageLoad())
 
-            case Some(cisId) =>
+            case Some(_) =>
               Ok(
                 view(
                   TrustAmendConfirmationViewModel.rows(originalTrustAnswers, ua),
                   trustDisplayName(ua),
-                  appConfig.manageYourSubcontractorsUrl(cisId)
+                  appConfig.retrieveSubcontractorListUrl
                 )
               )
           }

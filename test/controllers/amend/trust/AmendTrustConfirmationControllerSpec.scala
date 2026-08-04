@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package controllers.amend
+package controllers.amend.trust
 
 import base.SpecBase
 import models.amend.trust.OriginalTrustAnswers
@@ -83,7 +83,7 @@ class AmendTrustConfirmationControllerSpec extends SpecBase {
             trustName,
             application.injector
               .instanceOf[config.FrontendAppConfig]
-              .manageYourSubcontractorsUrl(cisId)
+              .retrieveSubcontractorListUrl
           )(
             request,
             messages(application)
