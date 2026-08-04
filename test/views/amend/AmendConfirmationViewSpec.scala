@@ -30,68 +30,86 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
 import uk.gov.hmrc.govukfrontend.views.viewmodels.table.TableRow
 import views.html.amend.AmendConfirmationView
 
+import java.util
+
 class AmendConfirmationViewSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite {
 
   "AmendConfirmationView" should {
 
     "render the confirmation panel, table and links" in new Setup {
-
-      val html: HtmlFormat.Appendable =
-        view(rows, subcontractorName, manageYourSubcontractorsUrl)
-
-      val doc: Document = Jsoup.parse(html.toString())
+      val html: HtmlFormat.Appendable = view(rows, subcontractorName, retrieveSubcontractorListUrl)
+      val doc: Document               = Jsoup.parse(html.toString())
 
       doc.title() must include(messages("amendConfirmation.panel.heading"))
 
-      doc.select(".govuk-panel__title").text() mustBe
+      val confirmationPanelTitle: Elements = doc.select(".govuk-panel__title")
+      confirmationPanelTitle.text() mustBe
         messages("amendConfirmation.panel.heading")
 
-      doc.select("h2").first().text() mustBe
-        messages("amendConfirmation.updatesMade.h2")
+      val headings: util.List[String] = doc.select("h2").eachText()
 
-      doc.select("table").size() mustBe 1
+      headings must contain(messages("amendConfirmation.updatesMade.h2"))
+      headings must contain(messages("amendConfirmation.beforeYouGo.h2"))
 
-      val headers: Elements = doc.select("thead th")
-      headers.get(0).text() mustBe messages("amendConfirmation.table.hdr.details")
-      headers.get(1).text() mustBe messages("amendConfirmation.table.hdr.previous")
-      headers.get(2).text() mustBe messages("amendConfirmation.table.hdr.updated")
+      val table: Elements = doc.select("table")
+      table.size() mustBe 1
 
-      doc.select("tbody tr").size() mustBe 1
-      val firstRow: Element = doc.select("tbody tr").first()
+      val tableHeaders: Elements = doc.select("thead th")
+
+      tableHeaders.get(0).text() mustBe
+        messages("amendConfirmation.table.hdr.details")
+      tableHeaders.get(1).text() mustBe
+        messages("amendConfirmation.table.hdr.previous")
+      tableHeaders.get(2).text() mustBe
+        messages("amendConfirmation.table.hdr.updated")
+
+      val tableRows: Elements = doc.select("tbody tr")
+      tableRows.size() mustBe 1
+
+      val firstRow: Element = tableRows.first()
 
       firstRow.select("td").get(0).text() mustBe "Trust name"
       firstRow.select("td").get(1).text() mustBe "Old Trust"
       firstRow.select("td").get(2).text() mustBe "New Trust"
 
-      val backLink: Elements = doc.select("a[href='" + manageYourSubcontractorsUrl + "']")
-      backLink.text() mustBe messages("amendConfirmation.yourSubcontractors")
-      backLink.attr("target") mustBe "_blank"
-      backLink.attr("rel") mustBe "noopener noreferrer"
+      val bodyParagraphs: Elements = doc.select("p.govuk-body")
 
-      doc.select("h2").text() must include(
-        messages("amendConfirmation.beforeYouGo.h2")
-      )
+      val backToParagraph: Element = bodyParagraphs.get(1)
+      backToParagraph.text() mustBe
+        s"${messages("amendConfirmation.backTo")} ${messages("amendConfirmation.yourSubcontractors")}."
+
+      val beforeYouGoParagraph: Element = bodyParagraphs.get(2)
+      beforeYouGoParagraph.text() mustBe
+        messages("amendConfirmation.beforeYouGo.p1")
+
+      val manageYourSubcontractorsLink: Elements =
+        doc.select(s"a[href='$retrieveSubcontractorListUrl']")
+
+      manageYourSubcontractorsLink.text() mustBe
+        messages("amendConfirmation.yourSubcontractors")
     }
 
     "render the subcontractor name in the confirmation text" in new Setup {
+      val html: HtmlFormat.Appendable = view(rows, subcontractorName, retrieveSubcontractorListUrl)
+      val doc: Document               = Jsoup.parse(html.toString())
 
-      val html = view(rows, subcontractorName, manageYourSubcontractorsUrl)
-      val doc  = Jsoup.parse(html.toString())
+      val confirmationParagraph: Element = doc.select("p.govuk-body").first()
 
-      doc.body().text() must include(
+      confirmationParagraph.text() mustBe
         messages("amendConfirmation.p1", subcontractorName)
-      )
     }
 
     "render the survey link" in new Setup {
-
-      val html          = view(rows, subcontractorName, manageYourSubcontractorsUrl)
-      val doc: Document = Jsoup.parse(html.toString())
+      val html: HtmlFormat.Appendable = view(rows, subcontractorName, retrieveSubcontractorListUrl)
+      val doc: Document               = Jsoup.parse(html.toString())
 
       val surveyLink: Element = doc.select("a[href='#']").last()
 
       surveyLink.text() mustBe
         messages("amendConfirmation.beforeYouGo.takeAShortSurvey")
+      surveyLink.attr("href") mustBe "#"
+      surveyLink.attr("target") mustBe "_blank"
+      surveyLink.attr("rel") mustBe "noopener noreferrer"
     }
   }
 
@@ -99,8 +117,7 @@ class AmendConfirmationViewSpec extends AnyWordSpec with Matchers with GuiceOneA
 
     val subcontractorName = "ABC Trust"
 
-    val manageYourSubcontractorsUrl =
-      "/manage-your-subcontractors"
+    val retrieveSubcontractorListUrl = "/retrieve-your-subcontractors"
 
     val rows: Seq[Seq[TableRow]] =
       Seq(

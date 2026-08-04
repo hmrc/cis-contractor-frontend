@@ -237,6 +237,59 @@ class AmendTrustCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
       }
     }
 
+    "must not render the verification number row when the trust is pending verifications" in {
+
+      val verifiedUa =
+        minUa
+          .set(ShowVerificationDetailsPage, true)
+          .success
+          .value
+          .set(
+            OriginalTrustAnswersQuery,
+            OriginalTrustAnswers(
+              trustName = Some("Test Trust"),
+              addressYesNo = Some(false),
+              address = None,
+              trustContactMethodsYesNo = Some(false),
+              trustContactMethod = Set.empty,
+              email = None,
+              phone = None,
+              mobile = None,
+              utrYesNo = Some(false),
+              utr = None,
+              worksReferenceYesNo = Some(false),
+              worksReference = None,
+              verificationNumber = None
+            )
+          )
+          .success
+          .value
+
+      val application =
+        applicationBuilder(userAnswers = Some(verifiedUa)).build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(
+            GET,
+            controllers.amend.trust.routes.AmendTrustCheckYourAnswersController.onPageLoad().url
+          )
+
+        val msg = application.injector.instanceOf[MessagesApi].preferred(request)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual OK
+
+        val page = contentAsString(result)
+
+        page must not include msg("amendCheckYourAnswers.verificationNumber.label")
+        page must not include "VRN123456"
+        page must include(msg("trustUtr.verified.checkYourAnswersLabel"))
+      }
+    }
+
     "must redirect to Journey Recovery when validation fails" in {
 
       val invalidUa =
