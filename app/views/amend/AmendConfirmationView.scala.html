@@ -27,14 +27,14 @@
     link: Link
 )
 
-@(rows: Seq[Seq[TableRow]], subcontractorName: String, manageYourSubcontractorsUrl: String)(implicit request: Request[_], messages: Messages)
+@(rows: Seq[Seq[TableRow]], subcontractorName: String, retrieveSubcontractorListUrl: String)(implicit request: Request[_], messages: Messages)
 
 @layout(
     pageTitle = titleNoForm(messages("amendConfirmation.panel.heading")),
     showBackLink = false
 ){
     @govukPanel(Panel(
-    title = messages("amendConfirmation.panel.heading")
+        title = messages("amendConfirmation.panel.heading")
     ))
 
     @paragraph(messages("amendConfirmation.p1", subcontractorName))
@@ -50,12 +50,13 @@
         rows = rows
     ))
 
-    <p class="govuk-body">
-        @messages("amendConfirmation.backTo")
-        <a href="@manageYourSubcontractorsUrl" target="_blank" rel="noopener noreferrer" class="govuk-link">
-            @messages("amendConfirmation.yourSubcontractors")
-        </a>
-    </p>
+    @link(
+        linkTextKey = "amendConfirmation.yourSubcontractors",
+        linkUrl = retrieveSubcontractorListUrl,
+        hasFullStop = true,
+        prefixTextKey = "amendConfirmation.backTo",
+        isNewTab = false
+    )
 
     @h2("amendConfirmation.beforeYouGo.h2")
 
