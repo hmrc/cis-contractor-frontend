@@ -1004,6 +1004,12 @@ verify.verifyCheckYourAnswers.confirm                                   =  Confi
 
 verify.noName                                                           =  No name provided
 
+verify.noVerificationResults.title = No verification results
+verify.noVerificationResults.heading = Verification results
+verify.noVerificationResults.p = You do not have any verification results to show at the moment.
+verify.noVerificationResults.backTo = Back to
+verify.noVerificationResults.manageYourSubcontractors.link = Manage your subcontractors
+
 # Contractor Details
 contractordetails.contractorDetailsIndex.title                                 =  Contractor details
 contractordetails.contractorDetailsIndex.heading                               =  Contractor details
