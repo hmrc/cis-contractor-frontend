@@ -100,7 +100,7 @@ class PartnershipNominatedPartnerNinoControllerSpec extends SpecBase with Mockit
 
         redirectLocation(
           result
-        ).value mustEqual controllers.add.partnership.routes.PartnershipNominatedPartnerNinoController
+        ).value mustEqual controllers.add.partnership.routes.PartnershipNominatedPartnerNinoYesNoController
           .onPageLoad(NormalMode)
           .url
 
@@ -109,7 +109,9 @@ class PartnershipNominatedPartnerNinoControllerSpec extends SpecBase with Mockit
 
     "must redirect to journey recovery page when none for yesorno page for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers.set(PartnershipNominatedPartnerNamePage, nominatedPartnerName)
+        .success
+        .value)).build()
 
       running(application) {
         val request = FakeRequest(GET, getUrl)

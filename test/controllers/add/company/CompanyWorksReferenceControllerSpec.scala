@@ -92,7 +92,10 @@ class CompanyWorksReferenceControllerSpec extends SpecBase with MockitoSugar {
 
     "must redirect to journey recovery page when none for yesorno page for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val companyName = "Accenture"
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers.set(CompanyNamePage, companyName)
+        .success
+        .value)).build()
 
       running(application) {
         val request = FakeRequest(GET, companyWorksReferenceRoute)

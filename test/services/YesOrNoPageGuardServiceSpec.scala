@@ -82,7 +82,7 @@ class YesOrNoPageGuardServiceSpec extends SpecBase with MockitoSugar with ModelG
       ),
       (
         PartnershipNominatedPartnerNinoYesNoPage,
-        controllers.add.partnership.routes.PartnershipNominatedPartnerNinoController.onPageLoad(mode)
+        controllers.add.partnership.routes.PartnershipNominatedPartnerNinoYesNoController.onPageLoad(mode)
       ),
       (
         PartnershipNominatedPartnerCrnYesNoPage,

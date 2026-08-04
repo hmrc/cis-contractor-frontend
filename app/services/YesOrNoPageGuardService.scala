@@ -69,7 +69,7 @@ class YesOrNoPageGuardService @Inject() extends LoggingUtil {
     case PartnershipNominatedPartnerUtrYesNoPage  =>
       controllers.add.partnership.routes.PartnershipNominatedPartnerUtrYesNoController.onPageLoad(mode)
     case PartnershipNominatedPartnerNinoYesNoPage =>
-      controllers.add.partnership.routes.PartnershipNominatedPartnerNinoController.onPageLoad(mode)
+      controllers.add.partnership.routes.PartnershipNominatedPartnerNinoYesNoController.onPageLoad(mode)
     case PartnershipNominatedPartnerCrnYesNoPage  =>
       controllers.add.partnership.routes.PartnershipNominatedPartnerCrnYesNoController.onPageLoad(mode)
     case PartnershipHasUtrYesNoPage               =>
