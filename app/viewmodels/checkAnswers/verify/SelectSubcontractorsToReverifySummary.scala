@@ -17,7 +17,7 @@
 package viewmodels.checkAnswers.verify
 
 import models.{CheckMode, UserAnswers}
-import pages.verify.{ReverifyExistingSubcontractorsYesNoPage, SelectSubcontractorsToReverifyPage}
+import pages.verify.SelectSubcontractorsToReverifyPage
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
@@ -31,7 +31,7 @@ object SelectSubcontractorsToReverifySummary {
     val selectEmptyReverify = List(messages("verify.selectSubcontractorsToReverify.display.noneSelected"))
     answers
       .get(SelectSubcontractorsToReverifyPage)
-      .filter(_ => answers.get(ReverifyExistingSubcontractorsYesNoPage).contains(true))
+      .filter(_.nonEmpty)
       .flatMap { selected =>
         val selectNames = selected.map(s => HtmlFormat.escape(s.name).toString).toSeq
         val names       = if (selectNames.isEmpty) selectEmptyReverify else selectNames
