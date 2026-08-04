@@ -35,17 +35,17 @@ class JourneyRecoveryStartAgainViewSpec extends SpecBase with Matchers {
 
         "must render the page with the correct heading and paragraph with link" in new Setup {
           val html = view(cisAccountURL)
-          val doc = Jsoup.parse(html.body)
+          val doc  = Jsoup.parse(html.body)
 
-          doc.title must include(messages("journeyRecovery.startAgain.title"))
-          doc.select("h1").text must include(messages("journeyRecovery.startAgain.heading"))
-          doc.select("p").text must include(messages("journeyRecovery.startAgain.guidance.p1"))
-          doc.select("p").text must include(messages("journeyRecovery.startAgain.guidance.p2"))
-          doc.select("p").text must include(messages("journeyRecovery.startAgain.guidance.contactHMRC.suffix"))
+          doc.title                                 must include(messages("journeyRecovery.startAgain.title"))
+          doc.select("h1").text                     must include(messages("journeyRecovery.startAgain.heading"))
+          doc.select("p").text                      must include(messages("journeyRecovery.startAgain.guidance.p1"))
+          doc.select("p").text                      must include(messages("journeyRecovery.startAgain.guidance.p2"))
+          doc.select("p").text                      must include(messages("journeyRecovery.startAgain.guidance.contactHMRC.suffix"))
           doc.getElementsByClass("govuk-link").text must include(
             messages("journeyRecovery.startAgain.guidance.contactHMRC.link")
           )
-          doc.select("p").text must include(messages("journeyRecovery.startAgain.guidance.cisAccount.prefix"))
+          doc.select("p").text                      must include(messages("journeyRecovery.startAgain.guidance.cisAccount.prefix"))
           doc.getElementsByClass("govuk-link").text must include(
             messages("journeyRecovery.startAgain.guidance.cisAccount.link")
           )
@@ -54,10 +54,10 @@ class JourneyRecoveryStartAgainViewSpec extends SpecBase with Matchers {
       }
 
       trait Setup {
-        val app = applicationBuilder().build()
-        val view = app.injector.instanceOf[JourneyRecoveryStartAgainView]
+        val app                                       = applicationBuilder().build()
+        val view                                      = app.injector.instanceOf[JourneyRecoveryStartAgainView]
         implicit val request: play.api.mvc.Request[_] = FakeRequest()
-        implicit val messages: Messages = play.api.i18n.MessagesImpl(
+        implicit val messages: Messages               = play.api.i18n.MessagesImpl(
           play.api.i18n.Lang.defaultLang,
           app.injector.instanceOf[play.api.i18n.MessagesApi]
         )
