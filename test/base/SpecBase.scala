@@ -28,6 +28,7 @@ import play.api.Application
 import play.api.i18n.{Messages, MessagesApi}
 import play.api.inject.{Binding, bind}
 import play.api.inject.guice.GuiceApplicationBuilder
+import play.api.libs.json.Json
 import play.api.mvc.PlayBodyParsers
 import play.api.test.FakeRequest
 import play.api.test.Helpers.stubControllerComponents
@@ -47,6 +48,12 @@ trait SpecBase
   val parsers: PlayBodyParsers = stubControllerComponents().parsers
 
   def emptyUserAnswers: UserAnswers = UserAnswers(userAnswersId)
+
+  val cisIdData = Json.obj(
+    "cisId" -> "1"
+  )
+
+  def userAnswersWithCisId: UserAnswers = UserAnswers(userAnswersId, cisIdData)
 
   def messages(app: Application): Messages = app.injector.instanceOf[MessagesApi].preferred(FakeRequest())
 
@@ -69,7 +76,8 @@ trait SpecBase
           bind[IdentifierAction]
             .qualifiedWith("ContractorIdentifier")
             .to(new FakeIdentifierAction(false, false, true)(parsers)),
-          bind[DataRetrievalAction].toInstance(new FakeDataRetrievalAction(userAnswers))
+          bind[DataRetrievalAction].toInstance(new FakeDataRetrievalAction(userAnswers)),
+          bind[CisIdRequiredAction].to[CisIdRequiredActionImpl]
         ) ++ additionalBindings
       )
 }
