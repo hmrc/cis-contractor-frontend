@@ -24,7 +24,7 @@ import models.contact.ContactMethodOptions
 import models.{TypeOfSubcontractor, UserAnswers}
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.{never, verify, verifyNoInteractions, verifyNoMoreInteractions, when}
+import org.mockito.Mockito.*
 import org.scalatestplus.mockito.MockitoSugar
 import pages.add.TypeOfSubcontractorPage
 import pages.add.company.*
@@ -33,11 +33,12 @@ import play.api.i18n.MessagesApi
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import queries.OriginalCompanyAnswersQuery
+import queries.{CisIdQuery, OriginalCompanyAnswersQuery}
 import repositories.SessionRepository
 import services.SubcontractorService
-import pages.amend.AmendCheckYourAnswersSubmittedPage
 import uk.gov.hmrc.http.HeaderCarrier
+import utils.AmendmentHelper
+import config.FrontendAppConfig
 
 import scala.concurrent.Future
 
@@ -94,7 +95,7 @@ class AmendCompanyCheckYourAnswersControllerSpec extends SpecBase with MockitoSu
       .set(CompanyWorksReferenceYesNoPage, true)
       .success
       .value
-      .set(CompanyWorksReferencePage, "WRN-1")
+      .set(CompanyWorksReferencePage, "WRN-11")
       .success
       .value
       .set(ShowVerificationDetailsPage, false)
@@ -244,6 +245,61 @@ class AmendCompanyCheckYourAnswersControllerSpec extends SpecBase with MockitoSu
       }
     }
 
+    "must not render the verification number row when the company is pending verifications" in {
+
+      val verifiedUa =
+        minUa
+          .set(ShowVerificationDetailsPage, true)
+          .success
+          .value
+          .set(
+            OriginalCompanyAnswersQuery,
+            OriginalCompanyAnswers(
+              companyName = Some("Test Company Ltd"),
+              addressYesNo = Some(false),
+              address = None,
+              companyContactMethodsYesNo = Some(false),
+              companyContactMethod = Set.empty,
+              email = None,
+              phone = None,
+              mobile = None,
+              crnYesNo = Some(false),
+              crn = None,
+              utrYesNo = Some(false),
+              utr = None,
+              worksReferenceYesNo = Some(false),
+              worksReference = None,
+              verificationNumber = None
+            )
+          )
+          .success
+          .value
+
+      val application =
+        applicationBuilder(userAnswers = Some(verifiedUa)).build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(
+            GET,
+            controllers.amend.company.routes.AmendCompanyCheckYourAnswersController.onPageLoad().url
+          )
+
+        val msg = application.injector.instanceOf[MessagesApi].preferred(request)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual OK
+
+        val page = contentAsString(result)
+
+        page must not include msg("amendCheckYourAnswers.verificationNumber.label")
+        page must not include "VRN123456"
+        page must include(msg("companyUtr.verified.checkYourAnswersLabel"))
+      }
+    }
+
     "must redirect to Journey Recovery when validation fails" in {
 
       val invalidUa =
@@ -293,7 +349,7 @@ class AmendCompanyCheckYourAnswersControllerSpec extends SpecBase with MockitoSu
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual
-          controllers.amend.company.routes.AmendCompanyCheckYourAnswersController.onPageLoad().url
+          controllers.amend.company.routes.AmendCompanyConfirmationController.onPageLoad().url
       }
 
       verify(mockSubcontractorService)
@@ -332,6 +388,52 @@ class AmendCompanyCheckYourAnswersControllerSpec extends SpecBase with MockitoSu
           controllers.routes.JourneyRecoveryController.onPageLoad().url
       }
       verifyNoInteractions(mockSubcontractorService)
+    }
+
+    "must redirect to Manage Your Subcontractors when no changes have been made" in {
+      val cisId = "cis-123"
+      val ua    =
+        minUa
+          .set(CisIdQuery, cisId)
+          .success
+          .value
+          .set(CompanyWorksReferencePage, "WRN-1")
+          .success
+          .value
+
+      val mockSubcontractorService = mock[SubcontractorService]
+      val mockSessionRepository    = mock[SessionRepository]
+      AmendmentHelper.companyHasChanges(ua) mustBe false
+
+      val application =
+        applicationBuilder(userAnswers = Some(ua))
+          .configure(
+            "urls.manage-your-subcontractors" ->
+              s"http://localhost:6996/construction-industry-scheme/management/subcontractors/$cisId/your-subcontractors"
+          )
+          .overrides(
+            bind[SubcontractorService].toInstance(mockSubcontractorService),
+            bind[SessionRepository].toInstance(mockSessionRepository)
+          )
+          .build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(
+            POST,
+            controllers.amend.company.routes.AmendCompanyCheckYourAnswersController.onSubmit().url
+          )
+
+        val result = route(application, request).value
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result).value mustBe
+          "http://localhost:6996/construction-industry-scheme/management/subcontractors/cis-123/your-subcontractors"
+      }
+
+      verifyNoInteractions(mockSubcontractorService)
+      verifyNoInteractions(mockSessionRepository)
     }
 
     "must redirect to Journey Recovery when the service fails" in {
@@ -403,13 +505,18 @@ class AmendCompanyCheckYourAnswersControllerSpec extends SpecBase with MockitoSu
 
     "must clear answers and redirect to Index on cancel" in {
 
+      val ua                    =
+        minUa
+          .set(CisIdQuery, "cis-123")
+          .success
+          .value
       val mockSessionRepository = mock[SessionRepository]
 
       when(mockSessionRepository.set(any[UserAnswers]))
         .thenReturn(Future.successful(true))
 
       val application =
-        applicationBuilder(userAnswers = Some(minUa))
+        applicationBuilder(userAnswers = Some(ua))
           .overrides(
             bind[SessionRepository].toInstance(mockSessionRepository)
           )
@@ -424,7 +531,9 @@ class AmendCompanyCheckYourAnswersControllerSpec extends SpecBase with MockitoSu
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual
-          routes.IndexController.onPageLoad().url
+          app.injector
+            .instanceOf[FrontendAppConfig]
+            .manageYourSubcontractorsUrl("cis-123")
       }
 
       verify(mockSessionRepository).set(any[UserAnswers])
