@@ -20,6 +20,7 @@ import models.UserAnswers
 import models.amend.partnership.AmendPartnershipRemoveDetail
 import models.amend.partnership.AmendPartnershipRemoveDetail.*
 import pages.QuestionPage
+import scala.util.Try
 import pages.add.partnership.*
 import play.api.libs.json.JsPath
 
@@ -36,7 +37,7 @@ case class AmendPartnershipRemoveDetailYesNoPage(
   override def cleanup(
     value: Option[Boolean],
     userAnswers: UserAnswers
-  ) =
+  ): Try[UserAnswers] =
     AmendPartnershipRemoveDetail.fromKey(detail) match {
 
       case Some(Address) if value.contains(true) =>

@@ -63,11 +63,7 @@ class AmendPartnershipRemoveDetailYesNoController @Inject() (
         action(detailType)
 
       case None =>
-        Future.successful(
-          Redirect(
-            controllers.routes.JourneyRecoveryController.onPageLoad()
-          )
-        )
+        Future.successful(journeyRecovery)
     }
 
   private def getPartnershipName(

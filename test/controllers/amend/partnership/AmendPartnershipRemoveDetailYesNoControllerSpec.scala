@@ -506,6 +506,49 @@ class AmendPartnershipRemoveDetailYesNoControllerSpec extends SpecBase with Mock
           }
         }
 
+        "must redirect to Journey Recovery when saving the answer fails" in {
+
+          val mockSessionRepository =
+            mock[SessionRepository]
+
+          when(mockSessionRepository.set(any()))
+            .thenReturn(Future.failed(new RuntimeException("Failed to save")))
+
+          val application =
+            applicationBuilder(
+              userAnswers = Some(uaWithDetail(detail))
+            )
+              .overrides(
+                bind[SessionRepository]
+                  .toInstance(mockSessionRepository)
+              )
+              .build()
+
+          running(application) {
+
+            val request =
+              FakeRequest(
+                POST,
+                controllers.amend.partnership.routes.AmendPartnershipRemoveDetailYesNoController
+                  .onSubmit(detailKey)
+                  .url
+              )
+                .withFormUrlEncodedBody(
+                  ("value", "true")
+                )
+
+            val result =
+              route(application, request).value
+
+            status(result) mustEqual SEE_OTHER
+
+            redirectLocation(result).value mustEqual
+              controllers.routes.JourneyRecoveryController
+                .onPageLoad()
+                .url
+          }
+        }
+
         "must redirect to Journey Recovery on POST when the requested detail is not present" in {
 
           val userAnswers =
