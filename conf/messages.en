@@ -1082,4 +1082,6 @@ verify.verificationResults.name                                                =
 verify.verificationResults.status                                              = Verification status
 verify.verificationResults.taxTreatment                                        = Tax treatment
 verify.verificationResults.verificationNumber                                  = Verification number
-verify.reviewUnmatchedSubcontractors.button                                    = Review unmatched subcontractors
+verify.verificationResults.reviewUnmatchedSubcontractors.button                = Review unmatched subcontractors
+verify.verificationResults.backTo                                              = Back to
+verify.verificationResults.manageYourSubcontractors.link                       = Manage your subcontractors

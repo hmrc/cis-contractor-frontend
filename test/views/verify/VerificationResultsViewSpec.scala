@@ -33,13 +33,39 @@ class VerificationResultsViewSpec extends SpecBase {
 
   "VerificationResultsView" - {
 
-    "must return the header, paragraph and table with the verification results list" in new Setup {
-      val html: HtmlFormat.Appendable = view(verificationResults)
+    "must display the Back to Manage your subcontractors link when all subcontractors are verified" in new Setup {
+      val verificationResults = Seq(
+        VerificationResultsViewModel(
+          "Brody, Martin",
+          "Verified",
+          "Higher rate",
+          "V0004528765/A"
+        ),
+        VerificationResultsViewModel(
+          "Hooper and Associates",
+          "Verified",
+          "Standard rate",
+          "V0004528765"
+        ),
+        VerificationResultsViewModel(
+          "Quint Transportation",
+          "Verified",
+          "Higher rate",
+          "V0004528765/B"
+        ),
+        VerificationResultsViewModel(
+          "The Kintner Group",
+          "Verified",
+          "Higher rate",
+          "V0004528765/C"
+        )
+      )
+      val manageSubcontractorsUrl = "/manage-subcontractors/1"
+      val html: HtmlFormat.Appendable = view(verificationResults, manageSubcontractorsUrl)
       val doc: Document               = Jsoup.parse(html.body)
-
       doc.select("title").text() must include(messages("verify.verificationResults.title"))
-      doc.select("h1").text()    must include(messages("verify.verificationResults.heading"))
-      doc.select("p").text()     must include(messages("verify.verificationResults.paragraph"))
+      doc.select("h1").text() must include(messages("verify.verificationResults.heading"))
+      doc.select("p").text() must include(messages("verify.verificationResults.paragraph"))
 
       val headers: util.List[String] = doc.select("thead th").eachText()
 
@@ -64,9 +90,67 @@ class VerificationResultsViewSpec extends SpecBase {
         )
       }
 
-      doc.select("button").text() mustBe
-        messages("verify.reviewUnmatchedSubcontractors.button")
+      doc.select("p").text() must include(messages("verify.verificationResults.backTo"))
+      doc.select(".govuk-link").text must include(messages("verify.verificationResults.manageYourSubcontractors.link"))
     }
+
+    "must display the Review unmatched subcontractors button when there is at least one unmatched subcontractor" in new Setup {
+      val verificationResults = Seq(
+        VerificationResultsViewModel(
+          "Brody, Martin",
+          "Unmatched",
+          "Higher rate",
+          "V0004528765/A"
+        ),
+        VerificationResultsViewModel(
+          "Hooper and Associates",
+          "Verified",
+          "Standard rate",
+          "V0004528765"
+        ),
+        VerificationResultsViewModel(
+          "Quint Transportation",
+          "Unmatched",
+          "Higher rate",
+          "V0004528765/B"
+        ),
+        VerificationResultsViewModel(
+          "The Kintner Group",
+          "Verified",
+          "Higher rate",
+          "V0004528765/C"
+        )
+      )
+      val manageSubcontractorsUrl = "/manage-subcontractors/1"
+      val html: HtmlFormat.Appendable = view(verificationResults, manageSubcontractorsUrl)
+      val doc: Document = Jsoup.parse(html.body)
+      val headers: util.List[String] = doc.select("thead th").eachText()
+
+      headers mustBe util.Arrays.asList(
+        messages("verify.verificationResults.name"),
+        messages("verify.verificationResults.status"),
+        messages("verify.verificationResults.taxTreatment"),
+        messages("verify.verificationResults.verificationNumber")
+      )
+
+      val rows: Elements = doc.select("tbody tr")
+      rows.size() mustBe verificationResults.size
+
+      verificationResults.zipWithIndex.foreach { case (result, index) =>
+        val cells = rows.get(index).select("td").eachText()
+
+        cells mustBe util.Arrays.asList(
+          result.name,
+          result.verificationStatus,
+          result.taxTreatment,
+          result.verificationNumber
+        )
+      }
+
+      doc.select("button").text() mustBe
+        messages("verify.verificationResults.reviewUnmatchedSubcontractors.button")
+    }
+
   }
   trait Setup {
 
@@ -81,32 +165,5 @@ class VerificationResultsViewSpec extends SpecBase {
 
     val view: VerificationResultsView =
       app.injector.instanceOf[VerificationResultsView]
-
-    val verificationResults = Seq(
-      VerificationResultsViewModel(
-        "Brody, Martin",
-        "Unmatched",
-        "Higher rate",
-        "V0004528765/A"
-      ),
-      VerificationResultsViewModel(
-        "Hooper and Associates",
-        "Verified",
-        "Standard rate",
-        "V0004528765"
-      ),
-      VerificationResultsViewModel(
-        "Quint Transportation",
-        "Unmatched",
-        "Higher rate",
-        "V0004528765/B"
-      ),
-      VerificationResultsViewModel(
-        "The Kintner Group",
-        "Unmatched",
-        "Higher rate",
-        "V0004528765/C"
-      )
-    )
   }
 }

@@ -19,6 +19,7 @@ package controllers.verify
 import base.SpecBase
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
+import queries.CisIdQuery
 import viewmodels.verify.VerificationResultsViewModel
 import views.html.verify.VerificationResultsView
 
@@ -27,22 +28,24 @@ class VerificationResultsControllerSpec extends SpecBase {
   "VerificationResults Controller" - {
 
     "must return OK and the correct view for a GET" in {
+      val cisId = "1"
+      val userAnswers = emptyUserAnswers.set(CisIdQuery, cisId).success.value
       val verificationResults = Seq(
         VerificationResultsViewModel(
           "Brody, Martin",
-          "Unmatched",
+          "Verified",
           "Higher rate",
           "V0004528765/A"
         ),
         VerificationResultsViewModel(
           "Hooper and Associates",
-          "Verified",
+          "Unmatched",
           "Standard rate",
           "V0004528765"
         ),
         VerificationResultsViewModel(
           "Quint Transportation",
-          "Unmatched",
+          "Verified",
           "Higher rate",
           "V0004528765/B"
         ),
@@ -54,7 +57,9 @@ class VerificationResultsControllerSpec extends SpecBase {
         )
       )
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val manageSubcontractorsUrl =
+        s"${applicationConfig.manageSubcontractorsUrl}/$cisId"
+      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
       running(application) {
         val request = FakeRequest(GET, controllers.verify.routes.VerificationResultsController.onPageLoad().url)
@@ -64,7 +69,21 @@ class VerificationResultsControllerSpec extends SpecBase {
         val view = application.injector.instanceOf[VerificationResultsView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(verificationResults)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(verificationResults, manageSubcontractorsUrl)(request, messages(application)).toString
+      }
+    }
+
+    "must redirect to Journey Recovery when CisId is missing" in {
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+
+      running(application) {
+        val request = FakeRequest(GET, controllers.verify.routes.VerificationResultsController.onPageLoad().url)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual
+          controllers.routes.JourneyRecoveryController.onPageLoad().url
       }
     }
   }

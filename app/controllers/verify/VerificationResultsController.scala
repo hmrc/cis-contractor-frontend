@@ -16,9 +16,11 @@
 
 package controllers.verify
 
+import config.FrontendAppConfig
 import controllers.actions.*
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import queries.CisIdQuery
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.verify.VerificationResultsViewModel
 import views.html.verify.VerificationResultsView
@@ -32,26 +34,27 @@ class VerificationResultsController @Inject() (
   requireData: DataRequiredAction,
   val controllerComponents: MessagesControllerComponents,
   view: VerificationResultsView
-) extends FrontendBaseController
+) (implicit  appConfig: FrontendAppConfig)
+    extends FrontendBaseController
     with I18nSupport {
 
   def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
     val verificationResults = Seq(
       VerificationResultsViewModel(
         "Brody, Martin",
-        "Unmatched",
+        "Verified",
         "Higher rate",
         "V0004528765/A"
       ),
       VerificationResultsViewModel(
         "Hooper and Associates",
-        "Verified",
+        "Unmatched",
         "Standard rate",
         "V0004528765"
       ),
       VerificationResultsViewModel(
         "Quint Transportation",
-        "Unmatched",
+        "Verified",
         "Higher rate",
         "V0004528765/B"
       ),
@@ -62,6 +65,11 @@ class VerificationResultsController @Inject() (
         "V0004528765/C"
       )
     )
-    Ok(view(verificationResults))
+    request.userAnswers.get(CisIdQuery) match {
+      case Some(cisId) =>
+        val manageSubcontractorsUrl = s"${appConfig.manageSubcontractorsUrl}/$cisId"
+        Ok(view(verificationResults, manageSubcontractorsUrl))
+      case None        => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+    }
   }
 }
