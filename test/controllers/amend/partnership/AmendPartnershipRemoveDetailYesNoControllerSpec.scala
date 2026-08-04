@@ -18,8 +18,8 @@ package controllers.amend.partnership
 
 import base.SpecBase
 import forms.amend.partnership.AmendPartnershipRemoveDetailYesNoFormProvider
-import models.amend.partnership.AmendPartnershipRemoveDetail
 import models.UserAnswers
+import models.amend.partnership.AmendPartnershipRemoveDetail
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
@@ -55,48 +55,55 @@ class AmendPartnershipRemoveDetailYesNoControllerSpec extends SpecBase with Mock
       .success
       .value
 
+  private val nominatedPartnerDetails: Seq[AmendPartnershipRemoveDetail] =
+    Seq(
+      AmendPartnershipRemoveDetail.NominatedPartnerUtr,
+      AmendPartnershipRemoveDetail.NominatedPartnerNino,
+      AmendPartnershipRemoveDetail.NominatedPartnerCompanyRegistrationNumber
+    )
+
   private def uaWithDetail(
-    detail: String
+    detail: AmendPartnershipRemoveDetail
   ): UserAnswers =
     detail match {
 
-      case "address" =>
+      case AmendPartnershipRemoveDetail.Address =>
         uaWithPartnershipName
           .set(PartnershipAddressYesNoPage, true)
           .success
           .value
 
-      case "contact-details" =>
+      case AmendPartnershipRemoveDetail.ContactDetails =>
         uaWithPartnershipName
           .set(AddPartnershipContactMethodsYesNoPage, true)
           .success
           .value
 
-      case "utr" =>
+      case AmendPartnershipRemoveDetail.Utr =>
         uaWithPartnershipName
           .set(PartnershipHasUtrYesNoPage, true)
           .success
           .value
 
-      case "works-reference-number" =>
+      case AmendPartnershipRemoveDetail.WorksReferenceNumber =>
         uaWithPartnershipName
           .set(PartnershipWorksReferenceNumberYesNoPage, true)
           .success
           .value
 
-      case "nominated-partner-utr" =>
+      case AmendPartnershipRemoveDetail.NominatedPartnerUtr =>
         uaWithNominatedPartnerName
           .set(PartnershipNominatedPartnerUtrYesNoPage, true)
           .success
           .value
 
-      case "nominated-partner-nino" =>
+      case AmendPartnershipRemoveDetail.NominatedPartnerNino =>
         uaWithNominatedPartnerName
           .set(PartnershipNominatedPartnerNinoYesNoPage, true)
           .success
           .value
 
-      case "nominated-partner-company-registration-number" =>
+      case AmendPartnershipRemoveDetail.NominatedPartnerCompanyRegistrationNumber =>
         uaWithNominatedPartnerName
           .set(PartnershipNominatedPartnerCrnYesNoPage, true)
           .success
@@ -104,47 +111,47 @@ class AmendPartnershipRemoveDetailYesNoControllerSpec extends SpecBase with Mock
     }
 
   private def uaWithDetailPresentButNameMissing(
-    detail: String
+    detail: AmendPartnershipRemoveDetail
   ): UserAnswers =
     detail match {
 
-      case "address" =>
+      case AmendPartnershipRemoveDetail.Address =>
         emptyUserAnswers
           .set(PartnershipAddressYesNoPage, true)
           .success
           .value
 
-      case "contact-details" =>
+      case AmendPartnershipRemoveDetail.ContactDetails =>
         emptyUserAnswers
           .set(AddPartnershipContactMethodsYesNoPage, true)
           .success
           .value
 
-      case "utr" =>
+      case AmendPartnershipRemoveDetail.Utr =>
         emptyUserAnswers
           .set(PartnershipHasUtrYesNoPage, true)
           .success
           .value
 
-      case "works-reference-number" =>
+      case AmendPartnershipRemoveDetail.WorksReferenceNumber =>
         emptyUserAnswers
           .set(PartnershipWorksReferenceNumberYesNoPage, true)
           .success
           .value
 
-      case "nominated-partner-utr" =>
+      case AmendPartnershipRemoveDetail.NominatedPartnerUtr =>
         emptyUserAnswers
           .set(PartnershipNominatedPartnerUtrYesNoPage, true)
           .success
           .value
 
-      case "nominated-partner-nino" =>
+      case AmendPartnershipRemoveDetail.NominatedPartnerNino =>
         emptyUserAnswers
           .set(PartnershipNominatedPartnerNinoYesNoPage, true)
           .success
           .value
 
-      case "nominated-partner-company-registration-number" =>
+      case AmendPartnershipRemoveDetail.NominatedPartnerCompanyRegistrationNumber =>
         emptyUserAnswers
           .set(PartnershipNominatedPartnerCrnYesNoPage, true)
           .success
@@ -154,21 +161,24 @@ class AmendPartnershipRemoveDetailYesNoControllerSpec extends SpecBase with Mock
   "AmendPartnershipRemoveDetailYesNo Controller" - {
 
     Seq(
-      ("address", partnershipName),
-      ("contact-details", partnershipName),
-      ("utr", partnershipName),
-      ("works-reference-number", partnershipName),
-      ("nominated-partner-utr", nominatedPartnerName),
-      ("nominated-partner-nino", nominatedPartnerName),
-      ("nominated-partner-company-registration-number", nominatedPartnerName)
+      (AmendPartnershipRemoveDetail.Address, partnershipName),
+      (AmendPartnershipRemoveDetail.ContactDetails, partnershipName),
+      (AmendPartnershipRemoveDetail.Utr, partnershipName),
+      (AmendPartnershipRemoveDetail.WorksReferenceNumber, partnershipName),
+      (AmendPartnershipRemoveDetail.NominatedPartnerUtr, nominatedPartnerName),
+      (AmendPartnershipRemoveDetail.NominatedPartnerNino, nominatedPartnerName),
+      (AmendPartnershipRemoveDetail.NominatedPartnerCompanyRegistrationNumber, nominatedPartnerName)
     ).foreach { case (detail, detailName) =>
-      s"when detail is '$detail'" - {
+      val detailKey =
+        detail.key
+
+      s"when detail is '$detailKey'" - {
 
         val form = formProvider()
 
         lazy val removeDetailYesNoRoute =
           controllers.amend.partnership.routes.AmendPartnershipRemoveDetailYesNoController
-            .onPageLoad(detail)
+            .onPageLoad(detailKey)
             .url
 
         "must return OK and the correct view for a GET" in {
@@ -190,20 +200,15 @@ class AmendPartnershipRemoveDetailYesNoControllerSpec extends SpecBase with Mock
               application.injector
                 .instanceOf[AmendPartnershipRemoveDetailYesNoView]
 
-            val detailType =
-              AmendPartnershipRemoveDetail
-                .fromKey(detail)
-                .value
-
             val detailTitle =
-              messages(application)(detailType.messageKey)
+              messages(application)(detail.messageKey)
 
             status(result) mustEqual OK
 
             contentAsString(result) mustEqual
               view(
                 form,
-                detail,
+                detailKey,
                 detailTitle,
                 detailName
               )(
@@ -237,7 +242,7 @@ class AmendPartnershipRemoveDetailYesNoControllerSpec extends SpecBase with Mock
               FakeRequest(
                 POST,
                 controllers.amend.partnership.routes.AmendPartnershipRemoveDetailYesNoController
-                  .onSubmit(detail)
+                  .onSubmit(detailKey)
                   .url
               )
                 .withFormUrlEncodedBody(
@@ -280,7 +285,7 @@ class AmendPartnershipRemoveDetailYesNoControllerSpec extends SpecBase with Mock
               FakeRequest(
                 POST,
                 controllers.amend.partnership.routes.AmendPartnershipRemoveDetailYesNoController
-                  .onSubmit(detail)
+                  .onSubmit(detailKey)
                   .url
               )
                 .withFormUrlEncodedBody(
@@ -312,7 +317,7 @@ class AmendPartnershipRemoveDetailYesNoControllerSpec extends SpecBase with Mock
               FakeRequest(
                 POST,
                 controllers.amend.partnership.routes.AmendPartnershipRemoveDetailYesNoController
-                  .onSubmit(detail)
+                  .onSubmit(detailKey)
                   .url
               )
                 .withFormUrlEncodedBody(
@@ -328,13 +333,8 @@ class AmendPartnershipRemoveDetailYesNoControllerSpec extends SpecBase with Mock
               application.injector
                 .instanceOf[AmendPartnershipRemoveDetailYesNoView]
 
-            val detailType =
-              AmendPartnershipRemoveDetail
-                .fromKey(detail)
-                .value
-
             val detailTitle =
-              messages(application)(detailType.messageKey)
+              messages(application)(detail.messageKey)
 
             val result =
               route(application, request).value
@@ -344,7 +344,7 @@ class AmendPartnershipRemoveDetailYesNoControllerSpec extends SpecBase with Mock
             contentAsString(result) mustEqual
               view(
                 boundForm,
-                detail,
+                detailKey,
                 detailTitle,
                 detailName
               )(
@@ -394,7 +394,7 @@ class AmendPartnershipRemoveDetailYesNoControllerSpec extends SpecBase with Mock
               FakeRequest(
                 POST,
                 controllers.amend.partnership.routes.AmendPartnershipRemoveDetailYesNoController
-                  .onSubmit(detail)
+                  .onSubmit(detailKey)
                   .url
               )
                 .withFormUrlEncodedBody(
@@ -453,7 +453,7 @@ class AmendPartnershipRemoveDetailYesNoControllerSpec extends SpecBase with Mock
               FakeRequest(
                 POST,
                 controllers.amend.partnership.routes.AmendPartnershipRemoveDetailYesNoController
-                  .onSubmit(detail)
+                  .onSubmit(detailKey)
                   .url
               )
                 .withFormUrlEncodedBody(
@@ -475,11 +475,7 @@ class AmendPartnershipRemoveDetailYesNoControllerSpec extends SpecBase with Mock
         "must redirect to Journey Recovery on GET when the requested detail is not present" in {
 
           val userAnswers =
-            if (
-              detail == "nominated-partner-utr" ||
-              detail == "nominated-partner-nino" ||
-              detail == "nominated-partner-company-registration-number"
-            ) {
+            if (nominatedPartnerDetails.contains(detail)) {
               uaWithNominatedPartnerName
             } else {
               uaWithPartnershipName
@@ -513,11 +509,7 @@ class AmendPartnershipRemoveDetailYesNoControllerSpec extends SpecBase with Mock
         "must redirect to Journey Recovery on POST when the requested detail is not present" in {
 
           val userAnswers =
-            if (
-              detail == "nominated-partner-utr" ||
-              detail == "nominated-partner-nino" ||
-              detail == "nominated-partner-company-registration-number"
-            ) {
+            if (nominatedPartnerDetails.contains(detail)) {
               uaWithNominatedPartnerName
             } else {
               uaWithPartnershipName
@@ -534,7 +526,7 @@ class AmendPartnershipRemoveDetailYesNoControllerSpec extends SpecBase with Mock
               FakeRequest(
                 POST,
                 controllers.amend.partnership.routes.AmendPartnershipRemoveDetailYesNoController
-                  .onSubmit(detail)
+                  .onSubmit(detailKey)
                   .url
               )
                 .withFormUrlEncodedBody(
