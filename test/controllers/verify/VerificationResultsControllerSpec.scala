@@ -28,8 +28,8 @@ class VerificationResultsControllerSpec extends SpecBase {
   "VerificationResults Controller" - {
 
     "must return OK and the correct view for a GET" in {
-      val cisId = "1"
-      val userAnswers = emptyUserAnswers.set(CisIdQuery, cisId).success.value
+      val cisId               = "1"
+      val userAnswers         = emptyUserAnswers.set(CisIdQuery, cisId).success.value
       val verificationResults = Seq(
         VerificationResultsViewModel(
           "Brody, Martin",
@@ -59,7 +59,7 @@ class VerificationResultsControllerSpec extends SpecBase {
 
       val manageSubcontractorsUrl =
         s"${applicationConfig.manageSubcontractorsUrl}/$cisId"
-      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
+      val application             = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
       running(application) {
         val request = FakeRequest(GET, controllers.verify.routes.VerificationResultsController.onPageLoad().url)
@@ -69,7 +69,10 @@ class VerificationResultsControllerSpec extends SpecBase {
         val view = application.injector.instanceOf[VerificationResultsView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(verificationResults, manageSubcontractorsUrl)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(verificationResults, manageSubcontractorsUrl)(
+          request,
+          messages(application)
+        ).toString
       }
     }
 

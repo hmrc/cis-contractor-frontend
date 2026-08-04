@@ -34,7 +34,7 @@ class VerificationResultsController @Inject() (
   requireData: DataRequiredAction,
   val controllerComponents: MessagesControllerComponents,
   view: VerificationResultsView
-) (implicit  appConfig: FrontendAppConfig)
+)(implicit appConfig: FrontendAppConfig)
     extends FrontendBaseController
     with I18nSupport {
 

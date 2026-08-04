@@ -34,7 +34,7 @@ class VerificationResultsViewSpec extends SpecBase {
   "VerificationResultsView" - {
 
     "must display the Back to Manage your subcontractors link when all subcontractors are verified" in new Setup {
-      val verificationResults = Seq(
+      val verificationResults         = Seq(
         VerificationResultsViewModel(
           "Brody, Martin",
           "Verified",
@@ -60,12 +60,12 @@ class VerificationResultsViewSpec extends SpecBase {
           "V0004528765/C"
         )
       )
-      val manageSubcontractorsUrl = "/manage-subcontractors/1"
+      val manageSubcontractorsUrl     = "/manage-subcontractors/1"
       val html: HtmlFormat.Appendable = view(verificationResults, manageSubcontractorsUrl)
       val doc: Document               = Jsoup.parse(html.body)
       doc.select("title").text() must include(messages("verify.verificationResults.title"))
-      doc.select("h1").text() must include(messages("verify.verificationResults.heading"))
-      doc.select("p").text() must include(messages("verify.verificationResults.paragraph"))
+      doc.select("h1").text()    must include(messages("verify.verificationResults.heading"))
+      doc.select("p").text()     must include(messages("verify.verificationResults.paragraph"))
 
       val headers: util.List[String] = doc.select("thead th").eachText()
 
@@ -90,12 +90,12 @@ class VerificationResultsViewSpec extends SpecBase {
         )
       }
 
-      doc.select("p").text() must include(messages("verify.verificationResults.backTo"))
+      doc.select("p").text()         must include(messages("verify.verificationResults.backTo"))
       doc.select(".govuk-link").text must include(messages("verify.verificationResults.manageYourSubcontractors.link"))
     }
 
     "must display the Review unmatched subcontractors button when there is at least one unmatched subcontractor" in new Setup {
-      val verificationResults = Seq(
+      val verificationResults         = Seq(
         VerificationResultsViewModel(
           "Brody, Martin",
           "Unmatched",
@@ -121,10 +121,10 @@ class VerificationResultsViewSpec extends SpecBase {
           "V0004528765/C"
         )
       )
-      val manageSubcontractorsUrl = "/manage-subcontractors/1"
+      val manageSubcontractorsUrl     = "/manage-subcontractors/1"
       val html: HtmlFormat.Appendable = view(verificationResults, manageSubcontractorsUrl)
-      val doc: Document = Jsoup.parse(html.body)
-      val headers: util.List[String] = doc.select("thead th").eachText()
+      val doc: Document               = Jsoup.parse(html.body)
+      val headers: util.List[String]  = doc.select("thead th").eachText()
 
       headers mustBe util.Arrays.asList(
         messages("verify.verificationResults.name"),
