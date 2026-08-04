@@ -19,7 +19,7 @@ package controllers.verify
 import controllers.actions.*
 import models.{AmendMode, CheckMode, Mode, NormalMode, UserAnswers}
 import models.verify.VerificationBatchReadiness
-import pages.verify.{NewestVerificationBatchResponsePage, SelectSubcontractorPage, SelectSubcontractorsToReverifyPage, VerificationBatchReadinessPage}
+import pages.verify.{CurrentVerificationBatchResponsePage, NewestVerificationBatchResponsePage, SelectSubcontractorPage, SelectSubcontractorsToReverifyPage, VerificationBatchReadinessPage}
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
@@ -61,21 +61,11 @@ class CheckVerificationBatchReadinessController @Inject() (
       val selectedIds: Set[String] =
         selectedUnverifiedIds ++ selectedReverifyIds
 
-      val isReverifyOnly =
-        selectedUnverifiedIds.isEmpty && selectedReverifyIds.nonEmpty
-
       val batchReadyOpt =
-        ua.get(NewestVerificationBatchResponsePage)
+        ua.get(CurrentVerificationBatchResponsePage)
           .filter(_ => selectedIds.nonEmpty)
           .map { batchResponse =>
-            if (isReverifyOnly) {
-              val batchSubcontractorIds =
-                batchResponse.subcontractors.map(_.subcontractorId.toString).toSet
-
-              selectedReverifyIds.subsetOf(batchSubcontractorIds)
-            } else {
-              VerificationBatchReadiness.isBatchReady(selectedIds, batchResponse.subcontractors)
-            }
+            VerificationBatchReadiness.isBatchReady(selectedIds, batchResponse.subcontractors)
           }
 
       batchReadyOpt match {
