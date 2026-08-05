@@ -24,6 +24,7 @@ case class ManualAddressEntryConfig(
   line3MaxLength: Option[Int] = None,
   townMaxLength: Option[Int] = None,
   mandatoryFields: MandatoryFieldsConfigModel,
+  maxLengthErrorMessages: MaxLengthErrorMessagesModel,
   showOrganisationName: Boolean
 )
 

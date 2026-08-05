@@ -30,6 +30,7 @@ import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{never, times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import pages.add.*
+import pages.amend.ShowVerificationDetailsPage
 import play.api.inject.bind
 import play.api.mvc.MessagesControllerComponents
 import play.api.test.FakeRequest
@@ -121,8 +122,7 @@ class AmendIndividualControllerSpec extends SpecBase with MockitoSugar {
   private val response =
     GetSubcontractorResponse(
       scheme = None,
-      subcontractor = Some(subcontractor),
-      otherInfo = Seq.empty
+      subcontractor = Some(subcontractor)
     )
 
   private val expectedOriginal =
@@ -1249,6 +1249,221 @@ class AmendIndividualControllerSpec extends SpecBase with MockitoSugar {
 
           verify(mockSessionRepository, never())
             .set(any[UserAnswers])
+        }
+      }
+
+      "must redirect to JourneyRecovery and not save when the subcontractor is not an individual or sole trader" in {
+        val mockService           = mock[SubcontractorService]
+        val mockSessionRepository = mock[SessionRepository]
+
+        val invalidSubcontractor =
+          subcontractor.copy(
+            subcontractorType = Some("company")
+          )
+
+        mockSuccessfulService(
+          mockService,
+          response.copy(
+            subcontractor = Some(invalidSubcontractor)
+          )
+        )
+
+        val application =
+          applicationBuilder(userAnswers = Some(emptyUserAnswers))
+            .overrides(
+              bind[SubcontractorService].toInstance(mockService),
+              bind[SessionRepository].toInstance(mockSessionRepository)
+            )
+            .build()
+
+        running(application) {
+          val result =
+            route(
+              application,
+              FakeRequest(GET, amendIndividualRoute)
+            ).value
+
+          status(result) mustBe SEE_OTHER
+
+          redirectLocation(result).value mustBe
+            controllers.routes.JourneyRecoveryController
+              .onPageLoad()
+              .url
+
+          verify(mockSessionRepository, never())
+            .set(any[UserAnswers])
+        }
+      }
+
+      "must redirect to JourneyRecovery and not save when the subcontractor type is missing" in {
+        val mockService           = mock[SubcontractorService]
+        val mockSessionRepository = mock[SessionRepository]
+
+        val invalidSubcontractor =
+          subcontractor.copy(
+            subcontractorType = None
+          )
+
+        mockSuccessfulService(
+          mockService,
+          response.copy(
+            subcontractor = Some(invalidSubcontractor)
+          )
+        )
+
+        val application =
+          applicationBuilder(userAnswers = Some(emptyUserAnswers))
+            .overrides(
+              bind[SubcontractorService].toInstance(mockService),
+              bind[SessionRepository].toInstance(mockSessionRepository)
+            )
+            .build()
+
+        running(application) {
+          val result =
+            route(
+              application,
+              FakeRequest(GET, amendIndividualRoute)
+            ).value
+
+          status(result) mustBe SEE_OTHER
+
+          redirectLocation(result).value mustBe
+            controllers.routes.JourneyRecoveryController
+              .onPageLoad()
+              .url
+
+          verify(mockSessionRepository, never())
+            .set(any[UserAnswers])
+        }
+      }
+
+      "must show verification details when the individual is verified" in {
+        val mockService           = mock[SubcontractorService]
+        val mockSessionRepository = mock[SessionRepository]
+        val captor                =
+          ArgumentCaptor.forClass(classOf[UserAnswers])
+
+        val verifiedIndividual =
+          subcontractor.copy(
+            verified = Some("Y"),
+            pendingVerifications = Some(0)
+          )
+
+        mockSuccessfulService(
+          mockService,
+          response.copy(
+            subcontractor = Some(verifiedIndividual)
+          )
+        )
+
+        mockSuccessfulRepository(mockSessionRepository)
+
+        val application =
+          applicationBuilder(userAnswers = Some(emptyUserAnswers))
+            .overrides(
+              bind[SubcontractorService].toInstance(mockService),
+              bind[SessionRepository].toInstance(mockSessionRepository)
+            )
+            .build()
+
+        running(application) {
+          route(
+            application,
+            FakeRequest(GET, amendIndividualRoute)
+          ).value.futureValue
+
+          verify(mockSessionRepository).set(captor.capture())
+
+          captor.getValue
+            .get(ShowVerificationDetailsPage)
+            .value mustBe true
+        }
+      }
+
+      "must show verification details when the individual is unverified but has a pending verification" in {
+        val mockService           = mock[SubcontractorService]
+        val mockSessionRepository = mock[SessionRepository]
+        val captor                =
+          ArgumentCaptor.forClass(classOf[UserAnswers])
+
+        val pendingIndividual =
+          subcontractor.copy(
+            verified = Some("N"),
+            pendingVerifications = Some(1)
+          )
+
+        mockSuccessfulService(
+          mockService,
+          response.copy(
+            subcontractor = Some(pendingIndividual)
+          )
+        )
+
+        mockSuccessfulRepository(mockSessionRepository)
+
+        val application =
+          applicationBuilder(userAnswers = Some(emptyUserAnswers))
+            .overrides(
+              bind[SubcontractorService].toInstance(mockService),
+              bind[SessionRepository].toInstance(mockSessionRepository)
+            )
+            .build()
+
+        running(application) {
+          route(
+            application,
+            FakeRequest(GET, amendIndividualRoute)
+          ).value.futureValue
+
+          verify(mockSessionRepository).set(captor.capture())
+
+          captor.getValue
+            .get(ShowVerificationDetailsPage)
+            .value mustBe true
+        }
+      }
+
+      "must hide verification details when the individual is unverified and has no pending verification" in {
+        val mockService           = mock[SubcontractorService]
+        val mockSessionRepository = mock[SessionRepository]
+        val captor                =
+          ArgumentCaptor.forClass(classOf[UserAnswers])
+
+        val unverifiedIndividual =
+          subcontractor.copy(
+            verified = Some("N"),
+            pendingVerifications = Some(0)
+          )
+
+        mockSuccessfulService(
+          mockService,
+          response.copy(
+            subcontractor = Some(unverifiedIndividual)
+          )
+        )
+
+        mockSuccessfulRepository(mockSessionRepository)
+
+        val application =
+          applicationBuilder(userAnswers = Some(emptyUserAnswers))
+            .overrides(
+              bind[SubcontractorService].toInstance(mockService),
+              bind[SessionRepository].toInstance(mockSessionRepository)
+            )
+            .build()
+
+        running(application) {
+          route(
+            application,
+            FakeRequest(GET, amendIndividualRoute)
+          ).value.futureValue
+
+          verify(mockSessionRepository).set(captor.capture())
+
+          captor.getValue
+            .get(ShowVerificationDetailsPage)
+            .value mustBe false
         }
       }
     }

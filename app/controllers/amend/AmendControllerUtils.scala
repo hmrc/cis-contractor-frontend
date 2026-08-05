@@ -37,4 +37,11 @@ object AmendControllerUtils {
     subcontractor.subcontractorType.exists(
       _.trim.equalsIgnoreCase(expectedType)
     )
+
+  def shouldShowVerificationDetails(
+    subcontractor: SubcontractorResponse
+  ): Boolean =
+    subcontractor.verified.exists(
+      _.trim.equalsIgnoreCase("Y")
+    ) || subcontractor.pendingVerifications.exists(_ > 0)
 }
