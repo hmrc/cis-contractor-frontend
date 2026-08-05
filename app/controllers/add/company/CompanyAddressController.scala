@@ -60,9 +60,8 @@ class CompanyAddressController @Inject() (
 
   override protected def onChangeCompletion(isAmend: Boolean): Call =
     if (isAmend) {
-      controllers.routes.JourneyRecoveryController.onPageLoad()
-    } // TODO: redirect to amend cya page
-    else {
+      controllers.amend.company.routes.AmendCompanyCheckYourAnswersController.onPageLoad()
+    } else {
       routes.CompanyCheckYourAnswersController.onPageLoad()
     }
 

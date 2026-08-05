@@ -14,16 +14,17 @@
  * limitations under the License.
  */
 
-package pages.verify
+package forms.amend.trust
 
-import pages.QuestionPage
-import play.api.libs.json.JsPath
+import forms.mappings.Mappings
+import play.api.data.Form
 
-case object RebuildVerificationFromWarningPage extends QuestionPage[Boolean] {
+import javax.inject.Inject
 
-  override def path: JsPath =
-    JsPath \ toString
+class AmendTrustRemoveDetailYesNoFormProvider @Inject() extends Mappings {
 
-  override def toString: String =
-    "rebuildVerificationFromWarning"
+  def apply(): Form[Boolean] =
+    Form(
+      "value" -> boolean("amendTrustRemoveDetailYesNo.error.required")
+    )
 }

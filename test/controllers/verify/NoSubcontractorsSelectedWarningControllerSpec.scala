@@ -87,52 +87,6 @@ class NoSubcontractorsSelectedWarningControllerSpec extends SpecBase with Matche
       }
     }
 
-    "must return OK for CheckMode when CisId is present" in {
-
-      val userAnswers =
-        UserAnswers(userAnswersId)
-          .set(CisIdQuery, cisId)
-          .success
-          .value
-
-      val application =
-        applicationBuilder(userAnswers = Some(userAnswers)).build()
-
-      running(application) {
-
-        val request =
-          FakeRequest(
-            GET,
-            routes.NoSubcontractorsSelectedWarningController.onPageLoadCheckMode().url
-          )
-
-        val result = route(application, request).value
-
-        status(result) mustBe OK
-      }
-    }
-
-    "must redirect to Journey Recovery from CheckMode when CisId is missing" in {
-
-      val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
-
-      running(application) {
-
-        val request =
-          FakeRequest(
-            GET,
-            routes.NoSubcontractorsSelectedWarningController.onPageLoadCheckMode().url
-          )
-
-        val result = route(application, request).value
-
-        status(result) mustBe SEE_OTHER
-        redirectLocation(result).value mustBe
-          controllers.routes.JourneyRecoveryController.onPageLoad().url
-      }
-    }
-
     "must redirect to Journey Recovery when CisId is missing" in {
 
       val application =
