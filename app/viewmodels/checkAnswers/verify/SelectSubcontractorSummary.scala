@@ -28,7 +28,7 @@ object SelectSubcontractorSummary {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] = {
     val selectEmptyReverify = List(messages("verify.selectSubcontractor.display.noneSelected"))
-    answers.get(SelectSubcontractorPage).flatMap { answers =>
+    answers.get(SelectSubcontractorPage).filter(_.nonEmpty).flatMap { answers =>
       val selectNames = answers.toSeq.map(sub => HtmlFormat.escape(sub.name).toString)
 
       val names = if (selectNames.isEmpty) selectEmptyReverify else selectNames
