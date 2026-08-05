@@ -18,14 +18,27 @@ package controllers.amend.trust
 
 import base.SpecBase
 import models.amend.trust.OriginalTrustAnswers
+import models.UserAnswers
 import pages.add.trust.TrustNamePage
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import queries.{CisIdQuery, OriginalTrustAnswersQuery}
 import viewmodels.amend.trust.TrustAmendConfirmationViewModel
 import views.html.amend.AmendConfirmationView
+import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito.{mock, never, reset, verify, when}
+import org.scalatest.BeforeAndAfterEach
+import org.scalatestplus.mockito.MockitoSugar
+import play.api.inject.bind
+import repositories.SessionRepository
+import utils.DefaultSubcontractorCleanupService
+import scala.concurrent.Future
+import scala.util.{Failure, Success}
 
-class AmendTrustConfirmationControllerSpec extends SpecBase {
+class AmendTrustConfirmationControllerSpec
+  extends SpecBase
+    with MockitoSugar
+    with BeforeAndAfterEach {
   private val cisId     = "123456789"
   private val trustName = "ABC Trust"
   private val original  =
@@ -60,10 +73,36 @@ class AmendTrustConfirmationControllerSpec extends SpecBase {
   private lazy val confirmationRoute =
     controllers.amend.trust.routes.AmendTrustConfirmationController.onPageLoad().url
 
+  private val mockCleanupService =
+    mock[DefaultSubcontractorCleanupService]
+
+  private val mockSessionRepository =
+    mock[SessionRepository]
+
+  override protected def beforeEach(): Unit = {
+    super.beforeEach()
+    reset(mockCleanupService, mockSessionRepository)
+  }
+
+  private def application(userAnswers: UserAnswers) =
+    applicationBuilder(userAnswers = Some(userAnswers))
+      .overrides(
+        bind[DefaultSubcontractorCleanupService].toInstance(mockCleanupService),
+        bind[SessionRepository].toInstance(mockSessionRepository)
+      )
+      .build()
+
   "AmendTrustConfirmationController" - {
 
     "must return OK and the correct view for a GET" in {
-      val application = applicationBuilder(userAnswers = Some(userAnswersWithOriginal)).build()
+
+      when(mockCleanupService.cleanAmend(any[UserAnswers]))
+        .thenReturn(Success(userAnswersWithOriginal))
+
+      when(mockSessionRepository.set(any[UserAnswers]))
+        .thenReturn(Future.successful(true))
+
+      val application = this.application(userAnswersWithOriginal)
 
       running(application) {
 
@@ -84,10 +123,10 @@ class AmendTrustConfirmationControllerSpec extends SpecBase {
             application.injector
               .instanceOf[config.FrontendAppConfig]
               .retrieveSubcontractorListUrl
-          )(
-            request,
-            messages(application)
-          ).toString
+          )(request, messages(application)).toString
+
+        verify(mockCleanupService).cleanAmend(any())
+        verify(mockSessionRepository).set(any())
       }
     }
 
@@ -140,6 +179,27 @@ class AmendTrustConfirmationControllerSpec extends SpecBase {
 
         redirectLocation(result).value mustEqual
           controllers.routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must redirect to Journey Recovery when cleanup fails" in {
+
+      when(mockCleanupService.cleanAmend(any[UserAnswers]))
+        .thenReturn(Failure(new RuntimeException("cleanup failed")))
+
+      val application = this.application(userAnswersWithOriginal)
+
+      running(application) {
+
+        val request = FakeRequest(GET, confirmationRoute)
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(result).value mustEqual
+          controllers.routes.JourneyRecoveryController.onPageLoad().url
+
+        verify(mockSessionRepository, never()).set(any())
       }
     }
   }

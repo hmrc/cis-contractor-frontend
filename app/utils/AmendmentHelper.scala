@@ -18,7 +18,8 @@ package utils
 
 import models.UserAnswers
 import pages.add.company.*
-import queries.OriginalCompanyAnswersQuery
+import pages.add.trust.*
+import queries.{OriginalCompanyAnswersQuery, OriginalTrustAnswersQuery}
 
 object AmendmentHelper {
 
@@ -39,6 +40,26 @@ object AmendmentHelper {
         original.crn                        -> userAnswers.get(CompanyCrnPage),
         original.worksReferenceYesNo        -> userAnswers.get(CompanyWorksReferenceYesNoPage),
         original.worksReference             -> userAnswers.get(CompanyWorksReferencePage)
+      ).exists { case (originalValue, currentValue) =>
+        originalValue != currentValue
+      }
+    }
+
+  def trustHasChanges(userAnswers: UserAnswers): Boolean =
+    userAnswers.get(OriginalTrustAnswersQuery).exists { original =>
+      Seq(
+        original.trustName -> userAnswers.get(TrustNamePage),
+        original.addressYesNo -> userAnswers.get(TrustAddressYesNoPage),
+        original.address -> userAnswers.get(TrustAddressPage),
+        original.trustContactMethodsYesNo -> userAnswers.get(AddTrustContactMethodsYesNoPage),
+        original.trustContactMethod -> userAnswers.get(TrustContactMethodOptionsPage).getOrElse(Set.empty),
+        original.email -> userAnswers.get(TrustEmailAddressPage),
+        original.phone -> userAnswers.get(TrustPhoneNumberPage),
+        original.mobile -> userAnswers.get(TrustMobileNumberPage),
+        original.utrYesNo -> userAnswers.get(TrustUtrYesNoPage),
+        original.utr -> userAnswers.get(TrustUtrPage),
+        original.worksReferenceYesNo -> userAnswers.get(TrustWorksReferenceYesNoPage),
+        original.worksReference -> userAnswers.get(TrustWorksReferencePage)
       ).exists { case (originalValue, currentValue) =>
         originalValue != currentValue
       }

@@ -26,11 +26,15 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.libs.json.Reads
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import queries.{CisIdQuery, OriginalTrustAnswersQuery}
+import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import utils.DefaultSubcontractorCleanupService
 import viewmodels.amend.trust.TrustAmendConfirmationViewModel
 import views.html.amend.AmendConfirmationView
 
+import scala.util.{Failure, Success}
 import javax.inject.Inject
+import scala.concurrent.{ExecutionContext, Future}
 
 class AmendTrustConfirmationController @Inject() (
   override val messagesApi: MessagesApi,
@@ -38,14 +42,19 @@ class AmendTrustConfirmationController @Inject() (
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   val controllerComponents: MessagesControllerComponents,
+  cleanupService: DefaultSubcontractorCleanupService,
+  sessionRepository: SessionRepository,
   view: AmendConfirmationView,
   appConfig: FrontendAppConfig
-) extends FrontendBaseController
+)(implicit ec: ExecutionContext) extends FrontendBaseController
     with I18nSupport
     with Logging {
 
   def onPageLoad(): Action[AnyContent] =
-    (identify andThen getData andThen requireData) { implicit request =>
+    (identify andThen getData andThen requireData).async { implicit request =>
+
+      val recoveryRedirect =
+        Redirect(routes.JourneyRecoveryController.onPageLoad())
 
       val ua = request.userAnswers
 
@@ -53,23 +62,39 @@ class AmendTrustConfirmationController @Inject() (
 
         case None =>
           logger.error("[AmendTrustConfirmationController] Missing OriginalTrustAnswersQuery")
-          Redirect(routes.JourneyRecoveryController.onPageLoad())
+          Future.successful(recoveryRedirect)
 
         case Some(originalTrustAnswers) =>
           ua.get(CisIdQuery) match {
 
             case None =>
               logger.error("[AmendTrustConfirmationController] Missing CisIdQuery")
-              Redirect(routes.JourneyRecoveryController.onPageLoad())
+              Future.successful(recoveryRedirect)
 
             case Some(_) =>
-              Ok(
-                view(
-                  TrustAmendConfirmationViewModel.rows(originalTrustAnswers, ua),
-                  trustDisplayName(ua),
-                  appConfig.retrieveSubcontractorListUrl
-                )
-              )
+              val tableRows = TrustAmendConfirmationViewModel.rows(originalTrustAnswers, ua)
+              val trustName = trustDisplayName(ua)
+
+              cleanupService.cleanAmend(ua) match {
+
+                case Success(cleanedUa) =>
+                  sessionRepository.set(cleanedUa).map { _ =>
+                    Ok(
+                      view(
+                        tableRows,
+                        trustName,
+                        appConfig.retrieveSubcontractorListUrl
+                      )
+                    )
+                  }
+
+                case Failure(exception) =>
+                  logger.warn(
+                    "[AmendTrustConfirmationController] Failed to clean user answers",
+                    exception
+                  )
+                  Future.successful(recoveryRedirect)
+              }
           }
       }
     }

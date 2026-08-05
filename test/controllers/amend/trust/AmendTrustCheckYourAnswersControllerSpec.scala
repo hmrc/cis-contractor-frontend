@@ -40,6 +40,9 @@ import models.contact.ContactMethodOptions
 import pages.amend.ShowVerificationDetailsPage
 import org.mockito.ArgumentCaptor
 import pages.amend.AmendCheckYourAnswersSubmittedPage
+import queries.CisIdQuery
+import utils.AmendmentHelper
+import config.FrontendAppConfig
 
 class AmendTrustCheckYourAnswersControllerSpec extends SpecBase with MockitoSugar {
   private val address =
@@ -88,7 +91,7 @@ class AmendTrustCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
       .set(TrustWorksReferenceYesNoPage, true)
       .success
       .value
-      .set(TrustWorksReferencePage, "WRN-1")
+      .set(TrustWorksReferencePage, "WRN-11")
       .success
       .value
       .set(ShowVerificationDetailsPage, false)
@@ -148,7 +151,7 @@ class AmendTrustCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
         page must include("Trust")
         page must include("Test Trust")
         page must include("11111111")
-        page must include("WRN-1")
+        page must include("WRN-11")
         page must include("test@test.com")
         page must include("12 Harbor View Road")
         page must include("Amity Island")
@@ -233,7 +236,7 @@ class AmendTrustCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
         page must include(msg("trustWorksReferenceYesNo.checkYourAnswersLabel"))
         page must include(msg("trustWorksReference.checkYourAnswersLabel"))
         page must include(msg("site.no"))
-        page must include("WRN-1")
+        page must include("WRN-11")
       }
     }
 
@@ -381,6 +384,54 @@ class AmendTrustCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
       verifyNoInteractions(mockSubcontractorService)
     }
 
+    "must redirect to Manage Your Subcontractors when no changes have been made" in {
+      val cisId = "cis-123"
+
+      val ua =
+        minUa
+          .set(CisIdQuery, cisId)
+          .success
+          .value
+          .set(TrustWorksReferencePage, "WRN-1")
+          .success
+          .value
+
+      val mockSubcontractorService = mock[SubcontractorService]
+      val mockSessionRepository = mock[SessionRepository]
+
+      AmendmentHelper.trustHasChanges(ua) mustBe false
+
+      val application =
+        applicationBuilder(userAnswers = Some(ua))
+          .configure(
+            "urls.manage-your-subcontractors" ->
+              s"http://localhost:6996/construction-industry-scheme/management/subcontractors/$cisId/your-subcontractors"
+          )
+          .overrides(
+            bind[SubcontractorService].toInstance(mockSubcontractorService),
+            bind[SessionRepository].toInstance(mockSessionRepository)
+          )
+          .build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(
+            POST,
+            controllers.amend.trust.routes.AmendTrustCheckYourAnswersController.onSubmit().url
+          )
+
+        val result = route(application, request).value
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result).value mustBe
+          "http://localhost:6996/construction-industry-scheme/management/subcontractors/cis-123/your-subcontractors"
+      }
+
+      verifyNoInteractions(mockSubcontractorService)
+      verifyNoInteractions(mockSessionRepository)
+    }
+    
     "must redirect to Journey Recovery when the service fails" in {
 
       val mockSubcontractorService = mock[SubcontractorService]
@@ -448,15 +499,20 @@ class AmendTrustCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
         .createAndUpdateSubcontractor(any[UserAnswers])(any[HeaderCarrier])
     }
 
-    "must clear answers and redirect to Index on cancel" in {
+    "must clear answers and redirect to your subcontractor page on cancel" in {
 
+      val ua                    =
+        minUa
+          .set(CisIdQuery, "cis-123")
+          .success
+          .value
       val mockSessionRepository = mock[SessionRepository]
 
       when(mockSessionRepository.set(any[UserAnswers]))
         .thenReturn(Future.successful(true))
 
       val application =
-        applicationBuilder(userAnswers = Some(minUa))
+        applicationBuilder(userAnswers = Some(ua))
           .overrides(
             bind[SessionRepository].toInstance(mockSessionRepository)
           )
@@ -471,7 +527,9 @@ class AmendTrustCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual
-          routes.IndexController.onPageLoad().url
+          app.injector
+            .instanceOf[FrontendAppConfig]
+            .manageYourSubcontractorsUrl("cis-123")
       }
 
       verify(mockSessionRepository).set(any[UserAnswers])
