@@ -82,10 +82,14 @@ POST  /subcontractor/amend/add-contact-details  controllers.add.AddIndividualCon
 GET   /subcontractor/amend/select-contact-details  controllers.add.IndividualContactMethodOptionsController.onPageLoad(mode: Mode = AmendMode)
 POST  /subcontractor/amend/select-contact-details  controllers.add.IndividualContactMethodOptionsController.onSubmit(mode: Mode = AmendMode)
 
+GET   /subcontractor/amend/individual/:cisId/:subbieResourceRef  controllers.amend.AmendIndividualController.onPageLoad(cisId: String, subbieResourceRef: Long)
 GET   /subcontractor/amend/remove/information/:subcontractorDetail  controllers.amend.AmendIndividualRemoveDetailYesNoController.onPageLoad(subcontractorDetail: String)
 POST  /subcontractor/amend/remove/information/:subcontractorDetail  controllers.amend.AmendIndividualRemoveDetailYesNoController.onSubmit(subcontractorDetail: String)
 
 GET   /subcontractor/amend/individual/:cisId/:subbieResourceRef  controllers.amend.AmendIndividualController.onPageLoad(cisId: String, subbieResourceRef: Long)
+
+GET   /subcontractor/amend/trust/remove/information/:subcontractorDetail  controllers.amend.trust.AmendTrustRemoveDetailYesNoController.onPageLoad(subcontractorDetail: String)
+POST  /subcontractor/amend/trust/remove/information/:subcontractorDetail  controllers.amend.trust.AmendTrustRemoveDetailYesNoController.onSubmit(subcontractorDetail: String)
 
 GET   /subcontractor/amend/partnership/:cisId/:subbieResourceRef  controllers.amend.partnership.AmendPartnershipController.onPageLoad(cisId: String, subbieResourceRef: Long)
 
@@ -99,16 +103,20 @@ POST  /subcontractor/amend/subcontractor-information  controllers.amend.AmendInd
 GET   /subcontractor/amend/partnership-information  controllers.amend.partnership.AmendPartnershipCheckYourAnswersController.onPageLoad()
 POST  /subcontractor/amend/partnership-information  controllers.amend.partnership.AmendPartnershipCheckYourAnswersController.onSubmit()
 
-GET   /subcontractor/amend/company-information  controllers.amend.company.AmendCompanyCheckYourAnswersController.onPageLoad()
-POST  /subcontractor/amend/company-information  controllers.amend.company.AmendCompanyCheckYourAnswersController.onSubmit()
+GET   /subcontractor/amend/company-information                controllers.amend.company.AmendCompanyCheckYourAnswersController.onPageLoad()
+POST  /subcontractor/amend/company-information                controllers.amend.company.AmendCompanyCheckYourAnswersController.onSubmit()
+GET   /subcontractor/amend/company/subcontractor-information  controllers.amend.company.AmendCompanyCheckYourAnswersController.onPageLoad()
+POST  /subcontractor/amend/company/subcontractor-information  controllers.amend.company.AmendCompanyCheckYourAnswersController.onSubmit()
+GET   /subcontractor/amend/company/cancel                     controllers.amend.company.AmendCompanyCheckYourAnswersController.onCancel()
+
+GET   /subcontractor/amend/company/subcontractor-details-updated  controllers.amend.company.AmendCompanyConfirmationController.onPageLoad()
 
 GET   /subcontractor/amend/trust/subcontractor-information  controllers.amend.trust.AmendTrustCheckYourAnswersController.onPageLoad()
 POST  /subcontractor/amend/trust/subcontractor-information  controllers.amend.trust.AmendTrustCheckYourAnswersController.onSubmit()
 GET   /subcontractor/amend/trust/cancel                     controllers.amend.trust.AmendTrustCheckYourAnswersController.onCancel()
 
-GET   /subcontractor/amend/company/subcontractor-information  controllers.amend.company.AmendCompanyCheckYourAnswersController.onPageLoad()
-POST  /subcontractor/amend/company/subcontractor-information  controllers.amend.company.AmendCompanyCheckYourAnswersController.onSubmit()
-GET   /subcontractor/amend/company/cancel                     controllers.amend.company.AmendCompanyCheckYourAnswersController.onCancel()
+GET   /subcontractor/amend/partnership/remove/information/:subcontractorDetail  controllers.amend.partnership.AmendPartnershipRemoveDetailYesNoController.onPageLoad(subcontractorDetail: String)
+POST  /subcontractor/amend/partnership/remove/information/:subcontractorDetail  controllers.amend.partnership.AmendPartnershipRemoveDetailYesNoController.onSubmit(subcontractorDetail: String)
 
 # Errors & Auth
 GET  /unauthorised/standard-user  controllers.UnauthorisedWrongRoleController.onPageLoad()
@@ -612,6 +620,8 @@ GET   /subcontractor/verify/verification-status/reverification-decision  control
 GET   /subcontractor/verify/verification-status/select-subcontractors    controllers.verify.VerificationStatusController.goToSelectSubcontractorsToReverify(mode: Mode = NormalMode)
 GET   /verify/verification-status/reverification-decision                controllers.verify.VerificationStatusController.goToReverificationDecision(mode: Mode = NormalMode)
 GET   /verify/verification-status/select-subcontractors                  controllers.verify.VerificationStatusController.goToSelectSubcontractorsToReverify(mode: Mode = NormalMode)
+
+GET   /subcontractor/verify/no-verification-results  controllers.verify.NoVerificationResultsController.onPageLoad()
 
 # Contractor Details
 GET   /contractor-details/introduction  controllers.contractordetails.ContractorDetailsController.onPageLoad()
