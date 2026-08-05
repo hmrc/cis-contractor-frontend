@@ -435,9 +435,7 @@ amendPartnershipRemoveDetailYesNo.detail.utr                                    
 amendPartnershipRemoveDetailYesNo.detail.worksReferenceNumber                       =  works reference number
 amendPartnershipRemoveDetailYesNo.detail.nominatedPartnerUtr                        =  nominated partner's UTR
 amendPartnershipRemoveDetailYesNo.detail.nominatedPartnerNino                       =  nominated partner's National Insurance number
-amendPartnershipRemoveDet
-
-CompanyRegistrationNumber  =  nominated partner's company registration number
+amendPartnershipRemoveDetailYesNo.detail.nominatedPartnerCompanyRegistrationNumber  =  nominated partner's company registration number
 
 # Partnership
 addPartnershipContactMethodsYesNo.title                     =  Do you want to add contact details for this partnership?
