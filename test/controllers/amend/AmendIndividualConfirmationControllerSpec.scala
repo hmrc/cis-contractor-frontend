@@ -25,8 +25,20 @@ import play.api.test.Helpers.*
 import queries.{CisIdQuery, OriginalIndividualAnswersQuery}
 import viewmodels.amend.IndividualAmendedViewModel
 import views.html.amend.AmendConfirmationView
+import config.FrontendAppConfig
+import models.UserAnswers
+import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito.{mock, never, reset, verify, when}
+import org.scalatest.BeforeAndAfterEach
+import org.scalatestplus.mockito.MockitoSugar
+import play.api.inject.bind
+import repositories.SessionRepository
+import utils.DefaultSubcontractorCleanupService
 
-class AmendIndividualConfirmationControllerSpec extends SpecBase {
+import scala.concurrent.Future
+import scala.util.{Failure, Success}
+
+class AmendIndividualConfirmationControllerSpec extends SpecBase with MockitoSugar with BeforeAndAfterEach {
 
   private val cisId = "123456789"
 
@@ -75,20 +87,43 @@ class AmendIndividualConfirmationControllerSpec extends SpecBase {
   private lazy val confirmationRoute =
     controllers.amend.routes.AmendIndividualConfirmationController.onPageLoad().url
 
+  private val mockCleanupService =
+    mock[DefaultSubcontractorCleanupService]
+
+  private val mockSessionRepository =
+    mock[SessionRepository]
+
+  override protected def beforeEach(): Unit = {
+    super.beforeEach()
+    reset(mockCleanupService, mockSessionRepository)
+  }
+
+  private def application(userAnswers: UserAnswers) =
+    applicationBuilder(userAnswers = Some(userAnswers))
+      .overrides(
+        bind[DefaultSubcontractorCleanupService].toInstance(mockCleanupService),
+        bind[SessionRepository].toInstance(mockSessionRepository)
+      )
+      .build()
+
   "AmendIndividualConfirmationController" - {
 
     "must return OK and the correct view for a GET" in {
 
-      val application =
-        applicationBuilder(userAnswers = Some(userAnswersWithOriginal)).build()
+      when(mockCleanupService.cleanAmend(any[UserAnswers]))
+        .thenReturn(Success(userAnswersWithOriginal))
 
-      running(application) {
+      when(mockSessionRepository.set(any[UserAnswers]))
+        .thenReturn(Future.successful(true))
+
+      val app = application(userAnswersWithOriginal)
+
+      running(app) {
 
         val request = FakeRequest(GET, confirmationRoute)
-        val result  = route(application, request).value
+        val result  = route(app, request).value
 
-        val view =
-          application.injector.instanceOf[AmendConfirmationView]
+        val view = app.injector.instanceOf[AmendConfirmationView]
 
         status(result) mustEqual OK
 
@@ -97,15 +132,15 @@ class AmendIndividualConfirmationControllerSpec extends SpecBase {
             IndividualAmendedViewModel.rows(
               original,
               userAnswersWithOriginal
-            )(messages(application)),
+            )(messages(app)),
             displayName,
-            application.injector
-              .instanceOf[config.FrontendAppConfig]
+            app.injector
+              .instanceOf[FrontendAppConfig]
               .manageYourSubcontractorsUrl(cisId)
-          )(
-            request,
-            messages(application)
-          ).toString
+          )(request, messages(app)).toString
+
+        verify(mockCleanupService).cleanAmend(any())
+        verify(mockSessionRepository).set(any())
       }
     }
 
@@ -120,13 +155,12 @@ class AmendIndividualConfirmationControllerSpec extends SpecBase {
           .success
           .value
 
-      val application =
-        applicationBuilder(userAnswers = Some(userAnswers)).build()
+      val app = application(userAnswers)
 
-      running(application) {
+      running(app) {
 
         val request = FakeRequest(GET, confirmationRoute)
-        val result  = route(application, request).value
+        val result  = route(app, request).value
 
         status(result) mustEqual SEE_OTHER
 
@@ -146,18 +180,37 @@ class AmendIndividualConfirmationControllerSpec extends SpecBase {
           .success
           .value
 
-      val application =
-        applicationBuilder(userAnswers = Some(userAnswers)).build()
+      val app = application(userAnswers)
 
-      running(application) {
+      running(app) {
 
         val request = FakeRequest(GET, confirmationRoute)
-        val result  = route(application, request).value
+        val result  = route(app, request).value
 
         status(result) mustEqual SEE_OTHER
 
         redirectLocation(result).value mustEqual
           controllers.routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must redirect to Journey Recovery when cleanup fails" in {
+      when(mockCleanupService.cleanAmend(any[UserAnswers]))
+        .thenReturn(Failure(new RuntimeException("cleanup failed")))
+
+      val app = application(userAnswersWithOriginal)
+
+      running(app) {
+
+        val request = FakeRequest(GET, confirmationRoute)
+        val result  = route(app, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(result).value mustEqual
+          controllers.routes.JourneyRecoveryController.onPageLoad().url
+
+        verify(mockSessionRepository, never()).set(any())
       }
     }
   }

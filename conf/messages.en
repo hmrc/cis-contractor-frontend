@@ -1100,26 +1100,4 @@ contractordetails.removeDetailYesNo.detail.schemeName                          =
 contractordetails.removeDetailYesNo.error.required.email                       =  Select yes to remove the contractor’s email address
 contractordetails.removeDetailYesNo.error.required.schemeName                  =  Select yes to remove the contractor’s scheme name
 
-amendCheckYourAnswers.title = Subcontractor information
-amendCheckYourAnswers.heading.subcontractorInformation.h2    = Subcontractor information
-amendCheckYourAnswers.heading.moreDetails.h2    = More details
-amendCheckYourAnswers.confirm.h2 = Confirm changes
-amendCheckYourAnswers.confirm.p1 = By changing this subcontractor’s details you are confirming that, to the best of your knowledge, the details you are providing are correct.
-amendCheckYourAnswers.confirm = Confirm
-amendCheckYourAnswers.cancelChanges = Cancel changes
-amendCheckYourAnswers.verificationNumber.label = Verification number
-
-amendConfirmation.panel.heading                                              =  Subcontractor details updated
-amendConfirmation.p1                                                         =  You have updated the subcontractor details for {0}.
-amendConfirmation.updatesMade.h2                                             =  Updates made
-amendConfirmation.table.hdr.previous                                         =  Previous
-amendConfirmation.table.hdr.updated                                          =  Updated
-amendConfirmation.table.hdr.details                                          =  Details
-amendConfirmation.backTo                                                     =  Back to
-amendConfirmation.yourSubcontractors                                         =  Your subcontractors
-amendConfirmation.beforeYouGo.h2                                             =  Before you go
-amendConfirmation.beforeYouGo.p1                                             =  Your feedback helps us make our service better.
-amendConfirmation.beforeYouGo.takeAShortSurvey                               =  Take a short survey
-amendConfirmation.beforeYouGo.shareFeedback                                  =  to share your feedback on this service.
-amendConfirmation.table.content.none                                         =  None provided
 
