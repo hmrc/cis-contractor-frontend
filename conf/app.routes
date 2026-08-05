@@ -83,10 +83,9 @@ GET   /subcontractor/amend/select-contact-details  controllers.add.IndividualCon
 POST  /subcontractor/amend/select-contact-details  controllers.add.IndividualContactMethodOptionsController.onSubmit(mode: Mode = AmendMode)
 
 GET   /subcontractor/amend/individual/:cisId/:subbieResourceRef  controllers.amend.AmendIndividualController.onPageLoad(cisId: String, subbieResourceRef: Long)
+
 GET   /subcontractor/amend/remove/information/:subcontractorDetail  controllers.amend.AmendIndividualRemoveDetailYesNoController.onPageLoad(subcontractorDetail: String)
 POST  /subcontractor/amend/remove/information/:subcontractorDetail  controllers.amend.AmendIndividualRemoveDetailYesNoController.onSubmit(subcontractorDetail: String)
-
-GET   /subcontractor/amend/individual/:cisId/:subbieResourceRef  controllers.amend.AmendIndividualController.onPageLoad(cisId: String, subbieResourceRef: Long)
 
 GET   /subcontractor/amend/trust/remove/information/:subcontractorDetail  controllers.amend.trust.AmendTrustRemoveDetailYesNoController.onPageLoad(subcontractorDetail: String)
 POST  /subcontractor/amend/trust/remove/information/:subcontractorDetail  controllers.amend.trust.AmendTrustRemoveDetailYesNoController.onSubmit(subcontractorDetail: String)
