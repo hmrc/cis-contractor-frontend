@@ -35,7 +35,7 @@ class AmendCompanyRemoveDetailYesNoViewSpec extends AnyWordSpec with Matchers wi
   Seq(
     ("address", Address, "amendCompanyRemoveDetailYesNo.detail.address"),
     ("contact-details", ContactDetails, "amendCompanyRemoveDetailYesNo.detail.contactDetails"),
-    ("unique-taxpayer-reference", Utr, "amendCompanyRemoveDetailYesNo.detail.utr"),
+    ("utr", Utr, "amendCompanyRemoveDetailYesNo.detail.utr"),
     (
       "company-registration-number",
       CompanyRegistrationNumber,

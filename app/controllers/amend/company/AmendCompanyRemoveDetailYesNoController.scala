@@ -159,7 +159,7 @@ class AmendCompanyRemoveDetailYesNoController @Inject() (
                         )
                       _              <- sessionRepository.set(updatedAnswers)
                     } yield Redirect(
-                      controllers.amend.company.routes.AmendCompanyCheckYourAnswersController.onPageLoad().url
+                      controllers.amend.company.routes.AmendCompanyCheckYourAnswersController.onPageLoad()
                     )
                 )
             }
