@@ -35,10 +35,12 @@ import queries.OriginalIndividualAnswersQuery
 import repositories.SessionRepository
 import services.SubcontractorService
 import uk.gov.hmrc.http.HeaderCarrier
-
 import scala.concurrent.Future
 import models.contact.ContactMethodOptions
 import org.mockito.ArgumentCaptor
+import config.FrontendAppConfig
+import queries.CisIdQuery
+import utils.AmendmentHelper
 import pages.amend.{AmendCheckYourAnswersSubmittedPage, ShowVerificationDetailsPage}
 
 class AmendIndividualCheckYourAnswersControllerSpec extends SpecBase with MockitoSugar {
@@ -101,7 +103,7 @@ class AmendIndividualCheckYourAnswersControllerSpec extends SpecBase with Mockit
       .set(WorksReferenceNumberYesNoPage, true)
       .success
       .value
-      .set(WorksReferenceNumberPage, "WRN-1")
+      .set(WorksReferenceNumberPage, "WRN-11")
       .success
       .value
       .set(ShowVerificationDetailsPage, false)
@@ -173,7 +175,7 @@ class AmendIndividualCheckYourAnswersControllerSpec extends SpecBase with Mockit
         page must include("Individual")
         page must include("John Smith")
         page must include("11111111")
-        page must include("WRN-1")
+        page must include("WRN-11")
         page must include("test@test.com")
         page must include("12 Harbor View Road")
         page must include("Amity Island")
@@ -269,7 +271,72 @@ class AmendIndividualCheckYourAnswersControllerSpec extends SpecBase with Mockit
         page must include(msg("worksReferenceNumberYesNo.checkYourAnswersLabel"))
         page must include(msg("worksReferenceNumber.checkYourAnswersLabel"))
         page must include(msg("site.no"))
-        page must include("WRN-1")
+        page must include("WRN-11")
+      }
+    }
+
+    "must not render the verification number row when the individual is pending verification" in {
+
+      val verifiedUa =
+        minUa
+          .set(ShowVerificationDetailsPage, true)
+          .success
+          .value
+          .set(
+            OriginalIndividualAnswersQuery,
+            OriginalIndividualAnswers(
+              usesTradingName = Some(false),
+              subcontractorName = Some(
+                SubcontractorName(
+                  firstName = "John",
+                  middleName = None,
+                  lastName = "Smith"
+                )
+              ),
+              tradingName = None,
+              addressYesNo = Some(false),
+              address = None,
+              individualContactMethodsYesNo = Some(false),
+              individualContactMethod = Set.empty,
+              email = None,
+              phone = None,
+              mobile = None,
+              utrYesNo = Some(false),
+              utr = None,
+              ninoYesNo = Some(false),
+              nino = None,
+              worksReferenceYesNo = Some(false),
+              worksReference = None,
+              verificationNumber = None
+            )
+          )
+          .success
+          .value
+
+      val application =
+        applicationBuilder(userAnswers = Some(verifiedUa)).build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(
+            GET,
+            controllers.amend.routes.AmendIndividualCheckYourAnswersController.onPageLoad().url
+          )
+
+        val msg = application.injector.instanceOf[MessagesApi].preferred(request)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual OK
+
+        val page = contentAsString(result)
+
+        page must not include msg("amendCheckYourAnswers.verificationNumber.label")
+        page must not include "VRN123456"
+
+        page must include(msg("subcontractorsUniqueTaxpayerReference.checkYourAnswersLabel"))
+        page must include("11111111")
       }
     }
 
@@ -365,6 +432,54 @@ class AmendIndividualCheckYourAnswersControllerSpec extends SpecBase with Mockit
       verifyNoInteractions(mockSubcontractorService)
     }
 
+    "must redirect to Manage Your Subcontractors when no changes have been made" in {
+      val cisId = "cis-123"
+
+      val ua =
+        minUa
+          .set(CisIdQuery, cisId)
+          .success
+          .value
+          .set(WorksReferenceNumberPage, "WRN-1")
+          .success
+          .value
+
+      val mockSubcontractorService = mock[SubcontractorService]
+      val mockSessionRepository    = mock[SessionRepository]
+
+      AmendmentHelper.individualHasChanges(ua) mustBe false
+
+      val application =
+        applicationBuilder(userAnswers = Some(ua))
+          .configure(
+            "urls.manage-your-subcontractors" ->
+              s"http://localhost:6996/construction-industry-scheme/management/subcontractors/$cisId/your-subcontractors"
+          )
+          .overrides(
+            bind[SubcontractorService].toInstance(mockSubcontractorService),
+            bind[SessionRepository].toInstance(mockSessionRepository)
+          )
+          .build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(
+            POST,
+            controllers.amend.routes.AmendIndividualCheckYourAnswersController.onSubmit().url
+          )
+
+        val result = route(application, request).value
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result).value mustBe
+          "http://localhost:6996/construction-industry-scheme/management/subcontractors/cis-123/your-subcontractors"
+      }
+
+      verifyNoInteractions(mockSubcontractorService)
+      verifyNoInteractions(mockSessionRepository)
+    }
+
     "must redirect to Journey Recovery when the service fails" in {
 
       val mockSubcontractorService = mock[SubcontractorService]
@@ -434,13 +549,18 @@ class AmendIndividualCheckYourAnswersControllerSpec extends SpecBase with Mockit
 
     "must clear answers and redirect to Index on cancel" in {
 
+      val ua                    =
+        minUa
+          .set(CisIdQuery, "cis-123")
+          .success
+          .value
       val mockSessionRepository = mock[SessionRepository]
 
       when(mockSessionRepository.set(any[UserAnswers]))
         .thenReturn(Future.successful(true))
 
       val application =
-        applicationBuilder(userAnswers = Some(minUa))
+        applicationBuilder(userAnswers = Some(ua))
           .overrides(
             bind[SessionRepository].toInstance(mockSessionRepository)
           )
@@ -455,7 +575,9 @@ class AmendIndividualCheckYourAnswersControllerSpec extends SpecBase with Mockit
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual
-          routes.IndexController.onPageLoad().url
+          app.injector
+            .instanceOf[FrontendAppConfig]
+            .manageYourSubcontractorsUrl("cis-123")
       }
 
       verify(mockSessionRepository).set(any[UserAnswers])

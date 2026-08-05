@@ -19,53 +19,53 @@
 @import views.html.components._
 
 @this(
-  layout: templates.Layout,
-  govukPanel: GovukPanel,
-  govukTable: GovukTable,
-  h2: H2,
-  paragraph: Paragraph,
-  link: Link
+    layout: templates.Layout,
+    govukPanel: GovukPanel,
+    govukTable: GovukTable,
+    h2: H2,
+    paragraph: Paragraph,
+    link: Link
 )
 
-@(rows: Seq[Seq[TableRow]], subcontractorName: String, manageYourSubcontractorsUrl: String)(implicit request: Request[_], messages: Messages)
+@(rows: Seq[Seq[TableRow]], subcontractorName: String, retrieveSubcontractorListUrl: String)(implicit request: Request[_], messages: Messages)
 
 @layout(
-  pageTitle = titleNoForm(messages("amendConfirmation.panel.heading")),
-  showBackLink = false
-) {
-
-      @govukPanel(Panel(
+    pageTitle = titleNoForm(messages("amendConfirmation.panel.heading")),
+    showBackLink = false
+){
+    @govukPanel(Panel(
         title = messages("amendConfirmation.panel.heading")
-      ))
+    ))
 
-      @paragraph(messages("amendConfirmation.p1", subcontractorName))
+    @paragraph(messages("amendConfirmation.p1", subcontractorName))
 
-      @h2("amendConfirmation.updatesMade.h2")
+    @h2("amendConfirmation.updatesMade.h2")
 
-      @govukTable(Table(
+    @govukTable(Table(
         head = Some(Seq(
             HeadCell(Text(messages("amendConfirmation.table.hdr.details"))),
             HeadCell(Text(messages("amendConfirmation.table.hdr.previous"))),
             HeadCell(Text(messages("amendConfirmation.table.hdr.updated")))
         )),
         rows = rows
-      ))
+    ))
 
-      <p class="govuk-body">
-            @messages("amendConfirmation.backTo")
-            <a href="@manageYourSubcontractorsUrl" target="_blank" rel="noopener noreferrer" class="govuk-link">
-                @messages("amendConfirmation.yourSubcontractors")
-            </a>
-      </p>
+    @link(
+        linkTextKey = "amendConfirmation.yourSubcontractors",
+        linkUrl = retrieveSubcontractorListUrl,
+        hasFullStop = true,
+        prefixTextKey = "amendConfirmation.backTo",
+        isNewTab = false
+    )
 
-      @h2("amendConfirmation.beforeYouGo.h2")
+    @h2("amendConfirmation.beforeYouGo.h2")
 
-      @paragraph(messages("amendConfirmation.beforeYouGo.p1"))
+    @paragraph(messages("amendConfirmation.beforeYouGo.p1"))
 
-      <p class="govuk-body">
-            <a href="#" target="_blank" rel="noopener noreferrer" class="govuk-link">
-                @messages("amendConfirmation.beforeYouGo.takeAShortSurvey")
-            </a>
-            @messages("amendConfirmation.beforeYouGo.shareFeedback")
-      </p>
+    <p class="govuk-body">
+        <a href="#" target="_blank" rel="noopener noreferrer" class="govuk-link">
+            @messages("amendConfirmation.beforeYouGo.takeAShortSurvey")
+        </a>
+        @messages("amendConfirmation.beforeYouGo.shareFeedback")
+    </p>
 }
