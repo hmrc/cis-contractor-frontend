@@ -17,21 +17,22 @@
 package controllers.amend.trust
 
 import base.SpecBase
-import models.amend.trust.OriginalTrustAnswers
 import models.UserAnswers
+import models.amend.trust.OriginalTrustAnswers
+import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito.*
+import org.scalatest.BeforeAndAfterEach
+import org.scalatestplus.mockito.MockitoSugar
 import pages.add.trust.TrustNamePage
+import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import queries.{CisIdQuery, OriginalTrustAnswersQuery}
-import viewmodels.amend.trust.TrustAmendConfirmationViewModel
-import views.html.amend.AmendConfirmationView
-import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.{mock, never, reset, verify, when}
-import org.scalatest.BeforeAndAfterEach
-import org.scalatestplus.mockito.MockitoSugar
-import play.api.inject.bind
 import repositories.SessionRepository
 import utils.DefaultSubcontractorCleanupService
+import viewmodels.amend.trust.TrustAmendConfirmationViewModel
+import views.html.amend.AmendConfirmationView
+
 import scala.concurrent.Future
 import scala.util.{Failure, Success}
 
