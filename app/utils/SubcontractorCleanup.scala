@@ -120,6 +120,5 @@ object SubcontractorCleanup {
       .flatMap(_.remove(CurrentVerificationBatchResponsePage))
       .flatMap(_.remove(NewestVerificationBatchResponsePage))
       .flatMap(_.remove(VerificationBatchReadinessPage))
-      .flatMap(_.remove(RebuildVerificationFromWarningPage))
 
 }

@@ -16,8 +16,8 @@
 
 package models.verify
 
-import models.SubcontractorCurrentVerification
 import base.SpecBase
+import models.Subcontractor
 
 class VerificationBatchReadinessSpec extends SpecBase {
 
@@ -32,28 +32,26 @@ class VerificationBatchReadinessSpec extends SpecBase {
     partnerUtr: Option[String] = None,
     nino: Option[String] = None,
     crn: Option[String] = None
-  ): SubcontractorCurrentVerification =
-    SubcontractorCurrentVerification(
-      subcontractorId = id,
-      subbieResourceRef = None,
-      firstName = firstName,
-      secondName = None,
-      surname = surname,
-      tradingName = tradingName,
-      utr = utr,
-      nino = nino,
-      crn = crn,
-      partnerUtr = partnerUtr,
-      partnershipTradingName = partnershipTradingName,
-      subcontractorType = subType,
-      addressLine1 = None,
-      addressLine2 = None,
-      addressLine3 = None,
-      addressLine4 = None,
-      country = None,
-      postcode = None,
-      worksReferenceNumber = None
-    )
+  ): Subcontractor = Subcontractor(
+    subcontractorId = id,
+    firstName = firstName,
+    secondName = None,
+    surname = surname,
+    tradingName = tradingName,
+    partnershipTradingName = partnershipTradingName,
+    verified = None,
+    verificationNumber = None,
+    taxTreatment = None,
+    verificationDate = None,
+    lastMonthlyReturnDate = None,
+    createDate = None,
+    subcontractorType = subType,
+    subbieResourceRef = None,
+    utr = utr,
+    partnerUtr = partnerUtr,
+    crn = crn,
+    nino = nino
+  )
 
   "VerificationBatchReadiness.isSubcontractorReady" - {
 
