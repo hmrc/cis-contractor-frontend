@@ -90,7 +90,7 @@ class ReverifyExistingSubcontractorsYesNoControllerSpec extends SpecBase with Mo
       }
     }
 
-    "must redirect to CheckVerificationBatchReadiness on POST with false when selections exist" in {
+    "must redirect to CurrentVerificationBatch on POST with false when selections exist" in {
 
       val userAnswers =
         emptyUserAnswers
@@ -112,7 +112,7 @@ class ReverifyExistingSubcontractorsYesNoControllerSpec extends SpecBase with Mo
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual
-          controllers.verify.routes.CheckVerificationBatchReadinessController.checkVerificationBatchReadiness().url
+          controllers.verify.routes.CurrentVerificationBatchController.onPageLoad().url
       }
     }
 
