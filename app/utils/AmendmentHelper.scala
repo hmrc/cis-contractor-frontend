@@ -18,7 +18,8 @@ package utils
 
 import models.UserAnswers
 import pages.add.company.*
-import queries.OriginalCompanyAnswersQuery
+import pages.add.*
+import queries.{OriginalCompanyAnswersQuery, OriginalIndividualAnswersQuery}
 
 object AmendmentHelper {
 
@@ -39,6 +40,30 @@ object AmendmentHelper {
         original.crn                        -> userAnswers.get(CompanyCrnPage),
         original.worksReferenceYesNo        -> userAnswers.get(CompanyWorksReferenceYesNoPage),
         original.worksReference             -> userAnswers.get(CompanyWorksReferencePage)
+      ).exists { case (originalValue, currentValue) =>
+        originalValue != currentValue
+      }
+    }
+
+  def individualHasChanges(userAnswers: UserAnswers): Boolean =
+    userAnswers.get(OriginalIndividualAnswersQuery).exists { original =>
+      Seq(
+        original.usesTradingName               -> userAnswers.get(SubTradingNameYesNoPage),
+        original.tradingName                   -> userAnswers.get(TradingNameOfSubcontractorPage),
+        original.subcontractorName             -> userAnswers.get(SubcontractorNamePage),
+        original.addressYesNo                  -> userAnswers.get(SubAddressYesNoPage),
+        original.address                       -> userAnswers.get(AddressOfSubcontractorPage),
+        original.individualContactMethodsYesNo -> userAnswers.get(AddIndividualContactMethodsYesNoPage),
+        original.individualContactMethod       -> userAnswers.get(IndividualContactMethodOptionsPage).getOrElse(Set.empty),
+        original.email                         -> userAnswers.get(IndividualEmailAddressPage),
+        original.phone                         -> userAnswers.get(IndividualPhoneNumberPage),
+        original.mobile                        -> userAnswers.get(IndividualMobileNumberPage),
+        original.utrYesNo                      -> userAnswers.get(UniqueTaxpayerReferenceYesNoPage),
+        original.utr                           -> userAnswers.get(SubcontractorsUniqueTaxpayerReferencePage),
+        original.ninoYesNo                     -> userAnswers.get(NationalInsuranceNumberYesNoPage),
+        original.nino                          -> userAnswers.get(SubNationalInsuranceNumberPage),
+        original.worksReferenceYesNo           -> userAnswers.get(WorksReferenceNumberYesNoPage),
+        original.worksReference                -> userAnswers.get(WorksReferenceNumberPage)
       ).exists { case (originalValue, currentValue) =>
         originalValue != currentValue
       }
