@@ -397,7 +397,7 @@ class AmendTrustCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
           .value
 
       val mockSubcontractorService = mock[SubcontractorService]
-      val mockSessionRepository = mock[SessionRepository]
+      val mockSessionRepository    = mock[SessionRepository]
 
       AmendmentHelper.trustHasChanges(ua) mustBe false
 
@@ -431,7 +431,7 @@ class AmendTrustCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
       verifyNoInteractions(mockSubcontractorService)
       verifyNoInteractions(mockSessionRepository)
     }
-    
+
     "must redirect to Journey Recovery when the service fails" in {
 
       val mockSubcontractorService = mock[SubcontractorService]

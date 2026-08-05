@@ -35,10 +35,7 @@ import utils.DefaultSubcontractorCleanupService
 import scala.concurrent.Future
 import scala.util.{Failure, Success}
 
-class AmendTrustConfirmationControllerSpec
-  extends SpecBase
-    with MockitoSugar
-    with BeforeAndAfterEach {
+class AmendTrustConfirmationControllerSpec extends SpecBase with MockitoSugar with BeforeAndAfterEach {
   private val cisId     = "123456789"
   private val trustName = "ABC Trust"
   private val original  =
@@ -192,7 +189,7 @@ class AmendTrustConfirmationControllerSpec
       running(application) {
 
         val request = FakeRequest(GET, confirmationRoute)
-        val result = route(application, request).value
+        val result  = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
 

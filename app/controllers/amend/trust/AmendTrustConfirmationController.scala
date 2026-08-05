@@ -46,7 +46,8 @@ class AmendTrustConfirmationController @Inject() (
   sessionRepository: SessionRepository,
   view: AmendConfirmationView,
   appConfig: FrontendAppConfig
-)(implicit ec: ExecutionContext) extends FrontendBaseController
+)(implicit ec: ExecutionContext)
+    extends FrontendBaseController
     with I18nSupport
     with Logging {
 
