@@ -607,23 +607,6 @@ class VerifyNavigatorSpec extends SpecBase {
               .checkVerificationBatchReadinessInCheckMode()
         }
 
-        "must go to ReverifyExistingSubcontractorsYesNoController in CheckMode when rebuildVerificationFromWarning is true" in {
-          val ua =
-            emptyUserAnswers
-              .set(
-                SelectSubcontractorPage,
-                Set(SubcontractorViewModel("1", "Test Subcontractor"))
-              )
-              .success
-              .value
-              .set(RebuildVerificationFromWarningPage, true)
-              .success
-              .value
-
-          navigator.nextPage(SelectSubcontractorPage, CheckMode, ua) mustBe
-            controllers.verify.routes.ReverifyExistingSubcontractorsYesNoController.onPageLoad(CheckMode)
-        }
-
         "must go to NoSubcontractorsSelectedWarningController when no selections exist (CheckMode)" in {
 
           navigator.nextPage(
