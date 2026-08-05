@@ -670,3 +670,5 @@ GET   /contractor-details/remove-contractor-detail/:contractorDetail  controller
 POST  /contractor-details/remove-contractor-detail/:contractorDetail  controllers.contractordetails.RemoveDetailYesNoController.onSubmit(contractorDetail: String)
 
 GET   /subcontractor/verify/unmatched-subcontractors-exist                       controllers.UnmatchedSubcontractorsController.onPageLoad()
+
+GET   /subcontractor/no-unmatched-subcontractors                       controllers.NoUnmatchedSubcontractorsController.onPageLoad()
