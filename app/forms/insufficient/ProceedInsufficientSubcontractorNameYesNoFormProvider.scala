@@ -14,13 +14,17 @@
  * limitations under the License.
  */
 
-package pages
+package forms.insufficient
 
-import models.response.GetSubcontractorResponse
-import play.api.libs.json.JsPath
+import javax.inject.Inject
 
-case object GetSubcontractorResponsePage extends QuestionPage[GetSubcontractorResponse] {
+import forms.mappings.Mappings
+import play.api.data.Form
 
-  override def path: JsPath =
-    JsPath \ toString
+class ProceedInsufficientSubcontractorNameYesNoFormProvider @Inject() extends Mappings {
+
+  def apply(): Form[Boolean] =
+    Form(
+      "value" -> boolean("proceedInsufficientSubcontractorNameYesNo.error.required")
+    )
 }

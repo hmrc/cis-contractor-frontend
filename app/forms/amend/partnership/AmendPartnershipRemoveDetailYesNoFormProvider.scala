@@ -14,13 +14,19 @@
  * limitations under the License.
  */
 
-package pages
+package forms.amend.partnership
 
-import models.response.GetSubcontractorResponse
-import play.api.libs.json.JsPath
+import forms.mappings.Mappings
+import play.api.data.Form
 
-case object GetSubcontractorResponsePage extends QuestionPage[GetSubcontractorResponse] {
+import javax.inject.Inject
 
-  override def path: JsPath =
-    JsPath \ toString
+class AmendPartnershipRemoveDetailYesNoFormProvider @Inject() extends Mappings {
+
+  def apply(): Form[Boolean] =
+    Form(
+      "value" -> boolean(
+        requiredKey = "amendPartnershipRemoveDetailYesNo.error.required"
+      )
+    )
 }

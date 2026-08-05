@@ -100,6 +100,28 @@ class AddTrustContactMethodsYesNoSummarySpec extends AnyFreeSpec with Matchers {
       changeAction.attributes                 should contain("id" -> "add-trust-contact-details")
     }
 
+    "must return a SummaryListRow with 'No' and change action pointing to add flow when the answer is false in AmendMode" in {
+      val answers = UserAnswers("test-id")
+        .set(AddTrustContactMethodsYesNoPage, false)
+        .success
+        .value
+
+      val maybeRow: Option[SummaryListRow] = AddTrustContactMethodsYesNoSummary.row(answers, AmendMode)
+      maybeRow shouldBe defined
+
+      val row           = maybeRow.value
+      val expectedValue = messages("site.no")
+      row.value.content.asHtml.toString should include(expectedValue)
+
+      row.actions shouldBe defined
+      val actions = row.actions.value.items
+      actions should have size 1
+
+      val changeAction = actions.head
+      val expectedHref = routes.AddTrustContactMethodsYesNoController.onPageLoad(AmendMode).url
+      changeAction.href shouldBe expectedHref
+    }
+
     "must return a SummaryListRow with 'No' when the answer is false" in {
       val answers = UserAnswers("test-id")
         .set(AddTrustContactMethodsYesNoPage, false)

@@ -117,6 +117,34 @@ class TrustAddressYesNoSummarySpec extends SpecBase with GuiceOneAppPerSuite {
       action.attributes must contain("id" -> "add-trust-address")
     }
 
+    "return a row with key, value = no, and change action pointing to add flow when the answer is false in AmendMode" in {
+      val ua: UserAnswers =
+        emptyUserAnswers
+          .set(TrustAddressYesNoPage, false)
+          .success
+          .value
+
+      val maybeRow = TrustAddressYesNoSummary.row(ua, AmendMode)
+      maybeRow must not be empty
+
+      val row: SummaryListRow = maybeRow.value
+
+      row.key mustBe Key(content = Text(messages("trustAddressYesNo.checkYourAnswersLabel")))
+      row.value mustBe Value(content = Text(messages("site.no")))
+
+      row.actions must not be empty
+      val actions: Actions = row.actions.value
+      actions.items must have size 1
+
+      val action: ActionItem = actions.items.head
+      action.href mustBe controllers.add.trust.routes.TrustAddressYesNoController
+        .onPageLoad(AmendMode)
+        .url
+      action.content mustBe Text(messages("site.change"))
+      action.visuallyHiddenText mustBe Some(messages("trustAddressYesNo.change.hidden"))
+      action.attributes must contain("id" -> "add-trust-address")
+    }
+
     "return None when the answer is missing" in {
       val ua: UserAnswers = emptyUserAnswers
       TrustAddressYesNoSummary.row(ua) mustBe None
