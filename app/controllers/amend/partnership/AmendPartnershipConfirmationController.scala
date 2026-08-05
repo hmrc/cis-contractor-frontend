@@ -19,18 +19,20 @@ package controllers.amend.partnership
 import config.FrontendAppConfig
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
 import controllers.routes
-import models.UserAnswers
 import pages.add.partnership.PartnershipNamePage
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.libs.json.Reads
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import queries.{CisIdQuery, OriginalPartnershipAnswersQuery}
+import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import utils.DefaultSubcontractorCleanupService
 import viewmodels.checkAnswers.amend.partnership.AmendPartnershipConfirmationViewModel
 import views.html.amend.AmendConfirmationView
 
 import javax.inject.Inject
+import scala.concurrent.{ExecutionContext, Future}
+import scala.util.{Failure, Success}
 
 class AmendPartnershipConfirmationController @Inject() (
   override val messagesApi: MessagesApi,
@@ -38,14 +40,20 @@ class AmendPartnershipConfirmationController @Inject() (
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   val controllerComponents: MessagesControllerComponents,
+  cleanupService: DefaultSubcontractorCleanupService,
+  sessionRepository: SessionRepository,
   view: AmendConfirmationView,
   appConfig: FrontendAppConfig
-) extends FrontendBaseController
+)(implicit ec: ExecutionContext)
+    extends FrontendBaseController
     with I18nSupport
     with Logging {
 
   def onPageLoad(): Action[AnyContent] =
-    (identify andThen getData andThen requireData) { implicit request =>
+    (identify andThen getData andThen requireData).async { implicit request =>
+
+      val recoveryRedirect =
+        Redirect(routes.JourneyRecoveryController.onPageLoad())
 
       val ua = request.userAnswers
 
@@ -53,27 +61,39 @@ class AmendPartnershipConfirmationController @Inject() (
 
         case None =>
           logger.error("[AmendPartnershipConfirmationController] Missing OriginalPartnershipAnswersQuery")
-          Redirect(routes.JourneyRecoveryController.onPageLoad())
+          Future.successful(recoveryRedirect)
 
         case Some(originalPartnershipAnswers) =>
           ua.get(CisIdQuery) match {
 
             case None =>
               logger.error("[AmendPartnershipConfirmationController] Missing CisIdQuery")
-              Redirect(routes.JourneyRecoveryController.onPageLoad())
+              Future.successful(recoveryRedirect)
 
-            case Some(cisId) =>
-              Ok(
-                view(
-                  AmendPartnershipConfirmationViewModel.rows(originalPartnershipAnswers, ua),
-                  partnershipDisplayName(ua),
-                  appConfig.manageYourSubcontractorsUrl(cisId)
-                )
-              )
+            case Some(_) =>
+              val tableRows       = AmendPartnershipConfirmationViewModel.rows(originalPartnershipAnswers, ua)
+              val partnershipName = ua.get(PartnershipNamePage).getOrElse("")
+              cleanupService.cleanAmend(ua) match {
+
+                case Success(cleanedUa) =>
+                  sessionRepository.set(cleanedUa).map { _ =>
+                    Ok(
+                      view(
+                        tableRows,
+                        partnershipName,
+                        appConfig.retrieveSubcontractorListUrl
+                      )
+                    )
+                  }
+                case Failure(exception) =>
+                  logger.warn(
+                    "[AmendPartnershipConfirmationController] Failed to clean user answers",
+                    exception
+                  )
+                  Future.successful(recoveryRedirect)
+              }
           }
       }
     }
 
-  private def partnershipDisplayName(ua: UserAnswers): String =
-    ua.get(PartnershipNamePage).getOrElse("")
 }

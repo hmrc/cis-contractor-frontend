@@ -79,23 +79,16 @@ class AmendPartnershipController @Inject() (
 
             case Some(subcontractor) =>
               populateUserAnswers(request.userAnswers, cisId, subcontractor).fold(
-                error => {
-                  logger.error(
-                    s"[AmendPartnershipController] Failed to populate UserAnswers for " +
-                      s"cisId=$cisId, subbieResourceRef=$subbieResourceRef",
-                    error
-                  )
-                  Future.successful(recovery)
-                },
+                _ => Future.successful(recovery),
                 updatedAnswers =>
                   sessionRepository
                     .set(updatedAnswers)
-                    .map { _ =>
+                    .map(_ =>
                       Redirect(
                         controllers.amend.partnership.routes.AmendPartnershipCheckYourAnswersController
                           .onPageLoad()
                       )
-                    }
+                    )
               )
           }
         }

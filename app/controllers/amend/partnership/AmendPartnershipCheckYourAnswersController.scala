@@ -16,16 +16,18 @@
 
 package controllers.amend.partnership
 
+import config.FrontendAppConfig
 import controllers.actions.*
 import controllers.routes
 import models.add.partnership.ValidatedPartnership
 import models.{AmendMode, UserAnswers}
 import pages.add.*
 import pages.add.partnership.PartnershipNamePage
+import pages.amend.{AmendCheckYourAnswersSubmittedPage, ShowVerificationDetailsPage}
 import play.api.Logging
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import queries.OriginalPartnershipAnswersQuery
+import queries.{CisIdQuery, OriginalPartnershipAnswersQuery}
 import repositories.SessionRepository
 import services.SubcontractorService
 import uk.gov.hmrc.govukfrontend.views.Aliases.{Text, Value}
@@ -35,7 +37,7 @@ import viewmodels.checkAnswers.add.*
 import viewmodels.checkAnswers.add.partnership.*
 import viewmodels.govuk.summarylist.*
 import views.html.amend.AmendCheckYourAnswersView
-import pages.amend.{AmendCheckYourAnswersSubmittedPage, ShowVerificationDetailsPage}
+import utils.AmendmentHelper
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -48,37 +50,37 @@ class AmendPartnershipCheckYourAnswersController @Inject() (
   val controllerComponents: MessagesControllerComponents,
   subcontractorService: SubcontractorService,
   sessionRepository: SessionRepository,
-  view: AmendCheckYourAnswersView
+  view: AmendCheckYourAnswersView,
+  appConfig: FrontendAppConfig
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport
     with Logging {
 
-  def onPageLoad(): Action[AnyContent] =
-    (identify andThen getData andThen requireData) { implicit request =>
-      val ua = request.userAnswers
+  def onPageLoad(): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
+    val ua = request.userAnswers
 
-      ValidatedPartnership.build(ua) match {
-        case Right(_) =>
-          val isVerified      = ua.get(ShowVerificationDetailsPage)
-          val partnershipName = ua.get(PartnershipNamePage).getOrElse("")
+    ValidatedPartnership.build(ua) match {
+      case Right(_) =>
+        val isVerified      = ua.get(ShowVerificationDetailsPage)
+        val partnershipName = ua.get(PartnershipNamePage).getOrElse("")
 
-          val subcontractorInformationList =
-            SummaryListViewModel(rows = subcontractorInformationRows(ua, isVerified).flatten)
+        val subcontractorInformationList =
+          SummaryListViewModel(rows = subcontractorInformationRows(ua, isVerified).flatten)
 
-          val detailsList =
-            SummaryListViewModel(rows = detailsRows(ua, isVerified).flatten)
+        val detailsList =
+          SummaryListViewModel(rows = detailsRows(ua, isVerified).flatten)
 
-          val submitUrl = controllers.amend.partnership.routes.AmendPartnershipCheckYourAnswersController.onSubmit()
-          val cancelUrl = controllers.amend.partnership.routes.AmendPartnershipCheckYourAnswersController.onCancel()
+        val submitUrl = controllers.amend.partnership.routes.AmendPartnershipCheckYourAnswersController.onSubmit()
+        val cancelUrl = controllers.amend.partnership.routes.AmendPartnershipCheckYourAnswersController.onCancel()
 
-          Ok(view(subcontractorInformationList, detailsList, partnershipName, submitUrl, cancelUrl))
+        Ok(view(subcontractorInformationList, detailsList, partnershipName, submitUrl, cancelUrl))
 
-        case Left(error) =>
-          logger.error(s"[AmendPartnershipCheckYourAnswersController.onPageLoad] Failed to load the page: $error")
-          Redirect(routes.JourneyRecoveryController.onPageLoad())
-      }
+      case Left(error) =>
+        logger.error(s"[AmendPartnershipCheckYourAnswersController.onPageLoad] Failed to load the page: $error")
+        Redirect(routes.JourneyRecoveryController.onPageLoad())
     }
+  }
 
   private def subcontractorInformationRows(
     ua: UserAnswers,
@@ -88,11 +90,15 @@ class AmendPartnershipCheckYourAnswersController @Inject() (
     val verificationRows =
       Option
         .when(isVerified.contains(true)) {
+
           val verificationNumberOpt =
-            ua.get(OriginalPartnershipAnswersQuery).flatMap(_.verificationNumber).filter(_.trim.nonEmpty)
+            ua.get(OriginalPartnershipAnswersQuery)
+              .flatMap(_.verificationNumber)
+              .filter(_.trim.nonEmpty)
 
           Seq(
-            PartnershipUniqueTaxpayerReferenceSummary.row(ua, AmendMode, showActions = false)
+            PartnershipUniqueTaxpayerReferenceSummary.row(ua, AmendMode, showActions = false),
+            PartnershipNominatedPartnerUtrSummary.row(ua, AmendMode, showActions = false)
           ) ++ verificationNumberOpt.map { verificationNumber =>
             Some(
               SummaryListRowViewModel(
@@ -127,7 +133,9 @@ class AmendPartnershipCheckYourAnswersController @Inject() (
       } else {
         Seq(
           PartnershipHasUtrYesNoSummary.row(ua, AmendMode),
-          PartnershipUniqueTaxpayerReferenceSummary.row(ua, AmendMode)
+          PartnershipUniqueTaxpayerReferenceSummary.row(ua, AmendMode),
+          PartnershipNominatedPartnerUtrSummary.row(ua, AmendMode),
+          PartnershipNominatedPartnerUtrYesNoSummary.row(ua, AmendMode)
         )
       }
 
@@ -144,8 +152,6 @@ class AmendPartnershipCheckYourAnswersController @Inject() (
       utrRows ++
       Seq(
         PartnershipNominatedPartnerNameSummary.row(ua, AmendMode),
-        PartnershipNominatedPartnerUtrYesNoSummary.row(ua, AmendMode),
-        PartnershipNominatedPartnerUtrSummary.row(ua, AmendMode),
         PartnershipNominatedPartnerNinoYesNoSummary.row(ua, AmendMode),
         PartnershipNominatedPartnerNinoSummary.row(ua, AmendMode),
         PartnershipNominatedPartnerCrnYesNoSummary.row(ua, AmendMode),
@@ -158,40 +164,75 @@ class AmendPartnershipCheckYourAnswersController @Inject() (
   def onSubmit(): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
       ValidatedPartnership.build(request.userAnswers) match {
-        case Right(_) =>
-          if (request.userAnswers.get(AmendCheckYourAnswersSubmittedPage).contains(true)) {
-            Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
-          } else {
-            subcontractorService
-              .createAndUpdateSubcontractor(request.userAnswers)
-              .map(_ =>
-                Redirect(controllers.amend.partnership.routes.AmendPartnershipCheckYourAnswersController.onPageLoad())
-              )
-              .recover { case t =>
-                logger.error(
-                  "[AmendPartnershipCheckYourAnswersController.onSubmit] Failed to update subcontractor",
-                  t
-                )
-                Redirect(routes.JourneyRecoveryController.onPageLoad())
-              }
-          }
 
         case Left(error) =>
           logger.error(s"[AmendPartnershipCheckYourAnswersController.onSubmit] Validation failed: $error")
           Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
+
+        case Right(_) if request.userAnswers.get(AmendCheckYourAnswersSubmittedPage).contains(true) =>
+          Future.successful(
+            Redirect(routes.JourneyRecoveryController.onPageLoad())
+          )
+
+        case Right(_) if !AmendmentHelper.partnershipHasChanges(request.userAnswers) =>
+          request.userAnswers.get(CisIdQuery) match {
+            case Some(cisId) =>
+              Future.successful(
+                Redirect(appConfig.manageYourSubcontractorsUrl(cisId))
+              )
+
+            case None =>
+              logger.error("[AmendPartnershipCheckYourAnswersController.onSubmit] Missing CisIdQuery")
+              Future.successful(
+                Redirect(routes.JourneyRecoveryController.onPageLoad())
+              )
+          }
+
+        case Right(_) =>
+          subcontractorService
+            .createAndUpdateSubcontractor(request.userAnswers)
+            .flatMap { _ =>
+              Future
+                .fromTry(request.userAnswers.set(AmendCheckYourAnswersSubmittedPage, true))
+                .flatMap(updated => sessionRepository.set(updated).map(_ => ()))
+                .map { _ =>
+                  Redirect(
+                    controllers.amend.partnership.routes.AmendPartnershipConfirmationController.onPageLoad()
+                  )
+                }
+            }
+            .recover { case t =>
+              logger.error(
+                "[AmendPartnershipCheckYourAnswersController.onSubmit] Failed to update subcontractor",
+                t
+              )
+              Redirect(routes.JourneyRecoveryController.onPageLoad())
+            }
       }
     }
 
-  def onCancel(): Action[AnyContent] = (identify andThen getData andThen requireData).async { implicit request =>
-    sessionRepository
-      .set(UserAnswers(request.userAnswers.id))
-      .map(_ => Redirect(routes.IndexController.onPageLoad()))
-      .recover { case t =>
-        logger.error(
-          s"[AmendCompanyCheckYourAnswersController.onCancel] Failed to clear user answers for session ${request.userAnswers.id}",
-          t
-        )
-        Redirect(routes.JourneyRecoveryController.onPageLoad())
+  def onCancel(): Action[AnyContent] =
+    (identify andThen getData andThen requireData).async { implicit request =>
+      request.userAnswers.get(CisIdQuery) match {
+        case Some(cisId) =>
+          sessionRepository
+            .set(UserAnswers(request.userAnswers.id))
+            .map(_ => Redirect(appConfig.manageYourSubcontractorsUrl(cisId)))
+            .recover { case t =>
+              logger.error(
+                s"[AmendPartnershipCheckYourAnswersController.onCancel] Failed to clear user answers for session ${request.userAnswers.id}",
+                t
+              )
+              Redirect(routes.JourneyRecoveryController.onPageLoad())
+            }
+
+        case None =>
+          logger.error(
+            "[AmendvCheckYourAnswersController.onCancel] Missing CisIdQuery"
+          )
+          Future.successful(
+            Redirect(routes.JourneyRecoveryController.onPageLoad())
+          )
       }
-  }
+    }
 }

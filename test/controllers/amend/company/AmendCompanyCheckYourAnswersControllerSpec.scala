@@ -43,6 +43,7 @@ import config.FrontendAppConfig
 import scala.concurrent.Future
 
 class AmendCompanyCheckYourAnswersControllerSpec extends SpecBase with MockitoSugar {
+
   private val address =
     Address(
       addressLine1 = "12 Harbor View Road",
@@ -57,7 +58,8 @@ class AmendCompanyCheckYourAnswersControllerSpec extends SpecBase with MockitoSu
         )
       )
     )
-  private val minUa   =
+
+  private val minUa =
     emptyUserAnswers
       .set(TypeOfSubcontractorPage, TypeOfSubcontractor.Limitedcompany)
       .success

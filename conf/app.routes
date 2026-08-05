@@ -93,9 +93,9 @@ GET   /subcontractor/amend/trust/:cisId/:subbieResourceRef  controllers.amend.tr
 GET   /subcontractor/amend/subcontractor-information  controllers.amend.AmendIndividualCheckYourAnswersController.onPageLoad()
 POST  /subcontractor/amend/subcontractor-information  controllers.amend.AmendIndividualCheckYourAnswersController.onSubmit()
 
-GET   /subcontractor/amend/partnership-information  controllers.amend.partnership.AmendPartnershipCheckYourAnswersController.onPageLoad()
-POST  /subcontractor/amend/partnership-information  controllers.amend.partnership.AmendPartnershipCheckYourAnswersController.onSubmit()
-GET   /subcontractor/amend/partnership/cancel       controllers.amend.partnership.AmendPartnershipCheckYourAnswersController.onCancel()
+GET   /subcontractor/amend/partnership/partnership-information  controllers.amend.partnership.AmendPartnershipCheckYourAnswersController.onPageLoad()
+POST  /subcontractor/amend/partnership/partnership-information  controllers.amend.partnership.AmendPartnershipCheckYourAnswersController.onSubmit()
+GET   /subcontractor/amend/partnership/cancel                   controllers.amend.partnership.AmendPartnershipCheckYourAnswersController.onCancel()
 
 GET   /subcontractor/amend/partnership/subcontractor-details-updated  controllers.amend.partnership.AmendPartnershipConfirmationController.onPageLoad()
 

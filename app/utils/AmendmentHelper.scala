@@ -18,7 +18,8 @@ package utils
 
 import models.UserAnswers
 import pages.add.company.*
-import queries.OriginalCompanyAnswersQuery
+import pages.add.partnership.*
+import queries.{OriginalCompanyAnswersQuery, OriginalPartnershipAnswersQuery}
 
 object AmendmentHelper {
 
@@ -39,6 +40,35 @@ object AmendmentHelper {
         original.crn                        -> userAnswers.get(CompanyCrnPage),
         original.worksReferenceYesNo        -> userAnswers.get(CompanyWorksReferenceYesNoPage),
         original.worksReference             -> userAnswers.get(CompanyWorksReferencePage)
+      ).exists { case (originalValue, currentValue) =>
+        originalValue != currentValue
+      }
+    }
+
+  def partnershipHasChanges(userAnswers: UserAnswers): Boolean =
+    userAnswers.get(OriginalPartnershipAnswersQuery).exists { original =>
+      Seq(
+        original.partnershipName                     -> userAnswers.get(PartnershipNamePage),
+        original.addressYesNo                        -> userAnswers.get(PartnershipAddressYesNoPage),
+        original.address                             -> userAnswers.get(PartnershipAddressPage),
+        original.partnershipContactMethodsYesNo      -> userAnswers.get(AddPartnershipContactMethodsYesNoPage),
+        original.partnershipContactMethodOptions     -> userAnswers
+          .get(PartnershipContactMethodOptionsPage)
+          .getOrElse(Set.empty),
+        original.email                               -> userAnswers.get(PartnershipEmailAddressPage),
+        original.phone                               -> userAnswers.get(PartnershipPhoneNumberPage),
+        original.mobile                              -> userAnswers.get(PartnershipMobileNumberPage),
+        original.hasUtrYesNo                         -> userAnswers.get(PartnershipHasUtrYesNoPage),
+        original.utr                                 -> userAnswers.get(PartnershipUniqueTaxpayerReferencePage),
+        original.nominatedPartnerName                -> userAnswers.get(PartnershipNominatedPartnerNamePage),
+        original.nominatedPartnerUtrYesNo            -> userAnswers.get(PartnershipNominatedPartnerUtrYesNoPage),
+        original.nominatedPartnerUtr                 -> userAnswers.get(PartnershipNominatedPartnerUtrPage),
+        original.nominatedPartnerNinoYesNo           -> userAnswers.get(PartnershipNominatedPartnerNinoYesNoPage),
+        original.nominatedPartnerNino                -> userAnswers.get(PartnershipNominatedPartnerNinoPage),
+        original.nominatedPartnerCrnYesNo            -> userAnswers.get(PartnershipNominatedPartnerCrnYesNoPage),
+        original.nominatedPartnerCrn                 -> userAnswers.get(PartnershipNominatedPartnerCrnPage),
+        original.nominatedPartnerWorksReferenceYesNo -> userAnswers.get(PartnershipWorksReferenceNumberYesNoPage),
+        original.nominatedPartnerWorksReference      -> userAnswers.get(PartnershipWorksReferenceNumberPage)
       ).exists { case (originalValue, currentValue) =>
         originalValue != currentValue
       }
