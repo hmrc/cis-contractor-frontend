@@ -144,7 +144,7 @@ class ModifyVerificationBatchAndVerificationsControllerSpec extends SpecBase wit
         status(result) mustBe SEE_OTHER
         redirectLocation(result).value mustBe
           controllers.verify.routes.CheckVerificationBatchReadinessController
-            .checkVerificationBatchReadiness()
+            .checkVerificationBatchReadinessBeforeDeclaration()
             .url
 
         val reqCaptor = ArgumentCaptor.forClass(classOf[ModifyVerificationsRequest])
@@ -194,7 +194,7 @@ class ModifyVerificationBatchAndVerificationsControllerSpec extends SpecBase wit
         status(result) mustBe SEE_OTHER
         redirectLocation(result).value mustBe
           controllers.verify.routes.CheckVerificationBatchReadinessController
-            .checkVerificationBatchReadiness()
+            .checkVerificationBatchReadinessBeforeDeclaration()
             .url
 
         verify(mockService, never()).modifyVerificationBatchAndVerifications(any(), any())(any())
@@ -392,7 +392,7 @@ class ModifyVerificationBatchAndVerificationsControllerSpec extends SpecBase wit
         status(result) mustBe SEE_OTHER
         redirectLocation(result).value mustBe
           controllers.verify.routes.CheckVerificationBatchReadinessController
-            .checkVerificationBatchReadiness()
+            .checkVerificationBatchReadinessBeforeDeclaration()
             .url
 
         val reqCaptor = ArgumentCaptor.forClass(classOf[ModifyVerificationsRequest])
