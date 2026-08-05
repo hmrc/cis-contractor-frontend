@@ -100,6 +100,40 @@ class PartnershipNominatedPartnerCrnYesNoSummarySpec extends AnyFreeSpec with Ma
       changeAction.attributes                   must contain("id" -> "add-nominated-partner-crn")
     }
 
+    "return a row with key, value = no, and change action pointing to add flow when the answer is false in AmendMode" in {
+      val ua = UserAnswers("test-id")
+        .set(PartnershipNominatedPartnerCrnYesNoPage, false)
+        .success
+        .value
+
+      val maybeRow: Option[SummaryListRow] = PartnershipNominatedPartnerCrnYesNoSummary.row(ua, AmendMode)
+      maybeRow shouldBe defined
+
+      val row: SummaryListRow = maybeRow.value
+
+      val expectedKeyText = messages("partnershipNominatedPartnerCrnYesNo.checkYourAnswersLabel")
+      row.key.content.asHtml.toString should include(expectedKeyText)
+
+      val expectedValue = messages("site.no")
+      row.value.content.asHtml.toString should include(expectedValue)
+
+      row.actions shouldBe defined
+      val actions = row.actions.value.items
+      actions should have size 1
+
+      val changeAction       = actions.head
+      val expectedHref       = controllers.add.partnership.routes.PartnershipNominatedPartnerCrnYesNoController
+        .onPageLoad(AmendMode)
+        .url
+      val expectedChangeText = messages("site.change")
+      val expectedHiddenText = messages("partnershipNominatedPartnerCrnYesNo.change.hidden")
+
+      changeAction.content.asHtml.toString    should include(expectedChangeText)
+      changeAction.href                     shouldBe expectedHref
+      changeAction.visuallyHiddenText.value shouldBe expectedHiddenText
+      changeAction.attributes                 should contain("id" -> "add-nominated-partner-crn")
+    }
+
     "must return a SummaryListRow with 'No' when the answer is false" in {
       val answers = UserAnswers("test-id")
         .set(PartnershipNominatedPartnerCrnYesNoPage, false)
