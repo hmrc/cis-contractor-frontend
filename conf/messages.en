@@ -433,9 +433,9 @@ amendPartnershipRemoveDetailYesNo.detail.address                                
 amendPartnershipRemoveDetailYesNo.detail.contactDetails                             =  contact details
 amendPartnershipRemoveDetailYesNo.detail.utr                                        =  UTR
 amendPartnershipRemoveDetailYesNo.detail.worksReferenceNumber                       =  works reference number
-amendPartnershipRemoveDetailYesNo.detail.nominatedPartnerUtr                        =  nominated partner's UTR
-amendPartnershipRemoveDetailYesNo.detail.nominatedPartnerNino                       =  nominated partner's National Insurance number
-amendPartnershipRemoveDetailYesNo.detail.nominatedPartnerCompanyRegistrationNumber  =  nominated partner's company registration number
+amendPartnershipRemoveDetailYesNo.detail.nominatedPartnerUtr                        =  nominated partner’s UTR
+amendPartnershipRemoveDetailYesNo.detail.nominatedPartnerNino                       =  nominated partner’s National Insurance number
+amendPartnershipRemoveDetailYesNo.detail.nominatedPartnerCompanyRegistrationNumber  =  nominated partner’s company registration number
 
 # Partnership
 addPartnershipContactMethodsYesNo.title                     =  Do you want to add contact details for this partnership?
@@ -1023,12 +1023,6 @@ verify.verifyCheckYourAnswers.confirm                                   =  Confi
 
 verify.noName                                                           =  No name provided
 
-verify.noVerificationResults.title                                      =  No verification results
-verify.noVerificationResults.heading                                    =  Verification results
-verify.noVerificationResults.p                                          =  You do not have any verification results to show at the moment.
-verify.noVerificationResults.backTo                                     =  Back to
-verify.noVerificationResults.manageYourSubcontractors.link              =  Manage your subcontractors
-
 # Contractor Details
 contractordetails.contractorDetailsIndex.title                                 =  Contractor details
 contractordetails.contractorDetailsIndex.heading                               =  Contractor details
@@ -1113,3 +1107,8 @@ amendCheckYourAnswers.confirm.p1                                               =
 amendCheckYourAnswers.confirm                                                  = Confirm
 amendCheckYourAnswers.cancelChanges                                            = Cancel changes
 amendCheckYourAnswers.verificationNumber.label                                 = Verification number
+
+proceedInsufficientSubcontractorNameYesNo.title                                = Are you sure you want to proceed with including this subcontractor in this verification request
+proceedInsufficientSubcontractorNameYesNo.heading                              = Are you sure you want to proceed with including {0} in this verification request?
+proceedInsufficientSubcontractorNameYesNo.hint                                 = This will assign the higher rate tax treatment to this subcontractor.
+proceedInsufficientSubcontractorNameYesNo.error.required                       = Select yes if you want to proceed with including this subcontractor in this verification request
