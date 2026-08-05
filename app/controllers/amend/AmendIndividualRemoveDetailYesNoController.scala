@@ -174,17 +174,15 @@ class AmendIndividualRemoveDetailYesNoController @Inject() (
                     } yield
                       if (value && subcontractorDetail == "trading-name") {
                         Redirect(
-                          controllers.add.routes.SubcontractorNameController.onPageLoad(AmendMode).url
+                          controllers.add.routes.SubcontractorNameController.onPageLoad(AmendMode)
                         )
                       } else if (value && subcontractorDetail == "subcontractor-name") {
                         Redirect(
-                          controllers.add.routes.TradingNameOfSubcontractorController.onPageLoad(AmendMode).url
+                          controllers.add.routes.TradingNameOfSubcontractorController.onPageLoad(AmendMode)
                         )
                       } else {
                         Redirect(
-                          controllers.amend.routes.AmendIndividualCheckYourAnswersController
-                            .onPageLoad()
-                            .url
+                          controllers.amend.routes.AmendIndividualCheckYourAnswersController.onPageLoad()
                         )
                       }
                 )

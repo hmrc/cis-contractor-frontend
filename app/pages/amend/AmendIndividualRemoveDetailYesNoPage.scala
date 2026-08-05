@@ -23,6 +23,8 @@ import pages.QuestionPage
 import pages.add.*
 import play.api.libs.json.JsPath
 
+// All variants share one JSON key: this value is transient and removed immediately after submit, so concurrent detail types never clash.
+
 case class AmendIndividualRemoveDetailYesNoPage(subcontractorDetail: AmendIndividualRemoveDetail)
     extends QuestionPage[Boolean] {
 
