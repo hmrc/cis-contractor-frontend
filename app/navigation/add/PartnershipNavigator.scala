@@ -342,7 +342,7 @@ class PartnershipNavigator @Inject() () extends NavigatorForJourney {
             cyaRoute(mode)
           }
 
-      case (Some(false), CheckMode) =>
+      case (Some(false), CheckMode | AmendMode) =>
         cyaRoute(mode)
 
       case _ =>

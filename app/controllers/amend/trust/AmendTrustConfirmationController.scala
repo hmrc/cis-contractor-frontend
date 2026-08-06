@@ -31,6 +31,7 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.DefaultSubcontractorCleanupService
 import viewmodels.amend.trust.TrustAmendConfirmationViewModel
 import views.html.amend.AmendConfirmationView
+import pages.amend.AmendCheckYourAnswersSubmittedPage
 
 import scala.util.{Failure, Success}
 import javax.inject.Inject
@@ -59,44 +60,52 @@ class AmendTrustConfirmationController @Inject() (
 
       val ua = request.userAnswers
 
-      ua.get(OriginalTrustAnswersQuery) match {
+      if (!ua.get(AmendCheckYourAnswersSubmittedPage).contains(true)) {
+        logger.warn(
+          s"[AmendPartnershipConfirmationController][onPageLoad] " +
+            "Accessed confirmation page without prior submission"
+        )
+        Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
+      } else {
+        ua.get(OriginalTrustAnswersQuery) match {
 
-        case None =>
-          logger.error("[AmendTrustConfirmationController] Missing OriginalTrustAnswersQuery")
-          Future.successful(recoveryRedirect)
+          case None =>
+            logger.error("[AmendTrustConfirmationController] Missing OriginalTrustAnswersQuery")
+            Future.successful(recoveryRedirect)
 
-        case Some(originalTrustAnswers) =>
-          ua.get(CisIdQuery) match {
+          case Some(originalTrustAnswers) =>
+            ua.get(CisIdQuery) match {
 
-            case None =>
-              logger.error("[AmendTrustConfirmationController] Missing CisIdQuery")
-              Future.successful(recoveryRedirect)
+              case None =>
+                logger.error("[AmendTrustConfirmationController] Missing CisIdQuery")
+                Future.successful(recoveryRedirect)
 
-            case Some(_) =>
-              val tableRows = TrustAmendConfirmationViewModel.rows(originalTrustAnswers, ua)
-              val trustName = trustDisplayName(ua)
+              case Some(_) =>
+                val tableRows = TrustAmendConfirmationViewModel.rows(originalTrustAnswers, ua)
+                val trustName = trustDisplayName(ua)
 
-              cleanupService.cleanAmend(ua) match {
+                cleanupService.cleanAmend(ua) match {
 
-                case Success(cleanedUa) =>
-                  sessionRepository.set(cleanedUa).map { _ =>
-                    Ok(
-                      view(
-                        tableRows,
-                        trustName,
-                        appConfig.retrieveSubcontractorListUrl
+                  case Success(cleanedUa) =>
+                    sessionRepository.set(cleanedUa).map { _ =>
+                      Ok(
+                        view(
+                          tableRows,
+                          trustName,
+                          appConfig.retrieveSubcontractorListUrl
+                        )
                       )
-                    )
-                  }
+                    }
 
-                case Failure(exception) =>
-                  logger.warn(
-                    "[AmendTrustConfirmationController] Failed to clean user answers",
-                    exception
-                  )
-                  Future.successful(recoveryRedirect)
-              }
-          }
+                  case Failure(exception) =>
+                    logger.warn(
+                      "[AmendTrustConfirmationController] Failed to clean user answers",
+                      exception
+                    )
+                    Future.successful(recoveryRedirect)
+                }
+            }
+        }
       }
     }
 

@@ -1034,14 +1034,14 @@ class PartnershipNavigatorSpec extends SpecBase {
             ) mustBe controllers.add.partnership.routes.PartnershipContactMethodOptionsController.onPageLoad(AmendMode)
           }
 
-          "to journeyrecovery when answer is No" in {
+          "to amend cya when answer is No" in {
             val answers = emptyUserAnswers.set(AddPartnershipContactMethodsYesNoPage, false).success.value
 
             navigator.nextPage(
               AddPartnershipContactMethodsYesNoPage,
               AmendMode,
               answers
-            ) mustBe journeyRecovery
+            ) mustBe partnershipAmendCYA
           }
 
           "to JourneyRecovery when answer is not present" in {

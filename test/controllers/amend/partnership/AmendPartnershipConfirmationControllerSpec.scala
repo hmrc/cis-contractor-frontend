@@ -97,6 +97,9 @@ class AmendPartnershipConfirmationControllerSpec extends SpecBase with MockitoSu
       .set(PartnershipNamePage, partnershipName)
       .success
       .value
+      .set(AmendCheckYourAnswersSubmittedPage, true)
+      .success
+      .value
 
   private lazy val confirmationRoute =
     controllers.amend.partnership.routes.AmendPartnershipConfirmationController.onPageLoad().url
@@ -111,7 +114,7 @@ class AmendPartnershipConfirmationControllerSpec extends SpecBase with MockitoSu
       when(mockSessionRepository.set(any[UserAnswers]))
         .thenReturn(Future.successful(true))
 
-      val app = application(userAnswersWithOriginal)
+      val app = this.application(userAnswersWithOriginal)
 
       running(app) {
 
@@ -139,6 +142,35 @@ class AmendPartnershipConfirmationControllerSpec extends SpecBase with MockitoSu
 
         verify(mockCleanupService).cleanAmend(any())
         verify(mockSessionRepository).set(any())
+      }
+    }
+
+    "must redirect to Journey Recovery when not submitted" in {
+
+      val userAnswers =
+        emptyUserAnswers
+          .set(CisIdQuery, cisId)
+          .success
+          .value
+          .set(PartnershipNamePage, partnershipName)
+          .success
+          .value
+          .set(AmendCheckYourAnswersSubmittedPage, false)
+          .success
+          .value
+
+      val application =
+        applicationBuilder(userAnswers = Some(userAnswers)).build()
+
+      running(application) {
+
+        val request = FakeRequest(GET, confirmationRoute)
+        val result  = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(result).value mustEqual
+          controllers.routes.JourneyRecoveryController.onPageLoad().url
       }
     }
 
