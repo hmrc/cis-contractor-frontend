@@ -112,7 +112,10 @@ class AmendPartnershipCheckYourAnswersControllerSpec extends SpecBase with Mocki
       .set(PartnershipWorksReferenceNumberYesNoPage, true)
       .success
       .value
-      .set(PartnershipWorksReferenceNumberPage, "WRN-1")
+      .set(PartnershipWorksReferenceNumberPage, "WRN-11")
+      .success
+      .value
+      .set(ShowVerificationDetailsPage, false)
       .success
       .value
       .set(
@@ -374,42 +377,46 @@ class AmendPartnershipCheckYourAnswersControllerSpec extends SpecBase with Mocki
           routes.JourneyRecoveryController.onPageLoad().url
       }
     }
-//
-//    "must redirect back to amend CYA after successful submit" in {
-//
-//      val mockSubcontractorService = mock[SubcontractorService]
-//      val mockSessionRepository    = mock[SessionRepository]
-//      val captor                   = ArgumentCaptor.forClass(classOf[UserAnswers])
-//      when(mockSubcontractorService.createAndUpdateSubcontractor(any[UserAnswers])(any[HeaderCarrier]))
-//        .thenReturn(Future.successful(()))
-//      when(mockSessionRepository.set(any[UserAnswers])).thenReturn(Future.successful(true))
-//      val application              =
-//        applicationBuilder(userAnswers = Some(minUa))
-//          .overrides(
-//            bind[SubcontractorService].toInstance(mockSubcontractorService),
-//            bind[SessionRepository].toInstance(mockSessionRepository)
-//          )
-//          .build()
-//
-//      running(application) {
-//
-//        val request =
-//          FakeRequest(POST, controllers.amend.partnership.routes.AmendPartnershipCheckYourAnswersController.onSubmit().url)
-//
-//        val result = route(application, request).value
-//
-//        status(result) mustEqual SEE_OTHER
-//        redirectLocation(result).value mustEqual
-//          controllers.amend.partnership.routes.AmendPartnershipConfirmationController.onPageLoad().url
-//      }
-//
-//      verify(mockSubcontractorService)
-//        .createAndUpdateSubcontractor(any[UserAnswers])(any[HeaderCarrier])
-//
-//      verify(mockSessionRepository).set(captor.capture())
-//      captor.getValue.get(AmendCheckYourAnswersSubmittedPage) mustBe Some(true)
-//      verifyNoMoreInteractions(mockSubcontractorService, mockSessionRepository)
-//    }
+
+    "must redirect back to amend CYA after successful submit" in {
+
+      val mockSubcontractorService = mock[SubcontractorService]
+      val mockSessionRepository    = mock[SessionRepository]
+      val captor                   = ArgumentCaptor.forClass(classOf[UserAnswers])
+      when(mockSubcontractorService.createAndUpdateSubcontractor(any[UserAnswers])(any[HeaderCarrier]))
+        .thenReturn(Future.successful(()))
+      when(mockSessionRepository.set(any[UserAnswers])).thenReturn(Future.successful(true))
+      val application              =
+        applicationBuilder(userAnswers = Some(minUa))
+          .overrides(
+            bind[SubcontractorService].toInstance(mockSubcontractorService),
+            bind[SessionRepository].toInstance(mockSessionRepository)
+          )
+          .build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(
+            POST,
+            controllers.amend.partnership.routes.AmendPartnershipCheckYourAnswersController.onSubmit().url
+          )
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual
+          controllers.amend.partnership.routes.AmendPartnershipConfirmationController.onPageLoad().url
+      }
+
+      verify(mockSubcontractorService)
+        .createAndUpdateSubcontractor(any[UserAnswers])(any[HeaderCarrier])
+
+      verify(mockSessionRepository).set(captor.capture())
+      captor.getValue.get(AmendCheckYourAnswersSubmittedPage) mustBe Some(true)
+
+      verifyNoMoreInteractions(mockSubcontractorService, mockSessionRepository)
+    }
 
     "must redirect to Journey Recovery when the check your answers page has already been submitted" in {
 
@@ -490,37 +497,40 @@ class AmendPartnershipCheckYourAnswersControllerSpec extends SpecBase with Mocki
       verifyNoInteractions(mockSessionRepository)
     }
 
-//    "must redirect to Journey Recovery when the service fails" in {
-//
-//      val mockSubcontractorService = mock[SubcontractorService]
-//      val mockSessionRepository    = mock[SessionRepository]
-//
-//      when(mockSubcontractorService.createAndUpdateSubcontractor(any[UserAnswers])(any[HeaderCarrier]))
-//        .thenReturn(Future.failed(new RuntimeException("boom")))
-//
-//      val application =
-//        applicationBuilder(userAnswers = Some(minUa))
-//          .overrides(
-//            bind[SubcontractorService].toInstance(mockSubcontractorService),
-//            bind[SessionRepository].toInstance(mockSessionRepository)
-//          )
-//          .build()
-//
-//      running(application) {
-//
-//        val request =
-//          FakeRequest(POST, controllers.amend.partnership.routes.AmendPartnershipCheckYourAnswersController.onSubmit().url)
-//
-//        val result = route(application, request).value
-//
-//        status(result) mustEqual SEE_OTHER
-//        redirectLocation(result).value mustEqual
-//          routes.JourneyRecoveryController.onPageLoad().url
-//      }
-//
-//      verify(mockSubcontractorService)
-//        .createAndUpdateSubcontractor(any[UserAnswers])(any[HeaderCarrier])
-//    }
+    "must redirect to Journey Recovery when the service fails" in {
+
+      val mockSubcontractorService = mock[SubcontractorService]
+      val mockSessionRepository    = mock[SessionRepository]
+
+      when(mockSubcontractorService.createAndUpdateSubcontractor(any[UserAnswers])(any[HeaderCarrier]))
+        .thenReturn(Future.failed(new RuntimeException("boom")))
+
+      val application =
+        applicationBuilder(userAnswers = Some(minUa))
+          .overrides(
+            bind[SubcontractorService].toInstance(mockSubcontractorService),
+            bind[SessionRepository].toInstance(mockSessionRepository)
+          )
+          .build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(
+            POST,
+            controllers.amend.partnership.routes.AmendPartnershipCheckYourAnswersController.onSubmit().url
+          )
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual
+          routes.JourneyRecoveryController.onPageLoad().url
+      }
+
+      verify(mockSubcontractorService)
+        .createAndUpdateSubcontractor(any[UserAnswers])(any[HeaderCarrier])
+    }
 
     "must redirect to Journey Recovery when POST validation fails" in {
 
