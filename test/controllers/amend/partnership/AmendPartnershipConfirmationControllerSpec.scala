@@ -21,10 +21,11 @@ import config.FrontendAppConfig
 import models.UserAnswers
 import models.amend.partnership.OriginalPartnershipAnswers
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.{never, reset, verify, when}
+import org.mockito.Mockito.{never, reset, verify, verifyNoInteractions, when}
 import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.mockito.MockitoSugar
 import pages.add.partnership.PartnershipNamePage
+import pages.amend.AmendCheckYourAnswersSubmittedPage
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
@@ -33,6 +34,7 @@ import repositories.SessionRepository
 import utils.DefaultSubcontractorCleanupService
 import viewmodels.checkAnswers.amend.partnership.AmendPartnershipConfirmationViewModel
 import views.html.amend.AmendConfirmationView
+import services.SubcontractorService
 
 import scala.concurrent.Future
 import scala.util.{Failure, Success}
@@ -190,6 +192,39 @@ class AmendPartnershipConfirmationControllerSpec extends SpecBase with MockitoSu
         redirectLocation(result).value mustEqual
           controllers.routes.JourneyRecoveryController.onPageLoad().url
       }
+    }
+
+    "must redirect to Journey Recovery when not already submitted" in {
+
+      val ua = emptyUserAnswers
+        .set(AmendCheckYourAnswersSubmittedPage, false)
+        .success
+        .value
+
+      val mockSubcontractorService = mock[SubcontractorService]
+
+      val application =
+        applicationBuilder(userAnswers = Some(ua))
+          .overrides(
+            bind[SubcontractorService].toInstance(mockSubcontractorService)
+          )
+          .build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(
+            GET,
+            controllers.amend.partnership.routes.AmendPartnershipConfirmationController.onPageLoad().url
+          )
+
+        val result = route(application, request).value
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result).value mustBe
+          controllers.routes.JourneyRecoveryController.onPageLoad().url
+      }
+      verifyNoInteractions(mockSubcontractorService)
     }
 
     "must redirect to Journey Recovery when cleanup fails" in {

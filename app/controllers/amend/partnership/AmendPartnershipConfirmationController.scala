@@ -29,6 +29,7 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.DefaultSubcontractorCleanupService
 import viewmodels.checkAnswers.amend.partnership.AmendPartnershipConfirmationViewModel
 import views.html.amend.AmendConfirmationView
+import pages.amend.AmendCheckYourAnswersSubmittedPage
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -54,45 +55,52 @@ class AmendPartnershipConfirmationController @Inject() (
 
       val recoveryRedirect =
         Redirect(routes.JourneyRecoveryController.onPageLoad())
-
+      
       val ua = request.userAnswers
 
-      ua.get(OriginalPartnershipAnswersQuery) match {
+      if (!ua.get(AmendCheckYourAnswersSubmittedPage).contains(true)) {
+        logger.warn(s"[AmendPartnershipConfirmationController][onPageLoad] " +
+          "Accessed confirmation page without prior submission")
+        Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
+      } else {
 
-        case None =>
-          logger.error("[AmendPartnershipConfirmationController] Missing OriginalPartnershipAnswersQuery")
-          Future.successful(recoveryRedirect)
+        ua.get(OriginalPartnershipAnswersQuery)  match {
 
-        case Some(originalPartnershipAnswers) =>
-          ua.get(CisIdQuery) match {
+          case None =>
+            logger.error("[AmendPartnershipConfirmationController] Missing OriginalPartnershipAnswersQuery")
+            Future.successful(recoveryRedirect)
 
-            case None =>
-              logger.error("[AmendPartnershipConfirmationController] Missing CisIdQuery")
-              Future.successful(recoveryRedirect)
+          case Some(originalPartnershipAnswers) =>
+            ua.get(CisIdQuery) match {
 
-            case Some(_) =>
-              val tableRows       = AmendPartnershipConfirmationViewModel.rows(originalPartnershipAnswers, ua)
-              val partnershipName = ua.get(PartnershipNamePage).getOrElse("")
-              cleanupService.cleanAmend(ua) match {
+              case None =>
+                logger.error("[AmendPartnershipConfirmationController] Missing CisIdQuery")
+                Future.successful(recoveryRedirect)
 
-                case Success(cleanedUa) =>
-                  sessionRepository.set(cleanedUa).map { _ =>
-                    Ok(
-                      view(
-                        tableRows,
-                        partnershipName,
-                        appConfig.retrieveSubcontractorListUrl
+              case Some(_) =>
+                val tableRows = AmendPartnershipConfirmationViewModel.rows(originalPartnershipAnswers, ua)
+                val partnershipName = ua.get(PartnershipNamePage).getOrElse("")
+                cleanupService.cleanAmend(ua) match {
+
+                  case Success(cleanedUa) =>
+                    sessionRepository.set(cleanedUa).map { _ =>
+                      Ok(
+                        view(
+                          tableRows,
+                          partnershipName,
+                          appConfig.retrieveSubcontractorListUrl
+                        )
                       )
+                    }
+                  case Failure(exception) =>
+                    logger.warn(
+                      "[AmendPartnershipConfirmationController] Failed to clean user answers",
+                      exception
                     )
-                  }
-                case Failure(exception) =>
-                  logger.warn(
-                    "[AmendPartnershipConfirmationController] Failed to clean user answers",
-                    exception
-                  )
-                  Future.successful(recoveryRedirect)
-              }
-          }
+                    Future.successful(recoveryRedirect)
+                }
+            }
+        }
       }
     }
 
