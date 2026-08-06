@@ -28,14 +28,13 @@ class UnmatchedSubcontractorsController @Inject() (
   override val messagesApi: MessagesApi,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
-  requireData: DataRequiredAction,
   val controllerComponents: MessagesControllerComponents,
   view: UnmatchedSubcontractorsView
 )(implicit appConfig: FrontendAppConfig)
     extends FrontendBaseController
     with I18nSupport {
 
-  def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
+  def onPageLoad: Action[AnyContent] = (identify andThen getData) { implicit request =>
     Ok(view(appConfig.verificationHistoryUrl))
   }
 }
