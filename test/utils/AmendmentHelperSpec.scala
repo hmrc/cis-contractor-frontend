@@ -17,13 +17,16 @@
 package utils
 
 import base.SpecBase
+import models.UserAnswers
 import models.address.{Address, Country}
 import models.amend.company.OriginalCompanyAnswers
 import models.amend.partnership.OriginalPartnershipAnswers
 import models.contact.ContactMethodOptions
 import pages.add.company.*
 import pages.add.partnership.*
-import queries.{OriginalCompanyAnswersQuery, OriginalPartnershipAnswersQuery}
+import queries.{OriginalCompanyAnswersQuery, OriginalPartnershipAnswersQuery, OriginalTrustAnswersQuery}
+import models.amend.trust.OriginalTrustAnswers
+import pages.add.trust.*
 
 class AmendmentHelperSpec extends SpecBase {
 
@@ -104,6 +107,65 @@ class AmendmentHelperSpec extends SpecBase {
       .success
       .value
 
+  private val originalTrust =
+    OriginalTrustAnswers(
+      trustName = Some("ABC Trust"),
+      addressYesNo = Some(true),
+      address = Some(address),
+      trustContactMethodsYesNo = Some(true),
+      trustContactMethod = Set(ContactMethodOptions.Email),
+      email = Some("test@test.com"),
+      phone = Some("0123456789"),
+      mobile = Some("07123456789"),
+      utrYesNo = Some(true),
+      utr = Some("1111111111"),
+      worksReferenceYesNo = Some(true),
+      worksReference = Some("WRN123"),
+      verificationNumber = Some("VRN123")
+    )
+
+  private val trustUserAnswers: UserAnswers =
+    emptyUserAnswers
+      .set(OriginalTrustAnswersQuery, originalTrust)
+      .success
+      .value
+      .set(TrustNamePage, "ABC Trust")
+      .success
+      .value
+      .set(TrustAddressYesNoPage, true)
+      .success
+      .value
+      .set(TrustAddressPage, address)
+      .success
+      .value
+      .set(AddTrustContactMethodsYesNoPage, true)
+      .success
+      .value
+      .set(TrustContactMethodOptionsPage, Set(ContactMethodOptions.Email))
+      .success
+      .value
+      .set(TrustEmailAddressPage, "test@test.com")
+      .success
+      .value
+      .set(TrustPhoneNumberPage, "0123456789")
+      .success
+      .value
+      .set(TrustMobileNumberPage, "07123456789")
+      .success
+      .value
+      .set(TrustUtrYesNoPage, true)
+      .success
+      .value
+      .set(TrustUtrPage, "1111111111")
+      .success
+      .value
+      .set(TrustWorksReferenceYesNoPage, true)
+      .success
+      .value
+      .set(TrustWorksReferencePage, "WRN123")
+      .success
+      .value
+
   "AmendmentHelper" - {
 
     "companyHasChanges" - {
@@ -124,6 +186,27 @@ class AmendmentHelperSpec extends SpecBase {
             .value
 
         AmendmentHelper.companyHasChanges(updated) mustBe true
+      }
+    }
+
+    "trustHasChanges" - {
+
+      "must return false when there are no original answers" in {
+        AmendmentHelper.trustHasChanges(emptyUserAnswers) mustBe false
+      }
+
+      "must return false when no fields have changed" in {
+        AmendmentHelper.trustHasChanges(trustUserAnswers) mustBe false
+      }
+
+      "must return true when a field has changed" in {
+        val updated =
+          trustUserAnswers
+            .set(TrustNamePage, "XYZ Trust")
+            .success
+            .value
+
+        AmendmentHelper.trustHasChanges(updated) mustBe true
       }
     }
 

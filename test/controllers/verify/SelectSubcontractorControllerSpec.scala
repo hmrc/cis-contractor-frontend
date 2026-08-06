@@ -19,13 +19,13 @@ package controllers.verify
 import base.SpecBase
 import forms.verify.SelectSubcontractorFormProvider
 import models.response.GetNewestVerificationBatchResponse
-import models.{NormalMode, Subcontractor, SubcontractorViewModel, UserAnswers, Verification}
+import models.{CheckMode, NormalMode, Subcontractor, SubcontractorViewModel, UserAnswers, Verification}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{verify, when}
 import org.scalatestplus.mockito.MockitoSugar
-import pages.verify.{NewestVerificationBatchResponsePage, SelectSubcontractorPage, UnverifiedSubcontractorsPage}
+import pages.verify.{NewestVerificationBatchResponsePage, RebuildVerificationFromWarningPage, SelectSubcontractorPage, UnverifiedSubcontractorsPage}
 import play.api.data.Forms.*
 import play.api.data.Form
 import play.api.inject.bind
@@ -55,6 +55,9 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
 
   def url(page: Int = 1): String =
     controllers.verify.routes.SelectSubcontractorController.onPageLoad(NormalMode, page).url
+
+  def checkModeUrl(page: Int = 1): String =
+    controllers.verify.routes.SelectSubcontractorController.onPageLoad(CheckMode, page).url
 
   private def generateSubcontractors(count: Int): Seq[Subcontractor] =
     (1 to count).map { subcontractorId =>
@@ -578,6 +581,47 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual onwardRoute.url
+      }
+    }
+
+    "must clear RebuildVerificationFromWarningPage after it is consumed in CheckMode" in {
+
+      val mockSessionRepository = mock[SessionRepository]
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+      val userAnswers =
+        uaWithSubcontractors
+          .set(RebuildVerificationFromWarningPage, true)
+          .success
+          .value
+
+      val application =
+        applicationBuilder(userAnswers = Some(userAnswers))
+          .overrides(
+            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
+            bind[SessionRepository].toInstance(mockSessionRepository)
+          )
+          .build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(POST, checkModeUrl())
+            .withFormUrlEncodedBody("value[0]" -> allSubs.head.id)
+
+        val result =
+          route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual onwardRoute.url
+
+        val captor: ArgumentCaptor[UserAnswers] =
+          ArgumentCaptor.forClass(classOf[UserAnswers])
+
+        verify(mockSessionRepository).set(captor.capture())
+
+        captor.getValue.get(SelectSubcontractorPage).value mustEqual Set(allSubs.head)
+        captor.getValue.get(RebuildVerificationFromWarningPage) mustEqual None
       }
     }
 

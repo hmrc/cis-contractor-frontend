@@ -24,6 +24,8 @@ import navigation.Navigator
 import pages.verify.{NewestVerificationBatchResponsePage, SelectSubcontractorPage, UnverifiedSubcontractorsPage}
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
+import models.CheckMode
+import pages.verify.RebuildVerificationFromWarningPage
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import repositories.SessionRepository
 import services.{CheckboxPaginationResult, PaginationService}
@@ -151,19 +153,50 @@ class SelectSubcontractorController @Inject() (
             case None =>
               if (mergedValues.nonEmpty || hasAnyVerifiedSubcontractor(request)) {
                 for {
-                  updatedAnswers <- Future.fromTry(ua.set(SelectSubcontractorPage, mergedValues))
-                  _              <- sessionRepository.set(updatedAnswers)
-                } yield Redirect(navigator.nextPage(SelectSubcontractorPage, mode, updatedAnswers))
+                  answersWithSelections <- Future.fromTry(
+                                             ua.set(SelectSubcontractorPage, mergedValues)
+                                           )
+
+                  nextPage =
+                    navigator.nextPage(
+                      SelectSubcontractorPage,
+                      mode,
+                      answersWithSelections
+                    )
+
+                  updatedAnswers <-
+                    if (
+                      mode == CheckMode &&
+                      answersWithSelections
+                        .get(RebuildVerificationFromWarningPage)
+                        .contains(true)
+                    ) {
+                      Future.fromTry(
+                        answersWithSelections.remove(RebuildVerificationFromWarningPage)
+                      )
+                    } else {
+                      Future.successful(answersWithSelections)
+                    }
+
+                  _ <- sessionRepository.set(updatedAnswers)
+                } yield Redirect(nextPage)
               } else {
                 val formWithErrors =
                   form
                     .fill(currentSelectedValues.map(_.id))
-                    .withError("value", "verify.selectSubcontractor.error.required")
+                    .withError(
+                      "value",
+                      "verify.selectSubcontractor.error.required"
+                    )
 
                 Future.successful(
-                  renderPageWithError(formWithErrors, mode, page, result)
+                  renderPageWithError(
+                    formWithErrors,
+                    mode,
+                    page,
+                    result
+                  )
                 )
-
               }
           }
       }
