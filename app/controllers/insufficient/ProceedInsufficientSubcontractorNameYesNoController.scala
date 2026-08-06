@@ -18,12 +18,15 @@ package controllers.insufficient
 
 import controllers.actions.*
 import forms.insufficient.ProceedInsufficientSubcontractorNameYesNoFormProvider
+
 import javax.inject.Inject
 import models.Mode
 import models.requests.DataRequest
+import models.response.GetNewestVerificationBatchResponse
 import navigation.Navigator
 import pages.insufficient.ProceedInsufficientSubcontractorNameYesNoPage
-import play.api.i18n.{I18nSupport, MessagesApi}
+import pages.verify.NewestVerificationBatchResponsePage
+import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import play.api.data.Form
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
@@ -58,51 +61,73 @@ class ProceedInsufficientSubcontractorNameYesNoController @Inject() (
 
   def onPageLoad(mode: Mode, subcontractorId: Long): Action[AnyContent] =
     (identify andThen getData andThen requireData) { implicit request =>
-      Ok(
-        view(
-          preparedForm,
-          mode,
-          "TODO: fetch name",
-          subcontractorId
-        )
-      )
+      request.userAnswers.get(NewestVerificationBatchResponsePage) match {
+        case Some(batch) =>
+          batch.subcontractors
+            .find(_.subcontractorId == subcontractorId)
+            .map { subcontractor =>
+              Ok(
+                view(
+                  preparedForm,
+                  mode,
+                  subcontractor.displayName(),
+                  subcontractorId
+                )
+              )
+            }
+            .getOrElse(recoveryRedirect)
+
+        case None =>
+          recoveryRedirect
+      }
     }
 
   def onSubmit(mode: Mode, subcontractorId: Long): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
-      form
-        .bindFromRequest()
-        .fold(
-          formWithErrors =>
-            Future.successful(
-              BadRequest(
-                view(
-                  formWithErrors,
-                  mode,
-                  "TODO: fetch name",
-                  subcontractorId
-                )
-              )
-            ),
-          value =>
-            for {
-              updatedAnswers <-
-                Future.fromTry(
-                  request.userAnswers.set(
-                    ProceedInsufficientSubcontractorNameYesNoPage,
-                    value
-                  )
-                )
+      request.userAnswers.get(NewestVerificationBatchResponsePage) match {
+        case Some(batch) =>
+          batch.subcontractors
+            .find(_.subcontractorId == subcontractorId)
+            .map { subcontractor =>
+              form
+                .bindFromRequest()
+                .fold(
+                  formWithErrors =>
+                    Future.successful(
+                      BadRequest(
+                        view(
+                          formWithErrors,
+                          mode,
+                          subcontractor.displayName(),
+                          subcontractorId
+                        )
+                      )
+                    ),
+                  value =>
+                    for {
+                      updatedAnswers <-
+                        Future.fromTry(
+                          request.userAnswers.set(
+                            ProceedInsufficientSubcontractorNameYesNoPage,
+                            value
+                          )
+                        )
 
-              _ <- sessionRepository.set(updatedAnswers)
+                      _ <- sessionRepository.set(updatedAnswers)
 
-            } yield Redirect(
-              navigator.nextPage(
-                ProceedInsufficientSubcontractorNameYesNoPage,
-                mode,
-                updatedAnswers
-              )
-            )
-        )
+                    } yield Redirect(
+                      navigator.nextPage(
+                        ProceedInsufficientSubcontractorNameYesNoPage,
+                        mode,
+                        updatedAnswers
+                      )
+                    )
+                )
+            }
+            .getOrElse(Future.successful(recoveryRedirect))
+
+        case None =>
+          Future.successful(recoveryRedirect)
+      }
     }
 }
