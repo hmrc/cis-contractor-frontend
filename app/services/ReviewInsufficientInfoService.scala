@@ -49,7 +49,12 @@ class ReviewInsufficientInfoService @Inject() () {
       nameLink = LinkViewModel(dummyUrl, name),
       utr = utrDisplay(sub),
       editLink = LinkViewModel(dummyUrl, name),
-      proceedLink = LinkViewModel(dummyUrl, name),
+      proceedLink = LinkViewModel(
+        controllers.insufficient.routes.ProceedInsufficientSubcontractorNameYesNoController
+          .onPageLoad(sub.subcontractorId)
+          .url,
+        name
+      ),
       removeLink = LinkViewModel(dummyUrl, name)
     )
   }

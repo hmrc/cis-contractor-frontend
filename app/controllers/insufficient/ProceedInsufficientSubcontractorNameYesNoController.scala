@@ -29,7 +29,6 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.insufficient.ProceedInsufficientSubcontractorNameYesNoView
-import utils.SubcontractorNameExtractor
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -41,7 +40,6 @@ class ProceedInsufficientSubcontractorNameYesNoController @Inject() (
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   formProvider: ProceedInsufficientSubcontractorNameYesNoFormProvider,
-  subcontractorNameExtractor: SubcontractorNameExtractor,
   val controllerComponents: MessagesControllerComponents,
   view: ProceedInsufficientSubcontractorNameYesNoView
 )(implicit ec: ExecutionContext)
@@ -58,59 +56,53 @@ class ProceedInsufficientSubcontractorNameYesNoController @Inject() (
       .get(ProceedInsufficientSubcontractorNameYesNoPage)
       .fold(form)(form.fill)
 
-  def onPageLoad(mode: Mode): Action[AnyContent] =
+  def onPageLoad(mode: Mode, subcontractorId: Long): Action[AnyContent] =
     (identify andThen getData andThen requireData) { implicit request =>
-      subcontractorNameExtractor
-        .getSubcontractorName(request.userAnswers)
-        .fold(recoveryRedirect) { subcontractorName =>
-          Ok(
-            view(
-              preparedForm,
-              mode,
-              subcontractorName
-            )
-          )
-        }
+      Ok(
+        view(
+          preparedForm,
+          mode,
+          "TODO: fetch name",
+          subcontractorId
+        )
+      )
     }
 
-  def onSubmit(mode: Mode): Action[AnyContent] =
+  def onSubmit(mode: Mode, subcontractorId: Long): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
-      subcontractorNameExtractor
-        .getSubcontractorName(request.userAnswers)
-        .fold(Future.successful(recoveryRedirect)) { subcontractorName =>
-          form
-            .bindFromRequest()
-            .fold(
-              formWithErrors =>
-                Future.successful(
-                  BadRequest(
-                    view(
-                      formWithErrors,
-                      mode,
-                      subcontractorName
-                    )
-                  )
-                ),
-              value =>
-                for {
-                  updatedAnswers <-
-                    Future.fromTry(
-                      request.userAnswers.set(
-                        ProceedInsufficientSubcontractorNameYesNoPage,
-                        value
-                      )
-                    )
-
-                  _ <- sessionRepository.set(updatedAnswers)
-
-                } yield Redirect(
-                  navigator.nextPage(
+      form
+        .bindFromRequest()
+        .fold(
+          formWithErrors =>
+            Future.successful(
+              BadRequest(
+                view(
+                  formWithErrors,
+                  mode,
+                  "TODO: fetch name",
+                  subcontractorId
+                )
+              )
+            ),
+          value =>
+            for {
+              updatedAnswers <-
+                Future.fromTry(
+                  request.userAnswers.set(
                     ProceedInsufficientSubcontractorNameYesNoPage,
-                    mode,
-                    updatedAnswers
+                    value
                   )
                 )
+
+              _ <- sessionRepository.set(updatedAnswers)
+
+            } yield Redirect(
+              navigator.nextPage(
+                ProceedInsufficientSubcontractorNameYesNoPage,
+                mode,
+                updatedAnswers
+              )
             )
-        }
+        )
     }
 }
