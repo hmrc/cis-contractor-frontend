@@ -72,9 +72,9 @@ class VerificationBatchReadinessSpec extends SpecBase {
     )
 
   private def verification(
-                            subcontractorId: Long,
-                            proceed: Option[String] = None
-                          ): VerificationCurrentVerification =
+    subcontractorId: Long,
+    proceed: Option[String] = None
+  ): VerificationCurrentVerification =
     VerificationCurrentVerification(
       verificationId = subcontractorId,
       verificationBatchId = None,
@@ -89,9 +89,9 @@ class VerificationBatchReadinessSpec extends SpecBase {
     )
 
   private def batchResponse(
-                             subcontractors: Seq[SubcontractorCurrentVerification],
-                             verifications: Seq[VerificationCurrentVerification] = Seq.empty
-                           ): GetCurrentVerificationBatchResponse =
+    subcontractors: Seq[SubcontractorCurrentVerification],
+    verifications: Seq[VerificationCurrentVerification] = Seq.empty
+  ): GetCurrentVerificationBatchResponse =
     GetCurrentVerificationBatchResponse(
       subcontractors = subcontractors,
       verificationBatch = None,

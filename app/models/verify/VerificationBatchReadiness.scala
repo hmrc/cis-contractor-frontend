@@ -23,9 +23,9 @@ import models.response.GetCurrentVerificationBatchResponse
 object VerificationBatchReadiness {
 
   def isBatchReady(
-                    selectedIds: Set[String],
-                    batchResponse: GetCurrentVerificationBatchResponse
-                  ): Boolean = {
+    selectedIds: Set[String],
+    batchResponse: GetCurrentVerificationBatchResponse
+  ): Boolean = {
 
     val allSubcontractors = batchResponse.subcontractors
     val verifications     = batchResponse.verifications
@@ -35,19 +35,19 @@ object VerificationBatchReadiness {
         selectedIds.flatMap(id => allSubcontractors.find(_.subcontractorId.toString == id))
 
       selectedSubs.size == selectedIds.size &&
-        selectedSubs.forall { sub =>
-          val verification =
-            verifications.find(_.subcontractorId.contains(sub.subcontractorId))
+      selectedSubs.forall { sub =>
+        val verification =
+          verifications.find(_.subcontractorId.contains(sub.subcontractorId))
 
-          isSubcontractorReady(sub, verification)
-        }
+        isSubcontractorReady(sub, verification)
+      }
     }
   }
 
   def isSubcontractorReady(
-                            sub: SubcontractorCurrentVerification,
-                            verification: Option[VerificationCurrentVerification]
-                          ): Boolean =
+    sub: SubcontractorCurrentVerification,
+    verification: Option[VerificationCurrentVerification]
+  ): Boolean =
     hasProceeded(verification) ||
       (sub.subcontractorType.flatMap(TypeOfSubcontractor.enumerable.withName) match {
         case Some(Individualorsoletrader) => isIndividualReady(sub)
@@ -60,8 +60,8 @@ object VerificationBatchReadiness {
   private def nonBlank(opt: Option[String]): Boolean = opt.exists(_.trim.nonEmpty)
 
   private def hasProceeded(
-                            verification: Option[VerificationCurrentVerification]
-                          ): Boolean =
+    verification: Option[VerificationCurrentVerification]
+  ): Boolean =
     verification.exists(_.proceed.contains("Y"))
 
   private def isIndividualReady(sub: SubcontractorCurrentVerification): Boolean = {
