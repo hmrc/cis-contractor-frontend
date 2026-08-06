@@ -1133,3 +1133,9 @@ contractordetails.removeDetailYesNo.detail.email                               =
 contractordetails.removeDetailYesNo.detail.schemeName                          =  scheme name
 contractordetails.removeDetailYesNo.error.required.email                       =  Select yes to remove the contractor’s email address
 contractordetails.removeDetailYesNo.error.required.schemeName                  =  Select yes to remove the contractor’s scheme name
+
+unmatchedSubcontractors.title = You have unmatched subcontractors
+unmatchedSubcontractors.heading = You have unmatched subcontractors
+unmatchedSubcontractors.p1 = Some of the subcontractor details in your most recent verification request do not match the information about that subcontractor held by HMRC.
+unmatchedSubcontractors.p2 = You cannot create a new verification request until you have reviewed and fixed these unmatched results.
+unmatchedSubcontractors.verificationResults.link = Check your latest verification results
