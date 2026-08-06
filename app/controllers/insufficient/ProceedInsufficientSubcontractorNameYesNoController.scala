@@ -18,21 +18,20 @@ package controllers.insufficient
 
 import controllers.actions.*
 import forms.insufficient.ProceedInsufficientSubcontractorNameYesNoFormProvider
-
-import javax.inject.Inject
 import models.Mode
 import models.requests.DataRequest
 import models.response.GetNewestVerificationBatchResponse
 import navigation.Navigator
 import pages.insufficient.ProceedInsufficientSubcontractorNameYesNoPage
 import pages.verify.NewestVerificationBatchResponsePage
-import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import play.api.data.Form
+import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.insufficient.ProceedInsufficientSubcontractorNameYesNoView
 
+import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class ProceedInsufficientSubcontractorNameYesNoController @Inject() (
