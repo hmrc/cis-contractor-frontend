@@ -55,16 +55,18 @@ class AmendPartnershipConfirmationController @Inject() (
 
       val recoveryRedirect =
         Redirect(routes.JourneyRecoveryController.onPageLoad())
-      
+
       val ua = request.userAnswers
 
       if (!ua.get(AmendCheckYourAnswersSubmittedPage).contains(true)) {
-        logger.warn(s"[AmendPartnershipConfirmationController][onPageLoad] " +
-          "Accessed confirmation page without prior submission")
+        logger.warn(
+          s"[AmendPartnershipConfirmationController][onPageLoad] " +
+            "Accessed confirmation page without prior submission"
+        )
         Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
       } else {
 
-        ua.get(OriginalPartnershipAnswersQuery)  match {
+        ua.get(OriginalPartnershipAnswersQuery) match {
 
           case None =>
             logger.error("[AmendPartnershipConfirmationController] Missing OriginalPartnershipAnswersQuery")
@@ -78,7 +80,7 @@ class AmendPartnershipConfirmationController @Inject() (
                 Future.successful(recoveryRedirect)
 
               case Some(_) =>
-                val tableRows = AmendPartnershipConfirmationViewModel.rows(originalPartnershipAnswers, ua)
+                val tableRows       = AmendPartnershipConfirmationViewModel.rows(originalPartnershipAnswers, ua)
                 val partnershipName = ua.get(PartnershipNamePage).getOrElse("")
                 cleanupService.cleanAmend(ua) match {
 
