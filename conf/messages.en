@@ -442,6 +442,11 @@ proceedInsufficientSubcontractorNameYesNo.heading                               
 proceedInsufficientSubcontractorNameYesNo.hint                                      =  This will assign the higher rate tax treatment to this subcontractor.
 proceedInsufficientSubcontractorNameYesNo.error.required                            =  Select yes if you want to proceed with including this subcontractor in this verification request
 
+removeInsufficientSubcontractorNameYesNo.title                                      =  Are you sure you want to remove this subcontractor from this verification request?
+removeInsufficientSubcontractorNameYesNo.heading                                    =  Are you sure you want to remove {0} from this verification request?
+removeInsufficientSubcontractorNameYesNo.hint                                       =  This means they will remain unverified, so you must not make any payments to them.
+removeInsufficientSubcontractorNameYesNo.error.required                             =  Select yes if you want to remove this subcontractor from this verification request
+
 # Partnership
 addPartnershipContactMethodsYesNo.title                            =  Do you want to add contact details for this partnership?
 addPartnershipContactMethodsYesNo.heading                          =  Do you want to add contact details for {0}?

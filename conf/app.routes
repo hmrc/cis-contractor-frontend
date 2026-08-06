@@ -107,8 +107,6 @@ GET   /subcontractor/amend/company/subcontractor-details-updated  controllers.am
 GET   /subcontractor/amend/trust/subcontractor-information  controllers.amend.trust.AmendTrustCheckYourAnswersController.onPageLoad()
 POST  /subcontractor/amend/trust/subcontractor-information  controllers.amend.trust.AmendTrustCheckYourAnswersController.onSubmit()
 GET   /subcontractor/amend/trust/cancel                     controllers.amend.trust.AmendTrustCheckYourAnswersController.onCancel()
-GET   /subcontractor/amend/trust-information                controllers.amend.trust.AmendTrustCheckYourAnswersController.onPageLoad()
-POST  /subcontractor/amend/trust-information                controllers.amend.trust.AmendTrustCheckYourAnswersController.onSubmit()
 
 GET   /subcontractor/amend/company/subcontractor-information  controllers.amend.company.AmendCompanyCheckYourAnswersController.onPageLoad()
 POST  /subcontractor/amend/company/subcontractor-information  controllers.amend.company.AmendCompanyCheckYourAnswersController.onSubmit()
@@ -121,6 +119,9 @@ POST  /subcontractor/amend/partnership/remove/information/:subcontractorDetail  
 
 GET   /subcontractor/proceed-verifying-subcontractor  controllers.insufficient.ProceedInsufficientSubcontractorNameYesNoController.onPageLoad(mode: Mode = NormalMode)
 POST  /subcontractor/proceed-verifying-subcontractor  controllers.insufficient.ProceedInsufficientSubcontractorNameYesNoController.onSubmit(mode: Mode = NormalMode)
+
+GET   /subcontractor/remove-subcontractor-from-request  controllers.insufficient.RemoveInsufficientSubcontractorNameYesNoController.onPageLoad(mode: Mode = NormalMode)
+POST  /subcontractor/remove-subcontractor-from-request  controllers.insufficient.RemoveInsufficientSubcontractorNameYesNoController.onSubmit(mode: Mode = NormalMode)
 
 # Errors & Auth
 GET  /unauthorised/standard-user  controllers.UnauthorisedWrongRoleController.onPageLoad()
