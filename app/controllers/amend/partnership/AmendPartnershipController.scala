@@ -107,19 +107,17 @@ class AmendPartnershipController @Inject() (
     cisId: String,
     subcontractor: SubcontractorResponse
   ): Try[UserAnswers] = {
-    val address                    = toAddress(subcontractor)
-    val methods                    = contactMethods(subcontractor)
-    val nominatedPartnerName       =
-      Seq(subcontractor.firstName, subcontractor.secondName, subcontractor.surname).flatten.mkString(" ").trim
-    val partnershipName            = subcontractor.partnershipTradingName.orElse(subcontractor.tradingName)
-    val nominatedPartnerNameOption = Option.when(nominatedPartnerName.nonEmpty)(nominatedPartnerName)
+    val address              = toAddress(subcontractor)
+    val methods              = contactMethods(subcontractor)
+    val nominatedPartnerName = subcontractor.tradingName
+    val partnershipName      = subcontractor.partnershipTradingName
 
     val original = originalAnswers(
       subcontractor = subcontractor,
       address = address,
       methods = methods,
       partnershipName = partnershipName,
-      nominatedPartnerName = nominatedPartnerNameOption
+      nominatedPartnerName = nominatedPartnerName
     )
 
     for {
@@ -134,11 +132,7 @@ class AmendPartnershipController @Inject() (
       updated <- setOptional(updated, PartnershipMobileNumberPage, subcontractor.mobilePhoneNumber)
       updated <- updated.set(PartnershipHasUtrYesNoPage, subcontractor.utr.isDefined)
       updated <- setOptional(updated, PartnershipUniqueTaxpayerReferencePage, subcontractor.utr)
-      updated <- setOptional(
-                   updated,
-                   PartnershipNominatedPartnerNamePage,
-                   Option.when(nominatedPartnerName.nonEmpty)(nominatedPartnerName)
-                 )
+      updated <- setOptional(updated, PartnershipNominatedPartnerNamePage, nominatedPartnerName)
       updated <- updated.set(PartnershipNominatedPartnerUtrYesNoPage, subcontractor.partnerUtr.isDefined)
       updated <- setOptional(updated, PartnershipNominatedPartnerUtrPage, subcontractor.partnerUtr)
       updated <- updated.set(ShowVerificationDetailsPage, shouldShowVerificationDetails(subcontractor))

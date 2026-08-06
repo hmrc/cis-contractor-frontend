@@ -134,8 +134,8 @@ class AmendPartnershipCheckYourAnswersController @Inject() (
         Seq(
           PartnershipHasUtrYesNoSummary.row(ua, AmendMode),
           PartnershipUniqueTaxpayerReferenceSummary.row(ua, AmendMode),
-          PartnershipNominatedPartnerUtrSummary.row(ua, AmendMode),
-          PartnershipNominatedPartnerUtrYesNoSummary.row(ua, AmendMode)
+          PartnershipNominatedPartnerUtrYesNoSummary.row(ua, AmendMode),
+          PartnershipNominatedPartnerUtrSummary.row(ua, AmendMode)
         )
       }
 
