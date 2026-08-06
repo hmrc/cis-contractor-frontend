@@ -437,6 +437,17 @@ amendPartnershipRemoveDetailYesNo.detail.nominatedPartnerUtr                    
 amendPartnershipRemoveDetailYesNo.detail.nominatedPartnerNino                       =  nominated partner’s National Insurance number
 amendPartnershipRemoveDetailYesNo.detail.nominatedPartnerCompanyRegistrationNumber  =  nominated partner’s company registration number
 
+amendIndividualRemoveDetailYesNo.title                                              =  Are you sure you want to remove this information from this subcontractor?
+amendIndividualRemoveDetailYesNo.heading                                            =  Are you sure you want to remove the {1} from {0}?
+amendIndividualRemoveDetailYesNo.error.required                                     =  Select whether you want to remove this information from this subcontractor
+amendIndividualRemoveDetailYesNo.detail.tradingName                                 =  trading name
+amendIndividualRemoveDetailYesNo.detail.subcontractorName                           =  subcontractor name
+amendIndividualRemoveDetailYesNo.detail.address                                     =  address
+amendIndividualRemoveDetailYesNo.detail.contactDetails                              =  contact details
+amendIndividualRemoveDetailYesNo.detail.utr                                         =  UTR
+amendIndividualRemoveDetailYesNo.detail.nationalInsuranceNumber                     =  National Insurance number
+amendIndividualRemoveDetailYesNo.detail.worksReferenceNumber                        =  works reference number
+
 # Partnership
 addPartnershipContactMethodsYesNo.title                     =  Do you want to add contact details for this partnership?
 addPartnershipContactMethodsYesNo.heading                   =  Do you want to add contact details for {0}?
