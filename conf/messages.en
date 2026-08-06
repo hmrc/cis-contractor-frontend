@@ -45,7 +45,6 @@ journeyRecovery.continue.heading                        =  Sorry, there is a pro
 journeyRecovery.continue.guidance.p1                    =  There is a problem with this service. You can return to
 journeyRecovery.continue.guidance.link                  =  Construction Industry Scheme
 journeyRecovery.continue.guidance.p2                    =  or try again later.
-
 journeyRecovery.startAgain.title                        =  There is a problem with this service
 journeyRecovery.startAgain.heading                      =  Sorry, there is a problem with this service
 journeyRecovery.startAgain.guidance.p1                  =  Try again later
