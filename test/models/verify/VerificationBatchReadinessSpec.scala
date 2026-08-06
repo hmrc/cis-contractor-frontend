@@ -16,11 +16,9 @@
 
 package models.verify
 
-import models.{SubcontractorCurrentVerification, VerificationCurrentVerification}
 import base.SpecBase
 import models.response.GetCurrentVerificationBatchResponse
-
-import java.time.LocalDateTime
+import models.{SubcontractorCurrentVerification, VerificationCurrentVerification}
 
 class VerificationBatchReadinessSpec extends SpecBase {
 

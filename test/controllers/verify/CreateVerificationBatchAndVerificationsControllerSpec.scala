@@ -55,7 +55,7 @@ class CreateVerificationBatchAndVerificationsControllerSpec extends SpecBase wit
     GetCurrentVerificationBatchResponse(
       subcontractors = Seq(
         SubcontractorCurrentVerification(
-          subcontractorId = 1L,
+          subcontractorId = 10L,
           subbieResourceRef = Some(1111L),
           firstName = None,
           secondName = None,
