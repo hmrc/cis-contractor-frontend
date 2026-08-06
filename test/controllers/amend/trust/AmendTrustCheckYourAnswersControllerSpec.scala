@@ -17,104 +17,522 @@
 package controllers.amend.trust
 
 import base.SpecBase
+import controllers.routes
+import models.address.{Address, Country}
+import models.amend.trust.OriginalTrustAnswers
+import models.{TypeOfSubcontractor, UserAnswers}
+import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito.{never, verify, verifyNoInteractions, verifyNoMoreInteractions, when}
+import org.scalatestplus.mockito.MockitoSugar
+import pages.add.TypeOfSubcontractorPage
+import pages.add.trust.*
+import play.api.i18n.MessagesApi
+import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
+import queries.OriginalTrustAnswersQuery
+import repositories.SessionRepository
+import services.SubcontractorService
+import uk.gov.hmrc.http.HeaderCarrier
 
-class AmendTrustCheckYourAnswersControllerSpec extends SpecBase {
+import scala.concurrent.Future
+import models.contact.ContactMethodOptions
+import pages.amend.ShowVerificationDetailsPage
+import org.mockito.ArgumentCaptor
+import pages.amend.AmendCheckYourAnswersSubmittedPage
+import queries.CisIdQuery
+import utils.AmendmentHelper
+import config.FrontendAppConfig
 
-  private lazy val onPageLoadRoute =
-    controllers.amend.trust.routes.AmendTrustCheckYourAnswersController
-      .onPageLoad()
-      .url
-
-  private lazy val onSubmitRoute =
-    controllers.amend.trust.routes.AmendTrustCheckYourAnswersController
-      .onSubmit()
-      .url
+class AmendTrustCheckYourAnswersControllerSpec extends SpecBase with MockitoSugar {
+  private val address =
+    Address(
+      addressLine1 = "12 Harbor View Road",
+      addressLine2 = Some("Amity Island"),
+      addressLine3 = Some("Bodmin"),
+      addressLine4 = Some("Cornwall"),
+      postcode = Some("PL31 2HL"),
+      country = Some(
+        Country(
+          code = None,
+          name = Some("England")
+        )
+      )
+    )
+  private val minUa   =
+    emptyUserAnswers
+      .set(TypeOfSubcontractorPage, TypeOfSubcontractor.Trust)
+      .success
+      .value
+      .set(TrustNamePage, "Test Trust")
+      .success
+      .value
+      .set(TrustAddressYesNoPage, true)
+      .success
+      .value
+      .set(TrustAddressPage, address)
+      .success
+      .value
+      .set(AddTrustContactMethodsYesNoPage, true)
+      .success
+      .value
+      .set(TrustContactMethodOptionsPage, Set(ContactMethodOptions.Email))
+      .success
+      .value
+      .set(TrustEmailAddressPage, "test@test.com")
+      .success
+      .value
+      .set(TrustUtrYesNoPage, true)
+      .success
+      .value
+      .set(TrustUtrPage, "11111111")
+      .success
+      .value
+      .set(TrustWorksReferenceYesNoPage, true)
+      .success
+      .value
+      .set(TrustWorksReferencePage, "WRN-11")
+      .success
+      .value
+      .set(ShowVerificationDetailsPage, false)
+      .success
+      .value
+      .set(
+        OriginalTrustAnswersQuery,
+        OriginalTrustAnswers(
+          trustName = Some("Test Trust"),
+          addressYesNo = Some(true),
+          address = Some(address),
+          trustContactMethodsYesNo = Some(true),
+          trustContactMethod = Set(ContactMethodOptions.Email),
+          email = Some("test@test.com"),
+          phone = None,
+          mobile = None,
+          utrYesNo = Some(true),
+          utr = Some("11111111"),
+          worksReferenceYesNo = Some(true),
+          worksReference = Some("WRN-1"),
+          verificationNumber = None
+        )
+      )
+      .success
+      .value
 
   "AmendTrustCheckYourAnswersController" - {
 
-    "onPageLoad" - {
+    "must return OK and render the page with the correct summary list for GET when validation succeeds for unverified trust" in {
+      val application =
+        applicationBuilder(userAnswers = Some(minUa)).build()
 
-      "must return OK when user answers exist" in {
-        val application =
-          applicationBuilder(userAnswers = Some(emptyUserAnswers))
-            .build()
+      running(application) {
+        val request =
+          FakeRequest(GET, controllers.amend.trust.routes.AmendTrustCheckYourAnswersController.onPageLoad().url)
+        val msg     = app.injector.instanceOf[MessagesApi].preferred(request)
+        val result  = route(application, request).value
 
-        running(application) {
-          val request = FakeRequest(GET, onPageLoadRoute)
-          val result  = route(application, request).value
+        status(result) mustEqual OK
 
-          status(result) mustBe OK
-        }
-      }
+        val page = contentAsString(result)
 
-      "must return the expected trust details content" in {
-        val application =
-          applicationBuilder(userAnswers = Some(emptyUserAnswers))
-            .build()
+        page must include(msg("typeOfSubcontractor.checkYourAnswersLabel"))
+        page must include(msg("trustName.checkYourAnswersLabel"))
+        page must include(msg("trustUtrYesNo.checkYourAnswersLabel"))
+        page must include(msg("trustUtr.checkYourAnswersLabel"))
+        page must include(msg("trustWorksReferenceYesNo.checkYourAnswersLabel"))
+        page must include(msg("trustWorksReference.checkYourAnswersLabel"))
+        page must include(msg("trustAddressYesNo.checkYourAnswersLabel"))
+        page must include(msg("trustAddress.checkYourAnswersLabel"))
+        page must include(msg("addTrustContactMethodsYesNo.checkYourAnswersLabel"))
+        page must include(msg("trustContactMethodOptions.checkYourAnswersLabel"))
+        page must include(msg("trustEmailAddress.checkYourAnswersLabel"))
 
-        running(application) {
-          val request = FakeRequest(GET, onPageLoadRoute)
-          val result  = route(application, request).value
+        page must not include msg("amendCheckYourAnswers.verificationNumber.label")
 
-          contentAsString(result) mustBe
-            "Amend trust subcontractor details"
-        }
-      }
+        page must include("Trust")
+        page must include("Test Trust")
+        page must include("11111111")
+        page must include("WRN-11")
+        page must include("test@test.com")
+        page must include("12 Harbor View Road")
+        page must include("Amity Island")
+        page must include("Bodmin")
+        page must include("Cornwall")
+        page must include("PL31 2HL")
+        page must include("England")
 
-      "must redirect to JourneyRecovery when no user answers exist" in {
-        val application =
-          applicationBuilder(userAnswers = None)
-            .build()
-
-        running(application) {
-          val request = FakeRequest(GET, onPageLoadRoute)
-          val result  = route(application, request).value
-
-          status(result) mustBe SEE_OTHER
-
-          redirectLocation(result).value mustBe
-            controllers.routes.JourneyRecoveryController
-              .onPageLoad()
-              .url
-        }
+        page must not include "VRN123456"
       }
     }
 
-    "onSubmit" - {
+    "must render the correct summary for a verified trust" in {
 
-      "must redirect to onPageLoad when user answers exist" in {
-        val application =
-          applicationBuilder(userAnswers = Some(emptyUserAnswers))
-            .build()
+      val verifiedUa =
+        minUa
+          .set(ShowVerificationDetailsPage, true)
+          .success
+          .value
+          .set(
+            OriginalTrustAnswersQuery,
+            OriginalTrustAnswers(
+              trustName = Some("Test Trust"),
+              addressYesNo = Some(false),
+              address = None,
+              trustContactMethodsYesNo = Some(false),
+              trustContactMethod = Set.empty,
+              email = None,
+              phone = None,
+              mobile = None,
+              utrYesNo = Some(false),
+              utr = None,
+              worksReferenceYesNo = Some(false),
+              worksReference = None,
+              verificationNumber = Some("VRN123456")
+            )
+          )
+          .success
+          .value
 
-        running(application) {
-          val request = FakeRequest(POST, onSubmitRoute)
-          val result  = route(application, request).value
+      val application =
+        applicationBuilder(userAnswers = Some(verifiedUa)).build()
 
-          status(result) mustBe SEE_OTHER
-          redirectLocation(result).value mustBe onPageLoadRoute
-        }
+      running(application) {
+
+        val request =
+          FakeRequest(GET, controllers.amend.trust.routes.AmendTrustCheckYourAnswersController.onPageLoad().url)
+        val msg     = app.injector.instanceOf[MessagesApi].preferred(request)
+        val result  = route(application, request).value
+
+        status(result) mustEqual OK
+
+        val page = contentAsString(result)
+
+        page must include(msg("amendCheckYourAnswers.verificationNumber.label"))
+        page must include("VRN123456")
+
+        page must not include msg("trustName.checkYourAnswersLabel")
+        page must not include msg("trustUtrYesNo.checkYourAnswersLabel")
+        page must not include msg("trustUtr.change.hidden")
+
+        page must include(msg("typeOfSubcontractor.checkYourAnswersLabel"))
+        page must include("Trust")
+
+        page must include(msg("trustUtr.verified.checkYourAnswersLabel"))
+        page must include("11111111")
+        page must include(msg("trustAddressYesNo.checkYourAnswersLabel"))
+        page must include(msg("trustAddress.checkYourAnswersLabel"))
+        page must include(msg("site.yes"))
+        page must include("12 Harbor View Road")
+        page must include("Amity Island")
+        page must include("Bodmin")
+        page must include("Cornwall")
+        page must include("PL31 2HL")
+        page must include("England")
+
+        page must include(msg("addTrustContactMethodsYesNo.checkYourAnswersLabel"))
+        page must include(msg("trustContactMethodOptions.checkYourAnswersLabel"))
+        page must include(msg("trustEmailAddress.checkYourAnswersLabel"))
+        page must include("test@test.com")
+
+        page must include(msg("trustWorksReferenceYesNo.checkYourAnswersLabel"))
+        page must include(msg("trustWorksReference.checkYourAnswersLabel"))
+        page must include(msg("site.no"))
+        page must include("WRN-11")
+      }
+    }
+
+    "must not render the verification number row when the trust is pending verifications" in {
+
+      val verifiedUa =
+        minUa
+          .set(ShowVerificationDetailsPage, true)
+          .success
+          .value
+          .set(
+            OriginalTrustAnswersQuery,
+            OriginalTrustAnswers(
+              trustName = Some("Test Trust"),
+              addressYesNo = Some(false),
+              address = None,
+              trustContactMethodsYesNo = Some(false),
+              trustContactMethod = Set.empty,
+              email = None,
+              phone = None,
+              mobile = None,
+              utrYesNo = Some(false),
+              utr = None,
+              worksReferenceYesNo = Some(false),
+              worksReference = None,
+              verificationNumber = None
+            )
+          )
+          .success
+          .value
+
+      val application =
+        applicationBuilder(userAnswers = Some(verifiedUa)).build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(
+            GET,
+            controllers.amend.trust.routes.AmendTrustCheckYourAnswersController.onPageLoad().url
+          )
+
+        val msg = application.injector.instanceOf[MessagesApi].preferred(request)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual OK
+
+        val page = contentAsString(result)
+
+        page must not include msg("amendCheckYourAnswers.verificationNumber.label")
+        page must not include "VRN123456"
+        page must include(msg("trustUtr.verified.checkYourAnswersLabel"))
+      }
+    }
+
+    "must redirect to Journey Recovery when validation fails" in {
+
+      val invalidUa =
+        emptyUserAnswers
+          .set(TypeOfSubcontractorPage, TypeOfSubcontractor.Trust)
+          .success
+          .value
+
+      val application =
+        applicationBuilder(userAnswers = Some(invalidUa)).build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(GET, controllers.amend.trust.routes.AmendTrustCheckYourAnswersController.onPageLoad().url)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual
+          routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must redirect back to amend CYA after successful submit" in {
+
+      val mockSubcontractorService = mock[SubcontractorService]
+      val mockSessionRepository    = mock[SessionRepository]
+      val captor                   = ArgumentCaptor.forClass(classOf[UserAnswers])
+      when(mockSubcontractorService.createAndUpdateSubcontractor(any[UserAnswers])(any[HeaderCarrier]))
+        .thenReturn(Future.successful(()))
+      when(mockSessionRepository.set(any[UserAnswers])).thenReturn(Future.successful(true))
+
+      val application =
+        applicationBuilder(userAnswers = Some(minUa))
+          .overrides(
+            bind[SubcontractorService].toInstance(mockSubcontractorService),
+            bind[SessionRepository].toInstance(mockSessionRepository)
+          )
+          .build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(POST, controllers.amend.trust.routes.AmendTrustCheckYourAnswersController.onSubmit().url)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual
+          controllers.amend.trust.routes.AmendTrustConfirmationController.onPageLoad().url
       }
 
-      "must redirect to JourneyRecovery when no user answers exist" in {
-        val application =
-          applicationBuilder(userAnswers = None)
-            .build()
+      verify(mockSubcontractorService)
+        .createAndUpdateSubcontractor(any[UserAnswers])(any[HeaderCarrier])
+      verify(mockSessionRepository).set(captor.capture())
 
-        running(application) {
-          val request = FakeRequest(POST, onSubmitRoute)
-          val result  = route(application, request).value
+      captor.getValue.get(AmendCheckYourAnswersSubmittedPage) mustBe Some(true)
+      verifyNoMoreInteractions(mockSubcontractorService)
+    }
 
-          status(result) mustBe SEE_OTHER
+    "must redirect to Journey Recovery when the check your answers page has already been submitted" in {
 
-          redirectLocation(result).value mustBe
-            controllers.routes.JourneyRecoveryController
-              .onPageLoad()
-              .url
-        }
+      val ua = minUa
+        .set(AmendCheckYourAnswersSubmittedPage, true)
+        .success
+        .value
+
+      val mockSubcontractorService = mock[SubcontractorService]
+
+      val application =
+        applicationBuilder(userAnswers = Some(ua))
+          .overrides(
+            bind[SubcontractorService].toInstance(mockSubcontractorService)
+          )
+          .build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(POST, controllers.amend.trust.routes.AmendTrustCheckYourAnswersController.onSubmit().url)
+
+        val result = route(application, request).value
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result).value mustBe
+          controllers.routes.JourneyRecoveryController.onPageLoad().url
       }
+      verifyNoInteractions(mockSubcontractorService)
+    }
+
+    "must redirect to Manage Your Subcontractors when no changes have been made" in {
+      val cisId = "cis-123"
+
+      val ua =
+        minUa
+          .set(CisIdQuery, cisId)
+          .success
+          .value
+          .set(TrustWorksReferencePage, "WRN-1")
+          .success
+          .value
+
+      val mockSubcontractorService = mock[SubcontractorService]
+      val mockSessionRepository    = mock[SessionRepository]
+
+      AmendmentHelper.trustHasChanges(ua) mustBe false
+
+      val application =
+        applicationBuilder(userAnswers = Some(ua))
+          .configure(
+            "urls.manage-your-subcontractors" ->
+              s"http://localhost:6996/construction-industry-scheme/management/subcontractors/$cisId/your-subcontractors"
+          )
+          .overrides(
+            bind[SubcontractorService].toInstance(mockSubcontractorService),
+            bind[SessionRepository].toInstance(mockSessionRepository)
+          )
+          .build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(
+            POST,
+            controllers.amend.trust.routes.AmendTrustCheckYourAnswersController.onSubmit().url
+          )
+
+        val result = route(application, request).value
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result).value mustBe
+          "http://localhost:6996/construction-industry-scheme/management/subcontractors/cis-123/your-subcontractors"
+      }
+
+      verifyNoInteractions(mockSubcontractorService)
+      verifyNoInteractions(mockSessionRepository)
+    }
+
+    "must redirect to Journey Recovery when the service fails" in {
+
+      val mockSubcontractorService = mock[SubcontractorService]
+      val mockSessionRepository    = mock[SessionRepository]
+
+      when(mockSubcontractorService.createAndUpdateSubcontractor(any[UserAnswers])(any[HeaderCarrier]))
+        .thenReturn(Future.failed(new RuntimeException("boom")))
+
+      val application =
+        applicationBuilder(userAnswers = Some(minUa))
+          .overrides(
+            bind[SubcontractorService].toInstance(mockSubcontractorService),
+            bind[SessionRepository].toInstance(mockSessionRepository)
+          )
+          .build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(POST, controllers.amend.trust.routes.AmendTrustCheckYourAnswersController.onSubmit().url)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual
+          routes.JourneyRecoveryController.onPageLoad().url
+      }
+
+      verify(mockSubcontractorService)
+        .createAndUpdateSubcontractor(any[UserAnswers])(any[HeaderCarrier])
+    }
+
+    "must redirect to Journey Recovery when POST validation fails" in {
+
+      val invalidUa =
+        emptyUserAnswers
+          .set(TypeOfSubcontractorPage, TypeOfSubcontractor.Trust)
+          .success
+          .value
+
+      val mockSubcontractorService = mock[SubcontractorService]
+      val mockSessionRepository    = mock[SessionRepository]
+
+      val application =
+        applicationBuilder(userAnswers = Some(invalidUa))
+          .overrides(
+            bind[SubcontractorService].toInstance(mockSubcontractorService),
+            bind[SessionRepository].toInstance(mockSessionRepository)
+          )
+          .build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(POST, controllers.amend.trust.routes.AmendTrustCheckYourAnswersController.onSubmit().url)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual
+          routes.JourneyRecoveryController.onPageLoad().url
+      }
+
+      verify(mockSubcontractorService, never())
+        .createAndUpdateSubcontractor(any[UserAnswers])(any[HeaderCarrier])
+    }
+
+    "must clear answers and redirect to your subcontractor page on cancel" in {
+
+      val ua                    =
+        minUa
+          .set(CisIdQuery, "cis-123")
+          .success
+          .value
+      val mockSessionRepository = mock[SessionRepository]
+
+      when(mockSessionRepository.set(any[UserAnswers]))
+        .thenReturn(Future.successful(true))
+
+      val application =
+        applicationBuilder(userAnswers = Some(ua))
+          .overrides(
+            bind[SessionRepository].toInstance(mockSessionRepository)
+          )
+          .build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(GET, controllers.amend.trust.routes.AmendTrustCheckYourAnswersController.onCancel().url)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual
+          app.injector
+            .instanceOf[FrontendAppConfig]
+            .manageYourSubcontractorsUrl("cis-123")
+      }
+
+      verify(mockSessionRepository).set(any[UserAnswers])
     }
   }
 }

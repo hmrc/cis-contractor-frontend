@@ -26,7 +26,8 @@ import models.response.SubcontractorResponse
 import pages.add.*
 import pages.add.company.*
 import play.api.Logging
-import controllers.amend.AmendControllerUtils._
+import controllers.amend.AmendControllerUtils.*
+import pages.amend.ShowVerificationDetailsPage
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import queries.{CisIdQuery, OriginalCompanyAnswersQuery}
 import repositories.SessionRepository
@@ -79,11 +80,7 @@ class AmendCompanyController @Inject() (
               Future.successful(recovery)
 
             case Some(subcontractor) =>
-              populateUserAnswers(
-                request.userAnswers,
-                cisId,
-                subcontractor
-              ).fold(
+              populateUserAnswers(request.userAnswers, cisId, subcontractor).fold(
                 _ => Future.successful(recovery),
                 updatedAnswers =>
                   sessionRepository
@@ -138,6 +135,7 @@ class AmendCompanyController @Inject() (
       updated <- setOptional(updated, CompanyCrnPage, subcontractor.crn)
       updated <- updated.set(CompanyWorksReferenceYesNoPage, subcontractor.worksReferenceNumber.isDefined)
       updated <- setOptional(updated, CompanyWorksReferencePage, subcontractor.worksReferenceNumber)
+      updated <- updated.set(ShowVerificationDetailsPage, shouldShowVerificationDetails(subcontractor))
       updated <- updated.set(CisIdQuery, cisId)
       updated <- updated.set(OriginalCompanyAnswersQuery, original)
     } yield updated
@@ -171,14 +169,20 @@ class AmendCompanyController @Inject() (
   ): OriginalCompanyAnswers =
     OriginalCompanyAnswers(
       companyName = subcontractor.tradingName,
+      addressYesNo = Some(address.isDefined),
       address = address,
-      companyContactMethod = Option.when(methods.nonEmpty)(methods),
+      companyContactMethodsYesNo = Some(methods.nonEmpty),
+      companyContactMethod = methods,
       email = subcontractor.emailAddress,
       phone = subcontractor.phoneNumber,
       mobile = subcontractor.mobilePhoneNumber,
+      crnYesNo = Some(subcontractor.crn.isDefined),
       crn = subcontractor.crn,
+      utrYesNo = Some(subcontractor.utr.isDefined),
       utr = subcontractor.utr,
-      worksReference = subcontractor.worksReferenceNumber
+      worksReferenceYesNo = Some(subcontractor.worksReferenceNumber.isDefined),
+      worksReference = subcontractor.worksReferenceNumber,
+      verificationNumber = subcontractor.verificationNumber
     )
 
 }
