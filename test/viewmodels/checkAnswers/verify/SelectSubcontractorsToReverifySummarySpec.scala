@@ -106,5 +106,21 @@ class SelectSubcontractorsToReverifySummarySpec extends SpecBase with Matchers {
     "must return None when no subcontractors are selected" in {
       SelectSubcontractorsToReverifySummary.row(emptyUserAnswers) mustBe None
     }
+
+    "must return a row with 'None selected' when subcontractors reverify list is empty" in {
+
+      val answers: UserAnswers =
+        emptyUserAnswers
+          .set(SelectSubcontractorsToReverifyPage, Set())
+          .success
+          .value
+
+      val result = SelectSubcontractorsToReverifySummary.row(answers)
+
+      result mustBe defined
+
+      val valueHtml = result.value.value.content.asHtml.toString
+      valueHtml must include(messages("verify.selectSubcontractorsToReverify.display.noneSelected"))
+    }
   }
 }

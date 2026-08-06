@@ -29,11 +29,11 @@ object SelectSubcontractorsToReverifySummary {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] = {
     val selectEmptyReverify = List(messages("verify.selectSubcontractorsToReverify.display.noneSelected"))
-    answers
-      .get(SelectSubcontractorsToReverifyPage)
-      .filter(_.nonEmpty)
-      .flatMap { selected =>
-        val selectNames = selected.map(s => HtmlFormat.escape(s.name).toString).toSeq
+
+    answers.get(SelectSubcontractorsToReverifyPage) match {
+
+      case Some(subcontractorsToReverify) =>
+        val selectNames = subcontractorsToReverify.map(s => HtmlFormat.escape(s.name).toString).toSeq
         val names       = if (selectNames.isEmpty) selectEmptyReverify else selectNames
         ValueViewModelHelper.makeGovukBulletList(names).map { value =>
           SummaryListRowViewModel(
@@ -48,6 +48,7 @@ object SelectSubcontractorsToReverifySummary {
             )
           )
         }
-      }
+      case none                           => None
+    }
   }
 }
