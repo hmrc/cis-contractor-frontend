@@ -59,7 +59,8 @@ class SelectSubcontractorsToReverifyController @Inject() (
     extends FrontendBaseController
     with I18nSupport {
 
-  private val dateFmt = DateTimeFormatter.ofPattern("d MMM yyyy", Locale.UK)
+  private def dateFmt(implicit messages: Messages) =
+    DateTimeFormatter.ofPattern("d MMM yyyy", messages.lang.locale)
 
   private def recovery =
     Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
