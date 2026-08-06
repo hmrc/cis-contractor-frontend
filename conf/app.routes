@@ -111,6 +111,8 @@ GET   /subcontractor/amend/trust/subcontractor-information  controllers.amend.tr
 POST  /subcontractor/amend/trust/subcontractor-information  controllers.amend.trust.AmendTrustCheckYourAnswersController.onSubmit()
 GET   /subcontractor/amend/trust/cancel                     controllers.amend.trust.AmendTrustCheckYourAnswersController.onCancel()
 
+GET   /subcontractor/amend/trust/subcontractor-details-updated  controllers.amend.trust.AmendTrustConfirmationController.onPageLoad()
+
 GET   /subcontractor/amend/partnership/remove/information/:subcontractorDetail  controllers.amend.partnership.AmendPartnershipRemoveDetailYesNoController.onPageLoad(subcontractorDetail: String)
 POST  /subcontractor/amend/partnership/remove/information/:subcontractorDetail  controllers.amend.partnership.AmendPartnershipRemoveDetailYesNoController.onSubmit(subcontractorDetail: String)
 
