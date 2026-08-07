@@ -18,9 +18,9 @@ package controllers.verify
 
 import base.SpecBase
 import controllers.routes
-import models.Subcontractor
-import models.response.GetNewestVerificationBatchResponse
-import pages.verify.NewestVerificationBatchResponsePage
+import models.SubcontractorCurrentVerification
+import models.response.GetCurrentVerificationBatchResponse
+import pages.verify.CurrentVerificationBatchResponsePage
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import services.ReviewInsufficientInfoService
@@ -38,37 +38,47 @@ class ReviewInsufficientInfoSubcontractorsControllerSpec extends SpecBase {
     tradingName: Option[String] = None,
     subcontractorType: Option[String] = None,
     utr: Option[String] = None
-  ): Subcontractor =
-    Subcontractor(
+  ): SubcontractorCurrentVerification =
+    SubcontractorCurrentVerification(
       subcontractorId = id,
+      subbieResourceRef = None,
       firstName = firstName,
       secondName = None,
       surname = surname,
       tradingName = tradingName,
+      utr = utr,
+      nino = None,
+      crn = None,
+      partnerUtr = None,
       partnershipTradingName = None,
+      subcontractorType = subcontractorType,
+      addressLine1 = None,
+      addressLine2 = None,
+      addressLine3 = None,
+      addressLine4 = None,
+      country = None,
+      postcode = None,
+      emailAddress = None,
+      phoneNumber = None,
+      mobilePhoneNumber = None,
+      worksReferenceNumber = None,
+      matched = None,
+      autoVerified = None,
       verified = None,
       verificationNumber = None,
       taxTreatment = None,
       verificationDate = None,
+      version = None,
+      updatedTaxTreatment = None,
       lastMonthlyReturnDate = None,
-      createDate = None,
-      subcontractorType = subcontractorType,
-      subbieResourceRef = None,
-      utr = utr,
-      partnerUtr = None,
-      crn = None,
-      nino = None
+      pendingVerifications = None
     )
 
-  private def batchOf(subs: Subcontractor*): GetNewestVerificationBatchResponse =
-    GetNewestVerificationBatchResponse(
-      scheme = None,
+  private def batchOf(subs: SubcontractorCurrentVerification*): GetCurrentVerificationBatchResponse =
+    GetCurrentVerificationBatchResponse(
       subcontractors = subs,
       verificationBatch = None,
-      verifications = Nil,
-      submission = None,
-      monthlyReturn = None,
-      monthlyReturnSubmission = None
+      verifications = Nil
     )
 
   private val missingSub =
@@ -89,7 +99,7 @@ class ReviewInsufficientInfoSubcontractorsControllerSpec extends SpecBase {
 
       val userAnswers =
         emptyUserAnswers
-          .set(NewestVerificationBatchResponsePage, batchOf(missingSub, readySub))
+          .set(CurrentVerificationBatchResponsePage, batchOf(missingSub, readySub))
           .success
           .value
 
@@ -115,7 +125,7 @@ class ReviewInsufficientInfoSubcontractorsControllerSpec extends SpecBase {
 
       val userAnswers =
         emptyUserAnswers
-          .set(NewestVerificationBatchResponsePage, batchOf(missingSub, readySub))
+          .set(CurrentVerificationBatchResponsePage, batchOf(missingSub, readySub))
           .success
           .value
 
@@ -135,7 +145,7 @@ class ReviewInsufficientInfoSubcontractorsControllerSpec extends SpecBase {
       }
     }
 
-    "must redirect to Journey Recovery when NewestVerificationBatchResponsePage is missing" in {
+    "must redirect to Journey Recovery when CurrentVerificationBatchResponsePage is missing" in {
 
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
@@ -152,7 +162,7 @@ class ReviewInsufficientInfoSubcontractorsControllerSpec extends SpecBase {
 
       val userAnswers =
         emptyUserAnswers
-          .set(NewestVerificationBatchResponsePage, batchOf())
+          .set(CurrentVerificationBatchResponsePage, batchOf())
           .success
           .value
 

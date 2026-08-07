@@ -16,8 +16,8 @@
 
 package services
 
-import models.Subcontractor
-import models.response.GetNewestVerificationBatchResponse
+import models.SubcontractorCurrentVerification
+import models.response.GetCurrentVerificationBatchResponse
 import models.verify.VerificationBatchReadiness
 import play.api.i18n.Messages
 import viewmodels.verify.*
@@ -25,16 +25,19 @@ import viewmodels.verify.*
 import javax.inject.{Inject, Singleton}
 
 @Singleton
-class ReviewInsufficientInfoService @Inject() () {
+class ReviewInsufficientInfoService @Inject() {
 
   // TODO: replace with real destinations once Edit / Proceed / Remove / view-details actions are built.
   private val dummyUrl = "#"
 
   def buildViewModel(
-    batch: GetNewestVerificationBatchResponse
+    batch: GetCurrentVerificationBatchResponse
   )(implicit messages: Messages): ReviewInsufficientInfoViewModel = {
     val (readySubs, missingSubs) =
-      batch.subcontractors.partition(VerificationBatchReadiness.isSubcontractorReady)
+      batch.subcontractors.partition { sub =>
+        val verification = batch.verifications.find(_.subcontractorId.contains(sub.subcontractorId))
+        VerificationBatchReadiness.isSubcontractorReady(sub, verification)
+      }
 
     ReviewInsufficientInfoViewModel(
       missing = missingSubs.map(toMissingRow),
@@ -42,7 +45,9 @@ class ReviewInsufficientInfoService @Inject() () {
     )
   }
 
-  private def toMissingRow(sub: Subcontractor)(implicit messages: Messages): MissingSubcontractorRow = {
+  private def toMissingRow(
+    sub: SubcontractorCurrentVerification
+  )(implicit messages: Messages): MissingSubcontractorRow = {
     val name = displayName(sub)
     MissingSubcontractorRow(
       name = name,
@@ -54,7 +59,7 @@ class ReviewInsufficientInfoService @Inject() () {
     )
   }
 
-  private def toReadyRow(sub: Subcontractor)(implicit messages: Messages): ReadySubcontractorRow = {
+  private def toReadyRow(sub: SubcontractorCurrentVerification)(implicit messages: Messages): ReadySubcontractorRow = {
     val name = displayName(sub)
     ReadySubcontractorRow(
       name = name,
@@ -63,16 +68,16 @@ class ReviewInsufficientInfoService @Inject() () {
     )
   }
 
-  private def utrDisplay(sub: Subcontractor)(implicit messages: Messages): String =
+  private def utrDisplay(sub: SubcontractorCurrentVerification)(implicit messages: Messages): String =
     sub.utr
       .map(_.trim)
       .filter(_.nonEmpty)
       .getOrElse(messages("verify.reviewInsufficientInfo.utr.noneProvided"))
 
-  private def displayName(sub: Subcontractor)(implicit messages: Messages): String =
+  private def displayName(sub: SubcontractorCurrentVerification)(implicit messages: Messages): String =
     nameFor(sub).getOrElse(messages("verify.noName"))
 
-  private def nameFor(sub: Subcontractor): Option[String] = {
+  private def nameFor(sub: SubcontractorCurrentVerification): Option[String] = {
     val first              = sub.firstName.map(_.trim).filter(_.nonEmpty)
     val surname            = sub.surname.map(_.trim).filter(_.nonEmpty)
     val trading            = sub.tradingName.map(_.trim).filter(_.nonEmpty)

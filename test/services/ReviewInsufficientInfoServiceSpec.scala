@@ -17,8 +17,8 @@
 package services
 
 import base.SpecBase
-import models.Subcontractor
-import models.response.GetNewestVerificationBatchResponse
+import models.SubcontractorCurrentVerification
+import models.response.GetCurrentVerificationBatchResponse
 import play.api.i18n.Messages
 import play.api.test.FakeRequest
 
@@ -40,37 +40,49 @@ class ReviewInsufficientInfoServiceSpec extends SpecBase {
     partnerUtr: Option[String] = None,
     crn: Option[String] = None,
     nino: Option[String] = None
-  ): Subcontractor =
-    Subcontractor(
+  ): SubcontractorCurrentVerification =
+    SubcontractorCurrentVerification(
       subcontractorId = id,
+      subbieResourceRef = None,
       firstName = firstName,
       secondName = None,
       surname = surname,
       tradingName = tradingName,
+      utr = utr,
+      nino = nino,
+      crn = crn,
+      partnerUtr = partnerUtr,
       partnershipTradingName = partnershipTradingName,
+      subcontractorType = subcontractorType,
+      addressLine1 = None,
+      addressLine2 = None,
+      addressLine3 = None,
+      addressLine4 = None,
+      country = None,
+      postcode = None,
+      emailAddress = None,
+      phoneNumber = None,
+      mobilePhoneNumber = None,
+      worksReferenceNumber = None,
+      matched = None,
+      autoVerified = None,
       verified = None,
       verificationNumber = None,
       taxTreatment = None,
       verificationDate = None,
+      version = None,
+      updatedTaxTreatment = None,
       lastMonthlyReturnDate = None,
-      createDate = None,
-      subcontractorType = subcontractorType,
-      subbieResourceRef = None,
-      utr = utr,
-      partnerUtr = partnerUtr,
-      crn = crn,
-      nino = nino
+      pendingVerifications = None
     )
 
-  private def batchOf(subs: Subcontractor*): GetNewestVerificationBatchResponse =
-    GetNewestVerificationBatchResponse(
-      scheme = None,
-      subcontractors = subs,
-      verificationBatch = None,
-      verifications = Nil,
-      submission = None,
-      monthlyReturn = None,
-      monthlyReturnSubmission = None
+  private def build(subs: SubcontractorCurrentVerification*) =
+    service.buildViewModel(
+      GetCurrentVerificationBatchResponse(
+        subcontractors = subs,
+        verificationBatch = None,
+        verifications = Nil
+      )
     )
 
   "ReviewInsufficientInfoService.buildViewModel" - {
@@ -79,7 +91,7 @@ class ReviewInsufficientInfoServiceSpec extends SpecBase {
       val readyCompany =
         mkSub(id = 1L, tradingName = Some("Acme Ltd"), subcontractorType = Some("company"), utr = Some("1234567890"))
 
-      val vm = service.buildViewModel(batchOf(readyCompany))
+      val vm = build(readyCompany)
 
       vm.ready.map(_.name) mustBe Seq("Acme Ltd")
       vm.missing mustBe empty
@@ -90,7 +102,7 @@ class ReviewInsufficientInfoServiceSpec extends SpecBase {
       val missingCompany =
         mkSub(id = 2L, tradingName = Some("Acme Ltd"), subcontractorType = Some("company"), utr = None)
 
-      val vm = service.buildViewModel(batchOf(missingCompany))
+      val vm = build(missingCompany)
 
       vm.missing.map(_.name) mustBe Seq("Acme Ltd")
       vm.ready mustBe empty
@@ -110,7 +122,7 @@ class ReviewInsufficientInfoServiceSpec extends SpecBase {
       val ready   =
         mkSub(id = 2L, tradingName = Some("Acme Ltd"), subcontractorType = Some("company"), utr = Some("1234567890"))
 
-      val vm = service.buildViewModel(batchOf(missing, ready))
+      val vm = build(missing, ready)
 
       vm.missing.map(_.name) mustBe Seq("Brody, Martin")
       vm.ready.map(_.name) mustBe Seq("Acme Ltd")
@@ -120,7 +132,7 @@ class ReviewInsufficientInfoServiceSpec extends SpecBase {
       val missing =
         mkSub(id = 1L, tradingName = Some("Acme Ltd"), subcontractorType = Some("company"), utr = None)
 
-      val vm = service.buildViewModel(batchOf(missing))
+      val vm = build(missing)
 
       vm.missing.head.utr mustBe messages("verify.reviewInsufficientInfo.utr.noneProvided")
     }
@@ -135,7 +147,7 @@ class ReviewInsufficientInfoServiceSpec extends SpecBase {
           utr = None
         )
 
-      val vm = service.buildViewModel(batchOf(sub))
+      val vm = build(sub)
 
       vm.missing.head.name mustBe "Brody, Martin"
     }
@@ -151,7 +163,7 @@ class ReviewInsufficientInfoServiceSpec extends SpecBase {
           utr = None
         )
 
-      val vm = service.buildViewModel(batchOf(sub))
+      val vm = build(sub)
 
       vm.missing.head.name mustBe "Doe Trading"
     }
@@ -159,7 +171,7 @@ class ReviewInsufficientInfoServiceSpec extends SpecBase {
     "must use 'No name provided' when no name can be derived" in {
       val sub = mkSub(id = 1L, subcontractorType = Some("company"), utr = None)
 
-      val vm = service.buildViewModel(batchOf(sub))
+      val vm = build(sub)
 
       vm.missing.head.name mustBe messages("verify.noName")
     }
@@ -168,7 +180,7 @@ class ReviewInsufficientInfoServiceSpec extends SpecBase {
       val sub =
         mkSub(id = 1L, tradingName = Some("Acme Ltd"), subcontractorType = Some("company"), utr = None)
 
-      val row = service.buildViewModel(batchOf(sub)).missing.head
+      val row = build(sub).missing.head
 
       row.nameLink.url mustBe "#"
       row.editLink.url mustBe "#"
@@ -177,11 +189,23 @@ class ReviewInsufficientInfoServiceSpec extends SpecBase {
     }
 
     "must return empty lists for an empty batch" in {
-      val vm = service.buildViewModel(batchOf())
+      val vm = build()
 
       vm.missing mustBe empty
       vm.ready mustBe empty
       vm.allReady mustBe false
+    }
+
+    "must include all subcontractors in the batch, split by readiness" in {
+      val missing =
+        mkSub(id = 1L, tradingName = Some("Acme Ltd"), subcontractorType = Some("company"), utr = None)
+      val ready   =
+        mkSub(id = 2L, tradingName = Some("Other Ltd"), subcontractorType = Some("company"), utr = Some("1234567890"))
+
+      val vm = build(missing, ready)
+
+      vm.missing.map(_.name) mustBe Seq("Acme Ltd")
+      vm.ready.map(_.name) mustBe Seq("Other Ltd")
     }
   }
 }
