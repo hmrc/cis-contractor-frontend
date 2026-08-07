@@ -20,9 +20,11 @@ import controllers.actions.*
 import forms.verify.VerifyYourSubcontractorsYesNoFormProvider
 import models.NormalMode
 import navigation.Navigator
+import config.FrontendAppConfig
 import pages.verify.VerifyYourSubcontractorsYesNoPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import queries.CisIdQuery
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.verify.VerifyYourSubcontractorsYesNoView
@@ -40,7 +42,7 @@ class VerifyYourSubcontractorsYesNoController @Inject() (
   formProvider: VerifyYourSubcontractorsYesNoFormProvider,
   val controllerComponents: MessagesControllerComponents,
   view: VerifyYourSubcontractorsYesNoView
-)(implicit ec: ExecutionContext)
+)(implicit ec: ExecutionContext, appConfig: FrontendAppConfig)
     extends FrontendBaseController
     with I18nSupport {
 
@@ -65,7 +67,18 @@ class VerifyYourSubcontractorsYesNoController @Inject() (
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(VerifyYourSubcontractorsYesNoPage, value))
             _              <- sessionRepository.set(updatedAnswers)
-          } yield Redirect(navigator.nextPage(VerifyYourSubcontractorsYesNoPage, NormalMode, updatedAnswers))
+          } yield
+            if (value) {
+              Redirect(navigator.nextPage(VerifyYourSubcontractorsYesNoPage, NormalMode, updatedAnswers))
+            } else {
+              updatedAnswers.get(CisIdQuery) match {
+                case Some(cisId) =>
+                  Redirect(s"${appConfig.manageSubcontractorsUrl}/$cisId")
+
+                case None =>
+                  Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+              }
+            }
       )
   }
 }

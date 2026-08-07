@@ -14,13 +14,16 @@
  * limitations under the License.
  */
 
-package pages
+package pages.amend
 
-import models.response.GetSubcontractorResponse
+import pages.QuestionPage
+import pages.add.IndividualJourney
 import play.api.libs.json.JsPath
 
-case object GetSubcontractorResponsePage extends QuestionPage[GetSubcontractorResponse] {
+case object SubTradingNameYesNoAmendPage extends QuestionPage[Boolean] with IndividualJourney {
 
-  override def path: JsPath =
-    JsPath \ toString
+  override def path: JsPath = JsPath \ toString
+
+  override def toString: String = "subTradingNameYesNo"
+
 }

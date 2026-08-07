@@ -14,13 +14,18 @@
  * limitations under the License.
  */
 
-package pages
+package pages.insufficient
 
-import models.response.GetSubcontractorResponse
-import play.api.libs.json.JsPath
+import pages.behaviours.PageBehaviours
 
-case object GetSubcontractorResponsePage extends QuestionPage[GetSubcontractorResponse] {
+class RemoveInsufficientSubcontractorNameYesNoPageSpec extends PageBehaviours {
 
-  override def path: JsPath =
-    JsPath \ toString
+  "RemoveInsufficientSubcontractorNameYesNoPage" - {
+
+    beRetrievable[Boolean](RemoveInsufficientSubcontractorNameYesNoPage)
+
+    beSettable[Boolean](RemoveInsufficientSubcontractorNameYesNoPage)
+
+    beRemovable[Boolean](RemoveInsufficientSubcontractorNameYesNoPage)
+  }
 }
