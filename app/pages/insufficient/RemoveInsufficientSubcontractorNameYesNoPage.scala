@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 
-package pages
+package pages.insufficient
 
-import models.response.GetSubcontractorResponse
+import pages.QuestionPage
 import play.api.libs.json.JsPath
 
-case object GetSubcontractorResponsePage extends QuestionPage[GetSubcontractorResponse] {
+case object RemoveInsufficientSubcontractorNameYesNoPage extends QuestionPage[Boolean] {
 
-  override def path: JsPath =
-    JsPath \ toString
+  override def path: JsPath = JsPath \ toString
+
+  override def toString: String = "removeInsufficientSubcontractorNameYesNo"
 }

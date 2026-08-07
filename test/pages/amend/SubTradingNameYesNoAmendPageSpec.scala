@@ -14,13 +14,18 @@
  * limitations under the License.
  */
 
-package pages
+package pages.amend
 
-import models.response.GetSubcontractorResponse
-import play.api.libs.json.JsPath
+import pages.behaviours.PageBehaviours
 
-case object GetSubcontractorResponsePage extends QuestionPage[GetSubcontractorResponse] {
+class SubTradingNameYesNoAmendPageSpec extends PageBehaviours {
+  "SubTradingNameYesNoAmendPage" - {
 
-  override def path: JsPath =
-    JsPath \ toString
+    beRetrievable[Boolean](SubTradingNameYesNoAmendPage)
+
+    beSettable[Boolean](SubTradingNameYesNoAmendPage)
+
+    beRemovable[Boolean](SubTradingNameYesNoAmendPage)
+
+  }
 }
