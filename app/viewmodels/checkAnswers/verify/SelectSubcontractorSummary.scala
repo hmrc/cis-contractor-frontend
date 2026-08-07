@@ -26,13 +26,15 @@ import viewmodels.implicits.*
 
 object SelectSubcontractorSummary {
 
-  def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] = {
-    val selectEmptySubcontractors = List(messages("verify.selectSubcontractor.display.noneSelected"))
+  def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
     answers.get(SelectSubcontractorPage) match {
       case Some(subcontractors) =>
         val names =
-          if (subcontractors.isEmpty) selectEmptySubcontractors
-          else subcontractors.toSeq.map(sub => HtmlFormat.escape(sub.name).toString)
+          if (subcontractors.isEmpty) {
+            List(messages("verify.selectSubcontractor.display.noneSelected"))
+          } else {
+            subcontractors.toSeq.map(sub => HtmlFormat.escape(sub.name).toString)
+          }
 
         ValueViewModelHelper.makeGovukBulletList(names).map { value =>
           SummaryListRowViewModel(
@@ -48,7 +50,6 @@ object SelectSubcontractorSummary {
             )
           )
         }
-      case none                 => None
+      case None                 => None
     }
-  }
 }
