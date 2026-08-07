@@ -79,7 +79,14 @@ class AmendPartnershipController @Inject() (
 
             case Some(subcontractor) =>
               populateUserAnswers(request.userAnswers, cisId, subcontractor).fold(
-                _ => Future.successful(recovery),
+                error => {
+                  logger.error(
+                    s"[AmendPartnershipController] Failed to populate UserAnswers for " +
+                      s"cisId=$cisId, subbieResourceRef=$subbieResourceRef",
+                    error
+                  )
+                  Future.successful(recovery)
+                },
                 updatedAnswers =>
                   sessionRepository
                     .set(updatedAnswers)
@@ -142,7 +149,6 @@ class AmendPartnershipController @Inject() (
       updated <- setOptional(updated, PartnershipNominatedPartnerCrnPage, subcontractor.crn)
       updated <- updated.set(PartnershipWorksReferenceNumberYesNoPage, subcontractor.worksReferenceNumber.isDefined)
       updated <- setOptional(updated, PartnershipWorksReferenceNumberPage, subcontractor.worksReferenceNumber)
-      updated <- updated.set(ShowVerificationDetailsPage, shouldShowVerificationDetails(subcontractor))
       updated <- updated.set(CisIdQuery, cisId)
       updated <- updated.set(OriginalPartnershipAnswersQuery, original)
     } yield updated

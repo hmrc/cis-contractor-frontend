@@ -60,7 +60,7 @@ class AmendCompanyConfirmationController @Inject() (
 
       if (!ua.get(AmendCheckYourAnswersSubmittedPage).contains(true)) {
         logger.warn(
-          s"[AmendPartnershipConfirmationController][onPageLoad] " +
+          s"[AmendCompanyConfirmationController][onPageLoad] " +
             "Accessed confirmation page without prior submission"
         )
         Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))

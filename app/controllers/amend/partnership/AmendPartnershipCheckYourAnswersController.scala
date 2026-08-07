@@ -129,11 +129,12 @@ class AmendPartnershipCheckYourAnswersController @Inject() (
 
     val utrRows =
       if (isVerified.contains(true)) {
-        Nil
+        Seq(PartnershipNominatedPartnerNameSummary.row(ua, AmendMode))
       } else {
         Seq(
           PartnershipHasUtrYesNoSummary.row(ua, AmendMode),
           PartnershipUniqueTaxpayerReferenceSummary.row(ua, AmendMode),
+          PartnershipNominatedPartnerNameSummary.row(ua, AmendMode),
           PartnershipNominatedPartnerUtrYesNoSummary.row(ua, AmendMode),
           PartnershipNominatedPartnerUtrSummary.row(ua, AmendMode)
         )
@@ -151,7 +152,6 @@ class AmendPartnershipCheckYourAnswersController @Inject() (
       ) ++
       utrRows ++
       Seq(
-        PartnershipNominatedPartnerNameSummary.row(ua, AmendMode),
         PartnershipNominatedPartnerNinoYesNoSummary.row(ua, AmendMode),
         PartnershipNominatedPartnerNinoSummary.row(ua, AmendMode),
         PartnershipNominatedPartnerCrnYesNoSummary.row(ua, AmendMode),
@@ -228,7 +228,7 @@ class AmendPartnershipCheckYourAnswersController @Inject() (
 
         case None =>
           logger.error(
-            "[AmendvCheckYourAnswersController.onCancel] Missing CisIdQuery"
+            "[AmendPartnershipCheckYourAnswersController.onCancel] Missing CisIdQuery"
           )
           Future.successful(
             Redirect(routes.JourneyRecoveryController.onPageLoad())
