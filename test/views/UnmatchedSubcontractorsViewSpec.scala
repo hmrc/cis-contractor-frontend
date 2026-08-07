@@ -29,17 +29,17 @@ class UnmatchedSubcontractorsViewSpec extends SpecBase {
 
   "UnmatchedSubcontractorsView" - {
     "render the page with title, heading, paragraphs and link" in new Setup {
-      val verificationResultsUrl      = "/verification-history/retrieve"
-      val html: HtmlFormat.Appendable = view(verificationResultsUrl)
+      val verificationHistoryUrl      = "/verification-history/retrieve"
+      val html: HtmlFormat.Appendable = view(verificationHistoryUrl)
       val doc: Document               = Jsoup.parse(html.body)
 
       doc.select("title").text must include(messages("unmatchedSubcontractors.title"))
       doc.select("h1").text    must include(messages("unmatchedSubcontractors.heading"))
       doc.select("p").text     must include(messages("unmatchedSubcontractors.p1"))
       doc.select("p").text     must include(messages("unmatchedSubcontractors.p2"))
-      val verificationResultsLink = doc.select(s"a[href='$verificationResultsUrl']")
-      verificationResultsLink.size() mustBe 1
-      verificationResultsLink.text() mustBe
+      val verificationHistoryLink = doc.select(s"a[href='$verificationHistoryUrl']")
+      verificationHistoryLink.size() mustBe 1
+      verificationHistoryLink.text() mustBe
         messages("unmatchedSubcontractors.verificationResults.link")
     }
   }
