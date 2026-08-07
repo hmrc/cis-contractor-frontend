@@ -33,19 +33,19 @@ class VerificationResultsControllerSpec extends SpecBase {
       val verificationResults = Seq(
         VerificationResultsViewModel(
           "Brody, Martin",
-          "Verified",
+          "Unmatched",
           "Higher rate",
           "V0004528765/A"
         ),
         VerificationResultsViewModel(
           "Hooper and Associates",
-          "Unmatched",
+          "Verified",
           "Standard rate",
           "V0004528765"
         ),
         VerificationResultsViewModel(
           "Quint Transportation",
-          "Verified",
+          "Unmatched",
           "Higher rate",
           "V0004528765/B"
         ),
