@@ -17,7 +17,6 @@
 package controllers.add.partnership
 
 import controllers.actions.*
-import controllers.helpers.ContactGuard
 import forms.add.partnership.PartnershipEmailAddressFormProvider
 import models.Mode
 import models.contact.ContactMethodOptions
@@ -44,22 +43,27 @@ class PartnershipEmailAddressController @Inject() (
   view: PartnershipEmailAddressView
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
-    with I18nSupport
-    with ContactGuard {
+    with I18nSupport {
 
   val form = formProvider()
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
-    requireContactMethodInSet(
-      request.userAnswers.get(PartnershipNamePage),
-      request.userAnswers.get(PartnershipContactMethodOptionsPage),
-      ContactMethodOptions.Email
-    ) { partnershipName =>
-      val preparedForm = request.userAnswers.get(PartnershipEmailAddressPage) match {
-        case None        => form
-        case Some(value) => form.fill(value)
-      }
-      Ok(view(preparedForm, mode, partnershipName))
+
+    val contactOption   = request.userAnswers.get(PartnershipContactMethodOptionsPage)
+    val partnershipName = request.userAnswers.get(PartnershipNamePage)
+
+    (partnershipName, contactOption) match {
+      case (Some(partnershipName), Some(options)) if options.contains(ContactMethodOptions.Email) =>
+        val preparedForm = request.userAnswers.get(PartnershipEmailAddressPage) match {
+          case None        => form
+          case Some(value) => form.fill(value)
+        }
+        Ok(view(preparedForm, mode, partnershipName))
+
+      case (Some(_), _) =>
+        Redirect(controllers.add.partnership.routes.AddPartnershipContactMethodsYesNoController.onPageLoad(mode))
+      case _            =>
+        Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
     }
   }
 

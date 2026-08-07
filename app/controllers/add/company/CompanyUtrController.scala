@@ -21,11 +21,11 @@ import forms.add.company.CompanyUtrFormProvider
 import models.requests.DataRequest
 import models.{AmendMode, Mode}
 import navigation.Navigator
-import pages.add.company.{CompanyNamePage, CompanyUtrPage}
+import pages.add.company.{CompanyNamePage, CompanyUtrPage, CompanyUtrYesNoPage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
-import services.SubcontractorService
+import services.{SubcontractorService, YesOrNoPageGuardService}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.add.company.CompanyUtrView
 
@@ -41,6 +41,7 @@ class CompanyUtrController @Inject() (
   requireData: DataRequiredAction,
   formProvider: CompanyUtrFormProvider,
   subcontractorService: SubcontractorService,
+  yesOrNoPageGuardService: YesOrNoPageGuardService,
   val controllerComponents: MessagesControllerComponents,
   view: CompanyUtrView
 )(implicit ec: ExecutionContext)
@@ -59,6 +60,10 @@ class CompanyUtrController @Inject() (
     )
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
+
+    val yesOrNoPage       = CompanyUtrYesNoPage
+    val yesOrNoPageOption = request.userAnswers.get(CompanyUtrYesNoPage)
+
     request.userAnswers
       .get(CompanyNamePage)
       .map { companyName =>
@@ -67,7 +72,8 @@ class CompanyUtrController @Inject() (
           case Some(value) => form.fill(value)
         }
 
-        Ok(view(preparedForm, mode, companyName))
+        val result = Ok(view(preparedForm, mode, companyName))
+        yesOrNoPageGuardService.yesOrNoPageRoute(result, yesOrNoPageOption, yesOrNoPage, mode)
       }
       .getOrElse(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
 

@@ -21,11 +21,11 @@ import forms.add.UtrFormProvider
 import models.{AmendMode, Mode}
 import models.requests.DataRequest
 import navigation.Navigator
-import pages.add.SubcontractorsUniqueTaxpayerReferencePage
+import pages.add.{SubcontractorsUniqueTaxpayerReferencePage, UniqueTaxpayerReferenceYesNoPage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
-import services.SubcontractorService
+import services.{SubcontractorService, YesOrNoPageGuardService}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.SubcontractorNameExtractor
 import views.html.add.SubcontractorsUniqueTaxpayerReferenceView
@@ -44,6 +44,7 @@ class SubcontractorsUniqueTaxpayerReferenceController @Inject() (
   subcontractorService: SubcontractorService,
   subcontractorNameExtractor: SubcontractorNameExtractor,
   val controllerComponents: MessagesControllerComponents,
+  yesOrNoPageGuardService: YesOrNoPageGuardService,
   view: SubcontractorsUniqueTaxpayerReferenceView
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
@@ -68,10 +69,15 @@ class SubcontractorsUniqueTaxpayerReferenceController @Inject() (
 
   def onPageLoad(mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData) { implicit request =>
+
+      val yesOrNoPage       = UniqueTaxpayerReferenceYesNoPage
+      val yesOrNoPageOption = request.userAnswers.get(UniqueTaxpayerReferenceYesNoPage)
+
       subcontractorNameExtractor
         .getSubcontractorName(request.userAnswers)
         .fold(recoveryRedirect) { subcontractorName =>
-          Ok(view(preparedForm, mode, subcontractorName))
+          val result = Ok(view(preparedForm, mode, subcontractorName))
+          yesOrNoPageGuardService.yesOrNoPageRoute(result, yesOrNoPageOption, yesOrNoPage, mode)
         }
     }
 
