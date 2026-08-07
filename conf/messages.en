@@ -433,9 +433,20 @@ amendPartnershipRemoveDetailYesNo.detail.address                                
 amendPartnershipRemoveDetailYesNo.detail.contactDetails                             =  contact details
 amendPartnershipRemoveDetailYesNo.detail.utr                                        =  UTR
 amendPartnershipRemoveDetailYesNo.detail.worksReferenceNumber                       =  works reference number
-amendPartnershipRemoveDetailYesNo.detail.nominatedPartnerUtr                        =  nominated partner's UTR
-amendPartnershipRemoveDetailYesNo.detail.nominatedPartnerNino                       =  nominated partner's National Insurance number
-amendPartnershipRemoveDetailYesNo.detail.nominatedPartnerCompanyRegistrationNumber  =  nominated partner's company registration number
+amendPartnershipRemoveDetailYesNo.detail.nominatedPartnerUtr                        =  nominated partner’s UTR
+amendPartnershipRemoveDetailYesNo.detail.nominatedPartnerNino                       =  nominated partner’s National Insurance number
+amendPartnershipRemoveDetailYesNo.detail.nominatedPartnerCompanyRegistrationNumber  =  nominated partner’s company registration number
+
+amendIndividualRemoveDetailYesNo.title                                              =  Are you sure you want to remove this information from this subcontractor?
+amendIndividualRemoveDetailYesNo.heading                                            =  Are you sure you want to remove the {1} from {0}?
+amendIndividualRemoveDetailYesNo.error.required                                     =  Select whether you want to remove this information from this subcontractor
+amendIndividualRemoveDetailYesNo.detail.tradingName                                 =  trading name
+amendIndividualRemoveDetailYesNo.detail.subcontractorName                           =  subcontractor name
+amendIndividualRemoveDetailYesNo.detail.address                                     =  address
+amendIndividualRemoveDetailYesNo.detail.contactDetails                              =  contact details
+amendIndividualRemoveDetailYesNo.detail.utr                                         =  UTR
+amendIndividualRemoveDetailYesNo.detail.nationalInsuranceNumber                     =  National Insurance number
+amendIndividualRemoveDetailYesNo.detail.worksReferenceNumber                        =  works reference number
 
 # Partnership
 addPartnershipContactMethodsYesNo.title                     =  Do you want to add contact details for this partnership?
@@ -1023,12 +1034,6 @@ verify.verifyCheckYourAnswers.confirm                                   =  Confi
 
 verify.noName                                                           =  No name provided
 
-verify.noVerificationResults.title                                      =  No verification results
-verify.noVerificationResults.heading                                    =  Verification results
-verify.noVerificationResults.p                                          =  You do not have any verification results to show at the moment.
-verify.noVerificationResults.backTo                                     =  Back to
-verify.noVerificationResults.manageYourSubcontractors.link              =  Manage your subcontractors
-
 # Contractor Details
 contractordetails.contractorDetailsIndex.title                                 =  Contractor details
 contractordetails.contractorDetailsIndex.heading                               =  Contractor details
@@ -1100,4 +1105,21 @@ contractordetails.removeDetailYesNo.detail.schemeName                          =
 contractordetails.removeDetailYesNo.error.required.email                       =  Select yes to remove the contractor’s email address
 contractordetails.removeDetailYesNo.error.required.schemeName                  =  Select yes to remove the contractor’s scheme name
 
+removeInsufficientSubcontractorNameYesNo.title                                 = Are you sure you want to remove this subcontractor from this verification request?
+removeInsufficientSubcontractorNameYesNo.heading                               = Are you sure you want to remove {0} from this verification request?
+removeInsufficientSubcontractorNameYesNo.hint                                  = This means they will remain unverified, so you must not make any payments to them.
+removeInsufficientSubcontractorNameYesNo.error.required                        = Select yes if you want to remove this subcontractor from this verification request
 
+amendCheckYourAnswers.title                                                    = Subcontractor information
+amendCheckYourAnswers.heading.subcontractorInformation.h2                      = Subcontractor information
+amendCheckYourAnswers.heading.moreDetails.h2                                   = More details
+amendCheckYourAnswers.confirm.h2                                               = Confirm changes
+amendCheckYourAnswers.confirm.p1                                               = By changing this subcontractor’s details you are confirming that, to the best of your knowledge, the details you are providing are correct.
+amendCheckYourAnswers.confirm                                                  = Confirm
+amendCheckYourAnswers.cancelChanges                                            = Cancel changes
+amendCheckYourAnswers.verificationNumber.label                                 = Verification number
+
+proceedInsufficientSubcontractorNameYesNo.title                                = Are you sure you want to proceed with including this subcontractor in this verification request
+proceedInsufficientSubcontractorNameYesNo.heading                              = Are you sure you want to proceed with including {0} in this verification request?
+proceedInsufficientSubcontractorNameYesNo.hint                                 = This will assign the higher rate tax treatment to this subcontractor.
+proceedInsufficientSubcontractorNameYesNo.error.required                       = Select yes if you want to proceed with including this subcontractor in this verification request
