@@ -43,5 +43,16 @@ class UnmatchedSubcontractorsControllerSpec extends SpecBase {
         ).toString
       }
     }
+
+    "must return OK for a GET with no existing data" in {
+      val application = applicationBuilder(userAnswers = None).build()
+
+      running(application) {
+        val request = FakeRequest(GET, routes.UnmatchedSubcontractorsController.onPageLoad().url)
+        val result  = route(application, request).value
+
+        status(result) mustEqual OK
+      }
+    }
   }
 }

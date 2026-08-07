@@ -21,7 +21,7 @@
     link: components.Link
 )
 
-@(verificationResultsUrl: String)(implicit request: Request[_], messages: Messages)
+@(verificationHistoryUrl: String)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = titleNoForm(messages("unmatchedSubcontractors.title"))) {
 
@@ -30,6 +30,6 @@
     @paragraph(messages("unmatchedSubcontractors.p2"))
     @link(
         linkTextKey = "unmatchedSubcontractors.verificationResults.link",
-        linkUrl = verificationResultsUrl
+        linkUrl = verificationHistoryUrl
     )
 }
