@@ -437,6 +437,11 @@ amendPartnershipRemoveDetailYesNo.detail.nominatedPartnerUtr                    
 amendPartnershipRemoveDetailYesNo.detail.nominatedPartnerNino                       =  nominated partner’s National Insurance number
 amendPartnershipRemoveDetailYesNo.detail.nominatedPartnerCompanyRegistrationNumber  =  nominated partner’s company registration number
 
+proceedInsufficientSubcontractorNameYesNo.title                                     =  Are you sure you want to proceed with including this subcontractor in this verification request
+proceedInsufficientSubcontractorNameYesNo.heading                                   =  Are you sure you want to proceed with including {0} in this verification request?
+proceedInsufficientSubcontractorNameYesNo.hint                                      =  This will assign the higher rate tax treatment to this subcontractor.
+proceedInsufficientSubcontractorNameYesNo.error.required                            =  Select yes if you want to proceed with including this subcontractor in this verification request
+
 # Partnership
 addPartnershipContactMethodsYesNo.title                     =  Do you want to add contact details for this partnership?
 addPartnershipContactMethodsYesNo.heading                   =  Do you want to add contact details for {0}?
@@ -925,6 +930,25 @@ verify.selectSubcontractorsToReverify.taxTreatment.unmatched            =  Highe
 verify.selectSubcontractorsToReverify.taxTreatment.gross                =  Gross
 verify.selectSubcontractorsToReverify.display.noneSelected              =  None selected
 
+verify.reviewInsufficientInfo.title                                     =  Cannot verify all subcontractors
+verify.reviewInsufficientInfo.heading                                   =  Cannot verify all subcontractors
+verify.reviewInsufficientInfo.p1                                        =  Some of the subcontractors in your verification request do not have all the information we need to verify them.
+verify.reviewInsufficientInfo.p2                                        =  To fix this, you can:
+verify.reviewInsufficientInfo.bullet1                                   =  edit their information and correct any of their details
+verify.reviewInsufficientInfo.bullet2                                   =  proceed with including them in this verification request without making any changes
+verify.reviewInsufficientInfo.bullet3                                   =  remove the subcontractor from this verification request
+verify.reviewInsufficientInfo.whatYouNeed.link                          =  What you''ll need to verify subcontractors (opens in new tab)
+verify.reviewInsufficientInfo.missing.subheading                        =  Subcontractors with missing information
+verify.reviewInsufficientInfo.ready.subheading                          =  Ready for verification
+verify.reviewInsufficientInfo.name                                      =  Name
+verify.reviewInsufficientInfo.utr                                       =  UTR
+verify.reviewInsufficientInfo.utr.full                                  =  Unique Taxpayer Reference
+verify.reviewInsufficientInfo.utr.noneProvided                          =  None provided
+verify.reviewInsufficientInfo.actions                                   =  Actions
+verify.reviewInsufficientInfo.action.edit                               =  Edit
+verify.reviewInsufficientInfo.action.proceed                            =  Proceed
+verify.reviewInsufficientInfo.action.remove                             =  Remove
+
 verify.selectSubcontractor.title                                        =  Which subcontractors do you want to verify?
 verify.selectSubcontractor.heading                                      =  Which subcontractors do you want to verify?
 verify.selectSubcontractor.hint                                         =  Select the unverified subcontractors you want to add to this verification request
@@ -1093,17 +1117,3 @@ contractordetails.removeDetailYesNo.detail.email                               =
 contractordetails.removeDetailYesNo.detail.schemeName                          =  scheme name
 contractordetails.removeDetailYesNo.error.required.email                       =  Select yes to remove the contractor’s email address
 contractordetails.removeDetailYesNo.error.required.schemeName                  =  Select yes to remove the contractor’s scheme name
-
-amendCheckYourAnswers.title = Subcontractor information
-amendCheckYourAnswers.heading.subcontractorInformation.h2    = Subcontractor information
-amendCheckYourAnswers.heading.moreDetails.h2    = More details
-amendCheckYourAnswers.confirm.h2 = Confirm changes
-amendCheckYourAnswers.confirm.p1 = By changing this subcontractor’s details you are confirming that, to the best of your knowledge, the details you are providing are correct.
-amendCheckYourAnswers.confirm = Confirm
-amendCheckYourAnswers.cancelChanges = Cancel changes
-amendCheckYourAnswers.verificationNumber.label = Verification number
-
-proceedInsufficientSubcontractorNameYesNo.title = Are you sure you want to proceed with including this subcontractor in this verification request
-proceedInsufficientSubcontractorNameYesNo.heading = Are you sure you want to proceed with including {0} in this verification request?
-proceedInsufficientSubcontractorNameYesNo.hint = This will assign the higher rate tax treatment to this subcontractor.
-proceedInsufficientSubcontractorNameYesNo.error.required = Select yes if you want to proceed with including this subcontractor in this verification request
