@@ -1123,3 +1123,9 @@ proceedInsufficientSubcontractorNameYesNo.title                                =
 proceedInsufficientSubcontractorNameYesNo.heading                              = Are you sure you want to proceed with including {0} in this verification request?
 proceedInsufficientSubcontractorNameYesNo.hint                                 = This will assign the higher rate tax treatment to this subcontractor.
 proceedInsufficientSubcontractorNameYesNo.error.required                       = Select yes if you want to proceed with including this subcontractor in this verification request
+
+unmatchedSubcontractors.title = You have unmatched subcontractors
+unmatchedSubcontractors.heading = You have unmatched subcontractors
+unmatchedSubcontractors.p1 = Some of the subcontractor details in your most recent verification request do not match the information about that subcontractor held by HMRC.
+unmatchedSubcontractors.p2 = You cannot create a new verification request until you have reviewed and fixed these unmatched results.
+unmatchedSubcontractors.verificationResults.link = Check your latest verification results
