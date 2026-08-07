@@ -21,6 +21,7 @@ import controllers.actions._
 import javax.inject.Inject
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.utils.UriEncoding
 import queries.CisIdQuery
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.NoUnmatchedSubcontractorsView
@@ -39,7 +40,8 @@ class NoUnmatchedSubcontractorsController @Inject() (
   def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
     request.userAnswers.get(CisIdQuery) match {
       case Some(cisId) =>
-        val manageSubcontractorsUrl = s"${appConfig.manageSubcontractorsUrl}/$cisId"
+        val manageSubcontractorsUrl =
+          s"${appConfig.manageSubcontractorsUrl}/${UriEncoding.encodePathSegment(cisId, "UTF-8")}"
         Ok(view(manageSubcontractorsUrl))
       case None        =>
         Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())

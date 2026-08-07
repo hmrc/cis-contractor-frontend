@@ -43,6 +43,9 @@ class NoUnmatchedSubcontractorsViewSpec extends SpecBase {
       manageSubcontractorsLink.size() mustBe 1
       manageSubcontractorsLink.text() mustBe
         messages("noUnmatchedSubcontractors.manageYourSubcontractors.link")
+      manageSubcontractorsLink.attr("href") mustEqual manageSubcontractorsUrl
+      manageSubcontractorsLink.attr("href") must not include "?"
+      manageSubcontractorsLink.attr("href") must not include "#"
     }
   }
 

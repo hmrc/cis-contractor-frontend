@@ -19,6 +19,7 @@ package controllers
 import base.SpecBase
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
+import play.utils.UriEncoding
 import queries.CisIdQuery
 import views.html.NoUnmatchedSubcontractorsView
 
@@ -32,7 +33,7 @@ class NoUnmatchedSubcontractorsControllerSpec extends SpecBase {
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
       val manageSubcontractorsUrl =
-        s"${applicationConfig.manageSubcontractorsUrl}/$cisId"
+        s"${applicationConfig.manageSubcontractorsUrl}/${UriEncoding.encodePathSegment(cisId, "UTF-8")}"
 
       running(application) {
         val request = FakeRequest(GET, routes.NoUnmatchedSubcontractorsController.onPageLoad().url)
@@ -64,6 +65,20 @@ class NoUnmatchedSubcontractorsControllerSpec extends SpecBase {
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual
           controllers.routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must redirect to Journey Recovery for a GET if no existing data is found" in {
+
+      val application = applicationBuilder(userAnswers = None).build()
+
+      running(application) {
+        val request = FakeRequest(GET, routes.NoUnmatchedSubcontractorsController.onPageLoad().url)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
       }
     }
   }
