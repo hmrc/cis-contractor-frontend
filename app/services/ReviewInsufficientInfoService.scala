@@ -43,7 +43,7 @@ class ReviewInsufficientInfoService @Inject() () {
   }
 
   private def toMissingRow(sub: Subcontractor)(implicit messages: Messages): MissingSubcontractorRow = {
-    val name = displayName(sub)
+    val name = sub.displayName()
     MissingSubcontractorRow(
       name = name,
       nameLink = LinkViewModel(dummyUrl, name),
@@ -60,7 +60,7 @@ class ReviewInsufficientInfoService @Inject() () {
   }
 
   private def toReadyRow(sub: Subcontractor)(implicit messages: Messages): ReadySubcontractorRow = {
-    val name = displayName(sub)
+    val name = sub.displayName()
     ReadySubcontractorRow(
       name = name,
       nameLink = LinkViewModel(dummyUrl, name),
@@ -73,20 +73,4 @@ class ReviewInsufficientInfoService @Inject() () {
       .map(_.trim)
       .filter(_.nonEmpty)
       .getOrElse(messages("verify.reviewInsufficientInfo.utr.noneProvided"))
-
-  private def displayName(sub: Subcontractor)(implicit messages: Messages): String =
-    nameFor(sub).getOrElse(messages("verify.noName"))
-
-  private def nameFor(sub: Subcontractor): Option[String] = {
-    val first              = sub.firstName.map(_.trim).filter(_.nonEmpty)
-    val surname            = sub.surname.map(_.trim).filter(_.nonEmpty)
-    val trading            = sub.tradingName.map(_.trim).filter(_.nonEmpty)
-    val partnershipTrading = sub.partnershipTradingName.map(_.trim).filter(_.nonEmpty)
-
-    val individualName = surname.map { s =>
-      first.map(f => s"$s, $f").getOrElse(s)
-    }
-
-    partnershipTrading.orElse(trading).orElse(individualName)
-  }
 }
