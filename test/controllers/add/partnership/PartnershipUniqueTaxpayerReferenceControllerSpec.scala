@@ -48,6 +48,8 @@ class PartnershipUniqueTaxpayerReferenceControllerSpec extends SpecBase with Moc
 
   lazy private val partnershipUniqueTaxpayerReferenceRouteAmend =
     controllers.add.partnership.routes.PartnershipUniqueTaxpayerReferenceController.onPageLoad(AmendMode).url
+  private lazy val partnershipAmendCYA                          =
+    controllers.amend.partnership.routes.AmendPartnershipCheckYourAnswersController.onPageLoad().url
 
   "PartnershipUniqueTaxpayerReferenceControllerSpec Controller" - {
 
@@ -231,7 +233,7 @@ class PartnershipUniqueTaxpayerReferenceControllerSpec extends SpecBase with Moc
 
         status(result) mustEqual SEE_OTHER
 
-        redirectLocation(result).value must include("/subcontractor/there-is-a-problem") // TODO when AmendCYA available
+        redirectLocation(result).value mustEqual partnershipAmendCYA
       }
 
       verify(mockSubcontractorService).isDuplicateUTR(any[UserAnswers], any[String])(any[HeaderCarrier])
@@ -259,7 +261,7 @@ class PartnershipUniqueTaxpayerReferenceControllerSpec extends SpecBase with Moc
 
         status(result) mustEqual SEE_OTHER
 
-        redirectLocation(result).value must include("/subcontractor/there-is-a-problem") // TODO when AmendCYA available
+        redirectLocation(result).value mustEqual partnershipAmendCYA
       }
     }
 

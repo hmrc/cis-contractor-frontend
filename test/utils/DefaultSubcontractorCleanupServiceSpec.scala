@@ -70,7 +70,7 @@ class DefaultSubcontractorCleanupServiceSpec extends SpecBase {
       addressYesNo = None,
       address = None,
       partnershipContactMethodsYesNo = None,
-      partnershipContactMethodOptions = None,
+      partnershipContactMethodOptions = Set.empty,
       email = None,
       phone = None,
       mobile = None,
@@ -84,7 +84,8 @@ class DefaultSubcontractorCleanupServiceSpec extends SpecBase {
       nominatedPartnerCrnYesNo = None,
       nominatedPartnerCrn = None,
       nominatedPartnerWorksReferenceYesNo = None,
-      nominatedPartnerWorksReference = None
+      nominatedPartnerWorksReference = None,
+      verificationNumber = None
     )
 
   private val originalTrust =

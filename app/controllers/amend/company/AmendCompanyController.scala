@@ -81,7 +81,14 @@ class AmendCompanyController @Inject() (
 
             case Some(subcontractor) =>
               populateUserAnswers(request.userAnswers, cisId, subcontractor).fold(
-                _ => Future.successful(recovery),
+                error => {
+                  logger.error(
+                    s"[AmendCompanyController] Failed to populate UserAnswers for " +
+                      s"cisId=$cisId, subbieResourceRef=$subbieResourceRef",
+                    error
+                  )
+                  Future.successful(recovery)
+                },
                 updatedAnswers =>
                   sessionRepository
                     .set(updatedAnswers)
