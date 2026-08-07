@@ -573,8 +573,8 @@ POST  /subcontractor/verify/select-subcontractors-to-reverify         controller
 GET   /subcontractor/verify/change-select-subcontractors-to-reverify  controllers.verify.SelectSubcontractorsToReverifyController.onPageLoad(mode: Mode = CheckMode, page: Int ?= 1)
 POST  /subcontractor/verify/change-select-subcontractors-to-reverify  controllers.verify.SelectSubcontractorsToReverifyController.onSubmit(mode: Mode = CheckMode, page: Int ?= 1)
 
-GET   /subcontractor/verify/verification-batch/modify  controllers.verify.ModifyVerificationBatchAndVerificationsController.modifyVerificationBatch()
-POST  /subcontractor/verify/verification-batch/modify  controllers.verify.ModifyVerificationBatchAndVerificationsController.modifyVerificationBatch()
+GET  /subcontractor/verify/verification-batch/modify                controllers.verify.ModifyVerificationBatchAndVerificationsController.modifyVerificationBatch(mode: Mode = NormalMode)
+GET  /subcontractor/verify/verification-batch/modify/check-mode     controllers.verify.ModifyVerificationBatchAndVerificationsController.modifyVerificationBatch(mode: Mode = CheckMode)
 
 GET   /subcontractor/verify/select-subcontractors-to-verify         controllers.verify.SelectSubcontractorController.onPageLoad(mode: Mode = NormalMode, page: Int ?= 1)
 POST  /subcontractor/verify/select-subcontractors-to-verify         controllers.verify.SelectSubcontractorController.onSubmit(mode: Mode = NormalMode, page: Int ?= 1)

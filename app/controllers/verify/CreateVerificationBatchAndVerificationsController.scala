@@ -17,6 +17,7 @@
 package controllers.verify
 
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
+import models.NormalMode
 import pages.verify.{CurrentVerificationBatchResponsePage, SelectSubcontractorPage, SelectSubcontractorsToReverifyPage}
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -98,7 +99,7 @@ class CreateVerificationBatchAndVerificationsController @Inject() (
                   Future.successful(
                     Redirect(
                       controllers.verify.routes.ModifyVerificationBatchAndVerificationsController
-                        .modifyVerificationBatch()
+                        .modifyVerificationBatch(NormalMode)
                     )
                   )
 
