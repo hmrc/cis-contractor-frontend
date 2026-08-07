@@ -341,7 +341,7 @@ class AmendSubcontractorPopulatorSpec extends SpecBase {
           addressYesNo = Some(true),
           address = Some(expectedAddress),
           partnershipContactMethodsYesNo = Some(true),
-          partnershipContactMethodOptions = Some(Set(Email, Phone, Mobile)),
+          partnershipContactMethodOptions = Set(Email, Phone, Mobile),
           email = Some("test@example.com"),
           phone = Some("02070000000"),
           mobile = Some("07123456789"),
@@ -355,7 +355,8 @@ class AmendSubcontractorPopulatorSpec extends SpecBase {
           nominatedPartnerCrnYesNo = Some(true),
           nominatedPartnerCrn = Some("12345678"),
           nominatedPartnerWorksReferenceYesNo = Some(true),
-          nominatedPartnerWorksReference = Some("XLS345-MM")
+          nominatedPartnerWorksReference = Some("XLS345-MM"),
+          verificationNumber = Some("V1234567890")
         )
       }
 

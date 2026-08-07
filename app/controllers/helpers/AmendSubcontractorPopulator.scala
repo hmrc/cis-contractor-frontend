@@ -319,7 +319,7 @@ object AmendSubcontractorPopulator {
         addressYesNo = Some(address.isDefined),
         address = address,
         partnershipContactMethodsYesNo = Some(methods.nonEmpty),
-        partnershipContactMethodOptions = Option.when(methods.nonEmpty)(methods),
+        partnershipContactMethodOptions = methods,
         email = subcontractor.emailAddress,
         phone = subcontractor.phoneNumber,
         mobile = subcontractor.mobilePhoneNumber,
@@ -333,7 +333,8 @@ object AmendSubcontractorPopulator {
         nominatedPartnerCrnYesNo = Some(subcontractor.crn.isDefined),
         nominatedPartnerCrn = subcontractor.crn,
         nominatedPartnerWorksReferenceYesNo = Some(subcontractor.worksReferenceNumber.isDefined),
-        nominatedPartnerWorksReference = subcontractor.worksReferenceNumber
+        nominatedPartnerWorksReference = subcontractor.worksReferenceNumber,
+        verificationNumber = subcontractor.verificationNumber
       )
   }
 
