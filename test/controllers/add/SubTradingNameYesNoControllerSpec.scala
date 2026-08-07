@@ -259,7 +259,9 @@ class SubTradingNameYesNoControllerSpec extends SpecBase with MockitoSugar {
           val result = route(application, request).value
 
           status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual controllers.amend.routes.AmendIndividualCheckYourAnswersController.onPageLoad().url
+          redirectLocation(result).value mustEqual controllers.amend.routes.AmendIndividualCheckYourAnswersController
+            .onPageLoad()
+            .url
         }
       }
 
@@ -317,7 +319,9 @@ class SubTradingNameYesNoControllerSpec extends SpecBase with MockitoSugar {
           val result = route(application, request).value
 
           status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual controllers.amend.routes.AmendIndividualCheckYourAnswersController.onPageLoad().url
+          redirectLocation(result).value mustEqual controllers.amend.routes.AmendIndividualCheckYourAnswersController
+            .onPageLoad()
+            .url
         }
       }
     }
