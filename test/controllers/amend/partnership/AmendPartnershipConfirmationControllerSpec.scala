@@ -14,34 +14,34 @@
  * limitations under the License.
  */
 
-package controllers.amend.company
+package controllers.amend.partnership
 
 import base.SpecBase
 import config.FrontendAppConfig
 import models.UserAnswers
-import models.amend.company.OriginalCompanyAnswers
+import models.amend.partnership.OriginalPartnershipAnswers
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.{never, reset, verify, when}
+import org.mockito.Mockito.{never, reset, verify, verifyNoInteractions, when}
 import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.mockito.MockitoSugar
-import pages.add.company.CompanyNamePage
+import pages.add.partnership.PartnershipNamePage
 import pages.amend.AmendCheckYourAnswersSubmittedPage
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import queries.{CisIdQuery, OriginalCompanyAnswersQuery}
+import queries.{CisIdQuery, OriginalPartnershipAnswersQuery}
 import repositories.SessionRepository
 import utils.DefaultSubcontractorCleanupService
-import viewmodels.amend.company.CompanyAmendConfirmationViewModel
+import viewmodels.checkAnswers.amend.partnership.AmendPartnershipConfirmationViewModel
 import views.html.amend.AmendConfirmationView
+import services.SubcontractorService
 
 import scala.concurrent.Future
 import scala.util.{Failure, Success}
 
-class AmendCompanyConfirmationControllerSpec extends SpecBase with MockitoSugar with BeforeAndAfterEach {
-
-  private val companyName = "Company Ltd"
-  private val cisId       = "contractor-123"
+class AmendPartnershipConfirmationControllerSpec extends SpecBase with MockitoSugar with BeforeAndAfterEach {
+  private val cisId           = "123456789"
+  private val partnershipName = "ABC Partnership"
 
   private val mockCleanupService =
     mock[DefaultSubcontractorCleanupService]
@@ -54,43 +54,6 @@ class AmendCompanyConfirmationControllerSpec extends SpecBase with MockitoSugar 
     reset(mockCleanupService, mockSessionRepository)
   }
 
-  private val original =
-    OriginalCompanyAnswers(
-      companyName = Some(companyName),
-      addressYesNo = None,
-      address = None,
-      companyContactMethodsYesNo = None,
-      companyContactMethod = Set.empty,
-      email = None,
-      phone = None,
-      mobile = None,
-      utrYesNo = None,
-      utr = None,
-      crnYesNo = None,
-      crn = None,
-      worksReferenceYesNo = None,
-      worksReference = None,
-      verificationNumber = None
-    )
-
-  private val userAnswersWithOriginal =
-    emptyUserAnswers
-      .set(OriginalCompanyAnswersQuery, original)
-      .success
-      .value
-      .set(CisIdQuery, cisId)
-      .success
-      .value
-      .set(CompanyNamePage, companyName)
-      .success
-      .value
-      .set(AmendCheckYourAnswersSubmittedPage, true)
-      .success
-      .value
-
-  private lazy val confirmationRoute =
-    controllers.amend.company.routes.AmendCompanyConfirmationController.onPageLoad().url
-
   private def application(userAnswers: UserAnswers) =
     applicationBuilder(userAnswers = Some(userAnswers))
       .overrides(
@@ -99,7 +62,49 @@ class AmendCompanyConfirmationControllerSpec extends SpecBase with MockitoSugar 
       )
       .build()
 
-  "AmendCompanyConfirmationController" - {
+  private val original =
+    OriginalPartnershipAnswers(
+      partnershipName = Some(partnershipName),
+      addressYesNo = None,
+      address = None,
+      partnershipContactMethodsYesNo = None,
+      partnershipContactMethodOptions = Set.empty,
+      email = None,
+      phone = None,
+      mobile = None,
+      hasUtrYesNo = None,
+      utr = None,
+      nominatedPartnerName = None,
+      nominatedPartnerUtrYesNo = None,
+      nominatedPartnerUtr = None,
+      nominatedPartnerNinoYesNo = None,
+      nominatedPartnerNino = None,
+      nominatedPartnerCrnYesNo = None,
+      nominatedPartnerCrn = None,
+      nominatedPartnerWorksReferenceYesNo = None,
+      nominatedPartnerWorksReference = None,
+      verificationNumber = None
+    )
+
+  private def userAnswersWithOriginal =
+    emptyUserAnswers
+      .set(OriginalPartnershipAnswersQuery, original)
+      .success
+      .value
+      .set(CisIdQuery, cisId)
+      .success
+      .value
+      .set(PartnershipNamePage, partnershipName)
+      .success
+      .value
+      .set(AmendCheckYourAnswersSubmittedPage, true)
+      .success
+      .value
+
+  private lazy val confirmationRoute =
+    controllers.amend.partnership.routes.AmendPartnershipConfirmationController.onPageLoad().url
+
+  "AmendPartnershipConfirmationController" - {
 
     "must return OK and the correct view for a GET" in {
 
@@ -109,7 +114,7 @@ class AmendCompanyConfirmationControllerSpec extends SpecBase with MockitoSugar 
       when(mockSessionRepository.set(any[UserAnswers]))
         .thenReturn(Future.successful(true))
 
-      val app = application(userAnswersWithOriginal)
+      val app = this.application(userAnswersWithOriginal)
 
       running(app) {
 
@@ -122,15 +127,18 @@ class AmendCompanyConfirmationControllerSpec extends SpecBase with MockitoSugar 
 
         contentAsString(result) mustEqual
           view(
-            CompanyAmendConfirmationViewModel.rows(
+            AmendPartnershipConfirmationViewModel.rows(
               original,
               userAnswersWithOriginal
             )(messages(app)),
-            companyName,
+            partnershipName,
             app.injector
-              .instanceOf[FrontendAppConfig]
+              .instanceOf[config.FrontendAppConfig]
               .retrieveSubcontractorListUrl
-          )(request, messages(app)).toString
+          )(
+            request,
+            messages(app)
+          ).toString
 
         verify(mockCleanupService).cleanAmend(any())
         verify(mockSessionRepository).set(any())
@@ -144,7 +152,7 @@ class AmendCompanyConfirmationControllerSpec extends SpecBase with MockitoSugar 
           .set(CisIdQuery, cisId)
           .success
           .value
-          .set(CompanyNamePage, companyName)
+          .set(PartnershipNamePage, partnershipName)
           .success
           .value
           .set(AmendCheckYourAnswersSubmittedPage, false)
@@ -173,16 +181,17 @@ class AmendCompanyConfirmationControllerSpec extends SpecBase with MockitoSugar 
           .set(CisIdQuery, cisId)
           .success
           .value
-          .set(CompanyNamePage, companyName)
+          .set(PartnershipNamePage, partnershipName)
           .success
           .value
 
-      val app = application(userAnswers)
+      val application =
+        applicationBuilder(userAnswers = Some(userAnswers)).build()
 
-      running(app) {
+      running(application) {
 
         val request = FakeRequest(GET, confirmationRoute)
-        val result  = route(app, request).value
+        val result  = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
 
@@ -195,25 +204,59 @@ class AmendCompanyConfirmationControllerSpec extends SpecBase with MockitoSugar 
 
       val userAnswers =
         emptyUserAnswers
-          .set(OriginalCompanyAnswersQuery, original)
+          .set(OriginalPartnershipAnswersQuery, original)
           .success
           .value
-          .set(CompanyNamePage, companyName)
+          .set(PartnershipNamePage, partnershipName)
           .success
           .value
 
-      val app = application(userAnswers)
+      val application =
+        applicationBuilder(userAnswers = Some(userAnswers)).build()
 
-      running(app) {
+      running(application) {
 
         val request = FakeRequest(GET, confirmationRoute)
-        val result  = route(app, request).value
+        val result  = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
 
         redirectLocation(result).value mustEqual
           controllers.routes.JourneyRecoveryController.onPageLoad().url
       }
+    }
+
+    "must redirect to Journey Recovery when not already submitted" in {
+
+      val ua = emptyUserAnswers
+        .set(AmendCheckYourAnswersSubmittedPage, false)
+        .success
+        .value
+
+      val mockSubcontractorService = mock[SubcontractorService]
+
+      val application =
+        applicationBuilder(userAnswers = Some(ua))
+          .overrides(
+            bind[SubcontractorService].toInstance(mockSubcontractorService)
+          )
+          .build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(
+            GET,
+            controllers.amend.partnership.routes.AmendPartnershipConfirmationController.onPageLoad().url
+          )
+
+        val result = route(application, request).value
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result).value mustBe
+          controllers.routes.JourneyRecoveryController.onPageLoad().url
+      }
+      verifyNoInteractions(mockSubcontractorService)
     }
 
     "must redirect to Journey Recovery when cleanup fails" in {

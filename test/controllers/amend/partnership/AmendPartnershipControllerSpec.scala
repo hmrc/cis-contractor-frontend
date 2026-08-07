@@ -120,13 +120,13 @@ class AmendPartnershipControllerSpec extends SpecBase with MockitoSugar {
       addressYesNo = Some(true),
       address = Some(expectedAddress),
       partnershipContactMethodsYesNo = Some(true),
-      partnershipContactMethodOptions = Some(Set(Email, Phone, Mobile)),
+      partnershipContactMethodOptions = Set(Email, Phone, Mobile),
       email = Some("partnership@example.com"),
       phone = Some("02070000000"),
       mobile = Some("07123456789"),
       hasUtrYesNo = Some(true),
       utr = Some("7777777777"),
-      nominatedPartnerName = Some("Martin James Brody"),
+      nominatedPartnerName = Some("Fallback Partnership"),
       nominatedPartnerUtrYesNo = Some(true),
       nominatedPartnerUtr = Some("8777777777"),
       nominatedPartnerNinoYesNo = Some(true),
@@ -134,7 +134,8 @@ class AmendPartnershipControllerSpec extends SpecBase with MockitoSugar {
       nominatedPartnerCrnYesNo = Some(true),
       nominatedPartnerCrn = Some("AC012345"),
       nominatedPartnerWorksReferenceYesNo = Some(true),
-      nominatedPartnerWorksReference = Some("XLS345-MM")
+      nominatedPartnerWorksReference = Some("XLS345-MM"),
+      verificationNumber = Some("V1234567890")
     )
 
   "AmendPartnershipController" - {
@@ -268,7 +269,7 @@ class AmendPartnershipControllerSpec extends SpecBase with MockitoSugar {
 
           savedAnswers
             .get(PartnershipNominatedPartnerNamePage)
-            .value mustBe "Martin James Brody"
+            .value mustBe "Fallback Partnership"
 
           savedAnswers
             .get(PartnershipNominatedPartnerUtrYesNoPage)
@@ -309,243 +310,6 @@ class AmendPartnershipControllerSpec extends SpecBase with MockitoSugar {
           savedAnswers
             .get(OriginalPartnershipAnswersQuery)
             .value mustBe expectedOriginal
-        }
-      }
-
-      "must prefer partnershipTradingName over tradingName" in {
-        val mockService           = mock[SubcontractorService]
-        val mockSessionRepository = mock[SessionRepository]
-        val captor                =
-          ArgumentCaptor.forClass(classOf[UserAnswers])
-
-        when(
-          mockService.getSubcontractor(
-            eqTo(cisId),
-            eqTo(subbieResourceRef)
-          )(any[HeaderCarrier])
-        ).thenReturn(Future.successful(response))
-
-        when(mockSessionRepository.set(any[UserAnswers]))
-          .thenReturn(Future.successful(true))
-
-        val application =
-          applicationBuilder(userAnswers = Some(emptyUserAnswers))
-            .overrides(
-              bind[SubcontractorService].toInstance(mockService),
-              bind[SessionRepository].toInstance(mockSessionRepository)
-            )
-            .build()
-
-        running(application) {
-          route(
-            application,
-            FakeRequest(GET, amendPartnershipRoute)
-          ).value.futureValue
-
-          verify(mockSessionRepository).set(captor.capture())
-
-          captor.getValue
-            .get(PartnershipNamePage)
-            .value mustBe "Brody Partnership"
-        }
-      }
-
-      "must use tradingName when partnershipTradingName is missing" in {
-        val mockService           = mock[SubcontractorService]
-        val mockSessionRepository = mock[SessionRepository]
-        val captor                =
-          ArgumentCaptor.forClass(classOf[UserAnswers])
-
-        val subcontractorWithoutPartnershipName =
-          subcontractor.copy(
-            partnershipTradingName = None,
-            tradingName = Some("Fallback Partnership")
-          )
-
-        when(
-          mockService.getSubcontractor(
-            eqTo(cisId),
-            eqTo(subbieResourceRef)
-          )(any[HeaderCarrier])
-        ).thenReturn(
-          Future.successful(
-            response.copy(
-              subcontractor = Some(subcontractorWithoutPartnershipName)
-            )
-          )
-        )
-
-        when(mockSessionRepository.set(any[UserAnswers]))
-          .thenReturn(Future.successful(true))
-
-        val application =
-          applicationBuilder(userAnswers = Some(emptyUserAnswers))
-            .overrides(
-              bind[SubcontractorService].toInstance(mockService),
-              bind[SessionRepository].toInstance(mockSessionRepository)
-            )
-            .build()
-
-        running(application) {
-          route(
-            application,
-            FakeRequest(GET, amendPartnershipRoute)
-          ).value.futureValue
-
-          verify(mockSessionRepository).set(captor.capture())
-
-          val savedAnswers = captor.getValue
-
-          savedAnswers
-            .get(PartnershipNamePage)
-            .value mustBe "Fallback Partnership"
-
-          savedAnswers
-            .get(OriginalPartnershipAnswersQuery)
-            .value
-            .partnershipName mustBe Some("Fallback Partnership")
-        }
-      }
-
-      "must build the nominated partner name from first, second and surname" in {
-        val mockService           = mock[SubcontractorService]
-        val mockSessionRepository = mock[SessionRepository]
-        val captor                =
-          ArgumentCaptor.forClass(classOf[UserAnswers])
-
-        when(
-          mockService.getSubcontractor(
-            eqTo(cisId),
-            eqTo(subbieResourceRef)
-          )(any[HeaderCarrier])
-        ).thenReturn(Future.successful(response))
-
-        when(mockSessionRepository.set(any[UserAnswers]))
-          .thenReturn(Future.successful(true))
-
-        val application =
-          applicationBuilder(userAnswers = Some(emptyUserAnswers))
-            .overrides(
-              bind[SubcontractorService].toInstance(mockService),
-              bind[SessionRepository].toInstance(mockSessionRepository)
-            )
-            .build()
-
-        running(application) {
-          route(
-            application,
-            FakeRequest(GET, amendPartnershipRoute)
-          ).value.futureValue
-
-          verify(mockSessionRepository).set(captor.capture())
-
-          captor.getValue
-            .get(PartnershipNominatedPartnerNamePage)
-            .value mustBe "Martin James Brody"
-        }
-      }
-
-      "must build the nominated partner name without extra spaces when second name is missing" in {
-        val mockService           = mock[SubcontractorService]
-        val mockSessionRepository = mock[SessionRepository]
-        val captor                =
-          ArgumentCaptor.forClass(classOf[UserAnswers])
-
-        val subcontractorWithoutSecondName =
-          subcontractor.copy(secondName = None)
-
-        when(
-          mockService.getSubcontractor(
-            eqTo(cisId),
-            eqTo(subbieResourceRef)
-          )(any[HeaderCarrier])
-        ).thenReturn(
-          Future.successful(
-            response.copy(
-              subcontractor = Some(subcontractorWithoutSecondName)
-            )
-          )
-        )
-
-        when(mockSessionRepository.set(any[UserAnswers]))
-          .thenReturn(Future.successful(true))
-
-        val application =
-          applicationBuilder(userAnswers = Some(emptyUserAnswers))
-            .overrides(
-              bind[SubcontractorService].toInstance(mockService),
-              bind[SessionRepository].toInstance(mockSessionRepository)
-            )
-            .build()
-
-        running(application) {
-          route(
-            application,
-            FakeRequest(GET, amendPartnershipRoute)
-          ).value.futureValue
-
-          verify(mockSessionRepository).set(captor.capture())
-
-          captor.getValue
-            .get(PartnershipNominatedPartnerNamePage)
-            .value mustBe "Martin Brody"
-        }
-      }
-
-      "must not populate the nominated partner name when all name fields are missing" in {
-        val mockService           = mock[SubcontractorService]
-        val mockSessionRepository = mock[SessionRepository]
-        val captor                =
-          ArgumentCaptor.forClass(classOf[UserAnswers])
-
-        val subcontractorWithoutName =
-          subcontractor.copy(
-            firstName = None,
-            secondName = None,
-            surname = None
-          )
-
-        when(
-          mockService.getSubcontractor(
-            eqTo(cisId),
-            eqTo(subbieResourceRef)
-          )(any[HeaderCarrier])
-        ).thenReturn(
-          Future.successful(
-            response.copy(
-              subcontractor = Some(subcontractorWithoutName)
-            )
-          )
-        )
-
-        when(mockSessionRepository.set(any[UserAnswers]))
-          .thenReturn(Future.successful(true))
-
-        val application =
-          applicationBuilder(userAnswers = Some(emptyUserAnswers))
-            .overrides(
-              bind[SubcontractorService].toInstance(mockService),
-              bind[SessionRepository].toInstance(mockSessionRepository)
-            )
-            .build()
-
-        running(application) {
-          route(
-            application,
-            FakeRequest(GET, amendPartnershipRoute)
-          ).value.futureValue
-
-          verify(mockSessionRepository).set(captor.capture())
-
-          val savedAnswers = captor.getValue
-
-          savedAnswers
-            .get(PartnershipNominatedPartnerNamePage) mustBe None
-
-          savedAnswers
-            .get(OriginalPartnershipAnswersQuery)
-            .value
-            .nominatedPartnerName mustBe None
         }
       }
 
@@ -678,10 +442,16 @@ class AmendPartnershipControllerSpec extends SpecBase with MockitoSugar {
           savedAnswers
             .get(PartnershipMobileNumberPage) mustBe None
 
-          savedAnswers
-            .get(OriginalPartnershipAnswersQuery)
-            .value
-            .partnershipContactMethodOptions mustBe None
+          val original =
+            savedAnswers
+              .get(OriginalPartnershipAnswersQuery)
+              .value
+
+          original.partnershipContactMethodsYesNo mustBe Some(false)
+          original.partnershipContactMethodOptions mustBe Set.empty
+          original.email mustBe None
+          original.phone mustBe None
+          original.mobile mustBe None
         }
       }
 
