@@ -19,11 +19,12 @@ package controllers.add
 import base.SpecBase
 import controllers.routes
 import forms.add.SubTradingNameYesNoFormProvider
-import models.{NormalMode, UserAnswers}
+import models.add.SubcontractorName
+import models.{AmendMode, NormalMode, UserAnswers}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.add.SubTradingNameYesNoPage
+import pages.add.{SubTradingNameYesNoPage, SubcontractorNamePage, TradingNameOfSubcontractorPage}
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
@@ -202,5 +203,123 @@ class SubTradingNameYesNoControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
+    "in amend mode" - {
+
+      lazy val subTradingNameYesNoAmendRoute =
+        controllers.add.routes.SubTradingNameYesNoController.onPageLoad(AmendMode).url
+
+      "must redirect to AmendIndividualRemoveDetailYesNo(subcontractor-name) when valid data with value Yes is submitted and trading name not answered" in {
+
+        val mockSessionRepository = mock[SessionRepository]
+
+        when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+        val application =
+          applicationBuilder(userAnswers = Some(emptyUserAnswers))
+            .overrides(
+              bind[SessionRepository].toInstance(mockSessionRepository)
+            )
+            .build()
+
+        running(application) {
+          val request =
+            FakeRequest(POST, subTradingNameYesNoAmendRoute)
+              .withFormUrlEncodedBody(("value", "true"))
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual controllers.amend.routes.AmendIndividualRemoveDetailYesNoController
+            .onPageLoad("subcontractor-name")
+            .url
+        }
+      }
+
+      "must redirect to Journey Recovery when valid data with value Yes is submitted and trading name is answered" in {
+
+        val userAnswers: UserAnswers =
+          emptyUserAnswers.set(TradingNameOfSubcontractorPage, "Trading Name").success.value
+
+        val mockSessionRepository = mock[SessionRepository]
+
+        when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+        val application =
+          applicationBuilder(userAnswers = Some(userAnswers))
+            .overrides(
+              bind[SessionRepository].toInstance(mockSessionRepository)
+            )
+            .build()
+
+        running(application) {
+          val request =
+            FakeRequest(POST, subTradingNameYesNoAmendRoute)
+              .withFormUrlEncodedBody(("value", "true"))
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+        }
+      }
+
+      "must redirect to AmendIndividualRemoveDetailYesNo(trading-name) when valid data with value No is submitted and subcontractor-name not answered" in {
+
+        val mockSessionRepository = mock[SessionRepository]
+
+        when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+        val application =
+          applicationBuilder(userAnswers = Some(emptyUserAnswers))
+            .overrides(
+              bind[SessionRepository].toInstance(mockSessionRepository)
+            )
+            .build()
+
+        running(application) {
+          val request =
+            FakeRequest(POST, subTradingNameYesNoAmendRoute)
+              .withFormUrlEncodedBody(("value", "false"))
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual controllers.amend.routes.AmendIndividualRemoveDetailYesNoController
+            .onPageLoad("trading-name")
+            .url
+        }
+      }
+
+      "must redirect to Journey Recovery when valid data with value No is submitted and subcontractor-name is answered" in {
+
+        val userAnswers: UserAnswers =
+          emptyUserAnswers
+            .set(SubcontractorNamePage, SubcontractorName(firstName = "John", middleName = None, lastName = "Smith"))
+            .success
+            .value
+
+        val mockSessionRepository = mock[SessionRepository]
+
+        when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+        val application =
+          applicationBuilder(userAnswers = Some(userAnswers))
+            .overrides(
+              bind[SessionRepository].toInstance(mockSessionRepository)
+            )
+            .build()
+
+        running(application) {
+          val request =
+            FakeRequest(POST, subTradingNameYesNoAmendRoute)
+              .withFormUrlEncodedBody(("value", "false"))
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+        }
+      }
+    }
   }
 }

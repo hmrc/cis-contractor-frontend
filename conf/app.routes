@@ -82,10 +82,13 @@ POST  /subcontractor/amend/add-contact-details  controllers.add.AddIndividualCon
 GET   /subcontractor/amend/select-contact-details  controllers.add.IndividualContactMethodOptionsController.onPageLoad(mode: Mode = AmendMode)
 POST  /subcontractor/amend/select-contact-details  controllers.add.IndividualContactMethodOptionsController.onSubmit(mode: Mode = AmendMode)
 
+GET   /subcontractor/amend/individual/:cisId/:subbieResourceRef  controllers.amend.AmendIndividualController.onPageLoad(cisId: String, subbieResourceRef: Long)
+
+GET   /subcontractor/amend/remove/information/:subcontractorDetail  controllers.amend.AmendIndividualRemoveDetailYesNoController.onPageLoad(subcontractorDetail: String)
+POST  /subcontractor/amend/remove/information/:subcontractorDetail  controllers.amend.AmendIndividualRemoveDetailYesNoController.onSubmit(subcontractorDetail: String)
+
 GET   /subcontractor/amend/trust/remove/information/:subcontractorDetail  controllers.amend.trust.AmendTrustRemoveDetailYesNoController.onPageLoad(subcontractorDetail: String)
 POST  /subcontractor/amend/trust/remove/information/:subcontractorDetail  controllers.amend.trust.AmendTrustRemoveDetailYesNoController.onSubmit(subcontractorDetail: String)
-
-GET   /subcontractor/amend/individual/:cisId/:subbieResourceRef  controllers.amend.AmendIndividualController.onPageLoad(cisId: String, subbieResourceRef: Long)
 
 GET   /subcontractor/amend/partnership/:cisId/:subbieResourceRef  controllers.amend.partnership.AmendPartnershipController.onPageLoad(cisId: String, subbieResourceRef: Long)
 
@@ -111,11 +114,16 @@ GET   /subcontractor/amend/trust/subcontractor-information  controllers.amend.tr
 POST  /subcontractor/amend/trust/subcontractor-information  controllers.amend.trust.AmendTrustCheckYourAnswersController.onSubmit()
 GET   /subcontractor/amend/trust/cancel                     controllers.amend.trust.AmendTrustCheckYourAnswersController.onCancel()
 
+GET   /subcontractor/amend/trust/subcontractor-details-updated  controllers.amend.trust.AmendTrustConfirmationController.onPageLoad()
+
 GET   /subcontractor/amend/partnership/remove/information/:subcontractorDetail  controllers.amend.partnership.AmendPartnershipRemoveDetailYesNoController.onPageLoad(subcontractorDetail: String)
 POST  /subcontractor/amend/partnership/remove/information/:subcontractorDetail  controllers.amend.partnership.AmendPartnershipRemoveDetailYesNoController.onSubmit(subcontractorDetail: String)
 
 GET   /subcontractor/proceed-verifying-subcontractor  controllers.insufficient.ProceedInsufficientSubcontractorNameYesNoController.onPageLoad(mode: Mode = NormalMode)
 POST  /subcontractor/proceed-verifying-subcontractor  controllers.insufficient.ProceedInsufficientSubcontractorNameYesNoController.onSubmit(mode: Mode = NormalMode)
+
+GET   /subcontractor/remove-subcontractor-from-request  controllers.insufficient.RemoveInsufficientSubcontractorNameYesNoController.onPageLoad(mode: Mode = NormalMode)
+POST  /subcontractor/remove-subcontractor-from-request  controllers.insufficient.RemoveInsufficientSubcontractorNameYesNoController.onSubmit(mode: Mode = NormalMode)
 
 # Errors & Auth
 GET  /unauthorised/standard-user  controllers.UnauthorisedWrongRoleController.onPageLoad()
@@ -553,7 +561,6 @@ GET   /subcontractor/verify/no-subcontractors-added  controllers.verify.NoSubcon
 
 GET   /subcontractor/verify/check-verification-batch-readiness             controllers.verify.CheckVerificationBatchReadinessController.checkVerificationBatchReadiness(mode: Mode = NormalMode)
 GET   /subcontractor/verify/check-verification-batch-readiness/check-mode  controllers.verify.CheckVerificationBatchReadinessController.checkVerificationBatchReadinessInCheckMode()
-GET   /verify/check-verification-batch-readiness-before-declaration        controllers.verify.CheckVerificationBatchReadinessController.checkVerificationBatchReadinessBeforeDeclaration()
 
 GET   /subcontractor/verify/newest                            controllers.verify.NewestVerificationBatchController.onPageLoad()
 GET   /subcontractor/verify/inactive-scheme-warning/continue  controllers.verify.NewestVerificationBatchController.onContinue
@@ -599,8 +606,9 @@ GET   /subcontractor/verify/inactive-scheme-warning  controllers.verify.Inactive
 
 GET   /subcontractor/verify/verification-not-submitted-warning  controllers.verify.VerificationNotSubmittedWarningController.onPageLoad()
 
-GET   /subcontractor/verify/no-subcontractors-selected-warning         controllers.verify.NoSubcontractorsSelectedWarningController.onPageLoad()
-GET   /subcontractor/verify/no-subcontractors-selected-warning/cancel  controllers.verify.NoSubcontractorsSelectedWarningController.onCancel()
+GET   /subcontractor/verify/no-subcontractors-selected-warning/check-mode  controllers.verify.NoSubcontractorsSelectedWarningController.onPageLoadCheckMode()
+GET   /subcontractor/verify/no-subcontractors-selected-warning             controllers.verify.NoSubcontractorsSelectedWarningController.onPageLoad()
+GET   /subcontractor/verify/no-subcontractors-selected-warning/cancel      controllers.verify.NoSubcontractorsSelectedWarningController.onCancel()
 
 GET   /subcontractor/verify/verification-request-submitted  controllers.verify.VerificationRequestSubmittedController.onPageLoad()
 

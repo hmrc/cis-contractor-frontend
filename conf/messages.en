@@ -437,10 +437,26 @@ amendPartnershipRemoveDetailYesNo.detail.nominatedPartnerUtr                    
 amendPartnershipRemoveDetailYesNo.detail.nominatedPartnerNino                       =  nominated partner’s National Insurance number
 amendPartnershipRemoveDetailYesNo.detail.nominatedPartnerCompanyRegistrationNumber  =  nominated partner’s company registration number
 
+amendIndividualRemoveDetailYesNo.title                                              =  Are you sure you want to remove this information from this subcontractor?
+amendIndividualRemoveDetailYesNo.heading                                            =  Are you sure you want to remove the {1} from {0}?
+amendIndividualRemoveDetailYesNo.error.required                                     =  Select whether you want to remove this information from this subcontractor
+amendIndividualRemoveDetailYesNo.detail.tradingName                                 =  trading name
+amendIndividualRemoveDetailYesNo.detail.subcontractorName                           =  subcontractor name
+amendIndividualRemoveDetailYesNo.detail.address                                     =  address
+amendIndividualRemoveDetailYesNo.detail.contactDetails                              =  contact details
+amendIndividualRemoveDetailYesNo.detail.utr                                         =  UTR
+amendIndividualRemoveDetailYesNo.detail.nationalInsuranceNumber                     =  National Insurance number
+amendIndividualRemoveDetailYesNo.detail.worksReferenceNumber                        =  works reference number
+
 proceedInsufficientSubcontractorNameYesNo.title                                     =  Are you sure you want to proceed with including this subcontractor in this verification request
 proceedInsufficientSubcontractorNameYesNo.heading                                   =  Are you sure you want to proceed with including {0} in this verification request?
 proceedInsufficientSubcontractorNameYesNo.hint                                      =  This will assign the higher rate tax treatment to this subcontractor.
 proceedInsufficientSubcontractorNameYesNo.error.required                            =  Select yes if you want to proceed with including this subcontractor in this verification request
+
+removeInsufficientSubcontractorNameYesNo.title                                      =  Are you sure you want to remove this subcontractor from this verification request?
+removeInsufficientSubcontractorNameYesNo.heading                                    =  Are you sure you want to remove {0} from this verification request?
+removeInsufficientSubcontractorNameYesNo.hint                                       =  This means they will remain unverified, so you must not make any payments to them.
+removeInsufficientSubcontractorNameYesNo.error.required                             =  Select yes if you want to remove this subcontractor from this verification request
 
 # Partnership
 addPartnershipContactMethodsYesNo.title                     =  Do you want to add contact details for this partnership?
