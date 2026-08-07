@@ -40,7 +40,6 @@ class VerificationResultsController @Inject() (
     with I18nSupport {
 
   def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
-
 // TODO:
     //  AC3 DTR-6349
     // ALSO, TO TEST
@@ -51,10 +50,10 @@ class VerificationResultsController @Inject() (
           case Some(cisId) =>
             val manageSubcontractorsUrl = s"${appConfig.manageSubcontractorsUrl}/$cisId"
             Ok(view(VerificationResultsViewModel.from(response), manageSubcontractorsUrl))
-          case None => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+          case None        => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
         }
-        // TODO: Instead of redirecting to JourneyRecoveryController, AC says to navigate to CRR1 (Recovery Page)
-      case None => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+      // TODO: Instead of redirecting to JourneyRecoveryController, AC says to navigate to CRR1 (Recovery Page)
+      case None           => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
     }
   }
 }

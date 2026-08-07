@@ -29,16 +29,18 @@ case class VerificationResultsViewModel(
 
 object VerificationResultsViewModel {
 
-  def from(response: GetNewestVerificationBatchResponse)(implicit messages: Messages): Seq[VerificationResultsViewModel] = {
+  def from(
+    response: GetNewestVerificationBatchResponse
+  )(implicit messages: Messages): Seq[VerificationResultsViewModel] = {
     val subcontractorsById = response.subcontractors.map(s => s.subcontractorId -> s).toMap
 
     response.verifications.flatMap { verification =>
       verification.subcontractorId.flatMap { subId =>
         subcontractorsById.get(subId).map { sub =>
           VerificationResultsViewModel(
-            name               = nameFor(sub),
+            name = nameFor(sub),
             verificationStatus = verificationStatusFor(verification),
-            taxTreatment       = taxTreatmentFor(verification),
+            taxTreatment = taxTreatmentFor(verification),
             verificationNumber = verification.verificationNumber.getOrElse(messages("site.unknown"))
           )
         }
@@ -53,14 +55,14 @@ object VerificationResultsViewModel {
     val partnershipTrading = sub.partnershipTradingName.map(_.trim).filter(_.nonEmpty)
 
     val individualName: Option[String] =
-      sur.map { s => first.fold(s)(f => s"$s, $f") }
+      sur.map(s => first.fold(s)(f => s"$s, $f"))
 
     sub.subcontractorType
       .flatMap(TypeOfSubcontractor.fromString)
       .map {
-        case TypeOfSubcontractor.Partnership                                 => partnershipTrading.orElse(trading)
+        case TypeOfSubcontractor.Partnership                                => partnershipTrading.orElse(trading)
         case TypeOfSubcontractor.Limitedcompany | TypeOfSubcontractor.Trust => trading
-        case TypeOfSubcontractor.Individualorsoletrader                      => individualName.orElse(trading)
+        case TypeOfSubcontractor.Individualorsoletrader                     => individualName.orElse(trading)
       }
       .getOrElse(individualName.orElse(trading))
       .getOrElse(messages("verify.noName"))

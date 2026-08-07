@@ -68,25 +68,26 @@ class VerificationResultsControllerSpec extends SpecBase {
     monthlyReturnSubmission = None
   )
 
-
   "VerificationResults Controller" - {
 
     "must return OK and the correct view for a GET" in {
-      val cisId               = "1"
-      val userAnswer          = emptyUserAnswers
-        .set(NewestVerificationBatchResponsePage, batchResponse).success.value
-        .set(CisIdQuery, cisId).success.value
-
-
+      val cisId      = "1"
+      val userAnswer = emptyUserAnswers
+        .set(NewestVerificationBatchResponsePage, batchResponse)
+        .success
+        .value
+        .set(CisIdQuery, cisId)
+        .success
+        .value
 
       val manageSubcontractorsUrl =
         s"${applicationConfig.manageSubcontractorsUrl}/$cisId"
       val application             = applicationBuilder(userAnswers = Some(userAnswer)).build()
 
       running(application) {
-        val request = FakeRequest(GET, controllers.verify.routes.VerificationResultsController.onPageLoad().url)
-        val result = route(application, request).value
-        val view = application.injector.instanceOf[VerificationResultsView]
+        val request            = FakeRequest(GET, controllers.verify.routes.VerificationResultsController.onPageLoad().url)
+        val result             = route(application, request).value
+        val view               = application.injector.instanceOf[VerificationResultsView]
         val expectedViewModels = VerificationResultsViewModel.from(batchResponse)(messages(application))
 
         status(result) mustEqual OK
