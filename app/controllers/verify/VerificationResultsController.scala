@@ -18,6 +18,7 @@ package controllers.verify
 
 import config.FrontendAppConfig
 import controllers.actions.*
+import pages.verify.NewestVerificationBatchResponsePage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import queries.CisIdQuery
@@ -39,37 +40,21 @@ class VerificationResultsController @Inject() (
     with I18nSupport {
 
   def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
-    val verificationResults = Seq(
-      VerificationResultsViewModel(
-        "Brody, Martin",
-        "Verified",
-        "Higher rate",
-        "V0004528765/A"
-      ),
-      VerificationResultsViewModel(
-        "Hooper and Associates",
-        "Unmatched",
-        "Standard rate",
-        "V0004528765"
-      ),
-      VerificationResultsViewModel(
-        "Quint Transportation",
-        "Verified",
-        "Higher rate",
-        "V0004528765/B"
-      ),
-      VerificationResultsViewModel(
-        "The Kintner Group",
-        "Unmatched",
-        "Higher rate",
-        "V0004528765/C"
-      )
-    )
-    request.userAnswers.get(CisIdQuery) match {
-      case Some(cisId) =>
-        val manageSubcontractorsUrl = s"${appConfig.manageSubcontractorsUrl}/$cisId"
-        Ok(view(verificationResults, manageSubcontractorsUrl))
-      case None        => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+
+// TODO:
+    //  AC3 DTR-6349
+    // ALSO, TO TEST
+
+    request.userAnswers.get(NewestVerificationBatchResponsePage) match {
+      case Some(response) =>
+        request.userAnswers.get(CisIdQuery) match {
+          case Some(cisId) =>
+            val manageSubcontractorsUrl = s"${appConfig.manageSubcontractorsUrl}/$cisId"
+            Ok(view(VerificationResultsViewModel.from(response), manageSubcontractorsUrl))
+          case None => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+        }
+        // TODO: Instead of redirecting to JourneyRecoveryController, AC says to navigate to CRR1 (Recovery Page)
+      case None => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
     }
   }
 }
