@@ -71,7 +71,11 @@ class ProceedInsufficientSubcontractorNameYesNoViewSpec extends AnyWordSpec with
       labels must contain("Yes")
       labels must contain("No")
 
-      doc.select("form").attr("action") mustBe controllers.insufficient.routes.ProceedInsufficientSubcontractorNameYesNoController.onSubmit(subcontractorId).url
+      doc
+        .select("form")
+        .attr("action") mustBe controllers.insufficient.routes.ProceedInsufficientSubcontractorNameYesNoController
+        .onSubmit(subcontractorId)
+        .url
 
       doc.select("form").attr("autocomplete") mustBe "off"
 
