@@ -235,7 +235,7 @@ class SubTradingNameYesNoControllerSpec extends SpecBase with MockitoSugar {
         }
       }
 
-      "must redirect to Journey Recovery when valid data with value Yes is submitted and trading name is answered" in {
+      "must redirect to amend cya page when valid data with value Yes is submitted and trading name is answered" in {
 
         val userAnswers: UserAnswers =
           emptyUserAnswers.set(TradingNameOfSubcontractorPage, "Trading Name").success.value
@@ -259,7 +259,7 @@ class SubTradingNameYesNoControllerSpec extends SpecBase with MockitoSugar {
           val result = route(application, request).value
 
           status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+          redirectLocation(result).value mustEqual controllers.amend.routes.AmendIndividualCheckYourAnswersController.onPageLoad().url
         }
       }
 
@@ -290,7 +290,7 @@ class SubTradingNameYesNoControllerSpec extends SpecBase with MockitoSugar {
         }
       }
 
-      "must redirect to Journey Recovery when valid data with value No is submitted and subcontractor-name is answered" in {
+      "must redirect to amend cya page when valid data with value No is submitted and subcontractor-name is answered" in {
 
         val userAnswers: UserAnswers =
           emptyUserAnswers
@@ -317,7 +317,7 @@ class SubTradingNameYesNoControllerSpec extends SpecBase with MockitoSugar {
           val result = route(application, request).value
 
           status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+          redirectLocation(result).value mustEqual controllers.amend.routes.AmendIndividualCheckYourAnswersController.onPageLoad().url
         }
       }
     }
