@@ -657,6 +657,6 @@ POST  /contractor-details/change-add-contractor-scheme-name  controllers.contrac
 GET   /contractor-details/remove-contractor-detail/:contractorDetail  controllers.contractordetails.RemoveDetailYesNoController.onPageLoad(contractorDetail: String)
 POST  /contractor-details/remove-contractor-detail/:contractorDetail  controllers.contractordetails.RemoveDetailYesNoController.onSubmit(contractorDetail: String)
 
-GET   /subcontractor/proceed-verifying-subcontractor          controllers.insufficient.ProceedInsufficientSubcontractorNameYesNoController.onPageLoad(mode: Mode = NormalMode, subcontractorId: Long)
-POST  /subcontractor/proceed-verifying-subcontractor          controllers.insufficient.ProceedInsufficientSubcontractorNameYesNoController.onSubmit(mode: Mode = NormalMode, subcontractorId: Long)
+GET   /subcontractor/proceed-verifying-subcontractor          controllers.insufficient.ProceedInsufficientSubcontractorNameYesNoController.onPageLoad(subcontractorId: Long, mode: Mode = NormalMode)
+POST  /subcontractor/proceed-verifying-subcontractor          controllers.insufficient.ProceedInsufficientSubcontractorNameYesNoController.onSubmit(subcontractorId: Long, mode: Mode = NormalMode)
 

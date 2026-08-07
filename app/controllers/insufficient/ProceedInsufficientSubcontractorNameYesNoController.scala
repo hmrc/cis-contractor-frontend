@@ -24,10 +24,13 @@ import models.response.GetNewestVerificationBatchResponse
 import navigation.Navigator
 import pages.insufficient.ProceedInsufficientSubcontractorNameYesNoPage
 import pages.verify.NewestVerificationBatchResponsePage
+import play.api.Logging
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import queries.CisIdQuery
 import repositories.SessionRepository
+import services.ReviewInsufficientInfoService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.insufficient.ProceedInsufficientSubcontractorNameYesNoView
 
@@ -42,11 +45,13 @@ class ProceedInsufficientSubcontractorNameYesNoController @Inject() (
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   formProvider: ProceedInsufficientSubcontractorNameYesNoFormProvider,
+  reviewInsufficientInfoService: ReviewInsufficientInfoService,
   val controllerComponents: MessagesControllerComponents,
   view: ProceedInsufficientSubcontractorNameYesNoView
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
-    with I18nSupport {
+    with I18nSupport
+    with Logging {
 
   private val form: Form[Boolean] = formProvider()
 
@@ -58,7 +63,7 @@ class ProceedInsufficientSubcontractorNameYesNoController @Inject() (
       .get(ProceedInsufficientSubcontractorNameYesNoPage)
       .fold(form)(form.fill)
 
-  def onPageLoad(mode: Mode, subcontractorId: Long): Action[AnyContent] =
+  def onPageLoad(subcontractorId: Long, mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData) { implicit request =>
       request.userAnswers.get(NewestVerificationBatchResponsePage) match {
         case Some(batch) =>
@@ -81,52 +86,56 @@ class ProceedInsufficientSubcontractorNameYesNoController @Inject() (
       }
     }
 
-  def onSubmit(mode: Mode, subcontractorId: Long): Action[AnyContent] =
+  def onSubmit(subcontractorId: Long, mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
-      request.userAnswers.get(NewestVerificationBatchResponsePage) match {
-        case Some(batch) =>
-          batch.subcontractors
-            .find(_.subcontractorId == subcontractorId)
-            .map { subcontractor =>
-              form
-                .bindFromRequest()
-                .fold(
-                  formWithErrors =>
-                    Future.successful(
-                      BadRequest(
-                        view(
-                          formWithErrors,
-                          mode,
-                          subcontractor.displayName(),
-                          subcontractorId
-                        )
-                      )
-                    ),
-                  value =>
-                    for {
-                      updatedAnswers <-
-                        Future.fromTry(
-                          request.userAnswers.set(
-                            ProceedInsufficientSubcontractorNameYesNoPage,
-                            value
+
+      val result =
+        (request.userAnswers.get(CisIdQuery), request.userAnswers.get(NewestVerificationBatchResponsePage)) match {
+          case (Some(cisId), Some(batch)) =>
+            batch.subcontractors
+              .find(_.subcontractorId == subcontractorId)
+              .map { subcontractor =>
+                form
+                  .bindFromRequest()
+                  .fold(
+                    formWithErrors =>
+                      Future.successful(
+                        BadRequest(
+                          view(
+                            formWithErrors,
+                            mode,
+                            subcontractor.displayName,
+                            subcontractorId
                           )
                         )
+                      ),
+                    value =>
+                      for {
+                        updatedAnswers <-
+                          Future.fromTry(request.userAnswers.set(ProceedInsufficientSubcontractorNameYesNoPage, value))
+                        _              <- sessionRepository.set(updatedAnswers)
+                        _              <-
+                          reviewInsufficientInfoService.proceedInsufficientVerification(cisId, subcontractorId, batch)
 
-                      _ <- sessionRepository.set(updatedAnswers)
-
-                    } yield Redirect(
-                      navigator.nextPage(
-                        ProceedInsufficientSubcontractorNameYesNoPage,
-                        mode,
-                        updatedAnswers
+                      } yield Redirect(
+                        navigator.nextPage(
+                          ProceedInsufficientSubcontractorNameYesNoPage,
+                          mode,
+                          updatedAnswers
+                        )
                       )
-                    )
-                )
-            }
-            .getOrElse(Future.successful(recoveryRedirect))
-
-        case None =>
-          Future.successful(recoveryRedirect)
+                  )
+              }
+              .getOrElse(Future.successful(recoveryRedirect))
+          case _                          =>
+            Future.successful(recoveryRedirect)
+        }
+      result.recover { case ex =>
+        logger.error(
+          s"[DeleteAmendedNilMonthlyReturnController][onSubmit] Failed to proceed insufficient verification for subcontractorId=$subcontractorId",
+          ex
+        )
+        recoveryRedirect
       }
     }
 }

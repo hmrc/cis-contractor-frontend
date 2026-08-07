@@ -16,16 +16,24 @@
 
 package services
 
+import connectors.ConstructionIndustrySchemeConnector
 import models.Subcontractor
+import models.requests.ProceedInsufficientVerificationRequest
 import models.response.GetNewestVerificationBatchResponse
 import models.verify.VerificationBatchReadiness
+import play.api.Logging
 import play.api.i18n.Messages
+import uk.gov.hmrc.http.HeaderCarrier
 import viewmodels.verify.*
 
 import javax.inject.{Inject, Singleton}
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class ReviewInsufficientInfoService @Inject() () {
+class ReviewInsufficientInfoService @Inject() (
+  cisConnector: ConstructionIndustrySchemeConnector
+)(implicit ec: ExecutionContext)
+    extends Logging {
 
   // TODO: replace with real destinations once Edit / Proceed / Remove / view-details actions are built.
   private val dummyUrl = "#"
@@ -40,6 +48,35 @@ class ReviewInsufficientInfoService @Inject() () {
       missing = missingSubs.map(toMissingRow),
       ready = readySubs.map(toReadyRow)
     )
+  }
+
+  def proceedInsufficientVerification(cisId: String, subcontractorId: Long, batch: GetNewestVerificationBatchResponse)(
+    implicit hc: HeaderCarrier
+  ): Future[Unit] = {
+    val request =
+      for {
+        verificationBatchResourceRef <- batch.verificationBatch.flatMap(_.verifBatchResourceRef)
+        verificationResourceRef      <- batch.verifications
+                                          .find(_.subcontractorId.contains(subcontractorId))
+                                          .flatMap(_.verificationResourceRef)
+      } yield ProceedInsufficientVerificationRequest(
+        instanceId = cisId,
+        verificationBatchResourceRef = verificationBatchResourceRef,
+        verificationResourceRef = verificationResourceRef,
+        proceed = "Y"
+      )
+
+    request match {
+      case Some(req) =>
+        cisConnector.proceedInsufficientVerification(req)
+
+      case None =>
+        Future.failed(
+          new RuntimeException(
+            s"Unable to proceed insufficient verification. Missing resource refs for subcontractorId=$subcontractorId"
+          )
+        )
+    }
   }
 
   private def toMissingRow(sub: Subcontractor)(implicit messages: Messages): MissingSubcontractorRow = {

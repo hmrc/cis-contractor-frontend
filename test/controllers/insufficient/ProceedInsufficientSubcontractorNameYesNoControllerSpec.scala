@@ -30,6 +30,7 @@ import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import repositories.SessionRepository
+import services.ReviewInsufficientInfoService
 import utils.SubcontractorNameExtractor
 import views.html.insufficient.ProceedInsufficientSubcontractorNameYesNoView
 
@@ -37,59 +38,45 @@ import scala.concurrent.Future
 
 class ProceedInsufficientSubcontractorNameYesNoControllerSpec extends SpecBase with MockitoSugar {
 
-  private val formProvider =
-    new ProceedInsufficientSubcontractorNameYesNoFormProvider()
+  private val formProvider = new ProceedInsufficientSubcontractorNameYesNoFormProvider()
 
-  private val form =
-    formProvider()
+  private val form = formProvider()
 
-  private val subcontractorName =
-    "Test Subcontractor"
+  private val subcontractorName = "Test Subcontractor"
 
-  private val mode =
-    NormalMode
+  private val subcontractorId = 10
 
-  private def onwardRoute: Call =
-    Call("GET", "/foo")
+  private val mode = NormalMode
+
+  private def onwardRoute: Call = Call("GET", "/foo")
 
   private lazy val proceedInsufficientSubcontractorNameYesNoRoute =
     controllers.insufficient.routes.ProceedInsufficientSubcontractorNameYesNoController
-      .onPageLoad()
+      .onPageLoad(subcontractorId)
       .url
 
   "ProceedInsufficientSubcontractorNameYesNo Controller" - {
 
     "must return OK and the correct view for a GET" in {
 
-      val mockSubcontractorNameExtractor =
-        mock[SubcontractorNameExtractor]
+      val mockService = mock[ReviewInsufficientInfoService]
 
-      when(
-        mockSubcontractorNameExtractor.getSubcontractorName(any())
-      ).thenReturn(Some(subcontractorName))
+      //      when(
+      //        mockSubcontractorNameExtractor.getSubcontractorName(any())
+      //      ).thenReturn(Some(subcontractorName))
 
       val application =
         applicationBuilder(userAnswers = Some(emptyUserAnswers))
-          .overrides(
-            bind[SubcontractorNameExtractor]
-              .toInstance(mockSubcontractorNameExtractor)
-          )
+          .overrides(bind[ReviewInsufficientInfoService].toInstance(mockService))
           .build()
 
       running(application) {
 
-        val request =
-          FakeRequest(
-            GET,
-            proceedInsufficientSubcontractorNameYesNoRoute
-          )
+        val request = FakeRequest(GET, proceedInsufficientSubcontractorNameYesNoRoute)
 
-        val result =
-          route(application, request).value
+        val result = route(application, request).value
 
-        val view =
-          application.injector
-            .instanceOf[ProceedInsufficientSubcontractorNameYesNoView]
+        val view = application.injector.instanceOf[ProceedInsufficientSubcontractorNameYesNoView]
 
         status(result) mustEqual OK
 
@@ -97,51 +84,37 @@ class ProceedInsufficientSubcontractorNameYesNoControllerSpec extends SpecBase w
           view(
             form,
             mode,
-            subcontractorName
+            subcontractorName,
+            subcontractorId
           )(request, messages(application)).toString
       }
     }
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers =
-        UserAnswers(userAnswersId)
-          .set(
-            ProceedInsufficientSubcontractorNameYesNoPage,
-            true
-          )
-          .success
-          .value
+      val userAnswers = UserAnswers(userAnswersId)
+        .set(ProceedInsufficientSubcontractorNameYesNoPage, true)
+        .success
+        .value
 
-      val mockSubcontractorNameExtractor =
-        mock[SubcontractorNameExtractor]
+      val mockService = mock[ReviewInsufficientInfoService]
 
-      when(
-        mockSubcontractorNameExtractor.getSubcontractorName(any())
-      ).thenReturn(Some(subcontractorName))
+//      when(
+//        mockSubcontractorNameExtractor.getSubcontractorName(any())
+//      ).thenReturn(Some(subcontractorName))
 
       val application =
         applicationBuilder(userAnswers = Some(userAnswers))
-          .overrides(
-            bind[SubcontractorNameExtractor]
-              .toInstance(mockSubcontractorNameExtractor)
-          )
+          .overrides(bind[ReviewInsufficientInfoService].toInstance(mockService))
           .build()
 
       running(application) {
 
-        val request =
-          FakeRequest(
-            GET,
-            proceedInsufficientSubcontractorNameYesNoRoute
-          )
+        val request = FakeRequest(GET, proceedInsufficientSubcontractorNameYesNoRoute)
 
-        val result =
-          route(application, request).value
+        val result = route(application, request).value
 
-        val view =
-          application.injector
-            .instanceOf[ProceedInsufficientSubcontractorNameYesNoView]
+        val view = application.injector.instanceOf[ProceedInsufficientSubcontractorNameYesNoView]
 
         status(result) mustEqual OK
 
@@ -149,52 +122,38 @@ class ProceedInsufficientSubcontractorNameYesNoControllerSpec extends SpecBase w
           view(
             form.fill(true),
             mode,
-            subcontractorName
+            subcontractorName,
+            subcontractorId
           )(request, messages(application)).toString
       }
     }
 
     "must redirect to the next page when valid data is submitted" in {
 
-      val mockSessionRepository =
-        mock[SessionRepository]
+      val mockSessionRepository = mock[SessionRepository]
 
-      val mockSubcontractorNameExtractor =
-        mock[SubcontractorNameExtractor]
+      val mockService = mock[ReviewInsufficientInfoService]
+//      when(
+//        mockSubcontractorNameExtractor.getSubcontractorName(any())
+//      ).thenReturn(Some(subcontractorName))
 
-      when(
-        mockSubcontractorNameExtractor.getSubcontractorName(any())
-      ).thenReturn(Some(subcontractorName))
-
-      when(
-        mockSessionRepository.set(any())
-      ).thenReturn(Future.successful(true))
+      when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
 
       val application =
         applicationBuilder(userAnswers = Some(emptyUserAnswers))
           .overrides(
-            bind[Navigator]
-              .toInstance(new FakeNavigator(onwardRoute)),
-            bind[SessionRepository]
-              .toInstance(mockSessionRepository),
-            bind[SubcontractorNameExtractor]
-              .toInstance(mockSubcontractorNameExtractor)
+            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
+            bind[SessionRepository].toInstance(mockSessionRepository),
+            bind[ReviewInsufficientInfoService].toInstance(mockService)
           )
           .build()
 
       running(application) {
 
         val request =
-          FakeRequest(
-            POST,
-            proceedInsufficientSubcontractorNameYesNoRoute
-          )
-            .withFormUrlEncodedBody(
-              "value" -> "true"
-            )
+          FakeRequest(POST, proceedInsufficientSubcontractorNameYesNoRoute).withFormUrlEncodedBody("value" -> "true")
 
-        val result =
-          route(application, request).value
+        val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
 
@@ -204,45 +163,26 @@ class ProceedInsufficientSubcontractorNameYesNoControllerSpec extends SpecBase w
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
-      val mockSubcontractorNameExtractor =
-        mock[SubcontractorNameExtractor]
+      val mockService = mock[ReviewInsufficientInfoService]
 
-      when(
-        mockSubcontractorNameExtractor.getSubcontractorName(any())
-      ).thenReturn(Some(subcontractorName))
+//      when(
+//        mockSubcontractorNameExtractor.getSubcontractorName(any())
+//      ).thenReturn(Some(subcontractorName))
 
-      val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
-          .overrides(
-            bind[SubcontractorNameExtractor]
-              .toInstance(mockSubcontractorNameExtractor)
-          )
-          .build()
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        .overrides(bind[ReviewInsufficientInfoService].toInstance(mockService))
+        .build()
 
       running(application) {
 
         val request =
-          FakeRequest(
-            POST,
-            proceedInsufficientSubcontractorNameYesNoRoute
-          )
-            .withFormUrlEncodedBody(
-              "value" -> ""
-            )
+          FakeRequest(POST, proceedInsufficientSubcontractorNameYesNoRoute).withFormUrlEncodedBody("value" -> "")
 
-        val boundForm =
-          form.bind(
-            Map(
-              "value" -> ""
-            )
-          )
+        val boundForm = form.bind(Map("value" -> ""))
 
-        val result =
-          route(application, request).value
+        val result = route(application, request).value
 
-        val view =
-          application.injector
-            .instanceOf[ProceedInsufficientSubcontractorNameYesNoView]
+        val view = application.injector.instanceOf[ProceedInsufficientSubcontractorNameYesNoView]
 
         status(result) mustEqual BAD_REQUEST
 
@@ -250,78 +190,54 @@ class ProceedInsufficientSubcontractorNameYesNoControllerSpec extends SpecBase w
           view(
             boundForm,
             mode,
-            subcontractorName
+            subcontractorName,
+            subcontractorId
           )(request, messages(application)).toString
       }
     }
 
     "must redirect to Journey Recovery for a GET if no existing data is found" in {
 
-      val mockSubcontractorNameExtractor =
-        mock[SubcontractorNameExtractor]
+      val mockService = mock[ReviewInsufficientInfoService]
 
-      when(
-        mockSubcontractorNameExtractor.getSubcontractorName(any())
-      ).thenReturn(None)
+      //      when(
+      //        mockSubcontractorNameExtractor.getSubcontractorName(any())
+      //      ).thenReturn(Some(subcontractorName))
 
-      val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
-          .overrides(
-            bind[SubcontractorNameExtractor]
-              .toInstance(mockSubcontractorNameExtractor)
-          )
-          .build()
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        .overrides(bind[ReviewInsufficientInfoService].toInstance(mockService))
+        .build()
 
       running(application) {
 
-        val request =
-          FakeRequest(
-            GET,
-            proceedInsufficientSubcontractorNameYesNoRoute
-          )
+        val request = FakeRequest(GET, proceedInsufficientSubcontractorNameYesNoRoute)
 
-        val result =
-          route(application, request).value
+        val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
 
-        redirectLocation(result).value mustEqual
-          routes.JourneyRecoveryController
-            .onPageLoad()
-            .url
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
       }
     }
 
     "must redirect to Journey Recovery for a POST if no existing data is found" in {
 
-      val mockSubcontractorNameExtractor =
-        mock[SubcontractorNameExtractor]
+      val mockService = mock[ReviewInsufficientInfoService]
 
-      when(
-        mockSubcontractorNameExtractor.getSubcontractorName(any())
-      ).thenReturn(None)
+      //      when(
+      //        mockSubcontractorNameExtractor.getSubcontractorName(any())
+      //      ).thenReturn(Some(subcontractorName))
 
-      val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
-          .overrides(
-            bind[SubcontractorNameExtractor]
-              .toInstance(mockSubcontractorNameExtractor)
-          )
-          .build()
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        .overrides(bind[ReviewInsufficientInfoService].toInstance(mockService))
+        .build()
 
       running(application) {
 
         val request =
-          FakeRequest(
-            POST,
-            proceedInsufficientSubcontractorNameYesNoRoute
-          )
-            .withFormUrlEncodedBody(
-              "value" -> "true"
-            )
+          FakeRequest(POST, proceedInsufficientSubcontractorNameYesNoRoute).withFormUrlEncodedBody("value" -> "true")
 
-        val result =
-          route(application, request).value
+        val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
 

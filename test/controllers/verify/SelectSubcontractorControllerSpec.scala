@@ -96,7 +96,8 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
           verificationNumber = None,
           taxTreatment = None,
           verificationBatchId = None,
-          subcontractorId = None
+          subcontractorId = None,
+          verificationResourceRef = Some(10L)
         )
       ),
       submission = None,
@@ -302,7 +303,8 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
               verificationNumber = None,
               taxTreatment = None,
               verificationBatchId = None,
-              subcontractorId = None
+              subcontractorId = None,
+              verificationResourceRef = Some(10L)
             )
           ),
           submission = None,

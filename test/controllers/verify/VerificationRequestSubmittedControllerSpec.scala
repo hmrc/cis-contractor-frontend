@@ -41,7 +41,8 @@ class VerificationRequestSubmittedControllerSpec extends SpecBase with MockitoSu
     VerificationBatch(
       verificationBatchId = 1L,
       status = Some("Submitted"),
-      verificationNumber = Some("VB00000001")
+      verificationNumber = Some("VB00000001"),
+      verifBatchResourceRef = None
     )
 
   private val submission =

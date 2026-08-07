@@ -17,17 +17,26 @@
 package services
 
 import base.SpecBase
+import connectors.ConstructionIndustrySchemeConnector
 import models.Subcontractor
 import models.response.GetNewestVerificationBatchResponse
 import play.api.i18n.Messages
 import play.api.test.FakeRequest
+import uk.gov.hmrc.http.HeaderCarrier
+import org.scalatestplus.mockito.MockitoSugar
 
-class ReviewInsufficientInfoServiceSpec extends SpecBase {
+import scala.concurrent.ExecutionContext
+
+class ReviewInsufficientInfoServiceSpec extends SpecBase with MockitoSugar {
+
+  implicit val hc: HeaderCarrier    = HeaderCarrier()
+  implicit val ec: ExecutionContext = scala.concurrent.ExecutionContext.global
 
   private implicit val messages: Messages =
     app.injector.instanceOf[play.api.i18n.MessagesApi].preferred(FakeRequest())
 
-  private val service = new ReviewInsufficientInfoService()
+  private val mockConnector: ConstructionIndustrySchemeConnector = mock[ConstructionIndustrySchemeConnector]
+  private val service                                            = new ReviewInsufficientInfoService(mockConnector)
 
   private def mkSub(
     id: Long,
