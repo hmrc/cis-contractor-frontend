@@ -18,14 +18,16 @@ package utils
 
 import base.SpecBase
 import models.UserAnswers
+import models.add.SubcontractorName
 import models.address.{Address, Country}
+import models.amend.OriginalIndividualAnswers
 import models.amend.company.OriginalCompanyAnswers
-import models.contact.ContactMethodOptions
-import pages.add.company.*
-import queries.OriginalCompanyAnswersQuery
 import models.amend.trust.OriginalTrustAnswers
+import models.contact.ContactMethodOptions
+import pages.add.*
+import pages.add.company.*
 import pages.add.trust.*
-import queries.OriginalTrustAnswersQuery
+import queries.{OriginalCompanyAnswersQuery, OriginalIndividualAnswersQuery, OriginalTrustAnswersQuery}
 
 class AmendmentHelperSpec extends SpecBase {
 
@@ -165,6 +167,87 @@ class AmendmentHelperSpec extends SpecBase {
       .success
       .value
 
+  private val originalIndividual =
+    OriginalIndividualAnswers(
+      usesTradingName = Some(false),
+      tradingName = None,
+      subcontractorName = Some(
+        SubcontractorName(
+          firstName = "John",
+          middleName = None,
+          lastName = "Smith"
+        )
+      ),
+      addressYesNo = Some(true),
+      address = Some(address),
+      individualContactMethodsYesNo = Some(true),
+      individualContactMethod = Set(ContactMethodOptions.Email),
+      email = Some("test@test.com"),
+      phone = Some("0123456789"),
+      mobile = Some("07123456789"),
+      utrYesNo = Some(true),
+      utr = Some("1111111111"),
+      ninoYesNo = Some(false),
+      nino = None,
+      worksReferenceYesNo = Some(true),
+      worksReference = Some("WRN123"),
+      verificationNumber = Some("VRN123")
+    )
+
+  private val individualUserAnswers =
+    emptyUserAnswers
+      .set(OriginalIndividualAnswersQuery, originalIndividual)
+      .success
+      .value
+      .set(SubTradingNameYesNoPage, false)
+      .success
+      .value
+      .set(
+        SubcontractorNamePage,
+        SubcontractorName(
+          firstName = "John",
+          middleName = None,
+          lastName = "Smith"
+        )
+      )
+      .success
+      .value
+      .set(SubAddressYesNoPage, true)
+      .success
+      .value
+      .set(AddressOfSubcontractorPage, address)
+      .success
+      .value
+      .set(AddIndividualContactMethodsYesNoPage, true)
+      .success
+      .value
+      .set(IndividualContactMethodOptionsPage, Set(ContactMethodOptions.Email))
+      .success
+      .value
+      .set(IndividualEmailAddressPage, "test@test.com")
+      .success
+      .value
+      .set(IndividualPhoneNumberPage, "0123456789")
+      .success
+      .value
+      .set(IndividualMobileNumberPage, "07123456789")
+      .success
+      .value
+      .set(UniqueTaxpayerReferenceYesNoPage, true)
+      .success
+      .value
+      .set(SubcontractorsUniqueTaxpayerReferencePage, "1111111111")
+      .success
+      .value
+      .set(NationalInsuranceNumberYesNoPage, false)
+      .success
+      .value
+      .set(WorksReferenceNumberYesNoPage, true)
+      .success
+      .value
+      .set(WorksReferenceNumberPage, "WRN123")
+      .success
+      .value
   "AmendmentHelper" - {
 
     "companyHasChanges" - {
@@ -208,5 +291,27 @@ class AmendmentHelperSpec extends SpecBase {
         AmendmentHelper.trustHasChanges(updated) mustBe true
       }
     }
+
+    "individualHasChanges" - {
+
+      "must return false when there are no original answers" in {
+        AmendmentHelper.individualHasChanges(emptyUserAnswers) mustBe false
+      }
+
+      "must return false when no fields have changed" in {
+        AmendmentHelper.individualHasChanges(individualUserAnswers) mustBe false
+      }
+
+      "must return true when a field has changed" in {
+        val updated =
+          individualUserAnswers
+            .set(SubcontractorsUniqueTaxpayerReferencePage, "2222222222")
+            .success
+            .value
+
+        AmendmentHelper.individualHasChanges(updated) mustBe true
+      }
+    }
   }
+
 }

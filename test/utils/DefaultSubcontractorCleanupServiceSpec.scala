@@ -23,8 +23,8 @@ import models.amend.partnership.OriginalPartnershipAnswers
 import models.amend.trust.OriginalTrustAnswers
 import org.scalatest.TryValues.*
 import pages.add.CheckYourAnswersSubmittedPage
-import queries.{OriginalCompanyAnswersQuery, OriginalIndividualAnswersQuery, OriginalPartnershipAnswersQuery, OriginalTrustAnswersQuery}
 import pages.amend.{AmendCheckYourAnswersSubmittedPage, ShowVerificationDetailsPage}
+import queries.{OriginalCompanyAnswersQuery, OriginalIndividualAnswersQuery, OriginalPartnershipAnswersQuery, OriginalTrustAnswersQuery}
 
 class DefaultSubcontractorCleanupServiceSpec extends SpecBase {
 
@@ -35,14 +35,20 @@ class DefaultSubcontractorCleanupServiceSpec extends SpecBase {
       usesTradingName = None,
       tradingName = None,
       subcontractorName = None,
+      addressYesNo = None,
       address = None,
-      individualContactMethod = None,
+      individualContactMethodsYesNo = None,
+      individualContactMethod = Set.empty,
       email = None,
       phone = None,
       mobile = None,
+      utrYesNo = None,
       utr = None,
+      ninoYesNo = None,
       nino = None,
-      worksReference = None
+      worksReferenceYesNo = None,
+      worksReference = None,
+      verificationNumber = None
     )
 
   private val originalCompany =
