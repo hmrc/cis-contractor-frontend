@@ -23,10 +23,8 @@ import models.amend.partnership.OriginalPartnershipAnswers
 import models.amend.trust.OriginalTrustAnswers
 import org.scalatest.TryValues.*
 import pages.add.CheckYourAnswersSubmittedPage
-import queries.{OriginalCompanyAnswersQuery, OriginalIndividualAnswersQuery, OriginalPartnershipAnswersQuery, OriginalTrustAnswersQuery}
 import pages.amend.{AmendCheckYourAnswersSubmittedPage, ShowVerificationDetailsPage}
-import models.add.IndividualContactMethodOptions
-import models.contact.ContactMethodOptions
+import queries.{OriginalCompanyAnswersQuery, OriginalIndividualAnswersQuery, OriginalPartnershipAnswersQuery, OriginalTrustAnswersQuery}
 
 class DefaultSubcontractorCleanupServiceSpec extends SpecBase {
 

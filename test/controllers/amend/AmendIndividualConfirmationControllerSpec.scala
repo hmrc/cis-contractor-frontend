@@ -17,23 +17,23 @@
 package controllers.amend
 
 import base.SpecBase
+import config.FrontendAppConfig
+import models.UserAnswers
 import models.add.SubcontractorName
 import models.amend.OriginalIndividualAnswers
+import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito.*
+import org.scalatest.BeforeAndAfterEach
+import org.scalatestplus.mockito.MockitoSugar
 import pages.add.SubcontractorNamePage
+import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import queries.{CisIdQuery, OriginalIndividualAnswersQuery}
-import viewmodels.amend.IndividualAmendedViewModel
-import views.html.amend.AmendConfirmationView
-import config.FrontendAppConfig
-import models.UserAnswers
-import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.{mock, never, reset, verify, when}
-import org.scalatest.BeforeAndAfterEach
-import org.scalatestplus.mockito.MockitoSugar
-import play.api.inject.bind
 import repositories.SessionRepository
 import utils.DefaultSubcontractorCleanupService
+import viewmodels.amend.IndividualAmendedViewModel
+import views.html.amend.AmendConfirmationView
 
 import scala.concurrent.Future
 import scala.util.{Failure, Success}
