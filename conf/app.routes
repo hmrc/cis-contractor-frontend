@@ -88,7 +88,7 @@ POST  /subcontractor/amend/remove/information/:subcontractorDetail  controllers.
 GET   /subcontractor/amend/trust/remove/information/:subcontractorDetail  controllers.amend.trust.AmendTrustRemoveDetailYesNoController.onPageLoad(subcontractorDetail: String)
 POST  /subcontractor/amend/trust/remove/information/:subcontractorDetail  controllers.amend.trust.AmendTrustRemoveDetailYesNoController.onSubmit(subcontractorDetail: String)
 
-GET   /subcontractor/amend/:cisId/:subbieResourceRef  controllers.amend.AmendSubcontractorController.onPageLoad(cisId: String, subbieResourceRef: Long)
+GET   /subcontractor/amend/start/:cisId/:subbieResourceRef  controllers.amend.AmendSubcontractorController.onPageLoad(cisId: String, subbieResourceRef: Long)
 
 GET   /subcontractor/amend/subcontractor-information  controllers.amend.AmendIndividualCheckYourAnswersController.onPageLoad()
 POST  /subcontractor/amend/subcontractor-information  controllers.amend.AmendIndividualCheckYourAnswersController.onSubmit()
