@@ -17,7 +17,7 @@
 package controllers.verify
 
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
-import models.NormalMode
+import models.{CheckMode, Mode, NormalMode}
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -40,9 +40,8 @@ class CurrentVerificationBatchController @Inject() (
     with I18nSupport
     with Logging {
 
-  def onPageLoad(): Action[AnyContent] =
+  def onPageLoad(mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
-      println("\n\n\n CurrentVerificationBatchController in onPageLoad")
       verificationBatchService
         .getCurrentVerificationBatch(request.userAnswers)
         .map { updatedAnswers =>
@@ -51,17 +50,14 @@ class CurrentVerificationBatchController @Inject() (
             case Some(response)
                 if response.verificationBatch.nonEmpty ||
                   response.verifications.nonEmpty =>
-              println("\n\n\n 1..modify")
               Redirect(
                 controllers.verify.routes.ModifyVerificationBatchAndVerificationsController
-                  .modifyVerificationBatch(NormalMode)
+                  .modifyVerificationBatch(mode)
               )
-
             case Some(_) =>
-              println("\n\n\n 2..create")
               Redirect(
                 controllers.verify.routes.CreateVerificationBatchAndVerificationsController
-                  .onSubmit()
+                  .onSubmit(mode)
               )
 
             case None =>

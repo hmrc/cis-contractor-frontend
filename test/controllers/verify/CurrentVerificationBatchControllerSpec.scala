@@ -18,13 +18,12 @@ package controllers.verify
 
 import base.SpecBase
 import controllers.routes
-import models.UserAnswers
+import models.{NormalMode, UserAnswers, VerificationBatchCurrentVerification}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{never, verify, verifyNoMoreInteractions, when}
 import org.scalatestplus.mockito.MockitoSugar
 import models.response.GetCurrentVerificationBatchResponse
 import pages.verify.CurrentVerificationBatchResponsePage
-import models.VerificationBatchCurrentVerification
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
@@ -34,7 +33,10 @@ import uk.gov.hmrc.http.HeaderCarrier
 import scala.concurrent.Future
 
 class CurrentVerificationBatchControllerSpec extends SpecBase with MockitoSugar {
-  private val endpointUrl = "/subcontractor/verify/current"
+  private val endpointUrl =
+    controllers.verify.routes.CurrentVerificationBatchController
+      .onPageLoad(NormalMode)
+      .url
 
   "CurrentVerificationBatchController" - {
 
@@ -142,7 +144,7 @@ class CurrentVerificationBatchControllerSpec extends SpecBase with MockitoSugar 
 
         redirectLocation(result).value mustEqual
           controllers.verify.routes.ModifyVerificationBatchAndVerificationsController
-            .modifyVerificationBatch()
+            .modifyVerificationBatch(NormalMode)
             .url
       }
     }
@@ -178,7 +180,7 @@ class CurrentVerificationBatchControllerSpec extends SpecBase with MockitoSugar 
 
         redirectLocation(result).value mustEqual
           controllers.verify.routes.CreateVerificationBatchAndVerificationsController
-            .onSubmit()
+            .onSubmit(NormalMode)
             .url
       }
     }

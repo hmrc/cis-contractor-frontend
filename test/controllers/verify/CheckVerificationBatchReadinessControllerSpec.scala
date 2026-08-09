@@ -18,14 +18,16 @@ package controllers.verify
 
 import base.SpecBase
 import models.response.{GetCurrentVerificationBatchResponse, GetNewestVerificationBatchResponse}
-import models.{AmendMode, ContractorScheme, NormalMode, Subcontractor, SubcontractorCurrentVerification, SubcontractorViewModel}
+import models.{AmendMode, CheckMode, ContractorScheme, NormalMode, Subcontractor, SubcontractorCurrentVerification, SubcontractorViewModel}
 import pages.verify.{CurrentVerificationBatchResponsePage, NewestVerificationBatchResponsePage, SelectSubcontractorPage}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 
 class CheckVerificationBatchReadinessControllerSpec extends SpecBase {
 
-  private val normalModeUrl = "/subcontractor/verify/check-verification-batch-readiness"
+  private val normalModeUrl = controllers.verify.routes.CheckVerificationBatchReadinessController
+    .checkVerificationBatchReadiness(NormalMode)
+    .url
 
   private def readyIndividual(id: Long): Subcontractor = Subcontractor(
     subcontractorId = id,
@@ -271,7 +273,7 @@ class CheckVerificationBatchReadinessControllerSpec extends SpecBase {
           val controller = application.injector.instanceOf[CheckVerificationBatchReadinessController]
 
           val result =
-            controller.checkVerificationBatchReadinessInCheckMode()(FakeRequest(GET, "/test-only"))
+            controller.checkVerificationBatchReadiness(CheckMode)(FakeRequest(GET, "/test-only"))
 
           status(result) mustEqual SEE_OTHER
           redirectLocation(result).value mustEqual

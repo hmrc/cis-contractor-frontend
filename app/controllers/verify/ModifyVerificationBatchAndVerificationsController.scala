@@ -17,7 +17,7 @@
 package controllers.verify
 
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
-import models.{Mode, NormalMode}
+import models.{CheckMode, Mode, NormalMode}
 import models.requests.{CreateVerifications, DeleteVerifications, ModifyVerificationsRequest}
 import models.response.GetCurrentVerificationBatchResponse
 import pages.verify.{CurrentVerificationBatchResponsePage, SelectSubcontractorPage, SelectSubcontractorsToReverifyPage}
@@ -47,7 +47,7 @@ class ModifyVerificationBatchAndVerificationsController @Inject() (
     (identify andThen getData andThen requireData).async { implicit request =>
       runModifyLogic(mode)
     }
-    
+
   private def runModifyLogic(mode: Mode)(implicit request: models.requests.DataRequest[?]): Future[Result] = {
 
     val verifyIdsRaw: Seq[String] =
@@ -96,13 +96,7 @@ class ModifyVerificationBatchAndVerificationsController @Inject() (
               verificationService.modifyVerificationBatchAndVerifications(request.userAnswers, modifyReq).map(_ => ())
             }
         } yield Redirect(
-          if(mode == NormalMode) {
-            controllers.verify.routes.CheckVerificationBatchReadinessController
-              .checkVerificationBatchReadiness()
-          } else {
-            controllers.verify.routes.CheckVerificationBatchReadinessController
-              .checkVerificationBatchReadinessInCheckMode() 
-          }
+          controllers.verify.routes.CheckVerificationBatchReadinessController.checkVerificationBatchReadiness(mode)
         ))
           .recover { case t =>
             logger.error(

@@ -134,12 +134,8 @@ class SelectSubcontractorController @Inject() (
               .getOrElse(Set.empty)
               .flatMap(id => subcontractorsVm.find(_.id == id))
 
-          println("\n\n\n otherPageValues : "+otherPageValues)
-          println("\n\n\n currentSelectedValues : "+currentSelectedValues)
-          val mergedValues: Set[SubcontractorViewModel] = {
+          val mergedValues: Set[SubcontractorViewModel] =
             otherPageValues ++ currentSelectedValues
-          }
-          println("\n\n\n mergedValues: "+mergedValues)
 
           val gotoPage: Option[Int] =
             request.body.asFormUrlEncoded
@@ -149,19 +145,25 @@ class SelectSubcontractorController @Inject() (
 
           gotoPage match {
             case Some(targetPage) =>
-              println("\n\n\n gotopage 1...")
               for {
                 updatedAnswers <- Future.fromTry(ua.set(SelectSubcontractorPage, mergedValues))
                 _              <- sessionRepository.set(updatedAnswers)
               } yield Redirect(routes.SelectSubcontractorController.onPageLoad(mode, targetPage))
 
             case None =>
-              println("\n\n\n gotopage 2...")
-              println("\n\n\n hasAnyVerifiedSubcontractor(request) : "+hasAnyVerifiedSubcontractor(request))
               if (mergedValues.nonEmpty || hasAnyVerifiedSubcontractor(request)) {
                 for {
-                  answersWithSelections <- Future.fromTry(ua.set(SelectSubcontractorPage, mergedValues))
-                  nextPage = navigator.nextPage(SelectSubcontractorPage, mode, answersWithSelections)
+                  answersWithSelections <- Future.fromTry(
+                                             ua.set(SelectSubcontractorPage, mergedValues)
+                                           )
+
+                  nextPage =
+                    navigator.nextPage(
+                      SelectSubcontractorPage,
+                      mode,
+                      answersWithSelections
+                    )
+
                   updatedAnswers <-
                     if (
                       mode == CheckMode &&
@@ -169,12 +171,10 @@ class SelectSubcontractorController @Inject() (
                         .get(RebuildVerificationFromWarningPage)
                         .contains(true)
                     ) {
-                      println("\n\n\n inside if 3..."+answersWithSelections)
                       Future.fromTry(
                         answersWithSelections.remove(RebuildVerificationFromWarningPage)
                       )
                     } else {
-                      println("\n\n\n inside else 4..."+answersWithSelections)
                       Future.successful(answersWithSelections)
                     }
 
