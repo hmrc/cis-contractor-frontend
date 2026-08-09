@@ -23,6 +23,7 @@
 
 @this(
     layout: templates.Layout,
+    formHelper: FormWithCSRF,
     govukTable: GovukTable,
     govukButton: GovukButton,
     h1: H1,
@@ -118,8 +119,10 @@
     }
 
     @if(viewModel.allReady) {
-        @govukButton(Button(
-            content = Text(messages("site.continue")),
-        ))
+    @formHelper(action = controllers.verify.routes.ReviewInsufficientInfoSubcontractorsController.onPageLoad()) {
+            @govukButton(Button(
+                content = Text(messages("site.continue")),
+            ))
+        }
     }
 }
