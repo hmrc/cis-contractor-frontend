@@ -93,30 +93,26 @@ class AmendIndividualCheckYourAnswersController @Inject() (
   )(implicit messages: Messages): Seq[Option[SummaryListRow]] = {
 
     val verificationRows =
-      Option
-        .when(ua.get(ShowVerificationDetailsPage).contains(true)) {
-
-          val verificationNumberOpt =
-            originalAnswers
-              .flatMap(_.verificationNumber)
-              .filter(_.trim.nonEmpty)
-
-          Seq(
-            SubcontractorsUniqueTaxpayerReferenceSummary.row(
-              ua,
-              AmendMode,
-              showActions = false
-            )
-          ) ++ verificationNumberOpt.map { verificationNumber =>
-            Some(
+      if (ua.get(ShowVerificationDetailsPage).contains(true)) {
+        Seq(
+          SubcontractorsUniqueTaxpayerReferenceSummary.row(
+            ua,
+            AmendMode,
+            showActions = false
+          ),
+          originalAnswers
+            .flatMap(_.verificationNumber)
+            .filter(_.trim.nonEmpty)
+            .map { verificationNumber =>
               SummaryListRowViewModel(
                 key = Key(Text(messages("amendCheckYourAnswers.verificationNumber.label"))),
                 value = Value(Text(verificationNumber))
               )
-            )
-          }
-        }
-        .getOrElse(Nil)
+            }
+        )
+      } else {
+        Nil
+      }
 
     Seq(
       TypeOfSubcontractorSummary.row(
@@ -132,31 +128,33 @@ class AmendIndividualCheckYourAnswersController @Inject() (
   )(implicit messages: Messages): Seq[Option[SummaryListRow]] = {
 
     val nameRows =
-      Option
-        .when(!isVerified.contains(true)) {
-          Seq(
-            SubTradingNameYesNoSummary.row(ua, AmendMode),
-            SubcontractorNameSummary.row(ua, AmendMode),
-            TradingNameOfSubcontractorSummary.row(ua, AmendMode)
-          )
-        }
-        .getOrElse(Nil)
+      if (!isVerified.contains(true)) {
+        Seq(
+          SubTradingNameYesNoSummary.row(ua, AmendMode),
+          SubcontractorNameSummary.row(ua, AmendMode),
+          TradingNameOfSubcontractorSummary.row(ua, AmendMode)
+        )
+      } else {
+        Nil
+      }
 
-    val addressRows    =
+    val addressRows =
       Seq(
         SubAddressYesNoSummary.row(ua, AmendMode),
         AddressOfSubcontractorSummary.row(ua, AmendMode)
       )
-    val utrRows        =
-      Option
-        .when(!isVerified.contains(true)) {
-          Seq(
-            UniqueTaxpayerReferenceYesNoSummary.row(ua, AmendMode),
-            SubcontractorsUniqueTaxpayerReferenceSummary.row(ua, AmendMode)
-          )
-        }
-        .getOrElse(Nil)
-    val contactRows    =
+
+    val utrRows =
+      if (!isVerified.contains(true)) {
+        Seq(
+          UniqueTaxpayerReferenceYesNoSummary.row(ua, AmendMode),
+          SubcontractorsUniqueTaxpayerReferenceSummary.row(ua, AmendMode)
+        )
+      } else {
+        Nil
+      }
+
+    val contactRows =
       Seq(
         AddIndividualContactMethodsYesNoSummary.row(ua, AmendMode),
         IndividualContactMethodOptionsSummary.row(ua, AmendMode),
@@ -164,6 +162,7 @@ class AmendIndividualCheckYourAnswersController @Inject() (
         IndividualPhoneNumberSummary.row(ua, AmendMode),
         IndividualMobileNumberSummary.row(ua, AmendMode)
       )
+
     val additionalRows =
       Seq(
         NationalInsuranceNumberYesNoSummary.row(ua, AmendMode),
@@ -171,11 +170,8 @@ class AmendIndividualCheckYourAnswersController @Inject() (
         WorksReferenceNumberYesNoSummary.row(ua, AmendMode),
         WorksReferenceNumberSummary.row(ua, AmendMode)
       )
-    nameRows ++
-      addressRows ++
-      contactRows ++
-      utrRows ++
-      additionalRows
+
+    nameRows ++ addressRows ++ contactRows ++ utrRows ++ additionalRows
   }
 
   private def displayName(ua: UserAnswers): String =

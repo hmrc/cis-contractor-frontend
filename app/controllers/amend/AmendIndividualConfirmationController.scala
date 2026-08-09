@@ -34,9 +34,9 @@ import views.html.amend.AmendConfirmationView
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
+import pages.amend.AmendCheckYourAnswersSubmittedPage
 
 class AmendIndividualConfirmationController @Inject() (
-  override val messagesApi: MessagesApi,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
@@ -53,49 +53,51 @@ class AmendIndividualConfirmationController @Inject() (
   def onPageLoad(): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
 
-      val recoveryRedirect =
-        Redirect(routes.JourneyRecoveryController.onPageLoad())
+      val recoveryRedirect = Redirect(routes.JourneyRecoveryController.onPageLoad())
 
       val ua = request.userAnswers
 
-      ua.get(OriginalIndividualAnswersQuery) match {
+      if (!ua.get(AmendCheckYourAnswersSubmittedPage).contains(true)) {
+        logger.warn("[AmendIndividualConfirmationController] Accessed without prior CYA submission")
+        Future.successful(recoveryRedirect)
+      } else {
+        ua.get(OriginalIndividualAnswersQuery) match {
+          case None =>
+            logger.error("[AmendIndividualConfirmationController] Missing OriginalIndividualAnswersQuery")
+            Future.successful(recoveryRedirect)
 
-        case None =>
-          logger.error("[AmendIndividualConfirmationController] Missing OriginalIndividualAnswersQuery")
-          Future.successful(recoveryRedirect)
+          case Some(originalIndividualAnswers) =>
+            ua.get(CisIdQuery) match {
 
-        case Some(originalIndividualAnswers) =>
-          ua.get(CisIdQuery) match {
+              case None =>
+                logger.error("[AmendIndividualConfirmationController] Missing CisIdQuery")
+                Future.successful(recoveryRedirect)
 
-            case None =>
-              logger.error("[AmendIndividualConfirmationController] Missing CisIdQuery")
-              Future.successful(recoveryRedirect)
+              case Some(cisId) =>
+                val tableRows      = IndividualAmendedViewModel.rows(originalIndividualAnswers, ua)
+                val individualName = individualDisplayName(ua)
 
-            case Some(cisId) =>
-              val tableRows      = IndividualAmendedViewModel.rows(originalIndividualAnswers, ua)
-              val individualName = individualDisplayName(ua)
+                cleanupService.cleanAmend(ua) match {
 
-              cleanupService.cleanAmend(ua) match {
-
-                case Success(cleanedUa) =>
-                  sessionRepository.set(cleanedUa).map { _ =>
-                    Ok(
-                      view(
-                        tableRows,
-                        individualName,
-                        appConfig.manageYourSubcontractorsUrl(cisId)
+                  case Success(cleanedUa) =>
+                    sessionRepository.set(cleanedUa).map { _ =>
+                      Ok(
+                        view(
+                          tableRows,
+                          individualName
+                        )
                       )
-                    )
-                  }
+                    }
 
-                case Failure(exception) =>
-                  logger.warn(
-                    "[AmendIndividualConfirmationController] Failed to clean user answers",
-                    exception
-                  )
-                  Future.successful(recoveryRedirect)
-              }
-          }
+                  case Failure(exception) =>
+                    logger.warn(
+                      "[AmendIndividualConfirmationController] Failed to clean user answers",
+                      exception
+                    )
+                    Future.successful(recoveryRedirect)
+                }
+            }
+        }
       }
     }
 

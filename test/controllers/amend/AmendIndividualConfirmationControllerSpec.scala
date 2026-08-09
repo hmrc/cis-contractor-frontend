@@ -34,7 +34,7 @@ import repositories.SessionRepository
 import utils.DefaultSubcontractorCleanupService
 import viewmodels.amend.IndividualAmendedViewModel
 import views.html.amend.AmendConfirmationView
-
+import pages.amend.AmendCheckYourAnswersSubmittedPage
 import scala.concurrent.Future
 import scala.util.{Failure, Success}
 
@@ -81,6 +81,9 @@ class AmendIndividualConfirmationControllerSpec extends SpecBase with MockitoSug
       .success
       .value
       .set(SubcontractorNamePage, subcontractorName)
+      .success
+      .value
+      .set(AmendCheckYourAnswersSubmittedPage, true)
       .success
       .value
 
@@ -133,10 +136,7 @@ class AmendIndividualConfirmationControllerSpec extends SpecBase with MockitoSug
               original,
               userAnswersWithOriginal
             )(messages(app)),
-            displayName,
-            app.injector
-              .instanceOf[FrontendAppConfig]
-              .manageYourSubcontractorsUrl(cisId)
+            displayName
           )(request, messages(app)).toString
 
         verify(mockCleanupService).cleanAmend(any())
@@ -191,6 +191,37 @@ class AmendIndividualConfirmationControllerSpec extends SpecBase with MockitoSug
 
         redirectLocation(result).value mustEqual
           controllers.routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must redirect to Journey Recovery when accessed without prior CYA submission" in {
+
+      val userAnswers =
+        emptyUserAnswers
+          .set(OriginalIndividualAnswersQuery, original)
+          .success
+          .value
+          .set(CisIdQuery, cisId)
+          .success
+          .value
+          .set(SubcontractorNamePage, subcontractorName)
+          .success
+          .value
+
+      val app = application(userAnswers)
+
+      running(app) {
+
+        val request = FakeRequest(GET, confirmationRoute)
+        val result  = route(app, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(result).value mustEqual
+          controllers.routes.JourneyRecoveryController.onPageLoad().url
+
+        verifyNoInteractions(mockCleanupService)
+        verifyNoInteractions(mockSessionRepository)
       }
     }
 

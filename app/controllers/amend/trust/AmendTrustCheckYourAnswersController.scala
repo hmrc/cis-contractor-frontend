@@ -88,29 +88,32 @@ class AmendTrustCheckYourAnswersController @Inject() (
   )(implicit messages: Messages): Seq[Option[SummaryListRow]] = {
 
     val verificationRows =
-      Option
-        .when(isVerified.contains(true)) {
-
-          val verificationNumberOpt =
-            ua.get(OriginalTrustAnswersQuery)
-              .flatMap(_.verificationNumber)
-              .filter(_.trim.nonEmpty)
-
-          Seq(
-            TrustUtrSummary.row(ua, AmendMode, showActions = false)
-          ) ++ verificationNumberOpt.map { verificationNumber =>
-            Some(
+      if (isVerified.contains(true)) {
+        Seq(
+          TrustUtrSummary.row(
+            ua,
+            AmendMode,
+            showActions = false
+          ),
+          ua.get(OriginalTrustAnswersQuery)
+            .flatMap(_.verificationNumber)
+            .filter(_.trim.nonEmpty)
+            .map { verificationNumber =>
               SummaryListRowViewModel(
                 key = Key(Text(messages("amendCheckYourAnswers.verificationNumber.label"))),
                 value = Value(Text(verificationNumber))
               )
-            )
-          }
-        }
-        .getOrElse(Nil)
+            }
+        )
+      } else {
+        Nil
+      }
 
     Seq(
-      TypeOfSubcontractorSummary.row(ua, showActions = false)
+      TypeOfSubcontractorSummary.row(
+        ua,
+        showActions = false
+      )
     ) ++ verificationRows
   }
 

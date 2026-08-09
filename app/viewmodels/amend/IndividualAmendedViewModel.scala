@@ -218,11 +218,11 @@ object IndividualAmendedViewModel {
         .sortBy(_.toString)
         .map {
           case ContactMethodOptions.Email  =>
-            messages("trustContactMethodOptions.email")
+            messages("individualContactMethodOptions.email")
           case ContactMethodOptions.Phone  =>
-            messages("trustContactMethodOptions.phone")
+            messages("individualContactMethodOptions.phone")
           case ContactMethodOptions.Mobile =>
-            messages("trustContactMethodOptions.mobile")
+            messages("individualContactMethodOptions.mobile")
         }
         .mkString(", ")
     }
