@@ -23,7 +23,7 @@ import models.{NormalMode, UserAnswers}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.add.TradingNameOfSubcontractorPage
+import pages.add.{SubTradingNameYesNoPage, TradingNameOfSubcontractorPage}
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
@@ -45,7 +45,9 @@ class TradingNameOfSubcontractorControllerSpec extends SpecBase with MockitoSuga
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers =
+        Some(emptyUserAnswers.set(SubTradingNameYesNoPage, true).success.value)
+      ).build()
 
       running(application) {
         val request = FakeRequest(GET, nameOfSubcontractorRoute)
@@ -63,7 +65,8 @@ class TradingNameOfSubcontractorControllerSpec extends SpecBase with MockitoSuga
 
       val userAnswers = UserAnswers(userAnswersId).set(TradingNameOfSubcontractorPage, "answer").success.value
 
-      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
+      val application =
+        applicationBuilder(userAnswers = Some(userAnswers.set(SubTradingNameYesNoPage, true).success.value)).build()
 
       running(application) {
         val request = FakeRequest(GET, nameOfSubcontractorRoute)
@@ -74,6 +77,44 @@ class TradingNameOfSubcontractorControllerSpec extends SpecBase with MockitoSuga
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(form.fill("answer"), NormalMode)(request, messages(application)).toString
+      }
+    }
+
+    "must redirect to yesOrNo page when yesorno page has No for a GET" in {
+
+      val application = applicationBuilder(userAnswers =
+        Some(emptyUserAnswers.set(SubTradingNameYesNoPage, false).success.value)
+      ).build()
+
+      running(application) {
+        val request = FakeRequest(GET, nameOfSubcontractorRoute)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(result).value mustEqual controllers.add.routes.SubTradingNameYesNoController
+          .onPageLoad(NormalMode)
+          .url
+
+      }
+    }
+
+    "must redirect to journey recovery page when none for yesorno page for a GET" in {
+
+      val application = applicationBuilder(userAnswers =
+        Some(emptyUserAnswers.set(TradingNameOfSubcontractorPage, "answer").success.value)
+      ).build()
+
+      running(application) {
+        val request = FakeRequest(GET, nameOfSubcontractorRoute)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+
       }
     }
 

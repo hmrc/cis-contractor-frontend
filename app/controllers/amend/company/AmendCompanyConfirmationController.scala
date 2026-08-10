@@ -29,6 +29,7 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.DefaultSubcontractorCleanupService
 import viewmodels.amend.company.CompanyAmendConfirmationViewModel
 import views.html.amend.AmendConfirmationView
+import pages.amend.AmendCheckYourAnswersSubmittedPage
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -57,42 +58,50 @@ class AmendCompanyConfirmationController @Inject() (
 
       val ua = request.userAnswers
 
-      ua.get(OriginalCompanyAnswersQuery) match {
+      if (!ua.get(AmendCheckYourAnswersSubmittedPage).contains(true)) {
+        logger.warn(
+          s"[AmendCompanyConfirmationController][onPageLoad] " +
+            "Accessed confirmation page without prior submission"
+        )
+        Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
+      } else {
+        ua.get(OriginalCompanyAnswersQuery) match {
 
-        case None =>
-          logger.error("[AmendCompanyConfirmationController] Missing OriginalCompanyAnswersQuery")
-          Future.successful(recoveryRedirect)
+          case None =>
+            logger.error("[AmendCompanyConfirmationController] Missing OriginalCompanyAnswersQuery")
+            Future.successful(recoveryRedirect)
 
-        case Some(originalCompanyAnswers) =>
-          ua.get(CisIdQuery) match {
+          case Some(originalCompanyAnswers) =>
+            ua.get(CisIdQuery) match {
 
-            case None =>
-              logger.error("[AmendCompanyConfirmationController] Missing CisIdQuery")
-              Future.successful(recoveryRedirect)
+              case None =>
+                logger.error("[AmendCompanyConfirmationController] Missing CisIdQuery")
+                Future.successful(recoveryRedirect)
 
-            case Some(_) =>
-              val tableRows   = CompanyAmendConfirmationViewModel.rows(originalCompanyAnswers, ua)
-              val companyName = ua.get(CompanyNamePage).getOrElse("")
-              cleanupService.cleanAmend(ua) match {
+              case Some(_) =>
+                val tableRows   = CompanyAmendConfirmationViewModel.rows(originalCompanyAnswers, ua)
+                val companyName = ua.get(CompanyNamePage).getOrElse("")
+                cleanupService.cleanAmend(ua) match {
 
-                case Success(cleanedUa) =>
-                  sessionRepository.set(cleanedUa).map { _ =>
-                    Ok(
-                      view(
-                        tableRows,
-                        companyName,
-                        appConfig.retrieveSubcontractorListUrl
+                  case Success(cleanedUa) =>
+                    sessionRepository.set(cleanedUa).map { _ =>
+                      Ok(
+                        view(
+                          tableRows,
+                          companyName,
+                          appConfig.retrieveSubcontractorListUrl
+                        )
                       )
+                    }
+                  case Failure(exception) =>
+                    logger.warn(
+                      "[AmendCompanyConfirmationController] Failed to clean user answers",
+                      exception
                     )
-                  }
-                case Failure(exception) =>
-                  logger.warn(
-                    "[AmendCompanyConfirmationController] Failed to clean user answers",
-                    exception
-                  )
-                  Future.successful(recoveryRedirect)
-              }
-          }
+                    Future.successful(recoveryRedirect)
+                }
+            }
+        }
       }
     }
 

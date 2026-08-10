@@ -21,7 +21,7 @@ import forms.add.SubcontractorNameFormProvider
 import models.Mode
 import models.add.SubcontractorName.format
 import navigation.Navigator
-import pages.add.SubcontractorNamePage
+import pages.add.{SubTradingNameYesNoPage, SubcontractorNamePage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
@@ -53,8 +53,15 @@ class SubcontractorNameController @Inject() (
       case Some(subcontractorName) => form.fill(subcontractorName)
       case None                    => form
     }
+    request.userAnswers.get(SubTradingNameYesNoPage) match {
+      case Some(false) =>
+        Ok(view(preparedForm, mode))
+      case Some(true)  =>
+        Redirect(controllers.add.routes.SubTradingNameYesNoController.onPageLoad(mode))
+      case none        =>
+        Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+    }
 
-    Ok(view(preparedForm, mode))
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] =

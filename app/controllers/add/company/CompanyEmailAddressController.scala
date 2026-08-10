@@ -17,7 +17,6 @@
 package controllers.add.company
 
 import controllers.actions.*
-import controllers.helpers.ContactGuard
 import forms.add.company.CompanyEmailAddressFormProvider
 import models.Mode
 import models.contact.ContactMethodOptions
@@ -45,22 +44,28 @@ class CompanyEmailAddressController @Inject() (
   view: CompanyEmailAddressView
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
-    with I18nSupport
-    with ContactGuard {
+    with I18nSupport {
 
   val form: Form[String] = formProvider()
 
   def onPageLoad(mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData) { implicit request =>
-      requireContactMethodInSet(
-        request.userAnswers.get(CompanyNamePage),
-        request.userAnswers.get(CompanyContactMethodOptionsPage),
-        ContactMethodOptions.Email
-      ) { companyName =>
-        val preparedForm =
-          request.userAnswers.get(CompanyEmailAddressPage).fold(form)(form.fill)
 
-        Ok(view(preparedForm, mode, companyName))
+      val contactOption = request.userAnswers.get(CompanyContactMethodOptionsPage)
+      val companyName   = request.userAnswers.get(CompanyNamePage)
+
+      (companyName, contactOption) match {
+        case (Some(companyName), Some(options)) if options.contains(ContactMethodOptions.Email) =>
+          val preparedForm = request.userAnswers.get(CompanyEmailAddressPage) match {
+            case None        => form
+            case Some(value) => form.fill(value)
+          }
+          Ok(view(preparedForm, mode, companyName))
+
+        case (Some(_), _) =>
+          Redirect(controllers.add.company.routes.AddCompanyContactMethodsYesNoController.onPageLoad(mode))
+        case _            =>
+          Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
       }
     }
 

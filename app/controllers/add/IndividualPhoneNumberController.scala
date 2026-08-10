@@ -17,7 +17,6 @@
 package controllers.add
 
 import controllers.actions.*
-import controllers.helpers.ContactGuard
 import forms.add.IndividualPhoneNumberFormProvider
 import models.Mode
 import models.contact.ContactMethodOptions
@@ -46,23 +45,28 @@ class IndividualPhoneNumberController @Inject() (
   view: IndividualPhoneNumberView
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
-    with I18nSupport
-    with ContactGuard {
+    with I18nSupport {
 
   val form = formProvider()
 
   def onPageLoad(mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData) { implicit request =>
-      requireContactMethodInSet(
-        subcontractorNameExtractor.getSubcontractorName(request.userAnswers),
-        request.userAnswers.get(IndividualContactMethodOptionsPage),
-        ContactMethodOptions.Phone
-      ) { subcontractorName =>
-        val preparedForm = request.userAnswers.get(IndividualPhoneNumberPage) match {
-          case None        => form
-          case Some(value) => form.fill(value)
-        }
-        Ok(view(preparedForm, mode, subcontractorName))
+
+      val contactOption     = request.userAnswers.get(IndividualContactMethodOptionsPage)
+      val subcontractorName = subcontractorNameExtractor.getSubcontractorName(request.userAnswers)
+
+      (subcontractorName, contactOption) match {
+        case (Some(subcontractorName), Some(options)) if options.contains(ContactMethodOptions.Phone) =>
+          val preparedForm = request.userAnswers.get(IndividualPhoneNumberPage) match {
+            case None        => form
+            case Some(value) => form.fill(value)
+          }
+          Ok(view(preparedForm, mode, subcontractorName))
+
+        case (Some(_), _) =>
+          Redirect(controllers.add.routes.IndividualContactMethodOptionsController.onPageLoad(mode))
+        case _            =>
+          Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
       }
     }
 
