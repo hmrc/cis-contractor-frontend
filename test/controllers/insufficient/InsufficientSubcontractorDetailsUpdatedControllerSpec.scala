@@ -117,6 +117,34 @@ class InsufficientSubcontractorDetailsUpdatedControllerSpec extends SpecBase {
       }
     }
 
+    "must redirect to Journey Recovery when CIS ID is missing" in {
+
+      val userAnswers =
+        emptyUserAnswers
+          .set(
+            InsufficientSubcontractorDetailsUpdatedPage,
+            confirmationData(
+              InsufficientSubcontractorDetailsUpdatedReturnTo.YourSubcontractors
+            )
+          )
+          .success
+          .value
+
+      val application =
+        applicationBuilder(userAnswers = Some(userAnswers)).build()
+
+      running(application) {
+
+        val request = FakeRequest(GET, pageUrl)
+        val result  = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(result).value mustEqual
+          controllers.routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
     "must return OK and render the correct view for Cannot verify all subcontractors journey" in {
 
       val userAnswers =

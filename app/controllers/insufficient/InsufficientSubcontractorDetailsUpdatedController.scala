@@ -23,7 +23,7 @@ import queries.CisIdQuery
 import models.insufficient.InsufficientSubcontractorDetailsUpdatedReturnTo
 import pages.insufficient.InsufficientSubcontractorDetailsUpdatedPage
 import play.api.Logging
-import play.api.i18n.{I18nSupport, MessagesApi}
+import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.insufficient.InsufficientSubcontractorDetailsUpdatedViewModel
@@ -32,7 +32,6 @@ import views.html.insufficient.InsufficientSubcontractorDetailsUpdatedView
 import javax.inject.Inject
 
 class InsufficientSubcontractorDetailsUpdatedController @Inject() (
-  override val messagesApi: MessagesApi,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
@@ -48,24 +47,33 @@ class InsufficientSubcontractorDetailsUpdatedController @Inject() (
       request.userAnswers.get(InsufficientSubcontractorDetailsUpdatedPage) match {
 
         case Some(confirmationData) =>
-          val cisId =
-            request.userAnswers.get(CisIdQuery).getOrElse("")
+          request.userAnswers.get(CisIdQuery) match {
 
-          val (returnUrl, returnTextKey, showBeforeYouGo) =
-            linkDetails(
-              confirmationData.returnTo,
-              appConfig.manageYourSubcontractorsUrl(cisId)
-            )
+            case None =>
+              logger.error(
+                "[InsufficientSubcontractorDetailsUpdatedController.onPageLoad] Missing CisIdQuery"
+              )
+              Redirect(routes.JourneyRecoveryController.onPageLoad())
 
-          Ok(
-            view(
-              rows = InsufficientSubcontractorDetailsUpdatedViewModel.rows(confirmationData),
-              subcontractorName = confirmationData.subcontractorName.displayName,
-              returnUrl = returnUrl,
-              returnTextKey = returnTextKey,
-              showBeforeYouGo = showBeforeYouGo
-            )
-          )
+            case Some(cisId) =>
+              val (returnUrl, returnTextKey, showBeforeYouGo) =
+                linkDetails(
+                  confirmationData.returnTo,
+                  appConfig.manageYourSubcontractorsUrl(cisId)
+                )
+
+              Ok(
+                view(
+                  rows = InsufficientSubcontractorDetailsUpdatedViewModel.rows(
+                    confirmationData
+                  ),
+                  subcontractorName = confirmationData.subcontractorName.displayName,
+                  returnUrl = returnUrl,
+                  returnTextKey = returnTextKey,
+                  showBeforeYouGo = showBeforeYouGo
+                )
+              )
+          }
 
         case None =>
           logger.error(
