@@ -168,6 +168,35 @@ class AmendCompanyConfirmationControllerSpec extends SpecBase with MockitoSugar 
       }
     }
 
+    "must redirect to Journey Recovery when not submitted" in {
+
+      val userAnswers =
+        emptyUserAnswers
+          .set(CisIdQuery, cisId)
+          .success
+          .value
+          .set(CompanyNamePage, companyName)
+          .success
+          .value
+          .set(AmendCheckYourAnswersSubmittedPage, false)
+          .success
+          .value
+
+      val application =
+        applicationBuilder(userAnswers = Some(userAnswers)).build()
+
+      running(application) {
+
+        val request = FakeRequest(GET, confirmationRoute)
+        val result  = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(result).value mustEqual
+          controllers.routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
     "must redirect to Journey Recovery when the original answers are missing" in {
 
       val userAnswers =

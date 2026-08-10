@@ -21,7 +21,7 @@ import controllers.routes
 import pages.add.{SubcontractorNamePage, TradingNameOfSubcontractorPage}
 import pages.amend.AmendCheckYourAnswersSubmittedPage
 import play.api.Logging
-import play.api.i18n.{I18nSupport, MessagesApi}
+import play.api.i18n.I18nSupport
 import play.api.libs.json.Reads
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import queries.{CisIdQuery, OriginalIndividualAnswersQuery}
@@ -36,7 +36,6 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
 class AmendIndividualConfirmationController @Inject() (
-  override val messagesApi: MessagesApi,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,

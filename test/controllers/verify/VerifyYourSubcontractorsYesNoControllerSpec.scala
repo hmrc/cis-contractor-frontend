@@ -23,6 +23,8 @@ import models.UserAnswers
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
+import config.FrontendAppConfig
+import queries.CisIdQuery
 import org.scalatestplus.mockito.MockitoSugar
 import pages.verify.VerifyYourSubcontractorsYesNoPage
 import play.api.inject.bind
@@ -123,6 +125,74 @@ class VerifyYourSubcontractorsYesNoControllerSpec extends SpecBase with MockitoS
 
         status(result) mustEqual BAD_REQUEST
         contentAsString(result) mustEqual view(boundForm)(request, messages(application)).toString
+      }
+    }
+
+    "must redirect to Manage Subcontractors landing page when No is selected" in {
+
+      val mockSessionRepository = mock[SessionRepository]
+
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+      val cisId = "1234567890"
+
+      val userAnswers =
+        emptyUserAnswers
+          .set(CisIdQuery, cisId)
+          .success
+          .value
+
+      val application =
+        applicationBuilder(userAnswers = Some(userAnswers))
+          .overrides(
+            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
+            bind[SessionRepository].toInstance(mockSessionRepository)
+          )
+          .build()
+
+      running(application) {
+
+        val appConfig = application.injector.instanceOf[FrontendAppConfig]
+
+        val request =
+          FakeRequest(POST, verifyYourSubcontractorsRoute)
+            .withFormUrlEncodedBody(("value", "false"))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(result).value mustEqual
+          s"${appConfig.manageSubcontractorsUrl}/$cisId"
+      }
+    }
+
+    "must redirect to JourneyRecovery when No is selected and CIS ID is missing" in {
+
+      val mockSessionRepository = mock[SessionRepository]
+
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+      val application =
+        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          .overrides(
+            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
+            bind[SessionRepository].toInstance(mockSessionRepository)
+          )
+          .build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(POST, verifyYourSubcontractorsRoute)
+            .withFormUrlEncodedBody(("value", "false"))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(result).value mustEqual
+          routes.JourneyRecoveryController.onPageLoad().url
       }
     }
 

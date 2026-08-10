@@ -22,6 +22,7 @@ import models.{AmendMode, CheckMode, UserAnswers}
 import org.scalatest.OptionValues.convertOptionToValuable
 import org.scalatest.TryValues.convertTryToSuccessOrFailure
 import org.scalatest.freespec.AnyFreeSpec
+import org.scalatest.matchers.must.Matchers.must
 import org.scalatest.matchers.should.Matchers
 import pages.add.partnership.PartnershipUniqueTaxpayerReferencePage
 import play.api.i18n.Messages
@@ -63,6 +64,7 @@ class PartnershipUniqueTaxpayerReferenceSummarySpec extends AnyFreeSpec with Mat
       changeAction.content.asHtml.toString    should include(expectedChangeText)
       changeAction.href                     shouldBe expectedHref
       changeAction.visuallyHiddenText.value shouldBe expectedHiddenText
+      changeAction.attributes                   must contain("id" -> "partnership-unique-taxpayer-reference")
     }
 
     "must return a SummaryListRow when the answer exists in AmendMode" in {
@@ -94,6 +96,35 @@ class PartnershipUniqueTaxpayerReferenceSummarySpec extends AnyFreeSpec with Mat
       changeAction.content.asHtml.toString    should include(expectedChangeText)
       changeAction.href                     shouldBe expectedHref
       changeAction.visuallyHiddenText.value shouldBe expectedHiddenText
+    }
+
+    "must not include actions when showActions is false" in {
+      val utr = "1234567890"
+
+      val answers =
+        UserAnswers("test-id")
+          .set(PartnershipUniqueTaxpayerReferencePage, utr)
+          .success
+          .value
+
+      val maybeRow = PartnershipUniqueTaxpayerReferenceSummary.row(
+        answers,
+        mode = CheckMode,
+        showActions = false
+      )
+
+      maybeRow shouldBe defined
+
+      val row = maybeRow.value
+
+      row.key.content.asHtml.toString should include(
+        messages("partnershipUniqueTaxpayerReference.verified.checkYourAnswersLabel")
+      )
+
+      row.value.content.asHtml.toString should include(utr)
+
+      row.actions             shouldBe defined
+      row.actions.value.items shouldBe empty
     }
 
     "must return None when the answer does not exist" in {

@@ -20,10 +20,11 @@ import controllers.actions.*
 import forms.add.partnership.PartnershipWorksReferenceNumberFormProvider
 import models.Mode
 import navigation.Navigator
-import pages.add.partnership.{PartnershipNamePage, PartnershipWorksReferenceNumberPage}
+import pages.add.partnership.{PartnershipNamePage, PartnershipWorksReferenceNumberPage, PartnershipWorksReferenceNumberYesNoPage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
+import services.YesOrNoPageGuardService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.add.partnership.PartnershipWorksReferenceNumberView
 
@@ -39,6 +40,7 @@ class PartnershipWorksReferenceNumberController @Inject() (
   requireData: DataRequiredAction,
   formProvider: PartnershipWorksReferenceNumberFormProvider,
   val controllerComponents: MessagesControllerComponents,
+  yesOrNoPageGuardService: YesOrNoPageGuardService,
   view: PartnershipWorksReferenceNumberView
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
@@ -47,6 +49,9 @@ class PartnershipWorksReferenceNumberController @Inject() (
   val form = formProvider()
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
+    val yesOrNoPage       = PartnershipWorksReferenceNumberYesNoPage
+    val yesOrNoPageOption = request.userAnswers.get(PartnershipWorksReferenceNumberYesNoPage)
+
     request.userAnswers
       .get(PartnershipNamePage)
       .map { partnershipName =>
@@ -54,7 +59,8 @@ class PartnershipWorksReferenceNumberController @Inject() (
           case None        => form
           case Some(value) => form.fill(value)
         }
-        Ok(view(preparedForm, mode, partnershipName))
+        val result       = Ok(view(preparedForm, mode, partnershipName))
+        yesOrNoPageGuardService.yesOrNoPageRoute(result, yesOrNoPageOption, yesOrNoPage, mode)
       }
       .getOrElse(
         Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())

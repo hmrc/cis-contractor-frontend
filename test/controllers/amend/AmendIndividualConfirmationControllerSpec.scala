@@ -17,7 +17,6 @@
 package controllers.amend
 
 import base.SpecBase
-import config.FrontendAppConfig
 import models.UserAnswers
 import models.add.SubcontractorName
 import models.amend.OriginalIndividualAnswers
@@ -26,6 +25,7 @@ import org.mockito.Mockito.*
 import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.mockito.MockitoSugar
 import pages.add.SubcontractorNamePage
+import pages.amend.AmendCheckYourAnswersSubmittedPage
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
@@ -34,7 +34,7 @@ import repositories.SessionRepository
 import utils.DefaultSubcontractorCleanupService
 import viewmodels.amend.IndividualAmendedViewModel
 import views.html.amend.AmendConfirmationView
-import pages.amend.AmendCheckYourAnswersSubmittedPage
+
 import scala.concurrent.Future
 import scala.util.{Failure, Success}
 

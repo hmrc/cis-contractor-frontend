@@ -25,7 +25,7 @@ import models.{AmendMode, UserAnswers}
 import pages.add.*
 import pages.amend.{AmendCheckYourAnswersSubmittedPage, ShowVerificationDetailsPage}
 import play.api.Logging
-import play.api.i18n.{I18nSupport, Messages, MessagesApi}
+import play.api.i18n.{I18nSupport, Messages}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import queries.{CisIdQuery, OriginalIndividualAnswersQuery}
 import repositories.SessionRepository
@@ -42,7 +42,6 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class AmendIndividualCheckYourAnswersController @Inject() (
-  override val messagesApi: MessagesApi,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
