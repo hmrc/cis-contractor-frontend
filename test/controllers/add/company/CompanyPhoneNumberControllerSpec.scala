@@ -215,7 +215,7 @@ class CompanyPhoneNumberControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must redirect to Journey Recovery for a GET when CompanyContactMethodOptions is missing" in {
+    "must redirect to contact method option page for a GET when CompanyContactMethodOptions is missing" in {
 
       val application = applicationBuilder(userAnswers = Some(uaWithName)).build()
 
@@ -225,11 +225,13 @@ class CompanyPhoneNumberControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+        redirectLocation(result).value mustEqual controllers.add.company.routes.AddCompanyContactMethodsYesNoController
+          .onPageLoad(NormalMode)
+          .url
       }
     }
 
-    "must redirect to Journey Recovery for a GET when Phone is not in CompanyContactMethodOptions" in {
+    "must redirect to contact method option page for a GET when Phone is not in CompanyContactMethodOptions" in {
 
       val userAnswers =
         uaWithName
@@ -245,7 +247,9 @@ class CompanyPhoneNumberControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+        redirectLocation(result).value mustEqual controllers.add.company.routes.AddCompanyContactMethodsYesNoController
+          .onPageLoad(NormalMode)
+          .url
       }
     }
 

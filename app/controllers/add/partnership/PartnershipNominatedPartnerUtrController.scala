@@ -20,10 +20,11 @@ import controllers.actions.*
 import forms.add.partnership.PartnershipNominatedPartnerUtrFormProvider
 import models.Mode
 import navigation.Navigator
-import pages.add.partnership.{PartnershipNominatedPartnerNamePage, PartnershipNominatedPartnerUtrPage}
+import pages.add.partnership.{PartnershipNominatedPartnerNamePage, PartnershipNominatedPartnerUtrPage, PartnershipNominatedPartnerUtrYesNoPage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
+import services.YesOrNoPageGuardService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.add.partnership.PartnershipNominatedPartnerUtrView
 
@@ -38,6 +39,7 @@ class PartnershipNominatedPartnerUtrController @Inject() (
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   formProvider: PartnershipNominatedPartnerUtrFormProvider,
+  yesOrNoPageGuardService: YesOrNoPageGuardService,
   val controllerComponents: MessagesControllerComponents,
   view: PartnershipNominatedPartnerUtrView
 )(implicit ec: ExecutionContext)
@@ -47,6 +49,9 @@ class PartnershipNominatedPartnerUtrController @Inject() (
   val form = formProvider()
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
+    val yesOrNoPage       = PartnershipNominatedPartnerUtrYesNoPage
+    val yesOrNoPageOption = request.userAnswers.get(PartnershipNominatedPartnerUtrYesNoPage)
+
     request.userAnswers
       .get(PartnershipNominatedPartnerNamePage)
       .map { partnershipName =>
@@ -54,7 +59,8 @@ class PartnershipNominatedPartnerUtrController @Inject() (
           case None        => form
           case Some(value) => form.fill(value)
         }
-        Ok(view(preparedForm, mode, partnershipName))
+        val result       = Ok(view(preparedForm, mode, partnershipName))
+        yesOrNoPageGuardService.yesOrNoPageRoute(result, yesOrNoPageOption, yesOrNoPage, mode)
       }
       .getOrElse(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
   }

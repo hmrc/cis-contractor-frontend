@@ -78,6 +78,7 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
   lazy val findUtr: String                       = configuration.get[String]("urls.findUtr")
   lazy val managefrontendBaseUrl: String         = configuration.get[String]("urls.manageFrontendBaseUrl")
   lazy val verificationHistoryUrl: String        = s"$managefrontendBaseUrl/verification-history/retrieve"
+  lazy val retrieveSubcontractorListUrl: String  = s"$managefrontendBaseUrl/subcontractors/retrieve"
 
   private val exitSurveyBaseUrl: String = configuration.get[Service]("microservice.services.feedback-frontend").baseUrl
   lazy val exitSurveyUrl: String        = s"$exitSurveyBaseUrl/feedback/cis-contractor-frontend"

@@ -24,7 +24,7 @@ import models.add.*
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.add.SubcontractorNamePage
+import pages.add.{SubTradingNameYesNoPage, SubcontractorNamePage}
 import play.api.inject.bind
 import play.api.libs.json.{Json, OFormat}
 import play.api.test.FakeRequest
@@ -46,7 +46,9 @@ class SubcontractorNameControllerSpec extends SpecBase with MockitoSugar {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers =
+        Some(emptyUserAnswers.set(SubTradingNameYesNoPage, false).success.value)
+      ).build()
 
       running(application) {
         val request = FakeRequest(GET, subcontractorNameRoute)
@@ -60,6 +62,24 @@ class SubcontractorNameControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
+    "must redirect SubTradingNameYesNo page when page value has true" in {
+
+      val application = applicationBuilder(userAnswers =
+        Some(emptyUserAnswers.set(SubTradingNameYesNoPage, true).success.value)
+      ).build()
+
+      running(application) {
+        val request = FakeRequest(GET, subcontractorNameRoute)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.add.routes.SubTradingNameYesNoController
+          .onPageLoad(NormalMode)
+          .url
+      }
+    }
+
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
       implicit val subcontractorNameFormat: OFormat[SubcontractorName] =
@@ -67,7 +87,13 @@ class SubcontractorNameControllerSpec extends SpecBase with MockitoSugar {
 
       val validName = SubcontractorName("John", Some("Paul"), "Smith")
 
-      val userAnswers = emptyUserAnswers.set(SubcontractorNamePage, validName).success.value
+      val userAnswers = emptyUserAnswers
+        .set(SubcontractorNamePage, validName)
+        .success
+        .value
+        .set(SubTradingNameYesNoPage, false)
+        .success
+        .value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
