@@ -223,9 +223,11 @@ class PartnershipMobileNumberControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must redirect to Journey Recovery for a GET when PartnershipContactMethodOptions is missing" in {
+    "must redirect to contact method option page for a GET when partnership name  is missing" in {
 
-      val application = applicationBuilder(userAnswers = Some(uaWithName)).build()
+      val application = applicationBuilder(userAnswers =
+        Some(emptyUserAnswers.set(PartnershipContactMethodOptionsPage, Set(ContactMethodOptions.Mobile)).success.value)
+      ).build()
 
       running(application) {
         val request = FakeRequest(GET, partnershipMobileNumberRoute)
@@ -237,7 +239,7 @@ class PartnershipMobileNumberControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must redirect to Journey Recovery for a GET when Mobile is not in PartnershipContactMethodOptions" in {
+    "must redirect to contact method option page for a GET when Mobile is not in PartnershipContactMethodOptions" in {
 
       val userAnswers =
         uaWithName
@@ -253,7 +255,11 @@ class PartnershipMobileNumberControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+        redirectLocation(
+          result
+        ).value mustEqual controllers.add.partnership.routes.AddPartnershipContactMethodsYesNoController
+          .onPageLoad(NormalMode)
+          .url
       }
     }
 

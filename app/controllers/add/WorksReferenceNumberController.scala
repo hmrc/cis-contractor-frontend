@@ -21,10 +21,11 @@ import forms.add.WorksReferenceNumberFormProvider
 import models.Mode
 import models.requests.DataRequest
 import navigation.Navigator
-import pages.add.WorksReferenceNumberPage
+import pages.add.{WorksReferenceNumberPage, WorksReferenceNumberYesNoPage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
+import services.YesOrNoPageGuardService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.SubcontractorNameExtractor
 import views.html.add.WorksReferenceNumberView
@@ -42,6 +43,7 @@ class WorksReferenceNumberController @Inject() (
   formProvider: WorksReferenceNumberFormProvider,
   subcontractorNameExtractor: SubcontractorNameExtractor,
   val controllerComponents: MessagesControllerComponents,
+  yesOrNoPageGuardService: YesOrNoPageGuardService,
   view: WorksReferenceNumberView
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
@@ -57,10 +59,15 @@ class WorksReferenceNumberController @Inject() (
 
   def onPageLoad(mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData) { implicit request =>
+
+      val yesOrNoPage       = WorksReferenceNumberYesNoPage
+      val yesOrNoPageOption = request.userAnswers.get(WorksReferenceNumberYesNoPage)
+
       subcontractorNameExtractor
         .getSubcontractorName(request.userAnswers)
         .fold(recoveryRedirect) { subcontractorName =>
-          Ok(view(preparedForm, mode, subcontractorName))
+          val result = Ok(view(preparedForm, mode, subcontractorName))
+          yesOrNoPageGuardService.yesOrNoPageRoute(result, yesOrNoPageOption, yesOrNoPage, mode)
         }
     }
 

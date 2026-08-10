@@ -24,6 +24,7 @@ import org.mockito.Mockito.*
 import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.mockito.MockitoSugar
 import pages.add.trust.TrustNamePage
+import pages.amend.AmendCheckYourAnswersSubmittedPage
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
@@ -65,6 +66,9 @@ class AmendTrustConfirmationControllerSpec extends SpecBase with MockitoSugar wi
       .success
       .value
       .set(TrustNamePage, trustName)
+      .success
+      .value
+      .set(AmendCheckYourAnswersSubmittedPage, true)
       .success
       .value
 
@@ -125,6 +129,35 @@ class AmendTrustConfirmationControllerSpec extends SpecBase with MockitoSugar wi
 
         verify(mockCleanupService).cleanAmend(any())
         verify(mockSessionRepository).set(any())
+      }
+    }
+
+    "must redirect to Journey Recovery when not submitted" in {
+
+      val userAnswers =
+        emptyUserAnswers
+          .set(CisIdQuery, cisId)
+          .success
+          .value
+          .set(TrustNamePage, trustName)
+          .success
+          .value
+          .set(AmendCheckYourAnswersSubmittedPage, false)
+          .success
+          .value
+
+      val application =
+        applicationBuilder(userAnswers = Some(userAnswers)).build()
+
+      running(application) {
+
+        val request = FakeRequest(GET, confirmationRoute)
+        val result  = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(result).value mustEqual
+          controllers.routes.JourneyRecoveryController.onPageLoad().url
       }
     }
 

@@ -60,9 +60,8 @@ class PartnershipAddressController @Inject() (
 
   override protected def onChangeCompletion(isAmend: Boolean): Call =
     if (isAmend) {
-      controllers.routes.JourneyRecoveryController.onPageLoad()
-    } // TODO: redirect to amend cya page
-    else {
+      controllers.amend.partnership.routes.AmendPartnershipCheckYourAnswersController.onPageLoad()
+    } else {
       routes.PartnershipCheckYourAnswersController.onPageLoad()
     }
 

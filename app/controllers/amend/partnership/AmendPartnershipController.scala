@@ -90,12 +90,12 @@ class AmendPartnershipController @Inject() (
                 updatedAnswers =>
                   sessionRepository
                     .set(updatedAnswers)
-                    .map { _ =>
+                    .map(_ =>
                       Redirect(
                         controllers.amend.partnership.routes.AmendPartnershipCheckYourAnswersController
                           .onPageLoad()
                       )
-                    }
+                    )
               )
           }
         }
@@ -114,19 +114,17 @@ class AmendPartnershipController @Inject() (
     cisId: String,
     subcontractor: SubcontractorResponse
   ): Try[UserAnswers] = {
-    val address                    = toAddress(subcontractor)
-    val methods                    = contactMethods(subcontractor)
-    val nominatedPartnerName       =
-      Seq(subcontractor.firstName, subcontractor.secondName, subcontractor.surname).flatten.mkString(" ").trim
-    val partnershipName            = subcontractor.partnershipTradingName.orElse(subcontractor.tradingName)
-    val nominatedPartnerNameOption = Option.when(nominatedPartnerName.nonEmpty)(nominatedPartnerName)
+    val address              = toAddress(subcontractor)
+    val methods              = contactMethods(subcontractor)
+    val nominatedPartnerName = subcontractor.tradingName
+    val partnershipName      = subcontractor.partnershipTradingName
 
     val original = originalAnswers(
       subcontractor = subcontractor,
       address = address,
       methods = methods,
       partnershipName = partnershipName,
-      nominatedPartnerName = nominatedPartnerNameOption
+      nominatedPartnerName = nominatedPartnerName
     )
 
     for {
@@ -141,11 +139,7 @@ class AmendPartnershipController @Inject() (
       updated <- setOptional(updated, PartnershipMobileNumberPage, subcontractor.mobilePhoneNumber)
       updated <- updated.set(PartnershipHasUtrYesNoPage, subcontractor.utr.isDefined)
       updated <- setOptional(updated, PartnershipUniqueTaxpayerReferencePage, subcontractor.utr)
-      updated <- setOptional(
-                   updated,
-                   PartnershipNominatedPartnerNamePage,
-                   Option.when(nominatedPartnerName.nonEmpty)(nominatedPartnerName)
-                 )
+      updated <- setOptional(updated, PartnershipNominatedPartnerNamePage, nominatedPartnerName)
       updated <- updated.set(PartnershipNominatedPartnerUtrYesNoPage, subcontractor.partnerUtr.isDefined)
       updated <- setOptional(updated, PartnershipNominatedPartnerUtrPage, subcontractor.partnerUtr)
       updated <- updated.set(ShowVerificationDetailsPage, shouldShowVerificationDetails(subcontractor))
@@ -193,7 +187,7 @@ class AmendPartnershipController @Inject() (
       addressYesNo = Some(address.isDefined),
       address = address,
       partnershipContactMethodsYesNo = Some(methods.nonEmpty),
-      partnershipContactMethodOptions = Option.when(methods.nonEmpty)(methods),
+      partnershipContactMethodOptions = methods,
       email = subcontractor.emailAddress,
       phone = subcontractor.phoneNumber,
       mobile = subcontractor.mobilePhoneNumber,
@@ -207,6 +201,7 @@ class AmendPartnershipController @Inject() (
       nominatedPartnerCrnYesNo = Some(subcontractor.crn.isDefined),
       nominatedPartnerCrn = subcontractor.crn,
       nominatedPartnerWorksReferenceYesNo = Some(subcontractor.worksReferenceNumber.isDefined),
-      nominatedPartnerWorksReference = subcontractor.worksReferenceNumber
+      nominatedPartnerWorksReference = subcontractor.worksReferenceNumber,
+      verificationNumber = subcontractor.verificationNumber
     )
 }
