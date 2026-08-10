@@ -18,7 +18,7 @@ package controllers.amend
 
 import base.SpecBase
 import models.TypeOfSubcontractor.{Individualorsoletrader, Limitedcompany, Partnership, Trust}
-import models.UserAnswers
+import models.{TypeOfSubcontractor, UserAnswers}
 import models.response.{GetSubcontractorResponse, SubcontractorResponse}
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
@@ -440,6 +440,121 @@ class AmendSubcontractorControllerSpec extends SpecBase with MockitoSugar {
         }
       }
 
+      "must redirect to JourneyRecovery when the service fails" in {
+        val mockService           = mock[SubcontractorService]
+        val mockSessionRepository = mock[SessionRepository]
+
+        when(
+          mockService.getSubcontractor(
+            eqTo(cisId),
+            eqTo(subbieResourceRef)
+          )(any[HeaderCarrier])
+        ).thenReturn(
+          Future.failed(new RuntimeException("Backend unavailable"))
+        )
+
+        val application =
+          applicationBuilder(userAnswers = Some(emptyUserAnswers))
+            .overrides(
+              bind[SubcontractorService].toInstance(mockService),
+              bind[SessionRepository].toInstance(mockSessionRepository)
+            )
+            .build()
+
+        running(application) {
+          val result =
+            route(
+              application,
+              FakeRequest(GET, amendSubcontractorRoute)
+            ).value
+
+          status(result) mustBe SEE_OTHER
+          redirectLocation(result).value mustBe
+            controllers.routes.JourneyRecoveryController
+              .onPageLoad()
+              .url
+
+          verify(mockSessionRepository, never())
+            .set(any[UserAnswers])
+        }
+      }
+
+      "must redirect to JourneyRecovery and not call the service when no user answers exist" in {
+        val mockService           = mock[SubcontractorService]
+        val mockSessionRepository = mock[SessionRepository]
+
+        val application =
+          applicationBuilder(userAnswers = None)
+            .overrides(
+              bind[SubcontractorService].toInstance(mockService),
+              bind[SessionRepository].toInstance(mockSessionRepository)
+            )
+            .build()
+
+        running(application) {
+          val result =
+            route(
+              application,
+              FakeRequest(GET, amendSubcontractorRoute)
+            ).value
+
+          status(result) mustBe SEE_OTHER
+
+          redirectLocation(result).value mustBe
+            controllers.routes.JourneyRecoveryController
+              .onPageLoad()
+              .url
+
+          verify(mockService, never())
+            .getSubcontractor(
+              any[String],
+              any[Long]
+            )(any[HeaderCarrier])
+
+          verify(mockSessionRepository, never())
+            .set(any[UserAnswers])
+        }
+      }
+
+      "must redirect to JourneyRecovery and not save when populating user answers fails" in {
+        val mockService           = mock[SubcontractorService]
+        val mockSessionRepository = mock[SessionRepository]
+
+        when(
+          mockService.getSubcontractor(
+            eqTo(cisId),
+            eqTo(subbieResourceRef)
+          )(any[HeaderCarrier])
+        ).thenReturn(Future.failed(new RuntimeException(RuntimeException("Unable to populate UserAnswers"))))
+
+        val application =
+          applicationBuilder(userAnswers = Some(emptyUserAnswers))
+            .overrides(
+              bind[SubcontractorService].toInstance(mockService),
+              bind[SessionRepository].toInstance(mockSessionRepository),
+            )
+            .build()
+
+        running(application) {
+          val result =
+            route(
+              application,
+              FakeRequest(GET, amendSubcontractorRoute)
+            ).value
+
+          status(result) mustBe SEE_OTHER
+
+          redirectLocation(result).value mustBe
+            controllers.routes.JourneyRecoveryController
+              .onPageLoad()
+              .url
+
+          verify(mockSessionRepository, never())
+            .set(any[UserAnswers])
+        }
+      }
+
     }
   }
 }
+
