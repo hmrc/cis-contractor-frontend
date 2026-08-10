@@ -27,13 +27,12 @@ import uk.gov.hmrc.http.HeaderCarrier
 import viewmodels.verify.*
 
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
 
 @Singleton
 class ReviewInsufficientInfoService @Inject() (
   cisConnector: ConstructionIndustrySchemeConnector
-)(implicit ec: ExecutionContext)
-    extends Logging {
+) extends Logging {
 
   // TODO: replace with real destinations once Edit / Proceed / Remove / view-details actions are built.
   private val dummyUrl = "#"
@@ -68,7 +67,7 @@ class ReviewInsufficientInfoService @Inject() (
         verificationResourceRef = verificationResourceRef,
         proceed = "Y"
       )
-
+//
     request match {
       case Some(req) =>
         cisConnector.proceedInsufficientVerification(req)
