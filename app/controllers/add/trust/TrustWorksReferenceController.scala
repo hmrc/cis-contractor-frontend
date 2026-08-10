@@ -20,10 +20,11 @@ import controllers.actions.*
 import forms.add.trust.TrustWorksReferenceFormProvider
 import models.Mode
 import navigation.Navigator
-import pages.add.trust.{TrustNamePage, TrustWorksReferencePage}
+import pages.add.trust.{TrustNamePage, TrustWorksReferencePage, TrustWorksReferenceYesNoPage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
+import services.YesOrNoPageGuardService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.add.trust.TrustWorksReferenceView
 
@@ -38,6 +39,7 @@ class TrustWorksReferenceController @Inject() (
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   formProvider: TrustWorksReferenceFormProvider,
+  yesOrNoPageGuardService: YesOrNoPageGuardService,
   val controllerComponents: MessagesControllerComponents,
   view: TrustWorksReferenceView
 )(implicit ec: ExecutionContext)
@@ -47,6 +49,9 @@ class TrustWorksReferenceController @Inject() (
   val form = formProvider()
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
+    val yesOrNoPage       = TrustWorksReferenceYesNoPage
+    val yesOrNoPageOption = request.userAnswers.get(TrustWorksReferenceYesNoPage)
+
     request.userAnswers
       .get(TrustNamePage)
       .map { trustName =>
@@ -55,7 +60,8 @@ class TrustWorksReferenceController @Inject() (
           case Some(value) => form.fill(value)
         }
 
-        Ok(view(preparedForm, mode, trustName))
+        val result = Ok(view(preparedForm, mode, trustName))
+        yesOrNoPageGuardService.yesOrNoPageRoute(result, yesOrNoPageOption, yesOrNoPage, mode)
       }
       .getOrElse(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
   }
