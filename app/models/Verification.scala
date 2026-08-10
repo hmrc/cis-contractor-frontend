@@ -23,7 +23,8 @@ final case class Verification(
   verificationNumber: Option[String],
   taxTreatment: Option[String],
   verificationBatchId: Option[Long],
-  subcontractorId: Option[Long]
+  subcontractorId: Option[Long],
+  verificationResourceRef: Option[Long] = None
 )
 
 object Verification:
