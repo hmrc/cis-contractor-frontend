@@ -26,27 +26,30 @@ import viewmodels.implicits.*
 
 object SelectSubcontractorSummary {
 
-  def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] = {
-    val selectEmptyReverify = List(messages("verify.selectSubcontractor.display.noneSelected"))
-    answers.get(SelectSubcontractorPage).flatMap { answers =>
-      val selectNames = answers.toSeq.map(sub => HtmlFormat.escape(sub.name).toString)
+  def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
+    answers.get(SelectSubcontractorPage) match {
+      case Some(subcontractors) =>
+        val names =
+          if (subcontractors.isEmpty) {
+            List(messages("verify.selectSubcontractor.display.noneSelected"))
+          } else {
+            subcontractors.toSeq.map(sub => HtmlFormat.escape(sub.name).toString)
+          }
 
-      val names = if (selectNames.isEmpty) selectEmptyReverify else selectNames
-
-      ValueViewModelHelper.makeGovukBulletList(names).map { value =>
-        SummaryListRowViewModel(
-          key = "verify.selectSubcontractor.checkYourAnswersLabel",
-          value = value,
-          actions = Seq(
-            ActionItemViewModel(
-              "site.change",
-              controllers.verify.routes.SelectSubcontractorController.onPageLoad(CheckMode).url
+        ValueViewModelHelper.makeGovukBulletList(names).map { value =>
+          SummaryListRowViewModel(
+            key = "verify.selectSubcontractor.checkYourAnswersLabel",
+            value = value,
+            actions = Seq(
+              ActionItemViewModel(
+                "site.change",
+                controllers.verify.routes.SelectSubcontractorController.onPageLoad(CheckMode).url
+              )
+                .withVisuallyHiddenText(messages("verify.selectSubcontractor.change.hidden"))
+                .withAttribute("id" -> "select-subcontractor")
             )
-              .withVisuallyHiddenText(messages("verify.selectSubcontractor.change.hidden"))
-              .withAttribute("id" -> "select-subcontractor")
           )
-        )
-      }
+        }
+      case None                 => None
     }
-  }
 }

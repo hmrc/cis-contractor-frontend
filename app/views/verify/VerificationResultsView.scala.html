@@ -29,7 +29,7 @@
 
 @(verificationResults: Seq[VerificationResultsViewModel], manageSubcontractorsUrl: String)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = titleNoForm(messages("verify.verificationResults.title"))) {
+@layout(pageTitle = titleNoForm(messages("verify.verificationResults.title")), isFullWidth = true) {
 
     @h1(messages("verify.verificationResults.heading"))
     @paragraph(messages("verify.verificationResults.paragraph"))

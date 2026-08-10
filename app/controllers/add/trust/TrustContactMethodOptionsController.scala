@@ -20,10 +20,11 @@ import controllers.actions.*
 import forms.add.trust.TrustContactMethodOptionsFormProvider
 import models.Mode
 import navigation.Navigator
-import pages.add.trust.{TrustContactMethodOptionsPage, TrustNamePage}
+import pages.add.trust.{AddTrustContactMethodsYesNoPage, TrustContactMethodOptionsPage, TrustNamePage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
+import services.YesOrNoPageGuardService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.add.trust.TrustContactMethodOptionsView
 
@@ -39,6 +40,7 @@ class TrustContactMethodOptionsController @Inject() (
   requireData: DataRequiredAction,
   formProvider: TrustContactMethodOptionsFormProvider,
   val controllerComponents: MessagesControllerComponents,
+  yesOrNoPageGuardService: YesOrNoPageGuardService,
   view: TrustContactMethodOptionsView
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
@@ -47,6 +49,9 @@ class TrustContactMethodOptionsController @Inject() (
   val form = formProvider()
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
+    val yesOrNoPage       = AddTrustContactMethodsYesNoPage
+    val yesOrNoPageOption = request.userAnswers.get(AddTrustContactMethodsYesNoPage)
+
     request.userAnswers
       .get(TrustNamePage)
       .map { trustName =>
@@ -55,7 +60,8 @@ class TrustContactMethodOptionsController @Inject() (
           case Some(value) => form.fill(value)
         }
 
-        Ok(view(preparedForm, mode, trustName))
+        val result = Ok(view(preparedForm, mode, trustName))
+        yesOrNoPageGuardService.yesOrNoPageRoute(result, yesOrNoPageOption, yesOrNoPage, mode)
       }
       .getOrElse(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
   }

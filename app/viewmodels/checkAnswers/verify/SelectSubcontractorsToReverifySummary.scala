@@ -17,7 +17,7 @@
 package viewmodels.checkAnswers.verify
 
 import models.{CheckMode, UserAnswers}
-import pages.verify.{ReverifyExistingSubcontractorsYesNoPage, SelectSubcontractorsToReverifyPage}
+import pages.verify.SelectSubcontractorsToReverifyPage
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
@@ -27,14 +27,15 @@ import viewmodels.implicits.*
 
 object SelectSubcontractorsToReverifySummary {
 
-  def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] = {
-    val selectEmptyReverify = List(messages("verify.selectSubcontractorsToReverify.display.noneSelected"))
-    answers
-      .get(SelectSubcontractorsToReverifyPage)
-      .filter(_ => answers.get(ReverifyExistingSubcontractorsYesNoPage).contains(true))
-      .flatMap { selected =>
-        val selectNames = selected.map(s => HtmlFormat.escape(s.name).toString).toSeq
-        val names       = if (selectNames.isEmpty) selectEmptyReverify else selectNames
+  def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
+    answers.get(SelectSubcontractorsToReverifyPage) match {
+
+      case Some(subcontractorsToReverify) =>
+        val names = if (subcontractorsToReverify.isEmpty) {
+          List(messages("verify.selectSubcontractorsToReverify.display.noneSelected"))
+        } else {
+          subcontractorsToReverify.toSeq.map(s => HtmlFormat.escape(s.name).toString)
+        }
         ValueViewModelHelper.makeGovukBulletList(names).map { value =>
           SummaryListRowViewModel(
             key = messages("verify.selectSubcontractorsToReverify.checkYourAnswersLabel"),
@@ -48,6 +49,6 @@ object SelectSubcontractorsToReverifySummary {
             )
           )
         }
-      }
-  }
+      case None                           => None
+    }
 }
