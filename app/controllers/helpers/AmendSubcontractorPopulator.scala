@@ -261,19 +261,17 @@ object AmendSubcontractorPopulator {
       cisId: String,
       subcontractor: SubcontractorResponse
     ): Try[UserAnswers] = {
-      val address                    = toAddress(subcontractor)
-      val methods                    = contactMethods(subcontractor)
-      val nominatedPartnerName       =
-        Seq(subcontractor.firstName, subcontractor.secondName, subcontractor.surname).flatten.mkString(" ").trim
-      val partnershipName            = subcontractor.partnershipTradingName.orElse(subcontractor.tradingName)
-      val nominatedPartnerNameOption = Option.when(nominatedPartnerName.nonEmpty)(nominatedPartnerName)
+      val address              = toAddress(subcontractor)
+      val methods              = contactMethods(subcontractor)
+      val nominatedPartnerName = subcontractor.tradingName
+      val partnershipName      = subcontractor.partnershipTradingName
 
       val original = originalAnswers(
         subcontractor = subcontractor,
         address = address,
         methods = methods,
         partnershipName = partnershipName,
-        nominatedPartnerName = nominatedPartnerNameOption
+        nominatedPartnerName = nominatedPartnerName
       )
 
       for {
@@ -291,7 +289,7 @@ object AmendSubcontractorPopulator {
         updated <- setOptional(
                      updated,
                      PartnershipNominatedPartnerNamePage,
-                     Option.when(nominatedPartnerName.nonEmpty)(nominatedPartnerName)
+                     nominatedPartnerName
                    )
         updated <- updated.set(PartnershipNominatedPartnerUtrYesNoPage, subcontractor.partnerUtr.isDefined)
         updated <- setOptional(updated, PartnershipNominatedPartnerUtrPage, subcontractor.partnerUtr)

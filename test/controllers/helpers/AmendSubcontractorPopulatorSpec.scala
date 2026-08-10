@@ -319,7 +319,7 @@ class AmendSubcontractorPopulatorSpec extends SpecBase {
         answers.get(PartnershipHasUtrYesNoPage).value mustBe true
         answers.get(PartnershipUniqueTaxpayerReferencePage).value mustBe "1123456789"
 
-        answers.get(PartnershipNominatedPartnerNamePage).value mustBe "John Middle Smith"
+        answers.get(PartnershipNominatedPartnerNamePage).value mustBe "Test Trading Name"
 
         answers.get(PartnershipNominatedPartnerUtrYesNoPage).value mustBe true
         answers.get(PartnershipNominatedPartnerUtrPage).value mustBe "2234567890"
@@ -347,7 +347,7 @@ class AmendSubcontractorPopulatorSpec extends SpecBase {
           mobile = Some("07123456789"),
           hasUtrYesNo = Some(true),
           utr = Some("1123456789"),
-          nominatedPartnerName = Some("John Middle Smith"),
+          nominatedPartnerName = Some("Test Trading Name"),
           nominatedPartnerUtrYesNo = Some(true),
           nominatedPartnerUtr = Some("2234567890"),
           nominatedPartnerNinoYesNo = Some(true),
@@ -360,38 +360,6 @@ class AmendSubcontractorPopulatorSpec extends SpecBase {
         )
       }
 
-      "must use tradingName as partnership name when partnershipTradingName is missing" in {
-        val subcontractor =
-          baseSubcontractor.copy(
-            partnershipTradingName = None,
-            tradingName = Some("Fallback Partnership")
-          )
-
-        val answers =
-          AmendSubcontractorPopulator.PartnershipPopulator
-            .populate(emptyUserAnswers, cisId, subcontractor)
-            .get
-
-        answers.get(PartnershipNamePage).value mustBe "Fallback Partnership"
-        answers.get(OriginalPartnershipAnswersQuery).value.partnershipName mustBe Some("Fallback Partnership")
-      }
-
-      "must not populate nominated partner name when all name fields are missing" in {
-        val subcontractor =
-          baseSubcontractor.copy(
-            firstName = None,
-            secondName = None,
-            surname = None
-          )
-
-        val answers =
-          AmendSubcontractorPopulator.PartnershipPopulator
-            .populate(emptyUserAnswers, cisId, subcontractor)
-            .get
-
-        answers.get(PartnershipNominatedPartnerNamePage) mustBe None
-        answers.get(OriginalPartnershipAnswersQuery).value.nominatedPartnerName mustBe None
-      }
     }
 
     "TrustPopulator" - {
