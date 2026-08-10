@@ -16,10 +16,10 @@
 
 package controllers.amend.company
 
-import config.FrontendAppConfig
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
 import controllers.routes
 import pages.add.company.CompanyNamePage
+import pages.amend.AmendCheckYourAnswersSubmittedPage
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -29,7 +29,7 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.DefaultSubcontractorCleanupService
 import viewmodels.amend.company.CompanyAmendConfirmationViewModel
 import views.html.amend.AmendConfirmationView
-import pages.amend.AmendCheckYourAnswersSubmittedPage
+
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
@@ -42,8 +42,7 @@ class AmendCompanyConfirmationController @Inject() (
   val controllerComponents: MessagesControllerComponents,
   cleanupService: DefaultSubcontractorCleanupService,
   sessionRepository: SessionRepository,
-  view: AmendConfirmationView,
-  appConfig: FrontendAppConfig
+  view: AmendConfirmationView
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport

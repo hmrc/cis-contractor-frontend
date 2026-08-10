@@ -16,10 +16,10 @@
 
 package controllers.amend
 
-import config.FrontendAppConfig
 import controllers.actions.*
 import controllers.routes
 import pages.add.{SubcontractorNamePage, TradingNameOfSubcontractorPage}
+import pages.amend.AmendCheckYourAnswersSubmittedPage
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.libs.json.Reads
@@ -34,17 +34,16 @@ import views.html.amend.AmendConfirmationView
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
-import pages.amend.AmendCheckYourAnswersSubmittedPage
 
 class AmendIndividualConfirmationController @Inject() (
+  override val messagesApi: MessagesApi,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   val controllerComponents: MessagesControllerComponents,
   view: AmendConfirmationView,
   cleanupService: DefaultSubcontractorCleanupService,
-  sessionRepository: SessionRepository,
-  appConfig: FrontendAppConfig
+  sessionRepository: SessionRepository
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport

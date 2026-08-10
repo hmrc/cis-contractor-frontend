@@ -16,11 +16,11 @@
 
 package controllers.amend.trust
 
-import config.FrontendAppConfig
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
 import controllers.routes
 import models.UserAnswers
 import pages.add.trust.TrustNamePage
+import pages.amend.AmendCheckYourAnswersSubmittedPage
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.libs.json.Reads
@@ -31,11 +31,10 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.DefaultSubcontractorCleanupService
 import viewmodels.amend.trust.TrustAmendConfirmationViewModel
 import views.html.amend.AmendConfirmationView
-import pages.amend.AmendCheckYourAnswersSubmittedPage
 
-import scala.util.{Failure, Success}
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.{Failure, Success}
 
 class AmendTrustConfirmationController @Inject() (
   override val messagesApi: MessagesApi,
@@ -45,8 +44,7 @@ class AmendTrustConfirmationController @Inject() (
   val controllerComponents: MessagesControllerComponents,
   cleanupService: DefaultSubcontractorCleanupService,
   sessionRepository: SessionRepository,
-  view: AmendConfirmationView,
-  appConfig: FrontendAppConfig
+  view: AmendConfirmationView
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport
