@@ -40,10 +40,6 @@ class VerificationResultsController @Inject() (
     with I18nSupport {
 
   def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
-// TODO:
-    //  AC3 DTR-6349
-    // ALSO, TO TEST
-
     request.userAnswers.get(NewestVerificationBatchResponsePage) match {
       case Some(response) =>
         request.userAnswers.get(CisIdQuery) match {
@@ -52,7 +48,6 @@ class VerificationResultsController @Inject() (
             Ok(view(VerificationResultsViewModel.from(response), manageSubcontractorsUrl))
           case None        => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
         }
-      // TODO: Instead of redirecting to JourneyRecoveryController, AC says to navigate to CRR1 (Recovery Page)
       case None           => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
     }
   }

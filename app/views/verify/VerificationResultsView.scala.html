@@ -63,7 +63,7 @@
         )
     )
 
-    @if(verificationResults.exists(_.verificationStatus == "Unmatched")) {
+    @if(verificationResults.exists(_.isUnmatched)) {
         <div>
             @govukButton(
                 ButtonViewModel(messages("verify.verificationResults.reviewUnmatchedSubcontractors.button"))

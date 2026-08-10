@@ -39,25 +39,29 @@ class VerificationResultsViewSpec extends SpecBase {
           "Brody, Martin",
           "Verified",
           "Higher rate",
-          "V0004528765/A"
+          "V0004528765/A",
+          true
         ),
         VerificationResultsViewModel(
           "Hooper and Associates",
           "Verified",
           "Standard rate",
-          "V0004528765"
+          "V0004528765",
+          true
         ),
         VerificationResultsViewModel(
           "Quint Transportation",
           "Verified",
           "Higher rate",
-          "V0004528765/B"
+          "V0004528765/B",
+          true
         ),
         VerificationResultsViewModel(
           "The Kintner Group",
           "Verified",
           "Higher rate",
-          "V0004528765/C"
+          "V0004528765/C",
+          true
         )
       )
       val manageSubcontractorsUrl     = "/manage-subcontractors/1"
@@ -100,25 +104,29 @@ class VerificationResultsViewSpec extends SpecBase {
           "Brody, Martin",
           "Unmatched",
           "Higher rate",
-          "V0004528765/A"
+          "V0004528765/A",
+          true
         ),
         VerificationResultsViewModel(
           "Hooper and Associates",
           "Verified",
           "Standard rate",
-          "V0004528765"
+          "V0004528765",
+          true
         ),
         VerificationResultsViewModel(
           "Quint Transportation",
           "Unmatched",
           "Higher rate",
-          "V0004528765/B"
+          "V0004528765/B",
+          true
         ),
         VerificationResultsViewModel(
           "The Kintner Group",
           "Verified",
           "Higher rate",
-          "V0004528765/C"
+          "V0004528765/C",
+          true
         )
       )
       val manageSubcontractorsUrl     = "/manage-subcontractors/1"
