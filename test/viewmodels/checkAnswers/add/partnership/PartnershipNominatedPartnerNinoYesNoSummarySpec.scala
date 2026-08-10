@@ -101,8 +101,8 @@ class PartnershipNominatedPartnerNinoYesNoSummarySpec extends AnyFreeSpec with M
       val changeAction       = actions.head
       val expectedChangeText = messages("site.change")
       val expectedHref       =
-        controllers.add.partnership.routes.PartnershipNominatedPartnerNinoYesNoController
-          .onPageLoad(AmendMode)
+        controllers.amend.partnership.routes.AmendPartnershipRemoveDetailYesNoController
+          .onPageLoad("nominated-partner-nino")
           .url
       val expectedHiddenText =
         messages("partnershipNominatedPartnerNinoYesNo.change.hidden")

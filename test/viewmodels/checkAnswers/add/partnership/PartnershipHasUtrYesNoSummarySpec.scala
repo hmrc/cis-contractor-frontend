@@ -89,8 +89,8 @@ class PartnershipHasUtrYesNoSummarySpec extends SpecBase with GuiceOneAppPerSuit
       actions.items must have size 1
 
       val action: ActionItem = actions.items.head
-      action.href mustBe controllers.add.partnership.routes.PartnershipHasUtrYesNoController
-        .onPageLoad(AmendMode)
+      action.href mustBe controllers.amend.partnership.routes.AmendPartnershipRemoveDetailYesNoController
+        .onPageLoad("utr")
         .url
       action.content mustBe Text(messages("site.change"))
       action.visuallyHiddenText mustBe Some(messages("partnershipHasUtrYesNo.change.hidden"))

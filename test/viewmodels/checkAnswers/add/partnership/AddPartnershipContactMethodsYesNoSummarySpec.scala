@@ -89,7 +89,9 @@ class AddPartnershipContactMethodsYesNoSummarySpec extends AnyFreeSpec with Matc
 
       val changeAction       = actions.head
       val expectedChangeText = messages("site.change")
-      val expectedHref       = routes.AddPartnershipContactMethodsYesNoController.onPageLoad(AmendMode).url
+      val expectedHref       = controllers.amend.partnership.routes.AmendPartnershipRemoveDetailYesNoController
+        .onPageLoad("contact-details")
+        .url
       val expectedHiddenText = messages("addPartnershipContactMethodsYesNo.change.hidden")
 
       changeAction.content.asHtml.toString    should include(expectedChangeText)

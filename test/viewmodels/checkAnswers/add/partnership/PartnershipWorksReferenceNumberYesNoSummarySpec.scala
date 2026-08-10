@@ -91,7 +91,9 @@ class PartnershipWorksReferenceNumberYesNoSummarySpec extends AnyFreeSpec with M
 
       val changeAction       = actions.head
       val expectedChangeText = messages("site.change")
-      val expectedHref       = routes.PartnershipWorksReferenceNumberYesNoController.onPageLoad(AmendMode).url
+      val expectedHref       = controllers.amend.partnership.routes.AmendPartnershipRemoveDetailYesNoController
+        .onPageLoad("works-reference-number")
+        .url
       val expectedHiddenText = messages("partnershipWorksReferenceNumberYesNo.change.hidden")
 
       changeAction.content.asHtml.toString    should include(expectedChangeText)
