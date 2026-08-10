@@ -62,8 +62,8 @@ class ReviewInsufficientInfoService @Inject() (
       for {
         verificationBatchResourceRef <- batch.verificationBatch.flatMap(_.verifBatchResourceRef)
         verificationResourceRef      <- batch.verifications
-          .find(_.subcontractorId.contains(subcontractorId))
-          .flatMap(_.verificationResourceRef)
+                                          .find(_.subcontractorId.contains(subcontractorId))
+                                          .flatMap(_.verificationResourceRef)
       } yield ProceedInsufficientVerificationRequest(
         instanceId = cisId,
         verificationBatchResourceRef = verificationBatchResourceRef,
