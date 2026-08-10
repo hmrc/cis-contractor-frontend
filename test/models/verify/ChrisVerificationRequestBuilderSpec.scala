@@ -61,7 +61,20 @@ class ChrisVerificationRequestBuilderSpec extends SpecBase with MockitoSugar {
           addressLine4 = None,
           country = None,
           postcode = None,
-          worksReferenceNumber = None
+          emailAddress = None,
+          phoneNumber = None,
+          mobilePhoneNumber = None,
+          worksReferenceNumber = None,
+          matched = None,
+          autoVerified = None,
+          verified = None,
+          verificationNumber = None,
+          taxTreatment = None,
+          verificationDate = None,
+          version = None,
+          updatedTaxTreatment = None,
+          lastMonthlyReturnDate = None,
+          pendingVerifications = None
         )
 
       val currentVerificationBatchResponse =
@@ -78,7 +91,13 @@ class ChrisVerificationRequestBuilderSpec extends SpecBase with MockitoSugar {
               verificationId = 3001L,
               verificationBatchId = Some(1001L),
               subcontractorId = Some(10L),
-              verificationResourceRef = Some(4001L)
+              verificationResourceRef = Some(4001L),
+              subcontractorName = None,
+              verificationNumber = None,
+              taxTreatment = None,
+              actionIndicator = None,
+              proceed = None,
+              matched = None
             )
           )
         )

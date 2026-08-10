@@ -437,6 +437,11 @@ amendPartnershipRemoveDetailYesNo.detail.nominatedPartnerUtr                    
 amendPartnershipRemoveDetailYesNo.detail.nominatedPartnerNino                       =  nominated partner’s National Insurance number
 amendPartnershipRemoveDetailYesNo.detail.nominatedPartnerCompanyRegistrationNumber  =  nominated partner’s company registration number
 
+proceedInsufficientSubcontractorNameYesNo.title                                     =  Are you sure you want to proceed with including this subcontractor in this verification request
+proceedInsufficientSubcontractorNameYesNo.heading                                   =  Are you sure you want to proceed with including {0} in this verification request?
+proceedInsufficientSubcontractorNameYesNo.hint                                      =  This will assign the higher rate tax treatment to this subcontractor.
+proceedInsufficientSubcontractorNameYesNo.error.required                            =  Select yes if you want to proceed with including this subcontractor in this verification request
+
 # Partnership
 addPartnershipContactMethodsYesNo.title                     =  Do you want to add contact details for this partnership?
 addPartnershipContactMethodsYesNo.heading                   =  Do you want to add contact details for {0}?
@@ -1112,17 +1117,3 @@ contractordetails.removeDetailYesNo.detail.email                               =
 contractordetails.removeDetailYesNo.detail.schemeName                          =  scheme name
 contractordetails.removeDetailYesNo.error.required.email                       =  Select yes to remove the contractor’s email address
 contractordetails.removeDetailYesNo.error.required.schemeName                  =  Select yes to remove the contractor’s scheme name
-
-amendCheckYourAnswers.title = Subcontractor information
-amendCheckYourAnswers.heading.subcontractorInformation.h2    = Subcontractor information
-amendCheckYourAnswers.heading.moreDetails.h2    = More details
-amendCheckYourAnswers.confirm.h2 = Confirm changes
-amendCheckYourAnswers.confirm.p1 = By changing this subcontractor’s details you are confirming that, to the best of your knowledge, the details you are providing are correct.
-amendCheckYourAnswers.confirm = Confirm
-amendCheckYourAnswers.cancelChanges = Cancel changes
-amendCheckYourAnswers.verificationNumber.label = Verification number
-
-proceedInsufficientSubcontractorNameYesNo.title = Are you sure you want to proceed with including this subcontractor in this verification request
-proceedInsufficientSubcontractorNameYesNo.heading = Are you sure you want to proceed with including {0} in this verification request?
-proceedInsufficientSubcontractorNameYesNo.hint = This will assign the higher rate tax treatment to this subcontractor.
-proceedInsufficientSubcontractorNameYesNo.error.required = Select yes if you want to proceed with including this subcontractor in this verification request

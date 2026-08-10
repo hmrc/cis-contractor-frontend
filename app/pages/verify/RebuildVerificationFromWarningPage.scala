@@ -14,23 +14,16 @@
  * limitations under the License.
  */
 
-package models
+package pages.verify
 
-import play.api.libs.json.{Json, OFormat}
+import pages.QuestionPage
+import play.api.libs.json.JsPath
 
-case class VerificationCurrentVerification(
-  verificationId: Long,
-  verificationBatchId: Option[Long],
-  subcontractorId: Option[Long],
-  verificationResourceRef: Option[Long],
-  subcontractorName: Option[String],
-  verificationNumber: Option[String],
-  taxTreatment: Option[String],
-  actionIndicator: Option[String],
-  proceed: Option[String],
-  matched: Option[String]
-)
+case object RebuildVerificationFromWarningPage extends QuestionPage[Boolean] {
 
-object VerificationCurrentVerification {
-  given format: OFormat[VerificationCurrentVerification] = Json.format[VerificationCurrentVerification]
+  override def path: JsPath =
+    JsPath \ toString
+
+  override def toString: String =
+    "rebuildVerificationFromWarning"
 }

@@ -96,7 +96,7 @@ class ModifyVerificationBatchAndVerificationsController @Inject() (
             }
         } yield Redirect(
           controllers.verify.routes.CheckVerificationBatchReadinessController
-            .checkVerificationBatchReadinessBeforeDeclaration()
+            .checkVerificationBatchReadiness()
         ))
           .recover { case t =>
             logger.error(

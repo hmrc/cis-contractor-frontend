@@ -16,6 +16,8 @@
 
 package services
 
+import models.SubcontractorCurrentVerification
+import models.response.GetCurrentVerificationBatchResponse
 import connectors.ConstructionIndustrySchemeConnector
 import models.Subcontractor
 import models.requests.ProceedInsufficientVerificationRequest
@@ -39,10 +41,13 @@ class ReviewInsufficientInfoService @Inject() (
   private val dummyUrl = "#"
 
   def buildViewModel(
-    batch: GetNewestVerificationBatchResponse
+    batch: GetCurrentVerificationBatchResponse
   )(implicit messages: Messages): ReviewInsufficientInfoViewModel = {
     val (readySubs, missingSubs) =
-      batch.subcontractors.partition(VerificationBatchReadiness.isSubcontractorReady)
+      batch.subcontractors.partition { sub =>
+        val verification = batch.verifications.find(_.subcontractorId.contains(sub.subcontractorId))
+        VerificationBatchReadiness.isSubcontractorReady(sub, verification)
+      }
 
     ReviewInsufficientInfoViewModel(
       missing = missingSubs.map(toMissingRow),
@@ -57,8 +62,8 @@ class ReviewInsufficientInfoService @Inject() (
       for {
         verificationBatchResourceRef <- batch.verificationBatch.flatMap(_.verifBatchResourceRef)
         verificationResourceRef      <- batch.verifications
-                                          .find(_.subcontractorId.contains(subcontractorId))
-                                          .flatMap(_.verificationResourceRef)
+          .find(_.subcontractorId.contains(subcontractorId))
+          .flatMap(_.verificationResourceRef)
       } yield ProceedInsufficientVerificationRequest(
         instanceId = cisId,
         verificationBatchResourceRef = verificationBatchResourceRef,
@@ -79,8 +84,10 @@ class ReviewInsufficientInfoService @Inject() (
     }
   }
 
-  private def toMissingRow(sub: Subcontractor)(implicit messages: Messages): MissingSubcontractorRow = {
-    val name = sub.displayName()
+  private def toMissingRow(
+    sub: SubcontractorCurrentVerification
+  )(implicit messages: Messages): MissingSubcontractorRow = {
+    val name = displayName(sub)
     MissingSubcontractorRow(
       name = name,
       nameLink = LinkViewModel(dummyUrl, name),
@@ -96,8 +103,8 @@ class ReviewInsufficientInfoService @Inject() (
     )
   }
 
-  private def toReadyRow(sub: Subcontractor)(implicit messages: Messages): ReadySubcontractorRow = {
-    val name = sub.displayName()
+  private def toReadyRow(sub: SubcontractorCurrentVerification)(implicit messages: Messages): ReadySubcontractorRow = {
+    val name = displayName(sub)
     ReadySubcontractorRow(
       name = name,
       nameLink = LinkViewModel(dummyUrl, name),
@@ -105,9 +112,25 @@ class ReviewInsufficientInfoService @Inject() (
     )
   }
 
-  private def utrDisplay(sub: Subcontractor)(implicit messages: Messages): String =
+  private def utrDisplay(sub: SubcontractorCurrentVerification)(implicit messages: Messages): String =
     sub.utr
       .map(_.trim)
       .filter(_.nonEmpty)
       .getOrElse(messages("verify.reviewInsufficientInfo.utr.noneProvided"))
+
+  private def displayName(sub: SubcontractorCurrentVerification)(implicit messages: Messages): String =
+    nameFor(sub).getOrElse(messages("verify.noName"))
+
+  private def nameFor(sub: SubcontractorCurrentVerification): Option[String] = {
+    val first              = sub.firstName.map(_.trim).filter(_.nonEmpty)
+    val surname            = sub.surname.map(_.trim).filter(_.nonEmpty)
+    val trading            = sub.tradingName.map(_.trim).filter(_.nonEmpty)
+    val partnershipTrading = sub.partnershipTradingName.map(_.trim).filter(_.nonEmpty)
+
+    val individualName = surname.map { s =>
+      first.map(f => s"$s, $f").getOrElse(s)
+    }
+
+    partnershipTrading.orElse(trading).orElse(individualName)
+  }
 }
