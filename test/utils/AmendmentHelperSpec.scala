@@ -20,12 +20,13 @@ import base.SpecBase
 import models.UserAnswers
 import models.address.{Address, Country}
 import models.amend.company.OriginalCompanyAnswers
+import models.amend.partnership.OriginalPartnershipAnswers
 import models.contact.ContactMethodOptions
 import pages.add.company.*
-import queries.OriginalCompanyAnswersQuery
+import pages.add.partnership.*
+import queries.{OriginalCompanyAnswersQuery, OriginalPartnershipAnswersQuery, OriginalTrustAnswersQuery}
 import models.amend.trust.OriginalTrustAnswers
 import pages.add.trust.*
-import queries.OriginalTrustAnswersQuery
 
 class AmendmentHelperSpec extends SpecBase {
 
@@ -206,6 +207,114 @@ class AmendmentHelperSpec extends SpecBase {
             .value
 
         AmendmentHelper.trustHasChanges(updated) mustBe true
+      }
+    }
+
+    "partnershipHasChanges" - {
+
+      val original =
+        OriginalPartnershipAnswers(
+          partnershipName = Some("Test Partnership"),
+          addressYesNo = Some(true),
+          address = Some(address),
+          partnershipContactMethodsYesNo = Some(true),
+          partnershipContactMethodOptions = Set(ContactMethodOptions.Email),
+          email = Some("test@test.com"),
+          phone = Some("0123456789"),
+          mobile = Some("07123456789"),
+          hasUtrYesNo = Some(true),
+          utr = Some("11111111"),
+          nominatedPartnerName = Some("Partnership nominated name"),
+          nominatedPartnerUtrYesNo = Some(true),
+          nominatedPartnerUtr = Some("11111111"),
+          nominatedPartnerNinoYesNo = Some(true),
+          nominatedPartnerNino = Some("AC123456"),
+          nominatedPartnerCrnYesNo = Some(true),
+          nominatedPartnerCrn = Some("12345678"),
+          nominatedPartnerWorksReferenceYesNo = Some(true),
+          nominatedPartnerWorksReference = Some("WRN-1"),
+          verificationNumber = Some("VRN123")
+        )
+
+      val userAnswers =
+        emptyUserAnswers
+          .set(OriginalPartnershipAnswersQuery, original)
+          .success
+          .value
+          .set(PartnershipNamePage, "Test Partnership")
+          .success
+          .value
+          .set(PartnershipAddressYesNoPage, true)
+          .success
+          .value
+          .set(PartnershipAddressPage, address)
+          .success
+          .value
+          .set(AddPartnershipContactMethodsYesNoPage, true)
+          .success
+          .value
+          .set(PartnershipContactMethodOptionsPage, Set(ContactMethodOptions.Email))
+          .success
+          .value
+          .set(PartnershipEmailAddressPage, "test@test.com")
+          .success
+          .value
+          .set(PartnershipPhoneNumberPage, "0123456789")
+          .success
+          .value
+          .set(PartnershipMobileNumberPage, "07123456789")
+          .success
+          .value
+          .set(PartnershipHasUtrYesNoPage, true)
+          .success
+          .value
+          .set(PartnershipUniqueTaxpayerReferencePage, "11111111")
+          .success
+          .value
+          .set(PartnershipNominatedPartnerNamePage, "Partnership nominated name")
+          .success
+          .value
+          .set(PartnershipNominatedPartnerCrnYesNoPage, true)
+          .success
+          .value
+          .set(PartnershipNominatedPartnerCrnPage, "12345678")
+          .success
+          .value
+          .set(PartnershipNominatedPartnerNinoYesNoPage, true)
+          .success
+          .value
+          .set(PartnershipNominatedPartnerNinoPage, "AC123456")
+          .success
+          .value
+          .set(PartnershipNominatedPartnerUtrYesNoPage, true)
+          .success
+          .value
+          .set(PartnershipNominatedPartnerUtrPage, "11111111")
+          .success
+          .value
+          .set(PartnershipWorksReferenceNumberYesNoPage, true)
+          .success
+          .value
+          .set(PartnershipWorksReferenceNumberPage, "WRN-1")
+          .success
+          .value
+
+      "must return false when there are no original answers" in {
+        AmendmentHelper.partnershipHasChanges(emptyUserAnswers) mustBe false
+      }
+
+      "must return false when no fields have changed" in {
+        AmendmentHelper.partnershipHasChanges(userAnswers) mustBe false
+      }
+
+      "must return true when a field has changed" in {
+        val updated =
+          userAnswers
+            .set(PartnershipNamePage, "XYZ Ltd")
+            .success
+            .value
+
+        AmendmentHelper.partnershipHasChanges(updated) mustBe true
       }
     }
   }

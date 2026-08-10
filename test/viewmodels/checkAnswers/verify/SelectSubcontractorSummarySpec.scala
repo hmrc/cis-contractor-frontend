@@ -18,12 +18,12 @@ package viewmodels.checkAnswers.verify
 
 import base.SpecBase
 import models.{CheckMode, SubcontractorViewModel, UserAnswers}
-import org.scalatest.OptionValues._
+import org.scalatest.OptionValues.*
 import org.scalatest.matchers.must.Matchers
 import pages.verify.SelectSubcontractorPage
 import play.api.i18n.{Lang, Messages, MessagesImpl}
 import play.api.test.Helpers.stubMessagesApi
-import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist._
+import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.*
 
 class SelectSubcontractorSummarySpec extends SpecBase with Matchers {
 
@@ -118,5 +118,6 @@ class SelectSubcontractorSummarySpec extends SpecBase with Matchers {
 
       valueHtml must include(messages("verify.selectSubcontractor.display.noneSelected"))
     }
+
   }
 }

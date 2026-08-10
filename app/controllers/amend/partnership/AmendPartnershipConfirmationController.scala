@@ -14,20 +14,20 @@
  * limitations under the License.
  */
 
-package controllers.amend.company
+package controllers.amend.partnership
 
 import config.FrontendAppConfig
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
 import controllers.routes
-import pages.add.company.CompanyNamePage
+import pages.add.partnership.PartnershipNamePage
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import queries.{CisIdQuery, OriginalCompanyAnswersQuery}
+import queries.{CisIdQuery, OriginalPartnershipAnswersQuery}
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.DefaultSubcontractorCleanupService
-import viewmodels.amend.company.CompanyAmendConfirmationViewModel
+import viewmodels.checkAnswers.amend.partnership.AmendPartnershipConfirmationViewModel
 import views.html.amend.AmendConfirmationView
 import pages.amend.AmendCheckYourAnswersSubmittedPage
 
@@ -35,7 +35,7 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-class AmendCompanyConfirmationController @Inject() (
+class AmendPartnershipConfirmationController @Inject() (
   override val messagesApi: MessagesApi,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
@@ -60,27 +60,28 @@ class AmendCompanyConfirmationController @Inject() (
 
       if (!ua.get(AmendCheckYourAnswersSubmittedPage).contains(true)) {
         logger.warn(
-          s"[AmendCompanyConfirmationController][onPageLoad] " +
+          s"[AmendPartnershipConfirmationController][onPageLoad] " +
             "Accessed confirmation page without prior submission"
         )
         Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
       } else {
-        ua.get(OriginalCompanyAnswersQuery) match {
+
+        ua.get(OriginalPartnershipAnswersQuery) match {
 
           case None =>
-            logger.error("[AmendCompanyConfirmationController] Missing OriginalCompanyAnswersQuery")
+            logger.error("[AmendPartnershipConfirmationController] Missing OriginalPartnershipAnswersQuery")
             Future.successful(recoveryRedirect)
 
-          case Some(originalCompanyAnswers) =>
+          case Some(originalPartnershipAnswers) =>
             ua.get(CisIdQuery) match {
 
               case None =>
-                logger.error("[AmendCompanyConfirmationController] Missing CisIdQuery")
+                logger.error("[AmendPartnershipConfirmationController] Missing CisIdQuery")
                 Future.successful(recoveryRedirect)
 
               case Some(_) =>
-                val tableRows   = CompanyAmendConfirmationViewModel.rows(originalCompanyAnswers, ua)
-                val companyName = ua.get(CompanyNamePage).getOrElse("")
+                val tableRows       = AmendPartnershipConfirmationViewModel.rows(originalPartnershipAnswers, ua)
+                val partnershipName = ua.get(PartnershipNamePage).getOrElse("")
                 cleanupService.cleanAmend(ua) match {
 
                   case Success(cleanedUa) =>
@@ -88,14 +89,14 @@ class AmendCompanyConfirmationController @Inject() (
                       Ok(
                         view(
                           tableRows,
-                          companyName,
+                          partnershipName,
                           appConfig.retrieveSubcontractorListUrl
                         )
                       )
                     }
                   case Failure(exception) =>
                     logger.warn(
-                      "[AmendCompanyConfirmationController] Failed to clean user answers",
+                      "[AmendPartnershipConfirmationController] Failed to clean user answers",
                       exception
                     )
                     Future.successful(recoveryRedirect)
