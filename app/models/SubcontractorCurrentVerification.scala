@@ -16,6 +16,7 @@
 
 package models
 
+import play.api.i18n.Messages
 import play.api.libs.json.{JsObject, Json, OFormat, Reads, Writes}
 
 import java.time.LocalDateTime
@@ -53,7 +54,22 @@ case class SubcontractorCurrentVerification(
   updatedTaxTreatment: Option[String],
   lastMonthlyReturnDate: Option[LocalDateTime],
   pendingVerifications: Option[Int]
-)
+) {
+  def name: Option[String] = {
+    val first              = firstName.map(_.trim).filter(_.nonEmpty)
+    val surnameValue       = surname.map(_.trim).filter(_.nonEmpty)
+    val trading            = tradingName.map(_.trim).filter(_.nonEmpty)
+    val partnershipTrading = partnershipTradingName.map(_.trim).filter(_.nonEmpty)
+
+    val individualName =
+      surnameValue.map(s => first.map(f => s"$s, $f").getOrElse(s))
+
+    partnershipTrading.orElse(trading).orElse(individualName)
+  }
+
+  def displayName(implicit messages: Messages): String =
+    name.getOrElse(messages("verify.noName"))
+}
 
 object SubcontractorCurrentVerification {
   given format: OFormat[SubcontractorCurrentVerification] = Json.format[SubcontractorCurrentVerification]

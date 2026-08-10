@@ -23,7 +23,7 @@ import models.requests.DataRequest
 import models.response.GetNewestVerificationBatchResponse
 import navigation.Navigator
 import pages.insufficient.ProceedInsufficientSubcontractorNameYesNoPage
-import pages.verify.NewestVerificationBatchResponsePage
+import pages.verify.CurrentVerificationBatchResponsePage
 import play.api.Logging
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -65,7 +65,7 @@ class ProceedInsufficientSubcontractorNameYesNoController @Inject() (
 
   def onPageLoad(subcontractorId: Long, mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData) { implicit request =>
-      request.userAnswers.get(NewestVerificationBatchResponsePage) match {
+      request.userAnswers.get(CurrentVerificationBatchResponsePage) match {
         case Some(batch) =>
           batch.subcontractors
             .find(_.subcontractorId == subcontractorId)
@@ -90,7 +90,7 @@ class ProceedInsufficientSubcontractorNameYesNoController @Inject() (
     (identify andThen getData andThen requireData).async { implicit request =>
 
       val result =
-        (request.userAnswers.get(CisIdQuery), request.userAnswers.get(NewestVerificationBatchResponsePage)) match {
+        (request.userAnswers.get(CisIdQuery), request.userAnswers.get(CurrentVerificationBatchResponsePage)) match {
           case (Some(cisId), Some(batch)) =>
             batch.subcontractors
               .find(_.subcontractorId == subcontractorId)

@@ -19,9 +19,7 @@ package services
 import models.SubcontractorCurrentVerification
 import models.response.GetCurrentVerificationBatchResponse
 import connectors.ConstructionIndustrySchemeConnector
-import models.Subcontractor
 import models.requests.ProceedInsufficientVerificationRequest
-import models.response.GetNewestVerificationBatchResponse
 import models.verify.VerificationBatchReadiness
 import play.api.Logging
 import play.api.i18n.Messages
@@ -55,7 +53,7 @@ class ReviewInsufficientInfoService @Inject() (
     )
   }
 
-  def proceedInsufficientVerification(cisId: String, subcontractorId: Long, batch: GetNewestVerificationBatchResponse)(
+  def proceedInsufficientVerification(cisId: String, subcontractorId: Long, batch: GetCurrentVerificationBatchResponse)(
     implicit hc: HeaderCarrier
   ): Future[Unit] = {
     val request =
