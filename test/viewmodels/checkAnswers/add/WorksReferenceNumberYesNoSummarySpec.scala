@@ -88,7 +88,8 @@ class WorksReferenceNumberYesNoSummarySpec extends AnyFreeSpec with Matchers {
 
       val changeAction       = actions.head
       val expectedChangeText = messages("site.change")
-      val expectedHref       = routes.WorksReferenceNumberYesNoController.onPageLoad(AmendMode).url
+      val expectedHref       =
+        controllers.amend.routes.AmendIndividualRemoveDetailYesNoController.onPageLoad("works-reference-number").url
       val expectedHiddenText = messages("worksReferenceNumberYesNo.change.hidden")
 
       changeAction.content.asHtml.toString    should include(expectedChangeText)

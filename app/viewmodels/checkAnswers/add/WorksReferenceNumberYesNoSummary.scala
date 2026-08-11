@@ -16,7 +16,7 @@
 
 package viewmodels.checkAnswers.add
 
-import models.{CheckMode, Mode, UserAnswers}
+import models.{AmendMode, CheckMode, Mode, UserAnswers}
 import pages.add.WorksReferenceNumberYesNoPage
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
@@ -36,7 +36,11 @@ object WorksReferenceNumberYesNoSummary {
         actions = Seq(
           ActionItemViewModel(
             "site.change",
-            controllers.add.routes.WorksReferenceNumberYesNoController.onPageLoad(mode).url
+            if answer && mode == AmendMode then
+              controllers.amend.routes.AmendIndividualRemoveDetailYesNoController
+                .onPageLoad("works-reference-number")
+                .url
+            else controllers.add.routes.WorksReferenceNumberYesNoController.onPageLoad(mode).url
           )
             .withVisuallyHiddenText(messages("worksReferenceNumberYesNo.change.hidden"))
             .withAttribute("id" -> "works-reference-number-yes-no")

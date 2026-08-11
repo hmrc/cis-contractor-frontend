@@ -90,7 +90,7 @@ class UniqueTaxpayerReferenceYesNoSummarySpec extends AnyFreeSpec with Matchers 
 
       val changeAction       = actions.head
       val expectedChangeText = messages("site.change")
-      val expectedHref       = routes.UniqueTaxpayerReferenceYesNoController.onPageLoad(AmendMode).url
+      val expectedHref       = controllers.amend.routes.AmendIndividualRemoveDetailYesNoController.onPageLoad("utr").url
       val expectedHiddenText = messages("uniqueTaxpayerReferenceYesNo.change.hidden")
 
       changeAction.content.asHtml.toString    should include(expectedChangeText)

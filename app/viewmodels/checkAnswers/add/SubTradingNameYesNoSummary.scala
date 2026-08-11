@@ -16,7 +16,7 @@
 
 package viewmodels.checkAnswers.add
 
-import models.{CheckMode, Mode, UserAnswers}
+import models.{AmendMode, CheckMode, Mode, UserAnswers}
 import pages.add.SubTradingNameYesNoPage
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
@@ -36,7 +36,9 @@ object SubTradingNameYesNoSummary {
         actions = Seq(
           ActionItemViewModel(
             "site.change",
-            controllers.add.routes.SubTradingNameYesNoController.onPageLoad(mode).url
+            if answer && mode == AmendMode then
+              controllers.amend.routes.AmendIndividualRemoveDetailYesNoController.onPageLoad("subcontractor-name").url
+            else controllers.add.routes.SubTradingNameYesNoController.onPageLoad(mode).url
           )
             .withVisuallyHiddenText(messages("subTradingNameYesNo.change.hidden"))
             .withAttribute("id" -> "sub-trading-name-yes-no")

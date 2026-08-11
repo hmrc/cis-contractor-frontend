@@ -90,7 +90,8 @@ class AddIndividualContactMethodsYesNoSummarySpec extends AnyFreeSpec with Match
 
       val changeAction       = actions.head
       val expectedChangeText = messages("site.change")
-      val expectedHref       = routes.AddIndividualContactMethodsYesNoController.onPageLoad(AmendMode).url
+      val expectedHref       =
+        controllers.amend.routes.AmendIndividualRemoveDetailYesNoController.onPageLoad("contact-details").url
       val expectedHiddenText = messages("addIndividualContactMethodsYesNo.change.hidden")
 
       changeAction.content.asHtml.toString    should include(expectedChangeText)
