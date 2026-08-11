@@ -96,35 +96,29 @@ class VerifyNavigator @Inject() () extends NavigatorForJourney {
         controllers.routes.JourneyRecoveryController.onPageLoad()
     }
 
-  private def navigatorFromSelectSubcontractorPage(mode: Mode)(ua: UserAnswers): Call = {
-
-    val hasSubcontractorsToReverify =
-      ua.get(NewestVerificationBatchResponsePage)
-        .exists(_.subcontractors.exists(_.isVerified))
-
-    val noSubcontractorsSelected =
-      ua.get(SelectSubcontractorPage).forall(_.isEmpty)
-
-    val hasNoReverifications =
-      ua.get(ReverifyExistingSubcontractorsYesNoPage).contains(false) ||
-        ua.get(SelectSubcontractorsToReverifyPage).forall(_.isEmpty)
-
+  private def navigatorFromSelectSubcontractorPage(mode: Mode)(ua: UserAnswers): Call =
     mode match {
 
       case NormalMode =>
-        if (!hasSubcontractorsToReverify) {
-          controllers.verify.routes.CurrentVerificationBatchController.onPageLoad(NormalMode)
-        } else {
+        val hasSubcontractorsToReverify = ua.get(NewestVerificationBatchResponsePage).exists(_.subcontractors.exists(_.isVerified))
+
+        if (hasSubcontractorsToReverify) {
           controllers.verify.routes.ReverifyExistingSubcontractorsYesNoController.onPageLoad(NormalMode)
+        } else {
+          controllers.verify.routes.CurrentVerificationBatchController.onPageLoad(NormalMode)
         }
 
       case CheckMode =>
-        val rebuildVerificationFromWarning =
-          ua.get(RebuildVerificationFromWarningPage).contains(true)
-        if (noSubcontractorsSelected && hasNoReverifications) {
-          controllers.verify.routes.NoSubcontractorsSelectedWarningController.onPageLoadCheckMode()
-        } else if (rebuildVerificationFromWarning) {
+        val noSubcontractorsSelected = ua.get(SelectSubcontractorPage).forall(_.isEmpty)
+
+        val rebuildingFromWarning = ua.get(RebuildVerificationFromWarningPage).contains(true)
+
+        val noReverificationSelected = ua.get(SelectSubcontractorsToReverifyPage).forall(_.isEmpty)
+
+        if (rebuildingFromWarning) {
           controllers.verify.routes.ReverifyExistingSubcontractorsYesNoController.onPageLoad(CheckMode)
+        } else if (noSubcontractorsSelected && noReverificationSelected) {
+          controllers.verify.routes.NoSubcontractorsSelectedWarningController.onPageLoadCheckMode()
         } else {
           controllers.verify.routes.CurrentVerificationBatchController.onPageLoad(CheckMode)
         }
@@ -132,7 +126,6 @@ class VerifyNavigator @Inject() () extends NavigatorForJourney {
       case AmendMode =>
         controllers.routes.JourneyRecoveryController.onPageLoad()
     }
-  }
 
   private def navigatorFromReverifyExistingSubcontractorsYesNoPage(mode: Mode)(ua: UserAnswers): Call =
     (ua.get(ReverifyExistingSubcontractorsYesNoPage), mode) match {

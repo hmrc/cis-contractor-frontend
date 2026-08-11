@@ -18,7 +18,7 @@ package controllers.verify
 
 import base.SpecBase
 import controllers.routes
-import models.{NormalMode, UserAnswers, VerificationBatchCurrentVerification}
+import models.{NormalMode, UserAnswers, VerificationBatchCurrentVerification, VerificationCurrentVerification}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{never, verify, verifyNoMoreInteractions, when}
 import org.scalatestplus.mockito.MockitoSugar
@@ -181,6 +181,49 @@ class CurrentVerificationBatchControllerSpec extends SpecBase with MockitoSugar 
         redirectLocation(result).value mustEqual
           controllers.verify.routes.CreateVerificationBatchAndVerificationsController
             .onSubmit(NormalMode)
+            .url
+      }
+    }
+
+    "must redirect to ModifyVerificationBatchAndVerificationsController when verifications exist but current batch does not" in {
+      val mockService = mock[VerificationService]
+
+      val response = GetCurrentVerificationBatchResponse(
+        verificationBatch = None,
+        verifications = Seq(
+          VerificationCurrentVerification(
+            verificationId = 1L,
+            verificationBatchId = None,
+            subcontractorId = Some(2L),
+            verificationResourceRef = Some(20L)
+          )
+        ),
+        subcontractors = Seq.empty
+      )
+
+      val updatedAnswers =
+        emptyUserAnswers.setOrException(
+          CurrentVerificationBatchResponsePage,
+          response
+        )
+
+      when(mockService.getCurrentVerificationBatch(any[UserAnswers])(any[HeaderCarrier]))
+        .thenReturn(Future.successful(updatedAnswers))
+
+      val application =
+        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          .overrides(bind[VerificationService].toInstance(mockService))
+          .build()
+
+      running(application) {
+        val request = FakeRequest(GET, endpointUrl)
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(result).value mustEqual
+          controllers.verify.routes.ModifyVerificationBatchAndVerificationsController
+            .modifyVerificationBatch(NormalMode)
             .url
       }
     }
