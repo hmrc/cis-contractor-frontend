@@ -21,8 +21,9 @@ import connectors.ConstructionIndustrySchemeConnector
 import models.{SubcontractorCurrentVerification, VerificationBatchCurrentVerification, VerificationCurrentVerification}
 import models.requests.ProceedInsufficientVerificationRequest
 import models.response.GetCurrentVerificationBatchResponse
-import org.mockito.Mockito.{verify, verifyNoInteractions, when}
+import org.mockito.Mockito.{never, reset, verify, when}
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
+import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.mockito.MockitoSugar.mock
 import play.api.i18n.Messages
@@ -31,7 +32,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class ReviewInsufficientInfoServiceSpec extends SpecBase with MockitoSugar {
+class ReviewInsufficientInfoServiceSpec extends SpecBase with MockitoSugar with BeforeAndAfterEach {
 
   private implicit val messages: Messages =
     app.injector.instanceOf[play.api.i18n.MessagesApi].preferred(FakeRequest())
@@ -41,6 +42,11 @@ class ReviewInsufficientInfoServiceSpec extends SpecBase with MockitoSugar {
 
   private val mockConnector: ConstructionIndustrySchemeConnector = mock[ConstructionIndustrySchemeConnector]
   private val service                                            = new ReviewInsufficientInfoService(mockConnector)
+
+  override def beforeEach(): Unit = {
+    super.beforeEach()
+    reset(mockConnector)
+  }
 
   private def mkSub(
     id: Long,
@@ -314,7 +320,9 @@ class ReviewInsufficientInfoServiceSpec extends SpecBase with MockitoSugar {
 
       result.failed.futureValue mustBe a[RuntimeException]
 
-      verifyNoInteractions(mockConnector)
+      verify(mockConnector, never).proceedInsufficientVerification(any[ProceedInsufficientVerificationRequest])(
+        any[HeaderCarrier]
+      )
     }
   }
 }
