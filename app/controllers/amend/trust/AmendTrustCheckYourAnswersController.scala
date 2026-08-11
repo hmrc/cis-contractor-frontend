@@ -173,11 +173,17 @@ class AmendTrustCheckYourAnswersController @Inject() (
 
         case Right(_) if !AmendmentHelper.trustHasChanges(request.userAnswers) =>
           request.userAnswers.get(CisIdQuery) match {
-
             case Some(cisId) =>
-              Future.successful(
-                Redirect(appConfig.manageYourSubcontractorsUrl(cisId))
-              )
+              sessionRepository
+                .set(UserAnswers(request.userAnswers.id))
+                .map(_ => Redirect(appConfig.manageYourSubcontractorsUrl(cisId)))
+                .recover { case t =>
+                  logger.error(
+                    s"[AmendTrustCheckYourAnswersController.onSubmit] Failed to clear user answers for session ${request.userAnswers.id}",
+                    t
+                  )
+                  Redirect(routes.JourneyRecoveryController.onPageLoad())
+                }
 
             case None =>
               logger.error("[AmendTrustCheckYourAnswersController.onSubmit] Missing CisIdQuery")

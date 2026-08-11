@@ -365,18 +365,14 @@ class AmendIndividualCheckYourAnswersControllerSpec extends SpecBase with Mockit
     }
 
     "must redirect to confirmation page after successful submit" in {
+
       val mockSubcontractorService = mock[SubcontractorService]
       val mockSessionRepository    = mock[SessionRepository]
-
-      val captor = ArgumentCaptor.forClass(classOf[UserAnswers])
-
+      val captor                   = ArgumentCaptor.forClass(classOf[UserAnswers])
       when(mockSubcontractorService.createAndUpdateSubcontractor(any[UserAnswers])(any[HeaderCarrier]))
         .thenReturn(Future.successful(()))
-
-      when(mockSessionRepository.set(any[UserAnswers]))
-        .thenReturn(Future.successful(true))
-
-      val application =
+      when(mockSessionRepository.set(any[UserAnswers])).thenReturn(Future.successful(true))
+      val application              =
         applicationBuilder(userAnswers = Some(minUa))
           .overrides(
             bind[SubcontractorService].toInstance(mockSubcontractorService),
@@ -387,26 +383,22 @@ class AmendIndividualCheckYourAnswersControllerSpec extends SpecBase with Mockit
       running(application) {
 
         val request =
-          FakeRequest(
-            POST,
-            controllers.amend.routes.AmendIndividualCheckYourAnswersController.onSubmit().url
-          )
+          FakeRequest(POST, controllers.amend.routes.AmendIndividualCheckYourAnswersController.onSubmit().url)
 
         val result = route(application, request).value
 
-        status(result) mustBe SEE_OTHER
-        redirectLocation(result).value mustBe
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual
           controllers.amend.routes.AmendIndividualConfirmationController
             .onPageLoad()
             .url
       }
 
-      verify(mockSessionRepository).set(captor.capture())
       verify(mockSubcontractorService)
         .createAndUpdateSubcontractor(any[UserAnswers])(any[HeaderCarrier])
+      verify(mockSessionRepository).set(captor.capture())
 
       captor.getValue.get(AmendCheckYourAnswersSubmittedPage) mustBe Some(true)
-
       verifyNoMoreInteractions(mockSubcontractorService)
     }
 
@@ -537,7 +529,7 @@ class AmendIndividualCheckYourAnswersControllerSpec extends SpecBase with Mockit
 
     "must redirect to Journey Recovery when saving the submitted flag fails" in {
       val mockSubcontractorService = mock[SubcontractorService]
-      val mockSessionRepository = mock[SessionRepository]
+      val mockSessionRepository    = mock[SessionRepository]
 
       when(mockSessionRepository.set(any[UserAnswers]))
         .thenReturn(Future.failed(new RuntimeException("session failure")))

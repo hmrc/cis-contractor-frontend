@@ -175,9 +175,16 @@ class AmendCompanyCheckYourAnswersController @Inject() (
         case Right(_) if !AmendmentHelper.companyHasChanges(request.userAnswers) =>
           request.userAnswers.get(CisIdQuery) match {
             case Some(cisId) =>
-              Future.successful(
-                Redirect(appConfig.manageYourSubcontractorsUrl(cisId))
-              )
+              sessionRepository
+                .set(UserAnswers(request.userAnswers.id))
+                .map(_ => Redirect(appConfig.manageYourSubcontractorsUrl(cisId)))
+                .recover { case t =>
+                  logger.error(
+                    s"[AmendCompanyCheckYourAnswersController.onSubmit] Failed to clear user answers for session ${request.userAnswers.id}",
+                    t
+                  )
+                  Redirect(routes.JourneyRecoveryController.onPageLoad())
+                }
 
             case None =>
               logger.error("[AmendCompanyCheckYourAnswersController.onSubmit] Missing CisIdQuery")

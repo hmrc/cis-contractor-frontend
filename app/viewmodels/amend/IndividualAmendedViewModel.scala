@@ -209,8 +209,8 @@ object IndividualAmendedViewModel {
   }
 
   private def formatContactMethods(
-                                    methods: Set[ContactMethodOptions]
-                                  )(implicit messages: Messages): String =
+    methods: Set[ContactMethodOptions]
+  )(implicit messages: Messages): String =
     if (methods.isEmpty) {
       missingValue
     } else {

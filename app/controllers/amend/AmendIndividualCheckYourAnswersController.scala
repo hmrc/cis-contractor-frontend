@@ -216,12 +216,12 @@ class AmendIndividualCheckYourAnswersController @Inject() (
           }
 
         case Right(_) =>
-          Future
-            .fromTry(request.userAnswers.set(AmendCheckYourAnswersSubmittedPage, true))
-            .flatMap(updated => sessionRepository.set(updated))
+          subcontractorService
+            .createAndUpdateSubcontractor(request.userAnswers)
             .flatMap { _ =>
-              subcontractorService
-                .createAndUpdateSubcontractor(request.userAnswers)
+              Future
+                .fromTry(request.userAnswers.set(AmendCheckYourAnswersSubmittedPage, true))
+                .flatMap(updated => sessionRepository.set(updated).map(_ => ()))
                 .map { _ =>
                   Redirect(
                     controllers.amend.routes.AmendIndividualConfirmationController.onPageLoad()

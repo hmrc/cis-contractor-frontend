@@ -358,11 +358,11 @@ class IndividualAmendedViewModelSpec extends SpecBase {
       val row = result.head
 
       row.head.content mustBe Text(msgs("individualContactMethodOptions.checkYourAnswersLabel"))
-      row(1).content mustBe Text(msgs("trustContactMethodOptions.email"))
+      row(1).content mustBe Text(msgs("individualContactMethodOptions.email"))
       row(2).content mustBe Text(
-        s"${msgs("trustContactMethodOptions.email")}, " +
-          s"${msgs("trustContactMethodOptions.phone")}, " +
-          msgs("trustContactMethodOptions.mobile")
+        s"${msgs("individualContactMethodOptions.email")}, " +
+          s"${msgs("individualContactMethodOptions.phone")}, " +
+          msgs("individualContactMethodOptions.mobile")
       )
     }
 
@@ -555,7 +555,7 @@ class IndividualAmendedViewModelSpec extends SpecBase {
       result must have size 2
 
       val methodRow = result.head
-      val phoneRow = result(1)
+      val phoneRow  = result(1)
 
       methodRow.head.content mustBe Text(msgs("individualContactMethodOptions.checkYourAnswersLabel"))
       methodRow(1).content mustBe Text(msgs("trustContactMethodOptions.email"))
