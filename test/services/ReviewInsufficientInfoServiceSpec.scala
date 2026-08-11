@@ -17,8 +17,10 @@
 package services
 
 import base.SpecBase
+import connectors.ConstructionIndustrySchemeConnector
 import models.SubcontractorCurrentVerification
 import models.response.GetCurrentVerificationBatchResponse
+import org.scalatestplus.mockito.MockitoSugar.mock
 import play.api.i18n.Messages
 import play.api.test.FakeRequest
 
@@ -27,7 +29,8 @@ class ReviewInsufficientInfoServiceSpec extends SpecBase {
   private implicit val messages: Messages =
     app.injector.instanceOf[play.api.i18n.MessagesApi].preferred(FakeRequest())
 
-  private val service = new ReviewInsufficientInfoService()
+  private val mockConnector: ConstructionIndustrySchemeConnector = mock[ConstructionIndustrySchemeConnector]
+  private val service                                            = new ReviewInsufficientInfoService(mockConnector)
 
   private def mkSub(
     id: Long,
@@ -184,7 +187,9 @@ class ReviewInsufficientInfoServiceSpec extends SpecBase {
 
       row.nameLink.url mustBe "#"
       row.editLink.url mustBe "#"
-      row.proceedLink.url mustBe "#"
+      row.proceedLink.url mustBe controllers.insufficient.routes.ProceedInsufficientSubcontractorNameYesNoController
+        .onPageLoad(1L)
+        .url
       row.removeLink.url mustBe "#"
     }
 
