@@ -22,6 +22,7 @@ import models.UserAnswers
 import models.amend.company.AmendCompanyRemoveDetail
 import pages.add.company.*
 import pages.amend.company.AmendCompanyRemoveDetailYesNoPage
+import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import repositories.SessionRepository
@@ -42,7 +43,8 @@ class AmendCompanyRemoveDetailYesNoController @Inject() (
   view: AmendCompanyRemoveDetailYesNoView
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
-    with I18nSupport {
+    with I18nSupport
+    with Logging {
 
   private def withValidDetail(
     detail: String
@@ -150,7 +152,7 @@ class AmendCompanyRemoveDetailYesNoController @Inject() (
                     )
                   ,
                   value =>
-                    for {
+                    (for {
                       updatedAnswers <-
                         Future.fromTry(
                           request.userAnswers
@@ -160,7 +162,13 @@ class AmendCompanyRemoveDetailYesNoController @Inject() (
                       _              <- sessionRepository.set(updatedAnswers)
                     } yield Redirect(
                       controllers.amend.company.routes.AmendCompanyCheckYourAnswersController.onPageLoad()
-                    )
+                    )).recover { case ex =>
+                      logger.error(
+                        s"Failed to save remove detail answer for '$subcontractorDetail'",
+                        ex
+                      )
+                      journeyRecovery
+                    }
                 )
             }
           }

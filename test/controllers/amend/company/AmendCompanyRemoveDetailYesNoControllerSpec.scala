@@ -179,7 +179,7 @@ class AmendCompanyRemoveDetailYesNoControllerSpec extends SpecBase with MockitoS
     Seq(
       ("address", "address"),
       ("contact-details", "contact-details"),
-      ("unique-taxpayer-reference", "utr"),
+      ("utr", "utr"),
       ("company-registration-number", "company-registration-number"),
       ("works-reference-number", "works-reference-number")
     ).foreach { case (subcontractorDetail, selectedDetail) =>
@@ -404,10 +404,36 @@ class AmendCompanyRemoveDetailYesNoControllerSpec extends SpecBase with MockitoS
           }
         }
 
+        "must redirect to the JourneyRecovery when failed to save remove detail answer in session" in {
+
+          val mockSessionRepository = mock[SessionRepository]
+
+          when(mockSessionRepository.set(any())).thenReturn(
+            Future.failed(new RuntimeException(s"Failed to save remove detail answer for '$subcontractorDetail'"))
+          )
+
+          val application =
+            applicationBuilder(userAnswers = Some(uaWithNameAndDetail(selectedDetail)))
+              .overrides(
+                bind[SessionRepository].toInstance(mockSessionRepository)
+              )
+              .build()
+
+          running(application) {
+            val request =
+              FakeRequest(POST, removeDetailYesNoRoute)
+                .withFormUrlEncodedBody(("value", "true"))
+
+            val result = route(application, request).value
+
+            status(result) mustEqual SEE_OTHER
+            redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+          }
+        }
       }
     }
 
-    "when subcontractorDetail is neither 'address', 'contact-details', 'unique-taxpayer-reference', 'company-registration-number' or 'works-reference-number'" - {
+    "when subcontractorDetail is neither 'address', 'contact-details', 'utr', 'company-registration-number' or 'works-reference-number'" - {
 
       "must redirect to Journey Recovery on GET" in {
 
@@ -450,8 +476,6 @@ class AmendCompanyRemoveDetailYesNoControllerSpec extends SpecBase with MockitoS
             controllers.routes.JourneyRecoveryController.onPageLoad().url
         }
       }
-
     }
-
   }
 }
