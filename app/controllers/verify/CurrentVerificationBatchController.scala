@@ -17,11 +17,11 @@
 package controllers.verify
 
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
-import models.{CheckMode, Mode, NormalMode}
+import models.Mode
+import pages.verify.CurrentVerificationBatchResponsePage
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import pages.verify.CurrentVerificationBatchResponsePage
 import services.VerificationService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 

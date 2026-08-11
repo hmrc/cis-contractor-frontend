@@ -102,9 +102,12 @@ class VerifyNavigator @Inject() () extends NavigatorForJourney {
       ua.get(NewestVerificationBatchResponsePage)
         .exists(_.subcontractors.exists(_.isVerified))
 
-    val hasSelections =
-      ua.get(SelectSubcontractorPage).exists(_.nonEmpty) ||
-        ua.get(SelectSubcontractorsToReverifyPage).exists(_.nonEmpty)
+    val noSubcontractorsSelected =
+      ua.get(SelectSubcontractorPage).forall(_.isEmpty)
+
+    val hasNoReverifications =
+      ua.get(ReverifyExistingSubcontractorsYesNoPage).contains(false) ||
+        ua.get(SelectSubcontractorsToReverifyPage).forall(_.isEmpty)
 
     mode match {
 
@@ -118,7 +121,7 @@ class VerifyNavigator @Inject() () extends NavigatorForJourney {
       case CheckMode =>
         val rebuildVerificationFromWarning =
           ua.get(RebuildVerificationFromWarningPage).contains(true)
-        if (!hasSelections && !hasSubcontractorsToReverify) {
+        if (noSubcontractorsSelected && hasNoReverifications) {
           controllers.verify.routes.NoSubcontractorsSelectedWarningController.onPageLoadCheckMode()
         } else if (rebuildVerificationFromWarning) {
           controllers.verify.routes.ReverifyExistingSubcontractorsYesNoController.onPageLoad(CheckMode)

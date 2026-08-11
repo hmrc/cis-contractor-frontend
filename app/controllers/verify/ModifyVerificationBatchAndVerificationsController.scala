@@ -17,7 +17,7 @@
 package controllers.verify
 
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
-import models.{CheckMode, Mode, NormalMode}
+import models.Mode
 import models.requests.{CreateVerifications, DeleteVerifications, ModifyVerificationsRequest}
 import models.response.GetCurrentVerificationBatchResponse
 import pages.verify.{CurrentVerificationBatchResponsePage, SelectSubcontractorPage, SelectSubcontractorsToReverifyPage}
