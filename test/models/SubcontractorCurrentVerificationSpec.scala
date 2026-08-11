@@ -17,11 +17,59 @@
 package models
 
 import base.SpecBase
+import org.scalatest.matchers.should.Matchers.shouldBe
+import play.api.i18n.Messages
 import play.api.libs.json.Json
+import play.api.test.FakeRequest
 
 import java.time.LocalDateTime
 
 class SubcontractorCurrentVerificationSpec extends SpecBase {
+
+  private implicit val messages: Messages =
+    app.injector.instanceOf[play.api.i18n.MessagesApi].preferred(FakeRequest())
+
+  def subcontractor(
+    firstName: Option[String] = None,
+    surname: Option[String] = None,
+    tradingName: Option[String] = None,
+    partnershipTradingName: Option[String] = None
+  ): SubcontractorCurrentVerification =
+    SubcontractorCurrentVerification(
+      subcontractorId = 1L,
+      subbieResourceRef = None,
+      firstName = firstName,
+      secondName = None,
+      surname = surname,
+      tradingName = tradingName,
+      utr = None,
+      nino = None,
+      crn = None,
+      partnerUtr = None,
+      partnershipTradingName = partnershipTradingName,
+      subcontractorType = None,
+      addressLine1 = None,
+      addressLine2 = None,
+      addressLine3 = None,
+      addressLine4 = None,
+      country = None,
+      postcode = None,
+      emailAddress = None,
+      phoneNumber = None,
+      mobilePhoneNumber = None,
+      worksReferenceNumber = None,
+      matched = None,
+      autoVerified = None,
+      verified = None,
+      verificationNumber = None,
+      taxTreatment = None,
+      verificationDate = None,
+      version = None,
+      updatedTaxTreatment = None,
+      lastMonthlyReturnDate = None,
+      pendingVerifications = None
+    )
+
   "SubcontractorCurrentVerification" - {
     "serialize to JSON correctly" in {
       val subcontractors = SubcontractorCurrentVerification(
@@ -195,6 +243,36 @@ class SubcontractorCurrentVerificationSpec extends SpecBase {
       val json           = Json.toJson(subcontractors)
       val result         = json.as[SubcontractorCurrentVerification]
       result mustBe subcontractors
+    }
+
+    "displayName" - {
+
+      "return partnership trading name when available" in {
+        subcontractor(
+          firstName = Some("John"),
+          surname = Some("Smith"),
+          tradingName = Some("Trading Ltd"),
+          partnershipTradingName = Some("Partnership Ltd")
+        ).displayName shouldBe "Partnership Ltd"
+      }
+
+      "return trading name when partnership trading name is not available" in {
+        subcontractor(
+          tradingName = Some("Trading Ltd")
+        ).displayName shouldBe "Trading Ltd"
+      }
+
+      "return surname and first name when no trading names are available" in {
+        subcontractor(
+          firstName = Some("John"),
+          surname = Some("Smith")
+        ).displayName shouldBe "Smith, John"
+      }
+
+      "return the no name message when no name is available" in {
+        subcontractor().displayName shouldBe messages("verify.noName")
+      }
+
     }
   }
 }

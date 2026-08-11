@@ -55,7 +55,10 @@ case class SubcontractorCurrentVerification(
   lastMonthlyReturnDate: Option[LocalDateTime],
   pendingVerifications: Option[Int]
 ) {
-  def name: Option[String] = {
+  def displayName(implicit messages: Messages): String =
+    name.getOrElse(messages("verify.noName"))
+
+  private def name: Option[String] = {
     val first              = firstName.map(_.trim).filter(_.nonEmpty)
     val surnameValue       = surname.map(_.trim).filter(_.nonEmpty)
     val trading            = tradingName.map(_.trim).filter(_.nonEmpty)
@@ -66,9 +69,6 @@ case class SubcontractorCurrentVerification(
 
     partnershipTrading.orElse(trading).orElse(individualName)
   }
-
-  def displayName(implicit messages: Messages): String =
-    name.getOrElse(messages("verify.noName"))
 }
 
 object SubcontractorCurrentVerification {
