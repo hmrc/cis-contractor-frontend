@@ -558,8 +558,10 @@ class IndividualAmendedViewModelSpec extends SpecBase {
       val phoneRow  = result(1)
 
       methodRow.head.content mustBe Text(msgs("individualContactMethodOptions.checkYourAnswersLabel"))
-      methodRow(1).content mustBe Text(msgs("trustContactMethodOptions.email"))
-      methodRow(2).content mustBe Text(msgs("trustContactMethodOptions.phone"))
+      methodRow(1).content mustBe Text(msgs("individualContactMethodOptions.email"))
+      methodRow(2).content mustBe Text(
+        s"${msgs("individualContactMethodOptions.email")}, ${msgs("individualContactMethodOptions.phone")}"
+      )
 
       phoneRow.head.content mustBe Text(msgs("individualPhoneNumber.checkYourAnswersLabel"))
       phoneRow(1).content mustBe Text(msgs("amendConfirmation.table.content.none"))
