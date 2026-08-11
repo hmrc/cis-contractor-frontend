@@ -140,7 +140,7 @@ class AmendCompanyRemoveDetailYesNoPageSpec extends PageBehaviours {
     }
 
     Seq(
-      ("unique-taxpayer-reference", CompanyUtrPage, CompanyUtrYesNoPage, AmendCompanyRemoveDetail.Utr, "7777777777"),
+      ("utr", CompanyUtrPage, CompanyUtrYesNoPage, AmendCompanyRemoveDetail.Utr, "7777777777"),
       (
         "company-registration-number",
         CompanyCrnPage,
