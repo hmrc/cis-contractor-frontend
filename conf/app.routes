@@ -663,4 +663,4 @@ POST  /contractor-details/change-add-contractor-scheme-name  controllers.contrac
 GET   /contractor-details/remove-contractor-detail/:contractorDetail  controllers.contractordetails.RemoveDetailYesNoController.onPageLoad(contractorDetail: String)
 POST  /contractor-details/remove-contractor-detail/:contractorDetail  controllers.contractordetails.RemoveDetailYesNoController.onSubmit(contractorDetail: String)
 
-GET   /subcontractor/unmatched-subcontractors                       controllers.UnmatchedSubcontractorsController.onPageLoad()
+GET   /subcontractor/verify/unmatched-subcontractors                       controllers.UnmatchedSubcontractorsController.onPageLoad()
