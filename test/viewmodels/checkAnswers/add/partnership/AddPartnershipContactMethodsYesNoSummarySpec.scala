@@ -98,6 +98,40 @@ class AddPartnershipContactMethodsYesNoSummarySpec extends AnyFreeSpec with Matc
       changeAction.attributes                 should contain("id" -> "add-partnership-contact-details")
     }
 
+    "return a row with key, value = no, and change action pointing to add flow when the answer is false in AmendMode" in {
+      val ua = UserAnswers("test-id")
+        .set(AddPartnershipContactMethodsYesNoPage, false)
+        .success
+        .value
+
+      val maybeRow: Option[SummaryListRow] = AddPartnershipContactMethodsYesNoSummary.row(ua, AmendMode)
+      maybeRow shouldBe defined
+
+      val row: SummaryListRow = maybeRow.value
+
+      val expectedKeyText = messages("addPartnershipContactMethodsYesNo.checkYourAnswersLabel")
+      row.key.content.asHtml.toString should include(expectedKeyText)
+
+      val expectedValue = messages("site.no")
+      row.value.content.asHtml.toString should include(expectedValue)
+
+      row.actions shouldBe defined
+      val actions = row.actions.value.items
+      actions should have size 1
+
+      val changeAction       = actions.head
+      val expectedHref       = controllers.add.partnership.routes.AddPartnershipContactMethodsYesNoController
+        .onPageLoad(AmendMode)
+        .url
+      val expectedChangeText = messages("site.change")
+      val expectedHiddenText = messages("addPartnershipContactMethodsYesNo.change.hidden")
+
+      changeAction.content.asHtml.toString    should include(expectedChangeText)
+      changeAction.href                     shouldBe expectedHref
+      changeAction.visuallyHiddenText.value shouldBe expectedHiddenText
+      changeAction.attributes                 should contain("id" -> "add-partnership-contact-details")
+    }
+
     "must return a SummaryListRow with 'No' when the answer is false" in {
       val answers = UserAnswers("test-id")
         .set(AddPartnershipContactMethodsYesNoPage, false)

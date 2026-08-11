@@ -71,8 +71,8 @@ class TrustUtrYesNoSummarySpec extends SpecBase with GuiceOneAppPerSuite {
       actions.items must have size 1
 
       val action: ActionItem = actions.items.head
-      action.href mustBe controllers.add.trust.routes.TrustUtrYesNoController
-        .onPageLoad(AmendMode)
+      action.href mustBe controllers.amend.trust.routes.AmendTrustRemoveDetailYesNoController
+        .onPageLoad("utr")
         .url
       action.content mustBe Text(messages("site.change"))
       action.visuallyHiddenText mustBe Some(messages("trustUtrYesNo.change.hidden"))
@@ -96,6 +96,29 @@ class TrustUtrYesNoSummarySpec extends SpecBase with GuiceOneAppPerSuite {
       val action: ActionItem = actions.items.head
       action.href mustBe controllers.add.trust.routes.TrustUtrYesNoController
         .onPageLoad(CheckMode)
+        .url
+      action.content mustBe Text(messages("site.change"))
+      action.visuallyHiddenText mustBe Some(messages("trustUtrYesNo.change.hidden"))
+    }
+
+    "return a row with correct key, value = no, and change action pointing to add flow when the answer is false in AmendMode" in {
+      val ua: UserAnswers = emptyUserAnswers.set(TrustUtrYesNoPage, false).success.value
+
+      val maybeRow = TrustUtrYesNoSummary.row(ua, AmendMode)
+      maybeRow must not be empty
+
+      val row: SummaryListRow = maybeRow.value
+
+      row.key mustBe Key(content = Text(messages("trustUtrYesNo.checkYourAnswersLabel")))
+      row.value mustBe Value(content = Text(messages("site.no")))
+
+      row.actions must not be empty
+      val actions: Actions = row.actions.value
+      actions.items must have size 1
+
+      val action: ActionItem = actions.items.head
+      action.href mustBe controllers.add.trust.routes.TrustUtrYesNoController
+        .onPageLoad(AmendMode)
         .url
       action.content mustBe Text(messages("site.change"))
       action.visuallyHiddenText mustBe Some(messages("trustUtrYesNo.change.hidden"))
