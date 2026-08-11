@@ -30,7 +30,7 @@ final class VerificationBatchSpec extends AnyWordSpec with Matchers {
           |{
           |  "verificationBatchId": 99,
           |  "status": "STARTED",
-          |  "verificationNumber": "VB00000001"
+          |  "verificationNumber": "VB00000001",
           |  "verifBatchResourceRef": 10
           |}
           |""".stripMargin
