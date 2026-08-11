@@ -24,6 +24,7 @@ final case class Verification(
   taxTreatment: Option[String],
   verificationBatchId: Option[Long],
   subcontractorId: Option[Long],
+  actionIndicator: Option[String] = None,
   verificationResourceRef: Option[Long] = None
 )
 

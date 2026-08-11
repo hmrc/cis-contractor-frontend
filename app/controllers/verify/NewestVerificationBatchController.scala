@@ -27,10 +27,7 @@ import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
-import services.CisManageService
-import services.VerificationService
-import services.SubmissionStatusCheckResult
-import services.CheckLatestSubmissionStatusService
+import services.{CheckLatestSubmissionStatusService, CheckUnmatchedSubcontractorsService, CisManageService, SubmissionStatusCheckResult, VerificationService}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
 import javax.inject.Inject
@@ -89,18 +86,23 @@ class NewestVerificationBatchController @Inject() (
 
   private def checkSubmissionStatus(
     response: models.response.GetNewestVerificationBatchResponse
-  ): SubmissionStatusCheckResult = {
-    val status = response.verificationBatch.flatMap(_.status).flatMap { raw =>
-      val parsed = VerificationBatchStatus.from(raw)
-      if (parsed.isEmpty) {
-        logger.warn(
-          s"[NewestVerificationBatchController.onPageLoad] Unrecognised verification batch status: $raw"
-        )
-      }
-      parsed
+  ): SubmissionStatusCheckResult =
+    response.verificationBatch.flatMap(_.status) match {
+      case Some(rawStatus) =>
+        VerificationBatchStatus.from(rawStatus) match {
+          case Some(status) =>
+            CheckLatestSubmissionStatusService.check(Some(status))
+
+          case None =>
+            logger.warn(
+              s"[NewestVerificationBatchController] Unrecognised verification batch status: $rawStatus"
+            )
+            CheckLatestSubmissionStatusService.check(None)
+        }
+
+      case None =>
+        CheckLatestSubmissionStatusService.check(None)
     }
-    CheckLatestSubmissionStatusService.check(status)
-  }
 
   private def routeFromResponse(
     response: models.response.GetNewestVerificationBatchResponse,
@@ -123,16 +125,35 @@ class NewestVerificationBatchController @Inject() (
   ): play.api.mvc.Result =
     checkSubmissionStatus(response) match {
       case SubmissionStatusCheckResult.ShowPendingVerificationWarning =>
-        Redirect(controllers.verify.routes.VerificationRequestInProgressController.onPageLoad())
+        Redirect(
+          controllers.verify.routes.VerificationRequestInProgressController
+            .onPageLoad()
+        )
 
-      case SubmissionStatusCheckResult.Continue if response.subcontractors.isEmpty =>
-        Redirect(controllers.verify.routes.NoSubcontractorsAddedController.onPageLoad())
+      case SubmissionStatusCheckResult.CheckUnmatchedSubcontractors
+          if CheckUnmatchedSubcontractorsService
+            .hasAssociatedUnmatchedVerification(
+              response.verifications,
+              response.subcontractors
+            ) =>
+        Redirect(
+          controllers.routes.UnmatchedSubcontractorsController.onPageLoad()
+        )
 
-      case SubmissionStatusCheckResult.Continue if unverified.isEmpty =>
-        Redirect(controllers.verify.routes.VerifyYourSubcontractorsYesNoController.onPageLoad)
+      case SubmissionStatusCheckResult.Continue | SubmissionStatusCheckResult.CheckUnmatchedSubcontractors =>
+        continueToF4(response, unverified)
+    }
 
-      case SubmissionStatusCheckResult.Continue =>
-        Redirect(controllers.verify.routes.SelectSubcontractorController.onPageLoad(NormalMode))
+  private def continueToF4(
+    response: models.response.GetNewestVerificationBatchResponse,
+    unverified: Seq[models.Subcontractor]
+  ): play.api.mvc.Result =
+    if (response.subcontractors.isEmpty) {
+      Redirect(controllers.verify.routes.NoSubcontractorsAddedController.onPageLoad())
+    } else if (unverified.isEmpty) {
+      Redirect(controllers.verify.routes.VerifyYourSubcontractorsYesNoController.onPageLoad)
+    } else {
+      Redirect(controllers.verify.routes.SelectSubcontractorController.onPageLoad(NormalMode))
     }
 
   def onPageLoad(): Action[AnyContent] =

@@ -19,7 +19,7 @@ package controllers.verify
 import base.SpecBase
 import controllers.routes
 import models.response.GetNewestVerificationBatchResponse
-import models.{MonthlyReturn, MonthlyReturnSubmission, NormalMode, Subcontractor, Submission, UserAnswers}
+import models.{MonthlyReturn, MonthlyReturnSubmission, NormalMode, Subcontractor, Submission, UserAnswers, Verification}
 import generators.ModelGenerators
 import models.agent.AgentClientData
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
@@ -55,8 +55,30 @@ class NewestVerificationBatchControllerSpec extends SpecBase with MockitoSugar w
       verified = Some("N")
     )
 
+  private val verificationResourceRef = 1001L
+
+  private val associatedUnverifiedSubcontractor =
+    unverifiedSubcontractor.copy(
+      subbieResourceRef = Some(verificationResourceRef)
+    )
+
+  private def unmatchedVerification(
+    resourceRef: Long
+  ): Verification =
+    Verification(
+      verificationId = 1L,
+      matched = Some("N"),
+      verificationNumber = Some("V0000000001"),
+      taxTreatment = None,
+      verificationBatchId = Some(1L),
+      subcontractorId = Some(associatedUnverifiedSubcontractor.subcontractorId),
+      actionIndicator = Some("VERIFY"),
+      verificationResourceRef = Some(resourceRef)
+    )
+
   private def newestBatchResponse(
     subcontractors: Seq[Subcontractor],
+    verifications: Seq[Verification] = Seq.empty,
     submission: Option[Submission] = None,
     monthlyReturn: Option[MonthlyReturn] = None,
     monthlyReturnSubmission: Option[MonthlyReturnSubmission] = None,
@@ -72,7 +94,7 @@ class NewestVerificationBatchControllerSpec extends SpecBase with MockitoSugar w
           verificationNumber = Some("VB123")
         )
       ),
-      verifications = Seq.empty,
+      verifications = verifications,
       submission = submission,
       monthlyReturn = monthlyReturn,
       monthlyReturnSubmission = monthlyReturnSubmission
@@ -106,6 +128,48 @@ class NewestVerificationBatchControllerSpec extends SpecBase with MockitoSugar w
         bind[Clock].toInstance(fixedClock)
       )
   }
+
+  private def submittedUserAnswers(
+    batchStatus: String,
+    verificationRef: Long
+  ): UserAnswers =
+    emptyUserAnswers
+      .set(
+        NewestVerificationBatchResponsePage,
+        newestBatchResponse(
+          subcontractors = Seq(associatedUnverifiedSubcontractor),
+          verifications = Seq(unmatchedVerification(verificationRef)),
+          monthlyReturn = Some(activeMonthlyReturn),
+          status = Some(batchStatus)
+        )
+      )
+      .flatMap(
+        _.set(
+          UnverifiedSubcontractorsPage,
+          Seq(associatedUnverifiedSubcontractor)
+        )
+      )
+      .success
+      .value
+
+  private def userAnswersForStatus(batchStatus: String): UserAnswers =
+    emptyUserAnswers
+      .set(
+        NewestVerificationBatchResponsePage,
+        newestBatchResponse(
+          subcontractors = Seq(unverifiedSubcontractor),
+          monthlyReturn = Some(activeMonthlyReturn),
+          status = Some(batchStatus)
+        )
+      )
+      .flatMap(
+        _.set(
+          UnverifiedSubcontractorsPage,
+          Seq(unverifiedSubcontractor)
+        )
+      )
+      .success
+      .value
 
   "NewestVerificationBatchController" - {
 
@@ -509,6 +573,31 @@ class NewestVerificationBatchControllerSpec extends SpecBase with MockitoSugar w
       }
     }
 
+    Seq("STARTED", "VALIDATED").foreach { batchStatus =>
+      s"must continue to F4 when status is $batchStatus" in {
+        val mockService = mock[VerificationService]
+
+        when(mockService.refreshNewestVerificationBatch(any[UserAnswers])(any[HeaderCarrier]))
+          .thenReturn(Future.successful(userAnswersForStatus(batchStatus)))
+
+        val application = appBuilder(mockService).build()
+
+        running(application) {
+          val result = route(application, FakeRequest(GET, endpointUrl)).value
+
+          status(result) mustBe SEE_OTHER
+          redirectLocation(result).value mustBe
+            controllers.verify.routes.SelectSubcontractorController
+              .onPageLoad(NormalMode)
+              .url
+
+          verify(mockService)
+            .refreshNewestVerificationBatch(any[UserAnswers])(any[HeaderCarrier])
+          verifyNoMoreInteractions(mockService)
+        }
+      }
+    }
+
     "must treat an unrecognised status as Continue (redirects based on subcontractors)" in {
       val mockService = mock[VerificationService]
 
@@ -750,6 +839,133 @@ class NewestVerificationBatchControllerSpec extends SpecBase with MockitoSugar w
         verifyNoMoreInteractions(mockService)
       }
     }
+
+    "must redirect to CS-12 when SUBMITTED has an associated unmatched verification" in {
+      val mockService = mock[VerificationService]
+
+      val updatedAnswers =
+        submittedUserAnswers(
+          batchStatus = "SUBMITTED",
+          verificationRef = verificationResourceRef
+        )
+
+      when(mockService.refreshNewestVerificationBatch(any[UserAnswers])(any[HeaderCarrier]))
+        .thenReturn(Future.successful(updatedAnswers))
+
+      val application = appBuilder(mockService).build()
+
+      running(application) {
+        val result = route(application, FakeRequest(GET, endpointUrl)).value
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result).value mustBe
+          routes.UnmatchedSubcontractorsController.onPageLoad().url
+
+        verify(mockService).refreshNewestVerificationBatch(any[UserAnswers])(any[HeaderCarrier])
+        verifyNoMoreInteractions(mockService)
+      }
+    }
+
+    "must continue to F4 when SUBMITTED_NO_RECEIPT has no associated unmatched verification" in {
+      val mockService = mock[VerificationService]
+
+      val updatedAnswers =
+        submittedUserAnswers(
+          batchStatus = "SUBMITTED_NO_RECEIPT",
+          verificationRef = verificationResourceRef + 1
+        )
+
+      when(mockService.refreshNewestVerificationBatch(any[UserAnswers])(any[HeaderCarrier]))
+        .thenReturn(Future.successful(updatedAnswers))
+
+      val application = appBuilder(mockService).build()
+
+      running(application) {
+        val result = route(application, FakeRequest(GET, endpointUrl)).value
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result).value mustBe
+          controllers.verify.routes.SelectSubcontractorController
+            .onPageLoad(NormalMode)
+            .url
+
+        verify(mockService).refreshNewestVerificationBatch(any[UserAnswers])(any[HeaderCarrier])
+        verifyNoMoreInteractions(mockService)
+      }
+    }
+
+    "must redirect to VerificationRequestInProgress when status is ACCEPTED" in {
+      val mockService = mock[VerificationService]
+
+      when(mockService.refreshNewestVerificationBatch(any[UserAnswers])(any[HeaderCarrier]))
+        .thenReturn(Future.successful(userAnswersForStatus("ACCEPTED")))
+
+      val application = appBuilder(mockService).build()
+
+      running(application) {
+        val result = route(application, FakeRequest(GET, endpointUrl)).value
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result).value mustBe
+          controllers.verify.routes.VerificationRequestInProgressController
+            .onPageLoad()
+            .url
+
+        verify(mockService).refreshNewestVerificationBatch(any[UserAnswers])(any[HeaderCarrier])
+        verifyNoMoreInteractions(mockService)
+      }
+    }
+
+    Seq("FATAL_ERROR", "DEPARTMENTAL_ERROR").foreach { batchStatus =>
+      s"must continue to F4 when status is $batchStatus" in {
+        val mockService = mock[VerificationService]
+
+        when(mockService.refreshNewestVerificationBatch(any[UserAnswers])(any[HeaderCarrier]))
+          .thenReturn(Future.successful(userAnswersForStatus(batchStatus)))
+
+        val application = appBuilder(mockService).build()
+
+        running(application) {
+          val result = route(application, FakeRequest(GET, endpointUrl)).value
+
+          status(result) mustBe SEE_OTHER
+          redirectLocation(result).value mustBe
+            controllers.verify.routes.SelectSubcontractorController
+              .onPageLoad(NormalMode)
+              .url
+
+          verify(mockService).refreshNewestVerificationBatch(any[UserAnswers])(any[HeaderCarrier])
+          verifyNoMoreInteractions(mockService)
+        }
+      }
+    }
+
+    "must redirect to JourneyRecovery when batch status is unrecognised" in {
+      val mockService = mock[VerificationService]
+
+      when(
+        mockService
+          .refreshNewestVerificationBatch(any[UserAnswers])(any[HeaderCarrier])
+      ).thenReturn(
+        Future.successful(userAnswersForStatus("UNRECOGNISED_STATUS"))
+      )
+
+      val application = appBuilder(mockService).build()
+
+      running(application) {
+        val result = route(application, FakeRequest(GET, endpointUrl)).value
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result).value mustBe
+          controllers.verify.routes.SelectSubcontractorController
+            .onPageLoad(NormalMode)
+            .url
+
+        verify(mockService)
+          .refreshNewestVerificationBatch(any[UserAnswers])(any[HeaderCarrier])
+        verifyNoMoreInteractions(mockService)
+      }
+    }
   }
 
   "NewestVerificationBatchController.onContinue" - {
@@ -965,6 +1181,31 @@ class NewestVerificationBatchControllerSpec extends SpecBase with MockitoSugar w
       }
     }
 
+    Seq("STARTED", "VALIDATED").foreach { batchStatus =>
+      s"must continue to F4 when status is $batchStatus" in {
+        val mockService = mock[VerificationService]
+
+        when(mockService.refreshNewestVerificationBatch(any[UserAnswers])(any[HeaderCarrier]))
+          .thenReturn(Future.successful(userAnswersForStatus(batchStatus)))
+
+        val application = appBuilder(mockService).build()
+
+        running(application) {
+          val result = route(application, FakeRequest(GET, continueUrl)).value
+
+          status(result) mustBe SEE_OTHER
+          redirectLocation(result).value mustBe
+            controllers.verify.routes.SelectSubcontractorController
+              .onPageLoad(NormalMode)
+              .url
+
+          verify(mockService)
+            .refreshNewestVerificationBatch(any[UserAnswers])(any[HeaderCarrier])
+          verifyNoMoreInteractions(mockService)
+        }
+      }
+    }
+
     "must redirect to JourneyRecovery when NewestVerificationBatchResponsePage is missing" in {
       val mockService = mock[VerificationService]
 
@@ -1022,6 +1263,105 @@ class NewestVerificationBatchControllerSpec extends SpecBase with MockitoSugar w
 
         verify(mockService, never()).refreshNewestVerificationBatch(any[UserAnswers])(any[HeaderCarrier])
         verifyNoMoreInteractions(mockService)
+      }
+    }
+
+    "must redirect to CS-12 when SUBMITTED_NO_RECEIPT has an associated unmatched verification" in {
+      val mockService = mock[VerificationService]
+
+      val updatedAnswers =
+        submittedUserAnswers(
+          batchStatus = "SUBMITTED_NO_RECEIPT",
+          verificationRef = verificationResourceRef
+        )
+
+      when(mockService.refreshNewestVerificationBatch(any[UserAnswers])(any[HeaderCarrier]))
+        .thenReturn(Future.successful(updatedAnswers))
+
+      val application = appBuilder(mockService).build()
+
+      running(application) {
+        val result = route(application, FakeRequest(GET, continueUrl)).value
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result).value mustBe
+          routes.UnmatchedSubcontractorsController.onPageLoad().url
+
+        verify(mockService).refreshNewestVerificationBatch(any[UserAnswers])(any[HeaderCarrier])
+        verifyNoMoreInteractions(mockService)
+      }
+    }
+
+    "must continue to F4 when SUBMITTED has no associated unmatched verification" in {
+      val mockService = mock[VerificationService]
+
+      val updatedAnswers =
+        submittedUserAnswers(
+          batchStatus = "SUBMITTED",
+          verificationRef = verificationResourceRef + 1
+        )
+
+      when(mockService.refreshNewestVerificationBatch(any[UserAnswers])(any[HeaderCarrier]))
+        .thenReturn(Future.successful(updatedAnswers))
+
+      val application = appBuilder(mockService).build()
+
+      running(application) {
+        val result = route(application, FakeRequest(GET, continueUrl)).value
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result).value mustBe
+          controllers.verify.routes.SelectSubcontractorController
+            .onPageLoad(NormalMode)
+            .url
+
+        verify(mockService).refreshNewestVerificationBatch(any[UserAnswers])(any[HeaderCarrier])
+        verifyNoMoreInteractions(mockService)
+      }
+    }
+    "must redirect to VerificationRequestInProgress when status is ACCEPTED" in {
+      val mockService = mock[VerificationService]
+
+      when(mockService.refreshNewestVerificationBatch(any[UserAnswers])(any[HeaderCarrier]))
+        .thenReturn(Future.successful(userAnswersForStatus("ACCEPTED")))
+
+      val application = appBuilder(mockService).build()
+
+      running(application) {
+        val result = route(application, FakeRequest(GET, continueUrl)).value
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result).value mustBe
+          controllers.verify.routes.VerificationRequestInProgressController
+            .onPageLoad()
+            .url
+
+        verify(mockService).refreshNewestVerificationBatch(any[UserAnswers])(any[HeaderCarrier])
+        verifyNoMoreInteractions(mockService)
+      }
+    }
+
+    Seq("FATAL_ERROR", "DEPARTMENTAL_ERROR").foreach { batchStatus =>
+      s"must continue to F4 when status is $batchStatus" in {
+        val mockService = mock[VerificationService]
+
+        when(mockService.refreshNewestVerificationBatch(any[UserAnswers])(any[HeaderCarrier]))
+          .thenReturn(Future.successful(userAnswersForStatus(batchStatus)))
+
+        val application = appBuilder(mockService).build()
+
+        running(application) {
+          val result = route(application, FakeRequest(GET, continueUrl)).value
+
+          status(result) mustBe SEE_OTHER
+          redirectLocation(result).value mustBe
+            controllers.verify.routes.SelectSubcontractorController
+              .onPageLoad(NormalMode)
+              .url
+
+          verify(mockService).refreshNewestVerificationBatch(any[UserAnswers])(any[HeaderCarrier])
+          verifyNoMoreInteractions(mockService)
+        }
       }
     }
   }
