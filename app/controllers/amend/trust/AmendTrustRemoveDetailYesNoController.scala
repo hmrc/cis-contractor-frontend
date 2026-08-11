@@ -30,6 +30,7 @@ import views.html.amend.trust.AmendTrustRemoveDetailYesNoView
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
+
 class AmendTrustRemoveDetailYesNoController @Inject() (
   override val messagesApi: MessagesApi,
   sessionRepository: SessionRepository,
@@ -154,7 +155,7 @@ class AmendTrustRemoveDetailYesNoController @Inject() (
                         )
                       _              <- sessionRepository.set(updatedAnswers)
                     } yield Redirect(
-                      controllers.amend.trust.routes.AmendTrustCheckYourAnswersController.onPageLoad().url
+                      controllers.amend.trust.routes.AmendTrustCheckYourAnswersController.onPageLoad()
                     )
                 )
             }

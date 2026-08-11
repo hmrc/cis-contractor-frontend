@@ -25,6 +25,7 @@ import play.api.libs.json.JsPath
 
 case class AmendTrustRemoveDetailYesNoPage(subcontractorDetail: AmendTrustRemoveDetail) extends QuestionPage[Boolean] {
 
+  // All variants share one JSON key: this value is transient and removed immediately after submit, so concurrent detail types never clash.
   override def path: JsPath = JsPath \ toString
 
   override def toString: String = "amendTrustRemoveDetailYesNo"

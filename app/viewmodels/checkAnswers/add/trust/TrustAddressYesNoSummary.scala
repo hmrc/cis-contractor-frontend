@@ -16,7 +16,7 @@
 
 package viewmodels.checkAnswers.add.trust
 
-import models.{CheckMode, Mode, UserAnswers}
+import models.{AmendMode, CheckMode, Mode, UserAnswers}
 import pages.add.trust.TrustAddressYesNoPage
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
@@ -36,7 +36,9 @@ object TrustAddressYesNoSummary {
         actions = Seq(
           ActionItemViewModel(
             "site.change",
-            controllers.add.trust.routes.TrustAddressYesNoController.onPageLoad(mode).url
+            if answer && mode == AmendMode then
+              controllers.amend.trust.routes.AmendTrustRemoveDetailYesNoController.onPageLoad("address").url
+            else controllers.add.trust.routes.TrustAddressYesNoController.onPageLoad(mode).url
           )
             .withVisuallyHiddenText(messages("trustAddressYesNo.change.hidden"))
             .withAttribute("id" -> "add-trust-address")
