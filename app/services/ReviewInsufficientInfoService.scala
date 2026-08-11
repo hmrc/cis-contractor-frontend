@@ -67,7 +67,6 @@ class ReviewInsufficientInfoService @Inject() (
         verificationResourceRef = verificationResourceRef,
         proceed = "Y"
       )
-//
     request match {
       case Some(req) =>
         cisConnector.proceedInsufficientVerification(req)
