@@ -127,8 +127,8 @@ object CompanyAmendConfirmationViewModel {
     if (methods.isEmpty) {
       missingValue
     } else {
-      methods.toSeq
-        .sortBy(_.toString)
+      ContactMethodOptions
+        .ordered(methods)
         .map {
           case ContactMethodOptions.Email  =>
             messages("companyContactMethodOptions.email")

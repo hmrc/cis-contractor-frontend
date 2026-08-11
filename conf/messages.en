@@ -287,7 +287,7 @@ individualEmailAddress.checkYourAnswersLabel                                    
 individualEmailAddress.error.required                                               =  Enter an email address in the correct format, like name@example.com
 individualEmailAddress.error.length                                                 =  Enter a valid email address in the correct format, like name@example.com, up to 254 characters
 individualEmailAddress.error.invalid                                                =  Enter a valid email address in the correct format, like name@example.com
-individualEmailAddress.change.hidden                                                =  email Address
+individualEmailAddress.change.hidden                                                =  email address
 
 individualChooseContactDetails.title                                                =  Do you want to add contact details?
 individualChooseContactDetails.heading                                              =  What are the contact details for {0}?
