@@ -37,10 +37,7 @@ class UnmatchedSubcontractorsControllerSpec extends SpecBase {
         val view = application.injector.instanceOf[UnmatchedSubcontractorsView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(applicationConfig.verificationHistoryUrl)(
-          request,
-          messages(application)
-        ).toString
+        contentAsString(result) mustEqual view()(request, messages(application)).toString
       }
     }
 

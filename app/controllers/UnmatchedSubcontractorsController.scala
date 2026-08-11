@@ -16,7 +16,6 @@
 
 package controllers
 
-import config.FrontendAppConfig
 import controllers.actions._
 import javax.inject.Inject
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -30,11 +29,10 @@ class UnmatchedSubcontractorsController @Inject() (
   getData: DataRetrievalAction,
   val controllerComponents: MessagesControllerComponents,
   view: UnmatchedSubcontractorsView
-)(implicit appConfig: FrontendAppConfig)
-    extends FrontendBaseController
+) extends FrontendBaseController
     with I18nSupport {
 
   def onPageLoad: Action[AnyContent] = (identify andThen getData) { implicit request =>
-    Ok(view(appConfig.verificationHistoryUrl))
+    Ok(view())
   }
 }
