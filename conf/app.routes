@@ -671,4 +671,4 @@ POST  /contractor-details/remove-contractor-detail/:contractorDetail  controller
 
 GET   /subcontractor/verify/unmatched-subcontractors-exist                       controllers.UnmatchedSubcontractorsController.onPageLoad()
 
-GET   /subcontractor/no-unmatched-subcontractors                       controllers.NoUnmatchedSubcontractorsController.onPageLoad()
+GET   /subcontractor/verify/no-unmatched-subcontractors                      controllers.NoUnmatchedSubcontractorsController.onPageLoad()
