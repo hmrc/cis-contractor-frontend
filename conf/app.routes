@@ -126,11 +126,11 @@ POST  /subcontractor/proceed-verifying-subcontractor  controllers.insufficient.P
 GET   /subcontractor/remove-subcontractor-from-request  controllers.insufficient.RemoveInsufficientSubcontractorNameYesNoController.onPageLoad(mode: Mode = NormalMode)
 POST  /subcontractor/remove-subcontractor-from-request  controllers.insufficient.RemoveInsufficientSubcontractorNameYesNoController.onSubmit(mode: Mode = NormalMode)
 
-GET   /remove-unmatched-subcontractor-from-request  controllers.unmatched.RemoveSubcontractorVerifyRequestController.onPageLoad(mode: Mode = NormalMode)
-POST  /remove-unmatched-subcontractor-from-request  controllers.unmatched.RemoveSubcontractorVerifyRequestController.onSubmit(mode: Mode = NormalMode)
+GET   /subcontractor/remove-unmatched-subcontractor-from-request  controllers.unmatched.RemoveSubcontractorVerifyRequestController.onPageLoad(mode: Mode = NormalMode)
+POST  /subcontractor/remove-unmatched-subcontractor-from-request  controllers.unmatched.RemoveSubcontractorVerifyRequestController.onSubmit(mode: Mode = NormalMode)
 
-GET   /proceed-verifying-unmatched-subcontractor  controllers.unmatched.ProceedSubcontractorVerifyRequestController.onPageLoad(mode: Mode = NormalMode)
-POST  /proceed-verifying-unmatched-subcontractor  controllers.unmatched.ProceedSubcontractorVerifyRequestController.onSubmit(mode: Mode = NormalMode)
+GET   /subcontractor/proceed-verifying-unmatched-subcontractor  controllers.unmatched.ProceedSubcontractorVerifyRequestController.onPageLoad(mode: Mode = NormalMode)
+POST  /subcontractor/proceed-verifying-unmatched-subcontractor  controllers.unmatched.ProceedSubcontractorVerifyRequestController.onSubmit(mode: Mode = NormalMode)
 
 # Errors & Auth
 GET  /unauthorised/standard-user  controllers.UnauthorisedWrongRoleController.onPageLoad()
