@@ -65,7 +65,7 @@ class CheckVerificationBatchReadinessController @Inject() (
         ua.get(CurrentVerificationBatchResponsePage)
           .filter(_ => selectedIds.nonEmpty)
           .map { batchResponse =>
-            VerificationBatchReadiness.isBatchReady(selectedIds, batchResponse.subcontractors)
+            VerificationBatchReadiness.isBatchReady(selectedIds, batchResponse)
           }
 
       batchReadyOpt match {
