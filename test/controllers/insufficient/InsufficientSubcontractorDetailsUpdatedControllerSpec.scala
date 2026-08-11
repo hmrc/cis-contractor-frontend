@@ -83,9 +83,6 @@ class InsufficientSubcontractorDetailsUpdatedControllerSpec extends SpecBase {
 
       val application =
         applicationBuilder(userAnswers = Some(userAnswers))
-          .configure(
-            "urls.manageBaseUrl" -> "http://localhost:12345"
-          )
           .build()
 
       running(application) {

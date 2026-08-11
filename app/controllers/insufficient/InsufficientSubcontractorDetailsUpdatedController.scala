@@ -17,9 +17,8 @@
 package controllers.insufficient
 
 import config.FrontendAppConfig
-import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
+import controllers.actions.{CisIdRequiredAction, DataRequiredAction, DataRetrievalAction, IdentifierAction}
 import controllers.routes
-import queries.CisIdQuery
 import models.insufficient.InsufficientSubcontractorDetailsUpdatedReturnTo
 import pages.insufficient.InsufficientSubcontractorDetailsUpdatedPage
 import play.api.Logging
@@ -35,6 +34,7 @@ class InsufficientSubcontractorDetailsUpdatedController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
+  cisIdRequired: CisIdRequiredAction,
   val controllerComponents: MessagesControllerComponents,
   view: InsufficientSubcontractorDetailsUpdatedView,
   appConfig: FrontendAppConfig
@@ -43,37 +43,26 @@ class InsufficientSubcontractorDetailsUpdatedController @Inject() (
     with Logging {
 
   def onPageLoad(): Action[AnyContent] =
-    (identify andThen getData andThen requireData) { implicit request =>
+    (identify andThen getData andThen requireData andThen cisIdRequired) { implicit request =>
       request.userAnswers.get(InsufficientSubcontractorDetailsUpdatedPage) match {
 
         case Some(confirmationData) =>
-          request.userAnswers.get(CisIdQuery) match {
+          val (returnUrl, returnTextKey, showBeforeYouGo) =
+            linkDetails(
+              confirmationData.returnTo,
+              appConfig.manageYourSubcontractorsUrl(request.cisId)
+            )
 
-            case None =>
-              logger.error(
-                "[InsufficientSubcontractorDetailsUpdatedController.onPageLoad] Missing CisIdQuery"
-              )
-              Redirect(routes.JourneyRecoveryController.onPageLoad())
-
-            case Some(cisId) =>
-              val (returnUrl, returnTextKey, showBeforeYouGo) =
-                linkDetails(
-                  confirmationData.returnTo,
-                  appConfig.manageYourSubcontractorsUrl(cisId)
-                )
-
-              Ok(
-                view(
-                  rows = InsufficientSubcontractorDetailsUpdatedViewModel.rows(
-                    confirmationData
-                  ),
-                  subcontractorName = confirmationData.subcontractorName.displayName,
-                  returnUrl = returnUrl,
-                  returnTextKey = returnTextKey,
-                  showBeforeYouGo = showBeforeYouGo
-                )
-              )
-          }
+          Ok(
+            view(
+              rows = InsufficientSubcontractorDetailsUpdatedViewModel
+                .rows(confirmationData),
+              subcontractorName = confirmationData.subcontractorName.displayName,
+              returnUrl = returnUrl,
+              returnTextKey = returnTextKey,
+              showBeforeYouGo = showBeforeYouGo
+            )
+          )
 
         case None =>
           logger.error(
