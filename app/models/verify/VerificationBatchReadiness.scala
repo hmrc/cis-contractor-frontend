@@ -16,34 +16,57 @@
 
 package models.verify
 
-import models.{SubcontractorCurrentVerification, TypeOfSubcontractor}
+import models.{SubcontractorCurrentVerification, TypeOfSubcontractor, VerificationCurrentVerification}
 import models.TypeOfSubcontractor.*
+import models.response.GetCurrentVerificationBatchResponse
 
 object VerificationBatchReadiness {
 
-  // TODO(DTR-4685): ID matching uses subcontractorId — confirm this remains correct once SubcontractorSource is replaced with real backend data
-  def isBatchReady(selectedIds: Set[String], allSubcontractors: Seq[SubcontractorCurrentVerification]): Boolean =
-    selectedIds.nonEmpty && {
-      val selectedSubs = selectedIds.flatMap(id => allSubcontractors.find(_.subcontractorId.toString == id))
-      selectedSubs.size == selectedIds.size && selectedSubs.forall(isSubcontractorReady)
-    }
+  def isBatchReady(
+    selectedIds: Set[String],
+    batchResponse: GetCurrentVerificationBatchResponse
+  ): Boolean = {
 
-  def isSubcontractorReady(sub: SubcontractorCurrentVerification): Boolean =
-    sub.subcontractorType.flatMap(TypeOfSubcontractor.enumerable.withName) match {
-      case Some(Individualorsoletrader) => isIndividualReady(sub)
-      case Some(Limitedcompany)         => isCompanyReady(sub)
-      case Some(Trust)                  => isTrustReady(sub)
-      case Some(Partnership)            => isPartnershipReady(sub)
-      case _                            => false
+    val allSubcontractors = batchResponse.subcontractors
+    val verifications     = batchResponse.verifications
+
+    selectedIds.nonEmpty && {
+      val selectedSubs =
+        selectedIds.flatMap(id => allSubcontractors.find(_.subcontractorId.toString == id))
+
+      selectedSubs.size == selectedIds.size &&
+      selectedSubs.forall { sub =>
+        val verification =
+          verifications.find(_.subcontractorId.contains(sub.subcontractorId))
+
+        isSubcontractorReady(sub, verification)
+      }
     }
+  }
+
+  def isSubcontractorReady(
+    sub: SubcontractorCurrentVerification,
+    verification: Option[VerificationCurrentVerification]
+  ): Boolean =
+    hasProceeded(verification) ||
+      (sub.subcontractorType.flatMap(TypeOfSubcontractor.enumerable.withName) match {
+        case Some(Individualorsoletrader) => isIndividualReady(sub)
+        case Some(Limitedcompany)         => isCompanyReady(sub)
+        case Some(Trust)                  => isTrustReady(sub)
+        case Some(Partnership)            => isPartnershipReady(sub)
+        case _                            => false
+      })
 
   private def nonBlank(opt: Option[String]): Boolean = opt.exists(_.trim.nonEmpty)
 
+  private def hasProceeded(
+    verification: Option[VerificationCurrentVerification]
+  ): Boolean =
+    verification.exists(_.proceed.contains("Y"))
+
   private def isIndividualReady(sub: SubcontractorCurrentVerification): Boolean = {
     val hasName =
-      nonBlank(sub.tradingName) || (
-        nonBlank(sub.firstName) && nonBlank(sub.surname)
-      )
+      nonBlank(sub.tradingName) || nonBlank(sub.surname)
 
     hasName && nonBlank(sub.utr)
   }

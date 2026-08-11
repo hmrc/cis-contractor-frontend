@@ -16,7 +16,7 @@
 
 package viewmodels.checkAnswers.add.trust
 
-import models.{CheckMode, Mode, UserAnswers}
+import models.{AmendMode, CheckMode, Mode, UserAnswers}
 import pages.add.trust.TrustWorksReferenceYesNoPage
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
@@ -36,7 +36,11 @@ object TrustWorksReferenceYesNoSummary {
         actions = Seq(
           ActionItemViewModel(
             "site.change",
-            controllers.add.trust.routes.TrustWorksReferenceYesNoController.onPageLoad(mode).url
+            if answer && mode == AmendMode then
+              controllers.amend.trust.routes.AmendTrustRemoveDetailYesNoController
+                .onPageLoad("works-reference-number")
+                .url
+            else controllers.add.trust.routes.TrustWorksReferenceYesNoController.onPageLoad(mode).url
           )
             .withVisuallyHiddenText(messages("trustWorksReferenceYesNo.change.hidden"))
             .withAttribute("id" -> "add-trust-works-reference")

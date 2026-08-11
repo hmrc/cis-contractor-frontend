@@ -14,23 +14,11 @@
  * limitations under the License.
  */
 
-package models
+package viewmodels.verify
 
-import play.api.libs.json.{Json, OFormat}
-
-case class VerificationCurrentVerification(
-  verificationId: Long,
-  verificationBatchId: Option[Long],
-  subcontractorId: Option[Long],
-  verificationResourceRef: Option[Long],
-  subcontractorName: Option[String],
-  verificationNumber: Option[String],
-  taxTreatment: Option[String],
-  actionIndicator: Option[String],
-  proceed: Option[String],
-  matched: Option[String]
+case class VerificationResultsViewModel(
+  name: String,
+  verificationStatus: String,
+  taxTreatment: String,
+  verificationNumber: String
 )
-
-object VerificationCurrentVerification {
-  given format: OFormat[VerificationCurrentVerification] = Json.format[VerificationCurrentVerification]
-}
