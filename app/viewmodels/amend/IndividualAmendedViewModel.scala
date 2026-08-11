@@ -209,13 +209,13 @@ object IndividualAmendedViewModel {
   }
 
   private def formatContactMethods(
-    methods: Set[ContactMethodOptions]
-  )(implicit messages: Messages): String =
+                                    methods: Set[ContactMethodOptions]
+                                  )(implicit messages: Messages): String =
     if (methods.isEmpty) {
       missingValue
     } else {
-      methods.toSeq
-        .sortBy(_.toString)
+      ContactMethodOptions
+        .ordered(methods)
         .map {
           case ContactMethodOptions.Email  =>
             messages("individualContactMethodOptions.email")

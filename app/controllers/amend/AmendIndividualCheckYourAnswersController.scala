@@ -196,11 +196,17 @@ class AmendIndividualCheckYourAnswersController @Inject() (
 
         case Right(_) if !AmendmentHelper.individualHasChanges(request.userAnswers) =>
           request.userAnswers.get(CisIdQuery) match {
-
             case Some(cisId) =>
-              Future.successful(
-                Redirect(appConfig.manageYourSubcontractorsUrl(cisId))
-              )
+              sessionRepository
+                .set(UserAnswers(request.userAnswers.id))
+                .map(_ => Redirect(appConfig.manageYourSubcontractorsUrl(cisId)))
+                .recover { case t =>
+                  logger.error(
+                    s"[AmendIndividualCheckYourAnswersController.onSubmit] Failed to clear user answers for session ${request.userAnswers.id}",
+                    t
+                  )
+                  Redirect(routes.JourneyRecoveryController.onPageLoad())
+                }
 
             case None =>
               logger.error("[AmendIndividualCheckYourAnswersController.onSubmit] Missing CisIdQuery")
@@ -210,12 +216,12 @@ class AmendIndividualCheckYourAnswersController @Inject() (
           }
 
         case Right(_) =>
-          subcontractorService
-            .createAndUpdateSubcontractor(request.userAnswers)
+          Future
+            .fromTry(request.userAnswers.set(AmendCheckYourAnswersSubmittedPage, true))
+            .flatMap(updated => sessionRepository.set(updated))
             .flatMap { _ =>
-              Future
-                .fromTry(request.userAnswers.set(AmendCheckYourAnswersSubmittedPage, true))
-                .flatMap(updated => sessionRepository.set(updated).map(_ => ()))
+              subcontractorService
+                .createAndUpdateSubcontractor(request.userAnswers)
                 .map { _ =>
                   Redirect(
                     controllers.amend.routes.AmendIndividualConfirmationController.onPageLoad()

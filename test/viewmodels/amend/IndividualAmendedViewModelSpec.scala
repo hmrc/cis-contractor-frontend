@@ -335,13 +335,17 @@ class IndividualAmendedViewModelSpec extends SpecBase {
       emailRow(2).content mustBe Text(msgs("amendConfirmation.table.content.none"))
     }
 
-    "must display contact methods in a consistent order regardless of selection order" in {
+    "must display contact methods in canonical order" in {
 
       val answers =
         answersMatchingOriginal
           .set(
             IndividualContactMethodOptionsPage,
-            Set(ContactMethodOptions.Phone, ContactMethodOptions.Email)
+            Set(
+              ContactMethodOptions.Mobile,
+              ContactMethodOptions.Email,
+              ContactMethodOptions.Phone
+            )
           )
           .success
           .value
@@ -356,7 +360,9 @@ class IndividualAmendedViewModelSpec extends SpecBase {
       row.head.content mustBe Text(msgs("individualContactMethodOptions.checkYourAnswersLabel"))
       row(1).content mustBe Text(msgs("trustContactMethodOptions.email"))
       row(2).content mustBe Text(
-        s"${msgs("trustContactMethodOptions.email")}, ${msgs("trustContactMethodOptions.phone")}"
+        s"${msgs("trustContactMethodOptions.email")}, " +
+          s"${msgs("trustContactMethodOptions.phone")}, " +
+          msgs("trustContactMethodOptions.mobile")
       )
     }
 
@@ -533,8 +539,8 @@ class IndividualAmendedViewModelSpec extends SpecBase {
           .set(
             IndividualContactMethodOptionsPage,
             Set(
-              ContactMethodOptions.Email,
-              ContactMethodOptions.Phone
+              ContactMethodOptions.Phone,
+              ContactMethodOptions.Email
             )
           )
           .success
@@ -549,13 +555,11 @@ class IndividualAmendedViewModelSpec extends SpecBase {
       result must have size 2
 
       val methodRow = result.head
-      val phoneRow  = result(1)
+      val phoneRow = result(1)
 
       methodRow.head.content mustBe Text(msgs("individualContactMethodOptions.checkYourAnswersLabel"))
       methodRow(1).content mustBe Text(msgs("trustContactMethodOptions.email"))
-      methodRow(2).content mustBe Text(
-        s"${msgs("trustContactMethodOptions.email")}, ${msgs("trustContactMethodOptions.phone")}"
-      )
+      methodRow(2).content mustBe Text(msgs("trustContactMethodOptions.phone"))
 
       phoneRow.head.content mustBe Text(msgs("individualPhoneNumber.checkYourAnswersLabel"))
       phoneRow(1).content mustBe Text(msgs("amendConfirmation.table.content.none"))
