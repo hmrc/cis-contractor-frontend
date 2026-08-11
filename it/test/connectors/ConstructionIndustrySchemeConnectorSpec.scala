@@ -561,9 +561,11 @@ class ConstructionIndustrySchemeConnectorSpec
         proceed = "Y"
       )
 
-      stubFor(post(urlPathEqualTo("/cis/verification-batch/create")).willReturn(aResponse().withStatus(OK)))
+      stubFor(
+        post(urlPathEqualTo("/cis/verification/proceed-with-insufficient-data")).willReturn(aResponse().withStatus(OK))
+      )
 
-      connector.proceedInsufficientVerification(requestModel).futureValue mustBe ((): Unit)
+      connector.proceedInsufficientVerification(reqest).futureValue mustBe ((): Unit)
     }
 
     "propagate upstream error on non-2xx (e.g. 500)" in {
@@ -579,7 +581,7 @@ class ConstructionIndustrySchemeConnectorSpec
           .willReturn(aResponse().withStatus(INTERNAL_SERVER_ERROR).withBody("boom"))
       )
 
-      val ex = connector.proceedInsufficientVerification(requestModel).failed.futureValue
+      val ex = connector.proceedInsufficientVerification(reqest).failed.futureValue
       ex.getMessage must include("returned 500")
     }
   }
