@@ -106,9 +106,6 @@ GET   /subcontractor/amend/partnership/cancel                   controllers.amen
 GET   /subcontractor/amend/company/remove/information/:subcontractorDetail  controllers.amend.company.AmendCompanyRemoveDetailYesNoController.onPageLoad(subcontractorDetail: String)
 POST  /subcontractor/amend/company/remove/information/:subcontractorDetail  controllers.amend.company.AmendCompanyRemoveDetailYesNoController.onSubmit(subcontractorDetail: String)
 
-GET   /subcontractor/amend/partnership-information  controllers.amend.partnership.AmendPartnershipCheckYourAnswersController.onPageLoad()
-POST  /subcontractor/amend/partnership-information  controllers.amend.partnership.AmendPartnershipCheckYourAnswersController.onSubmit()
-
 GET   /subcontractor/amend/partnership/subcontractor-details-updated  controllers.amend.partnership.AmendPartnershipConfirmationController.onPageLoad()
 
 GET   /subcontractor/amend/company/subcontractor-details-updated  controllers.amend.company.AmendCompanyConfirmationController.onPageLoad()
@@ -637,7 +634,7 @@ GET   /verify/verification-status/select-subcontractors                  control
 
 GET   /subcontractor/verify/no-verification-results  controllers.verify.NoVerificationResultsController.onPageLoad()
 
-GET   /subcontractor/verify/verification-results                       controllers.verify.VerificationResultsController.onPageLoad()
+GET   /subcontractor/verify/verification-results  controllers.verify.VerificationResultsController.onPageLoad()
 
 # Contractor Details
 GET   /contractor-details/introduction  controllers.contractordetails.ContractorDetailsController.onPageLoad()
