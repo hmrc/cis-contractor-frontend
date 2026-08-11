@@ -31,6 +31,7 @@ import views.html.amend.trust.AmendTrustRemoveDetailYesNoView
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
+
 class AmendTrustRemoveDetailYesNoController @Inject() (
   override val messagesApi: MessagesApi,
   sessionRepository: SessionRepository,
