@@ -1,0 +1,753 @@
+/*
+ * Copyright 2026 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package viewmodels.amend
+
+import base.SpecBase
+import models.add.SubcontractorName
+import models.address.{Address, Country}
+import models.amend.OriginalIndividualAnswers
+import models.contact.ContactMethodOptions
+import pages.add.*
+import play.api.i18n.Messages
+import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
+
+class IndividualAmendedViewModelSpec extends SpecBase {
+
+  implicit val msgs: Messages = messages(app)
+
+  private val original =
+    OriginalIndividualAnswers(
+      usesTradingName = Some(false),
+      tradingName = None,
+      subcontractorName = Some(
+        SubcontractorName(
+          firstName = "John",
+          middleName = Some("A"),
+          lastName = "Smith"
+        )
+      ),
+      addressYesNo = Some(true),
+      address = Some(
+        Address(
+          addressLine1 = "1 High Street",
+          addressLine3 = Some("Leeds"),
+          postcode = Some("SA1 1AA"),
+          country = Some(Country(code = None, name = Some("England")))
+        )
+      ),
+      individualContactMethodsYesNo = Some(true),
+      individualContactMethod = Set(ContactMethodOptions.Email),
+      email = Some("john@test.com"),
+      phone = None,
+      mobile = None,
+      utrYesNo = Some(true),
+      utr = Some("1234567890"),
+      ninoYesNo = Some(true),
+      nino = Some("AB123456C"),
+      worksReferenceYesNo = Some(true),
+      worksReference = Some("WR123"),
+      verificationNumber = None
+    )
+
+  private val answersMatchingOriginal =
+    emptyUserAnswers
+      .set(SubTradingNameYesNoPage, false)
+      .success
+      .value
+      .set(
+        SubcontractorNamePage,
+        SubcontractorName("John", Some("A"), "Smith")
+      )
+      .success
+      .value
+      .set(SubAddressYesNoPage, true)
+      .success
+      .value
+      .set(
+        AddressOfSubcontractorPage,
+        Address(
+          addressLine1 = "1 High Street",
+          addressLine3 = Some("Leeds"),
+          postcode = Some("SA1 1AA"),
+          country = Some(Country(code = None, name = Some("England")))
+        )
+      )
+      .success
+      .value
+      .set(AddIndividualContactMethodsYesNoPage, true)
+      .success
+      .value
+      .set(IndividualContactMethodOptionsPage, Set(ContactMethodOptions.Email))
+      .success
+      .value
+      .set(IndividualEmailAddressPage, "john@test.com")
+      .success
+      .value
+      .set(UniqueTaxpayerReferenceYesNoPage, true)
+      .success
+      .value
+      .set(SubcontractorsUniqueTaxpayerReferencePage, "1234567890")
+      .success
+      .value
+      .set(NationalInsuranceNumberYesNoPage, true)
+      .success
+      .value
+      .set(SubNationalInsuranceNumberPage, "AB123456C")
+      .success
+      .value
+      .set(WorksReferenceNumberYesNoPage, true)
+      .success
+      .value
+      .set(WorksReferenceNumberPage, "WR123")
+      .success
+      .value
+
+  "rows" - {
+
+    "must return no rows when nothing has changed" in {
+
+      val result =
+        IndividualAmendedViewModel.rows(original, answersMatchingOriginal)
+
+      result mustBe empty
+    }
+
+    "must return a name row when the name changes" in {
+
+      val answers =
+        answersMatchingOriginal
+          .set(
+            SubcontractorNamePage,
+            SubcontractorName("Jane", None, "Smith")
+          )
+          .success
+          .value
+
+      val result =
+        IndividualAmendedViewModel.rows(original, answers)
+
+      val row = result.head
+
+      row.head.content mustBe Text(msgs("subcontractorName.checkYourAnswersLabel"))
+      row(1).content mustBe Text("John A Smith")
+      row(2).content mustBe Text("Jane Smith")
+    }
+
+    "must compare trading names when the original uses a trading name" in {
+
+      val originalTrading =
+        original.copy(
+          usesTradingName = Some(true),
+          tradingName = Some("ABC Contractors"),
+          subcontractorName = None
+        )
+
+      val answers =
+        answersMatchingOriginal
+          .set(SubTradingNameYesNoPage, true)
+          .success
+          .value
+          .set(TradingNameOfSubcontractorPage, "XYZ Contractors")
+          .success
+          .value
+
+      val result =
+        IndividualAmendedViewModel.rows(originalTrading, answers)
+
+      val row = result.head
+
+      row.head.content mustBe Text(msgs("tradingNameOfSubcontractor.checkYourAnswersLabel"))
+      row(1).content mustBe Text("ABC Contractors")
+      row(2).content mustBe Text("XYZ Contractors")
+    }
+
+    "must use the trading name label when the user uses a trading name" in {
+
+      val answers =
+        answersMatchingOriginal
+          .set(SubTradingNameYesNoPage, true)
+          .success
+          .value
+          .set(TradingNameOfSubcontractorPage, "ABC Contractors")
+          .success
+          .value
+
+      val result =
+        IndividualAmendedViewModel.rows(original, answers)
+
+      val subNameRow =
+        result.find(_.head.content == Text(msgs("subcontractorName.checkYourAnswersLabel"))).value
+
+      val tradingRow =
+        result.find(_.head.content == Text(msgs("tradingNameOfSubcontractor.checkYourAnswersLabel"))).value
+
+      subNameRow(1).content mustBe Text("John A Smith")
+      subNameRow(2).content mustBe Text(msgs("amendConfirmation.table.content.none"))
+
+      tradingRow(1).content mustBe Text(msgs("amendConfirmation.table.content.none"))
+      tradingRow(2).content mustBe Text("ABC Contractors")
+    }
+
+    "must compare trading name to subcontractor name when switching from a trading  to sub contractor name" in {
+
+      val originalTrading =
+        original.copy(
+          usesTradingName = Some(true),
+          tradingName = Some("ABC Contractors"),
+          subcontractorName = None
+        )
+
+      val answers =
+        answersMatchingOriginal
+          .set(SubTradingNameYesNoPage, false)
+          .success
+          .value
+          .set(
+            SubcontractorNamePage,
+            SubcontractorName("John", Some("A"), "Smith")
+          )
+          .success
+          .value
+
+      val result =
+        IndividualAmendedViewModel.rows(originalTrading, answers)
+
+      result must have size 3
+
+      val yesNoRow   = result(0)
+      val tradingRow = result(1)
+      val nameRow    = result(2)
+
+      yesNoRow.head.content mustBe Text(msgs("subTradingNameYesNo.checkYourAnswersLabel"))
+      yesNoRow(1).content mustBe Text(msgs("site.yes"))
+      yesNoRow(2).content mustBe Text(msgs("site.no"))
+
+      tradingRow.head.content mustBe Text(msgs("tradingNameOfSubcontractor.checkYourAnswersLabel"))
+      tradingRow(1).content mustBe Text("ABC Contractors")
+      tradingRow(2).content mustBe Text(msgs("amendConfirmation.table.content.none"))
+
+      nameRow.head.content mustBe Text(msgs("subcontractorName.checkYourAnswersLabel"))
+      nameRow(1).content mustBe Text(msgs("amendConfirmation.table.content.none"))
+      nameRow(2).content mustBe Text("John A Smith")
+    }
+
+    "must return address yes/no and address rows when address is removed" in {
+
+      val answers =
+        answersMatchingOriginal
+          .set(SubAddressYesNoPage, false)
+          .success
+          .value
+          .remove(AddressOfSubcontractorPage)
+          .success
+          .value
+
+      val result =
+        IndividualAmendedViewModel.rows(original, answers)
+
+      result must have size 2
+
+      val yesNoRow   = result.head
+      val addressRow = result(1)
+
+      yesNoRow.head.content mustBe Text(msgs("subAddressYesNo.checkYourAnswersLabel"))
+      yesNoRow(1).content mustBe Text(msgs("site.yes"))
+      yesNoRow(2).content mustBe Text(msgs("site.no"))
+
+      addressRow.head.content mustBe Text(msgs("addressOfSubcontractor.checkYourAnswersLabel"))
+      addressRow(1).content mustBe Text("1 High Street, Leeds, SA1 1AA, England")
+      addressRow(2).content mustBe Text(msgs("amendConfirmation.table.content.none"))
+    }
+
+    "must return an address row when the address changes" in {
+
+      val answers =
+        answersMatchingOriginal
+          .set(
+            AddressOfSubcontractorPage,
+            Address(
+              addressLine1 = "1 HIGH Street",
+              addressLine3 = Some("Leeds"),
+              postcode = Some("SA1 1AA"),
+              country = Some(Country(code = None, name = Some("England")))
+            )
+          )
+          .success
+          .value
+
+      val result =
+        IndividualAmendedViewModel.rows(original, answers)
+
+      val row = result.head
+
+      row.head.content mustBe Text(msgs("addressOfSubcontractor.checkYourAnswersLabel"))
+      row(1).content mustBe Text("1 High Street, Leeds, SA1 1AA, England")
+      row(2).content mustBe Text("1 HIGH Street, Leeds, SA1 1AA, England")
+    }
+
+    "must return contact rows when contact methods are removed" in {
+
+      val answers =
+        answersMatchingOriginal
+          .set(AddIndividualContactMethodsYesNoPage, false)
+          .success
+          .value
+          .remove(IndividualContactMethodOptionsPage)
+          .success
+          .value
+          .remove(IndividualEmailAddressPage)
+          .success
+          .value
+
+      val result =
+        IndividualAmendedViewModel.rows(original, answers)
+
+      result must have size 3
+
+      val yesNoRow  = result(0)
+      val methodRow = result(1)
+      val emailRow  = result(2)
+
+      yesNoRow.head.content mustBe Text(msgs("addIndividualContactMethodsYesNo.checkYourAnswersLabel"))
+      yesNoRow(1).content mustBe Text(msgs("site.yes"))
+      yesNoRow(2).content mustBe Text(msgs("site.no"))
+
+      methodRow.head.content mustBe Text(msgs("individualContactMethodOptions.checkYourAnswersLabel"))
+      methodRow(1).content mustBe Text(msgs("trustContactMethodOptions.email"))
+      methodRow(2).content mustBe Text(msgs("amendConfirmation.table.content.none"))
+
+      emailRow.head.content mustBe Text(msgs("individualEmailAddress.checkYourAnswersLabel"))
+      emailRow(1).content mustBe Text("john@test.com")
+      emailRow(2).content mustBe Text(msgs("amendConfirmation.table.content.none"))
+    }
+
+    "must display contact methods in canonical order" in {
+
+      val answers =
+        answersMatchingOriginal
+          .set(
+            IndividualContactMethodOptionsPage,
+            Set(
+              ContactMethodOptions.Mobile,
+              ContactMethodOptions.Email,
+              ContactMethodOptions.Phone
+            )
+          )
+          .success
+          .value
+
+      val result =
+        IndividualAmendedViewModel.rows(original, answers)
+
+      result must have size 1
+
+      val row = result.head
+
+      row.head.content mustBe Text(msgs("individualContactMethodOptions.checkYourAnswersLabel"))
+      row(1).content mustBe Text(msgs("individualContactMethodOptions.email"))
+      row(2).content mustBe Text(
+        s"${msgs("individualContactMethodOptions.email")}, " +
+          s"${msgs("individualContactMethodOptions.phone")}, " +
+          msgs("individualContactMethodOptions.mobile")
+      )
+    }
+
+    "must return contact method, email and phone rows when changing from email to phone" in {
+
+      val answers =
+        answersMatchingOriginal
+          .set(
+            IndividualContactMethodOptionsPage,
+            Set(ContactMethodOptions.Phone)
+          )
+          .success
+          .value
+          .remove(IndividualEmailAddressPage)
+          .success
+          .value
+          .set(IndividualPhoneNumberPage, "01131234567")
+          .success
+          .value
+
+      val result =
+        IndividualAmendedViewModel.rows(original, answers)
+
+      result must have size 3
+
+      val methodRow = result(0)
+      val emailRow  = result(1)
+      val phoneRow  = result(2)
+
+      methodRow(1).content mustBe Text(msgs("trustContactMethodOptions.email"))
+      methodRow(2).content mustBe Text(msgs("trustContactMethodOptions.phone"))
+
+      emailRow(1).content mustBe Text("john@test.com")
+      emailRow(2).content mustBe Text(msgs("amendConfirmation.table.content.none"))
+
+      phoneRow(1).content mustBe Text(msgs("amendConfirmation.table.content.none"))
+      phoneRow(2).content mustBe Text("01131234567")
+    }
+
+    "must return an email row when the email changes" in {
+
+      val answers =
+        answersMatchingOriginal
+          .set(IndividualEmailAddressPage, "new@test.com")
+          .success
+          .value
+
+      val result =
+        IndividualAmendedViewModel.rows(original, answers)
+
+      val row = result.head
+
+      row.head.content mustBe Text(msgs("individualEmailAddress.checkYourAnswersLabel"))
+      row(1).content mustBe Text("john@test.com")
+      row(2).content mustBe Text("new@test.com")
+    }
+
+    "must return a phone row when a phone number is added" in {
+
+      val answers =
+        answersMatchingOriginal
+          .set(IndividualPhoneNumberPage, "01131234567")
+          .success
+          .value
+
+      val result =
+        IndividualAmendedViewModel.rows(original, answers)
+
+      result must have size 1
+
+      val row = result.head
+
+      row.head.content mustBe Text(msgs("individualPhoneNumber.checkYourAnswersLabel"))
+      row(1).content mustBe Text(msgs("amendConfirmation.table.content.none"))
+      row(2).content mustBe Text("01131234567")
+    }
+
+    "must return a phone row when the phone number changes" in {
+
+      val originalPhone =
+        original.copy(
+          individualContactMethod = Set(ContactMethodOptions.Phone),
+          email = None,
+          phone = Some("01131234567")
+        )
+
+      val answers =
+        answersMatchingOriginal
+          .remove(IndividualEmailAddressPage)
+          .success
+          .value
+          .set(
+            IndividualContactMethodOptionsPage,
+            Set(ContactMethodOptions.Phone)
+          )
+          .success
+          .value
+          .set(IndividualPhoneNumberPage, "07700900123")
+          .success
+          .value
+
+      val result =
+        IndividualAmendedViewModel.rows(originalPhone, answers)
+
+      result must have size 1
+
+      val row = result.head
+
+      row.head.content mustBe Text(msgs("individualPhoneNumber.checkYourAnswersLabel"))
+      row(1).content mustBe Text("01131234567")
+      row(2).content mustBe Text("07700900123")
+    }
+
+    "must return a mobile row when a mobile number is added" in {
+
+      val answers =
+        answersMatchingOriginal
+          .set(IndividualMobileNumberPage, "07700900123")
+          .success
+          .value
+
+      val result =
+        IndividualAmendedViewModel.rows(original, answers)
+
+      result must have size 1
+
+      val row = result.head
+
+      row.head.content mustBe Text(msgs("individualMobileNumber.checkYourAnswersLabel"))
+      row(1).content mustBe Text(msgs("amendConfirmation.table.content.none"))
+      row(2).content mustBe Text("07700900123")
+    }
+
+    "must return a mobile row when the mobile number changes" in {
+
+      val originalMobile =
+        original.copy(
+          individualContactMethod = Set(ContactMethodOptions.Mobile),
+          email = None,
+          mobile = Some("07700900123")
+        )
+
+      val answers =
+        answersMatchingOriginal
+          .remove(IndividualEmailAddressPage)
+          .success
+          .value
+          .set(
+            IndividualContactMethodOptionsPage,
+            Set(ContactMethodOptions.Mobile)
+          )
+          .success
+          .value
+          .set(IndividualMobileNumberPage, "07700900456")
+          .success
+          .value
+
+      val result =
+        IndividualAmendedViewModel.rows(originalMobile, answers)
+
+      result must have size 1
+
+      val row = result.head
+
+      row.head.content mustBe Text(msgs("individualMobileNumber.checkYourAnswersLabel"))
+      row(1).content mustBe Text("07700900123")
+      row(2).content mustBe Text("07700900456")
+    }
+
+    "must return a contact methods row when multiple contact methods are selected" in {
+
+      val answers =
+        answersMatchingOriginal
+          .set(
+            IndividualContactMethodOptionsPage,
+            Set(
+              ContactMethodOptions.Phone,
+              ContactMethodOptions.Email
+            )
+          )
+          .success
+          .value
+          .set(IndividualPhoneNumberPage, "01131234567")
+          .success
+          .value
+
+      val result =
+        IndividualAmendedViewModel.rows(original, answers)
+
+      result must have size 2
+
+      val methodRow = result.head
+      val phoneRow  = result(1)
+
+      methodRow.head.content mustBe Text(msgs("individualContactMethodOptions.checkYourAnswersLabel"))
+      methodRow(1).content mustBe Text(msgs("individualContactMethodOptions.email"))
+      methodRow(2).content mustBe Text(
+        s"${msgs("individualContactMethodOptions.email")}, ${msgs("individualContactMethodOptions.phone")}"
+      )
+
+      phoneRow.head.content mustBe Text(msgs("individualPhoneNumber.checkYourAnswersLabel"))
+      phoneRow(1).content mustBe Text(msgs("amendConfirmation.table.content.none"))
+      phoneRow(2).content mustBe Text("01131234567")
+    }
+
+    "must return a UTR row when the UTR changes" in {
+
+      val answers =
+        answersMatchingOriginal
+          .set(SubcontractorsUniqueTaxpayerReferencePage, "9999999999")
+          .success
+          .value
+
+      val result =
+        IndividualAmendedViewModel.rows(original, answers)
+
+      val row = result.head
+
+      row.head.content mustBe Text(msgs("subcontractorsUniqueTaxpayerReference.checkYourAnswersLabel"))
+      row(1).content mustBe Text("1234567890")
+      row(2).content mustBe Text("9999999999")
+    }
+
+    "must display none when the UTR is removed" in {
+
+      val answers =
+        answersMatchingOriginal
+          .remove(SubcontractorsUniqueTaxpayerReferencePage)
+          .success
+          .value
+
+      val result =
+        IndividualAmendedViewModel.rows(original, answers)
+
+      val row = result.head
+
+      row.head.content mustBe Text(msgs("subcontractorsUniqueTaxpayerReference.checkYourAnswersLabel"))
+      row(1).content mustBe Text("1234567890")
+      row(2).content mustBe Text(msgs("amendConfirmation.table.content.none"))
+    }
+
+    "must return a NINO row when the NINO changes" in {
+
+      val answers =
+        answersMatchingOriginal
+          .set(SubNationalInsuranceNumberPage, "CD123456E")
+          .success
+          .value
+
+      val result =
+        IndividualAmendedViewModel.rows(original, answers)
+
+      val row = result.head
+
+      row.head.content mustBe Text(msgs("subNationalInsuranceNumber.checkYourAnswersLabel"))
+      row(1).content mustBe Text("AB123456C")
+      row(2).content mustBe Text("CD123456E")
+    }
+
+    "must display none when the NINO is removed" in {
+
+      val answers =
+        answersMatchingOriginal
+          .remove(SubNationalInsuranceNumberPage)
+          .success
+          .value
+
+      val result =
+        IndividualAmendedViewModel.rows(original, answers)
+
+      val row = result.head
+
+      row.head.content mustBe Text(msgs("subNationalInsuranceNumber.checkYourAnswersLabel"))
+      row(1).content mustBe Text("AB123456C")
+      row(2).content mustBe Text(msgs("amendConfirmation.table.content.none"))
+    }
+
+    "must return a works reference row when the works reference changes" in {
+
+      val answers =
+        answersMatchingOriginal
+          .set(WorksReferenceNumberPage, "WR999")
+          .success
+          .value
+      val result  =
+        IndividualAmendedViewModel.rows(original, answers)
+
+      val row = result.head
+
+      row.head.content mustBe Text(msgs("worksReferenceNumber.checkYourAnswersLabel"))
+      row(1).content mustBe Text("WR123")
+      row(2).content mustBe Text("WR999")
+    }
+
+    "must display none when the works reference is removed" in {
+
+      val answers =
+        answersMatchingOriginal
+          .remove(WorksReferenceNumberPage)
+          .success
+          .value
+
+      val result =
+        IndividualAmendedViewModel.rows(original, answers)
+
+      val row = result.head
+
+      row.head.content mustBe Text(msgs("worksReferenceNumber.checkYourAnswersLabel"))
+      row(1).content mustBe Text("WR123")
+      row(2).content mustBe Text(msgs("amendConfirmation.table.content.none"))
+    }
+
+    "must return a UTR yes/no row when the answer changes" in {
+
+      val answers =
+        answersMatchingOriginal
+          .set(UniqueTaxpayerReferenceYesNoPage, false)
+          .success
+          .value
+
+      val result =
+        IndividualAmendedViewModel.rows(original, answers)
+
+      result must have size 2
+
+      val yesNoRow = result.head
+      val utrRow   = result(1)
+
+      yesNoRow.head.content mustBe Text(msgs("uniqueTaxpayerReferenceYesNo.checkYourAnswersLabel"))
+      yesNoRow(1).content mustBe Text(msgs("site.yes"))
+      yesNoRow(2).content mustBe Text(msgs("site.no"))
+
+      utrRow.head.content mustBe Text(msgs("subcontractorsUniqueTaxpayerReference.checkYourAnswersLabel"))
+      utrRow(1).content mustBe Text("1234567890")
+      utrRow(2).content mustBe Text(msgs("amendConfirmation.table.content.none"))
+    }
+
+    "must return a NINO yes/no row when the answer changes" in {
+
+      val answers =
+        answersMatchingOriginal
+          .set(NationalInsuranceNumberYesNoPage, false)
+          .success
+          .value
+
+      val result =
+        IndividualAmendedViewModel.rows(original, answers)
+
+      result must have size 2
+
+      val yesNoRow = result.head
+      val ninoRow  = result(1)
+
+      yesNoRow.head.content mustBe Text(msgs("nationalInsuranceNumberYesNo.checkYourAnswersLabel"))
+      yesNoRow(1).content mustBe Text(msgs("site.yes"))
+      yesNoRow(2).content mustBe Text(msgs("site.no"))
+
+      ninoRow.head.content mustBe Text(msgs("subNationalInsuranceNumber.checkYourAnswersLabel"))
+      ninoRow(1).content mustBe Text("AB123456C")
+      ninoRow(2).content mustBe Text(msgs("amendConfirmation.table.content.none"))
+    }
+
+    "must return a works reference yes/no row when the answer changes" in {
+
+      val answers =
+        answersMatchingOriginal
+          .set(WorksReferenceNumberYesNoPage, false)
+          .success
+          .value
+
+      val result =
+        IndividualAmendedViewModel.rows(original, answers)
+
+      result must have size 2
+
+      val yesNoRow = result.head
+      val worksRow = result(1)
+
+      yesNoRow.head.content mustBe Text(msgs("worksReferenceNumberYesNo.checkYourAnswersLabel"))
+      yesNoRow(1).content mustBe Text(msgs("site.yes"))
+      yesNoRow(2).content mustBe Text(msgs("site.no"))
+
+      worksRow.head.content mustBe Text(msgs("worksReferenceNumber.checkYourAnswersLabel"))
+      worksRow(1).content mustBe Text("WR123")
+      worksRow(2).content mustBe Text(msgs("amendConfirmation.table.content.none"))
+    }
+  }
+}

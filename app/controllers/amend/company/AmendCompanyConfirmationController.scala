@@ -16,10 +16,10 @@
 
 package controllers.amend.company
 
-import config.FrontendAppConfig
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
 import controllers.routes
 import pages.add.company.CompanyNamePage
+import pages.amend.AmendCheckYourAnswersSubmittedPage
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -29,7 +29,6 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.DefaultSubcontractorCleanupService
 import viewmodels.amend.company.CompanyAmendConfirmationViewModel
 import views.html.amend.AmendConfirmationView
-import pages.amend.AmendCheckYourAnswersSubmittedPage
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -43,8 +42,7 @@ class AmendCompanyConfirmationController @Inject() (
   val controllerComponents: MessagesControllerComponents,
   cleanupService: DefaultSubcontractorCleanupService,
   sessionRepository: SessionRepository,
-  view: AmendConfirmationView,
-  appConfig: FrontendAppConfig
+  view: AmendConfirmationView
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport
@@ -52,25 +50,17 @@ class AmendCompanyConfirmationController @Inject() (
 
   def onPageLoad(): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
-
-      val recoveryRedirect =
-        Redirect(routes.JourneyRecoveryController.onPageLoad())
-
-      val ua = request.userAnswers
+      val recoveryRedirect = Redirect(routes.JourneyRecoveryController.onPageLoad())
+      val ua               = request.userAnswers
 
       if (!ua.get(AmendCheckYourAnswersSubmittedPage).contains(true)) {
-        logger.warn(
-          s"[AmendCompanyConfirmationController][onPageLoad] " +
-            "Accessed confirmation page without prior submission"
-        )
-        Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
+        logger.warn("[AmendCompanyConfirmationController] Accessed without prior CYA submission")
+        Future.successful(recoveryRedirect)
       } else {
         ua.get(OriginalCompanyAnswersQuery) match {
-
-          case None =>
+          case None                         =>
             logger.error("[AmendCompanyConfirmationController] Missing OriginalCompanyAnswersQuery")
             Future.successful(recoveryRedirect)
-
           case Some(originalCompanyAnswers) =>
             ua.get(CisIdQuery) match {
 
@@ -79,25 +69,24 @@ class AmendCompanyConfirmationController @Inject() (
                 Future.successful(recoveryRedirect)
 
               case Some(_) =>
-                val tableRows   = CompanyAmendConfirmationViewModel.rows(originalCompanyAnswers, ua)
-                val companyName = ua.get(CompanyNamePage).getOrElse("")
-                cleanupService.cleanAmend(ua) match {
+                val tableRows =
+                  CompanyAmendConfirmationViewModel.rows(originalCompanyAnswers, ua)
 
+                val companyName =
+                  ua.get(CompanyNamePage).getOrElse("")
+
+                cleanupService.cleanAmend(ua) match {
                   case Success(cleanedUa) =>
                     sessionRepository.set(cleanedUa).map { _ =>
                       Ok(
                         view(
                           tableRows,
-                          companyName,
-                          appConfig.retrieveSubcontractorListUrl
+                          companyName
                         )
                       )
                     }
                   case Failure(exception) =>
-                    logger.warn(
-                      "[AmendCompanyConfirmationController] Failed to clean user answers",
-                      exception
-                    )
+                    logger.warn("[AmendCompanyConfirmationController] Failed to clean user answers", exception)
                     Future.successful(recoveryRedirect)
                 }
             }
