@@ -30,7 +30,9 @@ case class VerificationResultsViewModel(
 
 object VerificationResultsViewModel {
 
-  def from(response: GetNewestVerificationBatchResponse)(implicit messages: Messages): Seq[VerificationResultsViewModel] = {
+  def from(
+    response: GetNewestVerificationBatchResponse
+  )(implicit messages: Messages): Seq[VerificationResultsViewModel] = {
     val subcontractorsById = response.subcontractors.map(s => s.subcontractorId -> s).toMap
 
     response.verifications.flatMap { verification =>

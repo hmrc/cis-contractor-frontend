@@ -46,14 +46,14 @@ case class Subcontractor(
 
 object Subcontractor:
   given format: OFormat[Subcontractor] = Json.format[Subcontractor]
-  
+
   def resolveName(sub: Subcontractor): Option[String] = {
 
     def nonBlank(field: Option[String]): Option[String] =
       field.map(_.trim).filter(_.nonEmpty)
 
-    val trading = nonBlank(sub.tradingName)
-    val partnershipTrading = nonBlank(sub.partnershipTradingName)
+    val trading                        = nonBlank(sub.tradingName)
+    val partnershipTrading             = nonBlank(sub.partnershipTradingName)
     val soleTraderName: Option[String] =
       nonBlank(sub.surname).map { surname =>
         nonBlank(sub.firstName).fold(surname)(firstName => s"$surname, $firstName")
@@ -61,8 +61,8 @@ object Subcontractor:
 
     sub.subcontractorType.flatMap(TypeOfSubcontractor.fromString).flatMap {
       case Individualorsoletrader => soleTraderName.orElse(trading)
-      case Limitedcompany => trading
-      case Partnership => partnershipTrading.orElse(trading)
-      case Trust => trading
+      case Limitedcompany         => trading
+      case Partnership            => partnershipTrading.orElse(trading)
+      case Trust                  => trading
     }
   }
