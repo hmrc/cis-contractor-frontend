@@ -323,6 +323,9 @@ class ConstructionIndustrySchemeConnectorSpec
 
       val verification = result.verifications.head
 
+      verification.verificationId mustBe 1001L
+      verification.verificationNumber mustBe Some("V0000000001")
+      verification.subcontractorId mustBe Some(1L)
       verification.actionIndicator mustBe Some("VERIFY")
       verification.matched mustBe Some("N")
       verification.verificationResourceRef mustBe Some(10L)
