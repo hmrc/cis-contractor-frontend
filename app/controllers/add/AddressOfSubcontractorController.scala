@@ -17,9 +17,9 @@
 package controllers.add
 
 import controllers.actions.*
-import models.{Mode, UserAnswers}
 import models.address.Address
 import models.address.AddressLookupJourneyIdentifier.individualQuestionsAddress
+import models.{Mode, UserAnswers}
 import pages.add.AddressOfSubcontractorPage
 import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
@@ -60,9 +60,7 @@ class AddressOfSubcontractorController @Inject() (
     routes.AddIndividualContactMethodsYesNoController.onPageLoad(mode)
 
   override protected def onChangeCompletion(isAmend: Boolean): Call =
-    if isAmend then
-      controllers.routes.JourneyRecoveryController
-        .onPageLoad() // TODO - redirect to AmendIndividualCheckYourAnswer
+    if (isAmend) controllers.amend.routes.AmendIndividualCheckYourAnswersController.onPageLoad()
     else routes.CheckYourAnswersController.onPageLoad()
 
   def redirectToAmendAddressLookup(): Action[AnyContent] =

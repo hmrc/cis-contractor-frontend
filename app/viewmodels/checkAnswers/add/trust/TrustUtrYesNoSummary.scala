@@ -16,7 +16,7 @@
 
 package viewmodels.checkAnswers.add.trust
 
-import models.{CheckMode, Mode, UserAnswers}
+import models.{AmendMode, CheckMode, Mode, UserAnswers}
 import pages.add.trust.TrustUtrYesNoPage
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
@@ -36,7 +36,9 @@ object TrustUtrYesNoSummary {
         actions = Seq(
           ActionItemViewModel(
             "site.change",
-            controllers.add.trust.routes.TrustUtrYesNoController.onPageLoad(mode).url
+            if answer && mode == AmendMode then
+              controllers.amend.trust.routes.AmendTrustRemoveDetailYesNoController.onPageLoad("utr").url
+            else controllers.add.trust.routes.TrustUtrYesNoController.onPageLoad(mode).url
           )
             .withVisuallyHiddenText(messages("trustUtrYesNo.change.hidden"))
             .withAttribute("id" -> "add-trust-utr")

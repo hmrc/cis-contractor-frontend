@@ -21,6 +21,8 @@ import org.scalatest.wordspec.AnyWordSpec
 import play.api.libs.json.{JsSuccess, Json}
 import models.*
 
+import java.time.LocalDateTime
+
 class GetCurrentVerificationBatchResponseSpec extends AnyWordSpec with Matchers {
 
   "GetCurrentVerificationBatchResponse Json format" should {
@@ -32,8 +34,8 @@ class GetCurrentVerificationBatchResponseSpec extends AnyWordSpec with Matchers 
             subcontractorId = 1L,
             subbieResourceRef = Some(10L),
             firstName = Some("John"),
-            surname = Some("Smith"),
             secondName = None,
+            surname = Some("Smith"),
             tradingName = Some("ACME"),
             utr = Some("1111111111"),
             nino = Some("AA123456A"),
@@ -47,7 +49,20 @@ class GetCurrentVerificationBatchResponseSpec extends AnyWordSpec with Matchers 
             addressLine4 = None,
             country = Some("GB"),
             postcode = Some("AA1 1AA"),
-            worksReferenceNumber = Some("WRN123")
+            emailAddress = Some("john@test.com"),
+            phoneNumber = Some("01911234567"),
+            mobilePhoneNumber = Some("07123456789"),
+            worksReferenceNumber = Some("WRN123"),
+            matched = Some("Y"),
+            autoVerified = Some("N"),
+            verified = Some("Y"),
+            verificationNumber = Some("V123456"),
+            taxTreatment = Some("0"),
+            verificationDate = Some(LocalDateTime.parse("2026-07-23T10:15:30")),
+            version = Some(1),
+            updatedTaxTreatment = Some("1"),
+            lastMonthlyReturnDate = Some(LocalDateTime.parse("2026-06-30T00:00:00")),
+            pendingVerifications = Some(2)
           )
         ),
         verificationBatch = Some(
@@ -61,7 +76,13 @@ class GetCurrentVerificationBatchResponseSpec extends AnyWordSpec with Matchers 
             verificationId = 1001L,
             verificationBatchId = Some(99L),
             subcontractorId = Some(1L),
-            verificationResourceRef = Some(1L)
+            verificationResourceRef = Some(1L),
+            subcontractorName = Some("John Smith"),
+            verificationNumber = Some("V123456"),
+            taxTreatment = Some("0"),
+            actionIndicator = Some("A"),
+            proceed = Some("Y"),
+            matched = Some("Y")
           )
         )
       )
@@ -70,17 +91,24 @@ class GetCurrentVerificationBatchResponseSpec extends AnyWordSpec with Matchers 
 
       val sub0 = (json \ "subcontractors")(0)
 
-      (sub0 \ "subcontractorId").as[Long] mustBe 1L
-      (sub0 \ "subbieResourceRef").as[Long] mustBe 10L
-      (sub0 \ "firstName").as[String] mustBe "John"
-      (sub0 \ "surname").as[String] mustBe "Smith"
-      (sub0 \ "secondName").toOption mustBe None
-      (sub0 \ "tradingName").as[String] mustBe "ACME"
-      (sub0 \ "utr").as[String] mustBe "1111111111"
-      (sub0 \ "nino").as[String] mustBe "AA123456A"
-      (sub0 \ "crn").as[String] mustBe "AC012345"
-      (sub0 \ "partnerUtr").as[String] mustBe "5860920998"
-      (sub0 \ "partnershipTradingName").as[String] mustBe "ACME trading"
+      (sub0 \ "subcontractorType").as[String] mustBe "soletrader"
+      (sub0 \ "addressLine1").as[String] mustBe "1 Test Street"
+      (sub0 \ "country").as[String] mustBe "GB"
+      (sub0 \ "postcode").as[String] mustBe "AA1 1AA"
+      (sub0 \ "emailAddress").as[String] mustBe "john@test.com"
+      (sub0 \ "phoneNumber").as[String] mustBe "01911234567"
+      (sub0 \ "mobilePhoneNumber").as[String] mustBe "07123456789"
+      (sub0 \ "worksReferenceNumber").as[String] mustBe "WRN123"
+      (sub0 \ "matched").as[String] mustBe "Y"
+      (sub0 \ "autoVerified").as[String] mustBe "N"
+      (sub0 \ "verified").as[String] mustBe "Y"
+      (sub0 \ "verificationNumber").as[String] mustBe "V123456"
+      (sub0 \ "taxTreatment").as[String] mustBe "0"
+      (sub0 \ "verificationDate").as[String] mustBe "2026-07-23T10:15:30"
+      (sub0 \ "version").as[Int] mustBe 1
+      (sub0 \ "updatedTaxTreatment").as[String] mustBe "1"
+      (sub0 \ "lastMonthlyReturnDate").as[String] mustBe "2026-06-30T00:00:00"
+      (sub0 \ "pendingVerifications").as[Int] mustBe 2
 
       val vb0 = json \ "verificationBatch"
 
@@ -93,6 +121,12 @@ class GetCurrentVerificationBatchResponseSpec extends AnyWordSpec with Matchers 
       (v0 \ "verificationBatchId").as[Long] mustBe 99L
       (v0 \ "subcontractorId").as[Long] mustBe 1L
       (v0 \ "verificationResourceRef").as[Long] mustBe 1L
+      (v0 \ "subcontractorName").as[String] mustBe "John Smith"
+      (v0 \ "verificationNumber").as[String] mustBe "V123456"
+      (v0 \ "taxTreatment").as[String] mustBe "0"
+      (v0 \ "actionIndicator").as[String] mustBe "A"
+      (v0 \ "proceed").as[String] mustBe "Y"
+      (v0 \ "matched").as[String] mustBe "Y"
     }
 
     "round-trip (model -> json -> model) without losing data" in {
