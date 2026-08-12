@@ -554,7 +554,7 @@ class ConstructionIndustrySchemeConnectorSpec
   "proceedInsufficientVerification" should {
 
     "successfully create verification batch and verifications when BE returns 200" in {
-      val reqest = ProceedInsufficientVerificationRequest(
+      val request = ProceedInsufficientVerificationRequest(
         instanceId = "1",
         verificationBatchResourceRef = 10L,
         verificationResourceRef = 9L,
@@ -565,11 +565,11 @@ class ConstructionIndustrySchemeConnectorSpec
         post(urlPathEqualTo("/cis/verification/proceed-with-insufficient-data")).willReturn(aResponse().withStatus(OK))
       )
 
-      connector.proceedInsufficientVerification(reqest).futureValue mustBe ((): Unit)
+      connector.proceedInsufficientVerification(request).futureValue mustBe ((): Unit)
     }
 
     "propagate upstream error on non-2xx (e.g. 500)" in {
-      val reqest = ProceedInsufficientVerificationRequest(
+      val request = ProceedInsufficientVerificationRequest(
         instanceId = "1",
         verificationBatchResourceRef = 10L,
         verificationResourceRef = 9L,
@@ -581,7 +581,7 @@ class ConstructionIndustrySchemeConnectorSpec
           .willReturn(aResponse().withStatus(INTERNAL_SERVER_ERROR).withBody("boom"))
       )
 
-      val ex = connector.proceedInsufficientVerification(reqest).failed.futureValue
+      val ex = connector.proceedInsufficientVerification(request).failed.futureValue
       ex.getMessage must include("returned 500")
     }
   }
