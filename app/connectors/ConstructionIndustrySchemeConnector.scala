@@ -140,6 +140,19 @@ class ConstructionIndustrySchemeConnector @Inject() (config: ServicesConfig, htt
         response
       }
 
+  def getLastSubmittedVerificationBatch(
+    instanceId: String
+  )(implicit hc: HeaderCarrier): Future[GetLastSubmittedVerificationBatchResponse] =
+    http
+      .get(url"$cisBaseUrl/verification-batch/last/$instanceId")
+      .execute[GetLastSubmittedVerificationBatchResponse]
+      .map { response =>
+        logger.info(
+          s"[ConstructionIndustrySchemeConnector][getLastSubmittedVerificationBatch] instanceId=$instanceId - Response received"
+        )
+        response
+      }
+
   def createVerificationBatchAndVerifications(
     request: CreateVerificationBatchAndVerificationsRequest
   )(implicit hc: HeaderCarrier): Future[CreateVerificationBatchAndVerificationsResponse] =

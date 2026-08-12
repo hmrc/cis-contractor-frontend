@@ -17,9 +17,9 @@
 package controllers.verify
 
 import base.SpecBase
-import models.response.GetNewestVerificationBatchResponse
-import models.{Subcontractor, Verification}
-import pages.verify.NewestVerificationBatchResponsePage
+import models.response.GetLastSubmittedVerificationBatchResponse
+import models.{SubcontractorLastVerification, VerificationLastVerification}
+import pages.verify.LastSubmittedVerificationBatchResponsePage
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import queries.CisIdQuery
@@ -28,44 +28,29 @@ import views.html.verify.VerificationResultsView
 
 class VerificationResultsControllerSpec extends SpecBase {
 
-  private val subcontractor = Subcontractor(
+  private val subcontractor = SubcontractorLastVerification(
     subcontractorId = 1L,
-    firstName = None,
-    secondName = None,
-    surname = None,
-    tradingName = Some("Hooper and Associates"),
-    partnershipTradingName = None,
-    verified = Some("Y"),
-    verificationNumber = Some("V0004528765"),
-    taxTreatment = Some("net"),
-    verificationDate = None,
-    lastMonthlyReturnDate = None,
-    createDate = None,
-    subcontractorType = Some("company"),
     subbieResourceRef = None,
-    utr = None,
-    partnerUtr = None,
-    crn = None,
-    nino = None
+    subcontractorType = Some("company"),
+    utr = None
   )
 
-  private val verification = Verification(
+  private val verification = VerificationLastVerification(
     verificationId = 1L,
-    matched = Some("matched"),
-    verificationNumber = Some("V0004528765"),
-    taxTreatment = Some("net"),
     verificationBatchId = Some(1L),
-    subcontractorId = Some(1L)
+    verificationResourceRef = None,
+    matched = Some("Y"),
+    verificationNumber = Some("V0004528765"),
+    taxTreatment = Some("0"),
+    subcontractorName = Some("Hooper and Associates")
   )
 
-  private val batchResponse = GetNewestVerificationBatchResponse(
+  private val batchResponse = GetLastSubmittedVerificationBatchResponse(
     scheme = None,
     subcontractors = Seq(subcontractor),
-    verificationBatch = None,
     verifications = Seq(verification),
-    submission = None,
-    monthlyReturn = None,
-    monthlyReturnSubmission = None
+    verificationBatch = None,
+    submission = None
   )
 
   "VerificationResults Controller" - {
@@ -73,7 +58,7 @@ class VerificationResultsControllerSpec extends SpecBase {
     "must return OK and the correct view for a GET" in {
       val cisId      = "1"
       val userAnswer = emptyUserAnswers
-        .set(NewestVerificationBatchResponsePage, batchResponse)
+        .set(LastSubmittedVerificationBatchResponsePage, batchResponse)
         .success
         .value
         .set(CisIdQuery, cisId)
