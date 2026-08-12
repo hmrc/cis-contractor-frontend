@@ -97,6 +97,9 @@ GET   /subcontractor/amend/partnership/partnership-information  controllers.amen
 POST  /subcontractor/amend/partnership/partnership-information  controllers.amend.partnership.AmendPartnershipCheckYourAnswersController.onSubmit()
 GET   /subcontractor/amend/partnership/cancel                   controllers.amend.partnership.AmendPartnershipCheckYourAnswersController.onCancel()
 
+GET   /subcontractor/amend/company/remove/information/:subcontractorDetail  controllers.amend.company.AmendCompanyRemoveDetailYesNoController.onPageLoad(subcontractorDetail: String)
+POST  /subcontractor/amend/company/remove/information/:subcontractorDetail  controllers.amend.company.AmendCompanyRemoveDetailYesNoController.onSubmit(subcontractorDetail: String)
+
 GET   /subcontractor/amend/partnership/subcontractor-details-updated  controllers.amend.partnership.AmendPartnershipConfirmationController.onPageLoad()
 
 GET   /subcontractor/amend/company/subcontractor-details-updated  controllers.amend.company.AmendCompanyConfirmationController.onPageLoad()
