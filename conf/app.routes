@@ -82,19 +82,13 @@ POST  /subcontractor/amend/add-contact-details  controllers.add.AddIndividualCon
 GET   /subcontractor/amend/select-contact-details  controllers.add.IndividualContactMethodOptionsController.onPageLoad(mode: Mode = AmendMode)
 POST  /subcontractor/amend/select-contact-details  controllers.add.IndividualContactMethodOptionsController.onSubmit(mode: Mode = AmendMode)
 
-GET   /subcontractor/amend/individual/:cisId/:subbieResourceRef  controllers.amend.AmendIndividualController.onPageLoad(cisId: String, subbieResourceRef: Long)
-
 GET   /subcontractor/amend/remove/information/:subcontractorDetail  controllers.amend.AmendIndividualRemoveDetailYesNoController.onPageLoad(subcontractorDetail: String)
 POST  /subcontractor/amend/remove/information/:subcontractorDetail  controllers.amend.AmendIndividualRemoveDetailYesNoController.onSubmit(subcontractorDetail: String)
 
 GET   /subcontractor/amend/trust/remove/information/:subcontractorDetail  controllers.amend.trust.AmendTrustRemoveDetailYesNoController.onPageLoad(subcontractorDetail: String)
 POST  /subcontractor/amend/trust/remove/information/:subcontractorDetail  controllers.amend.trust.AmendTrustRemoveDetailYesNoController.onSubmit(subcontractorDetail: String)
 
-GET   /subcontractor/amend/partnership/:cisId/:subbieResourceRef  controllers.amend.partnership.AmendPartnershipController.onPageLoad(cisId: String, subbieResourceRef: Long)
-
-GET   /subcontractor/amend/company/:cisId/:subbieResourceRef  controllers.amend.company.AmendCompanyController.onPageLoad(cisId: String, subbieResourceRef: Long)
-
-GET   /subcontractor/amend/trust/:cisId/:subbieResourceRef  controllers.amend.trust.AmendTrustController.onPageLoad(cisId: String, subbieResourceRef: Long)
+GET   /subcontractor/amend/start/:cisId/:subbieResourceRef  controllers.amend.AmendSubcontractorController.onPageLoad(cisId: String, subbieResourceRef: Long)
 
 GET   /subcontractor/amend/subcontractor-information  controllers.amend.AmendIndividualCheckYourAnswersController.onPageLoad()
 POST  /subcontractor/amend/subcontractor-information  controllers.amend.AmendIndividualCheckYourAnswersController.onSubmit()
@@ -125,6 +119,10 @@ POST  /subcontractor/proceed-verifying-subcontractor  controllers.insufficient.P
 
 GET   /subcontractor/remove-subcontractor-from-request  controllers.insufficient.RemoveInsufficientSubcontractorNameYesNoController.onPageLoad(mode: Mode = NormalMode)
 POST  /subcontractor/remove-subcontractor-from-request  controllers.insufficient.RemoveInsufficientSubcontractorNameYesNoController.onSubmit(mode: Mode = NormalMode)
+
+GET   /subcontractor/amend/subcontractor-information  controllers.amend.AmendIndividualCheckYourAnswersController.onPageLoad()
+POST  /subcontractor/amend/subcontractor-information  controllers.amend.AmendIndividualCheckYourAnswersController.onSubmit()
+GET   /subcontractor/amend/cancel              controllers.amend.AmendIndividualCheckYourAnswersController.onCancel()
 
 # Errors & Auth
 GET  /unauthorised/standard-user  controllers.UnauthorisedWrongRoleController.onPageLoad()
@@ -218,6 +216,8 @@ GET   /subcontractor/add/select-contact-details         controllers.add.Individu
 POST  /subcontractor/add/select-contact-details         controllers.add.IndividualContactMethodOptionsController.onSubmit(mode: Mode = NormalMode)
 GET   /subcontractor/add/change-select-contact-details  controllers.add.IndividualContactMethodOptionsController.onPageLoad(mode: Mode = CheckMode)
 POST  /subcontractor/add/change-select-contact-details  controllers.add.IndividualContactMethodOptionsController.onSubmit(mode: Mode = CheckMode)
+
+GET   /subcontractor/amend/individual/subcontractor-details-updated         controllers.amend.AmendIndividualConfirmationController.onPageLoad()
 
 # Company
 GET   /subcontractor/add/company/subcontractor-added  controllers.add.SubcontractorAddedController.companySubcontractorAdded()
@@ -631,7 +631,7 @@ GET   /verify/verification-status/select-subcontractors                  control
 
 GET   /subcontractor/verify/no-verification-results  controllers.verify.NoVerificationResultsController.onPageLoad()
 
-GET   /subcontractor/verify/verification-results                       controllers.verify.VerificationResultsController.onPageLoad()
+GET   /subcontractor/verify/verification-results  controllers.verify.VerificationResultsController.onPageLoad()
 
 # Contractor Details
 GET   /contractor-details/introduction  controllers.contractordetails.ContractorDetailsController.onPageLoad()
