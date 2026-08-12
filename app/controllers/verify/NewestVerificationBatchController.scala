@@ -18,11 +18,9 @@ package controllers.verify
 
 import controllers.AgentClientChecks
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
-import models.NormalMode
-import models.UserAnswers
+import models.{NormalMode, UserAnswers}
 import models.verify.VerificationBatchStatus
-import pages.verify.NewestVerificationBatchResponsePage
-import pages.verify.UnverifiedSubcontractorsPage
+import pages.verify.{NewestVerificationBatchResponsePage, ReverificationDecisionsPage, UnverifiedSubcontractorsPage}
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -105,43 +103,74 @@ class NewestVerificationBatchController @Inject() (
     }
 
   private def routeFromResponse(
+    updatedAnswers: UserAnswers,
     response: models.response.GetNewestVerificationBatchResponse,
     unverified: Seq[models.Subcontractor]
-  ): play.api.mvc.Result =
+  ): Future[play.api.mvc.Result] =
     checkSchemeInactivity(response) match {
       case InactivityStatus.MissingData =>
-        Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+        Future.successful(
+          Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+        )
 
       case InactivityStatus.Inactive =>
-        Redirect(controllers.verify.routes.InactiveSchemeWarningController.onPageLoad())
+        Future.successful(
+          Redirect(
+            controllers.verify.routes.InactiveSchemeWarningController
+              .onPageLoad()
+          )
+        )
 
       case InactivityStatus.Active =>
-        routeFromSubmissionStatus(response, unverified)
+        routeFromSubmissionStatus(
+          updatedAnswers,
+          response,
+          unverified
+        )
     }
 
   private def routeFromSubmissionStatus(
+    updatedAnswers: UserAnswers,
     response: models.response.GetNewestVerificationBatchResponse,
     unverified: Seq[models.Subcontractor]
-  ): play.api.mvc.Result =
+  ): Future[play.api.mvc.Result] =
     checkSubmissionStatus(response) match {
       case SubmissionStatusCheckResult.ShowPendingVerificationWarning =>
-        Redirect(
-          controllers.verify.routes.VerificationRequestInProgressController
-            .onPageLoad()
+        Future.successful(
+          Redirect(
+            controllers.verify.routes.VerificationRequestInProgressController
+              .onPageLoad()
+          )
         )
 
-      case SubmissionStatusCheckResult.CheckUnmatchedSubcontractors
-          if CheckUnmatchedSubcontractorsService
-            .hasAssociatedUnmatchedVerification(
-              response.verifications,
-              response.subcontractors
-            ) =>
-        Redirect(
-          controllers.routes.UnmatchedSubcontractorsController.onPageLoad()
-        )
+      case SubmissionStatusCheckResult.CheckUnmatchedSubcontractors =>
+        val decisions =
+          CheckUnmatchedSubcontractorsService.reverificationDecisions(
+            response.verifications,
+            response.subcontractors
+          )
 
-      case SubmissionStatusCheckResult.Continue | SubmissionStatusCheckResult.CheckUnmatchedSubcontractors =>
-        continueToF4(response, unverified)
+        for {
+          answersWithDecisions <- Future.fromTry(
+                                    updatedAnswers.set(
+                                      ReverificationDecisionsPage,
+                                      decisions
+                                    )
+                                  )
+          _                    <- sessionRepository.set(answersWithDecisions)
+        } yield
+          if (decisions.exists(_.considerForReverification)) {
+            Redirect(
+              controllers.routes.UnmatchedSubcontractorsController.onPageLoad()
+            )
+          } else {
+            continueToF4(response, unverified)
+          }
+
+      case SubmissionStatusCheckResult.Continue =>
+        Future.successful(
+          continueToF4(response, unverified)
+        )
     }
 
   private def continueToF4(
@@ -166,14 +195,23 @@ class NewestVerificationBatchController @Inject() (
           case Right(checkedAnswers) =>
             verificationBatchService
               .refreshNewestVerificationBatch(checkedAnswers)
-              .map { updatedAnswers =>
+              .flatMap { updatedAnswers =>
 
                 val batch      = updatedAnswers.get(NewestVerificationBatchResponsePage)
                 val unverified = updatedAnswers.get(UnverifiedSubcontractorsPage).getOrElse(Seq.empty)
 
                 batch match {
-                  case None           => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-                  case Some(response) => routeFromResponse(response, unverified)
+                  case None =>
+                    Future.successful(
+                      Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+                    )
+
+                  case Some(response) =>
+                    routeFromResponse(
+                      updatedAnswers,
+                      response,
+                      unverified
+                    )
                 }
               }
         }
@@ -190,14 +228,23 @@ class NewestVerificationBatchController @Inject() (
     (identify andThen getData andThen requireData).async { implicit request =>
       verificationBatchService
         .refreshNewestVerificationBatch(request.userAnswers)
-        .map { updatedAnswers =>
+        .flatMap { updatedAnswers =>
 
           val batch      = updatedAnswers.get(NewestVerificationBatchResponsePage)
           val unverified = updatedAnswers.get(UnverifiedSubcontractorsPage).getOrElse(Seq.empty)
 
           batch match {
-            case None           => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-            case Some(response) => routeFromSubmissionStatus(response, unverified)
+            case None =>
+              Future.successful(
+                Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+              )
+
+            case Some(response) =>
+              routeFromSubmissionStatus(
+                updatedAnswers,
+                response,
+                unverified
+              )
           }
         }
         .recover { case t =>

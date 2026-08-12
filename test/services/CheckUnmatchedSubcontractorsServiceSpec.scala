@@ -17,6 +17,7 @@
 package services
 
 import base.SpecBase
+import models.verify.ReverificationDecision
 import models.{Subcontractor, Verification}
 
 class CheckUnmatchedSubcontractorsServiceSpec extends SpecBase {
@@ -27,10 +28,11 @@ class CheckUnmatchedSubcontractorsServiceSpec extends SpecBase {
     verificationNumber: Option[String],
     actionIndicator: Option[String],
     matched: Option[String],
-    verificationResourceRef: Option[Long] = Some(resourceRef)
+    verificationResourceRef: Option[Long] = Some(resourceRef),
+    verificationId: Long = 1L
   ): Verification =
     Verification(
-      verificationId = 1L,
+      verificationId = verificationId,
       matched = matched,
       verificationNumber = verificationNumber,
       taxTreatment = None,
@@ -41,10 +43,11 @@ class CheckUnmatchedSubcontractorsServiceSpec extends SpecBase {
     )
 
   private def subcontractor(
-    subbieResourceRef: Option[Long] = Some(resourceRef)
+    subbieResourceRef: Option[Long] = Some(resourceRef),
+    subcontractorId: Long = 1L
   ): Subcontractor =
     Subcontractor(
-      subcontractorId = 1L,
+      subcontractorId = subcontractorId,
       firstName = None,
       secondName = None,
       surname = None,
@@ -206,6 +209,264 @@ class CheckUnmatchedSubcontractorsServiceSpec extends SpecBase {
           Seq.empty,
           Seq.empty
         ) mustBe false
+    }
+  }
+
+  "CheckUnmatchedSubcontractorsService.reverificationDecisions" - {
+
+    "must retain eligible and ineligible decisions for every verification" in {
+      val eligible = verification(
+        verificationNumber = None,
+        actionIndicator = None,
+        matched = Some("Y"),
+        verificationResourceRef = Some(1001L),
+        verificationId = 1L
+      )
+
+      val alreadyMatched = verification(
+        verificationNumber = Some("V0000000002"),
+        actionIndicator = Some("VERIFY"),
+        matched = Some("Y"),
+        verificationResourceRef = Some(1002L),
+        verificationId = 2L
+      )
+
+      val unsupportedAction = verification(
+        verificationNumber = Some("V0000000003"),
+        actionIndicator = Some("UNKNOWN"),
+        matched = Some("N"),
+        verificationResourceRef = Some(1003L),
+        verificationId = 3L
+      )
+
+      val notAssociated = verification(
+        verificationNumber = None,
+        actionIndicator = None,
+        matched = None,
+        verificationResourceRef = Some(9999L),
+        verificationId = 4L
+      )
+
+      val result =
+        CheckUnmatchedSubcontractorsService.reverificationDecisions(
+          verifications = Seq(
+            eligible,
+            alreadyMatched,
+            unsupportedAction,
+            notAssociated
+          ),
+          subcontractors = Seq(
+            subcontractor(Some(1001L), subcontractorId = 11L),
+            subcontractor(Some(1002L), subcontractorId = 12L),
+            subcontractor(Some(1003L), subcontractorId = 13L)
+          )
+        )
+
+      result mustBe Seq(
+        ReverificationDecision(
+          verificationId = 1L,
+          subcontractorId = Some(11L),
+          considerForReverification = true
+        ),
+        ReverificationDecision(
+          verificationId = 2L,
+          subcontractorId = Some(12L),
+          considerForReverification = false
+        ),
+        ReverificationDecision(
+          verificationId = 3L,
+          subcontractorId = Some(13L),
+          considerForReverification = false
+        ),
+        ReverificationDecision(
+          verificationId = 4L,
+          subcontractorId = None,
+          considerForReverification = false
+        )
+      )
+    }
+
+    "must return an empty decision list when no verifications exist" in {
+      CheckUnmatchedSubcontractorsService.reverificationDecisions(
+        verifications = Seq.empty,
+        subcontractors = Seq(subcontractor())
+      ) mustBe Seq.empty
+    }
+
+    "must store the correct decision for every F3a acceptance criterion" in {
+      val result =
+        CheckUnmatchedSubcontractorsService.reverificationDecisions(
+          verifications = Seq(
+            // No verification number
+            verification(
+              verificationNumber = None,
+              actionIndicator = None,
+              matched = Some("Y"),
+              verificationResourceRef = Some(1001L),
+              verificationId = 1L
+            ),
+
+            // EDIT is eligible regardless of matched
+            verification(
+              verificationNumber = Some("V0000000002"),
+              actionIndicator = Some("EDIT"),
+              matched = Some("Y"),
+              verificationResourceRef = Some(1002L),
+              verificationId = 2L
+            ),
+
+            // MATCH and not matched
+            verification(
+              verificationNumber = Some("V0000000003"),
+              actionIndicator = Some("MATCH"),
+              matched = Some("N"),
+              verificationResourceRef = Some(1003L),
+              verificationId = 3L
+            ),
+
+            // VERIFY and not matched
+            verification(
+              verificationNumber = Some("V0000000004"),
+              actionIndicator = Some("VERIFY"),
+              matched = Some("N"),
+              verificationResourceRef = Some(1004L),
+              verificationId = 4L
+            ),
+
+            // MATCH and already matched
+            verification(
+              verificationNumber = Some("V0000000005"),
+              actionIndicator = Some("MATCH"),
+              matched = Some("Y"),
+              verificationResourceRef = Some(1005L),
+              verificationId = 5L
+            ),
+
+            // VERIFY and already matched
+            verification(
+              verificationNumber = Some("V0000000006"),
+              actionIndicator = Some("VERIFY"),
+              matched = Some("Y"),
+              verificationResourceRef = Some(1006L),
+              verificationId = 6L
+            ),
+
+            // Action does not support reverification
+            verification(
+              verificationNumber = Some("V0000000007"),
+              actionIndicator = Some("UNKNOWN"),
+              matched = Some("N"),
+              verificationResourceRef = Some(1007L),
+              verificationId = 7L
+            )
+          ),
+          subcontractors = Seq(
+            subcontractor(Some(1001L), subcontractorId = 11L),
+            subcontractor(Some(1002L), subcontractorId = 12L),
+            subcontractor(Some(1003L), subcontractorId = 13L),
+            subcontractor(Some(1004L), subcontractorId = 14L),
+            subcontractor(Some(1005L), subcontractorId = 15L),
+            subcontractor(Some(1006L), subcontractorId = 16L),
+            subcontractor(Some(1007L), subcontractorId = 17L)
+          )
+        )
+
+      result mustBe Seq(
+        ReverificationDecision(1L, Some(11L), considerForReverification = true),
+        ReverificationDecision(2L, Some(12L), considerForReverification = true),
+        ReverificationDecision(3L, Some(13L), considerForReverification = true),
+        ReverificationDecision(4L, Some(14L), considerForReverification = true),
+        ReverificationDecision(5L, Some(15L), considerForReverification = false),
+        ReverificationDecision(6L, Some(16L), considerForReverification = false),
+        ReverificationDecision(7L, Some(17L), considerForReverification = false)
+      )
+    }
+
+    "must store false when an unmatched verification has no associated subcontractor" in {
+      val result =
+        CheckUnmatchedSubcontractorsService.reverificationDecisions(
+          verifications = Seq(
+            verification(
+              verificationNumber = None,
+              actionIndicator = None,
+              matched = None,
+              verificationResourceRef = Some(2001L),
+              verificationId = 1L
+            )
+          ),
+          subcontractors = Seq(
+            subcontractor(
+              subbieResourceRef = Some(1001L),
+              subcontractorId = 11L
+            )
+          )
+        )
+
+      result mustBe Seq(
+        ReverificationDecision(
+          verificationId = 1L,
+          subcontractorId = None,
+          considerForReverification = false
+        )
+      )
+    }
+
+    "must store false when verificationResourceRef is missing" in {
+      val result =
+        CheckUnmatchedSubcontractorsService.reverificationDecisions(
+          verifications = Seq(
+            verification(
+              verificationNumber = None,
+              actionIndicator = None,
+              matched = None,
+              verificationResourceRef = None,
+              verificationId = 1L
+            )
+          ),
+          subcontractors = Seq(
+            subcontractor(
+              subbieResourceRef = Some(1001L),
+              subcontractorId = 11L
+            )
+          )
+        )
+
+      result mustBe Seq(
+        ReverificationDecision(
+          verificationId = 1L,
+          subcontractorId = None,
+          considerForReverification = false
+        )
+      )
+    }
+
+    "must normalise case and whitespace when applying the rules" in {
+      val result =
+        CheckUnmatchedSubcontractorsService.reverificationDecisions(
+          verifications = Seq(
+            verification(
+              verificationNumber = Some(" V0000000001 "),
+              actionIndicator = Some(" verify "),
+              matched = Some(" n "),
+              verificationResourceRef = Some(1001L),
+              verificationId = 1L
+            )
+          ),
+          subcontractors = Seq(
+            subcontractor(
+              subbieResourceRef = Some(1001L),
+              subcontractorId = 11L
+            )
+          )
+        )
+
+      result mustBe Seq(
+        ReverificationDecision(
+          verificationId = 1L,
+          subcontractorId = Some(11L),
+          considerForReverification = true
+        )
+      )
     }
   }
 }

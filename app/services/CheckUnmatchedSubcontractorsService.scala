@@ -16,26 +16,45 @@
 
 package services
 
+import models.verify.ReverificationDecision
 import models.{Subcontractor, Verification}
 
 object CheckUnmatchedSubcontractorsService {
 
-  def hasAssociatedUnmatchedVerification(
+  def reverificationDecisions(
     verifications: Seq[Verification],
     subcontractors: Seq[Subcontractor]
-  ): Boolean = {
-    val subcontractorResourceRefs =
-      subcontractors.flatMap(_.subbieResourceRef).toSet
+  ): Seq[ReverificationDecision] = {
+    val subcontractorsByResourceRef =
+      subcontractors.flatMap { subcontractor =>
+        subcontractor.subbieResourceRef.map(_ -> subcontractor)
+      }.toMap
 
-    verifications.exists { verification =>
-      isUnmatched(verification) &&
-      verification.verificationResourceRef.exists(
-        subcontractorResourceRefs.contains
+    verifications.map { verification =>
+      val associatedSubcontractor =
+        verification.verificationResourceRef.flatMap(
+          subcontractorsByResourceRef.get
+        )
+
+      ReverificationDecision(
+        verificationId = verification.verificationId,
+        subcontractorId = associatedSubcontractor.map(_.subcontractorId),
+        considerForReverification = associatedSubcontractor.isDefined &&
+          shouldConsiderForReverification(verification)
       )
     }
   }
 
-  private def isUnmatched(verification: Verification): Boolean = {
+  def hasAssociatedUnmatchedVerification(
+    verifications: Seq[Verification],
+    subcontractors: Seq[Subcontractor]
+  ): Boolean =
+    reverificationDecisions(verifications, subcontractors)
+      .exists(_.considerForReverification)
+
+  private def shouldConsiderForReverification(
+    verification: Verification
+  ): Boolean = {
     val verificationNumberExists =
       normalise(verification.verificationNumber).isDefined
 

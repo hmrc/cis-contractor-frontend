@@ -20,13 +20,14 @@ import base.SpecBase
 import controllers.routes
 import models.response.GetNewestVerificationBatchResponse
 import models.{MonthlyReturn, MonthlyReturnSubmission, NormalMode, Subcontractor, Submission, UserAnswers, Verification}
+import models.verify.ReverificationDecision
 import generators.ModelGenerators
 import models.agent.AgentClientData
+import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{never, verify, verifyNoMoreInteractions, when}
 import org.scalatestplus.mockito.MockitoSugar
-import pages.verify.NewestVerificationBatchResponsePage
-import pages.verify.UnverifiedSubcontractorsPage
+import pages.verify.{NewestVerificationBatchResponsePage, ReverificationDecisionsPage, UnverifiedSubcontractorsPage}
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.FakeRequest
@@ -112,9 +113,11 @@ class NewestVerificationBatchControllerSpec extends SpecBase with MockitoSugar w
 
   // Builds the test application with the shared agent/client checks stubbed for the (default)
   // non-agent path, so the request proceeds through to refreshNewestVerificationBatch.
-  private def appBuilder(mockService: VerificationService): GuiceApplicationBuilder = {
+  private def appBuilder(
+    mockService: VerificationService,
+    mockSessionRepository: SessionRepository = mock[SessionRepository]
+  ): GuiceApplicationBuilder = {
     val mockCisManagerService = mock[CisManageService]
-    val mockSessionRepository = mock[SessionRepository]
 
     when(mockCisManagerService.ensureCisIdInUserAnswers(any[UserAnswers])(any[HeaderCarrier]))
       .thenReturn(Future.successful(emptyUserAnswers))
@@ -940,7 +943,7 @@ class NewestVerificationBatchControllerSpec extends SpecBase with MockitoSugar w
       }
     }
 
-    "must redirect to JourneyRecovery when batch status is unrecognised" in {
+    "must treat an unrecognised status as Continue and redirect to SelectSubcontractor" in {
       val mockService = mock[VerificationService]
 
       when(
@@ -1319,6 +1322,7 @@ class NewestVerificationBatchControllerSpec extends SpecBase with MockitoSugar w
         verifyNoMoreInteractions(mockService)
       }
     }
+
     "must redirect to VerificationRequestInProgress when status is ACCEPTED" in {
       val mockService = mock[VerificationService]
 
@@ -1362,6 +1366,219 @@ class NewestVerificationBatchControllerSpec extends SpecBase with MockitoSugar w
           verify(mockService).refreshNewestVerificationBatch(any[UserAnswers])(any[HeaderCarrier])
           verifyNoMoreInteractions(mockService)
         }
+      }
+    }
+
+    "must persist every reverification decision before redirecting to CS-12" in {
+      val mockService           = mock[VerificationService]
+      val mockSessionRepository = mock[SessionRepository]
+
+      val eligibleVerification =
+        unmatchedVerification(verificationResourceRef)
+
+      val ineligibleVerification =
+        unmatchedVerification(verificationResourceRef).copy(
+          verificationId = 2L,
+          matched = Some("Y")
+        )
+
+      val updatedAnswers =
+        emptyUserAnswers
+          .set(
+            NewestVerificationBatchResponsePage,
+            newestBatchResponse(
+              subcontractors = Seq(associatedUnverifiedSubcontractor),
+              verifications = Seq(
+                eligibleVerification,
+                ineligibleVerification
+              ),
+              monthlyReturn = Some(activeMonthlyReturn),
+              status = Some("SUBMITTED")
+            )
+          )
+          .flatMap(
+            _.set(
+              UnverifiedSubcontractorsPage,
+              Seq(associatedUnverifiedSubcontractor)
+            )
+          )
+          .success
+          .value
+
+      when(
+        mockService
+          .refreshNewestVerificationBatch(any[UserAnswers])(
+            any[HeaderCarrier]
+          )
+      ).thenReturn(Future.successful(updatedAnswers))
+
+      val application =
+        appBuilder(
+          mockService,
+          mockSessionRepository
+        ).build()
+
+      running(application) {
+        val result =
+          route(application, FakeRequest(GET, continueUrl)).value
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result).value mustBe
+          routes.UnmatchedSubcontractorsController.onPageLoad().url
+
+        val captor: ArgumentCaptor[UserAnswers] =
+          ArgumentCaptor.forClass(classOf[UserAnswers])
+
+        verify(mockSessionRepository).set(captor.capture())
+
+        captor.getValue.get(ReverificationDecisionsPage) mustBe Some(
+          Seq(
+            ReverificationDecision(
+              verificationId = 1L,
+              subcontractorId = Some(associatedUnverifiedSubcontractor.subcontractorId),
+              considerForReverification = true
+            ),
+            ReverificationDecision(
+              verificationId = 2L,
+              subcontractorId = Some(associatedUnverifiedSubcontractor.subcontractorId),
+              considerForReverification = false
+            )
+          )
+        )
+      }
+    }
+
+    "must persist ineligible decisions and continue to F4 when no verification can be reconsidered" in {
+      val mockService           = mock[VerificationService]
+      val mockSessionRepository = mock[SessionRepository]
+
+      val ineligibleVerification =
+        unmatchedVerification(verificationResourceRef).copy(
+          verificationNumber = Some("V0000000001"),
+          actionIndicator = Some("VERIFY"),
+          matched = Some("Y")
+        )
+
+      val updatedAnswers =
+        emptyUserAnswers
+          .set(
+            NewestVerificationBatchResponsePage,
+            newestBatchResponse(
+              subcontractors = Seq(associatedUnverifiedSubcontractor),
+              verifications = Seq(ineligibleVerification),
+              monthlyReturn = Some(activeMonthlyReturn),
+              status = Some("SUBMITTED")
+            )
+          )
+          .flatMap(
+            _.set(
+              UnverifiedSubcontractorsPage,
+              Seq(associatedUnverifiedSubcontractor)
+            )
+          )
+          .success
+          .value
+
+      when(
+        mockService
+          .refreshNewestVerificationBatch(any[UserAnswers])(
+            any[HeaderCarrier]
+          )
+      ).thenReturn(Future.successful(updatedAnswers))
+
+      val application =
+        appBuilder(
+          mockService,
+          mockSessionRepository
+        ).build()
+
+      running(application) {
+        val result =
+          route(application, FakeRequest(GET, continueUrl)).value
+
+        status(result) mustBe SEE_OTHER
+
+        redirectLocation(result).value mustBe
+          controllers.verify.routes.SelectSubcontractorController
+            .onPageLoad(NormalMode)
+            .url
+
+        val captor =
+          ArgumentCaptor.forClass(classOf[UserAnswers])
+
+        verify(mockSessionRepository).set(captor.capture())
+
+        captor.getValue
+          .get(ReverificationDecisionsPage)
+          .value mustBe Seq(
+          ReverificationDecision(
+            verificationId = ineligibleVerification.verificationId,
+            subcontractorId = Some(associatedUnverifiedSubcontractor.subcontractorId),
+            considerForReverification = false
+          )
+        )
+      }
+    }
+
+    "must redirect to JourneyRecovery when persisting reverification decisions fails" in {
+      val mockService           = mock[VerificationService]
+      val mockSessionRepository = mock[SessionRepository]
+
+      val eligibleVerification =
+        unmatchedVerification(verificationResourceRef)
+
+      val updatedAnswers =
+        emptyUserAnswers
+          .set(
+            NewestVerificationBatchResponsePage,
+            newestBatchResponse(
+              subcontractors = Seq(associatedUnverifiedSubcontractor),
+              verifications = Seq(eligibleVerification),
+              monthlyReturn = Some(activeMonthlyReturn),
+              status = Some("SUBMITTED")
+            )
+          )
+          .flatMap(
+            _.set(
+              UnverifiedSubcontractorsPage,
+              Seq(associatedUnverifiedSubcontractor)
+            )
+          )
+          .success
+          .value
+
+      when(
+        mockService
+          .refreshNewestVerificationBatch(any[UserAnswers])(
+            any[HeaderCarrier]
+          )
+      ).thenReturn(Future.successful(updatedAnswers))
+
+      val builder =
+        appBuilder(
+          mockService,
+          mockSessionRepository
+        )
+
+      when(mockSessionRepository.set(any()))
+        .thenReturn(Future.failed(new RuntimeException("Unable to save decisions")))
+
+      val application = builder.build()
+
+      running(application) {
+        val result =
+          route(application, FakeRequest(GET, continueUrl)).value
+
+        status(result) mustBe SEE_OTHER
+
+        redirectLocation(result).value mustBe
+          routes.JourneyRecoveryController.onPageLoad().url
+
+        verify(mockSessionRepository).set(any())
+        verify(mockService)
+          .refreshNewestVerificationBatch(any[UserAnswers])(
+            any[HeaderCarrier]
+          )
       }
     }
   }
