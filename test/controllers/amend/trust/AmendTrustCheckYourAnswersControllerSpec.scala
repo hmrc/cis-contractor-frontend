@@ -384,7 +384,7 @@ class AmendTrustCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
       verifyNoInteractions(mockSubcontractorService)
     }
 
-    "must redirect to Manage Your Subcontractors when no changes have been made" in {
+    "must clear answers and redirect to Manage Your Subcontractors when no changes have been made" in {
       val cisId = "cis-123"
 
       val ua =
@@ -398,6 +398,9 @@ class AmendTrustCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
 
       val mockSubcontractorService = mock[SubcontractorService]
       val mockSessionRepository    = mock[SessionRepository]
+
+      when(mockSessionRepository.set(any[UserAnswers]))
+        .thenReturn(Future.successful(true))
 
       AmendmentHelper.trustHasChanges(ua) mustBe false
 
@@ -429,7 +432,12 @@ class AmendTrustCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
       }
 
       verifyNoInteractions(mockSubcontractorService)
-      verifyNoInteractions(mockSessionRepository)
+
+      val captor = ArgumentCaptor.forClass(classOf[UserAnswers])
+      verify(mockSessionRepository).set(captor.capture())
+
+      captor.getValue.id mustBe ua.id
+      captor.getValue.get(CisIdQuery) mustBe None
     }
 
     "must redirect to Journey Recovery when the service fails" in {

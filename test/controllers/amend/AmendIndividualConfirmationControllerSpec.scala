@@ -14,61 +14,73 @@
  * limitations under the License.
  */
 
-package controllers.amend.trust
+package controllers.amend
 
 import base.SpecBase
 import models.UserAnswers
-import models.amend.trust.OriginalTrustAnswers
+import models.add.SubcontractorName
+import models.amend.OriginalIndividualAnswers
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.*
 import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.mockito.MockitoSugar
-import pages.add.trust.TrustNamePage
+import pages.add.SubcontractorNamePage
 import pages.amend.AmendCheckYourAnswersSubmittedPage
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import queries.{CisIdQuery, OriginalTrustAnswersQuery}
+import queries.{CisIdQuery, OriginalIndividualAnswersQuery}
 import repositories.SessionRepository
 import utils.DefaultSubcontractorCleanupService
-import viewmodels.amend.trust.TrustAmendConfirmationViewModel
+import viewmodels.amend.IndividualAmendedViewModel
 import views.html.amend.AmendConfirmationView
 
 import scala.concurrent.Future
 import scala.util.{Failure, Success}
 
-class AmendTrustConfirmationControllerSpec extends SpecBase with MockitoSugar with BeforeAndAfterEach {
+class AmendIndividualConfirmationControllerSpec extends SpecBase with MockitoSugar with BeforeAndAfterEach {
 
   private val cisId = "123456789"
 
-  private val trustName = "ABC Trust"
+  private val subcontractorName =
+    SubcontractorName(
+      firstName = "John",
+      middleName = Some("A"),
+      lastName = "Smith"
+    )
+
+  private val displayName = "John Smith"
 
   private val original =
-    OriginalTrustAnswers(
-      trustName = Some(trustName),
+    OriginalIndividualAnswers(
+      usesTradingName = Some(false),
+      tradingName = None,
+      subcontractorName = Some(subcontractorName),
       addressYesNo = None,
       address = None,
-      trustContactMethodsYesNo = None,
-      trustContactMethod = Set.empty,
+      individualContactMethodsYesNo = None,
+      individualContactMethod = Set.empty,
       email = None,
       phone = None,
       mobile = None,
       utrYesNo = None,
       utr = None,
+      ninoYesNo = None,
+      nino = None,
       worksReferenceYesNo = None,
       worksReference = None,
       verificationNumber = None
     )
 
-  private def userAnswersWithOriginal: UserAnswers =
+  private def userAnswersWithOriginal =
     emptyUserAnswers
-      .set(OriginalTrustAnswersQuery, original)
+      .set(OriginalIndividualAnswersQuery, original)
       .success
       .value
       .set(CisIdQuery, cisId)
       .success
       .value
-      .set(TrustNamePage, trustName)
+      .set(SubcontractorNamePage, subcontractorName)
       .success
       .value
       .set(AmendCheckYourAnswersSubmittedPage, true)
@@ -76,9 +88,7 @@ class AmendTrustConfirmationControllerSpec extends SpecBase with MockitoSugar wi
       .value
 
   private lazy val confirmationRoute =
-    controllers.amend.trust.routes.AmendTrustConfirmationController
-      .onPageLoad()
-      .url
+    controllers.amend.routes.AmendIndividualConfirmationController.onPageLoad().url
 
   private val mockCleanupService =
     mock[DefaultSubcontractorCleanupService]
@@ -99,7 +109,7 @@ class AmendTrustConfirmationControllerSpec extends SpecBase with MockitoSugar wi
       )
       .build()
 
-  "AmendTrustConfirmationController" - {
+  "AmendIndividualConfirmationController" - {
 
     "must return OK and the correct view for a GET" in {
 
@@ -116,84 +126,21 @@ class AmendTrustConfirmationControllerSpec extends SpecBase with MockitoSugar wi
         val request = FakeRequest(GET, confirmationRoute)
         val result  = route(app, request).value
 
-        val view =
-          app.injector.instanceOf[AmendConfirmationView]
+        val view = app.injector.instanceOf[AmendConfirmationView]
 
         status(result) mustEqual OK
 
         contentAsString(result) mustEqual
           view(
-            TrustAmendConfirmationViewModel.rows(
+            IndividualAmendedViewModel.rows(
               original,
               userAnswersWithOriginal
             )(messages(app)),
-            trustName
+            displayName
           )(request, messages(app)).toString
 
-        verify(mockCleanupService).cleanAmend(any[UserAnswers])
-        verify(mockSessionRepository).set(any[UserAnswers])
-      }
-    }
-
-    "must redirect to Journey Recovery when accessed without prior CYA submission" in {
-
-      val userAnswers =
-        emptyUserAnswers
-          .set(OriginalTrustAnswersQuery, original)
-          .success
-          .value
-          .set(CisIdQuery, cisId)
-          .success
-          .value
-          .set(TrustNamePage, trustName)
-          .success
-          .value
-
-      val app = application(userAnswers)
-
-      running(app) {
-
-        val request = FakeRequest(GET, confirmationRoute)
-        val result  = route(app, request).value
-
-        status(result) mustEqual SEE_OTHER
-
-        redirectLocation(result).value mustEqual
-          controllers.routes.JourneyRecoveryController
-            .onPageLoad()
-            .url
-
-        verifyNoInteractions(mockCleanupService)
-        verifyNoInteractions(mockSessionRepository)
-      }
-    }
-
-    "must redirect to Journey Recovery when not submitted" in {
-
-      val userAnswers =
-        emptyUserAnswers
-          .set(CisIdQuery, cisId)
-          .success
-          .value
-          .set(TrustNamePage, trustName)
-          .success
-          .value
-          .set(AmendCheckYourAnswersSubmittedPage, false)
-          .success
-          .value
-
-      val application =
-        applicationBuilder(userAnswers = Some(userAnswers)).build()
-
-      running(application) {
-
-        val request = FakeRequest(GET, confirmationRoute)
-        val result  = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-
-        redirectLocation(result).value mustEqual
-          controllers.routes.JourneyRecoveryController.onPageLoad().url
+        verify(mockCleanupService).cleanAmend(any())
+        verify(mockSessionRepository).set(any())
       }
     }
 
@@ -204,10 +151,7 @@ class AmendTrustConfirmationControllerSpec extends SpecBase with MockitoSugar wi
           .set(CisIdQuery, cisId)
           .success
           .value
-          .set(TrustNamePage, trustName)
-          .success
-          .value
-          .set(AmendCheckYourAnswersSubmittedPage, true)
+          .set(SubcontractorNamePage, subcontractorName)
           .success
           .value
 
@@ -221,12 +165,7 @@ class AmendTrustConfirmationControllerSpec extends SpecBase with MockitoSugar wi
         status(result) mustEqual SEE_OTHER
 
         redirectLocation(result).value mustEqual
-          controllers.routes.JourneyRecoveryController
-            .onPageLoad()
-            .url
-
-        verifyNoInteractions(mockCleanupService)
-        verifyNoInteractions(mockSessionRepository)
+          controllers.routes.JourneyRecoveryController.onPageLoad().url
       }
     }
 
@@ -234,13 +173,10 @@ class AmendTrustConfirmationControllerSpec extends SpecBase with MockitoSugar wi
 
       val userAnswers =
         emptyUserAnswers
-          .set(OriginalTrustAnswersQuery, original)
+          .set(OriginalIndividualAnswersQuery, original)
           .success
           .value
-          .set(TrustNamePage, trustName)
-          .success
-          .value
-          .set(AmendCheckYourAnswersSubmittedPage, true)
+          .set(SubcontractorNamePage, subcontractorName)
           .success
           .value
 
@@ -254,9 +190,35 @@ class AmendTrustConfirmationControllerSpec extends SpecBase with MockitoSugar wi
         status(result) mustEqual SEE_OTHER
 
         redirectLocation(result).value mustEqual
-          controllers.routes.JourneyRecoveryController
-            .onPageLoad()
-            .url
+          controllers.routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must redirect to Journey Recovery when accessed without prior CYA submission" in {
+
+      val userAnswers =
+        emptyUserAnswers
+          .set(OriginalIndividualAnswersQuery, original)
+          .success
+          .value
+          .set(CisIdQuery, cisId)
+          .success
+          .value
+          .set(SubcontractorNamePage, subcontractorName)
+          .success
+          .value
+
+      val app = application(userAnswers)
+
+      running(app) {
+
+        val request = FakeRequest(GET, confirmationRoute)
+        val result  = route(app, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(result).value mustEqual
+          controllers.routes.JourneyRecoveryController.onPageLoad().url
 
         verifyNoInteractions(mockCleanupService)
         verifyNoInteractions(mockSessionRepository)
@@ -264,11 +226,8 @@ class AmendTrustConfirmationControllerSpec extends SpecBase with MockitoSugar wi
     }
 
     "must redirect to Journey Recovery when cleanup fails" in {
-
       when(mockCleanupService.cleanAmend(any[UserAnswers]))
-        .thenReturn(
-          Failure(new RuntimeException("cleanup failed"))
-        )
+        .thenReturn(Failure(new RuntimeException("cleanup failed")))
 
       val app = application(userAnswersWithOriginal)
 
@@ -280,12 +239,9 @@ class AmendTrustConfirmationControllerSpec extends SpecBase with MockitoSugar wi
         status(result) mustEqual SEE_OTHER
 
         redirectLocation(result).value mustEqual
-          controllers.routes.JourneyRecoveryController
-            .onPageLoad()
-            .url
+          controllers.routes.JourneyRecoveryController.onPageLoad().url
 
-        verify(mockCleanupService).cleanAmend(any[UserAnswers])
-        verify(mockSessionRepository, never()).set(any[UserAnswers])
+        verify(mockSessionRepository, never()).set(any())
       }
     }
   }
