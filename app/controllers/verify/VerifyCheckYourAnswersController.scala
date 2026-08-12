@@ -19,7 +19,9 @@ package controllers.verify
 import controllers.actions.*
 import models.verify.ValidatedVerify
 import play.api.Logging
-import play.api.i18n.{I18nSupport, MessagesApi}
+import play.api.i18n.I18nSupport
+import pages.verify.VerificationDeclarationPage
+import repositories.SessionRepository
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.checkAnswers.verify.*
@@ -27,16 +29,17 @@ import viewmodels.govuk.summarylist.*
 import views.html.verify.VerifyCheckYourAnswersView
 
 import javax.inject.Inject
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 class VerifyCheckYourAnswersController @Inject() (
-  override val messagesApi: MessagesApi,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
+  sessionRepository: SessionRepository,
   val controllerComponents: MessagesControllerComponents,
   view: VerifyCheckYourAnswersView
-) extends FrontendBaseController
+)(implicit ec: ExecutionContext)
+    extends FrontendBaseController
     with I18nSupport
     with Logging {
 
@@ -64,13 +67,21 @@ class VerifyCheckYourAnswersController @Inject() (
   def onSubmit(): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
       ValidatedVerify.build(request.userAnswers) match {
+
         case Right(_) =>
-          Future.successful(
-            Redirect(controllers.verify.routes.SubmissionSendingController.onPageLoad())
+          for {
+            updatedAnswers <- Future.fromTry(
+                                request.userAnswers.set(VerificationDeclarationPage, true)
+                              )
+            _              <- sessionRepository.set(updatedAnswers)
+          } yield Redirect(
+            controllers.verify.routes.SubmissionSendingController.onPageLoad()
           )
 
         case Left(error) =>
-          logger.error(s"[VerifyCheckYourAnswersController.onSubmit] Validation failed: $error")
+          logger.error(
+            s"[VerifyCheckYourAnswersController.onSubmit] Validation failed: $error"
+          )
           Future.successful(
             Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
           )
