@@ -107,7 +107,7 @@ class PartnershipHasUtrYesNoSummarySpec extends SpecBase with GuiceOneAppPerSuit
           .success
           .value
 
-      val maybeRow = PartnershipHasUtrYesNoSummary.row(ua)
+      val maybeRow = PartnershipHasUtrYesNoSummary.row(ua, AmendMode)
       maybeRow must not be empty
 
       val row: SummaryListRow = maybeRow.value
@@ -121,7 +121,7 @@ class PartnershipHasUtrYesNoSummarySpec extends SpecBase with GuiceOneAppPerSuit
 
       val action: ActionItem = actions.items.head
       action.href mustBe controllers.add.partnership.routes.PartnershipHasUtrYesNoController
-        .onPageLoad(CheckMode)
+        .onPageLoad(AmendMode)
         .url
       action.content mustBe Text(messages("site.change"))
       action.visuallyHiddenText mustBe Some(messages("partnershipHasUtrYesNo.change.hidden"))

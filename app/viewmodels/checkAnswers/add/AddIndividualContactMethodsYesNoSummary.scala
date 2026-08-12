@@ -16,6 +16,7 @@
 
 package viewmodels.checkAnswers.add
 
+import models.amend.AmendIndividualRemoveDetail
 import models.{AmendMode, CheckMode, Mode, UserAnswers}
 import pages.add.AddIndividualContactMethodsYesNoPage
 import play.api.i18n.Messages
@@ -37,7 +38,9 @@ object AddIndividualContactMethodsYesNoSummary {
           ActionItemViewModel(
             "site.change",
             if answer && mode == AmendMode then
-              controllers.amend.routes.AmendIndividualRemoveDetailYesNoController.onPageLoad("contact-details").url
+              controllers.amend.routes.AmendIndividualRemoveDetailYesNoController
+                .onPageLoad(AmendIndividualRemoveDetail.ContactDetails.key)
+                .url
             else controllers.add.routes.AddIndividualContactMethodsYesNoController.onPageLoad(mode).url
           )
             .withVisuallyHiddenText(messages("addIndividualContactMethodsYesNo.change.hidden"))

@@ -32,7 +32,7 @@ class PartnershipNominatedPartnerUtrYesNoSummarySpec extends AnyFreeSpec with Ma
 
   implicit val messages: Messages = stubMessages()
 
-  "PartnershipWorksReferenceNumberYesNoSummary.row" - {
+  "PartnershipNominatedPartnerUtrYesNoSummary.row" - {
 
     "must return a SummaryListRow with 'Yes' when the answer is true" in {
       val answers = UserAnswers("test-id")

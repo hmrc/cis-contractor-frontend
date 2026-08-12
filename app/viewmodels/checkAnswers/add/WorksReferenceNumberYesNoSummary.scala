@@ -16,6 +16,7 @@
 
 package viewmodels.checkAnswers.add
 
+import models.amend.AmendIndividualRemoveDetail
 import models.{AmendMode, CheckMode, Mode, UserAnswers}
 import pages.add.WorksReferenceNumberYesNoPage
 import play.api.i18n.Messages
@@ -38,7 +39,7 @@ object WorksReferenceNumberYesNoSummary {
             "site.change",
             if answer && mode == AmendMode then
               controllers.amend.routes.AmendIndividualRemoveDetailYesNoController
-                .onPageLoad("works-reference-number")
+                .onPageLoad(AmendIndividualRemoveDetail.WorksReferenceNumber.key)
                 .url
             else controllers.add.routes.WorksReferenceNumberYesNoController.onPageLoad(mode).url
           )

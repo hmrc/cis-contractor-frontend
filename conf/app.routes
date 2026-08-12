@@ -120,9 +120,9 @@ POST  /subcontractor/proceed-verifying-subcontractor  controllers.insufficient.P
 GET   /subcontractor/remove-subcontractor-from-request  controllers.insufficient.RemoveInsufficientSubcontractorNameYesNoController.onPageLoad(mode: Mode = NormalMode)
 POST  /subcontractor/remove-subcontractor-from-request  controllers.insufficient.RemoveInsufficientSubcontractorNameYesNoController.onSubmit(mode: Mode = NormalMode)
 
-GET   /subcontractor/amend/subcontractor-information  controllers.amend.AmendIndividualCheckYourAnswersController.onPageLoad()
-POST  /subcontractor/amend/subcontractor-information  controllers.amend.AmendIndividualCheckYourAnswersController.onSubmit()
-GET   /subcontractor/amend/cancel              controllers.amend.AmendIndividualCheckYourAnswersController.onCancel()
+GET   /subcontractor/amend/cancel  controllers.amend.AmendIndividualCheckYourAnswersController.onCancel()
+
+GET   /subcontractor/amend/individual/subcontractor-details-updated  controllers.amend.AmendIndividualConfirmationController.onPageLoad()
 
 # Errors & Auth
 GET  /unauthorised/standard-user  controllers.UnauthorisedWrongRoleController.onPageLoad()
@@ -216,8 +216,6 @@ GET   /subcontractor/add/select-contact-details         controllers.add.Individu
 POST  /subcontractor/add/select-contact-details         controllers.add.IndividualContactMethodOptionsController.onSubmit(mode: Mode = NormalMode)
 GET   /subcontractor/add/change-select-contact-details  controllers.add.IndividualContactMethodOptionsController.onPageLoad(mode: Mode = CheckMode)
 POST  /subcontractor/add/change-select-contact-details  controllers.add.IndividualContactMethodOptionsController.onSubmit(mode: Mode = CheckMode)
-
-GET   /subcontractor/amend/individual/subcontractor-details-updated         controllers.amend.AmendIndividualConfirmationController.onPageLoad()
 
 # Company
 GET   /subcontractor/add/company/subcontractor-added  controllers.add.SubcontractorAddedController.companySubcontractorAdded()

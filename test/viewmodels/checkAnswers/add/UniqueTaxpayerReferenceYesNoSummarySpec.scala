@@ -17,6 +17,7 @@
 package viewmodels.checkAnswers.add
 
 import controllers.add.routes
+import models.amend.AmendIndividualRemoveDetail
 import models.{AmendMode, CheckMode, UserAnswers}
 import org.scalatest.OptionValues.convertOptionToValuable
 import org.scalatest.TryValues.convertTryToSuccessOrFailure
@@ -90,7 +91,9 @@ class UniqueTaxpayerReferenceYesNoSummarySpec extends AnyFreeSpec with Matchers 
 
       val changeAction       = actions.head
       val expectedChangeText = messages("site.change")
-      val expectedHref       = controllers.amend.routes.AmendIndividualRemoveDetailYesNoController.onPageLoad("utr").url
+      val expectedHref       = controllers.amend.routes.AmendIndividualRemoveDetailYesNoController
+        .onPageLoad(AmendIndividualRemoveDetail.Utr.key)
+        .url
       val expectedHiddenText = messages("uniqueTaxpayerReferenceYesNo.change.hidden")
 
       changeAction.content.asHtml.toString    should include(expectedChangeText)

@@ -17,6 +17,7 @@
 package viewmodels.checkAnswers.add
 
 import controllers.add.routes
+import models.amend.AmendIndividualRemoveDetail
 import models.{AmendMode, CheckMode, UserAnswers}
 import org.scalatest.OptionValues.convertOptionToValuable
 import org.scalatest.TryValues.convertTryToSuccessOrFailure
@@ -91,7 +92,7 @@ class NationalInsuranceNumberYesNoSummarySpec extends AnyFreeSpec with Matchers 
       val changeAction       = actions.head
       val expectedChangeText = messages("site.change")
       val expectedHref       = controllers.amend.routes.AmendIndividualRemoveDetailYesNoController
-        .onPageLoad("national-insurance-number")
+        .onPageLoad(AmendIndividualRemoveDetail.NationalInsuranceNumber.key)
         .url
       val expectedHiddenText = messages("nationalInsuranceNumberYesNo.change.hidden")
 

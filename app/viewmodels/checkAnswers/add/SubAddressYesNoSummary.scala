@@ -16,6 +16,7 @@
 
 package viewmodels.checkAnswers.add
 
+import models.amend.AmendIndividualRemoveDetail
 import models.{AmendMode, CheckMode, Mode, UserAnswers}
 import pages.add.SubAddressYesNoPage
 import play.api.i18n.Messages
@@ -37,7 +38,9 @@ object SubAddressYesNoSummary {
           ActionItemViewModel(
             "site.change",
             if answer && mode == AmendMode then
-              controllers.amend.routes.AmendIndividualRemoveDetailYesNoController.onPageLoad("address").url
+              controllers.amend.routes.AmendIndividualRemoveDetailYesNoController
+                .onPageLoad(AmendIndividualRemoveDetail.Address.key)
+                .url
             else controllers.add.routes.SubAddressYesNoController.onPageLoad(mode).url
           )
             .withVisuallyHiddenText(messages("subAddressYesNo.change.hidden"))
