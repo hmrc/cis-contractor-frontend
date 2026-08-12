@@ -88,29 +88,32 @@ class AmendTrustCheckYourAnswersController @Inject() (
   )(implicit messages: Messages): Seq[Option[SummaryListRow]] = {
 
     val verificationRows =
-      Option
-        .when(isVerified.contains(true)) {
-
-          val verificationNumberOpt =
-            ua.get(OriginalTrustAnswersQuery)
-              .flatMap(_.verificationNumber)
-              .filter(_.trim.nonEmpty)
-
-          Seq(
-            TrustUtrSummary.row(ua, AmendMode, showActions = false)
-          ) ++ verificationNumberOpt.map { verificationNumber =>
-            Some(
+      if (isVerified.contains(true)) {
+        Seq(
+          TrustUtrSummary.row(
+            ua,
+            AmendMode,
+            showActions = false
+          ),
+          ua.get(OriginalTrustAnswersQuery)
+            .flatMap(_.verificationNumber)
+            .filter(_.trim.nonEmpty)
+            .map { verificationNumber =>
               SummaryListRowViewModel(
                 key = Key(Text(messages("amendCheckYourAnswers.verificationNumber.label"))),
                 value = Value(Text(verificationNumber))
               )
-            )
-          }
-        }
-        .getOrElse(Nil)
+            }
+        )
+      } else {
+        Nil
+      }
 
     Seq(
-      TypeOfSubcontractorSummary.row(ua, showActions = false)
+      TypeOfSubcontractorSummary.row(
+        ua,
+        showActions = false
+      )
     ) ++ verificationRows
   }
 
@@ -170,11 +173,17 @@ class AmendTrustCheckYourAnswersController @Inject() (
 
         case Right(_) if !AmendmentHelper.trustHasChanges(request.userAnswers) =>
           request.userAnswers.get(CisIdQuery) match {
-
             case Some(cisId) =>
-              Future.successful(
-                Redirect(appConfig.manageYourSubcontractorsUrl(cisId))
-              )
+              sessionRepository
+                .set(UserAnswers(request.userAnswers.id))
+                .map(_ => Redirect(appConfig.manageYourSubcontractorsUrl(cisId)))
+                .recover { case t =>
+                  logger.error(
+                    s"[AmendTrustCheckYourAnswersController.onSubmit] Failed to clear user answers for session ${request.userAnswers.id}",
+                    t
+                  )
+                  Redirect(routes.JourneyRecoveryController.onPageLoad())
+                }
 
             case None =>
               logger.error("[AmendTrustCheckYourAnswersController.onSubmit] Missing CisIdQuery")
