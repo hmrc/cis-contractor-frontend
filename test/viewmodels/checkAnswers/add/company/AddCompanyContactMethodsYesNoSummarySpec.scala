@@ -90,8 +90,9 @@ class AddCompanyContactMethodsYesNoSummarySpec extends AnyFreeSpec with Matchers
 
       val changeAction       = actions.head
       val expectedChangeText = messages("site.change")
-      val expectedHref       =               controllers.amend.company.routes.AmendCompanyRemoveDetailYesNoController
-        .onPageLoad(AmendCompanyRemoveDetail.ContactDetails.key).url
+      val expectedHref       = controllers.amend.company.routes.AmendCompanyRemoveDetailYesNoController
+        .onPageLoad(AmendCompanyRemoveDetail.ContactDetails.key)
+        .url
       val expectedHiddenText = messages("addCompanyContactMethodsYesNo.change.hidden")
 
       changeAction.content.asHtml.toString    should include(expectedChangeText)

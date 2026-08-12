@@ -37,7 +37,11 @@ import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.Future
 
-class AmendSubcontractorControllerSpec  extends SpecBase with MockitoSugar with ModelGenerators with GuiceOneAppPerSuite {
+class AmendSubcontractorControllerSpec
+    extends SpecBase
+    with MockitoSugar
+    with ModelGenerators
+    with GuiceOneAppPerSuite {
 
   private val cisId             = "INST-123"
   private val subbieResourceRef = 1001L
@@ -94,7 +98,10 @@ class AmendSubcontractorControllerSpec  extends SpecBase with MockitoSugar with 
       subcontractor = subcontractor
     )
 
-  private def applicationWith(mockService: SubcontractorService, mockSessionRepository: SessionRepository): GuiceApplicationBuilder = {
+  private def applicationWith(
+    mockService: SubcontractorService,
+    mockSessionRepository: SessionRepository
+  ): GuiceApplicationBuilder = {
     val mockCisManagerService = mock[CisManageService]
     when(mockCisManagerService.ensureCisIdInUserAnswers(any[UserAnswers])(any[HeaderCarrier]))
       .thenReturn(Future.successful(emptyUserAnswers))

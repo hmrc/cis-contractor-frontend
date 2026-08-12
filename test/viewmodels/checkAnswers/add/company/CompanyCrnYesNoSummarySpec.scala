@@ -92,7 +92,8 @@ class CompanyCrnYesNoSummarySpec extends AnyFreeSpec with Matchers {
       val changeAction       = actions.head
       val expectedChangeText = messages("site.change")
       val expectedHref       = controllers.amend.company.routes.AmendCompanyRemoveDetailYesNoController
-        .onPageLoad(AmendCompanyRemoveDetail.CompanyRegistrationNumber.key).url
+        .onPageLoad(AmendCompanyRemoveDetail.CompanyRegistrationNumber.key)
+        .url
       val expectedHiddenText = messages("companyCrnYesNo.change.hidden")
 
       changeAction.content.asHtml.toString    should include(expectedChangeText)

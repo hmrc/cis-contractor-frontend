@@ -33,21 +33,21 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
 
 class AmendSubcontractorController @Inject() (
-                                               identify: IdentifierAction,
-                                               getData: DataRetrievalAction,
-                                               subcontractorService: SubcontractorService,
-                                               val controllerComponents: MessagesControllerComponents,
-                                               override protected val cisManageService: CisManageService,
-                                               override protected val sessionRepository: SessionRepository
-                                             )(implicit ec: ExecutionContext)
-  extends FrontendBaseController
+  identify: IdentifierAction,
+  getData: DataRetrievalAction,
+  subcontractorService: SubcontractorService,
+  val controllerComponents: MessagesControllerComponents,
+  override protected val cisManageService: CisManageService,
+  override protected val sessionRepository: SessionRepository
+)(implicit ec: ExecutionContext)
+    extends FrontendBaseController
     with AgentClientChecks
     with Logging {
 
   def onPageLoad(
-                  cisId: String,
-                  subbieResourceRef: Long
-                ): Action[AnyContent] =
+    cisId: String,
+    subbieResourceRef: Long
+  ): Action[AnyContent] =
     (identify andThen getData).async { implicit request =>
       val userAnswers = request.userAnswers.getOrElse(UserAnswers(request.userId))
       withAgentClientChecks(request.userId, request.isAgent, userAnswers)
@@ -77,11 +77,11 @@ class AmendSubcontractorController @Inject() (
     }
 
   private def resolveSubcontractor(
-                                    response: GetSubcontractorResponse,
-                                    cisId: String,
-                                    subbieResourceRef: Long,
-                                    userAnswers: UserAnswers
-                                  ): Future[Result] =
+    response: GetSubcontractorResponse,
+    cisId: String,
+    subbieResourceRef: Long,
+    userAnswers: UserAnswers
+  ): Future[Result] =
     response.subcontractor match {
       case Some(subcontractor) =>
         subcontractor.subcontractorType
@@ -112,12 +112,12 @@ class AmendSubcontractorController @Inject() (
     }
 
   private def handleSubcontractor(
-                                   subcontractorType: TypeOfSubcontractor,
-                                   userAnswers: UserAnswers,
-                                   cisId: String,
-                                   subbieResourceRef: Long,
-                                   subcontractor: SubcontractorResponse
-                                 ): Future[Result] =
+    subcontractorType: TypeOfSubcontractor,
+    userAnswers: UserAnswers,
+    cisId: String,
+    subbieResourceRef: Long,
+    subcontractor: SubcontractorResponse
+  ): Future[Result] =
     populateUserAnswers(
       subcontractorType,
       userAnswers,
@@ -140,11 +140,11 @@ class AmendSubcontractorController @Inject() (
           .map(_ => Redirect(onwardRoute(subcontractorType)))
     )
   private def populateUserAnswers(
-                                   subcontractorType: TypeOfSubcontractor,
-                                   userAnswers: UserAnswers,
-                                   cisId: String,
-                                   subcontractor: SubcontractorResponse
-                                 ): Try[UserAnswers] =
+    subcontractorType: TypeOfSubcontractor,
+    userAnswers: UserAnswers,
+    cisId: String,
+    subcontractor: SubcontractorResponse
+  ): Try[UserAnswers] =
     subcontractorType match {
       case Individualorsoletrader =>
         AmendSubcontractorPopulator.IndividualPopulator
