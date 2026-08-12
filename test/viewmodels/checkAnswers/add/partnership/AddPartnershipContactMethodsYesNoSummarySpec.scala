@@ -17,6 +17,7 @@
 package viewmodels.checkAnswers.add.partnership
 
 import controllers.add.partnership.routes
+import models.amend.partnership.AmendPartnershipRemoveDetail
 import models.{AmendMode, CheckMode, UserAnswers}
 import org.scalatest.OptionValues.convertOptionToValuable
 import org.scalatest.TryValues.convertTryToSuccessOrFailure
@@ -90,7 +91,7 @@ class AddPartnershipContactMethodsYesNoSummarySpec extends AnyFreeSpec with Matc
       val changeAction       = actions.head
       val expectedChangeText = messages("site.change")
       val expectedHref       = controllers.amend.partnership.routes.AmendPartnershipRemoveDetailYesNoController
-        .onPageLoad("contact-details")
+        .onPageLoad(AmendPartnershipRemoveDetail.ContactDetails.key)
         .url
       val expectedHiddenText = messages("addPartnershipContactMethodsYesNo.change.hidden")
 

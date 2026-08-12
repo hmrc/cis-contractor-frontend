@@ -16,6 +16,7 @@
 
 package viewmodels.checkAnswers.add.partnership
 
+import models.amend.partnership.AmendPartnershipRemoveDetail
 import models.{AmendMode, CheckMode, Mode, UserAnswers}
 import pages.add.partnership.{PartnershipHasUtrYesNoPage, PartnershipNamePage}
 import play.api.i18n.Messages
@@ -44,7 +45,9 @@ object PartnershipHasUtrYesNoSummary {
             content = messages("site.change"),
             href =
               if answer && mode == AmendMode then
-                controllers.amend.partnership.routes.AmendPartnershipRemoveDetailYesNoController.onPageLoad("utr").url
+                controllers.amend.partnership.routes.AmendPartnershipRemoveDetailYesNoController
+                  .onPageLoad(AmendPartnershipRemoveDetail.Utr.key)
+                  .url
               else
                 controllers.add.partnership.routes.PartnershipHasUtrYesNoController
                   .onPageLoad(mode)

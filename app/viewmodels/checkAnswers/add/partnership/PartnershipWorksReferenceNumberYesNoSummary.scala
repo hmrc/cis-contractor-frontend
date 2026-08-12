@@ -16,6 +16,7 @@
 
 package viewmodels.checkAnswers.add.partnership
 
+import models.amend.partnership.AmendPartnershipRemoveDetail
 import models.{AmendMode, CheckMode, Mode, UserAnswers}
 import pages.add.partnership.PartnershipWorksReferenceNumberYesNoPage
 import play.api.i18n.Messages
@@ -38,7 +39,7 @@ object PartnershipWorksReferenceNumberYesNoSummary {
             "site.change",
             if answer && mode == AmendMode then
               controllers.amend.partnership.routes.AmendPartnershipRemoveDetailYesNoController
-                .onPageLoad("works-reference-number")
+                .onPageLoad(AmendPartnershipRemoveDetail.WorksReferenceNumber.key)
                 .url
             else controllers.add.partnership.routes.PartnershipWorksReferenceNumberYesNoController.onPageLoad(mode).url
           )

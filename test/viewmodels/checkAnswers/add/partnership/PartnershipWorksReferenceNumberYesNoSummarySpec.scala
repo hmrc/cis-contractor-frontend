@@ -17,6 +17,7 @@
 package viewmodels.checkAnswers.add.partnership
 
 import controllers.add.partnership.routes
+import models.amend.partnership.AmendPartnershipRemoveDetail
 import models.{AmendMode, CheckMode, UserAnswers}
 import org.scalatest.OptionValues.convertOptionToValuable
 import org.scalatest.TryValues.convertTryToSuccessOrFailure
@@ -92,7 +93,7 @@ class PartnershipWorksReferenceNumberYesNoSummarySpec extends AnyFreeSpec with M
       val changeAction       = actions.head
       val expectedChangeText = messages("site.change")
       val expectedHref       = controllers.amend.partnership.routes.AmendPartnershipRemoveDetailYesNoController
-        .onPageLoad("works-reference-number")
+        .onPageLoad(AmendPartnershipRemoveDetail.WorksReferenceNumber.key)
         .url
       val expectedHiddenText = messages("partnershipWorksReferenceNumberYesNo.change.hidden")
 

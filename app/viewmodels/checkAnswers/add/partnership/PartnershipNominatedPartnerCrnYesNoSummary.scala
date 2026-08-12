@@ -16,6 +16,7 @@
 
 package viewmodels.checkAnswers.add.partnership
 
+import models.amend.partnership.AmendPartnershipRemoveDetail
 import models.{AmendMode, CheckMode, Mode, UserAnswers}
 import pages.add.partnership.PartnershipNominatedPartnerCrnYesNoPage
 import play.api.i18n.Messages
@@ -38,7 +39,7 @@ object PartnershipNominatedPartnerCrnYesNoSummary {
             "site.change",
             if answer && mode == AmendMode then
               controllers.amend.partnership.routes.AmendPartnershipRemoveDetailYesNoController
-                .onPageLoad("nominated-partner-company-registration-number")
+                .onPageLoad(AmendPartnershipRemoveDetail.NominatedPartnerCompanyRegistrationNumber.key)
                 .url
             else controllers.add.partnership.routes.PartnershipNominatedPartnerCrnYesNoController.onPageLoad(mode).url
           )

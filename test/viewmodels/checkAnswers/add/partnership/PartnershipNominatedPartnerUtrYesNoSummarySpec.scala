@@ -17,6 +17,7 @@
 package viewmodels.checkAnswers.add.partnership
 
 import controllers.add.partnership.routes
+import models.amend.partnership.AmendPartnershipRemoveDetail
 import models.{AmendMode, CheckMode, UserAnswers}
 import org.scalatest.OptionValues.convertOptionToValuable
 import org.scalatest.TryValues.convertTryToSuccessOrFailure
@@ -32,7 +33,7 @@ class PartnershipNominatedPartnerUtrYesNoSummarySpec extends AnyFreeSpec with Ma
 
   implicit val messages: Messages = stubMessages()
 
-  "PartnershipWorksReferenceNumberYesNoSummary.row" - {
+  "PartnershiNominatedPartnerUtrYesNoSummary.row" - {
 
     "must return a SummaryListRow with 'Yes' when the answer is true" in {
       val answers = UserAnswers("test-id")
@@ -92,7 +93,7 @@ class PartnershipNominatedPartnerUtrYesNoSummarySpec extends AnyFreeSpec with Ma
       val changeAction       = actions.head
       val expectedChangeText = messages("site.change")
       val expectedHref       = controllers.amend.partnership.routes.AmendPartnershipRemoveDetailYesNoController
-        .onPageLoad("nominated-partner-utr")
+        .onPageLoad(AmendPartnershipRemoveDetail.NominatedPartnerUtr.key)
         .url
       val expectedHiddenText = messages("partnershipNominatedPartnerUtrYesNo.change.hidden")
 

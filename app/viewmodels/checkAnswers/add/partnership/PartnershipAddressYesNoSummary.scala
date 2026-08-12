@@ -16,6 +16,7 @@
 
 package viewmodels.checkAnswers.add.partnership
 
+import models.amend.partnership.AmendPartnershipRemoveDetail
 import models.{AmendMode, CheckMode, Mode, UserAnswers}
 import pages.add.partnership.PartnershipAddressYesNoPage
 import play.api.i18n.Messages
@@ -37,7 +38,9 @@ object PartnershipAddressYesNoSummary {
           ActionItemViewModel(
             "site.change",
             if answer && mode == AmendMode then
-              controllers.amend.partnership.routes.AmendPartnershipRemoveDetailYesNoController.onPageLoad("address").url
+              controllers.amend.partnership.routes.AmendPartnershipRemoveDetailYesNoController
+                .onPageLoad(AmendPartnershipRemoveDetail.Address.key)
+                .url
             else controllers.add.partnership.routes.PartnershipAddressYesNoController.onPageLoad(mode).url
           )
             .withVisuallyHiddenText(messages("partnershipAddressYesNo.change.hidden"))
