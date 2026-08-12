@@ -19,9 +19,7 @@ package queries
 import models.response.SubcontractorResponse
 import play.api.libs.json.JsPath
 
-case object OriginalSubcontractorQuery
-  extends Gettable[SubcontractorResponse]
-    with Settable[SubcontractorResponse] {
+case object OriginalSubcontractorQuery extends Gettable[SubcontractorResponse] with Settable[SubcontractorResponse] {
 
   override def path: JsPath =
     JsPath \ "originalSubcontractor"
