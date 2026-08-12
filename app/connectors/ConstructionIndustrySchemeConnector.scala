@@ -231,4 +231,30 @@ class ConstructionIndustrySchemeConnector @Inject() (config: ServicesConfig, htt
       }
   }
 
+
+  def updateSubcontractor(
+                           request: UpdateSubcontractorRequest
+                         )(implicit hc: HeaderCarrier): Future[UpdateSubcontractorResponse] = {
+
+    logger.info(
+      s"[ConstructionIndustrySchemeConnector][updateSubcontractor] " +
+        s"cisId=${request.cisId}, " +
+        s"subcontractorId=${request.subcontractor.subcontractorId}, " +
+        s"subbieResourceRef=${request.subcontractor.subbieResourceRef}"
+    )
+
+    http
+      .post(url"$cisBaseUrl/subcontractor/update")
+      .withBody(Json.toJson(request))
+      .execute[UpdateSubcontractorResponse]
+      .map { response =>
+        logger.info(
+          s"[ConstructionIndustrySchemeConnector][updateSubcontractor] " +
+            s"Updated subcontractor, version=${response.version}"
+        )
+
+        response
+      }
+  }
+
 }
