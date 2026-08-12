@@ -103,7 +103,7 @@ class CreateVerificationBatchAndVerificationsController @Inject() (
                     )
                   )
 
-                case Some(_) =>
+                case Some(ref) if ref.verificationBatch.flatMap(_.verifBatchResourceRef).isEmpty =>
                   verificationService
                     .createVerificationBatchAndVerifications(
                       userAnswers = ua,
