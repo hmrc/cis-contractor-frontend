@@ -1133,3 +1133,6 @@ contractordetails.removeDetailYesNo.detail.email                               =
 contractordetails.removeDetailYesNo.detail.schemeName                          =  scheme name
 contractordetails.removeDetailYesNo.error.required.email                       =  Select yes to remove the contractor’s email address
 contractordetails.removeDetailYesNo.error.required.schemeName                  =  Select yes to remove the contractor’s scheme name
+
+unmatchedSubcontractorDetailsUpdated.title = unmatchedSubcontractorDetailsUpdated
+unmatchedSubcontractorDetailsUpdated.heading = unmatchedSubcontractorDetailsUpdated
