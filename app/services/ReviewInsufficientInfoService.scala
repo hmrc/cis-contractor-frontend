@@ -72,7 +72,7 @@ class ReviewInsufficientInfoService @Inject() {
     sub.utr
       .map(_.trim)
       .filter(_.nonEmpty)
-      .getOrElse(messages("verify.reviewInsufficientInfo.utr.noneProvided"))
+      .getOrElse(messages("verify.reviewInsufficientInfo.noneProvided"))
 
   private def displayName(sub: SubcontractorCurrentVerification)(implicit messages: Messages): String =
     nameFor(sub).getOrElse(messages("verify.noName"))

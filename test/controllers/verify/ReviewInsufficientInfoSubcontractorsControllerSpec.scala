@@ -112,12 +112,11 @@ class ReviewInsufficientInfoSubcontractorsControllerSpec extends SpecBase {
 
         val service   = application.injector.instanceOf[ReviewInsufficientInfoService]
         val view      = application.injector.instanceOf[ReviewInsufficientInfoSubcontractorsView]
-        val appConfig = application.injector.instanceOf[config.FrontendAppConfig]
         val viewModel = service.buildViewModel(batchOf(missingSub, readySub))(messages(application))
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual
-          view(viewModel)(request, appConfig, messages(application)).toString
+          view(viewModel)(request, messages(application)).toString
       }
     }
 
@@ -141,7 +140,7 @@ class ReviewInsufficientInfoSubcontractorsControllerSpec extends SpecBase {
         body must include("Brody, Martin")
         body must include("Acme Ltd")
         body must include("1234567890")
-        body must include(messages(application)("verify.reviewInsufficientInfo.utr.noneProvided"))
+        body must include(messages(application)("verify.reviewInsufficientInfo.noneProvided"))
       }
     }
 

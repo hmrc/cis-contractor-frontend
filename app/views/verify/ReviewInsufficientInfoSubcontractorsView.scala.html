@@ -30,10 +30,11 @@
     h2: H2,
     paragraph: Paragraph,
     link: Link,
-    bulletList: BulletList
+    bulletList: BulletList,
+    appConfig: FrontendAppConfig
 )
 
-@(viewModel: ReviewInsufficientInfoViewModel)(implicit request: Request[_], appConfig: FrontendAppConfig, messages: Messages)
+@(viewModel: ReviewInsufficientInfoViewModel)(implicit request: Request[_], messages: Messages)
 
 @nameLink(vm: LinkViewModel, name: String) = {
         @link(
