@@ -195,7 +195,13 @@ class CurrentVerificationBatchControllerSpec extends SpecBase with MockitoSugar 
             verificationId = 1L,
             verificationBatchId = None,
             subcontractorId = Some(2L),
-            verificationResourceRef = Some(20L)
+            verificationResourceRef = Some(20L),
+            subcontractorName = None,
+            verificationNumber = None,
+            taxTreatment = None,
+            actionIndicator = None,
+            proceed = None,
+            matched = None
           )
         ),
         subcontractors = Seq.empty
