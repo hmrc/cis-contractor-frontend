@@ -46,12 +46,7 @@ case class Subcontractor(
 
 object Subcontractor:
   given format: OFormat[Subcontractor] = Json.format[Subcontractor]
-
-  /** Resolves a display name for a subcontractor using the type-specific field
-   * selection rules. Returns None when the subcontractor type is unrecognised
-   * or when all applicable name fields are blank; callers should fall back to a
-   * localised "no name" message.
-   */
+  
   def resolveName(sub: Subcontractor): Option[String] = {
 
     def nonBlank(field: Option[String]): Option[String] =

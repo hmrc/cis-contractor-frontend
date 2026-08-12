@@ -40,28 +40,28 @@ class VerificationResultsViewSpec extends SpecBase {
           "Verified",
           "Higher rate",
           "V0004528765/A",
-          true
+          false
         ),
         VerificationResultsViewModel(
           "Hooper and Associates",
           "Verified",
           "Standard rate",
           "V0004528765",
-          true
+          false
         ),
         VerificationResultsViewModel(
           "Quint Transportation",
           "Verified",
           "Higher rate",
           "V0004528765/B",
-          true
+          false
         ),
         VerificationResultsViewModel(
           "The Kintner Group",
           "Verified",
           "Higher rate",
           "V0004528765/C",
-          true
+          false
         )
       )
       val manageSubcontractorsUrl     = "/manage-subcontractors/1"
