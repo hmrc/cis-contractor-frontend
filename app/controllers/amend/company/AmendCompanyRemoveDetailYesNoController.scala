@@ -85,9 +85,9 @@ class AmendCompanyRemoveDetailYesNoController @Inject() (
         userAnswers
           .get(CompanyUtrYesNoPage)
           .contains(true) &&
-          userAnswers
-            .get(ShowVerificationDetailsPage)
-            .contains(false)
+        userAnswers
+          .get(ShowVerificationDetailsPage)
+          .contains(false)
 
       case AmendCompanyRemoveDetail.CompanyRegistrationNumber =>
         userAnswers
