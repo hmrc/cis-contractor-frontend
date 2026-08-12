@@ -16,7 +16,7 @@
 
 package models
 
-import play.api.mvc.JavascriptLiteral
+import play.api.mvc.{JavascriptLiteral, PathBindable}
 
 sealed trait Mode
 
@@ -33,4 +33,29 @@ object Mode {
       case AmendMode  => "AmendMode"
     }
   }
+
+  implicit val pathBindable: PathBindable[Mode] =
+    new PathBindable[Mode] {
+
+      override def bind(
+        key: String,
+        value: String
+      ): Either[String, Mode] =
+        value match {
+          case "NormalMode" => Right(NormalMode)
+          case "CheckMode"  => Right(CheckMode)
+          case "AmendMode"  => Right(AmendMode)
+          case _            => Left(s"Invalid mode: $value")
+        }
+
+      override def unbind(
+        key: String,
+        value: Mode
+      ): String =
+        value match {
+          case NormalMode => "NormalMode"
+          case CheckMode  => "CheckMode"
+          case AmendMode  => "AmendMode"
+        }
+    }
 }

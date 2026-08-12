@@ -14,38 +14,37 @@
  * limitations under the License.
  */
 
-package controllers.amend.trust
+package controllers.amend.company
 
 import base.SpecBase
-import forms.amend.trust.AmendTrustRemoveDetailYesNoFormProvider
-import models.address.Address
+import forms.amend.company.AmendCompanyRemoveDetailYesNoFormProvider
+import models.amend.company.AmendCompanyRemoveDetail
 import models.UserAnswers
-import models.amend.trust.AmendTrustRemoveDetail
+import models.address.Address
 import models.contact.ContactMethodOptions
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{verify, when}
-import pages.amend.trust.AmendTrustRemoveDetailYesNoPage
 import org.scalatestplus.mockito.MockitoSugar
-import pages.add.trust.*
+import pages.add.company.*
+import pages.amend.company.AmendCompanyRemoveDetailYesNoPage
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import repositories.SessionRepository
-import views.html.amend.trust.AmendTrustRemoveDetailYesNoView
+import views.html.amend.company.AmendCompanyRemoveDetailYesNoView
 
 import scala.concurrent.Future
 
-class AmendTrustRemoveDetailYesNoControllerSpec extends SpecBase with MockitoSugar {
+class AmendCompanyRemoveDetailYesNoControllerSpec extends SpecBase with MockitoSugar {
 
-  val formProvider = new AmendTrustRemoveDetailYesNoFormProvider()
-  val form         = formProvider()
+  val formProvider = new AmendCompanyRemoveDetailYesNoFormProvider()
 
-  private val trustName = "Test Trust"
-  private val address   = Address("line 1", postcode = Some("AA1 1AA"))
+  private val companyName = "Test Company"
+  private val address     = Address("line 1", postcode = Some("AA1 1AA"))
 
   private def uaWithName: UserAnswers =
-    emptyUserAnswers.set(TrustNamePage, trustName).success.value
+    emptyUserAnswers.set(CompanyNamePage, companyName).success.value
 
   private def uaWithNameAndDetail(
     detail: String
@@ -56,49 +55,58 @@ class AmendTrustRemoveDetailYesNoControllerSpec extends SpecBase with MockitoSug
 
         case "address" =>
           uaWithName
-            .set(TrustAddressPage, address)
+            .set(CompanyAddressPage, address)
             .success
             .value
-            .set(TrustAddressYesNoPage, true)
+            .set(CompanyAddressYesNoPage, true)
             .success
             .value
 
         case "contact-details" =>
           uaWithName
             .set(
-              TrustContactMethodOptionsPage,
+              CompanyContactMethodOptionsPage,
               Set(ContactMethodOptions.Email, ContactMethodOptions.Phone, ContactMethodOptions.Mobile)
             )
             .success
             .value
-            .set(TrustEmailAddressPage, "old@email.com")
+            .set(CompanyEmailAddressPage, "old@email.com")
             .success
             .value
-            .set(TrustPhoneNumberPage, "01234567890")
+            .set(CompanyPhoneNumberPage, "01234567890")
             .success
             .value
-            .set(TrustMobileNumberPage, "07123456789")
+            .set(CompanyMobileNumberPage, "07123456789")
             .success
             .value
-            .set(AddTrustContactMethodsYesNoPage, true)
+            .set(AddCompanyContactMethodsYesNoPage, true)
             .success
             .value
 
         case "utr" =>
           uaWithName
-            .set(TrustUtrPage, "7777777777")
+            .set(CompanyUtrPage, "7777777777")
             .success
             .value
-            .set(TrustUtrYesNoPage, true)
+            .set(CompanyUtrYesNoPage, true)
+            .success
+            .value
+
+        case "company-registration-number" =>
+          uaWithName
+            .set(CompanyCrnPage, "AA1234567A")
+            .success
+            .value
+            .set(CompanyCrnYesNoPage, true)
             .success
             .value
 
         case "works-reference-number" =>
           uaWithName
-            .set(TrustWorksReferencePage, "WR-001")
+            .set(CompanyWorksReferencePage, "WR-001")
             .success
             .value
-            .set(TrustWorksReferenceYesNoPage, true)
+            .set(CompanyWorksReferenceYesNoPage, true)
             .success
             .value
       }
@@ -108,73 +116,83 @@ class AmendTrustRemoveDetailYesNoControllerSpec extends SpecBase with MockitoSug
 
   private def assertDetailWasRemoved(
     userAnswers: UserAnswers,
-    detail: AmendTrustRemoveDetail
+    detail: AmendCompanyRemoveDetail
   ): Unit =
     detail match {
-      case AmendTrustRemoveDetail.Address =>
-        userAnswers.get(TrustAddressPage) mustBe None
-        userAnswers.get(TrustAddressYesNoPage) mustBe Some(false)
+      case AmendCompanyRemoveDetail.Address =>
+        userAnswers.get(CompanyAddressPage) mustBe None
+        userAnswers.get(CompanyAddressYesNoPage) mustBe Some(false)
 
-      case AmendTrustRemoveDetail.ContactDetails =>
-        userAnswers.get(TrustContactMethodOptionsPage) mustBe None
-        userAnswers.get(TrustEmailAddressPage) mustBe None
-        userAnswers.get(TrustPhoneNumberPage) mustBe None
-        userAnswers.get(TrustMobileNumberPage) mustBe None
-        userAnswers.get(AddTrustContactMethodsYesNoPage) mustBe Some(false)
+      case AmendCompanyRemoveDetail.ContactDetails =>
+        userAnswers.get(CompanyContactMethodOptionsPage) mustBe None
+        userAnswers.get(CompanyEmailAddressPage) mustBe None
+        userAnswers.get(CompanyPhoneNumberPage) mustBe None
+        userAnswers.get(CompanyMobileNumberPage) mustBe None
+        userAnswers.get(AddCompanyContactMethodsYesNoPage) mustBe Some(false)
 
-      case AmendTrustRemoveDetail.Utr =>
-        userAnswers.get(TrustUtrPage) mustBe None
-        userAnswers.get(TrustUtrYesNoPage) mustBe Some(false)
+      case AmendCompanyRemoveDetail.Utr =>
+        userAnswers.get(CompanyUtrPage) mustBe None
+        userAnswers.get(CompanyUtrYesNoPage) mustBe Some(false)
 
-      case AmendTrustRemoveDetail.WorksReferenceNumber =>
-        userAnswers.get(TrustWorksReferencePage) mustBe None
-        userAnswers.get(TrustWorksReferenceYesNoPage) mustBe Some(false)
+      case AmendCompanyRemoveDetail.CompanyRegistrationNumber =>
+        userAnswers.get(CompanyCrnPage) mustBe None
+        userAnswers.get(CompanyCrnYesNoPage) mustBe Some(false)
+
+      case AmendCompanyRemoveDetail.WorksReferenceNumber =>
+        userAnswers.get(CompanyWorksReferencePage) mustBe None
+        userAnswers.get(CompanyWorksReferenceYesNoPage) mustBe Some(false)
     }
 
   private def assertDetailWasRetained(
     userAnswers: UserAnswers,
-    detail: AmendTrustRemoveDetail
+    detail: AmendCompanyRemoveDetail
   ): Unit =
     detail match {
-      case AmendTrustRemoveDetail.Address =>
-        userAnswers.get(TrustAddressPage) mustBe Some(address)
-        userAnswers.get(TrustAddressYesNoPage) mustBe Some(true)
+      case AmendCompanyRemoveDetail.Address =>
+        userAnswers.get(CompanyAddressPage) mustBe Some(address)
+        userAnswers.get(CompanyAddressYesNoPage) mustBe Some(true)
 
-      case AmendTrustRemoveDetail.ContactDetails =>
-        userAnswers.get(TrustContactMethodOptionsPage) mustBe Some(
+      case AmendCompanyRemoveDetail.ContactDetails =>
+        userAnswers.get(CompanyContactMethodOptionsPage) mustBe Some(
           Set(ContactMethodOptions.Email, ContactMethodOptions.Phone, ContactMethodOptions.Mobile)
         )
-        userAnswers.get(TrustEmailAddressPage) mustBe Some("old@email.com")
-        userAnswers.get(TrustPhoneNumberPage) mustBe Some("01234567890")
-        userAnswers.get(TrustMobileNumberPage) mustBe Some("07123456789")
-        userAnswers.get(AddTrustContactMethodsYesNoPage) mustBe Some(true)
+        userAnswers.get(CompanyEmailAddressPage) mustBe Some("old@email.com")
+        userAnswers.get(CompanyPhoneNumberPage) mustBe Some("01234567890")
+        userAnswers.get(CompanyMobileNumberPage) mustBe Some("07123456789")
+        userAnswers.get(AddCompanyContactMethodsYesNoPage) mustBe Some(true)
 
-      case AmendTrustRemoveDetail.Utr =>
-        userAnswers.get(TrustUtrPage) mustBe Some("7777777777")
-        userAnswers.get(TrustUtrYesNoPage) mustBe Some(true)
+      case AmendCompanyRemoveDetail.Utr =>
+        userAnswers.get(CompanyUtrPage) mustBe Some("7777777777")
+        userAnswers.get(CompanyUtrYesNoPage) mustBe Some(true)
 
-      case AmendTrustRemoveDetail.WorksReferenceNumber =>
-        userAnswers.get(TrustWorksReferencePage) mustBe Some("WR-001")
-        userAnswers.get(TrustWorksReferenceYesNoPage) mustBe Some(true)
+      case AmendCompanyRemoveDetail.CompanyRegistrationNumber =>
+        userAnswers.get(CompanyCrnPage) mustBe Some("AA1234567A")
+        userAnswers.get(CompanyCrnYesNoPage) mustBe Some(true)
+
+      case AmendCompanyRemoveDetail.WorksReferenceNumber =>
+        userAnswers.get(CompanyWorksReferencePage) mustBe Some("WR-001")
+        userAnswers.get(CompanyWorksReferenceYesNoPage) mustBe Some(true)
     }
 
-  "AmendTrustRemoveDetailYesNo Controller" - {
+  "AmendCompanyRemoveDetailYesNo Controller" - {
+
     Seq(
       ("address", "address"),
       ("contact-details", "contact-details"),
-      ("unique-taxpayer-reference", "utr"),
+      ("utr", "utr"),
+      ("company-registration-number", "company-registration-number"),
       ("works-reference-number", "works-reference-number")
     ).foreach { case (subcontractorDetail, selectedDetail) =>
-      s"when contractorDetail is '$subcontractorDetail'" - {
+      s"when subcontractorDetail is '$subcontractorDetail'" - {
         val form = formProvider()
 
         val detailType =
-          AmendTrustRemoveDetail
+          AmendCompanyRemoveDetail
             .fromKey(selectedDetail)
             .value
 
         lazy val removeDetailYesNoRoute =
-          controllers.amend.trust.routes.AmendTrustRemoveDetailYesNoController.onPageLoad(selectedDetail).url
+          controllers.amend.company.routes.AmendCompanyRemoveDetailYesNoController.onPageLoad(selectedDetail).url
 
         "must return OK and the correct view for a GET" in {
 
@@ -188,10 +206,10 @@ class AmendTrustRemoveDetailYesNoControllerSpec extends SpecBase with MockitoSug
 
             val result = route(application, request).value
 
-            val view = application.injector.instanceOf[AmendTrustRemoveDetailYesNoView]
+            val view = application.injector.instanceOf[AmendCompanyRemoveDetailYesNoView]
 
             status(result) mustEqual OK
-            contentAsString(result) mustEqual view(trustName, selectedDetail, detailTitle, form)(
+            contentAsString(result) mustEqual view(companyName, selectedDetail, detailTitle, form)(
               request,
               messages(application)
             ).toString
@@ -220,7 +238,9 @@ class AmendTrustRemoveDetailYesNoControllerSpec extends SpecBase with MockitoSug
             val result = route(application, request).value
 
             status(result) mustEqual SEE_OTHER
-            redirectLocation(result).value mustEqual controllers.amend.trust.routes.AmendTrustCheckYourAnswersController
+            redirectLocation(
+              result
+            ).value mustEqual controllers.amend.company.routes.AmendCompanyCheckYourAnswersController
               .onPageLoad()
               .url
 
@@ -228,7 +248,7 @@ class AmendTrustRemoveDetailYesNoControllerSpec extends SpecBase with MockitoSug
             val savedAnswers = captor.getValue
 
             assertDetailWasRemoved(savedAnswers, detailType)
-            savedAnswers.get(AmendTrustRemoveDetailYesNoPage(detailType)) mustBe None
+            savedAnswers.get(AmendCompanyRemoveDetailYesNoPage(detailType)) mustBe None
           }
         }
 
@@ -254,7 +274,9 @@ class AmendTrustRemoveDetailYesNoControllerSpec extends SpecBase with MockitoSug
             val result = route(application, request).value
 
             status(result) mustEqual SEE_OTHER
-            redirectLocation(result).value mustEqual controllers.amend.trust.routes.AmendTrustCheckYourAnswersController
+            redirectLocation(
+              result
+            ).value mustEqual controllers.amend.company.routes.AmendCompanyCheckYourAnswersController
               .onPageLoad()
               .url
 
@@ -262,7 +284,7 @@ class AmendTrustRemoveDetailYesNoControllerSpec extends SpecBase with MockitoSug
             val savedAnswers = captor.getValue
 
             assertDetailWasRetained(savedAnswers, detailType)
-            savedAnswers.get(AmendTrustRemoveDetailYesNoPage(detailType)) mustBe None
+            savedAnswers.get(AmendCompanyRemoveDetailYesNoPage(detailType)) mustBe None
           }
         }
 
@@ -280,12 +302,12 @@ class AmendTrustRemoveDetailYesNoControllerSpec extends SpecBase with MockitoSug
 
             val boundForm = form.bind(Map("value" -> ""))
 
-            val view = application.injector.instanceOf[AmendTrustRemoveDetailYesNoView]
+            val view = application.injector.instanceOf[AmendCompanyRemoveDetailYesNoView]
 
             val result = route(application, request).value
 
             status(result) mustEqual BAD_REQUEST
-            contentAsString(result) mustEqual view(trustName, selectedDetail, detailTitle, boundForm)(
+            contentAsString(result) mustEqual view(companyName, selectedDetail, detailTitle, boundForm)(
               request,
               messages(application)
             ).toString
@@ -322,7 +344,7 @@ class AmendTrustRemoveDetailYesNoControllerSpec extends SpecBase with MockitoSug
           }
         }
 
-        "must redirect to JourneyRecovery if trustName is missing for a GET" in {
+        "must redirect to JourneyRecovery if CompanyName is missing for a GET" in {
 
           val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
@@ -336,7 +358,7 @@ class AmendTrustRemoveDetailYesNoControllerSpec extends SpecBase with MockitoSug
           }
         }
 
-        "must redirect to JourneyRecovery if trustName is missing for a POST" in {
+        "must redirect to JourneyRecovery if CompanyName is missing for a POST" in {
 
           val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
@@ -411,7 +433,7 @@ class AmendTrustRemoveDetailYesNoControllerSpec extends SpecBase with MockitoSug
       }
     }
 
-    "when contractorDetail is neither 'address', 'contact-details', 'unique-taxpayer-reference' or 'works-reference-number'" - {
+    "when subcontractorDetail is neither 'address', 'contact-details', 'utr', 'company-registration-number' or 'works-reference-number'" - {
 
       "must redirect to Journey Recovery on GET" in {
 
@@ -422,7 +444,7 @@ class AmendTrustRemoveDetailYesNoControllerSpec extends SpecBase with MockitoSug
           val request =
             FakeRequest(
               GET,
-              controllers.amend.trust.routes.AmendTrustRemoveDetailYesNoController.onPageLoad("invalid").url
+              controllers.amend.company.routes.AmendCompanyRemoveDetailYesNoController.onPageLoad("invalid").url
             )
 
           val result = route(application, request).value
@@ -443,7 +465,7 @@ class AmendTrustRemoveDetailYesNoControllerSpec extends SpecBase with MockitoSug
           val request =
             FakeRequest(
               POST,
-              controllers.amend.trust.routes.AmendTrustRemoveDetailYesNoController.onSubmit("invalid").url
+              controllers.amend.company.routes.AmendCompanyRemoveDetailYesNoController.onSubmit("invalid").url
             )
               .withFormUrlEncodedBody(("value", "true"))
 
