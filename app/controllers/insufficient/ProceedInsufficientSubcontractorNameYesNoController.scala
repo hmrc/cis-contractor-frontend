@@ -20,8 +20,7 @@ import controllers.actions.*
 import forms.insufficient.ProceedInsufficientSubcontractorNameYesNoFormProvider
 import models.Mode
 import models.requests.DataRequest
-import models.response.GetNewestVerificationBatchResponse
-import navigation.Navigator
+import navigation.verify.VerifyNavigator
 import pages.insufficient.ProceedInsufficientSubcontractorNameYesNoPage
 import pages.verify.CurrentVerificationBatchResponsePage
 import play.api.Logging
@@ -40,7 +39,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class ProceedInsufficientSubcontractorNameYesNoController @Inject() (
   override val messagesApi: MessagesApi,
   sessionRepository: SessionRepository,
-  navigator: Navigator,
+  navigator: VerifyNavigator,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,

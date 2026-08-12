@@ -21,7 +21,6 @@ import controllers.routes
 import forms.insufficient.ProceedInsufficientSubcontractorNameYesNoFormProvider
 import models.response.GetCurrentVerificationBatchResponse
 import models.{NormalMode, SubcontractorCurrentVerification, UserAnswers, VerificationBatchCurrentVerification, VerificationCurrentVerification}
-import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
@@ -34,7 +33,6 @@ import play.api.test.Helpers.*
 import queries.CisIdQuery
 import repositories.SessionRepository
 import services.ReviewInsufficientInfoService
-import utils.SubcontractorNameExtractor
 import views.html.insufficient.ProceedInsufficientSubcontractorNameYesNoView
 
 import scala.concurrent.Future
@@ -52,8 +50,6 @@ class ProceedInsufficientSubcontractorNameYesNoControllerSpec extends SpecBase w
   private val unmappedSubcontractorId = 999999L
 
   private val mode = NormalMode
-
-  private def onwardRoute: Call = Call("GET", "/foo")
 
   private lazy val proceedInsufficientSubcontractorNameYesNoRoute =
     controllers.insufficient.routes.ProceedInsufficientSubcontractorNameYesNoController
@@ -207,7 +203,6 @@ class ProceedInsufficientSubcontractorNameYesNoControllerSpec extends SpecBase w
       val application =
         applicationBuilder(userAnswers = Some(userAnswers))
           .overrides(
-            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
             bind[SessionRepository].toInstance(mockSessionRepository),
             bind[ReviewInsufficientInfoService].toInstance(mockService)
           )
@@ -222,7 +217,11 @@ class ProceedInsufficientSubcontractorNameYesNoControllerSpec extends SpecBase w
 
         status(result) mustEqual SEE_OTHER
 
-        redirectLocation(result).value mustEqual onwardRoute.url
+        redirectLocation(
+          result
+        ).value mustEqual controllers.verify.routes.ReviewInsufficientInfoSubcontractorsController
+          .onPageLoad()
+          .url
       }
     }
 
@@ -383,7 +382,6 @@ class ProceedInsufficientSubcontractorNameYesNoControllerSpec extends SpecBase w
       val application =
         applicationBuilder(userAnswers = Some(userAnswers))
           .overrides(
-            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
             bind[SessionRepository].toInstance(mockSessionRepository),
             bind[ReviewInsufficientInfoService].toInstance(mockService)
           )

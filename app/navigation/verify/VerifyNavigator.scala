@@ -23,6 +23,7 @@ import navigation.NavigatorForJourney
 import pages.Page
 import pages.verify.*
 import models.verify.ContractorEmailConfirmationStored.{CurrentEmail, DifferentEmail, DoNotSend}
+import pages.insufficient.ProceedInsufficientSubcontractorNameYesNoPage
 import play.api.mvc.Call
 
 import javax.inject.Inject
@@ -41,23 +42,25 @@ class VerifyNavigator @Inject() () extends NavigatorForJourney {
 
   private def normalRoutes: Page => UserAnswers => Call = {
 
-    case ContractorEmailConfirmationNotStoredPage =>
+    case ContractorEmailConfirmationNotStoredPage      =>
       userAnswers => navigatorFromContractorEmailConfirmationNotStoredPage(NormalMode)(userAnswers)
-    case SelectSubcontractorPage                  =>
+    case SelectSubcontractorPage                       =>
       userAnswers => navigatorFromSelectSubcontractorPage(NormalMode)(userAnswers)
-    case VerifyYourSubcontractorsYesNoPage        =>
+    case VerifyYourSubcontractorsYesNoPage             =>
       userAnswers => navigatorFromVerifyYourSubcontractorsYesNoPage(NormalMode)(userAnswers)
-    case ReverifyExistingSubcontractorsYesNoPage  =>
+    case ReverifyExistingSubcontractorsYesNoPage       =>
       userAnswers => navigatorFromReverifyExistingSubcontractorsYesNoPage(NormalMode)(userAnswers)
-    case ContractorEmailConfirmationStoredPage    =>
+    case ContractorEmailConfirmationStoredPage         =>
       userAnswers => navigatorFromContractorEmailConfirmationStoredPage(NormalMode)(userAnswers)
-    case SelectSubcontractorsToReverifyPage       =>
+    case SelectSubcontractorsToReverifyPage            =>
       userAnswers => navigatorFromSelectSubcontractorsToReverifyPage(NormalMode)(userAnswers)
-    case EmailAddressPage                         =>
+    case EmailAddressPage                              =>
       _ => controllers.verify.routes.VerifyCheckYourAnswersController.onPageLoad()
-    case VerificationDeclarationPage              =>
+    case VerificationDeclarationPage                   =>
       _ => controllers.verify.routes.VerifyCheckYourAnswersController.onPageLoad()
-    case _                                        => _ => controllers.routes.JourneyRecoveryController.onPageLoad()
+    case ProceedInsufficientSubcontractorNameYesNoPage =>
+      userAnswers => navigatorFromProceedInsufficientSubcontractorNameYesNoPage(NormalMode)(userAnswers)
+    case _                                             => _ => controllers.routes.JourneyRecoveryController.onPageLoad()
   }
 
   private def checkRouteMap: Page => UserAnswers => Call = {
@@ -233,6 +236,15 @@ class VerifyNavigator @Inject() () extends NavigatorForJourney {
         controllers.verify.routes.VerifyCheckYourAnswersController.onPageLoad()
 
       case _ =>
+        controllers.routes.JourneyRecoveryController.onPageLoad()
+    }
+
+  private def navigatorFromProceedInsufficientSubcontractorNameYesNoPage(mode: Mode)(ua: UserAnswers): Call =
+    (ua.get(ProceedInsufficientSubcontractorNameYesNoPage), mode) match {
+      case (Some(true), NormalMode) =>
+        controllers.verify.routes.ReviewInsufficientInfoSubcontractorsController
+          .onPageLoad()
+      case _                        =>
         controllers.routes.JourneyRecoveryController.onPageLoad()
     }
 }
