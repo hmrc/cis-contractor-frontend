@@ -24,10 +24,11 @@
     govukTable: GovukTable,
     h2: H2,
     paragraph: Paragraph,
-    link: Link
+    link: Link,
+    appConfig: config.FrontendAppConfig
 )
 
-@(rows: Seq[Seq[TableRow]], subcontractorName: String, retrieveSubcontractorListUrl: String)(implicit request: Request[_], messages: Messages)
+@(rows: Seq[Seq[TableRow]], subcontractorName: String)(implicit request: Request[_], messages: Messages)
 
 @layout(
     pageTitle = titleNoForm(messages("amendConfirmation.panel.heading")),
@@ -52,16 +53,16 @@
 
     @link(
         linkTextKey = "amendConfirmation.yourSubcontractors",
-        linkUrl = retrieveSubcontractorListUrl,
+        linkUrl = appConfig.retrieveSubcontractorListUrl,
         hasFullStop = true,
         prefixTextKey = "amendConfirmation.backTo",
         isNewTab = false
     )
-    
+
     @h2("amendConfirmation.beforeYouGo.h2")
-    
+
     @paragraph(messages("amendConfirmation.beforeYouGo.p1"))
-    
+
     <p class="govuk-body">
         <a href="#" target="_blank" rel="noopener noreferrer" class="govuk-link">
             @messages("amendConfirmation.beforeYouGo.takeAShortSurvey")

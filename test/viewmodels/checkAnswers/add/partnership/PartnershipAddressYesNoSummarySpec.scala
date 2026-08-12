@@ -116,6 +116,34 @@ class PartnershipAddressYesNoSummarySpec extends SpecBase with GuiceOneAppPerSui
       action.attributes must contain("id" -> "add-partnership-address")
     }
 
+    "return a row with key, value = no, and change action pointing to add flow when the answer is false in AmendMode" in {
+      val ua: UserAnswers =
+        emptyUserAnswers
+          .set(PartnershipAddressYesNoPage, false)
+          .success
+          .value
+
+      val maybeRow = PartnershipAddressYesNoSummary.row(ua, AmendMode)
+      maybeRow must not be empty
+
+      val row: SummaryListRow = maybeRow.value
+
+      row.key mustBe Key(content = Text(messages("partnershipAddressYesNo.checkYourAnswersLabel")))
+      row.value mustBe Value(content = Text(messages("site.no")))
+
+      row.actions must not be empty
+      val actions: Actions = row.actions.value
+      actions.items must have size 1
+
+      val action: ActionItem = actions.items.head
+      action.href mustBe controllers.add.partnership.routes.PartnershipAddressYesNoController
+        .onPageLoad(AmendMode)
+        .url
+      action.content mustBe Text(messages("site.change"))
+      action.visuallyHiddenText mustBe Some(messages("partnershipAddressYesNo.change.hidden"))
+      action.attributes must contain("id" -> "add-partnership-address")
+    }
+
     "return None when the answer is missing" in {
       val ua: UserAnswers = emptyUserAnswers
       PartnershipAddressYesNoSummary.row(ua) mustBe None

@@ -43,6 +43,7 @@ import config.FrontendAppConfig
 import scala.concurrent.Future
 
 class AmendCompanyCheckYourAnswersControllerSpec extends SpecBase with MockitoSugar {
+
   private val address =
     Address(
       addressLine1 = "12 Harbor View Road",
@@ -57,7 +58,8 @@ class AmendCompanyCheckYourAnswersControllerSpec extends SpecBase with MockitoSu
         )
       )
     )
-  private val minUa   =
+
+  private val minUa =
     emptyUserAnswers
       .set(TypeOfSubcontractorPage, TypeOfSubcontractor.Limitedcompany)
       .success
@@ -390,9 +392,10 @@ class AmendCompanyCheckYourAnswersControllerSpec extends SpecBase with MockitoSu
       verifyNoInteractions(mockSubcontractorService)
     }
 
-    "must redirect to Manage Your Subcontractors when no changes have been made" in {
+    "must clear answers and redirect to Manage Your Subcontractors when no changes have been made" in {
       val cisId = "cis-123"
-      val ua    =
+
+      val ua =
         minUa
           .set(CisIdQuery, cisId)
           .success
@@ -403,6 +406,10 @@ class AmendCompanyCheckYourAnswersControllerSpec extends SpecBase with MockitoSu
 
       val mockSubcontractorService = mock[SubcontractorService]
       val mockSessionRepository    = mock[SessionRepository]
+
+      when(mockSessionRepository.set(any[UserAnswers]))
+        .thenReturn(Future.successful(true))
+
       AmendmentHelper.companyHasChanges(ua) mustBe false
 
       val application =
@@ -433,7 +440,12 @@ class AmendCompanyCheckYourAnswersControllerSpec extends SpecBase with MockitoSu
       }
 
       verifyNoInteractions(mockSubcontractorService)
-      verifyNoInteractions(mockSessionRepository)
+
+      val captor = ArgumentCaptor.forClass(classOf[UserAnswers])
+      verify(mockSessionRepository).set(captor.capture())
+
+      captor.getValue.id mustBe ua.id
+      captor.getValue.get(CisIdQuery) mustBe None
     }
 
     "must redirect to Journey Recovery when the service fails" in {

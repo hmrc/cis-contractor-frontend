@@ -42,11 +42,9 @@ class OriginalPartnershipAnswersSpec extends AnyWordSpec with Matchers {
           )
         ),
         partnershipContactMethodsYesNo = Some(true),
-        partnershipContactMethodOptions = Some(
-          Set(
-            ContactMethodOptions.Email,
-            ContactMethodOptions.Phone
-          )
+        partnershipContactMethodOptions = Set(
+          ContactMethodOptions.Email,
+          ContactMethodOptions.Phone
         ),
         email = Some("test@test.com"),
         phone = Some("01234567890"),
@@ -61,7 +59,8 @@ class OriginalPartnershipAnswersSpec extends AnyWordSpec with Matchers {
         nominatedPartnerCrnYesNo = Some(true),
         nominatedPartnerCrn = Some("12345678"),
         nominatedPartnerWorksReferenceYesNo = Some(true),
-        nominatedPartnerWorksReference = Some("123/AB456")
+        nominatedPartnerWorksReference = Some("123/AB456"),
+        verificationNumber = Some("V100000")
       )
 
       Json.fromJson[OriginalPartnershipAnswers](Json.toJson(model)).get shouldBe model
@@ -74,7 +73,7 @@ class OriginalPartnershipAnswersSpec extends AnyWordSpec with Matchers {
         addressYesNo = None,
         address = None,
         partnershipContactMethodsYesNo = None,
-        partnershipContactMethodOptions = None,
+        partnershipContactMethodOptions = Set.empty,
         email = None,
         phone = None,
         mobile = None,
@@ -88,7 +87,8 @@ class OriginalPartnershipAnswersSpec extends AnyWordSpec with Matchers {
         nominatedPartnerCrnYesNo = None,
         nominatedPartnerCrn = None,
         nominatedPartnerWorksReferenceYesNo = None,
-        nominatedPartnerWorksReference = None
+        nominatedPartnerWorksReference = None,
+        verificationNumber = None
       )
 
       Json.fromJson[OriginalPartnershipAnswers](Json.toJson(model)).get shouldBe model

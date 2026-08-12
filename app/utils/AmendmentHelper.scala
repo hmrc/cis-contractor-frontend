@@ -17,8 +17,11 @@
 package utils
 
 import models.UserAnswers
+import pages.add.*
 import pages.add.company.*
-import queries.OriginalCompanyAnswersQuery
+import pages.add.partnership.*
+import pages.add.trust.*
+import queries.{OriginalCompanyAnswersQuery, OriginalIndividualAnswersQuery, OriginalPartnershipAnswersQuery, OriginalTrustAnswersQuery}
 
 object AmendmentHelper {
 
@@ -39,6 +42,79 @@ object AmendmentHelper {
         original.crn                        -> userAnswers.get(CompanyCrnPage),
         original.worksReferenceYesNo        -> userAnswers.get(CompanyWorksReferenceYesNoPage),
         original.worksReference             -> userAnswers.get(CompanyWorksReferencePage)
+      ).exists { case (originalValue, currentValue) =>
+        originalValue != currentValue
+      }
+    }
+
+  def partnershipHasChanges(userAnswers: UserAnswers): Boolean =
+    userAnswers.get(OriginalPartnershipAnswersQuery).exists { original =>
+      Seq(
+        original.partnershipName                     -> userAnswers.get(PartnershipNamePage),
+        original.addressYesNo                        -> userAnswers.get(PartnershipAddressYesNoPage),
+        original.address                             -> userAnswers.get(PartnershipAddressPage),
+        original.partnershipContactMethodsYesNo      -> userAnswers.get(AddPartnershipContactMethodsYesNoPage),
+        original.partnershipContactMethodOptions     -> userAnswers
+          .get(PartnershipContactMethodOptionsPage)
+          .getOrElse(Set.empty),
+        original.email                               -> userAnswers.get(PartnershipEmailAddressPage),
+        original.phone                               -> userAnswers.get(PartnershipPhoneNumberPage),
+        original.mobile                              -> userAnswers.get(PartnershipMobileNumberPage),
+        original.hasUtrYesNo                         -> userAnswers.get(PartnershipHasUtrYesNoPage),
+        original.utr                                 -> userAnswers.get(PartnershipUniqueTaxpayerReferencePage),
+        original.nominatedPartnerName                -> userAnswers.get(PartnershipNominatedPartnerNamePage),
+        original.nominatedPartnerUtrYesNo            -> userAnswers.get(PartnershipNominatedPartnerUtrYesNoPage),
+        original.nominatedPartnerUtr                 -> userAnswers.get(PartnershipNominatedPartnerUtrPage),
+        original.nominatedPartnerNinoYesNo           -> userAnswers.get(PartnershipNominatedPartnerNinoYesNoPage),
+        original.nominatedPartnerNino                -> userAnswers.get(PartnershipNominatedPartnerNinoPage),
+        original.nominatedPartnerCrnYesNo            -> userAnswers.get(PartnershipNominatedPartnerCrnYesNoPage),
+        original.nominatedPartnerCrn                 -> userAnswers.get(PartnershipNominatedPartnerCrnPage),
+        original.nominatedPartnerWorksReferenceYesNo -> userAnswers.get(PartnershipWorksReferenceNumberYesNoPage),
+        original.nominatedPartnerWorksReference      -> userAnswers.get(PartnershipWorksReferenceNumberPage)
+      ).exists { case (originalValue, currentValue) =>
+        originalValue != currentValue
+      }
+    }
+
+  def trustHasChanges(userAnswers: UserAnswers): Boolean =
+    userAnswers.get(OriginalTrustAnswersQuery).exists { original =>
+      Seq(
+        original.trustName                -> userAnswers.get(TrustNamePage),
+        original.addressYesNo             -> userAnswers.get(TrustAddressYesNoPage),
+        original.address                  -> userAnswers.get(TrustAddressPage),
+        original.trustContactMethodsYesNo -> userAnswers.get(AddTrustContactMethodsYesNoPage),
+        original.trustContactMethod       -> userAnswers.get(TrustContactMethodOptionsPage).getOrElse(Set.empty),
+        original.email                    -> userAnswers.get(TrustEmailAddressPage),
+        original.phone                    -> userAnswers.get(TrustPhoneNumberPage),
+        original.mobile                   -> userAnswers.get(TrustMobileNumberPage),
+        original.utrYesNo                 -> userAnswers.get(TrustUtrYesNoPage),
+        original.utr                      -> userAnswers.get(TrustUtrPage),
+        original.worksReferenceYesNo      -> userAnswers.get(TrustWorksReferenceYesNoPage),
+        original.worksReference           -> userAnswers.get(TrustWorksReferencePage)
+      ).exists { case (originalValue, currentValue) =>
+        originalValue != currentValue
+      }
+    }
+
+  def individualHasChanges(userAnswers: UserAnswers): Boolean =
+    userAnswers.get(OriginalIndividualAnswersQuery).exists { original =>
+      Seq(
+        original.usesTradingName               -> userAnswers.get(SubTradingNameYesNoPage),
+        original.tradingName                   -> userAnswers.get(TradingNameOfSubcontractorPage),
+        original.subcontractorName             -> userAnswers.get(SubcontractorNamePage),
+        original.addressYesNo                  -> userAnswers.get(SubAddressYesNoPage),
+        original.address                       -> userAnswers.get(AddressOfSubcontractorPage),
+        original.individualContactMethodsYesNo -> userAnswers.get(AddIndividualContactMethodsYesNoPage),
+        original.individualContactMethod       -> userAnswers.get(IndividualContactMethodOptionsPage).getOrElse(Set.empty),
+        original.email                         -> userAnswers.get(IndividualEmailAddressPage),
+        original.phone                         -> userAnswers.get(IndividualPhoneNumberPage),
+        original.mobile                        -> userAnswers.get(IndividualMobileNumberPage),
+        original.utrYesNo                      -> userAnswers.get(UniqueTaxpayerReferenceYesNoPage),
+        original.utr                           -> userAnswers.get(SubcontractorsUniqueTaxpayerReferencePage),
+        original.ninoYesNo                     -> userAnswers.get(NationalInsuranceNumberYesNoPage),
+        original.nino                          -> userAnswers.get(SubNationalInsuranceNumberPage),
+        original.worksReferenceYesNo           -> userAnswers.get(WorksReferenceNumberYesNoPage),
+        original.worksReference                -> userAnswers.get(WorksReferenceNumberPage)
       ).exists { case (originalValue, currentValue) =>
         originalValue != currentValue
       }

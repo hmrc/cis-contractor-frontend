@@ -32,8 +32,8 @@ class PartnershipNavigatorSpec extends SpecBase {
   private lazy val journeyRecovery     = routes.JourneyRecoveryController.onPageLoad()
   private lazy val partnershipCYA      =
     controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
-  private lazy val partnershipAmendCYA = routes.JourneyRecoveryController
-    .onPageLoad() // TODO when available   controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
+  private lazy val partnershipAmendCYA =
+    controllers.amend.partnership.routes.AmendPartnershipCheckYourAnswersController.onPageLoad()
 
   "PartnershipNavigator" - {
 
@@ -594,13 +594,13 @@ class PartnershipNavigatorSpec extends SpecBase {
 
     "in Amend mode" - {
 
-      "must go from any page to JourneyRecovery" in {
+      "must go from any page to amend cya" in {
         case object UnknownPage extends Page
-        navigator.nextPage(UnknownPage, AmendMode, UserAnswers("id")) mustBe journeyRecovery
+        navigator.nextPage(UnknownPage, AmendMode, UserAnswers("id")) mustBe partnershipAmendCYA
       }
 
       "must go from PartnershipNamePage to JourneyRecovery" in {
-        navigator.nextPage(PartnershipNamePage, AmendMode, emptyUserAnswers) mustBe journeyRecovery
+        navigator.nextPage(PartnershipNamePage, AmendMode, emptyUserAnswers) mustBe partnershipAmendCYA
       }
 
       "must go from a PartnershipWorksReferenceNumberYesNoPage to next page when true" in {
@@ -818,9 +818,6 @@ class PartnershipNavigatorSpec extends SpecBase {
       }
 
       "Partnership UTR in aAmend journey" - {
-        "saveAndContinue" - {
-          // TODO - need unit tests for saveAndContinue private def
-        }
 
         "must go from a PartnershipUniqueTaxpayerReference to PartnershipCheckYourAnswers page in AmendMode" in {
           navigator.nextPage(
@@ -923,6 +920,14 @@ class PartnershipNavigatorSpec extends SpecBase {
             PartnershipNominatedPartnerUtrYesNoPage,
             AmendMode,
             answers
+          ) mustBe partnershipAmendCYA
+        }
+
+        "must go from a PartnershipNominatedPartnerUtrPage to PartnershipCheckYourAnswers page in AmendMode" in {
+          navigator.nextPage(
+            PartnershipNominatedPartnerUtrPage,
+            AmendMode,
+            emptyUserAnswers.setOrException(PartnershipNominatedPartnerUtrPage, "5860920998")
           ) mustBe partnershipAmendCYA
         }
 
@@ -1029,7 +1034,7 @@ class PartnershipNavigatorSpec extends SpecBase {
             ) mustBe controllers.add.partnership.routes.PartnershipContactMethodOptionsController.onPageLoad(AmendMode)
           }
 
-          "to CYA when answer is No" in {
+          "to amend cya when answer is No" in {
             val answers = emptyUserAnswers.set(AddPartnershipContactMethodsYesNoPage, false).success.value
 
             navigator.nextPage(
