@@ -231,10 +231,9 @@ class ConstructionIndustrySchemeConnector @Inject() (config: ServicesConfig, htt
       }
   }
 
-
   def updateSubcontractor(
-                           request: UpdateSubcontractorRequest
-                         )(implicit hc: HeaderCarrier): Future[UpdateSubcontractorResponse] = {
+    request: UpdateSubcontractorRequest
+  )(implicit hc: HeaderCarrier): Future[UpdateSubcontractorResponse] = {
 
     logger.info(
       s"[ConstructionIndustrySchemeConnector][updateSubcontractor] " +

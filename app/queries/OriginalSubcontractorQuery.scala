@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package models.response
+package queries
 
-import play.api.libs.json.{Json, OFormat}
+import models.response.SubcontractorResponse
+import play.api.libs.json.JsPath
 
-final case class UpdateSubcontractorResponse(
-  version: Int
-)
+case object OriginalSubcontractorQuery
+  extends Gettable[SubcontractorResponse]
+    with Settable[SubcontractorResponse] {
 
-object UpdateSubcontractorResponse {
-  given format: OFormat[UpdateSubcontractorResponse] =
-    Json.format[UpdateSubcontractorResponse]
+  override def path: JsPath =
+    JsPath \ "originalSubcontractor"
 }

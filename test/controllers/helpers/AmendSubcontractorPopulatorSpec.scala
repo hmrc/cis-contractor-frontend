@@ -108,6 +108,7 @@ class AmendSubcontractorPopulatorSpec extends SpecBase {
         answers.get(TypeOfSubcontractorPage).value mustBe Individualorsoletrader
         answers.get(SubTradingNameYesNoPage).value mustBe true
         answers.get(TradingNameOfSubcontractorPage).value mustBe "Test Trading Name"
+        answers.get(OriginalSubcontractorQuery).value mustBe baseSubcontractor
 
         answers.get(SubcontractorNamePage).value mustBe SubcontractorName(
           firstName = "John",
@@ -231,6 +232,7 @@ class AmendSubcontractorPopulatorSpec extends SpecBase {
 
         answers.get(CompanyCrnYesNoPage).value mustBe true
         answers.get(CompanyCrnPage).value mustBe "12345678"
+        answers.get(OriginalSubcontractorQuery).value mustBe subcontractor
 
         answers.get(CompanyWorksReferenceYesNoPage).value mustBe true
         answers.get(CompanyWorksReferencePage).value mustBe "XLS345-MM"
@@ -341,6 +343,7 @@ class AmendSubcontractorPopulatorSpec extends SpecBase {
 
         answers.get(ShowVerificationDetailsPage).value mustBe true
         answers.get(CisIdQuery).value mustBe cisId
+        answers.get(OriginalSubcontractorQuery).value mustBe subcontractor
 
         answers.get(OriginalPartnershipAnswersQuery).value mustBe OriginalPartnershipAnswers(
           partnershipName = Some("Test Partnership"),
@@ -406,6 +409,7 @@ class AmendSubcontractorPopulatorSpec extends SpecBase {
 
         answers.get(ShowVerificationDetailsPage).value mustBe true
         answers.get(CisIdQuery).value mustBe cisId
+        answers.get(OriginalSubcontractorQuery).value mustBe subcontractor
 
         answers.get(OriginalTrustAnswersQuery).value mustBe OriginalTrustAnswers(
           trustName = Some("Test Trust"),

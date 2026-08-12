@@ -195,14 +195,24 @@ class AmendCompanyCheckYourAnswersController @Inject() (
 
         case Right(_) =>
           subcontractorService
-            .createAndUpdateSubcontractor(request.userAnswers)
+            .updateSubcontractor(request.userAnswers)
             .flatMap { _ =>
               Future
-                .fromTry(request.userAnswers.set(AmendCheckYourAnswersSubmittedPage, true))
-                .flatMap(updated => sessionRepository.set(updated).map(_ => ()))
+                .fromTry(
+                  request.userAnswers.set(
+                    AmendCheckYourAnswersSubmittedPage,
+                    true
+                  )
+                )
+                .flatMap { updated =>
+                  sessionRepository
+                    .set(updated)
+                    .map(_ => ())
+                }
                 .map { _ =>
                   Redirect(
-                    controllers.amend.company.routes.AmendCompanyConfirmationController.onPageLoad()
+                    controllers.amend.company.routes.AmendCompanyConfirmationController
+                      .onPageLoad()
                   )
                 }
             }
@@ -211,7 +221,10 @@ class AmendCompanyCheckYourAnswersController @Inject() (
                 "[AmendCompanyCheckYourAnswersController.onSubmit] Failed to update subcontractor",
                 t
               )
-              Redirect(routes.JourneyRecoveryController.onPageLoad())
+
+              Redirect(
+                routes.JourneyRecoveryController.onPageLoad()
+              )
             }
       }
     }

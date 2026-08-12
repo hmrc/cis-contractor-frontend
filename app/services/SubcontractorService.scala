@@ -26,24 +26,9 @@ import pages.add.partnership.*
 import pages.add.company.*
 import pages.add.trust.*
 import play.api.Logging
-import queries.CisIdQuery
 import uk.gov.hmrc.http.HeaderCarrier
-import models.requests.{
-  SubcontractorRequest,
-  UpdateSubcontractorRequest
-}
-import models.response.{
-  GetSubcontractorResponse,
-  SubcontractorResponse,
-  UpdateSubcontractorResponse
-}
-import queries.{
-  CisIdQuery,
-  OriginalCompanyAnswersQuery,
-  OriginalIndividualAnswersQuery,
-  OriginalPartnershipAnswersQuery,
-  OriginalTrustAnswersQuery
-}
+import models.requests.{SubcontractorRequest, UpdateSubcontractorRequest}
+import queries.{CisIdQuery, OriginalSubcontractorQuery}
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
@@ -200,15 +185,12 @@ class SubcontractorService @Inject() (
     cisConnector.getSubcontractor(cisId = cisId, subbieResourceRef = subbieResourceRef)
 
   def updateSubcontractor(
-                           userAnswers: UserAnswers
-                         )(implicit hc: HeaderCarrier): Future[UpdateSubcontractorResponse] =
+    userAnswers: UserAnswers
+  )(implicit hc: HeaderCarrier): Future[UpdateSubcontractorResponse] =
     for {
-      cisId <- getCisId(userAnswers)
+      cisId             <- getCisId(userAnswers)
       subcontractorType <- getSubcontractorType(userAnswers)
-      original <- getOriginalSubcontractor(
-        userAnswers,
-        subcontractorType
-      )
+      original          <- getOriginalSubcontractor(userAnswers)
 
       subcontractor =
         updateSubcontractorFromUserAnswers(
@@ -225,44 +207,25 @@ class SubcontractorService @Inject() (
           )
         )
     } yield response
-  
+
   private def getOriginalSubcontractor(
-                                            userAnswers: UserAnswers,
-                                            subcontractorType: TypeOfSubcontractor
-                                          ): Future[SubcontractorResponse] = {
+    userAnswers: UserAnswers
+  ): Future[SubcontractorResponse] =
+    userAnswers.get(OriginalSubcontractorQuery) match {
+      case Some(subcontractor) =>
+        Future.successful(subcontractor)
 
-        val original =
-          subcontractorType match {
-            case Individualorsoletrader =>
-              userAnswers.get(OriginalIndividualAnswersQuery)
-
-            case Limitedcompany =>
-              userAnswers.get(OriginalCompanyAnswersQuery)
-
-            case Partnership =>
-              userAnswers.get(OriginalPartnershipAnswersQuery)
-
-            case Trust =>
-              userAnswers.get(OriginalTrustAnswersQuery)
-          }
-
-        original match {
-          case Some(subcontractor) =>
-            Future.successful(subcontractor)
-
-          case None =>
-            Future.failed(
-              new RuntimeException(
-                s"Original subcontractor answers not found for $subcontractorType"
-              )
-            )
-        }
-      }
-
+      case None =>
+        Future.failed(
+          new RuntimeException(
+            "OriginalSubcontractorQuery not found in session data"
+          )
+        )
+    }
 
   private def toSubcontractorRequest(
-                                      subcontractor: SubcontractorResponse
-                                    ): SubcontractorRequest =
+    subcontractor: SubcontractorResponse
+  ): SubcontractorRequest =
     SubcontractorRequest(
       subcontractorId = subcontractor.subcontractorId,
       utr = subcontractor.utr,
@@ -302,10 +265,10 @@ class SubcontractorService @Inject() (
     )
 
   private def updateSubcontractorFromUserAnswers(
-                                                  original: SubcontractorResponse,
-                                                  subcontractorType: TypeOfSubcontractor,
-                                                  userAnswers: UserAnswers
-                                                ): SubcontractorRequest = {
+    original: SubcontractorResponse,
+    subcontractorType: TypeOfSubcontractor,
+    userAnswers: UserAnswers
+  ): SubcontractorRequest = {
 
     val existing =
       toSubcontractorRequest(original)
@@ -338,9 +301,9 @@ class SubcontractorService @Inject() (
   }
 
   private def updateCompany(
-                             existing: SubcontractorRequest,
-                             userAnswers: UserAnswers
-                           ): SubcontractorRequest = {
+    existing: SubcontractorRequest,
+    userAnswers: UserAnswers
+  ): SubcontractorRequest = {
 
     val address =
       userAnswers.get(CompanyAddressPage)
@@ -362,13 +325,11 @@ class SubcontractorService @Inject() (
     )
   }
 
-
   private def updatePartnership(existing: SubcontractorRequest, userAnswers: UserAnswers): SubcontractorRequest = {
     val address = userAnswers.get(PartnershipAddressPage)
 
     existing.copy(
-      utr =
-        userAnswers.get(PartnershipUniqueTaxpayerReferencePage),
+      utr = userAnswers.get(PartnershipUniqueTaxpayerReferencePage),
       partnerUtr = userAnswers.get(PartnershipNominatedPartnerUtrPage),
       partnershipTradingName = userAnswers.get(PartnershipNamePage),
       tradingName = userAnswers.get(PartnershipNominatedPartnerNamePage),
@@ -378,73 +339,55 @@ class SubcontractorService @Inject() (
       addressLine2 = address.flatMap(_.addressLine2),
       addressLine3 = address.flatMap(_.addressLine3),
       addressLine4 = address.flatMap(_.addressLine4),
-      country =
-        address
-          .flatMap(_.country)
-          .flatMap(_.name),
-      postcode =
-        address.flatMap(_.postcode),
-      emailAddress =
-        userAnswers.get(
-          PartnershipEmailAddressPage
-        ),
-      phoneNumber =
-        userAnswers.get(
-          PartnershipPhoneNumberPage
-        ),
-      mobilePhoneNumber =
-        userAnswers.get(
-          PartnershipMobileNumberPage
-        ),
-      worksReferenceNumber =
-        userAnswers.get(
-          PartnershipWorksReferenceNumberPage
-        )
+      country = address
+        .flatMap(_.country)
+        .flatMap(_.name),
+      postcode = address.flatMap(_.postcode),
+      emailAddress = userAnswers.get(
+        PartnershipEmailAddressPage
+      ),
+      phoneNumber = userAnswers.get(
+        PartnershipPhoneNumberPage
+      ),
+      mobilePhoneNumber = userAnswers.get(
+        PartnershipMobileNumberPage
+      ),
+      worksReferenceNumber = userAnswers.get(
+        PartnershipWorksReferenceNumberPage
+      )
     )
   }
 
   private def updateTrust(
-                           existing: SubcontractorRequest,
-                           userAnswers: UserAnswers
-                         ): SubcontractorRequest = {
+    existing: SubcontractorRequest,
+    userAnswers: UserAnswers
+  ): SubcontractorRequest = {
 
     val address =
       userAnswers.get(TrustAddressPage)
 
     existing.copy(
-      utr =
-        userAnswers.get(TrustUtrPage),
-      tradingName =
-        userAnswers.get(TrustNamePage),
-      addressLine1 =
-        address.map(_.addressLine1),
-      addressLine2 =
-        address.flatMap(_.addressLine2),
-      addressLine3 =
-        address.flatMap(_.addressLine3),
-      addressLine4 =
-        address.flatMap(_.addressLine4),
-      country =
-        address
-          .flatMap(_.country)
-          .flatMap(_.name),
-      postcode =
-        address.flatMap(_.postcode),
-      emailAddress =
-        userAnswers.get(TrustEmailAddressPage),
-      phoneNumber =
-        userAnswers.get(TrustPhoneNumberPage),
-      mobilePhoneNumber =
-        userAnswers.get(TrustMobileNumberPage),
-      worksReferenceNumber =
-        userAnswers.get(TrustWorksReferencePage)
+      utr = userAnswers.get(TrustUtrPage),
+      tradingName = userAnswers.get(TrustNamePage),
+      addressLine1 = address.map(_.addressLine1),
+      addressLine2 = address.flatMap(_.addressLine2),
+      addressLine3 = address.flatMap(_.addressLine3),
+      addressLine4 = address.flatMap(_.addressLine4),
+      country = address
+        .flatMap(_.country)
+        .flatMap(_.name),
+      postcode = address.flatMap(_.postcode),
+      emailAddress = userAnswers.get(TrustEmailAddressPage),
+      phoneNumber = userAnswers.get(TrustPhoneNumberPage),
+      mobilePhoneNumber = userAnswers.get(TrustMobileNumberPage),
+      worksReferenceNumber = userAnswers.get(TrustWorksReferencePage)
     )
   }
 
   private def updateIndividual(
-                                existing: SubcontractorRequest,
-                                userAnswers: UserAnswers
-                              ): SubcontractorRequest = {
+    existing: SubcontractorRequest,
+    userAnswers: UserAnswers
+  ): SubcontractorRequest = {
 
     val name =
       userAnswers.get(SubcontractorNamePage)
@@ -453,56 +396,39 @@ class SubcontractorService @Inject() (
       userAnswers.get(AddressOfSubcontractorPage)
 
     existing.copy(
-      firstName =
-        name.map(_.firstName),
-      secondName =
-        name.flatMap(_.middleName),
-      surname =
-        name.map(_.lastName),
-      tradingName =
-        userAnswers.get(
-          TradingNameOfSubcontractorPage
-        ),
-      nino =
-        userAnswers.get(
-          SubNationalInsuranceNumberPage
-        ),
-      utr =
-        userAnswers.get(
-          SubcontractorsUniqueTaxpayerReferencePage
-        ),
-      addressLine1 =
-        address.map(_.addressLine1),
-      addressLine2 =
-        address.flatMap(_.addressLine2),
-      addressLine3 =
-        address.flatMap(_.addressLine3),
-      addressLine4 =
-        address.flatMap(_.addressLine4),
-      country =
-        address
-          .flatMap(_.country)
-          .flatMap(_.name),
-      postcode =
-        address.flatMap(_.postcode),
-      emailAddress =
-        userAnswers.get(
-          IndividualEmailAddressPage
-        ),
-      phoneNumber =
-        userAnswers.get(
-          IndividualPhoneNumberPage
-        ),
-      mobilePhoneNumber =
-        userAnswers.get(
-          IndividualMobileNumberPage
-        ),
-      worksReferenceNumber =
-        userAnswers.get(
-          WorksReferenceNumberPage
-        )
+      firstName = name.map(_.firstName),
+      secondName = name.flatMap(_.middleName),
+      surname = name.map(_.lastName),
+      tradingName = userAnswers.get(
+        TradingNameOfSubcontractorPage
+      ),
+      nino = userAnswers.get(
+        SubNationalInsuranceNumberPage
+      ),
+      utr = userAnswers.get(
+        SubcontractorsUniqueTaxpayerReferencePage
+      ),
+      addressLine1 = address.map(_.addressLine1),
+      addressLine2 = address.flatMap(_.addressLine2),
+      addressLine3 = address.flatMap(_.addressLine3),
+      addressLine4 = address.flatMap(_.addressLine4),
+      country = address
+        .flatMap(_.country)
+        .flatMap(_.name),
+      postcode = address.flatMap(_.postcode),
+      emailAddress = userAnswers.get(
+        IndividualEmailAddressPage
+      ),
+      phoneNumber = userAnswers.get(
+        IndividualPhoneNumberPage
+      ),
+      mobilePhoneNumber = userAnswers.get(
+        IndividualMobileNumberPage
+      ),
+      worksReferenceNumber = userAnswers.get(
+        WorksReferenceNumberPage
+      )
     )
   }
-
 
 }

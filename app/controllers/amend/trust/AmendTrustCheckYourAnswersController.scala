@@ -194,14 +194,24 @@ class AmendTrustCheckYourAnswersController @Inject() (
 
         case Right(_) =>
           subcontractorService
-            .createAndUpdateSubcontractor(request.userAnswers)
+            .updateSubcontractor(request.userAnswers)
             .flatMap { _ =>
               Future
-                .fromTry(request.userAnswers.set(AmendCheckYourAnswersSubmittedPage, true))
-                .flatMap(updated => sessionRepository.set(updated).map(_ => ()))
+                .fromTry(
+                  request.userAnswers.set(
+                    AmendCheckYourAnswersSubmittedPage,
+                    true
+                  )
+                )
+                .flatMap { updated =>
+                  sessionRepository
+                    .set(updated)
+                    .map(_ => ())
+                }
                 .map { _ =>
                   Redirect(
-                    controllers.amend.trust.routes.AmendTrustConfirmationController.onPageLoad()
+                    controllers.amend.trust.routes.AmendTrustConfirmationController
+                      .onPageLoad()
                   )
                 }
             }
@@ -210,7 +220,10 @@ class AmendTrustCheckYourAnswersController @Inject() (
                 "[AmendTrustCheckYourAnswersController.onSubmit] Failed to update subcontractor",
                 t
               )
-              Redirect(routes.JourneyRecoveryController.onPageLoad())
+
+              Redirect(
+                routes.JourneyRecoveryController.onPageLoad()
+              )
             }
       }
     }
