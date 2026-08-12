@@ -44,6 +44,11 @@ class CreateVerificationBatchAndVerificationsController @Inject() (
       current.verificationBatch.nonEmpty || current.verifications.nonEmpty
     }
 
+  private def hasVerificationBatchResource(ua: models.UserAnswers): Boolean =
+    ua.get(CurrentVerificationBatchResponsePage).exists { cu =>
+      cu.verificationBatch.flatMap(_.verifBatchResourceRef).isEmpty
+    }
+
   private def parseIds(label: String, ids: Iterable[String]): Either[String, Seq[Long]] = {
     val parsed = ids.toSeq.distinct.map(_.trim).map(_.toLongOption)
     if (parsed.forall(_.isDefined)) Right(parsed.flatten)
@@ -102,7 +107,7 @@ class CreateVerificationBatchAndVerificationsController @Inject() (
                     )
                   )
 
-                case Some(_) =>
+                case Some(_) if hasVerificationBatchResource(ua) =>
                   verificationService
                     .createVerificationBatchAndVerifications(
                       userAnswers = ua,
