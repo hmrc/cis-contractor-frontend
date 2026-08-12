@@ -16,10 +16,10 @@
 
 package controllers.verify
 
-import config.FrontendAppConfig
 import controllers.actions.*
+import models.NormalMode
 import pages.verify.CurrentVerificationBatchResponsePage
-import play.api.i18n.{I18nSupport, MessagesApi}
+import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.ReviewInsufficientInfoService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -28,15 +28,13 @@ import views.html.verify.ReviewInsufficientInfoSubcontractorsView
 import javax.inject.Inject
 
 class ReviewInsufficientInfoSubcontractorsController @Inject() (
-  override val messagesApi: MessagesApi,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   reviewInsufficientInfoService: ReviewInsufficientInfoService,
   val controllerComponents: MessagesControllerComponents,
   view: ReviewInsufficientInfoSubcontractorsView
-)(implicit appConfig: FrontendAppConfig)
-    extends FrontendBaseController
+) extends FrontendBaseController
     with I18nSupport {
 
   def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
@@ -52,5 +50,9 @@ class ReviewInsufficientInfoSubcontractorsController @Inject() (
       case None =>
         Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
     }
+  }
+
+  def onSubmit(): Action[AnyContent] = (identify andThen getData andThen requireData) { _ =>
+    Redirect(controllers.verify.routes.ContractorEmailConfirmationStoredController.onPageLoad(NormalMode))
   }
 }

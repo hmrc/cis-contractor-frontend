@@ -112,5 +112,5 @@ class ReviewInsufficientInfoService @Inject() (
     sub.utr
       .map(_.trim)
       .filter(_.nonEmpty)
-      .getOrElse(messages("verify.reviewInsufficientInfo.utr.noneProvided"))
+      .getOrElse(messages("verify.reviewInsufficientInfo.noneProvided"))
 }

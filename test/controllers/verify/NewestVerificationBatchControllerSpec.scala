@@ -207,7 +207,7 @@ class NewestVerificationBatchControllerSpec extends SpecBase with MockitoSugar w
       }
     }
 
-    "must redirect to NoSubcontractorsAdded when inactivity declared within 6 months and no subcontractors exist" in {
+    "must redirect to InactiveSchemeWarning when inactivity declared within 6 months and no subcontractors exist" in {
       val mockService = mock[VerificationService]
 
       val monthlyReturnSubmission = MonthlyReturnSubmission(
@@ -239,7 +239,7 @@ class NewestVerificationBatchControllerSpec extends SpecBase with MockitoSugar w
 
         status(result) mustBe SEE_OTHER
         redirectLocation(result).value mustBe
-          controllers.verify.routes.NoSubcontractorsAddedController.onPageLoad().url
+          controllers.verify.routes.InactiveSchemeWarningController.onPageLoad().url
 
         verify(mockService).refreshNewestVerificationBatch(any[UserAnswers])(any[HeaderCarrier])
         verifyNoMoreInteractions(mockService)
@@ -279,7 +279,7 @@ class NewestVerificationBatchControllerSpec extends SpecBase with MockitoSugar w
 
         status(result) mustBe SEE_OTHER
         redirectLocation(result).value mustBe
-          controllers.verify.routes.VerifyYourSubcontractorsYesNoController.onPageLoad.url
+          controllers.verify.routes.InactiveSchemeWarningController.onPageLoad().url
 
         verify(mockService).refreshNewestVerificationBatch(any[UserAnswers])(any[HeaderCarrier])
         verifyNoMoreInteractions(mockService)
@@ -319,7 +319,7 @@ class NewestVerificationBatchControllerSpec extends SpecBase with MockitoSugar w
 
         status(result) mustBe SEE_OTHER
         redirectLocation(result).value mustBe
-          controllers.verify.routes.SelectSubcontractorController.onPageLoad(NormalMode).url
+          controllers.verify.routes.InactiveSchemeWarningController.onPageLoad().url
 
         verify(mockService).refreshNewestVerificationBatch(any[UserAnswers])(any[HeaderCarrier])
         verifyNoMoreInteractions(mockService)
@@ -359,7 +359,7 @@ class NewestVerificationBatchControllerSpec extends SpecBase with MockitoSugar w
 
         status(result) mustBe SEE_OTHER
         redirectLocation(result).value mustBe
-          controllers.verify.routes.InactiveSchemeWarningController.onPageLoad().url
+          controllers.verify.routes.SelectSubcontractorController.onPageLoad(NormalMode).url
 
         verify(mockService).refreshNewestVerificationBatch(any[UserAnswers])(any[HeaderCarrier])
         verifyNoMoreInteractions(mockService)
@@ -784,6 +784,85 @@ class NewestVerificationBatchControllerSpec extends SpecBase with MockitoSugar w
 
         verify(mockService).refreshNewestVerificationBatch(any[UserAnswers])(any[HeaderCarrier])
         verifyNoMoreInteractions(mockService)
+      }
+    }
+
+    "must redirect to NoSubcontractorsAdded when scheme is inactive and no subcontractors exist" in {
+
+      val mockService = mock[VerificationService]
+
+      val monthlyReturnSubmission = MonthlyReturnSubmission(
+        submissionId = 1L,
+        submissionRequestDate = Some(withinSixMonthsDateTime)
+      )
+
+      val updatedAnswers =
+        emptyUserAnswers
+          .set(
+            NewestVerificationBatchResponsePage,
+            newestBatchResponse(
+              subcontractors = Seq.empty,
+              monthlyReturn = Some(inactiveMonthlyReturn),
+              monthlyReturnSubmission = Some(monthlyReturnSubmission)
+            )
+          )
+          .success
+          .value
+
+      when(mockService.refreshNewestVerificationBatch(any[UserAnswers])(any[HeaderCarrier]))
+        .thenReturn(Future.successful(updatedAnswers))
+
+      val application =
+        appBuilder(mockService).build()
+
+      running(application) {
+        val result = route(application, FakeRequest(GET, continueUrl)).value
+
+        status(result) mustBe SEE_OTHER
+
+        redirectLocation(result).value mustBe
+          controllers.verify.routes.NoSubcontractorsAddedController.onPageLoad().url
+      }
+    }
+
+    "must redirect to SelectSubcontractor when scheme is inactive and unverified subcontractors exist" in {
+
+      val mockService = mock[VerificationService]
+
+      val monthlyReturnSubmission = MonthlyReturnSubmission(
+        submissionId = 1L,
+        submissionRequestDate = Some(withinSixMonthsDateTime)
+      )
+
+      val updatedAnswers =
+        emptyUserAnswers
+          .set(
+            NewestVerificationBatchResponsePage,
+            newestBatchResponse(
+              subcontractors = Seq(unverifiedSubcontractor),
+              monthlyReturn = Some(inactiveMonthlyReturn),
+              monthlyReturnSubmission = Some(monthlyReturnSubmission)
+            )
+          )
+          .flatMap(_.set(UnverifiedSubcontractorsPage, Seq(unverifiedSubcontractor)))
+          .success
+          .value
+
+      when(mockService.refreshNewestVerificationBatch(any[UserAnswers])(any[HeaderCarrier]))
+        .thenReturn(Future.successful(updatedAnswers))
+
+      val application =
+        appBuilder(mockService).build()
+
+      running(application) {
+        val result = route(application, FakeRequest(GET, continueUrl)).value
+
+        status(result) mustBe SEE_OTHER
+
+        redirectLocation(result).value mustBe
+          controllers.verify.routes.SelectSubcontractorController
+            .onPageLoad(NormalMode)
+            .url
       }
     }
 

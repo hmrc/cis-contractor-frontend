@@ -27,11 +27,9 @@ import views.html.verify.ReviewInsufficientInfoSubcontractorsView
 
 class ReviewInsufficientInfoSubcontractorsViewSpec extends SpecBase {
 
-  private implicit val request: Request[?]                 = FakeRequest()
-  private implicit val messagesImpl: Messages              =
+  private implicit val request: Request[?]    = FakeRequest()
+  private implicit val messagesImpl: Messages =
     app.injector.instanceOf[play.api.i18n.MessagesApi].preferred(FakeRequest())
-  private implicit val appConfig: config.FrontendAppConfig =
-    app.injector.instanceOf[config.FrontendAppConfig]
 
   private val view = app.injector.instanceOf[ReviewInsufficientInfoSubcontractorsView]
 
@@ -85,7 +83,7 @@ class ReviewInsufficientInfoSubcontractorsViewSpec extends SpecBase {
       table must not be null
 
       table.text must include("Brody, Martin")
-      table.text must include("None provided")
+      table.text must include(messagesImpl("verify.reviewInsufficientInfo.utr.noneProvided"))
       table.text must include(messagesImpl("verify.reviewInsufficientInfo.action.edit"))
       table.text must include(messagesImpl("verify.reviewInsufficientInfo.action.proceed"))
       table.text must include(messagesImpl("verify.reviewInsufficientInfo.action.remove"))

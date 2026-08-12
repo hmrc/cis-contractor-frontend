@@ -153,7 +153,7 @@ class ReviewInsufficientInfoServiceSpec extends SpecBase with MockitoSugar with 
 
       val vm = build(missing)
 
-      vm.missing.head.utr mustBe messages("verify.reviewInsufficientInfo.utr.noneProvided")
+      vm.missing.head.utr mustBe messages("verify.reviewInsufficientInfo.noneProvided")
     }
 
     "must render an individual's name as 'surname, firstName'" in {
