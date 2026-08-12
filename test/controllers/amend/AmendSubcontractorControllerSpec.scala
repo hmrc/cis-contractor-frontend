@@ -17,6 +17,7 @@
 package controllers.amend
 
 import base.SpecBase
+import generators.ModelGenerators
 import models.TypeOfSubcontractor.{Individualorsoletrader, Limitedcompany, Partnership, Trust}
 import models.UserAnswers
 import models.response.{GetSubcontractorResponse, SubcontractorResponse}
@@ -24,17 +25,19 @@ import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{never, times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
+import org.scalatestplus.play.guice.GuiceOneAppPerSuite
+import play.api.inject.guice.GuiceApplicationBuilder
 import pages.add.TypeOfSubcontractorPage
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import repositories.SessionRepository
-import services.SubcontractorService
+import services.{CisManageService, SubcontractorService}
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.Future
 
-class AmendSubcontractorControllerSpec extends SpecBase with MockitoSugar {
+class AmendSubcontractorControllerSpec  extends SpecBase with MockitoSugar with ModelGenerators with GuiceOneAppPerSuite {
 
   private val cisId             = "INST-123"
   private val subbieResourceRef = 1001L
@@ -91,17 +94,18 @@ class AmendSubcontractorControllerSpec extends SpecBase with MockitoSugar {
       subcontractor = subcontractor
     )
 
-  private def applicationWith(
-    mockService: SubcontractorService,
-    mockSessionRepository: SessionRepository,
-    userAnswers: Option[UserAnswers] = Some(emptyUserAnswers)
-  ) =
-    applicationBuilder(userAnswers = userAnswers)
+  private def applicationWith(mockService: SubcontractorService, mockSessionRepository: SessionRepository): GuiceApplicationBuilder = {
+    val mockCisManagerService = mock[CisManageService]
+    when(mockCisManagerService.ensureCisIdInUserAnswers(any[UserAnswers])(any[HeaderCarrier]))
+      .thenReturn(Future.successful(emptyUserAnswers))
+
+    applicationBuilder(userAnswers = Some(emptyUserAnswers))
       .overrides(
         bind[SubcontractorService].toInstance(mockService),
+        bind[CisManageService].toInstance(mockCisManagerService),
         bind[SessionRepository].toInstance(mockSessionRepository)
       )
-      .build()
+  }
 
   "AmendSubcontractorController" - {
 
@@ -129,7 +133,7 @@ class AmendSubcontractorControllerSpec extends SpecBase with MockitoSugar {
         when(mockSessionRepository.set(any[UserAnswers]))
           .thenReturn(Future.successful(true))
 
-        val application = applicationWith(mockService, mockSessionRepository)
+        val application = applicationWith(mockService, mockSessionRepository).build()
 
         running(application) {
           val result =
@@ -151,7 +155,7 @@ class AmendSubcontractorControllerSpec extends SpecBase with MockitoSugar {
               eqTo(subbieResourceRef)
             )(any[HeaderCarrier])
 
-          verify(mockSessionRepository, times(1))
+          verify(mockSessionRepository, times(2))
             .set(captor.capture())
 
           captor.getValue
@@ -163,6 +167,7 @@ class AmendSubcontractorControllerSpec extends SpecBase with MockitoSugar {
       "must retrieve a company subcontractor, save populated answers and redirect to company CYA" in {
         val mockService           = mock[SubcontractorService]
         val mockSessionRepository = mock[SessionRepository]
+        val mockCisManagerService = mock[CisManageService]
         val captor                = ArgumentCaptor.forClass(classOf[UserAnswers])
 
         val subcontractor =
@@ -178,11 +183,13 @@ class AmendSubcontractorControllerSpec extends SpecBase with MockitoSugar {
         ).thenReturn(
           Future.successful(responseWith(Some(subcontractor)))
         )
+        when(mockCisManagerService.ensureCisIdInUserAnswers(any[UserAnswers])(any[HeaderCarrier]))
+          .thenReturn(Future.successful(emptyUserAnswers))
 
         when(mockSessionRepository.set(any[UserAnswers]))
           .thenReturn(Future.successful(true))
 
-        val application = applicationWith(mockService, mockSessionRepository)
+        val application = applicationWith(mockService, mockSessionRepository).build()
 
         running(application) {
           val result =
@@ -198,7 +205,7 @@ class AmendSubcontractorControllerSpec extends SpecBase with MockitoSugar {
               .onPageLoad()
               .url
 
-          verify(mockSessionRepository, times(1))
+          verify(mockSessionRepository, times(2))
             .set(captor.capture())
 
           captor.getValue
@@ -210,6 +217,7 @@ class AmendSubcontractorControllerSpec extends SpecBase with MockitoSugar {
       "must retrieve a partnership subcontractor, save populated answers and redirect to partnership CYA" in {
         val mockService           = mock[SubcontractorService]
         val mockSessionRepository = mock[SessionRepository]
+        val mockCisManagerService = mock[CisManageService]
         val captor                = ArgumentCaptor.forClass(classOf[UserAnswers])
 
         val subcontractor =
@@ -226,10 +234,13 @@ class AmendSubcontractorControllerSpec extends SpecBase with MockitoSugar {
           Future.successful(responseWith(Some(subcontractor)))
         )
 
+        when(mockCisManagerService.ensureCisIdInUserAnswers(any[UserAnswers])(any[HeaderCarrier]))
+          .thenReturn(Future.successful(emptyUserAnswers))
+
         when(mockSessionRepository.set(any[UserAnswers]))
           .thenReturn(Future.successful(true))
 
-        val application = applicationWith(mockService, mockSessionRepository)
+        val application = applicationWith(mockService, mockSessionRepository).build()
 
         running(application) {
           val result =
@@ -245,7 +256,7 @@ class AmendSubcontractorControllerSpec extends SpecBase with MockitoSugar {
               .onPageLoad()
               .url
 
-          verify(mockSessionRepository, times(1))
+          verify(mockSessionRepository, times(2))
             .set(captor.capture())
 
           captor.getValue
@@ -276,7 +287,7 @@ class AmendSubcontractorControllerSpec extends SpecBase with MockitoSugar {
         when(mockSessionRepository.set(any[UserAnswers]))
           .thenReturn(Future.successful(true))
 
-        val application = applicationWith(mockService, mockSessionRepository)
+        val application = applicationWith(mockService, mockSessionRepository).build()
 
         running(application) {
           val result =
@@ -292,7 +303,7 @@ class AmendSubcontractorControllerSpec extends SpecBase with MockitoSugar {
               .onPageLoad()
               .url
 
-          verify(mockSessionRepository, times(1))
+          verify(mockSessionRepository, times(2))
             .set(captor.capture())
 
           captor.getValue
@@ -304,6 +315,10 @@ class AmendSubcontractorControllerSpec extends SpecBase with MockitoSugar {
       "must redirect to JourneyRecovery and not save when no subcontractor is returned" in {
         val mockService           = mock[SubcontractorService]
         val mockSessionRepository = mock[SessionRepository]
+        val mockCisManagerService = mock[CisManageService]
+
+        when(mockCisManagerService.ensureCisIdInUserAnswers(any[UserAnswers])(any[HeaderCarrier]))
+          .thenReturn(Future.successful(emptyUserAnswers))
 
         when(
           mockService.getSubcontractor(
@@ -319,10 +334,14 @@ class AmendSubcontractorControllerSpec extends SpecBase with MockitoSugar {
           )
         )
 
+        when(mockSessionRepository.set(any[UserAnswers]))
+          .thenReturn(Future.successful(false))
+
         val application =
           applicationBuilder(userAnswers = Some(emptyUserAnswers))
             .overrides(
               bind[SubcontractorService].toInstance(mockService),
+              bind[CisManageService].toInstance(mockCisManagerService),
               bind[SessionRepository].toInstance(mockSessionRepository)
             )
             .build()

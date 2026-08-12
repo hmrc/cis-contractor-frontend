@@ -16,15 +16,16 @@
 
 package controllers.amend
 
+import controllers.AgentClientChecks
 import controllers.actions.*
 import controllers.helpers.AmendSubcontractorPopulator
 import models.TypeOfSubcontractor.{Individualorsoletrader, Limitedcompany, Partnership, Trust}
 import models.{TypeOfSubcontractor, UserAnswers}
-import models.response.SubcontractorResponse
+import models.response.{GetSubcontractorResponse, SubcontractorResponse}
 import play.api.Logging
 import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents, Result}
 import repositories.SessionRepository
-import services.SubcontractorService
+import services.{CisManageService, SubcontractorService}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
 import javax.inject.Inject
@@ -32,75 +33,91 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
 
 class AmendSubcontractorController @Inject() (
-  identify: IdentifierAction,
-  getData: DataRetrievalAction,
-  requireData: DataRequiredAction,
-  subcontractorService: SubcontractorService,
-  sessionRepository: SessionRepository,
-  val controllerComponents: MessagesControllerComponents
-)(implicit ec: ExecutionContext)
-    extends FrontendBaseController
+                                               identify: IdentifierAction,
+                                               getData: DataRetrievalAction,
+                                               subcontractorService: SubcontractorService,
+                                               val controllerComponents: MessagesControllerComponents,
+                                               override protected val cisManageService: CisManageService,
+                                               override protected val sessionRepository: SessionRepository
+                                             )(implicit ec: ExecutionContext)
+  extends FrontendBaseController
+    with AgentClientChecks
     with Logging {
 
   def onPageLoad(
-    cisId: String,
-    subbieResourceRef: Long
-  ): Action[AnyContent] =
-    (identify andThen getData andThen requireData).async { implicit request =>
-      subcontractorService
-        .getSubcontractor(cisId, subbieResourceRef)
-        .flatMap { response =>
-          response.subcontractor match {
-
-            case None =>
-              logger.error(
-                s"[AmendSubcontractorController] No subcontractor returned " +
-                  s"for cisId=$cisId, subbieResourceRef=$subbieResourceRef"
+                  cisId: String,
+                  subbieResourceRef: Long
+                ): Action[AnyContent] =
+    (identify andThen getData).async { implicit request =>
+      val userAnswers = request.userAnswers.getOrElse(UserAnswers(request.userId))
+      withAgentClientChecks(request.userId, request.isAgent, userAnswers)
+        .flatMap {
+          case Left(redirect)        => Future.successful(redirect)
+          case Right(checkedAnswers) =>
+            subcontractorService
+              .getSubcontractor(cisId, subbieResourceRef)
+              .flatMap(
+                resolveSubcontractor(
+                  _,
+                  cisId,
+                  subbieResourceRef,
+                  userAnswers
+                )
               )
-              Future.successful(recovery)
+              .recover { case error =>
+                logger.error(
+                  s"[AmendSubcontractorController] Failed to retrieve subcontractor. " +
+                    s"cisId=$cisId, subbieResourceRef=$subbieResourceRef",
+                  error
+                )
 
-            case Some(subcontractor) =>
-              subcontractor.subcontractorType
-                .flatMap(TypeOfSubcontractor.fromString)
-                .fold[Future[Result]] {
-
-                  logger.error(
-                    s"[AmendSubcontractorController] Unsupported subcontractor type. " +
-                      s"type=${subcontractor.subcontractorType.getOrElse("missing")}, " +
-                      s"cisId=$cisId, subbieResourceRef=$subbieResourceRef"
-                  )
-
-                  Future.successful(recovery)
-
-                } { subcontractorType =>
-                  handleSubcontractor(
-                    subcontractorType = subcontractorType,
-                    userAnswers = request.userAnswers,
-                    cisId = cisId,
-                    subbieResourceRef = subbieResourceRef,
-                    subcontractor = subcontractor
-                  )
-                }
-          }
-        }
-        .recover { case error =>
-          logger.error(
-            s"[AmendSubcontractorController] Failed to retrieve subcontractor. " +
-              s"cisId=$cisId, subbieResourceRef=$subbieResourceRef",
-            error
-          )
-
-          recovery
+                recovery
+              }
         }
     }
 
+  private def resolveSubcontractor(
+                                    response: GetSubcontractorResponse,
+                                    cisId: String,
+                                    subbieResourceRef: Long,
+                                    userAnswers: UserAnswers
+                                  ): Future[Result] =
+    response.subcontractor match {
+      case Some(subcontractor) =>
+        subcontractor.subcontractorType
+          .flatMap(TypeOfSubcontractor.fromString)
+          .fold[Future[Result]] {
+            logger.error(
+              s"[AmendSubcontractorController] Unsupported subcontractor type. " +
+                s"type=${subcontractor.subcontractorType.getOrElse("missing")}, " +
+                s"cisId=$cisId, subbieResourceRef=$subbieResourceRef"
+            )
+            Future.successful(recovery)
+          } { subcontractorType =>
+            handleSubcontractor(
+              subcontractorType,
+              userAnswers,
+              cisId,
+              subbieResourceRef,
+              subcontractor
+            )
+          }
+
+      case None =>
+        logger.error(
+          s"[AmendSubcontractorController] No subcontractor returned " +
+            s"for cisId=$cisId, subbieResourceRef=$subbieResourceRef"
+        )
+        Future.successful(recovery)
+    }
+
   private def handleSubcontractor(
-    subcontractorType: TypeOfSubcontractor,
-    userAnswers: UserAnswers,
-    cisId: String,
-    subbieResourceRef: Long,
-    subcontractor: SubcontractorResponse
-  ): Future[Result] =
+                                   subcontractorType: TypeOfSubcontractor,
+                                   userAnswers: UserAnswers,
+                                   cisId: String,
+                                   subbieResourceRef: Long,
+                                   subcontractor: SubcontractorResponse
+                                 ): Future[Result] =
     populateUserAnswers(
       subcontractorType,
       userAnswers,
@@ -123,11 +140,11 @@ class AmendSubcontractorController @Inject() (
           .map(_ => Redirect(onwardRoute(subcontractorType)))
     )
   private def populateUserAnswers(
-    subcontractorType: TypeOfSubcontractor,
-    userAnswers: UserAnswers,
-    cisId: String,
-    subcontractor: SubcontractorResponse
-  ): Try[UserAnswers] =
+                                   subcontractorType: TypeOfSubcontractor,
+                                   userAnswers: UserAnswers,
+                                   cisId: String,
+                                   subcontractor: SubcontractorResponse
+                                 ): Try[UserAnswers] =
     subcontractorType match {
       case Individualorsoletrader =>
         AmendSubcontractorPopulator.IndividualPopulator
