@@ -63,9 +63,6 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
     s"$protocol://$host:$port"
   }
 
-  def manageYourSubcontractorsUrl(cisId: String): String =
-    s"$managefrontendBaseUrl/subcontractors/$cisId/your-subcontractors"
-
   lazy val loginUrl: String                      = configuration.get[String]("urls.login")
   lazy val loginContinueUrl: String              = configuration.get[String]("urls.loginContinue")
   lazy val signOutUrl: String                    = configuration.get[String]("urls.signOut")
@@ -79,6 +76,9 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
   lazy val managefrontendBaseUrl: String         = configuration.get[String]("urls.manageFrontendBaseUrl")
   lazy val verificationHistoryUrl: String        = s"$managefrontendBaseUrl/verification-history/retrieve"
   lazy val retrieveSubcontractorListUrl: String  = s"$managefrontendBaseUrl/subcontractors/retrieve"
+
+  def manageYourSubcontractorsUrl(cisId: String): String =
+    s"$managefrontendBaseUrl/subcontractors/$cisId/your-subcontractors"
 
   private val exitSurveyBaseUrl: String = configuration.get[Service]("microservice.services.feedback-frontend").baseUrl
   lazy val exitSurveyUrl: String        = s"$exitSurveyBaseUrl/feedback/cis-contractor-frontend"

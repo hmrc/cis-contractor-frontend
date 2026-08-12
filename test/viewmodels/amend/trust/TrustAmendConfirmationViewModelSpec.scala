@@ -239,14 +239,16 @@ class TrustAmendConfirmationViewModelSpec extends SpecBase {
       emailRow(2).content mustBe Text(msgs("amendConfirmation.table.content.none"))
     }
 
-    "must display contact methods in a consistent order regardless of selection order" in {
+    "must display contact methods in canonical order" in {
+
       val answers =
         answersMatchingOriginal
           .set(
             TrustContactMethodOptionsPage,
             Set(
-              ContactMethodOptions.Phone,
-              ContactMethodOptions.Email
+              ContactMethodOptions.Mobile,
+              ContactMethodOptions.Email,
+              ContactMethodOptions.Phone
             )
           )
           .success
@@ -262,7 +264,9 @@ class TrustAmendConfirmationViewModelSpec extends SpecBase {
       row.head.content mustBe Text(msgs("trustContactMethodOptions.checkYourAnswersLabel"))
       row(1).content mustBe Text(msgs("trustContactMethodOptions.email"))
       row(2).content mustBe Text(
-        s"${msgs("trustContactMethodOptions.email")}, ${msgs("trustContactMethodOptions.phone")}"
+        s"${msgs("trustContactMethodOptions.email")}, " +
+          s"${msgs("trustContactMethodOptions.phone")}, " +
+          msgs("trustContactMethodOptions.mobile")
       )
     }
 

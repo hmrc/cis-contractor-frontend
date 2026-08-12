@@ -381,6 +381,33 @@ class AmendTrustRemoveDetailYesNoControllerSpec extends SpecBase with MockitoSug
             redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
           }
         }
+
+        "must redirect to the JourneyRecovery when failed to save remove detail answer in session" in {
+
+          val mockSessionRepository = mock[SessionRepository]
+
+          when(mockSessionRepository.set(any())).thenReturn(
+            Future.failed(new RuntimeException(s"Failed to save remove detail answer for '$subcontractorDetail'"))
+          )
+
+          val application =
+            applicationBuilder(userAnswers = Some(uaWithNameAndDetail(selectedDetail)))
+              .overrides(
+                bind[SessionRepository].toInstance(mockSessionRepository)
+              )
+              .build()
+
+          running(application) {
+            val request =
+              FakeRequest(POST, removeDetailYesNoRoute)
+                .withFormUrlEncodedBody(("value", "true"))
+
+            val result = route(application, request).value
+
+            status(result) mustEqual SEE_OTHER
+            redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+          }
+        }
       }
     }
 
