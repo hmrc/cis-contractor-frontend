@@ -14,37 +14,35 @@
  * limitations under the License.
  */
 
-package controllers.amend.trust
+package controllers.amend
 
-import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
+import controllers.actions.*
 import controllers.routes
-import models.UserAnswers
-import pages.add.trust.TrustNamePage
+import pages.add.{SubcontractorNamePage, TradingNameOfSubcontractorPage}
 import pages.amend.AmendCheckYourAnswersSubmittedPage
 import play.api.Logging
-import play.api.i18n.{I18nSupport, MessagesApi}
+import play.api.i18n.I18nSupport
 import play.api.libs.json.Reads
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import queries.{CisIdQuery, OriginalTrustAnswersQuery}
+import queries.{CisIdQuery, OriginalIndividualAnswersQuery}
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.DefaultSubcontractorCleanupService
-import viewmodels.amend.trust.TrustAmendConfirmationViewModel
+import viewmodels.amend.IndividualAmendedViewModel
 import views.html.amend.AmendConfirmationView
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-class AmendTrustConfirmationController @Inject() (
-  override val messagesApi: MessagesApi,
+class AmendIndividualConfirmationController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   val controllerComponents: MessagesControllerComponents,
+  view: AmendConfirmationView,
   cleanupService: DefaultSubcontractorCleanupService,
-  sessionRepository: SessionRepository,
-  view: AmendConfirmationView
+  sessionRepository: SessionRepository
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport
@@ -52,42 +50,48 @@ class AmendTrustConfirmationController @Inject() (
 
   def onPageLoad(): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
+
       val recoveryRedirect = Redirect(routes.JourneyRecoveryController.onPageLoad())
 
       val ua = request.userAnswers
 
       if (!ua.get(AmendCheckYourAnswersSubmittedPage).contains(true)) {
-        logger.warn("[AmendTrustConfirmationController] Accessed without prior CYA submission")
+        logger.warn("[AmendIndividualConfirmationController] Accessed without prior CYA submission")
         Future.successful(recoveryRedirect)
       } else {
-        ua.get(OriginalTrustAnswersQuery) match {
-          case None                       =>
-            logger.error("[AmendTrustConfirmationController] Missing OriginalTrustAnswersQuery")
+        ua.get(OriginalIndividualAnswersQuery) match {
+          case None =>
+            logger.error("[AmendIndividualConfirmationController] Missing OriginalIndividualAnswersQuery")
             Future.successful(recoveryRedirect)
-          case Some(originalTrustAnswers) =>
-            ua.get(CisIdQuery) match {
-              case None    =>
-                logger.error("[AmendTrustConfirmationController] Missing CisIdQuery")
-                Future.successful(recoveryRedirect)
-              case Some(_) =>
-                val tableRows =
-                  TrustAmendConfirmationViewModel.rows(originalTrustAnswers, ua)
 
-                val trustName =
-                  trustDisplayName(ua)
+          case Some(originalIndividualAnswers) =>
+            ua.get(CisIdQuery) match {
+
+              case None =>
+                logger.error("[AmendIndividualConfirmationController] Missing CisIdQuery")
+                Future.successful(recoveryRedirect)
+
+              case Some(cisId) =>
+                val tableRows      = IndividualAmendedViewModel.rows(originalIndividualAnswers, ua)
+                val individualName = individualDisplayName(ua)
 
                 cleanupService.cleanAmend(ua) match {
+
                   case Success(cleanedUa) =>
                     sessionRepository.set(cleanedUa).map { _ =>
                       Ok(
                         view(
                           tableRows,
-                          trustName
+                          individualName
                         )
                       )
                     }
+
                   case Failure(exception) =>
-                    logger.warn("[AmendTrustConfirmationController] Failed to clean user answers", exception)
+                    logger.warn(
+                      "[AmendIndividualConfirmationController] Failed to clean user answers",
+                      exception
+                    )
                     Future.successful(recoveryRedirect)
                 }
             }
@@ -95,6 +99,9 @@ class AmendTrustConfirmationController @Inject() (
       }
     }
 
-  private def trustDisplayName(ua: UserAnswers): String =
-    ua.get(TrustNamePage).getOrElse("")
+  private def individualDisplayName(ua: models.UserAnswers): String =
+    ua.get(SubcontractorNamePage)
+      .map(n => s"${n.firstName} ${n.lastName}")
+      .orElse(ua.get(TradingNameOfSubcontractorPage))
+      .getOrElse("")
 }

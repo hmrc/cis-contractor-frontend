@@ -166,7 +166,7 @@ class SubcontractorsUniqueTaxpayerReferenceControllerSpec extends SpecBase with 
       verifyNoMoreInteractions(mockSubcontractorService)
     }
 
-    "must bind the form and redirect to there-is-a-problem Page on POST when valid UTR is submitted for Amend journey" in {
+    "must bind the form and redirect to amend cya Page on POST when valid UTR is submitted for Amend journey" in {
 
       val validValue = "5860920998"
       val prevValue  = "5860920997"
@@ -195,7 +195,9 @@ class SubcontractorsUniqueTaxpayerReferenceControllerSpec extends SpecBase with 
 
         status(result) mustEqual SEE_OTHER
 
-        redirectLocation(result).value must include("subcontractor/there-is-a-problem")
+        redirectLocation(result).value mustEqual controllers.amend.routes.AmendIndividualCheckYourAnswersController
+          .onPageLoad()
+          .url
       }
       verify(mockSubcontractorService).isDuplicateUTR(any[UserAnswers], any[String])(any[HeaderCarrier])
       verifyNoMoreInteractions(mockSubcontractorService)
@@ -345,7 +347,7 @@ class SubcontractorsUniqueTaxpayerReferenceControllerSpec extends SpecBase with 
       }
     }
 
-    "must bind the form and redirect to JourneyRecovery Page on POST when valid UTR is submitted but is same as previous value in AmendMode" in {
+    "must bind the form and redirect to amend cya Page on POST when valid UTR is submitted but is same as previous value in AmendMode" in {
 
       val validValue = "5860920998"
       val prevValue  = "5860920998"
@@ -366,7 +368,9 @@ class SubcontractorsUniqueTaxpayerReferenceControllerSpec extends SpecBase with 
 
         status(result) mustEqual SEE_OTHER
 
-        redirectLocation(result).value must include("/subcontractor/there-is-a-problem") // TODO when AmendCYA available
+        redirectLocation(result).value mustEqual controllers.amend.routes.AmendIndividualCheckYourAnswersController
+          .onPageLoad()
+          .url
       }
     }
 

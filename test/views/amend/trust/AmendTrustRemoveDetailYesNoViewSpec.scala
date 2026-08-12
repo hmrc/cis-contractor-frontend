@@ -35,7 +35,7 @@ class AmendTrustRemoveDetailYesNoViewSpec extends AnyWordSpec with Matchers with
   Seq(
     ("address", Address, "amendTrustRemoveDetailYesNo.detail.address"),
     ("contact-details", ContactDetails, "amendTrustRemoveDetailYesNo.detail.contactDetails"),
-    ("unique-taxpayer-reference", Utr, "amendTrustRemoveDetailYesNo.detail.utr"),
+    ("utr", Utr, "amendTrustRemoveDetailYesNo.detail.utr"),
     ("works-reference-number", WorksReferenceNumber, "amendTrustRemoveDetailYesNo.detail.worksReferenceNumber")
   ).foreach { case (contractorDetail, amendTrustRemoveDetail, detailKey) =>
     s"AmendTrustRemoveDetailYesNoView when contractorDetail is '$contractorDetail'" should {
