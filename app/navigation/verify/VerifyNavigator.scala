@@ -100,7 +100,8 @@ class VerifyNavigator @Inject() () extends NavigatorForJourney {
     mode match {
 
       case NormalMode =>
-        val hasSubcontractorsToReverify = ua.get(NewestVerificationBatchResponsePage).exists(_.subcontractors.exists(_.isVerified))
+        val hasSubcontractorsToReverify =
+          ua.get(NewestVerificationBatchResponsePage).exists(_.subcontractors.exists(_.isVerified))
 
         if (hasSubcontractorsToReverify) {
           controllers.verify.routes.ReverifyExistingSubcontractorsYesNoController.onPageLoad(NormalMode)
