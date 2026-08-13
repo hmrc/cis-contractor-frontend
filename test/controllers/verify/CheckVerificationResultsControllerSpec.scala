@@ -20,10 +20,11 @@ import base.SpecBase
 import models.response.GetLastSubmittedVerificationBatchResponse
 import models.{SubcontractorLastVerification, UserAnswers, VerificationBatchLastVerification, VerificationLastVerification}
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.{verify, verifyNoMoreInteractions, when}
+import org.mockito.Mockito.{verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import pages.verify.LastSubmittedVerificationBatchResponsePage
 import play.api.inject.bind
+import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import queries.CisIdQuery
@@ -35,8 +36,7 @@ import scala.concurrent.Future
 
 class CheckVerificationResultsControllerSpec extends SpecBase with MockitoSugar {
 
-  private val endpointUrl =
-    controllers.verify.routes.CheckVerificationResultsController.onPageLoad().url
+  private val endpointUrl = "/subcontractor/verify/check-results"
 
   private def responseWithStatus(
     status: Option[String],
@@ -73,15 +73,31 @@ class CheckVerificationResultsControllerSpec extends SpecBase with MockitoSugar 
       submission = None
     )
 
+  private def appBuilder(
+    mockService: VerificationService,
+    userAnswers: UserAnswers
+  ): GuiceApplicationBuilder = {
+    val mockCisManageService = mock[CisManageService]
+    val mockSessionRepo      = mock[SessionRepository]
+
+    when(mockCisManageService.ensureCisIdInUserAnswers(any[UserAnswers])(any[HeaderCarrier]))
+      .thenReturn(Future.successful(userAnswers))
+    when(mockSessionRepo.set(any[UserAnswers])).thenReturn(Future.successful(true))
+
+    applicationBuilder(userAnswers = Some(userAnswers))
+      .overrides(
+        bind[VerificationService].toInstance(mockService),
+        bind[CisManageService].toInstance(mockCisManageService),
+        bind[SessionRepository].toInstance(mockSessionRepo)
+      )
+  }
+
   "CheckVerificationResultsController" - {
 
     "must redirect to VerificationResults when the last submitted batch is available" in {
-      val mockService          = mock[VerificationService]
-      val mockCisManageService = mock[CisManageService]
-      val mockSessionRepo      = mock[SessionRepository]
-
-      val response = responseWithStatus(Some("VALIDATED"))
-      val ua       = emptyUserAnswers
+      val mockService = mock[VerificationService]
+      val response    = responseWithStatus(Some("VALIDATED"))
+      val ua          = emptyUserAnswers
         .set(CisIdQuery, "INST-123")
         .success
         .value
@@ -89,46 +105,32 @@ class CheckVerificationResultsControllerSpec extends SpecBase with MockitoSugar 
         .success
         .value
 
-      when(mockCisManageService.ensureCisIdInUserAnswers(any[UserAnswers])(any[HeaderCarrier]))
-        .thenReturn(Future.successful(ua))
-      when(mockSessionRepo.set(any())).thenReturn(Future.successful(true))
-      when(mockService.getLastSubmittedVerificationBatch(any())(any[HeaderCarrier]))
+      when(mockService.getLastSubmittedVerificationBatch(any[UserAnswers])(any[HeaderCarrier]))
         .thenReturn(Future.successful(ua))
 
-      val application =
-        applicationBuilder(userAnswers = Some(ua))
-          .overrides(
-            bind[VerificationService].toInstance(mockService),
-            bind[CisManageService].toInstance(mockCisManageService),
-            bind[SessionRepository].toInstance(mockSessionRepo)
-          )
-          .build()
+      val application = appBuilder(mockService, ua).build()
 
       running(application) {
-        val request = FakeRequest(GET, endpointUrl)
-        val result  = route(application, request).value
+        val result = route(application, FakeRequest(GET, endpointUrl)).value
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual
           controllers.verify.routes.VerificationResultsController.onPageLoad().url
 
-        verify(mockService).getLastSubmittedVerificationBatch(any())(any[HeaderCarrier])
+        verify(mockService).getLastSubmittedVerificationBatch(any[UserAnswers])(any[HeaderCarrier])
       }
     }
 
     "must redirect to NoVerificationResults when verification batch id is missing" in {
-      val mockService          = mock[VerificationService]
-      val mockCisManageService = mock[CisManageService]
-      val mockSessionRepo      = mock[SessionRepository]
-
-      val response = GetLastSubmittedVerificationBatchResponse(
+      val mockService = mock[VerificationService]
+      val response    = GetLastSubmittedVerificationBatchResponse(
         scheme = None,
         subcontractors = Nil,
         verifications = Nil,
         verificationBatch = None,
         submission = None
       )
-      val ua       = emptyUserAnswers
+      val ua          = emptyUserAnswers
         .set(CisIdQuery, "INST-123")
         .success
         .value
@@ -136,24 +138,13 @@ class CheckVerificationResultsControllerSpec extends SpecBase with MockitoSugar 
         .success
         .value
 
-      when(mockCisManageService.ensureCisIdInUserAnswers(any[UserAnswers])(any[HeaderCarrier]))
-        .thenReturn(Future.successful(ua))
-      when(mockSessionRepo.set(any())).thenReturn(Future.successful(true))
-      when(mockService.getLastSubmittedVerificationBatch(any())(any[HeaderCarrier]))
+      when(mockService.getLastSubmittedVerificationBatch(any[UserAnswers])(any[HeaderCarrier]))
         .thenReturn(Future.successful(ua))
 
-      val application =
-        applicationBuilder(userAnswers = Some(ua))
-          .overrides(
-            bind[VerificationService].toInstance(mockService),
-            bind[CisManageService].toInstance(mockCisManageService),
-            bind[SessionRepository].toInstance(mockSessionRepo)
-          )
-          .build()
+      val application = appBuilder(mockService, ua).build()
 
       running(application) {
-        val request = FakeRequest(GET, endpointUrl)
-        val result  = route(application, request).value
+        val result = route(application, FakeRequest(GET, endpointUrl)).value
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual
@@ -162,12 +153,9 @@ class CheckVerificationResultsControllerSpec extends SpecBase with MockitoSugar 
     }
 
     "must redirect to NoVerificationResults when status is PENDING" in {
-      val mockService          = mock[VerificationService]
-      val mockCisManageService = mock[CisManageService]
-      val mockSessionRepo      = mock[SessionRepository]
-
-      val response = responseWithStatus(Some("PENDING"))
-      val ua       = emptyUserAnswers
+      val mockService = mock[VerificationService]
+      val response    = responseWithStatus(Some("PENDING"))
+      val ua          = emptyUserAnswers
         .set(CisIdQuery, "INST-123")
         .success
         .value
@@ -175,24 +163,13 @@ class CheckVerificationResultsControllerSpec extends SpecBase with MockitoSugar 
         .success
         .value
 
-      when(mockCisManageService.ensureCisIdInUserAnswers(any[UserAnswers])(any[HeaderCarrier]))
-        .thenReturn(Future.successful(ua))
-      when(mockSessionRepo.set(any())).thenReturn(Future.successful(true))
-      when(mockService.getLastSubmittedVerificationBatch(any())(any[HeaderCarrier]))
+      when(mockService.getLastSubmittedVerificationBatch(any[UserAnswers])(any[HeaderCarrier]))
         .thenReturn(Future.successful(ua))
 
-      val application =
-        applicationBuilder(userAnswers = Some(ua))
-          .overrides(
-            bind[VerificationService].toInstance(mockService),
-            bind[CisManageService].toInstance(mockCisManageService),
-            bind[SessionRepository].toInstance(mockSessionRepo)
-          )
-          .build()
+      val application = appBuilder(mockService, ua).build()
 
       running(application) {
-        val request = FakeRequest(GET, endpointUrl)
-        val result  = route(application, request).value
+        val result = route(application, FakeRequest(GET, endpointUrl)).value
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual
@@ -201,12 +178,9 @@ class CheckVerificationResultsControllerSpec extends SpecBase with MockitoSugar 
     }
 
     "must redirect to NoVerificationResults when status is ACCEPTED" in {
-      val mockService          = mock[VerificationService]
-      val mockCisManageService = mock[CisManageService]
-      val mockSessionRepo      = mock[SessionRepository]
-
-      val response = responseWithStatus(Some("ACCEPTED"))
-      val ua       = emptyUserAnswers
+      val mockService = mock[VerificationService]
+      val response    = responseWithStatus(Some("ACCEPTED"))
+      val ua          = emptyUserAnswers
         .set(CisIdQuery, "INST-123")
         .success
         .value
@@ -214,24 +188,13 @@ class CheckVerificationResultsControllerSpec extends SpecBase with MockitoSugar 
         .success
         .value
 
-      when(mockCisManageService.ensureCisIdInUserAnswers(any[UserAnswers])(any[HeaderCarrier]))
-        .thenReturn(Future.successful(ua))
-      when(mockSessionRepo.set(any())).thenReturn(Future.successful(true))
-      when(mockService.getLastSubmittedVerificationBatch(any())(any[HeaderCarrier]))
+      when(mockService.getLastSubmittedVerificationBatch(any[UserAnswers])(any[HeaderCarrier]))
         .thenReturn(Future.successful(ua))
 
-      val application =
-        applicationBuilder(userAnswers = Some(ua))
-          .overrides(
-            bind[VerificationService].toInstance(mockService),
-            bind[CisManageService].toInstance(mockCisManageService),
-            bind[SessionRepository].toInstance(mockSessionRepo)
-          )
-          .build()
+      val application = appBuilder(mockService, ua).build()
 
       running(application) {
-        val request = FakeRequest(GET, endpointUrl)
-        val result  = route(application, request).value
+        val result = route(application, FakeRequest(GET, endpointUrl)).value
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual
@@ -240,37 +203,22 @@ class CheckVerificationResultsControllerSpec extends SpecBase with MockitoSugar 
     }
 
     "must redirect to SystemError when the service call fails" in {
-      val mockService          = mock[VerificationService]
-      val mockCisManageService = mock[CisManageService]
-      val mockSessionRepo      = mock[SessionRepository]
+      val mockService = mock[VerificationService]
+      val ua          = emptyUserAnswers.set(CisIdQuery, "INST-123").success.value
 
-      val ua = emptyUserAnswers.set(CisIdQuery, "INST-123").success.value
-
-      when(mockCisManageService.ensureCisIdInUserAnswers(any[UserAnswers])(any[HeaderCarrier]))
-        .thenReturn(Future.successful(ua))
-      when(mockSessionRepo.set(any())).thenReturn(Future.successful(true))
-      when(mockService.getLastSubmittedVerificationBatch(any())(any[HeaderCarrier]))
+      when(mockService.getLastSubmittedVerificationBatch(any[UserAnswers])(any[HeaderCarrier]))
         .thenReturn(Future.failed(new RuntimeException("boom")))
 
-      val application =
-        applicationBuilder(userAnswers = Some(ua))
-          .overrides(
-            bind[VerificationService].toInstance(mockService),
-            bind[CisManageService].toInstance(mockCisManageService),
-            bind[SessionRepository].toInstance(mockSessionRepo)
-          )
-          .build()
+      val application = appBuilder(mockService, ua).build()
 
       running(application) {
-        val request = FakeRequest(GET, endpointUrl)
-        val result  = route(application, request).value
+        val result = route(application, FakeRequest(GET, endpointUrl)).value
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual
           controllers.routes.SystemErrorController.onPageLoad().url
 
-        verify(mockService).getLastSubmittedVerificationBatch(any())(any[HeaderCarrier])
-        verifyNoMoreInteractions(mockService)
+        verify(mockService).getLastSubmittedVerificationBatch(any[UserAnswers])(any[HeaderCarrier])
       }
     }
   }
