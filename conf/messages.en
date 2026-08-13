@@ -985,6 +985,27 @@ verify.reviewInsufficientInfo.action.edit                               =  Edit
 verify.reviewInsufficientInfo.action.proceed                            =  Proceed
 verify.reviewInsufficientInfo.action.remove                             =  Remove
 
+verify.reviewUnmatched.title                                            =  Review unmatched subcontractors
+verify.reviewUnmatched.heading                                          =  Review unmatched subcontractors
+verify.reviewUnmatched.p1                                               =  Some of the subcontractor details in your most recent verification request do not match the information about that subcontractor held by HMRC. This means we cannot verify them or give them an accurate tax treatment.
+verify.reviewUnmatched.p2                                               =  To fix this, you can:
+verify.reviewUnmatched.bullet1                                          =  edit their information and correct any of their details before trying to verify them again
+verify.reviewUnmatched.bullet2                                          =  proceed with verifying them again without making any changes
+verify.reviewUnmatched.bullet3                                          =  remove the subcontractor from this verification request
+verify.reviewUnmatched.whatYouNeed.link                                 =  What you must do as a Construction Industry Scheme (CIS) contractor (opens in new tab)
+verify.reviewUnmatched.unmatched.subheading                             =  Unmatched subcontractors
+verify.reviewUnmatched.ready.subheading                                 =  Ready for verification
+verify.reviewUnmatched.name                                             =  Name
+verify.reviewUnmatched.utr                                              =  UTR
+verify.reviewUnmatched.utr.full                                         =  Unique Taxpayer Reference
+verify.reviewUnmatched.noneProvided                                     =  None provided
+verify.reviewUnmatched.actions                                          =  Actions
+verify.reviewUnmatched.action.edit                                      =  Edit
+verify.reviewUnmatched.action.proceed                                   =  Proceed
+verify.reviewUnmatched.action.remove                                    =  Remove
+verify.reviewUnmatched.backToResults.prefix                             =  Back to
+verify.reviewUnmatched.backToResults.link                               =  Verification results
+
 verify.selectSubcontractor.title                                        =  Which subcontractors do you want to verify?
 verify.selectSubcontractor.heading                                      =  Which subcontractors do you want to verify?
 verify.selectSubcontractor.hint                                         =  Select the unverified subcontractors you want to add to this verification request
