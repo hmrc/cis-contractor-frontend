@@ -19,7 +19,6 @@ package models
 import base.SpecBase
 import play.api.libs.json.Json
 
-
 class VerificationBatchLastVerificationSpec extends SpecBase {
   "VerificationBatchLastVerification" - {
     "serialize to JSON correctly" in {
@@ -28,14 +27,14 @@ class VerificationBatchLastVerificationSpec extends SpecBase {
         verifBatchResourceRef = Some(1234567L),
         verificationBatchStatus = Some("ACCEPTED")
       )
-      val json = Json.toJson(verificationBatch)
+      val json              = Json.toJson(verificationBatch)
       (json \ "verificationBatchId").as[Long] mustBe 99L
       (json \ "verifBatchResourceRef").as[Long] mustBe 1234567L
       (json \ "verificationBatchStatus").as[String] mustBe "ACCEPTED"
     }
 
     "deserialize from JSON correctly" in {
-      val json = Json.parse(
+      val json   = Json.parse(
         """|{
            |"verificationBatchId": 99,
            | "verifBatchResourceRef": 1234567
@@ -52,8 +51,8 @@ class VerificationBatchLastVerificationSpec extends SpecBase {
         verifBatchResourceRef = Some(1234567L),
         verificationBatchStatus = Some("ACCEPTED")
       )
-      val json = Json.toJson(verificationBatch)
-      val result = json.as[VerificationBatchLastVerification]
+      val json              = Json.toJson(verificationBatch)
+      val result            = json.as[VerificationBatchLastVerification]
       result mustBe verificationBatch
     }
   }

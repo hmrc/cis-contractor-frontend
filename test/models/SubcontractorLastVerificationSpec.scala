@@ -29,7 +29,7 @@ class SubcontractorLastVerificationSpec extends SpecBase {
         subcontractorType = Some("soletrader"),
         utr = Some("1111111111")
       )
-      val json = Json.toJson(subcontractor)
+      val json          = Json.toJson(subcontractor)
       (json \ "subcontractorId").as[Long] mustBe 1L
       (json \ "subbieResourceRef").as[Long] mustBe 10L
       (json \ "subcontractorType").as[String] mustBe "soletrader"
@@ -37,7 +37,7 @@ class SubcontractorLastVerificationSpec extends SpecBase {
     }
 
     "deserialize from JSON correctly" in {
-      val json = Json.parse(
+      val json   = Json.parse(
         """|{
            | "subcontractorId": 1,
            | "subbieResourceRef": 10,
@@ -58,8 +58,8 @@ class SubcontractorLastVerificationSpec extends SpecBase {
         subcontractorType = Some("soletrader"),
         utr = Some("1111111111")
       )
-      val json = Json.toJson(subcontractor)
-      val result = json.as[SubcontractorLastVerification]
+      val json          = Json.toJson(subcontractor)
+      val result        = json.as[SubcontractorLastVerification]
       result mustBe subcontractor
     }
   }

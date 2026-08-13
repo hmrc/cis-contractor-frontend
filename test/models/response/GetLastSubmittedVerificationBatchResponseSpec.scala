@@ -23,8 +23,7 @@ import play.api.libs.json.{JsSuccess, Json}
 
 import java.time.LocalDateTime
 
-
-class GetLastSubmittedVerificationBatchResponseSpec extends AnyWordSpec with Matchers{
+class GetLastSubmittedVerificationBatchResponseSpec extends AnyWordSpec with Matchers {
   "GetLastSubmittedVerificationBatchResponse Json format" should {
 
     "read FormP response JSON and parse all sections (including empty cursors)" in {
@@ -95,7 +94,7 @@ class GetLastSubmittedVerificationBatchResponseSpec extends AnyWordSpec with Mat
             status = Some("ACCEPTED"),
             submissionRequestDate = Some(
               LocalDateTime.of(2026, 8, 11, 11, 50, 0)
-            ),
+            )
           )
         )
       )
@@ -182,7 +181,7 @@ class GetLastSubmittedVerificationBatchResponseSpec extends AnyWordSpec with Mat
             status = Some("ACCEPTED"),
             submissionRequestDate = Some(
               LocalDateTime.of(2026, 8, 11, 11, 50, 0)
-            ),
+            )
           )
         )
       )
