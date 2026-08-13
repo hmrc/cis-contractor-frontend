@@ -268,6 +268,37 @@ class AmendPartnershipConfirmationViewModelSpec extends SpecBase {
       emailRow(2).content mustBe Text(msgs("amendConfirmation.table.content.none"))
     }
 
+    "must display contact methods in canonical order" in {
+
+      val answers =
+        answersMatchingOriginal
+          .set(
+            PartnershipContactMethodOptionsPage,
+            Set(
+              ContactMethodOptions.Mobile,
+              ContactMethodOptions.Email,
+              ContactMethodOptions.Phone
+            )
+          )
+          .success
+          .value
+
+      val result =
+        AmendPartnershipConfirmationViewModel.rows(original, answers)
+
+      result must have size 1
+
+      val row = result.head
+
+      row.head.content mustBe Text(msgs("partnershipContactMethodOptions.checkYourAnswersLabel"))
+      row(1).content mustBe Text(msgs("partnershipContactMethodOptions.email"))
+      row(2).content mustBe Text(
+        s"${msgs("partnershipContactMethodOptions.email")}, " +
+          s"${msgs("partnershipContactMethodOptions.phone")}, " +
+          msgs("partnershipContactMethodOptions.mobile")
+      )
+    }
+
     "must display contact methods in a consistent order regardless of selection order" in {
       val answers =
         answersMatchingOriginal

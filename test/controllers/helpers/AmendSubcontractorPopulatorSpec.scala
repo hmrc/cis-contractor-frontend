@@ -146,14 +146,20 @@ class AmendSubcontractorPopulatorSpec extends SpecBase {
               lastName = "Smith"
             )
           ),
+          addressYesNo = Some(true),
           address = Some(expectedAddress),
-          individualContactMethod = Some(Set(Email, Phone, Mobile)),
+          individualContactMethodsYesNo = Some(true),
+          individualContactMethod = Set(Email, Phone, Mobile),
           email = Some("test@example.com"),
           phone = Some("02070000000"),
           mobile = Some("07123456789"),
+          utrYesNo = Some(true),
           utr = Some("1123456789"),
+          ninoYesNo = Some(true),
           nino = Some("AA123456A"),
-          worksReference = Some("XLS345-MM")
+          worksReferenceYesNo = Some(true),
+          worksReference = Some("XLS345-MM"),
+          verificationNumber = Some("V1234567890")
         )
       }
 

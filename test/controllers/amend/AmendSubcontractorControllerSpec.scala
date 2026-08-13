@@ -18,6 +18,7 @@ package controllers.amend
 
 import base.SpecBase
 import models.TypeOfSubcontractor.{Individualorsoletrader, Limitedcompany, Partnership, Trust}
+import models.UserAnswers
 import models.{TypeOfSubcontractor, UserAnswers}
 import models.response.{GetSubcontractorResponse, SubcontractorResponse}
 import org.mockito.ArgumentCaptor
@@ -557,4 +558,3 @@ class AmendSubcontractorControllerSpec extends SpecBase with MockitoSugar {
     }
   }
 }
-

@@ -122,5 +122,34 @@ class SubcontractorsUniqueTaxpayerReferenceSummarySpec extends AnyFreeSpec with 
       assertEscaped(html, "1234567890 &amp; Ref&#x27;01")
       assertNoDoubleEncoding(html)
     }
+
+    "must not include actions when showActions is false" in {
+      val utr = "1234567890"
+
+      val answers =
+        UserAnswers("test-id")
+          .set(SubcontractorsUniqueTaxpayerReferencePage, utr)
+          .success
+          .value
+
+      val maybeRow = SubcontractorsUniqueTaxpayerReferenceSummary.row(
+        answers,
+        mode = CheckMode,
+        showActions = false
+      )
+
+      maybeRow shouldBe defined
+
+      val row = maybeRow.value
+
+      row.key.content.asHtml.toString should include(
+        messages("subcontractorsUniqueTaxpayerReference.checkYourAnswersLabel")
+      )
+
+      row.value.content.asHtml.toString should include(utr)
+
+      row.actions             shouldBe defined
+      row.actions.value.items shouldBe empty
+    }
   }
 }

@@ -112,7 +112,7 @@ class ReverifyExistingSubcontractorsYesNoControllerSpec extends SpecBase with Mo
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual
-          controllers.verify.routes.CurrentVerificationBatchController.onPageLoad().url
+          controllers.verify.routes.CurrentVerificationBatchController.onPageLoad(NormalMode).url
       }
     }
 

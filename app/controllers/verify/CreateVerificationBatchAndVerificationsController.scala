@@ -17,6 +17,7 @@
 package controllers.verify
 
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
+import models.Mode
 import pages.verify.{CurrentVerificationBatchResponsePage, SelectSubcontractorPage, SelectSubcontractorsToReverifyPage}
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -61,7 +62,7 @@ class CreateVerificationBatchAndVerificationsController @Inject() (
         verificationService.getCurrentVerificationBatch(ua)
     }
 
-  def onSubmit(): Action[AnyContent] =
+  def onSubmit(mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
       userAnswersWithCurrentBatch(request.userAnswers)
         .flatMap { ua =>
@@ -98,11 +99,11 @@ class CreateVerificationBatchAndVerificationsController @Inject() (
                   Future.successful(
                     Redirect(
                       controllers.verify.routes.ModifyVerificationBatchAndVerificationsController
-                        .modifyVerificationBatch()
+                        .modifyVerificationBatch(mode)
                     )
                   )
 
-                case Some(_) =>
+                case Some(ref) if ref.verificationBatch.flatMap(_.verifBatchResourceRef).isEmpty =>
                   verificationService
                     .createVerificationBatchAndVerifications(
                       userAnswers = ua,
@@ -112,7 +113,7 @@ class CreateVerificationBatchAndVerificationsController @Inject() (
                     .map(_ =>
                       Redirect(
                         controllers.verify.routes.CheckVerificationBatchReadinessController
-                          .checkVerificationBatchReadiness()
+                          .checkVerificationBatchReadiness(mode)
                       )
                     )
                     .recover { case t =>

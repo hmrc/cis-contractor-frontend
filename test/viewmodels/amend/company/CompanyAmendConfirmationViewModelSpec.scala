@@ -248,14 +248,16 @@ class CompanyAmendConfirmationViewModelSpec extends SpecBase {
       emailRow(2).content mustBe Text(msgs("amendConfirmation.table.content.none"))
     }
 
-    "must display contact methods in a consistent order regardless of selection order" in {
+    "must display contact methods in canonical order" in {
+
       val answers =
         answersMatchingOriginal
           .set(
             CompanyContactMethodOptionsPage,
             Set(
-              ContactMethodOptions.Phone,
-              ContactMethodOptions.Email
+              ContactMethodOptions.Mobile,
+              ContactMethodOptions.Email,
+              ContactMethodOptions.Phone
             )
           )
           .success
@@ -271,7 +273,9 @@ class CompanyAmendConfirmationViewModelSpec extends SpecBase {
       row.head.content mustBe Text(msgs("companyContactMethodOptions.checkYourAnswersLabel"))
       row(1).content mustBe Text(msgs("companyContactMethodOptions.email"))
       row(2).content mustBe Text(
-        s"${msgs("companyContactMethodOptions.email")}, ${msgs("companyContactMethodOptions.phone")}"
+        s"${msgs("companyContactMethodOptions.email")}, " +
+          s"${msgs("companyContactMethodOptions.phone")}, " +
+          msgs("companyContactMethodOptions.mobile")
       )
     }
 

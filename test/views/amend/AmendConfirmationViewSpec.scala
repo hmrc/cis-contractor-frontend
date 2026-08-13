@@ -16,6 +16,7 @@
 
 package views.amend
 
+import config.FrontendAppConfig
 import org.jsoup.Jsoup
 import org.jsoup.nodes.{Document, Element}
 import org.jsoup.select.Elements
@@ -37,7 +38,7 @@ class AmendConfirmationViewSpec extends AnyWordSpec with Matchers with GuiceOneA
   "AmendConfirmationView" should {
 
     "render the confirmation panel, table and links" in new Setup {
-      val html: HtmlFormat.Appendable = view(rows, subcontractorName, retrieveSubcontractorListUrl)
+      val html: HtmlFormat.Appendable = view(rows, subcontractorName)
       val doc: Document               = Jsoup.parse(html.toString())
 
       doc.title() must include(messages("amendConfirmation.panel.heading"))
@@ -82,17 +83,15 @@ class AmendConfirmationViewSpec extends AnyWordSpec with Matchers with GuiceOneA
       beforeYouGoParagraph.text() mustBe
         messages("amendConfirmation.beforeYouGo.p1")
 
-//      val manageYourSubcontractorsLink: Elements =
-//        doc.select(s"a[href='$retrieveSubcontractorListUrl']")
-//
-//      manageYourSubcontractorsLink.text() mustBe
-//        messages("amendConfirmation.yourSubcontractors")
-//      manageYourSubcontractorsLink.attr("target") mustBe "_blank"
-//      manageYourSubcontractorsLink.attr("rel") mustBe "noopener noreferrer"
+      val manageYourSubcontractorsLink: Elements =
+        doc.select(s"a[href='${appConfig.retrieveSubcontractorListUrl}']")
+
+      manageYourSubcontractorsLink.text() mustBe
+        messages("amendConfirmation.yourSubcontractors")
     }
 
     "render the subcontractor name in the confirmation text" in new Setup {
-      val html: HtmlFormat.Appendable = view(rows, subcontractorName, retrieveSubcontractorListUrl)
+      val html: HtmlFormat.Appendable = view(rows, subcontractorName)
       val doc: Document               = Jsoup.parse(html.toString())
 
       val confirmationParagraph: Element = doc.select("p.govuk-body").first()
@@ -102,7 +101,7 @@ class AmendConfirmationViewSpec extends AnyWordSpec with Matchers with GuiceOneA
     }
 
     "render the survey link" in new Setup {
-      val html: HtmlFormat.Appendable = view(rows, subcontractorName, retrieveSubcontractorListUrl)
+      val html: HtmlFormat.Appendable = view(rows, subcontractorName)
       val doc: Document               = Jsoup.parse(html.toString())
 
       val surveyLink: Element = doc.select("a[href='#']").last()
@@ -118,8 +117,6 @@ class AmendConfirmationViewSpec extends AnyWordSpec with Matchers with GuiceOneA
   trait Setup {
 
     val subcontractorName = "ABC Trust"
-
-    val retrieveSubcontractorListUrl = "/retrieve-your-subcontractors"
 
     val rows: Seq[Seq[TableRow]] =
       Seq(
@@ -137,6 +134,9 @@ class AmendConfirmationViewSpec extends AnyWordSpec with Matchers with GuiceOneA
         play.api.i18n.Lang.defaultLang,
         app.injector.instanceOf[play.api.i18n.MessagesApi]
       )
+
+    val appConfig: FrontendAppConfig =
+      app.injector.instanceOf[config.FrontendAppConfig]
 
     val view: AmendConfirmationView =
       app.injector.instanceOf[AmendConfirmationView]
