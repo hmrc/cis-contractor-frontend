@@ -31,16 +31,16 @@ import views.html.unmatched.UnmatchedSubcontractorDetailsUpdatedView
 import javax.inject.Inject
 
 class UnmatchedSubcontractorDetailsUpdatedController @Inject() (
-                                                                    identify: IdentifierAction,
-                                                                    getData: DataRetrievalAction,
-                                                                    requireData: DataRequiredAction,
-                                                                    cisIdRequired: CisIdRequiredAction,
-                                                                    val controllerComponents: MessagesControllerComponents,
-                                                                    view: UnmatchedSubcontractorDetailsUpdatedView,
-                                                                    appConfig: FrontendAppConfig
-                                                                  ) extends FrontendBaseController
-  with I18nSupport
-  with Logging {
+  identify: IdentifierAction,
+  getData: DataRetrievalAction,
+  requireData: DataRequiredAction,
+  cisIdRequired: CisIdRequiredAction,
+  val controllerComponents: MessagesControllerComponents,
+  view: UnmatchedSubcontractorDetailsUpdatedView,
+  appConfig: FrontendAppConfig
+) extends FrontendBaseController
+    with I18nSupport
+    with Logging {
 
   def onPageLoad(): Action[AnyContent] =
     (identify andThen getData andThen requireData andThen cisIdRequired) { implicit request =>
@@ -73,9 +73,9 @@ class UnmatchedSubcontractorDetailsUpdatedController @Inject() (
     }
 
   private def linkDetails(
-                           returnTo: String,
-                           manageYourSubcontractorsUrl: => String
-                         ): (String, String, Boolean) =
+    returnTo: String,
+    manageYourSubcontractorsUrl: => String
+  ): (String, String, Boolean) =
     returnTo match {
 
       case UnmatchedSubcontractorDetailsUpdatedReturnTo.YourSubcontractors =>

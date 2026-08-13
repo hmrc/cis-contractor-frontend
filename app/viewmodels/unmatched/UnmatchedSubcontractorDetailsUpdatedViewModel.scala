@@ -24,15 +24,15 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.table.TableRow
 object UnmatchedSubcontractorDetailsUpdatedViewModel {
 
   def rows(
-            confirmationData: UnmatchedSubcontractorDetailsUpdated
-          )(implicit messages: Messages): Seq[Seq[TableRow]] =
+    confirmationData: UnmatchedSubcontractorDetailsUpdated
+  )(implicit messages: Messages): Seq[Seq[TableRow]] =
     confirmationData.updates
       .filter(update => normalise(update.previous) != normalise(update.updated))
       .map(row)
 
   private def row(
-                   update: UnmatchedSubcontractorUpdate
-                 )(implicit messages: Messages): Seq[TableRow] =
+    update: UnmatchedSubcontractorUpdate
+  )(implicit messages: Messages): Seq[TableRow] =
     Seq(
       TableRow(
         content = Text(update.detail),
@@ -47,9 +47,9 @@ object UnmatchedSubcontractorDetailsUpdatedViewModel {
     )
 
   private def displayValue(
-                            value: Option[String],
-                            missingValueKey: String
-                          )(implicit messages: Messages): String =
+    value: Option[String],
+    missingValueKey: String
+  )(implicit messages: Messages): String =
     value match {
       case Some(v) if v.trim.nonEmpty =>
         v

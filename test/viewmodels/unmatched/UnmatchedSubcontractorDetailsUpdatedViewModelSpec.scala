@@ -30,8 +30,8 @@ class UnmatchedSubcontractorDetailsUpdatedViewModelSpec extends SpecBase {
     messages(app)
 
   private def confirmationData(
-                                updates: Seq[UnmatchedSubcontractorUpdate]
-                              ): UnmatchedSubcontractorDetailsUpdated =
+    updates: Seq[UnmatchedSubcontractorUpdate]
+  ): UnmatchedSubcontractorDetailsUpdated =
     UnmatchedSubcontractorDetailsUpdated(
       subcontractorName = UnmatchedSubcontractorName(
         firstName = Some("Martin"),

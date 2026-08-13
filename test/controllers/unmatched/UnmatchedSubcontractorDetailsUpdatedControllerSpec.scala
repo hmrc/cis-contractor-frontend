@@ -18,8 +18,7 @@ package controllers.unmatched
 
 import base.SpecBase
 import config.FrontendAppConfig
-import models.unmatched.{UnmatchedSubcontractorDetailsUpdated, UnmatchedSubcontractorDetailsUpdatedReturnTo,
-  UnmatchedSubcontractorName, UnmatchedSubcontractorUpdate}
+import models.unmatched.{UnmatchedSubcontractorDetailsUpdated, UnmatchedSubcontractorDetailsUpdatedReturnTo, UnmatchedSubcontractorName, UnmatchedSubcontractorUpdate}
 import pages.unmatched.UnmatchedSubcontractorDetailsUpdatedPage
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
@@ -37,8 +36,8 @@ class UnmatchedSubcontractorDetailsUpdatedControllerSpec extends SpecBase {
       .url
 
   private def confirmationData(
-                                returnTo: String
-                              ): UnmatchedSubcontractorDetailsUpdated =
+    returnTo: String
+  ): UnmatchedSubcontractorDetailsUpdated =
     UnmatchedSubcontractorDetailsUpdated(
       subcontractorName = UnmatchedSubcontractorName(
         firstName = Some("Martin"),
@@ -60,8 +59,8 @@ class UnmatchedSubcontractorDetailsUpdatedControllerSpec extends SpecBase {
     )
 
   private def userAnswersWithConfirmation(
-                                           returnTo: String
-                                         ) =
+    returnTo: String
+  ) =
     emptyUserAnswers
       .set(
         UnmatchedSubcontractorDetailsUpdatedPage,
@@ -115,7 +114,7 @@ class UnmatchedSubcontractorDetailsUpdatedControllerSpec extends SpecBase {
       }
     }
 
-    "must redirect to Journey Recovery when CIS ID is missing" in {
+    "must redirect to Unauthorised ORG when CIS ID is missing & User is ORG role" in {
 
       val userAnswers =
         emptyUserAnswers
@@ -139,7 +138,35 @@ class UnmatchedSubcontractorDetailsUpdatedControllerSpec extends SpecBase {
         status(result) mustEqual SEE_OTHER
 
         redirectLocation(result).value mustEqual
-          controllers.routes.JourneyRecoveryController.onPageLoad().url
+          controllers.routes.UnauthorisedOrganisationAffinityController.onPageLoad().url
+      }
+    }
+
+    "must redirect to Unauthorised AGENT when CIS ID is missing & User is AGENT role" in {
+
+      val userAnswers =
+        emptyUserAnswers
+          .set(
+            UnmatchedSubcontractorDetailsUpdatedPage,
+            confirmationData(
+              UnmatchedSubcontractorDetailsUpdatedReturnTo.YourSubcontractors
+            )
+          )
+          .success
+          .value
+
+      val application =
+        applicationBuilder(userAnswers = Some(userAnswers), isAgent = true).build()
+
+      running(application) {
+
+        val request = FakeRequest(GET, pageUrl)
+        val result  = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(result).value mustEqual
+          controllers.routes.UnauthorisedAgentAffinityController.onPageLoad().url
       }
     }
 

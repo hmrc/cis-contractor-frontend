@@ -32,8 +32,8 @@ class CisIdRequiredActionSpec extends SpecBase {
   private class TestCisIdRequiredAction extends CisIdRequiredActionImpl {
 
     def testRefine[A](
-                       request: DataRequest[A]
-                     ): Future[Either[Result, CisIdDataRequest[A]]] =
+      request: DataRequest[A]
+    ): Future[Either[Result, CisIdDataRequest[A]]] =
       refine(request)
   }
 
@@ -66,7 +66,7 @@ class CisIdRequiredActionSpec extends SpecBase {
       cisIdRequest.userId mustBe "user-id"
     }
 
-    "redirect to Journey Recovery when CIS ID is missing" in {
+    "redirect to Unauthorised ORG when CIS ID is missing & User is ORG role" in {
       val request =
         DataRequest(
           request = FakeRequest(GET, "/"),
@@ -81,7 +81,30 @@ class CisIdRequiredActionSpec extends SpecBase {
       result match {
         case Left(redirect) =>
           redirect mustBe Redirect(
-            controllers.routes.JourneyRecoveryController.onPageLoad()
+            controllers.routes.UnauthorisedOrganisationAffinityController.onPageLoad()
+          )
+
+        case Right(_) =>
+          fail("Expected a redirect but got a successful result")
+      }
+    }
+    "redirect to Unauthorised AGENT when CIS ID is missing & User is AGENT role" in {
+      val request =
+        DataRequest(
+          request = FakeRequest(GET, "/"),
+          userId = "user-id",
+          userAnswers = emptyUserAnswers,
+          isAgent = true
+        )
+
+      val result = action.testRefine(request).futureValue
+
+      result mustBe a[Left[?, ?]]
+
+      result match {
+        case Left(redirect) =>
+          redirect mustBe Redirect(
+            controllers.routes.UnauthorisedAgentAffinityController.onPageLoad()
           )
 
         case Right(_) =>

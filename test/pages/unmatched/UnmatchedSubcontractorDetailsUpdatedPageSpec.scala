@@ -47,8 +47,7 @@ class UnmatchedSubcontractorDetailsUpdatedPageSpec extends PageBehaviours {
       returnTo = UnmatchedSubcontractorDetailsUpdatedReturnTo.CannotVerifyAllSubcontractors
     )
 
-  implicit private val arbitraryUnmatchedSubcontractorDetailsUpdated
-  : Arbitrary[UnmatchedSubcontractorDetailsUpdated] =
+  implicit private val arbitraryUnmatchedSubcontractorDetailsUpdated: Arbitrary[UnmatchedSubcontractorDetailsUpdated] =
     Arbitrary(
       Gen.const(confirmationData)
     )

@@ -458,6 +458,24 @@ removeInsufficientSubcontractorNameYesNo.heading                                
 removeInsufficientSubcontractorNameYesNo.hint                                       =  This means they will remain unverified, so you must not make any payments to them.
 removeInsufficientSubcontractorNameYesNo.error.required                             =  Select yes if you want to remove this subcontractor from this verification request
 
+unmatchedSubcontractorDetailsUpdated.title                                          =  Subcontractor details updated
+unmatchedSubcontractorDetailsUpdated.heading                                        =  Subcontractor details updated
+unmatchedSubcontractorDetailsUpdated.p1                                             =  You have updated the subcontractor details for {0}.
+unmatchedSubcontractorDetailsUpdated.updatesMade.h2                                 =  Updates made
+unmatchedSubcontractorDetailsUpdated.table.hdr.details                              =  Details
+unmatchedSubcontractorDetailsUpdated.table.hdr.previous                             =  Previous
+unmatchedSubcontractorDetailsUpdated.table.hdr.updated                              =  Updated
+unmatchedSubcontractorDetailsUpdated.noneProvided                                   =  None provided
+unmatchedSubcontractorDetailsUpdated.noneSelected                                   =  None selected
+unmatchedSubcontractorDetailsUpdated.backTo                                         =  Back to
+unmatchedSubcontractorDetailsUpdated.cannotVerifyAllSubcontractors                  =  Cannot verify all subcontractors
+unmatchedSubcontractorDetailsUpdated.beforeYouGo.h2                                 =  Before you go
+unmatchedSubcontractorDetailsUpdated.beforeYouGo.p1                                 =  Your feedback helps us make our service better.
+unmatchedSubcontractorDetailsUpdated.beforeYouGo.takeAShortSurvey                   =  Take a short survey
+unmatchedSubcontractorDetailsUpdated.beforeYouGo.shareFeedback                      =  to share your feedback on this service.
+unmatchedSubcontractorDetailsUpdated.reviewUnmatchedSubcontractors                  =  Review unmatched subcontractors
+unmatchedSubcontractorDetailsUpdated.yourSubcontractors                             =  Your subcontractors
+
 # Partnership
 addPartnershipContactMethodsYesNo.title                            =  Do you want to add contact details for this partnership?
 addPartnershipContactMethodsYesNo.heading                          =  Do you want to add contact details for {0}?
@@ -1133,6 +1151,3 @@ contractordetails.removeDetailYesNo.detail.email                               =
 contractordetails.removeDetailYesNo.detail.schemeName                          =  scheme name
 contractordetails.removeDetailYesNo.error.required.email                       =  Select yes to remove the contractor’s email address
 contractordetails.removeDetailYesNo.error.required.schemeName                  =  Select yes to remove the contractor’s scheme name
-
-unmatchedSubcontractorDetailsUpdated.title = unmatchedSubcontractorDetailsUpdated
-unmatchedSubcontractorDetailsUpdated.heading = unmatchedSubcontractorDetailsUpdated

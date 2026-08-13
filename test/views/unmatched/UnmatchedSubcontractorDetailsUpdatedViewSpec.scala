@@ -77,10 +77,10 @@ class UnmatchedSubcontractorDetailsUpdatedViewSpec extends SpecBase {
     )
 
   private def renderView(
-                          returnUrl: String,
-                          returnTextKey: String,
-                          showBeforeYouGo: Boolean
-                        ): Document = {
+    returnUrl: String,
+    returnTextKey: String,
+    showBeforeYouGo: Boolean
+  ): Document = {
 
     implicit val request =
       FakeRequest(GET, "/")
@@ -97,9 +97,9 @@ class UnmatchedSubcontractorDetailsUpdatedViewSpec extends SpecBase {
   }
 
   private def linkWithText(
-                            document: Document,
-                            text: String
-                          ): Element =
+    document: Document,
+    text: String
+  ): Element =
     document
       .select("a.govuk-link")
       .asScala
@@ -109,17 +109,17 @@ class UnmatchedSubcontractorDetailsUpdatedViewSpec extends SpecBase {
       )
 
   private def assertLinkIsNotShown(
-                                    document: Document,
-                                    text: String
-                                  ): Unit =
+    document: Document,
+    text: String
+  ): Unit =
     document
       .select("a.govuk-link")
       .asScala
       .exists(_.text() == text) mustBe false
 
   private def assertCommonContent(
-                                   document: Document
-                                 ): Unit = {
+    document: Document
+  ): Unit = {
 
     document.select(".govuk-panel__title").text() mustEqual
       msgs("unmatchedSubcontractorDetailsUpdated.title")
@@ -159,8 +159,8 @@ class UnmatchedSubcontractorDetailsUpdatedViewSpec extends SpecBase {
   }
 
   private def assertBeforeYouGoHidden(
-                                       document: Document
-                                     ): Unit = {
+    document: Document
+  ): Unit = {
 
     document.text() must not include
       msgs("unmatchedSubcontractorDetailsUpdated.beforeYouGo.h2")

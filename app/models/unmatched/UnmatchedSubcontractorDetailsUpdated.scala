@@ -20,10 +20,10 @@ import play.api.libs.functional.syntax.*
 import play.api.libs.json.*
 
 case class UnmatchedSubcontractorDetailsUpdated(
-                                                    subcontractorName: UnmatchedSubcontractorName,
-                                                    updates: Seq[UnmatchedSubcontractorUpdate],
-                                                    returnTo: String = UnmatchedSubcontractorDetailsUpdatedReturnTo.CannotVerifyAllSubcontractors
-                                                  )
+  subcontractorName: UnmatchedSubcontractorName,
+  updates: Seq[UnmatchedSubcontractorUpdate],
+  returnTo: String = UnmatchedSubcontractorDetailsUpdatedReturnTo.CannotVerifyAllSubcontractors
+)
 
 object UnmatchedSubcontractorDetailsUpdatedReturnTo {
 
@@ -45,7 +45,7 @@ object UnmatchedSubcontractorDetailsUpdated {
       (__ \ "returnTo").readWithDefault(
         UnmatchedSubcontractorDetailsUpdatedReturnTo.CannotVerifyAllSubcontractors
       )
-    )(UnmatchedSubcontractorDetailsUpdated.apply)
+  )(UnmatchedSubcontractorDetailsUpdated.apply)
 
   implicit val writes: OWrites[UnmatchedSubcontractorDetailsUpdated] =
     Json.writes[UnmatchedSubcontractorDetailsUpdated]
@@ -55,9 +55,9 @@ object UnmatchedSubcontractorDetailsUpdated {
 }
 
 case class UnmatchedSubcontractorName(
-                                          firstName: Option[String],
-                                          lastName: Option[String]
-                                        ) {
+  firstName: Option[String],
+  lastName: Option[String]
+) {
   def displayName: String =
     Seq(firstName, lastName).flatten.mkString(" ")
 }
@@ -68,11 +68,11 @@ object UnmatchedSubcontractorName {
 }
 
 case class UnmatchedSubcontractorUpdate(
-                                            detail: String,
-                                            previous: Option[String],
-                                            updated: Option[String],
-                                            missingValueKey: String = "unmatchedSubcontractorDetailsUpdated.noneProvided"
-                                          )
+  detail: String,
+  previous: Option[String],
+  updated: Option[String],
+  missingValueKey: String = "unmatchedSubcontractorDetailsUpdated.noneProvided"
+)
 
 object UnmatchedSubcontractorUpdate {
 
@@ -83,7 +83,7 @@ object UnmatchedSubcontractorUpdate {
       (__ \ "missingValueKey").readWithDefault(
         "insufficientSubcontractorDetailsUpdated.noneProvided"
       )
-    )(UnmatchedSubcontractorUpdate.apply)
+  )(UnmatchedSubcontractorUpdate.apply)
 
   implicit val writes: OWrites[UnmatchedSubcontractorUpdate] =
     Json.writes[UnmatchedSubcontractorUpdate]

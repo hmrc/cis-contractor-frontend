@@ -20,14 +20,14 @@ import play.api.mvc.{Request, WrappedRequest}
 import models.{EmployerReference, UserAnswers}
 
 case class OptionalDataRequest[A](
-                                   request: Request[A],
-                                   userId: String,
-                                   userAnswers: Option[UserAnswers],
-                                   employerReference: Option[EmployerReference] = None,
-                                   agentReference: Option[String] = None,
-                                   isAgent: Boolean = false,
-                                   agentCode: Option[String] = None
-                                 ) extends WrappedRequest[A](request)
+  request: Request[A],
+  userId: String,
+  userAnswers: Option[UserAnswers],
+  employerReference: Option[EmployerReference] = None,
+  agentReference: Option[String] = None,
+  isAgent: Boolean = false,
+  agentCode: Option[String] = None
+) extends WrappedRequest[A](request)
 
 trait DataRequestFields[A] {
   val request: Request[A]
@@ -40,23 +40,23 @@ trait DataRequestFields[A] {
 }
 
 case class DataRequest[A](
-                           request: Request[A],
-                           userId: String,
-                           userAnswers: UserAnswers,
-                           employerReference: Option[EmployerReference] = None,
-                           agentReference: Option[String] = None,
-                           isAgent: Boolean = false,
-                           agentCode: Option[String] = None
-                         ) extends WrappedRequest[A](request)
+  request: Request[A],
+  userId: String,
+  userAnswers: UserAnswers,
+  employerReference: Option[EmployerReference] = None,
+  agentReference: Option[String] = None,
+  isAgent: Boolean = false,
+  agentCode: Option[String] = None
+) extends WrappedRequest[A](request)
 
 case class CisIdDataRequest[A](
-                                request: Request[A],
-                                userId: String,
-                                userAnswers: UserAnswers,
-                                cisId: String,
-                                employerReference: Option[EmployerReference] = None,
-                                agentReference: Option[String] = None,
-                                isAgent: Boolean = false,
-                                agentCode: Option[String] = None
-                              ) extends WrappedRequest[A](request)
-  with DataRequestFields[A]
+  request: Request[A],
+  userId: String,
+  userAnswers: UserAnswers,
+  cisId: String,
+  employerReference: Option[EmployerReference] = None,
+  agentReference: Option[String] = None,
+  isAgent: Boolean = false,
+  agentCode: Option[String] = None
+) extends WrappedRequest[A](request)
+    with DataRequestFields[A]
