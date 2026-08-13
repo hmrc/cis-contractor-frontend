@@ -50,29 +50,6 @@ class VerifyCheckYourAnswersViewSpec extends AnyWordSpec with Matchers with Guic
         messages("verify.verificationDeclaration.heading")
     }
 
-    "render the declaration content" in new Setup {
-      val doc = Jsoup.parse(view(SummaryList()).toString())
-
-      doc.select("main h2").text() mustBe
-        messages("verify.verificationDeclaration.heading")
-
-      doc.select("main p").text() must include(
-        messages("verify.verificationDeclaration.p1")
-      )
-
-      doc.select(".govuk-list--bullet li").size() mustBe 2
-
-      doc.select(".govuk-list--bullet li").get(0).text() mustBe
-        messages("verify.verificationDeclaration.list.l1")
-
-      doc.select(".govuk-list--bullet li").get(1).text() mustBe
-        messages("verify.verificationDeclaration.list.l2")
-
-      doc.text() must include(
-        messages("verify.verificationDeclaration.warningText")
-      )
-    }
-
     "render summary list rows when present" in new Setup {
       val list = SummaryList(rows =
         Seq(

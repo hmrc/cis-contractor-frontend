@@ -55,8 +55,6 @@ class VerifyNavigator @Inject() () extends NavigatorForJourney {
       userAnswers => navigatorFromSelectSubcontractorsToReverifyPage(NormalMode)(userAnswers)
     case EmailAddressPage                         =>
       _ => controllers.verify.routes.VerifyCheckYourAnswersController.onPageLoad()
-    case VerificationDeclarationPage              =>
-      _ => controllers.verify.routes.VerifyCheckYourAnswersController.onPageLoad()
     case _                                        => _ => controllers.routes.JourneyRecoveryController.onPageLoad()
   }
 
@@ -74,8 +72,6 @@ class VerifyNavigator @Inject() () extends NavigatorForJourney {
     case SelectSubcontractorsToReverifyPage       =>
       userAnswers => navigatorFromSelectSubcontractorsToReverifyPage(CheckMode)(userAnswers)
     case EmailAddressPage                         =>
-      _ => controllers.verify.routes.VerifyCheckYourAnswersController.onPageLoad()
-    case VerificationDeclarationPage              =>
       _ => controllers.verify.routes.VerifyCheckYourAnswersController.onPageLoad()
     case _                                        => _ => controllers.routes.JourneyRecoveryController.onPageLoad()
   }

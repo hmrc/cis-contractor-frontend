@@ -26,30 +26,28 @@ import viewmodels.implicits.*
 
 object SelectSubcontractorSummary {
 
-  def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(SelectSubcontractorPage) match {
-      case Some(subcontractors) =>
-        val names =
-          if (subcontractors.isEmpty) {
-            List(messages("verify.selectSubcontractor.display.noneSelected"))
-          } else {
-            subcontractors.toSeq.map(sub => HtmlFormat.escape(sub.name).toString)
-          }
+  def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] = {
+    val subcontractors = answers.get(SelectSubcontractorPage).getOrElse(Set.empty)
+    val names          =
+      if (subcontractors.isEmpty) {
+        List(messages("verify.selectSubcontractor.display.noneSelected"))
+      } else {
+        subcontractors.toSeq.map(sub => HtmlFormat.escape(sub.name).toString)
+      }
 
-        ValueViewModelHelper.makeGovukBulletList(names).map { value =>
-          SummaryListRowViewModel(
-            key = "verify.selectSubcontractor.checkYourAnswersLabel",
-            value = value,
-            actions = Seq(
-              ActionItemViewModel(
-                "site.change",
-                controllers.verify.routes.SelectSubcontractorController.onPageLoad(CheckMode).url
-              )
-                .withVisuallyHiddenText(messages("verify.selectSubcontractor.change.hidden"))
-                .withAttribute("id" -> "select-subcontractor")
-            )
+    ValueViewModelHelper.makeGovukBulletList(names).map { value =>
+      SummaryListRowViewModel(
+        key = "verify.selectSubcontractor.checkYourAnswersLabel",
+        value = value,
+        actions = Seq(
+          ActionItemViewModel(
+            "site.change",
+            controllers.verify.routes.SelectSubcontractorController.onPageLoad(CheckMode).url
           )
-        }
-      case None                 => None
+            .withVisuallyHiddenText(messages("verify.selectSubcontractor.change.hidden"))
+            .withAttribute("id" -> "select-subcontractor")
+        )
+      )
     }
+  }
 }

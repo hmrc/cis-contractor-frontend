@@ -15,18 +15,15 @@
  *@
 
 @import views.html.components._
+@import views.html.verify.VerificationDeclarationContent
 
 @this(
     layout: templates.Layout,
     govukSummaryList: GovukSummaryList,
     h1: H1,
-    h2: H2,
     govukButton: GovukButton,
     formHelper: FormWithCSRF,
-    bulletList: BulletList,
-    govukWarningText: GovukWarningText,
-    paragraph: Paragraph,
-    warningInsetText: components.WarningInsetText
+    verificationDeclarationContent: VerificationDeclarationContent
 
 )
 
@@ -40,20 +37,7 @@
 
         @govukSummaryList(list)
 
-        @h2("verify.verificationDeclaration.heading")
-
-        @paragraph(
-            messages("verify.verificationDeclaration.p1")
-        )
-
-        @bulletList(Seq(
-            messages("verify.verificationDeclaration.list.l1"),
-            messages("verify.verificationDeclaration.list.l2")
-        ))
-
-        @warningInsetText(
-            messages("verify.verificationDeclaration.warningText")
-        )
+        @verificationDeclarationContent()
 
         @govukButton(ButtonViewModel(messages("verify.verifyCheckYourAnswers.confirm")))
     }

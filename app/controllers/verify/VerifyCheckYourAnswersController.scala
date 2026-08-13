@@ -20,8 +20,6 @@ import controllers.actions.*
 import models.verify.ValidatedVerify
 import play.api.Logging
 import play.api.i18n.I18nSupport
-import pages.verify.VerificationDeclarationPage
-import repositories.SessionRepository
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.checkAnswers.verify.*
@@ -29,17 +27,15 @@ import viewmodels.govuk.summarylist.*
 import views.html.verify.VerifyCheckYourAnswersView
 
 import javax.inject.Inject
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
 
 class VerifyCheckYourAnswersController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
-  sessionRepository: SessionRepository,
   val controllerComponents: MessagesControllerComponents,
   view: VerifyCheckYourAnswersView
-)(implicit ec: ExecutionContext)
-    extends FrontendBaseController
+) extends FrontendBaseController
     with I18nSupport
     with Logging {
 
@@ -69,13 +65,10 @@ class VerifyCheckYourAnswersController @Inject() (
       ValidatedVerify.build(request.userAnswers) match {
 
         case Right(_) =>
-          for {
-            updatedAnswers <- Future.fromTry(
-                                request.userAnswers.set(VerificationDeclarationPage, true)
-                              )
-            _              <- sessionRepository.set(updatedAnswers)
-          } yield Redirect(
-            controllers.verify.routes.SubmissionSendingController.onPageLoad()
+          Future.successful(
+            Redirect(
+              controllers.verify.routes.SubmissionSendingController.onPageLoad()
+            )
           )
 
         case Left(error) =>
@@ -83,7 +76,9 @@ class VerifyCheckYourAnswersController @Inject() (
             s"[VerifyCheckYourAnswersController.onSubmit] Validation failed: $error"
           )
           Future.successful(
-            Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+            Redirect(
+              controllers.routes.JourneyRecoveryController.onPageLoad()
+            )
           )
       }
     }

@@ -22,7 +22,6 @@ import models.verify.ContractorEmailConfirmationStored.{CurrentEmail, DifferentE
 import models.verify.SelectedSubcontractors
 import models.{ContractorScheme, Subcontractor, SubcontractorViewModel}
 import models.response.GetNewestVerificationBatchResponse
-
 import org.scalatestplus.mockito.MockitoSugar
 import org.jsoup.Jsoup
 import pages.verify._
@@ -382,7 +381,7 @@ class VerifyCheckYourAnswersControllerSpec extends SpecBase with MockitoSugar {
 
     "onSubmit" - {
 
-      "must save the declaration and redirect to Submission Sending when answers are valid" in {
+      "must redirect to Submission Sending when answers are valid" in {
         val ua = emptyUserAnswers
           .setOrException(SelectSubcontractorPage, Set(brodyMartin))
           .setOrException(ReverifyExistingSubcontractorsYesNoPage, false)
@@ -395,16 +394,7 @@ class VerifyCheckYourAnswersControllerSpec extends SpecBase with MockitoSugar {
           val result = route(application, FakeRequest(POST, onSubmitRoute)).value
 
           status(result) mustBe SEE_OTHER
-          redirectLocation(result).value mustBe
-            controllers.verify.routes.SubmissionSendingController.onPageLoad().url
-
-          val updatedAnswers = await(
-            application.injector
-              .instanceOf[repositories.SessionRepository]
-              .get(ua.id)
-          )
-
-          updatedAnswers.value.get(VerificationDeclarationPage) mustBe Some(true)
+          redirectLocation(result).value mustBe controllers.verify.routes.SubmissionSendingController.onPageLoad().url
         }
       }
 

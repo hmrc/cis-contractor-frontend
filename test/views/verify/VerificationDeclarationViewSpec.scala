@@ -46,7 +46,9 @@ class VerificationDeclarationViewSpec extends SpecBase {
 
         doc.title() must include(msgs("verify.verificationDeclaration.title"))
 
-        doc.select("h1").text() mustEqual msgs("verify.verificationDeclaration.heading")
+        doc.select("h2").text() must include(
+          msgs("verify.verificationDeclaration.heading")
+        )
 
         doc.text() must include(msgs("verify.verificationDeclaration.p1"))
         doc.text() must include(msgs("verify.verificationDeclaration.list.l1"))

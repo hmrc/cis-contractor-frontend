@@ -16,16 +16,13 @@
 
 @import viewmodels.LegendSize.Large
 @import views.html.components._
+@import views.html.verify.VerificationDeclarationContent
 
 @this(
         layout: templates.Layout,
-        bulletList: BulletList,
         formHelper: FormWithCSRF,
-        heading: H1,
         govukButton: GovukButton,
-        govukWarningText: GovukWarningText,
-        paragraph: Paragraph,
-        warningInsetText: components.WarningInsetText
+        verificationDeclarationContent: VerificationDeclarationContent
 )
 
 @(form: Form[Boolean],  mode: Mode)(implicit request: Request[_], messages: Messages)
@@ -36,22 +33,7 @@
         Symbol("autoComplete") -> "off"
     ) {
 
-        @heading(
-            messages("verify.verificationDeclaration.heading")
-        )
-
-        @paragraph(
-            messages("verify.verificationDeclaration.p1")
-        )
-
-        @bulletList(Seq(
-            messages("verify.verificationDeclaration.list.l1"),
-            messages("verify.verificationDeclaration.list.l2")
-        ))
-
-        @warningInsetText(
-            messages("verify.verificationDeclaration.warningText")
-        )
+        @verificationDeclarationContent()
 
         @govukButton(
             ButtonViewModel(messages("verify.verificationDeclaration.confirm"))
