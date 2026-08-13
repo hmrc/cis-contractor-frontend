@@ -17,7 +17,6 @@
 package viewmodels.checkAnswers.add
 
 import controllers.add.routes
-import models.amend.AmendIndividualRemoveDetail
 import models.{AmendMode, CheckMode, UserAnswers}
 import org.scalatest.OptionValues.convertOptionToValuable
 import org.scalatest.TryValues.convertTryToSuccessOrFailure
@@ -89,9 +88,7 @@ class SubTradingNameYesNoSummarySpec extends AnyFreeSpec with Matchers {
       val changeAction       = actions.head
       val expectedChangeText = messages("site.change")
       val expectedHref       =
-        controllers.amend.routes.AmendIndividualRemoveDetailYesNoController
-          .onPageLoad(AmendIndividualRemoveDetail.SubcontractorName.key)
-          .url
+        routes.SubTradingNameYesNoController.onPageLoad(AmendMode).url
       val expectedHiddenText = messages("subTradingNameYesNo.change.hidden")
 
       changeAction.content.asHtml.toString    should include(expectedChangeText)
