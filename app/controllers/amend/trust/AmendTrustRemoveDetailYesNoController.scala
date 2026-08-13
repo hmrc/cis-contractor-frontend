@@ -165,7 +165,7 @@ class AmendTrustRemoveDetailYesNoController @Inject() (
                       )
                       journeyRecovery
                     }
-                    )
+                )
             }
           }
         }

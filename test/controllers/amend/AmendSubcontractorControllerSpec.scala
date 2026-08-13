@@ -532,7 +532,7 @@ class AmendSubcontractorControllerSpec extends SpecBase with MockitoSugar {
           applicationBuilder(userAnswers = Some(emptyUserAnswers))
             .overrides(
               bind[SubcontractorService].toInstance(mockService),
-              bind[SessionRepository].toInstance(mockSessionRepository),
+              bind[SessionRepository].toInstance(mockSessionRepository)
             )
             .build()
 
