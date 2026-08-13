@@ -140,8 +140,8 @@ class CompanyUtrSummarySpec extends AnyFreeSpec with Matchers with CyaEncodingSp
   "CompanyUtrSummary.row with ViewOnlyCompanyAnswers" - {
 
     def viewOnlyAnswers(
-                         utr: Option[String] = None
-                       ): ViewOnlyCompanyAnswers =
+      utr: Option[String] = None
+    ): ViewOnlyCompanyAnswers =
       ViewOnlyCompanyAnswers(
         subcontractorType = TypeOfSubcontractor.Limitedcompany,
         showVerificationDetails = false,
@@ -178,10 +178,10 @@ class CompanyUtrSummarySpec extends AnyFreeSpec with Matchers with CyaEncodingSp
       val expectedKeyText =
         messages("companyUtr.verified.checkYourAnswersLabel")
 
-      row.key.content.asHtml.toString should include(expectedKeyText)
+      row.key.content.asHtml.toString   should include(expectedKeyText)
       row.value.content.asHtml.toString should include("7777777777")
 
-      row.actions shouldBe defined
+      row.actions             shouldBe defined
       row.actions.value.items shouldBe empty
     }
 
@@ -201,10 +201,10 @@ class CompanyUtrSummarySpec extends AnyFreeSpec with Matchers with CyaEncodingSp
       val expectedKeyText =
         messages("companyUtr.checkYourAnswersLabel")
 
-      row.key.content.asHtml.toString should include(expectedKeyText)
+      row.key.content.asHtml.toString   should include(expectedKeyText)
       row.value.content.asHtml.toString should include("7777777777")
 
-      row.actions shouldBe defined
+      row.actions             shouldBe defined
       row.actions.value.items shouldBe empty
     }
 

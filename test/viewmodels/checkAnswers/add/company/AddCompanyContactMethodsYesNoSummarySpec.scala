@@ -123,8 +123,8 @@ class AddCompanyContactMethodsYesNoSummarySpec extends AnyFreeSpec with Matchers
   "ViewOnly - AddCompanyContactMethodsYesNoSummary.row" - {
 
     def viewOnlyAnswers(
-                         companyContactMethodsYesNo: Option[Boolean]
-                       ): ViewOnlyCompanyAnswers =
+      companyContactMethodsYesNo: Option[Boolean]
+    ): ViewOnlyCompanyAnswers =
       ViewOnlyCompanyAnswers(
         subcontractorType = TypeOfSubcontractor.Limitedcompany,
         showVerificationDetails = false,
@@ -165,7 +165,7 @@ class AddCompanyContactMethodsYesNoSummarySpec extends AnyFreeSpec with Matchers
         messages("site.yes")
       )
 
-      row.actions shouldBe defined
+      row.actions             shouldBe defined
       row.actions.value.items shouldBe empty
     }
 
@@ -189,7 +189,7 @@ class AddCompanyContactMethodsYesNoSummarySpec extends AnyFreeSpec with Matchers
         messages("site.no")
       )
 
-      row.actions shouldBe defined
+      row.actions             shouldBe defined
       row.actions.value.items shouldBe empty
     }
 

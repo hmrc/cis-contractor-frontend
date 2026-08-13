@@ -138,8 +138,8 @@ class CompanyWorksReferenceSummarySpec extends AnyFreeSpec with Matchers with Cy
   "CompanyWorksReferenceSummary.row with ViewOnlyCompanyAnswers" - {
 
     def viewOnlyAnswers(
-                         worksReference: Option[String] = None
-                       ): ViewOnlyCompanyAnswers =
+      worksReference: Option[String] = None
+    ): ViewOnlyCompanyAnswers =
       ViewOnlyCompanyAnswers(
         subcontractorType = TypeOfSubcontractor.Limitedcompany,
         showVerificationDetails = false,
@@ -173,10 +173,10 @@ class CompanyWorksReferenceSummarySpec extends AnyFreeSpec with Matchers with Cy
       val expectedKeyText =
         messages("companyWorksReference.checkYourAnswersLabel")
 
-      row.key.content.asHtml.toString should include(expectedKeyText)
+      row.key.content.asHtml.toString   should include(expectedKeyText)
       row.value.content.asHtml.toString should include("WR-001")
 
-      row.actions shouldBe defined
+      row.actions             shouldBe defined
       row.actions.value.items shouldBe empty
     }
 

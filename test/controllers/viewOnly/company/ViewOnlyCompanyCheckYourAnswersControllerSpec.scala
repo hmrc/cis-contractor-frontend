@@ -27,9 +27,7 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import queries.ViewOnlyCompanyAnswersQuery
 
-class ViewOnlyCompanyCheckYourAnswersControllerSpec
-  extends SpecBase
-    with MockitoSugar {
+class ViewOnlyCompanyCheckYourAnswersControllerSpec extends SpecBase with MockitoSugar {
 
   private val address =
     Address(
@@ -162,9 +160,9 @@ class ViewOnlyCompanyCheckYourAnswersControllerSpec
           msg("companyWorksReference.checkYourAnswersLabel")
         )
 
-        page must not include(
+        page must not include (
           msg("amendCheckYourAnswers.verificationNumber.label")
-          )
+        )
 
         page must include("Company")
         page must include("Test Company Ltd")
@@ -182,7 +180,7 @@ class ViewOnlyCompanyCheckYourAnswersControllerSpec
         page must include("PL31 2HL")
         page must include("England")
 
-        page must not include("VRN123456")
+        page must not include "VRN123456"
       }
     }
 
@@ -234,13 +232,13 @@ class ViewOnlyCompanyCheckYourAnswersControllerSpec
 
         page must include("Company")
 
-        page must not include(
+        page must not include (
           msg("companyName.checkYourAnswersLabel")
-          )
+        )
 
-        page must not include(
+        page must not include (
           msg("companyUtrYesNo.checkYourAnswersLabel")
-          )
+        )
 
         page must include(
           msg("companyUtr.verified.checkYourAnswersLabel")
@@ -329,11 +327,11 @@ class ViewOnlyCompanyCheckYourAnswersControllerSpec
         val page =
           contentAsString(result)
 
-        page must not include(
+        page must not include (
           msg("amendCheckYourAnswers.verificationNumber.label")
-          )
+        )
 
-        page must not include("VRN123456")
+        page must not include "VRN123456"
 
         page must include(
           msg("companyUtr.verified.checkYourAnswersLabel")

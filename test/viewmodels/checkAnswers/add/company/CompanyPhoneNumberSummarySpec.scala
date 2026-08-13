@@ -129,8 +129,8 @@ class CompanyPhoneNumberSummarySpec extends AnyFreeSpec with Matchers with CyaEn
   "CompanyPhoneNumberSummary.row with ViewOnlyCompanyAnswers" - {
 
     def viewOnlyAnswers(
-                         phone: Option[String] = None
-                       ): ViewOnlyCompanyAnswers =
+      phone: Option[String] = None
+    ): ViewOnlyCompanyAnswers =
       ViewOnlyCompanyAnswers(
         subcontractorType = TypeOfSubcontractor.Limitedcompany,
         showVerificationDetails = false,
@@ -164,10 +164,10 @@ class CompanyPhoneNumberSummarySpec extends AnyFreeSpec with Matchers with CyaEn
       val expectedKeyText =
         messages("companyPhoneNumber.checkYourAnswersLabel")
 
-      row.key.content.asHtml.toString should include(expectedKeyText)
+      row.key.content.asHtml.toString   should include(expectedKeyText)
       row.value.content.asHtml.toString should include("0123456789")
 
-      row.actions shouldBe defined
+      row.actions             shouldBe defined
       row.actions.value.items shouldBe empty
     }
 

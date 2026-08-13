@@ -124,12 +124,11 @@ class TrustContactMethodOptionsSummarySpec extends SpecBase with Matchers {
           addressYesNo = None,
           address = None,
           trustContactMethodsYesNo = Some(true),
-          trustContactMethod =
-            Set(
-              ContactMethodOptions.Email,
-              ContactMethodOptions.Phone,
-              ContactMethodOptions.Mobile
-            ),
+          trustContactMethod = Set(
+            ContactMethodOptions.Email,
+            ContactMethodOptions.Phone,
+            ContactMethodOptions.Mobile
+          ),
           email = None,
           phone = None,
           mobile = None,
@@ -156,7 +155,7 @@ class TrustContactMethodOptionsSummarySpec extends SpecBase with Matchers {
       valueHtml must include("Email address")
       valueHtml must include("Phone number")
       valueHtml must include("Mobile number")
-      valueHtml must not include ("<br>")
+      valueHtml must not include "<br>"
       valueHtml must include("govuk-list--bullet")
 
       row.actions mustBe None
@@ -192,8 +191,8 @@ class TrustContactMethodOptionsSummarySpec extends SpecBase with Matchers {
         result.value.value.content.asHtml.toString
 
       valueHtml must include("Email address")
-      valueHtml must not include ("<br>")
-      valueHtml must not include ("govuk-list--bullet")
+      valueHtml must not include "<br>"
+      valueHtml must not include "govuk-list--bullet"
 
       result.value.actions mustBe None
     }

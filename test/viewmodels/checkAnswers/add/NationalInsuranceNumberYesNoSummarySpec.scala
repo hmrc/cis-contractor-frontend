@@ -163,7 +163,7 @@ class NationalInsuranceNumberYesNoSummarySpec extends AnyFreeSpec with Matchers 
 
       row.value.content.asHtml.toString should include(expectedValue)
 
-      row.actions shouldBe defined
+      row.actions             shouldBe defined
       row.actions.value.items shouldBe empty
     }
 
@@ -204,7 +204,7 @@ class NationalInsuranceNumberYesNoSummarySpec extends AnyFreeSpec with Matchers 
 
       row.value.content.asHtml.toString should include(expectedValue)
 
-      row.actions shouldBe defined
+      row.actions             shouldBe defined
       row.actions.value.items shouldBe empty
     }
 

@@ -198,7 +198,7 @@ class SubcontractorNameSummarySpec extends AnyFreeSpec with Matchers with CyaEnc
 
       row.value.content.asHtml.toString should include(expectedFullName)
 
-      row.actions shouldBe defined
+      row.actions             shouldBe defined
       row.actions.value.items shouldBe empty
     }
 
@@ -243,7 +243,7 @@ class SubcontractorNameSummarySpec extends AnyFreeSpec with Matchers with CyaEnc
       row.value.content.asHtml.toString should include("John Doe")
       row.value.content.asHtml.toString should not include "John  Doe"
 
-      row.actions shouldBe defined
+      row.actions             shouldBe defined
       row.actions.value.items shouldBe empty
     }
 
@@ -322,7 +322,7 @@ class SubcontractorNameSummarySpec extends AnyFreeSpec with Matchers with CyaEnc
 
       assertNoDoubleEncoding(html)
 
-      row.actions shouldBe defined
+      row.actions             shouldBe defined
       row.actions.value.items shouldBe empty
     }
   }

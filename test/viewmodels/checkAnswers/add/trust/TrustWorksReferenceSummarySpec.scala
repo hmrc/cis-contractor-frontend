@@ -129,7 +129,7 @@ class TrustWorksReferenceSummarySpec extends AnyFreeSpec with Matchers with CyaE
       assertNoDoubleEncoding(html)
     }
   }
-  
+
   "ViewOnly - TrustWorksReferenceSummary.row" - {
 
     "must return a SummaryListRow when works reference exists in ViewOnlyTrustAnswers" in {

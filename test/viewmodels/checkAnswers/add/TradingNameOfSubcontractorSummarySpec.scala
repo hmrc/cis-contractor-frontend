@@ -148,7 +148,7 @@ class TradingNameOfSubcontractorSummarySpec extends AnyFreeSpec with Matchers wi
         "O&#x27;Reilly &amp; Co &lt;UK&gt;"
       )
 
-      row.actions shouldBe defined
+      row.actions             shouldBe defined
       row.actions.value.items shouldBe empty
     }
 
@@ -221,7 +221,7 @@ class TradingNameOfSubcontractorSummarySpec extends AnyFreeSpec with Matchers wi
 
       assertNoDoubleEncoding(html)
 
-      row.actions shouldBe defined
+      row.actions             shouldBe defined
       row.actions.value.items shouldBe empty
     }
   }

@@ -25,9 +25,7 @@ import models.response.SubcontractorResponse
 import org.scalatest.matchers.must.Matchers
 import queries.{ViewOnlyCompanyAnswersQuery, ViewOnlyIndividualAnswersQuery, ViewOnlyPartnershipAnswersQuery, ViewOnlyTrustAnswersQuery}
 
-class ViewOnlySubcontractorPopulatorSpec
-  extends SpecBase
-    with Matchers {
+class ViewOnlySubcontractorPopulatorSpec extends SpecBase with Matchers {
 
   private val subcontractor =
     SubcontractorResponse(

@@ -147,7 +147,7 @@ class WorksReferenceNumberSummarySpec extends AnyFreeSpec with Matchers with Cya
 
       row.value.content.asHtml.toString should include("1234567890")
 
-      row.actions shouldBe defined
+      row.actions             shouldBe defined
       row.actions.value.items shouldBe empty
     }
 
@@ -214,7 +214,7 @@ class WorksReferenceNumberSummarySpec extends AnyFreeSpec with Matchers with Cya
       assertEscaped(html, "WRN &amp; Ref&#x27;01")
       assertNoDoubleEncoding(html)
 
-      row.actions shouldBe defined
+      row.actions             shouldBe defined
       row.actions.value.items shouldBe empty
     }
   }

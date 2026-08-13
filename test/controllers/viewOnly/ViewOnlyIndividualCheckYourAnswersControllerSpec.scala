@@ -29,9 +29,7 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import queries.ViewOnlyIndividualAnswersQuery
 
-class ViewOnlyIndividualCheckYourAnswersControllerSpec
-  extends SpecBase
-    with MockitoSugar {
+class ViewOnlyIndividualCheckYourAnswersControllerSpec extends SpecBase with MockitoSugar {
 
   private val address =
     Address(
@@ -175,9 +173,9 @@ class ViewOnlyIndividualCheckYourAnswersControllerSpec
           msg("worksReferenceNumber.checkYourAnswersLabel")
         )
 
-        page must not include(
+        page must not include (
           msg("amendCheckYourAnswers.verificationNumber.label")
-          )
+        )
 
         page must include("Individual")
         page must include("John Middle Smith")
@@ -237,21 +235,21 @@ class ViewOnlyIndividualCheckYourAnswersControllerSpec
 
         page must include("VRN123456")
 
-        page must not include(
+        page must not include (
           msg("subTradingNameYesNo.checkYourAnswersLabel")
-          )
+        )
 
-        page must not include(
+        page must not include (
           msg("subcontractorName.checkYourAnswersLabel")
-          )
+        )
 
-        page must not include(
+        page must not include (
           msg("tradingNameOfSubcontractor.checkYourAnswersLabel")
-          )
+        )
 
-        page must not include(
+        page must not include (
           msg("uniqueTaxpayerReferenceYesNo.checkYourAnswersLabel")
-          )
+        )
 
         page must include(
           msg("subcontractorsUniqueTaxpayerReference.checkYourAnswersLabel")

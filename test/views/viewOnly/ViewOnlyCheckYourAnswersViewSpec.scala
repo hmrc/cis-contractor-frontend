@@ -30,10 +30,7 @@ import uk.gov.hmrc.govukfrontend.views.Aliases.Text
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.*
 import views.html.viewOnly.ViewOnlyCheckYourAnswersView
 
-class ViewOnlyCheckYourAnswersViewSpec
-  extends AnyWordSpec
-    with Matchers
-    with GuiceOneAppPerSuite {
+class ViewOnlyCheckYourAnswersViewSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite {
 
   "ViewOnlyCheckYourAnswersView" should {
 
@@ -90,8 +87,8 @@ class ViewOnlyCheckYourAnswersViewSpec
 
       backLinkContainer.text() mustBe
         s"${messages("viewOnlyCheckYourAnswers.backTo")} " +
-          messages("viewOnlyCheckYourAnswers.cannotVerifyAllSubcontractors") +
-          "."
+        messages("viewOnlyCheckYourAnswers.cannotVerifyAllSubcontractors") +
+        "."
     }
   }
 

@@ -56,17 +56,16 @@ object PartnershipNominatedPartnerUtrSummary {
     }
 
   def row(
-           answers: ViewOnlyPartnershipAnswers,
-           isVerified: Boolean
-         )(implicit messages: Messages): Option[SummaryListRow] =
+    answers: ViewOnlyPartnershipAnswers,
+    isVerified: Boolean
+  )(implicit messages: Messages): Option[SummaryListRow] =
     answers.nominatedPartnerUtr.map { answer =>
       SummaryListRowViewModel(
-        key =
-          if (isVerified) {
-            "partnershipNominatedPartnerUtr.verified.checkYourAnswersLabel"
-          } else {
-            "partnershipNominatedPartnerUtr.checkYourAnswersLabel"
-          },
+        key = if (isVerified) {
+          "partnershipNominatedPartnerUtr.verified.checkYourAnswersLabel"
+        } else {
+          "partnershipNominatedPartnerUtr.checkYourAnswersLabel"
+        },
         value = ValueViewModel(answer),
         actions = Seq.empty
       )

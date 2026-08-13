@@ -163,7 +163,7 @@ class IndividualPhoneNumberSummarySpec extends AnyFreeSpec with Matchers with Cy
 
       row.value.content.asHtml.toString should include("0987456231")
 
-      row.actions shouldBe defined
+      row.actions             shouldBe defined
       row.actions.value.items shouldBe empty
     }
 
@@ -234,7 +234,7 @@ class IndividualPhoneNumberSummarySpec extends AnyFreeSpec with Matchers with Cy
       assertEscaped(html, "020 7946 0958 &amp; ext&#x27;78")
       assertNoDoubleEncoding(html)
 
-      row.actions shouldBe defined
+      row.actions             shouldBe defined
       row.actions.value.items shouldBe empty
     }
   }

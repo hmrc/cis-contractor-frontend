@@ -146,8 +146,8 @@ class PartnershipWorksReferenceNumberSummarySpec extends AnyFreeSpec with Matche
   "PartnershipWorksReferenceNumberSummary.row(ViewOnlyPartnershipAnswers)" - {
 
     def viewOnlyAnswers(
-                         nominatedPartnerWorksReference: Option[String]
-                       ): ViewOnlyPartnershipAnswers =
+      nominatedPartnerWorksReference: Option[String]
+    ): ViewOnlyPartnershipAnswers =
       ViewOnlyPartnershipAnswers(
         subcontractorType = TypeOfSubcontractor.Partnership,
         showVerificationDetails = false,
@@ -191,7 +191,7 @@ class PartnershipWorksReferenceNumberSummarySpec extends AnyFreeSpec with Matche
 
       row.value.content.asHtml.toString should include("ABC123456")
 
-      row.actions shouldBe defined
+      row.actions             shouldBe defined
       row.actions.value.items shouldBe empty
     }
 

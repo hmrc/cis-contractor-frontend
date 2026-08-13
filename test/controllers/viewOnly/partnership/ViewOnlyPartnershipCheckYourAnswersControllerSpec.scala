@@ -29,9 +29,7 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import queries.ViewOnlyPartnershipAnswersQuery
 
-class ViewOnlyPartnershipCheckYourAnswersControllerSpec
-  extends SpecBase
-    with MockitoSugar {
+class ViewOnlyPartnershipCheckYourAnswersControllerSpec extends SpecBase with MockitoSugar {
 
   private val address =
     Address(
@@ -190,9 +188,9 @@ class ViewOnlyPartnershipCheckYourAnswersControllerSpec
           msg("partnershipNominatedPartnerUtr.checkYourAnswersLabel")
         )
 
-        page must not include(
+        page must not include (
           msg("amendCheckYourAnswers.verificationNumber.label")
-          )
+        )
 
         page must include("Partnership")
         page must include("Test Partnership")
@@ -212,7 +210,7 @@ class ViewOnlyPartnershipCheckYourAnswersControllerSpec
         page must include("PL31 2HL")
         page must include("England")
 
-        page must not include("VRN123456")
+        page must not include "VRN123456"
       }
     }
 
@@ -255,21 +253,21 @@ class ViewOnlyPartnershipCheckYourAnswersControllerSpec
 
         page must include("VRN123456")
 
-        page must not include(
+        page must not include (
           msg("partnershipName.checkYourAnswersLabel")
-          )
+        )
 
-        page must not include(
+        page must not include (
           msg("partnershipHasUtrYesNo.checkYourAnswersLabel")
-          )
+        )
 
-        page must not include(
+        page must not include (
           msg("partnershipNominatedPartnerUtrYesNo.checkYourAnswersLabel")
-          )
+        )
 
-        page must not include(
+        page must not include (
           msg("partnershipNominatedPartnerUtr.change.hidden")
-          )
+        )
 
         page must include(
           msg("typeOfSubcontractor.checkYourAnswersLabel")
@@ -373,11 +371,11 @@ class ViewOnlyPartnershipCheckYourAnswersControllerSpec
 
         val page = contentAsString(result)
 
-        page must not include(
+        page must not include (
           msg("amendCheckYourAnswers.verificationNumber.label")
-          )
+        )
 
-        page must not include("VRN123456")
+        page must not include "VRN123456"
 
         page must include(
           msg("partnershipUniqueTaxpayerReference.verified.checkYourAnswersLabel")

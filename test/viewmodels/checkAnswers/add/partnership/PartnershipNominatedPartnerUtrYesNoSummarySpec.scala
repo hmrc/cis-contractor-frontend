@@ -63,17 +63,17 @@ class PartnershipNominatedPartnerUtrYesNoSummarySpec extends AnyFreeSpec with Ma
 
       val changeAction       = actions.head
       val expectedChangeText = messages("site.change")
-      val expectedHref =
+      val expectedHref       =
         routes.PartnershipNominatedPartnerUtrYesNoController
           .onPageLoad(CheckMode)
           .url
       val expectedHiddenText =
         messages("partnershipNominatedPartnerUtrYesNo.change.hidden")
 
-      changeAction.content.asHtml.toString should include(expectedChangeText)
-      changeAction.href shouldBe expectedHref
+      changeAction.content.asHtml.toString    should include(expectedChangeText)
+      changeAction.href                     shouldBe expectedHref
       changeAction.visuallyHiddenText.value shouldBe expectedHiddenText
-      changeAction.attributes should contain("id" -> "add-nominated-partner-utr")
+      changeAction.attributes                 should contain("id" -> "add-nominated-partner-utr")
     }
 
     "must return a SummaryListRow with 'Yes' when the answer is true for Amend journey" in {
@@ -103,17 +103,17 @@ class PartnershipNominatedPartnerUtrYesNoSummarySpec extends AnyFreeSpec with Ma
 
       val changeAction       = actions.head
       val expectedChangeText = messages("site.change")
-      val expectedHref =
+      val expectedHref       =
         routes.PartnershipNominatedPartnerUtrYesNoController
           .onPageLoad(AmendMode)
           .url
       val expectedHiddenText =
         messages("partnershipNominatedPartnerUtrYesNo.change.hidden")
 
-      changeAction.content.asHtml.toString should include(expectedChangeText)
-      changeAction.href shouldBe expectedHref
+      changeAction.content.asHtml.toString    should include(expectedChangeText)
+      changeAction.href                     shouldBe expectedHref
       changeAction.visuallyHiddenText.value shouldBe expectedHiddenText
-      changeAction.attributes should contain("id" -> "add-nominated-partner-utr")
+      changeAction.attributes                 should contain("id" -> "add-nominated-partner-utr")
     }
 
     "must return a SummaryListRow with 'No' and change action pointing to add flow when the answer is false in AmendMode" in {
@@ -142,7 +142,7 @@ class PartnershipNominatedPartnerUtrYesNoSummarySpec extends AnyFreeSpec with Ma
       actions should have size 1
 
       val changeAction       = actions.head
-      val expectedHref =
+      val expectedHref       =
         routes.PartnershipNominatedPartnerUtrYesNoController
           .onPageLoad(AmendMode)
           .url
@@ -150,10 +150,10 @@ class PartnershipNominatedPartnerUtrYesNoSummarySpec extends AnyFreeSpec with Ma
       val expectedHiddenText =
         messages("partnershipNominatedPartnerUtrYesNo.change.hidden")
 
-      changeAction.content.asHtml.toString should include(expectedChangeText)
-      changeAction.href shouldBe expectedHref
+      changeAction.content.asHtml.toString    should include(expectedChangeText)
+      changeAction.href                     shouldBe expectedHref
       changeAction.visuallyHiddenText.value shouldBe expectedHiddenText
-      changeAction.attributes should contain("id" -> "add-nominated-partner-utr")
+      changeAction.attributes                 should contain("id" -> "add-nominated-partner-utr")
     }
 
     "must return a SummaryListRow with 'No' when the answer is false" in {
@@ -183,8 +183,8 @@ class PartnershipNominatedPartnerUtrYesNoSummarySpec extends AnyFreeSpec with Ma
   "PartnershipNominatedPartnerUtrYesNoSummary.row(ViewOnlyPartnershipAnswers)" - {
 
     def viewOnlyAnswers(
-                         nominatedPartnerUtrYesNo: Option[Boolean]
-                       ): ViewOnlyPartnershipAnswers =
+      nominatedPartnerUtrYesNo: Option[Boolean]
+    ): ViewOnlyPartnershipAnswers =
       ViewOnlyPartnershipAnswers(
         subcontractorType = TypeOfSubcontractor.Partnership,
         showVerificationDetails = false,
@@ -230,7 +230,7 @@ class PartnershipNominatedPartnerUtrYesNoSummarySpec extends AnyFreeSpec with Ma
         messages("site.yes")
       )
 
-      row.actions shouldBe defined
+      row.actions             shouldBe defined
       row.actions.value.items shouldBe empty
     }
 
@@ -254,7 +254,7 @@ class PartnershipNominatedPartnerUtrYesNoSummarySpec extends AnyFreeSpec with Ma
         messages("site.no")
       )
 
-      row.actions shouldBe defined
+      row.actions             shouldBe defined
       row.actions.value.items shouldBe empty
     }
 

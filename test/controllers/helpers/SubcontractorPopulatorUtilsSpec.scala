@@ -23,9 +23,7 @@ import models.contact.ContactMethodOptions
 import models.response.SubcontractorResponse
 import org.scalatest.matchers.must.Matchers
 
-class SubcontractorPopulatorUtilsSpec
-  extends SpecBase
-    with Matchers {
+class SubcontractorPopulatorUtilsSpec extends SpecBase with Matchers {
 
   private val subcontractor =
     SubcontractorResponse(

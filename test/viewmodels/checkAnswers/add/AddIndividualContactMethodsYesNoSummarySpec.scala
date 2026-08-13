@@ -123,8 +123,8 @@ class AddIndividualContactMethodsYesNoSummarySpec extends AnyFreeSpec with Match
   "ViewOnly - AddIndividualContactMethodsYesNoSummary.row" - {
 
     def viewOnlyAnswers(
-                         contactMethodsYesNo: Option[Boolean]
-                       ): ViewOnlyIndividualAnswers =
+      contactMethodsYesNo: Option[Boolean]
+    ): ViewOnlyIndividualAnswers =
       ViewOnlyIndividualAnswers(
         subcontractorType = models.TypeOfSubcontractor.Individualorsoletrader,
         showVerificationDetails = false,
@@ -166,7 +166,7 @@ class AddIndividualContactMethodsYesNoSummarySpec extends AnyFreeSpec with Match
         messages("site.yes")
       )
 
-      row.actions shouldBe defined
+      row.actions             shouldBe defined
       row.actions.value.items shouldBe empty
     }
 
@@ -185,7 +185,7 @@ class AddIndividualContactMethodsYesNoSummarySpec extends AnyFreeSpec with Match
         messages("site.no")
       )
 
-      row.actions shouldBe defined
+      row.actions             shouldBe defined
       row.actions.value.items shouldBe empty
     }
 

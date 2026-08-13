@@ -133,8 +133,8 @@ class PartnershipNominatedPartnerCrnSummarySpec
   "PartnershipNominatedPartnerCrnSummary.row(ViewOnlyPartnershipAnswers)" - {
 
     def viewOnlyAnswers(
-                         nominatedPartnerCrn: Option[String]
-                       ): ViewOnlyPartnershipAnswers =
+      nominatedPartnerCrn: Option[String]
+    ): ViewOnlyPartnershipAnswers =
       ViewOnlyPartnershipAnswers(
         subcontractorType = TypeOfSubcontractor.Partnership,
         showVerificationDetails = false,
@@ -176,7 +176,7 @@ class PartnershipNominatedPartnerCrnSummarySpec
 
       row.value.content.asHtml.toString should include("AC012345")
 
-      row.actions shouldBe defined
+      row.actions             shouldBe defined
       row.actions.value.items shouldBe empty
     }
 

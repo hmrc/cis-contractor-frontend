@@ -183,7 +183,7 @@ class PartnershipEmailAddressSummarySpec extends AnyFreeSpec with Matchers with 
 
       row.value.content.asHtml.toString should include("partners@test.com")
 
-      row.actions shouldBe defined
+      row.actions             shouldBe defined
       row.actions.value.items shouldBe empty
     }
 

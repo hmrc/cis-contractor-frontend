@@ -159,8 +159,8 @@ class PartnershipNominatedPartnerCrnYesNoSummarySpec extends AnyFreeSpec with Ma
   "PartnershipNominatedPartnerCrnYesNoSummary.row(ViewOnlyPartnershipAnswers)" - {
 
     def viewOnlyAnswers(
-                         nominatedPartnerCrnYesNo: Option[Boolean]
-                       ): ViewOnlyPartnershipAnswers =
+      nominatedPartnerCrnYesNo: Option[Boolean]
+    ): ViewOnlyPartnershipAnswers =
       ViewOnlyPartnershipAnswers(
         subcontractorType = TypeOfSubcontractor.Partnership,
         showVerificationDetails = false,
@@ -205,7 +205,7 @@ class PartnershipNominatedPartnerCrnYesNoSummarySpec extends AnyFreeSpec with Ma
         messages("site.yes")
       )
 
-      row.actions shouldBe defined
+      row.actions             shouldBe defined
       row.actions.value.items shouldBe empty
     }
 
@@ -228,7 +228,7 @@ class PartnershipNominatedPartnerCrnYesNoSummarySpec extends AnyFreeSpec with Ma
         messages("site.no")
       )
 
-      row.actions shouldBe defined
+      row.actions             shouldBe defined
       row.actions.value.items shouldBe empty
     }
 

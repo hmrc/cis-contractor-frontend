@@ -229,7 +229,7 @@ class PartnershipAddressSummarySpec extends AnyWordSpec with Matchers with CyaEn
           "United Kingdom"
       )
 
-      row.actions shouldBe defined
+      row.actions             shouldBe defined
       row.actions.value.items shouldBe empty
     }
 

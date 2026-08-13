@@ -137,8 +137,8 @@ class CompanyMobileNumberSummarySpec extends AnyFreeSpec with Matchers with CyaE
   "CompanyMobileNumberSummary.row with ViewOnlyCompanyAnswers" - {
 
     def viewOnlyAnswers(
-                         mobile: Option[String] = None
-                       ): ViewOnlyCompanyAnswers =
+      mobile: Option[String] = None
+    ): ViewOnlyCompanyAnswers =
       ViewOnlyCompanyAnswers(
         subcontractorType = TypeOfSubcontractor.Limitedcompany,
         showVerificationDetails = false,
@@ -172,10 +172,10 @@ class CompanyMobileNumberSummarySpec extends AnyFreeSpec with Matchers with CyaE
       val expectedKeyText =
         messages("companyMobileNumber.checkYourAnswersLabel")
 
-      row.key.content.asHtml.toString should include(expectedKeyText)
+      row.key.content.asHtml.toString   should include(expectedKeyText)
       row.value.content.asHtml.toString should include("07700 900 982")
 
-      row.actions shouldBe defined
+      row.actions             shouldBe defined
       row.actions.value.items shouldBe empty
     }
 

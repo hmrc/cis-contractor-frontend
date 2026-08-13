@@ -123,12 +123,12 @@ class CompanyNameSummarySpec extends AnyFreeSpec with Matchers with CyaEncodingS
       assertNoDoubleEncoding(html)
     }
   }
-  
+
   "CompanyNameSummary.row with ViewOnlyCompanyAnswers" - {
 
     def viewOnlyAnswers(
-                         companyName: Option[String] = None
-                       ): ViewOnlyCompanyAnswers =
+      companyName: Option[String] = None
+    ): ViewOnlyCompanyAnswers =
       ViewOnlyCompanyAnswers(
         subcontractorType = TypeOfSubcontractor.Limitedcompany,
         showVerificationDetails = false,
@@ -162,10 +162,10 @@ class CompanyNameSummarySpec extends AnyFreeSpec with Matchers with CyaEncodingS
       val expectedKeyText =
         messages("companyName.checkYourAnswersLabel")
 
-      row.key.content.asHtml.toString should include(expectedKeyText)
+      row.key.content.asHtml.toString   should include(expectedKeyText)
       row.value.content.asHtml.toString should include("ABC Construction Ltd")
 
-      row.actions shouldBe defined
+      row.actions             shouldBe defined
       row.actions.value.items shouldBe empty
     }
 

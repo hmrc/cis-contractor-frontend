@@ -156,8 +156,8 @@ class PartnershipUniqueTaxpayerReferenceSummarySpec extends AnyFreeSpec with Mat
   "PartnershipUniqueTaxpayerReferenceSummary.row(ViewOnlyPartnershipAnswers)" - {
 
     def viewOnlyAnswers(
-                         utr: Option[String]
-                       ): ViewOnlyPartnershipAnswers =
+      utr: Option[String]
+    ): ViewOnlyPartnershipAnswers =
       ViewOnlyPartnershipAnswers(
         subcontractorType = TypeOfSubcontractor.Partnership,
         showVerificationDetails = false,
@@ -204,7 +204,7 @@ class PartnershipUniqueTaxpayerReferenceSummarySpec extends AnyFreeSpec with Mat
 
       row.value.content.asHtml.toString should include("1234567890")
 
-      row.actions shouldBe defined
+      row.actions             shouldBe defined
       row.actions.value.items shouldBe empty
     }
 
@@ -229,7 +229,7 @@ class PartnershipUniqueTaxpayerReferenceSummarySpec extends AnyFreeSpec with Mat
 
       row.value.content.asHtml.toString should include("1234567890")
 
-      row.actions shouldBe defined
+      row.actions             shouldBe defined
       row.actions.value.items shouldBe empty
     }
 
@@ -250,10 +250,12 @@ class PartnershipUniqueTaxpayerReferenceSummarySpec extends AnyFreeSpec with Mat
         viewOnlyAnswers(Some("1234567890 & Ref'01"))
 
       val row =
-        PartnershipUniqueTaxpayerReferenceSummary.row(
-          answers,
-          isVerified = false
-        ).value
+        PartnershipUniqueTaxpayerReferenceSummary
+          .row(
+            answers,
+            isVerified = false
+          )
+          .value
 
       val html = extractHtml(row)
 

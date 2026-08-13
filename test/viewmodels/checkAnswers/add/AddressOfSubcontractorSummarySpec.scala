@@ -279,7 +279,7 @@ class AddressOfSubcontractorSummarySpec extends AnyWordSpec with Matchers with C
           "United Kingdom"
       )
 
-      row.actions shouldBe defined
+      row.actions             shouldBe defined
       row.actions.value.items shouldBe empty
     }
 
@@ -359,7 +359,7 @@ class AddressOfSubcontractorSummarySpec extends AnyWordSpec with Matchers with C
           "SW1A 2AA"
       )
 
-      row.actions shouldBe defined
+      row.actions             shouldBe defined
       row.actions.value.items shouldBe empty
     }
   }

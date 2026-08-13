@@ -180,7 +180,7 @@ class TrustEmailAddressSummarySpec extends AnyFreeSpec with Matchers with CyaEnc
         "trust@example.com"
       )
 
-      row.actions shouldBe defined
+      row.actions             shouldBe defined
       row.actions.value.items shouldBe empty
     }
 

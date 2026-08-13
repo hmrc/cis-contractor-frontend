@@ -162,8 +162,8 @@ class PartnershipPhoneNumberSummarySpec extends AnyFreeSpec with Matchers with C
   "PartnershipPhoneNumberSummary.row(ViewOnlyPartnershipAnswers)" - {
 
     def viewOnlyAnswers(
-                         phone: Option[String]
-                       ): ViewOnlyPartnershipAnswers =
+      phone: Option[String]
+    ): ViewOnlyPartnershipAnswers =
       ViewOnlyPartnershipAnswers(
         subcontractorType = TypeOfSubcontractor.Partnership,
         showVerificationDetails = false,
@@ -207,7 +207,7 @@ class PartnershipPhoneNumberSummarySpec extends AnyFreeSpec with Matchers with C
 
       row.value.content.asHtml.toString should include("0123456789")
 
-      row.actions shouldBe defined
+      row.actions             shouldBe defined
       row.actions.value.items shouldBe empty
     }
 

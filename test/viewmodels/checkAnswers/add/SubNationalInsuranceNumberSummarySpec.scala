@@ -163,7 +163,7 @@ class SubNationalInsuranceNumberSummarySpec extends AnyFreeSpec with Matchers wi
 
       row.value.content.asHtml.toString should include("AA123456A")
 
-      row.actions shouldBe defined
+      row.actions             shouldBe defined
       row.actions.value.items shouldBe empty
     }
 
@@ -234,7 +234,7 @@ class SubNationalInsuranceNumberSummarySpec extends AnyFreeSpec with Matchers wi
       assertEscaped(html, "AB123456C &amp; Ref&#x27;01")
       assertNoDoubleEncoding(html)
 
-      row.actions shouldBe defined
+      row.actions             shouldBe defined
       row.actions.value.items shouldBe empty
     }
   }

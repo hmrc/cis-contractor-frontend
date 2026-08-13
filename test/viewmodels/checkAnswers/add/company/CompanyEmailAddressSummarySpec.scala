@@ -137,8 +137,8 @@ class CompanyEmailAddressSummarySpec extends AnyFreeSpec with Matchers with CyaE
 
   "CompanyEmailAddressSummary.row with ViewOnlyCompanyAnswers" - {
     def viewOnlyAnswers(
-                                 email: Option[String] = None
-                               ): ViewOnlyCompanyAnswers =
+      email: Option[String] = None
+    ): ViewOnlyCompanyAnswers =
       ViewOnlyCompanyAnswers(
         subcontractorType = TypeOfSubcontractor.Limitedcompany,
         showVerificationDetails = false,
@@ -171,10 +171,10 @@ class CompanyEmailAddressSummarySpec extends AnyFreeSpec with Matchers with CyaE
       val expectedKeyText =
         messages("companyEmailAddress.checkYourAnswersLabel")
 
-      row.key.content.asHtml.toString should include(expectedKeyText)
+      row.key.content.asHtml.toString   should include(expectedKeyText)
       row.value.content.asHtml.toString should include("test@example.com")
 
-      row.actions shouldBe defined
+      row.actions             shouldBe defined
       row.actions.value.items shouldBe empty
     }
 

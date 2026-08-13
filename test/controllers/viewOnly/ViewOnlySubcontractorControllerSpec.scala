@@ -81,18 +81,18 @@ class ViewOnlySubcontractorControllerSpec extends SpecBase with MockitoSugar {
     )
 
   private def responseWith(
-                            subcontractor: Option[SubcontractorResponse]
-                          ): GetSubcontractorResponse =
+    subcontractor: Option[SubcontractorResponse]
+  ): GetSubcontractorResponse =
     GetSubcontractorResponse(
       scheme = None,
       subcontractor = subcontractor
     )
 
   private def applicationWith(
-                               mockService: SubcontractorService,
-                               mockSessionRepository: SessionRepository,
-                               userAnswers: Option[UserAnswers] = Some(emptyUserAnswers)
-                             ) =
+    mockService: SubcontractorService,
+    mockSessionRepository: SessionRepository,
+    userAnswers: Option[UserAnswers] = Some(emptyUserAnswers)
+  ) =
     applicationBuilder(userAnswers = userAnswers)
       .overrides(
         bind[SubcontractorService].toInstance(mockService),

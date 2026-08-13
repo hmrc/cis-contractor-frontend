@@ -46,8 +46,8 @@ object PartnershipWorksReferenceNumberYesNoSummary {
     }
 
   def row(
-           answers: ViewOnlyPartnershipAnswers
-         )(implicit messages: Messages): Option[SummaryListRow] =
+    answers: ViewOnlyPartnershipAnswers
+  )(implicit messages: Messages): Option[SummaryListRow] =
     answers.nominatedPartnerWorksReferenceYesNo.map { answer =>
 
       val value = if (answer) "site.yes" else "site.no"

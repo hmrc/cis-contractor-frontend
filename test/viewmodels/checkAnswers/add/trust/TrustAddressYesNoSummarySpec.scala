@@ -183,8 +183,7 @@ class TrustAddressYesNoSummarySpec extends SpecBase with GuiceOneAppPerSuite {
 
       row.key mustBe
         Key(
-          content =
-            Text(messages("trustAddressYesNo.checkYourAnswersLabel"))
+          content = Text(messages("trustAddressYesNo.checkYourAnswersLabel"))
         )
 
       row.value mustBe
@@ -224,8 +223,7 @@ class TrustAddressYesNoSummarySpec extends SpecBase with GuiceOneAppPerSuite {
 
       row.key mustBe
         Key(
-          content =
-            Text(messages("trustAddressYesNo.checkYourAnswersLabel"))
+          content = Text(messages("trustAddressYesNo.checkYourAnswersLabel"))
         )
 
       row.value mustBe

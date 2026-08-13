@@ -130,8 +130,8 @@ class CompanyCrnSummarySpec extends AnyFreeSpec with Matchers with CyaEncodingSp
   "CompanyCrnSummary.row(ViewOnlyCompanyAnswers)" - {
 
     def viewOnlyAnswers(
-                         crn: Option[String]
-                       ): ViewOnlyCompanyAnswers =
+      crn: Option[String]
+    ): ViewOnlyCompanyAnswers =
       ViewOnlyCompanyAnswers(
         subcontractorType = TypeOfSubcontractor.Limitedcompany,
         showVerificationDetails = false,
@@ -170,7 +170,7 @@ class CompanyCrnSummarySpec extends AnyFreeSpec with Matchers with CyaEncodingSp
 
       row.value.content.asHtml.toString should include("AC012345")
 
-      row.actions shouldBe defined
+      row.actions             shouldBe defined
       row.actions.value.items shouldBe empty
     }
 
@@ -195,7 +195,7 @@ class CompanyCrnSummarySpec extends AnyFreeSpec with Matchers with CyaEncodingSp
       assertEscaped(html, "O&#x27;Reilly &amp; Co UK")
       assertNoDoubleEncoding(html)
 
-      row.actions shouldBe defined
+      row.actions             shouldBe defined
       row.actions.value.items shouldBe empty
     }
   }

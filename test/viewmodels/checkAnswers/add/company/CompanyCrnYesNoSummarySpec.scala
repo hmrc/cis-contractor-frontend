@@ -124,8 +124,8 @@ class CompanyCrnYesNoSummarySpec extends AnyFreeSpec with Matchers {
   "CompanyCrnYesNoSummary.row(ViewOnlyCompanyAnswers)" - {
 
     def viewOnlyAnswers(
-                         crnYesNo: Option[Boolean]
-                       ): ViewOnlyCompanyAnswers =
+      crnYesNo: Option[Boolean]
+    ): ViewOnlyCompanyAnswers =
       ViewOnlyCompanyAnswers(
         subcontractorType = TypeOfSubcontractor.Limitedcompany,
         showVerificationDetails = false,
@@ -166,7 +166,7 @@ class CompanyCrnYesNoSummarySpec extends AnyFreeSpec with Matchers {
         messages("site.yes")
       )
 
-      row.actions shouldBe defined
+      row.actions             shouldBe defined
       row.actions.value.items shouldBe empty
     }
 
@@ -190,7 +190,7 @@ class CompanyCrnYesNoSummarySpec extends AnyFreeSpec with Matchers {
         messages("site.no")
       )
 
-      row.actions shouldBe defined
+      row.actions             shouldBe defined
       row.actions.value.items shouldBe empty
     }
 

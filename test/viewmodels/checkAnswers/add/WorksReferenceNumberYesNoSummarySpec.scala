@@ -63,15 +63,15 @@ class WorksReferenceNumberYesNoSummarySpec extends AnyFreeSpec with Matchers {
       val changeAction = actions.head
 
       val expectedChangeText = messages("site.change")
-      val expectedHref =
+      val expectedHref       =
         routes.WorksReferenceNumberYesNoController
           .onPageLoad(CheckMode)
           .url
       val expectedHiddenText =
         messages("worksReferenceNumberYesNo.change.hidden")
 
-      changeAction.content.asHtml.toString should include(expectedChangeText)
-      changeAction.href shouldBe expectedHref
+      changeAction.content.asHtml.toString    should include(expectedChangeText)
+      changeAction.href                     shouldBe expectedHref
       changeAction.visuallyHiddenText.value shouldBe expectedHiddenText
     }
 
@@ -104,15 +104,15 @@ class WorksReferenceNumberYesNoSummarySpec extends AnyFreeSpec with Matchers {
       val changeAction = actions.head
 
       val expectedChangeText = messages("site.change")
-      val expectedHref =
+      val expectedHref       =
         routes.WorksReferenceNumberYesNoController
           .onPageLoad(AmendMode)
           .url
       val expectedHiddenText =
         messages("worksReferenceNumberYesNo.change.hidden")
 
-      changeAction.content.asHtml.toString should include(expectedChangeText)
-      changeAction.href shouldBe expectedHref
+      changeAction.content.asHtml.toString    should include(expectedChangeText)
+      changeAction.href                     shouldBe expectedHref
       changeAction.visuallyHiddenText.value shouldBe expectedHiddenText
     }
 
@@ -182,7 +182,7 @@ class WorksReferenceNumberYesNoSummarySpec extends AnyFreeSpec with Matchers {
         messages("site.yes")
       )
 
-      row.actions shouldBe defined
+      row.actions             shouldBe defined
       row.actions.value.items shouldBe empty
     }
 
@@ -226,7 +226,7 @@ class WorksReferenceNumberYesNoSummarySpec extends AnyFreeSpec with Matchers {
         messages("site.no")
       )
 
-      row.actions shouldBe defined
+      row.actions             shouldBe defined
       row.actions.value.items shouldBe empty
     }
 
@@ -259,4 +259,3 @@ class WorksReferenceNumberYesNoSummarySpec extends AnyFreeSpec with Matchers {
     }
   }
 }
-

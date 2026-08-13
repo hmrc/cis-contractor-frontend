@@ -88,8 +88,8 @@ class PartnershipNominatedPartnerNinoSummarySpec extends AnyFreeSpec with Matche
   "PartnershipNominatedPartnerNinoSummary.row(ViewOnlyPartnershipAnswers)" - {
 
     def viewOnlyAnswers(
-                         nominatedPartnerNino: Option[String]
-                       ): ViewOnlyPartnershipAnswers =
+      nominatedPartnerNino: Option[String]
+    ): ViewOnlyPartnershipAnswers =
       ViewOnlyPartnershipAnswers(
         subcontractorType = TypeOfSubcontractor.Partnership,
         showVerificationDetails = false,

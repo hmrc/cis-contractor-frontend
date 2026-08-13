@@ -113,7 +113,7 @@ class TypeOfSubcontractorSummarySpec extends AnyFreeSpec with Matchers {
         messages("typeOfSubcontractor.soletrader")
       )
 
-      row.actions shouldBe defined
+      row.actions             shouldBe defined
       row.actions.value.items shouldBe empty
     }
 
@@ -134,7 +134,7 @@ class TypeOfSubcontractorSummarySpec extends AnyFreeSpec with Matchers {
         messages("typeOfSubcontractor.company")
       )
 
-      row.actions shouldBe defined
+      row.actions             shouldBe defined
       row.actions.value.items shouldBe empty
     }
 
@@ -155,7 +155,7 @@ class TypeOfSubcontractorSummarySpec extends AnyFreeSpec with Matchers {
         messages("typeOfSubcontractor.partnership")
       )
 
-      row.actions shouldBe defined
+      row.actions             shouldBe defined
       row.actions.value.items shouldBe empty
     }
 
@@ -176,7 +176,7 @@ class TypeOfSubcontractorSummarySpec extends AnyFreeSpec with Matchers {
         messages("typeOfSubcontractor.trust")
       )
 
-      row.actions shouldBe defined
+      row.actions             shouldBe defined
       row.actions.value.items shouldBe empty
     }
   }

@@ -152,7 +152,7 @@ class AddPartnershipContactMethodsYesNoSummarySpec extends AnyFreeSpec with Matc
       AddPartnershipContactMethodsYesNoSummary.row(answers) shouldBe None
     }
   }
-  
+
   "ViewOnly - AddPartnershipContactMethodsYesNoSummary.row" - {
 
     "must return a SummaryListRow with 'Yes' when the answer is true" in {
@@ -193,7 +193,7 @@ class AddPartnershipContactMethodsYesNoSummarySpec extends AnyFreeSpec with Matc
       val expectedValue = messages("site.yes")
       row.value.content.asHtml.toString should include(expectedValue)
 
-      row.actions shouldBe defined
+      row.actions             shouldBe defined
       row.actions.value.items shouldBe empty
     }
 
@@ -235,7 +235,7 @@ class AddPartnershipContactMethodsYesNoSummarySpec extends AnyFreeSpec with Matc
       val expectedValue = messages("site.no")
       row.value.content.asHtml.toString should include(expectedValue)
 
-      row.actions shouldBe defined
+      row.actions             shouldBe defined
       row.actions.value.items shouldBe empty
     }
 

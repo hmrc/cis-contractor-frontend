@@ -172,7 +172,7 @@ class IndividualEmailAddressSummarySpec extends AnyFreeSpec with Matchers with C
 
       row.value.content.asHtml.toString should include("test@example.com")
 
-      row.actions shouldBe defined
+      row.actions             shouldBe defined
       row.actions.value.items shouldBe empty
     }
 
@@ -243,10 +243,8 @@ class IndividualEmailAddressSummarySpec extends AnyFreeSpec with Matchers with C
       assertEscaped(html, "user+o&#x27;reilly&amp;co@test.com")
       assertNoDoubleEncoding(html)
 
-      row.actions shouldBe defined
+      row.actions             shouldBe defined
       row.actions.value.items shouldBe empty
     }
   }
 }
-
-

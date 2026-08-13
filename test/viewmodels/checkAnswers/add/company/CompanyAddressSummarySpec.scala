@@ -173,8 +173,8 @@ class CompanyAddressSummarySpec extends AnyWordSpec with Matchers with CyaEncodi
   "ViewOnly - CompanyAddressSummary.row" should {
 
     def viewOnlyAnswers(
-                         address: Option[Address]
-                       ): ViewOnlyCompanyAnswers =
+      address: Option[Address]
+    ): ViewOnlyCompanyAnswers =
       ViewOnlyCompanyAnswers(
         subcontractorType = TypeOfSubcontractor.Limitedcompany,
         showVerificationDetails = false,
@@ -228,7 +228,7 @@ class CompanyAddressSummarySpec extends AnyWordSpec with Matchers with CyaEncodi
           "United Kingdom"
       )
 
-      row.actions shouldBe defined
+      row.actions             shouldBe defined
       row.actions.value.items shouldBe empty
     }
 

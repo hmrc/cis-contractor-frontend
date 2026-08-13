@@ -55,17 +55,16 @@ object TrustUtrSummary {
     }
 
   def row(
-           answers: ViewOnlyTrustAnswers,
-           isVerified: Boolean
-         )(implicit messages: Messages): Option[SummaryListRow] =
+    answers: ViewOnlyTrustAnswers,
+    isVerified: Boolean
+  )(implicit messages: Messages): Option[SummaryListRow] =
     answers.utr.map { answer =>
       SummaryListRowViewModel(
-        key =
-          if (isVerified) {
-            "trustUtr.verified.checkYourAnswersLabel"
-          } else {
-            "trustUtr.checkYourAnswersLabel"
-          },
+        key = if (isVerified) {
+          "trustUtr.verified.checkYourAnswersLabel"
+        } else {
+          "trustUtr.checkYourAnswersLabel"
+        },
         value = ValueViewModel(answer)
       )
     }

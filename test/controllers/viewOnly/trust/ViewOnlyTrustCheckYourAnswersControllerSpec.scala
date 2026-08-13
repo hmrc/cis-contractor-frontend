@@ -27,9 +27,7 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import queries.ViewOnlyTrustAnswersQuery
 
-class ViewOnlyTrustCheckYourAnswersControllerSpec
-  extends SpecBase
-    with MockitoSugar {
+class ViewOnlyTrustCheckYourAnswersControllerSpec extends SpecBase with MockitoSugar {
 
   private val address =
     Address(
@@ -149,9 +147,9 @@ class ViewOnlyTrustCheckYourAnswersControllerSpec
           msg("trustMobileNumber.checkYourAnswersLabel")
         )
 
-        page must not include(
+        page must not include (
           msg("amendCheckYourAnswers.verificationNumber.label")
-          )
+        )
 
         page must include("Trust")
         page must include("Test Trust")
@@ -168,7 +166,7 @@ class ViewOnlyTrustCheckYourAnswersControllerSpec
         page must include("PL31 2HL")
         page must include("England")
 
-        page must not include("VRN123456")
+        page must not include "VRN123456"
       }
     }
 
@@ -211,13 +209,13 @@ class ViewOnlyTrustCheckYourAnswersControllerSpec
 
         page must include("VRN123456")
 
-        page must not include(
+        page must not include (
           msg("trustName.checkYourAnswersLabel")
-          )
+        )
 
-        page must not include(
+        page must not include (
           msg("trustUtrYesNo.checkYourAnswersLabel")
-          )
+        )
 
         page must include(
           msg("trustUtr.verified.checkYourAnswersLabel")
@@ -303,11 +301,11 @@ class ViewOnlyTrustCheckYourAnswersControllerSpec
 
         val page = contentAsString(result)
 
-        page must not include(
+        page must not include (
           msg("amendCheckYourAnswers.verificationNumber.label")
-          )
+        )
 
-        page must not include("VRN123456")
+        page must not include "VRN123456"
 
         page must include(
           msg("trustUtr.verified.checkYourAnswersLabel")

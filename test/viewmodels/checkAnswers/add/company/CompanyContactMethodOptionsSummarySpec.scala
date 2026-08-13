@@ -163,8 +163,8 @@ class CompanyContactMethodOptionsSummarySpec extends SpecBase with Matchers {
   "CompanyContactMethodOptionsSummary.row(ViewOnlyCompanyAnswers)" - {
 
     def viewOnlyAnswers(
-                         companyContactMethod: Set[ContactMethodOptions]
-                       ): ViewOnlyCompanyAnswers =
+      companyContactMethod: Set[ContactMethodOptions]
+    ): ViewOnlyCompanyAnswers =
       ViewOnlyCompanyAnswers(
         subcontractorType = TypeOfSubcontractor.Limitedcompany,
         showVerificationDetails = false,
@@ -212,7 +212,7 @@ class CompanyContactMethodOptionsSummarySpec extends SpecBase with Matchers {
       valueHtml must include("Email address")
       valueHtml must include("Phone number")
       valueHtml must include("Mobile number")
-      valueHtml must not include ("<br>")
+      valueHtml must not include "<br>"
       valueHtml must include("govuk-list--bullet")
 
       row.actions mustBe defined
@@ -234,8 +234,8 @@ class CompanyContactMethodOptionsSummarySpec extends SpecBase with Matchers {
       val valueHtml = result.value.value.content.asHtml.toString
 
       valueHtml must include("Email address")
-      valueHtml must not include ("<br>")
-      valueHtml must not include ("govuk-list--bullet")
+      valueHtml must not include "<br>"
+      valueHtml must not include "govuk-list--bullet"
 
       row.actions mustBe defined
       row.actions.value.items mustBe empty

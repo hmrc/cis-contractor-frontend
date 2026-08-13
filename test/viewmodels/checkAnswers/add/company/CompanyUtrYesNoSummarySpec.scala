@@ -144,8 +144,8 @@ class CompanyUtrYesNoSummarySpec extends AnyFreeSpec with Matchers {
   "CompanyUtrYesNoSummary.row with ViewOnlyCompanyAnswers" - {
 
     def viewOnlyAnswers(
-                         utrYesNo: Option[Boolean] = None
-                       ): ViewOnlyCompanyAnswers =
+      utrYesNo: Option[Boolean] = None
+    ): ViewOnlyCompanyAnswers =
       ViewOnlyCompanyAnswers(
         subcontractorType = TypeOfSubcontractor.Limitedcompany,
         showVerificationDetails = false,
@@ -184,7 +184,7 @@ class CompanyUtrYesNoSummarySpec extends AnyFreeSpec with Matchers {
       val expectedValue = messages("site.yes")
       row.value.content.asHtml.toString should include(expectedValue)
 
-      row.actions shouldBe defined
+      row.actions             shouldBe defined
       row.actions.value.items shouldBe empty
     }
 
@@ -206,7 +206,7 @@ class CompanyUtrYesNoSummarySpec extends AnyFreeSpec with Matchers {
       val expectedValue = messages("site.no")
       row.value.content.asHtml.toString should include(expectedValue)
 
-      row.actions shouldBe defined
+      row.actions             shouldBe defined
       row.actions.value.items shouldBe empty
     }
 

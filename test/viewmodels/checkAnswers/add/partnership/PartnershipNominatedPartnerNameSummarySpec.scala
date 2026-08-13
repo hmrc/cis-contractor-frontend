@@ -132,8 +132,8 @@ class PartnershipNominatedPartnerNameSummarySpec extends AnyFreeSpec with Matche
   "PartnershipNominatedPartnerNameSummary.row(ViewOnlyPartnershipAnswers)" - {
 
     def viewOnlyAnswers(
-                         nominatedPartnerName: Option[String]
-                       ): ViewOnlyPartnershipAnswers =
+      nominatedPartnerName: Option[String]
+    ): ViewOnlyPartnershipAnswers =
       ViewOnlyPartnershipAnswers(
         subcontractorType = TypeOfSubcontractor.Partnership,
         showVerificationDetails = false,
@@ -176,7 +176,7 @@ class PartnershipNominatedPartnerNameSummarySpec extends AnyFreeSpec with Matche
 
       row.value.content.asHtml.toString should include("John Doe")
 
-      row.actions shouldBe defined
+      row.actions             shouldBe defined
       row.actions.value.items shouldBe empty
     }
 

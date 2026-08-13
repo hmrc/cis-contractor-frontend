@@ -180,9 +180,9 @@ class TrustUtrSummarySpec extends AnyFreeSpec with Matchers with CyaEncodingSpec
         messages("trustUtr.checkYourAnswersLabel")
       )
 
-      row.key.content.asHtml.toString should not include(
+      row.key.content.asHtml.toString should not include (
         messages("trustUtr.verified.checkYourAnswersLabel")
-        )
+      )
 
       row.value.content.asHtml.toString should include("1234567890")
 
@@ -221,9 +221,9 @@ class TrustUtrSummarySpec extends AnyFreeSpec with Matchers with CyaEncodingSpec
         messages("trustUtr.verified.checkYourAnswersLabel")
       )
 
-      row.key.content.asHtml.toString should not include(
+      row.key.content.asHtml.toString should not include (
         messages("trustUtr.checkYourAnswersLabel")
-        )
+      )
 
       row.value.content.asHtml.toString should include("1234567890")
 

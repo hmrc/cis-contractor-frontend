@@ -222,7 +222,7 @@ class TrustAddressSummarySpec extends AnyWordSpec with Matchers with CyaEncoding
           "United Kingdom"
       )
 
-      row.actions shouldBe defined
+      row.actions             shouldBe defined
       row.actions.value.items shouldBe empty
     }
 
@@ -294,7 +294,7 @@ class TrustAddressSummarySpec extends AnyWordSpec with Matchers with CyaEncoding
       assertHasBreaks(html)
       assertNoDoubleEncoding(html)
 
-      row.actions shouldBe defined
+      row.actions             shouldBe defined
       row.actions.value.items shouldBe empty
     }
   }

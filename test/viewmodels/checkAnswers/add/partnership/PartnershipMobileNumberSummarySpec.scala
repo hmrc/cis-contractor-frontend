@@ -167,7 +167,7 @@ class PartnershipMobileNumberSummarySpec extends AnyFreeSpec with Matchers with 
 
       row.value.content.asHtml.toString should include("0987456231")
 
-      row.actions shouldBe defined
+      row.actions             shouldBe defined
       row.actions.value.items shouldBe empty
     }
 

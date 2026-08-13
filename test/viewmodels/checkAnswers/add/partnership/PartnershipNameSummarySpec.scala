@@ -163,7 +163,7 @@ class PartnershipNameSummarySpec extends AnyFreeSpec with Matchers with CyaEncod
 
       row.value.content.asHtml.toString should include("Acme Partners")
 
-      row.actions shouldBe defined
+      row.actions             shouldBe defined
       row.actions.value.items shouldBe empty
     }
 

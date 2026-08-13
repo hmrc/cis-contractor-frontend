@@ -153,8 +153,8 @@ class CompanyAddressYesNoSummarySpec extends SpecBase with GuiceOneAppPerSuite {
   "CompanyAddressYesNoSummary.row(ViewOnlyCompanyAnswers)" - {
 
     def viewOnlyAnswers(
-                         addressYesNo: Option[Boolean]
-                       ): ViewOnlyCompanyAnswers =
+      addressYesNo: Option[Boolean]
+    ): ViewOnlyCompanyAnswers =
       ViewOnlyCompanyAnswers(
         subcontractorType = TypeOfSubcontractor.Limitedcompany,
         showVerificationDetails = false,

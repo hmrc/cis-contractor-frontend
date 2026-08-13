@@ -157,8 +157,8 @@ class PartnershipNominatedPartnerUtrSummarySpec extends AnyFreeSpec with Matcher
   "PartnershipNominatedPartnerUtrSummary.row(ViewOnlyPartnershipAnswers)" - {
 
     def viewOnlyAnswers(
-                         nominatedPartnerUtr: Option[String]
-                       ): ViewOnlyPartnershipAnswers =
+      nominatedPartnerUtr: Option[String]
+    ): ViewOnlyPartnershipAnswers =
       ViewOnlyPartnershipAnswers(
         subcontractorType = TypeOfSubcontractor.Partnership,
         showVerificationDetails = false,
@@ -205,7 +205,7 @@ class PartnershipNominatedPartnerUtrSummarySpec extends AnyFreeSpec with Matcher
 
       row.value.content.asHtml.toString should include("1234567890")
 
-      row.actions shouldBe defined
+      row.actions             shouldBe defined
       row.actions.value.items shouldBe empty
     }
 
@@ -230,7 +230,7 @@ class PartnershipNominatedPartnerUtrSummarySpec extends AnyFreeSpec with Matcher
 
       row.value.content.asHtml.toString should include("1234567890")
 
-      row.actions shouldBe defined
+      row.actions             shouldBe defined
       row.actions.value.items shouldBe empty
     }
 
@@ -251,10 +251,12 @@ class PartnershipNominatedPartnerUtrSummarySpec extends AnyFreeSpec with Matcher
         viewOnlyAnswers(Some("1234567890 & Ref'01"))
 
       val row =
-        PartnershipNominatedPartnerUtrSummary.row(
-          answers,
-          isVerified = false
-        ).value
+        PartnershipNominatedPartnerUtrSummary
+          .row(
+            answers,
+            isVerified = false
+          )
+          .value
 
       val html = extractHtml(row)
 
