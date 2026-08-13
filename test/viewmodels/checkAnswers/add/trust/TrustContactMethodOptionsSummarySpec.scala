@@ -18,6 +18,7 @@ package viewmodels.checkAnswers.add.trust
 
 import base.SpecBase
 import models.contact.ContactMethodOptions
+import models.viewOnly.trust.ViewOnlyTrustAnswers
 import models.{CheckMode, UserAnswers}
 import org.scalatest.matchers.must.Matchers
 import pages.add.trust.TrustContactMethodOptionsPage
@@ -108,6 +109,117 @@ class TrustContactMethodOptionsSummarySpec extends SpecBase with Matchers {
 
     "return None when the answer is not set" in {
       TrustContactMethodOptionsSummary.row(emptyUserAnswers) mustBe None
+    }
+  }
+
+  "ViewOnly - TrustContactMethodOptionsSummary.row" - {
+
+    "must return a row with multiple selected options for ViewOnlyTrustAnswers" in {
+
+      val answers =
+        ViewOnlyTrustAnswers(
+          subcontractorType = models.TypeOfSubcontractor.Trust,
+          showVerificationDetails = false,
+          trustName = None,
+          addressYesNo = None,
+          address = None,
+          trustContactMethodsYesNo = Some(true),
+          trustContactMethod =
+            Set(
+              ContactMethodOptions.Email,
+              ContactMethodOptions.Phone,
+              ContactMethodOptions.Mobile
+            ),
+          email = None,
+          phone = None,
+          mobile = None,
+          utrYesNo = None,
+          utr = None,
+          worksReferenceYesNo = None,
+          worksReference = None,
+          verificationNumber = None
+        )
+
+      val result =
+        TrustContactMethodOptionsSummary.row(answers)
+
+      result mustBe defined
+
+      val row = result.value
+
+      row.key.content.asHtml.toString must include(
+        messages("trustContactMethodOptions.checkYourAnswersLabel")
+      )
+
+      val valueHtml = row.value.content.asHtml.toString
+
+      valueHtml must include("Email address")
+      valueHtml must include("Phone number")
+      valueHtml must include("Mobile number")
+      valueHtml must not include ("<br>")
+      valueHtml must include("govuk-list--bullet")
+
+      row.actions mustBe None
+    }
+
+    "must return a row with a single selected option for ViewOnlyTrustAnswers" in {
+
+      val answers =
+        ViewOnlyTrustAnswers(
+          subcontractorType = models.TypeOfSubcontractor.Trust,
+          showVerificationDetails = false,
+          trustName = None,
+          addressYesNo = None,
+          address = None,
+          trustContactMethodsYesNo = Some(true),
+          trustContactMethod = Set(ContactMethodOptions.Email),
+          email = None,
+          phone = None,
+          mobile = None,
+          utrYesNo = None,
+          utr = None,
+          worksReferenceYesNo = None,
+          worksReference = None,
+          verificationNumber = None
+        )
+
+      val result =
+        TrustContactMethodOptionsSummary.row(answers)
+
+      result mustBe defined
+
+      val valueHtml =
+        result.value.value.content.asHtml.toString
+
+      valueHtml must include("Email address")
+      valueHtml must not include ("<br>")
+      valueHtml must not include ("govuk-list--bullet")
+
+      result.value.actions mustBe None
+    }
+
+    "must return None when no contact methods are selected in ViewOnlyTrustAnswers" in {
+
+      val answers =
+        ViewOnlyTrustAnswers(
+          subcontractorType = models.TypeOfSubcontractor.Trust,
+          showVerificationDetails = false,
+          trustName = None,
+          addressYesNo = None,
+          address = None,
+          trustContactMethodsYesNo = Some(false),
+          trustContactMethod = Set.empty,
+          email = None,
+          phone = None,
+          mobile = None,
+          utrYesNo = None,
+          utr = None,
+          worksReferenceYesNo = None,
+          worksReference = None,
+          verificationNumber = None
+        )
+
+      TrustContactMethodOptionsSummary.row(answers) mustBe None
     }
   }
 }

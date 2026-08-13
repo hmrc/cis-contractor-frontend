@@ -25,6 +25,7 @@ import play.api.test.Helpers.*
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.*
 import org.scalatest.matchers.must.Matchers.must
+import models.viewOnly.trust.ViewOnlyTrustAnswers
 
 class TrustAddressYesNoSummarySpec extends SpecBase with GuiceOneAppPerSuite {
 
@@ -148,6 +149,114 @@ class TrustAddressYesNoSummarySpec extends SpecBase with GuiceOneAppPerSuite {
     "return None when the answer is missing" in {
       val ua: UserAnswers = emptyUserAnswers
       TrustAddressYesNoSummary.row(ua) mustBe None
+    }
+  }
+
+  "ViewOnly - TrustAddressYesNoSummary.row" - {
+
+    "must return a SummaryListRow with 'Yes' for ViewOnlyTrustAnswers" in {
+      val answers =
+        ViewOnlyTrustAnswers(
+          subcontractorType = models.TypeOfSubcontractor.Trust,
+          showVerificationDetails = false,
+          trustName = None,
+          addressYesNo = Some(true),
+          address = None,
+          trustContactMethodsYesNo = None,
+          trustContactMethod = Set.empty,
+          email = None,
+          phone = None,
+          mobile = None,
+          utrYesNo = None,
+          utr = None,
+          worksReferenceYesNo = None,
+          worksReference = None,
+          verificationNumber = None
+        )
+
+      val maybeRow =
+        TrustAddressYesNoSummary.row(answers)
+
+      maybeRow must not be empty
+
+      val row: SummaryListRow = maybeRow.value
+
+      row.key mustBe
+        Key(
+          content =
+            Text(messages("trustAddressYesNo.checkYourAnswersLabel"))
+        )
+
+      row.value mustBe
+        Value(
+          content = Text(messages("site.yes"))
+        )
+
+      row.actions mustBe None
+    }
+
+    "must return a SummaryListRow with 'No' for ViewOnlyTrustAnswers" in {
+      val answers =
+        ViewOnlyTrustAnswers(
+          subcontractorType = models.TypeOfSubcontractor.Trust,
+          showVerificationDetails = false,
+          trustName = None,
+          addressYesNo = Some(false),
+          address = None,
+          trustContactMethodsYesNo = None,
+          trustContactMethod = Set.empty,
+          email = None,
+          phone = None,
+          mobile = None,
+          utrYesNo = None,
+          utr = None,
+          worksReferenceYesNo = None,
+          worksReference = None,
+          verificationNumber = None
+        )
+
+      val maybeRow =
+        TrustAddressYesNoSummary.row(answers)
+
+      maybeRow must not be empty
+
+      val row: SummaryListRow = maybeRow.value
+
+      row.key mustBe
+        Key(
+          content =
+            Text(messages("trustAddressYesNo.checkYourAnswersLabel"))
+        )
+
+      row.value mustBe
+        Value(
+          content = Text(messages("site.no"))
+        )
+
+      row.actions mustBe None
+    }
+
+    "must return None when addressYesNo is missing in ViewOnlyTrustAnswers" in {
+      val answers =
+        ViewOnlyTrustAnswers(
+          subcontractorType = models.TypeOfSubcontractor.Trust,
+          showVerificationDetails = false,
+          trustName = None,
+          addressYesNo = None,
+          address = None,
+          trustContactMethodsYesNo = None,
+          trustContactMethod = Set.empty,
+          email = None,
+          phone = None,
+          mobile = None,
+          utrYesNo = None,
+          utr = None,
+          worksReferenceYesNo = None,
+          worksReference = None,
+          verificationNumber = None
+        )
+
+      TrustAddressYesNoSummary.row(answers) mustBe None
     }
   }
 }

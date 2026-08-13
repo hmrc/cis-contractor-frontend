@@ -16,6 +16,7 @@
 
 package viewmodels.checkAnswers.add.partnership
 
+import models.viewOnly.partnership.ViewOnlyPartnershipAnswers
 import controllers.add.partnership.routes
 import models.{CheckMode, Mode, UserAnswers}
 import pages.add.partnership.PartnershipWorksReferenceNumberPage
@@ -36,6 +37,17 @@ object PartnershipWorksReferenceNumberSummary {
             .withVisuallyHiddenText(messages("partnershipWorksReferenceNumber.change.hidden"))
             .withAttribute("id" -> "partnership-works-reference-number")
         )
+      )
+    }
+
+  def row(
+    answers: ViewOnlyPartnershipAnswers
+  )(implicit messages: Messages): Option[SummaryListRow] =
+    answers.nominatedPartnerWorksReference.map { answer =>
+      SummaryListRowViewModel(
+        key = "partnershipWorksReferenceNumber.checkYourAnswersLabel",
+        value = ValueViewModel(answer),
+        actions = Seq.empty
       )
     }
 }

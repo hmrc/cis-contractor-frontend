@@ -22,6 +22,7 @@ import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
+import models.viewOnly.company.ViewOnlyCompanyAnswers
 
 object CompanyWorksReferenceSummary {
 
@@ -38,6 +39,17 @@ object CompanyWorksReferenceSummary {
             .withVisuallyHiddenText(messages("companyWorksReference.change.hidden"))
             .withAttribute("id" -> "company-works-reference")
         )
+      )
+    }
+
+  def row(
+    answers: ViewOnlyCompanyAnswers
+  )(implicit messages: Messages): Option[SummaryListRow] =
+    answers.worksReference.map { answer =>
+      SummaryListRowViewModel(
+        key = "companyWorksReference.checkYourAnswersLabel",
+        value = ValueViewModel(answer),
+        actions = Seq.empty
       )
     }
 }

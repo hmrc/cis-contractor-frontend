@@ -16,6 +16,7 @@
 
 package viewmodels.checkAnswers.add.partnership
 
+import models.viewOnly.partnership.ViewOnlyPartnershipAnswers
 import models.{CheckMode, Mode, UserAnswers}
 import pages.add.partnership.PartnershipNominatedPartnerNinoYesNoPage
 import play.api.i18n.Messages
@@ -41,6 +42,20 @@ object PartnershipNominatedPartnerNinoYesNoSummary {
             .withVisuallyHiddenText(messages("partnershipNominatedPartnerNinoYesNo.change.hidden"))
             .withAttribute("id" -> "add-nominated-partner-nino")
         )
+      )
+    }
+
+  def row(
+    answers: ViewOnlyPartnershipAnswers
+  )(implicit messages: Messages): Option[SummaryListRow] =
+    answers.nominatedPartnerNinoYesNo.map { answer =>
+
+      val value = if (answer) "site.yes" else "site.no"
+
+      SummaryListRowViewModel(
+        key = "partnershipNominatedPartnerNinoYesNo.checkYourAnswersLabel",
+        value = ValueViewModel(value),
+        actions = Seq.empty
       )
     }
 }

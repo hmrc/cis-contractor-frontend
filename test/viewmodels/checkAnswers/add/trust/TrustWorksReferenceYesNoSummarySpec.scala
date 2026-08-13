@@ -26,6 +26,7 @@ import pages.add.trust.TrustWorksReferenceYesNoPage
 import play.api.i18n.Messages
 import play.api.test.Helpers.stubMessages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.*
+import models.viewOnly.trust.ViewOnlyTrustAnswers
 
 class TrustWorksReferenceYesNoSummarySpec extends AnyFreeSpec with Matchers {
 
@@ -137,6 +138,111 @@ class TrustWorksReferenceYesNoSummarySpec extends AnyFreeSpec with Matchers {
 
     "must return None when the answer does not exist" in {
       val answers = UserAnswers("test-id")
+      TrustWorksReferenceYesNoSummary.row(answers) shouldBe None
+    }
+  }
+
+  "ViewOnly - TrustWorksReferenceYesNoSummary.row" - {
+
+    "must return a SummaryListRow with 'Yes' when worksReferenceYesNo is true" in {
+
+      val answers =
+        ViewOnlyTrustAnswers(
+          subcontractorType = models.TypeOfSubcontractor.Trust,
+          showVerificationDetails = false,
+          trustName = None,
+          addressYesNo = None,
+          address = None,
+          trustContactMethodsYesNo = None,
+          trustContactMethod = Set.empty,
+          email = None,
+          phone = None,
+          mobile = None,
+          utrYesNo = None,
+          utr = None,
+          worksReferenceYesNo = Some(true),
+          worksReference = None,
+          verificationNumber = None
+        )
+
+      val maybeRow =
+        TrustWorksReferenceYesNoSummary.row(answers)
+
+      maybeRow shouldBe defined
+
+      val row = maybeRow.value
+
+      row.key.content.asHtml.toString should include(
+        messages("trustWorksReferenceYesNo.checkYourAnswersLabel")
+      )
+
+      row.value.content.asHtml.toString should include(
+        messages("site.yes")
+      )
+
+      row.actions shouldBe None
+    }
+
+    "must return a SummaryListRow with 'No' when worksReferenceYesNo is false" in {
+
+      val answers =
+        ViewOnlyTrustAnswers(
+          subcontractorType = models.TypeOfSubcontractor.Trust,
+          showVerificationDetails = false,
+          trustName = None,
+          addressYesNo = None,
+          address = None,
+          trustContactMethodsYesNo = None,
+          trustContactMethod = Set.empty,
+          email = None,
+          phone = None,
+          mobile = None,
+          utrYesNo = None,
+          utr = None,
+          worksReferenceYesNo = Some(false),
+          worksReference = None,
+          verificationNumber = None
+        )
+
+      val maybeRow =
+        TrustWorksReferenceYesNoSummary.row(answers)
+
+      maybeRow shouldBe defined
+
+      val row = maybeRow.value
+
+      row.key.content.asHtml.toString should include(
+        messages("trustWorksReferenceYesNo.checkYourAnswersLabel")
+      )
+
+      row.value.content.asHtml.toString should include(
+        messages("site.no")
+      )
+
+      row.actions shouldBe None
+    }
+
+    "must return None when worksReferenceYesNo is not set in ViewOnlyTrustAnswers" in {
+
+      val answers =
+        ViewOnlyTrustAnswers(
+          subcontractorType = models.TypeOfSubcontractor.Trust,
+          showVerificationDetails = false,
+          trustName = None,
+          addressYesNo = None,
+          address = None,
+          trustContactMethodsYesNo = None,
+          trustContactMethod = Set.empty,
+          email = None,
+          phone = None,
+          mobile = None,
+          utrYesNo = None,
+          utr = None,
+          worksReferenceYesNo = None,
+          worksReference = None,
+          verificationNumber = None
+        )
+
       TrustWorksReferenceYesNoSummary.row(answers) shouldBe None
     }
   }

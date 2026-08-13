@@ -22,6 +22,8 @@ import models.{CheckMode, UserAnswers}
 import org.scalatest.matchers.must.Matchers
 import pages.add.partnership.PartnershipContactMethodOptionsPage
 import play.api.i18n.{DefaultMessagesApi, Lang, Messages}
+import models.TypeOfSubcontractor
+import models.viewOnly.partnership.ViewOnlyPartnershipAnswers
 
 class PartnershipContactMethodOptionsSummarySpec extends SpecBase with Matchers {
   implicit val messages: Messages = new DefaultMessagesApi(
@@ -103,6 +105,148 @@ class PartnershipContactMethodOptionsSummarySpec extends SpecBase with Matchers 
       valueHtml must include("Email address")
       valueHtml must not include "<br>"
       valueHtml must not include "govuk-list--bullet"
+    }
+  }
+
+  "PartnershipContactMethodOptionsSummary.row(ViewOnlyPartnershipAnswers)" - {
+
+    "must return a row with multiple selected options and no actions" in {
+
+      val answers = ViewOnlyPartnershipAnswers(
+        subcontractorType = models.TypeOfSubcontractor.Partnership,
+        showVerificationDetails = false,
+        partnershipName = None,
+        addressYesNo = None,
+        address = None,
+        partnershipContactMethodsYesNo = None,
+        partnershipContactMethodOptions = Set(
+          ContactMethodOptions.Email,
+          ContactMethodOptions.Phone,
+          ContactMethodOptions.Mobile
+        ),
+        email = None,
+        phone = None,
+        mobile = None,
+        hasUtrYesNo = None,
+        utr = None,
+        nominatedPartnerName = None,
+        nominatedPartnerUtrYesNo = None,
+        nominatedPartnerUtr = None,
+        nominatedPartnerNinoYesNo = None,
+        nominatedPartnerNino = None,
+        nominatedPartnerCrnYesNo = None,
+        nominatedPartnerCrn = None,
+        nominatedPartnerWorksReferenceYesNo = None,
+        nominatedPartnerWorksReference = None,
+        verificationNumber = None
+      )
+
+      val result = PartnershipContactMethodOptionsSummary.row(answers)
+
+      result mustBe defined
+
+      val row = result.value
+
+      row.key.content.asHtml.toString must include(
+        messages("partnershipContactMethodOptions.checkYourAnswersLabel")
+      )
+
+      val valueHtml = row.value.content.asHtml.toString
+
+      valueHtml must include("Email address")
+      valueHtml must include("Phone number")
+      valueHtml must include("Mobile number")
+      valueHtml must not include ("<br>")
+      valueHtml must include("govuk-list--bullet")
+
+      row.actions mustBe defined
+      row.actions.value.items mustBe empty
+    }
+
+    "must return a row with a single selected option and no actions" in {
+
+      val answers = ViewOnlyPartnershipAnswers(
+        subcontractorType = models.TypeOfSubcontractor.Partnership,
+        showVerificationDetails = false,
+        partnershipName = None,
+        addressYesNo = None,
+        address = None,
+        partnershipContactMethodsYesNo = None,
+        partnershipContactMethodOptions = Set(ContactMethodOptions.Email),
+        email = None,
+        phone = None,
+        mobile = None,
+        hasUtrYesNo = None,
+        utr = None,
+        nominatedPartnerName = None,
+        nominatedPartnerUtrYesNo = None,
+        nominatedPartnerUtr = None,
+        nominatedPartnerNinoYesNo = None,
+        nominatedPartnerNino = None,
+        nominatedPartnerCrnYesNo = None,
+        nominatedPartnerCrn = None,
+        nominatedPartnerWorksReferenceYesNo = None,
+        nominatedPartnerWorksReference = None,
+        verificationNumber = None
+      )
+
+      val result = PartnershipContactMethodOptionsSummary.row(answers)
+
+      result mustBe defined
+
+      val row = result.value
+
+      val valueHtml = row.value.content.asHtml.toString
+
+      valueHtml must include("Email address")
+      valueHtml must not include ("<br>")
+      valueHtml must not include ("govuk-list--bullet")
+
+      row.actions mustBe defined
+      row.actions.value.items mustBe empty
+    }
+
+    "must return a row with empty value and no actions when no contact methods are selected" in {
+
+      val answers = ViewOnlyPartnershipAnswers(
+        subcontractorType = models.TypeOfSubcontractor.Partnership,
+        showVerificationDetails = false,
+        partnershipName = None,
+        addressYesNo = None,
+        address = None,
+        partnershipContactMethodsYesNo = None,
+        partnershipContactMethodOptions = Set.empty,
+        email = None,
+        phone = None,
+        mobile = None,
+        hasUtrYesNo = None,
+        utr = None,
+        nominatedPartnerName = None,
+        nominatedPartnerUtrYesNo = None,
+        nominatedPartnerUtr = None,
+        nominatedPartnerNinoYesNo = None,
+        nominatedPartnerNino = None,
+        nominatedPartnerCrnYesNo = None,
+        nominatedPartnerCrn = None,
+        nominatedPartnerWorksReferenceYesNo = None,
+        nominatedPartnerWorksReference = None,
+        verificationNumber = None
+      )
+
+      val result = PartnershipContactMethodOptionsSummary.row(answers)
+
+      result mustBe defined
+
+      val row = result.value
+
+      row.key.content.asHtml.toString must include(
+        messages("partnershipContactMethodOptions.checkYourAnswersLabel")
+      )
+
+      row.value.content.asHtml.toString mustBe ""
+
+      row.actions mustBe defined
+      row.actions.value.items mustBe empty
     }
   }
 

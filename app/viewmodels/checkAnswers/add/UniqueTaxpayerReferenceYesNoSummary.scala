@@ -22,6 +22,7 @@ import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
+import models.viewOnly.ViewOnlyIndividualAnswers
 
 object UniqueTaxpayerReferenceYesNoSummary {
 
@@ -41,6 +42,20 @@ object UniqueTaxpayerReferenceYesNoSummary {
             .withVisuallyHiddenText(messages("uniqueTaxpayerReferenceYesNo.change.hidden"))
             .withAttribute("id" -> "unique-taxpayer-reference-yes-no")
         )
+      )
+    }
+
+  def row(
+    answers: ViewOnlyIndividualAnswers
+  )(implicit messages: Messages): Option[SummaryListRow] =
+    answers.utrYesNo.map { answer =>
+
+      val value = if (answer) "site.yes" else "site.no"
+
+      SummaryListRowViewModel(
+        key = "uniqueTaxpayerReferenceYesNo.checkYourAnswersLabel",
+        value = ValueViewModel(value),
+        actions = Seq.empty
       )
     }
 }

@@ -22,6 +22,7 @@ import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
+import models.viewOnly.company.ViewOnlyCompanyAnswers
 
 object CompanyUtrSummary {
 
@@ -51,5 +52,21 @@ object CompanyUtrSummary {
           actions = Seq.empty
         )
       }
+    }
+
+  def row(
+    answers: ViewOnlyCompanyAnswers,
+    isVerified: Boolean
+  )(implicit messages: Messages): Option[SummaryListRow] =
+    answers.utr.map { answer =>
+      SummaryListRowViewModel(
+        key =
+          if (isVerified)
+            "companyUtr.verified.checkYourAnswersLabel"
+          else
+            "companyUtr.checkYourAnswersLabel",
+        value = ValueViewModel(answer),
+        actions = Seq.empty
+      )
     }
 }

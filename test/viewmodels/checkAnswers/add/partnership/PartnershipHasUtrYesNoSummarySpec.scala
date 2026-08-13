@@ -25,6 +25,8 @@ import play.api.test.Helpers.*
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.*
 import org.scalatest.matchers.must.Matchers.must
+import models.TypeOfSubcontractor
+import models.viewOnly.partnership.ViewOnlyPartnershipAnswers
 
 class PartnershipHasUtrYesNoSummarySpec extends SpecBase with GuiceOneAppPerSuite {
 
@@ -143,6 +145,189 @@ class PartnershipHasUtrYesNoSummarySpec extends SpecBase with GuiceOneAppPerSuit
     "return None when the answer is missing (even if the partnership name is absent)" in {
       val ua: UserAnswers = emptyUserAnswers
       PartnershipHasUtrYesNoSummary.row(ua) mustBe None
+    }
+  }
+
+  "PartnershipHasUtrYesNoSummary.row(ViewOnlyPartnershipAnswers)" - {
+
+    "return a row with partnership name, value = yes, and no change action when the answer is true" in {
+
+      val answers = ViewOnlyPartnershipAnswers(
+        subcontractorType = TypeOfSubcontractor.Partnership,
+        showVerificationDetails = false,
+        partnershipName = Some(partnershipName),
+        addressYesNo = None,
+        address = None,
+        partnershipContactMethodsYesNo = None,
+        partnershipContactMethodOptions = Set.empty,
+        email = None,
+        phone = None,
+        mobile = None,
+        hasUtrYesNo = Some(true),
+        utr = None,
+        nominatedPartnerName = None,
+        nominatedPartnerUtrYesNo = None,
+        nominatedPartnerUtr = None,
+        nominatedPartnerNinoYesNo = None,
+        nominatedPartnerNino = None,
+        nominatedPartnerCrnYesNo = None,
+        nominatedPartnerCrn = None,
+        nominatedPartnerWorksReferenceYesNo = None,
+        nominatedPartnerWorksReference = None,
+        verificationNumber = None
+      )
+
+      val maybeRow = PartnershipHasUtrYesNoSummary.row(answers)
+
+      maybeRow must not be empty
+
+      val row: SummaryListRow = maybeRow.value
+
+      row.key mustBe Key(
+        content = Text(
+          messages(
+            "partnershipHasUtrYesNo.checkYourAnswersLabel",
+            partnershipName
+          )
+        )
+      )
+
+      row.value mustBe Value(
+        content = Text(messages("site.yes"))
+      )
+
+      row.actions mustBe defined
+      row.actions.value.items mustBe empty
+    }
+
+    "return a row with partnership name, value = no, and no change action when the answer is false" in {
+
+      val answers = ViewOnlyPartnershipAnswers(
+        subcontractorType = TypeOfSubcontractor.Partnership,
+        showVerificationDetails = false,
+        partnershipName = Some(partnershipName),
+        addressYesNo = None,
+        address = None,
+        partnershipContactMethodsYesNo = None,
+        partnershipContactMethodOptions = Set.empty,
+        email = None,
+        phone = None,
+        mobile = None,
+        hasUtrYesNo = Some(false),
+        utr = None,
+        nominatedPartnerName = None,
+        nominatedPartnerUtrYesNo = None,
+        nominatedPartnerUtr = None,
+        nominatedPartnerNinoYesNo = None,
+        nominatedPartnerNino = None,
+        nominatedPartnerCrnYesNo = None,
+        nominatedPartnerCrn = None,
+        nominatedPartnerWorksReferenceYesNo = None,
+        nominatedPartnerWorksReference = None,
+        verificationNumber = None
+      )
+
+      val maybeRow = PartnershipHasUtrYesNoSummary.row(answers)
+
+      maybeRow must not be empty
+
+      val row: SummaryListRow = maybeRow.value
+
+      row.key mustBe Key(
+        content = Text(
+          messages(
+            "partnershipHasUtrYesNo.checkYourAnswersLabel",
+            partnershipName
+          )
+        )
+      )
+
+      row.value mustBe Value(
+        content = Text(messages("site.no"))
+      )
+
+      row.actions mustBe defined
+      row.actions.value.items mustBe empty
+    }
+
+    "return a row with an empty partnership name when partnership name is missing" in {
+
+      val answers = ViewOnlyPartnershipAnswers(
+        subcontractorType = TypeOfSubcontractor.Partnership,
+        showVerificationDetails = false,
+        partnershipName = None,
+        addressYesNo = None,
+        address = None,
+        partnershipContactMethodsYesNo = None,
+        partnershipContactMethodOptions = Set.empty,
+        email = None,
+        phone = None,
+        mobile = None,
+        hasUtrYesNo = Some(true),
+        utr = None,
+        nominatedPartnerName = None,
+        nominatedPartnerUtrYesNo = None,
+        nominatedPartnerUtr = None,
+        nominatedPartnerNinoYesNo = None,
+        nominatedPartnerNino = None,
+        nominatedPartnerCrnYesNo = None,
+        nominatedPartnerCrn = None,
+        nominatedPartnerWorksReferenceYesNo = None,
+        nominatedPartnerWorksReference = None,
+        verificationNumber = None
+      )
+
+      val maybeRow = PartnershipHasUtrYesNoSummary.row(answers)
+
+      maybeRow must not be empty
+
+      val row: SummaryListRow = maybeRow.value
+
+      row.key mustBe Key(
+        content = Text(
+          messages(
+            "partnershipHasUtrYesNo.checkYourAnswersLabel",
+            ""
+          )
+        )
+      )
+
+      row.value mustBe Value(
+        content = Text(messages("site.yes"))
+      )
+
+      row.actions mustBe defined
+      row.actions.value.items mustBe empty
+    }
+
+    "return None when hasUtrYesNo is missing" in {
+
+      val answers = ViewOnlyPartnershipAnswers(
+        subcontractorType = TypeOfSubcontractor.Partnership,
+        showVerificationDetails = false,
+        partnershipName = Some(partnershipName),
+        addressYesNo = None,
+        address = None,
+        partnershipContactMethodsYesNo = None,
+        partnershipContactMethodOptions = Set.empty,
+        email = None,
+        phone = None,
+        mobile = None,
+        hasUtrYesNo = None,
+        utr = None,
+        nominatedPartnerName = None,
+        nominatedPartnerUtrYesNo = None,
+        nominatedPartnerUtr = None,
+        nominatedPartnerNinoYesNo = None,
+        nominatedPartnerNino = None,
+        nominatedPartnerCrnYesNo = None,
+        nominatedPartnerCrn = None,
+        nominatedPartnerWorksReferenceYesNo = None,
+        nominatedPartnerWorksReference = None,
+        verificationNumber = None
+      )
+
+      PartnershipHasUtrYesNoSummary.row(answers) mustBe None
     }
   }
 }

@@ -27,6 +27,7 @@ import pages.add.TradingNameOfSubcontractorPage
 import play.api.i18n.Messages
 import play.api.test.Helpers.stubMessages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.*
+import models.viewOnly.ViewOnlyIndividualAnswers
 
 class TradingNameOfSubcontractorSummarySpec extends AnyFreeSpec with Matchers with CyaEncodingSpecHelper {
 
@@ -101,6 +102,127 @@ class TradingNameOfSubcontractorSummarySpec extends AnyFreeSpec with Matchers wi
     "must return None when the answer does not exist" in {
       val answers = UserAnswers("test-id")
       TradingNameOfSubcontractorSummary.row(answers) shouldBe None
+    }
+  }
+
+  "ViewOnly - TradingNameOfSubcontractorSummary.row" - {
+
+    "must return a SummaryListRow when the trading name exists" in {
+
+      val answers =
+        ViewOnlyIndividualAnswers(
+          subcontractorType = models.TypeOfSubcontractor.Individualorsoletrader,
+          showVerificationDetails = false,
+          usesTradingName = Some(true),
+          tradingName = Some("O'Reilly & Co <UK>"),
+          subcontractorName = None,
+          addressYesNo = None,
+          address = None,
+          individualContactMethodsYesNo = None,
+          individualContactMethod = Set.empty,
+          email = None,
+          phone = None,
+          mobile = None,
+          utrYesNo = None,
+          utr = None,
+          ninoYesNo = None,
+          nino = None,
+          worksReferenceYesNo = None,
+          worksReference = None,
+          verificationNumber = None
+        )
+
+      val maybeRow =
+        TradingNameOfSubcontractorSummary.row(answers)
+
+      maybeRow shouldBe defined
+
+      val row = maybeRow.value
+
+      val expectedKeyText =
+        messages("tradingNameOfSubcontractor.checkYourAnswersLabel")
+
+      row.key.content.asHtml.toString should include(expectedKeyText)
+
+      row.value.content.asHtml.toString should include(
+        "O&#x27;Reilly &amp; Co &lt;UK&gt;"
+      )
+
+      row.actions shouldBe defined
+      row.actions.value.items shouldBe empty
+    }
+
+    "must return None when the trading name does not exist" in {
+
+      val answers =
+        ViewOnlyIndividualAnswers(
+          subcontractorType = models.TypeOfSubcontractor.Individualorsoletrader,
+          showVerificationDetails = false,
+          usesTradingName = Some(false),
+          tradingName = None,
+          subcontractorName = None,
+          addressYesNo = None,
+          address = None,
+          individualContactMethodsYesNo = None,
+          individualContactMethod = Set.empty,
+          email = None,
+          phone = None,
+          mobile = None,
+          utrYesNo = None,
+          utr = None,
+          ninoYesNo = None,
+          nino = None,
+          worksReferenceYesNo = None,
+          worksReference = None,
+          verificationNumber = None
+        )
+
+      TradingNameOfSubcontractorSummary.row(answers) shouldBe None
+    }
+
+    "must HTML-escape special characters correctly for ViewOnly trading name" in {
+
+      val answers =
+        ViewOnlyIndividualAnswers(
+          subcontractorType = models.TypeOfSubcontractor.Individualorsoletrader,
+          showVerificationDetails = false,
+          usesTradingName = Some(true),
+          tradingName = Some("O'Reilly & Co <UK>"),
+          subcontractorName = None,
+          addressYesNo = None,
+          address = None,
+          individualContactMethodsYesNo = None,
+          individualContactMethod = Set.empty,
+          email = None,
+          phone = None,
+          mobile = None,
+          utrYesNo = None,
+          utr = None,
+          ninoYesNo = None,
+          nino = None,
+          worksReferenceYesNo = None,
+          worksReference = None,
+          verificationNumber = None
+        )
+
+      val maybeRow =
+        TradingNameOfSubcontractorSummary.row(answers)
+
+      maybeRow shouldBe defined
+
+      val row = maybeRow.value
+
+      val html = extractHtml(row)
+
+      assertEscaped(
+        html,
+        "O&#x27;Reilly &amp; Co &lt;UK&gt;"
+      )
+
+      assertNoDoubleEncoding(html)
+
+      row.actions shouldBe defined
+      row.actions.value.items shouldBe empty
     }
   }
 }

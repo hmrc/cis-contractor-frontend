@@ -16,6 +16,7 @@
 
 package viewmodels.checkAnswers.add.partnership
 
+import models.viewOnly.partnership.ViewOnlyPartnershipAnswers
 import controllers.add.partnership.routes
 import models.{CheckMode, Mode, UserAnswers}
 import pages.add.partnership.PartnershipNominatedPartnerUtrPage
@@ -52,5 +53,22 @@ object PartnershipNominatedPartnerUtrSummary {
           actions = Seq.empty
         )
       }
+    }
+
+  def row(
+           answers: ViewOnlyPartnershipAnswers,
+           isVerified: Boolean
+         )(implicit messages: Messages): Option[SummaryListRow] =
+    answers.nominatedPartnerUtr.map { answer =>
+      SummaryListRowViewModel(
+        key =
+          if (isVerified) {
+            "partnershipNominatedPartnerUtr.verified.checkYourAnswersLabel"
+          } else {
+            "partnershipNominatedPartnerUtr.checkYourAnswersLabel"
+          },
+        value = ValueViewModel(answer),
+        actions = Seq.empty
+      )
     }
 }

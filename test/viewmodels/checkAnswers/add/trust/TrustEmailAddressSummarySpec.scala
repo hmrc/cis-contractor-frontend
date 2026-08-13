@@ -18,6 +18,7 @@ package viewmodels.checkAnswers.add.trust
 
 import controllers.add.trust.routes
 import helpers.CyaEncodingSpecHelper
+import models.viewOnly.trust.ViewOnlyTrustAnswers
 import models.{AmendMode, CheckMode, UserAnswers}
 import org.scalatest.OptionValues.convertOptionToValuable
 import org.scalatest.TryValues.convertTryToSuccessOrFailure
@@ -138,6 +139,73 @@ class TrustEmailAddressSummarySpec extends AnyFreeSpec with Matchers with CyaEnc
 
       assertEscaped(html, "trust+o&#x27;reilly&amp;co@test.com")
       assertNoDoubleEncoding(html)
+    }
+  }
+
+  "ViewOnly - TrustEmailAddressSummary.row" - {
+
+    "must return a SummaryListRow when email exists in ViewOnlyTrustAnswers" in {
+
+      val answers =
+        ViewOnlyTrustAnswers(
+          subcontractorType = models.TypeOfSubcontractor.Trust,
+          showVerificationDetails = false,
+          trustName = None,
+          addressYesNo = None,
+          address = None,
+          trustContactMethodsYesNo = None,
+          trustContactMethod = Set.empty,
+          email = Some("trust@example.com"),
+          phone = None,
+          mobile = None,
+          utrYesNo = None,
+          utr = None,
+          worksReferenceYesNo = None,
+          worksReference = None,
+          verificationNumber = None
+        )
+
+      val maybeRow =
+        TrustEmailAddressSummary.row(answers)
+
+      maybeRow shouldBe defined
+
+      val row = maybeRow.value
+
+      row.key.content.asHtml.toString should include(
+        messages("trustEmailAddress.checkYourAnswersLabel")
+      )
+
+      row.value.content.asHtml.toString should include(
+        "trust@example.com"
+      )
+
+      row.actions shouldBe defined
+      row.actions.value.items shouldBe empty
+    }
+
+    "must return None when email does not exist in ViewOnlyTrustAnswers" in {
+
+      val answers =
+        ViewOnlyTrustAnswers(
+          subcontractorType = models.TypeOfSubcontractor.Trust,
+          showVerificationDetails = false,
+          trustName = None,
+          addressYesNo = None,
+          address = None,
+          trustContactMethodsYesNo = None,
+          trustContactMethod = Set.empty,
+          email = None,
+          phone = None,
+          mobile = None,
+          utrYesNo = None,
+          utr = None,
+          worksReferenceYesNo = None,
+          worksReference = None,
+          verificationNumber = None
+        )
+
+      TrustEmailAddressSummary.row(answers) shouldBe None
     }
   }
 }

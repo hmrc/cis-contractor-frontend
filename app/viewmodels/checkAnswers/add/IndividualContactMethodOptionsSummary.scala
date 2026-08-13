@@ -26,6 +26,7 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.checkAnswers.verify.ValueViewModelHelper
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
+import models.viewOnly.ViewOnlyIndividualAnswers
 
 object IndividualContactMethodOptionsSummary {
 
@@ -48,6 +49,29 @@ object IndividualContactMethodOptionsSummary {
             .withVisuallyHiddenText(messages("individualContactMethodOptions.change.hidden"))
             .withAttribute("id" -> "individual-methods-of-contact")
         )
+      )
+    }
+
+  def row(
+    answers: ViewOnlyIndividualAnswers
+  )(implicit messages: Messages): Option[SummaryListRow] =
+    Option.when(answers.individualContactMethod.nonEmpty) {
+
+      val options =
+        ContactMethodOptions
+          .ordered(answers.individualContactMethod)
+          .map(m =>
+            HtmlFormat
+              .escape(messages(s"individualContactMethodOptions.$m"))
+              .toString
+          )
+
+      SummaryListRowViewModel(
+        key = "individualContactMethodOptions.checkYourAnswersLabel",
+        value = ValueViewModelHelper
+          .makeGovukBulletList(options, false)
+          .getOrElse(ValueViewModel(HtmlContent(""))),
+        actions = Seq.empty
       )
     }
 }

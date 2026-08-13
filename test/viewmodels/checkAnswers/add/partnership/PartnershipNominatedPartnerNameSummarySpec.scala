@@ -28,6 +28,8 @@ import play.api.i18n.Messages
 import play.api.test.Helpers.stubMessages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.*
 import org.scalatest.matchers.must.Matchers.must
+import models.TypeOfSubcontractor
+import models.viewOnly.partnership.ViewOnlyPartnershipAnswers
 
 class PartnershipNominatedPartnerNameSummarySpec extends AnyFreeSpec with Matchers with CyaEncodingSpecHelper {
 
@@ -125,6 +127,81 @@ class PartnershipNominatedPartnerNameSummarySpec extends AnyFreeSpec with Matche
       assertNoDoubleEncoding(html)
     }
 
+  }
+
+  "PartnershipNominatedPartnerNameSummary.row(ViewOnlyPartnershipAnswers)" - {
+
+    def viewOnlyAnswers(
+                         nominatedPartnerName: Option[String]
+                       ): ViewOnlyPartnershipAnswers =
+      ViewOnlyPartnershipAnswers(
+        subcontractorType = TypeOfSubcontractor.Partnership,
+        showVerificationDetails = false,
+        partnershipName = None,
+        addressYesNo = None,
+        address = None,
+        partnershipContactMethodsYesNo = None,
+        partnershipContactMethodOptions = Set.empty,
+        email = None,
+        phone = None,
+        mobile = None,
+        hasUtrYesNo = None,
+        utr = None,
+        nominatedPartnerName = nominatedPartnerName,
+        nominatedPartnerUtrYesNo = None,
+        nominatedPartnerUtr = None,
+        nominatedPartnerNinoYesNo = None,
+        nominatedPartnerNino = None,
+        nominatedPartnerCrnYesNo = None,
+        nominatedPartnerCrn = None,
+        nominatedPartnerWorksReferenceYesNo = None,
+        nominatedPartnerWorksReference = None,
+        verificationNumber = None
+      )
+
+    "must return a SummaryListRow when the nominated partner name exists" in {
+
+      val answers = viewOnlyAnswers(Some("John Doe"))
+
+      val maybeRow =
+        PartnershipNominatedPartnerNameSummary.row(answers)
+
+      maybeRow shouldBe defined
+
+      val row = maybeRow.value
+
+      row.key.content.asHtml.toString should include(
+        messages("partnershipNominatedPartnerName.checkYourAnswersLabel")
+      )
+
+      row.value.content.asHtml.toString should include("John Doe")
+
+      row.actions shouldBe defined
+      row.actions.value.items shouldBe empty
+    }
+
+    "must return None when the nominated partner name does not exist" in {
+
+      val answers = viewOnlyAnswers(None)
+
+      PartnershipNominatedPartnerNameSummary.row(answers) shouldBe None
+    }
+
+    "must HTML-escape special characters correctly in ViewOnly row" in {
+
+      val answers =
+        viewOnlyAnswers(Some("O'Reilly & Sons"))
+
+      val row =
+        PartnershipNominatedPartnerNameSummary.row(answers).value
+
+      val html = extractHtml(row)
+
+      assertEscaped(html, "O&#x27;Reilly &amp; Sons")
+      assertNoDoubleEncoding(html)
+
+      row.actions.value.items shouldBe empty
+    }
   }
 
 }

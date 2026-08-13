@@ -27,6 +27,7 @@ import pages.add.SubNationalInsuranceNumberPage
 import play.api.i18n.Messages
 import play.api.test.Helpers.stubMessages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.*
+import models.viewOnly.ViewOnlyIndividualAnswers
 
 class SubNationalInsuranceNumberSummarySpec extends AnyFreeSpec with Matchers with CyaEncodingSpecHelper {
 
@@ -119,6 +120,122 @@ class SubNationalInsuranceNumberSummarySpec extends AnyFreeSpec with Matchers wi
 
       assertEscaped(html, "AB123456C &amp; Ref&#x27;01")
       assertNoDoubleEncoding(html)
+    }
+  }
+
+  "ViewOnly - SubNationalInsuranceNumberSummary.row" - {
+
+    "must return a SummaryListRow when NINO exists" in {
+
+      val answers =
+        ViewOnlyIndividualAnswers(
+          subcontractorType = models.TypeOfSubcontractor.Individualorsoletrader,
+          showVerificationDetails = false,
+          usesTradingName = None,
+          tradingName = None,
+          subcontractorName = None,
+          addressYesNo = None,
+          address = None,
+          individualContactMethodsYesNo = None,
+          individualContactMethod = Set.empty,
+          email = None,
+          phone = None,
+          mobile = None,
+          utrYesNo = None,
+          utr = None,
+          ninoYesNo = Some(true),
+          nino = Some("AA123456A"),
+          worksReferenceYesNo = None,
+          worksReference = None,
+          verificationNumber = None
+        )
+
+      val maybeRow =
+        SubNationalInsuranceNumberSummary.row(answers)
+
+      maybeRow shouldBe defined
+
+      val row = maybeRow.value
+
+      row.key.content.asHtml.toString should include(
+        messages("subNationalInsuranceNumber.checkYourAnswersLabel")
+      )
+
+      row.value.content.asHtml.toString should include("AA123456A")
+
+      row.actions shouldBe defined
+      row.actions.value.items shouldBe empty
+    }
+
+    "must return None when NINO does not exist" in {
+
+      val answers =
+        ViewOnlyIndividualAnswers(
+          subcontractorType = models.TypeOfSubcontractor.Individualorsoletrader,
+          showVerificationDetails = false,
+          usesTradingName = None,
+          tradingName = None,
+          subcontractorName = None,
+          addressYesNo = None,
+          address = None,
+          individualContactMethodsYesNo = None,
+          individualContactMethod = Set.empty,
+          email = None,
+          phone = None,
+          mobile = None,
+          utrYesNo = None,
+          utr = None,
+          ninoYesNo = None,
+          nino = None,
+          worksReferenceYesNo = None,
+          worksReference = None,
+          verificationNumber = None
+        )
+
+      SubNationalInsuranceNumberSummary.row(answers) shouldBe None
+    }
+
+    "must HTML-escape special characters correctly for ViewOnly NINO" in {
+
+      val nino = "AB123456C & Ref'01"
+
+      val answers =
+        ViewOnlyIndividualAnswers(
+          subcontractorType = models.TypeOfSubcontractor.Individualorsoletrader,
+          showVerificationDetails = false,
+          usesTradingName = None,
+          tradingName = None,
+          subcontractorName = None,
+          addressYesNo = None,
+          address = None,
+          individualContactMethodsYesNo = None,
+          individualContactMethod = Set.empty,
+          email = None,
+          phone = None,
+          mobile = None,
+          utrYesNo = None,
+          utr = None,
+          ninoYesNo = Some(true),
+          nino = Some(nino),
+          worksReferenceYesNo = None,
+          worksReference = None,
+          verificationNumber = None
+        )
+
+      val maybeRow =
+        SubNationalInsuranceNumberSummary.row(answers)
+
+      maybeRow shouldBe defined
+
+      val row = maybeRow.value
+
+      val html = extractHtml(row)
+
+      assertEscaped(html, "AB123456C &amp; Ref&#x27;01")
+      assertNoDoubleEncoding(html)
+
+      row.actions shouldBe defined
+      row.actions.value.items shouldBe empty
     }
   }
 }

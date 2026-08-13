@@ -16,9 +16,11 @@
 
 package viewmodels.checkAnswers.add.partnership
 
+import models.viewOnly.partnership.ViewOnlyPartnershipAnswers
 import models.{CheckMode, Mode, UserAnswers}
 import pages.add.partnership.PartnershipAddressYesNoPage
 import play.api.i18n.Messages
+import uk.gov.hmrc.govukfrontend.views.Aliases.{Key, Text}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
@@ -41,6 +43,20 @@ object PartnershipAddressYesNoSummary {
             .withVisuallyHiddenText(messages("partnershipAddressYesNo.change.hidden"))
             .withAttribute("id" -> "add-partnership-address")
         )
+      )
+    }
+
+  def row(
+    answers: ViewOnlyPartnershipAnswers
+  )(implicit messages: Messages): Option[SummaryListRow] =
+    answers.addressYesNo.map { answer =>
+
+      val value = if (answer) "site.yes" else "site.no"
+
+      SummaryListRowViewModel(
+        "partnershipAddressYesNo.checkYourAnswersLabel",
+        ValueViewModel(value),
+        Seq.empty
       )
     }
 }

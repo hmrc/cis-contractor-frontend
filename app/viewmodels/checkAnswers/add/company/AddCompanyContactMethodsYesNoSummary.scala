@@ -16,6 +16,7 @@
 
 package viewmodels.checkAnswers.add.company
 
+import models.viewOnly.company.ViewOnlyCompanyAnswers
 import models.{CheckMode, Mode, UserAnswers}
 import pages.add.company.AddCompanyContactMethodsYesNoPage
 import play.api.i18n.Messages
@@ -41,6 +42,20 @@ object AddCompanyContactMethodsYesNoSummary {
             .withVisuallyHiddenText(messages("addCompanyContactMethodsYesNo.change.hidden"))
             .withAttribute("id" -> "add-company-contact-details")
         )
+      )
+    }
+
+  def row(
+    answers: ViewOnlyCompanyAnswers
+  )(implicit messages: Messages): Option[SummaryListRow] =
+    answers.companyContactMethodsYesNo.map { answer =>
+
+      val value = if (answer) "site.yes" else "site.no"
+
+      SummaryListRowViewModel(
+        key = "addCompanyContactMethodsYesNo.checkYourAnswersLabel",
+        value = ValueViewModel(value),
+        actions = Seq.empty
       )
     }
 }

@@ -16,6 +16,7 @@
 
 package viewmodels.checkAnswers.add.partnership
 
+import models.viewOnly.partnership.ViewOnlyPartnershipAnswers
 import models.{CheckMode, Mode, UserAnswers}
 import pages.add.partnership.AddPartnershipContactMethodsYesNoPage
 import play.api.i18n.Messages
@@ -41,6 +42,20 @@ object AddPartnershipContactMethodsYesNoSummary {
             .withVisuallyHiddenText(messages("addPartnershipContactMethodsYesNo.change.hidden"))
             .withAttribute("id" -> "add-partnership-contact-details")
         )
+      )
+    }
+
+  def row(
+    answers: ViewOnlyPartnershipAnswers
+  )(implicit messages: Messages): Option[SummaryListRow] =
+    answers.partnershipContactMethodsYesNo.map { answer =>
+
+      val value = if (answer) "site.yes" else "site.no"
+
+      SummaryListRowViewModel(
+        "addPartnershipContactMethodsYesNo.checkYourAnswersLabel",
+        ValueViewModel(value),
+        Seq.empty
       )
     }
 }

@@ -28,6 +28,7 @@ import pages.add.trust.TrustUtrPage
 import play.api.i18n.Messages
 import play.api.test.Helpers.stubMessages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.*
+import models.viewOnly.trust.ViewOnlyTrustAnswers
 
 class TrustUtrSummarySpec extends AnyFreeSpec with Matchers with CyaEncodingSpecHelper {
 
@@ -142,6 +143,147 @@ class TrustUtrSummarySpec extends AnyFreeSpec with Matchers with CyaEncodingSpec
 
       row.actions             shouldBe defined
       row.actions.value.items shouldBe empty
+    }
+  }
+
+  "ViewOnly - TrustUtrSummary.row" - {
+
+    "must return a SummaryListRow with the normal label when UTR exists and is not verified" in {
+
+      val answers =
+        ViewOnlyTrustAnswers(
+          subcontractorType = models.TypeOfSubcontractor.Trust,
+          showVerificationDetails = false,
+          trustName = None,
+          addressYesNo = None,
+          address = None,
+          trustContactMethodsYesNo = None,
+          trustContactMethod = Set.empty,
+          email = None,
+          phone = None,
+          mobile = None,
+          utrYesNo = None,
+          utr = Some("1234567890"),
+          worksReferenceYesNo = None,
+          worksReference = None,
+          verificationNumber = None
+        )
+
+      val maybeRow =
+        TrustUtrSummary.row(answers, isVerified = false)
+
+      maybeRow shouldBe defined
+
+      val row = maybeRow.value
+
+      row.key.content.asHtml.toString should include(
+        messages("trustUtr.checkYourAnswersLabel")
+      )
+
+      row.key.content.asHtml.toString should not include(
+        messages("trustUtr.verified.checkYourAnswersLabel")
+        )
+
+      row.value.content.asHtml.toString should include("1234567890")
+
+      row.actions shouldBe None
+    }
+
+    "must return a SummaryListRow with the verified label when UTR exists and is verified" in {
+
+      val answers =
+        ViewOnlyTrustAnswers(
+          subcontractorType = models.TypeOfSubcontractor.Trust,
+          showVerificationDetails = false,
+          trustName = None,
+          addressYesNo = None,
+          address = None,
+          trustContactMethodsYesNo = None,
+          trustContactMethod = Set.empty,
+          email = None,
+          phone = None,
+          mobile = None,
+          utrYesNo = None,
+          utr = Some("1234567890"),
+          worksReferenceYesNo = None,
+          worksReference = None,
+          verificationNumber = None
+        )
+
+      val maybeRow =
+        TrustUtrSummary.row(answers, isVerified = true)
+
+      maybeRow shouldBe defined
+
+      val row = maybeRow.value
+
+      row.key.content.asHtml.toString should include(
+        messages("trustUtr.verified.checkYourAnswersLabel")
+      )
+
+      row.key.content.asHtml.toString should not include(
+        messages("trustUtr.checkYourAnswersLabel")
+        )
+
+      row.value.content.asHtml.toString should include("1234567890")
+
+      row.actions shouldBe None
+    }
+
+    "must return None when UTR does not exist in ViewOnlyTrustAnswers" in {
+
+      val answers =
+        ViewOnlyTrustAnswers(
+          subcontractorType = models.TypeOfSubcontractor.Trust,
+          showVerificationDetails = false,
+          trustName = None,
+          addressYesNo = None,
+          address = None,
+          trustContactMethodsYesNo = None,
+          trustContactMethod = Set.empty,
+          email = None,
+          phone = None,
+          mobile = None,
+          utrYesNo = None,
+          utr = None,
+          worksReferenceYesNo = None,
+          worksReference = None,
+          verificationNumber = None
+        )
+
+      TrustUtrSummary.row(answers, isVerified = false) shouldBe None
+    }
+
+    "must HTML-escape special characters correctly in ViewOnly row" in {
+
+      val answers =
+        ViewOnlyTrustAnswers(
+          subcontractorType = models.TypeOfSubcontractor.Trust,
+          showVerificationDetails = false,
+          trustName = None,
+          addressYesNo = None,
+          address = None,
+          trustContactMethodsYesNo = None,
+          trustContactMethod = Set.empty,
+          email = None,
+          phone = None,
+          mobile = None,
+          utrYesNo = None,
+          utr = Some("1234567890 & Ref'01"),
+          worksReferenceYesNo = None,
+          worksReference = None,
+          verificationNumber = None
+        )
+
+      val row =
+        TrustUtrSummary.row(answers, isVerified = false).value
+
+      val html = extractHtml(row)
+
+      assertEscaped(html, "1234567890 &amp; Ref&#x27;01")
+      assertNoDoubleEncoding(html)
+
+      row.actions shouldBe None
     }
   }
 }

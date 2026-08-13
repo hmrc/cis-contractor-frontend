@@ -22,6 +22,7 @@ import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
+import models.viewOnly.ViewOnlyIndividualAnswers
 
 object IndividualEmailAddressSummary {
 
@@ -37,6 +38,17 @@ object IndividualEmailAddressSummary {
           )
             .withVisuallyHiddenText(messages("individualEmailAddress.change.hidden"))
         )
+      )
+    }
+
+  def row(
+    answers: ViewOnlyIndividualAnswers
+  )(implicit messages: Messages): Option[SummaryListRow] =
+    answers.email.map { answer =>
+      SummaryListRowViewModel(
+        key = "individualEmailAddress.checkYourAnswersLabel",
+        value = ValueViewModel(answer),
+        actions = Seq.empty
       )
     }
 }

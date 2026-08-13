@@ -18,7 +18,8 @@ package viewmodels.checkAnswers.add.company
 
 import controllers.add.company.routes
 import helpers.CyaEncodingSpecHelper
-import models.{AmendMode, CheckMode, UserAnswers}
+import models.viewOnly.company.ViewOnlyCompanyAnswers
+import models.{AmendMode, CheckMode, TypeOfSubcontractor, UserAnswers}
 import org.scalatest.OptionValues.convertOptionToValuable
 import org.scalatest.TryValues.convertTryToSuccessOrFailure
 import org.scalatest.freespec.AnyFreeSpec
@@ -117,6 +118,77 @@ class CompanyPhoneNumberSummarySpec extends AnyFreeSpec with Matchers with CyaEn
           .value
 
       val row = CompanyPhoneNumberSummary.row(answers).value
+
+      val html = extractHtml(row)
+
+      assertEscaped(html, "020 7946 0958 &amp; ext&#x27;123")
+      assertNoDoubleEncoding(html)
+    }
+  }
+
+  "CompanyPhoneNumberSummary.row with ViewOnlyCompanyAnswers" - {
+
+    def viewOnlyAnswers(
+                         phone: Option[String] = None
+                       ): ViewOnlyCompanyAnswers =
+      ViewOnlyCompanyAnswers(
+        subcontractorType = TypeOfSubcontractor.Limitedcompany,
+        showVerificationDetails = false,
+        companyName = None,
+        addressYesNo = None,
+        address = None,
+        companyContactMethodsYesNo = None,
+        companyContactMethod = Set.empty,
+        email = None,
+        phone = phone,
+        mobile = None,
+        crnYesNo = None,
+        crn = None,
+        utrYesNo = None,
+        utr = None,
+        worksReferenceYesNo = None,
+        worksReference = None,
+        verificationNumber = None
+      )
+
+    "must return a SummaryListRow when the phone number exists" in {
+
+      val answers = viewOnlyAnswers(Some("0123456789"))
+
+      val maybeRow = CompanyPhoneNumberSummary.row(answers)
+
+      maybeRow shouldBe defined
+
+      val row = maybeRow.value
+
+      val expectedKeyText =
+        messages("companyPhoneNumber.checkYourAnswersLabel")
+
+      row.key.content.asHtml.toString should include(expectedKeyText)
+      row.value.content.asHtml.toString should include("0123456789")
+
+      row.actions shouldBe defined
+      row.actions.value.items shouldBe empty
+    }
+
+    "must return None when the phone number does not exist" in {
+
+      val answers = viewOnlyAnswers()
+
+      CompanyPhoneNumberSummary.row(answers) shouldBe None
+    }
+
+    "must HTML-escape special characters correctly (single encoding only)" in {
+
+      val phone = "020 7946 0958 & ext'123"
+
+      val answers = viewOnlyAnswers(Some(phone))
+
+      val maybeRow = CompanyPhoneNumberSummary.row(answers)
+
+      maybeRow shouldBe defined
+
+      val row = maybeRow.value
 
       val html = extractHtml(row)
 

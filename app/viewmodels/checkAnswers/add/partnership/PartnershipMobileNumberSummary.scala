@@ -16,6 +16,7 @@
 
 package viewmodels.checkAnswers.add.partnership
 
+import models.viewOnly.partnership.ViewOnlyPartnershipAnswers
 import models.{CheckMode, Mode, UserAnswers}
 import pages.add.partnership.PartnershipMobileNumberPage
 import play.api.i18n.Messages
@@ -38,6 +39,17 @@ object PartnershipMobileNumberSummary {
             .withVisuallyHiddenText(messages("partnershipMobileNumber.change.hidden"))
             .withAttribute("id" -> "partnership-mobile-number")
         )
+      )
+    }
+
+  def row(
+    answers: ViewOnlyPartnershipAnswers
+  )(implicit messages: Messages): Option[SummaryListRow] =
+    answers.mobile.map { answer =>
+      SummaryListRowViewModel(
+        key = "partnershipMobileNumber.checkYourAnswersLabel",
+        value = ValueViewModel(answer),
+        actions = Seq.empty
       )
     }
 }

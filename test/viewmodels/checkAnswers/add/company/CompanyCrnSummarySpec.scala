@@ -29,6 +29,9 @@ import play.api.i18n.Messages
 import play.api.test.Helpers.stubMessages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.*
 
+import models.TypeOfSubcontractor
+import models.viewOnly.company.ViewOnlyCompanyAnswers
+
 class CompanyCrnSummarySpec extends AnyFreeSpec with Matchers with CyaEncodingSpecHelper {
   implicit val messages: Messages = stubMessages()
 
@@ -122,5 +125,78 @@ class CompanyCrnSummarySpec extends AnyFreeSpec with Matchers with CyaEncodingSp
       assertNoDoubleEncoding(html)
     }
 
+  }
+
+  "CompanyCrnSummary.row(ViewOnlyCompanyAnswers)" - {
+
+    def viewOnlyAnswers(
+                         crn: Option[String]
+                       ): ViewOnlyCompanyAnswers =
+      ViewOnlyCompanyAnswers(
+        subcontractorType = TypeOfSubcontractor.Limitedcompany,
+        showVerificationDetails = false,
+        companyName = None,
+        addressYesNo = None,
+        address = None,
+        companyContactMethodsYesNo = None,
+        companyContactMethod = Set.empty,
+        email = None,
+        phone = None,
+        mobile = None,
+        utrYesNo = None,
+        utr = None,
+        crnYesNo = None,
+        crn = crn,
+        worksReferenceYesNo = None,
+        worksReference = None,
+        verificationNumber = None
+      )
+
+    "must return a SummaryListRow when CRN exists" in {
+
+      val answers =
+        viewOnlyAnswers(Some("AC012345"))
+
+      val maybeRow =
+        CompanyCrnSummary.row(answers)
+
+      maybeRow shouldBe defined
+
+      val row = maybeRow.value
+
+      row.key.content.asHtml.toString should include(
+        messages("companyCrn.checkYourAnswersLabel")
+      )
+
+      row.value.content.asHtml.toString should include("AC012345")
+
+      row.actions shouldBe defined
+      row.actions.value.items shouldBe empty
+    }
+
+    "must return None when CRN does not exist" in {
+
+      val answers =
+        viewOnlyAnswers(None)
+
+      CompanyCrnSummary.row(answers) shouldBe None
+    }
+
+    "must HTML-escape special characters correctly in ViewOnly row" in {
+
+      val answers =
+        viewOnlyAnswers(Some("O'Reilly & Co UK"))
+
+      val row =
+        CompanyCrnSummary.row(answers).value
+
+      val html = extractHtml(row)
+
+      assertEscaped(html, "O&#x27;Reilly &amp; Co UK")
+      assertNoDoubleEncoding(html)
+
+      row.actions shouldBe defined
+      row.actions.value.items shouldBe empty
+    }
   }
 }

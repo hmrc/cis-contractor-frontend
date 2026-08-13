@@ -93,4 +93,91 @@ class TypeOfSubcontractorSummarySpec extends AnyFreeSpec with Matchers {
       row.actions.value.items shouldBe empty
     }
   }
+
+  "TypeOfSubcontractorSummary.row(TypeOfSubcontractor)" - {
+
+    "must return a SummaryListRow for an individual or sole trader" in {
+
+      val maybeRow =
+        TypeOfSubcontractorSummary.row(TypeOfSubcontractor.Individualorsoletrader)
+
+      maybeRow shouldBe defined
+
+      val row = maybeRow.value
+
+      row.key.content.asHtml.toString should include(
+        messages("typeOfSubcontractor.checkYourAnswersLabel")
+      )
+
+      row.value.content.asHtml.toString should include(
+        messages("typeOfSubcontractor.soletrader")
+      )
+
+      row.actions shouldBe defined
+      row.actions.value.items shouldBe empty
+    }
+
+    "must return a SummaryListRow for a limited company" in {
+
+      val maybeRow =
+        TypeOfSubcontractorSummary.row(TypeOfSubcontractor.Limitedcompany)
+
+      maybeRow shouldBe defined
+
+      val row = maybeRow.value
+
+      row.key.content.asHtml.toString should include(
+        messages("typeOfSubcontractor.checkYourAnswersLabel")
+      )
+
+      row.value.content.asHtml.toString should include(
+        messages("typeOfSubcontractor.company")
+      )
+
+      row.actions shouldBe defined
+      row.actions.value.items shouldBe empty
+    }
+
+    "must return a SummaryListRow for a partnership" in {
+
+      val maybeRow =
+        TypeOfSubcontractorSummary.row(TypeOfSubcontractor.Partnership)
+
+      maybeRow shouldBe defined
+
+      val row = maybeRow.value
+
+      row.key.content.asHtml.toString should include(
+        messages("typeOfSubcontractor.checkYourAnswersLabel")
+      )
+
+      row.value.content.asHtml.toString should include(
+        messages("typeOfSubcontractor.partnership")
+      )
+
+      row.actions shouldBe defined
+      row.actions.value.items shouldBe empty
+    }
+
+    "must return a SummaryListRow for a trust" in {
+
+      val maybeRow =
+        TypeOfSubcontractorSummary.row(TypeOfSubcontractor.Trust)
+
+      maybeRow shouldBe defined
+
+      val row = maybeRow.value
+
+      row.key.content.asHtml.toString should include(
+        messages("typeOfSubcontractor.checkYourAnswersLabel")
+      )
+
+      row.value.content.asHtml.toString should include(
+        messages("typeOfSubcontractor.trust")
+      )
+
+      row.actions shouldBe defined
+      row.actions.value.items shouldBe empty
+    }
+  }
 }

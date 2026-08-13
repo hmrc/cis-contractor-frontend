@@ -26,6 +26,8 @@ import org.scalatest.matchers.should.Matchers
 import pages.add.partnership.PartnershipNominatedPartnerCrnPage
 import play.api.i18n.Messages
 import play.api.test.Helpers.stubMessages
+import models.TypeOfSubcontractor
+import models.viewOnly.partnership.ViewOnlyPartnershipAnswers
 
 class PartnershipNominatedPartnerCrnSummarySpec
     extends AnyFreeSpec
@@ -125,6 +127,80 @@ class PartnershipNominatedPartnerCrnSummarySpec
       assertEscaped(html, "CRN &amp; Co &#x27;123&#x27;")
 
       assertNoDoubleEncoding(html)
+    }
+  }
+
+  "PartnershipNominatedPartnerCrnSummary.row(ViewOnlyPartnershipAnswers)" - {
+
+    def viewOnlyAnswers(
+                         nominatedPartnerCrn: Option[String]
+                       ): ViewOnlyPartnershipAnswers =
+      ViewOnlyPartnershipAnswers(
+        subcontractorType = TypeOfSubcontractor.Partnership,
+        showVerificationDetails = false,
+        partnershipName = None,
+        addressYesNo = None,
+        address = None,
+        partnershipContactMethodsYesNo = None,
+        partnershipContactMethodOptions = Set.empty,
+        email = None,
+        phone = None,
+        mobile = None,
+        hasUtrYesNo = None,
+        utr = None,
+        nominatedPartnerName = None,
+        nominatedPartnerUtrYesNo = None,
+        nominatedPartnerUtr = None,
+        nominatedPartnerNinoYesNo = None,
+        nominatedPartnerNino = None,
+        nominatedPartnerCrnYesNo = None,
+        nominatedPartnerCrn = nominatedPartnerCrn,
+        nominatedPartnerWorksReferenceYesNo = None,
+        nominatedPartnerWorksReference = None,
+        verificationNumber = None
+      )
+
+    "must return a SummaryListRow when the nominated partner CRN exists" in {
+
+      val answers = viewOnlyAnswers(Some("AC012345"))
+
+      val maybeRow = PartnershipNominatedPartnerCrnSummary.row(answers)
+
+      maybeRow shouldBe defined
+
+      val row = maybeRow.value
+
+      row.key.content.asHtml.toString should include(
+        messages("partnershipNominatedPartnerCrn.checkYourAnswersLabel")
+      )
+
+      row.value.content.asHtml.toString should include("AC012345")
+
+      row.actions shouldBe defined
+      row.actions.value.items shouldBe empty
+    }
+
+    "must return None when the nominated partner CRN does not exist" in {
+
+      val answers = viewOnlyAnswers(None)
+
+      PartnershipNominatedPartnerCrnSummary.row(answers) shouldBe None
+    }
+
+    "must HTML-escape special characters correctly in ViewOnly row" in {
+
+      val answers =
+        viewOnlyAnswers(Some("CRN & Co '123'"))
+
+      val row = PartnershipNominatedPartnerCrnSummary.row(answers).value
+
+      val html = extractHtml(row)
+
+      assertEscaped(html, "CRN &amp; Co &#x27;123&#x27;")
+
+      assertNoDoubleEncoding(html)
+
+      row.actions.value.items shouldBe empty
     }
   }
 }

@@ -19,6 +19,7 @@ package viewmodels.checkAnswers.add
 import controllers.add.routes
 import helpers.CyaEncodingSpecHelper
 import models.add.SubcontractorName
+import models.viewOnly.ViewOnlyIndividualAnswers
 import models.{AmendMode, CheckMode, UserAnswers}
 import org.scalatest.OptionValues.convertOptionToValuable
 import org.scalatest.TryValues.convertTryToSuccessOrFailure
@@ -145,6 +146,184 @@ class SubcontractorNameSummarySpec extends AnyFreeSpec with Matchers with CyaEnc
 
       assertEscaped(html, "O&#x27;Reilly A&amp;B Smith &amp; Co")
       assertNoDoubleEncoding(html)
+    }
+  }
+
+  "ViewOnly - SubcontractorNameSummary.row" - {
+
+    "must return a SummaryListRow when subcontractor name exists" in {
+
+      val subcontractorName = SubcontractorName(
+        firstName = "John",
+        middleName = Some("F."),
+        lastName = "Doe"
+      )
+
+      val answers =
+        ViewOnlyIndividualAnswers(
+          subcontractorType = models.TypeOfSubcontractor.Individualorsoletrader,
+          showVerificationDetails = false,
+          usesTradingName = None,
+          tradingName = None,
+          subcontractorName = Some(subcontractorName),
+          addressYesNo = None,
+          address = None,
+          individualContactMethodsYesNo = None,
+          individualContactMethod = Set.empty,
+          email = None,
+          phone = None,
+          mobile = None,
+          utrYesNo = None,
+          utr = None,
+          ninoYesNo = None,
+          nino = None,
+          worksReferenceYesNo = None,
+          worksReference = None,
+          verificationNumber = None
+        )
+
+      val maybeRow =
+        SubcontractorNameSummary.row(answers)
+
+      maybeRow shouldBe defined
+
+      val row = maybeRow.value
+
+      row.key.content.asHtml.toString should include(
+        messages("subcontractorName.checkYourAnswersLabel")
+      )
+
+      val expectedFullName =
+        Seq(Some("John"), Some("F."), Some("Doe")).flatten.mkString(" ")
+
+      row.value.content.asHtml.toString should include(expectedFullName)
+
+      row.actions shouldBe defined
+      row.actions.value.items shouldBe empty
+    }
+
+    "must return a SummaryListRow when subcontractor name has no middle name" in {
+
+      val subcontractorName = SubcontractorName(
+        firstName = "John",
+        middleName = None,
+        lastName = "Doe"
+      )
+
+      val answers =
+        ViewOnlyIndividualAnswers(
+          subcontractorType = models.TypeOfSubcontractor.Individualorsoletrader,
+          showVerificationDetails = false,
+          usesTradingName = None,
+          tradingName = None,
+          subcontractorName = Some(subcontractorName),
+          addressYesNo = None,
+          address = None,
+          individualContactMethodsYesNo = None,
+          individualContactMethod = Set.empty,
+          email = None,
+          phone = None,
+          mobile = None,
+          utrYesNo = None,
+          utr = None,
+          ninoYesNo = None,
+          nino = None,
+          worksReferenceYesNo = None,
+          worksReference = None,
+          verificationNumber = None
+        )
+
+      val maybeRow =
+        SubcontractorNameSummary.row(answers)
+
+      maybeRow shouldBe defined
+
+      val row = maybeRow.value
+
+      row.value.content.asHtml.toString should include("John Doe")
+      row.value.content.asHtml.toString should not include "John  Doe"
+
+      row.actions shouldBe defined
+      row.actions.value.items shouldBe empty
+    }
+
+    "must return None when subcontractor name does not exist" in {
+
+      val answers =
+        ViewOnlyIndividualAnswers(
+          subcontractorType = models.TypeOfSubcontractor.Individualorsoletrader,
+          showVerificationDetails = false,
+          usesTradingName = None,
+          tradingName = None,
+          subcontractorName = None,
+          addressYesNo = None,
+          address = None,
+          individualContactMethodsYesNo = None,
+          individualContactMethod = Set.empty,
+          email = None,
+          phone = None,
+          mobile = None,
+          utrYesNo = None,
+          utr = None,
+          ninoYesNo = None,
+          nino = None,
+          worksReferenceYesNo = None,
+          worksReference = None,
+          verificationNumber = None
+        )
+
+      SubcontractorNameSummary.row(answers) shouldBe None
+    }
+
+    "must HTML-escape special characters correctly" in {
+
+      val subcontractorName = SubcontractorName(
+        firstName = "O'Reilly",
+        middleName = Some("A&B"),
+        lastName = "Smith & Co"
+      )
+
+      val answers =
+        ViewOnlyIndividualAnswers(
+          subcontractorType = models.TypeOfSubcontractor.Individualorsoletrader,
+          showVerificationDetails = false,
+          usesTradingName = None,
+          tradingName = None,
+          subcontractorName = Some(subcontractorName),
+          addressYesNo = None,
+          address = None,
+          individualContactMethodsYesNo = None,
+          individualContactMethod = Set.empty,
+          email = None,
+          phone = None,
+          mobile = None,
+          utrYesNo = None,
+          utr = None,
+          ninoYesNo = None,
+          nino = None,
+          worksReferenceYesNo = None,
+          worksReference = None,
+          verificationNumber = None
+        )
+
+      val maybeRow =
+        SubcontractorNameSummary.row(answers)
+
+      maybeRow shouldBe defined
+
+      val row = maybeRow.value
+
+      val html = extractHtml(row)
+
+      assertEscaped(
+        html,
+        "O&#x27;Reilly A&amp;B Smith &amp; Co"
+      )
+
+      assertNoDoubleEncoding(html)
+
+      row.actions shouldBe defined
+      row.actions.value.items shouldBe empty
     }
   }
 }
