@@ -17,10 +17,11 @@
 package controllers.verify
 
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
+import models.Mode
+import pages.verify.CurrentVerificationBatchResponsePage
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import pages.verify.CurrentVerificationBatchResponsePage
 import services.VerificationService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
@@ -39,7 +40,7 @@ class CurrentVerificationBatchController @Inject() (
     with I18nSupport
     with Logging {
 
-  def onPageLoad(): Action[AnyContent] =
+  def onPageLoad(mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
       verificationBatchService
         .getCurrentVerificationBatch(request.userAnswers)
@@ -51,13 +52,12 @@ class CurrentVerificationBatchController @Inject() (
                   response.verifications.nonEmpty =>
               Redirect(
                 controllers.verify.routes.ModifyVerificationBatchAndVerificationsController
-                  .modifyVerificationBatch()
+                  .modifyVerificationBatch(mode)
               )
-
             case Some(_) =>
               Redirect(
                 controllers.verify.routes.CreateVerificationBatchAndVerificationsController
-                  .onSubmit()
+                  .onSubmit(mode)
               )
 
             case None =>
