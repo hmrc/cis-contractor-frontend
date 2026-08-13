@@ -467,6 +467,15 @@ removeInsufficientSubcontractorNameYesNo.heading                                
 removeInsufficientSubcontractorNameYesNo.hint                                       =  This means they will remain unverified, so you must not make any payments to them.
 removeInsufficientSubcontractorNameYesNo.error.required                             =  Select yes if you want to remove this subcontractor from this verification request
 
+unmatched.removeSubcontractorVerifyRequest.title                                    =  Are you sure you want to remove this subcontractor from this verification request?
+unmatched.removeSubcontractorVerifyRequest.heading                                  =  Are you sure you want to remove {0} from this verification request?
+unmatched.removeSubcontractorVerifyRequest.p1                                       =  This means they will remain unverified, so you must not make any payments to them.
+unmatched.removeSubcontractorVerifyRequest.error.required                           =  Select yes if you want to remove this subcontractor from this verification request
+unmatched.proceedSubcontractorVerifyRequest.title                                   =  Are you sure you want to proceed with verifying this subcontractor?
+unmatched.proceedSubcontractorVerifyRequest.heading                                 =  Are you sure you want to proceed with verifying {0}?
+unmatched.proceedSubcontractorVerifyRequest.p1                                      =  This will assign the higher rate tax treatment to this subcontractor.
+unmatched.proceedSubcontractorVerifyRequest.error.required                          =  Select yes if you want to proceed with verifying this subcontractor
+
 unmatchedSubcontractors.title                                                       =  You have unmatched subcontractors
 unmatchedSubcontractors.heading                                                     =  You have unmatched subcontractors
 unmatchedSubcontractors.p1                                                          =  Some of the subcontractor details in your most recent verification request do not match the information about that subcontractor held by HMRC.
