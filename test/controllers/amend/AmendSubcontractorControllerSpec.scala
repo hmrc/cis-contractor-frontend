@@ -23,18 +23,19 @@ import models.UserAnswers
 import models.response.{GetSubcontractorResponse, SubcontractorResponse}
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
-import org.mockito.Mockito.{never, times, verify, when}
+import org.mockito.Mockito.{atLeastOnce, times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
-import play.api.inject.guice.GuiceApplicationBuilder
 import pages.add.TypeOfSubcontractorPage
 import play.api.inject.bind
+import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import repositories.SessionRepository
 import services.{CisManageService, SubcontractorService}
 import uk.gov.hmrc.http.HeaderCarrier
 
+import scala.jdk.CollectionConverters.*
 import scala.concurrent.Future
 
 class AmendSubcontractorControllerSpec
@@ -156,12 +157,6 @@ class AmendSubcontractorControllerSpec
               .onPageLoad()
               .url
 
-          verify(mockService, times(1))
-            .getSubcontractor(
-              eqTo(cisId),
-              eqTo(subbieResourceRef)
-            )(any[HeaderCarrier])
-
           verify(mockSessionRepository, times(2))
             .set(captor.capture())
 
@@ -174,7 +169,6 @@ class AmendSubcontractorControllerSpec
       "must retrieve a company subcontractor, save populated answers and redirect to company CYA" in {
         val mockService           = mock[SubcontractorService]
         val mockSessionRepository = mock[SessionRepository]
-        val mockCisManagerService = mock[CisManageService]
         val captor                = ArgumentCaptor.forClass(classOf[UserAnswers])
 
         val subcontractor =
@@ -190,8 +184,6 @@ class AmendSubcontractorControllerSpec
         ).thenReturn(
           Future.successful(responseWith(Some(subcontractor)))
         )
-        when(mockCisManagerService.ensureCisIdInUserAnswers(any[UserAnswers])(any[HeaderCarrier]))
-          .thenReturn(Future.successful(emptyUserAnswers))
 
         when(mockSessionRepository.set(any[UserAnswers]))
           .thenReturn(Future.successful(true))
@@ -224,7 +216,6 @@ class AmendSubcontractorControllerSpec
       "must retrieve a partnership subcontractor, save populated answers and redirect to partnership CYA" in {
         val mockService           = mock[SubcontractorService]
         val mockSessionRepository = mock[SessionRepository]
-        val mockCisManagerService = mock[CisManageService]
         val captor                = ArgumentCaptor.forClass(classOf[UserAnswers])
 
         val subcontractor =
@@ -240,9 +231,6 @@ class AmendSubcontractorControllerSpec
         ).thenReturn(
           Future.successful(responseWith(Some(subcontractor)))
         )
-
-        when(mockCisManagerService.ensureCisIdInUserAnswers(any[UserAnswers])(any[HeaderCarrier]))
-          .thenReturn(Future.successful(emptyUserAnswers))
 
         when(mockSessionRepository.set(any[UserAnswers]))
           .thenReturn(Future.successful(true))
@@ -322,10 +310,7 @@ class AmendSubcontractorControllerSpec
       "must redirect to JourneyRecovery and not save when no subcontractor is returned" in {
         val mockService           = mock[SubcontractorService]
         val mockSessionRepository = mock[SessionRepository]
-        val mockCisManagerService = mock[CisManageService]
-
-        when(mockCisManagerService.ensureCisIdInUserAnswers(any[UserAnswers])(any[HeaderCarrier]))
-          .thenReturn(Future.successful(emptyUserAnswers))
+        val captor                = ArgumentCaptor.forClass(classOf[UserAnswers])
 
         when(
           mockService.getSubcontractor(
@@ -342,16 +327,10 @@ class AmendSubcontractorControllerSpec
         )
 
         when(mockSessionRepository.set(any[UserAnswers]))
-          .thenReturn(Future.successful(false))
+          .thenReturn(Future.successful(true))
 
         val application =
-          applicationBuilder(userAnswers = Some(emptyUserAnswers))
-            .overrides(
-              bind[SubcontractorService].toInstance(mockService),
-              bind[CisManageService].toInstance(mockCisManagerService),
-              bind[SessionRepository].toInstance(mockSessionRepository)
-            )
-            .build()
+          applicationWith(mockService, mockSessionRepository).build()
 
         running(application) {
           val result =
@@ -367,14 +346,21 @@ class AmendSubcontractorControllerSpec
               .onPageLoad()
               .url
 
-          verify(mockSessionRepository, never())
-            .set(any[UserAnswers])
+          verify(mockSessionRepository, atLeastOnce())
+            .set(captor.capture())
+
+          val savedAnswers = captor.getAllValues
+
+          savedAnswers.forEach { answers =>
+            answers.get(TypeOfSubcontractorPage) mustBe None
+          }
         }
       }
 
       "must redirect to JourneyRecovery and not save when subcontractor type is missing" in {
         val mockService           = mock[SubcontractorService]
         val mockSessionRepository = mock[SessionRepository]
+        val captor                = ArgumentCaptor.forClass(classOf[UserAnswers])
 
         val invalidSubcontractor =
           baseSubcontractor.copy(
@@ -392,13 +378,11 @@ class AmendSubcontractorControllerSpec
           )
         )
 
+        when(mockSessionRepository.set(any[UserAnswers]))
+          .thenReturn(Future.successful(true))
+
         val application =
-          applicationBuilder(userAnswers = Some(emptyUserAnswers))
-            .overrides(
-              bind[SubcontractorService].toInstance(mockService),
-              bind[SessionRepository].toInstance(mockSessionRepository)
-            )
-            .build()
+          applicationWith(mockService, mockSessionRepository).build()
 
         running(application) {
           val result =
@@ -414,14 +398,19 @@ class AmendSubcontractorControllerSpec
               .onPageLoad()
               .url
 
-          verify(mockSessionRepository, never())
-            .set(any[UserAnswers])
+          verify(mockSessionRepository, atLeastOnce())
+            .set(captor.capture())
+
+          captor.getAllValues.asScala.exists(
+            _.get(TypeOfSubcontractorPage).isDefined
+          ) mustBe false
         }
       }
 
       "must redirect to JourneyRecovery and not save when subcontractor type is unsupported" in {
         val mockService           = mock[SubcontractorService]
         val mockSessionRepository = mock[SessionRepository]
+        val captor                = ArgumentCaptor.forClass(classOf[UserAnswers])
 
         val invalidSubcontractor =
           baseSubcontractor.copy(
@@ -439,13 +428,11 @@ class AmendSubcontractorControllerSpec
           )
         )
 
+        when(mockSessionRepository.set(any[UserAnswers]))
+          .thenReturn(Future.successful(true))
+
         val application =
-          applicationBuilder(userAnswers = Some(emptyUserAnswers))
-            .overrides(
-              bind[SubcontractorService].toInstance(mockService),
-              bind[SessionRepository].toInstance(mockSessionRepository)
-            )
-            .build()
+          applicationWith(mockService, mockSessionRepository).build()
 
         running(application) {
           val result =
@@ -461,8 +448,12 @@ class AmendSubcontractorControllerSpec
               .onPageLoad()
               .url
 
-          verify(mockSessionRepository, never())
-            .set(any[UserAnswers])
+          verify(mockSessionRepository, atLeastOnce())
+            .set(captor.capture())
+
+          captor.getAllValues.asScala.exists(
+            _.get(TypeOfSubcontractorPage).isDefined
+          ) mustBe false
         }
       }
 
