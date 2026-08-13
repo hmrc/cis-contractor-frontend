@@ -17,11 +17,10 @@
 package controllers.amend.partnership
 
 import base.SpecBase
-import config.FrontendAppConfig
 import models.UserAnswers
 import models.amend.partnership.OriginalPartnershipAnswers
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.{never, reset, verify, verifyNoInteractions, when}
+import org.mockito.Mockito.*
 import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.mockito.MockitoSugar
 import pages.add.partnership.PartnershipNamePage
@@ -31,10 +30,10 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import queries.{CisIdQuery, OriginalPartnershipAnswersQuery}
 import repositories.SessionRepository
+import services.SubcontractorService
 import utils.DefaultSubcontractorCleanupService
 import viewmodels.checkAnswers.amend.partnership.AmendPartnershipConfirmationViewModel
 import views.html.amend.AmendConfirmationView
-import services.SubcontractorService
 
 import scala.concurrent.Future
 import scala.util.{Failure, Success}
@@ -131,10 +130,7 @@ class AmendPartnershipConfirmationControllerSpec extends SpecBase with MockitoSu
               original,
               userAnswersWithOriginal
             )(messages(app)),
-            partnershipName,
-            app.injector
-              .instanceOf[config.FrontendAppConfig]
-              .retrieveSubcontractorListUrl
+            partnershipName
           )(
             request,
             messages(app)
