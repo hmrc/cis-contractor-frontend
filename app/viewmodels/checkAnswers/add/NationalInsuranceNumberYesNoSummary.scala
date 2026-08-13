@@ -16,6 +16,7 @@
 
 package viewmodels.checkAnswers.add
 
+import models.amend.AmendIndividualRemoveDetail
 import models.{AmendMode, CheckMode, Mode, UserAnswers}
 import pages.add.NationalInsuranceNumberYesNoPage
 import play.api.i18n.Messages
@@ -38,7 +39,7 @@ object NationalInsuranceNumberYesNoSummary {
             "site.change",
             if answer && mode == AmendMode then
               controllers.amend.routes.AmendIndividualRemoveDetailYesNoController
-                .onPageLoad("national-insurance-number")
+                .onPageLoad(AmendIndividualRemoveDetail.NationalInsuranceNumber.key)
                 .url
             else controllers.add.routes.NationalInsuranceNumberYesNoController.onPageLoad(mode).url
           )
