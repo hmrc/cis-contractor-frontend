@@ -36,6 +36,7 @@ object IndividualPhoneNumberSummary {
             controllers.add.routes.IndividualPhoneNumberController.onPageLoad(mode).url
           )
             .withVisuallyHiddenText(messages("individualPhoneNumber.change.hidden"))
+            .withAttribute("id" -> "individual-phone-address")
         )
       )
     }
