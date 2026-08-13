@@ -441,10 +441,37 @@ class AmendIndividualRemoveDetailYesNoControllerSpec extends SpecBase with Mocki
             redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
           }
         }
+
+        "must redirect to the JourneyRecovery when failed to save remove detail answer in session" in {
+
+          val mockSessionRepository = mock[SessionRepository]
+
+          when(mockSessionRepository.set(any())).thenReturn(
+            Future.failed(new RuntimeException(s"\"Failed to save remove detail answer for '$subcontractorDetail'\""))
+          )
+
+          val application =
+            applicationBuilder(userAnswers = Some(uaWithTradingNameAndDetail(selectedDetail)))
+              .overrides(
+                bind[SessionRepository].toInstance(mockSessionRepository)
+              )
+              .build()
+
+          running(application) {
+            val request =
+              FakeRequest(POST, removeDetailYesNoRoute)
+                .withFormUrlEncodedBody(("value", "true"))
+
+            val result = route(application, request).value
+
+            status(result) mustEqual SEE_OTHER
+            redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+          }
+        }
       }
     }
 
-    "when subcontractorDetail is subcontractor-name " - {
+    "when subcontractorDetail is subcontractor-name" - {
       val form = formProvider()
 
       val subcontractorName = "John Smith"
@@ -652,6 +679,33 @@ class AmendIndividualRemoveDetailYesNoControllerSpec extends SpecBase with Mocki
       "must redirect to JourneyRecovery if detail is missing for a POST" in {
 
         val application = applicationBuilder(userAnswers = Some(uaWithSubcontractorName)).build()
+
+        running(application) {
+          val request =
+            FakeRequest(POST, removeDetailYesNoRoute)
+              .withFormUrlEncodedBody(("value", "true"))
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+        }
+      }
+
+      "must redirect to the JourneyRecovery when failed to save remove detail answer in session" in {
+
+        val mockSessionRepository = mock[SessionRepository]
+
+        when(mockSessionRepository.set(any())).thenReturn(
+          Future.failed(new RuntimeException("Failed to save remove detail answer for subcontractor-name"))
+        )
+
+        val application =
+          applicationBuilder(userAnswers = Some(uaWithSubcontractorNameAndDetail))
+            .overrides(
+              bind[SessionRepository].toInstance(mockSessionRepository)
+            )
+            .build()
 
         running(application) {
           val request =
@@ -885,6 +939,32 @@ class AmendIndividualRemoveDetailYesNoControllerSpec extends SpecBase with Mocki
         }
       }
 
+      "must redirect to the JourneyRecovery when failed to save remove detail answer in session" in {
+
+        val mockSessionRepository = mock[SessionRepository]
+
+        when(mockSessionRepository.set(any())).thenReturn(
+          Future.failed(new RuntimeException("Failed to save remove detail answer for trading-name"))
+        )
+
+        val application =
+          applicationBuilder(userAnswers = Some(uaWithTradingNameAndDetail(selectedDetail)))
+            .overrides(
+              bind[SessionRepository].toInstance(mockSessionRepository)
+            )
+            .build()
+
+        running(application) {
+          val request =
+            FakeRequest(POST, removeDetailYesNoRoute)
+              .withFormUrlEncodedBody(("value", "true"))
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+        }
+      }
     }
 
     "when subcontractorDetail is neither 'subcontractor-name', 'trading-name', 'address', 'contact-details', 'unique-taxpayer-reference' or 'works-reference-number'" - {
