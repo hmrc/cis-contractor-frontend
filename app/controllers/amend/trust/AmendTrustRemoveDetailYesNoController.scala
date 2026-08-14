@@ -22,6 +22,7 @@ import models.UserAnswers
 import models.amend.trust.AmendTrustRemoveDetail
 import pages.add.trust.*
 import pages.amend.trust.AmendTrustRemoveDetailYesNoPage
+import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import repositories.SessionRepository
@@ -42,7 +43,8 @@ class AmendTrustRemoveDetailYesNoController @Inject() (
   view: AmendTrustRemoveDetailYesNoView
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
-    with I18nSupport {
+    with I18nSupport
+    with Logging {
 
   private def withValidDetail(
     detail: String
@@ -146,7 +148,7 @@ class AmendTrustRemoveDetailYesNoController @Inject() (
                     )
                   ,
                   value =>
-                    for {
+                    (for {
                       updatedAnswers <-
                         Future.fromTry(
                           request.userAnswers
@@ -155,8 +157,14 @@ class AmendTrustRemoveDetailYesNoController @Inject() (
                         )
                       _              <- sessionRepository.set(updatedAnswers)
                     } yield Redirect(
-                      controllers.amend.trust.routes.AmendTrustCheckYourAnswersController.onPageLoad()
-                    )
+                      controllers.amend.trust.routes.AmendTrustCheckYourAnswersController.onPageLoad().url
+                    )).recover { case ex =>
+                      logger.error(
+                        s"Failed to save remove detail answer for '$subcontractorDetail'",
+                        ex
+                      )
+                      journeyRecovery
+                    }
                 )
             }
           }

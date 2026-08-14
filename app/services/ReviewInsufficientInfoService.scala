@@ -40,15 +40,21 @@ class ReviewInsufficientInfoService @Inject() (
   def buildViewModel(
     batch: GetCurrentVerificationBatchResponse
   )(implicit messages: Messages): ReviewInsufficientInfoViewModel = {
+    val batchSubs =
+      batch.verifications.flatMap { verification =>
+        batch.subcontractors
+          .find(sub => verification.subcontractorId.contains(sub.subcontractorId))
+          .map(sub => (sub, verification))
+      }
+
     val (readySubs, missingSubs) =
-      batch.subcontractors.partition { sub =>
-        val verification = batch.verifications.find(_.subcontractorId.contains(sub.subcontractorId))
-        VerificationBatchReadiness.isSubcontractorReady(sub, verification)
+      batchSubs.partition { case (sub, verification) =>
+        VerificationBatchReadiness.isSubcontractorReady(sub, Some(verification))
       }
 
     ReviewInsufficientInfoViewModel(
-      missing = missingSubs.map(toMissingRow),
-      ready = readySubs.map(toReadyRow)
+      missing = missingSubs.map { case (sub, _) => toMissingRow(sub) },
+      ready = readySubs.map { case (sub, _) => toReadyRow(sub) }
     )
   }
 

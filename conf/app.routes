@@ -97,6 +97,9 @@ GET   /subcontractor/amend/partnership/partnership-information  controllers.amen
 POST  /subcontractor/amend/partnership/partnership-information  controllers.amend.partnership.AmendPartnershipCheckYourAnswersController.onSubmit()
 GET   /subcontractor/amend/partnership/cancel                   controllers.amend.partnership.AmendPartnershipCheckYourAnswersController.onCancel()
 
+GET   /subcontractor/amend/company/remove/information/:subcontractorDetail  controllers.amend.company.AmendCompanyRemoveDetailYesNoController.onPageLoad(subcontractorDetail: String)
+POST  /subcontractor/amend/company/remove/information/:subcontractorDetail  controllers.amend.company.AmendCompanyRemoveDetailYesNoController.onSubmit(subcontractorDetail: String)
+
 GET   /subcontractor/amend/partnership/subcontractor-details-updated  controllers.amend.partnership.AmendPartnershipConfirmationController.onPageLoad()
 
 GET   /subcontractor/amend/company/subcontractor-details-updated  controllers.amend.company.AmendCompanyConfirmationController.onPageLoad()
@@ -123,6 +126,12 @@ POST  /subcontractor/remove-subcontractor-from-request  controllers.insufficient
 GET   /subcontractor/amend/cancel  controllers.amend.AmendIndividualCheckYourAnswersController.onCancel()
 
 GET   /subcontractor/amend/individual/subcontractor-details-updated  controllers.amend.AmendIndividualConfirmationController.onPageLoad()
+
+GET   /subcontractor/remove-unmatched-subcontractor-from-request  controllers.unmatched.RemoveSubcontractorVerifyRequestController.onPageLoad(mode: Mode = NormalMode)
+POST  /subcontractor/remove-unmatched-subcontractor-from-request  controllers.unmatched.RemoveSubcontractorVerifyRequestController.onSubmit(mode: Mode = NormalMode)
+
+GET   /subcontractor/proceed-verifying-unmatched-subcontractor  controllers.unmatched.ProceedSubcontractorVerifyRequestController.onPageLoad(mode: Mode = NormalMode)
+POST  /subcontractor/proceed-verifying-unmatched-subcontractor  controllers.unmatched.ProceedSubcontractorVerifyRequestController.onSubmit(mode: Mode = NormalMode)
 
 # Errors & Auth
 GET  /unauthorised/standard-user  controllers.UnauthorisedWrongRoleController.onPageLoad()
@@ -559,12 +568,13 @@ GET   /subcontractor/verify/polling                          controllers.verify.
 GET   /subcontractor/verify/no-subcontractors-added  controllers.verify.NoSubcontractorsAddedController.onPageLoad()
 
 GET   /subcontractor/verify/check-verification-batch-readiness             controllers.verify.CheckVerificationBatchReadinessController.checkVerificationBatchReadiness(mode: Mode = NormalMode)
-GET   /subcontractor/verify/check-verification-batch-readiness/check-mode  controllers.verify.CheckVerificationBatchReadinessController.checkVerificationBatchReadinessInCheckMode()
+GET   /subcontractor/verify/check-verification-batch-readiness/change      controllers.verify.CheckVerificationBatchReadinessController.checkVerificationBatchReadiness(mode: Mode = CheckMode)
 
 GET   /subcontractor/verify/newest                            controllers.verify.NewestVerificationBatchController.onPageLoad()
 GET   /subcontractor/verify/inactive-scheme-warning/continue  controllers.verify.NewestVerificationBatchController.onContinue
 
-GET   /subcontractor/verify/current  controllers.verify.CurrentVerificationBatchController.onPageLoad()
+GET  /subcontractor/verify/current                       controllers.verify.CurrentVerificationBatchController.onPageLoad(mode: Mode = NormalMode)
+GET  /subcontractor/verify/change-current                controllers.verify.CurrentVerificationBatchController.onPageLoad(mode: Mode = CheckMode)
 
 GET   /subcontractor/verify/verification-request-in-progress  controllers.verify.VerificationRequestInProgressController.onPageLoad()
 
@@ -578,8 +588,8 @@ POST  /subcontractor/verify/select-subcontractors-to-reverify         controller
 GET   /subcontractor/verify/change-select-subcontractors-to-reverify  controllers.verify.SelectSubcontractorsToReverifyController.onPageLoad(mode: Mode = CheckMode, page: Int ?= 1)
 POST  /subcontractor/verify/change-select-subcontractors-to-reverify  controllers.verify.SelectSubcontractorsToReverifyController.onSubmit(mode: Mode = CheckMode, page: Int ?= 1)
 
-GET   /subcontractor/verify/verification-batch/modify  controllers.verify.ModifyVerificationBatchAndVerificationsController.modifyVerificationBatch()
-POST  /subcontractor/verify/verification-batch/modify  controllers.verify.ModifyVerificationBatchAndVerificationsController.modifyVerificationBatch()
+GET /subcontractor/verify/verification-batch/modify             controllers.verify.ModifyVerificationBatchAndVerificationsController.modifyVerificationBatch(mode: Mode = NormalMode)
+GET /subcontractor/verify/verification-batch/change-modify      controllers.verify.ModifyVerificationBatchAndVerificationsController.modifyVerificationBatch(mode: Mode = CheckMode)
 
 GET   /subcontractor/verify/select-subcontractors-to-verify         controllers.verify.SelectSubcontractorController.onPageLoad(mode: Mode = NormalMode, page: Int ?= 1)
 POST  /subcontractor/verify/select-subcontractors-to-verify         controllers.verify.SelectSubcontractorController.onSubmit(mode: Mode = NormalMode, page: Int ?= 1)
@@ -613,14 +623,13 @@ GET   /subcontractor/verify/verification-request-submitted  controllers.verify.V
 
 GET   /subcontractor/verify/verification-sent-not-received-warning  controllers.verify.VerifySendErrorController.onPageLoad()
 
-POST  /subcontractor/verify/verification-batch-create  controllers.verify.CreateVerificationBatchAndVerificationsController.onSubmit()
-
 GET   /subcontractor/verify/check-your-answers  controllers.verify.VerifyCheckYourAnswersController.onPageLoad()
 POST  /subcontractor/verify/check-your-answers  controllers.verify.VerifyCheckYourAnswersController.onSubmit()
 
 GET   /subcontractor/verify/submission/create  controllers.verify.SubmissionSendingController.onPageLoad()
 
-GET   /subcontractor/verify/verification-batch-create  controllers.verify.CreateVerificationBatchAndVerificationsController.onSubmit()
+GET /subcontractor/verify/verification-batch-create               controllers.verify.CreateVerificationBatchAndVerificationsController.onSubmit(mode: Mode = NormalMode)
+GET /subcontractor/verify/verification-batch-change-create        controllers.verify.CreateVerificationBatchAndVerificationsController.onSubmit(mode: Mode = CheckMode)
 
 GET   /subcontractor/verify/verification-status/reverification-decision  controllers.verify.VerificationStatusController.goToReverificationDecision(mode: Mode = NormalMode)
 GET   /subcontractor/verify/verification-status/select-subcontractors    controllers.verify.VerificationStatusController.goToSelectSubcontractorsToReverify(mode: Mode = NormalMode)

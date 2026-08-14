@@ -95,6 +95,20 @@ class ReviewInsufficientInfoServiceSpec extends SpecBase with MockitoSugar with 
       pendingVerifications = None
     )
 
+  private def mkVerification(subcontractorId: Long): VerificationCurrentVerification =
+    VerificationCurrentVerification(
+      verificationId = subcontractorId,
+      verificationBatchId = None,
+      subcontractorId = Some(subcontractorId),
+      verificationResourceRef = None,
+      subcontractorName = None,
+      verificationNumber = None,
+      taxTreatment = None,
+      actionIndicator = None,
+      proceed = None,
+      matched = None
+    )
+
   private def build(subs: SubcontractorCurrentVerification*) =
     service.buildViewModel(
       GetCurrentVerificationBatchResponse(
@@ -227,6 +241,25 @@ class ReviewInsufficientInfoServiceSpec extends SpecBase with MockitoSugar with 
 
       vm.missing.map(_.name) mustBe Seq("Acme Ltd")
       vm.ready.map(_.name) mustBe Seq("Other Ltd")
+    }
+
+    "must only include subcontractors that are members of the current verification batch" in {
+      val inBatch    =
+        mkSub(id = 1L, tradingName = Some("Acme Ltd"), subcontractorType = Some("company"), utr = None)
+      val notInBatch =
+        mkSub(id = 2L, tradingName = Some("Other Ltd"), subcontractorType = Some("company"), utr = None)
+
+      val vm =
+        service.buildViewModel(
+          GetCurrentVerificationBatchResponse(
+            subcontractors = Seq(inBatch, notInBatch),
+            verificationBatch = None,
+            verifications = Seq(mkVerification(inBatch.subcontractorId))
+          )
+        )
+
+      vm.missing.map(_.name) mustBe Seq("Acme Ltd")
+      vm.ready mustBe empty
     }
   }
 
