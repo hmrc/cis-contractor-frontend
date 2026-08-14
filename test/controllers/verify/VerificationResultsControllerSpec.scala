@@ -41,7 +41,7 @@ class VerificationResultsControllerSpec extends SpecBase {
     verificationResourceRef = None,
     matched = Some("Y"),
     verificationNumber = Some("V0004528765"),
-taxTreatment = Some("net"),
+    taxTreatment = Some("net"),
     subcontractorName = Some("Hooper and Associates"),
     subcontractorId = Some(22L),
     actionIndicator = Some("verify")
