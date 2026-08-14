@@ -29,6 +29,7 @@ class UnmatchedSubcontractorsViewSpec extends SpecBase {
 
   "UnmatchedSubcontractorsView" - {
     "render the page with title, heading, paragraphs and link" in new Setup {
+      val link = "/subcontractor/verify/check-results"
       val html: HtmlFormat.Appendable = view()
       val doc: Document               = Jsoup.parse(html.body)
 
@@ -38,7 +39,7 @@ class UnmatchedSubcontractorsViewSpec extends SpecBase {
       doc.select("p").text     must include(messages("unmatchedSubcontractors.p2"))
       val verificationResultsLink = doc.select(".govuk-body a.govuk-link")
       verificationResultsLink.size() mustBe 1
-      verificationResultsLink.attr("href") mustEqual "#"
+      verificationResultsLink.attr("href") mustEqual link
       verificationResultsLink.text() mustBe
         messages("unmatchedSubcontractors.verificationResults.link")
     }
@@ -52,5 +53,4 @@ class UnmatchedSubcontractorsViewSpec extends SpecBase {
       play.api.i18n.Lang.defaultLang,
       app.injector.instanceOf[play.api.i18n.MessagesApi]
     )
-  }
-}
+  }}
