@@ -114,7 +114,7 @@ class ReviewInsufficientInfoServiceSpec extends SpecBase with MockitoSugar with 
       GetCurrentVerificationBatchResponse(
         subcontractors = subs,
         verificationBatch = None,
-        verifications = Nil
+        verifications = subs.map(sub => mkVerification(sub.subcontractorId))
       )
     )
 
