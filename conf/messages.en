@@ -395,6 +395,15 @@ individualContactMethodOptions.hint                                             
 individualContactMethodOptions.error.required                                       =  Select the methods of contact you want to add for this subcontractor
 individualContactMethodOptions.change.hidden                                        =  methods of contact
 
+amendCompanyRemoveDetailYesNo.title                                                 =  Are you sure you want to remove this information from this subcontractor?
+amendCompanyRemoveDetailYesNo.heading                                               =  Are you sure you want to remove the {1} for {0}?
+amendCompanyRemoveDetailYesNo.error.required                                        =  Select whether you want to remove this information from this subcontractor
+amendCompanyRemoveDetailYesNo.detail.address                                        =  address
+amendCompanyRemoveDetailYesNo.detail.contactDetails                                 =  contact details
+amendCompanyRemoveDetailYesNo.detail.utr                                            =  UTR
+amendCompanyRemoveDetailYesNo.detail.companyRegistrationNumber                      =  company registration number
+amendCompanyRemoveDetailYesNo.detail.worksReferenceNumber                           =  works reference number
+
 amendCheckYourAnswers.title                                                         =  Subcontractor information
 amendCheckYourAnswers.heading.subcontractorInformation.h2                           =  Subcontractor information
 amendCheckYourAnswers.heading.moreDetails.h2                                        =  More details
@@ -419,7 +428,7 @@ amendConfirmation.beforeYouGo.shareFeedback                                     
 amendConfirmation.table.content.none                                                =  None provided
 
 amendTrustRemoveDetailYesNo.title                                                   =  Are you sure you want to remove this information from this subcontractor?
-amendTrustRemoveDetailYesNo.heading                                                 =  Are you sure you want to remove the {1} from {0}?
+amendTrustRemoveDetailYesNo.heading                                                 =  Are you sure you want to remove the {1} for {0}?
 amendTrustRemoveDetailYesNo.error.required                                          =  Select whether you want to remove this information from this subcontractor
 amendTrustRemoveDetailYesNo.detail.address                                          =  address
 amendTrustRemoveDetailYesNo.detail.contactDetails                                   =  contact details
@@ -427,7 +436,7 @@ amendTrustRemoveDetailYesNo.detail.utr                                          
 amendTrustRemoveDetailYesNo.detail.worksReferenceNumber                             =  works reference number
 
 amendPartnershipRemoveDetailYesNo.title                                             =  Are you sure you want to remove this information from this subcontractor?
-amendPartnershipRemoveDetailYesNo.heading                                           =  Are you sure you want to remove the {0} from {1}?
+amendPartnershipRemoveDetailYesNo.heading                                           =  Are you sure you want to remove the {0} for {1}?
 amendPartnershipRemoveDetailYesNo.error.required                                    =  Select whether you want to remove this information from this subcontractor
 amendPartnershipRemoveDetailYesNo.detail.address                                    =  address
 amendPartnershipRemoveDetailYesNo.detail.contactDetails                             =  contact details
@@ -438,7 +447,7 @@ amendPartnershipRemoveDetailYesNo.detail.nominatedPartnerNino                   
 amendPartnershipRemoveDetailYesNo.detail.nominatedPartnerCompanyRegistrationNumber  =  nominated partner’s company registration number
 
 amendIndividualRemoveDetailYesNo.title                                              =  Are you sure you want to remove this information from this subcontractor?
-amendIndividualRemoveDetailYesNo.heading                                            =  Are you sure you want to remove the {1} from {0}?
+amendIndividualRemoveDetailYesNo.heading                                            =  Are you sure you want to remove the {1} for {0}?
 amendIndividualRemoveDetailYesNo.error.required                                     =  Select whether you want to remove this information from this subcontractor
 amendIndividualRemoveDetailYesNo.detail.tradingName                                 =  trading name
 amendIndividualRemoveDetailYesNo.detail.subcontractorName                           =  subcontractor name
@@ -457,6 +466,15 @@ removeInsufficientSubcontractorNameYesNo.title                                  
 removeInsufficientSubcontractorNameYesNo.heading                                    =  Are you sure you want to remove {0} from this verification request?
 removeInsufficientSubcontractorNameYesNo.hint                                       =  This means they will remain unverified, so you must not make any payments to them.
 removeInsufficientSubcontractorNameYesNo.error.required                             =  Select yes if you want to remove this subcontractor from this verification request
+
+unmatched.removeSubcontractorVerifyRequest.title                                    =  Are you sure you want to remove this subcontractor from this verification request?
+unmatched.removeSubcontractorVerifyRequest.heading                                  =  Are you sure you want to remove {0} from this verification request?
+unmatched.removeSubcontractorVerifyRequest.p1                                       =  This means they will remain unverified, so you must not make any payments to them.
+unmatched.removeSubcontractorVerifyRequest.error.required                           =  Select yes if you want to remove this subcontractor from this verification request
+unmatched.proceedSubcontractorVerifyRequest.title                                   =  Are you sure you want to proceed with verifying this subcontractor?
+unmatched.proceedSubcontractorVerifyRequest.heading                                 =  Are you sure you want to proceed with verifying {0}?
+unmatched.proceedSubcontractorVerifyRequest.p1                                      =  This will assign the higher rate tax treatment to this subcontractor.
+unmatched.proceedSubcontractorVerifyRequest.error.required                          =  Select yes if you want to proceed with verifying this subcontractor
 
 # Partnership
 removeInsufficientSubcontractorNameYesNo.title                            =  Do you want to add contact details for this partnership?

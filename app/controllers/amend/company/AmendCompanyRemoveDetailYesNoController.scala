@@ -14,35 +14,33 @@
  * limitations under the License.
  */
 
-package controllers.amend
+package controllers.amend.company
 
 import controllers.actions.*
-import forms.amend.AmendIndividualRemoveDetailYesNoFormProvider
-import models.{AmendMode, UserAnswers}
-import models.amend.AmendIndividualRemoveDetail
-import pages.add.*
-import pages.amend.AmendIndividualRemoveDetailYesNoPage
+import forms.amend.company.AmendCompanyRemoveDetailYesNoFormProvider
+import models.UserAnswers
+import models.amend.company.AmendCompanyRemoveDetail
+import pages.add.company.*
+import pages.amend.company.AmendCompanyRemoveDetailYesNoPage
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import utils.SubcontractorNameExtractor
-import views.html.amend.AmendIndividualRemoveDetailYesNoView
+import views.html.amend.company.AmendCompanyRemoveDetailYesNoView
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class AmendIndividualRemoveDetailYesNoController @Inject() (
+class AmendCompanyRemoveDetailYesNoController @Inject() (
   override val messagesApi: MessagesApi,
   sessionRepository: SessionRepository,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
-  formProvider: AmendIndividualRemoveDetailYesNoFormProvider,
-  subcontractorNameExtractor: SubcontractorNameExtractor,
+  formProvider: AmendCompanyRemoveDetailYesNoFormProvider,
   val controllerComponents: MessagesControllerComponents,
-  view: AmendIndividualRemoveDetailYesNoView
+  view: AmendCompanyRemoveDetailYesNoView
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport
@@ -51,9 +49,9 @@ class AmendIndividualRemoveDetailYesNoController @Inject() (
   private def withValidDetail(
     detail: String
   )(
-    action: AmendIndividualRemoveDetail => Future[Result]
+    action: AmendCompanyRemoveDetail => Future[Result]
   ): Future[Result] =
-    AmendIndividualRemoveDetail.fromKey(detail) match {
+    AmendCompanyRemoveDetail.fromKey(detail) match {
 
       case Some(detailType) =>
         action(detailType)
@@ -67,44 +65,34 @@ class AmendIndividualRemoveDetailYesNoController @Inject() (
     }
 
   private def detailIsPresent(
-    detail: AmendIndividualRemoveDetail,
+    detail: AmendCompanyRemoveDetail,
     userAnswers: UserAnswers
   ): Boolean =
     detail match {
 
-      case AmendIndividualRemoveDetail.TradingName =>
+      case AmendCompanyRemoveDetail.Address =>
         userAnswers
-          .get(SubTradingNameYesNoPage)
-          .contains(false)
-
-      case AmendIndividualRemoveDetail.SubcontractorName =>
-        userAnswers
-          .get(SubTradingNameYesNoPage)
+          .get(CompanyAddressYesNoPage)
           .contains(true)
 
-      case AmendIndividualRemoveDetail.Address =>
+      case AmendCompanyRemoveDetail.ContactDetails =>
         userAnswers
-          .get(SubAddressYesNoPage)
+          .get(AddCompanyContactMethodsYesNoPage)
           .contains(true)
 
-      case AmendIndividualRemoveDetail.ContactDetails =>
+      case AmendCompanyRemoveDetail.Utr =>
         userAnswers
-          .get(AddIndividualContactMethodsYesNoPage)
+          .get(CompanyUtrYesNoPage)
           .contains(true)
 
-      case AmendIndividualRemoveDetail.Utr =>
+      case AmendCompanyRemoveDetail.CompanyRegistrationNumber =>
         userAnswers
-          .get(UniqueTaxpayerReferenceYesNoPage)
+          .get(CompanyCrnYesNoPage)
           .contains(true)
 
-      case AmendIndividualRemoveDetail.NationalInsuranceNumber =>
+      case AmendCompanyRemoveDetail.WorksReferenceNumber =>
         userAnswers
-          .get(NationalInsuranceNumberYesNoPage)
-          .contains(true)
-
-      case AmendIndividualRemoveDetail.WorksReferenceNumber =>
-        userAnswers
-          .get(WorksReferenceNumberYesNoPage)
+          .get(CompanyWorksReferenceYesNoPage)
           .contains(true)
     }
 
@@ -115,9 +103,9 @@ class AmendIndividualRemoveDetailYesNoController @Inject() (
 
   def onPageLoad(subcontractorDetail: String): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
-      subcontractorNameExtractor
-        .getSubcontractorName(request.userAnswers)
-        .map { subcontractorName =>
+      request.userAnswers
+        .get(CompanyNamePage)
+        .map { companyName =>
           withValidDetail(subcontractorDetail) { detailType =>
             if (!detailIsPresent(detailType, request.userAnswers)) {
 
@@ -132,7 +120,7 @@ class AmendIndividualRemoveDetailYesNoController @Inject() (
               val subcontractorDetailTitle =
                 messages(detailType.messageKey)
 
-              Future.successful(Ok(view(subcontractorName, subcontractorDetail, subcontractorDetailTitle, form)))
+              Future.successful(Ok(view(companyName, subcontractorDetail, subcontractorDetailTitle, form)))
             }
           }
         }
@@ -141,9 +129,9 @@ class AmendIndividualRemoveDetailYesNoController @Inject() (
 
   def onSubmit(subcontractorDetail: String): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
-      subcontractorNameExtractor
-        .getSubcontractorName(request.userAnswers)
-        .map { subcontractorName =>
+      request.userAnswers
+        .get(CompanyNamePage)
+        .map { companyName =>
           withValidDetail(subcontractorDetail) { detailType =>
             if (!detailIsPresent(detailType, request.userAnswers)) {
 
@@ -154,14 +142,13 @@ class AmendIndividualRemoveDetailYesNoController @Inject() (
                 .bindFromRequest()
                 .fold(
                   formWithErrors =>
-                    val messages =
-                      messagesApi.preferred(request)
 
-                    val subcontractorDetailTitle =
-                      messages(detailType.messageKey)
+                    val messages = messagesApi.preferred(request)
+
+                    val subcontractorDetailTitle = messages(detailType.messageKey)
 
                     Future.successful(
-                      BadRequest(view(subcontractorName, subcontractorDetail, subcontractorDetailTitle, formWithErrors))
+                      BadRequest(view(companyName, subcontractorDetail, subcontractorDetailTitle, formWithErrors))
                     )
                   ,
                   value =>
@@ -169,24 +156,13 @@ class AmendIndividualRemoveDetailYesNoController @Inject() (
                       updatedAnswers <-
                         Future.fromTry(
                           request.userAnswers
-                            .set(AmendIndividualRemoveDetailYesNoPage(detailType), value)
-                            .flatMap(_.remove(AmendIndividualRemoveDetailYesNoPage(detailType)))
+                            .set(AmendCompanyRemoveDetailYesNoPage(detailType), value)
+                            .flatMap(_.remove(AmendCompanyRemoveDetailYesNoPage(detailType)))
                         )
                       _              <- sessionRepository.set(updatedAnswers)
-                    } yield
-                      if (value && subcontractorDetail == "trading-name") {
-                        Redirect(
-                          controllers.add.routes.SubcontractorNameController.onPageLoad(AmendMode)
-                        )
-                      } else if (value && subcontractorDetail == "subcontractor-name") {
-                        Redirect(
-                          controllers.add.routes.TradingNameOfSubcontractorController.onPageLoad(AmendMode)
-                        )
-                      } else {
-                        Redirect(
-                          controllers.amend.routes.AmendIndividualCheckYourAnswersController.onPageLoad()
-                        )
-                      }).recover { case ex =>
+                    } yield Redirect(
+                      controllers.amend.company.routes.AmendCompanyCheckYourAnswersController.onPageLoad()
+                    )).recover { case ex =>
                       logger.error(
                         s"Failed to save remove detail answer for '$subcontractorDetail'",
                         ex
