@@ -342,7 +342,7 @@ object IndividualAmendedViewModel {
     label: String,
     original: Option[String],
     current: UserAnswers,
-    missingValue: Messages=>String = missingValue
+    missingValue: Messages => String = missingValue
   )(implicit messages: Messages): Option[Seq[TableRow]] = {
     val currentVal = current.get(page)
 
@@ -367,4 +367,4 @@ object IndividualAmendedViewModel {
 
   private def missingSelect(implicit messages: Messages): String =
     messages("amendConfirmation.table.selectContent.none")
- }
+}

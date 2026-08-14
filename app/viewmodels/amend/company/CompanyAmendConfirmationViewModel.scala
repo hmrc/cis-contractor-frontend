@@ -231,7 +231,7 @@ object CompanyAmendConfirmationViewModel {
     label: String,
     original: Option[String],
     current: UserAnswers,
-    missingValue: Messages=>String = missingValue
+    missingValue: Messages => String = missingValue
   )(implicit messages: Messages): Option[Seq[TableRow]] = {
     val currentVal = current.get(page)
 
