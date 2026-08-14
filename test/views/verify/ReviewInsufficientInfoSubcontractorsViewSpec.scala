@@ -83,7 +83,7 @@ class ReviewInsufficientInfoSubcontractorsViewSpec extends SpecBase {
       table must not be null
 
       table.text must include("Brody, Martin")
-      table.text must include(messagesImpl("verify.reviewInsufficientInfo.utr.full"))
+      table.text must include(messagesImpl("verify.reviewInsufficientInfo.noneProvided"))
       table.text must include(messagesImpl("verify.reviewInsufficientInfo.action.edit"))
       table.text must include(messagesImpl("verify.reviewInsufficientInfo.action.proceed"))
       table.text must include(messagesImpl("verify.reviewInsufficientInfo.action.remove"))
