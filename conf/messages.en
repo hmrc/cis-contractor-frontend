@@ -935,7 +935,7 @@ verify.verifyYourSubcontractorsYesNo.p3                                 =  You m
 verify.verifyYourSubcontractorsYesNo.list.l1                            =  have recently changed any of their information
 verify.verifyYourSubcontractorsYesNo.list.l2                            =  have not been included on a return recently and have lost their verified status
 verify.verifyYourSubcontractorsYesNo.list.l3                            =  are about to lose their verified status
-verify.verifyYourSubcontractorsYesNo.heading2                           =  Do you want to add existing subcontractors to this verification request?
+verify.verifyYourSubcontractorsYesNo.heading2                           =  Do you want to reverify any existing subcontractors?
 verify.verifyYourSubcontractorsYesNo.error.required                     =  Select yes if you want to add existing subcontractors to this verification request
 
 verify.verificationRequestInProgress.title                              =  Verification request in progress
@@ -992,10 +992,10 @@ verify.reverifyExistingSubcontractorsYesNo.p2                           =  You m
 verify.reverifyExistingSubcontractorsYesNo.list.l1                      =  have recently changed any of their information
 verify.reverifyExistingSubcontractorsYesNo.list.l2                      =  have not been included on a return recently and have lost their verified status
 verify.reverifyExistingSubcontractorsYesNo.list.l3                      =  are about to lose their verified status
-verify.reverifyExistingSubcontractorsYesNo.subHeading                   =  Do you want to add other subcontractors to this verification request?
+verify.reverifyExistingSubcontractorsYesNo.subHeading                   =  Do you want to reverify any existing subcontractors?
 verify.reverifyExistingSubcontractorsYesNo.error.required               =  Select yes if you want to add existing subcontractors to this verification request
-verify.reverifyExistingSubcontractorsYesNo.checkYourAnswersLabel        =  Do you want to add other subcontractors to this verification request?
-verify.reverifyExistingSubcontractorsYesNo.change.hidden                =  do you want to add other subcontractors to this verification request?
+verify.reverifyExistingSubcontractorsYesNo.checkYourAnswersLabel        =  Do you want to reverify any existing subcontractors?
+verify.reverifyExistingSubcontractorsYesNo.change.hidden                =  do you want to reverify any existing subcontractors?
 
 verify.verifyDepartmentalError.title                                    =  There was a problem with your verification request
 verify.verifyDepartmentalError.heading                                  =  There was a problem with your verification request
