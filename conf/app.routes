@@ -127,6 +127,12 @@ GET   /subcontractor/amend/cancel  controllers.amend.AmendIndividualCheckYourAns
 
 GET   /subcontractor/amend/individual/subcontractor-details-updated  controllers.amend.AmendIndividualConfirmationController.onPageLoad()
 
+GET   /subcontractor/remove-unmatched-subcontractor-from-request  controllers.unmatched.RemoveSubcontractorVerifyRequestController.onPageLoad(mode: Mode = NormalMode)
+POST  /subcontractor/remove-unmatched-subcontractor-from-request  controllers.unmatched.RemoveSubcontractorVerifyRequestController.onSubmit(mode: Mode = NormalMode)
+
+GET   /subcontractor/proceed-verifying-unmatched-subcontractor  controllers.unmatched.ProceedSubcontractorVerifyRequestController.onPageLoad(mode: Mode = NormalMode)
+POST  /subcontractor/proceed-verifying-unmatched-subcontractor  controllers.unmatched.ProceedSubcontractorVerifyRequestController.onSubmit(mode: Mode = NormalMode)
+
 # Errors & Auth
 GET  /unauthorised/standard-user  controllers.UnauthorisedWrongRoleController.onPageLoad()
 
