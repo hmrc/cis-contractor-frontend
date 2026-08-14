@@ -869,6 +869,32 @@ class NewestVerificationBatchControllerSpec extends SpecBase with MockitoSugar w
       }
     }
 
+    "must redirect to CS-12 when SUBMITTED_NO_RECEIPT has an associated unmatched verification" in {
+      val mockService = mock[VerificationService]
+
+      val updatedAnswers =
+        submittedUserAnswers(
+          batchStatus = "SUBMITTED_NO_RECEIPT",
+          verificationRef = verificationResourceRef
+        )
+
+      when(mockService.refreshNewestVerificationBatch(any[UserAnswers])(any[HeaderCarrier]))
+        .thenReturn(Future.successful(updatedAnswers))
+
+      val application = appBuilder(mockService).build()
+
+      running(application) {
+        val result = route(application, FakeRequest(GET, endpointUrl)).value
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result).value mustBe
+          routes.UnmatchedSubcontractorsController.onPageLoad().url
+
+        verify(mockService).refreshNewestVerificationBatch(any[UserAnswers])(any[HeaderCarrier])
+        verifyNoMoreInteractions(mockService)
+      }
+    }
+
     "must continue to F4 when SUBMITTED_NO_RECEIPT has no associated unmatched verification" in {
       val mockService = mock[VerificationService]
 

@@ -45,13 +45,6 @@ object CheckUnmatchedSubcontractorsService {
     }
   }
 
-  def hasAssociatedUnmatchedVerification(
-    verifications: Seq[Verification],
-    subcontractors: Seq[Subcontractor]
-  ): Boolean =
-    reverificationDecisions(verifications, subcontractors)
-      .exists(_.considerForReverification)
-
   private def shouldConsiderForReverification(
     verification: Verification
   ): Boolean = {
