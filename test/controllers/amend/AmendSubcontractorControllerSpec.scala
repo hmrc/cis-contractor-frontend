@@ -34,6 +34,7 @@ import play.api.test.Helpers.*
 import repositories.SessionRepository
 import services.{CisManageService, SubcontractorService}
 import uk.gov.hmrc.http.HeaderCarrier
+import queries.CisIdQuery
 
 import scala.jdk.CollectionConverters.*
 import scala.concurrent.Future
@@ -49,7 +50,7 @@ class AmendSubcontractorControllerSpec
 
   private lazy val amendSubcontractorRoute =
     controllers.amend.routes.AmendSubcontractorController
-      .onPageLoad(cisId, subbieResourceRef)
+      .onPageLoad(subbieResourceRef)
       .url
 
   private val baseSubcontractor =
@@ -103,9 +104,17 @@ class AmendSubcontractorControllerSpec
     mockService: SubcontractorService,
     mockSessionRepository: SessionRepository
   ): GuiceApplicationBuilder = {
+
     val mockCisManagerService = mock[CisManageService]
+
+    val answersWithCisId =
+      emptyUserAnswers
+        .set(CisIdQuery, cisId)
+        .success
+        .value
+
     when(mockCisManagerService.ensureCisIdInUserAnswers(any[UserAnswers])(any[HeaderCarrier]))
-      .thenReturn(Future.successful(emptyUserAnswers))
+      .thenReturn(Future.successful(answersWithCisId))
 
     applicationBuilder(userAnswers = Some(emptyUserAnswers))
       .overrides(
@@ -325,6 +334,50 @@ class AmendSubcontractorControllerSpec
             )
           )
         )
+
+        when(mockSessionRepository.set(any[UserAnswers]))
+          .thenReturn(Future.successful(true))
+
+        val application =
+          applicationWith(mockService, mockSessionRepository).build()
+
+        running(application) {
+          val result =
+            route(
+              application,
+              FakeRequest(GET, amendSubcontractorRoute)
+            ).value
+
+          status(result) mustBe SEE_OTHER
+
+          redirectLocation(result).value mustBe
+            controllers.routes.JourneyRecoveryController
+              .onPageLoad()
+              .url
+
+          verify(mockSessionRepository, atLeastOnce())
+            .set(captor.capture())
+
+          val savedAnswers = captor.getAllValues
+
+          savedAnswers.forEach { answers =>
+            answers.get(TypeOfSubcontractorPage) mustBe None
+          }
+        }
+      }
+
+      "must redirect to JourneyRecovery when getSubcontractor is missing" in {
+        val mockService           = mock[SubcontractorService]
+        val mockSessionRepository = mock[SessionRepository]
+        val captor                = ArgumentCaptor.forClass(classOf[UserAnswers])
+
+        when(
+          mockService.getSubcontractor(
+            eqTo(cisId),
+            eqTo(subbieResourceRef)
+          )(any[HeaderCarrier])
+        )
+          .thenReturn(Future.failed(new RuntimeException("current batch failed")))
 
         when(mockSessionRepository.set(any[UserAnswers]))
           .thenReturn(Future.successful(true))

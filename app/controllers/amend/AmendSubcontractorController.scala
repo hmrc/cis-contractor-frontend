@@ -24,6 +24,7 @@ import models.{TypeOfSubcontractor, UserAnswers}
 import models.response.{GetSubcontractorResponse, SubcontractorResponse}
 import play.api.Logging
 import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents, Result}
+import queries.CisIdQuery
 import repositories.SessionRepository
 import services.{CisManageService, SubcontractorService}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -45,34 +46,49 @@ class AmendSubcontractorController @Inject() (
     with Logging {
 
   def onPageLoad(
-    cisId: String,
     subbieResourceRef: Long
   ): Action[AnyContent] =
     (identify andThen getData).async { implicit request =>
       val userAnswers = request.userAnswers.getOrElse(UserAnswers(request.userId))
+
       withAgentClientChecks(request.userId, request.isAgent, userAnswers)
         .flatMap {
           case Left(redirect)        => Future.successful(redirect)
           case Right(checkedAnswers) =>
-            subcontractorService
-              .getSubcontractor(cisId, subbieResourceRef)
-              .flatMap(
-                resolveSubcontractor(
-                  _,
-                  cisId,
-                  subbieResourceRef,
-                  userAnswers
-                )
-              )
-              .recover { case error =>
-                logger.error(
-                  s"[AmendSubcontractorController] Failed to retrieve subcontractor. " +
-                    s"cisId=$cisId, subbieResourceRef=$subbieResourceRef",
-                  error
-                )
+            checkedAnswers.get(CisIdQuery) match {
+              case None                 =>
+                logger.error("[AmendSubcontractorController] CIS ID missing from checked answers")
+                Future.successful(recovery)
+              case Some(validatedCisId) =>
+                subcontractorService
+                  .getSubcontractor(validatedCisId, subbieResourceRef)
+                  .flatMap(
+                    resolveSubcontractor(
+                      _,
+                      validatedCisId,
+                      subbieResourceRef,
+                      userAnswers
+                    )
+                  )
+                  .recover { case error =>
+                    logger.error(
+                      s"[AmendSubcontractorController] Failed to resolve subcontractor. " +
+                        s"cisId=$validatedCisId, subbieResourceRef=$subbieResourceRef",
+                      error
+                    )
 
-                recovery
-              }
+                    recovery
+                  }
+            }
+        }
+        .recover { case error =>
+          logger.error(
+            s"[AmendSubcontractorController] Failed to retrieve subcontractor. " +
+              s"cisId=${userAnswers.get(CisIdQuery)}, subbieResourceRef=$subbieResourceRef",
+            error
+          )
+
+          recovery
         }
     }
 
