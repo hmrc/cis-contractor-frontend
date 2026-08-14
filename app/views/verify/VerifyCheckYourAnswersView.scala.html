@@ -21,6 +21,7 @@
     layout: templates.Layout,
     govukSummaryList: GovukSummaryList,
     h1: H1,
+    h2: H2,
     govukButton: GovukButton,
     formHelper: FormWithCSRF,
     verificationDeclarationContent: VerificationDeclarationContent
@@ -36,6 +37,8 @@
         @h1("verify.verifyCheckYourAnswers.heading")
 
         @govukSummaryList(list)
+
+        @h2("verify.verificationDeclaration.heading")
 
         @verificationDeclarationContent()
 

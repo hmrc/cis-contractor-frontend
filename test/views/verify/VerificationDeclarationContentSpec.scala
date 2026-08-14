@@ -29,13 +29,6 @@ class VerificationDeclarationContentSpec extends AnyWordSpec with Matchers with 
 
   "VerificationDeclarationContent" should {
 
-    "render the declaration heading" in new Setup {
-      val doc = Jsoup.parse(view().toString())
-
-      doc.select("h2").text() mustBe
-        messages("verify.verificationDeclaration.heading")
-    }
-
     "render the declaration paragraph" in new Setup {
       val doc = Jsoup.parse(view().toString())
 
