@@ -106,7 +106,7 @@
             Table(
                 head = Some(Seq(
                     HeadCell(Text(messages("verify.reviewInsufficientInfo.name"))),
-                    HeadCell(Text(messages("verify.reviewInsufficientInfo.utr.full")))
+                    HeadCell(Text(messages("verify.reviewInsufficientInfo.utr")))
                 )),
                 rows = viewModel.ready.map { row =>
                     Seq(
