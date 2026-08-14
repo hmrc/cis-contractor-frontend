@@ -17,6 +17,7 @@
 package viewmodels.checkAnswers.add.company
 
 import base.SpecBase
+import models.amend.company.AmendCompanyRemoveDetail
 import models.{AmendMode, CheckMode, UserAnswers}
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import pages.add.company.CompanyAddressYesNoPage
@@ -80,8 +81,8 @@ class CompanyAddressYesNoSummarySpec extends SpecBase with GuiceOneAppPerSuite {
       actions.items must have size 1
 
       val action: ActionItem = actions.items.head
-      action.href mustBe controllers.add.company.routes.CompanyAddressYesNoController
-        .onPageLoad(AmendMode)
+      action.href mustBe controllers.amend.company.routes.AmendCompanyRemoveDetailYesNoController
+        .onPageLoad(AmendCompanyRemoveDetail.Address.key)
         .url
       action.content mustBe Text(messages("site.change"))
       action.visuallyHiddenText mustBe Some(messages("companyAddressYesNo.change.hidden"))
