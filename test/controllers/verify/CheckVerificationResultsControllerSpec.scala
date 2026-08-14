@@ -67,7 +67,7 @@ class CheckVerificationResultsControllerSpec extends SpecBase with MockitoSugar 
         VerificationBatchLastVerification(
           verificationBatchId = batchId,
           verifBatchResourceRef = Some(1234567L),
-          verificationBatchStatus = status
+          status = status
         )
       ),
       submission = None

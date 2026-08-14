@@ -77,7 +77,7 @@ class CheckVerificationResultsController @Inject() (
   private def routeFromResponse(response: GetLastSubmittedVerificationBatchResponse): Result = {
     val batchIdMissing = response.verificationBatch.flatMap(_.verificationBatchId).isEmpty
     val status         = response.verificationBatch
-      .flatMap(_.verificationBatchStatus)
+      .flatMap(_.status)
       .flatMap { raw =>
         val parsed = VerificationBatchStatus.from(raw)
         if (parsed.isEmpty) {
