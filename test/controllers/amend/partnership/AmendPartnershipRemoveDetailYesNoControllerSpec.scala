@@ -598,7 +598,7 @@ class AmendPartnershipRemoveDetailYesNoControllerSpec extends SpecBase with Mock
     }
 
     "when detail is utr" - {
-      val removeDetailYesNoUtrRoute: String =
+      lazy val removeDetailYesNoUtrRoute: String =
         controllers.amend.partnership.routes.AmendPartnershipRemoveDetailYesNoController
           .onPageLoad(AmendPartnershipRemoveDetail.Utr.key)
           .url
@@ -647,7 +647,7 @@ class AmendPartnershipRemoveDetailYesNoControllerSpec extends SpecBase with Mock
     }
 
     "when detail is NominatedPartnerUtr" - {
-      val removeDetailYesNoUtrRoute: String =
+      lazy val removeDetailYesNoUtrRoute: String =
         controllers.amend.partnership.routes.AmendPartnershipRemoveDetailYesNoController
           .onPageLoad(AmendPartnershipRemoveDetail.NominatedPartnerUtr.key)
           .url

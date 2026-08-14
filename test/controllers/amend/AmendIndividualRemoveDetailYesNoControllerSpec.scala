@@ -1062,7 +1062,7 @@ class AmendIndividualRemoveDetailYesNoControllerSpec extends SpecBase with Mocki
     }
 
     "when contractorDetail is utr" - {
-      val removeDetailYesNoUtrRoute: String =
+      lazy val removeDetailYesNoUtrRoute: String =
         controllers.amend.routes.AmendIndividualRemoveDetailYesNoController.onPageLoad("utr").url
 
       val verifiedSubcontractorUa =

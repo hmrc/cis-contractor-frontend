@@ -416,7 +416,7 @@ class AmendTrustRemoveDetailYesNoControllerSpec extends SpecBase with MockitoSug
     }
 
     "when contractorDetail is utr" - {
-      val removeDetailYesNoUtrRoute: String =
+      lazy val removeDetailYesNoUtrRoute: String =
         controllers.amend.trust.routes.AmendTrustRemoveDetailYesNoController.onPageLoad("utr").url
 
       val verifiedSubcontractorUa =
