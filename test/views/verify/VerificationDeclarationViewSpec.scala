@@ -17,10 +17,7 @@
 package views.verify
 
 import base.SpecBase
-import forms.verify.VerificationDeclarationFormProvider
-import models.{Mode, NormalMode}
 import org.jsoup.Jsoup
-import play.api.data.Form
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import views.html.verify.VerificationDeclarationView
@@ -37,16 +34,13 @@ class VerificationDeclarationViewSpec extends SpecBase {
         implicit val request = FakeRequest()
         implicit val msgs    = messages(application)
 
-        val view                = application.injector.instanceOf[VerificationDeclarationView]
-        val form: Form[Boolean] = application.injector.instanceOf[VerificationDeclarationFormProvider].apply()
-        val mode: Mode          = NormalMode
-
-        val html = view(form, mode)
+        val view = application.injector.instanceOf[VerificationDeclarationView]
+        val html = view()
         val doc  = Jsoup.parse(html.toString)
 
         doc.title() must include(msgs("verify.verificationDeclaration.title"))
 
-        doc.select("h2").text() must include(
+        doc.select("h1").text() must include(
           msgs("verify.verificationDeclaration.heading")
         )
 

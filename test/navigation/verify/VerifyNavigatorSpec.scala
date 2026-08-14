@@ -512,6 +512,14 @@ class VerifyNavigatorSpec extends SpecBase {
         ) mustBe cya
       }
 
+      "must go to VerifyCheckYourAnswers from VerificationDeclarationPage in CheckMode" in {
+        navigator.nextPage(
+          VerificationDeclarationPage,
+          CheckMode,
+          emptyUserAnswers
+        ) mustBe cya
+      }
+
       "VerifyYourSubcontractorsYesNoPage" - {
 
         "must go to SelectSubcontractorsToReverifyController when answer is true in CheckMode" in {
