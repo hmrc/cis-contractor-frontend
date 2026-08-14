@@ -29,7 +29,7 @@ class UnmatchedSubcontractorsViewSpec extends SpecBase {
 
   "UnmatchedSubcontractorsView" - {
     "render the page with title, heading, paragraphs and link" in new Setup {
-      val link = "/subcontractor/verify/check-results"
+      val link                        = "/subcontractor/verify/check-results"
       val html: HtmlFormat.Appendable = view()
       val doc: Document               = Jsoup.parse(html.body)
 
@@ -53,4 +53,5 @@ class UnmatchedSubcontractorsViewSpec extends SpecBase {
       play.api.i18n.Lang.defaultLang,
       app.injector.instanceOf[play.api.i18n.MessagesApi]
     )
-  }}
+  }
+}
