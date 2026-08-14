@@ -71,7 +71,7 @@ case class UnmatchedSubcontractorUpdate(
   detail: String,
   previous: Option[String],
   updated: Option[String],
-  missingValueKey: String = "unmatchedSubcontractorDetailsUpdated.noneProvided"
+  missingValueKey: String = "unmatched.unmatchedSubcontractorDetailsUpdated.noneProvided"
 )
 
 object UnmatchedSubcontractorUpdate {
@@ -81,7 +81,7 @@ object UnmatchedSubcontractorUpdate {
       (__ \ "previous").readNullable[String] and
       (__ \ "updated").readNullable[String] and
       (__ \ "missingValueKey").readWithDefault(
-        "insufficientSubcontractorDetailsUpdated.noneProvided"
+        "unmatched.unmatchedSubcontractorDetailsUpdated.noneProvided"
       )
   )(UnmatchedSubcontractorUpdate.apply)
 

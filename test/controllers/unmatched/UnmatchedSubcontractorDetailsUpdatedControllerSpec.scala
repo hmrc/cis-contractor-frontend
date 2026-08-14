@@ -108,7 +108,7 @@ class UnmatchedSubcontractorDetailsUpdatedControllerSpec extends SpecBase {
             )(messages(application)),
             subcontractorName = "Martin Brody",
             returnUrl = appConfig.manageYourSubcontractorsUrl(cisId),
-            returnTextKey = "unmatchedSubcontractorDetailsUpdated.yourSubcontractors",
+            returnTextKey = "unmatched.unmatchedSubcontractorDetailsUpdated.yourSubcontractors",
             showBeforeYouGo = true
           )(request, messages(application)).toString
       }
@@ -200,7 +200,7 @@ class UnmatchedSubcontractorDetailsUpdatedControllerSpec extends SpecBase {
             )(messages(application)),
             subcontractorName = "Martin Brody",
             returnUrl = "#",
-            returnTextKey = "unmatchedSubcontractorDetailsUpdated.cannotVerifyAllSubcontractors",
+            returnTextKey = "unmatched.unmatchedSubcontractorDetailsUpdated.cannotVerifyAllSubcontractors",
             showBeforeYouGo = false
           )(request, messages(application)).toString
       }
@@ -236,7 +236,7 @@ class UnmatchedSubcontractorDetailsUpdatedControllerSpec extends SpecBase {
             )(messages(application)),
             subcontractorName = "Martin Brody",
             returnUrl = "#",
-            returnTextKey = "unmatchedSubcontractorDetailsUpdated.reviewUnmatchedSubcontractors",
+            returnTextKey = "unmatched.unmatchedSubcontractorDetailsUpdated.reviewUnmatchedSubcontractors",
             showBeforeYouGo = false
           )(request, messages(application)).toString
       }

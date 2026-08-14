@@ -31,23 +31,23 @@
 @(rows: Seq[Seq[TableRow]], subcontractorName: String, returnUrl: String, returnTextKey: String, showBeforeYouGo: Boolean = false)(implicit request: Request[_], messages: Messages)
 
 @layout(
-    pageTitle = titleNoForm(messages("unmatchedSubcontractorDetailsUpdated.title")),
+    pageTitle = titleNoForm(messages("unmatched.unmatchedSubcontractorDetailsUpdated.title")),
     showBackLink = false
 ) {
 
     @govukPanel(Panel(
-        title = Text(messages("unmatchedSubcontractorDetailsUpdated.title"))
+        title = Text(messages("unmatched.unmatchedSubcontractorDetailsUpdated.title"))
     ))
 
-    @paragraph(messages("unmatchedSubcontractorDetailsUpdated.p1", subcontractorName))
+    @paragraph(messages("unmatched.unmatchedSubcontractorDetailsUpdated.p1", subcontractorName))
 
-    @h2("unmatchedSubcontractorDetailsUpdated.updatesMade.h2")
+    @h2("unmatched.unmatchedSubcontractorDetailsUpdated.updatesMade.h2")
 
     @govukTable(Table(
         head = Some(Seq(
-            HeadCell(Text(messages("unmatchedSubcontractorDetailsUpdated.table.hdr.details"))),
-            HeadCell(Text(messages("unmatchedSubcontractorDetailsUpdated.table.hdr.previous"))),
-            HeadCell(Text(messages("unmatchedSubcontractorDetailsUpdated.table.hdr.updated")))
+            HeadCell(Text(messages("unmatched.unmatchedSubcontractorDetailsUpdated.table.hdr.details"))),
+            HeadCell(Text(messages("unmatched.unmatchedSubcontractorDetailsUpdated.table.hdr.previous"))),
+            HeadCell(Text(messages("unmatched.unmatchedSubcontractorDetailsUpdated.table.hdr.updated")))
         )),
         rows = rows
     ))
@@ -56,21 +56,21 @@
         linkTextKey = returnTextKey,
         linkUrl = returnUrl,
         hasFullStop = true,
-        prefixTextKey = "unmatchedSubcontractorDetailsUpdated.backTo",
+        prefixTextKey = "unmatched.unmatchedSubcontractorDetailsUpdated.backTo",
         isNewTab = false
     )
 
     @if(showBeforeYouGo) {
 
-    @h2("unmatchedSubcontractorDetailsUpdated.beforeYouGo.h2")
+    @h2("unmatched.unmatchedSubcontractorDetailsUpdated.beforeYouGo.h2")
 
-    @paragraph(messages("unmatchedSubcontractorDetailsUpdated.beforeYouGo.p1"))
+    @paragraph(messages("unmatched.unmatchedSubcontractorDetailsUpdated.beforeYouGo.p1"))
 
     <p class="govuk-body">
         <a href="#" class="govuk-link">
-            @messages("unmatchedSubcontractorDetailsUpdated.beforeYouGo.takeAShortSurvey")
+            @messages("unmatched.unmatchedSubcontractorDetailsUpdated.beforeYouGo.takeAShortSurvey")
         </a>
-        @messages("unmatchedSubcontractorDetailsUpdated.beforeYouGo.shareFeedback")
+        @messages("unmatched.unmatchedSubcontractorDetailsUpdated.beforeYouGo.shareFeedback")
     </p>
 
     }

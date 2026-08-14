@@ -67,7 +67,7 @@ class UnmatchedSubcontractorDetailsUpdatedViewSpec extends SpecBase {
         ),
         TableRow(
           content = Text(
-            msgs("unmatchedSubcontractorDetailsUpdated.noneProvided")
+            msgs("unmatched.unmatchedSubcontractorDetailsUpdated.noneProvided")
           )
         ),
         TableRow(
@@ -122,29 +122,29 @@ class UnmatchedSubcontractorDetailsUpdatedViewSpec extends SpecBase {
   ): Unit = {
 
     document.select(".govuk-panel__title").text() mustEqual
-      msgs("unmatchedSubcontractorDetailsUpdated.title")
+      msgs("unmatched.unmatchedSubcontractorDetailsUpdated.title")
 
     document.text() must include(
       msgs(
-        "unmatchedSubcontractorDetailsUpdated.p1",
+        "unmatched.unmatchedSubcontractorDetailsUpdated.p1",
         subcontractorName
       )
     )
 
     document.text() must include(
-      msgs("unmatchedSubcontractorDetailsUpdated.updatesMade.h2")
+      msgs("unmatched.unmatchedSubcontractorDetailsUpdated.updatesMade.h2")
     )
 
     document.select("th").text() must include(
-      msgs("unmatchedSubcontractorDetailsUpdated.table.hdr.details")
+      msgs("unmatched.unmatchedSubcontractorDetailsUpdated.table.hdr.details")
     )
 
     document.select("th").text() must include(
-      msgs("unmatchedSubcontractorDetailsUpdated.table.hdr.previous")
+      msgs("unmatched.unmatchedSubcontractorDetailsUpdated.table.hdr.previous")
     )
 
     document.select("th").text() must include(
-      msgs("unmatchedSubcontractorDetailsUpdated.table.hdr.updated")
+      msgs("unmatched.unmatchedSubcontractorDetailsUpdated.table.hdr.updated")
     )
 
     document.text() must include("Add UTR?")
@@ -154,7 +154,7 @@ class UnmatchedSubcontractorDetailsUpdatedViewSpec extends SpecBase {
     document.text() must include(utr)
 
     document.text() must include(
-      msgs("unmatchedSubcontractorDetailsUpdated.noneProvided")
+      msgs("unmatched.unmatchedSubcontractorDetailsUpdated.noneProvided")
     )
   }
 
@@ -163,13 +163,13 @@ class UnmatchedSubcontractorDetailsUpdatedViewSpec extends SpecBase {
   ): Unit = {
 
     document.text() must not include
-      msgs("unmatchedSubcontractorDetailsUpdated.beforeYouGo.h2")
+      msgs("unmatched.unmatchedSubcontractorDetailsUpdated.beforeYouGo.h2")
 
     document.text() must not include
-      msgs("unmatchedSubcontractorDetailsUpdated.beforeYouGo.p1")
+      msgs("unmatched.unmatchedSubcontractorDetailsUpdated.beforeYouGo.p1")
 
     document.text() must not include
-      msgs("unmatchedSubcontractorDetailsUpdated.beforeYouGo.takeAShortSurvey")
+      msgs("unmatched.unmatchedSubcontractorDetailsUpdated.beforeYouGo.takeAShortSurvey")
 
     document.text() must not include
       msgs("unmatchedSubcontractorDetailsUpdated.beforeYouGo.shareFeedback")
@@ -182,7 +182,7 @@ class UnmatchedSubcontractorDetailsUpdatedViewSpec extends SpecBase {
       val document =
         renderView(
           returnUrl = "#",
-          returnTextKey = "unmatchedSubcontractorDetailsUpdated.cannotVerifyAllSubcontractors",
+          returnTextKey = "unmatched.unmatchedSubcontractorDetailsUpdated.cannotVerifyAllSubcontractors",
           showBeforeYouGo = false
         )
 
@@ -191,24 +191,24 @@ class UnmatchedSubcontractorDetailsUpdatedViewSpec extends SpecBase {
       val cannotVerifyLink =
         linkWithText(
           document,
-          msgs("unmatchedSubcontractorDetailsUpdated.cannotVerifyAllSubcontractors")
+          msgs("unmatched.unmatchedSubcontractorDetailsUpdated.cannotVerifyAllSubcontractors")
         )
 
       cannotVerifyLink.attr("href") mustEqual "#"
 
       assertLinkIsNotShown(
         document,
-        msgs("unmatchedSubcontractorDetailsUpdated.reviewUnmatchedSubcontractors")
+        msgs("unmatched.unmatchedSubcontractorDetailsUpdated.reviewUnmatchedSubcontractors")
       )
 
       assertLinkIsNotShown(
         document,
-        msgs("unmatchedSubcontractorDetailsUpdated.yourSubcontractors")
+        msgs("unmatched.unmatchedSubcontractorDetailsUpdated.yourSubcontractors")
       )
 
       assertLinkIsNotShown(
         document,
-        msgs("unmatchedSubcontractorDetailsUpdated.beforeYouGo.takeAShortSurvey")
+        msgs("unmatched.unmatchedSubcontractorDetailsUpdated.beforeYouGo.takeAShortSurvey")
       )
 
       assertBeforeYouGoHidden(document)
@@ -219,7 +219,7 @@ class UnmatchedSubcontractorDetailsUpdatedViewSpec extends SpecBase {
       val document =
         renderView(
           returnUrl = "#",
-          returnTextKey = "unmatchedSubcontractorDetailsUpdated.reviewUnmatchedSubcontractors",
+          returnTextKey = "unmatched.unmatchedSubcontractorDetailsUpdated.reviewUnmatchedSubcontractors",
           showBeforeYouGo = false
         )
 
@@ -228,24 +228,24 @@ class UnmatchedSubcontractorDetailsUpdatedViewSpec extends SpecBase {
       val reviewUnmatchedLink =
         linkWithText(
           document,
-          msgs("unmatchedSubcontractorDetailsUpdated.reviewUnmatchedSubcontractors")
+          msgs("unmatched.unmatchedSubcontractorDetailsUpdated.reviewUnmatchedSubcontractors")
         )
 
       reviewUnmatchedLink.attr("href") mustEqual "#"
 
       assertLinkIsNotShown(
         document,
-        msgs("unmatchedSubcontractorDetailsUpdated.cannotVerifyAllSubcontractors")
+        msgs("unmatched.unmatchedSubcontractorDetailsUpdated.cannotVerifyAllSubcontractors")
       )
 
       assertLinkIsNotShown(
         document,
-        msgs("unmatchedSubcontractorDetailsUpdated.yourSubcontractors")
+        msgs("unmatched.unmatchedSubcontractorDetailsUpdated.yourSubcontractors")
       )
 
       assertLinkIsNotShown(
         document,
-        msgs("unmatchedSubcontractorDetailsUpdated.beforeYouGo.takeAShortSurvey")
+        msgs("unmatched.unmatchedSubcontractorDetailsUpdated.beforeYouGo.takeAShortSurvey")
       )
 
       assertBeforeYouGoHidden(document)
@@ -259,7 +259,7 @@ class UnmatchedSubcontractorDetailsUpdatedViewSpec extends SpecBase {
       val document =
         renderView(
           returnUrl = manageUrl,
-          returnTextKey = "unmatchedSubcontractorDetailsUpdated.yourSubcontractors",
+          returnTextKey = "unmatched.unmatchedSubcontractorDetailsUpdated.yourSubcontractors",
           showBeforeYouGo = true
         )
 
@@ -268,7 +268,7 @@ class UnmatchedSubcontractorDetailsUpdatedViewSpec extends SpecBase {
       val yourSubcontractorsLink =
         linkWithText(
           document,
-          msgs("unmatchedSubcontractorDetailsUpdated.yourSubcontractors")
+          msgs("unmatched.unmatchedSubcontractorDetailsUpdated.yourSubcontractors")
         )
 
       yourSubcontractorsLink.attr("href") mustEqual manageUrl
@@ -276,31 +276,31 @@ class UnmatchedSubcontractorDetailsUpdatedViewSpec extends SpecBase {
       val surveyLink =
         linkWithText(
           document,
-          msgs("unmatchedSubcontractorDetailsUpdated.beforeYouGo.takeAShortSurvey")
+          msgs("unmatched.unmatchedSubcontractorDetailsUpdated.beforeYouGo.takeAShortSurvey")
         )
 
       surveyLink.attr("href") mustEqual "#"
 
       assertLinkIsNotShown(
         document,
-        msgs("unmatchedSubcontractorDetailsUpdated.cannotVerifyAllSubcontractors")
+        msgs("unmatched.unmatchedSubcontractorDetailsUpdated.cannotVerifyAllSubcontractors")
       )
 
       assertLinkIsNotShown(
         document,
-        msgs("unmatchedSubcontractorDetailsUpdated.reviewUnmatchedSubcontractors")
+        msgs("unmatched.unmatchedSubcontractorDetailsUpdated.reviewUnmatchedSubcontractors")
       )
 
       document.text() must include(
-        msgs("unmatchedSubcontractorDetailsUpdated.beforeYouGo.h2")
+        msgs("unmatched.unmatchedSubcontractorDetailsUpdated.beforeYouGo.h2")
       )
 
       document.text() must include(
-        msgs("unmatchedSubcontractorDetailsUpdated.beforeYouGo.p1")
+        msgs("unmatched.unmatchedSubcontractorDetailsUpdated.beforeYouGo.p1")
       )
 
       document.text() must include(
-        msgs("unmatchedSubcontractorDetailsUpdated.beforeYouGo.shareFeedback")
+        msgs("unmatched.unmatchedSubcontractorDetailsUpdated.beforeYouGo.shareFeedback")
       )
     }
   }
