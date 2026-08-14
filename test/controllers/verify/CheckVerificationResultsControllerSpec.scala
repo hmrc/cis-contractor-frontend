@@ -59,7 +59,7 @@ class CheckVerificationResultsControllerSpec extends SpecBase with MockitoSugar 
           verificationResourceRef = Some(12345L),
           matched = Some("Y"),
           verificationNumber = Some("V0000000001"),
-taxTreatment = Some("net"),
+          taxTreatment = Some("net"),
           subcontractorName = Some("John Smith"),
           subcontractorId = Some(22L),
           actionIndicator = Some("verify")
