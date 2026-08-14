@@ -978,7 +978,6 @@ verify.reviewInsufficientInfo.missing.subheading                        =  Subco
 verify.reviewInsufficientInfo.ready.subheading                          =  Ready for verification
 verify.reviewInsufficientInfo.name                                      =  Name
 verify.reviewInsufficientInfo.utr                                       =  UTR
-verify.reviewInsufficientInfo.utr.full                                  =  Unique Taxpayer Reference
 verify.reviewInsufficientInfo.noneProvided                              =  None provided
 verify.reviewInsufficientInfo.actions                                   =  Actions
 verify.reviewInsufficientInfo.action.edit                               =  Edit
