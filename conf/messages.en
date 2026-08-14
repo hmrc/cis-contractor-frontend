@@ -980,7 +980,6 @@ verify.reviewInsufficientInfo.name                                      =  Name
 verify.reviewInsufficientInfo.utr                                       =  UTR
 verify.reviewInsufficientInfo.noneProvided                              =  None provided
 verify.reviewInsufficientInfo.utr.full                                  =  Unique Taxpayer Reference
-verify.reviewInsufficientInfo.utr.noneProvided                          =  None provided
 verify.reviewInsufficientInfo.actions                                   =  Actions
 verify.reviewInsufficientInfo.action.edit                               =  Edit
 verify.reviewInsufficientInfo.action.proceed                            =  Proceed
