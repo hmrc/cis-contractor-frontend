@@ -37,6 +37,7 @@ class VerificationResultsViewModelSpec extends SpecBase {
       verificationNumber = verificationNumber,
       taxTreatment = taxTreatment,
       subcontractorName = subcontractorName,
+      subcontractorId = Some(1L),
       actionIndicator = actionIndicator
     )
 
