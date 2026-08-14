@@ -22,7 +22,6 @@ import models.verify.ContractorEmailConfirmationStored.{CurrentEmail, DifferentE
 import models.verify.SelectedSubcontractors
 import models.{ContractorScheme, Subcontractor, SubcontractorViewModel}
 import models.response.GetNewestVerificationBatchResponse
-
 import org.scalatestplus.mockito.MockitoSugar
 import org.jsoup.Jsoup
 import pages.verify._
