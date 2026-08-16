@@ -644,6 +644,7 @@ GET   /subcontractor/verify/subcontractors-have-missing-information  controllers
 POST   /subcontractor/verify/subcontractors-have-missing-information  controllers.verify.ReviewInsufficientInfoSubcontractorsController.onSubmit()
 
 # Contractor Details
+GET   /contractor-details/manage  controllers.contractordetails.ManageContractorDetailsController.onPageLoad()
 GET   /contractor-details/introduction  controllers.contractordetails.ContractorDetailsController.onPageLoad()
 POST  /contractor-details/introduction  controllers.contractordetails.ContractorDetailsController.onSubmit()
 

@@ -18,7 +18,7 @@ package controllers.contractordetails
 
 import base.SpecBase
 import org.scalatestplus.mockito.MockitoSugar
-import pages.contractordetails.{ContractorUtrPage, EnterContractorEmailAddressPage, SchemeNamePage}
+import pages.contractordetails.{AccountsOfficeReferencePage, ContractorUtrPage, EnterContractorEmailAddressPage, SchemeNamePage}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 
@@ -32,6 +32,9 @@ class ContractorDetailsCheckAnswersControllerSpec extends SpecBase with MockitoS
 
       val userAnswers =
         emptyUserAnswers
+          .set(AccountsOfficeReferencePage, "123 PA 87654321")
+          .success
+          .value
           .set(ContractorUtrPage, "1234567890")
           .success
           .value
@@ -56,33 +59,59 @@ class ContractorDetailsCheckAnswersControllerSpec extends SpecBase with MockitoS
 
         status(result) mustEqual OK
 
-        body must include(accountsOfficeReference)
+        body must include("123 PA 87654321")
         body must include("1234567890")
         body must include("Scheme ABC")
         body must include("test@mail.com")
       }
     }
 
-    "must return OK and show the empty-state Add Details link when no answers exist" in {
+    "must redirect to JourneyRecovery when AccountsOfficeReferencePage is missing" in {
 
-      val application = applicationBuilder(Some(emptyUserAnswers)).build()
+      val application =
+        applicationBuilder(Some(emptyUserAnswers)).build()
 
       running(application) {
 
         val request = FakeRequest(
           GET,
-          controllers.contractordetails.routes.ContractorDetailsCheckAnswersController.onPageLoad().url
+          routes.ContractorDetailsCheckAnswersController.onPageLoad().url
         )
 
         val result = route(application, request).value
-        val body   = contentAsString(result)
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(result).value mustEqual
+          controllers.routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must render the page when only AccountsOfficeReferencePage exists" in {
+
+      val userAnswers =
+        emptyUserAnswers
+          .set(AccountsOfficeReferencePage, "123 PA 87654321")
+          .success
+          .value
+
+      val application =
+        applicationBuilder(Some(userAnswers)).build()
+
+      running(application) {
+
+        val request = FakeRequest(
+          GET,
+          routes.ContractorDetailsCheckAnswersController.onPageLoad().url
+        )
+
+        val result = route(application, request).value
 
         status(result) mustEqual OK
 
-        body must include(accountsOfficeReference)
-        body must not include "Contractor UTR"
-        body must not include "Scheme ABC"
-        body must not include "Email"
+        val body = contentAsString(result)
+
+        body must include("123 PA 87654321")
       }
     }
   }
