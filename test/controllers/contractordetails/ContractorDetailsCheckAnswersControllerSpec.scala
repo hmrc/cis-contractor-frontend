@@ -17,14 +17,24 @@
 package controllers.contractordetails
 
 import base.SpecBase
+import models.Scheme
 import org.scalatestplus.mockito.MockitoSugar
-import pages.contractordetails.{AccountsOfficeReferencePage, ContractorUtrPage, EnterContractorEmailAddressPage, SchemeNamePage}
+import pages.contractordetails.{ContractorSchemePage, ContractorUtrPage, EnterContractorEmailAddressPage, SchemeNamePage}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 
 class ContractorDetailsCheckAnswersControllerSpec extends SpecBase with MockitoSugar {
 
-  val accountsOfficeReference = "123 PA 87654321"
+  private val scheme = Scheme(
+    schemeId = 123,
+    instanceId = "cisId",
+    accountsOfficeReference = "123 PA 87654321",
+    taxOfficeNumber = "123",
+    taxOfficeReference = "45678",
+    utr = Some("1234567890"),
+    name = Some("Scheme ABC"),
+    emailAddress = Some("test@mail.com")
+  )
 
   "ContractorDetailsCheckAnswersController" - {
 
@@ -32,7 +42,7 @@ class ContractorDetailsCheckAnswersControllerSpec extends SpecBase with MockitoS
 
       val userAnswers =
         emptyUserAnswers
-          .set(AccountsOfficeReferencePage, "123 PA 87654321")
+          .set(ContractorSchemePage, scheme)
           .success
           .value
           .set(ContractorUtrPage, "1234567890")
@@ -66,7 +76,7 @@ class ContractorDetailsCheckAnswersControllerSpec extends SpecBase with MockitoS
       }
     }
 
-    "must redirect to JourneyRecovery when AccountsOfficeReferencePage is missing" in {
+    "must redirect to JourneyRecovery when ContractorSchemePage is missing" in {
 
       val application =
         applicationBuilder(Some(emptyUserAnswers)).build()
@@ -87,11 +97,11 @@ class ContractorDetailsCheckAnswersControllerSpec extends SpecBase with MockitoS
       }
     }
 
-    "must render the page when only AccountsOfficeReferencePage exists" in {
+    "must render the page when only ContractorSchemePage exists" in {
 
       val userAnswers =
         emptyUserAnswers
-          .set(AccountsOfficeReferencePage, "123 PA 87654321")
+          .set(ContractorSchemePage, scheme)
           .success
           .value
 

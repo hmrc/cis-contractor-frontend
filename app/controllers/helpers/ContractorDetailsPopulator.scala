@@ -51,11 +51,6 @@ object ContractorDetailsPopulator {
                  EnterContractorEmailAddressPage,
                  scheme.emailAddress.getOrElse("")
                )
-
-        ua6 <- ua5.set(
-                 AccountsOfficeReferencePage,
-                 scheme.accountsOfficeReference
-               )
-      } yield ua6
+      } yield ua5
     ).getOrElse(userAnswers)
 }

@@ -18,9 +18,11 @@ package controllers.contractordetails
 
 import base.SpecBase
 import models.{Scheme, UserAnswers}
+import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
-import org.mockito.Mockito.when
+import org.mockito.Mockito.{atLeastOnce, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
+import pages.contractordetails.ContractorSchemePage
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.FakeRequest
@@ -31,6 +33,7 @@ import services.{CisManageService, ContractorDetailsService}
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.Future
+import scala.jdk.CollectionConverters.*
 
 class ManageContractorDetailsControllerSpec extends SpecBase with MockitoSugar {
 
@@ -177,6 +180,59 @@ class ManageContractorDetailsControllerSpec extends SpecBase with MockitoSugar {
           controllers.contractordetails.routes.ContractorDetailsController
             .onPageLoad()
             .url
+      }
+    }
+
+    "must store the scheme in user answers before redirecting to check answers" in {
+
+      val userAnswers =
+        emptyUserAnswers
+          .set(CisIdQuery, "cisId")
+          .success
+          .value
+
+      when(
+        mockContractorDetailsService.getScheme(any[String])(any())
+      ).thenReturn(
+        Future.successful(schemeWithUtr)
+      )
+
+      when(
+        mockSessionRepository.set(any[UserAnswers])
+      ).thenReturn(
+        Future.successful(true)
+      )
+
+      val application =
+        applicationWith(
+          userAnswers,
+          mockContractorDetailsService,
+          mockSessionRepository
+        ).build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(
+            GET,
+            routes.ManageContractorDetailsController.onPageLoad().url
+          )
+
+        val result =
+          route(application, request).value
+
+        status(result) mustBe SEE_OTHER
+
+        val userAnswersCaptor =
+          ArgumentCaptor.forClass(classOf[UserAnswers])
+
+        verify(mockSessionRepository, atLeastOnce())
+          .set(userAnswersCaptor.capture())
+
+        val savedAnswers =
+          userAnswersCaptor.getAllValues.asScala.last
+
+        savedAnswers.get(ContractorSchemePage) mustBe Some(schemeWithUtr)
       }
     }
 

@@ -48,7 +48,6 @@ class ContractorDetailsPopulatorSpec extends SpecBase {
       result.get(SchemeNamePage) mustBe Some("ABC Contractors")
       result.get(AddEmailAddressYesNoPage) mustBe Some(true)
       result.get(EnterContractorEmailAddressPage) mustBe Some("abc@test.com")
-      result.get(AccountsOfficeReferencePage) mustBe Some("123 PA 87654321")
     }
 
     "set scheme name and email flags to false when values are missing" in {
@@ -75,7 +74,6 @@ class ContractorDetailsPopulatorSpec extends SpecBase {
       result.get(SchemeNamePage) mustBe Some("")
       result.get(AddEmailAddressYesNoPage) mustBe Some(false)
       result.get(EnterContractorEmailAddressPage) mustBe Some("")
-      result.get(AccountsOfficeReferencePage) mustBe Some("123 PA 87654321")
     }
   }
 }

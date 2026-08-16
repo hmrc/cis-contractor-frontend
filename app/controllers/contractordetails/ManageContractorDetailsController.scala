@@ -20,6 +20,7 @@ import controllers.AgentClientChecks
 import controllers.actions.*
 import controllers.helpers.ContractorDetailsPopulator
 import models.{Scheme, UserAnswers}
+import pages.contractordetails.ContractorSchemePage
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -66,29 +67,39 @@ class ManageContractorDetailsController @Inject() (
             contractorDetailsService
               .getScheme(cisId)
               .flatMap { scheme =>
-                if (shouldRedirectToCheckAnswers(scheme)) {
+                checkedAnswers
+                  .set(ContractorSchemePage, scheme) match {
 
-                  val updatedAnswers =
-                    ContractorDetailsPopulator.populate(
-                      checkedAnswers,
-                      scheme
-                    )
+                  case scala.util.Failure(error) =>
+                    Future.failed(error)
 
-                  sessionRepository
-                    .set(updatedAnswers)
-                    .map { _ =>
-                      Redirect(
-                        routes.ContractorDetailsCheckAnswersController.onPageLoad()
-                      )
+                  case scala.util.Success(answersWithScheme) =>
+                    if (shouldRedirectToCheckAnswers(scheme)) {
+
+                      val updatedAnswers =
+                        ContractorDetailsPopulator.populate(
+                          answersWithScheme,
+                          scheme
+                        )
+
+                      sessionRepository
+                        .set(updatedAnswers)
+                        .map { _ =>
+                          Redirect(
+                            routes.ContractorDetailsCheckAnswersController.onPageLoad()
+                          )
+                        }
+
+                    } else {
+
+                      sessionRepository
+                        .set(answersWithScheme)
+                        .map { _ =>
+                          Redirect(
+                            routes.ContractorDetailsController.onPageLoad()
+                          )
+                        }
                     }
-
-                } else {
-
-                  Future.successful(
-                    Redirect(
-                      routes.ContractorDetailsController.onPageLoad()
-                    )
-                  )
                 }
               }
           }

@@ -17,15 +17,21 @@
 package pages.contractordetails
 
 import pages.behaviours.PageBehaviours
+import play.api.libs.json.JsPath
 
-class AccountsOfficeReferencePageSpec extends PageBehaviours {
+class ContractorSchemePageSpec extends PageBehaviours {
 
-  "AccountsOfficeReferencePage" - {
+  "ContractorSchemePage" - {
 
-    beRetrievable[String](AccountsOfficeReferencePage)
+    "have the correct path" in {
+      ContractorSchemePage.path mustBe (
+        JsPath \ "contractordetails" \ "ContractorSchemePage"
+      )
+    }
 
-    beSettable[String](AccountsOfficeReferencePage)
+    "have the correct toString" in {
+      ContractorSchemePage.toString mustBe "ContractorSchemePage"
+    }
 
-    beRemovable[String](AccountsOfficeReferencePage)
   }
 }

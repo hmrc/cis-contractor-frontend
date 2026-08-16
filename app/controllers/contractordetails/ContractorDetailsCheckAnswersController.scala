@@ -18,7 +18,7 @@ package controllers.contractordetails
 
 import config.FrontendAppConfig
 import controllers.actions.*
-import pages.contractordetails.AccountsOfficeReferencePage
+import pages.contractordetails.ContractorSchemePage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -40,8 +40,9 @@ class ContractorDetailsCheckAnswersController @Inject() (
 
   def onPageLoad: Action[AnyContent] =
     (identify andThen getData andThen requireData) { implicit request =>
-      request.userAnswers.get(AccountsOfficeReferencePage) match {
-        case Some(accountsOfficeReference) =>
+      request.userAnswers.get(ContractorSchemePage) match {
+
+        case Some(scheme) =>
           val summaryRows = Seq(
             ContractorUtrSummary.row(request.userAnswers),
             AddSchemeNameYesNoSummary.row(request.userAnswers),
@@ -50,10 +51,17 @@ class ContractorDetailsCheckAnswersController @Inject() (
             EnterContractorEmailAddressSummary.row(request.userAnswers)
           ).flatten
 
-          Ok(view(accountsOfficeReference, summaryRows))
+          Ok(
+            view(
+              scheme.accountsOfficeReference,
+              summaryRows
+            )
+          )
 
         case None =>
-          Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+          Redirect(
+            controllers.routes.JourneyRecoveryController.onPageLoad()
+          )
       }
     }
 }
