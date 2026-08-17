@@ -17,31 +17,40 @@
 package controllers.amend
 
 import base.SpecBase
+import generators.ModelGenerators
 import models.TypeOfSubcontractor.{Individualorsoletrader, Limitedcompany, Partnership, Trust}
 import models.UserAnswers
 import models.response.{GetSubcontractorResponse, SubcontractorResponse}
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
-import org.mockito.Mockito.{never, times, verify, when}
+import org.mockito.Mockito.{atLeastOnce, times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
+import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import pages.add.TypeOfSubcontractorPage
 import play.api.inject.bind
+import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import repositories.SessionRepository
-import services.SubcontractorService
+import services.{CisManageService, SubcontractorService}
 import uk.gov.hmrc.http.HeaderCarrier
+import queries.CisIdQuery
 
+import scala.jdk.CollectionConverters.*
 import scala.concurrent.Future
 
-class AmendSubcontractorControllerSpec extends SpecBase with MockitoSugar {
+class AmendSubcontractorControllerSpec
+    extends SpecBase
+    with MockitoSugar
+    with ModelGenerators
+    with GuiceOneAppPerSuite {
 
   private val cisId             = "INST-123"
   private val subbieResourceRef = 1001L
 
   private lazy val amendSubcontractorRoute =
     controllers.amend.routes.AmendSubcontractorController
-      .onPageLoad(cisId, subbieResourceRef)
+      .onPageLoad(subbieResourceRef)
       .url
 
   private val baseSubcontractor =
@@ -93,15 +102,27 @@ class AmendSubcontractorControllerSpec extends SpecBase with MockitoSugar {
 
   private def applicationWith(
     mockService: SubcontractorService,
-    mockSessionRepository: SessionRepository,
-    userAnswers: Option[UserAnswers] = Some(emptyUserAnswers)
-  ) =
-    applicationBuilder(userAnswers = userAnswers)
+    mockSessionRepository: SessionRepository
+  ): GuiceApplicationBuilder = {
+
+    val mockCisManagerService = mock[CisManageService]
+
+    val answersWithCisId =
+      emptyUserAnswers
+        .set(CisIdQuery, cisId)
+        .success
+        .value
+
+    when(mockCisManagerService.ensureCisIdInUserAnswers(any[UserAnswers])(any[HeaderCarrier]))
+      .thenReturn(Future.successful(answersWithCisId))
+
+    applicationBuilder(userAnswers = Some(emptyUserAnswers))
       .overrides(
         bind[SubcontractorService].toInstance(mockService),
+        bind[CisManageService].toInstance(mockCisManagerService),
         bind[SessionRepository].toInstance(mockSessionRepository)
       )
-      .build()
+  }
 
   "AmendSubcontractorController" - {
 
@@ -129,7 +150,7 @@ class AmendSubcontractorControllerSpec extends SpecBase with MockitoSugar {
         when(mockSessionRepository.set(any[UserAnswers]))
           .thenReturn(Future.successful(true))
 
-        val application = applicationWith(mockService, mockSessionRepository)
+        val application = applicationWith(mockService, mockSessionRepository).build()
 
         running(application) {
           val result =
@@ -145,13 +166,7 @@ class AmendSubcontractorControllerSpec extends SpecBase with MockitoSugar {
               .onPageLoad()
               .url
 
-          verify(mockService, times(1))
-            .getSubcontractor(
-              eqTo(cisId),
-              eqTo(subbieResourceRef)
-            )(any[HeaderCarrier])
-
-          verify(mockSessionRepository, times(1))
+          verify(mockSessionRepository, times(2))
             .set(captor.capture())
 
           captor.getValue
@@ -182,7 +197,7 @@ class AmendSubcontractorControllerSpec extends SpecBase with MockitoSugar {
         when(mockSessionRepository.set(any[UserAnswers]))
           .thenReturn(Future.successful(true))
 
-        val application = applicationWith(mockService, mockSessionRepository)
+        val application = applicationWith(mockService, mockSessionRepository).build()
 
         running(application) {
           val result =
@@ -198,7 +213,7 @@ class AmendSubcontractorControllerSpec extends SpecBase with MockitoSugar {
               .onPageLoad()
               .url
 
-          verify(mockSessionRepository, times(1))
+          verify(mockSessionRepository, times(2))
             .set(captor.capture())
 
           captor.getValue
@@ -229,7 +244,7 @@ class AmendSubcontractorControllerSpec extends SpecBase with MockitoSugar {
         when(mockSessionRepository.set(any[UserAnswers]))
           .thenReturn(Future.successful(true))
 
-        val application = applicationWith(mockService, mockSessionRepository)
+        val application = applicationWith(mockService, mockSessionRepository).build()
 
         running(application) {
           val result =
@@ -245,7 +260,7 @@ class AmendSubcontractorControllerSpec extends SpecBase with MockitoSugar {
               .onPageLoad()
               .url
 
-          verify(mockSessionRepository, times(1))
+          verify(mockSessionRepository, times(2))
             .set(captor.capture())
 
           captor.getValue
@@ -276,7 +291,7 @@ class AmendSubcontractorControllerSpec extends SpecBase with MockitoSugar {
         when(mockSessionRepository.set(any[UserAnswers]))
           .thenReturn(Future.successful(true))
 
-        val application = applicationWith(mockService, mockSessionRepository)
+        val application = applicationWith(mockService, mockSessionRepository).build()
 
         running(application) {
           val result =
@@ -292,7 +307,7 @@ class AmendSubcontractorControllerSpec extends SpecBase with MockitoSugar {
               .onPageLoad()
               .url
 
-          verify(mockSessionRepository, times(1))
+          verify(mockSessionRepository, times(2))
             .set(captor.capture())
 
           captor.getValue
@@ -304,6 +319,7 @@ class AmendSubcontractorControllerSpec extends SpecBase with MockitoSugar {
       "must redirect to JourneyRecovery and not save when no subcontractor is returned" in {
         val mockService           = mock[SubcontractorService]
         val mockSessionRepository = mock[SessionRepository]
+        val captor                = ArgumentCaptor.forClass(classOf[UserAnswers])
 
         when(
           mockService.getSubcontractor(
@@ -319,13 +335,11 @@ class AmendSubcontractorControllerSpec extends SpecBase with MockitoSugar {
           )
         )
 
+        when(mockSessionRepository.set(any[UserAnswers]))
+          .thenReturn(Future.successful(true))
+
         val application =
-          applicationBuilder(userAnswers = Some(emptyUserAnswers))
-            .overrides(
-              bind[SubcontractorService].toInstance(mockService),
-              bind[SessionRepository].toInstance(mockSessionRepository)
-            )
-            .build()
+          applicationWith(mockService, mockSessionRepository).build()
 
         running(application) {
           val result =
@@ -341,14 +355,65 @@ class AmendSubcontractorControllerSpec extends SpecBase with MockitoSugar {
               .onPageLoad()
               .url
 
-          verify(mockSessionRepository, never())
-            .set(any[UserAnswers])
+          verify(mockSessionRepository, atLeastOnce())
+            .set(captor.capture())
+
+          val savedAnswers = captor.getAllValues
+
+          savedAnswers.forEach { answers =>
+            answers.get(TypeOfSubcontractorPage) mustBe None
+          }
+        }
+      }
+
+      "must redirect to JourneyRecovery when getSubcontractor is missing" in {
+        val mockService           = mock[SubcontractorService]
+        val mockSessionRepository = mock[SessionRepository]
+        val captor                = ArgumentCaptor.forClass(classOf[UserAnswers])
+
+        when(
+          mockService.getSubcontractor(
+            eqTo(cisId),
+            eqTo(subbieResourceRef)
+          )(any[HeaderCarrier])
+        )
+          .thenReturn(Future.failed(new RuntimeException("current batch failed")))
+
+        when(mockSessionRepository.set(any[UserAnswers]))
+          .thenReturn(Future.successful(true))
+
+        val application =
+          applicationWith(mockService, mockSessionRepository).build()
+
+        running(application) {
+          val result =
+            route(
+              application,
+              FakeRequest(GET, amendSubcontractorRoute)
+            ).value
+
+          status(result) mustBe SEE_OTHER
+
+          redirectLocation(result).value mustBe
+            controllers.routes.JourneyRecoveryController
+              .onPageLoad()
+              .url
+
+          verify(mockSessionRepository, atLeastOnce())
+            .set(captor.capture())
+
+          val savedAnswers = captor.getAllValues
+
+          savedAnswers.forEach { answers =>
+            answers.get(TypeOfSubcontractorPage) mustBe None
+          }
         }
       }
 
       "must redirect to JourneyRecovery and not save when subcontractor type is missing" in {
         val mockService           = mock[SubcontractorService]
         val mockSessionRepository = mock[SessionRepository]
+        val captor                = ArgumentCaptor.forClass(classOf[UserAnswers])
 
         val invalidSubcontractor =
           baseSubcontractor.copy(
@@ -366,13 +431,11 @@ class AmendSubcontractorControllerSpec extends SpecBase with MockitoSugar {
           )
         )
 
+        when(mockSessionRepository.set(any[UserAnswers]))
+          .thenReturn(Future.successful(true))
+
         val application =
-          applicationBuilder(userAnswers = Some(emptyUserAnswers))
-            .overrides(
-              bind[SubcontractorService].toInstance(mockService),
-              bind[SessionRepository].toInstance(mockSessionRepository)
-            )
-            .build()
+          applicationWith(mockService, mockSessionRepository).build()
 
         running(application) {
           val result =
@@ -388,14 +451,19 @@ class AmendSubcontractorControllerSpec extends SpecBase with MockitoSugar {
               .onPageLoad()
               .url
 
-          verify(mockSessionRepository, never())
-            .set(any[UserAnswers])
+          verify(mockSessionRepository, atLeastOnce())
+            .set(captor.capture())
+
+          captor.getAllValues.asScala.exists(
+            _.get(TypeOfSubcontractorPage).isDefined
+          ) mustBe false
         }
       }
 
       "must redirect to JourneyRecovery and not save when subcontractor type is unsupported" in {
         val mockService           = mock[SubcontractorService]
         val mockSessionRepository = mock[SessionRepository]
+        val captor                = ArgumentCaptor.forClass(classOf[UserAnswers])
 
         val invalidSubcontractor =
           baseSubcontractor.copy(
@@ -413,13 +481,11 @@ class AmendSubcontractorControllerSpec extends SpecBase with MockitoSugar {
           )
         )
 
+        when(mockSessionRepository.set(any[UserAnswers]))
+          .thenReturn(Future.successful(true))
+
         val application =
-          applicationBuilder(userAnswers = Some(emptyUserAnswers))
-            .overrides(
-              bind[SubcontractorService].toInstance(mockService),
-              bind[SessionRepository].toInstance(mockSessionRepository)
-            )
-            .build()
+          applicationWith(mockService, mockSessionRepository).build()
 
         running(application) {
           val result =
@@ -435,8 +501,12 @@ class AmendSubcontractorControllerSpec extends SpecBase with MockitoSugar {
               .onPageLoad()
               .url
 
-          verify(mockSessionRepository, never())
-            .set(any[UserAnswers])
+          verify(mockSessionRepository, atLeastOnce())
+            .set(captor.capture())
+
+          captor.getAllValues.asScala.exists(
+            _.get(TypeOfSubcontractorPage).isDefined
+          ) mustBe false
         }
       }
 
