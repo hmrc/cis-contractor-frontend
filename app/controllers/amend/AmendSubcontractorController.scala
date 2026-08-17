@@ -118,16 +118,13 @@ class AmendSubcontractorController @Inject() (
               subcontractor
             )
           }
-        }
-        .recover { case error =>
-          logger.error(
-            s"[AmendSubcontractorController] Failed to retrieve subcontractor. " +
-              s"cisId=$cisId, subbieResourceRef=$subbieResourceRef",
-            error
-          )
 
-          recovery
-        }
+      case None =>
+        logger.error(
+          s"[AmendSubcontractorController] No subcontractor returned " +
+            s"for cisId=$cisId, subbieResourceRef=$subbieResourceRef"
+        )
+        Future.successful(recovery)
     }
 
   private def handleSubcontractor(
