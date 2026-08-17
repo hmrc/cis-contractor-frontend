@@ -179,10 +179,10 @@ class ConstructionIndustrySchemeConnectorSpec
 
   "getAgentClient" should {
 
-    val userId = "some-user-id"
+    val userId             = "some-user-id"
     val validJson: JsValue = Json.obj(
-      "uniqueId" -> "1",
-      "taxOfficeNumber" -> "123",
+      "uniqueId"           -> "1",
+      "taxOfficeNumber"    -> "123",
       "taxOfficeReference" -> "AB001"
     )
 
@@ -223,7 +223,6 @@ class ConstructionIndustrySchemeConnectorSpec
               .withStatus(INTERNAL_SERVER_ERROR)
               .withBody("Something broke")
           )
-
       )
 
       val result = connector
@@ -236,7 +235,7 @@ class ConstructionIndustrySchemeConnectorSpec
     }
 
   }
-  
+
   "hasClient(taxOfficeNumber, taxOfficeReference)" should {
 
     "GET /cis/agent/has-client/:ton/:tor and return true when BE returns 200" in {
@@ -552,4 +551,34 @@ class ConstructionIndustrySchemeConnectorSpec
     }
   }
 
+  "delete Verification" should {
+
+    "successfully delete verification and when BE returns 200" in {
+      val request = DeleteVerificationRequest(
+        instanceId = "1",
+        verificationResourceRef = 9L
+      )
+
+      stubFor(
+        post(urlPathEqualTo("/cis/verification/delete")).willReturn(aResponse().withStatus(OK))
+      )
+
+      connector.deleteVerification(request).futureValue mustBe ((): Unit)
+    }
+
+    "propagate upstream error on non-2xx (e.g. 500)" in {
+      val request = DeleteVerificationRequest(
+        instanceId = "1",
+        verificationResourceRef = 9L
+      )
+
+      stubFor(
+        post(urlPathEqualTo("/cis/verification/delete"))
+          .willReturn(aResponse().withStatus(INTERNAL_SERVER_ERROR).withBody("boom"))
+      )
+
+      val ex = connector.deleteVerification(request).failed.futureValue
+      ex.getMessage must include("returned 500")
+    }
+  }
 }
