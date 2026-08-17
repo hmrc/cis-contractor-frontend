@@ -16,7 +16,7 @@
 
 package viewmodels.checkAnswers.verify
 
-import models.{CheckMode, SubcontractorViewModel, UserAnswers}
+import models.{CheckMode, UserAnswers}
 import pages.verify.SelectSubcontractorPage
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
@@ -26,12 +26,14 @@ import viewmodels.implicits.*
 
 object SelectSubcontractorSummary {
 
-  def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] = {
-    val selectEmptyReverify = List(messages("verify.selectSubcontractor.display.noneSelected"))
-    answers.get(SelectSubcontractorPage).flatMap { answers =>
-      val selectNames = answers.toSeq.map(sub => HtmlFormat.escape(sub.name).toString)
-
-      val names = if (selectNames.isEmpty) selectEmptyReverify else selectNames
+  def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
+    answers.get(SelectSubcontractorPage).flatMap { subcontractors =>
+      val names =
+        if (subcontractors.isEmpty) {
+          List(messages("verify.selectSubcontractor.display.noneSelected"))
+        } else {
+          subcontractors.toSeq.map(sub => HtmlFormat.escape(sub.name).toString)
+        }
 
       ValueViewModelHelper.makeGovukBulletList(names).map { value =>
         SummaryListRowViewModel(
@@ -48,5 +50,4 @@ object SelectSubcontractorSummary {
         )
       }
     }
-  }
 }

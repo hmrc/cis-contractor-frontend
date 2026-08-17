@@ -24,7 +24,7 @@ import models.{AmendMode, NormalMode, UserAnswers}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{verify, verifyNoMoreInteractions, when}
 import org.scalatestplus.mockito.MockitoSugar
-import pages.add.{SubcontractorNamePage, SubcontractorsUniqueTaxpayerReferencePage}
+import pages.add.{SubcontractorNamePage, SubcontractorsUniqueTaxpayerReferencePage, UniqueTaxpayerReferenceYesNoPage}
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
@@ -49,7 +49,13 @@ class SubcontractorsUniqueTaxpayerReferenceControllerSpec extends SpecBase with 
   private val name = "John Smith"
 
   private def uaWithName: UserAnswers =
-    emptyUserAnswers.set(SubcontractorNamePage, subcontractorName).success.value
+    emptyUserAnswers
+      .set(SubcontractorNamePage, subcontractorName)
+      .success
+      .value
+      .set(UniqueTaxpayerReferenceYesNoPage, true)
+      .success
+      .value
 
   "SubcontractorsUniqueTaxpayerReference Controller" - {
 
@@ -90,6 +96,43 @@ class SubcontractorsUniqueTaxpayerReferenceControllerSpec extends SpecBase with 
       }
     }
 
+    "must redirect to yesOrNo page when yesorno page has No for a GET" in {
+
+      val application = applicationBuilder(userAnswers =
+        Some(uaWithName.set(UniqueTaxpayerReferenceYesNoPage, false).success.value)
+      ).build()
+
+      running(application) {
+        val request = FakeRequest(GET, subcontractorsUniqueTaxpayerReferenceRoute)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(result).value mustEqual controllers.add.routes.UniqueTaxpayerReferenceYesNoController
+          .onPageLoad(NormalMode)
+          .url
+
+      }
+    }
+
+    "must redirect to journey recovery page when none for yesorno page for a GET" in {
+      val subcontractName = SubcontractorName("John", Some("Paul"), "Smith")
+      val application     = applicationBuilder(userAnswers =
+        Some(emptyUserAnswers.set(SubcontractorNamePage, subcontractName).success.value)
+      ).build()
+      running(application) {
+        val request = FakeRequest(GET, subcontractorsUniqueTaxpayerReferenceRoute)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+
+      }
+    }
+
     "must bind the form and redirect to NationalInsuranceNumberYesNo Page on POST when valid UTR is submitted" in {
 
       val validValue = "5860920998"
@@ -123,7 +166,7 @@ class SubcontractorsUniqueTaxpayerReferenceControllerSpec extends SpecBase with 
       verifyNoMoreInteractions(mockSubcontractorService)
     }
 
-    "must bind the form and redirect to there-is-a-problem Page on POST when valid UTR is submitted for Amend journey" in {
+    "must bind the form and redirect to amend cya Page on POST when valid UTR is submitted for Amend journey" in {
 
       val validValue = "5860920998"
       val prevValue  = "5860920997"
@@ -152,7 +195,9 @@ class SubcontractorsUniqueTaxpayerReferenceControllerSpec extends SpecBase with 
 
         status(result) mustEqual SEE_OTHER
 
-        redirectLocation(result).value must include("subcontractor/there-is-a-problem")
+        redirectLocation(result).value mustEqual controllers.amend.routes.AmendIndividualCheckYourAnswersController
+          .onPageLoad()
+          .url
       }
       verify(mockSubcontractorService).isDuplicateUTR(any[UserAnswers], any[String])(any[HeaderCarrier])
       verifyNoMoreInteractions(mockSubcontractorService)
@@ -302,7 +347,7 @@ class SubcontractorsUniqueTaxpayerReferenceControllerSpec extends SpecBase with 
       }
     }
 
-    "must bind the form and redirect to JourneyRecovery Page on POST when valid UTR is submitted but is same as previous value in AmendMode" in {
+    "must bind the form and redirect to amend cya Page on POST when valid UTR is submitted but is same as previous value in AmendMode" in {
 
       val validValue = "5860920998"
       val prevValue  = "5860920998"
@@ -323,7 +368,9 @@ class SubcontractorsUniqueTaxpayerReferenceControllerSpec extends SpecBase with 
 
         status(result) mustEqual SEE_OTHER
 
-        redirectLocation(result).value must include("/subcontractor/there-is-a-problem") // TODO when AmendCYA available
+        redirectLocation(result).value mustEqual controllers.amend.routes.AmendIndividualCheckYourAnswersController
+          .onPageLoad()
+          .url
       }
     }
 

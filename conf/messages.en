@@ -290,7 +290,7 @@ individualEmailAddress.checkYourAnswersLabel                                    
 individualEmailAddress.error.required                                               =  Enter an email address in the correct format, like name@example.com
 individualEmailAddress.error.length                                                 =  Enter a valid email address in the correct format, like name@example.com, up to 254 characters
 individualEmailAddress.error.invalid                                                =  Enter a valid email address in the correct format, like name@example.com
-individualEmailAddress.change.hidden                                                =  email Address
+individualEmailAddress.change.hidden                                                =  email address
 
 individualChooseContactDetails.title                                                =  Do you want to add contact details?
 individualChooseContactDetails.heading                                              =  What are the contact details for {0}?
@@ -398,6 +398,15 @@ individualContactMethodOptions.hint                                             
 individualContactMethodOptions.error.required                                       =  Select the methods of contact you want to add for this subcontractor
 individualContactMethodOptions.change.hidden                                        =  methods of contact
 
+amendCompanyRemoveDetailYesNo.title                                                 =  Are you sure you want to remove this information from this subcontractor?
+amendCompanyRemoveDetailYesNo.heading                                               =  Are you sure you want to remove the {1} for {0}?
+amendCompanyRemoveDetailYesNo.error.required                                        =  Select whether you want to remove this information from this subcontractor
+amendCompanyRemoveDetailYesNo.detail.address                                        =  address
+amendCompanyRemoveDetailYesNo.detail.contactDetails                                 =  contact details
+amendCompanyRemoveDetailYesNo.detail.utr                                            =  UTR
+amendCompanyRemoveDetailYesNo.detail.companyRegistrationNumber                      =  company registration number
+amendCompanyRemoveDetailYesNo.detail.worksReferenceNumber                           =  works reference number
+
 amendCheckYourAnswers.title                                                         =  Subcontractor information
 amendCheckYourAnswers.heading.subcontractorInformation.h2                           =  Subcontractor information
 amendCheckYourAnswers.heading.moreDetails.h2                                        =  More details
@@ -422,7 +431,7 @@ amendConfirmation.beforeYouGo.shareFeedback                                     
 amendConfirmation.table.content.none                                                =  None provided
 
 amendTrustRemoveDetailYesNo.title                                                   =  Are you sure you want to remove this information from this subcontractor?
-amendTrustRemoveDetailYesNo.heading                                                 =  Are you sure you want to remove the {1} from {0}?
+amendTrustRemoveDetailYesNo.heading                                                 =  Are you sure you want to remove the {1} for {0}?
 amendTrustRemoveDetailYesNo.error.required                                          =  Select whether you want to remove this information from this subcontractor
 amendTrustRemoveDetailYesNo.detail.address                                          =  address
 amendTrustRemoveDetailYesNo.detail.contactDetails                                   =  contact details
@@ -430,7 +439,7 @@ amendTrustRemoveDetailYesNo.detail.utr                                          
 amendTrustRemoveDetailYesNo.detail.worksReferenceNumber                             =  works reference number
 
 amendPartnershipRemoveDetailYesNo.title                                             =  Are you sure you want to remove this information from this subcontractor?
-amendPartnershipRemoveDetailYesNo.heading                                           =  Are you sure you want to remove the {0} from {1}?
+amendPartnershipRemoveDetailYesNo.heading                                           =  Are you sure you want to remove the {0} for {1}?
 amendPartnershipRemoveDetailYesNo.error.required                                    =  Select whether you want to remove this information from this subcontractor
 amendPartnershipRemoveDetailYesNo.detail.address                                    =  address
 amendPartnershipRemoveDetailYesNo.detail.contactDetails                             =  contact details
@@ -441,7 +450,7 @@ amendPartnershipRemoveDetailYesNo.detail.nominatedPartnerNino                   
 amendPartnershipRemoveDetailYesNo.detail.nominatedPartnerCompanyRegistrationNumber  =  nominated partner’s company registration number
 
 amendIndividualRemoveDetailYesNo.title                                              =  Are you sure you want to remove this information from this subcontractor?
-amendIndividualRemoveDetailYesNo.heading                                            =  Are you sure you want to remove the {1} from {0}?
+amendIndividualRemoveDetailYesNo.heading                                            =  Are you sure you want to remove the {1} for {0}?
 amendIndividualRemoveDetailYesNo.error.required                                     =  Select whether you want to remove this information from this subcontractor
 amendIndividualRemoveDetailYesNo.detail.tradingName                                 =  trading name
 amendIndividualRemoveDetailYesNo.detail.subcontractorName                           =  subcontractor name
@@ -460,6 +469,28 @@ removeInsufficientSubcontractorNameYesNo.title                                  
 removeInsufficientSubcontractorNameYesNo.heading                                    =  Are you sure you want to remove {0} from this verification request?
 removeInsufficientSubcontractorNameYesNo.hint                                       =  This means they will remain unverified, so you must not make any payments to them.
 removeInsufficientSubcontractorNameYesNo.error.required                             =  Select yes if you want to remove this subcontractor from this verification request
+
+unmatched.removeSubcontractorVerifyRequest.title                                    =  Are you sure you want to remove this subcontractor from this verification request?
+unmatched.removeSubcontractorVerifyRequest.heading                                  =  Are you sure you want to remove {0} from this verification request?
+unmatched.removeSubcontractorVerifyRequest.p1                                       =  This means they will remain unverified, so you must not make any payments to them.
+unmatched.removeSubcontractorVerifyRequest.error.required                           =  Select yes if you want to remove this subcontractor from this verification request
+unmatched.proceedSubcontractorVerifyRequest.title                                   =  Are you sure you want to proceed with verifying this subcontractor?
+unmatched.proceedSubcontractorVerifyRequest.heading                                 =  Are you sure you want to proceed with verifying {0}?
+unmatched.proceedSubcontractorVerifyRequest.p1                                      =  This will assign the higher rate tax treatment to this subcontractor.
+unmatched.proceedSubcontractorVerifyRequest.error.required                          =  Select yes if you want to proceed with verifying this subcontractor
+
+unmatchedSubcontractors.title                                                       =  You have unmatched subcontractors
+unmatchedSubcontractors.heading                                                     =  You have unmatched subcontractors
+unmatchedSubcontractors.p1                                                          =  Some of the subcontractor details in your most recent verification request do not match the information about that subcontractor held by HMRC.
+unmatchedSubcontractors.p2                                                          =  You cannot create a new verification request until you have reviewed and fixed these unmatched results.
+unmatchedSubcontractors.verificationResults.link                                    =  Check your latest verification results
+
+noUnmatchedSubcontractors.title                                                     =  No unmatched subcontractors
+noUnmatchedSubcontractors.heading                                                   =  No unmatched subcontractors
+noUnmatchedSubcontractors.p1                                                        =  The subcontractors marked as unmatched in your most recent verification results have been deleted.
+noUnmatchedSubcontractors.p2                                                        =  You can now verify any of your other subcontractors by creating a new verification request.
+noUnmatchedSubcontractors.backTo                                                    =  Back to
+noUnmatchedSubcontractors.manageYourSubcontractors.link                             =  Manage your subcontractors
 
 # Partnership
 addPartnershipContactMethodsYesNo.title                            =  Do you want to add contact details for this partnership?
@@ -1048,6 +1079,23 @@ verify.verifyCheckYourAnswers.subHeading                                =  Subco
 verify.verifyCheckYourAnswers.confirm                                   =  Confirm and submit
 
 verify.noName                                                           =  No name provided
+
+verify.noVerificationResults.title                                      =  No verification results
+verify.noVerificationResults.heading                                    =  Verification results
+verify.noVerificationResults.p                                          =  You do not have any verification results to show at the moment.
+verify.noVerificationResults.backTo                                     =  Back to
+verify.noVerificationResults.manageYourSubcontractors.link              =  Manage your subcontractors
+
+verify.verificationResults.title                                        =  Verification results
+verify.verificationResults.heading                                      =  Verification results
+verify.verificationResults.paragraph                                    =  Here are the verification results from your most recent verification request.
+verify.verificationResults.name                                         =  Name
+verify.verificationResults.status                                       =  Verification status
+verify.verificationResults.taxTreatment                                 =  Tax treatment
+verify.verificationResults.verificationNumber                           =  Verification number
+verify.verificationResults.reviewUnmatchedSubcontractors.button         =  Review unmatched subcontractors
+verify.verificationResults.backTo                                       =  Back to
+verify.verificationResults.manageYourSubcontractors.link                =  Manage your subcontractors
 
 # Contractor Details
 contractordetails.contractorDetailsIndex.title                                 =  Contractor details
