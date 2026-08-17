@@ -74,41 +74,25 @@ class ReviewInsufficientInfoSubcontractorsControllerSpec extends SpecBase {
       pendingVerifications = None
     )
 
+  private def mkVerification(subcontractorId: Long): VerificationCurrentVerification =
+    VerificationCurrentVerification(
+      verificationId = subcontractorId,
+      verificationBatchId = None,
+      subcontractorId = Some(subcontractorId),
+      verificationResourceRef = None,
+      subcontractorName = None,
+      verificationNumber = None,
+      taxTreatment = None,
+      actionIndicator = None,
+      proceed = None,
+      matched = None
+    )
+
   private def batchOf(subs: SubcontractorCurrentVerification*): GetCurrentVerificationBatchResponse =
     GetCurrentVerificationBatchResponse(
       subcontractors = subs,
-      verificationBatch = Some(
-        VerificationBatchCurrentVerification(
-          verificationBatchId = 999L,
-          verifBatchResourceRef = Some(10L)
-        )
-      ),
-      verifications = Seq(
-        VerificationCurrentVerification(
-          verificationId = 1L,
-          verificationBatchId = Some(999L),
-          subcontractorId = Some(1L),
-          verificationResourceRef = Some(10L),
-          subcontractorName = None,
-          verificationNumber = None,
-          taxTreatment = None,
-          actionIndicator = None,
-          proceed = None,
-          matched = None
-        ),
-        VerificationCurrentVerification(
-          verificationId = 2L,
-          verificationBatchId = Some(999L),
-          subcontractorId = Some(2L),
-          verificationResourceRef = Some(10L),
-          subcontractorName = None,
-          verificationNumber = None,
-          taxTreatment = None,
-          actionIndicator = None,
-          proceed = None,
-          matched = None
-        )
-      )
+      verificationBatch = None,
+      verifications = subs.map(sub => mkVerification(sub.subcontractorId))
     )
 
   private val missingSub =
