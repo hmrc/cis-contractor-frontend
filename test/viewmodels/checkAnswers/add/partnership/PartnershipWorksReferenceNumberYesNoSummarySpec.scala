@@ -29,7 +29,6 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.*
 import org.scalatest.matchers.must.Matchers.must
 import models.TypeOfSubcontractor
 import models.viewOnly.partnership.ViewOnlyPartnershipAnswers
-import helpers.CyaEncodingSpecHelper
 
 class PartnershipWorksReferenceNumberYesNoSummarySpec extends AnyFreeSpec with Matchers {
 

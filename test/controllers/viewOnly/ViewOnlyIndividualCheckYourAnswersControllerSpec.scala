@@ -23,7 +23,6 @@ import models.address.{Address, Country}
 import models.contact.ContactMethodOptions
 import models.viewOnly.ViewOnlyIndividualAnswers
 import org.scalatestplus.mockito.MockitoSugar
-import pages.amend.ShowVerificationDetailsPage
 import play.api.i18n.MessagesApi
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*

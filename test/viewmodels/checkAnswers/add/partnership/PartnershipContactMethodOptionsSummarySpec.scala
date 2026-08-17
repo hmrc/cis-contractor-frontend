@@ -22,7 +22,6 @@ import models.{CheckMode, UserAnswers}
 import org.scalatest.matchers.must.Matchers
 import pages.add.partnership.PartnershipContactMethodOptionsPage
 import play.api.i18n.{DefaultMessagesApi, Lang, Messages}
-import models.TypeOfSubcontractor
 import models.viewOnly.partnership.ViewOnlyPartnershipAnswers
 
 class PartnershipContactMethodOptionsSummarySpec extends SpecBase with Matchers {

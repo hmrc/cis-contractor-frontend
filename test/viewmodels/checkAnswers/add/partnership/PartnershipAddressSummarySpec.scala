@@ -28,7 +28,7 @@ import pages.add.partnership.PartnershipAddressPage
 import play.api.i18n.Messages
 import play.api.test.Helpers.stubMessages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
-import models.{AmendMode, TypeOfSubcontractor, UserAnswers}
+import models.TypeOfSubcontractor
 import models.viewOnly.partnership.ViewOnlyPartnershipAnswers
 
 class PartnershipAddressSummarySpec extends AnyWordSpec with Matchers with CyaEncodingSpecHelper {
