@@ -47,27 +47,29 @@ class RemoveSubcontractorVerifyRequestController @Inject() (
   val form              = formProvider()
   val subcontractorName = "Test Subcontractor" // TODO: Make Dynamic
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
+  def onPageLoad(subcontractorId: Long, mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData) { implicit request =>
 
-    val preparedForm = request.userAnswers.get(RemoveSubcontractorVerifyRequestPage) match {
-      case None        => form
-      case Some(value) => form.fill(value)
+      val preparedForm = request.userAnswers.get(RemoveSubcontractorVerifyRequestPage) match {
+        case None        => form
+        case Some(value) => form.fill(value)
+      }
+
+      Ok(view(preparedForm, subcontractorName, subcontractorId))
     }
 
-    Ok(view(preparedForm, subcontractorName))
-  }
-
-  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
-    implicit request =>
+  def onSubmit(subcontractorId: Long, mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData).async { implicit request =>
       form
         .bindFromRequest()
         .fold(
-          formWithErrors => Future.successful(BadRequest(view(formWithErrors, subcontractorName = subcontractorName))),
+          formWithErrors =>
+            Future.successful(BadRequest(view(formWithErrors, subcontractorName = subcontractorName, subcontractorId))),
           value =>
             for {
               updatedAnswers <- Future.fromTry(request.userAnswers.set(RemoveSubcontractorVerifyRequestPage, value))
               _              <- sessionRepository.set(updatedAnswers)
             } yield Redirect(navigator.nextPage(RemoveSubcontractorVerifyRequestPage, mode, updatedAnswers))
         )
-  }
+    }
 }
