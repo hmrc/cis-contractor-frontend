@@ -16,7 +16,8 @@
 
 package viewmodels.checkAnswers.add.company
 
-import models.{CheckMode, Mode, UserAnswers}
+import models.amend.company.AmendCompanyRemoveDetail
+import models.{AmendMode, CheckMode, Mode, UserAnswers}
 import pages.add.company.CompanyUtrYesNoPage
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
@@ -37,7 +38,11 @@ object CompanyUtrYesNoSummary {
         actions = Seq(
           ActionItemViewModel(
             "site.change",
-            controllers.add.company.routes.CompanyUtrYesNoController.onPageLoad(mode).url
+            if answer && mode == AmendMode then
+              controllers.amend.company.routes.AmendCompanyRemoveDetailYesNoController
+                .onPageLoad(AmendCompanyRemoveDetail.Utr.key)
+                .url
+            else controllers.add.company.routes.CompanyUtrYesNoController.onPageLoad(mode).url
           )
             .withVisuallyHiddenText(messages("companyUtrYesNo.change.hidden"))
             .withAttribute("id" -> "add-company-utr")

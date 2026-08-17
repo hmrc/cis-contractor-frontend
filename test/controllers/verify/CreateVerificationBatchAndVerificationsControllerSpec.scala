@@ -50,44 +50,46 @@ class CreateVerificationBatchAndVerificationsControllerSpec extends SpecBase wit
       verifications = Nil
     )
 
+  private val subcontractors = Seq(
+    SubcontractorCurrentVerification(
+      subcontractorId = 10L,
+      subbieResourceRef = Some(1111L),
+      firstName = None,
+      secondName = None,
+      surname = None,
+      tradingName = None,
+      utr = None,
+      nino = None,
+      crn = None,
+      partnerUtr = None,
+      partnershipTradingName = None,
+      subcontractorType = None,
+      addressLine1 = None,
+      addressLine2 = None,
+      addressLine3 = None,
+      addressLine4 = None,
+      country = None,
+      postcode = None,
+      emailAddress = None,
+      phoneNumber = None,
+      mobilePhoneNumber = None,
+      worksReferenceNumber = None,
+      matched = None,
+      autoVerified = None,
+      verified = None,
+      verificationNumber = None,
+      taxTreatment = None,
+      verificationDate = None,
+      version = None,
+      updatedTaxTreatment = None,
+      lastMonthlyReturnDate = None,
+      pendingVerifications = None
+    )
+  )
+
   private val nonEmptyCurrent: GetCurrentVerificationBatchResponse =
     GetCurrentVerificationBatchResponse(
-      subcontractors = Seq(
-        SubcontractorCurrentVerification(
-          subcontractorId = 10L,
-          subbieResourceRef = Some(1111L),
-          firstName = None,
-          secondName = None,
-          surname = None,
-          tradingName = None,
-          utr = None,
-          nino = None,
-          crn = None,
-          partnerUtr = None,
-          partnershipTradingName = None,
-          subcontractorType = None,
-          addressLine1 = None,
-          addressLine2 = None,
-          addressLine3 = None,
-          addressLine4 = None,
-          country = None,
-          postcode = None,
-          emailAddress = None,
-          phoneNumber = None,
-          mobilePhoneNumber = None,
-          worksReferenceNumber = None,
-          matched = None,
-          autoVerified = None,
-          verified = None,
-          verificationNumber = None,
-          taxTreatment = None,
-          verificationDate = None,
-          version = None,
-          updatedTaxTreatment = None,
-          lastMonthlyReturnDate = None,
-          pendingVerifications = None
-        )
-      ),
+      subcontractors,
       verificationBatch = Some(
         VerificationBatchCurrentVerification(
           verificationBatchId = 999L,

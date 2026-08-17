@@ -16,6 +16,7 @@
 
 package viewmodels.checkAnswers.add.company
 
+import models.amend.company.AmendCompanyRemoveDetail
 import models.{AmendMode, CheckMode, UserAnswers}
 import org.scalatest.OptionValues.convertOptionToValuable
 import org.scalatest.TryValues.convertTryToSuccessOrFailure
@@ -103,8 +104,8 @@ class CompanyUtrYesNoSummarySpec extends AnyFreeSpec with Matchers {
       val changeAction       = actions.head
       val expectedChangeText = messages("site.change")
       val expectedHref       =
-        controllers.add.company.routes.CompanyUtrYesNoController
-          .onPageLoad(AmendMode)
+        controllers.amend.company.routes.AmendCompanyRemoveDetailYesNoController
+          .onPageLoad(AmendCompanyRemoveDetail.Utr.key)
           .url
       val expectedHiddenText =
         messages("companyUtrYesNo.change.hidden")
