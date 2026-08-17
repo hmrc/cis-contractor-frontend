@@ -89,11 +89,15 @@ GET   /subcontractor/amend/trust/remove/information/:subcontractorDetail  contro
 POST  /subcontractor/amend/trust/remove/information/:subcontractorDetail  controllers.amend.trust.AmendTrustRemoveDetailYesNoController.onSubmit(subcontractorDetail: String)
 
 GET   /subcontractor/amend/start/:subbieResourceRef  controllers.amend.AmendSubcontractorController.onPageLoad(subbieResourceRef: Long)
+
 GET   /subcontractor/viewOnly/start/:cisId/:subbieResourceRef  controllers.viewOnly.ViewOnlySubcontractorController.onPageLoad(cisId: String, subbieResourceRef: Long)
 
 GET   /subcontractor/viewOnly/partnership/partnership-information-read-only  controllers.viewOnly.partnership.ViewOnlyPartnershipCheckYourAnswersController.onPageLoad()
+
 GET   /subcontractor/viewOnly/company/company-information-read-only  controllers.viewOnly.company.ViewOnlyCompanyCheckYourAnswersController.onPageLoad()
+
 GET   /subcontractor/viewOnly/trust/trust-information-read-only  controllers.viewOnly.trust.ViewOnlyTrustCheckYourAnswersController.onPageLoad()
+
 GET   /subcontractor/viewOnly/individual-information-read-only  controllers.viewOnly.ViewOnlyIndividualCheckYourAnswersController.onPageLoad()
 
 GET   /subcontractor/amend/subcontractor-information  controllers.amend.AmendIndividualCheckYourAnswersController.onPageLoad()
