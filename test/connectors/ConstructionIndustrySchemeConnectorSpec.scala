@@ -17,7 +17,7 @@
 package connectors
 
 import models.TypeOfSubcontractor
-import models.requests.CreateAndUpdateSubcontractorPayload
+import models.requests.{CreateAndUpdateSubcontractorPayload, CreateSubmissionForVerificationRequest, DeleteVerificationRequest, ModifyVerificationsRequest, VerificationToUpdate}
 import models.requests.CreateAndUpdateSubcontractorPayload.*
 import models.response.{GetCurrentVerificationBatchResponse, GetNewestVerificationBatchResponse, GetSubcontractorResponse}
 import org.mockito.ArgumentCaptor
@@ -32,8 +32,6 @@ import play.api.libs.json.{JsValue, Json}
 import uk.gov.hmrc.http.client.{HttpClientV2, RequestBuilder}
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
-import models.requests.ModifyVerificationsRequest
-import models.requests.{CreateSubmissionForVerificationRequest, VerificationToUpdate}
 import models.response.CreateSubmissionForVerificationResponse
 
 import java.net.URL
