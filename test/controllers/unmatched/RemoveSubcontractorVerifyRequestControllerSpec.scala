@@ -42,10 +42,11 @@ class RemoveSubcontractorVerifyRequestControllerSpec extends SpecBase with Mocki
   val formProvider = new RemoveSubcontractorVerifyRequestFormProvider()
   val form         = formProvider()
 
-  val subcontractorName = "Test Subcontractor"
+  val subcontractorName       = "Test Subcontractor"
+  private val subcontractorId = 10
 
   lazy val removeSubcontractorVerifyRequestRoute =
-    unmatchedRoutes.RemoveSubcontractorVerifyRequestController.onPageLoad().url
+    unmatchedRoutes.RemoveSubcontractorVerifyRequestController.onPageLoad(subcontractorId).url
 
   "RemoveSubcontractorVerifyRequest Controller" - {
 
@@ -61,7 +62,7 @@ class RemoveSubcontractorVerifyRequestControllerSpec extends SpecBase with Mocki
         val view = application.injector.instanceOf[RemoveSubcontractorVerifyRequestView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, subcontractorName)(
+        contentAsString(result) mustEqual view(form, subcontractorName, subcontractorId)(
           request,
           messages(application)
         ).toString
@@ -82,7 +83,7 @@ class RemoveSubcontractorVerifyRequestControllerSpec extends SpecBase with Mocki
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(true), subcontractorName)(
+        contentAsString(result) mustEqual view(form.fill(true), subcontractorName, subcontractorId)(
           request,
           messages(application)
         ).toString
@@ -131,7 +132,7 @@ class RemoveSubcontractorVerifyRequestControllerSpec extends SpecBase with Mocki
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, subcontractorName)(
+        contentAsString(result) mustEqual view(boundForm, subcontractorName, subcontractorId)(
           request,
           messages(application)
         ).toString

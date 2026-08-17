@@ -127,8 +127,8 @@ GET   /subcontractor/amend/subcontractor-information  controllers.amend.AmendInd
 POST  /subcontractor/amend/subcontractor-information  controllers.amend.AmendIndividualCheckYourAnswersController.onSubmit()
 GET   /subcontractor/amend/cancel              controllers.amend.AmendIndividualCheckYourAnswersController.onCancel()
 
-GET   /subcontractor/remove-unmatched-subcontractor-from-request  controllers.unmatched.RemoveSubcontractorVerifyRequestController.onPageLoad(mode: Mode = NormalMode)
-POST  /subcontractor/remove-unmatched-subcontractor-from-request  controllers.unmatched.RemoveSubcontractorVerifyRequestController.onSubmit(mode: Mode = NormalMode)
+GET   /subcontractor/remove-unmatched-subcontractor-from-request  controllers.unmatched.RemoveSubcontractorVerifyRequestController.onPageLoad(subcontractorId: Long, mode: Mode = NormalMode)
+POST  /subcontractor/remove-unmatched-subcontractor-from-request  controllers.unmatched.RemoveSubcontractorVerifyRequestController.onSubmit(subcontractorId: Long, mode: Mode = NormalMode)
 
 GET   /subcontractor/proceed-verifying-unmatched-subcontractor  controllers.unmatched.ProceedSubcontractorVerifyRequestController.onPageLoad(mode: Mode = NormalMode)
 POST  /subcontractor/proceed-verifying-unmatched-subcontractor  controllers.unmatched.ProceedSubcontractorVerifyRequestController.onSubmit(mode: Mode = NormalMode)

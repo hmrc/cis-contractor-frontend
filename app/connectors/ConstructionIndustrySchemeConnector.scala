@@ -231,4 +231,24 @@ class ConstructionIndustrySchemeConnector @Inject() (config: ServicesConfig, htt
       }
   }
 
+  def deleteVerification(
+    request: DeleteVerificationRequest
+  )(implicit hc: HeaderCarrier): Future[Unit] =
+    http
+      .post(url"$cisBaseUrl/verification/delete")
+      .withBody(Json.toJson(request))
+      .execute[HttpResponse]
+      .flatMap { resp =>
+        resp.status match {
+          case OK    =>
+            logger.info(
+              s"[ConstructionIndustrySchemeConnector][deleteVerification] instanceId=${request.instanceId}, verificationResourceRef=${request.verificationResourceRef}"
+            )
+            Future.successful(())
+          case other =>
+            Future.failed(
+              UpstreamErrorResponse(s"deleteVerification failed, returned $other", other, other)
+            )
+        }
+      }
 }
