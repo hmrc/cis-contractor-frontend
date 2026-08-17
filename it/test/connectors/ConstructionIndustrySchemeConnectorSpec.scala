@@ -553,7 +553,7 @@ class ConstructionIndustrySchemeConnectorSpec
 
   "delete Verification" should {
 
-    "successfully delete verification and when BE returns 200" in {
+    "successfully delete verification when BE returns 200" in {
       val request = DeleteVerificationRequest(
         instanceId = "1",
         verificationResourceRef = 9L
