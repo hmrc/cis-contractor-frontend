@@ -17,6 +17,7 @@
 package viewmodels.checkAnswers.add.partnership
 
 import controllers.add.partnership.routes
+import models.amend.partnership.AmendPartnershipRemoveDetail
 import models.{AmendMode, CheckMode, UserAnswers}
 import org.scalatest.OptionValues.convertOptionToValuable
 import org.scalatest.TryValues.convertTryToSuccessOrFailure
@@ -91,7 +92,9 @@ class PartnershipNominatedPartnerUtrYesNoSummarySpec extends AnyFreeSpec with Ma
 
       val changeAction       = actions.head
       val expectedChangeText = messages("site.change")
-      val expectedHref       = routes.PartnershipNominatedPartnerUtrYesNoController.onPageLoad(AmendMode).url
+      val expectedHref       = controllers.amend.partnership.routes.AmendPartnershipRemoveDetailYesNoController
+        .onPageLoad(AmendPartnershipRemoveDetail.NominatedPartnerUtr.key)
+        .url
       val expectedHiddenText = messages("partnershipNominatedPartnerUtrYesNo.change.hidden")
 
       changeAction.content.asHtml.toString    should include(expectedChangeText)

@@ -17,6 +17,7 @@
 package viewmodels.checkAnswers.add.partnership
 
 import base.SpecBase
+import models.amend.partnership.AmendPartnershipRemoveDetail
 import models.{AmendMode, CheckMode, UserAnswers}
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import pages.add.partnership.{PartnershipHasUtrYesNoPage, PartnershipNamePage}
@@ -89,6 +90,37 @@ class PartnershipHasUtrYesNoSummarySpec extends SpecBase with GuiceOneAppPerSuit
       actions.items must have size 1
 
       val action: ActionItem = actions.items.head
+      action.href mustBe controllers.amend.partnership.routes.AmendPartnershipRemoveDetailYesNoController
+        .onPageLoad(AmendPartnershipRemoveDetail.Utr.key)
+        .url
+      action.content mustBe Text(messages("site.change"))
+      action.visuallyHiddenText mustBe Some(messages("partnershipHasUtrYesNo.change.hidden"))
+      action.attributes must contain("id" -> "add-partnership-utr")
+    }
+
+    "return a row with key (including partnership name), value = no, and change action when the answer is false" in {
+      val ua: UserAnswers =
+        emptyUserAnswers
+          .set(PartnershipHasUtrYesNoPage, false)
+          .success
+          .value
+          .set(PartnershipNamePage, partnershipName)
+          .success
+          .value
+
+      val maybeRow = PartnershipHasUtrYesNoSummary.row(ua, AmendMode)
+      maybeRow must not be empty
+
+      val row: SummaryListRow = maybeRow.value
+
+      row.key mustBe Key(content = Text(messages("partnershipHasUtrYesNo.checkYourAnswersLabel", partnershipName)))
+      row.value mustBe Value(content = Text(messages("site.no")))
+
+      row.actions must not be empty
+      val actions: Actions = row.actions.value
+      actions.items must have size 1
+
+      val action: ActionItem = actions.items.head
       action.href mustBe controllers.add.partnership.routes.PartnershipHasUtrYesNoController
         .onPageLoad(AmendMode)
         .url
@@ -97,7 +129,7 @@ class PartnershipHasUtrYesNoSummarySpec extends SpecBase with GuiceOneAppPerSuit
       action.attributes must contain("id" -> "add-partnership-utr")
     }
 
-    "return a row with key (including partnership name), value = no, and change action when the answer is false" in {
+    "return a row with key (including partnership name), value = no, and change action pointing to add flow when the answer is false in AmendMode" in {
       val ua: UserAnswers =
         emptyUserAnswers
           .set(PartnershipHasUtrYesNoPage, false)
