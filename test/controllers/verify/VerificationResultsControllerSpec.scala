@@ -42,7 +42,8 @@ class VerificationResultsControllerSpec extends SpecBase {
     matched = Some("Y"),
     verificationNumber = Some("V0004528765"),
     taxTreatment = Some("0"),
-    subcontractorName = Some("Hooper and Associates")
+    subcontractorName = Some("Hooper and Associates"),
+    subcontractorId = Some(22L)
   )
 
   private val batchResponse = GetLastSubmittedVerificationBatchResponse(

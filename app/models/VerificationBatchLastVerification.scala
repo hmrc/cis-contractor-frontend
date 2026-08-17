@@ -19,7 +19,7 @@ package models
 import play.api.libs.json.{Json, OFormat}
 
 case class VerificationBatchLastVerification(
-  verificationBatchId: Option[Long],
+  verificationBatchId: Long,
   verifBatchResourceRef: Option[Long],
   status: Option[String]
 )
