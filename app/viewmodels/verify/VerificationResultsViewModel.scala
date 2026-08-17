@@ -48,6 +48,15 @@ object VerificationResultsViewModel {
       )
     }
 
+  def unmatchedSubcontractorIds(response: GetLastSubmittedVerificationBatchResponse): Set[Long] =
+    response.verifications
+      .collect {
+        case verification if !isVerified(verification) =>
+          verification.subcontractorId
+      }
+      .flatten
+      .toSet
+
   private def isVerified(verification: VerificationLastVerification): Boolean = {
     val hasVerificationNumber =
       verification.verificationNumber.exists(_.trim.nonEmpty)

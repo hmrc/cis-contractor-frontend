@@ -640,6 +640,7 @@ GET   /verify/verification-status/select-subcontractors                  control
 GET   /subcontractor/verify/no-verification-results  controllers.verify.NoVerificationResultsController.onPageLoad()
 
 GET   /subcontractor/verify/verification-results  controllers.verify.VerificationResultsController.onPageLoad()
+GET   /subcontractor/verify/review-unmatched-subcontractors  controllers.verify.ReviewUnmatchedSubcontractorsController.onPageLoad()
 
 GET   /subcontractor/verify/unmatched-subcontractors-exist  controllers.UnmatchedSubcontractorsController.onPageLoad()
 

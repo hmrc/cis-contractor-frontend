@@ -199,6 +199,19 @@ class VerificationService @Inject() (
         request => Future.successful(request)
       )
 
+  def anyUnmatchedSubcontractorsStillPresent(
+    cisId: String,
+    unmatchedSubcontractorIds: Set[Long]
+  )(implicit hc: HeaderCarrier): Future[Boolean] =
+    if (unmatchedSubcontractorIds.isEmpty) {
+      Future.successful(false)
+    } else {
+      cisConnector.getSubcontractorList(cisId).map { response =>
+        val liveIds = response.subcontractors.map(_.subcontractorId).toSet
+        unmatchedSubcontractorIds.exists(liveIds.contains)
+      }
+    }
+
   private def resolveEmployerReference(
     userId: String,
     isAgent: Boolean,
