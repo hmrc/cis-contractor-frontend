@@ -27,7 +27,8 @@ class VerificationResultsViewModelSpec extends SpecBase {
     verificationNumber: Option[String] = Some("V0000000001"),
     taxTreatment: Option[String] = Some("net"),
     subcontractorName: Option[String] = Some("John Smith"),
-    actionIndicator: Option[String] = Some("verify")
+    actionIndicator: Option[String] = Some("verify"),
+    subcontractorId: Option[Long] = Some(1L)
   ): VerificationLastVerification =
     VerificationLastVerification(
       verificationId = 1L,
@@ -37,7 +38,7 @@ class VerificationResultsViewModelSpec extends SpecBase {
       verificationNumber = verificationNumber,
       taxTreatment = taxTreatment,
       subcontractorName = subcontractorName,
-      subcontractorId = Some(1L),
+      subcontractorId = subcontractorId,
       actionIndicator = actionIndicator
     )
 
@@ -147,6 +148,26 @@ class VerificationResultsViewModelSpec extends SpecBase {
 
       withNumber.verificationNumber mustBe "V0000000001"
       blank.verificationNumber mustBe ""
+    }
+  }
+
+  "VerificationResultsViewModel.unmatchedSubcontractorIds" - {
+
+    "must return subcontractorIds for unmatched verifications only" in {
+      val ids = VerificationResultsViewModel.unmatchedSubcontractorIds(
+        response(
+          verification(subcontractorId = Some(10L)),
+          verification(verificationNumber = None, subcontractorId = Some(22L)),
+          verification(matched = Some("N"), subcontractorId = Some(33L)),
+          verification(verificationNumber = None, subcontractorId = None)
+        )
+      )
+
+      ids mustBe Set(22L, 33L)
+    }
+
+    "must return empty when all verifications are matched" in {
+      VerificationResultsViewModel.unmatchedSubcontractorIds(response(verification())) mustBe Set.empty
     }
   }
 }
