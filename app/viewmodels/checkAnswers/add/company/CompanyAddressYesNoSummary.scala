@@ -16,7 +16,8 @@
 
 package viewmodels.checkAnswers.add.company
 
-import models.{CheckMode, Mode, UserAnswers}
+import models.amend.company.AmendCompanyRemoveDetail
+import models.{AmendMode, CheckMode, Mode, UserAnswers}
 import pages.add.company.CompanyAddressYesNoPage
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
@@ -36,7 +37,11 @@ object CompanyAddressYesNoSummary {
         actions = Seq(
           ActionItemViewModel(
             "site.change",
-            controllers.add.company.routes.CompanyAddressYesNoController.onPageLoad(mode).url
+            if answer && mode == AmendMode then
+              controllers.amend.company.routes.AmendCompanyRemoveDetailYesNoController
+                .onPageLoad(AmendCompanyRemoveDetail.Address.key)
+                .url
+            else controllers.add.company.routes.CompanyAddressYesNoController.onPageLoad(mode).url
           )
             .withVisuallyHiddenText(messages("companyAddressYesNo.change.hidden"))
             .withAttribute("id" -> "add-company-address")

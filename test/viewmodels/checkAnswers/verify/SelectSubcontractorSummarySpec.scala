@@ -23,7 +23,6 @@ import org.scalatest.matchers.must.Matchers
 import pages.verify.SelectSubcontractorPage
 import play.api.i18n.{Lang, Messages, MessagesImpl}
 import play.api.test.Helpers.stubMessagesApi
-import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.*
 
 class SelectSubcontractorSummarySpec extends SpecBase with Matchers {
 
@@ -100,7 +99,10 @@ class SelectSubcontractorSummarySpec extends SpecBase with Matchers {
     }
 
     "must return None when no answer is present" in {
-      SelectSubcontractorSummary.row(emptyUserAnswers) mustBe None
+
+      val result = SelectSubcontractorSummary.row(emptyUserAnswers)
+
+      result mustBe None
     }
 
     "must return a row with 'None selected' when subcontractors list is empty" in {
