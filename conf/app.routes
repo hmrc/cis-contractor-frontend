@@ -661,6 +661,7 @@ POST  /contractor-details/change-contractor-email-address  controllers.contracto
 GET   /contractor-details/contractor-details-updated  controllers.contractordetails.ContractorDetailsUpdatedController.onPageLoad()
 
 GET   /contractor-details/contractor-details-added  controllers.contractordetails.ContractorDetailsCheckAnswersController.onPageLoad()
+POST  /contractor-details/contractor-details-added  controllers.contractordetails.ContractorDetailsCheckAnswersController.onSubmit()
 
 GET   /contractor-details/enter-contractor-utr   controllers.contractordetails.ContractorUtrController.onPageLoad(mode: Mode = NormalMode)
 POST  /contractor-details/enter-contractor-utr   controllers.contractordetails.ContractorUtrController.onSubmit(mode: Mode = NormalMode)

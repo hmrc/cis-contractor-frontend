@@ -17,8 +17,11 @@
 package controllers.contractordetails
 
 import config.FrontendAppConfig
+import connectors.ConstructionIndustrySchemeConnector
+import controllers.Execution.trampoline
 import controllers.actions.*
-import pages.contractordetails.ContractorSchemePage
+import models.requests.UpdateContractorSchemeParams
+import pages.contractordetails.{ContractorSchemePage, ContractorUtrPage, EnterContractorEmailAddressPage, SchemeNamePage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -26,12 +29,14 @@ import viewmodels.checkAnswers.contractordetails.*
 import views.html.contractordetails.ContractorDetailsCheckAnswersView
 
 import javax.inject.Inject
+import scala.concurrent.Future
 
 class ContractorDetailsCheckAnswersController @Inject() (
   override val messagesApi: MessagesApi,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
+  connector: ConstructionIndustrySchemeConnector,
   val controllerComponents: MessagesControllerComponents,
   view: ContractorDetailsCheckAnswersView
 )(implicit appConfig: FrontendAppConfig)
@@ -61,6 +66,41 @@ class ContractorDetailsCheckAnswersController @Inject() (
         case None =>
           Redirect(
             controllers.routes.JourneyRecoveryController.onPageLoad()
+          )
+      }
+    }
+
+  def onSubmit: Action[AnyContent] =
+    (identify andThen getData andThen requireData).async { implicit request =>
+      request.userAnswers.get(ContractorSchemePage) match {
+
+        case Some(scheme) =>
+          val updateRequest =
+            UpdateContractorSchemeParams(
+              schemeId = scheme.schemeId,
+              instanceId = scheme.instanceId,
+              accountsOfficeReference = scheme.accountsOfficeReference,
+              taxOfficeNumber = scheme.taxOfficeNumber,
+              taxOfficeReference = scheme.taxOfficeReference,
+              utr = request.userAnswers.get(ContractorUtrPage),
+              name = request.userAnswers.get(SchemeNamePage),
+              emailAddress = request.userAnswers.get(EnterContractorEmailAddressPage),
+              version = scheme.version
+            )
+
+          connector
+            .submitContractorDetails(updateRequest)
+            .map { _ =>
+              Redirect(
+                routes.ManageContractorDetailsController.onPageLoad()
+              )
+            }
+
+        case None =>
+          Future.successful(
+            Redirect(
+              controllers.routes.JourneyRecoveryController.onPageLoad()
+            )
           )
       }
     }
