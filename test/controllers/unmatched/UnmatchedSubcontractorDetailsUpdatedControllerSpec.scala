@@ -18,8 +18,7 @@ package controllers.unmatched
 
 import base.SpecBase
 import config.FrontendAppConfig
-import models.unmatched.{UnmatchedSubcontractorDetailsUpdated, UnmatchedSubcontractorDetailsUpdatedReturnTo,
-  UnmatchedSubcontractorName, UnmatchedSubcontractorUpdate}
+import models.unmatched.{UnmatchedSubcontractorDetailsUpdated, UnmatchedSubcontractorDetailsUpdatedReturnTo, UnmatchedSubcontractorName, UnmatchedSubcontractorUpdate}
 import pages.unmatched.UnmatchedSubcontractorDetailsUpdatedPage
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
