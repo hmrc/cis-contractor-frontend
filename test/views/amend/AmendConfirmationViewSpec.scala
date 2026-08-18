@@ -108,7 +108,7 @@ class AmendConfirmationViewSpec extends AnyWordSpec with Matchers with GuiceOneA
 
       surveyLink.text() mustBe
         messages("amendConfirmation.beforeYouGo.takeAShortSurvey")
-      surveyLink.attr("href") mustBe appConfig.feedbackUrl
+      surveyLink.attr("rel") mustBe "noopener noreferrer"
     }
   }
 
