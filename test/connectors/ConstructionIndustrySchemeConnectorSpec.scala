@@ -768,7 +768,7 @@ class ConstructionIndustrySchemeConnectorSpec extends AnyWordSpec with Matchers 
       verify(http).post(urlCaptor.capture())(any[HeaderCarrier])
 
       urlCaptor.getValue.toString must include(
-        "/contractor-details/submit"
+        "/contractor-details/update"
       )
 
       val bodyCaptor: ArgumentCaptor[JsValue] =
