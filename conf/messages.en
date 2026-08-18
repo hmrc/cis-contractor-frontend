@@ -493,7 +493,7 @@ viewOnlyCheckYourAnswers.backTo                                                 
 viewOnlyCheckYourAnswers.cannotVerifyAllSubcontractors                              =  Cannot verify all subcontractors
 
 # Partnership
-addPartnershipContactMethodsYesNo.title                            = Do you want to add contact details for this partnership?
+addPartnershipContactMethodsYesNo.title                            =  Do you want to add contact details for this partnership?
 addPartnershipContactMethodsYesNo.heading                          =  Do you want to add contact details for {0}?
 addPartnershipContactMethodsYesNo.error.required                   =  Select yes if you want to add contact details for this partnership
 addPartnershipContactMethodsYesNo.checkYourAnswersLabel            =  Add contact details?
