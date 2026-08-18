@@ -19,44 +19,32 @@ contractordetails.contractorUtr.hint                                           =
 contractordetails.contractorUtr.error.required                                 =  Nodwch Gyfeirnod Unigryw y Trethdalwr 10 digid ar gyfer y contractwr
 contractordetails.contractorUtr.error.invalid                                  =  Nodwch Gyfeirnod Trethdalwr Unigryw (UTR) dilys sy’n 10 digid
 contractordetails.contractorUtr.checkYourAnswersLabel                          =  Cyfeirnod Unigryw y Trethdalwr
-contractordetails.contractorUtr.change.hidden                                  =  Cyfeirnod Unigryw y Trethdalwr
 
 contractordetails.addSchemeNameYesNo.title                                     =  A ydych am nodi enw cynllun y contractwr?
 contractordetails.addSchemeNameYesNo.heading                                   =  A ydych am nodi enw cynllun y contractwr?
 contractordetails.addSchemeNameYesNo.error.required                            =  Dewiswch ‘Iawn’ i nodi enw cynllun y contractwr
-contractordetails.addSchemeNameYesNo.checkYourAnswersLabel                     =  Ychwanegu enw’r cynllun?
-contractordetails.addSchemeNameYesNo.change.hidden                             =  add scheme name?
 
 contractordetails.schemeName.title                                             =  Beth yw enw cynllun y contractwr?
 contractordetails.schemeName.heading                                           =  Beth yw enw cynllun y contractwr?
 contractordetails.schemeName.error.required                                    =  Nodwch enw’r cynllun
 contractordetails.schemeName.error.length                                      =  Rydych wedi nodi gormod o gymeriadau ar gyfer enw’r cynllun
 contractordetails.schemeName.error.invalidCharacters                           =  Rydych wedi nodi enw’r cynllun yn y fformat anghywir
-contractordetails.schemeName.checkYourAnswersLabel                             =  Enw’r cynllun
-contractordetails.schemeName.change.hidden                                     =  scheme Name
 
 contractordetails.addEmailAddressYesNo.title                                   =  A ydych am nodi cyfeiriad e-bost y contractwr?
 contractordetails.addEmailAddressYesNo.heading                                 =  A ydych am nodi cyfeiriad e-bost y contractwr?
-contractordetails.addEmailAddressYesNo.checkYourAnswersLabel                   =  Ychwanegu cyfeiriad e-bost?
-contractordetails.addEmailAddressYesNo.change.hidden                           =  ychwanegu cyfeiriad e-bost?
 
 contractordetails.enterContractorEmailAddress.title                            =  Beth yw cyfeiriad e-bost y contractwr?
 contractordetails.enterContractorEmailAddress.heading                          =  Beth yw cyfeiriad e-bost y contractwr?
 contractordetails.enterContractorEmailAddress.error.required                   =  Nodwch gyfeiriad e-bost
 contractordetails.enterContractorEmailAddress.error.length                     =  TRydych wedi nodi gormod o gymeriadau ar gyfer y cyfeiriad e-bost
 contractordetails.enterContractorEmailAddress.error.invalid                    =  Rydych wedi nodi’r cyfeiriad e-bost yn y fformat anghywir
-contractordetails.enterContractorEmailAddress.checkYourAnswersLabel            =  Cyfeiriad e-bost
-contractordetails.enterContractorEmailAddress.change.hidden                    =  eyfeiriad e-bost
 
 contractordetails.contractorDetailsCheckAnswers.title                          =  Manylion y contractwr
 contractordetails.contractorDetailsCheckAnswers.heading                        =  Manylion y contractwr
 contractordetails.contractorDetailsCheckAnswers.accountsOfficeReference        =  Cyfeirnod y swyddfa gyfrifon: {0}
 contractordetails.contractorDetailsCheckAnswers.table.uniqueTaxpayerReference  =  Cyfeirnod Unigryw y Trethdalwr
 contractordetails.contractorDetailsCheckAnswers.table.schemeName               =  Enw’r cynllun
-contractordetails.contractorDetailsCheckAnswers.table.schemeName.hidden        =  snw’r cynllun
 contractordetails.contractorDetailsCheckAnswers.table.email                    =  E-bost?
-contractordetails.contractorDetailsCheckAnswers.table.email.hidden             =  e-bost
-contractordetails.contractorDetailsCheckAnswers.table.link.addDetails          =  Add details
 contractordetails.contractorDetailsCheckAnswers.returnToCisDashboard.link      =  Dychwelyd i ‘Cyfrif CIS’
 
 contractordetails.contractorDetailsUpdated.title                               =  Manylion y contractwr wedi’u diweddaru
