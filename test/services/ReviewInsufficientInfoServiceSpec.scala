@@ -182,6 +182,38 @@ class ReviewInsufficientInfoServiceSpec extends SpecBase {
       vm.missing.head.name mustBe "Doe Trading"
     }
 
+    "must prefer the personal name over the trading name for a sole trader with both set" in {
+      val sub =
+        mkSub(
+          id = 1L,
+          firstName = Some("Martin"),
+          surname = Some("Brody"),
+          tradingName = Some("Brody Builders"),
+          subcontractorType = Some("soletrader"),
+          utr = None
+        )
+
+      val vm = build(sub)
+
+      vm.missing.head.name mustBe "Brody, Martin"
+    }
+
+    "must use the trading name for a company even when personal name fields are set" in {
+      val sub =
+        mkSub(
+          id = 1L,
+          firstName = Some("Martin"),
+          surname = Some("Brody"),
+          tradingName = Some("Acme Ltd"),
+          subcontractorType = Some("company"),
+          utr = None
+        )
+
+      val vm = build(sub)
+
+      vm.missing.head.name mustBe "Acme Ltd"
+    }
+
     "must use 'No name provided' when no name can be derived" in {
       val sub = mkSub(id = 1L, subcontractorType = Some("company"), utr = None)
 

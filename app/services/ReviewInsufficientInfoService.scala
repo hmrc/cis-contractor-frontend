@@ -17,6 +17,8 @@
 package services
 
 import models.SubcontractorCurrentVerification
+import models.TypeOfSubcontractor
+import models.TypeOfSubcontractor.*
 import models.response.GetCurrentVerificationBatchResponse
 import models.verify.VerificationBatchReadiness
 import play.api.i18n.Messages
@@ -93,6 +95,12 @@ class ReviewInsufficientInfoService @Inject() {
       first.map(f => s"$s, $f").getOrElse(s)
     }
 
-    partnershipTrading.orElse(trading).orElse(individualName)
+    sub.subcontractorType.flatMap(TypeOfSubcontractor.enumerable.withName) match {
+      case Some(Individualorsoletrader) => individualName.orElse(trading)
+      case Some(Limitedcompany)         => trading
+      case Some(Trust)                  => trading
+      case Some(Partnership)            => partnershipTrading.orElse(trading)
+      case _                            => partnershipTrading.orElse(trading).orElse(individualName)
+    }
   }
 }
