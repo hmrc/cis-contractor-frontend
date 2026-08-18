@@ -16,7 +16,8 @@
 
 package viewmodels.checkAnswers.add
 
-import models.{CheckMode, Mode, UserAnswers}
+import models.amend.AmendIndividualRemoveDetail
+import models.{AmendMode, CheckMode, Mode, UserAnswers}
 import pages.add.UniqueTaxpayerReferenceYesNoPage
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
@@ -36,7 +37,11 @@ object UniqueTaxpayerReferenceYesNoSummary {
         actions = Seq(
           ActionItemViewModel(
             "site.change",
-            controllers.add.routes.UniqueTaxpayerReferenceYesNoController.onPageLoad(mode).url
+            if answer && mode == AmendMode then
+              controllers.amend.routes.AmendIndividualRemoveDetailYesNoController
+                .onPageLoad(AmendIndividualRemoveDetail.Utr.key)
+                .url
+            else controllers.add.routes.UniqueTaxpayerReferenceYesNoController.onPageLoad(mode).url
           )
             .withVisuallyHiddenText(messages("uniqueTaxpayerReferenceYesNo.change.hidden"))
             .withAttribute("id" -> "unique-taxpayer-reference-yes-no")

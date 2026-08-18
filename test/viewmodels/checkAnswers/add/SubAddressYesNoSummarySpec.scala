@@ -17,6 +17,7 @@
 package viewmodels.checkAnswers.add
 
 import controllers.add.routes
+import models.amend.AmendIndividualRemoveDetail
 import models.{AmendMode, CheckMode, UserAnswers}
 import org.scalatest.OptionValues.convertOptionToValuable
 import org.scalatest.TryValues.convertTryToSuccessOrFailure
@@ -89,7 +90,9 @@ class SubAddressYesNoSummarySpec extends AnyFreeSpec with Matchers {
 
       val changeAction       = actions.head
       val expectedChangeText = messages("site.change")
-      val expectedHref       = routes.SubAddressYesNoController.onPageLoad(AmendMode).url
+      val expectedHref       = controllers.amend.routes.AmendIndividualRemoveDetailYesNoController
+        .onPageLoad(AmendIndividualRemoveDetail.Address.key)
+        .url
       val expectedHiddenText = messages("subAddressYesNo.change.hidden")
 
       changeAction.content.asHtml.toString    should include(expectedChangeText)
