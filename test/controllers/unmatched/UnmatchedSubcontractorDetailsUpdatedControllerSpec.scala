@@ -18,7 +18,8 @@ package controllers.unmatched
 
 import base.SpecBase
 import config.FrontendAppConfig
-import models.unmatched.{UnmatchedSubcontractorDetailsUpdated, UnmatchedSubcontractorDetailsUpdatedReturnTo, UnmatchedSubcontractorName, UnmatchedSubcontractorUpdate}
+import models.unmatched.{UnmatchedSubcontractorDetailsUpdated, UnmatchedSubcontractorDetailsUpdatedReturnTo,
+  UnmatchedSubcontractorName, UnmatchedSubcontractorUpdate}
 import pages.unmatched.UnmatchedSubcontractorDetailsUpdatedPage
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
@@ -36,7 +37,7 @@ class UnmatchedSubcontractorDetailsUpdatedControllerSpec extends SpecBase {
       .url
 
   private def confirmationData(
-    returnTo: String
+    returnTo: UnmatchedSubcontractorDetailsUpdatedReturnTo
   ): UnmatchedSubcontractorDetailsUpdated =
     UnmatchedSubcontractorDetailsUpdated(
       subcontractorName = UnmatchedSubcontractorName(
@@ -59,7 +60,7 @@ class UnmatchedSubcontractorDetailsUpdatedControllerSpec extends SpecBase {
     )
 
   private def userAnswersWithConfirmation(
-    returnTo: String
+    returnTo: UnmatchedSubcontractorDetailsUpdatedReturnTo
   ) =
     emptyUserAnswers
       .set(
@@ -235,38 +236,10 @@ class UnmatchedSubcontractorDetailsUpdatedControllerSpec extends SpecBase {
               )
             )(messages(application)),
             subcontractorName = "Martin Brody",
-            returnUrl = "#",
+            returnUrl = controllers.routes.UnmatchedSubcontractorsController.onPageLoad().url,
             returnTextKey = "unmatched.unmatchedSubcontractorDetailsUpdated.reviewUnmatchedSubcontractors",
             showBeforeYouGo = false
           )(request, messages(application)).toString
-      }
-    }
-
-    "must default to Cannot verify all subcontractors when returnTo is unknown" in {
-
-      val userAnswers =
-        userAnswersWithConfirmation("unknownReturnTo")
-
-      val application =
-        applicationBuilder(userAnswers = Some(userAnswers)).build()
-
-      running(application) {
-
-        val request =
-          FakeRequest(GET, pageUrl)
-
-        val result =
-          route(application, request).value
-
-        status(result) mustEqual OK
-
-        val page =
-          contentAsString(result)
-
-        page must include("Cannot verify all subcontractors")
-        page must include("""href="#"""")
-        page must not include "Before you go"
-        page must not include "Take a short survey"
       }
     }
 

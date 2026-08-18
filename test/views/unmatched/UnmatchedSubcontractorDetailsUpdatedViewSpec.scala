@@ -34,8 +34,8 @@ class UnmatchedSubcontractorDetailsUpdatedViewSpec extends SpecBase {
   private val subcontractorName =
     "Martin Brody"
 
-  private val utr =
-    "3992651526"
+  private val subcontractorEmail =
+    "martin.brody@virginmedia.com"
 
   private lazy val application =
     applicationBuilder().build()
@@ -50,19 +50,21 @@ class UnmatchedSubcontractorDetailsUpdatedViewSpec extends SpecBase {
     Seq(
       Seq(
         TableRow(
-          content = Text("Add UTR?"),
+          content = Text("Methods of contact"),
           classes = "govuk-!-font-weight-bold"
         ),
         TableRow(
-          content = Text("No")
+          content = Text(
+            msgs("unmatched.unmatchedSubcontractorDetailsUpdated.noneSelected")
+          )
         ),
         TableRow(
-          content = Text("Yes")
+          content = Text("Email address")
         )
       ),
       Seq(
         TableRow(
-          content = Text("UTR"),
+          content = Text("Email address"),
           classes = "govuk-!-font-weight-bold"
         ),
         TableRow(
@@ -71,7 +73,7 @@ class UnmatchedSubcontractorDetailsUpdatedViewSpec extends SpecBase {
           )
         ),
         TableRow(
-          content = Text(utr)
+          content = Text(subcontractorEmail)
         )
       )
     )
@@ -122,7 +124,7 @@ class UnmatchedSubcontractorDetailsUpdatedViewSpec extends SpecBase {
   ): Unit = {
 
     document.select(".govuk-panel__title").text() mustEqual
-      msgs("unmatched.unmatchedSubcontractorDetailsUpdated.title")
+      msgs("unmatched.unmatchedSubcontractorDetailsUpdated.heading")
 
     document.text() must include(
       msgs(
@@ -147,15 +149,12 @@ class UnmatchedSubcontractorDetailsUpdatedViewSpec extends SpecBase {
       msgs("unmatched.unmatchedSubcontractorDetailsUpdated.table.hdr.updated")
     )
 
-    document.text() must include("Add UTR?")
-    document.text() must include("No")
-    document.text() must include("Yes")
-    document.text() must include("UTR")
-    document.text() must include(utr)
+    document.text() must include("Methods of contact")
+    document.text() must include(msgs("unmatched.unmatchedSubcontractorDetailsUpdated.noneSelected"))
+    document.text() must include("Email address")
+    document.text() must include(msgs("unmatched.unmatchedSubcontractorDetailsUpdated.noneProvided"))
+    document.text() must include(subcontractorEmail)
 
-    document.text() must include(
-      msgs("unmatched.unmatchedSubcontractorDetailsUpdated.noneProvided")
-    )
   }
 
   private def assertBeforeYouGoHidden(
@@ -172,7 +171,7 @@ class UnmatchedSubcontractorDetailsUpdatedViewSpec extends SpecBase {
       msgs("unmatched.unmatchedSubcontractorDetailsUpdated.beforeYouGo.takeAShortSurvey")
 
     document.text() must not include
-      msgs("unmatchedSubcontractorDetailsUpdated.beforeYouGo.shareFeedback")
+      msgs("unmatched.unmatchedSubcontractorDetailsUpdated.beforeYouGo.shareFeedback")
   }
 
   "UnmatchedSubcontractorDetailsUpdatedView" - {

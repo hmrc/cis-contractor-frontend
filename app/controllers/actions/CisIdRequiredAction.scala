@@ -21,13 +21,14 @@ import models.requests.{CisIdDataRequest, DataRequest}
 import pages.CisIdPage
 import play.api.mvc.Results.Redirect
 import play.api.mvc.{ActionRefiner, Result}
+import queries.CisIdQuery
 
 import scala.concurrent.{ExecutionContext, Future}
 
 class CisIdRequiredActionImpl @Inject() (implicit val executionContext: ExecutionContext) extends CisIdRequiredAction {
 
   override protected def refine[A](request: DataRequest[A]): Future[Either[Result, CisIdDataRequest[A]]] =
-    request.userAnswers.get(CisIdPage) match {
+    request.userAnswers.get(CisIdQuery) match {
       case Some(cisId) =>
         Future.successful(
           Right(

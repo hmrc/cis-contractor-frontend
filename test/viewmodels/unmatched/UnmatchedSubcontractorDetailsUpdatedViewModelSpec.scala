@@ -49,14 +49,14 @@ class UnmatchedSubcontractorDetailsUpdatedViewModelSpec extends SpecBase {
         confirmationData(
           Seq(
             UnmatchedSubcontractorUpdate(
-              detail = "Add UTR?",
-              previous = Some("No"),
-              updated = Some("Yes")
+              detail = "Methods of contact",
+              previous = Some("None selected"),
+              updated = Some("Email address")
             ),
             UnmatchedSubcontractorUpdate(
-              detail = "UTR",
-              previous = None,
-              updated = Some("3992651526")
+              detail = "Email address",
+              previous = Some("None provided"),
+              updated = Some("martin.brody@virginmedia.com")
             )
           )
         )
@@ -66,15 +66,15 @@ class UnmatchedSubcontractorDetailsUpdatedViewModelSpec extends SpecBase {
 
       result.size mustEqual 2
 
-      result.head.head.content mustEqual Text("Add UTR?")
+      result.head.head.content mustEqual Text("Methods of contact")
       result.head.head.classes mustEqual "govuk-!-font-weight-bold"
-      result.head(1).content mustEqual Text("No")
-      result.head(2).content mustEqual Text("Yes")
+      result.head(1).content mustEqual Text("None selected")
+      result.head(2).content mustEqual Text("Email address")
 
-      result(1).head.content mustEqual Text("UTR")
+      result(1).head.content mustEqual Text("Email address")
       result(1).head.classes mustEqual "govuk-!-font-weight-bold"
       result(1)(1).content mustEqual Text("None provided")
-      result(1)(2).content mustEqual Text("3992651526")
+      result(1)(2).content mustEqual Text("martin.brody@virginmedia.com")
     }
 
     "must not create table rows when previous and updated values are the same" in {

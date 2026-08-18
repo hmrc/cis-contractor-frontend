@@ -73,7 +73,7 @@ class UnmatchedSubcontractorDetailsUpdatedController @Inject() (
     }
 
   private def linkDetails(
-    returnTo: String,
+    returnTo: UnmatchedSubcontractorDetailsUpdatedReturnTo,
     manageYourSubcontractorsUrl: => String
   ): (String, String, Boolean) =
     returnTo match {
@@ -94,15 +94,8 @@ class UnmatchedSubcontractorDetailsUpdatedController @Inject() (
 
       case UnmatchedSubcontractorDetailsUpdatedReturnTo.ReviewUnmatchedSubcontractors =>
         (
-          "#",
+          controllers.routes.UnmatchedSubcontractorsController.onPageLoad().url,
           "unmatched.unmatchedSubcontractorDetailsUpdated.reviewUnmatchedSubcontractors",
-          false
-        )
-
-      case _ =>
-        (
-          "#",
-          "unmatched.unmatchedSubcontractorDetailsUpdated.cannotVerifyAllSubcontractors",
           false
         )
     }

@@ -17,24 +17,37 @@
 package models.unmatched
 
 import play.api.libs.functional.syntax.*
-import play.api.libs.json.*
+import play.api.libs.json.{JsError, JsString, Json, OFormat, OWrites, Reads, Writes, __}
 
 case class UnmatchedSubcontractorDetailsUpdated(
   subcontractorName: UnmatchedSubcontractorName,
   updates: Seq[UnmatchedSubcontractorUpdate],
-  returnTo: String = UnmatchedSubcontractorDetailsUpdatedReturnTo.CannotVerifyAllSubcontractors
+  returnTo: UnmatchedSubcontractorDetailsUpdatedReturnTo =
+    UnmatchedSubcontractorDetailsUpdatedReturnTo.CannotVerifyAllSubcontractors
 )
+
+sealed trait UnmatchedSubcontractorDetailsUpdatedReturnTo
 
 object UnmatchedSubcontractorDetailsUpdatedReturnTo {
 
-  val ReviewUnmatchedSubcontractors: String =
-    "reviewUnmatchedSubcontractors"
+  case object ReviewUnmatchedSubcontractors extends UnmatchedSubcontractorDetailsUpdatedReturnTo
+  case object YourSubcontractors extends UnmatchedSubcontractorDetailsUpdatedReturnTo
+  case object CannotVerifyAllSubcontractors extends UnmatchedSubcontractorDetailsUpdatedReturnTo
 
-  val YourSubcontractors: String =
-    "yourSubcontractors"
+  implicit val reads: Reads[UnmatchedSubcontractorDetailsUpdatedReturnTo] =
+    Reads.of[String].flatMap {
+      case "reviewUnmatchedSubcontractors" => Reads.pure(ReviewUnmatchedSubcontractors)
+      case "yourSubcontractors"            => Reads.pure(YourSubcontractors)
+      case "cannotVerifyAllSubcontractors" => Reads.pure(CannotVerifyAllSubcontractors)
+      case _                               => Reads(_ => JsError("Unknown returnTo value"))
+    }
 
-  val CannotVerifyAllSubcontractors: String =
-    "cannotVerifyAllSubcontractors"
+  implicit val writes: Writes[UnmatchedSubcontractorDetailsUpdatedReturnTo] =
+    Writes {
+      case ReviewUnmatchedSubcontractors => JsString("reviewUnmatchedSubcontractors")
+      case YourSubcontractors            => JsString("yourSubcontractors")
+      case CannotVerifyAllSubcontractors => JsString("cannotVerifyAllSubcontractors")
+    }
 }
 
 object UnmatchedSubcontractorDetailsUpdated {
@@ -71,6 +84,7 @@ case class UnmatchedSubcontractorUpdate(
   detail: String,
   previous: Option[String],
   updated: Option[String],
+  nonSelectedKey: String = "unmatched.unmatchedSubcontractorDetailsUpdated.noneSelected",
   missingValueKey: String = "unmatched.unmatchedSubcontractorDetailsUpdated.noneProvided"
 )
 
@@ -80,6 +94,9 @@ object UnmatchedSubcontractorUpdate {
     (__ \ "detail").read[String] and
       (__ \ "previous").readNullable[String] and
       (__ \ "updated").readNullable[String] and
+      (__ \ "nonSelectedKey").readWithDefault(
+        "unmatched.unmatchedSubcontractorDetailsUpdated.noneSelected"
+      ) and
       (__ \ "missingValueKey").readWithDefault(
         "unmatched.unmatchedSubcontractorDetailsUpdated.noneProvided"
       )
