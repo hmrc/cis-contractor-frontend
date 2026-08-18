@@ -16,7 +16,8 @@
 
 package viewmodels.checkAnswers.add.partnership
 
-import models.{CheckMode, Mode, UserAnswers}
+import models.amend.partnership.AmendPartnershipRemoveDetail
+import models.{AmendMode, CheckMode, Mode, UserAnswers}
 import pages.add.partnership.PartnershipNominatedPartnerUtrYesNoPage
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
@@ -36,7 +37,11 @@ object PartnershipNominatedPartnerUtrYesNoSummary {
         actions = Seq(
           ActionItemViewModel(
             "site.change",
-            controllers.add.partnership.routes.PartnershipNominatedPartnerUtrYesNoController.onPageLoad(mode).url
+            if answer && mode == AmendMode then
+              controllers.amend.partnership.routes.AmendPartnershipRemoveDetailYesNoController
+                .onPageLoad(AmendPartnershipRemoveDetail.NominatedPartnerUtr.key)
+                .url
+            else controllers.add.partnership.routes.PartnershipNominatedPartnerUtrYesNoController.onPageLoad(mode).url
           )
             .withVisuallyHiddenText(messages("partnershipNominatedPartnerUtrYesNo.change.hidden"))
             .withAttribute("id" -> "add-nominated-partner-utr")
