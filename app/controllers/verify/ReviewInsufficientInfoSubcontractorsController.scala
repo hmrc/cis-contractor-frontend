@@ -52,7 +52,7 @@ class ReviewInsufficientInfoSubcontractorsController @Inject() (
     }
   }
 
-  //TODO: This is a temporary redirect until DTR-6949 is implemented to handle the next step in the journey
+  // TODO: This is a temporary redirect until DTR-6949 is implemented to handle the next step in the journey
   def onSubmit(): Action[AnyContent] = (identify andThen getData andThen requireData) { _ =>
     Redirect(controllers.verify.routes.ContractorEmailConfirmationStoredController.onPageLoad(NormalMode))
   }
