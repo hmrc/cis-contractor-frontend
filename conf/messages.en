@@ -1096,8 +1096,8 @@ verify.verificationResults.manageYourSubcontractors.link                =  Manag
 
 # Contractor Details
 contractordetails.contractorDetailsIndex.title                                 =  Contractor details
-contractordetails.contractorDetailsIndex.heading                               =  Contractor details
-contractordetails.contractorDetailsIndex.p1                                    =  To use the Construction Industry Scheme service, you will need the contractor’s Unique Taxpayer Reference and scheme name.
+contractordetails.contractorDetailsIndex.heading                               =  Manage contractor details
+contractordetails.contractorDetailsIndex.p1                                    =  To use the Construction Industry Scheme service, you will need the contractor's Unique Taxpayer Reference.
 
 contractordetails.schemeName.title                                             =  What is the contractor’s scheme name?
 contractordetails.schemeName.heading                                           =  What is the contractor’s scheme name?
@@ -1115,11 +1115,11 @@ contractordetails.enterContractorEmailAddress.error.length                     =
 contractordetails.enterContractorEmailAddress.error.invalid                    =  You have entered an email address in an incorrect format
 contractordetails.enterContractorEmailAddress.change.hidden                    =  email address
 
-contractordetails.contractorDetailsUpdated.title                               =  Contractor Details Updated
+contractordetails.contractorDetailsUpdated.title                               =  Contractor details updated
 contractordetails.contractorDetailsUpdated.heading                             =  Contractor details updated
 contractordetails.contractorDetailsUpdated.p1.details.prefix                   =  You have successfully changed the contractor details. You can
 contractordetails.contractorDetailsUpdated.p1.details.link                     =  view the change on your contractor details
-contractordetails.contractorDetailsUpdated.returnToDashboard.link              =  Return to manage your CIS account
+contractordetails.contractorDetailsUpdated.returnToDashboard.link              =  Return to CIS account
 contractordetails.contractorDetailsUpdated.p2.whatDidYouThink.link             =  What did you think of this service?
 contractordetails.contractorDetailsUpdated.p2.whatDidYouThink.suffix           =  (takes 30 seconds)
 
@@ -1144,7 +1144,7 @@ contractordetails.contractorDetailsCheckAnswers.table.schemeName.hidden        =
 contractordetails.contractorDetailsCheckAnswers.table.email                    =  Email
 contractordetails.contractorDetailsCheckAnswers.table.email.hidden             =  email
 contractordetails.contractorDetailsCheckAnswers.table.link.addDetails          =  Add details
-contractordetails.contractorDetailsCheckAnswers.returnToCisDashboard.link      =  Return to manage your CIS account
+contractordetails.contractorDetailsCheckAnswers.returnToCisDashboard.link      =  Return to CIS account
 
 contractordetails.addEmailAddressYesNo.title                                   =  Do you want to enter the contractor’s email address?
 contractordetails.addEmailAddressYesNo.heading                                 =  Do you want to enter the contractor’s email address?
