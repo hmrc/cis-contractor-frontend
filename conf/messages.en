@@ -1183,7 +1183,6 @@ insufficientSubcontractorDetailsUpdated.table.hdr.updated                      =
 insufficientSubcontractorDetailsUpdated.noneProvided                           = None provided
 insufficientSubcontractorDetailsUpdated.noneSelected                           = None selected
 insufficientSubcontractorDetailsUpdated.backTo                                 = Back to
-insufficientSubcontractorDetailsUpdated.cannotVerifyAllSubcontractors          = Cannot verify all subcontractors
 insufficientSubcontractorDetailsUpdated.beforeYouGo.h2                         = Before you go
 insufficientSubcontractorDetailsUpdated.beforeYouGo.p1                         = Your feedback helps us make our service better.
 insufficientSubcontractorDetailsUpdated.beforeYouGo.takeAShortSurvey           = Take a short survey

@@ -18,8 +18,7 @@ package views.insufficient
 
 import base.SpecBase
 import org.jsoup.Jsoup
-import org.jsoup.nodes.Document
-import org.jsoup.nodes.Element
+import org.jsoup.nodes.{Document, Element}
 import play.api.i18n.Messages
 import play.api.test.FakeRequest
 import play.api.test.Helpers.GET
@@ -31,11 +30,9 @@ import scala.jdk.CollectionConverters.CollectionHasAsScala
 
 class InsufficientSubcontractorDetailsUpdatedViewSpec extends SpecBase {
 
-  private val subcontractorName =
-    "Martin Brody"
+  private val subcontractorName = "Martin Brody"
 
-  private val utr =
-    "3992651526"
+  private val utr = "3992651526"
 
   private lazy val application =
     applicationBuilder().build()
@@ -88,7 +85,7 @@ class InsufficientSubcontractorDetailsUpdatedViewSpec extends SpecBase {
     Jsoup.parse(
       view(
         rows = rows,
-        subcontractorName = subcontractorName,
+        subcontractorName = Some(subcontractorName),
         returnUrl = returnUrl,
         returnTextKey = returnTextKey,
         showBeforeYouGo = showBeforeYouGo
@@ -191,24 +188,25 @@ class InsufficientSubcontractorDetailsUpdatedViewSpec extends SpecBase {
       val cannotVerifyLink =
         linkWithText(
           document,
-          msgs("insufficientSubcontractorDetailsUpdated.cannotVerifyAllSubcontractors")
+          msgs(
+            "insufficientSubcontractorDetailsUpdated.cannotVerifyAllSubcontractors"
+          )
         )
 
       cannotVerifyLink.attr("href") mustEqual "#"
 
       assertLinkIsNotShown(
         document,
-        msgs("insufficientSubcontractorDetailsUpdated.reviewUnmatchedSubcontractors")
+        msgs(
+          "insufficientSubcontractorDetailsUpdated.reviewUnmatchedSubcontractors"
+        )
       )
 
       assertLinkIsNotShown(
         document,
-        msgs("insufficientSubcontractorDetailsUpdated.yourSubcontractors")
-      )
-
-      assertLinkIsNotShown(
-        document,
-        msgs("insufficientSubcontractorDetailsUpdated.beforeYouGo.takeAShortSurvey")
+        msgs(
+          "insufficientSubcontractorDetailsUpdated.yourSubcontractors"
+        )
       )
 
       assertBeforeYouGoHidden(document)
@@ -216,9 +214,14 @@ class InsufficientSubcontractorDetailsUpdatedViewSpec extends SpecBase {
 
     "must render the Review unmatched subcontractors journey" in {
 
+      val reviewUnmatchedUrl =
+        controllers.routes.UnmatchedSubcontractorsController
+          .onPageLoad()
+          .url
+
       val document =
         renderView(
-          returnUrl = "#",
+          returnUrl = reviewUnmatchedUrl,
           returnTextKey = "insufficientSubcontractorDetailsUpdated.reviewUnmatchedSubcontractors",
           showBeforeYouGo = false
         )
@@ -228,24 +231,25 @@ class InsufficientSubcontractorDetailsUpdatedViewSpec extends SpecBase {
       val reviewUnmatchedLink =
         linkWithText(
           document,
-          msgs("insufficientSubcontractorDetailsUpdated.reviewUnmatchedSubcontractors")
+          msgs(
+            "insufficientSubcontractorDetailsUpdated.reviewUnmatchedSubcontractors"
+          )
         )
 
-      reviewUnmatchedLink.attr("href") mustEqual "#"
+      reviewUnmatchedLink.attr("href") mustEqual reviewUnmatchedUrl
 
       assertLinkIsNotShown(
         document,
-        msgs("insufficientSubcontractorDetailsUpdated.cannotVerifyAllSubcontractors")
+        msgs(
+          "insufficientSubcontractorDetailsUpdated.cannotVerifyAllSubcontractors"
+        )
       )
 
       assertLinkIsNotShown(
         document,
-        msgs("insufficientSubcontractorDetailsUpdated.yourSubcontractors")
-      )
-
-      assertLinkIsNotShown(
-        document,
-        msgs("insufficientSubcontractorDetailsUpdated.beforeYouGo.takeAShortSurvey")
+        msgs(
+          "insufficientSubcontractorDetailsUpdated.yourSubcontractors"
+        )
       )
 
       assertBeforeYouGoHidden(document)
@@ -268,7 +272,9 @@ class InsufficientSubcontractorDetailsUpdatedViewSpec extends SpecBase {
       val yourSubcontractorsLink =
         linkWithText(
           document,
-          msgs("insufficientSubcontractorDetailsUpdated.yourSubcontractors")
+          msgs(
+            "insufficientSubcontractorDetailsUpdated.yourSubcontractors"
+          )
         )
 
       yourSubcontractorsLink.attr("href") mustEqual manageUrl
@@ -276,19 +282,25 @@ class InsufficientSubcontractorDetailsUpdatedViewSpec extends SpecBase {
       val surveyLink =
         linkWithText(
           document,
-          msgs("insufficientSubcontractorDetailsUpdated.beforeYouGo.takeAShortSurvey")
+          msgs(
+            "insufficientSubcontractorDetailsUpdated.beforeYouGo.takeAShortSurvey"
+          )
         )
 
       surveyLink.attr("href") mustEqual "#"
 
       assertLinkIsNotShown(
         document,
-        msgs("insufficientSubcontractorDetailsUpdated.cannotVerifyAllSubcontractors")
+        msgs(
+          "insufficientSubcontractorDetailsUpdated.cannotVerifyAllSubcontractors"
+        )
       )
 
       assertLinkIsNotShown(
         document,
-        msgs("insufficientSubcontractorDetailsUpdated.reviewUnmatchedSubcontractors")
+        msgs(
+          "insufficientSubcontractorDetailsUpdated.reviewUnmatchedSubcontractors"
+        )
       )
 
       document.text() must include(
@@ -301,6 +313,34 @@ class InsufficientSubcontractorDetailsUpdatedViewSpec extends SpecBase {
 
       document.text() must include(
         msgs("insufficientSubcontractorDetailsUpdated.beforeYouGo.shareFeedback")
+      )
+    }
+
+    "must render the no-name message when subcontractor name is not available" in {
+
+      implicit val request =
+        FakeRequest(GET, "/")
+
+      val document =
+        Jsoup.parse(
+          view(
+            rows = rows,
+            subcontractorName = None,
+            returnUrl = "#",
+            returnTextKey = "insufficientSubcontractorDetailsUpdated.cannotVerifyAllSubcontractors",
+            showBeforeYouGo = false
+          ).toString()
+        )
+
+      document.text() must include(
+        msgs("verify.noName")
+      )
+
+      document.text() must not include (
+        msgs(
+          "insufficientSubcontractorDetailsUpdated.p1",
+          subcontractorName
+        )
       )
     }
   }

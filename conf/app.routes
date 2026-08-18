@@ -682,7 +682,3 @@ POST  /contractor-details/remove-contractor-detail/:contractorDetail  controller
 
 #Insufficient
 GET   /subcontractor/insufficient/subcontractor-details-updated   controllers.insufficient.InsufficientSubcontractorDetailsUpdatedController.onPageLoad()
-
-GET   /subcontractor/verify/unmatched-subcontractors-exist                       controllers.UnmatchedSubcontractorsController.onPageLoad()
-
-GET   /subcontractor/verify/no-unmatched-subcontractors                      controllers.NoUnmatchedSubcontractorsController.onPageLoad()

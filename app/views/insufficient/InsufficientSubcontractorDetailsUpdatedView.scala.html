@@ -28,7 +28,7 @@
     link: Link
 )
 
-@(rows: Seq[Seq[TableRow]], subcontractorName: String, returnUrl: String, returnTextKey: String, showBeforeYouGo: Boolean = false)(implicit request: Request[_], messages: Messages)
+@(rows: Seq[Seq[TableRow]], subcontractorName: Option[String], returnUrl: String, returnTextKey: String, showBeforeYouGo: Boolean = false)(implicit request: Request[_], messages: Messages)
 
 @layout(
         pageTitle = titleNoForm(messages("insufficientSubcontractorDetailsUpdated.title")),
@@ -39,7 +39,14 @@
              title = Text(messages("insufficientSubcontractorDetailsUpdated.title"))
         ))
 
-        @paragraph(messages("insufficientSubcontractorDetailsUpdated.p1", subcontractorName))
+        @subcontractorName match {
+            case Some(name) => {
+                 @paragraph(messages("insufficientSubcontractorDetailsUpdated.p1", name))
+            }
+            case None => {
+                 @paragraph(messages("verify.noName"))
+             }
+        }
 
         @h2("insufficientSubcontractorDetailsUpdated.updatesMade.h2")
 

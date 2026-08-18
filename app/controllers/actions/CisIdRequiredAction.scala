@@ -20,6 +20,7 @@ import models.requests.{CisIdDataRequest, DataRequest}
 import play.api.mvc.{ActionRefiner, Result}
 import play.api.mvc.Results.Redirect
 import queries.CisIdQuery
+import play.api.Logging
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -28,7 +29,8 @@ trait CisIdRequiredAction extends ActionRefiner[DataRequest, CisIdDataRequest]
 
 class CisIdRequiredActionImpl @Inject() (implicit
   val executionContext: ExecutionContext
-) extends CisIdRequiredAction {
+) extends CisIdRequiredAction
+    with Logging {
 
   override protected def refine[A](
     request: DataRequest[A]
@@ -51,6 +53,10 @@ class CisIdRequiredActionImpl @Inject() (implicit
         )
 
       case None =>
+        logger.error(
+          "[CisIdRequiredAction] Missing CIS ID, redirecting to journey recovery"
+        )
+
         Future.successful(
           Left(
             Redirect(

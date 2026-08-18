@@ -22,19 +22,44 @@ import play.api.libs.json.*
 case class InsufficientSubcontractorDetailsUpdated(
   subcontractorName: InsufficientSubcontractorName,
   updates: Seq[InsufficientSubcontractorUpdate],
-  returnTo: String = InsufficientSubcontractorDetailsUpdatedReturnTo.CannotVerifyAllSubcontractors
+  returnTo: InsufficientSubcontractorDetailsUpdatedReturnTo =
+    InsufficientSubcontractorDetailsUpdatedReturnTo.CannotVerifyAllSubcontractors
 )
+
+sealed trait InsufficientSubcontractorDetailsUpdatedReturnTo
 
 object InsufficientSubcontractorDetailsUpdatedReturnTo {
 
-  val ReviewUnmatchedSubcontractors: String =
-    "reviewUnmatchedSubcontractors"
+  case object ReviewUnmatchedSubcontractors extends InsufficientSubcontractorDetailsUpdatedReturnTo
+  case object YourSubcontractors extends InsufficientSubcontractorDetailsUpdatedReturnTo
+  case object CannotVerifyAllSubcontractors extends InsufficientSubcontractorDetailsUpdatedReturnTo
 
-  val YourSubcontractors: String =
-    "yourSubcontractors"
+  implicit val reads: Reads[InsufficientSubcontractorDetailsUpdatedReturnTo] =
+    Reads.of[String].flatMap {
+      case "reviewUnmatchedSubcontractors" =>
+        Reads.pure(ReviewUnmatchedSubcontractors)
 
-  val CannotVerifyAllSubcontractors: String =
-    "cannotVerifyAllSubcontractors"
+      case "yourSubcontractors" =>
+        Reads.pure(YourSubcontractors)
+
+      case "cannotVerifyAllSubcontractors" =>
+        Reads.pure(CannotVerifyAllSubcontractors)
+
+      case value =>
+        Reads(_ => JsError(s"Unknown returnTo value: $value"))
+    }
+
+  implicit val writes: Writes[InsufficientSubcontractorDetailsUpdatedReturnTo] =
+    Writes {
+      case ReviewUnmatchedSubcontractors =>
+        JsString("reviewUnmatchedSubcontractors")
+
+      case YourSubcontractors =>
+        JsString("yourSubcontractors")
+
+      case CannotVerifyAllSubcontractors =>
+        JsString("cannotVerifyAllSubcontractors")
+    }
 }
 
 object InsufficientSubcontractorDetailsUpdated {
@@ -58,11 +83,20 @@ case class InsufficientSubcontractorName(
   firstName: Option[String],
   lastName: Option[String]
 ) {
-  def displayName: String =
-    Seq(firstName, lastName).flatten.mkString(" ")
+
+  def displayName: Option[String] = {
+    val name =
+      Seq(firstName, lastName).flatten
+        .map(_.trim)
+        .filter(_.nonEmpty)
+        .mkString(" ")
+
+    Option.when(name.nonEmpty)(name)
+  }
 }
 
 object InsufficientSubcontractorName {
+
   implicit val format: OFormat[InsufficientSubcontractorName] =
     Json.format[InsufficientSubcontractorName]
 }

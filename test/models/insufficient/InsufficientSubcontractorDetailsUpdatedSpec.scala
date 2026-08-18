@@ -17,8 +17,7 @@
 package models.insufficient
 
 import base.SpecBase
-import play.api.libs.json.JsNull
-import play.api.libs.json.Json
+import play.api.libs.json.{JsNull, Json}
 
 class InsufficientSubcontractorDetailsUpdatedSpec extends SpecBase {
 
@@ -32,7 +31,7 @@ class InsufficientSubcontractorDetailsUpdatedSpec extends SpecBase {
           lastName = Some("Brody")
         )
 
-      model.displayName mustEqual "Martin Brody"
+      model.displayName mustEqual Some("Martin Brody")
     }
 
     "must display first name when last name is missing" in {
@@ -43,7 +42,7 @@ class InsufficientSubcontractorDetailsUpdatedSpec extends SpecBase {
           lastName = None
         )
 
-      model.displayName mustEqual "Martin"
+      model.displayName mustEqual Some("Martin")
     }
 
     "must display last name when first name is missing" in {
@@ -54,10 +53,10 @@ class InsufficientSubcontractorDetailsUpdatedSpec extends SpecBase {
           lastName = Some("Brody")
         )
 
-      model.displayName mustEqual "Brody"
+      model.displayName mustEqual Some("Brody")
     }
 
-    "must display empty string when first name and last name are missing" in {
+    "must return None when first name and last name are missing" in {
 
       val model =
         InsufficientSubcontractorName(
@@ -65,7 +64,29 @@ class InsufficientSubcontractorDetailsUpdatedSpec extends SpecBase {
           lastName = None
         )
 
-      model.displayName mustEqual ""
+      model.displayName mustEqual None
+    }
+
+    "must ignore blank first and last names" in {
+
+      val model =
+        InsufficientSubcontractorName(
+          firstName = Some(" "),
+          lastName = Some("  ")
+        )
+
+      model.displayName mustEqual None
+    }
+
+    "must trim first and last names" in {
+
+      val model =
+        InsufficientSubcontractorName(
+          firstName = Some(" Martin "),
+          lastName = Some(" Brody ")
+        )
+
+      model.displayName mustEqual Some("Martin Brody")
     }
 
     "must serialise and deserialise" in {
@@ -77,6 +98,47 @@ class InsufficientSubcontractorDetailsUpdatedSpec extends SpecBase {
         )
 
       Json.toJson(model).as[InsufficientSubcontractorName] mustEqual model
+    }
+  }
+
+  "InsufficientSubcontractorDetailsUpdatedReturnTo" - {
+
+    "must serialise and deserialise ReviewUnmatchedSubcontractors" in {
+
+      val returnTo: InsufficientSubcontractorDetailsUpdatedReturnTo =
+        InsufficientSubcontractorDetailsUpdatedReturnTo.ReviewUnmatchedSubcontractors
+
+      Json
+        .toJson[InsufficientSubcontractorDetailsUpdatedReturnTo](returnTo)
+        .as[InsufficientSubcontractorDetailsUpdatedReturnTo] mustEqual returnTo
+    }
+
+    "must serialise and deserialise YourSubcontractors" in {
+
+      val returnTo: InsufficientSubcontractorDetailsUpdatedReturnTo =
+        InsufficientSubcontractorDetailsUpdatedReturnTo.YourSubcontractors
+
+      Json
+        .toJson[InsufficientSubcontractorDetailsUpdatedReturnTo](returnTo)
+        .as[InsufficientSubcontractorDetailsUpdatedReturnTo] mustEqual returnTo
+    }
+
+    "must serialise and deserialise CannotVerifyAllSubcontractors" in {
+
+      val returnTo: InsufficientSubcontractorDetailsUpdatedReturnTo =
+        InsufficientSubcontractorDetailsUpdatedReturnTo.CannotVerifyAllSubcontractors
+
+      Json
+        .toJson[InsufficientSubcontractorDetailsUpdatedReturnTo](returnTo)
+        .as[InsufficientSubcontractorDetailsUpdatedReturnTo] mustEqual returnTo
+    }
+
+    "must reject an unknown returnTo value" in {
+
+      Json
+        .toJson("unknownReturnTo")
+        .validate[InsufficientSubcontractorDetailsUpdatedReturnTo]
+        .isError mustBe true
     }
   }
 
@@ -190,6 +252,23 @@ class InsufficientSubcontractorDetailsUpdatedSpec extends SpecBase {
 
       model.returnTo mustEqual
         InsufficientSubcontractorDetailsUpdatedReturnTo.CannotVerifyAllSubcontractors
+    }
+
+    "must reject an unknown returnTo value when reading the complete model" in {
+
+      val json =
+        Json.obj(
+          "subcontractorName" -> Json.obj(
+            "firstName" -> "Martin",
+            "lastName"  -> "Brody"
+          ),
+          "updates"           -> Json.arr(),
+          "returnTo"          -> "unknownReturnTo"
+        )
+
+      json
+        .validate[InsufficientSubcontractorDetailsUpdated]
+        .isError mustBe true
     }
   }
 }

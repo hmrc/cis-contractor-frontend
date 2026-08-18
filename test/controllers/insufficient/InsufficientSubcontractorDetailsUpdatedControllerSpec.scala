@@ -36,7 +36,7 @@ class InsufficientSubcontractorDetailsUpdatedControllerSpec extends SpecBase {
       .url
 
   private def confirmationData(
-    returnTo: String
+    returnTo: InsufficientSubcontractorDetailsUpdatedReturnTo
   ): InsufficientSubcontractorDetailsUpdated =
     InsufficientSubcontractorDetailsUpdated(
       subcontractorName = InsufficientSubcontractorName(
@@ -59,7 +59,7 @@ class InsufficientSubcontractorDetailsUpdatedControllerSpec extends SpecBase {
     )
 
   private def userAnswersWithConfirmation(
-    returnTo: String
+    returnTo: InsufficientSubcontractorDetailsUpdatedReturnTo
   ) =
     emptyUserAnswers
       .set(
@@ -106,7 +106,7 @@ class InsufficientSubcontractorDetailsUpdatedControllerSpec extends SpecBase {
                 InsufficientSubcontractorDetailsUpdatedReturnTo.YourSubcontractors
               )
             )(messages(application)),
-            subcontractorName = "Martin Brody",
+            subcontractorName = Some("Martin Brody"),
             returnUrl = appConfig.manageYourSubcontractorsUrl(cisId),
             returnTextKey = "insufficientSubcontractorDetailsUpdated.yourSubcontractors",
             showBeforeYouGo = true
@@ -170,7 +170,7 @@ class InsufficientSubcontractorDetailsUpdatedControllerSpec extends SpecBase {
                 InsufficientSubcontractorDetailsUpdatedReturnTo.CannotVerifyAllSubcontractors
               )
             )(messages(application)),
-            subcontractorName = "Martin Brody",
+            subcontractorName = Some("Martin Brody"),
             returnUrl = "#",
             returnTextKey = "insufficientSubcontractorDetailsUpdated.cannotVerifyAllSubcontractors",
             showBeforeYouGo = false
@@ -206,39 +206,13 @@ class InsufficientSubcontractorDetailsUpdatedControllerSpec extends SpecBase {
                 InsufficientSubcontractorDetailsUpdatedReturnTo.ReviewUnmatchedSubcontractors
               )
             )(messages(application)),
-            subcontractorName = "Martin Brody",
-            returnUrl = "#",
+            subcontractorName = Some("Martin Brody"),
+            returnUrl = controllers.routes.UnmatchedSubcontractorsController
+              .onPageLoad()
+              .url,
             returnTextKey = "insufficientSubcontractorDetailsUpdated.reviewUnmatchedSubcontractors",
             showBeforeYouGo = false
           )(request, messages(application)).toString
-      }
-    }
-
-    "must default to Cannot verify all subcontractors when returnTo is unknown" in {
-
-      val userAnswers =
-        userAnswersWithConfirmation("unknownReturnTo")
-
-      val application =
-        applicationBuilder(userAnswers = Some(userAnswers)).build()
-
-      running(application) {
-
-        val request =
-          FakeRequest(GET, pageUrl)
-
-        val result =
-          route(application, request).value
-
-        status(result) mustEqual OK
-
-        val page =
-          contentAsString(result)
-
-        page must include("Cannot verify all subcontractors")
-        page must include("""href="#"""")
-        page must not include "Before you go"
-        page must not include "Take a short survey"
       }
     }
 
@@ -255,11 +229,9 @@ class InsufficientSubcontractorDetailsUpdatedControllerSpec extends SpecBase {
 
       running(application) {
 
-        val request =
-          FakeRequest(GET, pageUrl)
+        val request = FakeRequest(GET, pageUrl)
 
-        val result =
-          route(application, request).value
+        val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
 
