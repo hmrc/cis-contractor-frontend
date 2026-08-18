@@ -17,6 +17,7 @@
 package viewmodels.checkAnswers.add.partnership
 
 import controllers.add.partnership.routes
+import models.amend.partnership.AmendPartnershipRemoveDetail
 import models.{AmendMode, CheckMode, UserAnswers}
 import models.TypeOfSubcontractor
 import models.viewOnly.partnership.ViewOnlyPartnershipAnswers
@@ -34,7 +35,7 @@ class PartnershipNominatedPartnerUtrYesNoSummarySpec extends AnyFreeSpec with Ma
 
   implicit val messages: Messages = stubMessages()
 
-  "PartnershipNominatedPartnerUtrYesNoSummary.row" - {
+  "PartnershiNominatedPartnerUtrYesNoSummary.row" - {
 
     "must return a SummaryListRow with 'Yes' when the answer is true" in {
       val answers = UserAnswers("test-id")
@@ -103,12 +104,10 @@ class PartnershipNominatedPartnerUtrYesNoSummarySpec extends AnyFreeSpec with Ma
 
       val changeAction       = actions.head
       val expectedChangeText = messages("site.change")
-      val expectedHref       =
-        routes.PartnershipNominatedPartnerUtrYesNoController
-          .onPageLoad(AmendMode)
-          .url
-      val expectedHiddenText =
-        messages("partnershipNominatedPartnerUtrYesNo.change.hidden")
+      val expectedHref       = controllers.amend.partnership.routes.AmendPartnershipRemoveDetailYesNoController
+        .onPageLoad(AmendPartnershipRemoveDetail.NominatedPartnerUtr.key)
+        .url
+      val expectedHiddenText = messages("partnershipNominatedPartnerUtrYesNo.change.hidden")
 
       changeAction.content.asHtml.toString    should include(expectedChangeText)
       changeAction.href                     shouldBe expectedHref

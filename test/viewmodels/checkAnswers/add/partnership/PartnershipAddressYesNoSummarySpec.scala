@@ -17,6 +17,7 @@
 package viewmodels.checkAnswers.add.partnership
 
 import base.SpecBase
+import models.amend.partnership.AmendPartnershipRemoveDetail
 import models.{AmendMode, CheckMode, UserAnswers}
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import pages.add.partnership.PartnershipAddressYesNoPage
@@ -82,8 +83,8 @@ class PartnershipAddressYesNoSummarySpec extends SpecBase with GuiceOneAppPerSui
       actions.items must have size 1
 
       val action: ActionItem = actions.items.head
-      action.href mustBe controllers.add.partnership.routes.PartnershipAddressYesNoController
-        .onPageLoad(AmendMode)
+      action.href mustBe controllers.amend.partnership.routes.AmendPartnershipRemoveDetailYesNoController
+        .onPageLoad(AmendPartnershipRemoveDetail.Address.key)
         .url
       action.content mustBe Text(messages("site.change"))
       action.visuallyHiddenText mustBe Some(messages("partnershipAddressYesNo.change.hidden"))

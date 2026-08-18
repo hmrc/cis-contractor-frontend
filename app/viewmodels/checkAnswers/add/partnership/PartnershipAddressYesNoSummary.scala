@@ -16,8 +16,9 @@
 
 package viewmodels.checkAnswers.add.partnership
 
+import models.amend.partnership.AmendPartnershipRemoveDetail
 import models.viewOnly.partnership.ViewOnlyPartnershipAnswers
-import models.{CheckMode, Mode, UserAnswers}
+import models.{AmendMode, CheckMode, Mode, UserAnswers}
 import pages.add.partnership.PartnershipAddressYesNoPage
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
@@ -37,7 +38,11 @@ object PartnershipAddressYesNoSummary {
         actions = Seq(
           ActionItemViewModel(
             "site.change",
-            controllers.add.partnership.routes.PartnershipAddressYesNoController.onPageLoad(mode).url
+            if answer && mode == AmendMode then
+              controllers.amend.partnership.routes.AmendPartnershipRemoveDetailYesNoController
+                .onPageLoad(AmendPartnershipRemoveDetail.Address.key)
+                .url
+            else controllers.add.partnership.routes.PartnershipAddressYesNoController.onPageLoad(mode).url
           )
             .withVisuallyHiddenText(messages("partnershipAddressYesNo.change.hidden"))
             .withAttribute("id" -> "add-partnership-address")

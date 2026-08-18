@@ -16,8 +16,9 @@
 
 package viewmodels.checkAnswers.add.partnership
 
+import models.amend.partnership.AmendPartnershipRemoveDetail
 import models.viewOnly.partnership.ViewOnlyPartnershipAnswers
-import models.{CheckMode, Mode, UserAnswers}
+import models.{AmendMode, CheckMode, Mode, UserAnswers}
 import pages.add.partnership.{PartnershipHasUtrYesNoPage, PartnershipNamePage}
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.Aliases.Text
@@ -43,9 +44,15 @@ object PartnershipHasUtrYesNoSummary {
         actions = Seq(
           ActionItemViewModel(
             content = messages("site.change"),
-            href = controllers.add.partnership.routes.PartnershipHasUtrYesNoController
-              .onPageLoad(mode)
-              .url
+            href =
+              if answer && mode == AmendMode then
+                controllers.amend.partnership.routes.AmendPartnershipRemoveDetailYesNoController
+                  .onPageLoad(AmendPartnershipRemoveDetail.Utr.key)
+                  .url
+              else
+                controllers.add.partnership.routes.PartnershipHasUtrYesNoController
+                  .onPageLoad(mode)
+                  .url
           ).withVisuallyHiddenText(
             messages("partnershipHasUtrYesNo.change.hidden")
           ).withAttribute("id" -> "add-partnership-utr")
