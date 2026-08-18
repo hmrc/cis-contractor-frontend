@@ -150,7 +150,7 @@ class VerificationService @Inject() (
   private def isSubmittedStatus(status: String): Boolean =
     SubmissionStatus.fromString(status) match {
       case SubmissionStatus.SUBMITTED | SubmissionStatus.SUBMITTED_NO_RECEIPT => true
-      case _                                                                 => false
+      case _                                                                  => false
     }
 
   def modifyVerificationBatchAndVerifications(
