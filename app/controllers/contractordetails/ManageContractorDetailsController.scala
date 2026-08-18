@@ -76,29 +76,32 @@ class ManageContractorDetailsController @Inject() (
                   case scala.util.Success(answersWithScheme) =>
                     if (shouldRedirectToCheckAnswers(scheme)) {
 
-                      val updatedAnswers =
-                        ContractorDetailsPopulator.populate(
+                      ContractorDetailsPopulator
+                        .populate(
                           answersWithScheme,
                           scheme
                         )
-
-                      sessionRepository
-                        .set(updatedAnswers)
-                        .map { _ =>
-                          Redirect(
-                            routes.ContractorDetailsCheckAnswersController.onPageLoad()
-                          )
-                        }
+                        .fold(
+                          Future.failed,
+                          updatedAnswers =>
+                            sessionRepository
+                              .set(updatedAnswers)
+                              .map(_ =>
+                                Redirect(
+                                  routes.ContractorDetailsCheckAnswersController.onPageLoad()
+                                )
+                              )
+                        )
 
                     } else {
 
                       sessionRepository
                         .set(answersWithScheme)
-                        .map { _ =>
+                        .map(_ =>
                           Redirect(
                             routes.ContractorDetailsController.onPageLoad()
                           )
-                        }
+                        )
                     }
                 }
               }
@@ -131,5 +134,6 @@ class ManageContractorDetailsController @Inject() (
   private def shouldRedirectToCheckAnswers(
     scheme: Scheme
   ): Boolean =
-    scheme.utr.isDefined
+    scheme.utr.exists(_.trim.nonEmpty)
+
 }

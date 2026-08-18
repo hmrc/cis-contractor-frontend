@@ -305,5 +305,57 @@ class ManageContractorDetailsControllerSpec extends SpecBase with MockitoSugar {
             .url
       }
     }
+
+    "must redirect to ContractorDetailsController when utr is blank" in {
+
+      val schemeWithBlankUtr =
+        schemeWithUtr.copy(
+          utr = Some("   ")
+        )
+
+      val userAnswers =
+        emptyUserAnswers
+          .set(CisIdQuery, "cisId")
+          .success
+          .value
+
+      when(
+        mockContractorDetailsService.getScheme(eqTo("cisId"))(any())
+      ).thenReturn(
+        Future.successful(schemeWithBlankUtr)
+      )
+
+      when(
+        mockSessionRepository.set(any())
+      ).thenReturn(
+        Future.successful(true)
+      )
+
+      val application =
+        applicationWith(
+          userAnswers,
+          mockContractorDetailsService,
+          mockSessionRepository
+        ).build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(
+            GET,
+            routes.ManageContractorDetailsController.onPageLoad().url
+          )
+
+        val result =
+          route(application, request).value
+
+        status(result) mustBe SEE_OTHER
+
+        redirectLocation(result).value mustBe
+          controllers.contractordetails.routes.ContractorDetailsController
+            .onPageLoad()
+            .url
+      }
+    }
   }
 }

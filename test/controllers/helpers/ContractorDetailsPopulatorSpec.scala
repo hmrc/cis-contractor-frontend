@@ -43,11 +43,15 @@ class ContractorDetailsPopulatorSpec extends SpecBase {
           scheme
         )
 
-      result.get(ContractorUtrPage) mustBe Some("1234567890")
-      result.get(AddSchemeNameYesNoPage) mustBe Some(true)
-      result.get(SchemeNamePage) mustBe Some("ABC Contractors")
-      result.get(AddEmailAddressYesNoPage) mustBe Some(true)
-      result.get(EnterContractorEmailAddressPage) mustBe Some("abc@test.com")
+      result.isSuccess mustBe true
+
+      val answers = result.get
+
+      answers.get(ContractorUtrPage) mustBe Some("1234567890")
+      answers.get(AddSchemeNameYesNoPage) mustBe Some(true)
+      answers.get(SchemeNamePage) mustBe Some("ABC Contractors")
+      answers.get(AddEmailAddressYesNoPage) mustBe Some(true)
+      answers.get(EnterContractorEmailAddressPage) mustBe Some("abc@test.com")
     }
 
     "set scheme name and email flags to false when values are missing" in {
@@ -69,11 +73,65 @@ class ContractorDetailsPopulatorSpec extends SpecBase {
           scheme
         )
 
-      result.get(ContractorUtrPage) mustBe Some("1234567890")
-      result.get(AddSchemeNameYesNoPage) mustBe Some(false)
-      result.get(SchemeNamePage) mustBe Some("")
-      result.get(AddEmailAddressYesNoPage) mustBe Some(false)
-      result.get(EnterContractorEmailAddressPage) mustBe Some("")
+      result.isSuccess mustBe true
+
+      val answers = result.get
+
+      answers.get(ContractorUtrPage) mustBe Some("1234567890")
+      answers.get(AddSchemeNameYesNoPage) mustBe Some(false)
+      answers.get(SchemeNamePage) mustBe None
+      answers.get(AddEmailAddressYesNoPage) mustBe Some(false)
+      answers.get(EnterContractorEmailAddressPage) mustBe None
+    }
+
+    "treat blank name and email values as missing" in {
+
+      val scheme = Scheme(
+        schemeId = 1,
+        instanceId = "cisId",
+        accountsOfficeReference = "123 PA 87654321",
+        taxOfficeNumber = "123",
+        taxOfficeReference = "45678",
+        utr = Some("1234567890"),
+        name = Some("   "),
+        emailAddress = Some("")
+      )
+
+      val result =
+        ContractorDetailsPopulator.populate(
+          emptyUserAnswers,
+          scheme
+        )
+
+      result.isSuccess mustBe true
+
+      val answers = result.get
+
+      answers.get(ContractorUtrPage) mustBe Some("1234567890")
+      answers.get(AddSchemeNameYesNoPage) mustBe Some(false)
+      answers.get(SchemeNamePage) mustBe None
+      answers.get(AddEmailAddressYesNoPage) mustBe Some(false)
+      answers.get(EnterContractorEmailAddressPage) mustBe None
+    }
+
+    "return Failure when UTR is missing" in {
+
+      val scheme = Scheme(
+        schemeId = 1,
+        instanceId = "cisId",
+        accountsOfficeReference = "123 PA 87654321",
+        taxOfficeNumber = "123",
+        taxOfficeReference = "45678",
+        utr = None
+      )
+
+      val result =
+        ContractorDetailsPopulator.populate(
+          emptyUserAnswers,
+          scheme
+        )
+
+      result.isFailure mustBe true
     }
   }
 }

@@ -19,38 +19,57 @@ package controllers.helpers
 import models.{Scheme, UserAnswers}
 import pages.contractordetails.*
 
+import scala.util.{Success, Try}
+
 object ContractorDetailsPopulator {
+
+  private def nonBlank(value: Option[String]): Option[String] =
+    value.map(_.trim).filter(_.nonEmpty)
 
   def populate(
     userAnswers: UserAnswers,
     scheme: Scheme
-  ): UserAnswers =
-    (
-      for {
-        ua1 <- userAnswers.set(
-                 ContractorUtrPage,
-                 scheme.utr.get
-               )
+  ): Try[UserAnswers] = {
 
-        ua2 <- ua1.set(
-                 AddSchemeNameYesNoPage,
-                 scheme.name.isDefined
-               )
+    val utr   = nonBlank(scheme.utr)
+    val name  = nonBlank(scheme.name)
+    val email = nonBlank(scheme.emailAddress)
 
-        ua3 <- ua2.set(
-                 SchemeNamePage,
-                 scheme.name.getOrElse("")
-               )
+    for {
+      contractorUtr <- Try(
+                         utr.getOrElse(
+                           throw new IllegalArgumentException(
+                             "Cannot populate contractor details without UTR"
+                           )
+                         )
+                       )
 
-        ua4 <- ua3.set(
-                 AddEmailAddressYesNoPage,
-                 scheme.emailAddress.isDefined
-               )
+      ua1 <- userAnswers.set(ContractorUtrPage, contractorUtr)
 
-        ua5 <- ua4.set(
-                 EnterContractorEmailAddressPage,
-                 scheme.emailAddress.getOrElse("")
-               )
-      } yield ua5
-    ).getOrElse(userAnswers)
+      ua2 <- ua1.set(AddSchemeNameYesNoPage, name.isDefined)
+
+      ua3 <-
+        name match {
+          case Some(value) =>
+            ua2.set(SchemeNamePage, value)
+
+          case None =>
+            Success(ua2)
+        }
+
+      ua4 <- ua3.set(AddEmailAddressYesNoPage, email.isDefined)
+
+      ua5 <-
+        email match {
+          case Some(value) =>
+            ua4.set(
+              EnterContractorEmailAddressPage,
+              value
+            )
+
+          case None => Success(ua4)
+        }
+
+    } yield ua5
+  }
 }
