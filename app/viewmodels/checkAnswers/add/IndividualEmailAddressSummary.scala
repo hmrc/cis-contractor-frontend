@@ -37,6 +37,7 @@ object IndividualEmailAddressSummary {
             controllers.add.routes.IndividualEmailAddressController.onPageLoad(mode).url
           )
             .withVisuallyHiddenText(messages("individualEmailAddress.change.hidden"))
+            .withAttribute("id" -> "individual-email-address")
         )
       )
     }

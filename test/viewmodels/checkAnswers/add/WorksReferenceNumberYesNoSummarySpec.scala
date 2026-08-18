@@ -17,6 +17,7 @@
 package viewmodels.checkAnswers.add
 
 import controllers.add.routes
+import models.amend.AmendIndividualRemoveDetail
 import models.{AmendMode, CheckMode, UserAnswers}
 import models.viewOnly.ViewOnlyIndividualAnswers
 import org.scalatest.OptionValues.convertOptionToValuable
@@ -105,11 +106,10 @@ class WorksReferenceNumberYesNoSummarySpec extends AnyFreeSpec with Matchers {
 
       val expectedChangeText = messages("site.change")
       val expectedHref       =
-        routes.WorksReferenceNumberYesNoController
-          .onPageLoad(AmendMode)
+        controllers.amend.routes.AmendIndividualRemoveDetailYesNoController
+          .onPageLoad(AmendIndividualRemoveDetail.WorksReferenceNumber.key)
           .url
-      val expectedHiddenText =
-        messages("worksReferenceNumberYesNo.change.hidden")
+      val expectedHiddenText = messages("worksReferenceNumberYesNo.change.hidden")
 
       changeAction.content.asHtml.toString    should include(expectedChangeText)
       changeAction.href                     shouldBe expectedHref
