@@ -191,22 +191,19 @@ object IndividualAmendedViewModel {
         IndividualEmailAddressPage,
         messages("individualEmailAddress.checkYourAnswersLabel"),
         original.email,
-        current,
-        missingValue
+        current
       ),
       fieldRow(
         IndividualPhoneNumberPage,
         messages("individualPhoneNumber.checkYourAnswersLabel"),
         original.phone,
-        current,
-        missingValue
+        current
       ),
       fieldRow(
         IndividualMobileNumberPage,
         messages("individualMobileNumber.checkYourAnswersLabel"),
         original.mobile,
-        current,
-        missingValue
+        current
       )
     ).flatten
   }
