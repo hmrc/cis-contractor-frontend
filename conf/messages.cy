@@ -18,8 +18,6 @@ contractordetails.contractorUtr.label                                          =
 contractordetails.contractorUtr.hint                                           =  Mae UTR yn rhif 10 digid.
 contractordetails.contractorUtr.error.required                                 =  Nodwch Gyfeirnod Unigryw y Trethdalwr 10 digid ar gyfer y contractwr
 contractordetails.contractorUtr.error.invalid                                  =  Nodwch Gyfeirnod Trethdalwr Unigryw (UTR) dilys sy’n 10 digid
-#TODO: contractordetails.contractorUtr.error.length (NOT TRANSLATED) -> Don't think is used anywhere in the project
-contractordetails.contractorUtr.error.length                                   =  Enter a valid Unique Taxpayer Reference (UTR) using 10 numbers, like 1234567890
 contractordetails.contractorUtr.checkYourAnswersLabel                          =  Cyfeirnod Unigryw y Trethdalwr
 contractordetails.contractorUtr.change.hidden                                  =  Cyfeirnod Unigryw y Trethdalwr
 
@@ -39,9 +37,6 @@ contractordetails.schemeName.change.hidden                                     =
 
 contractordetails.addEmailAddressYesNo.title                                   =  A ydych am nodi cyfeiriad e-bost y contractwr?
 contractordetails.addEmailAddressYesNo.heading                                 =  A ydych am nodi cyfeiriad e-bost y contractwr?
-# TODO: On google docs, contractordetails.addEmailAddressYesNo.error.required needs to be adjusted to email address instead of scheme name
-# TODO: Remove the contractordetails.addEmailAddressYesNo.error.required
-contractordetails.addEmailAddressYesNo.error.required                          =  Select yes to enter the contractor’s email address
 contractordetails.addEmailAddressYesNo.checkYourAnswersLabel                   =  Ychwanegu cyfeiriad e-bost?
 contractordetails.addEmailAddressYesNo.change.hidden                           =  ychwanegu cyfeiriad e-bost?
 
