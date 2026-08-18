@@ -37,7 +37,7 @@ object VerificationResultsViewModel {
       VerificationResultsViewModel(
         name = verification.subcontractorName.getOrElse(messages("verify.noName")),
         verificationStatus = verificationStatusFor(verification),
-        taxTreatment = verification.taxTreatment.getOrElse(messages("site.unknown")),
+        taxTreatment = taxTreatmentFor(verification),
         verificationNumber = verification.verificationNumber.getOrElse(""),
         isUnmatched = isUnmatched(verification)
       )
@@ -51,5 +51,13 @@ object VerificationResultsViewModel {
     }
 
   private def isUnmatched(verification: VerificationLastVerification): Boolean =
-    !verification.matched.contains("Y")
+    verification.matched.contains("N")
+
+  private def taxTreatmentFor(verification: VerificationLastVerification)(implicit messages: Messages): String =
+    verification.taxTreatment match {
+      case Some("net")       => messages("verify.verificationResults.taxTreatment.net")
+      case Some("gross")     => messages("verify.verificationResults.taxTreatment.gross")
+      case Some("unmatched") => messages("verify.verificationResults.taxTreatment.unmatched")
+      case _                 => messages("site.unknown")
+    }
 }

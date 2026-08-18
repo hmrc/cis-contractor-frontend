@@ -20,46 +20,67 @@ import base.SpecBase
 import play.api.libs.json.Json
 
 class VerificationLastVerificationSpec extends SpecBase {
-  "SubcontractorLastVerification" - {
+  "VerificationLastVerification" - {
     "serialize to JSON correctly" in {
-      val subcontractor = SubcontractorLastVerification(
-        subcontractorId = 1L,
-        subbieResourceRef = Some(10L),
-        subcontractorType = Some("soletrader"),
-        utr = Some("1111111111")
+      val verification = VerificationLastVerification(
+        verificationId = 1L,
+        verificationBatchId = Some(10L),
+        verificationResourceRef = Some(20L),
+        matched = Some("Y"),
+        verificationNumber = Some("V1234567890"),
+        taxTreatment = Some("net"),
+        subcontractorName = Some("ABC Construction"),
+        subcontractorId = Some(99L)
       )
-      val json          = Json.toJson(subcontractor)
-      (json \ "subcontractorId").as[Long] mustBe 1L
-      (json \ "subbieResourceRef").as[Long] mustBe 10L
-      (json \ "subcontractorType").as[String] mustBe "soletrader"
-      (json \ "utr").as[String] mustBe "1111111111"
+      val json         = Json.toJson(verification)
+      (json \ "verificationId").as[Long] mustBe 1L
+      (json \ "verificationBatchId").as[Long] mustBe 10L
+      (json \ "verificationResourceRef").as[Long] mustBe 20L
+      (json \ "matched").as[String] mustBe "Y"
+      (json \ "verificationNumber").as[String] mustBe "V1234567890"
+      (json \ "taxTreatment").as[String] mustBe "net"
+      (json \ "subcontractorName").as[String] mustBe "ABC Construction"
+      (json \ "subcontractorId").as[Long] mustBe 99L
     }
 
     "deserialize from JSON correctly" in {
       val json   = Json.parse(
         """|{
-           | "subcontractorId": 1,
-           | "subbieResourceRef": 10,
-           | "subcontractorType": "soletrader",
-           | "utr": "1111111111"
+           | "verificationId": 1,
+           | "verificationBatchId": 10,
+           | "verificationResourceRef": 20,
+           | "matched": "Y",
+           | "verificationNumber": "V1234567890",
+           | "taxTreatment": "net",
+           | "subcontractorName": "ABC Construction",
+           | "subcontractorId": 99
            |}""".stripMargin
       )
-      val result = json.as[SubcontractorLastVerification]
-      result.subcontractorId mustBe 1L
-      result.subbieResourceRef mustBe Some(10L)
-      result.subcontractorType mustBe Some("soletrader")
-      result.utr mustBe Some("1111111111")
+      val result = json.as[VerificationLastVerification]
+      result.verificationId mustBe 1L
+      result.verificationBatchId mustBe Some(10L)
+      result.verificationResourceRef mustBe Some(20L)
+      result.matched mustBe Some("Y")
+      result.verificationNumber mustBe Some("V1234567890")
+      result.taxTreatment mustBe Some("net")
+      result.subcontractorName mustBe Some("ABC Construction")
+      result.subcontractorId mustBe Some(99L)
     }
+
     "round-trip serialize and deserialize correctly" in {
-      val subcontractor = SubcontractorLastVerification(
-        subcontractorId = 1L,
-        subbieResourceRef = Some(10L),
-        subcontractorType = Some("soletrader"),
-        utr = Some("1111111111")
+      val verification = VerificationLastVerification(
+        verificationId = 1L,
+        verificationBatchId = Some(10L),
+        verificationResourceRef = Some(20L),
+        matched = Some("Y"),
+        verificationNumber = Some("V1234567890"),
+        taxTreatment = Some("net"),
+        subcontractorName = Some("ABC Construction"),
+        subcontractorId = Some(99L)
       )
-      val json          = Json.toJson(subcontractor)
-      val result        = json.as[SubcontractorLastVerification]
-      result mustBe subcontractor
+      val json         = Json.toJson(verification)
+      val result       = json.as[VerificationLastVerification]
+      result mustBe verification
     }
   }
 }
