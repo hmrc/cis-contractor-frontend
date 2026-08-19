@@ -83,7 +83,7 @@ class ReviewInsufficientInfoSubcontractorsViewSpec extends SpecBase {
       table must not be null
 
       table.text must include("Brody, Martin")
-      table.text must include(messagesImpl("verify.reviewInsufficientInfo.utr.noneProvided"))
+      table.text must include(messagesImpl("verify.reviewInsufficientInfo.noneProvided"))
       table.text must include(messagesImpl("verify.reviewInsufficientInfo.action.edit"))
       table.text must include(messagesImpl("verify.reviewInsufficientInfo.action.proceed"))
       table.text must include(messagesImpl("verify.reviewInsufficientInfo.action.remove"))
@@ -95,7 +95,7 @@ class ReviewInsufficientInfoSubcontractorsViewSpec extends SpecBase {
       val table = document.getElementById("ready-table")
       table must not be null
 
-      table.select("thead th").text must include(messagesImpl("verify.reviewInsufficientInfo.utr.full"))
+      table.select("thead th").text must include(messagesImpl("verify.reviewInsufficientInfo.utr"))
       table.text                    must include("Smith, John")
       table.text                    must include("1234567890")
     }

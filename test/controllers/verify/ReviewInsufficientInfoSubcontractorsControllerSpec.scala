@@ -18,7 +18,7 @@ package controllers.verify
 
 import base.SpecBase
 import controllers.routes
-import models.SubcontractorCurrentVerification
+import models.{SubcontractorCurrentVerification, VerificationCurrentVerification}
 import models.response.GetCurrentVerificationBatchResponse
 import pages.verify.CurrentVerificationBatchResponsePage
 import play.api.test.FakeRequest
@@ -74,11 +74,25 @@ class ReviewInsufficientInfoSubcontractorsControllerSpec extends SpecBase {
       pendingVerifications = None
     )
 
+  private def mkVerification(subcontractorId: Long): VerificationCurrentVerification =
+    VerificationCurrentVerification(
+      verificationId = subcontractorId,
+      verificationBatchId = None,
+      subcontractorId = Some(subcontractorId),
+      verificationResourceRef = None,
+      subcontractorName = None,
+      verificationNumber = None,
+      taxTreatment = None,
+      actionIndicator = None,
+      proceed = None,
+      matched = None
+    )
+
   private def batchOf(subs: SubcontractorCurrentVerification*): GetCurrentVerificationBatchResponse =
     GetCurrentVerificationBatchResponse(
       subcontractors = subs,
       verificationBatch = None,
-      verifications = Nil
+      verifications = subs.map(sub => mkVerification(sub.subcontractorId))
     )
 
   private val missingSub =

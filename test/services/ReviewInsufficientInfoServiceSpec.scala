@@ -17,7 +17,7 @@
 package services
 
 import base.SpecBase
-import models.SubcontractorCurrentVerification
+import models.{SubcontractorCurrentVerification, VerificationCurrentVerification}
 import models.response.GetCurrentVerificationBatchResponse
 import play.api.i18n.Messages
 import play.api.test.FakeRequest
@@ -76,12 +76,26 @@ class ReviewInsufficientInfoServiceSpec extends SpecBase {
       pendingVerifications = None
     )
 
+  private def mkVerification(subcontractorId: Long): VerificationCurrentVerification =
+    VerificationCurrentVerification(
+      verificationId = subcontractorId,
+      verificationBatchId = None,
+      subcontractorId = Some(subcontractorId),
+      verificationResourceRef = None,
+      subcontractorName = None,
+      verificationNumber = None,
+      taxTreatment = None,
+      actionIndicator = None,
+      proceed = None,
+      matched = None
+    )
+
   private def build(subs: SubcontractorCurrentVerification*) =
     service.buildViewModel(
       GetCurrentVerificationBatchResponse(
         subcontractors = subs,
         verificationBatch = None,
-        verifications = Nil
+        verifications = subs.map(sub => mkVerification(sub.subcontractorId))
       )
     )
 
@@ -168,6 +182,38 @@ class ReviewInsufficientInfoServiceSpec extends SpecBase {
       vm.missing.head.name mustBe "Doe Trading"
     }
 
+    "must prefer the personal name over the trading name for a sole trader with both set" in {
+      val sub =
+        mkSub(
+          id = 1L,
+          firstName = Some("Martin"),
+          surname = Some("Brody"),
+          tradingName = Some("Brody Builders"),
+          subcontractorType = Some("soletrader"),
+          utr = None
+        )
+
+      val vm = build(sub)
+
+      vm.missing.head.name mustBe "Brody, Martin"
+    }
+
+    "must use the trading name for a company even when personal name fields are set" in {
+      val sub =
+        mkSub(
+          id = 1L,
+          firstName = Some("Martin"),
+          surname = Some("Brody"),
+          tradingName = Some("Acme Ltd"),
+          subcontractorType = Some("company"),
+          utr = None
+        )
+
+      val vm = build(sub)
+
+      vm.missing.head.name mustBe "Acme Ltd"
+    }
+
     "must use 'No name provided' when no name can be derived" in {
       val sub = mkSub(id = 1L, subcontractorType = Some("company"), utr = None)
 
@@ -206,6 +252,25 @@ class ReviewInsufficientInfoServiceSpec extends SpecBase {
 
       vm.missing.map(_.name) mustBe Seq("Acme Ltd")
       vm.ready.map(_.name) mustBe Seq("Other Ltd")
+    }
+
+    "must only include subcontractors that are members of the current verification batch" in {
+      val inBatch    =
+        mkSub(id = 1L, tradingName = Some("Acme Ltd"), subcontractorType = Some("company"), utr = None)
+      val notInBatch =
+        mkSub(id = 2L, tradingName = Some("Other Ltd"), subcontractorType = Some("company"), utr = None)
+
+      val vm =
+        service.buildViewModel(
+          GetCurrentVerificationBatchResponse(
+            subcontractors = Seq(inBatch, notInBatch),
+            verificationBatch = None,
+            verifications = Seq(mkVerification(inBatch.subcontractorId))
+          )
+        )
+
+      vm.missing.map(_.name) mustBe Seq("Acme Ltd")
+      vm.ready mustBe empty
     }
   }
 }

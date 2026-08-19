@@ -17,6 +17,8 @@
 package services
 
 import models.SubcontractorCurrentVerification
+import models.TypeOfSubcontractor
+import models.TypeOfSubcontractor.*
 import models.response.GetCurrentVerificationBatchResponse
 import models.verify.VerificationBatchReadiness
 import play.api.i18n.Messages
@@ -33,15 +35,21 @@ class ReviewInsufficientInfoService @Inject() {
   def buildViewModel(
     batch: GetCurrentVerificationBatchResponse
   )(implicit messages: Messages): ReviewInsufficientInfoViewModel = {
+    val batchSubs =
+      batch.verifications.flatMap { verification =>
+        batch.subcontractors
+          .find(sub => verification.subcontractorId.contains(sub.subcontractorId))
+          .map(sub => (sub, verification))
+      }
+
     val (readySubs, missingSubs) =
-      batch.subcontractors.partition { sub =>
-        val verification = batch.verifications.find(_.subcontractorId.contains(sub.subcontractorId))
-        VerificationBatchReadiness.isSubcontractorReady(sub, verification)
+      batchSubs.partition { case (sub, verification) =>
+        VerificationBatchReadiness.isSubcontractorReady(sub, Some(verification))
       }
 
     ReviewInsufficientInfoViewModel(
-      missing = missingSubs.map(toMissingRow),
-      ready = readySubs.map(toReadyRow)
+      missing = missingSubs.map { case (sub, _) => toMissingRow(sub) },
+      ready = readySubs.map { case (sub, _) => toReadyRow(sub) }
     )
   }
 
@@ -87,6 +95,12 @@ class ReviewInsufficientInfoService @Inject() {
       first.map(f => s"$s, $f").getOrElse(s)
     }
 
-    partnershipTrading.orElse(trading).orElse(individualName)
+    sub.subcontractorType.flatMap(TypeOfSubcontractor.enumerable.withName) match {
+      case Some(Individualorsoletrader) => individualName.orElse(trading)
+      case Some(Limitedcompany)         => trading
+      case Some(Trust)                  => trading
+      case Some(Partnership)            => partnershipTrading.orElse(trading)
+      case _                            => partnershipTrading.orElse(trading).orElse(individualName)
+    }
   }
 }

@@ -426,6 +426,7 @@ amendConfirmation.beforeYouGo.p1                                                
 amendConfirmation.beforeYouGo.takeAShortSurvey                                      =  Take a short survey
 amendConfirmation.beforeYouGo.shareFeedback                                         =  to share your feedback on this service.
 amendConfirmation.table.content.none                                                =  None provided
+amendConfirmation.table.selectContent.none                                          =  None selected
 
 amendTrustRemoveDetailYesNo.title                                                   =  Are you sure you want to remove this information from this subcontractor?
 amendTrustRemoveDetailYesNo.heading                                                 =  Are you sure you want to remove the {1} for {0}?
@@ -476,8 +477,21 @@ unmatched.proceedSubcontractorVerifyRequest.heading                             
 unmatched.proceedSubcontractorVerifyRequest.p1                                      =  This will assign the higher rate tax treatment to this subcontractor.
 unmatched.proceedSubcontractorVerifyRequest.error.required                          =  Select yes if you want to proceed with verifying this subcontractor
 
+unmatchedSubcontractors.title                                                       =  You have unmatched subcontractors
+unmatchedSubcontractors.heading                                                     =  You have unmatched subcontractors
+unmatchedSubcontractors.p1                                                          =  Some of the subcontractor details in your most recent verification request do not match the information about that subcontractor held by HMRC.
+unmatchedSubcontractors.p2                                                          =  You cannot create a new verification request until you have reviewed and fixed these unmatched results.
+unmatchedSubcontractors.verificationResults.link                                    =  Check your latest verification results
+
+noUnmatchedSubcontractors.title                                                     =  No unmatched subcontractors
+noUnmatchedSubcontractors.heading                                                   =  No unmatched subcontractors
+noUnmatchedSubcontractors.p1                                                        =  The subcontractors marked as unmatched in your most recent verification results have been deleted.
+noUnmatchedSubcontractors.p2                                                        =  You can now verify any of your other subcontractors by creating a new verification request.
+noUnmatchedSubcontractors.backTo                                                    =  Back to
+noUnmatchedSubcontractors.manageYourSubcontractors.link                             =  Manage your subcontractors
+
 # Partnership
-removeInsufficientSubcontractorNameYesNo.title                            =  Do you want to add contact details for this partnership?
+addPartnershipContactMethodsYesNo.title                            = Do you want to add contact details for this partnership?
 addPartnershipContactMethodsYesNo.heading                          =  Do you want to add contact details for {0}?
 addPartnershipContactMethodsYesNo.error.required                   =  Select yes if you want to add contact details for this partnership
 addPartnershipContactMethodsYesNo.checkYourAnswersLabel            =  Add contact details?
@@ -935,7 +949,7 @@ verify.verifyYourSubcontractorsYesNo.p3                                 =  You m
 verify.verifyYourSubcontractorsYesNo.list.l1                            =  have recently changed any of their information
 verify.verifyYourSubcontractorsYesNo.list.l2                            =  have not been included on a return recently and have lost their verified status
 verify.verifyYourSubcontractorsYesNo.list.l3                            =  are about to lose their verified status
-verify.verifyYourSubcontractorsYesNo.heading2                           =  Do you want to add existing subcontractors to this verification request?
+verify.verifyYourSubcontractorsYesNo.heading2                           =  Do you want to reverify any existing subcontractors?
 verify.verifyYourSubcontractorsYesNo.error.required                     =  Select yes if you want to add existing subcontractors to this verification request
 
 verify.verificationRequestInProgress.title                              =  Verification request in progress
@@ -978,8 +992,7 @@ verify.reviewInsufficientInfo.missing.subheading                        =  Subco
 verify.reviewInsufficientInfo.ready.subheading                          =  Ready for verification
 verify.reviewInsufficientInfo.name                                      =  Name
 verify.reviewInsufficientInfo.utr                                       =  UTR
-verify.reviewInsufficientInfo.utr.full                                  =  Unique Taxpayer Reference
-verify.reviewInsufficientInfo.utr.noneProvided                          =  None provided
+verify.reviewInsufficientInfo.noneProvided                              =  None provided
 verify.reviewInsufficientInfo.actions                                   =  Actions
 verify.reviewInsufficientInfo.action.edit                               =  Edit
 verify.reviewInsufficientInfo.action.proceed                            =  Proceed
@@ -1032,10 +1045,10 @@ verify.reverifyExistingSubcontractorsYesNo.p2                           =  You m
 verify.reverifyExistingSubcontractorsYesNo.list.l1                      =  have recently changed any of their information
 verify.reverifyExistingSubcontractorsYesNo.list.l2                      =  have not been included on a return recently and have lost their verified status
 verify.reverifyExistingSubcontractorsYesNo.list.l3                      =  are about to lose their verified status
-verify.reverifyExistingSubcontractorsYesNo.subHeading                   =  Do you want to add other subcontractors to this verification request?
+verify.reverifyExistingSubcontractorsYesNo.subHeading                   =  Do you want to reverify any existing subcontractors?
 verify.reverifyExistingSubcontractorsYesNo.error.required               =  Select yes if you want to add existing subcontractors to this verification request
-verify.reverifyExistingSubcontractorsYesNo.checkYourAnswersLabel        =  Do you want to add other subcontractors to this verification request?
-verify.reverifyExistingSubcontractorsYesNo.change.hidden                =  do you want to add other subcontractors to this verification request?
+verify.reverifyExistingSubcontractorsYesNo.checkYourAnswersLabel        =  Do you want to reverify any existing subcontractors?
+verify.reverifyExistingSubcontractorsYesNo.change.hidden                =  do you want to reverify any existing subcontractors?
 
 verify.verifyDepartmentalError.title                                    =  There was a problem with your verification request
 verify.verifyDepartmentalError.heading                                  =  There was a problem with your verification request
@@ -1191,16 +1204,3 @@ contractordetails.removeDetailYesNo.detail.email                               =
 contractordetails.removeDetailYesNo.detail.schemeName                          =  scheme name
 contractordetails.removeDetailYesNo.error.required.email                       =  Select yes to remove the contractor’s email address
 contractordetails.removeDetailYesNo.error.required.schemeName                  =  Select yes to remove the contractor’s scheme name
-
-unmatchedSubcontractors.title = You have unmatched subcontractors
-unmatchedSubcontractors.heading = You have unmatched subcontractors
-unmatchedSubcontractors.p1 = Some of the subcontractor details in your most recent verification request do not match the information about that subcontractor held by HMRC.
-unmatchedSubcontractors.p2 = You cannot create a new verification request until you have reviewed and fixed these unmatched results.
-unmatchedSubcontractors.verificationResults.link = Check your latest verification results
-
-noUnmatchedSubcontractors.title = No unmatched subcontractors
-noUnmatchedSubcontractors.heading = No unmatched subcontractors
-noUnmatchedSubcontractors.p1 = The subcontractors marked as unmatched in your most recent verification results have been deleted.
-noUnmatchedSubcontractors.p2 = You can now verify any of your other subcontractors by creating a new verification request.
-noUnmatchedSubcontractors.backTo = Back to
-noUnmatchedSubcontractors.manageYourSubcontractors.link = Manage your subcontractors
